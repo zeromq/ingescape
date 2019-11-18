@@ -39,5 +39,6 @@
         <file>qml/popup/DatabaseConfigurationPopup.qml</file>
         <file>resources/SVG/ingescape_assessments-pictos.svg</file>
         <file>qml/popup/CreateDependentVariablePopup.qml</file>
+        <file>qml/task_instance/ActionsList.qml</file>
     </qresource>
 </RCC>
