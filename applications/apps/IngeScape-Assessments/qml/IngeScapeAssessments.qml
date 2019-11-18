@@ -313,7 +313,7 @@ Item {
 
         anchors.centerIn: parent
 
-        //licenseController: IngeScapeAssessmentsC.licensesC
+        licenseController: IngeScapeAssessmentsC.licensesC
     }
 
 

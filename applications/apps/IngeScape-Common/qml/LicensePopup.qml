@@ -410,7 +410,7 @@ I2PopupBase {
                 verticalCenter: parent.verticalCenter
             }
 
-            text: "No license file found.\nThe editor is running un demo mode with limitations.\n\n\n\nTo change this, please set the license directory above,\ndrop a license file here \nor use the \"Import...\" button below."
+            text: "No license file found.\nThe editor is running in demo mode with limitations.\n\n\n\nTo change this, please set the license directory above,\ndrop a license file here \nor use the \"Import...\" button below."
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
 

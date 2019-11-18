@@ -748,7 +748,7 @@ void IngeScapeEditorController::clearCurrentPlatform()
         // Delete all published values
         _modelManager->deleteAllPublishedValues();
 
-        // Delete all actions
+        // Delete all (models of) actions
         _modelManager->deleteAllActions();
 
         // Delete agents OFF

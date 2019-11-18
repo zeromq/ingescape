@@ -24,6 +24,7 @@
 
 #include <controller/assessmentsmodelmanager.h>
 #include <controller/networkcontroller.h>
+#include <controller/licensescontroller.h>
 #include <controller/experimentationslistcontroller.h>
 #include <controller/experimentationcontroller.h>
 #include <controller/subject/subjectscontroller.h>
@@ -63,6 +64,9 @@ class IngeScapeAssessmentsController : public QObject
 
     // Controller for network communication
     I2_QML_PROPERTY_READONLY(NetworkController*, networkC)
+
+    // Controller to manage IngeScape licenses
+    I2_QML_PROPERTY_READONLY(LicensesController*, licensesC)
 
     // Controller to manage the list of experimentations
     I2_QML_PROPERTY_READONLY(ExperimentationsListController*, experimentationsListC)
