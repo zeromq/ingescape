@@ -29,7 +29,7 @@ I2PopupBase {
     dismissOnOutsideTap: false
 
     // Our controller
-    property LicensesController licenseController: null;
+    property LicensesController licensesController: null;
 
     // Flag indicating if we prevent the user to continue to use our Application
     // We display only the button "Quit"
@@ -50,9 +50,9 @@ I2PopupBase {
     function validate() {
         console.log("QML: function validate()");
 
-        if (rootPopup.licenseController)
+        if (rootPopup.licensesController)
         {
-            rootPopup.licenseController.updateLicensesPath(txtLicensesPath.text);
+            rootPopup.licensesController.updateLicensesPath(txtLicensesPath.text);
         }
 
         // Close our popup
@@ -69,8 +69,8 @@ I2PopupBase {
     //--------------------------------------------------------
 
     onOpened: {
-        if (rootPopup.licenseController) {
-            txtLicensesPath.text = rootPopup.licenseController.licensesPath;
+        if (rootPopup.licensesController) {
+            txtLicensesPath.text = rootPopup.licensesController.licensesPath;
         }
 
         // Set the focus to catch keyboard press on Return/Escape
@@ -237,13 +237,13 @@ I2PopupBase {
                 }
 
                 onClicked: {
-                    if (rootPopup.licenseController)
+                    if (rootPopup.licensesController)
                     {
-                        var directoryPath = rootPopup.licenseController.selectLicensesDirectory();
+                        var directoryPath = rootPopup.licensesController.selectLicensesDirectory();
                         if (directoryPath) {
                             txtLicensesPath.text = directoryPath;
 
-                            rootPopup.licenseController.updateLicensesPath(directoryPath);
+                            rootPopup.licensesController.updateLicensesPath(directoryPath);
                         }
                     }
                 }
@@ -276,14 +276,14 @@ I2PopupBase {
         height: (text === "") ? 0 : 30
 
         Connections {
-            target: rootPopup.licenseController
+            target: rootPopup.licensesController
 
             onLicenseLimitationReached: {
                 errorMessage.visible = true
             }
         }
 
-        text: rootPopup.licenseController ? rootPopup.licenseController.errorMessageWhenLicenseFailed : ""
+        text: rootPopup.licensesController ? rootPopup.licensesController.errorMessageWhenLicenseFailed : ""
 
         color: IngeScapeTheme.orangeColor
         font {
@@ -318,11 +318,11 @@ I2PopupBase {
             spacing: 26
 
             LicenseInformationView {
-                licenseInformation: rootPopup.licenseController.mergedLicense
+                licenseInformation: rootPopup.licensesController.mergedLicense
             }
 
             Text {
-                text: rootPopup.licenseController ? qsTr("License details:") : ""
+                text: rootPopup.licensesController ? qsTr("License details:") : ""
 
                 color: IngeScapeTheme.whiteColor
                 font {
@@ -335,7 +335,7 @@ I2PopupBase {
 
             Repeater {
                 id: licenseDetailsRepeater
-                model: rootPopup.licenseController ? rootPopup.licenseController.licenseDetailsList : 0
+                model: rootPopup.licensesController ? rootPopup.licensesController.licenseDetailsList : 0
 
                 delegate: Column {
                     spacing: 26
@@ -457,8 +457,8 @@ I2PopupBase {
             }
 
             onClicked: {
-                if (rootPopup.licenseController) {
-                    rootPopup.licenseController.importLicense();
+                if (rootPopup.licensesController) {
+                    rootPopup.licensesController.importLicense();
                 }
             }
         }
@@ -480,9 +480,9 @@ I2PopupBase {
 
         onDropped: {
             dragHovering = false
-            if (drop.hasUrls && rootPopup.licenseController)
+            if (drop.hasUrls && rootPopup.licensesController)
             {
-                rootPopup.licenseController.addLicenses(drop.urls)
+                rootPopup.licensesController.addLicenses(drop.urls)
             }
         }
 
@@ -586,8 +586,8 @@ I2PopupBase {
 
         onConfirmed: {
             rootPopup.enabled = true;
-            if (license && rootPopup.licenseController) {
-                rootPopup.licenseController.deleteLicense(license.QtObject);
+            if (license && rootPopup.licensesController) {
+                rootPopup.licensesController.deleteLicense(license.QtObject);
             }
         }
 

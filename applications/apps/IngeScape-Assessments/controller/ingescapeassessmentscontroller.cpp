@@ -132,14 +132,14 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
 
 
     // Connect to signals from our licenses manager
-    //connect(_licensesC, &LicensesController::licensesUpdated, this, &IngeScapeEditorController::_onLicensesUpdated);
+    //connect(_licensesC, &LicensesController::licensesUpdated, this, &IngeScapeAssessmentsController::_onLicensesUpdated);
 
 
     // Connect to signals from the network controller
     connect(_networkC, &NetworkController::agentEntered, _modelManager, &AssessmentsModelManager::onAgentEntered);
     connect(_networkC, &NetworkController::agentExited, _modelManager, &AssessmentsModelManager::onAgentExited);
-    //connect(_networkC, &NetworkController::launcherEntered, _modelManager, &EditorModelManager::onLauncherEntered);
-    //connect(_networkC, &NetworkController::launcherExited, _modelManager, &EditorModelManager::onLauncherExited);
+    connect(_networkC, &NetworkController::launcherEntered, _modelManager, &AssessmentsModelManager::onLauncherEntered);
+    connect(_networkC, &NetworkController::launcherExited, _modelManager, &AssessmentsModelManager::onLauncherExited);
     connect(_networkC, &NetworkController::recorderEntered, _experimentationC, &ExperimentationController::onRecorderEntered);
     connect(_networkC, &NetworkController::recorderExited, _experimentationC, &ExperimentationController::onRecorderExited);
 
@@ -211,14 +211,14 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
 IngeScapeAssessmentsController::~IngeScapeAssessmentsController()
 {
     // Unsubscribe to OS events
-    //disconnect(OSUtils::instance(), &OSUtils::systemSleep, this, &IngeScapeEditorController::_onSystemSleep);
-    //disconnect(OSUtils::instance(), &OSUtils::systemWake, this, &IngeScapeEditorController::_onSystemWake);
-    //disconnect(OSUtils::instance(), &OSUtils::systemNetworkConfigurationsUpdated, this, &IngeScapeEditorController::_onSystemNetworkConfigurationsUpdated);
+    //disconnect(OSUtils::instance(), &OSUtils::systemSleep, this, &IngeScapeAssessmentsController::_onSystemSleep);
+    //disconnect(OSUtils::instance(), &OSUtils::systemWake, this, &IngeScapeAssessmentsController::_onSystemWake);
+    //disconnect(OSUtils::instance(), &OSUtils::systemNetworkConfigurationsUpdated, this, &IngeScapeAssessmentsController::_onSystemNetworkConfigurationsUpdated);
 
     // Unsubscribe to our application
     /*if (IngescapeApplication::instance() != nullptr)
     {
-        disconnect(IngescapeApplication::instance(), &IngescapeApplication::openFileRequest, this, &IngeScapeEditorController::_onOpenFileRequest);
+        disconnect(IngescapeApplication::instance(), &IngescapeApplication::openFileRequest, this, &IngeScapeAssessmentsController::_onOpenFileRequest);
     }*/
 
 

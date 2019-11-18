@@ -576,30 +576,5 @@ ApplicationWindow {
         SystemInformationPopup {
             id: systemInformationPopup
         }
-
-
-        // Save before quit popup
-        /*Popups.SaveBeforeQuitPopup {
-            id: saveBeforeQuitPopup
-
-            anchors.centerIn: parent
-
-            // Save the changes to the currently opened platform and quit
-            onSaveAs: {
-                IngeScapeEditorC.selectFileToSavePlatform();
-
-                mainWindow.forceClose = true;
-                mainWindow.close();
-            }
-
-            // Discard all unsaved changes and quit
-            onDiscard: {
-                mainWindow.forceClose = true;
-                mainWindow.close();
-            }
-
-            // Cancel the closing procedure and keep the editor open
-            onCancel: {}
-        }*/
     }
 }

@@ -313,7 +313,24 @@ Item {
 
         anchors.centerIn: parent
 
-        licenseController: IngeScapeAssessmentsC.licensesC
+        licensesController: IngeScapeAssessmentsC.licensesC
+    }
+
+
+    //
+    // Popup displayed when an event occurs about the license(s)
+    //
+    LicenseEventPopup {
+        id: licenseEventPopup
+
+        licensesController: IngeScapeAssessmentsC.licensesC
+
+        onClosed: {
+            console.log("Popup displayed when an event occurs about the license(s) has just been closed");
+
+            licensePopup.allowsOnlyQuit = true;
+            licensePopup.open();
+        }
     }
 
 
