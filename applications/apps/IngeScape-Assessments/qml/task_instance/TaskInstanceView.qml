@@ -451,23 +451,24 @@ Item {
                 }
 
                 Tab {
-                    id: tabAgents
-                    title: qsTr("AGENTS")
-                    active: true
-
-                    Rectangle {
-                        color: IngeScapeTheme.veryDarkGreyColor
-
-                    }
-                }
-
-                Tab {
                     id: tabActions
                     anchors.fill: parent
                     title: qsTr("ACTIONS")
                     active : true
 
                     ActionsList {
+                        id: actionsList
+                        taskInstanceController: rootItem.taskInstanceController
+                    }
+                }
+
+                Tab {
+                    id: tabAgents
+                    title: qsTr("AGENTS")
+                    active: true
+                    anchors.fill: parent
+
+                    AgentsList{
                         id: agentsList
                         taskInstanceController: rootItem.taskInstanceController
                     }

@@ -39,6 +39,9 @@ class TaskInstanceController : public QObject
     // The (experimentation) task instance currently selected
     I2_QML_PROPERTY_CUSTOM_SETTER(TaskInstanceM*, currentTaskInstance)
 
+    // List off all agents present in the current platform
+    I2_QOBJECT_SORTFILTERPROXY(AgentsGroupedByNameVM, allAgentsGroupedByNameInCurrentPlatform)
+
 
 public:
 

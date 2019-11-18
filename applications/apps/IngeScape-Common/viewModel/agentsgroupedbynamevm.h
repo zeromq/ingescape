@@ -70,6 +70,8 @@ class AgentsGroupedByNameVM : public QObject
     // Current mapping (real mapping without edition)
     I2_CPP_NOSIGNAL_PROPERTY(AgentMappingM*, currentMapping)
 
+    // Flag indicate if the agent is in the current platform
+    I2_QML_PROPERTY(bool, isAgentGroupedByNameInCurrentPlatform)
 
 public:
     /**

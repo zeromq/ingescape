@@ -27,6 +27,7 @@ AgentsGroupedByNameVM::AgentsGroupedByNameVM(QString agentName,
     _numberOfAgentsON(0),
     _numberOfAgentsOFF(0),
     _currentMapping(nullptr),
+    _isAgentGroupedByNameInCurrentPlatform(true),
     _canBeDeleted_whenListOfAllAgentsGroupsByDefinition_isEmpty(true),
     _agentsGroupedByDefinitionNULL(nullptr)
 
