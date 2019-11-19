@@ -29,7 +29,7 @@ Item {
 
     Rectangle {
         anchors {
-            bottom: actionsList.top
+            bottom: agentList.top
             left: parent.left
             right: parent.right
         }
@@ -40,7 +40,7 @@ Item {
     }
 
     ScrollView {
-        id: actionsList
+        id: agentList
 
         anchors {
             top: parent.top
@@ -50,14 +50,16 @@ Item {
             bottom: parent.bottom
         }
 
-        //spacing: 0
-
         style: IngeScapeScrollViewStyle {
         }
 
-         ListView {
+        // Prevent drag overshoot on Windows
+        flickableItem.boundsBehavior: Flickable.OvershootBounds
 
-            model: (rootItem.taskInstanceController && rootItem.taskInstanceController.scenarioC) ? rootItem.taskInstanceController.scenarioC.actionsList : null
+        ListView {
+            //FIXME: model should be the allAgentsGroupedByNameInCurrentPlatform list
+            //model: rootItem.taskInstanceController ? rootItem.taskInstanceController.allAgentsGroupedByNameInCurrentPlatform : null
+            model: rootItem.taskInstanceController.temp.allAgentsGroupsByName
 
             delegate: MouseArea {
                 id: mouseArea
@@ -67,32 +69,15 @@ Item {
 
                 hoverEnabled: true
 
-                ActionsListItem {
-                    id : actionInList
+                AgentsListItem {
+                    id: agentInList
 
                     anchors.fill: parent
 
-                    areActionsButtonsActivated: false
-
-                    action: model.QtObject
-                    controller: rootItem.taskInstanceController
-
-                    actionItemIsHovered: mouseArea.containsMouse
-                    actionItemIsPressed: mouseArea.pressed
+                    taskInstanceController: taskInstanceController
+                    agent: model.QtObject
                 }
 
-//                onPressed: {
-//                    if (rootItem.taskInstanceController && rootItem.taskInstanceController.scenarioC)
-//                    {
-//                        Q
-//                        if (rootItem.taskInstanceController.scenarioC.selectedAction === model.QtObject) {
-//                            rootItem.taskInstanceController.scenarioC.selectedAction = null;
-//                        }
-//                        else {
-//                            rootItem.taskInstanceController.scenarioC.selectedAction = model.QtObject;
-//                        }
-//                    }
-//                }
             }
         }
     }
