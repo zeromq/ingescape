@@ -34,6 +34,7 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     _snapshotDirectory(""),
     _modelManager(nullptr),
     _networkC(nullptr),
+    _licensesC(nullptr),
     _experimentationsListC(nullptr),
     _experimentationC(nullptr),
     _subjectsC(nullptr),
@@ -111,6 +112,9 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     // Create the controller for network communications
     _networkC = new NetworkController(this);
 
+    // Create the controller to manage IngeScape licenses
+    _licensesC = new LicensesController(this);
+
     // Create the controller to manage the list of experimentations
     _experimentationsListC = new ExperimentationsListController(this);
 
@@ -127,23 +131,40 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     _exportC = new ExportController(this);
 
 
+    // Connect to signals from our licenses manager
+    //connect(_licensesC, &LicensesController::licensesUpdated, this, &IngeScapeAssessmentsController::_onLicensesUpdated);
+
+
+    // Connect to signals from the network controller
+    connect(_networkC, &NetworkController::agentEntered, _modelManager, &AssessmentsModelManager::onAgentEntered);
+    connect(_networkC, &NetworkController::agentExited, _modelManager, &AssessmentsModelManager::onAgentExited);
+    connect(_networkC, &NetworkController::launcherEntered, _modelManager, &AssessmentsModelManager::onLauncherEntered);
+    connect(_networkC, &NetworkController::launcherExited, _modelManager, &AssessmentsModelManager::onLauncherExited);
+    connect(_networkC, &NetworkController::recorderEntered, _experimentationC, &ExperimentationController::onRecorderEntered);
+    connect(_networkC, &NetworkController::recorderExited, _experimentationC, &ExperimentationController::onRecorderExited);
+
+    connect(_networkC, &NetworkController::definitionReceived, _modelManager, &AssessmentsModelManager::onDefinitionReceived);
+    connect(_networkC, &NetworkController::mappingReceived, _modelManager, &AssessmentsModelManager::onMappingReceived);
+    connect(_networkC, &NetworkController::valuePublished, _modelManager, &AssessmentsModelManager::onValuePublished);
+
+
     // Connect to signals from the data model manager
     connect(_modelManager, &AssessmentsModelManager::isConnectedToDatabaseChanged,
             this, &IngeScapeAssessmentsController::_onIsConnectedToDatabaseChanged);
+
+    connect(_modelManager, &AssessmentsModelManager::isMappingConnectedChanged,
+            _networkC, &NetworkController::onIsMappingConnectedChanged);
+    connect(_modelManager, &AssessmentsModelManager::addInputsToOurApplicationForAgentOutputs,
+            _networkC, &NetworkController::onAddInputsToOurApplicationForAgentOutputs);
+    connect(_modelManager, &AssessmentsModelManager::removeInputsFromOurApplicationForAgentOutputs,
+            _networkC, &NetworkController::onRemoveInputsFromOurApplicationForAgentOutputs);
+
 
     // Connect to signals from the experimentation controller to the rest of the controllers
     connect(_experimentationC, &ExperimentationController::currentExperimentationChanged,
             this, &IngeScapeAssessmentsController::_onCurrentExperimentationChanged);
     connect(_experimentationC, &ExperimentationController::commandAskedToRecorder,
             _networkC, &NetworkController::onCommandAskedToRecorder);
-
-    // Connect to signals from the network controller
-    //connect(_networkC, &NetworkController::agentEntered, _modelManager, &EditorModelManager::onAgentEntered);
-    //connect(_networkC, &NetworkController::agentExited, _modelManager, &EditorModelManager::onAgentExited);
-    //connect(_networkC, &NetworkController::launcherEntered, _modelManager, &EditorModelManager::onLauncherEntered);
-    //connect(_networkC, &NetworkController::launcherExited, _modelManager, &EditorModelManager::onLauncherExited);
-    connect(_networkC, &NetworkController::recorderEntered, _experimentationC, &ExperimentationController::onRecorderEntered);
-    connect(_networkC, &NetworkController::recorderExited, _experimentationC, &ExperimentationController::onRecorderExited);
 
 
     // Update the list of available network devices
@@ -189,6 +210,18 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
 */
 IngeScapeAssessmentsController::~IngeScapeAssessmentsController()
 {
+    // Unsubscribe to OS events
+    //disconnect(OSUtils::instance(), &OSUtils::systemSleep, this, &IngeScapeAssessmentsController::_onSystemSleep);
+    //disconnect(OSUtils::instance(), &OSUtils::systemWake, this, &IngeScapeAssessmentsController::_onSystemWake);
+    //disconnect(OSUtils::instance(), &OSUtils::systemNetworkConfigurationsUpdated, this, &IngeScapeAssessmentsController::_onSystemNetworkConfigurationsUpdated);
+
+    // Unsubscribe to our application
+    /*if (IngescapeApplication::instance() != nullptr)
+    {
+        disconnect(IngescapeApplication::instance(), &IngescapeApplication::openFileRequest, this, &IngeScapeAssessmentsController::_onOpenFileRequest);
+    }*/
+
+
     //
     // Clean-up our TerminationSignalWatcher first
     //
@@ -262,6 +295,16 @@ IngeScapeAssessmentsController::~IngeScapeAssessmentsController()
 
         NetworkController* temp = _networkC;
         setnetworkC(nullptr);
+        delete temp;
+        temp = nullptr;
+    }
+
+    if (_licensesC != nullptr)
+    {
+        disconnect(_licensesC);
+
+        LicensesController* temp = _licensesC;
+        setlicensesC(nullptr);
         delete temp;
         temp = nullptr;
     }

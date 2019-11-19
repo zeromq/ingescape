@@ -130,7 +130,7 @@ void registerCustomQmlTypes()
     //----------------
     //qmlRegisterUncreatableType<LogsSortFilter>("INGESCAPE", 1, 0, "LogsSortFilter", "Internal class");
     //qmlRegisterUncreatableType<ValuesHistorySortFilter>("INGESCAPE", 1, 0, "ValuesHistorySortFilter", "Internal class");
-
+    qmlRegisterUncreatableType<AreAgentsInPlatformFilter>("INGESCAPE", 1, 0, "AreAgentsInPlatformFilter", "Internal class");
 
     //----------------
     //
@@ -148,11 +148,9 @@ void registerCustomQmlTypes()
     //----------------
     qmlRegisterUncreatableType<AgentNameAndOutputsM>("INGESCAPE", 1, 0, "AgentNameAndOutputsM", "Internal class");
     qmlRegisterUncreatableType<AssessmentsEnums>("INGESCAPE", 1, 0, "AssessmentsEnums", "Internal class");
-    //qmlRegisterUncreatableType<CharacteristicEnumM>("INGESCAPE", 1, 0, "CharacteristicEnumM", "Internal class");
     qmlRegisterUncreatableType<CharacteristicM>("INGESCAPE", 1, 0, "CharacteristicM", "Internal class");
     qmlRegisterUncreatableType<DependentVariableM>("INGESCAPE", 1, 0, "DependentVariableM", "Internal class");
     qmlRegisterUncreatableType<ExperimentationM>("INGESCAPE", 1, 0, "ExperimentationM", "Internal class");
-    //qmlRegisterUncreatableType<IndependentVariableEnumM>("INGESCAPE", 1, 0, "IndependentVariableEnumM", "Internal class");
     qmlRegisterUncreatableType<IndependentVariableM>("INGESCAPE", 1, 0, "IndependentVariableM", "Internal class");
     qmlRegisterUncreatableType<TaskInstanceM>("INGESCAPE", 1, 0, "TaskInstanceM", "Internal class");
     qmlRegisterUncreatableType<SubjectM>("INGESCAPE", 1, 0, "SubjectM", "Internal class");

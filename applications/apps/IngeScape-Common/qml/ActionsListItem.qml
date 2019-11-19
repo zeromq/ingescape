@@ -20,6 +20,9 @@ Item {
     // Controller associated to our view
     property var controller: null;
 
+    // Use type "var" instead of a type inside Editor app (null inside Assessments app)
+    property var agentsMappingController: null;
+
     // Model of action
     property var action: null;
 
@@ -31,6 +34,9 @@ Item {
 
     // Flag indicating if our action is selected
     property bool actionItemIsSelected: controller && action && (controller.selectedAction === action);
+
+    // Flag indicating if option buttons should be loaded
+    property bool areActionsButtonsActivated: true;
 
     //width: parent.width
     height: 42
@@ -98,7 +104,8 @@ Item {
             svgFileCache: IngeScapeTheme.svgFileIngeScape
             svgElementId: rootItem.actionItemIsPressed ? "grip-drag-drop-rollover-pressed" : "grip-drag-drop-rollover"
 
-            visible: rootItem.actionItemIsHovered
+            visible: rootItem.actionItemIsHovered && areActionsButtonsActivated
+            enabled: areActionsButtonsActivated
         }
 
         // Feedback visible if all conditions are valids
@@ -133,16 +140,25 @@ Item {
             hoverEnabled: true
 
             onClicked: {
-                if (controller && rootItem.action) {
+                if (controller && rootItem.action && areActionsButtonsActivated) {
                     // Open the editor of our action
                     controller.openActionEditorWithModel(rootItem.action);
+                }else if(controller && controller.scenarioC && rootItem.action ){
+                    console.log("QML: play action '" + rootItem.action.name + "'");
+                    controller.scenarioC.executeEffectsOfAction(rootItem.action);
                 }
             }
 
             TextMetrics {
                 id: textMetrics_ActionName
 
-                elideWidth: rootItem.width - btnActionName.anchors.leftMargin - rightRow.width - rightRow.anchors.rightMargin - 5
+                elideWidth: {
+                    if (areActionsButtonsActivated){
+                        rootItem.width - btnActionName.anchors.leftMargin - rowButtonLoader.width - rowButtonLoader.anchors.rightMargin - 5
+                    }else{
+                        rootItem.width - btnActionName.anchors.leftMargin - 5
+                    }
+                }
                 elide: Text.ElideRight
 
                 text: rootItem.action ? rootItem.action.name : ""
@@ -175,83 +191,17 @@ Item {
                 visible: btnActionName.containsMouse
                 color: actionName.color
             }
-        }
+       }
 
-        Row {
-            id: rightRow
-
+        Loader{
+            id: rowButtonLoader
             anchors {
-                top: parent.top
+                top : parent.top
                 bottom: parent.bottom
                 right: parent.right
-                rightMargin: 6
             }
 
-            spacing: 12
-
-            LabellessSvgButton {
-                id: playButton
-
-                anchors.verticalCenter: parent.verticalCenter
-
-                visible: rootItem.actionItemIsHovered || popupActionOptions.isOpened
-
-                pressedID: releasedID + "-pressed"
-                releasedID: "list-play"
-                disabledID: releasedID
-
-                onClicked: {
-                    console.log("QML: play action '" + rootItem.action.name + "'");
-                    if (controller) {
-                        controller.executeEffectsOfAction(rootItem.action);
-                    }
-                }
-            }
-
-            LabellessSvgButton {
-                id: btnOptions
-
-                anchors.verticalCenter: parent.verticalCenter
-
-                visible: rootItem.actionItemIsHovered || popupActionOptions.isOpened
-
-                releasedID: "button-options"
-                pressedID: releasedID + "-pressed"
-                disabledID : releasedID
-
-                onClicked: {
-                    popupActionOptions.openInScreen();
-                }
-            }
-
-            LabellessSvgButton {
-                id: removeButton
-
-                anchors.verticalCenter: parent.verticalCenter
-
-                //visible: rootItem.actionItemIsSelected
-                visible: rootItem.actionItemIsHovered || popupActionOptions.isOpened
-
-                pressedID: releasedID + "-pressed"
-                releasedID: "delete"
-                disabledID: releasedID
-
-                onClicked: {
-                    if (controller && rootItem.action)
-                    {
-                        // FIXME: Common does not access to IngeScapeEditorC
-                        if (controller.isActionInsertedInTimeLine(rootItem.action)
-                                || IngeScapeEditorC.agentsMappingC.isActionInsertedInMapping(rootItem.action))
-                        {
-                            rootItem.needConfirmationToDeleteAction(rootItem.action);
-                        }
-                        else {
-                            // Delete our action
-                            controller.deleteAction(rootItem.action);
-                        }
-                    }
-                }
-            }
+            sourceComponent: areActionsButtonsActivated ? componentRowButton : null
         }
     }
 
@@ -328,6 +278,89 @@ Item {
                             rootItem.controller.openActionEditorToDuplicateModel(rootItem.action);
                         }
                         popupActionOptions.close();
+                    }
+                }
+            }
+        }
+    }
+
+
+    Component{
+        id: componentRowButton
+
+        Row {
+            id: rightRow
+
+            anchors {
+                top: parent.top
+                bottom: parent.bottom
+                right: parent.right
+                rightMargin: 6
+            }
+
+            spacing: 12
+
+            LabellessSvgButton {
+                id: playButton
+
+                anchors.verticalCenter: parent.verticalCenter
+
+                visible: rootItem.actionItemIsHovered || popupActionOptions.isOpened
+
+                pressedID: releasedID + "-pressed"
+                releasedID: "list-play"
+                disabledID: releasedID
+
+                onClicked: {
+                    console.log("QML: play action '" + rootItem.action.name + "'");
+                    if (controller) {
+                        controller.executeEffectsOfAction(rootItem.action);
+                    }
+                }
+            }
+
+            LabellessSvgButton {
+                id: btnOptions
+
+                anchors.verticalCenter: parent.verticalCenter
+
+                visible: rootItem.actionItemIsHovered || popupActionOptions.isOpened
+
+                releasedID: "button-options"
+                pressedID: releasedID + "-pressed"
+                disabledID : releasedID
+
+                onClicked: {
+                    popupActionOptions.openInScreen();
+                }
+            }
+
+            LabellessSvgButton {
+                id: removeButton
+
+                anchors.verticalCenter: parent.verticalCenter
+
+                //visible: rootItem.actionItemIsSelected
+                visible: rootItem.actionItemIsHovered || popupActionOptions.isOpened
+
+                pressedID: releasedID + "-pressed"
+                releasedID: "delete"
+                disabledID: releasedID
+
+                onClicked: {
+                    if (controller && rootItem.action)
+                    {
+                        if (controller.isActionInsertedInTimeLine(rootItem.action)
+                                || (rootItem.agentsMappingController && rootItem.agentsMappingController.isActionInsertedInMapping(rootItem.action)))
+                        {
+                            // We need a confirmation to delete the action
+                            rootItem.needConfirmationToDeleteAction(rootItem.action);
+                        }
+                        else
+                        {
+                            // Delete our action
+                            controller.deleteAction(rootItem.action);
+                        }
                     }
                 }
             }

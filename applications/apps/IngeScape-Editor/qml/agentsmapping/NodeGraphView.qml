@@ -288,7 +288,7 @@ Item {
     Connections {
         target: IngeScapeEditorC
 
-        onResetMappindAndTimeLineViews: {
+        onResetMappindView: {
             rootItem.showAll();
         }
     }

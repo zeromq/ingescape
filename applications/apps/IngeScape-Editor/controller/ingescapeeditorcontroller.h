@@ -271,9 +271,15 @@ Q_SIGNALS:
 
 
     /**
-      * @brief Signal emitted to reset the mapping and timeline views
+      * @brief Signal emitted to reset the mapping view
       */
-    void resetMappindAndTimeLineViews();
+    void resetMappindView();
+
+
+    /**
+      * @brief Signal emitted to reset the timeline view
+      */
+    void resetTimeLineView();
 
 
 private Q_SLOTS:

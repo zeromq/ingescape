@@ -349,6 +349,7 @@ Item {
 
                     action : model.QtObject
                     controller: rootItem.scenarioController
+                    agentsMappingController: IngeScapeEditorC.agentsMappingC
 
                     // visible: mouseArea.drag.active
 
@@ -452,6 +453,7 @@ Item {
 
                             action: model.QtObject
                             controller: rootItem.scenarioController
+                            agentsMappingController: IngeScapeEditorC.agentsMappingC
 
                             actionItemIsHovered: mouseArea.containsMouse /*|| dragArea.containsMouse*/
                             actionItemIsPressed: mouseArea.pressed /*|| dragArea.pressed*/

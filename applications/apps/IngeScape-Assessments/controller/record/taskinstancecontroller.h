@@ -22,6 +22,9 @@
 #include <model/jsonhelper.h>
 #include <model/taskinstancem.h>
 
+#include <controller/assessmentsmodelmanager.h>
+#include <sortFilter/areagentsinplatformfilter.h>
+
 
 /**
  * @brief The TaskInstanceController class defines the controller to manage a record of the current experimentation
@@ -38,6 +41,9 @@ class TaskInstanceController : public QObject
 
     // The (experimentation) task instance currently selected
     I2_QML_PROPERTY_CUSTOM_SETTER(TaskInstanceM*, currentTaskInstance)
+
+    // List off all agents present in the current platform
+    Q_PROPERTY(AreAgentsInPlatformFilter* agentsGroupedByNameInCurrentPlatform READ agentsGroupedByNameInCurrentPlatform CONSTANT)
 
 
 public:
@@ -63,6 +69,11 @@ public:
      */
     Q_INVOKABLE void addNewAttachements(const QList<QUrl>& urlList);
 
+    AreAgentsInPlatformFilter* agentsGroupedByNameInCurrentPlatform()
+    {
+        return &_agentsGroupedByNameInCurrentPlatform;
+    }
+
 
 private Q_SLOTS:
 
@@ -77,7 +88,7 @@ private Q_SLOTS:
 private:
     // Helper to manage JSON files
     JsonHelper* _jsonHelper;
-
+    AreAgentsInPlatformFilter _agentsGroupedByNameInCurrentPlatform;
 };
 
 QML_DECLARE_TYPE(TaskInstanceController)

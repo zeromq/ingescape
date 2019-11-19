@@ -23,6 +23,8 @@
 
 #include "I2PropertyHelpers.h"
 #include <model/enums.h>
+#include <model/publishedvaluem.h>
+#include <model/agent/agentm.h>
 
 
 extern "C" {
@@ -58,6 +60,9 @@ class IngeScapeNetworkController: public QObject
     // NB: this flags exists to allow each application based on IngeScape-Common to define its own behavior
     //     By default, this property is set to false
     I2_QML_PROPERTY(bool, automaticallyStartStopOnMonitorEvents)
+
+    // Model of our agent "IngeScape"
+    I2_QML_PROPERTY_READONLY(AgentM*, agentModel)
 
     // Number of each type of IngeScape applications
     I2_QML_PROPERTY_READONLY(int, numberOfAgents)
@@ -334,6 +339,13 @@ Q_SIGNALS:
     void mappingReceived(QString peerId, QString peerName, QString mappingJSON);
 
 
+    /**
+     * @brief Signal emitted when a new value is published
+     * @param publishedValue
+     */
+    void valuePublished(PublishedValueM* publishedValue);
+
+
 public Q_SLOTS:
 
     /**
@@ -342,6 +354,31 @@ public Q_SLOTS:
      * @param commandAndParameters
      */
     void onCommandAskedToRecorder(QString peerIdOfRecorder, QString commandAndParameters);
+
+
+    /**
+     * @brief Slot called when the flag "is Mapping Activated" changed
+     * @param isMappingConnected
+     */
+    void onIsMappingConnectedChanged(bool isMappingConnected);
+
+
+    /**
+     * @brief Slot called when inputs must be added to our application for a list of agent outputs
+     * @param agentName
+     * @param newOutputsIds
+     * @param isMappingConnected
+     */
+    void onAddInputsToOurApplicationForAgentOutputs(QString agentName, QStringList newOutputsIds, bool isMappingConnected);
+
+
+    /**
+     * @brief Slot called when inputs must be removed from our application for a list of agent outputs
+     * @param agentName
+     * @param oldOutputsIds
+     * @param isMappingConnected
+     */
+    void onRemoveInputsFromOurApplicationForAgentOutputs(QString agentName, QStringList oldOutputsIds, bool isMappingConnected);
 
 
 protected:

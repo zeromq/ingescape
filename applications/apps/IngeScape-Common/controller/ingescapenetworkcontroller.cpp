@@ -27,6 +27,8 @@
 // Suffix used by IngeScape launcher
 static const QString suffix_Launcher = ".ingescapelauncher";
 
+static const int PUBLISHED_VALUE_MAXIMUM_STRING_LENGTH = 4096;
+
 
 /**
  * @brief Callback for incomming messages on the bus
@@ -438,6 +440,134 @@ void onMonitorCallback(igs_monitorEvent_t event, const char *device, const char 
 }
 
 
+/**
+ * @brief Callback for Observing Inputs of our agent "IngeScape Editor"
+ * @param iopType
+ * @param name
+ * @param valueType
+ * @param value
+ * @param valueSize
+ * @param myData
+ */
+void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType, void* value, size_t valueSize, void* myData)
+{
+    Q_UNUSED(value)
+    Q_UNUSED(valueSize)
+
+    IngeScapeNetworkController* networkController = static_cast<IngeScapeNetworkController*>(myData);
+    if (networkController != nullptr)
+    {
+        if (iopType == IGS_INPUT_T)
+        {
+            QString inputName(name);
+
+            QStringList agentNameAndIOP = inputName.split(SEPARATOR_AGENT_NAME_AND_IOP);
+            if (agentNameAndIOP.count() == 2)
+            {
+                QString outputAgentName = agentNameAndIOP.at(0);
+                QString outputId = agentNameAndIOP.at(1);
+
+                AgentIOPValueTypes::Value agentIOPValueType = static_cast<AgentIOPValueTypes::Value>(valueType);
+                QVariant currentValue = QVariant();
+                bool isValid = false;
+
+                switch (valueType)
+                {
+                // INTEGER
+                case IGS_INTEGER_T: {
+                    int newValue = *(static_cast<int *>(value));
+
+                    currentValue = QVariant(newValue);
+                    isValid = true;
+
+                    //qDebug() << "New value" << newValue << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                    break;
+                }
+                // DOUBLE
+                case IGS_DOUBLE_T: {
+                    double newValue = *(static_cast<double*>(value));
+
+                    currentValue = QVariant(newValue);
+                    isValid = true;
+
+                    //qDebug() << "New value" << newValue << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                    break;
+                }
+                // STRING
+                case IGS_STRING_T: {
+                    char *rawNewValue = static_cast<char *>(value);
+                    QString newValue = QString::fromUtf8(rawNewValue, qMin(static_cast<int>(strlen(rawNewValue)), PUBLISHED_VALUE_MAXIMUM_STRING_LENGTH));
+
+                    currentValue = QVariant(newValue);
+                    isValid = true;
+
+                    //qDebug() << "New value" << newValue << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                    break;
+                }
+                // BOOL
+                case IGS_BOOL_T: {
+                    bool newValue = *(static_cast<bool*>(value));
+
+                    currentValue = QVariant(newValue);
+                    isValid = true;
+
+                    //qDebug() << "New value" << newValue << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                    break;
+                }
+                // IMPULSION
+                case IGS_IMPULSION_T: {
+                    isValid = true;
+
+                    //qDebug() << "New IMPULSION received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                    break;
+                }
+                // DATA
+                case IGS_DATA_T: {
+                    // On peut utiliser directement value plutôt que de re-générer un tableau de bytes ??
+                    // On stocke dans un dossier le media (eg video, son, image) et on log le path et le start time ??
+                    //void* data = NULL;
+                    //int result = igs_readInputAsData(name, &data, &valueSize);
+                    //if (result == 1) {
+                        // data must be a char* to have automatic conversion
+                        //QByteArray newValue = QByteArray(data, valueSize);
+                        //currentValue = QVariant(newValue);
+                        //isValid = true;
+
+                        //qDebug() << "New DATA with size" << valueSize << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                    //}
+                    //else {
+                    //    qCritical() << "Can NOT read input" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType) << "(DATA of size:" << valueSize << ")";
+                    //}
+
+                    isValid = true;
+
+                    break;
+                }
+                default: {
+                    break;
+                }
+                }
+
+                if (isValid)
+                {
+                    PublishedValueM* publishedValue = new PublishedValueM(QDateTime::currentDateTime(),
+                                                                          outputAgentName,
+                                                                          outputId,
+                                                                          agentIOPValueType,
+                                                                          currentValue);
+
+                    // Emit the signal "Value Published"
+                    Q_EMIT networkController->valuePublished(publishedValue);
+                }
+                else {
+                    qCritical() << "Can NOT read input" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                }
+            }
+        }
+    }
+}
+
+
 //--------------------------------------------------------------
 //
 // IngeScape Network Controller
@@ -453,6 +583,7 @@ IngeScapeNetworkController::IngeScapeNetworkController(QObject *parent) : QObjec
     _isStarted(false),
     _isOnline(false),
     _automaticallyStartStopOnMonitorEvents(false),
+    _agentModel(nullptr),
     _numberOfAgents(0),
     _numberOfLaunchers(0),
     _numberOfRecorders(0),
@@ -512,6 +643,16 @@ IngeScapeNetworkController::IngeScapeNetworkController(QObject *parent) : QObjec
     if (result == 0) {
         qCritical() << "The callback on zyre messages has NOT been registered !";
     }
+
+    // Create the model of our agent "IngeScape"
+    _agentModel = new AgentM(_igsAgentApplicationName);
+
+    QString definitionDescription = QString("Definition of %1 made by %2").arg(_igsAgentApplicationName, organizationName);
+    DefinitionM* agentDefinition = new DefinitionM(_igsAgentApplicationName,
+                                                   version,
+                                                   definitionDescription);
+
+    _agentModel->setdefinition(agentDefinition);
 }
 
 
@@ -525,6 +666,14 @@ IngeScapeNetworkController::~IngeScapeNetworkController()
 
     // Stop our IngeScape agent
     stop();
+
+    // Delete the model of our agent "IngeScape Editor"
+    if (_agentModel != nullptr)
+    {
+        AgentM* temp = _agentModel;
+        setagentModel(nullptr);
+        delete temp;
+    }
 }
 
 
@@ -788,6 +937,21 @@ void IngeScapeNetworkController::manageWhisperedMessage(QString peerId, QString 
     std::unique_ptr<char> zmsg_str(zmsg_popstr(zMessage));
     QString message(zmsg_str.get());
 
+    // An agent DEFINITION has been received
+    /*if (message.startsWith(prefix_Definition))
+    {
+        QString definitionJSON = message.remove(0, prefix_Definition.length());
+
+        Q_EMIT definitionReceived(peerId, peerName, definitionJSON);
+    }
+    // An agent MAPPING has been received
+    else if (message.startsWith(prefix_Mapping))
+    {
+        QString mappingJSON = message.remove(0, prefix_Mapping.length());
+
+        Q_EMIT mappingReceived(peerId, peerName, mappingJSON);
+    }*/
+
     qDebug() << "Not yet managed WHISPERED message '" << message << "' for agent" << peerName << "(" << peerId << ")";
 }
 
@@ -805,5 +969,230 @@ void IngeScapeNetworkController::onCommandAskedToRecorder(QString peerIdOfRecord
         int success = igs_busSendStringToAgent(peerIdOfRecorder.toStdString().c_str(), "%s", commandAndParameters.toStdString().c_str());
 
         qInfo() << "Send command (and parameters)" << commandAndParameters << "to recorder" << peerIdOfRecorder << "with success ?" << success;
+    }
+}
+
+
+/**
+ * @brief Slot called when the flag "is Mapping Activated" changed
+ * @param isMappingConnected
+ */
+void IngeScapeNetworkController::onIsMappingConnectedChanged(bool isMappingConnected)
+{
+    if ((_agentModel != nullptr) && (_agentModel->definition() != nullptr))
+    {
+        for (AgentIOPM* input : _agentModel->definition()->inputsList()->toList())
+        {
+            if (input != nullptr)
+            {
+                QString inputName = input->name();
+
+                QStringList agentNameAndIOP = inputName.split(SEPARATOR_AGENT_NAME_AND_IOP);
+                if (agentNameAndIOP.count() == 2)
+                {
+                    QString outputAgentName = agentNameAndIOP.at(0);
+                    QString outputId = agentNameAndIOP.at(1);
+
+                    // Get the name and the value type of the output from its id
+                    QPair<QString, AgentIOPValueTypes::Value> pair = AgentIOPM::getNameAndValueTypeFromId(outputId);
+
+                    if (!pair.first.isEmpty() && (pair.second != AgentIOPValueTypes::UNKNOWN))
+                    {
+                        QString outputName = pair.first;
+                        //AgentIOPValueTypes::Value valueType = pair.second;
+
+                        // Mapping Activated (Connected)
+                        if (isMappingConnected)
+                        {
+                            // Add mapping between our input and this output
+                            unsigned long id = igs_addMappingEntry(inputName.toStdString().c_str(), outputAgentName.toStdString().c_str(), outputName.toStdString().c_str());
+
+                            if (id > 0) {
+                                //qDebug() << "Mapping added between output" << outputName << "of agent" << outputAgentName << "and input" << inputName << "of agent" << _igsAgentApplicationName << "(id" << id << ")";
+                            }
+                            else {
+                                qCritical() << "Can NOT add mapping between output" << outputName << "of agent" << outputAgentName << "and input" << inputName << "of agent" << _igsAgentApplicationName << "Error code:" << id;
+                            }
+                        }
+                        // Mapping DE-activated (DIS-connected)
+                        else
+                        {
+                            // Remove mapping between our input and this output
+                            int resultRemoveMappingEntry = igs_removeMappingEntryWithName(inputName.toStdString().c_str(), outputAgentName.toStdString().c_str(), outputName.toStdString().c_str());
+
+                            if (resultRemoveMappingEntry == 1)
+                            {
+                                //qDebug() << "Mapping removed between output" << outputName << "of agent" << outputAgentName << "and input" << inputName << "of agent" << _igsAgentApplicationName;
+                            }
+                            else {
+                                qCritical() << "Can NOT remove mapping between output" << outputName << "of agent" << outputAgentName << "and input" << inputName << "of agent" << _igsAgentApplicationName << "Error code:" << resultRemoveMappingEntry;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+/**
+ * @brief Slot called when inputs must be added to our application for a list of agent outputs
+ * @param agentName
+ * @param newOutputsIds
+ * @param isMappingConnected
+ */
+void IngeScapeNetworkController::onAddInputsToOurApplicationForAgentOutputs(QString agentName, QStringList newOutputsIds, bool isMappingConnected)
+{
+    if ((_agentModel != nullptr) && (_agentModel->definition() != nullptr) && !newOutputsIds.isEmpty())
+    {
+        for (QString outputId : newOutputsIds)
+        {
+            // Get the name and the value type of the output from its id
+            QPair<QString, AgentIOPValueTypes::Value> pair = AgentIOPM::getNameAndValueTypeFromId(outputId);
+
+            if (!pair.first.isEmpty() && (pair.second != AgentIOPValueTypes::UNKNOWN))
+            {
+                QString outputName = pair.first;
+                AgentIOPValueTypes::Value valueType = pair.second;
+
+                QString inputName = QString("%1%2%3").arg(agentName, SEPARATOR_AGENT_NAME_AND_IOP, outputId);
+
+                int resultCreateInput = 0;
+
+                switch (valueType)
+                {
+                case AgentIOPValueTypes::INTEGER: {
+                    resultCreateInput = igs_createInput(inputName.toStdString().c_str(), IGS_INTEGER_T, nullptr, 0);
+                    break;
+                }
+                case AgentIOPValueTypes::DOUBLE: {
+                    resultCreateInput = igs_createInput(inputName.toStdString().c_str(), IGS_DOUBLE_T, nullptr, 0);
+                    break;
+                }
+                case AgentIOPValueTypes::STRING: {
+                    resultCreateInput = igs_createInput(inputName.toStdString().c_str(), IGS_STRING_T, nullptr, 0);
+                    break;
+                }
+                case AgentIOPValueTypes::BOOL: {
+                    resultCreateInput = igs_createInput(inputName.toStdString().c_str(), IGS_BOOL_T, nullptr, 0);
+                    break;
+                }
+                case AgentIOPValueTypes::IMPULSION: {
+                    resultCreateInput = igs_createInput(inputName.toStdString().c_str(), IGS_IMPULSION_T, nullptr, 0);
+                    break;
+                }
+                case AgentIOPValueTypes::DATA: {
+                    resultCreateInput = igs_createInput(inputName.toStdString().c_str(), IGS_DATA_T, nullptr, 0);
+                    break;
+                }
+                default: {
+                    qCritical() << "Wrong type for the value of output" << outputName << "of agent" << agentName;
+                    break;
+                }
+                }
+
+                if (resultCreateInput == 1)
+                {
+                    qDebug() << "Input" << inputName << "created on agent" << _igsAgentApplicationName << "with value type" << AgentIOPValueTypes::staticEnumToString(valueType);
+
+                    // Create a new model of input
+                    AgentIOPM* input = new AgentIOPM(AgentIOPTypes::INPUT, inputName, valueType);
+
+                    // Add the input to the definition of our agent "IngeScape Editor"
+                    _agentModel->definition()->inputsList()->append(input);
+
+                    // Begin the observe of this input
+                    int resultObserveInput = igs_observeInput(inputName.toStdString().c_str(), onObserveInputCallback, this);
+
+                    if (resultObserveInput == 1) {
+                        //qDebug() << "Observe input" << inputName << "on agent" << _igsAgentApplicationName;
+                    }
+                    else {
+                        qCritical() << "Can NOT observe input" << inputName << "on agent" << _igsAgentApplicationName << "Error code:" << resultObserveInput;
+                    }
+
+                    // The mapping is activated (connected)
+                    if (isMappingConnected)
+                    {
+                        // Add mapping between our input and this output
+                        unsigned long id = igs_addMappingEntry(inputName.toStdString().c_str(), agentName.toStdString().c_str(), outputName.toStdString().c_str());
+
+                        if (id > 0) {
+                            //qDebug() << "Mapping added between output" << outputName << "of agent" << agentName << "and input" << inputName << "of agent" << _igsAgentApplicationName << "(id" << id << ")";
+                        }
+                        else {
+                            qCritical() << "Can NOT add mapping between output" << outputName << "of agent" << agentName << "and input" << inputName << "of agent" << _igsAgentApplicationName << "Error code:" << id;
+                        }
+                    }
+                }
+                else {
+                    qCritical() << "Can NOT create input" << inputName << "on agent" << _igsAgentApplicationName << "with value type" << AgentIOPValueTypes::staticEnumToString(valueType) << "Error code:" << resultCreateInput;
+                }
+            }
+        }
+    }
+}
+
+
+/**
+ * @brief Slot called when inputs must be removed from our application for a list of agent outputs
+ * @param agentName
+ * @param oldOutputsIds
+ * @param isMappingConnected
+ */
+void IngeScapeNetworkController::onRemoveInputsFromOurApplicationForAgentOutputs(QString agentName, QStringList oldOutputsIds, bool isMappingConnected)
+{
+    Q_UNUSED(isMappingConnected)
+
+    if ((_agentModel != nullptr) && (_agentModel->definition() != nullptr) && !oldOutputsIds.isEmpty())
+    {
+        for (QString outputId : oldOutputsIds)
+        {
+            // Get the name and the value type of the output from its id
+            QPair<QString, AgentIOPValueTypes::Value> pair = AgentIOPM::getNameAndValueTypeFromId(outputId);
+
+            if (!pair.first.isEmpty() && (pair.second != AgentIOPValueTypes::UNKNOWN))
+            {
+                QString outputName = pair.first;
+                AgentIOPValueTypes::Value valueType = pair.second;
+
+                QString inputName = QString("%1%2%3").arg(agentName, SEPARATOR_AGENT_NAME_AND_IOP, outputId);
+
+                // The mapping is activated (connected)
+                //if (isMappingConnected)
+                //{
+                // Remove mapping between our input and this output
+                int resultRemoveMappingEntry = igs_removeMappingEntryWithName(inputName.toStdString().c_str(), agentName.toStdString().c_str(), outputName.toStdString().c_str());
+
+                if (resultRemoveMappingEntry == 1)
+                {
+                    //qDebug() << "Mapping removed between output" << outputName << "of agent" << agentName << "and input" << inputName << "of agent" << _igsAgentApplicationName;
+                }
+                else {
+                    qCritical() << "Can NOT remove mapping between output" << outputName << "of agent" << agentName << "and input" << inputName << "of agent" << _igsAgentApplicationName << "Error code:" << resultRemoveMappingEntry;
+                }
+                //}
+
+                // Remove our input
+                int resultRemoveInput = igs_removeInput(inputName.toStdString().c_str());
+
+                if (resultRemoveInput == 1)
+                {
+                    qDebug() << "Input" << inputName << "removed on agent" << _igsAgentApplicationName << "with value type" << AgentIOPValueTypes::staticEnumToString(valueType);
+
+                    // Get the Input with its name
+                    AgentIOPM* input = _agentModel->definition()->getInputWithName(inputName);
+                    if (input != nullptr)
+                    {
+                        // Remove the input from the definition of our agent "IngeScape Editor"
+                        _agentModel->definition()->inputsList()->remove(input);
+                    }
+                }
+                else {
+                    qCritical() << "Can NOT remove input" << inputName << "on agent" << _igsAgentApplicationName << "with value type" << AgentIOPValueTypes::staticEnumToString(valueType) << "Error code:" << resultRemoveInput;
+                }
+            }
+        }
     }
 }

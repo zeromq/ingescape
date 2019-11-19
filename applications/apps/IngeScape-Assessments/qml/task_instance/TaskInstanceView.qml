@@ -89,11 +89,11 @@ Item {
     Rectangle {
         id: actionsRightShadow
 
-        x: actionsPanel.width - (width / 2) + height / 2
-        y: actionsPanel.y + (actionsPanel.height / 2) - height / 2
+        x: leftPanel.width - (width / 2) + height / 2
+        y: leftPanel.y + (leftPanel.height / 2) - height / 2
 
         height: 8
-        width: actionsPanel.height
+        width: leftPanel.height
         rotation: -90
 
         gradient: Gradient {
@@ -109,7 +109,7 @@ Item {
         id: timeline
 
         anchors {
-            left: actionsPanel.right
+            left: leftPanel.right
             right: parent.right
             bottom: parent.bottom
         }
@@ -117,6 +117,8 @@ Item {
 
         scenarioController: rootItem.taskInstanceController ? rootItem.taskInstanceController.scenarioC : null;
         timeLineController: rootItem.taskInstanceController ? rootItem.taskInstanceController.timeLineC : null;
+        licensesController: IngeScapeAssessmentsC.licensesC
+        mainController: IngeScapeAssessmentsC
 
         Rectangle {
             id: timeLineLeftShadow
@@ -379,10 +381,10 @@ Item {
     }
 
     //
-    // Actions panel
+    // Agents and actions pannel
     //
     Rectangle {
-        id: actionsPanel
+        id: leftPanel
 
         anchors {
             left: parent.left
@@ -393,106 +395,84 @@ Item {
 
         color: IngeScapeTheme.veryDarkGreyColor
 
-        // Top shadow
-        Rectangle {
+        I2CustomRectangle {
             anchors {
-                top: parent.top
-                left: parent.left
+                fill: parent
+                topMargin: 9
             }
-
-            width: parent.width - parent.border.width
-
-            height: 8
-
-            gradient: Gradient {
-                GradientStop { position: 0.0; color: IngeScapeTheme.blackColor; }
-                GradientStop { position: 1.0; color: "transparent" }
-            }
-
-        }
-
-        Text {
-            id: titleActions
-
-            anchors {
-                left: parent.left
-                leftMargin: 25
-                top: parent.top
-                topMargin: 30
-            }
-            height: 30
-
-            text: qsTr("ACTIONS")
-
-            verticalAlignment: Text.AlignVCenter
-
-            color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.labelFontFamily
-                weight: Font.Black
-                pixelSize: 24
-            }
-        }
-
-        Rectangle {
-            anchors {
-                bottom: actionsList.top
-                left: parent.left
-                right: parent.right
-            }
-
             color: IngeScapeTheme.blackColor
 
-            height: 1
-        }
+            fuzzyRadius: 8
+            topRightRadius : 5
 
-        Column {
-            id: actionsList
+            borderWidth: 1
+            borderColor: IngeScapeTheme.veryDarkGreyColor
 
-            anchors {
-                top: titleActions.bottom
-                topMargin: 10
-                left: parent.left
-                right: parent.right
-                bottom: parent.bottom
-            }
+            // tabs of left panel
+            I2TabView {
+                id : leftPanelTabs
 
-            spacing: 0
+                anchors.fill: parent
 
-            Repeater {
+                style: I2TabViewStyle {
+                    frameOverlap: 1
 
-                model: (rootItem.taskInstanceController && rootItem.taskInstanceController.scenarioC) ? rootItem.taskInstanceController.scenarioC.actionsList : null
+                    tab: I2CustomRectangle {
+                        color: styleData.selected ? IngeScapeTheme.veryDarkGreyColor : "transparent"
 
-                delegate: MouseArea {
-                    id: mouseArea
+                        implicitWidth: leftPanelTabs.width / 2
+                        implicitHeight: 26
+                        topRightRadius : 5
 
-                    width: parent.width
-                    height: 42
+                        visible: true
 
-                    hoverEnabled: true
+                        Text {
+                            id: text
 
-                    ActionsListItem {
-                        id : actionInList
+                            anchors.fill: parent
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter;
 
-                        anchors.fill: parent
+                            text: styleData.title
 
-                        action: model.QtObject
-                        controller: rootItem.taskInstanceController
+                            color: styleData.selected ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor
+                            wrapMode: Text.Wrap;
 
-                        actionItemIsHovered: mouseArea.containsMouse
-                        actionItemIsPressed: mouseArea.pressed
-                    }
-
-                    onPressed: {
-                        if (rootItem.taskInstanceController && rootItem.taskInstanceController.scenarioC)
-                        {
-                            if (rootItem.taskInstanceController.scenarioC.selectedAction === model.QtObject) {
-                                rootItem.taskInstanceController.scenarioC.selectedAction = null;
-                            }
-                            else {
-                                rootItem.taskInstanceController.scenarioC.selectedAction = model.QtObject;
+                            font {
+                                family: IngeScapeTheme.labelFontFamily;
+                                weight: Font.ExtraBold;
+                                pixelSize:18;
+                                capitalization: Font.AllUppercase;
                             }
                         }
+                    }
+
+                    frame: Rectangle {
+                        color: IngeScapeTheme.veryDarkGreyColor
+                    }
+                }
+
+                Tab {
+                    id: tabActions
+                    anchors.fill: parent
+                    title: qsTr("ACTIONS")
+                    active : true
+
+                    ActionsList {
+                        id: actionsList
+                        taskInstanceController: rootItem.taskInstanceController
+                    }
+                }
+
+                Tab {
+                    id: tabAgents
+                    title: qsTr("AGENTS")
+                    active: true
+                    anchors.fill: parent
+
+                    AgentsList{
+                        id: agentsList
+                        taskInstanceController: rootItem.taskInstanceController
                     }
                 }
             }
@@ -507,7 +487,7 @@ Item {
         id: commentsPanel
 
         anchors {
-            left: actionsPanel.right
+            left: leftPanel.right
             leftMargin: 16
             top: headerItem.bottom
             topMargin: 16
@@ -910,7 +890,7 @@ Item {
 
         anchors {
             top: headerItem.bottom
-            left: actionsPanel.right
+            left: leftPanel.right
             right: headerItem.right
         }
 

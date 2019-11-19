@@ -47,7 +47,6 @@ SOURCES += main.cpp \
     model/taskinstancem.cpp \
     model/subject/subjectm.cpp \
     model/subject/characteristicm.cpp \
-    model/subject/characteristicenumm.cpp \
     model/subject/characteristicvaluem.cpp \
     model/task/taskm.cpp \
     model/experimentationm.cpp \
@@ -73,7 +72,6 @@ HEADERS += \
     controller/networkcontroller.h \
     model/subject/subjectm.h \
     model/subject/characteristicm.h \
-    model/subject/characteristicenumm.h \
     model/subject/characteristicvaluem.h \
     model/task/taskm.h \
     model/experimentationm.h \

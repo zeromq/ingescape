@@ -257,6 +257,15 @@ CassStatement* TaskM::createBoundInsertStatement(const TaskM& task)
     return cassStatement;
 }
 
+/**
+ * @brief Returns true if the agent name is in the hashFromAgentNameToSimplifiedAgent
+ * @param agentName
+ * @return
+ */
+bool TaskM::isAgentNameInHash(QString agentName){
+    return _hashFromAgentNameToSimplifiedAgent.containsKey(agentName);
+}
+
 
 /**
  * @brief Initialize the temporary dependent variable with the given dependent variable

@@ -161,6 +161,12 @@ public:
      */
     static CassStatement* createBoundInsertStatement(const TaskM& task);
 
+    /**
+     * @brief Returns true if the agent name is in the hashTable hashFromAgentNameToSimplifiedAgent
+     * @param agentName
+     * @return
+     */
+    bool isAgentNameInHash(QString agentName);
 
     /**
      * @brief Initialize the temporary dependent variable with the given dependent variable

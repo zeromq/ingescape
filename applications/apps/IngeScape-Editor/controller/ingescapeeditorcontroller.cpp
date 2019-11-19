@@ -748,7 +748,7 @@ void IngeScapeEditorController::clearCurrentPlatform()
         // Delete all published values
         _modelManager->deleteAllPublishedValues();
 
-        // Delete all actions
+        // Delete all (models of) actions
         _modelManager->deleteAllActions();
 
         // Delete agents OFF
@@ -761,8 +761,9 @@ void IngeScapeEditorController::clearCurrentPlatform()
         }
     }
 
-    // Notify QML to reset view
-    Q_EMIT resetMappindAndTimeLineViews();
+    // Notify QML to reset views
+    Q_EMIT resetMappindView();
+    Q_EMIT resetTimeLineView();
 }
 
 
@@ -1227,8 +1228,9 @@ void IngeScapeEditorController::_onReplayLoading(int deltaTimeFromTimeLineStart,
                 _scenarioC->importExecutedActionsFromJson(jsonExecutedActions.toUtf8());
             }
 
-            // Notify QML to reset view
-            Q_EMIT resetMappindAndTimeLineViews();
+            // Notify QML to reset views
+            Q_EMIT resetMappindView();
+            Q_EMIT resetTimeLineView();
         }
         else
         {
@@ -1560,8 +1562,9 @@ bool IngeScapeEditorController::_loadPlatformFromFile(QString platformFilePath)
                     sethasAPlatformBeenLoadedByUser(true);
                 }
 
-                // Notify QML to reset view
-                Q_EMIT resetMappindAndTimeLineViews();
+                // Notify QML to reset views
+                Q_EMIT resetMappindView();
+                Q_EMIT resetTimeLineView();
             }
             else
             {

@@ -24,16 +24,19 @@ import INGESCAPE 1.0
 import "theme" as Theme;
 
 I2PopupBase {
-    id: rootItem
-
-    height: 200
-    width: 360
+    id: rootPopup
 
     anchors.centerIn: parent
+    height: 200
+    width: 360
 
     isModal: true
     dismissOnOutsideTap: false
     keepRelativePositionToInitialParent: false
+
+    // Licenses controller
+    property LicensesController licensesController: null;
+
 
     Rectangle {
 
@@ -58,7 +61,7 @@ I2PopupBase {
                 margins: 16
             }
 
-            text: IngeScapeEditorC.licensesC ? IngeScapeEditorC.licensesC.errorMessageWhenLicenseFailed : "";
+            text: rootPopup.licensesController ? rootPopup.licensesController.errorMessageWhenLicenseFailed : ""
 
             horizontalAlignment: Text.AlignHCenter
             lineHeight: 24
@@ -111,7 +114,7 @@ I2PopupBase {
 
             onClicked: {
                 // Close our popup
-                rootItem.close();
+                rootPopup.close();
             }
         }
     }

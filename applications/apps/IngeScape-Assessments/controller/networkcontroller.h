@@ -58,7 +58,7 @@ public:
      * @param peerName
      * @param zMessage
      */
-    //void manageWhisperedMessage(QString peerId, QString peerName, zmsg_t* zMessage) Q_DECL_OVERRIDE;
+    void manageWhisperedMessage(QString peerId, QString peerName, zmsg_t* zMessage) Q_DECL_OVERRIDE;
 
 
 

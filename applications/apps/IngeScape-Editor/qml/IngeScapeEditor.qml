@@ -330,6 +330,8 @@ Item {
 
         scenarioController: IngeScapeEditorC.scenarioC
         timeLineController: IngeScapeEditorC.timeLineC
+        licensesController: IngeScapeEditorC.licensesC
+        mainController: IngeScapeEditorC
 
         onUnlicensedAction: {
             licensePopup.open();
@@ -676,7 +678,7 @@ Item {
 
         anchors.centerIn: parent
 
-        licenseController: IngeScapeEditorC.licensesC
+        licensesController: IngeScapeEditorC.licensesC
     }
 
 
@@ -685,6 +687,8 @@ Item {
     //
     LicenseEventPopup {
         id: licenseEventPopup
+
+        licensesController: IngeScapeEditorC.licensesC
 
         onClosed: {
             console.log("Popup displayed when an event occurs about the license(s) has just been closed");

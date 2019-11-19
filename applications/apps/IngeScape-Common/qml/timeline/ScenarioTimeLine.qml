@@ -33,6 +33,16 @@ Item {
     property var scenarioController: null;
     property var timeLineController: null;
 
+    // Licenses controller
+    property LicensesController licensesController: null;
+
+    // Use type "var" instead of a type inside Editor or Assessments app
+    // Used to connect to signal "Reset TimeLine View"
+    property var mainController: null;
+
+    // Flag indicating if the user have a valid license for the editor
+    property bool isEditorLicenseValid: rootItem.licensesController && rootItem.licensesController.mergedLicense && rootItem.licensesController.mergedLicense.editorLicenseValidity
+
 
     // graphical properties
     property int linesNumber: scenarioController ? scenarioController.linesNumberInTimeLine : 0;
@@ -41,6 +51,40 @@ Item {
     // flag indicating if our component is reduced or expanded
     property bool isReduced: true;
 
+    // Flag used to check if we can perform resize animations
+    // NB: this flag is used to avoid animations during a drag-n-drop
+    property bool _canPerformResizeAnimations: true
+
+
+    //--------------------------------
+    //
+    // Signals
+    //
+    //--------------------------------
+
+    // Signal emitted when the user tries to perform an action forbidden by the license
+    signal unlicensedAction();
+
+
+    //--------------------------------
+    //
+    // Behaviors & Slots
+    //
+    //--------------------------------
+    Connections {
+        target: mainController
+
+        onResetTimeLineView: {
+            console.log("QML: onResetTimeLineView")
+            contentArea.contentX = 0;
+            contentArea.contentY = 0;
+        }
+
+        ignoreUnknownSignals: true
+    }
+
+
+    // Called when the flag "Is Reduced" changed
     onIsReducedChanged : {
         // Allow resize animations
         rootItem._canPerformResizeAnimations = true;
@@ -58,17 +102,7 @@ Item {
     }
 
 
-    // Licenses controller
-    property LicensesController licensesController: IngeScapeEditorC.licensesC;
-
-    // Flag indicating if the user have a valid license for the editor
-    property bool isEditorLicenseValid: rootItem.licensesController && rootItem.licensesController.mergedLicense && rootItem.licensesController.mergedLicense.editorLicenseValidity
-
-
-    // Flag used to check if we can perform resize animations
-    // NB: this flag is used to avoid animations during a drag-n-drop
-    property bool _canPerformResizeAnimations: true
-
+    // Animation on height
     Behavior on height {
         enabled: rootItem._canPerformResizeAnimations
 
@@ -146,36 +180,10 @@ Item {
 
     //--------------------------------
     //
-    // Behaviors
-    //
-    //--------------------------------
-    Connections {
-        target: IngeScapeEditorC
-
-        onResetMappindAndTimeLineViews : {
-            contentArea.contentX = 0;
-            contentArea.contentY = 0;
-        }
-
-        //ignoreUnknownSignals: true
-    }
-
-
-    //--------------------------------
-    //
-    // Signals
-    //
-    //--------------------------------
-
-    // Signal emitted when the user tries to perform an action forbidden by the license
-    signal unlicensedAction();
-
-
-    //--------------------------------
-    //
     // Content
     //
     //--------------------------------
+
     // Background
     I2CustomRectangle {
         id: background
