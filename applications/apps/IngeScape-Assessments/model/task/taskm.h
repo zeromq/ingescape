@@ -166,7 +166,7 @@ public:
      * @param agentName
      * @return
      */
-    bool isAgentNameInHash(QString agentName);
+    bool isAgentNameInProtocol(QString agentName);
 
     /**
      * @brief Initialize the temporary dependent variable with the given dependent variable

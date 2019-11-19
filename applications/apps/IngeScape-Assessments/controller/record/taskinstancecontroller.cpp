@@ -151,7 +151,9 @@ void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previo
         {
             if (currentTaskInstance->task()->platformFileUrl().isValid())
             {
-                _agentsGroupedByNameInCurrentPlatform.updateProtocol(currentTaskInstance->task());
+                //_agentsGroupedByNameInCurrentPlatform.updateProtocol(currentTaskInstance->task());
+
+                _agentsGroupedByNameInCurrentPlatform.setcurrentProtocol(currentTaskInstance->task());
 
                 QString platformFilePath = currentTaskInstance->task()->platformFileUrl().path();
 
