@@ -57,9 +57,7 @@ Item {
         flickableItem.boundsBehavior: Flickable.OvershootBounds
 
         ListView {
-            //FIXME: model should be the allAgentsGroupedByNameInCurrentPlatform list
-            //model: rootItem.taskInstanceController ? rootItem.taskInstanceController.allAgentsGroupedByNameInCurrentPlatform : null
-            model: rootItem.taskInstanceController.temp.allAgentsGroupsByName
+            model: rootItem.taskInstanceController ? rootItem.taskInstanceController.agentsGroupedByNameInCurrentPlatform : null
 
             delegate: MouseArea {
                 id: mouseArea
