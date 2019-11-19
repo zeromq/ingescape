@@ -9,8 +9,8 @@
 #ifndef ingescape_class_h
 #define ingescape_class_h
 
-#include <ingescape/ingescape.h>
-#include <ingescape/ingescape_advanced.h>
+#include "ingescape.h"
+#include "ingescape_advanced.h"
 
 
 #ifdef __cplusplus
