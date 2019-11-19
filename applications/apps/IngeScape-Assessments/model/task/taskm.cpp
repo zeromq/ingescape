@@ -262,7 +262,7 @@ CassStatement* TaskM::createBoundInsertStatement(const TaskM& task)
  * @param agentName
  * @return
  */
-bool TaskM::isAgentNameInHash(QString agentName){
+bool TaskM::isAgentNameInProtocol(QString agentName){
     return _hashFromAgentNameToSimplifiedAgent.containsKey(agentName);
 }
 

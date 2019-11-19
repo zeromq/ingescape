@@ -88,6 +88,8 @@ private Q_SLOTS:
 private:
     // Helper to manage JSON files
     JsonHelper* _jsonHelper;
+
+    //Filtered list with all present agents
     AreAgentsInPlatformFilter _agentsGroupedByNameInCurrentPlatform;
 };
 
