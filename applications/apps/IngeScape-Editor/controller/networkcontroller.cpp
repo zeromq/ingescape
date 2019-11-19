@@ -84,6 +84,17 @@ NetworkController::~NetworkController()
 
 
 /**
+ * @brief Accessor to the singleton instance
+ * @return
+ */
+NetworkController& NetworkController::Instance()
+{
+    //return NetworkController::_instance;
+    return _instance;
+}
+
+
+/**
  * @brief Manage a "Shouted" message
  * @param peerId
  * @param peerName
@@ -505,25 +516,6 @@ void NetworkController::sendCommandExecutionStatusToExpe(QString peerIdOfExpe, Q
 
 
 /**
- * @brief Send a (string) message to a peer id
- * @param peerId
- * @param message
- */
-void NetworkController::sendMessageToPeerId(QString peerId, QString message)
-{
-    if (!peerId.isEmpty())
-    {
-        // Send the message to the peer id
-        int success = igs_busSendStringToAgent(peerId.toStdString().c_str(),
-                                               "%s",
-                                               message.toStdString().c_str());
-
-        qInfo() << "Send message" << message << "to peer" << peerId << "with success ?" << success;
-    }
-}
-
-
-/**
  * @brief Slot called when a command must be sent on the network to a launcher
  * @param peerIdOfLauncher
  * @param command
@@ -626,10 +618,10 @@ void NetworkController::onCommandAskedToAgentAboutMappingInput(QStringList peerI
     {
         // Send the command to a peer id of agent
         int success = igs_busSendStringToAgent(peerId.toStdString().c_str(), "%s %s %s %s",
-                                                command.toStdString().c_str(),
-                                                inputName.toStdString().c_str(),
-                                                outputAgentName.toStdString().c_str(),
-                                                outputName.toStdString().c_str());
+                                               command.toStdString().c_str(),
+                                               inputName.toStdString().c_str(),
+                                               outputAgentName.toStdString().c_str(),
+                                               outputName.toStdString().c_str());
 
         qInfo() << "Send command" << command << "for agent" << peerId << "and input" << inputName << "about mapping on agent" << outputAgentName << "and output" << outputName << "with success ?" << success;
     }

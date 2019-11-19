@@ -86,7 +86,7 @@ class IngeScapeEditorController : public QObject
     I2_QML_PROPERTY_READONLY(AgentsMappingController*, agentsMappingC)
 
     // Controller to manage network communications
-    I2_QML_PROPERTY_READONLY(NetworkController*, networkC)
+    //I2_QML_PROPERTY_READONLY(NetworkController*, networkC)
 
     // Controller to manage the scenario
     I2_QML_PROPERTY_READONLY(ScenarioController*, scenarioC)

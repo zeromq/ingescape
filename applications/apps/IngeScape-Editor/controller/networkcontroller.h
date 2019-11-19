@@ -35,16 +35,10 @@ class NetworkController: public IngeScapeNetworkController
 public:
 
     /**
-     * @brief Constructor
-     * @param parent
+     * @brief Accessor to the singleton instance
+     * @return
      */
-    explicit NetworkController(QObject *parent = nullptr);
-
-
-    /**
-      * @brief Destructor
-      */
-    ~NetworkController() Q_DECL_OVERRIDE;
+    static NetworkController& Instance();
 
 
     /**
@@ -80,14 +74,6 @@ public:
      * @param status
      */
     void sendCommandExecutionStatusToExpe(QString peerIdOfExpe, QString command, QString commandParameters, int status);
-
-
-    /**
-     * @brief Send a (string) message to a peer id
-     * @param peerId
-     * @param message
-     */
-    void sendMessageToPeerId(QString peerId, QString message);
 
 
 Q_SIGNALS:
@@ -325,6 +311,23 @@ public Q_SLOTS:
 
 private:
 
+    /**
+     * @brief Constructor
+     * @param parent
+     */
+    explicit NetworkController(QObject *parent = nullptr);
+
+
+    /**
+      * @brief Destructor
+      */
+    ~NetworkController() Q_DECL_OVERRIDE;
+
+
+private:
+    // The singleton instance
+    static NetworkController _instance;
+    //static NetworkController* _instance;
 
 };
 
