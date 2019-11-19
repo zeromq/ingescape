@@ -19,6 +19,8 @@ SOURCES += \
     $$PWD/../src/monitor.c \
     $$PWD/../src/json.c \
     $$PWD/../src/performance.c \
+    $$PWD/../src/global.c \
+    $$PWD/../src/agent.c \
     $$PWD/../dependencies/yajl/src/yajl_alloc.c \
     $$PWD/../dependencies/yajl/src/yajl_buf.c \
     $$PWD/../dependencies/yajl/src/yajl_encode.c \
@@ -34,6 +36,7 @@ HEADERS += \
     $$PWD/../src/include/ingescape.h \
     $$PWD/../src/include/ingescape_advanced.h \
     $$PWD/../src/include/ingescape_private.h \
+    $$PWD/../src/include/ingescape_agent.h \
     $$PWD/../dependencies/yajl/src/yajl_alloc.h\
     $$PWD/../dependencies/yajl/src/yajl_buf.h \
     $$PWD/../dependencies/yajl/src/yajl_bytestack.h \
