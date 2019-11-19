@@ -40,11 +40,13 @@ TaskInstanceController::TaskInstanceController(JsonHelper* jsonHelper,
     // Create the controller for scenario management
     _scenarioC = new AbstractScenarioController(AssessmentsModelManager::Instance(), _jsonHelper, this);
 
+    //FIXME: remove temp property
+    _temp = AssessmentsModelManager::Instance();
 
-    _allAgentsGroupedByNameInCurrentPlatform.setSourceModel(AssessmentsModelManager::Instance()->allAgentsGroupsByName());
+    _allAgentsGroupedByNameInCurrentPlatform.setSourceModel(_temp->allAgentsGroupsByName());
     _allAgentsGroupedByNameInCurrentPlatform.setSortProperty("name");
-//    _allAgentsGroupedByNameInCurrentPlatform.setFilterProperty("isAgentGroupedByNameInCurrentPlatform");
-//    _allAgentsGroupedByNameInCurrentPlatform.setFilterFixedString("true");
+    _allAgentsGroupedByNameInCurrentPlatform.setFilterProperty("isAgentGroupedByNameInCurrentPlatform");
+    _allAgentsGroupedByNameInCurrentPlatform.setFilterFixedString("true");
 
     // Connect to the signal "time range changed" from the time line
     // to the scenario controller to filter the action view models

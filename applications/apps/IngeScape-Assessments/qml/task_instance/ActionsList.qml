@@ -39,7 +39,7 @@ Item {
         height: 1
     }
 
-    Column {
+    ScrollView {
         id: actionsList
 
         anchors {
@@ -50,9 +50,12 @@ Item {
             bottom: parent.bottom
         }
 
-        spacing: 0
+        //spacing: 0
 
-        Repeater {
+        style: IngeScapeScrollViewStyle {
+        }
+
+         ListView {
 
             model: (rootItem.taskInstanceController && rootItem.taskInstanceController.scenarioC) ? rootItem.taskInstanceController.scenarioC.actionsList : null
 

@@ -50,7 +50,7 @@ Item {
     // Flag indicating if the user have a valid license for the editor
     property bool isEditorLicenseValid: true
 
-    width: IngeScapeEditorTheme.leftPanelWidth
+    width: parent.width
     height: 85
 
     //-----------------------------------------
@@ -73,7 +73,7 @@ Item {
 
         border.width: 0
 
-        color: agentItemIsHovered ? IngeScapeEditorTheme.agentsListItemRollOverBackgroundColor : IngeScapeEditorTheme.agentsListItemBackgroundColor
+        color: agentItemIsHovered ? IngeScapeTheme.greyColor : IngeScapeTheme.veryDarkGreyColor
 
         // bottom separator
         Rectangle {
@@ -113,22 +113,12 @@ Item {
                 leftMargin: 28
                 top: parent.top
                 topMargin: 12
-                right: middleRow.left
+                right: parent.left
                 //rightMargin: 5
             }
             height: childrenRect.height
 
             spacing: 4
-
-            TextMetrics {
-                id: textMetricsName
-
-                elideWidth: (columnName.width - textState.width - textState.anchors.leftMargin)
-                elide: Text.ElideRight
-
-                text: rootItem.agent ? rootItem.agent.name : ""
-                font: IngeScapeTheme.headingFont
-            }
 
             // Name
             Text {
@@ -139,30 +129,13 @@ Item {
                     //right: parent.right
                 }
 
-                text: textMetricsName.elidedText
+                text: rootItem.agent.name
 
-                color: (rootItem.agent && rootItem.agent.isON) ? IngeScapeTheme.agentsListLabelColor : IngeScapeTheme.agentOFFLabelColor
+                color: (rootItem.agent && rootItem.agent.isON) ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor
 
                 font: IngeScapeTheme.headingFont
 
-                Text {
-                    id: textState
 
-                    anchors {
-                        left: parent.right
-                        leftMargin: 5
-                        baseline: parent.baseline
-                    }
-
-                    text: (model.state !== "") ? qsTr("(%1)").arg(model.state) : ""
-
-                    color : IngeScapeTheme.whiteColor
-                    font {
-                        family: IngeScapeTheme.labelFontFamily
-                        pixelSize : 12
-                        italic: true
-                    }
-                }
             }
         }
     }

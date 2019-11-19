@@ -39,7 +39,7 @@ Item {
         height: 1
     }
 
-    Column {
+    ScrollView {
         id: agentList
 
         anchors {
@@ -50,19 +50,18 @@ Item {
             bottom: parent.bottom
         }
 
-        spacing: 0
+        style: IngeScapeScrollViewStyle {
+        }
 
-        Repeater {
+        // Prevent drag overshoot on Windows
+        flickableItem.boundsBehavior: Flickable.OvershootBounds
 
-            model: rootItem.taskInstanceController ? rootItem.taskInstanceController.allAgentsGroupedByNameInCurrentPlatform : null
+        ListView {
+            //FIXME: model should be the allAgentsGroupedByNameInCurrentPlatform list
+            //model: rootItem.taskInstanceController ? rootItem.taskInstanceController.allAgentsGroupedByNameInCurrentPlatform : null
+            model: rootItem.taskInstanceController.temp.allAgentsGroupsByName
 
-            delegate: Rectangle {
-                width: 50
-                height: 50
-                color: "red"
-            }
-
-            /*delegate: MouseArea {
+            delegate: MouseArea {
                 id: mouseArea
 
                 width: parent.width
@@ -79,7 +78,7 @@ Item {
                     agent: model.QtObject
                 }
 
-            }*/
+            }
         }
     }
 }

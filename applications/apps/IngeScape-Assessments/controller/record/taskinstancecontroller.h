@@ -22,6 +22,8 @@
 #include <model/jsonhelper.h>
 #include <model/taskinstancem.h>
 
+#include <controller/assessmentsmodelmanager.h>
+
 
 /**
  * @brief The TaskInstanceController class defines the controller to manage a record of the current experimentation
@@ -41,6 +43,9 @@ class TaskInstanceController : public QObject
 
     // List off all agents present in the current platform
     I2_QOBJECT_SORTFILTERPROXY(AgentsGroupedByNameVM, allAgentsGroupedByNameInCurrentPlatform)
+
+    //FIXME: remove temp property
+    I2_QML_PROPERTY(AssessmentsModelManager*, temp)
 
 
 public:
