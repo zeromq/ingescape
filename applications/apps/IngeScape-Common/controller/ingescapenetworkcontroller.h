@@ -191,6 +191,42 @@ public:
     virtual void manageWhisperedMessage(QString peerId, QString peerName, zmsg_t* zMessage);
 
 
+    /**
+     * @brief Send a (string) message to an agent (identified by its peer id)
+     * @param agentId peer id of the agent
+     * @param message 1 string
+     * @return true if successful, false otherwise
+     */
+    bool sendMessageToAgent(QString agentId, QString message);
+
+
+    /**
+     * @brief Send a (strings list) message to an agent (identified by its peer id)
+     * @param agentId peer id of the agent
+     * @param message list of strings
+     * @return true if successful, false otherwise
+     */
+    bool sendMessageToAgent(QString agentId, QStringList message);
+
+
+    /**
+     * @brief Send a (string) message to a list of agents (identified by their peer id)
+     * @param agentIds peer ids of the agents
+     * @param message 1 string
+     * @return true if successful, false otherwise
+     */
+    bool sendMessageToAgents(QStringList agentIds, QString message);
+
+
+    /**
+     * @brief Send a (strings list) message to an agent (identified by its peer id)
+     * @param agentIds peer ids of the agents
+     * @param message list of strings
+     * @return true if successful, false otherwise
+     */
+    bool sendMessageToAgents(QStringList agentIds, QStringList message);
+
+
 Q_SIGNALS:
     /**
      * @brief Triggered when our network device is not available

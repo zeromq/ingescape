@@ -957,6 +957,187 @@ void IngeScapeNetworkController::manageWhisperedMessage(QString peerId, QString 
 
 
 /**
+ * @brief Send a (string) message to an agent (identified by its peer id)
+ * @param agentId peer id of the agent
+ * @param message 1 string
+ * @return true if successful, false otherwise
+ */
+bool IngeScapeNetworkController::sendMessageToAgent(QString agentId, QString message)
+{
+    bool success = false;
+
+    if (!agentId.isEmpty() && !message.isEmpty())
+    {
+        // Use IngeScape to send the message to the agent
+        int result = igs_busSendStringToAgent(agentId.toStdString().c_str(),
+                                              "%s",
+                                              message.toStdString().c_str());
+
+        if (result == 1)
+        {
+            success = true;
+
+            qInfo() << "Message" << message << "to peer" << agentId << "sent successfully";
+        }
+        else {
+            qWarning() << "Error (" << result << ") during send message" << message << "to peer" << agentId;
+        }
+    }
+    return success;
+}
+
+
+/**
+ * @brief Send a (strings list) message to an agent (identified by its peer id)
+ * @param agentId peer id of the agent
+ * @param message list of strings
+ * @return true if successful, false otherwise
+ */
+bool IngeScapeNetworkController::sendMessageToAgent(QString agentId, QStringList message)
+{
+    bool success = false;
+
+    if (!agentId.isEmpty() && !message.isEmpty())
+    {
+        int stringsNumber = message.count();
+        QString string1 = message.at(0);
+
+        if (stringsNumber > 1)
+        {
+            QString spaceAndString = " %s";
+            QString format = QString("%s%1").arg(spaceAndString.repeated(stringsNumber - 1));
+
+            switch (stringsNumber)
+            {
+            case 2:
+            {
+                QString string2 = message.at(1);
+
+                // Use IngeScape to send the message to the agent
+                int result = igs_busSendStringToAgent(agentId.toStdString().c_str(),
+                                                      format.toStdString().c_str(),
+                                                      string1.toStdString().c_str(),
+                                                      string2.toStdString().c_str());
+
+                if (result == 1)
+                {
+                    success = true;
+
+                    qInfo() << "Message" << message << "to peer" << agentId << "sent successfully";
+                }
+                else {
+                    qWarning() << "Error (" << result << ") during send message" << message << "to peer" << agentId;
+                }
+            }
+                break;
+
+            case 3:
+            {
+                QString string2 = message.at(1);
+                QString string3 = message.at(2);
+
+                // Use IngeScape to send the message to the agent
+                int result = igs_busSendStringToAgent(agentId.toStdString().c_str(),
+                                                      format.toStdString().c_str(),
+                                                      string1.toStdString().c_str(),
+                                                      string2.toStdString().c_str(),
+                                                      string3.toStdString().c_str());
+
+                if (result == 1)
+                {
+                    success = true;
+
+                    qInfo() << "Message" << message << "to peer" << agentId << "sent successfully";
+                }
+                else {
+                    qWarning() << "Error (" << result << ") during send message" << message << "to peer" << agentId;
+                }
+            }
+                break;
+
+            /*case 4:
+            {
+                QString string2 = message.at(1);
+                QString string3 = message.at(2);
+                QString string4 = message.at(3);
+
+                // Use IngeScape to send the message to the agent
+                int result = igs_busSendStringToAgent(agentId.toStdString().c_str(),
+                                                   format.toStdString().c_str(),
+                                                   string1.toStdString().c_str(),
+                                                   string2.toStdString().c_str(),
+                                                   string3.toStdString().c_str(),
+                                                   string4.toStdString().c_str());
+
+                if (result == 1)
+                {
+                    success = true;
+
+                    qInfo() << "Message" << message << "to peer" << agentId << "sent successfully";
+                }
+                else {
+                    qWarning() << "Error (" << result << ") during send message" << message << "to peer" << agentId;
+                }
+            }
+                break;*/
+
+            default:
+                qCritical() << "Message" << message << "could not be sent due to too many parameters:" << stringsNumber;
+                break;
+            }
+        }
+        else
+        {
+            success = sendMessageToAgent(agentId, string1);
+        }
+    }
+    return success;
+}
+
+
+/**
+ * @brief Send a (string) message to a list of agents (identified by their peer id)
+ * @param agentIds peer ids of the agents
+ * @param message 1 string
+ * @return true if successful, false otherwise
+ */
+bool IngeScapeNetworkController::sendMessageToAgents(QStringList agentIds, QString message)
+{
+    bool allSucceeded = true;
+
+    for (QString agentId : agentIds)
+    {
+        bool success = sendMessageToAgent(agentId, message);
+        if (!success) {
+            allSucceeded = false;
+        }
+    }
+    return allSucceeded;
+}
+
+
+/**
+ * @brief Send a (strings list) message to an agent (identified by its peer id)
+ * @param agentIds peer ids of the agents
+ * @param message list of strings
+ * @return true if successful, false otherwise
+ */
+bool IngeScapeNetworkController::sendMessageToAgents(QStringList agentIds, QStringList message)
+{
+    bool allSucceeded = true;
+
+    for (QString agentId : agentIds)
+    {
+        bool success = sendMessageToAgent(agentId, message);
+        if (!success) {
+            allSucceeded = false;
+        }
+    }
+    return allSucceeded;
+}
+
+
+/**
  * @brief Slot called when a command must be sent on the network to a recorder
  * @param peerIdOfRecorder
  * @param commandAndParameters
