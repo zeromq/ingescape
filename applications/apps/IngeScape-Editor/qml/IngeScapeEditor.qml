@@ -331,6 +331,7 @@ Item {
         scenarioController: IngeScapeEditorC.scenarioC
         timeLineController: IngeScapeEditorC.timeLineC
         licensesController: IngeScapeEditorC.licensesC
+        mainController: IngeScapeEditorC
 
         onUnlicensedAction: {
             licensePopup.open();

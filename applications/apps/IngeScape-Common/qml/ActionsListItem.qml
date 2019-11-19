@@ -20,6 +20,9 @@ Item {
     // Controller associated to our view
     property var controller: null;
 
+    // Use type "var" instead of a type inside Editor app (null inside Assessments app)
+    property var agentsMappingController: null;
+
     // Model of action
     property var action: null;
 
@@ -347,13 +350,14 @@ Item {
                 onClicked: {
                     if (controller && rootItem.action)
                     {
-                        // FIXME: Common does not access to IngeScapeEditorC
                         if (controller.isActionInsertedInTimeLine(rootItem.action)
-                                || IngeScapeEditorC.agentsMappingC.isActionInsertedInMapping(rootItem.action))
+                                || (rootItem.agentsMappingController && rootItem.agentsMappingController.isActionInsertedInMapping(rootItem.action)))
                         {
+                            // We need a confirmation to delete the action
                             rootItem.needConfirmationToDeleteAction(rootItem.action);
                         }
-                        else {
+                        else
+                        {
                             // Delete our action
                             controller.deleteAction(rootItem.action);
                         }

@@ -118,6 +118,7 @@ Item {
         scenarioController: rootItem.taskInstanceController ? rootItem.taskInstanceController.scenarioC : null;
         timeLineController: rootItem.taskInstanceController ? rootItem.taskInstanceController.timeLineC : null;
         licensesController: IngeScapeAssessmentsC.licensesC
+        mainController: IngeScapeAssessmentsC
 
         Rectangle {
             id: timeLineLeftShadow
