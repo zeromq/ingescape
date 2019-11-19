@@ -13,6 +13,9 @@
 
 igsAgent_t *igsAgent_new(void){
     igsAgent_t *agent = calloc(1, sizeof(igsAgent_t));
+    agent->network_discoveryInterval = 1000;
+    agent->network_agentTimeout = 30000;
+    agent->network_hwmValue = 1000;
     return agent;
 }
 void igsAgent_destroy(igsAgent_t **agent){
