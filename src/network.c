@@ -586,15 +586,15 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         }
                     }
                 }
-                if (agent->admin_logInStream){
+                if (admin_logInStream){
                     bus_zyreLock();
                     zyre_whispers(agent->agentElements->node, peer, "LOG_IN_STREAM=1");
                     bus_zyreUnlock();
                 }
-                if (agent->admin_logInFile){
+                if (admin_logInFile){
                     bus_zyreLock();
                     zyre_whispers(agent->agentElements->node, peer, "LOG_IN_FILE=1");
-                    zyre_whispers(agent->agentElements->node, peer, "LOG_FILE_PATH=%s", agent->admin_logFile);
+                    zyre_whispers(agent->agentElements->node, peer, "LOG_FILE_PATH=%s", admin_logFile);
                     bus_zyreUnlock();
                 }
                 if (strlen(agent->definition_path) > 0){
@@ -1372,7 +1372,7 @@ initLoop (zsock_t *pipe, void *args){
 #endif
     
     //start logger stream if needed
-    if (agent->admin_logInStream){
+    if (admin_logInStream){
         sprintf(endpoint, "tcp://%s:*", agent->agentElements->ipAddress);
         agent->agentElements->logger = zsock_new_pub(endpoint);
         zsock_set_sndhwm(agent->agentElements->logger, agent->network_hwmValue);
@@ -1928,7 +1928,7 @@ int igsAgent_stop(igsAgent_t *agent){
         // NB: If we don't call zsys_shutdown, the application will crash on exit
         // (WSASTARTUP assertion failure)
         // NB: Monitoring also uses a zactor, we can not call zsys_shutdown() when it is running
-        if (!igs_isMonitoringEnabled()) {
+        if (!igsAgent_isMonitoringEnabled(agent)) {
             zsys_shutdown();
         }
         #endif

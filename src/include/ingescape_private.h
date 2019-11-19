@@ -318,18 +318,6 @@ typedef struct _igsAgent_t {
     zyreCallback_t *zyreCallbacks;
     forcedStopCalback_t *forcedStopCalbacks;
 
-    //admin
-    FILE *log_fp;
-    bool admin_logInStream;
-    bool admin_logInFile;
-    bool logInConsole;
-    bool useColorInConsole;
-    igs_logLevel_t logLevel;
-    char admin_logFile[4096];
-    char logContent[2048];
-    char logTime[128];
-    int log_nb_of_entries; //for fflush rotation
-    
     //bus
     serviceHeader_t *serviceHeaders;
 
@@ -352,6 +340,8 @@ typedef struct _igsAgent_t {
     bool monitor_shallStartStopAgent;
 
 } igsAgent_t;
+
+extern igsAgent_t *internalAgent;
 
 //////////////////  FUNCTIONS  //////////////////
 
@@ -387,6 +377,9 @@ mapping_t* parser_LoadMap (const char* json_str);
 mapping_t* parser_LoadMapFromPath (const char* load_file);
 
 // admin
+extern bool admin_logInStream;
+extern bool admin_logInFile;
+extern char admin_logFile[4096];
 void admin_makeFilePath(const char *from, char *to, size_t size_of_to);
 
 //bus
