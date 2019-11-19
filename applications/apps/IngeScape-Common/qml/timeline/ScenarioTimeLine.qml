@@ -33,6 +33,12 @@ Item {
     property var scenarioController: null;
     property var timeLineController: null;
 
+    // Licenses controller
+    property LicensesController licensesController: null;
+
+    // Flag indicating if the user have a valid license for the editor
+    property bool isEditorLicenseValid: rootItem.licensesController && rootItem.licensesController.mergedLicense && rootItem.licensesController.mergedLicense.editorLicenseValidity
+
 
     // graphical properties
     property int linesNumber: scenarioController ? scenarioController.linesNumberInTimeLine : 0;
@@ -56,13 +62,6 @@ Item {
             //rootItem.height = IngeScapeTheme.timeLineHeight_OneRow;
         }
     }
-
-
-    // Licenses controller
-    property LicensesController licensesController: IngeScapeEditorC.licensesC;
-
-    // Flag indicating if the user have a valid license for the editor
-    property bool isEditorLicenseValid: rootItem.licensesController && rootItem.licensesController.mergedLicense && rootItem.licensesController.mergedLicense.editorLicenseValidity
 
 
     // Flag used to check if we can perform resize animations
