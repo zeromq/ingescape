@@ -283,7 +283,7 @@ void igsAgent_monitoringDisable(igsAgent_t *agent){
     // On Windows, we need to use a sledgehammer to avoid assertion errors
     // NB: If we don't call zsys_shutdown, the application will crash on exit
     // (WSASTARTUP assertion failure)
-    if (agentElements == NULL) {
+    if (agent->agentElements == NULL) {
         zsys_shutdown();
     }
 #endif
