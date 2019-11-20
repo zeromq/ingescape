@@ -288,18 +288,14 @@ int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *arg){
 }
 
 //function actually handling messages from one of the publisher agents we subscribed to
-int handleSubscriptionMessage(igsAgent_t *agent, zmsg_t *msg, const char *subscriberPeerId){
+int handleSubscriptionMessage(igsAgent_t *agent, zmsg_t *msg, subscriber_t *subscriber){
     
-    // Try to find the subscriber object
-    subscriber_t * foundSubscriber = NULL;
-    HASH_FIND_STR(agent->subscribers, subscriberPeerId, foundSubscriber);
-    
-    if(foundSubscriber == NULL){
-        igs_error("Could not find subscriber structure for agent %s", subscriberPeerId);
+    if(subscriber == NULL){
+        igs_error("subscriber is NULL");
         return -1;
     }
     if(agent->isFrozen == true){
-        igs_debug("Message received from agent %s but all traffic in our agent has been frozen", foundSubscriber->agentName);
+        igs_debug("Message received from agent %s but all traffic in our agent has been frozen", subscriber->agentName);
         return 0;
     }
     
@@ -336,7 +332,7 @@ int handleSubscriptionMessage(igsAgent_t *agent, zmsg_t *msg, const char *subscr
         //TODO : some day, optimize mapping storage to avoid iterating
         mapping_element_t *elmt, *tmp;
         HASH_ITER(hh, agent->internal_mapping->map_elements, elmt, tmp) {
-            if (strcmp(elmt->agent_name, foundSubscriber->agentName) == 0
+            if (strcmp(elmt->agent_name, subscriber->agentName) == 0
                 && strcmp(elmt->output_name, output) == 0){
                 //we have a match on emitting agent name and its ouput name :
                 //still need to check the targeted input existence in our definition
@@ -380,7 +376,7 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
     
     if (item->revents & ZMQ_POLLIN && strlen(subscriber->agentPeerId) > 0){
         zmsg_t *msg = zmsg_recv(item->socket);
-        handleSubscriptionMessage(agent, msg, subscriber->agentPeerId);
+        handleSubscriptionMessage(agent, msg, subscriber);
         zmsg_destroy(&msg);
     }
     return 0;
@@ -496,6 +492,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                             }
                             subscriber = calloc(1, sizeof(subscriber_t));
                             zagent->subscriber = subscriber;
+                            subscriber->agent = agent;
                             subscriber->agentName = strdup(name);
                             subscriber->agentPeerId = strdup (peer);
                             if (agent->allowIpc && useIPC){
