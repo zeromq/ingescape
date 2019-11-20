@@ -21,6 +21,7 @@ extern "C" {
 #include <ingescape.h>
 //#include <ingescape_advanced.h>
 #include <ingescape_private.h>
+//#include <ingescape_agent.h>
 }
 
 
@@ -266,7 +267,7 @@ void LicensesController::refreshLicensesData()
     // Allows to update data about licenses
     igs_checkLicenseForAgent(nullptr);
 
-    if (license != nullptr)
+    if (internalAgent->license != nullptr)
     {
         if (_mergedLicense != nullptr)
         {
@@ -275,20 +276,20 @@ void LicensesController::refreshLicensesData()
             delete temp;
         }
 
-        setmergedLicense(new LicenseInformationM(license));
+        setmergedLicense(new LicenseInformationM(internalAgent->license));
         _licenseDetailsList.deleteAllItems();
 
         //
         // License details
         //
-        if ((license->licenseDetails != nullptr) && (zlist_size(license->licenseDetails) > 0))
+        if ((internalAgent->license->licenseDetails != nullptr) && (zlist_size(internalAgent->license->licenseDetails) > 0))
         {
-            license_t* detail = static_cast<license_t*>(zlist_first(license->licenseDetails));
+            license_t* detail = static_cast<license_t*>(zlist_first(internalAgent->license->licenseDetails));
             while (detail != nullptr)
             {
                 LicenseInformationM* licenseDetails = new LicenseInformationM(detail);
                 _licenseDetailsList.append(licenseDetails);
-                detail = static_cast<license_t*>(zlist_next(license->licenseDetails));
+                detail = static_cast<license_t*>(zlist_next(internalAgent->license->licenseDetails));
             }
         }
     }

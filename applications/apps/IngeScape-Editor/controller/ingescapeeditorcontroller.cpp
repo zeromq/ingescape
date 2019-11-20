@@ -761,6 +761,11 @@ void IngeScapeEditorController::clearCurrentPlatform()
         }
     }
 
+    if (_timeLineC != nullptr) {
+        // Reset timeline parameters
+        _timeLineC->resetTimeline();
+    }
+
     // Notify QML to reset views
     Q_EMIT resetMappindView();
     Q_EMIT resetTimeLineView();
@@ -1701,6 +1706,12 @@ bool IngeScapeEditorController::_loadPlatformFromJSON(QJsonDocument jsonDocument
             _agentsMappingC->importMappingFromJson(jsonRoot.value("mapping").toArray());
         }
 
+        // Import timeline settings from JSON
+        if ((_timeLineC != nullptr) && jsonRoot.contains("timeline"))
+        {
+            _timeLineC->importTimelineFromJson(jsonRoot.value("timeline").toObject());
+        }
+
         success = true;
     }
 
@@ -1751,8 +1762,19 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
             platformJsonObject.insert("scenario", jsonScenario);
         }
 
+        // Save timeline settings
+        if ((_timeLineC != nullptr))
+        {
+            // Zoom level (actual pixels number per minute in timeline)
+            QJsonObject jsonTimeline;
+            jsonTimeline.insert("pixels_per_minute", _timeLineC->pixelsPerMinute());
+
+            platformJsonObject.insert("timeline", jsonTimeline);
+        }
+
         jsonDocument = QJsonDocument(platformJsonObject);
     }
+
     return jsonDocument;
 }
 
