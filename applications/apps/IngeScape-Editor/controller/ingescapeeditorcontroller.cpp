@@ -214,9 +214,8 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     // Create the manager for the data model of our IngeScape Editor application
     _modelManager = new EditorModelManager(_jsonHelper, rootPath, this);
 
-    // Create the controller to manage network communications
-    //networkC = new NetworkController(this);
-    NetworkController& networkC = NetworkController::Instance();
+    // Get (Create) the controller to manage network communications
+    NetworkController* networkC = NetworkController::instance();
 
     // Create the controller to manage the agents list
     _agentsSupervisionC = new AgentsSupervisionController(_modelManager, _jsonHelper, this);
@@ -251,49 +250,49 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
 
     // Connect to signals from the network controller
-    connect(&networkC, &NetworkController::networkDeviceIsNotAvailable, this, &IngeScapeEditorController::_onNetworkDeviceIsNotAvailable);
-    connect(&networkC, &NetworkController::networkDeviceIsAvailableAgain, this, &IngeScapeEditorController::_onNetworkDeviceIsAvailableAgain);
-    connect(&networkC, &NetworkController::networkDeviceIpAddressHasChanged, this, &IngeScapeEditorController::_onNetworkDeviceIpAddressHasChanged);
+    connect(networkC, &NetworkController::networkDeviceIsNotAvailable, this, &IngeScapeEditorController::_onNetworkDeviceIsNotAvailable);
+    connect(networkC, &NetworkController::networkDeviceIsAvailableAgain, this, &IngeScapeEditorController::_onNetworkDeviceIsAvailableAgain);
+    connect(networkC, &NetworkController::networkDeviceIpAddressHasChanged, this, &IngeScapeEditorController::_onNetworkDeviceIpAddressHasChanged);
 
-    connect(&networkC, &NetworkController::agentEntered, _modelManager, &EditorModelManager::onAgentEntered);
-    connect(&networkC, &NetworkController::agentExited, _modelManager, &EditorModelManager::onAgentExited);
-    connect(&networkC, &NetworkController::launcherEntered, _modelManager, &EditorModelManager::onLauncherEntered);
-    connect(&networkC, &NetworkController::launcherExited, _modelManager, &EditorModelManager::onLauncherExited);
-    connect(&networkC, &NetworkController::recorderEntered, _recordsSupervisionC, &RecordsSupervisionController::onRecorderEntered);
-    connect(&networkC, &NetworkController::recorderExited, _recordsSupervisionC, &RecordsSupervisionController::onRecorderExited);
-    connect(&networkC, &NetworkController::expeEntered, this, &IngeScapeEditorController::_onExpeEntered);
-    connect(&networkC, &NetworkController::expeExited, this, &IngeScapeEditorController::_onExpeExited);
+    connect(networkC, &NetworkController::agentEntered, _modelManager, &EditorModelManager::onAgentEntered);
+    connect(networkC, &NetworkController::agentExited, _modelManager, &EditorModelManager::onAgentExited);
+    connect(networkC, &NetworkController::launcherEntered, _modelManager, &EditorModelManager::onLauncherEntered);
+    connect(networkC, &NetworkController::launcherExited, _modelManager, &EditorModelManager::onLauncherExited);
+    connect(networkC, &NetworkController::recorderEntered, _recordsSupervisionC, &RecordsSupervisionController::onRecorderEntered);
+    connect(networkC, &NetworkController::recorderExited, _recordsSupervisionC, &RecordsSupervisionController::onRecorderExited);
+    connect(networkC, &NetworkController::expeEntered, this, &IngeScapeEditorController::_onExpeEntered);
+    connect(networkC, &NetworkController::expeExited, this, &IngeScapeEditorController::_onExpeExited);
 
-    connect(&networkC, &NetworkController::definitionReceived, _modelManager, &EditorModelManager::onDefinitionReceived);
-    connect(&networkC, &NetworkController::mappingReceived, _modelManager, &EditorModelManager::onMappingReceived);
-    connect(&networkC, &NetworkController::valuePublished, _modelManager, &EditorModelManager::onValuePublished);
-    connect(&networkC, &NetworkController::isMutedFromAgentUpdated, _modelManager, &EditorModelManager::onisMutedFromAgentUpdated);
-    connect(&networkC, &NetworkController::canBeFrozenFromAgentUpdated, _modelManager, &EditorModelManager::onCanBeFrozenFromAgentUpdated);
-    connect(&networkC, &NetworkController::isFrozenFromAgentUpdated, _modelManager, &EditorModelManager::onIsFrozenFromAgentUpdated);
-    connect(&networkC, &NetworkController::isMutedFromOutputOfAgentUpdated, _modelManager, &EditorModelManager::onIsMutedFromOutputOfAgentUpdated);
-    connect(&networkC, &NetworkController::agentStateChanged, _modelManager, &EditorModelManager::onAgentStateChanged);
-    connect(&networkC, &NetworkController::agentHasLogInStream, _modelManager, &EditorModelManager::onAgentHasLogInStream);
-    connect(&networkC, &NetworkController::agentHasLogInFile, _modelManager, &EditorModelManager::onAgentHasLogInFile);
-    connect(&networkC, &NetworkController::agentLogFilePath, _modelManager, &EditorModelManager::onAgentLogFilePath);
-    connect(&networkC, &NetworkController::agentDefinitionFilePath, _modelManager, &EditorModelManager::onAgentDefinitionFilePath);
-    connect(&networkC, &NetworkController::agentMappingFilePath, _modelManager, &EditorModelManager::onAgentMappingFilePath);
+    connect(networkC, &NetworkController::definitionReceived, _modelManager, &EditorModelManager::onDefinitionReceived);
+    connect(networkC, &NetworkController::mappingReceived, _modelManager, &EditorModelManager::onMappingReceived);
+    connect(networkC, &NetworkController::valuePublished, _modelManager, &EditorModelManager::onValuePublished);
+    connect(networkC, &NetworkController::isMutedFromAgentUpdated, _modelManager, &EditorModelManager::onisMutedFromAgentUpdated);
+    connect(networkC, &NetworkController::canBeFrozenFromAgentUpdated, _modelManager, &EditorModelManager::onCanBeFrozenFromAgentUpdated);
+    connect(networkC, &NetworkController::isFrozenFromAgentUpdated, _modelManager, &EditorModelManager::onIsFrozenFromAgentUpdated);
+    connect(networkC, &NetworkController::isMutedFromOutputOfAgentUpdated, _modelManager, &EditorModelManager::onIsMutedFromOutputOfAgentUpdated);
+    connect(networkC, &NetworkController::agentStateChanged, _modelManager, &EditorModelManager::onAgentStateChanged);
+    connect(networkC, &NetworkController::agentHasLogInStream, _modelManager, &EditorModelManager::onAgentHasLogInStream);
+    connect(networkC, &NetworkController::agentHasLogInFile, _modelManager, &EditorModelManager::onAgentHasLogInFile);
+    connect(networkC, &NetworkController::agentLogFilePath, _modelManager, &EditorModelManager::onAgentLogFilePath);
+    connect(networkC, &NetworkController::agentDefinitionFilePath, _modelManager, &EditorModelManager::onAgentDefinitionFilePath);
+    connect(networkC, &NetworkController::agentMappingFilePath, _modelManager, &EditorModelManager::onAgentMappingFilePath);
 
-    connect(&networkC, &NetworkController::allRecordsReceived, _recordsSupervisionC, &RecordsSupervisionController::onAllRecordsReceived);
-    connect(&networkC, &NetworkController::recordStartedReceived, _recordsSupervisionC, &RecordsSupervisionController::onRecordStartedReceived);
-    connect(&networkC, &NetworkController::recordStoppedReceived, _recordsSupervisionC, &RecordsSupervisionController::onRecordStoppedReceived);
-    connect(&networkC, &NetworkController::addedRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onAddedRecord);
-    connect(&networkC, &NetworkController::deletedRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onDeletedRecord);
-    connect(&networkC, &NetworkController::replayLoadingReceived, this, &IngeScapeEditorController::_onReplayLoading);
-    connect(&networkC, &NetworkController::replayLoadedReceived, _recordsSupervisionC, &RecordsSupervisionController::onReplayLoaded);
-    connect(&networkC, &NetworkController::replayUNloadedReceived, _recordsSupervisionC, &RecordsSupervisionController::onReplayUNloaded);
-    connect(&networkC, &NetworkController::replayEndedReceived, _recordsSupervisionC, &RecordsSupervisionController::onReplayEnded);
-    connect(&networkC, &NetworkController::recordExported, _recordsSupervisionC, &RecordsSupervisionController::onRecordExported);
+    connect(networkC, &NetworkController::allRecordsReceived, _recordsSupervisionC, &RecordsSupervisionController::onAllRecordsReceived);
+    connect(networkC, &NetworkController::recordStartedReceived, _recordsSupervisionC, &RecordsSupervisionController::onRecordStartedReceived);
+    connect(networkC, &NetworkController::recordStoppedReceived, _recordsSupervisionC, &RecordsSupervisionController::onRecordStoppedReceived);
+    connect(networkC, &NetworkController::addedRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onAddedRecord);
+    connect(networkC, &NetworkController::deletedRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onDeletedRecord);
+    connect(networkC, &NetworkController::replayLoadingReceived, this, &IngeScapeEditorController::_onReplayLoading);
+    connect(networkC, &NetworkController::replayLoadedReceived, _recordsSupervisionC, &RecordsSupervisionController::onReplayLoaded);
+    connect(networkC, &NetworkController::replayUNloadedReceived, _recordsSupervisionC, &RecordsSupervisionController::onReplayUNloaded);
+    connect(networkC, &NetworkController::replayEndedReceived, _recordsSupervisionC, &RecordsSupervisionController::onReplayEnded);
+    connect(networkC, &NetworkController::recordExported, _recordsSupervisionC, &RecordsSupervisionController::onRecordExported);
 
-    connect(&networkC, &NetworkController::runAction, _scenarioC, &ScenarioController::onRunAction);
-    connect(&networkC, &NetworkController::loadPlatformFileFromPath, this, &IngeScapeEditorController::_onLoadPlatformFileFromPath);
-    connect(&networkC, &NetworkController::updateTimeLineState, this, &IngeScapeEditorController::_onUpdateTimeLineState);
-    connect(&networkC, &NetworkController::updateRecordState, this, &IngeScapeEditorController::_onUpdateRecordState);
-    connect(&networkC, &NetworkController::highlightLink, _agentsMappingC, &AgentsMappingController::onHighlightLink);
+    connect(networkC, &NetworkController::runAction, _scenarioC, &ScenarioController::onRunAction);
+    connect(networkC, &NetworkController::loadPlatformFileFromPath, this, &IngeScapeEditorController::_onLoadPlatformFileFromPath);
+    connect(networkC, &NetworkController::updateTimeLineState, this, &IngeScapeEditorController::_onUpdateTimeLineState);
+    connect(networkC, &NetworkController::updateRecordState, this, &IngeScapeEditorController::_onUpdateRecordState);
+    connect(networkC, &NetworkController::highlightLink, _agentsMappingC, &AgentsMappingController::onHighlightLink);
 
 
     // Connect to signals from the model manager
@@ -314,36 +313,36 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_modelManager, &EditorModelManager::agentsGroupedByDefinitionHasBeenCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentsGroupedByDefinitionHasBeenCreated);
     connect(_modelManager, &EditorModelManager::agentsGroupedByDefinitionWillBeDeleted, _agentsSupervisionC, &AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted);
 
-    connect(_modelManager, &EditorModelManager::isMappingConnectedChanged, &networkC, &NetworkController::onIsMappingConnectedChanged);
-    connect(_modelManager, &EditorModelManager::addInputsToOurApplicationForAgentOutputs, &networkC, &NetworkController::onAddInputsToOurApplicationForAgentOutputs);
-    connect(_modelManager, &EditorModelManager::removeInputsFromOurApplicationForAgentOutputs, &networkC, &NetworkController::onRemoveInputsFromOurApplicationForAgentOutputs);
+    connect(_modelManager, &EditorModelManager::isMappingConnectedChanged, networkC, &NetworkController::onIsMappingConnectedChanged);
+    connect(_modelManager, &EditorModelManager::addInputsToOurApplicationForAgentOutputs, networkC, &NetworkController::onAddInputsToOurApplicationForAgentOutputs);
+    connect(_modelManager, &EditorModelManager::removeInputsFromOurApplicationForAgentOutputs, networkC, &NetworkController::onRemoveInputsFromOurApplicationForAgentOutputs);
 
     connect(_modelManager, &EditorModelManager::actionModelWillBeDeleted, _agentsMappingC, &AgentsMappingController::onActionModelWillBeDeleted);
 
 
     // Connect to signals from the controller for supervision of agents
-    connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedToLauncher, &networkC, &NetworkController::onCommandAskedToLauncher);
-    connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedToAgent, &networkC, &NetworkController::onCommandAskedToAgent);
-    connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedToAgentAboutOutput, &networkC, &NetworkController::onCommandAskedToAgentAboutOutput);
+    connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedToLauncher, networkC, &NetworkController::onCommandAskedToLauncher);
+    connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedToAgent, networkC, &NetworkController::onCommandAskedToAgent);
+    connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedToAgentAboutOutput, networkC, &NetworkController::onCommandAskedToAgentAboutOutput);
     connect(_agentsSupervisionC, &AgentsSupervisionController::openValuesHistoryOfAgent, _valuesHistoryC, &ValuesHistoryController::filterValuesToShowOnlyAgent);
     connect(_agentsSupervisionC, &AgentsSupervisionController::openLogStreamOfAgents, this, &IngeScapeEditorController::_onOpenLogStreamOfAgents);
 
     // Connect to signals from the controller for supervision of hosts
-    connect(_hostsSupervisionC, &HostsSupervisionController::commandAskedToAgent, &networkC, &NetworkController::onCommandAskedToAgent);
-    connect(_hostsSupervisionC, &HostsSupervisionController::commandAskedToLauncher, &networkC, &NetworkController::onCommandAskedToLauncher);
+    connect(_hostsSupervisionC, &HostsSupervisionController::commandAskedToAgent, networkC, &NetworkController::onCommandAskedToAgent);
+    connect(_hostsSupervisionC, &HostsSupervisionController::commandAskedToLauncher, networkC, &NetworkController::onCommandAskedToLauncher);
 
     // Connect to signals from the controller for mapping of agents
-    connect(_agentsMappingC, &AgentsMappingController::commandAskedToAgent, &networkC, &NetworkController::onCommandAskedToAgent);
-    connect(_agentsMappingC, &AgentsMappingController::commandAskedToAgentAboutMappingInput, &networkC, &NetworkController::onCommandAskedToAgentAboutMappingInput);
-    connect(_agentsMappingC, &AgentsMappingController::commandAskedToAgentAboutSettingValue, &networkC, &NetworkController::onCommandAskedToAgentAboutSettingValue);
+    connect(_agentsMappingC, &AgentsMappingController::commandAskedToAgent, networkC, &NetworkController::onCommandAskedToAgent);
+    connect(_agentsMappingC, &AgentsMappingController::commandAskedToAgentAboutMappingInput, networkC, &NetworkController::onCommandAskedToAgentAboutMappingInput);
+    connect(_agentsMappingC, &AgentsMappingController::commandAskedToAgentAboutSettingValue, networkC, &NetworkController::onCommandAskedToAgentAboutSettingValue);
     connect(_agentsMappingC, &AgentsMappingController::executeAction, _scenarioC, &ScenarioController::onExecuteAction);
 
     // Connect to signals from the controller of the scenario
-    connect(_scenarioC, &ScenarioController::commandAskedToLauncher, &networkC, &NetworkController::onCommandAskedToLauncher);
+    connect(_scenarioC, &ScenarioController::commandAskedToLauncher, networkC, &NetworkController::onCommandAskedToLauncher);
     connect(_scenarioC, &ScenarioController::commandAskedToRecorder, this, &IngeScapeEditorController::_onCommandAskedToRecorder);
-    connect(_scenarioC, &ScenarioController::commandAskedToAgent, &networkC, &NetworkController::onCommandAskedToAgent);
-    connect(_scenarioC, &ScenarioController::commandAskedToAgentAboutSettingValue, &networkC, &NetworkController::onCommandAskedToAgentAboutSettingValue);
-    connect(_scenarioC, &ScenarioController::commandAskedToAgentAboutMappingInput, &networkC, &NetworkController::onCommandAskedToAgentAboutMappingInput);
+    connect(_scenarioC, &ScenarioController::commandAskedToAgent, networkC, &NetworkController::onCommandAskedToAgent);
+    connect(_scenarioC, &ScenarioController::commandAskedToAgentAboutSettingValue, networkC, &NetworkController::onCommandAskedToAgentAboutSettingValue);
+    connect(_scenarioC, &ScenarioController::commandAskedToAgentAboutMappingInput, networkC, &NetworkController::onCommandAskedToAgentAboutMappingInput);
     connect(_scenarioC, &ScenarioController::timeLineStateUpdated, this, &IngeScapeEditorController::_onTimeLineStateUpdated);
 
     // Connect to the signal "time range changed" from the time line
@@ -351,7 +350,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_timeLineC, &AbstractTimeActionslineScenarioViewController::timeRangeChanged, _scenarioC, &ScenarioController::onTimeRangeChanged);
 
     // Connect to signals from Record supervision controller
-    connect(_recordsSupervisionC, &RecordsSupervisionController::commandAskedToRecorder, &networkC, &NetworkController::onCommandAskedToRecorder);
+    connect(_recordsSupervisionC, &RecordsSupervisionController::commandAskedToRecorder, networkC, &NetworkController::onCommandAskedToRecorder);
     connect(_recordsSupervisionC, &RecordsSupervisionController::startToRecord, this, &IngeScapeEditorController::_onStartToRecord);
 
 
@@ -1170,7 +1169,7 @@ void IngeScapeEditorController::_onStartToRecord()
         commandAndParameters.append(jsonString);
 
         // Send the command, parameters and the content of the JSON file to the recorder
-        NetworkController::Instance().sendCommandWithJsonToRecorder(_recordsSupervisionC->peerIdOfRecorder(), commandAndParameters);
+        NetworkController::instance()->sendCommandWithJsonToRecorder(_recordsSupervisionC->peerIdOfRecorder(), commandAndParameters);
     }
 }
 
@@ -1257,7 +1256,7 @@ void IngeScapeEditorController::_onLoadPlatformFileFromPath(QString platformFile
     if (!_peerIdOfExpe.isEmpty())
     {
         // Reply by sending the command execution status to Expe
-        NetworkController::Instance().sendCommandExecutionStatusToExpe(_peerIdOfExpe, command_LoadPlatformFile, platformFilePath, static_cast<int>(success));
+        NetworkController::instance()->sendCommandExecutionStatusToExpe(_peerIdOfExpe, command_LoadPlatformFile, platformFilePath, static_cast<int>(success));
     }
     else
     {
@@ -1325,13 +1324,13 @@ void IngeScapeEditorController::_onTimeLineStateUpdated(QString state)
     // Notify the Recorder app
     if ((_recordsSupervisionC != nullptr) && _recordsSupervisionC->isRecorderON())
     {
-        NetworkController::Instance().sendMessageToAgent(_recordsSupervisionC->peerIdOfRecorder(), notificationAndParameters);
+        NetworkController::instance()->sendMessageToAgent(_recordsSupervisionC->peerIdOfRecorder(), notificationAndParameters);
     }
 
     // Notify the Expe app
     if (!_peerIdOfExpe.isEmpty())
     {
-        NetworkController::Instance().sendMessageToAgent(_peerIdOfExpe, notificationAndParameters);
+        NetworkController::instance()->sendMessageToAgent(_peerIdOfExpe, notificationAndParameters);
     }
 }
 
@@ -1377,7 +1376,7 @@ void IngeScapeEditorController::_onCommandAskedToRecorder(QString commandAndPara
 {
     if ((_recordsSupervisionC != nullptr) && _recordsSupervisionC->isRecorderON())
     {
-        NetworkController::Instance().onCommandAskedToRecorder(_recordsSupervisionC->peerIdOfRecorder(), commandAndParameters);
+        NetworkController::instance()->onCommandAskedToRecorder(_recordsSupervisionC->peerIdOfRecorder(), commandAndParameters);
     }
 }
 
@@ -1445,7 +1444,7 @@ void IngeScapeEditorController::_onNetworkDeviceIsNotAvailable()
     qDebug() << Q_FUNC_INFO;
 
     // Stop IngeScape if needed
-    if (NetworkController::Instance().isStarted())
+    if (NetworkController::instance()->isStarted())
     {
         _stopIngeScape(false);
     }
@@ -1487,7 +1486,7 @@ void IngeScapeEditorController::_onSystemSleep()
     qDebug() << Q_FUNC_INFO;
 
     // Stop monitoring to save energy
-    NetworkController::Instance().stopMonitoring();
+    NetworkController::instance()->stopMonitoring();
 
     // Stop IngeScape
     _stopIngeScape(false);
@@ -1511,7 +1510,7 @@ void IngeScapeEditorController::_onSystemWake()
  */
 void IngeScapeEditorController::_onSystemNetworkConfigurationsUpdated()
 {
-    NetworkController::Instance().updateAvailableNetworkDevices();
+    NetworkController::instance()->updateAvailableNetworkDevices();
 }
 
 
@@ -1754,7 +1753,7 @@ void IngeScapeEditorController::_stopIngeScape(bool hasToClearPlatform)
 {
     if (_modelManager != nullptr)
     {
-        NetworkController& networkC = NetworkController::Instance();
+        NetworkController* networkC = NetworkController::instance();
 
         if (hasToClearPlatform)
         {
@@ -1775,10 +1774,10 @@ void IngeScapeEditorController::_stopIngeScape(bool hasToClearPlatform)
         _modelManager->setisMappingControlled(false);
 
         // Stop our IngeScape agent
-        networkC.stop();
+        networkC->stop();
 
         // We don't see itself
-        networkC.setnumberOfEditors(1);
+        networkC->setnumberOfEditors(1);
 
         // Simulate an exit for each agent ON
         _modelManager->simulateExitForEachAgentON();
@@ -1819,23 +1818,23 @@ bool IngeScapeEditorController::_startIngeScape(bool checkAvailableNetworkDevice
 
     if (_modelManager != nullptr)
     {
-        NetworkController& networkC = NetworkController::Instance();
+        NetworkController* networkC = NetworkController::instance();
 
         if (checkAvailableNetworkDevices)
         {
             // Update the list of available network devices
-            networkC.updateAvailableNetworkDevices();
+            networkC->updateAvailableNetworkDevices();
 
             // There is only one available network device, we use it !
-            if (networkC.availableNetworkDevices().count() == 1)
+            if (networkC->availableNetworkDevices().count() == 1)
             {
-                _networkDevice = networkC.availableNetworkDevices().at(0);
+                _networkDevice = networkC->availableNetworkDevices().at(0);
             }
         }
 
 
         // Start our IngeScape agent with the network device and the port
-        success = networkC.start(_networkDevice, _ipAddress, _port);
+        success = networkC->start(_networkDevice, _ipAddress, _port);
 
         if (success)
         {

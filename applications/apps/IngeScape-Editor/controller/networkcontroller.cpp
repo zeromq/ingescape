@@ -56,6 +56,38 @@ static const QString prefix_UpdateRecordState = "UPDATE_RECORD_STATE=";
 //
 //--------------------------------------------------------------
 
+// Define our singleton instance
+// Creates a global and static object of type QGlobalStatic, of name _singletonInstance and that behaves as a pointer to NetworkController.
+// The object created by Q_GLOBAL_STATIC initializes itself on the first use, which means that it will not increase the application or the library's load time.
+// Additionally, the object is initialized in a thread-safe manner on all platforms.
+Q_GLOBAL_STATIC(NetworkController, _singletonInstance)
+
+
+/**
+ * @brief Get our singleton instance
+ * @return
+ */
+NetworkController* NetworkController::instance()
+{
+    return _singletonInstance;
+}
+
+
+/**
+ * @brief Method used to provide a singleton to QML
+ * @param engine
+ * @param scriptEngine
+ * @return
+ */
+QObject* NetworkController::qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine)
+{
+    Q_UNUSED(engine);
+    Q_UNUSED(scriptEngine);
+
+    return _singletonInstance;
+}
+
+
 /**
  * @brief Default constructor
  * @param parent
@@ -80,17 +112,6 @@ NetworkController::~NetworkController()
 {
     // Mother class is automatically called
     //IngeScapeNetworkController::~IngeScapeNetworkController();
-}
-
-
-/**
- * @brief Accessor to the singleton instance
- * @return
- */
-NetworkController& NetworkController::Instance()
-{
-    //return NetworkController::_instance;
-    return _instance;
 }
 
 

@@ -38,7 +38,29 @@ public:
      * @brief Accessor to the singleton instance
      * @return
      */
-    static NetworkController& Instance();
+    static NetworkController* instance();
+
+
+    /**
+     * @brief Method used to provide a singleton to QML
+     * @param engine
+     * @param scriptEngine
+     * @return
+     */
+     static QObject* qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine);
+
+
+    /**
+     * @brief Constructor
+     * @param parent
+     */
+    explicit NetworkController(QObject *parent = nullptr);
+
+
+    /**
+      * @brief Destructor
+      */
+    ~NetworkController() Q_DECL_OVERRIDE;
 
 
     /**
@@ -310,24 +332,6 @@ public Q_SLOTS:
 
 
 private:
-
-    /**
-     * @brief Constructor
-     * @param parent
-     */
-    explicit NetworkController(QObject *parent = nullptr);
-
-
-    /**
-      * @brief Destructor
-      */
-    ~NetworkController() Q_DECL_OVERRIDE;
-
-
-private:
-    // The singleton instance
-    static NetworkController _instance;
-    //static NetworkController* _instance;
 
 };
 
