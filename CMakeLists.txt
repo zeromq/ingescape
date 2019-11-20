@@ -96,6 +96,7 @@ message(STATUS "Detected INGESCAPE Version - ${INGESCAPE_VERSION}")
 # includes
 # ##############################################################################
 set(ingescape_headers_to_install src/include/ingescape.h
+				 src/include/ingescape_agent.h
                                  src/include/ingescape_advanced.h)
 
 set(ingescape_headers
