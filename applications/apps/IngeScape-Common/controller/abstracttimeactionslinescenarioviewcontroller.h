@@ -73,9 +73,6 @@ class AbstractTimeActionslineScenarioViewController : public QObject
     // Viewport height in pixels
     I2_QML_PROPERTY(int, viewportHeight)
 
-    // Scale factor applied to the content of our viewport (X-axis)
-    I2_QML_PROPERTY_CUSTOM_SETTER(qreal, viewportContentScaleX)
-
     // Time margin in pixels
     I2_QML_PROPERTY(int, timeMarginInPixels)
 
@@ -100,6 +97,16 @@ public:
      */
     ~AbstractTimeActionslineScenarioViewController();
 
+    /**
+      * @brief Import timeline parameters from JSON
+      * @param jsonScenario
+      */
+    void importTimelineFromJson(QJsonObject jsonTimeline);
+
+    /**
+      * @brief Reset timeline parameters
+      */
+    void resetTimeline();
 
     /**
      * @brief Get our filtered list of "time ticks"

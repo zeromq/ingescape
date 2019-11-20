@@ -129,6 +129,9 @@ list(APPEND ingescape_assessments_sources ${ingescape_assessments_sources_model}
 file(GLOB_RECURSE ingescape_assessments_sources_view_model "${SOURCE_DIR}/viewModel/*.cpp")
 list(APPEND ingescape_assessments_sources ${ingescape_assessments_sources_view_model})
 
+file(GLOB_RECURSE ingescape_assessments_sort_filter "${SOURCE_DIR}/sortFilter/*.cpp")
+list(APPEND ingescape_assessments_sources ${ingescape_assessments_sort_filter})
+
 list(APPEND ingescape_assessments_sources "${SOURCE_DIR}/main.cpp")
 
 add_ingescape_common_sources(ingescape_assessments_sources)

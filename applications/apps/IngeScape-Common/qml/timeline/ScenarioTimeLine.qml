@@ -334,8 +334,6 @@ Item {
         }
 
 
-
-
         // NB: Flickable is inside PinchArea to avoid input issues on Linux
         //     i.e. sometimes PinchArea does not detect two fingers
         //          only one finger is detected and handled by our Flickable
@@ -371,7 +369,6 @@ Item {
 
                 // Move content of our flickable within bounds
                 contentArea.returnToBounds();
-
             }
 
 
@@ -1428,8 +1425,6 @@ Item {
                 }
             }
         }
-
-
     }
 
     //--------------------------------------------------------
@@ -1468,23 +1463,19 @@ Item {
         value: timeLineArea.height
     }
 
-    // columnHeaders => contentArea
+    // ContentArea => columnHeaders
     Binding {
         target: columnHeaders
         property: "contentX"
         value: contentArea.contentX
     }
 
-    // contentArea => columnHeaders
+    // ColumnHeaders => contentArea
     Binding {
         target: contentArea
         property: "contentX"
         value: columnHeaders.contentX
     }
-
-
-
-
 
     // scrollBarHorizontal => contentArea
     Binding {
@@ -1499,7 +1490,7 @@ Item {
         when: mouseArea.drag.active
     }
 
-    // timeLineController => scrollBarHorizontal
+    // TimeLineController => scrollBarHorizontal
     Binding {
         target: scrollBarHorizontal
         property: "x"
@@ -1511,6 +1502,4 @@ Item {
                }
         when: !mouseArea.drag.active
     }
-
-
 }

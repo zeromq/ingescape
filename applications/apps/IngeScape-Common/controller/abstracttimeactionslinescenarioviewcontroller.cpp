@@ -38,10 +38,10 @@
 #define LENGTH_TIME_LINE 2.0
 
 // time ranges number
-#define TIME_RANGES_COUNT 8
+#define TIME_RANGES_COUNT 9
 
 // time ranges for time ticks
-int TIME_RANGES[TIME_RANGES_COUNT] = {1, 2, 5, 10, 30, 60, 120, 300};
+int TIME_RANGES[TIME_RANGES_COUNT] = {1, 2, 5, 10, 30, 60, 120, 300, 600};
 
 #define NB_MILLI_SECONDS_IN_ONE_MINUTE 60000.0
 
@@ -59,7 +59,6 @@ AbstractTimeActionslineScenarioViewController::AbstractTimeActionslineScenarioVi
     _viewportY(-1),
     _viewportWidth(0),
     _viewportHeight(0),
-    _viewportContentScaleX(1.0),
     _timeMarginInPixels(TIME_MARGIN_IN_PIXELS),
     _minPixelsPerMinute(DEFAULT_VIEWPORT_WIDTH/MAXIMUM_TIME_RANGE),
     _maxPixelsPerMinute(DEFAULT_VIEWPORT_WIDTH/MINIMUM_TIME_RANGE),
@@ -129,7 +128,35 @@ AbstractTimeActionslineScenarioViewController::~AbstractTimeActionslineScenarioV
     _timeTicks.deleteAllItems();
 }
 
+/**
+  * @brief Import timeline parameters from JSON
+  * @param jsonScenario
+  */
+void AbstractTimeActionslineScenarioViewController::importTimelineFromJson(QJsonObject jsonTimeline)
+{
+    QJsonValue jsonValue = jsonTimeline.value("pixels_per_minute");
 
+    if (jsonValue.isDouble())
+    {
+        double pixelsPerMinute = jsonValue.toDouble();
+        setpixelsPerMinute(pixelsPerMinute);
+
+        // Update time coordinate after
+        updateTimeCoordinatesOfTimeTicks();
+    }
+}
+
+
+/**
+  * @brief Reset timeline parameters
+  */
+void AbstractTimeActionslineScenarioViewController::resetTimeline()
+{    
+    setpixelsPerMinute(DEFAULT_VIEWPORT_WIDTH/DEFAULT_TIME_RANGE);
+
+    // Update time coordinate after
+    updateTimeCoordinatesOfTimeTicks();
+}
 
 /**
  * @brief Update time coordinates of X axis according to zoom levels
@@ -145,7 +172,7 @@ void AbstractTimeActionslineScenarioViewController::updateTimeCoordinatesOfTimeT
 
     for (int index = 0; index < TIME_RANGES_COUNT; index ++)
     {
-        if (minDeltaBetweenTicks < TIME_RANGES[index])
+        if (minDeltaBetweenTicks <= TIME_RANGES[index])
         {
             _timeRangeBetweenTimeTicksInMilliSeconds = TIME_RANGES[index] * 1000;
             break;
@@ -164,13 +191,16 @@ void AbstractTimeActionslineScenarioViewController::updateTimeCoordinatesOfTimeT
 
         // the number of small ticks is different according to the time range between big ticks
         int rangeForSmallTicks;
-        if ( (_timeRangeBetweenTimeTicksInMilliSeconds/1000) == 5 || (_timeRangeBetweenTimeTicksInMilliSeconds/1000) == 300) {
+        if (((_timeRangeBetweenTimeTicksInMilliSeconds/1000) == 5) || ((_timeRangeBetweenTimeTicksInMilliSeconds/1000) == 300))
+        {
             rangeForSmallTicks = _timeRangeBetweenTimeTicksInMilliSeconds/5;
         }
-        else if ((_timeRangeBetweenTimeTicksInMilliSeconds/1000) == 30)  {
+        else if ((_timeRangeBetweenTimeTicksInMilliSeconds/1000) == 30)
+        {
             rangeForSmallTicks = _timeRangeBetweenTimeTicksInMilliSeconds/3;
         }
-        else {
+        else
+        {
             rangeForSmallTicks = _timeRangeBetweenTimeTicksInMilliSeconds/2;
         }
 
@@ -218,24 +248,6 @@ void AbstractTimeActionslineScenarioViewController::setpixelsPerMinute(qreal val
 
         // Notify change
         Q_EMIT pixelsPerMinuteChanged(value);
-    }
-}
-
-
-
-/**
- * @brief Set the scale factor applied to the content of our viewport (X-axis)
- * @param value
- */
-void AbstractTimeActionslineScenarioViewController::setviewportContentScaleX(qreal value)
-{
-    if (!qFuzzyCompare(_viewportContentScaleX, value))
-    {
-        // Save new value
-        _viewportContentScaleX = value;
-
-        // Notify change
-        Q_EMIT viewportContentScaleXChanged(value);
     }
 }
 
@@ -406,7 +418,3 @@ void AbstractTimeActionslineScenarioViewController::_updateFilteredTimeTicksList
     // Emit the change for actions view models
     Q_EMIT timeRangeChanged(intViewportTimeRangeStartInMilliseconds, intViewportTimeRangeEndInMilliseconds);
 }
-
-
-
-
