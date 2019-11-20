@@ -306,7 +306,14 @@ int AbstractTimeActionslineScenarioViewController::convertAbscissaInCoordinateSy
 
     qreal timeSeconds = ((xValue- _timeMarginInPixels)/_pixelsPerMinute) * 60.0;
 
-    return static_cast<int>((timeSeconds + _startRelativeTimeInSeconds) * 1000.0);
+    int currentTimeInMilliseconds = static_cast<int>((timeSeconds + _startRelativeTimeInSeconds) * 1000.0);
+
+    // If converted value is under start time, converted value gives start time
+    if (currentTimeInMilliseconds < _startRelativeTimeInSeconds) {
+        currentTimeInMilliseconds = _startRelativeTimeInSeconds;
+    }
+
+    return currentTimeInMilliseconds;
 }
 
 
