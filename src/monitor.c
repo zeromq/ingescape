@@ -261,7 +261,7 @@ void igsAgent_monitoringEnableWithExpectedDevice(igsAgent_t *agent, unsigned int
     }
     agent->monitor->port = port;
 
-    agent->monitor->monitorActor = zactor_new (monitor_initLoop, NULL);
+    agent->monitor->monitorActor = zactor_new (monitor_initLoop, agent);
 }
 
 void igsAgent_monitoringDisable(igsAgent_t *agent){
