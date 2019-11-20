@@ -590,16 +590,15 @@ IngeScapeEditorController::~IngeScapeEditorController()
         temp = nullptr;
     }
 
-    /*if (networkC != nullptr)
+    if (NetworkController::instance() != nullptr)
     {
-        disconnect(&networkC);
+        disconnect(NetworkController::instance());
 
-        NetworkController* temp = networkC;
-        setnetworkC(nullptr);
-        delete temp;
-        temp = nullptr;
-    }*/
-    // FIXME TODO: delete NetworkController::destroyInstance()
+        //NetworkController* temp = networkC;
+        //setnetworkC(nullptr);
+        //delete temp;
+        //temp = nullptr;
+    }
 
     // Delete json helper
     if (_jsonHelper != nullptr)

@@ -27,7 +27,7 @@
 /**
  * @brief The NetworkController class defines the controller for network communications
  */
-class NetworkController: public IngeScapeNetworkController
+class NetworkController : public IngeScapeNetworkController
 {
     Q_OBJECT
 

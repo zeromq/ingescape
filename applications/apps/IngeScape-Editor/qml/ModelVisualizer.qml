@@ -106,7 +106,7 @@ Rectangle {
             }
 
             Text {
-                text: "- " + IngeScapeEditorC.networkC.numberOfAgents + " agents"
+                text: "- " + NetworkC.numberOfAgents + " agents"
 
                 color: "white"
                 font {
@@ -116,7 +116,7 @@ Rectangle {
             }
 
             Text {
-                text: "- " + IngeScapeEditorC.networkC.numberOfLaunchers + " launchers"
+                text: "- " + NetworkC.numberOfLaunchers + " launchers"
 
                 color: "white"
                 font {
@@ -126,7 +126,7 @@ Rectangle {
             }
 
             Text {
-                text: "- " + IngeScapeEditorC.networkC.numberOfRecorders + " recorders"
+                text: "- " + NetworkC.numberOfRecorders + " recorders"
 
                 color: "white"
                 font {
@@ -136,7 +136,7 @@ Rectangle {
             }
 
             Text {
-                text: "- " + IngeScapeEditorC.networkC.numberOfEditors + " editors"
+                text: "- " + NetworkC.numberOfEditors + " editors"
 
                 color: "white"
                 font {
@@ -146,7 +146,7 @@ Rectangle {
             }
 
             Text {
-                text: "- " + IngeScapeEditorC.networkC.numberOfAssessments + " assessments"
+                text: "- " + NetworkC.numberOfAssessments + " assessments"
 
                 color: "white"
                 font {
@@ -156,7 +156,7 @@ Rectangle {
             }
 
             Text {
-                text: "- " + IngeScapeEditorC.networkC.numberOfExpes + " expes"
+                text: "- " + NetworkC.numberOfExpes + " expes"
 
                 color: "white"
                 font {
