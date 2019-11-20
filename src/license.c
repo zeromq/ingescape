@@ -36,9 +36,6 @@ pthread_mutex_t *license_readWriteMutex = NULL;
 pthread_mutex_t license_readWriteMutex = NULL;
 #endif
 
-license_t *license = NULL;
-char *licensePath = NULL;
-
 uint8_t secretEncryptionKey[crypto_secretstream_xchacha20poly1305_KEYBYTES] = {1,255,34,41,58,63,47,183,134,223,33,41,25,16,87,38,211,27,183,124,185,196,107,128,34,92,83,54,35,60,37,28};
 unsigned char publicSignKey[crypto_sign_PUBLICKEYBYTES] = {47,20,1,206,112,73,169,19,31,67,21,116,192,151,109,34,215,117,250,86,247,235,53,159,208,126,234,177,133,49,103,111};
 #define CHUNK_SIZE 4096
@@ -246,38 +243,38 @@ void license_parseLine(const char *command, const char *data, license_t *myLicen
 ////////////////////////////////////////////////////////////////////////
 // PRIVATE API
 ////////////////////////////////////////////////////////////////////////
-void license_cleanLicense(void){
+void license_cleanLicense(igsAgent_t *agent){
     license_readWriteLock();
-    if (license != NULL){
-        if (license->id != NULL){
-            free(license->id);
+    if (agent->license != NULL){
+        if (agent->license->id != NULL){
+            free(agent->license->id);
         }
-        if (license->customer != NULL){
-            free(license->customer);
+        if (agent->license->customer != NULL){
+            free(agent->license->customer);
         }
-        if (license->order != NULL){
-            free(license->order);
+        if (agent->license->order != NULL){
+            free(agent->license->order);
         }
-        if (license->editorOwner != NULL){
-            free(license->editorOwner);
+        if (agent->license->editorOwner != NULL){
+            free(agent->license->editorOwner);
         }
-        if (license->features != NULL){
-            zhash_destroy(&license->features);
+        if (agent->license->features != NULL){
+            zhash_destroy(&agent->license->features);
         }
-        if (license->agents != NULL){
-            licenseForAgent_t *l = zhash_first(license->agents);
+        if (agent->license->agents != NULL){
+            licenseForAgent_t *l = zhash_first(agent->license->agents);
             while (l != NULL){
                 if (l->agentId != NULL)
                     free(l->agentId);
                 if (l->agentName)
                     free(l->agentName);
                 free(l);
-                l = zhash_next(license->agents);
+                l = zhash_next(agent->license->agents);
             }
-            zhash_destroy(&license->agents);
+            zhash_destroy(&agent->license->agents);
         }
-        if (license->licenseDetails != NULL){
-            license_t *detail = zlist_first(license->licenseDetails);
+        if (agent->license->licenseDetails != NULL){
+            license_t *detail = zlist_first(agent->license->licenseDetails);
             while (detail != NULL){
                 if (detail->id != NULL){
                     free(detail->id);
@@ -310,26 +307,26 @@ void license_cleanLicense(void){
                     zhash_destroy(&detail->agents);
                 }
                 free(detail);
-                detail = zlist_next(license->licenseDetails);
+                detail = zlist_next(agent->license->licenseDetails);
             }
-            zlist_destroy(&license->licenseDetails);
+            zlist_destroy(&agent->license->licenseDetails);
         }
-        free(license);
-        license = NULL;
+        free(agent->license);
+        agent->license = NULL;
     }
     license_readWriteUnlock();
 }
 
-void license_readLicense(void){
-    if (license == NULL){
+void license_readLicense(igsAgent_t *agent){
+    if (agent->license == NULL){
         if (sodium_init() != 0) {
             //nothing to do ?
             //NB: sodium returns -1 when trying to initialize more than once
         }
     }
-    license_cleanLicense();
+    license_cleanLicense(agent);
     license_readWriteLock();
-    if (licensePath == NULL){
+    if (agent->licensePath == NULL){
         //use agent executable file as license path
 #if defined __unix__ || defined __APPLE__ || defined __linux__
 #ifdef __APPLE__
@@ -361,33 +358,33 @@ void license_readLicense(void){
 #endif
 #endif
         //remove exec name from exec path
-        licensePath = strdup(pathbuf);
-        char *index = licensePath + strlen(licensePath);
-        while (*index != '/' && *index != '\\' && index > licensePath) {
+        agent->licensePath = strdup(pathbuf);
+        char *index = agent->licensePath + strlen(agent->licensePath);
+        while (*index != '/' && *index != '\\' && index > agent->licensePath) {
                index--;
         }
         *index = '\0';
 #if defined __APPLE__
-        switchToBundlePath(&licensePath);
+        switchToBundlePath(&agent->licensePath);
 #endif
     }
     
-    if (!zsys_file_exists(licensePath)){
-        igs_error("%s could not be opened properly : no license found", licensePath);
+    if (!zsys_file_exists(agent->licensePath)){
+        igs_error("%s could not be opened properly : no license found", agent->licensePath);
     }else{
         //NB: zdir provides a function to scan folder contents but
         //this function scans all subdirectories which may take a very
         //long time, e.g. in /Applications/.
         //That's why we use dirent here.
-        igs_debug("scan for licenses in %s", licensePath);
+        igs_debug("scan for licenses in %s", agent->licensePath);
         zlist_t *filesList = zlist_new();
         DIR *dir;
         struct dirent *ent;
-        if ((dir = opendir (licensePath)) != NULL) {
+        if ((dir = opendir (agent->licensePath)) != NULL) {
             ent = readdir (dir);
             while (ent != NULL) {
-                zfile_t *new = zfile_new(licensePath, ent->d_name);
-                const char *name = zfile_filename(new, licensePath);
+                zfile_t *new = zfile_new(agent->licensePath, ent->d_name);
+                const char *name = zfile_filename(new, agent->licensePath);
                 const char *extension = license_getFilenameExt(name);
                 if (strcmp(extension, "igslicense") == 0
                     && !zfile_is_directory(new)
@@ -404,17 +401,17 @@ void license_readLicense(void){
         }
         igs_debug("%zu license(s) found", zlist_size(filesList));
         if (zlist_size(filesList) > 0){
-            license = calloc(1, sizeof(license_t));
-            license->features = zhash_new();
-            license->agents = zhash_new();
-            license->licenseDetails = zlist_new();
+            agent->license = calloc(1, sizeof(license_t));
+            agent->license->features = zhash_new();
+            agent->license->agents = zhash_new();
+            agent->license->licenseDetails = zlist_new();
         }
         
         //iterate on license files in folder
         zfile_t *file = zlist_first(filesList);
         while (file != NULL) {
             license_t *detail = calloc(1, sizeof(license_t));
-            zlist_append(license->licenseDetails, detail);
+            zlist_append(agent->license->licenseDetails, detail);
             detail->features = zhash_new();
             detail->agents = zhash_new();
             
@@ -451,62 +448,62 @@ void license_readLicense(void){
         
         //go through details to apply least contraining values in main license struct
         license_t *detail = NULL;
-        if (license != NULL && license->licenseDetails != NULL){
-            detail = zlist_first(license->licenseDetails);
+        if (agent->license != NULL && agent->license->licenseDetails != NULL){
+            detail = zlist_first(agent->license->licenseDetails);
         }
         while (detail != NULL){
             if (detail->isLicenseValid){
                 if (detail->id != NULL){
-                    if (license->id == NULL){
-                        license->id = strdup(detail->id);
+                    if (agent->license->id == NULL){
+                        agent->license->id = strdup(detail->id);
                     }else{
-                        char *tempId = strdup(license->id);
-                        license->id = realloc(license->id, strlen(license->id) + strlen(detail->id) + 3);
-                        sprintf(license->id, "%s, %s", tempId, detail->id);
+                        char *tempId = strdup(agent->license->id);
+                        agent->license->id = realloc(agent->license->id, strlen(agent->license->id) + strlen(detail->id) + 3);
+                        sprintf(agent->license->id, "%s, %s", tempId, detail->id);
                         free(tempId);
                     }
                 }
                 if (detail->customer != NULL){
-                    if (license->customer == NULL){
-                        license->customer = strdup(detail->customer);
+                    if (agent->license->customer == NULL){
+                        agent->license->customer = strdup(detail->customer);
                     }else{
-                        char *tempCustomer = strdup(license->customer);
-                        license->customer = realloc(license->customer, strlen(license->customer) + strlen(detail->customer) + 3);
-                        sprintf(license->customer, "%s, %s", tempCustomer, detail->customer);
+                        char *tempCustomer = strdup(agent->license->customer);
+                        agent->license->customer = realloc(agent->license->customer, strlen(agent->license->customer) + strlen(detail->customer) + 3);
+                        sprintf(agent->license->customer, "%s, %s", tempCustomer, detail->customer);
                         free(tempCustomer);
                     }
                 }
                 if (detail->order != NULL){
-                    if (license->order == NULL){
-                        license->order = strdup(detail->order);
+                    if (agent->license->order == NULL){
+                        agent->license->order = strdup(detail->order);
                     }else{
-                        char *tempOrder = strdup(license->order);
-                        license->order = realloc(license->order, strlen(license->order) + strlen(detail->order) + 3);
-                        sprintf(license->order, "%s, %s", tempOrder, detail->order);
+                        char *tempOrder = strdup(agent->license->order);
+                        agent->license->order = realloc(agent->license->order, strlen(agent->license->order) + strlen(detail->order) + 3);
+                        sprintf(agent->license->order, "%s, %s", tempOrder, detail->order);
                         free(tempOrder);
                     }
                 }
-                if (license->licenseExpirationDate < detail->licenseExpirationDate){
-                    license->licenseExpirationDate = detail->licenseExpirationDate;
+                if (agent->license->licenseExpirationDate < detail->licenseExpirationDate){
+                    agent->license->licenseExpirationDate = detail->licenseExpirationDate;
                     long t = (long)time(NULL);
-                    if (license->licenseExpirationDate >= t){
-                        license->isLicenseValid = true;
+                    if (agent->license->licenseExpirationDate >= t){
+                        agent->license->isLicenseValid = true;
                     }
                 }
                 
-                if (license->platformNbAgents < detail->platformNbAgents){
-                    license->platformNbAgents = detail->platformNbAgents;
+                if (agent->license->platformNbAgents < detail->platformNbAgents){
+                    agent->license->platformNbAgents = detail->platformNbAgents;
                 }
-                if (license->platformNbIOPs < detail->platformNbIOPs){
-                    license->platformNbIOPs = detail->platformNbIOPs;
+                if (agent->license->platformNbIOPs < detail->platformNbIOPs){
+                    agent->license->platformNbIOPs = detail->platformNbIOPs;
                 }
                 
                 //add new features that are not in the list yet
                 zlist_t *features = zhash_keys(detail->features);
                 char *k = zlist_first(features);
                 while (k != NULL){
-                    if (zhash_lookup(license->features, k) == NULL){
-                        zhash_insert(license->features, k, NULL);
+                    if (zhash_lookup(agent->license->features, k) == NULL){
+                        zhash_insert(agent->license->features, k, NULL);
                     }
                     k = zlist_next(features);
                 }
@@ -516,12 +513,12 @@ void license_readLicense(void){
                 zlist_t *agents = zhash_keys(detail->agents);
                 k = zlist_first(agents);
                 while (k != NULL){
-                    if (zhash_lookup(license->agents, k) == NULL){
+                    if (zhash_lookup(agent->license->agents, k) == NULL){
                         licenseForAgent_t *l = zhash_lookup(detail->agents, k);
                         licenseForAgent_t *l_dup = calloc(1, sizeof(licenseForAgent_t));
                         l_dup->agentId = strdup(l->agentId);
                         l_dup->agentName = strdup(l->agentName);
-                        zhash_insert(license->agents, k, l_dup);
+                        zhash_insert(agent->license->agents, k, l_dup);
                     }
                     k = zlist_next(agents);
                 }
@@ -529,50 +526,50 @@ void license_readLicense(void){
             }
             if (detail->isEditorLicenseValid){
                 if (detail->editorOwner != NULL){
-                    if (license->editorOwner == NULL){
-                        license->editorOwner = strdup(detail->editorOwner);
+                    if (agent->license->editorOwner == NULL){
+                        agent->license->editorOwner = strdup(detail->editorOwner);
                     }else{
-                        char *tempOwner = strdup(license->editorOwner);
-                        license->editorOwner = realloc(license->editorOwner, strlen(license->editorOwner) + strlen(detail->editorOwner) + 3);
-                        sprintf(license->editorOwner, "%s, %s", tempOwner, detail->editorOwner);
+                        char *tempOwner = strdup(agent->license->editorOwner);
+                        agent->license->editorOwner = realloc(agent->license->editorOwner, strlen(agent->license->editorOwner) + strlen(detail->editorOwner) + 3);
+                        sprintf(agent->license->editorOwner, "%s, %s", tempOwner, detail->editorOwner);
                         free(tempOwner);
                     }
                 }
-                if (license->editorExpirationDate < detail->editorExpirationDate){
-                    license->editorExpirationDate = detail->editorExpirationDate;
+                if (agent->license->editorExpirationDate < detail->editorExpirationDate){
+                    agent->license->editorExpirationDate = detail->editorExpirationDate;
                     time_t t = time(NULL);
-                    if (license->editorExpirationDate >= t){
-                        license->isEditorLicenseValid = true;
+                    if (agent->license->editorExpirationDate >= t){
+                        agent->license->isEditorLicenseValid = true;
                     }
                 }
             }
-            detail = zlist_next(license->licenseDetails);
+            detail = zlist_next(agent->license->licenseDetails);
         }
     }
-    if (license == NULL){
-        igs_license("no license found in %s : switching to demonstration mode", licensePath);
-        license = calloc(1, sizeof(license_t));
-        license->features = zhash_new();
-        license->agents = zhash_new();
+    if (agent->license == NULL){
+        igs_license("no license found in %s : switching to demonstration mode", agent->licensePath);
+        agent->license = calloc(1, sizeof(license_t));
+        agent->license->features = zhash_new();
+        agent->license->agents = zhash_new();
     }
     //set license parameters to default for uninitialized values
-    if (license->id == NULL)
-        license->id = strdup("Unregistered");
-    if (license->customer == NULL)
-        license->customer = strdup("Unregistered");
-    if (license->order == NULL)
-        license->order = strdup("none");
-    if (license->licenseExpirationDate == 0){
-        license->licenseExpirationDate = -1;
+    if (agent->license->id == NULL)
+        agent->license->id = strdup("Unregistered");
+    if (agent->license->customer == NULL)
+        agent->license->customer = strdup("Unregistered");
+    if (agent->license->order == NULL)
+        agent->license->order = strdup("none");
+    if (agent->license->licenseExpirationDate == 0){
+        agent->license->licenseExpirationDate = -1;
     }
-    if (license->platformNbAgents == 0)
-        license->platformNbAgents = MAX_NB_OF_AGENTS;
-    if (license->platformNbIOPs == 0)
-        license->platformNbIOPs = MAX_NB_OF_IOP;
-    if (license->editorOwner == NULL)
-        license->editorOwner = strdup("Unregistered");
-    if (license->editorExpirationDate == 0){
-        license->editorExpirationDate = -1;
+    if (agent->license->platformNbAgents == 0)
+        agent->license->platformNbAgents = MAX_NB_OF_AGENTS;
+    if (agent->license->platformNbIOPs == 0)
+        agent->license->platformNbIOPs = MAX_NB_OF_IOP;
+    if (agent->license->editorOwner == NULL)
+        agent->license->editorOwner = strdup("Unregistered");
+    if (agent->license->editorExpirationDate == 0){
+        agent->license->editorExpirationDate = -1;
     }
     license_readWriteUnlock();
 }
@@ -581,41 +578,41 @@ void license_readLicense(void){
 ////////////////////////////////////////////////////////////////////////
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
-void igs_setLicensePath(const char *path){
+void igsAgent_setLicensePath(igsAgent_t *agent, const char *path){
     char reviewedPath[4096] = "";
     admin_makeFilePath(path, reviewedPath, 4096);
     if (zsys_file_exists(reviewedPath)){
-        if (licensePath != NULL){
-            free(licensePath);
+        if (agent->licensePath != NULL){
+            free(agent->licensePath);
         }
-        licensePath = strdup(reviewedPath);
+        agent->licensePath = strdup(reviewedPath);
     }else{
         igs_license("%s does not exist", reviewedPath);
     }
 }
-char *igs_getLicensePath(void){
-    return strdup(licensePath);
+char *igsAgent_getLicensePath(igsAgent_t *agent){
+    return strdup(agent->licensePath);
 }
 
-bool igs_checkLicenseForAgent(const char *agentId){
-    license_readLicense();
+bool igsAgent_checkLicense(igsAgent_t *agent, const char *agentId){
+    license_readLicense(agent);
     if (agentId == NULL)
         return false;
-    licenseForAgent_t *l = zhash_first(license->agents);
+    licenseForAgent_t *l = zhash_first(agent->license->agents);
     while (l != NULL) {
         if (l->agentId != NULL
             && strcmp(agentId, l->agentId) == 0){
             return true;
         }
-        l = zhash_next(license->agents);
+        l = zhash_next(agent->license->agents);
     }
     return false;
 }
 
-int igs_observeLicense(igs_licenseCallback cb, void *myData){
+int igsAgent_observeLicense(igsAgent_t *agent, igs_licenseCallback cb, void *myData){
     license_callback_t *l = (license_callback_t *)calloc(1, sizeof(license_callback_t));
     l->callback_ptr = cb;
     l->data = myData;
-    DL_APPEND(licenseCallbacks, l);
+    DL_APPEND(agent->licenseCallbacks, l);
     return 1;
 }

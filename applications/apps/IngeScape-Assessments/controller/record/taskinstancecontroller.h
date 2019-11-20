@@ -23,6 +23,7 @@
 #include <model/taskinstancem.h>
 
 #include <controller/assessmentsmodelmanager.h>
+#include <sortFilter/areagentsinplatformfilter.h>
 
 
 /**
@@ -42,10 +43,7 @@ class TaskInstanceController : public QObject
     I2_QML_PROPERTY_CUSTOM_SETTER(TaskInstanceM*, currentTaskInstance)
 
     // List off all agents present in the current platform
-    I2_QOBJECT_SORTFILTERPROXY(AgentsGroupedByNameVM, allAgentsGroupedByNameInCurrentPlatform)
-
-    //FIXME: remove temp property
-    I2_QML_PROPERTY(AssessmentsModelManager*, temp)
+    Q_PROPERTY(AreAgentsInPlatformFilter* agentsGroupedByNameInCurrentPlatform READ agentsGroupedByNameInCurrentPlatform CONSTANT)
 
 
 public:
@@ -71,6 +69,11 @@ public:
      */
     Q_INVOKABLE void addNewAttachements(const QList<QUrl>& urlList);
 
+    AreAgentsInPlatformFilter* agentsGroupedByNameInCurrentPlatform()
+    {
+        return &_agentsGroupedByNameInCurrentPlatform;
+    }
+
 
 private Q_SLOTS:
 
@@ -86,6 +89,8 @@ private:
     // Helper to manage JSON files
     JsonHelper* _jsonHelper;
 
+    //Filtered list with all present agents
+    AreAgentsInPlatformFilter _agentsGroupedByNameInCurrentPlatform;
 };
 
 QML_DECLARE_TYPE(TaskInstanceController)

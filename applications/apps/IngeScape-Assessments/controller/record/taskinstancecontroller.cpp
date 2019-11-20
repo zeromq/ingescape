@@ -40,13 +40,8 @@ TaskInstanceController::TaskInstanceController(JsonHelper* jsonHelper,
     // Create the controller for scenario management
     _scenarioC = new AbstractScenarioController(AssessmentsModelManager::Instance(), _jsonHelper, this);
 
-    //FIXME: remove temp property
-    _temp = AssessmentsModelManager::Instance();
-
-    _allAgentsGroupedByNameInCurrentPlatform.setSourceModel(_temp->allAgentsGroupsByName());
-    _allAgentsGroupedByNameInCurrentPlatform.setSortProperty("name");
-    _allAgentsGroupedByNameInCurrentPlatform.setFilterProperty("isAgentGroupedByNameInCurrentPlatform");
-    _allAgentsGroupedByNameInCurrentPlatform.setFilterFixedString("true");
+    // List of agents present in current Platform
+    _agentsGroupedByNameInCurrentPlatform.setSourceModel(AssessmentsModelManager::Instance()->allAgentsGroupsByName());
 
     // Connect to the signal "time range changed" from the time line
     // to the scenario controller to filter the action view models
@@ -156,6 +151,10 @@ void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previo
         {
             if (currentTaskInstance->task()->platformFileUrl().isValid())
             {
+                //_agentsGroupedByNameInCurrentPlatform.updateProtocol(currentTaskInstance->task());
+
+                _agentsGroupedByNameInCurrentPlatform.setcurrentProtocol(currentTaskInstance->task());
+
                 QString platformFilePath = currentTaskInstance->task()->platformFileUrl().path();
 
                 QFile jsonFile(platformFilePath);

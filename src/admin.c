@@ -30,6 +30,7 @@
 #define INGESCAPE_VERSION ((INGESCAPE_MAJOR * 10000) + (INGESCAPE_MINOR * 100) + INGESCAPE_MICRO)
 
 #define INGESCAPE_PROTOCOL 1
+#define NUMBER_OF_LOGS_FOR_FFLUSH 0
 
 FILE *fp = NULL;
 bool admin_logInStream = false;
@@ -40,7 +41,6 @@ igs_logLevel_t logLevel = IGS_LOG_INFO;
 char admin_logFile[4096] = "";
 char logContent[2048] = "";
 char logTime[128] = "";
-#define NUMBER_OF_LOGS_FOR_FFLUSH 0
 static int nb_of_entries = 0; //for fflush rotation
 
 #if defined(__unix__) || defined(__linux__) || \
@@ -177,9 +177,9 @@ void igs_log(igs_logLevel_t level, const char *function, const char *fmt, ...){
             strncat(admin_logFile, ".log", 4095);
             printf("creating default log file %s\n", admin_logFile);
             free(name);
-            if (agentElements != NULL && agentElements->node != NULL){
+            if (internalAgent && internalAgent->agentElements != NULL && internalAgent->agentElements->node != NULL){
                 bus_zyreLock();
-                zyre_shouts(agentElements->node, CHANNEL, "LOG_FILE_PATH=%s", admin_logFile);
+                zyre_shouts(internalAgent->agentElements->node, CHANNEL, "LOG_FILE_PATH=%s", admin_logFile);
                 bus_zyreUnlock();
             }
         }
@@ -217,8 +217,8 @@ void igs_log(igs_logLevel_t level, const char *function, const char *fmt, ...){
         }
         
     }
-    if (admin_logInStream && agentElements != NULL && agentElements->logger != NULL){
-        zstr_sendf(agentElements->logger, "%s;%s;%s\n", log_levels[level], function, logContent);
+    if (admin_logInStream && internalAgent && internalAgent->agentElements != NULL && internalAgent->agentElements->logger != NULL){
+        zstr_sendf(internalAgent->agentElements->logger, "%s;%s;%s\n", log_levels[level], function, logContent);
     }
     admin_unlock();
 
@@ -235,12 +235,12 @@ igs_logLevel_t igs_getLogLevel (void) {
 void igs_setLogInFile (bool allow){
     if (allow != admin_logInFile){
         admin_logInFile = allow;
-        if (agentElements != NULL && agentElements->node != NULL){
+        if (internalAgent && internalAgent->agentElements != NULL && internalAgent->agentElements->node != NULL){
             bus_zyreLock();
             if (allow){
-                zyre_shouts(agentElements->node, CHANNEL, "LOG_IN_FILE=1");
+                zyre_shouts(internalAgent->agentElements->node, CHANNEL, "LOG_IN_FILE=1");
             }else{
-                zyre_shouts(agentElements->node, CHANNEL, "LOG_IN_FILE=0");
+                zyre_shouts(internalAgent->agentElements->node, CHANNEL, "LOG_IN_FILE=0");
             }
             bus_zyreUnlock();
         }
@@ -269,7 +269,7 @@ bool igs_getUseColorVerbose (void) {
 
 void igs_setLogStream(bool stream){
     if (stream != admin_logInStream){
-        if (agentElements != NULL){
+        if (internalAgent && internalAgent->agentElements != NULL){
             if (stream){
                 igs_warn("agent is already started, log stream cannot be created anymore");
             }else{
@@ -278,12 +278,12 @@ void igs_setLogStream(bool stream){
             return;
         }
         admin_logInStream = stream;
-        if (agentElements != NULL && agentElements->node != NULL){
+        if (internalAgent && internalAgent->agentElements != NULL && internalAgent->agentElements->node != NULL){
             bus_zyreLock();
             if (stream){
-                zyre_shouts(agentElements->node, CHANNEL, "LOG_IN_STREAM=1");
+                zyre_shouts(internalAgent->agentElements->node, CHANNEL, "LOG_IN_STREAM=1");
             }else{
-                zyre_shouts(agentElements->node, CHANNEL, "LOG_IN_STREAM=0");
+                zyre_shouts(internalAgent->agentElements->node, CHANNEL, "LOG_IN_STREAM=0");
             }
             bus_zyreUnlock();
         }
@@ -322,9 +322,9 @@ void igs_setLogPath(const char *path){
         }else{
             printf("switching to new log file: %s\n", admin_logFile);
         }
-        if (fp != NULL && agentElements != NULL && agentElements->node != NULL){
+        if (fp != NULL && internalAgent && internalAgent->agentElements != NULL && internalAgent->agentElements->node != NULL){
             bus_zyreLock();
-            zyre_shouts(agentElements->node, CHANNEL, "LOG_FILE_PATH=%s", admin_logFile);
+            zyre_shouts(internalAgent->agentElements->node, CHANNEL, "LOG_FILE_PATH=%s", admin_logFile);
             bus_zyreUnlock();
         }
         admin_unlock();

@@ -39,7 +39,7 @@
 #define MAP_NO_DESCRIPTION "NO_DESCRIPTION"
 #define MAP_NO_VERSION "NO_VERSION"
 
-char definitionPath[IGS_MAX_PATH] = "";
+char definition_path[IGS_MAX_PATH] = "";
 
 iopType_t string_to_value_type(const char* str) {
     
@@ -1160,13 +1160,13 @@ mapping_t* parser_LoadMapFromPath (const char* path){
 /**
  * \fn int igs_loadDefinition (const char* json_str)
  * \ingroup loadSetGetDefFct
- * \brief load definition in variable 'igs_definition_loaded' & copy in 'igs_internal_definition"
+ * \brief load definition in variable 'igs_definition_loaded' & copy in 'agent->internal_definition"
  *      from a json string
  *
  * \param json_str String in json format. Can't be NULL.
  * \return The error. 1 is OK, 0 json string is NULL, -1 Definition file has not been loaded
  */
-int igs_loadDefinition (const char* json_str){
+int igsAgent_loadDefinition (igsAgent_t *agent, const char* json_str){
     
     //Check if the json string is null
     if(json_str == NULL)
@@ -1183,20 +1183,20 @@ int igs_loadDefinition (const char* json_str){
         igs_debug("igs_loadDefinition : json string caused an error and was ignored\n%s\n", json_str );
         return -1;
     }else{
-        if (igs_internal_definition != NULL){
-            definition_freeDefinition(igs_internal_definition);
-            igs_internal_definition = NULL;
+        if (agent->internal_definition != NULL){
+            definition_freeDefinition(agent->internal_definition);
+            agent->internal_definition = NULL;
         }
-        igs_internal_definition = tmp;
+        agent->internal_definition = tmp;
         //Check the name of agent from network layer
         char *name = igs_getAgentName();
         if(strcmp(name, AGENT_NAME_DEFAULT) == 0){
             //The name of the agent is default : we change it to definition name
-            igs_setAgentName(igs_internal_definition->name);
+            igs_setAgentName(agent->internal_definition->name);
         }//else
             //The agent name was assigned by the developer : we keep it untouched
         free(name);
-        network_needToSendDefinitionUpdate = true;
+        agent->network_needToSendDefinitionUpdate = true;
     }
 
     return 1;
@@ -1205,13 +1205,13 @@ int igs_loadDefinition (const char* json_str){
 /**
  * \fn int igs_loadDefinitionFromPath (const char* file_path)
  * \ingroup loadSetGetDefFct
- * \brief load definition in variable 'igs_definition_loaded' & copy in 'igs_internal_definition"
+ * \brief load definition in variable 'igs_definition_loaded' & copy in 'agent->internal_definition"
  *      from a file path
  *
  * \param file_path The string which contains the json file path. Can't be NULL.
  * \return The error. 1 is OK, 0 json string is NULL, -1 Definition file has not been loaded
  */
-int igs_loadDefinitionFromPath (const char* file_path){
+int igsAgent_loadDefinitionFromPath (igsAgent_t *agent, const char* file_path){
     
     //Check if the json string is null
     if(file_path == NULL){
@@ -1233,21 +1233,21 @@ int igs_loadDefinitionFromPath (const char* file_path){
         igs_debug("igs_loadDefinitionFromPath : %s caused an error and was ignored\n", file_path);
         return -1;
     }else{
-        strncpy(definitionPath, file_path, IGS_MAX_PATH - 1);
-        if (igs_internal_definition != NULL){
-            definition_freeDefinition(igs_internal_definition);
-            igs_internal_definition = NULL;
+        strncpy(definition_path, file_path, IGS_MAX_PATH - 1);
+        if (agent->internal_definition != NULL){
+            definition_freeDefinition(agent->internal_definition);
+            agent->internal_definition = NULL;
         }
-        igs_internal_definition = tmp;
+        agent->internal_definition = tmp;
         //Check the name of agent from network layer
         char *name = igs_getAgentName();
         if(strcmp(name, AGENT_NAME_DEFAULT) == 0){
             //The name of the agent is default : we change it to definition name
-            igs_setAgentName(igs_internal_definition->name);
+            igs_setAgentName(agent->internal_definition->name);
         }//else
             //The agent name was assigned by the developer : we keep it untouched
         free(name);
-        network_needToSendDefinitionUpdate = true;
+        agent->network_needToSendDefinitionUpdate = true;
     }
 
     return 1;
