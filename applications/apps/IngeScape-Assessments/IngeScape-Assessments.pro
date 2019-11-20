@@ -60,7 +60,8 @@ SOURCES += main.cpp \
     controller/record/taskinstancecontroller.cpp \
     viewModel/experimentationsgroupvm.cpp \
     controller/assessmentsmodelmanager.cpp \
-    model/task/agentnameandoutputsm.cpp
+    model/task/agentnameandoutputsm.cpp \
+    sortFilter/areagentsinplatformfilter.cpp
 
 
 HEADERS += \
@@ -85,7 +86,8 @@ HEADERS += \
     controller/record/taskinstancecontroller.h \
     viewModel/experimentationsgroupvm.h \
     controller/assessmentsmodelmanager.h \
-    model/task/agentnameandoutputsm.h
+    model/task/agentnameandoutputsm.h \
+    sortFilter/areagentsinplatformfilter.h
 
 
 RESOURCES += qml.qrc
