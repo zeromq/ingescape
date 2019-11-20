@@ -27,28 +27,12 @@
 /**
  * @brief The NetworkController class defines the controller for network communications
  */
-class NetworkController : public IngeScapeNetworkController
+class NetworkController : public QObject
 {
     Q_OBJECT
 
 
 public:
-
-    /**
-     * @brief Accessor to the singleton instance
-     * @return
-     */
-    static NetworkController* instance();
-
-
-    /**
-     * @brief Method used to provide a singleton to QML
-     * @param engine
-     * @param scriptEngine
-     * @return
-     */
-     static QObject* qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine);
-
 
     /**
      * @brief Constructor
@@ -60,25 +44,7 @@ public:
     /**
       * @brief Destructor
       */
-    ~NetworkController() Q_DECL_OVERRIDE;
-
-
-    /**
-     * @brief Manage a "Shouted" message
-     * @param peerId
-     * @param peerName
-     * @param zMessage
-     */
-    void manageShoutedMessage(QString peerId, QString peerName, zmsg_t* zMessage) Q_DECL_OVERRIDE;
-
-
-    /**
-     * @brief Manage a "Whispered" message
-     * @param peerId
-     * @param peerName
-     * @param zMessage
-     */
-    void manageWhisperedMessage(QString peerId, QString peerName, zmsg_t* zMessage) Q_DECL_OVERRIDE;
+    ~NetworkController();
 
 
     /**
@@ -332,6 +298,23 @@ public Q_SLOTS:
 
 
 private:
+
+    /**
+     * @brief Slot called when a "Shouted" message has been received
+     * @param peerId
+     * @param peerName
+     * @param zMessage
+     */
+    void _onShoutedMessageReceived(QString peerId, QString peerName, zmsg_t* zMessage);
+
+
+    /**
+     * @brief Slot called when "Whispered" message has been received
+     * @param peerId
+     * @param peerName
+     * @param zMessage
+     */
+    void _onWhisperedMessageReceived(QString peerId, QString peerName, zmsg_t* zMessage);
 
 };
 

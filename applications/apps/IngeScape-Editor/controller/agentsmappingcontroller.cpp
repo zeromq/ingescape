@@ -1460,16 +1460,6 @@ void AgentsMappingController::onIsMappingConnectedChanged(bool isMappingConnecte
 
 
 /**
- * @brief Slot called when the flag "is Mapping Controlled" changed
- * @param isMappingControlled
- */
-void AgentsMappingController::onIsMappingControlledChanged(bool isMappingControlled)
-{
-    qDebug() << "AgentsMappingController: Is Mapping Controlled Changed to" << isMappingControlled;
-}
-
-
-/**
  * @brief Slot called when a new view model of agents grouped by name has been created
  * @param agentsGroupedByName
  */

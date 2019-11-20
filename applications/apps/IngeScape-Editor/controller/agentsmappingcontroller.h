@@ -292,13 +292,6 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot called when the flag "is Mapping Controlled" changed
-     * @param isMappingControlled
-     */
-    void onIsMappingControlledChanged(bool isMappingControlled);
-
-
-    /**
      * @brief Slot called when a new view model of agents grouped by name has been created
      * @param agentsGroupedByName
      */

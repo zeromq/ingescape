@@ -17,8 +17,6 @@
 #include <QDebug>
 #include <QApplication>
 
-#include <memory>
-
 
 static const QString prefix_Muted = "MUTED=";
 static const QString prefix_CanBeFrozen = "CANBEFROZEN=";
@@ -56,43 +54,11 @@ static const QString prefix_UpdateRecordState = "UPDATE_RECORD_STATE=";
 //
 //--------------------------------------------------------------
 
-// Define our singleton instance
-// Creates a global and static object of type QGlobalStatic, of name _singletonInstance and that behaves as a pointer to NetworkController.
-// The object created by Q_GLOBAL_STATIC initializes itself on the first use, which means that it will not increase the application or the library's load time.
-// Additionally, the object is initialized in a thread-safe manner on all platforms.
-Q_GLOBAL_STATIC(NetworkController, _singletonInstance)
-
-
-/**
- * @brief Get our singleton instance
- * @return
- */
-NetworkController* NetworkController::instance()
-{
-    return _singletonInstance;
-}
-
-
-/**
- * @brief Method used to provide a singleton to QML
- * @param engine
- * @param scriptEngine
- * @return
- */
-QObject* NetworkController::qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine)
-{
-    Q_UNUSED(engine);
-    Q_UNUSED(scriptEngine);
-
-    return _singletonInstance;
-}
-
-
 /**
  * @brief Default constructor
  * @param parent
  */
-NetworkController::NetworkController(QObject *parent) : IngeScapeNetworkController(parent)
+NetworkController::NetworkController(QObject *parent) : QObject(parent)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -100,8 +66,18 @@ NetworkController::NetworkController(QObject *parent) : IngeScapeNetworkControll
     // Add  header to declare ourselves as an editor
     igs_busAddServiceDescription("isEditor", "1");
 
-    // We don't see itself
-    setnumberOfEditors(1);
+    IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
+    if (ingeScapeNetworkC != nullptr)
+    {
+        // We don't see itself
+        ingeScapeNetworkC->setnumberOfEditors(1);
+
+        connect(ingeScapeNetworkC, &IngeScapeNetworkController::shoutedMessageReceived,
+                this, &NetworkController::_onShoutedMessageReceived);
+        connect(ingeScapeNetworkC, &IngeScapeNetworkController::whisperedMessageReceived,
+                this, &NetworkController::_onWhisperedMessageReceived);
+
+    }
 }
 
 
@@ -110,371 +86,11 @@ NetworkController::NetworkController(QObject *parent) : IngeScapeNetworkControll
  */
 NetworkController::~NetworkController()
 {
-    // Mother class is automatically called
-    //IngeScapeNetworkController::~IngeScapeNetworkController();
-}
-
-
-/**
- * @brief Manage a "Shouted" message
- * @param peerId
- * @param peerName
- * @param zMessage
- */
-void NetworkController::manageShoutedMessage(QString peerId, QString peerName, zmsg_t* zMessage)
-{
-    QString message = zmsg_popstr(zMessage);
-
-    // MUTED / UN-MUTED
-    if (message.startsWith(prefix_Muted))
+    IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
+    if (ingeScapeNetworkC != nullptr)
     {
-        QString isMuted = message.remove(0, prefix_Muted.length());
-
-        // Emit the signal "is Muted from Agent Updated"
-        if (isMuted == "1") {
-            Q_EMIT isMutedFromAgentUpdated(peerId, true);
-        }
-        else {
-            Q_EMIT isMutedFromAgentUpdated(peerId, false);
-        }
-    }
-    // CAN BE FROZEN / CAN NOT BE FROZEN
-    else if (message.startsWith(prefix_CanBeFrozen))
-    {
-        QString canBeFrozen = message.remove(0, prefix_CanBeFrozen.length());
-
-        // Emit the signal "can be Frozen from Agent Updated"
-        if (canBeFrozen == "1") {
-            Q_EMIT canBeFrozenFromAgentUpdated(peerId, true);
-        }
-        else {
-            Q_EMIT canBeFrozenFromAgentUpdated(peerId, false);
-        }
-    }
-    // FROZEN / UN-FROZEN
-    else if (message.startsWith(prefix_Frozen))
-    {
-        QString isFrozen = message.remove(0, prefix_Frozen.length());
-
-        // Emit the signal "is Frozen from Agent Updated"
-        if (isFrozen == "1") {
-            Q_EMIT isFrozenFromAgentUpdated(peerId, true);
-        }
-        else {
-            Q_EMIT isFrozenFromAgentUpdated(peerId, false);
-        }
-    }
-    // OUTPUT MUTED
-    else if (message.startsWith(prefix_OutputMuted))
-    {
-        QString outputName = message.remove(0, prefix_OutputMuted.length());
-
-        // Emit the signal "is Muted from OUTPUT of Agent Updated"
-        Q_EMIT isMutedFromOutputOfAgentUpdated(peerId, true, outputName);
-    }
-    // OUTPUT UN-MUTED
-    else if (message.startsWith(prefix_OutputUnmuted))
-    {
-        QString outputName = message.remove(0, prefix_OutputUnmuted.length());
-
-        // Emit the signal "is Muted from OUTPUT of Agent Updated"
-        Q_EMIT isMutedFromOutputOfAgentUpdated(peerId, false, outputName);
-    }
-    // STATE
-    else if (message.startsWith(prefix_State))
-    {
-        QString stateName = message.remove(0, prefix_State.length());
-
-        // Emit the signal "State changed"
-        Q_EMIT agentStateChanged(peerId, stateName);
-    }
-    // LOG IN STREAM
-    else if (message.startsWith(prefix_LogInStream))
-    {
-        QString hasLogInStream = message.remove(0, prefix_LogInStream.length());
-        if (hasLogInStream == "1") {
-            Q_EMIT agentHasLogInStream(peerId, true);
-        }
-        else {
-            Q_EMIT agentHasLogInStream(peerId, false);
-        }
-    }
-    // LOG IN FILE
-    else if (message.startsWith(prefix_LogInFile))
-    {
-        QString hasLogInFile = message.remove(0, prefix_LogInFile.length());
-        if (hasLogInFile == "1") {
-            Q_EMIT agentHasLogInFile(peerId, true);
-        }
-        else {
-            Q_EMIT agentHasLogInFile(peerId, false);
-        }
-    }
-    // LOG FILE PATH
-    else if (message.startsWith(prefix_LogFilePath))
-    {
-        QString logFilePath = message.remove(0, prefix_LogFilePath.length());
-
-        Q_EMIT agentLogFilePath(peerId, logFilePath);
-    }
-    // DEFINITION FILE PATH
-    else if (message.startsWith(prefix_DefinitionFilePath))
-    {
-        QString definitionFilePath = message.remove(0, prefix_DefinitionFilePath.length());
-
-        Q_EMIT agentDefinitionFilePath(peerId, definitionFilePath);
-    }
-    // MAPPING FILE PATH
-    else if (message.startsWith(prefix_MappingFilePath))
-    {
-        QString mappingFilePath = message.remove(0, prefix_MappingFilePath.length());
-
-        Q_EMIT agentMappingFilePath(peerId, mappingFilePath);
-    }
-    // Unknown
-    else
-    {
-        qDebug() << "Not yet managed SHOUTED message '" << message << "' for agent" << peerName << "(" << peerId << ")";
-    }
-}
-
-
-/**
- * @brief Manage a "Whispered" message
- * @param peerId
- * @param peerName
- * @param zMessage
- */
-void NetworkController::manageWhisperedMessage(QString peerId, QString peerName, zmsg_t* zMessage)
-{
-    std::unique_ptr<char> zmsg_str(zmsg_popstr(zMessage));
-    QString message(zmsg_str.get());
-
-    // An agent DEFINITION has been received
-    if (message.startsWith(prefix_Definition))
-    {
-        QString definitionJSON = message.remove(0, prefix_Definition.length());
-
-        Q_EMIT definitionReceived(peerId, peerName, definitionJSON);
-    }
-    // An agent MAPPING has been received
-    else if (message.startsWith(prefix_Mapping))
-    {
-        QString mappingJSON = message.remove(0, prefix_Mapping.length());
-
-        Q_EMIT mappingReceived(peerId, peerName, mappingJSON);
-    }
-    // The "Recorder app" Started to record
-    else if (message.startsWith(prefix_RecordStarted))
-    {
-        qInfo() << prefix_RecordStarted;
-
-        Q_EMIT recordStartedReceived();
-    }
-    // The "Recorder app" Stopped to record
-    else if (message.startsWith(prefix_RecordStopped))
-    {
-        qInfo() << prefix_RecordStopped;
-
-        Q_EMIT recordStoppedReceived();
-    }
-    // All records
-    else if (message.startsWith(prefix_AllRecords))
-    {
-        message.remove(0, prefix_AllRecords.length());
-
-        // Emit the signal "All records Received"
-        Q_EMIT allRecordsReceived(message);
-    }
-    // Added record
-    else if (message.startsWith(prefix_AddedRecord))
-    {
-        message.remove(0, prefix_AddedRecord.length());
-
-        // Emit the signal "Added record received"
-        Q_EMIT addedRecordReceived(message);
-    }
-    // Deleted Record
-    else if (message.startsWith(prefix_DeletedRecord))
-    {
-        message.remove(0, prefix_DeletedRecord.length());
-
-        Q_EMIT deletedRecordReceived(message);
-    }
-    // A replay is currently loading
-    else if (message == prefix_ReplayLoading)
-    {
-        qDebug() << prefix_ReplayLoading << zmsg_size(zMessage) << "frames";
-
-        // Check that there are still 3 frames
-        if (zmsg_size(zMessage) == 3)
-        {
-            QString deltaTimeFromTimeLineStart = zmsg_popstr(zMessage);
-            QString jsonPlatform = zmsg_popstr(zMessage);
-            QString jsonExecutedActions = zmsg_popstr(zMessage);
-
-            // Emit the signal "Replay Loading received"
-            Q_EMIT replayLoadingReceived(deltaTimeFromTimeLineStart.toInt(), jsonPlatform, jsonExecutedActions);
-        }
-    }
-    // A replay has been loaded
-    else if (message == prefix_ReplayLoaded)
-    {
-        qDebug() << prefix_ReplayLoaded;
-
-        Q_EMIT replayLoadedReceived();
-    }
-    // A replay has been UN-loaded
-    else if (message == prefix_ReplayUNloaded)
-    {
-        qDebug() << prefix_ReplayUNloaded;
-
-        Q_EMIT replayUNloadedReceived();
-    }
-    // A replay has ended
-    else if (message == prefix_ReplayEnded)
-    {
-        qDebug() << prefix_ReplayEnded;
-
-        Q_EMIT replayEndedReceived();
-    }
-    // MUTED / UN-MUTED
-    else if (message.startsWith(prefix_Muted))
-    {
-        QString isMuted = message.remove(0, prefix_Muted.length());
-
-        // Emit the signal "is Muted from Agent Updated"
-        if (isMuted == "1") {
-            Q_EMIT isMutedFromAgentUpdated(peerId, true);
-        }
-        else {
-            Q_EMIT isMutedFromAgentUpdated(peerId, false);
-        }
-    }
-    // FROZEN / UN-FROZEN
-    else if (message.startsWith(prefix_Frozen))
-    {
-        QString isFrozen = message.remove(0, prefix_Frozen.length());
-
-        // Emit the signal "is Frozen from Agent Updated"
-        if (isFrozen == "1") {
-            Q_EMIT isFrozenFromAgentUpdated(peerId, true);
-        }
-        else {
-            Q_EMIT isFrozenFromAgentUpdated(peerId, false);
-        }
-    }
-    // OUTPUT MUTED
-    else if (message.startsWith(prefix_OutputMuted))
-    {
-        QString outputName = message.remove(0, prefix_OutputMuted.length());
-
-        // Emit the signal "is Muted from OUTPUT of Agent Updated"
-        Q_EMIT isMutedFromOutputOfAgentUpdated(peerId, true, outputName);
-    }
-    // OUTPUT UN-MUTED
-    else if (message.startsWith(prefix_OutputUnmuted))
-    {
-        QString outputName = message.remove(0, prefix_OutputUnmuted.length());
-
-        // Emit the signal "is Muted from OUTPUT of Agent Updated"
-        Q_EMIT isMutedFromOutputOfAgentUpdated(peerId, false, outputName);
-    }
-    // STATE
-    else if (message.startsWith(prefix_State))
-    {
-        QString stateName = message.remove(0, prefix_State.length());
-
-        // Emit the signal "State changed"
-        Q_EMIT agentStateChanged(peerId, stateName);
-    }
-    // LOG IN STREAM
-    else if (message.startsWith(prefix_LogInStream))
-    {
-        QString hasLogInStream = message.remove(0, prefix_LogInStream.length());
-        if (hasLogInStream == "1") {
-            Q_EMIT agentHasLogInStream(peerId, true);
-        }
-        else {
-            Q_EMIT agentHasLogInStream(peerId, false);
-        }
-    }
-    // LOG IN FILE
-    else if (message.startsWith(prefix_LogInFile))
-    {
-        QString hasLogInFile = message.remove(0, prefix_LogInFile.length());
-        if (hasLogInFile == "1") {
-            Q_EMIT agentHasLogInFile(peerId, true);
-        }
-        else {
-            Q_EMIT agentHasLogInFile(peerId, false);
-        }
-    }
-    // LOG FILE PATH
-    else if (message.startsWith(prefix_LogFilePath))
-    {
-        QString logFilePath = message.remove(0, prefix_LogFilePath.length());
-
-        Q_EMIT agentLogFilePath(peerId, logFilePath);
-    }
-    // DEFINITION FILE PATH
-    else if (message.startsWith(prefix_DefinitionFilePath))
-    {
-        QString definitionFilePath = message.remove(0, prefix_DefinitionFilePath.length());
-
-        Q_EMIT agentDefinitionFilePath(peerId, definitionFilePath);
-    }
-    // MAPPING FILE PATH
-    else if (message.startsWith(prefix_MappingFilePath))
-    {
-        QString mappingFilePath = message.remove(0, prefix_MappingFilePath.length());
-
-        Q_EMIT agentMappingFilePath(peerId, mappingFilePath);
-    }
-    // HIGHLIGHT LINK
-    else if (message.startsWith(prefix_HighlightLink))
-    {
-        message.remove(0, prefix_HighlightLink.length());
-
-        Q_EMIT highlightLink(message.split('|'));
-    }
-    // RUN (THIS) ACTION
-    else if (message.startsWith(prefix_RunAction))
-    {
-        message.remove(0, prefix_RunAction.length());
-
-        Q_EMIT runAction(message);
-    }
-    // LOAD PLATFORM FROM PATH
-    else if (message.startsWith(prefix_LoadPlatformFile))
-    {
-        message.remove(0, prefix_LoadPlatformFile.length());
-
-        Q_EMIT loadPlatformFileFromPath(message);
-    }
-    // Update the state of the TimeLine (Play/Pause/Stop)
-    else if (message.startsWith(prefix_UpdateTimeLineState))
-    {
-        QString state = message.remove(0, prefix_UpdateTimeLineState.length());
-
-        Q_EMIT updateTimeLineState(state);
-    }
-    // Update the state of the Record (Start/Stop)
-    else if (message.startsWith(prefix_UpdateRecordState))
-    {
-        QString state = message.remove(0, prefix_UpdateRecordState.length());
-
-        Q_EMIT updateRecordState(state);
-    }
-    // A record has been exported
-    else if (message == prefix_RecordExported)
-    {
-        Q_EMIT recordExported();
-    }
-    // Unknown
-    else
-    {
-        qDebug() << "Not yet managed WHISPERED message '" << message << "' for agent" << peerName << "(" << peerId << ")";
+        // DIS-connect from the IngeScape Network Controller
+        disconnect(ingeScapeNetworkC, nullptr, this, nullptr);
     }
 }
 
@@ -645,6 +261,345 @@ void NetworkController::onCommandAskedToAgentAboutMappingInput(QStringList peerI
                                                outputName.toStdString().c_str());
 
         qInfo() << "Send command" << command << "for agent" << peerId << "and input" << inputName << "about mapping on agent" << outputAgentName << "and output" << outputName << "with success ?" << success;
+    }
+}
+
+
+/**
+ * @brief Manage a "Shouted" message
+ * @param peerId
+ * @param peerName
+ * @param zMessage
+ */
+void NetworkController::_onShoutedMessageReceived(QString peerId, QString peerName, zmsg_t* zMessage)
+{
+    QString message = zmsg_popstr(zMessage);
+
+    // MUTED / UN-MUTED
+    if (message.startsWith(prefix_Muted))
+    {
+        QString isMuted = message.remove(0, prefix_Muted.length());
+
+        if (isMuted == "1") {
+            Q_EMIT isMutedFromAgentUpdated(peerId, true);
+        }
+        else {
+            Q_EMIT isMutedFromAgentUpdated(peerId, false);
+        }
+    }
+    // CAN BE FROZEN / CAN NOT BE FROZEN
+    else if (message.startsWith(prefix_CanBeFrozen))
+    {
+        QString canBeFrozen = message.remove(0, prefix_CanBeFrozen.length());
+
+        if (canBeFrozen == "1") {
+            Q_EMIT canBeFrozenFromAgentUpdated(peerId, true);
+        }
+        else {
+            Q_EMIT canBeFrozenFromAgentUpdated(peerId, false);
+        }
+    }
+    // FROZEN / UN-FROZEN
+    else if (message.startsWith(prefix_Frozen))
+    {
+        QString isFrozen = message.remove(0, prefix_Frozen.length());
+
+        if (isFrozen == "1") {
+            Q_EMIT isFrozenFromAgentUpdated(peerId, true);
+        }
+        else {
+            Q_EMIT isFrozenFromAgentUpdated(peerId, false);
+        }
+    }
+    // OUTPUT MUTED
+    else if (message.startsWith(prefix_OutputMuted))
+    {
+        QString outputName = message.remove(0, prefix_OutputMuted.length());
+
+        Q_EMIT isMutedFromOutputOfAgentUpdated(peerId, true, outputName);
+    }
+    // OUTPUT UN-MUTED
+    else if (message.startsWith(prefix_OutputUnmuted))
+    {
+        QString outputName = message.remove(0, prefix_OutputUnmuted.length());
+
+        Q_EMIT isMutedFromOutputOfAgentUpdated(peerId, false, outputName);
+    }
+    // STATE
+    else if (message.startsWith(prefix_State))
+    {
+        QString stateName = message.remove(0, prefix_State.length());
+
+        Q_EMIT agentStateChanged(peerId, stateName);
+    }
+    // LOG IN STREAM
+    else if (message.startsWith(prefix_LogInStream))
+    {
+        QString hasLogInStream = message.remove(0, prefix_LogInStream.length());
+        if (hasLogInStream == "1") {
+            Q_EMIT agentHasLogInStream(peerId, true);
+        }
+        else {
+            Q_EMIT agentHasLogInStream(peerId, false);
+        }
+    }
+    // LOG IN FILE
+    else if (message.startsWith(prefix_LogInFile))
+    {
+        QString hasLogInFile = message.remove(0, prefix_LogInFile.length());
+        if (hasLogInFile == "1") {
+            Q_EMIT agentHasLogInFile(peerId, true);
+        }
+        else {
+            Q_EMIT agentHasLogInFile(peerId, false);
+        }
+    }
+    // LOG FILE PATH
+    else if (message.startsWith(prefix_LogFilePath))
+    {
+        QString logFilePath = message.remove(0, prefix_LogFilePath.length());
+
+        Q_EMIT agentLogFilePath(peerId, logFilePath);
+    }
+    // DEFINITION FILE PATH
+    else if (message.startsWith(prefix_DefinitionFilePath))
+    {
+        QString definitionFilePath = message.remove(0, prefix_DefinitionFilePath.length());
+
+        Q_EMIT agentDefinitionFilePath(peerId, definitionFilePath);
+    }
+    // MAPPING FILE PATH
+    else if (message.startsWith(prefix_MappingFilePath))
+    {
+        QString mappingFilePath = message.remove(0, prefix_MappingFilePath.length());
+
+        Q_EMIT agentMappingFilePath(peerId, mappingFilePath);
+    }
+    // Unknown
+    else
+    {
+        qDebug() << "Not yet managed SHOUTED message '" << message << "' for agent" << peerName << "(" << peerId << ")";
+    }
+}
+
+
+/**
+ * @brief Manage a "Whispered" message
+ * @param peerId
+ * @param peerName
+ * @param zMessage
+ */
+void NetworkController::_onWhisperedMessageReceived(QString peerId, QString peerName, zmsg_t* zMessage)
+{
+    std::unique_ptr<char> zmsg_str(zmsg_popstr(zMessage));
+    QString message(zmsg_str.get());
+
+    // MUTED / UN-MUTED
+    if (message.startsWith(prefix_Muted))
+    {
+        QString isMuted = message.remove(0, prefix_Muted.length());
+
+        if (isMuted == "1") {
+            Q_EMIT isMutedFromAgentUpdated(peerId, true);
+        }
+        else {
+            Q_EMIT isMutedFromAgentUpdated(peerId, false);
+        }
+    }
+    // FROZEN / UN-FROZEN
+    else if (message.startsWith(prefix_Frozen))
+    {
+        QString isFrozen = message.remove(0, prefix_Frozen.length());
+
+        if (isFrozen == "1") {
+            Q_EMIT isFrozenFromAgentUpdated(peerId, true);
+        }
+        else {
+            Q_EMIT isFrozenFromAgentUpdated(peerId, false);
+        }
+    }
+    // OUTPUT MUTED
+    else if (message.startsWith(prefix_OutputMuted))
+    {
+        QString outputName = message.remove(0, prefix_OutputMuted.length());
+
+        Q_EMIT isMutedFromOutputOfAgentUpdated(peerId, true, outputName);
+    }
+    // OUTPUT UN-MUTED
+    else if (message.startsWith(prefix_OutputUnmuted))
+    {
+        QString outputName = message.remove(0, prefix_OutputUnmuted.length());
+
+        Q_EMIT isMutedFromOutputOfAgentUpdated(peerId, false, outputName);
+    }
+    // STATE
+    else if (message.startsWith(prefix_State))
+    {
+        QString stateName = message.remove(0, prefix_State.length());
+
+        Q_EMIT agentStateChanged(peerId, stateName);
+    }
+    // LOG IN STREAM
+    else if (message.startsWith(prefix_LogInStream))
+    {
+        QString hasLogInStream = message.remove(0, prefix_LogInStream.length());
+        if (hasLogInStream == "1") {
+            Q_EMIT agentHasLogInStream(peerId, true);
+        }
+        else {
+            Q_EMIT agentHasLogInStream(peerId, false);
+        }
+    }
+    // LOG IN FILE
+    else if (message.startsWith(prefix_LogInFile))
+    {
+        QString hasLogInFile = message.remove(0, prefix_LogInFile.length());
+        if (hasLogInFile == "1") {
+            Q_EMIT agentHasLogInFile(peerId, true);
+        }
+        else {
+            Q_EMIT agentHasLogInFile(peerId, false);
+        }
+    }
+    // LOG FILE PATH
+    else if (message.startsWith(prefix_LogFilePath))
+    {
+        QString logFilePath = message.remove(0, prefix_LogFilePath.length());
+
+        Q_EMIT agentLogFilePath(peerId, logFilePath);
+    }
+    // DEFINITION FILE PATH
+    else if (message.startsWith(prefix_DefinitionFilePath))
+    {
+        QString definitionFilePath = message.remove(0, prefix_DefinitionFilePath.length());
+
+        Q_EMIT agentDefinitionFilePath(peerId, definitionFilePath);
+    }
+    // MAPPING FILE PATH
+    else if (message.startsWith(prefix_MappingFilePath))
+    {
+        QString mappingFilePath = message.remove(0, prefix_MappingFilePath.length());
+
+        Q_EMIT agentMappingFilePath(peerId, mappingFilePath);
+    }
+    // The "Recorder app" Started to record
+    else if (message.startsWith(prefix_RecordStarted))
+    {
+        qInfo() << prefix_RecordStarted;
+
+        Q_EMIT recordStartedReceived();
+    }
+    // The "Recorder app" Stopped to record
+    else if (message.startsWith(prefix_RecordStopped))
+    {
+        qInfo() << prefix_RecordStopped;
+
+        Q_EMIT recordStoppedReceived();
+    }
+    // All records
+    else if (message.startsWith(prefix_AllRecords))
+    {
+        message.remove(0, prefix_AllRecords.length());
+
+        // Emit the signal "All records Received"
+        Q_EMIT allRecordsReceived(message);
+    }
+    // Added record
+    else if (message.startsWith(prefix_AddedRecord))
+    {
+        message.remove(0, prefix_AddedRecord.length());
+
+        // Emit the signal "Added record received"
+        Q_EMIT addedRecordReceived(message);
+    }
+    // Deleted Record
+    else if (message.startsWith(prefix_DeletedRecord))
+    {
+        message.remove(0, prefix_DeletedRecord.length());
+
+        Q_EMIT deletedRecordReceived(message);
+    }
+    // A replay is currently loading
+    else if (message == prefix_ReplayLoading)
+    {
+        qDebug() << prefix_ReplayLoading << zmsg_size(zMessage) << "frames";
+
+        // Check that there are still 3 frames
+        if (zmsg_size(zMessage) == 3)
+        {
+            QString deltaTimeFromTimeLineStart = zmsg_popstr(zMessage);
+            QString jsonPlatform = zmsg_popstr(zMessage);
+            QString jsonExecutedActions = zmsg_popstr(zMessage);
+
+            // Emit the signal "Replay Loading received"
+            Q_EMIT replayLoadingReceived(deltaTimeFromTimeLineStart.toInt(), jsonPlatform, jsonExecutedActions);
+        }
+    }
+    // A replay has been loaded
+    else if (message == prefix_ReplayLoaded)
+    {
+        qDebug() << prefix_ReplayLoaded;
+
+        Q_EMIT replayLoadedReceived();
+    }
+    // A replay has been UN-loaded
+    else if (message == prefix_ReplayUNloaded)
+    {
+        qDebug() << prefix_ReplayUNloaded;
+
+        Q_EMIT replayUNloadedReceived();
+    }
+    // A replay has ended
+    else if (message == prefix_ReplayEnded)
+    {
+        qDebug() << prefix_ReplayEnded;
+
+        Q_EMIT replayEndedReceived();
+    }
+    // HIGHLIGHT LINK
+    else if (message.startsWith(prefix_HighlightLink))
+    {
+        message.remove(0, prefix_HighlightLink.length());
+
+        Q_EMIT highlightLink(message.split('|'));
+    }
+    // RUN (THIS) ACTION
+    else if (message.startsWith(prefix_RunAction))
+    {
+        message.remove(0, prefix_RunAction.length());
+
+        Q_EMIT runAction(message);
+    }
+    // LOAD PLATFORM FROM PATH
+    else if (message.startsWith(prefix_LoadPlatformFile))
+    {
+        message.remove(0, prefix_LoadPlatformFile.length());
+
+        Q_EMIT loadPlatformFileFromPath(message);
+    }
+    // Update the state of the TimeLine (Play/Pause/Stop)
+    else if (message.startsWith(prefix_UpdateTimeLineState))
+    {
+        QString state = message.remove(0, prefix_UpdateTimeLineState.length());
+
+        Q_EMIT updateTimeLineState(state);
+    }
+    // Update the state of the Record (Start/Stop)
+    else if (message.startsWith(prefix_UpdateRecordState))
+    {
+        QString state = message.remove(0, prefix_UpdateRecordState.length());
+
+        Q_EMIT updateRecordState(state);
+    }
+    // A record has been exported
+    else if (message == prefix_RecordExported)
+    {
+        Q_EMIT recordExported();
+    }
+    // Unknown
+    else
+    {
+        qDebug() << "Not yet managed WHISPERED message '" << message << "' for agent" << peerName << "(" << peerId << ")";
     }
 }
 

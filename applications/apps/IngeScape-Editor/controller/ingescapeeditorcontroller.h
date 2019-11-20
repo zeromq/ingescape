@@ -70,6 +70,9 @@ class IngeScapeEditorController : public QObject
     // Controller to manage the data model of our IngeScape editor
     I2_QML_PROPERTY_READONLY(EditorModelManager*, modelManager)
 
+    // Controller to manage network communications
+    I2_QML_PROPERTY_READONLY(NetworkController*, networkC)
+
     // Controller to manage the agents list
     I2_QML_PROPERTY_READONLY(AgentsSupervisionController*, agentsSupervisionC)
 

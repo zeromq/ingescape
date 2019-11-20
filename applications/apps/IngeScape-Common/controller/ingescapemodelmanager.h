@@ -264,24 +264,6 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when inputs must be added to our application for a list of agent outputs
-     * @param agentName
-     * @param newOutputsIds
-     * @param isMappingConnected
-     */
-    void addInputsToOurApplicationForAgentOutputs(QString agentName, QStringList newOutputsIds, bool isMappingConnected);
-
-
-    /**
-     * @brief Signal emitted when inputs must be removed from our application for a list of agent outputs
-     * @param agentName
-     * @param oldOutputsIds
-     * @param isMappingConnected
-     */
-    void removeInputsFromOurApplicationForAgentOutputs(QString agentName, QStringList oldOutputsIds, bool isMappingConnected);
-
-
-    /**
      * @brief Signal emitted when a model of host has been created
      * @param host
      */

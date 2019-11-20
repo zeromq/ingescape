@@ -45,8 +45,8 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
 {
     Q_UNUSED(channel)
 
-    IngeScapeNetworkController* networkController = static_cast<IngeScapeNetworkController*>(myData);
-    if (networkController != nullptr)
+    IngeScapeNetworkController* ingeScapeNetworkC = static_cast<IngeScapeNetworkController*>(myData);
+    if (ingeScapeNetworkC != nullptr)
     {
         QString peerId = QString(peer);
         QString peerName = QString(name);
@@ -155,15 +155,15 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                 qDebug() << "Our zyre event is about IngeScape LAUNCHER";
 
                 // Save the peer id of this launcher
-                networkController->manageEnteredPeerId(peerId, IngeScapeTypes::LAUNCHER);
-                networkController->setnumberOfLaunchers(networkController->numberOfLaunchers() + 1);
+                ingeScapeNetworkC->manageEnteredPeerId(peerId, IngeScapeTypes::LAUNCHER);
+                ingeScapeNetworkC->setnumberOfLaunchers(ingeScapeNetworkC->numberOfLaunchers() + 1);
 
                 if (peerName.endsWith(suffix_Launcher)) {
                     hostname = peerName.left(peerName.length() - suffix_Launcher.length());
                 }
 
                 // Emit the signal "Launcher Entered"
-                Q_EMIT networkController->launcherEntered(peerId, hostname, ipAddress, streamingPort);
+                Q_EMIT ingeScapeNetworkC->launcherEntered(peerId, hostname, ipAddress, streamingPort);
             }
             // IngeScape RECORDER
             else if (isIngeScapeRecorder)
@@ -171,11 +171,11 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                 qDebug() << "Our zyre event is about IngeScape RECORDER";
 
                 // Save the peer id of this recorder
-                networkController->manageEnteredPeerId(peerId, IngeScapeTypes::RECORDER);
-                networkController->setnumberOfRecorders(networkController->numberOfRecorders() + 1);
+                ingeScapeNetworkC->manageEnteredPeerId(peerId, IngeScapeTypes::RECORDER);
+                ingeScapeNetworkC->setnumberOfRecorders(ingeScapeNetworkC->numberOfRecorders() + 1);
 
                 // Emit the signal "Recorder Entered"
-                Q_EMIT networkController->recorderEntered(peerId, peerName, ipAddress, hostname);
+                Q_EMIT ingeScapeNetworkC->recorderEntered(peerId, peerName, ipAddress, hostname);
             }
             // IngeScape EDITOR
             else if (isIngeScapeEditor)
@@ -183,11 +183,11 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                 qDebug() << "Our zyre event is about IngeScape EDITOR";
 
                 // Save the peer id of this editor
-                networkController->manageEnteredPeerId(peerId, IngeScapeTypes::EDITOR);
-                networkController->setnumberOfEditors(networkController->numberOfEditors() + 1);
+                ingeScapeNetworkC->manageEnteredPeerId(peerId, IngeScapeTypes::EDITOR);
+                ingeScapeNetworkC->setnumberOfEditors(ingeScapeNetworkC->numberOfEditors() + 1);
 
                 // Emit the signal "Editor Entered"
-                Q_EMIT networkController->editorEntered(peerId, peerName, ipAddress, hostname);
+                Q_EMIT ingeScapeNetworkC->editorEntered(peerId, peerName, ipAddress, hostname);
             }
             // IngeScape ASSESSMENTS
             else if (isIngeScapeAssessments)
@@ -195,11 +195,11 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                 qDebug() << "Our zyre event is about IngeScape ASSESSMENTS";
 
                 // Save the peer id of this recorder
-                networkController->manageEnteredPeerId(peerId, IngeScapeTypes::ASSESSMENTS);
-                networkController->setnumberOfAssessments(networkController->numberOfAssessments() + 1);
+                ingeScapeNetworkC->manageEnteredPeerId(peerId, IngeScapeTypes::ASSESSMENTS);
+                ingeScapeNetworkC->setnumberOfAssessments(ingeScapeNetworkC->numberOfAssessments() + 1);
 
                 // Emit the signal "Assessments Entered"
-                Q_EMIT networkController->assessmentsEntered(peerId, peerName, ipAddress, hostname);
+                Q_EMIT ingeScapeNetworkC->assessmentsEntered(peerId, peerName, ipAddress, hostname);
             }
             // IngeScape EXPE
             else if (isIngeScapeExpe)
@@ -207,11 +207,11 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                 qDebug() << "Our zyre event is about IngeScape EXPE";
 
                 // Save the peer id of this recorder
-                networkController->manageEnteredPeerId(peerId, IngeScapeTypes::EXPE);
-                networkController->setnumberOfExpes(networkController->numberOfExpes() + 1);
+                ingeScapeNetworkC->manageEnteredPeerId(peerId, IngeScapeTypes::EXPE);
+                ingeScapeNetworkC->setnumberOfExpes(ingeScapeNetworkC->numberOfExpes() + 1);
 
                 // Emit the signal "Expe Entered"
-                Q_EMIT networkController->expeEntered(peerId, peerName, ipAddress, hostname);
+                Q_EMIT ingeScapeNetworkC->expeEntered(peerId, peerName, ipAddress, hostname);
             }
             // IngeScape AGENT
             else if (nbKeys > 0)
@@ -219,11 +219,11 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                 qDebug() << "Our zyre event is about IngeScape AGENT on" << hostname;
 
                 // Save the peer id of this agent
-                networkController->manageEnteredPeerId(peerId, IngeScapeTypes::AGENT);
-                networkController->setnumberOfAgents(networkController->numberOfAgents() + 1);
+                ingeScapeNetworkC->manageEnteredPeerId(peerId, IngeScapeTypes::AGENT);
+                ingeScapeNetworkC->setnumberOfAgents(ingeScapeNetworkC->numberOfAgents() + 1);
 
                 // Emit the signal "Agent Entered"
-                Q_EMIT networkController->agentEntered(peerId, peerName, ipAddress, hostname, commandLine, canBeFrozen, loggerPort);
+                Q_EMIT ingeScapeNetworkC->agentEntered(peerId, peerName, ipAddress, hostname, commandLine, canBeFrozen, loggerPort);
             }
             else {
                 qDebug() << "Our zyre event is about an element without headers, we ignore it !";
@@ -245,7 +245,7 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             zmsg_t* msg_dup = zmsg_dup(msg);
 
             // Manage the "Shouted" message
-            networkController->manageShoutedMessage(peerId, peerName, msg_dup);
+            ingeScapeNetworkC->manageShoutedMessage(peerId, peerName, msg_dup);
 
             zmsg_destroy(&msg_dup);
         }
@@ -255,7 +255,7 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             zmsg_t* msg_dup = zmsg_dup(msg);
 
             // Manage the "Whispered" message
-            networkController->manageWhisperedMessage(peerId, peerName, msg_dup);
+            ingeScapeNetworkC->manageWhisperedMessage(peerId, peerName, msg_dup);
 
             zmsg_destroy(&msg_dup);
         }
@@ -265,7 +265,7 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             qDebug() << QString("<-- %1 (%2) exited").arg(peerName, peerId);
 
             // Get the IngeScape type of a peer id
-            IngeScapeTypes::Value ingeScapeType = networkController->getIngeScapeTypeOfPeerId(peerId);
+            IngeScapeTypes::Value ingeScapeType = ingeScapeNetworkC->getIngeScapeTypeOfPeerId(peerId);
 
             switch (ingeScapeType)
             {
@@ -273,9 +273,9 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             case IngeScapeTypes::AGENT:
             {
                 // Emit the signal "Agent Exited"
-                Q_EMIT networkController->agentExited(peerId, peerName);
+                Q_EMIT ingeScapeNetworkC->agentExited(peerId, peerName);
 
-                networkController->setnumberOfAgents(networkController->numberOfAgents() - 1);
+                ingeScapeNetworkC->setnumberOfAgents(ingeScapeNetworkC->numberOfAgents() - 1);
 
                 break;
             }
@@ -289,9 +289,9 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                 }
 
                 // Emit the signal "Launcher Exited"
-                Q_EMIT networkController->launcherExited(peerId, hostname);
+                Q_EMIT ingeScapeNetworkC->launcherExited(peerId, hostname);
 
-                networkController->setnumberOfLaunchers(networkController->numberOfLaunchers() - 1);
+                ingeScapeNetworkC->setnumberOfLaunchers(ingeScapeNetworkC->numberOfLaunchers() - 1);
 
                 break;
             }
@@ -299,9 +299,9 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             case IngeScapeTypes::RECORDER:
             {
                 // Emit the signal "Recorder Exited"
-                Q_EMIT networkController->recorderExited(peerId, peerName);
+                Q_EMIT ingeScapeNetworkC->recorderExited(peerId, peerName);
 
-                networkController->setnumberOfRecorders(networkController->numberOfRecorders() - 1);
+                ingeScapeNetworkC->setnumberOfRecorders(ingeScapeNetworkC->numberOfRecorders() - 1);
 
                 break;
             }
@@ -309,9 +309,9 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             case IngeScapeTypes::EDITOR:
             {
                 // Emit the signal "Editor Exited"
-                Q_EMIT networkController->editorExited(peerId, peerName);
+                Q_EMIT ingeScapeNetworkC->editorExited(peerId, peerName);
 
-                networkController->setnumberOfEditors(networkController->numberOfEditors() - 1);
+                ingeScapeNetworkC->setnumberOfEditors(ingeScapeNetworkC->numberOfEditors() - 1);
 
                 break;
             }
@@ -319,9 +319,9 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             case IngeScapeTypes::ASSESSMENTS:
             {
                 // Emit the signal "Assessments Exited"
-                Q_EMIT networkController->assessmentsExited(peerId, peerName);
+                Q_EMIT ingeScapeNetworkC->assessmentsExited(peerId, peerName);
 
-                networkController->setnumberOfAssessments(networkController->numberOfAssessments() - 1);
+                ingeScapeNetworkC->setnumberOfAssessments(ingeScapeNetworkC->numberOfAssessments() - 1);
 
                 break;
             }
@@ -329,9 +329,9 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             case IngeScapeTypes::EXPE:
             {
                 // Emit the signal "Expe Exited"
-                Q_EMIT networkController->expeExited(peerId, peerName);
+                Q_EMIT ingeScapeNetworkC->expeExited(peerId, peerName);
 
-                networkController->setnumberOfExpes(networkController->numberOfExpes() - 1);
+                ingeScapeNetworkC->setnumberOfExpes(ingeScapeNetworkC->numberOfExpes() - 1);
 
                 break;
             }
@@ -341,7 +341,7 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             }
 
             // Manage the peer id which exited the network
-            networkController->manageExitedPeerId(peerId);
+            ingeScapeNetworkC->manageExitedPeerId(peerId);
         }
     }
 }
@@ -358,8 +358,8 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
  */
 void onMonitorCallback(igs_monitorEvent_t event, const char *device, const char *ipAddress, void *myData)
 {
-    IngeScapeNetworkController* networkController = static_cast<IngeScapeNetworkController*>(myData);
-    if (networkController != nullptr)
+    IngeScapeNetworkController* ingeScapeNetworkC = static_cast<IngeScapeNetworkController*>(myData);
+    if (ingeScapeNetworkC != nullptr)
     {
 #ifdef Q_OS_WIN
         QString networkDevice = QString::fromLatin1(device);
@@ -375,15 +375,15 @@ void onMonitorCallback(igs_monitorEvent_t event, const char *device, const char 
                             << " - ingescape agent can be started again";
 
                     // Update our list of network devices
-                    networkController->updateAvailableNetworkDevices();
+                    ingeScapeNetworkC->updateAvailableNetworkDevices();
 
                     // Notify event
-                    networkController->networkDeviceIsAvailableAgain();
+                    ingeScapeNetworkC->networkDeviceIsAvailableAgain();
 
                     // Automatically start our agent if needed
-                    if (networkController->automaticallyStartStopOnMonitorEvents())
+                    if (ingeScapeNetworkC->automaticallyStartStopOnMonitorEvents())
                     {
-                        networkController->startWithPreviousConfiguration();
+                        ingeScapeNetworkC->startWithPreviousConfiguration();
                     }
                 }
                 break;
@@ -394,18 +394,18 @@ void onMonitorCallback(igs_monitorEvent_t event, const char *device, const char 
                             << " - ingescape agent must be stopped";
 
                     // Update internal state
-                    networkController->setisOnline(false);
+                    ingeScapeNetworkC->setisOnline(false);
 
                     // Update our list of network devices
-                    networkController->updateAvailableNetworkDevices();
+                    ingeScapeNetworkC->updateAvailableNetworkDevices();
 
                     // Notify event
-                    networkController->networkDeviceIsNotAvailable();
+                    ingeScapeNetworkC->networkDeviceIsNotAvailable();
 
                     // Automatically stop our agent if needed
-                    if (networkController->automaticallyStartStopOnMonitorEvents())
+                    if (ingeScapeNetworkC->automaticallyStartStopOnMonitorEvents())
                     {
-                        networkController->stop();
+                        ingeScapeNetworkC->stop();
                     }
                 }
                 break;
@@ -416,12 +416,12 @@ void onMonitorCallback(igs_monitorEvent_t event, const char *device, const char 
                             << " has a new ip address " << ipAddress << " - ingescape agent must be restarted";
 
                     // Notify event
-                    networkController->networkDeviceIpAddressHasChanged(QString(ipAddress));
+                    ingeScapeNetworkC->networkDeviceIpAddressHasChanged(QString(ipAddress));
 
                     // Automatically restart our agent if needed
-                    if (networkController->automaticallyStartStopOnMonitorEvents())
+                    if (ingeScapeNetworkC->automaticallyStartStopOnMonitorEvents())
                     {
-                        networkController->restart();
+                        ingeScapeNetworkC->restart();
                     }
                 }
                 break;
@@ -454,8 +454,8 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
     Q_UNUSED(value)
     Q_UNUSED(valueSize)
 
-    IngeScapeNetworkController* networkController = static_cast<IngeScapeNetworkController*>(myData);
-    if (networkController != nullptr)
+    IngeScapeNetworkController* ingeScapeNetworkC = static_cast<IngeScapeNetworkController*>(myData);
+    if (ingeScapeNetworkC != nullptr)
     {
         if (iopType == IGS_INPUT_T)
         {
@@ -557,7 +557,7 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
                                                                           currentValue);
 
                     // Emit the signal "Value Published"
-                    Q_EMIT networkController->valuePublished(publishedValue);
+                    Q_EMIT ingeScapeNetworkC->valuePublished(publishedValue);
                 }
                 else {
                     qCritical() << "Can NOT read input" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
@@ -570,9 +570,43 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
 
 //--------------------------------------------------------------
 //
+//
 // IngeScape Network Controller
 //
+//
 //--------------------------------------------------------------
+
+// Define our singleton instance
+// Creates a global and static object of type QGlobalStatic, of name _singletonInstance and that behaves as a pointer to NetworkController.
+// The object created by Q_GLOBAL_STATIC initializes itself on the first use, which means that it will not increase the application or the library's load time.
+// Additionally, the object is initialized in a thread-safe manner on all platforms.
+Q_GLOBAL_STATIC(IngeScapeNetworkController, _singletonInstance)
+
+
+/**
+ * @brief Get our singleton instance
+ * @return
+ */
+IngeScapeNetworkController* IngeScapeNetworkController::instance()
+{
+    return _singletonInstance;
+}
+
+
+/**
+ * @brief Method used to provide a singleton to QML
+ * @param engine
+ * @param scriptEngine
+ * @return
+ */
+QObject* IngeScapeNetworkController::qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine)
+{
+    Q_UNUSED(engine);
+    Q_UNUSED(scriptEngine);
+
+    return _singletonInstance;
+}
+
 
 /**
  * @brief Constructor
@@ -615,6 +649,10 @@ IngeScapeNetworkController::IngeScapeNetworkController(QObject *parent) : QObjec
                                   \"parameters\": [],   \
                                   \"inputs\": [],       \
                                   \"outputs\": [] }}";
+
+    //QJsonDocument jsonDocument(jsonObject);
+    //QString jsonOfMapping = QString(jsonDocument.toJson(QJsonDocument::Indented));
+    //QString jsonOfMapping = QString(jsonDocument.toJson(QJsonDocument::Compact));
 
     igs_loadDefinition(definitionByDefault.toStdString().c_str());
 
@@ -919,10 +957,9 @@ bool IngeScapeNetworkController::isAvailableNetworkDevice(QString networkDevice)
  */
 void IngeScapeNetworkController::manageShoutedMessage(QString peerId, QString peerName, zmsg_t* zMessage)
 {
-    std::unique_ptr<char> zmsg_str(zmsg_popstr(zMessage));
-    QString message(zmsg_str.get());
+    Q_EMIT shoutedMessageReceived(peerId, peerName, zMessage);
 
-    qDebug() << "Not yet managed SHOUTED message '" << message << "' for agent" << peerName << "(" << peerId << ")";
+    //qDebug() << "Not yet managed SHOUTED message '" << message << "' for agent" << peerName << "(" << peerId << ")";
 }
 
 
@@ -938,7 +975,7 @@ void IngeScapeNetworkController::manageWhisperedMessage(QString peerId, QString 
     QString message(zmsg_str.get());
 
     // An agent DEFINITION has been received
-    /*if (message.startsWith(prefix_Definition))
+    if (message.startsWith(prefix_Definition))
     {
         QString definitionJSON = message.remove(0, prefix_Definition.length());
 
@@ -950,9 +987,14 @@ void IngeScapeNetworkController::manageWhisperedMessage(QString peerId, QString 
         QString mappingJSON = message.remove(0, prefix_Mapping.length());
 
         Q_EMIT mappingReceived(peerId, peerName, mappingJSON);
-    }*/
+    }
+    // Other message has been received
+    else
+    {
+         Q_EMIT whisperedMessageReceived(peerId, peerName, zMessage);
+    }
 
-    qDebug() << "Not yet managed WHISPERED message '" << message << "' for agent" << peerName << "(" << peerId << ")";
+    //qDebug() << "Not yet managed WHISPERED message '" << message << "' for agent" << peerName << "(" << peerId << ")";
 }
 
 
@@ -1138,92 +1180,12 @@ bool IngeScapeNetworkController::sendMessageToAgents(QStringList agentIds, QStri
 
 
 /**
- * @brief Slot called when a command must be sent on the network to a recorder
- * @param peerIdOfRecorder
- * @param commandAndParameters
- */
-void IngeScapeNetworkController::onCommandAskedToRecorder(QString peerIdOfRecorder, QString commandAndParameters)
-{
-    if (!peerIdOfRecorder.isEmpty() && !commandAndParameters.isEmpty())
-    {
-        // Send the command (and parameters) to the peer id of the recorder
-        int success = igs_busSendStringToAgent(peerIdOfRecorder.toStdString().c_str(), "%s", commandAndParameters.toStdString().c_str());
-
-        qInfo() << "Send command (and parameters)" << commandAndParameters << "to recorder" << peerIdOfRecorder << "with success ?" << success;
-    }
-}
-
-
-/**
- * @brief Slot called when the flag "is Mapping Activated" changed
- * @param isMappingConnected
- */
-void IngeScapeNetworkController::onIsMappingConnectedChanged(bool isMappingConnected)
-{
-    if ((_agentModel != nullptr) && (_agentModel->definition() != nullptr))
-    {
-        for (AgentIOPM* input : _agentModel->definition()->inputsList()->toList())
-        {
-            if (input != nullptr)
-            {
-                QString inputName = input->name();
-
-                QStringList agentNameAndIOP = inputName.split(SEPARATOR_AGENT_NAME_AND_IOP);
-                if (agentNameAndIOP.count() == 2)
-                {
-                    QString outputAgentName = agentNameAndIOP.at(0);
-                    QString outputId = agentNameAndIOP.at(1);
-
-                    // Get the name and the value type of the output from its id
-                    QPair<QString, AgentIOPValueTypes::Value> pair = AgentIOPM::getNameAndValueTypeFromId(outputId);
-
-                    if (!pair.first.isEmpty() && (pair.second != AgentIOPValueTypes::UNKNOWN))
-                    {
-                        QString outputName = pair.first;
-                        //AgentIOPValueTypes::Value valueType = pair.second;
-
-                        // Mapping Activated (Connected)
-                        if (isMappingConnected)
-                        {
-                            // Add mapping between our input and this output
-                            unsigned long id = igs_addMappingEntry(inputName.toStdString().c_str(), outputAgentName.toStdString().c_str(), outputName.toStdString().c_str());
-
-                            if (id > 0) {
-                                //qDebug() << "Mapping added between output" << outputName << "of agent" << outputAgentName << "and input" << inputName << "of agent" << _igsAgentApplicationName << "(id" << id << ")";
-                            }
-                            else {
-                                qCritical() << "Can NOT add mapping between output" << outputName << "of agent" << outputAgentName << "and input" << inputName << "of agent" << _igsAgentApplicationName << "Error code:" << id;
-                            }
-                        }
-                        // Mapping DE-activated (DIS-connected)
-                        else
-                        {
-                            // Remove mapping between our input and this output
-                            int resultRemoveMappingEntry = igs_removeMappingEntryWithName(inputName.toStdString().c_str(), outputAgentName.toStdString().c_str(), outputName.toStdString().c_str());
-
-                            if (resultRemoveMappingEntry == 1)
-                            {
-                                //qDebug() << "Mapping removed between output" << outputName << "of agent" << outputAgentName << "and input" << inputName << "of agent" << _igsAgentApplicationName;
-                            }
-                            else {
-                                qCritical() << "Can NOT remove mapping between output" << outputName << "of agent" << outputAgentName << "and input" << inputName << "of agent" << _igsAgentApplicationName << "Error code:" << resultRemoveMappingEntry;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-/**
- * @brief Slot called when inputs must be added to our application for a list of agent outputs
+ * @brief Add inputs to our application for a list of agent outputs
  * @param agentName
  * @param newOutputsIds
  * @param isMappingConnected
  */
-void IngeScapeNetworkController::onAddInputsToOurApplicationForAgentOutputs(QString agentName, QStringList newOutputsIds, bool isMappingConnected)
+void IngeScapeNetworkController::addInputsToOurApplicationForAgentOutputs(QString agentName, QStringList newOutputsIds, bool isMappingConnected)
 {
     if ((_agentModel != nullptr) && (_agentModel->definition() != nullptr) && !newOutputsIds.isEmpty())
     {
@@ -1317,12 +1279,12 @@ void IngeScapeNetworkController::onAddInputsToOurApplicationForAgentOutputs(QStr
 
 
 /**
- * @brief Slot called when inputs must be removed from our application for a list of agent outputs
+ * @brief Remove inputs from our application for a list of agent outputs
  * @param agentName
  * @param oldOutputsIds
  * @param isMappingConnected
  */
-void IngeScapeNetworkController::onRemoveInputsFromOurApplicationForAgentOutputs(QString agentName, QStringList oldOutputsIds, bool isMappingConnected)
+void IngeScapeNetworkController::removeInputsFromOurApplicationForAgentOutputs(QString agentName, QStringList oldOutputsIds, bool isMappingConnected)
 {
     Q_UNUSED(isMappingConnected)
 
@@ -1377,3 +1339,84 @@ void IngeScapeNetworkController::onRemoveInputsFromOurApplicationForAgentOutputs
         }
     }
 }
+
+
+/**
+ * @brief Slot called when a command must be sent on the network to a recorder
+ * @param peerIdOfRecorder
+ * @param commandAndParameters
+ */
+void IngeScapeNetworkController::onCommandAskedToRecorder(QString peerIdOfRecorder, QString commandAndParameters)
+{
+    if (!peerIdOfRecorder.isEmpty() && !commandAndParameters.isEmpty())
+    {
+        // Send the command (and parameters) to the peer id of the recorder
+        int success = igs_busSendStringToAgent(peerIdOfRecorder.toStdString().c_str(), "%s", commandAndParameters.toStdString().c_str());
+
+        qInfo() << "Send command (and parameters)" << commandAndParameters << "to recorder" << peerIdOfRecorder << "with success ?" << success;
+    }
+}
+
+
+/**
+ * @brief Slot called when the flag "is Mapping Activated" changed
+ * @param isMappingConnected
+ */
+void IngeScapeNetworkController::onIsMappingConnectedChanged(bool isMappingConnected)
+{
+    if ((_agentModel != nullptr) && (_agentModel->definition() != nullptr))
+    {
+        for (AgentIOPM* input : _agentModel->definition()->inputsList()->toList())
+        {
+            if (input != nullptr)
+            {
+                QString inputName = input->name();
+
+                QStringList agentNameAndIOP = inputName.split(SEPARATOR_AGENT_NAME_AND_IOP);
+                if (agentNameAndIOP.count() == 2)
+                {
+                    QString outputAgentName = agentNameAndIOP.at(0);
+                    QString outputId = agentNameAndIOP.at(1);
+
+                    // Get the name and the value type of the output from its id
+                    QPair<QString, AgentIOPValueTypes::Value> pair = AgentIOPM::getNameAndValueTypeFromId(outputId);
+
+                    if (!pair.first.isEmpty() && (pair.second != AgentIOPValueTypes::UNKNOWN))
+                    {
+                        QString outputName = pair.first;
+                        //AgentIOPValueTypes::Value valueType = pair.second;
+
+                        // Mapping Activated (Connected)
+                        if (isMappingConnected)
+                        {
+                            // Add mapping between our input and this output
+                            unsigned long id = igs_addMappingEntry(inputName.toStdString().c_str(), outputAgentName.toStdString().c_str(), outputName.toStdString().c_str());
+
+                            if (id > 0) {
+                                //qDebug() << "Mapping added between output" << outputName << "of agent" << outputAgentName << "and input" << inputName << "of agent" << _igsAgentApplicationName << "(id" << id << ")";
+                            }
+                            else {
+                                qCritical() << "Can NOT add mapping between output" << outputName << "of agent" << outputAgentName << "and input" << inputName << "of agent" << _igsAgentApplicationName << "Error code:" << id;
+                            }
+                        }
+                        // Mapping DE-activated (DIS-connected)
+                        else
+                        {
+                            // Remove mapping between our input and this output
+                            int resultRemoveMappingEntry = igs_removeMappingEntryWithName(inputName.toStdString().c_str(), outputAgentName.toStdString().c_str(), outputName.toStdString().c_str());
+
+                            if (resultRemoveMappingEntry == 1)
+                            {
+                                //qDebug() << "Mapping removed between output" << outputName << "of agent" << outputAgentName << "and input" << inputName << "of agent" << _igsAgentApplicationName;
+                            }
+                            else {
+                                qCritical() << "Can NOT remove mapping between output" << outputName << "of agent" << outputAgentName << "and input" << inputName << "of agent" << _igsAgentApplicationName << "Error code:" << resultRemoveMappingEntry;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+

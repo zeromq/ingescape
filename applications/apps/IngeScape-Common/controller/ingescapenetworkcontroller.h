@@ -42,7 +42,7 @@ static const QString prefix_Mapping = "EXTERNAL_MAPPING#";
 /**
  * @brief The IngeScapeNetworkController class defines the controller for IngeScape network communications
  */
-class IngeScapeNetworkController: public QObject
+class IngeScapeNetworkController : public QObject
 {
     Q_OBJECT
 
@@ -74,6 +74,22 @@ class IngeScapeNetworkController: public QObject
 
 
 public:
+
+    /**
+     * @brief Accessor to the singleton instance
+     * @return
+     */
+    static IngeScapeNetworkController* instance();
+
+
+    /**
+     * @brief Method used to provide a singleton to QML
+     * @param engine
+     * @param scriptEngine
+     * @return
+     */
+     static QObject* qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine);
+
 
     /**
      * @brief Constructor
@@ -179,7 +195,7 @@ public:
      * @param peerName
      * @param zMessage
      */
-    virtual void manageShoutedMessage(QString peerId, QString peerName, zmsg_t* zMessage);
+    void manageShoutedMessage(QString peerId, QString peerName, zmsg_t* zMessage);
 
 
     /**
@@ -188,7 +204,7 @@ public:
      * @param peerName
      * @param zMessage
      */
-    virtual void manageWhisperedMessage(QString peerId, QString peerName, zmsg_t* zMessage);
+    void manageWhisperedMessage(QString peerId, QString peerName, zmsg_t* zMessage);
 
 
     /**
@@ -225,6 +241,24 @@ public:
      * @return true if successful, false otherwise
      */
     bool sendMessageToAgents(QStringList agentIds, QStringList message);
+
+
+    /**
+     * @brief Add inputs to our application for a list of agent outputs
+     * @param agentName
+     * @param newOutputsIds
+     * @param isMappingConnected
+     */
+    void addInputsToOurApplicationForAgentOutputs(QString agentName, QStringList newOutputsIds, bool isMappingConnected);
+
+
+    /**
+     * @brief Remove inputs from our application for a list of agent outputs
+     * @param agentName
+     * @param oldOutputsIds
+     * @param isMappingConnected
+     */
+    void removeInputsFromOurApplicationForAgentOutputs(QString agentName, QStringList oldOutputsIds, bool isMappingConnected);
 
 
 Q_SIGNALS:
@@ -376,10 +410,28 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when a new value is published
+     * @brief Signal emitted when a new value has been published
      * @param publishedValue
      */
     void valuePublished(PublishedValueM* publishedValue);
+
+
+    /**
+     * @brief Signal emitted when a "Shouted" message has been received
+     * @param peerId
+     * @param peerName
+     * @param zMessage
+     */
+    void shoutedMessageReceived(QString peerId, QString peerName, zmsg_t* zMessage);
+
+
+    /**
+     * @brief Signal emitted when "Whispered" message has been received
+     * @param peerId
+     * @param peerName
+     * @param zMessage
+     */
+    void whisperedMessageReceived(QString peerId, QString peerName, zmsg_t* zMessage);
 
 
 public Q_SLOTS:
@@ -399,25 +451,7 @@ public Q_SLOTS:
     void onIsMappingConnectedChanged(bool isMappingConnected);
 
 
-    /**
-     * @brief Slot called when inputs must be added to our application for a list of agent outputs
-     * @param agentName
-     * @param newOutputsIds
-     * @param isMappingConnected
-     */
-    void onAddInputsToOurApplicationForAgentOutputs(QString agentName, QStringList newOutputsIds, bool isMappingConnected);
-
-
-    /**
-     * @brief Slot called when inputs must be removed from our application for a list of agent outputs
-     * @param agentName
-     * @param oldOutputsIds
-     * @param isMappingConnected
-     */
-    void onRemoveInputsFromOurApplicationForAgentOutputs(QString agentName, QStringList oldOutputsIds, bool isMappingConnected);
-
-
-protected:
+private:
     // Name of our "IngeScape" agent that correspond to our application
     QString _igsAgentApplicationName;
 

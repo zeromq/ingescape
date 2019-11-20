@@ -20,6 +20,7 @@
 #include <QFileDialog>
 #include <I2Quick.h>
 #include <misc/ingescapeutils.h>
+#include <controller/ingescapenetworkcontroller.h>
 
 
 // Threshold beyond which we consider that there are too many values
@@ -1038,8 +1039,8 @@ void IngeScapeModelManager::_onOutputsHaveBeenAddedToAgentsGroupedByName(QList<O
 
         if (!newOutputsIds.isEmpty())
         {
-            // Emit the signal "Add Inputs to our application for Agent Outputs"
-            Q_EMIT addInputsToOurApplicationForAgentOutputs(agentsGroupedByName->name(), newOutputsIds, _isMappingConnected);
+            // Add inputs to our application for these agent outputs
+            IngeScapeNetworkController::instance()->addInputsToOurApplicationForAgentOutputs(agentsGroupedByName->name(), newOutputsIds, _isMappingConnected);
         }
     }
 }
@@ -1066,8 +1067,8 @@ void IngeScapeModelManager::_onOutputsWillBeRemovedFromAgentsGroupedByName(QList
 
         if (!oldOutputsIds.isEmpty())
         {
-            // Emit the signal "Remove Inputs from our application for Agent Outputs"
-            Q_EMIT removeInputsFromOurApplicationForAgentOutputs(agentsGroupedByName->name(), oldOutputsIds, _isMappingConnected);
+            // Remove inputs from our application for these agent outputs
+            IngeScapeNetworkController::instance()->removeInputsFromOurApplicationForAgentOutputs(agentsGroupedByName->name(), oldOutputsIds, _isMappingConnected);
         }
     }
 }

@@ -18,6 +18,7 @@
 #include <QQmlEngine>
 #include <QDebug>
 #include <model/editorenums.h>
+#include <controller/ingescapenetworkcontroller.h>
 
 
 /**
@@ -226,9 +227,11 @@ void AgentsSupervisionController::_onLoadAgentDefinitionFromPath(QStringList pee
             QString jsonOfDefinition = QString(jsonDocument.toJson(QJsonDocument::Compact));
 
             // Create the command "Load Definition"
-            QString command = QString("%1%2").arg(command_LoadDefinition, jsonOfDefinition);
+            QString message = QString("%1%2").arg(command_LoadDefinition, jsonOfDefinition);
 
-            Q_EMIT commandAskedToAgent(peerIdsList, command);
+            // Send the message to the agent
+            // FIXME: JSON can be too big for a string
+            IngeScapeNetworkController::instance()->sendMessageToAgents(peerIdsList, message);
         }
         else {
             qCritical() << "Can not open file" << definitionFilePath << "(to load the definition of" << agentsGroupedByDefinition->name() << ")";
@@ -258,9 +261,11 @@ void AgentsSupervisionController::_onLoadAgentMappingFromPath(QStringList peerId
             QString jsonOfMapping = QString(jsonDocument.toJson(QJsonDocument::Compact));
 
             // Create the command "Load Mapping"
-            QString command = QString("%1%2").arg(command_LoadMapping, jsonOfMapping);
+            QString message = QString("%1%2").arg(command_LoadMapping, jsonOfMapping);
 
-            Q_EMIT commandAskedToAgent(peerIdsList, command);
+            // Send the message to the agent
+            // FIXME: JSON can be too big for a string
+            IngeScapeNetworkController::instance()->sendMessageToAgents(peerIdsList, message);
         }
         else {
             qCritical() << "Can not open file" << mappingFilePath << "(to load the mapping of" << agentsGroupedByDefinition->name() << ")";
