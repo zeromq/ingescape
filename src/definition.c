@@ -211,7 +211,7 @@ int igsAgent_clearDefinition(igsAgent_t *agent){
         definition_freeDefinition(agent->internal_definition);
     }
     agent->internal_definition = calloc(1, sizeof(definition));
-    agent->internal_definition->name = igs_getAgentName();
+    agent->internal_definition->name = igsAgent_getAgentName(agent);
     agent->internal_definition->description = NULL;
     agent->internal_definition->version = NULL;
     agent->internal_definition->params_table = NULL;

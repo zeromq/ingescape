@@ -39,9 +39,9 @@ public:
     /**
      * @brief Method called when the editor is launched to notify our server.
      * The given license information as identification.
-     * @param license
+     * @param licenseObject
      */
-    Q_INVOKABLE void editorLaunched(LicenseInformationM* license);
+    Q_INVOKABLE void editorLaunched(LicenseInformationM* licenseObject);
 
 
 private Q_SLOTS:

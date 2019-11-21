@@ -50,13 +50,13 @@ CallHomeController::~CallHomeController()
  * @brief Method called when the editor is launched to notify our server.
  * The given license information as identification.
  */
-void CallHomeController::editorLaunched(LicenseInformationM* license)
+void CallHomeController::editorLaunched(LicenseInformationM* licenseObject)
 {
-    if ((_accessManager != nullptr) && (license != nullptr))
+    if ((_accessManager != nullptr) && (licenseObject != nullptr))
     {
         // Build JSON Body
         QByteArray jsonString = "{\"user_id\":\"";
-        jsonString.append(license->licenseId());
+        jsonString.append(licenseObject->licenseId());
         jsonString.append("\"}");
 
         // Prepare request

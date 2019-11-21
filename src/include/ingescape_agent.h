@@ -12,38 +12,21 @@
 #include "ingescape.h"
 #include "ingescape_advanced.h"
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#if (defined WIN32 || defined _WIN32)
-#if defined INGESCAPE
-#define PUBLIC __declspec(dllexport)
-#elif defined INGESCAPE_FROM_PRI
-#define PUBLIC
-#else
-#define PUBLIC __declspec(dllimport)
-#endif
-#else
-#define PUBLIC
-#endif
-
-// GCC and clang can validate format strings for functions that act like printf
-// this is used to check the logging functions
-#if defined (__GNUC__) && (__GNUC__ >= 2)
-#   define CHECK_PRINTF(a)   __attribute__((format (printf, a, a + 1)))
-#else
-#   define CHECK_PRINTF(a)
-#endif
-
-//Macro to avoid "unused parameter" warnings
-#define IGS_UNUSED(x) (void)x;
-
+//agent creation and destruction
 typedef struct _igsAgent_t igsAgent_t;
-igsAgent_t *igsAgent_new(void);
-void igsAgent_destroy(igsAgent_t **agent);
+PUBLIC igsAgent_t *igsAgent_new(void);
+PUBLIC void igsAgent_destroy(igsAgent_t **agent);
 
+/*
+ All the functions below behave the same as the functions presented
+ in ingescape.h, except that they take an agent instance as first argument.
+ */
+
+//initialization and control
 PUBLIC int igsAgent_startWithDevice(igsAgent_t *agent, const char *networkDevice, unsigned int port);
 PUBLIC int igsAgent_startWithIP(igsAgent_t *agent, const char *ipAddress, unsigned int port);
 PUBLIC int igsAgent_stop(igsAgent_t *agent);
@@ -64,7 +47,7 @@ PUBLIC int igsAgent_observeFreeze(igsAgent_t *agent, igs_freezeCallback cb, void
 PUBLIC void igsAgent_setCanBeFrozen(igsAgent_t *agent, bool canBeFrozen);
 PUBLIC bool igsAgent_canBeFrozen(igsAgent_t *agent);
 
-//IOP
+//IOP read, write, creation, destruction, introspection
 PUBLIC int igsAgent_readInput(igsAgent_t *agent, const char *name, void **value, size_t *size);
 PUBLIC int igsAgent_readOutput(igsAgent_t *agent, const char *name, void **value, size_t *size);
 PUBLIC int igsAgent_readParameter(igsAgent_t *agent, const char *name, void **value, size_t *size);
@@ -115,9 +98,9 @@ PUBLIC iopType_t igsAgent_getTypeForParameter(igsAgent_t *agent, const char *nam
 PUBLIC int igsAgent_getInputsNumber(igsAgent_t *agent);
 PUBLIC int igsAgent_getOutputsNumber(igsAgent_t *agent);
 PUBLIC int igsAgent_getParametersNumber(igsAgent_t *agent);
-PUBLIC char** igsAgent_getInputsList(igsAgent_t *agent, long *nbOfElements); //returned char** must be freed using igsAgent_freeIOPList
-PUBLIC char** igsAgent_getOutputsList(igsAgent_t *agent, long *nbOfElements); //returned char** must be freed using igsAgent_freeIOPList
-PUBLIC char** igsAgent_getParametersList(igsAgent_t *agent, long *nbOfElements); //returned char** must be freed using igsAgent_freeIOPList
+PUBLIC char** igsAgent_getInputsList(igsAgent_t *agent, long *nbOfElements); //returned char** must be freed using igs_freeIOPList
+PUBLIC char** igsAgent_getOutputsList(igsAgent_t *agent, long *nbOfElements); //returned char** must be freed using igs_freeIOPList
+PUBLIC char** igsAgent_getParametersList(igsAgent_t *agent, long *nbOfElements); //returned char** must be freed using igs_freeIOPList
 PUBLIC bool igsAgent_checkInputExistence(igsAgent_t *agent, const char *name);
 PUBLIC bool igsAgent_checkOutputExistence(igsAgent_t *agent, const char *name);
 PUBLIC bool igsAgent_checkParameterExistence(igsAgent_t *agent, const char *name);
@@ -125,8 +108,8 @@ PUBLIC bool igsAgent_checkParameterExistence(igsAgent_t *agent, const char *name
 //definition
 PUBLIC int igsAgent_loadDefinition (igsAgent_t *agent, const char* json_str);
 PUBLIC int igsAgent_loadDefinitionFromPath (igsAgent_t *agent, const char* file_path);
-PUBLIC int igsAgent_clearDefinition(igsAgent_t *agent); //clears definition data for the agent
-PUBLIC char* igsAgent_getDefinition(igsAgent_t *agent); //returns json string, must be freed by caller
+PUBLIC int igsAgent_clearDefinition(igsAgent_t *agent);
+PUBLIC char* igsAgent_getDefinition(igsAgent_t *agent);
 PUBLIC char *igsAgent_getDefinitionName(igsAgent_t *agent); //returned char* must be freed by caller
 PUBLIC char *igsAgent_getDefinitionDescription(igsAgent_t *agent); //returned char* must be freed by caller
 PUBLIC char *igsAgent_getDefinitionVersion(igsAgent_t *agent); //returned char* must be freed by caller
@@ -143,7 +126,7 @@ PUBLIC int igsAgent_removeParameter(igsAgent_t *agent, const char *name);
 //mapping
 PUBLIC int igsAgent_loadMapping (igsAgent_t *agent, const char* json_str);
 PUBLIC int igsAgent_loadMappingFromPath (igsAgent_t *agent, const char* file_path);
-PUBLIC int igsAgent_clearMapping(igsAgent_t *agent); //clears all mapping for the agent
+PUBLIC int igsAgent_clearMapping(igsAgent_t *agent);
 PUBLIC char* igsAgent_getMapping(igsAgent_t *agent); //returns json string, must be freed by caller
 PUBLIC char *igsAgent_getMappingName(igsAgent_t *agent); //returned char* must be freed by caller
 PUBLIC char *igsAgent_getMappingDescription(igsAgent_t *agent); //returned char* must be freed by caller
@@ -151,8 +134,8 @@ PUBLIC char *igsAgent_getMappingVersion(igsAgent_t *agent); //returned char* mus
 PUBLIC int igsAgent_setMappingName(igsAgent_t *agent, const char *name);
 PUBLIC int igsAgent_setMappingDescription(igsAgent_t *agent, const char *description);
 PUBLIC int igsAgent_setMappingVersion(igsAgent_t *agent, const char *version);
-PUBLIC int igsAgent_getMappingEntriesNumber(igsAgent_t *agent); //number of entries in the mapping output type
-PUBLIC unsigned long igsAgent_addMappingEntry(igsAgent_t *agent, const char *fromOurInput, const char *toAgent, const char *withOutput); //returns mapping id or zero or below if creation failed
+PUBLIC int igsAgent_getMappingEntriesNumber(igsAgent_t *agent);
+PUBLIC unsigned long igsAgent_addMappingEntry(igsAgent_t *agent, const char *fromOurInput, const char *toAgent, const char *withOutput);
 PUBLIC int igsAgent_removeMappingEntryWithId(igsAgent_t *agent, unsigned long theId);
 PUBLIC int igsAgent_removeMappingEntryWithName(igsAgent_t *agent, const char *fromOurInput, const char *toAgent, const char *withOutput);
 
@@ -161,7 +144,6 @@ PUBLIC void igsAgent_setCommandLine(igsAgent_t *agent, const char *line);
 PUBLIC void igsAgent_setCommandLineFromArgs(igsAgent_t *agent, int argc, const char * argv[]);
 PUBLIC void igsAgent_setRequestOutputsFromMappedAgents(igsAgent_t *agent, bool notify);
 PUBLIC bool igsAgent_getRequestOutputsFromMappedAgents(igsAgent_t *agent);
-
 PUBLIC void igsAgent_setDefinitionPath(igsAgent_t *agent, const char *path);
 PUBLIC void igsAgent_setMappingPath(igsAgent_t *agent, const char *path);
 PUBLIC void igsAgent_writeDefinitionToPath(igsAgent_t *agent);
@@ -169,7 +151,6 @@ PUBLIC void igsAgent_writeMappingToPath(igsAgent_t *agent);
 PUBLIC void igsAgent_setAllowIpc(igsAgent_t *agent, bool allow);
 PUBLIC bool igsAgent_getAllowIpc(igsAgent_t *agent);
 #if defined __unix__ || defined __APPLE__ || defined __linux__
-//set IPC folder path for the agent on UNIX systems (igsAgent_t *agent, default is /tmp/)
 PUBLIC void igsAgent_setIpcFolderPath(igsAgent_t *agent, char *path);
 PUBLIC const char* igsAgent_getIpcFolderPath(igsAgent_t *agent);
 #endif
@@ -182,7 +163,7 @@ PUBLIC bool igsAgent_checkLicense(igsAgent_t *agent, const char *agentId);
 PUBLIC int igsAgent_observeLicense(igsAgent_t *agent, igs_licenseCallback cb, void *myData);
 #endif
 
-//ADVANCED
+//advanced functions
 PUBLIC void igsAgent_setPublishingPort(igsAgent_t *agent, unsigned int port);
 PUBLIC void igsAgent_setDiscoveryInterval(igsAgent_t *agent, unsigned int interval); //in milliseconds
 PUBLIC void igsAgent_setAgentTimeout(igsAgent_t *agent, unsigned int duration); //in milliseconds

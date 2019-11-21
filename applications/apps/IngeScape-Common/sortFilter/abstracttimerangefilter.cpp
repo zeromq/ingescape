@@ -91,7 +91,7 @@ bool AbstractTimeRangeFilter::filterAccepts(QObject* item, int index) const
         int timeInMilliseconds = timeTickItem->timeInMilliSeconds();
 
         // Check if our time is valid
-        if (timeInMilliseconds > 0)
+        if (timeInMilliseconds >= 0)
         {
             result = ((timeInMilliseconds <= _endTimeInMilliseconds) && (timeInMilliseconds >= _startTimeInMilliseconds));
         }
@@ -101,7 +101,7 @@ bool AbstractTimeRangeFilter::filterAccepts(QObject* item, int index) const
         if (actionVMItem != nullptr)
         {
             // Check if our time is valid
-            if (actionVMItem->startTime() > 0)
+            if (actionVMItem->startTime() >= 0)
             {
                 // Case of forever actions
                 result = !( (actionVMItem->startTime() > _endTimeInMilliseconds) || (actionVMItem->endTime() != -1 && actionVMItem->endTime() < _startTimeInMilliseconds));
