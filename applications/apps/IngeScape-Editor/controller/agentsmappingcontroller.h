@@ -245,27 +245,6 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when a command must be sent on the network to an agent about mapping one of its input
-     * @param peerIdsList
-     * @param command
-     * @param inputName
-     * @param outputAgentName
-     * @param outputName
-     */
-    void commandAskedToAgentAboutMappingInput(QStringList peerIdsList, QString command, QString inputName, QString outputAgentName, QString outputName);
-
-
-    /**
-     * @brief Signal emitted when a command must be sent on the network to an agent about setting a value to one of its Input/Output/Parameter
-     * @param peerIdsList
-     * @param command
-     * @param agentIOPName
-     * @param value
-     */
-    void commandAskedToAgentAboutSettingValue(QStringList peerIdsList, QString command, QString agentIOPName, QString value);
-
-
-    /**
      * @brief Signal emitted when an action has to be executed
      * @param action
      */

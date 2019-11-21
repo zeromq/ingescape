@@ -97,7 +97,7 @@ void AgentsMappingController::setisLoadedView(bool value)
         _isLoadedView = value;
 
         // The view of the global mapping is loaded
-        if ((_isLoadedView) && (_modelManager != nullptr))
+        if (_isLoadedView)
         {
             bool allAgentsOFF = true;
             bool isAddedOrRemovedLink_WhileMappingWasUNactivated = false;
@@ -130,7 +130,7 @@ void AgentsMappingController::setisLoadedView(bool value)
             if (allAgentsOFF)
             {
                 // DE-activate the mapping
-                _modelManager->setisMappingConnected(false);
+                IngeScapeModelManager::instance()->setisMappingConnected(false);
             }
             // There have been changes in the mapping while the mapping was UN-activated
             else if (isAddedOrRemovedLink_WhileMappingWasUNactivated)
@@ -155,9 +155,7 @@ void AgentsMappingController::clearMapping()
     qInfo() << "Clear the current mapping";
 
     // 1- First, DE-activate the mapping
-    if (_modelManager != nullptr) {
-        _modelManager->setisMappingConnected(false);
-    }
+    IngeScapeModelManager::instance()->setisMappingConnected(false);
 
     // Clear the hash table from "output agent name" to a list of waiting mapping elements (where the agent is involved as "output agent")
     _hashFromOutputAgentNameToListOfWaitingMappingElements.clear();
@@ -340,10 +338,12 @@ void AgentsMappingController::dropAgentNameToMappingAtPosition(const QString& ag
     // Check that there is NOT yet an agent in the current mapping for this name
     AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);
 
-    if ((agentInMapping == nullptr) && (_modelManager != nullptr))
+    IngeScapeModelManager* igsModelManager = IngeScapeModelManager::instance();
+
+    if ((agentInMapping == nullptr) && (igsModelManager != nullptr))
     {
         // Get the (view model of) agents grouped for this name
-        AgentsGroupedByNameVM* agentsGroupedByName = _modelManager->getAgentsGroupedForName(agentName);
+        AgentsGroupedByNameVM* agentsGroupedByName = igsModelManager->getAgentsGroupedForName(agentName);
         if (agentsGroupedByName != nullptr)
         {
             // Create a new agent in the global mapping (with an "Agents Grouped by Name") at a specific position with the default width
@@ -352,10 +352,10 @@ void AgentsMappingController::dropAgentNameToMappingAtPosition(const QString& ag
             if (agentInMapping != nullptr)
             {
                 // The global mapping is activated
-                if (_modelManager->isMappingConnected())
+                if (igsModelManager->isMappingConnected())
                 {
                     // CONTROL
-                    /*if (_modelManager->isMappingControlled())
+                    /*if (igsModelManager->isMappingControlled())
                     {
                     }
                     // OBSERVE
@@ -403,7 +403,7 @@ void AgentsMappingController::dropAgentNameToMappingAtPosition(const QString& ag
                                 else
                                 {
                                     // Get the (view model of) agents grouped for the output agent name
-                                    AgentsGroupedByNameVM* outputAgent = _modelManager->getAgentsGroupedForName(mappingElement->firstModel()->outputAgent());
+                                    AgentsGroupedByNameVM* outputAgent = igsModelManager->getAgentsGroupedForName(mappingElement->firstModel()->outputAgent());
                                     if (outputAgent != nullptr)
                                     {
                                         QList<OutputVM*> outputsWithSameName = outputAgent->getOutputsListFromName(mappingElement->firstModel()->output());
@@ -495,7 +495,7 @@ void AgentsMappingController::dropLinkBetweenTwoAgents(AgentInMappingVM* outputA
                 QString linkName = MappingElementM::getLinkNameFromNamesList(outputAgent->name(), linkOutput->name(), inputAgent->name(), linkInput->name());
 
                 // The global mapping is activated AND the input agent is ON
-                if ((_modelManager != nullptr) && _modelManager->isMappingConnected() && inputAgent->agentsGroupedByName()->isON())
+                if (IngeScapeModelManager::instance()->isMappingConnected() && inputAgent->agentsGroupedByName()->isON())
                 {
                     // Create a new TEMPORARY link between the two agents
                     link = _createLinkBetweenTwoObjectsInMapping(linkName,
@@ -515,12 +515,15 @@ void AgentsMappingController::dropLinkBetweenTwoAgents(AgentInMappingVM* outputA
                         qWarning() << "The request" << command_MapAgents << "has already been sent to add the link" << link->uid();
                     }
 
-                    // Emit signal "Command asked to agent about Mapping Input"
-                    Q_EMIT commandAskedToAgentAboutMappingInput(inputAgent->agentsGroupedByName()->peerIdsList(),
-                                                                command_MapAgents,
-                                                                linkInput->name(),
-                                                                outputAgent->name(),
-                                                                linkOutput->name());
+                    QStringList message = {
+                        command_MapAgents,
+                        linkInput->name(),
+                        outputAgent->name(),
+                        linkOutput->name()
+                    };
+
+                    // Send the message "MAP" to the list of agents
+                    IngeScapeNetworkController::instance()->sendMessageToAgents(inputAgent->agentsGroupedByName()->peerIdsList(), message);
                 }
                 // The global mapping is NOT activated OR the input agent is OFF
                 else
@@ -741,184 +744,181 @@ QJsonArray AgentsMappingController::exportGlobalMappingToJSON()
 {
     QJsonArray jsonArray;
 
-    if (_modelManager != nullptr)
+    // Copy the list of links
+    QList<LinkVM*> linksList = _allLinksInMapping.toList();
+
+    // List of agents and their mapping
+    for (AgentInMappingVM* agentInMapping : _allAgentsInMapping)
     {
-        // Copy the list of links
-        QList<LinkVM*> linksList = _allLinksInMapping.toList();
-
-        // List of agents and their mapping
-        for (AgentInMappingVM* agentInMapping : _allAgentsInMapping)
+        if ((agentInMapping != nullptr) && (agentInMapping->agentsGroupedByName() != nullptr)
+                && (agentInMapping->agentsGroupedByName()->currentMapping() != nullptr))
         {
-            if ((agentInMapping != nullptr) && (agentInMapping->agentsGroupedByName() != nullptr)
-                    && (agentInMapping->agentsGroupedByName()->currentMapping() != nullptr))
+            QJsonObject jsonAgent;
+
+            // Set the agent name
+            jsonAgent.insert("agentName", agentInMapping->name());
+
+            // Set the position
+            QString position = QString("%1, %2").arg(QString::number(agentInMapping->position().x()), QString::number(agentInMapping->position().y()));
+            jsonAgent.insert("position", position);
+
+            // Set the width
+            jsonAgent.insert("width", agentInMapping->width());
+
+
+            //
+            // Set the mapping
+            //
+            QJsonObject jsonMapping = QJsonObject();
+
+            // The global mapping is activated AND the agent is ON
+            if (IngeScapeModelManager::instance()->isMappingConnected() && agentInMapping->agentsGroupedByName()->isON())
             {
-                QJsonObject jsonAgent;
+                // Export the current mapping
+                jsonMapping = JsonHelper::exportAgentMappingToJson(agentInMapping->agentsGroupedByName()->currentMapping());
+            }
+            // The global mapping is NOT activated OR the agent is OFF
+            else
+            {
+                if (agentInMapping->hadLinksAdded_WhileMappingWasUNactivated() || agentInMapping->hadLinksRemoved_WhileMappingWasUNactivated())
+                {
+                    // Get the list of all added mapping elements while the global mapping was UN-activated
+                    QList<MappingElementM*> addedMappingElements = agentInMapping->getAddedMappingElements_WhileMappingWasUNactivated();
 
-                // Set the agent name
-                jsonAgent.insert("agentName", agentInMapping->name());
+                    // Get the list of all names of removed mapping elements while the global mapping was UN-activated
+                    QStringList namesOfRemovedMappingElements = agentInMapping->getNamesOfRemovedMappingElements_WhileMappingWasUNactivated();
 
-                // Set the position
-                QString position = QString("%1, %2").arg(QString::number(agentInMapping->position().x()), QString::number(agentInMapping->position().y()));
-                jsonAgent.insert("position", position);
-
-                // Set the width
-                jsonAgent.insert("width", agentInMapping->width());
-
-
-                //
-                // Set the mapping
-                //
-                QJsonObject jsonMapping = QJsonObject();
-
-                // The global mapping is activated AND the agent is ON
-                if (_modelManager->isMappingConnected() && agentInMapping->agentsGroupedByName()->isON())
+                    // Export the current mapping with changes (applied while the global mapping was UN-activated) into a JSON objec
+                    jsonMapping = JsonHelper::exportAgentMappingWithChangesToJson(agentInMapping->agentsGroupedByName()->currentMapping(),
+                                                                                  addedMappingElements,
+                                                                                  namesOfRemovedMappingElements);
+                }
+                else
                 {
                     // Export the current mapping
                     jsonMapping = JsonHelper::exportAgentMappingToJson(agentInMapping->agentsGroupedByName()->currentMapping());
                 }
-                // The global mapping is NOT activated OR the agent is OFF
-                else
-                {
-                    if (agentInMapping->hadLinksAdded_WhileMappingWasUNactivated() || agentInMapping->hadLinksRemoved_WhileMappingWasUNactivated())
-                    {
-                        // Get the list of all added mapping elements while the global mapping was UN-activated
-                        QList<MappingElementM*> addedMappingElements = agentInMapping->getAddedMappingElements_WhileMappingWasUNactivated();
-
-                        // Get the list of all names of removed mapping elements while the global mapping was UN-activated
-                        QStringList namesOfRemovedMappingElements = agentInMapping->getNamesOfRemovedMappingElements_WhileMappingWasUNactivated();
-
-                        // Export the current mapping with changes (applied while the global mapping was UN-activated) into a JSON objec
-                        jsonMapping = JsonHelper::exportAgentMappingWithChangesToJson(agentInMapping->agentsGroupedByName()->currentMapping(),
-                                                                                      addedMappingElements,
-                                                                                      namesOfRemovedMappingElements);
-                    }
-                    else
-                    {
-                        // Export the current mapping
-                        jsonMapping = JsonHelper::exportAgentMappingToJson(agentInMapping->agentsGroupedByName()->currentMapping());
-                    }
-                }
-                jsonAgent.insert("mapping", jsonMapping);
-
-
-                //
-                // Set the actions mapping
-                //
-                QJsonArray jsonActionsMapping = QJsonArray();
-
-                // Make a copy because the list can be modified inside loop "for"
-                QList<LinkVM*> copy = QList<LinkVM*>(linksList);
-                for (LinkVM* link : copy)
-                {
-                    if ((link != nullptr) && (link->inputObject() != nullptr) && (link->inputObject() == agentInMapping)
-                            && (link->outputObject() != nullptr))
-                    {
-                        QJsonObject jsonMappingElement;
-
-                        jsonMappingElement.insert("input_name", link->linkInput()->name());
-
-                        jsonMappingElement.insert("output_name", link->linkOutput()->name());
-
-                        // From Action to Agent
-                        if (link->outputObject()->type() == ObjectInMappingTypes::ACTION)
-                        {
-                            jsonMappingElement.insert("output_action_name", link->outputObject()->name());
-
-                            ActionInMappingVM* outputAction = qobject_cast<ActionInMappingVM*>(link->outputObject());
-                            if ((outputAction != nullptr) && (outputAction->action() != nullptr))
-                            {
-                                jsonMappingElement.insert("output_actionInMapping_id", outputAction->uid());
-                                //jsonMappingElement.insert("output_action_id", outputAction->action()->uid());
-                            }
-                        }
-                        // From Agent to Agent
-                        //else if (link->outputObject()->type() == ObjectInMappingTypes::AGENT)
-                        //{
-                        //}
-
-                        jsonActionsMapping.append(jsonMappingElement);
-
-                        // Remove from the list to optimize next traversals
-                        linksList.removeOne(link);
-                    }
-                }
-
-                jsonAgent.insert("actions_mapping", jsonActionsMapping);
-
-                jsonArray.append(jsonAgent);
             }
-        }
+            jsonAgent.insert("mapping", jsonMapping);
 
-        // List of actions and their mapping
-        for (ActionInMappingVM* actionInMapping : _allActionsInMapping)
-        {
-            if ((actionInMapping != nullptr) && (actionInMapping->action() != nullptr))
+
+            //
+            // Set the actions mapping
+            //
+            QJsonArray jsonActionsMapping = QJsonArray();
+
+            // Make a copy because the list can be modified inside loop "for"
+            QList<LinkVM*> copy = QList<LinkVM*>(linksList);
+            for (LinkVM* link : copy)
             {
-                QJsonObject jsonAction;
-
-                // Set the action name
-                jsonAction.insert("action_name", actionInMapping->name());
-                //jsonAction.insert("action_name", actionInMapping->action()->name());
-
-                // Set the action id and the unique id of the action in the mapping
-                jsonAction.insert("action_id", actionInMapping->action()->uid());
-                jsonAction.insert("actionInMapping_id", actionInMapping->uid());
-
-                // Set the position
-                QString position = QString("%1, %2").arg(QString::number(actionInMapping->position().x()), QString::number(actionInMapping->position().y()));
-                jsonAction.insert("position", position);
-
-                // Set the width
-                jsonAction.insert("width", actionInMapping->width());
-
-
-                //
-                // Set the actions mapping
-                //
-                QJsonArray jsonActionsMapping = QJsonArray();
-
-                // Make a copy because the list can be modified inside loop "for"
-                QList<LinkVM*> copy = QList<LinkVM*>(linksList);
-                for (LinkVM* link : copy)
+                if ((link != nullptr) && (link->inputObject() != nullptr) && (link->inputObject() == agentInMapping)
+                        && (link->outputObject() != nullptr))
                 {
-                    if ((link != nullptr) && (link->inputObject() != nullptr) && (link->inputObject() == actionInMapping)
-                            && (link->outputObject() != nullptr))
+                    QJsonObject jsonMappingElement;
+
+                    jsonMappingElement.insert("input_name", link->linkInput()->name());
+
+                    jsonMappingElement.insert("output_name", link->linkOutput()->name());
+
+                    // From Action to Agent
+                    if (link->outputObject()->type() == ObjectInMappingTypes::ACTION)
                     {
-                        QJsonObject jsonMappingElement;
+                        jsonMappingElement.insert("output_action_name", link->outputObject()->name());
 
-                        jsonMappingElement.insert("input_name", link->linkInput()->name());
-
-                        jsonMappingElement.insert("output_name", link->linkOutput()->name());
-
-                        // From Agent to Action
-                        if (link->outputObject()->type() == ObjectInMappingTypes::AGENT)
+                        ActionInMappingVM* outputAction = qobject_cast<ActionInMappingVM*>(link->outputObject());
+                        if ((outputAction != nullptr) && (outputAction->action() != nullptr))
                         {
-                            jsonMappingElement.insert("output_agent_name", link->outputObject()->name());
+                            jsonMappingElement.insert("output_actionInMapping_id", outputAction->uid());
+                            //jsonMappingElement.insert("output_action_id", outputAction->action()->uid());
                         }
-                        // From Action to Action
-                        else if (link->outputObject()->type() == ObjectInMappingTypes::ACTION)
-                        {
-                            jsonMappingElement.insert("output_action_name", link->outputObject()->name());
-
-                            ActionInMappingVM* outputAction = qobject_cast<ActionInMappingVM*>(link->outputObject());
-                            if ((outputAction != nullptr) && (outputAction->action() != nullptr))
-                            {
-                                jsonMappingElement.insert("output_actionInMapping_id", outputAction->uid());
-                                //jsonMappingElement.insert("output_action_id", outputAction->action()->uid());
-                            }
-                        }
-
-                        jsonActionsMapping.append(jsonMappingElement);
-
-                        // Remove from the list to optimize next traversals
-                        linksList.removeOne(link);
                     }
+                    // From Agent to Agent
+                    //else if (link->outputObject()->type() == ObjectInMappingTypes::AGENT)
+                    //{
+                    //}
+
+                    jsonActionsMapping.append(jsonMappingElement);
+
+                    // Remove from the list to optimize next traversals
+                    linksList.removeOne(link);
                 }
-
-                jsonAction.insert("actions_mapping", jsonActionsMapping);
-
-                jsonArray.append(jsonAction);
             }
+
+            jsonAgent.insert("actions_mapping", jsonActionsMapping);
+
+            jsonArray.append(jsonAgent);
+        }
+    }
+
+    // List of actions and their mapping
+    for (ActionInMappingVM* actionInMapping : _allActionsInMapping)
+    {
+        if ((actionInMapping != nullptr) && (actionInMapping->action() != nullptr))
+        {
+            QJsonObject jsonAction;
+
+            // Set the action name
+            jsonAction.insert("action_name", actionInMapping->name());
+            //jsonAction.insert("action_name", actionInMapping->action()->name());
+
+            // Set the action id and the unique id of the action in the mapping
+            jsonAction.insert("action_id", actionInMapping->action()->uid());
+            jsonAction.insert("actionInMapping_id", actionInMapping->uid());
+
+            // Set the position
+            QString position = QString("%1, %2").arg(QString::number(actionInMapping->position().x()), QString::number(actionInMapping->position().y()));
+            jsonAction.insert("position", position);
+
+            // Set the width
+            jsonAction.insert("width", actionInMapping->width());
+
+
+            //
+            // Set the actions mapping
+            //
+            QJsonArray jsonActionsMapping = QJsonArray();
+
+            // Make a copy because the list can be modified inside loop "for"
+            QList<LinkVM*> copy = QList<LinkVM*>(linksList);
+            for (LinkVM* link : copy)
+            {
+                if ((link != nullptr) && (link->inputObject() != nullptr) && (link->inputObject() == actionInMapping)
+                        && (link->outputObject() != nullptr))
+                {
+                    QJsonObject jsonMappingElement;
+
+                    jsonMappingElement.insert("input_name", link->linkInput()->name());
+
+                    jsonMappingElement.insert("output_name", link->linkOutput()->name());
+
+                    // From Agent to Action
+                    if (link->outputObject()->type() == ObjectInMappingTypes::AGENT)
+                    {
+                        jsonMappingElement.insert("output_agent_name", link->outputObject()->name());
+                    }
+                    // From Action to Action
+                    else if (link->outputObject()->type() == ObjectInMappingTypes::ACTION)
+                    {
+                        jsonMappingElement.insert("output_action_name", link->outputObject()->name());
+
+                        ActionInMappingVM* outputAction = qobject_cast<ActionInMappingVM*>(link->outputObject());
+                        if ((outputAction != nullptr) && (outputAction->action() != nullptr))
+                        {
+                            jsonMappingElement.insert("output_actionInMapping_id", outputAction->uid());
+                            //jsonMappingElement.insert("output_action_id", outputAction->action()->uid());
+                        }
+                    }
+
+                    jsonActionsMapping.append(jsonMappingElement);
+
+                    // Remove from the list to optimize next traversals
+                    linksList.removeOne(link);
+                }
+            }
+
+            jsonAction.insert("actions_mapping", jsonActionsMapping);
+
+            jsonArray.append(jsonAction);
         }
     }
     return jsonArray;
@@ -931,7 +931,9 @@ QJsonArray AgentsMappingController::exportGlobalMappingToJSON()
  */
 void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgentsInMapping)
 {
-    if (_modelManager != nullptr)
+    IngeScapeModelManager* igsModelManager = IngeScapeModelManager::instance();
+
+    if (igsModelManager != nullptr)
     {
         QList<QPair<AgentInMappingVM*, AgentMappingM*>> listOfAgentsAndMappingToAgents;
         QList<QPair<AgentInMappingVM*, ActionMappingM*>> listOfAgentsAndMappingToActions;
@@ -1040,7 +1042,7 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
 
 
                         // Get the (view model of) agents grouped for this name
-                        AgentsGroupedByNameVM* agentsGroupedByName = _modelManager->getAgentsGroupedForName(agentName);
+                        AgentsGroupedByNameVM* agentsGroupedByName = igsModelManager->getAgentsGroupedForName(agentName);
 
                         if ((agentsGroupedByName != nullptr) && !position.isNull())
                         {
@@ -1153,7 +1155,7 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
                         }
 
                         // Get the (model of) action for this name
-                        ActionM* action = _modelManager->getActionWithId(actionUID);
+                        ActionM* action = igsModelManager->getActionWithId(actionUID);
 
                         if ((action != nullptr) && !position.isNull())
                         {
@@ -1566,16 +1568,16 @@ void AgentsMappingController::_onAllAgentsInMappingChanged()
  */
 void AgentsMappingController::_onAgentIsONChanged(bool isON)
 {
-    if (isON)
+    if (isON && (_modelManager != nullptr))
     {
         AgentsGroupedByNameVM* agentsGroupedByName = qobject_cast<AgentsGroupedByNameVM*>(sender());
         if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty())
         {
             AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentsGroupedByName->name());
-            if ((agentInMapping != nullptr) && (_modelManager != nullptr))
+            if (agentInMapping != nullptr)
             {
                 // The mapping is activated
-                if (_modelManager->isMappingConnected())
+                if (IngeScapeModelManager::instance()->isMappingConnected())
                 {
                     // OBSERVE
                     if (!_modelManager->isMappingControlled())
@@ -1641,7 +1643,7 @@ void AgentsMappingController::_onAgentModelONhasBeenAdded(AgentM* model)
     // Model of Agent ON
     if ((model != nullptr) && model->isON() && !model->name().isEmpty() && !model->peerId().isEmpty()
             // The global mapping is activated
-            && (_modelManager != nullptr) && _modelManager->isMappingConnected())
+            && IngeScapeModelManager::instance()->isMappingConnected())
     {
         QString agentName = model->name();
 
@@ -1649,7 +1651,7 @@ void AgentsMappingController::_onAgentModelONhasBeenAdded(AgentM* model)
         AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);
 
         // CONTROL
-        if (_modelManager->isMappingControlled())
+        if ((_modelManager != nullptr) && _modelManager->isMappingControlled())
         {
             // The agent is already in the global mapping
             if (agentInMapping != nullptr)
@@ -1695,7 +1697,7 @@ void AgentsMappingController::_onAgentModelONhasBeenAdded(AgentM* model)
                 qreal width = AgentInMappingVM::DEFAULT_WIDTH;
 
                 // Get the (view model of) agents grouped for the name
-                AgentsGroupedByNameVM* agentsGroupedByName = _modelManager->getAgentsGroupedForName(agentName);
+                AgentsGroupedByNameVM* agentsGroupedByName = IngeScapeModelManager::instance()->getAgentsGroupedForName(agentName);
                 if (agentsGroupedByName != nullptr)
                 {
                     // Create a new agent in the global mapping (with an "Agents Grouped by Name") at a specific position
@@ -1723,7 +1725,7 @@ void AgentsMappingController::_onAgentModelONhasBeenAdded(AgentM* model)
 void AgentsMappingController::_onMappingElementsHaveBeenAdded(QList<MappingElementVM*> newMappingElements)
 {
     AgentsGroupedByNameVM* agentsGroupedByName = qobject_cast<AgentsGroupedByNameVM*>(sender());
-    if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty() && !newMappingElements.isEmpty() && (_modelManager != nullptr))
+    if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty() && !newMappingElements.isEmpty())
     {
         // Get the input agent in the global mapping from the agent name (outside loop "for")
         AgentInMappingVM* inputAgent = getAgentInMappingFromName(agentsGroupedByName->name());
@@ -1736,7 +1738,7 @@ void AgentsMappingController::_onMappingElementsHaveBeenAdded(QList<MappingEleme
                     qInfo() << mappingElement->name() << "MAPPED";
 
                     // The global mapping is activated
-                    if (_modelManager->isMappingConnected())
+                    if (IngeScapeModelManager::instance()->isMappingConnected())
                     {
                         // Link the agent on its input from the mapping element (add a missing link TO the agent)
                         _linkAgentOnInputFromMappingElement(inputAgent, mappingElement);
@@ -1777,7 +1779,7 @@ void AgentsMappingController::_onMappingElementsWillBeRemoved(QList<MappingEleme
 {
     //AgentsGroupedByNameVM* agentsGroupedByName = qobject_cast<AgentsGroupedByNameVM*>(sender());
     //if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty() && !oldMappingElements.isEmpty())
-    if (!oldMappingElements.isEmpty() && (_modelManager != nullptr))
+    if (!oldMappingElements.isEmpty())
     {
         for (MappingElementVM* mappingElement : oldMappingElements)
         {
@@ -1831,7 +1833,7 @@ void AgentsMappingController::_onMappingElementsWillBeRemoved(QList<MappingEleme
                     if (link != nullptr)
                     {
                         // The global mapping is activated
-                        if (_modelManager->isMappingConnected())
+                        if (IngeScapeModelManager::instance()->isMappingConnected())
                         {
                             // The link was Temporary
                             if (link->isTemporary())
@@ -2006,11 +2008,14 @@ void AgentsMappingController::_onWriteOnInputOfAgentInMapping(ObjectInMappingVM*
         {
             qDebug() << "Write on Input" << linkInput->input()->name() << "of Agent in Mapping" << agentInMapping->agentsGroupedByName()->name();
 
-            // Emit the signal "Command asked to agent about Setting Value"
-            Q_EMIT commandAskedToAgentAboutSettingValue(agentInMapping->agentsGroupedByName()->peerIdsList(),
-                                                        "SET_INPUT",
-                                                        linkInput->input()->name(),
-                                                        "0");
+            QStringList message = {
+                "SET_INPUT",
+                linkInput->input()->name(),
+                "0"
+            };
+
+            // Send the message "SET INPUT" to the list of agents
+            IngeScapeNetworkController::instance()->sendMessageToAgents(agentInMapping->agentsGroupedByName()->peerIdsList(), message);
         }
     }
 }
@@ -2170,7 +2175,7 @@ void AgentsMappingController::_removeLinkBetweenTwoAgents(LinkVM* link)
             qInfo() << "Remove the link between agents" << link->outputObject()->name() << "and" << link->inputObject()->name();
 
             // The global mapping is activated AND the input agent is ON
-            if ((_modelManager != nullptr) && _modelManager->isMappingConnected() && inputAgent->agentsGroupedByName()->isON())
+            if (IngeScapeModelManager::instance()->isMappingConnected() && inputAgent->agentsGroupedByName()->isON())
             {
                 if (!_hashFromLinkIdToRemovedLink_WaitingReply.contains(link->uid()))
                 {
@@ -2184,12 +2189,15 @@ void AgentsMappingController::_removeLinkBetweenTwoAgents(LinkVM* link)
                     qWarning() << "The request" << command_UnmapAgents << "has already been sent to remove the link" << link->uid();
                 }
 
-                // Emit signal "Command asked to agent about Mapping Input"
-                Q_EMIT commandAskedToAgentAboutMappingInput(inputAgent->agentsGroupedByName()->peerIdsList(),
-                                                            command_UnmapAgents,
-                                                            link->linkInput()->name(),
-                                                            link->outputObject()->name(),
-                                                            link->linkOutput()->name());
+                QStringList message = {
+                    command_UnmapAgents,
+                    link->linkInput()->name(),
+                    link->outputObject()->name(),
+                    link->linkOutput()->name()
+                };
+
+                // Send the message "UNMAP" to the list of agents
+                IngeScapeNetworkController::instance()->sendMessageToAgents(inputAgent->agentsGroupedByName()->peerIdsList(), message);
             }
             // The global mapping is NOT activated OR the input agent is OFF
             else
@@ -2257,7 +2265,7 @@ void AgentsMappingController::_deleteLinkBetweenTwoObjectsInMapping(LinkVM* link
  */
 void AgentsMappingController::_removeAllLinksWithAgent(AgentInMappingVM* agent)
 {
-    if ((agent != nullptr) && (agent->agentsGroupedByName() != nullptr) && (_modelManager != nullptr))
+    if ((agent != nullptr) && (agent->agentsGroupedByName() != nullptr))
     {
         qDebug() << "Remove all Links with agent" << agent->name();
 
@@ -2277,7 +2285,7 @@ void AgentsMappingController::_removeAllLinksWithAgent(AgentInMappingVM* agent)
         }
 
         // The global mapping is activated AND the agent is ON
-        if (_modelManager->isMappingConnected() && agent->agentsGroupedByName()->isON())
+        if (IngeScapeModelManager::instance()->isMappingConnected() && agent->agentsGroupedByName()->isON())
         {
             // Send the message "Clear Mapping" to these agents
             IngeScapeNetworkController::instance()->sendMessageToAgents(agent->agentsGroupedByName()->peerIdsList(), command_ClearMapping);
@@ -2315,48 +2323,45 @@ void AgentsMappingController::_removeAllLinksWithAgent(AgentInMappingVM* agent)
  */
 void AgentsMappingController::_updateMappingWithAgentsONandLinks()
 {
-    if (_modelManager != nullptr)
+    double randomMax = static_cast<double>(RAND_MAX);
+
+    // Traverse the list of all "agents grouped by name"
+    for (AgentsGroupedByNameVM* agentsGroupedByName : IngeScapeModelManager::instance()->allAgentsGroupsByName()->toList())
     {
-        double randomMax = static_cast<double>(RAND_MAX);
-
-        // Traverse the list of all "agents grouped by name"
-        for (AgentsGroupedByNameVM* agentsGroupedByName : _modelManager->allAgentsGroupsByName()->toList())
+        // Only when the agent(s) is ON
+        if ((agentsGroupedByName != nullptr) && agentsGroupedByName->isON() && !agentsGroupedByName->name().isEmpty())
         {
-            // Only when the agent(s) is ON
-            if ((agentsGroupedByName != nullptr) && agentsGroupedByName->isON() && !agentsGroupedByName->name().isEmpty())
+            AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentsGroupedByName->name());
+
+            // This agent(s) is NOT yet in the global mapping
+            if (agentInMapping == nullptr)
             {
-                AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentsGroupedByName->name());
+                // Get a random position in the current window
+                QPointF position = _getRandomPosition(randomMax);
+                // Default with of the new agent
+                qreal width = AgentInMappingVM::DEFAULT_WIDTH;
 
-                // This agent(s) is NOT yet in the global mapping
-                if (agentInMapping == nullptr)
-                {
-                    // Get a random position in the current window
-                    QPointF position = _getRandomPosition(randomMax);
-                    // Default with of the new agent
-                    qreal width = AgentInMappingVM::DEFAULT_WIDTH;
-
-                    // Create a new agent in the global mapping (with an "Agents Grouped by Name") at a specific position
-                    _createAgentInMappingAtPosition(agentsGroupedByName, position, width);
-                }
+                // Create a new agent in the global mapping (with an "Agents Grouped by Name") at a specific position
+                _createAgentInMappingAtPosition(agentsGroupedByName, position, width);
             }
         }
-
-        // Link all agents in the global mapping
-        for (AgentInMappingVM* agentInMapping : _allAgentsInMapping.toList())
-        {
-            if (agentInMapping != nullptr)
-            {
-                // Link the agent in the global mapping on its inputs (add all missing links TO the agent)
-                _linkAgentOnInputs(agentInMapping);
-
-                // Link the agent in the global mapping on its outputs (add all missing links FROM the agent)
-                _linkAgentOnOutputs(agentInMapping);
-            }
-        }
-
-        // Notify the QML to fit the view
-        Q_EMIT fitToView();
     }
+
+    // Link all agents in the global mapping
+    for (AgentInMappingVM* agentInMapping : _allAgentsInMapping.toList())
+    {
+        if (agentInMapping != nullptr)
+        {
+            // Link the agent in the global mapping on its inputs (add all missing links TO the agent)
+            _linkAgentOnInputs(agentInMapping);
+
+            // Link the agent in the global mapping on its outputs (add all missing links FROM the agent)
+            _linkAgentOnOutputs(agentInMapping);
+        }
+    }
+
+    // Notify the QML to fit the view
+    Q_EMIT fitToView();
 }
 
 

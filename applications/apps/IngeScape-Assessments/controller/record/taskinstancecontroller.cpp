@@ -35,10 +35,10 @@ TaskInstanceController::TaskInstanceController(QObject *parent) : QObject(parent
     _timeLineC = new AbstractTimeActionslineScenarioViewController(this);
 
     // Create the controller for scenario management
-    _scenarioC = new AbstractScenarioController(AssessmentsModelManager::Instance(), this);
+    _scenarioC = new AbstractScenarioController(this);
 
     // List of agents present in current Platform
-    _agentsGroupedByNameInCurrentPlatform.setSourceModel(AssessmentsModelManager::Instance()->allAgentsGroupsByName());
+    _agentsGroupedByNameInCurrentPlatform.setSourceModel(IngeScapeModelManager::instance()->allAgentsGroupsByName());
 
     // Connect to the signal "time range changed" from the time line
     // to the scenario controller to filter the action view models

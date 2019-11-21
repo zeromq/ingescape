@@ -19,12 +19,9 @@
 
 /**
  * @brief Constructor
- * @param modelManager
  * @param parent
  */
-ScenarioController::ScenarioController(IngeScapeModelManager* modelManager,
-                                       QObject *parent) : AbstractScenarioController (modelManager,
-                                                                                      parent)
+ScenarioController::ScenarioController(QObject *parent) : AbstractScenarioController (parent)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);

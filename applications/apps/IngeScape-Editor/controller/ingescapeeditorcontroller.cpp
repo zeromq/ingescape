@@ -202,6 +202,8 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     //
     //-------------------------------
 
+    IngeScapeModelManager* igsModelManager = IngeScapeModelManager::instance();
+
     // Create the manager for the data model of our IngeScape Editor application
     _modelManager = new EditorModelManager(this);
 
@@ -211,7 +213,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _networkC = new NetworkController(this);
 
     // Create the controller to manage the agents list
-    _agentsSupervisionC = new AgentsSupervisionController(_modelManager, this);
+    _agentsSupervisionC = new AgentsSupervisionController(this);
 
     // Create the controller to manage hosts
     _hostsSupervisionC = new HostsSupervisionController(_modelManager, this);
@@ -226,7 +228,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _callHomeC = new CallHomeController(this);
 
     // Create the controller to manage the scenario
-    _scenarioC = new ScenarioController(_modelManager, this);
+    _scenarioC = new ScenarioController(this);
 
     // Create the controller to manage the history of values
     _valuesHistoryC = new ValuesHistoryController(_modelManager, this);
@@ -247,18 +249,18 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::networkDeviceIsAvailableAgain, this, &IngeScapeEditorController::_onNetworkDeviceIsAvailableAgain);
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::networkDeviceIpAddressHasChanged, this, &IngeScapeEditorController::_onNetworkDeviceIpAddressHasChanged);
 
-    connect(ingeScapeNetworkC, &IngeScapeNetworkController::agentEntered, _modelManager, &EditorModelManager::onAgentEntered);
-    connect(ingeScapeNetworkC, &IngeScapeNetworkController::agentExited, _modelManager, &EditorModelManager::onAgentExited);
-    connect(ingeScapeNetworkC, &IngeScapeNetworkController::launcherEntered, _modelManager, &EditorModelManager::onLauncherEntered);
-    connect(ingeScapeNetworkC, &IngeScapeNetworkController::launcherExited, _modelManager, &EditorModelManager::onLauncherExited);
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::agentEntered, igsModelManager, &IngeScapeModelManager::onAgentEntered);
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::agentExited, igsModelManager, &IngeScapeModelManager::onAgentExited);
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::launcherEntered, igsModelManager, &IngeScapeModelManager::onLauncherEntered);
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::launcherExited, igsModelManager, &IngeScapeModelManager::onLauncherExited);
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::recorderEntered, _recordsSupervisionC, &RecordsSupervisionController::onRecorderEntered);
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::recorderExited, _recordsSupervisionC, &RecordsSupervisionController::onRecorderExited);
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::expeEntered, this, &IngeScapeEditorController::_onExpeEntered);
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::expeExited, this, &IngeScapeEditorController::_onExpeExited);
 
-    connect(ingeScapeNetworkC, &IngeScapeNetworkController::definitionReceived, _modelManager, &EditorModelManager::onDefinitionReceived);
-    connect(ingeScapeNetworkC, &IngeScapeNetworkController::mappingReceived, _modelManager, &EditorModelManager::onMappingReceived);
-    connect(ingeScapeNetworkC, &IngeScapeNetworkController::valuePublished, _modelManager, &EditorModelManager::onValuePublished);
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::definitionReceived, igsModelManager, &IngeScapeModelManager::onDefinitionReceived);
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::mappingReceived, igsModelManager, &IngeScapeModelManager::onMappingReceived);
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::valuePublished, igsModelManager, &IngeScapeModelManager::onValuePublished);
 
     connect(_networkC, &NetworkController::isMutedFromAgentUpdated, _modelManager, &EditorModelManager::onisMutedFromAgentUpdated);
     connect(_networkC, &NetworkController::canBeFrozenFromAgentUpdated, _modelManager, &EditorModelManager::onCanBeFrozenFromAgentUpdated);
@@ -290,44 +292,37 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
 
     // Connect to signals from the model manager
-    connect(_modelManager, &EditorModelManager::isMappingConnectedChanged, _agentsMappingC, &AgentsMappingController::onIsMappingConnectedChanged);
-    connect(_modelManager, &EditorModelManager::isMappingConnectedChanged, ingeScapeNetworkC, &IngeScapeNetworkController::onIsMappingConnectedChanged);
+    connect(igsModelManager, &IngeScapeModelManager::isMappingConnectedChanged, _agentsMappingC, &AgentsMappingController::onIsMappingConnectedChanged);
+    connect(igsModelManager, &IngeScapeModelManager::isMappingConnectedChanged, ingeScapeNetworkC, &IngeScapeNetworkController::onIsMappingConnectedChanged);
 
-    connect(_modelManager, &EditorModelManager::agentModelHasBeenCreated, _hostsSupervisionC, &HostsSupervisionController::onAgentModelHasBeenCreated);
-    connect(_modelManager, &EditorModelManager::agentModelWillBeDeleted, _hostsSupervisionC, &HostsSupervisionController::onAgentModelWillBeDeleted);
+    connect(igsModelManager, &IngeScapeModelManager::agentModelHasBeenCreated, _hostsSupervisionC, &HostsSupervisionController::onAgentModelHasBeenCreated);
+    connect(igsModelManager, &IngeScapeModelManager::agentModelWillBeDeleted, _hostsSupervisionC, &HostsSupervisionController::onAgentModelWillBeDeleted);
 
-    connect(_modelManager, &EditorModelManager::hostModelHasBeenCreated, _hostsSupervisionC, &HostsSupervisionController::onHostModelHasBeenCreated);
-    connect(_modelManager, &EditorModelManager::hostModelWillBeDeleted, _hostsSupervisionC, &HostsSupervisionController::onHostModelWillBeDeleted);
-    connect(_modelManager, &EditorModelManager::previousHostParsed, _hostsSupervisionC, &HostsSupervisionController::onPreviousHostParsed);
+    connect(igsModelManager, &IngeScapeModelManager::hostModelHasBeenCreated, _hostsSupervisionC, &HostsSupervisionController::onHostModelHasBeenCreated);
+    connect(igsModelManager, &IngeScapeModelManager::hostModelWillBeDeleted, _hostsSupervisionC, &HostsSupervisionController::onHostModelWillBeDeleted);
+    connect(igsModelManager, &IngeScapeModelManager::previousHostParsed, _hostsSupervisionC, &HostsSupervisionController::onPreviousHostParsed);
 
-    connect(IngeScapeModelManager::instance(), &IngeScapeModelManager::agentsGroupedByNameHasBeenCreated, _modelManager, &EditorModelManager::onAgentsGroupedByNameHasBeenCreated);
-    connect(_modelManager, &EditorModelManager::agentsGroupedByNameHasBeenCreated, _valuesHistoryC, &ValuesHistoryController::onAgentsGroupedByNameHasBeenCreated);
-    connect(_modelManager, &EditorModelManager::agentsGroupedByNameHasBeenCreated, _agentsMappingC, &AgentsMappingController::onAgentsGroupedByNameHasBeenCreated);
-    connect(_modelManager, &EditorModelManager::agentsGroupedByNameWillBeDeleted, _agentsMappingC, &AgentsMappingController::onAgentsGroupedByNameWillBeDeleted);
+    connect(igsModelManager, &IngeScapeModelManager::agentsGroupedByNameHasBeenCreated, _modelManager, &EditorModelManager::onAgentsGroupedByNameHasBeenCreated);
+    connect(igsModelManager, &IngeScapeModelManager::agentsGroupedByNameHasBeenCreated, _valuesHistoryC, &ValuesHistoryController::onAgentsGroupedByNameHasBeenCreated);
+    connect(igsModelManager, &IngeScapeModelManager::agentsGroupedByNameHasBeenCreated, _agentsMappingC, &AgentsMappingController::onAgentsGroupedByNameHasBeenCreated);
+    connect(igsModelManager, &IngeScapeModelManager::agentsGroupedByNameWillBeDeleted, _agentsMappingC, &AgentsMappingController::onAgentsGroupedByNameWillBeDeleted);
 
-    connect(_modelManager, &EditorModelManager::agentsGroupedByDefinitionHasBeenCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentsGroupedByDefinitionHasBeenCreated);
-    connect(_modelManager, &EditorModelManager::agentsGroupedByDefinitionWillBeDeleted, _agentsSupervisionC, &AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted);
+    connect(igsModelManager, &IngeScapeModelManager::agentsGroupedByDefinitionHasBeenCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentsGroupedByDefinitionHasBeenCreated);
+    connect(igsModelManager, &IngeScapeModelManager::agentsGroupedByDefinitionWillBeDeleted, _agentsSupervisionC, &AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted);
 
-    connect(_modelManager, &EditorModelManager::actionModelWillBeDeleted, _agentsMappingC, &AgentsMappingController::onActionModelWillBeDeleted);
+    connect(igsModelManager, &IngeScapeModelManager::actionModelWillBeDeleted, _agentsMappingC, &AgentsMappingController::onActionModelWillBeDeleted);
 
 
     // Connect to signals from the controller for supervision of agents
-    connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedToLauncher, networkC, &NetworkController::onCommandAskedToLauncher);
-    connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedToAgentAboutOutput, networkC, &NetworkController::onCommandAskedToAgentAboutOutput);
     connect(_agentsSupervisionC, &AgentsSupervisionController::openValuesHistoryOfAgent, _valuesHistoryC, &ValuesHistoryController::filterValuesToShowOnlyAgent);
     connect(_agentsSupervisionC, &AgentsSupervisionController::openLogStreamOfAgents, this, &IngeScapeEditorController::_onOpenLogStreamOfAgents);
 
 
     // Connect to signals from the controller for mapping of agents
-    connect(_agentsMappingC, &AgentsMappingController::commandAskedToAgentAboutMappingInput, networkC, &NetworkController::onCommandAskedToAgentAboutMappingInput);
-    connect(_agentsMappingC, &AgentsMappingController::commandAskedToAgentAboutSettingValue, networkC, &NetworkController::onCommandAskedToAgentAboutSettingValue);
     connect(_agentsMappingC, &AgentsMappingController::executeAction, _scenarioC, &ScenarioController::onExecuteAction);
 
     // Connect to signals from the controller of the scenario
-    connect(_scenarioC, &ScenarioController::commandAskedToLauncher, networkC, &NetworkController::onCommandAskedToLauncher);
     connect(_scenarioC, &ScenarioController::commandAskedToRecorder, this, &IngeScapeEditorController::_onCommandAskedToRecorder);
-    connect(_scenarioC, &ScenarioController::commandAskedToAgentAboutSettingValue, networkC, &NetworkController::onCommandAskedToAgentAboutSettingValue);
-    connect(_scenarioC, &ScenarioController::commandAskedToAgentAboutMappingInput, networkC, &NetworkController::onCommandAskedToAgentAboutMappingInput);
     connect(_scenarioC, &ScenarioController::timeLineStateUpdated, this, &IngeScapeEditorController::_onTimeLineStateUpdated);
 
     // Connect to the signal "time range changed" from the time line
@@ -335,7 +330,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_timeLineC, &AbstractTimeActionslineScenarioViewController::timeRangeChanged, _scenarioC, &ScenarioController::onTimeRangeChanged);
 
     // Connect to signals from Record supervision controller
-    connect(_recordsSupervisionC, &RecordsSupervisionController::commandAskedToRecorder, networkC, &NetworkController::onCommandAskedToRecorder);
     connect(_recordsSupervisionC, &RecordsSupervisionController::startToRecord, this, &IngeScapeEditorController::_onStartToRecord);
 
 
@@ -348,7 +342,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     if (_isAvailableModelVisualizer)
     {
         // Emit the signal "Previous Host Parsed" to create the fake host "HOSTNAME_NOT_DEFINED"
-        Q_EMIT _modelManager->previousHostParsed(HOSTNAME_NOT_DEFINED);
+        Q_EMIT igsModelManager->previousHostParsed(HOSTNAME_NOT_DEFINED);
     }
 
 
@@ -1125,7 +1119,7 @@ void IngeScapeEditorController::_onStartToRecord()
     // Get the JSON of the current platform
     QJsonDocument jsonDocument = _getJsonOfCurrentPlatform();
 
-    if ((_recordsSupervisionC != nullptr) && _recordsSupervisionC->isRecorderON()
+    if ((_recordsSupervisionC != nullptr) && _recordsSupervisionC->isRecorderON() && (_networkC != nullptr)
             && !jsonDocument.isNull() && !jsonDocument.isEmpty())
     {
         QString jsonString = QString::fromUtf8(jsonDocument.toJson(QJsonDocument::Compact));
@@ -1151,7 +1145,7 @@ void IngeScapeEditorController::_onStartToRecord()
         commandAndParameters.append(jsonString);
 
         // Send the command, parameters and the content of the JSON file to the recorder
-        NetworkController::instance()->sendCommandWithJsonToRecorder(_recordsSupervisionC->peerIdOfRecorder(), commandAndParameters);
+        _networkC->sendCommandWithJsonToRecorder(_recordsSupervisionC->peerIdOfRecorder(), commandAndParameters);
     }
 }
 
@@ -1358,7 +1352,7 @@ void IngeScapeEditorController::_onCommandAskedToRecorder(QString commandAndPara
 {
     if ((_recordsSupervisionC != nullptr) && _recordsSupervisionC->isRecorderON())
     {
-        NetworkController::instance()->onCommandAskedToRecorder(_recordsSupervisionC->peerIdOfRecorder(), commandAndParameters);
+        IngeScapeNetworkController::instance()->sendMessageToAgent(_recordsSupervisionC->peerIdOfRecorder(), commandAndParameters);
     }
 }
 

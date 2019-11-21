@@ -144,14 +144,6 @@ public:
 Q_SIGNALS:
 
     /**
-     * @brief Signal emitted when a command must be sent on the network to the recorder
-     * @param peerIdOfRecorder
-     * @param commandAndParameters
-     */
-    void commandAskedToRecorder(QString peerIdOfRecorder, QString commandAndParameters);
-
-
-    /**
      * @brief Signal emitted when the user wants to start to record
      */
     void startToRecord();

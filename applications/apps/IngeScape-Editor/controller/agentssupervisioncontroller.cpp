@@ -85,12 +85,10 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionHasBeenCreated(Agen
     if (agentsGroupedByDefinition != nullptr)
     {
         // Propagate some signals from this new view model of agents grouped by definition
-        connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::commandAskedToAgentAboutOutput, this, &AgentsSupervisionController::commandAskedToAgentAboutOutput);
         connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::openValuesHistoryOfAgent, this, &AgentsSupervisionController::openValuesHistoryOfAgent);
         connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::openLogStreamOfAgents, this, &AgentsSupervisionController::openLogStreamOfAgents);
 
         // Connect some signals from this new view model of agents grouped by definition to slots
-        connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::commandAskedToLauncher, this, &AgentsSupervisionController::_onCommandAskedToLauncher);
         connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::loadAgentDefinitionFromPath, this, &AgentsSupervisionController::_onLoadAgentDefinitionFromPath);
         connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::loadAgentMappingFromPath, this, &AgentsSupervisionController::_onLoadAgentMappingFromPath);
         connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::downloadAgentDefinitionToPath, this, &AgentsSupervisionController::_onDownloadAgentDefinitionToPath);
@@ -162,23 +160,6 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted(Agent
         {
             qDebug() << "on Agents Grouped by Definition 'NULL' will be Deleted" << agentsGroupedByDefinition->name();
         }
-    }
-}
-
-
-/**
- * @brief Slot called when a command must be sent on the network to a launcher
- * @param hostname
- * @param command
- * @param commandLine
- */
-void AgentsSupervisionController::_onCommandAskedToLauncher(QString hostname, QString command, QString commandLine)
-{
-    // Get the peer id of the Launcher on this host
-    QString peerIdOfLauncher = IngeScapeModelManager::instance()->getPeerIdOfLauncherOnHost(hostname);
-    if (!peerIdOfLauncher.isEmpty())
-    {
-        Q_EMIT commandAskedToLauncher(peerIdOfLauncher, command, commandLine);
     }
 }
 

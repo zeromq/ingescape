@@ -113,9 +113,15 @@ public:
 
 
     /**
-     * @brief Change the state of our agent
+     * @brief Ask to start our agent
      */
-    Q_INVOKABLE void changeState();
+    Q_INVOKABLE void askStartAgent();
+
+
+    /**
+     * @brief Ask to stop our agent
+     */
+    Q_INVOKABLE void askStopAgent();
 
 
     /**
@@ -207,15 +213,6 @@ Q_SIGNALS:
      * @brief Signal emitted when our view model has become useless (no more model)
      */
     void noMoreModelAndUseless();
-
-
-    /**
-     * @brief Signal emitted when a command must be sent on the network to agent(s) about one of its output
-     * @param peerIdsList
-     * @param command
-     * @param outputName
-     */
-    void commandAskedToAgentAboutOutput(QStringList peerIdsList, QString command, QString outputName);
 
 
     /**

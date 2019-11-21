@@ -24,15 +24,13 @@
  * @param modelManager
  * @param parent
  */
-AbstractScenarioController::AbstractScenarioController(IngeScapeModelManager* modelManager,
-                                                       QObject *parent) : QObject(parent),
+AbstractScenarioController::AbstractScenarioController(QObject *parent) : QObject(parent),
     _selectedAction(nullptr),
     _selectedActionVMInTimeline(nullptr),
     _linesNumberInTimeLine(MINIMUM_DISPLAYED_LINES_NUMBER_IN_TIMELINE),
     _isPlaying(false),
     _currentTime(QTime::fromMSecsSinceStartOfDay(0)),
     _nextActionToActivate(nullptr),
-    _modelManager(modelManager),
     _allActionNames(QStringList()),
     _timeOfDayInMS_WhenStartScenario_ThenAtLastTimeOut(0)
 {
@@ -84,9 +82,6 @@ AbstractScenarioController::~AbstractScenarioController()
 
     // Clear the current scenario
     clearScenario();
-
-    // Reset pointers
-    _modelManager = nullptr;
 }
 
 
@@ -96,10 +91,11 @@ AbstractScenarioController::~AbstractScenarioController()
   */
 void AbstractScenarioController::importScenarioFromJson(QJsonObject jsonScenario)
 {
-    if (_modelManager != nullptr)
+    IngeScapeModelManager* igsModelManager = IngeScapeModelManager::instance();
+    if (igsModelManager != nullptr)
     {
         // Get the hash table from a name to the group of agents with this name
-        QHash<QString, AgentsGroupedByNameVM*> hashFromNameToAgentsGrouped = _modelManager->getHashTableFromNameToAgentsGrouped();
+        QHash<QString, AgentsGroupedByNameVM*> hashFromNameToAgentsGrouped = igsModelManager->getHashTableFromNameToAgentsGrouped();
 
         // Create a model of scenario (actions in the list, in the palette and in the timeline) from JSON
         ScenarioM* scenarioToImport = JsonHelper::createModelOfScenarioFromJSON(jsonScenario, hashFromNameToAgentsGrouped);
@@ -111,10 +107,10 @@ void AbstractScenarioController::importScenarioFromJson(QJsonObject jsonScenario
                 // Add each action to our list
                 for (ActionM* actionM : scenarioToImport->actionsList()->toList())
                 {
-                    if ((actionM != nullptr) && (_modelManager->getActionWithId(actionM->uid()) == nullptr))
+                    if ((actionM != nullptr) && (igsModelManager->getActionWithId(actionM->uid()) == nullptr))
                     {
                         // Add the action to the model manager
-                        _modelManager->storeNewAction(actionM);
+                        igsModelManager->storeNewAction(actionM);
 
                         // Add the action to the list
                         _actionsList.append(actionM);
@@ -206,7 +202,7 @@ void AbstractScenarioController::importExecutedActionsFromJson(QByteArray byteAr
                         qDebug() << "Executed action" << actionId << "on line" << lineIndexInTimeLine << "at" << executionTime << "ms";
 
                         /*// Get the model of action with its (unique) id
-                        ActionM* action = _modelManager->getActionWithId(actionId);
+                        ActionM* action = IngeScapeModelManager::instance()->getActionWithId(actionId);
                         if (action != nullptr)
                         {
 
@@ -262,7 +258,7 @@ void AbstractScenarioController::importExecutedActionsFromJson(QByteArray byteAr
   */
 void AbstractScenarioController::deleteAction(ActionM* action)
 {
-    if ((action != nullptr) && (_modelManager != nullptr))
+    if (action != nullptr)
     {
         int actionId = action->uid();
 
@@ -292,7 +288,7 @@ void AbstractScenarioController::deleteAction(ActionM* action)
         _allActionNames.removeOne(action->name());
 
         // Delete the model of action
-        _modelManager->deleteAction(action);
+        IngeScapeModelManager::instance()->deleteAction(action);
     }
 }
 
@@ -447,7 +443,7 @@ void AbstractScenarioController::clearScenario()
 
     // Clear the list of actions
     _actionsList.clear();
-    // NB: We have to call "_modelManager->deleteAllActions();" after our method "clearScenario()" to free memory
+    // NB: We have to call "IngeScapeModelManager::deleteAllActions();" after our method "clearScenario()" to free memory
 
     // Clear names list
     _allActionNames.clear();
@@ -470,8 +466,9 @@ void AbstractScenarioController::executeEffectsOfAction(ActionM* action, int lin
     if ((action != nullptr) && !action->effectsList()->isEmpty())
     {
         // Active the mapping if needed
-        if ((_modelManager != nullptr) && !_modelManager->isMappingConnected()) {
-            _modelManager->setisMappingConnected(true);
+        if (!IngeScapeModelManager::instance()->isMappingConnected())
+        {
+            IngeScapeModelManager::instance()->setisMappingConnected(true);
         }
 
         QString commandAndParameters = QString("%1=%2|%3").arg(command_ExecutedAction,
@@ -583,10 +580,10 @@ void AbstractScenarioController::onRunAction(QString actionID)
     bool success = false;
     int id = actionID.toInt(&success);
 
-    if (success && (_modelManager != nullptr))
+    if (success)
     {
         // Get the model of action with this (unique) id
-        ActionM* action = _modelManager->getActionWithId(id);
+        ActionM* action = IngeScapeModelManager::instance()->getActionWithId(id);
         if (action != nullptr)
         {
             // Execute all effects of the action
@@ -821,8 +818,9 @@ void AbstractScenarioController::_initActionsAndPlayOrResumeScenario()
     int currentTimeInMilliSeconds = _currentTime.msecsSinceStartOfDay();
 
     // Active the mapping if needed
-    if ((_modelManager != nullptr) && !_modelManager->isMappingConnected()) {
-        _modelManager->setisMappingConnected(true);
+    if (!IngeScapeModelManager::instance()->isMappingConnected())
+    {
+        IngeScapeModelManager::instance()->setisMappingConnected(true);
     }
 
     // Disconnect from signals
@@ -1000,7 +998,7 @@ void AbstractScenarioController::_executeEffectsOfAction(ActionM* action)
  */
 void AbstractScenarioController::_executeReverseEffectsOfAction(ActionExecutionVM* actionExecution)
 {
-    if ((_modelManager != nullptr) && (actionExecution != nullptr) && actionExecution->shallRevert())
+    if ((actionExecution != nullptr) && actionExecution->shallRevert())
     {
         // Get the list of pairs <agent name, reverse command (and parameters)>
         QList<QPair<QString, QStringList>> reverseCommandsForAgents = actionExecution->getReverseCommands();
@@ -1009,7 +1007,7 @@ void AbstractScenarioController::_executeReverseEffectsOfAction(ActionExecutionV
         {
             QPair<QString, QStringList> pairAgentNameAndReverseCommand = reverseCommandsForAgents.at(i);
 
-            AgentsGroupedByNameVM* agentsGroupedByName = _modelManager->getAgentsGroupedForName(pairAgentNameAndReverseCommand.first);
+            AgentsGroupedByNameVM* agentsGroupedByName = IngeScapeModelManager::instance()->getAgentsGroupedForName(pairAgentNameAndReverseCommand.first);
             if (agentsGroupedByName != nullptr)
             {
                 // Execute the (reverse) command for the agent
@@ -1036,19 +1034,23 @@ void AbstractScenarioController::_executeCommandForAgent(AgentsGroupedByNameVM* 
         // START
         if (command == command_StartAgent)
         {
-            if (_modelManager != nullptr)
+            for (AgentM* model : agentsGroupedByName->models()->toList())
             {
-                for (AgentM* model : agentsGroupedByName->models()->toList())
+                // Check if the model is not already ON
+                // and if it has a hostname
+                if ((model != nullptr) && !model->isON() && !model->hostname().isEmpty())
                 {
-                    // Check if the model has a hostname
-                    if ((model != nullptr) && !model->hostname().isEmpty())
+                    // Get the peer id of the Launcher on this host
+                    QString peerIdOfLauncher = IngeScapeModelManager::instance()->getPeerIdOfLauncherOnHost(model->hostname());
+                    if (!peerIdOfLauncher.isEmpty())
                     {
-                        // Get the peer id of the Launcher on this host
-                        QString peerIdOfLauncher = _modelManager->getPeerIdOfLauncherOnHost(model->hostname());
-                        if (!peerIdOfLauncher.isEmpty())
-                        {
-                            Q_EMIT commandAskedToLauncher(peerIdOfLauncher, command, model->commandLine());
-                        }
+                        QStringList message = {
+                            command,
+                            model->commandLine()
+                        };
+
+                        // Send the message "Start Agent" to the IngeScape Launcher
+                        IngeScapeNetworkController::instance()->sendMessageToAgent(peerIdOfLauncher, message);
                     }
                 }
             }
@@ -1066,12 +1068,20 @@ void AbstractScenarioController::_executeCommandForAgent(AgentsGroupedByNameVM* 
         {
             if (commandAndParameters.count() == 4)
             {
-                QString inputName = commandAndParameters.at(1);
+                /*QString inputName = commandAndParameters.at(1);
                 QString outputAgentName = commandAndParameters.at(2);
                 QString outputName = commandAndParameters.at(3);
 
-                // Emit signal "Command asked to agent about Mapping Input"
-                Q_EMIT commandAskedToAgentAboutMappingInput(agentsGroupedByName->peerIdsList(), command, inputName, outputAgentName, outputName);
+                QStringList message = {
+                    command,
+                    inputName,
+                    outputAgentName,
+                    outputName
+                };*/
+
+                // Send the message to the list of agents
+                //IngeScapeNetworkController::instance()->sendMessageToAgents(agentsGroupedByName->peerIdsList(), message);
+                IngeScapeNetworkController::instance()->sendMessageToAgents(agentsGroupedByName->peerIdsList(), commandAndParameters);
             }
             else {
                 qCritical() << "Wrong number of parameters (" << commandAndParameters.count() << ") to map an input of agent" << agentsGroupedByName->name();
@@ -1082,11 +1092,18 @@ void AbstractScenarioController::_executeCommandForAgent(AgentsGroupedByNameVM* 
         {
             if (commandAndParameters.count() == 3)
             {
-                QString agentIOPName = commandAndParameters.at(1);
+                /*QString agentIOPName = commandAndParameters.at(1);
                 QString value = commandAndParameters.at(2);
 
-                // Emit signal "Command asked to agent about Setting Value"
-                Q_EMIT commandAskedToAgentAboutSettingValue(agentsGroupedByName->peerIdsList(), command, agentIOPName, value);
+                QStringList message = {
+                    command,
+                    agentIOPName,
+                    value
+                };*/
+
+                // Send the message to the list of agents
+                //IngeScapeNetworkController::instance()->sendMessageToAgents(agentsGroupedByName->peerIdsList(), message);
+                IngeScapeNetworkController::instance()->sendMessageToAgents(agentsGroupedByName->peerIdsList(), commandAndParameters);
             }
             else {
                 qCritical() << "Wrong number of parameters (" << commandAndParameters.count() << ") to set a value to agent" << agentsGroupedByName->name();

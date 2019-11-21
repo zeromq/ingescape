@@ -125,40 +125,40 @@ void AgentsGroupedByDefinitionVM::setisMuted(bool value)
     }
 }
 
-
 /**
- * @brief Change the state of our agent
+ * @brief Ask to start our agent
  */
-void AgentsGroupedByDefinitionVM::changeState()
+void AgentsGroupedByDefinitionVM::askStartAgent()
 {
-    // is ON --> Kill all agents
-    if (_isON)
+    for (AgentM* model : _models.toList())
     {
-        IngeScapeNetworkController::instance()->sendMessageToAgents(_peerIdsList, command_StopAgent);
-    }
-    // is OFF --> Execute all agents
-    else
-    {
-        for (AgentM* model : _models.toList())
+        // Check if the model has a hostname
+        if ((model != nullptr) && !model->hostname().isEmpty())
         {
-            // Check if the model has a hostname
-            if ((model != nullptr) && !model->hostname().isEmpty())
+            // Get the peer id of the Launcher on this host
+            QString peerIdOfLauncher = IngeScapeModelManager::instance()->getPeerIdOfLauncherOnHost(model->hostname());
+            if (!peerIdOfLauncher.isEmpty())
             {
-                // Get the peer id of the Launcher on this host
-                QString peerIdOfLauncher = IngeScapeModelManager::instance()->getPeerIdOfLauncherOnHost(model->hostname());
-                if (!peerIdOfLauncher.isEmpty())
-                {
-                    QStringList message = {
-                        command_StartAgent,
-                        model->commandLine()
-                    };
+                QStringList message = {
+                    command_StartAgent,
+                    model->commandLine()
+                };
 
-                    // Send the message "Start Agent" to the IngeScape Launcher
-                    IngeScapeNetworkController::instance()->sendMessageToAgent(peerIdOfLauncher, message);
-                }
+                // Send the message "Start Agent" to the IngeScape Launcher
+                IngeScapeNetworkController::instance()->sendMessageToAgent(peerIdOfLauncher, message);
             }
         }
     }
+}
+
+
+/**
+ * @brief Ask to stop our agent
+ */
+void AgentsGroupedByDefinitionVM::askStopAgent()
+{
+    // Send the message "Stop Agent" to our agent
+    IngeScapeNetworkController::instance()->sendMessageToAgents(_peerIdsList, command_StopAgent);
 }
 
 
@@ -169,10 +169,12 @@ void AgentsGroupedByDefinitionVM::changeMuteAllOutputs()
 {
     if (_isMuted)
     {
+        // Send the message to our agent (list of models of agent)
         IngeScapeNetworkController::instance()->sendMessageToAgents(_peerIdsList, command_UnmuteAgent);
     }
     else
     {
+        // Send the message to our agent (list of models of agent)
         IngeScapeNetworkController::instance()->sendMessageToAgents(_peerIdsList, command_MuteAgent);
     }
 }
@@ -185,10 +187,12 @@ void AgentsGroupedByDefinitionVM::changeFreeze()
 {
     if (_isFrozen)
     {
+        // Send the message to our agent (list of models of agent)
         IngeScapeNetworkController::instance()->sendMessageToAgents(_peerIdsList, command_UnfreezeAgent);
     }
     else
     {
+        // Send the message to our agent (list of models of agent)
         IngeScapeNetworkController::instance()->sendMessageToAgents(_peerIdsList, command_FreezeAgent);
     }
 }
@@ -948,8 +952,14 @@ void AgentsGroupedByDefinitionVM::_onIsMutedOutputOfModelChanged(bool isMutedOut
  * @param outputName
  */
 void AgentsGroupedByDefinitionVM::_onCommandAskedToAgentAboutOutput(QString command, QString outputName)
-{
-    Q_EMIT commandAskedToAgentAboutOutput(_peerIdsList, command, outputName);
+{   
+    QStringList message = {
+        command,
+        outputName
+    };
+
+    // Send the message to our agent (list of models of agent)
+    IngeScapeNetworkController::instance()->sendMessageToAgents(_peerIdsList, message);
 }
 
 

@@ -85,11 +85,9 @@ public:
 
     /**
      * @brief Constructor
-     * @param modelManager
      * @param parent
      */
-    explicit AbstractScenarioController(IngeScapeModelManager* modelManager,
-                                        QObject *parent = nullptr);
+    explicit AbstractScenarioController(QObject *parent = nullptr);
 
 
     /**
@@ -174,40 +172,10 @@ public:
 Q_SIGNALS:
 
     /**
-     * @brief Signal emitted when a command must be sent on the network to a launcher
-     * @param peerIdOfLauncher
-     * @param command
-     * @param commandLine
-     */
-    void commandAskedToLauncher(QString peerIdOfLauncher, QString command, QString commandLine);
-
-
-    /**
      * @brief Signal emitted when a command must be sent on the network to a recorder
      * @param commandAndParameters
      */
     void commandAskedToRecorder(QString commandAndParameters);
-
-
-    /**
-     * @brief Signal emitted when a command must be sent on the network to an agent about setting a value to one of its Input/Output/Parameter
-     * @param peerIdsList
-     * @param command
-     * @param agentIOPName
-     * @param value
-     */
-    void commandAskedToAgentAboutSettingValue(QStringList peerIdsList, QString command, QString agentIOPName, QString value);
-
-
-    /**
-     * @brief Signal emitted when a command must be sent on the network to an agent about mapping one of its input
-     * @param peerIdsList
-     * @param command
-     * @param inputName
-     * @param outputAgentName
-     * @param outputName
-     */
-    void commandAskedToAgentAboutMappingInput(QStringList peerIdsList, QString command, QString inputName, QString outputAgentName, QString outputName);
 
 
     /**
@@ -334,9 +302,6 @@ protected:
 
 
 protected:
-
-    // Manager for the data model of IngeScape
-    IngeScapeModelManager* _modelManager;
 
     // List of all action names
     QStringList _allActionNames;

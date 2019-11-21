@@ -108,10 +108,6 @@ void NetworkController::sendCommandWithJsonToRecorder(QString peerIdOfRecorder, 
 
         for (QString string : commandAndParameters)
         {
-            // Add a frame with STRING
-            //zframe_t* frameString = zframe_new(string.toStdString().c_str(), string.length() + 1);
-            //zmsg_append(msg, &frameString);
-
             zmsg_addstr(msg, string.toStdString().c_str());
         }
 
@@ -149,78 +145,6 @@ void NetworkController::sendCommandExecutionStatusToExpe(QString peerIdOfExpe, Q
         qInfo() << "Send execution status" << status << "of command" << command << "with parameters" << commandParameters << "to expe" << peerIdOfExpe << "with success ?" << success;
     }
 }
-
-
-/**
- * @brief Slot when a command must be sent on the network to an agent about one of its output
- * @param peerIdsList
- * @param command
- * @param outputName
- */
-/*void NetworkController::onCommandAskedToAgentAboutOutput(QStringList peerIdsList, QString command, QString outputName)
-{
-    if (!command.isEmpty() && !outputName.isEmpty() && (peerIdsList.count() > 0))
-    {
-        for (QString peerId : peerIdsList)
-        {
-            // Send the command to a peer id of agent
-            int success = igs_busSendStringToAgent(peerId.toStdString().c_str(), "%s %s",
-                                                   command.toStdString().c_str(),
-                                                   outputName.toStdString().c_str());
-
-            qInfo() << "Send command" << command << "for agent" << peerId << "and output" << outputName << "with success ?" << success;
-        }
-    }
-}*/
-
-
-/**
- * @brief Slot when a command must be sent on the network to an agent about setting a value to one of its Input/Output/Parameter
- * @param peerIdsList
- * @param command
- * @param agentIOPName
- * @param value
- */
-/*void NetworkController::onCommandAskedToAgentAboutSettingValue(QStringList peerIdsList, QString command, QString agentIOPName, QString value)
-{
-    if (!command.isEmpty() && !agentIOPName.isEmpty() && !value.isEmpty() && (peerIdsList.count() > 0))
-    {
-        for (QString peerId : peerIdsList)
-        {
-            // Send the command to a peer id of agent
-            int success = igs_busSendStringToAgent(peerId.toStdString().c_str(), "%s %s %s",
-                                                   command.toStdString().c_str(),
-                                                   agentIOPName.toStdString().c_str(),
-                                                   value.toStdString().c_str());
-
-            qInfo() << "Send command" << command << "for agent" << peerId << "and I/O/P" << agentIOPName << "about setting value" << value << "with success ?" << success;
-        }
-    }
-}*/
-
-
-/**
- * @brief Slot when a command must be sent on the network to an agent about mapping one of its input
- * @param peerIdsList
- * @param command
- * @param inputName
- * @param outputAgentName
- * @param outputName
- */
-/*void NetworkController::onCommandAskedToAgentAboutMappingInput(QStringList peerIdsList, QString command, QString inputName, QString outputAgentName, QString outputName)
-{
-    for (QString peerId : peerIdsList)
-    {
-        // Send the command to a peer id of agent
-        int success = igs_busSendStringToAgent(peerId.toStdString().c_str(), "%s %s %s %s",
-                                               command.toStdString().c_str(),
-                                               inputName.toStdString().c_str(),
-                                               outputAgentName.toStdString().c_str(),
-                                               outputName.toStdString().c_str());
-
-        qInfo() << "Send command" << command << "for agent" << peerId << "and input" << inputName << "about mapping on agent" << outputAgentName << "and output" << outputName << "with success ?" << success;
-    }
-}*/
 
 
 /**

@@ -63,11 +63,9 @@ public:
 
     /**
      * @brief Constructor
-     * @param modelManager
      * @param parent
      */
-    explicit ScenarioController(IngeScapeModelManager* modelManager,
-                                QObject *parent = nullptr);
+    explicit ScenarioController(QObject *parent = nullptr);
 
 
     /**

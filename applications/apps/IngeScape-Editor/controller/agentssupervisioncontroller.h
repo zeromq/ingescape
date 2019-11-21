@@ -62,24 +62,6 @@ public:
 Q_SIGNALS:
 
     /**
-     * @brief Signal emitted when a command must be sent on the network to a launcher
-     * @param peerIdOfLauncher
-     * @param command
-     * @param commandLine
-     */
-    void commandAskedToLauncher(QString peerIdOfLauncher, QString command, QString commandLine);
-
-
-    /**
-     * @brief Signal emitted when a command must be sent on the network to agent(s) about one of its output
-     * @param peerIdsList
-     * @param command
-     * @param outputName
-     */
-    void commandAskedToAgentAboutOutput(QStringList peerIdsList, QString command, QString outputName);
-
-
-    /**
      * @brief Signal emitted when we have to open the values history of an agent
      * @param agentName
      */
