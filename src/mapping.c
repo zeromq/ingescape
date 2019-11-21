@@ -266,7 +266,7 @@ int igsAgent_setMappingName(igsAgent_t *agent, const char *name){
         return -1;
     }
     if(agent->internal_mapping == NULL){
-        igs_clearMapping();
+        igsAgent_clearMapping(agent);
     }
     if(agent->internal_mapping->name != NULL){
         free(agent->internal_mapping->name);
@@ -293,7 +293,7 @@ int igsAgent_setMappingDescription(igsAgent_t *agent, const char *description){
         return -1;
     }
     if(agent->internal_mapping == NULL){
-        igs_clearMapping();
+        igsAgent_clearMapping(agent);
     }
     if(agent->internal_mapping->description != NULL){
         free(agent->internal_mapping->description);
@@ -320,7 +320,7 @@ int igsAgent_setMappingVersion(igsAgent_t *agent, const char *version){
         return -1;
     }
     if(agent->internal_mapping == NULL){
-        igs_clearMapping();
+        igsAgent_clearMapping(agent);
     }
     if(agent->internal_mapping->version != NULL){
         free(agent->internal_mapping->version);
@@ -398,7 +398,7 @@ unsigned long igsAgent_addMappingEntry(igsAgent_t *agent,
     if (spaceInName){
         igs_warn("Spaces are not allowed in agent name: %s has been renamed to %s", toAgent, reviewedToAgent);
     }
-    char *aName = igs_getAgentName();
+    char *aName = igsAgent_getAgentName(agent);
     if (strcmp(reviewedToAgent, aName) == 0){
         igs_warn("mapping inputs to outputs of the same agent will not work (except from one clone or variant to others)");
     }
@@ -425,7 +425,7 @@ unsigned long igsAgent_addMappingEntry(igsAgent_t *agent,
 
     //Check if already initialized, and do it if not
     if(agent->internal_mapping == NULL){
-        igs_clearMapping();
+        igsAgent_clearMapping(agent);
     }
 
     //Add the new mapping element if not already there
@@ -447,7 +447,7 @@ unsigned long igsAgent_addMappingEntry(igsAgent_t *agent,
     if (tmp == NULL){
         //element does not exist yet : create and register it
         //check input against definition and reject if input does not exist in definition
-        if (igs_checkInputExistence(reviewedFromOurInput)){
+        if (igsAgent_checkInputExistence(agent, reviewedFromOurInput)){
             mapping_element_t *new = mapping_createMappingElement(reviewedFromOurInput, reviewedToAgent, reviewedWithOutput);
             new->id = h;
             HASH_ADD(hh, agent->internal_mapping->map_elements, id, sizeof(unsigned long), new);
@@ -532,7 +532,7 @@ int igsAgent_removeMappingEntryWithName(igsAgent_t *agent, const char *fromOurIn
         return -2;
     }
     if(agent->internal_mapping == NULL){
-        igs_clearMapping();
+        igsAgent_clearMapping(agent);
         igs_error("No mapping defined yet");
         return -3;
     }

@@ -617,7 +617,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
             if (strcmp(group, agent->replayChannel) == 0){
                 //this is a replay message for one of our inputs
                 char *input = zmsg_popstr (msgDuplicate);
-                iopType_t inputType = igs_getTypeForInput(input);
+                iopType_t inputType = igsAgent_getTypeForInput(agent, input);
                 
                 if (inputType > 0 && zmsg_size(msgDuplicate) > 0){
                     zframe_t *frame = NULL;
@@ -1727,7 +1727,7 @@ int igsAgent_startWithDevice(igsAgent_t *agent, const char *networkDevice, unsig
     
     if (agent->agentElements != NULL){
         //Agent is already active : need to stop it first
-        igs_stop();
+        igsAgent_stop(agent);
     }
     agent->igs_Interrupted = false;
     agent->forcedStop = false;
@@ -1792,7 +1792,7 @@ int igsAgent_startWithIP(igsAgent_t *agent, const char *ipAddress, unsigned int 
     
     if (agent->agentElements != NULL){
         //Agent is already active : need to stop it first
-        igs_stop();
+        igsAgent_stop(agent);
     }
     agent->igs_Interrupted = false;
     agent->forcedStop = false;
@@ -1852,7 +1852,7 @@ int igsAgent_startWithDeviceOnBroker(igsAgent_t *agent, const char *networkDevic
     }
     
     if (agent->agentElements != NULL){
-        igs_stop();
+        igsAgent_stop(agent);
     }
     agent->igs_Interrupted = false;
     agent->forcedStop = false;
@@ -1972,7 +1972,7 @@ int igsAgent_setAgentName(igsAgent_t *agent, const char *name){
         strncpy(networkDevice, agent->agentElements->networkDevice, NETWORK_DEVICE_LENGTH);
         strncpy(ipAddress, agent->agentElements->ipAddress, IP_ADDRESS_LENGTH);
         zyrePort = agent->agentElements->zyrePort;
-        igs_stop();
+        igsAgent_stop(agent);
         needRestart = true;
     }
     char *n = strndup(name, MAX_AGENT_NAME_LENGTH);
@@ -1995,7 +1995,7 @@ int igsAgent_setAgentName(igsAgent_t *agent, const char *name){
     free(n);
     
     if (needRestart){
-        igs_startWithIP(ipAddress, zyrePort);
+        igsAgent_startWithIP(agent, ipAddress, zyrePort);
     }
     igs_debug("Agent name is %s", agent->agentName);
     return 1;
@@ -2260,7 +2260,7 @@ int igsAgent_observeMute(igsAgent_t *agent, igs_muteCallback cb, void *myData){
 
 void igsAgent_die(igsAgent_t *agent){
     agent->forcedStop = true;
-    igs_stop();
+    igsAgent_stop(agent);
 }
 
 void igsAgent_setCommandLine(igsAgent_t *agent, const char *line){

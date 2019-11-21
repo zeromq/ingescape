@@ -240,7 +240,7 @@ void* model_getValueFor(igsAgent_t *agent, const char *name, iop_t type){
     return NULL;
 }
 
-int igs_readIOP(igsAgent_t *agent, const char *name, iop_t type, void **value, size_t *size){
+int igsAgent_readIOP(igsAgent_t *agent, const char *name, iop_t type, void **value, size_t *size){
     agent_iop_t *iop = model_findIopByName(agent, (char*) name, type);
     if(iop == NULL){
         igs_error("%s not found", name);
@@ -953,15 +953,15 @@ agent_iop_t * model_findIopByName(igsAgent_t *agent, const char *name, iop_t typ
 // --------------------------------  READ ------------------------------------//
 
 int igsAgent_readInput(igsAgent_t *agent, const char *name, void **value, size_t *size){
-    return igs_readIOP(agent, name, IGS_INPUT_T, value, size);
+    return igsAgent_readIOP(agent, name, IGS_INPUT_T, value, size);
 }
 
 int igsAgent_readOutput(igsAgent_t *agent, const char *name, void **value, size_t *size){
-    return igs_readIOP(agent, name, IGS_OUTPUT_T, value, size);
+    return igsAgent_readIOP(agent, name, IGS_OUTPUT_T, value, size);
 }
 
 int igsAgent_readParameter(igsAgent_t *agent, const char *name, void **value, size_t *size){
-    return igs_readIOP(agent, name, IGS_PARAMETER_T, value, size);
+    return igsAgent_readIOP(agent, name, IGS_PARAMETER_T, value, size);
 }
 
 bool igsAgent_readInputAsBool(igsAgent_t *agent, const char *name){
