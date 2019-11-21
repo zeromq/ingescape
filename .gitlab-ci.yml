@@ -4,18 +4,18 @@
 stages:
   - build-lib
   - installer-lib
+  - deploy-lib
+  - delivery-lib
+  - delivery-lib-stable
   - build-binding
   - installer-binding
+  - deploy-binding
+  - delivery-binding
+  - delivery-binding-stable
   - build-apps
   - installer-apps
-  - deploy-lib
-  - deploy-binding
-  - delivery-lib
   - delivery-apps
-  - delivery-binding
-  - delivery-lib-stable
   - delivery-apps-stable
-  - delivery-binding-stable
 
 # Define ingescape library files
 .build-lib-files: &build-lib-files
