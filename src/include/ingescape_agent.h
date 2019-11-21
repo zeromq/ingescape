@@ -12,38 +12,14 @@
 #include "ingescape.h"
 #include "ingescape_advanced.h"
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#if (defined WIN32 || defined _WIN32)
-#if defined INGESCAPE
-#define PUBLIC __declspec(dllexport)
-#elif defined INGESCAPE_FROM_PRI
-#define PUBLIC
-#else
-#define PUBLIC __declspec(dllimport)
-#endif
-#else
-#define PUBLIC
-#endif
-
-// GCC and clang can validate format strings for functions that act like printf
-// this is used to check the logging functions
-#if defined (__GNUC__) && (__GNUC__ >= 2)
-#   define CHECK_PRINTF(a)   __attribute__((format (printf, a, a + 1)))
-#else
-#   define CHECK_PRINTF(a)
-#endif
-
-//Macro to avoid "unused parameter" warnings
-#define IGS_UNUSED(x) (void)x;
-
 //agent creation and destruction
 typedef struct _igsAgent_t igsAgent_t;
-igsAgent_t *igsAgent_new(void);
-void igsAgent_destroy(igsAgent_t **agent);
+PUBLIC igsAgent_t *igsAgent_new(void);
+PUBLIC void igsAgent_destroy(igsAgent_t **agent);
 
 /*
  All the functions below behave the same as the functions presented

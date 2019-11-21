@@ -9,18 +9,6 @@
 #ifndef ingescape_advanced_h
 #define ingescape_advanced_h
 
-#if (defined WIN32 || defined _WIN32)
-#if defined INGESCAPE
-#define PUBLIC __declspec(dllexport)
-#elif defined INGESCAPE_FROM_PRI
-#define PUBLIC
-#else
-#define PUBLIC __declspec(dllimport)
-#endif
-#else
-#define PUBLIC
-#endif
-
 #include <czmq.h>
 #include "ingescape.h"
 
