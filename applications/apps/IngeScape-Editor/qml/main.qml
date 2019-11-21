@@ -289,13 +289,13 @@ ApplicationWindow {
                 text: ""
 
                 onTriggered: {
-                    if (IngeScapeEditorC.modelManager && IngeScapeEditorC.modelManager.isMappingConnected) {
+                    if (IgsModelManager.isMappingConnected) {
                         //console.log("DE-activate mapping");
-                        IngeScapeEditorC.modelManager.isMappingConnected = false;
+                        IgsModelManager.isMappingConnected = false;
                     }
                     else {
                         //console.log("Activate mapping");
-                        IngeScapeEditorC.modelManager.isMappingConnected = true;
+                        IgsModelManager.isMappingConnected = true;
                     }
                 }
             }
@@ -371,12 +371,9 @@ ApplicationWindow {
                 onTriggered: {
                     if (mainWindow.isEditorLicenseValid)
                     {
-                        if (IngeScapeEditorC.modelManager)
-                        {
-                            var success = IngeScapeEditorC.modelManager.importAgentOrAgentsListFromSelectedFile();
-                            if (!success) {
-                                popupFailedToLoadAgentDefinition.open();
-                            }
+                        var success = IgsModelManager.importAgentOrAgentsListFromSelectedFile();
+                        if (!success) {
+                            popupFailedToLoadAgentDefinition.open();
                         }
                     }
                     else
@@ -774,7 +771,7 @@ ApplicationWindow {
                 });
 
                 menuPlugUNplugMapping.text = Qt.binding(function() {
-                    return (((IngeScapeEditorC.modelManager !== null) && IngeScapeEditorC.modelManager.isMappingConnected) ? qsTr("Unplug mapping") : qsTr("Plug mapping"));
+                    return ((IgsModelManager.isMappingConnected) ? qsTr("Unplug mapping") : qsTr("Plug mapping"));
                 });
 
                 subWindowsInstantiator.model = Qt.binding(function() {

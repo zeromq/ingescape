@@ -1097,7 +1097,7 @@ bool IngeScapeNetworkController::sendMessageToAgent(QString agentId, QStringList
             }
                 break;
 
-            /*case 4:
+            case 4:
             {
                 QString string2 = message.at(1);
                 QString string3 = message.at(2);
@@ -1121,7 +1121,7 @@ bool IngeScapeNetworkController::sendMessageToAgent(QString agentId, QStringList
                     qWarning() << "Error (" << result << ") during send message" << message << "to peer" << agentId;
                 }
             }
-                break;*/
+                break;
 
             default:
                 qCritical() << "Message" << message << "could not be sent due to too many parameters:" << stringsNumber;

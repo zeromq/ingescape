@@ -37,7 +37,9 @@ Item {
     //--------------------------------
 
     // Controller associated to our view
-    property var controller : null;
+    property AgentsMappingController controller : null;
+
+    property bool isMappingControlled: IngeScapeEditorC.modelManager ? IngeScapeEditorC.modelManager.isMappingControlled : false
 
 
     //-----------------------------------------
@@ -112,7 +114,7 @@ Item {
 
                 I2PieSlice {
                     id: pieSlice
-                    //visible: IngeScapeEditorC.modelManager.isMappingConnected
+                    //visible: IgsModelManager.isMappingConnected
 
                     anchors.fill: parent
 
@@ -156,17 +158,17 @@ Item {
                 fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
                 pressedID: releasedID + "-pressed"
-                releasedID: IngeScapeEditorC.modelManager.isMappingConnected ? "connect-on" : "connect-off"
+                releasedID: IgsModelManager.isMappingConnected ? "connect-on" : "connect-off"
                 disabledID : releasedID
 
                 onClicked: {
-                    IngeScapeEditorC.modelManager.isMappingConnected = checked;
+                    IgsModelManager.isMappingConnected = checked;
                 }
 
                 Binding {
                     target: activeMappingBtn
                     property: "checked"
-                    value: IngeScapeEditorC.modelManager.isMappingConnected
+                    value: IgsModelManager.isMappingConnected
                 }
             }
 
@@ -179,8 +181,8 @@ Item {
                 anchors {
                     bottom: parent.bottom
                     left: parent.left
-                    leftMargin: 74 + (IngeScapeEditorC.modelManager.isMappingControlled ? 5 : 0)
-                    bottomMargin: 64 + (IngeScapeEditorC.modelManager.isMappingControlled ? 0 : 2)
+                    leftMargin: 74 + (rootItem.isMappingControlled ? 5 : 0)
+                    bottomMargin: 64 + (rootItem.isMappingControlled ? 0 : 2)
                 }
 
                 LabellessSvgButton {
@@ -193,7 +195,7 @@ Item {
                     fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
                     pressedID: releasedID + "-pressed"
-                    releasedID: IngeScapeEditorC.modelManager.isMappingControlled ? "control" : "observe"
+                    releasedID: rootItem.isMappingControlled ? "control" : "observe"
                     disabledID : releasedID
 
                     onClicked: {
@@ -230,7 +232,7 @@ Item {
                     id: checkBoxObserve
 
                     exclusiveGroup: typeMappingGroup
-                    //checked: !IngeScapeEditorC.modelManager.isMappingControlled
+                    //checked: !rootItem.isMappingControlled
 
                     style: CheckBoxStyle {
                         label: Text {
@@ -284,7 +286,7 @@ Item {
                     Binding {
                         target: checkBoxObserve
                         property: "checked"
-                        value: !IngeScapeEditorC.modelManager.isMappingControlled
+                        value: !rootItem.isMappingControlled
                     }
                 }
 
@@ -292,7 +294,7 @@ Item {
                     id: checkBoxControl
 
                     exclusiveGroup: typeMappingGroup
-                    //checked: IngeScapeEditorC.modelManager.isMappingControlled
+                    //checked: rootItem.isMappingControlled
 
                     style: CheckBoxStyle {
                         label: Text {
@@ -346,7 +348,7 @@ Item {
                     Binding {
                         target: checkBoxControl
                         property: "checked"
-                        value: IngeScapeEditorC.modelManager.isMappingControlled
+                        value: rootItem.isMappingControlled
                     }
                 }
             }
@@ -364,7 +366,7 @@ Item {
                         left : parent.left
                     }
 
-                    visible : rootItem.controller && rootItem.controller.isEmptyMapping && !IngeScapeEditorC.modelManager.isMappingConnected
+                    visible : rootItem.controller && rootItem.controller.isEmptyMapping && !IgsModelManager.isMappingConnected
                     text : "No active mapping at the moment."
 
                     color : IngeScapeTheme.blueGreyColor
@@ -381,7 +383,7 @@ Item {
                         left : parent.left
                     }
 
-                    visible : rootItem.controller && rootItem.controller.isEmptyMapping && !IngeScapeEditorC.modelManager.isMappingConnected
+                    visible : rootItem.controller && rootItem.controller.isEmptyMapping && !IgsModelManager.isMappingConnected
                     text : "Click on the button to synchronize with the current platform and get the active mapping.\nOr create/load a platform description and click on the button to apply it to the platform."
 
                     color : IngeScapeTheme.blueGreyColor

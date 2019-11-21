@@ -182,7 +182,7 @@ Rectangle {
         }
         //height: contentHeight
 
-        model: IngeScapeEditorC.modelManager.allAgentsGroupsByName
+        model: IgsModelManager.allAgentsGroupsByName
 
         delegate: Rectangle {
 

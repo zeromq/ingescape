@@ -257,13 +257,10 @@ Item {
                 onClicked: {
                     if (rootItem.isEditorLicenseValid)
                     {
-                        if (IngeScapeEditorC.modelManager)
-                        {
-                            //console.log("Import Agent(s)")
-                            var success = IngeScapeEditorC.modelManager.importAgentOrAgentsListFromSelectedFile();
-                            if (!success) {
-                                popupErrorMessage.open();
-                            }
+                        //console.log("Import Agent(s)")
+                        var success = IgsModelManager.importAgentOrAgentsListFromSelectedFile();
+                        if (!success) {
+                            popupErrorMessage.open();
                         }
                     }
                     else
@@ -305,7 +302,8 @@ Item {
 
 
                 onClicked: {
-                    if (rootItem.isEditorLicenseValid) {
+                    if (rootItem.isEditorLicenseValid)
+                    {
                         if (IngeScapeEditorC.modelManager) {
                             //console.log("Export Agent(s)")
                             IngeScapeEditorC.modelManager.exportAgentsListToSelectedFile();

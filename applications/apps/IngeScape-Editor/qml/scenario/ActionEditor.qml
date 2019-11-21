@@ -56,7 +56,7 @@ WindowBlockTouches {
     // action view model
     property var actionVM: panelController ? panelController.editedViewModel : null;
 
-    property var allAgentsGroupsByName: IngeScapeEditorC.modelManager ? IngeScapeEditorC.modelManager.allAgentsGroupsByName : null;
+    property var allAgentsGroupsByName: IgsModelManager.allAgentsGroupsByName;
 
     // our scenario controller
     property var controller: null;
