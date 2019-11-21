@@ -335,7 +335,6 @@ HostVM* HostsSupervisionController::_createViewModelOfHost(QString hostName, Hos
 
         // Connect to signals
         //connect(host, &HostVM::nameChanged, this, &HostsSupervisionController::_onHostNameChanged);
-        connect(host, &HostVM::commandAskedToAgent, this, &HostsSupervisionController::commandAskedToAgent);
         connect(host, &HostVM::commandAskedToLauncher, this, &HostsSupervisionController::commandAskedToLauncher);
 
         _hashFromNameToHost.insert(hostName, host);

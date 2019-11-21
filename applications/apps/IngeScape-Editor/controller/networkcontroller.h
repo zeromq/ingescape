@@ -260,14 +260,6 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot called when a command must be sent on the network to an agent
-     * @param peerIdsList
-     * @param command
-     */
-    void onCommandAskedToAgent(QStringList peerIdsList, QString command);
-
-
-    /**
      * @brief Slot called when a command must be sent on the network to an agent about one of its output
      * @param peerIdsList
      * @param command

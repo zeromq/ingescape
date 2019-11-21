@@ -21,6 +21,7 @@
 #include <misc/ingescapeutils.h>
 #include <model/editorenums.h>
 #include <model/actionmappingm.h>
+#include <controller/ingescapenetworkcontroller.h>
 
 
 /**
@@ -1398,10 +1399,11 @@ void AgentsMappingController::onIsMappingConnectedChanged(bool isMappingConnecte
                     // Get the JSON of the mapping of the agent as displayed in the global mapping
                     QString jsonOfMapping = _getJSONofMappingOfAgentInGlobalMapping(agentInMapping);
 
-                    QString command = QString("%1%2").arg(command_LoadMapping, jsonOfMapping);
+                    QString message = QString("%1%2").arg(command_LoadMapping, jsonOfMapping);
 
-                    // Emit signal "Command asked to agent"
-                    Q_EMIT commandAskedToAgent(agentInMapping->agentsGroupedByName()->peerIdsList(), command);
+                    // Send the message to the agent (list of models of agent)
+                    // FIXME: JSON can be too big for a string
+                    IngeScapeNetworkController::instance()->sendMessageToAgents(agentInMapping->agentsGroupedByName()->peerIdsList(), message);
                 }
                 // Nothing to do for agents OFF
             }
@@ -1651,8 +1653,6 @@ void AgentsMappingController::_onAgentModelONhasBeenAdded(AgentM* model)
         // Get the (view model of) agent in the global mapping from the agent name
         AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);
 
-        QStringList peerIdsList = QStringList(model->peerId());
-
         // CONTROL
         if (_modelManager->isMappingControlled())
         {
@@ -1664,18 +1664,19 @@ void AgentsMappingController::_onAgentModelONhasBeenAdded(AgentM* model)
                 // Get the JSON of the mapping of the agent as displayed in the global mapping
                 QString jsonOfMapping = _getJSONofMappingOfAgentInGlobalMapping(agentInMapping);
 
-                QString command = QString("%1%2").arg(command_LoadMapping, jsonOfMapping);
+                QString message = QString("%1%2").arg(command_LoadMapping, jsonOfMapping);
 
-                // Emit signal "Command asked to agent"
-                Q_EMIT commandAskedToAgent(peerIdsList, command);
+                // Send the message "LOAD THIS MAPPING" to this agent
+                // FIXME: JSON can be too big for a string
+                IngeScapeNetworkController::instance()->sendMessageToAgent(model->peerId(), message);
             }
             // The agent is NOT in the global mapping
             else
             {
                 qDebug() << "CONTROL:" << agentName << "is ON but NOT in the global mapping --> CLEAR its MAPPING !";
 
-                // Send the command "Clear Mapping" on the network to this agent(s)
-                Q_EMIT commandAskedToAgent(peerIdsList, command_ClearMapping);
+                // Send the message "Clear Mapping" to this agent
+                IngeScapeNetworkController::instance()->sendMessageToAgent(model->peerId(), command_ClearMapping);
             }
         }
         // OBSERVE
@@ -2283,8 +2284,8 @@ void AgentsMappingController::_removeAllLinksWithAgent(AgentInMappingVM* agent)
         // The global mapping is activated AND the agent is ON
         if (_modelManager->isMappingConnected() && agent->agentsGroupedByName()->isON())
         {
-            // Send the command "Clear Mapping" on the network to this agent(s)
-            Q_EMIT commandAskedToAgent(agent->agentsGroupedByName()->peerIdsList(), command_ClearMapping);
+            // Send the message "Clear Mapping" to these agents
+            IngeScapeNetworkController::instance()->sendMessageToAgents(agent->agentsGroupedByName()->peerIdsList(), command_ClearMapping);
         }
         // The global mapping is NOT activated OR the agent is OFF
         else

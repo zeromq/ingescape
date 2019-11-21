@@ -16,6 +16,8 @@
 
 #include <QDebug>
 #include <misc/ingescapeutils.h>
+#include <controller/ingescapenetworkcontroller.h>
+
 
 /**
  * @brief Constructor
@@ -1060,8 +1062,8 @@ void AbstractScenarioController::_executeCommandForAgent(AgentsGroupedByNameVM* 
                   || (command == command_MuteAgent) || (command == command_UnmuteAgent)
                   || (command == command_FreezeAgent) || (command == command_UnfreezeAgent) )
         {
-            // Emit signal "Command asked to agent"
-            Q_EMIT commandAskedToAgent(agentsGroupedByName->peerIdsList(), command);
+            // Send the command to the list of agents
+            IngeScapeNetworkController::instance()->sendMessageToAgents(agentsGroupedByName->peerIdsList(), command);
         }
         // MAP or UNMAP
         else if ((command == command_MapAgents) || (command == command_UnmapAgents))

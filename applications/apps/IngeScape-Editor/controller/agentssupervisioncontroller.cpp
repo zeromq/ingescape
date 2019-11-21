@@ -103,7 +103,6 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionHasBeenCreated(Agen
     if (agentsGroupedByDefinition != nullptr)
     {
         // Propagate some signals from this new view model of agents grouped by definition
-        connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::commandAskedToAgent, this, &AgentsSupervisionController::commandAskedToAgent);
         connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::commandAskedToAgentAboutOutput, this, &AgentsSupervisionController::commandAskedToAgentAboutOutput);
         connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::openValuesHistoryOfAgent, this, &AgentsSupervisionController::openValuesHistoryOfAgent);
         connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::openLogStreamOfAgents, this, &AgentsSupervisionController::openLogStreamOfAgents);
@@ -229,7 +228,7 @@ void AgentsSupervisionController::_onLoadAgentDefinitionFromPath(QStringList pee
             // Create the command "Load Definition"
             QString message = QString("%1%2").arg(command_LoadDefinition, jsonOfDefinition);
 
-            // Send the message to the agent
+            // Send the message to the agent (list of models of agent)
             // FIXME: JSON can be too big for a string
             IngeScapeNetworkController::instance()->sendMessageToAgents(peerIdsList, message);
         }
@@ -263,7 +262,7 @@ void AgentsSupervisionController::_onLoadAgentMappingFromPath(QStringList peerId
             // Create the command "Load Mapping"
             QString message = QString("%1%2").arg(command_LoadMapping, jsonOfMapping);
 
-            // Send the message to the agent
+            // Send the message to the agent (list of models of agent)
             // FIXME: JSON can be too big for a string
             IngeScapeNetworkController::instance()->sendMessageToAgents(peerIdsList, message);
         }

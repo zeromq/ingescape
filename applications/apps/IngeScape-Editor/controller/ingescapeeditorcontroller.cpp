@@ -321,17 +321,14 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
     // Connect to signals from the controller for supervision of agents
     connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedToLauncher, networkC, &NetworkController::onCommandAskedToLauncher);
-    //connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedToAgent, networkC, &NetworkController::onCommandAskedToAgent);
     connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedToAgentAboutOutput, networkC, &NetworkController::onCommandAskedToAgentAboutOutput);
     connect(_agentsSupervisionC, &AgentsSupervisionController::openValuesHistoryOfAgent, _valuesHistoryC, &ValuesHistoryController::filterValuesToShowOnlyAgent);
     connect(_agentsSupervisionC, &AgentsSupervisionController::openLogStreamOfAgents, this, &IngeScapeEditorController::_onOpenLogStreamOfAgents);
 
     // Connect to signals from the controller for supervision of hosts
-    connect(_hostsSupervisionC, &HostsSupervisionController::commandAskedToAgent, networkC, &NetworkController::onCommandAskedToAgent);
     connect(_hostsSupervisionC, &HostsSupervisionController::commandAskedToLauncher, networkC, &NetworkController::onCommandAskedToLauncher);
 
     // Connect to signals from the controller for mapping of agents
-    connect(_agentsMappingC, &AgentsMappingController::commandAskedToAgent, networkC, &NetworkController::onCommandAskedToAgent);
     connect(_agentsMappingC, &AgentsMappingController::commandAskedToAgentAboutMappingInput, networkC, &NetworkController::onCommandAskedToAgentAboutMappingInput);
     connect(_agentsMappingC, &AgentsMappingController::commandAskedToAgentAboutSettingValue, networkC, &NetworkController::onCommandAskedToAgentAboutSettingValue);
     connect(_agentsMappingC, &AgentsMappingController::executeAction, _scenarioC, &ScenarioController::onExecuteAction);
@@ -339,7 +336,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     // Connect to signals from the controller of the scenario
     connect(_scenarioC, &ScenarioController::commandAskedToLauncher, networkC, &NetworkController::onCommandAskedToLauncher);
     connect(_scenarioC, &ScenarioController::commandAskedToRecorder, this, &IngeScapeEditorController::_onCommandAskedToRecorder);
-    connect(_scenarioC, &ScenarioController::commandAskedToAgent, networkC, &NetworkController::onCommandAskedToAgent);
     connect(_scenarioC, &ScenarioController::commandAskedToAgentAboutSettingValue, networkC, &NetworkController::onCommandAskedToAgentAboutSettingValue);
     connect(_scenarioC, &ScenarioController::commandAskedToAgentAboutMappingInput, networkC, &NetworkController::onCommandAskedToAgentAboutMappingInput);
     connect(_scenarioC, &ScenarioController::timeLineStateUpdated, this, &IngeScapeEditorController::_onTimeLineStateUpdated);

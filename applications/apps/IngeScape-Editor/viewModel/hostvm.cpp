@@ -17,6 +17,7 @@
 #include "hostvm.h"
 
 #include <QQmlEngine>
+#include <controller/ingescapenetworkcontroller.h>
 
 
 /**
@@ -144,9 +145,7 @@ void HostVM::stopAgent(AgentM* agent)
 {
     if (agent != nullptr)
     {
-        QStringList peerIdsList = QStringList(agent->peerId());
-
-        Q_EMIT commandAskedToAgent(peerIdsList, command_StopAgent);
+        IngeScapeNetworkController::instance()->sendMessageToAgent(agent->peerId(), command_StopAgent);
     }
 }
 

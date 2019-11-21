@@ -174,26 +174,6 @@ void NetworkController::onCommandAskedToLauncher(QString peerIdOfLauncher, QStri
 
 
 /**
- * @brief Slot when a command must be sent on the network to an agent
- * @param peerIdsList
- * @param command
- */
-void NetworkController::onCommandAskedToAgent(QStringList peerIdsList, QString command)
-{
-    if (!command.isEmpty() && (peerIdsList.count() > 0))
-    {
-        for (QString peerId : peerIdsList)
-        {
-            // Send the command to a peer id of agent
-            int success = igs_busSendStringToAgent(peerId.toStdString().c_str(), "%s", command.toStdString().c_str());
-
-            qInfo() << "Send command" << command << "for agent" << peerId << "with success ?" << success;
-        }
-    }
-}
-
-
-/**
  * @brief Slot when a command must be sent on the network to an agent about one of its output
  * @param peerIdsList
  * @param command

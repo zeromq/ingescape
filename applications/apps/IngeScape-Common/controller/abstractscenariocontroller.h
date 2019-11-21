@@ -192,14 +192,6 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when a command must be sent on the network to an agent
-     * @param peerIdsList
-     * @param command
-     */
-    void commandAskedToAgent(QStringList peerIdsList, QString command);
-
-
-    /**
      * @brief Signal emitted when a command must be sent on the network to an agent about setting a value to one of its Input/Output/Parameter
      * @param peerIdsList
      * @param command
