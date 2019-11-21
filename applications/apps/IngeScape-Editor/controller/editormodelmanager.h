@@ -25,12 +25,9 @@
 /**
  * @brief The EditorModelManager class defines the manager for the data model of IngeScape
  */
-class EditorModelManager : public IngeScapeModelManager
+class EditorModelManager : public QObject
 {
     Q_OBJECT
-
-    // Flag indicating if our global mapping is activated
-    //I2_QML_PROPERTY_CUSTOM_SETTER(bool, isMappingActivated)
 
     // Flag indicating if our global mapping is controlled (or passive)
     I2_QML_PROPERTY_CUSTOM_SETTER(bool, isMappingControlled)
@@ -40,21 +37,34 @@ class EditorModelManager : public IngeScapeModelManager
 
 
 public:
+
+    /**
+     * @brief Accessor to the singleton instance
+     * @return
+     */
+    static EditorModelManager* instance();
+
+
+    /**
+     * @brief Method used to provide a singleton to QML
+     * @param engine
+     * @param scriptEngine
+     * @return
+     */
+     static QObject* qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine);
+
+
     /**
      * @brief Constructor
-     * @param jsonHelper
-     * @param rootDirectoryPath
      * @param parent
      */
-    explicit EditorModelManager(JsonHelper* jsonHelper,
-                                QString rootDirectoryPath,
-                                QObject *parent = nullptr);
+    explicit EditorModelManager(QObject *parent = nullptr);
 
 
     /**
      * @brief Destructor
      */
-    ~EditorModelManager() Q_DECL_OVERRIDE;
+    ~EditorModelManager();
 
 
     /**
@@ -90,24 +100,12 @@ Q_SIGNALS:
 
 
 public Q_SLOTS:
-    
 
     /**
-     * @brief Slot called when an agent definition has been received and must be processed
-     * @param peer Id
-     * @param agent name
-     * @param definition in JSON format
+     * @brief Slot called when a new view model of agents grouped by name has been created
+     * @param agentsGroupedByName
      */
-    //void onDefinitionReceived(QString peerId, QString agentName, QString definitionJSON);
-
-
-    /**
-     * @brief Slot called when an agent mapping has been received and must be processed
-     * @param peer Id
-     * @param agent name
-     * @param mapping in JSON format
-     */
-    //void onMappingReceived(QString peerId, QString agentName, QString mappingJSON);
+    void onAgentsGroupedByNameHasBeenCreated(AgentsGroupedByNameVM* agentsGroupedByName);
 
 
     /**
@@ -191,7 +189,7 @@ public Q_SLOTS:
     void onAgentMappingFilePath(QString peerId, QString mappingFilePath);
 
 
-protected Q_SLOTS:
+private Q_SLOTS:
 
     /**
      * @brief Slot called when the definition(s) of an agent (agents grouped by name) must be opened
@@ -200,14 +198,7 @@ protected Q_SLOTS:
     void _onDefinitionsToOpen(QList<DefinitionM*> definitionsList);
 
 
-protected:
-
-    /**
-     * @brief Create a new view model of agents grouped by name
-     * @param model
-     */
-    void _createAgentsGroupedByName(AgentM* model) Q_DECL_OVERRIDE;
-
+private:
 
     /**
      * @brief Open a list of definitions (if the definition is already opened, we bring it to front)

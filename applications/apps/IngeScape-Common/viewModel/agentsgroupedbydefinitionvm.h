@@ -210,15 +210,6 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when a command must be sent on the network to a launcher
-     * @param hostname
-     * @param command
-     * @param commandLine
-     */
-    void commandAskedToLauncher(QString hostname, QString command, QString commandLine);
-
-
-    /**
      * @brief Signal emitted when a command must be sent on the network to agent(s) about one of its output
      * @param peerIdsList
      * @param command

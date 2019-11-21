@@ -44,8 +44,6 @@
 #include "platformsupport/IngescapeApplication.h"
 
 
-
-
 /**
  * @brief Handler for "Log Message"
  * @param type
@@ -124,7 +122,6 @@ void registerCustomQmlTypes()
     //----------------
     // Singleton used as primary access point to our controllers
     qmlRegisterSingletonType<IngeScapeEditorController>("INGESCAPE", 1, 0, "IngeScapeEditorC", &IngeScapeEditorController::qmlSingleton);
-    qmlRegisterSingletonType<NetworkController>("INGESCAPE", 1, 0, "NetworkC", &NetworkController::qmlSingleton);
 
     // sub-controllers
     qmlRegisterUncreatableType<ActionEditorController>("INGESCAPE", 1, 0, "ActionEditorController", "Internal Class");
@@ -133,7 +130,7 @@ void registerCustomQmlTypes()
     qmlRegisterUncreatableType<EditorModelManager>("INGESCAPE", 1, 0, "EditorModelManager", "Internal Class");
     qmlRegisterUncreatableType<HostsSupervisionController>("INGESCAPE", 1, 0, "HostsSupervisionController", "Internal Class");
     qmlRegisterUncreatableType<LogStreamController>("INGESCAPE", 1, 0, "LogStreamController", "Internal Class");
-    //qmlRegisterUncreatableType<NetworkController>("INGESCAPE", 1, 0, "NetworkController", "Internal Class");
+    qmlRegisterUncreatableType<NetworkController>("INGESCAPE", 1, 0, "NetworkController", "Internal Class");
     qmlRegisterUncreatableType<RecordsSupervisionController>("INGESCAPE", 1, 0, "RecordsSupervisionController", "Internal Class");
     qmlRegisterUncreatableType<ValuesHistoryController>("INGESCAPE", 1, 0, "ValuesHistoryController", "Internal Class");
 

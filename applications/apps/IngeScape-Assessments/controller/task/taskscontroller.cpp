@@ -20,13 +20,11 @@
 /**
  * @brief Constructor
  * @param modelManager
- * @param jsonHelper
  * @param parent
  */
-TasksController::TasksController(/*JsonHelper* jsonHelper, */QObject *parent)
-    : QObject(parent)
-    , _currentExperimentation(nullptr)
-    , _selectedTask(nullptr)
+TasksController::TasksController(QObject *parent) : QObject(parent),
+    _currentExperimentation(nullptr),
+    _selectedTask(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);

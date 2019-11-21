@@ -22,11 +22,9 @@
 /**
  * @brief Constructor
  * @param modelManager
- * @param jsonHelper
  * @param parent
  */
 AbstractScenarioController::AbstractScenarioController(IngeScapeModelManager* modelManager,
-                                                       JsonHelper* jsonHelper,
                                                        QObject *parent) : QObject(parent),
     _selectedAction(nullptr),
     _selectedActionVMInTimeline(nullptr),
@@ -35,7 +33,6 @@ AbstractScenarioController::AbstractScenarioController(IngeScapeModelManager* mo
     _currentTime(QTime::fromMSecsSinceStartOfDay(0)),
     _nextActionToActivate(nullptr),
     _modelManager(modelManager),
-    _jsonHelper(jsonHelper),
     _allActionNames(QStringList()),
     _timeOfDayInMS_WhenStartScenario_ThenAtLastTimeOut(0)
 {
@@ -90,7 +87,6 @@ AbstractScenarioController::~AbstractScenarioController()
 
     // Reset pointers
     _modelManager = nullptr;
-    _jsonHelper = nullptr;
 }
 
 
@@ -100,13 +96,13 @@ AbstractScenarioController::~AbstractScenarioController()
   */
 void AbstractScenarioController::importScenarioFromJson(QJsonObject jsonScenario)
 {
-    if ((_modelManager != nullptr) && (_jsonHelper != nullptr))
+    if (_modelManager != nullptr)
     {
         // Get the hash table from a name to the group of agents with this name
         QHash<QString, AgentsGroupedByNameVM*> hashFromNameToAgentsGrouped = _modelManager->getHashTableFromNameToAgentsGrouped();
 
         // Create a model of scenario (actions in the list, in the palette and in the timeline) from JSON
-        ScenarioM* scenarioToImport = _jsonHelper->createModelOfScenarioFromJSON(jsonScenario, hashFromNameToAgentsGrouped);
+        ScenarioM* scenarioToImport = JsonHelper::createModelOfScenarioFromJSON(jsonScenario, hashFromNameToAgentsGrouped);
         if (scenarioToImport != nullptr)
         {
             // Append the list of actions

@@ -19,15 +19,12 @@
 /**
  * @brief Constructor
  * @param modelManager
- * @param jsonHelper
  * @param parent
  */
-TaskInstanceController::TaskInstanceController(JsonHelper* jsonHelper,
-                                               QObject *parent) : QObject(parent),
+TaskInstanceController::TaskInstanceController(QObject *parent) : QObject(parent),
     _timeLineC(nullptr),
     _scenarioC(nullptr),
-    _currentTaskInstance(nullptr),
-    _jsonHelper(jsonHelper)
+    _currentTaskInstance(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -38,7 +35,7 @@ TaskInstanceController::TaskInstanceController(JsonHelper* jsonHelper,
     _timeLineC = new AbstractTimeActionslineScenarioViewController(this);
 
     // Create the controller for scenario management
-    _scenarioC = new AbstractScenarioController(AssessmentsModelManager::Instance(), _jsonHelper, this);
+    _scenarioC = new AbstractScenarioController(AssessmentsModelManager::Instance(), this);
 
     // List of agents present in current Platform
     _agentsGroupedByNameInCurrentPlatform.setSourceModel(AssessmentsModelManager::Instance()->allAgentsGroupsByName());
@@ -86,10 +83,6 @@ TaskInstanceController::~TaskInstanceController()
         delete temp;
         temp = nullptr;
     }
-
-
-    // Reset pointers
-    _jsonHelper = nullptr;
 }
 
 

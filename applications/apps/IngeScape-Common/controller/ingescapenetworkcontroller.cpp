@@ -650,6 +650,7 @@ IngeScapeNetworkController::IngeScapeNetworkController(QObject *parent) : QObjec
                                   \"inputs\": [],       \
                                   \"outputs\": [] }}";
 
+    // FIXME TODO jsonDocument.toJson
     //QJsonDocument jsonDocument(jsonObject);
     //QString jsonOfMapping = QString(jsonDocument.toJson(QJsonDocument::Indented));
     //QString jsonOfMapping = QString(jsonDocument.toJson(QJsonDocument::Compact));
@@ -971,8 +972,7 @@ void IngeScapeNetworkController::manageShoutedMessage(QString peerId, QString pe
  */
 void IngeScapeNetworkController::manageWhisperedMessage(QString peerId, QString peerName, zmsg_t* zMessage)
 {
-    std::unique_ptr<char> zmsg_str(zmsg_popstr(zMessage));
-    QString message(zmsg_str.get());
+    QString message = zmsg_popstr(zMessage);
 
     // An agent DEFINITION has been received
     if (message.startsWith(prefix_Definition))

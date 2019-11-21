@@ -40,8 +40,7 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     _subjectsC(nullptr),
     _tasksC(nullptr),
     _exportC(nullptr),
-    _terminationSignalWatcher(nullptr),
-    _jsonHelper(nullptr)
+    _terminationSignalWatcher(nullptr)
 {
     qInfo() << "New IngeScape Assessments Controller";
 
@@ -97,16 +96,12 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     settings.endGroup();
 
 
-    // Create the helper to manage JSON files
-    _jsonHelper = new JsonHelper(this);
-
-
     //
     // Create sub-controllers
     //
 
     // Create the manager for the data model of our IngeScape Assessments application
-    AssessmentsModelManager::initInstance(_jsonHelper, rootPath, this);
+    AssessmentsModelManager::initInstance(this);
     _modelManager = AssessmentsModelManager::Instance();
 
     // Create the controller for network communications
@@ -119,7 +114,7 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     _experimentationsListC = new ExperimentationsListController(this);
 
     // Create the controller to manage the current experimentation
-    _experimentationC = new ExperimentationController(_jsonHelper, this);
+    _experimentationC = new ExperimentationController(this);
 
     // Create the controller to manage the subjects of the current experimentation
     _subjectsC = new SubjectsController(this);
@@ -154,17 +149,23 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
 
     connect(_modelManager, &AssessmentsModelManager::isMappingConnectedChanged,
             _networkC, &NetworkController::onIsMappingConnectedChanged);
-    connect(_modelManager, &AssessmentsModelManager::addInputsToOurApplicationForAgentOutputs,
-            _networkC, &NetworkController::onAddInputsToOurApplicationForAgentOutputs);
-    connect(_modelManager, &AssessmentsModelManager::removeInputsFromOurApplicationForAgentOutputs,
-            _networkC, &NetworkController::onRemoveInputsFromOurApplicationForAgentOutputs);
-
 
     // Connect to signals from the experimentation controller to the rest of the controllers
     connect(_experimentationC, &ExperimentationController::currentExperimentationChanged,
             this, &IngeScapeAssessmentsController::_onCurrentExperimentationChanged);
     connect(_experimentationC, &ExperimentationController::commandAskedToRecorder,
             _networkC, &NetworkController::onCommandAskedToRecorder);
+
+
+    // Connect to signals from the controller of the scenario
+    if ((_experimentationC->taskInstanceC() != nullptr) && (_experimentationC->taskInstanceC()->scenarioC() != nullptr))
+    {
+        //connect(_scenarioC, &ScenarioController::commandAskedToLauncher, _networkC, &NetworkController::onCommandAskedToLauncher);
+        //connect(_scenarioC, &ScenarioController::commandAskedToRecorder, this, &IngeScapeEditorController::_onCommandAskedToRecorder);
+        //connect(_experimentationC->taskInstanceC()->scenarioC(), &AbstractScenarioController::commandAskedToAgentAboutSettingValue, _networkC, &NetworkController::onCommandAskedToAgentAboutSettingValue);
+        //connect(_scenarioC, &ScenarioController::commandAskedToAgentAboutMappingInput, _networkC, &NetworkController::onCommandAskedToAgentAboutMappingInput);
+        //connect(_scenarioC, &ScenarioController::timeLineStateUpdated, this, &IngeScapeEditorController::_onTimeLineStateUpdated);
+    }
 
 
     // Update the list of available network devices
@@ -307,13 +308,6 @@ IngeScapeAssessmentsController::~IngeScapeAssessmentsController()
         setlicensesC(nullptr);
         delete temp;
         temp = nullptr;
-    }
-
-    // Delete json helper
-    if (_jsonHelper != nullptr)
-    {
-        delete _jsonHelper;
-        _jsonHelper = nullptr;
     }
 
     qInfo() << "Delete IngeScape Assessments Controller";

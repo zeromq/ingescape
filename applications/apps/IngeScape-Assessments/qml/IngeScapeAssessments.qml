@@ -196,25 +196,22 @@ Item {
             rightMargin: -1
         }
 
-        isOnline: IngeScapeAssessmentsC.networkC && IngeScapeAssessmentsC.networkC.isOnline
+        isOnline: IgsNetworkController.isOnline
 
         currentNetworkDevice: IngeScapeAssessmentsC.networkDevice
         currentPort: IngeScapeAssessmentsC.port
 
-        listOfNetworkDevices: IngeScapeAssessmentsC.networkC ? IngeScapeAssessmentsC.networkC.availableNetworkDevices : null
+        listOfNetworkDevices: IgsNetworkController.availableNetworkDevices
 
         errorMessage: IngeScapeAssessmentsC.errorMessageWhenConnectionFailed
 
         onWillOpenEditionMode: {
             // Update our list of available network devices
-            if (IngeScapeAssessmentsC.networkC)
-            {
-                IngeScapeAssessmentsC.networkC.updateAvailableNetworkDevices();
-            }
+            IgsNetworkController.updateAvailableNetworkDevices();
         }
 
         onChangeNetworkSettings: {
-            if (IngeScapeAssessmentsC.networkC && IngeScapeAssessmentsC.networkC.isAvailableNetworkDevice(networkDevice))
+            if (IgsNetworkController.isAvailableNetworkDevice(networkDevice))
             {
                 // Re-Start the Network
                 var success = IngeScapeAssessmentsC.restartNetwork(port, networkDevice, clearPlatform);

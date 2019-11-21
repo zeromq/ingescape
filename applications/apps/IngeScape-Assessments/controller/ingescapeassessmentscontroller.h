@@ -161,9 +161,6 @@ private:
     // To subscribe to termination signals
     TerminationSignalWatcher *_terminationSignalWatcher;
 
-    // Helper to manage JSON files
-    JsonHelper* _jsonHelper;
-
 };
 
 QML_DECLARE_TYPE(IngeScapeAssessmentsController)

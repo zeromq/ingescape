@@ -279,22 +279,22 @@ Item {
                 rightMargin: -1
             }
 
-            isOnline: NetworkC.isOnline
+            isOnline: IgsNetworkController.isOnline
 
             currentNetworkDevice: IngeScapeEditorC.networkDevice
             currentPort: IngeScapeEditorC.port
 
-            listOfNetworkDevices: NetworkC.availableNetworkDevices
+            listOfNetworkDevices: IgsNetworkController.availableNetworkDevices
 
             errorMessage: IngeScapeEditorC.errorMessageWhenConnectionFailed
 
             onWillOpenEditionMode: {
                 // Update our list of available network devices
-                NetworkC.updateAvailableNetworkDevices();
+                IgsNetworkController.updateAvailableNetworkDevices();
             }
 
             onChangeNetworkSettings: {
-                if (NetworkC.isAvailableNetworkDevice(networkDevice))
+                if (IgsNetworkController.isAvailableNetworkDevice(networkDevice))
                 {
                     // Re-Start the Network
                     var success = IngeScapeEditorC.restartNetwork(port, networkDevice, clearPlatform);

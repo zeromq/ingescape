@@ -20,14 +20,10 @@
 /**
  * @brief Constructor
  * @param modelManager
- * @param jsonHelper
  * @param parent
  */
-ScenarioController::ScenarioController(//EditorModelManager* modelManager,
-                                       IngeScapeModelManager* modelManager,
-                                       JsonHelper* jsonHelper,
+ScenarioController::ScenarioController(IngeScapeModelManager* modelManager,
                                        QObject *parent) : AbstractScenarioController (modelManager,
-                                                                                      jsonHelper,
                                                                                       parent)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -86,13 +82,13 @@ void ScenarioController::importScenarioFromJson(QJsonObject jsonScenario)
     // Call our mother class
     AbstractScenarioController::importScenarioFromJson(jsonScenario);
 
-    if ((_modelManager != nullptr) && (_jsonHelper != nullptr))
+    if (_modelManager != nullptr)
     {
         // Get the hash table from a name to the group of agents with this name
         QHash<QString, AgentsGroupedByNameVM*> hashFromNameToAgentsGrouped = _modelManager->getHashTableFromNameToAgentsGrouped();
 
         // Create a model of scenario (actions in the list, in the palette and in the timeline) from JSON
-        ScenarioM* scenarioToImport = _jsonHelper->createModelOfScenarioFromJSON(jsonScenario, hashFromNameToAgentsGrouped);
+        ScenarioM* scenarioToImport = JsonHelper::createModelOfScenarioFromJSON(jsonScenario, hashFromNameToAgentsGrouped);
         if (scenarioToImport != nullptr)
         {
             // Set the list of actions in palette

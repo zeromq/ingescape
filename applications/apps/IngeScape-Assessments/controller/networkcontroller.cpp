@@ -27,7 +27,7 @@
  * @brief Constructor
  * @param parent
  */
-NetworkController::NetworkController(QObject *parent) : IngeScapeNetworkController(parent)
+NetworkController::NetworkController(QObject *parent) : QObject(parent)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -35,8 +35,17 @@ NetworkController::NetworkController(QObject *parent) : IngeScapeNetworkControll
     // Add  header to declare ourselves as assessments
     igs_busAddServiceDescription("isAssessments", "1");
 
-    // We don't see itself
-    setnumberOfAssessments(1);
+    IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
+    if (ingeScapeNetworkC != nullptr)
+    {
+        // We don't see itself
+        ingeScapeNetworkC->setnumberOfAssessments(1);
+
+        connect(ingeScapeNetworkC, &IngeScapeNetworkController::shoutedMessageReceived,
+                this, &NetworkController::_onShoutedMessageReceived);
+        connect(ingeScapeNetworkC, &IngeScapeNetworkController::whisperedMessageReceived,
+                this, &NetworkController::_onWhisperedMessageReceived);
+    }
 }
 
 
@@ -45,8 +54,12 @@ NetworkController::NetworkController(QObject *parent) : IngeScapeNetworkControll
  */
 NetworkController::~NetworkController()
 {
-    // Mother class is automatically called
-    //IngeScapeNetworkController::~IngeScapeNetworkController();
+    IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
+    if (ingeScapeNetworkC != nullptr)
+    {
+        // DIS-connect from the IngeScape Network Controller
+        disconnect(ingeScapeNetworkC, nullptr, this, nullptr);
+    }
 }
 
 
@@ -56,10 +69,12 @@ NetworkController::~NetworkController()
  * @param peerName
  * @param zMessage
  */
-/*void NetworkController::manageShoutedMessage(QString peerId, QString peerName, zmsg_t* zMessage)
+void NetworkController::_onShoutedMessageReceived(QString peerId, QString peerName, zmsg_t* zMessage)
 {
+    QString message = zmsg_popstr(zMessage);
 
-}*/
+    qDebug() << "Not yet managed SHOUTED message '" << message << "' for agent" << peerName << "(" << peerId << ")";
+}
 
 
 /**
@@ -68,28 +83,10 @@ NetworkController::~NetworkController()
  * @param peerName
  * @param zMessage
  */
-void NetworkController::manageWhisperedMessage(QString peerId, QString peerName, zmsg_t* zMessage)
+void NetworkController::_onWhisperedMessageReceived(QString peerId, QString peerName, zmsg_t* zMessage)
 {
-    std::unique_ptr<char> zmsg_str(zmsg_popstr(zMessage));
-    QString message(zmsg_str.get());
+    QString message = zmsg_popstr(zMessage);
 
-    // An agent DEFINITION has been received
-    if (message.startsWith(prefix_Definition))
-    {
-        QString definitionJSON = message.remove(0, prefix_Definition.length());
-
-        Q_EMIT definitionReceived(peerId, peerName, definitionJSON);
-    }
-    // An agent MAPPING has been received
-    else if (message.startsWith(prefix_Mapping))
-    {
-        QString mappingJSON = message.remove(0, prefix_Mapping.length());
-
-        Q_EMIT mappingReceived(peerId, peerName, mappingJSON);
-    }
-    // Unknown
-    else
-    {
-        qDebug() << "Not yet managed WHISPERED message '" << message << "' for agent" << peerName << "(" << peerId << ")";
-    }
+    qDebug() << "Not yet managed WHISPERED message '" << message << "' for agent" << peerName << "(" << peerId << ")";
 }
+

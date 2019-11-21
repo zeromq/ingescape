@@ -76,7 +76,6 @@ NetworkController::NetworkController(QObject *parent) : QObject(parent)
                 this, &NetworkController::_onShoutedMessageReceived);
         connect(ingeScapeNetworkC, &IngeScapeNetworkController::whisperedMessageReceived,
                 this, &NetworkController::_onWhisperedMessageReceived);
-
     }
 }
 
@@ -153,33 +152,12 @@ void NetworkController::sendCommandExecutionStatusToExpe(QString peerIdOfExpe, Q
 
 
 /**
- * @brief Slot called when a command must be sent on the network to a launcher
- * @param peerIdOfLauncher
- * @param command
- * @param commandLine
- */
-void NetworkController::onCommandAskedToLauncher(QString peerIdOfLauncher, QString command, QString commandLine)
-{
-    if (!peerIdOfLauncher.isEmpty())
-    {
-        // Send the command with command line to the peer id of the launcher
-        int success = igs_busSendStringToAgent(peerIdOfLauncher.toStdString().c_str(),
-                                               "%s %s",
-                                               command.toStdString().c_str(),
-                                               commandLine.toStdString().c_str());
-
-        qInfo() << "Send command" << command << "with command line" << commandLine << "to launcher" << peerIdOfLauncher << "with success ?" << success;
-    }
-}
-
-
-/**
  * @brief Slot when a command must be sent on the network to an agent about one of its output
  * @param peerIdsList
  * @param command
  * @param outputName
  */
-void NetworkController::onCommandAskedToAgentAboutOutput(QStringList peerIdsList, QString command, QString outputName)
+/*void NetworkController::onCommandAskedToAgentAboutOutput(QStringList peerIdsList, QString command, QString outputName)
 {
     if (!command.isEmpty() && !outputName.isEmpty() && (peerIdsList.count() > 0))
     {
@@ -193,7 +171,7 @@ void NetworkController::onCommandAskedToAgentAboutOutput(QStringList peerIdsList
             qInfo() << "Send command" << command << "for agent" << peerId << "and output" << outputName << "with success ?" << success;
         }
     }
-}
+}*/
 
 
 /**
@@ -203,7 +181,7 @@ void NetworkController::onCommandAskedToAgentAboutOutput(QStringList peerIdsList
  * @param agentIOPName
  * @param value
  */
-void NetworkController::onCommandAskedToAgentAboutSettingValue(QStringList peerIdsList, QString command, QString agentIOPName, QString value)
+/*void NetworkController::onCommandAskedToAgentAboutSettingValue(QStringList peerIdsList, QString command, QString agentIOPName, QString value)
 {
     if (!command.isEmpty() && !agentIOPName.isEmpty() && !value.isEmpty() && (peerIdsList.count() > 0))
     {
@@ -218,7 +196,7 @@ void NetworkController::onCommandAskedToAgentAboutSettingValue(QStringList peerI
             qInfo() << "Send command" << command << "for agent" << peerId << "and I/O/P" << agentIOPName << "about setting value" << value << "with success ?" << success;
         }
     }
-}
+}*/
 
 
 /**
@@ -229,7 +207,7 @@ void NetworkController::onCommandAskedToAgentAboutSettingValue(QStringList peerI
  * @param outputAgentName
  * @param outputName
  */
-void NetworkController::onCommandAskedToAgentAboutMappingInput(QStringList peerIdsList, QString command, QString inputName, QString outputAgentName, QString outputName)
+/*void NetworkController::onCommandAskedToAgentAboutMappingInput(QStringList peerIdsList, QString command, QString inputName, QString outputAgentName, QString outputName)
 {
     for (QString peerId : peerIdsList)
     {
@@ -242,7 +220,7 @@ void NetworkController::onCommandAskedToAgentAboutMappingInput(QStringList peerI
 
         qInfo() << "Send command" << command << "for agent" << peerId << "and input" << inputName << "about mapping on agent" << outputAgentName << "and output" << outputName << "with success ?" << success;
     }
-}
+}*/
 
 
 /**
@@ -371,8 +349,7 @@ void NetworkController::_onShoutedMessageReceived(QString peerId, QString peerNa
  */
 void NetworkController::_onWhisperedMessageReceived(QString peerId, QString peerName, zmsg_t* zMessage)
 {
-    std::unique_ptr<char> zmsg_str(zmsg_popstr(zMessage));
-    QString message(zmsg_str.get());
+    QString message = zmsg_popstr(zMessage);
 
     // MUTED / UN-MUTED
     if (message.startsWith(prefix_Muted))

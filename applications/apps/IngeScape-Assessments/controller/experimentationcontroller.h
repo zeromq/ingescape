@@ -17,7 +17,6 @@
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
-#include <model/jsonhelper.h>
 #include <controller/record/taskinstancecontroller.h>
 #include <model/experimentationm.h>
 
@@ -53,11 +52,9 @@ public:
     /**
      * @brief Constructor
      * @param modelManager
-     * @param jsonHelper
      * @param parent
      */
-    explicit ExperimentationController(JsonHelper* jsonHelper,
-                                       QObject *parent = nullptr);
+    explicit ExperimentationController(QObject *parent = nullptr);
 
 
     /**
@@ -201,9 +198,8 @@ protected: // Methods
     void _retrieveIndependentVariableValuesForTaskInstancesInExperimentation(ExperimentationM* experimentation);
 
 
-protected: // Attributes
-    // Helper to manage JSON files
-    JsonHelper* _jsonHelper;
+protected:
+
 };
 
 QML_DECLARE_TYPE(ExperimentationController)

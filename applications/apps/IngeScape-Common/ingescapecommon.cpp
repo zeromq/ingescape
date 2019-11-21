@@ -76,12 +76,11 @@ void IngeScapeCommon::registerIngeScapeQmlTypes()
     //
     //----------------
     qmlRegisterSingletonType<DebugQuickInspector>("INGESCAPE", 1, 0, "DebugQuickInspector", &DebugQuickInspector::qmlSingleton);
-    qmlRegisterSingletonType<IngeScapeNetworkController>("INGESCAPE", 1, 0, "IngeScapeNetworkC", &IngeScapeNetworkController::qmlSingleton);
+    qmlRegisterSingletonType<IngeScapeModelManager>("INGESCAPE", 1, 0, "IgsModelManager", &IngeScapeModelManager::qmlSingleton);
+    qmlRegisterSingletonType<IngeScapeNetworkController>("INGESCAPE", 1, 0, "IgsNetworkController", &IngeScapeNetworkController::qmlSingleton);
 
     qmlRegisterUncreatableType<AbstractScenarioController>("INGESCAPE", 1, 0, "AbstractScenarioController", "Internal Class");
     qmlRegisterUncreatableType<AbstractTimeActionslineScenarioViewController>("INGESCAPE", 1, 0, "AbstractTimeActionslineScenarioViewController", "Internal Class");
-    qmlRegisterUncreatableType<IngeScapeModelManager>("INGESCAPE", 1, 0, "IngeScapeModelManager", "Internal class");
-    //qmlRegisterUncreatableType<IngeScapeNetworkController>("INGESCAPE", 1, 0, "IngeScapeNetworkController", "Internal class");
     qmlRegisterUncreatableType<LicensesController>("INGESCAPE", 1, 0, "LicensesController", "Internal class");
     qmlRegisterUncreatableType<CallHomeController>("INGESCAPE", 1, 0, "CallHomeController", "Internal class");
 

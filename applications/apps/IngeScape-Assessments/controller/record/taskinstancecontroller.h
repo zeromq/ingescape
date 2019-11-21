@@ -19,7 +19,6 @@
 #include <I2PropertyHelpers.h>
 #include <controller/abstracttimeactionslinescenarioviewcontroller.h>
 #include <controller/abstractscenariocontroller.h>
-#include <model/jsonhelper.h>
 #include <model/taskinstancem.h>
 
 #include <controller/assessmentsmodelmanager.h>
@@ -51,11 +50,9 @@ public:
     /**
      * @brief Constructor
      * @param modelManager
-     * @param jsonHelper
      * @param parent
      */
-    explicit TaskInstanceController(JsonHelper* jsonHelper,
-                              QObject *parent = nullptr);
+    explicit TaskInstanceController(QObject *parent = nullptr);
 
 
     /**
@@ -86,11 +83,10 @@ private Q_SLOTS:
 
 
 private:
-    // Helper to manage JSON files
-    JsonHelper* _jsonHelper;
 
-    //Filtered list with all present agents
+    // Filtered list with all present agents
     AreAgentsInPlatformFilter _agentsGroupedByNameInCurrentPlatform;
+
 };
 
 QML_DECLARE_TYPE(TaskInstanceController)

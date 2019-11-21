@@ -23,17 +23,14 @@
 /**
  * @brief Constructor
  * @param modelManager
- * @param jsonHelper
  * @param parent
  */
-ExperimentationController::ExperimentationController(JsonHelper* jsonHelper,
-                                                     QObject *parent) : QObject(parent),
+ExperimentationController::ExperimentationController(QObject *parent) : QObject(parent),
     _taskInstanceC(nullptr),
     _currentExperimentation(nullptr),
     _peerIdOfRecorder(""),
     _peerNameOfRecorder(""),
-    _isRecorderON(false),
-    _jsonHelper(jsonHelper)
+    _isRecorderON(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -41,7 +38,7 @@ ExperimentationController::ExperimentationController(JsonHelper* jsonHelper,
     qInfo() << "New Experimentation Controller";
 
     // Create the controller to manage a record of the current experimentation
-    _taskInstanceC = new TaskInstanceController(_jsonHelper, this);
+    _taskInstanceC = new TaskInstanceController(this);
 }
 
 
@@ -67,9 +64,6 @@ ExperimentationController::~ExperimentationController()
         delete temp;
         temp = nullptr;
     }
-
-    // Reset pointers
-    _jsonHelper = nullptr;
 }
 
 

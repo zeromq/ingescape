@@ -18,6 +18,7 @@
 #include <QObject>
 //#include <QtQml>
 #include <I2PropertyHelpers.h>
+#include <misc/ingescapeutils.h>
 #include <model/enums.h>
 #include <model/jsonhelper.h>
 #include <model/publishedvaluem.h>
@@ -46,15 +47,28 @@ class IngeScapeModelManager : public QObject
 
 
 public:
+
+    /**
+     * @brief Accessor to the singleton instance
+     * @return
+     */
+    static IngeScapeModelManager* instance();
+
+
+    /**
+     * @brief Method used to provide a singleton to QML
+     * @param engine
+     * @param scriptEngine
+     * @return
+     */
+     static QObject* qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine);
+
+
     /**
      * @brief Constructor
-     * @param jsonHelper
-     * @param rootDirectoryPath
      * @param parent
      */
-    explicit IngeScapeModelManager(JsonHelper* jsonHelper,
-                                   QString rootDirectoryPath,
-                                   QObject *parent = nullptr);
+    explicit IngeScapeModelManager(QObject *parent = nullptr);
 
 
     /**
@@ -385,22 +399,16 @@ protected Q_SLOTS:
     void _onNetworkDataOfAgentWillBeCleared(QString peerId);
 
 
-protected:
+private:
 
     /**
      * @brief Create a new view model of agents grouped by name
      * @param model
      */
-    virtual void _createAgentsGroupedByName(AgentM* model);
+    void _createAgentsGroupedByName(AgentM* model);
 
 
-protected:
-
-    // Helper to manage JSON files
-    JsonHelper* _jsonHelper;
-
-    // Path to the root directory to load/save files
-    QString _rootDirectoryPath;
+private:
 
     // Map from a "peer id" to a model of agent
     QHash<QString, AgentM*> _hashFromPeerIdToAgent;

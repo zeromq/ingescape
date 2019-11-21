@@ -20,25 +20,49 @@
 #include <I2Quick.h>
 
 
+// Define our singleton instance
+// Creates a global and static object of type QGlobalStatic, of name _singletonInstance and that behaves as a pointer to EditorModelManager.
+// The object created by Q_GLOBAL_STATIC initializes itself on the first use, which means that it will not increase the application or the library's load time.
+// Additionally, the object is initialized in a thread-safe manner on all platforms.
+Q_GLOBAL_STATIC(EditorModelManager, _singletonInstance)
+
+
+/**
+ * @brief Get our singleton instance
+ * @return
+ */
+EditorModelManager* EditorModelManager::instance()
+{
+    return _singletonInstance;
+}
+
+
+/**
+ * @brief Method used to provide a singleton to QML
+ * @param engine
+ * @param scriptEngine
+ * @return
+ */
+QObject* EditorModelManager::qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine)
+{
+    Q_UNUSED(engine);
+    Q_UNUSED(scriptEngine);
+
+    return _singletonInstance;
+}
+
+
 /**
  * @brief Constructor
- * @param jsonHelper
- * @param rootDirectoryPath
  * @param parent
  */
-EditorModelManager::EditorModelManager(JsonHelper* jsonHelper,
-                                       QString rootDirectoryPath,
-                                       QObject *parent) : IngeScapeModelManager(jsonHelper,
-                                                                                rootDirectoryPath,
-                                                                                parent),
-    //_isMappingActivated(false),
+EditorModelManager::EditorModelManager(QObject *parent) : QObject(parent),
     _isMappingControlled(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     qInfo() << "New IngeScape Editor Model Manager";
-
 }
 
 
@@ -51,9 +75,6 @@ EditorModelManager::~EditorModelManager()
 
     // Clear all opened definitions
     _openedDefinitions.clear();
-
-    // Mother class is automatically called
-    //IngeScapeModelManager::~IngeScapeModelManager();
 }
 
 
@@ -87,67 +108,64 @@ QJsonArray EditorModelManager::exportAgentsToJSON()
 {
     QJsonArray jsonArrayAgentsGroupedByName = QJsonArray();
 
-    if (_jsonHelper != nullptr)
+    // List of all groups (of agents) grouped by name
+    for (AgentsGroupedByNameVM* agentsGroupedByName : IngeScapeModelManager::instance()->allAgentsGroupsByName()->toList())
     {
-        // List of all groups (of agents) grouped by name
-        for (AgentsGroupedByNameVM* agentsGroupedByName : _allAgentsGroupsByName.toList())
+        if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty())
         {
-            if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty())
+            QJsonObject jsonAgentsGroupedByName = QJsonObject();
+
+            // Name
+            jsonAgentsGroupedByName.insert("agentName", agentsGroupedByName->name());
+
+            QJsonArray jsonArrayAgentsGroupedByDefinition = QJsonArray();
+
+            // List of all groups (of agents) grouped by definition
+            for (AgentsGroupedByDefinitionVM* agentsGroupedByDefinition : agentsGroupedByName->allAgentsGroupsByDefinition()->toList())
             {
-                QJsonObject jsonAgentsGroupedByName = QJsonObject();
-
-                // Name
-                jsonAgentsGroupedByName.insert("agentName", agentsGroupedByName->name());
-
-                QJsonArray jsonArrayAgentsGroupedByDefinition = QJsonArray();
-
-                // List of all groups (of agents) grouped by definition
-                for (AgentsGroupedByDefinitionVM* agentsGroupedByDefinition : agentsGroupedByName->allAgentsGroupsByDefinition()->toList())
+                if (agentsGroupedByDefinition != nullptr)
                 {
-                    if (agentsGroupedByDefinition != nullptr)
+                    QJsonObject jsonAgentsGroupedByDefinition = QJsonObject();
+
+                    // Definition
+                    if (agentsGroupedByDefinition->definition() != nullptr)
                     {
-                        QJsonObject jsonAgentsGroupedByDefinition = QJsonObject();
-
-                        // Definition
-                        if (agentsGroupedByDefinition->definition() != nullptr)
-                        {
-                            QJsonObject jsonDefinition = _jsonHelper->exportAgentDefinitionToJson(agentsGroupedByDefinition->definition());
-                            jsonAgentsGroupedByDefinition.insert("definition", jsonDefinition);
-                        }
-                        else {
-                            jsonAgentsGroupedByDefinition.insert("definition", QJsonValue());
-                        }
-
-                        // Clones (models)
-                        QJsonArray jsonClones = QJsonArray();
-
-                        for (AgentM* model : agentsGroupedByDefinition->models()->toList())
-                        {
-                            // Hostname and Command Line must be defined to be added to the array of clones
-                            if ((model != nullptr) && !model->hostname().isEmpty() && !model->commandLine().isEmpty())
-                            {
-                                qDebug() << "Export" << model->name() << "on" << model->hostname() << "at" << model->commandLine() << "(" << model->peerId() << ")";
-
-                                QJsonObject jsonClone = QJsonObject();
-                                jsonClone.insert("hostname", model->hostname());
-                                jsonClone.insert("commandLine", model->commandLine());
-                                //jsonClone.insert("peerId", model->peerId());
-                                //jsonClone.insert("address", model->address());
-
-                                jsonClones.append(jsonClone);
-                            }
-                        }
-
-                        jsonAgentsGroupedByDefinition.insert("clones", jsonClones);
-
-                        jsonArrayAgentsGroupedByDefinition.append(jsonAgentsGroupedByDefinition);
+                        QJsonObject jsonDefinition = JsonHelper::exportAgentDefinitionToJson(agentsGroupedByDefinition->definition());
+                        jsonAgentsGroupedByDefinition.insert("definition", jsonDefinition);
                     }
+                    else {
+                        jsonAgentsGroupedByDefinition.insert("definition", QJsonValue());
+                    }
+
+                    // Clones (models)
+                    QJsonArray jsonClones = QJsonArray();
+
+                    for (AgentM* model : agentsGroupedByDefinition->models()->toList())
+                    {
+                        // Hostname and Command Line must be defined to be added to the array of clones
+                        if ((model != nullptr) && !model->hostname().isEmpty() && !model->commandLine().isEmpty())
+                        {
+                            qDebug() << "Export" << model->name() << "on" << model->hostname() << "at" << model->commandLine() << "(" << model->peerId() << ")";
+
+                            QJsonObject jsonClone = QJsonObject();
+                            jsonClone.insert("hostname", model->hostname());
+                            jsonClone.insert("commandLine", model->commandLine());
+                            //jsonClone.insert("peerId", model->peerId());
+                            //jsonClone.insert("address", model->address());
+
+                            jsonClones.append(jsonClone);
+                        }
+                    }
+
+                    jsonAgentsGroupedByDefinition.insert("clones", jsonClones);
+
+                    jsonArrayAgentsGroupedByDefinition.append(jsonAgentsGroupedByDefinition);
                 }
-
-                jsonAgentsGroupedByName.insert("definitions", jsonArrayAgentsGroupedByDefinition);
-
-                jsonArrayAgentsGroupedByName.append(jsonAgentsGroupedByName);
             }
+
+            jsonAgentsGroupedByName.insert("definitions", jsonArrayAgentsGroupedByDefinition);
+
+            jsonArrayAgentsGroupedByName.append(jsonAgentsGroupedByName);
         }
     }
     return jsonArrayAgentsGroupedByName;
@@ -162,7 +180,7 @@ void EditorModelManager::exportAgentsListToSelectedFile()
     // "File Dialog" to get the file (path) to save
     QString agentsListFilePath = QFileDialog::getSaveFileName(nullptr,
                                                               tr("Save agents"),
-                                                              _rootDirectoryPath,
+                                                              IngeScapeUtils::getRootPath(),
                                                               tr("List of agents (*.json)")
                                                               );
 
@@ -264,88 +282,26 @@ void EditorModelManager::duplicateAgentWithNewCommandLine(AgentM* agent, QString
          }
 
          // Duplicate the agent with the new command line
-         createAgentModel(agent->name(),
-                          copyOfDefinition,
-                          agent->hostname(),
-                          newCommandLine);
+         IngeScapeModelManager::instance()->createAgentModel(agent->name(),
+                                                             copyOfDefinition,
+                                                             agent->hostname(),
+                                                             newCommandLine);
     }
 }
 
 
 /**
- * @brief Slot called when an agent definition has been received and must be processed
- * @param peer Id
- * @param agent name
- * @param definition in JSON format
+ * @brief Slot called when a new view model of agents grouped by name has been created
+ * @param agentsGroupedByName
  */
-/*void EditorModelManager::onDefinitionReceived(QString peerId, QString agentName, QString definitionJSON)
+void EditorModelManager::onAgentsGroupedByNameHasBeenCreated(AgentsGroupedByNameVM* agentsGroupedByName)
 {
-    Q_UNUSED(agentName)
-
-    AgentM* agent = getAgentModelFromPeerId(peerId);
-
-    if ((agent != nullptr) && (_jsonHelper != nullptr) && !definitionJSON.isEmpty())
+    if (agentsGroupedByName != nullptr)
     {
-        // Save the previous agent definition
-        DefinitionM* previousDefinition = agent->definition();
-
-        // Create the new model of agent definition from JSON
-        DefinitionM* newDefinition = _jsonHelper->createModelOfAgentDefinitionFromBytes(definitionJSON.toUtf8());
-
-        if (newDefinition != nullptr)
-        {
-            // Set this new definition to the agent
-            agent->setdefinition(newDefinition);
-
-            // Free memory
-            if (previousDefinition != nullptr) {
-                delete previousDefinition;
-            }
-        }
+        // Connect to signals from this new view model of agents grouped by definition
+        connect(agentsGroupedByName, &AgentsGroupedByNameVM::definitionsToOpen, this, &EditorModelManager::_onDefinitionsToOpen);
     }
-}*/
-
-
-/**
- * @brief Slot called when an agent mapping has been received and must be processed
- * @param peer Id
- * @param agent name
- * @param mapping in JSON format
- */
-/*void EditorModelManager::onMappingReceived(QString peerId, QString agentName, QString mappingJSON)
-{
-    AgentM* agent = getAgentModelFromPeerId(peerId);
-
-    if ((agent != nullptr) && (_jsonHelper != nullptr))
-    {
-        // Save the previous agent mapping
-        AgentMappingM* previousMapping = agent->mapping();
-
-        AgentMappingM* newMapping = nullptr;
-
-        if (mappingJSON.isEmpty())
-        {
-            QString mappingName = QString("EMPTY MAPPING of %1").arg(agentName);
-            newMapping = new AgentMappingM(mappingName, "", "");
-        }
-        else
-        {
-            // Create the new model of agent mapping from the JSON
-            newMapping = _jsonHelper->createModelOfAgentMappingFromBytes(agentName, mappingJSON.toUtf8());
-        }
-
-        if (newMapping != nullptr)
-        {
-            // Set this new mapping to the agent
-            agent->setmapping(newMapping);
-
-            // Free memory
-            if (previousMapping != nullptr) {
-                delete previousMapping;
-            }
-        }
-    }
-}*/
+}
 
 
 /**
@@ -496,28 +452,6 @@ void EditorModelManager::onAgentMappingFilePath(QString peerId, QString mappingF
 void EditorModelManager::_onDefinitionsToOpen(QList<DefinitionM*> definitionsList)
 {
     _openDefinitions(definitionsList);
-}
-
-
-/**
- * @brief Create a new view model of agents grouped by name
- * @param model
- */
-void EditorModelManager::_createAgentsGroupedByName(AgentM* model)
-{
-    // Call our mother class
-    IngeScapeModelManager::_createAgentsGroupedByName(model);
-
-    if ((model != nullptr) && !model->name().isEmpty())
-    {
-        // Get the (view model of) agents grouped for this name
-        AgentsGroupedByNameVM* agentsGroupedByName = getAgentsGroupedForName(model->name());
-        if (agentsGroupedByName != nullptr)
-        {
-            // Connect to signals from this new view model of agents grouped by definition
-            connect(agentsGroupedByName, &AgentsGroupedByNameVM::definitionsToOpen, this, &EditorModelManager::_onDefinitionsToOpen);
-        }
-    }
 }
 
 

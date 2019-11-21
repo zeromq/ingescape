@@ -47,7 +47,6 @@ public:
     /**
      * @brief Constructor
      * @param modelManager
-     * @param jsonHelper
      * @param parent
      */
     explicit TasksController(QObject *parent = nullptr);

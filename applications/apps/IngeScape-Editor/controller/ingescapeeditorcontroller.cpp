@@ -66,7 +66,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _hasAPlatformBeenLoadedByUser(false),
     _gettingStartedShowAtStartup(true),
     _terminationSignalWatcher(nullptr),
-    _jsonHelper(nullptr),
     _platformDirectoryPath(""),
     _platformDefaultFilePath(""),
     _currentPlatformFilePath(""),
@@ -169,14 +168,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     settings.endGroup();
 
 
-    //
-    // Create the helper to manage JSON files
-    //
-    _jsonHelper = new JsonHelper(this);
-
-
-
-
     //-------------------------------
     //
     // Command line options
@@ -212,7 +203,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     //-------------------------------
 
     // Create the manager for the data model of our IngeScape Editor application
-    _modelManager = new EditorModelManager(_jsonHelper, rootPath, this);
+    _modelManager = new EditorModelManager(this);
 
     IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
 
@@ -220,7 +211,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _networkC = new NetworkController(this);
 
     // Create the controller to manage the agents list
-    _agentsSupervisionC = new AgentsSupervisionController(_modelManager, _jsonHelper, this);
+    _agentsSupervisionC = new AgentsSupervisionController(_modelManager, this);
 
     // Create the controller to manage hosts
     _hostsSupervisionC = new HostsSupervisionController(_modelManager, this);
@@ -229,13 +220,13 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _recordsSupervisionC = new RecordsSupervisionController(_modelManager, this);
 
     // Create the controller to manage the agents mapping
-    _agentsMappingC = new AgentsMappingController(_modelManager, _jsonHelper, this);
+    _agentsMappingC = new AgentsMappingController(_modelManager, this);
 
     // Create the controller to manage the call home at startup
     _callHomeC = new CallHomeController(this);
 
     // Create the controller to manage the scenario
-    _scenarioC = new ScenarioController(_modelManager, _jsonHelper, this);
+    _scenarioC = new ScenarioController(_modelManager, this);
 
     // Create the controller to manage the history of values
     _valuesHistoryC = new ValuesHistoryController(_modelManager, this);
@@ -309,6 +300,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_modelManager, &EditorModelManager::hostModelWillBeDeleted, _hostsSupervisionC, &HostsSupervisionController::onHostModelWillBeDeleted);
     connect(_modelManager, &EditorModelManager::previousHostParsed, _hostsSupervisionC, &HostsSupervisionController::onPreviousHostParsed);
 
+    connect(IngeScapeModelManager::instance(), &IngeScapeModelManager::agentsGroupedByNameHasBeenCreated, _modelManager, &EditorModelManager::onAgentsGroupedByNameHasBeenCreated);
     connect(_modelManager, &EditorModelManager::agentsGroupedByNameHasBeenCreated, _valuesHistoryC, &ValuesHistoryController::onAgentsGroupedByNameHasBeenCreated);
     connect(_modelManager, &EditorModelManager::agentsGroupedByNameHasBeenCreated, _agentsMappingC, &AgentsMappingController::onAgentsGroupedByNameHasBeenCreated);
     connect(_modelManager, &EditorModelManager::agentsGroupedByNameWillBeDeleted, _agentsMappingC, &AgentsMappingController::onAgentsGroupedByNameWillBeDeleted);
@@ -325,8 +317,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_agentsSupervisionC, &AgentsSupervisionController::openValuesHistoryOfAgent, _valuesHistoryC, &ValuesHistoryController::filterValuesToShowOnlyAgent);
     connect(_agentsSupervisionC, &AgentsSupervisionController::openLogStreamOfAgents, this, &IngeScapeEditorController::_onOpenLogStreamOfAgents);
 
-    // Connect to signals from the controller for supervision of hosts
-    connect(_hostsSupervisionC, &HostsSupervisionController::commandAskedToLauncher, networkC, &NetworkController::onCommandAskedToLauncher);
 
     // Connect to signals from the controller for mapping of agents
     connect(_agentsMappingC, &AgentsMappingController::commandAskedToAgentAboutMappingInput, networkC, &NetworkController::onCommandAskedToAgentAboutMappingInput);
@@ -585,21 +575,14 @@ IngeScapeEditorController::~IngeScapeEditorController()
         temp = nullptr;
     }
 
-    if (NetworkController::instance() != nullptr)
+    if (_networkC != nullptr)
     {
-        disconnect(NetworkController::instance());
+        disconnect(_networkC);
 
-        //NetworkController* temp = networkC;
-        //setnetworkC(nullptr);
-        //delete temp;
-        //temp = nullptr;
-    }
-
-    // Delete json helper
-    if (_jsonHelper != nullptr)
-    {
-        delete _jsonHelper;
-        _jsonHelper = nullptr;
+        NetworkController* temp = _networkC;
+        setnetworkC(nullptr);
+        delete temp;
+        temp = nullptr;
     }
 
     qInfo() << "Delete IngeScape Editor Controller";
@@ -1707,56 +1690,50 @@ bool IngeScapeEditorController::_loadPlatformFromJSON(QJsonDocument jsonDocument
 QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
 {
     QJsonDocument jsonDocument;
+    QJsonObject platformJsonObject;
 
-    if (_jsonHelper != nullptr)
+    platformJsonObject.insert("version", VERSION_JSON_PLATFORM);
+
+    // Save the agents
+    if (_modelManager != nullptr)
     {
-        QJsonObject platformJsonObject;
-
-        platformJsonObject.insert("version", VERSION_JSON_PLATFORM);
-
-        // Save the agents
-        if (_modelManager != nullptr)
-        {
-            // Export the agents into JSON
-            QJsonArray arrayOfAgents = _modelManager->exportAgentsToJSON();
-            platformJsonObject.insert("agents", arrayOfAgents);
-        }
-
-        // Save the mapping
-        if (_agentsMappingC != nullptr)
-        {
-            // Export the global mapping (of agents) into JSON
-            QJsonArray arrayOfAgentsInMapping = _agentsMappingC->exportGlobalMappingToJSON();
-            platformJsonObject.insert("mapping", arrayOfAgentsInMapping);
-        }
-
-        // Save the scenario
-        if (_scenarioC != nullptr)
-        {
-            // actions list
-            // actions list in the palette
-            // actions list in the timeline
-            QJsonObject jsonScenario = _jsonHelper->exportScenario(_scenarioC->actionsList()->toList(),
-                                                                   _scenarioC->actionsInPaletteList()->toList(),
-                                                                   _scenarioC->actionsInTimeLine()->toList());
-
-            platformJsonObject.insert("scenario", jsonScenario);
-        }
-
-        // Save timeline settings
-        if ((_timeLineC != nullptr))
-        {
-            // Zoom level (actual pixels number per minute in timeline)
-            QJsonObject jsonTimeline;
-            jsonTimeline.insert("pixels_per_minute", _timeLineC->pixelsPerMinute());
-
-            platformJsonObject.insert("timeline", jsonTimeline);
-        }
-
-        jsonDocument = QJsonDocument(platformJsonObject);
+        // Export the agents into JSON
+        QJsonArray arrayOfAgents = _modelManager->exportAgentsToJSON();
+        platformJsonObject.insert("agents", arrayOfAgents);
     }
 
-    return jsonDocument;
+    // Save the mapping
+    if (_agentsMappingC != nullptr)
+    {
+        // Export the global mapping (of agents) into JSON
+        QJsonArray arrayOfAgentsInMapping = _agentsMappingC->exportGlobalMappingToJSON();
+        platformJsonObject.insert("mapping", arrayOfAgentsInMapping);
+    }
+
+    // Save the scenario
+    if (_scenarioC != nullptr)
+    {
+        // actions list
+        // actions list in the palette
+        // actions list in the timeline
+        QJsonObject jsonScenario = JsonHelper::exportScenario(_scenarioC->actionsList()->toList(),
+                                                              _scenarioC->actionsInPaletteList()->toList(),
+                                                              _scenarioC->actionsInTimeLine()->toList());
+
+        platformJsonObject.insert("scenario", jsonScenario);
+    }
+
+    // Save timeline settings
+    if ((_timeLineC != nullptr))
+    {
+        // Zoom level (actual pixels number per minute in timeline)
+        QJsonObject jsonTimeline;
+        jsonTimeline.insert("pixels_per_minute", _timeLineC->pixelsPerMinute());
+
+        platformJsonObject.insert("timeline", jsonTimeline);
+    }
+
+    return QJsonDocument(platformJsonObject);
 }
 
 

@@ -483,9 +483,6 @@ private:
     // To subscribe to termination signals
     TerminationSignalWatcher *_terminationSignalWatcher;
 
-    // Helper to manage JSON files
-    JsonHelper* _jsonHelper;
-
     // Path to the directory containing JSON files about platforms
     QString _platformDirectoryPath;
 

@@ -86,11 +86,9 @@ public:
     /**
      * @brief Constructor
      * @param modelManager
-     * @param jsonHelper
      * @param parent
      */
     explicit AbstractScenarioController(IngeScapeModelManager* modelManager,
-                                        JsonHelper* jsonHelper,
                                         QObject *parent = nullptr);
 
 
@@ -339,9 +337,6 @@ protected:
 
     // Manager for the data model of IngeScape
     IngeScapeModelManager* _modelManager;
-
-    // Helper to manage JSON files
-    JsonHelper* _jsonHelper;
 
     // List of all action names
     QStringList _allActionNames;

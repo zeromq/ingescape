@@ -71,11 +71,9 @@ public:
     /**
      * @brief Constructor
      * @param modelManager
-     * @param jsonHelper
      * @param parent
      */
     explicit AgentsMappingController(EditorModelManager* modelManager,
-                                     JsonHelper* jsonHelper,
                                      QObject *parent = nullptr);
 
 
@@ -547,9 +545,6 @@ private:
 
     // Manager for the data model of IngeScape
     EditorModelManager* _modelManager;
-
-    // Helper to manage JSON files
-    JsonHelper* _jsonHelper;
 
     // Hash table from agent name to the (view model of) agent in mapping
     QHash<QString, AgentInMappingVM*> _hashFromNameToAgentInMapping;

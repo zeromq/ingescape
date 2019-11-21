@@ -106,7 +106,7 @@ Rectangle {
             }
 
             Text {
-                text: "- " + NetworkC.numberOfAgents + " agents"
+                text: "- " + IgsNetworkController.numberOfAgents + " agents"
 
                 color: "white"
                 font {
@@ -116,7 +116,7 @@ Rectangle {
             }
 
             Text {
-                text: "- " + NetworkC.numberOfLaunchers + " launchers"
+                text: "- " + IgsNetworkController.numberOfLaunchers + " launchers"
 
                 color: "white"
                 font {
@@ -126,7 +126,7 @@ Rectangle {
             }
 
             Text {
-                text: "- " + NetworkC.numberOfRecorders + " recorders"
+                text: "- " + IgsNetworkController.numberOfRecorders + " recorders"
 
                 color: "white"
                 font {
@@ -136,7 +136,7 @@ Rectangle {
             }
 
             Text {
-                text: "- " + NetworkC.numberOfEditors + " editors"
+                text: "- " + IgsNetworkController.numberOfEditors + " editors"
 
                 color: "white"
                 font {
@@ -146,7 +146,7 @@ Rectangle {
             }
 
             Text {
-                text: "- " + NetworkC.numberOfAssessments + " assessments"
+                text: "- " + IgsNetworkController.numberOfAssessments + " assessments"
 
                 color: "white"
                 font {
@@ -156,7 +156,7 @@ Rectangle {
             }
 
             Text {
-                text: "- " + NetworkC.numberOfExpes + " expes"
+                text: "- " + IgsNetworkController.numberOfExpes + " expes"
 
                 color: "white"
                 font {

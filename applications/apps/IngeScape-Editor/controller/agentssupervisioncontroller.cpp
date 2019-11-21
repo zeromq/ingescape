@@ -23,33 +23,19 @@
 
 /**
  * @brief Constructor
- * @param modelManager
- * @param jsonHelper
  * @param parent
  */
-AgentsSupervisionController::AgentsSupervisionController(EditorModelManager* modelManager,
-                                                         JsonHelper* jsonHelper,
-                                                         QObject *parent) : QObject(parent),
-    _selectedAgent(nullptr),
-    _modelManager(modelManager),
-    _jsonHelper(jsonHelper)
+AgentsSupervisionController::AgentsSupervisionController(QObject *parent) : QObject(parent),
+    _selectedAgent(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    if (_modelManager != nullptr)
-    {
-        // Agents are sorted on their name (alphabetical order)
-        _agentsList.setSortProperty("name");
+    // Agents are sorted on their name (alphabetical order)
+    _agentsList.setSortProperty("name");
 
-        // FIXME TODO: Add another property for sorting, because variants can provoke re-order in the list
-        //_agentsList.setSortProperty("TODO");
-
-        //_agentsList.setFilterProperty("TODO");
-        //_agentsList.setFilterFixedString("true");
-        //_agentsList.setFilterProperty("currentState");
-        //_agentsList.setFilterFixedString(QString::number(SegmentZoneStates::ENCOMBRE));
-    }
+    // FIXME TODO: Add another property for sorting, because variants can provoke re-order in the list
+    //_agentsList.setSortProperty("TODO");
 }
 
 
@@ -68,10 +54,6 @@ AgentsSupervisionController::~AgentsSupervisionController()
     // Deleted elsewhere (in the destructor of AgentsGroupedByNameVM)
     //_agentsList.deleteAllItems();
     _agentsList.clear();
-
-    // Reset pointers
-    _modelManager = nullptr;
-    _jsonHelper = nullptr;
 }
 
 
@@ -81,11 +63,11 @@ AgentsSupervisionController::~AgentsSupervisionController()
  */
 void AgentsSupervisionController::deleteAgentInList(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition)
 {
-    if ((_modelManager != nullptr) && (agentsGroupedByDefinition != nullptr))
+    if (agentsGroupedByDefinition != nullptr)
     {
         qInfo() << "Delete the agent" << agentsGroupedByDefinition->name() << "in the List";
 
-        AgentsGroupedByNameVM* agentsGroupedByName = _modelManager->getAgentsGroupedForName(agentsGroupedByDefinition->name());
+        AgentsGroupedByNameVM* agentsGroupedByName = IngeScapeModelManager::instance()->getAgentsGroupedForName(agentsGroupedByDefinition->name());
         if (agentsGroupedByName != nullptr) {
             // Delete the view model of agents grouped by definition
             agentsGroupedByName->deleteAgentsGroupedByDefinition(agentsGroupedByDefinition);
@@ -192,14 +174,11 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted(Agent
  */
 void AgentsSupervisionController::_onCommandAskedToLauncher(QString hostname, QString command, QString commandLine)
 {
-    if (_modelManager != nullptr)
+    // Get the peer id of the Launcher on this host
+    QString peerIdOfLauncher = IngeScapeModelManager::instance()->getPeerIdOfLauncherOnHost(hostname);
+    if (!peerIdOfLauncher.isEmpty())
     {
-        // Get the peer id of the Launcher on this host
-        QString peerIdOfLauncher = _modelManager->getPeerIdOfLauncherOnHost(hostname);
-        if (!peerIdOfLauncher.isEmpty())
-        {
-            Q_EMIT commandAskedToLauncher(peerIdOfLauncher, command, commandLine);
-        }
+        Q_EMIT commandAskedToLauncher(peerIdOfLauncher, command, commandLine);
     }
 }
 
@@ -212,7 +191,7 @@ void AgentsSupervisionController::_onCommandAskedToLauncher(QString hostname, QS
 void AgentsSupervisionController::_onLoadAgentDefinitionFromPath(QStringList peerIdsList, QString definitionFilePath)
 {
     AgentsGroupedByDefinitionVM* agentsGroupedByDefinition = qobject_cast<AgentsGroupedByDefinitionVM*>(sender());
-    if ((_jsonHelper != nullptr) && (agentsGroupedByDefinition != nullptr) && !peerIdsList.isEmpty() && !definitionFilePath.isEmpty())
+    if ((agentsGroupedByDefinition != nullptr) && !peerIdsList.isEmpty() && !definitionFilePath.isEmpty())
     {
         QFile jsonFile(definitionFilePath);
         if (jsonFile.open(QIODevice::ReadOnly))
@@ -246,7 +225,7 @@ void AgentsSupervisionController::_onLoadAgentDefinitionFromPath(QStringList pee
 void AgentsSupervisionController::_onLoadAgentMappingFromPath(QStringList peerIdsList, QString mappingFilePath)
 {
     AgentsGroupedByDefinitionVM* agentsGroupedByDefinition = qobject_cast<AgentsGroupedByDefinitionVM*>(sender());
-    if ((_jsonHelper != nullptr) && (agentsGroupedByDefinition != nullptr) && !peerIdsList.isEmpty() && !mappingFilePath.isEmpty())
+    if ((agentsGroupedByDefinition != nullptr) && !peerIdsList.isEmpty() && !mappingFilePath.isEmpty())
     {
         QFile jsonFile(mappingFilePath);
         if (jsonFile.open(QIODevice::ReadOnly))
@@ -281,10 +260,10 @@ void AgentsSupervisionController::_onLoadAgentMappingFromPath(QStringList peerId
 void AgentsSupervisionController::_onDownloadAgentDefinitionToPath(DefinitionM* agentDefinition, QString definitionFilePath)
 {
     AgentsGroupedByDefinitionVM* agentsGroupedByDefinition = qobject_cast<AgentsGroupedByDefinitionVM*>(sender());
-    if ((_jsonHelper != nullptr) && (agentsGroupedByDefinition != nullptr) && (agentDefinition != nullptr) && !definitionFilePath.isEmpty())
+    if ((agentsGroupedByDefinition != nullptr) && (agentDefinition != nullptr) && !definitionFilePath.isEmpty())
     {
         // Get the JSON of the agent definition
-        QString jsonOfDefinition = _jsonHelper->getJsonOfAgentDefinition(agentDefinition, QJsonDocument::Indented);
+        QString jsonOfDefinition = JsonHelper::getJsonOfAgentDefinition(agentDefinition, QJsonDocument::Indented);
         if (!jsonOfDefinition.isEmpty())
         {
             QFile jsonFile(definitionFilePath);
@@ -313,10 +292,10 @@ void AgentsSupervisionController::_onDownloadAgentDefinitionToPath(DefinitionM* 
 void AgentsSupervisionController::_onDownloadAgentMappingToPath(AgentMappingM* agentMapping, QString mappingFilePath)
 {
     AgentsGroupedByDefinitionVM* agentsGroupedByDefinition = qobject_cast<AgentsGroupedByDefinitionVM*>(sender());
-    if ((_jsonHelper != nullptr) && (agentsGroupedByDefinition != nullptr) && (agentMapping != nullptr) && !mappingFilePath.isEmpty())
+    if ((agentsGroupedByDefinition != nullptr) && (agentMapping != nullptr) && !mappingFilePath.isEmpty())
     {
         // Get the JSON of the agent mapping
-        QString jsonOfMapping = _jsonHelper->getJsonOfAgentMapping(agentMapping, QJsonDocument::Indented);
+        QString jsonOfMapping = JsonHelper::getJsonOfAgentMapping(agentMapping, QJsonDocument::Indented);
         if (!jsonOfMapping.isEmpty())
         {
             QFile jsonFile(mappingFilePath);

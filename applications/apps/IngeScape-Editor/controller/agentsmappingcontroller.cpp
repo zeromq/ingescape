@@ -18,7 +18,6 @@
 #include <QQmlEngine>
 #include <QDebug>
 #include <QFileDialog>
-#include <misc/ingescapeutils.h>
 #include <model/editorenums.h>
 #include <model/actionmappingm.h>
 #include <controller/ingescapenetworkcontroller.h>
@@ -27,12 +26,10 @@
 /**
  * @brief Constructor
  * @param modelManager
- * @param jsonHelper
  * @param directoryPath
  * @param parent
  */
 AgentsMappingController::AgentsMappingController(EditorModelManager* modelManager,
-                                                 JsonHelper* jsonHelper,
                                                  QObject *parent) : QObject(parent),
       _viewWidth(1920 - 320), // Full HD - Width of left panel
       _viewHeight(1080 - 100), // Full HD - Height of top & bottom bars of OS
@@ -43,8 +40,7 @@ AgentsMappingController::AgentsMappingController(EditorModelManager* modelManage
       _selectedAction(nullptr),
       _selectedLink(nullptr),
       _isLoadedView(false),
-      _modelManager(modelManager),
-      _jsonHelper(jsonHelper)
+      _modelManager(modelManager)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -87,7 +83,6 @@ AgentsMappingController::~AgentsMappingController()
 
     // Reset pointers
     _modelManager = nullptr;
-    _jsonHelper = nullptr;
 }
 
 
@@ -746,7 +741,7 @@ QJsonArray AgentsMappingController::exportGlobalMappingToJSON()
 {
     QJsonArray jsonArray;
 
-    if ((_jsonHelper != nullptr) && (_modelManager != nullptr))
+    if (_modelManager != nullptr)
     {
         // Copy the list of links
         QList<LinkVM*> linksList = _allLinksInMapping.toList();
@@ -779,7 +774,7 @@ QJsonArray AgentsMappingController::exportGlobalMappingToJSON()
                 if (_modelManager->isMappingConnected() && agentInMapping->agentsGroupedByName()->isON())
                 {
                     // Export the current mapping
-                    jsonMapping = _jsonHelper->exportAgentMappingToJson(agentInMapping->agentsGroupedByName()->currentMapping());
+                    jsonMapping = JsonHelper::exportAgentMappingToJson(agentInMapping->agentsGroupedByName()->currentMapping());
                 }
                 // The global mapping is NOT activated OR the agent is OFF
                 else
@@ -793,14 +788,14 @@ QJsonArray AgentsMappingController::exportGlobalMappingToJSON()
                         QStringList namesOfRemovedMappingElements = agentInMapping->getNamesOfRemovedMappingElements_WhileMappingWasUNactivated();
 
                         // Export the current mapping with changes (applied while the global mapping was UN-activated) into a JSON objec
-                        jsonMapping = _jsonHelper->exportAgentMappingWithChangesToJson(agentInMapping->agentsGroupedByName()->currentMapping(),
-                                                                                       addedMappingElements,
-                                                                                       namesOfRemovedMappingElements);
+                        jsonMapping = JsonHelper::exportAgentMappingWithChangesToJson(agentInMapping->agentsGroupedByName()->currentMapping(),
+                                                                                      addedMappingElements,
+                                                                                      namesOfRemovedMappingElements);
                     }
                     else
                     {
                         // Export the current mapping
-                        jsonMapping = _jsonHelper->exportAgentMappingToJson(agentInMapping->agentsGroupedByName()->currentMapping());
+                        jsonMapping = JsonHelper::exportAgentMappingToJson(agentInMapping->agentsGroupedByName()->currentMapping());
                     }
                 }
                 jsonAgent.insert("mapping", jsonMapping);
@@ -936,7 +931,7 @@ QJsonArray AgentsMappingController::exportGlobalMappingToJSON()
  */
 void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgentsInMapping)
 {
-    if ((_modelManager != nullptr) && (_jsonHelper != nullptr))
+    if (_modelManager != nullptr)
     {
         QList<QPair<AgentInMappingVM*, AgentMappingM*>> listOfAgentsAndMappingToAgents;
         QList<QPair<AgentInMappingVM*, ActionMappingM*>> listOfAgentsAndMappingToActions;
@@ -996,7 +991,7 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
                         QString agentName = jsonName.toString();
 
                         // Create the agent mapping from JSON
-                        AgentMappingM* agentMapping = _jsonHelper->createModelOfAgentMappingFromJSON(agentName, jsonMapping.toObject());
+                        AgentMappingM* agentMapping = JsonHelper::createModelOfAgentMappingFromJSON(agentName, jsonMapping.toObject());
 
 
                         //
@@ -1383,7 +1378,7 @@ void AgentsMappingController::resetModificationsWhileMappingWasUNactivated()
  */
 void AgentsMappingController::onIsMappingConnectedChanged(bool isMappingConnected)
 {
-    if ((_modelManager != nullptr) && (_jsonHelper != nullptr) && isMappingConnected)
+    if ((_modelManager != nullptr) && isMappingConnected)
     {
         // CONTROL
         if (_modelManager->isMappingControlled())
@@ -2724,8 +2719,7 @@ QString AgentsMappingController::_getJSONofMappingOfAgentInGlobalMapping(AgentIn
 {
     QString jsonOfMapping;
 
-    if ((agentInMapping != nullptr) && (agentInMapping->agentsGroupedByName() != nullptr) && (agentInMapping->agentsGroupedByName()->currentMapping() != nullptr)
-            && (_jsonHelper != nullptr))
+    if ((agentInMapping != nullptr) && (agentInMapping->agentsGroupedByName() != nullptr) && (agentInMapping->agentsGroupedByName()->currentMapping() != nullptr))
     {
         if (agentInMapping->hadLinksAdded_WhileMappingWasUNactivated() || agentInMapping->hadLinksRemoved_WhileMappingWasUNactivated())
         {
@@ -2736,16 +2730,16 @@ QString AgentsMappingController::_getJSONofMappingOfAgentInGlobalMapping(AgentIn
             QStringList namesOfRemovedMappingElements = agentInMapping->getNamesOfRemovedMappingElements_WhileMappingWasUNactivated();
 
             // Get the JSON of the current mapping of the agent with changes applied while the mapping was UN-activated
-            jsonOfMapping = _jsonHelper->getJsonOfAgentMappingWithChanges(agentInMapping->agentsGroupedByName()->currentMapping(),
-                                                                          addedMappingElements,
-                                                                          namesOfRemovedMappingElements,
-                                                                          QJsonDocument::Compact);
+            jsonOfMapping = JsonHelper::getJsonOfAgentMappingWithChanges(agentInMapping->agentsGroupedByName()->currentMapping(),
+                                                                         addedMappingElements,
+                                                                         namesOfRemovedMappingElements,
+                                                                         QJsonDocument::Compact);
         }
         else
         {
             // Get the JSON of the current mapping of the agent
-            jsonOfMapping = _jsonHelper->getJsonOfAgentMapping(agentInMapping->agentsGroupedByName()->currentMapping(),
-                                                               QJsonDocument::Compact);
+            jsonOfMapping = JsonHelper::getJsonOfAgentMapping(agentInMapping->agentsGroupedByName()->currentMapping(),
+                                                              QJsonDocument::Compact);
         }
     }
     return jsonOfMapping;

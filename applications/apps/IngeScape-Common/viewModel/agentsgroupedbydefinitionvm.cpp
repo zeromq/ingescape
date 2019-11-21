@@ -15,6 +15,7 @@
 #include "agentsgroupedbydefinitionvm.h"
 #include <QFileDialog>
 #include <model/enums.h>
+#include <controller/ingescapemodelmanager.h>
 #include <controller/ingescapenetworkcontroller.h>
 
 
@@ -143,7 +144,18 @@ void AgentsGroupedByDefinitionVM::changeState()
             // Check if the model has a hostname
             if ((model != nullptr) && !model->hostname().isEmpty())
             {
-                Q_EMIT commandAskedToLauncher(model->hostname(), command_StartAgent, model->commandLine());
+                // Get the peer id of the Launcher on this host
+                QString peerIdOfLauncher = IngeScapeModelManager::instance()->getPeerIdOfLauncherOnHost(model->hostname());
+                if (!peerIdOfLauncher.isEmpty())
+                {
+                    QStringList message = {
+                        command_StartAgent,
+                        model->commandLine()
+                    };
+
+                    // Send the message "Start Agent" to the IngeScape Launcher
+                    IngeScapeNetworkController::instance()->sendMessageToAgent(peerIdOfLauncher, message);
+                }
             }
         }
     }

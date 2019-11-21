@@ -25,12 +25,15 @@
 
 #include <controller/ingescapeassessmentscontroller.h>
 
+
 //
 // IngeScape Common
 //
 #include <ingescapecommon.h>
 #include <settings/ingescapesettings.h>
 #include <misc/ingescapeutils.h>
+//#include "platformsupport/osutils.h"
+//#include "platformsupport/IngescapeApplication.h"
 
 
 /**
@@ -118,6 +121,7 @@ void registerCustomQmlTypes()
     qmlRegisterUncreatableType<ExperimentationController>("INGESCAPE", 1, 0, "ExperimentationController", "Internal Class");
     qmlRegisterUncreatableType<ExperimentationsListController>("INGESCAPE", 1, 0, "ExperimentationsListController", "Internal Class");
     qmlRegisterUncreatableType<ExportController>("INGESCAPE", 1, 0, "ExportController", "Internal Class");
+    qmlRegisterUncreatableType<NetworkController>("INGESCAPE", 1, 0, "NetworkController", "Internal Class");
     qmlRegisterUncreatableType<TaskInstanceController>("INGESCAPE", 1, 0, "TaskInstanceController", "Internal Class");
     qmlRegisterUncreatableType<SubjectsController>("INGESCAPE", 1, 0, "SubjectsController", "Internal Class");
     qmlRegisterUncreatableType<TasksController>("INGESCAPE", 1, 0, "TasksController", "Internal Class");
@@ -128,9 +132,8 @@ void registerCustomQmlTypes()
     // Sort and Filter
     //
     //----------------
-    //qmlRegisterUncreatableType<LogsSortFilter>("INGESCAPE", 1, 0, "LogsSortFilter", "Internal class");
-    //qmlRegisterUncreatableType<ValuesHistorySortFilter>("INGESCAPE", 1, 0, "ValuesHistorySortFilter", "Internal class");
     qmlRegisterUncreatableType<AreAgentsInPlatformFilter>("INGESCAPE", 1, 0, "AreAgentsInPlatformFilter", "Internal class");
+
 
     //----------------
     //
