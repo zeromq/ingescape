@@ -147,7 +147,8 @@ int igs_protocol(void){
 
 void igs_log(igs_logLevel_t level, const char *function, const char *fmt, ...){
     admin_lock();
-
+    initInternalAgentIfNeeded();
+    
     va_list list;
     va_start(list, fmt);
     vsnprintf(logContent, 2047, fmt, list);
@@ -177,7 +178,7 @@ void igs_log(igs_logLevel_t level, const char *function, const char *fmt, ...){
             strncat(admin_logFile, ".log", 4095);
             printf("creating default log file %s\n", admin_logFile);
             free(name);
-            if (internalAgent && internalAgent->agentElements != NULL && internalAgent->agentElements->node != NULL){
+            if (internalAgent->agentElements != NULL && internalAgent->agentElements->node != NULL){
                 bus_zyreLock();
                 zyre_shouts(internalAgent->agentElements->node, CHANNEL, "LOG_FILE_PATH=%s", admin_logFile);
                 bus_zyreUnlock();
@@ -217,7 +218,7 @@ void igs_log(igs_logLevel_t level, const char *function, const char *fmt, ...){
         }
         
     }
-    if (admin_logInStream && internalAgent && internalAgent->agentElements != NULL && internalAgent->agentElements->logger != NULL){
+    if (admin_logInStream && internalAgent->agentElements != NULL && internalAgent->agentElements->logger != NULL){
         zstr_sendf(internalAgent->agentElements->logger, "%s;%s;%s\n", log_levels[level], function, logContent);
     }
     admin_unlock();
@@ -234,8 +235,9 @@ igs_logLevel_t igs_getLogLevel (void) {
 
 void igs_setLogInFile (bool allow){
     if (allow != admin_logInFile){
+        initInternalAgentIfNeeded();
         admin_logInFile = allow;
-        if (internalAgent && internalAgent->agentElements != NULL && internalAgent->agentElements->node != NULL){
+        if (internalAgent->agentElements != NULL && internalAgent->agentElements->node != NULL){
             bus_zyreLock();
             if (allow){
                 zyre_shouts(internalAgent->agentElements->node, CHANNEL, "LOG_IN_FILE=1");
@@ -269,7 +271,8 @@ bool igs_getUseColorVerbose (void) {
 
 void igs_setLogStream(bool stream){
     if (stream != admin_logInStream){
-        if (internalAgent && internalAgent->agentElements != NULL){
+        initInternalAgentIfNeeded();
+        if (internalAgent->agentElements != NULL){
             if (stream){
                 igs_warn("agent is already started, log stream cannot be created anymore");
             }else{
@@ -278,7 +281,7 @@ void igs_setLogStream(bool stream){
             return;
         }
         admin_logInStream = stream;
-        if (internalAgent && internalAgent->agentElements != NULL && internalAgent->agentElements->node != NULL){
+        if (internalAgent->agentElements != NULL && internalAgent->agentElements->node != NULL){
             bus_zyreLock();
             if (stream){
                 zyre_shouts(internalAgent->agentElements->node, CHANNEL, "LOG_IN_STREAM=1");
@@ -296,6 +299,7 @@ bool igs_getLogStream (void) {
 
 void igs_setLogPath(const char *path){
     if ((path != NULL) && (strlen(path) > 0)){
+        initInternalAgentIfNeeded();
         char tmpPath[4096] = "";
         admin_lock();
         admin_makeFilePath(path, tmpPath, 4095);
@@ -322,7 +326,7 @@ void igs_setLogPath(const char *path){
         }else{
             printf("switching to new log file: %s\n", admin_logFile);
         }
-        if (fp != NULL && internalAgent && internalAgent->agentElements != NULL && internalAgent->agentElements->node != NULL){
+        if (fp != NULL && internalAgent->agentElements != NULL && internalAgent->agentElements->node != NULL){
             bus_zyreLock();
             zyre_shouts(internalAgent->agentElements->node, CHANNEL, "LOG_FILE_PATH=%s", admin_logFile);
             bus_zyreUnlock();
