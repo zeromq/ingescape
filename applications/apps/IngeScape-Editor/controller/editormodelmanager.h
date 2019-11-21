@@ -42,7 +42,7 @@ public:
      * @brief Accessor to the singleton instance
      * @return
      */
-    static EditorModelManager* instance();
+    //static EditorModelManager* instance();
 
 
     /**
@@ -51,7 +51,7 @@ public:
      * @param scriptEngine
      * @return
      */
-     static QObject* qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine);
+     //static QObject* qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine);
 
 
     /**

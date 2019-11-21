@@ -18,7 +18,6 @@
 
 /**
  * @brief Constructor
- * @param modelManager
  * @param parent
  */
 TaskInstanceController::TaskInstanceController(QObject *parent) : QObject(parent),
@@ -113,10 +112,9 @@ void TaskInstanceController::setcurrentTaskInstance(TaskInstanceM *value)
  */
 void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previousTaskInstance, TaskInstanceM* currentTaskInstance)
 {
-    if ((AssessmentsModelManager::Instance() != nullptr) && (_scenarioC != nullptr))
+    IngeScapeModelManager* igsModelManager = IngeScapeModelManager::instance();
+    if ((igsModelManager != nullptr) && (_scenarioC != nullptr))
     {
-        AssessmentsModelManager* modelManager = AssessmentsModelManager::Instance();
-
         //
         // Clean the previous session
         //
@@ -126,13 +124,13 @@ void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previo
             _scenarioC->clearScenario();
 
             // Delete all published values
-            modelManager->deleteAllPublishedValues();
+            igsModelManager->deleteAllPublishedValues();
 
             // Delete all (models of) actions
-            modelManager->deleteAllActions();
+            igsModelManager->deleteAllActions();
 
             // Delete agents OFF
-            QStringList namesListOfAgentsON = modelManager->deleteAgentsOFF();
+            QStringList namesListOfAgentsON = igsModelManager->deleteAgentsOFF();
             qDebug() << "Remaining agents ON:" << namesListOfAgentsON;
         }
 
@@ -178,7 +176,7 @@ void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previo
                             // Import the agents list from JSON
                             if (jsonRoot.contains("agents"))
                             {
-                                modelManager->importAgentsListFromJson(jsonRoot.value("agents").toArray(), versionJsonPlatform);
+                                igsModelManager->importAgentsListFromJson(jsonRoot.value("agents").toArray(), versionJsonPlatform);
                             }
 
                             // Import the scenario from JSON
@@ -202,6 +200,7 @@ void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previo
         }
     }
 }
+
 
 /**
  * @brief Adds the given URLs as attachements for this record

@@ -21,7 +21,6 @@
 
 /**
  * @brief Constructor
- * @param modelManager
  * @param parent
  */
 AbstractScenarioController::AbstractScenarioController(QObject *parent) : QObject(parent),
@@ -471,12 +470,13 @@ void AbstractScenarioController::executeEffectsOfAction(ActionM* action, int lin
             IngeScapeModelManager::instance()->setisMappingConnected(true);
         }
 
-        QString commandAndParameters = QString("%1=%2|%3").arg(command_ExecutedAction,
-                                                               QString::number(action->uid()),
-                                                               QString::number(lineInTimeLine));
+        QString message = QString("%1=%2|%3").arg(command_ExecutedAction,
+                                                  QString::number(action->uid()),
+                                                  QString::number(lineInTimeLine));
 
-        // Emit the signal "Command asked to Recorder"
-        Q_EMIT commandAskedToRecorder(commandAndParameters);
+        // Emit the signal just before the action is performed
+        // (the message "EXECUTED ACTION" must be sent on the network to the recorder)
+        Q_EMIT actionWillBeExecuted(message);
 
         // Execute all effects of the action
         _executeEffectsOfAction(action);
@@ -605,9 +605,6 @@ void AbstractScenarioController::onExecuteAction(ActionM* action)
         // Activate (connect) the mapping if necessary
         // Notify the recorder that the action has been executed
         executeEffectsOfAction(action, 0);
-
-        // Execute all effects of the action
-        //_executeEffectsOfAction(action);
     }
 }
 

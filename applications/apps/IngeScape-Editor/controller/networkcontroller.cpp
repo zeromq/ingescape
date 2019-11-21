@@ -72,10 +72,10 @@ NetworkController::NetworkController(QObject *parent) : QObject(parent)
         // We don't see itself
         ingeScapeNetworkC->setnumberOfEditors(1);
 
-        connect(ingeScapeNetworkC, &IngeScapeNetworkController::shoutedMessageReceived,
+        /*connect(ingeScapeNetworkC, &IngeScapeNetworkController::shoutedMessageReceived,
                 this, &NetworkController::_onShoutedMessageReceived);
         connect(ingeScapeNetworkC, &IngeScapeNetworkController::whisperedMessageReceived,
-                this, &NetworkController::_onWhisperedMessageReceived);
+                this, &NetworkController::_onWhisperedMessageReceived);*/
     }
 }
 
@@ -153,7 +153,7 @@ void NetworkController::sendCommandExecutionStatusToExpe(QString peerIdOfExpe, Q
  * @param peerName
  * @param zMessage
  */
-void NetworkController::_onShoutedMessageReceived(QString peerId, QString peerName, zmsg_t* zMessage)
+/*void NetworkController::_onShoutedMessageReceived(QString peerId, QString peerName, zmsg_t* zMessage)
 {
     QString message = zmsg_popstr(zMessage);
 
@@ -262,7 +262,7 @@ void NetworkController::_onShoutedMessageReceived(QString peerId, QString peerNa
     {
         qDebug() << "Not yet managed SHOUTED message '" << message << "' for agent" << peerName << "(" << peerId << ")";
     }
-}
+}*/
 
 
 /**
@@ -271,7 +271,7 @@ void NetworkController::_onShoutedMessageReceived(QString peerId, QString peerNa
  * @param peerName
  * @param zMessage
  */
-void NetworkController::_onWhisperedMessageReceived(QString peerId, QString peerName, zmsg_t* zMessage)
+/*void NetworkController::_onWhisperedMessageReceived(QString peerId, QString peerName, zmsg_t* zMessage)
 {
     QString message = zmsg_popstr(zMessage);
 
@@ -482,5 +482,5 @@ void NetworkController::_onWhisperedMessageReceived(QString peerId, QString peer
     {
         qDebug() << "Not yet managed WHISPERED message '" << message << "' for agent" << peerName << "(" << peerId << ")";
     }
-}
+}*/
 

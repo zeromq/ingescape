@@ -18,6 +18,8 @@
 
 #include <QQmlEngine>
 #include <QDebug>
+#include <controller/ingescapenetworkcontroller.h>
+
 
 // Interval in milli-seconds to display current record elapsed time
 #define INTERVAL_ELAPSED_TIME 250
@@ -25,11 +27,9 @@
 
 /**
  * @brief Constructor
- * @param modelManager
  * @param parent
  */
-RecordsSupervisionController::RecordsSupervisionController(EditorModelManager* modelManager,
-                                                           QObject *parent) : QObject(parent),
+RecordsSupervisionController::RecordsSupervisionController(QObject *parent) : QObject(parent),
     _peerIdOfRecorder(""),
     _peerNameOfRecorder(""),
     _isRecorderON(false),
@@ -39,7 +39,6 @@ RecordsSupervisionController::RecordsSupervisionController(EditorModelManager* m
     _replayState(ReplayStates::UNLOADED),
     _currentReplay(nullptr),
     _currentRecordTime(QDateTime(QDate::currentDate())),
-    _modelManager(modelManager),
     _recordStartTime(QDateTime(QDate::currentDate()))
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -70,9 +69,6 @@ RecordsSupervisionController::~RecordsSupervisionController()
 
     // Delete all VM of host
     _recordsList.deleteAllItems();
-
-    // Reset pointers
-    _modelManager = nullptr;
 }
 
 
@@ -128,7 +124,8 @@ void RecordsSupervisionController::startOrStopToRecord(bool withTimeLine)
             // Update the flag
             //setisRecordingTimeLine(false);
 
-            Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, command_StopRecord);
+            // Send the message "Stop Record" to the recorder
+            IngeScapeNetworkController::instance()->sendMessageToAgent(_peerIdOfRecorder, command_StopRecord);
         }
         // Start to record
         else
@@ -155,9 +152,10 @@ void RecordsSupervisionController::deleteRecord(RecordVM* record)
         // Notify the recorder that it has to remove entry from the data base
         if (_isRecorderON)
         {
-            QString commandAndParameters = QString("%1=%2").arg(command_DeleteRecord, record->modelM()->uid());
+            QString message = QString("%1=%2").arg(command_DeleteRecord, record->modelM()->uid());
 
-            Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, commandAndParameters);
+            // Send the message "Delete Record" to the recorder
+            IngeScapeNetworkController::instance()->sendMessageToAgent(_peerIdOfRecorder, message);
         }
     }
 }
@@ -180,9 +178,10 @@ void RecordsSupervisionController::loadRecord(QString recordId)
             // Set the current replay (loading record)
             setcurrentReplay(recordVM);
 
-            QString commandAndParameters = QString("%1=%2").arg(command_LoadReplay, recordId);
+            QString message = QString("%1=%2").arg(command_LoadReplay, recordId);
 
-            Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, commandAndParameters);
+            // Send the message "Load Replay" to the recorder
+            IngeScapeNetworkController::instance()->sendMessageToAgent(_peerIdOfRecorder, message);
         }
     }
 }
@@ -195,9 +194,10 @@ void RecordsSupervisionController::unloadRecord()
 {
     if (_isRecorderON && (_currentReplay != nullptr) && (_currentReplay->modelM() != nullptr))
     {
-        QString commandAndParameters = QString("%1=%2").arg(command_UNloadReplay, _currentReplay->modelM()->uid());
+        QString message = QString("%1=%2").arg(command_UNloadReplay, _currentReplay->modelM()->uid());
 
-        Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, commandAndParameters);
+        // Send the message "UN-load Replay" to the recorder
+        IngeScapeNetworkController::instance()->sendMessageToAgent(_peerIdOfRecorder, message);
     }
 }
 
@@ -210,24 +210,25 @@ void RecordsSupervisionController::startOrResumeReplay(bool isStart)
 {
     if (_isRecorderON && (_currentReplay != nullptr) && (_currentReplay->modelM() != nullptr))
     {
-        QString commandAndParameters = "";
+        QString message = "";
 
         if (isStart)
         {
             // Update the current state of the replay
             setreplayState(ReplayStates::PLAYING);
 
-            commandAndParameters = QString("%1=%2").arg(command_StartReplay, _currentReplay->modelM()->uid());
+            message = QString("%1=%2").arg(command_StartReplay, _currentReplay->modelM()->uid());
         }
         else
         {
             // Update the current state of the replay
             setreplayState(ReplayStates::RESUMING);
 
-            commandAndParameters = QString("%1=%2").arg(command_UNpauseReplay, _currentReplay->modelM()->uid());
+            message = QString("%1=%2").arg(command_UNpauseReplay, _currentReplay->modelM()->uid());
         }
 
-        Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, commandAndParameters);
+        // Send the message "Start Replay" or "UN-pause Replay" to the recorder
+        IngeScapeNetworkController::instance()->sendMessageToAgent(_peerIdOfRecorder, message);
     }
 }
 
@@ -240,24 +241,25 @@ void RecordsSupervisionController::stopOrPauseReplay(bool isStop)
 {
     if (_isRecorderON && (_currentReplay != nullptr) && (_currentReplay->modelM() != nullptr))
     {
-        QString commandAndParameters = "";
+        QString message = "";
 
         if (isStop)
         {
             // Update the current state of the replay
             //setreplayState(ReplayStates::LOADED);
 
-            commandAndParameters = QString("%1=%2").arg(command_StopReplay, _currentReplay->modelM()->uid());
+            message = QString("%1=%2").arg(command_StopReplay, _currentReplay->modelM()->uid());
         }
         else
         {
             // Update the current state of the replay
             setreplayState(ReplayStates::PAUSED);
 
-            commandAndParameters = QString("%1=%2").arg(command_PauseReplay, _currentReplay->modelM()->uid());
+            message = QString("%1=%2").arg(command_PauseReplay, _currentReplay->modelM()->uid());
         }
 
-        Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, commandAndParameters);
+        // Send the message "Stop Replay" or "Pause Replay" to the recorder
+        IngeScapeNetworkController::instance()->sendMessageToAgent(_peerIdOfRecorder, message);
     }
 }
 
@@ -270,9 +272,10 @@ void RecordsSupervisionController::exportRecord(QString recordId)
 {
     if (_isRecorderON && !recordId.isEmpty())
     {
-        QString commandAndParameters = QString("%1=%2").arg(command_ExportRecord, recordId);
+        QString message = QString("%1=%2").arg(command_ExportRecord, recordId);
 
-        Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, commandAndParameters);
+        // Send the message "Export Record" to the recorder
+        IngeScapeNetworkController::instance()->sendMessageToAgent(_peerIdOfRecorder, message);
     }
 }
 
@@ -312,8 +315,8 @@ void RecordsSupervisionController::onRecorderEntered(QString peerId, QString pee
 
         qDebug() << "New recorder on the network, get all its records...";
 
-        // Get all records
-        Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, "GET_RECORDS");
+        // Send the message "Get Records" to the recorder
+        IngeScapeNetworkController::instance()->sendMessageToAgent(_peerIdOfRecorder, "GET_RECORDS");
     }
     else {
         qCritical() << "We are already connected to a recorder:" << _peerNameOfRecorder << "(" << _peerIdOfRecorder << ")";

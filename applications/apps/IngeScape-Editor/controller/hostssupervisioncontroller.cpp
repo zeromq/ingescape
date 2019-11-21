@@ -23,10 +23,8 @@
  * @brief Constructor
  * @param parent
  */
-HostsSupervisionController::HostsSupervisionController(EditorModelManager* modelManager,
-                                                       QObject *parent) : QObject(parent),
-    _selectedHost(nullptr),
-    _modelManager(modelManager)
+HostsSupervisionController::HostsSupervisionController(QObject *parent) : QObject(parent),
+    _selectedHost(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -53,9 +51,6 @@ HostsSupervisionController::~HostsSupervisionController()
 
     // Clear the list of agents
     _allAgents.clear();
-
-    // Reset pointers
-    _modelManager = nullptr;
 }
 
 
@@ -66,7 +61,7 @@ HostsSupervisionController::~HostsSupervisionController()
  */
 void HostsSupervisionController::removeAgentModelFromHost(AgentM* agent, HostVM* host)
 {
-    if ((host != nullptr) && (agent != nullptr) && (_modelManager != nullptr))
+    if ((host != nullptr) && (agent != nullptr))
     {
         if (host->agentsList()->contains(agent))
         {
@@ -75,7 +70,7 @@ void HostsSupervisionController::removeAgentModelFromHost(AgentM* agent, HostVM*
             qDebug() << "Remove agent" << agent->name() << "from host" << host->name();
         }
 
-        AgentsGroupedByNameVM* agentsGroupedByName = _modelManager->getAgentsGroupedForName(agent->name());
+        AgentsGroupedByNameVM* agentsGroupedByName = IngeScapeModelManager::instance()->getAgentsGroupedForName(agent->name());
         if (agentsGroupedByName != nullptr)
         {
             // Remove a model of agent from its host

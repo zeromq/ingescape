@@ -160,7 +160,7 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     // Connect to signals from the controller of the scenario
     if ((_experimentationC->taskInstanceC() != nullptr) && (_experimentationC->taskInstanceC()->scenarioC() != nullptr))
     {
-        //connect(_scenarioC, &ScenarioController::commandAskedToRecorder, this, &IngeScapeEditorController::_onCommandAskedToRecorder);
+        //connect(_scenarioC, &ScenarioController::actionWillBeExecuted, this, &IngeScapeEditorController::_onActionWillBeExecuted);
         //connect(_scenarioC, &ScenarioController::timeLineStateUpdated, this, &IngeScapeEditorController::_onTimeLineStateUpdated);
     }
 

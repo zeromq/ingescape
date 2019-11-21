@@ -24,9 +24,9 @@
 
 #include <misc/ingescapeutils.h>
 #include <settings/ingescapesettings.h>
-
 #include <platformsupport/osutils.h>
 #include <platformsupport/IngescapeApplication.h>
+#include <controller/ingescapenetworkcontroller.h>
 
 
 // Name of the example platform to load when no other platform has been loaded yet
@@ -203,11 +203,17 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     //-------------------------------
 
     IngeScapeModelManager* igsModelManager = IngeScapeModelManager::instance();
+    if (igsModelManager == nullptr) {
+        qCritical() << "IngeScape Model Manager is null !";
+    }
 
     // Create the manager for the data model of our IngeScape Editor application
     _modelManager = new EditorModelManager(this);
 
     IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
+    if (ingeScapeNetworkC == nullptr) {
+        qCritical() << "IngeScape Network Controller is null !";
+    }
 
     // Create the controller to manage network communications
     _networkC = new NetworkController(this);
@@ -216,10 +222,10 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _agentsSupervisionC = new AgentsSupervisionController(this);
 
     // Create the controller to manage hosts
-    _hostsSupervisionC = new HostsSupervisionController(_modelManager, this);
+    _hostsSupervisionC = new HostsSupervisionController(this);
 
     // Create the controller for records supervision
-    _recordsSupervisionC = new RecordsSupervisionController(_modelManager, this);
+    _recordsSupervisionC = new RecordsSupervisionController(this);
 
     // Create the controller to manage the agents mapping
     _agentsMappingC = new AgentsMappingController(_modelManager, this);
@@ -231,7 +237,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _scenarioC = new ScenarioController(this);
 
     // Create the controller to manage the history of values
-    _valuesHistoryC = new ValuesHistoryController(_modelManager, this);
+    _valuesHistoryC = new ValuesHistoryController(this);
 
     // Create the controller to manage IngeScape licenses
     _licensesC = new LicensesController(this);
@@ -322,7 +328,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_agentsMappingC, &AgentsMappingController::executeAction, _scenarioC, &ScenarioController::onExecuteAction);
 
     // Connect to signals from the controller of the scenario
-    connect(_scenarioC, &ScenarioController::commandAskedToRecorder, this, &IngeScapeEditorController::_onCommandAskedToRecorder);
+    connect(_scenarioC, &ScenarioController::actionWillBeExecuted, this, &IngeScapeEditorController::_onActionWillBeExecuted);
     connect(_scenarioC, &ScenarioController::timeLineStateUpdated, this, &IngeScapeEditorController::_onTimeLineStateUpdated);
 
     // Connect to the signal "time range changed" from the time line
@@ -715,16 +721,17 @@ void IngeScapeEditorController::clearCurrentPlatform()
         _hostsSupervisionC->deleteHostsOFF();
     }
 
-    if (_modelManager != nullptr)
+    IngeScapeModelManager* igsModelManager = IngeScapeModelManager::instance();
+    if (igsModelManager != nullptr)
     {
         // Delete all published values
-        _modelManager->deleteAllPublishedValues();
+        igsModelManager->deleteAllPublishedValues();
 
         // Delete all (models of) actions
-        _modelManager->deleteAllActions();
+        igsModelManager->deleteAllActions();
 
         // Delete agents OFF
-        QStringList namesListOfAgentsON = _modelManager->deleteAgentsOFF();
+        QStringList namesListOfAgentsON = igsModelManager->deleteAgentsOFF();
 
         if (_valuesHistoryC != nullptr)
         {
@@ -771,12 +778,12 @@ bool IngeScapeEditorController::isAgentUsedInPlatform(AgentsGroupedByDefinitionV
     bool isUsed = false;
 
     if ((agentsGroupedByDefinition != nullptr) && !agentsGroupedByDefinition->name().isEmpty()
-            && (_modelManager != nullptr) && (_agentsMappingC != nullptr) && (_scenarioC != nullptr))
+            && (_agentsMappingC != nullptr) && (_scenarioC != nullptr))
     {
         QString agentName = agentsGroupedByDefinition->name();
 
         // Get the (view model of) agents grouped for this name
-        AgentsGroupedByNameVM* agentsGroupedByName = _modelManager->getAgentsGroupedForName(agentName);
+        AgentsGroupedByNameVM* agentsGroupedByName = IngeScapeModelManager::instance()->getAgentsGroupedForName(agentName);
         if (agentsGroupedByName != nullptr)
         {
             // It is the last agents grouped by definition
@@ -1013,17 +1020,15 @@ void IngeScapeEditorController::_onOpenFileRequest(QUrl url, QString filePath)
                 // Definition file
 
                 // We need to check if we have a valid license
-                if (
-                    (_licensesC != nullptr)
+                if ((_licensesC != nullptr)
                     &&
                     (_licensesC->mergedLicense() != nullptr)
                     &&
-                    _licensesC->mergedLicense()->editorLicenseValidity()
-                    )
+                    _licensesC->mergedLicense()->editorLicenseValidity())
                 {
                     if (_modelManager != nullptr)
                     {
-                        bool succeeded = _modelManager->importAgentOrAgentsListFromFilePath(filePath);
+                        bool succeeded = IngeScapeModelManager::instance()->importAgentOrAgentsListFromFilePath(filePath);
                         if (!succeeded)
                         {
                             Q_EMIT openPopupFailedToLoadAgentDefinition();
@@ -1229,10 +1234,13 @@ void IngeScapeEditorController::_onLoadPlatformFileFromPath(QString platformFile
     bool success = _clearAndLoadPlatformFromFile(platformFilePath);
 
     // Send command to Ingescape-Expe if needed
-    if (!_peerIdOfExpe.isEmpty())
+    if ((_networkC != nullptr) && !_peerIdOfExpe.isEmpty())
     {
         // Reply by sending the command execution status to Expe
-        NetworkController::instance()->sendCommandExecutionStatusToExpe(_peerIdOfExpe, command_LoadPlatformFile, platformFilePath, static_cast<int>(success));
+        _networkC->sendCommandExecutionStatusToExpe(_peerIdOfExpe,
+                                                    command_LoadPlatformFile,
+                                                    platformFilePath,
+                                                    static_cast<int>(success));
     }
     else
     {
@@ -1300,13 +1308,13 @@ void IngeScapeEditorController::_onTimeLineStateUpdated(QString state)
     // Notify the Recorder app
     if ((_recordsSupervisionC != nullptr) && _recordsSupervisionC->isRecorderON())
     {
-        NetworkController::instance()->sendMessageToAgent(_recordsSupervisionC->peerIdOfRecorder(), notificationAndParameters);
+        IngeScapeNetworkController::instance()->sendMessageToAgent(_recordsSupervisionC->peerIdOfRecorder(), notificationAndParameters);
     }
 
     // Notify the Expe app
     if (!_peerIdOfExpe.isEmpty())
     {
-        NetworkController::instance()->sendMessageToAgent(_peerIdOfExpe, notificationAndParameters);
+        IngeScapeNetworkController::instance()->sendMessageToAgent(_peerIdOfExpe, notificationAndParameters);
     }
 }
 
@@ -1334,8 +1342,12 @@ void IngeScapeEditorController::_onUpdateRecordState(QString state)
     // STOP (to Record)
     else if (state == STOP)
     {
-        // Call the private slot (called when a command must be sent on the network to a recorder)
-        _onCommandAskedToRecorder(command_StopRecord);
+        if ((_recordsSupervisionC != nullptr) && _recordsSupervisionC->isRecorderON())
+        {
+            // Send the message "Stop Record" to the recorder
+            IngeScapeNetworkController::instance()->sendMessageToAgent(_recordsSupervisionC->peerIdOfRecorder(),
+                                                                       command_StopRecord);
+        }
     }
     // Unknown
     else {
@@ -1345,14 +1357,17 @@ void IngeScapeEditorController::_onUpdateRecordState(QString state)
 
 
 /**
- * @brief Slot called when a command must be sent on the network to a recorder
- * @param commandAndParameters
+ * @brief Slot called just before an action is performed
+ * (the message "EXECUTED ACTION" must be sent on the network to the recorder)
+ * @param message
  */
-void IngeScapeEditorController::_onCommandAskedToRecorder(QString commandAndParameters)
+void IngeScapeEditorController::_onActionWillBeExecuted(QString message)
 {
     if ((_recordsSupervisionC != nullptr) && _recordsSupervisionC->isRecorderON())
     {
-        IngeScapeNetworkController::instance()->sendMessageToAgent(_recordsSupervisionC->peerIdOfRecorder(), commandAndParameters);
+        // Send the message "EXECUTED ACTION" to the recorder
+        IngeScapeNetworkController::instance()->sendMessageToAgent(_recordsSupervisionC->peerIdOfRecorder(),
+                                                                   message);
     }
 }
 
@@ -1420,7 +1435,7 @@ void IngeScapeEditorController::_onNetworkDeviceIsNotAvailable()
     qDebug() << Q_FUNC_INFO;
 
     // Stop IngeScape if needed
-    if (NetworkController::instance()->isStarted())
+    if (IngeScapeNetworkController::instance()->isStarted())
     {
         _stopIngeScape(false);
     }
@@ -1462,7 +1477,7 @@ void IngeScapeEditorController::_onSystemSleep()
     qDebug() << Q_FUNC_INFO;
 
     // Stop monitoring to save energy
-    NetworkController::instance()->stopMonitoring();
+    IngeScapeNetworkController::instance()->stopMonitoring();
 
     // Stop IngeScape
     _stopIngeScape(false);
@@ -1486,7 +1501,7 @@ void IngeScapeEditorController::_onSystemWake()
  */
 void IngeScapeEditorController::_onSystemNetworkConfigurationsUpdated()
 {
-    NetworkController::instance()->updateAvailableNetworkDevices();
+    IngeScapeNetworkController::instance()->updateAvailableNetworkDevices();
 }
 
 
@@ -1647,9 +1662,9 @@ bool IngeScapeEditorController::_loadPlatformFromJSON(QJsonDocument jsonDocument
         }
 
         // Import the agents list from JSON
-        if ((_modelManager != nullptr) && jsonRoot.contains("agents"))
+        if (jsonRoot.contains("agents"))
         {
-            _modelManager->importAgentsListFromJson(jsonRoot.value("agents").toArray(), versionJsonPlatform);
+            IngeScapeModelManager::instance()->importAgentsListFromJson(jsonRoot.value("agents").toArray(), versionJsonPlatform);
         }
 
         // Import the scenario from JSON
@@ -1738,10 +1753,11 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
  */
 void IngeScapeEditorController::_stopIngeScape(bool hasToClearPlatform)
 {
-    if (_modelManager != nullptr)
-    {
-        NetworkController* networkC = NetworkController::instance();
+    IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
+    IngeScapeModelManager* igsModelManager = IngeScapeModelManager::instance();
 
+    if ((ingeScapeNetworkC != nullptr) && (igsModelManager != nullptr) && (_modelManager != nullptr))
+    {
         if (hasToClearPlatform)
         {
             qInfo() << "Stop the network on" << _networkDevice << "with" << _port << "(and CLEAR the current platform)";
@@ -1752,25 +1768,25 @@ void IngeScapeEditorController::_stopIngeScape(bool hasToClearPlatform)
         }
 
         // Save states of our mapping if needed
-        _beforeNetworkStop_isMappingConnected = _modelManager->isMappingConnected();
+        _beforeNetworkStop_isMappingConnected = igsModelManager->isMappingConnected();
         _beforeNetworkStop_isMappingControlled = _modelManager->isMappingControlled();
 
 
         // Disable mapping
-        _modelManager->setisMappingConnected(false);
+        igsModelManager->setisMappingConnected(false);
         _modelManager->setisMappingControlled(false);
 
         // Stop our IngeScape agent
-        networkC->stop();
+        ingeScapeNetworkC->stop();
 
         // We don't see itself
-        networkC->setnumberOfEditors(1);
+        ingeScapeNetworkC->setnumberOfEditors(1);
 
         // Simulate an exit for each agent ON
-        _modelManager->simulateExitForEachAgentON();
+        igsModelManager->simulateExitForEachAgentON();
 
         // Simulate an exit for each launcher
-        _modelManager->simulateExitForEachLauncher();
+        igsModelManager->simulateExitForEachLauncher();
 
         // Simulate an exit for the recorder
         //_modelManager->simulateExitForRecorder();
@@ -1803,30 +1819,30 @@ bool IngeScapeEditorController::_startIngeScape(bool checkAvailableNetworkDevice
     // Reset the error message
     seterrorMessageWhenConnectionFailed("");
 
-    if (_modelManager != nullptr)
-    {
-        NetworkController* networkC = NetworkController::instance();
+    IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
+    IngeScapeModelManager* igsModelManager = IngeScapeModelManager::instance();
 
+    if ((ingeScapeNetworkC != nullptr) && (igsModelManager != nullptr) && (_modelManager != nullptr))
+    {
         if (checkAvailableNetworkDevices)
         {
             // Update the list of available network devices
-            networkC->updateAvailableNetworkDevices();
+            ingeScapeNetworkC->updateAvailableNetworkDevices();
 
             // There is only one available network device, we use it !
-            if (networkC->availableNetworkDevices().count() == 1)
+            if (ingeScapeNetworkC->availableNetworkDevices().count() == 1)
             {
-                _networkDevice = networkC->availableNetworkDevices().at(0);
+                _networkDevice = ingeScapeNetworkC->availableNetworkDevices().at(0);
             }
         }
 
-
         // Start our IngeScape agent with the network device and the port
-        success = networkC->start(_networkDevice, _ipAddress, _port);
+        success = ingeScapeNetworkC->start(_networkDevice, _ipAddress, _port);
 
         if (success)
         {
             // Re-enable mapping
-            _modelManager->setisMappingConnected(_beforeNetworkStop_isMappingConnected);
+            igsModelManager->setisMappingConnected(_beforeNetworkStop_isMappingConnected);
             _modelManager->setisMappingControlled(_beforeNetworkStop_isMappingControlled);
         }
     }

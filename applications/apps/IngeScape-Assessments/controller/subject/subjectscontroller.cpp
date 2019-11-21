@@ -20,7 +20,6 @@
 
 /**
  * @brief Constructor
- * @param modelManager
  * @param parent
  */
 SubjectsController::SubjectsController(QObject *parent) : QObject(parent),

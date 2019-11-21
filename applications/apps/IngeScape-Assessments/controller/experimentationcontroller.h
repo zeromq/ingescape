@@ -51,7 +51,6 @@ public:
 
     /**
      * @brief Constructor
-     * @param modelManager
      * @param parent
      */
     explicit ExperimentationController(QObject *parent = nullptr);

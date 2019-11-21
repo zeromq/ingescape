@@ -19,7 +19,6 @@
 
 /**
  * @brief Constructor
- * @param modelManager
  * @param parent
  */
 TasksController::TasksController(QObject *parent) : QObject(parent),

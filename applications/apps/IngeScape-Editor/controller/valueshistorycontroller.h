@@ -20,7 +20,7 @@
 
 #include <I2PropertyHelpers.h>
 
-#include <controller/editormodelmanager.h>
+#include <controller/ingescapemodelmanager.h>
 #include <sortFilter/valueshistorysortfilter.h>
 
 
@@ -44,10 +44,9 @@ class ValuesHistoryController : public QObject
 public:
     /**
      * @brief Constructor
-     * @param modelManager
      * @param parent
      */
-    explicit ValuesHistoryController(EditorModelManager* modelManager, QObject *parent = nullptr);
+    explicit ValuesHistoryController(QObject *parent = nullptr);
 
 
     /**
@@ -134,11 +133,10 @@ private:
 
 
 private:
-    // Manager for the data model of INGESCAPE
-    EditorModelManager* _modelManager;
 
     // List of filtered (and sorted) values
     ValuesHistorySortFilter _filteredValues;
+
 };
 
 QML_DECLARE_TYPE(ValuesHistoryController)

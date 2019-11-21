@@ -172,10 +172,11 @@ public:
 Q_SIGNALS:
 
     /**
-     * @brief Signal emitted when a command must be sent on the network to a recorder
-     * @param commandAndParameters
+     * @brief Signal emitted just before an action is performed
+     * (the message "EXECUTED ACTION" must be sent on the network to the recorder)
+     * @param message
      */
-    void commandAskedToRecorder(QString commandAndParameters);
+    void actionWillBeExecuted(QString message);
 
 
     /**

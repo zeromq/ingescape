@@ -342,10 +342,11 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Slot called when a command must be sent on the network to a recorder
-     * @param commandAndParameters
+     * @brief Slot called just before an action is performed
+     * (the message "EXECUTED ACTION" must be sent on the network to the recorder)
+     * @param message
      */
-    void _onCommandAskedToRecorder(QString commandAndParameters);
+    void _onActionWillBeExecuted(QString message);
 
 
     /**

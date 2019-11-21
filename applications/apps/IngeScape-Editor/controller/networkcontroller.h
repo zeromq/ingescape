@@ -23,6 +23,13 @@
 #include "I2PropertyHelpers.h"
 #include <controller/ingescapenetworkcontroller.h>
 
+extern "C" {
+//#include <ingescape.h>
+//#include <ingescape_advanced.h>
+//#include <ingescape_private.h>
+#include <czmq.h>
+}
+
 
 /**
  * @brief The NetworkController class defines the controller for network communications
@@ -259,7 +266,7 @@ private:
      * @param peerName
      * @param zMessage
      */
-    void _onShoutedMessageReceived(QString peerId, QString peerName, zmsg_t* zMessage);
+    //void _onShoutedMessageReceived(QString peerId, QString peerName, zmsg_t* zMessage);
 
 
     /**
@@ -268,7 +275,7 @@ private:
      * @param peerName
      * @param zMessage
      */
-    void _onWhisperedMessageReceived(QString peerId, QString peerName, zmsg_t* zMessage);
+    //void _onWhisperedMessageReceived(QString peerId, QString peerName, zmsg_t* zMessage);
 
 };
 

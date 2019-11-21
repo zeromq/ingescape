@@ -17,11 +17,11 @@
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
+
+#include <controller/ingescapemodelmanager.h>
 #include <controller/abstracttimeactionslinescenarioviewcontroller.h>
 #include <controller/abstractscenariocontroller.h>
 #include <model/taskinstancem.h>
-
-#include <controller/assessmentsmodelmanager.h>
 #include <sortFilter/areagentsinplatformfilter.h>
 
 
@@ -49,7 +49,6 @@ public:
 
     /**
      * @brief Constructor
-     * @param modelManager
      * @param parent
      */
     explicit TaskInstanceController(QObject *parent = nullptr);

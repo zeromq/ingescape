@@ -24,17 +24,17 @@
 // Creates a global and static object of type QGlobalStatic, of name _singletonInstance and that behaves as a pointer to EditorModelManager.
 // The object created by Q_GLOBAL_STATIC initializes itself on the first use, which means that it will not increase the application or the library's load time.
 // Additionally, the object is initialized in a thread-safe manner on all platforms.
-Q_GLOBAL_STATIC(EditorModelManager, _singletonInstance)
+//Q_GLOBAL_STATIC(EditorModelManager, _singletonInstance)
 
 
 /**
  * @brief Get our singleton instance
  * @return
  */
-EditorModelManager* EditorModelManager::instance()
+/*EditorModelManager* EditorModelManager::instance()
 {
     return _singletonInstance;
-}
+}*/
 
 
 /**
@@ -43,13 +43,13 @@ EditorModelManager* EditorModelManager::instance()
  * @param scriptEngine
  * @return
  */
-QObject* EditorModelManager::qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine)
+/*QObject* EditorModelManager::qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine)
 {
     Q_UNUSED(engine);
     Q_UNUSED(scriptEngine);
 
     return _singletonInstance;
-}
+}*/
 
 
 /**
@@ -311,7 +311,7 @@ void EditorModelManager::onAgentsGroupedByNameHasBeenCreated(AgentsGroupedByName
  */
 void EditorModelManager::onisMutedFromAgentUpdated(QString peerId, bool isMuted)
 {
-    AgentM* agent = getAgentModelFromPeerId(peerId);
+    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromPeerId(peerId);
     if (agent != nullptr) {
         agent->setisMuted(isMuted);
     }
@@ -325,7 +325,7 @@ void EditorModelManager::onisMutedFromAgentUpdated(QString peerId, bool isMuted)
  */
 void EditorModelManager::onCanBeFrozenFromAgentUpdated(QString peerId, bool canBeFrozen)
 {
-    AgentM* agent = getAgentModelFromPeerId(peerId);
+    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromPeerId(peerId);
     if (agent != nullptr) {
         agent->setcanBeFrozen(canBeFrozen);
     }
@@ -339,7 +339,7 @@ void EditorModelManager::onCanBeFrozenFromAgentUpdated(QString peerId, bool canB
  */
 void EditorModelManager::onIsFrozenFromAgentUpdated(QString peerId, bool isFrozen)
 {
-    AgentM* agent = getAgentModelFromPeerId(peerId);
+    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromPeerId(peerId);
     if (agent != nullptr) {
         agent->setisFrozen(isFrozen);
     }
@@ -354,7 +354,7 @@ void EditorModelManager::onIsFrozenFromAgentUpdated(QString peerId, bool isFroze
  */
 void EditorModelManager::onIsMutedFromOutputOfAgentUpdated(QString peerId, bool isMuted, QString outputName)
 {
-    AgentM* agent = getAgentModelFromPeerId(peerId);
+    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromPeerId(peerId);
     if (agent != nullptr) {
         agent->setisMutedOfOutput(isMuted, outputName);
     }
@@ -368,7 +368,7 @@ void EditorModelManager::onIsMutedFromOutputOfAgentUpdated(QString peerId, bool 
  */
 void EditorModelManager::onAgentStateChanged(QString peerId, QString stateName)
 {
-    AgentM* agent = getAgentModelFromPeerId(peerId);
+    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromPeerId(peerId);
     if (agent != nullptr) {
         agent->setstate(stateName);
     }
@@ -382,7 +382,7 @@ void EditorModelManager::onAgentStateChanged(QString peerId, QString stateName)
  */
 void EditorModelManager::onAgentHasLogInStream(QString peerId, bool hasLogInStream)
 {
-    AgentM* agent = getAgentModelFromPeerId(peerId);
+    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromPeerId(peerId);
     if (agent != nullptr) {
         agent->sethasLogInStream(hasLogInStream);
     }
@@ -396,7 +396,7 @@ void EditorModelManager::onAgentHasLogInStream(QString peerId, bool hasLogInStre
  */
 void EditorModelManager::onAgentHasLogInFile(QString peerId, bool hasLogInFile)
 {
-    AgentM* agent = getAgentModelFromPeerId(peerId);
+    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromPeerId(peerId);
     if (agent != nullptr) {
         agent->sethasLogInFile(hasLogInFile);
     }
@@ -410,7 +410,7 @@ void EditorModelManager::onAgentHasLogInFile(QString peerId, bool hasLogInFile)
  */
 void EditorModelManager::onAgentLogFilePath(QString peerId, QString logFilePath)
 {
-    AgentM* agent = getAgentModelFromPeerId(peerId);
+    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromPeerId(peerId);
     if (agent != nullptr) {
         agent->setlogFilePath(logFilePath);
     }
@@ -424,7 +424,7 @@ void EditorModelManager::onAgentLogFilePath(QString peerId, QString logFilePath)
  */
 void EditorModelManager::onAgentDefinitionFilePath(QString peerId, QString definitionFilePath)
 {
-    AgentM* agent = getAgentModelFromPeerId(peerId);
+    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromPeerId(peerId);
     if (agent != nullptr) {
         agent->setdefinitionFilePath(definitionFilePath);
     }
@@ -438,7 +438,7 @@ void EditorModelManager::onAgentDefinitionFilePath(QString peerId, QString defin
  */
 void EditorModelManager::onAgentMappingFilePath(QString peerId, QString mappingFilePath)
 {
-    AgentM* agent = getAgentModelFromPeerId(peerId);
+    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromPeerId(peerId);
     if (agent != nullptr) {
         agent->setmappingFilePath(mappingFilePath);
     }

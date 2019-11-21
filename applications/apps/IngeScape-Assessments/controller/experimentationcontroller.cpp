@@ -22,7 +22,6 @@
 
 /**
  * @brief Constructor
- * @param modelManager
  * @param parent
  */
 ExperimentationController::ExperimentationController(QObject *parent) : QObject(parent),

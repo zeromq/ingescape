@@ -79,28 +79,25 @@ void ScenarioController::importScenarioFromJson(QJsonObject jsonScenario)
     // Call our mother class
     AbstractScenarioController::importScenarioFromJson(jsonScenario);
 
-    if (_modelManager != nullptr)
-    {
-        // Get the hash table from a name to the group of agents with this name
-        QHash<QString, AgentsGroupedByNameVM*> hashFromNameToAgentsGrouped = _modelManager->getHashTableFromNameToAgentsGrouped();
+    // Get the hash table from a name to the group of agents with this name
+    QHash<QString, AgentsGroupedByNameVM*> hashFromNameToAgentsGrouped = IngeScapeModelManager::instance()->getHashTableFromNameToAgentsGrouped();
 
-        // Create a model of scenario (actions in the list, in the palette and in the timeline) from JSON
-        ScenarioM* scenarioToImport = JsonHelper::createModelOfScenarioFromJSON(jsonScenario, hashFromNameToAgentsGrouped);
-        if (scenarioToImport != nullptr)
+    // Create a model of scenario (actions in the list, in the palette and in the timeline) from JSON
+    ScenarioM* scenarioToImport = JsonHelper::createModelOfScenarioFromJSON(jsonScenario, hashFromNameToAgentsGrouped);
+    if (scenarioToImport != nullptr)
+    {
+        // Set the list of actions in palette
+        if (!scenarioToImport->actionsInPaletteList()->isEmpty())
         {
-            // Set the list of actions in palette
-            if (!scenarioToImport->actionsInPaletteList()->isEmpty())
+            for (ActionInPaletteVM* actionInPalette : scenarioToImport->actionsInPaletteList()->toList())
             {
-                for (ActionInPaletteVM* actionInPalette : scenarioToImport->actionsInPaletteList()->toList())
-                {
-                    if ((actionInPalette != nullptr) && (actionInPalette->modelM() != nullptr)) {
-                        setActionInPalette(actionInPalette->indexInPanel(), actionInPalette->modelM());
-                    }
+                if ((actionInPalette != nullptr) && (actionInPalette->modelM() != nullptr)) {
+                    setActionInPalette(actionInPalette->indexInPanel(), actionInPalette->modelM());
                 }
             }
-
-            delete scenarioToImport;
         }
+
+        delete scenarioToImport;
     }
 }
 
@@ -238,10 +235,13 @@ bool ScenarioController::isAgentUsedInScenario(QString agentName)
   */
 void ScenarioController::openActionEditorToDuplicateModel(ActionM* action)
 {
-    if ((action != nullptr) && (_modelManager != nullptr))
+    if (action != nullptr)
     {
         // Create an action editor
-        ActionEditorController* actionEditorC = new ActionEditorController(_buildDuplicateActionName(action->name()), action, _modelManager->allAgentsGroupsByName()->toList(), true);
+        ActionEditorController* actionEditorC = new ActionEditorController(_buildDuplicateActionName(action->name()),
+                                                                           action,
+                                                                           IngeScapeModelManager::instance()->allAgentsGroupsByName()->toList(),
+                                                                           true);
 
         _hashActionEditorControllerFromModelOfAction.insert(actionEditorC->editedAction(), actionEditorC);
 
@@ -256,45 +256,48 @@ void ScenarioController::openActionEditorToDuplicateModel(ActionM* action)
   */
 void ScenarioController::openActionEditorWithModel(ActionM* action)
 {
-    if (_modelManager != nullptr)
+    ActionEditorController* actionEditorC = nullptr;
+
+    if (action != nullptr)
     {
-        ActionEditorController* actionEditorC = nullptr;
+        actionEditorC = _getActionEditorFromModelOfAction(action);
 
-        if (action != nullptr)
+        // The corresponding editor is already opened
+        if (actionEditorC != nullptr)
         {
-            actionEditorC = _getActionEditorFromModelOfAction(action);
+            qDebug() << "The 'Action Editor' of" << action->name() << "is already opened...bring to front !";
 
-            // The corresponding editor is already opened
-            if (actionEditorC != nullptr)
-            {
-                qDebug() << "The 'Action Editor' of" << action->name() << "is already opened...bring to front !";
-
-                Q_EMIT actionEditorC->bringToFront();
-            }
-            else
-            {
-                // Set selected action
-                setselectedAction(action);
-
-                // Create an action editor
-                actionEditorC = new ActionEditorController(_buildNewActionName(), action, _modelManager->allAgentsGroupsByName()->toList(), false);
-
-                _hashActionEditorControllerFromModelOfAction.insert(action, actionEditorC);
-
-                // Add to the list of opened action editors
-                _openedActionsEditorsControllers.append(actionEditorC);
-            }
+            Q_EMIT actionEditorC->bringToFront();
         }
         else
         {
-            // Create an action editor
-            actionEditorC = new ActionEditorController(_buildNewActionName(), nullptr, _modelManager->allAgentsGroupsByName()->toList(), false);
+            // Set selected action
+            setselectedAction(action);
 
-            _hashActionEditorControllerFromModelOfAction.insert(actionEditorC->editedAction(), actionEditorC);
+            // Create an action editor
+            actionEditorC = new ActionEditorController(_buildNewActionName(),
+                                                       action,
+                                                       IngeScapeModelManager::instance()->allAgentsGroupsByName()->toList(),
+                                                       false);
+
+            _hashActionEditorControllerFromModelOfAction.insert(action, actionEditorC);
 
             // Add to the list of opened action editors
             _openedActionsEditorsControllers.append(actionEditorC);
         }
+    }
+    else
+    {
+        // Create an action editor
+        actionEditorC = new ActionEditorController(_buildNewActionName(),
+                                                   nullptr,
+                                                   IngeScapeModelManager::instance()->allAgentsGroupsByName()->toList(),
+                                                   false);
+
+        _hashActionEditorControllerFromModelOfAction.insert(actionEditorC->editedAction(), actionEditorC);
+
+        // Add to the list of opened action editors
+        _openedActionsEditorsControllers.append(actionEditorC);
     }
 }
 
@@ -305,7 +308,7 @@ void ScenarioController::openActionEditorWithModel(ActionM* action)
   */
 void ScenarioController::openActionEditorWithViewModel(ActionVM* action)
 {
-    if ((_modelManager != nullptr) && (action != nullptr) && (action->modelM() != nullptr))
+    if ((action != nullptr) && (action->modelM() != nullptr))
     {
         ActionEditorController* actionEditorC = _getActionEditorFromViewModelOfAction(action);
 
@@ -321,7 +324,10 @@ void ScenarioController::openActionEditorWithViewModel(ActionVM* action)
             setselectedAction(action->modelM());
 
             // Create an action editor
-            actionEditorC = new ActionEditorController(_buildNewActionName(), action->modelM(), _modelManager->allAgentsGroupsByName()->toList(), false);
+            actionEditorC = new ActionEditorController(_buildNewActionName(),
+                                                       action->modelM(),
+                                                       IngeScapeModelManager::instance()->allAgentsGroupsByName()->toList(),
+                                                       false);
 
             _hashActionEditorControllerFromViewModelOfAction.insert(action, actionEditorC);
 
@@ -348,16 +354,18 @@ void ScenarioController::openActionEditorWithViewModel(ActionVM* action)
   */
 void ScenarioController::validateActionEditor(ActionEditorController* actionEditorC)
 {
-    if ((actionEditorC != nullptr) && (_modelManager != nullptr))
+    IngeScapeModelManager* igsModelManager = IngeScapeModelManager::instance();
+
+    if ((actionEditorC != nullptr) && (igsModelManager != nullptr))
     {
         // Validate modification
         actionEditorC->validateModification();
 
         ActionM* originalAction = actionEditorC->originalAction();
-        if ((originalAction != nullptr) && (_modelManager->getActionWithId(originalAction->uid()) == nullptr))
+        if ((originalAction != nullptr) && (igsModelManager->getActionWithId(originalAction->uid()) == nullptr))
         {
             // Add the action to the model manager
-            _modelManager->storeNewAction(originalAction);
+            igsModelManager->storeNewAction(originalAction);
 
             // Add the action to the list
             _actionsList.append(originalAction);
