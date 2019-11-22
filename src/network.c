@@ -540,7 +540,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                                 igs_license("Maximum number of allowed agents (%d) is exceeded : agent will stop", agent->license->platformNbAgents);
                                 license_callback_t *el = NULL;
                                 DL_FOREACH(agent->licenseCallbacks, el){
-                                    el->callback_ptr(IGS_LICENSE_TOO_MANY_AGENTS, el->data);
+                                    el->callback_ptr(agent, IGS_LICENSE_TOO_MANY_AGENTS, el->data);
                                 }
                                 return -1;
                             }
@@ -704,7 +704,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         igs_license("Maximum number of allowed IOPs (%d) is exceeded : agent will stop", agent->license->platformNbIOPs);
                         license_callback_t *el = NULL;
                         DL_FOREACH(agent->licenseCallbacks, el){
-                            el->callback_ptr(IGS_LICENSE_TOO_MANY_IOPS, el->data);
+                            el->callback_ptr(agent, IGS_LICENSE_TOO_MANY_IOPS, el->data);
                         }
                         return -1;
                     }
@@ -1088,7 +1088,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                                 igs_callArgument_t *_arg = NULL;
                                 LL_COUNT(call->arguments, _arg, nbArgs);
                                 if (call_addValuesToArgumentsFromMessage(callName, call->arguments, msgDuplicate)){
-                                    (call->cb)(name, peer, callName, call->arguments, nbArgs, call->cbData);
+                                    (call->cb)(agent, name, peer, callName, call->arguments, nbArgs, call->cbData);
                                     call_freeValuesInArguments(call->arguments);
                                 }
                             }else{
@@ -1176,7 +1176,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
         DL_FOREACH(agent->zyreCallbacks,elt){
             if (zyre_event != NULL){
                 zmsg_t *dup = zmsg_dup(msg);
-                elt->callback_ptr(event, peer, name, address, group, headers, dup, elt->myData);
+                elt->callback_ptr(agent, event, peer, name, address, group, headers, dup, elt->myData);
                 zmsg_destroy(&dup);
             }else{
                 igs_error("previous callback certainly destroyed the bus event : next callbacks will not be executed");
@@ -1224,7 +1224,7 @@ int triggerLicenseStop(zloop_t *loop, int timer_id, void *arg){
     igs_license("Runtime duration limit has been reached : stopping ingescape now");
     license_callback_t *el = NULL;
     DL_FOREACH(agent->licenseCallbacks, el){
-        el->callback_ptr(IGS_LICENSE_TIMEOUT, el->data);
+        el->callback_ptr(agent, IGS_LICENSE_TIMEOUT, el->data);
     }
     return -1;
 }
@@ -1628,7 +1628,7 @@ initLoop (zsock_t *pipe, void *args){
     forcedStopCalback_t *cb = NULL;
     if (agent->forcedStop){
         DL_FOREACH(agent->forcedStopCalbacks, cb){
-            cb->callback_ptr(cb->myData);
+            cb->callback_ptr(agent, cb->myData);
         }
     }
     igs_debug("loop stopped");
@@ -1735,7 +1735,7 @@ int network_publishOutput (igsAgent_t *agent, const agent_iop_t *iop){
     return result;
 }
 
-int igsAgent_observeBus(igsAgent_t *agent, igs_BusMessageIncoming cb, void *myData){
+int igsAgent_observeBus(igsAgent_t *agent, igsAgent_BusMessageIncoming cb, void *myData){
     if (cb != NULL){
         zyreCallback_t *newCb = calloc(1, sizeof(zyreCallback_t));
         newCb->callback_ptr = cb;
@@ -2135,7 +2135,7 @@ int igsAgent_unfreeze(igsAgent_t *agent){
  * \param myData is pointer to user data is needed.
  * \return 1 if ok, else 0.
  */
-int igsAgent_observeFreeze(igsAgent_t *agent, igs_freezeCallback cb, void *myData){
+int igsAgent_observeFreeze(igsAgent_t *agent, igsAgent_freezeCallback cb, void *myData){
     if (cb != NULL){
         freezeCallback_t *newCb = calloc(1, sizeof(freezeCallback_t));
         newCb->callback_ptr = cb;
@@ -2241,7 +2241,7 @@ int igsAgent_mute(igsAgent_t *agent){
         }
         muteCallback_t *elt;
         DL_FOREACH(agent->muteCallbacks,elt){
-            elt->callback_ptr(agent->isWholeAgentMuted, elt->myData);
+            elt->callback_ptr(agent, agent->isWholeAgentMuted, elt->myData);
         }
     }
     return 1;
@@ -2264,7 +2264,7 @@ int igsAgent_unmute(igsAgent_t *agent){
         }
         muteCallback_t *elt;
         DL_FOREACH(agent->muteCallbacks,elt){
-            elt->callback_ptr(agent->isWholeAgentMuted, elt->myData);
+            elt->callback_ptr(agent, agent->isWholeAgentMuted, elt->myData);
         }
     }
     return 1;
@@ -2289,7 +2289,7 @@ bool igsAgent_isMuted(igsAgent_t *agent){
  * \param myData is pointer to user data is needed.
  * \return 1 if ok, else 0.
  */
-int igsAgent_observeMute(igsAgent_t *agent, igs_muteCallback cb, void *myData){
+int igsAgent_observeMute(igsAgent_t *agent, igsAgent_muteCallback cb, void *myData){
     if (cb != NULL){
         muteCallback_t *newCb = calloc(1, sizeof(muteCallback_t));
         newCb->callback_ptr = cb;
@@ -2468,7 +2468,7 @@ void igs_freeNetaddressesList(char **addresses, int nb){
     igs_freeNetdevicesList(addresses, nb);
 }
 
-void igsAgent_observeForcedStop(igsAgent_t *agent, igs_forcedStopCallback cb, void *myData){
+void igsAgent_observeForcedStop(igsAgent_t *agent, igsAgent_forcedStopCallback cb, void *myData){
     if (cb != NULL){
         forcedStopCalback_t *newCb = calloc(1, sizeof(forcedStopCalback_t));
         newCb->callback_ptr = cb;

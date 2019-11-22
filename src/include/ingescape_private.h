@@ -90,7 +90,7 @@ typedef struct agent_iop {
 typedef struct call{
     char * name;
     char * description;
-    igs_callFunction cb;
+    igsAgent_callFunction cb;
     void *cbData;
     igs_callArgument_t *arguments;
     struct call *reply;
@@ -234,7 +234,7 @@ typedef struct licenseEnforcement {
 } licenseEnforcement_t;
 
 typedef struct license_callback {
-    igs_licenseCallback callback_ptr;
+    igsAgent_licenseCallback callback_ptr;
     void* data;
     struct license_callback *prev;
     struct license_callback *next;
@@ -250,35 +250,35 @@ typedef struct monitor {
 } monitor_t;
 
 typedef struct monitorCallback {
-    igs_monitorCallback callback_ptr;
+    igsAgent_monitorCallback callback_ptr;
     void *myData;
     struct monitorCallback *prev;
     struct monitorCallback *next;
 } monitorCallback_t;
 
 typedef struct muteCallback {
-    igs_muteCallback callback_ptr;
+    igsAgent_muteCallback callback_ptr;
     void *myData;
     struct muteCallback *prev;
     struct muteCallback *next;
 } muteCallback_t;
 
 typedef struct freezeCallback {
-    igs_freezeCallback callback_ptr;
+    igsAgent_freezeCallback callback_ptr;
     void *myData;
     struct freezeCallback *prev;
     struct freezeCallback *next;
 } freezeCallback_t;
 
 typedef struct zyreCallback {
-    igs_BusMessageIncoming callback_ptr;
+    igsAgent_BusMessageIncoming callback_ptr;
     void *myData;
     struct zyreCallback *prev;
     struct zyreCallback *next;
 } zyreCallback_t;
 
 typedef struct forcedStopCalback {
-    igs_forcedStopCallback callback_ptr;
+    igsAgent_forcedStopCallback callback_ptr;
     void *myData;
     struct forcedStopCalback *prev;
     struct forcedStopCalback *next;
@@ -386,7 +386,7 @@ extern bool admin_logInStream;
 extern bool admin_logInFile;
 extern char admin_logFile[4096];
 void admin_makeFilePath(const char *from, char *to, size_t size_of_to);
-PUBLIC void igs_log(char *name, igs_logLevel_t, const char *function, const char *format, ...)  CHECK_PRINTF (4);
+PUBLIC void admin_log(char *name, igs_logLevel_t, const char *function, const char *format, ...)  CHECK_PRINTF (4);
 
 //bus
 void bus_zyreLock(void);

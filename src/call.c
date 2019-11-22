@@ -209,7 +209,7 @@ void igs_addDataToArgumentsList(igs_callArgument_t **list, void *value, size_t s
 }
 
 
-int igsAgent_initCall(igsAgent_t *agent, const char *name, igs_callFunction cb, void *myData){
+int igsAgent_initCall(igsAgent_t *agent, const char *name, igsAgent_callFunction cb, void *myData){
     igs_call_t *t = NULL;
     if(agent->internal_definition == NULL){
         agent->internal_definition = calloc(1, sizeof(definition));

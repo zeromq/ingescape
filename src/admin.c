@@ -145,7 +145,7 @@ int igs_protocol(void){
     return INGESCAPE_PROTOCOL;
 }
 
-void igs_log(char *name, igs_logLevel_t level, const char *function, const char *fmt, ...){
+void admin_log(char *name, igs_logLevel_t level, const char *function, const char *fmt, ...){
     admin_lock();
     initInternalAgentIfNeeded();
     

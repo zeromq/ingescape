@@ -609,7 +609,7 @@ bool igsAgent_checkLicense(igsAgent_t *agent, const char *agentId){
     return false;
 }
 
-int igsAgent_observeLicense(igsAgent_t *agent, igs_licenseCallback cb, void *myData){
+int igsAgent_observeLicense(igsAgent_t *agent, igsAgent_licenseCallback cb, void *myData){
     license_callback_t *l = (license_callback_t *)calloc(1, sizeof(license_callback_t));
     l->callback_ptr = cb;
     l->data = myData;

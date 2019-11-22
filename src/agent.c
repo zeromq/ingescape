@@ -26,51 +26,11 @@ void igsAgent_destroy(igsAgent_t **agent){
     *agent = NULL;
 }
 
-void igsAgent_trace2(const char *function, igsAgent_t *agent, const char *format, ...){
+void igsAgent_log(igs_logLevel_t level, const char *function, igsAgent_t *agent, const char *format, ...){
     va_list list;
     va_start(list, format);
     char content[MAX_STRING_MSG_LENGTH] = "";
     vsnprintf(content, MAX_STRING_MSG_LENGTH - 1, format, list);
     va_end(list);
-    igs_log(agent->agentName, IGS_LOG_TRACE, function, "%s", content);
-}
-void igsAgent_debug2(const char *function, igsAgent_t *agent, const char *format, ...){
-    va_list list;
-    va_start(list, format);
-    char content[MAX_STRING_MSG_LENGTH] = "";
-    vsnprintf(content, MAX_STRING_MSG_LENGTH - 1, format, list);
-    va_end(list);
-    igs_log(agent->agentName, IGS_LOG_DEBUG, function, "%s", content);
-}
-void igsAgent_info2(const char *function, igsAgent_t *agent, const char *format, ...){
-    va_list list;
-    va_start(list, format);
-    char content[MAX_STRING_MSG_LENGTH] = "";
-    vsnprintf(content, MAX_STRING_MSG_LENGTH - 1, format, list);
-    va_end(list);
-    igs_log(agent->agentName, IGS_LOG_INFO, function, "%s", content);
-}
-void igsAgent_warn2(const char *function, igsAgent_t *agent, const char *format, ...){
-    va_list list;
-    va_start(list, format);
-    char content[MAX_STRING_MSG_LENGTH] = "";
-    vsnprintf(content, MAX_STRING_MSG_LENGTH - 1, format, list);
-    va_end(list);
-    igs_log(agent->agentName, IGS_LOG_WARN, function, "%s", content);
-}
-void igsAgent_error2(const char *function, igsAgent_t *agent, const char *format, ...){
-    va_list list;
-    va_start(list, format);
-    char content[MAX_STRING_MSG_LENGTH] = "";
-    vsnprintf(content, MAX_STRING_MSG_LENGTH - 1, format, list);
-    va_end(list);
-    igs_log(agent->agentName, IGS_LOG_ERROR, function, "%s", content);
-}
-void igsAgent_fatal2(const char *function, igsAgent_t *agent, const char *format, ...){
-    va_list list;
-    va_start(list, format);
-    char content[MAX_STRING_MSG_LENGTH] = "";
-    vsnprintf(content, MAX_STRING_MSG_LENGTH - 1, format, list);
-    va_end(list);
-    igs_log(agent->agentName, IGS_LOG_FATAL, function, "%s", content);
+    admin_log(agent->agentName, level, function, "%s", content);
 }

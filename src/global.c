@@ -16,7 +16,7 @@
 igsAgent_t *internalAgent = NULL;
 bool igs_Interrupted = false;
 
-void globalforcedStopCB(void *myData){
+void globalforcedStopCB(igsAgent_t *agent, void *myData){
     IGS_UNUSED(myData)
     igs_Interrupted = true;
 }
@@ -45,9 +45,23 @@ int igs_stop(void){
     return igsAgent_stop(internalAgent);
 }
 
+
+typedef struct {
+    igs_forcedStopCallback cb;
+    void *myData;
+} observeForcedStopCbWrapper_t;
+
+void global_observeForcedStopCallback(igsAgent_t *agent, void *myData){
+    observeForcedStopCbWrapper_t *wrap = (observeForcedStopCbWrapper_t *)myData;
+    wrap->cb(wrap->myData);
+}
+
 void igs_observeForcedStop(igs_forcedStopCallback cb, void *myData){
     initInternalAgentIfNeeded();
-    igsAgent_observeForcedStop(internalAgent, cb, myData);
+    observeForcedStopCbWrapper_t *wrap = calloc(1, sizeof(observeForcedStopCbWrapper_t));
+    wrap->cb = cb;
+    wrap->myData = myData;
+    igsAgent_observeForcedStop(internalAgent, global_observeForcedStopCallback, wrap);
 }
 
 void igs_die(void){
@@ -90,9 +104,22 @@ bool igs_isMuted(void){
     return igsAgent_isMuted(internalAgent);
 }
 
+typedef struct {
+    igs_muteCallback cb;
+    void *myData;
+} observeMuteCbWrapper_t;
+
+void global_observeMuteCallback(igsAgent_t *agent, bool isMuted, void *myData){
+    observeMuteCbWrapper_t *wrap = (observeMuteCbWrapper_t *)myData;
+    wrap->cb(isMuted, wrap->myData);
+}
+
 int igs_observeMute(igs_muteCallback cb, void *myData){
     initInternalAgentIfNeeded();
-    return igsAgent_observeMute(internalAgent, cb, myData);
+    observeMuteCbWrapper_t *wrap = calloc(1, sizeof(observeMuteCbWrapper_t));
+    wrap->cb = cb;
+    wrap->myData = myData;
+    return igsAgent_observeMute(internalAgent, global_observeMuteCallback, wrap);
 }
 
 int igs_freeze(void){
@@ -110,9 +137,22 @@ int igs_unfreeze(void){
     return igsAgent_unfreeze(internalAgent);
 }
 
+typedef struct {
+    igs_freezeCallback cb;
+    void *myData;
+} observeFreezeCbWrapper_t;
+
+void global_observeFreezeCallback(igsAgent_t *agent, bool isPaused, void *myData){
+    observeFreezeCbWrapper_t *wrap = (observeFreezeCbWrapper_t *)myData;
+    wrap->cb(isPaused, wrap->myData);
+}
+
 int igs_observeFreeze(igs_freezeCallback cb, void *myData){
     initInternalAgentIfNeeded();
-    return igsAgent_observeFreeze(internalAgent, cb, myData);
+    observeFreezeCbWrapper_t *wrap = calloc(1, sizeof(observeFreezeCbWrapper_t));
+    wrap->cb = cb;
+    wrap->myData = myData;
+    return igsAgent_observeFreeze(internalAgent, cb, wrap);
 }
 
 void igs_setCanBeFrozen(bool canBeFrozen){
@@ -320,35 +360,35 @@ void igs_clearDataForParameter(const char *name){
 typedef struct {
     igs_observeCallback cb;
     void *myData;
-} observeCbWrapper_t;
+} observeIOPCbWrapper_t;
 
-void igsAgent_GlobalObserveCallback(igsAgent_t *agent, iop_t iopType, const char *name, iopType_t valueType, void *value, size_t valueSize, void *myData){
-    observeCbWrapper_t *wrap = (observeCbWrapper_t *)myData;
+void global_observeIOPCallback(igsAgent_t *agent, iop_t iopType, const char *name, iopType_t valueType, void *value, size_t valueSize, void *myData){
+    observeIOPCbWrapper_t *wrap = (observeIOPCbWrapper_t *)myData;
     wrap->cb(iopType, name, valueType, value, valueSize, wrap->myData);
 }
 
 int igs_observeInput(const char *name, igs_observeCallback cb, void *myData){
     initInternalAgentIfNeeded();
-    observeCbWrapper_t *wrap = calloc(1, sizeof(observeCbWrapper_t));
+    observeIOPCbWrapper_t *wrap = calloc(1, sizeof(observeIOPCbWrapper_t));
     wrap->cb = cb;
     wrap->myData = myData;
-    return igsAgent_observeInput(internalAgent, name, igsAgent_GlobalObserveCallback, wrap);
+    return igsAgent_observeInput(internalAgent, name, global_observeIOPCallback, wrap);
 }
 
 int igs_observeOutput(const char *name, igs_observeCallback cb, void * myData){
     initInternalAgentIfNeeded();
-    observeCbWrapper_t *wrap = calloc(1, sizeof(observeCbWrapper_t));
+    observeIOPCbWrapper_t *wrap = calloc(1, sizeof(observeIOPCbWrapper_t));
     wrap->cb = cb;
     wrap->myData = myData;
-    return igsAgent_observeOutput(internalAgent, name, igsAgent_GlobalObserveCallback, myData);
+    return igsAgent_observeOutput(internalAgent, name, global_observeIOPCallback, wrap);
 }
 
 int igs_observeParameter(const char *name, igs_observeCallback cb, void * myData){
     initInternalAgentIfNeeded();
-    observeCbWrapper_t *wrap = calloc(1, sizeof(observeCbWrapper_t));
+    observeIOPCbWrapper_t *wrap = calloc(1, sizeof(observeIOPCbWrapper_t));
     wrap->cb = cb;
     wrap->myData = myData;
-    return igsAgent_observeParameter(internalAgent, name, igsAgent_GlobalObserveCallback, myData);
+    return igsAgent_observeParameter(internalAgent, name, global_observeIOPCallback, wrap);
 }
 
 int igs_muteOutput(const char *name){
@@ -655,74 +695,14 @@ const char* igs_getIpcFolderPath(void){
 }
 #endif
 
-void igs_traceGlobal(const char *function, const char *format, ...){
+void igs_log(igs_logLevel_t level, const char *function, const char *format, ...){
     initInternalAgentIfNeeded();
     va_list list;
     va_start(list, format);
     char content[MAX_STRING_MSG_LENGTH] = "";
     vsnprintf(content, MAX_STRING_MSG_LENGTH - 1, format, list);
     va_end(list);
-    igs_log(internalAgent->agentName, IGS_LOG_TRACE, function, "%s", content);
-}
-
-void igs_debugGlobal(const char *function, const char *format, ...){
-    initInternalAgentIfNeeded();
-    va_list list;
-    va_start(list, format);
-    char content[MAX_STRING_MSG_LENGTH] = "";
-    vsnprintf(content, MAX_STRING_MSG_LENGTH - 1, format, list);
-    va_end(list);
-    igs_log(internalAgent->agentName, IGS_LOG_DEBUG, function, "%s", content);
-}
-
-void igs_infoGlobal(const char *function, const char *format, ...){
-    initInternalAgentIfNeeded();
-    va_list list;
-    va_start(list, format);
-    char content[MAX_STRING_MSG_LENGTH] = "";
-    vsnprintf(content, MAX_STRING_MSG_LENGTH - 1, format, list);
-    va_end(list);
-    igs_log(internalAgent->agentName, IGS_LOG_INFO, function, "%s", content);
-}
-
-void igs_warnGlobal(const char *function, const char *format, ...){
-    initInternalAgentIfNeeded();
-    va_list list;
-    va_start(list, format);
-    char content[MAX_STRING_MSG_LENGTH] = "";
-    vsnprintf(content, MAX_STRING_MSG_LENGTH - 1, format, list);
-    va_end(list);
-    igs_log(internalAgent->agentName, IGS_LOG_WARN, function, "%s", content);
-}
-
-void igs_errorGlobal(const char *function, const char *format, ...){
-    initInternalAgentIfNeeded();
-    va_list list;
-    va_start(list, format);
-    char content[MAX_STRING_MSG_LENGTH] = "";
-    vsnprintf(content, MAX_STRING_MSG_LENGTH - 1, format, list);
-    va_end(list);
-    igs_log(internalAgent->agentName, IGS_LOG_ERROR, function, "%s", content);
-}
-
-void igs_fatalGlobal(const char *function, const char *format, ...){
-    initInternalAgentIfNeeded();
-    va_list list;
-    va_start(list, format);
-    char content[MAX_STRING_MSG_LENGTH] = "";
-    vsnprintf(content, MAX_STRING_MSG_LENGTH - 1, format, list);
-    va_end(list);
-    igs_log(internalAgent->agentName, IGS_LOG_FATAL, function, "%s", content);
-}
-
-void igs_licenseGlobal(const char *function, const char *format, ...){
-    initInternalAgentIfNeeded();
-    va_list list;
-    va_start(list, format);
-    char content[MAX_STRING_MSG_LENGTH] = "";
-    vsnprintf(content, MAX_STRING_MSG_LENGTH - 1, format, list);
-    va_end(list);
-    igs_log(internalAgent->agentName, IGS_LOG_FATAL+1, function, "%s", content);
+    admin_log(internalAgent->agentName, level, function, "%s", content);
 }
 
 //licenses
@@ -742,9 +722,22 @@ bool igs_checkLicenseForAgent(const char *agentId){
     return igsAgent_checkLicense(internalAgent, agentId);
 }
 
+typedef struct {
+    igs_licenseCallback cb;
+    void *myData;
+} observeLicenseCbWrapper_t;
+
+void global_observeLicenseCallback(igsAgent_t *agent, igs_license_limit_t limit, void *myData){
+    observeLicenseCbWrapper_t *wrap = (observeLicenseCbWrapper_t *)myData;
+    wrap->cb(limit, wrap->myData);
+}
+
 int igs_observeLicense(igs_licenseCallback cb, void *myData){
     initInternalAgentIfNeeded();
-    return igsAgent_observeLicense(internalAgent, cb, myData);
+    observeLicenseCbWrapper_t *wrap = calloc(1, sizeof(observeLicenseCbWrapper_t));
+    wrap->cb = cb;
+    wrap->myData = myData;
+    return igsAgent_observeLicense(internalAgent, global_observeLicenseCallback, wrap);
 }
 #endif
 
@@ -796,9 +789,22 @@ bool igs_isMonitoringEnabled(void){
     return igsAgent_isMonitoringEnabled(internalAgent);
 }
 
+typedef struct {
+    igs_monitorCallback cb;
+    void *myData;
+} observeMonitorCbWrapper_t;
+
+void global_observeMonitorCallback(igsAgent_t *agent, igs_monitorEvent_t event, const char *device, const char *ipAddress, void *myData){
+    observeMonitorCbWrapper_t *wrap = (observeMonitorCbWrapper_t *)myData;
+    wrap->cb(event, device, ipAddress, wrap->myData);
+}
+
 void igs_monitor(igs_monitorCallback cb, void *myData){
     initInternalAgentIfNeeded();
-    igsAgent_monitor(internalAgent, cb, myData);
+    observeMonitorCbWrapper_t *wrap = calloc(1, sizeof(observeMonitorCbWrapper_t));
+    wrap->cb = cb;
+    wrap->myData = myData;
+    igsAgent_monitor(internalAgent, global_observeMonitorCallback, wrap);
 }
 
 void igs_monitoringShallStartStopAgent(bool flag){
@@ -817,9 +823,24 @@ int igs_readInputAsZMQMsg(const char *name, zmsg_t **msg){
     return igsAgent_readInputAsZMQMsg(internalAgent, name, msg);
 }
 
+typedef struct {
+    igs_BusMessageIncoming cb;
+    void *myData;
+} observeBusCbWrapper_t;
+
+void global_observeBusCallback(igsAgent_t *agent, const char *event, const char *peerID, const char *name,
+                               const char *address, const char *channel,
+                               zhash_t *headers, zmsg_t *msg, void *myData){
+    observeBusCbWrapper_t *wrap = (observeBusCbWrapper_t *)myData;
+    wrap->cb(event, peerID, name, address, channel, headers, msg, wrap->myData);
+}
+
 int igs_observeBus(igs_BusMessageIncoming cb, void *myData){
     initInternalAgentIfNeeded();
-    return igsAgent_observeBus(internalAgent, cb, myData);
+    observeBusCbWrapper_t *wrap = calloc(1, sizeof(observeBusCbWrapper_t));
+    wrap->cb = cb;
+    wrap->myData = myData;
+    return igsAgent_observeBus(internalAgent, global_observeBusCallback, wrap);
 }
 
 void igs_busJoinChannel(const char *channel){
@@ -888,9 +909,24 @@ int igs_sendCall(const char *agentNameOrUUID, const char *callName, igs_callArgu
     return igsAgent_sendCall(internalAgent, agentNameOrUUID, callName, list);
 }
 
+typedef struct {
+    igs_callFunction cb;
+    void *myData;
+} callCbWrapper_t;
+
+void global_callCallback(igsAgent_t *agent, const char *senderAgentName, const char *senderAgentUUID,
+                         const char *callName, igs_callArgument_t *firstArgument, size_t nbArgs,
+                         void* myData){
+    callCbWrapper_t *wrap = (callCbWrapper_t *)myData;
+    wrap->cb(senderAgentName, senderAgentUUID, callName, firstArgument, nbArgs, wrap->myData);
+}
+
 int igs_initCall(const char *name, igs_callFunction cb, void *myData){
     initInternalAgentIfNeeded();
-    return igsAgent_initCall(internalAgent, name, cb, myData);
+    callCbWrapper_t *wrap = calloc(1, sizeof(callCbWrapper_t));
+    wrap->cb = cb;
+    wrap->myData = myData;
+    return igsAgent_initCall(internalAgent, name, global_callCallback, wrap);
 }
 
 int igs_removeCall(const char *name){

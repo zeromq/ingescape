@@ -46,7 +46,7 @@ int monitor_triggerNetworkCheck(zloop_t *loop, int timer_id, void *arg){
 
                     // Call our callbacks
                     DL_FOREACH(agent->monitorCallbacks, cb){
-                        cb->callback_ptr(IGS_NETWORK_ADDRESS_CHANGED,
+                        cb->callback_ptr(agent, IGS_NETWORK_ADDRESS_CHANGED,
                                          agent->agentElements->networkDevice, ziflist_address(iflist), cb->myData);
                     }
 
@@ -84,7 +84,7 @@ int monitor_triggerNetworkCheck(zloop_t *loop, int timer_id, void *arg){
 
                 // Call our callbacks
                 DL_FOREACH(agent->monitorCallbacks, cb){
-                    cb->callback_ptr(IGS_NETWORK_OK, agent->monitor->networkDevice, NULL, cb->myData);
+                    cb->callback_ptr(agent, IGS_NETWORK_OK, agent->monitor->networkDevice, NULL, cb->myData);
                 }
 
                 // check if we need to restart it
@@ -110,7 +110,7 @@ int monitor_triggerNetworkCheck(zloop_t *loop, int timer_id, void *arg){
 
                 // Call our callbacks
                 DL_FOREACH(agent->monitorCallbacks, cb){
-                    cb->callback_ptr(IGS_NETWORK_OK_AFTER_MANUAL_RESTART, agent->agentElements->networkDevice, agent->agentElements->ipAddress, cb->myData);
+                    cb->callback_ptr(agent, IGS_NETWORK_OK_AFTER_MANUAL_RESTART, agent->agentElements->networkDevice, agent->agentElements->ipAddress, cb->myData);
                 }
 
                 //NB: we don't need to (re)start our agent because it is already started
@@ -149,7 +149,7 @@ int monitor_triggerNetworkCheck(zloop_t *loop, int timer_id, void *arg){
 
             // Call our callbacks
             DL_FOREACH(agent->monitorCallbacks, cb){
-                cb->callback_ptr(IGS_NETWORK_DEVICE_NOT_AVAILABLE, agent->agentElements->networkDevice, agent->agentElements->ipAddress, cb->myData);
+                cb->callback_ptr(agent, IGS_NETWORK_DEVICE_NOT_AVAILABLE, agent->agentElements->networkDevice, agent->agentElements->ipAddress, cb->myData);
             }
 
             // Check if we need to stop it
@@ -168,7 +168,7 @@ int monitor_triggerNetworkCheck(zloop_t *loop, int timer_id, void *arg){
 
             // Call our callbacks
             DL_FOREACH(agent->monitorCallbacks, cb){
-                cb->callback_ptr(IGS_NETWORK_DEVICE_NOT_AVAILABLE, agent->monitor->networkDevice, NULL, cb->myData);
+                cb->callback_ptr(agent, IGS_NETWORK_DEVICE_NOT_AVAILABLE, agent->monitor->networkDevice, NULL, cb->myData);
             }
 
             //NB: we don't need to call igs_stop because our agent is not running
@@ -293,7 +293,7 @@ bool igsAgent_isMonitoringEnabled(igsAgent_t *agent){
     return (agent->monitor != NULL);
 }
 
-void igsAgent_monitor(igsAgent_t *agent, igs_monitorCallback cb, void *myData){
+void igsAgent_monitor(igsAgent_t *agent, igsAgent_monitorCallback cb, void *myData){
     if (cb != NULL){
         monitorCallback_t *newCb = calloc(1, sizeof(monitorCallback_t));
         newCb->callback_ptr = cb;
