@@ -52,7 +52,7 @@ Item {
     readonly property int automaticPanZoomAnimationDuration: 300;
 
     // Size of a cell of our background
-    readonly property int backgroundCellSize: 150;
+    readonly property int backgroundCellSize: 60 ;
 
     // Number of subdivisions for background cells
     readonly property int backgroundCellNumberOfSubDivisions: 5
@@ -331,10 +331,6 @@ Item {
                 offsetY: workspace.y
 
                 cellSize: rootItem.backgroundCellSize * workspace.scale
-                numberOfSubDivisions: rootItem.backgroundCellNumberOfSubDivisions
-
-                cellStroke: IngeScapeEditorTheme.agentsMappingGridLineColor
-                subCellStroke: IngeScapeEditorTheme.agentsMappingGridSublineColor
             }
         }
 

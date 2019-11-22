@@ -4,18 +4,18 @@
 stages:
   - build-lib
   - installer-lib
+  - deploy-lib
+  - delivery-lib
+  - delivery-lib-stable
   - build-binding
   - installer-binding
+  - deploy-binding
+  - delivery-binding
+  - delivery-binding-stable
   - build-apps
   - installer-apps
-  - deploy-lib
-  - deploy-binding
-  - delivery-lib
   - delivery-apps
-  - delivery-binding
-  - delivery-lib-stable
   - delivery-apps-stable
-  - delivery-binding-stable
 
 # Define ingescape library files
 .build-lib-files: &build-lib-files
@@ -446,7 +446,7 @@ editor-windows-release-x86:
   stage: build-apps
   variables:
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
-    ARCH: "x86"
+    ARCH: "Editor_x86"
   tags:
     - windows
   script:
@@ -469,7 +469,7 @@ editor-windows-release-x64:
   stage: build-apps
   variables:
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
-    ARCH: "x64"
+    ARCH: "Editor_x64"
   tags:
     - windows
   script:
@@ -493,7 +493,7 @@ assessments-windows-release-x86:
   variables:
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
     GIT_SUBMODULE_STRATEGY: recursive
-    ARCH: "x86"
+    ARCH: "Assessments_x86"
   tags:
     - windows
   script:
@@ -517,7 +517,7 @@ assessments-windows-release-x64:
   variables:
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
     GIT_SUBMODULE_STRATEGY: recursive
-    ARCH: "x64"
+    ARCH: "Assessments_x64"
   tags:
     - windows
   script:
@@ -541,7 +541,7 @@ expe-windows-release-x86:
   variables:
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
     GIT_SUBMODULE_STRATEGY: recursive
-    ARCH: "x86"
+    ARCH: "Expe_x86"
   tags:
     - windows
   script:
@@ -565,7 +565,7 @@ expe-windows-release-x64:
   variables:
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
     GIT_SUBMODULE_STRATEGY: recursive
-    ARCH: "x64"
+    ARCH: "Expe_x64"
   tags:
     - windows
   script:
@@ -694,7 +694,7 @@ editor-installer-windows-x86:
   <<: *build-editor-files
   stage: installer-apps
   variables:
-    ARCH: "x86"
+    ARCH: "Editor_x86"
   tags:
     - windows
   script:
@@ -711,7 +711,7 @@ editor-installer-windows-x64:
   <<: *build-editor-files
   stage: installer-apps
   variables:
-    ARCH: "x64"
+    ARCH: "Editor_x64"
   tags:
     - windows
   script:
@@ -744,7 +744,7 @@ assessments-installer-windows-x86:
   <<: *build-assessments-files
   stage: installer-apps
   variables:
-    ARCH: "x86"
+    ARCH: "Assessments_x86"
   tags:
     - windows
   script:
@@ -761,7 +761,7 @@ assessments-installer-windows-x64:
   <<: *build-assessments-files
   stage: installer-apps
   variables:
-    ARCH: "x64"
+    ARCH: "Assessments_x64"
   tags:
     - windows
   script:
@@ -794,7 +794,7 @@ expe-installer-windows-x86:
   <<: *build-expe-files
   stage: installer-apps
   variables:
-    ARCH: "x86"
+    ARCH: "Expe_x86"
   tags:
     - windows
   script:
@@ -811,7 +811,7 @@ expe-installer-windows-x64:
   <<: *build-expe-files
   stage: installer-apps
   variables:
-    ARCH: "x64"
+    ARCH: "Expe_x64"
   tags:
     - windows
   script:

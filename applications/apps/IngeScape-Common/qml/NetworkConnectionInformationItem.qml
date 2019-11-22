@@ -313,9 +313,8 @@ I2CustomRectangle {
                 LabellessSvgButton {
                     id: buttonOpenSettings
 
-                    releasedID: "settings"
-                    pressedID: "settings-pressed"
-                    disabledID: "settings-disabled"
+                    releasedID: "mapping-mode-settings"
+                    pressedID: "mapping-mode-settings-pressed"
 
                     visible: !rootPrivate.isEditionModeOpened
                     enabled: visible
