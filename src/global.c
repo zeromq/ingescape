@@ -613,6 +613,16 @@ bool igs_getAllowIpc(void){
     return igsAgent_getAllowIpc(internalAgent);
 }
 
+void igs_setAllowInproc(bool allow){
+    initInternalAgentIfNeeded();
+    igsAgent_setAllowInproc(internalAgent, allow);
+}
+
+bool igs_getAllowInproc(void){
+    initInternalAgentIfNeeded();
+    return igsAgent_getAllowInproc(internalAgent);
+}
+
 #if defined __unix__ || defined __APPLE__ || defined __linux__
 void igs_setIpcFolderPath(char *path){
     initInternalAgentIfNeeded();

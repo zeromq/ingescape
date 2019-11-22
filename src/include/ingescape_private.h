@@ -176,11 +176,13 @@ typedef struct zyreloopElements{
     char networkDevice[NETWORK_DEVICE_LENGTH];
     char ipAddress[IP_ADDRESS_LENGTH];
     char brokerEndPoint[IP_ADDRESS_LENGTH];
+    int processId;
     int zyrePort;
     zactor_t *agentActor;
     zyre_t *node;
     zsock_t *publisher;
     zsock_t *ipcPublisher;
+    zsock_t *inprocPublisher;
     zsock_t *logger;
     zloop_t *loop;
 } zyreloopElements_t;
@@ -306,6 +308,7 @@ typedef struct _igsAgent_t {
     bool network_RequestOutputsFromMappedAgents;
     bool forcedStop;
     bool allowIpc;
+    bool allowInproc;
     char agentName[MAX_AGENT_NAME_LENGTH];
     char agentState[MAX_AGENT_NAME_LENGTH];
     char commandLine[COMMAND_LINE_LENGTH];

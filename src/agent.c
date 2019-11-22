@@ -16,6 +16,8 @@ igsAgent_t *igsAgent_new(void){
     agent->network_discoveryInterval = 1000;
     agent->network_agentTimeout = 30000;
     agent->network_hwmValue = 1000;
+    agent->allowIpc = true;
+    agent->allowInproc = true;
     return agent;
 }
 void igsAgent_destroy(igsAgent_t **agent){

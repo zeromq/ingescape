@@ -319,8 +319,11 @@ PUBLIC void igs_setMappingPath(const char *path);
 PUBLIC void igs_writeDefinitionToPath(void);
 PUBLIC void igs_writeMappingToPath(void);
 
-//Ingescape automatically detects agents on the same computer and uses
-//optimized communication for input/output data exchange.
+//Ingescape automatically detects agents on the same computer and same process (PID)
+//Then, it uses optimized communication for input/output data exchange chosen
+//between TCP, IPC/loopback and inproc.
+
+//Same IP address but differet PIDs : use IPC or loopback
 //IPC is supported on UNIX systems only. On windows, we use the loopback as an alternative.
 //IPC is activated by default be can be deactivated here.
 PUBLIC void igs_setAllowIpc(bool allow);
@@ -330,6 +333,11 @@ PUBLIC bool igs_getAllowIpc(void);
 PUBLIC void igs_setIpcFolderPath(char *path);
 PUBLIC const char* igs_getIpcFolderPath(void);
 #endif
+
+//Same IP address and same PID : use inproc
+//Inproc is activated by default be can be deactivated here.
+PUBLIC void igs_setAllowInproc(bool allow);
+PUBLIC bool igs_getAllowInproc(void);
 
 
 //////////////////////////////////////////////////

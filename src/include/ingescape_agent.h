@@ -153,6 +153,8 @@ PUBLIC bool igsAgent_getAllowIpc(igsAgent_t *agent);
 #if defined __unix__ || defined __APPLE__ || defined __linux__
 PUBLIC void igsAgent_setIpcFolderPath(igsAgent_t *agent, char *path);
 PUBLIC const char* igsAgent_getIpcFolderPath(igsAgent_t *agent);
+PUBLIC void igsAgent_setAllowInproc(igsAgent_t *agent, bool allow);
+PUBLIC bool igsAgent_getAllowInproc(igsAgent_t *agent);
 #endif
 
 //licenses
