@@ -55,7 +55,7 @@ extern "C" {
 //////////////////  STRUCTURES AND ENUMS   //////////////////
 
 typedef struct igs_observe_callback {
-    igs_observeCallback callback_ptr;
+    igsAgent_observeCallback callback_ptr;
     void* data;
     struct igs_observe_callback *prev;
     struct igs_observe_callback *next;
@@ -176,11 +176,13 @@ typedef struct zyreloopElements{
     char networkDevice[NETWORK_DEVICE_LENGTH];
     char ipAddress[IP_ADDRESS_LENGTH];
     char brokerEndPoint[IP_ADDRESS_LENGTH];
+    int processId;
     int zyrePort;
     zactor_t *agentActor;
     zyre_t *node;
     zsock_t *publisher;
     zsock_t *ipcPublisher;
+    zsock_t *inprocPublisher;
     zsock_t *logger;
     zloop_t *loop;
 } zyreloopElements_t;
@@ -306,6 +308,7 @@ typedef struct _igsAgent_t {
     bool network_RequestOutputsFromMappedAgents;
     bool forcedStop;
     bool allowIpc;
+    bool allowInproc;
     char agentName[MAX_AGENT_NAME_LENGTH];
     char agentState[MAX_AGENT_NAME_LENGTH];
     char commandLine[COMMAND_LINE_LENGTH];
@@ -344,7 +347,7 @@ typedef struct _igsAgent_t {
 
 //////////////////  FUNCTIONS  AND SHARED VARIABLES //////////////////
 
-extern igsAgent_t *internalAgent;
+PUBLIC extern igsAgent_t *internalAgent;
 void initInternalAgentIfNeeded(void);
 
 //  definition
@@ -383,6 +386,7 @@ extern bool admin_logInStream;
 extern bool admin_logInFile;
 extern char admin_logFile[4096];
 void admin_makeFilePath(const char *from, char *to, size_t size_of_to);
+PUBLIC void igs_log(char *name, igs_logLevel_t, const char *function, const char *format, ...)  CHECK_PRINTF (4);
 
 //bus
 void bus_zyreLock(void);

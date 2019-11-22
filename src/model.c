@@ -60,10 +60,10 @@ void model_readWriteUnlock(void) {
     }
 }
 
-void model_runObserveCallbacksForIOP(agent_iop_t *iop, void *value, size_t valueSize){
+void model_runObserveCallbacksForIOP(igsAgent_t *agent, agent_iop_t *iop, void *value, size_t valueSize){
     igs_observe_callback_t *cb;
     DL_FOREACH(iop->callbacks, cb){
-        cb->callback_ptr(iop->type, iop->name, iop->value_type, value, valueSize, cb->data);
+        cb->callback_ptr(agent, iop->type, iop->name, iop->value_type, value, valueSize, cb->data);
     }
 }
 
@@ -87,7 +87,7 @@ char* model_doubleToString(const double value){
     return str;
 }
 
-static int model_observe(igsAgent_t *agent, const char* name, iop_t iopType, igs_observeCallback cb, void* myData){
+static int model_observe(igsAgent_t *agent, const char* name, iop_t iopType, igsAgent_observeCallback cb, void* myData){
 
     //find the iop
     agent_iop_t *iop = model_findIopByName(agent, (char*) name, iopType);
@@ -920,7 +920,7 @@ const agent_iop_t* model_writeIOP (igsAgent_t *agent, const char *iopName, iop_t
     model_readWriteUnlock();
     
     if (ret){
-        model_runObserveCallbacksForIOP(iop, outValue, outSize);
+        model_runObserveCallbacksForIOP(agent, iop, outValue, outSize);
     }
     return iop;
 }
@@ -1381,15 +1381,15 @@ bool igsAgent_checkParameterExistence(igsAgent_t *agent, const char *name){
 
 // --------------------------------  OBSERVE ------------------------------------//
 
-int igsAgent_observeInput(igsAgent_t *agent, const char *name, igs_observeCallback cb, void *myData){
+int igsAgent_observeInput(igsAgent_t *agent, const char *name, igsAgent_observeCallback cb, void *myData){
     return model_observe(agent, name, IGS_INPUT_T, cb, myData);
 }
 
-int igsAgent_observeOutput(igsAgent_t *agent, const char *name, igs_observeCallback cb, void * myData){
+int igsAgent_observeOutput(igsAgent_t *agent, const char *name, igsAgent_observeCallback cb, void * myData){
     return model_observe(agent, name, IGS_OUTPUT_T, cb, myData);
 }
 
-int igsAgent_observeParameter(igsAgent_t *agent, const char *name, igs_observeCallback cb, void * myData){
+int igsAgent_observeParameter(igsAgent_t *agent, const char *name, igsAgent_observeCallback cb, void * myData){
     return model_observe(agent, name, IGS_PARAMETER_T, cb, myData);
 }
 

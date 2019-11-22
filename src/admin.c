@@ -145,7 +145,7 @@ int igs_protocol(void){
     return INGESCAPE_PROTOCOL;
 }
 
-void igs_log(igs_logLevel_t level, const char *function, const char *fmt, ...){
+void igs_log(char *name, igs_logLevel_t level, const char *function, const char *fmt, ...){
     admin_lock();
     initInternalAgentIfNeeded();
     
@@ -192,7 +192,7 @@ void igs_log(igs_logLevel_t level, const char *function, const char *fmt, ...){
         }
         if (fp != NULL){
             admin_computeTime(logTime);
-            if (fprintf(fp,"%s;%s;%s;%s\n", logTime, log_levels[level], function, logContent) >= 0){
+            if (fprintf(fp,"%s;%s;%s;%s;%s\n", name, logTime, log_levels[level], function, logContent) >= 0){
                 if (++nb_of_entries > NUMBER_OF_LOGS_FOR_FFLUSH){
                     nb_of_entries = 0;
                     fflush(fp);
@@ -205,21 +205,21 @@ void igs_log(igs_logLevel_t level, const char *function, const char *fmt, ...){
     if ((logInConsole && level >= logLevel) || level >= IGS_LOG_ERROR){
         if (level >= IGS_LOG_WARN){
             if (useColorInConsole){
-                fprintf(stderr,"%s%s\x1b[0m;%s;%s\n", log_colors[level], log_levels[level], function, logContent);
+                fprintf(stderr,"%s;%s%s\x1b[0m;%s;%s\n", name, log_colors[level], log_levels[level], function, logContent);
             }else{
-                fprintf(stderr,"%s;%s;%s\n", log_levels[level], function, logContent);
+                fprintf(stderr,"%s;%s;%s;%s\n", name, log_levels[level], function, logContent);
             }
         }else{
             if (useColorInConsole){
-                fprintf(stdout,"%s%s\x1b[0m;%s;%s\n", log_colors[level], log_levels[level], function, logContent);
+                fprintf(stdout,"%s;%s%s\x1b[0m;%s;%s\n", name, log_colors[level], log_levels[level], function, logContent);
             }else{
-                fprintf(stdout,"%s;%s;%s\n", log_levels[level], function, logContent);
+                fprintf(stdout,"%s;%s;%s;%s\n", name, log_levels[level], function, logContent);
             }
         }
         
     }
     if (admin_logInStream && internalAgent->agentElements != NULL && internalAgent->agentElements->logger != NULL){
-        zstr_sendf(internalAgent->agentElements->logger, "%s;%s;%s\n", log_levels[level], function, logContent);
+        zstr_sendf(internalAgent->agentElements->logger, "%s;%s;%s;%s\n", name, log_levels[level], function, logContent);
     }
     admin_unlock();
 

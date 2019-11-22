@@ -449,18 +449,31 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                             char *incomingIpAddress = endpointAddress + 6; //ignore tcp://
                             *insert = '\0';
                             bool useIPC = false;
+                            bool useInproc = false;
                             const char *ipcAddress = NULL;
+                            const char *inprocAddress = NULL;
                             if (strcmp(agent->agentElements->ipAddress, incomingIpAddress) == 0){
                                 //same IP address : we can try to use ipc (or loopback on windows) instead of TCP
-                                //try to recover agent ipc/loopback address
-#if defined __unix__ || defined __APPLE__ || defined __linux__
-                                ipcAddress = zyre_event_header(zyre_event, "ipc");
-#elif (defined WIN32 || defined _WIN32)
-                                ipcAddress = zyre_event_header(zyre_event, "loopback");
-#endif
-                                if (ipcAddress != NULL){
-                                    useIPC = true;
-                                    igs_debug("Use address %s to subscribe to %s", ipcAddress, name);
+                                //or we can use inproc if both agents are in the same process
+                                int pid = atoi(zyre_event_header(zyre_event, "pid"));
+                                if (agent->agentElements->processId == pid){
+                                    //same ip address and same process : we can use inproc
+                                    inprocAddress = zyre_event_header(zyre_event, "inproc");
+                                    if (inprocAddress != NULL){
+                                        useInproc = true;
+                                        igs_debug("Use address %s to subscribe to %s", inprocAddress, name);
+                                    }
+                                }else{
+                                    //try to recover agent ipc/loopback address
+                                    #if defined __unix__ || defined __APPLE__ || defined __linux__
+                                    ipcAddress = zyre_event_header(zyre_event, "ipc");
+                                    #elif (defined WIN32 || defined _WIN32)
+                                    ipcAddress = zyre_event_header(zyre_event, "loopback");
+                                    #endif
+                                    if (ipcAddress != NULL){
+                                        useIPC = true;
+                                        igs_debug("Use address %s to subscribe to %s", ipcAddress, name);
+                                    }
                                 }
                             }
                             *insert = ':';
@@ -495,14 +508,18 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                             subscriber->agent = agent;
                             subscriber->agentName = strdup(name);
                             subscriber->agentPeerId = strdup (peer);
-                            if (agent->allowIpc && useIPC){
+                            if (agent->allowInproc && useInproc){
+                                subscriber->subscriber = zsock_new_sub(inprocAddress, NULL);
+                                zsock_set_rcvhwm(subscriber->subscriber, agent->network_hwmValue);
+                                igs_debug("Subscription created for %s at %s (inproc)",subscriber->agentName, inprocAddress);
+                            }else if (agent->allowIpc && useIPC){
                                 subscriber->subscriber = zsock_new_sub(ipcAddress, NULL);
                                 zsock_set_rcvhwm(subscriber->subscriber, agent->network_hwmValue);
-                                igs_debug("Subscription created for %s at %s",subscriber->agentName,ipcAddress);
+                                igs_debug("Subscription created for %s at %s (ipc)",subscriber->agentName, ipcAddress);
                             }else{
                                 subscriber->subscriber = zsock_new_sub(endpointAddress, NULL);
                                 zsock_set_rcvhwm(subscriber->subscriber, agent->network_hwmValue);
-                                igs_debug("Subscription created for %s at %s",subscriber->agentName,endpointAddress);
+                                igs_debug("Subscription created for %s at %s (tcp)",subscriber->agentName, endpointAddress);
                             }
                             assert(subscriber->subscriber);
                             subscriber->definition = NULL;
@@ -1321,11 +1338,11 @@ initLoop (zsock_t *pipe, void *args){
         snprintf(endpoint, 511, "tcp://%s:%d", agent->agentElements->ipAddress, agent->network_publishingPort);
     }
     agent->agentElements->publisher = zsock_new_pub(endpoint);
-    zsock_set_sndhwm(agent->agentElements->publisher, agent->network_hwmValue);
     if (agent->agentElements->publisher == NULL){
         igs_error("Could not create publishing socket (%s): Agent will interrupt immediately.", endpoint);
         canContinue = false;
     }else{
+        zsock_set_sndhwm(agent->agentElements->publisher, agent->network_hwmValue);
         strncpy(endpoint, zsock_endpoint(agent->agentElements->publisher), 256);
         char *insert = endpoint + strlen(endpoint) - 1;
         while (*insert != ':' && insert > endpoint) {
@@ -1374,6 +1391,22 @@ initLoop (zsock_t *pipe, void *args){
         bus_zyreUnlock();
     }
 #endif
+    
+    //start inproc publisher
+    bus_zyreLock();
+    char *inprocEndpoint = calloc(1, sizeof(char) * (12 + strlen(zyre_uuid(agent->agentElements->node))));
+    sprintf(inprocEndpoint, "inproc://%s", zyre_uuid(agent->agentElements->node));
+    bus_zyreUnlock();
+    agent->agentElements->inprocPublisher = zsock_new_pub(inprocEndpoint);
+    if (agent->agentElements->inprocPublisher == NULL){
+        igs_warn("Could not create inproc publishing socket (%s)", inprocEndpoint);
+        canContinue = false;
+    }else{
+        zsock_set_sndhwm(agent->agentElements->inprocPublisher, agent->network_hwmValue);
+        bus_zyreLock();
+        zyre_set_header(agent->agentElements->node, "inproc", "%s", inprocEndpoint);
+        bus_zyreUnlock();
+    }
     
     //start logger stream if needed
     if (admin_logInStream){
@@ -1463,6 +1496,7 @@ initLoop (zsock_t *pipe, void *args){
     zyre_set_header(agent->agentElements->node, "pid", "%i", (int)pid);
     bus_zyreUnlock();
 #endif
+    agent->agentElements->processId = (int)pid;
 
 
     char hostname[1024];
@@ -1579,6 +1613,9 @@ initLoop (zsock_t *pipe, void *args){
         }
 #endif
     }
+    if (agent->agentElements->inprocPublisher != NULL){
+        zsock_destroy(&agent->agentElements->inprocPublisher);
+    }
     free(ipcEndpoint);
     
     if (agent->agentElements->logger != NULL){
@@ -1657,16 +1694,25 @@ int network_publishOutput (igsAgent_t *agent, const agent_iop_t *iop){
                     break;
             }
             zmsg_t *msgBis = zmsg_dup(msg);
+            //successively publish to TCP, IPC and inproc
             if (zmsg_send(&msg, agent->agentElements->publisher) != 0){
                 igs_error("Could not publish output %s on the network\n",iop->name);
                 zmsg_destroy(&msgBis);
             }else{
                 result = 1;
+                zmsg_t *msgTer = zmsg_dup(msgBis);
                 if (agent->agentElements->ipcPublisher != NULL){
                     //publisher can be NULL on IOS or for read/write problems with assigned IPC path
                     //in both cases, an error message has been issued at start
                     if (zmsg_send(&msgBis, agent->agentElements->ipcPublisher) != 0){
                         igs_error("Could not publish output %s using IPC\n",iop->name);
+                        zmsg_destroy(&msgBis);
+                    }
+                }
+                if (agent->agentElements->inprocPublisher != NULL){
+                    if (zmsg_send(&msgTer, agent->agentElements->inprocPublisher) != 0){
+                        igs_error("Could not publish output %s using inproc\n",iop->name);
+                        zmsg_destroy(&msgTer);
                     }
                 }
             }
@@ -2484,6 +2530,14 @@ const char* igsAgent_getIpcFolderPath(igsAgent_t *agent){
     return agent->ipcFolderPath;
 }
 #endif
+
+void igsAgent_setAllowInproc(igsAgent_t *agent, bool allow){
+    agent->allowInproc = allow;
+}
+
+bool igsAgent_getAllowInproc(igsAgent_t *agent){
+    return agent->allowInproc;
+}
 
 void igsAgent_setAllowIpc(igsAgent_t *agent, bool allow){
     agent->allowIpc = allow;
