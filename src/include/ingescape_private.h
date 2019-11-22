@@ -347,7 +347,7 @@ typedef struct _igsAgent_t {
 
 //////////////////  FUNCTIONS  AND SHARED VARIABLES //////////////////
 
-extern igsAgent_t *internalAgent;
+PUBLIC extern igsAgent_t *internalAgent;
 void initInternalAgentIfNeeded(void);
 
 //  definition
