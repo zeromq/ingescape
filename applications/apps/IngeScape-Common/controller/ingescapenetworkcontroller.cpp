@@ -958,9 +958,35 @@ bool IngeScapeNetworkController::isAvailableNetworkDevice(QString networkDevice)
  */
 void IngeScapeNetworkController::manageShoutedMessage(QString peerId, QString peerName, zmsg_t* zMessage)
 {
-    Q_EMIT shoutedMessageReceived(peerId, peerName, zMessage);
+    uint count = (uint)zmsg_size(zMessage);
 
-    //qDebug() << "Not yet managed SHOUTED message '" << message << "' for agent" << peerName << "(" << peerId << ")";
+    QString messagePart1 = zmsg_popstr(zMessage);
+
+    qDebug() << "SHOUTED message '" << messagePart1 << "' with" << count << "parts for agent" << peerName << "(" << peerId << ")";
+
+    // Message contains only one string
+    if (count == 1)
+    {
+        Q_EMIT shoutedMessageReceived(peerId, peerName, messagePart1);
+    }
+    // Message contains several parts
+    else //if (count > 1)
+    {
+        QStringList messageOthersParts;
+
+        for (uint i = 1; i < count; i++)
+        {
+            // FIXME TODO: use generic zmsg_pop and zframe_t (instead of zmsg_popstr and char*)
+            //zframe_t* messagePart_i = zmsg_pop(zMessage);
+            QString messagePart_i = zmsg_popstr(zMessage);
+
+            messageOthersParts.append(messagePart_i);
+        }
+
+        Q_EMIT shoutedMessageReceived(peerId, peerName, messagePart1, messageOthersParts);
+    }
+
+    //qDebug() << "Not yet managed SHOUTED message '" << messagePart1 << "' with" << count << "parts for agent" << peerName << "(" << peerId << ")";
 }
 
 
@@ -972,29 +998,53 @@ void IngeScapeNetworkController::manageShoutedMessage(QString peerId, QString pe
  */
 void IngeScapeNetworkController::manageWhisperedMessage(QString peerId, QString peerName, zmsg_t* zMessage)
 {
-    QString message = zmsg_popstr(zMessage);
+    uint count = (uint)zmsg_size(zMessage);
 
-    // An agent DEFINITION has been received
-    if (message.startsWith(prefix_Definition))
+    QString messagePart1 = zmsg_popstr(zMessage);
+
+    qDebug() << "WHISPERED message '" << messagePart1 << "' with" << count << "parts for agent" << peerName << "(" << peerId << ")";
+
+    // Message contains only one string
+    if (count == 1)
     {
-        QString definitionJSON = message.remove(0, prefix_Definition.length());
+        // An agent DEFINITION has been received
+        if (messagePart1.startsWith(prefix_Definition))
+        {
+            QString definitionJSON = messagePart1.remove(0, prefix_Definition.length());
 
-        Q_EMIT definitionReceived(peerId, peerName, definitionJSON);
+            Q_EMIT definitionReceived(peerId, peerName, definitionJSON);
+        }
+        // An agent MAPPING has been received
+        else if (messagePart1.startsWith(prefix_Mapping))
+        {
+            QString mappingJSON = messagePart1.remove(0, prefix_Mapping.length());
+
+            Q_EMIT mappingReceived(peerId, peerName, mappingJSON);
+        }
+        // Other message has been received
+        else
+        {
+            Q_EMIT whisperedMessageReceived(peerId, peerName, messagePart1);
+        }
     }
-    // An agent MAPPING has been received
-    else if (message.startsWith(prefix_Mapping))
+    // Message contains several parts
+    else //if (count > 1)
     {
-        QString mappingJSON = message.remove(0, prefix_Mapping.length());
+        QStringList messageOthersParts;
 
-        Q_EMIT mappingReceived(peerId, peerName, mappingJSON);
-    }
-    // Other message has been received
-    else
-    {
-         Q_EMIT whisperedMessageReceived(peerId, peerName, zMessage);
+        for (uint i = 1; i < count; i++)
+        {
+            // FIXME TODO: use generic zmsg_pop and zframe_t (instead of zmsg_popstr and char*)
+            //zframe_t* messagePart_i = zmsg_pop(zMessage);
+            QString messagePart_i = zmsg_popstr(zMessage);
+
+            messageOthersParts.append(messagePart_i);
+        }
+
+        Q_EMIT whisperedMessageReceived(peerId, peerName, messagePart1, messageOthersParts);
     }
 
-    //qDebug() << "Not yet managed WHISPERED message '" << message << "' for agent" << peerName << "(" << peerId << ")";
+    //qDebug() << "Not yet managed WHISPERED message '" << messagePart1 << "' with" << count << "parts for agent" << peerName << "(" << peerId << ")";
 }
 
 

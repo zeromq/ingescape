@@ -417,21 +417,41 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when a "Shouted" message has been received
+     * @brief Signal emitted when a "Shouted" message (with one part) has been received
      * @param peerId
      * @param peerName
-     * @param zMessage
+     * @param message
      */
-    void shoutedMessageReceived(QString peerId, QString peerName, zmsg_t* zMessage);
+    void shoutedMessageReceived(QString peerId, QString peerName, QString message);
 
 
     /**
-     * @brief Signal emitted when "Whispered" message has been received
+     * @brief Signal emitted when a "Shouted" message (with several parts) has been received
      * @param peerId
      * @param peerName
-     * @param zMessage
+     * @param messagePart1
+     * @param messageOthersParts
      */
-    void whisperedMessageReceived(QString peerId, QString peerName, zmsg_t* zMessage);
+    void shoutedMessageReceived(QString peerId, QString peerName, QString messagePart1, QStringList messageOthersParts);
+
+
+    /**
+     * @brief Signal emitted when "Whispered" message (with one part) has been received
+     * @param peerId
+     * @param peerName
+     * @param message
+     */
+    void whisperedMessageReceived(QString peerId, QString peerName, QString message);
+
+
+    /**
+     * @brief Signal emitted when "Whispered" message (with several parts) has been received
+     * @param peerId
+     * @param peerName
+     * @param messagePart1
+     * @param messageOthersParts
+     */
+    void whisperedMessageReceived(QString peerId, QString peerName, QString messagePart1, QStringList messageOthersParts);
 
 
 public Q_SLOTS:
