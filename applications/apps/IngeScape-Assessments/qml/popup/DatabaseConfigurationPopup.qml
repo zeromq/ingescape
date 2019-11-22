@@ -40,8 +40,6 @@ AssessmentsPopupBase {
     //
     //--------------------------------------------------------
 
-    property AssessmentsModelManager modelManager: null;
-
 
     //--------------------------------
     //
@@ -52,9 +50,9 @@ AssessmentsPopupBase {
     //--------------------------------
 
     onOpened: {
-        if (modelManager)
+        if (AssessmentsModelC)
         {
-            txtDatabaseAddress.text = modelManager.databaseAddress;
+            txtDatabaseAddress.text = AssessmentsModelC.databaseAddress;
         }
     }
 
@@ -161,7 +159,7 @@ AssessmentsPopupBase {
             width: 20
             height: 20
 
-            color: (rootPopup.modelManager && rootPopup.modelManager.isConnectedToDatabase) ? "green" : "red"
+            color: (AssessmentsModelC && AssessmentsModelC.isConnectedToDatabase) ? "green" : "red"
             radius: 10
         }
 
@@ -179,7 +177,7 @@ AssessmentsPopupBase {
 
             wrapMode: Text.WordWrap
 
-            color: (rootPopup.modelManager && rootPopup.modelManager.isConnectedToDatabase) ? IngeScapeAssessmentsTheme.regularDarkBlueHeader : IngeScapeTheme.orangeColor
+            color: (AssessmentsModelC && AssessmentsModelC.isConnectedToDatabase) ? IngeScapeAssessmentsTheme.regularDarkBlueHeader : IngeScapeTheme.orangeColor
 
             font {
                 family: IngeScapeTheme.textFontFamily
@@ -187,7 +185,7 @@ AssessmentsPopupBase {
                 pixelSize: 16
             }
 
-            text: rootPopup.modelManager ? rootPopup.modelManager.errorMessageWhenDatabaseConnectionFailed : ""
+            text: AssessmentsModelC ? AssessmentsModelC.errorMessageWhenDatabaseConnectionFailed : ""
 
             //visible: (text.length !== 0)
         }
@@ -260,7 +258,7 @@ AssessmentsPopupBase {
 
             activeFocusOnPress: true
 
-            enabled: rootPopup.modelManager && (rootPopup.modelManager.databaseAddress !== txtDatabaseAddress.text)
+            enabled: AssessmentsModelC && (AssessmentsModelC.databaseAddress !== txtDatabaseAddress.text)
 
             style: IngeScapeAssessmentsButtonStyle {
                 text: "OK"
@@ -269,22 +267,22 @@ AssessmentsPopupBase {
             onClicked: {
                 //console.log("Update database address " + txtDatabaseAddress.text);
 
-                if (rootPopup.modelManager)
+                if (AssessmentsModelC)
                 {
-                    rootPopup.modelManager.databaseAddress = txtDatabaseAddress.text;
+                    AssessmentsModelC.databaseAddress = txtDatabaseAddress.text;
 
-                    rootPopup.modelManager.connectToDatabase();
+                    AssessmentsModelC.connectToDatabase();
 
-                    if (rootPopup.modelManager.isConnectedToDatabase)
+                    if (AssessmentsModelC.isConnectedToDatabase)
                     {
-                        console.log("QML: Connected to the Cassandra database on " + rootPopup.modelManager.databaseAddress);
+                        console.log("QML: Connected to the Cassandra database on " + AssessmentsModelC.databaseAddress);
 
                         // Close the popup
                         //rootPopup.close();
                     }
                     else
                     {
-                        console.warn("QML: Could not connect to the Cassandra database on " + rootPopup.modelManager.databaseAddress);
+                        console.warn("QML: Could not connect to the Cassandra database on " + AssessmentsModelC.databaseAddress);
                     }
                 }
             }

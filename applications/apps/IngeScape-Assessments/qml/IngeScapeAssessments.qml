@@ -102,7 +102,7 @@ Item {
         // FIXME Several popup may appear at startup depending on the current platform configuration. Need to prioritize them and maybe show them sequentialy, not on top of each other.
 
         // ...we check if we are connected to a database
-        if (IngeScapeAssessmentsC.modelManager && !IngeScapeAssessmentsC.modelManager.isConnectedToDatabase)
+        if (AssessmentsModelC && !AssessmentsModelC.isConnectedToDatabase)
         {
             openDatabasePopup();
         }
@@ -133,7 +133,7 @@ Item {
         onCurrentExperimentationChanged: {
             if (IngeScapeAssessmentsC.experimentationC.currentExperimentation)
             {
-                //console.log("QML: on Current Experimentation changed: " + IngeScapeAssessmentsC.modelManager.currentExperimentation.name);
+                //console.log("QML: on Current Experimentation changed: " + AssessmentsModelC.currentExperimentation.name);
 
                 // Add the "Experimentation View" to the stack
                 stackview.push(componentExperimentationView);
@@ -338,7 +338,5 @@ Item {
         id: databasePopup
 
         anchors.centerIn: parent
-
-        modelManager: IngeScapeAssessmentsC.modelManager
     }
 }

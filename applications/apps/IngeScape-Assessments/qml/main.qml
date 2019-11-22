@@ -517,7 +517,7 @@ ApplicationWindow {
 
                 // Binding to display our application loader
                 applicationLoader.visible = Qt.binding(function() {
-                    return ((applicationLoader.status === Loader.Ready) && (IngeScapeAssessmentsC.modelManager !== null));
+                    return ((applicationLoader.status === Loader.Ready) && (AssessmentsModelC !== null));
                 });
 
                 /*subWindowsInstantiator.model = Qt.binding(function() {

@@ -142,9 +142,6 @@ void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previo
         {
             if (currentTaskInstance->task()->platformFileUrl().isValid())
             {
-                // Update the filter
-                _agentsGroupedByNameInCurrentPlatform.setcurrentProtocol(currentTaskInstance->task());
-
                 QString platformFilePath = currentTaskInstance->task()->platformFileUrl().path();
 
                 QFile jsonFile(platformFilePath);
@@ -192,6 +189,10 @@ void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previo
                 else {
                     qWarning() << "There is no file" << platformFilePath;
                 }
+
+                // Update the filter
+                _agentsGroupedByNameInCurrentPlatform.setcurrentProtocol(currentTaskInstance->task());
+                _agentsGroupedByNameInCurrentPlatform.forceUpdate();
             }
             else {
                 qWarning() << "The URL of platform" << currentTaskInstance->task()->platformFileUrl() << "is not valid";
