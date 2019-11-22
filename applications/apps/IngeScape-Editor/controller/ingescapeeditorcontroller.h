@@ -440,15 +440,6 @@ private:
     QJsonDocument _getJsonOfCurrentPlatform();
 
 
-
-    /**
-     * @brief Stop IngeScape
-     *
-     * @param hasToClearPlatform
-     */
-    void _stopIngeScape(bool hasToClearPlatform);
-
-
     /**
      * @brief Start IngeScape
      *
@@ -469,6 +460,14 @@ private:
      * @return true if success
      */
     bool _restartIngeScape(bool hasToClearPlatform, bool checkAvailableNetworkDevices = false);
+
+
+    /**
+     * @brief Stop IngeScape
+     *
+     * @param hasToClearPlatform
+     */
+    void _stopIngeScape(bool hasToClearPlatform);
 
 
 private:

@@ -276,30 +276,59 @@ void ExperimentationController::_onCurrentExperimentationChanged(Experimentation
  */
 void ExperimentationController::_onStartToRecord()
 {
-    // Get the JSON of the current platform
-    QJsonDocument jsonDocument = _getJsonOfCurrentPlatform();
-
-    if (_isRecorderON && !jsonDocument.isNull() && !jsonDocument.isEmpty())
+    if ((_taskInstanceC != nullptr) && (_taskInstanceC->currentTaskInstance() != nullptr))
     {
-        QString jsonString = QString::fromUtf8(jsonDocument.toJson(QJsonDocument::Compact));
+        TaskM* protocol = _taskInstanceC->currentTaskInstance()->task();
 
-        // Add the delta from the start time of the TimeLine
-        int deltaTimeFromTimeLineStart = 0;
-
-        if ((_taskInstanceC != nullptr) && (_taskInstanceC->scenarioC() != nullptr))
+        if ((protocol != nullptr) && protocol->platformFileUrl().isValid())
         {
-            deltaTimeFromTimeLineStart = _taskInstanceC->scenarioC()->currentTime().msecsSinceStartOfDay();
+            QString platformFilePath = protocol->platformFileUrl().path();
+
+            // Get the JSON of the current platform
+            QFile jsonFile(platformFilePath);
+            if (jsonFile.exists())
+            {
+                if (jsonFile.open(QIODevice::ReadOnly))
+                {
+                    QByteArray byteArrayOfJson = jsonFile.readAll();
+                    jsonFile.close();
+
+                    QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArrayOfJson);
+
+                    if (_isRecorderON && !jsonDocument.isNull() && !jsonDocument.isEmpty())
+                    {
+                        QString jsonString = QString::fromUtf8(jsonDocument.toJson(QJsonDocument::Compact));
+
+                        // Add the delta from the start time of the TimeLine
+                        int deltaTimeFromTimeLineStart = 0;
+
+                        if (_taskInstanceC->scenarioC() != nullptr)
+                        {
+                            deltaTimeFromTimeLineStart = _taskInstanceC->scenarioC()->currentTime().msecsSinceStartOfDay();
+                        }
+
+                        QStringList message = {
+                            command_StartRecord,
+                            protocol->platformFileName(),
+                            QString::number(deltaTimeFromTimeLineStart),
+                            jsonString
+                        };
+
+                        // Send a ZMQ message in several parts to the recorder
+                        IngeScapeNetworkController::instance()->sendZMQMessageToAgent(_peerIdOfRecorder, message);
+                    }
+                }
+                else {
+                    qCritical() << "Can not open file" << platformFilePath;
+                }
+            }
+            else {
+                qWarning() << "There is no file" << platformFilePath;
+            }
         }
-
-        QStringList message = {
-            command_StartRecord,
-            _currentPlatformName,
-            QString::number(deltaTimeFromTimeLineStart),
-            jsonString
-        };
-
-        // Send a ZMQ message in several parts to the recorder
-        IngeScapeNetworkController::instance()->sendZMQMessageToAgent(_peerIdOfRecorder, message);
+        else {
+            qWarning() << "The URL of platform" << protocol->platformFileUrl() << "is not valid";
+        }
     }
 }
 

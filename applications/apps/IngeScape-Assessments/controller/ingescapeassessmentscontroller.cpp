@@ -19,6 +19,7 @@
 #include <controller/assessmentsmodelmanager.h>
 #include <misc/ingescapeutils.h>
 #include <settings/ingescapesettings.h>
+#include <platformsupport/osutils.h>
 
 
 /**
@@ -173,25 +174,16 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
             this, &IngeScapeAssessmentsController::_onCurrentExperimentationChanged);
 
 
-    // Update the list of available network devices
-    _networkC->updateAvailableNetworkDevices();
+    // Connect to OS events
+    connect(OSUtils::instance(), &OSUtils::systemSleep, this, &IngeScapeAssessmentsController::_onSystemSleep);
+    connect(OSUtils::instance(), &OSUtils::systemWake, this, &IngeScapeAssessmentsController::_onSystemWake);
+    connect(OSUtils::instance(), &OSUtils::systemNetworkConfigurationsUpdated, this, &IngeScapeAssessmentsController::_onSystemNetworkConfigurationsUpdated);
 
-    // There is only one available network device, we use it !
-    if (_networkC->availableNetworkDevices().count() == 1) {
-        _networkDevice = _networkC->availableNetworkDevices().at(0);
-    }
 
-    // Start our INGESCAPE agent with a network device (or an IP address) and a port
-    bool isStarted = _networkC->start(_networkDevice, _ipAddress, _port);
-
-    if (isStarted && (_modelManager != nullptr))
-    {
-        // Initialize platform from online mapping
-        _modelManager->setisMappingConnected(true);
-    }
-    else {
-        seterrorMessageWhenConnectionFailed(tr("Failed to connect with network device %1 on port %2").arg(_networkDevice, QString::number(_port)));
-    }
+    //
+    // Start IngeScape
+    //
+    _startIngeScape(true);
 
 
     //
@@ -293,8 +285,6 @@ IngeScapeAssessmentsController::~IngeScapeAssessmentsController()
         temp = nullptr;
     }
 
-    AssessmentsModelManager::destroyInstance();
-
     if (_networkC != nullptr)
     {
         disconnect(_networkC);
@@ -354,8 +344,6 @@ void IngeScapeAssessmentsController::processBeforeClosing()
  */
 bool IngeScapeAssessmentsController::restartNetwork(QString strPort, QString networkDevice, bool hasToClearPlatform)
 {
-    Q_UNUSED(hasToClearPlatform)
-
     bool success = false;
 
     bool isUInt = false;
@@ -386,7 +374,7 @@ bool IngeScapeAssessmentsController::restartNetwork(QString strPort, QString net
             settings.sync();
 
             // Restart IngeScape
-            success = _restartIngeScape();
+            success = _restartIngeScape(hasToClearPlatform, false);
         }
     }
     else {
@@ -550,44 +538,128 @@ void IngeScapeAssessmentsController::_onCurrentExperimentationChanged(Experiment
 
 
 /**
- * @brief Restart IngeScape
- * @return true if success
+ * @brief Start IngeScape
+ *
+ * @param checkAvailableNetworkDevices
+ *
+ * @return
  */
-bool IngeScapeAssessmentsController::_restartIngeScape()
+bool IngeScapeAssessmentsController::_startIngeScape(bool checkAvailableNetworkDevices)
 {
     bool success = false;
 
     // Reset the error message
     seterrorMessageWhenConnectionFailed("");
 
-    if ((_networkC != nullptr) && (_modelManager != nullptr))
+    IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
+    IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
+
+    if ((ingeScapeNetworkC != nullptr) && (ingeScapeModelManager != nullptr))
     {
-        qInfo() << "Restart the network on" << _networkDevice << "with" << _port;
+        if (checkAvailableNetworkDevices)
+        {
+            // Update the list of available network devices
+            ingeScapeNetworkC->updateAvailableNetworkDevices();
 
-        _modelManager->setisMappingConnected(false);
-        //_modelManager->setisMappingControlled(false);
-
-        // Stop our IngeScape agent
-        _networkC->stop();
-
-        // Simulate an exit for each agent ON
-        //modelManager->simulateExitForEachAgentON();
-
-        // Simulate an exit for each launcher
-        //modelManager->simulateExitForEachLauncher();
+            // There is only one available network device, we use it !
+            if (ingeScapeNetworkC->availableNetworkDevices().count() == 1)
+            {
+                _networkDevice = ingeScapeNetworkC->availableNetworkDevices().at(0);
+            }
+        }
 
         // Start our IngeScape agent with the network device and the port
-        success = _networkC->start(_networkDevice, "", _port);
+        success = ingeScapeNetworkC->start(_networkDevice, _ipAddress, _port);
 
-        if (success) {
-            _modelManager->setisMappingConnected(true);
+        if (success)
+        {
+            // Re-enable mapping
+            ingeScapeModelManager->setisMappingConnected(_beforeNetworkStop_isMappingConnected);
         }
     }
 
-    if (!success) {
-        seterrorMessageWhenConnectionFailed(tr("Failed to connect with network device %1 on port %2").arg(_networkDevice, QString::number(_port)));
+    if (!success && !_networkDevice.isEmpty())
+    {
+        seterrorMessageWhenConnectionFailed(tr("Failed to connect on network device %1 with port %2").arg(_networkDevice, QString::number(_port)));
     }
 
     return success;
 }
+
+
+/**
+ * @brief Restart IngeScape
+ *
+ * @param hasToClearPlatform
+ * @param checkAvailableNetworkDevices
+ *
+ * @return true if success
+ */
+bool IngeScapeAssessmentsController::_restartIngeScape(bool hasToClearPlatform, bool checkAvailableNetworkDevices)
+{
+    if (hasToClearPlatform)
+    {
+        qInfo() << "Restart the network on" << _networkDevice << "with" << _port << "(and CLEAR the current platform)";
+    }
+    else
+    {
+        qInfo() << "Restart the network on" << _networkDevice << "with" << _port << "(and KEEP the current platform)";
+    }
+
+    // Stop IngeScape
+    _stopIngeScape(hasToClearPlatform);
+
+    // Start IngeScape
+    return _startIngeScape(checkAvailableNetworkDevices);
+}
+
+
+/**
+ * @brief Stop IngeScape
+ *
+ * @param hasToClearPlatform
+ */
+void IngeScapeAssessmentsController::_stopIngeScape(bool hasToClearPlatform)
+{
+    IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
+    IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
+
+    if ((ingeScapeNetworkC != nullptr) && (ingeScapeModelManager != nullptr))
+    {
+        if (hasToClearPlatform)
+        {
+            qInfo() << "Stop the network on" << _networkDevice << "with" << _port << "(and CLEAR the current platform)";
+        }
+        else
+        {
+            qInfo() << "Stop the network on" << _networkDevice << "with" << _port << "(and KEEP the current platform)";
+        }
+
+        // Save states of our mapping if needed
+        _beforeNetworkStop_isMappingConnected = ingeScapeModelManager->isMappingConnected();
+
+
+        // Disable mapping
+        ingeScapeModelManager->setisMappingConnected(false);
+
+        // Stop our IngeScape agent
+        ingeScapeNetworkC->stop();
+
+        // We don't see itself
+        ingeScapeNetworkC->setnumberOfEditors(1);
+
+        // Simulate an exit for each agent ON
+        ingeScapeModelManager->simulateExitForEachAgentON();
+
+        // Simulate an exit for each launcher
+        ingeScapeModelManager->simulateExitForEachLauncher();
+
+        // Simulate an exit for the recorder
+        if ((_experimentationC != nullptr) && _experimentationC->isRecorderON())
+        {
+            _experimentationC->onRecorderExited(_experimentationC->peerIdOfRecorder(), _experimentationC->peerNameOfRecorder());
+        }
+    }
+}
+
 

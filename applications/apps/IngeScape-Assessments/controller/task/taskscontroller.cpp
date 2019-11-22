@@ -110,7 +110,7 @@ void TasksController::createNewProtocolWithIngeScapePlatformFilePath(QString pro
  */
 void TasksController::deleteTask(TaskM* task)
 {
-    if ((task != nullptr) && (_currentExperimentation != nullptr) && (AssessmentsModelManager::Instance() != nullptr))
+    if ((task != nullptr) && (_currentExperimentation != nullptr) && (AssessmentsModelManager::instance() != nullptr))
     {
         if (task == _selectedTask) {
             setselectedTask(nullptr);
@@ -364,7 +364,7 @@ void TasksController::saveModificationsOfIndependentVariableEnum(IndependentVari
  */
 void TasksController::deleteIndependentVariable(IndependentVariableM* independentVariable)
 {
-    if ((independentVariable != nullptr) && (_selectedTask != nullptr) && (AssessmentsModelManager::Instance() != nullptr))
+    if ((independentVariable != nullptr) && (_selectedTask != nullptr) && (AssessmentsModelManager::instance() != nullptr))
     {
         // Delete independent variable values from Cassandra DB
         QList<CassUuid> taskInstanceUuidList;
@@ -405,12 +405,12 @@ void TasksController::createNewDependentVariable(QString dependentVariableName,
                                                  QString outputName)
 {
     if (!dependentVariableName.isEmpty() && !agentName.isEmpty() && !outputName.isEmpty()
-            && (_selectedTask != nullptr) && (AssessmentsModelManager::Instance() != nullptr))
+            && (_selectedTask != nullptr) && (AssessmentsModelManager::instance() != nullptr))
     {
         qInfo() << "Create a new dependent variable" << dependentVariableName << "on output" << outputName << "of agent" << agentName;
 
         CassUuid dependentVarUuid;
-        cass_uuid_gen_time(AssessmentsModelManager::Instance()->getCassUuidGen(), &dependentVarUuid);
+        cass_uuid_gen_time(AssessmentsModelManager::instance()->getCassUuidGen(), &dependentVarUuid);
 
         DependentVariableM* dependentVariable = _insertDependentVariableIntoDB(_selectedTask->getExperimentationCassUuid(),
                                                                                _selectedTask->getCassUuid(),
@@ -460,7 +460,7 @@ TaskM* TasksController::_createNewProtocolWithIngeScapePlatformFileUrl(QString p
 {
     TaskM* task = nullptr;
 
-    if (!protocolName.isEmpty() && platformFileUrl.isValid() && (_currentExperimentation != nullptr) && (AssessmentsModelManager::Instance() != nullptr))
+    if (!protocolName.isEmpty() && platformFileUrl.isValid() && (_currentExperimentation != nullptr) && (AssessmentsModelManager::instance() != nullptr))
     {
         // Create the new task
         task = new TaskM(_currentExperimentation->getCassUuid(), AssessmentsModelManager::genCassUuid(), protocolName, platformFileUrl);
@@ -499,7 +499,7 @@ IndependentVariableM* TasksController::_insertIndependentVariableIntoDB(CassUuid
 {
     IndependentVariableM* independentVariable = nullptr;
 
-    if (!variableName.isEmpty() && (AssessmentsModelManager::Instance() != nullptr))
+    if (!variableName.isEmpty() && (AssessmentsModelManager::instance() != nullptr))
     {
         independentVariable = new IndependentVariableM(experimentationUuid, taskUuid, AssessmentsModelManager::genCassUuid(), variableName, variableDescription, valueType, enumValues);
         if (independentVariable == nullptr || !AssessmentsModelManager::insert(*independentVariable))

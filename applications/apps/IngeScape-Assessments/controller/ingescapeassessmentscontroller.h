@@ -183,16 +183,42 @@ private Q_SLOTS:
 private:
 
     /**
+     * @brief Start IngeScape
+     *
+     * @param checkAvailableNetworkDevices
+     *
+     * @return
+     */
+    bool _startIngeScape(bool checkAvailableNetworkDevices);
+
+
+    /**
      * @brief Restart IngeScape
+     *
+     * @param hasToClearPlatform
+     * @param checkAvailableNetworkDevices
+     *
+     *
      * @return true if success
      */
-    bool _restartIngeScape();
+    bool _restartIngeScape(bool hasToClearPlatform, bool checkAvailableNetworkDevices = false);
+
+
+    /**
+     * @brief Stop IngeScape
+     *
+     * @param hasToClearPlatform
+     */
+    void _stopIngeScape(bool hasToClearPlatform);
 
 
 private:
 
     // To subscribe to termination signals
     TerminationSignalWatcher *_terminationSignalWatcher;
+
+    // States of our mapping when our network was stopped
+    bool _beforeNetworkStop_isMappingConnected;
 
 };
 

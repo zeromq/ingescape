@@ -439,7 +439,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     }
 
 
-
     //
     // Start IngeScape
     //
@@ -1731,65 +1730,6 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
 
 
 /**
- * @brief Stop IngeScape
- *
- * @param hasToClearPlatform
- */
-void IngeScapeEditorController::_stopIngeScape(bool hasToClearPlatform)
-{
-    IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
-    IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
-
-    if ((ingeScapeNetworkC != nullptr) && (ingeScapeModelManager != nullptr) && (_modelManager != nullptr))
-    {
-        if (hasToClearPlatform)
-        {
-            qInfo() << "Stop the network on" << _networkDevice << "with" << _port << "(and CLEAR the current platform)";
-        }
-        else
-        {
-            qInfo() << "Stop the network on" << _networkDevice << "with" << _port << "(and KEEP the current platform)";
-        }
-
-        // Save states of our mapping if needed
-        _beforeNetworkStop_isMappingConnected = ingeScapeModelManager->isMappingConnected();
-        _beforeNetworkStop_isMappingControlled = _modelManager->isMappingControlled();
-
-
-        // Disable mapping
-        ingeScapeModelManager->setisMappingConnected(false);
-        _modelManager->setisMappingControlled(false);
-
-        // Stop our IngeScape agent
-        ingeScapeNetworkC->stop();
-
-        // We don't see itself
-        ingeScapeNetworkC->setnumberOfEditors(1);
-
-        // Simulate an exit for each agent ON
-        ingeScapeModelManager->simulateExitForEachAgentON();
-
-        // Simulate an exit for each launcher
-        ingeScapeModelManager->simulateExitForEachLauncher();
-
-        // Simulate an exit for the recorder
-        //_modelManager->simulateExitForRecorder();
-        if ((_recordsSupervisionC != nullptr) && _recordsSupervisionC->isRecorderON())
-        {
-            _recordsSupervisionC->onRecorderExited(_recordsSupervisionC->peerIdOfRecorder(), _recordsSupervisionC->peerNameOfRecorder());
-        }
-
-        // Has to clear the current platform
-        if (hasToClearPlatform)
-        {
-            // Clear the current platform by deleting all existing data
-            clearCurrentPlatform();
-        }
-    }
-}
-
-
-/**
  * @brief Start IngeScape
  *
  * @param checkAvailableNetworkDevices
@@ -1864,4 +1804,62 @@ bool IngeScapeEditorController::_restartIngeScape(bool hasToClearPlatform, bool 
 
     // Start IngeScape
     return _startIngeScape(checkAvailableNetworkDevices);
+}
+
+
+/**
+ * @brief Stop IngeScape
+ *
+ * @param hasToClearPlatform
+ */
+void IngeScapeEditorController::_stopIngeScape(bool hasToClearPlatform)
+{
+    IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
+    IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
+
+    if ((ingeScapeNetworkC != nullptr) && (ingeScapeModelManager != nullptr) && (_modelManager != nullptr))
+    {
+        if (hasToClearPlatform)
+        {
+            qInfo() << "Stop the network on" << _networkDevice << "with" << _port << "(and CLEAR the current platform)";
+        }
+        else
+        {
+            qInfo() << "Stop the network on" << _networkDevice << "with" << _port << "(and KEEP the current platform)";
+        }
+
+        // Save states of our mapping if needed
+        _beforeNetworkStop_isMappingConnected = ingeScapeModelManager->isMappingConnected();
+        _beforeNetworkStop_isMappingControlled = _modelManager->isMappingControlled();
+
+
+        // Disable mapping
+        ingeScapeModelManager->setisMappingConnected(false);
+        _modelManager->setisMappingControlled(false);
+
+        // Stop our IngeScape agent
+        ingeScapeNetworkC->stop();
+
+        // We don't see itself
+        ingeScapeNetworkC->setnumberOfEditors(1);
+
+        // Simulate an exit for each agent ON
+        ingeScapeModelManager->simulateExitForEachAgentON();
+
+        // Simulate an exit for each launcher
+        ingeScapeModelManager->simulateExitForEachLauncher();
+
+        // Simulate an exit for the recorder
+        if ((_recordsSupervisionC != nullptr) && _recordsSupervisionC->isRecorderON())
+        {
+            _recordsSupervisionC->onRecorderExited(_recordsSupervisionC->peerIdOfRecorder(), _recordsSupervisionC->peerNameOfRecorder());
+        }
+
+        // Has to clear the current platform
+        if (hasToClearPlatform)
+        {
+            // Clear the current platform by deleting all existing data
+            clearCurrentPlatform();
+        }
+    }
 }
