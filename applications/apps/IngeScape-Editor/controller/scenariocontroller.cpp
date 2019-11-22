@@ -354,18 +354,18 @@ void ScenarioController::openActionEditorWithViewModel(ActionVM* action)
   */
 void ScenarioController::validateActionEditor(ActionEditorController* actionEditorC)
 {
-    IngeScapeModelManager* igsModelManager = IngeScapeModelManager::instance();
+    IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
 
-    if ((actionEditorC != nullptr) && (igsModelManager != nullptr))
+    if ((actionEditorC != nullptr) && (ingeScapeModelManager != nullptr))
     {
         // Validate modification
         actionEditorC->validateModification();
 
         ActionM* originalAction = actionEditorC->originalAction();
-        if ((originalAction != nullptr) && (igsModelManager->getActionWithId(originalAction->uid()) == nullptr))
+        if ((originalAction != nullptr) && (ingeScapeModelManager->getActionWithId(originalAction->uid()) == nullptr))
         {
             // Add the action to the model manager
-            igsModelManager->storeNewAction(originalAction);
+            ingeScapeModelManager->storeNewAction(originalAction);
 
             // Add the action to the list
             _actionsList.append(originalAction);

@@ -125,7 +125,7 @@ void RecordsSupervisionController::startOrStopToRecord(bool withTimeLine)
             //setisRecordingTimeLine(false);
 
             // Send the message "Stop Record" to the recorder
-            IngeScapeNetworkController::instance()->sendMessageToAgent(_peerIdOfRecorder, command_StopRecord);
+            IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerIdOfRecorder, command_StopRecord);
         }
         // Start to record
         else
@@ -155,7 +155,7 @@ void RecordsSupervisionController::deleteRecord(RecordVM* record)
             QString message = QString("%1=%2").arg(command_DeleteRecord, record->modelM()->uid());
 
             // Send the message "Delete Record" to the recorder
-            IngeScapeNetworkController::instance()->sendMessageToAgent(_peerIdOfRecorder, message);
+            IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerIdOfRecorder, message);
         }
     }
 }
@@ -181,7 +181,7 @@ void RecordsSupervisionController::loadRecord(QString recordId)
             QString message = QString("%1=%2").arg(command_LoadReplay, recordId);
 
             // Send the message "Load Replay" to the recorder
-            IngeScapeNetworkController::instance()->sendMessageToAgent(_peerIdOfRecorder, message);
+            IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerIdOfRecorder, message);
         }
     }
 }
@@ -197,7 +197,7 @@ void RecordsSupervisionController::unloadRecord()
         QString message = QString("%1=%2").arg(command_UNloadReplay, _currentReplay->modelM()->uid());
 
         // Send the message "UN-load Replay" to the recorder
-        IngeScapeNetworkController::instance()->sendMessageToAgent(_peerIdOfRecorder, message);
+        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerIdOfRecorder, message);
     }
 }
 
@@ -228,7 +228,7 @@ void RecordsSupervisionController::startOrResumeReplay(bool isStart)
         }
 
         // Send the message "Start Replay" or "UN-pause Replay" to the recorder
-        IngeScapeNetworkController::instance()->sendMessageToAgent(_peerIdOfRecorder, message);
+        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerIdOfRecorder, message);
     }
 }
 
@@ -259,7 +259,7 @@ void RecordsSupervisionController::stopOrPauseReplay(bool isStop)
         }
 
         // Send the message "Stop Replay" or "Pause Replay" to the recorder
-        IngeScapeNetworkController::instance()->sendMessageToAgent(_peerIdOfRecorder, message);
+        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerIdOfRecorder, message);
     }
 }
 
@@ -275,7 +275,7 @@ void RecordsSupervisionController::exportRecord(QString recordId)
         QString message = QString("%1=%2").arg(command_ExportRecord, recordId);
 
         // Send the message "Export Record" to the recorder
-        IngeScapeNetworkController::instance()->sendMessageToAgent(_peerIdOfRecorder, message);
+        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerIdOfRecorder, message);
     }
 }
 
@@ -316,7 +316,7 @@ void RecordsSupervisionController::onRecorderEntered(QString peerId, QString pee
         qDebug() << "New recorder on the network, get all its records...";
 
         // Send the message "Get Records" to the recorder
-        IngeScapeNetworkController::instance()->sendMessageToAgent(_peerIdOfRecorder, "GET_RECORDS");
+        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerIdOfRecorder, "GET_RECORDS");
     }
     else {
         qCritical() << "We are already connected to a recorder:" << _peerNameOfRecorder << "(" << _peerIdOfRecorder << ")";

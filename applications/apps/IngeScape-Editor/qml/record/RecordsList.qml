@@ -332,7 +332,7 @@ Item {
                     }
                     elide: Text.ElideRight
 
-                    text: recordItem.model_recordVM.modelM ? recordItem.model_recordVM.modelM.name : ""
+                    text: (recordItem.model_recordVM && recordItem.model_recordVM.modelM) ? recordItem.model_recordVM.modelM.name : ""
 
                     color: rootItem._isPlayingOrResumingReplay && recordItem._isCurrentReplay ? IngeScapeTheme.veryDarkGreyColor : IngeScapeTheme.whiteColor
                     font: IngeScapeTheme.headingFont

@@ -59,16 +59,26 @@ public:
      */
     ~TaskInstanceController();
 
+
     /**
      * @brief Adds the given URLs as attachements for this record
      * @param urlList
      */
     Q_INVOKABLE void addNewAttachements(const QList<QUrl>& urlList);
 
+
     AreAgentsInPlatformFilter* agentsGroupedByNameInCurrentPlatform()
     {
         return &_agentsGroupedByNameInCurrentPlatform;
     }
+
+
+Q_SIGNALS:
+
+    /**
+     * @brief Signal emitted when the user wants to start to record
+     */
+    void startToRecord();
 
 
 private Q_SLOTS:

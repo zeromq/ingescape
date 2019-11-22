@@ -32,7 +32,6 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     _licensesPath(""),
     _errorMessageWhenConnectionFailed(""),
     _snapshotDirectory(""),
-    _modelManager(nullptr),
     _networkC(nullptr),
     _licensesC(nullptr),
     _experimentationsListC(nullptr),
@@ -96,15 +95,31 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     settings.endGroup();
 
 
+    //-------------------------------
     //
     // Create sub-controllers
     //
+    //-------------------------------
 
-    // Create the manager for the data model of our IngeScape Assessments application
-    AssessmentsModelManager::initInstance(this);
-    _modelManager = AssessmentsModelManager::Instance();
+    // Create the manager for the IngeScape data model
+    IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
+    if (ingeScapeModelManager == nullptr) {
+        qCritical() << "IngeScape Model Manager is null !";
+    }
 
-    // Create the controller for network communications
+    // Create the manager for the data model of our Assessments application
+    AssessmentsModelManager* assessmentsModelManager = AssessmentsModelManager::instance();
+    if (assessmentsModelManager == nullptr) {
+        qCritical() << "Assessments Model Manager is null !";
+    }
+
+    // Create the controller to manage IngeScape network communications
+    IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
+    if (ingeScapeNetworkC == nullptr) {
+        qCritical() << "IngeScape Network Controller is null !";
+    }
+
+    // Create the controller to manage network communications specific to our our Assessments application
     _networkC = new NetworkController(this);
 
     // Create the controller to manage IngeScape licenses
@@ -130,39 +145,32 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     //connect(_licensesC, &LicensesController::licensesUpdated, this, &IngeScapeAssessmentsController::_onLicensesUpdated);
 
 
-    // Connect to signals from the network controller
-    connect(_networkC, &NetworkController::agentEntered, _modelManager, &AssessmentsModelManager::onAgentEntered);
-    connect(_networkC, &NetworkController::agentExited, _modelManager, &AssessmentsModelManager::onAgentExited);
-    connect(_networkC, &NetworkController::launcherEntered, _modelManager, &AssessmentsModelManager::onLauncherEntered);
-    connect(_networkC, &NetworkController::launcherExited, _modelManager, &AssessmentsModelManager::onLauncherExited);
-    connect(_networkC, &NetworkController::recorderEntered, _experimentationC, &ExperimentationController::onRecorderEntered);
-    connect(_networkC, &NetworkController::recorderExited, _experimentationC, &ExperimentationController::onRecorderExited);
+    // Connect to signals from network controllers
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::networkDeviceIsNotAvailable, this, &IngeScapeAssessmentsController::_onNetworkDeviceIsNotAvailable);
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::networkDeviceIsAvailableAgain, this, &IngeScapeAssessmentsController::_onNetworkDeviceIsAvailableAgain);
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::networkDeviceIpAddressHasChanged, this, &IngeScapeAssessmentsController::_onNetworkDeviceIpAddressHasChanged);
 
-    connect(_networkC, &NetworkController::definitionReceived, _modelManager, &AssessmentsModelManager::onDefinitionReceived);
-    connect(_networkC, &NetworkController::mappingReceived, _modelManager, &AssessmentsModelManager::onMappingReceived);
-    connect(_networkC, &NetworkController::valuePublished, _modelManager, &AssessmentsModelManager::onValuePublished);
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::agentEntered, ingeScapeModelManager, &IngeScapeModelManager::onAgentEntered);
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::agentExited, ingeScapeModelManager, &IngeScapeModelManager::onAgentExited);
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::launcherEntered, ingeScapeModelManager, &IngeScapeModelManager::onLauncherEntered);
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::launcherExited, ingeScapeModelManager, &IngeScapeModelManager::onLauncherExited);
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::recorderEntered, _experimentationC, &ExperimentationController::onRecorderEntered);
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::recorderExited, _experimentationC, &ExperimentationController::onRecorderExited);
+
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::definitionReceived, ingeScapeModelManager, &IngeScapeModelManager::onDefinitionReceived);
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::mappingReceived, ingeScapeModelManager, &IngeScapeModelManager::onMappingReceived);
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::valuePublished, ingeScapeModelManager, &IngeScapeModelManager::onValuePublished);
 
 
-    // Connect to signals from the data model manager
-    connect(_modelManager, &AssessmentsModelManager::isConnectedToDatabaseChanged,
+    // Connect to signals from model managers
+    connect(ingeScapeModelManager, &IngeScapeModelManager::isMappingConnectedChanged, ingeScapeNetworkC, &IngeScapeNetworkController::onIsMappingConnectedChanged);
+
+    connect(assessmentsModelManager, &AssessmentsModelManager::isConnectedToDatabaseChanged,
             this, &IngeScapeAssessmentsController::_onIsConnectedToDatabaseChanged);
 
-    connect(_modelManager, &AssessmentsModelManager::isMappingConnectedChanged,
-            _networkC, &NetworkController::onIsMappingConnectedChanged);
-
-    // Connect to signals from the experimentation controller to the rest of the controllers
+    // Connect to signals from the experimentation controller
     connect(_experimentationC, &ExperimentationController::currentExperimentationChanged,
             this, &IngeScapeAssessmentsController::_onCurrentExperimentationChanged);
-    connect(_experimentationC, &ExperimentationController::commandAskedToRecorder,
-            _networkC, &NetworkController::onCommandAskedToRecorder);
-
-
-    // Connect to signals from the controller of the scenario
-    if ((_experimentationC->taskInstanceC() != nullptr) && (_experimentationC->taskInstanceC()->scenarioC() != nullptr))
-    {
-        //connect(_scenarioC, &ScenarioController::actionWillBeExecuted, this, &IngeScapeEditorController::_onActionWillBeExecuted);
-        //connect(_scenarioC, &ScenarioController::timeLineStateUpdated, this, &IngeScapeEditorController::_onTimeLineStateUpdated);
-    }
 
 
     // Update the list of available network devices
@@ -402,6 +410,84 @@ bool IngeScapeAssessmentsController::restartNetwork(QString strPort, QString net
 void IngeScapeAssessmentsController::forceCreation()
 {
     qDebug() << "Force the creation of our singleton from QML";
+}
+
+
+/**
+ * @brief Called when our network device is not available
+ */
+void IngeScapeAssessmentsController::_onNetworkDeviceIsNotAvailable()
+{
+    qDebug() << Q_FUNC_INFO;
+
+    // Stop IngeScape if needed
+    if (IngeScapeNetworkController::instance()->isStarted())
+    {
+        _stopIngeScape(false);
+    }
+    // Else: our agent is not started, we don't need to stop it
+}
+
+
+/**
+ * @brief Called when our network device is available again
+ */
+void IngeScapeAssessmentsController::_onNetworkDeviceIsAvailableAgain()
+{
+    qDebug() << Q_FUNC_INFO;
+
+    // Start IngeScape
+    // => we don't need to check available network devices
+    _startIngeScape(false);
+}
+
+
+/**
+ * @brief Called when the IP address of our network device has changed
+ */
+void IngeScapeAssessmentsController::_onNetworkDeviceIpAddressHasChanged()
+{
+    qDebug() << Q_FUNC_INFO;
+
+    // Restart IngeScape
+    // (Do not clear platform, do no check available network devices)
+    _restartIngeScape(false, false);
+}
+
+
+/**
+ * @brief Called when our machine will go to sleep
+ */
+void IngeScapeAssessmentsController::_onSystemSleep()
+{
+    qDebug() << Q_FUNC_INFO;
+
+    // Stop monitoring to save energy
+    IngeScapeNetworkController::instance()->stopMonitoring();
+
+    // Stop IngeScape
+    _stopIngeScape(false);
+}
+
+
+/**
+ * @brief Called when our machine did wake from sleep
+ */
+void IngeScapeAssessmentsController::_onSystemWake()
+{
+    // Start IngeScape
+    // => we need to check available network devices
+    _startIngeScape(true);
+}
+
+
+
+/**
+ * @brief Called when a network configuration is added, removed or changed
+ */
+void IngeScapeAssessmentsController::_onSystemNetworkConfigurationsUpdated()
+{
+    IngeScapeNetworkController::instance()->updateAvailableNetworkDevices();
 }
 
 

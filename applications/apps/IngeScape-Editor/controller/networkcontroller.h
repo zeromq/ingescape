@@ -55,14 +55,6 @@ public:
 
 
     /**
-     * @brief Send a command, parameters and the content of a JSON file to the recorder
-     * @param peerIdOfRecorder
-     * @param commandAndParameters
-     */
-    void sendCommandWithJsonToRecorder(QString peerIdOfRecorder, QStringList commandAndParameters);
-
-
-    /**
      * @brief Send a command execution status to the expe
      * @param command
      * @param commandParameters

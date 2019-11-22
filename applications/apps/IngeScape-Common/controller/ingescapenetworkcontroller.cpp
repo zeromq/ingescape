@@ -1002,7 +1002,7 @@ void IngeScapeNetworkController::manageWhisperedMessage(QString peerId, QString 
 
     QString messagePart1 = zmsg_popstr(zMessage);
 
-    qDebug() << "WHISPERED message '" << messagePart1 << "' with" << count << "parts for agent" << peerName << "(" << peerId << ")";
+    //qDebug() << "WHISPERED message '" << messagePart1 << "' with" << count << "parts for agent" << peerName << "(" << peerId << ")";
 
     // Message contains only one string
     if (count == 1)
@@ -1049,12 +1049,12 @@ void IngeScapeNetworkController::manageWhisperedMessage(QString peerId, QString 
 
 
 /**
- * @brief Send a (string) message to an agent (identified by its peer id)
+ * @brief Send a string message to an agent (identified by its peer id)
  * @param agentId peer id of the agent
  * @param message 1 string
  * @return true if successful, false otherwise
  */
-bool IngeScapeNetworkController::sendMessageToAgent(QString agentId, QString message)
+bool IngeScapeNetworkController::sendStringMessageToAgent(QString agentId, QString message)
 {
     bool success = false;
 
@@ -1080,12 +1080,12 @@ bool IngeScapeNetworkController::sendMessageToAgent(QString agentId, QString mes
 
 
 /**
- * @brief Send a (strings list) message to an agent (identified by its peer id)
+ * @brief Send a strings list message to an agent (identified by its peer id)
  * @param agentId peer id of the agent
  * @param message list of strings
  * @return true if successful, false otherwise
  */
-bool IngeScapeNetworkController::sendMessageToAgent(QString agentId, QStringList message)
+bool IngeScapeNetworkController::sendStringMessageToAgent(QString agentId, QStringList message)
 {
     bool success = false;
 
@@ -1180,7 +1180,7 @@ bool IngeScapeNetworkController::sendMessageToAgent(QString agentId, QStringList
         }
         else
         {
-            success = sendMessageToAgent(agentId, string1);
+            success = sendStringMessageToAgent(agentId, string1);
         }
     }
     return success;
@@ -1188,18 +1188,18 @@ bool IngeScapeNetworkController::sendMessageToAgent(QString agentId, QStringList
 
 
 /**
- * @brief Send a (string) message to a list of agents (identified by their peer id)
+ * @brief Send a string message to a list of agents (identified by their peer id)
  * @param agentIds peer ids of the agents
  * @param message 1 string
  * @return true if successful, false otherwise
  */
-bool IngeScapeNetworkController::sendMessageToAgents(QStringList agentIds, QString message)
+bool IngeScapeNetworkController::sendStringMessageToAgents(QStringList agentIds, QString message)
 {
     bool allSucceeded = true;
 
     for (QString agentId : agentIds)
     {
-        bool success = sendMessageToAgent(agentId, message);
+        bool success = sendStringMessageToAgent(agentId, message);
         if (!success) {
             allSucceeded = false;
         }
@@ -1209,23 +1209,65 @@ bool IngeScapeNetworkController::sendMessageToAgents(QStringList agentIds, QStri
 
 
 /**
- * @brief Send a (strings list) message to an agent (identified by its peer id)
+ * @brief Send a strings list message to an agent (identified by its peer id)
  * @param agentIds peer ids of the agents
  * @param message list of strings
  * @return true if successful, false otherwise
  */
-bool IngeScapeNetworkController::sendMessageToAgents(QStringList agentIds, QStringList message)
+bool IngeScapeNetworkController::sendStringMessageToAgents(QStringList agentIds, QStringList message)
 {
     bool allSucceeded = true;
 
     for (QString agentId : agentIds)
     {
-        bool success = sendMessageToAgent(agentId, message);
+        bool success = sendStringMessageToAgent(agentId, message);
         if (!success) {
             allSucceeded = false;
         }
     }
     return allSucceeded;
+}
+
+
+/**
+ * @brief Send a ZMQ message in several parts to an agent (identified by its peer id)
+ * @param agentId
+ * @param messageParts
+ * @return
+ */
+bool IngeScapeNetworkController::sendZMQMessageToAgent(QString agentId, QStringList messageParts)
+{
+    bool success = false;
+
+    if (!agentId.isEmpty() && !messageParts.isEmpty())
+    {
+        // Create ZMQ message
+        zmsg_t* zMsg = zmsg_new();
+
+        for (QString string : messageParts)
+        {
+            zmsg_addstr(zMsg, string.toStdString().c_str());
+        }
+
+        // Send ZMQ message to the recorder
+        int result = igs_busSendZMQMsgToAgent(agentId.toStdString().c_str(), &zMsg);
+
+        if (result == 1)
+        {
+            success = true;
+
+            // Do not print the JSON file content
+            messageParts.removeLast();
+
+            qInfo() << "Message" << messageParts << "to peer" << agentId << "sent successfully";
+        }
+        else {
+            qWarning() << "Error (" << result << ") during send message" << messageParts << "to peer" << agentId;
+        }
+
+        zmsg_destroy(&zMsg);
+    }
+    return success;
 }
 
 
@@ -1387,23 +1429,6 @@ void IngeScapeNetworkController::removeInputsFromOurApplicationForAgentOutputs(Q
                 }
             }
         }
-    }
-}
-
-
-/**
- * @brief Slot called when a command must be sent on the network to a recorder
- * @param peerIdOfRecorder
- * @param commandAndParameters
- */
-void IngeScapeNetworkController::onCommandAskedToRecorder(QString peerIdOfRecorder, QString commandAndParameters)
-{
-    if (!peerIdOfRecorder.isEmpty() && !commandAndParameters.isEmpty())
-    {
-        // Send the command (and parameters) to the peer id of the recorder
-        int success = igs_busSendStringToAgent(peerIdOfRecorder.toStdString().c_str(), "%s", commandAndParameters.toStdString().c_str());
-
-        qInfo() << "Send command (and parameters)" << commandAndParameters << "to recorder" << peerIdOfRecorder << "with success ?" << success;
     }
 }
 

@@ -61,25 +61,50 @@ Q_SIGNALS:
 public Q_SLOTS:
 
 
-private:
+private Q_SLOTS:
 
-    /**
-     * @brief Slot called when a "Shouted" message has been received
-     * @param peerId
-     * @param peerName
-     * @param zMessage
-     */
-    void _onShoutedMessageReceived(QString peerId, QString peerName, zmsg_t* zMessage);
+    // FIXME error: invalid application of 'sizeof' to an incomplete type '_zmsg_t'
+    // Q_STATIC_ASSERT_X(sizeof(T), "Type argument of Q_DECLARE_METATYPE(T*) must be fully defined");
+    //void _onShoutedMessageReceived(QString peerId, QString peerName, zmsg_t* zMessage);
+    //void _onWhisperedMessageReceived(QString peerId, QString peerName, zmsg_t* zMessage);
 
 
     /**
-     * @brief Slot called when "Whispered" message has been received
+     * @brief Slot called when a "Shouted" message (with one part) has been received
      * @param peerId
      * @param peerName
-     * @param zMessage
+     * @param message
      */
-    void _onWhisperedMessageReceived(QString peerId, QString peerName, zmsg_t* zMessage);
+    void _onShoutedMessageReceived(QString peerId, QString peerName, QString message);
 
+
+    /**
+     * @brief Slot called when a "Shouted" message (with several parts) has been received
+     * @param peerId
+     * @param peerName
+     * @param messagePart1
+     * @param messageOthersParts
+     */
+    void _onShoutedMessageReceived(QString peerId, QString peerName, QString messagePart1, QStringList messageOthersParts);
+
+
+    /**
+     * @brief Slot called when "Whispered" message (with one part) has been received
+     * @param peerId
+     * @param peerName
+     * @param message
+     */
+    void _onWhisperedMessageReceived(QString peerId, QString peerName, QString message);
+
+
+    /**
+     * @brief Slot called when "Whispered" message (with several parts) has been received
+     * @param peerId
+     * @param peerName
+     * @param messagePart1
+     * @param messageOthersParts
+     */
+    void _onWhisperedMessageReceived(QString peerId, QString peerName, QString messagePart1, QStringList messageOthersParts);
 
 };
 

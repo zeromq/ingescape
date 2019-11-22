@@ -247,16 +247,6 @@ public Q_SLOTS:
     void forceCreation();
 
 
-    /**
-      * @brief Get the position of the mouse cursor in global screen coordinates
-      *
-      * @remarks You must use mapToGlobal to convert it to local coordinates
-      *
-      * @return
-      */
-    QPointF getGlobalMousePosition();
-
-
 Q_SIGNALS:
     /**
      * @brief Triggered to open our license popup
@@ -283,6 +273,7 @@ Q_SIGNALS:
 
 
 private Q_SLOTS:
+
     /**
      * @brief Called when our application receives an "open file" request
      * @param url
@@ -328,13 +319,6 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Slot called when the state of the TimeLine updated
-     * @param state
-     */
-    void _onTimeLineStateUpdated(QString state);
-
-
-    /**
      * @brief Slot called when we receive the command "Update Record State"
      * @param state
      */
@@ -347,6 +331,13 @@ private Q_SLOTS:
      * @param message
      */
     void _onActionWillBeExecuted(QString message);
+
+
+    /**
+     * @brief Slot called when the state of the TimeLine updated
+     * @param state
+     */
+    void _onTimeLineStateUpdated(QString state);
 
 
     /**

@@ -71,7 +71,7 @@ void ExportController::exportExperimentation()
         openFile(const_cast<char*>(exportFilePath.toStdString().c_str()));
 
         // Set the cassandra session for the exporting layer
-        setCassSession(AssessmentsModelManager::Instance()->getCassSession());
+        setCassSession(AssessmentsModelManager::instance()->getCassSession());
 
         // Export a full dump of the current experimentation
         exportAllRecordsFromIdExpAndTableRecordSetup(experimentationUid);

@@ -90,11 +90,11 @@ AbstractScenarioController::~AbstractScenarioController()
   */
 void AbstractScenarioController::importScenarioFromJson(QJsonObject jsonScenario)
 {
-    IngeScapeModelManager* igsModelManager = IngeScapeModelManager::instance();
-    if (igsModelManager != nullptr)
+    IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
+    if (ingeScapeModelManager != nullptr)
     {
         // Get the hash table from a name to the group of agents with this name
-        QHash<QString, AgentsGroupedByNameVM*> hashFromNameToAgentsGrouped = igsModelManager->getHashTableFromNameToAgentsGrouped();
+        QHash<QString, AgentsGroupedByNameVM*> hashFromNameToAgentsGrouped = ingeScapeModelManager->getHashTableFromNameToAgentsGrouped();
 
         // Create a model of scenario (actions in the list, in the palette and in the timeline) from JSON
         ScenarioM* scenarioToImport = JsonHelper::createModelOfScenarioFromJSON(jsonScenario, hashFromNameToAgentsGrouped);
@@ -106,10 +106,10 @@ void AbstractScenarioController::importScenarioFromJson(QJsonObject jsonScenario
                 // Add each action to our list
                 for (ActionM* actionM : scenarioToImport->actionsList()->toList())
                 {
-                    if ((actionM != nullptr) && (igsModelManager->getActionWithId(actionM->uid()) == nullptr))
+                    if ((actionM != nullptr) && (ingeScapeModelManager->getActionWithId(actionM->uid()) == nullptr))
                     {
                         // Add the action to the model manager
-                        igsModelManager->storeNewAction(actionM);
+                        ingeScapeModelManager->storeNewAction(actionM);
 
                         // Add the action to the list
                         _actionsList.append(actionM);
@@ -1047,7 +1047,7 @@ void AbstractScenarioController::_executeCommandForAgent(AgentsGroupedByNameVM* 
                         };
 
                         // Send the message "Start Agent" to the IngeScape Launcher
-                        IngeScapeNetworkController::instance()->sendMessageToAgent(peerIdOfLauncher, message);
+                        IngeScapeNetworkController::instance()->sendStringMessageToAgent(peerIdOfLauncher, message);
                     }
                 }
             }
@@ -1058,7 +1058,7 @@ void AbstractScenarioController::_executeCommandForAgent(AgentsGroupedByNameVM* 
                   || (command == command_FreezeAgent) || (command == command_UnfreezeAgent) )
         {
             // Send the command to the list of agents
-            IngeScapeNetworkController::instance()->sendMessageToAgents(agentsGroupedByName->peerIdsList(), command);
+            IngeScapeNetworkController::instance()->sendStringMessageToAgents(agentsGroupedByName->peerIdsList(), command);
         }
         // MAP or UNMAP
         else if ((command == command_MapAgents) || (command == command_UnmapAgents))
@@ -1077,8 +1077,8 @@ void AbstractScenarioController::_executeCommandForAgent(AgentsGroupedByNameVM* 
                 };*/
 
                 // Send the message to the list of agents
-                //IngeScapeNetworkController::instance()->sendMessageToAgents(agentsGroupedByName->peerIdsList(), message);
-                IngeScapeNetworkController::instance()->sendMessageToAgents(agentsGroupedByName->peerIdsList(), commandAndParameters);
+                //IngeScapeNetworkController::instance()->sendStringMessageToAgents(agentsGroupedByName->peerIdsList(), message);
+                IngeScapeNetworkController::instance()->sendStringMessageToAgents(agentsGroupedByName->peerIdsList(), commandAndParameters);
             }
             else {
                 qCritical() << "Wrong number of parameters (" << commandAndParameters.count() << ") to map an input of agent" << agentsGroupedByName->name();
@@ -1099,8 +1099,8 @@ void AbstractScenarioController::_executeCommandForAgent(AgentsGroupedByNameVM* 
                 };*/
 
                 // Send the message to the list of agents
-                //IngeScapeNetworkController::instance()->sendMessageToAgents(agentsGroupedByName->peerIdsList(), message);
-                IngeScapeNetworkController::instance()->sendMessageToAgents(agentsGroupedByName->peerIdsList(), commandAndParameters);
+                //IngeScapeNetworkController::instance()->sendStringMessageToAgents(agentsGroupedByName->peerIdsList(), message);
+                IngeScapeNetworkController::instance()->sendStringMessageToAgents(agentsGroupedByName->peerIdsList(), commandAndParameters);
             }
             else {
                 qCritical() << "Wrong number of parameters (" << commandAndParameters.count() << ") to set a value to agent" << agentsGroupedByName->name();

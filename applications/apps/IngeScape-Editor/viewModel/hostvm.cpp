@@ -138,7 +138,7 @@ void HostVM::startAgent(AgentM* agent)
         };
 
         // Send the message "Start Agent" to this host (IngeScape Launcher)
-        IngeScapeNetworkController::instance()->sendMessageToAgent(_modelM->peerId(), message);
+        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_modelM->peerId(), message);
     }
 }
 
@@ -152,7 +152,7 @@ void HostVM::stopAgent(AgentM* agent)
     if (agent != nullptr)
     {
         // Send the message "Stop Agent" to this host (IngeScape Launcher)
-        IngeScapeNetworkController::instance()->sendMessageToAgent(agent->peerId(), command_StopAgent);
+        IngeScapeNetworkController::instance()->sendStringMessageToAgent(agent->peerId(), command_StopAgent);
     }
 }
 

@@ -370,6 +370,6 @@ QString AssessmentsModelManager::cassUuidToQString(CassUuid cassUuid)
 CassUuid AssessmentsModelManager::genCassUuid()
 {
     CassUuid uuid;
-    cass_uuid_gen_time(AssessmentsModelManager::Instance()->getCassUuidGen(), &uuid);
+    cass_uuid_gen_time(AssessmentsModelManager::instance()->getCassUuidGen(), &uuid);
     return uuid;
 }

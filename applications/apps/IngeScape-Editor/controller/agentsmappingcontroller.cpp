@@ -338,12 +338,12 @@ void AgentsMappingController::dropAgentNameToMappingAtPosition(const QString& ag
     // Check that there is NOT yet an agent in the current mapping for this name
     AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);
 
-    IngeScapeModelManager* igsModelManager = IngeScapeModelManager::instance();
+    IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
 
-    if ((agentInMapping == nullptr) && (igsModelManager != nullptr))
+    if ((agentInMapping == nullptr) && (ingeScapeModelManager != nullptr))
     {
         // Get the (view model of) agents grouped for this name
-        AgentsGroupedByNameVM* agentsGroupedByName = igsModelManager->getAgentsGroupedForName(agentName);
+        AgentsGroupedByNameVM* agentsGroupedByName = ingeScapeModelManager->getAgentsGroupedForName(agentName);
         if (agentsGroupedByName != nullptr)
         {
             // Create a new agent in the global mapping (with an "Agents Grouped by Name") at a specific position with the default width
@@ -352,10 +352,10 @@ void AgentsMappingController::dropAgentNameToMappingAtPosition(const QString& ag
             if (agentInMapping != nullptr)
             {
                 // The global mapping is activated
-                if (igsModelManager->isMappingConnected())
+                if (ingeScapeModelManager->isMappingConnected())
                 {
                     // CONTROL
-                    /*if (igsModelManager->isMappingControlled())
+                    /*if (ingeScapeModelManager->isMappingControlled())
                     {
                     }
                     // OBSERVE
@@ -403,7 +403,7 @@ void AgentsMappingController::dropAgentNameToMappingAtPosition(const QString& ag
                                 else
                                 {
                                     // Get the (view model of) agents grouped for the output agent name
-                                    AgentsGroupedByNameVM* outputAgent = igsModelManager->getAgentsGroupedForName(mappingElement->firstModel()->outputAgent());
+                                    AgentsGroupedByNameVM* outputAgent = ingeScapeModelManager->getAgentsGroupedForName(mappingElement->firstModel()->outputAgent());
                                     if (outputAgent != nullptr)
                                     {
                                         QList<OutputVM*> outputsWithSameName = outputAgent->getOutputsListFromName(mappingElement->firstModel()->output());
@@ -523,7 +523,7 @@ void AgentsMappingController::dropLinkBetweenTwoAgents(AgentInMappingVM* outputA
                     };
 
                     // Send the message "MAP" to the list of agents
-                    IngeScapeNetworkController::instance()->sendMessageToAgents(inputAgent->agentsGroupedByName()->peerIdsList(), message);
+                    IngeScapeNetworkController::instance()->sendStringMessageToAgents(inputAgent->agentsGroupedByName()->peerIdsList(), message);
                 }
                 // The global mapping is NOT activated OR the input agent is OFF
                 else
@@ -931,9 +931,9 @@ QJsonArray AgentsMappingController::exportGlobalMappingToJSON()
  */
 void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgentsInMapping)
 {
-    IngeScapeModelManager* igsModelManager = IngeScapeModelManager::instance();
+    IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
 
-    if (igsModelManager != nullptr)
+    if (ingeScapeModelManager != nullptr)
     {
         QList<QPair<AgentInMappingVM*, AgentMappingM*>> listOfAgentsAndMappingToAgents;
         QList<QPair<AgentInMappingVM*, ActionMappingM*>> listOfAgentsAndMappingToActions;
@@ -1042,7 +1042,7 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
 
 
                         // Get the (view model of) agents grouped for this name
-                        AgentsGroupedByNameVM* agentsGroupedByName = igsModelManager->getAgentsGroupedForName(agentName);
+                        AgentsGroupedByNameVM* agentsGroupedByName = ingeScapeModelManager->getAgentsGroupedForName(agentName);
 
                         if ((agentsGroupedByName != nullptr) && !position.isNull())
                         {
@@ -1155,7 +1155,7 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
                         }
 
                         // Get the (model of) action for this name
-                        ActionM* action = igsModelManager->getActionWithId(actionUID);
+                        ActionM* action = ingeScapeModelManager->getActionWithId(actionUID);
 
                         if ((action != nullptr) && !position.isNull())
                         {
@@ -1400,7 +1400,7 @@ void AgentsMappingController::onIsMappingConnectedChanged(bool isMappingConnecte
 
                     // Send the message to the agent (list of models of agent)
                     // FIXME: JSON can be too big for a string
-                    IngeScapeNetworkController::instance()->sendMessageToAgents(agentInMapping->agentsGroupedByName()->peerIdsList(), message);
+                    IngeScapeNetworkController::instance()->sendStringMessageToAgents(agentInMapping->agentsGroupedByName()->peerIdsList(), message);
                 }
                 // Nothing to do for agents OFF
             }
@@ -1665,7 +1665,7 @@ void AgentsMappingController::_onAgentModelONhasBeenAdded(AgentM* model)
 
                 // Send the message "LOAD THIS MAPPING" to this agent
                 // FIXME: JSON can be too big for a string
-                IngeScapeNetworkController::instance()->sendMessageToAgent(model->peerId(), message);
+                IngeScapeNetworkController::instance()->sendStringMessageToAgent(model->peerId(), message);
             }
             // The agent is NOT in the global mapping
             else
@@ -1673,7 +1673,7 @@ void AgentsMappingController::_onAgentModelONhasBeenAdded(AgentM* model)
                 qDebug() << "CONTROL:" << agentName << "is ON but NOT in the global mapping --> CLEAR its MAPPING !";
 
                 // Send the message "Clear Mapping" to this agent
-                IngeScapeNetworkController::instance()->sendMessageToAgent(model->peerId(), command_ClearMapping);
+                IngeScapeNetworkController::instance()->sendStringMessageToAgent(model->peerId(), command_ClearMapping);
             }
         }
         // OBSERVE
@@ -2015,7 +2015,7 @@ void AgentsMappingController::_onWriteOnInputOfAgentInMapping(ObjectInMappingVM*
             };
 
             // Send the message "SET INPUT" to the list of agents
-            IngeScapeNetworkController::instance()->sendMessageToAgents(agentInMapping->agentsGroupedByName()->peerIdsList(), message);
+            IngeScapeNetworkController::instance()->sendStringMessageToAgents(agentInMapping->agentsGroupedByName()->peerIdsList(), message);
         }
     }
 }
@@ -2197,7 +2197,7 @@ void AgentsMappingController::_removeLinkBetweenTwoAgents(LinkVM* link)
                 };
 
                 // Send the message "UNMAP" to the list of agents
-                IngeScapeNetworkController::instance()->sendMessageToAgents(inputAgent->agentsGroupedByName()->peerIdsList(), message);
+                IngeScapeNetworkController::instance()->sendStringMessageToAgents(inputAgent->agentsGroupedByName()->peerIdsList(), message);
             }
             // The global mapping is NOT activated OR the input agent is OFF
             else
@@ -2288,7 +2288,7 @@ void AgentsMappingController::_removeAllLinksWithAgent(AgentInMappingVM* agent)
         if (IngeScapeModelManager::instance()->isMappingConnected() && agent->agentsGroupedByName()->isON())
         {
             // Send the message "Clear Mapping" to these agents
-            IngeScapeNetworkController::instance()->sendMessageToAgents(agent->agentsGroupedByName()->peerIdsList(), command_ClearMapping);
+            IngeScapeNetworkController::instance()->sendStringMessageToAgents(agent->agentsGroupedByName()->peerIdsList(), command_ClearMapping);
         }
         // The global mapping is NOT activated OR the agent is OFF
         else

@@ -122,6 +122,27 @@ private Q_SLOTS:
     void _onCurrentExperimentationChanged(ExperimentationM* currentExperimentation);
 
 
+    /**
+     * @brief Slot called when the user wants to start to record
+     */
+    void _onStartToRecord();
+
+
+    /**
+     * @brief Slot called just before an action is performed
+     * (the message "EXECUTED ACTION" must be sent on the network to the recorder)
+     * @param message
+     */
+    void _onActionWillBeExecuted(QString message);
+
+
+    /**
+     * @brief Slot called when the state of the TimeLine updated
+     * @param state
+     */
+    void _onTimeLineStateUpdated(QString state);
+
+
 protected: // Methods
     /**
      * @brief Create and insert a new task instance into the DB.

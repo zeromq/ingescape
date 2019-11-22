@@ -201,7 +201,7 @@ public:
         }
 
         // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::instance()->getCassSession(), cassStatement);
         CassError cassError = cass_future_error_code(cassFuture);
         if (cassError == CASS_OK)
         {
@@ -290,7 +290,7 @@ public:
         }
 
         // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::instance()->getCassSession(), cassStatement);
         CassError cassError = cass_future_error_code(cassFuture);
         if (cassError == CASS_OK)
         {
@@ -333,7 +333,7 @@ public:
         CassStatement* cassStatement = ModelClass::createBoundInsertStatement(modelInstance);
 
         // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::instance()->getCassSession(), cassStatement);
         CassError cassError = cass_future_error_code(cassFuture);
         bool success = (cassError == CASS_OK);
         if (success)
@@ -361,7 +361,7 @@ public:
         CassStatement* cassStatement = ModelClass::createBoundUpdateStatement(modelInstance);
 
         // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::instance()->getCassSession(), cassStatement);
         CassError cassError = cass_future_error_code(cassFuture);
         bool success = (cassError == CASS_OK);
         if (success)

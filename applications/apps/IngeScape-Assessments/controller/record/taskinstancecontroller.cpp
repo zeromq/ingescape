@@ -112,8 +112,8 @@ void TaskInstanceController::setcurrentTaskInstance(TaskInstanceM *value)
  */
 void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previousTaskInstance, TaskInstanceM* currentTaskInstance)
 {
-    IngeScapeModelManager* igsModelManager = IngeScapeModelManager::instance();
-    if ((igsModelManager != nullptr) && (_scenarioC != nullptr))
+    IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
+    if ((ingeScapeModelManager != nullptr) && (_scenarioC != nullptr))
     {
         //
         // Clean the previous session
@@ -124,13 +124,13 @@ void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previo
             _scenarioC->clearScenario();
 
             // Delete all published values
-            igsModelManager->deleteAllPublishedValues();
+            ingeScapeModelManager->deleteAllPublishedValues();
 
             // Delete all (models of) actions
-            igsModelManager->deleteAllActions();
+            ingeScapeModelManager->deleteAllActions();
 
             // Delete agents OFF
-            QStringList namesListOfAgentsON = igsModelManager->deleteAgentsOFF();
+            QStringList namesListOfAgentsON = ingeScapeModelManager->deleteAgentsOFF();
             qDebug() << "Remaining agents ON:" << namesListOfAgentsON;
         }
 
@@ -176,7 +176,7 @@ void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previo
                             // Import the agents list from JSON
                             if (jsonRoot.contains("agents"))
                             {
-                                igsModelManager->importAgentsListFromJson(jsonRoot.value("agents").toArray(), versionJsonPlatform);
+                                ingeScapeModelManager->importAgentsListFromJson(jsonRoot.value("agents").toArray(), versionJsonPlatform);
                             }
 
                             // Import the scenario from JSON

@@ -208,39 +208,48 @@ public:
 
 
     /**
-     * @brief Send a (string) message to an agent (identified by its peer id)
+     * @brief Send a string message to an agent (identified by its peer id)
      * @param agentId peer id of the agent
      * @param message 1 string
      * @return true if successful, false otherwise
      */
-    bool sendMessageToAgent(QString agentId, QString message);
+    bool sendStringMessageToAgent(QString agentId, QString message);
 
 
     /**
-     * @brief Send a (strings list) message to an agent (identified by its peer id)
+     * @brief Send a strings list message to an agent (identified by its peer id)
      * @param agentId peer id of the agent
      * @param message list of strings
      * @return true if successful, false otherwise
      */
-    bool sendMessageToAgent(QString agentId, QStringList message);
+    bool sendStringMessageToAgent(QString agentId, QStringList message);
 
 
     /**
-     * @brief Send a (string) message to a list of agents (identified by their peer id)
+     * @brief Send a string message to a list of agents (identified by their peer id)
      * @param agentIds peer ids of the agents
      * @param message 1 string
      * @return true if successful, false otherwise
      */
-    bool sendMessageToAgents(QStringList agentIds, QString message);
+    bool sendStringMessageToAgents(QStringList agentIds, QString message);
 
 
     /**
-     * @brief Send a (strings list) message to an agent (identified by its peer id)
+     * @brief Send a strings list message to an agent (identified by its peer id)
      * @param agentIds peer ids of the agents
      * @param message list of strings
      * @return true if successful, false otherwise
      */
-    bool sendMessageToAgents(QStringList agentIds, QStringList message);
+    bool sendStringMessageToAgents(QStringList agentIds, QStringList message);
+
+
+    /**
+     * @brief Send a ZMQ message in several parts to an agent (identified by its peer id)
+     * @param agentId
+     * @param messageParts
+     * @return
+     */
+    bool sendZMQMessageToAgent(QString agentId, QStringList messageParts);
 
 
     /**
@@ -455,14 +464,6 @@ Q_SIGNALS:
 
 
 public Q_SLOTS:
-
-    /**
-     * @brief Slot called when a command must be sent on the network to a recorder
-     * @param peerIdOfRecorder
-     * @param commandAndParameters
-     */
-    void onCommandAskedToRecorder(QString peerIdOfRecorder, QString commandAndParameters);
-
 
     /**
      * @brief Slot called when the flag "is Mapping Activated" changed

@@ -190,7 +190,7 @@ void AgentsSupervisionController::_onLoadAgentDefinitionFromPath(QStringList pee
 
             // Send the message to the agent (list of models of agent)
             // FIXME: JSON can be too big for a string
-            IngeScapeNetworkController::instance()->sendMessageToAgents(peerIdsList, message);
+            IngeScapeNetworkController::instance()->sendStringMessageToAgents(peerIdsList, message);
         }
         else {
             qCritical() << "Can not open file" << definitionFilePath << "(to load the definition of" << agentsGroupedByDefinition->name() << ")";
@@ -224,7 +224,7 @@ void AgentsSupervisionController::_onLoadAgentMappingFromPath(QStringList peerId
 
             // Send the message to the agent (list of models of agent)
             // FIXME: JSON can be too big for a string
-            IngeScapeNetworkController::instance()->sendMessageToAgents(peerIdsList, message);
+            IngeScapeNetworkController::instance()->sendStringMessageToAgents(peerIdsList, message);
         }
         else {
             qCritical() << "Can not open file" << mappingFilePath << "(to load the mapping of" << agentsGroupedByDefinition->name() << ")";

@@ -50,7 +50,7 @@ ExperimentationsListController::ExperimentationsListController(QObject *parent) 
 
 
     // Get the model manager
-    AssessmentsModelManager* modelManager = AssessmentsModelManager::Instance();
+    AssessmentsModelManager* modelManager = AssessmentsModelManager::instance();
 
     // If we are connected to the database
     if ((modelManager != nullptr) && modelManager->isConnectedToDatabase())
@@ -142,8 +142,7 @@ void ExperimentationsListController::createNewExperimentationInNewGroup(QString 
  */
 void ExperimentationsListController::createNewExperimentationInGroup(QString experimentationName, ExperimentationsGroupVM* experimentationsGroup)
 {
-    if (!experimentationName.isEmpty() && (experimentationsGroup != nullptr)
-            && (AssessmentsModelManager::Instance() != nullptr))
+    if (!experimentationName.isEmpty() && (experimentationsGroup != nullptr))
     {
         ExperimentationM* experimentation = new ExperimentationM(AssessmentsModelManager::genCassUuid(),
                                                                  experimentationName,
@@ -262,7 +261,7 @@ void ExperimentationsListController::_removeExperimentationsGroup(Experimentatio
  */
 void ExperimentationsListController::_initExperimentationsList()
 {
-    if (AssessmentsModelManager::Instance()->isConnectedToDatabase())
+    if (AssessmentsModelManager::instance()->isConnectedToDatabase())
     {
         // Create the query
         QList<ExperimentationM*> experimentationsList = AssessmentsModelManager::select<ExperimentationM>({}); // #NoFilter

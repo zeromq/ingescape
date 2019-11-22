@@ -100,37 +100,6 @@ NetworkController::~NetworkController()
 
 
 /**
- * @brief Send a command, parameters and the content of a JSON file to the recorder
- * @param peerIdOfRecorder
- * @param commandAndParameters
- */
-void NetworkController::sendCommandWithJsonToRecorder(QString peerIdOfRecorder, QStringList commandAndParameters)
-{
-    if (!peerIdOfRecorder.isEmpty() && !commandAndParameters.isEmpty())
-    {
-        // Create ZMQ message
-        zmsg_t* msg = zmsg_new();
-
-        for (QString string : commandAndParameters)
-        {
-            zmsg_addstr(msg, string.toStdString().c_str());
-        }
-
-        //int framesNumber = zmsg_size(msg);
-
-        // Send ZMQ message to the recorder
-        int success = igs_busSendZMQMsgToAgent(peerIdOfRecorder.toStdString().c_str(), &msg);
-
-        // Do not print the JSON file content
-        commandAndParameters.removeLast();
-        qInfo() << "Send command, parameters and the content of a JSON file" << commandAndParameters << "to recorder" << peerIdOfRecorder << "with success ?" << success;
-
-        zmsg_destroy(&msg);
-    }
-}
-
-
-/**
  * @brief Send a command execution status to the expe
  * @param command
  * @param commandParameters
