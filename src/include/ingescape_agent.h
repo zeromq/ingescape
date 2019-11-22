@@ -86,9 +86,12 @@ PUBLIC int igsAgent_writeParameterAsData(igsAgent_t *agent, const char *name, vo
 PUBLIC void igsAgent_clearDataForInput(igsAgent_t *agent, const char *name);
 PUBLIC void igsAgent_clearDataForOutput(igsAgent_t *agent, const char *name);
 PUBLIC void igsAgent_clearDataForParameter(igsAgent_t *agent, const char *name);
-PUBLIC int igsAgent_observeInput(igsAgent_t *agent, const char *name, igs_observeCallback cb, void *myData);
-PUBLIC int igsAgent_observeOutput(igsAgent_t *agent, const char *name, igs_observeCallback cb, void * myData);
-PUBLIC int igsAgent_observeParameter(igsAgent_t *agent, const char *name, igs_observeCallback cb, void * myData);
+
+typedef void (*igsAgent_observeCallback)(igsAgent_t *agent, iop_t iopType, const char *name, iopType_t valueType, void *value, size_t valueSize, void *myData);
+PUBLIC int igsAgent_observeInput(igsAgent_t *agent, const char *name, igsAgent_observeCallback cb, void *myData);
+PUBLIC int igsAgent_observeOutput(igsAgent_t *agent, const char *name, igsAgent_observeCallback cb, void * myData);
+PUBLIC int igsAgent_observeParameter(igsAgent_t *agent, const char *name, igsAgent_observeCallback cb, void * myData);
+
 PUBLIC int igsAgent_muteOutput(igsAgent_t *agent, const char *name);
 PUBLIC int igsAgent_unmuteOutput(igsAgent_t *agent, const char *name);
 PUBLIC bool igsAgent_isOutputMuted(igsAgent_t *agent, const char *name);
@@ -144,6 +147,22 @@ PUBLIC void igsAgent_setCommandLine(igsAgent_t *agent, const char *line);
 PUBLIC void igsAgent_setCommandLineFromArgs(igsAgent_t *agent, int argc, const char * argv[]);
 PUBLIC void igsAgent_setRequestOutputsFromMappedAgents(igsAgent_t *agent, bool notify);
 PUBLIC bool igsAgent_getRequestOutputsFromMappedAgents(igsAgent_t *agent);
+
+//do not use these functions, use aliases just below
+PUBLIC void igsAgent_trace2(const char *function, igsAgent_t *agent, const char *format, ...) CHECK_PRINTF (3);
+PUBLIC void igsAgent_debug2(const char *function, igsAgent_t *agent, const char *format, ...) CHECK_PRINTF (3);
+PUBLIC void igsAgent_info2(const char *function, igsAgent_t *agent, const char *format, ...) CHECK_PRINTF (3);
+PUBLIC void igsAgent_warn2(const char *function, igsAgent_t *agent, const char *format, ...) CHECK_PRINTF (3);
+PUBLIC void igsAgent_error2(const char *function, igsAgent_t *agent, const char *format, ...) CHECK_PRINTF (3);
+PUBLIC void igsAgent_fatal2(const char *function, igsAgent_t *agent, const char *format, ...) CHECK_PRINTF (3);
+
+#define igsAgent_trace(...) igsAgent_trace2(__func__, __VA_ARGS__)
+#define igsAgent_debug(...) igsAgent_debug2(__func__, __VA_ARGS__)
+#define igsAgent_info(...) igsAgent_info2(__func__, __VA_ARGS__)
+#define igsAgent_warn(...) igsAgent_warn2(__func__, __VA_ARGS__)
+#define igsAgent_error(...) igsAgent_error2(__func__, __VA_ARGS__)
+#define igsAgent_fatal(...) igsAgent_fatal2(__func__, __VA_ARGS__)
+
 PUBLIC void igsAgent_setDefinitionPath(igsAgent_t *agent, const char *path);
 PUBLIC void igsAgent_setMappingPath(igsAgent_t *agent, const char *path);
 PUBLIC void igsAgent_writeDefinitionToPath(igsAgent_t *agent);

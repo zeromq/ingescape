@@ -55,7 +55,7 @@ extern "C" {
 //////////////////  STRUCTURES AND ENUMS   //////////////////
 
 typedef struct igs_observe_callback {
-    igs_observeCallback callback_ptr;
+    igsAgent_observeCallback callback_ptr;
     void* data;
     struct igs_observe_callback *prev;
     struct igs_observe_callback *next;
@@ -386,6 +386,7 @@ extern bool admin_logInStream;
 extern bool admin_logInFile;
 extern char admin_logFile[4096];
 void admin_makeFilePath(const char *from, char *to, size_t size_of_to);
+PUBLIC void igs_log(char *name, igs_logLevel_t, const char *function, const char *format, ...)  CHECK_PRINTF (4);
 
 //bus
 void bus_zyreLock(void);

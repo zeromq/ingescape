@@ -304,13 +304,20 @@ PUBLIC char* igs_getLogPath(void); // must be freed by caller
 
 PUBLIC void igs_setLogLevel (igs_logLevel_t level); //set log level in console, default is IGS_LOG_INFO
 PUBLIC igs_logLevel_t igs_getLogLevel(void);
-PUBLIC void igs_log(igs_logLevel_t, const char *function, const char *format, ...)  CHECK_PRINTF (3);
-#define igs_trace(...) igs_log(IGS_LOG_TRACE, __func__, __VA_ARGS__)
-#define igs_debug(...) igs_log(IGS_LOG_DEBUG, __func__, __VA_ARGS__)
-#define igs_info(...)  igs_log(IGS_LOG_INFO, __func__, __VA_ARGS__)
-#define igs_warn(...)  igs_log(IGS_LOG_WARN, __func__, __VA_ARGS__)
-#define igs_error(...) igs_log(IGS_LOG_ERROR, __func__, __VA_ARGS__)
-#define igs_fatal(...) igs_log(IGS_LOG_FATAL, __func__, __VA_ARGS__)
+
+//do not use these functions, use aliases just below
+PUBLIC void igs_traceGlobal(const char *function, const char *format, ...) CHECK_PRINTF (2);
+PUBLIC void igs_debugGlobal(const char *function, const char *format, ...) CHECK_PRINTF (2);
+PUBLIC void igs_infoGlobal(const char *function, const char *format, ...) CHECK_PRINTF (2);
+PUBLIC void igs_warnGlobal(const char *function, const char *format, ...) CHECK_PRINTF (2);
+PUBLIC void igs_errorGlobal(const char *function, const char *format, ...) CHECK_PRINTF (2);
+PUBLIC void igs_fatalGlobal(const char *function, const char *format, ...) CHECK_PRINTF (2);
+#define igs_trace(...) igs_traceGlobal(__func__, __VA_ARGS__)
+#define igs_debug(...) igs_debugGlobal(__func__, __VA_ARGS__)
+#define igs_info(...)  igs_infoGlobal(__func__, __VA_ARGS__)
+#define igs_warn(...)  igs_warnGlobal(__func__, __VA_ARGS__)
+#define igs_error(...) igs_errorGlobal(__func__, __VA_ARGS__)
+#define igs_fatal(...) igs_fatalGlobal(__func__, __VA_ARGS__)
 
 
 //resources file management
@@ -342,7 +349,8 @@ PUBLIC bool igs_getAllowInproc(void);
 
 //////////////////////////////////////////////////
 //licenses
-#define igs_license(...) igs_log(IGS_LOG_FATAL+1, __func__, __VA_ARGS__)
+PUBLIC void igs_licenseGlobal(const char *function, const char *format, ...) CHECK_PRINTF (2);
+#define igs_license(...) igs_licenseGlobal(__func__, __VA_ARGS__)
 typedef enum {
     IGS_LICENSE_TIMEOUT = 0,
     IGS_LICENSE_TOO_MANY_AGENTS,

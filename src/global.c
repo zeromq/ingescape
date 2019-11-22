@@ -11,6 +11,7 @@
 #include "ingescape.h"
 #include "ingescape_advanced.h"
 #include "ingescape_agent.h"
+#include "ingescape_private.h"
 
 igsAgent_t *internalAgent = NULL;
 bool igs_Interrupted = false;
@@ -316,19 +317,38 @@ void igs_clearDataForParameter(const char *name){
     igsAgent_clearDataForParameter(internalAgent, name);
 }
 
+typedef struct {
+    igs_observeCallback cb;
+    void *myData;
+} observeCbWrapper_t;
+
+void igsAgent_GlobalObserveCallback(igsAgent_t *agent, iop_t iopType, const char *name, iopType_t valueType, void *value, size_t valueSize, void *myData){
+    observeCbWrapper_t *wrap = (observeCbWrapper_t *)myData;
+    wrap->cb(iopType, name, valueType, value, valueSize, wrap->myData);
+}
+
 int igs_observeInput(const char *name, igs_observeCallback cb, void *myData){
     initInternalAgentIfNeeded();
-    return igsAgent_observeInput(internalAgent, name, cb, myData);
+    observeCbWrapper_t *wrap = calloc(1, sizeof(observeCbWrapper_t));
+    wrap->cb = cb;
+    wrap->myData = myData;
+    return igsAgent_observeInput(internalAgent, name, igsAgent_GlobalObserveCallback, wrap);
 }
 
 int igs_observeOutput(const char *name, igs_observeCallback cb, void * myData){
     initInternalAgentIfNeeded();
-    return igsAgent_observeOutput(internalAgent, name, cb, myData);
+    observeCbWrapper_t *wrap = calloc(1, sizeof(observeCbWrapper_t));
+    wrap->cb = cb;
+    wrap->myData = myData;
+    return igsAgent_observeOutput(internalAgent, name, igsAgent_GlobalObserveCallback, myData);
 }
 
 int igs_observeParameter(const char *name, igs_observeCallback cb, void * myData){
     initInternalAgentIfNeeded();
-    return igsAgent_observeParameter(internalAgent, name, cb, myData);
+    observeCbWrapper_t *wrap = calloc(1, sizeof(observeCbWrapper_t));
+    wrap->cb = cb;
+    wrap->myData = myData;
+    return igsAgent_observeParameter(internalAgent, name, igsAgent_GlobalObserveCallback, myData);
 }
 
 int igs_muteOutput(const char *name){
@@ -633,8 +653,77 @@ const char* igs_getIpcFolderPath(void){
     initInternalAgentIfNeeded();
     return igsAgent_getIpcFolderPath(internalAgent);
 }
-
 #endif
+
+void igs_traceGlobal(const char *function, const char *format, ...){
+    initInternalAgentIfNeeded();
+    va_list list;
+    va_start(list, format);
+    char content[MAX_STRING_MSG_LENGTH] = "";
+    vsnprintf(content, MAX_STRING_MSG_LENGTH - 1, format, list);
+    va_end(list);
+    igs_log(internalAgent->agentName, IGS_LOG_TRACE, function, "%s", content);
+}
+
+void igs_debugGlobal(const char *function, const char *format, ...){
+    initInternalAgentIfNeeded();
+    va_list list;
+    va_start(list, format);
+    char content[MAX_STRING_MSG_LENGTH] = "";
+    vsnprintf(content, MAX_STRING_MSG_LENGTH - 1, format, list);
+    va_end(list);
+    igs_log(internalAgent->agentName, IGS_LOG_DEBUG, function, "%s", content);
+}
+
+void igs_infoGlobal(const char *function, const char *format, ...){
+    initInternalAgentIfNeeded();
+    va_list list;
+    va_start(list, format);
+    char content[MAX_STRING_MSG_LENGTH] = "";
+    vsnprintf(content, MAX_STRING_MSG_LENGTH - 1, format, list);
+    va_end(list);
+    igs_log(internalAgent->agentName, IGS_LOG_INFO, function, "%s", content);
+}
+
+void igs_warnGlobal(const char *function, const char *format, ...){
+    initInternalAgentIfNeeded();
+    va_list list;
+    va_start(list, format);
+    char content[MAX_STRING_MSG_LENGTH] = "";
+    vsnprintf(content, MAX_STRING_MSG_LENGTH - 1, format, list);
+    va_end(list);
+    igs_log(internalAgent->agentName, IGS_LOG_WARN, function, "%s", content);
+}
+
+void igs_errorGlobal(const char *function, const char *format, ...){
+    initInternalAgentIfNeeded();
+    va_list list;
+    va_start(list, format);
+    char content[MAX_STRING_MSG_LENGTH] = "";
+    vsnprintf(content, MAX_STRING_MSG_LENGTH - 1, format, list);
+    va_end(list);
+    igs_log(internalAgent->agentName, IGS_LOG_ERROR, function, "%s", content);
+}
+
+void igs_fatalGlobal(const char *function, const char *format, ...){
+    initInternalAgentIfNeeded();
+    va_list list;
+    va_start(list, format);
+    char content[MAX_STRING_MSG_LENGTH] = "";
+    vsnprintf(content, MAX_STRING_MSG_LENGTH - 1, format, list);
+    va_end(list);
+    igs_log(internalAgent->agentName, IGS_LOG_FATAL, function, "%s", content);
+}
+
+void igs_licenseGlobal(const char *function, const char *format, ...){
+    initInternalAgentIfNeeded();
+    va_list list;
+    va_start(list, format);
+    char content[MAX_STRING_MSG_LENGTH] = "";
+    vsnprintf(content, MAX_STRING_MSG_LENGTH - 1, format, list);
+    va_end(list);
+    igs_log(internalAgent->agentName, IGS_LOG_FATAL+1, function, "%s", content);
+}
 
 //licenses
 #if !defined(TARGET_OS_IOS) || !TARGET_OS_IOS
@@ -770,7 +859,6 @@ int igs_busSendStringToAgent(const char *agentNameOrPeerID, const char *msg, ...
     vsnprintf(content, MAX_STRING_MSG_LENGTH - 1, msg, list);
     va_end(list);
     int res = igsAgent_busSendStringToAgent(internalAgent, agentNameOrPeerID, "%s", content);
-    va_end(list);
     return res;
 }
 
