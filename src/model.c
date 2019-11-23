@@ -37,14 +37,16 @@ void model_readWriteLock(void)   {
     if (model_readWriteMutex == NULL){
         model_readWriteMutex = calloc(1, sizeof(pthread_mutex_t));
         if (pthread_mutex_init(model_readWriteMutex, NULL) != 0){
-            igs_error("mutex init failed");
+            igs_fatal("mutex init failed");
+            assert(false);
             return;
         }
     }
 #elif (defined WIN32 || defined _WIN32)
     if (model_readWriteMutex == NULL){
         if (pthread_mutex_init(&model_readWriteMutex) != 0){
-            igs_error("mutex init failed");
+            igs_fatal("mutex init failed");
+            assert(false);
             return;
         }
     }
@@ -56,7 +58,8 @@ void model_readWriteUnlock(void) {
     if (model_readWriteMutex != NULL){
         pthread_mutex_unlock(model_readWriteMutex);
     }else{
-        igs_error("mutex was NULL");
+        igs_fatal("mutex was NULL");
+        assert(false);
     }
 }
 
@@ -109,13 +112,13 @@ static int model_observe(igsAgent_t *agent, const char* name, iop_t iopType, igs
             default:
                 break;
         }
-        igs_error("Cannot find %s %s", t, name);
+        igsAgent_error(agent, "Cannot find %s %s", t, name);
         return 0;
     }
 
     //callback not defined
     if(cb == NULL) {
-        igs_error("Callback cannot be NULL (called for %s)", name);
+        igsAgent_error(agent, "Callback cannot be NULL (called for %s)", name);
         return 0;
     }
 
@@ -124,18 +127,18 @@ static int model_observe(igsAgent_t *agent, const char* name, iop_t iopType, igs
     new_callback->data = myData;
     DL_APPEND(iop->callbacks, new_callback);
 
-    //igs_trace("observe iop with name %s and type %d\n", name, iopType);
+    //igsAgent_debug(agent, "observe iop with name %s and type %d\n", name, iopType);
 
     return 1;
 }
 
 iopType_t model_getTypeForIOP(igsAgent_t *agent, const char *name, iop_t type){
     if((name == NULL) || (strlen(name) == 0)){
-        igs_error("Name cannot be NULL or empty");
+        igsAgent_error(agent, "Name cannot be NULL or empty");
         return 0;
     }
     if(agent->internal_definition == NULL){
-        igs_error("Definition is NULL");
+        igsAgent_error(agent, "Definition is NULL");
         return 0;
     }
     
@@ -143,23 +146,23 @@ iopType_t model_getTypeForIOP(igsAgent_t *agent, const char *name, iop_t type){
     if (type == IGS_INPUT_T){
         HASH_FIND_STR(agent->internal_definition->inputs_table, name, iop);
         if(iop == NULL){
-            igs_error("Input %s cannot be found", name);
+            igsAgent_error(agent, "Input %s cannot be found", name);
             return 0;
         }
     } else if (type == IGS_OUTPUT_T){
         HASH_FIND_STR(agent->internal_definition->outputs_table, name, iop);
         if(iop == NULL){
-            igs_error("Output %s cannot be found", name);
+            igsAgent_error(agent, "Output %s cannot be found", name);
             return 0;
         }
     } else if (type == IGS_PARAMETER_T){
         HASH_FIND_STR(agent->internal_definition->params_table, name, iop);
         if(iop == NULL){
-            igs_error("Parameter %s cannot be found", name);
+            igsAgent_error(agent, "Parameter %s cannot be found", name);
             return 0;
         }
     }else{
-        igs_error("Unknown IOP type %d", type);
+        igsAgent_error(agent, "Unknown IOP type %d", type);
         return 0;
     }
     
@@ -172,9 +175,9 @@ agent_iop_t *model_findInputByName(igsAgent_t *agent, const char *name){
         HASH_FIND_STR( agent->internal_definition->inputs_table, name, found );
     }else{
         if (name == NULL || strlen(name) == 0){
-            igs_error("Input name cannot be NULL or empty");
+            igsAgent_error(agent, "Input name cannot be NULL or empty");
         }else{
-            igs_error("Definition is NULL");
+            igsAgent_error(agent, "Definition is NULL");
         }
     }
     return found;
@@ -186,9 +189,9 @@ agent_iop_t *model_findOutputByName(igsAgent_t *agent, const char *name){
         HASH_FIND_STR( agent->internal_definition->outputs_table, name, found );
     }else{
         if (name == NULL || strlen(name) == 0){
-            igs_error("Output name cannot be NULL or empty");
+            igsAgent_error(agent, "Output name cannot be NULL or empty");
         }else{
-            igs_error("Definition is NULL");
+            igsAgent_error(agent, "Definition is NULL");
         }
     }
     return found;
@@ -200,9 +203,9 @@ agent_iop_t *model_findParameterByName(igsAgent_t *agent, const char *name){
         HASH_FIND_STR( agent->internal_definition->params_table, name, found );
     }else{
         if (name == NULL || strlen(name) == 0){
-            igs_error("Parameter name cannot be NULL or empty");
+            igsAgent_error(agent, "Parameter name cannot be NULL or empty");
         }else{
-            igs_error("Definition is NULL");
+            igsAgent_error(agent, "Definition is NULL");
         }
     }
     return found;
@@ -211,7 +214,7 @@ agent_iop_t *model_findParameterByName(igsAgent_t *agent, const char *name){
 void* model_getValueFor(igsAgent_t *agent, const char *name, iop_t type){
     agent_iop_t *iop = model_findIopByName(agent, (char*) name,type);
     if(iop == NULL){
-        igs_error("%s not found", name);
+        igsAgent_error(agent, "%s not found", name);
         return NULL;
     }
     switch (iop->value_type) {
@@ -234,7 +237,7 @@ void* model_getValueFor(igsAgent_t *agent, const char *name, iop_t type){
             return iop->value.data;
             break;
         default:
-            igs_error("Unknown value type for %s", name);
+            igsAgent_error(agent, "Unknown value type for %s", name);
             break;
     }
     return NULL;
@@ -243,7 +246,7 @@ void* model_getValueFor(igsAgent_t *agent, const char *name, iop_t type){
 int igsAgent_readIOP(igsAgent_t *agent, const char *name, iop_t type, void **value, size_t *size){
     agent_iop_t *iop = model_findIopByName(agent, (char*) name, type);
     if(iop == NULL){
-        igs_error("%s not found", name);
+        igsAgent_error(agent, "%s not found", name);
         return 0;
     }
     if (iop->value_type == IGS_IMPULSION_T){
@@ -268,38 +271,38 @@ bool model_readIopAsBool (igsAgent_t *agent, const char *name, iop_t type){
                 break;
                 
             case IGS_INTEGER_T:
-                igs_warn("Implicit conversion from int to bool for %s", name);
+                igsAgent_warn(agent, "Implicit conversion from int to bool for %s", name);
                 res = (iop->value.i == 0)?false:true;
                 return res;
                 break;
                 
             case IGS_DOUBLE_T:
-                igs_warn("Implicit conversion from double to bool for %s", name);
+                igsAgent_warn(agent, "Implicit conversion from double to bool for %s", name);
                 res = (iop->value.d >= 0 && iop->value.d <= 0)?false:true;
                 return res;
                 break;
                 
             case IGS_STRING_T:
                 if (strcmp(iop->value.s, "true") == 0){
-                    igs_warn("Implicit conversion from string to bool for %s", name);
+                    igsAgent_warn(agent, "Implicit conversion from string to bool for %s", name);
                     return true;
                 }
                 else if (strcmp(iop->value.s, "false") == 0){
-                    igs_warn("Implicit conversion from string to bool for %s", name);
+                    igsAgent_warn(agent, "Implicit conversion from string to bool for %s", name);
                     return false;
                 }else{
-                    igs_warn("Implicit conversion from double to bool for %s (string value is %s and false was returned)", name, iop->value.s);
+                    igsAgent_warn(agent, "Implicit conversion from double to bool for %s (string value is %s and false was returned)", name, iop->value.s);
                     return false;
                 }
                 break;
                 
             default:
-                igs_error("No implicit conversion possible for %s (false was returned)", name);
+                igsAgent_error(agent, "No implicit conversion possible for %s (false was returned)", name);
                 return false;
                 break;
         }
     }else{
-        igs_error("%s not found", name);
+        igsAgent_error(agent, "%s not found", name);
         return false;
     }
 }
@@ -310,7 +313,7 @@ int model_readIopAsInt (igsAgent_t *agent, const char *name, iop_t type){
     if(iop != NULL){
         switch(iop->value_type){
             case IGS_BOOL_T:
-                igs_warn("Implicit conversion from bool to int for %s", name);
+                igsAgent_warn(agent, "Implicit conversion from bool to int for %s", name);
                 res =  (iop->value.b)?1:0;
                 return res;
                 break;
@@ -321,7 +324,7 @@ int model_readIopAsInt (igsAgent_t *agent, const char *name, iop_t type){
                 break;
                 
             case IGS_DOUBLE_T:
-                igs_warn("Implicit conversion from double to int for %s", name);
+                igsAgent_warn(agent, "Implicit conversion from double to int for %s", name);
                 if(iop->value.d < 0) {
                     res = (int) (iop->value.d - 0.5);
                     return res;
@@ -332,18 +335,18 @@ int model_readIopAsInt (igsAgent_t *agent, const char *name, iop_t type){
                 break;
                 
             case IGS_STRING_T:
-                igs_warn("Implicit conversion from string %s to int for %s", iop->value.s, name);
+                igsAgent_warn(agent, "Implicit conversion from string %s to int for %s", iop->value.s, name);
                 res = atoi(iop->value.s);
                 return res;
                 break;
                 
             default:
-                igs_error("No implicit conversion possible for %s (0 was returned)", name);
+                igsAgent_error(agent, "No implicit conversion possible for %s (0 was returned)", name);
                 return 0;
                 break;
         }
     }else{
-        igs_error("%s not found", name);
+        igsAgent_error(agent, "%s not found", name);
         return 0;
     }
 }
@@ -354,13 +357,13 @@ double model_readIopAsDouble (igsAgent_t *agent, const char *name, iop_t type){
     if(iop != NULL){
         switch(iop->value_type){
             case IGS_BOOL_T:
-                igs_warn("Implicit conversion from bool to double for %s", name);
+                igsAgent_warn(agent, "Implicit conversion from bool to double for %s", name);
                 res = (iop->value.b)?1:0;
                 return res;
                 break;
                 
             case IGS_INTEGER_T:
-                igs_warn("Implicit conversion from int to double for %s", name);
+                igsAgent_warn(agent, "Implicit conversion from int to double for %s", name);
                 res = iop->value.i;
                 return res;
                 break;
@@ -371,18 +374,18 @@ double model_readIopAsDouble (igsAgent_t *agent, const char *name, iop_t type){
                 break;
                 
             case IGS_STRING_T:
-                igs_warn("Implicit conversion from string %s to double for %s", iop->value.s, name);
+                igsAgent_warn(agent, "Implicit conversion from string %s to double for %s", iop->value.s, name);
                 res = atof(iop->value.s);
                 return res;
                 break;
                 
             default:
-                igs_error("No implicit conversion possible for %s (0 was returned)", name);
+                igsAgent_error(agent, "No implicit conversion possible for %s (0 was returned)", name);
                 return 0;
                 break;
         }
     }else{
-        igs_error("%s not found", name);
+        igsAgent_error(agent, "%s not found", name);
         return 0;
     }
 }
@@ -398,30 +401,30 @@ char *model_readIopAsString (igsAgent_t *agent, const char *name, iop_t type){
                 break;
                 
             case IGS_BOOL_T:
-                igs_warn("Implicit conversion from bool to string for %s", name);
+                igsAgent_warn(agent, "Implicit conversion from bool to string for %s", name);
                 res = iop->value.b ? strdup("true") : strdup("false");
                 return res;
                 break;
                 
             case IGS_INTEGER_T:
-                igs_warn("Implicit conversion from int to string for %s", name);
+                igsAgent_warn(agent, "Implicit conversion from int to string for %s", name);
                 res = model_intToString(iop->value.i);
                 return res;
                 break;
                 
             case IGS_DOUBLE_T:
-                igs_warn("Implicit conversion from double to string for %s", name);
+                igsAgent_warn(agent, "Implicit conversion from double to string for %s", name);
                 res = model_doubleToString(iop->value.d);
                 return res;
                 break;
                 
             default:
-                igs_error("No implicit conversion possible for %s (NULL was returned)", name);
+                igsAgent_error(agent, "No implicit conversion possible for %s (NULL was returned)", name);
                 return NULL;
                 break;
         }
     }else{
-        igs_error("%s not found", name);
+        igsAgent_error(agent, "%s not found", name);
         return NULL;
     }
 }
@@ -429,13 +432,13 @@ char *model_readIopAsString (igsAgent_t *agent, const char *name, iop_t type){
 int model_readIopAsData (igsAgent_t *agent, const char *name, iop_t type, void **value, size_t *size){
     agent_iop_t *iop = model_findIopByName(agent, (char*) name, type);
     if(iop == NULL){
-        igs_error("%s not found", name);
+        igsAgent_error(agent, "%s not found", name);
         *value = NULL;
         *size = 0;
         return 0;
     }
     if(iop->value_type != IGS_DATA_T){
-        igs_error("No implicit conversion possible for %s (NULL was returned)", name);
+        igsAgent_error(agent, "No implicit conversion possible for %s (NULL was returned)", name);
         *value = NULL;
         *size = 0;
         return 0;
@@ -449,7 +452,7 @@ int model_readIopAsData (igsAgent_t *agent, const char *name, iop_t type, void *
 bool model_checkIOPExistence(igsAgent_t *agent, const char *name, agent_iop_t *hash){
     agent_iop_t *iop = NULL;
     if(agent->internal_definition == NULL){
-        igs_error("Definition is NULL");
+        igsAgent_error(agent, "Definition is NULL");
         return false;
     }
     HASH_FIND_STR(hash, name, iop);
@@ -461,7 +464,7 @@ bool model_checkIOPExistence(igsAgent_t *agent, const char *name, agent_iop_t *h
 
 char **model_getIopList(igsAgent_t *agent, long *nbOfElements, iop_t type){
     if(agent->internal_definition == NULL){
-        igs_warn("Definition is NULL");
+        igsAgent_warn(agent, "Definition is NULL");
         *nbOfElements = 0;
         return NULL;
     }
@@ -537,7 +540,7 @@ char* model_getIOPValueAsString (agent_iop_t* iop){
 const agent_iop_t* model_writeIOP (igsAgent_t *agent, const char *iopName, iop_t iopType, iopType_t valType, void* value, size_t size){
     agent_iop_t *iop = model_findIopByName(agent, (char*) iopName, iopType);
     if(iop == NULL){
-        igs_error("%s not found for writing", iopName);
+        igsAgent_error(agent, "%s not found for writing", iopName);
         return NULL;
     }
     int ret = 1;
@@ -553,19 +556,19 @@ const agent_iop_t* model_writeIOP (igsAgent_t *agent, const char *iopName, iop_t
                     outSize = iop->valueSize = sizeof(int);
                     iop->value.i = (value == NULL)?0:*(int*)(value);
                     outValue = &(iop->value.i);
-                    igs_debug("set %s to %i", iopName, iop->value.i);
+                    igsAgent_debug(agent, "set %s to %i", iopName, iop->value.i);
                     break;
                 case IGS_DOUBLE_T:
                     outSize = iop->valueSize = sizeof(double);
                     iop->value.d = (value == NULL)?0:*(int*)(value);
                     outValue = &(iop->value.d);
-                    igs_debug("set %s to %lf", iopName, iop->value.d);
+                    igsAgent_debug(agent, "set %s to %lf", iopName, iop->value.d);
                     break;
                 case IGS_BOOL_T:
                     outSize = iop->valueSize = sizeof(bool);
                     iop->value.b = (value == NULL)?false:((*(int*)(value))?true:false);
                     outValue = &(iop->value.b);
-                    igs_debug("set %s to %i", iopName, iop->value.b);
+                    igsAgent_debug(agent, "set %s to %i", iopName, iop->value.b);
                     break;
                 case IGS_STRING_T:
                 {
@@ -581,13 +584,13 @@ const agent_iop_t* model_writeIOP (igsAgent_t *agent, const char *iopName, iop_t
                     }
                     outSize = iop->valueSize = (strlen(iop->value.s) + 1)*sizeof(char);
                     outValue = iop->value.s;
-                    igs_debug("set %s to %s (length: %zu)", iopName, iop->value.s, iop->valueSize - 1);
+                    igsAgent_debug(agent, "set %s to %s (length: %zu)", iopName, iop->value.s, iop->valueSize - 1);
                 }
                     break;
                 case IGS_IMPULSION_T:
                     //nothing to do
                     outSize = iop->valueSize = 0;
-                    igs_debug("set impulsion %s", iopName);
+                    igsAgent_debug(agent, "set impulsion %s", iopName);
                     break;
                 case IGS_DATA_T:
                 {
@@ -599,11 +602,11 @@ const agent_iop_t* model_writeIOP (igsAgent_t *agent, const char *iopName, iop_t
                     memcpy(iop->value.data, value, sizeof(int));
                     outSize = iop->valueSize = sizeof(int);
                     outValue = iop->value.data;
-                    igs_debug("set %s data (length: %zu)", iopName, iop->valueSize);
+                    igsAgent_debug(agent, "set %s data (length: %zu)", iopName, iop->valueSize);
                 }
                     break;
                 default:
-                    igs_error("%s has an invalid value type %d", iopName, iop->value_type);
+                    igsAgent_error(agent, "%s has an invalid value type %d", iopName, iop->value_type);
                     ret = 0;
                     break;
             }
@@ -615,19 +618,19 @@ const agent_iop_t* model_writeIOP (igsAgent_t *agent, const char *iopName, iop_t
                     outSize = iop->valueSize = sizeof(int);
                     iop->value.i = (value == NULL)?0:(int)(*(double*)(value));
                     outValue = &(iop->value.i);
-                    igs_debug("set %s to %i", iopName, iop->value.i);
+                    igsAgent_debug(agent, "set %s to %i", iopName, iop->value.i);
                     break;
                 case IGS_DOUBLE_T:
                     outSize = iop->valueSize = sizeof(double);
                     iop->value.d = (value == NULL)?0:(double)(*(double*)(value));
                     outValue = &(iop->value.d);
-                    igs_debug("set %s to %lf", iopName, iop->value.d);
+                    igsAgent_debug(agent, "set %s to %lf", iopName, iop->value.d);
                     break;
                 case IGS_BOOL_T:
                     outSize = iop->valueSize = sizeof(bool);
                     iop->value.b = (value == NULL)?false:(((int)(*(double*)(value)))?true:false);
                     outValue = &(iop->value.b);
-                    igs_debug("set %s to %i", iopName, iop->value.b);
+                    igsAgent_debug(agent, "set %s to %i", iopName, iop->value.b);
                     break;
                 case IGS_STRING_T:
                 {
@@ -643,13 +646,13 @@ const agent_iop_t* model_writeIOP (igsAgent_t *agent, const char *iopName, iop_t
                     }
                     outSize = iop->valueSize = (strlen(iop->value.s) + 1)*sizeof(char);
                     outValue = iop->value.s;
-                    igs_debug("set %s to %s (length: %zu)", iopName, iop->value.s, iop->valueSize - 1);
+                    igsAgent_debug(agent, "set %s to %s (length: %zu)", iopName, iop->value.s, iop->valueSize - 1);
                 }
                     break;
                 case IGS_IMPULSION_T:
                     //nothing to do
                     outSize = iop->valueSize = 0;
-                    igs_debug("set impulsion %s", iopName);
+                    igsAgent_debug(agent, "set impulsion %s", iopName);
                     break;
                 case IGS_DATA_T:
                 {
@@ -661,11 +664,11 @@ const agent_iop_t* model_writeIOP (igsAgent_t *agent, const char *iopName, iop_t
                     memcpy(iop->value.data, value, sizeof(double));
                     outSize = iop->valueSize = sizeof(double);
                     outValue = iop->value.data;
-                    igs_debug("set %s data (length: %zu)", iopName, iop->valueSize);
+                    igsAgent_debug(agent, "set %s data (length: %zu)", iopName, iop->valueSize);
                 }
                     break;
                 default:
-                    igs_error("%s has an invalid value type %d", iopName, iop->value_type);
+                    igsAgent_error(agent, "%s has an invalid value type %d", iopName, iop->value_type);
                     ret = 0;
                     break;
             }
@@ -677,19 +680,19 @@ const agent_iop_t* model_writeIOP (igsAgent_t *agent, const char *iopName, iop_t
                     outSize = iop->valueSize = sizeof(int);
                     iop->value.i = (value == NULL)?0:*(bool*)(value);
                     outValue = &(iop->value.i);
-                    igs_debug("set %s to %i", iopName, iop->value.i);
+                    igsAgent_debug(agent, "set %s to %i", iopName, iop->value.i);
                     break;
                 case IGS_DOUBLE_T:
                     outSize = iop->valueSize = sizeof(double);
                     iop->value.d = (value == NULL)?0:*(bool*)(value);
                     outValue = &(iop->value.d);
-                    igs_debug("set %s to %lf", iopName, iop->value.d);
+                    igsAgent_debug(agent, "set %s to %lf", iopName, iop->value.d);
                     break;
                 case IGS_BOOL_T:
                     outSize = iop->valueSize = sizeof(bool);
                     iop->value.b = (value == NULL)?false:*(bool*)value;
                     outValue = &(iop->value.b);
-                    igs_debug("set %s to %i", iopName, iop->value.b);
+                    igsAgent_debug(agent, "set %s to %i", iopName, iop->value.b);
                     break;
                 case IGS_STRING_T:
                 {
@@ -705,13 +708,13 @@ const agent_iop_t* model_writeIOP (igsAgent_t *agent, const char *iopName, iop_t
                     }
                     outSize = iop->valueSize = (strlen(iop->value.s) + 1)*sizeof(char);
                     outValue = iop->value.s;
-                    igs_debug("set %s to %s (length: %zu)", iopName, iop->value.s, iop->valueSize - 1);
+                    igsAgent_debug(agent, "set %s to %s (length: %zu)", iopName, iop->value.s, iop->valueSize - 1);
                 }
                     break;
                 case IGS_IMPULSION_T:
                     //nothing to do
                     outSize = iop->valueSize = 0;
-                    igs_debug("set impulsion %s", iopName);
+                    igsAgent_debug(agent, "set impulsion %s", iopName);
                     break;
                 case IGS_DATA_T:
                 {
@@ -723,11 +726,11 @@ const agent_iop_t* model_writeIOP (igsAgent_t *agent, const char *iopName, iop_t
                     memcpy(iop->value.data, value, sizeof(bool));
                     outSize = iop->valueSize = sizeof(bool);
                     outValue = iop->value.data;
-                    igs_debug("set %s data (length: %zu)", iopName, iop->valueSize);
+                    igsAgent_debug(agent, "set %s data (length: %zu)", iopName, iop->valueSize);
                 }
                     break;
                 default:
-                    igs_error("%s has an invalid value type %d", iopName, iop->value_type);
+                    igsAgent_error(agent, "%s has an invalid value type %d", iopName, iop->value_type);
                     ret = 0;
                     break;
             }
@@ -739,13 +742,13 @@ const agent_iop_t* model_writeIOP (igsAgent_t *agent, const char *iopName, iop_t
                     outSize = iop->valueSize = sizeof(int);
                     iop->value.i = (value == NULL)?0:atoi((char*)value);
                     outValue = &(iop->value.i);
-                    igs_debug("set %s to %i", iopName, iop->value.i);
+                    igsAgent_debug(agent, "set %s to %i", iopName, iop->value.i);
                     break;
                 case IGS_DOUBLE_T:
                     outSize = iop->valueSize = sizeof(double);
                     iop->value.d = (value == NULL)?0:atof((char*)value);
                     outValue = &(iop->value.d);
-                    igs_debug("set %s to %lf", iopName, iop->value.d);
+                    igsAgent_debug(agent, "set %s to %lf", iopName, iop->value.d);
                     break;
                 case IGS_BOOL_T:
                 {
@@ -766,7 +769,7 @@ const agent_iop_t* model_writeIOP (igsAgent_t *agent, const char *iopName, iop_t
                 }
                     outSize = iop->valueSize = sizeof(bool);
                     outValue = &(iop->value.b);
-                    igs_debug("set %s to %i", iopName, iop->value.b);
+                    igsAgent_debug(agent, "set %s to %i", iopName, iop->value.b);
                     break;
                 case IGS_STRING_T:
                 {
@@ -780,13 +783,13 @@ const agent_iop_t* model_writeIOP (igsAgent_t *agent, const char *iopName, iop_t
                     }
                     outSize = iop->valueSize = (strlen(iop->value.s) + 1)*sizeof(char);
                     outValue = iop->value.s;
-                    igs_debug("set %s to %s (length: %zu)", iopName, iop->value.s, iop->valueSize - 1);
+                    igsAgent_debug(agent, "set %s to %s (length: %zu)", iopName, iop->value.s, iop->valueSize - 1);
                 }
                     break;
                 case IGS_IMPULSION_T:
                     //nothing to do
                     outSize = iop->valueSize = 0;
-                    igs_debug("set impulsion %s", iopName);
+                    igsAgent_debug(agent, "set impulsion %s", iopName);
                     break;
                 case IGS_DATA_T:
                 {
@@ -803,11 +806,11 @@ const agent_iop_t* model_writeIOP (igsAgent_t *agent, const char *iopName, iop_t
                     }
                     outSize = iop->valueSize = s;
                     outValue = iop->value.data;
-                    igs_debug("set %s data (length: %zu)", iopName, s);
+                    igsAgent_debug(agent, "set %s data (length: %zu)", iopName, s);
                 }
                     break;
                 default:
-                    igs_error("%s has an invalid value type %d", iopName, iop->value_type);
+                    igsAgent_error(agent, "%s has an invalid value type %d", iopName, iop->value_type);
                     ret = 0;
                     break;
             }
@@ -819,19 +822,19 @@ const agent_iop_t* model_writeIOP (igsAgent_t *agent, const char *iopName, iop_t
                     outSize = iop->valueSize = sizeof(int);
                     iop->value.i = 0;
                     outValue = &(iop->value.i);
-                    igs_debug("set %s to %i", iopName, iop->value.i);
+                    igsAgent_debug(agent, "set %s to %i", iopName, iop->value.i);
                     break;
                 case IGS_DOUBLE_T:
                     outSize = iop->valueSize = sizeof(double);
                     iop->value.d = 0;
                     outValue = &(iop->value.d);
-                    igs_debug("set %s to %lf", iopName, iop->value.d);
+                    igsAgent_debug(agent, "set %s to %lf", iopName, iop->value.d);
                     break;
                 case IGS_BOOL_T:
                     outSize = iop->valueSize = sizeof(bool);
                     iop->value.b = false;
                     outValue = &(iop->value.b);
-                    igs_debug("set %s to %i", iopName, iop->value.b);
+                    igsAgent_debug(agent, "set %s to %i", iopName, iop->value.b);
                     break;
                 case IGS_STRING_T:
                 {
@@ -841,13 +844,13 @@ const agent_iop_t* model_writeIOP (igsAgent_t *agent, const char *iopName, iop_t
                     iop->value.s = strdup("");
                     outSize = iop->valueSize = sizeof(char);
                     outValue = iop->value.s;
-                    igs_debug("set %s to %s (length: %zu)", iopName, iop->value.s, iop->valueSize - 1);
+                    igsAgent_debug(agent, "set %s to %s (length: %zu)", iopName, iop->value.s, iop->valueSize - 1);
                 }
                     break;
                 case IGS_IMPULSION_T:
                     //nothing to do
                     outSize = iop->valueSize = 0;
-                    igs_debug("set impulsion %s", iopName);
+                    igsAgent_debug(agent, "set impulsion %s", iopName);
                     break;
                 case IGS_DATA_T:
                 {
@@ -857,42 +860,42 @@ const agent_iop_t* model_writeIOP (igsAgent_t *agent, const char *iopName, iop_t
                     iop->value.data = NULL;
                     outSize = iop->valueSize = 0;
                     outValue = NULL;
-                    igs_debug("set %s data (length: %zu)", iopName, iop->valueSize);
+                    igsAgent_debug(agent, "set %s data (length: %zu)", iopName, iop->valueSize);
                 }
                     break;
                 default:
-                    igs_error("%s has an invalid value type %d", iopName, iop->value_type);
+                    igsAgent_error(agent, "%s has an invalid value type %d", iopName, iop->value_type);
                     ret = 0;
                     break;
             }
             outSize = iop->valueSize = 0;
-            igs_debug("set impulsion %s", iopName);
+            igsAgent_debug(agent, "set impulsion %s", iopName);
         }
             break;
         case IGS_DATA_T:{
             switch (iop->value_type) {
                 case IGS_INTEGER_T:
-                    igs_warn("Cannot write data into integer IOP %s", iopName);
+                    igsAgent_warn(agent, "Cannot write data into integer IOP %s", iopName);
                     ret = 0;
                     break;
                 case IGS_DOUBLE_T:
-                    igs_warn("Cannot write data into double IOP %s", iopName);
+                    igsAgent_warn(agent, "Cannot write data into double IOP %s", iopName);
                     ret = 0;
                     break;
                 case IGS_BOOL_T:
-                    igs_warn("Cannot write data into boolean IOP %s", iopName);
+                    igsAgent_warn(agent, "Cannot write data into boolean IOP %s", iopName);
                     ret = 0;
                     break;
                 case IGS_STRING_T:
                 {
-                    igs_warn("Cannot write data into string IOP %s", iopName);
+                    igsAgent_warn(agent, "Cannot write data into string IOP %s", iopName);
                     ret = 0;
                 }
                     break;
                 case IGS_IMPULSION_T:
                     //nothing to do
                     outSize = iop->valueSize = 0;
-                    igs_debug("set impulsion %s", iopName);
+                    igsAgent_debug(agent, "set impulsion %s", iopName);
                     break;
                 case IGS_DATA_T:
                 {
@@ -904,11 +907,11 @@ const agent_iop_t* model_writeIOP (igsAgent_t *agent, const char *iopName, iop_t
                     memcpy(iop->value.data, value, size);
                     outSize = iop->valueSize = size;
                     outValue = iop->value.data;
-                    igs_debug("set %s data (length: %zu)", iopName, size);
+                    igsAgent_debug(agent, "set %s data (length: %zu)", iopName, size);
                 }
                     break;
                 default:
-                    igs_error("%s has an invalid value type %d", iopName, iop->value_type);
+                    igsAgent_error(agent, "%s has an invalid value type %d", iopName, iop->value_type);
                     ret = 0;
                     break;
             }
@@ -939,7 +942,7 @@ agent_iop_t * model_findIopByName(igsAgent_t *agent, const char *name, iop_t typ
             return model_findParameterByName(agent, name);
             break;
         default:
-            igs_error("Unknown IOP type %d", type);
+            igsAgent_error(agent, "Unknown IOP type %d", type);
             break;
     }
     
@@ -1039,7 +1042,7 @@ int igsAgent_readParameterAsData(igsAgent_t *agent, const char *name, void **dat
 
 int igsAgent_writeInputAsBool(igsAgent_t *agent, const char *name, bool value){
     if (name == NULL || strlen(name) == 0){
-        igs_error("Input name cannot be NULL or empty");
+        igsAgent_error(agent, "Input name cannot be NULL or empty");
         return 0;
     }
     const agent_iop_t *iop = model_writeIOP(agent, name, IGS_INPUT_T, IGS_BOOL_T, &value, sizeof(bool));
@@ -1048,7 +1051,7 @@ int igsAgent_writeInputAsBool(igsAgent_t *agent, const char *name, bool value){
 
 int igsAgent_writeInputAsInt(igsAgent_t *agent, const char *name, int value){
     if (name == NULL || strlen(name) == 0){
-        igs_error("Input name cannot be NULL or empty");
+        igsAgent_error(agent, "Input name cannot be NULL or empty");
         return 0;
     }
     const agent_iop_t *iop = model_writeIOP(agent, name, IGS_INPUT_T, IGS_INTEGER_T, &value, sizeof(int));
@@ -1057,7 +1060,7 @@ int igsAgent_writeInputAsInt(igsAgent_t *agent, const char *name, int value){
 
 int igsAgent_writeInputAsDouble(igsAgent_t *agent, const char *name, double value){
     if (name == NULL || strlen(name) == 0){
-        igs_error("Input name cannot be NULL or empty");
+        igsAgent_error(agent, "Input name cannot be NULL or empty");
         return 0;
     }
     const agent_iop_t *iop = model_writeIOP(agent, name, IGS_INPUT_T, IGS_DOUBLE_T, &value, sizeof(double));
@@ -1066,7 +1069,7 @@ int igsAgent_writeInputAsDouble(igsAgent_t *agent, const char *name, double valu
 
 int igsAgent_writeInputAsString(igsAgent_t *agent, const char *name, const char *value){
     if (name == NULL || strlen(name) == 0){
-        igs_error("Input name cannot be NULL or empty");
+        igsAgent_error(agent, "Input name cannot be NULL or empty");
         return 0;
     }
     const agent_iop_t *iop = model_writeIOP(agent, name, IGS_INPUT_T, IGS_STRING_T, (char *)value, strlen(value)+1);
@@ -1075,7 +1078,7 @@ int igsAgent_writeInputAsString(igsAgent_t *agent, const char *name, const char 
 
 int igsAgent_writeInputAsImpulsion(igsAgent_t *agent, const char *name){
     if (name == NULL || strlen(name) == 0){
-        igs_error("Input name cannot be NULL or empty");
+        igsAgent_error(agent, "Input name cannot be NULL or empty");
         return 0;
     }
     const agent_iop_t *iop = model_writeIOP(agent, name, IGS_INPUT_T, IGS_IMPULSION_T, NULL, 0);
@@ -1084,7 +1087,7 @@ int igsAgent_writeInputAsImpulsion(igsAgent_t *agent, const char *name){
 
 int igsAgent_writeInputAsData(igsAgent_t *agent, const char *name, void *value, size_t size){
     if (name == NULL || strlen(name) == 0){
-        igs_error("Input name cannot be NULL or empty");
+        igsAgent_error(agent, "Input name cannot be NULL or empty");
         return 0;
     }
     const agent_iop_t *iop = model_writeIOP(agent, name, IGS_INPUT_T, IGS_DATA_T, value, size);
@@ -1093,7 +1096,7 @@ int igsAgent_writeInputAsData(igsAgent_t *agent, const char *name, void *value, 
 
 int igsAgent_writeOutputAsBool(igsAgent_t *agent, const char *name, bool value){
     if (name == NULL || strlen(name) == 0){
-        igs_error("Output name cannot be NULL or empty");
+        igsAgent_error(agent, "Output name cannot be NULL or empty");
         return 0;
     }
     const agent_iop_t *iop = model_writeIOP(agent, name, IGS_OUTPUT_T, IGS_BOOL_T, &value, sizeof(bool));
@@ -1104,7 +1107,7 @@ int igsAgent_writeOutputAsBool(igsAgent_t *agent, const char *name, bool value){
 
 int igsAgent_writeOutputAsInt(igsAgent_t *agent, const char *name, int value){
     if (name == NULL || strlen(name) == 0){
-        igs_error("Output name cannot be NULL or empty");
+        igsAgent_error(agent, "Output name cannot be NULL or empty");
         return 0;
     }
     const agent_iop_t *iop = model_writeIOP(agent, name, IGS_OUTPUT_T, IGS_INTEGER_T, &value, sizeof(int));
@@ -1115,7 +1118,7 @@ int igsAgent_writeOutputAsInt(igsAgent_t *agent, const char *name, int value){
 
 int igsAgent_writeOutputAsDouble(igsAgent_t *agent, const char *name, double value){
     if (name == NULL || strlen(name) == 0){
-        igs_error("Output name cannot be NULL or empty");
+        igsAgent_error(agent, "Output name cannot be NULL or empty");
         return 0;
     }
     const agent_iop_t *iop = model_writeIOP(agent, name, IGS_OUTPUT_T, IGS_DOUBLE_T, &value, sizeof(double));
@@ -1126,7 +1129,7 @@ int igsAgent_writeOutputAsDouble(igsAgent_t *agent, const char *name, double val
 
 int igsAgent_writeOutputAsString(igsAgent_t *agent, const char *name, const char *value){
     if (name == NULL || strlen(name) == 0){
-        igs_error("Output name cannot be NULL or empty");
+        igsAgent_error(agent, "Output name cannot be NULL or empty");
         return 0;
     }
     size_t length = (value == NULL)?0:strlen(value)+1;
@@ -1138,7 +1141,7 @@ int igsAgent_writeOutputAsString(igsAgent_t *agent, const char *name, const char
 
 int igsAgent_writeOutputAsImpulsion(igsAgent_t *agent, const char *name){
     if (name == NULL || strlen(name) == 0){
-        igs_error("Output name cannot be NULL or empty");
+        igsAgent_error(agent, "Output name cannot be NULL or empty");
         return 0;
     }
     const agent_iop_t *iop = model_writeIOP(agent, name, IGS_OUTPUT_T, IGS_IMPULSION_T, NULL, 0);
@@ -1149,7 +1152,7 @@ int igsAgent_writeOutputAsImpulsion(igsAgent_t *agent, const char *name){
 
 int igsAgent_writeOutputAsData(igsAgent_t *agent, const char *name, void *value, size_t size){
     if (name == NULL || strlen(name) == 0){
-        igs_error("Output name cannot be NULL or empty");
+        igsAgent_error(agent, "Output name cannot be NULL or empty");
         return 0;
     }
     const agent_iop_t *iop = model_writeIOP(agent, name, IGS_OUTPUT_T, IGS_DATA_T, value, size);
@@ -1160,7 +1163,7 @@ int igsAgent_writeOutputAsData(igsAgent_t *agent, const char *name, void *value,
 
 int igsAgent_writeOutputAsZMQMsg(igsAgent_t *agent, const char *name, zmsg_t *msg){
     if (name == NULL || strlen(name) == 0){
-        igs_error("Output name cannot be NULL or empty");
+        igsAgent_error(agent, "Output name cannot be NULL or empty");
         return 0;
     }
     zframe_t *frame = zmsg_encode(msg);
@@ -1174,7 +1177,7 @@ int igsAgent_writeOutputAsZMQMsg(igsAgent_t *agent, const char *name, zmsg_t *ms
 
 int igsAgent_writeParameterAsBool(igsAgent_t *agent, const char *name, bool value){
     if (name == NULL || strlen(name) == 0){
-        igs_error("Parameter name cannot be NULL or empty");
+        igsAgent_error(agent, "Parameter name cannot be NULL or empty");
         return 0;
     }
     const agent_iop_t *iop = model_writeIOP(agent, name, IGS_PARAMETER_T, IGS_BOOL_T, &value, sizeof(bool));
@@ -1183,7 +1186,7 @@ int igsAgent_writeParameterAsBool(igsAgent_t *agent, const char *name, bool valu
 
 int igsAgent_writeParameterAsInt(igsAgent_t *agent, const char *name, int value){
     if (name == NULL || strlen(name) == 0){
-        igs_error("Parameter name cannot be NULL or empty");
+        igsAgent_error(agent, "Parameter name cannot be NULL or empty");
         return 0;
     }
     const agent_iop_t *iop = model_writeIOP(agent, name, IGS_PARAMETER_T, IGS_INTEGER_T, &value, sizeof(int));
@@ -1192,7 +1195,7 @@ int igsAgent_writeParameterAsInt(igsAgent_t *agent, const char *name, int value)
 
 int igsAgent_writeParameterAsDouble(igsAgent_t *agent, const char *name, double value){
     if (name == NULL || strlen(name) == 0){
-        igs_error("Parameter name cannot be NULL or empty");
+        igsAgent_error(agent, "Parameter name cannot be NULL or empty");
         return 0;
     }
     const agent_iop_t *iop = model_writeIOP(agent, name, IGS_PARAMETER_T, IGS_DOUBLE_T, &value, sizeof(double));
@@ -1201,7 +1204,7 @@ int igsAgent_writeParameterAsDouble(igsAgent_t *agent, const char *name, double 
 
 int igsAgent_writeParameterAsString(igsAgent_t *agent, const char *name, const char *value){
     if (name == NULL || strlen(name) == 0){
-        igs_error("Parameter name cannot be NULL or empty");
+        igsAgent_error(agent, "Parameter name cannot be NULL or empty");
         return 0;
     }
     const agent_iop_t *iop = model_writeIOP(agent, name, IGS_PARAMETER_T, IGS_STRING_T, (char *)value, strlen(value)+1);
@@ -1210,7 +1213,7 @@ int igsAgent_writeParameterAsString(igsAgent_t *agent, const char *name, const c
 
 int igsAgent_writeParameterAsData(igsAgent_t *agent, const char *name, void *value, size_t size){
     if (name == NULL || strlen(name) == 0){
-        igs_error("Parameter name cannot be NULL or empty");
+        igsAgent_error(agent, "Parameter name cannot be NULL or empty");
         return 0;
     }
     const agent_iop_t *iop = model_writeIOP(agent, name, IGS_PARAMETER_T, IGS_DATA_T, value, size);
@@ -1225,10 +1228,10 @@ void igsAgent_clearDataForInput(igsAgent_t *agent, const char *name){
         iop->valueSize = 0;
     }else{
         if (iop == NULL){
-            igs_error("%s is not a known input", name);
+            igsAgent_error(agent, "%s is not a known input", name);
         }else{
             if (iop->value_type != IGS_DATA_T){
-                igs_error("%s type is not IGS_DATA_T", name);
+                igsAgent_error(agent, "%s type is not IGS_DATA_T", name);
             }
         }
     }
@@ -1242,10 +1245,10 @@ void igsAgent_clearDataForOutput(igsAgent_t *agent, const char *name){
         iop->valueSize = 0;
     }else{
         if (iop == NULL){
-            igs_error("%s is not a known output", name);
+            igsAgent_error(agent, "%s is not a known output", name);
         }else{
             if (iop->value_type != IGS_DATA_T){
-                igs_error("%s type is not IGS_DATA_T", name);
+                igsAgent_error(agent, "%s type is not IGS_DATA_T", name);
             }
         }
     }
@@ -1259,10 +1262,10 @@ void igsAgent_clearDataForParameter(igsAgent_t *agent, const char *name){
         iop->valueSize = 0;
     }else{
         if (iop == NULL){
-            igs_error("%s is not a known parameter", name);
+            igsAgent_error(agent, "%s is not a known parameter", name);
         }else{
             if (iop->value_type != IGS_DATA_T){
-                igs_error("%s type is not IGS_DATA_T", name);
+                igsAgent_error(agent, "%s type is not IGS_DATA_T", name);
             }
         }
     }
@@ -1272,7 +1275,7 @@ void igsAgent_clearDataForParameter(igsAgent_t *agent, const char *name){
 
 iopType_t igsAgent_getTypeForInput(igsAgent_t *agent, const char *name){
     if((name == NULL) || (strlen(name) == 0)){
-        igs_error("Input name cannot be NULL or empty");
+        igsAgent_error(agent, "Input name cannot be NULL or empty");
         return 0;
     }
     return model_getTypeForIOP(agent, name, IGS_INPUT_T);
@@ -1280,7 +1283,7 @@ iopType_t igsAgent_getTypeForInput(igsAgent_t *agent, const char *name){
 
 iopType_t igsAgent_getTypeForOutput(igsAgent_t *agent, const char *name){
     if((name == NULL) || (strlen(name) == 0)){
-        igs_error("Output name cannot be NULL or empty");
+        igsAgent_error(agent, "Output name cannot be NULL or empty");
         return 0;
     }
     return model_getTypeForIOP(agent, name, IGS_OUTPUT_T);
@@ -1288,7 +1291,7 @@ iopType_t igsAgent_getTypeForOutput(igsAgent_t *agent, const char *name){
 
 iopType_t igsAgent_getTypeForParameter(igsAgent_t *agent, const char *name){
     if((name == NULL) || (strlen(name) == 0)){
-        igs_error("Parameter name cannot be NULL or empty");
+        igsAgent_error(agent, "Parameter name cannot be NULL or empty");
         return 0;
     }
     return model_getTypeForIOP(agent, name, IGS_PARAMETER_T);
@@ -1296,7 +1299,7 @@ iopType_t igsAgent_getTypeForParameter(igsAgent_t *agent, const char *name){
 
 int igsAgent_getInputsNumber(igsAgent_t *agent){
     if(agent->internal_definition == NULL){
-        igs_warn("definition is NULL");
+        igsAgent_warn(agent, "definition is NULL");
         return 0;
     }
     return HASH_COUNT(agent->internal_definition->inputs_table);
@@ -1304,7 +1307,7 @@ int igsAgent_getInputsNumber(igsAgent_t *agent){
 
 int igsAgent_getOutputsNumber(igsAgent_t *agent){
     if(agent->internal_definition == NULL){
-        igs_warn("definition is NULL");
+        igsAgent_warn(agent, "definition is NULL");
         return 0;
     }
     return HASH_COUNT(agent->internal_definition->outputs_table);
@@ -1312,7 +1315,7 @@ int igsAgent_getOutputsNumber(igsAgent_t *agent){
 
 int igsAgent_getParametersNumber(igsAgent_t *agent){
     if(agent->internal_definition == NULL){
-        igs_warn("definition is NULL");
+        igsAgent_warn(agent, "definition is NULL");
         return 0;
     }
     return HASH_COUNT(agent->internal_definition->params_table);
@@ -1351,7 +1354,7 @@ bool igsAgent_checkInputExistence(igsAgent_t *agent, const char *name){
         return false;
     }
     if((name == NULL) || (strlen(name) == 0)){
-        igs_error("Input name cannot be NULL or empty\n");
+        igsAgent_error(agent, "Input name cannot be NULL or empty\n");
         return false;
     }
     return model_checkIOPExistence(agent, name, agent->internal_definition->inputs_table);
@@ -1362,7 +1365,7 @@ bool igsAgent_checkOutputExistence(igsAgent_t *agent, const char *name){
         return false;
     }
     if((name == NULL) || (strlen(name) == 0)){
-        igs_warn("Output name cannot be NULL or empty");
+        igsAgent_warn(agent, "Output name cannot be NULL or empty");
         return false;
     }
     return model_checkIOPExistence(agent, name, agent->internal_definition->outputs_table);
@@ -1373,7 +1376,7 @@ bool igsAgent_checkParameterExistence(igsAgent_t *agent, const char *name){
         return false;
     }
     if((name == NULL) || (strlen(name) == 0)){
-        igs_warn("Parameter name cannot be NULL or empty");
+        igsAgent_warn(agent, "Parameter name cannot be NULL or empty");
         return false;
     }
     return model_checkIOPExistence(agent, name, agent->internal_definition->params_table);
@@ -1399,7 +1402,7 @@ int igsAgent_observeParameter(igsAgent_t *agent, const char *name, igsAgent_obse
 int igsAgent_muteOutput(igsAgent_t *agent, const char *name){
     agent_iop_t *iop = model_findIopByName(agent, (char*) name, IGS_OUTPUT_T);
     if(iop == NULL || iop->type != IGS_OUTPUT_T){
-        igs_warn("Output '%s' not found", name);
+        igsAgent_warn(agent, "Output '%s' not found", name);
         return 0;
     }
     iop->is_muted = true;
@@ -1414,7 +1417,7 @@ int igsAgent_muteOutput(igsAgent_t *agent, const char *name){
 int igsAgent_unmuteOutput(igsAgent_t *agent, const char *name){
     agent_iop_t *iop = model_findIopByName(agent, (char*) name,IGS_OUTPUT_T);
     if(iop == NULL || iop->type != IGS_OUTPUT_T){
-        igs_warn("Output '%s' not found", name);
+        igsAgent_warn(agent, "Output '%s' not found", name);
         return 0;
     }
     iop->is_muted = false;
@@ -1429,7 +1432,7 @@ int igsAgent_unmuteOutput(igsAgent_t *agent, const char *name){
 bool igsAgent_isOutputMuted(igsAgent_t *agent, const char *name){
     agent_iop_t *iop = model_findIopByName(agent, (char*) name,IGS_OUTPUT_T);
     if(iop == NULL || iop->type != IGS_OUTPUT_T){
-        igs_warn("Output '%s' not found", name);
+        igsAgent_warn(agent, "Output '%s' not found", name);
         return 0;
     }
     return iop->is_muted;

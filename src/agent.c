@@ -18,6 +18,8 @@ igsAgent_t *igsAgent_new(void){
     agent->network_hwmValue = 1000;
     agent->allowIpc = true;
     agent->allowInproc = true;
+    agent->logLevel = IGS_LOG_INFO;
+    sprintf(agent->agentName, "UNAMED_AGENT");
     return agent;
 }
 void igsAgent_destroy(igsAgent_t **agent){
@@ -32,5 +34,5 @@ void igsAgent_log(igs_logLevel_t level, const char *function, igsAgent_t *agent,
     char content[MAX_STRING_MSG_LENGTH] = "";
     vsnprintf(content, MAX_STRING_MSG_LENGTH - 1, format, list);
     va_end(list);
-    admin_log(agent->agentName, level, function, "%s", content);
+    admin_log(agent, level, function, "%s", content);
 }

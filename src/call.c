@@ -216,11 +216,11 @@ int igsAgent_initCall(igsAgent_t *agent, const char *name, igsAgent_callFunction
     }
     HASH_FIND_STR(agent->internal_definition->calls_table, name, t);
     if (t != NULL && t->cb != NULL){
-        igs_error("call with name %s already exists and has a callback", name);
+        igsAgent_error(agent, "call with name %s already exists and has a callback", name);
         return 0;
     }else{
         if (cb == NULL){
-            igs_error("non-NULL callback is mandatory at call creation");
+            igsAgent_error(agent, "non-NULL callback is mandatory at call creation");
             return 0;
         }else{
             if (t == NULL){
@@ -228,7 +228,7 @@ int igsAgent_initCall(igsAgent_t *agent, const char *name, igsAgent_callFunction
                 t = calloc(1, sizeof(igs_call_t));
                 if (strnlen(name, MAX_STRING_MSG_LENGTH) == MAX_STRING_MSG_LENGTH){
                     t->name = strndup(name, MAX_STRING_MSG_LENGTH);
-                    igs_warn("call name has been shortened to %s", t->name);
+                    igsAgent_warn(agent, "call name has been shortened to %s", t->name);
                 }else{
                     t->name = strndup(name, MAX_STRING_MSG_LENGTH);
                 }
@@ -244,12 +244,12 @@ int igsAgent_initCall(igsAgent_t *agent, const char *name, igsAgent_callFunction
 int igsAgent_removeCall(igsAgent_t *agent, const char *name){
     igs_call_t *t = NULL;
     if(agent->internal_definition == NULL){
-        igs_error("No definition available yet");
+        igsAgent_error(agent, "No definition available yet");
         return -1;
     }
     HASH_FIND_STR(agent->internal_definition->calls_table, name, t);
     if (t == NULL){
-        igs_error("call with name %s does not exist", name);
+        igsAgent_error(agent, "call with name %s does not exist", name);
     }else{
         HASH_DEL(agent->internal_definition->calls_table, t);
         call_freeCall(t);
@@ -260,26 +260,26 @@ int igsAgent_removeCall(igsAgent_t *agent, const char *name){
 int igsAgent_addArgumentToCall(igsAgent_t *agent, const char *callName, const char *argName, iopType_t type){
     igs_call_t *t = NULL;
     if(agent->internal_definition == NULL){
-        igs_error("No definition available yet");
+        igsAgent_error(agent, "No definition available yet");
         return -1;
     }
     HASH_FIND_STR(agent->internal_definition->calls_table, callName, t);
     if (type == IGS_IMPULSION_T){
-        igs_error("impulsion type is not allowed as a call argument");
+        igsAgent_error(agent, "impulsion type is not allowed as a call argument");
         return -1;
     }
     if (type == IGS_UNKNOWN_T){
-        igs_error("unknown type is not allowed as a call argument");
+        igsAgent_error(agent, "unknown type is not allowed as a call argument");
         return -1;
     }
     if (t == NULL){
-        igs_error("call with name %s does not exist", callName);
+        igsAgent_error(agent, "call with name %s does not exist", callName);
         return -1;
     }else{
         igs_callArgument_t *a = calloc(1, sizeof(igs_callArgument_t));
         if (strnlen(argName, MAX_STRING_MSG_LENGTH) == MAX_STRING_MSG_LENGTH){
             a->name = strndup(argName, MAX_STRING_MSG_LENGTH);
-            igs_warn("call argument name has been shortened to %s", a->name);
+            igsAgent_warn(agent, "call argument name has been shortened to %s", a->name);
         }else{
             a->name = strndup(argName, MAX_STRING_MSG_LENGTH);
         }
@@ -293,12 +293,12 @@ int igsAgent_addArgumentToCall(igsAgent_t *agent, const char *callName, const ch
 int igsAgent_removeArgumentFromCall(igsAgent_t *agent, const char *callName, const char *argName){
     igs_call_t *t = NULL;
     if(agent->internal_definition == NULL){
-        igs_error("No definition available yet");
+        igsAgent_error(agent, "No definition available yet");
         return -1;
     }
     HASH_FIND_STR(agent->internal_definition->calls_table, callName, t);
     if (t == NULL){
-        igs_error("call with name %s does not exist", callName);
+        igsAgent_error(agent, "call with name %s does not exist", callName);
         return -1;
     }else{
         igs_callArgument_t *arg = NULL, *tmp = NULL;
@@ -318,7 +318,7 @@ int igsAgent_removeArgumentFromCall(igsAgent_t *agent, const char *callName, con
             }
         }
         if (!found){
-            igs_debug("no argument named %s for call %s", argName, callName);
+            igsAgent_debug(agent, "no argument named %s for call %s", argName, callName);
         }
     }
     return 1;
@@ -326,7 +326,7 @@ int igsAgent_removeArgumentFromCall(igsAgent_t *agent, const char *callName, con
 
 int igsAgent_sendCall(igsAgent_t *agent, const char *agentNameOrUUID, const char *callName, igs_callArgument_t **list){
     if (agentNameOrUUID == NULL || strlen(agentNameOrUUID) == 0){
-        igs_error("agent name or UUID must not be NULL or empty");
+        igsAgent_error(agent, "agent name or UUID must not be NULL or empty");
         return -1;
     }
     zyreAgent_t *agt = NULL, *tmp = NULL;
@@ -337,7 +337,7 @@ int igsAgent_sendCall(igsAgent_t *agent, const char *agentNameOrUUID, const char
             //we found a matching agent
             igs_call_t *call = NULL;
             if (agt->subscriber == NULL || agt->subscriber->definition == NULL){
-                igs_error("subscriber or definition is empty for %s (cannot verify call)", agentNameOrUUID);
+                igsAgent_error(agent, "subscriber or definition is empty for %s (cannot verify call)", agentNameOrUUID);
                 break;
             }
             HASH_FIND_STR(agt->subscriber->definition->calls_table, callName, call);
@@ -352,7 +352,7 @@ int igsAgent_sendCall(igsAgent_t *agent, const char *agentNameOrUUID, const char
                 size_t definedNbArguments = 0;
                 LL_COUNT(call->arguments, arg, definedNbArguments);
                 if (nbArguments != definedNbArguments){
-                    igs_error("passed number of arguments is not correct (received: %zu / expected: %zu)",
+                    igsAgent_error(agent, "passed number of arguments is not correct (received: %zu / expected: %zu)",
                               nbArguments, definedNbArguments);
                     break;
                 }
@@ -391,14 +391,14 @@ int igsAgent_sendCall(igsAgent_t *agent, const char *agentNameOrUUID, const char
                 bus_zyreLock();
                 zyre_whisper(agent->agentElements->node, agt->peerId, &msg);
                 bus_zyreUnlock();
-                igs_debug("sent call %s to %s", callName, agentNameOrUUID);
+                igsAgent_debug(agent, "sent call %s to %s", callName, agentNameOrUUID);
             }else{
-                igs_error("could not find call named %s for %s", callName, agentNameOrUUID);
+                igsAgent_error(agent, "could not find call named %s for %s", callName, agentNameOrUUID);
             }
         }
     }
     if (!found){
-        igs_error("could not find agent name or UUID: %s", agentNameOrUUID);
+        igsAgent_error(agent, "could not find agent name or UUID: %s", agentNameOrUUID);
     }
     call_freeCallArguments(*list);
     *list = NULL;
@@ -407,7 +407,7 @@ int igsAgent_sendCall(igsAgent_t *agent, const char *agentNameOrUUID, const char
 
 size_t igsAgent_getNumberOfCalls(igsAgent_t *agent){
     if (agent->internal_definition == NULL){
-        igs_warn("definition is NULL");
+        igsAgent_warn(agent, "definition is NULL");
         return 0;
     }
     return HASH_COUNT(agent->internal_definition->calls_table);
@@ -458,17 +458,17 @@ void igs_freeCallsList(char **list, size_t nbOfCalls){
 
 igs_callArgument_t* igsAgent_getFirstArgumentForCall(igsAgent_t *agent, const char *callName){
     if (callName == NULL || strlen(callName) == 0){
-        igs_error("call name cannot be NULL or empty");
+        igsAgent_error(agent, "call name cannot be NULL or empty");
         return NULL;
     }
     if (agent->internal_definition == NULL){
-        igs_error("definition is NULL");
+        igsAgent_error(agent, "definition is NULL");
         return NULL;
     }
     igs_call_t *t = NULL;
     HASH_FIND_STR(agent->internal_definition->calls_table, callName, t);
     if (t == NULL){
-        igs_debug("could not find call with name %s", callName);
+        igsAgent_debug(agent, "could not find call with name %s", callName);
         return NULL;
     }
     return t->arguments;
@@ -476,17 +476,17 @@ igs_callArgument_t* igsAgent_getFirstArgumentForCall(igsAgent_t *agent, const ch
 
 size_t igsAgent_getNumberOfArgumentsForCall(igsAgent_t *agent, const char *callName){
     if (callName == NULL || strlen(callName) == 0){
-        igs_error("call name cannot be NULL or empty");
+        igsAgent_error(agent, "call name cannot be NULL or empty");
         return 0;
     }
     if (agent->internal_definition == NULL){
-        igs_error("definition is NULL");
+        igsAgent_error(agent, "definition is NULL");
         return 0;
     }
     igs_call_t *t = NULL;
     HASH_FIND_STR(agent->internal_definition->calls_table, callName, t);
     if (t == NULL){
-        igs_debug("could not find call with name %s", callName);
+        igsAgent_debug(agent, "could not find call with name %s", callName);
         return 0;
     }
     size_t nb = 0;
@@ -497,17 +497,17 @@ size_t igsAgent_getNumberOfArgumentsForCall(igsAgent_t *agent, const char *callN
 
 bool igsAgent_checkCallArgumentExistence(igsAgent_t *agent, const char *callName, const char *argName){
     if (callName == NULL || strlen(callName) == 0){
-        igs_error("call name cannot be NULL or empty");
+        igsAgent_error(agent, "call name cannot be NULL or empty");
         return false;
     }
     if (agent->internal_definition == NULL){
-        igs_error("definition is NULL");
+        igsAgent_error(agent, "definition is NULL");
         return false;
     }
     igs_call_t *t = NULL;
     HASH_FIND_STR(agent->internal_definition->calls_table, callName, t);
     if (t == NULL){
-        igs_debug("could not find call with name %s", callName);
+        igsAgent_debug(agent, "could not find call with name %s", callName);
         return false;
     }
     igs_callArgument_t *a = NULL;

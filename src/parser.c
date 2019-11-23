@@ -1171,7 +1171,7 @@ int igsAgent_loadDefinition (igsAgent_t *agent, const char* json_str){
     //Check if the json string is null
     if(json_str == NULL)
     {
-        igs_debug("igs_loadDefinition : json string is null \n");
+        igsAgent_debug(agent, "igs_loadDefinition : json string is null \n");
         return 0;
     }
 
@@ -1180,7 +1180,7 @@ int igsAgent_loadDefinition (igsAgent_t *agent, const char* json_str){
 
     if(tmp == NULL)
     {
-        igs_debug("igs_loadDefinition : json string caused an error and was ignored\n%s\n", json_str );
+        igsAgent_debug(agent, "igs_loadDefinition : json string caused an error and was ignored\n%s\n", json_str );
         return -1;
     }else{
         if (agent->internal_definition != NULL){
@@ -1215,12 +1215,12 @@ int igsAgent_loadDefinitionFromPath (igsAgent_t *agent, const char* file_path){
     
     //Check if the json string is null
     if(file_path == NULL){
-        igs_error("Json file path is NULL");
+        igsAgent_error(agent, "Json file path is NULL");
         return 0;
     }
     
     if (strlen(file_path) == 0){
-        igs_debug("Json file path is empty");
+        igsAgent_debug(agent, "Json file path is empty");
         return 1;
     }
 
@@ -1230,7 +1230,7 @@ int igsAgent_loadDefinitionFromPath (igsAgent_t *agent, const char* file_path){
 
     if(tmp == NULL)
     {
-        igs_debug("igs_loadDefinitionFromPath : %s caused an error and was ignored\n", file_path);
+        igsAgent_debug(agent, "igs_loadDefinitionFromPath : %s caused an error and was ignored\n", file_path);
         return -1;
     }else{
         strncpy(definition_path, file_path, IGS_MAX_PATH - 1);

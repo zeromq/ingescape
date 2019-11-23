@@ -320,6 +320,18 @@ typedef struct _igsAgent_t {
     freezeCallback_t *freezeCallbacks;
     zyreCallback_t *zyreCallbacks;
     forcedStopCalback_t *forcedStopCalbacks;
+    
+    //admin
+    FILE *fp;
+    bool admin_logInStream;
+    bool admin_logInFile;
+    bool logInConsole;
+    bool useColorInConsole;
+    igs_logLevel_t logLevel;
+    char admin_logFile[4096];
+    char logContent[2048];
+    char logTime[128];
+    int nb_of_entries; //for fflush rotation
 
     //bus
     serviceHeader_t *serviceHeaders;
@@ -347,7 +359,7 @@ typedef struct _igsAgent_t {
 
 //////////////////  FUNCTIONS  AND SHARED VARIABLES //////////////////
 
-PUBLIC extern igsAgent_t *internalAgent;
+PUBLIC extern igsAgent_t *processAgent;
 void initInternalAgentIfNeeded(void);
 
 //  definition
@@ -359,7 +371,7 @@ mapping_element_t * mapping_createMappingElement(const char * input_name,
                                                  const char *agent_name,
                                                  const char* output_name);
 unsigned long djb2_hash (unsigned char *str);
-bool mapping_checkCompatibilityInputOutput(agent_iop_t *foundInput, agent_iop_t *foundOutput);
+bool mapping_checkCompatibilityInputOutput(igsAgent_t *agent, agent_iop_t *foundInput, agent_iop_t *foundOutput);
 
 // model
 const agent_iop_t* model_writeIOP (igsAgent_t *agent, const char *iopName, iop_t iopType, iopType_t valType, void* value, size_t size);
@@ -382,11 +394,8 @@ mapping_t* parser_LoadMap (const char* json_str);
 mapping_t* parser_LoadMapFromPath (const char* load_file);
 
 // admin
-extern bool admin_logInStream;
-extern bool admin_logInFile;
-extern char admin_logFile[4096];
-void admin_makeFilePath(const char *from, char *to, size_t size_of_to);
-PUBLIC void admin_log(char *name, igs_logLevel_t, const char *function, const char *format, ...)  CHECK_PRINTF (4);
+void admin_makeFilePath(igsAgent_t *agent, const char *from, char *to, size_t size_of_to);
+PUBLIC void admin_log(igsAgent_t *agent, igs_logLevel_t, const char *function, const char *format, ...)  CHECK_PRINTF (4);
 
 //bus
 void bus_zyreLock(void);

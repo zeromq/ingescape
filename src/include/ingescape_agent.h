@@ -155,6 +155,19 @@ PUBLIC void igsAgent_setCommandLineFromArgs(igsAgent_t *agent, int argc, const c
 PUBLIC void igsAgent_setRequestOutputsFromMappedAgents(igsAgent_t *agent, bool notify);
 PUBLIC bool igsAgent_getRequestOutputsFromMappedAgents(igsAgent_t *agent);
 
+PUBLIC void igsAgent_setVerbose(igsAgent_t *agent, bool verbose); //enable logs in console (ERROR and FATAL are always displayed)
+PUBLIC bool igsAgent_isVerbose(igsAgent_t *agent);
+PUBLIC void igsAgent_setUseColorVerbose(igsAgent_t *agent, bool useColor); //use colors in console
+PUBLIC bool igsAgent_getUseColorVerbose(igsAgent_t *agent);
+PUBLIC void igsAgent_setLogStream(igsAgent_t *agent, bool useLogStream); //enable logs in socket stream
+PUBLIC bool igsAgent_getLogStream(igsAgent_t *agent);
+PUBLIC void igsAgent_setLogInFile(igsAgent_t *agent, bool useLogFile); //enable logs in file
+PUBLIC bool igsAgent_getLogInFile(igsAgent_t *agent);
+PUBLIC void igsAgent_setLogPath(igsAgent_t *agent, const char *path); //default directory is ~/ on UNIX systems and current PATH on Windows
+PUBLIC char* igsAgent_getLogPath(igsAgent_t *agent); // must be freed by caller
+
+PUBLIC void igsAgent_setLogLevel (igsAgent_t *agent, igs_logLevel_t level); //set log level in console, default is IGS_LOG_INFO
+
 PUBLIC void igsAgent_log(igs_logLevel_t level, const char *function, igsAgent_t *agent, const char *format, ...) CHECK_PRINTF (4);
 #define igsAgent_trace(...) igsAgent_log(IGS_LOG_TRACE, __func__, __VA_ARGS__)
 #define igsAgent_debug(...) igsAgent_log(IGS_LOG_DEBUG, __func__, __VA_ARGS__)

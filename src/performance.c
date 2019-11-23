@@ -21,15 +21,15 @@ int64_t performanceStop = 0;
 
 void igsAgent_performanceCheck(igsAgent_t *agent, const char *peerId, size_t msgSize, size_t nbOfMsg){
     if (agent->agentElements == NULL || agent->agentElements->node == NULL){
-        igs_error("agent must be started to execute performance tests");
+        igsAgent_error(agent, "agent must be started to execute performance tests");
         return;
     }
     if (performanceMsgCountTarget != 0){
-        igs_error("check already in progress");
+        igsAgent_error(agent, "check already in progress");
         return;
     }
     if (nbOfMsg == 0){
-        igs_error("nbOfMsg must be greater than zero");
+        igsAgent_error(agent, "nbOfMsg must be greater than zero");
         return;
     }
     
