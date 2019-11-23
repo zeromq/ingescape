@@ -452,7 +452,18 @@ Item {
                 onClicked: {
                     if (rootItem.isEditorLicenseValid)
                     {
-                        model.QtObject.changeState();
+                        // ON
+                        if (rootItem.agent && rootItem.agent.isON)
+                        {
+                            // Ask to stop our agent
+                            rootItem.agent.askStopAgent();
+                        }
+                        // OFF
+                        else
+                        {
+                            // Ask to start our agent
+                            rootItem.agent.askStartAgent();
+                        }
                     }
                     else
                     {

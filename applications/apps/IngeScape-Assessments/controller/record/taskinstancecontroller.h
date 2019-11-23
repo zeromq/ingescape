@@ -17,12 +17,11 @@
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
+
+#include <controller/ingescapemodelmanager.h>
 #include <controller/abstracttimeactionslinescenarioviewcontroller.h>
 #include <controller/abstractscenariocontroller.h>
-#include <model/jsonhelper.h>
 #include <model/taskinstancem.h>
-
-#include <controller/assessmentsmodelmanager.h>
 #include <sortFilter/areagentsinplatformfilter.h>
 
 
@@ -50,12 +49,9 @@ public:
 
     /**
      * @brief Constructor
-     * @param modelManager
-     * @param jsonHelper
      * @param parent
      */
-    explicit TaskInstanceController(JsonHelper* jsonHelper,
-                              QObject *parent = nullptr);
+    explicit TaskInstanceController(QObject *parent = nullptr);
 
 
     /**
@@ -63,16 +59,26 @@ public:
      */
     ~TaskInstanceController();
 
+
     /**
      * @brief Adds the given URLs as attachements for this record
      * @param urlList
      */
     Q_INVOKABLE void addNewAttachements(const QList<QUrl>& urlList);
 
+
     AreAgentsInPlatformFilter* agentsGroupedByNameInCurrentPlatform()
     {
         return &_agentsGroupedByNameInCurrentPlatform;
     }
+
+
+Q_SIGNALS:
+
+    /**
+     * @brief Signal emitted when the user wants to start to record
+     */
+    void startToRecord();
 
 
 private Q_SLOTS:
@@ -86,11 +92,10 @@ private Q_SLOTS:
 
 
 private:
-    // Helper to manage JSON files
-    JsonHelper* _jsonHelper;
 
-    //Filtered list with all present agents
+    // Filtered list with all present agents
     AreAgentsInPlatformFilter _agentsGroupedByNameInCurrentPlatform;
+
 };
 
 QML_DECLARE_TYPE(TaskInstanceController)

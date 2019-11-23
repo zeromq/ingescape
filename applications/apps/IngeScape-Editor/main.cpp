@@ -44,8 +44,6 @@
 #include "platformsupport/IngescapeApplication.h"
 
 
-
-
 /**
  * @brief Handler for "Log Message"
  * @param type
@@ -56,6 +54,8 @@ void LogMessageHandler(QtMsgType type, const QMessageLogContext& context, const 
 {
     fprintf(stdout, "%s\n", message.toLatin1().constData());
     fflush(stdout);
+
+    char agentName[] = "IngeScape-Editor";
 
     // "context.function" can be null
     QString function = "Undefined function";
@@ -72,28 +72,28 @@ void LogMessageHandler(QtMsgType type, const QMessageLogContext& context, const 
     {
         // Allows to prevent to log in the file useless logs (with type TRACE or DEBUG)
         if (logLevel <= IGS_LOG_DEBUG) {
-            igs_log(IGS_LOG_DEBUG, function.toStdString().c_str(), "%s", message.toStdString().c_str());
+            igs_log(agentName, IGS_LOG_DEBUG, function.toStdString().c_str(), "%s", message.toStdString().c_str());
         }
         break;
     }
     case QtInfoMsg:
     {
-        igs_log(IGS_LOG_INFO, function.toStdString().c_str(), "%s", message.toStdString().c_str());
+        igs_log(agentName, IGS_LOG_INFO, function.toStdString().c_str(), "%s", message.toStdString().c_str());
         break;
     }
     case QtWarningMsg:
     {
-        igs_log(IGS_LOG_WARN, function.toStdString().c_str(), "%s", message.toStdString().c_str());
+        igs_log(agentName, IGS_LOG_WARN, function.toStdString().c_str(), "%s", message.toStdString().c_str());
         break;
     }
     case QtCriticalMsg:
     {
-        igs_log(IGS_LOG_ERROR, function.toStdString().c_str(), "%s", message.toStdString().c_str());
+        igs_log(agentName, IGS_LOG_ERROR, function.toStdString().c_str(), "%s", message.toStdString().c_str());
         break;
     }
     case QtFatalMsg:
     {
-        igs_log(IGS_LOG_FATAL, function.toStdString().c_str(), "%s", message.toStdString().c_str());
+        igs_log(agentName, IGS_LOG_FATAL, function.toStdString().c_str(), "%s", message.toStdString().c_str());
         break;
     }
     default:
@@ -132,6 +132,7 @@ void registerCustomQmlTypes()
     qmlRegisterUncreatableType<EditorModelManager>("INGESCAPE", 1, 0, "EditorModelManager", "Internal Class");
     qmlRegisterUncreatableType<HostsSupervisionController>("INGESCAPE", 1, 0, "HostsSupervisionController", "Internal Class");
     qmlRegisterUncreatableType<LogStreamController>("INGESCAPE", 1, 0, "LogStreamController", "Internal Class");
+    qmlRegisterUncreatableType<NetworkController>("INGESCAPE", 1, 0, "NetworkController", "Internal Class");
     qmlRegisterUncreatableType<RecordsSupervisionController>("INGESCAPE", 1, 0, "RecordsSupervisionController", "Internal Class");
     qmlRegisterUncreatableType<ValuesHistoryController>("INGESCAPE", 1, 0, "ValuesHistoryController", "Internal Class");
 

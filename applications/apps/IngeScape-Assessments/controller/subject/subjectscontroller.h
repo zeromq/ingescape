@@ -40,7 +40,6 @@ public:
 
     /**
      * @brief Constructor
-     * @param modelManager
      * @param parent
      */
     explicit SubjectsController(QObject *parent = nullptr);

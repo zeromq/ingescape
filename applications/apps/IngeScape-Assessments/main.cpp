@@ -25,12 +25,15 @@
 
 #include <controller/ingescapeassessmentscontroller.h>
 
+
 //
 // IngeScape Common
 //
 #include <ingescapecommon.h>
 #include <settings/ingescapesettings.h>
 #include <misc/ingescapeutils.h>
+//#include "platformsupport/osutils.h"
+//#include "platformsupport/IngescapeApplication.h"
 
 
 /**
@@ -43,6 +46,8 @@ void LogMessageHandler(QtMsgType type, const QMessageLogContext& context, const 
 {
     fprintf(stdout, "%s\n", message.toLatin1().constData());
     fflush(stdout);
+
+    char agentName[] = "IngeScape-Assessments";
 
     // "context.function" can be null
     QString function = "Undefined function";
@@ -59,28 +64,28 @@ void LogMessageHandler(QtMsgType type, const QMessageLogContext& context, const 
     {
         // Allows to prevent to log in the file useless logs (with type TRACE or DEBUG)
         if (logLevel <= IGS_LOG_DEBUG) {
-            igs_log(IGS_LOG_DEBUG, function.toStdString().c_str(), message.toStdString().c_str(), "%s");
+            igs_log(agentName, IGS_LOG_DEBUG, function.toStdString().c_str(), message.toStdString().c_str(), "%s");
         }
         break;
     }
     case QtInfoMsg:
     {
-        igs_log(IGS_LOG_INFO, function.toStdString().c_str(), message.toStdString().c_str(), "%s");
+        igs_log(agentName, IGS_LOG_INFO, function.toStdString().c_str(), message.toStdString().c_str(), "%s");
         break;
     }
     case QtWarningMsg:
     {
-        igs_log(IGS_LOG_WARN, function.toStdString().c_str(), message.toStdString().c_str(), "%s");
+        igs_log(agentName, IGS_LOG_WARN, function.toStdString().c_str(), message.toStdString().c_str(), "%s");
         break;
     }
     case QtCriticalMsg:
     {
-        igs_log(IGS_LOG_ERROR, function.toStdString().c_str(), message.toStdString().c_str(), "%s");
+        igs_log(agentName, IGS_LOG_ERROR, function.toStdString().c_str(), message.toStdString().c_str(), "%s");
         break;
     }
     case QtFatalMsg:
     {
-        igs_log(IGS_LOG_FATAL, function.toStdString().c_str(), message.toStdString().c_str(), "%s");
+        igs_log(agentName, IGS_LOG_FATAL, function.toStdString().c_str(), message.toStdString().c_str(), "%s");
         break;
     }
     default:
@@ -112,12 +117,13 @@ void registerCustomQmlTypes()
     //----------------
     // Singleton used as primary access point to our controllers
     qmlRegisterSingletonType<IngeScapeAssessmentsController>("INGESCAPE", 1, 0, "IngeScapeAssessmentsC", &IngeScapeAssessmentsController::qmlSingleton);
+    qmlRegisterSingletonType<AssessmentsModelManager>("INGESCAPE", 1, 0, "AssessmentsModelC", &AssessmentsModelManager::qmlSingleton);
 
     // sub-controllers
-    qmlRegisterUncreatableType<AssessmentsModelManager>("INGESCAPE", 1, 0, "AssessmentsModelManager", "Internal Class");
     qmlRegisterUncreatableType<ExperimentationController>("INGESCAPE", 1, 0, "ExperimentationController", "Internal Class");
     qmlRegisterUncreatableType<ExperimentationsListController>("INGESCAPE", 1, 0, "ExperimentationsListController", "Internal Class");
     qmlRegisterUncreatableType<ExportController>("INGESCAPE", 1, 0, "ExportController", "Internal Class");
+    qmlRegisterUncreatableType<NetworkController>("INGESCAPE", 1, 0, "NetworkController", "Internal Class");
     qmlRegisterUncreatableType<TaskInstanceController>("INGESCAPE", 1, 0, "TaskInstanceController", "Internal Class");
     qmlRegisterUncreatableType<SubjectsController>("INGESCAPE", 1, 0, "SubjectsController", "Internal Class");
     qmlRegisterUncreatableType<TasksController>("INGESCAPE", 1, 0, "TasksController", "Internal Class");
@@ -128,9 +134,8 @@ void registerCustomQmlTypes()
     // Sort and Filter
     //
     //----------------
-    //qmlRegisterUncreatableType<LogsSortFilter>("INGESCAPE", 1, 0, "LogsSortFilter", "Internal class");
-    //qmlRegisterUncreatableType<ValuesHistorySortFilter>("INGESCAPE", 1, 0, "ValuesHistorySortFilter", "Internal class");
     qmlRegisterUncreatableType<AreAgentsInPlatformFilter>("INGESCAPE", 1, 0, "AreAgentsInPlatformFilter", "Internal class");
+
 
     //----------------
     //

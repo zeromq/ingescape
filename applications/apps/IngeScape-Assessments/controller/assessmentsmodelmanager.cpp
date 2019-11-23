@@ -42,119 +42,51 @@ uint qHash(const CassUuid& cassUuid)
 }
 
 
-/**
- * @brief The singleton instance.
- * NOTE: We hold a pointer here and not a plain value to be able to initialize it from the main controller without a "default value".
- */
-AssessmentsModelManager* AssessmentsModelManager::_instance = nullptr;
+//--------------------------------------------------------------
+//
+//
+// Assessments Model Manager
+//
+//
+//--------------------------------------------------------------
+
+// Define our singleton instance
+// Creates a global and static object of type QGlobalStatic, of name _singletonInstance and that behaves as a pointer to AssessmentsModelManager.
+// The object created by Q_GLOBAL_STATIC initializes itself on the first use, which means that it will not increase the application or the library's load time.
+// Additionally, the object is initialized in a thread-safe manner on all platforms.
+Q_GLOBAL_STATIC(AssessmentsModelManager, _singletonInstance)
+
 
 /**
- * @brief Initialize the singleton instance, destroying any previous instance if any
- * @param jsonHelper
- * @param rootDirectoryPath
- * @param parent
- */
-void AssessmentsModelManager::initInstance(JsonHelper* jsonHelper, QString rootDirectoryPath, QObject* parent)
-{
-    if (AssessmentsModelManager::_instance != nullptr)
-    {
-        AssessmentsModelManager::destroyInstance();
-    }
-
-    AssessmentsModelManager::_instance = new AssessmentsModelManager(jsonHelper, rootDirectoryPath, parent);
-}
-
-/**
- * @brief Destroy the current singleton instance
- */
-void AssessmentsModelManager::destroyInstance()
-{
-    if (AssessmentsModelManager::_instance != nullptr)
-    {
-        delete AssessmentsModelManager::_instance;
-        AssessmentsModelManager::_instance = nullptr;
-    }
-}
-
-/**
- * @brief Accessor to the singleton instance
+ * @brief Get our singleton instance
  * @return
  */
-AssessmentsModelManager* AssessmentsModelManager::Instance()
+AssessmentsModelManager* AssessmentsModelManager::instance()
 {
-    return AssessmentsModelManager::_instance;
+    return _singletonInstance;
 }
+
 
 /**
- * @brief Retrieve a 'text' value of given column inside the given row
- * and convert it to QString before returning it
- * @param row
- * @param columnName
+ * @brief Method used to provide a singleton to QML
+ * @param engine
+ * @param scriptEngine
  * @return
  */
-QString AssessmentsModelManager::getStringValueFromColumnName(const CassRow* row, const char* columnName)
+QObject* AssessmentsModelManager::qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine)
 {
-    const char *chrValueString = "";
-    size_t valueStringLength = 0;
-    cass_value_get_string(cass_row_get_column_by_name(row, columnName), &chrValueString, &valueStringLength);
-    return QString::fromUtf8(chrValueString, static_cast<int>(valueStringLength));
+    Q_UNUSED(engine);
+    Q_UNUSED(scriptEngine);
+
+    return _singletonInstance;
 }
 
-/**
- * @brief Retrive a full collection of 'text' for the given value inside the given row
- * @param row
- * @param columnName
- * @return
- */
-QStringList AssessmentsModelManager::getStringListFromColumnName(const CassRow* row, const char* columnName)
-{
-    QStringList collection;
-    CassIterator* enumValuesIterator = cass_iterator_from_collection(cass_row_get_column_by_name(row, columnName));
-    if (enumValuesIterator != nullptr) {
-        while(cass_iterator_next(enumValuesIterator)) {
-            const char *chrEnumValue = "";
-            size_t enumValueLength = 0;
-            cass_value_get_string(cass_iterator_get_value(enumValuesIterator), &chrEnumValue, &enumValueLength);
-            collection.append(QString::fromUtf8(chrEnumValue, static_cast<int>(enumValueLength)));
-        }
-
-        cass_iterator_free(enumValuesIterator);
-        enumValuesIterator = nullptr;
-    }
-    return collection;
-}
-
-/**
- * @brief Retrive a date and a time value from the given columns inside the given row
- * and convert it to a QDateTime before returning it
- * @param row
- * @param dateColumnName
- * @param timeColumnName
- * @return
- */
-QDateTime AssessmentsModelManager::getDateTimeFromColumnNames(const CassRow* row, const char* dateColumnName, const char* timeColumnName)
-{
-    cass_uint32_t yearMonthDay;
-    cass_value_get_uint32(cass_row_get_column_by_name(row, dateColumnName), &yearMonthDay);
-    cass_int64_t timeOfDay;
-    cass_value_get_int64(cass_row_get_column_by_name(row, timeColumnName), &timeOfDay);
-
-    /* Convert 'date' and 'time' to Epoch time */
-    time_t time = static_cast<time_t>(cass_date_time_to_epoch(yearMonthDay, timeOfDay));
-    return QDateTime::fromTime_t(static_cast<uint>(time));
-}
 
 /**
  * @brief Constructor
- * @param jsonHelper
- * @param rootDirectoryPath
  * @param parent
  */
-AssessmentsModelManager::AssessmentsModelManager(JsonHelper* jsonHelper,
-                                                 QString rootDirectoryPath,
-                                                 QObject *parent) : IngeScapeModelManager(jsonHelper,
-                                                                                          rootDirectoryPath,
-                                                                                          parent),
+AssessmentsModelManager::AssessmentsModelManager(QObject *parent) : QObject(parent),
     _databaseAddress("localhost"),
     _isConnectedToDatabase(false),
     _errorMessageWhenDatabaseConnectionFailed(""),
@@ -190,10 +122,6 @@ AssessmentsModelManager::~AssessmentsModelManager()
 
     // DIS-connect from the Cassandra Database
     disconnectFromDatabase();
-
-
-    // Mother class is automatically called
-    //IngeScapeModelManager::~IngeScapeModelManager();
 }
 
 
@@ -217,6 +145,68 @@ void AssessmentsModelManager::setdatabaseAddress(QString value)
 
         Q_EMIT databaseAddressChanged(value);
     }
+}
+
+
+/**
+ * @brief Retrieve a 'text' value of given column inside the given row
+ * and convert it to QString before returning it
+ * @param row
+ * @param columnName
+ * @return
+ */
+QString AssessmentsModelManager::getStringValueFromColumnName(const CassRow* row, const char* columnName)
+{
+    const char *chrValueString = "";
+    size_t valueStringLength = 0;
+    cass_value_get_string(cass_row_get_column_by_name(row, columnName), &chrValueString, &valueStringLength);
+    return QString::fromUtf8(chrValueString, static_cast<int>(valueStringLength));
+}
+
+
+/**
+ * @brief Retrive a full collection of 'text' for the given value inside the given row
+ * @param row
+ * @param columnName
+ * @return
+ */
+QStringList AssessmentsModelManager::getStringListFromColumnName(const CassRow* row, const char* columnName)
+{
+    QStringList collection;
+    CassIterator* enumValuesIterator = cass_iterator_from_collection(cass_row_get_column_by_name(row, columnName));
+    if (enumValuesIterator != nullptr) {
+        while(cass_iterator_next(enumValuesIterator)) {
+            const char *chrEnumValue = "";
+            size_t enumValueLength = 0;
+            cass_value_get_string(cass_iterator_get_value(enumValuesIterator), &chrEnumValue, &enumValueLength);
+            collection.append(QString::fromUtf8(chrEnumValue, static_cast<int>(enumValueLength)));
+        }
+
+        cass_iterator_free(enumValuesIterator);
+        enumValuesIterator = nullptr;
+    }
+    return collection;
+}
+
+
+/**
+ * @brief Retrive a date and a time value from the given columns inside the given row
+ * and convert it to a QDateTime before returning it
+ * @param row
+ * @param dateColumnName
+ * @param timeColumnName
+ * @return
+ */
+QDateTime AssessmentsModelManager::getDateTimeFromColumnNames(const CassRow* row, const char* dateColumnName, const char* timeColumnName)
+{
+    cass_uint32_t yearMonthDay;
+    cass_value_get_uint32(cass_row_get_column_by_name(row, dateColumnName), &yearMonthDay);
+    cass_int64_t timeOfDay;
+    cass_value_get_int64(cass_row_get_column_by_name(row, timeColumnName), &timeOfDay);
+
+    /* Convert 'date' and 'time' to Epoch time */
+    time_t time = static_cast<time_t>(cass_date_time_to_epoch(yearMonthDay, timeOfDay));
+    return QDateTime::fromTime_t(static_cast<uint>(time));
 }
 
 
@@ -380,6 +370,6 @@ QString AssessmentsModelManager::cassUuidToQString(CassUuid cassUuid)
 CassUuid AssessmentsModelManager::genCassUuid()
 {
     CassUuid uuid;
-    cass_uuid_gen_time(AssessmentsModelManager::Instance()->getCassUuidGen(), &uuid);
+    cass_uuid_gen_time(AssessmentsModelManager::instance()->getCassUuidGen(), &uuid);
     return uuid;
 }

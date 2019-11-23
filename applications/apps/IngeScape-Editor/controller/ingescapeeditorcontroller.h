@@ -70,6 +70,9 @@ class IngeScapeEditorController : public QObject
     // Controller to manage the data model of our IngeScape editor
     I2_QML_PROPERTY_READONLY(EditorModelManager*, modelManager)
 
+    // Controller to manage network communications
+    I2_QML_PROPERTY_READONLY(NetworkController*, networkC)
+
     // Controller to manage the agents list
     I2_QML_PROPERTY_READONLY(AgentsSupervisionController*, agentsSupervisionC)
 
@@ -84,9 +87,6 @@ class IngeScapeEditorController : public QObject
 
     // Controller to manage the agents mapping
     I2_QML_PROPERTY_READONLY(AgentsMappingController*, agentsMappingC)
-
-    // Controller to manage network communications
-    I2_QML_PROPERTY_READONLY(NetworkController*, networkC)
 
     // Controller to manage the scenario
     I2_QML_PROPERTY_READONLY(ScenarioController*, scenarioC)
@@ -247,16 +247,6 @@ public Q_SLOTS:
     void forceCreation();
 
 
-    /**
-      * @brief Get the position of the mouse cursor in global screen coordinates
-      *
-      * @remarks You must use mapToGlobal to convert it to local coordinates
-      *
-      * @return
-      */
-    QPointF getGlobalMousePosition();
-
-
 Q_SIGNALS:
     /**
      * @brief Triggered to open our license popup
@@ -283,6 +273,7 @@ Q_SIGNALS:
 
 
 private Q_SLOTS:
+
     /**
      * @brief Called when our application receives an "open file" request
      * @param url
@@ -328,13 +319,6 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Slot called when the state of the TimeLine updated
-     * @param state
-     */
-    void _onTimeLineStateUpdated(QString state);
-
-
-    /**
      * @brief Slot called when we receive the command "Update Record State"
      * @param state
      */
@@ -342,10 +326,18 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Slot called when a command must be sent on the network to a recorder
-     * @param commandAndParameters
+     * @brief Slot called just before an action is performed
+     * (the message "EXECUTED ACTION" must be sent on the network to the recorder)
+     * @param message
      */
-    void _onCommandAskedToRecorder(QString commandAndParameters);
+    void _onActionWillBeExecuted(QString message);
+
+
+    /**
+     * @brief Slot called when the state of the TimeLine updated
+     * @param state
+     */
+    void _onTimeLineStateUpdated(QString state);
 
 
     /**
@@ -448,15 +440,6 @@ private:
     QJsonDocument _getJsonOfCurrentPlatform();
 
 
-
-    /**
-     * @brief Stop IngeScape
-     *
-     * @param hasToClearPlatform
-     */
-    void _stopIngeScape(bool hasToClearPlatform);
-
-
     /**
      * @brief Start IngeScape
      *
@@ -479,12 +462,17 @@ private:
     bool _restartIngeScape(bool hasToClearPlatform, bool checkAvailableNetworkDevices = false);
 
 
+    /**
+     * @brief Stop IngeScape
+     *
+     * @param hasToClearPlatform
+     */
+    void _stopIngeScape(bool hasToClearPlatform);
+
+
 private:
     // To subscribe to termination signals
     TerminationSignalWatcher *_terminationSignalWatcher;
-
-    // Helper to manage JSON files
-    JsonHelper* _jsonHelper;
 
     // Path to the directory containing JSON files about platforms
     QString _platformDirectoryPath;

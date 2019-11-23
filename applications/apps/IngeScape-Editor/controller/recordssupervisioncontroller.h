@@ -20,7 +20,6 @@
 
 #include <I2PropertyHelpers.h>
 
-#include <controller/editormodelmanager.h>
 #include <viewModel/recordvm.h>
 #include <model/recordm.h>
 
@@ -73,11 +72,9 @@ class RecordsSupervisionController : public QObject
 public:
     /**
      * @brief Constructor
-     * @param modelManager
      * @param parent
      */
-    explicit RecordsSupervisionController(EditorModelManager* modelManager,
-                                          QObject *parent = nullptr);
+    explicit RecordsSupervisionController(QObject *parent = nullptr);
 
 
     /**
@@ -142,14 +139,6 @@ public:
 
 
 Q_SIGNALS:
-
-    /**
-     * @brief Signal emitted when a command must be sent on the network to the recorder
-     * @param peerIdOfRecorder
-     * @param commandAndParameters
-     */
-    void commandAskedToRecorder(QString peerIdOfRecorder, QString commandAndParameters);
-
 
     /**
      * @brief Signal emitted when the user wants to start to record
@@ -267,9 +256,6 @@ private:
 
 
 private:
-
-    // Manager for the data model of INGESCAPE
-    EditorModelManager* _modelManager;
 
     // Hash table from record id to a model of record
     QHash<QString, RecordM*> _hashFromRecordIdToModel;

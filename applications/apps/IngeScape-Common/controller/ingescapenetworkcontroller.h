@@ -42,7 +42,7 @@ static const QString prefix_Mapping = "EXTERNAL_MAPPING#";
 /**
  * @brief The IngeScapeNetworkController class defines the controller for IngeScape network communications
  */
-class IngeScapeNetworkController: public QObject
+class IngeScapeNetworkController : public QObject
 {
     Q_OBJECT
 
@@ -74,6 +74,22 @@ class IngeScapeNetworkController: public QObject
 
 
 public:
+
+    /**
+     * @brief Accessor to the singleton instance
+     * @return
+     */
+    static IngeScapeNetworkController* instance();
+
+
+    /**
+     * @brief Method used to provide a singleton to QML
+     * @param engine
+     * @param scriptEngine
+     * @return
+     */
+     static QObject* qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine);
+
 
     /**
      * @brief Constructor
@@ -179,7 +195,7 @@ public:
      * @param peerName
      * @param zMessage
      */
-    virtual void manageShoutedMessage(QString peerId, QString peerName, zmsg_t* zMessage);
+    void manageShoutedMessage(QString peerId, QString peerName, zmsg_t* zMessage);
 
 
     /**
@@ -188,7 +204,70 @@ public:
      * @param peerName
      * @param zMessage
      */
-    virtual void manageWhisperedMessage(QString peerId, QString peerName, zmsg_t* zMessage);
+    void manageWhisperedMessage(QString peerId, QString peerName, zmsg_t* zMessage);
+
+
+    /**
+     * @brief Send a string message to an agent (identified by its peer id)
+     * @param agentId peer id of the agent
+     * @param message 1 string
+     * @return true if successful, false otherwise
+     */
+    bool sendStringMessageToAgent(QString agentId, QString message);
+
+
+    /**
+     * @brief Send a strings list message to an agent (identified by its peer id)
+     * @param agentId peer id of the agent
+     * @param message list of strings
+     * @return true if successful, false otherwise
+     */
+    bool sendStringMessageToAgent(QString agentId, QStringList message);
+
+
+    /**
+     * @brief Send a string message to a list of agents (identified by their peer id)
+     * @param agentIds peer ids of the agents
+     * @param message 1 string
+     * @return true if successful, false otherwise
+     */
+    bool sendStringMessageToAgents(QStringList agentIds, QString message);
+
+
+    /**
+     * @brief Send a strings list message to an agent (identified by its peer id)
+     * @param agentIds peer ids of the agents
+     * @param message list of strings
+     * @return true if successful, false otherwise
+     */
+    bool sendStringMessageToAgents(QStringList agentIds, QStringList message);
+
+
+    /**
+     * @brief Send a ZMQ message in several parts to an agent (identified by its peer id)
+     * @param agentId
+     * @param messageParts
+     * @return
+     */
+    bool sendZMQMessageToAgent(QString agentId, QStringList messageParts);
+
+
+    /**
+     * @brief Add inputs to our application for a list of agent outputs
+     * @param agentName
+     * @param newOutputsIds
+     * @param isMappingConnected
+     */
+    void addInputsToOurApplicationForAgentOutputs(QString agentName, QStringList newOutputsIds, bool isMappingConnected);
+
+
+    /**
+     * @brief Remove inputs from our application for a list of agent outputs
+     * @param agentName
+     * @param oldOutputsIds
+     * @param isMappingConnected
+     */
+    void removeInputsFromOurApplicationForAgentOutputs(QString agentName, QStringList oldOutputsIds, bool isMappingConnected);
 
 
 Q_SIGNALS:
@@ -340,21 +419,51 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when a new value is published
+     * @brief Signal emitted when a new value has been published
      * @param publishedValue
      */
     void valuePublished(PublishedValueM* publishedValue);
 
 
-public Q_SLOTS:
+    /**
+     * @brief Signal emitted when a "Shouted" message (with one part) has been received
+     * @param peerId
+     * @param peerName
+     * @param message
+     */
+    void shoutedMessageReceived(QString peerId, QString peerName, QString message);
+
 
     /**
-     * @brief Slot called when a command must be sent on the network to a recorder
-     * @param peerIdOfRecorder
-     * @param commandAndParameters
+     * @brief Signal emitted when a "Shouted" message (with several parts) has been received
+     * @param peerId
+     * @param peerName
+     * @param messagePart1
+     * @param messageOthersParts
      */
-    void onCommandAskedToRecorder(QString peerIdOfRecorder, QString commandAndParameters);
+    void shoutedMessageReceived(QString peerId, QString peerName, QString messagePart1, QStringList messageOthersParts);
 
+
+    /**
+     * @brief Signal emitted when "Whispered" message (with one part) has been received
+     * @param peerId
+     * @param peerName
+     * @param message
+     */
+    void whisperedMessageReceived(QString peerId, QString peerName, QString message);
+
+
+    /**
+     * @brief Signal emitted when "Whispered" message (with several parts) has been received
+     * @param peerId
+     * @param peerName
+     * @param messagePart1
+     * @param messageOthersParts
+     */
+    void whisperedMessageReceived(QString peerId, QString peerName, QString messagePart1, QStringList messageOthersParts);
+
+
+public Q_SLOTS:
 
     /**
      * @brief Slot called when the flag "is Mapping Activated" changed
@@ -363,25 +472,7 @@ public Q_SLOTS:
     void onIsMappingConnectedChanged(bool isMappingConnected);
 
 
-    /**
-     * @brief Slot called when inputs must be added to our application for a list of agent outputs
-     * @param agentName
-     * @param newOutputsIds
-     * @param isMappingConnected
-     */
-    void onAddInputsToOurApplicationForAgentOutputs(QString agentName, QStringList newOutputsIds, bool isMappingConnected);
-
-
-    /**
-     * @brief Slot called when inputs must be removed from our application for a list of agent outputs
-     * @param agentName
-     * @param oldOutputsIds
-     * @param isMappingConnected
-     */
-    void onRemoveInputsFromOurApplicationForAgentOutputs(QString agentName, QStringList oldOutputsIds, bool isMappingConnected);
-
-
-protected:
+private:
     // Name of our "IngeScape" agent that correspond to our application
     QString _igsAgentApplicationName;
 

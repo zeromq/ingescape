@@ -16,7 +16,8 @@
 
 
 #include <QDebug>
-#include "viewmodel/agentsgroupedbynamevm.h"
+#include <viewModel/agentsgroupedbynamevm.h>
+
 
 /**
  * @brief Default constructor
@@ -53,7 +54,8 @@ bool AreAgentsInPlatformFilter::filterAccepts(QObject* item, int index) const
     Q_UNUSED(index)
 
     AgentsGroupedByNameVM* agent = dynamic_cast<AgentsGroupedByNameVM*>(item);
-    if (agent != nullptr){
+    if ((_currentProtocol != nullptr) && (agent != nullptr))
+    {
         return _currentProtocol->isAgentNameInProtocol(agent->name());
     }
     return false;

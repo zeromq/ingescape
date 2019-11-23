@@ -63,14 +63,9 @@ public:
 
     /**
      * @brief Constructor
-     * @param modelManager
-     * @param jsonHelper
      * @param parent
      */
-    explicit ScenarioController(//EditorModelManager* modelManager,
-                                IngeScapeModelManager* modelManager,
-                                JsonHelper* jsonHelper,
-                                QObject *parent = nullptr);
+    explicit ScenarioController(QObject *parent = nullptr);
 
 
     /**

@@ -43,7 +43,7 @@ uint qHash(const CassUuid& cassUuid);
 /**
  * @brief The AssessmentsModelManager class defines the manager for the data model of our IngeScape Assessments application
  */
-class AssessmentsModelManager : public IngeScapeModelManager
+class AssessmentsModelManager : public QObject
 {
     Q_OBJECT
 
@@ -59,39 +59,34 @@ class AssessmentsModelManager : public IngeScapeModelManager
 
 public:
 
-    // ------------------------
-    //
-    //  Singleton logic
-    //
-    // ------------------------
-
-    /**
-     * @brief Initialize the singleton instance, destroying any previous instance if any
-     * @param jsonHelper
-     * @param rootDirectoryPath
-     * @param parent
-     */
-    static void initInstance(JsonHelper* jsonHelper,
-                             QString rootDirectoryPath,
-                             QObject *parent = nullptr);
-
-    /**
-     * @brief Destroy the current singleton instance
-     */
-    static void destroyInstance();
-
     /**
      * @brief Accessor to the singleton instance
      * @return
      */
-    static AssessmentsModelManager* Instance();
+    static AssessmentsModelManager* instance();
 
 
-    // ------------------------
-    //
-    //  Model manager logic
-    //
-    // ------------------------
+    /**
+     * @brief Method used to provide a singleton to QML
+     * @param engine
+     * @param scriptEngine
+     * @return
+     */
+     static QObject* qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine);
+
+
+     /**
+      * @brief Constructor
+      * @param parent
+      */
+     explicit AssessmentsModelManager(QObject *parent = nullptr);
+
+
+     /**
+      * @brief Destructor
+      */
+     ~AssessmentsModelManager() Q_DECL_OVERRIDE;
+
 
     /**
      * @brief Retrieve a 'text' value of given column inside the given row
@@ -102,6 +97,7 @@ public:
      */
     static QString getStringValueFromColumnName(const CassRow* row, const char* columnName);
 
+
     /**
      * @brief Retrive a full collection of 'text' for the given value inside the given row
      * @param row
@@ -109,6 +105,7 @@ public:
      * @return
      */
     static QStringList getStringListFromColumnName(const CassRow* row, const char* columnName);
+
 
     /**
      * @brief Retrive a date and a time value from the given columns inside the given row
@@ -119,6 +116,7 @@ public:
      * @return
      */
     static QDateTime getDateTimeFromColumnNames(const CassRow* row, const char* dateColumnName, const char* timeColumnName);
+
 
     /**
      * @brief Delete an entry of the template type from Cassandra DB.
@@ -203,7 +201,7 @@ public:
         }
 
         // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::instance()->getCassSession(), cassStatement);
         CassError cassError = cass_future_error_code(cassFuture);
         if (cassError == CASS_OK)
         {
@@ -219,6 +217,7 @@ public:
 
         return cassError == CASS_OK;
     }
+
 
     /**
      * @brief Overload of bool deleteEntry(QList<QList<CassUuid>> filterValues)
@@ -239,6 +238,7 @@ public:
 
         return deleteEntry<ModelClass>(listOfList);
     }
+
 
     /**
      * @brief Execute a SELECT request and return the corresponding list of entries.
@@ -290,7 +290,7 @@ public:
         }
 
         // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::instance()->getCassSession(), cassStatement);
         CassError cassError = cass_future_error_code(cassFuture);
         if (cassError == CASS_OK)
         {
@@ -322,6 +322,7 @@ public:
         return objectList;
     }
 
+
     /**
      * @brief Execute an INSERT query to update the entry corresponding to the given instance
      */
@@ -332,7 +333,7 @@ public:
         CassStatement* cassStatement = ModelClass::createBoundInsertStatement(modelInstance);
 
         // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::instance()->getCassSession(), cassStatement);
         CassError cassError = cass_future_error_code(cassFuture);
         bool success = (cassError == CASS_OK);
         if (success)
@@ -360,7 +361,7 @@ public:
         CassStatement* cassStatement = ModelClass::createBoundUpdateStatement(modelInstance);
 
         // Execute the query or bound statement
-        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::Instance()->getCassSession(), cassStatement);
+        CassFuture* cassFuture = cass_session_execute(AssessmentsModelManager::instance()->getCassSession(), cassStatement);
         CassError cassError = cass_future_error_code(cassFuture);
         bool success = (cassError == CASS_OK);
         if (success)
@@ -376,6 +377,7 @@ public:
 
         return success;
     }
+
 
     /**
      * @brief Get the Cassandra Cluster
@@ -429,35 +431,12 @@ public:
 
 private:
     /**
-     * @brief The singleton instance.
-     * NOTE: We hold a pointer here and not a plain value to be able to initialize it from the main controller without a "default value".
-     */
-    static AssessmentsModelManager* _instance;
-
-    /**
-     * @brief Constructor
-     * @param jsonHelper
-     * @param rootDirectoryPath
-     * @param parent
-     */
-    explicit AssessmentsModelManager(JsonHelper* jsonHelper,
-                                     QString rootDirectoryPath,
-                                     QObject *parent = nullptr);
-
-
-    /**
-     * @brief Destructor
-     */
-    ~AssessmentsModelManager() Q_DECL_OVERRIDE;
-
-
-private:
-    /**
      * @brief A cluster object describes the configuration of the Cassandra cluster and is used
      * to construct a session instance. Unlike other DataStax drivers the cluster object
      * does not maintain the control connection.
      */
     CassCluster* _cassCluster = nullptr;
+
 
     /**
      * @brief A session object is used to execute queries and maintains cluster state through
@@ -466,6 +445,7 @@ private:
      * pools of connections to cluster nodes which are used to query the cluster.
      */
     CassSession* _cassSession = nullptr;
+
 
     /**
      * @brief A UUID generator privoded by Cassandra

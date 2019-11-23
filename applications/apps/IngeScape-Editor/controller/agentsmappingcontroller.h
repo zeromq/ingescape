@@ -71,11 +71,9 @@ public:
     /**
      * @brief Constructor
      * @param modelManager
-     * @param jsonHelper
      * @param parent
      */
     explicit AgentsMappingController(EditorModelManager* modelManager,
-                                     JsonHelper* jsonHelper,
                                      QObject *parent = nullptr);
 
 
@@ -247,35 +245,6 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when a command must be sent on the network to an agent
-     * @param peerIdsList
-     * @param command
-     */
-    void commandAskedToAgent(QStringList peerIdsList, QString command);
-
-
-    /**
-     * @brief Signal emitted when a command must be sent on the network to an agent about mapping one of its input
-     * @param peerIdsList
-     * @param command
-     * @param inputName
-     * @param outputAgentName
-     * @param outputName
-     */
-    void commandAskedToAgentAboutMappingInput(QStringList peerIdsList, QString command, QString inputName, QString outputAgentName, QString outputName);
-
-
-    /**
-     * @brief Signal emitted when a command must be sent on the network to an agent about setting a value to one of its Input/Output/Parameter
-     * @param peerIdsList
-     * @param command
-     * @param agentIOPName
-     * @param value
-     */
-    void commandAskedToAgentAboutSettingValue(QStringList peerIdsList, QString command, QString agentIOPName, QString value);
-
-
-    /**
      * @brief Signal emitted when an action has to be executed
      * @param action
      */
@@ -289,13 +258,6 @@ public Q_SLOTS:
      * @param isMappingConnected
      */
     void onIsMappingConnectedChanged(bool isMappingConnected);
-
-
-    /**
-     * @brief Slot called when the flag "is Mapping Controlled" changed
-     * @param isMappingControlled
-     */
-    void onIsMappingControlledChanged(bool isMappingControlled);
 
 
     /**
@@ -562,9 +524,6 @@ private:
 
     // Manager for the data model of IngeScape
     EditorModelManager* _modelManager;
-
-    // Helper to manage JSON files
-    JsonHelper* _jsonHelper;
 
     // Hash table from agent name to the (view model of) agent in mapping
     QHash<QString, AgentInMappingVM*> _hashFromNameToAgentInMapping;

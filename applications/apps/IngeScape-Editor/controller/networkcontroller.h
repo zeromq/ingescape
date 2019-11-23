@@ -23,11 +23,18 @@
 #include "I2PropertyHelpers.h"
 #include <controller/ingescapenetworkcontroller.h>
 
+extern "C" {
+//#include <ingescape.h>
+//#include <ingescape_advanced.h>
+//#include <ingescape_private.h>
+#include <czmq.h>
+}
+
 
 /**
  * @brief The NetworkController class defines the controller for network communications
  */
-class NetworkController: public IngeScapeNetworkController
+class NetworkController : public QObject
 {
     Q_OBJECT
 
@@ -44,33 +51,7 @@ public:
     /**
       * @brief Destructor
       */
-    ~NetworkController() Q_DECL_OVERRIDE;
-
-
-    /**
-     * @brief Manage a "Shouted" message
-     * @param peerId
-     * @param peerName
-     * @param zMessage
-     */
-    void manageShoutedMessage(QString peerId, QString peerName, zmsg_t* zMessage) Q_DECL_OVERRIDE;
-
-
-    /**
-     * @brief Manage a "Whispered" message
-     * @param peerId
-     * @param peerName
-     * @param zMessage
-     */
-    void manageWhisperedMessage(QString peerId, QString peerName, zmsg_t* zMessage) Q_DECL_OVERRIDE;
-
-
-    /**
-     * @brief Send a command, parameters and the content of a JSON file to the recorder
-     * @param peerIdOfRecorder
-     * @param commandAndParameters
-     */
-    void sendCommandWithJsonToRecorder(QString peerIdOfRecorder, QStringList commandAndParameters);
+    ~NetworkController();
 
 
     /**
@@ -80,14 +61,6 @@ public:
      * @param status
      */
     void sendCommandExecutionStatusToExpe(QString peerIdOfExpe, QString command, QString commandParameters, int status);
-
-
-    /**
-     * @brief Send a (string) message to a peer id
-     * @param peerId
-     * @param message
-     */
-    void sendMessageToPeerId(QString peerId, QString message);
 
 
 Q_SIGNALS:
@@ -276,55 +249,51 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 
-    /**
-     * @brief Slot called when a command must be sent on the network to a launcher
-     * @param peerIdOfLauncher
-     * @param command
-     * @param commandLine
-     */
-    void onCommandAskedToLauncher(QString peerIdOfLauncher, QString command, QString commandLine);
+
+private Q_SLOTS:
+
+    // FIXME error: invalid application of 'sizeof' to an incomplete type '_zmsg_t'
+    // Q_STATIC_ASSERT_X(sizeof(T), "Type argument of Q_DECLARE_METATYPE(T*) must be fully defined");
+    //void _onShoutedMessageReceived(QString peerId, QString peerName, zmsg_t* zMessage);
+    //void _onWhisperedMessageReceived(QString peerId, QString peerName, zmsg_t* zMessage);
 
 
     /**
-     * @brief Slot called when a command must be sent on the network to an agent
-     * @param peerIdsList
-     * @param command
+     * @brief Slot called when a "Shouted" message (with one part) has been received
+     * @param peerId
+     * @param peerName
+     * @param message
      */
-    void onCommandAskedToAgent(QStringList peerIdsList, QString command);
+    void _onShoutedMessageReceived(QString peerId, QString peerName, QString message);
 
 
     /**
-     * @brief Slot called when a command must be sent on the network to an agent about one of its output
-     * @param peerIdsList
-     * @param command
-     * @param outputName
+     * @brief Slot called when a "Shouted" message (with several parts) has been received
+     * @param peerId
+     * @param peerName
+     * @param messagePart1
+     * @param messageOthersParts
      */
-    void onCommandAskedToAgentAboutOutput(QStringList peerIdsList, QString command, QString outputName);
+    void _onShoutedMessageReceived(QString peerId, QString peerName, QString messagePart1, QStringList messageOthersParts);
 
 
     /**
-     * @brief Slot called when a command must be sent on the network to an agent about setting a value to one of its Input/Output/Parameter
-     * @param peerIdsList
-     * @param command
-     * @param agentIOPName
-     * @param value
+     * @brief Slot called when "Whispered" message (with one part) has been received
+     * @param peerId
+     * @param peerName
+     * @param message
      */
-    void onCommandAskedToAgentAboutSettingValue(QStringList peerIdsList, QString command, QString agentIOPName, QString value);
+    void _onWhisperedMessageReceived(QString peerId, QString peerName, QString message);
 
 
     /**
-     * @brief Slot called when a command must be sent on the network to an agent about mapping one of its input
-     * @param peerIdsList
-     * @param command
-     * @param inputName
-     * @param outputAgentName
-     * @param outputName
+     * @brief Slot called when "Whispered" message (with several parts) has been received
+     * @param peerId
+     * @param peerName
+     * @param messagePart1
+     * @param messageOthersParts
      */
-    void onCommandAskedToAgentAboutMappingInput(QStringList peerIdsList, QString command, QString inputName, QString outputAgentName, QString outputName);
-
-
-private:
-
+    void _onWhisperedMessageReceived(QString peerId, QString peerName, QString messagePart1, QStringList messageOthersParts);
 
 };
 

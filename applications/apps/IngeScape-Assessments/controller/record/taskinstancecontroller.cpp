@@ -18,16 +18,12 @@
 
 /**
  * @brief Constructor
- * @param modelManager
- * @param jsonHelper
  * @param parent
  */
-TaskInstanceController::TaskInstanceController(JsonHelper* jsonHelper,
-                                               QObject *parent) : QObject(parent),
+TaskInstanceController::TaskInstanceController(QObject *parent) : QObject(parent),
     _timeLineC(nullptr),
     _scenarioC(nullptr),
-    _currentTaskInstance(nullptr),
-    _jsonHelper(jsonHelper)
+    _currentTaskInstance(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -38,10 +34,10 @@ TaskInstanceController::TaskInstanceController(JsonHelper* jsonHelper,
     _timeLineC = new AbstractTimeActionslineScenarioViewController(this);
 
     // Create the controller for scenario management
-    _scenarioC = new AbstractScenarioController(AssessmentsModelManager::Instance(), _jsonHelper, this);
+    _scenarioC = new AbstractScenarioController(this);
 
     // List of agents present in current Platform
-    _agentsGroupedByNameInCurrentPlatform.setSourceModel(AssessmentsModelManager::Instance()->allAgentsGroupsByName());
+    _agentsGroupedByNameInCurrentPlatform.setSourceModel(IngeScapeModelManager::instance()->allAgentsGroupsByName());
 
     // Connect to the signal "time range changed" from the time line
     // to the scenario controller to filter the action view models
@@ -86,10 +82,6 @@ TaskInstanceController::~TaskInstanceController()
         delete temp;
         temp = nullptr;
     }
-
-
-    // Reset pointers
-    _jsonHelper = nullptr;
 }
 
 
@@ -120,10 +112,9 @@ void TaskInstanceController::setcurrentTaskInstance(TaskInstanceM *value)
  */
 void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previousTaskInstance, TaskInstanceM* currentTaskInstance)
 {
-    if ((AssessmentsModelManager::Instance() != nullptr) && (_scenarioC != nullptr))
+    IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
+    if ((ingeScapeModelManager != nullptr) && (_scenarioC != nullptr))
     {
-        AssessmentsModelManager* modelManager = AssessmentsModelManager::Instance();
-
         //
         // Clean the previous session
         //
@@ -133,13 +124,13 @@ void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previo
             _scenarioC->clearScenario();
 
             // Delete all published values
-            modelManager->deleteAllPublishedValues();
+            ingeScapeModelManager->deleteAllPublishedValues();
 
             // Delete all (models of) actions
-            modelManager->deleteAllActions();
+            ingeScapeModelManager->deleteAllActions();
 
             // Delete agents OFF
-            QStringList namesListOfAgentsON = modelManager->deleteAgentsOFF();
+            QStringList namesListOfAgentsON = ingeScapeModelManager->deleteAgentsOFF();
             qDebug() << "Remaining agents ON:" << namesListOfAgentsON;
         }
 
@@ -151,10 +142,6 @@ void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previo
         {
             if (currentTaskInstance->task()->platformFileUrl().isValid())
             {
-                //_agentsGroupedByNameInCurrentPlatform.updateProtocol(currentTaskInstance->task());
-
-                _agentsGroupedByNameInCurrentPlatform.setcurrentProtocol(currentTaskInstance->task());
-
                 QString platformFilePath = currentTaskInstance->task()->platformFileUrl().path();
 
                 QFile jsonFile(platformFilePath);
@@ -185,7 +172,7 @@ void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previo
                             // Import the agents list from JSON
                             if (jsonRoot.contains("agents"))
                             {
-                                modelManager->importAgentsListFromJson(jsonRoot.value("agents").toArray(), versionJsonPlatform);
+                                ingeScapeModelManager->importAgentsListFromJson(jsonRoot.value("agents").toArray(), versionJsonPlatform);
                             }
 
                             // Import the scenario from JSON
@@ -202,6 +189,10 @@ void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previo
                 else {
                     qWarning() << "There is no file" << platformFilePath;
                 }
+
+                // Update the filter
+                _agentsGroupedByNameInCurrentPlatform.setcurrentProtocol(currentTaskInstance->task());
+                _agentsGroupedByNameInCurrentPlatform.forceUpdate();
             }
             else {
                 qWarning() << "The URL of platform" << currentTaskInstance->task()->platformFileUrl() << "is not valid";
@@ -209,6 +200,7 @@ void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previo
         }
     }
 }
+
 
 /**
  * @brief Adds the given URLs as attachements for this record

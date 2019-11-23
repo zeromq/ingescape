@@ -16,23 +16,18 @@
 
 /**
  * @brief Constructor
- * @param modelManager
  * @param parent
  */
-ValuesHistoryController::ValuesHistoryController(EditorModelManager* modelManager,
-                                                 QObject *parent) : QObject(parent),
-    _modelManager(modelManager)
+ValuesHistoryController::ValuesHistoryController(QObject *parent) : QObject(parent)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    if (_modelManager != nullptr)
-    {
-        //
-        // Link our list to the list of the model manager
-        //
-        _filteredValues.setSourceModel(_modelManager->publishedValues());
-    }
+
+    //
+    // Link our list to the list of the model manager
+    //
+    _filteredValues.setSourceModel(IngeScapeModelManager::instance()->publishedValues());
 }
 
 
@@ -41,7 +36,7 @@ ValuesHistoryController::ValuesHistoryController(EditorModelManager* modelManage
  */
 ValuesHistoryController::~ValuesHistoryController()
 {
-    _modelManager = nullptr;
+    _filteredValues.setSourceModel(nullptr);
 }
 
 

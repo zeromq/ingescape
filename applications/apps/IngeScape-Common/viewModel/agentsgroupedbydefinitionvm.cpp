@@ -15,6 +15,8 @@
 #include "agentsgroupedbydefinitionvm.h"
 #include <QFileDialog>
 #include <model/enums.h>
+#include <controller/ingescapemodelmanager.h>
+#include <controller/ingescapenetworkcontroller.h>
 
 
 /**
@@ -123,29 +125,40 @@ void AgentsGroupedByDefinitionVM::setisMuted(bool value)
     }
 }
 
-
 /**
- * @brief Change the state of our agent
+ * @brief Ask to start our agent
  */
-void AgentsGroupedByDefinitionVM::changeState()
+void AgentsGroupedByDefinitionVM::askStartAgent()
 {
-    // is ON --> Kill all agents
-    if (_isON)
+    for (AgentM* model : _models.toList())
     {
-        Q_EMIT commandAskedToAgent(_peerIdsList, command_StopAgent);
-    }
-    // is OFF --> Execute all agents
-    else
-    {
-        for (AgentM* model : _models.toList())
+        // Check if the model has a hostname
+        if ((model != nullptr) && !model->hostname().isEmpty())
         {
-            // Check if the model has a hostname
-            if ((model != nullptr) && !model->hostname().isEmpty())
+            // Get the peer id of the Launcher on this host
+            QString peerIdOfLauncher = IngeScapeModelManager::instance()->getPeerIdOfLauncherOnHost(model->hostname());
+            if (!peerIdOfLauncher.isEmpty())
             {
-                Q_EMIT commandAskedToLauncher(model->hostname(), command_StartAgent, model->commandLine());
+                QStringList message = {
+                    command_StartAgent,
+                    model->commandLine()
+                };
+
+                // Send the message "Start Agent" to the IngeScape Launcher
+                IngeScapeNetworkController::instance()->sendStringMessageToAgent(peerIdOfLauncher, message);
             }
         }
     }
+}
+
+
+/**
+ * @brief Ask to stop our agent
+ */
+void AgentsGroupedByDefinitionVM::askStopAgent()
+{
+    // Send the message "Stop Agent" to our agent
+    IngeScapeNetworkController::instance()->sendStringMessageToAgents(_peerIdsList, command_StopAgent);
 }
 
 
@@ -154,11 +167,15 @@ void AgentsGroupedByDefinitionVM::changeState()
  */
 void AgentsGroupedByDefinitionVM::changeMuteAllOutputs()
 {
-    if (_isMuted) {
-        Q_EMIT commandAskedToAgent(_peerIdsList, command_UnmuteAgent);
+    if (_isMuted)
+    {
+        // Send the message to our agent (list of models of agent)
+        IngeScapeNetworkController::instance()->sendStringMessageToAgents(_peerIdsList, command_UnmuteAgent);
     }
-    else {
-        Q_EMIT commandAskedToAgent(_peerIdsList, command_MuteAgent);
+    else
+    {
+        // Send the message to our agent (list of models of agent)
+        IngeScapeNetworkController::instance()->sendStringMessageToAgents(_peerIdsList, command_MuteAgent);
     }
 }
 
@@ -168,11 +185,15 @@ void AgentsGroupedByDefinitionVM::changeMuteAllOutputs()
  */
 void AgentsGroupedByDefinitionVM::changeFreeze()
 {
-    if (_isFrozen) {
-        Q_EMIT commandAskedToAgent(_peerIdsList, command_UnfreezeAgent);
+    if (_isFrozen)
+    {
+        // Send the message to our agent (list of models of agent)
+        IngeScapeNetworkController::instance()->sendStringMessageToAgents(_peerIdsList, command_UnfreezeAgent);
     }
-    else {
-        Q_EMIT commandAskedToAgent(_peerIdsList, command_FreezeAgent);
+    else
+    {
+        // Send the message to our agent (list of models of agent)
+        IngeScapeNetworkController::instance()->sendStringMessageToAgents(_peerIdsList, command_FreezeAgent);
     }
 }
 
@@ -282,11 +303,13 @@ void AgentsGroupedByDefinitionVM::downloadMapping()
  */
 void AgentsGroupedByDefinitionVM::changeLogInStream()
 {
-    if (_hasLogInStream) {
-        Q_EMIT commandAskedToAgent(_peerIdsList, command_DisableLogStream);
+    if (_hasLogInStream)
+    {
+        IngeScapeNetworkController::instance()->sendStringMessageToAgents(_peerIdsList, command_DisableLogStream);
     }
-    else {
-        Q_EMIT commandAskedToAgent(_peerIdsList, command_EnableLogStream);
+    else
+    {
+        IngeScapeNetworkController::instance()->sendStringMessageToAgents(_peerIdsList, command_EnableLogStream);
     }
 }
 
@@ -296,11 +319,13 @@ void AgentsGroupedByDefinitionVM::changeLogInStream()
  */
 void AgentsGroupedByDefinitionVM::changeLogInFile()
 {
-    if (_hasLogInFile) {
-        Q_EMIT commandAskedToAgent(_peerIdsList, command_DisableLogFile);
+    if (_hasLogInFile)
+    {
+        IngeScapeNetworkController::instance()->sendStringMessageToAgents(_peerIdsList, command_DisableLogFile);
     }
-    else {
-        Q_EMIT commandAskedToAgent(_peerIdsList, command_EnableLogFile);
+    else
+    {
+        IngeScapeNetworkController::instance()->sendStringMessageToAgents(_peerIdsList, command_EnableLogFile);
     }
 }
 
@@ -318,9 +343,9 @@ void AgentsGroupedByDefinitionVM::saveFilesPaths(QString definitionFilePath, QSt
     {
         qDebug() << "Path of definition changed to" << definitionFilePath;
 
-        QString command = QString("%1 %2").arg(command_SetDefinitionPath, definitionFilePath);
+        QString message = QString("%1 %2").arg(command_SetDefinitionPath, definitionFilePath);
 
-        Q_EMIT commandAskedToAgent(_peerIdsList, command);
+        IngeScapeNetworkController::instance()->sendStringMessageToAgents(_peerIdsList, message);
     }
 
     // Path for mapping file changed
@@ -328,9 +353,9 @@ void AgentsGroupedByDefinitionVM::saveFilesPaths(QString definitionFilePath, QSt
     {
         qDebug() << "Path of mapping changed to" << mappingFilePath;
 
-        QString command = QString("%1 %2").arg(command_SetMappingPath, mappingFilePath);
+        QString message = QString("%1 %2").arg(command_SetMappingPath, mappingFilePath);
 
-        Q_EMIT commandAskedToAgent(_peerIdsList, command);
+        IngeScapeNetworkController::instance()->sendStringMessageToAgents(_peerIdsList, message);
     }
 
     // Path for log file changed
@@ -338,9 +363,9 @@ void AgentsGroupedByDefinitionVM::saveFilesPaths(QString definitionFilePath, QSt
     {
         qDebug() << "Path of log changed to" << logFilePath;
 
-        QString command = QString("%1 %2").arg(command_SetLogPath, logFilePath);
+        QString message = QString("%1 %2").arg(command_SetLogPath, logFilePath);
 
-        Q_EMIT commandAskedToAgent(_peerIdsList, command);
+        IngeScapeNetworkController::instance()->sendStringMessageToAgents(_peerIdsList, message);
     }
 }
 
@@ -350,7 +375,7 @@ void AgentsGroupedByDefinitionVM::saveFilesPaths(QString definitionFilePath, QSt
  */
 void AgentsGroupedByDefinitionVM::saveDefinitionToPath()
 {
-    Q_EMIT commandAskedToAgent(_peerIdsList, command_SaveDefinitionToPath);
+    IngeScapeNetworkController::instance()->sendStringMessageToAgents(_peerIdsList, command_SaveDefinitionToPath);
 }
 
 
@@ -359,7 +384,7 @@ void AgentsGroupedByDefinitionVM::saveDefinitionToPath()
  */
 void AgentsGroupedByDefinitionVM::saveMappingToPath()
 {
-    Q_EMIT commandAskedToAgent(_peerIdsList, command_SaveMappingToPath);
+    IngeScapeNetworkController::instance()->sendStringMessageToAgents(_peerIdsList, command_SaveMappingToPath);
 }
 
 
@@ -927,8 +952,14 @@ void AgentsGroupedByDefinitionVM::_onIsMutedOutputOfModelChanged(bool isMutedOut
  * @param outputName
  */
 void AgentsGroupedByDefinitionVM::_onCommandAskedToAgentAboutOutput(QString command, QString outputName)
-{
-    Q_EMIT commandAskedToAgentAboutOutput(_peerIdsList, command, outputName);
+{   
+    QStringList message = {
+        command,
+        outputName
+    };
+
+    // Send the message to our agent (list of models of agent)
+    IngeScapeNetworkController::instance()->sendStringMessageToAgents(_peerIdsList, message);
 }
 
 

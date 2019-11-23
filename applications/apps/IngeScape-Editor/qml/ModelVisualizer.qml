@@ -106,7 +106,7 @@ Rectangle {
             }
 
             Text {
-                text: "- " + IngeScapeEditorC.networkC.numberOfAgents + " agents"
+                text: "- " + IgsNetworkController.numberOfAgents + " agents"
 
                 color: "white"
                 font {
@@ -116,7 +116,7 @@ Rectangle {
             }
 
             Text {
-                text: "- " + IngeScapeEditorC.networkC.numberOfLaunchers + " launchers"
+                text: "- " + IgsNetworkController.numberOfLaunchers + " launchers"
 
                 color: "white"
                 font {
@@ -126,7 +126,7 @@ Rectangle {
             }
 
             Text {
-                text: "- " + IngeScapeEditorC.networkC.numberOfRecorders + " recorders"
+                text: "- " + IgsNetworkController.numberOfRecorders + " recorders"
 
                 color: "white"
                 font {
@@ -136,7 +136,7 @@ Rectangle {
             }
 
             Text {
-                text: "- " + IngeScapeEditorC.networkC.numberOfEditors + " editors"
+                text: "- " + IgsNetworkController.numberOfEditors + " editors"
 
                 color: "white"
                 font {
@@ -146,7 +146,7 @@ Rectangle {
             }
 
             Text {
-                text: "- " + IngeScapeEditorC.networkC.numberOfAssessments + " assessments"
+                text: "- " + IgsNetworkController.numberOfAssessments + " assessments"
 
                 color: "white"
                 font {
@@ -156,7 +156,7 @@ Rectangle {
             }
 
             Text {
-                text: "- " + IngeScapeEditorC.networkC.numberOfExpes + " expes"
+                text: "- " + IgsNetworkController.numberOfExpes + " expes"
 
                 color: "white"
                 font {
@@ -182,7 +182,7 @@ Rectangle {
         }
         //height: contentHeight
 
-        model: IngeScapeEditorC.modelManager.allAgentsGroupsByName
+        model: IgsModelManager.allAgentsGroupsByName
 
         delegate: Rectangle {
 

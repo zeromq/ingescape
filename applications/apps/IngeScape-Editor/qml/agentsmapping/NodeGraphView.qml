@@ -862,11 +862,8 @@ Item {
         onCancelMappingActivation: {
             console.log("on Cancel Mapping Activation");
 
-            if (IngeScapeEditorC.modelManager)
-            {
-                // UN-activate the mapping
-                IngeScapeEditorC.modelManager.isMappingConnected = false;
-            }
+            // UN-activate the mapping
+            IgsModelManager.isMappingConnected = false;
         }
 
         onSwitchToControl: {
@@ -875,13 +872,13 @@ Item {
             if (IngeScapeEditorC.modelManager)
             {
                 // UN-activate the mapping
-                IngeScapeEditorC.modelManager.isMappingConnected = false;
+                IgsModelManager.isMappingConnected = false;
 
                 // Switch to CONTROL
                 IngeScapeEditorC.modelManager.isMappingControlled = true;
 
                 // Activate the mapping
-                IngeScapeEditorC.modelManager.isMappingConnected = true;
+                IgsModelManager.isMappingConnected = true;
             }
         }
 

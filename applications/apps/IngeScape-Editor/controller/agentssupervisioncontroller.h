@@ -41,13 +41,9 @@ class AgentsSupervisionController : public QObject
 public:
     /**
      * @brief Constructor
-     * @param modelManager
-     * @param jsonHelper
      * @param parent
      */
-    explicit AgentsSupervisionController(EditorModelManager* modelManager,
-                                         JsonHelper* jsonHelper,
-                                         QObject *parent = nullptr);
+    explicit AgentsSupervisionController(QObject *parent = nullptr);
 
 
     /**
@@ -64,32 +60,6 @@ public:
 
 
 Q_SIGNALS:
-
-    /**
-     * @brief Signal emitted when a command must be sent on the network to a launcher
-     * @param peerIdOfLauncher
-     * @param command
-     * @param commandLine
-     */
-    void commandAskedToLauncher(QString peerIdOfLauncher, QString command, QString commandLine);
-
-
-    /**
-     * @brief Signal emitted when a command must be sent on the network to agent(s)
-     * @param peerIdsList
-     * @param command
-     */
-    void commandAskedToAgent(QStringList peerIdsList, QString command);
-
-
-    /**
-     * @brief Signal emitted when a command must be sent on the network to agent(s) about one of its output
-     * @param peerIdsList
-     * @param command
-     * @param outputName
-     */
-    void commandAskedToAgentAboutOutput(QStringList peerIdsList, QString command, QString outputName);
-
 
     /**
      * @brief Signal emitted when we have to open the values history of an agent
@@ -122,15 +92,6 @@ public Q_SLOTS:
 
 
 private Q_SLOTS:
-
-    /**
-     * @brief Slot called when a command must be sent on the network to a launcher
-     * @param hostname
-     * @param command
-     * @param commandLine
-     */
-    void _onCommandAskedToLauncher(QString hostname, QString command, QString commandLine);
-
 
     /**
      * @brief Slot called when we have to load an agent definition from a JSON file (path)
@@ -182,12 +143,6 @@ private:
 
 
 private:
-
-    // Manager for the data model of IngeScape
-    EditorModelManager* _modelManager;
-
-    // Helper to manage JSON files
-    JsonHelper* _jsonHelper;
 
     // Hash table from a definition name to a list of definitions with this name
     QHash<QString, QList<DefinitionM*>> _hashFromDefinitionNameToDefinitionsList;

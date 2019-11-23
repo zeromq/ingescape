@@ -20,7 +20,6 @@
 
 /**
  * @brief Constructor
- * @param modelManager
  * @param parent
  */
 SubjectsController::SubjectsController(QObject *parent) : QObject(parent),
@@ -171,7 +170,7 @@ void SubjectsController::deleteCharacteristic(CharacteristicM* characteristic)
  */
 void SubjectsController::createNewSubject()
 {
-    if ((_currentExperimentation != nullptr) && (AssessmentsModelManager::Instance() != nullptr))
+    if ((_currentExperimentation != nullptr) && (AssessmentsModelManager::instance() != nullptr))
     {
         QDateTime now = QDateTime::currentDateTime();
 
@@ -241,7 +240,7 @@ void SubjectsController::deleteSubject(SubjectM* subject)
  */
 void SubjectsController::_onCurrentExperimentationChanged(ExperimentationM* currentExperimentation)
 {
-    if ((currentExperimentation != nullptr) && (AssessmentsModelManager::Instance() != nullptr))
+    if ((currentExperimentation != nullptr) && (AssessmentsModelManager::instance() != nullptr))
     {
         qDebug() << "Subjects Controller: on Current Experimentation changed" << currentExperimentation->name();
 

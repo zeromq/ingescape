@@ -15,33 +15,39 @@
 #include "experimentationcontroller.h"
 
 #include <ctime>
-
+#include <controller/ingescapenetworkcontroller.h>
 #include <controller/assessmentsmodelmanager.h>
 #include "model/subject/characteristicvaluem.h"
 #include "model/task/independentvariablevaluem.h"
 
 /**
  * @brief Constructor
- * @param modelManager
- * @param jsonHelper
  * @param parent
  */
-ExperimentationController::ExperimentationController(JsonHelper* jsonHelper,
-                                                     QObject *parent) : QObject(parent),
+ExperimentationController::ExperimentationController(QObject *parent) : QObject(parent),
     _taskInstanceC(nullptr),
     _currentExperimentation(nullptr),
     _peerIdOfRecorder(""),
     _peerNameOfRecorder(""),
-    _isRecorderON(false),
-    _jsonHelper(jsonHelper)
+    _isRecorderON(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     qInfo() << "New Experimentation Controller";
 
-    // Create the controller to manage a record of the current experimentation
-    _taskInstanceC = new TaskInstanceController(_jsonHelper, this);
+    // Create the controller to manage a session of the current experimentation
+    _taskInstanceC = new TaskInstanceController(this);
+
+    // Connect to signals from the session controller
+    connect(_taskInstanceC, &TaskInstanceController::startToRecord, this, &ExperimentationController::_onStartToRecord);
+
+    // Connect to signals from the controller of the scenario
+    if (_taskInstanceC->scenarioC() != nullptr)
+    {
+        connect(_taskInstanceC->scenarioC(), &AbstractScenarioController::actionWillBeExecuted, this, &ExperimentationController::_onActionWillBeExecuted);
+        connect(_taskInstanceC->scenarioC(), &AbstractScenarioController::timeLineStateUpdated, this, &ExperimentationController::_onTimeLineStateUpdated);
+    }
 }
 
 
@@ -67,9 +73,6 @@ ExperimentationController::~ExperimentationController()
         delete temp;
         temp = nullptr;
     }
-
-    // Reset pointers
-    _jsonHelper = nullptr;
 }
 
 
@@ -185,12 +188,13 @@ void ExperimentationController::exportSelectedSessions()
 
         if (_isRecorderON && !sessionIds.isEmpty())
         {
-            QString commandAndParameters = QString("%1=%2").arg(command_ExportSessions, sessionIds.join('|'));
+            QString message = QString("%1=%2").arg(command_ExportSessions, sessionIds.join('|'));
 
             //QString experimentationUID = AssessmentsModelManager::cassUuidToQString(_currentExperimentation->getCassUuid());
-            //QString commandAndParameters = QString("%1=%2 [%3]").arg(command_ExportSessions, experimentationUID, sessionIds.join('|'));
+            //QString message = QString("%1=%2 [%3]").arg(command_ExportSessions, experimentationUID, sessionIds.join('|'));
 
-            Q_EMIT commandAskedToRecorder(_peerIdOfRecorder, commandAndParameters);
+            // Send the message "Export Sessions" to the recorder
+            IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerIdOfRecorder, message);
         }
     }
 }
@@ -245,7 +249,7 @@ void ExperimentationController::onRecorderExited(QString peerId, QString peerNam
  */
 void ExperimentationController::_onCurrentExperimentationChanged(ExperimentationM* currentExperimentation)
 {
-    if ((currentExperimentation != nullptr) && (AssessmentsModelManager::Instance() != nullptr))
+    if (currentExperimentation != nullptr)
     {
         qDebug() << "_on Current Experimentation Changed" << currentExperimentation->name();
 
@@ -265,6 +269,110 @@ void ExperimentationController::_onCurrentExperimentationChanged(Experimentation
         _retrieveIndependentVariableValuesForTaskInstancesInExperimentation(currentExperimentation);
     }
 }
+
+
+/**
+ * @brief Slot called when the user wants to start to record
+ */
+void ExperimentationController::_onStartToRecord()
+{
+    if ((_taskInstanceC != nullptr) && (_taskInstanceC->currentTaskInstance() != nullptr))
+    {
+        TaskM* protocol = _taskInstanceC->currentTaskInstance()->task();
+
+        if ((protocol != nullptr) && protocol->platformFileUrl().isValid())
+        {
+            QString platformFilePath = protocol->platformFileUrl().path();
+
+            // Get the JSON of the current platform
+            QFile jsonFile(platformFilePath);
+            if (jsonFile.exists())
+            {
+                if (jsonFile.open(QIODevice::ReadOnly))
+                {
+                    QByteArray byteArrayOfJson = jsonFile.readAll();
+                    jsonFile.close();
+
+                    QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArrayOfJson);
+
+                    if (_isRecorderON && !jsonDocument.isNull() && !jsonDocument.isEmpty())
+                    {
+                        QString jsonString = QString::fromUtf8(jsonDocument.toJson(QJsonDocument::Compact));
+
+                        // Add the delta from the start time of the TimeLine
+                        int deltaTimeFromTimeLineStart = 0;
+
+                        if (_taskInstanceC->scenarioC() != nullptr)
+                        {
+                            deltaTimeFromTimeLineStart = _taskInstanceC->scenarioC()->currentTime().msecsSinceStartOfDay();
+                        }
+
+                        QStringList message = {
+                            command_StartRecord,
+                            protocol->platformFileName(),
+                            QString::number(deltaTimeFromTimeLineStart),
+                            jsonString
+                        };
+
+                        // Send a ZMQ message in several parts to the recorder
+                        IngeScapeNetworkController::instance()->sendZMQMessageToAgent(_peerIdOfRecorder, message);
+                    }
+                }
+                else {
+                    qCritical() << "Can not open file" << platformFilePath;
+                }
+            }
+            else {
+                qWarning() << "There is no file" << platformFilePath;
+            }
+        }
+        else {
+            qWarning() << "The URL of platform" << protocol->platformFileUrl() << "is not valid";
+        }
+    }
+}
+
+
+/**
+ * @brief Slot called just before an action is performed
+ * (the message "EXECUTED ACTION" must be sent on the network to the recorder)
+ * @param message
+ */
+void ExperimentationController::_onActionWillBeExecuted(QString message)
+{
+    if (_isRecorderON)
+    {
+        // Send the message "EXECUTED ACTION" to the recorder
+        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerIdOfRecorder,
+                                                                   message);
+    }
+}
+
+
+/**
+ * @brief Slot called when the state of the TimeLine updated
+ * @param state
+ */
+void ExperimentationController::_onTimeLineStateUpdated(QString state)
+{
+    // Add the delta from the start time of the TimeLine
+    int deltaTimeFromTimeLineStart = 0;
+
+    if ((_taskInstanceC != nullptr) && (_taskInstanceC->scenarioC() != nullptr))
+    {
+        deltaTimeFromTimeLineStart = _taskInstanceC->scenarioC()->currentTime().msecsSinceStartOfDay();
+    }
+
+    // Notify the Recorder app
+    if (_isRecorderON)
+    {
+        QString notificationAndParameters = QString("%1=%2|%3").arg(notif_TimeLineState, state, QString::number(deltaTimeFromTimeLineStart));
+
+        // Send the message "TIMELINE STATE" to the recorder
+        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerIdOfRecorder, notificationAndParameters);
+    }
+}
+
 
 /**
  * @brief Create and insert a new task instance into the DB.
@@ -312,7 +420,7 @@ TaskInstanceM* ExperimentationController::_insertTaskInstanceIntoDB(const QStrin
  */
 void ExperimentationController::_retrieveIndependentVariableForTask(TaskM* task)
 {
-    if (AssessmentsModelManager::Instance() != nullptr)
+    if (task != nullptr)
     {
         QList<IndependentVariableM*> indepVarList = AssessmentsModelManager::select<IndependentVariableM>({ task->getExperimentationCassUuid(), task->getCassUuid() });
         for (IndependentVariableM* independentVariable : indepVarList) {
@@ -328,7 +436,7 @@ void ExperimentationController::_retrieveIndependentVariableForTask(TaskM* task)
  */
 void ExperimentationController::_retrieveDependentVariableForTask(TaskM* task)
 {
-    if ((task != nullptr) && (AssessmentsModelManager::Instance() != nullptr))
+    if (task != nullptr)
     {
         QList<DependentVariableM*> depVarList = AssessmentsModelManager::select<DependentVariableM>({ task->getExperimentationCassUuid(), task->getCassUuid() });
         for (DependentVariableM* dependentVariable : depVarList) {

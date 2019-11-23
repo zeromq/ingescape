@@ -17,7 +17,6 @@
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
-#include <model/jsonhelper.h>
 #include <controller/record/taskinstancecontroller.h>
 #include <model/experimentationm.h>
 
@@ -52,12 +51,9 @@ public:
 
     /**
      * @brief Constructor
-     * @param modelManager
-     * @param jsonHelper
      * @param parent
      */
-    explicit ExperimentationController(JsonHelper* jsonHelper,
-                                       QObject *parent = nullptr);
+    explicit ExperimentationController(QObject *parent = nullptr);
 
 
     /**
@@ -96,13 +92,6 @@ public:
 
 Q_SIGNALS:
 
-    /**
-     * @brief Signal emitted when a command must be sent on the network to the recorder
-     * @param peerIdOfRecorder
-     * @param commandAndParameters
-     */
-    void commandAskedToRecorder(QString peerIdOfRecorder, QString commandAndParameters);
-
 
 public Q_SLOTS:
 
@@ -131,6 +120,27 @@ private Q_SLOTS:
      * @param currentExperimentation
      */
     void _onCurrentExperimentationChanged(ExperimentationM* currentExperimentation);
+
+
+    /**
+     * @brief Slot called when the user wants to start to record
+     */
+    void _onStartToRecord();
+
+
+    /**
+     * @brief Slot called just before an action is performed
+     * (the message "EXECUTED ACTION" must be sent on the network to the recorder)
+     * @param message
+     */
+    void _onActionWillBeExecuted(QString message);
+
+
+    /**
+     * @brief Slot called when the state of the TimeLine updated
+     * @param state
+     */
+    void _onTimeLineStateUpdated(QString state);
 
 
 protected: // Methods
@@ -201,9 +211,8 @@ protected: // Methods
     void _retrieveIndependentVariableValuesForTaskInstancesInExperimentation(ExperimentationM* experimentation);
 
 
-protected: // Attributes
-    // Helper to manage JSON files
-    JsonHelper* _jsonHelper;
+protected:
+
 };
 
 QML_DECLARE_TYPE(ExperimentationController)

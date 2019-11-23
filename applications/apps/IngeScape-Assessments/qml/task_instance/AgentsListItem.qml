@@ -129,7 +129,7 @@ Item {
                     //right: parent.right
                 }
 
-                text: rootItem.agent.name
+                text: rootItem.agent ? rootItem.agent.name : ""
 
                 color: (rootItem.agent && rootItem.agent.isON) ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor
 

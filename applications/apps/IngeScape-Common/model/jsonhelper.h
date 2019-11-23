@@ -35,6 +35,125 @@ class JsonHelper : public QObject
 
 
 public:
+
+    /**
+     * @brief Create a model of agent definition from bytes (JSON file content)
+     * @param byteArrayOfJson
+     * @return
+     */
+    static DefinitionM* createModelOfAgentDefinitionFromBytes(QByteArray byteArrayOfJson);
+
+
+    /**
+     * @brief Create a model of agent definition from a JSON object
+     * @param jsonDefinition
+     * @return
+     */
+    static DefinitionM* createModelOfAgentDefinitionFromJSON(QJsonObject jsonDefinition);
+
+
+    /**
+     * @brief Create a model of agent mapping from bytes (JSON file content) and the corresponding input agent name
+     * @param inputAgentName
+     * @param byteArrayOfJson
+     * @return
+     */
+    static AgentMappingM* createModelOfAgentMappingFromBytes(QString inputAgentName, QByteArray byteArrayOfJson);
+
+
+    /**
+     * @brief Create a model of agent mapping from a JSON object and the corresponding input agent name
+     * @param inputAgentName
+     * @param jsonMapping
+     * @return
+     */
+    static AgentMappingM* createModelOfAgentMappingFromJSON(QString inputAgentName, QJsonObject jsonMapping);
+
+
+    /**
+     * @brief Export the model of agent definition into a JSON object
+     * @param agentDefinition
+     * @return JSON object
+     */
+    static QJsonObject exportAgentDefinitionToJson(DefinitionM* agentDefinition);
+
+
+    /**
+     * @brief Export the model of an agent mapping into a JSON object
+     * @param agentMapping
+     * @return JSON object
+     */
+    static QJsonObject exportAgentMappingToJson(AgentMappingM* agentMapping);
+
+
+    /**
+     * @brief Export the model of an agent mapping with changes (applied while the global mapping was UN-activated) into a JSON object
+     * @param agentMapping
+     * @param addedMappingElements
+     * @param namesOfRemovedMappingElements
+     * @return JSON object
+     */
+    static QJsonObject exportAgentMappingWithChangesToJson(AgentMappingM* agentMapping,
+                                                           QList<MappingElementM*> addedMappingElements,
+                                                           QStringList namesOfRemovedMappingElements);
+
+
+    /**
+     * @brief Get the JSON of an agent definition
+     * @param agentDefinition
+     * @param jsonFormat
+     * @return
+     */
+    static QString getJsonOfAgentDefinition(DefinitionM* agentDefinition, QJsonDocument::JsonFormat jsonFormat);
+
+
+    /**
+     * @brief Get the JSON of an agent mapping
+     * @param agentMapping
+     * @param jsonFormat
+     * @return
+     */
+    static QString getJsonOfAgentMapping(AgentMappingM* agentMapping, QJsonDocument::JsonFormat jsonFormat);
+
+
+    /**
+     * @brief Get the JSON of an agent mapping with changes (applied while the global mapping was UN-activated)
+     * @param agentMapping
+     * @param addedMappingElements
+     * @param namesOfRemovedMappingElements
+     * @param jsonFormat
+     * @return
+     */
+    static QString getJsonOfAgentMappingWithChanges(AgentMappingM* agentMapping,
+                                                    QList<MappingElementM*> addedMappingElements,
+                                                    QStringList namesOfRemovedMappingElements,
+                                                    QJsonDocument::JsonFormat jsonFormat);
+
+
+    /**
+     * @brief Create a model of scenario (actions in the list, in the palette and in the timeline) from JSON
+     * @param jsonScenario
+     * @param hashFromNameToAgentsGrouped
+     * @return
+     */
+    static ScenarioM* createModelOfScenarioFromJSON(QJsonObject jsonScenario,
+                                                    QHash<QString, AgentsGroupedByNameVM*> hashFromNameToAgentsGrouped);
+
+
+    /**
+     * @brief Export the actions lists into json object
+     * @param actions list
+     * @param actions list in the palette
+     * @param actions list in the timeline
+     * @return
+     */
+    static QJsonObject exportScenario(QList<ActionM*> actionsList,
+                                      QList<ActionInPaletteVM*> actionsInPaletteList,
+                                      QList<ActionVM*> actionsInTimeLine);
+
+
+private:
+
     /**
      * @brief Constructor
      * @param parent
@@ -49,141 +168,19 @@ public:
 
 
     /**
-     * @brief Create a model of agent definition from bytes (JSON file content)
-     * @param byteArrayOfJson
-     * @return
-     */
-    DefinitionM* createModelOfAgentDefinitionFromBytes(QByteArray byteArrayOfJson);
-
-
-    /**
-     * @brief Create a model of agent definition from a JSON object
-     * @param jsonDefinition
-     * @return
-     */
-    DefinitionM* createModelOfAgentDefinitionFromJSON(QJsonObject jsonDefinition);
-
-
-    /**
-     * @brief Create a model of agent mapping from bytes (JSON file content) and the corresponding input agent name
-     * @param inputAgentName
-     * @param byteArrayOfJson
-     * @return
-     */
-    AgentMappingM* createModelOfAgentMappingFromBytes(QString inputAgentName, QByteArray byteArrayOfJson);
-
-
-    /**
-     * @brief Create a model of agent mapping from a JSON object and the corresponding input agent name
-     * @param inputAgentName
-     * @param jsonMapping
-     * @return
-     */
-    AgentMappingM* createModelOfAgentMappingFromJSON(QString inputAgentName, QJsonObject jsonMapping);
-
-
-    /**
-     * @brief Export the model of agent definition into a JSON object
-     * @param agentDefinition
-     * @return JSON object
-     */
-    QJsonObject exportAgentDefinitionToJson(DefinitionM* agentDefinition);
-
-
-    /**
-     * @brief Export the model of an agent mapping into a JSON object
-     * @param agentMapping
-     * @return JSON object
-     */
-    QJsonObject exportAgentMappingToJson(AgentMappingM* agentMapping);
-
-
-    /**
-     * @brief Export the model of an agent mapping with changes (applied while the global mapping was UN-activated) into a JSON object
-     * @param agentMapping
-     * @param addedMappingElements
-     * @param namesOfRemovedMappingElements
-     * @return JSON object
-     */
-    QJsonObject exportAgentMappingWithChangesToJson(AgentMappingM* agentMapping,
-                                                    QList<MappingElementM*> addedMappingElements,
-                                                    QStringList namesOfRemovedMappingElements);
-
-
-    /**
-     * @brief Get the JSON of an agent definition
-     * @param agentDefinition
-     * @param jsonFormat
-     * @return
-     */
-    QString getJsonOfAgentDefinition(DefinitionM* agentDefinition, QJsonDocument::JsonFormat jsonFormat);
-
-
-    /**
-     * @brief Get the JSON of an agent mapping
-     * @param agentMapping
-     * @param jsonFormat
-     * @return
-     */
-    QString getJsonOfAgentMapping(AgentMappingM* agentMapping, QJsonDocument::JsonFormat jsonFormat);
-
-
-    /**
-     * @brief Get the JSON of an agent mapping with changes (applied while the global mapping was UN-activated)
-     * @param agentMapping
-     * @param addedMappingElements
-     * @param namesOfRemovedMappingElements
-     * @param jsonFormat
-     * @return
-     */
-    QString getJsonOfAgentMappingWithChanges(AgentMappingM* agentMapping,
-                                             QList<MappingElementM*> addedMappingElements,
-                                             QStringList namesOfRemovedMappingElements,
-                                             QJsonDocument::JsonFormat jsonFormat);
-
-
-    /**
-     * @brief Create a model of scenario (actions in the list, in the palette and in the timeline) from JSON
-     * @param jsonScenario
-     * @param hashFromNameToAgentsGrouped
-     * @return
-     */
-    ScenarioM* createModelOfScenarioFromJSON(QJsonObject jsonScenario,
-                                             QHash<QString, AgentsGroupedByNameVM*> hashFromNameToAgentsGrouped);
-
-
-    /**
-     * @brief Export the actions lists into json object
-     * @param actions list
-     * @param actions list in the palette
-     * @param actions list in the timeline
-     * @return
-     */
-    QJsonObject exportScenario(QList<ActionM*> actionsList, QList<ActionInPaletteVM*> actionsInPaletteList, QList<ActionVM*> actionsInTimeLine);
-
-
-Q_SIGNALS:
-
-
-public Q_SLOTS:
-
-
-private:
-
-    /**
      * @brief Create a model of agent Input/Output/Parameter from JSON object
      * @param jsonObject
      * @param agentIOPType
      * @return
      */
-    AgentIOPM* _createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTypes::Value agentIOPType);
+    static AgentIOPM* _createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTypes::Value agentIOPType);
 
     /**
      * @brief Create a model of call from a JSON object
      * @param jsonObject
      * @return
      */
-    CallM* _createModelOfCall(const QJsonObject& jsonObject);
+    static CallM* _createModelOfCall(const QJsonObject& jsonObject);
 
 
     /**
@@ -191,7 +188,7 @@ private:
      * @param agentIOP
      * @return
      */
-    QJsonObject _getJsonFromAgentIOP(AgentIOPM* agentIOP);
+    static QJsonObject _getJsonFromAgentIOP(AgentIOPM* agentIOP);
 
 
     /**
@@ -199,7 +196,7 @@ private:
      * @param call
      * @return
      */
-    QJsonObject _getJsonFromCall(CallM* call);
+    static QJsonObject _getJsonFromCall(CallM* call);
 
 
     /**
@@ -208,7 +205,7 @@ private:
      * @param jsonObject
      * @return
      */
-    MappingElementM* _createModelOfMappingElement(QString inputAgentName, QJsonObject jsonObject);
+    static MappingElementM* _createModelOfMappingElement(QString inputAgentName, QJsonObject jsonObject);
 
 
     /**
@@ -217,8 +214,8 @@ private:
      * @param hashFromNameToAgentsGrouped
      * @return
      */
-    ActionEffectVM* _parseEffectVMFromJson(QJsonObject jsonEffect,
-                                           QHash<QString, AgentsGroupedByNameVM*> hashFromNameToAgentsGrouped);
+    static ActionEffectVM* _parseEffectVMFromJson(QJsonObject jsonEffect,
+                                                  QHash<QString, AgentsGroupedByNameVM*> hashFromNameToAgentsGrouped);
 
 
     /**
@@ -227,8 +224,8 @@ private:
      * @param hashFromNameToAgentsGrouped
      * @return
      */
-    ActionConditionVM* _parseConditionsVMFromJson(QJsonObject jsonCondition,
-                                                  QHash<QString, AgentsGroupedByNameVM*> hashFromNameToAgentsGrouped);
+    static ActionConditionVM* _parseConditionsVMFromJson(QJsonObject jsonCondition,
+                                                         QHash<QString, AgentsGroupedByNameVM*> hashFromNameToAgentsGrouped);
 
 };
 

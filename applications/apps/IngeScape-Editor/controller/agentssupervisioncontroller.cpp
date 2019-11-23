@@ -18,37 +18,24 @@
 #include <QQmlEngine>
 #include <QDebug>
 #include <model/editorenums.h>
+#include <controller/ingescapenetworkcontroller.h>
 
 
 /**
  * @brief Constructor
- * @param modelManager
- * @param jsonHelper
  * @param parent
  */
-AgentsSupervisionController::AgentsSupervisionController(EditorModelManager* modelManager,
-                                                         JsonHelper* jsonHelper,
-                                                         QObject *parent) : QObject(parent),
-    _selectedAgent(nullptr),
-    _modelManager(modelManager),
-    _jsonHelper(jsonHelper)
+AgentsSupervisionController::AgentsSupervisionController(QObject *parent) : QObject(parent),
+    _selectedAgent(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    if (_modelManager != nullptr)
-    {
-        // Agents are sorted on their name (alphabetical order)
-        _agentsList.setSortProperty("name");
+    // Agents are sorted on their name (alphabetical order)
+    _agentsList.setSortProperty("name");
 
-        // FIXME TODO: Add another property for sorting, because variants can provoke re-order in the list
-        //_agentsList.setSortProperty("TODO");
-
-        //_agentsList.setFilterProperty("TODO");
-        //_agentsList.setFilterFixedString("true");
-        //_agentsList.setFilterProperty("currentState");
-        //_agentsList.setFilterFixedString(QString::number(SegmentZoneStates::ENCOMBRE));
-    }
+    // FIXME TODO: Add another property for sorting, because variants can provoke re-order in the list
+    //_agentsList.setSortProperty("TODO");
 }
 
 
@@ -67,10 +54,6 @@ AgentsSupervisionController::~AgentsSupervisionController()
     // Deleted elsewhere (in the destructor of AgentsGroupedByNameVM)
     //_agentsList.deleteAllItems();
     _agentsList.clear();
-
-    // Reset pointers
-    _modelManager = nullptr;
-    _jsonHelper = nullptr;
 }
 
 
@@ -80,11 +63,11 @@ AgentsSupervisionController::~AgentsSupervisionController()
  */
 void AgentsSupervisionController::deleteAgentInList(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition)
 {
-    if ((_modelManager != nullptr) && (agentsGroupedByDefinition != nullptr))
+    if (agentsGroupedByDefinition != nullptr)
     {
         qInfo() << "Delete the agent" << agentsGroupedByDefinition->name() << "in the List";
 
-        AgentsGroupedByNameVM* agentsGroupedByName = _modelManager->getAgentsGroupedForName(agentsGroupedByDefinition->name());
+        AgentsGroupedByNameVM* agentsGroupedByName = IngeScapeModelManager::instance()->getAgentsGroupedForName(agentsGroupedByDefinition->name());
         if (agentsGroupedByName != nullptr) {
             // Delete the view model of agents grouped by definition
             agentsGroupedByName->deleteAgentsGroupedByDefinition(agentsGroupedByDefinition);
@@ -102,13 +85,10 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionHasBeenCreated(Agen
     if (agentsGroupedByDefinition != nullptr)
     {
         // Propagate some signals from this new view model of agents grouped by definition
-        connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::commandAskedToAgent, this, &AgentsSupervisionController::commandAskedToAgent);
-        connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::commandAskedToAgentAboutOutput, this, &AgentsSupervisionController::commandAskedToAgentAboutOutput);
         connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::openValuesHistoryOfAgent, this, &AgentsSupervisionController::openValuesHistoryOfAgent);
         connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::openLogStreamOfAgents, this, &AgentsSupervisionController::openLogStreamOfAgents);
 
         // Connect some signals from this new view model of agents grouped by definition to slots
-        connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::commandAskedToLauncher, this, &AgentsSupervisionController::_onCommandAskedToLauncher);
         connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::loadAgentDefinitionFromPath, this, &AgentsSupervisionController::_onLoadAgentDefinitionFromPath);
         connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::loadAgentMappingFromPath, this, &AgentsSupervisionController::_onLoadAgentMappingFromPath);
         connect(agentsGroupedByDefinition, &AgentsGroupedByDefinitionVM::downloadAgentDefinitionToPath, this, &AgentsSupervisionController::_onDownloadAgentDefinitionToPath);
@@ -185,26 +165,6 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted(Agent
 
 
 /**
- * @brief Slot called when a command must be sent on the network to a launcher
- * @param hostname
- * @param command
- * @param commandLine
- */
-void AgentsSupervisionController::_onCommandAskedToLauncher(QString hostname, QString command, QString commandLine)
-{
-    if (_modelManager != nullptr)
-    {
-        // Get the peer id of the Launcher on this host
-        QString peerIdOfLauncher = _modelManager->getPeerIdOfLauncherOnHost(hostname);
-        if (!peerIdOfLauncher.isEmpty())
-        {
-            Q_EMIT commandAskedToLauncher(peerIdOfLauncher, command, commandLine);
-        }
-    }
-}
-
-
-/**
  * @brief Slot called when we have to load an agent definition from a JSON file (path)
  * @param peerIdsList
  * @param definitionFilePath
@@ -212,7 +172,7 @@ void AgentsSupervisionController::_onCommandAskedToLauncher(QString hostname, QS
 void AgentsSupervisionController::_onLoadAgentDefinitionFromPath(QStringList peerIdsList, QString definitionFilePath)
 {
     AgentsGroupedByDefinitionVM* agentsGroupedByDefinition = qobject_cast<AgentsGroupedByDefinitionVM*>(sender());
-    if ((_jsonHelper != nullptr) && (agentsGroupedByDefinition != nullptr) && !peerIdsList.isEmpty() && !definitionFilePath.isEmpty())
+    if ((agentsGroupedByDefinition != nullptr) && !peerIdsList.isEmpty() && !definitionFilePath.isEmpty())
     {
         QFile jsonFile(definitionFilePath);
         if (jsonFile.open(QIODevice::ReadOnly))
@@ -226,9 +186,11 @@ void AgentsSupervisionController::_onLoadAgentDefinitionFromPath(QStringList pee
             QString jsonOfDefinition = QString(jsonDocument.toJson(QJsonDocument::Compact));
 
             // Create the command "Load Definition"
-            QString command = QString("%1%2").arg(command_LoadDefinition, jsonOfDefinition);
+            QString message = QString("%1%2").arg(command_LoadDefinition, jsonOfDefinition);
 
-            Q_EMIT commandAskedToAgent(peerIdsList, command);
+            // Send the message to the agent (list of models of agent)
+            // FIXME: JSON can be too big for a string
+            IngeScapeNetworkController::instance()->sendStringMessageToAgents(peerIdsList, message);
         }
         else {
             qCritical() << "Can not open file" << definitionFilePath << "(to load the definition of" << agentsGroupedByDefinition->name() << ")";
@@ -244,7 +206,7 @@ void AgentsSupervisionController::_onLoadAgentDefinitionFromPath(QStringList pee
 void AgentsSupervisionController::_onLoadAgentMappingFromPath(QStringList peerIdsList, QString mappingFilePath)
 {
     AgentsGroupedByDefinitionVM* agentsGroupedByDefinition = qobject_cast<AgentsGroupedByDefinitionVM*>(sender());
-    if ((_jsonHelper != nullptr) && (agentsGroupedByDefinition != nullptr) && !peerIdsList.isEmpty() && !mappingFilePath.isEmpty())
+    if ((agentsGroupedByDefinition != nullptr) && !peerIdsList.isEmpty() && !mappingFilePath.isEmpty())
     {
         QFile jsonFile(mappingFilePath);
         if (jsonFile.open(QIODevice::ReadOnly))
@@ -258,9 +220,11 @@ void AgentsSupervisionController::_onLoadAgentMappingFromPath(QStringList peerId
             QString jsonOfMapping = QString(jsonDocument.toJson(QJsonDocument::Compact));
 
             // Create the command "Load Mapping"
-            QString command = QString("%1%2").arg(command_LoadMapping, jsonOfMapping);
+            QString message = QString("%1%2").arg(command_LoadMapping, jsonOfMapping);
 
-            Q_EMIT commandAskedToAgent(peerIdsList, command);
+            // Send the message to the agent (list of models of agent)
+            // FIXME: JSON can be too big for a string
+            IngeScapeNetworkController::instance()->sendStringMessageToAgents(peerIdsList, message);
         }
         else {
             qCritical() << "Can not open file" << mappingFilePath << "(to load the mapping of" << agentsGroupedByDefinition->name() << ")";
@@ -277,10 +241,10 @@ void AgentsSupervisionController::_onLoadAgentMappingFromPath(QStringList peerId
 void AgentsSupervisionController::_onDownloadAgentDefinitionToPath(DefinitionM* agentDefinition, QString definitionFilePath)
 {
     AgentsGroupedByDefinitionVM* agentsGroupedByDefinition = qobject_cast<AgentsGroupedByDefinitionVM*>(sender());
-    if ((_jsonHelper != nullptr) && (agentsGroupedByDefinition != nullptr) && (agentDefinition != nullptr) && !definitionFilePath.isEmpty())
+    if ((agentsGroupedByDefinition != nullptr) && (agentDefinition != nullptr) && !definitionFilePath.isEmpty())
     {
         // Get the JSON of the agent definition
-        QString jsonOfDefinition = _jsonHelper->getJsonOfAgentDefinition(agentDefinition, QJsonDocument::Indented);
+        QString jsonOfDefinition = JsonHelper::getJsonOfAgentDefinition(agentDefinition, QJsonDocument::Indented);
         if (!jsonOfDefinition.isEmpty())
         {
             QFile jsonFile(definitionFilePath);
@@ -309,10 +273,10 @@ void AgentsSupervisionController::_onDownloadAgentDefinitionToPath(DefinitionM* 
 void AgentsSupervisionController::_onDownloadAgentMappingToPath(AgentMappingM* agentMapping, QString mappingFilePath)
 {
     AgentsGroupedByDefinitionVM* agentsGroupedByDefinition = qobject_cast<AgentsGroupedByDefinitionVM*>(sender());
-    if ((_jsonHelper != nullptr) && (agentsGroupedByDefinition != nullptr) && (agentMapping != nullptr) && !mappingFilePath.isEmpty())
+    if ((agentsGroupedByDefinition != nullptr) && (agentMapping != nullptr) && !mappingFilePath.isEmpty())
     {
         // Get the JSON of the agent mapping
-        QString jsonOfMapping = _jsonHelper->getJsonOfAgentMapping(agentMapping, QJsonDocument::Indented);
+        QString jsonOfMapping = JsonHelper::getJsonOfAgentMapping(agentMapping, QJsonDocument::Indented);
         if (!jsonOfMapping.isEmpty())
         {
             QFile jsonFile(mappingFilePath);

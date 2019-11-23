@@ -85,13 +85,9 @@ public:
 
     /**
      * @brief Constructor
-     * @param modelManager
-     * @param jsonHelper
      * @param parent
      */
-    explicit AbstractScenarioController(IngeScapeModelManager* modelManager,
-                                        JsonHelper* jsonHelper,
-                                        QObject *parent = nullptr);
+    explicit AbstractScenarioController(QObject *parent = nullptr);
 
 
     /**
@@ -176,48 +172,11 @@ public:
 Q_SIGNALS:
 
     /**
-     * @brief Signal emitted when a command must be sent on the network to a launcher
-     * @param peerIdOfLauncher
-     * @param command
-     * @param commandLine
+     * @brief Signal emitted just before an action is performed
+     * (the message "EXECUTED ACTION" must be sent on the network to the recorder)
+     * @param message
      */
-    void commandAskedToLauncher(QString peerIdOfLauncher, QString command, QString commandLine);
-
-
-    /**
-     * @brief Signal emitted when a command must be sent on the network to a recorder
-     * @param commandAndParameters
-     */
-    void commandAskedToRecorder(QString commandAndParameters);
-
-
-    /**
-     * @brief Signal emitted when a command must be sent on the network to an agent
-     * @param peerIdsList
-     * @param command
-     */
-    void commandAskedToAgent(QStringList peerIdsList, QString command);
-
-
-    /**
-     * @brief Signal emitted when a command must be sent on the network to an agent about setting a value to one of its Input/Output/Parameter
-     * @param peerIdsList
-     * @param command
-     * @param agentIOPName
-     * @param value
-     */
-    void commandAskedToAgentAboutSettingValue(QStringList peerIdsList, QString command, QString agentIOPName, QString value);
-
-
-    /**
-     * @brief Signal emitted when a command must be sent on the network to an agent about mapping one of its input
-     * @param peerIdsList
-     * @param command
-     * @param inputName
-     * @param outputAgentName
-     * @param outputName
-     */
-    void commandAskedToAgentAboutMappingInput(QStringList peerIdsList, QString command, QString inputName, QString outputAgentName, QString outputName);
+    void actionWillBeExecuted(QString message);
 
 
     /**
@@ -344,12 +303,6 @@ protected:
 
 
 protected:
-
-    // Manager for the data model of IngeScape
-    IngeScapeModelManager* _modelManager;
-
-    // Helper to manage JSON files
-    JsonHelper* _jsonHelper;
 
     // List of all action names
     QStringList _allActionNames;
