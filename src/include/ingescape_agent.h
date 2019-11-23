@@ -190,11 +190,11 @@ PUBLIC bool igsAgent_getAllowInproc(igsAgent_t *agent);
 #endif
 
 //licenses
+typedef void (*igsAgent_licenseCallback)(igsAgent_t *agent, igs_license_limit_t limit, void *myData);
 #if !defined(TARGET_OS_IOS) || !TARGET_OS_IOS
 PUBLIC void igsAgent_setLicensePath(igsAgent_t *agent, const char *path);
 PUBLIC char *igsAgent_getLicensePath(igsAgent_t *agent);
 PUBLIC bool igsAgent_checkLicense(igsAgent_t *agent, const char *agentId);
-typedef void (*igsAgent_licenseCallback)(igsAgent_t *agent, igs_license_limit_t limit, void *myData);
 PUBLIC int igsAgent_observeLicense(igsAgent_t *agent, igsAgent_licenseCallback cb, void *myData);
 #endif
 

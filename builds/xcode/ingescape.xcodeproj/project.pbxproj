@@ -154,6 +154,7 @@
 		97A2128E22391A0D00ACCFB0 /* libczmq.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 97A2128C22391A0D00ACCFB0 /* libczmq.dylib */; };
 		97ABC93C2282EC5D00215310 /* monitor.c in Sources */ = {isa = PBXBuildFile; fileRef = 97ABC93B2282EC5D00215310 /* monitor.c */; };
 		97ABC93D2282EC5D00215310 /* monitor.c in Sources */ = {isa = PBXBuildFile; fileRef = 97ABC93B2282EC5D00215310 /* monitor.c */; };
+		97C55F9D2389B8DF00D0EDB2 /* ingescape_agent.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9738215023832BBF00D466DC /* ingescape_agent.h */; };
 		97FAC32B2244C88A0036293B /* yajl.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 973D1BB22226916D00D363BF /* yajl.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		97FAC32E2247BE920036293B /* license.c in Sources */ = {isa = PBXBuildFile; fileRef = 97FAC32C2247BE920036293B /* license.c */; };
 /* End PBXBuildFile section */
@@ -200,6 +201,7 @@
 			dstPath = include/ingescape;
 			dstSubfolderSpec = 16;
 			files = (
+				97C55F9D2389B8DF00D0EDB2 /* ingescape_agent.h in CopyFiles */,
 				977C247B1F03F50F00CA1675 /* ingescape.h in CopyFiles */,
 				973DC283207A479F004C1D80 /* ingescape_advanced.h in CopyFiles */,
 			);
