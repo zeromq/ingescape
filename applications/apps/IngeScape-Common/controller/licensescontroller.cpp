@@ -267,7 +267,7 @@ void LicensesController::refreshLicensesData()
     // Allows to update data about licenses
     igs_checkLicenseForAgent(nullptr);
 
-    if (internalAgent->license != nullptr)
+    if (globalAgent->license != nullptr)
     {
         if (_mergedLicense != nullptr)
         {
@@ -276,20 +276,20 @@ void LicensesController::refreshLicensesData()
             delete temp;
         }
 
-        setmergedLicense(new LicenseInformationM(internalAgent->license));
+        setmergedLicense(new LicenseInformationM(globalAgent->license));
         _licenseDetailsList.deleteAllItems();
 
         //
         // License details
         //
-        if ((internalAgent->license->licenseDetails != nullptr) && (zlist_size(internalAgent->license->licenseDetails) > 0))
+        if ((globalAgent->license->licenseDetails != nullptr) && (zlist_size(globalAgent->license->licenseDetails) > 0))
         {
-            license_t* detail = static_cast<license_t*>(zlist_first(internalAgent->license->licenseDetails));
+            license_t* detail = static_cast<license_t*>(zlist_first(globalAgent->license->licenseDetails));
             while (detail != nullptr)
             {
                 LicenseInformationM* licenseDetails = new LicenseInformationM(detail);
                 _licenseDetailsList.append(licenseDetails);
-                detail = static_cast<license_t*>(zlist_next(internalAgent->license->licenseDetails));
+                detail = static_cast<license_t*>(zlist_next(globalAgent->license->licenseDetails));
             }
         }
     }

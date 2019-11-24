@@ -167,9 +167,9 @@ void admin_log(igsAgent_t *agent, igs_logLevel_t level, const char *function, co
             strncat(agent->admin_logFile, ".log", 4095);
             printf("creating default log file %s\n", agent->admin_logFile);
             free(name);
-            if (processAgent->agentElements != NULL && processAgent->agentElements->node != NULL){
+            if (agent->agentElements != NULL && agent->agentElements->node != NULL){
                 bus_zyreLock();
-                zyre_shouts(processAgent->agentElements->node, CHANNEL, "LOG_FILE_PATH=%s", agent->admin_logFile);
+                zyre_shouts(agent->agentElements->node, CHANNEL, "LOG_FILE_PATH=%s", agent->admin_logFile);
                 bus_zyreUnlock();
             }
         }
@@ -207,8 +207,8 @@ void admin_log(igsAgent_t *agent, igs_logLevel_t level, const char *function, co
         }
         
     }
-    if (agent->admin_logInStream && processAgent->agentElements != NULL && processAgent->agentElements->logger != NULL){
-        zstr_sendf(processAgent->agentElements->logger, "%s;%s;%s;%s\n", agent->agentName, log_levels[level], function, agent->logContent);
+    if (agent->admin_logInStream && agent->agentElements != NULL && agent->agentElements->logger != NULL){
+        zstr_sendf(agent->agentElements->logger, "%s;%s;%s;%s\n", agent->agentName, log_levels[level], function, agent->logContent);
     }
     admin_unlock();
 
@@ -226,12 +226,12 @@ void igsAgent_setLogInFile (igsAgent_t *agent, bool allow){
     if (allow != agent->admin_logInFile){
         initInternalAgentIfNeeded();
         agent->admin_logInFile = allow;
-        if (processAgent->agentElements != NULL && processAgent->agentElements->node != NULL){
+        if (agent->agentElements != NULL && agent->agentElements->node != NULL){
             bus_zyreLock();
             if (allow){
-                zyre_shouts(processAgent->agentElements->node, CHANNEL, "LOG_IN_FILE=1");
+                zyre_shouts(agent->agentElements->node, CHANNEL, "LOG_IN_FILE=1");
             }else{
-                zyre_shouts(processAgent->agentElements->node, CHANNEL, "LOG_IN_FILE=0");
+                zyre_shouts(agent->agentElements->node, CHANNEL, "LOG_IN_FILE=0");
             }
             bus_zyreUnlock();
         }
@@ -261,7 +261,7 @@ bool igsAgent_getUseColorVerbose (igsAgent_t *agent) {
 void igsAgent_setLogStream(igsAgent_t *agent, bool stream){
     if (stream != agent->admin_logInStream){
         initInternalAgentIfNeeded();
-        if (processAgent->agentElements != NULL){
+        if (agent->agentElements != NULL){
             if (stream){
                 igsAgent_warn(agent, "agent is already started, log stream cannot be created anymore");
             }else{
@@ -270,12 +270,12 @@ void igsAgent_setLogStream(igsAgent_t *agent, bool stream){
             return;
         }
         agent->admin_logInStream = stream;
-        if (processAgent->agentElements != NULL && processAgent->agentElements->node != NULL){
+        if (agent->agentElements != NULL && agent->agentElements->node != NULL){
             bus_zyreLock();
             if (stream){
-                zyre_shouts(processAgent->agentElements->node, CHANNEL, "LOG_IN_STREAM=1");
+                zyre_shouts(agent->agentElements->node, CHANNEL, "LOG_IN_STREAM=1");
             }else{
-                zyre_shouts(processAgent->agentElements->node, CHANNEL, "LOG_IN_STREAM=0");
+                zyre_shouts(agent->agentElements->node, CHANNEL, "LOG_IN_STREAM=0");
             }
             bus_zyreUnlock();
         }
@@ -315,9 +315,9 @@ void igsAgent_setLogPath(igsAgent_t *agent, const char *path){
         }else{
             printf("switching to new log file: %s\n", agent->admin_logFile);
         }
-        if (agent->fp != NULL && processAgent->agentElements != NULL && processAgent->agentElements->node != NULL){
+        if (agent->fp != NULL && agent->agentElements != NULL && agent->agentElements->node != NULL){
             bus_zyreLock();
-            zyre_shouts(processAgent->agentElements->node, CHANNEL, "LOG_FILE_PATH=%s", agent->admin_logFile);
+            zyre_shouts(agent->agentElements->node, CHANNEL, "LOG_FILE_PATH=%s", agent->admin_logFile);
             bus_zyreUnlock();
         }
         admin_unlock();

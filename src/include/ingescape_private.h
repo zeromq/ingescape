@@ -359,7 +359,7 @@ typedef struct _igsAgent_t {
 
 //////////////////  FUNCTIONS  AND SHARED VARIABLES //////////////////
 
-PUBLIC extern igsAgent_t *processAgent;
+PUBLIC extern igsAgent_t *globalAgent;
 void initInternalAgentIfNeeded(void);
 
 //  definition
