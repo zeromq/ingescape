@@ -90,7 +90,7 @@ typedef struct agent_iop {
 typedef struct call{
     char * name;
     char * description;
-    igs_callFunction cb;
+    igsAgent_callFunction cb;
     void *cbData;
     igs_callArgument_t *arguments;
     struct call *reply;
@@ -234,7 +234,7 @@ typedef struct licenseEnforcement {
 } licenseEnforcement_t;
 
 typedef struct license_callback {
-    igs_licenseCallback callback_ptr;
+    igsAgent_licenseCallback callback_ptr;
     void* data;
     struct license_callback *prev;
     struct license_callback *next;
@@ -250,35 +250,35 @@ typedef struct monitor {
 } monitor_t;
 
 typedef struct monitorCallback {
-    igs_monitorCallback callback_ptr;
+    igsAgent_monitorCallback callback_ptr;
     void *myData;
     struct monitorCallback *prev;
     struct monitorCallback *next;
 } monitorCallback_t;
 
 typedef struct muteCallback {
-    igs_muteCallback callback_ptr;
+    igsAgent_muteCallback callback_ptr;
     void *myData;
     struct muteCallback *prev;
     struct muteCallback *next;
 } muteCallback_t;
 
 typedef struct freezeCallback {
-    igs_freezeCallback callback_ptr;
+    igsAgent_freezeCallback callback_ptr;
     void *myData;
     struct freezeCallback *prev;
     struct freezeCallback *next;
 } freezeCallback_t;
 
 typedef struct zyreCallback {
-    igs_BusMessageIncoming callback_ptr;
+    igsAgent_BusMessageIncoming callback_ptr;
     void *myData;
     struct zyreCallback *prev;
     struct zyreCallback *next;
 } zyreCallback_t;
 
 typedef struct forcedStopCalback {
-    igs_forcedStopCallback callback_ptr;
+    igsAgent_forcedStopCallback callback_ptr;
     void *myData;
     struct forcedStopCalback *prev;
     struct forcedStopCalback *next;
@@ -320,6 +320,18 @@ typedef struct _igsAgent_t {
     freezeCallback_t *freezeCallbacks;
     zyreCallback_t *zyreCallbacks;
     forcedStopCalback_t *forcedStopCalbacks;
+    
+    //admin
+    FILE *fp;
+    bool admin_logInStream;
+    bool admin_logInFile;
+    bool logInConsole;
+    bool useColorInConsole;
+    igs_logLevel_t logLevel;
+    char admin_logFile[4096];
+    char logContent[2048];
+    char logTime[128];
+    int nb_of_entries; //for fflush rotation
 
     //bus
     serviceHeader_t *serviceHeaders;
@@ -347,7 +359,7 @@ typedef struct _igsAgent_t {
 
 //////////////////  FUNCTIONS  AND SHARED VARIABLES //////////////////
 
-PUBLIC extern igsAgent_t *internalAgent;
+PUBLIC extern igsAgent_t *globalAgent;
 void initInternalAgentIfNeeded(void);
 
 //  definition
@@ -359,7 +371,7 @@ mapping_element_t * mapping_createMappingElement(const char * input_name,
                                                  const char *agent_name,
                                                  const char* output_name);
 unsigned long djb2_hash (unsigned char *str);
-bool mapping_checkCompatibilityInputOutput(agent_iop_t *foundInput, agent_iop_t *foundOutput);
+bool mapping_checkCompatibilityInputOutput(igsAgent_t *agent, agent_iop_t *foundInput, agent_iop_t *foundOutput);
 
 // model
 const agent_iop_t* model_writeIOP (igsAgent_t *agent, const char *iopName, iop_t iopType, iopType_t valType, void* value, size_t size);
@@ -382,11 +394,8 @@ mapping_t* parser_LoadMap (const char* json_str);
 mapping_t* parser_LoadMapFromPath (const char* load_file);
 
 // admin
-extern bool admin_logInStream;
-extern bool admin_logInFile;
-extern char admin_logFile[4096];
-void admin_makeFilePath(const char *from, char *to, size_t size_of_to);
-PUBLIC void igs_log(char *name, igs_logLevel_t, const char *function, const char *format, ...)  CHECK_PRINTF (4);
+void admin_makeFilePath(igsAgent_t *agent, const char *from, char *to, size_t size_of_to);
+PUBLIC void admin_log(igsAgent_t *agent, igs_logLevel_t, const char *function, const char *format, ...)  CHECK_PRINTF (4);
 
 //bus
 void bus_zyreLock(void);

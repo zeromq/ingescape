@@ -49,14 +49,16 @@ void license_readWriteLock(void)   {
     if (license_readWriteMutex == NULL){
         license_readWriteMutex = calloc(1, sizeof(pthread_mutex_t));
         if (pthread_mutex_init(license_readWriteMutex, NULL) != 0){
-            igs_error("mutex init failed");
+            igs_fatal("mutex init failed");
+            assert(false);
             return;
         }
     }
 #elif (defined WIN32 || defined _WIN32)
     if (license_readWriteMutex == NULL){
         if (pthread_mutex_init(&license_readWriteMutex) != 0){
-            igs_error("mutex init failed");
+            igs_fatal("mutex init failed");
+            assert(false);
             return;
         }
     }
@@ -68,7 +70,8 @@ void license_readWriteUnlock(void) {
     if (license_readWriteMutex != NULL){
         pthread_mutex_unlock(license_readWriteMutex);
     }else{
-        igs_error("mutex was NULL");
+        igs_fatal("mutex was NULL");
+        assert(false);
     }
 }
 
@@ -370,13 +373,13 @@ void license_readLicense(igsAgent_t *agent){
     }
     
     if (!zsys_file_exists(agent->licensePath)){
-        igs_error("%s could not be opened properly : no license found", agent->licensePath);
+        igsAgent_error(agent, "%s could not be opened properly : no license found", agent->licensePath);
     }else{
         //NB: zdir provides a function to scan folder contents but
         //this function scans all subdirectories which may take a very
         //long time, e.g. in /Applications/.
         //That's why we use dirent here.
-        igs_debug("scan for licenses in %s", agent->licensePath);
+        igsAgent_debug(agent, "scan for licenses in %s", agent->licensePath);
         zlist_t *filesList = zlist_new();
         DIR *dir;
         struct dirent *ent;
@@ -399,7 +402,7 @@ void license_readLicense(igsAgent_t *agent){
         } else {
             // could not open directory
         }
-        igs_debug("%zu license(s) found", zlist_size(filesList));
+        igsAgent_debug(agent, "%zu license(s) found", zlist_size(filesList));
         if (zlist_size(filesList) > 0){
             agent->license = calloc(1, sizeof(license_t));
             agent->license->features = zhash_new();
@@ -417,7 +420,7 @@ void license_readLicense(igsAgent_t *agent){
             
             const char *name = zfile_filename(file, NULL);
             detail->fileName = strdup(name);
-            igs_debug("parsing license file %s", name);
+            igsAgent_debug(agent, "parsing license file %s", name);
             //decrypt file
             char *licenseText = NULL;
             decryptLicenseFromFile(&licenseText, zfile_filename(file, NULL), secretEncryptionKey);
@@ -580,7 +583,7 @@ void license_readLicense(igsAgent_t *agent){
 ////////////////////////////////////////////////////////////////////////
 void igsAgent_setLicensePath(igsAgent_t *agent, const char *path){
     char reviewedPath[4096] = "";
-    admin_makeFilePath(path, reviewedPath, 4096);
+    admin_makeFilePath(agent, path, reviewedPath, 4096);
     if (zsys_file_exists(reviewedPath)){
         if (agent->licensePath != NULL){
             free(agent->licensePath);
@@ -609,7 +612,7 @@ bool igsAgent_checkLicense(igsAgent_t *agent, const char *agentId){
     return false;
 }
 
-int igsAgent_observeLicense(igsAgent_t *agent, igs_licenseCallback cb, void *myData){
+int igsAgent_observeLicense(igsAgent_t *agent, igsAgent_licenseCallback cb, void *myData){
     license_callback_t *l = (license_callback_t *)calloc(1, sizeof(license_callback_t));
     l->callback_ptr = cb;
     l->data = myData;

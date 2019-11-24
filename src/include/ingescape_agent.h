@@ -30,20 +30,27 @@ PUBLIC void igsAgent_destroy(igsAgent_t **agent);
 PUBLIC int igsAgent_startWithDevice(igsAgent_t *agent, const char *networkDevice, unsigned int port);
 PUBLIC int igsAgent_startWithIP(igsAgent_t *agent, const char *ipAddress, unsigned int port);
 PUBLIC int igsAgent_stop(igsAgent_t *agent);
-PUBLIC void igsAgent_observeForcedStop(igsAgent_t *agent, igs_forcedStopCallback cb, void *myData);
+
+typedef void (*igsAgent_forcedStopCallback)(igsAgent_t *agent, void *myData);
+PUBLIC void igsAgent_observeForcedStop(igsAgent_t *agent, igsAgent_forcedStopCallback cb, void *myData);
+
 PUBLIC void igsAgent_die(igsAgent_t *agent);
 PUBLIC int igsAgent_setAgentName(igsAgent_t *agent, const char *name);
 PUBLIC char *igsAgent_getAgentName(igsAgent_t *agent); //char* must be freed by caller
 PUBLIC int igsAgent_setAgentState(igsAgent_t *agent, const char *state);
 PUBLIC char *igsAgent_getAgentState(igsAgent_t *agent); //char* must be freed by caller
+
 PUBLIC int igsAgent_mute(igsAgent_t *agent);
 PUBLIC int igsAgent_unmute(igsAgent_t *agent);
 PUBLIC bool igsAgent_isMuted(igsAgent_t *agent);
-PUBLIC int igsAgent_observeMute(igsAgent_t *agent, igs_muteCallback cb, void *myData);
+typedef void (*igsAgent_muteCallback)(igsAgent_t *Agent, bool isMuted, void *myData);
+PUBLIC int igsAgent_observeMute(igsAgent_t *agent, igsAgent_muteCallback cb, void *myData);
+
 PUBLIC int igsAgent_freeze(igsAgent_t *agent);
 PUBLIC bool igsAgent_isFrozen(igsAgent_t *agent);
 PUBLIC int igsAgent_unfreeze(igsAgent_t *agent);
-PUBLIC int igsAgent_observeFreeze(igsAgent_t *agent, igs_freezeCallback cb, void *myData);
+typedef void (*igsAgent_freezeCallback)(bool isPaused, void *myData);
+PUBLIC int igsAgent_observeFreeze(igsAgent_t *agent, igsAgent_freezeCallback cb, void *myData);
 PUBLIC void igsAgent_setCanBeFrozen(igsAgent_t *agent, bool canBeFrozen);
 PUBLIC bool igsAgent_canBeFrozen(igsAgent_t *agent);
 
@@ -148,20 +155,26 @@ PUBLIC void igsAgent_setCommandLineFromArgs(igsAgent_t *agent, int argc, const c
 PUBLIC void igsAgent_setRequestOutputsFromMappedAgents(igsAgent_t *agent, bool notify);
 PUBLIC bool igsAgent_getRequestOutputsFromMappedAgents(igsAgent_t *agent);
 
-//do not use these functions, use aliases just below
-PUBLIC void igsAgent_trace2(const char *function, igsAgent_t *agent, const char *format, ...) CHECK_PRINTF (3);
-PUBLIC void igsAgent_debug2(const char *function, igsAgent_t *agent, const char *format, ...) CHECK_PRINTF (3);
-PUBLIC void igsAgent_info2(const char *function, igsAgent_t *agent, const char *format, ...) CHECK_PRINTF (3);
-PUBLIC void igsAgent_warn2(const char *function, igsAgent_t *agent, const char *format, ...) CHECK_PRINTF (3);
-PUBLIC void igsAgent_error2(const char *function, igsAgent_t *agent, const char *format, ...) CHECK_PRINTF (3);
-PUBLIC void igsAgent_fatal2(const char *function, igsAgent_t *agent, const char *format, ...) CHECK_PRINTF (3);
+PUBLIC void igsAgent_setVerbose(igsAgent_t *agent, bool verbose); //enable logs in console (ERROR and FATAL are always displayed)
+PUBLIC bool igsAgent_isVerbose(igsAgent_t *agent);
+PUBLIC void igsAgent_setUseColorVerbose(igsAgent_t *agent, bool useColor); //use colors in console
+PUBLIC bool igsAgent_getUseColorVerbose(igsAgent_t *agent);
+PUBLIC void igsAgent_setLogStream(igsAgent_t *agent, bool useLogStream); //enable logs in socket stream
+PUBLIC bool igsAgent_getLogStream(igsAgent_t *agent);
+PUBLIC void igsAgent_setLogInFile(igsAgent_t *agent, bool useLogFile); //enable logs in file
+PUBLIC bool igsAgent_getLogInFile(igsAgent_t *agent);
+PUBLIC void igsAgent_setLogPath(igsAgent_t *agent, const char *path); //default directory is ~/ on UNIX systems and current PATH on Windows
+PUBLIC char* igsAgent_getLogPath(igsAgent_t *agent); // must be freed by caller
 
-#define igsAgent_trace(...) igsAgent_trace2(__func__, __VA_ARGS__)
-#define igsAgent_debug(...) igsAgent_debug2(__func__, __VA_ARGS__)
-#define igsAgent_info(...) igsAgent_info2(__func__, __VA_ARGS__)
-#define igsAgent_warn(...) igsAgent_warn2(__func__, __VA_ARGS__)
-#define igsAgent_error(...) igsAgent_error2(__func__, __VA_ARGS__)
-#define igsAgent_fatal(...) igsAgent_fatal2(__func__, __VA_ARGS__)
+PUBLIC void igsAgent_setLogLevel (igsAgent_t *agent, igs_logLevel_t level); //set log level in console, default is IGS_LOG_INFO
+
+PUBLIC void igsAgent_log(igs_logLevel_t level, const char *function, igsAgent_t *agent, const char *format, ...) CHECK_PRINTF (4);
+#define igsAgent_trace(...) igsAgent_log(IGS_LOG_TRACE, __func__, __VA_ARGS__)
+#define igsAgent_debug(...) igsAgent_log(IGS_LOG_DEBUG, __func__, __VA_ARGS__)
+#define igsAgent_info(...) igsAgent_log(IGS_LOG_INFO, __func__, __VA_ARGS__)
+#define igsAgent_warn(...) igsAgent_log(IGS_LOG_WARN, __func__, __VA_ARGS__)
+#define igsAgent_error(...) igsAgent_log(IGS_LOG_ERROR, __func__, __VA_ARGS__)
+#define igsAgent_fatal(...) igsAgent_log(IGS_LOG_FATAL, __func__, __VA_ARGS__)
 
 PUBLIC void igsAgent_setDefinitionPath(igsAgent_t *agent, const char *path);
 PUBLIC void igsAgent_setMappingPath(igsAgent_t *agent, const char *path);
@@ -177,11 +190,12 @@ PUBLIC bool igsAgent_getAllowInproc(igsAgent_t *agent);
 #endif
 
 //licenses
+typedef void (*igsAgent_licenseCallback)(igsAgent_t *agent, igs_license_limit_t limit, void *myData);
 #if !defined(TARGET_OS_IOS) || !TARGET_OS_IOS
 PUBLIC void igsAgent_setLicensePath(igsAgent_t *agent, const char *path);
 PUBLIC char *igsAgent_getLicensePath(igsAgent_t *agent);
 PUBLIC bool igsAgent_checkLicense(igsAgent_t *agent, const char *agentId);
-PUBLIC int igsAgent_observeLicense(igsAgent_t *agent, igs_licenseCallback cb, void *myData);
+PUBLIC int igsAgent_observeLicense(igsAgent_t *agent, igsAgent_licenseCallback cb, void *myData);
 #endif
 
 //advanced functions
@@ -195,13 +209,17 @@ PUBLIC void igsAgent_monitoringEnable(igsAgent_t *agent, unsigned int period); /
 PUBLIC void igsAgent_monitoringEnableWithExpectedDevice(igsAgent_t *agent, unsigned int period, const char* networkDevice, unsigned int port);
 PUBLIC void igsAgent_monitoringDisable(igsAgent_t *agent);
 PUBLIC bool igsAgent_isMonitoringEnabled(igsAgent_t *agent);
-PUBLIC void igsAgent_monitor(igsAgent_t *agent, igs_monitorCallback cb, void *myData);
+typedef void (*igsAgent_monitorCallback)(igsAgent_t *agent, igs_monitorEvent_t event, const char *device, const char *ipAddress, void *myData);
+PUBLIC void igsAgent_monitor(igsAgent_t *agent, igsAgent_monitorCallback cb, void *myData);
 PUBLIC void igsAgent_monitoringShallStartStopAgent(igsAgent_t *agent, bool flag);
 
 PUBLIC int igsAgent_writeOutputAsZMQMsg(igsAgent_t *agent, const char *name, zmsg_t *msg);
 PUBLIC int igsAgent_readInputAsZMQMsg(igsAgent_t *agent, const char *name, zmsg_t **msg); //msg must be freed by caller using zmsg_destroy
 
-PUBLIC int igsAgent_observeBus(igsAgent_t *agent, igs_BusMessageIncoming cb, void *myData);
+typedef void (*igsAgent_BusMessageIncoming) (igsAgent_t *agent, const char *event, const char *peerID, const char *name,
+                                             const char *address, const char *channel,
+                                             zhash_t *headers, zmsg_t *msg, void *myData);
+PUBLIC int igsAgent_observeBus(igsAgent_t *agent, igsAgent_BusMessageIncoming cb, void *myData);
 PUBLIC void igsAgent_busJoinChannel(igsAgent_t *agent, const char *channel);
 PUBLIC void igsAgent_busLeaveChannel(igsAgent_t *agent, const char *channel);
 PUBLIC int igsAgent_busSendStringToChannel(igsAgent_t *agent, const char *channel, const char *msg, ...);
@@ -214,7 +232,10 @@ PUBLIC void igsAgent_busAddServiceDescription(igsAgent_t *agent, const char *key
 PUBLIC void igsAgent_busRemoveServiceDescription(igsAgent_t *agent, const char *key);
 
 PUBLIC int igsAgent_sendCall(igsAgent_t *agent, const char *agentNameOrUUID, const char *callName, igs_callArgument_t **list);
-PUBLIC int igsAgent_initCall(igsAgent_t *agent, const char *name, igs_callFunction cb, void *myData);
+typedef void (*igsAgent_callFunction)(igsAgent_t *agent, const char *senderAgentName, const char *senderAgentUUID,
+                                      const char *callName, igs_callArgument_t *firstArgument, size_t nbArgs,
+                                      void* myData);
+PUBLIC int igsAgent_initCall(igsAgent_t *agent, const char *name, igsAgent_callFunction cb, void *myData);
 PUBLIC int igsAgent_removeCall(igsAgent_t *agent, const char *name);
 PUBLIC int igsAgent_addArgumentToCall(igsAgent_t *agent, const char *callName, const char *argName, iopType_t type);
 PUBLIC int igsAgent_removeArgumentFromCall(igsAgent_t *agent, const char *callName, const char *argName); //removes first occurence with this name

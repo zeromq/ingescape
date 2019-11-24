@@ -31,14 +31,16 @@ void bus_zyreLock(void)   {
     if (bus_zyreMutex == NULL){
         bus_zyreMutex = calloc(1, sizeof(pthread_mutex_t));
         if (pthread_mutex_init(bus_zyreMutex, NULL) != 0){
-            igs_error("mutex init failed");
+            igs_fatal("mutex init failed");
+            assert(false);
             return;
         }
     }
 #elif (defined WIN32 || defined _WIN32)
     if (bus_zyreMutex == NULL){
         if (pthread_mutex_init(&bus_zyreMutex) != 0){
-            igs_error("mutex init failed");
+            igs_fatal("mutex init failed");
+            assert(false);
             return;
         }
     }
@@ -50,7 +52,8 @@ void bus_zyreUnlock(void) {
     if (bus_zyreMutex != NULL){
         pthread_mutex_unlock(bus_zyreMutex);
     }else{
-        igs_error("mutex was NULL");
+        igs_fatal("mutex was NULL\n");
+        assert(false);
     }
 }
 
@@ -59,7 +62,7 @@ void bus_zyreUnlock(void) {
 ////////////////////////////////////////////////////////////////////////
 void igsAgent_busJoinChannel(igsAgent_t *agent, const char *channel){
     if (strcmp(CHANNEL, channel) == 0){
-        igs_error("channel name %s is reserved and cannot be joined", channel);
+        igsAgent_error(agent, "channel name %s is reserved and cannot be joined", channel);
         return;
     }
     if (agent->agentElements != NULL && agent->agentElements->node != NULL){
@@ -67,7 +70,7 @@ void igsAgent_busJoinChannel(igsAgent_t *agent, const char *channel){
         zyre_join(agent->agentElements->node, channel);
         bus_zyreUnlock();
     }else{
-        igs_error("igs_startWithDevice or igs_startWithIP must be called before joining a channel");
+        igsAgent_error(agent, "igs_startWithDevice or igs_startWithIP must be called before joining a channel");
     }
 }
 void igsAgent_busLeaveChannel(igsAgent_t *agent, const char *channel){
@@ -76,21 +79,21 @@ void igsAgent_busLeaveChannel(igsAgent_t *agent, const char *channel){
         zyre_leave(agent->agentElements->node, channel);
         bus_zyreUnlock();
     }else{
-        igs_error("igs_startWithDevice or igs_startWithIP must be called before leaving a channel");
+        igsAgent_error(agent, "igs_startWithDevice or igs_startWithIP must be called before leaving a channel");
     }
 }
 
 int igsAgent_busSendStringToChannel(igsAgent_t *agent, const char *channel, const char *msg, ...){
     if (channel == NULL){
-        igs_debug("channel is NULL");
+        igsAgent_debug(agent, "channel is NULL");
         return 0;
     }
     if (strcmp(CHANNEL, channel) == 0){
-        igs_error("channel name %s is reserved and cannot be used", channel);
+        igsAgent_error(agent, "channel name %s is reserved and cannot be used", channel);
         return -1;
     }
     if (agent->agentElements == NULL || agent->agentElements->node == NULL){
-        igs_error("igs_startWithDevice or igs_startWithIP must be called before trying to send a message");
+        igsAgent_error(agent, "igs_startWithDevice or igs_startWithIP must be called before trying to send a message");
         return -1;
     }
     int res = 1;
@@ -108,15 +111,15 @@ int igsAgent_busSendStringToChannel(igsAgent_t *agent, const char *channel, cons
 
 int igsAgent_busSendDataToChannel(igsAgent_t *agent, const char *channel, void *data, size_t size){
     if (channel == NULL){
-        igs_debug("channel is NULL");
+        igsAgent_debug(agent, "channel is NULL");
         return 0;
     }
     if (strcmp(CHANNEL, channel) == 0){
-        igs_error("channel name %s is reserved and cannot be used", channel);
+        igsAgent_error(agent, "channel name %s is reserved and cannot be used", channel);
         return -1;
     }
     if (agent->agentElements == NULL || agent->agentElements->node == NULL){
-        igs_error("igs_startWithDevice or igs_startWithIP must be called before trying to send a message");
+        igsAgent_error(agent, "igs_startWithDevice or igs_startWithIP must be called before trying to send a message");
         return -1;
     }
     int res = 1;
@@ -132,15 +135,15 @@ int igsAgent_busSendDataToChannel(igsAgent_t *agent, const char *channel, void *
 
 int igsAgent_busSendZMQMsgToChannel(igsAgent_t *agent, const char *channel, zmsg_t **msg_p){
     if (channel == NULL){
-        igs_debug("channel is NULL");
+        igsAgent_debug(agent, "channel is NULL");
         return 0;
     }
     if (strcmp(CHANNEL, channel) == 0){
-        igs_error("channel name %s is reserved and cannot be used", channel);
+        igsAgent_error(agent, "channel name %s is reserved and cannot be used", channel);
         return -1;
     }
     if (agent->agentElements == NULL || agent->agentElements->node == NULL){
-        igs_error("igs_startWithDevice or igs_startWithIP must be called before trying to send a message");
+        igsAgent_error(agent, "igs_startWithDevice or igs_startWithIP must be called before trying to send a message");
         return -1;
     }
     int res = 1;
@@ -153,11 +156,11 @@ int igsAgent_busSendZMQMsgToChannel(igsAgent_t *agent, const char *channel, zmsg
 
 int igsAgent_busSendStringToAgent(igsAgent_t *agent, const char *agentNameOrPeerID, const char *msg, ...){
     if (agent->agentElements == NULL || agent->agentElements->node == NULL){
-        igs_error("igs_startWithDevice or igs_startWithIP must be called before trying to send a message");
+        igsAgent_error(agent, "igs_startWithDevice or igs_startWithIP must be called before trying to send a message");
         return -1;
     }
     if (agentNameOrPeerID == NULL){
-        igs_debug("agentNameOrPeerID is NULL");
+        igsAgent_debug(agent, "agentNameOrPeerID is NULL");
         return 0;
     }
     zyreAgent_t *el, *tmp;
@@ -180,11 +183,11 @@ int igsAgent_busSendStringToAgent(igsAgent_t *agent, const char *agentNameOrPeer
 
 int igsAgent_busSendDataToAgent(igsAgent_t *agent, const char *agentNameOrPeerID, void *data, size_t size){
     if (agent->agentElements == NULL || agent->agentElements->node == NULL){
-        igs_error("igs_startWithDevice or igs_startWithIP must be called before trying to send a message");
+        igsAgent_error(agent, "igs_startWithDevice or igs_startWithIP must be called before trying to send a message");
         return -1;
     }
     if (agentNameOrPeerID == NULL){
-        igs_debug("agentNameOrPeerID is NULL");
+        igsAgent_debug(agent, "agentNameOrPeerID is NULL");
         return 0;
     }
     zyreAgent_t *el, *tmp;
@@ -205,11 +208,11 @@ int igsAgent_busSendDataToAgent(igsAgent_t *agent, const char *agentNameOrPeerID
 
 int igsAgent_busSendZMQMsgToAgent(igsAgent_t *agent, const char *agentNameOrPeerID, zmsg_t **msg_p){
     if (agent->agentElements == NULL || agent->agentElements->node == NULL){
-        igs_error("igs_startWithDevice or igs_startWithIP must be called before trying to send a message");
+        igsAgent_error(agent, "igs_startWithDevice or igs_startWithIP must be called before trying to send a message");
         return -1;
     }
     if (agentNameOrPeerID == NULL){
-        igs_debug("agentNameOrPeerID is NULL");
+        igsAgent_debug(agent, "agentNameOrPeerID is NULL");
         return 0;
     }
     zyreAgent_t *el, *tmp;
@@ -238,7 +241,7 @@ void igsAgent_busAddServiceDescription(igsAgent_t *agent, const char *key, const
         serviceHeader_t *header;
         HASH_FIND_STR(agent->serviceHeaders, key, header);
         if (header != NULL){
-            igs_error("service key '%s' already defined : new value will be ignored", key);
+            igsAgent_error(agent, "service key '%s' already defined : new value will be ignored", key);
             return;
         }
         header = calloc(1, sizeof(serviceHeader_t));
@@ -246,7 +249,7 @@ void igsAgent_busAddServiceDescription(igsAgent_t *agent, const char *key, const
         header->value = strndup(value, MAX_STRING_MSG_LENGTH * 16);
         HASH_ADD_STR(agent->serviceHeaders, key, header);
     }else{
-        igs_warn("service key '%s' is reserved and cannot be edited", key);
+        igsAgent_warn(agent, "service key '%s' is reserved and cannot be edited", key);
     }
 }
 
@@ -261,7 +264,7 @@ void igsAgent_busRemoveServiceDescription(igsAgent_t *agent, const char *key){
         serviceHeader_t *header;
         HASH_FIND_STR(agent->serviceHeaders, key, header);
         if (header == NULL){
-            igs_warn("service key '%s' does not exist", key);
+            igsAgent_warn(agent, "service key '%s' does not exist", key);
             return;
         }
         HASH_DEL(agent->serviceHeaders, header);
@@ -269,9 +272,9 @@ void igsAgent_busRemoveServiceDescription(igsAgent_t *agent, const char *key){
         free(header->value);
         free(header);
         if (agent->agentElements != NULL && agent->agentElements->node != NULL){
-            igs_warn("agent is started : restart the agent to actually remove the service");
+            igsAgent_warn(agent, "agent is started : restart the agent to actually remove the service");
         }
     }else{
-        igs_warn("service key '%s' is reserved and cannot be removed", key);
+        igsAgent_warn(agent, "service key '%s' is reserved and cannot be removed", key);
     }
 }
