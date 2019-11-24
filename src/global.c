@@ -751,6 +751,10 @@ void igs_setLogLevel (igs_logLevel_t level){
     igsAgent_setLogLevel(globalAgent, level);
 }
 
+igs_logLevel_t igs_getLogLevel(void){
+    initInternalAgentIfNeeded();
+    return igsAgent_getLogLevel(globalAgent);
+}
 
 void igs_log(igs_logLevel_t level, const char *function, const char *format, ...){
     initInternalAgentIfNeeded();

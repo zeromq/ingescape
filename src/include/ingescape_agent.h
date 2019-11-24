@@ -167,6 +167,7 @@ PUBLIC void igsAgent_setLogPath(igsAgent_t *agent, const char *path); //default 
 PUBLIC char* igsAgent_getLogPath(igsAgent_t *agent); // must be freed by caller
 
 PUBLIC void igsAgent_setLogLevel (igsAgent_t *agent, igs_logLevel_t level); //set log level in console, default is IGS_LOG_INFO
+PUBLIC igs_logLevel_t igsAgent_getLogLevel(igsAgent_t *agent);
 
 PUBLIC void igsAgent_log(igs_logLevel_t level, const char *function, igsAgent_t *agent, const char *format, ...) CHECK_PRINTF (4);
 #define igsAgent_trace(...) igsAgent_log(IGS_LOG_TRACE, __func__, __VA_ARGS__)
