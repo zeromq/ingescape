@@ -211,7 +211,7 @@ Item {
                     verticalCenter: parent.verticalCenter
                 }
 
-                enabled: (IgsModelManager.allAgentsGroupsByName.count > 0)
+                enabled: (IgsModelManager && (IgsModelManager.allAgentsGroupsByName.count > 0))
 
                 fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 

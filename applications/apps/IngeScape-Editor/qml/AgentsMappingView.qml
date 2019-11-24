@@ -114,7 +114,6 @@ Item {
 
                 I2PieSlice {
                     id: pieSlice
-                    //visible: IgsModelManager.isMappingConnected
 
                     anchors.fill: parent
 
@@ -158,7 +157,7 @@ Item {
                 fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor
 
                 pressedID: releasedID + "-pressed"
-                releasedID: IgsModelManager.isMappingConnected ? "connect-on" : "connect-off"
+                releasedID: (IgsModelManager && IgsModelManager.isMappingConnected) ? "connect-on" : "connect-off"
                 disabledID : releasedID
 
                 onClicked: {
@@ -168,7 +167,7 @@ Item {
                 Binding {
                     target: activeMappingBtn
                     property: "checked"
-                    value: IgsModelManager.isMappingConnected
+                    value: IgsModelManager ? IgsModelManager.isMappingConnected : false
                 }
             }
 
@@ -366,7 +365,7 @@ Item {
                         left : parent.left
                     }
 
-                    visible : rootItem.controller && rootItem.controller.isEmptyMapping && !IgsModelManager.isMappingConnected
+                    visible : rootItem.controller && rootItem.controller.isEmptyMapping && IgsModelManager && !IgsModelManager.isMappingConnected
                     text : "No active mapping at the moment."
 
                     color : IngeScapeTheme.blueGreyColor
@@ -383,7 +382,7 @@ Item {
                         left : parent.left
                     }
 
-                    visible : rootItem.controller && rootItem.controller.isEmptyMapping && !IgsModelManager.isMappingConnected
+                    visible : rootItem.controller && rootItem.controller.isEmptyMapping && IgsModelManager && !IgsModelManager.isMappingConnected
                     text : "Click on the button to synchronize with the current platform and get the active mapping.\nOr create/load a platform description and click on the button to apply it to the platform."
 
                     color : IngeScapeTheme.blueGreyColor

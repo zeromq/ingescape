@@ -279,12 +279,12 @@ Item {
                 rightMargin: -1
             }
 
-            isOnline: IgsNetworkController.isOnline
+            isOnline: IgsNetworkController ? IgsNetworkController.isOnline : false
 
             currentNetworkDevice: IngeScapeEditorC.networkDevice
             currentPort: IngeScapeEditorC.port
 
-            listOfNetworkDevices: IgsNetworkController.availableNetworkDevices
+            listOfNetworkDevices: IgsNetworkController ? IgsNetworkController.availableNetworkDevices : null
 
             errorMessage: IngeScapeEditorC.errorMessageWhenConnectionFailed
 

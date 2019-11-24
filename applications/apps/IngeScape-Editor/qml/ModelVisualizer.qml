@@ -106,7 +106,8 @@ Rectangle {
             }
 
             Text {
-                text: "- " + IgsNetworkController.numberOfAgents + " agents"
+                text: IgsNetworkController ? "- " + IgsNetworkController.numberOfAgents + " agents"
+                                           : ""
 
                 color: "white"
                 font {
@@ -116,7 +117,8 @@ Rectangle {
             }
 
             Text {
-                text: "- " + IgsNetworkController.numberOfLaunchers + " launchers"
+                text: IgsNetworkController ?  "- " + IgsNetworkController.numberOfLaunchers + " launchers"
+                                           : ""
 
                 color: "white"
                 font {
@@ -126,7 +128,8 @@ Rectangle {
             }
 
             Text {
-                text: "- " + IgsNetworkController.numberOfRecorders + " recorders"
+                text: IgsNetworkController ? "- " + IgsNetworkController.numberOfRecorders + " recorders"
+                                           : ""
 
                 color: "white"
                 font {
@@ -136,7 +139,8 @@ Rectangle {
             }
 
             Text {
-                text: "- " + IgsNetworkController.numberOfEditors + " editors"
+                text: IgsNetworkController ? "- " + IgsNetworkController.numberOfEditors + " editors"
+                                           : ""
 
                 color: "white"
                 font {
@@ -146,7 +150,8 @@ Rectangle {
             }
 
             Text {
-                text: "- " + IgsNetworkController.numberOfAssessments + " assessments"
+                text: IgsNetworkController ? "- " + IgsNetworkController.numberOfAssessments + " assessments"
+                                           : ""
 
                 color: "white"
                 font {
@@ -156,7 +161,8 @@ Rectangle {
             }
 
             Text {
-                text: "- " + IgsNetworkController.numberOfExpes + " expes"
+                text: IgsNetworkController ? "- " + IgsNetworkController.numberOfExpes + " expes"
+                                           : ""
 
                 color: "white"
                 font {
@@ -182,7 +188,7 @@ Rectangle {
         }
         //height: contentHeight
 
-        model: IgsModelManager.allAgentsGroupsByName
+        model: IgsModelManager ? IgsModelManager.allAgentsGroupsByName : null
 
         delegate: Rectangle {
 

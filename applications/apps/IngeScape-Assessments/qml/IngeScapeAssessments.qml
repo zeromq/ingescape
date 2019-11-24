@@ -133,8 +133,6 @@ Item {
         onCurrentExperimentationChanged: {
             if (IngeScapeAssessmentsC.experimentationC.currentExperimentation)
             {
-                //console.log("QML: on Current Experimentation changed: " + AssessmentsModelC.currentExperimentation.name);
-
                 // Add the "Experimentation View" to the stack
                 stackview.push(componentExperimentationView);
             }
@@ -196,12 +194,12 @@ Item {
             rightMargin: -1
         }
 
-        isOnline: IgsNetworkController.isOnline
+        isOnline: IgsNetworkController ? IgsNetworkController.isOnline : false
 
         currentNetworkDevice: IngeScapeAssessmentsC.networkDevice
         currentPort: IngeScapeAssessmentsC.port
 
-        listOfNetworkDevices: IgsNetworkController.availableNetworkDevices
+        listOfNetworkDevices: IgsNetworkController ? IgsNetworkController.availableNetworkDevices : null
 
         errorMessage: IngeScapeAssessmentsC.errorMessageWhenConnectionFailed
 

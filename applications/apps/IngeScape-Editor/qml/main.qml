@@ -771,7 +771,7 @@ ApplicationWindow {
                 });
 
                 menuPlugUNplugMapping.text = Qt.binding(function() {
-                    return ((IgsModelManager.isMappingConnected) ? qsTr("Unplug mapping") : qsTr("Plug mapping"));
+                    return ((IgsModelManager && IgsModelManager.isMappingConnected) ? qsTr("Unplug mapping") : qsTr("Plug mapping"));
                 });
 
                 subWindowsInstantiator.model = Qt.binding(function() {

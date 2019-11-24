@@ -466,6 +466,9 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
  */
 IngeScapeEditorController::~IngeScapeEditorController()
 {
+    // First, Stop IngeScape
+    _stopIngeScape(false);
+
     // Unsubscribe to OS events
     disconnect(OSUtils::instance(), &OSUtils::systemSleep, this, &IngeScapeEditorController::_onSystemSleep);
     disconnect(OSUtils::instance(), &OSUtils::systemWake, this, &IngeScapeEditorController::_onSystemWake);
@@ -503,16 +506,6 @@ IngeScapeEditorController::~IngeScapeEditorController()
 
         AbstractTimeActionslineScenarioViewController* temp = _timeLineC;
         settimeLineC(nullptr);
-        delete temp;
-        temp = nullptr;
-    }
-
-    if (_licensesC != nullptr)
-    {
-        disconnect(_licensesC);
-
-        LicensesController* temp = _licensesC;
-        setlicensesC(nullptr);
         delete temp;
         temp = nullptr;
     }
@@ -567,6 +560,21 @@ IngeScapeEditorController::~IngeScapeEditorController()
         temp = nullptr;
     }
 
+    if (_networkC != nullptr)
+    {
+        disconnect(_networkC);
+
+        NetworkController* temp = _networkC;
+        setnetworkC(nullptr);
+        delete temp;
+        temp = nullptr;
+    }
+
+    // Free memory
+    IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
+    disconnect(ingeScapeNetworkC);
+    delete ingeScapeNetworkC;
+
     if (_modelManager != nullptr)
     {
         disconnect(_modelManager);
@@ -577,12 +585,17 @@ IngeScapeEditorController::~IngeScapeEditorController()
         temp = nullptr;
     }
 
-    if (_networkC != nullptr)
-    {
-        disconnect(_networkC);
+    // Free memory
+    IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
+    disconnect(ingeScapeModelManager);
+    delete ingeScapeModelManager;
 
-        NetworkController* temp = _networkC;
-        setnetworkC(nullptr);
+    if (_licensesC != nullptr)
+    {
+        disconnect(_licensesC);
+
+        LicensesController* temp = _licensesC;
+        setlicensesC(nullptr);
         delete temp;
         temp = nullptr;
     }

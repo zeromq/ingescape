@@ -56,7 +56,7 @@ WindowBlockTouches {
     // action view model
     property var actionVM: panelController ? panelController.editedViewModel : null;
 
-    property var allAgentsGroupsByName: IgsModelManager.allAgentsGroupsByName;
+    property var allAgentsGroupsByName: IgsModelManager ? IgsModelManager.allAgentsGroupsByName : null;
 
     // our scenario controller
     property var controller: null;

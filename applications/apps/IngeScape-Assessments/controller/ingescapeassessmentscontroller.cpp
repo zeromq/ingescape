@@ -208,16 +208,13 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
 */
 IngeScapeAssessmentsController::~IngeScapeAssessmentsController()
 {
-    // Unsubscribe to OS events
-    //disconnect(OSUtils::instance(), &OSUtils::systemSleep, this, &IngeScapeAssessmentsController::_onSystemSleep);
-    //disconnect(OSUtils::instance(), &OSUtils::systemWake, this, &IngeScapeAssessmentsController::_onSystemWake);
-    //disconnect(OSUtils::instance(), &OSUtils::systemNetworkConfigurationsUpdated, this, &IngeScapeAssessmentsController::_onSystemNetworkConfigurationsUpdated);
+    // First, Stop IngeScape
+    _stopIngeScape(false);
 
-    // Unsubscribe to our application
-    /*if (IngescapeApplication::instance() != nullptr)
-    {
-        disconnect(IngescapeApplication::instance(), &IngescapeApplication::openFileRequest, this, &IngeScapeAssessmentsController::_onOpenFileRequest);
-    }*/
+    // Unsubscribe to OS events
+    disconnect(OSUtils::instance(), &OSUtils::systemSleep, this, &IngeScapeAssessmentsController::_onSystemSleep);
+    disconnect(OSUtils::instance(), &OSUtils::systemWake, this, &IngeScapeAssessmentsController::_onSystemWake);
+    disconnect(OSUtils::instance(), &OSUtils::systemNetworkConfigurationsUpdated, this, &IngeScapeAssessmentsController::_onSystemNetworkConfigurationsUpdated);
 
 
     //
@@ -294,6 +291,21 @@ IngeScapeAssessmentsController::~IngeScapeAssessmentsController()
         delete temp;
         temp = nullptr;
     }
+
+    // Free memory
+    IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
+    disconnect(ingeScapeNetworkC);
+    delete ingeScapeNetworkC;
+
+    // Free memory
+    AssessmentsModelManager* assessmentsModelManager = AssessmentsModelManager::instance();
+    disconnect(assessmentsModelManager);
+    delete assessmentsModelManager;
+
+    // Free memory
+    IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
+    disconnect(ingeScapeModelManager);
+    delete ingeScapeModelManager;
 
     if (_licensesC != nullptr)
     {
