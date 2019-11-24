@@ -47,8 +47,6 @@ void LogMessageHandler(QtMsgType type, const QMessageLogContext& context, const 
     fprintf(stdout, "%s\n", message.toLatin1().constData());
     fflush(stdout);
 
-    char agentName[] = "IngeScape-Assessments";
-
     // "context.function" can be null
     QString function = "Undefined function";
     if (context.function != nullptr) {
@@ -64,28 +62,28 @@ void LogMessageHandler(QtMsgType type, const QMessageLogContext& context, const 
     {
         // Allows to prevent to log in the file useless logs (with type TRACE or DEBUG)
         if (logLevel <= IGS_LOG_DEBUG) {
-            igs_log(agentName, IGS_LOG_DEBUG, function.toStdString().c_str(), message.toStdString().c_str(), "%s");
+            igs_log(IGS_LOG_DEBUG, function.toStdString().c_str(), message.toStdString().c_str(), "%s");
         }
         break;
     }
     case QtInfoMsg:
     {
-        igs_log(agentName, IGS_LOG_INFO, function.toStdString().c_str(), message.toStdString().c_str(), "%s");
+        igs_log(IGS_LOG_INFO, function.toStdString().c_str(), message.toStdString().c_str(), "%s");
         break;
     }
     case QtWarningMsg:
     {
-        igs_log(agentName, IGS_LOG_WARN, function.toStdString().c_str(), message.toStdString().c_str(), "%s");
+        igs_log(IGS_LOG_WARN, function.toStdString().c_str(), message.toStdString().c_str(), "%s");
         break;
     }
     case QtCriticalMsg:
     {
-        igs_log(agentName, IGS_LOG_ERROR, function.toStdString().c_str(), message.toStdString().c_str(), "%s");
+        igs_log(IGS_LOG_ERROR, function.toStdString().c_str(), message.toStdString().c_str(), "%s");
         break;
     }
     case QtFatalMsg:
     {
-        igs_log(agentName, IGS_LOG_FATAL, function.toStdString().c_str(), message.toStdString().c_str(), "%s");
+        igs_log(IGS_LOG_FATAL, function.toStdString().c_str(), message.toStdString().c_str(), "%s");
         break;
     }
     default:
