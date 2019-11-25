@@ -16,6 +16,7 @@
 #define NETWORKCONTROLLER_H
 
 #include <QObject>
+
 #include "I2PropertyHelpers.h"
 #include <controller/ingescapenetworkcontroller.h>
 
@@ -23,7 +24,7 @@
 /**
  * @brief The NetworkController class defines the controller for network communications
  */
-class NetworkController : public IngeScapeNetworkController
+class NetworkController : public QObject
 {
     Q_OBJECT
 
@@ -39,33 +40,7 @@ public:
     /**
       * @brief Destructor
       */
-    ~NetworkController() Q_DECL_OVERRIDE;
-
-
-    /**
-     * @brief Manage a "Shouted" message
-     * @param peerId
-     * @param peerName
-     * @param zMessage
-     */
-    //void manageShoutedMessage(QString peerId, QString peerName, zmsg_t* zMessage) Q_DECL_OVERRIDE;
-
-
-    /**
-     * @brief Manage a "Whispered" message
-     * @param peerId
-     * @param peerName
-     * @param zMessage
-     */
-    void manageWhisperedMessage(QString peerId, QString peerName, zmsg_t* zMessage) Q_DECL_OVERRIDE;
-
-
-    /**
-     * @brief Send a command and parameters to the editor
-     * @param peerIdOfEditor
-     * @param commandAndParameters
-     */
-    void sendCommandToEditor(QString peerIdOfEditor, QString commandAndParameters);
+    ~NetworkController();
 
 
 Q_SIGNALS:
@@ -88,7 +63,21 @@ Q_SIGNALS:
 public Q_SLOTS:
 
 
-private:
+private Q_SLOTS:
+
+    // FIXME error: invalid application of 'sizeof' to an incomplete type '_zmsg_t'
+    // Q_STATIC_ASSERT_X(sizeof(T), "Type argument of Q_DECLARE_METATYPE(T*) must be fully defined");
+    //void _onShoutedMessageReceived(QString peerId, QString peerName, zmsg_t* zMessage);
+    //void _onWhisperedMessageReceived(QString peerId, QString peerName, zmsg_t* zMessage);
+
+
+    /**
+     * @brief Slot called when "Whispered" message (with one part) has been received
+     * @param peerId
+     * @param peerName
+     * @param message
+     */
+    void _onWhisperedMessageReceived(QString peerId, QString peerName, QString message);
 
 
 };

@@ -16,7 +16,6 @@
 
 #include <QApplication>
 
-#include <controller/assessmentsmodelmanager.h>
 #include <misc/ingescapeutils.h>
 #include <settings/ingescapesettings.h>
 #include <platformsupport/osutils.h>
@@ -40,7 +39,8 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     _subjectsC(nullptr),
     _tasksC(nullptr),
     _exportC(nullptr),
-    _terminationSignalWatcher(nullptr)
+    _terminationSignalWatcher(nullptr),
+    _beforeNetworkStop_isMappingConnected(true)
 {
     qInfo() << "New IngeScape Assessments Controller";
 
@@ -664,7 +664,7 @@ void IngeScapeAssessmentsController::_stopIngeScape(bool hasToClearPlatform)
         ingeScapeNetworkC->stop();
 
         // We don't see itself
-        ingeScapeNetworkC->setnumberOfEditors(1);
+        ingeScapeNetworkC->setnumberOfAssessments(1);
 
         // Simulate an exit for each agent ON
         ingeScapeModelManager->simulateExitForEachAgentON();

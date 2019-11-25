@@ -25,12 +25,11 @@ static const QString prefix_TimeLineState = "TIMELINE_STATE=";
 //
 //--------------------------------------------------------------
 
-
 /**
  * @brief Constructor
  * @param parent
  */
-NetworkController::NetworkController(QObject *parent) : IngeScapeNetworkController(parent)
+NetworkController::NetworkController(QObject *parent) : QObject(parent)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -38,8 +37,22 @@ NetworkController::NetworkController(QObject *parent) : IngeScapeNetworkControll
     // Add  header to declare ourselves as expe
     igs_busAddServiceDescription("isExpe", "1");
 
-    // We don't see itself
-    setnumberOfExpes(1);
+    IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
+    if (ingeScapeNetworkC != nullptr)
+    {
+        // We don't see itself
+        ingeScapeNetworkC->setnumberOfExpes(1);
+
+        /*connect(ingeScapeNetworkC, SIGNAL(shoutedMessageReceived(QString, QString, QString)),
+                this, SLOT(_onShoutedMessageReceived(QString, QString, QString)));
+        connect(ingeScapeNetworkC, SIGNAL(shoutedMessageReceived(QString, QString, QString, QStringList)),
+                this, SLOT(_onShoutedMessageReceived(QString, QString, QString, QStringList)));*/
+
+        connect(ingeScapeNetworkC, SIGNAL(whisperedMessageReceived(QString, QString, QString)),
+                this, SLOT(_onWhisperedMessageReceived(QString, QString, QString)));
+        /*connect(ingeScapeNetworkC, SIGNAL(whisperedMessageReceived(QString, QString, QString, QStringList)),
+                this, SLOT(_onWhisperedMessageReceived(QString, QString, QString, QStringList)));*/
+    }
 }
 
 
@@ -48,37 +61,25 @@ NetworkController::NetworkController(QObject *parent) : IngeScapeNetworkControll
  */
 NetworkController::~NetworkController()
 {
-    // Mother class is automatically called
-    //IngeScapeNetworkController::~IngeScapeNetworkController();
+    IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
+    if (ingeScapeNetworkC != nullptr)
+    {
+        // DIS-connect from the IngeScape Network Controller
+        disconnect(ingeScapeNetworkC, nullptr, this, nullptr);
+    }
 }
 
 
 /**
- * @brief Manage a "Whispered" message
+ * @brief Slot called when "Whispered" message (with one part) has been received
  * @param peerId
  * @param peerName
- * @param zMessage
+ * @param message
  */
-void NetworkController::manageWhisperedMessage(QString peerId, QString peerName, zmsg_t* zMessage)
+void NetworkController::_onWhisperedMessageReceived(QString peerId, QString peerName, QString message)
 {
-    QString message = zmsg_popstr(zMessage);
-
-    // An agent DEFINITION has been received
-    if (message.startsWith(prefix_Definition))
-    {
-        QString definitionJSON = message.remove(0, prefix_Definition.length());
-
-        Q_EMIT definitionReceived(peerId, peerName, definitionJSON);
-    }
-    // An agent MAPPING has been received
-    else if (message.startsWith(prefix_Mapping))
-    {
-        QString mappingJSON = message.remove(0, prefix_Mapping.length());
-
-        Q_EMIT mappingReceived(peerId, peerName, mappingJSON);
-    }
     // Status of command "LOAD PLATFORM FROM PATH"
-    else if (message.startsWith(prefix_LoadPlatformFile))
+    if (message.startsWith(prefix_LoadPlatformFile))
     {
         // Starts with the prefix, followed by parameters
         // Ends with white space followed by "STATUS=" and a digit
@@ -110,24 +111,9 @@ void NetworkController::manageWhisperedMessage(QString peerId, QString peerName,
         Q_EMIT timeLineStateUpdated(parameters);
     }
     // Unknown
-    else {
+    else
+    {
         qDebug() << "Not yet managed WHISPERED message '" << message << "' for agent" << peerName << "(" << peerId << ")";
     }
 }
 
-
-/**
- * @brief Send a command and parameters to the editor
- * @param peerIdOfEditor
- * @param commandAndParameters
- */
-void NetworkController::sendCommandToEditor(QString peerIdOfEditor, QString commandAndParameters)
-{
-    if (!peerIdOfEditor.isEmpty() && !commandAndParameters.isEmpty())
-    {
-        // Send the command (and parameters) to the peer id of the editor
-        int success = igs_busSendStringToAgent(peerIdOfEditor.toStdString().c_str(), "%s", commandAndParameters.toStdString().c_str());
-
-        qInfo() << "Send command (and parameters)" << commandAndParameters << "to editor" << peerIdOfEditor << "with success ?" << success;
-    }
-}

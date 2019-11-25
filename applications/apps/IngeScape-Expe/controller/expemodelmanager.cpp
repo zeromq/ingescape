@@ -17,15 +17,9 @@
 
 /**
  * @brief Constructor
- * @param jsonHelper
- * @param rootDirectoryPath
  * @param parent
  */
-ExpeModelManager::ExpeModelManager(JsonHelper* jsonHelper,
-                                   QString rootDirectoryPath,
-                                   QObject *parent) : IngeScapeModelManager(jsonHelper,
-                                                                            rootDirectoryPath,
-                                                                            parent),
+ExpeModelManager::ExpeModelManager(QObject *parent) : QObject(parent),
     _peerIdOfEditor(""),
     _peerNameOfEditor(),
     _isEditorON(false),
@@ -47,7 +41,10 @@ ExpeModelManager::ExpeModelManager(JsonHelper* jsonHelper,
     //
     // Link our filtered list to the list of all agents grouped by name
     //
-    _filteredPlatformAgents.setSourceModel(_allAgentsGroupsByName.sourceModel());
+    if (IngeScapeModelManager::instance() != nullptr)
+    {
+         _filteredPlatformAgents.setSourceModel(IngeScapeModelManager::instance()->allAgentsGroupsByName()->sourceModel());
+    }
 }
 
 
@@ -65,9 +62,6 @@ ExpeModelManager::~ExpeModelManager()
 
     // Free memory by deleting all platforms
     _platformsList.deleteAllItems();
-
-    // Mother class is automatically called
-    //IngeScapeModelManager::~IngeScapeModelManager();
 }
 
 
@@ -79,6 +73,8 @@ void ExpeModelManager::setcurrentLoadedPlatform(PlatformM *value)
 {
     if (_currentLoadedPlatform != value)
     {
+        IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
+
         if (_currentLoadedPlatform != nullptr)
         {
             // Clear agents of previous platform
@@ -88,12 +84,12 @@ void ExpeModelManager::setcurrentLoadedPlatform(PlatformM *value)
             _currentLoadedPlatform->setisLoaded(false);
 
             // If there are some agents
-            if (!_allAgentsGroupsByName.isEmpty())
+            if ((ingeScapeModelManager != nullptr) && !ingeScapeModelManager->allAgentsGroupsByName()->isEmpty())
             {
                 // Delete agents OFF
-                deleteAgentsOFF();
+                ingeScapeModelManager->deleteAgentsOFF();
 
-                qDebug() << _allAgentsGroupsByName.count() << "agents after the call to 'delete Agents OFF'";
+                qDebug() << ingeScapeModelManager->allAgentsGroupsByName()->count() << "agents after the call to 'delete Agents OFF'";
             }
 
             // Reset the list of agent names of the filter
@@ -102,7 +98,7 @@ void ExpeModelManager::setcurrentLoadedPlatform(PlatformM *value)
 
         _currentLoadedPlatform = value;
 
-        if (_currentLoadedPlatform != nullptr)
+        if ((_currentLoadedPlatform != nullptr) && (ingeScapeModelManager != nullptr))
         {
             // Load agents of new platform
             qDebug() << "Load agents of new platform" << _currentLoadedPlatform->name();
@@ -114,10 +110,10 @@ void ExpeModelManager::setcurrentLoadedPlatform(PlatformM *value)
             _filteredPlatformAgents.setagentNamesOfPlatform(_currentLoadedPlatform->agentNamesList());
 
             // Import agents list from the file path
-            bool success = importAgentOrAgentsListFromFilePath(_currentLoadedPlatform->filePath());
+            bool success = ingeScapeModelManager->importAgentOrAgentsListFromFilePath(_currentLoadedPlatform->filePath());
             if (success)
             {
-                qDebug() << _allAgentsGroupsByName.count() << "imported agents";
+                qDebug() << ingeScapeModelManager->allAgentsGroupsByName()->count() << "imported agents";
             }
             else {
                 qCritical() << "Error while importing the agents list from" << _currentLoadedPlatform->filePath();
@@ -154,7 +150,7 @@ void ExpeModelManager::listPlatformsInDirectory(QString directoryPath)
         QDir dir(directoryPath);
         if (dir.exists())
         {
-            QStringList nameFilters = { "*.json", "*.JSON" };
+            QStringList nameFilters = { "*.igsplatform", "*.json" };
 
             // Only JSON files and Ignore Case (Upper/Lower case)
             QFileInfoList fileInfoList = dir.entryInfoList(nameFilters, QDir::Files, QDir::IgnoreCase);

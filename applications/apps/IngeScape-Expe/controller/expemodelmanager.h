@@ -26,7 +26,7 @@
 /**
  * @brief The ExpeModelManager class defines the manager for the data model of our IngeScape Expe application
  */
-class ExpeModelManager : public IngeScapeModelManager
+class ExpeModelManager : public QObject
 {
     Q_OBJECT
 
@@ -66,19 +66,15 @@ public:
 
     /**
      * @brief Constructor
-     * @param jsonHelper
-     * @param rootDirectoryPath
      * @param parent
      */
-    explicit ExpeModelManager(JsonHelper* jsonHelper,
-                              QString rootDirectoryPath,
-                              QObject *parent = nullptr);
+    explicit ExpeModelManager(QObject *parent = nullptr);
 
 
     /**
      * @brief Destructor
      */
-    ~ExpeModelManager() Q_DECL_OVERRIDE;
+    ~ExpeModelManager();
 
 
     /**

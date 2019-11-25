@@ -19,6 +19,7 @@
 
 #include <misc/ingescapeutils.h>
 #include <settings/ingescapesettings.h>
+#include <platformsupport/osutils.h>
 
 
 /**
@@ -38,7 +39,7 @@ IngeScapeExpeController::IngeScapeExpeController(QObject *parent) : QObject(pare
     _timeLineState(TimeLineStates::STOPPED),
     //_isRecording(false),
     _terminationSignalWatcher(nullptr),
-    _jsonHelper(nullptr),
+    _beforeNetworkStop_isMappingConnected(true),
     _platformDirectoryPath(""),
     _withRecord(true)
 {
@@ -109,51 +110,59 @@ IngeScapeExpeController::IngeScapeExpeController(QObject *parent) : QObject(pare
     }
 
 
-    // Create the helper to manage JSON files
-    _jsonHelper = new JsonHelper(this);
-
-
     //
     // Create sub-controllers
     //
 
+    // Create the manager for the IngeScape data model
+    IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
+    if (ingeScapeModelManager == nullptr) {
+        qCritical() << "IngeScape Model Manager is null !";
+    }
+
     // Create the manager for the data model of our IngeScape Expe application
-    _modelManager = new ExpeModelManager(_jsonHelper, rootPath, this);
+    _modelManager = new ExpeModelManager(this);
+
+    // Create the controller to manage IngeScape network communications
+    IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
+    if (ingeScapeNetworkC == nullptr) {
+        qCritical() << "IngeScape Network Controller is null !";
+    }
 
     // Create the controller for network communications
     _networkC = new NetworkController(this);
 
+    // Create the controller to manage IngeScape licenses
+    //_licensesC = new LicensesController(this);
 
-    // Connect to signals from the network controller
-    connect(_networkC, &NetworkController::editorEntered, _modelManager, &ExpeModelManager::onEditorEntered);
-    connect(_networkC, &NetworkController::editorExited, _modelManager, &ExpeModelManager::onEditorExited);
-    connect(_networkC, &NetworkController::recorderEntered, _modelManager, &ExpeModelManager::onRecorderEntered);
-    connect(_networkC, &NetworkController::recorderExited, _modelManager, &ExpeModelManager::onRecorderExited);
-    connect(_networkC, &NetworkController::agentEntered, _modelManager, &ExpeModelManager::onAgentEntered);
-    connect(_networkC, &NetworkController::agentExited, _modelManager, &ExpeModelManager::onAgentExited);
+    // Connect to signals from network controllers
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::networkDeviceIsNotAvailable, this, &IngeScapeExpeController::_onNetworkDeviceIsNotAvailable);
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::networkDeviceIsAvailableAgain, this, &IngeScapeExpeController::_onNetworkDeviceIsAvailableAgain);
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::networkDeviceIpAddressHasChanged, this, &IngeScapeExpeController::_onNetworkDeviceIpAddressHasChanged);
+
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::editorEntered, _modelManager, &ExpeModelManager::onEditorEntered);
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::editorExited, _modelManager, &ExpeModelManager::onEditorExited);
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::recorderEntered, _modelManager, &ExpeModelManager::onRecorderEntered);
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::recorderExited, _modelManager, &ExpeModelManager::onRecorderExited);
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::agentEntered, ingeScapeModelManager, &IngeScapeModelManager::onAgentEntered);
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::agentExited, ingeScapeModelManager, &IngeScapeModelManager::onAgentExited);
+    //connect(ingeScapeNetworkC, &IngeScapeNetworkController::launcherEntered, ingeScapeModelManager, &IngeScapeModelManager::onLauncherEntered);
+    //connect(ingeScapeNetworkC, &IngeScapeNetworkController::launcherExited, ingeScapeModelManager, &IngeScapeModelManager::onLauncherExited);
+
     connect(_networkC, &NetworkController::statusReceivedAbout_LoadPlatformFile, _modelManager, &ExpeModelManager::onStatusReceivedAbout_LoadPlatformFile);
     connect(_networkC, &NetworkController::timeLineStateUpdated, this, &IngeScapeExpeController::_onTimeLineStateUpdated);
 
 
-    // Update the list of available network devices
-    _networkC->updateAvailableNetworkDevices();
+    // Connect to OS events
+    connect(OSUtils::instance(), &OSUtils::systemSleep, this, &IngeScapeExpeController::_onSystemSleep);
+    connect(OSUtils::instance(), &OSUtils::systemWake, this, &IngeScapeExpeController::_onSystemWake);
+    connect(OSUtils::instance(), &OSUtils::systemNetworkConfigurationsUpdated, this, &IngeScapeExpeController::_onSystemNetworkConfigurationsUpdated);
 
-    // There is only one available network device, we use it !
-    if (_networkC->availableNetworkDevices().count() == 1) {
-        _networkDevice = _networkC->availableNetworkDevices().at(0);
-    }
 
-    // Start our INGESCAPE agent with a network device (or an IP address) and a port
-    bool isStarted = _networkC->start(_networkDevice, _ipAddress, _port);
-
-    if (isStarted)
-    {
-        // Initialize platform from online mapping
-        //_modelManager->setisMappingConnected(true);
-    }
-    else {
-        seterrorMessageWhenConnectionFailed(tr("Failed to connect with network device %1 on port %2").arg(_networkDevice, QString::number(_port)));
-    }
+    //
+    // Start IngeScape
+    //
+    _startIngeScape(true);
 
 
     //
@@ -172,7 +181,7 @@ IngeScapeExpeController::IngeScapeExpeController(QObject *parent) : QObject(pare
 
 
     // Sleep to display our loading screen
-    QThread::msleep(2000);
+    //QThread::msleep(2000);
 }
 
 
@@ -181,6 +190,18 @@ IngeScapeExpeController::IngeScapeExpeController(QObject *parent) : QObject(pare
 */
 IngeScapeExpeController::~IngeScapeExpeController()
 {
+    // 1- Stop monitoring
+    IngeScapeNetworkController::instance()->stopMonitoring();
+
+    // 2- Stop IngeScape
+    _stopIngeScape(false);
+
+    // Unsubscribe to OS events
+    disconnect(OSUtils::instance(), &OSUtils::systemSleep, this, &IngeScapeExpeController::_onSystemSleep);
+    disconnect(OSUtils::instance(), &OSUtils::systemWake, this, &IngeScapeExpeController::_onSystemWake);
+    disconnect(OSUtils::instance(), &OSUtils::systemNetworkConfigurationsUpdated, this, &IngeScapeExpeController::_onSystemNetworkConfigurationsUpdated);
+
+
     //
     // Clean-up our TerminationSignalWatcher first
     //
@@ -206,6 +227,12 @@ IngeScapeExpeController::~IngeScapeExpeController()
         temp = nullptr;
     }
 
+    // Free memory
+    IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
+    disconnect(ingeScapeModelManager);
+    // Do not call "delete" now, the destructor will be called automatically
+    //delete ingeScapeModelManager;
+
     if (_networkC != nullptr)
     {
         disconnect(_networkC);
@@ -216,11 +243,20 @@ IngeScapeExpeController::~IngeScapeExpeController()
         temp = nullptr;
     }
 
-    // Delete json helper
-    /*if (_jsonHelper != nullptr)
+    // Free memory
+    IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
+    disconnect(ingeScapeNetworkC);
+    // Do not call "delete" now, the destructor will be called automatically
+    //delete ingeScapeNetworkC;
+
+    /*if (_licensesC != nullptr)
     {
-        delete _jsonHelper;
-        _jsonHelper = nullptr;
+        disconnect(_licensesC);
+
+        LicensesController* temp = _licensesC;
+        setlicensesC(nullptr);
+        delete temp;
+        temp = nullptr;
     }*/
 
     qInfo() << "Delete IngeScape Expe Controller";
@@ -281,10 +317,10 @@ void IngeScapeExpeController::openPlatform(PlatformM* platform)
     {
         qInfo() << "Open platform" << platform->name() << "at" << platform->filePath();
 
-        QString commandAndParameters = QString("%1=%2").arg(command_LoadPlatformFile, platform->filePath());
+        QString message = QString("%1=%2").arg(command_LoadPlatformFile, platform->filePath());
 
-        // Send the command and parameters to the editor
-        _networkC->sendCommandToEditor(_modelManager->peerIdOfEditor(), commandAndParameters);
+        // Send the message "Load Platform File" to the editor
+        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_modelManager->peerIdOfEditor(), message);
     }
 }
 
@@ -320,10 +356,10 @@ void IngeScapeExpeController::playOrResumeTimeLine(bool withRecord)
             qInfo() << "Play the timeline of platform" << _modelManager->currentLoadedPlatform()->name();
         }
 
-        QString commandAndParameters = QString("%1=%2").arg(command_UpdateTimeLineState, PLAY);
+        QString message = QString("%1=%2").arg(command_UpdateTimeLineState, PLAY);
 
-        // Send the command and parameters to the editor
-        _networkC->sendCommandToEditor(_modelManager->peerIdOfEditor(), commandAndParameters);
+        // Send the message "Update TimeLine State" to the editor
+        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_modelManager->peerIdOfEditor(), message);
     }
 }
 
@@ -338,10 +374,10 @@ void IngeScapeExpeController::pauseTimeLine()
     {
         qInfo() << "Pause the timeline of platform" << _modelManager->currentLoadedPlatform()->name();
 
-        QString commandAndParameters = QString("%1=%2").arg(command_UpdateTimeLineState, PAUSE);
+        QString message = QString("%1=%2").arg(command_UpdateTimeLineState, PAUSE);
 
-        // Send the command and parameters to the editor
-        _networkC->sendCommandToEditor(_modelManager->peerIdOfEditor(), commandAndParameters);
+        // Send the message "Update TimeLine State" to the editor
+        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_modelManager->peerIdOfEditor(), message);
     }
 }
 
@@ -356,10 +392,10 @@ void IngeScapeExpeController::stopTimeLine()
     {
         qInfo() << "STOP the timeline of platform" << _modelManager->currentLoadedPlatform()->name();
 
-        QString commandAndParameters = QString("%1=%2").arg(command_UpdateTimeLineState, RESET);
+        QString message = QString("%1=%2").arg(command_UpdateTimeLineState, RESET);
 
-        // Send the command and parameters to the editor
-        _networkC->sendCommandToEditor(_modelManager->peerIdOfEditor(), commandAndParameters);
+        // Send the message "Update TimeLine State" to the editor
+        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_modelManager->peerIdOfEditor(), message);
 
 
         if (_withRecord)
@@ -375,55 +411,89 @@ void IngeScapeExpeController::stopTimeLine()
 
 
 /**
- * @brief Start Recording
- */
-void IngeScapeExpeController::_startRecording()
-{
-    if ((_modelManager != nullptr) && _modelManager->isEditorON() && (_modelManager->currentLoadedPlatform() != nullptr)
-            && (_networkC != nullptr))
-    {
-        qInfo() << "Start recording the platform" << _modelManager->currentLoadedPlatform()->name();
-
-        QString commandAndParameters = QString("%1=%2").arg(command_UpdateRecordState, START);
-
-        // Send the command and parameters to the editor
-        _networkC->sendCommandToEditor(_modelManager->peerIdOfEditor(), commandAndParameters);
-
-
-        // FIXME: get state from recorder messages
-        _modelManager->currentLoadedPlatform()->setrecordState(RecordStates::RECORDING);
-    }
-}
-
-
-/**
- * @brief Stop Recording
- */
-void IngeScapeExpeController::_stopRecording()
-{
-    if ((_modelManager != nullptr) && _modelManager->isEditorON() && (_modelManager->currentLoadedPlatform() != nullptr)
-            && (_networkC != nullptr))
-    {
-        qInfo() << "Stop recording the platform" << _modelManager->currentLoadedPlatform()->name();
-
-        QString commandAndParameters = QString("%1=%2").arg(command_UpdateRecordState, STOP);
-
-        // Send the command and parameters to the editor
-        _networkC->sendCommandToEditor(_modelManager->peerIdOfEditor(), commandAndParameters);
-
-
-        // FIXME: get state from recorder messages
-        _modelManager->currentLoadedPlatform()->setrecordState(RecordStates::RECORDED);
-    }
-}
-
-
-/**
  * @brief Method used to force the creation of our singleton from QML
  */
 void IngeScapeExpeController::forceCreation()
 {
     qDebug() << "Force the creation of our singleton from QML";
+}
+
+
+/**
+ * @brief Called when our network device is not available
+ */
+void IngeScapeExpeController::_onNetworkDeviceIsNotAvailable()
+{
+    qDebug() << Q_FUNC_INFO;
+
+    // Stop IngeScape if needed
+    if (IngeScapeNetworkController::instance()->isStarted())
+    {
+        _stopIngeScape(false);
+    }
+    // Else: our agent is not started, we don't need to stop it
+}
+
+
+/**
+ * @brief Called when our network device is available again
+ */
+void IngeScapeExpeController::_onNetworkDeviceIsAvailableAgain()
+{
+    qDebug() << Q_FUNC_INFO;
+
+    // Start IngeScape
+    // => we don't need to check available network devices
+    _startIngeScape(false);
+}
+
+
+/**
+ * @brief Called when the IP address of our network device has changed
+ */
+void IngeScapeExpeController::_onNetworkDeviceIpAddressHasChanged()
+{
+    qDebug() << Q_FUNC_INFO;
+
+    // Restart IngeScape
+    // (Do not clear platform, do no check available network devices)
+    _restartIngeScape(false, false);
+}
+
+
+/**
+ * @brief Called when our machine will go to sleep
+ */
+void IngeScapeExpeController::_onSystemSleep()
+{
+    qDebug() << Q_FUNC_INFO;
+
+    // Stop monitoring to save energy
+    IngeScapeNetworkController::instance()->stopMonitoring();
+
+    // Stop IngeScape
+    _stopIngeScape(false);
+}
+
+
+/**
+ * @brief Called when our machine did wake from sleep
+ */
+void IngeScapeExpeController::_onSystemWake()
+{
+    // Start IngeScape
+    // => we need to check available network devices
+    _startIngeScape(true);
+}
+
+
+
+/**
+ * @brief Called when a network configuration is added, removed or changed
+ */
+void IngeScapeExpeController::_onSystemNetworkConfigurationsUpdated()
+{
+    IngeScapeNetworkController::instance()->updateAvailableNetworkDevices();
 }
 
 
@@ -467,4 +537,174 @@ void IngeScapeExpeController::_onTimeLineStateUpdated(QString parameters)
         }
     }
 }
+
+
+/**
+ * @brief Start IngeScape
+ *
+ * @param checkAvailableNetworkDevices
+ *
+ * @return
+ */
+bool IngeScapeExpeController::_startIngeScape(bool checkAvailableNetworkDevices)
+{
+    bool success = false;
+
+    // Reset the error message
+    seterrorMessageWhenConnectionFailed("");
+
+    IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
+    IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
+
+    if ((ingeScapeNetworkC != nullptr) && (ingeScapeModelManager != nullptr))
+    {
+        if (checkAvailableNetworkDevices)
+        {
+            // Update the list of available network devices
+            ingeScapeNetworkC->updateAvailableNetworkDevices();
+
+            // There is only one available network device, we use it !
+            if (ingeScapeNetworkC->availableNetworkDevices().count() == 1)
+            {
+                _networkDevice = ingeScapeNetworkC->availableNetworkDevices().at(0);
+            }
+        }
+
+        // Start our IngeScape agent with the network device and the port
+        success = ingeScapeNetworkC->start(_networkDevice, _ipAddress, _port);
+
+        if (success)
+        {
+            // Re-enable mapping
+            ingeScapeModelManager->setisMappingConnected(_beforeNetworkStop_isMappingConnected);
+        }
+    }
+
+    if (!success && !_networkDevice.isEmpty())
+    {
+        seterrorMessageWhenConnectionFailed(tr("Failed to connect on network device %1 with port %2").arg(_networkDevice, QString::number(_port)));
+    }
+
+    return success;
+}
+
+
+/**
+ * @brief Restart IngeScape
+ *
+ * @param hasToClearPlatform
+ * @param checkAvailableNetworkDevices
+ *
+ * @return true if success
+ */
+bool IngeScapeExpeController::_restartIngeScape(bool hasToClearPlatform, bool checkAvailableNetworkDevices)
+{
+    if (hasToClearPlatform)
+    {
+        qInfo() << "Restart the network on" << _networkDevice << "with" << _port << "(and CLEAR the current platform)";
+    }
+    else
+    {
+        qInfo() << "Restart the network on" << _networkDevice << "with" << _port << "(and KEEP the current platform)";
+    }
+
+    // Stop IngeScape
+    _stopIngeScape(hasToClearPlatform);
+
+    // Start IngeScape
+    return _startIngeScape(checkAvailableNetworkDevices);
+}
+
+
+/**
+ * @brief Stop IngeScape
+ *
+ * @param hasToClearPlatform
+ */
+void IngeScapeExpeController::_stopIngeScape(bool hasToClearPlatform)
+{
+    IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
+    IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
+
+    if ((ingeScapeNetworkC != nullptr) && (ingeScapeModelManager != nullptr))
+    {
+        if (hasToClearPlatform)
+        {
+            qInfo() << "Stop the network on" << _networkDevice << "with" << _port << "(and CLEAR the current platform)";
+        }
+        else
+        {
+            qInfo() << "Stop the network on" << _networkDevice << "with" << _port << "(and KEEP the current platform)";
+        }
+
+        // Save states of our mapping if needed
+        _beforeNetworkStop_isMappingConnected = ingeScapeModelManager->isMappingConnected();
+
+
+        // Disable mapping
+        ingeScapeModelManager->setisMappingConnected(false);
+
+        // Stop our IngeScape agent
+        ingeScapeNetworkC->stop();
+
+        // We don't see itself
+        ingeScapeNetworkC->setnumberOfExpes(1);
+
+        // Simulate an exit for each agent ON
+        ingeScapeModelManager->simulateExitForEachAgentON();
+
+        // Simulate an exit for each launcher
+        ingeScapeModelManager->simulateExitForEachLauncher();
+
+        // Simulate an exit for the recorder
+        if ((_modelManager != nullptr) && _modelManager->isRecorderON())
+        {
+            _modelManager->onRecorderExited(_modelManager->peerIdOfRecorder(), _modelManager->peerNameOfRecorder());
+        }
+    }
+}
+
+
+/**
+ * @brief Start Recording
+ */
+void IngeScapeExpeController::_startRecording()
+{
+    if ((_modelManager != nullptr) && _modelManager->isEditorON() && (_modelManager->currentLoadedPlatform() != nullptr)
+            && (_networkC != nullptr))
+    {
+        qInfo() << "Start recording the platform" << _modelManager->currentLoadedPlatform()->name();
+
+        QString message = QString("%1=%2").arg(command_UpdateRecordState, START);
+
+        // Send the message "Update Record State" to the editor
+        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_modelManager->peerIdOfEditor(), message);
+
+        // FIXME: get state from recorder messages
+        _modelManager->currentLoadedPlatform()->setrecordState(RecordStates::RECORDING);
+    }
+}
+
+
+/**
+ * @brief Stop Recording
+ */
+void IngeScapeExpeController::_stopRecording()
+{
+    if ((_modelManager != nullptr) && _modelManager->isEditorON() && (_modelManager->currentLoadedPlatform() != nullptr)
+            && (_networkC != nullptr))
+    {
+        qInfo() << "Stop recording the platform" << _modelManager->currentLoadedPlatform()->name();
+
+        QString message = QString("%1=%2").arg(command_UpdateRecordState, STOP);
+
+        // Send the message "Update Record State" to the editor
+        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_modelManager->peerIdOfEditor(), message);
+
+
+        // FIXME: get state from recorder messages
+        _modelManager->currentLoadedPlatform()->setrecordState(RecordStates::RECORDED);
+    }
+}
+
 

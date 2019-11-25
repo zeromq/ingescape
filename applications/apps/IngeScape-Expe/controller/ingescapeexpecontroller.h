@@ -106,6 +106,16 @@ public:
 
 
     /**
+     * @brief Re-Start the network with a port and a network device
+     * @param strPort
+     * @param networkDevice
+     * @param hasToClearPlatform
+     * @return true when success
+     */
+    //Q_INVOKABLE bool restartNetwork(QString strPort, QString networkDevice, bool hasToClearPlatform);
+
+
+    /**
      * @brief Select a directory
      */
     Q_INVOKABLE void selectDirectory();
@@ -149,6 +159,42 @@ public Q_SLOTS:
 private Q_SLOTS:
 
     /**
+     * @brief Called when our network device is not available
+     */
+    void _onNetworkDeviceIsNotAvailable();
+
+
+    /**
+     * @brief Called when our network device is available again
+     */
+    void _onNetworkDeviceIsAvailableAgain();
+
+
+    /**
+     * @brief Called when our network device has a new IP address
+     */
+    void _onNetworkDeviceIpAddressHasChanged();
+
+
+    /**
+     * @brief Called when our machine will go to sleep
+     */
+    void _onSystemSleep();
+
+
+    /**
+     * @brief Called when our machine did wake from sleep
+     */
+    void _onSystemWake();
+
+
+    /**
+     * @brief Called when a network configuration is added, removed or changed
+     */
+    void _onSystemNetworkConfigurationsUpdated();
+
+
+    /**
      * @brief Slot called when the state of the TimeLine updated (in Editor app)
      * @param parameters
      */
@@ -156,6 +202,36 @@ private Q_SLOTS:
 
 
 private:
+
+    /**
+     * @brief Start IngeScape
+     *
+     * @param checkAvailableNetworkDevices
+     *
+     * @return
+     */
+    bool _startIngeScape(bool checkAvailableNetworkDevices);
+
+
+    /**
+     * @brief Restart IngeScape
+     *
+     * @param hasToClearPlatform
+     * @param checkAvailableNetworkDevices
+     *
+     *
+     * @return true if success
+     */
+    bool _restartIngeScape(bool hasToClearPlatform, bool checkAvailableNetworkDevices = false);
+
+
+    /**
+     * @brief Stop IngeScape
+     *
+     * @param hasToClearPlatform
+     */
+    void _stopIngeScape(bool hasToClearPlatform);
+
 
     /**
      * @brief Start Recording
@@ -174,8 +250,8 @@ private:
     // To subscribe to termination signals
     TerminationSignalWatcher *_terminationSignalWatcher;
 
-    // Helper to manage JSON files
-    JsonHelper* _jsonHelper;
+    // States of our mapping when our network was stopped
+    bool _beforeNetworkStop_isMappingConnected;
 
     // Path to the directory containing JSON files about platforms
     QString _platformDirectoryPath;
