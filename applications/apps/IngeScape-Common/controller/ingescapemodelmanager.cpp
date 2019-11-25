@@ -1056,7 +1056,7 @@ void IngeScapeModelManager::_onOutputsHaveBeenAddedToAgentsGroupedByName(QList<O
             }
         }
 
-        if (!newOutputsIds.isEmpty())
+        if (!newOutputsIds.isEmpty() && (IngeScapeNetworkController::instance() != nullptr))
         {
             // Add inputs to our application for these agent outputs
             IngeScapeNetworkController::instance()->addInputsToOurApplicationForAgentOutputs(agentsGroupedByName->name(), newOutputsIds, _isMappingConnected);
@@ -1084,7 +1084,7 @@ void IngeScapeModelManager::_onOutputsWillBeRemovedFromAgentsGroupedByName(QList
             }
         }
 
-        if (!oldOutputsIds.isEmpty())
+        if (!oldOutputsIds.isEmpty() && (IngeScapeNetworkController::instance() != nullptr))
         {
             // Remove inputs from our application for these agent outputs
             IngeScapeNetworkController::instance()->removeInputsFromOurApplicationForAgentOutputs(agentsGroupedByName->name(), oldOutputsIds, _isMappingConnected);

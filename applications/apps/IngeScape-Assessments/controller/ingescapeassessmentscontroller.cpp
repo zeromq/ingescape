@@ -208,7 +208,10 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
 */
 IngeScapeAssessmentsController::~IngeScapeAssessmentsController()
 {
-    // First, Stop IngeScape
+    // 1- Stop monitoring
+    IngeScapeNetworkController::instance()->stopMonitoring();
+
+    // 2- Stop IngeScape
     _stopIngeScape(false);
 
     // Unsubscribe to OS events
@@ -282,6 +285,18 @@ IngeScapeAssessmentsController::~IngeScapeAssessmentsController()
         temp = nullptr;
     }
 
+    // Free memory
+    AssessmentsModelManager* assessmentsModelManager = AssessmentsModelManager::instance();
+    disconnect(assessmentsModelManager);
+    // Do not call "delete" now, the destructor will be called automatically
+    //delete assessmentsModelManager;
+
+    // Free memory
+    IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
+    disconnect(ingeScapeModelManager);
+    // Do not call "delete" now, the destructor will be called automatically
+    //delete ingeScapeModelManager;
+
     if (_networkC != nullptr)
     {
         disconnect(_networkC);
@@ -295,17 +310,8 @@ IngeScapeAssessmentsController::~IngeScapeAssessmentsController()
     // Free memory
     IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
     disconnect(ingeScapeNetworkC);
-    delete ingeScapeNetworkC;
-
-    // Free memory
-    AssessmentsModelManager* assessmentsModelManager = AssessmentsModelManager::instance();
-    disconnect(assessmentsModelManager);
-    delete assessmentsModelManager;
-
-    // Free memory
-    IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
-    disconnect(ingeScapeModelManager);
-    delete ingeScapeModelManager;
+    // Do not call "delete" now, the destructor will be called automatically
+    //delete ingeScapeNetworkC;
 
     if (_licensesC != nullptr)
     {

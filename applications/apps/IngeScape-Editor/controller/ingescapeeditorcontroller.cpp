@@ -466,7 +466,10 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
  */
 IngeScapeEditorController::~IngeScapeEditorController()
 {
-    // First, Stop IngeScape
+    // 1- Stop monitoring
+    IngeScapeNetworkController::instance()->stopMonitoring();
+
+    // 2- Stop IngeScape
     _stopIngeScape(false);
 
     // Unsubscribe to OS events
@@ -560,21 +563,6 @@ IngeScapeEditorController::~IngeScapeEditorController()
         temp = nullptr;
     }
 
-    if (_networkC != nullptr)
-    {
-        disconnect(_networkC);
-
-        NetworkController* temp = _networkC;
-        setnetworkC(nullptr);
-        delete temp;
-        temp = nullptr;
-    }
-
-    // Free memory
-    IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
-    disconnect(ingeScapeNetworkC);
-    delete ingeScapeNetworkC;
-
     if (_modelManager != nullptr)
     {
         disconnect(_modelManager);
@@ -588,7 +576,24 @@ IngeScapeEditorController::~IngeScapeEditorController()
     // Free memory
     IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
     disconnect(ingeScapeModelManager);
-    delete ingeScapeModelManager;
+    // Do not call "delete" now, the destructor will be called automatically
+    //delete ingeScapeModelManager;
+
+    if (_networkC != nullptr)
+    {
+        disconnect(_networkC);
+
+        NetworkController* temp = _networkC;
+        setnetworkC(nullptr);
+        delete temp;
+        temp = nullptr;
+    }
+
+    // Free memory
+    IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
+    disconnect(ingeScapeNetworkC);
+    // Do not call "delete" now, the destructor will be called automatically
+    //delete ingeScapeNetworkC;
 
     if (_licensesC != nullptr)
     {
