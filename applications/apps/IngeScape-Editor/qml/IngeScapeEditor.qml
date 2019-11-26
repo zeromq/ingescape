@@ -17,6 +17,7 @@
 import QtQuick 2.8
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
+import QtQuick.Controls 2.0 as Controls2
 
 import I2Quick 1.0
 import QtQuick.Window 2.3
@@ -274,9 +275,9 @@ Item {
 
             anchors {
                 top: parent.top
-                topMargin: -1
+                topMargin: 15
                 right: parent.right
-                rightMargin: -1
+                rightMargin: 13
             }
 
             isOnline: IgsNetworkController ? IgsNetworkController.isOnline : false
@@ -286,7 +287,7 @@ Item {
 
             listOfNetworkDevices: IgsNetworkController ? IgsNetworkController.availableNetworkDevices : null
 
-            errorMessage: IngeScapeEditorC.errorMessageWhenConnectionFailed
+//            errorMessage: IngeScapeEditorC.errorMessageWhenConnectionFailed
 
             onWillOpenEditionMode: {
                 // Update our list of available network devices
@@ -300,12 +301,168 @@ Item {
                     var success = IngeScapeEditorC.restartNetwork(port, networkDevice, clearPlatform);
                     if (success)
                     {
+                        // Apply mapping mode
+                        IngeScapeEditorC.modelManager.isMappingControlled = mappingForm.isMappingControlled;
                         close();
                     }
                     else
                     {
                         console.error("Network cannot be (re)started on device " + networkDevice + " and port " + port);
                     }
+                }
+            }
+
+            // Add extra selection for mapping mode
+            // NB : extraContent property of NetworkConnectionInformationItem
+            Item {
+                id: mappingForm
+
+                height: fullLabelMappingMode.height + fullLabelMappingMode.anchors.topMargin +
+                        selectMappingModeCombobox.height + selectMappingModeCombobox.anchors.topMargin +
+                        lowSeparator.height + lowSeparator.anchors.topMargin
+                width: networkConfigurationInfo.contentWidth
+
+                property bool isMappingControlled: selectMappingModeCombobox.selectedIndex === 0
+
+                Item {
+                    id: fullLabelMappingMode
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                        top: parent.top
+                        topMargin: 13
+                    }
+
+                    height: childrenRect.height
+
+                    Text {
+                        id: labelMappingMode
+
+                        anchors {
+                            left: parent.left
+                            top: parent.top
+                        }
+
+                        text: qsTr("Mapping mode")
+
+                        color: IngeScapeTheme.lightGreyColor
+
+                        font {
+                            family: IngeScapeTheme.textFontFamily
+                            pixelSize: 16
+                        }
+                    }
+
+                    LabellessSvgButton {
+                        id: infoMappingMode
+
+                        anchors {
+                            left: labelMappingMode.right
+                            leftMargin: 5
+                            verticalCenter: labelMappingMode.verticalCenter
+                        }
+
+                        pressedID: "mapping-mode-info"
+                        releasedID: "mapping-mode-info"
+
+                        Controls2.ToolTip {
+                            delay: Qt.styleHints.mousePressAndHoldInterval
+                            visible: infoMappingMode.enabled && infoMappingMode.__behavior.containsMouse
+                            text: qsTr("TODO description")
+                        }
+                    }
+                }
+
+                I2ComboboxStringList {
+                    id: selectMappingModeCombobox
+
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                        top: fullLabelMappingMode.bottom
+                        topMargin: 9
+                    }
+
+                    height : 22
+
+                    style: IngeScapeComboboxStyle {}
+                    scrollViewStyle: IngeScapeScrollViewStyle {}
+
+                    _mouseArea.hoverEnabled: true
+
+                    placeholderText: qsTr("Select a network device...")
+
+                    model: ["CONTROL", "OBSERVE"]
+                    selectedIndex: IngeScapeEditorC.modelManager.isMappingControlled ? 0 : 1;
+
+
+                    // We change the text anchor to shift it to the right of the picto.
+                    // We cannot use
+                    //   anchors.left: containerPictoSelected.right
+                    // since containerPictoSelected and the text element are not siblings.
+                    _textAnchor.leftMargin: containerPictoSelected.x + containerPictoSelected.width
+
+                    Item {
+                        id: containerPictoSelected
+
+                        anchors {
+                            left: parent.left
+                            verticalCenter: parent.verticalCenter
+                        }
+
+                        width : 25
+                        height: childrenRect.height
+
+                        SvgImage {
+                            id: picto
+
+                            anchors {
+                                horizontalCenter: parent.horizontalCenter
+                            }
+
+                            svgElementId : (selectMappingModeCombobox.selectedItem === "CONTROL") ? "mapping-mode-control" : "mapping-mode-observe"
+                        }
+                    }
+
+                    delegate: customDelegate.component
+
+                    IngeScapeToolTipComboboxDelegateMappingMode {
+                        id: customDelegate
+
+                        comboboxStyle: selectMappingModeCombobox.style
+                        selection: selectMappingModeCombobox.selectedIndex
+
+                        height: selectMappingModeCombobox.height
+                        width:  selectMappingModeCombobox.width
+
+                        // Called from the component's MouseArea
+                        // 'index' is the index of the clicked component inside the model.
+                        function onDelegateClicked(index) {
+                            selectMappingModeCombobox.onDelegateClicked(index)
+                        }
+
+                        // Called from the component to get the text of the current item to display
+                        // 'index' is the index of the component to be displayed inside the model.
+                        function getItemText(index) {
+                            return selectMappingModeCombobox.modelToString(selectMappingModeCombobox.model[index]);
+                        }
+                    }
+                }
+
+                // Second separator
+                Rectangle {
+                    id: lowSeparator
+
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                        top: selectMappingModeCombobox.bottom
+                        topMargin: 15
+                    }
+
+                    height: 1
+
+                    color: IngeScapeTheme.editorsBackgroundBorderColor
                 }
             }
         }
