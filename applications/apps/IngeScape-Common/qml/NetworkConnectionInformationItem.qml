@@ -86,7 +86,7 @@ I2CustomRectangle {
         property bool canAutoCloseEditionMode: false
 
         // Boolean indicating if we must highlight our component
-        property bool mustBeHighlighted : !root.isEditionModeOpened && contentMouseArea.enabled && contentMouseArea.containsMouse && IgsModelManager.isMappingConnected
+        property bool mustBeHighlighted : !root.isEditionModeOpened && contentMouseArea.enabled && contentMouseArea.containsMouse
     }
 
 
@@ -271,9 +271,7 @@ I2CustomRectangle {
         hoverEnabled: true
 
         onClicked: {
-            if (IgsModelManager.isMappingConnected) {
-                rootPrivate.isEditionModeOpened ? root.close() : root.open();
-            }
+            rootPrivate.isEditionModeOpened ? root.close() : root.open();
         }
 
         onPositionChanged: {
@@ -323,8 +321,6 @@ I2CustomRectangle {
                             topMargin: 8
                         }
 
-                        visible: IgsModelManager.isMappingConnected
-
                         releasedID: rootPrivate.mustBeHighlighted ? "mapping-mode-settings-hover" : "mapping-mode-settings"
                         pressedID: "mapping-mode-settings-pressed"
 
@@ -364,10 +360,6 @@ I2CustomRectangle {
 
                         onCheckedChanged: {
                             IgsModelManager.isMappingConnected = checked;
-
-                            if (!IgsModelManager.isMappingConnected) {
-                                root.close();
-                            }
                         }
 
                         Binding {
