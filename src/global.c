@@ -18,6 +18,7 @@ bool igs_Interrupted = false;
 
 void globalforcedStopCB(igsAgent_t *agent, void *myData){
     IGS_UNUSED(myData)
+    IGS_UNUSED(agent)
     igs_Interrupted = true;
 }
 
@@ -52,6 +53,7 @@ typedef struct {
 } observeForcedStopCbWrapper_t;
 
 void global_observeForcedStopCallback(igsAgent_t *agent, void *myData){
+    IGS_UNUSED(agent)
     observeForcedStopCbWrapper_t *wrap = (observeForcedStopCbWrapper_t *)myData;
     wrap->cb(wrap->myData);
 }
@@ -110,6 +112,7 @@ typedef struct {
 } observeMuteCbWrapper_t;
 
 void global_observeMuteCallback(igsAgent_t *agent, bool isMuted, void *myData){
+    IGS_UNUSED(agent)
     observeMuteCbWrapper_t *wrap = (observeMuteCbWrapper_t *)myData;
     wrap->cb(isMuted, wrap->myData);
 }
@@ -143,6 +146,7 @@ typedef struct {
 } observeFreezeCbWrapper_t;
 
 void global_observeFreezeCallback(igsAgent_t *agent, bool isPaused, void *myData){
+    IGS_UNUSED(agent)
     observeFreezeCbWrapper_t *wrap = (observeFreezeCbWrapper_t *)myData;
     wrap->cb(isPaused, wrap->myData);
 }
@@ -363,6 +367,7 @@ typedef struct {
 } observeIOPCbWrapper_t;
 
 void global_observeIOPCallback(igsAgent_t *agent, iop_t iopType, const char *name, iopType_t valueType, void *value, size_t valueSize, void *myData){
+    IGS_UNUSED(agent)
     observeIOPCbWrapper_t *wrap = (observeIOPCbWrapper_t *)myData;
     wrap->cb(iopType, name, valueType, value, valueSize, wrap->myData);
 }
@@ -789,6 +794,7 @@ typedef struct {
 } observeLicenseCbWrapper_t;
 
 void global_observeLicenseCallback(igsAgent_t *agent, igs_license_limit_t limit, void *myData){
+    IGS_UNUSED(agent)
     observeLicenseCbWrapper_t *wrap = (observeLicenseCbWrapper_t *)myData;
     wrap->cb(limit, wrap->myData);
 }
@@ -856,6 +862,7 @@ typedef struct {
 } observeMonitorCbWrapper_t;
 
 void global_observeMonitorCallback(igsAgent_t *agent, igs_monitorEvent_t event, const char *device, const char *ipAddress, void *myData){
+    IGS_UNUSED(agent)
     observeMonitorCbWrapper_t *wrap = (observeMonitorCbWrapper_t *)myData;
     wrap->cb(event, device, ipAddress, wrap->myData);
 }
@@ -892,6 +899,7 @@ typedef struct {
 void global_observeBusCallback(igsAgent_t *agent, const char *event, const char *peerID, const char *name,
                                const char *address, const char *channel,
                                zhash_t *headers, zmsg_t *msg, void *myData){
+    IGS_UNUSED(agent)
     observeBusCbWrapper_t *wrap = (observeBusCbWrapper_t *)myData;
     wrap->cb(event, peerID, name, address, channel, headers, msg, wrap->myData);
 }
@@ -978,6 +986,7 @@ typedef struct {
 void global_callCallback(igsAgent_t *agent, const char *senderAgentName, const char *senderAgentUUID,
                          const char *callName, igs_callArgument_t *firstArgument, size_t nbArgs,
                          void* myData){
+    IGS_UNUSED(agent)
     callCbWrapper_t *wrap = (callCbWrapper_t *)myData;
     wrap->cb(senderAgentName, senderAgentUUID, callName, firstArgument, nbArgs, wrap->myData);
 }
