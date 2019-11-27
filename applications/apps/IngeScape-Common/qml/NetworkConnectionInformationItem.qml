@@ -28,14 +28,16 @@ I2CustomRectangle {
     // Content width of our component
     readonly property alias contentWidth: content.width
 
-    // Flag indicating if we are online
-    property bool isOnline: false
+    // Flag indicating if editor is started on ingescape platform
+    // NB : if false, it means that no network devices were available
+    //      or that user have to make a choice to launch the editor on igs platform
+    property bool editorStartedOnIgs: true
 
     // Current network device
     property string currentNetworkDevice: ""
 
     // Current port
-    property int currentPort: 31520
+    property int currentPort: 5670
 
     // Duration of animations in milliseconds (250 ms => default duration of QML animations)
     property int animationDuration: 250
@@ -87,6 +89,9 @@ I2CustomRectangle {
 
         // Boolean indicating if we must highlight our component
         property bool mustBeHighlighted : !root.isEditionModeOpened && contentMouseArea.enabled && contentMouseArea.containsMouse
+
+        // Flag indicating if some network devices are available
+        property bool networkDevicesAvailable : selectNetworkDeviceCombobox.count > 0
     }
 
 
@@ -173,7 +178,7 @@ I2CustomRectangle {
             return (
                     (index >= 0)
                     ? index
-                    : ((root.listOfNetworkDevices.length === 1) ? 0 : -1)
+                    : (((root.listOfNetworkDevices) && (root.listOfNetworkDevices.length === 1)) ? 0 : -1)
                    );
         });
     }
@@ -230,12 +235,18 @@ I2CustomRectangle {
         resetComboboxSelectNetworkDevice();
     }
 
+    onEditorStartedOnIgsChanged: {
+        if (!root.editorStartedOnIgs && !root.isEditionModeOpened)
+        {
+            open();
+        }
+    }
 
     // Timer used to auto-close our edition mode
     Timer {
         id: autoCloseTimer
 
-        running: root.isOnline && rootPrivate.canAutoCloseEditionMode
+        running: root.editorStartedOnIgs && rootPrivate.canAutoCloseEditionMode
                  && !(selectNetworkDeviceCombobox.comboList.visible || selectPortTextfield.activeFocus)
 
         repeat: false
@@ -266,12 +277,19 @@ I2CustomRectangle {
         width: parent.width
         height: childrenRect.height
 
-        enabled: root.isOnline
+        enabled: rootPrivate.networkDevicesAvailable
 
         hoverEnabled: true
 
         onClicked: {
-            rootPrivate.isEditionModeOpened ? root.close() : root.open();
+            if (rootPrivate.isEditionModeOpened && root.editorStartedOnIgs)
+            {
+                root.close();
+            }
+            else if (!rootPrivate.isEditionModeOpened)
+            {
+                root.open();
+            }
         }
 
         onPositionChanged: {
@@ -309,7 +327,7 @@ I2CustomRectangle {
                     id: headerContentOnline
                     anchors.fill: parent
 
-                    visible: root.isOnline
+                    visible: rootPrivate.networkDevicesAvailable
 
                     // Button - Open network settings
                     LabellessSvgButton {
@@ -343,6 +361,10 @@ I2CustomRectangle {
                             top : buttonOpenSettings.verticalCenter
                         }
 
+                        enabled: root.editorStartedOnIgs
+
+                        checked : IgsModelManager ? IgsModelManager.isMappingConnected : false
+
                         style: I2SvgToggleButtonStyle {
                             fileCache: IngeScapeTheme.svgFileIngeScape
 
@@ -352,20 +374,14 @@ I2CustomRectangle {
                             toggleUncheckedPressedID: "mapping-mode-toggle-disconnected-pressed";
 
                             // No disabled states
-                            toggleCheckedDisabledID: ""
-                            toggleUncheckedDisabledID: ""
+                            toggleCheckedDisabledID: "mapping-mode-toggle-connected"; // TODO graphism
+                            toggleUncheckedDisabledID: "mapping-mode-toggle-disconnected"; // TODO graphism
 
                             labelMargin: 0;
                         }
 
                         onCheckedChanged: {
                             IgsModelManager.isMappingConnected = checked;
-                        }
-
-                        Binding {
-                            target: connectButton
-                            property: "checked"
-                            value: IgsModelManager ? IgsModelManager.isMappingConnected : false
                         }
                     }
 
@@ -400,6 +416,8 @@ I2CustomRectangle {
                            right: textInfoPart1.right
                            top: connectButton.bottom
                        }
+
+                       visible : root.editorStartedOnIgs
 
                        color: IgsModelManager.isMappingConnected ? IngeScapeTheme.veryLightGreyColor : IngeScapeTheme.lightGreyColor
 
@@ -659,13 +677,6 @@ I2CustomRectangle {
                         }
                     }
 
-                    Binding {
-                        target: selectPortTextfield
-                        property: "text"
-                        value: root.currentPort
-                    }
-
-
                     onTextChanged: {
                         root.resetAutoCloseTimer();
                     }
@@ -705,6 +716,8 @@ I2CustomRectangle {
                                 top: parent.top
                                 bottom: parent.bottom
                             }
+
+                            visible: root.editorStartedOnIgs
 
                             width: actions.buttonBoundingBox.width
 

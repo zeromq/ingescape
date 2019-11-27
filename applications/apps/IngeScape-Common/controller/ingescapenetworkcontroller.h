@@ -49,12 +49,11 @@ class IngeScapeNetworkController : public QObject
     // List of available network devices
     I2_QML_PROPERTY_READONLY(QStringList, availableNetworkDevices)
 
+    // List of addresses of available network devices
+    I2_CPP_NOSIGNAL_PROPERTY(QStringList, availableNetworkDevicesAddresses)
+
     // Flag indicating if our agent is started
     I2_QML_PROPERTY_READONLY(bool, isStarted)
-
-    // Flag indicating if our agent is online
-    // NB: false when our agent is not started OR when its network device is no more available
-    I2_QML_PROPERTY_READONLY(bool, isOnline)
 
     // Flag indicating if we must start/stop our agent automatically when we receive monitor events
     // NB: this flags exists to allow each application based on IngeScape-Common to define its own behavior

@@ -157,13 +157,6 @@ Item {
     Component.onCompleted: {
         // FIXME Several popup may appear at startup depending on the current platform configuration. Need to prioritize them and maybe show them sequentialy, not on top of each other.
 
-        // ...we check the value of the error message when a connection attempt fails
-        if (IngeScapeEditorC.errorMessageWhenConnectionFailed !== "")
-        {
-            //console.error("On Completed: Error Message = " + IngeScapeEditorC.errorMessageWhenConnectionFailed);
-            networkConfigurationInfo.open();
-        }
-
         // ...we check the value of the flag "is Valid License"
         if (IngeScapeEditorC.licensesC && IngeScapeEditorC.licensesC.mergedLicense && !IngeScapeEditorC.licensesC.mergedLicense.editorLicenseValidity)
         {
@@ -280,49 +273,25 @@ Item {
                 rightMargin: 13
             }
 
-            isOnline: IgsNetworkController ? IgsNetworkController.isOnline : false
+            editorStartedOnIgs: IgsNetworkController ? IgsNetworkController.isStarted : false
 
             currentNetworkDevice: IngeScapeEditorC.networkDevice
             currentPort: IngeScapeEditorC.port
 
             listOfNetworkDevices: IgsNetworkController ? IgsNetworkController.availableNetworkDevices : null
 
-//            errorMessage: IngeScapeEditorC.errorMessageWhenConnectionFailed
-
-            onWillOpenEditionMode: {
-                // Update our list of available network devices
-                IgsNetworkController.updateAvailableNetworkDevices();
-            }
-
-            onChangeNetworkSettings: {
-                if (IgsNetworkController.isAvailableNetworkDevice(networkDevice))
-                {
-                    // Re-Start the Network
-                    var success = IngeScapeEditorC.restartNetwork(port, networkDevice, clearPlatform);
-                    if (success)
-                    {
-                        // Apply mapping mode
-                        IngeScapeEditorC.modelManager.isMappingControlled = mappingForm.isMappingControlled;
-                        close();
-                    }
-                    else
-                    {
-                        console.error("Network cannot be (re)started on device " + networkDevice + " and port " + port);
-                    }
-                }
-            }
-
             // Add extra selection for mapping mode
             // NB : extraContent property of NetworkConnectionInformationItem
             Item {
                 id: mappingForm
 
+                // Must have fixed height and width
                 height: fullLabelMappingMode.height + fullLabelMappingMode.anchors.topMargin +
                         selectMappingModeCombobox.height + selectMappingModeCombobox.anchors.topMargin +
                         lowSeparator.height + lowSeparator.anchors.topMargin
                 width: networkConfigurationInfo.contentWidth
 
-                property bool isMappingControlled: selectMappingModeCombobox.selectedIndex === 0
+                property bool resMappingControlled: selectMappingModeCombobox.selectedIndex === 0
 
                 Item {
                     id: fullLabelMappingMode
@@ -463,6 +432,29 @@ Item {
                     height: 1
 
                     color: IngeScapeTheme.editorsBackgroundBorderColor
+                }
+            }
+
+            onWillOpenEditionMode: {
+                // Update our list of available network devices
+                IgsNetworkController.updateAvailableNetworkDevices();
+            }
+
+            onChangeNetworkSettings: {
+                if (IgsNetworkController.isAvailableNetworkDevice(networkDevice))
+                {
+                    // Re-Start the Network
+                    var success = IngeScapeEditorC.restartNetwork(port, networkDevice, clearPlatform);
+                    if (success)
+                    {
+                        // Apply mapping mode
+                        IngeScapeEditorC.modelManager.isMappingControlled = mappingForm.resMappingControlled;
+                        close();
+                    }
+                    else
+                    {
+                        console.error("Network cannot be (re)started on device " + networkDevice + " and port " + port);
+                    }
                 }
             }
         }

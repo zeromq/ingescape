@@ -61,9 +61,6 @@ class IngeScapeEditorController : public QObject
     // Flag indicating if the Model/View Model Visualizer is visible
     I2_QML_PROPERTY(bool, isVisibleModelVisualizer)
 
-    // Error message when a connection attempt fails
-    I2_QML_PROPERTY_READONLY(QString, errorMessageWhenConnectionFailed)
-
     // Snapshot Directory
     I2_QML_PROPERTY_READONLY(QString, snapshotDirectory)
 

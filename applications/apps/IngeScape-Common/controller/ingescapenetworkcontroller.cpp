@@ -393,9 +393,6 @@ void onMonitorCallback(igs_monitorEvent_t event, const char *device, const char 
                     qInfo() << "Device not available: " << networkDevice
                             << " - ingescape agent must be stopped";
 
-                    // Update internal state
-                    ingeScapeNetworkC->setisOnline(false);
-
                     // Update our list of network devices
                     ingeScapeNetworkC->updateAvailableNetworkDevices();
 
@@ -615,7 +612,6 @@ QObject* IngeScapeNetworkController::qmlSingleton(QQmlEngine* engine, QJSEngine*
  */
 IngeScapeNetworkController::IngeScapeNetworkController(QObject *parent) : QObject(parent),
     _isStarted(false),
-    _isOnline(false),
     _automaticallyStartStopOnMonitorEvents(false),
     _agentModel(nullptr),
     _numberOfAgents(0),
@@ -752,18 +748,17 @@ bool IngeScapeNetworkController::start(QString networkDevice, QString ipAddress,
         {
             // Update internal state
             setisStarted(true);
-            setisOnline(true);
 
             // Log
             qInfo() << "IngeScape Agent" << _igsAgentApplicationName << "started";
         }
-        else
-        {
+        else {
             // Update internal state
-            setisOnline(false);
+            setisStarted(false);
 
             // Log
-            qCritical() << "The network has NOT been initialized on" << networkDevice << "or" << ipAddress << "and port" << QString::number(port);
+            qInfo() << "The network has NOT been initialized on" << networkDevice << "or" << ipAddress << "and port" << QString::number(port);
+
         }
 
         // Save values
@@ -793,7 +788,6 @@ void IngeScapeNetworkController::stop()
 
         // Update internal states
         setisStarted(false);
-        setisOnline(false);
 
         // Reset counters
         setnumberOfAgents(0);
@@ -915,25 +909,36 @@ void IngeScapeNetworkController::manageExitedPeerId(QString peerId)
 void IngeScapeNetworkController::updateAvailableNetworkDevices()
 {
     QStringList networkDevices;
+    QStringList networkDeviceAddresses;
 
     char **devices = nullptr;
-    int nb = 0;
-    igs_getNetdevicesList(&devices, &nb);
+    char **addresses = nullptr;
+    int nbDevices = 0;
+    int nbAddresses = 0;
 
-    for (int i = 0; i < nb; i++)
+    igs_getNetdevicesList(&devices, &nbDevices);
+    igs_getNetaddressesList(&addresses, &nbAddresses);
+
+    for (int i = 0; i < nbDevices; i++)
     {
 #ifdef Q_OS_WIN
-        // igs_getNetdevicesList return latin1 values
+        // igs_getNetdevicesList & igs_getNetaddressesList return latin1 values
         QString availableNetworkDevice = QString::fromLatin1(devices[i]);
+        QString availableNetworkDeviceAddress =  QString::fromLatin1(addresses[i]);
 #else
         QString availableNetworkDevice = QString(devices[i]);
+        QString availableNetworkDeviceAddress =  QString(addresses[i]);
 #endif
 
         networkDevices.append(availableNetworkDevice);
+        networkDeviceAddresses.append(availableNetworkDeviceAddress);
     }
-    igs_freeNetdevicesList(devices, nb);
+
+    igs_freeNetdevicesList(devices, nbDevices);
+    igs_freeNetaddressesList(addresses, nbAddresses);
 
     setavailableNetworkDevices(networkDevices);
+    setavailableNetworkDevicesAddresses(networkDeviceAddresses);
 
     qInfo() << "Update available Network Devices:" << _availableNetworkDevices;
 }
