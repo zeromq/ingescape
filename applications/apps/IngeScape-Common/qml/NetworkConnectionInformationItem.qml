@@ -390,7 +390,15 @@ I2CustomRectangle {
                         }
 
                         onCheckedChanged: {
-                            IgsModelManager.isMappingConnected = checked;
+                            if (IgsModelManager) {
+                                IgsModelManager.isMappingConnected = checked;
+                            }
+                        }
+
+                        Binding {
+                            target: connectButton
+                            property: "checked"
+                            value: IgsModelManager.isMappingConnected
                         }
                     }
 
@@ -404,10 +412,10 @@ I2CustomRectangle {
                             leftMargin: 8
                         }
 
-                        text: (IgsModelManager.isMappingConnected) ? qsTr("Connected")
+                        text: (IgsModelManager && IgsModelManager.isMappingConnected) ? qsTr("Connected")
                                                                    : qsTr("Disconnected")
 
-                        color: (IgsModelManager.isMappingConnected) ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor
+                        color: (IgsModelManager && IgsModelManager.isMappingConnected) ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor
                         font {
                             family: IngeScapeTheme.labelFontFamily
                             weight: Font.Bold
@@ -428,7 +436,7 @@ I2CustomRectangle {
 
                        visible : root.editorStartedOnIgs
 
-                       color: IgsModelManager.isMappingConnected ? IngeScapeTheme.veryLightGreyColor : IngeScapeTheme.lightGreyColor
+                       color: IgsModelManager && IgsModelManager.isMappingConnected ? IngeScapeTheme.veryLightGreyColor : IngeScapeTheme.lightGreyColor
 
                        font {
                            family: IngeScapeTheme.heading2Font
