@@ -39,8 +39,7 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     _subjectsC(nullptr),
     _tasksC(nullptr),
     _exportC(nullptr),
-    _terminationSignalWatcher(nullptr),
-    _beforeNetworkStop_isMappingConnected(true)
+    _terminationSignalWatcher(nullptr)
 {
     qInfo() << "New IngeScape Assessments Controller";
 
@@ -591,8 +590,8 @@ bool IngeScapeAssessmentsController::_startIngeScape(bool checkAvailableNetworkD
 
         if (success)
         {
-            // Re-enable mapping
-            ingeScapeModelManager->setisMappingConnected(_beforeNetworkStop_isMappingConnected);
+            // Always enable mapping in assessment
+            ingeScapeModelManager->setisMappingConnected(true);
         }
     }
 
@@ -652,10 +651,6 @@ void IngeScapeAssessmentsController::_stopIngeScape(bool hasToClearPlatform)
         {
             qInfo() << "Stop the network on" << _networkDevice << "with" << _port << "(and KEEP the current platform)";
         }
-
-        // Save states of our mapping if needed
-        _beforeNetworkStop_isMappingConnected = ingeScapeModelManager->isMappingConnected();
-
 
         // Disable mapping
         ingeScapeModelManager->setisMappingConnected(false);

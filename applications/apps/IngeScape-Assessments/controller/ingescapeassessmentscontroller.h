@@ -216,10 +216,6 @@ private:
 
     // To subscribe to termination signals
     TerminationSignalWatcher *_terminationSignalWatcher;
-
-    // States of our mapping when our network was stopped
-    bool _beforeNetworkStop_isMappingConnected;
-
 };
 
 QML_DECLARE_TYPE(IngeScapeAssessmentsController)

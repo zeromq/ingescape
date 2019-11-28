@@ -51,6 +51,7 @@ I2CustomRectangle {
     // Auto-close timeout in milliseconds
     property alias autoCloseTimeoutInMilliseconds: autoCloseTimer.interval
 
+    property bool canEditConnection: false
 
     // Open settings button source appearance
     property string settingsReleasedId : "mapping-mode-settings"
@@ -365,9 +366,11 @@ I2CustomRectangle {
                         anchors {
                             left: parent.left
                             top : buttonOpenSettings.verticalCenter
+                            rightMargin: 8
                         }
 
-                        enabled: root.editorStartedOnIgs
+                        visible: canEditConnection
+                        enabled: visible && root.editorStartedOnIgs
 
                         checked : IgsModelManager ? IgsModelManager.isMappingConnected : false
 
@@ -396,7 +399,7 @@ I2CustomRectangle {
                         id: textInfoPart1
                         anchors {
                             verticalCenter: connectButton.verticalCenter
-                            left: connectButton.right
+                            left: connectButton.visible ? connectButton.right : parent.left
                             right: parent.right
                             leftMargin: 8
                         }
