@@ -495,20 +495,10 @@ WindowBlockTouches {
 //                        property var myEffectIopIsBool: myEffect && (myEffect.effectType === ActionEffectTypes.VALUE) && ( myEffect.modelM && myEffect.modelM.agentIOP && myEffect.modelM.agentIOP.firstModel && (myEffect.modelM.agentIOP.firstModel.agentIOPValueType === AgentIOPValueTypes.BOOL) )
 
 
-                        // Update real height of listview when there is an effect added or removed of effects list
-                        Component.onCompleted: {
-                            effectsListItem.realContentEffectsListHeight += effectsList.count !== 1 ? effectListItem.height + effectsList.spacing
-                                                                                                    : effectListItem.height
-                        }
-
-                        Component.onDestruction: {
-                            effectsListItem.realContentEffectsListHeight -= effectsList.count !== 1 ? effectListItem.height + effectsList.spacing
-                                                                                                    : effectListItem.height
-                        }
-
-
                         // Content of our effect list item
                         Rectangle {
+                            id: content
+
                             height: (myEffect && (myEffect.effectType === ActionEffectTypes.MAPPING)) ? 90 : 62
                             width: scrollView.width - 9 // scrollbar size
 
@@ -518,6 +508,29 @@ WindowBlockTouches {
                                 width : 1
                                 color : IngeScapeTheme.blackColor
                             }
+
+                            property real previousHeight : 0
+
+                            // Update real height of listview when there is an effect added or removed of effects list
+                            Component.onCompleted: {
+                                effectsListItem.realContentEffectsListHeight += effectsList.count !== 1 ? effectsList.spacing : 0
+
+                                content.previousHeight = content.height;
+                            }
+
+                            Component.onDestruction: {
+                                effectsListItem.realContentEffectsListHeight -= effectsList.count !== 1 ? content.height - effectsList.spacing
+                                                                                                        : content.height
+                            }
+
+                            // ... Or content height changed
+                            onHeightChanged: {
+                                effectsListItem.realContentEffectsListHeight -= content.previousHeight;
+                                effectsListItem.realContentEffectsListHeight += content.height
+
+                                content.previousHeight = content.height;
+                            }
+
 
                             // Effect Type
                             Row {
