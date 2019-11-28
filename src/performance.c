@@ -20,7 +20,7 @@ int64_t performanceStart = 0;
 int64_t performanceStop = 0;
 
 void igsAgent_performanceCheck(igsAgent_t *agent, const char *peerId, size_t msgSize, size_t nbOfMsg){
-    if (agent->agentElements == NULL || agent->agentElements->node == NULL){
+    if (agent->loopElements == NULL || agent->loopElements->node == NULL){
         igsAgent_error(agent, "agent must be started to execute performance tests");
         return;
     }
@@ -42,7 +42,7 @@ void igsAgent_performanceCheck(igsAgent_t *agent, const char *peerId, size_t msg
     zmsg_addmem(msg, &performanceMsgCounter, sizeof(size_t));
     void *mem = malloc(msgSize);
     zmsg_addmem(msg, mem, msgSize);
-    zyre_t *node = agent->agentElements->node;
+    zyre_t *node = agent->loopElements->node;
     
     performanceStart = zclock_usecs();
     bus_zyreLock();
