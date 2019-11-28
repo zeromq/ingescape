@@ -194,14 +194,12 @@ Item {
             rightMargin: -1
         }
 
-        isOnline: IgsNetworkController ? IgsNetworkController.isOnline : false
+        editorStartedOnIgs: IgsNetworkController ? IgsNetworkController.isStarted : false
 
         currentNetworkDevice: IngeScapeAssessmentsC.networkDevice
         currentPort: IngeScapeAssessmentsC.port
 
         listOfNetworkDevices: IgsNetworkController ? IgsNetworkController.availableNetworkDevices : null
-
-        errorMessage: IngeScapeAssessmentsC.errorMessageWhenConnectionFailed
 
         onWillOpenEditionMode: {
             // Update our list of available network devices

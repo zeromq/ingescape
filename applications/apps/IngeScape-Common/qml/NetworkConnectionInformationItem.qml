@@ -52,6 +52,12 @@ I2CustomRectangle {
     property alias autoCloseTimeoutInMilliseconds: autoCloseTimer.interval
 
 
+    // Open settings button source appearance
+    property string settingsReleasedId : "mapping-mode-settings"
+    property string settingsHighlightedId: "mapping-mode-settings-hover"
+    property string settingsPressedId : "mapping-mode-settings-pressed"
+
+
     //
     // Configure our item
     //
@@ -339,8 +345,8 @@ I2CustomRectangle {
                             topMargin: 8
                         }
 
-                        releasedID: rootPrivate.mustBeHighlighted ? "mapping-mode-settings-hover" : "mapping-mode-settings"
-                        pressedID: "mapping-mode-settings-pressed"
+                        releasedID: rootPrivate.mustBeHighlighted ? root.settingsHighlightedId : root.settingsReleasedId
+                        pressedID: root.settingsPressedId
 
                         onClicked: {
                             rootPrivate.isEditionModeOpened ? root.close() : root.open();
