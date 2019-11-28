@@ -46,7 +46,7 @@ void definition_freeIOP (agent_iop_t* iop){
     free(iop);
 }
 
-int definition_addIopToDefinition(igsAgent_t *agent, agent_iop_t *iop, iop_t iop_type, definition *def){
+int definition_addIopToDefinition(igsAgent_t *agent, agent_iop_t *iop, iop_t iop_type, igs_definition_t *def){
     if(def == NULL){
         igsAgent_error(agent, "Cannot add IOP %s to NULL definition", iop->name);
         return 0;
@@ -89,7 +89,7 @@ int definition_addIopToDefinition(igsAgent_t *agent, agent_iop_t *iop, iop_t iop
 }
 
 agent_iop_t* definition_createIop(igsAgent_t *agent, const char *name, iop_t type, iopType_t value_type, void *value, size_t size){
-    if (agent->internal_definition == NULL){
+    if (agent->definition == NULL){
         igsAgent_error(agent, "Cannot add IOP %s to NULL definition", name);
         return NULL;
     }
@@ -113,7 +113,7 @@ agent_iop_t* definition_createIop(igsAgent_t *agent, const char *name, iop_t typ
     iop->value_type = value_type;
     switch (type) {
         case IGS_INPUT_T:
-            if (definition_addIopToDefinition(agent, iop, IGS_INPUT_T, agent->internal_definition) < 1){
+            if (definition_addIopToDefinition(agent, iop, IGS_INPUT_T, agent->definition) < 1){
                 model_readWriteLock();
                 definition_freeIOP(iop);
                 model_readWriteUnlock();
@@ -121,7 +121,7 @@ agent_iop_t* definition_createIop(igsAgent_t *agent, const char *name, iop_t typ
             }
             break;
         case IGS_OUTPUT_T:
-            if (definition_addIopToDefinition(agent, iop, IGS_OUTPUT_T, agent->internal_definition) < 1){
+            if (definition_addIopToDefinition(agent, iop, IGS_OUTPUT_T, agent->definition) < 1){
                 model_readWriteLock();
                 definition_freeIOP(iop);
                 model_readWriteUnlock();
@@ -129,7 +129,7 @@ agent_iop_t* definition_createIop(igsAgent_t *agent, const char *name, iop_t typ
             }
             break;
         case IGS_PARAMETER_T:
-            if (definition_addIopToDefinition(agent, iop, IGS_PARAMETER_T, agent->internal_definition) < 1){
+            if (definition_addIopToDefinition(agent, iop, IGS_PARAMETER_T, agent->definition) < 1){
                 model_readWriteLock();
                 definition_freeIOP(iop);
                 model_readWriteUnlock();
@@ -147,7 +147,7 @@ agent_iop_t* definition_createIop(igsAgent_t *agent, const char *name, iop_t typ
 ////////////////////////////////////////////////////////////////////////
 // PRIVATE API
 ////////////////////////////////////////////////////////////////////////
-void definition_freeDefinition (definition* def) {
+void definition_freeDefinition (igs_definition_t* def) {
     if (def->name != NULL){
         free((char*)def->name);
         def->name = NULL;
@@ -199,7 +199,7 @@ void definition_freeDefinition (definition* def) {
  * \fn int igs_clearDefinition()
  * \ingroup loadSetGetDefFct
  * \brief Clear the internal definition of the agent.
- *        Free all members of the structure igs_definition_loaded & agent->internal_definition.
+ *        Free all members of the structure igs_definition_loaded & agent->definition.
  *        But the pointer of these structure is not free and stay allocated.
  * \return 1 if ok else 0
  */
@@ -207,48 +207,48 @@ int igsAgent_clearDefinition(igsAgent_t *agent){
 
     //Free the structure definition loaded
     igsAgent_debug(agent, "Clear our definition and initiate an empty one");
-    if(agent->internal_definition != NULL){
-        definition_freeDefinition(agent->internal_definition);
+    if(agent->definition != NULL){
+        definition_freeDefinition(agent->definition);
     }
-    agent->internal_definition = calloc(1, sizeof(definition));
-    agent->internal_definition->name = igsAgent_getAgentName(agent);
-    agent->internal_definition->description = NULL;
-    agent->internal_definition->version = NULL;
-    agent->internal_definition->params_table = NULL;
-    agent->internal_definition->inputs_table = NULL;
-    agent->internal_definition->outputs_table = NULL;
-    agent->internal_definition->calls_table = NULL;
+    agent->definition = calloc(1, sizeof(igs_definition_t));
+    agent->definition->name = igsAgent_getAgentName(agent);
+    agent->definition->description = NULL;
+    agent->definition->version = NULL;
+    agent->definition->params_table = NULL;
+    agent->definition->inputs_table = NULL;
+    agent->definition->outputs_table = NULL;
+    agent->definition->calls_table = NULL;
     agent->network_needToSendDefinitionUpdate = true;
     return 1;
 }
 
 char* igsAgent_getDefinition(igsAgent_t *agent){
     char * def = NULL;
-    if(agent->internal_definition == NULL)
+    if(agent->definition == NULL)
         return NULL;
-    def = parser_export_definition(agent->internal_definition);
+    def = parser_export_definition(agent->definition);
     return def;
 }
 
 char *igsAgent_getDefinitionName(igsAgent_t *agent){
-    if (agent->internal_definition != NULL && agent->internal_definition->name != NULL){
-        return strdup(agent->internal_definition->name);
+    if (agent->definition != NULL && agent->definition->name != NULL){
+        return strdup(agent->definition->name);
     }else{
         return NULL;
     }
 }
 
 char *igsAgent_getDefinitionDescription(igsAgent_t *agent){
-    if (agent->internal_definition != NULL && agent->internal_definition->description != NULL){
-        return strdup(agent->internal_definition->description);
+    if (agent->definition != NULL && agent->definition->description != NULL){
+        return strdup(agent->definition->description);
     }else{
         return NULL;
     }
 }
 
 char *igsAgent_getDefinitionVersion(igsAgent_t *agent){
-    if (agent->internal_definition != NULL && agent->internal_definition->version != NULL){
-        return strdup(agent->internal_definition->version);
+    if (agent->definition != NULL && agent->definition->version != NULL){
+        return strdup(agent->definition->version);
     }else{
         return NULL;
     }
@@ -264,13 +264,13 @@ int igsAgent_setDefinitionName(igsAgent_t *agent, const char *name){
         return -1;
     }
     
-    if(agent->internal_definition == NULL){
-        agent->internal_definition = calloc(1, sizeof(definition));
+    if(agent->definition == NULL){
+        agent->definition = calloc(1, sizeof(igs_definition_t));
     }
-    if(agent->internal_definition->name != NULL){
-        free((char*)agent->internal_definition->name);
+    if(agent->definition->name != NULL){
+        free((char*)agent->definition->name);
     }
-    agent->internal_definition->name = strndup(name, MAX_DEFINITION_NAME_LENGTH);
+    agent->definition->name = strndup(name, MAX_DEFINITION_NAME_LENGTH);
     agent->network_needToSendDefinitionUpdate = true;
     return 1;
 }
@@ -284,13 +284,13 @@ int igsAgent_setDefinitionDescription(igsAgent_t *agent, const char *description
         igsAgent_error(agent, "Definition description cannot be empty\n");
         return -1;
     }
-    if(agent->internal_definition == NULL){
-        agent->internal_definition = calloc(1, sizeof(definition));
+    if(agent->definition == NULL){
+        agent->definition = calloc(1, sizeof(igs_definition_t));
     }
-    if(agent->internal_definition->description != NULL){
-        free((char*)agent->internal_definition->description);
+    if(agent->definition->description != NULL){
+        free((char*)agent->definition->description);
     }
-    agent->internal_definition->description = strndup(description, MAX_DESCRIPTION_LENGTH);
+    agent->definition->description = strndup(description, MAX_DESCRIPTION_LENGTH);
     agent->network_needToSendDefinitionUpdate = true;
     return 1;
 }
@@ -304,13 +304,13 @@ int igsAgent_setDefinitionVersion(igsAgent_t *agent, const char *version){
         igsAgent_error(agent, "Definition version cannot be empty");
         return -1;
     }
-    if(agent->internal_definition == NULL){
-        agent->internal_definition = calloc(1, sizeof(definition));
+    if(agent->definition == NULL){
+        agent->definition = calloc(1, sizeof(igs_definition_t));
     }
-    if(agent->internal_definition->version != NULL){
-        free((char*)agent->internal_definition->version);
+    if(agent->definition->version != NULL){
+        free((char*)agent->definition->version);
     }
-    agent->internal_definition->version = strndup(version, 64);
+    agent->definition->version = strndup(version, 64);
     agent->network_needToSendDefinitionUpdate = true;
     return 1;
 }
@@ -336,8 +336,8 @@ int igsAgent_createInput(igsAgent_t *agent, const char *name, iopType_t value_ty
         igsAgent_error(agent, "Input name cannot be NULL or empty");
         return -1;
     }
-    if(agent->internal_definition == NULL){
-        agent->internal_definition = calloc(1, sizeof(definition));
+    if(agent->definition == NULL){
+        agent->definition = calloc(1, sizeof(igs_definition_t));
     }
     agent_iop_t *iop = definition_createIop(agent, name, IGS_INPUT_T, value_type, value, size);
     if (iop == NULL){
@@ -363,8 +363,8 @@ int igsAgent_createOutput(igsAgent_t *agent, const char *name, iopType_t value_t
         igsAgent_error(agent, "Output name cannot be NULL or empty");
         return -1;
     }
-    if(agent->internal_definition == NULL){
-        agent->internal_definition = calloc(1, sizeof(definition));
+    if(agent->definition == NULL){
+        agent->definition = calloc(1, sizeof(igs_definition_t));
     }
     agent_iop_t* iop = definition_createIop(agent, name, IGS_OUTPUT_T, value_type, value, size);
     if (iop == NULL){
@@ -389,8 +389,8 @@ int igsAgent_createParameter(igsAgent_t *agent, const char *name, iopType_t valu
         igsAgent_error(agent, "Parameter name cannot be NULL or empty");
         return -1;
     }
-    if(agent->internal_definition == NULL){
-        agent->internal_definition = calloc(1, sizeof(definition));
+    if(agent->definition == NULL){
+        agent->definition = calloc(1, sizeof(igs_definition_t));
     }
     agent_iop_t* iop = definition_createIop(agent, name, IGS_PARAMETER_T, value_type, value, size);
     if (iop == NULL){
@@ -413,7 +413,7 @@ int igsAgent_removeInput(igsAgent_t *agent, const char *name){
         igsAgent_error(agent, "Input name cannot be NULL or empty");
         return -1;
     }
-    if(agent->internal_definition == NULL){
+    if(agent->definition == NULL){
         igsAgent_error(agent, "No definition available yet");
         return -1;
     }
@@ -423,7 +423,7 @@ int igsAgent_removeInput(igsAgent_t *agent, const char *name){
         return -2;
     }
     model_readWriteLock();
-    HASH_DEL(agent->internal_definition->inputs_table, iop);
+    HASH_DEL(agent->definition->inputs_table, iop);
     definition_freeIOP(iop);
     model_readWriteUnlock();
     agent->network_needToSendDefinitionUpdate = true;
@@ -443,7 +443,7 @@ int igsAgent_removeOutput(igsAgent_t *agent, const char *name){
         igsAgent_error(agent, "Output name cannot be NULL or empty");
         return -1;
     }
-    if(agent->internal_definition == NULL){
+    if(agent->definition == NULL){
         igsAgent_error(agent, "No definition available yet");
         return -1;
     }
@@ -453,7 +453,7 @@ int igsAgent_removeOutput(igsAgent_t *agent, const char *name){
         return -2;
     }
     model_readWriteLock();
-    HASH_DEL(agent->internal_definition->outputs_table, iop);
+    HASH_DEL(agent->definition->outputs_table, iop);
     definition_freeIOP(iop);
     model_readWriteUnlock();
     agent->network_needToSendDefinitionUpdate = true;
@@ -473,7 +473,7 @@ int igsAgent_removeParameter(igsAgent_t *agent, const char *name){
         igsAgent_error(agent, "Parameter name cannot be NULL or empty");
         return -1;
     }
-    if(agent->internal_definition == NULL){
+    if(agent->definition == NULL){
         igsAgent_error(agent, "No definition available yet");
         return -1;
     }
@@ -483,7 +483,7 @@ int igsAgent_removeParameter(igsAgent_t *agent, const char *name){
         return -2;
     }
     model_readWriteLock();
-    HASH_DEL(agent->internal_definition->params_table, iop);
+    HASH_DEL(agent->definition->params_table, iop);
     definition_freeIOP(iop);
     model_readWriteUnlock();
     agent->network_needToSendDefinitionUpdate = true;
@@ -491,21 +491,21 @@ int igsAgent_removeParameter(igsAgent_t *agent, const char *name){
 }
 
 void igsAgent_setDefinitionPath(igsAgent_t *agent, const char *path){
-    strncpy(agent->definition_path, path, IGS_MAX_PATH - 1);
-    if (agent->agentElements != NULL && agent->agentElements->node != NULL){
+    strncpy(agent->definitionPath, path, IGS_MAX_PATH - 1);
+    if (agent->loopElements != NULL && agent->loopElements->node != NULL){
         bus_zyreLock();
-        zyre_shouts(agent->agentElements->node, CHANNEL, "DEFINITION_FILE_PATH=%s", agent->definition_path);
+        zyre_shouts(agent->loopElements->node, CHANNEL, "DEFINITION_FILE_PATH=%s", agent->definitionPath);
         bus_zyreUnlock();
     }
 }
 
 void igsAgent_writeDefinitionToPath(igsAgent_t *agent){
     FILE *fp = NULL;
-    fp = fopen (agent->definition_path,"w+");
+    fp = fopen (agent->definitionPath,"w+");
     if (fp == NULL){
-        igsAgent_error(agent, "Could not open %s for writing", agent->definition_path);
+        igsAgent_error(agent, "Could not open %s for writing", agent->definitionPath);
     }else{
-        char *def = parser_export_definition(agent->internal_definition);
+        char *def = parser_export_definition(agent->definition);
         fprintf(fp, "%s", def);
         fflush(fp);
         fclose(fp);

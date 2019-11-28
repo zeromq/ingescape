@@ -34,26 +34,26 @@ int monitor_triggerNetworkCheck(zloop_t *loop, int timer_id, void *arg){
     while (name) {
         if (agent->monitor->status == IGS_NETWORK_OK){
             //Agent was previously OK : check if it still is
-            if ((agent->agentElements != NULL)
-                && (strcmp(name, agent->agentElements->networkDevice) == 0)){
+            if ((agent->loopElements != NULL)
+                && (strcmp(name, agent->loopElements->networkDevice) == 0)){
                 // Agent is started
                 foundNetworkDevice = true;
 
                 // Check if IP address has changed : this might cause trouble in agent communication
-                if (strcmp(agent->agentElements->ipAddress, ziflist_address(iflist)) != 0){
+                if (strcmp(agent->loopElements->ipAddress, ziflist_address(iflist)) != 0){
                     igsAgent_warn(agent, "IP address has changed from %s to %s",
-                             agent->agentElements->ipAddress, ziflist_address(iflist));
+                             agent->loopElements->ipAddress, ziflist_address(iflist));
 
                     // Call our callbacks
                     DL_FOREACH(agent->monitorCallbacks, cb){
                         cb->callback_ptr(agent, IGS_NETWORK_ADDRESS_CHANGED,
-                                         agent->agentElements->networkDevice, ziflist_address(iflist), cb->myData);
+                                         agent->loopElements->networkDevice, ziflist_address(iflist), cb->myData);
                     }
 
                     // check if we need to restart after IP address change
                     if (agent->monitor_shallStartStopAgent){
-                        unsigned int port = agent->agentElements->zyrePort;
-                        char *networkDevice = strdup(agent->agentElements->networkDevice);
+                        unsigned int port = agent->loopElements->zyrePort;
+                        char *networkDevice = strdup(agent->loopElements->networkDevice);
                         igsAgent_warn(agent, "restarting agent after IP address has changed on %s", networkDevice);
                         igsAgent_stop(agent);
                         igsAgent_startWithDevice(agent, networkDevice, port);
@@ -63,7 +63,7 @@ int monitor_triggerNetworkCheck(zloop_t *loop, int timer_id, void *arg){
                 break;
             }
             // Agent is stopped : check if this is our expected network device
-            else if ((agent->agentElements == NULL)
+            else if ((agent->loopElements == NULL)
                      && (agent->monitor->networkDevice != NULL)
                      && (strcmp(name, agent->monitor->networkDevice) == 0)){
                 // Agent is not started BUT network device is available
@@ -73,7 +73,7 @@ int monitor_triggerNetworkCheck(zloop_t *loop, int timer_id, void *arg){
             }
         } else if (agent->monitor->status == IGS_NETWORK_DEVICE_NOT_AVAILABLE) {
             // network device was missing : check if situation has changed
-            if ((agent->agentElements == NULL)
+            if ((agent->loopElements == NULL)
                 && (agent->monitor->networkDevice != NULL)
                 && (strcmp(name, agent->monitor->networkDevice) == 0)){
                 foundNetworkDevice = true;
@@ -100,8 +100,8 @@ int monitor_triggerNetworkCheck(zloop_t *loop, int timer_id, void *arg){
                 agent->monitor->networkDevice = NULL;
                 break;
             }
-            else if ((agent->agentElements != NULL)
-                      && (strcmp(name, agent->agentElements->networkDevice) == 0)){
+            else if ((agent->loopElements != NULL)
+                      && (strcmp(name, agent->loopElements->networkDevice) == 0)){
                 // agent is now started : it was restarted manually
                 foundNetworkDevice = true;
 
@@ -110,7 +110,7 @@ int monitor_triggerNetworkCheck(zloop_t *loop, int timer_id, void *arg){
 
                 // Call our callbacks
                 DL_FOREACH(agent->monitorCallbacks, cb){
-                    cb->callback_ptr(agent, IGS_NETWORK_OK_AFTER_MANUAL_RESTART, agent->agentElements->networkDevice, agent->agentElements->ipAddress, cb->myData);
+                    cb->callback_ptr(agent, IGS_NETWORK_OK_AFTER_MANUAL_RESTART, agent->loopElements->networkDevice, agent->loopElements->ipAddress, cb->myData);
                 }
 
                 //NB: we don't need to (re)start our agent because it is already started
@@ -134,22 +134,22 @@ int monitor_triggerNetworkCheck(zloop_t *loop, int timer_id, void *arg){
         // we did not find our expected network device and this is new
 
         // Check if our agent is started
-        if (agent->agentElements != NULL) {
+        if (agent->loopElements != NULL) {
             //agent is started but network device was not found
-            igsAgent_warn(agent, "network device %s has disappeared", agent->agentElements->networkDevice);
+            igsAgent_warn(agent, "network device %s has disappeared", agent->loopElements->networkDevice);
 
             // Update status
             agent->monitor->status = IGS_NETWORK_DEVICE_NOT_AVAILABLE;
 
             // Save network values before calling our callbacks and igs_stop
-            agent->monitor->port = agent->agentElements->zyrePort;
+            agent->monitor->port = agent->loopElements->zyrePort;
             if (agent->monitor->networkDevice != NULL)
                 free(agent->monitor->networkDevice);
-            agent->monitor->networkDevice = strdup(agent->agentElements->networkDevice);
+            agent->monitor->networkDevice = strdup(agent->loopElements->networkDevice);
 
             // Call our callbacks
             DL_FOREACH(agent->monitorCallbacks, cb){
-                cb->callback_ptr(agent, IGS_NETWORK_DEVICE_NOT_AVAILABLE, agent->agentElements->networkDevice, agent->agentElements->ipAddress, cb->myData);
+                cb->callback_ptr(agent, IGS_NETWORK_DEVICE_NOT_AVAILABLE, agent->loopElements->networkDevice, agent->loopElements->ipAddress, cb->myData);
             }
 
             // Check if we need to stop it
@@ -283,7 +283,7 @@ void igsAgent_monitoringDisable(igsAgent_t *agent){
     // On Windows, we need to use a sledgehammer to avoid assertion errors
     // NB: If we don't call zsys_shutdown, the application will crash on exit
     // (WSASTARTUP assertion failure)
-    if (agent->agentElements == NULL) {
+    if (agent->loopElements == NULL) {
         zsys_shutdown();
     }
 #endif

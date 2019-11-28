@@ -58,7 +58,7 @@ void mapping_freeMappingElement (mapping_element_t* mapElmt){
 // PRIVATE API
 ////////////////////////////////////////////////////////////////////////
 
-void mapping_freeMapping (mapping_t* map) {
+void mapping_freeMapping (igs_mapping_t* map) {
     if (map == NULL){
         return;
     }
@@ -129,7 +129,7 @@ bool mapping_checkCompatibilityInputOutput(igsAgent_t *agent, agent_iop_t *input
 /**
  * \fn int igs_loadMapping (const char* json_str)
  * \ingroup loadClearGetMapFct
- * \brief load mapping in variable 'agent->internal_mapping' from a json string
+ * \brief load mapping in variable 'agent->mapping' from a json string
  *
  * \param json_str String in json format. Can't be NULL.
  * \return The error. 1 is OK, 0 json string is NULL or empty, -1 Mapping has not been loaded
@@ -139,12 +139,12 @@ int igsAgent_loadMapping (igsAgent_t *agent, const char* json_str){
         igsAgent_error(agent, "Json string is null or empty");
         return 0;
     }
-    mapping_t *tmp = parser_LoadMap(json_str);
+    igs_mapping_t *tmp = parser_LoadMap(json_str);
     if(tmp == NULL){
         igsAgent_error(agent, "Mapping could not be loaded from json string : %s", json_str);
         return -1;
     }else{
-        agent->internal_mapping = tmp;
+        agent->mapping = tmp;
         agent->network_needToUpdateMapping = true;
     }
     return 1;
@@ -153,7 +153,7 @@ int igsAgent_loadMapping (igsAgent_t *agent, const char* json_str){
 /**
  * \fn int igs_loadMappingFromPath (const char* file_path)
  * \ingroup loadClearGetMapFct
- * \brief load mapping in variable 'agent->internal_mapping' from a file path
+ * \brief load mapping in variable 'agent->mapping' from a file path
  *
  * \param file_path The string which contains the json file path. Can't be NULL.
  * \return The error. 1 is OK, 0 file path is NULL or empty, -1 Definition file has not been loaded
@@ -167,13 +167,13 @@ int igsAgent_loadMappingFromPath (igsAgent_t *agent, const char* file_path){
         igsAgent_debug(agent, "Json file path is empty");
         return 1;
     }
-    mapping_t *tmp = parser_LoadMapFromPath(file_path);
+    igs_mapping_t *tmp = parser_LoadMapFromPath(file_path);
     if(tmp == NULL){
         igsAgent_error(agent, "Mapping could not be loaded from path %s", file_path);
         return -1;
     }else{
-        strncpy(agent->mapping_path, file_path, IGS_MAX_PATH-1);
-        agent->internal_mapping = tmp;
+        strncpy(agent->mappingPath, file_path, IGS_MAX_PATH-1);
+        agent->mapping = tmp;
         agent->network_needToUpdateMapping = true;
     }
     return 1;
@@ -182,21 +182,21 @@ int igsAgent_loadMappingFromPath (igsAgent_t *agent, const char* file_path){
 /**
  * \fn int igs_clearMapping()
  * \ingroup loadClearGetMapFct
- * \brief Clear the variable 'agent->internal_mapping' and free all structures inside and itself
+ * \brief Clear the variable 'agent->mapping' and free all structures inside and itself
  *
  * \return The error. 1 is OK,
  * 0 file path is NULL or empty
  */
 int igsAgent_clearMapping(igsAgent_t *agent){
     igsAgent_debug(agent, "Clear current mapping if needed and initiate an empty one");
-    if(agent->internal_mapping != NULL){
-        mapping_freeMapping(agent->internal_mapping);
+    if(agent->mapping != NULL){
+        mapping_freeMapping(agent->mapping);
     }
-    agent->internal_mapping = calloc(1, sizeof(struct mapping));
-    agent->internal_mapping->name = NULL;
-    agent->internal_mapping->description = NULL;
-    agent->internal_mapping->version = NULL;
-    agent->internal_mapping->map_elements = NULL;
+    agent->mapping = calloc(1, sizeof(struct mapping));
+    agent->mapping->name = NULL;
+    agent->mapping->description = NULL;
+    agent->mapping->version = NULL;
+    agent->mapping->map_elements = NULL;
     agent->network_needToUpdateMapping = true;
     return 1;
 }
@@ -206,38 +206,38 @@ int igsAgent_clearMapping(igsAgent_t *agent){
  * \ingroup loadClearGetMapFct
  * \brief the agent mapping getter
  *
- * \return The loaded mapping string in json format. NULL if agent->internal_mapping was not initialized.
+ * \return The loaded mapping string in json format. NULL if agent->mapping was not initialized.
  * \warning Allocate memory that should be freed by the user.
  */
 char* igsAgent_getMapping(igsAgent_t *agent){
     char * mappingJson = NULL;
-    if(agent->internal_mapping == NULL){
+    if(agent->mapping == NULL){
         igsAgent_warn(agent, "No mapping defined yet");
         return NULL;
     }
-    mappingJson = parser_export_mapping(agent->internal_mapping);
+    mappingJson = parser_export_mapping(agent->mapping);
     return mappingJson;
 }
 
 char* igsAgent_getMappingName(igsAgent_t *agent){
-    if (agent->internal_mapping != NULL && agent->internal_mapping->name != NULL){
-        return strdup(agent->internal_mapping->name);
+    if (agent->mapping != NULL && agent->mapping->name != NULL){
+        return strdup(agent->mapping->name);
     }else{
         return NULL;
     }
 }
 
 char* igsAgent_getMappingDescription(igsAgent_t *agent){
-    if (agent->internal_mapping != NULL && agent->internal_mapping->description != NULL){
-        return strdup(agent->internal_mapping->description);
+    if (agent->mapping != NULL && agent->mapping->description != NULL){
+        return strdup(agent->mapping->description);
     }else{
         return NULL;
     }
 }
 
 char* igsAgent_getMappingVersion(igsAgent_t *agent){
-    if (agent->internal_mapping != NULL && agent->internal_mapping->version != NULL){
-        return strdup(agent->internal_mapping->version);
+    if (agent->mapping != NULL && agent->mapping->version != NULL){
+        return strdup(agent->mapping->version);
     }else{
         return NULL;
     }
@@ -265,13 +265,13 @@ int igsAgent_setMappingName(igsAgent_t *agent, const char *name){
         igsAgent_error(agent, "Mapping name cannot be empty");
         return -1;
     }
-    if(agent->internal_mapping == NULL){
+    if(agent->mapping == NULL){
         igsAgent_clearMapping(agent);
     }
-    if(agent->internal_mapping->name != NULL){
-        free(agent->internal_mapping->name);
+    if(agent->mapping->name != NULL){
+        free(agent->mapping->name);
     }
-    agent->internal_mapping->name = strndup(name, MAX_MAPPING_NAME_LENGTH);
+    agent->mapping->name = strndup(name, MAX_MAPPING_NAME_LENGTH);
     return 1;
 }
 
@@ -292,13 +292,13 @@ int igsAgent_setMappingDescription(igsAgent_t *agent, const char *description){
         igsAgent_error(agent, "Mapping description cannot be empty");
         return -1;
     }
-    if(agent->internal_mapping == NULL){
+    if(agent->mapping == NULL){
         igsAgent_clearMapping(agent);
     }
-    if(agent->internal_mapping->description != NULL){
-        free(agent->internal_mapping->description);
+    if(agent->mapping->description != NULL){
+        free(agent->mapping->description);
     }
-    agent->internal_mapping->description = strndup(description, MAX_MAPPING_DESCRIPTION_LENGTH);
+    agent->mapping->description = strndup(description, MAX_MAPPING_DESCRIPTION_LENGTH);
     return 1;
 }
 
@@ -319,13 +319,13 @@ int igsAgent_setMappingVersion(igsAgent_t *agent, const char *version){
         igsAgent_error(agent, "Mapping version cannot be empty");
         return -1;
     }
-    if(agent->internal_mapping == NULL){
+    if(agent->mapping == NULL){
         igsAgent_clearMapping(agent);
     }
-    if(agent->internal_mapping->version != NULL){
-        free(agent->internal_mapping->version);
+    if(agent->mapping->version != NULL){
+        free(agent->mapping->version);
     }
-    agent->internal_mapping->version = strndup(version, 64);
+    agent->mapping->version = strndup(version, 64);
     return 1;
 }
 
@@ -334,14 +334,14 @@ int igsAgent_setMappingVersion(igsAgent_t *agent, const char *version){
  * \ingroup EditMapFct
  * \brief the agent mapping entries number getter
  *
- * \return The number of mapping type output entries. If -1 The structure agent->internal_mapping is NULL.
+ * \return The number of mapping type output entries. If -1 The structure agent->mapping is NULL.
  */
 int igsAgent_getMappingEntriesNumber(igsAgent_t *agent){
-    if(agent->internal_mapping == NULL){
+    if(agent->mapping == NULL){
         igsAgent_warn(agent, "No mapping defined yet");
         return 0;
     }
-    return HASH_COUNT(agent->internal_mapping->map_elements);;
+    return HASH_COUNT(agent->mapping->map_elements);;
 }
 
 /**
@@ -424,7 +424,7 @@ unsigned long igsAgent_addMappingEntry(igsAgent_t *agent,
     }
 
     //Check if already initialized, and do it if not
-    if(agent->internal_mapping == NULL){
+    if(agent->mapping == NULL){
         igsAgent_clearMapping(agent);
     }
 
@@ -441,8 +441,8 @@ unsigned long igsAgent_addMappingEntry(igsAgent_t *agent,
     free (mashup);
     
     mapping_element_t *tmp = NULL;
-    if (agent->internal_mapping->map_elements != NULL){
-        HASH_FIND(hh, agent->internal_mapping->map_elements, &h, sizeof(unsigned long), tmp);
+    if (agent->mapping->map_elements != NULL){
+        HASH_FIND(hh, agent->mapping->map_elements, &h, sizeof(unsigned long), tmp);
     }
     if (tmp == NULL){
         //element does not exist yet : create and register it
@@ -450,7 +450,7 @@ unsigned long igsAgent_addMappingEntry(igsAgent_t *agent,
         if (igsAgent_checkInputExistence(agent, reviewedFromOurInput)){
             mapping_element_t *new = mapping_createMappingElement(reviewedFromOurInput, reviewedToAgent, reviewedWithOutput);
             new->id = h;
-            HASH_ADD(hh, agent->internal_mapping->map_elements, id, sizeof(unsigned long), new);
+            HASH_ADD(hh, agent->mapping->map_elements, id, sizeof(unsigned long), new);
             agent->network_needToUpdateMapping = true;
         }else{
             igsAgent_error(agent, "Input %s does not exist in our definition : cannot create mapping entry for it", reviewedFromOurInput);
@@ -477,25 +477,25 @@ unsigned long igsAgent_addMappingEntry(igsAgent_t *agent,
  * \param theId The id of the mapping. Cannot be negative.
  * \return The error. 1 is OK.
  * 0 The id of the mapping cannot be negative.
- * -1 The structure agent->internal_mapping is NULL.
+ * -1 The structure agent->mapping is NULL.
  * -2 The structure mapping out is NULL.
  */
 int igsAgent_removeMappingEntryWithId(igsAgent_t *agent, unsigned long theId){
     mapping_element_t *el = NULL;
-    if(agent->internal_mapping == NULL){
+    if(agent->mapping == NULL){
         igsAgent_error(agent, "No mapping defined yet");
         return -1;
     }
-    if(agent->internal_mapping->map_elements == NULL){
+    if(agent->mapping->map_elements == NULL){
         igsAgent_error(agent, "No mapping elements defined yet");
         return -2;
     }
-    HASH_FIND(hh, agent->internal_mapping->map_elements, &theId, sizeof(unsigned long), el);
+    HASH_FIND(hh, agent->mapping->map_elements, &theId, sizeof(unsigned long), el);
     if(el == NULL){
         igsAgent_warn(agent, "id %ld is not part of the current mapping", theId);
         return 0;
     }else{
-        HASH_DEL(agent->internal_mapping->map_elements, el);
+        HASH_DEL(agent->mapping->map_elements, el);
         mapping_freeMappingElement(el);
         agent->network_needToUpdateMapping = true;
     }
@@ -514,7 +514,7 @@ int igsAgent_removeMappingEntryWithId(igsAgent_t *agent, unsigned long theId){
  *  0 Our input name to be mapped cannot be NULL or empty.
  * -1 Agent name to be mapped cannot be NULL or empty.
  * -2 Extern agent output name to be mapped cannot be NULL or empty.
- * -3 The structure agent->internal_mapping is NULL.
+ * -3 The structure agent->mapping is NULL.
  * -4 The structure mapping out is NULL.
  */
 int igsAgent_removeMappingEntryWithName(igsAgent_t *agent, const char *fromOurInput,
@@ -531,12 +531,12 @@ int igsAgent_removeMappingEntryWithName(igsAgent_t *agent, const char *fromOurIn
         igsAgent_error(agent, "Agent output name to be mapped cannot be NULL or empty");
         return -2;
     }
-    if(agent->internal_mapping == NULL){
+    if(agent->mapping == NULL){
         igsAgent_clearMapping(agent);
         igsAgent_error(agent, "No mapping defined yet");
         return -3;
     }
-    if(agent->internal_mapping->map_elements == NULL){
+    if(agent->mapping->map_elements == NULL){
         igsAgent_error(agent, "No mapping elements defined yet");
         return -4;
     }
@@ -553,14 +553,14 @@ int igsAgent_removeMappingEntryWithName(igsAgent_t *agent, const char *fromOurIn
     free (mashup);
     
     mapping_element_t *tmp = NULL;
-    if (agent->internal_mapping->map_elements != NULL){
-        HASH_FIND(hh, agent->internal_mapping->map_elements, &h, sizeof(unsigned long), tmp);
+    if (agent->mapping->map_elements != NULL){
+        HASH_FIND(hh, agent->mapping->map_elements, &h, sizeof(unsigned long), tmp);
     }
     if (tmp == NULL){
         igsAgent_warn(agent, "Mapping combination %s.%s->%s does NOT exist", fromOurInput, toAgent, withOutput);
         return -5;
     }else{
-        HASH_DEL(agent->internal_mapping->map_elements, tmp);
+        HASH_DEL(agent->mapping->map_elements, tmp);
         mapping_freeMappingElement(tmp);
         agent->network_needToUpdateMapping = true;
         return 1;
@@ -568,21 +568,21 @@ int igsAgent_removeMappingEntryWithName(igsAgent_t *agent, const char *fromOurIn
 }
 
 void igsAgent_setMappingPath(igsAgent_t *agent, const char *path){
-    strncpy(agent->mapping_path, path, IGS_MAX_PATH - 1);
-    if (agent->agentElements != NULL && agent->agentElements->node != NULL){
+    strncpy(agent->mappingPath, path, IGS_MAX_PATH - 1);
+    if (agent->loopElements != NULL && agent->loopElements->node != NULL){
         bus_zyreLock();
-        zyre_shouts(agent->agentElements->node, CHANNEL, "MAPPING_FILE_PATH=%s", agent->mapping_path);
+        zyre_shouts(agent->loopElements->node, CHANNEL, "MAPPING_FILE_PATH=%s", agent->mappingPath);
         bus_zyreUnlock();
     }
 }
 
 void igsAgent_writeMappingToPath(igsAgent_t *agent){
     FILE *fp = NULL;
-    fp = fopen (agent->mapping_path,"w+");
+    fp = fopen (agent->mappingPath,"w+");
     if (fp == NULL){
-        igsAgent_error(agent, "Could not open %s for writing", agent->mapping_path);
+        igsAgent_error(agent, "Could not open %s for writing", agent->mappingPath);
     }else{
-        char *map = parser_export_mapping(agent->internal_mapping);
+        char *map = parser_export_mapping(agent->mapping);
         fprintf(fp, "%s", map);
         fflush(fp);
         fclose(fp);

@@ -116,7 +116,7 @@ typedef struct definition {
     agent_iop_t* outputs_table;
     igs_call_t *calls_table;
     UT_hash_handle hh;
-} definition;
+} igs_definition_t;
 
 /*
  * Define the structure 'mapping_element' which contains mapping between an input and an (one or all) external agent's output :
@@ -147,7 +147,7 @@ typedef struct mapping {
     char* version;
     mapping_element_t* map_elements;
     UT_hash_handle hh;
-} mapping_t;
+} igs_mapping_t;
 
 #define MAX_FILTER_SIZE 1024
 typedef struct mappingFilter {
@@ -161,9 +161,9 @@ typedef struct subscriber_s{
     const char *agentPeerId;
     zsock_t *subscriber;
     zmq_pollitem_t *pollItem;
-    definition *definition;
+    igs_definition_t *definition;
     bool mappedNotificationToSend;
-    mapping_t *mapping;
+    igs_mapping_t *mapping;
     mappingFilter_t *mappingsFilters;
     int timerId;
     igsAgent_t *agent;
@@ -286,26 +286,29 @@ typedef struct forcedStopCalback {
 
 typedef struct _igsAgent_t {
     //definition
-    char definition_path[IGS_MAX_PATH];
-    definition* internal_definition;
+    char definitionPath[IGS_MAX_PATH];
+    igs_definition_t* definition;
     
     //mapping
-    char mapping_path[IGS_MAX_PATH];
-    mapping_t *internal_mapping;
+    char mappingPath[IGS_MAX_PATH];
+    igs_mapping_t *mapping;
     
     //network
     bool isWholeAgentMuted;
     zyreAgent_t *zyreAgents;
     bool network_needToSendDefinitionUpdate;
     bool network_needToUpdateMapping;
+    bool network_RequestOutputsFromMappedAgents;
+    unsigned int network_discoveryInterval;
+    unsigned int network_agentTimeout;
+    unsigned int network_publishingPort;
     subscriber_t *subscribers;
-    zyreloopElements_t *agentElements;
+    zyreloopElements_t *loopElements;
     char *ipcFolderPath;
     int network_hwmValue;
     bool isFrozen;
-    bool agentCanBeFrozen;
-    bool igs_Interrupted;
-    bool network_RequestOutputsFromMappedAgents;
+    bool canBeFrozen;
+    bool isInterrupted;
     bool forcedStop;
     bool allowIpc;
     bool allowInproc;
@@ -313,31 +316,28 @@ typedef struct _igsAgent_t {
     char agentState[MAX_AGENT_NAME_LENGTH];
     char commandLine[COMMAND_LINE_LENGTH];
     char replayChannel[MAX_AGENT_NAME_LENGTH + 16];
-    unsigned int network_discoveryInterval;
-    unsigned int network_agentTimeout;
-    unsigned int network_publishingPort;
     muteCallback_t *muteCallbacks;
     freezeCallback_t *freezeCallbacks;
     zyreCallback_t *zyreCallbacks;
     forcedStopCalback_t *forcedStopCalbacks;
     
     //admin
-    FILE *fp;
-    bool admin_logInStream;
-    bool admin_logInFile;
+    FILE *logFile;
+    bool logInStream;
+    bool logInFile;
     bool logInConsole;
     bool useColorInConsole;
     igs_logLevel_t logLevel;
-    char admin_logFile[4096];
+    char logFilePath[4096];
     char logContent[2048];
     char logTime[128];
-    int nb_of_entries; //for fflush rotation
+    int logNbOfEntries; //for fflush rotation
 
     //bus
     serviceHeader_t *serviceHeaders;
 
     //license
-    licenseEnforcement_t *licEnforcement;
+    licenseEnforcement_t *licenseEnforcement;
     license_t *license;
     license_callback_t *licenseCallbacks;
     char *licensePath;
@@ -363,10 +363,10 @@ PUBLIC extern igsAgent_t *globalAgent;
 void initInternalAgentIfNeeded(void);
 
 //  definition
-PUBLIC void definition_freeDefinition (definition* definition);
+PUBLIC void definition_freeDefinition (igs_definition_t* definition);
 
 //  mapping
-PUBLIC void mapping_freeMapping (mapping_t* map);
+PUBLIC void mapping_freeMapping (igs_mapping_t* map);
 mapping_element_t * mapping_createMappingElement(const char * input_name,
                                                  const char *agent_name,
                                                  const char* output_name);
@@ -386,12 +386,12 @@ void model_readWriteUnlock(void);
 int network_publishOutput (igsAgent_t *agent, const agent_iop_t *iop);
 
 // parser
-PUBLIC definition* parser_loadDefinition (const char* json_str);
-PUBLIC definition* parser_loadDefinitionFromPath (const char* file_path);
-char* parser_export_definition (definition* def);
-PUBLIC char* parser_export_mapping(mapping_t* mapp);
-mapping_t* parser_LoadMap (const char* json_str);
-mapping_t* parser_LoadMapFromPath (const char* load_file);
+PUBLIC igs_definition_t* parser_loadDefinition (const char* json_str);
+PUBLIC igs_definition_t* parser_loadDefinitionFromPath (const char* file_path);
+char* parser_export_definition (igs_definition_t* def);
+PUBLIC char* parser_export_mapping(igs_mapping_t* mapp);
+igs_mapping_t* parser_LoadMap (const char* json_str);
+igs_mapping_t* parser_LoadMapFromPath (const char* load_file);
 
 // admin
 void admin_makeFilePath(igsAgent_t *agent, const char *from, char *to, size_t size_of_to);

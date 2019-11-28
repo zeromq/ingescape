@@ -137,26 +137,26 @@ iopType_t model_getTypeForIOP(igsAgent_t *agent, const char *name, iop_t type){
         igsAgent_error(agent, "Name cannot be NULL or empty");
         return 0;
     }
-    if(agent->internal_definition == NULL){
+    if(agent->definition == NULL){
         igsAgent_error(agent, "Definition is NULL");
         return 0;
     }
     
     agent_iop_t *iop = NULL;
     if (type == IGS_INPUT_T){
-        HASH_FIND_STR(agent->internal_definition->inputs_table, name, iop);
+        HASH_FIND_STR(agent->definition->inputs_table, name, iop);
         if(iop == NULL){
             igsAgent_error(agent, "Input %s cannot be found", name);
             return 0;
         }
     } else if (type == IGS_OUTPUT_T){
-        HASH_FIND_STR(agent->internal_definition->outputs_table, name, iop);
+        HASH_FIND_STR(agent->definition->outputs_table, name, iop);
         if(iop == NULL){
             igsAgent_error(agent, "Output %s cannot be found", name);
             return 0;
         }
     } else if (type == IGS_PARAMETER_T){
-        HASH_FIND_STR(agent->internal_definition->params_table, name, iop);
+        HASH_FIND_STR(agent->definition->params_table, name, iop);
         if(iop == NULL){
             igsAgent_error(agent, "Parameter %s cannot be found", name);
             return 0;
@@ -171,8 +171,8 @@ iopType_t model_getTypeForIOP(igsAgent_t *agent, const char *name, iop_t type){
 
 agent_iop_t *model_findInputByName(igsAgent_t *agent, const char *name){
     agent_iop_t *found = NULL;
-    if(name != NULL && agent->internal_definition != NULL){
-        HASH_FIND_STR( agent->internal_definition->inputs_table, name, found );
+    if(name != NULL && agent->definition != NULL){
+        HASH_FIND_STR( agent->definition->inputs_table, name, found );
     }else{
         if (name == NULL || strlen(name) == 0){
             igsAgent_error(agent, "Input name cannot be NULL or empty");
@@ -185,8 +185,8 @@ agent_iop_t *model_findInputByName(igsAgent_t *agent, const char *name){
 
 agent_iop_t *model_findOutputByName(igsAgent_t *agent, const char *name){
     agent_iop_t *found = NULL;
-    if(name != NULL && agent->internal_definition != NULL){
-        HASH_FIND_STR( agent->internal_definition->outputs_table, name, found );
+    if(name != NULL && agent->definition != NULL){
+        HASH_FIND_STR( agent->definition->outputs_table, name, found );
     }else{
         if (name == NULL || strlen(name) == 0){
             igsAgent_error(agent, "Output name cannot be NULL or empty");
@@ -199,8 +199,8 @@ agent_iop_t *model_findOutputByName(igsAgent_t *agent, const char *name){
 
 agent_iop_t *model_findParameterByName(igsAgent_t *agent, const char *name){
     agent_iop_t *found = NULL;
-    if(name != NULL && agent->internal_definition != NULL){
-        HASH_FIND_STR( agent->internal_definition->params_table, name, found );
+    if(name != NULL && agent->definition != NULL){
+        HASH_FIND_STR( agent->definition->params_table, name, found );
     }else{
         if (name == NULL || strlen(name) == 0){
             igsAgent_error(agent, "Parameter name cannot be NULL or empty");
@@ -451,7 +451,7 @@ int model_readIopAsData (igsAgent_t *agent, const char *name, iop_t type, void *
 
 bool model_checkIOPExistence(igsAgent_t *agent, const char *name, agent_iop_t *hash){
     agent_iop_t *iop = NULL;
-    if(agent->internal_definition == NULL){
+    if(agent->definition == NULL){
         igsAgent_error(agent, "Definition is NULL");
         return false;
     }
@@ -463,7 +463,7 @@ bool model_checkIOPExistence(igsAgent_t *agent, const char *name, agent_iop_t *h
 }
 
 char **model_getIopList(igsAgent_t *agent, long *nbOfElements, iop_t type){
-    if(agent->internal_definition == NULL){
+    if(agent->definition == NULL){
         igsAgent_warn(agent, "Definition is NULL");
         *nbOfElements = 0;
         return NULL;
@@ -471,13 +471,13 @@ char **model_getIopList(igsAgent_t *agent, long *nbOfElements, iop_t type){
     agent_iop_t *hash = NULL;
     switch (type) {
         case IGS_INPUT_T:
-            hash = agent->internal_definition->inputs_table;
+            hash = agent->definition->inputs_table;
             break;
         case IGS_OUTPUT_T:
-            hash = agent->internal_definition->outputs_table;
+            hash = agent->definition->outputs_table;
             break;
         case IGS_PARAMETER_T:
-            hash = agent->internal_definition->params_table;
+            hash = agent->definition->params_table;
             break;
             
         default:
@@ -1298,27 +1298,27 @@ iopType_t igsAgent_getTypeForParameter(igsAgent_t *agent, const char *name){
 }
 
 int igsAgent_getInputsNumber(igsAgent_t *agent){
-    if(agent->internal_definition == NULL){
+    if(agent->definition == NULL){
         igsAgent_warn(agent, "definition is NULL");
         return 0;
     }
-    return HASH_COUNT(agent->internal_definition->inputs_table);
+    return HASH_COUNT(agent->definition->inputs_table);
 }
 
 int igsAgent_getOutputsNumber(igsAgent_t *agent){
-    if(agent->internal_definition == NULL){
+    if(agent->definition == NULL){
         igsAgent_warn(agent, "definition is NULL");
         return 0;
     }
-    return HASH_COUNT(agent->internal_definition->outputs_table);
+    return HASH_COUNT(agent->definition->outputs_table);
 }
 
 int igsAgent_getParametersNumber(igsAgent_t *agent){
-    if(agent->internal_definition == NULL){
+    if(agent->definition == NULL){
         igsAgent_warn(agent, "definition is NULL");
         return 0;
     }
-    return HASH_COUNT(agent->internal_definition->params_table);
+    return HASH_COUNT(agent->definition->params_table);
 }
 
 char ** igsAgent_getInputsList(igsAgent_t *agent, long *nbOfElements){
@@ -1350,36 +1350,36 @@ void igs_freeIOPList(char ***list, long nbOfElements){
 }
 
 bool igsAgent_checkInputExistence(igsAgent_t *agent, const char *name){
-    if (agent->internal_definition == NULL){
+    if (agent->definition == NULL){
         return false;
     }
     if((name == NULL) || (strlen(name) == 0)){
         igsAgent_error(agent, "Input name cannot be NULL or empty\n");
         return false;
     }
-    return model_checkIOPExistence(agent, name, agent->internal_definition->inputs_table);
+    return model_checkIOPExistence(agent, name, agent->definition->inputs_table);
 }
 
 bool igsAgent_checkOutputExistence(igsAgent_t *agent, const char *name){
-    if (agent->internal_definition == NULL){
+    if (agent->definition == NULL){
         return false;
     }
     if((name == NULL) || (strlen(name) == 0)){
         igsAgent_warn(agent, "Output name cannot be NULL or empty");
         return false;
     }
-    return model_checkIOPExistence(agent, name, agent->internal_definition->outputs_table);
+    return model_checkIOPExistence(agent, name, agent->definition->outputs_table);
 }
 
 bool igsAgent_checkParameterExistence(igsAgent_t *agent, const char *name){
-    if (agent->internal_definition == NULL){
+    if (agent->definition == NULL){
         return false;
     }
     if((name == NULL) || (strlen(name) == 0)){
         igsAgent_warn(agent, "Parameter name cannot be NULL or empty");
         return false;
     }
-    return model_checkIOPExistence(agent, name, agent->internal_definition->params_table);
+    return model_checkIOPExistence(agent, name, agent->definition->params_table);
 }
 
 // --------------------------------  OBSERVE ------------------------------------//
@@ -1406,9 +1406,9 @@ int igsAgent_muteOutput(igsAgent_t *agent, const char *name){
         return 0;
     }
     iop->is_muted = true;
-    if (agent->agentElements != NULL && agent->agentElements->node != NULL){
+    if (agent->loopElements != NULL && agent->loopElements->node != NULL){
         bus_zyreLock();
-        zyre_shouts(agent->agentElements->node, CHANNEL, "OUTPUT_MUTED %s", name);
+        zyre_shouts(agent->loopElements->node, CHANNEL, "OUTPUT_MUTED %s", name);
         bus_zyreUnlock();
     }
     return 1;
@@ -1421,9 +1421,9 @@ int igsAgent_unmuteOutput(igsAgent_t *agent, const char *name){
         return 0;
     }
     iop->is_muted = false;
-    if (agent->agentElements != NULL && agent->agentElements->node != NULL){
+    if (agent->loopElements != NULL && agent->loopElements->node != NULL){
         bus_zyreLock();
-        zyre_shouts(agent->agentElements->node, CHANNEL, "OUTPUT_UNMUTED %s", name);
+        zyre_shouts(agent->loopElements->node, CHANNEL, "OUTPUT_UNMUTED %s", name);
         bus_zyreUnlock();
     }
     return 1;

@@ -419,10 +419,10 @@ static int json_callize (const char* json_str, igsyajl_val *node) {
 }
 
 // convert a definition json file into a definition structure
-static definition* json_parse_definition (igsyajl_val node) {
-    definition *def;
+static igs_definition_t* json_parse_definition (igsyajl_val node) {
+    igs_definition_t *def;
     igsyajl_val v;
-    def = (definition*) calloc(1, sizeof(definition));
+    def = (igs_definition_t*) calloc(1, sizeof(igs_definition_t));
     const char * path[] = { STR_DEFINITION, "", (const char *) 0 };
 
     path[1] = STR_NAME;
@@ -611,11 +611,11 @@ static void json_add_map_cat_to_hash (mapping_element_t** hasht,
 }
 
 // convert a map.json file into a mapping (output & category) structure
-static mapping_t* json_parse_mapping (igsyajl_val node) {
+static igs_mapping_t* json_parse_mapping (igsyajl_val node) {
 
-    mapping_t* mapp;
+    igs_mapping_t* mapp;
     igsyajl_val v;
-    mapp = (mapping_t*) calloc(1, sizeof(mapping_t));
+    mapp = (igs_mapping_t*) calloc(1, sizeof(igs_mapping_t));
     const char * path[] = { "mapping", "", (const char *) 0 };
 
     path[1] = STR_NAME;
@@ -786,7 +786,7 @@ static void json_dump_iop (igsyajl_gen *g, agent_iop_t* aiop) {
 }
 
 // convert a definition structure into definition.json string
-static void json_dump_definition (igsyajl_gen *g, definition* def) {
+static void json_dump_definition (igsyajl_gen *g, igs_definition_t* def) {
     
     unsigned int hashCount = 0;
     agent_iop_t *d;
@@ -908,7 +908,7 @@ static void json_dump_mapping_out (igsyajl_gen *g, mapping_element_t* mapp_out) 
 //}
 
 //convert a mapping structure into mapping.json string
-static void json_dump_mapping (igsyajl_gen *g, mapping_t* mapp) {
+static void json_dump_mapping (igsyajl_gen *g, igs_mapping_t* mapp) {
 
     unsigned int hashCount = 0;
     mapping_element_t *currentMapOut = NULL;
@@ -977,9 +977,9 @@ static void json_dump_mapping (igsyajl_gen *g, mapping_t* mapp) {
  *   returns: a pointer on a category structure or NULL if it has failed
  */
 
-definition* parser_loadDefinition (const char* json_str) {
+igs_definition_t* parser_loadDefinition (const char* json_str) {
     
-    definition *def = NULL;
+    igs_definition_t *def = NULL;
     igsyajl_val node;
     
     json_callize(json_str, &node);
@@ -1002,10 +1002,10 @@ definition* parser_loadDefinition (const char* json_str) {
  *   returns: a pointer on a category structure or NULL if it has failed
  */
 
-definition * parser_loadDefinitionFromPath (const char* path) {
+igs_definition_t * parser_loadDefinitionFromPath (const char* path) {
     
     char *json_str = NULL;
-    definition *def = NULL;
+    igs_definition_t *def = NULL;
     
     json_str = json_fetch(path);
     if (!json_str)
@@ -1029,7 +1029,7 @@ definition * parser_loadDefinitionFromPath (const char* path) {
  *   returns: a definition json format string UTF8
  */
 
-char* parser_export_definition (definition* def) {
+char* parser_export_definition (igs_definition_t* def) {
     
     char* result = NULL;
     if (def != NULL){
@@ -1069,7 +1069,7 @@ char* parser_export_definition (definition* def) {
  *   returns: a mapping json format string UTF8
  */
 
-char* parser_export_mapping(mapping_t *mapp){
+char* parser_export_mapping(igs_mapping_t *mapp){
     char* result = NULL;
     if (mapp != NULL){
         const unsigned char * json_str = NULL;
@@ -1107,9 +1107,9 @@ char* parser_export_mapping(mapping_t *mapp){
  *   returns : a pointer on a mapping structure or NULL if it has failed
  */
 
-mapping_t* parser_LoadMap(const char* json_str){
+igs_mapping_t* parser_LoadMap(const char* json_str){
     
-    mapping_t *mapp = NULL;
+    igs_mapping_t *mapp = NULL;
     igsyajl_val node;
     
     json_callize(json_str, &node);
@@ -1135,10 +1135,10 @@ mapping_t* parser_LoadMap(const char* json_str){
  *   returns : a pointer on a mapping structure or NULL if it has failed
  */
 
-mapping_t* parser_LoadMapFromPath (const char* path){
+igs_mapping_t* parser_LoadMapFromPath (const char* path){
     
     char *json_str = NULL;
-    mapping_t *mapp = NULL;
+    igs_mapping_t *mapp = NULL;
     
     json_str = json_fetch(path);
     if (!json_str)
@@ -1160,7 +1160,7 @@ mapping_t* parser_LoadMapFromPath (const char* path){
 /**
  * \fn int igs_loadDefinition (const char* json_str)
  * \ingroup loadSetGetDefFct
- * \brief load definition in variable 'igs_definition_loaded' & copy in 'agent->internal_definition"
+ * \brief load definition in variable 'igs_definition_loaded' & copy in 'agent->definition"
  *      from a json string
  *
  * \param json_str String in json format. Can't be NULL.
@@ -1176,23 +1176,23 @@ int igsAgent_loadDefinition (igsAgent_t *agent, const char* json_str){
     }
 
     //Try to load definition
-    definition *tmp = parser_loadDefinition(json_str);
+    igs_definition_t *tmp = parser_loadDefinition(json_str);
 
     if(tmp == NULL)
     {
         igsAgent_debug(agent, "igs_loadDefinition : json string caused an error and was ignored\n%s\n", json_str );
         return -1;
     }else{
-        if (agent->internal_definition != NULL){
-            definition_freeDefinition(agent->internal_definition);
-            agent->internal_definition = NULL;
+        if (agent->definition != NULL){
+            definition_freeDefinition(agent->definition);
+            agent->definition = NULL;
         }
-        agent->internal_definition = tmp;
+        agent->definition = tmp;
         //Check the name of agent from network layer
         char *name = igs_getAgentName();
         if(strcmp(name, AGENT_NAME_DEFAULT) == 0){
             //The name of the agent is default : we change it to definition name
-            igs_setAgentName(agent->internal_definition->name);
+            igs_setAgentName(agent->definition->name);
         }//else
             //The agent name was assigned by the developer : we keep it untouched
         free(name);
@@ -1205,7 +1205,7 @@ int igsAgent_loadDefinition (igsAgent_t *agent, const char* json_str){
 /**
  * \fn int igs_loadDefinitionFromPath (const char* file_path)
  * \ingroup loadSetGetDefFct
- * \brief load definition in variable 'igs_definition_loaded' & copy in 'agent->internal_definition"
+ * \brief load definition in variable 'igs_definition_loaded' & copy in 'agent->definition"
  *      from a file path
  *
  * \param file_path The string which contains the json file path. Can't be NULL.
@@ -1225,7 +1225,7 @@ int igsAgent_loadDefinitionFromPath (igsAgent_t *agent, const char* file_path){
     }
 
     //Try to load definition
-    definition *tmp = parser_loadDefinitionFromPath(file_path);
+    igs_definition_t *tmp = parser_loadDefinitionFromPath(file_path);
     
 
     if(tmp == NULL)
@@ -1234,16 +1234,16 @@ int igsAgent_loadDefinitionFromPath (igsAgent_t *agent, const char* file_path){
         return -1;
     }else{
         strncpy(definition_path, file_path, IGS_MAX_PATH - 1);
-        if (agent->internal_definition != NULL){
-            definition_freeDefinition(agent->internal_definition);
-            agent->internal_definition = NULL;
+        if (agent->definition != NULL){
+            definition_freeDefinition(agent->definition);
+            agent->definition = NULL;
         }
-        agent->internal_definition = tmp;
+        agent->definition = tmp;
         //Check the name of agent from network layer
         char *name = igs_getAgentName();
         if(strcmp(name, AGENT_NAME_DEFAULT) == 0){
             //The name of the agent is default : we change it to definition name
-            igs_setAgentName(agent->internal_definition->name);
+            igs_setAgentName(agent->definition->name);
         }//else
             //The agent name was assigned by the developer : we keep it untouched
         free(name);
