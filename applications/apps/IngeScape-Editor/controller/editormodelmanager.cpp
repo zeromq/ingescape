@@ -57,7 +57,7 @@
  * @param parent
  */
 EditorModelManager::EditorModelManager(QObject *parent) : QObject(parent),
-    _isMappingControlled(false)
+    _isMappingControlled(true)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);

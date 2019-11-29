@@ -107,13 +107,6 @@ Item {
             openDatabasePopup();
         }
 
-        // ...we check the value of the error message when a connection attempt fails
-        if (IngeScapeAssessmentsC.errorMessageWhenConnectionFailed !== "")
-        {
-            //console.error("On Completed: Error Message = " + IngeScapeAssessmentsC.errorMessageWhenConnectionFailed);
-            networkConfigurationInfo.open();
-        }
-
         /*// ...we check the value of the flag "is Valid License"
         if (IngeScapeAssessmentsC.licensesC && IngeScapeAssessmentsC.licensesC.mergedLicense && !IngeScapeAssessmentsC.licensesC.mergedLicense.editorLicenseValidity)
         {

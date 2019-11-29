@@ -53,9 +53,6 @@ class IngeScapeAssessmentsController : public QObject
     // Path to the directory with IngeScape licenses
     I2_QML_PROPERTY_READONLY(QString, licensesPath)
 
-    // Error message when a connection attempt fails
-    I2_QML_PROPERTY_READONLY(QString, errorMessageWhenConnectionFailed)
-
     // Snapshot Directory
     I2_QML_PROPERTY_READONLY(QString, snapshotDirectory)
 

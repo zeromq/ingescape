@@ -68,9 +68,9 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _platformDirectoryPath(""),
     _platformDefaultFilePath(""),
     _currentPlatformFilePath(""),
-    // Connect mapping in observe mode
+    // Connect mapping in control mode
     _beforeNetworkStop_isMappingConnected(true),
-    _beforeNetworkStop_isMappingControlled(false)
+    _beforeNetworkStop_isMappingControlled(true)
 {
     qInfo() << "New IngeScape Editor Controller";
 
@@ -128,7 +128,9 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     //
     settings.beginGroup("network");
 
-    _networkDevice = settings.value("networkDevice", QVariant("")).toString();
+    // networkDevice saved is only checked if there is more than 1 network device available
+    // in method _startIngescape
+//    _networkDevice = settings.value("networkDevice", QVariant("")).toString();
     _ipAddress = settings.value("ipAddress", QVariant("")).toString();
     _port = settings.value("port", QVariant(0)).toUInt();
     qInfo() << "Network Device:" << _networkDevice << "-- IP address:" << _ipAddress << "-- Port" << QString::number(_port);
@@ -441,13 +443,8 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     //
     // Start IngeScape
     //
-
-    // Update availaible network devices to check if _networkDevice property is available
-    ingeScapeNetworkC->updateAvailableNetworkDevices();
-    bool isAvailable = ingeScapeNetworkC->isAvailableNetworkDevice(_networkDevice);
-
-    // Check for an available device if _networkDevice is not available before start Ingescape
-    _startIngeScape(!isAvailable);
+    // Check for an available device and start Ingescape
+    _startIngeScape(true);
 
 
     //
@@ -1444,6 +1441,9 @@ void IngeScapeEditorController::_onNetworkDeviceIsNotAvailable()
     if (IngeScapeNetworkController::instance()->isStarted())
     {
         _stopIngeScape(false);
+
+        // Try to relaunch editor with an available device
+        _startIngeScape(true);
     }
     // Else: our agent is not started, we don't need to stop it
 }
@@ -1765,6 +1765,7 @@ bool IngeScapeEditorController::_startIngeScape(bool checkAvailableNetworkDevice
 
     IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
     IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
+    IngeScapeSettings &settings = IngeScapeSettings::Instance();
 
     if ((ingeScapeNetworkC != nullptr) && (ingeScapeModelManager != nullptr) && (_modelManager != nullptr))
     {
@@ -1776,27 +1777,46 @@ bool IngeScapeEditorController::_startIngeScape(bool checkAvailableNetworkDevice
             int nbDevices = ingeScapeNetworkC->availableNetworkDevices().count();
             QStringList devicesAddresses = ingeScapeNetworkC->availableNetworkDevicesAddresses();
 
-            if (nbDevices == 1)
+            if (nbDevices == 0 )
+            {
+                // No network device available
+                 setnetworkDevice("");
+            }
+            else if (nbDevices == 1)
             {
                 // There is only one available network device, we use it !
-                _networkDevice = ingeScapeNetworkC->availableNetworkDevices().at(0);
+
+                setnetworkDevice(ingeScapeNetworkC->availableNetworkDevices().at(0));
             }
             else if ((nbDevices == 2) && ((devicesAddresses.at(0) == "127.0.0.1")||(devicesAddresses.at(1) == "127.0.0.1")))
             {
                 // There are 2 devices, one of which is the loopback, we pick the device that is NOT the loopback
-                if (devicesAddresses.at(0) == "127.0.0.1") {
-                    _networkDevice = ingeScapeNetworkC->availableNetworkDevices().at(1);
+                if (devicesAddresses.at(0) == "127.0.0.1")
+                {
+                    setnetworkDevice(ingeScapeNetworkC->availableNetworkDevices().at(1));
+                }
+                else
+                {
+                    setnetworkDevice(ingeScapeNetworkC->availableNetworkDevices().at(0));
+                }
+            }
+            else
+            {
+                // Several devices available : look last saving
+                settings.beginGroup("network");
+                QString lastSaveNetworkDevice = settings.value("networkDevice", QVariant("")).toString();
+                settings.endGroup();
+
+                // If last save device is no more available, user must choose device to launch editor
+                if (!ingeScapeNetworkC->isAvailableNetworkDevice(lastSaveNetworkDevice))
+                {
+                    setnetworkDevice("");
                 }
                 else {
-                    _networkDevice = ingeScapeNetworkC->availableNetworkDevices().at(0);
+                    setnetworkDevice(lastSaveNetworkDevice);
                 }
             }
-            else {
-                // No network device available or several devices available and user must choose one
-                _networkDevice = "";
-            }
         }
-
 
         // Start our IngeScape agent with the network device and the port
         // NB : will failed if networkDevice = ""

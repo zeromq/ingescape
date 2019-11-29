@@ -280,8 +280,6 @@ Item {
 
             listOfNetworkDevices: IgsNetworkController ? IgsNetworkController.availableNetworkDevices : null
 
-            canEditConnection : true
-
             settingsReleasedId : IngeScapeEditorC.modelManager.isMappingControlled ? "mapping-mode-control" : "mapping-mode-observe"
             settingsHighlightedId: IngeScapeEditorC.modelManager.isMappingControlled ? "mapping-mode-control" : "mapping-mode-observe" // TODO graphism
             settingsPressedId : IngeScapeEditorC.modelManager.isMappingControlled ? "mapping-mode-control" : "mapping-mode-observe" // TODO graphism

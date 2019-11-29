@@ -51,13 +51,10 @@ I2CustomRectangle {
     // Auto-close timeout in milliseconds
     property alias autoCloseTimeoutInMilliseconds: autoCloseTimer.interval
 
-    property bool canEditConnection: false
-
     // Open settings button source appearance
     property string settingsReleasedId : "mapping-mode-settings"
     property string settingsHighlightedId: "mapping-mode-settings-hover"
     property string settingsPressedId : "mapping-mode-settings-pressed"
-
 
     //
     // Configure our item
@@ -369,7 +366,7 @@ I2CustomRectangle {
                             rightMargin: 8
                         }
 
-                        visible: canEditConnection
+                        visible: true
                         enabled: visible && root.editorStartedOnIgs
 
                         checked : IgsModelManager ? IgsModelManager.isMappingConnected : false
