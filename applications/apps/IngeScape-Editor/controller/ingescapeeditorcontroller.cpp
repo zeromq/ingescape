@@ -1442,8 +1442,18 @@ void IngeScapeEditorController::_onNetworkDeviceIsNotAvailable()
     {
         _stopIngeScape(false);
 
+        // Register last mapping connected value in case the attempt to reconnect ingescape failed
+        bool registerLastIsMappingConnected = _beforeNetworkStop_isMappingConnected;
+
+        // Disconnect the mapping
+        _beforeNetworkStop_isMappingConnected = false;
+
         // Try to relaunch editor with an available device
-        _startIngeScape(true);
+        bool success = _startIngeScape(true);
+
+        if (!success) {
+            _beforeNetworkStop_isMappingConnected = registerLastIsMappingConnected;
+        }
     }
     // Else: our agent is not started, we don't need to stop it
 }
@@ -1456,9 +1466,11 @@ void IngeScapeEditorController::_onNetworkDeviceIsAvailableAgain()
 {
     qDebug() << Q_FUNC_INFO;
 
-    // Start IngeScape
-    // => we don't need to check available network devices
-    _startIngeScape(false);
+    // Start IngeScape if not already started (it means that ingescape did not restart yet)
+    if (!IngeScapeNetworkController::instance()->isStarted())
+    {
+        _startIngeScape(true);
+    }
 }
 
 
@@ -1508,6 +1520,13 @@ void IngeScapeEditorController::_onSystemWake()
 void IngeScapeEditorController::_onSystemNetworkConfigurationsUpdated()
 {
     IngeScapeNetworkController::instance()->updateAvailableNetworkDevices();
+
+    // If Ingescape is not started try to restarted if there is at least, one network device available
+    // N.B: useful when last network device is always unaivalable and another network device become available
+    if ((!IngeScapeNetworkController::instance()->isStarted())
+            && (IngeScapeNetworkController::instance()->availableNetworkDevices().count() > 0)) {
+        _startIngeScape(true);
+    }
 }
 
 

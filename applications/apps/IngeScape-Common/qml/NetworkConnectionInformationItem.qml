@@ -95,7 +95,7 @@ I2CustomRectangle {
         property bool mustBeHighlighted : !root.isEditionModeOpened && contentMouseArea.enabled && contentMouseArea.containsMouse
 
         // Flag indicating if some network devices are available
-        property bool networkDevicesAvailable : selectNetworkDeviceCombobox.count > 0
+        property bool networkDevicesAvailable : root.listOfNetworkDevices.length > 0
     }
 
 
@@ -240,9 +240,15 @@ I2CustomRectangle {
     }
 
     onEditorStartedOnIgsChanged: {
-        if (!root.editorStartedOnIgs && !root.isEditionModeOpened)
+        if ((!root.editorStartedOnIgs) && (rootPrivate.networkDevicesAvailable))
         {
+            // Open settings to show user that he has to make a choice for a network device
             open();
+        }
+        else
+        {
+            // Close settings if editor is (re)started
+            close();
         }
     }
 
@@ -433,7 +439,7 @@ I2CustomRectangle {
 
                        visible : root.editorStartedOnIgs
 
-                       color: IgsModelManager && IgsModelManager.isMappingConnected ? IngeScapeTheme.veryLightGreyColor : IngeScapeTheme.lightGreyColor
+                       color: (IgsModelManager && IgsModelManager.isMappingConnected) ? IngeScapeTheme.veryLightGreyColor : IngeScapeTheme.lightGreyColor
 
                        font {
                            family: IngeScapeTheme.heading2Font

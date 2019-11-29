@@ -446,8 +446,10 @@ void IngeScapeAssessmentsController::_onNetworkDeviceIsAvailableAgain()
     qDebug() << Q_FUNC_INFO;
 
     // Start IngeScape
-    // => we don't need to check available network devices
-    _startIngeScape(false);
+    if (!IngeScapeNetworkController::instance()->isStarted())
+    {
+        _startIngeScape(true);
+    }
 }
 
 
@@ -497,6 +499,13 @@ void IngeScapeAssessmentsController::_onSystemWake()
 void IngeScapeAssessmentsController::_onSystemNetworkConfigurationsUpdated()
 {
     IngeScapeNetworkController::instance()->updateAvailableNetworkDevices();
+
+    // If Ingescape is not started try to restarted if there is at least, one network device available
+    // N.B: useful when last network device is always unaivalable and another network device become available
+    if ((!IngeScapeNetworkController::instance()->isStarted())
+            && (IngeScapeNetworkController::instance()->availableNetworkDevices().count() > 0)) {
+        _startIngeScape(true);
+    }
 }
 
 
