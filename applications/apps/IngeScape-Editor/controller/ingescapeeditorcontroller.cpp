@@ -169,6 +169,15 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     settings.endGroup();
 
 
+    //
+    // Settings about "Mapping mode and connect/disconnect"
+    //
+    settings.beginGroup("mapping");
+    _beforeNetworkStop_isMappingConnected = settings.value("connected", true).toBool();
+    _beforeNetworkStop_isMappingControlled = settings.value("controlled", true).toBool();
+    settings.endGroup();
+
+
     //-------------------------------
     //
     // Command line options
@@ -1904,6 +1913,15 @@ void IngeScapeEditorController::_stopIngeScape(bool hasToClearPlatform)
         _beforeNetworkStop_isMappingConnected = ingeScapeModelManager->isMappingConnected();
         _beforeNetworkStop_isMappingControlled = _modelManager->isMappingControlled();
 
+        // Update settings file
+        IngeScapeSettings &settings = IngeScapeSettings::Instance();
+        settings.beginGroup("mapping");
+        settings.setValue("connected", _beforeNetworkStop_isMappingConnected);
+        settings.setValue("controlled", _beforeNetworkStop_isMappingControlled);
+        settings.endGroup();
+
+        // Save new values
+        settings.sync();
 
         // Disable mapping
         ingeScapeModelManager->setisMappingConnected(false);
