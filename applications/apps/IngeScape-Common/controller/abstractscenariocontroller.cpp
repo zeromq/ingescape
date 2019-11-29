@@ -841,7 +841,7 @@ void AbstractScenarioController::_initActionsAndPlayOrResumeScenario()
     for (ActionVM* actionVM : _actionsInTimeLine.toList())
     {
         // Ends in the future
-        if ((actionVM != nullptr) && ((actionVM->endTime() > currentTimeInMilliSeconds) || (actionVM->endTime() == -1)) )
+        if ((actionVM != nullptr) && ((actionVM->endTime() >= currentTimeInMilliSeconds) || (actionVM->endTime() == -1)) )
         {
             // First line is reserved for live insertions from the palette
             if (actionVM->lineInTimeLine() == 0)
@@ -859,7 +859,7 @@ void AbstractScenarioController::_initActionsAndPlayOrResumeScenario()
                 actionVM->resetDataFrom(currentTimeInMilliSeconds);
 
                 // Current time is after the start time of the action
-                if (actionVM->startTime() <= currentTimeInMilliSeconds)
+                if (actionVM->startTime() < currentTimeInMilliSeconds)
                 {
                     // Add to the list of active actions
                     _listOfActiveActions.append(actionVM);
