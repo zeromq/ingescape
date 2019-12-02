@@ -386,8 +386,8 @@ I2CustomRectangle {
                             toggleUncheckedPressedID: "mapping-mode-toggle-disconnected-pressed";
 
                             // No disabled states
-                            toggleCheckedDisabledID: "mapping-mode-toggle-connected"; // TODO graphism
-                            toggleUncheckedDisabledID: "mapping-mode-toggle-disconnected"; // TODO graphism
+                            toggleCheckedDisabledID: ""; // No checked disable state
+                            toggleUncheckedDisabledID: "mapping-mode-toggle-disconnected-disabled";
 
                             labelMargin: 0;
                         }
