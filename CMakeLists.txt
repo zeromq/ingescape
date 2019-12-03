@@ -188,9 +188,9 @@ if(INGESCAPE_BUILD_SHARED)
 
     math(EXPR BITS "8*${CMAKE_SIZEOF_VOID_P}")
     if (${BITS} EQUAL 64)
-        install(DIRECTORY dependencies/windows/vcredist DESTINATION ressources FILES_MATCHING PATTERN "*64.exe")
+        install(DIRECTORY dependencies/windows/vcredist/ DESTINATION ressources FILES_MATCHING PATTERN "*64.exe")
     else()
-      install(DIRECTORY dependencies/windows/vcredist DESTINATION ressources FILES_MATCHING PATTERN "*86.exe")
+      install(DIRECTORY dependencies/windows/vcredist/ DESTINATION ressources FILES_MATCHING PATTERN "*86.exe")
     endif()
 
   else(MSVC)
