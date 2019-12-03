@@ -18,6 +18,7 @@
   Var ADD_TO_PATH_ALL_USERS
   Var ADD_TO_PATH_CURRENT_USER
   Var IS_DEFAULT_INSTALLDIR
+  Var REDISTRIBUABLE_CPP_2017
 ;--------------------------------
 ;Include Modern UI
 
@@ -637,6 +638,27 @@ Section "-Core installation"
   SetOutPath "$INSTDIR"
   @CPACK_NSIS_EXTRA_PREINSTALL_COMMANDS@
   @CPACK_NSIS_FULL_INSTALL@
+
+; Read ingescape installation folder
+  StrCmp @CPACK_NSIS_WINDOWS_ARCH@ "x64" 0 redist_32
+  ReadRegStr $REDISTRIBUABLE_CPP_2017 HKLM "Software\Microsoft\VisualStudio\17.0\VC\VCRedist\x64" "Installed"
+  Goto install_redist
+  redist_32:
+  ReadRegStr $REDISTRIBUABLE_CPP_2017 HKLM "Software\Microsoft\VisualStudio\17.0\VC\VCRedist\x86" "Installed"
+
+  install_redist:
+  ; Install C++ redistribuable if needed
+  StrCmp $REDISTRIBUABLE_CPP_2017 1 redist_ok
+
+  StrCmp @CPACK_NSIS_WINDOWS_ARCH@ "x64" 0 install_redist_32
+  ExecWait '"$INSTDIR\ressources\vc_redist.x64.exe" /passive /norestart'
+  Goto redist_ok
+  install_redist_32:
+  ExecWait '"$INSTDIR\ressources\vc_redist.x86.exe" /passive /norestart'
+  
+  redist_ok:
+  Delete "$INSTDIR\ressources\vc_redist*.exe"
+
 
   ;Store installation folder
   WriteRegStr SHCTX "Software\@CPACK_PACKAGE_VENDOR@\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@" "" $INSTDIR

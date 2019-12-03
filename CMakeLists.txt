@@ -185,6 +185,14 @@ if(INGESCAPE_BUILD_SHARED)
                                        OUTPUT_NAME
                                        "ingescaped")
     endif()
+
+    math(EXPR BITS "8*${CMAKE_SIZEOF_VOID_P}")
+    if (${BITS} EQUAL 64)
+        install(DIRECTORY dependencies/windows/vcredist DESTINATION ressources FILES_MATCHING PATTERN "*64.exe")
+    else()
+      install(DIRECTORY dependencies/windows/vcredist DESTINATION ressources FILES_MATCHING PATTERN "*86.exe")
+    endif()
+
   else(MSVC)
     add_library(${PROJECT_NAME} SHARED $<TARGET_OBJECTS:ingescape_objects>)
 
@@ -422,6 +430,14 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
       set(CPACK_GENERATOR "ZIP")
     endif()
   endif()
+
+  if(MSVC)
+    if( ${BITS} EQUAL 64)
+      set(CPACK_NSIS_WINDOWS_ARCH "x64")
+    else()
+      set(CPACK_NSIS_WINDOWS_ARCH "x32")
+    endif(${BITS} EQUAL 64)
+  endif(MSVC)
 
   include(CPack)
 endif()
