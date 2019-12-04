@@ -24,16 +24,31 @@ I2PopupBase {
     id: rootPopup
 
     width: 600
-    height: Math.min(containerPopup.height, 750)
+    height: containerPopup.height
 
     dismissOnOutsideTap: false
 
     // Our controller
-    property LicensesController licensesController: null;
+    property LicensesController licensesController: null
 
     // Flag indicating if we prevent the user to continue to use our Application
     // We display only the button "Quit"
     property bool allowsOnlyQuit: false
+
+    // Property to correctly size the popup when there are several licenses to show
+    property real maxHeight : 1000
+
+
+    //---------------------------
+    //
+    // Behavior
+    //
+    //---------------------------
+
+    // Animate resize
+    Behavior on height {
+        NumberAnimation {}
+    }
 
 
     //--------------------------------------------------------
@@ -44,12 +59,8 @@ I2PopupBase {
     //
     //--------------------------------------------------------
 
-    //
     // function allowing to validate the form
-    //
     function validate() {
-        console.log("QML: function validate()");
-
         if (rootPopup.licensesController)
         {
             rootPopup.licensesController.updateLicensesPath(txtLicensesPath.text);
@@ -122,349 +133,644 @@ I2PopupBase {
             rightMargin: 18
         }
 
-        height: childrenRect.height + childrenRect.y
+        height: childrenRect.height
 
-        Text {
-            id: title
+        Item {
+            id: header
 
             anchors {
                 top: parent.top
-                topMargin: 25
-                left: parent.left
-            }
-
-            text: qsTr("Licenses")
-
-            color: IngeScapeTheme.whiteColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight : Font.Medium
-                pixelSize : 23
-            }
-        }
-
-        Item {
-            id: directoryPathItem
-            anchors {
-                left: parent.left
                 right: parent.right
-                top: title.bottom
-                topMargin: 18
+                left: parent.left
             }
 
             height: childrenRect.height
 
             Text {
-                text: qsTr("Directory path")
+                id: title
+
+                anchors {
+                    top: parent.top
+                    topMargin: 25
+                    left: parent.left
+                }
+
+                text: qsTr("Licenses")
 
                 color: IngeScapeTheme.whiteColor
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    weight : Font.Medium
+                    pixelSize : 23
+                }
+            }
+
+            Item {
+                id: directoryPathItem
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    top: title.bottom
+                    topMargin: 18
+                }
+
+                height: childrenRect.height
+
+                Text {
+                    text: qsTr("Directory path")
+
+                    color: IngeScapeTheme.whiteColor
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        weight : Font.Medium
+                        pixelSize : 16
+                    }
+                }
+
+                Item {
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                    }
+
+                    height: childrenRect.height
+
+                    TextField {
+                        id: txtLicensesPath
+
+                        anchors {
+                            left: parent.left
+                            right: btnSelectLicencesDirectory.left
+                            rightMargin: 10
+                        }
+                        height: btnSelectLicencesDirectory.height
+                        verticalAlignment: TextInput.AlignVCenter
+
+                        text: "" //rootPopup.controller.licensesPath
+
+                        enabled: false
+
+                        style: I2TextFieldStyle {
+                            backgroundColor: IngeScapeTheme.darkBlueGreyColor
+                            backgroundDisabledColor: IngeScapeTheme.darkBlueGreyColor
+
+                            borderColor: IngeScapeTheme.whiteColor
+                            borderDisabledColor: IngeScapeTheme.whiteColor
+
+                            borderErrorColor: IngeScapeTheme.redColor
+
+                            radiusTextBox: 1
+                            borderWidth: 0;
+                            borderWidthActive: 1
+
+                            textIdleColor: IngeScapeTheme.whiteColor
+                            textDisabledColor: IngeScapeTheme.whiteColor
+
+                            padding.left: 6
+                            padding.right: 3
+
+                            font {
+                                pixelSize:15
+                                family: IngeScapeTheme.textFontFamily
+                            }
+                        }
+                    }
+
+                    Button {
+                        id: btnSelectLicencesDirectory
+
+                        property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
+
+                        anchors {
+                            right: parent.right
+                        }
+
+                        height: boundingBox.height
+                        width: boundingBox.width
+
+                        text: "Change..."
+                        activeFocusOnPress: true
+
+                        style: I2SvgButtonStyle {
+                            fileCache: IngeScapeTheme.svgFileIngeScape
+
+                            pressedID: releasedID + "-pressed"
+                            releasedID: "button"
+                            disabledID: releasedID + "-disabled"
+
+                            font {
+                                family: IngeScapeTheme.textFontFamily
+                                weight : Font.Medium
+                                pixelSize : 16
+                            }
+                            labelColorPressed: IngeScapeTheme.blackColor
+                            labelColorReleased: IngeScapeTheme.whiteColor
+                            labelColorDisabled: IngeScapeTheme.whiteColor
+
+                        }
+
+                        onClicked: {
+                            if (rootPopup.licensesController)
+                            {
+                                var directoryPath = rootPopup.licensesController.selectLicensesDirectory();
+                                if (directoryPath) {
+                                    txtLicensesPath.text = directoryPath;
+
+                                    rootPopup.licensesController.updateLicensesPath(directoryPath);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Vertical space
+                Item {
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                    }
+                    height: 10
+                }
+            }
+
+            Text {
+                id: errorMessage
+
+                anchors {
+                    top: directoryPathItem.bottom
+                    topMargin: 25
+                    left: parent.left
+                    leftMargin: 25
+                    right: parent.right
+                    rightMargin: 25
+                }
+                wrapMode: Text.WordWrap
+
+                height: (text === "") ? 0 : 30
+
+                Connections {
+                    target: rootPopup.licensesController
+
+                    onLicenseLimitationReached: {
+                        errorMessage.visible = true
+                    }
+                }
+
+                text: rootPopup.licensesController ? rootPopup.licensesController.errorMessageWhenLicenseFailed : ""
+
+                color: IngeScapeTheme.orangeColor
                 font {
                     family: IngeScapeTheme.textFontFamily
                     weight : Font.Medium
                     pixelSize : 16
                 }
             }
+        }
+
+        Item {
+            id: content
+
+            anchors {
+                top: header.bottom
+                topMargin: 20
+                right: parent.right
+                left: parent.left
+            }
+
+            height: childrenRect.height
+
+            visible: rootPopup.licensesController.licenseDetailsList && rootPopup.licensesController.licenseDetailsList.count > 0
 
             Item {
+                id: summary
+
                 anchors {
+                    top: parent.top
                     left: parent.left
                     right: parent.right
                 }
 
                 height: childrenRect.height
 
-                TextField {
-                    id: txtLicensesPath
+                Text {
+                    id : summaryTitle
 
                     anchors {
+                        top: parent.top
                         left: parent.left
-                        right: btnSelectLicencesDirectory.left
-                        rightMargin: 10
+                        leftMargin: 10
                     }
-                    height: btnSelectLicencesDirectory.height
-                    verticalAlignment: TextInput.AlignVCenter
 
-                    text: "" //rootPopup.controller.licensesPath
+                    text: rootPopup.licensesController.licenseDetailsList.count > 1 ? qsTr("Summary") : qsTr("Your license")
 
-                    enabled: false
-
-                    style: I2TextFieldStyle {
-                        backgroundColor: IngeScapeTheme.darkBlueGreyColor
-                        backgroundDisabledColor: IngeScapeTheme.darkBlueGreyColor
-
-                        borderColor: IngeScapeTheme.whiteColor
-                        borderDisabledColor: IngeScapeTheme.whiteColor
-
-                        borderErrorColor: IngeScapeTheme.redColor
-
-                        radiusTextBox: 1
-                        borderWidth: 0;
-                        borderWidthActive: 1
-
-                        textIdleColor: IngeScapeTheme.whiteColor
-                        textDisabledColor: IngeScapeTheme.whiteColor
-
-                        padding.left: 6
-                        padding.right: 3
-
-                        font {
-                            pixelSize:15
-                            family: IngeScapeTheme.textFontFamily
-                        }
+                    color: IngeScapeTheme.whiteColor
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        capitalization: Font.AllUppercase
+                        weight : Font.Medium
+                        pixelSize : 20
                     }
                 }
 
-                Button {
-                    id: btnSelectLicencesDirectory
-
-                    property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
+                Rectangle {
+                    id: summarySeparator
 
                     anchors {
+                        left: parent.left
                         right: parent.right
+                        top: summaryTitle.bottom
+                        topMargin : 10
                     }
 
-                    height: boundingBox.height
-                    width: boundingBox.width
+                    height: 1
 
-                    text: "Change..."
-                    activeFocusOnPress: true
+                    color: IngeScapeTheme.whiteColor
+                }
 
-                    style: I2SvgButtonStyle {
-                        fileCache: IngeScapeTheme.svgFileIngeScape
+                LicenseInformationView {
+                    id: summaryView
 
-                        pressedID: releasedID + "-pressed"
-                        releasedID: "button"
-                        disabledID: releasedID + "-disabled"
+                    anchors {
+                       top: summarySeparator.bottom
+                       topMargin: 10
+                       right: parent.right
+                       left: parent.left
+                    }
 
+                    licenseInformation: rootPopup.licensesController.mergedLicense
+                }
+            }
+
+            Item {
+                id: licensesDetails
+
+                anchors {
+                    top: summary.bottom
+                    topMargin : 22
+                    left: parent.left
+                    right: parent.right
+                }
+
+                height: childrenRect.height
+
+                Item {
+                    id: onlyOneLicenseView
+
+                    anchors {
+                        top: parent.top
+                        right: parent.right
+                        left: parent.left
+                    }
+
+                    visible: rootPopup.licensesController.licenseDetailsList.count === 1
+
+                    height : childrenRect.height
+
+                    property LicenseInformationM model : rootPopup.licensesController.licenseDetailsList.count === 1 ? rootPopup.licensesController.licenseDetailsList.get(0) : null
+
+                    LabellessSvgButton {
+                        id: buttonDelete
+
+                        anchors {
+                            top: parent.top
+                            right: parent.right
+                        }
+
+                        enabled: true
+
+                        releasedID: "delete-license"
+                        pressedID: "delete-license-pressed"
+                        disabledID: "delete-license-pressed"
+
+                        onClicked: {
+                            // Disable root popup while other popup isn't closed
+                            rootPopup.enabled = false;
+
+                            // Open delete confirmation popup
+                            deleteConfirmationPopup.license = onlyOneLicenseView.model
+                            deleteConfirmationPopup.open();
+                        }
+                    }
+
+                    SvgImage {
+                        id: licenseFilePicto
+
+                        anchors {
+                            verticalCenter : buttonDelete.verticalCenter
+                            left: parent.left
+                        }
+
+                        visible: licenseFileText.text !== ""
+
+                        svgElementId : onlyOneLicenseView.model && onlyOneLicenseView.model.ingescapeLicenseValidity  &&  onlyOneLicenseView.model.editorLicenseValidity ? "license-ok" : "license-fail"
+                    }
+
+                    Text {
+                        id : licenseFileText
+
+                        anchors {
+                            verticalCenter: licenseFilePicto.verticalCenter
+                            left: licenseFilePicto.right
+                            leftMargin: 8
+                        }
+
+                        text: onlyOneLicenseView.model && onlyOneLicenseView.model.fileName
+
+                        color: IngeScapeTheme.whiteColor
                         font {
                             family: IngeScapeTheme.textFontFamily
                             weight : Font.Medium
-                            pixelSize : 16
+                            pixelSize : 14
                         }
-                        labelColorPressed: IngeScapeTheme.blackColor
-                        labelColorReleased: IngeScapeTheme.whiteColor
-                        labelColorDisabled: IngeScapeTheme.whiteColor
-
                     }
 
-                    onClicked: {
-                        if (rootPopup.licensesController)
-                        {
-                            var directoryPath = rootPopup.licensesController.selectLicensesDirectory();
-                            if (directoryPath) {
-                                txtLicensesPath.text = directoryPath;
+                    Rectangle {
+                        id: endSeparator
 
-                                rootPopup.licensesController.updateLicensesPath(directoryPath);
+                        anchors {
+                            left: parent.left
+                            right: parent.right
+                            top: buttonDelete.bottom
+                            topMargin : 10
+                        }
+
+                        height: 1
+
+                        color: IngeScapeTheme.whiteColor
+                    }
+                }
+
+                Item {
+                    id: severalLicensesView
+
+                    anchors {
+                        top: parent.top
+                        right: parent.right
+                        left: parent.left
+                    }
+
+                    height: severalLicensesView.visible ? rootPopup.maxHeight - summary.height - header.height - footer.height - content.anchors.topMargin - licensesDetails.anchors.topMargin
+                                                        : 0 // To resize popup
+
+                    visible: rootPopup.licensesController.licenseDetailsList.count > 1
+
+                    Text {
+                        id : detailsTitle
+
+                        anchors {
+                            top: parent.top
+                            left: parent.left
+                            leftMargin: 10
+                        }
+
+                        text: qsTr("Your licenses")
+
+                        color: IngeScapeTheme.whiteColor
+                        font {
+                            family: IngeScapeTheme.textFontFamily
+                            capitalization: Font.AllUppercase
+                            weight : Font.Medium
+                            pixelSize : 20
+                        }
+                    }
+
+                    Rectangle {
+                        id: detailsSeparator
+
+                        anchors {
+                            left: parent.left
+                            right: parent.right
+                            top: detailsTitle.bottom
+                            topMargin : 10
+                        }
+
+                        height: 1
+
+                        color: IngeScapeTheme.whiteColor
+                    }
+
+                    ScrollView {
+                        id: detailsScrollView
+
+                        anchors {
+                            top: detailsSeparator.bottom
+                            topMargin: 10
+                            left: parent.left
+                            right: parent.right
+                            bottom: parent.bottom
+                        }
+
+                        style: IngeScapeScrollViewStyle {
+                        }
+
+                        // Prevent drag overshoot on Windows
+                        flickableItem.boundsBehavior: Flickable.OvershootBounds
+
+
+                        // Content of our scrollview
+                        ListView {
+                            model: rootPopup.licensesController ? rootPopup.licensesController.licenseDetailsList : 0
+
+                            delegate: Item {
+
+                                anchors {
+                                    left : parent.left
+                                    right : parent.right
+                                }
+
+                                height: childrenRect.height
+
+                                ExpanderItem {
+                                    id: expanderLicense
+                                    anchors {
+                                        left : parent.left
+                                        right : parent.right
+                                    }
+
+                                    headerText: model.fileName
+                                    headerHeight: 35
+
+                                    pictoHeader: model && model.ingescapeLicenseValidity  &&  model.editorLicenseValidity ? "license-ok" : "license-fail"
+                                    leftMarginTextHeader : 40
+
+                                    contentHeightWhenOpened : expandingLicenseInfosContainer.height
+
+
+                                    data : Item {
+                                        id: expandingLicenseInfosContainer
+
+                                        width: parent.width
+                                        height: expandingLicenseInfos.height + expandingLicenseInfos.anchors.topMargin + expandingLicenseInfos.anchors.bottomMargin
+
+                                        LicenseInformationView {
+                                            id: expandingLicenseInfos
+
+                                            anchors {
+                                                top: parent.top
+                                                topMargin: 10
+                                                bottomMargin: 10
+                                                right: parent.right
+                                                rightMargin: 40
+                                                left: parent.left
+                                                leftMargin: 40
+
+                                            }
+
+                                            viewWithPicto: false
+                                            licenseInformation: rootPopup.licensesController.licenseDetailsList.get(index)
+                                        }
+
+                                    }
+                                }
+
+                                Item {
+                                    id: containerButton
+
+                                    anchors {
+                                        top: parent.top
+                                        right: parent.right
+                                    }
+
+                                    height: 35
+
+                                    LabellessSvgButton {
+                                        id: btnDeleteSeveralLicense
+
+                                        anchors {
+                                            right: parent.right
+                                            rightMargin: 40
+                                            verticalCenter: parent.verticalCenter
+                                        }
+
+                                        visible: expanderLicense.checked
+
+                                        releasedID: "delete-license"
+                                        pressedID: "delete-license-pressed"
+                                        disabledID: "delete-license-pressed"
+
+                                        onClicked: {
+                                            // Disable root popup while other popup isn't closed
+                                            rootPopup.enabled = false;
+
+                                            // Open delete confirmation popup
+                                            deleteConfirmationPopup.license = model
+                                            deleteConfirmationPopup.open();
+                                        }
+                                    }
+
+                                }
                             }
                         }
                     }
                 }
             }
-
-            // Vertical space
-            Item {
-                anchors {
-                    left: parent.left
-                    right: parent.right
-                }
-                height: 10
-            }
-        }
-
-        Text {
-            id: errorMessage
-
-            anchors {
-                top: directoryPathItem.bottom
-                topMargin: 25
-                left: parent.left
-                leftMargin: 25
-                right: parent.right
-                rightMargin: 25
-            }
-            wrapMode: Text.WordWrap
-
-            height: (text === "") ? 0 : 30
-
-            Connections {
-                target: rootPopup.licensesController
-
-                onLicenseLimitationReached: {
-                    errorMessage.visible = true
-                }
-            }
-
-            text: rootPopup.licensesController ? rootPopup.licensesController.errorMessageWhenLicenseFailed : ""
-
-            color: IngeScapeTheme.orangeColor
-            font {
-                family: IngeScapeTheme.textFontFamily
-                weight : Font.Medium
-                pixelSize : 16
-            }
         }
 
         Item {
-            id: summary
+            id: emptyLicenseFeedback
 
-            anchors {
-                top: errorMessage.bottom
-                topMargin: (errorMessage.height > 0) ? 25 : 0
-                left: parent.left
-                right: parent.right
-            }
+            anchors.fill: content
 
-            height: childrenRect.height
+            visible: !content.visible
 
             Text {
-                id : summaryTitle
+                id: emptyLicenseFeedbackText
 
                 anchors {
-                    top: parent.top
                     left: parent.left
-                    leftMargin: 10
+                    right: parent.right
+                    verticalCenter: parent.verticalCenter
                 }
 
-                text: rootPopup.licensesController.licenseDetailsList.count > 1 ? qsTr("Summary") : qsTr("Your license")
+                text: "No license file found.\nThe editor is running in demo mode with limitations.\n\n\n\nTo change this, please set the license directory above,\ndrop a license file here \nor use the \"Import...\" button below."
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
 
                 color: IngeScapeTheme.whiteColor
+                wrapMode: Text.WordWrap
                 font {
                     family: IngeScapeTheme.textFontFamily
-                    capitalization: Font.AllUppercase
-                    weight : Font.Medium
-                    pixelSize : 20
+                    pixelSize : 18
+                    italic: true
                 }
             }
 
-            Rectangle {
-                id: summarySeparator
+            Button {
+                property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
+
+                height: boundingBox.height
+                width: boundingBox.width
+
+                activeFocusOnPress: true
+                text: "Import..."
 
                 anchors {
-                    left: parent.left
-                    right: parent.right
-                    top: summaryTitle.bottom
-                    topMargin : 10
+                    top: emptyLicenseFeedbackText.bottom
+                    topMargin: 25
+                    horizontalCenter: parent.horizontalCenter
                 }
 
-                height: 1
+                style: I2SvgButtonStyle {
+                    fileCache: IngeScapeTheme.svgFileIngeScape
 
-                color: IngeScapeTheme.whiteColor
-            }
+                    pressedID: releasedID + "-pressed"
+                    releasedID: "button"
+                    disabledID: releasedID + "-disabled"
 
-            LicenseInformationView {
-                id: summaryView
-
-                anchors {
-                   top: summarySeparator.bottom
-                   topMargin: 10
-                   right: parent.right
-                   left: parent.left
-                }
-
-                licenseInformation: rootPopup.licensesController.mergedLicense
-            }
-        }
-
-        Item {
-            id: licensesDetails
-
-            anchors {
-                top: summary.bottom
-                topMargin : 22
-                left: parent.left
-                right: parent.right
-            }
-
-            height: childrenRect.height
-
-            Item {
-                id: onlyOneLicenseView
-                anchors {
-                    top: parent.top
-                    right: parent.right
-                    left: parent.left
-                }
-
-                visible: rootPopup.licensesController.licenseDetailsList.count === 1
-
-                height : visible ? buttonDelete.height : 0
-
-                property LicenseInformationM model : rootPopup.licensesController.licenseDetailsList.get(0)
-
-                LabellessSvgButton {
-                    id: buttonDelete
-
-                    anchors {
-                        top: parent.top
-                        right: parent.right
-                    }
-
-                    enabled: true
-
-                    onEnabledChanged : {
-                        console.log("hey ");
-                    }
-
-                    releasedID: "delete-license"
-                    pressedID: "delete-license-pressed"
-                    disabledID: "delete-license-pressed"
-
-                    onClicked: {
-                        // Disable root popup while other popup isn't closed
-                        rootPopup.enabled = false;
-
-                        // Open delete confirmation popup
-                        deleteConfirmationPopup.license = onlyOneLicenseView.model
-                        deleteConfirmationPopup.open();
-                    }
-                }
-
-                SvgImage {
-                    id: licenseFilePicto
-
-                    anchors {
-                        verticalCenter : buttonDelete.verticalCenter
-                        left: parent.left
-                    }
-
-                    visible: licenseFileText.text !== ""
-
-                    svgElementId : onlyOneLicenseView.model && onlyOneLicenseView.model.ingescapeLicenseValidity  &&  onlyOneLicenseView.model.editorLicenseValidity ? "license-ok" : "license-fail"
-                }
-
-                Text {
-                    id : licenseFileText
-
-                    anchors {
-                        verticalCenter: licenseFilePicto.verticalCenter
-                        left: licenseFilePicto.right
-                        leftMargin: 8
-                    }
-
-                    text: onlyOneLicenseView.model.fileName
-
-                    color: IngeScapeTheme.whiteColor
                     font {
                         family: IngeScapeTheme.textFontFamily
                         weight : Font.Medium
-                        pixelSize : 14
+                        pixelSize : 16
+                    }
+                    labelColorPressed: IngeScapeTheme.blackColor
+                    labelColorReleased: IngeScapeTheme.whiteColor
+                    labelColorDisabled: IngeScapeTheme.greyColor
+
+                }
+
+                onClicked: {
+                    if (rootPopup.licensesController) {
+                        rootPopup.licensesController.importLicense();
                     }
                 }
             }
+        }
 
-            Rectangle {
-                id: detailsSeparator
+        DropArea {
+            id: dropZone
+            anchors.fill: emptyLicenseFeedback
 
-                anchors {
-                    left: parent.left
-                    right: parent.right
-                    top: onlyOneLicenseView.bottom
-                    topMargin : 10
+            enabled: emptyLicenseFeedback.visible
+
+            property bool dragHovering: false
+
+            onEntered: {
+                dragHovering = true
+            }
+
+            onExited: {
+                dragHovering = false
+            }
+
+            onDropped: {
+                dragHovering = false
+                if (drop.hasUrls && rootPopup.licensesController)
+                {
+                    rootPopup.licensesController.addLicenses(drop.urls)
                 }
+            }
 
-                height: 1
+            // Overlay appearing when the user drags something over the drop zone
+            Rectangle {
+                id: dropZoneOverlay
+                anchors.fill: parent
 
-                color: IngeScapeTheme.whiteColor
+                color: IngeScapeTheme.veryLightGreyColor
+                opacity: dropZone.dragHovering ? 0.65 : 0
+
+                Behavior on opacity {
+                    NumberAnimation {}
+                }
             }
         }
 
@@ -472,7 +778,7 @@ I2PopupBase {
             id: footer
 
             anchors {
-                top: licensesDetails.bottom
+                top: content.bottom
                 right : parent.right
                 left: parent.left
             }
@@ -533,215 +839,8 @@ I2PopupBase {
                 }
             }
         }
-
     }
 
-    //    ScrollView {
-    //        id: detailsScrollView
-
-    //        anchors {
-    //            top: summary.bottom
-    //            left: parent.left
-    //            leftMargin: 25
-    //            right: parent.right
-    //            rightMargin: 25
-    //            bottom: buttonRow.top
-    //            bottomMargin: 25
-    //        }
-
-    //        visible: licenseDetailsRepeater.model && licenseDetailsRepeater.model.count > 0
-
-    //        contentItem: Column {
-    //            id: detailsColumn
-    //            anchors {
-    //                left: parent.left
-    //                right: parent.right
-    //            }
-
-    //            spacing: 26
-
-    ////            LicenseInformationView {
-    ////                licenseInformation: rootPopup.licensesController.mergedLicense
-    ////            }
-
-    //            Text {
-    //                text: rootPopup.licensesController ? qsTr("License details:") : ""
-
-    //                color: IngeScapeTheme.whiteColor
-    //                font {
-    //                    family: IngeScapeTheme.textFontFamily
-    //                    weight: Font.Medium
-    //                    pixelSize: 16
-    //                    bold: true
-    //                }
-    //            }
-
-    //            Repeater {
-    //                id: licenseDetailsRepeater
-    //                model: rootPopup.licensesController ? rootPopup.licensesController.licenseDetailsList : 0
-
-    //                delegate: Column {
-    //                    spacing: 26
-
-    //                    Item {
-
-    //                        anchors {
-    //                            left: parent.left
-    //                            right: parent.right
-    //                        }
-
-    //                        height: childrenRect.height
-
-    //                        Text {
-    //                            id: licenseFileName
-    //                            text: qsTr("###\n### License file name: %1\n###").arg(model ? model.fileName : "")
-
-    //                            anchors {
-    //                                left: parent.left
-    //                                right: parent.right
-    //                            }
-
-    //                            color: IngeScapeTheme.whiteColor
-    //                            elide: Text.ElideRight
-    //                            font {
-    //                                family: IngeScapeTheme.textFontFamily
-    //                                weight: Font.Medium
-    //                                pixelSize: 16
-    //                                italic: true
-    //                            }
-    //                        }
-
-    //                        Button {
-    //                            text: "DEL"
-    //                            anchors {
-    //                                right: parent.right
-    //                                verticalCenter: licenseFileName.verticalCenter
-    //                            }
-
-    //                            onClicked: {
-    //                                // Disable root popup while other popup isn't closed
-    //                                rootPopup.enabled = false;
-
-    //                                // Open delete confirmation popup
-    //                                deleteConfirmationPopup.license = model
-    //                                deleteConfirmationPopup.open();
-    //                            }
-
-    //                        }
-    //                    }
-
-    //                    LicenseInformationView {
-    //                        licenseInformation: model ? model.QtObject : null
-    //                    }
-    //                }
-    //            }
-    //        }
-    //    }
-
-    //    Item {
-    //        id: emptyLicenseFeedback
-    //        anchors.fill: detailsScrollView
-
-    //        visible: !detailsScrollView.visible
-
-    //        Text {
-    //            id: emptyLicenseFeedbackText
-
-    //            anchors {
-    //                left: parent.left
-    //                right: parent.right
-    //                verticalCenter: parent.verticalCenter
-    //            }
-
-    //            text: "No license file found.\nThe editor is running in demo mode with limitations.\n\n\n\nTo change this, please set the license directory above,\ndrop a license file here \nor use the \"Import...\" button below."
-    //            verticalAlignment: Text.AlignVCenter
-    //            horizontalAlignment: Text.AlignHCenter
-
-    //            color: IngeScapeTheme.whiteColor
-    //            wrapMode: Text.WordWrap
-    //            font {
-    //                family: IngeScapeTheme.textFontFamily
-    //                pixelSize : 18
-    //                italic: true
-    //            }
-    //        }
-
-    //        Button {
-    //            property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
-
-    //            height: boundingBox.height
-    //            width: boundingBox.width
-
-    //            activeFocusOnPress: true
-    //            text: "Import..."
-
-    //            anchors {
-    //                top: emptyLicenseFeedbackText.bottom
-    //                topMargin: 25
-    //                horizontalCenter: parent.horizontalCenter
-    //            }
-
-    //            style: I2SvgButtonStyle {
-    //                fileCache: IngeScapeTheme.svgFileIngeScape
-
-    //                pressedID: releasedID + "-pressed"
-    //                releasedID: "button"
-    //                disabledID: releasedID + "-disabled"
-
-    //                font {
-    //                    family: IngeScapeTheme.textFontFamily
-    //                    weight : Font.Medium
-    //                    pixelSize : 16
-    //                }
-    //                labelColorPressed: IngeScapeTheme.blackColor
-    //                labelColorReleased: IngeScapeTheme.whiteColor
-    //                labelColorDisabled: IngeScapeTheme.greyColor
-
-    //            }
-
-    //            onClicked: {
-    //                if (rootPopup.licensesController) {
-    //                    rootPopup.licensesController.importLicense();
-    //                }
-    //            }
-    //        }
-    //    }
-
-    //    DropArea {
-    //        id: dropZone
-    //        anchors.fill: detailsScrollView
-
-    //        property bool dragHovering: false
-
-    //        onEntered: {
-    //            dragHovering = true
-    //        }
-
-    //        onExited: {
-    //            dragHovering = false
-    //        }
-
-    //        onDropped: {
-    //            dragHovering = false
-    //            if (drop.hasUrls && rootPopup.licensesController)
-    //            {
-    //                rootPopup.licensesController.addLicenses(drop.urls)
-    //            }
-    //        }
-
-    //        // Overlay appearing when the user drags something over the drop zone
-    //        Rectangle {
-    //            id: dropZoneOverlay
-    //            anchors.fill: parent
-
-    //            color: IngeScapeTheme.veryLightGreyColor
-    //            opacity: dropZone.dragHovering ? 0.65 : 0
-
-    //            Behavior on opacity {
-    //                NumberAnimation {}
-    //            }
-    //        }
-    //    }
 
     // Feedback layer on root popup when it is disabled
     Rectangle {
@@ -774,5 +873,3 @@ I2PopupBase {
         }
     }
 }
-
-

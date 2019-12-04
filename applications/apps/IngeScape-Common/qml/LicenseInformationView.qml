@@ -36,8 +36,9 @@ Item {
     property color propertiesNameColor : IngeScapeTheme.lightGreyColor
     property color propertiesValueColor : IngeScapeTheme.whiteColor
 
+    property bool viewWithPicto: true // Pass to false to have a more simplified view of license informations
 
-    height: childrenRect.height
+    height: childrenRect.height + childrenRect.y
 
     // Editor license informations
     SvgImage {
@@ -48,6 +49,11 @@ Item {
             left: parent.left
         }
 
+        height : visible ? editorPicto.svgHeight : parent.anchors.topMargin * 2 // To put editorText at right place
+        width : visible ? editorPicto.svgWidth : 0
+
+        visible: rootItem.viewWithPicto
+
         svgElementId : rootItem.licenseInformation && rootItem.licenseInformation.editorLicenseValidity ? "license-editor-ok" : "license-editor-fail"
     }
 
@@ -57,7 +63,7 @@ Item {
         anchors {
             verticalCenter: editorPicto.verticalCenter
             left: editorPicto.right
-            leftMargin: 8
+            leftMargin: editorPicto.visible ? 8 : 0
         }
 
         text: qsTr("Editor")
@@ -75,7 +81,7 @@ Item {
         id : editorInfosColumn
 
         anchors {
-            top: editorPicto.bottom
+            top: editorText.bottom
             topMargin: 8
             left: editorText.left
             right: parent.right
@@ -185,6 +191,11 @@ Item {
             right: editorPicto.right
         }
 
+        height : visible ? platformPicto.svgHeight : 0
+        width : visible ? platformPicto.svgWidth : 0
+
+        visible: rootItem.viewWithPicto
+
         svgElementId : rootItem.licenseInformation && rootItem.licenseInformation.ingescapeLicenseValidity ? "platform-ok" : "platform-fail"
     }
 
@@ -194,7 +205,7 @@ Item {
         anchors {
             verticalCenter: platformPicto.verticalCenter
             left: platformPicto.right
-            leftMargin: 8
+            leftMargin: platformPicto.visible ? 8 : 0
         }
 
         text: qsTr("Platform")
@@ -212,7 +223,7 @@ Item {
         id : platformInfosColumn
 
         anchors {
-            top: platformPicto.bottom
+            top: platformText.bottom
             topMargin: 8
             left: platformText.left
             right: parent.right
@@ -356,11 +367,107 @@ Item {
             }
         }
 
+        Item {
+            id : agentsInfosSimplify
+
+            anchors {
+                left : parent.left
+                right: parent.right
+            }
+
+            height: childrenRect.height
+
+            visible: !rootItem.viewWithPicto
+
+            Text {
+                id: agentsInfosSimplifyText
+
+                anchors.left: agentsInfosSimplify.left
+
+                text: qsTr("Max AGENTS: ")
+
+                color: rootItem.propertiesNameColor
+                font {
+                    family: rootItem.propertiesFont
+                    weight : rootItem.propertiesWeight
+                    pixelSize : rootItem.propertiesPixelSize
+                }
+
+            }
+
+            Text {
+                anchors {
+                    left: agentsInfosSimplifyText.right
+                    right: parent.right
+                }
+
+                text: rootItem.licenseInformation ? rootItem.licenseInformation.maxNumberOfAgents.toString() : ""
+
+                elide: Text.ElideRight
+
+                color: rootItem.propertiesValueColor
+                font {
+                    family: rootItem.propertiesFont
+                    weight : rootItem.propertiesWeight
+                    pixelSize : rootItem.propertiesPixelSize
+                }
+            }
+        }
+
+        Item {
+            id : iopsInfosSimplify
+
+            anchors {
+                left : parent.left
+                right: parent.right
+            }
+
+            height: childrenRect.height
+
+            visible: !rootItem.viewWithPicto
+
+            Text {
+                id: iopsInfosSimplifyText
+
+                anchors.left: iopsInfosSimplify.left
+
+                text: qsTr("Max IOP: ")
+
+                color: rootItem.propertiesNameColor
+                font {
+                    family: rootItem.propertiesFont
+                    weight : rootItem.propertiesWeight
+                    pixelSize : rootItem.propertiesPixelSize
+                }
+            }
+
+            Text {
+                anchors {
+                    left: iopsInfosSimplifyText.right
+                    right: parent.right
+                }
+
+                text: rootItem.licenseInformation ? rootItem.licenseInformation.maxNumberOfIOPs.toString() : ""
+
+                elide: Text.ElideRight
+
+                color: rootItem.propertiesValueColor
+                font {
+                    family: rootItem.propertiesFont
+                    weight : rootItem.propertiesWeight
+                    pixelSize : rootItem.propertiesPixelSize
+                }
+            }
+        }
+
+
         Row {
             anchors {
                 left : parent.left
                 right: parent.right
             }
+
+            visible: rootItem.viewWithPicto
 
             height: 64
 
@@ -433,7 +540,7 @@ Item {
 
                     anchors.horizontalCenter: maxIOPsText.horizontalCenter
 
-                    text: rootItem.licenseInformation ? rootItem.licenseInformation.maxNumberOfAgents.toString() : ""
+                    text: rootItem.licenseInformation ? rootItem.licenseInformation.maxNumberOfIOPs.toString() : ""
 
                     color: rootItem.propertiesValueColor
                     font {

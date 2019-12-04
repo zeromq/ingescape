@@ -38,5 +38,6 @@
         <file>qml/LicenseEventPopup.qml</file>
         <file>qml/popup/MenuPopup.qml</file>
         <file>qml/theme/ButtonStyleOfOption.qml</file>
+        <file>qml/ExpanderItem.qml</file>
     </qresource>
 </RCC>
