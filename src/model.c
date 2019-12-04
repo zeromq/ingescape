@@ -1072,7 +1072,8 @@ int igsAgent_writeInputAsString(igsAgent_t *agent, const char *name, const char 
         igsAgent_error(agent, "Input name cannot be NULL or empty");
         return 0;
     }
-    const agent_iop_t *iop = model_writeIOP(agent, name, IGS_INPUT_T, IGS_STRING_T, (char *)value, strlen(value)+1);
+    size_t valueLength = (value == NULL) ? 0 : strlen(value)+1;
+    const agent_iop_t *iop = model_writeIOP(agent, name, IGS_INPUT_T, IGS_STRING_T, (char *)value, valueLength);
     return (iop == NULL)?0:1;
 }
 
@@ -1207,7 +1208,8 @@ int igsAgent_writeParameterAsString(igsAgent_t *agent, const char *name, const c
         igsAgent_error(agent, "Parameter name cannot be NULL or empty");
         return 0;
     }
-    const agent_iop_t *iop = model_writeIOP(agent, name, IGS_PARAMETER_T, IGS_STRING_T, (char *)value, strlen(value)+1);
+    size_t valueLength = (value == NULL) ? 0 : strlen(value)+1;
+    const agent_iop_t *iop = model_writeIOP(agent, name, IGS_PARAMETER_T, IGS_STRING_T, (char *)value, valueLength);
     return (iop == NULL)?0:1;
 }
 
