@@ -9,7 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
- *
+ *      Chloé Roumieu      <roumieu@ingenuity.io>
  */
 
 import QtQuick 2.8
@@ -97,6 +97,9 @@ I2PopupBase {
     //
     //--------------------------------------------------------
 
+    //
+    // Background
+    //
     Rectangle {
         anchors.fill: parent
 
@@ -110,19 +113,23 @@ I2PopupBase {
         radius: 5
     }
 
+    //
+    // Popup content
+    //
     Item {
         id: containerPopup
 
         anchors {
             top: parent.top
             right: parent.right
+            rightMargin: 18
             left: parent.left
             leftMargin: 18
-            rightMargin: 18
         }
 
         height: childrenRect.height
 
+        // Header content : Title and license directory path
         Item {
             id: header
 
@@ -315,6 +322,8 @@ I2PopupBase {
             }
         }
 
+
+        // Content when user have one license or more
         Item {
             id: content
 
@@ -329,7 +338,7 @@ I2PopupBase {
 
             visible: rootPopup.licensesController.licenseDetailsList && rootPopup.licensesController.licenseDetailsList.count > 0
 
-            Item {
+            Column {
                 id: summary
 
                 anchors {
@@ -338,13 +347,12 @@ I2PopupBase {
                     right: parent.right
                 }
 
-                height: childrenRect.height
+                spacing : 10
 
                 Text {
                     id : summaryTitle
 
                     anchors {
-                        top: parent.top
                         left: parent.left
                         leftMargin: 10
                     }
@@ -366,8 +374,6 @@ I2PopupBase {
                     anchors {
                         left: parent.left
                         right: parent.right
-                        top: summaryTitle.bottom
-                        topMargin : 10
                     }
 
                     height: 1
@@ -379,8 +385,6 @@ I2PopupBase {
                     id: summaryView
 
                     anchors {
-                       top: summarySeparator.bottom
-                       topMargin: 10
                        right: parent.right
                        left: parent.left
                     }
@@ -394,7 +398,7 @@ I2PopupBase {
 
                 anchors {
                     top: summary.bottom
-                    topMargin : 22
+                    topMargin : 25
                     left: parent.left
                     right: parent.right
                 }
@@ -506,7 +510,6 @@ I2PopupBase {
                         NumberAnimation {}
                     }
 
-
                     Text {
                         id : detailsTitle
 
@@ -559,13 +562,11 @@ I2PopupBase {
                         // Prevent drag overshoot on Windows
                         flickableItem.boundsBehavior: Flickable.OvershootBounds
 
-
                         // Content of our scrollview
                         ListView {
                             model: rootPopup.licensesController ? rootPopup.licensesController.licenseDetailsList : 0
 
                             delegate: Item {
-
                                 anchors {
                                     left : parent.left
                                     right : parent.right
@@ -575,6 +576,7 @@ I2PopupBase {
 
                                 ExpanderItem {
                                     id: expanderLicense
+
                                     anchors {
                                         left : parent.left
                                         right : parent.right
@@ -582,12 +584,11 @@ I2PopupBase {
 
                                     headerText: model.fileName
                                     headerHeight: 35
-
-                                    pictoHeader: model && model.ingescapeLicenseValidity  &&  model.editorLicenseValidity ? "license-ok" : "license-fail"
                                     leftMarginTextHeader : 40
 
-                                    contentHeightWhenOpened : expandingLicenseInfosContainer.height
+                                    pictoHeader: model && model.ingescapeLicenseValidity  &&  model.editorLicenseValidity ? "license-ok" : "license-fail"
 
+                                    contentHeightWhenOpened : expandingLicenseInfosContainer.height
 
                                     data : Item {
                                         id: expandingLicenseInfosContainer
@@ -609,10 +610,9 @@ I2PopupBase {
 
                                             }
 
-                                            viewWithPicto: false
+                                            simplifiedWiew: false
                                             licenseInformation: rootPopup.licensesController.licenseDetailsList.get(index)
                                         }
-
                                     }
                                 }
 
@@ -650,7 +650,6 @@ I2PopupBase {
                                             deleteConfirmationPopup.open();
                                         }
                                     }
-
                                 }
                             }
                         }
@@ -659,15 +658,17 @@ I2PopupBase {
             }
         }
 
+
+        // Content when user have no license
         Item {
-            id: emptyLicenseFeedback
+            id: noLicenseContent
 
             anchors.fill: content
 
             visible: !content.visible
 
             Text {
-                id: emptyLicenseFeedbackText
+                id: noLicenseContentText
 
                 anchors {
                     left: parent.left
@@ -698,7 +699,7 @@ I2PopupBase {
                 text: "Import..."
 
                 anchors {
-                    top: emptyLicenseFeedbackText.bottom
+                    top: noLicenseContentText.bottom
                     topMargin: 25
                     horizontalCenter: parent.horizontalCenter
                 }
@@ -729,11 +730,13 @@ I2PopupBase {
             }
         }
 
+
+        // Drop Area to add a license from the editor (only when user have no license)
         DropArea {
             id: dropZone
-            anchors.fill: emptyLicenseFeedback
+            anchors.fill: noLicenseContent
 
-            enabled: emptyLicenseFeedback.visible
+            enabled: noLicenseContent.visible
 
             property bool dragHovering: false
 
@@ -767,6 +770,8 @@ I2PopupBase {
             }
         }
 
+
+        // Footer content : Button "OK"
         Item {
             id: footer
 
@@ -819,14 +824,14 @@ I2PopupBase {
                 onClicked: {
                     if (rootPopup.allowsOnlyQuit)
                     {
-                        console.info("QML: QUIT on License Popup")
+//                        console.info("QML: QUIT on License Popup")
 
                         // Quit our application (close the main window)
                         Qt.quit();
                     }
                     else
                     {
-                        console.log("QML: OK on License Popup")
+//                        console.log("QML: OK on License Popup")
                         rootPopup.validate();
                     }
                 }
@@ -834,6 +839,10 @@ I2PopupBase {
         }
     }
 
+
+    //
+    // Delete Confirmation Popup
+    //
 
     // Feedback layer on root popup when it is disabled
     Rectangle {
@@ -844,9 +853,6 @@ I2PopupBase {
         color: '#99000000';
     }
 
-    //
-    // Delete Confirmation
-    //
     ConfirmationPopup {
         id: deleteConfirmationPopup
 

@@ -9,7 +9,7 @@
  *
  *	Contributors:
  *      Mathieu Soum     <soum@ingenuity.io>
- *
+ *      Chloé Roumieu    <roumieu@ingenuity.io>
  */
 
 import QtQuick 2.8
@@ -22,25 +22,49 @@ import INGESCAPE 1.0
 
 Item {
     id: rootItem
+
+    //--------------------------------------------------------
+    //
+    // Properties
+    //
+    //--------------------------------------------------------
+
+    // Controller
     property LicenseInformationM licenseInformation: null
 
+    // Subtitles style
     property string subtitlesFont : IngeScapeTheme.textFontFamily
     property real subtitlesCapitalization : Font.AllUppercase
     property real subtitlesWeight : Font.Medium
     property real subtitlesPixelSize : 18
     property color subtitlesColor : IngeScapeTheme.whiteColor
 
+    // Properties style
     property string propertiesFont : IngeScapeTheme.textFontFamily
     property real propertiesWeight : Font.Medium
     property real propertiesPixelSize : 14
     property color propertiesNameColor : IngeScapeTheme.lightGreyColor
     property color propertiesValueColor : IngeScapeTheme.whiteColor
 
-    property bool viewWithPicto: true // Pass to false to have a more simplified view of license informations
+    // Simplify rendering of license information view
+    // NB : Pass to false to have a more simplified view of license informations
+    property bool simplifiedWiew: true
+
 
     height: childrenRect.height + childrenRect.y
 
-    // Editor license informations
+
+    //--------------------------------------------------------
+    //
+    // Content
+    //
+    //--------------------------------------------------------
+
+    //
+    // Editor part of license informations
+    //
+
+    // Picto "Editor"
     SvgImage {
         id: editorPicto
 
@@ -49,14 +73,15 @@ Item {
             left: parent.left
         }
 
-        height : visible ? editorPicto.svgHeight : parent.anchors.topMargin * 2 // To put editorText at right place
+        height : visible ? editorPicto.svgHeight : parent.anchors.topMargin * 2 // x2 : to put editorText at right place
         width : visible ? editorPicto.svgWidth : 0
 
-        visible: rootItem.viewWithPicto
+        visible: rootItem.simplifiedWiew
 
         svgElementId : rootItem.licenseInformation && rootItem.licenseInformation.editorLicenseValidity ? "license-editor-ok" : "license-editor-fail"
     }
 
+    // Subtitle "Editor"
     Text {
         id : editorText
 
@@ -69,6 +94,7 @@ Item {
         text: qsTr("Editor")
 
         color: rootItem.subtitlesColor
+
         font {
             family: rootItem.subtitlesFont
             capitalization: rootItem.subtitlesCapitalization
@@ -77,6 +103,7 @@ Item {
         }
     }
 
+    // Editor informations
     Column {
         id : editorInfosColumn
 
@@ -89,6 +116,7 @@ Item {
 
         spacing: 8
 
+        // OWNERS
         Item {
             id: ownerInfo
 
@@ -134,6 +162,7 @@ Item {
             }
         }
 
+        // EXPIRATION DATE
         Item {
             id : expirationDateInfo
 
@@ -181,7 +210,11 @@ Item {
     }
 
 
-    // Platform license informations
+    //
+    // Platform part of license informations
+    //
+
+    // Picto "Platform"
     SvgImage {
         id: platformPicto
 
@@ -194,11 +227,12 @@ Item {
         height : visible ? platformPicto.svgHeight : 0
         width : visible ? platformPicto.svgWidth : 0
 
-        visible: rootItem.viewWithPicto
+        visible: rootItem.simplifiedWiew
 
         svgElementId : rootItem.licenseInformation && rootItem.licenseInformation.ingescapeLicenseValidity ? "platform-ok" : "platform-fail"
     }
 
+    // Subtitle "Platform"
     Text {
         id : platformText
 
@@ -208,9 +242,10 @@ Item {
             leftMargin: platformPicto.visible ? 8 : 0
         }
 
-        text: qsTr("Platform")
+        text: rootItem.simplifiedWiew ? qsTr("Platform") : qsTr("License")
 
         color: rootItem.subtitlesColor
+
         font {
             family: rootItem.subtitlesFont
             capitalization: rootItem.subtitlesCapitalization
@@ -219,6 +254,7 @@ Item {
         }
     }
 
+    // Platform informations
     Column {
         id : platformInfosColumn
 
@@ -231,6 +267,7 @@ Item {
 
         spacing: 8
 
+        // CUSTOMERS
         Item {
             id: customerInfo
 
@@ -254,7 +291,6 @@ Item {
                     weight : rootItem.propertiesWeight
                     pixelSize : rootItem.propertiesPixelSize
                 }
-
             }
 
             Text {
@@ -268,6 +304,7 @@ Item {
                 elide: Text.ElideRight
 
                 color: rootItem.propertiesValueColor
+
                 font {
                     family: rootItem.propertiesFont
                     weight : rootItem.propertiesWeight
@@ -276,6 +313,7 @@ Item {
             }
         }
 
+        // ORDERS
         Item {
             id : orderInfo
 
@@ -294,12 +332,12 @@ Item {
                 text: qsTr("Orders: ")
 
                 color: rootItem.propertiesNameColor
+
                 font {
                     family: rootItem.propertiesFont
                     weight : rootItem.propertiesWeight
                     pixelSize : rootItem.propertiesPixelSize
                 }
-
             }
 
             Text {
@@ -313,6 +351,7 @@ Item {
                 elide: Text.ElideRight
 
                 color: rootItem.propertiesValueColor
+
                 font {
                     family: rootItem.propertiesFont
                     weight : rootItem.propertiesWeight
@@ -322,6 +361,7 @@ Item {
             }
         }
 
+        // EXPIRATION DATE
         Item {
             id : editorExpirationDateInfo
 
@@ -337,15 +377,15 @@ Item {
 
                 anchors.left: editorExpirationDateInfo.left
 
-                text: qsTr("Editor expiration date: ") // TODO pourquoi "Editor" ???
+                text: qsTr("Editor expiration date: ")
 
                 color: rootItem.propertiesNameColor
+
                 font {
                     family: rootItem.propertiesFont
                     weight : rootItem.propertiesWeight
                     pixelSize : rootItem.propertiesPixelSize
                 }
-
             }
 
             Text {
@@ -359,6 +399,7 @@ Item {
                 elide: Text.ElideRight
 
                 color: rootItem.propertiesValueColor
+
                 font {
                     family: rootItem.propertiesFont
                     weight : rootItem.propertiesWeight
@@ -367,6 +408,7 @@ Item {
             }
         }
 
+        // MAX AGENTS (if view is simplify : !rootItem.simplifiedWiew)
         Item {
             id : agentsInfosSimplify
 
@@ -377,7 +419,7 @@ Item {
 
             height: childrenRect.height
 
-            visible: !rootItem.viewWithPicto
+            visible: !rootItem.simplifiedWiew
 
             Text {
                 id: agentsInfosSimplifyText
@@ -387,12 +429,12 @@ Item {
                 text: qsTr("Max AGENTS: ")
 
                 color: rootItem.propertiesNameColor
+
                 font {
                     family: rootItem.propertiesFont
                     weight : rootItem.propertiesWeight
                     pixelSize : rootItem.propertiesPixelSize
                 }
-
             }
 
             Text {
@@ -406,6 +448,7 @@ Item {
                 elide: Text.ElideRight
 
                 color: rootItem.propertiesValueColor
+
                 font {
                     family: rootItem.propertiesFont
                     weight : rootItem.propertiesWeight
@@ -414,6 +457,7 @@ Item {
             }
         }
 
+        // MAX IOPS (if view is simplify : !rootItem.simplifiedWiew)
         Item {
             id : iopsInfosSimplify
 
@@ -424,7 +468,7 @@ Item {
 
             height: childrenRect.height
 
-            visible: !rootItem.viewWithPicto
+            visible: !rootItem.simplifiedWiew
 
             Text {
                 id: iopsInfosSimplifyText
@@ -434,6 +478,7 @@ Item {
                 text: qsTr("Max IOP: ")
 
                 color: rootItem.propertiesNameColor
+
                 font {
                     family: rootItem.propertiesFont
                     weight : rootItem.propertiesWeight
@@ -452,6 +497,7 @@ Item {
                 elide: Text.ElideRight
 
                 color: rootItem.propertiesValueColor
+
                 font {
                     family: rootItem.propertiesFont
                     weight : rootItem.propertiesWeight
@@ -460,14 +506,14 @@ Item {
             }
         }
 
-
+        // MAX AGENTS AND IOPS (when view is not simplify : rootItem.simplifiedWiew)
         Row {
             anchors {
                 left : parent.left
                 right: parent.right
             }
 
-            visible: rootItem.viewWithPicto
+            visible: rootItem.simplifiedWiew
 
             height: 64
 
@@ -489,6 +535,7 @@ Item {
                     text: rootItem.licenseInformation ? rootItem.licenseInformation.maxNumberOfAgents.toString() : ""
 
                     color: rootItem.propertiesValueColor
+
                     font {
                         family: rootItem.propertiesFont
                         weight : rootItem.propertiesWeight
@@ -509,6 +556,7 @@ Item {
                     elide: Text.ElideRight
 
                     color: rootItem.propertiesNameColor
+
                     font {
                         family: rootItem.propertiesFont
                         weight : rootItem.propertiesWeight
@@ -524,6 +572,7 @@ Item {
 
                 height : agentsInfos.height
                 width: 1
+
                 color: IngeScapeTheme.lightGreyColor
             }
 
@@ -543,6 +592,7 @@ Item {
                     text: rootItem.licenseInformation ? rootItem.licenseInformation.maxNumberOfIOPs.toString() : ""
 
                     color: rootItem.propertiesValueColor
+
                     font {
                         family: rootItem.propertiesFont
                         weight : rootItem.propertiesWeight
@@ -563,6 +613,7 @@ Item {
                     elide: Text.ElideRight
 
                     color: rootItem.propertiesNameColor
+
                     font {
                         family: rootItem.propertiesFont
                         weight : rootItem.propertiesWeight
@@ -570,10 +621,9 @@ Item {
                     }
                 }
             }
-
-
         }
 
+        // FEATURES
         Item {
             id : featuresInfo
 
@@ -592,12 +642,12 @@ Item {
                 text: qsTr("Features: ")
 
                 color: rootItem.propertiesNameColor
+
                 font {
                     family: rootItem.propertiesFont
                     weight : rootItem.propertiesWeight
                     pixelSize : rootItem.propertiesPixelSize
                 }
-
             }
 
             Text {
@@ -611,6 +661,7 @@ Item {
                 elide: Text.ElideRight
 
                 color: rootItem.propertiesValueColor
+
                 font {
                     family: rootItem.propertiesFont
                     weight : rootItem.propertiesWeight
@@ -619,6 +670,7 @@ Item {
             }
         }
 
+        // AGENTS
         Item {
             id : agentsInfo
 
@@ -637,12 +689,12 @@ Item {
                 text: qsTr("Agents: ")
 
                 color: rootItem.propertiesNameColor
+
                 font {
                     family: rootItem.propertiesFont
                     weight : rootItem.propertiesWeight
                     pixelSize : rootItem.propertiesPixelSize
                 }
-
             }
 
             Text {
@@ -656,6 +708,7 @@ Item {
                 elide: Text.ElideRight
 
                 color: rootItem.propertiesValueColor
+
                 font {
                     family: rootItem.propertiesFont
                     weight : rootItem.propertiesWeight
@@ -664,80 +717,4 @@ Item {
             }
         }
     }
-
-
-
-//    Row {
-//        spacing: 10
-
-//        Text {
-//            text: qsTr("Editor license validity:")
-
-//            anchors {
-//                verticalCenter: parent.verticalCenter
-//            }
-
-//            color: IngeScapeTheme.whiteColor
-//            font {
-//                family: IngeScapeTheme.textFontFamily
-//                weight : Font.Medium
-//                pixelSize : 16
-//            }
-//        }
-
-//        Rectangle {
-//            id: flagEditor
-//            width: 20
-//            height: 20
-//            radius: 10
-//            color: rootItem.licenseInformation && rootItem.licenseInformation.editorLicenseValidity ? "green" : "red"
-//        }
-//    }
-
-//    Text {
-//        text: rootItem.licenseInformation ? qsTr("Maximum number of agents: %1").arg(rootItem.licenseInformation.maxNumberOfAgents) : ""
-
-//        color: IngeScapeTheme.whiteColor
-//        font {
-//            family: IngeScapeTheme.textFontFamily
-//            //weight: Font.Medium
-//            pixelSize: 16
-//        }
-//    }
-//    Text {
-//        text: rootItem.licenseInformation ? qsTr("Maximum number of agents inputs/outputs/parameters: %1").arg(rootItem.licenseInformation.maxNumberOfIOPs) : ""
-
-//        color: IngeScapeTheme.whiteColor
-//        font {
-//            family: IngeScapeTheme.textFontFamily
-//            //weight: Font.Medium
-//            pixelSize: 16
-//        }
-//    }
-
-//    Text {
-//        text: rootItem.licenseInformation ? qsTr("Agents:") : ""
-
-//        color: IngeScapeTheme.whiteColor
-//        font {
-//            family: IngeScapeTheme.textFontFamily
-//            weight: Font.Medium
-//            pixelSize: 16
-//        }
-//    }
-
-//    Repeater {
-//        model: rootItem.licenseInformation ? rootItem.licenseInformation.agents : null
-
-//        Text {
-//            text: " - " + modelData
-
-//            color: IngeScapeTheme.whiteColor
-//            font {
-//                family: IngeScapeTheme.textFontFamily
-//                //weight: Font.Medium
-//                pixelSize: 16
-//            }
-//        }
-//    }
 }
