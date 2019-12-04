@@ -36,19 +36,7 @@ I2PopupBase {
     property bool allowsOnlyQuit: false
 
     // Property to correctly size the popup when there are several licenses to show
-    property real maxHeight : 1000
-
-
-    //---------------------------
-    //
-    // Behavior
-    //
-    //---------------------------
-
-    // Animate resize
-    Behavior on height {
-        NumberAnimation {}
-    }
+    property real maxHeight : parent.height - 40 // 40 to let a margin above and below our popup
 
 
     //--------------------------------------------------------
@@ -509,10 +497,15 @@ I2PopupBase {
                         left: parent.left
                     }
 
-                    height: severalLicensesView.visible ? rootPopup.maxHeight - summary.height - header.height - footer.height - content.anchors.topMargin - licensesDetails.anchors.topMargin
+                    height: severalLicensesView.visible ? rootPopup.maxHeight - licensesDetails.y - content.y - footer.height
                                                         : 0 // To resize popup
 
                     visible: rootPopup.licensesController.licenseDetailsList.count > 1
+
+                    Behavior on height {
+                        NumberAnimation {}
+                    }
+
 
                     Text {
                         id : detailsTitle
