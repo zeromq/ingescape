@@ -493,7 +493,8 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
                 // STRING
                 case IGS_STRING_T: {
                     char *rawNewValue = static_cast<char *>(value);
-                    QString newValue = QString::fromUtf8(rawNewValue, qMin(static_cast<int>(strlen(rawNewValue)), PUBLISHED_VALUE_MAXIMUM_STRING_LENGTH));
+                    size_t rawNewValueLength = (rawNewValue == nullptr) ? 0 : strlen(rawNewValue);
+                    QString newValue = QString::fromUtf8(rawNewValue, qMin(static_cast<int>(rawNewValueLength), PUBLISHED_VALUE_MAXIMUM_STRING_LENGTH));
 
                     currentValue = QVariant(newValue);
                     isValid = true;
