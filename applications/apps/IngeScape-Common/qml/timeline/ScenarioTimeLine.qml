@@ -55,6 +55,11 @@ Item {
     // NB: this flag is used to avoid animations during a drag-n-drop
     property bool _canPerformResizeAnimations: true
 
+    // Item to add extra children to our 'extraContentItem' item
+    // NB: We use the 'data' property instead of the 'children' property to allow any type
+    //     of content and not only visual items (data is a list<Object> AND children is a list<Item>)
+    property alias extraContent: extraContentItem.data
+
 
     //--------------------------------
     //
@@ -1289,7 +1294,7 @@ Item {
     }
 
 
-    // Buttons and time
+    // Buttons and time and extra content if necessary
     Item {
         anchors {
             left: parent.left
@@ -1393,6 +1398,8 @@ Item {
 
 
         Rectangle {
+            id: playTime
+
             anchors {
                 horizontalCenter: playScenarioBtn.horizontalCenter
                 top: playScenarioBtn.bottom
@@ -1424,6 +1431,19 @@ Item {
                     pixelSize: 14
                 }
             }
+        }
+
+        Item {
+            id: extraContentItem
+
+            anchors {
+                horizontalCenter: parent.horizontalCenter
+                top: playTime.bottom
+                topMargin: 15
+            }
+
+            height: childrenRect.height
+            width: childrenRect.width
         }
     }
 
