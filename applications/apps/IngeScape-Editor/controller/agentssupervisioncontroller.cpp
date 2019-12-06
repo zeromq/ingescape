@@ -17,7 +17,6 @@
 
 #include <QQmlEngine>
 #include <QDebug>
-#include <model/editorenums.h>
 #include <controller/ingescapenetworkcontroller.h>
 
 

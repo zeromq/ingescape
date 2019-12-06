@@ -80,6 +80,10 @@ static const QString STOP = QString("STOP");
 static const QString RESET = QString("RESET");
 
 
+static const QString command_LoadDefinition = "LOAD_THIS_DEFINITION#";
+static const QString command_LoadMapping = "LOAD_THIS_MAPPING#";
+static const QString command_ClearMapping = "CLEAR_MAPPING";
+
 static const QString command_StartAgent = "RUN";
 static const QString command_StopAgent = "STOP";
 

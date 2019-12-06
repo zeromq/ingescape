@@ -19,6 +19,7 @@
 #include <I2PropertyHelpers.h>
 
 #include <controller/ingescapemodelmanager.h>
+#include <controller/ingescapenetworkcontroller.h>
 #include <controller/abstracttimeactionslinescenarioviewcontroller.h>
 #include <controller/abstractscenariocontroller.h>
 #include <model/taskinstancem.h>
@@ -89,6 +90,15 @@ private Q_SLOTS:
      * @param currentTaskInstance
      */
     void _oncurrentTaskInstanceChanged(TaskInstanceM* previousTaskInstance, TaskInstanceM* currentTaskInstance);
+
+
+private:
+
+    /**
+     * @brief Import the global mapping (of agents) from JSON
+     * @param jsonArrayOfAgentsInMapping
+     */
+    void _importMappingFromJson(QJsonArray jsonArrayOfAgentsInMapping);
 
 
 private:

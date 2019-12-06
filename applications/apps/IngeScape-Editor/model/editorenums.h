@@ -20,11 +20,6 @@
 #include <model/enums.h>
 
 
-static const QString command_LoadDefinition = "LOAD_THIS_DEFINITION#";
-static const QString command_LoadMapping = "LOAD_THIS_MAPPING#";
-static const QString command_ClearMapping = "CLEAR_MAPPING";
-
-
 /**
  * @brief The EditorEnums class is a helper for enumerations and constants specific to the "Editor" application
  */

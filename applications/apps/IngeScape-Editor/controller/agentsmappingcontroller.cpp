@@ -18,7 +18,6 @@
 #include <QQmlEngine>
 #include <QDebug>
 #include <QFileDialog>
-#include <model/editorenums.h>
 #include <model/actionmappingm.h>
 #include <controller/ingescapenetworkcontroller.h>
 

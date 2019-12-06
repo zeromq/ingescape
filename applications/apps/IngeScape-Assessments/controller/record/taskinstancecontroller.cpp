@@ -106,6 +106,19 @@ void TaskInstanceController::setcurrentTaskInstance(TaskInstanceM *value)
 
 
 /**
+ * @brief Adds the given URLs as attachements for this record
+ * @param urlList
+ */
+void TaskInstanceController::addNewAttachements(const QList<QUrl>& urlList)
+{
+    for (QUrl url : urlList)
+    {
+        qDebug() << "New attachement:" << url.toString();
+    }
+}
+
+
+/**
  * @brief Slot called when the current task instance changed
  * @param previousTaskInstance
  * @param currentTaskInstance
@@ -180,6 +193,12 @@ void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previo
                             {
                                 _scenarioC->importScenarioFromJson(jsonRoot.value("scenario").toObject());
                             }
+
+                            // Import the global mapping (of agents) from JSON
+                            if (jsonRoot.contains("mapping"))
+                            {
+                                _importMappingFromJson(jsonRoot.value("mapping").toArray());
+                            }
                         }
                     }
                     else {
@@ -203,14 +222,59 @@ void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previo
 
 
 /**
- * @brief Adds the given URLs as attachements for this record
- * @param urlList
+ * @brief Import the global mapping (of agents) from JSON
+ * @param jsonArrayOfAgentsInMapping
  */
-void TaskInstanceController::addNewAttachements(const QList<QUrl>& urlList)
+void TaskInstanceController::_importMappingFromJson(QJsonArray jsonArrayOfAgentsInMapping)
 {
-    for (QUrl url : urlList)
+    IngeScapeModelManager* igsModelManager = IngeScapeModelManager::instance();
+    IngeScapeNetworkController* igsNetworkController = IngeScapeNetworkController::instance();
+
+    if ((igsModelManager != nullptr) && (igsNetworkController != nullptr))
     {
-        qDebug() << "New attachement:" << url.toString();
+        for (QJsonValue jsonValue : jsonArrayOfAgentsInMapping)
+        {
+            if (jsonValue.isObject())
+            {
+                QJsonObject jsonObjectInMapping = jsonValue.toObject();
+
+
+                //
+                // Agent
+                //
+                if (jsonObjectInMapping.contains("agentName"))
+                {
+                    // Get values for key "agentName" and "mapping"
+                    QJsonValue jsonName = jsonObjectInMapping.value("agentName");
+                    QJsonValue jsonMapping = jsonObjectInMapping.value("mapping");
+
+                    if (jsonName.isString() && jsonMapping.isObject())
+                    {
+                        QString agentName = jsonName.toString();
+
+                        // Get the (view model of) agents grouped for this name
+                        AgentsGroupedByNameVM* agentsGroupedByName = igsModelManager->getAgentsGroupedForName(agentName);
+
+                        // Create the agent mapping from JSON
+                        AgentMappingM* agentMapping = JsonHelper::createModelOfAgentMappingFromJSON(agentName, jsonMapping.toObject());
+
+                        if ((agentsGroupedByName != nullptr) && (agentMapping != nullptr))
+                        {
+                            // Get a string from the JSON
+                            QString jsonOfMapping = JsonHelper::getJsonOfAgentMapping(agentMapping,
+                                                                                      QJsonDocument::Compact);
+
+                            QString message = QString("%1%2").arg(command_LoadMapping, jsonOfMapping);
+
+                            // Send the message to the agent (list of models of agent)
+                            // FIXME: JSON can be too big for a string
+                            igsNetworkController->sendStringMessageToAgents(agentsGroupedByName->peerIdsList(), message);
+                        }
+                    }
+                }
+            }
+        }
     }
 }
+
 

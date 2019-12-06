@@ -125,6 +125,7 @@ void AgentsGroupedByDefinitionVM::setisMuted(bool value)
     }
 }
 
+
 /**
  * @brief Ask to start our agent
  */

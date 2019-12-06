@@ -18,7 +18,6 @@
 #include <QObject>
 //#include <QtQml>
 #include <I2PropertyHelpers.h>
-#include <model/editorenums.h>
 #include <controller/ingescapemodelmanager.h>
 
 
