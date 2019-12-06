@@ -123,24 +123,25 @@ Item {
         extraContent : LabellessSvgButton {
             id: startOrStopRecordButton
 
-            // TODO be sure of that behavior
             enabled: (experimentationController.isRecorderON)
             opacity: enabled ? 1.0 : 0.4
 
-            // TODO define when recorder is recording and when it not
-            property string currentID : /*controller && controller.isRecording ? "record-stop" : */ "record-start"
+            property string currentID : (rootItem.experimentationController && rootItem.experimentationController.isRecording) ? "record-stop" : "record-start"
             pressedID: currentID + "-pressed"
             releasedID: currentID
             disabledID: currentID
 
-            // TODO Launch/ Stop the recorder
             onClicked: {
-                console.log("CLIC START/STOP")
-//                if (controller) {
-//                    console.log("QML: Start or Stop to Record");
-
-//                    controller.startOrStopToRecord();
-//                }
+                if (rootItem.experimentationController) {
+                    if (!rootItem.experimentationController.isRecording) {
+                        console.log("QML: Start to Record");
+                        rootItem.experimentationController.startToRecord();
+                    }
+                    else {
+                        console.log("QML: Stop to Record");
+                        rootItem.experimentationController.stopToRecord();
+                    }
+                }
             }
         }
 
