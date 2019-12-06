@@ -21,7 +21,7 @@ import I2Quick 1.0
 
 import INGESCAPE 1.0
 
-import "theme" as Theme;
+import "../theme" as Theme;
 
 I2PopupBase {
     id: rootPopup

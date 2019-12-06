@@ -197,10 +197,13 @@ void IngeScapeCommon::registerIngeScapeQmlTypes()
     qmlRegisterType(QUrl("qrc:/qml/ActionsListItem.qml"), "INGESCAPE", 1, 0, "ActionsListItem");
 
     // - Popups
-    qmlRegisterType(QUrl("qrc:/qml/ConfirmationPopup.qml"), "INGESCAPE", 1, 0, "ConfirmationPopup");
-    qmlRegisterType(QUrl("qrc:/qml/LicensePopup.qml"), "INGESCAPE", 1, 0, "LicensePopup");
-    qmlRegisterType(QUrl("qrc:/qml/SystemInformationPopup.qml"), "INGESCAPE", 1, 0, "SystemInformationPopup");
+    qmlRegisterType(QUrl("qrc:/qml/popup/ConfirmationPopup.qml"), "INGESCAPE", 1, 0, "ConfirmationPopup");
+    qmlRegisterType(QUrl("qrc:/qml/popup/SystemInformationPopup.qml"), "INGESCAPE", 1, 0, "SystemInformationPopup");
     qmlRegisterType(QUrl("qrc:/qml/popup/MenuPopup.qml"), "INGESCAPE", 1, 0, "MenuPopup");
+
+    // License popups
+    qmlRegisterType(QUrl("qrc:/qml/license/LicensePopup.qml"), "INGESCAPE", 1, 0, "LicensePopup");
+    qmlRegisterType(QUrl("qrc:/qml/license/LicenseEventPopup.qml"), "INGESCAPE", 1, 0, "LicenseEventPopup");
 
     // - Text area with timer to delay processing of edited text while the user is editing it
     qmlRegisterType(QUrl("qrc:/qml/TextAreaWithTimer.qml"), "INGESCAPE", 1, 0, "TextAreaWithTimer");
@@ -216,6 +219,8 @@ void IngeScapeCommon::registerIngeScapeQmlTypes()
     qmlRegisterType(QUrl("qrc:/qml/widgets/LabellessSvgButton.qml"), "INGESCAPE", 1, 0, "LabellessSvgButton");
     qmlRegisterType(QUrl("qrc:/qml/widgets/LabellessSvgButtonCachedImage.qml"), "INGESCAPE", 1, 0, "LabellessSvgButtonCachedImage");
     qmlRegisterType(QUrl("qrc:/qml/widgets/SvgImage.qml"), "INGESCAPE", 1, 0, "SvgImage");
+
+
 
 }
 
