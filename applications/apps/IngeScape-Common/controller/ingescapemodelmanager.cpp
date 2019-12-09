@@ -133,7 +133,7 @@ void IngeScapeModelManager::setisMappingConnected(bool value)
  * @brief Create a new model of agent with a name, a definition (can be NULL) and some properties
  * @param agentName
  * @param definition optional (NULL by default)
- * @param hostname optional (default value)
+ * @param hostName optional (default value)
  * @param commandLine optional (empty by default)
  * @param peerId optional (empty by default)
  * @param ipAddress optional (empty by default)
@@ -142,7 +142,7 @@ void IngeScapeModelManager::setisMappingConnected(bool value)
  */
 AgentM* IngeScapeModelManager::createAgentModel(QString agentName,
                                                 DefinitionM* definition,
-                                                QString hostname,
+                                                QString hostName,
                                                 QString commandLine,
                                                 QString peerId,
                                                 QString ipAddress,
@@ -156,7 +156,7 @@ AgentM* IngeScapeModelManager::createAgentModel(QString agentName,
         agent = new AgentM(agentName,
                            peerId,
                            ipAddress,
-                           hostname,
+                           hostName,
                            commandLine,
                            isON,
                            this);
@@ -171,6 +171,13 @@ AgentM* IngeScapeModelManager::createAgentModel(QString agentName,
 
         if (!agent->peerId().isEmpty()) {
             _hashFromPeerIdToAgent.insert(agent->peerId(), agent);
+        }
+
+        // If there is a host with this name...
+        if (_hashFromNameToHost.contains(hostName))
+        {
+            // ...this agent can be restarted
+            agent->setcanBeRestarted(true);
         }
 
         // Emit the signal "Agent Model has been Created"
