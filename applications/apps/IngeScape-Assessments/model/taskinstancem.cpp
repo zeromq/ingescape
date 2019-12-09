@@ -80,6 +80,8 @@ TaskInstanceM::TaskInstanceM(CassUuid experimentationUuid,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
+    qInfo() << "New Model of Session" << _name << "(" << AssessmentsModelManager::cassUuidToQString(_cassUuid) << ")";
+
     // Create the "Qml Property Map" that allows to set key-value pairs that can be used in QML bindings
     _mapIndependentVariableValues = new QQmlPropertyMap(this);
 
@@ -110,7 +112,7 @@ TaskInstanceM::~TaskInstanceM()
 {
     if ((_subject != nullptr) && (_task != nullptr))
     {
-        qInfo() << "Delete Model of Record" << _name << "(" << AssessmentsModelManager::cassUuidToQString(_cassUuid) << ") for subject" << _subject->displayedId() << "and task" << _task->name() << "at" << _startDateTime.toString("dd/MM/yyyy hh:mm:ss");
+        qInfo() << "Delete Model of Session" << _name << "(" << AssessmentsModelManager::cassUuidToQString(_cassUuid) << ") for subject" << _subject->displayedId() << "and task" << _task->name() << "at" << _startDateTime.toString("dd/MM/yyyy hh:mm:ss");
 
         // For debug purpose: Print the value of all independent variables
         _printIndependentVariableValues();

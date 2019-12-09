@@ -536,69 +536,66 @@ void ExperimentationController::_retrieveIndependentVariableValuesForTaskInstanc
  */
 void ExperimentationController::startToRecord()
 {
-    if (!_isRecording) {
-        TaskM* currentTaskModel = _taskInstanceC->currentTaskInstance()->task();
-
-        // Get the JSON of the current platform
-        QString platformFilePath = currentTaskModel->platformFileUrl().path();
-        QFile jsonFile(platformFilePath);
-        if (jsonFile.exists())
+    if (!_isRecording && _isRecorderON && (_taskInstanceC != nullptr))
+    {
+        TaskInstanceM* currentSession = _taskInstanceC->currentTaskInstance();
+        if ((currentSession != nullptr) && (currentSession->task() != nullptr))
         {
-            if (jsonFile.open(QIODevice::ReadOnly))
+            TaskM* task = _taskInstanceC->currentTaskInstance()->task();
+
+            QString currentPlatformName = task->platformFileName();
+
+            // Get the JSON of the current platform
+            QString platformFilePath = task->platformFileUrl().path();
+            QFile jsonFile(platformFilePath);
+            if (jsonFile.exists())
             {
-                QByteArray byteArrayOfJson = jsonFile.readAll();
-                jsonFile.close();
-
-                QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArrayOfJson);
-
-                if (_isRecorderON && !jsonDocument.isNull() && !jsonDocument.isEmpty())
+                if (jsonFile.open(QIODevice::ReadOnly))
                 {
-                    QString jsonString = QString::fromUtf8(jsonDocument.toJson(QJsonDocument::Compact));
+                    QByteArray byteArrayOfJson = jsonFile.readAll();
+                    jsonFile.close();
 
-                    // Add the delta from the start time of the TimeLine
-                    int deltaTimeFromTimeLineStart = 0;
-                    if (_taskInstanceC->scenarioC() != nullptr)
+                    QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArrayOfJson);
+
+                    if (!jsonDocument.isNull() && !jsonDocument.isEmpty())
                     {
-                        deltaTimeFromTimeLineStart = _taskInstanceC->scenarioC()->currentTime().msecsSinceStartOfDay();
+                        QString jsonString = QString::fromUtf8(jsonDocument.toJson(QJsonDocument::Compact));
+
+                        // Add the delta from the start time of the TimeLine
+                        int deltaTimeFromTimeLineStart = 0;
+                        if (_taskInstanceC->scenarioC() != nullptr)
+                        {
+                            deltaTimeFromTimeLineStart = _taskInstanceC->scenarioC()->currentTime().msecsSinceStartOfDay();
+                        }
+
+                        QString sessionUID = AssessmentsModelManager::cassUuidToQString(currentSession->getCassUuid());
+                        QString experimentationUID = AssessmentsModelManager::cassUuidToQString(task->getExperimentationCassUuid());
+
+                        QStringList message = {
+                            command_StartRecord,
+                            currentPlatformName,
+                            QString::number(deltaTimeFromTimeLineStart),
+                            jsonString,
+                            sessionUID,
+                            experimentationUID
+                        };
+
+                        // Send a ZMQ message in several parts to the recorder
+                        IngeScapeNetworkController::instance()->sendZMQMessageToAgent(_peerIdOfRecorder, message);
+                        setisRecording(true);
                     }
-
-                    QString currentPlatformName = currentTaskModel->platformFileName();
-
-                    char taskInstanceIDC[CASS_UUID_STRING_LENGTH];
-                    cass_uuid_string(currentTaskModel->getCassUuid(), taskInstanceIDC);
-
-                    char experimentationID[CASS_UUID_STRING_LENGTH];
-                    cass_uuid_string(currentTaskModel->getExperimentationCassUuid(), experimentationID);
-
-                    QStringList message = {
-                        command_StartRecord,
-                        currentPlatformName,
-                        QString::number(deltaTimeFromTimeLineStart),
-                        jsonString,
-                        QString(taskInstanceIDC),
-                        QString(experimentationID)
-                    };
-
-                    // Send a ZMQ message in several parts to the recorder
-                    IngeScapeNetworkController::instance()->sendZMQMessageToAgent(_peerIdOfRecorder, message);
-                    setisRecording(true);
-
-                    qDebug() << _isRecording;
                 }
                 else {
                     qCritical() << "Can not open file" << platformFilePath;
                 }
             }
             else {
-                qWarning() << "There is no file" << platformFilePath;
+                qWarning() << "There is no file at" << platformFilePath;
             }
-        }
-        else {
-            qWarning() << "The URL of platform" << currentTaskModel->platformFileUrl() << "is not valid";
         }
     }
     else {
-        qWarning() << "Recording is already launched";
+        qWarning() << "Recording is already launched or recorder is not launched";
     }
 }
 
@@ -606,14 +603,15 @@ void ExperimentationController::startToRecord()
 /**
  * @brief Method called when the user wants to stop to record
  */
-void ExperimentationController::stopToRecord() {
-    if ((_isRecording) && (_isRecorderON))
+void ExperimentationController::stopToRecord()
+{
+    if (_isRecording && _isRecorderON)
     {
         // Send the message "Stop Record" to the recorder
         IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerIdOfRecorder, command_StopRecord);
         setisRecording(false);
     }
     else {
-        qWarning() << "Recording is already stopped, or recorder is not launched";
+        qWarning() << "Recording is already stopped or recorder is not launched";
     }
 }
