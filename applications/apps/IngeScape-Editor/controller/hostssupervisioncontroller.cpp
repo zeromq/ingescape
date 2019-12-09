@@ -89,13 +89,8 @@ void HostsSupervisionController::deleteHostsOFF()
     {
         if ((host != nullptr) && !host->isON() && (host->name() != HOSTNAME_NOT_DEFINED))
         {
-            bool hasAgentOn = false;
-            for (AgentM* iterator : *host->agentsList()) {
-                if (iterator->isON()) {
-                    hasAgentOn = true;
-                    break;
-                }
-            }
+            bool hasAgentOn = std::any_of(host->agentsList()->begin(), host->agentsList()->end(), [](AgentM* agent){ return (agent != nullptr) && (agent->isON()); });
+
             if (!hasAgentOn) {
                 deleteHost(host);
             }
