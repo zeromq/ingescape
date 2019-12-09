@@ -105,7 +105,7 @@ Item {
             color: IngeScapeTheme.selectionColor
         }
 
-        Column {
+        Rectangle{
             id: columnName
 
             anchors {
@@ -117,8 +117,6 @@ Item {
                 //rightMargin: 5
             }
             height: childrenRect.height
-
-            spacing: 4
 
             // Name
             Text {
@@ -138,8 +136,41 @@ Item {
 
             }
         }
-    }
 
+        // Button ON/OFF
+        LabellessSvgButton {
+            id: btnOnOff
+
+            anchors {
+                right: parent.right
+                rightMargin:10
+                verticalCenter: parent.verticalCenter
+            }
+
+            // Agent is "ON" OR Agent can be restarted
+            visible: (rootItem.agent && (rootItem.agent.isON || rootItem.agent.canBeRestarted))
+            enabled: visible
+
+            pressedID: releasedID + "-pressed"
+            releasedID: model.isON ? "on" : "off"
+            disabledID : releasedID
+
+            onClicked: {
+                // ON
+                if (rootItem.agent && rootItem.agent.isON)
+                {
+                    // Ask to stop our agent
+                    rootItem.agent.askStopAgent();
+                }
+                // OFF
+                else
+                {
+                    // Ask to start our agent
+                    rootItem.agent.askStartAgent();
+                }
+            }
+        }
+    }
 }
 
 

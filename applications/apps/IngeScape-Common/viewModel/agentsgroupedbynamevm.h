@@ -46,6 +46,9 @@ class AgentsGroupedByNameVM : public QObject
     // Flag indicating if our agent(s) is ON (vs OFF)
     I2_QML_PROPERTY_READONLY(bool, isON)
 
+    // Flag indicating if our agent can be restarted (by an IngeScape launcher)
+    I2_QML_PROPERTY_READONLY(bool, canBeRestarted)
+
     // Number of agents which are ON
     I2_QML_PROPERTY_READONLY(int, numberOfAgentsON)
 
@@ -94,6 +97,16 @@ public:
      */
     void clearBeforeDeletion();
 
+    /**
+     * @brief Ask to start our agent
+     */
+    Q_INVOKABLE void askStartAgent();
+
+
+    /**
+     * @brief Ask to stop our agent
+     */
+    Q_INVOKABLE void askStopAgent();
 
     /**
      * @brief Add a new model of agent
@@ -339,6 +352,12 @@ private Q_SLOTS:
      * @brief Slot called when a view model of agents grouped by definition has become useless (no more model)
      */
     void _onUselessAgentsGroupedByDefinition();
+
+    /**
+     * @brief Slot called when the flag "can Be Restarted" of a model changed
+     * @param canBeRestarted
+     */
+    void _onCanBeRestartedOfModelChanged(bool canBeRestarted);
 
 
 private:

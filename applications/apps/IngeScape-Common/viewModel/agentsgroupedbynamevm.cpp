@@ -13,6 +13,8 @@
  */
 
 #include "agentsgroupedbynamevm.h"
+#include <controller/ingescapemodelmanager.h>
+#include <controller/ingescapenetworkcontroller.h>
 
 /**
  * @brief Constructor
@@ -24,6 +26,7 @@ AgentsGroupedByNameVM::AgentsGroupedByNameVM(QString agentName,
     _name(agentName),
     _peerIdsList(QStringList()),
     _isON(false),
+    _canBeRestarted(false),
     _numberOfAgentsON(0),
     _numberOfAgentsOFF(0),
     _currentMapping(nullptr),
@@ -127,6 +130,44 @@ void AgentsGroupedByNameVM::clearBeforeDeletion()
 
 
 /**
+ * @brief Ask to start our agent
+ */
+void AgentsGroupedByNameVM::askStartAgent()
+{
+    for (AgentM* model : _models.toList())
+    {
+        // Check if the model has a hostname
+        if ((model != nullptr) && !model->hostname().isEmpty())
+        {
+            // Get the peer id of the Launcher on this host
+            QString peerIdOfLauncher = IngeScapeModelManager::instance()->getPeerIdOfLauncherOnHost(model->hostname());
+            if (!peerIdOfLauncher.isEmpty())
+            {
+                QStringList message = {
+                    command_StartAgent,
+                    model->commandLine()
+                };
+
+                // Send the message "Start Agent" to the IngeScape Launcher
+                IngeScapeNetworkController::instance()->sendStringMessageToAgent(peerIdOfLauncher, message);
+            }
+        }
+    }
+}
+
+
+/**
+ * @brief Ask to stop our agent
+ */
+void AgentsGroupedByNameVM::askStopAgent()
+{
+    // Send the message "Stop Agent" to our agent
+    IngeScapeNetworkController::instance()->sendStringMessageToAgents(_peerIdsList, command_StopAgent);
+}
+
+
+
+/**
  * @brief Add a new model of agent
  * @param model
  */
@@ -142,6 +183,7 @@ void AgentsGroupedByNameVM::addNewAgentModel(AgentM* model)
             connect(model, &AgentM::isONChanged, this, &AgentsGroupedByNameVM::_onIsONofModelChanged);
             connect(model, &AgentM::definitionChangedWithPreviousAndNewValues, this, &AgentsGroupedByNameVM::_onDefinitionOfModelChangedWithPreviousAndNewValues);
             connect(model, &AgentM::mappingChangedWithPreviousAndNewValues, this, &AgentsGroupedByNameVM::_onMappingOfModelChangedWithPreviousAndNewValues);
+            connect(model, &AgentM::canBeRestartedChanged, this, &AgentsGroupedByNameVM::_onCanBeRestartedOfModelChanged);
 
             _models.append(model);
 
@@ -753,6 +795,34 @@ void AgentsGroupedByNameVM::_onUselessAgentsGroupedByDefinition()
     }
 }
 
+/**
+ * @brief Slot called when the flag "can Be Restarted" of a model changed
+ * @param canBeRestarted
+ */
+void AgentsGroupedByNameVM::_onCanBeRestartedOfModelChanged(bool canBeRestarted)
+{
+    // Most of the time, there is only one model
+    if (_models.count() == 1)
+    {
+        setcanBeRestarted(canBeRestarted);
+    }
+    // Several models
+    else
+    {
+        bool globalCanBeRestarted = false;
+
+        for (AgentM* model : _models.toList())
+        {
+            if ((model != nullptr) && model->canBeRestarted())
+            {
+                globalCanBeRestarted = true;
+                break;
+            }
+        }
+        setcanBeRestarted(globalCanBeRestarted);
+    }
+}
+
 
 /**
  * @brief Update with all models of agents
@@ -764,6 +834,7 @@ void AgentsGroupedByNameVM::_updateWithAllModels()
     _peerIdsList.clear();
 
     bool globalIsON = false;
+    bool globalCanBeRestarted = false;
     int numberOfAgentsON = 0;
     int numberOfAgentsOFF = 0;
 
@@ -778,6 +849,7 @@ void AgentsGroupedByNameVM::_updateWithAllModels()
             }
 
             globalIsON = model->isON();
+            globalCanBeRestarted = model->canBeRestarted();
 
             if (model->isON()) {
                 numberOfAgentsON = 1;
@@ -812,6 +884,10 @@ void AgentsGroupedByNameVM::_updateWithAllModels()
                 else {
                     numberOfAgentsOFF++;
                 }
+
+                if (!globalCanBeRestarted && model->canBeRestarted()) {
+                    globalCanBeRestarted = true;
+                }
             }
         }
     }
@@ -821,6 +897,7 @@ void AgentsGroupedByNameVM::_updateWithAllModels()
     // Update properties
     //
     setisON(globalIsON);
+    setcanBeRestarted(globalCanBeRestarted);
     setnumberOfAgentsON(numberOfAgentsON);
     setnumberOfAgentsOFF(numberOfAgentsOFF);
 }
