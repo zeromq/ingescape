@@ -68,7 +68,6 @@ SOURCES += main.cpp \
     viewModel/link/linkoutputvm.cpp \
     viewModel/link/linkvm.cpp \
     viewModel/link/linkconnectorvm.cpp \
-    model/editorenums.cpp \
     controller/editormodelmanager.cpp \
     viewModel/mapping/objectinmappingvm.cpp \
     viewModel/mapping/actioninmappingvm.cpp
@@ -102,7 +101,6 @@ HEADERS += \
     viewModel/link/linkoutputvm.h \
     viewModel/link/linkvm.h \
     viewModel/link/linkconnectorvm.h \
-    model/editorenums.h \
     controller/editormodelmanager.h \
     viewModel/mapping/objectinmappingvm.h \
     viewModel/mapping/actioninmappingvm.h
