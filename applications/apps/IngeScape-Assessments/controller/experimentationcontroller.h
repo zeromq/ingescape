@@ -43,6 +43,9 @@ class ExperimentationController : public QObject
     // Flag indicating is there is a recorder with state ON
     I2_QML_PROPERTY_READONLY(bool, isRecorderON)
 
+    // Flag indicating if the recorder is currently recording
+    I2_QML_PROPERTY_READONLY(bool, isRecording)
+
     // List of selected sessions
     I2_QOBJECT_LISTMODEL(TaskInstanceM, selectedSessions)
 
@@ -90,7 +93,16 @@ public:
     Q_INVOKABLE void exportSelectedSessions();
 
 
-Q_SIGNALS:
+    /**
+     * @brief Method called when the user wants to start to record
+     */
+    Q_INVOKABLE void startToRecord();
+
+
+    /**
+     * @brief Method called when the user wants to stop to record
+     */
+    Q_INVOKABLE void stopToRecord();
 
 
 public Q_SLOTS:
@@ -120,12 +132,6 @@ private Q_SLOTS:
      * @param currentExperimentation
      */
     void _onCurrentExperimentationChanged(ExperimentationM* currentExperimentation);
-
-
-    /**
-     * @brief Slot called when the user wants to start to record
-     */
-    void _onStartToRecord();
 
 
     /**

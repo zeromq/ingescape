@@ -198,7 +198,7 @@ int igsAgent_busSendDataToAgent(igsAgent_t *agent, const char *agentNameOrPeerID
             zmsg_t *msg = zmsg_new();
             zmsg_append(msg, &frame);
             bus_zyreLock();
-            if (zyre_whisper(agent->loopElements->node, el->peerId, &msg) <= 0)
+            if (zyre_whisper(agent->loopElements->node, el->peerId, &msg) != 0)
                 res = -1;
             bus_zyreUnlock();
         }
@@ -221,7 +221,7 @@ int igsAgent_busSendZMQMsgToAgent(igsAgent_t *agent, const char *agentNameOrPeer
         if (strcmp(el->name, agentNameOrPeerID) == 0 || strcmp(el->peerId, agentNameOrPeerID) == 0){
             zmsg_t *msg = zmsg_dup(*msg_p);
             bus_zyreLock();
-            if (zyre_whisper(agent->loopElements->node, el->peerId, &msg) <= 0)
+            if (zyre_whisper(agent->loopElements->node, el->peerId, &msg) != 0)
                 res = -1;
             bus_zyreUnlock();
         }

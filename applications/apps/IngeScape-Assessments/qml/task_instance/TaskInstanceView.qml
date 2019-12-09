@@ -120,6 +120,31 @@ Item {
         licensesController: IngeScapeAssessmentsC.licensesC
         mainController: IngeScapeAssessmentsC
 
+        extraContent : LabellessSvgButton {
+            id: startOrStopRecordButton
+
+            enabled: (experimentationController.isRecorderON)
+            opacity: enabled ? 1.0 : 0.4
+
+            property string currentID : (rootItem.experimentationController && rootItem.experimentationController.isRecording) ? "record-stop" : "record-start"
+            pressedID: currentID + "-pressed"
+            releasedID: currentID
+            disabledID: currentID
+
+            onClicked: {
+                if (rootItem.experimentationController) {
+                    if (!rootItem.experimentationController.isRecording) {
+                        console.log("QML: Start to Record");
+                        rootItem.experimentationController.startToRecord();
+                    }
+                    else {
+                        console.log("QML: Stop to Record");
+                        rootItem.experimentationController.stopToRecord();
+                    }
+                }
+            }
+        }
+
         Rectangle {
             id: timeLineLeftShadow
 

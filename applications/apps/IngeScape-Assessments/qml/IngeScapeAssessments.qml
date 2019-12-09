@@ -182,9 +182,9 @@ Item {
 
         anchors {
             top: parent.top
-            topMargin: -1
+            topMargin: 20
             right: parent.right
-            rightMargin: -1
+            rightMargin: 13
         }
 
         editorStartedOnIgs: IgsNetworkController ? IgsNetworkController.isStarted : false
