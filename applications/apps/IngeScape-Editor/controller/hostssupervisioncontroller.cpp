@@ -81,7 +81,7 @@ void HostsSupervisionController::removeAgentModelFromHost(AgentM* agent, HostVM*
 
 
 /**
- * @brief Delete hosts OFF
+ * @brief Delete hosts OFF and that don't have agents ON
  */
 void HostsSupervisionController::deleteHostsOFF()
 {
@@ -89,7 +89,16 @@ void HostsSupervisionController::deleteHostsOFF()
     {
         if ((host != nullptr) && !host->isON() && (host->name() != HOSTNAME_NOT_DEFINED))
         {
-            deleteHost(host);
+            bool hasAgentOn = false;
+            for (AgentM* iterator : *host->agentsList()) {
+                if (iterator->isON()) {
+                    hasAgentOn = true;
+                    break;
+                }
+            }
+            if (!hasAgentOn) {
+                deleteHost(host);
+            }
         }
     }
 }

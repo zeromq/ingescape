@@ -60,7 +60,7 @@ public:
 
 
     /**
-     * @brief Delete hosts OFF
+     * @brief Delete hosts OFF and that don't have agents ON
      */
     void deleteHostsOFF();
 
