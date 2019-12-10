@@ -45,6 +45,9 @@ class HostVM : public QObject
     // (NOT sorted) list of agents executed on our host
     I2_QOBJECT_LISTMODEL(AgentM, agentsList)
 
+    // Flag indicating how many started agents host have
+    I2_QML_PROPERTY_READONLY(int, nbAgentsOn)
+
     // List of (filtered and) sorted agents executed on our host
     Q_PROPERTY(AgentsInHostSortFilter* sortedAgents READ sortedAgents CONSTANT)
 
@@ -105,12 +108,28 @@ public:
 
 
     /**
-     * @brief Is our host has agents "ON"
+     * @brief Add an agent model to list and connect to its isONChanged signal
+     * @param agent
      */
-    Q_INVOKABLE bool hasAgentsOn();
+    void addAgentModelToList(AgentM* agent);
+
+
+    /**
+     * @brief Remove an agent model from list and disconnect from its isONChanged signal
+     * @param agent
+     */
+    void removeAgentModelFromList(AgentM* agent);
 
 
 Q_SIGNALS:
+
+
+private Q_SLOTS:
+
+    /**
+     * @brief Slot called when the status ON/OFF changed in one agent model of _agentsList
+     */
+    void _onStatusONChanged(bool isOn);
 
 
 private:

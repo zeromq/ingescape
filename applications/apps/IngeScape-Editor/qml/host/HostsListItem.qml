@@ -497,7 +497,7 @@ Item {
 
                     text: qsTr("Remove...")
 
-                    enabled: (rootItem.host && !rootItem.host.isON)
+                    enabled: (rootItem.host && !rootItem.host.isON && (rootItem.host.nbAgentsOn <= 0))
 
                     style: ButtonStyleOfOption {
                     }

@@ -32,6 +32,7 @@ HostVM::HostVM(QString name,
     _name(name),
     _modelM(model),
     _isON(false),
+    _nbAgentsOn(0),
     _canProvideStream(false),
     _isStreaming(false)
 {
@@ -76,7 +77,15 @@ HostVM::~HostVM()
     }
 
     // Clear the list of agents
-    _agentsList.clear();
+    //    _agentsList.clear();
+    // To disconnect signals ...
+    for (AgentM* agent : _agentsList)
+    {
+        removeAgentModelFromList(agent);
+    }
+
+
+    _nbAgentsOn = 0;
 }
 
 
@@ -158,10 +167,57 @@ void HostVM::stopAgent(AgentM* agent)
 
 
 /**
- * @brief Is our host has agents "ON"
+ * @brief Add an agent model to list and connect to its isONChanged signal
+ * @param agent
  */
-bool HostVM::hasAgentsOn()
-{
-    return std::any_of(_agentsList.begin(), _agentsList.end(), [](AgentM* agent){ return (agent != nullptr) && (agent->isON()); });
+void HostVM::addAgentModelToList(AgentM* agent) {
+    if (!_agentsList.contains(agent))
+    {
+        // Update flag about number of agents ON
+        if (agent->isON()) {
+            setnbAgentsOn(_nbAgentsOn + 1);
+        }
+
+        // Connect to isON changed signal of our new agent
+        connect(agent, &AgentM::isONChanged, this, &HostVM::_onStatusONChanged);
+
+        // Add this agent to the host
+        _agentsList.append(agent);
+
+        qDebug() << "Add agent" << agent->name() << "to host" << _name;
+    }
 }
 
+
+/**
+ * @brief Remove an agent model from list and disconnect from its isONChanged signal
+ * @param agent
+ */
+void HostVM::removeAgentModelFromList(AgentM* agent)
+{
+    if (_agentsList.contains(agent))
+    {
+        // Update flag about number of agents ON
+        if (agent->isON()) {
+            setnbAgentsOn(_nbAgentsOn - 1);
+        }
+
+        // Disconnect from isON changed signal of our agent
+        disconnect(agent, &AgentM::isONChanged, this, &HostVM::_onStatusONChanged);
+
+        _agentsList.remove(agent);
+
+        qDebug() << "Remove agent" << agent->name() << "from host" << _name;
+    }
+}
+
+
+/**
+ * @brief Slot called when the status ON changed to OFF in one agent model of _agentsList
+ */
+void HostVM::_onStatusONChanged(bool isOn) {
+    // Update flag about number of agents ON
+    if (!isOn) {
+        setnbAgentsOn(_nbAgentsOn - 1);
+    }
+}

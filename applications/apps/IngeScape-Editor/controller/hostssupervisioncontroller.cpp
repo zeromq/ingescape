@@ -63,12 +63,7 @@ void HostsSupervisionController::removeAgentModelFromHost(AgentM* agent, HostVM*
 {
     if ((host != nullptr) && (agent != nullptr))
     {
-        if (host->agentsList()->contains(agent))
-        {
-            host->agentsList()->remove(agent);
-
-            qDebug() << "Remove agent" << agent->name() << "from host" << host->name();
-        }
+        host->removeAgentModelFromList(agent);
 
         AgentsGroupedByNameVM* agentsGroupedByName = IngeScapeModelManager::instance()->getAgentsGroupedForName(agent->name());
         if (agentsGroupedByName != nullptr)
@@ -87,7 +82,7 @@ void HostsSupervisionController::deleteHostsOFF()
 {
     for (HostVM* host : _hostsList.toList())
     {
-        if ((host != nullptr) && !host->isON() && (!host->hasAgentsOn()) && (host->name() != HOSTNAME_NOT_DEFINED)) {
+        if ((host != nullptr) && !host->isON() && (host->nbAgentsOn() <= 0) && (host->name() != HOSTNAME_NOT_DEFINED)) {
             deleteHost(host);
         }
     }
@@ -144,11 +139,11 @@ void HostsSupervisionController::onHostModelHasBeenCreated(HostM* host)
             // Associate host with existing agents if necessary
             for (AgentM* agent : _allAgents)
             {
-                if ((agent != nullptr) && (agent->hostname() == hostName) && !hostVM->agentsList()->contains(agent))
+                if ((agent != nullptr) && (agent->hostname() == hostName))
                 {
                     qDebug() << "Add (existing) agent" << agent->name() << "to new host" << hostName;
 
-                    hostVM->agentsList()->append(agent);
+                    hostVM->addAgentModelToList(agent);
                 }
             }
         }
@@ -236,12 +231,9 @@ void HostsSupervisionController::onAgentModelHasBeenCreated(AgentM* agent)
             hostVM = _createViewModelOfHost(agent->hostname(), nullptr);
         }
 
-        if ((hostVM != nullptr) && !hostVM->agentsList()->contains(agent))
+        if (hostVM != nullptr)
         {
-            // Add this agent to the host
-            hostVM->agentsList()->append(agent);
-
-            qDebug() << "Add agent" << agent->name() << "to host" << hostVM->name();
+            hostVM->addAgentModelToList(agent);
         }
     }
 }
@@ -260,12 +252,9 @@ void HostsSupervisionController::onAgentModelWillBeDeleted(AgentM* agent)
         // Get the view model of host with its name
         HostVM* hostVM = _getHostWithName(agent->hostname());
 
-        if ((hostVM != nullptr) && hostVM->agentsList()->contains(agent))
+        if (hostVM != nullptr)
         {
-            // Remove this agent from the host
-            hostVM->agentsList()->remove(agent);
-
-            qDebug() << "Remove agent" << agent->name() << "from host" << hostVM->name();
+            hostVM->removeAgentModelFromList(agent);
         }
     }
 }
