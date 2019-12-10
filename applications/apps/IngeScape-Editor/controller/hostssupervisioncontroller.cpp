@@ -87,13 +87,8 @@ void HostsSupervisionController::deleteHostsOFF()
 {
     for (HostVM* host : _hostsList.toList())
     {
-        if ((host != nullptr) && !host->isON() && (host->name() != HOSTNAME_NOT_DEFINED))
-        {
-            bool hasAgentOn = std::any_of(host->agentsList()->begin(), host->agentsList()->end(), [](AgentM* agent){ return (agent != nullptr) && (agent->isON()); });
-
-            if (!hasAgentOn) {
-                deleteHost(host);
-            }
+        if ((host != nullptr) && !host->isON() && (!host->hasAgentsOn()) && (host->name() != HOSTNAME_NOT_DEFINED)) {
+            deleteHost(host);
         }
     }
 }
@@ -234,6 +229,12 @@ void HostsSupervisionController::onAgentModelHasBeenCreated(AgentM* agent)
 
         // Get the view model of host with its name
         HostVM* hostVM = _getHostWithName(agent->hostname());
+
+        if (hostVM == nullptr)
+        {
+            // Create a view model of host with a name
+            hostVM = _createViewModelOfHost(agent->hostname(), nullptr);
+        }
 
         if ((hostVM != nullptr) && !hostVM->agentsList()->contains(agent))
         {

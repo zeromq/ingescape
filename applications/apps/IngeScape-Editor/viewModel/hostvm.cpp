@@ -156,3 +156,12 @@ void HostVM::stopAgent(AgentM* agent)
     }
 }
 
+
+/**
+ * @brief Is our host has agents "ON"
+ */
+bool HostVM::hasAgentsOn()
+{
+    return std::any_of(_agentsList.begin(), _agentsList.end(), [](AgentM* agent){ return (agent != nullptr) && (agent->isON()); });
+}
+

@@ -39,7 +39,7 @@ class HostVM : public QObject
     // Model of our host
     I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(HostM*, modelM)
 
-    // Flag indicating if our host is ON (vs OFF)
+    // Flag indicating if our host is ON (vs OFF) - Launcher status
     I2_QML_PROPERTY_READONLY(bool, isON)
 
     // (NOT sorted) list of agents executed on our host
@@ -102,6 +102,12 @@ public:
      * @param agent
      */
     Q_INVOKABLE void stopAgent(AgentM* agent);
+
+
+    /**
+     * @brief Is our host has agents "ON"
+     */
+    Q_INVOKABLE bool hasAgentsOn();
 
 
 Q_SIGNALS:
