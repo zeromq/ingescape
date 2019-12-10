@@ -217,10 +217,5 @@ void HostVM::removeAgentModelFromList(AgentM* agent)
  */
 void HostVM::_onStatusONChanged(bool isOn) {
     // Update flag about number of agents ON
-    if (!isOn) {
-        setnbAgentsOn(_nbAgentsOn - 1);
-    }
-    else {
-        setnbAgentsOn(_nbAgentsOn + 1);
-    }
+    isOn ? setnbAgentsOn(_nbAgentsOn + 1) : setnbAgentsOn(_nbAgentsOn - 1);
 }

@@ -213,10 +213,10 @@ void HostsSupervisionController::onPreviousHostParsed(QString hostName)
 
 
 /**
- * @brief Slot called when a new model of agent has been created
+ * @brief Slot called when a new model of agent has been created or when an existing model is back
  * @param agent
  */
-void HostsSupervisionController::onAgentModelHasBeenCreated(AgentM* agent)
+void HostsSupervisionController::onAgentModelHasBeenCreatedORonAgentModelBackOnNetwork(AgentM* agent)
 {
     if ((agent != nullptr) && !agent->hostname().isEmpty())
     {
