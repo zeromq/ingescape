@@ -133,6 +133,9 @@ void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previo
         //
         if (previousTaskInstance != nullptr)
         {
+            // Clear the filter
+            _agentsGroupedByNameInCurrentPlatform.setcurrentProtocol(nullptr);
+
             // Clear the previous mapping
             //clearMapping();
 
