@@ -99,10 +99,10 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot called when a new model of agent has been created
+     * @brief Slot called when a new model of agent has been created or when an existing model is back
      * @param agent
      */
-    void onAgentModelHasBeenCreated(AgentM* agent);
+    void onAgentModelHasBeenCreatedORonAgentModelBackOnNetwork(AgentM* agent);
 
 
     /**

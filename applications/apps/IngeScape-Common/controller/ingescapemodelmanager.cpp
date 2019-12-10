@@ -765,6 +765,9 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
 
             // Update the state (flag "is ON")
             agent->setisON(true);
+
+            // Emit the signal "Agent Model Back On Network"
+            Q_EMIT agentModelBackOnNetwork(agent);
         }
         // New peer id
         else
