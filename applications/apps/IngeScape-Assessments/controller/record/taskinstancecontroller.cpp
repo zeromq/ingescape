@@ -133,6 +133,12 @@ void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previo
         //
         if (previousTaskInstance != nullptr)
         {
+            if (!previousTaskInstance->isRecorded() && !previousTaskInstance->recordsList()->isEmpty())
+            {
+                // FIXME: save the flag in the DataBase ?
+                previousTaskInstance->setisRecorded(true);
+            }
+
             // Clear the filter
             _agentsGroupedByNameInCurrentPlatform.setcurrentProtocol(nullptr);
 

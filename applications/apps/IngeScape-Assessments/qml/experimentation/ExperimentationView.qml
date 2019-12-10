@@ -834,9 +834,9 @@ Item {
                                 //
                                 // Slots
                                 //
-                                onOpenTaskInstance: {
+                                onOpenSessionAsked: {
                                     if (rootItem.controller && modelM) {
-                                        rootItem.controller.openTaskInstance(modelM);
+                                        rootItem.controller.openSession(modelM);
                                     }
                                 }
 

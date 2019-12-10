@@ -24,6 +24,7 @@ SOURCES += \
     $$PWD/model/hostm.cpp \
     $$PWD/model/jsonhelper.cpp \
     $$PWD/model/publishedvaluem.cpp \
+    $$PWD/model/recordm.cpp \
     $$PWD/model/agent/agentm.cpp \
     $$PWD/model/agent/definition/definitionm.cpp \
     $$PWD/model/agent/definition/agentiopm.cpp \
@@ -82,6 +83,7 @@ HEADERS += \
     $$PWD/model/hostm.h \
     $$PWD/model/jsonhelper.h \
     $$PWD/model/publishedvaluem.h \
+    $$PWD/model/recordm.h \
     $$PWD/model/agent/agentm.h \
     $$PWD/model/agent/definition/definitionm.h \
     $$PWD/model/agent/definition/agentiopm.h \

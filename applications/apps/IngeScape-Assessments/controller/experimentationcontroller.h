@@ -74,10 +74,10 @@ public:
 
 
     /**
-     * @brief Open a task instance
-     * @param record
+     * @brief Open a session
+     * @param session
      */
-    Q_INVOKABLE void openTaskInstance(TaskInstanceM* taskInstance);
+    Q_INVOKABLE void openSession(TaskInstanceM* session);
 
 
     /**

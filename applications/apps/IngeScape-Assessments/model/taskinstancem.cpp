@@ -72,6 +72,7 @@ TaskInstanceM::TaskInstanceM(CassUuid experimentationUuid,
     _endDateTime(startDateTime),  //FIXME Need a way to compute actual endDateTime.
     _duration(QTime()),           //FIXME Need a way to compute actual duration.
     _mapIndependentVariableValues(nullptr),
+    _isRecorded(false),
     _experimentationCassUuid(experimentationUuid),
     _subjectUuid(subjectUuid),
     _taskUuid(taskUuid),

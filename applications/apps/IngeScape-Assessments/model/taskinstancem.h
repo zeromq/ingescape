@@ -21,6 +21,7 @@
 #include <model/subject/subjectm.h>
 #include <model/task/taskm.h>
 #include <model/assessmentsenums.h>
+#include <model/recordm.h>
 
 
 /**
@@ -30,31 +31,37 @@ class TaskInstanceM : public QObject
 {
     Q_OBJECT
 
-    // Name
+    // Name of our session
     I2_QML_PROPERTY_CUSTOM_SETTER(QString, name)
 
     // User comments
     I2_QML_PROPERTY_CUSTOM_SETTER(QString, comments)
 
-    // Subject of our record
+    // Subject of our session
     I2_QML_PROPERTY_DELETE_PROOF(SubjectM*, subject)
 
-    // Task of our record
+    // Protocol of our session
     I2_QML_PROPERTY_DELETE_PROOF(TaskM*, task)
 
-    // Start date and time of our record
+    // Start date and time of our session
     I2_QML_PROPERTY(QDateTime, startDateTime)
 
-    // End date and time of our record
+    // End date and time of our session
     I2_QML_PROPERTY_CUSTOM_SETTER(QDateTime, endDateTime)
 
-    // Duration of our record
+    // Duration of our session
     I2_QML_PROPERTY_QTime(duration)
     //I2_QML_PROPERTY(QDateTime, duration)
 
     // Values of the independent variables of the task
     // "Qml Property Map" allows to set key-value pairs that can be used in QML bindings
     I2_QML_PROPERTY_READONLY(QQmlPropertyMap*, mapIndependentVariableValues)
+
+    // List of records of our session
+    I2_QOBJECT_LISTMODEL(RecordM, recordsList)
+
+    // Flag indicating if our session is recorded
+    I2_QML_PROPERTY(bool, isRecorded)
 
 
 public:

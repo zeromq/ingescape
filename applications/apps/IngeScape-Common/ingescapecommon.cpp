@@ -28,6 +28,7 @@
 #include <controller/licensescontroller.h>
 #include <controller/callhomecontroller.h>
 
+#include <model/recordm.h>
 #include <model/scenario/scenariom.h>
 #include <model/scenario/timetickm.h>
 
@@ -115,6 +116,7 @@ void IngeScapeCommon::registerIngeScapeQmlTypes()
     qmlRegisterUncreatableType<MappingElementM>("INGESCAPE", 1, 0, "MappingElementM", "Internal class");
     qmlRegisterUncreatableType<OutputM>("INGESCAPE", 1, 0, "OutputM", "Internal class");
     qmlRegisterUncreatableType<PublishedValueM>("INGESCAPE", 1, 0, "PublishedValueM", "Internal class");
+    qmlRegisterUncreatableType<RecordM>("INGESCAPE", 1, 0, "RecordM", "Internal class");
     qmlRegisterUncreatableType<ScenarioM>("INGESCAPE", 1, 0, "ScenarioM", "Internal class");
     qmlRegisterUncreatableType<TimeTickM>("INGESCAPE", 1, 0, "TimeTickM", "Internal class");
     qmlRegisterUncreatableType<LicenseInformationM>("INGESCAPE", 1, 0, "LicenseInformationM", "Internal class");

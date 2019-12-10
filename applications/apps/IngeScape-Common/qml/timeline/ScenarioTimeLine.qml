@@ -1375,7 +1375,8 @@ Item {
             }
 
             onClicked: {
-                if (scenarioController) {
+                if (scenarioController)
+                {
                     if (!rootItem.isEditorLicenseValid) {
                         checked = false
                         rootItem.unlicensedAction();
@@ -1437,9 +1438,8 @@ Item {
             id: extraContentItem
 
             anchors {
+                top: parent.top
                 horizontalCenter: parent.horizontalCenter
-                top: playTime.bottom
-                topMargin: 15
             }
 
             height: childrenRect.height

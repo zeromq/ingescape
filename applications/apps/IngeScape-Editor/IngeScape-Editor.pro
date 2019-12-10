@@ -53,7 +53,6 @@ SOURCES += main.cpp \
     sortFilter/agentsinhostsortfilter.cpp \
     sortFilter/valueshistorysortfilter.cpp \
     controller/hostssupervisioncontroller.cpp \
-    model/recordm.cpp \
     controller/recordssupervisioncontroller.cpp \
     controller/logstreamcontroller.cpp \
     model/logm.cpp \
@@ -86,7 +85,6 @@ HEADERS += \
     misc/collapsiblecolumn.h \
     sortFilter/valueshistorysortfilter.h \
     controller/hostssupervisioncontroller.h \
-    model/recordm.h \
     controller/recordssupervisioncontroller.h \
     controller/logstreamcontroller.h \
     model/logm.h \

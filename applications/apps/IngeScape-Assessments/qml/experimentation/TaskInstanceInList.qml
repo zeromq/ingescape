@@ -66,8 +66,8 @@ Rectangle {
     //
     //--------------------------------
 
-    // Open Task Instance
-    signal openTaskInstance();
+    // Open session asked
+    signal openSessionAsked();
 
     // Delete Task Instance
     signal deleteTaskInstance();
@@ -101,10 +101,7 @@ Rectangle {
         anchors.fill: parent
         hoverEnabled: true
         onDoubleClicked: {
-            if (rootItem.modelM)
-            {
-                rootItem.openTaskInstance(rootItem.modelM)
-            }
+            rootItem.openSessionAsked();
         }
     }
 
@@ -313,7 +310,7 @@ Rectangle {
             }
 
             onClicked: {
-                rootItem.openTaskInstance();
+                rootItem.openSessionAsked();
             }
         }
 

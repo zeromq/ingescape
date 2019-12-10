@@ -120,24 +120,33 @@ void ExperimentationController::createNewSessionForSubjectAndProtocol(SubjectM* 
             _currentExperimentation->addTaskInstance(session);
 
             // Open this new task instance
-            openTaskInstance(session);
+            openSession(session);
         }
     }
 }
 
 
 /**
- * @brief Open a task instance
- * @param record
+ * @brief Open a session
+ * @param session
  */
-void ExperimentationController::openTaskInstance(TaskInstanceM* taskInstance)
+void ExperimentationController::openSession(TaskInstanceM* session)
 {
-    if ((taskInstance != nullptr) && (_currentExperimentation != nullptr))
+    if ((session != nullptr) && (_currentExperimentation != nullptr))
     {
-        qInfo() << "Open the record" << taskInstance->name() << "of the experimentation" << _currentExperimentation->name();
+        qInfo() << "Open the session" << session->name() << "of the experimentation" << _currentExperimentation->name();
+
+        if (_isRecorderON && session->recordsList()->isEmpty())
+        {
+            // FIXME TODO: get the list of records for this session from the data base
+            //session->getCassUuid()
+            //_currentExperimentation->getCassUuid()
+
+            //session->recordsList()->append();
+        }
 
         // Update the current task instance
-        _taskInstanceC->setcurrentTaskInstance(taskInstance);
+        _taskInstanceC->setcurrentTaskInstance(session);
     }
 }
 
@@ -536,14 +545,14 @@ void ExperimentationController::_retrieveIndependentVariableValuesForTaskInstanc
  */
 void ExperimentationController::startToRecord()
 {
-    if (!_isRecording && _isRecorderON && (_taskInstanceC != nullptr))
+    if (!_isRecording && _isRecorderON && (_taskInstanceC != nullptr) && (_taskInstanceC->scenarioC() != nullptr))
     {
         TaskInstanceM* currentSession = _taskInstanceC->currentTaskInstance();
         if ((currentSession != nullptr) && (currentSession->task() != nullptr))
         {
             TaskM* task = _taskInstanceC->currentTaskInstance()->task();
 
-            QString currentPlatformName = task->platformFileName();
+            //QString currentPlatformName = task->platformFileName();
 
             // Get the JSON of the current platform
             QString platformFilePath = task->platformFileUrl().path();
@@ -562,18 +571,17 @@ void ExperimentationController::startToRecord()
                         QString jsonString = QString::fromUtf8(jsonDocument.toJson(QJsonDocument::Compact));
 
                         // Add the delta from the start time of the TimeLine
-                        int deltaTimeFromTimeLineStart = 0;
-                        if (_taskInstanceC->scenarioC() != nullptr)
-                        {
-                            deltaTimeFromTimeLineStart = _taskInstanceC->scenarioC()->currentTime().msecsSinceStartOfDay();
-                        }
+                        int deltaTimeFromTimeLineStart = _taskInstanceC->scenarioC()->currentTime().msecsSinceStartOfDay();
+
+                        QString recordName = QString("%1 (%2)").arg(currentSession->name(), _taskInstanceC->scenarioC()->currentTime().toString("hh:mm:ss.zzz"));
 
                         QString sessionUID = AssessmentsModelManager::cassUuidToQString(currentSession->getCassUuid());
                         QString experimentationUID = AssessmentsModelManager::cassUuidToQString(task->getExperimentationCassUuid());
 
                         QStringList message = {
                             command_StartRecord,
-                            currentPlatformName,
+                            //currentPlatformName,
+                            recordName,
                             QString::number(deltaTimeFromTimeLineStart),
                             jsonString,
                             sessionUID,
@@ -582,7 +590,11 @@ void ExperimentationController::startToRecord()
 
                         // Send a ZMQ message in several parts to the recorder
                         IngeScapeNetworkController::instance()->sendZMQMessageToAgent(_peerIdOfRecorder, message);
+
+                        // FIXME TODO: wait "prefix_RecordStarted"
                         setisRecording(true);
+                        _taskInstanceC->scenarioC()->playOrResumeTimeLine();
+
                     }
                 }
                 else {
@@ -609,7 +621,13 @@ void ExperimentationController::stopToRecord()
     {
         // Send the message "Stop Record" to the recorder
         IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerIdOfRecorder, command_StopRecord);
-        setisRecording(false);
+
+        if (_taskInstanceC->scenarioC())
+        {
+            // FIXME TODO: wait "prefix_RecordStopped"
+            setisRecording(false);
+            _taskInstanceC->scenarioC()->pauseTimeLine();
+        }
     }
     else {
         qWarning() << "Recording is already stopped or recorder is not launched";
