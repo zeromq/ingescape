@@ -220,4 +220,7 @@ void HostVM::_onStatusONChanged(bool isOn) {
     if (!isOn) {
         setnbAgentsOn(_nbAgentsOn - 1);
     }
+    else {
+        setnbAgentsOn(_nbAgentsOn + 1);
+    }
 }

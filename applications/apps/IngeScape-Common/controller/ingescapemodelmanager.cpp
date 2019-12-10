@@ -930,12 +930,25 @@ void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentNa
 
         if (newDefinition != nullptr)
         {
-            // Set this new definition to the agent
-            agent->setdefinition(newDefinition);
+            // The 2 definitions are strictly identical (only when an agent is back on the network !)
+            if ((previousDefinition != nullptr) && (*previousDefinition == *newDefinition))
+            {
+                qDebug() << "The received definition is exactly the same" << newDefinition->name() << "and version" << newDefinition->version();
 
-            // Free memory
-            if (previousDefinition != nullptr) {
-                delete previousDefinition;
+                // Free memory (new definition will not be used)
+                if (newDefinition != nullptr) {
+                    delete newDefinition;
+                }
+            }
+            else
+            {
+                // Set this new definition to the agent
+                agent->setdefinition(newDefinition);
+
+                // Free memory (previous definition is not used anymore)
+                if (previousDefinition != nullptr) {
+                    delete previousDefinition;
+                }
             }
         }
     }
