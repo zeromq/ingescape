@@ -314,8 +314,10 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(ingeScapeModelManager, &IngeScapeModelManager::isMappingConnectedChanged, _agentsMappingC, &AgentsMappingController::onIsMappingConnectedChanged);
     connect(ingeScapeModelManager, &IngeScapeModelManager::isMappingConnectedChanged, ingeScapeNetworkC, &IngeScapeNetworkController::onIsMappingConnectedChanged);
 
-    connect(ingeScapeModelManager, &IngeScapeModelManager::agentModelHasBeenCreated, _hostsSupervisionC, &HostsSupervisionController::onAgentModelHasBeenCreated);
+    connect(ingeScapeModelManager, &IngeScapeModelManager::agentModelHasBeenCreated, _hostsSupervisionC, &HostsSupervisionController::onAgentModelHasBeenCreatedORonAgentModelBackOnNetwork);
     connect(ingeScapeModelManager, &IngeScapeModelManager::agentModelWillBeDeleted, _hostsSupervisionC, &HostsSupervisionController::onAgentModelWillBeDeleted);
+
+    connect(ingeScapeModelManager, &IngeScapeModelManager::agentModelBackOnNetwork, _hostsSupervisionC, &HostsSupervisionController::onAgentModelHasBeenCreatedORonAgentModelBackOnNetwork);
 
     connect(ingeScapeModelManager, &IngeScapeModelManager::hostModelHasBeenCreated, _hostsSupervisionC, &HostsSupervisionController::onHostModelHasBeenCreated);
     connect(ingeScapeModelManager, &IngeScapeModelManager::hostModelWillBeDeleted, _hostsSupervisionC, &HostsSupervisionController::onHostModelWillBeDeleted);

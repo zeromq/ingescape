@@ -120,10 +120,11 @@ Item {
         licensesController: IngeScapeAssessmentsC.licensesC
         mainController: IngeScapeAssessmentsC
 
-        extraContent : LabellessSvgButton {
+        extraContent: LabellessSvgButton {
             id: startOrStopRecordButton
 
-            enabled: (experimentationController.isRecorderON)
+            visible: (rootItem.taskInstance && !rootItem.taskInstance.isRecorded)
+            enabled: (visible && experimentationController.isRecorderON)
             opacity: enabled ? 1.0 : 0.4
 
             property string currentID : (rootItem.experimentationController && rootItem.experimentationController.isRecording) ? "record-stop" : "record-start"

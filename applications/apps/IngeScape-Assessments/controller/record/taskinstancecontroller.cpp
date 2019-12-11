@@ -133,6 +133,18 @@ void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previo
         //
         if (previousTaskInstance != nullptr)
         {
+            if (!previousTaskInstance->isRecorded() && !previousTaskInstance->recordsList()->isEmpty())
+            {
+                // FIXME: save the flag in the DataBase ?
+                previousTaskInstance->setisRecorded(true);
+            }
+
+            // Clear the filter
+            _agentsGroupedByNameInCurrentPlatform.setcurrentProtocol(nullptr);
+
+            // Clear the previous mapping
+            //clearMapping();
+
             // Clear the previous scenario
             _scenarioC->clearScenario();
 
@@ -145,6 +157,14 @@ void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previo
             // Delete agents OFF
             QStringList namesListOfAgentsON = ingeScapeModelManager->deleteAgentsOFF();
             qDebug() << "Remaining agents ON:" << namesListOfAgentsON;
+
+            // DIS-connect to the signal "Agent Model ON has been Added" of each agent
+            for (AgentsGroupedByNameVM* agentsGroupedByName : IngeScapeModelManager::instance()->allAgentsGroupsByName()->toList())
+            {
+                if (agentsGroupedByName != nullptr) {
+                    disconnect(agentsGroupedByName, &AgentsGroupedByNameVM::agentModelONhasBeenAdded, this, &TaskInstanceController::_onAgentModelONhasBeenAdded);
+                }
+            }
         }
 
 
@@ -153,9 +173,11 @@ void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previo
         //
         if ((currentTaskInstance != nullptr) && (currentTaskInstance->task() != nullptr))
         {
-            if (currentTaskInstance->task()->platformFileUrl().isValid())
+            TaskM* protocol = currentTaskInstance->task();
+
+            if (protocol->platformFileUrl().isValid())
             {
-                QString platformFilePath = currentTaskInstance->task()->platformFileUrl().path();
+                QString platformFilePath = protocol->platformFileUrl().path();
 
                 QFile jsonFile(platformFilePath);
                 if (jsonFile.exists())
@@ -199,6 +221,15 @@ void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previo
                             {
                                 _importMappingFromJson(jsonRoot.value("mapping").toArray());
                             }
+
+                            // Connect to the signal "Agent Model ON has been Added" of each agent
+                            // Allows to force an agent (model) to load the wanted mapping (in the protocol) when it appears on the network
+                            for (AgentsGroupedByNameVM* agentsGroupedByName : IngeScapeModelManager::instance()->allAgentsGroupsByName()->toList())
+                            {
+                                if (agentsGroupedByName != nullptr) {
+                                    connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentModelONhasBeenAdded, this, &TaskInstanceController::_onAgentModelONhasBeenAdded);
+                                }
+                            }
                         }
                     }
                     else {
@@ -210,13 +241,57 @@ void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previo
                 }
 
                 // Update the filter
-                _agentsGroupedByNameInCurrentPlatform.setcurrentProtocol(currentTaskInstance->task());
+                _agentsGroupedByNameInCurrentPlatform.setcurrentProtocol(protocol);
                 _agentsGroupedByNameInCurrentPlatform.forceUpdate();
             }
             else {
-                qWarning() << "The URL of platform" << currentTaskInstance->task()->platformFileUrl() << "is not valid";
+                qWarning() << "The URL of platform" << protocol->platformFileUrl() << "is not valid";
             }
         }
+    }
+}
+
+
+/**
+ * @brief Slot called when a model of agent "ON" has been added to an agent(s grouped by name)
+ * @param model
+ */
+void TaskInstanceController::_onAgentModelONhasBeenAdded(AgentM* model)
+{
+    // Model of Agent ON
+    if ((model != nullptr) && model->isON() && !model->name().isEmpty() && !model->peerId().isEmpty()
+            && (_currentTaskInstance != nullptr) && (_currentTaskInstance->task() != nullptr)
+            && (IngeScapeModelManager::instance() != nullptr) && (IngeScapeNetworkController::instance() != nullptr))
+    {
+        QString agentName = model->name();
+
+        // The agent is in the current protocol
+        if (_currentTaskInstance->task()->isAgentNameInProtocol(agentName))
+        {
+            qDebug() << agentName << "is ON and in the protocol --> LOAD the MAPPING !";
+
+            AgentsGroupedByNameVM* agentsGroupedByName = IngeScapeModelManager::instance()->getAgentsGroupedForName(agentName);
+            if (agentsGroupedByName != nullptr)
+            {
+                // Get a string from the JSON
+                QString jsonOfMapping = JsonHelper::getJsonOfAgentMapping(agentsGroupedByName->currentMapping(),
+                                                                          QJsonDocument::Compact);
+
+                QString message = QString("%1%2").arg(command_LoadMapping, jsonOfMapping);
+
+                // Send the message "LOAD THIS MAPPING" to this agent
+                // FIXME: JSON can be too big for a string (use Z-Frame instead ?)
+                IngeScapeNetworkController::instance()->sendStringMessageToAgent(model->peerId(), message);
+            }
+        }
+        // The agent is NOT in the current protocol
+        /*else
+        {
+            qDebug() << agentName << "is ON but NOT in the protocol --> CLEAR its MAPPING !";
+
+            // Send the message "Clear Mapping" to this agent
+            IngeScapeNetworkController::instance()->sendStringMessageToAgent(model->peerId(), command_ClearMapping);
+        }*/
     }
 }
 
@@ -227,10 +302,7 @@ void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previo
  */
 void TaskInstanceController::_importMappingFromJson(QJsonArray jsonArrayOfAgentsInMapping)
 {
-    IngeScapeModelManager* igsModelManager = IngeScapeModelManager::instance();
-    IngeScapeNetworkController* igsNetworkController = IngeScapeNetworkController::instance();
-
-    if ((igsModelManager != nullptr) && (igsNetworkController != nullptr))
+    if ((IngeScapeModelManager::instance() != nullptr) && (IngeScapeNetworkController::instance() != nullptr))
     {
         for (QJsonValue jsonValue : jsonArrayOfAgentsInMapping)
         {
@@ -238,10 +310,6 @@ void TaskInstanceController::_importMappingFromJson(QJsonArray jsonArrayOfAgents
             {
                 QJsonObject jsonObjectInMapping = jsonValue.toObject();
 
-
-                //
-                // Agent
-                //
                 if (jsonObjectInMapping.contains("agentName"))
                 {
                     // Get values for key "agentName" and "mapping"
@@ -253,22 +321,32 @@ void TaskInstanceController::_importMappingFromJson(QJsonArray jsonArrayOfAgents
                         QString agentName = jsonName.toString();
 
                         // Get the (view model of) agents grouped for this name
-                        AgentsGroupedByNameVM* agentsGroupedByName = igsModelManager->getAgentsGroupedForName(agentName);
+                        AgentsGroupedByNameVM* agentsGroupedByName = IngeScapeModelManager::instance()->getAgentsGroupedForName(agentName);
 
                         // Create the agent mapping from JSON
                         AgentMappingM* agentMapping = JsonHelper::createModelOfAgentMappingFromJSON(agentName, jsonMapping.toObject());
 
                         if ((agentsGroupedByName != nullptr) && (agentMapping != nullptr))
                         {
-                            // Get a string from the JSON
-                            QString jsonOfMapping = JsonHelper::getJsonOfAgentMapping(agentMapping,
-                                                                                      QJsonDocument::Compact);
+                            // Agent is ON
+                            if (agentsGroupedByName->isON())
+                            {
+                                // Get a string from the JSON
+                                QString jsonOfMapping = JsonHelper::getJsonOfAgentMapping(agentMapping,
+                                                                                          QJsonDocument::Compact);
 
-                            QString message = QString("%1%2").arg(command_LoadMapping, jsonOfMapping);
+                                QString message = QString("%1%2").arg(command_LoadMapping, jsonOfMapping);
 
-                            // Send the message to the agent (list of models of agent)
-                            // FIXME: JSON can be too big for a string
-                            igsNetworkController->sendStringMessageToAgents(agentsGroupedByName->peerIdsList(), message);
+                                // Send the message to the agent (list of models of agent)
+                                // FIXME: JSON can be too big for a string (use Z-Frame instead ?)
+                                IngeScapeNetworkController::instance()->sendStringMessageToAgents(agentsGroupedByName->peerIdsList(), message);
+                            }
+                            // Agent is OFF
+                            else
+                            {
+                                // Force its current mapping
+                                agentsGroupedByName->setcurrentMapping(agentMapping);
+                            }
                         }
                     }
                 }

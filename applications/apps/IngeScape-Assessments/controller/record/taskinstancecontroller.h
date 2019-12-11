@@ -92,6 +92,13 @@ private Q_SLOTS:
     void _oncurrentTaskInstanceChanged(TaskInstanceM* previousTaskInstance, TaskInstanceM* currentTaskInstance);
 
 
+    /**
+     * @brief Slot called when a model of agent "ON" has been added to an agent(s grouped by name)
+     * @param model
+     */
+    void _onAgentModelONhasBeenAdded(AgentM* model);
+
+
 private:
 
     /**

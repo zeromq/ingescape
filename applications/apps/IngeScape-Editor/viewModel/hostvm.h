@@ -39,11 +39,14 @@ class HostVM : public QObject
     // Model of our host
     I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(HostM*, modelM)
 
-    // Flag indicating if our host is ON (vs OFF)
+    // Flag indicating if our host is ON (vs OFF) - Launcher status
     I2_QML_PROPERTY_READONLY(bool, isON)
 
     // (NOT sorted) list of agents executed on our host
     I2_QOBJECT_LISTMODEL(AgentM, agentsList)
+
+    // Flag indicating how many started agents host have
+    I2_QML_PROPERTY_READONLY(int, nbAgentsOn)
 
     // List of (filtered and) sorted agents executed on our host
     Q_PROPERTY(AgentsInHostSortFilter* sortedAgents READ sortedAgents CONSTANT)
@@ -104,7 +107,29 @@ public:
     Q_INVOKABLE void stopAgent(AgentM* agent);
 
 
+    /**
+     * @brief Add an agent model to list and connect to its isONChanged signal
+     * @param agent
+     */
+    void addAgentModelToList(AgentM* agent);
+
+
+    /**
+     * @brief Remove an agent model from list and disconnect from its isONChanged signal
+     * @param agent
+     */
+    void removeAgentModelFromList(AgentM* agent);
+
+
 Q_SIGNALS:
+
+
+private Q_SLOTS:
+
+    /**
+     * @brief Slot called when the status ON/OFF changed in one agent model of _agentsList
+     */
+    void _onStatusONChanged(bool isOn);
 
 
 private:

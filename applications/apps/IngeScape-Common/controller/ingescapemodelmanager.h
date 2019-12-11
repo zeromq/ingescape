@@ -236,6 +236,15 @@ Q_SIGNALS:
 
 
     /**
+     * @brief Signal emitted when a model of agent is back on the network
+     * Special case when user changes the IngeScape port and go back on the previous IngeScape port
+     * PeerId of agent model did not changed
+     * @param agent
+     */
+    void agentModelBackOnNetwork(AgentM* agent);
+
+
+    /**
      * @brief Signal emitted when a model of agent will be deleted
      * @param agent
      */

@@ -163,7 +163,6 @@ void registerCustomQmlTypes()
     //----------------
     //qmlRegisterUncreatableType<ActionMappingM>("INGESCAPE", 1, 0, "ActionMappingM", "Internal class");
     qmlRegisterUncreatableType<LogM>("INGESCAPE", 1, 0, "LogM", "Internal class");
-    qmlRegisterUncreatableType<RecordM>("INGESCAPE", 1, 0, "RecordM", "Internal class");
 
 
     //---------------
