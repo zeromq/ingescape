@@ -19,6 +19,7 @@
 #include <I2PropertyHelpers.h>
 #include <controller/record/taskinstancecontroller.h>
 #include <model/experimentationm.h>
+#include <sortFilter/aresubjectandprotocolinsessionfilter.h>
 
 
 /**
@@ -48,6 +49,21 @@ class ExperimentationController : public QObject
 
     // List of selected sessions
     I2_QOBJECT_LISTMODEL(TaskInstanceM, selectedSessions)
+
+    // List off all agents present in the current platform
+    Q_PROPERTY(AreSubjectAndProtocolInSessionFilter* sessionFilteredList READ sessionFilteredList CONSTANT)
+
+    // List with ids of selected subjects
+    I2_QML_PROPERTY_READONLY(QStringList, selectedSubjectIdList)
+
+    // List with names of selected Protocol
+    I2_QML_PROPERTY_READONLY(QStringList, selectedProtocolNameList)
+
+    // List with ids of subjects for current experimentation
+    I2_QML_PROPERTY_READONLY(QStringList, subjectIdList)
+
+    // List with names of Protocol for current experimentation
+    I2_QML_PROPERTY_READONLY(QStringList, protocolNameList)
 
 
 public:
@@ -104,6 +120,76 @@ public:
      */
     Q_INVOKABLE void stopToRecord();
 
+    /**
+     * @brief Get our filtered list of values
+     * @return
+     */
+    AreSubjectAndProtocolInSessionFilter* sessionFilteredList()
+    {
+        return &_sessionFilteredList;
+    }
+
+    /**
+     * @brief Show the session for one subject
+     * @param agentName
+     */
+    Q_INVOKABLE void showSessionForSubject(QString subjectId);
+
+    /**
+     * @brief hide the session for one subject
+     * @param agentName
+     */
+    Q_INVOKABLE void hideSessionForSubject(QString subjectId);
+
+    /**
+     * @brief Show sessions for every subject
+     * @param agentName
+     */
+    Q_INVOKABLE void showAllSessionsForSubject();
+
+    /**
+     * @brief hide sessions for every subject
+     * @param agentName
+     */
+    Q_INVOKABLE void hideAllSessionsForSubject();
+
+    /**
+     * @brief Return true if the session is show for subject name
+     * @param agentName
+     * @return
+     */
+    Q_INVOKABLE bool areShownSessionsForSubject(QString subjectId);
+
+    /**
+     * @brief Show the session for one protocol
+     * @param agentName
+     */
+    Q_INVOKABLE void showSessionForProtocol(QString protocolName);
+
+    /**
+     * @brief hide the session for one subject
+     * @param agentName
+     */
+    Q_INVOKABLE void hideSessionForProtocol(QString protocolName);
+
+    /**
+     * @brief Show sessions for every subject
+     * @param agentName
+     */
+    Q_INVOKABLE void showAllSessionsForProtocol();
+
+    /**
+     * @brief hide sessions for every subject
+     * @param agentName
+     */
+    Q_INVOKABLE void hideAllSessionsForProtocol();
+
+    /**
+     * @brief Return true if the session is show for subject name
+     * @param agentName
+     * @return
+     */
+    Q_INVOKABLE bool areShownSessionsForProtocol(QString protocolName);
 
 public Q_SLOTS:
 
@@ -218,6 +304,17 @@ protected: // Methods
 
 
 protected:
+
+private:
+
+    /**
+     * @brief Update the filters on the list of sessions
+     */
+    void _updateFilters();
+
+private :
+    //List of sessions filtered by subject id and protocol name
+    AreSubjectAndProtocolInSessionFilter _sessionFilteredList;
 
 };
 

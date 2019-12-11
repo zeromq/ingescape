@@ -145,6 +145,7 @@ Rectangle {
                 }
 
                 opacity: rootItem.isSelectingSessionsToExport ? 1.0 : 0.0
+                enabled: opacity
 
                 Behavior on opacity {
                     NumberAnimation {

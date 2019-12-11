@@ -30,7 +30,11 @@ ExperimentationController::ExperimentationController(QObject *parent) : QObject(
     _peerIdOfRecorder(""),
     _peerNameOfRecorder(""),
     _isRecorderON(false),
-    _isRecording(false)
+    _isRecording(false),
+    _selectedSubjectIdList(QStringList()),
+    _selectedProtocolNameList(QStringList()),
+    _subjectIdList(QStringList()),
+    _protocolNameList(QStringList())
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -46,7 +50,8 @@ ExperimentationController::ExperimentationController(QObject *parent) : QObject(
         connect(_taskInstanceC->scenarioC(), &AbstractScenarioController::actionWillBeExecuted, this, &ExperimentationController::_onActionWillBeExecuted);
         connect(_taskInstanceC->scenarioC(), &AbstractScenarioController::timeLineStateUpdated, this, &ExperimentationController::_onTimeLineStateUpdated);
     }
-}
+   }
+
 
 
 /**
@@ -253,6 +258,9 @@ void ExperimentationController::_onCurrentExperimentationChanged(Experimentation
 
         // First, clear the list of selected sessions
         _selectedSessions.clear();
+        _subjectIdList.clear();
+        _protocolNameList.clear();
+        _sessionFilteredList.setSourceModel(nullptr);
 
         _retrieveTasksForExperimentation(currentExperimentation);
 
@@ -265,6 +273,12 @@ void ExperimentationController::_onCurrentExperimentationChanged(Experimentation
         _retrieveTaskInstancesForExperimentation(currentExperimentation);
 
         _retrieveIndependentVariableValuesForTaskInstancesInExperimentation(currentExperimentation);
+
+        showAllSessionsForSubject();
+        showAllSessionsForProtocol();
+        _sessionFilteredList.setSourceModel(_currentExperimentation->allTaskInstances());
+
+        _updateFilters();
     }
 }
 
@@ -394,6 +408,7 @@ void ExperimentationController::_retrieveSubjectsForExperimentation(Experimentat
         QList<SubjectM*> subejctList = AssessmentsModelManager::select<SubjectM>({ experimentation->getCassUuid() });
         for (SubjectM* subject : subejctList) {
             experimentation->addSubject(subject);
+            _subjectIdList.append(subject->displayedId());
         }
     }
 }
@@ -435,6 +450,7 @@ void ExperimentationController::_retrieveTasksForExperimentation(Experimentation
 
             // Add the task to the experimentation
             experimentation->addTask(task);
+            _protocolNameList.append(task->name());
         }
     }
 }
@@ -615,3 +631,126 @@ void ExperimentationController::stopToRecord()
         qWarning() << "Recording is already stopped or recorder is not launched";
     }
 }
+
+
+/**
+ * @brief Show the session for one subject
+ * @param agentName
+ */
+void ExperimentationController::showSessionForSubject(QString subjectId){
+    QStringList temp = _selectedSubjectIdList;
+    temp.append(subjectId);
+    temp.sort(Qt::CaseInsensitive);
+
+    setselectedSubjectIdList(temp);
+
+    _updateFilters();
+}
+
+/**
+ * @brief hide the session for one subject
+ * @param agentName
+ */
+void ExperimentationController::hideSessionForSubject(QString subjectId){
+    QStringList temp = _selectedSubjectIdList;
+    temp.removeOne(subjectId);
+
+    setselectedSubjectIdList(temp);
+
+    _updateFilters();
+}
+
+/**
+ * @brief Show sessions for every subject
+ * @param agentName
+ */
+void ExperimentationController::showAllSessionsForSubject(){
+    setselectedSubjectIdList(_subjectIdList);
+
+    _updateFilters();
+}
+
+/**
+ * @brief hide sessions for every subject
+ * @param agentName
+ */
+void ExperimentationController::hideAllSessionsForSubject(){
+    setselectedSubjectIdList(QStringList());
+
+    _updateFilters();
+}
+
+/**
+ * @brief Return true if the session is show for subject name
+ * @param agentName
+ * @return
+ */
+bool ExperimentationController::areShownSessionsForSubject(QString subjectId){
+    return _selectedSubjectIdList.contains(subjectId);
+}
+
+/**
+ * @brief Show the session for one protocol
+ * @param agentName
+ */
+void ExperimentationController::showSessionForProtocol(QString protocolName){
+    QStringList temp = _selectedProtocolNameList;
+    temp.append(protocolName);
+    temp.sort(Qt::CaseInsensitive);
+
+    setselectedProtocolNameList(temp);
+
+    _updateFilters();
+}
+
+/**
+ * @brief hide the session for one subject
+ * @param agentName
+ */
+void ExperimentationController::hideSessionForProtocol(QString protocolName){
+    QStringList temp = _selectedProtocolNameList;
+    temp.removeOne(protocolName);
+
+    setselectedProtocolNameList(temp);
+
+    _updateFilters();
+}
+
+/**
+ * @brief Show sessions for every subject
+ * @param agentName
+ */
+void ExperimentationController::showAllSessionsForProtocol(){
+    setselectedProtocolNameList(_protocolNameList);
+
+    _updateFilters();
+}
+
+/**
+ * @brief hide sessions for every subject
+ * @param agentName
+ */
+void ExperimentationController::hideAllSessionsForProtocol(){
+    setselectedProtocolNameList(QStringList());
+
+    _updateFilters();
+}
+
+/**
+ * @brief Return true if the session is show for subject name
+ * @param agentName
+ * @return
+ */
+bool ExperimentationController::areShownSessionsForProtocol(QString protocolName){
+    return _selectedProtocolNameList.contains(protocolName);
+}
+
+void ExperimentationController::_updateFilters(){
+    // Update the list of subjects and protocol of the filter
+    _sessionFilteredList.setselectedSubjectIdList(_selectedSubjectIdList);
+    _sessionFilteredList.setselectedProtocolIdList(_selectedProtocolNameList);
+
+    // Update the filter
+    _sessionFilteredList.forceUpdate();
+}
+

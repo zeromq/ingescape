@@ -61,7 +61,8 @@ SOURCES += main.cpp \
     viewModel/experimentationsgroupvm.cpp \
     controller/assessmentsmodelmanager.cpp \
     model/task/agentnameandoutputsm.cpp \
-    sortFilter/areagentsinplatformfilter.cpp
+    sortFilter/areagentsinplatformfilter.cpp \
+    sortFilter/aresubjectandprotocolinsessionfilter.cpp
 
 
 HEADERS += \
@@ -87,7 +88,8 @@ HEADERS += \
     viewModel/experimentationsgroupvm.h \
     controller/assessmentsmodelmanager.h \
     model/task/agentnameandoutputsm.h \
-    sortFilter/areagentsinplatformfilter.h
+    sortFilter/areagentsinplatformfilter.h \
+    sortFilter/aresubjectandprotocolinsessionfilter.h
 
 
 RESOURCES += qml.qrc
