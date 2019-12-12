@@ -61,12 +61,7 @@ ExperimentationController::~ExperimentationController()
 {
     qInfo() << "Delete Experimentation Controller";
 
-    // Reset the model of the current experimentation
-    if (_currentExperimentation != nullptr)
-    {
-        setcurrentExperimentation(nullptr);
-    }
-
+    // First, delete the controller for session management
     if (_taskInstanceC != nullptr)
     {
         disconnect(_taskInstanceC);
@@ -75,6 +70,12 @@ ExperimentationController::~ExperimentationController()
         settaskInstanceC(nullptr);
         delete temp;
         temp = nullptr;
+    }
+
+    // Then, we can reset the model of the current experimentation
+    if (_currentExperimentation != nullptr)
+    {
+        setcurrentExperimentation(nullptr);
     }
 }
 
