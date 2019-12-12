@@ -17,11 +17,6 @@
 #include <misc/ingescapeutils.h>
 
 
-extern "C" {
-    #include <cqlexporter.h>
-}
-
-
 /**
  * @brief Constructor
  * @param parent
@@ -54,59 +49,3 @@ ExportController::~ExportController()
     }
 }
 
-
-/**
- * @brief Export the current experimentation
- */
-void ExportController::exportExperimentation()
-{
-    if (_currentExperimentation != nullptr)
-    {
-        CassUuid experimentationUid = _currentExperimentation->getCassUuid();
-        qInfo() << "Export the experimentation" << _currentExperimentation->name() << "(" << AssessmentsModelManager::cassUuidToQString(experimentationUid) << ")";
-
-        QString exportFilePath = QString("%1export_%2.csv").arg(_exportsDirectoryPath, _currentExperimentation->name());
-
-        // Open the file to save the export
-        openFile(const_cast<char*>(exportFilePath.toStdString().c_str()));
-
-        // Set the cassandra session for the exporting layer
-        setCassSession(AssessmentsModelManager::instance()->getCassSession());
-
-        // Export a full dump of the current experimentation
-        exportAllRecordsFromIdExpAndTableRecordSetup(experimentationUid);
-
-        // Close the opening file
-        closeFileOpened();
-
-    }
-}
-
-/**
- * @brief Export the current experimentation function test
- */
-void ExportController::exportExperimentationTest(QString uuidIdExp)
-{
-    CassUuid experimentationUid;
-    cass_uuid_from_string(uuidIdExp.toLatin1().constData(), &experimentationUid);
-
-    qInfo() << "Export the experimentation from UUID : "<< AssessmentsModelManager::cassUuidToQString(experimentationUid);
-
-    QString ipAddress = "127.0.0.1";
-    QString exportFileName = QString("export_test.csv");
-
-    // Connect to the BDD
-    connectToBDD(const_cast<char*>(ipAddress.toStdString().c_str()));
-
-    // Open the file to save the export
-    openFile(const_cast<char*>(exportFileName.toStdString().c_str()));
-
-    // Export a full dump of the current experimentation
-    exportAllRecordsFromIdExpAndTableRecordSetup(experimentationUid);
-
-    // Disconnect from the BDD
-    disconnectToBDD();
-
-    // Close the opening file
-    closeFileOpened();
-}

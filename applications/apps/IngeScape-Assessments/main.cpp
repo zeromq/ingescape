@@ -242,16 +242,6 @@ int main(int argc, char *argv[])
     // Set the name of our agent
     igs_setAgentName(app.applicationName().toStdString().c_str());
 
-    //------------------------------
-    //
-    // Snippet to test the integration of the exporting code
-    // TOREMOVE : only for ESTIA you can remove it when you want
-    //
-    //------------------------------
-
-    //ExportController exportControllerTest;
-    //exportControllerTest.exportExperimentationTest("cf113ce0-9bda-11e9-9d27-8dfc860aae8b");
-
 
     //------------------------------
     //
