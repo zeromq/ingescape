@@ -757,9 +757,9 @@ I2PopupBase {
         // Drop Area to add a license from the editor (only when user have no license)
         DropArea {
             id: dropZone
-            anchors.fill: noLicenseContent
+            anchors.fill: content
 
-            enabled: noLicenseContent.visible
+            enabled: true
 
             property bool dragHovering: false
 
@@ -793,7 +793,6 @@ I2PopupBase {
             }
         }
 
-
         // Footer content : Button "OK"
         Item {
             id: footer
@@ -820,7 +819,7 @@ I2PopupBase {
                 width: boundingBox.width
 
                 activeFocusOnPress: true
-                text: rootPopup.allowsOnlyQuit ? qsTr("Quit") : qsTr("OK")
+                text: (rootPopup.allowsOnlyQuit || (rootPopup.licensesController && !rootPopup.licensesController.isLicenseValidForAgentNeeded)) ? qsTr("Quit") : qsTr("OK")
 
                 anchors {
                     verticalCenter: parent.verticalCenter
@@ -845,9 +844,9 @@ I2PopupBase {
                 }
 
                 onClicked: {
-                    if (rootPopup.allowsOnlyQuit)
+                    if (rootPopup.allowsOnlyQuit || (rootPopup.licensesController && !rootPopup.licensesController.isLicenseValidForAgentNeeded))
                     {
-//                        console.info("QML: QUIT on License Popup")
+                        console.info("QML: QUIT on License Popup")
 
                         // Quit our application (close the main window)
                         Qt.quit();
