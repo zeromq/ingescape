@@ -112,6 +112,9 @@ static const QString command_StopReplay = "STOP_REPLAY";
 static const QString command_PauseReplay = "PAUSE_REPLAY";
 static const QString command_UNpauseReplay = "UNPAUSE_REPLAY";
 
+static const QString prefix_RecordStarted = "RECORD_STARTED";
+static const QString prefix_RecordStopped = "RECORD_STOPPED";
+
 static const QString command_LoadPlatformFile = "LOAD_PLATFORM_FROM_PATH";
 static const QString command_UpdateTimeLineState = "UPDATE_TIMELINE_STATE";
 static const QString command_UpdateRecordState = "UPDATE_RECORD_STATE";

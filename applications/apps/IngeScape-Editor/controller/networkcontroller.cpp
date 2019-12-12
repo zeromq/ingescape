@@ -30,8 +30,6 @@ static const QString prefix_LogFilePath = "LOG_FILE_PATH=";
 static const QString prefix_DefinitionFilePath = "DEFINITION_FILE_PATH=";
 static const QString prefix_MappingFilePath = "MAPPING_FILE_PATH=";
 
-static const QString prefix_RecordStarted = "RECORD_STARTED";
-static const QString prefix_RecordStopped = "RECORD_STOPPED";
 static const QString prefix_AllRecords = "RECORDS_LIST=";
 static const QString prefix_AddedRecord = "ADDED_RECORD=";
 static const QString prefix_DeletedRecord = "DELETED_RECORD=";
