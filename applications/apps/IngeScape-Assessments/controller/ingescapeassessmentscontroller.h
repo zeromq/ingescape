@@ -213,6 +213,9 @@ private:
 
     // To subscribe to termination signals
     TerminationSignalWatcher *_terminationSignalWatcher;
+
+    // Agent license id needed for the app to work
+    static const char * AGENT_LICENSE_ID_NEEDED;
 };
 
 QML_DECLARE_TYPE(IngeScapeAssessmentsController)

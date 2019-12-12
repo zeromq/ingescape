@@ -40,6 +40,9 @@ class LicensesController : public QObject
     // List of detailed licenses (one for each file)
     I2_QOBJECT_LISTMODEL(LicenseInformationM, licenseDetailsList)
 
+    // Flag indicating if user's licenses allow needed agent
+    I2_QML_PROPERTY_READONLY(bool, isLicenseValidForAgentNeeded)
+
 
 public:
 
@@ -99,6 +102,14 @@ public:
     void refreshLicensesData();
 
 
+    /**
+     * @brief Set necessary license for agent
+     * @param agentName : agent name that is necessary
+     * @param agentID : agent's ID that must be present in the license
+     */
+    void setNecessaryLicenseForAgent(const char *agentName, const char *agentID);
+
+
 Q_SIGNALS:
     /**
      * @brief Triggered to update licenses data
@@ -125,8 +136,6 @@ protected Q_SLOTS:
 
 
 private:
-
-
     /**
      * @brief Import (copy) the given license file to the license directory
      * @param licenseFile
@@ -134,7 +143,21 @@ private:
      */
     bool _importLicenseFromFile(const QFileInfo& licenseFile);
 
+    /**
+     * @brief Clean up _licenseForAgentNeeded property
+     */
+    void _cleanupLicenseForAgentNeeded();
 
+    /**
+     * @brief Check license for agent needed
+     * @return true on success. false otherwise.
+     */
+    bool _checkLicenseForAgentNeeded();
+
+
+private :
+    // Agent with license needed for the application
+    licenseForAgent_t* _licenseForAgentNeeded;
 };
 
 QML_DECLARE_TYPE(LicensesController)

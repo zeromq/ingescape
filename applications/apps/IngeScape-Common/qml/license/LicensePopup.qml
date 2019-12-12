@@ -277,48 +277,71 @@ I2PopupBase {
                         }
                     }
                 }
-
-                // Vertical space
-                Item {
-                    anchors {
-                        left: parent.left
-                        right: parent.right
-                    }
-                    height: 10
-                }
             }
 
-            Text {
+            Item {
                 id: errorMessage
 
                 anchors {
                     top: directoryPathItem.bottom
-                    topMargin: 25
+                    topMargin: 10
                     left: parent.left
-                    leftMargin: 25
                     right: parent.right
-                    rightMargin: 25
                 }
-                wrapMode: Text.WordWrap
 
-                height: (text === "") ? 0 : 30
+                height: (errorText.text === "") ? 0 : 30
+                visible: (errorText.text !== "")
 
-                Connections {
-                    target: rootPopup.licensesController
+                SvgImage {
+                    id: errorPicto
 
-                    onLicenseLimitationReached: {
-                        errorMessage.visible = true
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    svgElementId : "mapping-mode-message-warning"
+
+                    height: errorPicto.svgheight
+                }
+
+                Text {
+                    id: errorText
+                    anchors {
+                        bottom: errorPicto.bottom
+                        left: errorPicto.right
+                        leftMargin: 10
+                    }
+
+                    wrapMode: Text.WordWrap
+
+                    Connections {
+                        target: rootPopup.licensesController
+
+                        onLicenseLimitationReached: {
+                            errorMessage.visible = true
+                        }
+                    }
+
+                    text: rootPopup.licensesController ? rootPopup.licensesController.errorMessageWhenLicenseFailed : ""
+
+                    color: IngeScapeTheme.orangeColor
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        weight : Font.Medium
+                        pixelSize : 16
                     }
                 }
+            }
 
-                text: rootPopup.licensesController ? rootPopup.licensesController.errorMessageWhenLicenseFailed : ""
 
-                color: IngeScapeTheme.orangeColor
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    weight : Font.Medium
-                    pixelSize : 16
+
+
+            // Vertical space
+            Item {
+                anchors {
+                    top: errorMessage.bottom
+                    left: parent.left
+                    right: parent.right
                 }
+                height: 10
             }
         }
 
