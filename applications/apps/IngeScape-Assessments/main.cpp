@@ -133,7 +133,7 @@ void registerCustomQmlTypes()
     //
     //----------------
     qmlRegisterUncreatableType<AreAgentsInPlatformFilter>("INGESCAPE", 1, 0, "AreAgentsInPlatformFilter", "Internal class");
-
+    qmlRegisterUncreatableType<AreSubjectAndProtocolInSessionFilter>("INGESCAPE", 1, 0, "AreSubjectAndProtocolInSessionFilter", "Internal class");
 
     //----------------
     //

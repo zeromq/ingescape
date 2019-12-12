@@ -12,8 +12,8 @@
  *
  */
 
-#ifndef AREAGENTSINPLATFORMFILTER_H
-#define AREAGENTSINPLATFORMFILTER_H
+#ifndef ARESUBJECTANDPROTOCOLINSESSIONFILTER_H
+#define ARESUBJECTANDPROTOCOLINSESSIONFILTER_H
 
 #include <QObject>
 #include <QtQml>
@@ -23,13 +23,21 @@
 #include <I2Quick.h>
 
 #include "I2PropertyHelpers.h"
+
+#include "model/taskinstancem.h"
+#include "model/subject/subjectm.h"
 #include "model/task/taskm.h"
 
-class AreAgentsInPlatformFilter: public I2SortFilterProxyModel
+
+class AreSubjectAndProtocolInSessionFilter : public I2SortFilterProxyModel
 {
     Q_OBJECT
 
-    I2_CPP_PROPERTY(TaskM*, currentProtocol)
+    // List with id of selected subjects
+    I2_CPP_NOSIGNAL_PROPERTY(QStringList, selectedSubjectIdList)
+
+    // List with id of selected protocols
+    I2_CPP_NOSIGNAL_PROPERTY(QStringList, selectedProtocolIdList)
 
 public:
 
@@ -37,7 +45,7 @@ public:
      * @brief Default constructor
      * @param parent
      */
-    explicit AreAgentsInPlatformFilter(QObject *parent = nullptr);
+    explicit AreSubjectAndProtocolInSessionFilter(QObject *parent = nullptr);
 
 
     /**
@@ -82,6 +90,6 @@ protected:
 
 };
 
-QML_DECLARE_TYPE(AreAgentsInPlatformFilter)
+QML_DECLARE_TYPE(AreSubjectAndProtocolInSessionFilter)
 
-#endif // AREAGENTSINPLATFORMFILTER_H
+#endif // ARESUBJECTANDPROTOCOLINSESSIONFILTER_H
