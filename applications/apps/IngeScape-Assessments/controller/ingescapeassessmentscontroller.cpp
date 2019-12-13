@@ -132,7 +132,7 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
 
     // Set assessment agent license ID in LicensesController so that it can handle when user does'nt have a valid license with this agent
     // TODO Uncomment when everyone is ready with their licenses ;)
-    //_licensesC->setNecessaryLicenseForAgent(globalAgent->agentName, AGENT_LICENSE_ID_NEEDED);
+    _licensesC->setNecessaryLicenseForAgent(globalAgent->agentName, AGENT_LICENSE_ID_NEEDED);
 
     // Create the controller to manage the list of experimentations
     _experimentationsListC = new ExperimentationsListController(this);
