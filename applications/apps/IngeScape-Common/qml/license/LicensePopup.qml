@@ -38,6 +38,9 @@ I2PopupBase {
     // Property to correctly size the popup when there are several licenses to show
     property real maxHeight : parent.height - 40 // 40 to let a margin above and below our popup
 
+    // Extra information to display when there is no license
+    property string extraInformationOnNoLicense: ""
+
 
     //--------------------------------------------------------
     //
@@ -699,7 +702,7 @@ I2PopupBase {
                     verticalCenter: parent.verticalCenter
                 }
 
-                text: "No license file found.\nThe editor is running in demo mode with limitations.\n\n\n\nTo change this, please set the license directory above,\ndrop a license file here \nor use the \"Import...\" button below."
+                text: "No license file found.\n " + rootPopup.extraInformationOnNoLicense + "\n\n\nTo change this, please set the license directory above,\ndrop a license file here \nor use the \"Import...\" button below."
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
 

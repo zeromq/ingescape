@@ -829,6 +829,8 @@ Item {
         anchors.centerIn: parent
 
         licensesController: IngeScapeEditorC.licensesC
+
+        extraInformationOnNoLicense: "The editor is running in demo mode with limitations."
     }
 
 
