@@ -67,6 +67,12 @@ ApplicationWindow {
         }
     }
 
+    // Licenses controller
+    property LicensesController licensesController: null
+
+    // Flag indicating if the user have a valid license for assessment
+    property bool isAssessmentLicenseValid: licensesController && licensesController.isLicenseValidForAgentNeeded
+
 
     //----------------------------------
     //
@@ -168,6 +174,8 @@ ApplicationWindow {
 
             MenuItem {
                 text: qsTr("Database")
+
+                enabled: isAssessmentLicenseValid
 
                 onTriggered: {
                     console.log("QML: Open the Database configuration popup");
@@ -519,6 +527,10 @@ ApplicationWindow {
                 applicationLoader.visible = Qt.binding(function() {
                     return ((applicationLoader.status === Loader.Ready) && (AssessmentsModelC !== null));
                 });
+
+                mainWindow.licensesController = Qt.binding(function() {
+                   return IngeScapeAssessmentsC.licensesC;
+                })
 
                 /*subWindowsInstantiator.model = Qt.binding(function() {
                     return IngeScapeAssessmentsC.openedWindows;
