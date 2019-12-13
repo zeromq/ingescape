@@ -127,26 +127,4 @@ I2PopupBase {
         }
     }
 
-    Button {
-        id: btnExportCurrentExpe
-
-        anchors {
-            top: titleExport.bottom
-            topMargin: 15
-            left: parent.left
-            leftMargin: 25
-        }
-        height: 30
-
-        text: "Export '" + (rootItem.experimentation ? rootItem.experimentation.name : "") + "'"
-
-        onClicked: {
-            console.log("QML: Export experimentation " + rootItem.experimentation.name);
-
-            if (rootItem.controller) {
-                rootItem.controller.exportExperimentation();
-            }
-        }
-    }
-
 }

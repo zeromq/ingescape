@@ -45,18 +45,6 @@ public:
     ~ExportController();
 
 
-    /**
-     * @brief Export the current experimentation
-     */
-    Q_INVOKABLE void exportExperimentation();
-
-
-    /**
-     * @brief Export the current experimentation function test
-     */
-    Q_INVOKABLE void exportExperimentationTest(QString uuidIdExp);
-
-
 private:
 
     // Path to the directory containing CSV files about exports

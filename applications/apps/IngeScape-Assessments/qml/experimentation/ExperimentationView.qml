@@ -67,6 +67,11 @@ Item {
     // Go back to "Home"
     signal goBackToHome();
 
+    // Emitted when "All protocol" is selected or unselected
+    signal clickAllProtocol();
+
+    // Emitted when "All subject" is selected or unselected
+    signal clickAllSubject();
 
 
     //--------------------------------------------------------
@@ -316,9 +321,9 @@ Item {
             right: parent.right
         }
 
-        property real selectionColumnWidth: _isSelectingSessionsToExport ? 30 : 0
-        property real subjectColumnWidth: 180
-        property real protocolColumnWidth: 280
+        property real selectionColumnWidth: 30
+        property real subjectColumnWidth: 210
+        property real protocolColumnWidth: 250
         property real creationDateTimeColumnWidth: 165
         property real buttonsColumnWidth: 135
 
@@ -429,30 +434,33 @@ Item {
                     }
                 }
 
-                Button {
-                    width: parent.width
-                    height: 62
+//                Button {
+//                    width: parent.width
+//                    height: 62
 
-                    enabled: rootItem.controller && rootItem.controller.isRecorderON
+//                    enabled: rootItem.controller && rootItem.controller.isRecorderON
 
-                    style: IngeScapeAssessmentsSvgAndTextButtonStyle {
-                        text: qsTr("EXPORT")
+//                    style: IngeScapeAssessmentsSvgAndTextButtonStyle {
+//                        text: qsTr("EXPORT")
 
-                        releasedID: "export"
-                        pressedID: releasedID
-                        rolloverID: releasedID
-                        disabledID: releasedID
-                    }
+//                        releasedID: "export"
+//                        pressedID: releasedID
+//                        rolloverID: releasedID
+//                        disabledID: releasedID
+//                    }
 
-                    onClicked: {
-                        //console.log("QML: Open the 'Export View' popup");
+//                    onClicked: {
+//                        //console.log("QML: Open the 'Export View' popup");
 
-                        // Open the popup "Export View"
-                        //exportViewPopup.open();
+//                        // Open the popup "Export View"
+//                        //exportViewPopup.open();
 
-                        _isSelectingSessionsToExport = !_isSelectingSessionsToExport;
-                    }
-                }
+//                        rootItem.controller.showAllSessionsForProtocol();
+//                        rootItem.controller.showAllSessionsForSubject();
+
+//                        _isSelectingSessionsToExport = !_isSelectingSessionsToExport;
+//                    }
+//                }
             }
         }
 
@@ -544,35 +552,62 @@ Item {
                         topLeftRadius: 5
                         clip: true
 
-                        Behavior on width {
-                            NumberAnimation {
-                                duration: rootItem._appearanceAnimationDuration
-                            }
-                        }
+                        LabellessSvgButton {
+                            id: btnExport
 
-                        Text {
                             anchors {
                                 horizontalCenter: parent.horizontalCenter
                                 verticalCenter: parent.verticalCenter
                             }
 
-                            text: qsTr("-->")
-                            opacity: rootItem._isSelectingSessionsToExport ? 1 : 0
+                            enabled: rootItem.controller && rootItem.controller.isRecorderON
+                            visible: enabled
 
-                            color: IngeScapeTheme.whiteColor
-                            font {
-                                family: IngeScapeTheme.labelFontFamily
-                                pixelSize: 18
-                                weight: Font.Black
-                            }
+                            fileCache: IngeScapeTheme.svgFileIngeScape
 
-                            Behavior on opacity {
-                                NumberAnimation {
-                                    duration: rootItem._appearanceAnimationDuration
-                                }
+                            pressedID: releasedID + "-pressed"
+                            releasedID: "export"
+                            disabledID : releasedID + "-disabled"
+
+                            onClicked: {
+                                //console.log("QML: Open the 'Export View' popup");
+
+                                // Open the popup "Export View"
+                                //exportViewPopup.open();
+
+                                rootItem.controller.showAllSessionsForProtocol();
+                                rootItem.controller.showAllSessionsForSubject();
+
+                                _isSelectingSessionsToExport = !_isSelectingSessionsToExport;
                             }
                         }
                     }
+//                    I2CustomRectangle {
+//                    //Rectangle {
+//                        width: mainView.selectionColumnWidth
+//                        height: parent.height
+
+//                        color: IngeScapeAssessmentsTheme.blueButton_pressed
+//                        topLeftRadius: 5
+//                        clip: true
+
+//                        Text {
+//                            anchors {
+//                                horizontalCenter: parent.horizontalCenter
+//                                verticalCenter: parent.verticalCenter
+//                            }
+
+//                            text: qsTr("-->")
+//                            opacity: 1
+
+//                            color: IngeScapeTheme.whiteColor
+//                            font {
+//                                family: IngeScapeTheme.labelFontFamily
+//                                pixelSize: 18
+//                                weight: Font.Black
+//                            }
+//                        }
+//                    }
 
                     Item {
                         width: mainView.subjectColumnWidth
@@ -584,6 +619,8 @@ Item {
                                 leftMargin: 15
                                 verticalCenter: parent.verticalCenter
                             }
+                            visible: !_isSelectingSessionsToExport
+                            enabled: visible
 
                             text: qsTr("Subject")
                             color: IngeScapeTheme.whiteColor
@@ -591,6 +628,174 @@ Item {
                                 family: IngeScapeTheme.labelFontFamily
                                 pixelSize: 18
                                 weight: Font.Black
+                            }
+                        }
+                        DropDownCheckboxes {
+                            id: dropDownSubject
+
+                            anchors {
+                                left: parent.left
+                                leftMargin: 15
+                                verticalCenter: parent.verticalCenter
+                            }
+
+                            height : 25
+                            width : mainView.subjectColumnWidth - 10
+                            //enabled: rootItem.controller && rootItem.controller.allAgentNamesList.length > 0
+                            visible: _isSelectingSessionsToExport && rootItem.controller
+                            enabled: visible
+                            model: rootItem.controller ? rootItem.controller.subjectIdList : 0
+
+                            placeholderText: enabled ? "- Select a subject -" : ""
+
+                            text:{
+                                if(enabled && rootItem.controller && (rootItem.controller.selectedSubjectIdList.length > 0)){
+                                    if(rootItem.controller.selectedSubjectIdList.length === 1){
+                                        "- " + rootItem.controller.selectedSubjectIdList + " -"
+                                    }else if(rootItem.controller.selectedSubjectIdList.length < rootItem.controller.subjectIdList.length){
+                                        "- " + rootItem.controller.selectedSubjectIdList.length + " subjects selected -"
+                                    }else{
+                                        "- All subjects selected -"
+                                    }
+                                }else{
+                                    ""
+                                }
+                            }
+
+                            checkAllText: " All subjects"
+
+                            onCheckAll: {
+                                rootItem.controller.showAllSessionsForSubject()
+                                clickAllSubject()
+                            }
+
+                            onUncheckAll: {
+                                rootItem.controller.hideAllSessionsForSubject()
+                                clickAllSubject()
+                            }
+
+                            onPopupOpen: {
+                                // update "all subjects" checkbox state
+                                // reset isPartiallyChecked and checkedState properties
+                                isPartiallyChecked = false;
+                                checkAllState = Qt.Unchecked;
+
+                                if (rootItem.controller && (rootItem.controller.selectedSubjectIdList.length > 0))
+                                {
+                                    if (rootItem.controller.selectedSubjectIdList.length === rootItem.controller.subjectIdList.length) {
+                                        checkAllState = Qt.Checked;
+                                    }
+                                    else {
+                                        isPartiallyChecked = true;
+                                    }
+                                }
+                            }
+
+                            delegate: Item {
+                                anchors {
+                                    left: parent.left
+                                    right: parent.right
+                                }
+
+                                width: dropDownSubject.comboButton.width
+                                height: dropDownSubject.comboButton.height
+
+                                CheckBox {
+                                    id : filterSubjectCB
+                                    anchors {
+                                        verticalCenter: parent.verticalCenter
+                                        left: parent.left
+                                        leftMargin :10
+                                        right: parent.right
+                                        rightMargin : 10
+                                    }
+
+                                    checked: false;
+                                    activeFocusOnPress: true;
+
+                                    style: CheckBoxStyle {
+                                        label: Text {
+                                            anchors {
+                                                verticalCenter: parent.verticalCenter
+                                                verticalCenterOffset: 1
+                                            }
+
+                                            color: IngeScapeTheme.lightGreyColor
+
+                                            text: " " + modelData
+                                            elide: Text.ElideRight
+
+                                            font {
+                                                family: IngeScapeTheme.textFontFamily
+                                                pixelSize: 16
+                                            }
+
+                                        }
+
+                                        indicator: Rectangle {
+                                            implicitWidth: 14
+                                            implicitHeight: 14
+                                            border.width: 0
+                                            color: IngeScapeTheme.veryDarkGreyColor
+
+                                            I2SvgItem {
+                                                visible: (control.checkedState === Qt.Checked)
+                                                anchors.centerIn: parent
+
+                                                svgFileCache: IngeScapeTheme.svgFileIngeScape;
+                                                svgElementId: "check";
+
+                                            }
+                                        }
+
+                                    }
+
+                                    onClicked : {
+                                        if (rootItem.controller) {
+                                            if (checked) {
+                                                rootItem.controller.showSessionForSubject(modelData)
+                                            }
+                                            else {
+                                                rootItem.controller.hideSessionForSubject(modelData)
+                                            }
+
+                                            // update "all subjects" checkbox state
+                                            // reset isPartiallyChecked and checkedState properties
+                                            dropDownSubject.isPartiallyChecked = false;
+                                            dropDownSubject.checkAllState = Qt.Unchecked;
+
+                                            if (rootItem.controller && (rootItem.controller.selectedSubjectIdList.length > 0))
+                                            {
+                                                if (rootItem.controller.selectedSubjectIdList.length === rootItem.controller.subjectIdList.length) {
+                                                    dropDownSubject.checkAllState = Qt.Checked;
+                                                }
+                                                else {
+                                                    dropDownSubject.isPartiallyChecked = true;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    Connections {
+                                        target : dropDownSubject.popup
+                                        onOpened : {
+                                            // update subjects checkboxes states when the pop up is opening
+                                            if (controller) {
+                                                filterSubjectCB.checked = controller.areShownSessionsForSubject(modelData);
+                                            }
+                                        }
+                                    }
+
+                                    Connections {
+                                        target : rootItem
+                                        onClickAllSubject : {
+                                            // update subjects checkboxes states when the "pop up is opening   "All subjects" check box is selected or unselected
+                                            if (controller) {
+                                                filterSubjectCB.checked = controller.areShownSessionsForSubject(modelData);
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -606,12 +811,183 @@ Item {
                                 verticalCenter: parent.verticalCenter
                             }
 
+                            visible: !_isSelectingSessionsToExport
+                            enabled: visible
+
                             text: qsTr("Protocol")
                             color: IngeScapeTheme.whiteColor
                             font {
                                 family: IngeScapeTheme.labelFontFamily
                                 pixelSize: 18
                                 weight: Font.Black
+                            }
+                        }
+
+                        DropDownCheckboxes {
+                            id: dropDownProtocol
+
+                            anchors {
+                                left: parent.left
+                                leftMargin: 15
+                                verticalCenter: parent.verticalCenter
+                            }
+
+                            height : 25
+                            width : mainView.protocolColumnWidth - 10
+                            //enabled: rootItem.controller && rootItem.controller.allAgentNamesList.length > 0
+                            visible: _isSelectingSessionsToExport && rootItem.controller
+                            enabled: visible
+                            model: rootItem.controller ? rootItem.controller.protocolNameList : 0
+
+                            placeholderText: enabled ? "- Select a protocol -" : ""
+
+                            text:{
+                                if(enabled && rootItem.controller && (rootItem.controller.selectedProtocolNameList.length > 0)){
+                                    if(rootItem.controller.selectedProtocolNameList.length === 1){
+                                        "- " + rootItem.controller.selectedProtocolNameList + " -"
+                                    }else if(rootItem.controller.selectedProtocolNameList.length < rootItem.controller.protocolNameList.length){
+                                        "- " + rootItem.controller.selectedProtocolNameList.length + " protocols selected -"
+                                    }else{
+                                        "- All protocols selected -"
+                                    }
+                                }else{
+                                    ""
+                                }
+                            }
+                            checkAllText: " All protocol"
+
+                            onCheckAll: {
+                                rootItem.controller.showAllSessionsForProtocol()
+                                rootItem.clickAllProtocol();
+                            }
+
+                            onUncheckAll: {
+                                rootItem.controller.hideAllSessionsForProtocol()
+                                rootItem.clickAllProtocol();
+                            }
+
+                            onPopupOpen: {
+                                // update "all agents" checkbox state
+                                // reset isPartiallyChecked and checkedState properties
+                                isPartiallyChecked = false;
+                                checkAllState = Qt.Unchecked;
+
+                                if (rootItem.controller && (rootItem.controller.selectedProtocolNameList.length > 0))
+                                {
+                                    if (rootItem.controller.selectedProtocolNameList.length === rootItem.controller.protocolNameList.length) {
+                                        checkAllState = Qt.Checked;
+                                    }
+                                    else {
+                                        isPartiallyChecked = true;
+                                    }
+                                }
+                            }
+
+                            delegate: Item {
+                                anchors {
+                                    left: parent.left
+                                    right: parent.right
+                                }
+
+                                width: dropDownProtocol.comboButton.width
+                                height: dropDownProtocol.comboButton.height
+
+                                CheckBox {
+                                    id : filterProtocolCB
+                                    anchors {
+                                        verticalCenter: parent.verticalCenter
+                                        left: parent.left
+                                        leftMargin :10
+                                        right: parent.right
+                                        rightMargin : 10
+                                    }
+
+                                    checked: false;
+                                    activeFocusOnPress: true;
+
+                                    style: CheckBoxStyle {
+                                        label: Text {
+                                            anchors {
+                                                verticalCenter: parent.verticalCenter
+                                                verticalCenterOffset: 1
+                                            }
+
+                                            color: IngeScapeTheme.lightGreyColor
+
+                                            text: " " + modelData
+                                            elide: Text.ElideRight
+
+                                            font {
+                                                family: IngeScapeTheme.textFontFamily
+                                                pixelSize: 16
+                                            }
+
+                                        }
+
+                                        indicator: Rectangle {
+                                            implicitWidth: 14
+                                            implicitHeight: 14
+                                            border.width: 0
+                                            color: IngeScapeTheme.veryDarkGreyColor
+
+                                            I2SvgItem {
+                                                visible: (control.checkedState === Qt.Checked)
+                                                anchors.centerIn: parent
+
+                                                svgFileCache: IngeScapeTheme.svgFileIngeScape;
+                                                svgElementId: "check";
+
+                                            }
+                                        }
+
+                                    }
+
+                                    onClicked : {
+                                        if (rootItem.controller) {
+                                            if (checked) {
+                                                rootItem.controller.showSessionForProtocol(modelData)
+                                            }
+                                            else {
+                                                rootItem.controller.hideSessionForProtocol(modelData)
+                                            }
+
+                                            // update "all agents" checkbox state
+                                            // reset isPartiallyChecked and checkedState properties
+                                            dropDownProtocol.isPartiallyChecked = false;
+                                            dropDownProtocol.checkAllState = Qt.Unchecked;
+
+                                            if (rootItem.controller && (rootItem.controller.selectedProtocolNameList.length > 0))
+                                            {
+                                                if (rootItem.controller.selectedProtocolNameList.length === rootItem.controller.protocolNameList.length) {
+                                                    dropDownProtocol.checkAllState = Qt.Checked;
+                                                }
+                                                else {
+                                                    dropDownProtocol.isPartiallyChecked = true;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    Connections {
+                                        target : dropDownProtocol.popup
+                                        onOpened : {
+                                            // update agents checkboxes states when the pop up is opening
+                                            if (controller) {
+                                                filterProtocolCB.checked = controller.areShownSessionsForProtocol(modelData);
+                                            }
+                                        }
+                                    }
+
+                                    Connections {
+                                        target : rootItem
+                                        onClickAllProtocol : {
+                                            // update agents checkboxes states when the "pop up is opening   "All Agents" check box is selected or unselected
+                                            if (controller) {
+                                                filterProtocolCB.checked = controller.areShownSessionsForProtocol(modelData);
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -667,7 +1043,7 @@ Item {
                     left: parent.left
                     right: parent.right
                 }
-                height: rootItem._isSelectingSessionsToExport ? 40 : 0
+                height: rootItem._isSelectingSessionsToExport && rootItem.controller.isRecorderON ? 40 : 0
                 clip: true
 
                 color: IngeScapeAssessmentsTheme.blueButton_pressed
@@ -811,10 +1187,10 @@ Item {
                         spacing: 0
 
                         Repeater {
-                            model: rootItem.experimentation ? rootItem.experimentation.allTaskInstances : null
+                            model: rootItem.experimentation ? rootItem.controller.sessionFilteredList : null
 
                             delegate: TaskInstanceInList {
-                                isSelectingSessionsToExport: rootItem._isSelectingSessionsToExport
+                                isSelectingSessionsToExport: rootItem._isSelectingSessionsToExport && rootItem.controller.isRecorderON
                                 appearanceAnimationDuration: rootItem._appearanceAnimationDuration
 
                                 selectionColumnWidth: mainView.selectionColumnWidth

@@ -61,7 +61,8 @@ SOURCES += main.cpp \
     viewModel/experimentationsgroupvm.cpp \
     controller/assessmentsmodelmanager.cpp \
     model/task/agentnameandoutputsm.cpp \
-    sortFilter/areagentsinplatformfilter.cpp
+    sortFilter/areagentsinplatformfilter.cpp \
+    sortFilter/aresubjectandprotocolinsessionfilter.cpp
 
 
 HEADERS += \
@@ -87,7 +88,8 @@ HEADERS += \
     viewModel/experimentationsgroupvm.h \
     controller/assessmentsmodelmanager.h \
     model/task/agentnameandoutputsm.h \
-    sortFilter/areagentsinplatformfilter.h
+    sortFilter/areagentsinplatformfilter.h \
+    sortFilter/aresubjectandprotocolinsessionfilter.h
 
 
 RESOURCES += qml.qrc
@@ -127,7 +129,6 @@ QML_DESIGNER_IMPORT_PATH =
 
 # Add the include directory of I2Quick
 INCLUDEPATH += ../../frameworks/I2Quick/include
-INCLUDEPATH += ../../dependencies/cqlExporter
 
 # Include ingescape library
 !include(../../../builds/ingescape.pri) {
@@ -137,11 +138,6 @@ INCLUDEPATH += ../../dependencies/cqlExporter
 # Include IngeScape-Common library
 !include(../IngeScape-Common/IngeScape-Common.pri) {
     error(Could not load IngeScape-Common.pri)
-}
-
-# Include cql exporter library
-!include(../../dependencies/cqlExporter/cqlexporter.pri) {
-    error(Could not load cqlExporter.pri)
 }
 
 
