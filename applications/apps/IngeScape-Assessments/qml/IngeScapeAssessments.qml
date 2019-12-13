@@ -107,13 +107,13 @@ Item {
             openDatabasePopup();
         }
 
-        /*// ...we check the value of the flag "is Valid License"
-        if (IngeScapeAssessmentsC.licensesC && IngeScapeAssessmentsC.licensesC.mergedLicense && !IngeScapeAssessmentsC.licensesC.mergedLicense.editorLicenseValidity)
+        // ...we check the value of the flag "is License For Agent Needed" (Here for IngeScape-Assessments agent)
+        if (IngeScapeAssessmentsC.licensesC && !IngeScapeAssessmentsC.licensesC.isLicenseValidForAgentNeeded)
         {
             openLicensePopup();
         }
 
-        // ...we check if we must open the getting started window
+        /*// ...we check if we must open the getting started window
         if (IngeScapeAssessmentsC.gettingStartedShowAtStartup)
         {
             openGettingStarted();
@@ -155,6 +155,18 @@ Item {
 
                 // Remove the "Task Instance view" from the stack
                 stackview.pop();
+            }
+        }
+    }
+
+    Connections {
+        target: IngeScapeAssessmentsC.licensesC
+
+        onIsLicenseValidForAgentNeededChanged: {
+            console.log("QML (IngeScape Assessment): on IsLicenseValidForAgentNeededChanged");
+            if (IngeScapeAssessmentsC.licensesC && !IngeScapeAssessmentsC.licensesC.isLicenseValidForAgentNeeded)
+            {
+                openLicensePopup();
             }
         }
     }

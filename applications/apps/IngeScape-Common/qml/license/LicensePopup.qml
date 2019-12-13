@@ -38,6 +38,9 @@ I2PopupBase {
     // Property to correctly size the popup when there are several licenses to show
     property real maxHeight : parent.height - 40 // 40 to let a margin above and below our popup
 
+    // Extra information to display when there is no license
+    property string extraInformationOnNoLicense: ""
+
 
     //--------------------------------------------------------
     //
@@ -277,48 +280,71 @@ I2PopupBase {
                         }
                     }
                 }
-
-                // Vertical space
-                Item {
-                    anchors {
-                        left: parent.left
-                        right: parent.right
-                    }
-                    height: 10
-                }
             }
 
-            Text {
+            Item {
                 id: errorMessage
 
                 anchors {
                     top: directoryPathItem.bottom
-                    topMargin: 25
+                    topMargin: 10
                     left: parent.left
-                    leftMargin: 25
                     right: parent.right
-                    rightMargin: 25
                 }
-                wrapMode: Text.WordWrap
 
-                height: (text === "") ? 0 : 30
+                height: (errorText.text === "") ? 0 : 30
+                visible: (errorText.text !== "")
 
-                Connections {
-                    target: rootPopup.licensesController
+                SvgImage {
+                    id: errorPicto
 
-                    onLicenseLimitationReached: {
-                        errorMessage.visible = true
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    svgElementId : "mapping-mode-message-warning"
+
+                    height: errorPicto.svgheight
+                }
+
+                Text {
+                    id: errorText
+                    anchors {
+                        bottom: errorPicto.bottom
+                        left: errorPicto.right
+                        leftMargin: 10
+                    }
+
+                    wrapMode: Text.WordWrap
+
+                    Connections {
+                        target: rootPopup.licensesController
+
+                        onLicenseLimitationReached: {
+                            errorMessage.visible = true
+                        }
+                    }
+
+                    text: rootPopup.licensesController ? rootPopup.licensesController.errorMessageWhenLicenseFailed : ""
+
+                    color: IngeScapeTheme.orangeColor
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        weight : Font.Medium
+                        pixelSize : 16
                     }
                 }
+            }
 
-                text: rootPopup.licensesController ? rootPopup.licensesController.errorMessageWhenLicenseFailed : ""
 
-                color: IngeScapeTheme.orangeColor
-                font {
-                    family: IngeScapeTheme.textFontFamily
-                    weight : Font.Medium
-                    pixelSize : 16
+
+
+            // Vertical space
+            Item {
+                anchors {
+                    top: errorMessage.bottom
+                    left: parent.left
+                    right: parent.right
                 }
+                height: 10
             }
         }
 
@@ -676,7 +702,7 @@ I2PopupBase {
                     verticalCenter: parent.verticalCenter
                 }
 
-                text: "No license file found.\nThe editor is running in demo mode with limitations.\n\n\n\nTo change this, please set the license directory above,\ndrop a license file here \nor use the \"Import...\" button below."
+                text: "No license file found.\n " + rootPopup.extraInformationOnNoLicense + "\n\n\nTo change this, please set the license directory above,\ndrop a license file here \nor use the \"Import...\" button below."
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
 
@@ -734,9 +760,9 @@ I2PopupBase {
         // Drop Area to add a license from the editor (only when user have no license)
         DropArea {
             id: dropZone
-            anchors.fill: noLicenseContent
+            anchors.fill: content
 
-            enabled: noLicenseContent.visible
+            enabled: true
 
             property bool dragHovering: false
 
@@ -770,7 +796,6 @@ I2PopupBase {
             }
         }
 
-
         // Footer content : Button "OK"
         Item {
             id: footer
@@ -797,7 +822,7 @@ I2PopupBase {
                 width: boundingBox.width
 
                 activeFocusOnPress: true
-                text: rootPopup.allowsOnlyQuit ? qsTr("Quit") : qsTr("OK")
+                text: (rootPopup.allowsOnlyQuit || (rootPopup.licensesController && !rootPopup.licensesController.isLicenseValidForAgentNeeded)) ? qsTr("Quit") : qsTr("OK")
 
                 anchors {
                     verticalCenter: parent.verticalCenter
@@ -822,9 +847,9 @@ I2PopupBase {
                 }
 
                 onClicked: {
-                    if (rootPopup.allowsOnlyQuit)
+                    if (rootPopup.allowsOnlyQuit || (rootPopup.licensesController && !rootPopup.licensesController.isLicenseValidForAgentNeeded))
                     {
-//                        console.info("QML: QUIT on License Popup")
+                        console.info("QML: QUIT on License Popup")
 
                         // Quit our application (close the main window)
                         Qt.quit();

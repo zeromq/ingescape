@@ -76,7 +76,9 @@ void onLicenseCallback(igs_license_limit_t limit, void *myData)
 LicensesController::LicensesController(QObject *parent) : QObject(parent),
     _licensesPath(""),
     _errorMessageWhenLicenseFailed(""),
-    _mergedLicense(nullptr)
+    _mergedLicense(nullptr),
+    _isLicenseValidForAgentNeeded(false),
+    _licenseForAgentNeeded(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -132,6 +134,10 @@ LicensesController::~LicensesController()
 
     // Clean-up license details
     _licenseDetailsList.deleteAllItems();
+
+    if (_licenseForAgentNeeded != nullptr) {
+        _cleanupLicenseForAgentNeeded();
+    }
 }
 
 
@@ -269,6 +275,7 @@ void LicensesController::refreshLicensesData()
 
     if (globalAgent->license != nullptr)
     {
+
         if (_mergedLicense != nullptr)
         {
             LicenseInformationM* temp = _mergedLicense;
@@ -292,7 +299,29 @@ void LicensesController::refreshLicensesData()
                 detail = static_cast<license_t*>(zlist_next(globalAgent->license->licenseDetails));
             }
         }
+
+        // Check if user's license has a valid license for agent needed
+        _checkLicenseForAgentNeeded();
     }
+}
+
+/**
+ * @brief Set necessary license for agent
+ * @param agentName : agent name that is necessary
+ * @param agentID : agent's ID that must be present in the license
+ */
+void LicensesController::setNecessaryLicenseForAgent(const char * agentName, const char * agentID) {
+    if (_licenseForAgentNeeded != nullptr) {
+        _cleanupLicenseForAgentNeeded();
+    }
+
+    // Update name and id of license for agent
+    _licenseForAgentNeeded = new licenseForAgent_t();
+    _licenseForAgentNeeded->agentName = strdup(agentName);
+    _licenseForAgentNeeded->agentId = strdup(agentID);
+
+    // Check if user's license has a valid license for agent needed
+    _checkLicenseForAgentNeeded();
 }
 
 
@@ -313,6 +342,49 @@ bool LicensesController::_importLicenseFromFile(const QFileInfo& licenseFile)
         }
     }
     return success;
+}
+
+
+/**
+ * @brief Clean up _licenseForAgentNeeded property
+ */
+void LicensesController::_cleanupLicenseForAgentNeeded()
+{
+    if (_licenseForAgentNeeded != nullptr) {
+        // Clean-up previous licenseForAgent_t
+        if (_licenseForAgentNeeded->agentName != nullptr)
+        {
+            free(_licenseForAgentNeeded->agentName);
+            _licenseForAgentNeeded->agentName = nullptr;
+        }
+
+        if (_licenseForAgentNeeded->agentId != nullptr)
+        {
+            free(_licenseForAgentNeeded->agentId);
+            _licenseForAgentNeeded->agentId = nullptr;
+        }
+
+        delete _licenseForAgentNeeded;
+    }
+}
+
+
+/**
+ * @brief Check license for agent needed
+ * @return true on success. false otherwise.
+ */
+bool LicensesController::_checkLicenseForAgentNeeded() {
+    bool agentHandleByLicense = true;
+    if ((_licenseForAgentNeeded != nullptr) && (!igs_checkLicenseForAgent(_licenseForAgentNeeded->agentId))) {
+        seterrorMessageWhenLicenseFailed("No valid license for the agent : " + QString(globalAgent->agentName));
+        agentHandleByLicense = false;
+    }
+    else {
+        seterrorMessageWhenLicenseFailed("");
+        agentHandleByLicense = true;
+    }
+    setisLicenseValidForAgentNeeded(agentHandleByLicense);
+    return agentHandleByLicense;
 }
 
 
