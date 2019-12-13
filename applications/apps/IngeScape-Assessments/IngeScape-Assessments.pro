@@ -62,7 +62,8 @@ SOURCES += main.cpp \
     controller/assessmentsmodelmanager.cpp \
     model/task/agentnameandoutputsm.cpp \
     sortFilter/areagentsinplatformfilter.cpp \
-    sortFilter/aresubjectandprotocolinsessionfilter.cpp
+    sortFilter/aresubjectandprotocolinsessionfilter.cpp \
+    model/recordassessmentm.cpp
 
 
 HEADERS += \
@@ -89,7 +90,8 @@ HEADERS += \
     controller/assessmentsmodelmanager.h \
     model/task/agentnameandoutputsm.h \
     sortFilter/areagentsinplatformfilter.h \
-    sortFilter/aresubjectandprotocolinsessionfilter.h
+    sortFilter/aresubjectandprotocolinsessionfilter.h\
+    model/recordassessmentm.h
 
 
 RESOURCES += qml.qrc

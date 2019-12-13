@@ -168,6 +168,7 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
 
     connect(_networkC, &NetworkController::recordStartedReceived, _experimentationC, &ExperimentationController::onRecordStartedReceived );
     connect(_networkC, &NetworkController::recordStoppedReceived, _experimentationC, &ExperimentationController::onRecordStoppedReceived );
+    connect(_networkC, &NetworkController::addedRecordReceived, _experimentationC, &ExperimentationController::onRecordAddedReceived );
 
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::definitionReceived, ingeScapeModelManager, &IngeScapeModelManager::onDefinitionReceived);
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::mappingReceived, ingeScapeModelManager, &IngeScapeModelManager::onMappingReceived);

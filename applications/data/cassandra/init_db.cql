@@ -9,6 +9,7 @@ CREATE KEYSPACE ingescape WITH replication = {'class': 'SimpleStrategy', 'replic
 CREATE TABLE ingescape.record (id timeuuid, id_experimentation timeuuid, year_month_day date, time_of_day time, end_time time, end_date date, name_record text, offset_tl bigint,
 platform text, id_task_instance timeuuid, PRIMARY KEY (id)) WITH gc_grace_seconds = 0;
 CREATE INDEX ON ingescape.record (id_experimentation);
+CREATE INDEX ON ingescape.record (id_task_instance);
 
 CREATE TABLE ingescape.event (time timeuuid, year_month_day date, time_of_day time, agent text, output text, type tinyint, id_record timeuuid, PRIMARY KEY (id_record, time) ) WITH CLUSTERING ORDER BY (time ASC) AND gc_grace_seconds = 0;
 CREATE TABLE ingescape.int (time timeuuid, id_record timeuuid, value int, PRIMARY KEY (id_record, time)) WITH CLUSTERING ORDER BY (time ASC) AND gc_grace_seconds = 0;

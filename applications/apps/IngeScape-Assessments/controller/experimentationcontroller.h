@@ -222,6 +222,12 @@ public Q_SLOTS:
      */
     void onRecordStoppedReceived();
 
+    /**
+     * @brief Slot called when a record is added
+     * @param model
+     */
+    void onRecordAddedReceived(QString message);
+
 private Q_SLOTS:
 
     /**

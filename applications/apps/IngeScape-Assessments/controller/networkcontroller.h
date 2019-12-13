@@ -56,6 +56,11 @@ Q_SIGNALS:
      */
     void recordStoppedReceived(QString peerId);
 
+    /**
+     * @brief Signal emitted when the "Recorder app" added to record
+     */
+    void addedRecordReceived(QString message);
+
 
 
 public Q_SLOTS:
