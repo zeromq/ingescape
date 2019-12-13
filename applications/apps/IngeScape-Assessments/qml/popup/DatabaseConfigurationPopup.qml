@@ -31,6 +31,7 @@ AssessmentsPopupBase {
 
     title: "DATABASE CONFIGURATION"
 
+    canExitPopup : (AssessmentsModelC && AssessmentsModelC.isConnectedToDatabase)
 
     //--------------------------------------------------------
     //
@@ -147,7 +148,6 @@ AssessmentsPopupBase {
             }
         }
 
-
         Rectangle {
             id: stateFeedback
 
@@ -189,8 +189,6 @@ AssessmentsPopupBase {
 
             //visible: (text.length !== 0)
         }
-
-
     }
 
 
@@ -214,6 +212,9 @@ AssessmentsPopupBase {
 
             height: boundingBox.height
             width: boundingBox.width
+
+
+            visible: (AssessmentsModelC && AssessmentsModelC.isConnectedToDatabase) // To prevent user to pass through the error
 
             activeFocusOnPress: true
 
@@ -258,10 +259,10 @@ AssessmentsPopupBase {
 
             activeFocusOnPress: true
 
-            enabled: AssessmentsModelC && (AssessmentsModelC.databaseAddress !== txtDatabaseAddress.text)
+            enabled: AssessmentsModelC && ((AssessmentsModelC.databaseAddress !== txtDatabaseAddress.text) || (!AssessmentsModelC.isConnectedToDatabase))
 
             style: IngeScapeAssessmentsButtonStyle {
-                text: "OK"
+                text: "Connect"
             }
 
             onClicked: {
@@ -278,13 +279,18 @@ AssessmentsPopupBase {
                         console.log("QML: Connected to the Cassandra database on " + AssessmentsModelC.databaseAddress);
 
                         // Close the popup
-                        //rootPopup.close();
+                        rootPopup.close();
                     }
                     else
                     {
                         console.warn("QML: Could not connect to the Cassandra database on " + AssessmentsModelC.databaseAddress);
                     }
                 }
+            }
+
+            onPressedChanged: {
+                stateFeedback.visible = !pressed;
+                textStateMessage.visible = !pressed;
             }
         }
     }

@@ -41,8 +41,12 @@ I2PopupBase {
 
     // Popup title
     property alias title: titleText.text
+
     // Show the title ?
     property var showPopupTitle: true
+
+    // Can user close the popup ?
+    property bool canExitPopup : true
 
 
     //--------------------------------------------------------
@@ -98,6 +102,8 @@ I2PopupBase {
 
             height: 20
             width: 20
+
+            visible: rootPopup.canExitPopup
 
             style: IngeScapeAssessmentsSvgButtonStyle {
                 releasedID: "cancel-edition"
