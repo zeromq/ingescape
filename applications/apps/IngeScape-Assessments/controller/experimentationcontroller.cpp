@@ -255,6 +255,28 @@ void ExperimentationController::onRecorderExited(QString peerId, QString peerNam
     }
 }
 
+/**
+ * @brief Slot called when the recorder has started the record
+ */
+void ExperimentationController::onRecordStartedReceived()
+{
+    if(_taskInstanceC != nullptr){
+        setisRecording(true);
+        _taskInstanceC->scenarioC()->playOrResumeTimeLine();
+    }
+}
+
+/**
+ * @brief Slot called when the recorder has stopped the record
+ */
+void ExperimentationController::onRecordStoppedReceived()
+{
+    qDebug() << "Record STOPPED" ;
+    if(_taskInstanceC != nullptr){
+        setisRecording(false);
+        _taskInstanceC->scenarioC()->stopTimeLine();
+    }
+}
 
 /**
  * @brief Slot called when the current experimentation changed
@@ -639,12 +661,6 @@ void ExperimentationController::stopToRecord()
         // Send the message "Stop Record" to the recorder
         IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerIdOfRecorder, command_StopRecord);
 
-        if (_taskInstanceC->scenarioC())
-        {
-            // FIXME TODO: wait "prefix_RecordStopped"
-            setisRecording(false);
-            _taskInstanceC->scenarioC()->pauseTimeLine();
-        }
     }
     else {
         qWarning() << "Recording is already stopped or recorder is not launched";

@@ -211,6 +211,17 @@ public Q_SLOTS:
     void onRecorderExited(QString peerId, QString peerName);
 
 
+    /**
+     * @brief Slot called when the recorder has started to record
+     * @param state
+     */
+    void onRecordStartedReceived();
+
+    /**
+     * @brief Slot called when the recorder has stopped the record
+     */
+    void onRecordStoppedReceived();
+
 private Q_SLOTS:
 
     /**

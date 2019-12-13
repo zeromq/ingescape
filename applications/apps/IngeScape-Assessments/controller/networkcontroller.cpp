@@ -100,8 +100,23 @@ void NetworkController::_onShoutedMessageReceived(QString peerId, QString peerNa
  */
 void NetworkController::_onWhisperedMessageReceived(QString peerId, QString peerName, QString message)
 {
-    qDebug() << "Not yet managed WHISPERED message '" << message << "' for agent" << peerName << "(" << peerId << ")";
+
+    /// The "Recorder app" Started to record
+    if (message.startsWith(prefix_RecordStarted))
+    {
+        qInfo() << prefix_RecordStarted;
+
+        Q_EMIT recordStartedReceived(peerId);
+    }else if (message.startsWith(prefix_RecordStopped))
+    {
+        qInfo() << prefix_RecordStopped;
+
+        Q_EMIT recordStoppedReceived(peerId);
+    }else{
+        qDebug() << "Not yet managed WHISPERED message '" << message << "' for agent" << peerName << "(" << peerId << ")";
+    }
 }
+
 
 
 /**
@@ -115,4 +130,5 @@ void NetworkController::_onWhisperedMessageReceived(QString peerId, QString peer
 {
     qDebug() << "Not yet managed WHISPERED message '" << messagePart1 << "+" << messageOthersParts << "' for agent" << peerName << "(" << peerId << ")";
 }
+
 
