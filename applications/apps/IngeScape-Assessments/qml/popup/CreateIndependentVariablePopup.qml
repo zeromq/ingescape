@@ -46,12 +46,27 @@ AssessmentsPopupBase {
     // property IndependentVariableValueTypes selectedType
     property int selectedType: -1;
 
-    property var enumTexts: [];
+    property var enumTexts: []
 
     property bool errorDetected: false
     property string errorMessage: ""
     property int errorEnumIndex: -1
 
+    // Our popup is used to edit temporaly independent variable of our tasks controller, after we can :
+    // - create a new independent variable
+    // OR
+    // - edit an existing independent variable
+    property IndependentVariableM independentVariableToEdit: null;
+
+
+    //
+    // Private properties
+    //
+    QtObject {
+        id: rootPrivate
+
+        property string originalName : ""
+    }
 
     //--------------------------------
     //
@@ -60,6 +75,8 @@ AssessmentsPopupBase {
     //
     //
     //--------------------------------
+
+    signal independentVariableIsEdited();
 
 
     //--------------------------------
@@ -71,7 +88,23 @@ AssessmentsPopupBase {
     //--------------------------------
 
     onOpened: {
+        if (rootPopup.independentVariableToEdit)
+        {
+            rootPrivate.originalName = rootPopup.independentVariableToEdit.name;
 
+            // Update controls
+            txtIndependentVariableName.text = rootPopup.independentVariableToEdit.name;
+            txtIndependentVariableDescription.text = rootPopup.independentVariableToEdit.description;
+            spinBoxValuesNumber.value = rootPopup.independentVariableToEdit.enumValues.length;
+
+            rootPopup.selectedType = rootPopup.independentVariableToEdit.valueType;
+            rootPopup.enumTexts = rootPopup.independentVariableToEdit.enumValues;
+        }
+    }
+
+    onClosed: {
+        // Reset all user inputs
+        rootPopup.resetInputs();
     }
 
 
@@ -85,10 +118,11 @@ AssessmentsPopupBase {
     //--------------------------------
 
     //
-    // Reset all user inputs and close the popup
+    // Reset all user inputs
     //
-    function resetInputsAndClosePopup() {
-        //console.log("QML: Reset all user inputs and close popup");
+    function resetInputs()
+    {
+        //console.log("QML: Reset all user inputs");
 
         // Reset all user inputs
         txtIndependentVariableName.text = "";
@@ -103,9 +137,6 @@ AssessmentsPopupBase {
         errorDetected = false
         errorMessage = ""
         errorEnumIndex = -1
-
-        // Close the popup
-        rootPopup.close();
     }
 
 
@@ -541,6 +572,9 @@ AssessmentsPopupBase {
                                         Component.onCompleted: {
                                             // If this index is not defined, initialize it with empty string
                                             if (typeof rootPopup.enumTexts[index] === 'undefined') {
+
+                                                console.log("undefined at " + index);
+
                                                 rootPopup.enumTexts[index] = "";
                                             }
                                         }
@@ -656,8 +690,8 @@ AssessmentsPopupBase {
             }
 
             onClicked: {
-                // Reset all user inputs and close the popup
-                rootPopup.resetInputsAndClosePopup();
+                // Close the popup
+                rootPopup.close();
             }
         }
 
@@ -676,13 +710,15 @@ AssessmentsPopupBase {
 
             activeFocusOnPress: true
 
-            enabled: if (rootPopup.taskController && (txtIndependentVariableName.text.length > 0) && (rootPopup.selectedType > -1))
+            enabled: if ((txtIndependentVariableName.text.length > 0) && (rootPopup.selectedType > -1))
                      {
-                         rootPopup.taskController.canCreateIndependentVariableWithName(txtIndependentVariableName.text);
+                         ((txtIndependentVariableName.text === rootPrivate.originalName) // Same name that when we opened the popup
+                         || rootPopup.taskController.canCreateIndependentVariableWithName(txtIndependentVariableName.text)); // No other independent variable with the same name
                      }
                      else {
                          false;
                      }
+
 
             style: IngeScapeAssessmentsButtonStyle {
                 text: "OK"
@@ -691,13 +727,15 @@ AssessmentsPopupBase {
             onClicked: {
                 if (rootPopup.taskController)
                 {
-                    // Selected type is ENUM
+                    var displayedEnumTexts = undefined;
+
+                    // Selected type is ENUM, get values of enum
                     if (rootPopup.selectedType === IndependentVariableValueTypes.INDEPENDENT_VARIABLE_ENUM)
                     {
                         // Use only the N first elements of the array (the array may be longer than the number of displayed TextFields
                         // if the user decreases the value of the spin box after edition the last TextField)
                         // Where N = spinBoxValuesNumber.value (the value of the spin box)
-                        var displayedEnumTexts = rootPopup.enumTexts.slice(0, spinBoxValuesNumber.value);
+                        displayedEnumTexts = rootPopup.enumTexts.slice(0, spinBoxValuesNumber.value);
 
                         // Clean-up global error status
                         rootPopup.errorDetected = false;
@@ -741,30 +779,25 @@ AssessmentsPopupBase {
                         }
 
                         console.log("QML: Enum with " + spinBoxValuesNumber.value + " strings: " + displayedEnumTexts);
-
-                        if (!rootPopup.errorDetected)
-                        {
-                            //console.log("QML: create a new Independent Variable " + txtIndependentVariableName.text + " of type " + rootPopup.selectedType);
-
-                            rootPopup.taskController.createNewIndependentVariableEnum(txtIndependentVariableName.text,
-                                                                                      txtIndependentVariableDescription.text,
-                                                                                      displayedEnumTexts);
-
-                            // Reset all user inputs and close the popup
-                            rootPopup.resetInputsAndClosePopup();
-                        }
                     }
-                    // Selected type is NOT ENUM
-                    else
+
+                    // Update our model of independent variable
+                    if ((!rootPopup.errorDetected) && (rootPopup.independentVariableToEdit))
                     {
-                        //console.log("QML: create a new Independent Variable " + txtIndependentVariableName.text + " of type " + rootPopup.selectedType);
+                        rootPopup.independentVariableToEdit.name = txtIndependentVariableName.text;
+                        rootPopup.independentVariableToEdit.description = txtIndependentVariableDescription.text;
+                        independentVariableToEdit.valueType = rootPopup.selectedType;
 
-                        rootPopup.taskController.createNewIndependentVariable(txtIndependentVariableName.text,
-                                                                              txtIndependentVariableDescription.text,
-                                                                              rootPopup.selectedType);
+                        // Update enum values only if independent variable is an enum
+                        if (displayedEnumTexts) {
+                            rootPopup.independentVariableToEdit.enumValues = displayedEnumTexts;
+                        }
 
-                        // Reset all user inputs and close the popup
-                        rootPopup.resetInputsAndClosePopup();
+                        // Close the popup
+                        rootPopup.close();
+
+                        // Emit the signal "Independent variable is edited"
+                        rootPopup.independentVariableIsEdited();
                     }
                 }
             }

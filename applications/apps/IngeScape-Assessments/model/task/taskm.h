@@ -51,9 +51,6 @@ class TaskM : public QObject
     // Found in the platform (JSON file) of our task
     I2_QOBJECT_HASHMODEL(AgentNameAndOutputsM, hashFromAgentNameToSimplifiedAgent)
 
-    // Temporary independent variable used for edition rollbacks
-    I2_QML_PROPERTY(IndependentVariableM*, temporaryIndependentVariable)
-
     // Temporary dependent variable used for edition rollbacks
     I2_QML_PROPERTY(DependentVariableM*, temporaryDependentVariable)
 
@@ -176,26 +173,11 @@ public:
 
 
     /**
-     * @brief Initialize the temporary independent variable with the given independent variable
-     * @param baseVariable
-     */
-    Q_INVOKABLE void initTemporaryIndependentVariable(IndependentVariableM* baseVariable);
-
-
-    /**
      * @brief Apply the values from the temporary dependent variable to the given dependent variable.
      * Update said dependent variable into the Cassandra DB
      * @param variableToUpdate
      */
     Q_INVOKABLE void applyTemporaryDependentVariable(DependentVariableM* variableToUpdate);
-
-
-    /**
-     * @brief Apply the values from the temporary independent variable to the given independent variable.
-     * Update said independent variable into the Cassandra DB
-     * @param variableToUpdate
-     */
-    Q_INVOKABLE void applyTemporaryIndependentVariable(IndependentVariableM* variableToUpdate);
 
 
     /**

@@ -24,8 +24,8 @@ import INGESCAPE 1.0
 Rectangle {
     id: rootItem
 
-    // Task model the current dependent variable is in
-    property var taskModel: null
+    // Model of protocol that contains our model of dependent variable
+    property TaskM protocol: null
 
     // Current model of dependent variable
     property var dependentVariableModel: null
@@ -46,6 +46,17 @@ Rectangle {
     color: rootItem.isCurrentlyEditing ? IngeScapeTheme.lightGreyColor
                                        : (rootItem.isMouseHovering ? IngeScapeTheme.veryLightGreyColor
                                                                    : IngeScapeTheme.whiteColor)
+
+
+    //--------------------------------
+    //
+    //
+    // Signals
+    //
+    //
+    //--------------------------------
+
+    signal editAsked();
 
 
     //--------------------------------------------------------
@@ -109,8 +120,8 @@ Rectangle {
                     margins: 5
                 }
 
-                text: rootItem.taskModel && rootItem.taskModel.temporaryDependentVariable
-                      ? rootItem.taskModel.temporaryDependentVariable.name
+                text: rootItem.protocol && rootItem.protocol.temporaryDependentVariable
+                      ? rootItem.protocol.temporaryDependentVariable.name
                       : ""
                 visible: rootItem.isCurrentlyEditing
 
@@ -135,9 +146,9 @@ Rectangle {
                 }
 
                 onTextChanged: {
-                    if (rootItem.taskModel && rootItem.taskModel.temporaryDependentVariable)
+                    if (rootItem.protocol && rootItem.protocol.temporaryDependentVariable)
                     {
-                        rootItem.taskModel.temporaryDependentVariable.name = text
+                        rootItem.protocol.temporaryDependentVariable.name = text
                     }
                 }
             }
@@ -186,8 +197,8 @@ Rectangle {
                     margins: 5
                 }
 
-                text: rootItem.taskModel && rootItem.taskModel.temporaryDependentVariable
-                      ? rootItem.taskModel.temporaryDependentVariable.description
+                text: rootItem.protocol && rootItem.protocol.temporaryDependentVariable
+                      ? rootItem.protocol.temporaryDependentVariable.description
                       : ""
                 visible: rootItem.isCurrentlyEditing
 
@@ -212,9 +223,9 @@ Rectangle {
                 }
 
                 onTextChanged: {
-                    if (rootItem.taskModel && rootItem.taskModel.temporaryDependentVariable)
+                    if (rootItem.protocol && rootItem.protocol.temporaryDependentVariable)
                     {
-                        rootItem.taskModel.temporaryDependentVariable.description = text
+                        rootItem.protocol.temporaryDependentVariable.description = text
                     }
                 }
             }
@@ -260,7 +271,7 @@ Rectangle {
             I2ComboboxStringList {
                 id: agentComboboxEditor
 
-                model: rootItem.taskModel ? rootItem.taskModel.hashFromAgentNameToSimplifiedAgent.keys : []
+                model: rootItem.protocol ? rootItem.protocol.hashFromAgentNameToSimplifiedAgent.keys : []
 
                 anchors {
                     fill: parent
@@ -280,20 +291,20 @@ Rectangle {
                 Binding {
                     target: agentComboboxEditor
                     property: "selectedItem"
-                    value: rootItem.taskModel && rootItem.taskModel.temporaryDependentVariable ? rootItem.taskModel.temporaryDependentVariable.agentName : ""
+                    value: rootItem.protocol && rootItem.protocol.temporaryDependentVariable ? rootItem.protocol.temporaryDependentVariable.agentName : ""
                 }
 
                 onSelectedItemChanged: {
-                    if (agentComboboxEditor.selectedItem && rootItem.taskModel && rootItem.taskModel.temporaryDependentVariable)
+                    if (agentComboboxEditor.selectedItem && rootItem.protocol && rootItem.protocol.temporaryDependentVariable)
                     {
-                        rootItem.taskModel.temporaryDependentVariable.agentName = agentComboboxEditor.selectedItem
+                        rootItem.protocol.temporaryDependentVariable.agentName = agentComboboxEditor.selectedItem
                     }
                 }
 
                 onVisibleChanged: {
-                    if (visible && rootItem.taskModel && rootItem.taskModel.temporaryDependentVariable)
+                    if (visible && rootItem.protocol && rootItem.protocol.temporaryDependentVariable)
                     {
-                        var index = agentComboboxEditor.model.indexOf(rootItem.taskModel.temporaryDependentVariable.agentName);
+                        var index = agentComboboxEditor.model.indexOf(rootItem.protocol.temporaryDependentVariable.agentName);
                         if (index > -1) {
                             agentComboboxEditor.selectedIndex = index;
                         }
@@ -342,10 +353,10 @@ Rectangle {
             I2ComboboxStringList {
                 id: outputComboboxEditor
 
-                model: rootItem.taskModel && rootItem.taskModel.temporaryDependentVariable
-                       && (rootItem.taskModel.temporaryDependentVariable.agentName.length > 0)
-                       && rootItem.taskModel.hashFromAgentNameToSimplifiedAgent.containsKey(rootItem.taskModel.temporaryDependentVariable.agentName)
-                       ? rootItem.taskModel.hashFromAgentNameToSimplifiedAgent.value(rootItem.taskModel.temporaryDependentVariable.agentName).outputNamesList
+                model: rootItem.protocol && rootItem.protocol.temporaryDependentVariable
+                       && (rootItem.protocol.temporaryDependentVariable.agentName.length > 0)
+                       && rootItem.protocol.hashFromAgentNameToSimplifiedAgent.containsKey(rootItem.protocol.temporaryDependentVariable.agentName)
+                       ? rootItem.protocol.hashFromAgentNameToSimplifiedAgent.value(rootItem.protocol.temporaryDependentVariable.agentName).outputNamesList
                        : []
 
                 anchors {
@@ -366,20 +377,20 @@ Rectangle {
                 Binding {
                     target: outputComboboxEditor
                     property: "selectedItem"
-                    value: rootItem.taskModel && rootItem.taskModel.temporaryDependentVariable ? rootItem.taskModel.temporaryDependentVariable.outputName : ""
+                    value: rootItem.protocol && rootItem.protocol.temporaryDependentVariable ? rootItem.protocol.temporaryDependentVariable.outputName : ""
                 }
 
                 onSelectedItemChanged: {
-                    if (outputComboboxEditor.selectedItem && rootItem.taskModel && rootItem.taskModel.temporaryDependentVariable)
+                    if (outputComboboxEditor.selectedItem && rootItem.protocol && rootItem.protocol.temporaryDependentVariable)
                     {
-                        rootItem.taskModel.temporaryDependentVariable.outputName = outputComboboxEditor.selectedItem
+                        rootItem.protocol.temporaryDependentVariable.outputName = outputComboboxEditor.selectedItem
                     }
                 }
 
                 onVisibleChanged: {
-                    if (visible && rootItem.taskModel && rootItem.taskModel.temporaryDependentVariable)
+                    if (visible && rootItem.protocol && rootItem.protocol.temporaryDependentVariable)
                     {
-                        var index = outputComboboxEditor.model.indexOf(rootItem.taskModel.temporaryDependentVariable.outputName);
+                        var index = outputComboboxEditor.model.indexOf(rootItem.protocol.temporaryDependentVariable.outputName);
                         if (index > -1) {
                             outputComboboxEditor.selectedIndex = index;
                         }
@@ -416,9 +427,9 @@ Rectangle {
             }
 
             onClicked: {
-                if (rootItem.taskModel && rootItem.dependentVariableModel)
+                if (rootItem.protocol && rootItem.dependentVariableModel)
                 {
-                    rootItem.taskModel.applyTemporaryDependentVariable(rootItem.dependentVariableModel);
+                    rootItem.protocol.applyTemporaryDependentVariable(rootItem.dependentVariableModel);
                 }
 
                 rootItem.isCurrentlyEditing = false
@@ -477,9 +488,12 @@ Rectangle {
             }
 
             onClicked: {
-                if (rootItem.taskModel && rootItem.dependentVariableModel)
+                if (rootItem.protocol && rootItem.dependentVariableModel)
                 {
-                    rootItem.taskModel.initTemporaryDependentVariable(rootItem.dependentVariableModel)
+                    rootItem.protocol.initTemporaryDependentVariable(rootItem.dependentVariableModel)
+
+                    // Emit the signal
+                    rootItem.editAsked();
                 }
 
                 rootItem.isCurrentlyEditing = true
@@ -507,9 +521,9 @@ Rectangle {
                     rootItem.taskController.deleteDependentVariable(rootItem.dependentVariableModel)
                 }*/
 
-                if (rootItem.taskModel && rootItem.dependentVariableModel)
+                if (rootItem.protocol && rootItem.dependentVariableModel)
                 {
-                    rootItem.taskModel.deleteDependentVariable(rootItem.dependentVariableModel)
+                    rootItem.protocol.deleteDependentVariable(rootItem.dependentVariableModel)
                 }
             }
         }

@@ -23,12 +23,16 @@
  */
 TasksController::TasksController(QObject *parent) : QObject(parent),
     _currentExperimentation(nullptr),
-    _selectedTask(nullptr)
+    _selectedTask(nullptr),
+    _temporaryIndependentVariable(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     qInfo() << "New Tasks Controller";
+
+    // Init temporary independent variable as an empty independent variable
+    _temporaryIndependentVariable = new IndependentVariableM(CassUuid(), CassUuid(), CassUuid(), "", "", IndependentVariableValueTypes::UNKNOWN);
 
     // Fill without type "UNKNOWN"
     _allIndependentVariableValueTypes.fillWithAllEnumValues();
@@ -38,7 +42,6 @@ TasksController::TasksController(QObject *parent) : QObject(parent),
     _independentVariableValueTypesWithoutEnum.fillWithAllEnumValues();
     _independentVariableValueTypesWithoutEnum.removeEnumValue(IndependentVariableValueTypes::INDEPENDENT_VARIABLE_ENUM);
     _independentVariableValueTypesWithoutEnum.removeEnumValue(IndependentVariableValueTypes::UNKNOWN);
-
 }
 
 
@@ -57,6 +60,14 @@ TasksController::~TasksController()
     if (_currentExperimentation != nullptr)
     {
         setcurrentExperimentation(nullptr);
+    }
+
+    // Reset the model of the temporary independant variable
+    if (_temporaryIndependentVariable != nullptr)
+    {
+        IndependentVariableM* tmp = _temporaryIndependentVariable;
+        settemporaryIndependentVariable(nullptr);
+        delete tmp;
     }
 }
 
@@ -257,23 +268,15 @@ bool TasksController::canEditIndependentVariableWithName(IndependentVariableM* i
 
 
 /**
- * @brief Create a new independent variable
- * @param independentVariableName
- * @param independentVariableDescription
- * @param nIndependentVariableValueType
+ * @brief Create a new independent variable from the Independent Variable currently edited (stored in _temporaryIndependentVariable)
  */
-void TasksController::createNewIndependentVariable(QString independentVariableName,
-                                                   QString independentVariableDescription,
-                                                   int nIndependentVariableValueType)
+void TasksController::createNewIndependentVariableFromTemporary()
 {
-    if (!independentVariableName.isEmpty() && (nIndependentVariableValueType > -1) && (_selectedTask != nullptr))
-    {
-        IndependentVariableValueTypes::Value independentVariableValueType = static_cast<IndependentVariableValueTypes::Value>(nIndependentVariableValueType);
-
-        qInfo() << "Create new independent variable" << independentVariableName << "of type" << IndependentVariableValueTypes::staticEnumToString(independentVariableValueType);
-
+    // TODO test mieux
+    if ((_temporaryIndependentVariable != nullptr) && (!_temporaryIndependentVariable->name().isEmpty()) && (_selectedTask != nullptr)) {//&& (_temporaryIndependentVariable->valueType() > -1)) {
         // Create and insert the new independent variable
-        IndependentVariableM* independentVariable = _insertIndependentVariableIntoDB(_selectedTask->getExperimentationCassUuid(), _selectedTask->getCassUuid(), independentVariableName, independentVariableDescription, independentVariableValueType, {});
+        IndependentVariableM* independentVariable = _insertIndependentVariableIntoDB(_selectedTask->getExperimentationCassUuid(), _selectedTask->getCassUuid(), _temporaryIndependentVariable->name(),
+                                                                                     _temporaryIndependentVariable->description(), _temporaryIndependentVariable->valueType(), _temporaryIndependentVariable->enumValues());
         if (independentVariable != nullptr)
         {
             // Add the independent variable to the selected task
@@ -284,76 +287,22 @@ void TasksController::createNewIndependentVariable(QString independentVariableNa
 
 
 /**
- * @brief Create a new independent variable of type enum
- * @param independentVariableName
- * @param independentVariableDescription
- * @param enumValues
- */
-void TasksController::createNewIndependentVariableEnum(QString independentVariableName,
-                                                       QString independentVariableDescription,
-                                                       QStringList enumValues)
-{
-    if (!independentVariableName.isEmpty() && !enumValues.isEmpty() && (_selectedTask != nullptr))
-    {
-        qInfo() << "Create new independent variable" << independentVariableName << "of type" << IndependentVariableValueTypes::staticEnumToString(IndependentVariableValueTypes::INDEPENDENT_VARIABLE_ENUM) << "with values:" << enumValues;
-
-        // Create the new independent variable
-        IndependentVariableM* independentVariable = _insertIndependentVariableIntoDB(_selectedTask->getExperimentationCassUuid(), _selectedTask->getCassUuid(), independentVariableName, independentVariableDescription, IndependentVariableValueTypes::INDEPENDENT_VARIABLE_ENUM, enumValues);
-        if (independentVariable != nullptr)
-        {
-            // Add the independent variable to the selected task
-            _selectedTask->addIndependentVariable(independentVariable);
-        }
-    }
-}
-
-
-/**
- * @brief Save the modifications of the Independent Variable currently edited
+ * @brief Save the modifications of the Independent Variable currently edited (stored in _temporaryIndependentVariable)
  * @param independentVariableCurrentlyEdited
- * @param independentVariableName
- * @param independentVariableDescription
- * @param nIndependentVariableValueType
  */
-void TasksController::saveModificationsOfIndependentVariable(IndependentVariableM* independentVariableCurrentlyEdited,
-                                                             QString independentVariableName,
-                                                             QString independentVariableDescription,
-                                                             int nIndependentVariableValueType)
+void TasksController::saveModificationsOfIndependentVariableFromTemporary(IndependentVariableM* independentVariableCurrentlyEdited)
 {
-    if ((independentVariableCurrentlyEdited != nullptr) && !independentVariableName.isEmpty() && (nIndependentVariableValueType > -1) && (_selectedTask != nullptr))
+    // TODO test mieux
+    if ((independentVariableCurrentlyEdited != nullptr) && (_temporaryIndependentVariable != nullptr) && (!_temporaryIndependentVariable->name().isEmpty()))
     {
-        IndependentVariableValueTypes::Value independentVariableValueType = static_cast<IndependentVariableValueTypes::Value>(nIndependentVariableValueType);
+//        qInfo() << "Edit independent variable" << independentVariableName << "of type" << IndependentVariableValueTypes::staticEnumToString(independentVariableValueType);
 
-        qInfo() << "Edit independent variable" << independentVariableName << "of type" << IndependentVariableValueTypes::staticEnumToString(independentVariableValueType);
+        independentVariableCurrentlyEdited->setname(_temporaryIndependentVariable->name());
+        independentVariableCurrentlyEdited->setdescription(_temporaryIndependentVariable->description());
+        independentVariableCurrentlyEdited->setvalueType(_temporaryIndependentVariable->valueType());
+        independentVariableCurrentlyEdited->setenumValues(_temporaryIndependentVariable->enumValues());
 
-        independentVariableCurrentlyEdited->setname(independentVariableName);
-        independentVariableCurrentlyEdited->setdescription(independentVariableDescription);
-        independentVariableCurrentlyEdited->setvalueType(independentVariableValueType);
-        independentVariableCurrentlyEdited->setenumValues(QStringList());
-    }
-}
-
-
-/**
- * @brief Save the modifications of the Independent Variable (of type enum) currently edited
- * @param independentVariableCurrentlyEdited
- * @param independentVariableName
- * @param independentVariableDescription
- * @param enumValues
- */
-void TasksController::saveModificationsOfIndependentVariableEnum(IndependentVariableM* independentVariableCurrentlyEdited,
-                                                                 QString independentVariableName,
-                                                                 QString independentVariableDescription,
-                                                                 QStringList enumValues)
-{
-    if ((independentVariableCurrentlyEdited != nullptr) && !independentVariableName.isEmpty() && !enumValues.isEmpty() && (_selectedTask != nullptr))
-    {
-        qInfo() << "Edit independent variable" << independentVariableName << "of type" << IndependentVariableValueTypes::staticEnumToString(IndependentVariableValueTypes::INDEPENDENT_VARIABLE_ENUM) << "with values:" << enumValues;
-
-        independentVariableCurrentlyEdited->setname(independentVariableName);
-        independentVariableCurrentlyEdited->setdescription(independentVariableDescription);
-        independentVariableCurrentlyEdited->setvalueType(IndependentVariableValueTypes::INDEPENDENT_VARIABLE_ENUM);
-        independentVariableCurrentlyEdited->setenumValues(enumValues);
+        AssessmentsModelManager::update(*independentVariableCurrentlyEdited);
     }
 }
 
@@ -545,4 +494,25 @@ DependentVariableM* TasksController::_insertDependentVariableIntoDB(CassUuid exp
     }
 
     return dependentVariable;
+}
+
+/**
+ * @brief Initialize the temporary independent variable with the given independent variable TODO COMPLETE
+ * @param baseVariable
+ */
+void TasksController::initTemporaryIndependentVariable(IndependentVariableM* baseVariable)
+{
+    if ((_temporaryIndependentVariable != nullptr) && (baseVariable != nullptr))
+    {
+        _temporaryIndependentVariable->setname(baseVariable->name());
+        _temporaryIndependentVariable->setdescription(baseVariable->description());
+        _temporaryIndependentVariable->setvalueType(baseVariable->valueType());
+        _temporaryIndependentVariable->setenumValues(baseVariable->enumValues());
+    }
+    else {
+        _temporaryIndependentVariable->setname("");
+        _temporaryIndependentVariable->setdescription("");
+        _temporaryIndependentVariable->setvalueType(IndependentVariableValueTypes::UNKNOWN);
+        _temporaryIndependentVariable->setenumValues({});
+    }
 }

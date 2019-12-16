@@ -44,7 +44,6 @@ TaskM::TaskM(const CassUuid& experimentationUuid, const CassUuid& uid, const QSt
     , _name(name)
     , _platformFileUrl(QUrl())
     , _platformFileName("")
-    , _temporaryIndependentVariable(nullptr)
     , _temporaryDependentVariable(nullptr)
     , _cassExperimentationUuid(experimentationUuid)
     , _cassUuid(uid)
@@ -54,8 +53,7 @@ TaskM::TaskM(const CassUuid& experimentationUuid, const CassUuid& uid, const QSt
 
     setplatformFileUrl(platformFile);
 
-    // Create the temporary Independent & Dependent variables
-    _temporaryIndependentVariable = new IndependentVariableM(CassUuid(), CassUuid(), CassUuid(), "", "", IndependentVariableValueTypes::UNKNOWN);
+    // Create the temporary Dependent variable
     _temporaryDependentVariable = new DependentVariableM(CassUuid(), CassUuid(), CassUuid(), "", "", "", "");
 
     qInfo() << "New Model of Task" << _name;
@@ -74,12 +72,6 @@ TaskM::~TaskM()
     _dependentVariables.deleteAllItems();
     _hashFromAgentNameToSimplifiedAgent.deleteAllItems();
 
-    if (_temporaryIndependentVariable != nullptr)
-    {
-        IndependentVariableM* tmp = _temporaryIndependentVariable;
-        settemporaryIndependentVariable(nullptr);
-        delete tmp;
-    }
     if (_temporaryDependentVariable != nullptr)
     {
         DependentVariableM* tmp = _temporaryDependentVariable;
@@ -284,22 +276,6 @@ void TaskM::initTemporaryDependentVariable(DependentVariableM* baseVariable)
 
 
 /**
- * @brief Initialize the temporary independent variable with the given independent variable
- * @param baseVariable
- */
-void TaskM::initTemporaryIndependentVariable(IndependentVariableM* baseVariable)
-{
-    if ((_temporaryIndependentVariable != nullptr) && (baseVariable != nullptr))
-    {
-        _temporaryIndependentVariable->setname(baseVariable->name());
-        _temporaryIndependentVariable->setdescription(baseVariable->description());
-        _temporaryIndependentVariable->setvalueType(baseVariable->valueType());
-        _temporaryIndependentVariable->setenumValues(baseVariable->enumValues());
-    }
-}
-
-
-/**
  * @brief Apply the values from the temporary dependent variable to the givend dependent variable.
  * Update said dependent variable into the Cassandra DB
  * @param variableToUpdate
@@ -312,25 +288,6 @@ void TaskM::applyTemporaryDependentVariable(DependentVariableM* variableToUpdate
         variableToUpdate->setdescription(_temporaryDependentVariable->description());
         variableToUpdate->setagentName(_temporaryDependentVariable->agentName());
         variableToUpdate->setoutputName(_temporaryDependentVariable->outputName());
-
-        AssessmentsModelManager::update(*variableToUpdate);
-    }
-}
-
-
-/**
- * @brief Apply the values from the temporary independent variable to the given independent variable.
- * Update said independent variable into the Cassandra DB
- * @param variableToUpdate
- */
-void TaskM::applyTemporaryIndependentVariable(IndependentVariableM* variableToUpdate)
-{
-    if ((variableToUpdate != nullptr) && (_temporaryIndependentVariable != nullptr))
-    {
-        variableToUpdate->setname(_temporaryIndependentVariable->name());
-        variableToUpdate->setdescription(_temporaryIndependentVariable->description());
-        variableToUpdate->setvalueType(_temporaryIndependentVariable->valueType());
-        variableToUpdate->setenumValues(_temporaryIndependentVariable->enumValues());
 
         AssessmentsModelManager::update(*variableToUpdate);
     }

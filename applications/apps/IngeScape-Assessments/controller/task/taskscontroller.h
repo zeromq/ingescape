@@ -41,6 +41,9 @@ class TasksController : public QObject
     // Model of the selected task
     I2_QML_PROPERTY_DELETE_PROOF(TaskM*, selectedTask)
 
+    // Temporary independent variable used for edition rollbacks
+    I2_QML_PROPERTY(IndependentVariableM*, temporaryIndependentVariable)
+
 
 public:
 
@@ -117,51 +120,16 @@ public:
 
 
     /**
-     * @brief Create a new independent variable
-     * @param independentVariableName
-     * @param independentVariableDescription
-     * @param nIndependentVariableValueType
+     * @brief Create a new independent variable from the Independent Variable currently edited (stored in _temporaryIndependentVariable)
      */
-    Q_INVOKABLE void createNewIndependentVariable(QString independentVariableName,
-                                                  QString independentVariableDescription,
-                                                  int nIndependentVariableValueType);
+    Q_INVOKABLE void createNewIndependentVariableFromTemporary();
 
 
     /**
-     * @brief Create a new independent variable of type enum
-     * @param independentVariableName
-     * @param independentVariableDescription
-     * @param enumValues
-     */
-    Q_INVOKABLE void createNewIndependentVariableEnum(QString independentVariableName,
-                                                      QString independentVariableDescription,
-                                                      QStringList enumValues);
-
-
-    /**
-     * @brief Save the modifications of the Independent Variable currently edited
+     * @brief Save the modifications of the Independent Variable currently edited (stored in _temporaryIndependentVariable)
      * @param independentVariableCurrentlyEdited
-     * @param independentVariableName
-     * @param independentVariableDescription
-     * @param nIndependentVariableValueType
      */
-    Q_INVOKABLE void saveModificationsOfIndependentVariable(IndependentVariableM* independentVariableCurrentlyEdited,
-                                                            QString independentVariableName,
-                                                            QString independentVariableDescription,
-                                                            int nIndependentVariableValueType);
-
-
-    /**
-     * @brief Save the modifications of the Independent Variable (of type enum) currently edited
-     * @param independentVariableCurrentlyEdited
-     * @param independentVariableName
-     * @param independentVariableDescription
-     * @param enumValues
-     */
-    Q_INVOKABLE void saveModificationsOfIndependentVariableEnum(IndependentVariableM* independentVariableCurrentlyEdited,
-                                                                QString independentVariableName,
-                                                                QString independentVariableDescription,
-                                                                QStringList enumValues);
+    Q_INVOKABLE void saveModificationsOfIndependentVariableFromTemporary(IndependentVariableM* independentVariableCurrentlyEdited);
 
 
     /**
@@ -191,6 +159,12 @@ public:
     // FIXME Unused
     //Q_INVOKABLE void deleteDependentVariable(DependentVariableM* dependentVariable);
 
+
+    /**
+     * @brief Initialize the temporary independent variable with the given independent variable
+     * @param baseVariable
+     */
+    Q_INVOKABLE void initTemporaryIndependentVariable(IndependentVariableM* baseVariable);
 
 private:
 
