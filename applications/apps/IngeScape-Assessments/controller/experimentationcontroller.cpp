@@ -144,18 +144,17 @@ void ExperimentationController::openSession(TaskInstanceM* session)
 
         if (_isRecorderON && session->recordsList()->isEmpty())
         {
-            // FIXME TODO: get the list of records for this session from the data base
-            //session->getCassUuid()
-            //_currentExperimentation->getCassUuid()
+            // Get the list of record
+                QList<RecordAssessmentM*> recordList = AssessmentsModelManager::select<RecordAssessmentM>({session->getCassUuid() });
+                session->recordsList()->append(recordList);
 
-            //session->recordsList()->append();
+                igs_info("%i records on current task", session->recordsList()->count());
         }
 
         // Update the current task instance
         _taskInstanceC->setcurrentTaskInstance(session);
     }
 }
-
 
 /**
  * @brief Delete a task instance
@@ -255,6 +254,77 @@ void ExperimentationController::onRecorderExited(QString peerId, QString peerNam
     }
 }
 
+/**
+ * @brief Slot called when the recorder has started the record
+ */
+void ExperimentationController::onRecordStartedReceived()
+{
+    if(_taskInstanceC != nullptr){
+        setisRecording(true);
+        _taskInstanceC->scenarioC()->playOrResumeTimeLine();
+    }
+}
+
+/**
+ * @brief Slot called when the recorder has stopped the record
+ */
+void ExperimentationController::onRecordStoppedReceived()
+{
+    qDebug() << "Record STOPPED" ;
+    if(_taskInstanceC != nullptr){
+        setisRecording(false);
+        _taskInstanceC->scenarioC()->stopTimeLine();
+    }
+}
+
+/**
+ * @brief Slot called when a record is added : create a record and add it to the currentSession
+ * @param model
+ */
+void ExperimentationController::onRecordAddedReceived(QString message){
+
+    if (_taskInstanceC != nullptr && _taskInstanceC->currentTaskInstance() != nullptr){
+        if (!message.isEmpty())
+        {
+            QByteArray byteArrayOfJson = message.toUtf8();
+
+            QJsonDocument jsonAgentDefinition = QJsonDocument::fromJson(byteArrayOfJson);
+            if (jsonAgentDefinition.isObject())
+            {
+                QJsonDocument jsonFileRoot = QJsonDocument::fromJson(byteArrayOfJson);
+                QJsonValue recordsValue = jsonFileRoot.object().value("Records");
+
+                if (recordsValue.isArray())
+                {
+                    for (QJsonValue jsonValue : recordsValue.toArray())
+                    {
+                        if (jsonValue.isObject())
+                        {
+                            QJsonObject jsonRecord = jsonValue.toObject();
+
+                            QJsonValue jsonId = jsonRecord.value("id");
+                            QJsonValue jsonName = jsonRecord.value("name_record");
+                            QJsonValue jsonBeginDateTime = jsonRecord.value("time_beg");
+                            QJsonValue jsonEndDateTime = jsonRecord.value("time_end");
+
+                            if (jsonName.isString() && jsonId.isString())
+                            {
+                                // Create record
+                                RecordAssessmentM* record = new RecordAssessmentM(jsonId.toString(),
+                                                              jsonName.toString(),
+                                                              QDateTime::fromSecsSinceEpoch(static_cast<int>(jsonBeginDateTime.toDouble())),
+                                                              QDateTime::fromSecsSinceEpoch(static_cast<int>(jsonEndDateTime.toDouble())));
+                                _taskInstanceC->currentTaskInstance()->recordsList()->append(record);
+
+                                qInfo() << "Number of record " << _taskInstanceC->currentTaskInstance()->recordsList()->count();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+};
 
 /**
  * @brief Slot called when the current experimentation changed
@@ -639,12 +709,6 @@ void ExperimentationController::stopToRecord()
         // Send the message "Stop Record" to the recorder
         IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerIdOfRecorder, command_StopRecord);
 
-        if (_taskInstanceC->scenarioC())
-        {
-            // FIXME TODO: wait "prefix_RecordStopped"
-            setisRecording(false);
-            _taskInstanceC->scenarioC()->pauseTimeLine();
-        }
     }
     else {
         qWarning() << "Recording is already stopped or recorder is not launched";

@@ -49,13 +49,18 @@ Q_SIGNALS:
     /**
      * @brief Signal emitted when the "Recorder app" started to record
      */
-    //void recordStartedReceived();
-
+    void recordStartedReceived(QString peerId);
 
     /**
      * @brief Signal emitted when the "Recorder app" stopped to record
      */
-    //void recordStoppedReceived();
+    void recordStoppedReceived(QString peerId);
+
+    /**
+     * @brief Signal emitted when the "Recorder app" added to record
+     */
+    void addedRecordReceived(QString message);
+
 
 
 public Q_SLOTS:

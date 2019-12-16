@@ -21,7 +21,7 @@
 #include <model/subject/subjectm.h>
 #include <model/task/taskm.h>
 #include <model/assessmentsenums.h>
-#include <model/recordm.h>
+#include <model/recordassessmentm.h>
 
 
 /**
@@ -58,7 +58,7 @@ class TaskInstanceM : public QObject
     I2_QML_PROPERTY_READONLY(QQmlPropertyMap*, mapIndependentVariableValues)
 
     // List of records of our session
-    I2_QOBJECT_LISTMODEL(RecordM, recordsList)
+    I2_QOBJECT_LISTMODEL(RecordAssessmentM, recordsList)
 
     // Flag indicating if our session is recorded
     I2_QML_PROPERTY(bool, isRecorded)
