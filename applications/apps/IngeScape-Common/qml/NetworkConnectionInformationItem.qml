@@ -106,7 +106,7 @@ I2CustomRectangle {
         property bool canAutoCloseEditionMode: false
 
         // Boolean indicating if we must highlight our component
-        property bool mustBeHighlighted : !root.isEditionModeOpened && contentMouseArea.enabled && contentMouseArea.containsMouse
+        property bool mustBeHighlighted : !root.isEditionModeOpened && contentMouseArea.enabled && contentMouseArea.containsMouse && !contentMouseArea.pressed
 
         // Flag indicating if some network devices are available
         property bool networkDevicesAvailable : root.listOfNetworkDevices.length > 0

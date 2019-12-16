@@ -77,7 +77,7 @@ LicensesController::LicensesController(QObject *parent) : QObject(parent),
     _licensesPath(""),
     _errorMessageWhenLicenseFailed(""),
     _mergedLicense(nullptr),
-    _isLicenseValidForAgentNeeded(false),
+    _isLicenseValidForAgentNeeded(true),
     _licenseForAgentNeeded(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -301,7 +301,9 @@ void LicensesController::refreshLicensesData()
         }
 
         // Check if user's license has a valid license for agent needed
-        _checkLicenseForAgentNeeded();
+        if (_licenseForAgentNeeded != nullptr) {
+            _checkLicenseForAgentNeeded();
+        }
     }
 }
 

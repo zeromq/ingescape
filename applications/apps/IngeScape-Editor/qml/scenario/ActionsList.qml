@@ -460,6 +460,16 @@ Item {
 
                             visible: !mouseArea.drag.active
 
+                            isLicenseValid: false
+
+                            //
+                            // Slot on signal "On Unlicensed Action"
+                            //
+                            onUnlicensedAction : {
+                                console.log("Receive signal");
+                                // Transmit signal
+                                rootItem.unlicensedAction();
+                            }
 
                             //
                             // Slot on signal "Need Confirmation to Delete Action"
