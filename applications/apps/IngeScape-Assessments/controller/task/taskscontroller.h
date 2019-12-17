@@ -44,6 +44,8 @@ class TasksController : public QObject
     // Temporary independent variable used for edition rollbacks
     I2_QML_PROPERTY(IndependentVariableM*, temporaryIndependentVariable)
 
+    // Temporary dependent variable used for edition rollbacks
+    I2_QML_PROPERTY(DependentVariableM*, temporaryDependentVariable)
 
 public:
 
@@ -140,31 +142,38 @@ public:
 
 
     /**
-     * @brief Create a new dependent variable
-     * @param dependentVariableName
-     * @param dependentVariableDescription
-     * @param agentName
-     * @param outputName
+     * @brief Create a new dependent variable from the Dependent Variable currently edited (stored in _temporaryDependentVariable)
      */
-    Q_INVOKABLE void createNewDependentVariable(QString dependentVariableName,
-                                                QString dependentVariableDescription,
-                                                QString agentName,
-                                                QString outputName);
+    Q_INVOKABLE void createNewDependentVariableFromTemporary();
+
+
+    /**
+     * @brief Save the modifications of the Dependent Variable currently edited (stored in _temporaryDependentVariable)
+     * @param independentVariableCurrentlyEdited
+     */
+    Q_INVOKABLE void saveModificationsOfDependentVariableFromTemporary(DependentVariableM* dependentVariableCurrentlyEdited);
 
 
     /**
      * @brief Delete an dependent variable
      * @param dependentVariable
      */
-    // FIXME Unused
-    //Q_INVOKABLE void deleteDependentVariable(DependentVariableM* dependentVariable);
+    Q_INVOKABLE void deleteDependentVariable(DependentVariableM* dependentVariable);
 
 
     /**
      * @brief Initialize the temporary independent variable with the given independent variable
-     * @param baseVariable
+     * @param baseVariable, if null, init empty temporary independent variable
      */
     Q_INVOKABLE void initTemporaryIndependentVariable(IndependentVariableM* baseVariable);
+
+
+    /**
+     * @brief Initialize the temporary dependent variable with the given dependent variable
+     * @param baseVariable, if null, init empty temporary dependent variable
+     */
+    Q_INVOKABLE void initTemporaryDependentVariable(DependentVariableM* baseVariable);
+
 
 private:
 

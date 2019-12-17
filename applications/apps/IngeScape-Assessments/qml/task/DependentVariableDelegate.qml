@@ -24,8 +24,11 @@ import INGESCAPE 1.0
 Rectangle {
     id: rootItem
 
+    // Task controller
+    property var taskController: null
+
     // Model of protocol that contains our model of dependent variable
-    property TaskM protocol: null
+//    property TaskM protocol: null
 
     // Current model of dependent variable
     property var dependentVariableModel: null
@@ -34,7 +37,7 @@ Rectangle {
     property bool isMouseHovering: itemMouseArea.containsMouse || editDepVarButton.containsMouse || deleteDepVarButton.containsMouse
 
     // Flag indicating if the current dependent variable is being edited
-    property bool isCurrentlyEditing: false
+//    property bool isCurrentlyEditing: false
 
     // List with all the column widths
     property var columnWidths: []
@@ -103,7 +106,7 @@ Rectangle {
                 text: rootItem.dependentVariableModel ? rootItem.dependentVariableModel.name : ""
 
                 verticalAlignment: Text.AlignVCenter
-                visible: !rootItem.isCurrentlyEditing
+//                visible: !rootItem.isCurrentlyEditing
 
                 elide: Text.ElideRight
                 color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
@@ -114,44 +117,44 @@ Rectangle {
                 }
             }
 
-            TextField {
-                anchors {
-                    fill: parent
-                    margins: 5
-                }
+//            TextField {
+//                anchors {
+//                    fill: parent
+//                    margins: 5
+//                }
 
-                text: rootItem.protocol && rootItem.protocol.temporaryDependentVariable
-                      ? rootItem.protocol.temporaryDependentVariable.name
-                      : ""
-                visible: rootItem.isCurrentlyEditing
+//                text: rootItem.protocol && rootItem.protocol.temporaryDependentVariable
+//                      ? rootItem.protocol.temporaryDependentVariable.name
+//                      : ""
+//                visible: rootItem.isCurrentlyEditing
 
-                style: I2TextFieldStyle {
-                    backgroundColor: IngeScapeTheme.whiteColor
-                    borderColor: IngeScapeTheme.lightGreyColor
-                    borderErrorColor: IngeScapeTheme.redColor
-                    radiusTextBox: 5
-                    borderWidth: 0
-                    borderWidthActive: 1
-                    textIdleColor: IngeScapeAssessmentsTheme.regularDarkBlueHeader
-                    textDisabledColor: IngeScapeTheme.veryLightGreyColor
+//                style: I2TextFieldStyle {
+//                    backgroundColor: IngeScapeTheme.whiteColor
+//                    borderColor: IngeScapeTheme.lightGreyColor
+//                    borderErrorColor: IngeScapeTheme.redColor
+//                    radiusTextBox: 5
+//                    borderWidth: 0
+//                    borderWidthActive: 1
+//                    textIdleColor: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+//                    textDisabledColor: IngeScapeTheme.veryLightGreyColor
 
-                    padding.left: 10
-                    padding.right: 5
+//                    padding.left: 10
+//                    padding.right: 5
 
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        weight: Font.Medium
-                        pixelSize: 16
-                    }
-                }
+//                    font {
+//                        family: IngeScapeTheme.textFontFamily
+//                        weight: Font.Medium
+//                        pixelSize: 16
+//                    }
+//                }
 
-                onTextChanged: {
-                    if (rootItem.protocol && rootItem.protocol.temporaryDependentVariable)
-                    {
-                        rootItem.protocol.temporaryDependentVariable.name = text
-                    }
-                }
-            }
+//                onTextChanged: {
+//                    if (rootItem.protocol && rootItem.protocol.temporaryDependentVariable)
+//                    {
+//                        rootItem.protocol.temporaryDependentVariable.name = text
+//                    }
+//                }
+//            }
         }
 
 
@@ -181,7 +184,7 @@ Rectangle {
                 text: rootItem.dependentVariableModel ? rootItem.dependentVariableModel.description : ""
 
                 verticalAlignment: Text.AlignVCenter
-                visible: !rootItem.isCurrentlyEditing
+//                visible: !rootItem.isCurrentlyEditing
 
                 elide: Text.ElideRight
                 color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
@@ -191,44 +194,44 @@ Rectangle {
                 }
             }
 
-            TextField {
-                anchors {
-                    fill: parent
-                    margins: 5
-                }
+//            TextField {
+//                anchors {
+//                    fill: parent
+//                    margins: 5
+//                }
 
-                text: rootItem.protocol && rootItem.protocol.temporaryDependentVariable
-                      ? rootItem.protocol.temporaryDependentVariable.description
-                      : ""
-                visible: rootItem.isCurrentlyEditing
+//                text: rootItem.protocol && rootItem.protocol.temporaryDependentVariable
+//                      ? rootItem.protocol.temporaryDependentVariable.description
+//                      : ""
+//                visible: rootItem.isCurrentlyEditing
 
-                style: I2TextFieldStyle {
-                    backgroundColor: IngeScapeTheme.whiteColor
-                    borderColor: IngeScapeTheme.lightGreyColor
-                    borderErrorColor: IngeScapeTheme.redColor
-                    radiusTextBox: 5
-                    borderWidth: 0
-                    borderWidthActive: 1
-                    textIdleColor: IngeScapeAssessmentsTheme.regularDarkBlueHeader
-                    textDisabledColor: IngeScapeTheme.veryLightGreyColor
+//                style: I2TextFieldStyle {
+//                    backgroundColor: IngeScapeTheme.whiteColor
+//                    borderColor: IngeScapeTheme.lightGreyColor
+//                    borderErrorColor: IngeScapeTheme.redColor
+//                    radiusTextBox: 5
+//                    borderWidth: 0
+//                    borderWidthActive: 1
+//                    textIdleColor: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+//                    textDisabledColor: IngeScapeTheme.veryLightGreyColor
 
-                    padding.left: 10
-                    padding.right: 5
+//                    padding.left: 10
+//                    padding.right: 5
 
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        weight: Font.Medium
-                        pixelSize: 16
-                    }
-                }
+//                    font {
+//                        family: IngeScapeTheme.textFontFamily
+//                        weight: Font.Medium
+//                        pixelSize: 16
+//                    }
+//                }
 
-                onTextChanged: {
-                    if (rootItem.protocol && rootItem.protocol.temporaryDependentVariable)
-                    {
-                        rootItem.protocol.temporaryDependentVariable.description = text
-                    }
-                }
-            }
+//                onTextChanged: {
+//                    if (rootItem.protocol && rootItem.protocol.temporaryDependentVariable)
+//                    {
+//                        rootItem.protocol.temporaryDependentVariable.description = text
+//                    }
+//                }
+//            }
         }
 
 
@@ -258,7 +261,7 @@ Rectangle {
                 text: rootItem.dependentVariableModel ? rootItem.dependentVariableModel.agentName : ""
 
                 verticalAlignment: Text.AlignVCenter
-                visible: !rootItem.isCurrentlyEditing
+//                visible: !rootItem.isCurrentlyEditing
 
                 elide: Text.ElideRight
                 color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
@@ -268,49 +271,49 @@ Rectangle {
                 }
             }
 
-            I2ComboboxStringList {
-                id: agentComboboxEditor
+//            I2ComboboxStringList {
+//                id: agentComboboxEditor
 
-                model: rootItem.protocol ? rootItem.protocol.hashFromAgentNameToSimplifiedAgent.keys : []
+//                model: rootItem.protocol ? rootItem.protocol.hashFromAgentNameToSimplifiedAgent.keys : []
 
-                anchors {
-                    fill: parent
-                    margins: 5
-                }
-                visible: rootItem.isCurrentlyEditing
+//                anchors {
+//                    fill: parent
+//                    margins: 5
+//                }
+//                visible: rootItem.isCurrentlyEditing
 
-                style: IngeScapeAssessmentsComboboxStyle {
-                    frameVisible: false
-                    listBackgroundColorIdle: IngeScapeTheme.veryLightGreyColor
-                }
-                scrollViewStyle: IngeScapeAssessmentsScrollViewStyle {
-                    scrollBarSize: 4
-                    verticalScrollbarMargin: 2
-                }
+//                style: IngeScapeAssessmentsComboboxStyle {
+//                    frameVisible: false
+//                    listBackgroundColorIdle: IngeScapeTheme.veryLightGreyColor
+//                }
+//                scrollViewStyle: IngeScapeAssessmentsScrollViewStyle {
+//                    scrollBarSize: 4
+//                    verticalScrollbarMargin: 2
+//                }
 
-                Binding {
-                    target: agentComboboxEditor
-                    property: "selectedItem"
-                    value: rootItem.protocol && rootItem.protocol.temporaryDependentVariable ? rootItem.protocol.temporaryDependentVariable.agentName : ""
-                }
+//                Binding {
+//                    target: agentComboboxEditor
+//                    property: "selectedItem"
+//                    value: rootItem.protocol && rootItem.protocol.temporaryDependentVariable ? rootItem.protocol.temporaryDependentVariable.agentName : ""
+//                }
 
-                onSelectedItemChanged: {
-                    if (agentComboboxEditor.selectedItem && rootItem.protocol && rootItem.protocol.temporaryDependentVariable)
-                    {
-                        rootItem.protocol.temporaryDependentVariable.agentName = agentComboboxEditor.selectedItem
-                    }
-                }
+//                onSelectedItemChanged: {
+//                    if (agentComboboxEditor.selectedItem && rootItem.protocol && rootItem.protocol.temporaryDependentVariable)
+//                    {
+//                        rootItem.protocol.temporaryDependentVariable.agentName = agentComboboxEditor.selectedItem
+//                    }
+//                }
 
-                onVisibleChanged: {
-                    if (visible && rootItem.protocol && rootItem.protocol.temporaryDependentVariable)
-                    {
-                        var index = agentComboboxEditor.model.indexOf(rootItem.protocol.temporaryDependentVariable.agentName);
-                        if (index > -1) {
-                            agentComboboxEditor.selectedIndex = index;
-                        }
-                    }
-                }
-            }
+//                onVisibleChanged: {
+//                    if (visible && rootItem.protocol && rootItem.protocol.temporaryDependentVariable)
+//                    {
+//                        var index = agentComboboxEditor.model.indexOf(rootItem.protocol.temporaryDependentVariable.agentName);
+//                        if (index > -1) {
+//                            agentComboboxEditor.selectedIndex = index;
+//                        }
+//                    }
+//                }
+//            }
         }
 
 
@@ -340,7 +343,7 @@ Rectangle {
                 text: rootItem.dependentVariableModel ? rootItem.dependentVariableModel.outputName : ""
 
                 verticalAlignment: Text.AlignVCenter
-                visible: !rootItem.isCurrentlyEditing
+//                visible: !rootItem.isCurrentlyEditing
 
                 elide: Text.ElideRight
                 color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
@@ -350,114 +353,113 @@ Rectangle {
                 }
             }
 
-            I2ComboboxStringList {
-                id: outputComboboxEditor
+//            I2ComboboxStringList {
+//                id: outputComboboxEditor
 
-                model: rootItem.protocol && rootItem.protocol.temporaryDependentVariable
-                       && (rootItem.protocol.temporaryDependentVariable.agentName.length > 0)
-                       && rootItem.protocol.hashFromAgentNameToSimplifiedAgent.containsKey(rootItem.protocol.temporaryDependentVariable.agentName)
-                       ? rootItem.protocol.hashFromAgentNameToSimplifiedAgent.value(rootItem.protocol.temporaryDependentVariable.agentName).outputNamesList
-                       : []
+//                model: rootItem.protocol && rootItem.protocol.temporaryDependentVariable
+//                       && (rootItem.protocol.temporaryDependentVariable.agentName.length > 0)
+//                       && rootItem.protocol.hashFromAgentNameToSimplifiedAgent.containsKey(rootItem.protocol.temporaryDependentVariable.agentName)
+//                       ? rootItem.protocol.hashFromAgentNameToSimplifiedAgent.value(rootItem.protocol.temporaryDependentVariable.agentName).outputNamesList
+//                       : []
 
-                anchors {
-                    fill: parent
-                    margins: 5
-                }
-                visible: rootItem.isCurrentlyEditing
+//                anchors {
+//                    fill: parent
+//                    margins: 5
+//                }
+//                visible: rootItem.isCurrentlyEditing
 
-                style: IngeScapeAssessmentsComboboxStyle {
-                    frameVisible: false
-                    listBackgroundColorIdle: IngeScapeTheme.veryLightGreyColor
-                }
-                scrollViewStyle: IngeScapeAssessmentsScrollViewStyle {
-                    scrollBarSize: 4
-                    verticalScrollbarMargin: 2
-                }
+//                style: IngeScapeAssessmentsComboboxStyle {
+//                    frameVisible: false
+//                    listBackgroundColorIdle: IngeScapeTheme.veryLightGreyColor
+//                }
+//                scrollViewStyle: IngeScapeAssessmentsScrollViewStyle {
+//                    scrollBarSize: 4
+//                    verticalScrollbarMargin: 2
+//                }
 
-                Binding {
-                    target: outputComboboxEditor
-                    property: "selectedItem"
-                    value: rootItem.protocol && rootItem.protocol.temporaryDependentVariable ? rootItem.protocol.temporaryDependentVariable.outputName : ""
-                }
+//                Binding {
+//                    target: outputComboboxEditor
+//                    property: "selectedItem"
+//                    value: rootItem.protocol && rootItem.protocol.temporaryDependentVariable ? rootItem.protocol.temporaryDependentVariable.outputName : ""
+//                }
 
-                onSelectedItemChanged: {
-                    if (outputComboboxEditor.selectedItem && rootItem.protocol && rootItem.protocol.temporaryDependentVariable)
-                    {
-                        rootItem.protocol.temporaryDependentVariable.outputName = outputComboboxEditor.selectedItem
-                    }
-                }
+//                onSelectedItemChanged: {
+//                    if (outputComboboxEditor.selectedItem && rootItem.protocol && rootItem.protocol.temporaryDependentVariable)
+//                    {
+//                        rootItem.protocol.temporaryDependentVariable.outputName = outputComboboxEditor.selectedItem
+//                    }
+//                }
 
-                onVisibleChanged: {
-                    if (visible && rootItem.protocol && rootItem.protocol.temporaryDependentVariable)
-                    {
-                        var index = outputComboboxEditor.model.indexOf(rootItem.protocol.temporaryDependentVariable.outputName);
-                        if (index > -1) {
-                            outputComboboxEditor.selectedIndex = index;
-                        }
-                    }
-                }
-            }
+//                onVisibleChanged: {
+//                    if (visible && rootItem.protocol && rootItem.protocol.temporaryDependentVariable)
+//                    {
+//                        var index = outputComboboxEditor.model.indexOf(rootItem.protocol.temporaryDependentVariable.outputName);
+//                        if (index > -1) {
+//                            outputComboboxEditor.selectedIndex = index;
+//                        }
+//                    }
+//                }
+//            }
         }
-
     }
 
 
     //
     // Buttons Apply / Cancel
     //
-    Row {
-        spacing: 10
+//    Row {
+//        spacing: 10
 
-        anchors {
-            right: parent.right
-            rightMargin: 0
-            verticalCenter: parent.verticalCenter
-        }
+//        anchors {
+//            right: parent.right
+//            rightMargin: 0
+//            verticalCenter: parent.verticalCenter
+//        }
 
-        Button {
-            id: aplpyEditionButton
-            height: 30
-            width: 86
+//        Button {
+//            id: aplpyEditionButton
+//            height: 30
+//            width: 86
 
-            opacity: rootItem.isCurrentlyEditing ? 1 : 0
-            enabled: opacity > 0
+//            opacity: rootItem.isCurrentlyEditing ? 1 : 0
+//            enabled: opacity > 0
 
-            style: IngeScapeAssessmentsButtonStyle {
-                text: "APPLY"
-            }
+//            style: IngeScapeAssessmentsButtonStyle {
+//                text: "APPLY"
+//            }
 
-            onClicked: {
-                if (rootItem.protocol && rootItem.dependentVariableModel)
-                {
-                    rootItem.protocol.applyTemporaryDependentVariable(rootItem.dependentVariableModel);
-                }
+//            onClicked: {
+//                if (rootItem.protocol && rootItem.dependentVariableModel)
+//                {
+//                    rootItem.protocol.applyTemporaryDependentVariable(rootItem.dependentVariableModel);
+//                }
 
-                rootItem.isCurrentlyEditing = false
-            }
-        }
+//                rootItem.isCurrentlyEditing = false
+//            }
+//        }
 
-        Button {
-            id: cancelEditionButton
-            anchors {
-                verticalCenter: parent.verticalCenter
-            }
+//        Button {
+//            id: cancelEditionButton
+//            anchors {
+//                verticalCenter: parent.verticalCenter
+//            }
 
-            height: 18
-            width: 18
+//            height: 18
+//            width: 18
 
-            opacity: rootItem.isCurrentlyEditing ? 1 : 0
-            enabled: opacity > 0
+//            opacity: rootItem.isCurrentlyEditing ? 1 : 0
+//            enabled: opacity > 0
 
-            style: IngeScapeAssessmentsSvgButtonStyle {
-                releasedID: "cancel-edition"
-                disabledID: releasedID
-            }
+//            style: IngeScapeAssessmentsSvgButtonStyle {
+//                releasedID: "cancel-edition"
+//                disabledID: releasedID
+//            }
 
-            onClicked: {
-                rootItem.isCurrentlyEditing = false
-            }
-        }
-    }
+//            onClicked: {
+//                rootItem.isCurrentlyEditing = false
+//            }
+//        }
+//    }
 
 
     //
@@ -488,15 +490,10 @@ Rectangle {
             }
 
             onClicked: {
-                if (rootItem.protocol && rootItem.dependentVariableModel)
-                {
-                    rootItem.protocol.initTemporaryDependentVariable(rootItem.dependentVariableModel)
+                // Emit the signal
+                rootItem.editAsked();
 
-                    // Emit the signal
-                    rootItem.editAsked();
-                }
-
-                rootItem.isCurrentlyEditing = true
+                // rootItem.isCurrentlyEditing = true
             }
         }
 
@@ -516,14 +513,9 @@ Rectangle {
             }
 
             onClicked: {
-                /*if (rootItem.taskController && rootItem.dependentVariableModel)
+                if (rootItem.taskController && rootItem.dependentVariableModel)
                 {
                     rootItem.taskController.deleteDependentVariable(rootItem.dependentVariableModel)
-                }*/
-
-                if (rootItem.protocol && rootItem.dependentVariableModel)
-                {
-                    rootItem.protocol.deleteDependentVariable(rootItem.dependentVariableModel)
                 }
             }
         }
@@ -539,7 +531,8 @@ Rectangle {
             bottom: parent.bottom
         }
         height: 2
-        color: rootItem.isCurrentlyEditing ? IngeScapeTheme.lightGreyColor : IngeScapeTheme.veryLightGreyColor
+//        color: rootItem.isCurrentlyEditing ? IngeScapeTheme.lightGreyColor : IngeScapeTheme.veryLightGreyColor
+        color: IngeScapeTheme.veryLightGreyColor
     }
 }
 

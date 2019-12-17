@@ -68,6 +68,7 @@ AssessmentsPopupBase {
         property string originalName : ""
     }
 
+
     //--------------------------------
     //
     //
@@ -90,6 +91,7 @@ AssessmentsPopupBase {
     onOpened: {
         if (rootPopup.independentVariableToEdit)
         {
+            // Save name at the origin to know if it is already set
             rootPrivate.originalName = rootPopup.independentVariableToEdit.name;
 
             // Update controls
@@ -106,7 +108,6 @@ AssessmentsPopupBase {
         // Reset all user inputs
         rootPopup.resetInputs();
     }
-
 
 
     //--------------------------------
@@ -145,7 +146,6 @@ AssessmentsPopupBase {
     // Content
     //
     //--------------------------------
-
 
     Item {
         id: rowName
@@ -710,10 +710,10 @@ AssessmentsPopupBase {
 
             activeFocusOnPress: true
 
-            enabled: if ((txtIndependentVariableName.text.length > 0) && (rootPopup.selectedType > -1))
+            enabled: if ((txtIndependentVariableName.text.length > 0) && (rootPopup.selectedType > 0))
                      {
-                         ((txtIndependentVariableName.text === rootPrivate.originalName) // Same name that when we opened the popup
-                         || rootPopup.taskController.canCreateIndependentVariableWithName(txtIndependentVariableName.text)); // No other independent variable with the same name
+                         ((txtIndependentVariableName.text === rootPrivate.originalName) // Same name that when we opened the popup : "edition" mode
+                         || (rootPopup.taskController && rootPopup.taskController.canCreateIndependentVariableWithName(txtIndependentVariableName.text))); // No other independent variable with the same name
                      }
                      else {
                          false;
@@ -784,6 +784,8 @@ AssessmentsPopupBase {
                     // Update our model of independent variable
                     if ((!rootPopup.errorDetected) && (rootPopup.independentVariableToEdit))
                     {
+                        console.log("QML: Edit an Independent Variable " + txtIndependentVariableName.text);
+
                         rootPopup.independentVariableToEdit.name = txtIndependentVariableName.text;
                         rootPopup.independentVariableToEdit.description = txtIndependentVariableDescription.text;
                         independentVariableToEdit.valueType = rootPopup.selectedType;
@@ -793,11 +795,11 @@ AssessmentsPopupBase {
                             rootPopup.independentVariableToEdit.enumValues = displayedEnumTexts;
                         }
 
-                        // Close the popup
-                        rootPopup.close();
-
                         // Emit the signal "Independent variable is edited"
                         rootPopup.independentVariableIsEdited();
+
+                        // Close the popup
+                        rootPopup.close();
                     }
                 }
             }

@@ -24,15 +24,17 @@
 TasksController::TasksController(QObject *parent) : QObject(parent),
     _currentExperimentation(nullptr),
     _selectedTask(nullptr),
-    _temporaryIndependentVariable(nullptr)
+    _temporaryIndependentVariable(nullptr),
+    _temporaryDependentVariable(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     qInfo() << "New Tasks Controller";
 
-    // Init temporary independent variable as an empty independent variable
+    // Init temporary independent and dependant variable as empty variables
     _temporaryIndependentVariable = new IndependentVariableM(CassUuid(), CassUuid(), CassUuid(), "", "", IndependentVariableValueTypes::UNKNOWN);
+    _temporaryDependentVariable = new DependentVariableM(CassUuid(), CassUuid(), CassUuid(), "", "", "", "");
 
     // Fill without type "UNKNOWN"
     _allIndependentVariableValueTypes.fillWithAllEnumValues();
@@ -67,6 +69,14 @@ TasksController::~TasksController()
     {
         IndependentVariableM* tmp = _temporaryIndependentVariable;
         settemporaryIndependentVariable(nullptr);
+        delete tmp;
+    }
+
+    // Reset the model of the temporary dependant variable
+    if (_temporaryDependentVariable != nullptr)
+    {
+        DependentVariableM* tmp = _temporaryDependentVariable;
+        settemporaryDependentVariable(nullptr);
         delete tmp;
     }
 }
@@ -272,8 +282,8 @@ bool TasksController::canEditIndependentVariableWithName(IndependentVariableM* i
  */
 void TasksController::createNewIndependentVariableFromTemporary()
 {
-    // TODO test mieux
-    if ((_temporaryIndependentVariable != nullptr) && (!_temporaryIndependentVariable->name().isEmpty()) && (_selectedTask != nullptr)) {//&& (_temporaryIndependentVariable->valueType() > -1)) {
+    if ((_temporaryIndependentVariable != nullptr) && (!_temporaryIndependentVariable->name().isEmpty()) && (_selectedTask != nullptr))
+    {
         // Create and insert the new independent variable
         IndependentVariableM* independentVariable = _insertIndependentVariableIntoDB(_selectedTask->getExperimentationCassUuid(), _selectedTask->getCassUuid(), _temporaryIndependentVariable->name(),
                                                                                      _temporaryIndependentVariable->description(), _temporaryIndependentVariable->valueType(), _temporaryIndependentVariable->enumValues());
@@ -292,11 +302,9 @@ void TasksController::createNewIndependentVariableFromTemporary()
  */
 void TasksController::saveModificationsOfIndependentVariableFromTemporary(IndependentVariableM* independentVariableCurrentlyEdited)
 {
-    // TODO test mieux
-    if ((independentVariableCurrentlyEdited != nullptr) && (_temporaryIndependentVariable != nullptr) && (!_temporaryIndependentVariable->name().isEmpty()))
+    if ((independentVariableCurrentlyEdited != nullptr) && (_temporaryIndependentVariable != nullptr) && (!_temporaryIndependentVariable->name().isEmpty())
+            && (AssessmentsModelManager::instance() != nullptr))
     {
-//        qInfo() << "Edit independent variable" << independentVariableName << "of type" << IndependentVariableValueTypes::staticEnumToString(independentVariableValueType);
-
         independentVariableCurrentlyEdited->setname(_temporaryIndependentVariable->name());
         independentVariableCurrentlyEdited->setdescription(_temporaryIndependentVariable->description());
         independentVariableCurrentlyEdited->setvalueType(_temporaryIndependentVariable->valueType());
@@ -342,31 +350,20 @@ void TasksController::deleteIndependentVariable(IndependentVariableM* independen
 
 
 /**
- * @brief Create a new dependent variable
- * @param dependentVariableName
- * @param dependentVariableDescription
- * @param agentName
- * @param outputName
+ * @brief Create a new dependent variable from the Dependent Variable currently edited (stored in _temporaryDependentVariable)
  */
-void TasksController::createNewDependentVariable(QString dependentVariableName,
-                                                 QString dependentVariableDescription,
-                                                 QString agentName,
-                                                 QString outputName)
+void TasksController::createNewDependentVariableFromTemporary()
 {
-    if (!dependentVariableName.isEmpty() && !agentName.isEmpty() && !outputName.isEmpty()
+    if ((_temporaryDependentVariable != nullptr) && (!_temporaryDependentVariable->name().isEmpty()) && (!_temporaryDependentVariable->outputName().isEmpty())
             && (_selectedTask != nullptr) && (AssessmentsModelManager::instance() != nullptr))
     {
-        qInfo() << "Create a new dependent variable" << dependentVariableName << "on output" << outputName << "of agent" << agentName;
-
-        CassUuid dependentVarUuid;
-        cass_uuid_gen_time(AssessmentsModelManager::instance()->getCassUuidGen(), &dependentVarUuid);
-
+        // Create and insert the new dependent variable
         DependentVariableM* dependentVariable = _insertDependentVariableIntoDB(_selectedTask->getExperimentationCassUuid(),
                                                                                _selectedTask->getCassUuid(),
-                                                                               dependentVariableName,
-                                                                               dependentVariableDescription,
-                                                                               agentName,
-                                                                               outputName);
+                                                                               _temporaryDependentVariable->name(),
+                                                                               _temporaryDependentVariable->description(),
+                                                                               _temporaryDependentVariable->agentName(),
+                                                                               _temporaryDependentVariable->outputName());
 
         if (dependentVariable != nullptr)
         {
@@ -378,11 +375,29 @@ void TasksController::createNewDependentVariable(QString dependentVariableName,
 
 
 /**
+ * @brief Save the modifications of the Dependent Variable currently edited (stored in _temporaryDependentVariable)
+ * @param independentVariableCurrentlyEdited
+ */
+void TasksController::saveModificationsOfDependentVariableFromTemporary(DependentVariableM* dependentVariableCurrentlyEdited)
+{
+    if ((dependentVariableCurrentlyEdited != nullptr) && (_temporaryDependentVariable != nullptr) && (!_temporaryDependentVariable->name().isEmpty()))
+    {
+        dependentVariableCurrentlyEdited->setname(_temporaryDependentVariable->name());
+        dependentVariableCurrentlyEdited->setdescription(_temporaryDependentVariable->description());
+        dependentVariableCurrentlyEdited->setagentName(_temporaryDependentVariable->agentName());
+        dependentVariableCurrentlyEdited->setoutputName(_temporaryDependentVariable->outputName());
+
+        AssessmentsModelManager::update(*dependentVariableCurrentlyEdited);
+    }
+}
+
+
+
+/**
  * @brief Delete a dependent variable
  * @param dependentVariable
  */
-// FIXME Unused
-/*void TasksController::deleteDependentVariable(DependentVariableM* dependentVariable)
+void TasksController::deleteDependentVariable(DependentVariableM* dependentVariable)
 {
     if ((dependentVariable != nullptr) && (_selectedTask != nullptr))
     {
@@ -396,7 +411,7 @@ void TasksController::createNewDependentVariable(QString dependentVariableName,
         // Free memory
         delete dependentVariable;
     }
-}*/
+}
 
 
 /**
@@ -497,22 +512,52 @@ DependentVariableM* TasksController::_insertDependentVariableIntoDB(CassUuid exp
 }
 
 /**
- * @brief Initialize the temporary independent variable with the given independent variable TODO COMPLETE
- * @param baseVariable
+ * @brief Initialize the temporary independent variable with the given independent variable
+ * @param baseVariable, if null, init empty temporary independent variable
  */
 void TasksController::initTemporaryIndependentVariable(IndependentVariableM* baseVariable)
 {
-    if ((_temporaryIndependentVariable != nullptr) && (baseVariable != nullptr))
+    if (_temporaryIndependentVariable != nullptr)
     {
-        _temporaryIndependentVariable->setname(baseVariable->name());
-        _temporaryIndependentVariable->setdescription(baseVariable->description());
-        _temporaryIndependentVariable->setvalueType(baseVariable->valueType());
-        _temporaryIndependentVariable->setenumValues(baseVariable->enumValues());
+        if (baseVariable != nullptr)
+        {
+            _temporaryIndependentVariable->setname(baseVariable->name());
+            _temporaryIndependentVariable->setdescription(baseVariable->description());
+            _temporaryIndependentVariable->setvalueType(baseVariable->valueType());
+            _temporaryIndependentVariable->setenumValues(baseVariable->enumValues());
+        }
+        else {
+            _temporaryIndependentVariable->setname("");
+            _temporaryIndependentVariable->setdescription("");
+            _temporaryIndependentVariable->setvalueType(IndependentVariableValueTypes::UNKNOWN);
+            _temporaryIndependentVariable->setenumValues({});
+        }
     }
-    else {
-        _temporaryIndependentVariable->setname("");
-        _temporaryIndependentVariable->setdescription("");
-        _temporaryIndependentVariable->setvalueType(IndependentVariableValueTypes::UNKNOWN);
-        _temporaryIndependentVariable->setenumValues({});
+}
+
+
+/**
+ * @brief Initialize the temporary dependent variable with the given dependent variable
+ * @param baseVariable, if null, init empty temporary dependent variable
+ */
+void TasksController::initTemporaryDependentVariable(DependentVariableM* baseVariable)
+{
+    if (_temporaryDependentVariable != nullptr)
+    {
+        if (baseVariable != nullptr)
+        {
+            qDebug() << "ON INIT " << baseVariable->name();
+            _temporaryDependentVariable->setname(baseVariable->name());
+            _temporaryDependentVariable->setdescription(baseVariable->description());
+            _temporaryDependentVariable->setagentName(baseVariable->agentName());
+            _temporaryDependentVariable->setoutputName(baseVariable->outputName());
+        }
+        else {
+            qDebug() << "ON INIT IS EMPTY";
+            _temporaryDependentVariable->setname("");
+            _temporaryDependentVariable->setdescription("");
+            _temporaryDependentVariable->setagentName("");
+            _temporaryDependentVariable->setoutputName("");
+        }
     }
 }

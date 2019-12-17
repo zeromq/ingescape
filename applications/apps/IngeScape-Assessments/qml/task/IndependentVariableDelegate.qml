@@ -35,7 +35,7 @@ Rectangle {
     property var taskController: null
 
     // Model of protocol that contains our model of independent variable
-    property TaskM protocol: null
+//    property TaskM protocol: null
 
     // Current model of independent variable
     property IndependentVariableM independentVarModel: null
@@ -410,13 +410,8 @@ Rectangle {
             }
 
             onClicked: {
-                if (rootItem.taskController && rootItem.independentVarModel)
-                {
-                    rootItem.taskController.initTemporaryIndependentVariable(rootItem.independentVarModel);
-
-                    // Emit the signal
-                    rootItem.editAsked();
-                }
+                // Emit the signal
+                rootItem.editAsked();
 
                 //rootItem.isCurrentlyEditing = true;
             }

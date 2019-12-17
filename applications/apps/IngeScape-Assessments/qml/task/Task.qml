@@ -39,7 +39,11 @@ Item {
 
     property TaskM modelM: taskController ? taskController.selectedTask : null;
 
+    // Save reference of independent variable that is currently edited
     property IndependentVariableM independentVariableCurrentlyEdited : null;
+
+    // Save reference of dependent variable that is currently edited
+    property DependentVariableM dependentVariableCurrentlyEdited : null;
 
     visible: rootItem.modelM
 
@@ -240,7 +244,7 @@ Item {
                     id: indepVarDelegate
 
                     taskController: rootItem.taskController
-                    protocol: rootItem.modelM
+//                    protocol: rootItem.modelM
                     independentVarModel: model ? model.QtObject : null
                     indepVarEditionInProgress: indepVarTable.indepVarEditionInProgress
 
@@ -256,7 +260,7 @@ Item {
                     }*/
 
                     onEditAsked: {
-                        if (indepVarDelegate.independentVarModel /*&& rootItem.modelM*/)
+                        if (indepVarDelegate.independentVarModel)
                         {
                             //console.log("onEditAsked " + indepVarDelegate.independentVarModel.name);
 
@@ -344,6 +348,11 @@ Item {
             onClicked: {
                 //console.log("QML: New Dependent Variable");
 
+                rootItem.dependentVariableCurrentlyEdited = null;
+
+                // Reset temporary dependent variable to allow creation
+                rootItem.taskController.initTemporaryDependentVariable(null);
+
                 // Open the popup
                 dependentVariablePopup.open();
             }
@@ -429,7 +438,8 @@ Item {
                 delegate: DependentVariableDelegate {
                     id: depVarDelegate
 
-                    protocol: rootItem.modelM
+                    taskController: rootItem.taskController
+//                    protocol: rootItem.modelM
                     dependentVariableModel: model ? model.QtObject : null
                     depVarEditionInProgress: depVarTable.depVarEditionInProgress
 
@@ -438,19 +448,24 @@ Item {
 
                     columnWidths: depVarListHeader.headerColumnWidths
 
-                    Binding {
-                        target: depVarTable
-                        property: "depVarEditionInProgress"
-                        value: depVarDelegate.isCurrentlyEditing
-                    }
+//                    Binding {
+//                        target: depVarTable
+//                        property: "depVarEditionInProgress"
+//                        value: depVarDelegate.isCurrentlyEditing
+//                    }
 
                     onEditAsked: {
                         if (depVarDelegate.dependentVariableModel)
                         {
                             //console.log("onEditAsked " + depVarDelegate.dependentVariableModel.name);
 
+                            // Configure the popup with the temporary Dependent Variable instead of the current variable
+                            // Because the "var enumTexts: []" is automatically binded to the I2_QML_PROPERTY(QStringList, enumValues)
+                            // with the line: enumTexts = dependentVariableToEdit.enumValues;
+                            rootItem.dependentVariableCurrentlyEdited = depVarDelegate.dependentVariableModel;
+                            rootItem.taskController.initTemporaryDependentVariable(depVarDelegate.dependentVariableModel);
+
                             // Open the popup
-                            dependentVariablePopup.dependentVariableCurrentlyEdited = depVarDelegate.dependentVariableModel;
                             dependentVariablePopup.open();
                         }
                     }
@@ -487,13 +502,14 @@ Item {
         independentVariableToEdit: rootItem.taskController.temporaryIndependentVariable
 
         onIndependentVariableIsEdited : {
-            if ((rootItem.taskController) && (rootItem.taskController.temporaryIndependentVariable)) {
+            if (rootItem.taskController)
+            {
                 if (rootItem.independentVariableCurrentlyEdited) {
                     // Edit an existing independent variable
                     rootItem.taskController.saveModificationsOfIndependentVariableFromTemporary(rootItem.independentVariableCurrentlyEdited);
                 }
                 else {
-                    // Create an existing independent variable
+                    // Create an independent variable
                     rootItem.taskController.createNewIndependentVariableFromTemporary();
                 }
             }
@@ -510,6 +526,26 @@ Item {
         layerObjectName: "overlay2Layer"
 
         taskController: rootItem.taskController
+
         protocolM: rootItem.modelM
+
+        dependentVariableToEdit: rootItem.taskController.temporaryDependentVariable
+
+        onDependentVariableIsEdited: {
+            if (rootItem.taskController)
+            {
+                if (rootItem.dependentVariableCurrentlyEdited) {
+                    // Edit an existing dependent variable
+                    console.log("EDIT !" + rootItem.taskController.temporaryDependentVariable.name)
+                    rootItem.taskController.saveModificationsOfDependentVariableFromTemporary(rootItem.dependentVariableCurrentlyEdited);
+                }
+                else {
+                    console.log("CREATE !" + rootItem.taskController.temporaryDependentVariable.name)
+
+                    // Create a dependent variable
+                    rootItem.taskController.createNewDependentVariableFromTemporary();
+                }
+            }
+        }
     }
 }
