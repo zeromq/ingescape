@@ -26,6 +26,9 @@ Item {
     // Model of action
     property var action: null;
 
+    // Indicate if license is valid to perform action on Ingescape action
+    property bool isLicenseValid : true;
+
     // Flag indicating if our action item contains the mouse (rollover)
     property bool actionItemIsHovered: false;
 
@@ -51,6 +54,8 @@ Item {
     // signal emitted when the delete confirmation popup is needed because the action is already used in the platform
     signal needConfirmationToDeleteAction(var action);
 
+    // Signal emitted when the user tries to perform an action forbidden by the license
+    signal unlicensedAction();
 
     //--------------------------------
     //
@@ -274,7 +279,10 @@ Item {
                     }
 
                     onClicked: {
-                        if (rootItem.controller && rootItem.action) {
+                        if (!rootItem.isLicenseValid) {
+                            rootItem.unlicensedAction();
+                        }
+                        else if (rootItem.isLicenseValid && rootItem.controller && rootItem.action) {
                             rootItem.controller.openActionEditorToDuplicateModel(rootItem.action);
                         }
                         popupActionOptions.close();
@@ -331,7 +339,12 @@ Item {
                 disabledID : releasedID
 
                 onClicked: {
-                    popupActionOptions.openInScreen();
+                    if (rootItem.isLicenseValid) {
+                        popupActionOptions.openInScreen();
+                    }
+                    else {
+                        rootItem.unlicensedAction();
+                    }
                 }
             }
 

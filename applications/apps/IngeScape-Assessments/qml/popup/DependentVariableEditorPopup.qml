@@ -46,6 +46,22 @@ AssessmentsPopupBase {
     // Protocol model the new dependent variable will be in
     property TaskM protocolM: null
 
+    // Our popup is used to edit temporaly dependent variable of our tasks controller, after we can :
+    // - create a new dependent variable
+    // OR
+    // - edit an existing dependent variable
+    property DependentVariableM dependentVariableToEdit: null;
+
+
+    //
+    // Private properties
+    //
+    QtObject {
+        id: rootPrivate
+
+        property string originalName : ""
+    }
+
 
     //--------------------------------
     //
@@ -55,6 +71,7 @@ AssessmentsPopupBase {
     //
     //--------------------------------
 
+    signal dependentVariableIsEdited();
 
     //--------------------------------
     //
@@ -65,10 +82,28 @@ AssessmentsPopupBase {
     //--------------------------------
 
     onOpened: {
-        comboBoxAgent.selectedIndex = -1;
-        comboBoxOutput.selectedIndex = -1;
+        if (rootPopup.dependentVariableToEdit)
+        {
+            // Save name at the origin to know if it is already set
+            rootPrivate.originalName = rootPopup.dependentVariableToEdit.name;
+
+            // Update controls
+            txtDependentVariableName.text = rootPopup.dependentVariableToEdit.name;
+            txtDependentVariableDescription.text = rootPopup.dependentVariableToEdit.description;
+
+            comboBoxAgent.selectedIndex = rootPopup.protocolM ? rootPopup.protocolM.hashFromAgentNameToSimplifiedAgent.keys.indexOf(rootPopup.dependentVariableToEdit.agentName)
+                                                              : -1
+
+            comboBoxOutput.selectedIndex = rootPopup.protocolM && comboBoxAgent.selectedItem && rootPopup.protocolM.hashFromAgentNameToSimplifiedAgent.containsKey(comboBoxAgent.selectedItem)
+                                           ? rootPopup.protocolM.hashFromAgentNameToSimplifiedAgent.value(comboBoxAgent.selectedItem).outputNamesList.indexOf(rootPopup.dependentVariableToEdit.outputName)
+                                           : -1
+        }
     }
 
+    onClosed: {
+        // Reset all user inputs
+        rootPopup.resetInputs();
+    }
 
 
     //--------------------------------
@@ -80,19 +115,16 @@ AssessmentsPopupBase {
     //--------------------------------
 
     //
-    // Reset all user inputs and close the popup
+    // Reset all user inputs
     //
-    function resetInputsAndClosePopup() {
-        //console.log("QML: Reset all user inputs and close popup");
+    function resetInputs() {
+        //console.log("QML: Reset all user inputs");
 
         // Reset all user inputs
         txtDependentVariableName.text = "";
         txtDependentVariableDescription.text = "";
         comboBoxAgent.selectedIndex = -1;
         comboBoxOutput.selectedIndex = -1;
-
-        // Close the popup
-        rootPopup.close();
     }
 
 
@@ -372,8 +404,8 @@ AssessmentsPopupBase {
             }
 
             onClicked: {
-                // Reset all user inputs and close the popup
-                rootPopup.resetInputsAndClosePopup();
+                // Close the popup
+                rootPopup.close();
             }
         }
 
@@ -392,30 +424,35 @@ AssessmentsPopupBase {
 
             activeFocusOnPress: true
 
-            enabled: if (rootPopup.taskController && (txtDependentVariableName.text.length > 0) && comboBoxAgent.selectedItem && comboBoxOutput.selectedItem)
+            enabled: if ((txtDependentVariableName.text.length > 0) && comboBoxAgent.selectedItem && comboBoxOutput.selectedItem)
                      {
-                         rootPopup.taskController.canCreateDependentVariableWithName(txtDependentVariableName.text);
+                         ((txtDependentVariableName.text === rootPrivate.originalName) // Same name that when we opened the popup : "edition" mode
+                         || (rootPopup.taskController && rootPopup.taskController.canCreateDependentVariableWithName(txtDependentVariableName.text))); // No other dependent variable with the same name
                      }
                      else {
                          false;
                      }
+
 
             style: IngeScapeAssessmentsButtonStyle {
                 text: "OK"
             }
 
             onClicked: {
-                if (rootPopup.taskController)
+                if (rootPopup.dependentVariableToEdit)
                 {
-                    console.log("QML: create a new Dependent Variable " + txtDependentVariableName.text + " on output " + comboBoxOutput.selectedItem + " of agent " + comboBoxAgent.selectedItem);
+                    console.log("QML: Edit a Dependent Variable " + txtDependentVariableName.text + " on output " + comboBoxOutput.selectedItem + " of agent " + comboBoxAgent.selectedItem);
 
-                    rootPopup.taskController.createNewDependentVariable(txtDependentVariableName.text,
-                                                                        txtDependentVariableDescription.text,
-                                                                        comboBoxAgent.selectedItem,
-                                                                        comboBoxOutput.selectedItem);
+                    rootPopup.dependentVariableToEdit.name = txtDependentVariableName.text;
+                    rootPopup.dependentVariableToEdit.description = txtDependentVariableDescription.text;
+                    rootPopup.dependentVariableToEdit.agentName = comboBoxAgent.selectedItem;
+                    rootPopup.dependentVariableToEdit.outputName = comboBoxOutput.selectedItem;
 
-                    // Reset all user inputs and close the popup
-                    rootPopup.resetInputsAndClosePopup();
+                    // Emit the signal "Dependent variable is edited"
+                    rootPopup.dependentVariableIsEdited();
+
+                    // Close the popup
+                    rootPopup.close();
                 }
             }
         }

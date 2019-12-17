@@ -35,7 +35,7 @@ Rectangle {
     property var taskController: null
 
     // Model of protocol that contains our model of independent variable
-    property TaskM protocol: null
+//    property TaskM protocol: null
 
     // Current model of independent variable
     property IndependentVariableM independentVarModel: null
@@ -44,7 +44,7 @@ Rectangle {
     property bool isMouseHovering: itemMouseArea.containsMouse || editIndepVarButton.containsMouse || deleteIndepVarButton.containsMouse
 
     // Flag indicating if the current independent variable is being edited
-    property bool isCurrentlyEditing: false
+    //property bool isCurrentlyEditing: false
 
     // Width of the columns (bound by the parent)
     property var columnWidths: [ 0, 0, 0 ]
@@ -53,9 +53,19 @@ Rectangle {
     // Bound by the parent
     property bool indepVarEditionInProgress: false
 
-    color: rootItem.isCurrentlyEditing ? IngeScapeTheme.lightGreyColor
-                                       : (rootItem.isMouseHovering ? IngeScapeTheme.veryLightGreyColor
-                                                                   : IngeScapeTheme.whiteColor)
+    color: rootItem.isMouseHovering ? IngeScapeTheme.veryLightGreyColor
+                                    : IngeScapeTheme.whiteColor
+
+
+    //--------------------------------
+    //
+    //
+    // Signals
+    //
+    //
+    //--------------------------------
+
+    signal editAsked();
 
 
     //--------------------------------------------------------
@@ -102,7 +112,7 @@ Rectangle {
                 text: rootItem.independentVarModel ? rootItem.independentVarModel.name : ""
 
                 verticalAlignment: Text.AlignVCenter
-                visible: !rootItem.isCurrentlyEditing
+                //visible: !rootItem.isCurrentlyEditing
 
                 elide: Text.ElideRight
                 color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
@@ -113,7 +123,7 @@ Rectangle {
                 }
             }
 
-            TextField {
+            /*TextField {
                 anchors {
                     fill: parent
                     margins: 5
@@ -150,7 +160,7 @@ Rectangle {
                         rootItem.protocol.temporaryIndependentVariable.name = text
                     }
                 }
-            }
+            }*/
         }
 
 
@@ -180,7 +190,7 @@ Rectangle {
                 text: rootItem.independentVarModel ? rootItem.independentVarModel.description : ""
 
                 verticalAlignment: Text.AlignVCenter
-                visible: !rootItem.isCurrentlyEditing
+                //visible: !rootItem.isCurrentlyEditing
 
                 elide: Text.ElideRight
                 color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
@@ -190,7 +200,7 @@ Rectangle {
                 }
             }
 
-            TextField {
+            /*TextField {
                 anchors {
                     fill: parent
                     margins: 5
@@ -227,7 +237,7 @@ Rectangle {
                         rootItem.protocol.temporaryIndependentVariable.description = text
                     }
                 }
-            }
+            }*/
         }
 
 
@@ -258,7 +268,7 @@ Rectangle {
                                                    : ""
 
                 verticalAlignment: Text.AlignVCenter
-                visible: !rootItem.isCurrentlyEditing
+                //visible: !rootItem.isCurrentlyEditing
 
                 elide: Text.ElideRight
                 color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
@@ -269,7 +279,7 @@ Rectangle {
             }
 
             // Combo to select the type of the value comparison
-            I2ComboboxItemModel {
+            /*I2ComboboxItemModel {
                 id: comboBoxValueTypes
 
                 anchors {
@@ -308,7 +318,7 @@ Rectangle {
                         rootItem.protocol.temporaryIndependentVariable.valueType = comboBoxValueTypes.selectedItem.value;
                     }
                 }
-            }
+            }*/
         }
 
     }
@@ -317,7 +327,7 @@ Rectangle {
     //
     // Buttons Apply / Cancel
     //
-    Row {
+    /*Row {
         spacing: 10
 
         anchors {
@@ -369,7 +379,7 @@ Rectangle {
                 rootItem.isCurrentlyEditing = false
             }
         }
-    }
+    }*/
 
 
     //
@@ -400,12 +410,10 @@ Rectangle {
             }
 
             onClicked: {
-                if (rootItem.protocol && rootItem.independentVarModel)
-                {
-                    rootItem.protocol.initTemporaryIndependentVariable(rootItem.independentVarModel)
-                }
+                // Emit the signal
+                rootItem.editAsked();
 
-                rootItem.isCurrentlyEditing = true;
+                //rootItem.isCurrentlyEditing = true;
             }
         }
 
@@ -444,6 +452,7 @@ Rectangle {
             bottom: parent.bottom
         }
         height: 2
-        color: rootItem.isCurrentlyEditing ? IngeScapeTheme.lightGreyColor : IngeScapeTheme.veryLightGreyColor
+        //color: rootItem.isCurrentlyEditing ? IngeScapeTheme.lightGreyColor : IngeScapeTheme.veryLightGreyColor
+        color: IngeScapeTheme.veryLightGreyColor
     }
 }
