@@ -363,6 +363,9 @@ void TaskM::deleteDependentVariable(DependentVariableM* variableToDelete)
  */
 void TaskM::_updateAgentsFromPlatformFilePath(QString platformFilePath)
 {
+#ifdef WIN64
+    platformFilePath  = platformFilePath.remove(0,1);
+#endif
     // Clear the hash table
     _hashFromAgentNameToSimplifiedAgent.deleteAllItems();
 

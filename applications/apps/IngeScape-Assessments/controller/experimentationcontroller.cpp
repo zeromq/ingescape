@@ -643,6 +643,10 @@ void ExperimentationController::startToRecord()
 
             // Get the JSON of the current platform
             QString platformFilePath = task->platformFileUrl().path();
+#ifdef WIN64
+    platformFilePath  = platformFilePath.remove(0,1);
+#endif
+
             QFile jsonFile(platformFilePath);
             if (jsonFile.exists())
             {
