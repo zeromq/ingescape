@@ -259,25 +259,6 @@ bool TasksController::canCreateDependentVariableWithName(QString dependentVariab
 
 
 /**
- * @brief Return true if the user can edit an independent variable with the name
- * Check if the name is not empty and if a independent variable with the same name does not already exist
- * @param independentVariableCurrentlyEdited
- * @param independentVariableName
- * @return
- */
-bool TasksController::canEditIndependentVariableWithName(IndependentVariableM* independentVariableCurrentlyEdited, QString independentVariableName)
-{
-    const QList<IndependentVariableM*>& varList = _selectedTask->independentVariables()->toList();
-    auto hasGivenNameAndIsNotEdited = [independentVariableName, independentVariableCurrentlyEdited](IndependentVariableM* independentVariable){
-        return (independentVariable != nullptr) && (independentVariable != independentVariableCurrentlyEdited) && (independentVariable->name() == independentVariableName);
-    };
-
-    return (independentVariableCurrentlyEdited != nullptr) && !independentVariableName.isEmpty() && (_selectedTask != nullptr)
-            && std::none_of(varList.begin(), varList.end(), hasGivenNameAndIsNotEdited);
-}
-
-
-/**
  * @brief Create a new independent variable from the Independent Variable currently edited (stored in _temporaryIndependentVariable)
  */
 void TasksController::createNewIndependentVariableFromTemporary()
@@ -546,14 +527,12 @@ void TasksController::initTemporaryDependentVariable(DependentVariableM* baseVar
     {
         if (baseVariable != nullptr)
         {
-            qDebug() << "ON INIT " << baseVariable->name();
             _temporaryDependentVariable->setname(baseVariable->name());
             _temporaryDependentVariable->setdescription(baseVariable->description());
             _temporaryDependentVariable->setagentName(baseVariable->agentName());
             _temporaryDependentVariable->setoutputName(baseVariable->outputName());
         }
         else {
-            qDebug() << "ON INIT IS EMPTY";
             _temporaryDependentVariable->setname("");
             _temporaryDependentVariable->setdescription("");
             _temporaryDependentVariable->setagentName("");

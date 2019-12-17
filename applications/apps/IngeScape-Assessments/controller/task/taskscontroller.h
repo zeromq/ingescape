@@ -112,16 +112,6 @@ public:
 
 
     /**
-     * @brief Return true if the user can edit an independent variable with the name
-     * Check if the name is not empty and if a independent variable with the same name does not already exist
-     * @param independentVariableCurrentlyEdited
-     * @param independentVariableName
-     * @return
-     */
-    Q_INVOKABLE bool canEditIndependentVariableWithName(IndependentVariableM* independentVariableCurrentlyEdited, QString independentVariableName);
-
-
-    /**
      * @brief Create a new independent variable from the Independent Variable currently edited (stored in _temporaryIndependentVariable)
      */
     Q_INVOKABLE void createNewIndependentVariableFromTemporary();

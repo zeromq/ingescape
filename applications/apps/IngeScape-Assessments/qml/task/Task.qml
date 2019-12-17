@@ -490,9 +490,9 @@ Item {
 
 
     //
-    // Create Independent Variable Popup
+    // Independent Variable Editor Popup
     //
-    Popup.CreateIndependentVariablePopup {
+    Popup.IndependentVariableEditorPopup {
         id: independentVariablePopup
 
         layerObjectName: "overlay2Layer"
@@ -518,9 +518,9 @@ Item {
 
 
     //
-    // Create Dependent Variable Popup
+    // Dependent Variable Editor Popup
     //
-    Popup.CreateDependentVariablePopup {
+    Popup.DependentVariableEditorPopup {
         id: dependentVariablePopup
 
         layerObjectName: "overlay2Layer"
@@ -536,12 +536,9 @@ Item {
             {
                 if (rootItem.dependentVariableCurrentlyEdited) {
                     // Edit an existing dependent variable
-                    console.log("EDIT !" + rootItem.taskController.temporaryDependentVariable.name)
                     rootItem.taskController.saveModificationsOfDependentVariableFromTemporary(rootItem.dependentVariableCurrentlyEdited);
                 }
                 else {
-                    console.log("CREATE !" + rootItem.taskController.temporaryDependentVariable.name)
-
                     // Create a dependent variable
                     rootItem.taskController.createNewDependentVariableFromTemporary();
                 }
