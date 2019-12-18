@@ -418,12 +418,16 @@ Item {
         width: 470
 
         onValidated: {
-            deleteSubject()
-            deleteSubjectPopup.close()
+            // Close our Popup
+            deleteSubjectPopup.close();
+
+            // Emit the signal
+            deleteSubject();
         }
 
         onCanceled: {
-            deleteSubjectPopup.close()
+            // Close our Popup
+            deleteSubjectPopup.close();
         }
     }
 }
