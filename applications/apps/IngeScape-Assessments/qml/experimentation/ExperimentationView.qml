@@ -927,7 +927,7 @@ Item {
 
                                             color: IngeScapeTheme.lightGreyColor
 
-                                            text: " " + taskM.name
+                                            text: delegateProtocolComboList.taskM ? " " + delegateProtocolComboList.taskM.name : ""
                                             elide: Text.ElideRight
 
                                             font {
@@ -952,7 +952,6 @@ Item {
 
                                             }
                                         }
-
                                     }
 
                                     onClicked : {

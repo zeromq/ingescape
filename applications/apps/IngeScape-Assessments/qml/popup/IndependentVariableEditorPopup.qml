@@ -794,6 +794,9 @@ AssessmentsPopupBase {
                         if (displayedEnumTexts) {
                             rootPopup.independentVariableToEdit.enumValues = displayedEnumTexts;
                         }
+                        else {
+                            rootPopup.independentVariableToEdit.enumValues = {};
+                        }
 
                         // Emit the signal "Independent variable is edited"
                         rootPopup.independentVariableIsEdited();
