@@ -19,7 +19,7 @@
         <file>qml/popup/CreateTaskPopup.qml</file>
         <file>qml/task/Task.qml</file>
         <file>qml/task/TaskInList.qml</file>
-        <file>qml/popup/CreateIndependentVariablePopup.qml</file>
+        <file>qml/popup/IndependentVariableEditorPopup.qml</file>
         <file>qml/task_instance/TaskInstanceView.qml</file>
         <file>qml/task_instance/IndependentVariableValueEditor.qml</file>
         <file>qml/export/ExportView.qml</file>
@@ -38,7 +38,7 @@
         <file>qml/theme/IngeScapeAssessmentsTextAreaStyle.qml</file>
         <file>qml/popup/DatabaseConfigurationPopup.qml</file>
         <file>resources/SVG/ingescape_assessments-pictos.svg</file>
-        <file>qml/popup/CreateDependentVariablePopup.qml</file>
+        <file>qml/popup/DependentVariableEditorPopup.qml</file>
         <file>qml/task_instance/ActionsList.qml</file>
         <file>qml/task_instance/AgentsList.qml</file>
         <file>qml/task_instance/AgentsListItem.qml</file>

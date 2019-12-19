@@ -179,6 +179,10 @@ void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previo
             {
                 QString platformFilePath = protocol->platformFileUrl().path();
 
+#ifdef WIN64
+    platformFilePath  = platformFilePath.remove(0,1);
+#endif
+
                 QFile jsonFile(platformFilePath);
                 if (jsonFile.exists())
                 {

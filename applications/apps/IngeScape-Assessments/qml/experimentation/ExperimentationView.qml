@@ -376,6 +376,9 @@ Item {
                     onClicked: {
                         console.log("QML: Open the 'Subjects View' popup");
 
+                        // Close select sessions to export
+                        _isSelectingSessionsToExport = false;
+
                         // Open the popup "Subjects View"
                         subjectsViewPopup.open()
                     }
@@ -396,6 +399,9 @@ Item {
 
                     onClicked: {
                         console.log("QML: Open the 'Protocols View' popup");
+
+                        // Close select sessions to export
+                        _isSelectingSessionsToExport = false;
 
                         // Open the popup "Protocols View"
                         protocolsViewPopup.open();
@@ -455,8 +461,8 @@ Item {
 //                        // Open the popup "Export View"
 //                        //exportViewPopup.open();
 
-//                        rootItem.controller.showAllSessionsForProtocol();
-//                        rootItem.controller.showAllSessionsForSubject();
+//                        rootItem.controller.addAllProtocolsToFilterSessions();
+//                        rootItem.controller.addAllSubjectsToFilterSessions();
 
 //                        _isSelectingSessionsToExport = !_isSelectingSessionsToExport;
 //                    }
@@ -575,8 +581,8 @@ Item {
                                 // Open the popup "Export View"
                                 //exportViewPopup.open();
 
-                                rootItem.controller.showAllSessionsForProtocol();
-                                rootItem.controller.showAllSessionsForSubject();
+                                rootItem.controller.addAllProtocolsToFilterSessions();
+                                rootItem.controller.addAllSubjectsToFilterSessions();
 
                                 _isSelectingSessionsToExport = !_isSelectingSessionsToExport;
                             }
@@ -644,16 +650,16 @@ Item {
                             //enabled: rootItem.controller && rootItem.controller.allAgentNamesList.length > 0
                             visible: _isSelectingSessionsToExport && rootItem.controller
                             enabled: visible
-                            model: rootItem.controller ? rootItem.controller.subjectIdList : 0
+                            model: rootItem.experimentation ? rootItem.experimentation.allSubjects : 0
 
                             placeholderText: enabled ? "- Select a subject -" : ""
 
                             text:{
-                                if(enabled && rootItem.controller && (rootItem.controller.selectedSubjectIdList.length > 0)){
-                                    if(rootItem.controller.selectedSubjectIdList.length === 1){
-                                        "- " + rootItem.controller.selectedSubjectIdList + " -"
-                                    }else if(rootItem.controller.selectedSubjectIdList.length < rootItem.controller.subjectIdList.length){
-                                        "- " + rootItem.controller.selectedSubjectIdList.length + " subjects selected -"
+                                if(enabled && rootItem.experimentation && rootItem.controller && (rootItem.controller.selectedSubjectIdListToFilter.length > 0)){
+                                    if(rootItem.controller.selectedSubjectIdListToFilter.length === 1){
+                                        "- " + rootItem.controller.selectedSubjectIdListToFilter + " -"
+                                    }else if(rootItem.controller.selectedSubjectIdListToFilter.length < rootItem.experimentation.allSubjects.length){
+                                        "- " + rootItem.controller.selectedSubjectIdListToFilter.length + " subjects selected -"
                                     }else{
                                         "- All subjects selected -"
                                     }
@@ -665,13 +671,13 @@ Item {
                             checkAllText: " All subjects"
 
                             onCheckAll: {
-                                rootItem.controller.showAllSessionsForSubject()
-                                clickAllSubject()
+                                rootItem.controller.addAllSubjectsToFilterSessions();
+                                clickAllSubject();
                             }
 
                             onUncheckAll: {
-                                rootItem.controller.hideAllSessionsForSubject()
-                                clickAllSubject()
+                                rootItem.controller.removeAllSubjectsToFilterSessions();
+                                clickAllSubject();
                             }
 
                             onPopupOpen: {
@@ -680,9 +686,9 @@ Item {
                                 isPartiallyChecked = false;
                                 checkAllState = Qt.Unchecked;
 
-                                if (rootItem.controller && (rootItem.controller.selectedSubjectIdList.length > 0))
+                                if (rootItem.experimentation && rootItem.controller && (rootItem.controller.selectedSubjectIdListToFilter.length > 0))
                                 {
-                                    if (rootItem.controller.selectedSubjectIdList.length === rootItem.controller.subjectIdList.length) {
+                                    if (rootItem.controller.selectedSubjectIdListToFilter.length === rootItem.experimentation.allSubjects.count) {
                                         checkAllState = Qt.Checked;
                                     }
                                     else {
@@ -692,6 +698,8 @@ Item {
                             }
 
                             delegate: Item {
+                                id: delegateSubjectCombolist
+
                                 anchors {
                                     left: parent.left
                                     right: parent.right
@@ -699,6 +707,8 @@ Item {
 
                                 width: dropDownSubject.comboButton.width
                                 height: dropDownSubject.comboButton.height
+
+                                property SubjectM subjectM : rootItem.experimentation ? rootItem.experimentation.allSubjects.get(index) : null
 
                                 CheckBox {
                                     id : filterSubjectCB
@@ -722,7 +732,7 @@ Item {
 
                                             color: IngeScapeTheme.lightGreyColor
 
-                                            text: " " + modelData
+                                            text: delegateSubjectCombolist.subjectM ? " " + delegateSubjectCombolist.subjectM.displayedId : ""
                                             elide: Text.ElideRight
 
                                             font {
@@ -751,12 +761,12 @@ Item {
                                     }
 
                                     onClicked : {
-                                        if (rootItem.controller) {
+                                        if (rootItem.controller && delegateSubjectCombolist.subjectM) {
                                             if (checked) {
-                                                rootItem.controller.showSessionForSubject(modelData)
+                                                rootItem.controller.addOneSubjectToFilterSessions(delegateSubjectCombolist.subjectM.displayedId)
                                             }
                                             else {
-                                                rootItem.controller.hideSessionForSubject(modelData)
+                                                rootItem.controller.removeOneSubjectToFilterSessions(delegateSubjectCombolist.subjectM.displayedId)
                                             }
 
                                             // update "all subjects" checkbox state
@@ -764,9 +774,9 @@ Item {
                                             dropDownSubject.isPartiallyChecked = false;
                                             dropDownSubject.checkAllState = Qt.Unchecked;
 
-                                            if (rootItem.controller && (rootItem.controller.selectedSubjectIdList.length > 0))
+                                            if (rootItem.controller && rootItem.experimentation && (rootItem.controller.selectedSubjectIdListToFilter.length > 0))
                                             {
-                                                if (rootItem.controller.selectedSubjectIdList.length === rootItem.controller.subjectIdList.length) {
+                                                if (rootItem.controller.selectedSubjectIdListToFilter.length === rootItem.experimentation.allSubjects.count) {
                                                     dropDownSubject.checkAllState = Qt.Checked;
                                                 }
                                                 else {
@@ -780,8 +790,8 @@ Item {
                                         target : dropDownSubject.popup
                                         onOpened : {
                                             // update subjects checkboxes states when the pop up is opening
-                                            if (controller) {
-                                                filterSubjectCB.checked = controller.areShownSessionsForSubject(modelData);
+                                            if (controller && delegateSubjectCombolist.subjectM) {
+                                                filterSubjectCB.checked = controller.isSubjectFilterSessions(delegateSubjectCombolist.subjectM.displayedId);
                                             }
                                         }
                                     }
@@ -791,7 +801,7 @@ Item {
                                         onClickAllSubject : {
                                             // update subjects checkboxes states when the "pop up is opening   "All subjects" check box is selected or unselected
                                             if (controller) {
-                                                filterSubjectCB.checked = controller.areShownSessionsForSubject(modelData);
+                                                filterSubjectCB.checked = controller.isSubjectFilterSessions(delegateSubjectCombolist.subjectM.displayedId);
                                             }
                                         }
                                     }
@@ -837,16 +847,16 @@ Item {
                             //enabled: rootItem.controller && rootItem.controller.allAgentNamesList.length > 0
                             visible: _isSelectingSessionsToExport && rootItem.controller
                             enabled: visible
-                            model: rootItem.controller ? rootItem.controller.protocolNameList : 0
+                            model: rootItem.experimentation ? rootItem.experimentation.allTasks : 0
 
                             placeholderText: enabled ? "- Select a protocol -" : ""
 
                             text:{
-                                if(enabled && rootItem.controller && (rootItem.controller.selectedProtocolNameList.length > 0)){
-                                    if(rootItem.controller.selectedProtocolNameList.length === 1){
-                                        "- " + rootItem.controller.selectedProtocolNameList + " -"
-                                    }else if(rootItem.controller.selectedProtocolNameList.length < rootItem.controller.protocolNameList.length){
-                                        "- " + rootItem.controller.selectedProtocolNameList.length + " protocols selected -"
+                                if(enabled && rootItem.controller && rootItem.experimentation && (rootItem.controller.selectedProtocolNameListToFilter.length > 0)){
+                                    if(rootItem.controller.selectedProtocolNameListToFilter.length === 1){
+                                        "- " + rootItem.controller.selectedProtocolNameListToFilter + " -"
+                                    }else if(rootItem.controller.selectedProtocolNameListToFilter.length < rootItem.experimentation.allTasks.count){
+                                        "- " + rootItem.controller.selectedProtocolNameListToFilter.length + " protocols selected -"
                                     }else{
                                         "- All protocols selected -"
                                     }
@@ -857,12 +867,12 @@ Item {
                             checkAllText: " All protocol"
 
                             onCheckAll: {
-                                rootItem.controller.showAllSessionsForProtocol()
+                                rootItem.controller.addAllProtocolsToFilterSessions();
                                 rootItem.clickAllProtocol();
                             }
 
                             onUncheckAll: {
-                                rootItem.controller.hideAllSessionsForProtocol()
+                                rootItem.controller.removeAllProtocolsToFilterSessions();
                                 rootItem.clickAllProtocol();
                             }
 
@@ -872,9 +882,9 @@ Item {
                                 isPartiallyChecked = false;
                                 checkAllState = Qt.Unchecked;
 
-                                if (rootItem.controller && (rootItem.controller.selectedProtocolNameList.length > 0))
+                                if (rootItem.controller && rootItem.experimentation && (rootItem.controller.selectedProtocolNameListToFilter.length > 0))
                                 {
-                                    if (rootItem.controller.selectedProtocolNameList.length === rootItem.controller.protocolNameList.length) {
+                                    if (rootItem.controller.selectedProtocolNameListToFilter.length === rootItem.experimentation.allTasks.count) {
                                         checkAllState = Qt.Checked;
                                     }
                                     else {
@@ -884,6 +894,7 @@ Item {
                             }
 
                             delegate: Item {
+                                id: delegateProtocolComboList
                                 anchors {
                                     left: parent.left
                                     right: parent.right
@@ -891,6 +902,8 @@ Item {
 
                                 width: dropDownProtocol.comboButton.width
                                 height: dropDownProtocol.comboButton.height
+
+                                property TaskM taskM : rootItem.experimentation ? rootItem.experimentation.allTasks.get(index) : null
 
                                 CheckBox {
                                     id : filterProtocolCB
@@ -914,7 +927,7 @@ Item {
 
                                             color: IngeScapeTheme.lightGreyColor
 
-                                            text: " " + modelData
+                                            text: delegateProtocolComboList.taskM ? " " + delegateProtocolComboList.taskM.name : ""
                                             elide: Text.ElideRight
 
                                             font {
@@ -939,16 +952,15 @@ Item {
 
                                             }
                                         }
-
                                     }
 
                                     onClicked : {
-                                        if (rootItem.controller) {
+                                        if (rootItem.controller && delegateProtocolComboList.taskM) {
                                             if (checked) {
-                                                rootItem.controller.showSessionForProtocol(modelData)
+                                                rootItem.controller.addOneProtocolToFilterSessions(delegateProtocolComboList.taskM.name)
                                             }
                                             else {
-                                                rootItem.controller.hideSessionForProtocol(modelData)
+                                                rootItem.controller.removeOneProtocolToFilterSessions(delegateProtocolComboList.taskM.name)
                                             }
 
                                             // update "all agents" checkbox state
@@ -956,9 +968,9 @@ Item {
                                             dropDownProtocol.isPartiallyChecked = false;
                                             dropDownProtocol.checkAllState = Qt.Unchecked;
 
-                                            if (rootItem.controller && (rootItem.controller.selectedProtocolNameList.length > 0))
+                                            if (rootItem.controller && rootItem.experimentation && (rootItem.controller.selectedProtocolNameListToFilter.length > 0))
                                             {
-                                                if (rootItem.controller.selectedProtocolNameList.length === rootItem.controller.protocolNameList.length) {
+                                                if (rootItem.controller.selectedProtocolNameListToFilter.length === rootItem.experimentation.allTasks.count) {
                                                     dropDownProtocol.checkAllState = Qt.Checked;
                                                 }
                                                 else {
@@ -972,8 +984,8 @@ Item {
                                         target : dropDownProtocol.popup
                                         onOpened : {
                                             // update agents checkboxes states when the pop up is opening
-                                            if (controller) {
-                                                filterProtocolCB.checked = controller.areShownSessionsForProtocol(modelData);
+                                            if (controller && delegateProtocolComboList.taskM) {
+                                                filterProtocolCB.checked = controller.isProtocolFilterSessions(delegateProtocolComboList.taskM.name);
                                             }
                                         }
                                     }
@@ -981,9 +993,9 @@ Item {
                                     Connections {
                                         target : rootItem
                                         onClickAllProtocol : {
-                                            // update agents checkboxes states when the "pop up is opening   "All Agents" check box is selected or unselected
-                                            if (controller) {
-                                                filterProtocolCB.checked = controller.areShownSessionsForProtocol(modelData);
+                                            // update agents checkboxes states when the "pop up is opening  "All Agents" check box is selected or unselected
+                                            if (controller && delegateProtocolComboList.taskM) {
+                                                filterProtocolCB.checked = controller.isProtocolFilterSessions(delegateProtocolComboList.taskM.name);
                                             }
                                         }
                                     }
@@ -1187,7 +1199,11 @@ Item {
                         spacing: 0
 
                         Repeater {
-                            model: rootItem.experimentation ? rootItem.controller.sessionFilteredList : null
+                            model: rootItem.controller && rootItem.experimentation
+                                   ? rootItem._isSelectingSessionsToExport ? rootItem.controller.sessionFilteredList
+                                                                           : rootItem.experimentation.allTaskInstances
+                                   : null
+
 
                             delegate: TaskInstanceInList {
                                 isSelectingSessionsToExport: rootItem._isSelectingSessionsToExport && rootItem.controller.isRecorderON

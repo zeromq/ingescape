@@ -36,7 +36,8 @@ const QStringList CharacteristicValueM::columnNames = {
  */
 const QStringList CharacteristicValueM::primaryKeys = {
     "id_experimentation",
-    "id",
+    "id_subject",
+    "id_characteristic"
 };
 
 /**
