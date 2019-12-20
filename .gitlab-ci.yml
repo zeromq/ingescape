@@ -115,8 +115,8 @@ lib-build-macos:
     - osx
   script:
     - git clean -xfd
-    - mkdir build
-    - mkdir release
+    - mkdir -p build
+    - mkdir -p release
     - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/builds/release/ingescape/usr/local/
     - make -C build
     - make -C build DESTDIR=$PWD/release install
@@ -138,6 +138,7 @@ lib-build-macos:
 #-install Packages from http://s.sudre.free.fr/Software/Packages/about.html
 #- get and install pkg signing certificate from apple developer site
 #- indicate proper developper id in signing command line below
+#- to allow codesign without password, call once: security set-keychain-settings ~/Library/Keychains/login.keychain
 lib-installer-macos:
   <<: *lib-build-files
   stage: lib-installer
@@ -145,11 +146,11 @@ lib-installer-macos:
     - osx
   script:
     - packagesbuild ./builds/xcode/ingescape.pkgproj
-#    - mv ./builds/xcode/build/ingescape.pkg ./builds/xcode/build/ingescape_unsigned.pkg
-#    - productsign --sign "Developer ID Installer: XXXXXXXXXXXXXX" ingescape_unsigned.pkg ingescape.pkg
-    - mkdir $HOME/builds/packages
+    - mv ./builds/xcode/build/ingescape.pkg ./builds/xcode/build/ingescape_unsigned.pkg
+    - productsign --sign "Developer ID Installer: Ingenuity i/o (56DRT9MG9S)" ./builds/xcode/build/ingescape_unsigned.pkg ./builds/xcode/build/ingescape.pkg
+    - mkdir -p $HOME/builds/packages
     - cp ./builds/xcode/build/ingescape.pkg $HOME/builds/packages/
-    - cp ./builds/xcode/build/ingescape.pkg .
+    - mv ./builds/xcode/build/ingescape.pkg .
   artifacts:
     paths:
       - ./ingescape.pkg
@@ -168,7 +169,7 @@ editor-build-macos:
     - osx
   script:
     - git clean -xfd
-    - mkdir applications/apps/IngeScape-Editor/build
+    - mkdir -p applications/apps/IngeScape-Editor/build
     - cmake -S applications/apps/IngeScape-Editor/ -B applications/apps/IngeScape-Editor/build -DCMAKE_BUILD_TYPE=Release
     - make -C applications/apps/IngeScape-Editor/build
   artifacts:
@@ -189,7 +190,7 @@ assessments-build-macos:
     - osx
   script:
     - git clean -xfd
-    - mkdir applications/apps/IngeScape-Assessments/build
+    - mkdir -p applications/apps/IngeScape-Assessments/build
     - cmake -S applications/apps/IngeScape-Assessments/ -B applications/apps/IngeScape-Assessments/build -DCMAKE_BUILD_TYPE=Release
     - make -C applications/apps/IngeScape-Assessments/build
   artifacts:
@@ -211,7 +212,7 @@ expe-build-macos:
     - osx
   script:
     - git clean -xfd
-    - mkdir applications/apps/IngeScape-Expe/build
+    - mkdir -p applications/apps/IngeScape-Expe/build
     - cmake -S applications/apps/IngeScape-Expe/ -B applications/apps/IngeScape-Expe/build -DCMAKE_BUILD_TYPE=Release
     - make -C applications/apps/IngeScape-Expe/build
   artifacts:
