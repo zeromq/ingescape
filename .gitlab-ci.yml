@@ -135,10 +135,11 @@ lib-build-macos:
 
 # Create runtime installer for macos
 #On runner machine:
-#-install Packages from http://s.sudre.free.fr/Software/Packages/about.html
+#- install Packages from http://s.sudre.free.fr/Software/Packages/about.html
 #- get and install pkg signing certificate from apple developer site
 #- indicate proper developper id in signing command line below
 #- to allow codesign without password, call once: security set-keychain-settings ~/Library/Keychains/login.keychain
+#http://s.sudre.free.fr/Software/documentation/Packages/en/Project_Building.html#4
 lib-installer-macos:
   <<: *lib-build-files
   stage: lib-installer
@@ -147,7 +148,7 @@ lib-installer-macos:
   script:
     - packagesbuild ./builds/xcode/ingescape.pkgproj
     - mv ./builds/xcode/build/ingescape.pkg ./builds/xcode/build/ingescape_unsigned.pkg
-    - productsign --sign "Developer ID Installer: Ingenuity i/o (56DRT9MG9S)" ./builds/xcode/build/ingescape_unsigned.pkg ./builds/xcode/build/ingescape.pkg
+    - 'productsign --sign "Developer ID Installer: Ingenuity i/o (56DRT9MG9S)" ./builds/xcode/build/ingescape_unsigned.pkg ./builds/xcode/build/ingescape.pkg'
     - mkdir -p $HOME/builds/packages
     - cp ./builds/xcode/build/ingescape.pkg $HOME/builds/packages/
     - mv ./builds/xcode/build/ingescape.pkg .
