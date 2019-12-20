@@ -165,17 +165,20 @@ editor-build-macos:
   <<: *editor-build-files
   stage: apps-build
   variables:
-    Qt5_DIR: ~/Qt/5.9.7/clang_64/lib/cmake/Qt5
+#    Qt5_DIR: ~/Qt/5.9.7/clang_64/lib/cmake/Qt5
+    GIT_SUBMODULE_STRATEGY: recursive
   tags:
     - osx
   script:
     - git clean -xfd
     - mkdir -p applications/apps/IngeScape-Editor/build
-    - cmake -S applications/apps/IngeScape-Editor/ -B applications/apps/IngeScape-Editor/build -DCMAKE_BUILD_TYPE=Release
+    - cmake -S applications/apps/IngeScape-Editor/ -B applications/apps/IngeScape-Editor/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.9.7/clang_64/;$HOME/builds/release/ingescape/usr/local/"
     - make -C applications/apps/IngeScape-Editor/build
+    - mkdir -p $HOME/builds/release/apps/
+    - cp -R applications/apps/IngeScape-Editor/build/IngeScape-Editor.app $HOME/builds/release/apps/
   artifacts:
     paths:
-      - applications/apps/IngeScape-Editor/build
+      - applications/apps/IngeScape-Editor/build/IngeScape-Editor.app
     name: "editor-build-macos"
     expire_in: 1 day
   dependencies: []
@@ -185,18 +188,20 @@ assessments-build-macos:
   <<: *assessments-build-files
   stage: apps-build
   variables:
-    Qt5_DIR: ~/Qt/5.9.7/clang_64/lib/cmake/Qt5
+  #    Qt5_DIR: ~/Qt/5.9.7/clang_64/lib/cmake/Qt5
     GIT_SUBMODULE_STRATEGY: recursive
   tags:
     - osx
   script:
     - git clean -xfd
     - mkdir -p applications/apps/IngeScape-Assessments/build
-    - cmake -S applications/apps/IngeScape-Assessments/ -B applications/apps/IngeScape-Assessments/build -DCMAKE_BUILD_TYPE=Release
+    - cmake -S applications/apps/IngeScape-Assessments/ -B applications/apps/IngeScape-Assessments/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.9.7/clang_64/;$HOME/builds/release/ingescape/usr/local/"
     - make -C applications/apps/IngeScape-Assessments/build
+    - mkdir -p $HOME/builds/release/apps/
+    - cp -R applications/apps/IngeScape-Assessments/build/IngeScape-Assessments.app $HOME/builds/release/apps/
   artifacts:
     paths:
-      - applications/apps/IngeScape-Assessments/build
+      - applications/apps/IngeScape-Assessments/build/IngeScape-Assessments.app
     name: "assessments-build-macos"
     expire_in: 1 day
   dependencies: []
@@ -207,18 +212,20 @@ expe-build-macos:
   <<: *expe-build-files
   stage: apps-build
   variables:
-    Qt5_DIR: ~/Qt/5.9.7/clang_64/lib/cmake/Qt5
+#    Qt5_DIR: ~/Qt/5.9.7/clang_64/lib/cmake/Qt5
     GIT_SUBMODULE_STRATEGY: recursive
   tags:
     - osx
   script:
     - git clean -xfd
     - mkdir -p applications/apps/IngeScape-Expe/build
-    - cmake -S applications/apps/IngeScape-Expe/ -B applications/apps/IngeScape-Expe/build -DCMAKE_BUILD_TYPE=Release
+    - cmake -S applications/apps/IngeScape-Expe/ -B applications/apps/IngeScape-Expe/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.9.7/clang_64/;$HOME/builds/release/ingescape/usr/local/"
     - make -C applications/apps/IngeScape-Expe/build
+    - mkdir -p $HOME/builds/release/apps/
+    - cp -R applications/apps/IngeScape-Expe/build/IngeScape-Expe.app $HOME/builds/release/apps/
   artifacts:
     paths:
-      - applications/apps/IngeScape-Expe/build
+      - applications/apps/IngeScape-Expe/build/IngeScape-Expe.app
     name: "expe-build-macos"
     expire_in: 1 day
   dependencies: []
@@ -235,7 +242,7 @@ editor-installer-macos:
   #  - make -C applications/apps/IngeScape-Editor/build package_source
   artifacts:
     paths:
-      - applications/apps/IngeScape-Editor/build/IngeScape-Editor-*
+      - applications/apps/IngeScape-Editor/build/IngeScape-Editor-*.dmg
     name: "editor-installer-macos"
   dependencies:
     - editor-build-macos
@@ -252,7 +259,7 @@ assessments-installer-macos:
   #  - make -C applications/apps/IngeScape-Assessments/build package_source
   artifacts:
     paths:
-      - applications/apps/IngeScape-Assessments/build/IngeScape-Assessments-*
+      - applications/apps/IngeScape-Assessments/build/IngeScape-Assessments-*.dmg
     name: "assessments-installer-macos"
   dependencies:
     - assessments-build-macos
@@ -269,7 +276,7 @@ expe-installer-macos:
   #  - make -C applications/apps/IngeScape-Expe/build package_source
   artifacts:
     paths:
-      - applications/apps/IngeScape-Expe/build/IngeScape-Expe-*
+      - applications/apps/IngeScape-Expe/build/IngeScape-Expe-*.dmg
     name: "expe-installer-macos"
   dependencies:
     - expe-build-macos
@@ -1151,7 +1158,7 @@ lib-delivery-all:
     - mv build/ReleaseX64/ingescape-*
          library/win64/
     - ls library/win64/ | grep -v 'latest_delivery' > library/win64/latest_delivery
-    - echo "Deliver MacOS x64"
+    - echo "Deliver macos"
     - mkdir --parents library/macos
     - mv ingescape.pkg library/macos/
     - ls library/macos/ | grep -v 'latest_delivery' > library/macos/latest_delivery
