@@ -135,7 +135,6 @@ void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previo
         {
             if (!previousTaskInstance->isRecorded() && !previousTaskInstance->recordsList()->isEmpty())
             {
-                // FIXME: save the flag in the DataBase ?
                 previousTaskInstance->setisRecorded(true);
             }
 
