@@ -149,9 +149,10 @@ lib-installer-macos:
 #    - productsign --sign "Developer ID Installer: XXXXXXXXXXXXXX" ingescape_unsigned.pkg ingescape.pkg
     - mkdir $HOME/builds/packages
     - cp ./builds/xcode/build/ingescape.pkg $HOME/builds/packages/
+    - cp ./builds/xcode/build/ingescape.pkg .
   artifacts:
     paths:
-      - ./builds/xcode/build/ingescape.pkg
+      - ./ingescape.pkg
     name: "lib-installer-macos"
   dependencies:
     - lib-build-macos
@@ -280,45 +281,6 @@ expe-installer-macos:
 #   \  /\  /  | | | | | (_| | (_) \ V  V /\__ \
 #    \/  \/   |_|_| |_|\__,_|\___/ \_/\_/ |___/
 
-binding-csharp-windows-x64:
-  <<: *binding-build-files
-  stage: binding-build
-  tags:
-    - windows
-  variables:
-    ARCH: "x64"
-  script:
-    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
-    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
-    - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release
-    - Powershell.exe -executionpolicy remotesigned bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64
-    - cmake --build bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64 --target IngescapeCSharp --config Release
-  artifacts:
-    paths:
-     - bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64
-    name: "binding-csharp-windows-x64"
-    expire_in: 1 day
-  dependencies: []
-
-binding-csharp-windows-x86:
-  <<: *binding-build-files
-  stage: binding-build
-  tags:
-    - windows
-  variables:
-    ARCH: "x86"
-  script:
-    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
-    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
-    - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release
-    - Powershell.exe -executionpolicy remotesigned bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86
-    - cmake --build bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86 --target IngescapeCSharp --config Release
-  artifacts:
-    paths:
-     - bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86
-    name: "binding-csharp-windows-x86"
-    expire_in: 1 day
-  dependencies: []
 
 # Create ingescape library for windows 64 bits release
 lib-windows-release-x64:
@@ -405,6 +367,46 @@ lib-windows-debug-x86:
     paths:
      - build
     name: "lib-windows-debug-x86"
+    expire_in: 1 day
+  dependencies: []
+
+binding-csharp-windows-x64:
+  <<: *binding-build-files
+  stage: binding-build
+  tags:
+    - windows
+  variables:
+    ARCH: "x64"
+  script:
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
+    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
+    - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release
+    - Powershell.exe -executionpolicy remotesigned bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64
+    - cmake --build bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64 --target IngescapeCSharp --config Release
+  artifacts:
+    paths:
+     - bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64
+    name: "binding-csharp-windows-x64"
+    expire_in: 1 day
+  dependencies: []
+
+binding-csharp-windows-x86:
+  <<: *binding-build-files
+  stage: binding-build
+  tags:
+    - windows
+  variables:
+    ARCH: "x86"
+  script:
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
+    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
+    - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release
+    - Powershell.exe -executionpolicy remotesigned bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86
+    - cmake --build bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86 --target IngescapeCSharp --config Release
+  artifacts:
+    paths:
+     - bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86
+    name: "binding-csharp-windows-x86"
     expire_in: 1 day
   dependencies: []
 
@@ -1149,9 +1151,7 @@ lib-delivery-all:
     - ls library/win64/ | grep -v 'latest_delivery' > library/win64/latest_delivery
     - echo "Deliver MacOS x64"
     - mkdir --parents library/macos
-    - mv macos_x64/ingescape-*
-         macos_x64/installIngescapeAndDependencies.sh
-         library/macos/
+    - mv ingescape.pkg library/macos/
     - ls library/macos/ | grep -v 'latest_delivery' > library/macos/latest_delivery
     - echo "Deliver generic Linux x64"
     - mkdir --parents library/linux_x64/
