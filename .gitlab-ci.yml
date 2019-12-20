@@ -147,7 +147,7 @@ lib-installer-macos:
     - packagesbuild ./builds/xcode/ingescape.pkgproj
 #    - mv ./builds/xcode/build/ingescape.pkg ./builds/xcode/build/ingescape_unsigned.pkg
 #    - productsign --sign "Developer ID Installer: XXXXXXXXXXXXXX" ingescape_unsigned.pkg ingescape.pkg
-    mkdir $HOME/builds/packages
+    - mkdir $HOME/builds/packages
     - cp ./builds/xcode/build/ingescape.pkg $HOME/builds/packages/
   artifacts:
     paths:
@@ -1199,7 +1199,7 @@ lib-delivery-all:
   dependencies:
     - lib-installer-runtime-windows-x86
     - lib-installer-runtime-windows-x64
-    - lib-installer-runtime-macos-x64
+    - lib-installer-macos
     - lib-installer-runtime-linux-x64
     - lib-installer-runtime-debian-9-x64
     - lib-installer-runtime-debian-10-x64
@@ -1240,7 +1240,7 @@ editor-delivery-all:
     - echo "Synchronization"
     - rsync --rsh="ssh -i ssh_secret" --recursive editor ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
   dependencies:
-    - editor-installer-macos-x64
+    - editor-installer-macos
     - editor-installer-windows-x86
     - editor-installer-windows-x64
 
@@ -1276,7 +1276,7 @@ assessments-delivery-all:
     - echo "Synchronization"
     - rsync --rsh="ssh -i ssh_secret" --recursive assessments ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
   dependencies:
-    - assessments-installer-macos-x64
+    - assessments-installer-macos
     - assessments-installer-windows-x86
     - assessments-installer-windows-x64
 
@@ -1312,7 +1312,7 @@ expe-delivery-all:
     - echo "Synchronization"
     - rsync --rsh="ssh -i ssh_secret" --recursive expe ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
   dependencies:
-    - expe-installer-macos-x64
+    - expe-installer-macos
     - expe-installer-windows-x86
     - expe-installer-windows-x64
 
@@ -1426,7 +1426,7 @@ lib-delivery-all-stable:
   dependencies:
     - lib-installer-runtime-windows-x86
     - lib-installer-runtime-windows-x64
-    - lib-installer-runtime-macos-x64
+    - lib-installer-macos
     - lib-installer-runtime-linux-x64
     - lib-installer-runtime-debian-9-x64
     - lib-installer-runtime-debian-10-x64
@@ -1469,7 +1469,7 @@ editor-delivery-all-stable:
     - echo "Synchronization"
     - rsync --rsh="ssh -i ssh_secret" --recursive editor ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST}:${STABLE_DELIVERY_DESTINATION}
   dependencies:
-    - editor-installer-macos-x64
+    - editor-installer-macos
     - editor-installer-windows-x86
     - editor-installer-windows-x64
 
@@ -1507,7 +1507,7 @@ assessments-delivery-all-stable:
     - echo "Synchronization"
     - rsync --rsh="ssh -i ssh_secret" --recursive assessments ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST}:${STABLE_DELIVERY_DESTINATION}
   dependencies:
-    - assessments-installer-macos-x64
+    - assessments-installer-macos
     - assessments-installer-windows-x86
     - assessments-installer-windows-x64
 
@@ -1545,7 +1545,7 @@ expe-delivery-all-stable:
     - echo "Synchronization"
     - rsync --rsh="ssh -i ssh_secret" --recursive expe ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST}:${STABLE_DELIVERY_DESTINATION}
   dependencies:
-    - expe-installer-macos-x64
+    - expe-installer-macos
     - expe-installer-windows-x86
     - expe-installer-windows-x64
 
