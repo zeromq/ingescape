@@ -174,7 +174,7 @@ editor-build-macos:
     - mkdir -p applications/apps/IngeScape-Editor/build
     - cmake -S applications/apps/IngeScape-Editor/ -B applications/apps/IngeScape-Editor/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.9.7/clang_64/;$HOME/builds/release/ingescape/usr/local/"
     - make -C applications/apps/IngeScape-Editor/build
-    - codesign --force --deep --sign  "Developer ID Application: Ingenuity i/o (56DRT9MG9S)" -v applications/apps/IngeScape-Editor/build/IngeScape-Editor.app
+    - 'codesign --force --deep --sign  "Developer ID Application: Ingenuity i/o (56DRT9MG9S)" -v applications/apps/IngeScape-Editor/build/IngeScape-Editor.app'
     - mkdir -p $HOME/builds/release/apps/
     - cp -Rf applications/apps/IngeScape-Editor/build/IngeScape-Editor.app $HOME/builds/release/apps/
   artifacts:
@@ -198,7 +198,7 @@ assessments-build-macos:
     - mkdir -p applications/apps/IngeScape-Assessments/build
     - cmake -S applications/apps/IngeScape-Assessments/ -B applications/apps/IngeScape-Assessments/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.9.7/clang_64/;$HOME/builds/release/ingescape/usr/local/"
     - make -C applications/apps/IngeScape-Assessments/build
-    - codesign --force --deep --sign  "Developer ID Application: Ingenuity i/o (56DRT9MG9S)" -v applications/apps/IngeScape-Assessments/build/IngeScape-Assessments.app
+    - 'codesign --force --deep --sign  "Developer ID Application: Ingenuity i/o (56DRT9MG9S)" -v applications/apps/IngeScape-Assessments/build/IngeScape-Assessments.app'
     - mkdir -p $HOME/builds/release/apps/
     - cp -Rf applications/apps/IngeScape-Assessments/build/IngeScape-Assessments.app $HOME/builds/release/apps/
   artifacts:
@@ -223,7 +223,7 @@ expe-build-macos:
     - mkdir -p applications/apps/IngeScape-Expe/build
     - cmake -S applications/apps/IngeScape-Expe/ -B applications/apps/IngeScape-Expe/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.9.7/clang_64/;$HOME/builds/release/ingescape/usr/local/"
     - make -C applications/apps/IngeScape-Expe/build
-    - codesign --force --deep --sign  "Developer ID Application: Ingenuity i/o (56DRT9MG9S)" -v applications/apps/IngeScape-Expe/build/IngeScape-Expe.app
+    - 'codesign --force --deep --sign  "Developer ID Application: Ingenuity i/o (56DRT9MG9S)" -v applications/apps/IngeScape-Expe/build/IngeScape-Expe.app'
     - mkdir -p $HOME/builds/release/apps/
     - cp -Rf applications/apps/IngeScape-Expe/build/IngeScape-Expe.app $HOME/builds/release/apps/
   artifacts:
