@@ -190,6 +190,21 @@ QStringList AssessmentsModelManager::getStringListFromColumnName(const CassRow* 
 
 
 /**
+ * @brief Retrieve an 'int64' value of given column inside the given row
+ * and convert it to int before returning it
+ * @param row
+ * @param columnName
+ * @return
+ */
+int AssessmentsModelManager::getIntValueFromColumnName(const CassRow* row, const char* columnName)
+{
+    cass_int64_t valueInt = 0;
+    cass_value_get_int64(cass_row_get_column_by_name(row, columnName), &valueInt);
+    return static_cast<int>(valueInt);
+}
+
+
+/**
  * @brief Retrive a date and a time value from the given columns inside the given row
  * and convert it to a QDateTime before returning it
  * @param row

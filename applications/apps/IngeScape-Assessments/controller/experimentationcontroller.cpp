@@ -146,11 +146,14 @@ void ExperimentationController::openSession(TaskInstanceM* session)
         if (_isRecorderON && session->recordsList()->isEmpty())
         {
             // Get the list of record
-                QList<RecordAssessmentM*> recordList = AssessmentsModelManager::select<RecordAssessmentM>({session->getCassUuid() });
-                session->recordsList()->append(recordList);
+            QList<RecordAssessmentM*> recordList = AssessmentsModelManager::select<RecordAssessmentM>({session->getCassUuid() });
+            session->recordsList()->append(recordList);
 
-                igs_info("%i records on current task", session->recordsList()->count());
+            igs_info("%i records on current task", session->recordsList()->count());
         }
+
+        // If records list is empty when we load it from DB : session has never been recorded
+        session->setisRecorded(!session->recordsList()->isEmpty());
 
         // Update the current task instance
         _taskInstanceC->setcurrentTaskInstance(session);
@@ -307,6 +310,9 @@ void ExperimentationController::onRecordAddedReceived(QString message){
                             QJsonValue jsonName = jsonRecord.value("name_record");
                             QJsonValue jsonBeginDateTime = jsonRecord.value("time_beg");
                             QJsonValue jsonEndDateTime = jsonRecord.value("time_end");
+                            QJsonValue jsonOffsetTimeline = jsonRecord.value("offset_timeline");
+
+                            qDebug() << "JSON OFFSET " << jsonOffsetTimeline.toInt();
 
                             if (jsonName.isString() && jsonId.isString())
                             {
@@ -314,7 +320,9 @@ void ExperimentationController::onRecordAddedReceived(QString message){
                                 RecordAssessmentM* record = new RecordAssessmentM(jsonId.toString(),
                                                               jsonName.toString(),
                                                               QDateTime::fromSecsSinceEpoch(static_cast<int>(jsonBeginDateTime.toDouble())),
-                                                              QDateTime::fromSecsSinceEpoch(static_cast<int>(jsonEndDateTime.toDouble())));
+                                                              QDateTime::fromSecsSinceEpoch(static_cast<int>(jsonEndDateTime.toDouble())),
+                                                              jsonOffsetTimeline.toInt());
+
                                 _taskInstanceC->currentTaskInstance()->recordsList()->append(record);
 
                                 qInfo() << "Number of record " << _taskInstanceC->currentTaskInstance()->recordsList()->count();

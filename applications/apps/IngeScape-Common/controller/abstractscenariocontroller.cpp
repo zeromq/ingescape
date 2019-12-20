@@ -414,9 +414,6 @@ void AbstractScenarioController::stopTimeLine()
 
     // Pause the scenario and associated actions (disconnect actions conditions and stop the action evaluation timer)
     _pauseScenarioAndActions();
-
-    // Reset current time (to 00:00:00.000)
-    setcurrentTime(QTime::fromMSecsSinceStartOfDay(0));
 }
 
 
@@ -428,8 +425,9 @@ void AbstractScenarioController::clearScenario()
 {
     qInfo() << "Abstract Scenario Controller: Clear the current scenario";
 
-    // Stop/Reset the timeline (current scenario)
-    stopTimeLine();
+    // Stop and reset the timeline  (to 00:00:00.000) (current scenario)
+    stopTimeLine();    
+    setcurrentTime(QTime::fromMSecsSinceStartOfDay(0));
 
     // Clean-up current selection
     setselectedAction(nullptr);

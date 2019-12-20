@@ -117,6 +117,9 @@ Item {
 
         scenarioController: rootItem.taskInstanceController ? rootItem.taskInstanceController.scenarioC : null;
         timeLineController: rootItem.taskInstanceController ? rootItem.taskInstanceController.timeLineC : null;
+
+        recordsListToShow : rootItem.taskInstance ? rootItem.taskInstance.recordsList : []
+
         licensesController: IngeScapeAssessmentsC.licensesC
         mainController: IngeScapeAssessmentsC
 

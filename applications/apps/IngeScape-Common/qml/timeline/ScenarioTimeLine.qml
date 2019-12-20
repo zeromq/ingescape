@@ -33,6 +33,8 @@ Item {
     property var scenarioController: null;
     property var timeLineController: null;
 
+    property var recordsListToShow : [];
+
     // Licenses controller
     property LicensesController licensesController: null;
 
@@ -506,6 +508,9 @@ Item {
                             width: timeLineController.timeTicksTotalWidth
                             height: rootItem.lineHeight * rootItem.linesNumber
 
+                            //
+                            // Actions content
+                            //
                             Repeater {
                                 model: scenarioController ? scenarioController.filteredListActionsInTimeLine : 0;
 
@@ -648,7 +653,6 @@ Item {
                                 }
                             }
 
-
                             // Ghost Drop Impossible
                             I2SvgItem {
                                 id : ghostDropImpossible
@@ -774,9 +778,19 @@ Item {
                                 }
                             }
 
+                            //
+                            // Records content
+                            //
+                            Repeater {
+                                model: rootItem.recordsListToShow
+
+                                RecordInTimeline {
+                                    recordM: model ? model.QtObject : null
+
+                                    timeLineController: rootItem.timeLineController
+                                }
+                            }
                         }
-
-
                     }
 
                     //

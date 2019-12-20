@@ -39,5 +39,6 @@
         <file>qml/license/LicensePopup.qml</file>
         <file>qml/popup/ConfirmationPopup.qml</file>
         <file>qml/popup/SystemInformationPopup.qml</file>
+        <file>qml/timeline/RecordInTimeline.qml</file>
     </qresource>
 </RCC>
