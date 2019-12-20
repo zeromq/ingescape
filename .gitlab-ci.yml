@@ -2,23 +2,23 @@
 
 # Define job order
 stages:
-  - build-lib
-  - installer-lib
-  - deploy-lib
-  - delivery-lib
-  - delivery-lib-stable
-  - build-binding
-  - installer-binding
-  - deploy-binding
-  - delivery-binding
-  - delivery-binding-stable
-  - build-apps
-  - installer-apps
-  - delivery-apps
-  - delivery-apps-stable
+  - lib-build
+  - lib-installer
+  - lib-deploy
+  - lib-delivery
+  - lib-delivery-stable
+  - binding-build
+  - binding-installer
+  - binding-deploy
+  - binding-delivery
+  - binding-delivery-stable
+  - apps-build
+  - apps-installer
+  - apps-delivery
+  - apps-delivery-stable
 
 # Define ingescape library files
-.build-lib-files: &build-lib-files
+.lib-build-files: &lib-build-files
   only:
     changes:
       - .gitlab-ci.yml
@@ -33,7 +33,7 @@ stages:
       - stable
 
 # Define csharp binding files
-.build-csharp-files: &build-csharp-files
+.binding-build-files: &binding-build-files
   only:
     changes:
       - .gitlab-ci.yml
@@ -49,7 +49,7 @@ stages:
       - stable
 
 # Define ingescape editor files
-.build-editor-files: &build-editor-files
+.editor-build-files: &editor-build-files
   only:
     changes:
       - .gitlab-ci.yml
@@ -66,7 +66,7 @@ stages:
       - stable
 
 # Define ingescape assessments files
-.build-assessments-files: &build-assessments-files
+.assessments-build-files: &assessments-build-files
   only:
     changes:
       - .gitlab-ci.yml
@@ -83,7 +83,7 @@ stages:
       - stable
 
 # Define ingescape expe files
-.build-expe-files: &build-expe-files
+.expe-build-files: &expe-build-files
   only:
     changes:
       - .gitlab-ci.yml
@@ -107,34 +107,60 @@ stages:
 #| | | | | | (_| | (__| |__| |____) |
 #|_| |_| |_|\__,_|\___|\____/|_____/
                                     
-# Create ingescape library for macos
-lib-macos-release-x64:
-  <<: *build-lib-files
-  stage: build-lib
+# Build library for macos
+lib-build-macos:
+  <<: *lib-build-files
+  stage: lib-build
   tags:
     - osx
   script:
     - git clean -xfd
     - mkdir build
-    - mkdir deploy
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/builds/release/x64/usr/local/
+    - mkdir release
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/builds/release/ingescape/usr/local/
     - make -C build
-    - make -C build DESTDIR=$PWD/deploy install
-    - make -C build DESTDIR=$HOME/builds/release/x64/ install
-    - cd deploy/usr/local/
+    - make -C build DESTDIR=$PWD/release install
+    - make -C build DESTDIR=$HOME/builds/release/ingescape/ install
+    - cp src/include/ingescape_private.h $HOME/builds/release/ingescape/usr/local/include/ingescape/
+    - cd release/usr/local/
     - tar zcvf ../../../libingescape.tgz *
     - cd ../../..
   artifacts:
     paths:
       - libingescape.tgz
-    name: "lib-macos-release-x64"
+    name: "lib-build-macos"
     expire_in: 1 day
   dependencies: []
 
-# Create ingescape editor for macos
-editor-macos-release-x64:
-  <<: *build-editor-files
-  stage: build-apps
+
+# Create runtime installer for macos
+#On runner machine:
+#-install Packages from http://s.sudre.free.fr/Software/Packages/about.html
+#- get and install pkg signing certificate from apple developer site
+#- indicate proper developper id in signing command line below
+lib-installer-macos:
+  <<: *lib-build-files
+  stage: lib-installer
+  tags:
+    - osx
+  script:
+    - packagesbuild ./builds/xcode/ingescape.pkgproj
+#    - mv ./builds/xcode/build/ingescape.pkg ./builds/xcode/build/ingescape_unsigned.pkg
+#    - productsign --sign "Developer ID Installer: XXXXXXXXXXXXXX" ingescape_unsigned.pkg ingescape.pkg
+    mkdir $HOME/builds/packages
+    - cp ./builds/xcode/build/ingescape.pkg $HOME/builds/packages/
+  artifacts:
+    paths:
+      - ./builds/xcode/build/ingescape.pkg
+    name: "lib-installer-macos"
+  dependencies:
+    - lib-build-macos
+
+
+# Build ingescape editor for macos
+editor-build-macos:
+  <<: *editor-build-files
+  stage: apps-build
   variables:
     Qt5_DIR: ~/Qt/5.9.7/clang_64/lib/cmake/Qt5
   tags:
@@ -147,14 +173,14 @@ editor-macos-release-x64:
   artifacts:
     paths:
       - applications/apps/IngeScape-Editor/build
-    name: "editor-macos-release-x64"
+    name: "editor-build-macos"
     expire_in: 1 day
   dependencies: []
 
-# Create ingescape assessments for macos
-assessments-macos-release-x64:
-  <<: *build-assessments-files
-  stage: build-apps
+# Build ingescape assessments for macos
+assessments-build-macos:
+  <<: *assessments-build-files
+  stage: apps-build
   variables:
     Qt5_DIR: ~/Qt/5.9.7/clang_64/lib/cmake/Qt5
     GIT_SUBMODULE_STRATEGY: recursive
@@ -168,14 +194,15 @@ assessments-macos-release-x64:
   artifacts:
     paths:
       - applications/apps/IngeScape-Assessments/build
-    name: "assessments-macos-release-x64"
+    name: "assessments-build-macos"
     expire_in: 1 day
   dependencies: []
 
-# Create ingescape expe for macos
-expe-macos-release-x64:
-  <<: *build-expe-files
-  stage: build-apps
+
+# Build ingescape expe for macos
+expe-build-macos:
+  <<: *expe-build-files
+  stage: apps-build
   variables:
     Qt5_DIR: ~/Qt/5.9.7/clang_64/lib/cmake/Qt5
     GIT_SUBMODULE_STRATEGY: recursive
@@ -189,33 +216,15 @@ expe-macos-release-x64:
   artifacts:
     paths:
       - applications/apps/IngeScape-Expe/build
-    name: "expe-macos-release-x64"
+    name: "expe-build-macos"
     expire_in: 1 day
   dependencies: []
 
-# Create runtime install for macos 64 bits
-lib-installer-runtime-macos-x64:
-  <<: *build-lib-files
-  stage: installer-lib
-  tags:
-    - osx
-  script:
-    - make -C build package
-    - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
-    - sed -i '' 's/DARWIN_PACKAGE_FILE_NAME=.*/DARWIN_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
-    - mv build macos_x64
-  artifacts:
-    paths:
-      - macos_x64/ingescape-*
-      - macos_x64/installIngescapeAndDependencies.sh
-    name: "lib-installer-runtime-macos-x64"
-  dependencies:
-    - lib-macos-release-x64
 
-# Create editor install for macos 64 bits
-editor-installer-macos-x64:
-  <<: *build-editor-files
-  stage: installer-apps
+# Create editor installer
+editor-installer-macos:
+  <<: *editor-build-files
+  stage: apps-installer
   tags:
     - osx
   script:
@@ -224,14 +233,15 @@ editor-installer-macos-x64:
   artifacts:
     paths:
       - applications/apps/IngeScape-Editor/build/IngeScape-Editor-*
-    name: "editor-installer-macos-x64"
+    name: "editor-installer-macos"
   dependencies:
-    - editor-macos-release-x64
+    - editor-build-macos
 
-# Create assessments install for macos 64 bits
-assessments-installer-macos-x64:
-  <<: *build-assessments-files
-  stage: installer-apps
+
+# Create assessments installer
+assessments-installer-macos:
+  <<: *assessments-build-files
+  stage: apps-installer
   tags:
     - osx
   script:
@@ -240,14 +250,15 @@ assessments-installer-macos-x64:
   artifacts:
     paths:
       - applications/apps/IngeScape-Assessments/build/IngeScape-Assessments-*
-    name: "assessments-installer-macos-x64"
+    name: "assessments-installer-macos"
   dependencies:
-    - assessments-macos-release-x64
+    - assessments-build-macos
 
-# Create expe install for macos 64 bits
-expe-installer-macos-x64:
-  <<: *build-expe-files
-  stage: installer-apps
+
+# Create expe installer
+expe-installer-macos:
+  <<: *expe-build-files
+  stage: apps-installer
   tags:
     - osx
   script:
@@ -256,21 +267,10 @@ expe-installer-macos-x64:
   artifacts:
     paths:
       - applications/apps/IngeScape-Expe/build/IngeScape-Expe-*
-    name: "expe-installer-macos-x64"
+    name: "expe-installer-macos"
   dependencies:
-    - expe-macos-release-x64
+    - expe-build-macos
 
-# Deploy ingescape in mac os X to be able to compile agents
-lib-deploy-macos-release-x64:
-  <<: *build-lib-files
-  stage: deploy-lib
-  tags:
-    - osx
-  script:
-    - make -C build install DESTDIR=~/builds/release/x64
-    - cp src/include/ingescape_private.h ~/builds/release/x64/usr/local/include/ingescape/
-  dependencies:
-    - lib-macos-release-x64
 
 
 #__          ___           _
@@ -281,8 +281,8 @@ lib-deploy-macos-release-x64:
 #    \/  \/   |_|_| |_|\__,_|\___/ \_/\_/ |___/
 
 binding-csharp-windows-x64:
-  <<: *build-csharp-files
-  stage: build-binding
+  <<: *binding-build-files
+  stage: binding-build
   tags:
     - windows
   variables:
@@ -301,8 +301,8 @@ binding-csharp-windows-x64:
   dependencies: []
 
 binding-csharp-windows-x86:
-  <<: *build-csharp-files
-  stage: build-binding
+  <<: *binding-build-files
+  stage: binding-build
   tags:
     - windows
   variables:
@@ -322,8 +322,8 @@ binding-csharp-windows-x86:
 
 # Create ingescape library for windows 64 bits release
 lib-windows-release-x64:
-  <<: *build-lib-files
-  stage: build-lib
+  <<: *lib-build-files
+  stage: lib-build
   tags:
     - windows
   variables:
@@ -344,8 +344,8 @@ lib-windows-release-x64:
 
 # Create ingescape library for windows 32 bits release
 lib-windows-release-x86:
-  <<: *build-lib-files
-  stage: build-lib
+  <<: *lib-build-files
+  stage: lib-build
   tags:
     - windows
   variables:
@@ -366,8 +366,8 @@ lib-windows-release-x86:
 
 # Create ingescape library for windows 64 bits debug
 lib-windows-debug-x64:
-  <<: *build-lib-files
-  stage: build-lib
+  <<: *lib-build-files
+  stage: lib-build
   tags:
     - windows
   variables:
@@ -388,8 +388,8 @@ lib-windows-debug-x64:
 
 # Create ingescape library for windows 32 bits debug
 lib-windows-debug-x86:
-  <<: *build-lib-files
-  stage: build-lib
+  <<: *lib-build-files
+  stage: lib-build
   tags:
     - windows
   variables:
@@ -410,8 +410,8 @@ lib-windows-debug-x86:
 
 # Create ingescape editor for windows
 editor-windows-release-x86:
-  <<: *build-editor-files
-  stage: build-apps
+  <<: *editor-build-files
+  stage: apps-build
   variables:
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
     ARCH: "Editor_x86"
@@ -433,8 +433,8 @@ editor-windows-release-x86:
 
 # Create ingescape editor for windows
 editor-windows-release-x64:
-  <<: *build-editor-files
-  stage: build-apps
+  <<: *editor-build-files
+  stage: apps-build
   variables:
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
     ARCH: "Editor_x64"
@@ -456,8 +456,8 @@ editor-windows-release-x64:
 
 # Create ingescape assessments for windows
 assessments-windows-release-x86:
-  <<: *build-assessments-files
-  stage: build-apps
+  <<: *assessments-build-files
+  stage: apps-build
   variables:
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
     GIT_SUBMODULE_STRATEGY: recursive
@@ -480,8 +480,8 @@ assessments-windows-release-x86:
 
 # Create ingescape assessments for windows
 assessments-windows-release-x64:
-  <<: *build-assessments-files
-  stage: build-apps
+  <<: *assessments-build-files
+  stage: apps-build
   variables:
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
     GIT_SUBMODULE_STRATEGY: recursive
@@ -504,8 +504,8 @@ assessments-windows-release-x64:
 
 # Create ingescape expe for windows (x86)
 expe-windows-release-x86:
-  <<: *build-expe-files
-  stage: build-apps
+  <<: *expe-build-files
+  stage: apps-build
   variables:
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
     GIT_SUBMODULE_STRATEGY: recursive
@@ -528,8 +528,8 @@ expe-windows-release-x86:
 
 # Create ingescape expe for windows (x64)
 expe-windows-release-x64:
-  <<: *build-expe-files
-  stage: build-apps
+  <<: *expe-build-files
+  stage: apps-build
   variables:
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
     GIT_SUBMODULE_STRATEGY: recursive
@@ -552,8 +552,8 @@ expe-windows-release-x64:
 
 # Create runtime install for windows 32 bits
 lib-installer-runtime-windows-x86:
-  <<: *build-lib-files
-  stage: installer-lib
+  <<: *lib-build-files
+  stage: lib-installer
   variables:
     ARCH: "Release_x86"
   tags:
@@ -570,8 +570,8 @@ lib-installer-runtime-windows-x86:
 
 # Create runtime install for windows 64 bits
 lib-installer-runtime-windows-x64:
-  <<: *build-lib-files
-  stage: installer-lib
+  <<: *lib-build-files
+  stage: lib-installer
   variables:
     ARCH: "Release_x64"
   tags:
@@ -588,8 +588,8 @@ lib-installer-runtime-windows-x64:
 
 # Create runtime install for windows 64 bits
 binding-csharp-installer-windows-x64:
-  <<: *build-csharp-files
-  stage: installer-binding
+  <<: *binding-build-files
+  stage: binding-installer
   variables:
     ARCH: "x64"
   tags:
@@ -606,8 +606,8 @@ binding-csharp-installer-windows-x64:
 
 # Create runtime install for windows 32 bits
 binding-csharp-installer-windows-x86:
-  <<: *build-csharp-files
-  stage: installer-binding
+  <<: *binding-build-files
+  stage: binding-installer
   variables:
     ARCH: "x86"
   tags:
@@ -624,8 +624,8 @@ binding-csharp-installer-windows-x86:
 
 # Create editor install for windows 32 bits
 editor-installer-windows-x86:
-  <<: *build-editor-files
-  stage: installer-apps
+  <<: *editor-build-files
+  stage: apps-installer
   variables:
     ARCH: "Editor_x86"
   tags:
@@ -641,8 +641,8 @@ editor-installer-windows-x86:
 
 # Create editor install for windows 64 bits
 editor-installer-windows-x64:
-  <<: *build-editor-files
-  stage: installer-apps
+  <<: *editor-build-files
+  stage: apps-installer
   variables:
     ARCH: "Editor_x64"
   tags:
@@ -658,8 +658,8 @@ editor-installer-windows-x64:
 
 # Create assessments install for windows 32 bits
 assessments-installer-windows-x86:
-  <<: *build-assessments-files
-  stage: installer-apps
+  <<: *assessments-build-files
+  stage: apps-installer
   variables:
     ARCH: "Assessments_x86"
   tags:
@@ -675,8 +675,8 @@ assessments-installer-windows-x86:
 
 # Create assessments install for windows 64 bits
 assessments-installer-windows-x64:
-  <<: *build-assessments-files
-  stage: installer-apps
+  <<: *assessments-build-files
+  stage: apps-installer
   variables:
     ARCH: "Assessments_x64"
   tags:
@@ -692,8 +692,8 @@ assessments-installer-windows-x64:
 
 # Create expe install for windows 32 bits
 expe-installer-windows-x86:
-  <<: *build-expe-files
-  stage: installer-apps
+  <<: *expe-build-files
+  stage: apps-installer
   variables:
     ARCH: "Expe_x86"
   tags:
@@ -709,8 +709,8 @@ expe-installer-windows-x86:
 
 # Create expe install for windows 64 bits
 expe-installer-windows-x64:
-  <<: *build-expe-files
-  stage: installer-apps
+  <<: *expe-build-files
+  stage: apps-installer
   variables:
     ARCH: "Expe_x64"
   tags:
@@ -726,8 +726,8 @@ expe-installer-windows-x64:
 
 # Deploy ingescape in windows to be able to compile agents
 lib-deploy-windows:
-  <<: *build-lib-files
-  stage: deploy-lib
+  <<: *lib-build-files
+  stage: lib-deploy
   tags:
     - windows
   script:
@@ -745,8 +745,8 @@ lib-deploy-windows:
 
 # Deploy ingescape binding in windows to be able to compile agents
 binding-deploy-windows-release-x64:
-  <<: *build-csharp-files
-  stage: deploy-binding
+  <<: *binding-build-files
+  stage: binding-deploy
   variables:
     ARCH: "x64"
   tags:
@@ -759,8 +759,8 @@ binding-deploy-windows-release-x64:
 
 # Deploy ingescape binding in windows to be able to compile agents
 binding-deploy-windows-release-x86:
-  <<: *build-csharp-files
-  stage: deploy-binding
+  <<: *binding-build-files
+  stage: binding-deploy
   variables:
     ARCH: "x86"
   tags:
@@ -780,8 +780,8 @@ binding-deploy-windows-release-x86:
 
 # Create ingescape library for linux (x86_64)
 lib-linux-release-x64:
-  <<: *build-lib-files
-  stage: build-lib
+  <<: *lib-build-files
+  stage: lib-build
   tags:
     - docker
   image: ingescape/debian-with-zyre
@@ -799,8 +799,8 @@ lib-linux-release-x64:
 
 # Create ingescape library for Debian 9 (x86_64)
 lib-debian-9-release-x64:
-  <<: *build-lib-files
-  stage: build-lib
+  <<: *lib-build-files
+  stage: lib-build
   tags:
     - docker
   image: ingescape/debian-9-with-zyre
@@ -818,8 +818,8 @@ lib-debian-9-release-x64:
 
 # Create ingescape library for Debian 10 (x86_64)
 lib-debian-10-release-x64:
-  <<: *build-lib-files
-  stage: build-lib
+  <<: *lib-build-files
+  stage: lib-build
   tags:
     - docker
   image: ingescape/debian-10-with-zyre
@@ -837,8 +837,8 @@ lib-debian-10-release-x64:
 
 # Create ingescape library for CentOS 7 (x86_64)
 lib-centos-7-release-x64:
-  <<: *build-lib-files
-  stage: build-lib
+  <<: *lib-build-files
+  stage: lib-build
   tags:
     - docker
   image: ingescape/centos-7-with-zyre
@@ -856,8 +856,8 @@ lib-centos-7-release-x64:
 
 # Create ingescape library for linux (armv7/armhf)
 lib-linux-release-armhf:
-  <<: *build-lib-files
-  stage: build-lib
+  <<: *lib-build-files
+  stage: lib-build
   tags:
     - docker
   image: ingescape/ubuntu-x-compil-rpi
@@ -875,8 +875,8 @@ lib-linux-release-armhf:
 
 # Create ingescape library for Raspbian 9 (armv7/armhf)
 lib-raspbian-9-release-armhf:
-  <<: *build-lib-files
-  stage: build-lib
+  <<: *lib-build-files
+  stage: lib-build
   tags:
     - docker
   image: ingescape/ubuntu-x-compil-rpi
@@ -894,8 +894,8 @@ lib-raspbian-9-release-armhf:
 
 # Create ingescape library for Android (armv7a softfp)
 lib-android-release-armv7a-softfp:
-  <<: *build-lib-files
-  stage: build-lib
+  <<: *lib-build-files
+  stage: lib-build
   tags:
     - docker
   image: ingescape/ubuntu-x-compil-android
@@ -913,8 +913,8 @@ lib-android-release-armv7a-softfp:
 
 # Create runtime install for linux 64 bits - Generic ZIP
 lib-installer-runtime-linux-x64:
-  <<: *build-lib-files
-  stage: installer-lib
+  <<: *lib-build-files
+  stage: lib-installer
   tags:
     - docker
   image: ingescape/debian-with-zyre
@@ -933,8 +933,8 @@ lib-installer-runtime-linux-x64:
 
 # Create runtime install for linux 64 bits - Debian 9 (stretch)
 lib-installer-runtime-debian-9-x64:
-  <<: *build-lib-files
-  stage: installer-lib
+  <<: *lib-build-files
+  stage: lib-installer
   tags:
     - docker
   image: ingescape/debian-9-with-zyre
@@ -953,8 +953,8 @@ lib-installer-runtime-debian-9-x64:
 
 # Create runtime install for linux 64 bits - Debian 10 (buster)
 lib-installer-runtime-debian-10-x64:
-  <<: *build-lib-files
-  stage: installer-lib
+  <<: *lib-build-files
+  stage: lib-installer
   tags:
     - docker
   image: ingescape/debian-10-with-zyre
@@ -973,8 +973,8 @@ lib-installer-runtime-debian-10-x64:
 
 # Create runtime install for linux 64 bits - CentOS
 lib-installer-runtime-centos-x64:
-  <<: *build-lib-files
-  stage: installer-lib
+  <<: *lib-build-files
+  stage: lib-installer
   tags:
     - docker
   image: ingescape/centos-7-with-zyre
@@ -993,8 +993,8 @@ lib-installer-runtime-centos-x64:
 
 # Create runtime install for linux ARMv7 (armhf) - Generic ZIP
 lib-installer-runtime-linux-armhf:
-  <<: *build-lib-files
-  stage: installer-lib
+  <<: *lib-build-files
+  stage: lib-installer
   tags:
     - docker
   image: ingescape/ubuntu-x-compil-rpi
@@ -1013,8 +1013,8 @@ lib-installer-runtime-linux-armhf:
 
 # Create runtime install for linux ARMv7 (armhf) - Raspbian 9 (stretch)
 lib-installer-runtime-raspbian-9-armhf:
-  <<: *build-lib-files
-  stage: installer-lib
+  <<: *lib-build-files
+  stage: lib-installer
   tags:
     - docker
   image: ingescape/ubuntu-x-compil-rpi
@@ -1033,8 +1033,8 @@ lib-installer-runtime-raspbian-9-armhf:
 
 # Create runtime install for Android (armv7a softfp) - Generic ZIP
 lib-installer-runtime-android-armv7a-softfp:
-  <<: *build-lib-files
-  stage: installer-lib
+  <<: *lib-build-files
+  stage: lib-installer
   tags:
     - docker
   image: ingescape/ubuntu-x-compil-android
@@ -1051,8 +1051,8 @@ lib-installer-runtime-android-armv7a-softfp:
 
 # Deploy ingescape in linux to be able to compile agents
 lib-deploy-linux-release-x64:
-  <<: *build-lib-files
-  stage: deploy-lib
+  <<: *lib-build-files
+  stage: lib-deploy
   tags:
     - docker
   image: ingescape/debian-with-zyre
@@ -1064,8 +1064,8 @@ lib-deploy-linux-release-x64:
 
 # Deploy ingescape in linux to be able to compile agents
 lib-deploy-debian-9-release-x64:
-  <<: *build-lib-files
-  stage: deploy-lib
+  <<: *lib-build-files
+  stage: lib-deploy
   tags:
     - docker
   image: ingescape/debian-9-with-zyre
@@ -1077,8 +1077,8 @@ lib-deploy-debian-9-release-x64:
 
 # Deploy ingescape in linux to be able to compile agents
 lib-deploy-debian-10-release-x64:
-  <<: *build-lib-files
-  stage: deploy-lib
+  <<: *lib-build-files
+  stage: lib-deploy
   tags:
     - docker
   image: ingescape/debian-10-with-zyre
@@ -1090,8 +1090,8 @@ lib-deploy-debian-10-release-x64:
 
 # Deploy ingescape in linux to be able to compile agents
 lib-deploy-centos-7-release-x64:
-  <<: *build-lib-files
-  stage: deploy-lib
+  <<: *lib-build-files
+  stage: lib-deploy
   tags:
     - docker
   image: ingescape/centos-7-with-zyre
@@ -1103,8 +1103,8 @@ lib-deploy-centos-7-release-x64:
 
 # Deploy ingescape in linux to be able to compile agents
 lib-deploy-linux-release-armhf:
-  <<: *build-lib-files
-  stage: deploy-lib
+  <<: *lib-build-files
+  stage: lib-deploy
   tags:
     - docker
   image: ingescape/ubuntu-x-compil-rpi
@@ -1121,12 +1121,12 @@ lib-deploy-linux-release-armhf:
 #| |__| |  __/ | |\ V /  __/ |  | |_| |
 #|_____/ \___|_|_| \_/ \___|_|   \__, |
 #                                 __/ |
-#                                |___/ 
+#                                |___/
 
 # Deliver installers so they can be downloaded from the website
 lib-delivery-all:
-  <<: *build-lib-files
-  stage: delivery-lib
+  <<: *lib-build-files
+  stage: lib-delivery
   tags:
     - docker
   image: ingescape/alpine-deployment
@@ -1210,8 +1210,8 @@ lib-delivery-all:
 
 # Deliver installers so they can be downloaded from the website
 editor-delivery-all:
-  <<: *build-editor-files
-  stage: delivery-apps
+  <<: *editor-build-files
+  stage: apps-delivery
   tags:
     - docker
   image: ingescape/alpine-deployment
@@ -1246,8 +1246,8 @@ editor-delivery-all:
 
 # Deliver installers so they can be downloaded from the website
 assessments-delivery-all:
-  <<: *build-assessments-files
-  stage: delivery-apps
+  <<: *assessments-build-files
+  stage: apps-delivery
   tags:
     - docker
   image: ingescape/alpine-deployment
@@ -1282,8 +1282,8 @@ assessments-delivery-all:
 
 # Deliver installers so they can be downloaded from the website
 expe-delivery-all:
-  <<: *build-expe-files
-  stage: delivery-apps
+  <<: *expe-build-files
+  stage: apps-delivery
   tags:
     - docker
   image: ingescape/alpine-deployment
@@ -1319,8 +1319,8 @@ expe-delivery-all:
 
 # Deliver installers so they can be downloaded from the website
 binding-delivery-all:
-  <<: *build-csharp-files
-  stage: delivery-binding
+  <<: *binding-build-files
+  stage: binding-delivery
   tags:
     - docker
   image: ingescape/alpine-deployment
@@ -1353,7 +1353,7 @@ lib-delivery-all-stable:
   only:
     refs:
       - stable
-  stage: delivery-lib-stable
+  stage: lib-delivery-stable
   tags:
     - docker
   image: ingescape/alpine-deployment
@@ -1440,7 +1440,7 @@ editor-delivery-all-stable:
   only:
     refs:
       - stable
-  stage: delivery-apps
+  stage: apps-delivery
   tags:
     - docker
   image: ingescape/alpine-deployment
@@ -1478,7 +1478,7 @@ assessments-delivery-all-stable:
   only:
     refs:
       - stable
-  stage: delivery-apps
+  stage: apps-delivery
   tags:
     - docker
   image: ingescape/alpine-deployment
@@ -1516,7 +1516,7 @@ expe-delivery-all-stable:
   only:
     refs:
       - stable
-  stage: delivery-apps
+  stage: apps-delivery
   tags:
     - docker
   image: ingescape/alpine-deployment
@@ -1555,7 +1555,7 @@ binding-delivery-all-stable:
   only:
     refs:
       - stable
-  stage: delivery-binding
+  stage: binding-delivery
   tags:
     - docker
   image: ingescape/alpine-deployment
