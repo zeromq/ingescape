@@ -53,7 +53,7 @@ Item {
     property Item parentItemWhenDragged: _listView ? _listView.parent : null
 
     // Color of placeholders
-    property color placeholderColor: "lightgrey" // IngeScapeTheme.editorsBackgroundColor
+    property color placeholderColor: IngeScapeTheme.editorsBackgroundColor
 
     // Radius of placeholders
     property real placeholderRadius : 0
