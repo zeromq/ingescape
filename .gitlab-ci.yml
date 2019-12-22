@@ -1166,7 +1166,7 @@ lib-delivery-all:
     - ls library/win64/ | grep -v 'latest_delivery' > library/win64/latest_delivery
     - echo "Deliver macos"
     - mkdir --parents library/macos
-    - mv ingescape.pkg library/macos/
+    - mv ./build/ingescape*.pkg library/macos/
     - ls library/macos/ | grep -v 'latest_delivery' > library/macos/latest_delivery
     - echo "Deliver generic Linux x64"
     - mkdir --parents library/linux_x64/
