@@ -127,7 +127,8 @@ lib-build-macos:
     - cd ../../..
   artifacts:
     paths:
-      - libingescape.tgz
+      - ./build
+      - ./release
     name: "lib-build-macos"
     expire_in: 1 day
   dependencies: []

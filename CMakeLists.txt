@@ -397,6 +397,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
             COMPONENT library)
 
   elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    # https://cmake.org/cmake/help/git-stage/cpack_gen/productbuild.html
     # Without component productbuild will not package any files
     set(CPACK_COMPONENTS_ALL library)
     set(CPACK_PACKAGING_INSTALL_PREFIX "/usr/local")
