@@ -146,15 +146,17 @@ lib-installer-macos:
   tags:
     - osx
   script:
-    - packagesbuild ./builds/xcode/ingescape.pkgproj
-    - mv ./builds/xcode/build/ingescape.pkg ./builds/xcode/build/ingescape_unsigned.pkg
-    - 'productsign --sign "Developer ID Installer: Ingenuity i/o (56DRT9MG9S)" ./builds/xcode/build/ingescape_unsigned.pkg ./builds/xcode/build/ingescape.pkg'
+    - make -C build package
+#    - packagesbuild ./builds/xcode/ingescape.pkgproj
+#    - mv ./builds/xcode/build/ingescape.pkg ./builds/xcode/build/ingescape_unsigned.pkg
+#    - 'productsign --sign "Developer ID Installer: Ingenuity i/o (56DRT9MG9S)" ./builds/xcode/build/ingescape_unsigned.pkg ./builds/xcode/build/ingescape.pkg'
     - mkdir -p $HOME/builds/packages
-    - cp ./builds/xcode/build/ingescape.pkg $HOME/builds/packages/
-    - mv ./builds/xcode/build/ingescape.pkg .
+#    - cp ./builds/xcode/build/ingescape.pkg $HOME/builds/packages/
+    - cp ./build/ingescape*.pkg $HOME/builds/packages/
+#    - mv ./build/ingescape*.pkg .
   artifacts:
     paths:
-      - ./ingescape.pkg
+      - ./build
     name: "lib-installer-macos"
   dependencies:
     - lib-build-macos
@@ -174,7 +176,7 @@ editor-build-macos:
     - mkdir -p applications/apps/IngeScape-Editor/build
     - cmake -S applications/apps/IngeScape-Editor/ -B applications/apps/IngeScape-Editor/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.9.7/clang_64/;$HOME/builds/release/ingescape/usr/local/"
     - make -C applications/apps/IngeScape-Editor/build
-    - 'codesign --force --deep --sign  "Developer ID Application: Ingenuity i/o (56DRT9MG9S)" -v applications/apps/IngeScape-Editor/build/IngeScape-Editor.app'
+#    - 'codesign --force --deep --sign  "Developer ID Application: Ingenuity i/o (56DRT9MG9S)" -v applications/apps/IngeScape-Editor/build/IngeScape-Editor.app'
     - mkdir -p $HOME/builds/release/apps/
     - cp -Rf applications/apps/IngeScape-Editor/build/IngeScape-Editor.app $HOME/builds/release/apps/
   artifacts:
@@ -198,7 +200,7 @@ assessments-build-macos:
     - mkdir -p applications/apps/IngeScape-Assessments/build
     - cmake -S applications/apps/IngeScape-Assessments/ -B applications/apps/IngeScape-Assessments/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.9.7/clang_64/;$HOME/builds/release/ingescape/usr/local/"
     - make -C applications/apps/IngeScape-Assessments/build
-    - 'codesign --force --deep --sign  "Developer ID Application: Ingenuity i/o (56DRT9MG9S)" -v applications/apps/IngeScape-Assessments/build/IngeScape-Assessments.app'
+#    - 'codesign --force --deep --sign  "Developer ID Application: Ingenuity i/o (56DRT9MG9S)" -v applications/apps/IngeScape-Assessments/build/IngeScape-Assessments.app'
     - mkdir -p $HOME/builds/release/apps/
     - cp -Rf applications/apps/IngeScape-Assessments/build/IngeScape-Assessments.app $HOME/builds/release/apps/
   artifacts:
@@ -223,7 +225,7 @@ expe-build-macos:
     - mkdir -p applications/apps/IngeScape-Expe/build
     - cmake -S applications/apps/IngeScape-Expe/ -B applications/apps/IngeScape-Expe/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.9.7/clang_64/;$HOME/builds/release/ingescape/usr/local/"
     - make -C applications/apps/IngeScape-Expe/build
-    - 'codesign --force --deep --sign  "Developer ID Application: Ingenuity i/o (56DRT9MG9S)" -v applications/apps/IngeScape-Expe/build/IngeScape-Expe.app'
+#    - 'codesign --force --deep --sign  "Developer ID Application: Ingenuity i/o (56DRT9MG9S)" -v applications/apps/IngeScape-Expe/build/IngeScape-Expe.app'
     - mkdir -p $HOME/builds/release/apps/
     - cp -Rf applications/apps/IngeScape-Expe/build/IngeScape-Expe.app $HOME/builds/release/apps/
   artifacts:
