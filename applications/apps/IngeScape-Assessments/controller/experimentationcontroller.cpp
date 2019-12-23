@@ -628,6 +628,19 @@ void ExperimentationController::_retrieveIndependentVariableValuesForTaskInstanc
     }
 }
 
+bool ExperimentationController::isThereOneRecordAfterStartTime() {
+    // Get start time of record in timeline
+    int startTimeRecordInTimeline = _taskInstanceC->scenarioC()->currentTime().msecsSinceStartOfDay();
+
+    // Test if there is an existing record after our start time
+    for (RecordAssessmentM* record : _taskInstanceC->currentTaskInstance()->recordsList()->toList()) {
+        if (record->startTimeInTimeline() >= startTimeRecordInTimeline) {
+            return true;
+        }
+    }
+    return false;
+}
+
 
 /**
  * @brief Method called when the user wants to start to record

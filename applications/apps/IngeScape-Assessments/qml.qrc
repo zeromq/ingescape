@@ -43,5 +43,6 @@
         <file>qml/task_instance/AgentsList.qml</file>
         <file>qml/task_instance/AgentsListItem.qml</file>
         <file>qml/experimentation/DropDownCheckboxes.qml</file>
+        <file>qml/popup/OverloadedRecordsTimelinePopup.qml</file>
     </qresource>
 </RCC>

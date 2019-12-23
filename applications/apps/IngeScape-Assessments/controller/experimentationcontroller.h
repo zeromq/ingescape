@@ -104,6 +104,14 @@ public:
 
 
     /**
+     * @brief Return true if start time in our timeline is before one (or more) record(s)
+     * of our current task instance, false if not
+     * @return
+     */
+    Q_INVOKABLE bool isThereOneRecordAfterStartTime();
+
+
+    /**
      * @brief Method called when the user wants to start to record
      */
     Q_INVOKABLE void startToRecord();

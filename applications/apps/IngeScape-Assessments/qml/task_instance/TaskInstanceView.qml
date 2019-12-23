@@ -20,6 +20,7 @@ import I2Quick 1.0
 
 import INGESCAPE 1.0
 
+import "../popup" as Popup
 
 Item {
     id: rootItem
@@ -51,7 +52,6 @@ Item {
     // 16 = left margin of other panels
     property real restWidth_For3Panels: rootItem.width - 319 - 8 - (3*16)
     property var panelWidths: [ 319, 2*restWidth_For3Panels/7, 3*restWidth_For3Panels/7, 2*restWidth_For3Panels/7]
-
 
 
     //--------------------------------
@@ -136,10 +136,21 @@ Item {
             disabledID: currentID
 
             onClicked: {
-                if (rootItem.experimentationController) {
-                    if (!rootItem.experimentationController.isRecording) {
-                        console.log("QML: Start to Record");
-                        rootItem.experimentationController.startToRecord();
+                if (rootItem.experimentationController)
+                {
+                    if (!rootItem.experimentationController.isRecording)
+                    {
+                        if (rootItem.experimentationController.isThereOneRecordAfterStartTime())
+                        {
+                            // Open notification popup, user has to make a choice
+                            notifOverloadedRecordsPopup.open();
+                        }
+                        else
+                        {
+                            console.log("QML: Start to Record");
+                            rootItem.experimentationController.startToRecord();
+                        }
+
                     }
                     else {
                         console.log("QML: Stop to Record");
@@ -930,5 +941,31 @@ Item {
             GradientStop { position: 1.0; color: "transparent" }
         }
 
+    }
+
+
+    //
+    // Popup to notify that records are about to be overloaded
+    //
+    Popup.OverloadedRecordsTimelinePopup {
+        id: notifOverloadedRecordsPopup
+
+        anchors.centerIn: parent
+
+        onRemoveOtherRecordsWhileRecording: {
+            console.log("QML : emit signal removeOtherRecordsWhileRecording()");
+
+            console.log("QML: Start to Record");
+
+            rootItem.experimentationController.startToRecord();
+
+        }
+
+        onStopRecordingWhenEncounterOtherRecords: {
+            console.log("QML : emit signal stopRecordingWhenEncounterOtherRecords()");
+
+            console.log("QML: Start to Record");
+            rootItem.experimentationController.startToRecord();
+        }
     }
 }
