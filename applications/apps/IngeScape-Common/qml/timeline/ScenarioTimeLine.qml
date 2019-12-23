@@ -336,7 +336,6 @@ Item {
                         }
                     }
                 }
-
             }
         }
 
@@ -777,19 +776,6 @@ Item {
                                     }
                                 }
                             }
-
-                            //
-                            // Records content
-                            //
-                            Repeater {
-                                model: rootItem.recordsListToShow
-
-                                RecordInTimeline {
-                                    recordM: model ? model.QtObject : null
-
-                                    timeLineController: rootItem.timeLineController
-                                }
-                            }
                         }
                     }
 
@@ -874,7 +860,6 @@ Item {
 
         height: 40
         clip : true
-
 
         // Time ticks and current time label
         Flickable {
@@ -979,6 +964,21 @@ Item {
 
                 width: timeLineController.timeTicksTotalWidth
                 height: columnHeadersArea.height
+
+                //
+                // Records content
+                //
+                Repeater {
+                    model: rootItem.recordsListToShow
+
+                    RecordInTimeline {
+                        anchors.bottom: parent.bottom
+
+                        recordM: model ? model.QtObject : null
+
+                        timeLineController: rootItem.timeLineController
+                    }
+                }
 
                 //
                 // Time ticks

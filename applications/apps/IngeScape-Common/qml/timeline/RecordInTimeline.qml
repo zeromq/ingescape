@@ -35,10 +35,6 @@ Item {
     // height of a line in the time line
     property int lineHeight: IngeScapeTheme.lineInTimeLineHeight
 
-    anchors {
-        top: parent.top
-    }
-
      x: recordM && timeLineController
             ? timeLineController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(recordM.startTimeInTimeline, timeLineController.pixelsPerMinute)
             : 0
@@ -47,7 +43,7 @@ Item {
                 ? timeLineController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(recordM.endTimeInTimeline, timeLineController.pixelsPerMinute) - rootItem.x
                 : 0
 
-     height: IngeScapeTheme.lineInTimeLineHeight
+     height: 5
 
 
      //--------------------------------------------------------
@@ -58,9 +54,7 @@ Item {
 
      Rectangle {
          anchors.fill: parent
-         border.color : "red"
-         border.width : 2
-         opacity: 0.3
-         color: "green"
+         opacity: 0.5
+         color: IngeScapeAssessmentsTheme.blueButton
      }
 }
