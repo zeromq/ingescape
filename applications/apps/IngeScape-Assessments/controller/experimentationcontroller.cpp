@@ -504,10 +504,12 @@ void ExperimentationController::_onTimeout_EncounterExistingRecords() {
                 {
                     if (record != nullptr)
                     {
-                        if ((record->endTimeInTimeline() >= deltaTimeFromTimeLineStart) && (_nextRecordToHandle == nullptr))
+                        if (record->endTimeInTimeline() >= deltaTimeFromTimeLineStart)
                         {
-                            // Next record to handle found
-                            setnextRecordToHandle(record);
+                            if (_nextRecordToHandle == nullptr) {
+                                // Next record to handle found
+                                setnextRecordToHandle(record);
+                            }
                         }
                         else
                         {
