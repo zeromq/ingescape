@@ -62,6 +62,9 @@ Item {
     //     of content and not only visual items (data is a list<Object> AND children is a list<Item>)
     property alias extraContent: extraContentItem.data
 
+    // Alias to set visibility of the playScenarioBtn
+    property alias playVisibility: playScenarioBtn.visible
+
 
     //--------------------------------
     //
@@ -114,6 +117,10 @@ Item {
         enabled: rootItem._canPerformResizeAnimations
 
         NumberAnimation {}
+    }
+
+    Component.onCompleted: {
+        console.log(rootItem.playVisibility);
     }
 
 

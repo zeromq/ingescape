@@ -240,6 +240,14 @@ Item {
             id: experimentationsListView
 
             controller: IngeScapeAssessmentsC.experimentationsListC
+
+            //
+            // Behavior
+            //
+
+            Component.onCompleted: {
+                networkConfigurationInfo.visible = false;
+            }
         }
     }
 
@@ -256,11 +264,23 @@ Item {
             controller: IngeScapeAssessmentsC.experimentationC
 
             //
+            // Behavior
+            //
+
+            Component.onCompleted: {
+                networkConfigurationInfo.visible = true;
+            }
+
+
+            //
             // Slots
             //
 
             onGoBackToHome: {
                 console.log("QML: on Go Back to 'Home' (from 'Experimentation' view)");
+
+                // Hide network configuration infos component
+                networkConfigurationInfo.visible = false;
 
                 // Reset the current experimentation
                 rootItem.resetCurrentExperimentation();
@@ -280,11 +300,22 @@ Item {
             experimentationController: IngeScapeAssessmentsC.experimentationC
 
             //
+            // Behavior
+            //
+
+            Component.onCompleted: {
+                networkConfigurationInfo.visible = true;
+            }
+
+            //
             // Slots
             //
 
             onGoBackToHome: {
                 console.log("QML: on Go Back to 'Home' (from 'TaskInstance' view)");
+
+                // Hide network configuration infos component
+                networkConfigurationInfo.visible = false;
 
                 // Reset the current record
                 rootItem.resetCurrentTaskInstance();
@@ -295,6 +326,9 @@ Item {
 
             onGoBackToExperimentation: {
                 console.log("QML: on Go Back to 'Experimentation' (from 'TaskInstance' view)");
+
+                // Hide network configuration infos component
+                networkConfigurationInfo.visible = true;
 
                 // Reset the current task instance
                 rootItem.resetCurrentTaskInstance();

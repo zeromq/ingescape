@@ -69,6 +69,18 @@ Item {
     signal goBackToExperimentation();
 
 
+    //--------------------------------------------------------
+    //
+    // Behavior
+    //
+    //--------------------------------------------------------
+
+    Component.onCompleted: {
+        if (taskInstance && !taskInstance.isRecorded) {
+            timeline.isReduced = false;
+        }
+    }
+
 
     //--------------------------------------------------------
     //
@@ -122,6 +134,8 @@ Item {
 
         licensesController: IngeScapeAssessmentsC.licensesC
         mainController: IngeScapeAssessmentsC
+
+        playVisibility: !startOrStopRecordButton.visible
 
         extraContent: LabellessSvgButton {
             id: startOrStopRecordButton

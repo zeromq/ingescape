@@ -161,7 +161,7 @@ void ExperimentationController::openSession(TaskInstanceM* session)
     {
         qInfo() << "Open the session" << session->name() << "of the experimentation" << _currentExperimentation->name();
 
-        if (_isRecorderON && session->recordsList()->isEmpty())
+        if (session->recordsList()->isEmpty())
         {
             // Get the list of record
             QList<RecordAssessmentM*> recordList = AssessmentsModelManager::select<RecordAssessmentM>({session->getCassUuid() });
@@ -504,10 +504,12 @@ void ExperimentationController::_onTimeout_EncounterExistingRecords() {
                 {
                     if (record != nullptr)
                     {
-                        if ((record->endTimeInTimeline() >= deltaTimeFromTimeLineStart) && (_nextRecordToHandle == nullptr))
+                        if (record->endTimeInTimeline() >= deltaTimeFromTimeLineStart)
                         {
-                            // Next record to handle found
-                            setnextRecordToHandle(record);
+                            if (_nextRecordToHandle == nullptr) {
+                                // Next record to handle found
+                                setnextRecordToHandle(record);
+                            }
                         }
                         else
                         {
