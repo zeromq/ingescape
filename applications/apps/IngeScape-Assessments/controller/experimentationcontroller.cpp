@@ -161,7 +161,7 @@ void ExperimentationController::openSession(TaskInstanceM* session)
     {
         qInfo() << "Open the session" << session->name() << "of the experimentation" << _currentExperimentation->name();
 
-        if (_isRecorderON && session->recordsList()->isEmpty())
+        if (session->recordsList()->isEmpty())
         {
             // Get the list of record
             QList<RecordAssessmentM*> recordList = AssessmentsModelManager::select<RecordAssessmentM>({session->getCassUuid() });

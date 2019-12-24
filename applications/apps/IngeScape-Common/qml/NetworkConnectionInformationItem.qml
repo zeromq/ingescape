@@ -266,6 +266,10 @@ I2CustomRectangle {
         }
     }
 
+    onVisibleChanged: {
+        close();
+    }
+
     // Timer used to auto-close our edition mode
     Timer {
         id: autoCloseTimer
