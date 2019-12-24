@@ -23,8 +23,8 @@ import INGESCAPE 1.0
 AssessmentsPopupBase {
     id: rootPopup
 
-    height: 300
-    width: 550
+    height: 280
+    width: 700
 
     anchors.centerIn: parent
 
@@ -94,9 +94,9 @@ AssessmentsPopupBase {
             anchors {
                 left: parent.left
             }
-            height: 50
+            height: 20
 
-            text: qsTr("You are about to record OVER one or more other record(s).\n\nIf your record encounters other records already registered, you can :\n")
+            text: qsTr("You are about to record OVER one or more other record(s). You can :")
 
             color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
             font {
@@ -131,7 +131,7 @@ AssessmentsPopupBase {
 
                     color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
 
-                    text: "Continue to record and remove other records encountered"
+                    text: "Remove other records already registered encountered and continue recording"
                     elide: Text.ElideRight
 
                     font {
@@ -185,7 +185,7 @@ AssessmentsPopupBase {
 
                     color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
 
-                    text: "Stop to record at the beginning of the first record encountered"
+                    text: "Keep records already registered and stop recording at the beginning of the first record encountered"
                     elide: Text.ElideRight
 
                     font {
@@ -285,14 +285,14 @@ AssessmentsPopupBase {
             }
 
             height: boundingBox.height
-            width: boundingBox.width
+            width: 150
 
             activeFocusOnPress: true
 
             enabled: checkRemoveOtherRecords.checked || checkStopRecord.checked
 
             style: IngeScapeAssessmentsButtonStyle {
-                text: "Ok"
+                text: "Start record"
             }
 
             onClicked: {

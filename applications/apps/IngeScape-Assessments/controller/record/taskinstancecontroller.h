@@ -74,14 +74,6 @@ public:
     }
 
 
-Q_SIGNALS:
-
-    /**
-     * @brief Signal emitted when the user wants to start to record
-     */
-    void startToRecord();
-
-
 private Q_SLOTS:
 
     /**
