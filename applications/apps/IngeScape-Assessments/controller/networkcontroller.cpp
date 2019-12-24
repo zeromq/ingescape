@@ -117,7 +117,12 @@ void NetworkController::_onWhisperedMessageReceived(QString peerId, QString peer
         message.remove(0, prefix_AddedRecord.length());
         // Emit the signal "Added record received"
         Q_EMIT addedRecordReceived(message);
-    }else {
+    }else if (message.startsWith(prefix_DeletedRecord)){
+        message.remove(0, prefix_DeletedRecord.length());
+        // Emit the signal "Deleted record received"
+        Q_EMIT deletedRecordReceived(message);
+    }
+    else {
         qDebug() << "Not yet managed WHISPERED message '" << message << "' for agent" << peerName << "(" << peerId << ")";
     }
 }

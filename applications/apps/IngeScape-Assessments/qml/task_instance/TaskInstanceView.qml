@@ -957,12 +957,16 @@ Item {
 
             console.log("QML: Start to Record");
 
+            rootItem.experimentationController.removeOtherRecordsWhileRecording = true;
+
             rootItem.experimentationController.startToRecord();
 
         }
 
         onStopRecordingWhenEncounterOtherRecords: {
             console.log("QML : emit signal stopRecordingWhenEncounterOtherRecords()");
+
+            rootItem.experimentationController.removeOtherRecordsWhileRecording = false;
 
             console.log("QML: Start to Record");
             rootItem.experimentationController.startToRecord();

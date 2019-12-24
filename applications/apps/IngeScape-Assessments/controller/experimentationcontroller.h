@@ -59,6 +59,16 @@ class ExperimentationController : public QObject
     // List with names of selected Protocol
     I2_QML_PROPERTY_READONLY(QStringList, selectedProtocolNameListToFilter)
 
+    // List of (future) record to handle at each timeout of our timer
+    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(RecordAssessmentM, listFuturRecordsToHandle)
+
+    // Next record model to handle
+    I2_QML_PROPERTY(RecordAssessmentM*, nextRecordToHandle)
+
+    // Flag indicating if user wants to remove other records encountered while recording
+    // If false, it means that recording have to stop at first other record encounter
+    I2_QML_PROPERTY(bool, removeOtherRecordsWhileRecording)
+
 
 public:
 
@@ -223,20 +233,29 @@ public Q_SLOTS:
 
     /**
      * @brief Slot called when the recorder has started to record
-     * @param state
      */
     void onRecordStartedReceived();
+
 
     /**
      * @brief Slot called when the recorder has stopped the record
      */
     void onRecordStoppedReceived();
 
+
     /**
      * @brief Slot called when a record is added
      * @param model
      */
     void onRecordAddedReceived(QString message);
+
+
+    /**
+     * @brief Slot called when a record is deleted
+     * @param message (id of the record)
+     */
+    void onRecordDeletedReceived(QString message);
+
 
 private Q_SLOTS:
 
@@ -260,6 +279,13 @@ private Q_SLOTS:
      * @param state
      */
     void _onTimeLineStateUpdated(QString state);
+
+
+    /**
+     * @brief Called when our timer time out to handle existing records
+     */
+    void _onTimeout_EncounterExistingRecords();
+
 
 
 protected: // Methods
@@ -331,6 +357,10 @@ protected: // Methods
 
 
 protected:
+
+    // Timer to handle the scenario and execute actions
+    QTimer _timerToHandleExistingRecords;
+
 
 private:
 

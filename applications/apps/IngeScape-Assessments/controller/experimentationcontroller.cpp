@@ -32,7 +32,9 @@ ExperimentationController::ExperimentationController(QObject *parent) : QObject(
     _isRecorderON(false),
     _isRecording(false),
     _selectedSubjectIdListToFilter(QStringList()),
-    _selectedProtocolNameListToFilter(QStringList())
+    _selectedProtocolNameListToFilter(QStringList()),
+    _nextRecordToHandle(nullptr),
+    _removeOtherRecordsWhileRecording(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -42,12 +44,21 @@ ExperimentationController::ExperimentationController(QObject *parent) : QObject(
     // Create the controller to manage a session of the current experimentation
     _taskInstanceC = new TaskInstanceController(this);
 
+    // Sort list of our futur records by their start time in timeline
+    _listFuturRecordsToHandle.setSortProperty("startTimeInTimeline");
+
     // Connect to signals from the controller of the scenario
     if (_taskInstanceC->scenarioC() != nullptr)
     {
         connect(_taskInstanceC->scenarioC(), &AbstractScenarioController::actionWillBeExecuted, this, &ExperimentationController::_onActionWillBeExecuted);
         connect(_taskInstanceC->scenarioC(), &AbstractScenarioController::timeLineStateUpdated, this, &ExperimentationController::_onTimeLineStateUpdated);
     }
+
+    //
+    // Init timer
+    //
+    _timerToHandleExistingRecords.setSingleShot(true);
+    connect(&_timerToHandleExistingRecords, &QTimer::timeout, this, &ExperimentationController::_onTimeout_EncounterExistingRecords);
 }
 
 
@@ -75,9 +86,16 @@ ExperimentationController::~ExperimentationController()
         setcurrentExperimentation(nullptr);
     }
 
-    //Clear selected list to filter
+    // Clear selected list to filter
     _selectedSubjectIdListToFilter.clear();
     _selectedProtocolNameListToFilter.clear();
+
+    // Clear our list of records to handlex
+    _listFuturRecordsToHandle.clear();
+
+    // Disconnect our timer and stop it
+    disconnect(&_timerToHandleExistingRecords, &QTimer::timeout, this, &ExperimentationController::_onTimeout_EncounterExistingRecords);
+    _timerToHandleExistingRecords.stop();
 }
 
 
@@ -258,6 +276,7 @@ void ExperimentationController::onRecorderExited(QString peerId, QString peerNam
     }
 }
 
+
 /**
  * @brief Slot called when the recorder has started the record
  */
@@ -266,8 +285,35 @@ void ExperimentationController::onRecordStartedReceived()
     if(_taskInstanceC != nullptr){
         setisRecording(true);
         _taskInstanceC->scenarioC()->playOrResumeTimeLine();
+
+        //
+        // Handle futur records
+        //
+
+        if ((_taskInstanceC->scenarioC() != nullptr) && (_nextRecordToHandle != nullptr))
+        {
+            int deltaTimeFromTimeLineStart = _taskInstanceC->scenarioC()->currentTime().msecsSinceStartOfDay();
+
+            // N.B: timeout will apply user's choice (remove other records or stop record)
+            if (_nextRecordToHandle->startTimeInTimeline() > deltaTimeFromTimeLineStart)
+            {
+                // Record to handle is beginning AFTER our current time
+                _timerToHandleExistingRecords.start(_nextRecordToHandle->startTimeInTimeline() - deltaTimeFromTimeLineStart);
+            }
+            else {
+                // Record to handle is beginning BEFORE our current time
+                if (_removeOtherRecordsWhileRecording)
+                {
+                    _timerToHandleExistingRecords.start(0);
+                }
+                else {
+                    qWarning() << "When user wants to keep its recorder already registered, next record to handle can't begin before our current time in our timeline !!";
+                }
+            }
+        }
     }
 }
+
 
 /**
  * @brief Slot called when the recorder has stopped the record
@@ -280,6 +326,7 @@ void ExperimentationController::onRecordStoppedReceived()
         _taskInstanceC->scenarioC()->stopTimeLine();
     }
 }
+
 
 /**
  * @brief Slot called when a record is added : create a record and add it to the currentSession
@@ -335,6 +382,31 @@ void ExperimentationController::onRecordAddedReceived(QString message){
     }
 };
 
+
+/**
+ * @brief Slot called when a record is deleted : delete a record and delete it from current session
+ * @param message (id of the record)
+ */
+void ExperimentationController::onRecordDeletedReceived(QString message)
+{
+    if ((!message.isEmpty()) && (_currentExperimentation != nullptr) && (!_currentExperimentation->allTaskInstances()->isEmpty()))
+    {
+        for (TaskInstanceM* taskInstance : _currentExperimentation->allTaskInstances()->toList())
+        {
+            for (RecordAssessmentM* record : taskInstance->recordsList()->toList())
+            {
+                if (record->uid() == message)
+                {
+                    // Message is an unique ID, we can return from our function after remove record
+                    _taskInstanceC->currentTaskInstance()->recordsList()->remove(record);
+                    return;
+                }
+            }
+        }
+    }
+};
+
+
 /**
  * @brief Slot called when the current experimentation changed
  * @param currentExperimentation
@@ -377,8 +449,7 @@ void ExperimentationController::_onActionWillBeExecuted(QString message)
     if (_isRecorderON)
     {
         // Send the message "EXECUTED ACTION" to the recorder
-        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerIdOfRecorder,
-                                                                   message);
+        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerIdOfRecorder, message);
     }
 }
 
@@ -404,6 +475,58 @@ void ExperimentationController::_onTimeLineStateUpdated(QString state)
 
         // Send the message "TIMELINE STATE" to the recorder
         IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerIdOfRecorder, notificationAndParameters);
+    }
+}
+
+
+/**
+ * @brief Called when our timer time out to handle existing record after our current time in our timeline
+ */
+void ExperimentationController::_onTimeout_EncounterExistingRecords() {
+    if ((_nextRecordToHandle != nullptr) && (_isRecording))
+    {
+        if (_removeOtherRecordsWhileRecording) // User wants to remove other records encountered
+        {
+            // Notify the recorder that it has to remove entry from the data base
+            QString message = QString("%1=%2").arg(command_DeleteRecord, _nextRecordToHandle->uid());
+            IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerIdOfRecorder, message);
+
+            // Clean list of the record just deleted
+            _listFuturRecordsToHandle.remove(_nextRecordToHandle);
+            setnextRecordToHandle(nullptr);
+
+            // Try to found next record that must be handled
+            if ((_taskInstanceC != nullptr) && (_taskInstanceC->scenarioC() != nullptr) && !_listFuturRecordsToHandle.isEmpty())
+            {
+                int deltaTimeFromTimeLineStart = _taskInstanceC->scenarioC()->currentTime().msecsSinceStartOfDay();
+
+                for (RecordAssessmentM* record : _listFuturRecordsToHandle.toList())
+                {
+                    if (record != nullptr)
+                    {
+                        if ((record->endTimeInTimeline() >= deltaTimeFromTimeLineStart) && (_nextRecordToHandle == nullptr))
+                        {
+                            // Next record to handle found
+                            setnextRecordToHandle(record);
+                        }
+                        else
+                        {
+                            // Clean list of records that are ended before our current time
+                            _listFuturRecordsToHandle.remove(record);
+                        }
+                    }
+                }
+
+                // Relaunch timer to delete next recorder when current time achieved this record
+                if (_nextRecordToHandle != nullptr)
+                {
+                    _timerToHandleExistingRecords.start(_nextRecordToHandle->startTimeInTimeline() - deltaTimeFromTimeLineStart);
+                }
+            }
+        }
+        else { // User wants to stop recording if we encounter another record already registered
+            stopToRecord();
+        }
     }
 }
 
@@ -634,7 +757,7 @@ bool ExperimentationController::isThereOneRecordAfterStartTime() {
 
     // Test if there is an existing record after our start time
     for (RecordAssessmentM* record : _taskInstanceC->currentTaskInstance()->recordsList()->toList()) {
-        if (record->startTimeInTimeline() >= startTimeRecordInTimeline) {
+        if (record->endTimeInTimeline() >= startTimeRecordInTimeline) {
             return true;
         }
     }
@@ -649,6 +772,63 @@ void ExperimentationController::startToRecord()
 {
     if (!_isRecording && _isRecorderON && (_taskInstanceC != nullptr) && (_taskInstanceC->scenarioC() != nullptr))
     {
+        // Current time in our timeline = beginning of user's new record
+        int deltaTimeFromTimeLineStart = _taskInstanceC->scenarioC()->currentTime().msecsSinceStartOfDay();
+
+        //
+        // Handle our futur records
+        //
+
+        // Clean records list to handle other records while user is recording
+        _listFuturRecordsToHandle.clear();
+        setnextRecordToHandle(nullptr);
+
+        // Update records list to handle and next record to handle
+        if ((_taskInstanceC != nullptr) && (_taskInstanceC->currentTaskInstance()) && (!_taskInstanceC->currentTaskInstance()->recordsList()->isEmpty()))
+        {
+            for (RecordAssessmentM* record : _taskInstanceC->currentTaskInstance()->recordsList()->toList())
+            {
+                if ((record != nullptr) && (record->endTimeInTimeline() >= deltaTimeFromTimeLineStart))
+                {
+                    // Records are ending in the futur : we have to handle it
+                    if (_nextRecordToHandle == nullptr)
+                    {
+                        // First record that start after our current time is next one to be handle
+                        setnextRecordToHandle(record);
+                    }
+                    _listFuturRecordsToHandle.append(record);
+                }
+            }
+        }
+
+        if (!_removeOtherRecordsWhileRecording)
+        {
+            while ((_nextRecordToHandle != nullptr) && (_nextRecordToHandle->startTimeInTimeline() <= deltaTimeFromTimeLineStart))
+            {
+                // Record to handle is beginning BEFORE our current time and user wants to keep records already registered
+                // We shift our current time in our timeline to the end of next record
+                deltaTimeFromTimeLineStart = _nextRecordToHandle->endTimeInTimeline();
+                QTime resetCurrentTime = QTime::fromMSecsSinceStartOfDay(0);
+                _taskInstanceC->scenarioC()->setcurrentTime(resetCurrentTime.addMSecs(deltaTimeFromTimeLineStart));
+
+                // Record end time is now before our current time, we can remove from our list to handle and set new next record to handle
+                _listFuturRecordsToHandle.remove(_nextRecordToHandle);
+                if (_listFuturRecordsToHandle.isEmpty())
+                {
+                    setnextRecordToHandle(nullptr);
+                }
+                else
+                {
+                    setnextRecordToHandle(_listFuturRecordsToHandle.at(0));
+                }
+            }
+        }
+
+
+        //
+        // Start our record
+        //
+
         TaskInstanceM* currentSession = _taskInstanceC->currentTaskInstance();
         if ((currentSession != nullptr) && (currentSession->task() != nullptr))
         {
@@ -677,7 +857,7 @@ void ExperimentationController::startToRecord()
                         QString jsonString = QString::fromUtf8(jsonDocument.toJson(QJsonDocument::Compact));
 
                         // Add the delta from the start time of the TimeLine
-                        int deltaTimeFromTimeLineStart = _taskInstanceC->scenarioC()->currentTime().msecsSinceStartOfDay();
+
 
                         QString recordName = QString("%1 (%2)").arg(currentSession->name(), _taskInstanceC->scenarioC()->currentTime().toString("hh:mm:ss.zzz"));
 
@@ -697,10 +877,7 @@ void ExperimentationController::startToRecord()
                         // Send a ZMQ message in several parts to the recorder
                         IngeScapeNetworkController::instance()->sendZMQMessageToAgent(_peerIdOfRecorder, message);
 
-                        // FIXME TODO: wait "prefix_RecordStarted"
-                        setisRecording(true);
-                        _taskInstanceC->scenarioC()->playOrResumeTimeLine();
-
+                        // N.B: Wait for record started received (see ExperimentationController::onRecordStartedReceived)
                     }
                 }
                 else {

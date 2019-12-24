@@ -86,6 +86,8 @@ TaskInstanceM::TaskInstanceM(CassUuid experimentationUuid,
     // Create the "Qml Property Map" that allows to set key-value pairs that can be used in QML bindings
     _mapIndependentVariableValues = new QQmlPropertyMap(this);
 
+    _recordsList.setSortProperty("startTimeInTimeline");
+
     // Connect to signal "Value Changed" from the "Qml Property Map"
     connect(_mapIndependentVariableValues, &QQmlPropertyMap::valueChanged, this, &TaskInstanceM::_onIndependentVariableValueChanged);
 
@@ -120,6 +122,8 @@ TaskInstanceM::~TaskInstanceM()
 
         // Clean-up independent variable map (by name). No deletion.
         _mapIndependentVarByName.clear();
+
+        _recordsList.clear();
 
         // Free memory
         if (_mapIndependentVariableValues != nullptr)

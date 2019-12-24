@@ -58,7 +58,7 @@ class TaskInstanceM : public QObject
     I2_QML_PROPERTY_READONLY(QQmlPropertyMap*, mapIndependentVariableValues)
 
     // List of records of our session
-    I2_QOBJECT_LISTMODEL(RecordAssessmentM, recordsList)
+    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(RecordAssessmentM, recordsList)
 
     // Flag indicating if our session is recorded
     I2_QML_PROPERTY(bool, isRecorded)
