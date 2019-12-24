@@ -397,6 +397,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
             COMPONENT library)
 
   elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    # https://cmake.org/cmake/help/git-stage/cpack_gen/productbuild.html
     # Without component productbuild will not package any files
     set(CPACK_COMPONENTS_ALL library)
     set(CPACK_PACKAGING_INSTALL_PREFIX "/usr/local")
@@ -408,6 +409,12 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
     set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_BINARY_DIR}/LICENSE.txt")
 
     set(CPACK_GENERATOR "productbuild")
+    install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS
+                                     IS_EDITOR)
+    install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS
+                                     IS_EDITOR)
+    install_ingescape_dependencies(CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS IS_EDITOR)
+    install_ingescape_dependencies(ZYRE_LIBRARIES ZYRE_INCLUDE_DIRS IS_EDITOR)
 
   else()
     set(CPACK_MONOLITHIC_INSTALL ON)
