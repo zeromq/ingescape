@@ -165,7 +165,7 @@ void AbstractTimeActionslineScenarioViewController::resetTimeline()
 void AbstractTimeActionslineScenarioViewController::updateTimeCoordinatesOfTimeTicks() {
 
     // change time coordinates if needed
-    qreal viewportTimeRangeInSeconds =  DEFAULT_VIEWPORT_WIDTH/(_pixelsPerMinute/60.0);
+    qreal viewportTimeRangeInSeconds = DEFAULT_VIEWPORT_WIDTH/(_pixelsPerMinute/60.0);
 
     qreal minDeltaBetweenTicks = viewportTimeRangeInSeconds/12.0;
     qreal previousTimeRange = _timeRangeBetweenTimeTicksInMilliSeconds;
@@ -416,8 +416,8 @@ void AbstractTimeActionslineScenarioViewController::_updateFilteredTimeTicksList
     qreal viewportTimeRangeStartInMilliseconds = (_viewportX - _timeMarginInPixels - 20) / (_pixelsPerMinute / NB_MILLI_SECONDS_IN_ONE_MINUTE);
     qreal viewportTimeRangeEndInMilliseconds = (_viewportX + _viewportWidth + 20) / (_pixelsPerMinute / NB_MILLI_SECONDS_IN_ONE_MINUTE);
 
-    int intViewportTimeRangeStartInMilliseconds =  static_cast<int>(viewportTimeRangeStartInMilliseconds);
-    int intViewportTimeRangeEndInMilliseconds =  static_cast<int>(viewportTimeRangeEndInMilliseconds);
+    int intViewportTimeRangeStartInMilliseconds = static_cast<int>(viewportTimeRangeStartInMilliseconds);
+    int intViewportTimeRangeEndInMilliseconds = static_cast<int>(viewportTimeRangeEndInMilliseconds);
 
     // Set the new time range
     _filteredListTimeTicks.setTimeRange(intViewportTimeRangeStartInMilliseconds, intViewportTimeRangeEndInMilliseconds);

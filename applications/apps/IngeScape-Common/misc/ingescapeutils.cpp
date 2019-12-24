@@ -72,7 +72,7 @@ QString IngeScapeUtils::getRootPath()
     if (rootDirectoryPath.isEmpty())
     {
         QStringList documentsLocation = QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation);
-        if (documentsLocation.count() > 0)
+        if (!documentsLocation.isEmpty())
         {
             QString documentsDirectoryPath = documentsLocation.first();
 
