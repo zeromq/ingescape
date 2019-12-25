@@ -141,6 +141,9 @@ lib-build-macos:
 #- indicate proper developper id in signing command line below
 #- to allow codesign without password, call once: security set-keychain-settings ~/Library/Keychains/login.keychain
 #http://s.sudre.free.fr/Software/documentation/Packages/en/Project_Building.html#4
+#https://eclecticlight.co/2017/03/08/making-an-installer-package-the-easier-way/
+#https://fre.applersg.com/check-packages-expired-certificates-mac-os-x
+#https://help.apple.com/xcode/mac/current/#/dev033e997ca
 lib-installer-macos:
   <<: *lib-build-files
   stage: lib-installer
