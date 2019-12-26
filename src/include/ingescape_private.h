@@ -316,6 +316,7 @@ typedef struct _igsAgent_t {
     char agentState[MAX_AGENT_NAME_LENGTH];
     char commandLine[COMMAND_LINE_LENGTH];
     char replayChannel[MAX_AGENT_NAME_LENGTH + 16];
+    char callsChannel[MAX_AGENT_NAME_LENGTH + 16];
     muteCallback_t *muteCallbacks;
     freezeCallback_t *freezeCallbacks;
     zyreCallback_t *zyreCallbacks;

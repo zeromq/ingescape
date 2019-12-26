@@ -1085,6 +1085,9 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         HASH_FIND_STR(agent->definition->calls_table, callName, call);
                         if (call != NULL ){
                             if (call->cb != NULL){
+                                bus_zyreLock();
+                                zyre_shouts(agent->loopElements->node, agent->callsChannel, "%s from %s (%s)", callName, name, peer);
+                                bus_zyreUnlock();
                                 size_t nbArgs = 0;
                                 igs_callArgument_t *_arg = NULL;
                                 LL_COUNT(call->arguments, _arg, nbArgs);
@@ -1315,6 +1318,12 @@ initLoop (zsock_t *pipe, void *args){
     snprintf(agent->replayChannel, MAX_AGENT_NAME_LENGTH + 15, "%s-IGS-REPLAY", agent->agentName);
     bus_zyreLock();
     zyre_join(agent->loopElements->node, agent->replayChannel);
+    bus_zyreUnlock();
+    
+    //create channel for calls feedback
+    snprintf(agent->callsChannel, MAX_AGENT_NAME_LENGTH + 15, "%s-IGS-CALLS", agent->agentName);
+    bus_zyreLock();
+    zyre_join(agent->loopElements->node, agent->callsChannel);
     bus_zyreUnlock();
     
     //Add version and protocol to headers
