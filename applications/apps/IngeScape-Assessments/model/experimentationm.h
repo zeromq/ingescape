@@ -20,7 +20,7 @@
 
 #include <model/subject/characteristicm.h>
 #include <model/subject/subjectm.h>
-#include <model/task/taskm.h>
+#include <model/task/protocolm.h>
 #include <model/taskinstancem.h>
 
 #include "cassandra.h"
@@ -137,14 +137,14 @@ public:
      * @brief Add a task to our experimentation
      * @param task
      */
-    void addTask(TaskM* task);
+    void addTask(ProtocolM* task);
 
 
     /**
      * @brief Remove a task from our experimentation
      * @param task
      */
-    void removeTask(TaskM* task);
+    void removeTask(ProtocolM* task);
 
 
     /**
@@ -172,7 +172,7 @@ public:
      * @brief Remove task instances related to the given task
      * @param task
      */
-    void removeTaskInstanceRelatedToTask(TaskM* task);
+    void removeTaskInstanceRelatedToTask(ProtocolM* task);
 
 
     /**
@@ -195,7 +195,7 @@ public:
      * @param cassUuid
      * @return
      */
-    TaskM* getTaskFromUID(const CassUuid& cassUuid);
+    ProtocolM* getTaskFromUID(const CassUuid& cassUuid);
 
 
     /**

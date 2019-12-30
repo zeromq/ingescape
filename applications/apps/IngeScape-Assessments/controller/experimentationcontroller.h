@@ -90,7 +90,7 @@ public:
      * @param subject
      * @param protocol
      */
-    Q_INVOKABLE void createNewSessionForSubjectAndProtocol(SubjectM* subject, TaskM* protocol);
+    Q_INVOKABLE void createNewSessionForSubjectAndProtocol(SubjectM* subject, ProtocolM* protocol);
 
 
     /**
@@ -297,21 +297,21 @@ protected: // Methods
      * @param task
      * @return
      */
-    TaskInstanceM* _insertTaskInstanceIntoDB(const QString& taskInstanceName, SubjectM* subject, TaskM* task);
+    TaskInstanceM* _insertTaskInstanceIntoDB(const QString& taskInstanceName, SubjectM* subject, ProtocolM* task);
 
     /**
      * @brief Retrieve all independent variables from the Cassandra DB for the given task.
      * The task will be updated by this method.
      * @param task
      */
-    void _retrieveIndependentVariableForTask(TaskM* task);
+    void _retrieveIndependentVariableForTask(ProtocolM* task);
 
     /**
      * @brief Retrieve all dependent variables from the Cassandra DB for the given task.
      * The task will be updated by this method.
      * @param task
      */
-    void _retrieveDependentVariableForTask(TaskM* task);
+    void _retrieveDependentVariableForTask(ProtocolM* task);
 
     /**
      * @brief Retrieve all subjects from the Cassandra DB for the given experimentaion.

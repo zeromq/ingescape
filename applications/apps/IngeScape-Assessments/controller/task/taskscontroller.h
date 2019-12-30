@@ -83,14 +83,14 @@ public:
      * @brief Delete a task
      * @param task
      */
-    Q_INVOKABLE void deleteTask(TaskM* task);
+    Q_INVOKABLE void deleteTask(ProtocolM* task);
 
 
     /**
      * @brief Duplicate a task
      * @param task
      */
-    Q_INVOKABLE void duplicateTask(TaskM* task);
+    Q_INVOKABLE void duplicateTask(ProtocolM* task);
 
 
     /**
@@ -173,7 +173,7 @@ private:
      * @param platformFileUrl
      * @return
      */
-    TaskM* _createNewProtocolWithIngeScapePlatformFileUrl(QString protocolName, QUrl platformFileUrl);
+    ProtocolM* _createNewProtocolWithIngeScapePlatformFileUrl(QString protocolName, QUrl platformFileUrl);
 
 
     /**

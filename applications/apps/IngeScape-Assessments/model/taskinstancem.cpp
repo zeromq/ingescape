@@ -92,7 +92,7 @@ TaskInstanceM::TaskInstanceM(CassUuid experimentationUuid,
     connect(_mapIndependentVariableValues, &QQmlPropertyMap::valueChanged, this, &TaskInstanceM::_onIndependentVariableValueChanged);
 
     // Connect to task change to reset the independent variables values
-    connect(this, &TaskInstanceM::taskChanged, [this](TaskM* task) {
+    connect(this, &TaskInstanceM::taskChanged, [this](ProtocolM* task) {
         if (task != nullptr) {
             for (IndependentVariableM* independentVariable : task->independentVariables()->toList())
             {

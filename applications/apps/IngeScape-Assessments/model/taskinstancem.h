@@ -19,7 +19,7 @@
 #include <I2PropertyHelpers.h>
 
 #include <model/subject/subjectm.h>
-#include <model/task/taskm.h>
+#include <model/task/protocolm.h>
 #include <model/assessmentsenums.h>
 #include <model/recordassessmentm.h>
 

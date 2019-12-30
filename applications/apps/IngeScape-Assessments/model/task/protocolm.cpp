@@ -12,7 +12,7 @@
  *
  */
 
-#include "taskm.h"
+#include "protocolm.h"
 
 #include "controller/assessmentsmodelmanager.h"
 
@@ -20,16 +20,16 @@
 /**
  * @brief Task table name
  */
-const QString TaskM::table = "ingescape.task";
+const QString ProtocolM::table = "ingescape.task";
 
-const QStringList TaskM::columnNames = {
+const QStringList ProtocolM::columnNames = {
     "id_experimentation",
     "id",
     "name",
     "platform_file",
 };
 
-const QStringList TaskM::primaryKeys = {
+const QStringList ProtocolM::primaryKeys = {
     "id_experimentation",
     "id",
 };
@@ -39,7 +39,7 @@ const QStringList TaskM::primaryKeys = {
  * @param name
  * @param parent
  */
-TaskM::TaskM(const CassUuid& experimentationUuid, const CassUuid& uid, const QString& name, const QUrl& platformFile, QObject *parent)
+ProtocolM::ProtocolM(const CassUuid& experimentationUuid, const CassUuid& uid, const QString& name, const QUrl& platformFile, QObject *parent)
     : QObject(parent)
     , _name(name)
     , _platformFileUrl(QUrl())
@@ -59,7 +59,7 @@ TaskM::TaskM(const CassUuid& experimentationUuid, const CassUuid& uid, const QSt
 /**
  * @brief Destructor
  */
-TaskM::~TaskM()
+ProtocolM::~ProtocolM()
 {
     qInfo() << "Delete Model of Task" << _name;
 
@@ -74,7 +74,7 @@ TaskM::~TaskM()
  * @brief Setter for property "Platform File Url"
  * @param value
  */
-void TaskM::setplatformFileUrl(QUrl value)
+void ProtocolM::setplatformFileUrl(QUrl value)
 {
     if (_platformFileUrl != value)
     {
@@ -105,7 +105,7 @@ void TaskM::setplatformFileUrl(QUrl value)
  * @brief Add an Independent Variable to our task
  * @param independentVariable
  */
-void TaskM::addIndependentVariable(IndependentVariableM* independentVariable)
+void ProtocolM::addIndependentVariable(IndependentVariableM* independentVariable)
 {
     if (independentVariable != nullptr)
     {
@@ -119,7 +119,7 @@ void TaskM::addIndependentVariable(IndependentVariableM* independentVariable)
  * @brief Remove an Independent Variable from our task
  * @param independentVariable
  */
-void TaskM::removeIndependentVariable(IndependentVariableM* independentVariable)
+void ProtocolM::removeIndependentVariable(IndependentVariableM* independentVariable)
 {
     if (independentVariable != nullptr)
     {
@@ -134,7 +134,7 @@ void TaskM::removeIndependentVariable(IndependentVariableM* independentVariable)
  * @param cassUuid
  * @return
  */
-IndependentVariableM* TaskM::getIndependentVariableFromUuid(const CassUuid& cassUuid) const
+IndependentVariableM* ProtocolM::getIndependentVariableFromUuid(const CassUuid& cassUuid) const
 {
     IndependentVariableM* indepVar = nullptr;
     auto indepVarIterator = std::find_if(_independentVariables.begin(),
@@ -157,7 +157,7 @@ IndependentVariableM* TaskM::getIndependentVariableFromUuid(const CassUuid& cass
  * @brief Add a Dependent Variable to our task
  * @param dependentVariable
  */
-void TaskM::addDependentVariable(DependentVariableM* dependentVariable)
+void ProtocolM::addDependentVariable(DependentVariableM* dependentVariable)
 {
     if (dependentVariable != nullptr)
     {
@@ -171,7 +171,7 @@ void TaskM::addDependentVariable(DependentVariableM* dependentVariable)
  * @brief Remove a Dependent Variable from our task
  * @param dependentVariable
  */
-void TaskM::removeDependentVariable(DependentVariableM* dependentVariable)
+void ProtocolM::removeDependentVariable(DependentVariableM* dependentVariable)
 {
     // Remove from the list
     _dependentVariables.remove(dependentVariable);
@@ -183,9 +183,9 @@ void TaskM::removeDependentVariable(DependentVariableM* dependentVariable)
  * @param row
  * @return
  */
-TaskM* TaskM::createFromCassandraRow(const CassRow* row)
+ProtocolM* ProtocolM::createFromCassandraRow(const CassRow* row)
 {
-    TaskM* task = nullptr;
+    ProtocolM* task = nullptr;
 
     if (row != nullptr)
     {
@@ -196,7 +196,7 @@ TaskM* TaskM::createFromCassandraRow(const CassRow* row)
         QString protocolName(AssessmentsModelManager::getStringValueFromColumnName(row, "name"));
         QUrl platformUrl(AssessmentsModelManager::getStringValueFromColumnName(row, "platform_file"));
 
-        task = new TaskM(experimentationUuid, taskUuid, protocolName, platformUrl);
+        task = new ProtocolM(experimentationUuid, taskUuid, protocolName, platformUrl);
     }
 
     return task;
@@ -206,7 +206,7 @@ TaskM* TaskM::createFromCassandraRow(const CassRow* row)
  * @brief Delete the given task from the Cassandra DB
  * @param task
  */
-void TaskM::deleteTaskFromCassandraRow(const TaskM& task)
+void ProtocolM::deleteTaskFromCassandraRow(const ProtocolM& task)
 {
 
     // Remove independent_var from DB
@@ -216,7 +216,7 @@ void TaskM::deleteTaskFromCassandraRow(const TaskM& task)
     AssessmentsModelManager::deleteEntry<DependentVariableM>({ task.getExperimentationCassUuid(), task.getCassUuid() });
 
     // Remove task from DB
-    AssessmentsModelManager::deleteEntry<TaskM>({ task.getExperimentationCassUuid(), task.getCassUuid() });
+    AssessmentsModelManager::deleteEntry<ProtocolM>({ task.getExperimentationCassUuid(), task.getCassUuid() });
 }
 
 
@@ -227,9 +227,9 @@ void TaskM::deleteTaskFromCassandraRow(const TaskM& task)
  * @param task
  * @return
  */
-CassStatement* TaskM::createBoundInsertStatement(const TaskM& task)
+CassStatement* ProtocolM::createBoundInsertStatement(const ProtocolM& task)
 {
-    QString queryStr = "INSERT INTO " + TaskM::table + " (id_experimentation, id, name, platform_file) VALUES (?, ?, ?, ?);";
+    QString queryStr = "INSERT INTO " + ProtocolM::table + " (id_experimentation, id, name, platform_file) VALUES (?, ?, ?, ?);";
     CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 4);
     cass_statement_bind_uuid  (cassStatement, 0, task.getExperimentationCassUuid());
     cass_statement_bind_uuid  (cassStatement, 1, task.getCassUuid());
@@ -243,7 +243,7 @@ CassStatement* TaskM::createBoundInsertStatement(const TaskM& task)
  * @param agentName
  * @return
  */
-bool TaskM::isAgentNameInProtocol(QString agentName){
+bool ProtocolM::isAgentNameInProtocol(QString agentName){
     return _hashFromAgentNameToSimplifiedAgent.containsKey(agentName);
 }
 
@@ -252,7 +252,7 @@ bool TaskM::isAgentNameInProtocol(QString agentName){
  * @brief Delete the given dependent variable from the task and from the Cassandra DB
  * @param variableToDelete
  */
-void TaskM::deleteDependentVariable(DependentVariableM* variableToDelete)
+void ProtocolM::deleteDependentVariable(DependentVariableM* variableToDelete)
 {
     if (variableToDelete != nullptr)
     {
@@ -272,7 +272,7 @@ void TaskM::deleteDependentVariable(DependentVariableM* variableToDelete)
  * Update the hash table from an agent name to a (simplified) model of agent with its name and its outputs
  * @param platformFilePath
  */
-void TaskM::_updateAgentsFromPlatformFilePath(QString platformFilePath)
+void ProtocolM::_updateAgentsFromPlatformFilePath(QString platformFilePath)
 {
 #ifdef WIN64
     platformFilePath  = platformFilePath.remove(0,1);

@@ -23,7 +23,7 @@
 #include <I2Quick.h>
 
 #include "I2PropertyHelpers.h"
-#include "model/task/taskm.h"
+#include "model/task/protocolm.h"
 
 class AreAgentsInPlatformFilter: public I2SortFilterProxyModel
 {

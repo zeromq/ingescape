@@ -191,7 +191,7 @@ void ExperimentationM::removeSubject(SubjectM* subject)
  * @brief Add a task to our experimentation
  * @param task
  */
-void ExperimentationM::addTask(TaskM* task)
+void ExperimentationM::addTask(ProtocolM* task)
 {
     if (task != nullptr)
     {
@@ -205,7 +205,7 @@ void ExperimentationM::addTask(TaskM* task)
  * @brief Remove a task from our experimentation
  * @param task
  */
-void ExperimentationM::removeTask(TaskM* task)
+void ExperimentationM::removeTask(ProtocolM* task)
 {
     if (task != nullptr)
     {
@@ -275,7 +275,7 @@ void ExperimentationM::removeTaskInstanceRelatedToSubject(SubjectM* subject)
  * @brief Remove task instances related to the given task
  * @param task
  */
-void ExperimentationM::removeTaskInstanceRelatedToTask(TaskM* task)
+void ExperimentationM::removeTaskInstanceRelatedToTask(ProtocolM* task)
 {
     const QList<TaskInstanceM*> taskInstanceList = _allTaskInstances.toList();
     auto taskInstanceIt = taskInstanceList.begin();
@@ -323,9 +323,9 @@ SubjectM* ExperimentationM::getSubjectFromUID(const CassUuid& cassUuid)
  * @param cassUuid
  * @return
  */
-TaskM* ExperimentationM::getTaskFromUID(const CassUuid& cassUuid)
+ProtocolM* ExperimentationM::getTaskFromUID(const CassUuid& cassUuid)
 {
-    auto taskIt = std::find_if(_allTasks.begin(), _allTasks.end(), [cassUuid](TaskM* task) { return (task != nullptr) && (task->getCassUuid() == cassUuid); });
+    auto taskIt = std::find_if(_allTasks.begin(), _allTasks.end(), [cassUuid](ProtocolM* task) { return (task != nullptr) && (task->getCassUuid() == cassUuid); });
     return (taskIt != _allTasks.end()) ? *taskIt : nullptr;
 }
 
@@ -439,7 +439,7 @@ void ExperimentationM::_deleteAllTasksForExperimentation(const ExperimentationM&
     AssessmentsModelManager::deleteEntry<DependentVariableM>({ experimentation.getCassUuid() });
 
     // Delete all tasks
-    AssessmentsModelManager::deleteEntry<TaskM>({ experimentation.getCassUuid() });
+    AssessmentsModelManager::deleteEntry<ProtocolM>({ experimentation.getCassUuid() });
 }
 
 /**

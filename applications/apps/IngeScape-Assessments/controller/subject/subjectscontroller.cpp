@@ -215,7 +215,7 @@ void SubjectsController::deleteSubject(SubjectM* subject)
 
         // Remove task instances related to the subject
         QList<CassUuid> taskUuidList;
-        for (TaskM* task : *(_currentExperimentation->allTasks())) {
+        for (ProtocolM* task : *(_currentExperimentation->allTasks())) {
             if (task != nullptr)
             {
                 taskUuidList.append(task->getCassUuid());

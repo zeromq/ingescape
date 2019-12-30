@@ -44,11 +44,11 @@ SOURCES += main.cpp \
     controller/ingescapeassessmentscontroller.cpp \
     controller/networkcontroller.cpp \
     model/assessmentsenums.cpp \
+    model/task/protocolm.cpp \
     model/taskinstancem.cpp \
     model/subject/subjectm.cpp \
     model/subject/characteristicm.cpp \
     model/subject/characteristicvaluem.cpp \
-    model/task/taskm.cpp \
     model/experimentationm.cpp \
     model/task/independentvariablem.cpp \
     model/task/independentvariablevaluem.cpp \
@@ -70,13 +70,13 @@ HEADERS += \
     controller/export/exportcontroller.h \
     controller/ingescapeassessmentscontroller.h \
     model/assessmentsenums.h \
+    model/task/protocolm.h \
     model/taskinstancem.h \
     stable.h \
     controller/networkcontroller.h \
     model/subject/subjectm.h \
     model/subject/characteristicm.h \
     model/subject/characteristicvaluem.h \
-    model/task/taskm.h \
     model/experimentationm.h \
     model/task/independentvariablem.h \
     model/task/independentvariablevaluem.h \

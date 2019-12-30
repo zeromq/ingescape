@@ -90,8 +90,8 @@ TasksController::~TasksController()
  */
 bool TasksController::canCreateProtocolWithName(QString protocolName)
 {
-    const QList<TaskM*>& taskList = _currentExperimentation->allTasks()->toList();
-    auto hasGivenName = [protocolName](TaskM* task) {
+    const QList<ProtocolM*>& taskList = _currentExperimentation->allTasks()->toList();
+    auto hasGivenName = [protocolName](ProtocolM* task) {
         return (task != nullptr) && (task->name() == protocolName);
     };
 
@@ -129,7 +129,7 @@ void TasksController::createNewProtocolWithIngeScapePlatformFilePath(QString pro
  * @brief Delete a task
  * @param task
  */
-void TasksController::deleteTask(TaskM* task)
+void TasksController::deleteTask(ProtocolM* task)
 {
     if ((task != nullptr) && (_currentExperimentation != nullptr) && (AssessmentsModelManager::instance() != nullptr))
     {
@@ -149,7 +149,7 @@ void TasksController::deleteTask(TaskM* task)
         AssessmentsModelManager::deleteEntry<TaskInstanceM>({ { _currentExperimentation->getCassUuid() }, subjectUuidList, { task->getCassUuid() } });
 
         // Remove from DB
-        TaskM::deleteTaskFromCassandraRow(*task);
+        ProtocolM::deleteTaskFromCassandraRow(*task);
 
         // Remove the task from the current experimentation
         _currentExperimentation->removeTask(task);
@@ -164,14 +164,14 @@ void TasksController::deleteTask(TaskM* task)
  * @brief Duplicate a task
  * @param task
  */
-void TasksController::duplicateTask(TaskM* task)
+void TasksController::duplicateTask(ProtocolM* task)
 {
     if (task != nullptr)
     {
         QString protocolName = QString("%1_copy").arg(task->name());
 
         // Create a new protocol with an IngeScape platform file URL
-        TaskM* newTask = _createNewProtocolWithIngeScapePlatformFileUrl(protocolName, task->platformFileUrl());
+        ProtocolM* newTask = _createNewProtocolWithIngeScapePlatformFileUrl(protocolName, task->platformFileUrl());
 
         if (newTask != nullptr)
         {
@@ -401,14 +401,14 @@ void TasksController::deleteDependentVariable(DependentVariableM* dependentVaria
  * @param platformFileUrl
  * @return
  */
-TaskM* TasksController::_createNewProtocolWithIngeScapePlatformFileUrl(QString protocolName, QUrl platformFileUrl)
+ProtocolM* TasksController::_createNewProtocolWithIngeScapePlatformFileUrl(QString protocolName, QUrl platformFileUrl)
 {
-    TaskM* task = nullptr;
+    ProtocolM* task = nullptr;
 
     if (!protocolName.isEmpty() && platformFileUrl.isValid() && (_currentExperimentation != nullptr) && (AssessmentsModelManager::instance() != nullptr))
     {
         // Create the new task
-        task = new TaskM(_currentExperimentation->getCassUuid(), AssessmentsModelManager::genCassUuid(), protocolName, platformFileUrl);
+        task = new ProtocolM(_currentExperimentation->getCassUuid(), AssessmentsModelManager::genCassUuid(), protocolName, platformFileUrl);
         if (task == nullptr || !AssessmentsModelManager::insert(*task)) {
             delete task;
             task = nullptr;

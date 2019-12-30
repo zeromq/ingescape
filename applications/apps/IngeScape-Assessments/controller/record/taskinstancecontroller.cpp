@@ -172,7 +172,7 @@ void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previo
         //
         if ((currentTaskInstance != nullptr) && (currentTaskInstance->task() != nullptr))
         {
-            TaskM* protocol = currentTaskInstance->task();
+            ProtocolM* protocol = currentTaskInstance->task();
 
             if (protocol->platformFileUrl().isValid())
             {

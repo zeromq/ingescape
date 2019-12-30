@@ -28,7 +28,7 @@
 /**
  * @brief The TaskM class defines a model of task
  */
-class TaskM : public QObject
+class ProtocolM : public QObject
 {
     Q_OBJECT
 
@@ -61,7 +61,7 @@ public:
      * @param platformFile
      * @param parent
      */
-    explicit TaskM(const CassUuid& experimentationUuid,
+    explicit ProtocolM(const CassUuid& experimentationUuid,
                    const CassUuid& uid,
                    const QString& name,
                    const QUrl& platformFile,
@@ -71,7 +71,7 @@ public:
     /**
      * @brief Destructor
      */
-    ~TaskM();
+    ~ProtocolM();
 
 
     /**
@@ -138,13 +138,13 @@ public:
      * @param row
      * @return
      */
-    static TaskM* createFromCassandraRow(const CassRow* row);
+    static ProtocolM* createFromCassandraRow(const CassRow* row);
 
     /**
      * @brief Delete the given task from the Cassandra DB
      * @param task
      */
-    static void deleteTaskFromCassandraRow(const TaskM& task);
+    static void deleteTaskFromCassandraRow(const ProtocolM& task);
 
     /**
      * @brief Create a CassStatement to insert an TaskM into the DB.
@@ -153,7 +153,7 @@ public:
      * @param task
      * @return
      */
-    static CassStatement* createBoundInsertStatement(const TaskM& task);
+    static CassStatement* createBoundInsertStatement(const ProtocolM& task);
 
     /**
      * @brief Returns true if the agent name is in the hashTable hashFromAgentNameToSimplifiedAgent
