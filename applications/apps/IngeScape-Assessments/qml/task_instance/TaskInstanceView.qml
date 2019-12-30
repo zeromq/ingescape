@@ -33,11 +33,11 @@ Item {
     //
     //--------------------------------------------------------
 
-    property TaskInstanceController taskInstanceController: null;
+    property SessionController sessionController: null;
 
     property ExperimentationController experimentationController: null;
 
-    property SessionM session: taskInstanceController ? taskInstanceController.currentSession : null;
+    property SessionM session: sessionController ? sessionController.currentSession : null;
 
     property bool isEditingName: false
 
@@ -127,10 +127,10 @@ Item {
         }
         height: 0
 
-        scenarioController: rootItem.taskInstanceController ? rootItem.taskInstanceController.scenarioC : null;
-        timeLineController: rootItem.taskInstanceController ? rootItem.taskInstanceController.timeLineC : null;
+        scenarioController: rootItem.sessionController ? rootItem.sessionController.scenarioC : null;
+        timeLineController: rootItem.sessionController ? rootItem.sessionController.timeLineC : null;
 
-        recordsListToShow : rootItem.taskInstance ? rootItem.taskInstance.recordsList : []
+        recordsListToShow : rootItem.session ? rootItem.session.recordsList : []
 
         licensesController: IngeScapeAssessmentsC.licensesC
         mainController: IngeScapeAssessmentsC
@@ -140,7 +140,7 @@ Item {
         extraContent: LabellessSvgButton {
             id: startOrStopRecordButton
 
-            visible: (rootItem.taskInstance && !rootItem.taskInstance.isRecorded)
+            visible: (rootItem.taskInstance && !rootItem.session.isRecorded)
             enabled: (visible && experimentationController.isRecorderON)
             opacity: enabled ? 1.0 : 0.4
 
@@ -342,7 +342,7 @@ Item {
                         if (rootItem.taskInstance)
                         {
                             taskInstanceName.text = taskInstanceNameEditionTextField.text
-                            rootItem.taskInstance.name = taskInstanceName.text
+                            rootItem.session.name = taskInstanceName.text
                         }
                     }
                 }
@@ -366,7 +366,7 @@ Item {
 
             width: Math.min(implicitWidth, maxAvailableWidth)
 
-            text: rootItem.taskInstance ? rootItem.taskInstance.name : ""
+            text: rootItem.taskInstance ? rootItem.session.name : ""
             elide: Text.ElideRight
 
             verticalAlignment: Text.AlignVCenter
@@ -514,7 +514,7 @@ Item {
 
                     ActionsList {
                         id: actionsList
-                        taskInstanceController: rootItem.taskInstanceController
+                        sessionController: rootItem.sessionController
                     }
                 }
 
@@ -526,7 +526,7 @@ Item {
 
                     AgentsList{
                         id: agentsList
-                        taskInstanceController: rootItem.taskInstanceController
+                        sessionController: rootItem.sessionController
                     }
                 }
             }
@@ -598,13 +598,13 @@ Item {
 
                 wrapMode: Text.WordWrap
 
-                text: rootItem.taskInstance ? rootItem.taskInstance.comments : ""
+                text: rootItem.taskInstance ? rootItem.session.comments : ""
 
                 style: IngeScapeAssessmentsTextAreaStyle {}
 
                 onInputChanged: {
                     if (rootItem.taskInstance) {
-                        rootItem.taskInstance.comments = text
+                        rootItem.session.comments = text
                     }
                 }
             }
@@ -696,7 +696,7 @@ Item {
 
                 Repeater {
 
-                    model: (rootItem.taskInstance && rootItem.taskInstance.task) ? rootItem.taskInstance.task.independentVariables : null
+                    model: (rootItem.taskInstance && rootItem.session.task) ? rootItem.session.task.independentVariables : null
 
                     delegate: IndependentVariableValueEditor {
 
@@ -707,18 +707,18 @@ Item {
 
                         variable: model ? model.QtObject : null
 
-                        variableValue: (rootItem.taskInstance && rootItem.taskInstance.mapIndependentVariableValues && model) ? rootItem.taskInstance.mapIndependentVariableValues[model.name] : ""
+                        variableValue: (rootItem.taskInstance && rootItem.session.mapIndependentVariableValues && model) ? rootItem.session.mapIndependentVariableValues[model.name] : ""
 
                         //
                         // Slots
                         //
                         onIndependentVariableValueUpdated: {
-                            if (rootItem.taskInstance && rootItem.taskInstance.mapIndependentVariableValues && model)
+                            if (rootItem.taskInstance && rootItem.session.mapIndependentVariableValues && model)
                             {
                                 //console.log("QML: on (IN-dependent) Variable Value Updated for " + model.name + ": " + value);
 
                                 // Update the value (in C++)
-                                rootItem.taskInstance.mapIndependentVariableValues[model.name] = value;
+                                rootItem.session.mapIndependentVariableValues[model.name] = value;
                             }
                         }
                     }
@@ -910,9 +910,9 @@ Item {
                 onDropped: {
                     console.log("Dropped")
                     dragHovering = false
-                    if (drop.hasUrls && rootItem.taskInstanceController)
+                    if (drop.hasUrls && rootItem.sessionController)
                     {
-                        rootItem.taskInstanceController.addNewAttachements(drop.urls)
+                        rootItem.sessionController.addNewAttachements(drop.urls)
 
                         // Populate fake model to see results in view
                         for (var index in drop.urls)

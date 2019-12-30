@@ -122,7 +122,7 @@ void registerCustomQmlTypes()
     qmlRegisterUncreatableType<ExperimentationsListController>("INGESCAPE", 1, 0, "ExperimentationsListController", "Internal Class");
     qmlRegisterUncreatableType<ExportController>("INGESCAPE", 1, 0, "ExportController", "Internal Class");
     qmlRegisterUncreatableType<NetworkController>("INGESCAPE", 1, 0, "NetworkController", "Internal Class");
-    qmlRegisterUncreatableType<TaskInstanceController>("INGESCAPE", 1, 0, "TaskInstanceController", "Internal Class");
+    qmlRegisterUncreatableType<SessionController>("INGESCAPE", 1, 0, "SessionController", "Internal Class");
     qmlRegisterUncreatableType<SubjectsController>("INGESCAPE", 1, 0, "SubjectsController", "Internal Class");
     qmlRegisterUncreatableType<ProtocolsController>("INGESCAPE", 1, 0, "ProtocolsController", "Internal Class");
 

@@ -23,7 +23,7 @@
  */
 ProtocolsController::ProtocolsController(QObject *parent) : QObject(parent),
     _currentExperimentation(nullptr),
-    _selectedTask(nullptr),
+    _selectedProtocol(nullptr),
     _temporaryIndependentVariable(nullptr),
     _temporaryDependentVariable(nullptr)
 {
@@ -54,8 +54,8 @@ ProtocolsController::~ProtocolsController()
 {
     qInfo() << "Delete Tasks Controller";
 
-    if (_selectedTask != nullptr) {
-        setselectedTask(nullptr);
+    if (_selectedProtocol != nullptr) {
+        setselectedProtocol(nullptr);
     }
 
     // Reset the model of the current experimentation
@@ -126,15 +126,15 @@ void ProtocolsController::createNewProtocolWithIngeScapePlatformFilePath(QString
 
 
 /**
- * @brief Delete a task
- * @param task
+ * @brief Delete a protocol
+ * @param protocol
  */
-void ProtocolsController::deleteTask(ProtocolM* task)
+void ProtocolsController::deleteProtocol(ProtocolM* protocol)
 {
-    if ((task != nullptr) && (_currentExperimentation != nullptr) && (AssessmentsModelManager::instance() != nullptr))
+    if ((protocol != nullptr) && (_currentExperimentation != nullptr) && (AssessmentsModelManager::instance() != nullptr))
     {
-        if (task == _selectedTask) {
-            setselectedTask(nullptr);
+        if (protocol == _selectedProtocol) {
+            setselectedProtocol(nullptr);
         }
 
         // Remove task instances related to the task
@@ -146,75 +146,73 @@ void ProtocolsController::deleteTask(ProtocolM* task)
             }
         }
 
-        AssessmentsModelManager::deleteEntry<SessionM>({ { _currentExperimentation->getCassUuid() }, subjectUuidList, { task->getCassUuid() } });
+        AssessmentsModelManager::deleteEntry<SessionM>({ { _currentExperimentation->getCassUuid() }, subjectUuidList, { protocol->getCassUuid() } });
 
         // Remove from DB
-        ProtocolM::deleteTaskFromCassandraRow(*task);
+        ProtocolM::deleteTaskFromCassandraRow(*protocol);
 
         // Remove the task from the current experimentation
-        _currentExperimentation->removeTask(task);
+        _currentExperimentation->removeTask(protocol);
 
         // Free memory
-        delete task;
+        delete protocol;
     }
 }
 
 
 /**
- * @brief Duplicate a task
- * @param task
+ * @brief Duplicate a protocol
+ * @param protocol
  */
-void ProtocolsController::duplicateTask(ProtocolM* task)
+void ProtocolsController::duplicateProtocol(ProtocolM* protocol)
 {
-    if (task != nullptr)
+    if (protocol != nullptr)
     {
-        QString protocolName = QString("%1_copy").arg(task->name());
+        QString protocolName = QString("%1_copy").arg(protocol->name());
 
         // Create a new protocol with an IngeScape platform file URL
-        ProtocolM* newTask = _createNewProtocolWithIngeScapePlatformFileUrl(protocolName, task->platformFileUrl());
+        ProtocolM* newProtocol = _createNewProtocolWithIngeScapePlatformFileUrl(protocolName, protocol->platformFileUrl());
 
-        if (newTask != nullptr)
+        if (newProtocol != nullptr)
         {
             // Copy each independent variables
-            for (IndependentVariableM* independentVariable : task->independentVariables()->toList())
+            for (IndependentVariableM* independentVariable : protocol->independentVariables()->toList())
             {
                 if (independentVariable != nullptr)
                 {
                     // Create the new independent variable
-                    IndependentVariableM* newIndependentVariable = _insertIndependentVariableIntoDB(newTask->getExperimentationCassUuid()
-                                                                                                    , newTask->getCassUuid()
-                                                                                                    , independentVariable->name()
-                                                                                                    , independentVariable->description()
-                                                                                                    , independentVariable->valueType()
-                                                                                                    , independentVariable->enumValues()
-                                                                                                    );
+                    IndependentVariableM* newIndependentVariable = _insertIndependentVariableIntoDB(newProtocol->getExperimentationCassUuid(),
+                                                                                                    newProtocol->getCassUuid(),
+                                                                                                    independentVariable->name(),
+                                                                                                    independentVariable->description(),
+                                                                                                    independentVariable->valueType(),
+                                                                                                    independentVariable->enumValues() );
 
                     if (newIndependentVariable != nullptr)
                     {
                         // Add the independent variable to the new task
-                        newTask->addIndependentVariable(newIndependentVariable);
+                        newProtocol->addIndependentVariable(newIndependentVariable);
                     }
                 }
             }
 
             // Copy each dependent variables
-            for (DependentVariableM* dependentVariable : task->dependentVariables()->toList())
+            for (DependentVariableM* dependentVariable : newProtocol->dependentVariables()->toList())
             {
                 if (dependentVariable != nullptr)
                 {
                     // Create the new dependent variable
-                    DependentVariableM* newDependentVariable = _insertDependentVariableIntoDB(newTask->getExperimentationCassUuid()
-                                                                                              , newTask->getCassUuid()
-                                                                                              , dependentVariable->name()
-                                                                                              , dependentVariable->description()
-                                                                                              , dependentVariable->agentName()
-                                                                                              , dependentVariable->outputName()
-                                                                                              );
+                    DependentVariableM* newDependentVariable = _insertDependentVariableIntoDB(newProtocol->getExperimentationCassUuid(),
+                                                                                              newProtocol->getCassUuid(),
+                                                                                              dependentVariable->name(),
+                                                                                              dependentVariable->description(),
+                                                                                              dependentVariable->agentName(),
+                                                                                              dependentVariable->outputName() );
 
                     if (newDependentVariable != nullptr)
                     {
                         // Add the dependent variable to the new task
-                        newTask->addDependentVariable(newDependentVariable);
+                        newProtocol->addDependentVariable(newDependentVariable);
                     }
 
                 }
@@ -232,12 +230,12 @@ void ProtocolsController::duplicateTask(ProtocolM* task)
  */
 bool ProtocolsController::canCreateIndependentVariableWithName(QString independentVariableName)
 {
-    const QList<IndependentVariableM*>& varList = _selectedTask->independentVariables()->toList();
+    const QList<IndependentVariableM*>& varList = _selectedProtocol->independentVariables()->toList();
     auto hasGivenName = [independentVariableName](IndependentVariableM* independentVariable) {
         return (independentVariable != nullptr) && (independentVariable->name() == independentVariableName);
     };
 
-    return !independentVariableName.isEmpty() && (_selectedTask != nullptr) && std::none_of(varList.begin(), varList.end(), hasGivenName);
+    return !independentVariableName.isEmpty() && (_selectedProtocol != nullptr) && std::none_of(varList.begin(), varList.end(), hasGivenName);
 }
 
 
@@ -249,12 +247,12 @@ bool ProtocolsController::canCreateIndependentVariableWithName(QString independe
  */
 bool ProtocolsController::canCreateDependentVariableWithName(QString dependentVariableName)
 {
-    const QList<DependentVariableM*>& varList = _selectedTask->dependentVariables()->toList();
+    const QList<DependentVariableM*>& varList = _selectedProtocol->dependentVariables()->toList();
     auto hasGivenName = [dependentVariableName](DependentVariableM* dependentVariable) {
         return (dependentVariable != nullptr) && (dependentVariable->name() == dependentVariableName);
     };
 
-    return !dependentVariableName.isEmpty() && (_selectedTask != nullptr) && std::none_of(varList.begin(), varList.end(), hasGivenName);
+    return !dependentVariableName.isEmpty() && (_selectedProtocol != nullptr) && std::none_of(varList.begin(), varList.end(), hasGivenName);
 }
 
 
@@ -263,15 +261,15 @@ bool ProtocolsController::canCreateDependentVariableWithName(QString dependentVa
  */
 void ProtocolsController::createNewIndependentVariableFromTemporary()
 {
-    if ((_temporaryIndependentVariable != nullptr) && (!_temporaryIndependentVariable->name().isEmpty()) && (_selectedTask != nullptr))
+    if ((_temporaryIndependentVariable != nullptr) && (!_temporaryIndependentVariable->name().isEmpty()) && (_selectedProtocol != nullptr))
     {
         // Create and insert the new independent variable
-        IndependentVariableM* independentVariable = _insertIndependentVariableIntoDB(_selectedTask->getExperimentationCassUuid(), _selectedTask->getCassUuid(), _temporaryIndependentVariable->name(),
+        IndependentVariableM* independentVariable = _insertIndependentVariableIntoDB(_selectedProtocol->getExperimentationCassUuid(), _selectedProtocol->getCassUuid(), _temporaryIndependentVariable->name(),
                                                                                      _temporaryIndependentVariable->description(), _temporaryIndependentVariable->valueType(), _temporaryIndependentVariable->enumValues());
         if (independentVariable != nullptr)
         {
             // Add the independent variable to the selected task
-            _selectedTask->addIndependentVariable(independentVariable);
+            _selectedProtocol->addIndependentVariable(independentVariable);
         }
     }
 }
@@ -302,7 +300,7 @@ void ProtocolsController::saveModificationsOfIndependentVariableFromTemporary(In
  */
 void ProtocolsController::deleteIndependentVariable(IndependentVariableM* independentVariable)
 {
-    if ((independentVariable != nullptr) && (_selectedTask != nullptr) && (AssessmentsModelManager::instance() != nullptr))
+    if ((independentVariable != nullptr) && (_selectedProtocol != nullptr) && (AssessmentsModelManager::instance() != nullptr))
     {
         // Delete independent variable values from Cassandra DB
         QList<CassUuid> taskInstanceUuidList;
@@ -322,7 +320,7 @@ void ProtocolsController::deleteIndependentVariable(IndependentVariableM* indepe
         IndependentVariableM::deleteIndependentVariableFromCassandra(*independentVariable);
 
         // Remove the independent variable from the selected task
-        _selectedTask->removeIndependentVariable(independentVariable);
+        _selectedProtocol->removeIndependentVariable(independentVariable);
 
         // Free memory
         delete independentVariable;
@@ -336,11 +334,11 @@ void ProtocolsController::deleteIndependentVariable(IndependentVariableM* indepe
 void ProtocolsController::createNewDependentVariableFromTemporary()
 {
     if ((_temporaryDependentVariable != nullptr) && (!_temporaryDependentVariable->name().isEmpty()) && (!_temporaryDependentVariable->outputName().isEmpty())
-            && (_selectedTask != nullptr) && (AssessmentsModelManager::instance() != nullptr))
+            && (_selectedProtocol != nullptr) && (AssessmentsModelManager::instance() != nullptr))
     {
         // Create and insert the new dependent variable
-        DependentVariableM* dependentVariable = _insertDependentVariableIntoDB(_selectedTask->getExperimentationCassUuid(),
-                                                                               _selectedTask->getCassUuid(),
+        DependentVariableM* dependentVariable = _insertDependentVariableIntoDB(_selectedProtocol->getExperimentationCassUuid(),
+                                                                               _selectedProtocol->getCassUuid(),
                                                                                _temporaryDependentVariable->name(),
                                                                                _temporaryDependentVariable->description(),
                                                                                _temporaryDependentVariable->agentName(),
@@ -349,7 +347,7 @@ void ProtocolsController::createNewDependentVariableFromTemporary()
         if (dependentVariable != nullptr)
         {
             // Add the dependent variable to the selected task
-            _selectedTask->addDependentVariable(dependentVariable);
+            _selectedProtocol->addDependentVariable(dependentVariable);
         }
     }
 }
@@ -380,14 +378,14 @@ void ProtocolsController::saveModificationsOfDependentVariableFromTemporary(Depe
  */
 void ProtocolsController::deleteDependentVariable(DependentVariableM* dependentVariable)
 {
-    if ((dependentVariable != nullptr) && (_selectedTask != nullptr))
+    if ((dependentVariable != nullptr) && (_selectedProtocol != nullptr))
     {
         // Remove the dependent variable from the selected task
-        _selectedTask->removeDependentVariable(dependentVariable);
+        _selectedProtocol->removeDependentVariable(dependentVariable);
 
         // Remove from DB
-        AssessmentsModelManager::deleteEntry<DependentVariableM>({ _selectedTask->getExperimentationCassUuid(),
-                                                                   _selectedTask->getCassUuid() });
+        AssessmentsModelManager::deleteEntry<DependentVariableM>({ _selectedProtocol->getExperimentationCassUuid(),
+                                                                   _selectedProtocol->getCassUuid() });
 
         // Free memory
         delete dependentVariable;
@@ -417,8 +415,8 @@ ProtocolM* ProtocolsController::_createNewProtocolWithIngeScapePlatformFileUrl(Q
             // Add the task to the current experimentation
             _currentExperimentation->addTask(task);
 
-            // Select this new task
-            setselectedTask(task);
+            // Select this new protocol
+            setselectedProtocol(task);
         }
     }
     else {

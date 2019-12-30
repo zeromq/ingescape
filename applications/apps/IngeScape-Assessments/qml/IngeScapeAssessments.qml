@@ -66,9 +66,9 @@ Item {
      */
     function resetCurrentSession()
     {
-        if (IngeScapeAssessmentsC.experimentationC && IngeScapeAssessmentsC.experimentationC.taskInstanceC)
+        if (IngeScapeAssessmentsC.experimentationC && IngeScapeAssessmentsC.experimentationC.sessionC)
         {
-            IngeScapeAssessmentsC.experimentationC.taskInstanceC.currentSession = null;
+            IngeScapeAssessmentsC.experimentationC.sessionC.currentSession = null;
         }
     }
 
@@ -139,13 +139,13 @@ Item {
     }
 
     Connections {
-        target: IngeScapeAssessmentsC.experimentationC.taskInstanceC
+        target: IngeScapeAssessmentsC.experimentationC.sessionC
 
         onCurrentSessionChanged: {
 
-            if (IngeScapeAssessmentsC.experimentationC.taskInstanceC.currentSession)
+            if (IngeScapeAssessmentsC.experimentationC.sessionC.currentSession)
             {
-                console.log("QML: on Current Session changed: " + IngeScapeAssessmentsC.experimentationC.taskInstanceC.currentSession.name);
+                console.log("QML: on Current Session changed: " + IngeScapeAssessmentsC.experimentationC.sessionC.currentSession.name);
 
                 // Add the "Session view" to the stack
                 stackview.push(componentTaskInstanceView);
@@ -296,7 +296,7 @@ Item {
         id: componentTaskInstanceView
 
         TaskInstance.TaskInstanceView {
-            taskInstanceController: IngeScapeAssessmentsC.experimentationC.taskInstanceC
+            sessionController: IngeScapeAssessmentsC.experimentationC.sessionC
             experimentationController: IngeScapeAssessmentsC.experimentationC
 
             //

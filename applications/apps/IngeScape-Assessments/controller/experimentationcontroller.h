@@ -17,7 +17,7 @@
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
-#include <controller/record/taskinstancecontroller.h>
+#include <controller/session/sessioncontroller.h>
 #include <model/experimentationm.h>
 #include <sortFilter/aresubjectandprotocolinsessionfilter.h>
 
@@ -29,8 +29,8 @@ class ExperimentationController : public QObject
 {
     Q_OBJECT
 
-    // Controller to manage a task instance of the current experimentation
-    I2_QML_PROPERTY_READONLY(TaskInstanceController*, taskInstanceC)
+    // Controller to manage a session of the current experimentation
+    I2_QML_PROPERTY_READONLY(SessionController*, sessionC)
 
     // Model of the current experimentation
     I2_QML_PROPERTY_CUSTOM_SETTER(ExperimentationM*, currentExperimentation)
@@ -101,10 +101,10 @@ public:
 
 
     /**
-     * @brief Delete a task instance
-     * @param record
+     * @brief Delete a session
+     * @param session
      */
-    Q_INVOKABLE void deleteTaskInstance(SessionM* taskInstance);
+    Q_INVOKABLE void deleteSession(SessionM* session);
 
 
     /**

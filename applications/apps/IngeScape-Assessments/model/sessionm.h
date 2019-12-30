@@ -138,10 +138,10 @@ public:
     static SessionM* createFromCassandraRow(const CassRow* row);
 
     /**
-     * @brief Delete the given task instance from Cassandra DB
-     * @param experimentation
+     * @brief Delete the given session from Cassandra DB
+     * @param session
      */
-    static void deleteTaskInstanceFromCassandra(const SessionM& taskInstance);
+    static void deleteSessionFromCassandra(const SessionM& session);
 
     /**
      * @brief Create a CassStatement to insert a SessionM into the DB.

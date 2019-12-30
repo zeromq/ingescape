@@ -55,14 +55,14 @@ Item {
     //
     //--------------------------------
 
-    // Signal emitted when the user clicks on our task
-    signal selectTask();
+    // Signal emitted when the user clicks on our protocol
+    signal selectProtocolAsked();
 
     // Signal emitted when the user clicks on the "duplicate" button
-    signal duplicateTask();
+    signal duplicateProtocolAsked();
 
     // Signal emitted when the user clicks on the "delete" button
-    signal deleteTask();
+    signal deleteProtocolAsked();
 
 
 
@@ -159,8 +159,8 @@ Item {
             hoverEnabled: true
 
             onClicked: {
-                // Emit the signal "Select Task"
-                rootItem.selectTask();
+                // Emit the signal "Select Protocol"
+                rootItem.selectProtocolAsked();
             }
         }
 
@@ -181,7 +181,7 @@ Item {
             enabled: opacity > 0
 
             Button {
-                id: btnDuplicate
+                id: btnDelete
 
                 property bool containsMouse: __behavior.containsMouse
 
@@ -194,18 +194,18 @@ Item {
                 }
 
                 onClicked: {
-                    deleteTaskPopup.open()
+                    deleteProtocolPopup.open()
                 }
 
                 Controls2.ToolTip {
-                    visible: btnDuplicate.hovered
+                    visible: btnDelete.hovered
                     text: qsTr("delete")
                     delay: 800
                 }
             }
 
             Button {
-                id: btnDelete
+                id: btnDuplicate
 
                 property bool containsMouse: __behavior.containsMouse
 
@@ -218,12 +218,12 @@ Item {
                 }
 
                 onClicked: {
-                    // Emit the signal "Duplicate Task"
-                    rootItem.duplicateTask();
+                    // Emit the signal "Duplicate Task asked"
+                    rootItem.duplicateProtocolAsked();
                 }
 
                 Controls2.ToolTip {
-                    visible: btnDelete.hovered
+                    visible: btnDuplicate.hovered
                     text: qsTr("duplicate")
                     delay: 800
                 }
@@ -232,7 +232,7 @@ Item {
     }
 
     Popup.DeleteConfirmationPopup {
-        id: deleteTaskPopup
+        id: deleteProtocolPopup
 
         layerObjectName: "overlay2Layer"
 
@@ -245,13 +245,14 @@ Item {
         width: 470
 
         onValidated: {
-            // Emit the signal "Delete Task"
-            rootItem.deleteTask();
-            deleteTaskPopup.close()
+            // Emit the signal "Delete Protocol asked"
+            rootItem.deleteProtocolAsked();
+
+            deleteProtocolPopup.close()
         }
 
         onCanceled: {
-            deleteTaskPopup.close()
+            deleteProtocolPopup.close()
         }
     }
 

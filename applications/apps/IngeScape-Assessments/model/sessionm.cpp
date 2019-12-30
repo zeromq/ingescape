@@ -225,10 +225,10 @@ SessionM* SessionM::createFromCassandraRow(const CassRow* row)
 }
 
 /**
- * @brief Delete the given task instance from Cassandra DB
- * @param experimentation
+ * @brief Delete the given session from Cassandra DB
+ * @param session
  */
-void SessionM::deleteTaskInstanceFromCassandra(const SessionM& session)
+void SessionM::deleteSessionFromCassandra(const SessionM& session)
 {
     if ((session.subject() != nullptr) && (session.task() != nullptr))
     {

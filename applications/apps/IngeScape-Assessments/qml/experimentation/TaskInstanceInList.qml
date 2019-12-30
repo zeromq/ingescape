@@ -69,8 +69,8 @@ Rectangle {
     // Open session asked
     signal openSessionAsked();
 
-    // Delete Task Instance
-    signal deleteTaskInstance();
+    // Delete session asked
+    signal deleteSessionAsked();
 
 
     //--------------------------------
@@ -334,7 +334,7 @@ Rectangle {
             }
 
             onClicked: {
-                rootItem.deleteTaskInstance();
+                rootItem.deleteSessionAsked();
             }
         }
     }

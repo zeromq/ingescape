@@ -12,8 +12,8 @@
  *
  */
 
-#ifndef RECORDCONTROLLER_H
-#define RECORDCONTROLLER_H
+#ifndef SESSION_CONTROLLER_H
+#define SESSION_CONTROLLER_H
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
@@ -27,9 +27,9 @@
 
 
 /**
- * @brief The TaskInstanceController class defines the controller to manage a record of the current experimentation
+ * @brief The SessionController class defines the controller to manage a record of the current experimentation
  */
-class TaskInstanceController : public QObject
+class SessionController : public QObject
 {
     Q_OBJECT
 
@@ -52,13 +52,13 @@ public:
      * @brief Constructor
      * @param parent
      */
-    explicit TaskInstanceController(QObject *parent = nullptr);
+    explicit SessionController(QObject *parent = nullptr);
 
 
     /**
      * @brief Destructor
      */
-    ~TaskInstanceController();
+    ~SessionController();
 
 
     /**
@@ -107,6 +107,6 @@ private:
 
 };
 
-QML_DECLARE_TYPE(TaskInstanceController)
+QML_DECLARE_TYPE(SessionController)
 
-#endif // RECORDCONTROLLER_H
+#endif // SESSION_CONTROLLER_H

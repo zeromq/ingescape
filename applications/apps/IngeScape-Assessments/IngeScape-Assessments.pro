@@ -44,6 +44,7 @@ SOURCES += main.cpp \
     controller/ingescapeassessmentscontroller.cpp \
     controller/networkcontroller.cpp \
     controller/protocol/protocolscontroller.cpp \
+    controller/session/sessioncontroller.cpp \
     model/assessmentsenums.cpp \
     model/protocol/protocolm.cpp \
     model/sessionm.cpp \
@@ -58,7 +59,6 @@ SOURCES += main.cpp \
     controller/experimentationslistcontroller.cpp \
     controller/subject/subjectscontroller.cpp \
     controller/experimentationcontroller.cpp \
-    controller/record/taskinstancecontroller.cpp \
     viewModel/experimentationsgroupvm.cpp \
     controller/assessmentsmodelmanager.cpp \
     sortFilter/areagentsinplatformfilter.cpp \
@@ -70,6 +70,7 @@ HEADERS += \
     controller/export/exportcontroller.h \
     controller/ingescapeassessmentscontroller.h \
     controller/protocol/protocolscontroller.h \
+    controller/session/sessioncontroller.h \
     model/assessmentsenums.h \
     model/protocol/protocolm.h \
     model/sessionm.h \
@@ -86,7 +87,6 @@ HEADERS += \
     controller/experimentationslistcontroller.h \
     controller/subject/subjectscontroller.h \
     controller/experimentationcontroller.h \
-    controller/record/taskinstancecontroller.h \
     viewModel/experimentationsgroupvm.h \
     controller/assessmentsmodelmanager.h \
     sortFilter/areagentsinplatformfilter.h \

@@ -17,7 +17,7 @@ Item {
     //
     //--------------------------------
 
-    property TaskInstanceController taskInstanceController: null;
+    property SessionController sessionController: null;
 
     // Licenses controller
     property LicensesController licensesController: null;
@@ -57,7 +57,7 @@ Item {
         flickableItem.boundsBehavior: Flickable.OvershootBounds
 
         ListView {
-            model: rootItem.taskInstanceController ? rootItem.taskInstanceController.agentsGroupedByNameInCurrentPlatform : null
+            model: rootItem.sessionController ? rootItem.sessionController.agentsGroupedByNameInCurrentPlatform : null
 
             delegate: MouseArea {
                 id: mouseArea
@@ -72,7 +72,7 @@ Item {
 
                     anchors.fill: parent
 
-                    taskInstanceController: taskInstanceController
+                    sessionController: rootItem.sessionController
                     agent: model.QtObject
                 }
 

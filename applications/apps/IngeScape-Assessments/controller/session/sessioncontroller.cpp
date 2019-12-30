@@ -12,7 +12,7 @@
  *
  */
 
-#include "taskinstancecontroller.h"
+#include "sessioncontroller.h"
 
 #include <controller/assessmentsmodelmanager.h>
 
@@ -20,7 +20,7 @@
  * @brief Constructor
  * @param parent
  */
-TaskInstanceController::TaskInstanceController(QObject *parent) : QObject(parent),
+SessionController::SessionController(QObject *parent) : QObject(parent),
     _timeLineC(nullptr),
     _scenarioC(nullptr),
     _currentSession(nullptr)
@@ -48,7 +48,7 @@ TaskInstanceController::TaskInstanceController(QObject *parent) : QObject(parent
 /**
  * @brief Destructor
  */
-TaskInstanceController::~TaskInstanceController()
+SessionController::~SessionController()
 {
     qInfo() << "Delete Record Controller";
 
@@ -89,7 +89,7 @@ TaskInstanceController::~TaskInstanceController()
  * @brief Setter for property "Current Session"
  * @param value
  */
-void TaskInstanceController::setcurrentSession(SessionM *value)
+void SessionController::setcurrentSession(SessionM *value)
 {
     if (_currentSession != value)
     {
@@ -109,7 +109,7 @@ void TaskInstanceController::setcurrentSession(SessionM *value)
  * @brief Adds the given URLs as attachements for this record
  * @param urlList
  */
-void TaskInstanceController::addNewAttachements(const QList<QUrl>& urlList)
+void SessionController::addNewAttachements(const QList<QUrl>& urlList)
 {
     for (QUrl url : urlList)
     {
@@ -123,7 +123,7 @@ void TaskInstanceController::addNewAttachements(const QList<QUrl>& urlList)
  * @param previousSession
  * @param currentSession
  */
-void TaskInstanceController::_oncurrentSessionChanged(SessionM* previousSession, SessionM* currentSession)
+void SessionController::_oncurrentSessionChanged(SessionM* previousSession, SessionM* currentSession)
 {
     IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
     if ((ingeScapeModelManager != nullptr) && (_scenarioC != nullptr))
@@ -161,7 +161,7 @@ void TaskInstanceController::_oncurrentSessionChanged(SessionM* previousSession,
             for (AgentsGroupedByNameVM* agentsGroupedByName : IngeScapeModelManager::instance()->allAgentsGroupsByName()->toList())
             {
                 if (agentsGroupedByName != nullptr) {
-                    disconnect(agentsGroupedByName, &AgentsGroupedByNameVM::agentModelONhasBeenAdded, this, &TaskInstanceController::_onAgentModelONhasBeenAdded);
+                    disconnect(agentsGroupedByName, &AgentsGroupedByNameVM::agentModelONhasBeenAdded, this, &SessionController::_onAgentModelONhasBeenAdded);
                 }
             }
         }
@@ -230,7 +230,7 @@ void TaskInstanceController::_oncurrentSessionChanged(SessionM* previousSession,
                             for (AgentsGroupedByNameVM* agentsGroupedByName : IngeScapeModelManager::instance()->allAgentsGroupsByName()->toList())
                             {
                                 if (agentsGroupedByName != nullptr) {
-                                    connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentModelONhasBeenAdded, this, &TaskInstanceController::_onAgentModelONhasBeenAdded);
+                                    connect(agentsGroupedByName, &AgentsGroupedByNameVM::agentModelONhasBeenAdded, this, &SessionController::_onAgentModelONhasBeenAdded);
                                 }
                             }
                         }
@@ -259,7 +259,7 @@ void TaskInstanceController::_oncurrentSessionChanged(SessionM* previousSession,
  * @brief Slot called when a model of agent "ON" has been added to an agent(s grouped by name)
  * @param model
  */
-void TaskInstanceController::_onAgentModelONhasBeenAdded(AgentM* model)
+void SessionController::_onAgentModelONhasBeenAdded(AgentM* model)
 {
     // Model of Agent ON
     if ((model != nullptr) && model->isON() && !model->name().isEmpty() && !model->peerId().isEmpty()
@@ -303,7 +303,7 @@ void TaskInstanceController::_onAgentModelONhasBeenAdded(AgentM* model)
  * @brief Import the global mapping (of agents) from JSON
  * @param jsonArrayOfAgentsInMapping
  */
-void TaskInstanceController::_importMappingFromJson(QJsonArray jsonArrayOfAgentsInMapping)
+void SessionController::_importMappingFromJson(QJsonArray jsonArrayOfAgentsInMapping)
 {
     if ((IngeScapeModelManager::instance() != nullptr) && (IngeScapeNetworkController::instance() != nullptr))
     {

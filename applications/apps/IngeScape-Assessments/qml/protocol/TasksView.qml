@@ -162,32 +162,32 @@ I2PopupBase {
 
             delegate: TaskInList {
                 modelM: model.QtObject
-                isSelected: rootItem.protocolsController && rootItem.protocolsController.selectedTask && (modelM === rootItem.protocolsController.selectedTask)
+                isSelected: rootItem.protocolsController && rootItem.protocolsController.selectedProtocol && (modelM === rootItem.protocolsController.selectedProtocol)
 
                 //
                 // Slots
                 //
-                onSelectTask: {
+                onSelectProtocolAsked: {
                     if (rootItem.protocolsController)
                     {
-                        // First, select the task
-                        rootItem.protocolsController.selectedTask = model.QtObject;
+                        // First, select the protocol
+                        rootItem.protocolsController.selectedProtocol = model.QtObject;
                     }
                 }
 
-                onDeleteTask: {
+                onDeleteProtocolAsked: {
                     if (rootItem.protocolsController)
                     {
-                        // Delete the task
-                        rootItem.protocolsController.deleteTask(model.QtObject);
+                        // Delete the protocol
+                        rootItem.protocolsController.deleteProtocol(model.QtObject);
                     }
                 }
 
-                onDuplicateTask: {
+                onDuplicateProtocolAsked: {
                     if (rootItem.protocolsController)
                     {
                         // Duplicate the task
-                        rootItem.protocolsController.duplicateTask(model.QtObject);
+                        rootItem.protocolsController.duplicateProtocol(model.QtObject);
                     }
                 }
             }
@@ -258,7 +258,8 @@ I2PopupBase {
 
             onClicked: {
                 if (rootItem.protocolsController) {
-                    rootItem.protocolsController.selectedTask = null;
+                    // UN-select the protocol
+                    rootItem.protocolsController.selectedProtocol = null;
                 }
 
                 console.log("QML: close Tasks view");

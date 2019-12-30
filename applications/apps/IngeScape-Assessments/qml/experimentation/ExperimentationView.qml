@@ -1199,7 +1199,8 @@ Item {
                     flickableItem.boundsBehavior: Flickable.OvershootBounds
 
                     Column {
-                        id: taskInstanceColumn
+                        id: sessionColumn
+
                         width: taskInstanceScrollView.width - (taskInstanceScrollView.scrollBarSize + taskInstanceScrollView.verticalScrollbarMargin)
                         height: childrenRect.height
                         spacing: 0
@@ -1238,9 +1239,9 @@ Item {
                                     }
                                 }
 
-                                onDeleteTaskInstance: {
-                                    deleteTaskInstancePopup.taskInstance = modelM
-                                    deleteTaskInstancePopup.open()
+                                onDeleteSessionAsked: {
+                                    deleteSessionPopup.session = modelM
+                                    deleteSessionPopup.open()
                                 }
 
                                 onIsSelectedSessionChanged: {
@@ -1354,27 +1355,27 @@ Item {
 
 
     Popup.DeleteConfirmationPopup {
-        id: deleteTaskInstancePopup
+        id: deleteSessionPopup
 
-        property var taskInstance: null
+        property var session: null
 
         showPopupTitle: false
         anchors.centerIn: parent
 
-        text: qsTr("Are you sure you want to delete the task instance %1 ?").arg(taskInstance ? taskInstance.name : "")
+        text: qsTr("Are you sure you want to delete the session %1 ?").arg(session ? session.name : "")
 
         height: 160
         width: 470
 
         onValidated: {
-            if (rootItem.controller && taskInstance) {
-                rootItem.controller.deleteTaskInstance(taskInstance);
+            if (rootItem.controller && session) {
+                rootItem.controller.deleteSession(session);
             }
-            close()
+            close();
         }
 
         onCanceled: {
-            close()
+            close();
         }
 
     }

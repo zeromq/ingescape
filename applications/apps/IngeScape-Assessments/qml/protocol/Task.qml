@@ -37,7 +37,7 @@ Item {
 
     property ProtocolsController protocolsController: null;
 
-    property ProtocolM modelM: protocolsController ? protocolsController.selectedTask : null;
+    property ProtocolM modelM: protocolsController ? protocolsController.selectedProtocol : null;
 
     // Save reference of independent variable that is currently edited
     property IndependentVariableM independentVariableCurrentlyEdited : null;

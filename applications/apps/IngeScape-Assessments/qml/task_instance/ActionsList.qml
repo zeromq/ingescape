@@ -17,7 +17,7 @@ Item {
     //
     //--------------------------------
 
-    property TaskInstanceController taskInstanceController: null;
+    property SessionController sessionController: null;
 
     // Licenses controller
     property LicensesController licensesController: null;
@@ -57,7 +57,7 @@ Item {
 
          ListView {
 
-            model: (rootItem.taskInstanceController && rootItem.taskInstanceController.scenarioC) ? rootItem.taskInstanceController.scenarioC.actionsList : null
+            model: (rootItem.sessionController && rootItem.sessionController.scenarioC) ? rootItem.sessionController.scenarioC.actionsList : null
 
             delegate: MouseArea {
                 id: mouseArea
@@ -75,21 +75,21 @@ Item {
                     areActionsButtonsActivated: false
 
                     action: model.QtObject
-                    controller: rootItem.taskInstanceController
+                    controller: rootItem.sessionController
 
                     actionItemIsHovered: mouseArea.containsMouse
                     actionItemIsPressed: mouseArea.pressed
                 }
 
 //                onPressed: {
-//                    if (rootItem.taskInstanceController && rootItem.taskInstanceController.scenarioC)
+//                    if (rootItem.sessionController && rootItem.sessionController.scenarioC)
 //                    {
 //                        Q
-//                        if (rootItem.taskInstanceController.scenarioC.selectedAction === model.QtObject) {
-//                            rootItem.taskInstanceController.scenarioC.selectedAction = null;
+//                        if (rootItem.sessionController.scenarioC.selectedAction === model.QtObject) {
+//                            rootItem.sessionController.scenarioC.selectedAction = null;
 //                        }
 //                        else {
-//                            rootItem.taskInstanceController.scenarioC.selectedAction = model.QtObject;
+//                            rootItem.sessionController.scenarioC.selectedAction = model.QtObject;
 //                        }
 //                    }
 //                }

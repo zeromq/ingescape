@@ -39,7 +39,7 @@ class ProtocolsController : public QObject
     I2_QML_PROPERTY_READONLY(ExperimentationM*, currentExperimentation)
 
     // Model of the selected protocol
-    I2_QML_PROPERTY_DELETE_PROOF(ProtocolM*, selectedTask)
+    I2_QML_PROPERTY_DELETE_PROOF(ProtocolM*, selectedProtocol)
 
     // Temporary independent variable used for edition rollbacks
     I2_QML_PROPERTY(IndependentVariableM*, temporaryIndependentVariable)
@@ -80,17 +80,17 @@ public:
 
 
     /**
-     * @brief Delete a task
-     * @param task
+     * @brief Delete a protocol
+     * @param protocol
      */
-    Q_INVOKABLE void deleteTask(ProtocolM* task);
+    Q_INVOKABLE void deleteProtocol(ProtocolM* protocol);
 
 
     /**
-     * @brief Duplicate a task
-     * @param task
+     * @brief Duplicate a protocol
+     * @param protocol
      */
-    Q_INVOKABLE void duplicateTask(ProtocolM* task);
+    Q_INVOKABLE void duplicateProtocol(ProtocolM* protocol);
 
 
     /**
