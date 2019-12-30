@@ -181,116 +181,116 @@ void ExperimentationM::removeSubject(SubjectM* subject)
         // Remove from the list
         _allSubjects.remove(subject);
 
-        // Remove related TaskInstances
-        removeTaskInstanceRelatedToSubject(subject);
+        // Remove related sessions
+        removeSessionsRelatedToSubject(subject);
     }
 }
 
 
 /**
- * @brief Add a task to our experimentation
- * @param task
+ * @brief Add a protocol to our experimentation
+ * @param protocol
  */
-void ExperimentationM::addTask(ProtocolM* task)
+void ExperimentationM::addProtocol(ProtocolM* protocol)
 {
-    if (task != nullptr)
+    if (protocol != nullptr)
     {
         // Add to the list
-        _allProtocols.append(task);
+        _allProtocols.append(protocol);
     }
 }
 
 
 /**
- * @brief Remove a task from our experimentation
- * @param task
+ * @brief Remove a protocol from our experimentation
+ * @param protocol
  */
-void ExperimentationM::removeTask(ProtocolM* task)
+void ExperimentationM::removeProtocol(ProtocolM* protocol)
 {
-    if (task != nullptr)
+    if (protocol != nullptr)
     {
         // Remove from the list
-        _allProtocols.remove(task);
+        _allProtocols.remove(protocol);
 
-        // Remove related TaskInstances
-        removeTaskInstanceRelatedToTask(task);
+        // Remove related sessions
+        removeSessionsRelatedToProtocol(protocol);
     }
 }
 
 
 /**
- * @brief Add a task instance to our experimentation
- * @param taskInstance
+ * @brief Add a session to our experimentation
+ * @param session
  */
-void ExperimentationM::addTaskInstance(SessionM* taskInstance)
+void ExperimentationM::addSession(SessionM* session)
 {
-    if (taskInstance != nullptr)
+    if (session != nullptr)
     {
         // Add to the list
-        _allSessions.append(taskInstance);
+        _allSessions.append(session);
     }
 }
 
 
 /**
- * @brief Remove a task instance from our experimentation
- * @param taskInstance
+ * @brief Remove a session from our experimentation
+ * @param session
  */
-void ExperimentationM::removeTaskInstance(SessionM* taskInstance)
+void ExperimentationM::removeSession(SessionM* session)
 {
-    if (taskInstance != nullptr)
+    if (session != nullptr)
     {
         // Remove from the list
-        _allSessions.remove(taskInstance);
+        _allSessions.remove(session);
     }
 }
 
 
 /**
- * @brief Remove task instances related to the given subject
+ * @brief Remove sessions related to the given subject
  * @param subject
  */
-void ExperimentationM::removeTaskInstanceRelatedToSubject(SubjectM* subject)
+void ExperimentationM::removeSessionsRelatedToSubject(SubjectM* subject)
 {
-    const QList<SessionM*> taskInstanceList = _allSessions.toList();
-    auto taskInstanceIt = taskInstanceList.begin();
-    while (taskInstanceIt != taskInstanceList.end())
+    const QList<SessionM*> sessionList = _allSessions.toList();
+    auto sessionIt = sessionList.begin();
+    while (sessionIt != sessionList.end())
     {
         // Looking for a task instance related to the given subject
-        taskInstanceIt = std::find_if(taskInstanceIt, taskInstanceList.end(), [subject](SessionM* taskInstance){
-                return (taskInstance != nullptr) && (taskInstance->subject() == subject);
+        sessionIt = std::find_if(sessionIt, sessionList.end(), [subject](SessionM* session){
+                return (session != nullptr) && (session->subject() == subject);
         });
 
-        if (taskInstanceIt != taskInstanceList.end())
+        if (sessionIt != sessionList.end())
         {
-            // We found a task instance with given subject
-            removeTaskInstance(*taskInstanceIt);
-            ++taskInstanceIt;
+            // We found a session with given subject
+            removeSession(*sessionIt);
+            ++sessionIt;
         }
     }
 }
 
 
 /**
- * @brief Remove task instances related to the given task
- * @param task
+ * @brief Remove sessions related to the given protocol
+ * @param protocol
  */
-void ExperimentationM::removeTaskInstanceRelatedToTask(ProtocolM* task)
+void ExperimentationM::removeSessionsRelatedToProtocol(ProtocolM* protocol)
 {
-    const QList<SessionM*> taskInstanceList = _allSessions.toList();
-    auto taskInstanceIt = taskInstanceList.begin();
-    while (taskInstanceIt != taskInstanceList.end())
+    const QList<SessionM*> sessionList = _allSessions.toList();
+    auto sessionIt = sessionList.begin();
+    while (sessionIt != sessionList.end())
     {
         // Looking for a task instance related to the given subject
-        taskInstanceIt = std::find_if(taskInstanceIt, taskInstanceList.end(), [task](SessionM* taskInstance){
-                return (taskInstance != nullptr) && (taskInstance->task() == task);
+        sessionIt = std::find_if(sessionIt, sessionList.end(), [protocol](SessionM* session) {
+                return (session != nullptr) && (session->protocol() == protocol);
         });
 
-        if (taskInstanceIt != taskInstanceList.end())
+        if (sessionIt != sessionList.end())
         {
-            // We found a task instance with given subject
-            removeTaskInstance(*taskInstanceIt);
-            ++taskInstanceIt;
+            // We found a session with given protocol
+            removeSession(*sessionIt);
+            ++sessionIt;
         }
     }
 }
@@ -319,27 +319,28 @@ SubjectM* ExperimentationM::getSubjectFromUID(const CassUuid& cassUuid)
 
 
 /**
- * @brief Get a task from its UUID
+ * @brief Get a protocol from its UUID
  * @param cassUuid
  * @return
  */
-ProtocolM* ExperimentationM::getTaskFromUID(const CassUuid& cassUuid)
+ProtocolM* ExperimentationM::getProtocolFromUID(const CassUuid& cassUuid)
 {
-    auto taskIt = std::find_if(_allProtocols.begin(), _allProtocols.end(), [cassUuid](ProtocolM* task) { return (task != nullptr) && (task->getCassUuid() == cassUuid); });
+    auto taskIt = std::find_if(_allProtocols.begin(), _allProtocols.end(), [cassUuid](ProtocolM* protocol) { return (protocol != nullptr) && (protocol->getCassUuid() == cassUuid); });
     return (taskIt != _allProtocols.end()) ? *taskIt : nullptr;
 }
 
 
 /**
- * @brief Get a task instance from its UUID
+ * @brief Get a session from its UUID
  * @param cassUuid
  * @return
  */
-SessionM* ExperimentationM::getTaskInstanceFromUID(const CassUuid& cassUuid)
+SessionM* ExperimentationM::getSessionFromUID(const CassUuid& cassUuid)
 {
-    const QList<SessionM*> taskInstanceList = _allSessions.toList();
-    auto taskInstanceIt = std::find_if(taskInstanceList.begin(), taskInstanceList.end(), [cassUuid](SessionM* taskInstance) { return (taskInstance != nullptr) && (taskInstance->getCassUuid() == cassUuid); });
-    return (taskInstanceIt != taskInstanceList.end()) ? *taskInstanceIt : nullptr;
+    // FIXME: why the copy ?
+    const QList<SessionM*> sessionsList = _allSessions.toList();
+    auto sessionIt = std::find_if(sessionsList.begin(), sessionsList.end(), [cassUuid](SessionM* session) { return (session != nullptr) && (session->getCassUuid() == cassUuid); });
+    return (sessionIt != sessionsList.end()) ? *sessionIt : nullptr;
 }
 
 

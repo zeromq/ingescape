@@ -134,45 +134,45 @@ public:
 
 
     /**
-     * @brief Add a task to our experimentation
-     * @param task
+     * @brief Add a protocol to our experimentation
+     * @param protocol
      */
-    void addTask(ProtocolM* task);
+    void addProtocol(ProtocolM* protocol);
 
 
     /**
-     * @brief Remove a task from our experimentation
-     * @param task
+     * @brief Remove a protocol from our experimentation
+     * @param protocol
      */
-    void removeTask(ProtocolM* task);
+    void removeProtocol(ProtocolM* protocol);
 
 
     /**
-     * @brief Add a task instance to our experimentation
-     * @param taskInstance
+     * @brief Add a session to our experimentation
+     * @param session
      */
-    void addTaskInstance(SessionM* taskInstance);
+    void addSession(SessionM* session);
 
 
     /**
-     * @brief Remove a task instance from our experimentation
-     * @param taskInstance
+     * @brief Remove a session from our experimentation
+     * @param session
      */
-    void removeTaskInstance(SessionM* taskInstance);
+    void removeSession(SessionM* session);
 
 
     /**
-     * @brief Remove task instances related to the given subject
+     * @brief Remove sessions related to the given subject
      * @param subject
      */
-    void removeTaskInstanceRelatedToSubject(SubjectM* subject);
+    void removeSessionsRelatedToSubject(SubjectM* subject);
 
 
     /**
-     * @brief Remove task instances related to the given task
-     * @param task
+     * @brief Remove sessions related to the given protocol
+     * @param protocol
      */
-    void removeTaskInstanceRelatedToTask(ProtocolM* task);
+    void removeSessionsRelatedToProtocol(ProtocolM* protocol);
 
 
     /**
@@ -191,19 +191,19 @@ public:
 
 
     /**
-     * @brief Get a task from its UUID
+     * @brief Get a protocol from its UUID
      * @param cassUuid
      * @return
      */
-    ProtocolM* getTaskFromUID(const CassUuid& cassUuid);
+    ProtocolM* getProtocolFromUID(const CassUuid& cassUuid);
 
 
     /**
-     * @brief Get a task instance from its UUID
+     * @brief Get a session from its UUID
      * @param cassUuid
      * @return
      */
-    SessionM* getTaskInstanceFromUID(const CassUuid& cassUuid);
+    SessionM* getSessionFromUID(const CassUuid& cassUuid);
 
 
     /**

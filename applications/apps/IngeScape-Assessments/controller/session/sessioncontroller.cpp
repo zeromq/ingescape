@@ -170,9 +170,9 @@ void SessionController::_oncurrentSessionChanged(SessionM* previousSession, Sess
         //
         // Manage the new (current) session
         //
-        if ((currentSession != nullptr) && (currentSession->task() != nullptr))
+        if ((currentSession != nullptr) && (currentSession->protocol() != nullptr))
         {
-            ProtocolM* protocol = currentSession->task();
+            ProtocolM* protocol = currentSession->protocol();
 
             if (protocol->platformFileUrl().isValid())
             {
@@ -263,13 +263,13 @@ void SessionController::_onAgentModelONhasBeenAdded(AgentM* model)
 {
     // Model of Agent ON
     if ((model != nullptr) && model->isON() && !model->name().isEmpty() && !model->peerId().isEmpty()
-            && (_currentSession != nullptr) && (_currentSession->task() != nullptr)
+            && (_currentSession != nullptr) && (_currentSession->protocol() != nullptr)
             && (IngeScapeModelManager::instance() != nullptr) && (IngeScapeNetworkController::instance() != nullptr))
     {
         QString agentName = model->name();
 
         // The agent is in the current protocol
-        if (_currentSession->task()->isAgentNameInProtocol(agentName))
+        if (_currentSession->protocol()->isAgentNameInProtocol(agentName))
         {
             qDebug() << agentName << "is ON and in the protocol --> LOAD the MAPPING !";
 

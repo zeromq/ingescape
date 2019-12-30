@@ -290,14 +290,14 @@ private Q_SLOTS:
 
 protected: // Methods
     /**
-     * @brief Create and insert a new task instance into the DB.
-     * A nullptr is returned if the task instance could not be created
-     * @param recordName
+     * @brief Create and insert a new session into the DB.
+     * A nullptr is returned if the session could not be created
+     * @param sessionName
      * @param subject
-     * @param task
+     * @param protocol
      * @return
      */
-    SessionM* _insertTaskInstanceIntoDB(const QString& taskInstanceName, SubjectM* subject, ProtocolM* task);
+    SessionM* _insertSessionIntoDB(const QString& sessionName, SubjectM* subject, ProtocolM* protocol);
 
     /**
      * @brief Retrieve all independent variables from the Cassandra DB for the given task.
@@ -328,18 +328,18 @@ protected: // Methods
     void _retrieveCharacteristicsForExperimentation(ExperimentationM* experimentation);
 
     /**
-     * @brief Retrieve all tasks from the Cassandra DB for the given experimentaion.
+     * @brief Retrieve all protocols from the Cassandra DB for the given experimentaion.
      * The experimentation will be updated by this method
      * @param experimentation
      */
-    void _retrieveTasksForExperimentation(ExperimentationM* experimentation);
+    void _retrieveProtocolsForExperimentation(ExperimentationM* experimentation);
 
     /**
-     * @brief Retrieve all task instances from the Cassandra DB for the given experimentaion.
+     * @brief Retrieve all sessions from the Cassandra DB for the given experimentaion.
      * The experimentation will be updated by this method
      * @param experimentation
      */
-    void _retrieveTaskInstancesForExperimentation(ExperimentationM* experimentation);
+    void _retrieveSessionsForExperimentation(ExperimentationM* experimentation);
 
     /**
      * @brief Retrieve all characteristic values from the Cassandra DB for each subjects in the given experimentation.

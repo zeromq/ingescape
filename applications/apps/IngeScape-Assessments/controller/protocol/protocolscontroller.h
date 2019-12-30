@@ -180,28 +180,38 @@ private:
      * @brief Creates a new independent variable with the given parameters and insert it into the Cassandra DB
      * A nullptr is returned if the operation failed.
      * @param experimentationUuid
-     * @param taskUuid
+     * @param protocolUuid
      * @param name
      * @param description
      * @param valueType
      * @param enumValues
      * @return
      */
-    IndependentVariableM* _insertIndependentVariableIntoDB(CassUuid experimentationUuid, CassUuid taskUuid, const QString& name, const QString& description, IndependentVariableValueTypes::Value valueType, const QStringList& enumValues = {});
+    IndependentVariableM* _insertIndependentVariableIntoDB(CassUuid experimentationUuid,
+                                                           CassUuid protocolUuid,
+                                                           const QString& name,
+                                                           const QString& description,
+                                                           IndependentVariableValueTypes::Value valueType,
+                                                           const QStringList& enumValues = {});
 
 
     /**
      * @brief Creates a new dependent variable with the given parameters and insert it into the Cassandra DB
      * A nullptr is returned if the operation failed.
      * @param experimentationUuid
-     * @param taskUuid
+     * @param protocolUuid
      * @param name
      * @param description
      * @param valueType
      * @param enumValues
      * @return
      */
-    DependentVariableM* _insertDependentVariableIntoDB(CassUuid experimentationUuid, CassUuid taskUuid, const QString& name, const QString& description, const QString& agentName, const QString& outputName);
+    DependentVariableM* _insertDependentVariableIntoDB(CassUuid experimentationUuid,
+                                                       CassUuid protocolUuid,
+                                                       const QString& name,
+                                                       const QString& description,
+                                                       const QString& agentName,
+                                                       const QString& outputName);
 };
 
 QML_DECLARE_TYPE(ProtocolsController)

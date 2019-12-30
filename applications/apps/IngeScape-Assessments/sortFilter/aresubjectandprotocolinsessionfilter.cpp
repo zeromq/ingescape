@@ -52,7 +52,7 @@ bool AreSubjectAndProtocolInSessionFilter::filterAccepts(QObject* item, int inde
     if (taskInstanceValue != nullptr)
     {
         bool resultSubject = _selectedSubjectIdList.contains(taskInstanceValue->subject()->displayedId());
-        bool resultProtocol = _selectedProtocolIdList.contains(taskInstanceValue->task()->name());
+        bool resultProtocol = _selectedProtocolIdList.contains(taskInstanceValue->protocol()->name());
         if (resultSubject && resultProtocol){
             return true;
         }

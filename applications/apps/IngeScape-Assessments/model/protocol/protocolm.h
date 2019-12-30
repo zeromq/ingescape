@@ -141,10 +141,10 @@ public:
     static ProtocolM* createFromCassandraRow(const CassRow* row);
 
     /**
-     * @brief Delete the given task from the Cassandra DB
-     * @param task
+     * @brief Delete the given protocol from the Cassandra DB
+     * @param protocol
      */
-    static void deleteTaskFromCassandraRow(const ProtocolM& task);
+    static void deleteProtocolFromCassandraRow(const ProtocolM& protocol);
 
     /**
      * @brief Create a CassStatement to insert an ProtocolM into the DB.

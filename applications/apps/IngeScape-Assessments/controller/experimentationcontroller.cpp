@@ -136,15 +136,15 @@ void ExperimentationController::createNewSessionForSubjectAndProtocol(SubjectM* 
 
         qInfo() << "Create new session" << sessionName << "for subject" << subject->displayedId() << "and protocol" << protocol->name();
 
-        // Create a new (experimentation) task instance
-        SessionM* session = _insertTaskInstanceIntoDB(sessionName, subject, protocol);
+        // Create a new session
+        SessionM* session = _insertSessionIntoDB(sessionName, subject, protocol);
 
         if (session != nullptr)
         {
-            // Add the task insatnce to the current experimentation
-            _currentExperimentation->addTaskInstance(session);
+            // Add the session to the current experimentation
+            _currentExperimentation->addSession(session);
 
-            // Open this new task instance
+            // Open this new session
             openSession(session);
         }
     }
@@ -192,7 +192,7 @@ void ExperimentationController::deleteSession(SessionM* session)
         SessionM::deleteSessionFromCassandra(*session);
 
         // Remove the session from the current experimentation
-        _currentExperimentation->removeTaskInstance(session);
+        _currentExperimentation->removeSession(session);
 
         // Free memory
         delete session;
@@ -422,7 +422,7 @@ void ExperimentationController::_onCurrentExperimentationChanged(Experimentation
 
         _sessionFilteredList.setSourceModel(nullptr);
 
-        _retrieveTasksForExperimentation(currentExperimentation);
+        _retrieveProtocolsForExperimentation(currentExperimentation);
 
         _retrieveSubjectsForExperimentation(currentExperimentation);
 
@@ -430,7 +430,7 @@ void ExperimentationController::_onCurrentExperimentationChanged(Experimentation
 
         _retrieveCharacteristicValuesForSubjectsInExperimentation(currentExperimentation);
 
-        _retrieveTaskInstancesForExperimentation(currentExperimentation);
+        _retrieveSessionsForExperimentation(currentExperimentation);
 
         _retrieveIndependentVariableValuesForTaskInstancesInExperimentation(currentExperimentation);
 
@@ -534,34 +534,41 @@ void ExperimentationController::_onTimeout_EncounterExistingRecords() {
 
 
 /**
- * @brief Create and insert a new task instance into the DB.
- * A nullptr is returned if the task instance could not be created
- * @param recordName
+ * @brief Create and insert a new session into the DB.
+ * A nullptr is returned if the session could not be created
+ * @param sessionName
  * @param subject
- * @param task
+ * @param protocol
  * @return
  */
-SessionM* ExperimentationController::_insertTaskInstanceIntoDB(const QString& taskInstanceName, SubjectM* subject, ProtocolM* task)
+SessionM* ExperimentationController::_insertSessionIntoDB(const QString& sessionName, SubjectM* subject, ProtocolM* protocol)
 {
-    SessionM* taskInstance = nullptr;
+    SessionM* session = nullptr;
 
-    if ((_currentExperimentation != nullptr) && (subject != nullptr) && (task != nullptr))
+    if ((_currentExperimentation != nullptr) && (subject != nullptr) && (protocol != nullptr))
     {
-        // Create the new task instance
-        taskInstance = new SessionM(_currentExperimentation->getCassUuid(), AssessmentsModelManager::genCassUuid(), taskInstanceName, "", subject->getCassUuid(), task->getCassUuid(), QDateTime::currentDateTime());
-        if (taskInstance != nullptr)
-        {
-            taskInstance->settask(task);
-            taskInstance->setsubject(subject);
+        // Create the new session
+        session = new SessionM(_currentExperimentation->getCassUuid(),
+                               AssessmentsModelManager::genCassUuid(),
+                               sessionName,
+                               "",
+                               subject->getCassUuid(),
+                               protocol->getCassUuid(),
+                               QDateTime::currentDateTime());
 
-            if (AssessmentsModelManager::insert(*taskInstance))
+        if (session != nullptr)
+        {
+            session->setprotocol(protocol);
+            session->setsubject(subject);
+
+            if (AssessmentsModelManager::insert(*session))
             {
-                for (auto indepVarIterator = task->independentVariables()->begin() ; indepVarIterator != task->independentVariables()->end() ; ++indepVarIterator)
+                for (auto indepVarIterator = protocol->independentVariables()->begin() ; indepVarIterator != protocol->independentVariables()->end() ; ++indepVarIterator)
                 {
                     IndependentVariableM* independentVar = *indepVarIterator;
                     if (independentVar != nullptr)
                     {
-                        IndependentVariableValueM indepVarValue(subject->getExperimentationCassUuid(), taskInstance->getCassUuid(), independentVar->getCassUuid(), "");
+                        IndependentVariableValueM indepVarValue(subject->getExperimentationCassUuid(), session->getCassUuid(), independentVar->getCassUuid(), "");
                         AssessmentsModelManager::insert(indepVarValue);
                     }
                 }
@@ -569,7 +576,7 @@ SessionM* ExperimentationController::_insertTaskInstanceIntoDB(const QString& ta
         }
     }
 
-    return taskInstance;
+    return session;
 }
 
 /**
@@ -640,44 +647,52 @@ void ExperimentationController::_retrieveCharacteristicsForExperimentation(Exper
 
 
 /**
- * @brief Retrieve all tasks from the Cassandra DB for the given experimentaion.
+ * @brief Retrieve all protocols from the Cassandra DB for the given experimentaion.
  * The experimentation will be updated by this method
  * @param experimentation
  */
-void ExperimentationController::_retrieveTasksForExperimentation(ExperimentationM* experimentation)
+void ExperimentationController::_retrieveProtocolsForExperimentation(ExperimentationM* experimentation)
 {
     if (experimentation != nullptr)
     {
-        QList<ProtocolM*> taskList = AssessmentsModelManager::select<ProtocolM>({ experimentation->getCassUuid() });
-        for (ProtocolM* task : taskList) {
-            // Independent variables
-            _retrieveIndependentVariableForTask(task);
+        QList<ProtocolM*> protocolsList = AssessmentsModelManager::select<ProtocolM>({ experimentation->getCassUuid() });
+        for (ProtocolM* protocol : protocolsList)
+        {
+            if (protocol != nullptr)
+            {
+                // Independent variables
+                _retrieveIndependentVariableForTask(protocol);
 
-            // Dependent variables
-            _retrieveDependentVariableForTask(task);
+                // Dependent variables
+                _retrieveDependentVariableForTask(protocol);
 
-            // Add the task to the experimentation
-            experimentation->addTask(task);
+                // Add the protocol to the experimentation
+                experimentation->addProtocol(protocol);
+            }
         }
     }
 }
 
 /**
- * @brief Retrieve all task instances from the Cassandra DB for the given experimentaion.
+ * @brief Retrieve all sessions from the Cassandra DB for the given experimentaion.
  * The experimentation will be updated by this method
  * @param experimentation
  */
-void ExperimentationController::_retrieveTaskInstancesForExperimentation(ExperimentationM* experimentation)
+void ExperimentationController::_retrieveSessionsForExperimentation(ExperimentationM* experimentation)
 {
     if (experimentation != nullptr)
     {
-        QList<SessionM*> taskInstanceList = AssessmentsModelManager::select<SessionM>({ experimentation->getCassUuid() });
-        for (SessionM* taskInstance : taskInstanceList) {
-            experimentation->addTaskInstance(taskInstance);
+        QList<SessionM*> sessionList = AssessmentsModelManager::select<SessionM>({ experimentation->getCassUuid() });
+        for (SessionM* session : sessionList)
+        {
+            if (session != nullptr)
+            {
+                experimentation->addSession(session);
 
-            // Set pointers to Task & Subject
-            taskInstance->settask(experimentation->getTaskFromUID(taskInstance->getTaskCassUuid()));
-            taskInstance->setsubject(experimentation->getSubjectFromUID(taskInstance->getSubjectCassUuid()));
+                // Set pointers to Task & Subject
+                session->setprotocol(experimentation->getProtocolFromUID(session->getProtocolCassUuid()));
+                session->setsubject(experimentation->getSubjectFromUID(session->getSubjectCassUuid()));
+            }
         }
     }
 }
@@ -740,11 +755,11 @@ void ExperimentationController::_retrieveIndependentVariableValuesForTaskInstanc
         {
             if (indepVarValue != nullptr)
             {
-                SessionM* taskInstance = experimentation->getTaskInstanceFromUID(indepVarValue->taskInstanceUuid);
-                IndependentVariableM* indepVar = taskInstance->task()->getIndependentVariableFromUuid(indepVarValue->independentVariableUuid);
-                if ((taskInstance != nullptr) && (indepVar != nullptr))
+                SessionM* session = experimentation->getSessionFromUID(indepVarValue->taskInstanceUuid);
+                IndependentVariableM* indepVar = session->protocol()->getIndependentVariableFromUuid(indepVarValue->independentVariableUuid);
+                if ((session != nullptr) && (indepVar != nullptr))
                 {
-                    taskInstance->setIndependentVariableValue(indepVar, indepVarValue->valueString);
+                    session->setIndependentVariableValue(indepVar, indepVarValue->valueString);
                 }
             }
         }
@@ -832,14 +847,14 @@ void ExperimentationController::startToRecord()
         //
 
         SessionM* currentSession = _sessionC->currentSession();
-        if ((currentSession != nullptr) && (currentSession->task() != nullptr))
+        if ((currentSession != nullptr) && (currentSession->protocol() != nullptr))
         {
-            ProtocolM* task = _sessionC->currentSession()->task();
+            ProtocolM* protocol = currentSession->protocol();
 
             //QString currentPlatformName = task->platformFileName();
 
             // Get the JSON of the current platform
-            QString platformFilePath = task->platformFileUrl().path();
+            QString platformFilePath = protocol->platformFileUrl().path();
 #ifdef WIN64
     platformFilePath  = platformFilePath.remove(0,1);
 #endif
@@ -864,7 +879,7 @@ void ExperimentationController::startToRecord()
                         QString recordName = QString("%1 (%2)").arg(currentSession->name(), _sessionC->scenarioC()->currentTime().toString("hh:mm:ss.zzz"));
 
                         QString sessionUID = AssessmentsModelManager::cassUuidToQString(currentSession->getCassUuid());
-                        QString experimentationUID = AssessmentsModelManager::cassUuidToQString(task->getExperimentationCassUuid());
+                        QString experimentationUID = AssessmentsModelManager::cassUuidToQString(protocol->getExperimentationCassUuid());
 
                         QStringList message = {
                             command_StartRecord,

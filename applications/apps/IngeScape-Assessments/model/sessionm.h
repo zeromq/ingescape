@@ -41,7 +41,7 @@ class SessionM : public QObject
     I2_QML_PROPERTY_DELETE_PROOF(SubjectM*, subject)
 
     // Protocol of our session
-    I2_QML_PROPERTY_DELETE_PROOF(ProtocolM*, task)
+    I2_QML_PROPERTY_DELETE_PROOF(ProtocolM*, protocol)
 
     // Start date and time of our session
     I2_QML_PROPERTY(QDateTime, startDateTime)
@@ -68,21 +68,23 @@ public:
 
     /**
      * @brief Constructor
-     * @param uid
+     * @param experimentationUuid
+     * @param cassUuid
      * @param name
-     * @param subject
-     * @param task
+     * @param comments
+     * @param subjectUuid
+     * @param protocolUuid
      * @param startDateTime
      * @param parent
      */
     explicit SessionM(CassUuid experimentationUuid,
-                           CassUuid cassUuid,
-                           QString name,
-                           QString comments,
-                           CassUuid subjectUuid,
-                           CassUuid taskUuid,
-                           QDateTime startDateTime,
-                           QObject *parent = nullptr);
+                      CassUuid cassUuid,
+                      QString name,
+                      QString comments,
+                      CassUuid subjectUuid,
+                      CassUuid protocolUuid,
+                      QDateTime startDateTime,
+                      QObject *parent = nullptr);
 
 
     /**
@@ -112,10 +114,10 @@ public:
     CassUuid getCassUuid() const { return _cassUuid; }
 
     /**
-     * @brief Accessor for the task's Cassandra UUID of this entry
+     * @brief Accessor for the protocol's Cassandra UUID of this entry
      * @return
      */
-    CassUuid getTaskCassUuid() const { return _taskUuid; }
+    CassUuid getProtocolCassUuid() const { return _protocolUuid; }
 
     /**
      * @brief Accessor for the subject's Cassandra UUID of this entry
@@ -182,7 +184,7 @@ private:
     QHash<QString, IndependentVariableM*> _mapIndependentVarByName;
     CassUuid _experimentationCassUuid;
     CassUuid _subjectUuid;
-    CassUuid _taskUuid;
+    CassUuid _protocolUuid;
 
     CassUuid _cassUuid;
 

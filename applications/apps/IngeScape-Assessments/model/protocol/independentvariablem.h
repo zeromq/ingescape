@@ -45,15 +45,9 @@ class IndependentVariableM : public QObject
 
 
 public:
-    /**
-     * @brief Constructor
-     * @param name
-     * @param description
-     * @param valueType
-     * @param parent
-     */
+    // TODO Comment
     explicit IndependentVariableM(CassUuid experimentationUuid,
-                                  CassUuid taskUuid,
+                                  CassUuid protocolUuid,
                                   CassUuid uuid,
                                   QString name,
                                   QString description,
@@ -76,10 +70,10 @@ public:
 
 
     /**
-     * @brief Accessor for this independent variable's task UUID in the Cassandra DB
+     * @brief Accessor for this independent variable's protocol UUID in the Cassandra DB
      * @return
      */
-    CassUuid getTaskCassUuid() const { return _taskCassUuid; }
+    CassUuid getProtocolCassUuid() const { return _protocolCassUuid; }
 
 
     /**
@@ -144,11 +138,11 @@ public:
 
 
 private:
-    // Task's experimentation's UUID from Cassandra DB
+    // Protocol's experimentation's UUID from Cassandra DB
     CassUuid _experimentationCassUuid;
 
-    // Task's UUID from Cassandra DB
-    CassUuid _taskCassUuid;
+    // Protocol's UUID from Cassandra DB
+    CassUuid _protocolCassUuid;
 
     // Independent variable's UUID from Cassandra DB
     CassUuid _cassUuid;

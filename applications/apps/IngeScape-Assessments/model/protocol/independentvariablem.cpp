@@ -45,13 +45,17 @@ const QStringList IndependentVariableM::primaryKeys = {
 
 /**
  * @brief Constructor
+ * @param experimentationUuid
+ * @param protocolUuid
+ * @param uuid
  * @param name
  * @param description
  * @param valueType
+ * @param enumValues
  * @param parent
  */
 IndependentVariableM::IndependentVariableM(CassUuid experimentationUuid,
-                                           CassUuid taskUuid,
+                                           CassUuid protocolUuid,
                                            CassUuid uuid,
                                            QString name,
                                            QString description,
@@ -63,7 +67,7 @@ IndependentVariableM::IndependentVariableM(CassUuid experimentationUuid,
     _valueType(valueType),
     _enumValues(enumValues),
     _experimentationCassUuid(experimentationUuid),
-    _taskCassUuid(taskUuid),
+    _protocolCassUuid(protocolUuid),
     _cassUuid(uuid)
 
 {
@@ -95,9 +99,9 @@ IndependentVariableM* IndependentVariableM::createFromCassandraRow(const CassRow
 
     if (row != nullptr)
     {
-        CassUuid experimentationUuid, taskUuid, independentVarUuid;
+        CassUuid experimentationUuid, protocolUuid, independentVarUuid;
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_experimentation"), &experimentationUuid);
-        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_task"), &taskUuid);
+        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_task"), &protocolUuid);
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &independentVarUuid);
 
         QString variableName(AssessmentsModelManager::getStringValueFromColumnName(row, "name"));
@@ -109,7 +113,13 @@ IndependentVariableM* IndependentVariableM::createFromCassandraRow(const CassRow
 
         QStringList enumValues = AssessmentsModelManager::getStringListFromColumnName(row, "enum_values");
 
-        independentVariable = new IndependentVariableM(experimentationUuid, taskUuid, independentVarUuid, variableName, variableDescription, valueType, enumValues);
+        independentVariable = new IndependentVariableM(experimentationUuid,
+                                                       protocolUuid,
+                                                       independentVarUuid,
+                                                       variableName,
+                                                       variableDescription,
+                                                       valueType,
+                                                       enumValues);
     }
 
     return independentVariable;
@@ -124,7 +134,9 @@ IndependentVariableM* IndependentVariableM::createFromCassandraRow(const CassRow
 void IndependentVariableM::deleteIndependentVariableFromCassandra(const IndependentVariableM& independentVariable)
 {
     // Remove independent variable from DB
-    AssessmentsModelManager::deleteEntry<IndependentVariableM>({ independentVariable.getExperimentationCassUuid(), independentVariable.getTaskCassUuid(), independentVariable.getCassUuid() });
+    AssessmentsModelManager::deleteEntry<IndependentVariableM>({ independentVariable.getExperimentationCassUuid(),
+                                                                 independentVariable.getProtocolCassUuid(),
+                                                                 independentVariable.getCassUuid() });
 }
 
 
@@ -140,7 +152,7 @@ CassStatement* IndependentVariableM::createBoundInsertStatement(const Independen
     QString queryStr = "INSERT INTO " + IndependentVariableM::table + " (id_experimentation, id_task, id, name, description, value_type, enum_values) VALUES (?, ?, ?, ?, ?, ?, ?);";
     CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 7);
     cass_statement_bind_uuid  (cassStatement, 0, independentVariable.getExperimentationCassUuid());
-    cass_statement_bind_uuid  (cassStatement, 1, independentVariable.getTaskCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 1, independentVariable.getProtocolCassUuid());
     cass_statement_bind_uuid  (cassStatement, 2, independentVariable.getCassUuid());
     cass_statement_bind_string(cassStatement, 3, independentVariable.name().toStdString().c_str());
     cass_statement_bind_string(cassStatement, 4, independentVariable.description().toStdString().c_str());
@@ -180,7 +192,7 @@ CassStatement* IndependentVariableM::createBoundUpdateStatement(const Independen
     cass_collection_free(enumValuesCassList);
 
     cass_statement_bind_uuid  (cassStatement, 4, independentVariable.getExperimentationCassUuid());
-    cass_statement_bind_uuid  (cassStatement, 5, independentVariable.getTaskCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 5, independentVariable.getProtocolCassUuid());
     cass_statement_bind_uuid  (cassStatement, 6, independentVariable.getCassUuid());
     return cassStatement;
 }

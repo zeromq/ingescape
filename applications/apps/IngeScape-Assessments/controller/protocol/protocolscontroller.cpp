@@ -149,10 +149,10 @@ void ProtocolsController::deleteProtocol(ProtocolM* protocol)
         AssessmentsModelManager::deleteEntry<SessionM>({ { _currentExperimentation->getCassUuid() }, subjectUuidList, { protocol->getCassUuid() } });
 
         // Remove from DB
-        ProtocolM::deleteTaskFromCassandraRow(*protocol);
+        ProtocolM::deleteProtocolFromCassandraRow(*protocol);
 
-        // Remove the task from the current experimentation
-        _currentExperimentation->removeTask(protocol);
+        // Remove the protocol from the current experimentation
+        _currentExperimentation->removeProtocol(protocol);
 
         // Free memory
         delete protocol;
@@ -401,29 +401,33 @@ void ProtocolsController::deleteDependentVariable(DependentVariableM* dependentV
  */
 ProtocolM* ProtocolsController::_createNewProtocolWithIngeScapePlatformFileUrl(QString protocolName, QUrl platformFileUrl)
 {
-    ProtocolM* task = nullptr;
+    ProtocolM* protocol = nullptr;
 
     if (!protocolName.isEmpty() && platformFileUrl.isValid() && (_currentExperimentation != nullptr) && (AssessmentsModelManager::instance() != nullptr))
     {
-        // Create the new task
-        task = new ProtocolM(_currentExperimentation->getCassUuid(), AssessmentsModelManager::genCassUuid(), protocolName, platformFileUrl);
-        if (task == nullptr || !AssessmentsModelManager::insert(*task)) {
-            delete task;
-            task = nullptr;
+        // Create the new protocol
+        protocol = new ProtocolM(_currentExperimentation->getCassUuid(),
+                                 AssessmentsModelManager::genCassUuid(),
+                                 protocolName,
+                                 platformFileUrl);
+        if ((protocol == nullptr) || !AssessmentsModelManager::insert(*protocol)) {
+            delete protocol;
+            protocol = nullptr;
         }
-        else {
+        else
+        {
             // Add the task to the current experimentation
-            _currentExperimentation->addTask(task);
+            _currentExperimentation->addProtocol(protocol);
 
             // Select this new protocol
-            setselectedProtocol(task);
+            setselectedProtocol(protocol);
         }
     }
     else {
-        qWarning() << "Cannot create new task because name is empty (" << task->name() << ") or group is null !";
+        qWarning() << "Cannot create new protocol because name is empty (" << protocolName << ") or platform file URL is wrong !";
     }
 
-    return task;
+    return protocol;
 }
 
 
@@ -431,20 +435,20 @@ ProtocolM* ProtocolsController::_createNewProtocolWithIngeScapePlatformFileUrl(Q
  * @brief Creates a new independent variable with the given parameters and insert it into the Cassandra DB
  * A nullptr is returned if the operation failed.
  * @param experimentationUuid
- * @param taskUuid
+ * @param protocolUuid
  * @param name
  * @param description
  * @param valueType
  * @param enumValues
  * @return
  */
-IndependentVariableM* ProtocolsController::_insertIndependentVariableIntoDB(CassUuid experimentationUuid, CassUuid taskUuid, const QString& variableName, const QString& variableDescription, IndependentVariableValueTypes::Value valueType, const QStringList& enumValues)
+IndependentVariableM* ProtocolsController::_insertIndependentVariableIntoDB(CassUuid experimentationUuid, CassUuid protocolUuid, const QString& variableName, const QString& variableDescription, IndependentVariableValueTypes::Value valueType, const QStringList& enumValues)
 {
     IndependentVariableM* independentVariable = nullptr;
 
     if (!variableName.isEmpty() && (AssessmentsModelManager::instance() != nullptr))
     {
-        independentVariable = new IndependentVariableM(experimentationUuid, taskUuid, AssessmentsModelManager::genCassUuid(), variableName, variableDescription, valueType, enumValues);
+        independentVariable = new IndependentVariableM(experimentationUuid, protocolUuid, AssessmentsModelManager::genCassUuid(), variableName, variableDescription, valueType, enumValues);
         if (independentVariable == nullptr || !AssessmentsModelManager::insert(*independentVariable))
         {
             delete independentVariable;
@@ -460,7 +464,7 @@ IndependentVariableM* ProtocolsController::_insertIndependentVariableIntoDB(Cass
  * @brief Creates a new dependent variable with the given parameters and insert it into the Cassandra DB
  * A nullptr is returned if the operation failed.
  * @param experimentationUuid
- * @param taskUuid
+ * @param protocolUuid
  * @param name
  * @param description
  * @param valueType
@@ -468,14 +472,14 @@ IndependentVariableM* ProtocolsController::_insertIndependentVariableIntoDB(Cass
  * @return
  */
 DependentVariableM* ProtocolsController::_insertDependentVariableIntoDB(CassUuid experimentationUuid,
-                                                                    CassUuid taskUuid,
+                                                                    CassUuid protocolUuid,
                                                                     const QString& name,
                                                                     const QString& description,
                                                                     const QString& agentName,
                                                                     const QString& outputName)
 {
     DependentVariableM* dependentVariable = new DependentVariableM(experimentationUuid,
-                                                                   taskUuid,
+                                                                   protocolUuid,
                                                                    AssessmentsModelManager::genCassUuid(),
                                                                    name,
                                                                    description,

@@ -189,34 +189,36 @@ ProtocolM* ProtocolM::createFromCassandraRow(const CassRow* row)
 
     if (row != nullptr)
     {
-        CassUuid experimentationUuid, taskUuid;
+        CassUuid experimentationUuid, protocolUuid;
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_experimentation"), &experimentationUuid);
-        cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &taskUuid);
+        cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &protocolUuid);
 
         QString protocolName(AssessmentsModelManager::getStringValueFromColumnName(row, "name"));
         QUrl platformUrl(AssessmentsModelManager::getStringValueFromColumnName(row, "platform_file"));
 
-        task = new ProtocolM(experimentationUuid, taskUuid, protocolName, platformUrl);
+        task = new ProtocolM(experimentationUuid,
+                             protocolUuid,
+                             protocolName,
+                             platformUrl);
     }
 
     return task;
 }
 
 /**
- * @brief Delete the given task from the Cassandra DB
- * @param task
+ * @brief Delete the given protocol from the Cassandra DB
+ * @param protocol
  */
-void ProtocolM::deleteTaskFromCassandraRow(const ProtocolM& task)
+void ProtocolM::deleteProtocolFromCassandraRow(const ProtocolM& protocol)
 {
-
     // Remove independent_var from DB
-    AssessmentsModelManager::deleteEntry<IndependentVariableM>({ task.getExperimentationCassUuid(), task.getCassUuid() });
+    AssessmentsModelManager::deleteEntry<IndependentVariableM>({ protocol.getExperimentationCassUuid(), protocol.getCassUuid() });
 
     // Remove dependent_var from DB
-    AssessmentsModelManager::deleteEntry<DependentVariableM>({ task.getExperimentationCassUuid(), task.getCassUuid() });
+    AssessmentsModelManager::deleteEntry<DependentVariableM>({ protocol.getExperimentationCassUuid(), protocol.getCassUuid() });
 
     // Remove task from DB
-    AssessmentsModelManager::deleteEntry<ProtocolM>({ task.getExperimentationCassUuid(), task.getCassUuid() });
+    AssessmentsModelManager::deleteEntry<ProtocolM>({ protocol.getExperimentationCassUuid(), protocol.getCassUuid() });
 }
 
 
@@ -259,7 +261,7 @@ void ProtocolM::deleteDependentVariable(DependentVariableM* variableToDelete)
         _dependentVariables.remove(variableToDelete);
 
         AssessmentsModelManager::deleteEntry<DependentVariableM>({ variableToDelete->getExperimentationCassUuid(),
-                                                                   variableToDelete->getTaskCassUuid(),
+                                                                   variableToDelete->getProtocolCassUuid(),
                                                                    variableToDelete->getCassUuid() });
 
         // Free memory

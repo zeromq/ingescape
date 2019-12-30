@@ -50,9 +50,12 @@ const QStringList SessionM::primaryKeys = {
 
 /**
  * @brief Constructor
+ * @param experimentationUuid
+ * @param cassUuid
  * @param name
- * @param subject
- * @param task
+ * @param comments
+ * @param subjectUuid
+ * @param protocolUuid
  * @param startDateTime
  * @param parent
  */
@@ -61,13 +64,13 @@ SessionM::SessionM(CassUuid experimentationUuid,
                              QString name,
                              QString comments,
                              CassUuid subjectUuid,
-                             CassUuid taskUuid,
+                             CassUuid protocolUuid,
                              QDateTime startDateTime,
                              QObject *parent) : QObject(parent),
     _name(name),
     _comments(comments),
     _subject(nullptr),
-    _task(nullptr),
+    _protocol(nullptr),
     _startDateTime(startDateTime),
     _endDateTime(startDateTime),  //FIXME Need a way to compute actual endDateTime.
     _duration(QTime()),           //FIXME Need a way to compute actual duration.
@@ -75,7 +78,7 @@ SessionM::SessionM(CassUuid experimentationUuid,
     _isRecorded(false),
     _experimentationCassUuid(experimentationUuid),
     _subjectUuid(subjectUuid),
-    _taskUuid(taskUuid),
+    _protocolUuid(protocolUuid),
     _cassUuid(cassUuid)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -91,10 +94,12 @@ SessionM::SessionM(CassUuid experimentationUuid,
     // Connect to signal "Value Changed" from the "Qml Property Map"
     connect(_mapIndependentVariableValues, &QQmlPropertyMap::valueChanged, this, &SessionM::_onIndependentVariableValueChanged);
 
-    // Connect to task change to reset the independent variables values
-    connect(this, &SessionM::taskChanged, [this](ProtocolM* task) {
-        if (task != nullptr) {
-            for (IndependentVariableM* independentVariable : task->independentVariables()->toList())
+    // Connect to protocol change to reset the independent variables values
+    connect(this, &SessionM::protocolChanged, [this](ProtocolM* protocol)
+    {
+        if (protocol != nullptr)
+        {
+            for (IndependentVariableM* independentVariable : protocol->independentVariables()->toList())
             {
                 if (independentVariable != nullptr)
                 {
@@ -113,9 +118,9 @@ SessionM::SessionM(CassUuid experimentationUuid,
  */
 SessionM::~SessionM()
 {
-    if ((_subject != nullptr) && (_task != nullptr))
+    if ((_subject != nullptr) && (_protocol != nullptr))
     {
-        qInfo() << "Delete Model of Session" << _name << "(" << AssessmentsModelManager::cassUuidToQString(_cassUuid) << ") for subject" << _subject->displayedId() << "and task" << _task->name() << "at" << _startDateTime.toString("dd/MM/yyyy hh:mm:ss");
+        qInfo() << "Delete Model of Session" << _name << "(" << AssessmentsModelManager::cassUuidToQString(_cassUuid) << ") for subject" << _subject->displayedId() << "and protocol" << _protocol->name() << "at" << _startDateTime.toString("dd/MM/yyyy hh:mm:ss");
 
         // For debug purpose: Print the value of all independent variables
         _printIndependentVariableValues();
@@ -136,7 +141,7 @@ SessionM::~SessionM()
 
         // Reset pointers
         setsubject(nullptr);
-        settask(nullptr);
+        setprotocol(nullptr);
     }
 }
 
@@ -206,10 +211,10 @@ SessionM* SessionM::createFromCassandraRow(const CassRow* row)
 
     if (row != nullptr)
     {
-        CassUuid experimentationUuid, subjectUuid, taskUuid, taskInstanceUuid;
+        CassUuid experimentationUuid, subjectUuid, protocolUuid, taskInstanceUuid;
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_experimentation"), &experimentationUuid);
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_subject"), &subjectUuid);
-        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_task"), &taskUuid);
+        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_task"), &protocolUuid);
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &taskInstanceUuid);
 
         QString sessionName(AssessmentsModelManager::getStringValueFromColumnName(row, "name"));
@@ -218,7 +223,13 @@ SessionM* SessionM::createFromCassandraRow(const CassRow* row)
 
         QDateTime startDateTime(AssessmentsModelManager::getDateTimeFromColumnNames(row, "start_date", "start_time"));
 
-        taskInstance = new SessionM(experimentationUuid, taskInstanceUuid, sessionName, comments, subjectUuid, taskUuid, startDateTime);
+        taskInstance = new SessionM(experimentationUuid,
+                                    taskInstanceUuid,
+                                    sessionName,
+                                    comments,
+                                    subjectUuid,
+                                    protocolUuid,
+                                    startDateTime);
     }
 
     return taskInstance;
@@ -230,13 +241,13 @@ SessionM* SessionM::createFromCassandraRow(const CassRow* row)
  */
 void SessionM::deleteSessionFromCassandra(const SessionM& session)
 {
-    if ((session.subject() != nullptr) && (session.task() != nullptr))
+    if ((session.subject() != nullptr) && (session.protocol() != nullptr))
     {
         // Delete independent variable values linked to this task instance from DB
         AssessmentsModelManager::deleteEntry<IndependentVariableValueM>({ session.subject()->getExperimentationCassUuid(), session.getCassUuid() });
 
         // Delete the actual task instance from DB
-        AssessmentsModelManager::deleteEntry<SessionM>({ session.subject()->getExperimentationCassUuid(), session.getSubjectCassUuid(), session.getTaskCassUuid(), session.getCassUuid() });
+        AssessmentsModelManager::deleteEntry<SessionM>({ session.subject()->getExperimentationCassUuid(), session.getSubjectCassUuid(), session.getProtocolCassUuid(), session.getCassUuid() });
     }
 }
 
@@ -252,9 +263,9 @@ CassStatement* SessionM::createBoundInsertStatement(const SessionM& session)
     QString queryStr = "INSERT INTO " + SessionM::table + " (id, id_experimentation, id_subject, id_task, name, comment, start_date, start_time, end_date, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
     CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 10);
     cass_statement_bind_uuid  (cassStatement, 0, session.getCassUuid());
-    cass_statement_bind_uuid  (cassStatement, 1, session.task()->getExperimentationCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 1, session.protocol()->getExperimentationCassUuid());
     cass_statement_bind_uuid  (cassStatement, 2, session.subject()->getCassUuid());
-    cass_statement_bind_uuid  (cassStatement, 3, session.task()->getCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 3, session.protocol()->getCassUuid());
     cass_statement_bind_string(cassStatement, 4, session.name().toStdString().c_str());
     cass_statement_bind_string(cassStatement, 5, "");
     cass_statement_bind_uint32(cassStatement, 6, cass_date_from_epoch(session.startDateTime().toTime_t()));
@@ -286,7 +297,7 @@ CassStatement* SessionM::createBoundUpdateStatement(const SessionM& session)
     cass_statement_bind_int64 (cassStatement, 5, cass_time_from_epoch(session.endDateTime().toTime_t()));
     cass_statement_bind_uuid  (cassStatement, 6, session.subject()->getExperimentationCassUuid());
     cass_statement_bind_uuid  (cassStatement, 7, session.subject()->getCassUuid());
-    cass_statement_bind_uuid  (cassStatement, 8, session.task()->getCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 8, session.protocol()->getCassUuid());
     cass_statement_bind_uuid  (cassStatement, 9, session.getCassUuid());
     return cassStatement;
 }
@@ -337,9 +348,9 @@ void SessionM::setendDateTime(QDateTime value)
  */
 void SessionM::_printIndependentVariableValues()
 {
-    if ((_task != nullptr) && (_mapIndependentVariableValues != nullptr))
+    if ((_protocol != nullptr) && (_mapIndependentVariableValues != nullptr))
     {
-        for (IndependentVariableM* independentVariable : _task->independentVariables()->toList())
+        for (IndependentVariableM* independentVariable : _protocol->independentVariables()->toList())
         {
             if ((independentVariable != nullptr) && _mapIndependentVariableValues->contains(independentVariable->name()))
             {
