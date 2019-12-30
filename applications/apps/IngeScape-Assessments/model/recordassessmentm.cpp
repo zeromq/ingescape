@@ -38,7 +38,7 @@ const QStringList RecordAssessmentM::columnNames = {
 };
 
 /**
- * @brief TaskInstance table primary keys IN ORDER
+ * @brief RecordAssessment table primary keys IN ORDER
  */
 const QStringList RecordAssessmentM::primaryKeys = {
     "id_task_instance",

@@ -22,7 +22,7 @@ import QtQuick.Window 2.3
 import INGESCAPE 1.0
 
 import "experimentation" as Experimentation
-import "task_instance" as TaskInstance
+import "task_instance" as Session
 import "popup" as Popup
 
 
@@ -148,7 +148,7 @@ Item {
                 console.log("QML: on Current Session changed: " + IngeScapeAssessmentsC.experimentationC.sessionC.currentSession.name);
 
                 // Add the "Session view" to the stack
-                stackview.push(componentTaskInstanceView);
+                stackview.push(componentSessionView);
             }
             else {
                 console.log("QML: on Current Session changed to NULL");
@@ -290,12 +290,12 @@ Item {
 
 
     //
-    // Task Instance View
+    // Session View
     //
     Component {
-        id: componentTaskInstanceView
+        id: componentSessionView
 
-        TaskInstance.TaskInstanceView {
+        Session.TaskInstanceView {
             sessionController: IngeScapeAssessmentsC.experimentationC.sessionC
             experimentationController: IngeScapeAssessmentsC.experimentationC
 

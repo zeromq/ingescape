@@ -327,7 +327,7 @@ Item {
         property real creationDateTimeColumnWidth: 165
         property real buttonsColumnWidth: 135
 
-        property real sessionColumnWidth: taskInstancesPanel.width - taskInstanceScrollView.scrollBarSize - taskInstanceScrollView.verticalScrollbarMargin
+        property real sessionColumnWidth: sessionsPanel.width - sessionsScrollView.scrollBarSize - sessionsScrollView.verticalScrollbarMargin
                                           - selectionColumnWidth
                                           - subjectColumnWidth
                                           - protocolColumnWidth
@@ -472,10 +472,10 @@ Item {
 
 
         //
-        // Task Instances Panel
+        // Sessions panel
         //
         Item {
-            id: taskInstancesPanel
+            id: sessionsPanel
 
             anchors {
                 top: parent.top
@@ -1181,18 +1181,18 @@ Item {
                 color: IngeScapeTheme.whiteColor
 
                 ScrollView {
-                    id: taskInstanceScrollView
+                    id: sessionsScrollView
                     anchors {
                         fill: parent
-                        rightMargin: -taskInstanceScrollView.scrollBarSize -taskInstanceScrollView.verticalScrollbarMargin
+                        rightMargin: -sessionsScrollView.scrollBarSize -sessionsScrollView.verticalScrollbarMargin
                     }
 
                     property int scrollBarSize: 11
                     property int verticalScrollbarMargin: 3
 
                     style: IngeScapeAssessmentsScrollViewStyle {
-                        scrollBarSize: taskInstanceScrollView.scrollBarSize
-                        verticalScrollbarMargin: taskInstanceScrollView.verticalScrollbarMargin
+                        scrollBarSize: sessionsScrollView.scrollBarSize
+                        verticalScrollbarMargin: sessionsScrollView.verticalScrollbarMargin
                     }
 
                     // Prevent drag overshoot on Windows
@@ -1201,7 +1201,7 @@ Item {
                     Column {
                         id: sessionColumn
 
-                        width: taskInstanceScrollView.width - (taskInstanceScrollView.scrollBarSize + taskInstanceScrollView.verticalScrollbarMargin)
+                        width: sessionsScrollView.width - (sessionsScrollView.scrollBarSize + sessionsScrollView.verticalScrollbarMargin)
                         height: childrenRect.height
                         spacing: 0
 

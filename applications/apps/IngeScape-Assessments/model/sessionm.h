@@ -25,7 +25,7 @@
 
 
 /**
- * @brief The SessionM class defines a model of task instance
+ * @brief The SessionM class defines a model of session
  */
 class SessionM : public QObject
 {
@@ -93,17 +93,17 @@ public:
     ~SessionM();
 
     /**
-     * @brief TaskInstance table name
+     * @brief Session table name
      */
     static const QString table;
 
     /**
-     * @brief TaskInstance table column names
+     * @brief Session table column names
      */
     static const QStringList columnNames;
 
     /**
-     * @brief TaskInstance table primary keys IN ORDER
+     * @brief Session table primary keys IN ORDER
      */
     static const QStringList primaryKeys;
 
@@ -133,7 +133,7 @@ public:
     void setIndependentVariableValue(IndependentVariableM* indepVar, const QString& value);
 
     /**
-     * @brief Static factory method to create a task instance from a CassandraDB record
+     * @brief Static factory method to create a session from a CassandraDB record
      * @param row
      * @return
      */
@@ -147,21 +147,21 @@ public:
 
     /**
      * @brief Create a CassStatement to insert a SessionM into the DB.
-     * The statement contains the values from the given taskInstance.
-     * Passed taskInstance must have a valid and unique UUID.
-     * @param taskInstance
+     * The statement contains the values from the given session.
+     * Passed session must have a valid and unique UUID.
+     * @param session
      * @return
      */
-    static CassStatement* createBoundInsertStatement(const SessionM& taskInstance);
+    static CassStatement* createBoundInsertStatement(const SessionM& session);
 
     /**
      * @brief Create a CassStatement to update a SessionM into the DB.
-     * The statement contains the values from the given taskInstance.
-     * Passed taskInstance must have a valid and unique UUID.
-     * @param taskInstance
+     * The statement contains the values from the given session.
+     * Passed session must have a valid and unique UUID.
+     * @param session
      * @return
      */
-    static CassStatement* createBoundUpdateStatement(const SessionM& taskInstance);
+    static CassStatement* createBoundUpdateStatement(const SessionM& session);
 
 
 private Q_SLOTS:

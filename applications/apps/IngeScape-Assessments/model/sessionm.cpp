@@ -18,12 +18,12 @@
 #include "model/protocol/independentvariablevaluem.h"
 
 /**
- * @brief TaskInstance table name
+ * @brief Session table name
  */
 const QString SessionM::table = "ingescape.task_instance";
 
 /**
- * @brief TaskInstance table column names
+ * @brief Session table column names
  */
 const QStringList SessionM::columnNames = {
     "id_experimentation",
@@ -39,7 +39,7 @@ const QStringList SessionM::columnNames = {
 };
 
 /**
- * @brief TaskInstance table primary keys IN ORDER
+ * @brief Session table primary keys IN ORDER
  */
 const QStringList SessionM::primaryKeys = {
     "id_experimentation",
@@ -201,21 +201,21 @@ void SessionM::setIndependentVariableValue(IndependentVariableM* indepVar, const
 
 
 /**
- * @brief Static factory method to create a task instance from a CassandraDB record
+ * @brief Static factory method to create a session from a CassandraDB record
  * @param row
  * @return
  */
 SessionM* SessionM::createFromCassandraRow(const CassRow* row)
 {
-    SessionM* taskInstance = nullptr;
+    SessionM* session = nullptr;
 
     if (row != nullptr)
     {
-        CassUuid experimentationUuid, subjectUuid, protocolUuid, taskInstanceUuid;
+        CassUuid experimentationUuid, subjectUuid, protocolUuid, sessionUuid;
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_experimentation"), &experimentationUuid);
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_subject"), &subjectUuid);
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_task"), &protocolUuid);
-        cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &taskInstanceUuid);
+        cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &sessionUuid);
 
         QString sessionName(AssessmentsModelManager::getStringValueFromColumnName(row, "name"));
         QString comments(AssessmentsModelManager::getStringValueFromColumnName(row, "comment"));
@@ -223,16 +223,16 @@ SessionM* SessionM::createFromCassandraRow(const CassRow* row)
 
         QDateTime startDateTime(AssessmentsModelManager::getDateTimeFromColumnNames(row, "start_date", "start_time"));
 
-        taskInstance = new SessionM(experimentationUuid,
-                                    taskInstanceUuid,
-                                    sessionName,
-                                    comments,
-                                    subjectUuid,
-                                    protocolUuid,
-                                    startDateTime);
+        session = new SessionM(experimentationUuid,
+                               sessionUuid,
+                               sessionName,
+                               comments,
+                               subjectUuid,
+                               protocolUuid,
+                               startDateTime);
     }
 
-    return taskInstance;
+    return session;
 }
 
 /**
@@ -243,10 +243,10 @@ void SessionM::deleteSessionFromCassandra(const SessionM& session)
 {
     if ((session.subject() != nullptr) && (session.protocol() != nullptr))
     {
-        // Delete independent variable values linked to this task instance from DB
+        // Delete independent variable values linked to this session from DB
         AssessmentsModelManager::deleteEntry<IndependentVariableValueM>({ session.subject()->getExperimentationCassUuid(), session.getCassUuid() });
 
-        // Delete the actual task instance from DB
+        // Delete the actual session from DB
         AssessmentsModelManager::deleteEntry<SessionM>({ session.subject()->getExperimentationCassUuid(), session.getSubjectCassUuid(), session.getProtocolCassUuid(), session.getCassUuid() });
     }
 }
@@ -254,8 +254,8 @@ void SessionM::deleteSessionFromCassandra(const SessionM& session)
 /**
  * @brief Create a CassStatement to insert a SessionM into the DB.
  * The statement contains the values from the given session.
- * Passed taskInstance must have a valid and unique UUID.
- * @param taskInstance
+ * Passed session must have a valid and unique UUID.
+ * @param session
  * @return
  */
 CassStatement* SessionM::createBoundInsertStatement(const SessionM& session)
@@ -278,8 +278,8 @@ CassStatement* SessionM::createBoundInsertStatement(const SessionM& session)
 /**
  * @brief Create a CassStatement to update a SessionM into the DB.
  * The statement contains the values from the given session.
- * Passed taskInstance must have a valid and unique UUID.
- * @param taskInstance
+ * Passed session must have a valid and unique UUID.
+ * @param session
  * @return
  */
 CassStatement* SessionM::createBoundUpdateStatement(const SessionM& session)

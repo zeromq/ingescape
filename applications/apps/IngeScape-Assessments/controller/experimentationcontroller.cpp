@@ -391,15 +391,18 @@ void ExperimentationController::onRecordDeletedReceived(QString message)
 {
     if ((!message.isEmpty()) && (_currentExperimentation != nullptr) && (!_currentExperimentation->allSessions()->isEmpty()))
     {
-        for (SessionM* taskInstance : _currentExperimentation->allSessions()->toList())
+        for (SessionM* session : _currentExperimentation->allSessions()->toList())
         {
-            for (RecordAssessmentM* record : taskInstance->recordsList()->toList())
+            if (session != nullptr)
             {
-                if (record->uid() == message)
+                for (RecordAssessmentM* record : session->recordsList()->toList())
                 {
-                    // Message is an unique ID, we can return from our function after remove record
-                    _sessionC->currentSession()->recordsList()->remove(record);
-                    return;
+                    if (record->uid() == message)
+                    {
+                        // Message is an unique ID, we can return from our function after remove record
+                        _sessionC->currentSession()->recordsList()->remove(record);
+                        return;
+                    }
                 }
             }
         }
@@ -432,7 +435,7 @@ void ExperimentationController::_onCurrentExperimentationChanged(Experimentation
 
         _retrieveSessionsForExperimentation(currentExperimentation);
 
-        _retrieveIndependentVariableValuesForTaskInstancesInExperimentation(currentExperimentation);
+        _retrieveIndependentVariableValuesForSessionsInExperimentation(currentExperimentation);
 
         _sessionFilteredList.setSourceModel(_currentExperimentation->allSessions());
     }
@@ -742,11 +745,11 @@ void ExperimentationController::_retrieveCharacteristicValuesForSubjectsInExperi
 }
 
 /**
- * @brief Retrieve all independent variable values Cassandra DB for each task instance in the given experimentation.
+ * @brief Retrieve all independent variable values Cassandra DB for each session in the given experimentation.
  * The experimentation will be updated by this method
  * @param experimentation
  */
-void ExperimentationController::_retrieveIndependentVariableValuesForTaskInstancesInExperimentation(ExperimentationM* experimentation)
+void ExperimentationController::_retrieveIndependentVariableValuesForSessionsInExperimentation(ExperimentationM* experimentation)
 {
     if (experimentation != nullptr)
     {
@@ -755,7 +758,7 @@ void ExperimentationController::_retrieveIndependentVariableValuesForTaskInstanc
         {
             if (indepVarValue != nullptr)
             {
-                SessionM* session = experimentation->getSessionFromUID(indepVarValue->taskInstanceUuid);
+                SessionM* session = experimentation->getSessionFromUID(indepVarValue->sessionUuid);
                 IndependentVariableM* indepVar = session->protocol()->getIndependentVariableFromUuid(indepVarValue->independentVariableUuid);
                 if ((session != nullptr) && (indepVar != nullptr))
                 {

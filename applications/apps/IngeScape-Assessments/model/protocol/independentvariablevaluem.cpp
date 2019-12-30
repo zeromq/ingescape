@@ -43,13 +43,16 @@ const QStringList IndependentVariableValueM::primaryKeys = {
 /**
  * @brief Constructor setting all parameters
  * @param experimentationUuid
- * @param taskInstanceUuid
+ * @param sessionUuid
  * @param independentVariableUuid
  * @param valueString
  */
-IndependentVariableValueM::IndependentVariableValueM(const CassUuid& experimentationUuid, const CassUuid& taskInstanceUuid, const CassUuid& independentVariableUuid, const QString& valueString)
+IndependentVariableValueM::IndependentVariableValueM(const CassUuid& experimentationUuid,
+                                                     const CassUuid& sessionUuid,
+                                                     const CassUuid& independentVariableUuid,
+                                                     const QString& valueString)
     : experimentationUuid(experimentationUuid)
-    , taskInstanceUuid(taskInstanceUuid)
+    , sessionUuid(sessionUuid)
     , independentVariableUuid(independentVariableUuid)
     , valueString(valueString) {}
 
@@ -66,13 +69,16 @@ IndependentVariableValueM* IndependentVariableValueM::createFromCassandraRow(con
     if (row != nullptr)
     {
         // Get independent variable uuid
-        CassUuid experimentationUuid, taskInstanceUuid, indepVarUuid;
+        CassUuid experimentationUuid, sessionUuid, indepVarUuid;
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_experimentation"), &experimentationUuid);
-        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_task_instance"), &taskInstanceUuid);
+        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_task_instance"), &sessionUuid);
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_independent_var"), &indepVarUuid);
         QString valueString = AssessmentsModelManager::getStringValueFromColumnName(row, "independent_var_value");
 
-        indepVarValue = new IndependentVariableValueM(experimentationUuid, taskInstanceUuid, indepVarUuid, valueString);
+        indepVarValue = new IndependentVariableValueM(experimentationUuid,
+                                                      sessionUuid,
+                                                      indepVarUuid,
+                                                      valueString);
     }
 
     return indepVarValue;
@@ -91,7 +97,7 @@ CassStatement* IndependentVariableValueM::createBoundInsertStatement(const Indep
     QString queryStr = "INSERT INTO " + IndependentVariableValueM::table + " (id_experimentation, id_task_instance, id_independent_var, independent_var_value) VALUES (?, ?, ?, ?);";
     CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 4);
     cass_statement_bind_uuid  (cassStatement, 0, independentVariableValue.experimentationUuid);
-    cass_statement_bind_uuid  (cassStatement, 1, independentVariableValue.taskInstanceUuid);
+    cass_statement_bind_uuid  (cassStatement, 1, independentVariableValue.sessionUuid);
     cass_statement_bind_uuid  (cassStatement, 2, independentVariableValue.independentVariableUuid);
     cass_statement_bind_string(cassStatement, 3, independentVariableValue.valueString.toStdString().c_str());
     return cassStatement;
@@ -110,7 +116,7 @@ CassStatement* IndependentVariableValueM::createBoundUpdateStatement(const Indep
     CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 4);
     cass_statement_bind_string(cassStatement, 0, independentVariableValue.valueString.toStdString().c_str());
     cass_statement_bind_uuid  (cassStatement, 1, independentVariableValue.experimentationUuid);
-    cass_statement_bind_uuid  (cassStatement, 2, independentVariableValue.taskInstanceUuid);
+    cass_statement_bind_uuid  (cassStatement, 2, independentVariableValue.sessionUuid);
     cass_statement_bind_uuid  (cassStatement, 3, independentVariableValue.independentVariableUuid);
     return cassStatement;
 }

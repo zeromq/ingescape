@@ -115,7 +115,7 @@ public:
 
     /**
      * @brief Return true if start time in our timeline is before one (or more) record(s)
-     * of our current task instance, false if not
+     * of our current session, false if not
      * @return
      */
     Q_INVOKABLE bool isThereOneRecordAfterStartTime();
@@ -349,11 +349,11 @@ protected: // Methods
     void _retrieveCharacteristicValuesForSubjectsInExperimentation(ExperimentationM* experimentation);
 
     /**
-     * @brief Retrieve all independent variable values Cassandra DB for each task instance in the given experimentation.
+     * @brief Retrieve all independent variable values Cassandra DB for each session in the given experimentation.
      * The experimentation will be updated by this method
      * @param experimentation
      */
-    void _retrieveIndependentVariableValuesForTaskInstancesInExperimentation(ExperimentationM* experimentation);
+    void _retrieveIndependentVariableValuesForSessionsInExperimentation(ExperimentationM* experimentation);
 
 
 protected:

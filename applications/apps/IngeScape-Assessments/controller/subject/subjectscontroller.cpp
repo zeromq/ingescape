@@ -367,7 +367,7 @@ void SubjectsController::_deleteCharacteristicValuesForCharacteristic(Characteri
 {
     if ((characteristic != nullptr) && (_currentExperimentation != nullptr))
     {
-        // Remove task instances related to the task
+        // Remove characteristic values related to the characteristic
         QList<CassUuid> subjectUuidList;
         for (SubjectM* subject : _currentExperimentation->allSubjects()->toList()) {
             if (subject != nullptr)

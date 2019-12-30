@@ -63,7 +63,7 @@ ExperimentationM::ExperimentationM(CassUuid cassUuid,
 
     qInfo() << "New Model of Experimentation" << _name << "created" << _creationDate.toString("dd/MM/yy hh:mm:ss") << "(" << AssessmentsModelManager::cassUuidToQString(_cassUuid) << ")";
 
-    // Task instances are sorted on their start date/time (chronological order)
+    // Sessions are sorted on their start date/time (chronological order)
     _allSessions.setSortProperty("startDateTime");
 }
 
@@ -84,7 +84,7 @@ ExperimentationM::~ExperimentationM()
  */
 void ExperimentationM::clearData()
 {
-    // Delete all task instances of our experimentation
+    // Delete all sessions of our experimentation
     _allSessions.deleteAllItems();
 
     // Delete all characteristics of our experimentation
@@ -256,7 +256,7 @@ void ExperimentationM::removeSessionsRelatedToSubject(SubjectM* subject)
     auto sessionIt = sessionList.begin();
     while (sessionIt != sessionList.end())
     {
-        // Looking for a task instance related to the given subject
+        // Looking for a session related to the given subject
         sessionIt = std::find_if(sessionIt, sessionList.end(), [subject](SessionM* session){
                 return (session != nullptr) && (session->subject() == subject);
         });
@@ -281,7 +281,7 @@ void ExperimentationM::removeSessionsRelatedToProtocol(ProtocolM* protocol)
     auto sessionIt = sessionList.begin();
     while (sessionIt != sessionList.end())
     {
-        // Looking for a task instance related to the given subject
+        // Looking for a session related to the given subject
         sessionIt = std::find_if(sessionIt, sessionList.end(), [protocol](SessionM* session) {
                 return (session != nullptr) && (session->protocol() == protocol);
         });
@@ -476,7 +476,7 @@ void ExperimentationM::_deleteAllSessionsForExperimentation(const Experimentatio
 {
     // Independent variable values already deleted with task deletion
 
-    // Delete all task_instance
+    // Delete all sessions
     AssessmentsModelManager::deleteEntry<SessionM>({ experimentation.getCassUuid() });
 }
 
