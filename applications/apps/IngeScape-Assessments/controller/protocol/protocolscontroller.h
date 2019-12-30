@@ -12,20 +12,20 @@
  *
  */
 
-#ifndef TASKSCONTROLLER_H
-#define TASKSCONTROLLER_H
+#ifndef PROTOCOLS_CONTROLLER_H
+#define PROTOCOLS_CONTROLLER_H
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
 
 #include <model/experimentationm.h>
-#include <model/task/independentvariablem.h>
+#include <model/protocol/independentvariablem.h>
 
 
 /**
- * @brief The TasksController class defines the controller to manage the tasks of the current experimentation
+ * @brief The ProtocolsController class defines the controller to manage the protocols of the current experimentation
  */
-class TasksController : public QObject
+class ProtocolsController : public QObject
 {
     Q_OBJECT
 
@@ -38,8 +38,8 @@ class TasksController : public QObject
     // Model of the current experimentation
     I2_QML_PROPERTY_READONLY(ExperimentationM*, currentExperimentation)
 
-    // Model of the selected task
-    I2_QML_PROPERTY_DELETE_PROOF(TaskM*, selectedTask)
+    // Model of the selected protocol
+    I2_QML_PROPERTY_DELETE_PROOF(ProtocolM*, selectedTask)
 
     // Temporary independent variable used for edition rollbacks
     I2_QML_PROPERTY(IndependentVariableM*, temporaryIndependentVariable)
@@ -53,13 +53,13 @@ public:
      * @brief Constructor
      * @param parent
      */
-    explicit TasksController(QObject *parent = nullptr);
+    explicit ProtocolsController(QObject *parent = nullptr);
 
 
     /**
      * @brief Destructor
      */
-    ~TasksController();
+    ~ProtocolsController();
 
 
     /**
@@ -204,6 +204,6 @@ private:
     DependentVariableM* _insertDependentVariableIntoDB(CassUuid experimentationUuid, CassUuid taskUuid, const QString& name, const QString& description, const QString& agentName, const QString& outputName);
 };
 
-QML_DECLARE_TYPE(TasksController)
+QML_DECLARE_TYPE(ProtocolsController)
 
-#endif // TASKSCONTROLLER_H
+#endif // PROTOCOLS_CONTROLLER_H

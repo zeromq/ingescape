@@ -36,9 +36,9 @@ I2PopupBase {
     //
     //--------------------------------------------------------
 
-    property TasksController taskController: null;
+    property ProtocolsController protocolsController: null;
 
-    property ExperimentationM experimentation: taskController ? taskController.currentExperimentation : null;
+    property ExperimentationM experimentation: protocolsController ? protocolsController.currentExperimentation : null;
 
 
     //--------------------------------
@@ -158,36 +158,36 @@ I2PopupBase {
                 bottom: parent.bottom
             }
 
-            model: rootItem.experimentation ? rootItem.experimentation.allTasks : null
+            model: rootItem.experimentation ? rootItem.experimentation.allProtocols : null
 
             delegate: TaskInList {
                 modelM: model.QtObject
-                isSelected: rootItem.taskController && rootItem.taskController.selectedTask && (modelM === rootItem.taskController.selectedTask)
+                isSelected: rootItem.protocolsController && rootItem.protocolsController.selectedTask && (modelM === rootItem.protocolsController.selectedTask)
 
                 //
                 // Slots
                 //
                 onSelectTask: {
-                    if (rootItem.taskController)
+                    if (rootItem.protocolsController)
                     {
                         // First, select the task
-                        rootItem.taskController.selectedTask = model.QtObject;
+                        rootItem.protocolsController.selectedTask = model.QtObject;
                     }
                 }
 
                 onDeleteTask: {
-                    if (rootItem.taskController)
+                    if (rootItem.protocolsController)
                     {
                         // Delete the task
-                        rootItem.taskController.deleteTask(model.QtObject);
+                        rootItem.protocolsController.deleteTask(model.QtObject);
                     }
                 }
 
                 onDuplicateTask: {
-                    if (rootItem.taskController)
+                    if (rootItem.protocolsController)
                     {
                         // Duplicate the task
-                        rootItem.taskController.duplicateTask(model.QtObject);
+                        rootItem.protocolsController.duplicateTask(model.QtObject);
                     }
                 }
             }
@@ -232,7 +232,7 @@ I2PopupBase {
 
             anchors.fill: parent
 
-            taskController: rootItem.taskController
+            protocolsController: rootItem.protocolsController
         }
 
 
@@ -257,8 +257,8 @@ I2PopupBase {
             }
 
             onClicked: {
-                if (taskController) {
-                    taskController.selectedTask = null;
+                if (rootItem.protocolsController) {
+                    rootItem.protocolsController.selectedTask = null;
                 }
 
                 console.log("QML: close Tasks view");
@@ -280,7 +280,7 @@ I2PopupBase {
 
         layerObjectName: "overlay2Layer"
 
-        taskController: rootItem.taskController
+        protocolsController: rootItem.protocolsController
     }
 
 }

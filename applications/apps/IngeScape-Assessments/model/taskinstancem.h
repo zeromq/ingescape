@@ -19,7 +19,7 @@
 #include <I2PropertyHelpers.h>
 
 #include <model/subject/subjectm.h>
-#include <model/task/protocolm.h>
+#include <model/protocol/protocolm.h>
 #include <model/assessmentsenums.h>
 #include <model/recordassessmentm.h>
 
@@ -41,7 +41,7 @@ class TaskInstanceM : public QObject
     I2_QML_PROPERTY_DELETE_PROOF(SubjectM*, subject)
 
     // Protocol of our session
-    I2_QML_PROPERTY_DELETE_PROOF(TaskM*, task)
+    I2_QML_PROPERTY_DELETE_PROOF(ProtocolM*, task)
 
     // Start date and time of our session
     I2_QML_PROPERTY(QDateTime, startDateTime)

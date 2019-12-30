@@ -25,10 +25,10 @@ Rectangle {
     id: rootItem
 
     // Task controller
-    property var taskController: null
+    property ProtocolsController protocolsController: null;
 
     // Model of protocol that contains our model of dependent variable
-//    property TaskM protocol: null
+//    property ProtocolM protocol: null
 
     // Current model of dependent variable
     property var dependentVariableModel: null
@@ -513,9 +513,9 @@ Rectangle {
             }
 
             onClicked: {
-                if (rootItem.taskController && rootItem.dependentVariableModel)
+                if (rootItem.protocolsController && rootItem.dependentVariableModel)
                 {
-                    rootItem.taskController.deleteDependentVariable(rootItem.dependentVariableModel)
+                    rootItem.protocolsController.deleteDependentVariable(rootItem.dependentVariableModel)
                 }
             }
         }

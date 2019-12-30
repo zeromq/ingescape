@@ -43,24 +43,24 @@ SOURCES += main.cpp \
     controller/export/exportcontroller.cpp \
     controller/ingescapeassessmentscontroller.cpp \
     controller/networkcontroller.cpp \
+    controller/protocol/protocolscontroller.cpp \
     model/assessmentsenums.cpp \
-    model/task/protocolm.cpp \
+    model/protocol/protocolm.cpp \
     model/taskinstancem.cpp \
     model/subject/subjectm.cpp \
     model/subject/characteristicm.cpp \
     model/subject/characteristicvaluem.cpp \
     model/experimentationm.cpp \
-    model/task/independentvariablem.cpp \
-    model/task/independentvariablevaluem.cpp \
-    model/task/dependentvariablem.cpp \
+    model/protocol/independentvariablem.cpp \
+    model/protocol/independentvariablevaluem.cpp \
+    model/protocol/dependentvariablem.cpp \
+    model/protocol/agentnameandoutputsm.cpp \
     controller/experimentationslistcontroller.cpp \
     controller/subject/subjectscontroller.cpp \
-    controller/task/taskscontroller.cpp \
     controller/experimentationcontroller.cpp \
     controller/record/taskinstancecontroller.cpp \
     viewModel/experimentationsgroupvm.cpp \
     controller/assessmentsmodelmanager.cpp \
-    model/task/agentnameandoutputsm.cpp \
     sortFilter/areagentsinplatformfilter.cpp \
     sortFilter/aresubjectandprotocolinsessionfilter.cpp \
     model/recordassessmentm.cpp
@@ -69,8 +69,9 @@ SOURCES += main.cpp \
 HEADERS += \
     controller/export/exportcontroller.h \
     controller/ingescapeassessmentscontroller.h \
+    controller/protocol/protocolscontroller.h \
     model/assessmentsenums.h \
-    model/task/protocolm.h \
+    model/protocol/protocolm.h \
     model/taskinstancem.h \
     stable.h \
     controller/networkcontroller.h \
@@ -78,17 +79,16 @@ HEADERS += \
     model/subject/characteristicm.h \
     model/subject/characteristicvaluem.h \
     model/experimentationm.h \
-    model/task/independentvariablem.h \
-    model/task/independentvariablevaluem.h \
-    model/task/dependentvariablem.h \
+    model/protocol/independentvariablem.h \
+    model/protocol/independentvariablevaluem.h \
+    model/protocol/dependentvariablem.h \
+    model/protocol/agentnameandoutputsm.h \
     controller/experimentationslistcontroller.h \
     controller/subject/subjectscontroller.h \
-    controller/task/taskscontroller.h \
     controller/experimentationcontroller.h \
     controller/record/taskinstancecontroller.h \
     viewModel/experimentationsgroupvm.h \
     controller/assessmentsmodelmanager.h \
-    model/task/agentnameandoutputsm.h \
     sortFilter/areagentsinplatformfilter.h \
     sortFilter/aresubjectandprotocolinsessionfilter.h\
     model/recordassessmentm.h

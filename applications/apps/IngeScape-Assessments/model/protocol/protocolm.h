@@ -12,21 +12,21 @@
  *
  */
 
-#ifndef TASKM_H
-#define TASKM_H
+#ifndef PROTOCOLM_H
+#define PROTOCOLM_H
 
 #include <QObject>
 #include "I2PropertyHelpers.h"
 
-#include <model/task/dependentvariablem.h>
-#include <model/task/independentvariablem.h>
-#include <model/task/agentnameandoutputsm.h>
+#include <model/protocol/dependentvariablem.h>
+#include <model/protocol/independentvariablem.h>
+#include <model/protocol/agentnameandoutputsm.h>
 
 #include "cassandra.h"
 
 
 /**
- * @brief The TaskM class defines a model of task
+ * @brief The ProtocolM class defines a model of task
  */
 class ProtocolM : public QObject
 {
@@ -147,7 +147,7 @@ public:
     static void deleteTaskFromCassandraRow(const ProtocolM& task);
 
     /**
-     * @brief Create a CassStatement to insert an TaskM into the DB.
+     * @brief Create a CassStatement to insert an ProtocolM into the DB.
      * The statement contains the values from the given task.
      * Passed task must have a valid and unique UUID.
      * @param task
@@ -191,6 +191,6 @@ private:
 
 };
 
-QML_DECLARE_TYPE(TaskM)
+QML_DECLARE_TYPE(ProtocolM)
 
-#endif // TASKM_H
+#endif // PROTOCOLM_H

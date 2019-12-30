@@ -287,9 +287,9 @@ AssessmentsPopupBase {
 
             height: 30
 
-            enabled: rootItem.experimentation && (rootItem.experimentation.allTasks.count > 0)
+            enabled: rootItem.experimentation && (rootItem.experimentation.allProtocols.count > 0)
 
-            model: rootItem.experimentation ? rootItem.experimentation.allTasks : null
+            model: rootItem.experimentation ? rootItem.experimentation.allProtocols : null
 
             style: IngeScapeAssessmentsComboboxStyle {
                 frameVisible: false

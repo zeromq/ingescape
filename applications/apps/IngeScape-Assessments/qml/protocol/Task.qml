@@ -35,9 +35,9 @@ Item {
     //
     //--------------------------------------------------------
 
-    property TasksController taskController: null;
+    property ProtocolsController protocolsController: null;
 
-    property TaskM modelM: taskController ? taskController.selectedTask : null;
+    property ProtocolM modelM: protocolsController ? protocolsController.selectedTask : null;
 
     // Save reference of independent variable that is currently edited
     property IndependentVariableM independentVariableCurrentlyEdited : null;
@@ -159,7 +159,7 @@ Item {
                 rootItem.independentVariableCurrentlyEdited = null;
 
                 // Reset temporary independent variable to allow creation
-                rootItem.taskController.initTemporaryIndependentVariable(null);
+                rootItem.protocolsController.initTemporaryIndependentVariable(null);
 
                 // Open the popup
                 independentVariablePopup.open();
@@ -243,7 +243,7 @@ Item {
                 delegate: IndependentVariableDelegate {
                     id: indepVarDelegate
 
-                    taskController: rootItem.taskController
+                    protocolsController: rootItem.protocolsController
 //                    protocol: rootItem.modelM
                     independentVarModel: model ? model.QtObject : null
                     indepVarEditionInProgress: indepVarTable.indepVarEditionInProgress
@@ -268,7 +268,7 @@ Item {
                             // Because the "var enumTexts: []" is automatically binded to the I2_QML_PROPERTY(QStringList, enumValues)
                             // with the line: enumTexts = independentVariableToEdit.enumValues;
                             rootItem.independentVariableCurrentlyEdited = indepVarDelegate.independentVarModel;
-                            rootItem.taskController.initTemporaryIndependentVariable(indepVarDelegate.independentVarModel);
+                            rootItem.protocolsController.initTemporaryIndependentVariable(indepVarDelegate.independentVarModel);
 
                             // Open the popup
                             independentVariablePopup.open();
@@ -351,7 +351,7 @@ Item {
                 rootItem.dependentVariableCurrentlyEdited = null;
 
                 // Reset temporary dependent variable to allow creation
-                rootItem.taskController.initTemporaryDependentVariable(null);
+                rootItem.protocolsController.initTemporaryDependentVariable(null);
 
                 // Open the popup
                 dependentVariablePopup.open();
@@ -438,7 +438,7 @@ Item {
                 delegate: DependentVariableDelegate {
                     id: depVarDelegate
 
-                    taskController: rootItem.taskController
+                    protocolsController: rootItem.protocolsController
 //                    protocol: rootItem.modelM
                     dependentVariableModel: model ? model.QtObject : null
                     depVarEditionInProgress: depVarTable.depVarEditionInProgress
@@ -463,7 +463,7 @@ Item {
                             // Because the "var enumTexts: []" is automatically binded to the I2_QML_PROPERTY(QStringList, enumValues)
                             // with the line: enumTexts = dependentVariableToEdit.enumValues;
                             rootItem.dependentVariableCurrentlyEdited = depVarDelegate.dependentVariableModel;
-                            rootItem.taskController.initTemporaryDependentVariable(depVarDelegate.dependentVariableModel);
+                            rootItem.protocolsController.initTemporaryDependentVariable(depVarDelegate.dependentVariableModel);
 
                             // Open the popup
                             dependentVariablePopup.open();
@@ -497,20 +497,20 @@ Item {
 
         layerObjectName: "overlay2Layer"
 
-        taskController: rootItem.taskController
+        protocolsController: rootItem.protocolsController
 
-        independentVariableToEdit: rootItem.taskController.temporaryIndependentVariable
+        independentVariableToEdit: rootItem.protocolsController.temporaryIndependentVariable
 
         onIndependentVariableIsEdited : {
-            if (rootItem.taskController)
+            if (rootItem.protocolsController)
             {
                 if (rootItem.independentVariableCurrentlyEdited) {
                     // Edit an existing independent variable
-                    rootItem.taskController.saveModificationsOfIndependentVariableFromTemporary(rootItem.independentVariableCurrentlyEdited);
+                    rootItem.protocolsController.saveModificationsOfIndependentVariableFromTemporary(rootItem.independentVariableCurrentlyEdited);
                 }
                 else {
                     // Create an independent variable
-                    rootItem.taskController.createNewIndependentVariableFromTemporary();
+                    rootItem.protocolsController.createNewIndependentVariableFromTemporary();
                 }
             }
         }
@@ -525,22 +525,22 @@ Item {
 
         layerObjectName: "overlay2Layer"
 
-        taskController: rootItem.taskController
+        protocolsController: rootItem.protocolsController
 
         protocolM: rootItem.modelM
 
-        dependentVariableToEdit: rootItem.taskController.temporaryDependentVariable
+        dependentVariableToEdit: rootItem.protocolsController.temporaryDependentVariable
 
         onDependentVariableIsEdited: {
-            if (rootItem.taskController)
+            if (rootItem.protocolsController)
             {
                 if (rootItem.dependentVariableCurrentlyEdited) {
                     // Edit an existing dependent variable
-                    rootItem.taskController.saveModificationsOfDependentVariableFromTemporary(rootItem.dependentVariableCurrentlyEdited);
+                    rootItem.protocolsController.saveModificationsOfDependentVariableFromTemporary(rootItem.dependentVariableCurrentlyEdited);
                 }
                 else {
                     // Create a dependent variable
-                    rootItem.taskController.createNewDependentVariableFromTemporary();
+                    rootItem.protocolsController.createNewDependentVariableFromTemporary();
                 }
             }
         }

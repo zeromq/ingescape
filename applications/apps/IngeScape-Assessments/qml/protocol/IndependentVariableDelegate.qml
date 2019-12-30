@@ -32,10 +32,10 @@ Rectangle {
     //--------------------------------------------------------
 
     // Task controller
-    property var taskController: null
+    property ProtocolsController protocolsController: null;
 
     // Model of protocol that contains our model of independent variable
-//    property TaskM protocol: null
+//    property ProtocolM protocol: null
 
     // Current model of independent variable
     property IndependentVariableM independentVarModel: null
@@ -287,7 +287,7 @@ Rectangle {
                     margins: 5
                 }
 
-                model: rootItem.taskController ? rootItem.taskController.allIndependentVariableValueTypes : null
+                model: rootItem.protocolsController ? rootItem.protocolsController.allIndependentVariableValueTypes : null
 
                 visible: rootItem.isCurrentlyEditing
 
@@ -308,7 +308,7 @@ Rectangle {
                 Binding {
                     target: comboBoxValueTypes
                     property: "selectedIndex"
-                    value: (rootItem.taskController && rootItem.protocol && rootItem.protocol.temporaryIndependentVariable) ? rootItem.taskController.allIndependentVariableValueTypes.indexOfEnumValue(rootItem.protocol.temporaryIndependentVariable.valueType)
+                    value: (rootItem.protocolsController && rootItem.protocol && rootItem.protocol.temporaryIndependentVariable) ? rootItem.protocolsController.allIndependentVariableValueTypes.indexOfEnumValue(rootItem.protocol.temporaryIndependentVariable.valueType)
                                                                                                                             : -1
                 }
 
@@ -434,9 +434,9 @@ Rectangle {
             }
 
             onClicked: {
-                if (rootItem.taskController && rootItem.independentVarModel)
+                if (rootItem.protocolsController && rootItem.independentVarModel)
                 {
-                    rootItem.taskController.deleteIndependentVariable(rootItem.independentVarModel)
+                    rootItem.protocolsController.deleteIndependentVariable(rootItem.independentVarModel)
                 }
             }
         }

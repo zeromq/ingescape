@@ -847,17 +847,23 @@ Item {
                             //enabled: rootItem.controller && rootItem.controller.allAgentNamesList.length > 0
                             visible: _isSelectingSessionsToExport && rootItem.controller
                             enabled: visible
-                            model: rootItem.experimentation ? rootItem.experimentation.allTasks : 0
+                            model: rootItem.experimentation ? rootItem.experimentation.allProtocols : 0
 
                             placeholderText: enabled ? "- Select a protocol -" : ""
 
                             text:{
-                                if(enabled && rootItem.controller && rootItem.experimentation && (rootItem.controller.selectedProtocolNameListToFilter.length > 0)){
-                                    if(rootItem.controller.selectedProtocolNameListToFilter.length === 1){
+                                if (enabled && rootItem.controller && rootItem.experimentation && (rootItem.controller.selectedProtocolNameListToFilter.length > 0))
+                                {
+                                    if (rootItem.controller.selectedProtocolNameListToFilter.length === 1)
+                                    {
                                         "- " + rootItem.controller.selectedProtocolNameListToFilter + " -"
-                                    }else if(rootItem.controller.selectedProtocolNameListToFilter.length < rootItem.experimentation.allTasks.count){
+                                    }
+                                    else if (rootItem.controller.selectedProtocolNameListToFilter.length < rootItem.experimentation.allProtocols.count)
+                                    {
                                         "- " + rootItem.controller.selectedProtocolNameListToFilter.length + " protocols selected -"
-                                    }else{
+                                    }
+                                    else
+                                    {
                                         "- All protocols selected -"
                                     }
                                 }else{
@@ -884,7 +890,7 @@ Item {
 
                                 if (rootItem.controller && rootItem.experimentation && (rootItem.controller.selectedProtocolNameListToFilter.length > 0))
                                 {
-                                    if (rootItem.controller.selectedProtocolNameListToFilter.length === rootItem.experimentation.allTasks.count) {
+                                    if (rootItem.controller.selectedProtocolNameListToFilter.length === rootItem.experimentation.allProtocols.count) {
                                         checkAllState = Qt.Checked;
                                     }
                                     else {
@@ -903,7 +909,7 @@ Item {
                                 width: dropDownProtocol.comboButton.width
                                 height: dropDownProtocol.comboButton.height
 
-                                property TaskM taskM : rootItem.experimentation ? rootItem.experimentation.allTasks.get(index) : null
+                                property ProtocolM taskM : rootItem.experimentation ? rootItem.experimentation.allProtocols.get(index) : null
 
                                 CheckBox {
                                     id : filterProtocolCB
@@ -970,7 +976,7 @@ Item {
 
                                             if (rootItem.controller && rootItem.experimentation && (rootItem.controller.selectedProtocolNameListToFilter.length > 0))
                                             {
-                                                if (rootItem.controller.selectedProtocolNameListToFilter.length === rootItem.experimentation.allTasks.count) {
+                                                if (rootItem.controller.selectedProtocolNameListToFilter.length === rootItem.experimentation.allProtocols.count) {
                                                     dropDownProtocol.checkAllState = Qt.Checked;
                                                 }
                                                 else {
@@ -1328,7 +1334,7 @@ Item {
         width: parent.width - subScreensMargin
         height: parent.height - subScreensMargin
 
-        taskController: IngeScapeAssessmentsC.tasksC
+        protocolsController: IngeScapeAssessmentsC.protocolsC
     }
 
 

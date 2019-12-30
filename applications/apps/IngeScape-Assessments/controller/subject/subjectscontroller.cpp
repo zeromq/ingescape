@@ -213,16 +213,16 @@ void SubjectsController::deleteSubject(SubjectM* subject)
         // Remove the subject from the current experimentation
         _currentExperimentation->removeSubject(subject);
 
-        // Remove task instances related to the subject
-        QList<CassUuid> taskUuidList;
-        for (ProtocolM* task : *(_currentExperimentation->allTasks())) {
-            if (task != nullptr)
+        // Remove protocols related to the subject
+        QList<CassUuid> protocolUuidList;
+        for (ProtocolM* protocol : *(_currentExperimentation->allProtocols())) {
+            if (protocol != nullptr)
             {
-                taskUuidList.append(task->getCassUuid());
+                protocolUuidList.append(protocol->getCassUuid());
             }
         }
 
-        AssessmentsModelManager::deleteEntry<TaskInstanceM>({ { _currentExperimentation->getCassUuid() }, { subject->getCassUuid() }, taskUuidList });
+        AssessmentsModelManager::deleteEntry<TaskInstanceM>({ { _currentExperimentation->getCassUuid() }, { subject->getCassUuid() }, protocolUuidList });
 
 
         // Remove subject from DB

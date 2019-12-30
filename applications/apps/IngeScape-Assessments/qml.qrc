@@ -9,7 +9,7 @@
         <file>qml/experimentation/ExperimentationView.qml</file>
         <file>qml/experimentation/TaskInstanceInList.qml</file>
         <file>qml/subject/SubjectsView.qml</file>
-        <file>qml/task/TasksView.qml</file>
+        <file>qml/protocol/TasksView.qml</file>
         <file>qml/popup/CreateExperimentationPopup.qml</file>
         <file>qml/popup/CreateTaskInstancePopup.qml</file>
         <file>qml/popup/CreateCharacteristicPopup.qml</file>
@@ -17,8 +17,8 @@
         <file>qml/subject/CharacteristicValueEditor.qml</file>
         <file>qml/theme/IngeScapeRadioButtonStyle.qml</file>
         <file>qml/popup/CreateTaskPopup.qml</file>
-        <file>qml/task/Task.qml</file>
-        <file>qml/task/TaskInList.qml</file>
+        <file>qml/protocol/Task.qml</file>
+        <file>qml/protocol/TaskInList.qml</file>
         <file>qml/popup/IndependentVariableEditorPopup.qml</file>
         <file>qml/task_instance/TaskInstanceView.qml</file>
         <file>qml/task_instance/IndependentVariableValueEditor.qml</file>
@@ -28,8 +28,8 @@
         <file>qml/subject/Subject.qml</file>
         <file>qml/theme/IngeScapeAssessmentsSvgButtonStyle.qml</file>
         <file>qml/theme/IngeScapeAssessmentsSvgAndTextButtonStyle.qml</file>
-        <file>qml/task/IndependentVariableDelegate.qml</file>
-        <file>qml/task/DependentVariableDelegate.qml</file>
+        <file>qml/protocol/IndependentVariableDelegate.qml</file>
+        <file>qml/protocol/DependentVariableDelegate.qml</file>
         <file>qml/popup/AssessmentsPopupBase.qml</file>
         <file>qml/popup/DeleteConfirmationPopup.qml</file>
         <file>qml/theme/IngeScapeAssessmentsScrollViewStyle.qml</file>

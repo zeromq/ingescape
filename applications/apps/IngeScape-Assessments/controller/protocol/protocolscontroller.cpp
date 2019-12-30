@@ -12,16 +12,16 @@
  *
  */
 
-#include "taskscontroller.h"
+#include "protocolscontroller.h"
 
 #include <controller/assessmentsmodelmanager.h>
-#include "model/task/independentvariablevaluem.h"
+#include "model/protocol/independentvariablevaluem.h"
 
 /**
  * @brief Constructor
  * @param parent
  */
-TasksController::TasksController(QObject *parent) : QObject(parent),
+ProtocolsController::ProtocolsController(QObject *parent) : QObject(parent),
     _currentExperimentation(nullptr),
     _selectedTask(nullptr),
     _temporaryIndependentVariable(nullptr),
@@ -50,7 +50,7 @@ TasksController::TasksController(QObject *parent) : QObject(parent),
 /**
  * @brief Destructor
  */
-TasksController::~TasksController()
+ProtocolsController::~ProtocolsController()
 {
     qInfo() << "Delete Tasks Controller";
 
@@ -88,9 +88,9 @@ TasksController::~TasksController()
  * @param protocolName
  * @return
  */
-bool TasksController::canCreateProtocolWithName(QString protocolName)
+bool ProtocolsController::canCreateProtocolWithName(QString protocolName)
 {
-    const QList<ProtocolM*>& taskList = _currentExperimentation->allTasks()->toList();
+    const QList<ProtocolM*>& taskList = _currentExperimentation->allProtocols()->toList();
     auto hasGivenName = [protocolName](ProtocolM* task) {
         return (task != nullptr) && (task->name() == protocolName);
     };
@@ -105,7 +105,7 @@ bool TasksController::canCreateProtocolWithName(QString protocolName)
  * @param protocolName
  * @param platformFilePath
  */
-void TasksController::createNewProtocolWithIngeScapePlatformFilePath(QString protocolName, QString platformFilePath)
+void ProtocolsController::createNewProtocolWithIngeScapePlatformFilePath(QString protocolName, QString platformFilePath)
 {
     if (!protocolName.isEmpty() && !platformFilePath.isEmpty())
     {
@@ -129,7 +129,7 @@ void TasksController::createNewProtocolWithIngeScapePlatformFilePath(QString pro
  * @brief Delete a task
  * @param task
  */
-void TasksController::deleteTask(ProtocolM* task)
+void ProtocolsController::deleteTask(ProtocolM* task)
 {
     if ((task != nullptr) && (_currentExperimentation != nullptr) && (AssessmentsModelManager::instance() != nullptr))
     {
@@ -164,7 +164,7 @@ void TasksController::deleteTask(ProtocolM* task)
  * @brief Duplicate a task
  * @param task
  */
-void TasksController::duplicateTask(ProtocolM* task)
+void ProtocolsController::duplicateTask(ProtocolM* task)
 {
     if (task != nullptr)
     {
@@ -230,7 +230,7 @@ void TasksController::duplicateTask(ProtocolM* task)
  * @param independentVariableName
  * @return
  */
-bool TasksController::canCreateIndependentVariableWithName(QString independentVariableName)
+bool ProtocolsController::canCreateIndependentVariableWithName(QString independentVariableName)
 {
     const QList<IndependentVariableM*>& varList = _selectedTask->independentVariables()->toList();
     auto hasGivenName = [independentVariableName](IndependentVariableM* independentVariable) {
@@ -247,7 +247,7 @@ bool TasksController::canCreateIndependentVariableWithName(QString independentVa
  * @param dependentVariableName
  * @return
  */
-bool TasksController::canCreateDependentVariableWithName(QString dependentVariableName)
+bool ProtocolsController::canCreateDependentVariableWithName(QString dependentVariableName)
 {
     const QList<DependentVariableM*>& varList = _selectedTask->dependentVariables()->toList();
     auto hasGivenName = [dependentVariableName](DependentVariableM* dependentVariable) {
@@ -261,7 +261,7 @@ bool TasksController::canCreateDependentVariableWithName(QString dependentVariab
 /**
  * @brief Create a new independent variable from the Independent Variable currently edited (stored in _temporaryIndependentVariable)
  */
-void TasksController::createNewIndependentVariableFromTemporary()
+void ProtocolsController::createNewIndependentVariableFromTemporary()
 {
     if ((_temporaryIndependentVariable != nullptr) && (!_temporaryIndependentVariable->name().isEmpty()) && (_selectedTask != nullptr))
     {
@@ -281,7 +281,7 @@ void TasksController::createNewIndependentVariableFromTemporary()
  * @brief Save the modifications of the Independent Variable currently edited (stored in _temporaryIndependentVariable)
  * @param independentVariableCurrentlyEdited
  */
-void TasksController::saveModificationsOfIndependentVariableFromTemporary(IndependentVariableM* independentVariableCurrentlyEdited)
+void ProtocolsController::saveModificationsOfIndependentVariableFromTemporary(IndependentVariableM* independentVariableCurrentlyEdited)
 {
     if ((independentVariableCurrentlyEdited != nullptr) && (_temporaryIndependentVariable != nullptr) && (!_temporaryIndependentVariable->name().isEmpty())
             && (AssessmentsModelManager::instance() != nullptr))
@@ -300,7 +300,7 @@ void TasksController::saveModificationsOfIndependentVariableFromTemporary(Indepe
  * @brief Delete an independent variable
  * @param independentVariable
  */
-void TasksController::deleteIndependentVariable(IndependentVariableM* independentVariable)
+void ProtocolsController::deleteIndependentVariable(IndependentVariableM* independentVariable)
 {
     if ((independentVariable != nullptr) && (_selectedTask != nullptr) && (AssessmentsModelManager::instance() != nullptr))
     {
@@ -333,7 +333,7 @@ void TasksController::deleteIndependentVariable(IndependentVariableM* independen
 /**
  * @brief Create a new dependent variable from the Dependent Variable currently edited (stored in _temporaryDependentVariable)
  */
-void TasksController::createNewDependentVariableFromTemporary()
+void ProtocolsController::createNewDependentVariableFromTemporary()
 {
     if ((_temporaryDependentVariable != nullptr) && (!_temporaryDependentVariable->name().isEmpty()) && (!_temporaryDependentVariable->outputName().isEmpty())
             && (_selectedTask != nullptr) && (AssessmentsModelManager::instance() != nullptr))
@@ -359,7 +359,7 @@ void TasksController::createNewDependentVariableFromTemporary()
  * @brief Save the modifications of the Dependent Variable currently edited (stored in _temporaryDependentVariable)
  * @param independentVariableCurrentlyEdited
  */
-void TasksController::saveModificationsOfDependentVariableFromTemporary(DependentVariableM* dependentVariableCurrentlyEdited)
+void ProtocolsController::saveModificationsOfDependentVariableFromTemporary(DependentVariableM* dependentVariableCurrentlyEdited)
 {
     if ((dependentVariableCurrentlyEdited != nullptr) && (_temporaryDependentVariable != nullptr) && (!_temporaryDependentVariable->name().isEmpty()))
     {
@@ -378,7 +378,7 @@ void TasksController::saveModificationsOfDependentVariableFromTemporary(Dependen
  * @brief Delete a dependent variable
  * @param dependentVariable
  */
-void TasksController::deleteDependentVariable(DependentVariableM* dependentVariable)
+void ProtocolsController::deleteDependentVariable(DependentVariableM* dependentVariable)
 {
     if ((dependentVariable != nullptr) && (_selectedTask != nullptr))
     {
@@ -401,7 +401,7 @@ void TasksController::deleteDependentVariable(DependentVariableM* dependentVaria
  * @param platformFileUrl
  * @return
  */
-ProtocolM* TasksController::_createNewProtocolWithIngeScapePlatformFileUrl(QString protocolName, QUrl platformFileUrl)
+ProtocolM* ProtocolsController::_createNewProtocolWithIngeScapePlatformFileUrl(QString protocolName, QUrl platformFileUrl)
 {
     ProtocolM* task = nullptr;
 
@@ -440,7 +440,7 @@ ProtocolM* TasksController::_createNewProtocolWithIngeScapePlatformFileUrl(QStri
  * @param enumValues
  * @return
  */
-IndependentVariableM* TasksController::_insertIndependentVariableIntoDB(CassUuid experimentationUuid, CassUuid taskUuid, const QString& variableName, const QString& variableDescription, IndependentVariableValueTypes::Value valueType, const QStringList& enumValues)
+IndependentVariableM* ProtocolsController::_insertIndependentVariableIntoDB(CassUuid experimentationUuid, CassUuid taskUuid, const QString& variableName, const QString& variableDescription, IndependentVariableValueTypes::Value valueType, const QStringList& enumValues)
 {
     IndependentVariableM* independentVariable = nullptr;
 
@@ -469,7 +469,7 @@ IndependentVariableM* TasksController::_insertIndependentVariableIntoDB(CassUuid
  * @param enumValues
  * @return
  */
-DependentVariableM* TasksController::_insertDependentVariableIntoDB(CassUuid experimentationUuid,
+DependentVariableM* ProtocolsController::_insertDependentVariableIntoDB(CassUuid experimentationUuid,
                                                                     CassUuid taskUuid,
                                                                     const QString& name,
                                                                     const QString& description,
@@ -496,7 +496,7 @@ DependentVariableM* TasksController::_insertDependentVariableIntoDB(CassUuid exp
  * @brief Initialize the temporary independent variable with the given independent variable
  * @param baseVariable, if null, init empty temporary independent variable
  */
-void TasksController::initTemporaryIndependentVariable(IndependentVariableM* baseVariable)
+void ProtocolsController::initTemporaryIndependentVariable(IndependentVariableM* baseVariable)
 {
     if (_temporaryIndependentVariable != nullptr)
     {
@@ -521,7 +521,7 @@ void TasksController::initTemporaryIndependentVariable(IndependentVariableM* bas
  * @brief Initialize the temporary dependent variable with the given dependent variable
  * @param baseVariable, if null, init empty temporary dependent variable
  */
-void TasksController::initTemporaryDependentVariable(DependentVariableM* baseVariable)
+void ProtocolsController::initTemporaryDependentVariable(DependentVariableM* baseVariable)
 {
     if (_temporaryDependentVariable != nullptr)
     {

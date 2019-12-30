@@ -41,7 +41,7 @@ AssessmentsPopupBase {
     //
     //--------------------------------------------------------
 
-    property TasksController taskController: null;
+    property ProtocolsController protocolsController: null;
 
     property url selectedPlatformUrl: "";
 
@@ -325,17 +325,17 @@ AssessmentsPopupBase {
             activeFocusOnPress: true
 
             enabled: ( (txtTaskName.text.length > 0) && (txtPlatformUrl.text.length > 0)
-                      && rootPopup.taskController && rootPopup.taskController.canCreateProtocolWithName(txtTaskName.text) )
+                      && rootPopup.protocolsController && rootPopup.protocolsController.canCreateProtocolWithName(txtTaskName.text) )
 
             style: IngeScapeAssessmentsButtonStyle {
                 text: "OK"
             }
 
             onClicked: {
-                if (rootPopup.taskController)
+                if (rootPopup.protocolsController)
                 {
                     // Create a new protocol with an IngeScape platform file path
-                    rootPopup.taskController.createNewProtocolWithIngeScapePlatformFilePath(txtTaskName.text, txtPlatformUrl.text);
+                    rootPopup.protocolsController.createNewProtocolWithIngeScapePlatformFilePath(txtTaskName.text, txtPlatformUrl.text);
                 }
 
                 // Reset all user inputs and close the popup

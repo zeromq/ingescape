@@ -221,7 +221,7 @@ void ProtocolM::deleteTaskFromCassandraRow(const ProtocolM& task)
 
 
 /**
- * @brief Create a CassStatement to insert an TaskM into the DB.
+ * @brief Create a CassStatement to insert an ProtocolM into the DB.
  * The statement contains the values from the given task.
  * Passed task must have a valid and unique UUID.
  * @param task

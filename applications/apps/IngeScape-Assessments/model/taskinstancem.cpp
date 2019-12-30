@@ -15,7 +15,7 @@
 #include "taskinstancem.h"
 
 #include "controller/assessmentsmodelmanager.h"
-#include "model/task/independentvariablevaluem.h"
+#include "model/protocol/independentvariablevaluem.h"
 
 /**
  * @brief TaskInstance table name

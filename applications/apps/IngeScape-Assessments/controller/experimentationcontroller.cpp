@@ -18,7 +18,7 @@
 #include <controller/ingescapenetworkcontroller.h>
 #include <controller/assessmentsmodelmanager.h>
 #include "model/subject/characteristicvaluem.h"
-#include "model/task/independentvariablevaluem.h"
+#include "model/protocol/independentvariablevaluem.h"
 
 /**
  * @brief Constructor
@@ -1013,7 +1013,7 @@ void ExperimentationController::removeOneProtocolToFilterSessions(QString protoc
 void ExperimentationController::addAllProtocolsToFilterSessions(){
     // Get all protocol names list
     QStringList tempProtocolNameList;
-    for (ProtocolM* protocol : _currentExperimentation->allTasks()->toList()) {
+    for (ProtocolM* protocol : _currentExperimentation->allProtocols()->toList()) {
         tempProtocolNameList.append(protocol->name());
     }
 

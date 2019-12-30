@@ -17,7 +17,7 @@
 
 #include "controller/assessmentsmodelmanager.h"
 #include "model/subject/characteristicvaluem.h"
-#include "model/task/independentvariablevaluem.h"
+#include "model/protocol/independentvariablevaluem.h"
 
 /**
  * @brief Experimentation table name
@@ -94,8 +94,8 @@ void ExperimentationM::clearData()
     // Delete all subjects of our experimentation
     _allSubjects.deleteAllItems();
 
-    // Delete all tasks of our experimentation
-    _allTasks.deleteAllItems();
+    // Delete all protocols of our experimentation
+    _allProtocols.deleteAllItems();
 }
 
 
@@ -196,7 +196,7 @@ void ExperimentationM::addTask(ProtocolM* task)
     if (task != nullptr)
     {
         // Add to the list
-        _allTasks.append(task);
+        _allProtocols.append(task);
     }
 }
 
@@ -210,7 +210,7 @@ void ExperimentationM::removeTask(ProtocolM* task)
     if (task != nullptr)
     {
         // Remove from the list
-        _allTasks.remove(task);
+        _allProtocols.remove(task);
 
         // Remove related TaskInstances
         removeTaskInstanceRelatedToTask(task);
@@ -325,8 +325,8 @@ SubjectM* ExperimentationM::getSubjectFromUID(const CassUuid& cassUuid)
  */
 ProtocolM* ExperimentationM::getTaskFromUID(const CassUuid& cassUuid)
 {
-    auto taskIt = std::find_if(_allTasks.begin(), _allTasks.end(), [cassUuid](ProtocolM* task) { return (task != nullptr) && (task->getCassUuid() == cassUuid); });
-    return (taskIt != _allTasks.end()) ? *taskIt : nullptr;
+    auto taskIt = std::find_if(_allProtocols.begin(), _allProtocols.end(), [cassUuid](ProtocolM* task) { return (task != nullptr) && (task->getCassUuid() == cassUuid); });
+    return (taskIt != _allProtocols.end()) ? *taskIt : nullptr;
 }
 
 
@@ -375,7 +375,7 @@ ExperimentationM* ExperimentationM::createFromCassandraRow(const CassRow* row)
 void ExperimentationM::deleteExperimentationFromCassandra(const ExperimentationM& experimentation)
 {
     // Delete experimentations associations
-    _deleteAllTasksForExperimentation(experimentation);
+    _deleteAllProtocolsForExperimentation(experimentation);
     _deleteAllSubjectsForExperimentation(experimentation);
     _deleteAllCharacteristicsForExperimentation(experimentation);
     _deleteAllTaskInstancesForExperimentation(experimentation);
@@ -428,10 +428,10 @@ CassStatement* ExperimentationM::createBoundUpdateStatement(const Experimentatio
 }
 
 /**
- * @brief Delete all tasks associated with the given experimentation
+ * @brief Delete all protocols associated with the given experimentation
  * @param experimentation
  */
-void ExperimentationM::_deleteAllTasksForExperimentation(const ExperimentationM& experimentation)
+void ExperimentationM::_deleteAllProtocolsForExperimentation(const ExperimentationM& experimentation)
 {
     // Delete all tasks associations
     AssessmentsModelManager::deleteEntry<IndependentVariableM>({ experimentation.getCassUuid() });

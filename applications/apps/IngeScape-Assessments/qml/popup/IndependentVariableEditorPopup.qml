@@ -41,7 +41,7 @@ AssessmentsPopupBase {
     //
     //--------------------------------------------------------
 
-    property TasksController taskController: null;
+    property ProtocolsController protocolsController: null;
 
     // property IndependentVariableValueTypes selectedType
     property int selectedType: -1;
@@ -311,7 +311,7 @@ AssessmentsPopupBase {
             }
 
             Repeater {
-                model: rootPopup.taskController ? rootPopup.taskController.independentVariableValueTypesWithoutEnum : null
+                model: rootPopup.protocolsController ? rootPopup.protocolsController.independentVariableValueTypesWithoutEnum : null
 
                 delegate: RadioButton {
                     id: radioIndependentVariableValueType
@@ -713,7 +713,7 @@ AssessmentsPopupBase {
             enabled: if ((txtIndependentVariableName.text.length > 0) && (rootPopup.selectedType > 0))
                      {
                          ((txtIndependentVariableName.text === rootPrivate.originalName) // Same name that when we opened the popup : "edition" mode
-                         || (rootPopup.taskController && rootPopup.taskController.canCreateIndependentVariableWithName(txtIndependentVariableName.text))); // No other independent variable with the same name
+                         || (rootPopup.protocolsController && rootPopup.protocolsController.canCreateIndependentVariableWithName(txtIndependentVariableName.text))); // No other independent variable with the same name
                      }
                      else {
                          false;
@@ -725,7 +725,7 @@ AssessmentsPopupBase {
             }
 
             onClicked: {
-                if (rootPopup.taskController)
+                if (rootPopup.protocolsController)
                 {
                     var displayedEnumTexts = undefined;
 

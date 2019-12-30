@@ -20,7 +20,7 @@
 
 #include <model/subject/characteristicm.h>
 #include <model/subject/subjectm.h>
-#include <model/task/protocolm.h>
+#include <model/protocol/protocolm.h>
 #include <model/taskinstancem.h>
 
 #include "cassandra.h"
@@ -48,8 +48,8 @@ class ExperimentationM : public QObject
     // List of all subjects of our experimentation
     I2_QOBJECT_LISTMODEL(SubjectM, allSubjects)
 
-    // List of all tasks of our experimentation
-    I2_QOBJECT_LISTMODEL(TaskM, allTasks)
+    // List of all protocols of our experimentation
+    I2_QOBJECT_LISTMODEL(ProtocolM, allProtocols)
 
     // List of all task instances of our experimentation
     I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(TaskInstanceM, allTaskInstances)
@@ -241,10 +241,10 @@ public:
 
 private: // Methods
     /**
-     * @brief Delete all tasks associated with the given experimentation
+     * @brief Delete all protocols associated with the given experimentation
      * @param experimentation
      */
-    static void _deleteAllTasksForExperimentation(const ExperimentationM& experimentation);
+    static void _deleteAllProtocolsForExperimentation(const ExperimentationM& experimentation);
     /**
      * @brief Delete all subjects associated with the given experimentation
      * @param experimentation

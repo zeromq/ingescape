@@ -41,7 +41,7 @@ Item {
     //
     //--------------------------------------------------------
 
-    property TaskM modelM: null;
+    property ProtocolM modelM: null;
 
     property bool isSelected: false;
 
