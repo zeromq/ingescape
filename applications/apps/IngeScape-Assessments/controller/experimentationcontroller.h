@@ -300,18 +300,18 @@ protected: // Methods
     SessionM* _insertSessionIntoDB(const QString& sessionName, SubjectM* subject, ProtocolM* protocol);
 
     /**
-     * @brief Retrieve all independent variables from the Cassandra DB for the given task.
-     * The task will be updated by this method.
-     * @param task
+     * @brief Retrieve all independent variables from the Cassandra DB for the given protocol.
+     * The protocol will be updated by this method.
+     * @param protocol
      */
-    void _retrieveIndependentVariableForTask(ProtocolM* task);
+    void _retrieveIndependentVariableForProtocol(ProtocolM* protocol);
 
     /**
-     * @brief Retrieve all dependent variables from the Cassandra DB for the given task.
-     * The task will be updated by this method.
-     * @param task
+     * @brief Retrieve all dependent variables from the Cassandra DB for the given protocol.
+     * The protocol will be updated by this method.
+     * @param protocol
      */
-    void _retrieveDependentVariableForTask(ProtocolM* task);
+    void _retrieveDependentVariableForProtocol(ProtocolM* protocol);
 
     /**
      * @brief Retrieve all subjects from the Cassandra DB for the given experimentaion.

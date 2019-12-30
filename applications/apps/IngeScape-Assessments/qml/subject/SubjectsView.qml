@@ -58,7 +58,7 @@ I2PopupBase {
     //
     //--------------------------------
 
-    // Close Tasks view
+    // Close Subjects view
     //signal closeSubjectsView();
 
 

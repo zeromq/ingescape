@@ -63,7 +63,7 @@ public:
 
 
     /**
-     * @brief Accessor for this independent variable's task's experiment UUID in the Cassandra DB
+     * @brief Accessor for this independent variable's protocol's experiment UUID in the Cassandra DB
      * @return
      */
     CassUuid getExperimentationCassUuid() const { return _experimentationCassUuid; }

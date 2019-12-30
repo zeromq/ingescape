@@ -183,7 +183,7 @@ public:
     CharacteristicM* getCharacteristicFromUID(const CassUuid& cassUuid);
 
     /**
-     * @brief Get a task from its UUID
+     * @brief Get a subject from its UUID
      * @param cassUuid
      * @return
      */

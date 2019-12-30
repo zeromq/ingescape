@@ -53,7 +53,7 @@ class SessionM : public QObject
     I2_QML_PROPERTY_QTime(duration)
     //I2_QML_PROPERTY(QDateTime, duration)
 
-    // Values of the independent variables of the task
+    // Values of the independent variables of the protocol
     // "Qml Property Map" allows to set key-value pairs that can be used in QML bindings
     I2_QML_PROPERTY_READONLY(QQmlPropertyMap*, mapIndependentVariableValues)
 

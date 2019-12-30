@@ -26,29 +26,29 @@
 
 
 /**
- * @brief The ProtocolM class defines a model of task
+ * @brief The ProtocolM class defines a model of protocol
  */
 class ProtocolM : public QObject
 {
     Q_OBJECT
 
-    // Name of our task
+    // Name of our protocol
     I2_QML_PROPERTY(QString, name)
 
-    // URL of the IngeScape platform (JSON file) of our task
+    // URL of the IngeScape platform (JSON file) of our protocol
     I2_CPP_PROPERTY_CUSTOM_SETTER(QUrl, platformFileUrl)
 
-    // Name of the IngeScape platform (JSON file) of our task
+    // Name of the IngeScape platform (JSON file) of our protocol
     I2_QML_PROPERTY_READONLY(QString, platformFileName)
 
-    // List of independent variables of our task
+    // List of independent variables of our protocol
     I2_QOBJECT_LISTMODEL(IndependentVariableM, independentVariables)
 
-    // List of dependent variables of our task
+    // List of dependent variables of our protocol
     I2_QOBJECT_LISTMODEL(DependentVariableM, dependentVariables)
 
     // Hash table from an agent name to a (simplified) model of agent with its name and its outputs
-    // Found in the platform (JSON file) of our task
+    // Found in the platform (JSON file) of our protocol
     I2_QOBJECT_HASHMODEL(AgentNameAndOutputsM, hashFromAgentNameToSimplifiedAgent)
 
 
@@ -75,28 +75,28 @@ public:
 
 
     /**
-     * @brief Accessor for this task UUID in the Cassandra DB
+     * @brief Accessor for this protocol UUID in the Cassandra DB
      * @return
      */
     CassUuid getCassUuid() const { return _cassUuid; }
 
 
     /**
-     * @brief Accessor for the task's experimentation UUID in the Cassandra DB
+     * @brief Accessor for the protocol's experimentation UUID in the Cassandra DB
      * @return
      */
     CassUuid getExperimentationCassUuid() const { return _cassExperimentationUuid; }
 
 
     /**
-     * @brief Add an Independent Variable to our task
+     * @brief Add an Independent Variable to our protocol
      * @param independentVariable
      */
     void addIndependentVariable(IndependentVariableM* independentVariable);
 
 
     /**
-     * @brief Remove an Independent Variable from our task
+     * @brief Remove an Independent Variable from our protocol
      * @param independentVariable
      */
     void removeIndependentVariable(IndependentVariableM* independentVariable);
@@ -111,21 +111,21 @@ public:
 
 
     /**
-     * @brief Add a Dependent Variable to our task
+     * @brief Add a Dependent Variable to our protocol
      * @param dependentVariable
      */
     void addDependentVariable(DependentVariableM* dependentVariable);
 
 
     /**
-     * @brief Remove a Dependent Variable from our task
+     * @brief Remove a Dependent Variable from our protocol
      * @param dependentVariable
      */
     void removeDependentVariable(DependentVariableM* dependentVariable);
 
 
     /**
-     * @brief Task table name
+     * @brief Protocol table name
      */
     static const QString table;
 
@@ -134,7 +134,7 @@ public:
     static const QStringList primaryKeys;
 
     /**
-     * @brief Static factory method to create a task from a CassandraDB record
+     * @brief Static factory method to create a protocol from a CassandraDB record
      * @param row
      * @return
      */
@@ -148,12 +148,12 @@ public:
 
     /**
      * @brief Create a CassStatement to insert an ProtocolM into the DB.
-     * The statement contains the values from the given task.
-     * Passed task must have a valid and unique UUID.
-     * @param task
+     * The statement contains the values from the given protocol.
+     * Passed protocol must have a valid and unique UUID.
+     * @param protocol
      * @return
      */
-    static CassStatement* createBoundInsertStatement(const ProtocolM& task);
+    static CassStatement* createBoundInsertStatement(const ProtocolM& protocol);
 
     /**
      * @brief Returns true if the agent name is in the hashTable hashFromAgentNameToSimplifiedAgent
@@ -164,7 +164,7 @@ public:
 
 
     /**
-     * @brief Delete the given dependent variable from the task and from the Cassandra DB
+     * @brief Delete the given dependent variable from the protocol and from the Cassandra DB
      * @param variableToUpdate
      */
     Q_INVOKABLE void deleteDependentVariable(DependentVariableM* variableToDelete);

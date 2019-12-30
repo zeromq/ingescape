@@ -78,7 +78,7 @@ AssessmentsPopupBase {
         // Reset all user inputs
         //txtRecordName.text = "";
         comboSubjects.selectedIndex = -1;
-        comboTasks.selectedIndex = -1;
+        comboProtocols.selectedIndex = -1;
 
         // Close the popup
         rootPopup.close();
@@ -128,7 +128,7 @@ AssessmentsPopupBase {
         }
 
         Text {
-            id: taskInstanceName
+            id: txtSessionName
 
             anchors {
                 left: parent.left
@@ -139,17 +139,17 @@ AssessmentsPopupBase {
 
             height: 30
 
-            // the subject and the task are defined
-            text: if (comboSubjects.selectedItem && comboTasks.selectedItem) {
-                      String("Session-%1-%2-%3").arg(comboSubjects.selectedItem.displayedId).arg(comboTasks.selectedItem.name).arg(rootPopup.currentDate.toLocaleString(Qt.locale(), "yyyyMMdd-hhmmss"));
+            // the subject and the protocol are defined
+            text: if (comboSubjects.selectedItem && comboProtocols.selectedItem) {
+                      String("Session-%1-%2-%3").arg(comboSubjects.selectedItem.displayedId).arg(comboProtocols.selectedItem.name).arg(rootPopup.currentDate.toLocaleString(Qt.locale(), "yyyyMMdd-hhmmss"));
                   }
             // Only the subject is defined
                   else if (comboSubjects.selectedItem) {
                       String("Session-%1-???-%2").arg(comboSubjects.selectedItem.displayedId).arg(rootPopup.currentDate.toLocaleString(Qt.locale(), "yyyyMMdd-hhmmss"));
                   }
-            // Only the task is defined
-                  else if (comboTasks.selectedItem) {
-                      String("Session-???-%1-%2").arg(comboTasks.selectedItem.name).arg(rootPopup.currentDate.toLocaleString(Qt.locale(), "yyyyMMdd-hhmmss"));
+            // Only the protocol is defined
+                  else if (comboProtocols.selectedItem) {
+                      String("Session-???-%1-%2").arg(comboProtocols.selectedItem.name).arg(rootPopup.currentDate.toLocaleString(Qt.locale(), "yyyyMMdd-hhmmss"));
                   }
                   else {
                       String("Session-???-???-%1").arg(rootPopup.currentDate.toLocaleString(Qt.locale(), "yyyyMMdd-hhmmss"));
@@ -242,7 +242,7 @@ AssessmentsPopupBase {
     }
 
     Item {
-        id: taskRow
+        id: protocolRow
 
         anchors {
             top: subjectRow.bottom
@@ -276,7 +276,7 @@ AssessmentsPopupBase {
         }
 
         I2ComboboxItemModel {
-            id: comboTasks
+            id: comboProtocols
 
             anchors {
                 left: parent.left
@@ -377,20 +377,20 @@ AssessmentsPopupBase {
 
             activeFocusOnPress: true
 
-            //enabled: (taskInstanceName.text.length > 0) && (typeof comboSubjects.selectedItem !== 'undefined') && (typeof comboTasks.selectedItem !== 'undefined')
-            enabled: (typeof comboSubjects.selectedItem !== 'undefined') && (typeof comboTasks.selectedItem !== 'undefined')
+            //enabled: (txtSessionName.text.length > 0) && (typeof comboSubjects.selectedItem !== 'undefined') && (typeof comboProtocols.selectedItem !== 'undefined')
+            enabled: (typeof comboSubjects.selectedItem !== 'undefined') && (typeof comboProtocols.selectedItem !== 'undefined')
 
             style: IngeScapeAssessmentsButtonStyle {
                 text: "OK"
             }
 
             onClicked: {
-                if (experimentationController && comboSubjects.selectedItem && comboTasks.selectedItem)
+                if (experimentationController && comboSubjects.selectedItem && comboProtocols.selectedItem)
                 {
-                    //console.log("QML: create new session with protocol " + comboTasks.selectedItem + " and subject " + comboSubjects.selectedItem);
+                    //console.log("QML: create new session with protocol " + comboProtocols.selectedItem + " and subject " + comboSubjects.selectedItem);
 
                     // Create a new session for a subject and a protocol
-                    experimentationController.createNewSessionForSubjectAndProtocol(comboSubjects.selectedItem, comboTasks.selectedItem);
+                    experimentationController.createNewSessionForSubjectAndProtocol(comboSubjects.selectedItem, comboProtocols.selectedItem);
                 }
 
                 // Reset all user inputs and close the popup

@@ -205,7 +205,7 @@ Rectangle {
                 verticalAlignment: Text.AlignVCenter
 
                 elide: Text.ElideRight
-                text: (rootItem.modelM && rootItem.modelM.task) ? rootItem.modelM.task.name : ""
+                text: (rootItem.modelM && rootItem.modelM.protocol) ? rootItem.modelM.protocol.name : ""
 
                 color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
                 font {

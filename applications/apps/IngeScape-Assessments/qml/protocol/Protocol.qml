@@ -82,7 +82,7 @@ Item {
     }
 
     Text {
-        id: taskName
+        id: txtProtocolName
 
         anchors {
             top: parent.top
@@ -109,18 +109,18 @@ Item {
         id: panelIndependentVariable
 
         anchors {
-            top: taskName.bottom
+            top: txtProtocolName.bottom
             topMargin: 18
-            left: taskName.left
+            left: txtProtocolName.left
             right: parent.right
             rightMargin: 20
         }
 
-        // 34 => margin between popup.top and taskName.top
-        // 18 => margin between taskName.bottom and indepVar.top
+        // 34 => margin between popup.top and txtProtocolName.top
+        // 18 => margin between txtProtocolName.bottom and indepVar.top
         // 24 => margin between depVar.bottom and popup.bottom
         // 26 => 52 / 2 ; 52 is margin between indepVar.bottom and depVar.top
-        height: (parent.height - 34 - taskName.height - 18 - 24 - 26) / 2
+        height: (parent.height - 34 - txtProtocolName.height - 18 - 24 - 26) / 2
 
         Text {
             text: "INDEPENDENT VARIABLES"
@@ -302,17 +302,17 @@ Item {
         id: panelDependentVariable
 
         anchors {
-            left: taskName.left
+            left: txtProtocolName.left
             right: panelIndependentVariable.right
             bottom: parent.bottom
             bottomMargin: 24
         }
 
-        // 34 => margin between popup.top and taskName.top
-        // 18 => margin between taskName.bottom and indepVar.top
+        // 34 => margin between popup.top and txtProtocolName.top
+        // 18 => margin between txtProtocolName.bottom and indepVar.top
         // 24 => margin between depVar.bottom and popup.bottom
         // 26 => 52 / 2 ; 52 is margin between indepVar.bottom and depVar.top
-        height: (parent.height - 34 - taskName.height - 18 - 24 - 26) / 2
+        height: (parent.height - 34 - txtProtocolName.height - 18 - 24 - 26) / 2
 
         Text {
             text: "DEPENDENT VARIABLES"

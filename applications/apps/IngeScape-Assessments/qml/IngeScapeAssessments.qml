@@ -22,7 +22,7 @@ import QtQuick.Window 2.3
 import INGESCAPE 1.0
 
 import "experimentation" as Experimentation
-import "task_instance" as Session
+import "session" as Session
 import "popup" as Popup
 
 
@@ -295,7 +295,7 @@ Item {
     Component {
         id: componentSessionView
 
-        Session.TaskInstanceView {
+        Session.SessionView {
             sessionController: IngeScapeAssessmentsC.experimentationC.sessionC
             experimentationController: IngeScapeAssessmentsC.experimentationC
 
@@ -312,7 +312,7 @@ Item {
             //
 
             onGoBackToHome: {
-                console.log("QML: on Go Back to 'Home' (from 'TaskInstance' view)");
+                console.log("QML: on Go Back to 'Home' (from 'Session' view)");
 
                 // Hide network configuration infos component
                 networkConfigurationInfo.visible = false;
@@ -325,7 +325,7 @@ Item {
             }
 
             onGoBackToExperimentation: {
-                console.log("QML: on Go Back to 'Experimentation' (from 'TaskInstance' view)");
+                console.log("QML: on Go Back to 'Experimentation' (from 'Session' view)");
 
                 // Hide network configuration infos component
                 networkConfigurationInfo.visible = true;

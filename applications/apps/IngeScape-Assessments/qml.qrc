@@ -7,21 +7,21 @@
         <file>qml/LoadingScreen.qml</file>
         <file>qml/ExperimentationsListView.qml</file>
         <file>qml/experimentation/ExperimentationView.qml</file>
-        <file>qml/experimentation/TaskInstanceInList.qml</file>
+        <file>qml/experimentation/SessionInList.qml</file>
         <file>qml/subject/SubjectsView.qml</file>
-        <file>qml/protocol/TasksView.qml</file>
+        <file>qml/protocol/ProtocolsView.qml</file>
         <file>qml/popup/CreateExperimentationPopup.qml</file>
-        <file>qml/popup/CreateTaskInstancePopup.qml</file>
+        <file>qml/popup/CreateSessionPopup.qml</file>
         <file>qml/popup/CreateCharacteristicPopup.qml</file>
         <file>qml/subject/Characteristic.qml</file>
         <file>qml/subject/CharacteristicValueEditor.qml</file>
         <file>qml/theme/IngeScapeRadioButtonStyle.qml</file>
-        <file>qml/popup/CreateTaskPopup.qml</file>
-        <file>qml/protocol/Task.qml</file>
-        <file>qml/protocol/TaskInList.qml</file>
+        <file>qml/popup/CreateProtocolPopup.qml</file>
+        <file>qml/protocol/Protocol.qml</file>
+        <file>qml/protocol/ProtocolInList.qml</file>
         <file>qml/popup/IndependentVariableEditorPopup.qml</file>
-        <file>qml/task_instance/TaskInstanceView.qml</file>
-        <file>qml/task_instance/IndependentVariableValueEditor.qml</file>
+        <file>qml/session/SessionView.qml</file>
+        <file>qml/session/IndependentVariableValueEditor.qml</file>
         <file>qml/export/ExportView.qml</file>
         <file>qml/theme/IngeScapeAssessmentsButtonStyle.qml</file>
         <file>qml/theme/IngeScapeAssessmentsListHeader.qml</file>
@@ -33,15 +33,15 @@
         <file>qml/popup/AssessmentsPopupBase.qml</file>
         <file>qml/popup/DeleteConfirmationPopup.qml</file>
         <file>qml/theme/IngeScapeAssessmentsScrollViewStyle.qml</file>
-        <file>qml/task_instance/AttachementDelegate.qml</file>
+        <file>qml/session/AttachementDelegate.qml</file>
         <file>qml/theme/IngeScapeAssessmentsComboboxStyle.qml</file>
         <file>qml/theme/IngeScapeAssessmentsTextAreaStyle.qml</file>
         <file>qml/popup/DatabaseConfigurationPopup.qml</file>
         <file>resources/SVG/ingescape_assessments-pictos.svg</file>
         <file>qml/popup/DependentVariableEditorPopup.qml</file>
-        <file>qml/task_instance/ActionsList.qml</file>
-        <file>qml/task_instance/AgentsList.qml</file>
-        <file>qml/task_instance/AgentsListItem.qml</file>
+        <file>qml/session/ActionsList.qml</file>
+        <file>qml/session/AgentsList.qml</file>
+        <file>qml/session/AgentsListItem.qml</file>
         <file>qml/experimentation/DropDownCheckboxes.qml</file>
         <file>qml/popup/OverloadedRecordsTimelinePopup.qml</file>
     </qresource>

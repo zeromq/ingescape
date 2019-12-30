@@ -30,7 +30,7 @@ ProtocolsController::ProtocolsController(QObject *parent) : QObject(parent),
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    qInfo() << "New Tasks Controller";
+    qInfo() << "New Protocols Controller";
 
     // Init temporary independent and dependant variable as empty variables
     _temporaryIndependentVariable = new IndependentVariableM(CassUuid(), CassUuid(), CassUuid(), "", "", IndependentVariableValueTypes::UNKNOWN);
@@ -52,7 +52,7 @@ ProtocolsController::ProtocolsController(QObject *parent) : QObject(parent),
  */
 ProtocolsController::~ProtocolsController()
 {
-    qInfo() << "Delete Tasks Controller";
+    qInfo() << "Delete Protocols Controller";
 
     if (_selectedProtocol != nullptr) {
         setselectedProtocol(nullptr);
@@ -90,13 +90,13 @@ ProtocolsController::~ProtocolsController()
  */
 bool ProtocolsController::canCreateProtocolWithName(QString protocolName)
 {
-    const QList<ProtocolM*>& taskList = _currentExperimentation->allProtocols()->toList();
-    auto hasGivenName = [protocolName](ProtocolM* task) {
-        return (task != nullptr) && (task->name() == protocolName);
+    const QList<ProtocolM*>& protocolsList = _currentExperimentation->allProtocols()->toList();
+    auto hasGivenName = [protocolName](ProtocolM* protocol) {
+        return (protocol != nullptr) && (protocol->name() == protocolName);
     };
 
     return !protocolName.isEmpty() && (_currentExperimentation != nullptr)
-            && std::none_of(taskList.begin(), taskList.end(), hasGivenName);
+            && std::none_of(protocolsList.begin(), protocolsList.end(), hasGivenName);
 }
 
 
@@ -190,7 +190,7 @@ void ProtocolsController::duplicateProtocol(ProtocolM* protocol)
 
                     if (newIndependentVariable != nullptr)
                     {
-                        // Add the independent variable to the new task
+                        // Add the independent variable to the new protocol
                         newProtocol->addIndependentVariable(newIndependentVariable);
                     }
                 }
@@ -211,7 +211,7 @@ void ProtocolsController::duplicateProtocol(ProtocolM* protocol)
 
                     if (newDependentVariable != nullptr)
                     {
-                        // Add the dependent variable to the new task
+                        // Add the dependent variable to the new protocol
                         newProtocol->addDependentVariable(newDependentVariable);
                     }
 
@@ -268,7 +268,7 @@ void ProtocolsController::createNewIndependentVariableFromTemporary()
                                                                                      _temporaryIndependentVariable->description(), _temporaryIndependentVariable->valueType(), _temporaryIndependentVariable->enumValues());
         if (independentVariable != nullptr)
         {
-            // Add the independent variable to the selected task
+            // Add the independent variable to the selected protocol
             _selectedProtocol->addIndependentVariable(independentVariable);
         }
     }
@@ -319,7 +319,7 @@ void ProtocolsController::deleteIndependentVariable(IndependentVariableM* indepe
         // Delete independent variable from Cassandra DB
         IndependentVariableM::deleteIndependentVariableFromCassandra(*independentVariable);
 
-        // Remove the independent variable from the selected task
+        // Remove the independent variable from the selected protocol
         _selectedProtocol->removeIndependentVariable(independentVariable);
 
         // Free memory
@@ -346,7 +346,7 @@ void ProtocolsController::createNewDependentVariableFromTemporary()
 
         if (dependentVariable != nullptr)
         {
-            // Add the dependent variable to the selected task
+            // Add the dependent variable to the selected protocol
             _selectedProtocol->addDependentVariable(dependentVariable);
         }
     }
@@ -380,7 +380,7 @@ void ProtocolsController::deleteDependentVariable(DependentVariableM* dependentV
 {
     if ((dependentVariable != nullptr) && (_selectedProtocol != nullptr))
     {
-        // Remove the dependent variable from the selected task
+        // Remove the dependent variable from the selected protocol
         _selectedProtocol->removeDependentVariable(dependentVariable);
 
         // Remove from DB
@@ -416,7 +416,7 @@ ProtocolM* ProtocolsController::_createNewProtocolWithIngeScapePlatformFileUrl(Q
         }
         else
         {
-            // Add the task to the current experimentation
+            // Add the protocol to the current experimentation
             _currentExperimentation->addProtocol(protocol);
 
             // Select this new protocol

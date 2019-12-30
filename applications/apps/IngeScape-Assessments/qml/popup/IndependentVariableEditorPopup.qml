@@ -52,7 +52,7 @@ AssessmentsPopupBase {
     property string errorMessage: ""
     property int errorEnumIndex: -1
 
-    // Our popup is used to edit temporaly independent variable of our tasks controller, after we can :
+    // Our popup is used to edit temporaly independent variable of our protocols controller, after we can :
     // - create a new independent variable
     // OR
     // - edit an existing independent variable

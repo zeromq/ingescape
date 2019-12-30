@@ -307,7 +307,7 @@ CharacteristicM* ExperimentationM::getCharacteristicFromUID(const CassUuid& cass
 }
 
 /**
- * @brief Get a task from its UUID
+ * @brief Get a subject from its UUID
  * @param cassUuid
  * @return
  */
@@ -325,8 +325,8 @@ SubjectM* ExperimentationM::getSubjectFromUID(const CassUuid& cassUuid)
  */
 ProtocolM* ExperimentationM::getProtocolFromUID(const CassUuid& cassUuid)
 {
-    auto taskIt = std::find_if(_allProtocols.begin(), _allProtocols.end(), [cassUuid](ProtocolM* protocol) { return (protocol != nullptr) && (protocol->getCassUuid() == cassUuid); });
-    return (taskIt != _allProtocols.end()) ? *taskIt : nullptr;
+    auto protocolIt = std::find_if(_allProtocols.begin(), _allProtocols.end(), [cassUuid](ProtocolM* protocol) { return (protocol != nullptr) && (protocol->getCassUuid() == cassUuid); });
+    return (protocolIt != _allProtocols.end()) ? *protocolIt : nullptr;
 }
 
 
@@ -434,12 +434,12 @@ CassStatement* ExperimentationM::createBoundUpdateStatement(const Experimentatio
  */
 void ExperimentationM::_deleteAllProtocolsForExperimentation(const ExperimentationM& experimentation)
 {
-    // Delete all tasks associations
+    // Delete all protocols associations
     AssessmentsModelManager::deleteEntry<IndependentVariableM>({ experimentation.getCassUuid() });
     AssessmentsModelManager::deleteEntry<IndependentVariableValueM>({ experimentation.getCassUuid() });
     AssessmentsModelManager::deleteEntry<DependentVariableM>({ experimentation.getCassUuid() });
 
-    // Delete all tasks
+    // Delete all protocols
     AssessmentsModelManager::deleteEntry<ProtocolM>({ experimentation.getCassUuid() });
 }
 
@@ -474,7 +474,7 @@ void ExperimentationM::_deleteAllCharacteristicsForExperimentation(const Experim
  */
 void ExperimentationM::_deleteAllSessionsForExperimentation(const ExperimentationM& experimentation)
 {
-    // Independent variable values already deleted with task deletion
+    // Independent variable values already deleted with protocol deletion
 
     // Delete all sessions
     AssessmentsModelManager::deleteEntry<SessionM>({ experimentation.getCassUuid() });

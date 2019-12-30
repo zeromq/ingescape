@@ -143,7 +143,7 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     // Create the controller to manage the subjects of the current experimentation
     _subjectsC = new SubjectsController(this);
 
-    // Create the controller to manage the tasks of the current experimentation
+    // Create the controller to manage the protocols of the current experimentation
     _protocolsC = new ProtocolsController(this);
 
     // Create the controller to export data from the database

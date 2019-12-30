@@ -24,7 +24,7 @@ import INGESCAPE 1.0
 Rectangle {
     id: rootItem
 
-    // Task controller
+    // Protocols controller
     property ProtocolsController protocolsController: null;
 
     // Model of protocol that contains our model of dependent variable

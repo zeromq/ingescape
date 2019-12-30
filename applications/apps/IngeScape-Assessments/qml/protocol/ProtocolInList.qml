@@ -218,7 +218,7 @@ Item {
                 }
 
                 onClicked: {
-                    // Emit the signal "Duplicate Task asked"
+                    // Emit the signal "Duplicate Protocol asked"
                     rootItem.duplicateProtocolAsked();
                 }
 
@@ -239,7 +239,7 @@ Item {
         showPopupTitle: false
         anchors.centerIn: parent
 
-        text: qsTr("Are you sure you want to delete the task %1 ?").arg(rootItem.modelM ? rootItem.modelM.name : "")
+        text: qsTr("Are you sure you want to delete the protocol %1 ?").arg(rootItem.modelM ? rootItem.modelM.name : "")
 
         height: 160
         width: 470

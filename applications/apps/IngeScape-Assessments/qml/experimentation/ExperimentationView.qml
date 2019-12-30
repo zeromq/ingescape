@@ -24,7 +24,7 @@ import INGESCAPE 1.0
 //import "theme" as Theme
 import "../popup" as Popup
 import "../subject" as Subject
-import "../task" as Task
+import "../protocol" as Protocol
 import "../export" as Export
 
 
@@ -909,7 +909,7 @@ Item {
                                 width: dropDownProtocol.comboButton.width
                                 height: dropDownProtocol.comboButton.height
 
-                                property ProtocolM taskM : rootItem.experimentation ? rootItem.experimentation.allProtocols.get(index) : null
+                                property ProtocolM protocolM : rootItem.experimentation ? rootItem.experimentation.allProtocols.get(index) : null
 
                                 CheckBox {
                                     id : filterProtocolCB
@@ -933,7 +933,7 @@ Item {
 
                                             color: IngeScapeTheme.lightGreyColor
 
-                                            text: delegateProtocolComboList.taskM ? " " + delegateProtocolComboList.taskM.name : ""
+                                            text: delegateProtocolComboList.protocolM ? " " + delegateProtocolComboList.protocolM.name : ""
                                             elide: Text.ElideRight
 
                                             font {
@@ -961,12 +961,12 @@ Item {
                                     }
 
                                     onClicked : {
-                                        if (rootItem.controller && delegateProtocolComboList.taskM) {
+                                        if (rootItem.controller && delegateProtocolComboList.protocolM) {
                                             if (checked) {
-                                                rootItem.controller.addOneProtocolToFilterSessions(delegateProtocolComboList.taskM.name)
+                                                rootItem.controller.addOneProtocolToFilterSessions(delegateProtocolComboList.protocolM.name)
                                             }
                                             else {
-                                                rootItem.controller.removeOneProtocolToFilterSessions(delegateProtocolComboList.taskM.name)
+                                                rootItem.controller.removeOneProtocolToFilterSessions(delegateProtocolComboList.protocolM.name)
                                             }
 
                                             // update "all agents" checkbox state
@@ -990,8 +990,8 @@ Item {
                                         target : dropDownProtocol.popup
                                         onOpened : {
                                             // update agents checkboxes states when the pop up is opening
-                                            if (controller && delegateProtocolComboList.taskM) {
-                                                filterProtocolCB.checked = controller.isProtocolFilterSessions(delegateProtocolComboList.taskM.name);
+                                            if (controller && delegateProtocolComboList.protocolM) {
+                                                filterProtocolCB.checked = controller.isProtocolFilterSessions(delegateProtocolComboList.protocolM.name);
                                             }
                                         }
                                     }
@@ -1000,8 +1000,8 @@ Item {
                                         target : rootItem
                                         onClickAllProtocol : {
                                             // update agents checkboxes states when the "pop up is opening  "All Agents" check box is selected or unselected
-                                            if (controller && delegateProtocolComboList.taskM) {
-                                                filterProtocolCB.checked = controller.isProtocolFilterSessions(delegateProtocolComboList.taskM.name);
+                                            if (controller && delegateProtocolComboList.protocolM) {
+                                                filterProtocolCB.checked = controller.isProtocolFilterSessions(delegateProtocolComboList.protocolM.name);
                                             }
                                         }
                                     }
@@ -1212,7 +1212,7 @@ Item {
                                    : null
 
 
-                            delegate: TaskInstanceInList {
+                            delegate: SessionInList {
                                 isSelectingSessionsToExport: rootItem._isSelectingSessionsToExport && rootItem.controller.isRecorderON
                                 appearanceAnimationDuration: rootItem._appearanceAnimationDuration
 
@@ -1282,7 +1282,7 @@ Item {
         //
         // Create Experimentation Popup
         //
-        Popup.CreateTaskInstancePopup {
+        Popup.CreateSessionPopup {
             id: createSessionPopup
 
             experimentationController: rootItem.controller
@@ -1327,7 +1327,7 @@ Item {
     //
     // Protocols View (popup)
     //
-    Task.TasksView {
+    Protocol.ProtocolsView {
         id: protocolsViewPopup
 
         anchors.centerIn: parent

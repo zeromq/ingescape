@@ -46,7 +46,7 @@ AssessmentsPopupBase {
     // Protocol model the new dependent variable will be in
     property ProtocolM protocolM: null
 
-    // Our popup is used to edit temporaly dependent variable of our tasks controller, after we can :
+    // Our popup is used to edit temporaly dependent variable of our protocols controller, after we can :
     // - create a new dependent variable
     // OR
     // - edit an existing dependent variable

@@ -583,33 +583,37 @@ SessionM* ExperimentationController::_insertSessionIntoDB(const QString& session
 }
 
 /**
- * @brief Retrieve all independent variables from the Cassandra DB for the given task.
- * The task will be updated by this method
- * @param task
+ * @brief Retrieve all independent variables from the Cassandra DB for the given protocol.
+ * The protocol will be updated by this method
+ * @param protocol
  */
-void ExperimentationController::_retrieveIndependentVariableForTask(ProtocolM* task)
+void ExperimentationController::_retrieveIndependentVariableForProtocol(ProtocolM* protocol)
 {
-    if (task != nullptr)
+    if (protocol != nullptr)
     {
-        QList<IndependentVariableM*> indepVarList = AssessmentsModelManager::select<IndependentVariableM>({ task->getExperimentationCassUuid(), task->getCassUuid() });
+        QList<IndependentVariableM*> indepVarList = AssessmentsModelManager::select<IndependentVariableM>({ protocol->getExperimentationCassUuid(), protocol->getCassUuid() });
         for (IndependentVariableM* independentVariable : indepVarList) {
-            task->addIndependentVariable(independentVariable);
+            if (independentVariable != nullptr) {
+                protocol->addIndependentVariable(independentVariable);
+            }
         }
     }
 }
 
 /**
- * @brief Retrieve all dependent variables from the Cassandra DB for the given task.
- * The task will be updated by this method.
- * @param task
+ * @brief Retrieve all dependent variables from the Cassandra DB for the given protocol.
+ * The protocol will be updated by this method.
+ * @param protocol
  */
-void ExperimentationController::_retrieveDependentVariableForTask(ProtocolM* task)
+void ExperimentationController::_retrieveDependentVariableForProtocol(ProtocolM* protocol)
 {
-    if (task != nullptr)
+    if (protocol != nullptr)
     {
-        QList<DependentVariableM*> depVarList = AssessmentsModelManager::select<DependentVariableM>({ task->getExperimentationCassUuid(), task->getCassUuid() });
+        QList<DependentVariableM*> depVarList = AssessmentsModelManager::select<DependentVariableM>({ protocol->getExperimentationCassUuid(), protocol->getCassUuid() });
         for (DependentVariableM* dependentVariable : depVarList) {
-            task->addDependentVariable(dependentVariable);
+            if (dependentVariable != nullptr) {
+                protocol->addDependentVariable(dependentVariable);
+            }
         }
     }
 }
@@ -664,10 +668,10 @@ void ExperimentationController::_retrieveProtocolsForExperimentation(Experimenta
             if (protocol != nullptr)
             {
                 // Independent variables
-                _retrieveIndependentVariableForTask(protocol);
+                _retrieveIndependentVariableForProtocol(protocol);
 
                 // Dependent variables
-                _retrieveDependentVariableForTask(protocol);
+                _retrieveDependentVariableForProtocol(protocol);
 
                 // Add the protocol to the experimentation
                 experimentation->addProtocol(protocol);
@@ -692,7 +696,7 @@ void ExperimentationController::_retrieveSessionsForExperimentation(Experimentat
             {
                 experimentation->addSession(session);
 
-                // Set pointers to Task & Subject
+                // Set pointers to Protocol & Subject
                 session->setprotocol(experimentation->getProtocolFromUID(session->getProtocolCassUuid()));
                 session->setsubject(experimentation->getSubjectFromUID(session->getSubjectCassUuid()));
             }
@@ -854,7 +858,7 @@ void ExperimentationController::startToRecord()
         {
             ProtocolM* protocol = currentSession->protocol();
 
-            //QString currentPlatformName = task->platformFileName();
+            //QString currentPlatformName = protocol->platformFileName();
 
             // Get the JSON of the current platform
             QString platformFilePath = protocol->platformFileUrl().path();

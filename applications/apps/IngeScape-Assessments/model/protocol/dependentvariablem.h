@@ -34,10 +34,10 @@ class DependentVariableM : public QObject
     // Description of our dependent variable
     I2_QML_PROPERTY(QString, description)
 
-    // Name of the agent in the platform associated to the task
+    // Name of the agent in the platform associated to the protocol
     I2_QML_PROPERTY(QString, agentName)
 
-    // Name of the (agent) output in the platform associated to the task
+    // Name of the (agent) output in the platform associated to the protocol
     I2_QML_PROPERTY(QString, outputName)
 
 
