@@ -48,7 +48,7 @@ class ExperimentationController : public QObject
     I2_QML_PROPERTY_READONLY(bool, isRecording)
 
     // List of selected sessions
-    I2_QOBJECT_LISTMODEL(TaskInstanceM, selectedSessions)
+    I2_QOBJECT_LISTMODEL(SessionM, selectedSessions)
 
     // List of all agents present in the current platform
     Q_PROPERTY(AreSubjectAndProtocolInSessionFilter* sessionFilteredList READ sessionFilteredList CONSTANT)
@@ -97,14 +97,14 @@ public:
      * @brief Open a session
      * @param session
      */
-    Q_INVOKABLE void openSession(TaskInstanceM* session);
+    Q_INVOKABLE void openSession(SessionM* session);
 
 
     /**
      * @brief Delete a task instance
      * @param record
      */
-    Q_INVOKABLE void deleteTaskInstance(TaskInstanceM* taskInstance);
+    Q_INVOKABLE void deleteTaskInstance(SessionM* taskInstance);
 
 
     /**
@@ -297,7 +297,7 @@ protected: // Methods
      * @param task
      * @return
      */
-    TaskInstanceM* _insertTaskInstanceIntoDB(const QString& taskInstanceName, SubjectM* subject, ProtocolM* task);
+    SessionM* _insertTaskInstanceIntoDB(const QString& taskInstanceName, SubjectM* subject, ProtocolM* task);
 
     /**
      * @brief Retrieve all independent variables from the Cassandra DB for the given task.

@@ -46,7 +46,7 @@ SOURCES += main.cpp \
     controller/protocol/protocolscontroller.cpp \
     model/assessmentsenums.cpp \
     model/protocol/protocolm.cpp \
-    model/taskinstancem.cpp \
+    model/sessionm.cpp \
     model/subject/subjectm.cpp \
     model/subject/characteristicm.cpp \
     model/subject/characteristicvaluem.cpp \
@@ -72,7 +72,7 @@ HEADERS += \
     controller/protocol/protocolscontroller.h \
     model/assessmentsenums.h \
     model/protocol/protocolm.h \
-    model/taskinstancem.h \
+    model/sessionm.h \
     stable.h \
     controller/networkcontroller.h \
     model/subject/subjectm.h \

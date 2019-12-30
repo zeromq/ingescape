@@ -62,13 +62,13 @@ Item {
     }
 
     /**
-     * Reset the current task instance
+     * Reset the current session
      */
-    function resetCurrentTaskInstance()
+    function resetCurrentSession()
     {
         if (IngeScapeAssessmentsC.experimentationC && IngeScapeAssessmentsC.experimentationC.taskInstanceC)
         {
-            IngeScapeAssessmentsC.experimentationC.taskInstanceC.currentTaskInstance = null;
+            IngeScapeAssessmentsC.experimentationC.taskInstanceC.currentSession = null;
         }
     }
 
@@ -141,19 +141,19 @@ Item {
     Connections {
         target: IngeScapeAssessmentsC.experimentationC.taskInstanceC
 
-        onCurrentTaskInstanceChanged: {
+        onCurrentSessionChanged: {
 
-            if (IngeScapeAssessmentsC.experimentationC.taskInstanceC.currentTaskInstance)
+            if (IngeScapeAssessmentsC.experimentationC.taskInstanceC.currentSession)
             {
-                console.log("QML: on Current Task Instance changed: " + IngeScapeAssessmentsC.experimentationC.taskInstanceC.currentTaskInstance.name);
+                console.log("QML: on Current Session changed: " + IngeScapeAssessmentsC.experimentationC.taskInstanceC.currentSession.name);
 
-                // Add the "Task Instance view" to the stack
+                // Add the "Session view" to the stack
                 stackview.push(componentTaskInstanceView);
             }
             else {
-                console.log("QML: on Current Task Instance changed to NULL");
+                console.log("QML: on Current Session changed to NULL");
 
-                // Remove the "Task Instance view" from the stack
+                // Remove the "Session view" from the stack
                 stackview.pop();
             }
         }
@@ -317,8 +317,8 @@ Item {
                 // Hide network configuration infos component
                 networkConfigurationInfo.visible = false;
 
-                // Reset the current record
-                rootItem.resetCurrentTaskInstance();
+                // Reset the current session
+                rootItem.resetCurrentSession();
 
                 // Reset the current experimentation
                 rootItem.resetCurrentExperimentation();
@@ -330,8 +330,8 @@ Item {
                 // Hide network configuration infos component
                 networkConfigurationInfo.visible = true;
 
-                // Reset the current task instance
-                rootItem.resetCurrentTaskInstance();
+                // Reset the current session
+                rootItem.resetCurrentSession();
             }
         }
     }

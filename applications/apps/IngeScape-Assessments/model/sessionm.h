@@ -12,8 +12,8 @@
  *
  */
 
-#ifndef TASK_INSTANCE_M_H
-#define TASK_INSTANCE_M_H
+#ifndef SESSION_M_H
+#define SESSION_M_H
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
@@ -25,9 +25,9 @@
 
 
 /**
- * @brief The TaskInstanceM class defines a model of task instance
+ * @brief The SessionM class defines a model of task instance
  */
-class TaskInstanceM : public QObject
+class SessionM : public QObject
 {
     Q_OBJECT
 
@@ -75,7 +75,7 @@ public:
      * @param startDateTime
      * @param parent
      */
-    explicit TaskInstanceM(CassUuid experimentationUuid,
+    explicit SessionM(CassUuid experimentationUuid,
                            CassUuid cassUuid,
                            QString name,
                            QString comments,
@@ -88,7 +88,7 @@ public:
     /**
      * @brief Destructor
      */
-    ~TaskInstanceM();
+    ~SessionM();
 
     /**
      * @brief TaskInstance table name
@@ -135,31 +135,31 @@ public:
      * @param row
      * @return
      */
-    static TaskInstanceM* createFromCassandraRow(const CassRow* row);
+    static SessionM* createFromCassandraRow(const CassRow* row);
 
     /**
      * @brief Delete the given task instance from Cassandra DB
      * @param experimentation
      */
-    static void deleteTaskInstanceFromCassandra(const TaskInstanceM& taskInstance);
+    static void deleteTaskInstanceFromCassandra(const SessionM& taskInstance);
 
     /**
-     * @brief Create a CassStatement to insert a TaskInstanceM into the DB.
+     * @brief Create a CassStatement to insert a SessionM into the DB.
      * The statement contains the values from the given taskInstance.
      * Passed taskInstance must have a valid and unique UUID.
      * @param taskInstance
      * @return
      */
-    static CassStatement* createBoundInsertStatement(const TaskInstanceM& taskInstance);
+    static CassStatement* createBoundInsertStatement(const SessionM& taskInstance);
 
     /**
-     * @brief Create a CassStatement to update a TaskInstanceM into the DB.
+     * @brief Create a CassStatement to update a SessionM into the DB.
      * The statement contains the values from the given taskInstance.
      * Passed taskInstance must have a valid and unique UUID.
      * @param taskInstance
      * @return
      */
-    static CassStatement* createBoundUpdateStatement(const TaskInstanceM& taskInstance);
+    static CassStatement* createBoundUpdateStatement(const SessionM& taskInstance);
 
 
 private Q_SLOTS:
@@ -189,6 +189,6 @@ private:
 
 };
 
-QML_DECLARE_TYPE(TaskInstanceM)
+QML_DECLARE_TYPE(SessionM)
 
-#endif // TASK_INSTANCE_M_H
+#endif // SESSION_M_H

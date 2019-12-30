@@ -12,7 +12,7 @@
  *
  */
 
-#include "taskinstancem.h"
+#include "sessionm.h"
 
 #include "controller/assessmentsmodelmanager.h"
 #include "model/protocol/independentvariablevaluem.h"
@@ -20,12 +20,12 @@
 /**
  * @brief TaskInstance table name
  */
-const QString TaskInstanceM::table = "ingescape.task_instance";
+const QString SessionM::table = "ingescape.task_instance";
 
 /**
  * @brief TaskInstance table column names
  */
-const QStringList TaskInstanceM::columnNames = {
+const QStringList SessionM::columnNames = {
     "id_experimentation",
     "id_subject",
     "id_task",
@@ -41,7 +41,7 @@ const QStringList TaskInstanceM::columnNames = {
 /**
  * @brief TaskInstance table primary keys IN ORDER
  */
-const QStringList TaskInstanceM::primaryKeys = {
+const QStringList SessionM::primaryKeys = {
     "id_experimentation",
     "id_subject",
     "id_task",
@@ -56,7 +56,7 @@ const QStringList TaskInstanceM::primaryKeys = {
  * @param startDateTime
  * @param parent
  */
-TaskInstanceM::TaskInstanceM(CassUuid experimentationUuid,
+SessionM::SessionM(CassUuid experimentationUuid,
                              CassUuid cassUuid,
                              QString name,
                              QString comments,
@@ -89,10 +89,10 @@ TaskInstanceM::TaskInstanceM(CassUuid experimentationUuid,
     _recordsList.setSortProperty("startTimeInTimeline");
 
     // Connect to signal "Value Changed" from the "Qml Property Map"
-    connect(_mapIndependentVariableValues, &QQmlPropertyMap::valueChanged, this, &TaskInstanceM::_onIndependentVariableValueChanged);
+    connect(_mapIndependentVariableValues, &QQmlPropertyMap::valueChanged, this, &SessionM::_onIndependentVariableValueChanged);
 
     // Connect to task change to reset the independent variables values
-    connect(this, &TaskInstanceM::taskChanged, [this](ProtocolM* task) {
+    connect(this, &SessionM::taskChanged, [this](ProtocolM* task) {
         if (task != nullptr) {
             for (IndependentVariableM* independentVariable : task->independentVariables()->toList())
             {
@@ -111,7 +111,7 @@ TaskInstanceM::TaskInstanceM(CassUuid experimentationUuid,
 /**
  * @brief Destructor
  */
-TaskInstanceM::~TaskInstanceM()
+SessionM::~SessionM()
 {
     if ((_subject != nullptr) && (_task != nullptr))
     {
@@ -144,7 +144,7 @@ TaskInstanceM::~TaskInstanceM()
  * @brief Custome _name setter that updates the DB entry with the new name
  * @param value
  */
-void TaskInstanceM::setname(QString value)
+void SessionM::setname(QString value)
 {
     if (value != _name)
     {
@@ -163,7 +163,7 @@ void TaskInstanceM::setname(QString value)
  * @brief Custome _comments setter that updates the DB entry with the new user comments
  * @param value
  */
-void TaskInstanceM::setcomments(QString value)
+void SessionM::setcomments(QString value)
 {
     if (value != _comments)
     {
@@ -183,7 +183,7 @@ void TaskInstanceM::setcomments(QString value)
  * @param indepVar
  * @param value
  */
-void TaskInstanceM::setIndependentVariableValue(IndependentVariableM* indepVar, const QString& value)
+void SessionM::setIndependentVariableValue(IndependentVariableM* indepVar, const QString& value)
 {
     if (indepVar != nullptr)
     {
@@ -200,9 +200,9 @@ void TaskInstanceM::setIndependentVariableValue(IndependentVariableM* indepVar, 
  * @param row
  * @return
  */
-TaskInstanceM* TaskInstanceM::createFromCassandraRow(const CassRow* row)
+SessionM* SessionM::createFromCassandraRow(const CassRow* row)
 {
-    TaskInstanceM* taskInstance = nullptr;
+    SessionM* taskInstance = nullptr;
 
     if (row != nullptr)
     {
@@ -218,7 +218,7 @@ TaskInstanceM* TaskInstanceM::createFromCassandraRow(const CassRow* row)
 
         QDateTime startDateTime(AssessmentsModelManager::getDateTimeFromColumnNames(row, "start_date", "start_time"));
 
-        taskInstance = new TaskInstanceM(experimentationUuid, taskInstanceUuid, sessionName, comments, subjectUuid, taskUuid, startDateTime);
+        taskInstance = new SessionM(experimentationUuid, taskInstanceUuid, sessionName, comments, subjectUuid, taskUuid, startDateTime);
     }
 
     return taskInstance;
@@ -228,66 +228,66 @@ TaskInstanceM* TaskInstanceM::createFromCassandraRow(const CassRow* row)
  * @brief Delete the given task instance from Cassandra DB
  * @param experimentation
  */
-void TaskInstanceM::deleteTaskInstanceFromCassandra(const TaskInstanceM& taskInstance)
+void SessionM::deleteTaskInstanceFromCassandra(const SessionM& session)
 {
-    if ((taskInstance.subject() != nullptr) && (taskInstance.task() != nullptr))
+    if ((session.subject() != nullptr) && (session.task() != nullptr))
     {
         // Delete independent variable values linked to this task instance from DB
-        AssessmentsModelManager::deleteEntry<IndependentVariableValueM>({ taskInstance.subject()->getExperimentationCassUuid(), taskInstance.getCassUuid() });
+        AssessmentsModelManager::deleteEntry<IndependentVariableValueM>({ session.subject()->getExperimentationCassUuid(), session.getCassUuid() });
 
         // Delete the actual task instance from DB
-        AssessmentsModelManager::deleteEntry<TaskInstanceM>({ taskInstance.subject()->getExperimentationCassUuid(), taskInstance.getSubjectCassUuid(), taskInstance.getTaskCassUuid(), taskInstance.getCassUuid() });
+        AssessmentsModelManager::deleteEntry<SessionM>({ session.subject()->getExperimentationCassUuid(), session.getSubjectCassUuid(), session.getTaskCassUuid(), session.getCassUuid() });
     }
 }
 
 /**
- * @brief Create a CassStatement to insert a TaskInstanceM into the DB.
- * The statement contains the values from the given taskInstance.
+ * @brief Create a CassStatement to insert a SessionM into the DB.
+ * The statement contains the values from the given session.
  * Passed taskInstance must have a valid and unique UUID.
  * @param taskInstance
  * @return
  */
-CassStatement* TaskInstanceM::createBoundInsertStatement(const TaskInstanceM& taskInstance)
+CassStatement* SessionM::createBoundInsertStatement(const SessionM& session)
 {
-    QString queryStr = "INSERT INTO " + TaskInstanceM::table + " (id, id_experimentation, id_subject, id_task, name, comment, start_date, start_time, end_date, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+    QString queryStr = "INSERT INTO " + SessionM::table + " (id, id_experimentation, id_subject, id_task, name, comment, start_date, start_time, end_date, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
     CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 10);
-    cass_statement_bind_uuid  (cassStatement, 0, taskInstance.getCassUuid());
-    cass_statement_bind_uuid  (cassStatement, 1, taskInstance.task()->getExperimentationCassUuid());
-    cass_statement_bind_uuid  (cassStatement, 2, taskInstance.subject()->getCassUuid());
-    cass_statement_bind_uuid  (cassStatement, 3, taskInstance.task()->getCassUuid());
-    cass_statement_bind_string(cassStatement, 4, taskInstance.name().toStdString().c_str());
+    cass_statement_bind_uuid  (cassStatement, 0, session.getCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 1, session.task()->getExperimentationCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 2, session.subject()->getCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 3, session.task()->getCassUuid());
+    cass_statement_bind_string(cassStatement, 4, session.name().toStdString().c_str());
     cass_statement_bind_string(cassStatement, 5, "");
-    cass_statement_bind_uint32(cassStatement, 6, cass_date_from_epoch(taskInstance.startDateTime().toTime_t()));
-    cass_statement_bind_int64 (cassStatement, 7, cass_time_from_epoch(taskInstance.startDateTime().toTime_t()));
-    cass_statement_bind_uint32(cassStatement, 8, cass_date_from_epoch(taskInstance.endDateTime().toTime_t()));
-    cass_statement_bind_int64 (cassStatement, 9, cass_time_from_epoch(taskInstance.endDateTime().toTime_t()));
+    cass_statement_bind_uint32(cassStatement, 6, cass_date_from_epoch(session.startDateTime().toTime_t()));
+    cass_statement_bind_int64 (cassStatement, 7, cass_time_from_epoch(session.startDateTime().toTime_t()));
+    cass_statement_bind_uint32(cassStatement, 8, cass_date_from_epoch(session.endDateTime().toTime_t()));
+    cass_statement_bind_int64 (cassStatement, 9, cass_time_from_epoch(session.endDateTime().toTime_t()));
     return cassStatement;
 }
 
 /**
- * @brief Create a CassStatement to update a TaskInstanceM into the DB.
- * The statement contains the values from the given taskInstance.
+ * @brief Create a CassStatement to update a SessionM into the DB.
+ * The statement contains the values from the given session.
  * Passed taskInstance must have a valid and unique UUID.
  * @param taskInstance
  * @return
  */
-CassStatement* TaskInstanceM::createBoundUpdateStatement(const TaskInstanceM& taskInstance)
+CassStatement* SessionM::createBoundUpdateStatement(const SessionM& session)
 {
 
-    QString queryStr("UPDATE " + TaskInstanceM::table
+    QString queryStr("UPDATE " + SessionM::table
                      + " SET name = ?, comment = ?, start_date = ?, start_time = ?, end_date = ?, end_time = ?"
                      + " WHERE id_experimentation = ? AND id_subject = ? AND id_task = ? AND id = ?;");
     CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 10);
-    cass_statement_bind_string(cassStatement, 0, taskInstance.name().toStdString().c_str());
-    cass_statement_bind_string(cassStatement, 1, taskInstance.comments().toStdString().c_str());
-    cass_statement_bind_uint32(cassStatement, 2, cass_date_from_epoch(taskInstance.startDateTime().toTime_t()));
-    cass_statement_bind_int64 (cassStatement, 3, cass_time_from_epoch(taskInstance.startDateTime().toTime_t()));
-    cass_statement_bind_uint32(cassStatement, 4, cass_date_from_epoch(taskInstance.endDateTime().toTime_t()));
-    cass_statement_bind_int64 (cassStatement, 5, cass_time_from_epoch(taskInstance.endDateTime().toTime_t()));
-    cass_statement_bind_uuid  (cassStatement, 6, taskInstance.subject()->getExperimentationCassUuid());
-    cass_statement_bind_uuid  (cassStatement, 7, taskInstance.subject()->getCassUuid());
-    cass_statement_bind_uuid  (cassStatement, 8, taskInstance.task()->getCassUuid());
-    cass_statement_bind_uuid  (cassStatement, 9, taskInstance.getCassUuid());
+    cass_statement_bind_string(cassStatement, 0, session.name().toStdString().c_str());
+    cass_statement_bind_string(cassStatement, 1, session.comments().toStdString().c_str());
+    cass_statement_bind_uint32(cassStatement, 2, cass_date_from_epoch(session.startDateTime().toTime_t()));
+    cass_statement_bind_int64 (cassStatement, 3, cass_time_from_epoch(session.startDateTime().toTime_t()));
+    cass_statement_bind_uint32(cassStatement, 4, cass_date_from_epoch(session.endDateTime().toTime_t()));
+    cass_statement_bind_int64 (cassStatement, 5, cass_time_from_epoch(session.endDateTime().toTime_t()));
+    cass_statement_bind_uuid  (cassStatement, 6, session.subject()->getExperimentationCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 7, session.subject()->getCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 8, session.task()->getCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 9, session.getCassUuid());
     return cassStatement;
 }
 
@@ -297,7 +297,7 @@ CassStatement* TaskInstanceM::createBoundUpdateStatement(const TaskInstanceM& ta
  * @param key
  * @param value
  */
-void TaskInstanceM::_onIndependentVariableValueChanged(const QString& key, const QVariant& value)
+void SessionM::_onIndependentVariableValueChanged(const QString& key, const QVariant& value)
 {
     IndependentVariableM* indepVar = _mapIndependentVarByName.value(key, nullptr);
     if (indepVar != nullptr)
@@ -314,7 +314,7 @@ void TaskInstanceM::_onIndependentVariableValueChanged(const QString& key, const
  * @brief Setter for property "End Date Time"
  * @param value
  */
-void TaskInstanceM::setendDateTime(QDateTime value)
+void SessionM::setendDateTime(QDateTime value)
 {
     if (_endDateTime != value)
     {
@@ -335,7 +335,7 @@ void TaskInstanceM::setendDateTime(QDateTime value)
 /**
  * @brief For debug purpose: Print the value of all independent variables
  */
-void TaskInstanceM::_printIndependentVariableValues()
+void SessionM::_printIndependentVariableValues()
 {
     if ((_task != nullptr) && (_mapIndependentVariableValues != nullptr))
     {

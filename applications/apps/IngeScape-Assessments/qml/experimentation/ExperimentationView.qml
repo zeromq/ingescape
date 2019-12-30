@@ -1207,7 +1207,7 @@ Item {
                         Repeater {
                             model: rootItem.controller && rootItem.experimentation
                                    ? rootItem._isSelectingSessionsToExport ? rootItem.controller.sessionFilteredList
-                                                                           : rootItem.experimentation.allTaskInstances
+                                                                           : rootItem.experimentation.allSessions
                                    : null
 
 

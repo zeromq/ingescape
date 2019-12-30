@@ -146,7 +146,7 @@ void ProtocolsController::deleteTask(ProtocolM* task)
             }
         }
 
-        AssessmentsModelManager::deleteEntry<TaskInstanceM>({ { _currentExperimentation->getCassUuid() }, subjectUuidList, { task->getCassUuid() } });
+        AssessmentsModelManager::deleteEntry<SessionM>({ { _currentExperimentation->getCassUuid() }, subjectUuidList, { task->getCassUuid() } });
 
         // Remove from DB
         ProtocolM::deleteTaskFromCassandraRow(*task);
@@ -306,11 +306,11 @@ void ProtocolsController::deleteIndependentVariable(IndependentVariableM* indepe
     {
         // Delete independent variable values from Cassandra DB
         QList<CassUuid> taskInstanceUuidList;
-        for (TaskInstanceM* taskInstance : _currentExperimentation->allTaskInstances()->toList())
+        for (SessionM* session : _currentExperimentation->allSessions()->toList())
         {
-            if (taskInstance != nullptr)
+            if (session != nullptr)
             {
-                taskInstanceUuidList.append(taskInstance->getCassUuid());
+                taskInstanceUuidList.append(session->getCassUuid());
             }
         }
 

@@ -64,7 +64,7 @@ ExperimentationM::ExperimentationM(CassUuid cassUuid,
     qInfo() << "New Model of Experimentation" << _name << "created" << _creationDate.toString("dd/MM/yy hh:mm:ss") << "(" << AssessmentsModelManager::cassUuidToQString(_cassUuid) << ")";
 
     // Task instances are sorted on their start date/time (chronological order)
-    _allTaskInstances.setSortProperty("startDateTime");
+    _allSessions.setSortProperty("startDateTime");
 }
 
 
@@ -85,7 +85,7 @@ ExperimentationM::~ExperimentationM()
 void ExperimentationM::clearData()
 {
     // Delete all task instances of our experimentation
-    _allTaskInstances.deleteAllItems();
+    _allSessions.deleteAllItems();
 
     // Delete all characteristics of our experimentation
     _hashFromUIDtoCharacteristic.clear();
@@ -222,12 +222,12 @@ void ExperimentationM::removeTask(ProtocolM* task)
  * @brief Add a task instance to our experimentation
  * @param taskInstance
  */
-void ExperimentationM::addTaskInstance(TaskInstanceM* taskInstance)
+void ExperimentationM::addTaskInstance(SessionM* taskInstance)
 {
     if (taskInstance != nullptr)
     {
         // Add to the list
-        _allTaskInstances.append(taskInstance);
+        _allSessions.append(taskInstance);
     }
 }
 
@@ -236,12 +236,12 @@ void ExperimentationM::addTaskInstance(TaskInstanceM* taskInstance)
  * @brief Remove a task instance from our experimentation
  * @param taskInstance
  */
-void ExperimentationM::removeTaskInstance(TaskInstanceM* taskInstance)
+void ExperimentationM::removeTaskInstance(SessionM* taskInstance)
 {
     if (taskInstance != nullptr)
     {
         // Remove from the list
-        _allTaskInstances.remove(taskInstance);
+        _allSessions.remove(taskInstance);
     }
 }
 
@@ -252,12 +252,12 @@ void ExperimentationM::removeTaskInstance(TaskInstanceM* taskInstance)
  */
 void ExperimentationM::removeTaskInstanceRelatedToSubject(SubjectM* subject)
 {
-    const QList<TaskInstanceM*> taskInstanceList = _allTaskInstances.toList();
+    const QList<SessionM*> taskInstanceList = _allSessions.toList();
     auto taskInstanceIt = taskInstanceList.begin();
     while (taskInstanceIt != taskInstanceList.end())
     {
         // Looking for a task instance related to the given subject
-        taskInstanceIt = std::find_if(taskInstanceIt, taskInstanceList.end(), [subject](TaskInstanceM* taskInstance){
+        taskInstanceIt = std::find_if(taskInstanceIt, taskInstanceList.end(), [subject](SessionM* taskInstance){
                 return (taskInstance != nullptr) && (taskInstance->subject() == subject);
         });
 
@@ -277,12 +277,12 @@ void ExperimentationM::removeTaskInstanceRelatedToSubject(SubjectM* subject)
  */
 void ExperimentationM::removeTaskInstanceRelatedToTask(ProtocolM* task)
 {
-    const QList<TaskInstanceM*> taskInstanceList = _allTaskInstances.toList();
+    const QList<SessionM*> taskInstanceList = _allSessions.toList();
     auto taskInstanceIt = taskInstanceList.begin();
     while (taskInstanceIt != taskInstanceList.end())
     {
         // Looking for a task instance related to the given subject
-        taskInstanceIt = std::find_if(taskInstanceIt, taskInstanceList.end(), [task](TaskInstanceM* taskInstance){
+        taskInstanceIt = std::find_if(taskInstanceIt, taskInstanceList.end(), [task](SessionM* taskInstance){
                 return (taskInstance != nullptr) && (taskInstance->task() == task);
         });
 
@@ -335,10 +335,10 @@ ProtocolM* ExperimentationM::getTaskFromUID(const CassUuid& cassUuid)
  * @param cassUuid
  * @return
  */
-TaskInstanceM* ExperimentationM::getTaskInstanceFromUID(const CassUuid& cassUuid)
+SessionM* ExperimentationM::getTaskInstanceFromUID(const CassUuid& cassUuid)
 {
-    const QList<TaskInstanceM*> taskInstanceList = _allTaskInstances.toList();
-    auto taskInstanceIt = std::find_if(taskInstanceList.begin(), taskInstanceList.end(), [cassUuid](TaskInstanceM* taskInstance) { return (taskInstance != nullptr) && (taskInstance->getCassUuid() == cassUuid); });
+    const QList<SessionM*> taskInstanceList = _allSessions.toList();
+    auto taskInstanceIt = std::find_if(taskInstanceList.begin(), taskInstanceList.end(), [cassUuid](SessionM* taskInstance) { return (taskInstance != nullptr) && (taskInstance->getCassUuid() == cassUuid); });
     return (taskInstanceIt != taskInstanceList.end()) ? *taskInstanceIt : nullptr;
 }
 
@@ -378,7 +378,7 @@ void ExperimentationM::deleteExperimentationFromCassandra(const ExperimentationM
     _deleteAllProtocolsForExperimentation(experimentation);
     _deleteAllSubjectsForExperimentation(experimentation);
     _deleteAllCharacteristicsForExperimentation(experimentation);
-    _deleteAllTaskInstancesForExperimentation(experimentation);
+    _deleteAllSessionsForExperimentation(experimentation);
 
     // Delete actual experimentation
     AssessmentsModelManager::deleteEntry<ExperimentationM>({ experimentation.getCassUuid() });
@@ -468,14 +468,14 @@ void ExperimentationM::_deleteAllCharacteristicsForExperimentation(const Experim
 }
 
 /**
- * @brief Delete all task instances with the given experimentation
+ * @brief Delete all sessions with the given experimentation
  * @param experimentation
  */
-void ExperimentationM::_deleteAllTaskInstancesForExperimentation(const ExperimentationM& experimentation)
+void ExperimentationM::_deleteAllSessionsForExperimentation(const ExperimentationM& experimentation)
 {
     // Independent variable values already deleted with task deletion
 
     // Delete all task_instance
-    AssessmentsModelManager::deleteEntry<TaskInstanceM>({ experimentation.getCassUuid() });
+    AssessmentsModelManager::deleteEntry<SessionM>({ experimentation.getCassUuid() });
 }
 

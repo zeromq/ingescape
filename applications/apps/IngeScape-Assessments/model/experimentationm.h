@@ -21,7 +21,7 @@
 #include <model/subject/characteristicm.h>
 #include <model/subject/subjectm.h>
 #include <model/protocol/protocolm.h>
-#include <model/taskinstancem.h>
+#include <model/sessionm.h>
 
 #include "cassandra.h"
 
@@ -51,8 +51,8 @@ class ExperimentationM : public QObject
     // List of all protocols of our experimentation
     I2_QOBJECT_LISTMODEL(ProtocolM, allProtocols)
 
-    // List of all task instances of our experimentation
-    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(TaskInstanceM, allTaskInstances)
+    // List of all sessions of our experimentation
+    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(SessionM, allSessions)
 
 
 public:
@@ -151,14 +151,14 @@ public:
      * @brief Add a task instance to our experimentation
      * @param taskInstance
      */
-    void addTaskInstance(TaskInstanceM* taskInstance);
+    void addTaskInstance(SessionM* taskInstance);
 
 
     /**
      * @brief Remove a task instance from our experimentation
      * @param taskInstance
      */
-    void removeTaskInstance(TaskInstanceM* taskInstance);
+    void removeTaskInstance(SessionM* taskInstance);
 
 
     /**
@@ -203,7 +203,7 @@ public:
      * @param cassUuid
      * @return
      */
-    TaskInstanceM* getTaskInstanceFromUID(const CassUuid& cassUuid);
+    SessionM* getTaskInstanceFromUID(const CassUuid& cassUuid);
 
 
     /**
@@ -256,10 +256,10 @@ private: // Methods
      */
     static void _deleteAllCharacteristicsForExperimentation(const ExperimentationM& experimentation);
     /**
-     * @brief Delete all task instances with the given experimentation
+     * @brief Delete all sessions with the given experimentation
      * @param experimentation
      */
-    static void _deleteAllTaskInstancesForExperimentation(const ExperimentationM& experimentation);
+    static void _deleteAllSessionsForExperimentation(const ExperimentationM& experimentation);
 
 
 private:

@@ -155,7 +155,7 @@ void registerCustomQmlTypes()
     qmlRegisterUncreatableType<DependentVariableM>("INGESCAPE", 1, 0, "DependentVariableM", "Internal class");
     qmlRegisterUncreatableType<ExperimentationM>("INGESCAPE", 1, 0, "ExperimentationM", "Internal class");
     qmlRegisterUncreatableType<IndependentVariableM>("INGESCAPE", 1, 0, "IndependentVariableM", "Internal class");
-    qmlRegisterUncreatableType<TaskInstanceM>("INGESCAPE", 1, 0, "TaskInstanceM", "Internal class");
+    qmlRegisterUncreatableType<SessionM>("INGESCAPE", 1, 0, "SessionM", "Internal class");
     qmlRegisterUncreatableType<SubjectM>("INGESCAPE", 1, 0, "SubjectM", "Internal class");
     qmlRegisterUncreatableType<ProtocolM>("INGESCAPE", 1, 0, "ProtocolM", "Internal class");
     qmlRegisterUncreatableType<QQmlPropertyMap>("INGESCAPE", 1, 0, "QQmlPropertyMap", "Internal class");

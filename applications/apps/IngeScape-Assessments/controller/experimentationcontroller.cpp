@@ -137,7 +137,7 @@ void ExperimentationController::createNewSessionForSubjectAndProtocol(SubjectM* 
         qInfo() << "Create new session" << sessionName << "for subject" << subject->displayedId() << "and protocol" << protocol->name();
 
         // Create a new (experimentation) task instance
-        TaskInstanceM* session = _insertTaskInstanceIntoDB(sessionName, subject, protocol);
+        SessionM* session = _insertTaskInstanceIntoDB(sessionName, subject, protocol);
 
         if (session != nullptr)
         {
@@ -155,7 +155,7 @@ void ExperimentationController::createNewSessionForSubjectAndProtocol(SubjectM* 
  * @brief Open a session
  * @param session
  */
-void ExperimentationController::openSession(TaskInstanceM* session)
+void ExperimentationController::openSession(SessionM* session)
 {
     if ((session != nullptr) && (_currentExperimentation != nullptr))
     {
@@ -173,8 +173,8 @@ void ExperimentationController::openSession(TaskInstanceM* session)
         // If records list is empty when we load it from DB : session has never been recorded
         session->setisRecorded(!session->recordsList()->isEmpty());
 
-        // Update the current task instance
-        _taskInstanceC->setcurrentTaskInstance(session);
+        // Update the current session
+        _taskInstanceC->setcurrentSession(session);
     }
 }
 
@@ -182,14 +182,14 @@ void ExperimentationController::openSession(TaskInstanceM* session)
  * @brief Delete a task instance
  * @param record
  */
-void ExperimentationController::deleteTaskInstance(TaskInstanceM* taskInstance)
+void ExperimentationController::deleteTaskInstance(SessionM* taskInstance)
 {
     if ((taskInstance != nullptr) && (_currentExperimentation != nullptr))
     {
         qInfo() << "Delete the record" << taskInstance->name() << "of the experimentation" << _currentExperimentation->name();
 
         // Delete task instance from DB
-        TaskInstanceM::deleteTaskInstanceFromCassandra(*taskInstance);
+        SessionM::deleteTaskInstanceFromCassandra(*taskInstance);
 
         // Remove the task instance from the current experimentation
         _currentExperimentation->removeTaskInstance(taskInstance);
@@ -211,7 +211,7 @@ void ExperimentationController::exportSelectedSessions()
 
         QStringList sessionIds;
 
-        for (TaskInstanceM *session : _selectedSessions)
+        for (SessionM *session : _selectedSessions)
         {
             if (session != nullptr)
             {
@@ -334,7 +334,7 @@ void ExperimentationController::onRecordStoppedReceived()
  */
 void ExperimentationController::onRecordAddedReceived(QString message){
 
-    if (_taskInstanceC != nullptr && _taskInstanceC->currentTaskInstance() != nullptr){
+    if (_taskInstanceC != nullptr && _taskInstanceC->currentSession() != nullptr){
         if (!message.isEmpty())
         {
             QByteArray byteArrayOfJson = message.toUtf8();
@@ -370,9 +370,9 @@ void ExperimentationController::onRecordAddedReceived(QString message){
                                                               QDateTime::fromSecsSinceEpoch(static_cast<int>(jsonEndDateTime.toDouble())),
                                                               jsonOffsetTimeline.toInt());
 
-                                _taskInstanceC->currentTaskInstance()->recordsList()->append(record);
+                                _taskInstanceC->currentSession()->recordsList()->append(record);
 
-                                qInfo() << "Number of record " << _taskInstanceC->currentTaskInstance()->recordsList()->count();
+                                qInfo() << "Number of record " << _taskInstanceC->currentSession()->recordsList()->count();
                             }
                         }
                     }
@@ -389,16 +389,16 @@ void ExperimentationController::onRecordAddedReceived(QString message){
  */
 void ExperimentationController::onRecordDeletedReceived(QString message)
 {
-    if ((!message.isEmpty()) && (_currentExperimentation != nullptr) && (!_currentExperimentation->allTaskInstances()->isEmpty()))
+    if ((!message.isEmpty()) && (_currentExperimentation != nullptr) && (!_currentExperimentation->allSessions()->isEmpty()))
     {
-        for (TaskInstanceM* taskInstance : _currentExperimentation->allTaskInstances()->toList())
+        for (SessionM* taskInstance : _currentExperimentation->allSessions()->toList())
         {
             for (RecordAssessmentM* record : taskInstance->recordsList()->toList())
             {
                 if (record->uid() == message)
                 {
                     // Message is an unique ID, we can return from our function after remove record
-                    _taskInstanceC->currentTaskInstance()->recordsList()->remove(record);
+                    _taskInstanceC->currentSession()->recordsList()->remove(record);
                     return;
                 }
             }
@@ -434,7 +434,7 @@ void ExperimentationController::_onCurrentExperimentationChanged(Experimentation
 
         _retrieveIndependentVariableValuesForTaskInstancesInExperimentation(currentExperimentation);
 
-        _sessionFilteredList.setSourceModel(_currentExperimentation->allTaskInstances());
+        _sessionFilteredList.setSourceModel(_currentExperimentation->allSessions());
     }
 }
 
@@ -541,14 +541,14 @@ void ExperimentationController::_onTimeout_EncounterExistingRecords() {
  * @param task
  * @return
  */
-TaskInstanceM* ExperimentationController::_insertTaskInstanceIntoDB(const QString& taskInstanceName, SubjectM* subject, ProtocolM* task)
+SessionM* ExperimentationController::_insertTaskInstanceIntoDB(const QString& taskInstanceName, SubjectM* subject, ProtocolM* task)
 {
-    TaskInstanceM* taskInstance = nullptr;
+    SessionM* taskInstance = nullptr;
 
     if ((_currentExperimentation != nullptr) && (subject != nullptr) && (task != nullptr))
     {
         // Create the new task instance
-        taskInstance = new TaskInstanceM(_currentExperimentation->getCassUuid(), AssessmentsModelManager::genCassUuid(), taskInstanceName, "", subject->getCassUuid(), task->getCassUuid(), QDateTime::currentDateTime());
+        taskInstance = new SessionM(_currentExperimentation->getCassUuid(), AssessmentsModelManager::genCassUuid(), taskInstanceName, "", subject->getCassUuid(), task->getCassUuid(), QDateTime::currentDateTime());
         if (taskInstance != nullptr)
         {
             taskInstance->settask(task);
@@ -671,8 +671,8 @@ void ExperimentationController::_retrieveTaskInstancesForExperimentation(Experim
 {
     if (experimentation != nullptr)
     {
-        QList<TaskInstanceM*> taskInstanceList = AssessmentsModelManager::select<TaskInstanceM>({ experimentation->getCassUuid() });
-        for (TaskInstanceM* taskInstance : taskInstanceList) {
+        QList<SessionM*> taskInstanceList = AssessmentsModelManager::select<SessionM>({ experimentation->getCassUuid() });
+        for (SessionM* taskInstance : taskInstanceList) {
             experimentation->addTaskInstance(taskInstance);
 
             // Set pointers to Task & Subject
@@ -740,7 +740,7 @@ void ExperimentationController::_retrieveIndependentVariableValuesForTaskInstanc
         {
             if (indepVarValue != nullptr)
             {
-                TaskInstanceM* taskInstance = experimentation->getTaskInstanceFromUID(indepVarValue->taskInstanceUuid);
+                SessionM* taskInstance = experimentation->getTaskInstanceFromUID(indepVarValue->taskInstanceUuid);
                 IndependentVariableM* indepVar = taskInstance->task()->getIndependentVariableFromUuid(indepVarValue->independentVariableUuid);
                 if ((taskInstance != nullptr) && (indepVar != nullptr))
                 {
@@ -758,7 +758,7 @@ bool ExperimentationController::isThereOneRecordAfterStartTime() {
     int startTimeRecordInTimeline = _taskInstanceC->scenarioC()->currentTime().msecsSinceStartOfDay();
 
     // Test if there is an existing record after our start time
-    for (RecordAssessmentM* record : _taskInstanceC->currentTaskInstance()->recordsList()->toList()) {
+    for (RecordAssessmentM* record : _taskInstanceC->currentSession()->recordsList()->toList()) {
         if (record->endTimeInTimeline() >= startTimeRecordInTimeline) {
             return true;
         }
@@ -786,9 +786,9 @@ void ExperimentationController::startToRecord()
         setnextRecordToHandle(nullptr);
 
         // Update records list to handle and next record to handle
-        if ((_taskInstanceC != nullptr) && (_taskInstanceC->currentTaskInstance()) && (!_taskInstanceC->currentTaskInstance()->recordsList()->isEmpty()))
+        if ((_taskInstanceC != nullptr) && (_taskInstanceC->currentSession()) && (!_taskInstanceC->currentSession()->recordsList()->isEmpty()))
         {
-            for (RecordAssessmentM* record : _taskInstanceC->currentTaskInstance()->recordsList()->toList())
+            for (RecordAssessmentM* record : _taskInstanceC->currentSession()->recordsList()->toList())
             {
                 if ((record != nullptr) && (record->endTimeInTimeline() >= deltaTimeFromTimeLineStart))
                 {
@@ -831,10 +831,10 @@ void ExperimentationController::startToRecord()
         // Start our record
         //
 
-        TaskInstanceM* currentSession = _taskInstanceC->currentTaskInstance();
+        SessionM* currentSession = _taskInstanceC->currentSession();
         if ((currentSession != nullptr) && (currentSession->task() != nullptr))
         {
-            ProtocolM* task = _taskInstanceC->currentTaskInstance()->task();
+            ProtocolM* task = _taskInstanceC->currentSession()->task();
 
             //QString currentPlatformName = task->platformFileName();
 

@@ -37,7 +37,7 @@ Item {
 
     property ExperimentationController experimentationController: null;
 
-    property TaskInstanceM taskInstance: taskInstanceController ? taskInstanceController.currentTaskInstance : null;
+    property SessionM session: taskInstanceController ? taskInstanceController.currentSession : null;
 
     property bool isEditingName: false
 
@@ -266,7 +266,7 @@ Item {
         }
 
         MouseArea {
-            id: taskInstanceMouseArea
+            id: sessionMouseArea
             anchors {
                 fill: taskInstanceNameEditBackground
             }
@@ -307,7 +307,7 @@ Item {
 
             color: IngeScapeTheme.veryLightGreyColor
 
-            opacity: (taskInstanceMouseArea.containsMouse || editButton.containsMouse || rootItem.isEditingName) ? 1 : 0
+            opacity: (sessionMouseArea.containsMouse || editButton.containsMouse || rootItem.isEditingName) ? 1 : 0
             enabled: opacity > 0
 
             Button {

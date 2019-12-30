@@ -222,7 +222,7 @@ void SubjectsController::deleteSubject(SubjectM* subject)
             }
         }
 
-        AssessmentsModelManager::deleteEntry<TaskInstanceM>({ { _currentExperimentation->getCassUuid() }, { subject->getCassUuid() }, protocolUuidList });
+        AssessmentsModelManager::deleteEntry<SessionM>({ { _currentExperimentation->getCassUuid() }, { subject->getCassUuid() }, protocolUuidList });
 
 
         // Remove subject from DB

@@ -22,7 +22,7 @@
  * @brief Mostly empty class representing an independent variable value for a particular task instance.
  * This class is a "fancy-struct" with all its attributes publicly accessible.
  * Its purpose is to handle more easily the DB entries and should no be kept in collections by controllers.
- * See TaskInstanceM for more details on how independent variable values values are stored for QML to use them.
+ * See SessionM for more details on how independent variable values values are stored for QML to use them.
  */
 class IndependentVariableValueM
 {

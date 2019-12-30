@@ -47,7 +47,7 @@ void AreSubjectAndProtocolInSessionFilter::forceUpdate()
 bool AreSubjectAndProtocolInSessionFilter::filterAccepts(QObject* item, int index) const
 {
     Q_UNUSED(index)
-    TaskInstanceM* taskInstanceValue = qobject_cast<TaskInstanceM*>(item);
+    SessionM* taskInstanceValue = qobject_cast<SessionM*>(item);
 
     if (taskInstanceValue != nullptr)
     {

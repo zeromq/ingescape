@@ -22,7 +22,7 @@
 #include <controller/ingescapenetworkcontroller.h>
 #include <controller/abstracttimeactionslinescenarioviewcontroller.h>
 #include <controller/abstractscenariocontroller.h>
-#include <model/taskinstancem.h>
+#include <model/sessionm.h>
 #include <sortFilter/areagentsinplatformfilter.h>
 
 
@@ -39,8 +39,8 @@ class TaskInstanceController : public QObject
     // Controller for scenario management
     I2_QML_PROPERTY_READONLY(AbstractScenarioController*, scenarioC)
 
-    // The (experimentation) task instance currently selected
-    I2_QML_PROPERTY_CUSTOM_SETTER(TaskInstanceM*, currentTaskInstance)
+    // The session currently selected
+    I2_QML_PROPERTY_CUSTOM_SETTER(SessionM*, currentSession)
 
     // List off all agents present in the current platform
     Q_PROPERTY(AreAgentsInPlatformFilter* agentsGroupedByNameInCurrentPlatform READ agentsGroupedByNameInCurrentPlatform CONSTANT)
@@ -77,11 +77,11 @@ public:
 private Q_SLOTS:
 
     /**
-     * @brief Slot called when the current task instance changed
-     * @param previousTaskInstance
-     * @param currentTaskInstance
+     * @brief Slot called when the current session changed
+     * @param previousSession
+     * @param currentSession
      */
-    void _oncurrentTaskInstanceChanged(TaskInstanceM* previousTaskInstance, TaskInstanceM* currentTaskInstance);
+    void _oncurrentSessionChanged(SessionM* previousSession, SessionM* currentSession);
 
 
     /**

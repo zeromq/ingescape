@@ -23,7 +23,7 @@
 TaskInstanceController::TaskInstanceController(QObject *parent) : QObject(parent),
     _timeLineC(nullptr),
     _scenarioC(nullptr),
-    _currentTaskInstance(nullptr)
+    _currentSession(nullptr)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -53,10 +53,10 @@ TaskInstanceController::~TaskInstanceController()
     qInfo() << "Delete Record Controller";
 
 
-    // Reset the model of the current task instance
-    if (_currentTaskInstance != nullptr)
+    // Reset the model of the current session
+    if (_currentSession != nullptr)
     {
-        setcurrentTaskInstance(nullptr);
+        setcurrentSession(nullptr);
     }
 
 
@@ -86,21 +86,21 @@ TaskInstanceController::~TaskInstanceController()
 
 
 /**
- * @brief Setter for property "Current Task Instance"
+ * @brief Setter for property "Current Session"
  * @param value
  */
-void TaskInstanceController::setcurrentTaskInstance(TaskInstanceM *value)
+void TaskInstanceController::setcurrentSession(SessionM *value)
 {
-    if (_currentTaskInstance != value)
+    if (_currentSession != value)
     {
-        TaskInstanceM *previousTaskInstance = _currentTaskInstance;
+        SessionM *previousSession = _currentSession;
 
-        _currentTaskInstance = value;
+        _currentSession = value;
 
         // Manage changes
-        _oncurrentTaskInstanceChanged(previousTaskInstance, _currentTaskInstance);
+        _oncurrentSessionChanged(previousSession, _currentSession);
 
-        Q_EMIT currentTaskInstanceChanged(value);
+        Q_EMIT currentSessionChanged(value);
     }
 }
 
@@ -119,11 +119,11 @@ void TaskInstanceController::addNewAttachements(const QList<QUrl>& urlList)
 
 
 /**
- * @brief Slot called when the current task instance changed
- * @param previousTaskInstance
- * @param currentTaskInstance
+ * @brief Slot called when the current session changed
+ * @param previousSession
+ * @param currentSession
  */
-void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previousTaskInstance, TaskInstanceM* currentTaskInstance)
+void TaskInstanceController::_oncurrentSessionChanged(SessionM* previousSession, SessionM* currentSession)
 {
     IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
     if ((ingeScapeModelManager != nullptr) && (_scenarioC != nullptr))
@@ -131,11 +131,11 @@ void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previo
         //
         // Clean the previous session
         //
-        if (previousTaskInstance != nullptr)
+        if (previousSession != nullptr)
         {
-            if (!previousTaskInstance->isRecorded() && !previousTaskInstance->recordsList()->isEmpty())
+            if (!previousSession->isRecorded() && !previousSession->recordsList()->isEmpty())
             {
-                previousTaskInstance->setisRecorded(true);
+                previousSession->setisRecorded(true);
             }
 
             // Clear the filter
@@ -170,9 +170,9 @@ void TaskInstanceController::_oncurrentTaskInstanceChanged(TaskInstanceM* previo
         //
         // Manage the new (current) session
         //
-        if ((currentTaskInstance != nullptr) && (currentTaskInstance->task() != nullptr))
+        if ((currentSession != nullptr) && (currentSession->task() != nullptr))
         {
-            ProtocolM* protocol = currentTaskInstance->task();
+            ProtocolM* protocol = currentSession->task();
 
             if (protocol->platformFileUrl().isValid())
             {
@@ -263,13 +263,13 @@ void TaskInstanceController::_onAgentModelONhasBeenAdded(AgentM* model)
 {
     // Model of Agent ON
     if ((model != nullptr) && model->isON() && !model->name().isEmpty() && !model->peerId().isEmpty()
-            && (_currentTaskInstance != nullptr) && (_currentTaskInstance->task() != nullptr)
+            && (_currentSession != nullptr) && (_currentSession->task() != nullptr)
             && (IngeScapeModelManager::instance() != nullptr) && (IngeScapeNetworkController::instance() != nullptr))
     {
         QString agentName = model->name();
 
         // The agent is in the current protocol
-        if (_currentTaskInstance->task()->isAgentNameInProtocol(agentName))
+        if (_currentSession->task()->isAgentNameInProtocol(agentName))
         {
             qDebug() << agentName << "is ON and in the protocol --> LOAD the MAPPING !";
 

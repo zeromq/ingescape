@@ -37,7 +37,7 @@ Rectangle {
     //
     //--------------------------------------------------------
 
-    property TaskInstanceM modelM: null
+    property SessionM modelM: null
 
     // Flag indicating if we are currently selecting the sessions to export
     property bool isSelectingSessionsToExport: false
