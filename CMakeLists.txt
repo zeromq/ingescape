@@ -1,7 +1,5 @@
 # CMake build script for Ingescape
 
-# TODO Add NSIS management (CPACK) TODO Add clean target (see czmq)
-
 # ##############################################################################
 # Project setup
 # ##############################################################################
@@ -339,7 +337,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
   set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "The ${PROJECT_NAME} core library")
   set(CPACK_PACKAGE_DESCRIPTION "The ${PROJECT_NAME} core library")
   set(CPACK_PACKAGE_HOMEPAGE_URL "https://ingescape.com")
-  set(CPACK_PACKAGE_VENDOR "Ingenuity i/o")
+  set(CPACK_PACKAGE_VENDOR "ingenuity.io")
   set(CPACK_PACKAGE_CONTACT "contact@ingescape.com")
   set(CPACK_PACKAGE_VERSION ${INGESCAPE_VERSION})
   set(CPACK_PACKAGE_VERSION_MAJOR "${INGESCAPE_VERSION_MAJOR}")
@@ -405,8 +403,10 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
     # Without component productbuild will not package any files
     set(CPACK_COMPONENTS_ALL library)
     set(CPACK_PACKAGING_INSTALL_PREFIX "/usr/local")
+    set(CPACK_SYSTEM_NAME "macos")
     
     set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_SOURCE_DIR}/builds/xcode/WELCOME.txt")
+    set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/builds/xcode/README.txt")
 
     # Without extention productbuild will crash So we just copy License file in
     # build folder with an extension
@@ -418,10 +418,9 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
     set(CPACK_POSTFLIGHT_LIBRARY_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/builds/xcode/postflight.sh")
 
     set(CPACK_GENERATOR "productbuild")
-    install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS
-                                     IS_EDITOR)
-    install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS
-                                     IS_EDITOR)
+    set(IS_EDITOR FALSE)
+    install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS IS_EDITOR)
+    install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS IS_EDITOR)
     install_ingescape_dependencies(CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS IS_EDITOR)
     install_ingescape_dependencies(ZYRE_LIBRARIES ZYRE_INCLUDE_DIRS IS_EDITOR)
 
