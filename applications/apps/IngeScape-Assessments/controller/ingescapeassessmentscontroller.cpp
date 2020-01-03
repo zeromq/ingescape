@@ -362,7 +362,12 @@ QObject* IngeScapeAssessmentsController::qmlSingleton(QQmlEngine* engine, QJSEng
  */
 void IngeScapeAssessmentsController::processBeforeClosing()
 {
-    // FXME TODO...
+    // If user is recording, stop it
+    if (_experimentationC->isRecording()) {
+        _experimentationC->stopToRecord();
+    }
+
+    // FIXME TODO THEN ...
 }
 
 
