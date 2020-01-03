@@ -334,9 +334,12 @@ endif()
 # ##############################################################################
 # Package installer for release build only
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
+  #https://cmake.org/cmake/help/v3.16/module/CPack.html#
   set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
-  set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_NAME} library")
-  set(CPACK_PACKAGE_VENDOR "Ingescape")
+  set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "The ${PROJECT_NAME} core library")
+  set(CPACK_PACKAGE_DESCRIPTION "The ${PROJECT_NAME} core library")
+  set(CPACK_PACKAGE_HOMEPAGE_URL "https://ingescape.com")
+  set(CPACK_PACKAGE_VENDOR "Ingenuity i/o")
   set(CPACK_PACKAGE_CONTACT "contact@ingescape.com")
   set(CPACK_PACKAGE_VERSION ${INGESCAPE_VERSION})
   set(CPACK_PACKAGE_VERSION_MAJOR "${INGESCAPE_VERSION_MAJOR}")
@@ -344,7 +347,8 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
   set(CPACK_PACKAGE_VERSION_PATCH "${INGESCAPE_VERSION_PATCH}")
   set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}")
   set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
-
+  set(CPACK_STRIP_FILES TRUE)
+  
   # Installers for 32- vs. 64-bit CMake: - Root install directory (displayed to
   # end user at installer-run time) - "NSIS package/display name" (text used in
   # the installer GUI) - Registry key used to store info about the installation
@@ -362,7 +366,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
 
   # NSIS configuration for Windows see https://cmake.org/cmake/help/v3.14/cpack_
   # gen/nsis.html#cpack_gen:CPack%20NSIS%20Generator
-  set(CPACK_NSIS_DISPLAY_NAME "IngeScape library")
+  set(CPACK_NSIS_DISPLAY_NAME "The ${PROJECT_NAME} core library")
   set(CPACK_NSIS_PACKAGE_NAME ${PROJECT_NAME})
   set(CPACK_NSIS_HELP_LINK "https://ingescape.com")
   set(CPACK_NSIS_CONTACT "contact@ingescape.com")
@@ -401,12 +405,17 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
     # Without component productbuild will not package any files
     set(CPACK_COMPONENTS_ALL library)
     set(CPACK_PACKAGING_INSTALL_PREFIX "/usr/local")
+    
+    set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_SOURCE_DIR}/builds/xcode/WELCOME.txt")
 
     # Without extention productbuild will crash So we just copy License file in
     # build folder with an extension
     configure_file("${CMAKE_CURRENT_SOURCE_DIR}/LICENSE"
                    "${CMAKE_BINARY_DIR}/LICENSE.txt" COPYONLY)
     set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_BINARY_DIR}/LICENSE.txt")
+    
+    set(CPACK_PREFLIGHT_LIBRARY_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/builds/xcode/preflight.sh")
+    set(CPACK_POSTFLIGHT_LIBRARY_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/builds/xcode/postflight.sh")
 
     set(CPACK_GENERATOR "productbuild")
     install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS
