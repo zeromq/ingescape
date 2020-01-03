@@ -19,10 +19,10 @@
 #include "cassandra.h"
 
 /**
- * @brief Mostly empty class representing an independent variable value for a particular task instance.
+ * @brief Mostly empty class representing an independent variable value for a particular session.
  * This class is a "fancy-struct" with all its attributes publicly accessible.
  * Its purpose is to handle more easily the DB entries and should no be kept in collections by controllers.
- * See TaskInstanceM for more details on how independent variable values values are stored for QML to use them.
+ * See SessionM for more details on how independent variable values values are stored for QML to use them.
  */
 class IndependentVariableValueM
 {
@@ -30,12 +30,12 @@ public:
     /**
      * @brief Constructor setting all parameters
      * @param experimentationUuid
-     * @param taskInstanceUuid
+     * @param sessionUuid
      * @param independentVariableUuid
      * @param valueString
      */
     IndependentVariableValueM(const CassUuid& experimentationUuid,
-                              const CassUuid& taskInstanceUuid,
+                              const CassUuid& sessionUuid,
                               const CassUuid& independentVariableUuid,
                               const QString& valueString);
 
@@ -45,9 +45,9 @@ public:
     CassUuid experimentationUuid;
 
     /**
-     * @brief Task instance's UUID
+     * @brief Session's UUID
      */
-    CassUuid taskInstanceUuid;
+    CassUuid sessionUuid;
 
     /**
      * @brief Independent variable's UUID

@@ -35,7 +35,7 @@ Item {
     //--------------------------------
 
     // Controller associated to our view
-    property TaskInstanceController taskInstanceController: null;
+    property SessionController sessionController: null;
 
     // Agents Grouped by Definition
     //property AgentsGroupedByDefinitionVM agentsGroupedByDefinition: null;
@@ -100,7 +100,7 @@ Item {
             }
             width : 6
 
-            visible: taskInstanceController && rootItem.agent
+            visible: rootItem.sessionController && rootItem.agent
 
             color: IngeScapeTheme.selectionColor
         }

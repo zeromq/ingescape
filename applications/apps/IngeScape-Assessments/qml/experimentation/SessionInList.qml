@@ -37,7 +37,7 @@ Rectangle {
     //
     //--------------------------------------------------------
 
-    property TaskInstanceM modelM: null
+    property SessionM modelM: null
 
     // Flag indicating if we are currently selecting the sessions to export
     property bool isSelectingSessionsToExport: false
@@ -69,8 +69,8 @@ Rectangle {
     // Open session asked
     signal openSessionAsked();
 
-    // Delete Task Instance
-    signal deleteTaskInstance();
+    // Delete session asked
+    signal deleteSessionAsked();
 
 
     //--------------------------------
@@ -205,7 +205,7 @@ Rectangle {
                 verticalAlignment: Text.AlignVCenter
 
                 elide: Text.ElideRight
-                text: (rootItem.modelM && rootItem.modelM.task) ? rootItem.modelM.task.name : ""
+                text: (rootItem.modelM && rootItem.modelM.protocol) ? rootItem.modelM.protocol.name : ""
 
                 color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
                 font {
@@ -334,7 +334,7 @@ Rectangle {
             }
 
             onClicked: {
-                rootItem.deleteTaskInstance();
+                rootItem.deleteSessionAsked();
             }
         }
     }

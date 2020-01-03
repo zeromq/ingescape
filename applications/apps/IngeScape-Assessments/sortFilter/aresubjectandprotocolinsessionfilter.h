@@ -24,9 +24,9 @@
 
 #include "I2PropertyHelpers.h"
 
-#include "model/taskinstancem.h"
+#include "model/sessionm.h"
 #include "model/subject/subjectm.h"
-#include "model/task/taskm.h"
+#include "model/protocol/protocolm.h"
 
 
 class AreSubjectAndProtocolInSessionFilter : public I2SortFilterProxyModel

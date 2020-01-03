@@ -36,9 +36,9 @@ I2PopupBase {
     //
     //--------------------------------------------------------
 
-    property TasksController taskController: null;
+    property ProtocolsController protocolsController: null;
 
-    property ExperimentationM experimentation: taskController ? taskController.currentExperimentation : null;
+    property ExperimentationM experimentation: protocolsController ? protocolsController.currentExperimentation : null;
 
 
     //--------------------------------
@@ -49,8 +49,8 @@ I2PopupBase {
     //
     //--------------------------------
 
-    // Close Tasks view
-    //signal closeTasksView();
+    // Close Protocols view
+    //signal closeProtocolsView();
 
 
 
@@ -95,7 +95,7 @@ I2PopupBase {
             id: titleProtocols
 
             anchors {
-                verticalCenter: btnNewTask.verticalCenter
+                verticalCenter: btnNewProtocol.verticalCenter
                 left: parent.left
                 leftMargin: 28
             }
@@ -114,7 +114,7 @@ I2PopupBase {
         }
 
         Button {
-            id: btnNewTask
+            id: btnNewProtocol
 
             anchors {
                 top: parent.top
@@ -138,7 +138,7 @@ I2PopupBase {
         Rectangle {
             id: topSeparator
             anchors {
-                bottom: taskList.top
+                bottom: protocolsList.top
                 left: parent.left
                 right: parent.right
             }
@@ -148,46 +148,46 @@ I2PopupBase {
         }
 
         ListView {
-            id: taskList
+            id: protocolsList
 
             anchors {
-                top: btnNewTask.bottom
+                top: btnNewProtocol.bottom
                 topMargin: 14
                 left: parent.left
                 right: parent.right
                 bottom: parent.bottom
             }
 
-            model: rootItem.experimentation ? rootItem.experimentation.allTasks : null
+            model: rootItem.experimentation ? rootItem.experimentation.allProtocols : null
 
-            delegate: TaskInList {
+            delegate: ProtocolInList {
                 modelM: model.QtObject
-                isSelected: rootItem.taskController && rootItem.taskController.selectedTask && (modelM === rootItem.taskController.selectedTask)
+                isSelected: rootItem.protocolsController && rootItem.protocolsController.selectedProtocol && (modelM === rootItem.protocolsController.selectedProtocol)
 
                 //
                 // Slots
                 //
-                onSelectTask: {
-                    if (rootItem.taskController)
+                onSelectProtocolAsked: {
+                    if (rootItem.protocolsController)
                     {
-                        // First, select the task
-                        rootItem.taskController.selectedTask = model.QtObject;
+                        // First, select the protocol
+                        rootItem.protocolsController.selectedProtocol = model.QtObject;
                     }
                 }
 
-                onDeleteTask: {
-                    if (rootItem.taskController)
+                onDeleteProtocolAsked: {
+                    if (rootItem.protocolsController)
                     {
-                        // Delete the task
-                        rootItem.taskController.deleteTask(model.QtObject);
+                        // Delete the protocol
+                        rootItem.protocolsController.deleteProtocol(model.QtObject);
                     }
                 }
 
-                onDuplicateTask: {
-                    if (rootItem.taskController)
+                onDuplicateProtocolAsked: {
+                    if (rootItem.protocolsController)
                     {
-                        // Duplicate the task
-                        rootItem.taskController.duplicateTask(model.QtObject);
+                        // Duplicate the protocol
+                        rootItem.protocolsController.duplicateProtocol(model.QtObject);
                     }
                 }
             }
@@ -195,10 +195,10 @@ I2PopupBase {
     }
 
     //
-    // Task
+    // Protocol
     //
     Rectangle {
-        id: taskItem
+        id: rectProtocol
 
         anchors {
             top: parent.top
@@ -224,15 +224,12 @@ I2PopupBase {
         }
 
 
-        //
-        // Task
-        //
-        Task {
-            id: task
+        Protocol {
+            id: protocol
 
             anchors.fill: parent
 
-            taskController: rootItem.taskController
+            protocolsController: rootItem.protocolsController
         }
 
 
@@ -257,14 +254,15 @@ I2PopupBase {
             }
 
             onClicked: {
-                if (taskController) {
-                    taskController.selectedTask = null;
+                if (rootItem.protocolsController) {
+                    // UN-select the protocol
+                    rootItem.protocolsController.selectedProtocol = null;
                 }
 
-                console.log("QML: close Tasks view");
+                console.log("QML: close Protocols view");
 
-                // Emit the signal "closeTasksView"
-                //rootItem.closeTasksView();
+                // Emit the signal "close protocols view"
+                //rootItem.closeProtocolsView();
 
                 close();
             }
@@ -273,14 +271,14 @@ I2PopupBase {
 
 
     //
-    // Create Task Popup
+    // Create Protocol Popup
     //
-    Popup.CreateTaskPopup {
+    Popup.CreateProtocolPopup {
         id: createProtocolPopup
 
         layerObjectName: "overlay2Layer"
 
-        taskController: rootItem.taskController
+        protocolsController: rootItem.protocolsController
     }
 
 }

@@ -41,12 +41,12 @@ AssessmentsPopupBase {
     //
     //--------------------------------------------------------
 
-    property TasksController taskController: null;
+    property ProtocolsController protocolsController: null;
 
     // Protocol model the new dependent variable will be in
-    property TaskM protocolM: null
+    property ProtocolM protocolM: null
 
-    // Our popup is used to edit temporaly dependent variable of our tasks controller, after we can :
+    // Our popup is used to edit temporaly dependent variable of our protocols controller, after we can :
     // - create a new dependent variable
     // OR
     // - edit an existing dependent variable
@@ -427,7 +427,7 @@ AssessmentsPopupBase {
             enabled: if ((txtDependentVariableName.text.length > 0) && comboBoxAgent.selectedItem && comboBoxOutput.selectedItem)
                      {
                          ((txtDependentVariableName.text === rootPrivate.originalName) // Same name that when we opened the popup : "edition" mode
-                         || (rootPopup.taskController && rootPopup.taskController.canCreateDependentVariableWithName(txtDependentVariableName.text))); // No other dependent variable with the same name
+                         || (rootPopup.protocolsController && rootPopup.protocolsController.canCreateDependentVariableWithName(txtDependentVariableName.text))); // No other dependent variable with the same name
                      }
                      else {
                          false;

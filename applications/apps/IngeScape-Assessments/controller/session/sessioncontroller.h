@@ -12,8 +12,8 @@
  *
  */
 
-#ifndef RECORDCONTROLLER_H
-#define RECORDCONTROLLER_H
+#ifndef SESSION_CONTROLLER_H
+#define SESSION_CONTROLLER_H
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
@@ -22,14 +22,14 @@
 #include <controller/ingescapenetworkcontroller.h>
 #include <controller/abstracttimeactionslinescenarioviewcontroller.h>
 #include <controller/abstractscenariocontroller.h>
-#include <model/taskinstancem.h>
+#include <model/sessionm.h>
 #include <sortFilter/areagentsinplatformfilter.h>
 
 
 /**
- * @brief The TaskInstanceController class defines the controller to manage a record of the current experimentation
+ * @brief The SessionController class defines the controller to manage a record of the current experimentation
  */
-class TaskInstanceController : public QObject
+class SessionController : public QObject
 {
     Q_OBJECT
 
@@ -39,8 +39,8 @@ class TaskInstanceController : public QObject
     // Controller for scenario management
     I2_QML_PROPERTY_READONLY(AbstractScenarioController*, scenarioC)
 
-    // The (experimentation) task instance currently selected
-    I2_QML_PROPERTY_CUSTOM_SETTER(TaskInstanceM*, currentTaskInstance)
+    // The session currently selected
+    I2_QML_PROPERTY_CUSTOM_SETTER(SessionM*, currentSession)
 
     // List off all agents present in the current platform
     Q_PROPERTY(AreAgentsInPlatformFilter* agentsGroupedByNameInCurrentPlatform READ agentsGroupedByNameInCurrentPlatform CONSTANT)
@@ -52,13 +52,13 @@ public:
      * @brief Constructor
      * @param parent
      */
-    explicit TaskInstanceController(QObject *parent = nullptr);
+    explicit SessionController(QObject *parent = nullptr);
 
 
     /**
      * @brief Destructor
      */
-    ~TaskInstanceController();
+    ~SessionController();
 
 
     /**
@@ -77,11 +77,11 @@ public:
 private Q_SLOTS:
 
     /**
-     * @brief Slot called when the current task instance changed
-     * @param previousTaskInstance
-     * @param currentTaskInstance
+     * @brief Slot called when the current session changed
+     * @param previousSession
+     * @param currentSession
      */
-    void _oncurrentTaskInstanceChanged(TaskInstanceM* previousTaskInstance, TaskInstanceM* currentTaskInstance);
+    void _oncurrentSessionChanged(SessionM* previousSession, SessionM* currentSession);
 
 
     /**
@@ -107,6 +107,6 @@ private:
 
 };
 
-QML_DECLARE_TYPE(TaskInstanceController)
+QML_DECLARE_TYPE(SessionController)
 
-#endif // RECORDCONTROLLER_H
+#endif // SESSION_CONTROLLER_H

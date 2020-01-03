@@ -34,18 +34,18 @@ class DependentVariableM : public QObject
     // Description of our dependent variable
     I2_QML_PROPERTY(QString, description)
 
-    // Name of the agent in the platform associated to the task
+    // Name of the agent in the platform associated to the protocol
     I2_QML_PROPERTY(QString, agentName)
 
-    // Name of the (agent) output in the platform associated to the task
+    // Name of the (agent) output in the platform associated to the protocol
     I2_QML_PROPERTY(QString, outputName)
 
 
 public:
    /**
-    * @brief DependentVariableM
+    * @brief Constructor
     * @param experimentationUuid
-    * @param taskUuid
+    * @param protocolUuid
     * @param cassUuid
     * @param name
     * @param description
@@ -54,7 +54,7 @@ public:
     * @param parent
     */
     explicit DependentVariableM(CassUuid experimentationUuid
-                                , CassUuid taskUuid
+                                , CassUuid protocolUuid
                                 , CassUuid cassUuid
                                 , const QString& name
                                 , const QString& description
@@ -116,15 +116,15 @@ public:
 
 
     CassUuid getExperimentationCassUuid() const { return _experimentationCassUuid; }
-    CassUuid getTaskCassUuid() const { return _taskCassUuid; }
+    CassUuid getProtocolCassUuid() const { return _protocolCassUuid; }
     CassUuid getCassUuid() const { return _cassUuid; }
 
 protected: // Attributes
-    // Task's experimentation's UUID from Cassandra DB
+    // Protocol's experimentation's UUID from Cassandra DB
     CassUuid _experimentationCassUuid;
 
-    // Task's UUID from Cassandra DB
-    CassUuid _taskCassUuid;
+    // Protocol's UUID from Cassandra DB
+    CassUuid _protocolCassUuid;
 
     // Unique identifier in Cassandra Data Base
     CassUuid _cassUuid;

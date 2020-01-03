@@ -40,7 +40,7 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     _experimentationsListC(nullptr),
     _experimentationC(nullptr),
     _subjectsC(nullptr),
-    _tasksC(nullptr),
+    _protocolsC(nullptr),
     _exportC(nullptr),
     _terminationSignalWatcher(nullptr)
 {
@@ -143,8 +143,8 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     // Create the controller to manage the subjects of the current experimentation
     _subjectsC = new SubjectsController(this);
 
-    // Create the controller to manage the tasks of the current experimentation
-    _tasksC = new TasksController(this);
+    // Create the controller to manage the protocols of the current experimentation
+    _protocolsC = new ProtocolsController(this);
 
     // Create the controller to export data from the database
     _exportC = new ExportController(this);
@@ -278,12 +278,12 @@ IngeScapeAssessmentsController::~IngeScapeAssessmentsController()
         temp = nullptr;
     }
 
-    if (_tasksC != nullptr)
+    if (_protocolsC != nullptr)
     {
-        disconnect(_tasksC);
+        disconnect(_protocolsC);
 
-        TasksController* temp = _tasksC;
-        settasksC(nullptr);
+        ProtocolsController* temp = _protocolsC;
+        setprotocolsC(nullptr);
         delete temp;
         temp = nullptr;
     }
@@ -565,8 +565,8 @@ void IngeScapeAssessmentsController::_onCurrentExperimentationChanged(Experiment
             _subjectsC->setcurrentExperimentation(currentExperimentation);
         }
 
-        if (_tasksC != nullptr) {
-            _tasksC->setcurrentExperimentation(currentExperimentation);
+        if (_protocolsC != nullptr) {
+            _protocolsC->setcurrentExperimentation(currentExperimentation);
         }
 
         if (_exportC != nullptr) {

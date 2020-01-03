@@ -17,7 +17,7 @@
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
-#include <controller/record/taskinstancecontroller.h>
+#include <controller/session/sessioncontroller.h>
 #include <model/experimentationm.h>
 #include <sortFilter/aresubjectandprotocolinsessionfilter.h>
 
@@ -29,8 +29,8 @@ class ExperimentationController : public QObject
 {
     Q_OBJECT
 
-    // Controller to manage a task instance of the current experimentation
-    I2_QML_PROPERTY_READONLY(TaskInstanceController*, taskInstanceC)
+    // Controller to manage a session of the current experimentation
+    I2_QML_PROPERTY_READONLY(SessionController*, sessionC)
 
     // Model of the current experimentation
     I2_QML_PROPERTY_CUSTOM_SETTER(ExperimentationM*, currentExperimentation)
@@ -48,7 +48,7 @@ class ExperimentationController : public QObject
     I2_QML_PROPERTY_READONLY(bool, isRecording)
 
     // List of selected sessions
-    I2_QOBJECT_LISTMODEL(TaskInstanceM, selectedSessions)
+    I2_QOBJECT_LISTMODEL(SessionM, selectedSessions)
 
     // List of all agents present in the current platform
     Q_PROPERTY(AreSubjectAndProtocolInSessionFilter* sessionFilteredList READ sessionFilteredList CONSTANT)
@@ -90,21 +90,21 @@ public:
      * @param subject
      * @param protocol
      */
-    Q_INVOKABLE void createNewSessionForSubjectAndProtocol(SubjectM* subject, TaskM* protocol);
+    Q_INVOKABLE void createNewSessionForSubjectAndProtocol(SubjectM* subject, ProtocolM* protocol);
 
 
     /**
      * @brief Open a session
      * @param session
      */
-    Q_INVOKABLE void openSession(TaskInstanceM* session);
+    Q_INVOKABLE void openSession(SessionM* session);
 
 
     /**
-     * @brief Delete a task instance
-     * @param record
+     * @brief Delete a session
+     * @param session
      */
-    Q_INVOKABLE void deleteTaskInstance(TaskInstanceM* taskInstance);
+    Q_INVOKABLE void deleteSession(SessionM* session);
 
 
     /**
@@ -115,7 +115,7 @@ public:
 
     /**
      * @brief Return true if start time in our timeline is before one (or more) record(s)
-     * of our current task instance, false if not
+     * of our current session, false if not
      * @return
      */
     Q_INVOKABLE bool isThereOneRecordAfterStartTime();
@@ -290,28 +290,28 @@ private Q_SLOTS:
 
 protected: // Methods
     /**
-     * @brief Create and insert a new task instance into the DB.
-     * A nullptr is returned if the task instance could not be created
-     * @param recordName
+     * @brief Create and insert a new session into the DB.
+     * A nullptr is returned if the session could not be created
+     * @param sessionName
      * @param subject
-     * @param task
+     * @param protocol
      * @return
      */
-    TaskInstanceM* _insertTaskInstanceIntoDB(const QString& taskInstanceName, SubjectM* subject, TaskM* task);
+    SessionM* _insertSessionIntoDB(const QString& sessionName, SubjectM* subject, ProtocolM* protocol);
 
     /**
-     * @brief Retrieve all independent variables from the Cassandra DB for the given task.
-     * The task will be updated by this method.
-     * @param task
+     * @brief Retrieve all independent variables from the Cassandra DB for the given protocol.
+     * The protocol will be updated by this method.
+     * @param protocol
      */
-    void _retrieveIndependentVariableForTask(TaskM* task);
+    void _retrieveIndependentVariableForProtocol(ProtocolM* protocol);
 
     /**
-     * @brief Retrieve all dependent variables from the Cassandra DB for the given task.
-     * The task will be updated by this method.
-     * @param task
+     * @brief Retrieve all dependent variables from the Cassandra DB for the given protocol.
+     * The protocol will be updated by this method.
+     * @param protocol
      */
-    void _retrieveDependentVariableForTask(TaskM* task);
+    void _retrieveDependentVariableForProtocol(ProtocolM* protocol);
 
     /**
      * @brief Retrieve all subjects from the Cassandra DB for the given experimentaion.
@@ -328,18 +328,18 @@ protected: // Methods
     void _retrieveCharacteristicsForExperimentation(ExperimentationM* experimentation);
 
     /**
-     * @brief Retrieve all tasks from the Cassandra DB for the given experimentaion.
+     * @brief Retrieve all protocols from the Cassandra DB for the given experimentaion.
      * The experimentation will be updated by this method
      * @param experimentation
      */
-    void _retrieveTasksForExperimentation(ExperimentationM* experimentation);
+    void _retrieveProtocolsForExperimentation(ExperimentationM* experimentation);
 
     /**
-     * @brief Retrieve all task instances from the Cassandra DB for the given experimentaion.
+     * @brief Retrieve all sessions from the Cassandra DB for the given experimentaion.
      * The experimentation will be updated by this method
      * @param experimentation
      */
-    void _retrieveTaskInstancesForExperimentation(ExperimentationM* experimentation);
+    void _retrieveSessionsForExperimentation(ExperimentationM* experimentation);
 
     /**
      * @brief Retrieve all characteristic values from the Cassandra DB for each subjects in the given experimentation.
@@ -349,11 +349,11 @@ protected: // Methods
     void _retrieveCharacteristicValuesForSubjectsInExperimentation(ExperimentationM* experimentation);
 
     /**
-     * @brief Retrieve all independent variable values Cassandra DB for each task instance in the given experimentation.
+     * @brief Retrieve all independent variable values Cassandra DB for each session in the given experimentation.
      * The experimentation will be updated by this method
      * @param experimentation
      */
-    void _retrieveIndependentVariableValuesForTaskInstancesInExperimentation(ExperimentationM* experimentation);
+    void _retrieveIndependentVariableValuesForSessionsInExperimentation(ExperimentationM* experimentation);
 
 
 protected:

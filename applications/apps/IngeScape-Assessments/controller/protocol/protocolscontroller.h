@@ -12,20 +12,20 @@
  *
  */
 
-#ifndef TASKSCONTROLLER_H
-#define TASKSCONTROLLER_H
+#ifndef PROTOCOLS_CONTROLLER_H
+#define PROTOCOLS_CONTROLLER_H
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
 
 #include <model/experimentationm.h>
-#include <model/task/independentvariablem.h>
+#include <model/protocol/independentvariablem.h>
 
 
 /**
- * @brief The TasksController class defines the controller to manage the tasks of the current experimentation
+ * @brief The ProtocolsController class defines the controller to manage the protocols of the current experimentation
  */
-class TasksController : public QObject
+class ProtocolsController : public QObject
 {
     Q_OBJECT
 
@@ -38,8 +38,8 @@ class TasksController : public QObject
     // Model of the current experimentation
     I2_QML_PROPERTY_READONLY(ExperimentationM*, currentExperimentation)
 
-    // Model of the selected task
-    I2_QML_PROPERTY_DELETE_PROOF(TaskM*, selectedTask)
+    // Model of the selected protocol
+    I2_QML_PROPERTY_DELETE_PROOF(ProtocolM*, selectedProtocol)
 
     // Temporary independent variable used for edition rollbacks
     I2_QML_PROPERTY(IndependentVariableM*, temporaryIndependentVariable)
@@ -53,13 +53,13 @@ public:
      * @brief Constructor
      * @param parent
      */
-    explicit TasksController(QObject *parent = nullptr);
+    explicit ProtocolsController(QObject *parent = nullptr);
 
 
     /**
      * @brief Destructor
      */
-    ~TasksController();
+    ~ProtocolsController();
 
 
     /**
@@ -80,17 +80,17 @@ public:
 
 
     /**
-     * @brief Delete a task
-     * @param task
+     * @brief Delete a protocol
+     * @param protocol
      */
-    Q_INVOKABLE void deleteTask(TaskM* task);
+    Q_INVOKABLE void deleteProtocol(ProtocolM* protocol);
 
 
     /**
-     * @brief Duplicate a task
-     * @param task
+     * @brief Duplicate a protocol
+     * @param protocol
      */
-    Q_INVOKABLE void duplicateTask(TaskM* task);
+    Q_INVOKABLE void duplicateProtocol(ProtocolM* protocol);
 
 
     /**
@@ -173,37 +173,47 @@ private:
      * @param platformFileUrl
      * @return
      */
-    TaskM* _createNewProtocolWithIngeScapePlatformFileUrl(QString protocolName, QUrl platformFileUrl);
+    ProtocolM* _createNewProtocolWithIngeScapePlatformFileUrl(QString protocolName, QUrl platformFileUrl);
 
 
     /**
      * @brief Creates a new independent variable with the given parameters and insert it into the Cassandra DB
      * A nullptr is returned if the operation failed.
      * @param experimentationUuid
-     * @param taskUuid
+     * @param protocolUuid
      * @param name
      * @param description
      * @param valueType
      * @param enumValues
      * @return
      */
-    IndependentVariableM* _insertIndependentVariableIntoDB(CassUuid experimentationUuid, CassUuid taskUuid, const QString& name, const QString& description, IndependentVariableValueTypes::Value valueType, const QStringList& enumValues = {});
+    IndependentVariableM* _insertIndependentVariableIntoDB(CassUuid experimentationUuid,
+                                                           CassUuid protocolUuid,
+                                                           const QString& name,
+                                                           const QString& description,
+                                                           IndependentVariableValueTypes::Value valueType,
+                                                           const QStringList& enumValues = {});
 
 
     /**
      * @brief Creates a new dependent variable with the given parameters and insert it into the Cassandra DB
      * A nullptr is returned if the operation failed.
      * @param experimentationUuid
-     * @param taskUuid
+     * @param protocolUuid
      * @param name
      * @param description
      * @param valueType
      * @param enumValues
      * @return
      */
-    DependentVariableM* _insertDependentVariableIntoDB(CassUuid experimentationUuid, CassUuid taskUuid, const QString& name, const QString& description, const QString& agentName, const QString& outputName);
+    DependentVariableM* _insertDependentVariableIntoDB(CassUuid experimentationUuid,
+                                                       CassUuid protocolUuid,
+                                                       const QString& name,
+                                                       const QString& description,
+                                                       const QString& agentName,
+                                                       const QString& outputName);
 };
 
-QML_DECLARE_TYPE(TasksController)
+QML_DECLARE_TYPE(ProtocolsController)
 
-#endif // TASKSCONTROLLER_H
+#endif // PROTOCOLS_CONTROLLER_H

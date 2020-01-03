@@ -22,7 +22,7 @@ import QtQuick.Window 2.3
 import INGESCAPE 1.0
 
 import "experimentation" as Experimentation
-import "task_instance" as TaskInstance
+import "session" as Session
 import "popup" as Popup
 
 
@@ -62,13 +62,13 @@ Item {
     }
 
     /**
-     * Reset the current task instance
+     * Reset the current session
      */
-    function resetCurrentTaskInstance()
+    function resetCurrentSession()
     {
-        if (IngeScapeAssessmentsC.experimentationC && IngeScapeAssessmentsC.experimentationC.taskInstanceC)
+        if (IngeScapeAssessmentsC.experimentationC && IngeScapeAssessmentsC.experimentationC.sessionC)
         {
-            IngeScapeAssessmentsC.experimentationC.taskInstanceC.currentTaskInstance = null;
+            IngeScapeAssessmentsC.experimentationC.sessionC.currentSession = null;
         }
     }
 
@@ -139,21 +139,21 @@ Item {
     }
 
     Connections {
-        target: IngeScapeAssessmentsC.experimentationC.taskInstanceC
+        target: IngeScapeAssessmentsC.experimentationC.sessionC
 
-        onCurrentTaskInstanceChanged: {
+        onCurrentSessionChanged: {
 
-            if (IngeScapeAssessmentsC.experimentationC.taskInstanceC.currentTaskInstance)
+            if (IngeScapeAssessmentsC.experimentationC.sessionC.currentSession)
             {
-                console.log("QML: on Current Task Instance changed: " + IngeScapeAssessmentsC.experimentationC.taskInstanceC.currentTaskInstance.name);
+                console.log("QML: on Current Session changed: " + IngeScapeAssessmentsC.experimentationC.sessionC.currentSession.name);
 
-                // Add the "Task Instance view" to the stack
-                stackview.push(componentTaskInstanceView);
+                // Add the "Session view" to the stack
+                stackview.push(componentSessionView);
             }
             else {
-                console.log("QML: on Current Task Instance changed to NULL");
+                console.log("QML: on Current Session changed to NULL");
 
-                // Remove the "Task Instance view" from the stack
+                // Remove the "Session view" from the stack
                 stackview.pop();
             }
         }
@@ -290,13 +290,13 @@ Item {
 
 
     //
-    // Task Instance View
+    // Session View
     //
     Component {
-        id: componentTaskInstanceView
+        id: componentSessionView
 
-        TaskInstance.TaskInstanceView {
-            taskInstanceController: IngeScapeAssessmentsC.experimentationC.taskInstanceC
+        Session.SessionView {
+            sessionController: IngeScapeAssessmentsC.experimentationC.sessionC
             experimentationController: IngeScapeAssessmentsC.experimentationC
 
             //
@@ -312,26 +312,26 @@ Item {
             //
 
             onGoBackToHome: {
-                console.log("QML: on Go Back to 'Home' (from 'TaskInstance' view)");
+                console.log("QML: on Go Back to 'Home' (from 'Session' view)");
 
                 // Hide network configuration infos component
                 networkConfigurationInfo.visible = false;
 
-                // Reset the current record
-                rootItem.resetCurrentTaskInstance();
+                // Reset the current session
+                rootItem.resetCurrentSession();
 
                 // Reset the current experimentation
                 rootItem.resetCurrentExperimentation();
             }
 
             onGoBackToExperimentation: {
-                console.log("QML: on Go Back to 'Experimentation' (from 'TaskInstance' view)");
+                console.log("QML: on Go Back to 'Experimentation' (from 'Session' view)");
 
                 // Hide network configuration infos component
                 networkConfigurationInfo.visible = true;
 
-                // Reset the current task instance
-                rootItem.resetCurrentTaskInstance();
+                // Reset the current session
+                rootItem.resetCurrentSession();
             }
         }
     }

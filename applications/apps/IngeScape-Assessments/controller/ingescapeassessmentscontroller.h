@@ -28,7 +28,7 @@
 #include <controller/experimentationslistcontroller.h>
 #include <controller/experimentationcontroller.h>
 #include <controller/subject/subjectscontroller.h>
-#include <controller/task/taskscontroller.h>
+#include <controller/protocol/protocolscontroller.h>
 #include <controller/export/exportcontroller.h>
 
 #include <misc/terminationsignalwatcher.h>
@@ -71,8 +71,8 @@ class IngeScapeAssessmentsController : public QObject
     // Controller to manage the subjects of the current experimentation
     I2_QML_PROPERTY_READONLY(SubjectsController*, subjectsC)
 
-    // Controller to manage the tasks of the current experimentation
-    I2_QML_PROPERTY_READONLY(TasksController*, tasksC)
+    // Controller to manage the protocols of the current experimentation
+    I2_QML_PROPERTY_READONLY(ProtocolsController*, protocolsC)
 
     // Controller to export data from the database
     I2_QML_PROPERTY_READONLY(ExportController*, exportC)

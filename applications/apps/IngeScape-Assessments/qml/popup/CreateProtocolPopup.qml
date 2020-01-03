@@ -41,7 +41,7 @@ AssessmentsPopupBase {
     //
     //--------------------------------------------------------
 
-    property TasksController taskController: null;
+    property ProtocolsController protocolsController: null;
 
     property url selectedPlatformUrl: "";
 
@@ -80,7 +80,7 @@ AssessmentsPopupBase {
         console.log("QML: Reset all user inputs and close popup");
 
         // Reset all user inputs
-        txtTaskName.text = "";
+        txtProtocolName.text = "";
         //txtPlatformUrl.text = "";
         rootPopup.selectedPlatformUrl = "";
 
@@ -125,7 +125,7 @@ AssessmentsPopupBase {
         }
 
         TextField {
-            id: txtTaskName
+            id: txtProtocolName
 
             anchors {
                 left: parent.left
@@ -324,18 +324,18 @@ AssessmentsPopupBase {
 
             activeFocusOnPress: true
 
-            enabled: ( (txtTaskName.text.length > 0) && (txtPlatformUrl.text.length > 0)
-                      && rootPopup.taskController && rootPopup.taskController.canCreateProtocolWithName(txtTaskName.text) )
+            enabled: ( (txtProtocolName.text.length > 0) && (txtPlatformUrl.text.length > 0)
+                      && rootPopup.protocolsController && rootPopup.protocolsController.canCreateProtocolWithName(txtProtocolName.text) )
 
             style: IngeScapeAssessmentsButtonStyle {
                 text: "OK"
             }
 
             onClicked: {
-                if (rootPopup.taskController)
+                if (rootPopup.protocolsController)
                 {
                     // Create a new protocol with an IngeScape platform file path
-                    rootPopup.taskController.createNewProtocolWithIngeScapePlatformFilePath(txtTaskName.text, txtPlatformUrl.text);
+                    rootPopup.protocolsController.createNewProtocolWithIngeScapePlatformFilePath(txtProtocolName.text, txtPlatformUrl.text);
                 }
 
                 // Reset all user inputs and close the popup

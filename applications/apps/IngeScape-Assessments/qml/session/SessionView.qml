@@ -33,11 +33,11 @@ Item {
     //
     //--------------------------------------------------------
 
-    property TaskInstanceController taskInstanceController: null;
+    property SessionController sessionController: null;
 
     property ExperimentationController experimentationController: null;
 
-    property TaskInstanceM taskInstance: taskInstanceController ? taskInstanceController.currentTaskInstance : null;
+    property SessionM session: sessionController ? sessionController.currentSession : null;
 
     property bool isEditingName: false
 
@@ -76,7 +76,7 @@ Item {
     //--------------------------------------------------------
 
     Component.onCompleted: {
-        if (taskInstance && !taskInstance.isRecorded) {
+        if (rootItem.session && !rootItem.session.isRecorded) {
             timeline.isReduced = false;
         }
     }
@@ -127,10 +127,12 @@ Item {
         }
         height: 0
 
-        scenarioController: rootItem.taskInstanceController ? rootItem.taskInstanceController.scenarioC : null;
-        timeLineController: rootItem.taskInstanceController ? rootItem.taskInstanceController.timeLineC : null;
+        scenarioController: rootItem.sessionController ? rootItem.sessionController.scenarioC : null;
+        timeLineController: rootItem.sessionController ? rootItem.sessionController.timeLineC : null;
 
-        recordsListToShow : rootItem.taskInstance ? rootItem.taskInstance.recordsList : []
+        recordsListToShow : rootItem.session ? rootItem.session.recordsList : []
+
+        canReorganizeScenario : false
 
         licensesController: IngeScapeAssessmentsC.licensesC
         mainController: IngeScapeAssessmentsC
@@ -140,7 +142,7 @@ Item {
         extraContent: LabellessSvgButton {
             id: startOrStopRecordButton
 
-            visible: (rootItem.taskInstance && !rootItem.taskInstance.isRecorded)
+            visible: (rootItem.session && !rootItem.session.isRecorded)
             enabled: (visible && experimentationController.isRecorderON)
             opacity: enabled ? 1.0 : 0.4
 
@@ -266,20 +268,20 @@ Item {
         }
 
         MouseArea {
-            id: taskInstanceMouseArea
+            id: sessionMouseArea
             anchors {
-                fill: taskInstanceNameEditBackground
+                fill: txtSessionNameEditBackground
             }
 
             hoverEnabled: true
         }
 
         Rectangle {
-            id: taskInstanceNameEditBackground
+            id: txtSessionNameEditBackground
             anchors {
-                left: taskInstanceName.left
+                left: txtSessionName.left
                 leftMargin: -10
-                verticalCenter: taskInstanceName.verticalCenter
+                verticalCenter: txtSessionName.verticalCenter
             }
 
             radius: 5
@@ -289,14 +291,14 @@ Item {
 
             // Max available width based on the size of the parent. Won't be bigger than this
             property real maxAvailableWidth: (parent.width
-                                              - 92 // taskInstanceName's leftMargin
-                                              + 10 // this left margin from taskInstanceName
+                                              - 92 // txtSessionName's leftMargin
+                                              + 10 // this left margin from txtSessionName
                                               - 22 // Right margin left to avoid reaching the edge of the window
                                               - 10  // Margins around the edit button (5 on both sides)
                                               )
 
             // Desired width to follow the size of expeName
-            property real desiredWidth: taskInstanceName.width
+            property real desiredWidth: txtSessionName.width
                                         + 10                // leftMargin
                                         + 10                // rightMargin
                                         + editButton.width  // button size
@@ -307,7 +309,7 @@ Item {
 
             color: IngeScapeTheme.veryLightGreyColor
 
-            opacity: (taskInstanceMouseArea.containsMouse || editButton.containsMouse || rootItem.isEditingName) ? 1 : 0
+            opacity: (sessionMouseArea.containsMouse || editButton.containsMouse || rootItem.isEditingName) ? 1 : 0
             enabled: opacity > 0
 
             Button {
@@ -334,15 +336,15 @@ Item {
                     if (rootItem.isEditingName)
                     {
                         // Entering edition mode
-                        taskInstanceNameEditionTextField.text = taskInstanceName.text;
+                        txtSessionNameEditionTextField.text = txtSessionName.text;
                     }
                     else
                     {
                         // Exiting edition mode
-                        if (rootItem.taskInstance)
+                        if (rootItem.session)
                         {
-                            taskInstanceName.text = taskInstanceNameEditionTextField.text
-                            rootItem.taskInstance.name = taskInstanceName.text
+                            txtSessionName.text = txtSessionNameEditionTextField.text
+                            rootItem.session.name = txtSessionName.text
                         }
                     }
                 }
@@ -350,7 +352,7 @@ Item {
         }
 
         Text {
-            id: taskInstanceName
+            id: txtSessionName
             anchors {
                 top: parent.top
                 topMargin: 30
@@ -358,7 +360,7 @@ Item {
                 leftMargin: 153
             }
 
-            property real maxAvailableWidth: taskInstanceNameEditBackground.maxAvailableWidth
+            property real maxAvailableWidth: txtSessionNameEditBackground.maxAvailableWidth
                                              - 10                // background's left margin
                                              - 5                 // edit button's right margin
                                              - editButton.width  // edit button's width
@@ -366,7 +368,7 @@ Item {
 
             width: Math.min(implicitWidth, maxAvailableWidth)
 
-            text: rootItem.taskInstance ? rootItem.taskInstance.name : ""
+            text: rootItem.session ? rootItem.session.name : ""
             elide: Text.ElideRight
 
             verticalAlignment: Text.AlignVCenter
@@ -383,8 +385,8 @@ Item {
         }
 
         TextField {
-            id: taskInstanceNameEditionTextField
-            anchors.fill: taskInstanceName
+            id: txtSessionNameEditionTextField
+            anchors.fill: txtSessionName
 
             visible: rootItem.isEditingName
             enabled: visible
@@ -413,12 +415,12 @@ Item {
             id: expeNameText
 
             anchors {
-                top: taskInstanceName.bottom
+                top: txtSessionName.bottom
                 topMargin: 15
-                left: taskInstanceName.left
+                left: txtSessionName.left
             }
 
-            width: taskInstanceName.maxAvailableWidth
+            width: txtSessionName.maxAvailableWidth
 
             text: rootItem.experimentationController && rootItem.experimentationController.currentExperimentation ? rootItem.experimentationController.currentExperimentation.name : ""
             elide: Text.ElideRight
@@ -514,7 +516,7 @@ Item {
 
                     ActionsList {
                         id: actionsList
-                        taskInstanceController: rootItem.taskInstanceController
+                        sessionController: rootItem.sessionController
                     }
                 }
 
@@ -526,7 +528,7 @@ Item {
 
                     AgentsList{
                         id: agentsList
-                        taskInstanceController: rootItem.taskInstanceController
+                        sessionController: rootItem.sessionController
                     }
                 }
             }
@@ -598,13 +600,13 @@ Item {
 
                 wrapMode: Text.WordWrap
 
-                text: rootItem.taskInstance ? rootItem.taskInstance.comments : ""
+                text: rootItem.session ? rootItem.session.comments : ""
 
                 style: IngeScapeAssessmentsTextAreaStyle {}
 
                 onInputChanged: {
-                    if (rootItem.taskInstance) {
-                        rootItem.taskInstance.comments = text
+                    if (rootItem.session) {
+                        rootItem.session.comments = text
                     }
                 }
             }
@@ -696,7 +698,7 @@ Item {
 
                 Repeater {
 
-                    model: (rootItem.taskInstance && rootItem.taskInstance.task) ? rootItem.taskInstance.task.independentVariables : null
+                    model: (rootItem.session && rootItem.session.protocol) ? rootItem.session.protocol.independentVariables : null
 
                     delegate: IndependentVariableValueEditor {
 
@@ -707,18 +709,18 @@ Item {
 
                         variable: model ? model.QtObject : null
 
-                        variableValue: (rootItem.taskInstance && rootItem.taskInstance.mapIndependentVariableValues && model) ? rootItem.taskInstance.mapIndependentVariableValues[model.name] : ""
+                        variableValue: (rootItem.session && rootItem.session.mapIndependentVariableValues && model) ? rootItem.session.mapIndependentVariableValues[model.name] : ""
 
                         //
                         // Slots
                         //
                         onIndependentVariableValueUpdated: {
-                            if (rootItem.taskInstance && rootItem.taskInstance.mapIndependentVariableValues && model)
+                            if (rootItem.session && rootItem.session.mapIndependentVariableValues && model)
                             {
                                 //console.log("QML: on (IN-dependent) Variable Value Updated for " + model.name + ": " + value);
 
                                 // Update the value (in C++)
-                                rootItem.taskInstance.mapIndependentVariableValues[model.name] = value;
+                                rootItem.session.mapIndependentVariableValues[model.name] = value;
                             }
                         }
                     }
@@ -910,9 +912,9 @@ Item {
                 onDropped: {
                     console.log("Dropped")
                     dragHovering = false
-                    if (drop.hasUrls && rootItem.taskInstanceController)
+                    if (drop.hasUrls && rootItem.sessionController)
                     {
-                        rootItem.taskInstanceController.addNewAttachements(drop.urls)
+                        rootItem.sessionController.addNewAttachements(drop.urls)
 
                         // Populate fake model to see results in view
                         for (var index in drop.urls)

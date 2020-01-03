@@ -23,13 +23,17 @@
 #include <I2Quick.h>
 
 #include "I2PropertyHelpers.h"
-#include "model/task/taskm.h"
+#include "model/protocol/protocolm.h"
 
+
+/**
+ * @brief The AreAgentsInPlatformFilter class defines a sort/filter on agents list in a platform
+ */
 class AreAgentsInPlatformFilter: public I2SortFilterProxyModel
 {
     Q_OBJECT
 
-    I2_CPP_PROPERTY(TaskM*, currentProtocol)
+    I2_CPP_PROPERTY(ProtocolM*, currentProtocol)
 
 public:
 

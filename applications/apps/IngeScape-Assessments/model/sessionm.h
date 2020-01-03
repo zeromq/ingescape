@@ -12,22 +12,22 @@
  *
  */
 
-#ifndef TASK_INSTANCE_M_H
-#define TASK_INSTANCE_M_H
+#ifndef SESSION_M_H
+#define SESSION_M_H
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
 
 #include <model/subject/subjectm.h>
-#include <model/task/taskm.h>
+#include <model/protocol/protocolm.h>
 #include <model/assessmentsenums.h>
 #include <model/recordassessmentm.h>
 
 
 /**
- * @brief The TaskInstanceM class defines a model of task instance
+ * @brief The SessionM class defines a model of session
  */
-class TaskInstanceM : public QObject
+class SessionM : public QObject
 {
     Q_OBJECT
 
@@ -41,7 +41,7 @@ class TaskInstanceM : public QObject
     I2_QML_PROPERTY_DELETE_PROOF(SubjectM*, subject)
 
     // Protocol of our session
-    I2_QML_PROPERTY_DELETE_PROOF(TaskM*, task)
+    I2_QML_PROPERTY_DELETE_PROOF(ProtocolM*, protocol)
 
     // Start date and time of our session
     I2_QML_PROPERTY(QDateTime, startDateTime)
@@ -53,7 +53,7 @@ class TaskInstanceM : public QObject
     I2_QML_PROPERTY_QTime(duration)
     //I2_QML_PROPERTY(QDateTime, duration)
 
-    // Values of the independent variables of the task
+    // Values of the independent variables of the protocol
     // "Qml Property Map" allows to set key-value pairs that can be used in QML bindings
     I2_QML_PROPERTY_READONLY(QQmlPropertyMap*, mapIndependentVariableValues)
 
@@ -68,40 +68,42 @@ public:
 
     /**
      * @brief Constructor
-     * @param uid
+     * @param experimentationUuid
+     * @param cassUuid
      * @param name
-     * @param subject
-     * @param task
+     * @param comments
+     * @param subjectUuid
+     * @param protocolUuid
      * @param startDateTime
      * @param parent
      */
-    explicit TaskInstanceM(CassUuid experimentationUuid,
-                           CassUuid cassUuid,
-                           QString name,
-                           QString comments,
-                           CassUuid subjectUuid,
-                           CassUuid taskUuid,
-                           QDateTime startDateTime,
-                           QObject *parent = nullptr);
+    explicit SessionM(CassUuid experimentationUuid,
+                      CassUuid cassUuid,
+                      QString name,
+                      QString comments,
+                      CassUuid subjectUuid,
+                      CassUuid protocolUuid,
+                      QDateTime startDateTime,
+                      QObject *parent = nullptr);
 
 
     /**
      * @brief Destructor
      */
-    ~TaskInstanceM();
+    ~SessionM();
 
     /**
-     * @brief TaskInstance table name
+     * @brief Session table name
      */
     static const QString table;
 
     /**
-     * @brief TaskInstance table column names
+     * @brief Session table column names
      */
     static const QStringList columnNames;
 
     /**
-     * @brief TaskInstance table primary keys IN ORDER
+     * @brief Session table primary keys IN ORDER
      */
     static const QStringList primaryKeys;
 
@@ -112,10 +114,10 @@ public:
     CassUuid getCassUuid() const { return _cassUuid; }
 
     /**
-     * @brief Accessor for the task's Cassandra UUID of this entry
+     * @brief Accessor for the protocol's Cassandra UUID of this entry
      * @return
      */
-    CassUuid getTaskCassUuid() const { return _taskUuid; }
+    CassUuid getProtocolCassUuid() const { return _protocolUuid; }
 
     /**
      * @brief Accessor for the subject's Cassandra UUID of this entry
@@ -131,35 +133,35 @@ public:
     void setIndependentVariableValue(IndependentVariableM* indepVar, const QString& value);
 
     /**
-     * @brief Static factory method to create a task instance from a CassandraDB record
+     * @brief Static factory method to create a session from a CassandraDB record
      * @param row
      * @return
      */
-    static TaskInstanceM* createFromCassandraRow(const CassRow* row);
+    static SessionM* createFromCassandraRow(const CassRow* row);
 
     /**
-     * @brief Delete the given task instance from Cassandra DB
-     * @param experimentation
+     * @brief Delete the given session from Cassandra DB
+     * @param session
      */
-    static void deleteTaskInstanceFromCassandra(const TaskInstanceM& taskInstance);
+    static void deleteSessionFromCassandra(const SessionM& session);
 
     /**
-     * @brief Create a CassStatement to insert a TaskInstanceM into the DB.
-     * The statement contains the values from the given taskInstance.
-     * Passed taskInstance must have a valid and unique UUID.
-     * @param taskInstance
+     * @brief Create a CassStatement to insert a SessionM into the DB.
+     * The statement contains the values from the given session.
+     * Passed session must have a valid and unique UUID.
+     * @param session
      * @return
      */
-    static CassStatement* createBoundInsertStatement(const TaskInstanceM& taskInstance);
+    static CassStatement* createBoundInsertStatement(const SessionM& session);
 
     /**
-     * @brief Create a CassStatement to update a TaskInstanceM into the DB.
-     * The statement contains the values from the given taskInstance.
-     * Passed taskInstance must have a valid and unique UUID.
-     * @param taskInstance
+     * @brief Create a CassStatement to update a SessionM into the DB.
+     * The statement contains the values from the given session.
+     * Passed session must have a valid and unique UUID.
+     * @param session
      * @return
      */
-    static CassStatement* createBoundUpdateStatement(const TaskInstanceM& taskInstance);
+    static CassStatement* createBoundUpdateStatement(const SessionM& session);
 
 
 private Q_SLOTS:
@@ -182,13 +184,13 @@ private:
     QHash<QString, IndependentVariableM*> _mapIndependentVarByName;
     CassUuid _experimentationCassUuid;
     CassUuid _subjectUuid;
-    CassUuid _taskUuid;
+    CassUuid _protocolUuid;
 
     CassUuid _cassUuid;
 
 
 };
 
-QML_DECLARE_TYPE(TaskInstanceM)
+QML_DECLARE_TYPE(SessionM)
 
-#endif // TASK_INSTANCE_M_H
+#endif // SESSION_M_H

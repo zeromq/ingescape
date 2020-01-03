@@ -50,7 +50,7 @@ const QStringList DependentVariableM::primaryKeys = {
  * @param parent
  */
 DependentVariableM::DependentVariableM(CassUuid experimentationUuid
-                                       , CassUuid taskUuid
+                                       , CassUuid protocolUuid
                                        , CassUuid cassUuid
                                        , const QString& name
                                        , const QString& description
@@ -63,7 +63,7 @@ DependentVariableM::DependentVariableM(CassUuid experimentationUuid
     , _agentName(agentName)
     , _outputName(outputName)
     , _experimentationCassUuid(experimentationUuid)
-    , _taskCassUuid(taskUuid)
+    , _protocolCassUuid(protocolUuid)
     , _cassUuid(cassUuid)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -94,9 +94,9 @@ DependentVariableM* DependentVariableM::createFromCassandraRow(const CassRow* ro
 
     if (row != nullptr)
     {
-        CassUuid experimentationUuid, taskUuid, independentVarUuid;
+        CassUuid experimentationUuid, protocolUuid, independentVarUuid;
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_experimentation"), &experimentationUuid);
-        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_task"), &taskUuid);
+        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_task"), &protocolUuid);
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &independentVarUuid);
 
         QString variableName(AssessmentsModelManager::getStringValueFromColumnName(row, "name"));
@@ -104,7 +104,13 @@ DependentVariableM* DependentVariableM::createFromCassandraRow(const CassRow* ro
         QString agentName(AssessmentsModelManager::getStringValueFromColumnName(row, "agent_name"));
         QString outputName(AssessmentsModelManager::getStringValueFromColumnName(row, "output_name"));
 
-        dependentVariable = new DependentVariableM(experimentationUuid, taskUuid, independentVarUuid, variableName, variableDescription, agentName, outputName);
+        dependentVariable = new DependentVariableM(experimentationUuid,
+                                                   protocolUuid,
+                                                   independentVarUuid,
+                                                   variableName,
+                                                   variableDescription,
+                                                   agentName,
+                                                   outputName);
     }
 
     return dependentVariable;
@@ -122,7 +128,7 @@ CassStatement* DependentVariableM::createBoundInsertStatement(const DependentVar
     QString queryStr = "INSERT INTO " + DependentVariableM::table + " (id_experimentation, id_task, id, name, description, agent_name, output_name) VALUES (?, ?, ?, ?, ?, ?, ?);";
     CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 7);
     cass_statement_bind_uuid  (cassStatement, 0, dependentVariable.getExperimentationCassUuid());
-    cass_statement_bind_uuid  (cassStatement, 1, dependentVariable.getTaskCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 1, dependentVariable.getProtocolCassUuid());
     cass_statement_bind_uuid  (cassStatement, 2, dependentVariable.getCassUuid());
     cass_statement_bind_string(cassStatement, 3, dependentVariable.name().toStdString().c_str());
     cass_statement_bind_string(cassStatement, 4, dependentVariable.description().toStdString().c_str());
@@ -147,7 +153,7 @@ CassStatement* DependentVariableM::createBoundUpdateStatement(const DependentVar
     cass_statement_bind_string(cassStatement, 2, dependentVariable.agentName().toStdString().c_str());
     cass_statement_bind_string(cassStatement, 3, dependentVariable.outputName().toStdString().c_str());
     cass_statement_bind_uuid  (cassStatement, 4, dependentVariable.getExperimentationCassUuid());
-    cass_statement_bind_uuid  (cassStatement, 5, dependentVariable.getTaskCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 5, dependentVariable.getProtocolCassUuid());
     cass_statement_bind_uuid  (cassStatement, 6, dependentVariable.getCassUuid());
     return cassStatement;
 }

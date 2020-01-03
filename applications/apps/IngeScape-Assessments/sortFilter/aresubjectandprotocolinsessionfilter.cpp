@@ -47,12 +47,12 @@ void AreSubjectAndProtocolInSessionFilter::forceUpdate()
 bool AreSubjectAndProtocolInSessionFilter::filterAccepts(QObject* item, int index) const
 {
     Q_UNUSED(index)
-    TaskInstanceM* taskInstanceValue = qobject_cast<TaskInstanceM*>(item);
+    SessionM* session = qobject_cast<SessionM*>(item);
 
-    if (taskInstanceValue != nullptr)
+    if (session != nullptr)
     {
-        bool resultSubject = _selectedSubjectIdList.contains(taskInstanceValue->subject()->displayedId());
-        bool resultProtocol = _selectedProtocolIdList.contains(taskInstanceValue->task()->name());
+        bool resultSubject = _selectedSubjectIdList.contains(session->subject()->displayedId());
+        bool resultProtocol = _selectedProtocolIdList.contains(session->protocol()->name());
         if (resultSubject && resultProtocol){
             return true;
         }

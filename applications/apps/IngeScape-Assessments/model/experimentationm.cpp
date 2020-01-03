@@ -17,7 +17,7 @@
 
 #include "controller/assessmentsmodelmanager.h"
 #include "model/subject/characteristicvaluem.h"
-#include "model/task/independentvariablevaluem.h"
+#include "model/protocol/independentvariablevaluem.h"
 
 /**
  * @brief Experimentation table name
@@ -63,8 +63,8 @@ ExperimentationM::ExperimentationM(CassUuid cassUuid,
 
     qInfo() << "New Model of Experimentation" << _name << "created" << _creationDate.toString("dd/MM/yy hh:mm:ss") << "(" << AssessmentsModelManager::cassUuidToQString(_cassUuid) << ")";
 
-    // Task instances are sorted on their start date/time (chronological order)
-    _allTaskInstances.setSortProperty("startDateTime");
+    // Sessions are sorted on their start date/time (chronological order)
+    _allSessions.setSortProperty("startDateTime");
 }
 
 
@@ -84,8 +84,8 @@ ExperimentationM::~ExperimentationM()
  */
 void ExperimentationM::clearData()
 {
-    // Delete all task instances of our experimentation
-    _allTaskInstances.deleteAllItems();
+    // Delete all sessions of our experimentation
+    _allSessions.deleteAllItems();
 
     // Delete all characteristics of our experimentation
     _hashFromUIDtoCharacteristic.clear();
@@ -94,8 +94,8 @@ void ExperimentationM::clearData()
     // Delete all subjects of our experimentation
     _allSubjects.deleteAllItems();
 
-    // Delete all tasks of our experimentation
-    _allTasks.deleteAllItems();
+    // Delete all protocols of our experimentation
+    _allProtocols.deleteAllItems();
 }
 
 
@@ -181,116 +181,116 @@ void ExperimentationM::removeSubject(SubjectM* subject)
         // Remove from the list
         _allSubjects.remove(subject);
 
-        // Remove related TaskInstances
-        removeTaskInstanceRelatedToSubject(subject);
+        // Remove related sessions
+        removeSessionsRelatedToSubject(subject);
     }
 }
 
 
 /**
- * @brief Add a task to our experimentation
- * @param task
+ * @brief Add a protocol to our experimentation
+ * @param protocol
  */
-void ExperimentationM::addTask(TaskM* task)
+void ExperimentationM::addProtocol(ProtocolM* protocol)
 {
-    if (task != nullptr)
+    if (protocol != nullptr)
     {
         // Add to the list
-        _allTasks.append(task);
+        _allProtocols.append(protocol);
     }
 }
 
 
 /**
- * @brief Remove a task from our experimentation
- * @param task
+ * @brief Remove a protocol from our experimentation
+ * @param protocol
  */
-void ExperimentationM::removeTask(TaskM* task)
+void ExperimentationM::removeProtocol(ProtocolM* protocol)
 {
-    if (task != nullptr)
+    if (protocol != nullptr)
     {
         // Remove from the list
-        _allTasks.remove(task);
+        _allProtocols.remove(protocol);
 
-        // Remove related TaskInstances
-        removeTaskInstanceRelatedToTask(task);
+        // Remove related sessions
+        removeSessionsRelatedToProtocol(protocol);
     }
 }
 
 
 /**
- * @brief Add a task instance to our experimentation
- * @param taskInstance
+ * @brief Add a session to our experimentation
+ * @param session
  */
-void ExperimentationM::addTaskInstance(TaskInstanceM* taskInstance)
+void ExperimentationM::addSession(SessionM* session)
 {
-    if (taskInstance != nullptr)
+    if (session != nullptr)
     {
         // Add to the list
-        _allTaskInstances.append(taskInstance);
+        _allSessions.append(session);
     }
 }
 
 
 /**
- * @brief Remove a task instance from our experimentation
- * @param taskInstance
+ * @brief Remove a session from our experimentation
+ * @param session
  */
-void ExperimentationM::removeTaskInstance(TaskInstanceM* taskInstance)
+void ExperimentationM::removeSession(SessionM* session)
 {
-    if (taskInstance != nullptr)
+    if (session != nullptr)
     {
         // Remove from the list
-        _allTaskInstances.remove(taskInstance);
+        _allSessions.remove(session);
     }
 }
 
 
 /**
- * @brief Remove task instances related to the given subject
+ * @brief Remove sessions related to the given subject
  * @param subject
  */
-void ExperimentationM::removeTaskInstanceRelatedToSubject(SubjectM* subject)
+void ExperimentationM::removeSessionsRelatedToSubject(SubjectM* subject)
 {
-    const QList<TaskInstanceM*> taskInstanceList = _allTaskInstances.toList();
-    auto taskInstanceIt = taskInstanceList.begin();
-    while (taskInstanceIt != taskInstanceList.end())
+    const QList<SessionM*> sessionList = _allSessions.toList();
+    auto sessionIt = sessionList.begin();
+    while (sessionIt != sessionList.end())
     {
-        // Looking for a task instance related to the given subject
-        taskInstanceIt = std::find_if(taskInstanceIt, taskInstanceList.end(), [subject](TaskInstanceM* taskInstance){
-                return (taskInstance != nullptr) && (taskInstance->subject() == subject);
+        // Looking for a session related to the given subject
+        sessionIt = std::find_if(sessionIt, sessionList.end(), [subject](SessionM* session){
+                return (session != nullptr) && (session->subject() == subject);
         });
 
-        if (taskInstanceIt != taskInstanceList.end())
+        if (sessionIt != sessionList.end())
         {
-            // We found a task instance with given subject
-            removeTaskInstance(*taskInstanceIt);
-            ++taskInstanceIt;
+            // We found a session with given subject
+            removeSession(*sessionIt);
+            ++sessionIt;
         }
     }
 }
 
 
 /**
- * @brief Remove task instances related to the given task
- * @param task
+ * @brief Remove sessions related to the given protocol
+ * @param protocol
  */
-void ExperimentationM::removeTaskInstanceRelatedToTask(TaskM* task)
+void ExperimentationM::removeSessionsRelatedToProtocol(ProtocolM* protocol)
 {
-    const QList<TaskInstanceM*> taskInstanceList = _allTaskInstances.toList();
-    auto taskInstanceIt = taskInstanceList.begin();
-    while (taskInstanceIt != taskInstanceList.end())
+    const QList<SessionM*> sessionList = _allSessions.toList();
+    auto sessionIt = sessionList.begin();
+    while (sessionIt != sessionList.end())
     {
-        // Looking for a task instance related to the given subject
-        taskInstanceIt = std::find_if(taskInstanceIt, taskInstanceList.end(), [task](TaskInstanceM* taskInstance){
-                return (taskInstance != nullptr) && (taskInstance->task() == task);
+        // Looking for a session related to the given subject
+        sessionIt = std::find_if(sessionIt, sessionList.end(), [protocol](SessionM* session) {
+                return (session != nullptr) && (session->protocol() == protocol);
         });
 
-        if (taskInstanceIt != taskInstanceList.end())
+        if (sessionIt != sessionList.end())
         {
-            // We found a task instance with given subject
-            removeTaskInstance(*taskInstanceIt);
-            ++taskInstanceIt;
+            // We found a session with given protocol
+            removeSession(*sessionIt);
+            ++sessionIt;
         }
     }
 }
@@ -307,7 +307,7 @@ CharacteristicM* ExperimentationM::getCharacteristicFromUID(const CassUuid& cass
 }
 
 /**
- * @brief Get a task from its UUID
+ * @brief Get a subject from its UUID
  * @param cassUuid
  * @return
  */
@@ -319,27 +319,28 @@ SubjectM* ExperimentationM::getSubjectFromUID(const CassUuid& cassUuid)
 
 
 /**
- * @brief Get a task from its UUID
+ * @brief Get a protocol from its UUID
  * @param cassUuid
  * @return
  */
-TaskM* ExperimentationM::getTaskFromUID(const CassUuid& cassUuid)
+ProtocolM* ExperimentationM::getProtocolFromUID(const CassUuid& cassUuid)
 {
-    auto taskIt = std::find_if(_allTasks.begin(), _allTasks.end(), [cassUuid](TaskM* task) { return (task != nullptr) && (task->getCassUuid() == cassUuid); });
-    return (taskIt != _allTasks.end()) ? *taskIt : nullptr;
+    auto protocolIt = std::find_if(_allProtocols.begin(), _allProtocols.end(), [cassUuid](ProtocolM* protocol) { return (protocol != nullptr) && (protocol->getCassUuid() == cassUuid); });
+    return (protocolIt != _allProtocols.end()) ? *protocolIt : nullptr;
 }
 
 
 /**
- * @brief Get a task instance from its UUID
+ * @brief Get a session from its UUID
  * @param cassUuid
  * @return
  */
-TaskInstanceM* ExperimentationM::getTaskInstanceFromUID(const CassUuid& cassUuid)
+SessionM* ExperimentationM::getSessionFromUID(const CassUuid& cassUuid)
 {
-    const QList<TaskInstanceM*> taskInstanceList = _allTaskInstances.toList();
-    auto taskInstanceIt = std::find_if(taskInstanceList.begin(), taskInstanceList.end(), [cassUuid](TaskInstanceM* taskInstance) { return (taskInstance != nullptr) && (taskInstance->getCassUuid() == cassUuid); });
-    return (taskInstanceIt != taskInstanceList.end()) ? *taskInstanceIt : nullptr;
+    // FIXME: why the copy ?
+    const QList<SessionM*> sessionsList = _allSessions.toList();
+    auto sessionIt = std::find_if(sessionsList.begin(), sessionsList.end(), [cassUuid](SessionM* session) { return (session != nullptr) && (session->getCassUuid() == cassUuid); });
+    return (sessionIt != sessionsList.end()) ? *sessionIt : nullptr;
 }
 
 
@@ -375,10 +376,10 @@ ExperimentationM* ExperimentationM::createFromCassandraRow(const CassRow* row)
 void ExperimentationM::deleteExperimentationFromCassandra(const ExperimentationM& experimentation)
 {
     // Delete experimentations associations
-    _deleteAllTasksForExperimentation(experimentation);
+    _deleteAllProtocolsForExperimentation(experimentation);
     _deleteAllSubjectsForExperimentation(experimentation);
     _deleteAllCharacteristicsForExperimentation(experimentation);
-    _deleteAllTaskInstancesForExperimentation(experimentation);
+    _deleteAllSessionsForExperimentation(experimentation);
 
     // Delete actual experimentation
     AssessmentsModelManager::deleteEntry<ExperimentationM>({ experimentation.getCassUuid() });
@@ -428,18 +429,18 @@ CassStatement* ExperimentationM::createBoundUpdateStatement(const Experimentatio
 }
 
 /**
- * @brief Delete all tasks associated with the given experimentation
+ * @brief Delete all protocols associated with the given experimentation
  * @param experimentation
  */
-void ExperimentationM::_deleteAllTasksForExperimentation(const ExperimentationM& experimentation)
+void ExperimentationM::_deleteAllProtocolsForExperimentation(const ExperimentationM& experimentation)
 {
-    // Delete all tasks associations
+    // Delete all protocols associations
     AssessmentsModelManager::deleteEntry<IndependentVariableM>({ experimentation.getCassUuid() });
     AssessmentsModelManager::deleteEntry<IndependentVariableValueM>({ experimentation.getCassUuid() });
     AssessmentsModelManager::deleteEntry<DependentVariableM>({ experimentation.getCassUuid() });
 
-    // Delete all tasks
-    AssessmentsModelManager::deleteEntry<TaskM>({ experimentation.getCassUuid() });
+    // Delete all protocols
+    AssessmentsModelManager::deleteEntry<ProtocolM>({ experimentation.getCassUuid() });
 }
 
 /**
@@ -468,14 +469,14 @@ void ExperimentationM::_deleteAllCharacteristicsForExperimentation(const Experim
 }
 
 /**
- * @brief Delete all task instances with the given experimentation
+ * @brief Delete all sessions with the given experimentation
  * @param experimentation
  */
-void ExperimentationM::_deleteAllTaskInstancesForExperimentation(const ExperimentationM& experimentation)
+void ExperimentationM::_deleteAllSessionsForExperimentation(const ExperimentationM& experimentation)
 {
-    // Independent variable values already deleted with task deletion
+    // Independent variable values already deleted with protocol deletion
 
-    // Delete all task_instance
-    AssessmentsModelManager::deleteEntry<TaskInstanceM>({ experimentation.getCassUuid() });
+    // Delete all sessions
+    AssessmentsModelManager::deleteEntry<SessionM>({ experimentation.getCassUuid() });
 }
 

@@ -24,7 +24,7 @@ import INGESCAPE 1.0
 //import "theme" as Theme
 import "../popup" as Popup
 import "../subject" as Subject
-import "../task" as Task
+import "../protocol" as Protocol
 import "../export" as Export
 
 
@@ -327,7 +327,7 @@ Item {
         property real creationDateTimeColumnWidth: 165
         property real buttonsColumnWidth: 135
 
-        property real sessionColumnWidth: taskInstancesPanel.width - taskInstanceScrollView.scrollBarSize - taskInstanceScrollView.verticalScrollbarMargin
+        property real sessionColumnWidth: sessionsPanel.width - sessionsScrollView.scrollBarSize - sessionsScrollView.verticalScrollbarMargin
                                           - selectionColumnWidth
                                           - subjectColumnWidth
                                           - protocolColumnWidth
@@ -472,10 +472,10 @@ Item {
 
 
         //
-        // Task Instances Panel
+        // Sessions panel
         //
         Item {
-            id: taskInstancesPanel
+            id: sessionsPanel
 
             anchors {
                 top: parent.top
@@ -847,17 +847,23 @@ Item {
                             //enabled: rootItem.controller && rootItem.controller.allAgentNamesList.length > 0
                             visible: _isSelectingSessionsToExport && rootItem.controller
                             enabled: visible
-                            model: rootItem.experimentation ? rootItem.experimentation.allTasks : 0
+                            model: rootItem.experimentation ? rootItem.experimentation.allProtocols : 0
 
                             placeholderText: enabled ? "- Select a protocol -" : ""
 
                             text:{
-                                if(enabled && rootItem.controller && rootItem.experimentation && (rootItem.controller.selectedProtocolNameListToFilter.length > 0)){
-                                    if(rootItem.controller.selectedProtocolNameListToFilter.length === 1){
+                                if (enabled && rootItem.controller && rootItem.experimentation && (rootItem.controller.selectedProtocolNameListToFilter.length > 0))
+                                {
+                                    if (rootItem.controller.selectedProtocolNameListToFilter.length === 1)
+                                    {
                                         "- " + rootItem.controller.selectedProtocolNameListToFilter + " -"
-                                    }else if(rootItem.controller.selectedProtocolNameListToFilter.length < rootItem.experimentation.allTasks.count){
+                                    }
+                                    else if (rootItem.controller.selectedProtocolNameListToFilter.length < rootItem.experimentation.allProtocols.count)
+                                    {
                                         "- " + rootItem.controller.selectedProtocolNameListToFilter.length + " protocols selected -"
-                                    }else{
+                                    }
+                                    else
+                                    {
                                         "- All protocols selected -"
                                     }
                                 }else{
@@ -884,7 +890,7 @@ Item {
 
                                 if (rootItem.controller && rootItem.experimentation && (rootItem.controller.selectedProtocolNameListToFilter.length > 0))
                                 {
-                                    if (rootItem.controller.selectedProtocolNameListToFilter.length === rootItem.experimentation.allTasks.count) {
+                                    if (rootItem.controller.selectedProtocolNameListToFilter.length === rootItem.experimentation.allProtocols.count) {
                                         checkAllState = Qt.Checked;
                                     }
                                     else {
@@ -903,7 +909,7 @@ Item {
                                 width: dropDownProtocol.comboButton.width
                                 height: dropDownProtocol.comboButton.height
 
-                                property TaskM taskM : rootItem.experimentation ? rootItem.experimentation.allTasks.get(index) : null
+                                property ProtocolM protocolM : rootItem.experimentation ? rootItem.experimentation.allProtocols.get(index) : null
 
                                 CheckBox {
                                     id : filterProtocolCB
@@ -927,7 +933,7 @@ Item {
 
                                             color: IngeScapeTheme.lightGreyColor
 
-                                            text: delegateProtocolComboList.taskM ? " " + delegateProtocolComboList.taskM.name : ""
+                                            text: delegateProtocolComboList.protocolM ? " " + delegateProtocolComboList.protocolM.name : ""
                                             elide: Text.ElideRight
 
                                             font {
@@ -955,12 +961,12 @@ Item {
                                     }
 
                                     onClicked : {
-                                        if (rootItem.controller && delegateProtocolComboList.taskM) {
+                                        if (rootItem.controller && delegateProtocolComboList.protocolM) {
                                             if (checked) {
-                                                rootItem.controller.addOneProtocolToFilterSessions(delegateProtocolComboList.taskM.name)
+                                                rootItem.controller.addOneProtocolToFilterSessions(delegateProtocolComboList.protocolM.name)
                                             }
                                             else {
-                                                rootItem.controller.removeOneProtocolToFilterSessions(delegateProtocolComboList.taskM.name)
+                                                rootItem.controller.removeOneProtocolToFilterSessions(delegateProtocolComboList.protocolM.name)
                                             }
 
                                             // update "all agents" checkbox state
@@ -970,7 +976,7 @@ Item {
 
                                             if (rootItem.controller && rootItem.experimentation && (rootItem.controller.selectedProtocolNameListToFilter.length > 0))
                                             {
-                                                if (rootItem.controller.selectedProtocolNameListToFilter.length === rootItem.experimentation.allTasks.count) {
+                                                if (rootItem.controller.selectedProtocolNameListToFilter.length === rootItem.experimentation.allProtocols.count) {
                                                     dropDownProtocol.checkAllState = Qt.Checked;
                                                 }
                                                 else {
@@ -984,8 +990,8 @@ Item {
                                         target : dropDownProtocol.popup
                                         onOpened : {
                                             // update agents checkboxes states when the pop up is opening
-                                            if (controller && delegateProtocolComboList.taskM) {
-                                                filterProtocolCB.checked = controller.isProtocolFilterSessions(delegateProtocolComboList.taskM.name);
+                                            if (controller && delegateProtocolComboList.protocolM) {
+                                                filterProtocolCB.checked = controller.isProtocolFilterSessions(delegateProtocolComboList.protocolM.name);
                                             }
                                         }
                                     }
@@ -994,8 +1000,8 @@ Item {
                                         target : rootItem
                                         onClickAllProtocol : {
                                             // update agents checkboxes states when the "pop up is opening  "All Agents" check box is selected or unselected
-                                            if (controller && delegateProtocolComboList.taskM) {
-                                                filterProtocolCB.checked = controller.isProtocolFilterSessions(delegateProtocolComboList.taskM.name);
+                                            if (controller && delegateProtocolComboList.protocolM) {
+                                                filterProtocolCB.checked = controller.isProtocolFilterSessions(delegateProtocolComboList.protocolM.name);
                                             }
                                         }
                                     }
@@ -1175,37 +1181,38 @@ Item {
                 color: IngeScapeTheme.whiteColor
 
                 ScrollView {
-                    id: taskInstanceScrollView
+                    id: sessionsScrollView
                     anchors {
                         fill: parent
-                        rightMargin: -taskInstanceScrollView.scrollBarSize -taskInstanceScrollView.verticalScrollbarMargin
+                        rightMargin: -sessionsScrollView.scrollBarSize -sessionsScrollView.verticalScrollbarMargin
                     }
 
                     property int scrollBarSize: 11
                     property int verticalScrollbarMargin: 3
 
                     style: IngeScapeAssessmentsScrollViewStyle {
-                        scrollBarSize: taskInstanceScrollView.scrollBarSize
-                        verticalScrollbarMargin: taskInstanceScrollView.verticalScrollbarMargin
+                        scrollBarSize: sessionsScrollView.scrollBarSize
+                        verticalScrollbarMargin: sessionsScrollView.verticalScrollbarMargin
                     }
 
                     // Prevent drag overshoot on Windows
                     flickableItem.boundsBehavior: Flickable.OvershootBounds
 
                     Column {
-                        id: taskInstanceColumn
-                        width: taskInstanceScrollView.width - (taskInstanceScrollView.scrollBarSize + taskInstanceScrollView.verticalScrollbarMargin)
+                        id: sessionColumn
+
+                        width: sessionsScrollView.width - (sessionsScrollView.scrollBarSize + sessionsScrollView.verticalScrollbarMargin)
                         height: childrenRect.height
                         spacing: 0
 
                         Repeater {
                             model: rootItem.controller && rootItem.experimentation
                                    ? rootItem._isSelectingSessionsToExport ? rootItem.controller.sessionFilteredList
-                                                                           : rootItem.experimentation.allTaskInstances
+                                                                           : rootItem.experimentation.allSessions
                                    : null
 
 
-                            delegate: TaskInstanceInList {
+                            delegate: SessionInList {
                                 isSelectingSessionsToExport: rootItem._isSelectingSessionsToExport && rootItem.controller.isRecorderON
                                 appearanceAnimationDuration: rootItem._appearanceAnimationDuration
 
@@ -1232,9 +1239,9 @@ Item {
                                     }
                                 }
 
-                                onDeleteTaskInstance: {
-                                    deleteTaskInstancePopup.taskInstance = modelM
-                                    deleteTaskInstancePopup.open()
+                                onDeleteSessionAsked: {
+                                    deleteSessionPopup.session = modelM
+                                    deleteSessionPopup.open()
                                 }
 
                                 onIsSelectedSessionChanged: {
@@ -1275,7 +1282,7 @@ Item {
         //
         // Create Experimentation Popup
         //
-        Popup.CreateTaskInstancePopup {
+        Popup.CreateSessionPopup {
             id: createSessionPopup
 
             experimentationController: rootItem.controller
@@ -1320,7 +1327,7 @@ Item {
     //
     // Protocols View (popup)
     //
-    Task.TasksView {
+    Protocol.ProtocolsView {
         id: protocolsViewPopup
 
         anchors.centerIn: parent
@@ -1328,7 +1335,7 @@ Item {
         width: parent.width - subScreensMargin
         height: parent.height - subScreensMargin
 
-        taskController: IngeScapeAssessmentsC.tasksC
+        protocolsController: IngeScapeAssessmentsC.protocolsC
     }
 
 
@@ -1348,27 +1355,27 @@ Item {
 
 
     Popup.DeleteConfirmationPopup {
-        id: deleteTaskInstancePopup
+        id: deleteSessionPopup
 
-        property var taskInstance: null
+        property var session: null
 
         showPopupTitle: false
         anchors.centerIn: parent
 
-        text: qsTr("Are you sure you want to delete the task instance %1 ?").arg(taskInstance ? taskInstance.name : "")
+        text: qsTr("Are you sure you want to delete the session %1 ?").arg(session ? session.name : "")
 
         height: 160
         width: 470
 
         onValidated: {
-            if (rootItem.controller && taskInstance) {
-                rootItem.controller.deleteTaskInstance(taskInstance);
+            if (rootItem.controller && session) {
+                rootItem.controller.deleteSession(session);
             }
-            close()
+            close();
         }
 
         onCanceled: {
-            close()
+            close();
         }
 
     }

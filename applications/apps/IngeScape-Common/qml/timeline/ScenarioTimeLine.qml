@@ -33,7 +33,12 @@ Item {
     property var scenarioController: null;
     property var timeLineController: null;
 
+    // Record model that we want to show in our scenario timeline
+    // N.B : Only for Assessments ...
     property var recordsListToShow : [];
+
+    // Flag indicating if the user can reorganize actions in scenario timeline
+    property bool canReorganizeScenario : true
 
     // Licenses controller
     property LicensesController licensesController: null;
@@ -117,10 +122,6 @@ Item {
         enabled: rootItem._canPerformResizeAnimations
 
         NumberAnimation {}
-    }
-
-    Component.onCompleted: {
-        console.log(rootItem.playVisibility);
     }
 
 
@@ -522,6 +523,8 @@ Item {
 
                                 ActionInTimeLine {
                                     myActionVM: model.QtObject;
+
+                                    canChangePositionInTimeline: rootItem.canReorganizeScenario
 
                                     scenarioController: rootItem.scenarioController
                                     timeLineController: rootItem.timeLineController
