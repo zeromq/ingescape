@@ -347,38 +347,38 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
   set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
   set(CPACK_STRIP_FILES TRUE)
   
-  # Installers for 32- vs. 64-bit CMake: - Root install directory (displayed to
-  # end user at installer-run time) - "NSIS package/display name" (text used in
-  # the installer GUI) - Registry key used to store info about the installation
-  if(CMAKE_CL_64)
-    set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES64")
-    set(CPACK_NSIS_PACKAGE_NAME
-        "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION} (Win64)")
-    set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} (Win64)")
-  else()
-    set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES")
-    set(CPACK_NSIS_PACKAGE_NAME
-        "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION}")
-    set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} (Win32)")
-  endif()
-
-  # NSIS configuration for Windows see https://cmake.org/cmake/help/v3.14/cpack_
-  # gen/nsis.html#cpack_gen:CPack%20NSIS%20Generator
-  set(CPACK_NSIS_DISPLAY_NAME "The ${PROJECT_NAME} core library")
-  set(CPACK_NSIS_PACKAGE_NAME ${PROJECT_NAME})
-  set(CPACK_NSIS_HELP_LINK "https://ingescape.com")
-  set(CPACK_NSIS_CONTACT "contact@ingescape.com")
-  set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
-  set(CPACK_NSIS_MODIFY_PATH ON)
-  set(CPACK_NSIS_URL_INFO_ABOUT ${CMAKE_PROJECT_HOMEPAGE_URL})
-  set(CPACK_NSIS_MENU_LINKS ${CMAKE_PROJECT_HOMEPAGE_URL} "IngeScape Web Site")
-
   set(
     CPACK_SOURCE_IGNORE_FILES
     "${SOURCE_DIR}/bindings/;${SOURCE_DIR}/build/;${SOURCE_DIR}/.git/;${SOURCE_DIR}/doc/;${SOURCE_DIR}/applications/;${SOURCE_DIR}/ingeprobe/;${SOURCE_DIR}/packaging/"
     )
 
   if(WIN32)
+    # Installers for 32- vs. 64-bit CMake: - Root install directory (displayed to
+    # end user at installer-run time) - "NSIS package/display name" (text used in
+    # the installer GUI) - Registry key used to store info about the installation
+    if(CMAKE_CL_64)
+      set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES64")
+      set(CPACK_NSIS_PACKAGE_NAME
+          "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION} (Win64)")
+      set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} (Win64)")
+    else()
+      set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES")
+      set(CPACK_NSIS_PACKAGE_NAME
+          "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION}")
+      set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} (Win32)")
+    endif()
+
+    # NSIS configuration for Windows see https://cmake.org/cmake/help/v3.14/cpack_
+    # gen/nsis.html#cpack_gen:CPack%20NSIS%20Generator
+    set(CPACK_NSIS_DISPLAY_NAME "The ${PROJECT_NAME} core library")
+    set(CPACK_NSIS_PACKAGE_NAME ${PROJECT_NAME})
+    set(CPACK_NSIS_HELP_LINK "https://ingescape.com")
+    set(CPACK_NSIS_CONTACT "contact@ingescape.com")
+    set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
+    set(CPACK_NSIS_MODIFY_PATH ON)
+    set(CPACK_NSIS_URL_INFO_ABOUT ${CMAKE_PROJECT_HOMEPAGE_URL})
+    set(CPACK_NSIS_MENU_LINKS ${CMAKE_PROJECT_HOMEPAGE_URL} "IngeScape Web Site")
+
     set(CPACK_MONOLITHIC_INSTALL ON)
 
     set(CPACK_GENERATOR "NSIS;ZIP")
