@@ -321,8 +321,14 @@ Item {
 
                 onClicked: {
                     console.log("QML: play action '" + rootItem.action.name + "'");
-                    if (controller) {
-                        controller.executeEffectsOfAction(rootItem.action);
+                    if (rootItem.controller && rootItem.action)
+                    {
+                        if (rootItem.controller.isPlaying) {
+                            rootItem.controller.addActionVMAtCurrentTime(rootItem.action);
+                        }
+                        else {
+                            rootItem.controller.executeEffectsOfAction(rootItem.action);
+                        }
                     }
                 }
             }
