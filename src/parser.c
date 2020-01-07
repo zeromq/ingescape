@@ -966,17 +966,6 @@ static void json_dump_mapping (igsyajl_gen *g, igs_mapping_t* mapp) {
 ////////////////////////////////////////////////////////////////////////
 // PRIVATE API
 ////////////////////////////////////////////////////////////////////////
-/*
- * Function: load_definition
- * ----------------------------
- *   Load a agent definition in the standartised format JSON to initialize a definition structure from a string.
- *   The definition structure is dynamically allocated. You will have to use definition_freeDefinition function to deallocated it correctly.
- *
- *   json_str      : a string (json format)
- *
- *   returns: a pointer on a category structure or NULL if it has failed
- */
-
 igs_definition_t* parser_loadDefinition (const char* json_str) {
     
     igs_definition_t *def = NULL;
@@ -991,16 +980,6 @@ igs_definition_t* parser_loadDefinition (const char* json_str) {
     return def;
 }
 
-/*
- * Function: load_definition_from_path
- * -----------------------------------
- *   Load a agent definition in the standartised format JSON to initialize a definition structure from a local file path.
- *   The definition structure is dynamically allocated. You will have to use definition_freeDefinition function to deallocated it correctly.
- *
- *   file_path      : the file path
- *
- *   returns: a pointer on a category structure or NULL if it has failed
- */
 
 igs_definition_t * parser_loadDefinitionFromPath (const char* path) {
     
@@ -1019,15 +998,6 @@ igs_definition_t * parser_loadDefinitionFromPath (const char* path) {
     return def;
 }
 
-/*
- * Function: parser_export_definition
- * ----------------------------
- *   Returns a agent's definition structure into a standartised format json string UTF8 to send it throught the BUS or save it in a file
- *
- *   def    : the agent's definition dump in string
- *
- *   returns: a definition json format string UTF8
- */
 
 char* parser_export_definition (igs_definition_t* def) {
     
@@ -1059,15 +1029,6 @@ char* parser_export_definition (igs_definition_t* def) {
     return result;
 }
 
-/*
- * Function: parser_export_mapping
- * ----------------------------
- *   Returns a agent's mapping structure into a standartised format json string UTF8 to send it throught the BUS or save it in a file
- *
- *   mapp    : the agent's mapping dump in string
- *
- *   returns: a mapping json format string UTF8
- */
 
 char* parser_export_mapping(igs_mapping_t *mapp){
     char* result = NULL;
@@ -1096,16 +1057,6 @@ char* parser_export_mapping(igs_mapping_t *mapp){
     return result;
 }
 
-/*
- * Function: load_map
- * ------------------
- *   Load a mapping in the standartised format JSON to initialize a mapping structure from a string.
- *   The mapping structure is dynamically allocated. You will have to use free_mapping function to deallocated it correctly.
- *
- *   json_str      : a string (json format)
- *
- *   returns : a pointer on a mapping structure or NULL if it has failed
- */
 
 igs_mapping_t* parser_LoadMap(const char* json_str){
     
@@ -1124,16 +1075,6 @@ igs_mapping_t* parser_LoadMap(const char* json_str){
     return mapp;
 }
 
-/*
- * Function: load_map_from_path
- * ----------------------------
- *   Load a mapping in the standartised format JSON to initialize a mapping structure from a local file path.
- *   The mapping structure is dynamically allocated. You will have to use free_mapping function to deallocated it correctly.
- *
- *   file_path      : the file path
- *
- *   returns : a pointer on a mapping structure or NULL if it has failed
- */
 
 igs_mapping_t* parser_LoadMapFromPath (const char* path){
     
@@ -1156,16 +1097,6 @@ igs_mapping_t* parser_LoadMapFromPath (const char* path){
 ////////////////////////////////////////////////////////////////////////
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
-
-/**
- * \fn int igs_loadDefinition (const char* json_str)
- * \ingroup loadSetGetDefFct
- * \brief load definition in variable 'igs_definition_loaded' & copy in 'agent->definition"
- *      from a json string
- *
- * \param json_str String in json format. Can't be NULL.
- * \return The error. 1 is OK, 0 json string is NULL, -1 Definition file has not been loaded
- */
 int igsAgent_loadDefinition (igsAgent_t *agent, const char* json_str){
     
     //Check if the json string is null
@@ -1189,10 +1120,10 @@ int igsAgent_loadDefinition (igsAgent_t *agent, const char* json_str){
         }
         agent->definition = tmp;
         //Check the name of agent from network layer
-        char *name = igs_getAgentName();
+        char *name = igsAgent_getAgentName(agent);
         if(strcmp(name, AGENT_NAME_DEFAULT) == 0){
             //The name of the agent is default : we change it to definition name
-            igs_setAgentName(agent->definition->name);
+            igsAgent_setAgentName(agent, agent->definition->name);
         }//else
             //The agent name was assigned by the developer : we keep it untouched
         free(name);
@@ -1202,15 +1133,7 @@ int igsAgent_loadDefinition (igsAgent_t *agent, const char* json_str){
     return 1;
 }
 
-/**
- * \fn int igs_loadDefinitionFromPath (const char* file_path)
- * \ingroup loadSetGetDefFct
- * \brief load definition in variable 'igs_definition_loaded' & copy in 'agent->definition"
- *      from a file path
- *
- * \param file_path The string which contains the json file path. Can't be NULL.
- * \return The error. 1 is OK, 0 json string is NULL, -1 Definition file has not been loaded
- */
+
 int igsAgent_loadDefinitionFromPath (igsAgent_t *agent, const char* file_path){
     
     //Check if the json string is null
@@ -1240,10 +1163,10 @@ int igsAgent_loadDefinitionFromPath (igsAgent_t *agent, const char* file_path){
         }
         agent->definition = tmp;
         //Check the name of agent from network layer
-        char *name = igs_getAgentName();
+        char *name = igsAgent_getAgentName(agent);
         if(strcmp(name, AGENT_NAME_DEFAULT) == 0){
             //The name of the agent is default : we change it to definition name
-            igs_setAgentName(agent->definition->name);
+            igsAgent_setAgentName(agent, agent->definition->name);
         }//else
             //The agent name was assigned by the developer : we keep it untouched
         free(name);
