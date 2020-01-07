@@ -279,35 +279,6 @@ napi_value node_igs_observeFreeze(napi_env env, napi_callback_info info) {
 
 CallbackIopJS *headIopObserved = NULL;
 
-// convert C value into napi value according to iopType value
-napi_value createValueWithGoodType(napi_env env, void * value, size_t size, iopType_t type) {
-    napi_value res = NULL;
-
-    switch(type) {
-        case IGS_INTEGER_T  :
-            convert_int_to_napi(env, *(int *)value, &res);
-            break;
-        case IGS_DOUBLE_T  :
-            convert_double_to_napi(env, *((double *)value), &res);
-            break;
-        case IGS_STRING_T  :
-            convert_string_to_napi(env, (char *) value, &res);
-            break;
-        case IGS_BOOL_T  :
-            convert_bool_to_napi(env, *(bool *)value, &res);
-            break;
-        case IGS_IMPULSION_T  :
-            convert_null_to_napi(env, &res);
-            break;
-        case IGS_DATA_T  :
-            convert_data_to_napi(env, value, size, &res);
-            break;
-        default : 
-            triggerException(env, NULL, "Unknow iopType_t passed as type.");
-    }
-    return res;
-}
-
 // Function to callback IOP JS function 
 static void cbIOP_into_js(napi_env env, napi_value js_callback, void* ctx, void* data) {
     napi_status status;
@@ -318,7 +289,7 @@ static void cbIOP_into_js(napi_env env, napi_value js_callback, void* ctx, void*
     convert_int_to_napi(env, callback->iopType, &argv[0]);
     convert_string_to_napi(env, callback->name, &argv[1]);
     convert_int_to_napi(env, get_iop_type_js_from_iop_type_t(callback->valueType), &argv[2]);
-    argv[3] = createValueWithGoodType(env, callback->value, callback->valueSize, callback->valueType);
+    convert_value_IOP_into_napi(env, callback->valueType, callback->value, callback->valueSize, &argv[3]);
     if (callback->ref_myData == NULL) {
         convert_null_to_napi(env, &argv[4]);
     }
@@ -350,7 +321,11 @@ void observeCallback(iop_t iopType, const char* name, iopType_t valueType, void*
     callback->iopType = iopType;
     callback->name = strndup(name, strlen(name));
     callback->valueType = valueType;
-    callback->value = value;
+
+    void * copyValue = malloc(valueSize);
+    memcpy(copyValue, value, valueSize);
+    callback->value = copyValue;
+
     callback->valueSize = valueSize;
     napi_call_threadsafe_function(callback->threadsafe_func, callback, napi_tsfn_nonblocking);
 }
@@ -815,31 +790,37 @@ void free_data_cb() {
     CallbackForcedStopJS *eltFS, *tmpFS;
     DL_FOREACH_SAFE(headForcedStopObserved, eltFS, tmpFS) {
         DL_DELETE(headForcedStopObserved, eltFS);
+        free(eltFS);
     }
 
     CallbackMuteJS *eltMute, *tmpMute;
     DL_FOREACH_SAFE(headMuteObserved, eltMute, tmpMute) {
         DL_DELETE(headMuteObserved, eltMute);
+        free(eltMute);
     }
 
     CallbackFreezeJS *eltFreeze, *tmpFreeze;
     DL_FOREACH_SAFE(headFreezeObserved, eltFreeze, tmpFreeze) {
         DL_DELETE(headFreezeObserved, eltFreeze);
+        free(eltFreeze);
     }
 
     CallbackIopJS *elt, *tmp;
     DL_FOREACH_SAFE(headIopObserved, elt, tmp) {
         DL_DELETE(headIopObserved, elt);
+        free(elt);
     }
 
     CallbackLicense *eltLicense, *tmpLicense;
     DL_FOREACH_SAFE(headLicenseObserved, eltLicense, tmpLicense) {
         DL_DELETE(headLicenseObserved, eltLicense);
+        free(eltLicense);
     }
 
     CallbackCall *eltCall, *tmpCall;
     DL_FOREACH_SAFE(headCallObserved, eltCall, tmpCall) {
         DL_DELETE(headCallObserved, eltCall);
+        free(eltCall);
     }
 }
 

@@ -159,6 +159,7 @@ int convert_null_to_napi(napi_env env, napi_value* value_converted) {
 
 void arrayBufferCollected(napi_env env, void * finalize_data, void * finalize_hint) {
     free(finalize_data);
+    finalize_data = NULL;
 }
 
 int convert_data_to_napi(napi_env env, void * value, size_t size, napi_value* value_converted) {
@@ -219,10 +220,13 @@ int convert_value_IOP_into_napi(napi_env env, iopType_t type, void * value, size
         case IGS_IMPULSION_T  :
             convert_null_to_napi(env, value_napi);
             break;
-        case IGS_DATA_T  :
-            convert_data_to_napi(env, value, size, value_napi);
+        case IGS_DATA_T  : {
+            void * copyValue = malloc(size);
+            memcpy(copyValue, value, size);
+            convert_data_to_napi(env, copyValue, size, value_napi);
             // value will be freed by the function
-            break;
+             break;
+        }
         default : 
             triggerException(env, NULL, "Unknown iopType_t.");
             return 0;
