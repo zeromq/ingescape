@@ -292,7 +292,7 @@ void ExperimentationController::onRecordStartedReceived()
 
         if ((_sessionC->scenarioC() != nullptr) && (_nextRecordToHandle != nullptr))
         {
-            int deltaTimeFromTimeLineStart = _sessionC->scenarioC()->currentTime().msecsSinceStartOfDay();
+            qint64 deltaTimeFromTimeLineStart = _sessionC->scenarioC()->currentTime().msecsSinceStartOfDay();
 
             // N.B: timeout will apply user's choice (remove other records or stop record)
             if (_nextRecordToHandle->startTimeInTimeline() > deltaTimeFromTimeLineStart)
@@ -359,15 +359,13 @@ void ExperimentationController::onRecordAddedReceived(QString message){
                             QJsonValue jsonEndDateTime = jsonRecord.value("time_end");
                             QJsonValue jsonOffsetTimeline = jsonRecord.value("offset_timeline");
 
-                            qDebug() << "JSON OFFSET " << jsonOffsetTimeline.toInt();
-
                             if (jsonName.isString() && jsonId.isString())
                             {
                                 // Create record
                                 RecordAssessmentM* record = new RecordAssessmentM(jsonId.toString(),
                                                               jsonName.toString(),
-                                                              QDateTime::fromSecsSinceEpoch(static_cast<int>(jsonBeginDateTime.toDouble())),
-                                                              QDateTime::fromSecsSinceEpoch(static_cast<int>(jsonEndDateTime.toDouble())),
+                                                              QDateTime::fromMSecsSinceEpoch(static_cast<qint64>(jsonBeginDateTime.toDouble())),
+                                                              QDateTime::fromMSecsSinceEpoch(static_cast<qint64>(jsonEndDateTime.toDouble())),
                                                               jsonOffsetTimeline.toInt());
 
                                 _sessionC->currentSession()->recordsList()->append(record);
@@ -763,10 +761,16 @@ void ExperimentationController::_retrieveIndependentVariableValuesForSessionsInE
             if (indepVarValue != nullptr)
             {
                 SessionM* session = experimentation->getSessionFromUID(indepVarValue->sessionUuid);
-                IndependentVariableM* indepVar = session->protocol()->getIndependentVariableFromUuid(indepVarValue->independentVariableUuid);
-                if ((session != nullptr) && (indepVar != nullptr))
+                if (session != nullptr)
                 {
-                    session->setIndependentVariableValue(indepVar, indepVarValue->valueString);
+                    IndependentVariableM* indepVar = session->protocol()->getIndependentVariableFromUuid(indepVarValue->independentVariableUuid);
+                    if ((session != nullptr) && (indepVar != nullptr))
+                    {
+                        session->setIndependentVariableValue(indepVar, indepVarValue->valueString);
+                    }
+                }
+                else {
+                    qCritical() << "The session with id" << AssessmentsModelManager::cassUuidToQString(indepVarValue->sessionUuid) << "does not exist for this independent variable value (Expe" << experimentation->name() << ")";
                 }
             }
         }
@@ -775,7 +779,9 @@ void ExperimentationController::_retrieveIndependentVariableValuesForSessionsInE
     }
 }
 
-bool ExperimentationController::isThereOneRecordAfterStartTime() {
+
+bool ExperimentationController::isThereOneRecordAfterStartTime()
+{
     // Get start time of record in timeline
     int startTimeRecordInTimeline = _sessionC->scenarioC()->currentTime().msecsSinceStartOfDay();
 

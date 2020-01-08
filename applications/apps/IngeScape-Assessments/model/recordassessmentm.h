@@ -27,10 +27,10 @@ class RecordAssessmentM : public RecordM
     Q_OBJECT
 
     // Start time in milliseconds of our record in timeline
-    I2_QML_PROPERTY(int, startTimeInTimeline)
+    I2_QML_PROPERTY(qint64, startTimeInTimeline)
 
     // End time in milliseconds of our record in timeline
-    I2_QML_PROPERTY(int, endTimeInTimeline)
+    I2_QML_PROPERTY(qint64, endTimeInTimeline)
 
 public:
     explicit RecordAssessmentM(QString uid,
