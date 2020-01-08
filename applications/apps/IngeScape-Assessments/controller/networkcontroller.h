@@ -61,6 +61,10 @@ Q_SIGNALS:
      */
     void addedRecordReceived(QString message);
 
+    /**
+     * @brief Signal emitted when the "Recorder app" deleted a record
+     */
+    void deletedRecordReceived(QString message);
 
 
 public Q_SLOTS:

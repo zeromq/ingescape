@@ -1,7 +1,5 @@
 # CMake build script for Ingescape
 
-# TODO Add NSIS management (CPACK) TODO Add clean target (see czmq)
-
 # ##############################################################################
 # Project setup
 # ##############################################################################
@@ -334,9 +332,12 @@ endif()
 # ##############################################################################
 # Package installer for release build only
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
+  #https://cmake.org/cmake/help/v3.16/module/CPack.html#
   set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
-  set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_NAME} library")
-  set(CPACK_PACKAGE_VENDOR "Ingescape")
+  set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "The ${PROJECT_NAME} core library")
+  set(CPACK_PACKAGE_DESCRIPTION "The ${PROJECT_NAME} core library")
+  set(CPACK_PACKAGE_HOMEPAGE_URL "https://ingescape.com")
+  set(CPACK_PACKAGE_VENDOR "ingenuity.io")
   set(CPACK_PACKAGE_CONTACT "contact@ingescape.com")
   set(CPACK_PACKAGE_VERSION ${INGESCAPE_VERSION})
   set(CPACK_PACKAGE_VERSION_MAJOR "${INGESCAPE_VERSION_MAJOR}")
@@ -344,39 +345,40 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
   set(CPACK_PACKAGE_VERSION_PATCH "${INGESCAPE_VERSION_PATCH}")
   set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}")
   set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
-
-  # Installers for 32- vs. 64-bit CMake: - Root install directory (displayed to
-  # end user at installer-run time) - "NSIS package/display name" (text used in
-  # the installer GUI) - Registry key used to store info about the installation
-  if(CMAKE_CL_64)
-    set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES64")
-    set(CPACK_NSIS_PACKAGE_NAME
-        "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION} (Win64)")
-    set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} (Win64)")
-  else()
-    set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES")
-    set(CPACK_NSIS_PACKAGE_NAME
-        "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION}")
-    set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} (Win32)")
-  endif()
-
-  # NSIS configuration for Windows see https://cmake.org/cmake/help/v3.14/cpack_
-  # gen/nsis.html#cpack_gen:CPack%20NSIS%20Generator
-  set(CPACK_NSIS_DISPLAY_NAME "IngeScape library")
-  set(CPACK_NSIS_PACKAGE_NAME ${PROJECT_NAME})
-  set(CPACK_NSIS_HELP_LINK "https://ingescape.com")
-  set(CPACK_NSIS_CONTACT "contact@ingescape.com")
-  set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
-  set(CPACK_NSIS_MODIFY_PATH ON)
-  set(CPACK_NSIS_URL_INFO_ABOUT ${CMAKE_PROJECT_HOMEPAGE_URL})
-  set(CPACK_NSIS_MENU_LINKS ${CMAKE_PROJECT_HOMEPAGE_URL} "IngeScape Web Site")
-
+  set(CPACK_STRIP_FILES TRUE)
+  
   set(
     CPACK_SOURCE_IGNORE_FILES
     "${SOURCE_DIR}/bindings/;${SOURCE_DIR}/build/;${SOURCE_DIR}/.git/;${SOURCE_DIR}/doc/;${SOURCE_DIR}/applications/;${SOURCE_DIR}/ingeprobe/;${SOURCE_DIR}/packaging/"
     )
 
   if(WIN32)
+    # Installers for 32- vs. 64-bit CMake: - Root install directory (displayed to
+    # end user at installer-run time) - "NSIS package/display name" (text used in
+    # the installer GUI) - Registry key used to store info about the installation
+    if(CMAKE_CL_64)
+      set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES64")
+      set(CPACK_NSIS_PACKAGE_NAME
+          "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION} (Win64)")
+      set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} (Win64)")
+    else()
+      set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES")
+      set(CPACK_NSIS_PACKAGE_NAME
+          "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION}")
+      set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} (Win32)")
+    endif()
+
+    # NSIS configuration for Windows see https://cmake.org/cmake/help/v3.14/cpack_
+    # gen/nsis.html#cpack_gen:CPack%20NSIS%20Generator
+    set(CPACK_NSIS_DISPLAY_NAME "The ${PROJECT_NAME} core library")
+    set(CPACK_NSIS_PACKAGE_NAME ${PROJECT_NAME})
+    set(CPACK_NSIS_HELP_LINK "https://ingescape.com")
+    set(CPACK_NSIS_CONTACT "contact@ingescape.com")
+    set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
+    set(CPACK_NSIS_MODIFY_PATH ON)
+    set(CPACK_NSIS_URL_INFO_ABOUT ${CMAKE_PROJECT_HOMEPAGE_URL})
+    set(CPACK_NSIS_MENU_LINKS ${CMAKE_PROJECT_HOMEPAGE_URL} "IngeScape Web Site")
+
     set(CPACK_MONOLITHIC_INSTALL ON)
 
     set(CPACK_GENERATOR "NSIS;ZIP")
@@ -397,17 +399,30 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
             COMPONENT library)
 
   elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    # https://cmake.org/cmake/help/git-stage/cpack_gen/productbuild.html
     # Without component productbuild will not package any files
     set(CPACK_COMPONENTS_ALL library)
     set(CPACK_PACKAGING_INSTALL_PREFIX "/usr/local")
+    set(CPACK_SYSTEM_NAME "macos")
+    
+    set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_SOURCE_DIR}/builds/xcode/WELCOME.txt")
+    set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/builds/xcode/README.txt")
 
     # Without extention productbuild will crash So we just copy License file in
     # build folder with an extension
     configure_file("${CMAKE_CURRENT_SOURCE_DIR}/LICENSE"
                    "${CMAKE_BINARY_DIR}/LICENSE.txt" COPYONLY)
     set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_BINARY_DIR}/LICENSE.txt")
+    
+    set(CPACK_PREFLIGHT_LIBRARY_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/builds/xcode/preflight.sh")
+    set(CPACK_POSTFLIGHT_LIBRARY_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/builds/xcode/postflight.sh")
 
     set(CPACK_GENERATOR "productbuild")
+    set(IS_EDITOR FALSE)
+    install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS IS_EDITOR)
+    install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS IS_EDITOR)
+    install_ingescape_dependencies(CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS IS_EDITOR)
+    install_ingescape_dependencies(ZYRE_LIBRARIES ZYRE_INCLUDE_DIRS IS_EDITOR)
 
   else()
     set(CPACK_MONOLITHIC_INSTALL ON)

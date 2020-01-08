@@ -148,7 +148,8 @@ macro(install_ingescape_dependencies _LIB _HEADERS_PATH _IS_EDITOR)
         if (${_IS_EDITOR})
             install(FILES ${${_FILE_WITHOUT_EXT}_DLL_FILE} DESTINATION . COMPONENT library)
         else ()
-            install(FILES ${${_LIB}} DESTINATION "lib${LIB_SUFFIX}" COMPONENT library)
+            FILE(GLOB all_libs "${_PATH_TO_FILE}/${_FILE_WITHOUT_EXT}*")
+            install(FILES ${all_libs} DESTINATION "lib${LIB_SUFFIX}" COMPONENT library)
             install(FILES ${${_FILE_WITHOUT_EXT}_DLL_FILE} DESTINATION "lib${LIB_SUFFIX}" COMPONENT library)
             install(DIRECTORY ${${_HEADERS_PATH}}/
                 DESTINATION include

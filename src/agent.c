@@ -19,7 +19,7 @@ igsAgent_t *igsAgent_new(void){
     agent->allowIpc = true;
     agent->allowInproc = true;
     agent->logLevel = IGS_LOG_INFO;
-    sprintf(agent->agentName, "UNAMED_AGENT");
+    sprintf(agent->agentName, AGENT_NAME_DEFAULT);
     return agent;
 }
 void igsAgent_destroy(igsAgent_t **agent){

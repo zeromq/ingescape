@@ -337,7 +337,7 @@ int main(int argc, char *argv[])
             if (QFile::copy(":/settings/IngeScape-Editor.ini", settingsFilePath))
             {
                 // Update permissions for our .ini file
-                QFileDevice::Permissions filePermissions =  QFileDevice::ReadUser | QFileDevice::WriteUser | QFileDevice::ReadGroup | QFileDevice::WriteGroup;
+                QFileDevice::Permissions filePermissions = QFileDevice::ReadUser | QFileDevice::WriteUser | QFileDevice::ReadGroup | QFileDevice::WriteGroup;
                 if (!QFile::setPermissions(settingsFilePath, filePermissions))
                 {
                     qWarning() << "ERROR during set permissions to file" << settingsFilePath;

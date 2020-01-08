@@ -1085,6 +1085,9 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         HASH_FIND_STR(agent->definition->calls_table, callName, call);
                         if (call != NULL ){
                             if (call->cb != NULL){
+                                bus_zyreLock();
+                                zyre_shouts(agent->loopElements->node, agent->callsChannel, "%s from %s (%s)", callName, name, peer);
+                                bus_zyreUnlock();
                                 size_t nbArgs = 0;
                                 igs_callArgument_t *_arg = NULL;
                                 LL_COUNT(call->arguments, _arg, nbArgs);
@@ -1315,6 +1318,12 @@ initLoop (zsock_t *pipe, void *args){
     snprintf(agent->replayChannel, MAX_AGENT_NAME_LENGTH + 15, "%s-IGS-REPLAY", agent->agentName);
     bus_zyreLock();
     zyre_join(agent->loopElements->node, agent->replayChannel);
+    bus_zyreUnlock();
+    
+    //create channel for calls feedback
+    snprintf(agent->callsChannel, MAX_AGENT_NAME_LENGTH + 15, "%s-IGS-CALLS", agent->agentName);
+    bus_zyreLock();
+    zyre_join(agent->loopElements->node, agent->callsChannel);
     bus_zyreUnlock();
     
     //Add version and protocol to headers
@@ -1952,12 +1961,7 @@ int igsAgent_startWithDeviceOnBroker(igsAgent_t *agent, const char *networkDevic
     return 1;
 }
 
-/**
- * \fn int igs_stop()
- * \ingroup startStopKillFct
- * \brief Stop the network layer of an agent.
- * \return 1 if ok, else 0.
- */
+
 int igsAgent_stop(igsAgent_t *agent){
     if (agent->loopElements != NULL){
         //interrupting and destroying ingescape thread and zyre layer
@@ -1994,13 +1998,7 @@ int igsAgent_stop(igsAgent_t *agent){
     return 1;
 }
 
-/**
- * \fn int igs_setAgentName(const char *name)
- * \ingroup startStopKillFct
- * \brief Set the agent name on network if different that the one defined in its json definition.
- * \param name is the name of the agent.
- * \return 1 if ok, else 0
- */
+
 int igsAgent_setAgentName(igsAgent_t *agent, const char *name){
     if ((name == NULL) || (strlen(name) == 0)){
         igsAgent_error(agent, "Agent name cannot be NULL or empty");
@@ -2048,29 +2046,12 @@ int igsAgent_setAgentName(igsAgent_t *agent, const char *name){
     return 1;
 }
 
-/**
- * \fn char *igs_getAgentName()
- * \ingroup startStopKillFct
- * \brief Get the agent name on the network
- * \return the name of the agent.
- * \warning Allocate memory that should be freed by the user.
- */
+
 char *igsAgent_getAgentName(igsAgent_t *agent){
     return strdup(agent->agentName);
 }
 
-/**
- *  \defgroup pauseResumeFct Agent: Pause / resume functions
- *
- */
 
-/**
- * \fn int igs_freeze()
- * \ingroup pauseResumeFct
- * \brief Freeze agent. Execute the associated FreezeCallback to the agent.
- * by default no callback is defined.
- * \return 1 if ok, else 0
- */
 int igsAgent_freeze(igsAgent_t *agent){
     if (!agent->canBeFrozen){
         igsAgent_error(agent, "agent is requested to be frozen but is still set to 'can't be Frozen' : call igs_setCanBeFrozen to change this");
@@ -2093,23 +2074,12 @@ int igsAgent_freeze(igsAgent_t *agent){
     return 1;
 }
 
-/**
- * \fn bool igs_agent->isFrozen()
- * \ingroup pauseResumeFct
- * \brief return the frozon state of a agent.
- * \return true if frozen else false.
- */
+
 bool igsAgent_isFrozen(igsAgent_t *agent){
     return agent->isFrozen;
 }
 
-/**
- * \fn int igs_unfreeze()
- * \ingroup pauseResumeFct
- * \brief  Unfreeze agent. Execute the associated FreezeCallback to the agent.
- * by default no callback is defined.
- * \return 1 if ok, else 0
- */
+
 int igsAgent_unfreeze(igsAgent_t *agent){
     if(agent->isFrozen == true)
     {
@@ -2128,14 +2098,7 @@ int igsAgent_unfreeze(igsAgent_t *agent){
     return 1;
 }
 
-/**
- * \fn int igs_observeFreeze(igs_freezeCallback cb, void *myData)
- * \ingroup pauseResumeFct
- * \brief Add a igs_freezeCallback on an agent.
- * \param cb is a pointer to a igs_freezeCallback
- * \param myData is pointer to user data is needed.
- * \return 1 if ok, else 0.
- */
+
 int igsAgent_observeFreeze(igsAgent_t *agent, igsAgent_freezeCallback cb, void *myData){
     if (cb != NULL){
         freezeCallback_t *newCb = calloc(1, sizeof(freezeCallback_t));
@@ -2149,18 +2112,7 @@ int igsAgent_observeFreeze(igsAgent_t *agent, igsAgent_freezeCallback cb, void *
     return 1;
 }
 
-/**
- *  \defgroup controleAgentFct Agent: Controle functions
- *
- */
 
-/**
- * \fn int igs_setAgentState(const char *state)
- * \ingroup controleAgentFct
- * \brief set the internal state of an agent (as the developper defined it)
- * \return 1 if ok, else 0.
- * \param state is the name of the state you want to send.
- */
 int igsAgent_setAgentState(igsAgent_t *agent, const char *state){
     if (state == NULL){
         igsAgent_error(agent, "state can not be NULL");
@@ -2179,24 +2131,12 @@ int igsAgent_setAgentState(igsAgent_t *agent, const char *state){
     return 1;
 }
 
-/**
- * \fn char *igs_getAgentState()
- * \ingroup controleAgentFct
- * \brief get the internal state of an agent (as the developper defined it)
- * \return the name of the state you want to get.
- * \warning Allocate memory that should be freed by the user.
- */
+
 char *igsAgent_getAgentState(igsAgent_t *agent){
     return strdup(agent->agentState);
 }
 
 
-/**
- * \fn void igs_setCanBeFrozen (bool canBeFrozen)
- * \ingroup setGetLibraryFct
- * \brief set or unset forzen mode on the agent.
- * \param canBeFrozen is a bool to set or unset the verbose mode
- */
 void igsAgent_setCanBeFrozen(igsAgent_t *agent, bool canBeFrozen){
     agent->canBeFrozen = canBeFrozen;
     if (agent->loopElements != NULL && agent->loopElements->node != NULL){
@@ -2210,27 +2150,12 @@ void igsAgent_setCanBeFrozen(igsAgent_t *agent, bool canBeFrozen){
     }
 }
 
-/**
- * \fn void igs_canBeFrozen (void)
- * \ingroup setGetLibraryFct
- * \brief check if our agent can be frozen
- */
+
 bool igsAgent_canBeFrozen (igsAgent_t *agent){
     return agent->canBeFrozen;
 }
 
 
-/**
- *  \defgroup muteAgentFct Agent: Mute functions
- *
- */
-
-/**
- * \fn int igs_mute()
- * \ingroup muteAgentFct
- * \brief function to mute the agent
- * \return 1 if ok else 0.
- */
 int igsAgent_mute(igsAgent_t *agent){
     if (!agent->isWholeAgentMuted)
     {
@@ -2248,12 +2173,7 @@ int igsAgent_mute(igsAgent_t *agent){
     return 1;
 }
 
-/**
- * \fn int igs_unmute()
- * \ingroup muteAgentFct
- * \brief function to unmute the agent
- * \return 1 if ok or 0.
- */
+
 int igsAgent_unmute(igsAgent_t *agent){
     if (agent->isWholeAgentMuted)
     {
@@ -2271,25 +2191,12 @@ int igsAgent_unmute(igsAgent_t *agent){
     return 1;
 }
 
-/**
- * \fn bool igs_isMuted()
- * \ingroup muteAgentFct
- * \brief function to know if the agent are muted
- * \return true if it is muted else false.
- */
+
 bool igsAgent_isMuted(igsAgent_t *agent){
     return agent->isWholeAgentMuted;
 }
 
 
-/**
- * \fn int igs_observeMute(igs_muteCallback cb, void *myData)
- * \ingroup muteAgentFct
- * \brief Add a igs_muteCallback on an agent.
- * \param cb is a pointer to a igs_muteCallback
- * \param myData is pointer to user data is needed.
- * \return 1 if ok, else 0.
- */
 int igsAgent_observeMute(igsAgent_t *agent, igsAgent_muteCallback cb, void *myData){
     if (cb != NULL){
         muteCallback_t *newCb = calloc(1, sizeof(muteCallback_t));

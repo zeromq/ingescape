@@ -460,13 +460,12 @@ Item {
 
                             visible: !mouseArea.drag.active
 
-                            isLicenseValid: false
+                            isLicenseValid: rootItem.isEditorLicenseValid;
 
                             //
                             // Slot on signal "On Unlicensed Action"
                             //
                             onUnlicensedAction : {
-                                console.log("Receive signal");
                                 // Transmit signal
                                 rootItem.unlicensedAction();
                             }

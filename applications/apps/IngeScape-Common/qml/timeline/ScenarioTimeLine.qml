@@ -33,6 +33,13 @@ Item {
     property var scenarioController: null;
     property var timeLineController: null;
 
+    // Record model that we want to show in our scenario timeline
+    // N.B : Only for Assessments ...
+    property var recordsListToShow : [];
+
+    // Flag indicating if the user can reorganize actions in scenario timeline
+    property bool canReorganizeScenario : true
+
     // Licenses controller
     property LicensesController licensesController: null;
 
@@ -59,6 +66,9 @@ Item {
     // NB: We use the 'data' property instead of the 'children' property to allow any type
     //     of content and not only visual items (data is a list<Object> AND children is a list<Item>)
     property alias extraContent: extraContentItem.data
+
+    // Alias to set visibility of the playScenarioBtn
+    property alias playVisibility: playScenarioBtn.visible
 
 
     //--------------------------------
@@ -334,7 +344,6 @@ Item {
                         }
                     }
                 }
-
             }
         }
 
@@ -506,11 +515,16 @@ Item {
                             width: timeLineController.timeTicksTotalWidth
                             height: rootItem.lineHeight * rootItem.linesNumber
 
+                            //
+                            // Actions content
+                            //
                             Repeater {
                                 model: scenarioController ? scenarioController.filteredListActionsInTimeLine : 0;
 
                                 ActionInTimeLine {
                                     myActionVM: model.QtObject;
+
+                                    canChangePositionInTimeline: rootItem.canReorganizeScenario
 
                                     scenarioController: rootItem.scenarioController
                                     timeLineController: rootItem.timeLineController
@@ -648,7 +662,6 @@ Item {
                                 }
                             }
 
-
                             // Ghost Drop Impossible
                             I2SvgItem {
                                 id : ghostDropImpossible
@@ -773,10 +786,7 @@ Item {
                                     }
                                 }
                             }
-
                         }
-
-
                     }
 
                     //
@@ -860,7 +870,6 @@ Item {
 
         height: 40
         clip : true
-
 
         // Time ticks and current time label
         Flickable {
@@ -965,6 +974,21 @@ Item {
 
                 width: timeLineController.timeTicksTotalWidth
                 height: columnHeadersArea.height
+
+                //
+                // Records content
+                //
+                Repeater {
+                    model: rootItem.recordsListToShow
+
+                    RecordInTimeline {
+                        anchors.bottom: parent.bottom
+
+                        recordM: model ? model.QtObject : null
+
+                        timeLineController: rootItem.timeLineController
+                    }
+                }
 
                 //
                 // Time ticks

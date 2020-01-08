@@ -108,6 +108,16 @@ public:
 
 
     /**
+     * @brief Retrieve an 'int64' value of given column inside the given row
+     * and convert it to int before returning it
+     * @param row
+     * @param columnName
+     * @return
+     */
+    static int getIntValueFromColumnName(const CassRow* row, const char* columnName);
+
+
+    /**
      * @brief Retrive a date and a time value from the given columns inside the given row
      * and convert it to a QDateTime before returning it
      * @param row

@@ -46,20 +46,39 @@ ingelicense --read ./licenses/AirbusControlDeck.igslicense
 echo ""
 
 #licenses for diota
-echo "License for DiotaEval"
+echo "License for Diota"
 ingelicense \
-    --id DiotaEval \
+    --id Diota \
     --customer Diota \
     --order Eval \
-    --expiration 2019/12/31 \
-    --editorExpiration 2019/12/31 \
+    --expiration 2020/12/31 \
+    --editorExpiration 2020/12/31 \
     --features /Users/steph/Documents/CloudStation/ingescape/code/ingescape/ingelicense/src/features.txt \
     --agents /Users/steph/Documents/CloudStation/ingescape/code/ingescape/ingelicense/src/agents.txt \
     --editorOwner "Christophe Chastanet" \
     --features ./src/features.txt \
     --agents ./src/agents.txt \
-    --output ./licenses/DiotaEval.igslicense
+    --output ./licenses/Diota.igslicense
 echo ""
-echo "Read license for DiotaEval"
-ingelicense --read ./licenses/DiotaEval.igslicense
+echo "Read license for Diota"
+ingelicense --read ./licenses/Diota.igslicense
+echo ""
+
+#licenses for diota
+echo "License for Diota Shiva"
+ingelicense \
+    --id Diota \
+    --customer DiotaShiva \
+    --order Eval \
+    --expiration 2020/12/31 \
+    --editorExpiration 2020/12/31 \
+    --features /Users/steph/Documents/CloudStation/ingescape/code/ingescape/ingelicense/src/features.txt \
+    --agents /Users/steph/Documents/CloudStation/ingescape/code/ingescape/ingelicense/src/agents.txt \
+    --editorOwner "Shiva team" \
+    --features ./src/features.txt \
+    --agents ./src/agents.txt \
+    --output ./licenses/DiotaShiva.igslicense
+echo ""
+echo "Read license for Diota Shiva"
+ingelicense --read ./licenses/DiotaShiva.igslicense
 echo ""

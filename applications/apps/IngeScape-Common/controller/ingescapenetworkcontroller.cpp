@@ -925,10 +925,10 @@ void IngeScapeNetworkController::updateAvailableNetworkDevices()
 #ifdef Q_OS_WIN
         // igs_getNetdevicesList & igs_getNetaddressesList return latin1 values
         QString availableNetworkDevice = QString::fromLatin1(devices[i]);
-        QString availableNetworkDeviceAddress =  QString::fromLatin1(addresses[i]);
+        QString availableNetworkDeviceAddress = QString::fromLatin1(addresses[i]);
 #else
         QString availableNetworkDevice = QString(devices[i]);
-        QString availableNetworkDeviceAddress =  QString(addresses[i]);
+        QString availableNetworkDeviceAddress = QString(addresses[i]);
 #endif
 
         networkDevices.append(availableNetworkDevice);

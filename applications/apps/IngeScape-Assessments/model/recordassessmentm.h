@@ -19,17 +19,25 @@
 #include <I2PropertyHelpers.h>
 
 #include <model/recordm.h>
+#include <model/enums.h>
 #include <cassandra.h>
 
 class RecordAssessmentM : public RecordM
 {
     Q_OBJECT
 
+    // Start time in milliseconds of our record in timeline
+    I2_QML_PROPERTY(int, startTimeInTimeline)
+
+    // End time in milliseconds of our record in timeline
+    I2_QML_PROPERTY(int, endTimeInTimeline)
+
 public:
     explicit RecordAssessmentM(QString uid,
                       QString name,
                       QDateTime begin,
                       QDateTime end,
+                      int startTimeInTimeline,
                       QObject *parent = nullptr);
 
     /**

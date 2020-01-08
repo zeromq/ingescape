@@ -122,9 +122,9 @@ void registerCustomQmlTypes()
     qmlRegisterUncreatableType<ExperimentationsListController>("INGESCAPE", 1, 0, "ExperimentationsListController", "Internal Class");
     qmlRegisterUncreatableType<ExportController>("INGESCAPE", 1, 0, "ExportController", "Internal Class");
     qmlRegisterUncreatableType<NetworkController>("INGESCAPE", 1, 0, "NetworkController", "Internal Class");
-    qmlRegisterUncreatableType<TaskInstanceController>("INGESCAPE", 1, 0, "TaskInstanceController", "Internal Class");
+    qmlRegisterUncreatableType<SessionController>("INGESCAPE", 1, 0, "SessionController", "Internal Class");
     qmlRegisterUncreatableType<SubjectsController>("INGESCAPE", 1, 0, "SubjectsController", "Internal Class");
-    qmlRegisterUncreatableType<TasksController>("INGESCAPE", 1, 0, "TasksController", "Internal Class");
+    qmlRegisterUncreatableType<ProtocolsController>("INGESCAPE", 1, 0, "ProtocolsController", "Internal Class");
 
 
     //----------------
@@ -155,9 +155,9 @@ void registerCustomQmlTypes()
     qmlRegisterUncreatableType<DependentVariableM>("INGESCAPE", 1, 0, "DependentVariableM", "Internal class");
     qmlRegisterUncreatableType<ExperimentationM>("INGESCAPE", 1, 0, "ExperimentationM", "Internal class");
     qmlRegisterUncreatableType<IndependentVariableM>("INGESCAPE", 1, 0, "IndependentVariableM", "Internal class");
-    qmlRegisterUncreatableType<TaskInstanceM>("INGESCAPE", 1, 0, "TaskInstanceM", "Internal class");
+    qmlRegisterUncreatableType<SessionM>("INGESCAPE", 1, 0, "SessionM", "Internal class");
     qmlRegisterUncreatableType<SubjectM>("INGESCAPE", 1, 0, "SubjectM", "Internal class");
-    qmlRegisterUncreatableType<TaskM>("INGESCAPE", 1, 0, "TaskM", "Internal class");
+    qmlRegisterUncreatableType<ProtocolM>("INGESCAPE", 1, 0, "ProtocolM", "Internal class");
     qmlRegisterUncreatableType<QQmlPropertyMap>("INGESCAPE", 1, 0, "QQmlPropertyMap", "Internal class");
 
 

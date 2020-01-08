@@ -1,0 +1,7 @@
+Welcome the the IngeScape core library installer for macos.
+
+Before starting, if you have installed Homebrew on your system, please open a terminal and type the following command:
+
+brew remove -f zyre czmq zeromq libsodium
+
+This will remove all possibly deprecated dependencies related to IngeScape.

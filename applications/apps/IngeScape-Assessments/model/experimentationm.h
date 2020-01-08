@@ -20,8 +20,8 @@
 
 #include <model/subject/characteristicm.h>
 #include <model/subject/subjectm.h>
-#include <model/task/taskm.h>
-#include <model/taskinstancem.h>
+#include <model/protocol/protocolm.h>
+#include <model/sessionm.h>
 
 #include "cassandra.h"
 
@@ -48,11 +48,11 @@ class ExperimentationM : public QObject
     // List of all subjects of our experimentation
     I2_QOBJECT_LISTMODEL(SubjectM, allSubjects)
 
-    // List of all tasks of our experimentation
-    I2_QOBJECT_LISTMODEL(TaskM, allTasks)
+    // List of all protocols of our experimentation
+    I2_QOBJECT_LISTMODEL(ProtocolM, allProtocols)
 
-    // List of all task instances of our experimentation
-    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(TaskInstanceM, allTaskInstances)
+    // List of all sessions of our experimentation
+    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(SessionM, allSessions)
 
 
 public:
@@ -134,45 +134,45 @@ public:
 
 
     /**
-     * @brief Add a task to our experimentation
-     * @param task
+     * @brief Add a protocol to our experimentation
+     * @param protocol
      */
-    void addTask(TaskM* task);
+    void addProtocol(ProtocolM* protocol);
 
 
     /**
-     * @brief Remove a task from our experimentation
-     * @param task
+     * @brief Remove a protocol from our experimentation
+     * @param protocol
      */
-    void removeTask(TaskM* task);
+    void removeProtocol(ProtocolM* protocol);
 
 
     /**
-     * @brief Add a task instance to our experimentation
-     * @param taskInstance
+     * @brief Add a session to our experimentation
+     * @param session
      */
-    void addTaskInstance(TaskInstanceM* taskInstance);
+    void addSession(SessionM* session);
 
 
     /**
-     * @brief Remove a task instance from our experimentation
-     * @param taskInstance
+     * @brief Remove a session from our experimentation
+     * @param session
      */
-    void removeTaskInstance(TaskInstanceM* taskInstance);
+    void removeSession(SessionM* session);
 
 
     /**
-     * @brief Remove task instances related to the given subject
+     * @brief Remove sessions related to the given subject
      * @param subject
      */
-    void removeTaskInstanceRelatedToSubject(SubjectM* subject);
+    void removeSessionsRelatedToSubject(SubjectM* subject);
 
 
     /**
-     * @brief Remove task instances related to the given task
-     * @param task
+     * @brief Remove sessions related to the given protocol
+     * @param protocol
      */
-    void removeTaskInstanceRelatedToTask(TaskM* task);
+    void removeSessionsRelatedToProtocol(ProtocolM* protocol);
 
 
     /**
@@ -183,7 +183,7 @@ public:
     CharacteristicM* getCharacteristicFromUID(const CassUuid& cassUuid);
 
     /**
-     * @brief Get a task from its UUID
+     * @brief Get a subject from its UUID
      * @param cassUuid
      * @return
      */
@@ -191,19 +191,19 @@ public:
 
 
     /**
-     * @brief Get a task from its UUID
+     * @brief Get a protocol from its UUID
      * @param cassUuid
      * @return
      */
-    TaskM* getTaskFromUID(const CassUuid& cassUuid);
+    ProtocolM* getProtocolFromUID(const CassUuid& cassUuid);
 
 
     /**
-     * @brief Get a task instance from its UUID
+     * @brief Get a session from its UUID
      * @param cassUuid
      * @return
      */
-    TaskInstanceM* getTaskInstanceFromUID(const CassUuid& cassUuid);
+    SessionM* getSessionFromUID(const CassUuid& cassUuid);
 
 
     /**
@@ -241,10 +241,10 @@ public:
 
 private: // Methods
     /**
-     * @brief Delete all tasks associated with the given experimentation
+     * @brief Delete all protocols associated with the given experimentation
      * @param experimentation
      */
-    static void _deleteAllTasksForExperimentation(const ExperimentationM& experimentation);
+    static void _deleteAllProtocolsForExperimentation(const ExperimentationM& experimentation);
     /**
      * @brief Delete all subjects associated with the given experimentation
      * @param experimentation
@@ -256,10 +256,10 @@ private: // Methods
      */
     static void _deleteAllCharacteristicsForExperimentation(const ExperimentationM& experimentation);
     /**
-     * @brief Delete all task instances with the given experimentation
+     * @brief Delete all sessions with the given experimentation
      * @param experimentation
      */
-    static void _deleteAllTaskInstancesForExperimentation(const ExperimentationM& experimentation);
+    static void _deleteAllSessionsForExperimentation(const ExperimentationM& experimentation);
 
 
 private:

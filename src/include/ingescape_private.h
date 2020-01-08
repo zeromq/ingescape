@@ -316,6 +316,7 @@ typedef struct _igsAgent_t {
     char agentState[MAX_AGENT_NAME_LENGTH];
     char commandLine[COMMAND_LINE_LENGTH];
     char replayChannel[MAX_AGENT_NAME_LENGTH + 16];
+    char callsChannel[MAX_AGENT_NAME_LENGTH + 16];
     muteCallback_t *muteCallbacks;
     freezeCallback_t *freezeCallbacks;
     zyreCallback_t *zyreCallbacks;
@@ -382,7 +383,7 @@ void model_readWriteUnlock(void);
 
 // network
 #define CHANNEL "INGESCAPE_PRIVATE"
-#define AGENT_NAME_DEFAULT "igs_noname"
+#define AGENT_NAME_DEFAULT "no_name"
 int network_publishOutput (igsAgent_t *agent, const agent_iop_t *iop);
 
 // parser
