@@ -50,7 +50,7 @@ SessionController::SessionController(QObject *parent) : QObject(parent),
  */
 SessionController::~SessionController()
 {
-    qInfo() << "Delete Record Controller";
+    qInfo() << "Delete Session Controller";
 
 
     // Reset the model of the current session

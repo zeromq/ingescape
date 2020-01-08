@@ -284,6 +284,7 @@ Item {
             settingsHighlightedId: IngeScapeEditorC.modelManager.isMappingControlled ? "mapping-mode-control" : "mapping-mode-observe"
             settingsPressedId : IngeScapeEditorC.modelManager.isMappingControlled ? "mapping-mode-control" : "mapping-mode-observe"
 
+
             // Add extra selection for mapping mode
             // NB : extraContent property of NetworkConnectionInformationItem
             Item {
@@ -442,6 +443,9 @@ Item {
             onWillOpenEditionMode: {
                 // Update our list of available network devices
                 IgsNetworkController.updateAvailableNetworkDevices();
+
+                // Select right mapping mode
+                selectMappingModeCombobox.selectedIndex = IngeScapeEditorC.modelManager.isMappingControlled ? 0 : 1;
             }
 
             onChangeNetworkSettings: {

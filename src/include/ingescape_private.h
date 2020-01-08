@@ -383,7 +383,7 @@ void model_readWriteUnlock(void);
 
 // network
 #define CHANNEL "INGESCAPE_PRIVATE"
-#define AGENT_NAME_DEFAULT "igs_noname"
+#define AGENT_NAME_DEFAULT "no_name"
 int network_publishOutput (igsAgent_t *agent, const agent_iop_t *iop);
 
 // parser

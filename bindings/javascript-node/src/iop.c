@@ -166,7 +166,7 @@ napi_value node_igs_readInputAsData(napi_env env, napi_callback_info info) {
     char * name = convert_napi_to_string(env, argv[0]);
 
     // call igs function
-    void * data;
+    void * data = NULL;
     size_t size;
     igs_readInputAsData(name, &data, &size); 
     free(name);
@@ -257,7 +257,7 @@ napi_value node_igs_readOutputAsData(napi_env env, napi_callback_info info) {
     char * name = convert_napi_to_string(env, argv[0]);
 
     // call igs function
-    void * data;
+    void * data = NULL;
     size_t size;
     igs_readOutputAsData(name, &data, &size); 
     free(name);
@@ -348,7 +348,7 @@ napi_value node_igs_readParameterAsData(napi_env env, napi_callback_info info) {
     char * name = convert_napi_to_string(env, argv[0]);
 
     // call igs function
-    void * data;
+    void * data = NULL;
     size_t size;
     igs_readParameterAsData(name, &data, &size); 
     free(name);

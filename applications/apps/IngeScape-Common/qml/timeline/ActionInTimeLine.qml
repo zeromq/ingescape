@@ -34,6 +34,8 @@ Item {
     // height of a line in the time line
     property int lineHeight: IngeScapeTheme.lineInTimeLineHeight
 
+    // Flag indicating is user can change position of the action VM Item in the timeline (via drag n drop)
+    property bool canChangePositionInTimeline : true
 
     //ghost temporary start time when drag is active
     property var temporaryStartTime: null;
@@ -255,7 +257,6 @@ Item {
                                                            : (model.isExecuted ? "revertAction" : "currentRevertAction"))
                     }
                 }
-
             }
         }
     }
@@ -313,11 +314,14 @@ Item {
         width : Math.max(backgroundActionName.width,
                          actionVMItem.width,
                          executionsItem.width) - x
+
         hoverEnabled: true
 
         drag.smoothed: false
-        drag.target: !scenarioController.isPlaying ? actionVMItem : null
-        cursorShape: (actionVMMouseArea.drag.active)? Qt.PointingHandCursor : Qt.OpenHandCursor //Qt.OpenHandCursor
+        drag.target: (actionVMItem.canChangePositionInTimeline && !scenarioController.isPlaying) ? actionVMItem : null
+
+        cursorShape: (actionVMItem.canChangePositionInTimeline) ? actionVMMouseArea.drag.active ? Qt.PointingHandCursor : Qt.OpenHandCursor
+                                                 : Qt.ArrowCursor
 
         onPressed: {
             // Find our layer and reparent our popup in it
@@ -435,6 +439,4 @@ Item {
             }
         }
     }
-
 }
-

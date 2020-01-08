@@ -132,6 +132,8 @@ Item {
 
         recordsListToShow : rootItem.session ? rootItem.session.recordsList : []
 
+        canReorganizeScenario : false
+
         licensesController: IngeScapeAssessmentsC.licensesC
         mainController: IngeScapeAssessmentsC
 
