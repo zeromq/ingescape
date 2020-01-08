@@ -763,10 +763,16 @@ void ExperimentationController::_retrieveIndependentVariableValuesForSessionsInE
             if (indepVarValue != nullptr)
             {
                 SessionM* session = experimentation->getSessionFromUID(indepVarValue->sessionUuid);
-                IndependentVariableM* indepVar = session->protocol()->getIndependentVariableFromUuid(indepVarValue->independentVariableUuid);
-                if ((session != nullptr) && (indepVar != nullptr))
+                if (session != nullptr)
                 {
-                    session->setIndependentVariableValue(indepVar, indepVarValue->valueString);
+                    IndependentVariableM* indepVar = session->protocol()->getIndependentVariableFromUuid(indepVarValue->independentVariableUuid);
+                    if ((session != nullptr) && (indepVar != nullptr))
+                    {
+                        session->setIndependentVariableValue(indepVar, indepVarValue->valueString);
+                    }
+                }
+                else {
+                    qCritical() << "The session with id" << AssessmentsModelManager::cassUuidToQString(indepVarValue->sessionUuid) << "does not exist for this independent variable value (Expe" << experimentation->name() << ")";
                 }
             }
         }
@@ -775,7 +781,9 @@ void ExperimentationController::_retrieveIndependentVariableValuesForSessionsInE
     }
 }
 
-bool ExperimentationController::isThereOneRecordAfterStartTime() {
+
+bool ExperimentationController::isThereOneRecordAfterStartTime()
+{
     // Get start time of record in timeline
     int startTimeRecordInTimeline = _sessionC->scenarioC()->currentTime().msecsSinceStartOfDay();
 
