@@ -564,8 +564,8 @@ QList<RecordM*> RecordsSupervisionController::_createRecordsListFromJSON(QByteAr
                         // Create record
                         RecordM* record = new RecordM(jsonId.toString(),
                                                       jsonName.toString(),
-                                                      QDateTime::fromSecsSinceEpoch(static_cast<int>(jsonBeginDateTime.toDouble())),
-                                                      QDateTime::fromSecsSinceEpoch(static_cast<int>(jsonEndDateTime.toDouble())));
+                                                      QDateTime::fromMSecsSinceEpoch(static_cast<qint64>(jsonBeginDateTime.toDouble())),
+                                                      QDateTime::fromMSecsSinceEpoch(static_cast<qint64>(jsonEndDateTime.toDouble())));
 
                         recordsList.append(record);
                     }

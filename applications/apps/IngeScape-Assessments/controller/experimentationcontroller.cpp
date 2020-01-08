@@ -292,7 +292,7 @@ void ExperimentationController::onRecordStartedReceived()
 
         if ((_sessionC->scenarioC() != nullptr) && (_nextRecordToHandle != nullptr))
         {
-            int deltaTimeFromTimeLineStart = _sessionC->scenarioC()->currentTime().msecsSinceStartOfDay();
+            qint64 deltaTimeFromTimeLineStart = _sessionC->scenarioC()->currentTime().msecsSinceStartOfDay();
 
             // N.B: timeout will apply user's choice (remove other records or stop record)
             if (_nextRecordToHandle->startTimeInTimeline() > deltaTimeFromTimeLineStart)
@@ -359,15 +359,13 @@ void ExperimentationController::onRecordAddedReceived(QString message){
                             QJsonValue jsonEndDateTime = jsonRecord.value("time_end");
                             QJsonValue jsonOffsetTimeline = jsonRecord.value("offset_timeline");
 
-                            qDebug() << "JSON OFFSET " << jsonOffsetTimeline.toInt();
-
                             if (jsonName.isString() && jsonId.isString())
                             {
                                 // Create record
                                 RecordAssessmentM* record = new RecordAssessmentM(jsonId.toString(),
                                                               jsonName.toString(),
-                                                              QDateTime::fromSecsSinceEpoch(static_cast<int>(jsonBeginDateTime.toDouble())),
-                                                              QDateTime::fromSecsSinceEpoch(static_cast<int>(jsonEndDateTime.toDouble())),
+                                                              QDateTime::fromMSecsSinceEpoch(static_cast<qint64>(jsonBeginDateTime.toDouble())),
+                                                              QDateTime::fromMSecsSinceEpoch(static_cast<qint64>(jsonEndDateTime.toDouble())),
                                                               jsonOffsetTimeline.toInt());
 
                                 _sessionC->currentSession()->recordsList()->append(record);
