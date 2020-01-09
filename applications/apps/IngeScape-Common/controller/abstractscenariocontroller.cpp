@@ -293,6 +293,180 @@ void AbstractScenarioController::deleteAction(ActionM* action)
 
 
 /**
+ * @brief Test if an item can be inserted into a line number
+ * @param actionM to insert
+ * @param time to insert
+ * @param line index
+ * @param optional dragged action VM when already in the time-line
+ */
+bool AbstractScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time, int lineIndex, ActionVM* draggedActionVM)
+{
+    // The dragged action is defined and is currently on the first line
+    if ((draggedActionVM != nullptr) && (draggedActionVM->lineInTimeLine() == 0))
+    {
+        // Prevent modification on the first line because it is reserved for live insertions from the palette
+        return false;
+    }
+
+    // Prevent insertion on the first line because it is reserved for live insertions from the palette
+    if (lineIndex == 0) {
+        return false;
+    }
+
+    // Get the "Sorted" list of view models of action with the index of the line (in the time line)
+    I2CustomItemSortFilterListModel<ActionVM>* sortedListOfActionVM = _getSortedListOfActionVMwithLineIndex(lineIndex);
+    if (sortedListOfActionVM != nullptr)
+    {
+        int insertionStartTime = time;
+        int insertionEndTime = time;
+
+        // If we insert a FOREVER action
+        if (actionMToInsert->validityDurationType() == ValidationDurationTypes::FOREVER) {
+            insertionEndTime = -1;
+        }
+        // If we insert a CUSTOM temporal action
+        else if (actionMToInsert->validityDurationType() == ValidationDurationTypes::CUSTOM)
+        {
+            insertionEndTime = time + actionMToInsert->validityDuration();
+        }
+
+        // Revert After Time > Validity Duration
+        if ((insertionEndTime > -1)
+                && actionMToInsert->shallRevertAfterTime() && (actionMToInsert->revertAfterTime() > actionMToInsert->validityDuration()))
+        {
+            insertionEndTime = time + actionMToInsert->revertAfterTime();
+        }
+
+        // Add some margin
+        if (insertionStartTime == insertionEndTime) {
+            insertionStartTime = time - MARGIN_FOR_ACTION_INSERTION_IN_MS;
+            insertionEndTime = time + MARGIN_FOR_ACTION_INSERTION_IN_MS;
+        }
+
+        for (int indexAction = 0; indexAction < sortedListOfActionVM->count(); indexAction++)
+        {
+            ActionVM* actionVM = sortedListOfActionVM->at(indexAction);
+
+            if ((actionVM != nullptr) && (actionVM->modelM() != nullptr)
+                    && ((draggedActionVM == nullptr) || (draggedActionVM != actionVM)) )
+            {
+                //qDebug() << "Insert" << insertionStartTime << insertionEndTime << "inside" << actionVM->startTime() << actionVM->endTime();
+
+                if ((actionVM->endTime() == -1) || (insertionEndTime == -1))
+                {
+                    // Both have no end time
+                    if ( ((actionVM->endTime() == -1) && (insertionEndTime == -1))
+                         ||
+                         // Action starts before "Insertion END Time"
+                         ((actionVM->endTime() == -1) && (actionVM->startTime() < insertionEndTime))
+                         ||
+                         // Action ends after "Insertion START Time"
+                         ((insertionEndTime == -1) && (actionVM->endTime() > insertionStartTime)) )
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    // Action is Inside
+                    if ( ((actionVM->startTime() > insertionStartTime) && (actionVM->endTime() < insertionEndTime))
+                            ||
+                            // Action is around "Insertion START Time"
+                            ((actionVM->startTime() < insertionStartTime) && (actionVM->endTime() > insertionStartTime))
+                            ||
+                            // Action is around "Insertion END Time"
+                            ((actionVM->startTime() < insertionEndTime) && (actionVM->endTime() > insertionEndTime))
+                            ||
+                            // Action starts before and ends after
+                            ((actionVM->startTime() < insertionStartTime) && (actionVM->endTime() > insertionEndTime)) )
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+    }
+    return true;
+}
+
+
+
+/**
+ * @brief Add an action VM at the current date time
+ * @param action model
+ */
+void AbstractScenarioController::addActionVMAtCurrentTime(ActionM* actionM)
+{
+    if (actionM != nullptr) {
+        addActionVMAtTime(actionM, _currentTime.msecsSinceStartOfDay(), 0);
+    }
+}
+
+
+/**
+ * @brief Add an action VM at the time in ms
+ * @param action model
+ * @param line index
+ */
+void AbstractScenarioController::addActionVMAtTime(ActionM* actionM, int timeInMs, int lineIndex)
+{
+    if (actionM != nullptr)
+    {
+        int actionId = actionM->uid();
+
+        ActionVM* actionVM = new ActionVM(actionM, timeInMs);
+
+        // Insert the actionVM to the reight line number
+        _insertActionVMIntoMapByLineNumber(actionVM, lineIndex);
+
+        // If the action VM found a line to be insert in
+        if (actionVM->lineInTimeLine() > -1)
+        {
+            // Add the new action VM to our hash table
+            QList<ActionVM*> listOfActionVM = _getListOfActionVMwithId(actionId);
+            listOfActionVM.append(actionVM);
+            _hashFromUidToViewModelsOfAction.insert(actionId, listOfActionVM);
+
+            // Add the action VM to the timeline
+            _actionsInTimeLine.append(actionVM);
+
+            // If scenario is playing we add the actionVM to the active ones
+            if (_isPlaying)
+            {
+                // Initialize the action connections
+                actionVM->modelM()->initializeConditionsConnections();
+
+                // Connect the revert action
+                connect(actionVM, &ActionVM::revertAction, this, &AbstractScenarioController::onRevertAction);
+                connect(actionVM, &ActionVM::rearmAction, this, &AbstractScenarioController::onRearmAction);
+
+                // Add action to the ones to check
+                _listOfActionsToEvaluate.append(actionVM);
+
+                // The new action VM is the next one to activate, we change the next timer trigger
+                if ( ((_nextActionToActivate == nullptr) && (timeInMs >= _currentTime.msecsSinceStartOfDay()))
+                     || ((_nextActionToActivate != nullptr) && (timeInMs < _nextActionToActivate->startTime())) )
+                {
+                    // Stop the timer if necessary
+                    if (_timerToExecuteActions.isActive()) {
+                        _timerToExecuteActions.stop();
+                    }
+
+                    setnextActionToActivate(actionVM);
+                    _timerToExecuteActions.start(actionVM->startTime() - _currentTime.msecsSinceStartOfDay());
+                }
+            }
+        }
+        else {
+            delete actionVM;
+            actionVM = nullptr;
+        }
+    }
+}
+
+
+
+/**
  * @brief Remove an action VM from the time line and delete it
  * @param action view model
  */
@@ -1151,4 +1325,93 @@ QList<ActionVM*> AbstractScenarioController::_getListOfActionVMwithId(int action
 I2CustomItemSortFilterListModel<ActionVM>* AbstractScenarioController::_getSortedListOfActionVMwithLineIndex(int index)
 {
     return _hashFromLineIndexToSortedViewModelsOfAction.value(index, nullptr);
+}
+
+
+/**
+ * @brief Insert an actionVM into our timeline
+ * @param action view model
+ * @return timeline line number
+ */
+void AbstractScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMToInsert, int lineNumberRef)
+{
+    if ((actionVMToInsert != nullptr) && (actionVMToInsert->modelM() != nullptr))
+    {
+        int insertionStartTime = actionVMToInsert->startTime();
+
+        int lineNumber = 0;
+        if (lineNumberRef != -1) {
+            lineNumber = lineNumberRef;
+        }
+
+        while (lineNumber < _linesNumberInTimeLine)
+        {
+            bool canInsert = false;
+            if (lineNumber == 0) {
+                canInsert = true;
+            }
+            else {
+                canInsert = canInsertActionVMTo(actionVMToInsert->modelM(), insertionStartTime, lineNumber);
+            }
+
+            // Insert our item if possible
+            if (canInsert)
+            {
+                // set the line number
+                actionVMToInsert->setlineInTimeLine(lineNumber);
+
+                // Add an extra line if inserted our actionVM at the last line
+                if (lineNumber >= _linesNumberInTimeLine - 1) {
+                    setlinesNumberInTimeLine(lineNumber + 2);
+                }
+
+                // Get the "Sorted" list of view models of action with the index of the line (in the time line)
+                I2CustomItemSortFilterListModel<ActionVM>* sortedListOfActionVM = _getSortedListOfActionVMwithLineIndex(lineNumber);
+                if (sortedListOfActionVM != nullptr)
+                {
+                    // Insert the action
+                    sortedListOfActionVM->append(actionVMToInsert);
+                    break;
+                }
+                else
+                {
+                    // Create a new list and add to the hash table
+                    sortedListOfActionVM = new I2CustomItemSortFilterListModel<ActionVM>();
+                    sortedListOfActionVM->setSortProperty("startTime");
+                    sortedListOfActionVM->append(actionVMToInsert);
+
+                    _hashFromLineIndexToSortedViewModelsOfAction.insert(lineNumber, sortedListOfActionVM);
+                    break;
+                }
+            }
+
+            if (lineNumberRef != -1) {
+                break;
+            }
+            else {
+                lineNumber++;
+            }
+
+        }
+
+        // If the action has not been inserted yet, we create a new line
+        // only if we are not dropping at a busy position the actionVM
+        if ((actionVMToInsert->lineInTimeLine() == -1) && (lineNumberRef == -1))
+        {
+            // Add an extra line if inserted our actionVM at the last line
+            if (lineNumber >= _linesNumberInTimeLine -1) {
+                setlinesNumberInTimeLine(lineNumber + 2);
+            }
+
+            // Create the new line number
+            actionVMToInsert->setlineInTimeLine(lineNumber);
+
+            // Create a new list and add to the hash table
+            I2CustomItemSortFilterListModel<ActionVM>* sortedListOfActionVM = new I2CustomItemSortFilterListModel<ActionVM>();
+            sortedListOfActionVM->setSortProperty("startTime");
+            sortedListOfActionVM->append(actionVMToInsert);
+
+            _hashFromLineIndexToSortedViewModelsOfAction.insert(lineNumber, sortedListOfActionVM);
+        }
+    }
 }

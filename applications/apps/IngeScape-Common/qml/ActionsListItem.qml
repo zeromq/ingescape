@@ -145,12 +145,23 @@ Item {
             hoverEnabled: true
 
             onClicked: {
-                if (controller && rootItem.action && areActionsButtonsActivated) {
+                if (rootItem.controller && rootItem.action && rootItem.areActionsButtonsActivated)
+                {
                     // Open the editor of our action
-                    controller.openActionEditorWithModel(rootItem.action);
-                }else if(controller && controller.scenarioC && rootItem.action ){
+                    rootItem.controller.openActionEditorWithModel(rootItem.action);
+                }
+                else if (rootItem.controller && rootItem.action )
+                {
                     console.log("QML: play action '" + rootItem.action.name + "'");
-                    controller.scenarioC.executeEffectsOfAction(rootItem.action);
+
+                    if (rootItem.controller.isPlaying)
+                    {
+                        rootItem.controller.addActionVMAtCurrentTime(rootItem.action);
+                    }
+                    else
+                    {
+                        rootItem.controller.executeEffectsOfAction(rootItem.action);
+                    }
                 }
             }
 
