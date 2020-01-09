@@ -117,7 +117,7 @@ public:
      * @brief Import the executed actions for a scenario from JSON
      * @param byteArrayOfJson
      */
-    void importExecutedActionsFromJson(QByteArray byteArrayOfJson);
+    void importExecutedActionsFromJson(int deltaTimeFromTimeLineStart, QByteArray byteArrayOfJson);
 
 
     /**

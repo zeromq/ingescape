@@ -467,12 +467,12 @@ void NetworkController::_onWhisperedMessageReceived(QString peerId, QString peer
         // Check that there are still 3 others parts
         if (messageOthersParts.count() == 3)
         {
-            QString deltaTimeFromTimeLineStart = messageOthersParts.at(0);
+            qint64 deltaTimeFromTimeLineStart = messageOthersParts.at(0).toLongLong();
             QString jsonPlatform = messageOthersParts.at(1);
             QString jsonExecutedActions = messageOthersParts.at(2);
 
             // Emit the signal "Replay Loading received"
-            Q_EMIT replayLoadingReceived(deltaTimeFromTimeLineStart.toInt(), jsonPlatform, jsonExecutedActions);
+            Q_EMIT replayLoadingReceived(static_cast<int>(deltaTimeFromTimeLineStart), jsonPlatform, jsonExecutedActions);
         }
     }
     // Unknown

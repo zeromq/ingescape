@@ -122,7 +122,8 @@ void AbstractScenarioController::importScenarioFromJson(QJsonObject jsonScenario
                 }
             }
 
-            // Append the list of actions in timeline
+            // Replace the list of actions in timeline
+            _hashFromUidToViewModelsOfAction.clear();
             if (!scenarioToImport->actionsInTimelineList()->isEmpty())
             {
                 // Add each actionVM in to the right line of our timeline
@@ -175,8 +176,11 @@ void AbstractScenarioController::importScenarioFromJson(QJsonObject jsonScenario
  * @brief Import the executed actions for a scenario from JSON
  * @param byteArrayOfJson
  */
-void AbstractScenarioController::importExecutedActionsFromJson(QByteArray byteArrayOfJson)
+void AbstractScenarioController::importExecutedActionsFromJson(int deltaTimeFromTimeLineStart, QByteArray byteArrayOfJson)
 {
+    // Delta time to check if executed action has the same time that another action in timeline
+    int deltaTime = 150;
+
     QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArrayOfJson);
     if (jsonDocument.isObject())
     {
@@ -190,58 +194,59 @@ void AbstractScenarioController::importExecutedActionsFromJson(QByteArray byteAr
                 {
                     QJsonObject jsonExecutedAction = iterator.toObject();
 
-                    if (jsonExecutedAction.contains("id_action")
-                            && jsonExecutedAction.contains("line_action")
+                    if (jsonExecutedAction.contains("id_action") && jsonExecutedAction.contains("line_action")
                             && jsonExecutedAction.contains("time_action"))
                     {
                         int actionId = jsonExecutedAction.value("id_action").toInt();
                         int lineIndexInTimeLine = jsonExecutedAction.value("line_action").toInt();
-                        int executionTime = jsonExecutedAction.value("time_action").toInt();
+                        int executionTime = jsonExecutedAction.value("time_action").toInt() + deltaTimeFromTimeLineStart;
 
-                        qDebug() << "Executed action" << actionId << "on line" << lineIndexInTimeLine << "at" << executionTime << "ms";
-
-                        /*// Get the model of action with its (unique) id
-                        ActionM* action = IngeScapeModelManager::instance()->getActionWithId(actionId);
-                        if (action != nullptr)
-                        {
-
-                        }*/
+//                        qDebug() << "Executed action" << actionId << "on line" << lineIndexInTimeLine << "at" <<
+//                                    static_cast<qint64>(jsonExecutedAction.value("time_action").toDouble()) << "ms";
 
                         // Get the list of view models of action with its (unique) id
                         QList<ActionVM*> listOfActionVM = _getListOfActionVMwithId(actionId);
-                        if (!listOfActionVM.isEmpty())
+
+                        // Check if the executed action has already a view model in our timeline
+                        ActionVM* associatedVMAction = nullptr;
+
+                        for (ActionVM* actionVM : listOfActionVM)
                         {
-                            for (ActionVM* actionVM : listOfActionVM)
+                            if ((actionVM != nullptr) && (actionVM->lineInTimeLine() == lineIndexInTimeLine)
+                                    && ((actionVM->startTime() - deltaTime) <= executionTime)
+                                    && ((actionVM->startTime() + deltaTime) >= executionTime))
                             {
-                                if ((actionVM != nullptr) && (actionVM->lineInTimeLine() == lineIndexInTimeLine))
-                                {
-                                    qDebug() << "Action VM found !";
-
-                                    // FIXME TODO
-                                    // Compare actionVM->startTime() and executionTime
-
-                                    /*if (actionVM->executionsList()->count() == 1)
-                                    {
-                                        actionVM->executionsList()->at(0);
-                                    }
-                                    else
-                                    {
-
-                                    }*/
-
-                                    // Create a new (view model of) action execution
-                                    // startTime relative to our view model of action
-                                    //void createActionExecution(int startTime);
-                                    break;
-                                }
+                                associatedVMAction = actionVM;
+                                break;
                             }
                         }
 
+                        if (associatedVMAction == nullptr) {
+//                            qDebug() << "Executed action not in our platform's scenario. Create new view model of action";
+
+                            // Get the model of action with its (unique) id
+                            ActionM* action = IngeScapeModelManager::instance()->getActionWithId(actionId);
+
+                            // Create new Action View Model
+                            associatedVMAction = new ActionVM(action, static_cast<int>(executionTime));
+                            associatedVMAction->setlineInTimeLine(lineIndexInTimeLine);
+
+                            // Add the new action VM to our hash table
+                            listOfActionVM.append(associatedVMAction);
+                            _hashFromUidToViewModelsOfAction.insert(actionId, listOfActionVM);
+
+                            // Add the action VM to the timeline
+                            _actionsInTimeLine.append(associatedVMAction);
+                        }
+
+                        // Feedback of executed actions in timeline
+                        associatedVMAction->currentExecution()->setisExecuted(true);
+
+                        // TO FIX : Maybe more efficient ?
                         // Get the "Sorted" list of view models of action with the index of the line (in the time line)
                         /*I2CustomItemSortFilterListModel<ActionVM>* sortedListOfActionVM = _getSortedListOfActionVMwithLineIndex(lineIndexInTimeLine);
                         if (sortedListOfActionVM != nullptr)
                         {
-                            // FIXME TODO importExecutedActionsFromJson
                         }*/
                     }
                 }
