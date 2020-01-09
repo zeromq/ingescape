@@ -9,7 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
- *
+ *      Chloé Roumieu      <roumieu@ingenuity.io>
  */
 
 #include "experimentationcontroller.h"
@@ -369,6 +369,9 @@ void ExperimentationController::onRecordAddedReceived(QString message){
                                                               jsonOffsetTimeline.toInt());
 
                                 _sessionC->currentSession()->recordsList()->append(record);
+
+                                // Update current time of our scenario to correspond to real endtime of our record
+                                _sessionC->scenarioC()->setcurrentTime(QTime::fromMSecsSinceStartOfDay(static_cast<int>(record->endTimeInTimeline())));
 
                                 qInfo() << "Number of record " << _sessionC->currentSession()->recordsList()->count();
                             }
@@ -787,7 +790,7 @@ bool ExperimentationController::isThereOneRecordAfterStartTime()
 
     // Test if there is an existing record after our start time
     for (RecordAssessmentM* record : _sessionC->currentSession()->recordsList()->toList()) {
-        if (record->endTimeInTimeline() >= startTimeRecordInTimeline) {
+        if (record->endTimeInTimeline() > startTimeRecordInTimeline) {
             return true;
         }
     }
