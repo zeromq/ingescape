@@ -9,7 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
- *
+ *      Chloé Roumieu      <roumieu@ingenuity.io>
  */
 
 #ifndef ASSESSMENTSMODELMANAGER_H
@@ -115,6 +115,26 @@ public:
      * @return
      */
     static int getIntValueFromColumnName(const CassRow* row, const char* columnName);
+
+
+    /**
+     * @brief Retrieve an 'int32' value of given column inside the given row
+     * and convert it to int before returning it
+     * @param row
+     * @param columnName
+     * @return
+     */
+    static int getInt32ValueFromColumnName(const CassRow* row, const char* columnName);
+
+
+    /**
+     * @brief Retrieve an 'int8' value of given column inside the given row
+     * and convert it to int before returning it
+     * @param row
+     * @param columnName
+     * @return
+     */
+    static int getTinyIntValueFromColumnName(const CassRow* row, const char* columnName);
 
 
     /**
@@ -430,6 +450,15 @@ public:
      * @return
      */
     static QString cassUuidToQString(CassUuid cassUuid);
+
+
+    /**
+     * @brief Converts the given QString into a CassUuid
+     * This is a static utility function and does not interact with the Cassandra server
+     * @param stringCassUuid
+     * @return
+     */
+    static CassUuid qStringToCassUuid(QString cassUuid);
 
 
     /**

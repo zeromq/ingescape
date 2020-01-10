@@ -9,7 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
- *
+ *      Chloé Roumieu      <roumieu@ingenuity.io>
  */
 
 #include "assessmentsmodelmanager.h"
@@ -205,6 +205,36 @@ int AssessmentsModelManager::getIntValueFromColumnName(const CassRow* row, const
 
 
 /**
+ * @brief Retrieve an 'int32' value of given column inside the given row
+ * and convert it to int before returning it
+ * @param row
+ * @param columnName
+ * @return
+ */
+int AssessmentsModelManager::getInt32ValueFromColumnName(const CassRow* row, const char* columnName)
+{
+    cass_int32_t valueInt = 0;
+    cass_value_get_int32(cass_row_get_column_by_name(row, columnName), &valueInt);
+    return static_cast<int>(valueInt);
+}
+
+
+/**
+ * @brief Retrieve an 'int8' value of given column inside the given row
+ * and convert it to int before returning it
+ * @param row
+ * @param columnName
+ * @return
+ */
+int AssessmentsModelManager::getTinyIntValueFromColumnName(const CassRow* row, const char* columnName)
+{
+    cass_int8_t valueInt = 0;
+    cass_value_get_int8(cass_row_get_column_by_name(row, columnName), &valueInt);
+    return static_cast<int>(valueInt);
+}
+
+
+/**
  * @brief Retrive a date and a time value from the given columns inside the given row
  * and convert it to a QDateTime before returning it
  * @param row
@@ -216,12 +246,15 @@ QDateTime AssessmentsModelManager::getDateTimeFromColumnNames(const CassRow* row
 {
     cass_uint32_t yearMonthDay;
     cass_value_get_uint32(cass_row_get_column_by_name(row, dateColumnName), &yearMonthDay);
+
     cass_int64_t timeOfDay;
     cass_value_get_int64(cass_row_get_column_by_name(row, timeColumnName), &timeOfDay);
 
-    /* Convert 'date' and 'time' to Epoch time */
-    time_t time = static_cast<time_t>(cass_date_time_to_epoch(yearMonthDay, timeOfDay));
-    return QDateTime::fromTime_t(static_cast<uint>(time));
+    // Convert in time to epoch
+    time_t timeToEpoch = cass_date_time_to_epoch(yearMonthDay, timeOfDay);
+    cass_int64_t millisecondsSinceStartOfDay = (timeOfDay/1000000)%1000;
+
+    return QDateTime::fromMSecsSinceEpoch(timeToEpoch*1000 + millisecondsSinceStartOfDay);
 }
 
 
@@ -375,6 +408,21 @@ QString AssessmentsModelManager::cassUuidToQString(CassUuid cassUuid)
     char chrCassUuid[CASS_UUID_STRING_LENGTH];
     cass_uuid_string(cassUuid, chrCassUuid);
     return QString(chrCassUuid);
+}
+
+
+/**
+ * @brief Converts the given QString into a CassUuid
+ * This is a static utility function and does not interact with the Cassandra server
+ * @param stringCassUuid
+ * @return
+ */
+CassUuid AssessmentsModelManager::qStringToCassUuid(QString stringCassUuid)
+{
+    const char * convertStringCassUuid = stringCassUuid.toStdString().c_str();
+    CassUuid cassUuid;
+    cass_uuid_from_string(convertStringCassUuid, &cassUuid);
+    return cassUuid;
 }
 
 
