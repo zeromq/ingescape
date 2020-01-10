@@ -119,6 +119,14 @@ public:
      */
     void importExecutedActionsFromJson(int deltaTimeFromTimeLineStart, QByteArray byteArrayOfJson);
 
+    /**
+
+     * @brief Import an executed action in scenario : create a new action view model
+     * ONLY if no action view model already exists for the actionID
+     * at lineIndexInTimeline and executionTime
+     */
+    void addExecutedActionToScenario(int actionId, int lineIndexInTimeLine, int executionTime);
+
 
     /**
       * @brief Remove an action from the list and delete it

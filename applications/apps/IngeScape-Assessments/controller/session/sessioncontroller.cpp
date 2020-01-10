@@ -15,6 +15,9 @@
 #include "sessioncontroller.h"
 
 #include <controller/assessmentsmodelmanager.h>
+#include "model/eventm.h"
+#include "model/actionassessmentm.h"
+
 
 /**
  * @brief Constructor
@@ -172,6 +175,9 @@ void SessionController::_oncurrentSessionChanged(SessionM* previousSession, Sess
         //
         if ((currentSession != nullptr) && (currentSession->protocol() != nullptr))
         {
+            //
+            // Load session's protocol
+            //
             ProtocolM* protocol = currentSession->protocol();
 
             if (protocol->platformFileUrl().isValid())
@@ -249,6 +255,51 @@ void SessionController::_oncurrentSessionChanged(SessionM* previousSession, Sess
             }
             else {
                 qWarning() << "The URL of platform" << protocol->platformFileUrl() << "is not valid";
+            }
+
+
+            //
+            // Load session's records if exist
+            //
+            if (currentSession->recordsList()->isEmpty())
+            {
+                // Get the list of record
+                QList<RecordAssessmentM*> recordList = AssessmentsModelManager::select<RecordAssessmentM>({currentSession->getCassUuid() });
+                currentSession->recordsList()->append(recordList);
+            }
+
+            // If records list is empty when we load it from DB : session has never been recorded
+            currentSession->setisRecorded(!currentSession->recordsList()->isEmpty());
+
+
+            //
+            // Load session's executed actions if session is already recorded
+            //
+            if (currentSession->isRecorded())
+            {
+                for (RecordAssessmentM* record : currentSession->recordsList()->toList())
+                {
+                    CassUuid cassUuidRecord = AssessmentsModelManager::qStringToCassUuid(record->uid());
+
+                    QList<EventM*> eventsList = AssessmentsModelManager::select<EventM>({ cassUuidRecord });
+
+                    for (EventM* event : eventsList)
+                    {
+                        if (event->type() == 9) // 9 is for REC_ACTION_T event type
+                        {
+                            QList<ActionAssessmentM*> actionsList = AssessmentsModelManager::select<ActionAssessmentM> ({ cassUuidRecord, event->getTimeCassUuid()});
+
+                            // Add executed actions in our timeline
+                            for (ActionAssessmentM* action : actionsList)
+                            {
+                                // Calculate real execution time of the action
+                                int executionTime = static_cast<int>(record->beginDateTime().msecsTo(event->executionDateTime())) + record->startTimeInTimeline();
+
+                                _scenarioC->addExecutedActionToScenario(action->actionId(), action->timelineLine(), executionTime);
+                            }
+                        }
+                    }
+                }
             }
         }
     }

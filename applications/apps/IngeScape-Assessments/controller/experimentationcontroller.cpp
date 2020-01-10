@@ -20,6 +20,7 @@
 #include "model/subject/characteristicvaluem.h"
 #include "model/protocol/independentvariablevaluem.h"
 
+
 /**
  * @brief Constructor
  * @param parent
@@ -161,18 +162,6 @@ void ExperimentationController::openSession(SessionM* session)
     {
         qInfo() << "Open the session" << session->name() << "of the experimentation" << _currentExperimentation->name();
 
-        if (session->recordsList()->isEmpty())
-        {
-            // Get the list of record
-            QList<RecordAssessmentM*> recordList = AssessmentsModelManager::select<RecordAssessmentM>({session->getCassUuid() });
-            session->recordsList()->append(recordList);
-
-            igs_info("%i records on current session", session->recordsList()->count());
-        }
-
-        // If records list is empty when we load it from DB : session has never been recorded
-        session->setisRecorded(!session->recordsList()->isEmpty());
-
         // Update the current session
         _sessionC->setcurrentSession(session);
     }
@@ -292,7 +281,7 @@ void ExperimentationController::onRecordStartedReceived()
 
         if ((_sessionC->scenarioC() != nullptr) && (_nextRecordToHandle != nullptr))
         {
-            qint64 deltaTimeFromTimeLineStart = _sessionC->scenarioC()->currentTime().msecsSinceStartOfDay();
+            int deltaTimeFromTimeLineStart = _sessionC->scenarioC()->currentTime().msecsSinceStartOfDay();
 
             // N.B: timeout will apply user's choice (remove other records or stop record)
             if (_nextRecordToHandle->startTimeInTimeline() > deltaTimeFromTimeLineStart)
