@@ -801,22 +801,29 @@ binding-deploy-windows-release-x86:
 #| |____| | | | | |_| |>  <
 #|______|_|_| |_|\__,_/_/\_\
 
-# Create ingescape library for linux (x86_64)
-lib-linux-release-x64:
+# Create ingescape library for linux (x64) from our custom libraries
+lib-build-linux-x64:
   <<: *lib-build-files
   stage: lib-build
+  image: ingescape/debian-testing-compil
   tags:
     - docker
-  image: ingescape/debian-with-zyre
   script:
-    - git clean -xfd
-    - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+    - mkdir -p build
+    - mkdir -p release
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/builds/release/linux_x64/usr/local/
     - make -C build
+    - make -C build DESTDIR=$PWD/release install
+    - make -C build DESTDIR=$HOME/builds/release/linux_x64/ install
+    - cp src/include/ingescape_private.h $HOME/builds/release/linux_x64/usr/local/include/ingescape/
+    - cd release/usr/local/
+    - tar zcvf ../../../libingescape.tgz *
+    - cd ../../..
   artifacts:
     paths:
-      - build
-    name: "lib-linux-release-x64"
+      - ./build
+      - ./release
+    name: "lib-build-linux-x64"
     expire_in: 1 day
   dependencies: []
 
@@ -933,26 +940,6 @@ lib-android-release-armv7a-softfp:
     name: "lib-android-release-armv7a-softfp"
     expire_in: 1 day
   dependencies: []
-
-# Create runtime install for linux 64 bits - Generic ZIP
-lib-installer-runtime-linux-x64:
-  <<: *lib-build-files
-  stage: lib-installer
-  tags:
-    - docker
-  image: ingescape/debian-with-zyre
-  script:
-    - make -C build package
-    - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
-    - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
-    - mv build linux_x64
-  artifacts:
-    paths:
-      - linux_x64/ingescape-*
-      - linux_x64/installIngescapeAndDependencies.sh
-    name: "lib-installer-runtime-linux-x64"
-  dependencies:
-    - lib-linux-release-x64
 
 # Create runtime install for linux 64 bits - Debian 9 (stretch)
 lib-installer-runtime-debian-9-x64:
@@ -1176,10 +1163,7 @@ lib-delivery-all:
     - ls library/macos/ | grep -v 'latest_delivery' > library/macos/latest_delivery
     - echo "Deliver generic Linux x64"
     - mkdir --parents library/linux_x64/
-    - mv linux_x64/ingescape-*
-         linux_x64/installIngescapeAndDependencies.sh
-         library/linux_x64/
-    - ls library/linux_x64/ | grep -v 'latest_delivery' > library/linux_x64/latest_delivery
+    - echo "A unified installer for linux x64 is on its way. It will replace the current collection of installers (for different linux flavors) into a single .run file compatible with the most common linux distributions. The current latest delivery may be outdated untill the unified installer is operational." > LINUX_X64_README.txt
     - echo "Deliver Debian 9 x64"
     - mkdir --parents library/debian9/
     - mv debian9_x64/ingescape-*
@@ -1221,7 +1205,6 @@ lib-delivery-all:
     - lib-installer-runtime-windows-x86
     - lib-installer-runtime-windows-x64
     - lib-installer-macos
-    - lib-installer-runtime-linux-x64
     - lib-installer-runtime-debian-9-x64
     - lib-installer-runtime-debian-10-x64
     - lib-installer-runtime-centos-x64
