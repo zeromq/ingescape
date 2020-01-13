@@ -1058,20 +1058,6 @@ lib-installer-runtime-android-armv7a-softfp:
   dependencies:
     - lib-android-release-armv7a-softfp
 
-
-# Deploy ingescape in linux to be able to compile agents
-lib-deploy-linux-release-x64:
-  <<: *lib-build-files
-  stage: lib-deploy
-  tags:
-    - docker
-  image: ingescape/debian-with-zyre
-  script:
-    - make -C build install DESTDIR=~/builds/release/linux_x64
-    - cp src/include/ingescape_private.h ~/builds/release/linux_x64/usr/local/include/ingescape/
-  dependencies:
-    - lib-linux-release-x64
-
 # Deploy ingescape in linux to be able to compile agents
 lib-deploy-debian-9-release-x64:
   <<: *lib-build-files
@@ -1431,7 +1417,6 @@ lib-delivery-all-stable:
     - lib-installer-runtime-windows-x86
     - lib-installer-runtime-windows-x64
     - lib-installer-macos
-    - lib-installer-runtime-linux-x64
     - lib-installer-runtime-debian-9-x64
     - lib-installer-runtime-debian-10-x64
     - lib-installer-runtime-centos-x64
