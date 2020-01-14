@@ -131,24 +131,25 @@ void ProtocolsController::createNewProtocolWithIngeScapePlatformFilePath(QString
  */
 void ProtocolsController::deleteProtocol(ProtocolM* protocol)
 {
-    if ((protocol != nullptr) && (_currentExperimentation != nullptr) && (AssessmentsModelManager::instance() != nullptr))
+    if ((protocol != nullptr) && (_currentExperimentation != nullptr))
     {
         if (protocol == _selectedProtocol) {
             setselectedProtocol(nullptr);
         }
 
         // Remove sessions related to the protocol
-        QList<CassUuid> subjectUuidList;
+        /*QList<CassUuid> subjectUuidList;
         for (SubjectM* subject : *(_currentExperimentation->allSubjects())) {
             if (subject != nullptr)
             {
                 subjectUuidList.append(subject->getCassUuid());
             }
-        }
+        }*/
 
-        AssessmentsModelManager::deleteEntry<SessionM>({ { _currentExperimentation->getCassUuid() }, subjectUuidList, { protocol->getCassUuid() } });
+        // Nous avons enlevé l'id de protocole de la clé primaire d'une session
+        //AssessmentsModelManager::deleteEntry<SessionM>({ { _currentExperimentation->getCassUuid() }, subjectUuidList, { protocol->getCassUuid() } });
 
-        // Remove from DB
+        // Remove protocol from DB
         ProtocolM::deleteProtocolFromCassandraRow(*protocol);
 
         // Remove the protocol from the current experimentation

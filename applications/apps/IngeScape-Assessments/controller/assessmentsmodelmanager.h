@@ -130,7 +130,7 @@ public:
 
     /**
      * @brief Delete an entry of the template type from Cassandra DB.
-     * The primary key list represents the entries to delete. Multiple keys my be passed for a single key.
+     * The primary key list represents the entries to delete. Multiple keys may be passed for a single key.
      *   (in which case, the WHERE clause will be like 'column IN (?, ?, ...)')
      * Values must be in the order of the primary keys.
      * If more values than there are keys are given, only the n-first will be used in the query.

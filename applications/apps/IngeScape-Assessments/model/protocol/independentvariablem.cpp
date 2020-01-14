@@ -26,7 +26,7 @@ const QString IndependentVariableM::table = "ingescape.independent_var";
  */
 const QStringList IndependentVariableM::columnNames = {
     "id_experimentation",
-    "id_task",
+    "id_protocol",
     "id",
     "description",
     "enum_value",
@@ -39,7 +39,7 @@ const QStringList IndependentVariableM::columnNames = {
  */
 const QStringList IndependentVariableM::primaryKeys = {
     "id_experimentation",
-    "id_task",
+    "id_protocol",
     "id",
 };
 
@@ -101,7 +101,7 @@ IndependentVariableM* IndependentVariableM::createFromCassandraRow(const CassRow
     {
         CassUuid experimentationUuid, protocolUuid, independentVarUuid;
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_experimentation"), &experimentationUuid);
-        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_task"), &protocolUuid);
+        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_protocol"), &protocolUuid);
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &independentVarUuid);
 
         QString variableName(AssessmentsModelManager::getStringValueFromColumnName(row, "name"));
@@ -149,7 +149,7 @@ void IndependentVariableM::deleteIndependentVariableFromCassandra(const Independ
  */
 CassStatement* IndependentVariableM::createBoundInsertStatement(const IndependentVariableM& independentVariable)
 {
-    QString queryStr = "INSERT INTO " + IndependentVariableM::table + " (id_experimentation, id_task, id, name, description, value_type, enum_values) VALUES (?, ?, ?, ?, ?, ?, ?);";
+    QString queryStr = "INSERT INTO " + IndependentVariableM::table + " (id_experimentation, id_protocol, id, name, description, value_type, enum_values) VALUES (?, ?, ?, ?, ?, ?, ?);";
     CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 7);
     cass_statement_bind_uuid  (cassStatement, 0, independentVariable.getExperimentationCassUuid());
     cass_statement_bind_uuid  (cassStatement, 1, independentVariable.getProtocolCassUuid());
@@ -178,7 +178,7 @@ CassStatement* IndependentVariableM::createBoundInsertStatement(const Independen
  */
 CassStatement* IndependentVariableM::createBoundUpdateStatement(const IndependentVariableM& independentVariable)
 {
-    QString queryStr = "UPDATE " + IndependentVariableM::table + " SET name = ?, description = ?, value_type = ?, enum_values = ? WHERE id_experimentation = ? AND id_task = ? AND id = ?;";
+    QString queryStr = "UPDATE " + IndependentVariableM::table + " SET name = ?, description = ?, value_type = ?, enum_values = ? WHERE id_experimentation = ? AND id_protocol = ? AND id = ?;";
     CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 7);
     cass_statement_bind_string(cassStatement, 0, independentVariable.name().toStdString().c_str());
     cass_statement_bind_string(cassStatement, 1, independentVariable.description().toStdString().c_str());

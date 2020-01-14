@@ -572,7 +572,7 @@ SessionM* ExperimentationController::_insertSessionIntoDB(const QString& session
                     IndependentVariableM* independentVar = *indepVarIterator;
                     if (independentVar != nullptr)
                     {
-                        IndependentVariableValueM indepVarValue(subject->getExperimentationCassUuid(), session->getCassUuid(), independentVar->getCassUuid(), "");
+                        IndependentVariableValueM indepVarValue(protocol->getExperimentationCassUuid(), session->getCassUuid(), independentVar->getCassUuid(), "");
                         AssessmentsModelManager::insert(indepVarValue);
                     }
                 }
