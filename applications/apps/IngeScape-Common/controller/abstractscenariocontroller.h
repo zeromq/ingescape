@@ -121,11 +121,11 @@ public:
 
     /**
 
-     * @brief Import an executed action in scenario : create a new action view model
+     * @brief Import an executed action in our timeline : create a new action view model
      * ONLY if no action view model already exists for the actionID
      * at lineIndexInTimeline and executionTime
      */
-    void addExecutedActionToScenario(int actionId, int lineIndexInTimeLine, int executionTime);
+    ActionVM* addExecutedActionToTimeline(int actionId, int lineIndexInTimeLine, int executionTime);
 
 
     /**
@@ -368,6 +368,11 @@ private:
      */
     void _insertActionVMIntoMapByLineNumber(ActionVM* actionVMToInsert, int lineNumberRef);
 
+    /**
+     * @brief Clear the current timeline
+     * (clear the list of actions in the timeline)
+     */
+    void _clearTimeline();
 };
 
 QML_DECLARE_TYPE(AbstractScenarioController)

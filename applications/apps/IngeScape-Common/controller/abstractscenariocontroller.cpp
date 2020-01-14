@@ -178,6 +178,9 @@ void AbstractScenarioController::importScenarioFromJson(QJsonObject jsonScenario
  */
 void AbstractScenarioController::importExecutedActionsFromJson(int deltaTimeFromTimeLineStart, QByteArray byteArrayOfJson)
 {
+    // Clear our timeline to show only executed actions
+    _clearTimeline();
+
     QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArrayOfJson);
     if (jsonDocument.isObject())
     {
@@ -198,7 +201,9 @@ void AbstractScenarioController::importExecutedActionsFromJson(int deltaTimeFrom
                         int lineIndexInTimeLine = jsonExecutedAction.value("line_action").toInt();
                         int executionTime = jsonExecutedAction.value("time_action").toInt() + deltaTimeFromTimeLineStart;
 
-                        addExecutedActionToScenario(actionId, lineIndexInTimeLine, executionTime);
+                        // Reset data from our begin of our timeline for new ActionVM added
+                        ActionVM* actionAdded = addExecutedActionToTimeline(actionId, lineIndexInTimeLine, executionTime);
+                        actionAdded->resetDataFrom(deltaTimeFromTimeLineStart);
                     }
                 }
             }
@@ -208,16 +213,13 @@ void AbstractScenarioController::importExecutedActionsFromJson(int deltaTimeFrom
 
 
 /**
- * @brief Import an executed action in scenario : create a new action view model
+ * @brief Import an executed action in our timeline : create a new action view model
  * ONLY if no action view model already exists for the actionID
  * at lineIndexInTimeline and executionTime
  */
-void AbstractScenarioController::addExecutedActionToScenario(int actionId, int lineIndexInTimeLine, int executionTime)
+ActionVM* AbstractScenarioController::addExecutedActionToTimeline(int actionId, int lineIndexInTimeLine, int executionTime)
 {
     qDebug() << "Executed action" << actionId << "on line" << lineIndexInTimeLine << "at" << executionTime << "ms";
-
-    // Delta time to check if executed action has the same time that another action in timeline
-    int deltaTime = 150;
 
     // Get the list of view models of action with its (unique) id
     QList<ActionVM*> listOfActionVM = _getListOfActionVMwithId(actionId);
@@ -225,27 +227,45 @@ void AbstractScenarioController::addExecutedActionToScenario(int actionId, int l
     // Check if the executed action has already a view model in our timeline
     ActionVM* associatedVMAction = nullptr;
 
+    // Delta time to check if executed action has the same time that another action in timeline
+    int deltaTime = 150;
+
+    // Search if an ActionVM is already in our timeline
     for (ActionVM* actionVM : listOfActionVM)
     {
-        if ((actionVM != nullptr) && (actionVM->lineInTimeLine() == lineIndexInTimeLine)
-                && ((actionVM->startTime() - deltaTime) <= executionTime)
-                && ((actionVM->startTime() + deltaTime) >= executionTime))
+        if ((actionVM != nullptr) && (actionVM->lineInTimeLine() == lineIndexInTimeLine))
         {
-            associatedVMAction = actionVM;
-            break;
+            if (((actionVM->startTime() - deltaTime) <= executionTime)
+                    && ((actionVM->startTime() + deltaTime) >= executionTime))
+            {
+                // Executed action is already in our scenario and its ValidationType is IMMEDIATE, replace it as executed
+                associatedVMAction = actionVM;
+                break;
+            }
+            else if (((actionVM->startTime() - deltaTime) <= executionTime)
+                && ((actionVM->endTime() + deltaTime) >= executionTime))
+            {
+                // Executed action is already in our scenario and its ValidationType is FOREVER OR CUSTOM , replace it as executed
+                associatedVMAction = actionVM;
+                associatedVMAction->rearmCurrentActionExecution(executionTime);
+                break;
+            }
         }
     }
 
-    if (associatedVMAction == nullptr) {
-//        qDebug() << "Executed action not in our platform's scenario. Create new view model of action";
-
+    // Associated Action VM not found, we create one
+    if (associatedVMAction == nullptr)
+    {
         // Get the model of action with its (unique) id
         ActionM* action = IngeScapeModelManager::instance()->getActionWithId(actionId);
 
         // Create new Action View Model
         if (action != nullptr) {
-            associatedVMAction = new ActionVM(action, static_cast<int>(executionTime));
+            associatedVMAction = new ActionVM(action, executionTime);
             associatedVMAction->setlineInTimeLine(lineIndexInTimeLine);
+
+            // Set end time to start time to show an IMMEDIATE action, even if its ValidationType is FOREVER OR CUSTOM
+            associatedVMAction->setendTime(executionTime);
 
             // Add the new action VM to our hash table
             listOfActionVM.append(associatedVMAction);
@@ -268,6 +288,8 @@ void AbstractScenarioController::addExecutedActionToScenario(int actionId, int l
     if (sortedListOfActionVM != nullptr)
     {
     }*/
+
+    return associatedVMAction;
 }
 
 
@@ -619,18 +641,10 @@ void AbstractScenarioController::clearScenario()
 {
     qInfo() << "Abstract Scenario Controller: Clear the current scenario";
 
-    // Stop and reset the timeline  (to 00:00:00.000) (current scenario)
-    stopTimeLine();    
-    setcurrentTime(QTime::fromMSecsSinceStartOfDay(0));
+    _clearTimeline();
 
     // Clean-up current selection
     setselectedAction(nullptr);
-
-    // Delete actions VM from the timeline
-    _actionsInTimeLine.deleteAllItems();
-
-    // Clean-up current selection
-    setselectedActionVMInTimeline(nullptr);
 
     // Clear the list of actions
     _actionsList.clear();
@@ -639,9 +653,32 @@ void AbstractScenarioController::clearScenario()
     // Clear names list
     _allActionNames.clear();
 
+}
+
+
+/**
+ * @brief Clear the current timeline
+ * (clear the list of actions in the timeline)
+ */
+void AbstractScenarioController::_clearTimeline()
+{
+    qInfo() << "Abstract Scenario Controller: Clear the current timeline";
+
+    // Stop and reset the timeline  (to 00:00:00.000) (current scenario)
+    stopTimeLine();
+    setcurrentTime(QTime::fromMSecsSinceStartOfDay(0));
+
+    // Delete actions VM from the timeline
+    _actionsInTimeLine.deleteAllItems();
+
+    // Clean-up current selection
+    setselectedActionVMInTimeline(nullptr);
+
     // Clean-up sorted actions hash table
     qDeleteAll(_hashFromLineIndexToSortedViewModelsOfAction);
     _hashFromLineIndexToSortedViewModelsOfAction.clear();
+
+    _hashFromUidToViewModelsOfAction.clear();
 }
 
 

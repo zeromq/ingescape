@@ -101,22 +101,18 @@ Item {
     x : myActionVM ? timeLineController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(myActionVM.startTime, timeLineController.pixelsPerMinute) : 0;
     y : myActionVM ? (actionVMItem.lineHeight * myActionVM.lineInTimeLine) : 0;
     height : actionVMItem.lineHeight
-    width : if (myActionVM && myActionVM.modelM)
+    width : if (myActionVM)
             {
-                switch (myActionVM.modelM.validityDurationType)
+                if (myActionVM.endTime === -1) // validity duration type is forever
                 {
-                case ValidationDurationTypes.IMMEDIATE:
+                    (timeLineController.timeTicksTotalWidth - timeLineController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(myActionVM.startTime, timeLineController.pixelsPerMinute));
+                }
+                else if (myActionVM.endTime === myActionVM.startTime) // validity duration type is immediate
+                {
                     0;
-                    break;
-                case ValidationDurationTypes.FOREVER:
-                    (timeLineController.timeTicksTotalWidth - timeLineController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(myActionVM.startTime, timeLineController.pixelsPerMinute))
-                    break;
-                case ValidationDurationTypes.CUSTOM:
-                    timeLineController.convertDurationInMillisecondsToLengthInCoordinateSystem(myActionVM.modelM.validityDuration, timeLineController.pixelsPerMinute)
-                    break;
-                default:
-                    0;
-                    break;
+                }
+                else { // validity duration type is custom
+                    timeLineController.convertDurationInMillisecondsToLengthInCoordinateSystem(myActionVM.modelM.validityDuration, timeLineController.pixelsPerMinute);
                 }
             }
             else {

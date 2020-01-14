@@ -295,7 +295,7 @@ void SessionController::_oncurrentSessionChanged(SessionM* previousSession, Sess
                                 // Calculate real execution time of the action
                                 int executionTime = static_cast<int>(record->beginDateTime().msecsTo(event->executionDateTime())) + record->startTimeInTimeline();
 
-                                _scenarioC->addExecutedActionToScenario(action->actionId(), action->timelineLine(), executionTime);
+                                _scenarioC->addExecutedActionToTimeline(action->actionId(), action->timelineLine(), executionTime);
                             }
                         }
                     }

@@ -1214,10 +1214,11 @@ void IngeScapeEditorController::_onReplayLoading(int deltaTimeFromTimeLineStart,
             if (_scenarioC != nullptr)
             {
                 // Update the current time
-                _scenarioC->setcurrentTime(QTime::fromMSecsSinceStartOfDay(deltaTimeFromTimeLineStart));
+                _scenarioC->setcurrentTime(QTime::fromMSecsSinceStartOfDay(0));
 
                 // Import the executed actions for this scenario from JSON
-                _scenarioC->importExecutedActionsFromJson(deltaTimeFromTimeLineStart, jsonExecutedActions.toUtf8());
+                _scenarioC->importExecutedActionsFromJson(0, jsonExecutedActions.toUtf8());
+
             }
 
             // Notify QML to reset views
