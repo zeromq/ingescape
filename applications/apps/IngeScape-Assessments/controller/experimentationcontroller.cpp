@@ -222,10 +222,10 @@ void ExperimentationController::exportSelectedSessions()
 
         if (_isRecorderON && !sessionIds.isEmpty())
         {
-            QString message = QString("%1=%2").arg(command_ExportSessions, sessionIds.join('|'));
+            //QString message = QString("%1=%2").arg(command_ExportSessions, sessionIds.join('|'));
 
-            //QString experimentationUID = AssessmentsModelManager::cassUuidToQString(_currentExperimentation->getCassUuid());
-            //QString message = QString("%1=%2 [%3]").arg(command_ExportSessions, experimentationUID, sessionIds.join('|'));
+            QString experimentationUID = AssessmentsModelManager::cassUuidToQString(_currentExperimentation->getCassUuid());
+            QString message = QString("%1=%2 EXPE=%3").arg(command_ExportSessions, sessionIds.join('|'), experimentationUID);
 
             // Send the message "Export Sessions" to the recorder
             IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerIdOfRecorder, message);
