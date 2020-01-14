@@ -436,6 +436,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
     else()
       install(FILES "${SOURCE_DIR}/dependencies/unix/install_script.sh"
               DESTINATION "."
+              PERMISSIONS OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
               COMPONENT library)
       set(CPACK_GENERATOR "TGZ")
     endif()
