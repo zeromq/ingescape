@@ -941,6 +941,29 @@ lib-android-release-armv7a-softfp:
     expire_in: 1 day
   dependencies: []
 
+# Create library installer for linux 64 bits
+lib-installer-linux-x64:
+  <<: *lib-build-files
+  stage: lib-installer
+  image: ingescape/debian-testing-compil
+  tags:
+    - docker
+  script:
+    - export INGESCAPE_MAJOR=$(grep "#define INGESCAPE_MAJOR" src/admin.c | cut -d ' ' -f3-)
+    - export INGESCAPE_MINOR=$(grep "#define INGESCAPE_MINOR" src/admin.c | cut -d ' ' -f3-)
+    - export INGESCAPE_MICRO=$(grep "#define INGESCAPE_MICRO" src/admin.c | cut -d ' ' -f3-)
+    - export INGESCAPE_VERSION=$INGESCAPE_MAJOR.$INGESCAPE_MINOR.$INGESCAPE_MICRO
+    - cd build
+    - make package
+    - makeself --target /tmp/ingescape-${INGESCAPE_VERSION} ingescape-${INGESCAPE_VERSION}-linux-x64 installer-ingescape-${INGESCAPE_VERSION}-linux-x64.run "Ingescape library v${INGESCAPE_VERSION}" ./install_script.sh
+    - mv build linux_x64
+  artifacts:
+    paths:
+      - ./linux_x64/installer-ingescape-${INGESCAPE_VERSION}-linux-x64.run
+    name: "lib-installer-linux-x64"
+  dependencies:
+    - lib-build-linux-x64
+
 # Create runtime install for linux 64 bits - Debian 9 (stretch)
 lib-installer-runtime-debian-9-x64:
   <<: *lib-build-files
@@ -1149,7 +1172,8 @@ lib-delivery-all:
     - ls library/macos/ | grep -v 'latest_delivery' > library/macos/latest_delivery
     - echo "Deliver generic Linux x64"
     - mkdir --parents library/linux_x64/
-    - echo "A unified installer for linux x64 is on its way. It will replace the current collection of installers (for different linux flavors) into a single .run file compatible with the most common linux distributions. The current latest delivery may be outdated untill the unified installer is operational." > LINUX_X64_README.txt
+    - mv linux_x64/* library/linux_x64/
+    - ls library/linux_x64/ | grep -v 'latest_delivery' > library/linux_x64/latest_delivery
     - echo "Deliver Debian 9 x64"
     - mkdir --parents library/debian9/
     - mv debian9_x64/ingescape-*
@@ -1191,6 +1215,7 @@ lib-delivery-all:
     - lib-installer-runtime-windows-x86
     - lib-installer-runtime-windows-x64
     - lib-installer-macos
+    - lib-installer-linux-x64
     - lib-installer-runtime-debian-9-x64
     - lib-installer-runtime-debian-10-x64
     - lib-installer-runtime-centos-x64

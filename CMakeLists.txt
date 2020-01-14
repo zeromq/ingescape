@@ -426,23 +426,21 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
 
   else()
     set(CPACK_MONOLITHIC_INSTALL ON)
-    if(CMAKE_OS_NAME
-       AND ${CMAKE_OS_NAME} STREQUAL "Debian"
-       AND ${CMAKE_OS_VERSION} STREQUAL "10")
-      set(CPACK_GENERATOR "DEB")
-      set(CPACK_DEBIAN_PACKAGE_DEPENDS
-          "libczmq4, libsodium23 (>= 1.0.14), libzmq5, libzyre2")
-    elseif(ANDROID)
-      set(IS_EDITOR FALSE)
-      install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS
-                                     IS_EDITOR)
-      install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS
-                                     IS_EDITOR)
-      install_ingescape_dependencies(CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS IS_EDITOR)
-      install_ingescape_dependencies(ZYRE_LIBRARIES ZYRE_INCLUDE_DIRS IS_EDITOR)
+    set(IS_EDITOR FALSE)
+    install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS IS_EDITOR)
+    install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS IS_EDITOR)
+    install_ingescape_dependencies(CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS IS_EDITOR)
+    install_ingescape_dependencies(ZYRE_LIBRARIES ZYRE_INCLUDE_DIRS IS_EDITOR)
+    if(ANDROID)
       set(CPACK_GENERATOR "ZIP")
     else()
-      set(CPACK_GENERATOR "ZIP")
+      configure_file("${SOURCE_DIR}/dependencies/unix/install_script.sh"
+                     "${CMAKE_CURRENT_BINARY_DIR}/install_script.sh"
+                     @ONLY)
+      install(FILES "${CMAKE_CURRENT_BINARY_DIR}/install_script.sh"
+              DESTINATION "install_script.sh"
+              COMPONENT library)
+      set(CPACK_GENERATOR "TGZ")
     endif()
   endif()
 
