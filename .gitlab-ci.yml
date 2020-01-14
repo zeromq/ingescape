@@ -955,11 +955,13 @@ lib-installer-linux-x64:
     - export INGESCAPE_VERSION=$INGESCAPE_MAJOR.$INGESCAPE_MINOR.$INGESCAPE_MICRO
     - cd build
     - make package
-    - makeself --target /tmp/ingescape-${INGESCAPE_VERSION} ingescape-${INGESCAPE_VERSION}-linux-x64 installer-ingescape-${INGESCAPE_VERSION}-linux-x64.run "Ingescape library v${INGESCAPE_VERSION}" ./install_script.sh
+    - tar xf ingescape-${INGESCAPE_VERSION}-Linux.tar.gz
+    - makeself --target /tmp/ingescape-${INGESCAPE_VERSION} ingescape-${INGESCAPE_VERSION}-Linux installer-ingescape-${INGESCAPE_VERSION}-linux-x64.run "Ingescape library v${INGESCAPE_VERSION}" ./install_script.sh
+    - cd ..
     - mv build linux_x64
   artifacts:
     paths:
-      - ./linux_x64/installer-ingescape-${INGESCAPE_VERSION}-linux-x64.run
+      - ./linux_x64/installer-ingescape-*.run
     name: "lib-installer-linux-x64"
   dependencies:
     - lib-build-linux-x64
