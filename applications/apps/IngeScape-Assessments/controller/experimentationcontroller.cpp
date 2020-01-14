@@ -725,21 +725,24 @@ void ExperimentationController::_retrieveCharacteristicValuesForSubjectsInExperi
                 // Get characteristic value type
                 if ((subject != nullptr) && (characteristic != nullptr))
                 {
-                    switch (characteristic->valueType()) {
-                        case CharacteristicValueTypes::INTEGER:
-                            subject->setCharacteristicValue(characteristic, characValue->valueString.toInt());
-                            break;
-                        case CharacteristicValueTypes::DOUBLE:
-                            subject->setCharacteristicValue(characteristic, characValue->valueString.toDouble());
-                            break;
-                        case CharacteristicValueTypes::TEXT:
-                            subject->setCharacteristicValue(characteristic, characValue->valueString);
-                            break;
-                        case CharacteristicValueTypes::CHARACTERISTIC_ENUM:
-                            subject->setCharacteristicValue(characteristic, characValue->valueString);
-                            break;
-                        default: // UNKNOWN
-                            break;
+                    switch (characteristic->valueType())
+                    {
+                    case CharacteristicValueTypes::INTEGER:
+                        subject->setCharacteristicValue(characteristic, characValue->valueString.toInt());
+                        break;
+                    case CharacteristicValueTypes::DOUBLE: {
+                        QLocale locale = QLocale(QLocale::English);
+                        subject->setCharacteristicValue(characteristic, locale.toDouble(characValue->valueString));
+                    }
+                        break;
+                    case CharacteristicValueTypes::TEXT:
+                        subject->setCharacteristicValue(characteristic, characValue->valueString);
+                        break;
+                    case CharacteristicValueTypes::CHARACTERISTIC_ENUM:
+                        subject->setCharacteristicValue(characteristic, characValue->valueString);
+                        break;
+                    default: // UNKNOWN
+                        break;
                     }
                 }
             }

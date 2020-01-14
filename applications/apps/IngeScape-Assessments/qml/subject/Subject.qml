@@ -214,7 +214,7 @@ Item {
                             id: textFieldEditor
 
                             property var intValidator: IntValidator {}
-                            property var doubleValidator: DoubleValidator {}
+                            property var doubleValidator: DoubleValidator { locale: "en_US" }
 
                             text: {
                                 if (rootItem.subject
@@ -263,6 +263,8 @@ Item {
                             onTextChanged: {
                                 if (rootItem.subject && characteristicDelegate.characteristic)
                                 {
+                                    console.log("QML: on Text Changed " + text);
+
                                     rootItem.subject.tempMapCharacteristicValues[characteristicDelegate.characteristic.name] = text
                                 }
                             }
