@@ -942,7 +942,7 @@ lib-android-release-armv7a-softfp:
   dependencies: []
 
 # Create library installer for linux 64 bits
-lib-installer-linux-64:
+lib-installer-linux-x64:
   <<: *lib-build-files
   stage: lib-installer
   image: ingescape/debian-testing-compil
