@@ -113,7 +113,7 @@ class IngeScapeEditorController : public QObject
     I2_QML_PROPERTY_READONLY(QString, currentPlatformName)
 
     // Flag indicating if a platform has been loaded (opened) by the user or if we are in a "new" or "last" state
-    I2_QML_PROPERTY_READONLY(bool, hasAPlatformBeenLoadedByUser)
+    I2_CPP_NOSIGNAL_PROPERTY(bool, hasAPlatformBeenLoadedByUser)
 
     // Flag indicating if we must show the getting started page on startup
     I2_QML_PROPERTY_CUSTOM_SETTER(bool, gettingStartedShowAtStartup)
@@ -302,6 +302,12 @@ private Q_SLOTS:
 
 
     /**
+     * @brief Slot called when a replay is  unloaded : allow to reload platform before "record mode"
+     */
+    void _onReplayUNloaded();
+
+
+    /**
      * @brief Slot called when we receive the command "Load Platform File From Path"
      * @param platformFilePath
      */
@@ -474,9 +480,6 @@ private:
     // Path to the directory containing JSON files about platforms
     QString _platformDirectoryPath;
 
-    // Path to the default file containing the last platform
-    QString _platformDefaultFilePath;
-
     // Path to the currently opened platform file (*.igsplatform)
     QString _currentPlatformFilePath;
 
@@ -492,6 +495,9 @@ private:
 
     // Default name when creating a new platform
     static const QString SPECIAL_EMPTY_LAST_PLATFORM;
+
+    // Name of the current Ingescape platform before a record is loading
+    QString _platformNameBeforeLoadReplay;
 
 };
 
