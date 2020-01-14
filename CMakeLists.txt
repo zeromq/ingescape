@@ -434,11 +434,8 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
     if(ANDROID)
       set(CPACK_GENERATOR "ZIP")
     else()
-      configure_file("${SOURCE_DIR}/dependencies/unix/install_script.sh"
-                     "${CMAKE_CURRENT_BINARY_DIR}/install_script.sh"
-                     @ONLY)
-      install(FILES "${CMAKE_CURRENT_BINARY_DIR}/install_script.sh"
-              DESTINATION "install_script.sh"
+      install(FILES "${SOURCE_DIR}/dependencies/unix/install_script.sh"
+              DESTINATION "."
               COMPONENT library)
       set(CPACK_GENERATOR "TGZ")
     endif()
