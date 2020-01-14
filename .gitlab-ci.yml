@@ -961,7 +961,7 @@ lib-installer-linux-x64:
     - mv build linux_x64
   artifacts:
     paths:
-      - ./linux_x64/installer-ingescape-${INGESCAPE_VERSION}-linux-x64.run
+      - ./linux_x64/installer-ingescape-*.run
     name: "lib-installer-linux-x64"
   dependencies:
     - lib-build-linux-x64
