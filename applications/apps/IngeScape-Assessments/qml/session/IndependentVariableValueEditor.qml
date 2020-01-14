@@ -198,7 +198,7 @@ Item {
             id: textFieldEditor
 
             property var intValidator: IntValidator {}
-            property var doubleValidator: DoubleValidator {}
+            property var doubleValidator: DoubleValidator { locale: "en_US" }
 
             text: (typeof rootItem.variableValue !== 'undefined') ? rootItem.variableValue : ""
 
