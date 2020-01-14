@@ -137,18 +137,6 @@ void ProtocolsController::deleteProtocol(ProtocolM* protocol)
             setselectedProtocol(nullptr);
         }
 
-        // Remove sessions related to the protocol
-        /*QList<CassUuid> subjectUuidList;
-        for (SubjectM* subject : *(_currentExperimentation->allSubjects())) {
-            if (subject != nullptr)
-            {
-                subjectUuidList.append(subject->getCassUuid());
-            }
-        }*/
-
-        // Nous avons enlevé l'id de protocole de la clé primaire d'une session
-        //AssessmentsModelManager::deleteEntry<SessionM>({ { _currentExperimentation->getCassUuid() }, subjectUuidList, { protocol->getCassUuid() } });
-
         // Remove protocol from DB
         ProtocolM::deleteProtocolFromCassandraRow(*protocol);
 

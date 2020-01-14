@@ -276,7 +276,7 @@ void ExperimentationM::removeSessionsRelatedToSubject(SubjectM* subject)
     // Remove from the DataBase
     if (!sessionCassUuidsToRemove.isEmpty())
     {
-        AssessmentsModelManager::instance()->deleteEntry<SubjectM>({ { subject->getExperimentationCassUuid() },
+        AssessmentsModelManager::instance()->deleteEntry<SessionM>({ { subject->getExperimentationCassUuid() },
                                                                      sessionCassUuidsToRemove });
     }
 }
