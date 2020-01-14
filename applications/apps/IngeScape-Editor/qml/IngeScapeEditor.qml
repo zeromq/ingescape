@@ -11,7 +11,7 @@
  *      Alexandre Lemort   <lemort@ingenuity.io>
  *      Justine Limoges    <limoges@ingenuity.io>
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
- *
+ *      Chloé Roumieu      <roumieu@ingenuity.io>
  */
 
 import QtQuick 2.8
@@ -487,8 +487,32 @@ Item {
         licensesController: IngeScapeEditorC.licensesC
         mainController: IngeScapeEditorC
 
-        onUnlicensedAction: {
-            licensePopup.open();
+        timelineButtonContent: LabellessSvgButton {
+            id: playButton
+
+            property string currentID : IngeScapeEditorC.scenarioC && IngeScapeEditorC.scenarioC.isPlaying ? "timeline-pause" : "timeline-play"
+
+            releasedID: currentID
+            pressedID: currentID + "-pressed"
+            disabledID : currentID
+
+            onClicked: {
+                if (IngeScapeEditorC.scenarioC)
+                {
+                    if (IngeScapeEditorC.licensesC && IngeScapeEditorC.licensesC.mergedLicense
+                            && !IngeScapeEditorC.licensesC.mergedLicense.editorLicenseValidity)
+                    {
+                        licensePopup.open();
+                    }
+                    else if (IngeScapeEditorC.scenarioC.isPlaying)
+                    {
+                        IngeScapeEditorC.scenarioC.pauseTimeLine();
+                    }
+                    else {
+                        IngeScapeEditorC.scenarioC.playOrResumeTimeLine();
+                    }
+                }
+            }
         }
     }
 
@@ -535,7 +559,7 @@ Item {
                         color: styleData.selected ? IngeScapeEditorTheme.selectedTabsBackgroundColor : "transparent"
 
                         implicitWidth: (IngeScapeEditorC.recordsSupervisionC && IngeScapeEditorC.recordsSupervisionC.isRecorderON) ? leftPanelTabs.width / 4
-                                                                                                                                              : leftPanelTabs.width / 3
+                                                                                                                                   : leftPanelTabs.width / 3
                         implicitHeight: 26
                         topRightRadius : 5
 

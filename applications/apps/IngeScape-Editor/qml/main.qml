@@ -84,6 +84,12 @@ ApplicationWindow {
                     // (to close the popup with agents list in the history panel if it is opened)
                     mainWindow.requestActivate();
 
+                    // Unload selected record
+                    if ((IngeScapeEditorC.recordsSupervisionC) && (IngeScapeEditorC.recordsSupervisionC.selectedRecord))
+                    {
+                        IngeScapeEditorC.recordsSupervisionC.selectedRecord = null;
+                    }
+
                     IngeScapeEditorC.clearCurrentPlatform();
                 }
             }
@@ -97,6 +103,12 @@ ApplicationWindow {
                     // Allows to give the focus to the main window
                     // (to close the popup with agents list in the history panel if it is opened)
                     mainWindow.requestActivate();
+
+                    // Unload selected record
+                    if ((IngeScapeEditorC.recordsSupervisionC) && (IngeScapeEditorC.recordsSupervisionC.selectedRecord))
+                    {
+                        IngeScapeEditorC.recordsSupervisionC.selectedRecord = null;
+                    }
 
                     IngeScapeEditorC.loadPlatformFromSelectedFile();
                 }

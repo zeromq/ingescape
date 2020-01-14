@@ -9,6 +9,7 @@
  *
  *	Contributors:
  *      Justine Limoges   <limoges@ingenuity.io>
+ *      Chloé Roumieu     <roumieu@ingenuity.io>
  */
 
 import QtQuick 2.8
@@ -50,7 +51,6 @@ Item {
     // Flag indicating if the user have a valid license for the editor
     property bool isEditorLicenseValid: rootItem.licensesController && rootItem.licensesController.mergedLicense && rootItem.licensesController.mergedLicense.editorLicenseValidity
 
-
     // graphical properties
     property int linesNumber: scenarioController ? scenarioController.linesNumberInTimeLine : 0;
     property int lineHeight: IngeScapeTheme.lineInTimeLineHeight;
@@ -62,23 +62,10 @@ Item {
     // NB: this flag is used to avoid animations during a drag-n-drop
     property bool _canPerformResizeAnimations: true
 
-    // Item to add extra children to our 'extraContentItem' item
+    // Item to add extra children to our 'timelineButton' item
     // NB: We use the 'data' property instead of the 'children' property to allow any type
     //     of content and not only visual items (data is a list<Object> AND children is a list<Item>)
-    property alias extraContent: extraContentItem.data
-
-    // Alias to set visibility of the playScenarioBtn
-    property alias playVisibility: playScenarioBtn.visible
-
-
-    //--------------------------------
-    //
-    // Signals
-    //
-    //--------------------------------
-
-    // Signal emitted when the user tries to perform an action forbidden by the license
-    signal unlicensedAction();
+    property alias timelineButtonContent: timelineButton.data
 
 
     //--------------------------------
@@ -386,7 +373,6 @@ Item {
             }
 
 
-
             //
             // MouseArea to capture scroll gesture events (trackpad)
             //
@@ -394,9 +380,6 @@ Item {
                 anchors.fill: parent
 
                 scrollGestureEnabled: true
-
-                onPressed: {
-                }
 
                 onWheel: {
                     wheel.accepted = true;
@@ -807,10 +790,7 @@ Item {
                         visible : contentArea.visibleArea.heightRatio < 1
                     }
                 }
-
-
             }
-
         }
 
 
@@ -851,9 +831,7 @@ Item {
                 }
             }
         }
-
     }
-
 
 
     // Timeline Header
@@ -862,8 +840,7 @@ Item {
 
         anchors {
             top: scrollTimeLine.bottom
-            left: parent.left
-            leftMargin: 105
+            left: leftPanel.right
             right: parent.right
             rightMargin: 35
         }
@@ -919,7 +896,6 @@ Item {
                     onPressed: {
                         rootItem.forceActiveFocus();
                     }
-
 
                     onWheel: {
                         wheel.accepted = true;
@@ -1079,7 +1055,6 @@ Item {
                                 family: IngeScapeTheme.textFontFamily
                                 pixelSize: 14
                             }
-
                         }
                     }
 
@@ -1094,7 +1069,6 @@ Item {
                         svgFileCache: IngeScapeTheme.svgFileIngeScape
                         svgElementId: "currentTime"
                     }
-
 
                     MouseArea {
                         id: currentTimeMouseArea
@@ -1151,13 +1125,9 @@ Item {
                             }
                         }
                     }
-
-
                 }
-
             }
         }
-
     }
 
 
@@ -1183,7 +1153,7 @@ Item {
             height : 13
 
             property var scrollBarSize: if (timeLineController) {
-                                           Math.max(8,(timeLineController.viewportWidth*scrollTimeLine.width)/timeLineController.timeTicksTotalWidth);
+                                            Math.max(8,(timeLineController.viewportWidth*scrollTimeLine.width)/timeLineController.timeTicksTotalWidth);
                                         }
                                         else {
                                             0
@@ -1318,116 +1288,25 @@ Item {
     }
 
 
-    // Buttons and time and extra content if necessary
+    // Button (extra content) and time
     Item {
+        id: leftPanel
+
         anchors {
             left: parent.left
-            right: columnHeadersArea.left
             top: parent.top
             topMargin: 20
         }
 
-
-        /*// Start/Stop Record button
-        Button {
-            id: startOrStopRecordButton
-
-            anchors {
-                top: parent.top
-                topMargin: -(20 + startOrStopRecordButton.height)
-                horizontalCenter: parent.horizontalCenter
-            }
-
-            //enabled: (controller.currentReplay === null)
-            //opacity: enabled ? 1.0 : 0.4
-
-            style: I2SvgToggleButtonStyle {
-                fileCache: IngeScapeTheme.svgFileIngeScape
-
-                toggleCheckedReleasedID: "record-stop"
-                toggleCheckedPressedID: toggleCheckedReleasedID + "-pressed"
-                toggleUncheckedReleasedID: "record-start"
-                toggleUncheckedPressedID: toggleUncheckedReleasedID + "-pressed"
-
-                // No disabled states
-                toggleCheckedDisabledID: toggleCheckedPressedID
-                toggleUncheckedDisabledID: toggleUncheckedPressedID
-
-                labelMargin: 0
-            }
-
-            onClicked: {
-                if (scenarioController) {
-                    console.log("QML: Start or Stop to Record");
-
-                    //scenarioController.startOrStopToRecord();
-                }
-            }
-
-            //Binding {
-            //    target: startOrStopRecordButton
-            //    property: "checked"
-            //    value: scenarioController ? scenarioController.isRecording : false
-            //}
-        }*/
-
-
-        // Play Button
-        Button {
-            id: playScenarioBtn
-
-            anchors {
-                top: parent.top
-                horizontalCenter: parent.horizontalCenter
-            }
-
-            activeFocusOnPress: true
-            checkable: true
-
-            style: I2SvgToggleButtonStyle {
-                fileCache: IngeScapeTheme.svgFileIngeScape
-
-                toggleCheckedReleasedID: "timeline-pause"
-                toggleCheckedPressedID: toggleCheckedReleasedID + "-pressed"
-                toggleCheckedDisabledID: toggleCheckedReleasedID
-
-                toggleUncheckedReleasedID: "timeline-play"
-                toggleUncheckedPressedID: toggleUncheckedReleasedID + "-pressed"
-                toggleUncheckedDisabledID: toggleUncheckedReleasedID
-
-                labelMargin: 0;
-            }
-
-            onClicked: {
-                if (scenarioController)
-                {
-                    if (!rootItem.isEditorLicenseValid) {
-                        checked = false
-                        rootItem.unlicensedAction();
-                    }
-                    else if (checked) {
-                        scenarioController.playOrResumeTimeLine();
-                    }
-                    else {
-                        scenarioController.pauseTimeLine();
-                    }
-                }
-            }
-
-            Binding {
-                target: playScenarioBtn
-                property: "checked"
-                value: scenarioController ? scenarioController.isPlaying : false
-            }
-        }
-
+        // N.B : 35 allow us to let a margin between parent.left and our timeline
+        width : opacity === 0 ? 35 : 105
 
         Rectangle {
             id: playTime
 
             anchors {
-                horizontalCenter: playScenarioBtn.horizontalCenter
-                top: playScenarioBtn.bottom
+                horizontalCenter: timelineButton.horizontalCenter
+                top: timelineButton.bottom
                 topMargin: 6
             }
             width: IngeScapeTheme.timeWidth
@@ -1459,17 +1338,24 @@ Item {
         }
 
         Item {
-            id: extraContentItem
+            id: timelineButton
 
             anchors {
                 top: parent.top
                 horizontalCenter: parent.horizontalCenter
             }
 
-            height: childrenRect.height
+            height:  childrenRect.height
             width: childrenRect.width
         }
+
+        Binding {
+            target : leftPanel
+            property: "opacity"
+            value: timelineButton.visibleChildren.length > 0 ? 1 : 0
+        }
     }
+
 
     //--------------------------------------------------------
     //
@@ -1547,3 +1433,4 @@ Item {
         when: !mouseArea.drag.active
     }
 }
+

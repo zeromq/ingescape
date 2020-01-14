@@ -66,11 +66,11 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _gettingStartedShowAtStartup(true),
     _terminationSignalWatcher(nullptr),
     _platformDirectoryPath(""),
-    _platformDefaultFilePath(""),
     _currentPlatformFilePath(""),
     // Connect mapping in control mode
     _beforeNetworkStop_isMappingConnected(true),
-    _beforeNetworkStop_isMappingControlled(true)
+    _beforeNetworkStop_isMappingControlled(true),
+    _platformNameBeforeLoadReplay("")
 {
     qInfo() << "New IngeScape Editor Controller";
 
@@ -94,6 +94,8 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
         qCritical() << "ERROR: could not create directory at '" << snapshotsPath << "' !";
     }
 
+    // Path to the example.igsPlatform
+    QString platformDefaultFilePath;
 
     // Directory for platform files
     QString platformPath = IngeScapeUtils::getPlatformsPath();
@@ -108,9 +110,8 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
         _platformDirectoryPath = platformPath;
 
         // Init the path to the platform file to load the example file
-        _platformDefaultFilePath = QString("%1%2.igsplatform").arg(_platformDirectoryPath, EXAMPLE_PLATFORM_NAME);
+        platformDefaultFilePath = QString("%1%2.igsplatform").arg(_platformDirectoryPath, EXAMPLE_PLATFORM_NAME);
     }
-
 
     // Create the (sub) directory "exports" if not exist (the directory contains CSV files about exports)
     IngeScapeUtils::getExportsPath();
@@ -157,7 +158,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     // Settings about "Platform"
     //
     settings.beginGroup("platform");
-    _currentPlatformFilePath = settings.value("last", _platformDefaultFilePath).toString();
+    _currentPlatformFilePath = settings.value("last", platformDefaultFilePath).toString();
     settings.endGroup();
 
 
@@ -300,6 +301,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_networkC, &NetworkController::replayLoadingReceived, this, &IngeScapeEditorController::_onReplayLoading);
     connect(_networkC, &NetworkController::replayLoadedReceived, _recordsSupervisionC, &RecordsSupervisionController::onReplayLoaded);
     connect(_networkC, &NetworkController::replayUNloadedReceived, _recordsSupervisionC, &RecordsSupervisionController::onReplayUNloaded);
+    connect(_networkC, &NetworkController::replayUNloadedReceived, this, &IngeScapeEditorController::_onReplayUNloaded);
     connect(_networkC, &NetworkController::replayEndedReceived, _recordsSupervisionC, &RecordsSupervisionController::onReplayEnded);
     connect(_networkC, &NetworkController::recordExported, _recordsSupervisionC, &RecordsSupervisionController::onRecordExported);
 
@@ -1191,6 +1193,13 @@ void IngeScapeEditorController::_onReplayLoading(int deltaTimeFromTimeLineStart,
 
     if ((deltaTimeFromTimeLineStart >= 0) && !jsonPlatform.isEmpty())
     {
+        // Set _platformNameBeforeLoadReplay on first replay loading only
+        // N.B : "Unload record" is only send when no more record is selected
+        if (_platformNameBeforeLoadReplay == "")
+        {
+            _platformNameBeforeLoadReplay = currentPlatformName();
+        }
+
         // First, clear the current platform by deleting all existing data
         clearCurrentPlatform();
 
@@ -1205,22 +1214,20 @@ void IngeScapeEditorController::_onReplayLoading(int deltaTimeFromTimeLineStart,
             {
                 setcurrentPlatformName(recordName);
 
-                //_currentPlatformFilePath = QDir(_platformDirectoryPath).absoluteFilePath(recordName);
                 _currentPlatformFilePath = QString("%1%2.igsplatform").arg(_platformDirectoryPath, recordName);
 
-                sethasAPlatformBeenLoadedByUser(true);
+                // Platform has been loaded by Editor
+                sethasAPlatformBeenLoadedByUser(false);
             }
 
             if (_scenarioC != nullptr)
             {
                 // Update the current time
-                _scenarioC->setcurrentTime(QTime::fromMSecsSinceStartOfDay(deltaTimeFromTimeLineStart));
-
-                // FIXME TODO jsonExecutedActions
-                //qDebug() << "jsonExecutedActions" << jsonExecutedActions;
+                _scenarioC->setcurrentTime(QTime::fromMSecsSinceStartOfDay(0));
 
                 // Import the executed actions for this scenario from JSON
-                _scenarioC->importExecutedActionsFromJson(jsonExecutedActions.toUtf8());
+                _scenarioC->importExecutedActionsFromJson(0, jsonExecutedActions.toUtf8());
+
             }
 
             // Notify QML to reset views
@@ -1231,6 +1238,31 @@ void IngeScapeEditorController::_onReplayLoading(int deltaTimeFromTimeLineStart,
         {
             qCritical() << "The loading of the replay failed !";
         }
+    }
+}
+
+/**
+ * @brief Slot called when a replay is  unloaded : allow to reload platform before "record mode"
+ */
+void IngeScapeEditorController::_onReplayUNloaded()
+{
+    if (_recordsSupervisionC != nullptr)
+    {
+        // Update the current state of the replay
+        _recordsSupervisionC->setreplayState(ReplayStates::UNLOADED);
+    }
+
+    // First, clear the current platform by deleting all existing data
+    clearCurrentPlatform();
+
+    _currentPlatformFilePath = QString("%1%2.igsplatform").arg(_platformDirectoryPath, _platformNameBeforeLoadReplay);
+    _platformNameBeforeLoadReplay = "";
+
+    // Load the platform from last platform file used before records
+    bool success = _loadPlatformFromFile(_currentPlatformFilePath);
+    if (!success)
+    {
+         qCritical() << "The loading of the current platform before replay failed !";
     }
 }
 
@@ -1635,7 +1667,6 @@ bool IngeScapeEditorController::_clearAndLoadPlatformFromFile(QString platformFi
 
     return succeeded;
 }
-
 
 
 /**
