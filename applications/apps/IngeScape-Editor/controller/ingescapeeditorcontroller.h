@@ -444,11 +444,7 @@ private:
 
 
     /**
-     * @brief Start IngeScape
-     *
-     * @param checkAvailableNetworkDevices
-     *
-     * @return
+     * @brief If checkAvailableNetworkDevices : auto select a network device to start Ingescape
      */
     bool _startIngeScape(bool checkAvailableNetworkDevices);
 

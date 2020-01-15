@@ -1549,7 +1549,7 @@ void IngeScapeEditorController::_onSystemSleep()
  * @brief Called when our machine did wake from sleep
  */
 void IngeScapeEditorController::_onSystemWake()
-{
+{  
     // Start IngeScape
     // => we need to check available network devices
     _startIngeScape(true);
@@ -1814,44 +1814,38 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
 
 
 /**
- * @brief Start IngeScape
- *
- * @param checkAvailableNetworkDevices
- *
- * @return
+ * @brief If checkAvailableNetworkDevices : auto select a network device to start Ingescape
  */
 bool IngeScapeEditorController::_startIngeScape(bool checkAvailableNetworkDevices)
 {
     bool success = false;
-
     IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
     IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
     IngeScapeSettings &settings = IngeScapeSettings::Instance();
 
-    if ((ingeScapeNetworkC != nullptr) && (ingeScapeModelManager != nullptr) && (_modelManager != nullptr))
+    // Always update available network devices (to have our qml list updated)
+    ingeScapeNetworkC->updateAvailableNetworkDevices();
+
+    if ((ingeScapeNetworkC != nullptr) && (ingeScapeModelManager != nullptr)
+            && (_modelManager != nullptr))
     {
         if (checkAvailableNetworkDevices)
         {
-            // Update the list of available network devices
-            ingeScapeNetworkC->updateAvailableNetworkDevices();
-
             int nbDevices = ingeScapeNetworkC->availableNetworkDevices().count();
             QStringList devicesAddresses = ingeScapeNetworkC->availableNetworkDevicesAddresses();
-
             if (nbDevices == 0 )
             {
-                // No network device available
                  setnetworkDevice("");
             }
             else if (nbDevices == 1)
             {
-                // There is only one available network device, we use it !
-
+                 // Use the only available network device
                 setnetworkDevice(ingeScapeNetworkC->availableNetworkDevices().at(0));
             }
-            else if ((nbDevices == 2) && ((devicesAddresses.at(0) == "127.0.0.1")||(devicesAddresses.at(1) == "127.0.0.1")))
+            else if ((nbDevices == 2)
+                     && ((devicesAddresses.at(0) == "127.0.0.1")||(devicesAddresses.at(1) == "127.0.0.1")))
             {
-                // There are 2 devices, one of which is the loopback, we pick the device that is NOT the loopback
+                // 2 available devices, one is the loopback : we pick the device that is NOT the loopback
                 if (devicesAddresses.at(0) == "127.0.0.1")
                 {
                     setnetworkDevice(ingeScapeNetworkC->availableNetworkDevices().at(1));
@@ -1867,10 +1861,9 @@ bool IngeScapeEditorController::_startIngeScape(bool checkAvailableNetworkDevice
                 settings.beginGroup("network");
                 QString lastSaveNetworkDevice = settings.value("networkDevice", QVariant("")).toString();
                 settings.endGroup();
-
-                // If last save device is no more available, user must choose device to launch editor
                 if (!ingeScapeNetworkC->isAvailableNetworkDevice(lastSaveNetworkDevice))
                 {
+                    // User have to choose a device to launch editor
                     setnetworkDevice("");
                 }
                 else {
@@ -1878,14 +1871,9 @@ bool IngeScapeEditorController::_startIngeScape(bool checkAvailableNetworkDevice
                 }
             }
         }
-
-        // Start our IngeScape agent with the network device and the port
-        // NB : will failed if networkDevice = ""
-        success = ingeScapeNetworkC->start(_networkDevice, _ipAddress, _port);
-
+        success = ingeScapeNetworkC->start(_networkDevice, _ipAddress, _port); //will failed if networkDevice = ""
         if (success)
         {
-            // Re-enable mapping
             ingeScapeModelManager->setisMappingConnected(_beforeNetworkStop_isMappingConnected);
             _modelManager->setisMappingControlled(_beforeNetworkStop_isMappingControlled);
         }

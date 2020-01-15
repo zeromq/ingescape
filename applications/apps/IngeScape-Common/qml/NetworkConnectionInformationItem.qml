@@ -251,6 +251,11 @@ I2CustomRectangle {
 
     onListOfNetworkDevicesChanged: {
         resetComboboxSelectNetworkDevice();
+
+        rootPrivate.networkDevicesAvailable = root.listOfNetworkDevices.length > 0;
+        if (!rootPrivate.networkDevicesAvailable) {
+            close();
+        }
     }
 
     onEditorStartedOnIgsChanged: {
