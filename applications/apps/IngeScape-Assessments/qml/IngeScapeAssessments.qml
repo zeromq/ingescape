@@ -9,22 +9,19 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
- *
+ *      Chloé Roumieu      <roumieu@ingenuity.io>
  */
 
 import QtQuick 2.9
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
-
-import I2Quick 1.0
 import QtQuick.Window 2.3
-
+import I2Quick 1.0
 import INGESCAPE 1.0
 
 import "experimentation" as Experimentation
 import "session" as Session
 import "popup" as Popup
-
 
 Item {
     id: rootItem
@@ -41,7 +38,6 @@ Item {
     //--------------------------------------------------------
 
 
-
     //--------------------------------------------------------
     //
     //
@@ -50,9 +46,6 @@ Item {
     //
     //--------------------------------------------------------
 
-    /**
-     * Reset the current experimentation
-     */
     function resetCurrentExperimentation()
     {
         if (IngeScapeAssessmentsC.experimentationC)
@@ -61,9 +54,6 @@ Item {
         }
     }
 
-    /**
-     * Reset the current session
-     */
     function resetCurrentSession()
     {
         if (IngeScapeAssessmentsC.experimentationC && IngeScapeAssessmentsC.experimentationC.sessionC)
@@ -72,18 +62,10 @@ Item {
         }
     }
 
-
-    //
-    // Function allowing to open the license (configuration) popup
-    //
     function openLicensePopup() {
         licensePopup.open();
     }
 
-
-    //
-    // Function allowing to open the database (configuration) popup
-    //
     function openDatabasePopup() {
         databasePopup.open();
     }
@@ -97,23 +79,18 @@ Item {
     //
     //--------------------------------------------------------
 
-    // When the QML is loaded...
     Component.onCompleted: {
         // FIXME Several popup may appear at startup depending on the current platform configuration. Need to prioritize them and maybe show them sequentialy, not on top of each other.
 
-        // ...we check if we are connected to a database
         if (AssessmentsModelC && !AssessmentsModelC.isConnectedToDatabase)
         {
             openDatabasePopup();
         }
-
-        // ...we check the value of the flag "is License For Agent Needed" (Here for IngeScape-Assessments agent)
-        if (IngeScapeAssessmentsC.licensesC && !IngeScapeAssessmentsC.licensesC.isLicenseValidForAgentNeeded)
+        if (IngeScapeAssessmentsC.licensesC && !IngeScapeAssessmentsC.licensesC.isLicenseValidForAgentNeeded) // (Here for IngeScape-Assessments agent)
         {
             openLicensePopup();
         }
-
-        /*// ...we check if we must open the getting started window
+        /*
         if (IngeScapeAssessmentsC.gettingStartedShowAtStartup)
         {
             openGettingStarted();
@@ -125,15 +102,12 @@ Item {
 
         onCurrentExperimentationChanged: {
             if (IngeScapeAssessmentsC.experimentationC.currentExperimentation)
-            {
-                // Add the "Experimentation View" to the stack
-                stackview.push(componentExperimentationView);
+            {                
+                stackview.push(componentExperimentationView); // Add the "Experimentation View" to the stack
             }
             else {
                 console.log("QML: on Current Experimentation changed to NULL");
-
-                // Remove the "Experimentation View" from the stack
-                stackview.pop();
+                stackview.pop(); // Remove the "Experimentation View" from the stack
             }
         }
     }
@@ -142,19 +116,14 @@ Item {
         target: IngeScapeAssessmentsC.experimentationC.sessionC
 
         onCurrentSessionChanged: {
-
             if (IngeScapeAssessmentsC.experimentationC.sessionC.currentSession)
             {
                 console.log("QML: on Current Session changed: " + IngeScapeAssessmentsC.experimentationC.sessionC.currentSession.name);
-
-                // Add the "Session view" to the stack
-                stackview.push(componentSessionView);
+                stackview.push(componentSessionView); // Add the "Session view" to the stack
             }
             else {
                 console.log("QML: on Current Session changed to NULL");
-
-                // Remove the "Session view" from the stack
-                stackview.pop();
+                stackview.pop(); // Remove the "Session view" from the stack
             }
         }
     }
@@ -188,9 +157,8 @@ Item {
         initialItem: componentExperimentationsListView
     }
 
-
     NetworkConnectionInformationItem {
-        id: networkConfigurationInfo
+        id: networkConnectionInformationItem
 
         anchors {
             top: parent.top
@@ -199,22 +167,24 @@ Item {
             rightMargin: 13
         }
 
-        editorStartedOnIgs: IgsNetworkController ? IgsNetworkController.isStarted : false
+        visible : (IngeScapeAssessmentsC.experimentationC
+                   // Only on experimentation view in selection mode if NO Recorder
+                  && ((IngeScapeAssessmentsC.experimentationC.currentExperimentation && IngeScapeAssessmentsC.experimentationC.isSelectingSessions && !IngeScapeAssessmentsC.experimentationC.isRecorderON)
+                        // And always in session view
+                        || (IngeScapeAssessmentsC.experimentationC.sessionC && IngeScapeAssessmentsC.experimentationC.sessionC.currentSession)))
 
+        editorStartedOnIgs: IgsNetworkController ? IgsNetworkController.isStarted : false
         currentNetworkDevice: IngeScapeAssessmentsC.networkDevice
         currentPort: IngeScapeAssessmentsC.port
-
         listOfNetworkDevices: IgsNetworkController ? IgsNetworkController.availableNetworkDevices : null
 
         onWillOpenEditionMode: {
-            // Update our list of available network devices
             IgsNetworkController.updateAvailableNetworkDevices();
         }
 
         onChangeNetworkSettings: {
             if (IgsNetworkController.isAvailableNetworkDevice(networkDevice))
             {
-                // Re-Start the Network
                 var success = IngeScapeAssessmentsC.restartNetwork(port, networkDevice, clearPlatform);
                 if (success)
                 {
@@ -228,8 +198,6 @@ Item {
         }
     }
 
-
-
     //
     // Experimentations List View
     //
@@ -240,17 +208,8 @@ Item {
             id: experimentationsListView
 
             controller: IngeScapeAssessmentsC.experimentationsListC
-
-            //
-            // Behavior
-            //
-
-            Component.onCompleted: {
-                networkConfigurationInfo.visible = false;
-            }
         }
     }
-
 
     //
     // Experimentation View
@@ -259,35 +218,14 @@ Item {
         id: componentExperimentationView
 
         Experimentation.ExperimentationView {
-            //id: experimentationView
-
-            controller: IngeScapeAssessmentsC.experimentationC
-
-            //
-            // Behavior
-            //
-
-            Component.onCompleted: {
-                networkConfigurationInfo.visible = true;
-            }
-
-
-            //
-            // Slots
-            //
+            experimentationC: IngeScapeAssessmentsC.experimentationC
 
             onGoBackToHome: {
                 console.log("QML: on Go Back to 'Home' (from 'Experimentation' view)");
-
-                // Hide network configuration infos component
-                networkConfigurationInfo.visible = false;
-
-                // Reset the current experimentation
                 rootItem.resetCurrentExperimentation();
             }
         }
     }
-
 
     //
     // Session View
@@ -299,43 +237,18 @@ Item {
             sessionController: IngeScapeAssessmentsC.experimentationC.sessionC
             experimentationController: IngeScapeAssessmentsC.experimentationC
 
-            //
-            // Behavior
-            //
-
-            Component.onCompleted: {
-                networkConfigurationInfo.visible = true;
-            }
-
-            //
-            // Slots
-            //
-
             onGoBackToHome: {
                 console.log("QML: on Go Back to 'Home' (from 'Session' view)");
-
-                // Hide network configuration infos component
-                networkConfigurationInfo.visible = false;
-
-                // Reset the current session
                 rootItem.resetCurrentSession();
-
-                // Reset the current experimentation
                 rootItem.resetCurrentExperimentation();
             }
 
             onGoBackToExperimentation: {
                 console.log("QML: on Go Back to 'Experimentation' (from 'Session' view)");
-
-                // Hide network configuration infos component
-                networkConfigurationInfo.visible = true;
-
-                // Reset the current session
                 rootItem.resetCurrentSession();
             }
         }
     }
-
 
     //
     // License (Configuration) Popup
@@ -348,7 +261,6 @@ Item {
         licensesController: IngeScapeAssessmentsC.licensesC
     }
 
-
     //
     // Popup displayed when an event occurs about the license(s)
     //
@@ -359,12 +271,10 @@ Item {
 
         onClosed: {
             console.log("Popup displayed when an event occurs about the license(s) has just been closed");
-
             licensePopup.allowsOnlyQuit = true;
             licensePopup.open();
         }
     }
-
 
     //
     // Database (Configuration) Popup

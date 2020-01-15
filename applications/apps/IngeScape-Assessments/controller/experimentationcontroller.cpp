@@ -32,6 +32,7 @@ ExperimentationController::ExperimentationController(QObject *parent) : QObject(
     _peerNameOfRecorder(""),
     _isRecorderON(false),
     _isRecording(false),
+    _isSelectingSessions(false),
     _selectedSubjectIdListToFilter(QStringList()),
     _selectedProtocolNameListToFilter(QStringList()),
     _nextRecordToHandle(nullptr),

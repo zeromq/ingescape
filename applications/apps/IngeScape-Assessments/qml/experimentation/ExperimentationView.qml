@@ -9,7 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
- *
+ *      Chloé Roumieu      <roumieu@ingenuity.io>
  */
 
 import QtQuick 2.9
@@ -39,18 +39,14 @@ Item {
     //
     //--------------------------------------------------------
 
-    property ExperimentationController controller: null;
-
-    property ExperimentationM experimentation: controller ? controller.currentExperimentation : null;
+    property ExperimentationController experimentationC: null;
+    property ExperimentationM experimentation: experimentationC ? experimentationC.currentExperimentation : null;
 
     property bool isEditingName: false
 
     property int rightMarginToAvoidToBeHiddenByNetworkConnectionInfo: 220
 
     property int subScreensMargin: 35
-
-    // Flag indicating if we are currently selecting the sessions to export
-    property bool _isSelectingSessionsToExport: false
 
     // Duration of the animation about appearance of the check box to select sessions
     property int _appearanceAnimationDuration: 250
@@ -375,11 +371,10 @@ Item {
 
                     onClicked: {
                         console.log("QML: Open the 'Subjects View' popup");
-
-                        // Close select sessions to export
-                        _isSelectingSessionsToExport = false;
-
-                        // Open the popup "Subjects View"
+                        if (rootItem.experimentationC)
+                        {
+                            rootItem.experimentationC.isSelectingSessions = false // Close mode "export session"
+                        }
                         subjectsViewPopup.open()
                     }
                 }
@@ -399,11 +394,10 @@ Item {
 
                     onClicked: {
                         console.log("QML: Open the 'Protocols View' popup");
-
-                        // Close select sessions to export
-                        _isSelectingSessionsToExport = false;
-
-                        // Open the popup "Protocols View"
+                        if (rootItem.experimentationC)
+                        {
+                            rootItem.experimentationC.isSelectingSessions = false // Close mode "export session"
+                        }
                         protocolsViewPopup.open();
                     }
                 }
@@ -439,34 +433,6 @@ Item {
                         disabledID: releasedID
                     }
                 }
-
-//                Button {
-//                    width: parent.width
-//                    height: 62
-
-//                    enabled: rootItem.controller && rootItem.controller.isRecorderON
-
-//                    style: IngeScapeAssessmentsSvgAndTextButtonStyle {
-//                        text: qsTr("EXPORT")
-
-//                        releasedID: "export"
-//                        pressedID: releasedID
-//                        rolloverID: releasedID
-//                        disabledID: releasedID
-//                    }
-
-//                    onClicked: {
-//                        //console.log("QML: Open the 'Export View' popup");
-
-//                        // Open the popup "Export View"
-//                        //exportViewPopup.open();
-
-//                        rootItem.controller.addAllProtocolsToFilterSessions();
-//                        rootItem.controller.addAllSubjectsToFilterSessions();
-
-//                        _isSelectingSessionsToExport = !_isSelectingSessionsToExport;
-//                    }
-//                }
             }
         }
 
@@ -521,7 +487,7 @@ Item {
                 width: 182
 
                 onClicked: {
-                    // Open the popup
+                    rootItem.experimentationC.isSelectingSessions = false // Close mode "export session"
                     createSessionPopup.open();
                 }
 
@@ -550,7 +516,6 @@ Item {
                     spacing: 0
 
                     I2CustomRectangle {
-                    //Rectangle {
                         width: mainView.selectionColumnWidth
                         height: parent.height
 
@@ -566,7 +531,7 @@ Item {
                                 verticalCenter: parent.verticalCenter
                             }
 
-                            enabled: rootItem.controller && rootItem.controller.isRecorderON
+                            enabled: rootItem.experimentationC
                             visible: enabled
 
                             fileCache: IngeScapeTheme.svgFileIngeScape
@@ -576,15 +541,12 @@ Item {
                             disabledID : releasedID + "-disabled"
 
                             onClicked: {
-                                //console.log("QML: Open the 'Export View' popup");
-
-                                // Open the popup "Export View"
-                                //exportViewPopup.open();
-
-                                rootItem.controller.addAllProtocolsToFilterSessions();
-                                rootItem.controller.addAllSubjectsToFilterSessions();
-
-                                _isSelectingSessionsToExport = !_isSelectingSessionsToExport;
+                                //console.log("QML: Open the 'Export Sessions' mode ");
+                                if (rootItem.experimentationC) {
+                                    rootItem.experimentationC.addAllProtocolsToFilterSessions();
+                                    rootItem.experimentationC.addAllSubjectsToFilterSessions();
+                                    rootItem.experimentationC.isSelectingSessions = ! rootItem.experimentationC.isSelectingSessions
+                                }
                             }
                         }
                     }
@@ -625,7 +587,7 @@ Item {
                                 leftMargin: 15
                                 verticalCenter: parent.verticalCenter
                             }
-                            visible: !_isSelectingSessionsToExport
+                            visible: rootItem.experimentationC ? !rootItem.experimentationC.isSelectingSessions : false
                             enabled: visible
 
                             text: qsTr("Subject")
@@ -647,23 +609,31 @@ Item {
 
                             height : 25
                             width : mainView.subjectColumnWidth - 10
-                            //enabled: rootItem.controller && rootItem.controller.allAgentNamesList.length > 0
-                            visible: _isSelectingSessionsToExport && rootItem.controller
+                            //enabled: rootItem.experimentationC && rootItem.experimentationC.allAgentNamesList.length > 0
+                            visible: rootItem.experimentationC ? rootItem.experimentationC.isSelectingSessions : false
                             enabled: visible
                             model: rootItem.experimentation ? rootItem.experimentation.allSubjects : 0
 
                             placeholderText: enabled ? "- Select a subject -" : ""
 
                             text:{
-                                if(enabled && rootItem.experimentation && rootItem.controller && (rootItem.controller.selectedSubjectIdListToFilter.length > 0)){
-                                    if(rootItem.controller.selectedSubjectIdListToFilter.length === 1){
-                                        "- " + rootItem.controller.selectedSubjectIdListToFilter + " -"
-                                    }else if(rootItem.controller.selectedSubjectIdListToFilter.length < rootItem.experimentation.allSubjects.length){
-                                        "- " + rootItem.controller.selectedSubjectIdListToFilter.length + " subjects selected -"
-                                    }else{
+                                if (enabled && rootItem.experimentation && rootItem.experimentationC && (rootItem.experimentationC.selectedSubjectIdListToFilter.length > 0))
+                                {
+                                    if(rootItem.experimentationC.selectedSubjectIdListToFilter.length === 1)
+                                    {
+                                        "- " + rootItem.experimentationC.selectedSubjectIdListToFilter + " -"
+                                    }
+                                    else if(rootItem.experimentationC.selectedSubjectIdListToFilter.length < rootItem.experimentation.allSubjects.length)
+                                    {
+                                        "- " + rootItem.experimentationC.selectedSubjectIdListToFilter.length + " subjects selected -"
+                                    }
+                                    else
+                                    {
                                         "- All subjects selected -"
                                     }
-                                }else{
+                                }
+                                else
+                                {
                                     ""
                                 }
                             }
@@ -671,12 +641,12 @@ Item {
                             checkAllText: " All subjects"
 
                             onCheckAll: {
-                                rootItem.controller.addAllSubjectsToFilterSessions();
+                                rootItem.experimentationC.addAllSubjectsToFilterSessions();
                                 clickAllSubject();
                             }
 
                             onUncheckAll: {
-                                rootItem.controller.removeAllSubjectsToFilterSessions();
+                                rootItem.experimentationC.removeAllSubjectsToFilterSessions();
                                 clickAllSubject();
                             }
 
@@ -686,9 +656,9 @@ Item {
                                 isPartiallyChecked = false;
                                 checkAllState = Qt.Unchecked;
 
-                                if (rootItem.experimentation && rootItem.controller && (rootItem.controller.selectedSubjectIdListToFilter.length > 0))
+                                if (rootItem.experimentation && rootItem.experimentationC && (rootItem.experimentationC.selectedSubjectIdListToFilter.length > 0))
                                 {
-                                    if (rootItem.controller.selectedSubjectIdListToFilter.length === rootItem.experimentation.allSubjects.count) {
+                                    if (rootItem.experimentationC.selectedSubjectIdListToFilter.length === rootItem.experimentation.allSubjects.count) {
                                         checkAllState = Qt.Checked;
                                     }
                                     else {
@@ -761,12 +731,12 @@ Item {
                                     }
 
                                     onClicked : {
-                                        if (rootItem.controller && delegateSubjectCombolist.subjectM) {
+                                        if (rootItem.experimentationC && delegateSubjectCombolist.subjectM) {
                                             if (checked) {
-                                                rootItem.controller.addOneSubjectToFilterSessions(delegateSubjectCombolist.subjectM.displayedId)
+                                                rootItem.experimentationC.addOneSubjectToFilterSessions(delegateSubjectCombolist.subjectM.displayedId)
                                             }
                                             else {
-                                                rootItem.controller.removeOneSubjectToFilterSessions(delegateSubjectCombolist.subjectM.displayedId)
+                                                rootItem.experimentationC.removeOneSubjectToFilterSessions(delegateSubjectCombolist.subjectM.displayedId)
                                             }
 
                                             // update "all subjects" checkbox state
@@ -774,9 +744,9 @@ Item {
                                             dropDownSubject.isPartiallyChecked = false;
                                             dropDownSubject.checkAllState = Qt.Unchecked;
 
-                                            if (rootItem.controller && rootItem.experimentation && (rootItem.controller.selectedSubjectIdListToFilter.length > 0))
+                                            if (rootItem.experimentationC && rootItem.experimentation && (rootItem.experimentationC.selectedSubjectIdListToFilter.length > 0))
                                             {
-                                                if (rootItem.controller.selectedSubjectIdListToFilter.length === rootItem.experimentation.allSubjects.count) {
+                                                if (rootItem.experimentationC.selectedSubjectIdListToFilter.length === rootItem.experimentation.allSubjects.count) {
                                                     dropDownSubject.checkAllState = Qt.Checked;
                                                 }
                                                 else {
@@ -790,8 +760,8 @@ Item {
                                         target : dropDownSubject.popup
                                         onOpened : {
                                             // update subjects checkboxes states when the pop up is opening
-                                            if (controller && delegateSubjectCombolist.subjectM) {
-                                                filterSubjectCB.checked = controller.isSubjectFilterSessions(delegateSubjectCombolist.subjectM.displayedId);
+                                            if (experimentationC && delegateSubjectCombolist.subjectM) {
+                                                filterSubjectCB.checked = experimentationC.isSubjectFilterSessions(delegateSubjectCombolist.subjectM.displayedId);
                                             }
                                         }
                                     }
@@ -800,8 +770,8 @@ Item {
                                         target : rootItem
                                         onClickAllSubject : {
                                             // update subjects checkboxes states when the "pop up is opening   "All subjects" check box is selected or unselected
-                                            if (controller) {
-                                                filterSubjectCB.checked = controller.isSubjectFilterSessions(delegateSubjectCombolist.subjectM.displayedId);
+                                            if (rootItem.experimentationC) {
+                                                filterSubjectCB.checked = rootItem.experimentationC.isSubjectFilterSessions(delegateSubjectCombolist.subjectM.displayedId);
                                             }
                                         }
                                     }
@@ -821,7 +791,7 @@ Item {
                                 verticalCenter: parent.verticalCenter
                             }
 
-                            visible: !_isSelectingSessionsToExport
+                            visible: rootItem.experimentationC ? !rootItem.experimentationC.isSelectingSessions : false
                             enabled: visible
 
                             text: qsTr("Protocol")
@@ -844,41 +814,43 @@ Item {
 
                             height : 25
                             width : mainView.protocolColumnWidth - 10
-                            //enabled: rootItem.controller && rootItem.controller.allAgentNamesList.length > 0
-                            visible: _isSelectingSessionsToExport && rootItem.controller
+                            //enabled: rootItem.experimentationC && rootItem.experimentationC.allAgentNamesList.length > 0
+                            visible: rootItem.experimentationC ? rootItem.experimentationC.isSelectingSessions : false
                             enabled: visible
                             model: rootItem.experimentation ? rootItem.experimentation.allProtocols : 0
 
                             placeholderText: enabled ? "- Select a protocol -" : ""
 
                             text:{
-                                if (enabled && rootItem.controller && rootItem.experimentation && (rootItem.controller.selectedProtocolNameListToFilter.length > 0))
+                                if (enabled && rootItem.experimentationC && rootItem.experimentation && (rootItem.experimentationC.selectedProtocolNameListToFilter.length > 0))
                                 {
-                                    if (rootItem.controller.selectedProtocolNameListToFilter.length === 1)
+                                    if (rootItem.experimentationC.selectedProtocolNameListToFilter.length === 1)
                                     {
-                                        "- " + rootItem.controller.selectedProtocolNameListToFilter + " -"
+                                        "- " + rootItem.experimentationC.selectedProtocolNameListToFilter + " -"
                                     }
-                                    else if (rootItem.controller.selectedProtocolNameListToFilter.length < rootItem.experimentation.allProtocols.count)
+                                    else if (rootItem.experimentationC.selectedProtocolNameListToFilter.length < rootItem.experimentation.allProtocols.count)
                                     {
-                                        "- " + rootItem.controller.selectedProtocolNameListToFilter.length + " protocols selected -"
+                                        "- " + rootItem.experimentationC.selectedProtocolNameListToFilter.length + " protocols selected -"
                                     }
                                     else
                                     {
                                         "- All protocols selected -"
                                     }
-                                }else{
+                                }
+                                else
+                                {
                                     ""
                                 }
                             }
                             checkAllText: " All protocol"
 
                             onCheckAll: {
-                                rootItem.controller.addAllProtocolsToFilterSessions();
+                                rootItem.experimentationC.addAllProtocolsToFilterSessions();
                                 rootItem.clickAllProtocol();
                             }
 
                             onUncheckAll: {
-                                rootItem.controller.removeAllProtocolsToFilterSessions();
+                                rootItem.experimentationC.removeAllProtocolsToFilterSessions();
                                 rootItem.clickAllProtocol();
                             }
 
@@ -888,9 +860,9 @@ Item {
                                 isPartiallyChecked = false;
                                 checkAllState = Qt.Unchecked;
 
-                                if (rootItem.controller && rootItem.experimentation && (rootItem.controller.selectedProtocolNameListToFilter.length > 0))
+                                if (rootItem.experimentationC && rootItem.experimentation && (rootItem.experimentationC.selectedProtocolNameListToFilter.length > 0))
                                 {
-                                    if (rootItem.controller.selectedProtocolNameListToFilter.length === rootItem.experimentation.allProtocols.count) {
+                                    if (rootItem.experimentationC.selectedProtocolNameListToFilter.length === rootItem.experimentation.allProtocols.count) {
                                         checkAllState = Qt.Checked;
                                     }
                                     else {
@@ -961,12 +933,15 @@ Item {
                                     }
 
                                     onClicked : {
-                                        if (rootItem.controller && delegateProtocolComboList.protocolM) {
-                                            if (checked) {
-                                                rootItem.controller.addOneProtocolToFilterSessions(delegateProtocolComboList.protocolM.name)
+                                        if (rootItem.experimentationC && delegateProtocolComboList.protocolM)
+                                        {
+                                            if (checked)
+                                            {
+                                                rootItem.experimentationC.addOneProtocolToFilterSessions(delegateProtocolComboList.protocolM.name)
                                             }
-                                            else {
-                                                rootItem.controller.removeOneProtocolToFilterSessions(delegateProtocolComboList.protocolM.name)
+                                            else
+                                            {
+                                                rootItem.experimentationC.removeOneProtocolToFilterSessions(delegateProtocolComboList.protocolM.name)
                                             }
 
                                             // update "all agents" checkbox state
@@ -974,12 +949,14 @@ Item {
                                             dropDownProtocol.isPartiallyChecked = false;
                                             dropDownProtocol.checkAllState = Qt.Unchecked;
 
-                                            if (rootItem.controller && rootItem.experimentation && (rootItem.controller.selectedProtocolNameListToFilter.length > 0))
+                                            if (rootItem.experimentationC && rootItem.experimentation && (rootItem.experimentationC.selectedProtocolNameListToFilter.length > 0))
                                             {
-                                                if (rootItem.controller.selectedProtocolNameListToFilter.length === rootItem.experimentation.allProtocols.count) {
+                                                if (rootItem.experimentationC.selectedProtocolNameListToFilter.length === rootItem.experimentation.allProtocols.count)
+                                                {
                                                     dropDownProtocol.checkAllState = Qt.Checked;
                                                 }
-                                                else {
+                                                else
+                                                {
                                                     dropDownProtocol.isPartiallyChecked = true;
                                                 }
                                             }
@@ -990,8 +967,9 @@ Item {
                                         target : dropDownProtocol.popup
                                         onOpened : {
                                             // update agents checkboxes states when the pop up is opening
-                                            if (controller && delegateProtocolComboList.protocolM) {
-                                                filterProtocolCB.checked = controller.isProtocolFilterSessions(delegateProtocolComboList.protocolM.name);
+                                            if (rootItem.experimentationC && delegateProtocolComboList.protocolM)
+                                            {
+                                                filterProtocolCB.checked = rootItem.experimentationC.isProtocolFilterSessions(delegateProtocolComboList.protocolM.name);
                                             }
                                         }
                                     }
@@ -1000,8 +978,9 @@ Item {
                                         target : rootItem
                                         onClickAllProtocol : {
                                             // update agents checkboxes states when the "pop up is opening  "All Agents" check box is selected or unselected
-                                            if (controller && delegateProtocolComboList.protocolM) {
-                                                filterProtocolCB.checked = controller.isProtocolFilterSessions(delegateProtocolComboList.protocolM.name);
+                                            if (rootItem.experimentationC && delegateProtocolComboList.protocolM)
+                                            {
+                                                filterProtocolCB.checked = rootItem.experimentationC.isProtocolFilterSessions(delegateProtocolComboList.protocolM.name);
                                             }
                                         }
                                     }
@@ -1061,18 +1040,21 @@ Item {
                     left: parent.left
                     right: parent.right
                 }
-                height: rootItem._isSelectingSessionsToExport && rootItem.controller.isRecorderON ? 40 : 0
+                height: (rootItem.experimentationC && rootItem.experimentationC.isSelectingSessions) ? 40 : 0
                 clip: true
 
-                color: IngeScapeAssessmentsTheme.blueButton_pressed
-                /*border {
-                    color: IngeScapeTheme.veryLightGreyColor
-                    width: 1
-                }*/
+                color: rootItem.experimentationC.isRecorderON ? IngeScapeAssessmentsTheme.blueButton_pressed : IngeScapeTheme.veryLightGreyColor
 
                 Behavior on height {
                     NumberAnimation {
                         duration: rootItem._appearanceAnimationDuration
+                    }
+                }
+
+                Behavior on color {
+                    enabled: !rootItem.experimentationC.isRecorderON
+                    ColorAnimation {
+                        duration: root._appearanceAnimationDuration
                     }
                 }
 
@@ -1083,6 +1065,8 @@ Item {
                         verticalCenter: parent.verticalCenter
                     }
 
+                    visible: rootItem.experimentationC.isRecorderON
+
                     text: qsTr("Select sessions to export")
 
                     color: IngeScapeTheme.whiteColor
@@ -1090,6 +1074,43 @@ Item {
                         family: IngeScapeTheme.labelFontFamily
                         pixelSize: 18
                         weight: Font.Black
+                    }
+                }
+
+                Item {
+                    anchors {
+                        verticalCenter: parent.verticalCenter
+                        left: parent.left
+                        leftMargin: 5
+                    }
+
+                    height: childrenRect.height
+                    width: childrenRect.width
+
+                    visible: !rootItem.experimentationC.isRecorderON
+
+                    I2SvgItem {
+                        id: errorMessageIcon
+                        svgFileCache: IngeScapeAssessmentsTheme.svgFileIngeScapeAssessments
+                        svgElementId: "warning"
+                    }
+
+                    Text {
+                        id: errorMessageText
+                        anchors {
+                            verticalCenter: errorMessageIcon.verticalCenter
+                            left : errorMessageIcon.right
+                            leftMargin: 10
+                        }
+
+                        wrapMode: Text.WordWrap
+                        text: "No Recorder found on network device '" + IngeScapeAssessmentsC.networkDevice + "' and port " + IngeScapeAssessmentsC.port + ". Unable to export sessions."
+                        color: IngeScapeTheme.orangeColor
+                        font {
+                            family: IngeScapeTheme.textFontFamily
+                            pixelSize: 16
+                            bold: true
+                        }
                     }
                 }
 
@@ -1108,35 +1129,39 @@ Item {
 
                     activeFocusOnPress: true
 
-                    style: ButtonStyle {
-                        background: Rectangle {
-                            anchors.fill: parent
-                            radius: 5
-                            color: control.pressed ? IngeScapeTheme.lightGreyColor : (control.hovered ? IngeScapeTheme.veryLightGreyColor : "transparent")
-                        }
-
-                        label: Text {
-                            text: "Cancel"
-                            verticalAlignment: Text.AlignVCenter
-                            horizontalAlignment: Text.AlignHCenter
-                            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
-
-                            font {
-                                family: IngeScapeTheme.textFontFamily
-                                weight: Font.Medium
-                                pixelSize: 16
-                            }
-                        }
+                    style: IngeScapeAssessmentsButtonStyle {
+                        text: "Cancel"
                     }
-                    /*style: IngeScapeAssessmentsButtonStyle {
-                            text: "Cancel"
-                        }*/
+
+//                    style: ButtonStyle {
+//                        background: Rectangle {
+//                            anchors.fill: parent
+//                            radius: 5
+//                            color: control.pressed ? IngeScapeTheme.lightGreyColor : (control.hovered ? IngeScapeTheme.veryLightGreyColor : "transparent")
+//                        }
+
+//                        label: Text {
+//                            text: "Cancel"
+//                            verticalAlignment: Text.AlignVCenter
+//                            horizontalAlignment: Text.AlignHCenter
+//                            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
+
+//                            font {
+//                                family: IngeScapeTheme.textFontFamily
+//                                weight: Font.Medium
+//                                pixelSize: 16
+//                            }
+//                        }
+//                    }
 
                     onClicked: {
-                        _isSelectingSessionsToExport = false;
+                        if (rootItem.experimentationC) {
+                            rootItem.experimentationC.isSelectingSessions = false;
+                        }
                     }
                 }
 
+                // TODO MAYBE
                 Button {
                     id: exportToFileButton
 
@@ -1151,23 +1176,20 @@ Item {
                     width: 150 // boundingBox.width
 
                     activeFocusOnPress: true
-                    enabled: rootItem.controller && (rootItem.controller.selectedSessions.count > 0)
+                    enabled: rootItem.experimentationC && (rootItem.experimentationC.selectedSessions.count > 0)
 
                     style: IngeScapeAssessmentsButtonStyle {
                         text: "Export to file"
                     }
 
                     onClicked: {
-                        if (rootItem.controller)
+                        if (rootItem.experimentationC)
                         {
-                            //console.log("QML: Export " + rootItem.controller.selectedSessions.count + " selected sessions (to file)...");
-
-                            // Export selected sessions
-                            rootItem.controller.exportSelectedSessions();
+                            //console.log("QML: Export " + rootItem.experimentationC.selectedSessions.count + " selected sessions (to file)...");
+                            rootItem.experimentationC.exportSelectedSessions();
                         }
                     }
                 }
-
             }
 
             Rectangle {
@@ -1206,14 +1228,14 @@ Item {
                         spacing: 0
 
                         Repeater {
-                            model: rootItem.controller && rootItem.experimentation
-                                   ? rootItem._isSelectingSessionsToExport ? rootItem.controller.sessionFilteredList
-                                                                           : rootItem.experimentation.allSessions
+                            model: rootItem.experimentationC && rootItem.experimentation
+                                   ? rootItem.experimentationC.isSelectingSessions ? rootItem.experimentationC.sessionFilteredList
+                                                                                   : rootItem.experimentation.allSessions
                                    : null
 
 
                             delegate: SessionInList {
-                                isSelectingSessionsToExport: rootItem._isSelectingSessionsToExport && rootItem.controller.isRecorderON
+                                isSelectingSessionsToExport: rootItem.experimentationC && rootItem.experimentationC.isSelectingSessions && rootItem.experimentationC.isRecorderON
                                 appearanceAnimationDuration: rootItem._appearanceAnimationDuration
 
                                 selectionColumnWidth: mainView.selectionColumnWidth
@@ -1234,8 +1256,8 @@ Item {
                                 // Slots
                                 //
                                 onOpenSessionAsked: {
-                                    if (rootItem.controller && modelM) {
-                                        rootItem.controller.openSession(modelM);
+                                    if (rootItem.experimentationC && modelM) {
+                                        rootItem.experimentationC.openSession(modelM);
                                     }
                                 }
 
@@ -1245,15 +1267,15 @@ Item {
                                 }
 
                                 onIsSelectedSessionChanged: {
-                                    if (rootItem.controller)
+                                    if (rootItem.experimentationC)
                                     {
                                         if (isSelectedSession) {
                                             //console.log("session " + modelM.name + " selected");
-                                            rootItem.controller.selectedSessions.insert(rootItem.controller.selectedSessions.count, modelM);
+                                            rootItem.experimentationC.selectedSessions.insert(rootItem.experimentationC.selectedSessions.count, modelM);
                                         }
                                         else {
                                             //console.log("session " + modelM.name + " UN-selected");
-                                            rootItem.controller.selectedSessions.remove(modelM);
+                                            rootItem.experimentationC.selectedSessions.remove(modelM);
                                         }
                                     }
                                 }
@@ -1285,7 +1307,7 @@ Item {
         Popup.CreateSessionPopup {
             id: createSessionPopup
 
-            experimentationController: rootItem.controller
+            experimentationController: rootItem.experimentationC
             experimentation: rootItem.experimentation
         }
     }
@@ -1368,8 +1390,8 @@ Item {
         width: 470
 
         onValidated: {
-            if (rootItem.controller && session) {
-                rootItem.controller.deleteSession(session);
+            if (rootItem.experimentationC && session) {
+                rootItem.experimentationC.deleteSession(session);
             }
             close();
         }
@@ -1377,7 +1399,5 @@ Item {
         onCanceled: {
             close();
         }
-
     }
-
 }
