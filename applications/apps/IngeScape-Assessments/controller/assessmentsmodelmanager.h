@@ -9,7 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
- *
+ *      Chloé Roumieu      <roumieu@ingenuity.io>
  */
 
 #ifndef ASSESSMENTSMODELMANAGER_H
@@ -118,6 +118,26 @@ public:
 
 
     /**
+     * @brief Retrieve an 'int32' value of given column inside the given row
+     * and convert it to int before returning it
+     * @param row
+     * @param columnName
+     * @return
+     */
+    static int getInt32ValueFromColumnName(const CassRow* row, const char* columnName);
+
+
+    /**
+     * @brief Retrieve an 'int8' value of given column inside the given row
+     * and convert it to int before returning it
+     * @param row
+     * @param columnName
+     * @return
+     */
+    static int getTinyIntValueFromColumnName(const CassRow* row, const char* columnName);
+
+
+    /**
      * @brief Retrive a date and a time value from the given columns inside the given row
      * and convert it to a QDateTime before returning it
      * @param row
@@ -130,7 +150,7 @@ public:
 
     /**
      * @brief Delete an entry of the template type from Cassandra DB.
-     * The primary key list represents the entries to delete. Multiple keys my be passed for a single key.
+     * The primary key list represents the entries to delete. Multiple keys may be passed for a single key.
      *   (in which case, the WHERE clause will be like 'column IN (?, ?, ...)')
      * Values must be in the order of the primary keys.
      * If more values than there are keys are given, only the n-first will be used in the query.
@@ -430,6 +450,15 @@ public:
      * @return
      */
     static QString cassUuidToQString(CassUuid cassUuid);
+
+
+    /**
+     * @brief Converts the given QString into a CassUuid
+     * This is a static utility function and does not interact with the Cassandra server
+     * @param stringCassUuid
+     * @return
+     */
+    static CassUuid qStringToCassUuid(QString cassUuid);
 
 
     /**

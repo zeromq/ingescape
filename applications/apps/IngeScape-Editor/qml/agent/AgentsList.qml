@@ -543,6 +543,8 @@ Item {
         id: popupErrorMessage
 
         anchors.centerIn: parent
+
+        message: qsTr("The file does not contain valid agent definition(s) !");
     }
 
 

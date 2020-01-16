@@ -114,6 +114,12 @@ public:
     CassUuid getCassUuid() const { return _cassUuid; }
 
     /**
+     * @brief Accessor for the experimentation's Cassandra UUID of this entry
+     * @return
+     */
+    CassUuid getExperimentationCassUuid() const { return _experimentationCassUuid; }
+
+    /**
      * @brief Accessor for the protocol's Cassandra UUID of this entry
      * @return
      */

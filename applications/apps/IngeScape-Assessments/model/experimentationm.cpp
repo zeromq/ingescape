@@ -252,6 +252,8 @@ void ExperimentationM::removeSession(SessionM* session)
  */
 void ExperimentationM::removeSessionsRelatedToSubject(SubjectM* subject)
 {
+    QList<CassUuid> sessionCassUuidsToRemove;
+
     const QList<SessionM*> sessionList = _allSessions.toList();
     auto sessionIt = sessionList.begin();
     while (sessionIt != sessionList.end())
@@ -263,10 +265,19 @@ void ExperimentationM::removeSessionsRelatedToSubject(SubjectM* subject)
 
         if (sessionIt != sessionList.end())
         {
+            sessionCassUuidsToRemove.append((*sessionIt)->getCassUuid());
+
             // We found a session with given subject
             removeSession(*sessionIt);
             ++sessionIt;
         }
+    }
+
+    // Remove from the DataBase
+    if (!sessionCassUuidsToRemove.isEmpty())
+    {
+        AssessmentsModelManager::instance()->deleteEntry<SessionM>({ { subject->getExperimentationCassUuid() },
+                                                                     sessionCassUuidsToRemove });
     }
 }
 
@@ -277,6 +288,8 @@ void ExperimentationM::removeSessionsRelatedToSubject(SubjectM* subject)
  */
 void ExperimentationM::removeSessionsRelatedToProtocol(ProtocolM* protocol)
 {
+    QList<CassUuid> sessionCassUuidsToRemove;
+
     const QList<SessionM*> sessionList = _allSessions.toList();
     auto sessionIt = sessionList.begin();
     while (sessionIt != sessionList.end())
@@ -288,10 +301,19 @@ void ExperimentationM::removeSessionsRelatedToProtocol(ProtocolM* protocol)
 
         if (sessionIt != sessionList.end())
         {
+            sessionCassUuidsToRemove.append((*sessionIt)->getCassUuid());
+
             // We found a session with given protocol
             removeSession(*sessionIt);
             ++sessionIt;
         }
+    }
+
+    // Remove from the DataBase
+    if (!sessionCassUuidsToRemove.isEmpty())
+    {
+        AssessmentsModelManager::instance()->deleteEntry<SessionM>({ { protocol->getExperimentationCassUuid() },
+                                                                     sessionCassUuidsToRemove });
     }
 }
 

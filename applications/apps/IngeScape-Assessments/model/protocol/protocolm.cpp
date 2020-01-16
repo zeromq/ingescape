@@ -20,7 +20,7 @@
 /**
  * @brief Protocol table name
  */
-const QString ProtocolM::table = "ingescape.task";
+const QString ProtocolM::table = "ingescape.protocol";
 
 const QStringList ProtocolM::columnNames = {
     "id_experimentation",

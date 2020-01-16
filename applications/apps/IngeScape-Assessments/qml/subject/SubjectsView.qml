@@ -300,6 +300,8 @@ I2PopupBase {
             height: 40
             width: 182
 
+            enabled: false
+
             onClicked: {
                 console.log("Not implemented yet")
             }

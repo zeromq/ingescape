@@ -9,7 +9,7 @@
  *
  *	Contributors:
  *      Bruno Lemenicier  <lemenicier@ingenuity.io>
- *
+ *      Chloé Roumieu     <roumieu@ingenuity.io>
  */
 
 import QtQuick 2.8
@@ -441,7 +441,7 @@ Item {
                     rightMargin: 10
                 }
 
-                visible: mouseAreaRecordItem.containsMouse || removeButton.hovered
+                visible: removeButton.hovered || mouseAreaRecordItem.containsMouse
 
                 releasedID: "delete"
                 pressedID: releasedID + "-pressed"

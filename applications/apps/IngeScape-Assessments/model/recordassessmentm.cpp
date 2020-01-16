@@ -29,7 +29,7 @@ const QStringList RecordAssessmentM::columnNames = {
     "end_date",
     "end_time",
     "id_experimentation",
-    "id_task_instance",
+    "id_session",
     "name_record",
     "offset_tl",
     "platform",
@@ -37,13 +37,24 @@ const QStringList RecordAssessmentM::columnNames = {
     "year_month_day",
 };
 
+
 /**
  * @brief RecordAssessment table primary keys IN ORDER
  */
 const QStringList RecordAssessmentM::primaryKeys = {
-    "id_task_instance",
+    "id_session",
 };
 
+
+/**
+ * @brief Constructor
+ * @param uid
+ * @param name
+ * @param beginDate
+ * @param endDate
+ * @param startTimeInTimeline
+ * @param parent
+ */
 RecordAssessmentM::RecordAssessmentM(QString uid,
                                      QString name,
                                      QDateTime beginDate,

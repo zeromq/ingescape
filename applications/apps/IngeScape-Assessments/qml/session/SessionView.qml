@@ -9,7 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
- *
+ *      Chloé Roumieu      <roumieu@ingenuity.io>
  */
 
 import QtQuick 2.9
@@ -71,19 +71,6 @@ Item {
 
     //--------------------------------------------------------
     //
-    // Behavior
-    //
-    //--------------------------------------------------------
-
-    Component.onCompleted: {
-        if (rootItem.session && !rootItem.session.isRecorded) {
-            timeline.isReduced = false;
-        }
-    }
-
-
-    //--------------------------------------------------------
-    //
     //
     // Content
     //
@@ -125,52 +112,61 @@ Item {
             right: parent.right
             bottom: parent.bottom
         }
-        height: 0
+        height : 0
 
         scenarioController: rootItem.sessionController ? rootItem.sessionController.scenarioC : null;
         timeLineController: rootItem.sessionController ? rootItem.sessionController.timeLineC : null;
+        licensesController: IngeScapeAssessmentsC.licensesC
+        mainController: rootItem.experimentationController
 
         recordsListToShow : rootItem.session ? rootItem.session.recordsList : []
 
         canReorganizeScenario : false
 
-        licensesController: IngeScapeAssessmentsC.licensesC
-        mainController: IngeScapeAssessmentsC
 
-        playVisibility: !startOrStopRecordButton.visible
+        // Record button
+        timelineButtonContent: LabellessSvgButton {
+            enabled: (rootItem.session && !rootItem.session.isRecorded)
+                     ? (rootItem.experimentationController && rootItem.experimentationController.isRecorderON)
+                     : true
 
-        extraContent: LabellessSvgButton {
-            id: startOrStopRecordButton
-
-            visible: (rootItem.session && !rootItem.session.isRecorded)
-            enabled: (visible && experimentationController.isRecorderON)
             opacity: enabled ? 1.0 : 0.4
 
-            property string currentID : (rootItem.experimentationController && rootItem.experimentationController.isRecording) ? "record-stop" : "record-start"
-            pressedID: currentID + "-pressed"
+            visible : rootItem.session && !rootItem.session.isRecorded
+
+            fileCache: IngeScapeTheme.svgFileIngeScape
+
+            property string currentID : (rootItem.session && rootItem.session.isRecorded)
+                                        ? (rootItem.sessionController) && (rootItem.sessionController.scenarioC) && (rootItem.sessionController.scenarioC.isPlaying) ? "timeline-pause" : "timeline-play"
+                                        : (rootItem.experimentationController) && (rootItem.experimentationController.isRecording) ? "record-stop" : "record-start"
+
             releasedID: currentID
-            disabledID: currentID
+            pressedID: currentID + "-pressed"
+            disabledID : currentID
 
             onClicked: {
-                if (rootItem.experimentationController)
+                if (rootItem.session && rootItem.experimentationController)
                 {
-                    if (!rootItem.experimentationController.isRecording)
+                    if (!rootItem.session.isRecorded)
                     {
-                        if (rootItem.experimentationController.isThereOneRecordAfterStartTime())
+                        if (rootItem.experimentationController.isRecording)
                         {
-                            // Open notification popup, user has to make a choice
-                            notifOverloadedRecordsPopup.open();
+                            console.log("QML: Stop to Record and pause scenario");
+                            rootItem.experimentationController.stopToRecord();
                         }
                         else
                         {
-                            console.log("QML: Start to Record");
-                            rootItem.experimentationController.startToRecord();
+                            if (rootItem.experimentationController.isThereOneRecordAfterStartTime())
+                            {
+                                // Open notification popup, user has to make a choice
+                                notifOverloadedRecordsPopup.open();
+                            }
+                            else
+                            {
+                                console.log("QML: Start to Record and launch scenario");
+                                rootItem.experimentationController.startToRecord();
+                            }
                         }
-
-                    }
-                    else {
-                        console.log("QML: Stop to Record");
-                        rootItem.experimentationController.stopToRecord();
                     }
                 }
             }

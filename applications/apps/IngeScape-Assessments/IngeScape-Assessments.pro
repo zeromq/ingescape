@@ -45,7 +45,9 @@ SOURCES += main.cpp \
     controller/networkcontroller.cpp \
     controller/protocol/protocolscontroller.cpp \
     controller/session/sessioncontroller.cpp \
+    model/actionassessmentm.cpp \
     model/assessmentsenums.cpp \
+    model/eventm.cpp \
     model/protocol/protocolm.cpp \
     model/sessionm.cpp \
     model/subject/subjectm.cpp \
@@ -71,7 +73,9 @@ HEADERS += \
     controller/ingescapeassessmentscontroller.h \
     controller/protocol/protocolscontroller.h \
     controller/session/sessioncontroller.h \
+    model/actionassessmentm.h \
     model/assessmentsenums.h \
+    model/eventm.h \
     model/protocol/protocolm.h \
     model/sessionm.h \
     stable.h \

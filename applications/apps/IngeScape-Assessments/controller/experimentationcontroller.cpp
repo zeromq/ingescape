@@ -9,7 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
- *
+ *      Chloé Roumieu      <roumieu@ingenuity.io>
  */
 
 #include "experimentationcontroller.h"
@@ -19,6 +19,7 @@
 #include <controller/assessmentsmodelmanager.h>
 #include "model/subject/characteristicvaluem.h"
 #include "model/protocol/independentvariablevaluem.h"
+
 
 /**
  * @brief Constructor
@@ -31,6 +32,7 @@ ExperimentationController::ExperimentationController(QObject *parent) : QObject(
     _peerNameOfRecorder(""),
     _isRecorderON(false),
     _isRecording(false),
+    _isSelectingSessions(false),
     _selectedSubjectIdListToFilter(QStringList()),
     _selectedProtocolNameListToFilter(QStringList()),
     _nextRecordToHandle(nullptr),
@@ -150,38 +152,16 @@ void ExperimentationController::createNewSessionForSubjectAndProtocol(SubjectM* 
     }
 }
 
-
-/**
- * @brief Open a session
- * @param session
- */
 void ExperimentationController::openSession(SessionM* session)
 {
     if ((session != nullptr) && (_currentExperimentation != nullptr))
     {
         qInfo() << "Open the session" << session->name() << "of the experimentation" << _currentExperimentation->name();
-
-        if (session->recordsList()->isEmpty())
-        {
-            // Get the list of record
-            QList<RecordAssessmentM*> recordList = AssessmentsModelManager::select<RecordAssessmentM>({session->getCassUuid() });
-            session->recordsList()->append(recordList);
-
-            igs_info("%i records on current session", session->recordsList()->count());
-        }
-
-        // If records list is empty when we load it from DB : session has never been recorded
-        session->setisRecorded(!session->recordsList()->isEmpty());
-
-        // Update the current session
         _sessionC->setcurrentSession(session);
+        Q_EMIT resetTimeLineView(true); // Open timeline view
     }
 }
 
-/**
- * @brief Delete a session
- * @param session
- */
 void ExperimentationController::deleteSession(SessionM* session)
 {
     if ((session != nullptr) && (_currentExperimentation != nullptr))
@@ -222,10 +202,10 @@ void ExperimentationController::exportSelectedSessions()
 
         if (_isRecorderON && !sessionIds.isEmpty())
         {
-            QString message = QString("%1=%2").arg(command_ExportSessions, sessionIds.join('|'));
+            //QString message = QString("%1=%2").arg(command_ExportSessions, sessionIds.join('|'));
 
-            //QString experimentationUID = AssessmentsModelManager::cassUuidToQString(_currentExperimentation->getCassUuid());
-            //QString message = QString("%1=%2 [%3]").arg(command_ExportSessions, experimentationUID, sessionIds.join('|'));
+            QString experimentationUID = AssessmentsModelManager::cassUuidToQString(_currentExperimentation->getCassUuid());
+            QString message = QString("%1=%2 EXPE=%3").arg(command_ExportSessions, sessionIds.join('|'), experimentationUID);
 
             // Send the message "Export Sessions" to the recorder
             IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerIdOfRecorder, message);
@@ -292,7 +272,7 @@ void ExperimentationController::onRecordStartedReceived()
 
         if ((_sessionC->scenarioC() != nullptr) && (_nextRecordToHandle != nullptr))
         {
-            qint64 deltaTimeFromTimeLineStart = _sessionC->scenarioC()->currentTime().msecsSinceStartOfDay();
+            int deltaTimeFromTimeLineStart = _sessionC->scenarioC()->currentTime().msecsSinceStartOfDay();
 
             // N.B: timeout will apply user's choice (remove other records or stop record)
             if (_nextRecordToHandle->startTimeInTimeline() > deltaTimeFromTimeLineStart)
@@ -369,6 +349,9 @@ void ExperimentationController::onRecordAddedReceived(QString message){
                                                               jsonOffsetTimeline.toInt());
 
                                 _sessionC->currentSession()->recordsList()->append(record);
+
+                                // Update current time of our scenario to correspond to real endtime of our record
+                                _sessionC->scenarioC()->setcurrentTime(QTime::fromMSecsSinceStartOfDay(static_cast<int>(record->endTimeInTimeline())));
 
                                 qInfo() << "Number of record " << _sessionC->currentSession()->recordsList()->count();
                             }
@@ -569,7 +552,7 @@ SessionM* ExperimentationController::_insertSessionIntoDB(const QString& session
                     IndependentVariableM* independentVar = *indepVarIterator;
                     if (independentVar != nullptr)
                     {
-                        IndependentVariableValueM indepVarValue(subject->getExperimentationCassUuid(), session->getCassUuid(), independentVar->getCassUuid(), "");
+                        IndependentVariableValueM indepVarValue(protocol->getExperimentationCassUuid(), session->getCassUuid(), independentVar->getCassUuid(), "");
                         AssessmentsModelManager::insert(indepVarValue);
                     }
                 }
@@ -722,21 +705,24 @@ void ExperimentationController::_retrieveCharacteristicValuesForSubjectsInExperi
                 // Get characteristic value type
                 if ((subject != nullptr) && (characteristic != nullptr))
                 {
-                    switch (characteristic->valueType()) {
-                        case CharacteristicValueTypes::INTEGER:
-                            subject->setCharacteristicValue(characteristic, characValue->valueString.toInt());
-                            break;
-                        case CharacteristicValueTypes::DOUBLE:
-                            subject->setCharacteristicValue(characteristic, characValue->valueString.toDouble());
-                            break;
-                        case CharacteristicValueTypes::TEXT:
-                            subject->setCharacteristicValue(characteristic, characValue->valueString);
-                            break;
-                        case CharacteristicValueTypes::CHARACTERISTIC_ENUM:
-                            subject->setCharacteristicValue(characteristic, characValue->valueString);
-                            break;
-                        default: // UNKNOWN
-                            break;
+                    switch (characteristic->valueType())
+                    {
+                    case CharacteristicValueTypes::INTEGER:
+                        subject->setCharacteristicValue(characteristic, characValue->valueString.toInt());
+                        break;
+                    case CharacteristicValueTypes::DOUBLE: {
+                        QLocale locale = QLocale(QLocale::English);
+                        subject->setCharacteristicValue(characteristic, locale.toDouble(characValue->valueString));
+                    }
+                        break;
+                    case CharacteristicValueTypes::TEXT:
+                        subject->setCharacteristicValue(characteristic, characValue->valueString);
+                        break;
+                    case CharacteristicValueTypes::CHARACTERISTIC_ENUM:
+                        subject->setCharacteristicValue(characteristic, characValue->valueString);
+                        break;
+                    default: // UNKNOWN
+                        break;
                     }
                 }
             }
@@ -787,7 +773,7 @@ bool ExperimentationController::isThereOneRecordAfterStartTime()
 
     // Test if there is an existing record after our start time
     for (RecordAssessmentM* record : _sessionC->currentSession()->recordsList()->toList()) {
-        if (record->endTimeInTimeline() >= startTimeRecordInTimeline) {
+        if (record->endTimeInTimeline() > startTimeRecordInTimeline) {
             return true;
         }
     }

@@ -10,7 +10,7 @@
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *      Alexandre Lemort <lemort@ingenuity.io>
- *
+ *      Chloé Roumieu    <roumieu@ingenuity.io>
  */
 
 #ifndef INGESCAPEEDITORCONTROLLER_H
@@ -113,11 +113,12 @@ class IngeScapeEditorController : public QObject
     I2_QML_PROPERTY_READONLY(QString, currentPlatformName)
 
     // Flag indicating if a platform has been loaded (opened) by the user or if we are in a "new" or "last" state
-    I2_QML_PROPERTY_READONLY(bool, hasAPlatformBeenLoadedByUser)
+    I2_CPP_NOSIGNAL_PROPERTY(bool, hasAPlatformBeenLoadedByUser)
 
     // Flag indicating if we must show the getting started page on startup
     I2_QML_PROPERTY_CUSTOM_SETTER(bool, gettingStartedShowAtStartup)
 
+    I2_QML_PROPERTY(QString, platformNameBeforeLoadReplay)
 
 public:
 
@@ -266,7 +267,7 @@ Q_SIGNALS:
     /**
       * @brief Signal emitted to reset the timeline view
       */
-    void resetTimeLineView();
+    void resetTimeLineView(bool showIt);
 
 
 private Q_SLOTS:
@@ -299,6 +300,12 @@ private Q_SLOTS:
      * @param jsonExecutedActions
      */
     void _onReplayLoading(int deltaTimeFromTimeLineStart, QString jsonPlatform, QString jsonExecutedActions);
+
+
+    /**
+     * @brief Slot called when a replay is  unloaded : allow to reload platform before "record mode"
+     */
+    void _onReplayUNloaded();
 
 
     /**
@@ -438,11 +445,7 @@ private:
 
 
     /**
-     * @brief Start IngeScape
-     *
-     * @param checkAvailableNetworkDevices
-     *
-     * @return
+     * @brief If checkAvailableNetworkDevices : auto select a network device to start Ingescape
      */
     bool _startIngeScape(bool checkAvailableNetworkDevices);
 
@@ -474,9 +477,6 @@ private:
     // Path to the directory containing JSON files about platforms
     QString _platformDirectoryPath;
 
-    // Path to the default file containing the last platform
-    QString _platformDefaultFilePath;
-
     // Path to the currently opened platform file (*.igsplatform)
     QString _currentPlatformFilePath;
 
@@ -492,7 +492,6 @@ private:
 
     // Default name when creating a new platform
     static const QString SPECIAL_EMPTY_LAST_PLATFORM;
-
 };
 
 QML_DECLARE_TYPE(IngeScapeEditorController)

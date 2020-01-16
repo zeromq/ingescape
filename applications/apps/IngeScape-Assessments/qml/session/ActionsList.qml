@@ -75,24 +75,11 @@ Item {
                     areActionsButtonsActivated: false
 
                     action: model.QtObject
-                    controller: rootItem.sessionController
+                    controller: rootItem.sessionController ? rootItem.sessionController.scenarioC : null
 
                     actionItemIsHovered: mouseArea.containsMouse
                     actionItemIsPressed: mouseArea.pressed
                 }
-
-//                onPressed: {
-//                    if (rootItem.sessionController && rootItem.sessionController.scenarioC)
-//                    {
-//                        Q
-//                        if (rootItem.sessionController.scenarioC.selectedAction === model.QtObject) {
-//                            rootItem.sessionController.scenarioC.selectedAction = null;
-//                        }
-//                        else {
-//                            rootItem.sessionController.scenarioC.selectedAction = model.QtObject;
-//                        }
-//                    }
-//                }
             }
         }
     }

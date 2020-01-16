@@ -10,7 +10,7 @@
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *      Alexandre Lemort   <lemort@ingenuity.io>
- *
+ *      Chloé Roumieu      <roumieu@ingenuity.io>
  */
 
 #include "controller/ingescapeeditorcontroller.h"
@@ -64,9 +64,9 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _currentPlatformName(EXAMPLE_PLATFORM_NAME),
     _hasAPlatformBeenLoadedByUser(false),
     _gettingStartedShowAtStartup(true),
+    _platformNameBeforeLoadReplay(""),
     _terminationSignalWatcher(nullptr),
     _platformDirectoryPath(""),
-    _platformDefaultFilePath(""),
     _currentPlatformFilePath(""),
     // Connect mapping in control mode
     _beforeNetworkStop_isMappingConnected(true),
@@ -94,6 +94,8 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
         qCritical() << "ERROR: could not create directory at '" << snapshotsPath << "' !";
     }
 
+    // Path to the example.igsPlatform
+    QString platformDefaultFilePath;
 
     // Directory for platform files
     QString platformPath = IngeScapeUtils::getPlatformsPath();
@@ -108,9 +110,8 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
         _platformDirectoryPath = platformPath;
 
         // Init the path to the platform file to load the example file
-        _platformDefaultFilePath = QString("%1%2.igsplatform").arg(_platformDirectoryPath, EXAMPLE_PLATFORM_NAME);
+        platformDefaultFilePath = QString("%1%2.igsplatform").arg(_platformDirectoryPath, EXAMPLE_PLATFORM_NAME);
     }
-
 
     // Create the (sub) directory "exports" if not exist (the directory contains CSV files about exports)
     IngeScapeUtils::getExportsPath();
@@ -157,7 +158,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     // Settings about "Platform"
     //
     settings.beginGroup("platform");
-    _currentPlatformFilePath = settings.value("last", _platformDefaultFilePath).toString();
+    _currentPlatformFilePath = settings.value("last", platformDefaultFilePath).toString();
     settings.endGroup();
 
 
@@ -300,6 +301,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_networkC, &NetworkController::replayLoadingReceived, this, &IngeScapeEditorController::_onReplayLoading);
     connect(_networkC, &NetworkController::replayLoadedReceived, _recordsSupervisionC, &RecordsSupervisionController::onReplayLoaded);
     connect(_networkC, &NetworkController::replayUNloadedReceived, _recordsSupervisionC, &RecordsSupervisionController::onReplayUNloaded);
+    connect(_networkC, &NetworkController::replayUNloadedReceived, this, &IngeScapeEditorController::_onReplayUNloaded);
     connect(_networkC, &NetworkController::replayEndedReceived, _recordsSupervisionC, &RecordsSupervisionController::onReplayEnded);
     connect(_networkC, &NetworkController::recordExported, _recordsSupervisionC, &RecordsSupervisionController::onRecordExported);
 
@@ -778,9 +780,8 @@ void IngeScapeEditorController::clearCurrentPlatform()
         _timeLineC->resetTimeline();
     }
 
-    // Notify QML to reset views
-    Q_EMIT resetMappindView();
-    Q_EMIT resetTimeLineView();
+    Q_EMIT resetTimeLineView(false); // Close timeline view
+    Q_EMIT resetMappindView(); // Center mapping view
 }
 
 
@@ -1191,6 +1192,13 @@ void IngeScapeEditorController::_onReplayLoading(int deltaTimeFromTimeLineStart,
 
     if ((deltaTimeFromTimeLineStart >= 0) && !jsonPlatform.isEmpty())
     {
+        // Set _platformNameBeforeLoadReplay on first replay loading only
+        // N.B : "Unload record" is only send when no more record is selected
+        if (_platformNameBeforeLoadReplay == "")
+        {
+            _platformNameBeforeLoadReplay = currentPlatformName();
+        }
+
         // First, clear the current platform by deleting all existing data
         clearCurrentPlatform();
 
@@ -1205,31 +1213,56 @@ void IngeScapeEditorController::_onReplayLoading(int deltaTimeFromTimeLineStart,
             {
                 setcurrentPlatformName(recordName);
 
-                //_currentPlatformFilePath = QDir(_platformDirectoryPath).absoluteFilePath(recordName);
                 _currentPlatformFilePath = QString("%1%2.igsplatform").arg(_platformDirectoryPath, recordName);
 
-                sethasAPlatformBeenLoadedByUser(true);
+                // Platform has been loaded by Editor
+                sethasAPlatformBeenLoadedByUser(false);
             }
 
             if (_scenarioC != nullptr)
             {
                 // Update the current time
-                _scenarioC->setcurrentTime(QTime::fromMSecsSinceStartOfDay(deltaTimeFromTimeLineStart));
-
-                // FIXME TODO jsonExecutedActions
-                //qDebug() << "jsonExecutedActions" << jsonExecutedActions;
+                _scenarioC->setcurrentTime(QTime::fromMSecsSinceStartOfDay(0));
 
                 // Import the executed actions for this scenario from JSON
-                _scenarioC->importExecutedActionsFromJson(jsonExecutedActions.toUtf8());
+                _scenarioC->importExecutedActionsFromJson(0, jsonExecutedActions.toUtf8());
+
             }
 
-            // Notify QML to reset views
-            Q_EMIT resetMappindView();
-            Q_EMIT resetTimeLineView();
+            Q_EMIT resetTimeLineView(true); // Open timeline view
+            Q_EMIT resetMappindView(); // Center mapping view
         }
         else
         {
             qCritical() << "The loading of the replay failed !";
+        }
+    }
+}
+
+/**
+ * @brief Slot called when a replay is  unloaded : allow to reload platform before "record mode"
+ */
+void IngeScapeEditorController::_onReplayUNloaded()
+{
+    if (_recordsSupervisionC != nullptr)
+    {
+        // Update the current state of the replay
+        _recordsSupervisionC->setreplayState(ReplayStates::UNLOADED);
+    }
+
+    // _platformNameBeforeLoadReplay = "" means that last platform is already clear,
+    // and current platform is a "NEW PLATFORM"
+    if (_platformNameBeforeLoadReplay != "")
+    {
+        clearCurrentPlatform();
+        _currentPlatformFilePath = QString("%1%2.igsplatform").arg(_platformDirectoryPath, _platformNameBeforeLoadReplay);
+        _platformNameBeforeLoadReplay = "";
+
+        // Load the platform from last platform file used before records
+        bool success = _loadPlatformFromFile(_currentPlatformFilePath);
+        if (!success)
+        {
+             qCritical() << "The loading of the current platform before replay failed !";
         }
     }
 }
@@ -1517,7 +1550,7 @@ void IngeScapeEditorController::_onSystemSleep()
  * @brief Called when our machine did wake from sleep
  */
 void IngeScapeEditorController::_onSystemWake()
-{
+{  
     // Start IngeScape
     // => we need to check available network devices
     _startIngeScape(true);
@@ -1576,9 +1609,8 @@ bool IngeScapeEditorController::_loadPlatformFromFile(QString platformFilePath)
                     sethasAPlatformBeenLoadedByUser(true);
                 }
 
-                // Notify QML to reset views
-                Q_EMIT resetMappindView();
-                Q_EMIT resetTimeLineView();
+                Q_EMIT resetTimeLineView(false); // Close timeline view
+                Q_EMIT resetMappindView(); // Center mapping view
             }
             else
             {
@@ -1635,7 +1667,6 @@ bool IngeScapeEditorController::_clearAndLoadPlatformFromFile(QString platformFi
 
     return succeeded;
 }
-
 
 
 /**
@@ -1783,44 +1814,38 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
 
 
 /**
- * @brief Start IngeScape
- *
- * @param checkAvailableNetworkDevices
- *
- * @return
+ * @brief If checkAvailableNetworkDevices : auto select a network device to start Ingescape
  */
 bool IngeScapeEditorController::_startIngeScape(bool checkAvailableNetworkDevices)
 {
     bool success = false;
-
     IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
     IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
     IngeScapeSettings &settings = IngeScapeSettings::Instance();
 
-    if ((ingeScapeNetworkC != nullptr) && (ingeScapeModelManager != nullptr) && (_modelManager != nullptr))
+    // Always update available network devices (to have our qml list updated)
+    ingeScapeNetworkC->updateAvailableNetworkDevices();
+
+    if ((ingeScapeNetworkC != nullptr) && (ingeScapeModelManager != nullptr)
+            && (_modelManager != nullptr))
     {
         if (checkAvailableNetworkDevices)
         {
-            // Update the list of available network devices
-            ingeScapeNetworkC->updateAvailableNetworkDevices();
-
             int nbDevices = ingeScapeNetworkC->availableNetworkDevices().count();
             QStringList devicesAddresses = ingeScapeNetworkC->availableNetworkDevicesAddresses();
-
             if (nbDevices == 0 )
             {
-                // No network device available
                  setnetworkDevice("");
             }
             else if (nbDevices == 1)
             {
-                // There is only one available network device, we use it !
-
+                 // Use the only available network device
                 setnetworkDevice(ingeScapeNetworkC->availableNetworkDevices().at(0));
             }
-            else if ((nbDevices == 2) && ((devicesAddresses.at(0) == "127.0.0.1")||(devicesAddresses.at(1) == "127.0.0.1")))
+            else if ((nbDevices == 2)
+                     && ((devicesAddresses.at(0) == "127.0.0.1")||(devicesAddresses.at(1) == "127.0.0.1")))
             {
-                // There are 2 devices, one of which is the loopback, we pick the device that is NOT the loopback
+                // 2 available devices, one is the loopback : we pick the device that is NOT the loopback
                 if (devicesAddresses.at(0) == "127.0.0.1")
                 {
                     setnetworkDevice(ingeScapeNetworkC->availableNetworkDevices().at(1));
@@ -1836,10 +1861,9 @@ bool IngeScapeEditorController::_startIngeScape(bool checkAvailableNetworkDevice
                 settings.beginGroup("network");
                 QString lastSaveNetworkDevice = settings.value("networkDevice", QVariant("")).toString();
                 settings.endGroup();
-
-                // If last save device is no more available, user must choose device to launch editor
                 if (!ingeScapeNetworkC->isAvailableNetworkDevice(lastSaveNetworkDevice))
                 {
+                    // User have to choose a device to launch editor
                     setnetworkDevice("");
                 }
                 else {
@@ -1847,14 +1871,9 @@ bool IngeScapeEditorController::_startIngeScape(bool checkAvailableNetworkDevice
                 }
             }
         }
-
-        // Start our IngeScape agent with the network device and the port
-        // NB : will failed if networkDevice = ""
-        success = ingeScapeNetworkC->start(_networkDevice, _ipAddress, _port);
-
+        success = ingeScapeNetworkC->start(_networkDevice, _ipAddress, _port); //will failed if networkDevice = ""
         if (success)
         {
-            // Re-enable mapping
             ingeScapeModelManager->setisMappingConnected(_beforeNetworkStop_isMappingConnected);
             _modelManager->setisMappingControlled(_beforeNetworkStop_isMappingControlled);
         }

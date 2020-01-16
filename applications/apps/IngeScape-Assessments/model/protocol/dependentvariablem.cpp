@@ -27,7 +27,7 @@ const QString DependentVariableM::table = "ingescape.dependent_var";
  */
 const QStringList DependentVariableM::columnNames = {
     "id_experimentation",
-    "id_task",
+    "id_protocol",
     "id",
     "agent_name",
     "description",
@@ -40,7 +40,7 @@ const QStringList DependentVariableM::columnNames = {
  */
 const QStringList DependentVariableM::primaryKeys = {
     "id_experimentation",
-    "id_task",
+    "id_protocol",
     "id",
 };
 
@@ -96,7 +96,7 @@ DependentVariableM* DependentVariableM::createFromCassandraRow(const CassRow* ro
     {
         CassUuid experimentationUuid, protocolUuid, independentVarUuid;
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_experimentation"), &experimentationUuid);
-        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_task"), &protocolUuid);
+        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_protocol"), &protocolUuid);
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &independentVarUuid);
 
         QString variableName(AssessmentsModelManager::getStringValueFromColumnName(row, "name"));
@@ -125,7 +125,7 @@ DependentVariableM* DependentVariableM::createFromCassandraRow(const CassRow* ro
  */
 CassStatement* DependentVariableM::createBoundInsertStatement(const DependentVariableM& dependentVariable)
 {
-    QString queryStr = "INSERT INTO " + DependentVariableM::table + " (id_experimentation, id_task, id, name, description, agent_name, output_name) VALUES (?, ?, ?, ?, ?, ?, ?);";
+    QString queryStr = "INSERT INTO " + DependentVariableM::table + " (id_experimentation, id_protocol, id, name, description, agent_name, output_name) VALUES (?, ?, ?, ?, ?, ?, ?);";
     CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 7);
     cass_statement_bind_uuid  (cassStatement, 0, dependentVariable.getExperimentationCassUuid());
     cass_statement_bind_uuid  (cassStatement, 1, dependentVariable.getProtocolCassUuid());
@@ -146,7 +146,7 @@ CassStatement* DependentVariableM::createBoundInsertStatement(const DependentVar
  */
 CassStatement* DependentVariableM::createBoundUpdateStatement(const DependentVariableM& dependentVariable)
 {
-    QString queryStr = "UPDATE " + DependentVariableM::table + " SET name = ?, description = ?, agent_name = ?, output_name = ? WHERE id_experimentation = ? AND id_task = ? AND id = ?;";
+    QString queryStr = "UPDATE " + DependentVariableM::table + " SET name = ?, description = ?, agent_name = ?, output_name = ? WHERE id_experimentation = ? AND id_protocol = ? AND id = ?;";
     CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 7);
     cass_statement_bind_string(cassStatement, 0, dependentVariable.name().toStdString().c_str());
     cass_statement_bind_string(cassStatement, 1, dependentVariable.description().toStdString().c_str());

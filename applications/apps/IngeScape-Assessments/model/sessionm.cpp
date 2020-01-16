@@ -20,7 +20,7 @@
 /**
  * @brief Session table name
  */
-const QString SessionM::table = "ingescape.task_instance";
+const QString SessionM::table = "ingescape.session";
 
 /**
  * @brief Session table column names
@@ -28,7 +28,7 @@ const QString SessionM::table = "ingescape.task_instance";
 const QStringList SessionM::columnNames = {
     "id_experimentation",
     "id_subject",
-    "id_task",
+    "id_protocol",
     "id",
     "comment",
     "end_date",
@@ -43,10 +43,9 @@ const QStringList SessionM::columnNames = {
  */
 const QStringList SessionM::primaryKeys = {
     "id_experimentation",
-    "id_subject",
-    "id_task",
     "id",
 };
+
 
 /**
  * @brief Constructor
@@ -214,7 +213,7 @@ SessionM* SessionM::createFromCassandraRow(const CassRow* row)
         CassUuid experimentationUuid, subjectUuid, protocolUuid, sessionUuid;
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_experimentation"), &experimentationUuid);
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id_subject"), &subjectUuid);
-        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_task"), &protocolUuid);
+        cass_value_get_uuid(cass_row_get_column_by_name(row, "id_protocol"), &protocolUuid);
         cass_value_get_uuid(cass_row_get_column_by_name(row, "id"), &sessionUuid);
 
         QString sessionName(AssessmentsModelManager::getStringValueFromColumnName(row, "name"));
@@ -244,10 +243,10 @@ void SessionM::deleteSessionFromCassandra(const SessionM& session)
     if ((session.subject() != nullptr) && (session.protocol() != nullptr))
     {
         // Delete independent variable values linked to this session from DB
-        AssessmentsModelManager::deleteEntry<IndependentVariableValueM>({ session.subject()->getExperimentationCassUuid(), session.getCassUuid() });
+        AssessmentsModelManager::deleteEntry<IndependentVariableValueM>({ session.getExperimentationCassUuid(), session.getCassUuid() });
 
         // Delete the actual session from DB
-        AssessmentsModelManager::deleteEntry<SessionM>({ session.subject()->getExperimentationCassUuid(), session.getSubjectCassUuid(), session.getProtocolCassUuid(), session.getCassUuid() });
+        AssessmentsModelManager::deleteEntry<SessionM>({ session.getExperimentationCassUuid(), session.getCassUuid() });
     }
 }
 
@@ -260,7 +259,7 @@ void SessionM::deleteSessionFromCassandra(const SessionM& session)
  */
 CassStatement* SessionM::createBoundInsertStatement(const SessionM& session)
 {
-    QString queryStr = "INSERT INTO " + SessionM::table + " (id, id_experimentation, id_subject, id_task, name, comment, start_date, start_time, end_date, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+    QString queryStr = "INSERT INTO " + SessionM::table + " (id, id_experimentation, id_subject, id_protocol, name, comment, start_date, start_time, end_date, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
     CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 10);
     cass_statement_bind_uuid  (cassStatement, 0, session.getCassUuid());
     cass_statement_bind_uuid  (cassStatement, 1, session.protocol()->getExperimentationCassUuid());
@@ -284,21 +283,18 @@ CassStatement* SessionM::createBoundInsertStatement(const SessionM& session)
  */
 CassStatement* SessionM::createBoundUpdateStatement(const SessionM& session)
 {
-
     QString queryStr("UPDATE " + SessionM::table
                      + " SET name = ?, comment = ?, start_date = ?, start_time = ?, end_date = ?, end_time = ?"
-                     + " WHERE id_experimentation = ? AND id_subject = ? AND id_task = ? AND id = ?;");
-    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 10);
+                     + " WHERE id_experimentation = ? AND id = ?;");
+    CassStatement* cassStatement = cass_statement_new(queryStr.toStdString().c_str(), 8);
     cass_statement_bind_string(cassStatement, 0, session.name().toStdString().c_str());
     cass_statement_bind_string(cassStatement, 1, session.comments().toStdString().c_str());
     cass_statement_bind_uint32(cassStatement, 2, cass_date_from_epoch(session.startDateTime().toTime_t()));
     cass_statement_bind_int64 (cassStatement, 3, cass_time_from_epoch(session.startDateTime().toTime_t()));
     cass_statement_bind_uint32(cassStatement, 4, cass_date_from_epoch(session.endDateTime().toTime_t()));
     cass_statement_bind_int64 (cassStatement, 5, cass_time_from_epoch(session.endDateTime().toTime_t()));
-    cass_statement_bind_uuid  (cassStatement, 6, session.subject()->getExperimentationCassUuid());
-    cass_statement_bind_uuid  (cassStatement, 7, session.subject()->getCassUuid());
-    cass_statement_bind_uuid  (cassStatement, 8, session.protocol()->getCassUuid());
-    cass_statement_bind_uuid  (cassStatement, 9, session.getCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 6, session.getExperimentationCassUuid());
+    cass_statement_bind_uuid  (cassStatement, 7, session.getCassUuid());
     return cassStatement;
 }
 

@@ -251,6 +251,11 @@ I2CustomRectangle {
 
     onListOfNetworkDevicesChanged: {
         resetComboboxSelectNetworkDevice();
+
+        rootPrivate.networkDevicesAvailable = root.listOfNetworkDevices.length > 0;
+        if (!rootPrivate.networkDevicesAvailable) {
+            close();
+        }
     }
 
     onEditorStartedOnIgsChanged: {
@@ -267,7 +272,9 @@ I2CustomRectangle {
     }
 
     onVisibleChanged: {
-        close();
+        if (visible == false) {
+            close();
+        }
     }
 
     // Timer used to auto-close our edition mode

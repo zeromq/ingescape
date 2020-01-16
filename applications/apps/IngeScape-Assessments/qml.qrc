@@ -14,7 +14,6 @@
         <file>qml/popup/CreateSessionPopup.qml</file>
         <file>qml/popup/CreateCharacteristicPopup.qml</file>
         <file>qml/subject/Characteristic.qml</file>
-        <file>qml/subject/CharacteristicValueEditor.qml</file>
         <file>qml/theme/IngeScapeRadioButtonStyle.qml</file>
         <file>qml/popup/CreateProtocolPopup.qml</file>
         <file>qml/protocol/Protocol.qml</file>

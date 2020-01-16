@@ -9,7 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
- *
+ *      Chloé Roumieu      <roumieu@ingenuity.io>
  */
 
 #ifndef EXPERIMENTATIONCONTROLLER_H
@@ -29,45 +29,24 @@ class ExperimentationController : public QObject
 {
     Q_OBJECT
 
-    // Controller to manage a session of the current experimentation
     I2_QML_PROPERTY_READONLY(SessionController*, sessionC)
-
-    // Model of the current experimentation
     I2_QML_PROPERTY_CUSTOM_SETTER(ExperimentationM*, currentExperimentation)
 
-    // Peer id of the recorder
     I2_CPP_NOSIGNAL_PROPERTY(QString, peerIdOfRecorder)
-
-    // Peer name of the recorder
     I2_CPP_NOSIGNAL_PROPERTY(QString, peerNameOfRecorder)
-
-    // Flag indicating is there is a recorder with state ON
     I2_QML_PROPERTY_READONLY(bool, isRecorderON)
-
-    // Flag indicating if the recorder is currently recording
     I2_QML_PROPERTY_READONLY(bool, isRecording)
 
-    // List of selected sessions
+    I2_QML_PROPERTY(bool, isSelectingSessions) // Mode "export sessions" in qml
     I2_QOBJECT_LISTMODEL(SessionM, selectedSessions)
 
-    // List of all agents present in the current platform
-    Q_PROPERTY(AreSubjectAndProtocolInSessionFilter* sessionFilteredList READ sessionFilteredList CONSTANT)
-
-    // List with ids of selected subjects
+    Q_PROPERTY(AreSubjectAndProtocolInSessionFilter* sessionFilteredList READ sessionFilteredList CONSTANT) // List of all agents present in the current platform
     I2_QML_PROPERTY_READONLY(QStringList, selectedSubjectIdListToFilter)
-
-    // List with names of selected Protocol
     I2_QML_PROPERTY_READONLY(QStringList, selectedProtocolNameListToFilter)
 
-    // List of (future) record to handle at each timeout of our timer
-    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(RecordAssessmentM, listFuturRecordsToHandle)
-
-    // Next record model to handle
+    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(RecordAssessmentM, listFuturRecordsToHandle) // at each timeout of our timer
     I2_QML_PROPERTY(RecordAssessmentM*, nextRecordToHandle)
-
-    // Flag indicating if user wants to remove other records encountered while recording
-    // If false, it means that recording have to stop at first other record encounter
-    I2_QML_PROPERTY(bool, removeOtherRecordsWhileRecording)
+    I2_QML_PROPERTY(bool, removeOtherRecordsWhileRecording) // If false, it means that recording have to stop at first other record encounter
 
 
 public:
@@ -255,6 +234,13 @@ public Q_SLOTS:
      * @param message (id of the record)
      */
     void onRecordDeletedReceived(QString message);
+
+
+Q_SIGNALS:
+    /**
+      * @brief Signal emitted to reset the timeline view
+      */
+    void resetTimeLineView(bool showIt);
 
 
 private Q_SLOTS:

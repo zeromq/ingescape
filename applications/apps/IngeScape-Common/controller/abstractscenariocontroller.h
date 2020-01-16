@@ -117,7 +117,15 @@ public:
      * @brief Import the executed actions for a scenario from JSON
      * @param byteArrayOfJson
      */
-    void importExecutedActionsFromJson(QByteArray byteArrayOfJson);
+    void importExecutedActionsFromJson(int deltaTimeFromTimeLineStart, QByteArray byteArrayOfJson);
+
+    /**
+
+     * @brief Import an executed action in our timeline : create a new action view model
+     * ONLY if no action view model already exists for the actionID
+     * at lineIndexInTimeline and executionTime
+     */
+    ActionVM* addExecutedActionToTimeline(int actionId, int lineIndexInTimeLine, int executionTime);
 
 
     /**
@@ -125,6 +133,31 @@ public:
       * @param action
       */
     virtual Q_INVOKABLE void deleteAction(ActionM* action);
+
+
+    /**
+     * @brief Test if an item can be inserted into a line number
+     * @param actionM to insert
+     * @param time to insert
+     * @param line index
+     * @param optional dragged action VM when already in the time-line
+     */
+    Q_INVOKABLE bool canInsertActionVMTo(ActionM *actionMToInsert, int time, int lineIndex, ActionVM* draggedActionVM = nullptr);
+
+
+    /**
+     * @brief Add an action VM at the current date time
+     * @param action model
+     */
+    Q_INVOKABLE void addActionVMAtCurrentTime(ActionM* actionM);
+
+
+    /**
+     * @brief Add an action VM at the time in ms
+     * @param action model
+     * @param line index
+     */
+    Q_INVOKABLE void addActionVMAtTime(ActionM* actionM, int timeInMs, int lineIndex);
 
 
     /**
@@ -325,6 +358,21 @@ protected:
     // List of actionVM in timeline filtered with a given time range in milliseconds
     AbstractTimeRangeFilter _filteredListActionsInTimeLine;
 
+
+private:
+
+    /**
+     * @brief Insert an actionVM into our timeline
+     * @param action view model
+     * @param line number
+     */
+    void _insertActionVMIntoMapByLineNumber(ActionVM* actionVMToInsert, int lineNumberRef);
+
+    /**
+     * @brief Clear the current timeline
+     * (clear the list of actions in the timeline)
+     */
+    void _clearTimeline();
 };
 
 QML_DECLARE_TYPE(AbstractScenarioController)

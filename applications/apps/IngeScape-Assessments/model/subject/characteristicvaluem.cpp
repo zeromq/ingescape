@@ -47,11 +47,17 @@ const QStringList CharacteristicValueM::primaryKeys = {
  * @param characteristicUuid
  * @param valueString
  */
-CharacteristicValueM::CharacteristicValueM(const CassUuid& experimentationUuid, const CassUuid& subjectUuid, const CassUuid& characteristicUuid, const QString& characteristicValue)
-    : experimentationUuid(experimentationUuid)
-    , subjectUuid(subjectUuid)
-    , characteristicUuid(characteristicUuid)
-    , valueString(characteristicValue) {}
+CharacteristicValueM::CharacteristicValueM(const CassUuid& experimentationUuid,
+                                           const CassUuid& subjectUuid,
+                                           const CassUuid& characteristicUuid,
+                                           const QString& characteristicValue) :
+    experimentationUuid(experimentationUuid),
+    subjectUuid(subjectUuid),
+    characteristicUuid(characteristicUuid),
+    valueString(characteristicValue)
+{
+
+}
 
 
 /**

@@ -213,18 +213,6 @@ void SubjectsController::deleteSubject(SubjectM* subject)
         // Remove the subject from the current experimentation
         _currentExperimentation->removeSubject(subject);
 
-        // Remove protocols related to the subject
-        QList<CassUuid> protocolUuidList;
-        for (ProtocolM* protocol : *(_currentExperimentation->allProtocols())) {
-            if (protocol != nullptr)
-            {
-                protocolUuidList.append(protocol->getCassUuid());
-            }
-        }
-
-        AssessmentsModelManager::deleteEntry<SessionM>({ { _currentExperimentation->getCassUuid() }, { subject->getCassUuid() }, protocolUuidList });
-
-
         // Remove subject from DB
         SubjectM::deleteSubjectFromCassandra(*subject);
 
