@@ -71,17 +71,6 @@ Item {
 
     //--------------------------------------------------------
     //
-    // Behavior
-    //
-    //--------------------------------------------------------
-
-    Component.onCompleted: {
-        timeline.isReduced = false;
-    }
-
-
-    //--------------------------------------------------------
-    //
     //
     // Content
     //
@@ -128,7 +117,7 @@ Item {
         scenarioController: rootItem.sessionController ? rootItem.sessionController.scenarioC : null;
         timeLineController: rootItem.sessionController ? rootItem.sessionController.timeLineC : null;
         licensesController: IngeScapeAssessmentsC.licensesC
-        mainController: IngeScapeAssessmentsC
+        mainController: rootItem.experimentationController
 
         recordsListToShow : rootItem.session ? rootItem.session.recordsList : []
 

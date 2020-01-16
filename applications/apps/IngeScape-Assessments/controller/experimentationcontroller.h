@@ -236,6 +236,13 @@ public Q_SLOTS:
     void onRecordDeletedReceived(QString message);
 
 
+Q_SIGNALS:
+    /**
+      * @brief Signal emitted to reset the timeline view
+      */
+    void resetTimeLineView(bool showIt);
+
+
 private Q_SLOTS:
 
     /**

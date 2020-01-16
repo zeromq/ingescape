@@ -152,26 +152,16 @@ void ExperimentationController::createNewSessionForSubjectAndProtocol(SubjectM* 
     }
 }
 
-
-/**
- * @brief Open a session
- * @param session
- */
 void ExperimentationController::openSession(SessionM* session)
 {
     if ((session != nullptr) && (_currentExperimentation != nullptr))
     {
         qInfo() << "Open the session" << session->name() << "of the experimentation" << _currentExperimentation->name();
-
-        // Update the current session
         _sessionC->setcurrentSession(session);
+        Q_EMIT resetTimeLineView(true); // Open timeline view
     }
 }
 
-/**
- * @brief Delete a session
- * @param session
- */
 void ExperimentationController::deleteSession(SessionM* session)
 {
     if ((session != nullptr) && (_currentExperimentation != nullptr))

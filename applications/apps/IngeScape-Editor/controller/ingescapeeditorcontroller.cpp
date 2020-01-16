@@ -780,9 +780,8 @@ void IngeScapeEditorController::clearCurrentPlatform()
         _timeLineC->resetTimeline();
     }
 
-    // Notify QML to reset views
-    Q_EMIT resetMappindView();
-    Q_EMIT resetTimeLineView();
+    Q_EMIT resetTimeLineView(false); // Close timeline view
+    Q_EMIT resetMappindView(); // Center mapping view
 }
 
 
@@ -1230,9 +1229,8 @@ void IngeScapeEditorController::_onReplayLoading(int deltaTimeFromTimeLineStart,
 
             }
 
-            // Notify QML to reset views
-            Q_EMIT resetMappindView();
-            Q_EMIT resetTimeLineView();
+            Q_EMIT resetTimeLineView(true); // Open timeline view
+            Q_EMIT resetMappindView(); // Center mapping view
         }
         else
         {
@@ -1611,9 +1609,8 @@ bool IngeScapeEditorController::_loadPlatformFromFile(QString platformFilePath)
                     sethasAPlatformBeenLoadedByUser(true);
                 }
 
-                // Notify QML to reset views
-                Q_EMIT resetMappindView();
-                Q_EMIT resetTimeLineView();
+                Q_EMIT resetTimeLineView(false); // Close timeline view
+                Q_EMIT resetMappindView(); // Center mapping view
             }
             else
             {

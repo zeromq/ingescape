@@ -77,7 +77,8 @@ Item {
         target: mainController
 
         onResetTimeLineView: {
-            console.log("QML: onResetTimeLineView")
+//            console.log("QML: onResetTimeLineView")
+            isReduced = !showIt;
             contentArea.contentX = 0;
             contentArea.contentY = 0;
         }
@@ -85,8 +86,6 @@ Item {
         ignoreUnknownSignals: true
     }
 
-
-    // Called when the flag "Is Reduced" changed
     onIsReducedChanged : {
         // Allow resize animations
         rootItem._canPerformResizeAnimations = true;
@@ -102,7 +101,6 @@ Item {
             //rootItem.height = IngeScapeTheme.timeLineHeight_OneRow;
         }
     }
-
 
     // Animation on height
     Behavior on height {
@@ -122,7 +120,6 @@ Item {
         // Check bounds of our delta scale
         var previousPixelsPerMinute = timeLineController.pixelsPerMinute;
         var newPixelsPerMinute = previousPixelsPerMinute * deltaScale;
-
         if (newPixelsPerMinute < timeLineController.minPixelsPerMinute)
         {
             newPixelsPerMinute = timeLineController.minPixelsPerMinute;
@@ -147,36 +144,41 @@ Item {
     }
 
     function dragViewWithDelta (deltaX, deltaY) {
-
         var maxXOfTimeline = contentArea.contentWidth - contentArea.width;
         var maxYOfTimeline = contentArea.contentHeight - contentArea.height;
-
-        if (maxXOfTimeline > 0) {
+        if (maxXOfTimeline > 0)
+        {
             if ((contentArea.contentX + deltaX >= 0)
-                    && (contentArea.contentX + deltaX <= maxXOfTimeline)) {
+                    && (contentArea.contentX + deltaX <= maxXOfTimeline))
+            {
                 contentArea.contentX += deltaX;
             }
-            else if (contentArea.contentX + deltaX < 0) {
+            else if (contentArea.contentX + deltaX < 0)
+            {
                 contentArea.contentX = 0;
             }
-            else if (contentArea.contentX + deltaX > maxXOfTimeline) {
+            else if (contentArea.contentX + deltaX > maxXOfTimeline)
+            {
                 contentArea.contentX = maxXOfTimeline;
             }
         }
 
-        if (maxYOfTimeline > 0) {
+        if (maxYOfTimeline > 0)
+        {
             if ((contentArea.contentY + deltaY >= 0)
-                    && (contentArea.contentY + deltaY <= maxYOfTimeline)) {
+                    && (contentArea.contentY + deltaY <= maxYOfTimeline))
+            {
                 contentArea.contentY += deltaY;
             }
-            else if (contentArea.contentY + deltaY < 0) {
+            else if (contentArea.contentY + deltaY < 0)
+            {
                 contentArea.contentY = 0;
             }
-            else if (contentArea.contentY + deltaY > maxYOfTimeline) {
+            else if (contentArea.contentY + deltaY > maxYOfTimeline)
+            {
                 contentArea.contentY = maxYOfTimeline;
             }
         }
-
     }
 
 
