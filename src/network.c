@@ -1829,6 +1829,7 @@ int igsAgent_startWithDevice(igsAgent_t *agent, const char *networkDevice, unsig
     agent->loopElements->zyrePort = port;
     agent->loopElements->agentActor = zactor_new (initLoop, agent);
     assert (agent->loopElements->agentActor);
+    igs_nbOfInternalAgents++;
     return 1;
 }
 
@@ -1892,7 +1893,7 @@ int igsAgent_startWithIP(igsAgent_t *agent, const char *ipAddress, unsigned int 
     agent->loopElements->zyrePort = port;
     agent->loopElements->agentActor = zactor_new (initLoop, agent);
     assert (agent->loopElements->agentActor);
- 
+    igs_nbOfInternalAgents++;
     return 1;
 }
 
@@ -1957,7 +1958,7 @@ int igsAgent_startWithDeviceOnBroker(igsAgent_t *agent, const char *networkDevic
     agent->loopElements->zyrePort = 0;
     agent->loopElements->agentActor = zactor_new (initLoop, agent);
     assert (agent->loopElements->agentActor);
-    
+    igs_nbOfInternalAgents++;
     return 1;
 }
 
@@ -1977,20 +1978,21 @@ int igsAgent_stop(igsAgent_t *agent){
         //cleaning agent
         free (agent->loopElements);
         agent->loopElements = NULL;
-
+        igs_nbOfInternalAgents--;
+        igsAgent_debug(agent, "still %d internal agents running", igs_nbOfInternalAgents);
         #if (defined WIN32 || defined _WIN32)
         // On Windows, we need to use a sledgehammer to avoid assertion errors
         // NB: If we don't call zsys_shutdown, the application will crash on exit
         // (WSASTARTUP assertion failure)
         // NB: Monitoring also uses a zactor, we can not call zsys_shutdown() when it is running
-        if (!igsAgent_isMonitoringEnabled(agent)) {
+        if (!igsAgent_isMonitoringEnabled(agent) && igs_nbOfInternalAgents == 0) {
             zsys_shutdown();
         }
         #endif
 
-        igsAgent_info(agent, "Agent stopped");
+        igsAgent_info(agent, "%s stopped", agent->agentName);
     }else{
-        igsAgent_debug(agent, "Agent already stopped");
+        igsAgent_debug(agent, "%s already stopped", agent->agentName);
     }
 #if !TARGET_OS_IOS
     license_cleanLicense(agent);

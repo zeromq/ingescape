@@ -14,6 +14,7 @@
 #include "ingescape_private.h"
 
 igsAgent_t *globalAgent = NULL;
+int igs_nbOfInternalAgents = 0;
 bool igs_Interrupted = false;
 
 void globalforcedStopCB(igsAgent_t *agent, void *myData){

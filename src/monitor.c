@@ -278,12 +278,13 @@ void igsAgent_monitoringDisable(igsAgent_t *agent){
     agent->monitor->networkDevice = NULL;
     free(agent->monitor);
     agent->monitor = NULL;
-
+    igsAgent_debug(agent, "still %d internal agents running", igs_nbOfInternalAgents);
+    
 #if (defined WIN32 || defined _WIN32)
     // On Windows, we need to use a sledgehammer to avoid assertion errors
     // NB: If we don't call zsys_shutdown, the application will crash on exit
     // (WSASTARTUP assertion failure)
-    if (agent->loopElements == NULL) {
+    if (agent->loopElements == NULL && igs_nbOfInternalAgents == 0) {
         zsys_shutdown();
     }
 #endif
