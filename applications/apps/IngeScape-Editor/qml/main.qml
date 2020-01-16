@@ -11,24 +11,22 @@
  *      Alexandre Lemort   <lemort@ingenuity.io>
  *      Justine Limoges    <limoges@ingenuity.io>
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
- *
+ *      Chloé Roumieu      <roumieu@ingenuity.io>
  */
 
 import QtQuick 2.8
 import QtQuick.Window 2.2
 import QtQuick.Controls 1.4
 import QtQml 2.2
-
 import I2Quick 1.0
-
 import INGESCAPE 1.0
 
-// popup sub-directory
 import "popup" as Popups
 
 
 ApplicationWindow {
     id: mainWindow
+
 
     //----------------------------------
     //
@@ -38,11 +36,9 @@ ApplicationWindow {
 
     visible: true
 
-    // Default size
     width: IngeScapeEditorTheme.appDefaultWidth
     height: IngeScapeEditorTheme.appDefaultHeight
 
-    // Minimum size
     minimumWidth: IngeScapeEditorTheme.appMinWidth
     minimumHeight: IngeScapeEditorTheme.appMinHeight
 
@@ -53,7 +49,6 @@ ApplicationWindow {
     // Flag enabling the check for a platform change before closing
     property bool forceClose: false
 
-    // Licenses controller
     property LicensesController licensesController: null
 
     // Flag indicating if the user have a valid license for the editor
@@ -67,8 +62,6 @@ ApplicationWindow {
     //----------------------------------
 
     menuBar: MenuBar {
-
-        // File
         Menu {
             id: menuFile
 
@@ -88,8 +81,8 @@ ApplicationWindow {
                     if ((IngeScapeEditorC.recordsSupervisionC) && (IngeScapeEditorC.recordsSupervisionC.selectedRecord))
                     {
                         IngeScapeEditorC.recordsSupervisionC.selectedRecord = null;
+                        IngeScapeEditorC.platformNameBeforeLoadReplay = "";
                     }
-
                     IngeScapeEditorC.clearCurrentPlatform();
                 }
             }
@@ -199,14 +192,12 @@ ApplicationWindow {
                 shortcut: StandardKey.Quit
 
                 onTriggered: {
-                    // Try to close our man window
                     mainWindow.close();
                 }
             }
         }
 
 
-        // Edit
         Menu {
             id: menuEdit
 
@@ -291,7 +282,6 @@ ApplicationWindow {
         }
 
 
-        // Mapping
         Menu {
             title: qsTr("Mapping")
 
@@ -364,7 +354,6 @@ ApplicationWindow {
         }
 
 
-        // Agents
         Menu {
             title: qsTr("Agents")
 
@@ -424,7 +413,6 @@ ApplicationWindow {
         }
 
 
-        // Windows
         Menu {
             id: menuWindows
 
@@ -463,7 +451,6 @@ ApplicationWindow {
         }
 
 
-        // Debug
         Menu {
             id: menuDebug
 
@@ -571,7 +558,6 @@ ApplicationWindow {
         }
 
 
-        // Help
         Menu {
             title: qsTr("&Help")
 
@@ -823,7 +809,6 @@ ApplicationWindow {
             objectName: "overlayLayer"
 
             anchors.fill: parent
-
 
             //
             // Popup "for Error messages"failed to laod agent definition"

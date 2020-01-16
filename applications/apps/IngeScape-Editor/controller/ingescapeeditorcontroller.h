@@ -10,7 +10,7 @@
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *      Alexandre Lemort <lemort@ingenuity.io>
- *
+ *      Chloé Roumieu    <roumieu@ingenuity.io>
  */
 
 #ifndef INGESCAPEEDITORCONTROLLER_H
@@ -118,6 +118,7 @@ class IngeScapeEditorController : public QObject
     // Flag indicating if we must show the getting started page on startup
     I2_QML_PROPERTY_CUSTOM_SETTER(bool, gettingStartedShowAtStartup)
 
+    I2_QML_PROPERTY(QString, platformNameBeforeLoadReplay)
 
 public:
 
@@ -491,10 +492,6 @@ private:
 
     // Default name when creating a new platform
     static const QString SPECIAL_EMPTY_LAST_PLATFORM;
-
-    // Name of the current Ingescape platform before a record is loading
-    QString _platformNameBeforeLoadReplay;
-
 };
 
 QML_DECLARE_TYPE(IngeScapeEditorController)

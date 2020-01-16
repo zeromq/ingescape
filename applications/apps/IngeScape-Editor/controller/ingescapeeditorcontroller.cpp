@@ -10,7 +10,7 @@
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *      Alexandre Lemort   <lemort@ingenuity.io>
- *
+ *      Chloé Roumieu      <roumieu@ingenuity.io>
  */
 
 #include "controller/ingescapeeditorcontroller.h"
@@ -64,13 +64,13 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _currentPlatformName(EXAMPLE_PLATFORM_NAME),
     _hasAPlatformBeenLoadedByUser(false),
     _gettingStartedShowAtStartup(true),
+    _platformNameBeforeLoadReplay(""),
     _terminationSignalWatcher(nullptr),
     _platformDirectoryPath(""),
     _currentPlatformFilePath(""),
     // Connect mapping in control mode
     _beforeNetworkStop_isMappingConnected(true),
-    _beforeNetworkStop_isMappingControlled(true),
-    _platformNameBeforeLoadReplay("")
+    _beforeNetworkStop_isMappingControlled(true)
 {
     qInfo() << "New IngeScape Editor Controller";
 
@@ -1252,17 +1252,20 @@ void IngeScapeEditorController::_onReplayUNloaded()
         _recordsSupervisionC->setreplayState(ReplayStates::UNLOADED);
     }
 
-    // First, clear the current platform by deleting all existing data
-    clearCurrentPlatform();
-
-    _currentPlatformFilePath = QString("%1%2.igsplatform").arg(_platformDirectoryPath, _platformNameBeforeLoadReplay);
-    _platformNameBeforeLoadReplay = "";
-
-    // Load the platform from last platform file used before records
-    bool success = _loadPlatformFromFile(_currentPlatformFilePath);
-    if (!success)
+    // _platformNameBeforeLoadReplay = "" means that last platform is already clear,
+    // and current platform is a "NEW PLATFORM"
+    if (_platformNameBeforeLoadReplay != "")
     {
-         qCritical() << "The loading of the current platform before replay failed !";
+        clearCurrentPlatform();
+        _currentPlatformFilePath = QString("%1%2.igsplatform").arg(_platformDirectoryPath, _platformNameBeforeLoadReplay);
+        _platformNameBeforeLoadReplay = "";
+
+        // Load the platform from last platform file used before records
+        bool success = _loadPlatformFromFile(_currentPlatformFilePath);
+        if (!success)
+        {
+             qCritical() << "The loading of the current platform before replay failed !";
+        }
     }
 }
 
