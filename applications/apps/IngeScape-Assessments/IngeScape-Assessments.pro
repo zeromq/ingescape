@@ -165,20 +165,19 @@ mac {
     # Compute the LFLAG associated to our frameworks
     LIBS += -L../../frameworks/I2Quick/Mac -lI2Quick
 
-    LIBS += -L/usr/local/lib -lcassandra
+    LIBS += /usr/local/lib/libcassandra.dylib
 
 
     # Copy libraries into the MacOS directory of our application
-    librariesToCopy.files += ../../frameworks/I2Quick/Mac/libI2Quick.$${QMAKE_EXTENSION_SHLIB}
+    # NB: libzyre, libzmq, libczmq, libsodium, have to be copied manually because macdeploy won't copy libraries referenced through @rpath
+    librariesToCopy.files += ../../frameworks/I2Quick/Mac/libI2Quick.$${QMAKE_EXTENSION_SHLIB} /usr/local/lib/libcassandra.dylib /usr/local/lib/libczmq.dylib /usr/local/lib/libzyre.dylib /usr/local/lib/libsodium.dylib
     librariesToCopy.path = Contents/Frameworks
     QMAKE_BUNDLE_DATA += librariesToCopy
-    # NB: libzyre, libzmq, libczmq, libsodium, libyajl will be copied by macdeployqt
-    #     because they are installed in a standard directory (/usr/local/lib)
 
 
     # Release / debug specific rules
     CONFIG(release, debug|release) {
-        # We must call install_name_tool to create a valid link. Otherwise, our application will not found our library
+        # We must call install_name_tool to create a valid link. Otherwise, our application will not find our library
         QMAKE_POST_LINK += $$quote(install_name_tool -change libI2Quick.$${QMAKE_EXTENSION_SHLIB} @executable_path/../Frameworks/libI2Quick.$${QMAKE_EXTENSION_SHLIB} $${OUT_PWD}/$${TARGET}.app/Contents/MacOS/$${TARGET} $$escape_expand(\\n\\t))
 
         # Release only: copy Qt libs and plugins inside our application to create a standalone application
@@ -186,7 +185,7 @@ mac {
         QMAKE_POST_LINK += $$quote(cd `dirname $(QMAKE)` && macdeployqt $${OUT_PWD}/$${TARGET}.app -qmldir=$${PWD} $$escape_expand(\n\t))
     }
     else {
-        # We must call install_name_tool to create a valid link. Otherwise, our application will not found our library
+        # We must call install_name_tool to create a valid link. Otherwise, our application will not find our library
         # NB: useless in debug mode because Qt Creator can find our I2Quick library
        # QMAKE_POST_LINK += $$quote(install_name_tool -change libI2Quick_debug.$${QMAKE_EXTENSION_SHLIB} @executable_path/libI2Quick_debug.$${QMAKE_EXTENSION_SHLIB} $${OUT_PWD}/$${TARGET}.app/Contents/MacOS/$${TARGET} $$escape_expand(\\n\\t))
     }
