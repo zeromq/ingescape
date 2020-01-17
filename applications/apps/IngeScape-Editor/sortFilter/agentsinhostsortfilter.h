@@ -36,12 +36,6 @@ public:
     explicit AgentsInHostSortFilter(QObject *parent = nullptr);
 
 
-    /**
-      * @brief Destructor
-      */
-    //~AgentsInHostSortFilter();
-
-
 protected:
 
     /**
@@ -70,6 +64,5 @@ protected:
 };
 
 QML_DECLARE_TYPE(AgentsInHostSortFilter)
-
 
 #endif // AGENTSINHOSTSORTFILTER_H

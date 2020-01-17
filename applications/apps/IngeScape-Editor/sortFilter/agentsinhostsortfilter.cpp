@@ -27,14 +27,6 @@ AgentsInHostSortFilter::AgentsInHostSortFilter(QObject *parent) : I2SortFilterPr
 
 
 /**
-  * @brief Destructor
-  */
-/*AgentsInHostSortFilter::~AgentsInHostSortFilter()
-{
-}*/
-
-
-/**
  * @brief filterAccepts is used to check if an item should be included in our result list or not
  *
  * @param item
