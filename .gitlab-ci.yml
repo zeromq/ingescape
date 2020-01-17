@@ -636,7 +636,7 @@ lib-installer-debug-windows-x64:
   tags:
     - windows
   script:
-    - cd build\DebugX64 && cpack --config CPackConfig.cmake && cd ..\..
+    - cd build\DebugX64 && cpack --config CPackConfig.cmake -C Debug && cd ..\..
   artifacts:
     paths:
       - build\DebugX64\ingescape-*.exe
