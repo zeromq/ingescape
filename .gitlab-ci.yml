@@ -609,6 +609,42 @@ lib-installer-runtime-windows-x64:
   dependencies:
     - lib-windows-release-x64
 
+# Create runtime install for windows 32 bits (debug)
+lib-installer-debug-windows-x86:
+  <<: *lib-build-files
+  stage: lib-installer
+  variables:
+    ARCH: "Debug_x86"
+  tags:
+    - windows
+  script:
+    - cd build\DebugX86 && cpack --config CPackConfig.cmake -C Debug && cd ..\..
+  artifacts:
+    paths:
+      - build\DebugX86\ingescape-*.exe
+      - build\DebugX86\ingescape-*.zip
+    name: "lib-installer-debug-windows-x86"
+  dependencies:
+    - lib-windows-debug-x86
+
+# Create runtime install for windows 64 bits (debug)
+lib-installer-debug-windows-x64:
+  <<: *lib-build-files
+  stage: lib-installer
+  variables:
+    ARCH: "Debug_x64"
+  tags:
+    - windows
+  script:
+    - cd build\DebugX64 && cpack --config CPackConfig.cmake -C Debug && cd ..\..
+  artifacts:
+    paths:
+      - build\DebugX64\ingescape-*.exe
+      - build\DebugX64\ingescape-*.zip
+    name: "lib-installer-debug-windows-x64"
+  dependencies:
+    - lib-windows-debug-x64
+
 # Create runtime install for windows 64 bits
 binding-csharp-installer-windows-x64:
   <<: *binding-build-files

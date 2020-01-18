@@ -331,7 +331,7 @@ endif()
 # installer
 # ##############################################################################
 # Package installer for release build only
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
+if((WIN32) OR (CMAKE_BUILD_TYPE STREQUAL "Release"))
   #https://cmake.org/cmake/help/v3.16/module/CPack.html#
   set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
   set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "The ${PROJECT_NAME} core library")
