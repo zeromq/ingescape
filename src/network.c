@@ -1979,13 +1979,14 @@ int igsAgent_stop(igsAgent_t *agent){
         free (agent->loopElements);
         agent->loopElements = NULL;
         igs_nbOfInternalAgents--;
-        igsAgent_debug(agent, "still %d internal agents running", igs_nbOfInternalAgents);
+        //igsAgent_debug(agent, "still %d internal agents running", igs_nbOfInternalAgents);
         #if (defined WIN32 || defined _WIN32)
         // On Windows, we need to use a sledgehammer to avoid assertion errors
         // NB: If we don't call zsys_shutdown, the application will crash on exit
         // (WSASTARTUP assertion failure)
         // NB: Monitoring also uses a zactor, we can not call zsys_shutdown() when it is running
-        if (!igsAgent_isMonitoringEnabled(agent) && igs_nbOfInternalAgents == 0) {
+        if (igs_nbOfInternalAgents == 0) {
+            igsAgent_debug(agent, "calling zsys_shutdown after last agent in process has stopped");
             zsys_shutdown();
         }
         #endif

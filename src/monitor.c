@@ -241,6 +241,7 @@ void igsAgent_monitoringEnable(igsAgent_t *agent, unsigned int period){
     agent->monitor->period = period;
     agent->monitor->status = IGS_NETWORK_OK;
     agent->monitor->monitorActor = zactor_new (monitor_initLoop, agent);
+    igs_nbOfInternalAgents++;
 }
 
 void igsAgent_monitoringEnableWithExpectedDevice(igsAgent_t *agent, unsigned int period,
@@ -278,13 +279,14 @@ void igsAgent_monitoringDisable(igsAgent_t *agent){
     agent->monitor->networkDevice = NULL;
     free(agent->monitor);
     agent->monitor = NULL;
-    igsAgent_debug(agent, "still %d internal agents running", igs_nbOfInternalAgents);
-    
+    igs_nbOfInternalAgents--;
+    //igsAgent_debug(agent, "still %d internal agents running", igs_nbOfInternalAgents);
 #if (defined WIN32 || defined _WIN32)
     // On Windows, we need to use a sledgehammer to avoid assertion errors
     // NB: If we don't call zsys_shutdown, the application will crash on exit
     // (WSASTARTUP assertion failure)
-    if (agent->loopElements == NULL && igs_nbOfInternalAgents == 0) {
+    if (igs_nbOfInternalAgents == 0) {
+        igsAgent_debug(agent, "calling zsys_shutdown after last agent in process has stopped");
         zsys_shutdown();
     }
 #endif
