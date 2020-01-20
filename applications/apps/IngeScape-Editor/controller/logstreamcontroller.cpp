@@ -337,12 +337,17 @@ void LogStreamController::_onLogReceived(QDateTime logDateTime, QStringList para
 {
     if (parametersOfLog.count() > 1)
     {
+        // Get agent name concerned by the log
+        // Do nothing with it right now
+        QString strAgentName = parametersOfLog.first();
+        parametersOfLog.removeFirst();
+
         QString strLogType = parametersOfLog.first();
         parametersOfLog.removeFirst();
 
         QString logContent = parametersOfLog.join(' ');
 
-        //qDebug() << parametersOfLog << "-->" << logContent;
+//        qDebug() << parametersOfLog << "-->" << logContent;
 
         int length = logContent.length();
 
