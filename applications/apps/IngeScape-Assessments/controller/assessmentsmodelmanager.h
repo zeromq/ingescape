@@ -238,6 +238,7 @@ public:
             qInfo() << typeid(ModelClass).name() << "has been successfully deleted from the DB";
         }
         else {
+            qDebug() << "Query string : " << queryStr;
             qCritical() << "Could not delete" << typeid(ModelClass).name() << "from the DB:" << cass_error_desc(cassError);
         }
 
@@ -327,6 +328,7 @@ public:
             qDebug() << "SELECT query for" << typeid(ModelClass).name() << "succeeded";
         }
         else {
+            qDebug() << "Query string : " << queryStr;
             qCritical() << "SELECT query for" << typeid(ModelClass).name() << "failed. Error:" << cass_error_desc(cassError);
         }
 

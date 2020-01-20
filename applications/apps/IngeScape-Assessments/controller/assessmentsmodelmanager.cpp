@@ -419,9 +419,8 @@ QString AssessmentsModelManager::cassUuidToQString(CassUuid cassUuid)
  */
 CassUuid AssessmentsModelManager::qStringToCassUuid(QString stringCassUuid)
 {
-    const char * convertStringCassUuid = stringCassUuid.toStdString().c_str();
     CassUuid cassUuid;
-    cass_uuid_from_string(convertStringCassUuid, &cassUuid);
+    cass_uuid_from_string(stringCassUuid.toStdString().c_str(), &cassUuid);
     return cassUuid;
 }
 
