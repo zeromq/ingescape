@@ -76,9 +76,54 @@ static const char *loadDefinitionPrefix = "LOAD_THIS_DEFINITION#";
 
 #define DEFAULT_IPC_PATH "/tmp/"
 
+#if defined(__unix__) || defined(__linux__) || \
+(defined(__APPLE__) && defined(__MACH__))
+pthread_mutex_t *network_Mutex = NULL;
+#else
+#define W_OK 02
+pthread_mutex_t network_Mutex = NULL;
+#endif
+
 ////////////////////////////////////////////////////////////////////////
 // INTERNAL API
 ////////////////////////////////////////////////////////////////////////
+/*
+ Network mutex is used to avoid collisions between starting and stopping
+ an agent, and between the manageBusIncoming, initLoop and start/stop functions.
+ IT SHOULD NO BE USED FOR ANYTHING ELSE
+ */
+void network_Lock(void)   {
+#if defined(__unix__) || defined(__linux__) || \
+(defined(__APPLE__) && defined(__MACH__))
+    if (network_Mutex == NULL){
+        network_Mutex = calloc(1, sizeof(pthread_mutex_t));
+        if (pthread_mutex_init(network_Mutex, NULL) != 0){
+            igs_fatal("mutex init failed");
+            assert(false);
+            return;
+        }
+    }
+#elif (defined WIN32 || defined _WIN32)
+    if (bus_zyreMutex == NULL){
+        if (pthread_mutex_init(&network_Mutex) != 0){
+            igs_fatal("mutex init failed");
+            assert(false);
+            return;
+        }
+    }
+#endif
+    pthread_mutex_lock(network_Mutex);
+}
+
+void network_Unlock(void) {
+    if (network_Mutex != NULL){
+        pthread_mutex_unlock(network_Mutex);
+    }else{
+        igs_fatal("mutex was NULL\n");
+        assert(false);
+    }
+}
+
 int subscribeToPublisherOutput(igsAgent_t *agent, subscriber_t *subscriber, const char *outputName)
 {
     if(outputName != NULL && strlen(outputName) > 0)
@@ -385,6 +430,7 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
 
 //manage messages received on the bus
 int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
+    network_Lock();
     igsAgent_t *agent = (igsAgent_t *)arg;
     zyre_t *node = agent->loopElements->node;
     
@@ -1190,6 +1236,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
         zmsg_destroy(&msgDuplicate);
         zyre_event_destroy(&zyre_event);
     }
+    network_Unlock();
     return 0;
 }
 
@@ -1262,7 +1309,9 @@ int triggerMappingUpdate(zloop_t *loop, int timer_id, void *arg){
 
 static void
 initLoop (zsock_t *pipe, void *args){
+    network_Lock();
     igsAgent_t *agent = (igsAgent_t *)args;
+    igsAgent_debug(agent, "loop init");
     
 #if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
     if (agent->licenseEnforcement != NULL){
@@ -1590,11 +1639,14 @@ initLoop (zsock_t *pipe, void *args){
         zloop_timer(agent->loopElements->loop, MAX_EXEC_DURATION_DURING_EVAL * 1000, 0, triggerLicenseStop, agent);
     }
 #endif
+    igsAgent_debug(agent, "loop starting");
+    network_Unlock();
 
     if (canContinue){
         zloop_start (agent->loopElements->loop); //start returns when one of the pollers returns -1
     }
     
+    network_Lock();
     igsAgent_debug(agent, "loop stopping...");
 
     //clean
@@ -1641,7 +1693,6 @@ initLoop (zsock_t *pipe, void *args){
             cb->callback_ptr(agent, cb->myData);
         }
     }
-    igsAgent_debug(agent, "loop stopped");
     if (agent->forcedStop){
         agent->isInterrupted = true;
         //in case of forced stop, we send SIGINT to our process so
@@ -1652,6 +1703,8 @@ initLoop (zsock_t *pipe, void *args){
         #endif
         //TODO : do that for windows also
     }
+    igsAgent_debug(agent, "loop stopped");
+    network_Unlock();
 }
 
 ////////////////////////////////////////////////////////////////////////
