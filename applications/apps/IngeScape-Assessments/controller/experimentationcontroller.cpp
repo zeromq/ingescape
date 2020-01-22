@@ -125,6 +125,23 @@ void ExperimentationController::setcurrentExperimentation(ExperimentationM *valu
 }
 
 
+void ExperimentationController::setisSelectingSessions(bool value)
+{
+    if (_isSelectingSessions != value)
+    {
+        _isSelectingSessions = value;
+
+        if (!_isSelectingSessions)
+        {
+            // Clear the list of selected sessions
+            _selectedSessions.clear();
+        }
+
+        Q_EMIT isSelectingSessionsChanged(value);
+    }
+}
+
+
 /**
  * @brief Create a new session for a subject and a protocol
  * @param subject
