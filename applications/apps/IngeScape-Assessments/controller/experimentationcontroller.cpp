@@ -135,6 +135,10 @@ void ExperimentationController::setisSelectingSessions(bool value)
         {
             // Clear the list of selected sessions
             _selectedSessions.clear();
+
+            // Add all protocols and all subjects to reset filtered sessions list
+            addAllSubjectsToFilterSessions();
+            addAllProtocolsToFilterSessions();
         }
 
         Q_EMIT isSelectingSessionsChanged(value);
@@ -436,6 +440,9 @@ void ExperimentationController::_onCurrentExperimentationChanged(Experimentation
         _retrieveIndependentVariableValuesForSessionsInExperimentation(currentExperimentation);
 
         _sessionFilteredList.setSourceModel(_currentExperimentation->allSessions());
+
+        addAllProtocolsToFilterSessions();
+        addAllSubjectsToFilterSessions();
     }
 }
 
@@ -1051,6 +1058,7 @@ void ExperimentationController::addAllProtocolsToFilterSessions(){
     // Update selected protocol names list
     setselectedProtocolNameListToFilter(tempProtocolNameList);
 
+    qDebug() << "GOOOO " << _selectedProtocolNameListToFilter.count();
     _updateFilters();
 }
 

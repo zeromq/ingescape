@@ -543,8 +543,6 @@ Item {
                             onClicked: {
                                 //console.log("QML: Open the 'Export Sessions' mode ");
                                 if (rootItem.experimentationC) {
-                                    rootItem.experimentationC.addAllProtocolsToFilterSessions();
-                                    rootItem.experimentationC.addAllSubjectsToFilterSessions();
                                     rootItem.experimentationC.isSelectingSessions = ! rootItem.experimentationC.isSelectingSessions
                                 }
                             }
