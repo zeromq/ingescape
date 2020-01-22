@@ -104,7 +104,7 @@ void network_Lock(void)   {
         }
     }
 #elif (defined WIN32 || defined _WIN32)
-    if (bus_zyreMutex == NULL){
+    if (network_Mutex == NULL){
         if (pthread_mutex_init(&network_Mutex) != 0){
             igs_fatal("mutex init failed");
             assert(false);
