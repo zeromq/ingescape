@@ -90,7 +90,7 @@ Item {
 
 
         // Selection feedback
-        Rectangle {
+        /*Rectangle {
             id: selectionFeedback
 
             anchors {
@@ -103,7 +103,7 @@ Item {
             visible: rootItem.sessionController && rootItem.agent
 
             color: IngeScapeTheme.selectionColor
-        }
+        }*/
 
         Rectangle{
             id: columnName
