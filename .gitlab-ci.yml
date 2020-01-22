@@ -18,7 +18,7 @@ stages:
   - apps-delivery-stable
 
 # Define ingescape library files
-.lib-build-files: &lib-build-files
+.lib-build-files:
   only:
     changes:
       - .gitlab-ci.yml
@@ -28,12 +28,9 @@ stages:
       - dependencies/unix/*
       - dependencies/windows/unix/*
       - CMakeLists.txt
-    refs:
-      - master
-      - stable
 
 # Define csharp binding files
-.binding-build-files: &binding-build-files
+.binding-build-files:
   only:
     changes:
       - .gitlab-ci.yml
@@ -44,12 +41,9 @@ stages:
       - dependencies/windows/unix/*
       - CMakeLists.txt
       - bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/**/*
-    refs:
-      - master
-      - stable
 
 # Define ingescape editor files
-.editor-build-files: &editor-build-files
+.editor-build-files:
   only:
     changes:
       - .gitlab-ci.yml
@@ -61,12 +55,9 @@ stages:
       - applications/frameworks/**/*
       - applications/apps/IngeScape-Common/**/*
       - applications/apps/IngeScape-Editor/**/*
-    refs:
-      - master
-      - stable
 
 # Define ingescape assessments files
-.assessments-build-files: &assessments-build-files
+.assessments-build-files:
   only:
     changes:
       - .gitlab-ci.yml
@@ -78,12 +69,9 @@ stages:
       - applications/frameworks/**/*
       - applications/apps/IngeScape-Common/**/*
       - applications/apps/IngeScape-Assessments/**/*
-    refs:
-      - master
-      - stable
 
 # Define ingescape expe files
-.expe-build-files: &expe-build-files
+.expe-build-files:
   only:
     changes:
       - .gitlab-ci.yml
@@ -95,9 +83,6 @@ stages:
       - applications/frameworks/**/*
       - applications/apps/IngeScape-Common/**/*
       - applications/apps/IngeScape-Expe/**/*
-    refs:
-      - master
-      - stable
       
 #http://patorjk.com/software/taag/#p=display&f=Big&t=Windows
 #                       ____   _____
@@ -109,7 +94,7 @@ stages:
                                     
 # Build library for macos
 lib-build-macos:
-  <<: *lib-build-files
+  extends: .lib-build-files
   stage: lib-build
   tags:
     - osx
@@ -145,7 +130,7 @@ lib-build-macos:
 #https://fre.applersg.com/check-packages-expired-certificates-mac-os-x
 #https://help.apple.com/xcode/mac/current/#/dev033e997ca
 lib-installer-macos:
-  <<: *lib-build-files
+  extends: .lib-build-files
   stage: lib-installer
   tags:
     - osx
@@ -168,7 +153,7 @@ lib-installer-macos:
 
 # Build ingescape editor for macos
 editor-build-macos:
-  <<: *editor-build-files
+  extends: .editor-build-files
   stage: apps-build
   variables:
 #    Qt5_DIR: ~/Qt/5.9.7/clang_64/lib/cmake/Qt5
@@ -193,7 +178,7 @@ editor-build-macos:
 
 # Build ingescape assessments for macos
 assessments-build-macos:
-  <<: *assessments-build-files
+  extends: .assessments-build-files
   stage: apps-build
   variables:
   #    Qt5_DIR: ~/Qt/5.9.7/clang_64/lib/cmake/Qt5
@@ -219,7 +204,7 @@ assessments-build-macos:
 
 # Build ingescape expe for macos
 expe-build-macos:
-  <<: *expe-build-files
+  extends: .expe-build-files
   stage: apps-build
   variables:
 #    Qt5_DIR: ~/Qt/5.9.7/clang_64/lib/cmake/Qt5
@@ -245,7 +230,7 @@ expe-build-macos:
 
 # Create editor installer
 editor-installer-macos:
-  <<: *editor-build-files
+  extends: .editor-build-files
   stage: apps-installer
   tags:
     - osx
@@ -262,7 +247,7 @@ editor-installer-macos:
 
 # Create assessments installer
 assessments-installer-macos:
-  <<: *assessments-build-files
+  extends: .assessments-build-files
   stage: apps-installer
   tags:
     - osx
@@ -279,7 +264,7 @@ assessments-installer-macos:
 
 # Create expe installer
 expe-installer-macos:
-  <<: *expe-build-files
+  extends: .expe-build-files
   stage: apps-installer
   tags:
     - osx
@@ -305,7 +290,7 @@ expe-installer-macos:
 
 # Create ingescape library for windows 64 bits release
 lib-windows-release-x64:
-  <<: *lib-build-files
+  extends: .lib-build-files
   stage: lib-build
   tags:
     - windows
@@ -327,7 +312,7 @@ lib-windows-release-x64:
 
 # Create ingescape library for windows 32 bits release
 lib-windows-release-x86:
-  <<: *lib-build-files
+  extends: .lib-build-files
   stage: lib-build
   tags:
     - windows
@@ -349,7 +334,7 @@ lib-windows-release-x86:
 
 # Create ingescape library for windows 64 bits debug
 lib-windows-debug-x64:
-  <<: *lib-build-files
+  extends: .lib-build-files
   stage: lib-build
   tags:
     - windows
@@ -371,7 +356,7 @@ lib-windows-debug-x64:
 
 # Create ingescape library for windows 32 bits debug
 lib-windows-debug-x86:
-  <<: *lib-build-files
+  extends: .lib-build-files
   stage: lib-build
   tags:
     - windows
@@ -392,7 +377,7 @@ lib-windows-debug-x86:
   dependencies: []
 
 binding-csharp-windows-x64:
-  <<: *binding-build-files
+  extends: .binding-build-files
   stage: binding-build
   tags:
     - windows
@@ -412,7 +397,7 @@ binding-csharp-windows-x64:
   dependencies: []
 
 binding-csharp-windows-x86:
-  <<: *binding-build-files
+  extends: .binding-build-files
   stage: binding-build
   tags:
     - windows
@@ -433,7 +418,7 @@ binding-csharp-windows-x86:
 
 # Create ingescape editor for windows
 editor-windows-release-x86:
-  <<: *editor-build-files
+  extends: .editor-build-files
   stage: apps-build
   variables:
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
@@ -456,7 +441,7 @@ editor-windows-release-x86:
 
 # Create ingescape editor for windows
 editor-windows-release-x64:
-  <<: *editor-build-files
+  extends: .editor-build-files
   stage: apps-build
   variables:
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
@@ -479,7 +464,7 @@ editor-windows-release-x64:
 
 # Create ingescape assessments for windows
 assessments-windows-release-x86:
-  <<: *assessments-build-files
+  extends: .assessments-build-files
   stage: apps-build
   variables:
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
@@ -503,7 +488,7 @@ assessments-windows-release-x86:
 
 # Create ingescape assessments for windows
 assessments-windows-release-x64:
-  <<: *assessments-build-files
+  extends: .assessments-build-files
   stage: apps-build
   variables:
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
@@ -527,7 +512,7 @@ assessments-windows-release-x64:
 
 # Create ingescape expe for windows (x86)
 expe-windows-release-x86:
-  <<: *expe-build-files
+  extends: .expe-build-files
   stage: apps-build
   variables:
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
@@ -551,7 +536,7 @@ expe-windows-release-x86:
 
 # Create ingescape expe for windows (x64)
 expe-windows-release-x64:
-  <<: *expe-build-files
+  extends: .expe-build-files
   stage: apps-build
   variables:
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
@@ -575,7 +560,7 @@ expe-windows-release-x64:
 
 # Create runtime install for windows 32 bits
 lib-installer-runtime-windows-x86:
-  <<: *lib-build-files
+  extends: .lib-build-files
   stage: lib-installer
   variables:
     ARCH: "Release_x86"
@@ -593,7 +578,7 @@ lib-installer-runtime-windows-x86:
 
 # Create runtime install for windows 64 bits
 lib-installer-runtime-windows-x64:
-  <<: *lib-build-files
+  extends: .lib-build-files
   stage: lib-installer
   variables:
     ARCH: "Release_x64"
@@ -611,7 +596,7 @@ lib-installer-runtime-windows-x64:
 
 # Create runtime install for windows 32 bits (debug)
 lib-installer-debug-windows-x86:
-  <<: *lib-build-files
+  extends: .lib-build-files
   stage: lib-installer
   variables:
     ARCH: "Debug_x86"
@@ -629,7 +614,7 @@ lib-installer-debug-windows-x86:
 
 # Create runtime install for windows 64 bits (debug)
 lib-installer-debug-windows-x64:
-  <<: *lib-build-files
+  extends: .lib-build-files
   stage: lib-installer
   variables:
     ARCH: "Debug_x64"
@@ -647,7 +632,7 @@ lib-installer-debug-windows-x64:
 
 # Create runtime install for windows 64 bits
 binding-csharp-installer-windows-x64:
-  <<: *binding-build-files
+  extends: .binding-build-files
   stage: binding-installer
   variables:
     ARCH: "x64"
@@ -665,7 +650,7 @@ binding-csharp-installer-windows-x64:
 
 # Create runtime install for windows 32 bits
 binding-csharp-installer-windows-x86:
-  <<: *binding-build-files
+  extends: .binding-build-files
   stage: binding-installer
   variables:
     ARCH: "x86"
@@ -683,7 +668,7 @@ binding-csharp-installer-windows-x86:
 
 # Create editor install for windows 32 bits
 editor-installer-windows-x86:
-  <<: *editor-build-files
+  extends: .editor-build-files
   stage: apps-installer
   variables:
     ARCH: "Editor_x86"
@@ -700,7 +685,7 @@ editor-installer-windows-x86:
 
 # Create editor install for windows 64 bits
 editor-installer-windows-x64:
-  <<: *editor-build-files
+  extends: .editor-build-files
   stage: apps-installer
   variables:
     ARCH: "Editor_x64"
@@ -717,7 +702,7 @@ editor-installer-windows-x64:
 
 # Create assessments install for windows 32 bits
 assessments-installer-windows-x86:
-  <<: *assessments-build-files
+  extends: .assessments-build-files
   stage: apps-installer
   variables:
     ARCH: "Assessments_x86"
@@ -734,7 +719,7 @@ assessments-installer-windows-x86:
 
 # Create assessments install for windows 64 bits
 assessments-installer-windows-x64:
-  <<: *assessments-build-files
+  extends: .assessments-build-files
   stage: apps-installer
   variables:
     ARCH: "Assessments_x64"
@@ -751,7 +736,7 @@ assessments-installer-windows-x64:
 
 # Create expe install for windows 32 bits
 expe-installer-windows-x86:
-  <<: *expe-build-files
+  extends: .expe-build-files
   stage: apps-installer
   variables:
     ARCH: "Expe_x86"
@@ -768,7 +753,7 @@ expe-installer-windows-x86:
 
 # Create expe install for windows 64 bits
 expe-installer-windows-x64:
-  <<: *expe-build-files
+  extends: .expe-build-files
   stage: apps-installer
   variables:
     ARCH: "Expe_x64"
@@ -785,7 +770,7 @@ expe-installer-windows-x64:
 
 # Deploy ingescape in windows to be able to compile agents
 lib-deploy-windows:
-  <<: *lib-build-files
+  extends: .lib-build-files
   stage: lib-deploy
   tags:
     - windows
@@ -801,10 +786,14 @@ lib-deploy-windows:
     - lib-windows-release-x86
     - lib-windows-debug-x64
     - lib-windows-debug-x86
+  only:
+    refs:
+      - master
+      - stable
 
 # Deploy ingescape binding in windows to be able to compile agents
 binding-deploy-windows-release-x64:
-  <<: *binding-build-files
+  extends: .binding-build-files
   stage: binding-deploy
   variables:
     ARCH: "x64"
@@ -815,10 +804,14 @@ binding-deploy-windows-release-x64:
     - copy /y bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64\Release\netstandard2.0\IngescapeCSharp.dll %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64\
   dependencies:
     - binding-csharp-windows-x64
+  only:
+    refs:
+      - master
+      - stable
 
 # Deploy ingescape binding in windows to be able to compile agents
 binding-deploy-windows-release-x86:
-  <<: *binding-build-files
+  extends: .binding-build-files
   stage: binding-deploy
   variables:
     ARCH: "x86"
@@ -829,6 +822,10 @@ binding-deploy-windows-release-x86:
     - copy /y bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86\Release\netstandard2.0\IngescapeCSharp.dll %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86\
   dependencies:
     - binding-csharp-windows-x86
+  only:
+    refs:
+      - master
+      - stable
 
 # _      _
 #| |    (_)
@@ -839,7 +836,7 @@ binding-deploy-windows-release-x86:
 
 # Create ingescape library for linux (x64) from our custom libraries
 lib-build-linux-x64:
-  <<: *lib-build-files
+  extends: .lib-build-files
   stage: lib-build
   image: ingescape/debian-testing-compil
   tags:
@@ -865,7 +862,7 @@ lib-build-linux-x64:
 
 # Create ingescape library for Debian 9 (x86_64)
 lib-debian-9-release-x64:
-  <<: *lib-build-files
+  extends: .lib-build-files
   stage: lib-build
   tags:
     - docker
@@ -884,7 +881,7 @@ lib-debian-9-release-x64:
 
 # Create ingescape library for Debian 10 (x86_64)
 lib-debian-10-release-x64:
-  <<: *lib-build-files
+  extends: .lib-build-files
   stage: lib-build
   tags:
     - docker
@@ -903,7 +900,7 @@ lib-debian-10-release-x64:
 
 # Create ingescape library for CentOS 7 (x86_64)
 lib-centos-7-release-x64:
-  <<: *lib-build-files
+  extends: .lib-build-files
   stage: lib-build
   tags:
     - docker
@@ -922,7 +919,7 @@ lib-centos-7-release-x64:
 
 # Create ingescape library for linux (armv7/armhf)
 lib-linux-release-armhf:
-  <<: *lib-build-files
+  extends: .lib-build-files
   stage: lib-build
   tags:
     - docker
@@ -941,7 +938,7 @@ lib-linux-release-armhf:
 
 # Create ingescape library for Raspbian 9 (armv7/armhf)
 lib-raspbian-9-release-armhf:
-  <<: *lib-build-files
+  extends: .lib-build-files
   stage: lib-build
   tags:
     - docker
@@ -960,7 +957,7 @@ lib-raspbian-9-release-armhf:
 
 # Create ingescape library for Android (armv7a softfp)
 lib-android-release-armv7a-softfp:
-  <<: *lib-build-files
+  extends: .lib-build-files
   stage: lib-build
   tags:
     - docker
@@ -979,7 +976,7 @@ lib-android-release-armv7a-softfp:
 
 # Create library installer for linux 64 bits
 lib-installer-linux-x64:
-  <<: *lib-build-files
+  extends: .lib-build-files
   stage: lib-installer
   image: ingescape/debian-testing-compil
   tags:
@@ -1004,7 +1001,7 @@ lib-installer-linux-x64:
 
 # Create runtime install for linux 64 bits - Debian 9 (stretch)
 lib-installer-runtime-debian-9-x64:
-  <<: *lib-build-files
+  extends: .lib-build-files
   stage: lib-installer
   tags:
     - docker
@@ -1024,7 +1021,7 @@ lib-installer-runtime-debian-9-x64:
 
 # Create runtime install for linux 64 bits - Debian 10 (buster)
 lib-installer-runtime-debian-10-x64:
-  <<: *lib-build-files
+  extends: .lib-build-files
   stage: lib-installer
   tags:
     - docker
@@ -1044,7 +1041,7 @@ lib-installer-runtime-debian-10-x64:
 
 # Create runtime install for linux 64 bits - CentOS
 lib-installer-runtime-centos-x64:
-  <<: *lib-build-files
+  extends: .lib-build-files
   stage: lib-installer
   tags:
     - docker
@@ -1064,7 +1061,7 @@ lib-installer-runtime-centos-x64:
 
 # Create runtime install for linux ARMv7 (armhf) - Generic ZIP
 lib-installer-runtime-linux-armhf:
-  <<: *lib-build-files
+  extends: .lib-build-files
   stage: lib-installer
   tags:
     - docker
@@ -1084,7 +1081,7 @@ lib-installer-runtime-linux-armhf:
 
 # Create runtime install for linux ARMv7 (armhf) - Raspbian 9 (stretch)
 lib-installer-runtime-raspbian-9-armhf:
-  <<: *lib-build-files
+  extends: .lib-build-files
   stage: lib-installer
   tags:
     - docker
@@ -1104,7 +1101,7 @@ lib-installer-runtime-raspbian-9-armhf:
 
 # Create runtime install for Android (armv7a softfp) - Generic ZIP
 lib-installer-runtime-android-armv7a-softfp:
-  <<: *lib-build-files
+  extends: .lib-build-files
   stage: lib-installer
   tags:
     - docker
@@ -1121,7 +1118,7 @@ lib-installer-runtime-android-armv7a-softfp:
 
 # Deploy ingescape in linux to be able to compile agents
 lib-deploy-debian-9-release-x64:
-  <<: *lib-build-files
+  extends: .lib-build-files
   stage: lib-deploy
   tags:
     - docker
@@ -1131,10 +1128,14 @@ lib-deploy-debian-9-release-x64:
     - cp src/include/ingescape_private.h ~/builds/release/debian9/usr/local/include/ingescape/
   dependencies:
     - lib-debian-9-release-x64
+  only:
+    refs:
+      - master
+      - stable
 
 # Deploy ingescape in linux to be able to compile agents
 lib-deploy-debian-10-release-x64:
-  <<: *lib-build-files
+  extends: .lib-build-files
   stage: lib-deploy
   tags:
     - docker
@@ -1144,10 +1145,14 @@ lib-deploy-debian-10-release-x64:
     - cp src/include/ingescape_private.h ~/builds/release/debian10/usr/local/include/ingescape/
   dependencies:
     - lib-debian-10-release-x64
+  only:
+    refs:
+      - master
+      - stable
 
 # Deploy ingescape in linux to be able to compile agents
 lib-deploy-centos-7-release-x64:
-  <<: *lib-build-files
+  extends: .lib-build-files
   stage: lib-deploy
   tags:
     - docker
@@ -1157,10 +1162,14 @@ lib-deploy-centos-7-release-x64:
     - cp src/include/ingescape_private.h ~/builds/release/centos7/usr/local/include/ingescape/
   dependencies:
     - lib-centos-7-release-x64
+  only:
+    refs:
+      - master
+      - stable
 
 # Deploy ingescape in linux to be able to compile agents
 lib-deploy-linux-release-armhf:
-  <<: *lib-build-files
+  extends: .lib-build-files
   stage: lib-deploy
   tags:
     - docker
@@ -1170,6 +1179,10 @@ lib-deploy-linux-release-armhf:
     - cp src/include/ingescape_private.h ~/builds/release/armhf/usr/local/include/ingescape/
   dependencies:
     - lib-linux-release-armhf
+  only:
+    refs:
+      - master
+      - stable
 
 # _____       _ _
 #|  __ \     | (_)
@@ -1182,7 +1195,7 @@ lib-deploy-linux-release-armhf:
 
 # Deliver installers so they can be downloaded from the website
 lib-delivery-all:
-  <<: *lib-build-files
+  extends: .lib-build-files
   stage: lib-delivery
   tags:
     - docker
@@ -1260,10 +1273,14 @@ lib-delivery-all:
     - lib-installer-runtime-linux-armhf
     - lib-installer-runtime-raspbian-9-armhf
     - lib-installer-runtime-android-armv7a-softfp
+  only:
+    refs:
+      - master
+      - stable
 
 # Deliver installers so they can be downloaded from the website
 editor-delivery-all:
-  <<: *editor-build-files
+  extends: .editor-build-files
   stage: apps-delivery
   tags:
     - docker
@@ -1296,10 +1313,14 @@ editor-delivery-all:
     - editor-installer-macos
     - editor-installer-windows-x86
     - editor-installer-windows-x64
+  only:
+    refs:
+      - master
+      - stable
 
 # Deliver installers so they can be downloaded from the website
 assessments-delivery-all:
-  <<: *assessments-build-files
+  extends: .assessments-build-files
   stage: apps-delivery
   tags:
     - docker
@@ -1332,10 +1353,14 @@ assessments-delivery-all:
     - assessments-installer-macos
     - assessments-installer-windows-x86
     - assessments-installer-windows-x64
+  only:
+    refs:
+      - master
+      - stable
 
 # Deliver installers so they can be downloaded from the website
 expe-delivery-all:
-  <<: *expe-build-files
+  extends: .expe-build-files
   stage: apps-delivery
   tags:
     - docker
@@ -1368,11 +1393,15 @@ expe-delivery-all:
     - expe-installer-macos
     - expe-installer-windows-x86
     - expe-installer-windows-x64
+  only:
+    refs:
+      - master
+      - stable
 
 
 # Deliver installers so they can be downloaded from the website
 binding-delivery-all:
-  <<: *binding-build-files
+  extends: .binding-build-files
   stage: binding-delivery
   tags:
     - docker
@@ -1400,6 +1429,10 @@ binding-delivery-all:
   dependencies:
     - binding-csharp-installer-windows-x64
     - binding-csharp-installer-windows-x86
+  only:
+    refs:
+      - master
+      - stable
 
 # Deliver installers so they can be downloaded from the website
 lib-delivery-all-stable:
