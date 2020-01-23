@@ -873,14 +873,7 @@ void ExperimentationController::startToRecord()
         if ((currentSession != nullptr) && (currentSession->protocol() != nullptr))
         {
             ProtocolM* protocol = currentSession->protocol();
-
-            //QString currentPlatformName = protocol->platformFileName();
-
-            // Get the JSON of the current platform
-            QString platformFilePath = protocol->platformFileUrl().path();
-#ifdef WIN64
-    platformFilePath  = platformFilePath.remove(0,1);
-#endif
+            QString platformFilePath = protocol->platformFileUrl().toLocalFile();
 
             QFile jsonFile(platformFilePath);
             if (jsonFile.exists())
