@@ -182,11 +182,7 @@ void SessionController::_oncurrentSessionChanged(SessionM* previousSession, Sess
 
             if (protocol->platformFileUrl().isValid())
             {
-                QString platformFilePath = protocol->platformFileUrl().path();
-
-#ifdef WIN64
-    platformFilePath  = platformFilePath.remove(0,1);
-#endif
+                QString platformFilePath = protocol->platformFileUrl().toLocalFile();
 
                 QFile jsonFile(platformFilePath);
                 if (jsonFile.exists())

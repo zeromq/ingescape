@@ -125,6 +125,27 @@ void ExperimentationController::setcurrentExperimentation(ExperimentationM *valu
 }
 
 
+void ExperimentationController::setisSelectingSessions(bool value)
+{
+    if (_isSelectingSessions != value)
+    {
+        _isSelectingSessions = value;
+
+        if (!_isSelectingSessions)
+        {
+            // Clear the list of selected sessions
+            _selectedSessions.clear();
+
+            // Add all protocols and all subjects to reset filtered sessions list
+            addAllSubjectsToFilterSessions();
+            addAllProtocolsToFilterSessions();
+        }
+
+        Q_EMIT isSelectingSessionsChanged(value);
+    }
+}
+
+
 /**
  * @brief Create a new session for a subject and a protocol
  * @param subject
@@ -419,6 +440,9 @@ void ExperimentationController::_onCurrentExperimentationChanged(Experimentation
         _retrieveIndependentVariableValuesForSessionsInExperimentation(currentExperimentation);
 
         _sessionFilteredList.setSourceModel(_currentExperimentation->allSessions());
+
+        addAllProtocolsToFilterSessions();
+        addAllSubjectsToFilterSessions();
     }
 }
 
@@ -849,14 +873,7 @@ void ExperimentationController::startToRecord()
         if ((currentSession != nullptr) && (currentSession->protocol() != nullptr))
         {
             ProtocolM* protocol = currentSession->protocol();
-
-            //QString currentPlatformName = protocol->platformFileName();
-
-            // Get the JSON of the current platform
-            QString platformFilePath = protocol->platformFileUrl().path();
-#ifdef WIN64
-    platformFilePath  = platformFilePath.remove(0,1);
-#endif
+            QString platformFilePath = protocol->platformFileUrl().toLocalFile();
 
             QFile jsonFile(platformFilePath);
             if (jsonFile.exists())
@@ -1034,6 +1051,7 @@ void ExperimentationController::addAllProtocolsToFilterSessions(){
     // Update selected protocol names list
     setselectedProtocolNameListToFilter(tempProtocolNameList);
 
+    qDebug() << "GOOOO " << _selectedProtocolNameListToFilter.count();
     _updateFilters();
 }
 

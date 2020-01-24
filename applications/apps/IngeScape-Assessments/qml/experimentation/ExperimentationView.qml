@@ -543,8 +543,6 @@ Item {
                             onClicked: {
                                 //console.log("QML: Open the 'Export Sessions' mode ");
                                 if (rootItem.experimentationC) {
-                                    rootItem.experimentationC.addAllProtocolsToFilterSessions();
-                                    rootItem.experimentationC.addAllSubjectsToFilterSessions();
                                     rootItem.experimentationC.isSelectingSessions = ! rootItem.experimentationC.isSelectingSessions
                                 }
                             }
@@ -1054,7 +1052,7 @@ Item {
                 Behavior on color {
                     enabled: !rootItem.experimentationC.isRecorderON
                     ColorAnimation {
-                        duration: root._appearanceAnimationDuration
+                        duration: rootItem._appearanceAnimationDuration
                     }
                 }
 
@@ -1228,11 +1226,8 @@ Item {
                         spacing: 0
 
                         Repeater {
-                            model: rootItem.experimentationC && rootItem.experimentation
-                                   ? rootItem.experimentationC.isSelectingSessions ? rootItem.experimentationC.sessionFilteredList
-                                                                                   : rootItem.experimentation.allSessions
-                                   : null
-
+                            model: rootItem.experimentationC ? rootItem.experimentationC.sessionFilteredList
+                                                             : null
 
                             delegate: SessionInList {
                                 isSelectingSessionsToExport: rootItem.experimentationC && rootItem.experimentationC.isSelectingSessions && rootItem.experimentationC.isRecorderON
@@ -1270,11 +1265,11 @@ Item {
                                     if (rootItem.experimentationC)
                                     {
                                         if (isSelectedSession) {
-                                            //console.log("session " + modelM.name + " selected");
+                                            console.log("session " + modelM.name + " selected");
                                             rootItem.experimentationC.selectedSessions.insert(rootItem.experimentationC.selectedSessions.count, modelM);
                                         }
                                         else {
-                                            //console.log("session " + modelM.name + " UN-selected");
+                                            console.log("session " + modelM.name + " UN-selected");
                                             rootItem.experimentationC.selectedSessions.remove(modelM);
                                         }
                                     }

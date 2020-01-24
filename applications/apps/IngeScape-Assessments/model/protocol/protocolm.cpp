@@ -86,7 +86,7 @@ void ProtocolM::setplatformFileUrl(QUrl value)
             setplatformFileName(_platformFileUrl.fileName());
 
             // Update the hash table from an agent name to a (simplified) model of agent with its name and its outputs
-            _updateAgentsFromPlatformFilePath(_platformFileUrl.path());
+            _updateAgentsFromPlatformFilePath(_platformFileUrl.toLocalFile());
         }
         else
         {
@@ -276,9 +276,6 @@ void ProtocolM::deleteDependentVariable(DependentVariableM* variableToDelete)
  */
 void ProtocolM::_updateAgentsFromPlatformFilePath(QString platformFilePath)
 {
-#ifdef WIN64
-    platformFilePath  = platformFilePath.remove(0,1);
-#endif
     // Clear the hash table
     _hashFromAgentNameToSimplifiedAgent.deleteAllItems();
 

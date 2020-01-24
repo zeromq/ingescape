@@ -37,7 +37,7 @@ class ExperimentationController : public QObject
     I2_QML_PROPERTY_READONLY(bool, isRecorderON)
     I2_QML_PROPERTY_READONLY(bool, isRecording)
 
-    I2_QML_PROPERTY(bool, isSelectingSessions) // Mode "export sessions" in qml
+    I2_QML_PROPERTY_CUSTOM_SETTER(bool, isSelectingSessions) // Mode "export sessions" in qml
     I2_QOBJECT_LISTMODEL(SessionM, selectedSessions)
 
     Q_PROPERTY(AreSubjectAndProtocolInSessionFilter* sessionFilteredList READ sessionFilteredList CONSTANT) // List of all agents present in the current platform
