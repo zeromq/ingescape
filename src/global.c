@@ -807,6 +807,11 @@ int igs_observeLicense(igs_licenseCallback cb, void *myData){
     wrap->myData = myData;
     return igsAgent_observeLicense(globalAgent, global_observeLicenseCallback, wrap);
 }
+
+void igs_loadLicenseData(const void *data, size_t size){
+    initInternalAgentIfNeeded();
+    igsAgent_loadLicenseData(globalAgent, data, size);
+}
 #endif
 
 
@@ -814,6 +819,11 @@ int igs_observeLicense(igs_licenseCallback cb, void *myData){
 void igs_setPublishingPort(unsigned int port){
     initInternalAgentIfNeeded();
     igsAgent_setPublishingPort(globalAgent, port);
+}
+
+void igs_setLogStreamPort(unsigned int port){
+    initInternalAgentIfNeeded();
+    igsAgent_setLogStreamPort(globalAgent, port);
 }
 
 void igs_setDiscoveryInterval(unsigned int interval){

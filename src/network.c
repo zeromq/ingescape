@@ -1469,17 +1469,26 @@ initLoop (zsock_t *pipe, void *args){
     
     //start logger stream if needed
     if (agent->logInStream){
-        sprintf(endpoint, "tcp://%s:*", agent->loopElements->ipAddress);
-        agent->loopElements->logger = zsock_new_pub(endpoint);
-        zsock_set_sndhwm(agent->loopElements->logger, agent->network_hwmValue);
-        strncpy(endpoint, zsock_endpoint(agent->loopElements->logger), 256);
-        char *insert = endpoint + strlen(endpoint) - 1;
-        while (*insert != ':' && insert > endpoint) {
-            insert--;
+        if (agent->network_logStreamPort == 0){
+            sprintf(endpoint, "tcp://%s:*", agent->loopElements->ipAddress);
+        } else {
+            sprintf(endpoint, "tcp://%s:%d", agent->loopElements->ipAddress, agent->network_logStreamPort);
         }
-        bus_zyreLock();
-        zyre_set_header(agent->loopElements->node, "logger", "%s", insert + 1);
-        bus_zyreUnlock();
+        agent->loopElements->logger = zsock_new_pub(endpoint);
+        if (agent->loopElements->logger == NULL){
+            igsAgent_error(agent, "Could not create log stream socket (%s): Agent will interrupt immediately.", endpoint);
+            canContinue = false;
+        } else {
+            zsock_set_sndhwm(agent->loopElements->logger, agent->network_hwmValue);
+            strncpy(endpoint, zsock_endpoint(agent->loopElements->logger), 256);
+            char *insert = endpoint + strlen(endpoint) - 1;
+            while (*insert != ':' && insert > endpoint) {
+                insert--;
+            }
+            bus_zyreLock();
+            zyre_set_header(agent->loopElements->node, "logger", "%s", insert + 1);
+            bus_zyreUnlock();
+        }
     }
     
     //set other headers for agent
@@ -2467,6 +2476,14 @@ void igsAgent_setPublishingPort(igsAgent_t *agent, unsigned int port){
         return;
     }
     agent->network_publishingPort = port;
+}
+
+void igsAgent_setLogStreamPort(igsAgent_t *agent, unsigned int port){
+    if (agent->loopElements != NULL && agent->loopElements->logger != NULL){
+        igsAgent_error(agent, "agent is already started : stop it first to change its logger port");
+        return;
+    }
+    agent->network_logStreamPort = port;
 }
 
 #if defined __unix__ || defined __APPLE__ || defined __linux__

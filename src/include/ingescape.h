@@ -369,6 +369,10 @@ PUBLIC bool igs_checkLicenseForAgent(const char *agentId);
 //or number of agents or number of IOPs has been exceeded in demo mode
 PUBLIC int igs_observeLicense(igs_licenseCallback cb, void *myData);
     
+//This function loads a license in memory and overrides all provided
+//license files.
+PUBLIC void igs_loadLicenseData(const void *data, size_t size);
+
 #endif
     
 #ifdef __cplusplus

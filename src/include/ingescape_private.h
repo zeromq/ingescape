@@ -302,6 +302,7 @@ typedef struct _igsAgent_t {
     unsigned int network_discoveryInterval;
     unsigned int network_agentTimeout;
     unsigned int network_publishingPort;
+    unsigned int network_logStreamPort;
     subscriber_t *subscribers;
     zyreloopElements_t *loopElements;
     char *ipcFolderPath;
@@ -342,6 +343,8 @@ typedef struct _igsAgent_t {
     license_t *license;
     license_callback_t *licenseCallbacks;
     char *licensePath;
+    void *licenseData; //overrides licence files
+    size_t licenseDataSize;
 
     //performance
     size_t performanceMsgCounter;

@@ -28,6 +28,7 @@ extern "C" {
 //void igs_setBusEndpoint(const char *endpoint); //usefull only with gossip discovery - TODO
 //void igs_connectAgentOnEndpoint(const char *endpoint); //not officially supported in Zyre 2.0.x yet
 PUBLIC void igs_setPublishingPort(unsigned int port);
+PUBLIC void igs_setLogStreamPort(unsigned int port);
 PUBLIC void igs_setDiscoveryInterval(unsigned int interval); //in milliseconds
 PUBLIC void igs_setAgentTimeout(unsigned int duration); //in milliseconds
 

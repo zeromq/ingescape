@@ -197,10 +197,12 @@ PUBLIC void igsAgent_setLicensePath(igsAgent_t *agent, const char *path);
 PUBLIC char *igsAgent_getLicensePath(igsAgent_t *agent);
 PUBLIC bool igsAgent_checkLicense(igsAgent_t *agent, const char *agentId);
 PUBLIC int igsAgent_observeLicense(igsAgent_t *agent, igsAgent_licenseCallback cb, void *myData);
+PUBLIC void igsAgent_loadLicenseData(igsAgent_t *agent, const void *data, size_t size);
 #endif
 
 //advanced functions
 PUBLIC void igsAgent_setPublishingPort(igsAgent_t *agent, unsigned int port);
+PUBLIC void igsAgent_setLogStreamPort(igsAgent_t *agent, unsigned int port);
 PUBLIC void igsAgent_setDiscoveryInterval(igsAgent_t *agent, unsigned int interval); //in milliseconds
 PUBLIC void igsAgent_setAgentTimeout(igsAgent_t *agent, unsigned int duration); //in milliseconds
 PUBLIC void igsAgent_performanceCheck(igsAgent_t *agent, const char *peerId, size_t msgSize, size_t nbOfMsg);
