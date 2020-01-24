@@ -289,6 +289,7 @@ AssessmentsPopupBase {
             style: IngeScapeAssessmentsComboboxStyle {
                 frameVisible: false
                 listBackgroundColorIdle: IngeScapeTheme.veryLightGreyColor
+                backgroundColorIdle: IngeScapeTheme.veryLightGreyColor
             }
             scrollViewStyle: IngeScapeAssessmentsScrollViewStyle {
                 scrollBarSize: 4
@@ -344,6 +345,7 @@ AssessmentsPopupBase {
             style: IngeScapeAssessmentsComboboxStyle {
                 frameVisible: false
                 listBackgroundColorIdle: IngeScapeTheme.veryLightGreyColor
+                backgroundColorIdle: IngeScapeTheme.veryLightGreyColor
             }
             scrollViewStyle: IngeScapeAssessmentsScrollViewStyle {
                 scrollBarSize: 4
