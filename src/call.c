@@ -333,73 +333,75 @@ int igsAgent_sendCall(igsAgent_t *agent, const char *agentNameOrUUID, const char
     bool found = false;
     HASH_ITER(hh, agent->zyreAgents, agt, tmp){
         if (strcmp(agt->name, agentNameOrUUID) == 0 || strcmp(agt->peerId, agentNameOrUUID) == 0){
-            found = true;
             //we found a matching agent
-            igs_call_t *call = NULL;
+            igs_callArgument_t *arg = NULL;
             if (agt->subscriber == NULL || agt->subscriber->definition == NULL){
-                igsAgent_error(agent, "subscriber or definition is empty for %s (cannot verify call)", agentNameOrUUID);
-                break;
-            }
-            HASH_FIND_STR(agt->subscriber->definition->calls_table, callName, call);
-            if (call != NULL){
-                igs_callArgument_t *arg = NULL;
-                zmsg_t *msg = zmsg_new();
-                zmsg_addstr(msg, "CALL");
-                zmsg_addstr(msg, callName);
-                
-                size_t nbArguments = 0;
-                LL_COUNT(*list, arg, nbArguments);
-                size_t definedNbArguments = 0;
-                LL_COUNT(call->arguments, arg, definedNbArguments);
-                if (nbArguments != definedNbArguments){
-                    igsAgent_error(agent, "passed number of arguments is not correct (received: %zu / expected: %zu)",
-                              nbArguments, definedNbArguments);
-                    break;
-                }
-                LL_FOREACH(*list, arg){
-                    zframe_t *frame = NULL;
-                    switch (arg->type) {
-                        case IGS_BOOL_T:
-                            frame = zframe_new(&arg->b, sizeof(int));
-                            break;
-                        case IGS_INTEGER_T:
-                            frame = zframe_new(&arg->i, sizeof(int));
-                            break;
-                        case IGS_DOUBLE_T:
-                            frame = zframe_new(&arg->d, sizeof(double));
-                            break;
-                        case IGS_STRING_T:{
-                            if (arg->c != NULL){
-                                frame = zframe_new(arg->c, strlen(arg->c)+1);
-                            }else{
-                                frame = zframe_new(NULL, 0);
-                            }
-                            break;
-                        }
-                            
-                        case IGS_DATA_T:
-                            frame = zframe_new(arg->data, arg->size);
-                            break;
-                            
-                        default:
-                            break;
-                    }
-                    if (frame != NULL){
-                        zmsg_add(msg, frame);
-                    }
-                }
-                bus_zyreLock();
-                zyre_shouts(agent->loopElements->node, agent->callsChannel, "%s to %s", callName, agentNameOrUUID);
-                zyre_whisper(agent->loopElements->node, agt->peerId, &msg);
-                bus_zyreUnlock();
-                igsAgent_debug(agent, "sent call %s to %s", callName, agentNameOrUUID);
+                igsAgent_warn(agent, "definition is unknown for %s : cannot verify call before sending it", agentNameOrUUID);
+                //continue; //commented to allow sending the message anyway
             }else{
-                igsAgent_error(agent, "could not find call named %s for %s", callName, agentNameOrUUID);
+                igs_call_t *call = NULL;
+                HASH_FIND_STR(agt->subscriber->definition->calls_table, callName, call);
+                if (call != NULL){
+                    size_t nbArguments = 0;
+                    LL_COUNT(*list, arg, nbArguments);
+                    size_t definedNbArguments = 0;
+                    LL_COUNT(call->arguments, arg, definedNbArguments);
+                    if (nbArguments != definedNbArguments){
+                        igsAgent_error(agent, "passed number of arguments is not correct (received: %zu / expected: %zu) : call will not be sent",
+                                  nbArguments, definedNbArguments);
+                        continue;
+                    }
+                }else{
+                    igsAgent_error(agent, "could not find call named %s for %s  : call will not be sent", callName, agentNameOrUUID);
+                    continue;
+                }
             }
+            found = true;
+            zmsg_t *msg = zmsg_new();
+            zmsg_addstr(msg, "CALL");
+            zmsg_addstr(msg, callName);
+            LL_FOREACH(*list, arg){
+                zframe_t *frame = NULL;
+                switch (arg->type) {
+                    case IGS_BOOL_T:
+                        frame = zframe_new(&arg->b, sizeof(int));
+                        break;
+                    case IGS_INTEGER_T:
+                        frame = zframe_new(&arg->i, sizeof(int));
+                        break;
+                    case IGS_DOUBLE_T:
+                        frame = zframe_new(&arg->d, sizeof(double));
+                        break;
+                    case IGS_STRING_T:{
+                        if (arg->c != NULL){
+                            frame = zframe_new(arg->c, strlen(arg->c)+1);
+                        }else{
+                            frame = zframe_new(NULL, 0);
+                        }
+                        break;
+                    }
+                        
+                    case IGS_DATA_T:
+                        frame = zframe_new(arg->data, arg->size);
+                        break;
+                        
+                    default:
+                        break;
+                }
+                if (frame != NULL){
+                    zmsg_add(msg, frame);
+                }
+            }
+            bus_zyreLock();
+            zyre_shouts(agent->loopElements->node, agent->callsChannel, "%s to %s", callName, agentNameOrUUID);
+            zyre_whisper(agent->loopElements->node, agt->peerId, &msg);
+            bus_zyreUnlock();
+            igsAgent_debug(agent, "sent call %s to %s", callName, agentNameOrUUID);
+            
         }
     }
     if (!found){
-        igsAgent_error(agent, "could not find agent name or UUID: %s", agentNameOrUUID);
+        igsAgent_error(agent, "could not find an agent with name or UUID : %s", agentNameOrUUID);
     }
     call_freeCallArguments(*list);
     *list = NULL;
