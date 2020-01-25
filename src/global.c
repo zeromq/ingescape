@@ -835,10 +835,20 @@ void igs_setAgentTimeout(unsigned int duration){
     initInternalAgentIfNeeded();
     igsAgent_setAgentTimeout(globalAgent, duration);
 }
- //in milliseconds
+
 void igs_performanceCheck(const char *peerId, size_t msgSize, size_t nbOfMsg){
     initInternalAgentIfNeeded();
     igsAgent_performanceCheck(globalAgent, peerId, msgSize, nbOfMsg);
+}
+
+int igs_timerStart(size_t delay, size_t times, igs_timerCallback cb, void *myData){
+    initInternalAgentIfNeeded();
+    return igsAgent_timerStart(globalAgent, delay, times, cb, myData);
+}
+
+void igs_timerStop(int timerId){
+    initInternalAgentIfNeeded();
+    igsAgent_timerStop(globalAgent, timerId);
 }
 
 void igs_setHighWaterMarks(int hwmValue){

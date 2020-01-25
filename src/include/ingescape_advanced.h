@@ -32,7 +32,16 @@ PUBLIC void igs_setLogStreamPort(unsigned int port);
 PUBLIC void igs_setDiscoveryInterval(unsigned int interval); //in milliseconds
 PUBLIC void igs_setAgentTimeout(unsigned int duration); //in milliseconds
 
+//sends number of messages with defiend size and displays performance
+//information when finished (information displayed as INFO-evel log)
 PUBLIC void igs_performanceCheck(const char *peerId, size_t msgSize, size_t nbOfMsg);
+
+//Timers can be created to call code a certain number of times,
+//each time after a certain delay. 0 times means repeating forever.
+//Timers must be created after starting an agent.
+typedef void (igs_timerCallback) (int timerId, void *myData);
+PUBLIC int igs_timerStart(size_t delay, size_t times, igs_timerCallback cb, void *myData); //returns timer id or -1 if error
+PUBLIC void igs_timerStop(int timerId);
 
 //Set high water marks (HWM) for the publish/subscribe sockets.
 //Setting HWM to 0 means that they are disabled.

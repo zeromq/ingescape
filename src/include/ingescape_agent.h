@@ -206,6 +206,8 @@ PUBLIC void igsAgent_setLogStreamPort(igsAgent_t *agent, unsigned int port);
 PUBLIC void igsAgent_setDiscoveryInterval(igsAgent_t *agent, unsigned int interval); //in milliseconds
 PUBLIC void igsAgent_setAgentTimeout(igsAgent_t *agent, unsigned int duration); //in milliseconds
 PUBLIC void igsAgent_performanceCheck(igsAgent_t *agent, const char *peerId, size_t msgSize, size_t nbOfMsg);
+PUBLIC int igsAgent_timerStart(igsAgent_t *agent, size_t delay, size_t times, igs_timerCallback cb, void *myData); //returns timer id
+PUBLIC void igsAgent_timerStop(igsAgent_t *agent, int timerId);
 PUBLIC void igsAgent_setHighWaterMarks(igsAgent_t *agent, int hwmValue);
 
 PUBLIC void igsAgent_monitoringEnable(igsAgent_t *agent, unsigned int period); //in milliseconds

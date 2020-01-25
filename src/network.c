@@ -1695,6 +1695,13 @@ initLoop (zsock_t *pipe, void *args){
     
     zloop_destroy (&agent->loopElements->loop);
     assert (agent->loopElements->loop == NULL);
+    
+    timer_t *current_timer, *tmp_timer;
+    HASH_ITER(hh, agent->loopElements->timers, current_timer, tmp_timer){
+        HASH_DEL(agent->loopElements->timers, current_timer);
+        free(current_timer);
+    }
+    
     //call registered interruption callbacks
     forcedStopCalback_t *cb = NULL;
     if (agent->forcedStop){
@@ -1702,6 +1709,7 @@ initLoop (zsock_t *pipe, void *args){
             cb->callback_ptr(agent, cb->myData);
         }
     }
+    
     if (agent->forcedStop){
         agent->isInterrupted = true;
         //in case of forced stop, we send SIGINT to our process so
@@ -1805,6 +1813,12 @@ int network_publishOutput (igsAgent_t *agent, const agent_iop_t *iop){
     }
     model_readWriteUnlock();
     return result;
+}
+
+int network_timerCallback (zloop_t *loop, int timer_id, void *arg){
+    timer_t *timer = (timer_t *)arg;
+    timer->cb(timer->timerId, timer->myData);
+    return 1;
 }
 
 int igsAgent_observeBus(igsAgent_t *agent, igsAgent_BusMessageIncoming cb, void *myData){
@@ -2542,4 +2556,37 @@ void igsAgent_setHighWaterMarks(igsAgent_t *agent, int hwmValue){
         }
     }
     agent->network_hwmValue = hwmValue;
+}
+
+int igsAgent_timerStart(igsAgent_t *agent, size_t delay, size_t times, igs_timerCallback cb, void *myData){
+    if (agent->loopElements == NULL || agent->loopElements->loop == NULL){
+        igs_error("agent must be started before creating a timer");
+        return -1;
+    }
+    if (cb == NULL){
+        igs_error("callback function cannot be NULL");
+        return -1;
+    }
+    timer_t *timer = calloc(1, sizeof(timer_t));
+    timer->cb = cb;
+    timer->myData = myData;
+    timer->timerId = zloop_timer(agent->loopElements->loop, delay, times, network_timerCallback, timer);
+    HASH_ADD_INT(agent->loopElements->timers, timerId, timer);
+    return timer->timerId;
+}
+
+void igsAgent_timerStop(igsAgent_t *agent, int timerId){
+    if (agent->loopElements->loop == NULL){
+        igs_error("agent must be started to destroy a timer");
+        return;
+    }
+    timer_t *timer = NULL;
+    HASH_FIND_INT(agent->loopElements->timers, &timerId, timer);
+    if (timer != NULL){
+        zloop_timer_end(agent->loopElements->loop, timerId);
+        HASH_DEL(agent->loopElements->timers, timer);
+        free(timer);
+    }else{
+        igs_error("could not find timer with id %d", timerId);
+    }
 }
