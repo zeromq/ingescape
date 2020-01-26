@@ -313,9 +313,6 @@ typedef struct _igsAgent_t {
     unsigned int network_logStreamPort;
     subscriber_t *subscribers;
     zyreloopElements_t *loopElements;
-    #if defined __unix__ || defined __APPLE__ || defined __linux__
-    pid_t pid;
-    #endif
     char *ipcFolderPath;
     char *ipcFullPath;
     char *ipcEndpoint;

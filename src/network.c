@@ -1438,7 +1438,7 @@ static void runLoop (zsock_t *mypipe, void *args){
         //that it can be trapped by main thread for a proper stop
         #if defined __unix__ || defined __APPLE__ || defined __linux__
         igsAgent_debug(agent, "triggering SIGINT");
-        kill(agent->pid, SIGINT);
+        kill(agent->loopElements->processId, SIGINT);
         #endif
         //TODO : do that for windows also
     }
@@ -1579,11 +1579,11 @@ void initLoop (igsAgent_t *agent){
         bus_zyreUnlock();
     }
 #elif (defined WIN32 || defined _WIN32)
-    ipcEndpoint = strdup("tcp://127.0.0.1:*");
-    zsock_t *ipcPublisher = agent->loopElements->ipcPublisher = zsock_new_pub(ipcEndpoint);
+    agent->ipcEndpoint = strdup("tcp://127.0.0.1:*");
+    zsock_t *ipcPublisher = agent->loopElements->ipcPublisher = zsock_new_pub(agent->ipcEndpoint);
     zsock_set_sndhwm(agent->loopElements->ipcPublisher, agent->network_hwmValue);
     if (ipcPublisher == NULL){
-        igsAgent_warn(agent, "Could not create loopback publishing socket (%s)", ipcEndpoint);
+        igsAgent_warn(agent, "Could not create loopback publishing socket (%s)", agent->ipcEndpoint);
     }else{
         bus_zyreLock();
         zyre_set_header(agent->loopElements->node, "loopback", "%s", zsock_endpoint(ipcPublisher));
@@ -1638,9 +1638,9 @@ void initLoop (igsAgent_t *agent){
 
 #if defined __unix__ || defined __APPLE__ || defined __linux__
     ssize_t ret;
-    agent->pid = getpid();
+    agent->loopElements->processId = getpid();
     bus_zyreLock();
-    zyre_set_header(agent->loopElements->node, "pid", "%i", agent->pid);
+    zyre_set_header(agent->loopElements->node, "pid", "%i", agent->loopElements->processId);
     bus_zyreUnlock();
     
     if (strlen(agent->commandLine) == 0){
@@ -1651,7 +1651,7 @@ void initLoop (igsAgent_t *agent){
         ret = 1;
 #elif TARGET_OS_OSX
         char pathbuf[PROC_PIDPATHINFO_MAXSIZE];
-        ret = proc_pidpath (agent->pid, pathbuf, sizeof(pathbuf));
+        ret = proc_pidpath (agent->loopElements->processId, pathbuf, sizeof(pathbuf));
 #endif
 #else
         char pathbuf[4*1024];
@@ -1659,9 +1659,9 @@ void initLoop (igsAgent_t *agent){
         ret = readlink("/proc/self/exe", pathbuf, sizeof(pathbuf));
 #endif
         if ( ret <= 0 ) {
-            igsAgent_error(agent, "PID %d: proc_pidpath () - %s", agent->pid, strerror(errno));
+            igsAgent_error(agent, "PID %d: proc_pidpath () - %s", agent->loopElements->processId, strerror(errno));
         } else {
-            igsAgent_debug(agent, "proc %d: %s", agent->pid, pathbuf);
+            igsAgent_debug(agent, "proc %d: %s", agent->loopElements->processId, pathbuf);
         }
         bus_zyreLock();
         zyre_set_header(agent->loopElements->node, "commandline", "%s", pathbuf);
@@ -1699,11 +1699,11 @@ void initLoop (igsAgent_t *agent){
         bus_zyreUnlock();
     }
     DWORD pid = GetCurrentProcessId();
+    agent->loopElements->processId = (int)pid;
     bus_zyreLock();
     zyre_set_header(agent->loopElements->node, "pid", "%i", (int)pid);
     bus_zyreUnlock();
 #endif
-    agent->loopElements->processId = (int)(agent->pid);
 
 
     char hostname[1024];
