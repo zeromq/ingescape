@@ -1307,10 +1307,147 @@ int triggerMappingUpdate(zloop_t *loop, int timer_id, void *arg){
     return 0;
 }
 
-static void
-initLoop (zsock_t *pipe, void *args){
-    network_Lock();
+int unlockAfterStartingLoop(zloop_t *loop, int timer_id, void *arg){
+    //igsAgent_t *agent = (igsAgent_t *)arg;
+    //igsAgent_debugg(agent, "unlocking after loop has started");
+    network_Unlock();
+    return 0;
+}
+
+static void runLoop (zsock_t *mypipe, void *args){
     igsAgent_t *agent = (igsAgent_t *)args;
+    
+    //start zyre now that everything is set
+    bus_zyreLock();
+    int zyreStartRes = zyre_start (agent->loopElements->node);
+    bus_zyreUnlock();
+    if (zyreStartRes == -1){
+        igsAgent_error(agent, "Could not start bus node : Agent will interrupt immediately.");
+        return;
+    }
+    
+    zmq_pollitem_t zpipePollItem;
+    zmq_pollitem_t zyrePollItem;
+
+    //main zmq socket (i.e. main thread)
+    void *zpipe = zsock_resolve(mypipe);
+    if (zpipe == NULL){
+        igsAgent_error(agent, "Could not get the pipe descriptor to the main thread for polling : Agent will interrupt immediately.");
+        return;
+    }
+    zpipePollItem.socket = zpipe;
+    zpipePollItem.fd = 0;
+    zpipePollItem.events = ZMQ_POLLIN;
+    zpipePollItem.revents = 0;
+
+    //zyre socket
+    void *zsock = zsock_resolve(zyre_socket (agent->loopElements->node));
+    if (zsock == NULL){
+        igsAgent_error(agent, "Could not get the bus socket for polling : Agent will interrupt immediately.");
+        return;
+    }
+    zyrePollItem.socket = zsock;
+    zyrePollItem.fd = 0;
+    zyrePollItem.events = ZMQ_POLLIN;
+    zyrePollItem.revents = 0;
+
+    agent->loopElements->loop = zloop_new ();
+    assert (agent->loopElements->loop);
+    zloop_set_verbose (agent->loopElements->loop, false);
+
+    zloop_poller (agent->loopElements->loop, &zpipePollItem, manageParent, agent);
+    zloop_poller_set_tolerant(agent->loopElements->loop, &zpipePollItem);
+    zloop_poller (agent->loopElements->loop, &zyrePollItem, manageBusIncoming, agent);
+    zloop_poller_set_tolerant(agent->loopElements->loop, &zyrePollItem);
+    
+    zloop_timer(agent->loopElements->loop, 1000, 0, triggerDefinitionUpdate, agent);
+    zloop_timer(agent->loopElements->loop, 1000, 0, triggerMappingUpdate, agent);
+    zloop_timer(agent->loopElements->loop, 0, 1, unlockAfterStartingLoop, agent);
+    
+#if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
+    if (agent->license != NULL && !agent->license->isLicenseValid){
+        igs_license("License is not valid : starting timer for demonstration mode (%d seconds)...", MAX_EXEC_DURATION_DURING_EVAL);
+        zloop_timer(agent->loopElements->loop, MAX_EXEC_DURATION_DURING_EVAL * 1000, 0, triggerLicenseStop, agent);
+    }
+#endif
+    
+    zsock_signal (mypipe, 0);
+    igsAgent_debug(agent, "loop starting");
+    zloop_start (agent->loopElements->loop); //returns when one of the pollers returns -1
+    
+    network_Lock();
+    igsAgent_debug(agent, "loop stopping...");
+
+    //clean
+    zyreAgent_t *zagent, *tmpa;
+    HASH_ITER(hh, agent->zyreAgents, zagent, tmpa){
+        HASH_DEL(agent->zyreAgents, zagent);
+        free(zagent);
+    }
+    subscriber_t *s, *tmps;
+    HASH_ITER(hh, agent->subscribers, s, tmps) {
+        network_cleanAndFreeSubscriber(agent, s);
+    }
+    bus_zyreLock();
+    zyre_stop (agent->loopElements->node);
+    bus_zyreUnlock();
+    zclock_sleep (100);
+    zyre_destroy (&agent->loopElements->node);
+    zsock_destroy(&agent->loopElements->publisher);
+    if (agent->loopElements->ipcPublisher != NULL){
+        zsock_destroy(&agent->loopElements->ipcPublisher);
+#if defined __unix__ || defined __APPLE__ || defined __linux__
+        if (agent->ipcFullPath != NULL){
+            zsys_file_delete(agent->ipcFullPath); //destroy ipcPath in file system
+            //NB: ipcPath is based on peer id which is unique. It will never be used again.
+            free(agent->ipcFullPath);
+            agent->ipcFullPath = NULL;
+        }
+#endif
+    }
+    if (agent->loopElements->inprocPublisher != NULL){
+        zsock_destroy(&agent->loopElements->inprocPublisher);
+    }
+    free(agent->ipcEndpoint);
+    agent->ipcEndpoint = NULL;
+    
+    if (agent->loopElements->logger != NULL){
+        zsock_destroy(&agent->loopElements->logger);
+    }
+    
+    zloop_destroy (&agent->loopElements->loop);
+    assert (agent->loopElements->loop == NULL);
+    
+    timer_t *current_timer, *tmp_timer;
+    HASH_ITER(hh, agent->loopElements->timers, current_timer, tmp_timer){
+        HASH_DEL(agent->loopElements->timers, current_timer);
+        free(current_timer);
+    }
+    
+    //call registered interruption callbacks
+    forcedStopCalback_t *cb = NULL;
+    if (agent->forcedStop){
+        DL_FOREACH(agent->forcedStopCalbacks, cb){
+            cb->callback_ptr(agent, cb->myData);
+        }
+    }
+    
+    if (agent->forcedStop){
+        agent->isInterrupted = true;
+        //in case of forced stop, we send SIGINT to our process so
+        //that it can be trapped by main thread for a proper stop
+        #if defined __unix__ || defined __APPLE__ || defined __linux__
+        igsAgent_debug(agent, "triggering SIGINT");
+        kill(agent->pid, SIGINT);
+        #endif
+        //TODO : do that for windows also
+    }
+    igsAgent_debug(agent, "loop stopped");
+    network_Unlock();
+}
+
+void initLoop (igsAgent_t *agent){
+    network_Lock();
     igsAgent_debug(agent, "loop init");
     
 #if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
@@ -1363,6 +1500,11 @@ initLoop (zsock_t *pipe, void *args){
     zyre_set_expired_timeout(agent->loopElements->node, agent->network_agentTimeout);
     bus_zyreUnlock();
     
+    //join ingescape private channel
+    bus_zyreLock();
+    zyre_join(agent->loopElements->node, CHANNEL);
+    bus_zyreUnlock();
+    
     //create channel for replay
     snprintf(agent->replayChannel, MAX_AGENT_NAME_LENGTH + 15, "%s-IGS-REPLAY", agent->agentName);
     bus_zyreLock();
@@ -1413,9 +1555,7 @@ initLoop (zsock_t *pipe, void *args){
     }
 
     //start ipc publisher
-    char *ipcEndpoint = NULL;
 #if defined __unix__ || defined __APPLE__ || defined __linux__
-    char *ipcFullPath = NULL;
     if (agent->ipcFolderPath == NULL){
         agent->ipcFolderPath = strdup(DEFAULT_IPC_PATH);
     }
@@ -1424,18 +1564,18 @@ initLoop (zsock_t *pipe, void *args){
         igsAgent_warn(agent, "Expected IPC directory %s does not exist : create it to remove this warning", agent->ipcFolderPath);
     }
     bus_zyreLock();
-    ipcFullPath = calloc(1, strlen(agent->ipcFolderPath)+strlen(zyre_uuid(agent->loopElements->node))+2);
-    sprintf(ipcFullPath, "%s/%s", agent->ipcFolderPath, zyre_uuid(agent->loopElements->node));
-    ipcEndpoint = calloc(1, strlen(agent->ipcFolderPath)+strlen(zyre_uuid(agent->loopElements->node))+8);
-    sprintf(ipcEndpoint, "ipc://%s/%s", agent->ipcFolderPath, zyre_uuid(agent->loopElements->node));
+    agent->ipcFullPath = calloc(1, strlen(agent->ipcFolderPath)+strlen(zyre_uuid(agent->loopElements->node))+2);
+    sprintf(agent->ipcFullPath, "%s/%s", agent->ipcFolderPath, zyre_uuid(agent->loopElements->node));
+    agent->ipcEndpoint = calloc(1, strlen(agent->ipcFolderPath)+strlen(zyre_uuid(agent->loopElements->node))+8);
+    sprintf(agent->ipcEndpoint, "ipc://%s/%s", agent->ipcFolderPath, zyre_uuid(agent->loopElements->node));
     bus_zyreUnlock();
-    zsock_t *ipcPublisher = agent->loopElements->ipcPublisher = zsock_new_pub(ipcEndpoint);
+    zsock_t *ipcPublisher = agent->loopElements->ipcPublisher = zsock_new_pub(agent->ipcEndpoint);
     if (ipcPublisher == NULL){
-        igsAgent_warn(agent, "Could not create IPC publishing socket (%s)", ipcEndpoint);
+        igsAgent_warn(agent, "Could not create IPC publishing socket (%s)", agent->ipcEndpoint);
     }else{
         zsock_set_sndhwm(agent->loopElements->ipcPublisher, agent->network_hwmValue);
         bus_zyreLock();
-        zyre_set_header(agent->loopElements->node, "ipc", "%s", ipcEndpoint);
+        zyre_set_header(agent->loopElements->node, "ipc", "%s", agent->ipcEndpoint);
         bus_zyreUnlock();
     }
 #elif (defined WIN32 || defined _WIN32)
@@ -1498,10 +1638,9 @@ initLoop (zsock_t *pipe, void *args){
 
 #if defined __unix__ || defined __APPLE__ || defined __linux__
     ssize_t ret;
-    pid_t pid;
-    pid = getpid();
+    agent->pid = getpid();
     bus_zyreLock();
-    zyre_set_header(agent->loopElements->node, "pid", "%i", pid);
+    zyre_set_header(agent->loopElements->node, "pid", "%i", agent->pid);
     bus_zyreUnlock();
     
     if (strlen(agent->commandLine) == 0){
@@ -1512,7 +1651,7 @@ initLoop (zsock_t *pipe, void *args){
         ret = 1;
 #elif TARGET_OS_OSX
         char pathbuf[PROC_PIDPATHINFO_MAXSIZE];
-        ret = proc_pidpath (pid, pathbuf, sizeof(pathbuf));
+        ret = proc_pidpath (agent->pid, pathbuf, sizeof(pathbuf));
 #endif
 #else
         char pathbuf[4*1024];
@@ -1520,9 +1659,9 @@ initLoop (zsock_t *pipe, void *args){
         ret = readlink("/proc/self/exe", pathbuf, sizeof(pathbuf));
 #endif
         if ( ret <= 0 ) {
-            igsAgent_error(agent, "PID %d: proc_pidpath () - %s", pid, strerror(errno));
+            igsAgent_error(agent, "PID %d: proc_pidpath () - %s", agent->pid, strerror(errno));
         } else {
-            igsAgent_debug(agent, "proc %d: %s", pid, pathbuf);
+            igsAgent_debug(agent, "proc %d: %s", agent->pid, pathbuf);
         }
         bus_zyreLock();
         zyre_set_header(agent->loopElements->node, "commandline", "%s", pathbuf);
@@ -1564,7 +1703,7 @@ initLoop (zsock_t *pipe, void *args){
     zyre_set_header(agent->loopElements->node, "pid", "%i", (int)pid);
     bus_zyreUnlock();
 #endif
-    agent->loopElements->processId = (int)pid;
+    agent->loopElements->processId = (int)(agent->pid);
 
 
     char hostname[1024];
@@ -1592,136 +1731,11 @@ initLoop (zsock_t *pipe, void *args){
 //    }
 //    freeaddrinfo(info);
     
-    //finally start zyre now that everything is set
-    bus_zyreLock();
-    int zyreStartRes = zyre_start (agent->loopElements->node);
-    bus_zyreUnlock();
-    if (zyreStartRes == -1){
-        igsAgent_error(agent, "Could not start bus node : Agent will interrupt immediately.");
-        canContinue = false;
-    }
-    bus_zyreLock();
-    zyre_join(agent->loopElements->node, CHANNEL);
-    bus_zyreUnlock();
-    zsock_signal (pipe, 0); //notify main thread that we are ready
-    
-    zmq_pollitem_t zpipePollItem;
-    zmq_pollitem_t zyrePollItem;
-
-    //main zmq socket (i.e. main thread)
-    void *zpipe = zsock_resolve(pipe);
-    if (zpipe == NULL){
-        igsAgent_error(agent, "Could not get the pipe descriptor to the main thread for polling : Agent will interrupt immediately.");
-        canContinue = false;
-    }
-    zpipePollItem.socket = zpipe;
-    zpipePollItem.fd = 0;
-    zpipePollItem.events = ZMQ_POLLIN;
-    zpipePollItem.revents = 0;
-
-    //zyre socket
-    void *zsock = zsock_resolve(zyre_socket (agent->loopElements->node));
-    if (zsock == NULL){
-        igsAgent_error(agent, "Could not get the bus socket for polling : Agent will interrupt immediately.");
-        canContinue = false;
-    }
-    zyrePollItem.socket = zsock;
-    zyrePollItem.fd = 0;
-    zyrePollItem.events = ZMQ_POLLIN;
-    zyrePollItem.revents = 0;
-
-    agent->loopElements->loop = zloop_new ();
-    assert (agent->loopElements->loop);
-    zloop_set_verbose (agent->loopElements->loop, false);
-
-    zloop_poller (agent->loopElements->loop, &zpipePollItem, manageParent, agent);
-    zloop_poller_set_tolerant(agent->loopElements->loop, &zpipePollItem);
-    zloop_poller (agent->loopElements->loop, &zyrePollItem, manageBusIncoming, agent);
-    zloop_poller_set_tolerant(agent->loopElements->loop, &zyrePollItem);
-    
-    zloop_timer(agent->loopElements->loop, 1000, 0, triggerDefinitionUpdate, agent);
-    zloop_timer(agent->loopElements->loop, 1000, 0, triggerMappingUpdate, agent);
-    
-#if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
-    if (agent->license != NULL && !agent->license->isLicenseValid){
-        igs_license("License is not valid : starting timer for demonstration mode (%d seconds)...", MAX_EXEC_DURATION_DURING_EVAL);
-        zloop_timer(agent->loopElements->loop, MAX_EXEC_DURATION_DURING_EVAL * 1000, 0, triggerLicenseStop, agent);
-    }
-#endif
-    igsAgent_debug(agent, "loop starting");
-    network_Unlock();
-
     if (canContinue){
-        zloop_start (agent->loopElements->loop); //start returns when one of the pollers returns -1
+        agent->loopElements->agentActor = zactor_new (runLoop, agent);
+    }else{
+        network_Unlock();
     }
-    
-    network_Lock();
-    igsAgent_debug(agent, "loop stopping...");
-
-    //clean
-    zyreAgent_t *zagent, *tmpa;
-    HASH_ITER(hh, agent->zyreAgents, zagent, tmpa){
-        HASH_DEL(agent->zyreAgents, zagent);
-        free(zagent);
-    }
-    subscriber_t *s, *tmps;
-    HASH_ITER(hh, agent->subscribers, s, tmps) {
-        network_cleanAndFreeSubscriber(agent, s);
-    }
-    bus_zyreLock();
-    zyre_stop (agent->loopElements->node);
-    bus_zyreUnlock();
-    zclock_sleep (100);
-    zyre_destroy (&agent->loopElements->node);
-    zsock_destroy(&agent->loopElements->publisher);
-    if (agent->loopElements->ipcPublisher != NULL){
-        zsock_destroy(&agent->loopElements->ipcPublisher);
-#if defined __unix__ || defined __APPLE__ || defined __linux__
-        if (ipcFullPath != NULL){
-            zsys_file_delete(ipcFullPath); //destroy ipcPath in file system
-            //NB: ipcPath is based on peer id which is unique. It will never be used again.
-            free(ipcFullPath);
-        }
-#endif
-    }
-    if (agent->loopElements->inprocPublisher != NULL){
-        zsock_destroy(&agent->loopElements->inprocPublisher);
-    }
-    free(ipcEndpoint);
-    
-    if (agent->loopElements->logger != NULL){
-        zsock_destroy(&agent->loopElements->logger);
-    }
-    
-    zloop_destroy (&agent->loopElements->loop);
-    assert (agent->loopElements->loop == NULL);
-    
-    timer_t *current_timer, *tmp_timer;
-    HASH_ITER(hh, agent->loopElements->timers, current_timer, tmp_timer){
-        HASH_DEL(agent->loopElements->timers, current_timer);
-        free(current_timer);
-    }
-    
-    //call registered interruption callbacks
-    forcedStopCalback_t *cb = NULL;
-    if (agent->forcedStop){
-        DL_FOREACH(agent->forcedStopCalbacks, cb){
-            cb->callback_ptr(agent, cb->myData);
-        }
-    }
-    
-    if (agent->forcedStop){
-        agent->isInterrupted = true;
-        //in case of forced stop, we send SIGINT to our process so
-        //that it can be trapped by main thread for a proper stop
-        #if defined __unix__ || defined __APPLE__ || defined __linux__
-        igsAgent_debug(agent, "triggering SIGINT");
-        kill(pid, SIGINT);
-        #endif
-        //TODO : do that for windows also
-    }
-    igsAgent_debug(agent, "loop stopped");
-    network_Unlock();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1810,6 +1824,8 @@ int network_publishOutput (igsAgent_t *agent, const agent_iop_t *iop){
                 igsAgent_debug(agent, "Should publish output %s but the agent has been frozen",iop->name);
             }
         }
+    }else{
+        igsAgent_warn(agent, "agent not started : could not publish output %s", iop->name);
     }
     model_readWriteUnlock();
     return result;
@@ -1838,19 +1854,6 @@ int igsAgent_observeBus(igsAgent_t *agent, igsAgent_BusMessageIncoming cb, void 
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
 
-/**
- *  \defgroup startStopKillFct Agent: Start / Stop / Kill functions
- *
- */
-
-/**
- * \fn int igs_startWithDevice(const char *networkDevice, int port)
- * \ingroup startStopKillFct
- * \brief Start an agent on a specific network device and network port.
- * \param networkDevice is the name of the network device (ex: eth0, ens2 ...)
- * \param port is the network port number used
- * \return 1 if ok, else 0.
- */
 int igsAgent_startWithDevice(igsAgent_t *agent, const char *networkDevice, unsigned int port){
     if ((networkDevice == NULL) || (strlen(networkDevice) == 0)){
         igsAgent_error(agent, "networkDevice cannot be NULL or empty");
@@ -1861,9 +1864,9 @@ int igsAgent_startWithDevice(igsAgent_t *agent, const char *networkDevice, unsig
         //Agent is already active : need to stop it first
         igsAgent_stop(agent);
     }
+    network_Lock();
     agent->isInterrupted = false;
     agent->forcedStop = false;
-    
     agent->loopElements = calloc(1, sizeof(zyreloopElements_t));
     strncpy(agent->loopElements->networkDevice, networkDevice, NETWORK_DEVICE_LENGTH-1);
     agent->loopElements->brokerEndPoint[0] = '\0';
@@ -1903,20 +1906,18 @@ int igsAgent_startWithDevice(igsAgent_t *agent, const char *networkDevice, unsig
     license_readLicense(agent);
 #endif
     agent->loopElements->zyrePort = port;
-    agent->loopElements->agentActor = zactor_new (initLoop, agent);
+    network_Unlock();
+    
+    initLoop(agent);
+    
+    network_Lock();
     assert (agent->loopElements->agentActor);
     igs_nbOfInternalAgents++;
+    network_Unlock();
+    
     return 1;
 }
 
-/**
- * \fn int igs_startWithIP(const char *ipAddress, int port)
- * \ingroup startStopKillFct
- * \brief Start an agent on a specific network IP and network port.
- * \param ipAddress is the ip address on network
- * \param port s the network port number used
- * \return 1 if ok, else 0.
- */
 int igsAgent_startWithIP(igsAgent_t *agent, const char *ipAddress, unsigned int port){
     if ((ipAddress == NULL) || (strlen(ipAddress) == 0)){
         igsAgent_error(agent, "IP address cannot be NULL or empty");
@@ -1967,7 +1968,7 @@ int igsAgent_startWithIP(igsAgent_t *agent, const char *ipAddress, unsigned int 
     license_readLicense(agent);
 #endif
     agent->loopElements->zyrePort = port;
-    agent->loopElements->agentActor = zactor_new (initLoop, agent);
+    initLoop(agent);
     assert (agent->loopElements->agentActor);
     igs_nbOfInternalAgents++;
     return 1;
@@ -2032,7 +2033,7 @@ int igsAgent_startWithDeviceOnBroker(igsAgent_t *agent, const char *networkDevic
     license_readLicense(agent);
 #endif
     agent->loopElements->zyrePort = 0;
-    agent->loopElements->agentActor = zactor_new (initLoop, agent);
+    initLoop(agent);
     assert (agent->loopElements->agentActor);
     igs_nbOfInternalAgents++;
     return 1;
@@ -2559,8 +2560,9 @@ void igsAgent_setHighWaterMarks(igsAgent_t *agent, int hwmValue){
 }
 
 int igsAgent_timerStart(igsAgent_t *agent, size_t delay, size_t times, igs_timerCallback cb, void *myData){
+    network_Lock();
     if (agent->loopElements == NULL || agent->loopElements->loop == NULL){
-        igs_error("agent must be started before creating a timer");
+        igs_error("agent %s must be started before creating a timer", agent->agentName);
         return -1;
     }
     if (cb == NULL){
@@ -2572,6 +2574,7 @@ int igsAgent_timerStart(igsAgent_t *agent, size_t delay, size_t times, igs_timer
     timer->myData = myData;
     timer->timerId = zloop_timer(agent->loopElements->loop, delay, times, network_timerCallback, timer);
     HASH_ADD_INT(agent->loopElements->timers, timerId, timer);
+    network_Unlock();
     return timer->timerId;
 }
 
