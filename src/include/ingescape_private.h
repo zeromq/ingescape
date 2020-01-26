@@ -170,12 +170,12 @@ typedef struct subscriber_s{
     UT_hash_handle hh;
 } subscriber_t;
 
-typedef struct timer_s{
+typedef struct igsTimer_s{
     int timerId;
     igs_timerCallback *cb;
     void *myData;
     UT_hash_handle hh;
-} timer_t;
+} igsTimer_t;
 
 #define NETWORK_DEVICE_LENGTH 256
 #define IP_ADDRESS_LENGTH 256
@@ -192,7 +192,7 @@ typedef struct zyreloopElements{
     zsock_t *inprocPublisher;
     zsock_t *logger;
     zloop_t *loop;
-    timer_t *timers;
+    igsTimer_t *timers;
 } zyreloopElements_t;
 
 //zyre agents storage

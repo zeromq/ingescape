@@ -1418,7 +1418,7 @@ static void runLoop (zsock_t *mypipe, void *args){
     zloop_destroy (&agent->loopElements->loop);
     assert (agent->loopElements->loop == NULL);
     
-    timer_t *current_timer, *tmp_timer;
+    igsTimer_t *current_timer, *tmp_timer;
     HASH_ITER(hh, agent->loopElements->timers, current_timer, tmp_timer){
         HASH_DEL(agent->loopElements->timers, current_timer);
         free(current_timer);
@@ -1832,7 +1832,7 @@ int network_publishOutput (igsAgent_t *agent, const agent_iop_t *iop){
 }
 
 int network_timerCallback (zloop_t *loop, int timer_id, void *arg){
-    timer_t *timer = (timer_t *)arg;
+    igsTimer_t *timer = (igsTimer_t *)arg;
     timer->cb(timer->timerId, timer->myData);
     return 1;
 }
@@ -2569,7 +2569,7 @@ int igsAgent_timerStart(igsAgent_t *agent, size_t delay, size_t times, igs_timer
         igs_error("callback function cannot be NULL");
         return -1;
     }
-    timer_t *timer = calloc(1, sizeof(timer_t));
+    igsTimer_t *timer = calloc(1, sizeof(igsTimer_t));
     timer->cb = cb;
     timer->myData = myData;
     timer->timerId = zloop_timer(agent->loopElements->loop, delay, times, network_timerCallback, timer);
@@ -2583,7 +2583,7 @@ void igsAgent_timerStop(igsAgent_t *agent, int timerId){
         igs_error("agent must be started to destroy a timer");
         return;
     }
-    timer_t *timer = NULL;
+    igsTimer_t *timer = NULL;
     HASH_FIND_INT(agent->loopElements->timers, &timerId, timer);
     if (timer != NULL){
         zloop_timer_end(agent->loopElements->loop, timerId);
