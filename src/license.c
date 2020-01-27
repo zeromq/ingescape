@@ -108,7 +108,7 @@ int decryptLicenseFromData(char **target_string, void *data, size_t size,
     
     //read header and move data head
     memcpy(header, data, sizeof(header));
-    (char *) data = (char *) data + sizeof(header);
+    data = (char *) data + sizeof(header);
     remainingSize = size - sizeof(header);
     
     if (crypto_secretstream_xchacha20poly1305_init_pull(&st, header, key) != 0) {
@@ -124,7 +124,7 @@ int decryptLicenseFromData(char **target_string, void *data, size_t size,
             remainingSize = 0;
         }else{
             memcpy(buf_in, data, sizeof(buf_in));
-            (char *) data = (char *) data + sizeof(buf_in);
+            data = (char *) data + sizeof(buf_in);
             readSize = sizeof(buf_in);
             remainingSize -= sizeof(buf_in);
         }
