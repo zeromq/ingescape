@@ -135,13 +135,7 @@ public:
      */
     Q_INVOKABLE void removeOneSubjectToFilterSessions(QString subjectId);
 
-    
-    /**
-     * @brief Filter sessions list with all subjects
-     */
-    Q_INVOKABLE void addAllSubjectsToFilterSessions();
 
-    
     /**
      * @brief Filter sessions list without any subject
      */
@@ -168,12 +162,6 @@ public:
      * @param protocolName
      */
     Q_INVOKABLE void removeOneProtocolToFilterSessions(QString protocolName);
-
-
-    /**
-     * @brief Filter sessions list with all protocols
-     */
-    Q_INVOKABLE void addAllProtocolsToFilterSessions();
 
 
     /**
@@ -234,6 +222,18 @@ public Q_SLOTS:
      * @param message (id of the record)
      */
     void onRecordDeletedReceived(QString message);
+
+
+    /**
+     * @brief Filter sessions list with all protocols
+     */
+    void addAllProtocolsToFilterSessions();
+
+
+    /**
+     * @brief Filter sessions list with all subjects
+     */
+    void addAllSubjectsToFilterSessions();
 
 
 Q_SIGNALS:

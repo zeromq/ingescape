@@ -111,11 +111,21 @@ void ExperimentationController::setcurrentExperimentation(ExperimentationM *valu
     {
         if (_currentExperimentation != nullptr)
         {
+            disconnect(_currentExperimentation->allProtocols(), &AbstractI2CustomItemListModel::countChanged, this, &ExperimentationController::addAllProtocolsToFilterSessions);
+            disconnect(_currentExperimentation->allSubjects(), &AbstractI2CustomItemListModel::countChanged, this, &ExperimentationController::addAllSubjectsToFilterSessions);
+
+
             // Unload any previous experimentation
             _currentExperimentation->clearData();
         }
 
         _currentExperimentation = value;
+
+        if (_currentExperimentation != nullptr)
+        {
+            connect(_currentExperimentation->allProtocols(), &AbstractI2CustomItemListModel::countChanged, this, &ExperimentationController::addAllProtocolsToFilterSessions);
+            connect(_currentExperimentation->allSubjects(), &AbstractI2CustomItemListModel::countChanged, this, &ExperimentationController::addAllSubjectsToFilterSessions);
+        }
 
         // Manage changes
         _onCurrentExperimentationChanged(_currentExperimentation);
@@ -409,7 +419,41 @@ void ExperimentationController::onRecordDeletedReceived(QString message)
             }
         }
     }
-};
+}
+
+
+/**
+ * @brief Filter sessions list with all protocols
+ */
+void ExperimentationController::addAllProtocolsToFilterSessions(){
+    // Get all protocol names list
+    QStringList tempProtocolNameList;
+    for (ProtocolM* protocol : _currentExperimentation->allProtocols()->toList()) {
+        tempProtocolNameList.append(protocol->name());
+    }
+
+    // Update selected protocol names list
+    setselectedProtocolNameListToFilter(tempProtocolNameList);
+
+    _updateFilters();
+}
+
+
+/**
+ * @brief Select sessions for every subject
+ */
+void ExperimentationController::addAllSubjectsToFilterSessions() {
+    // Get all subjects displayed ids list
+    QStringList tempSubjectIdList;
+    for (SubjectM* subject : _currentExperimentation->allSubjects()->toList()) {
+        tempSubjectIdList.append(subject->displayedId());
+    }
+
+    // Update selected subject ids list
+    setselectedSubjectIdListToFilter(tempSubjectIdList);
+
+    _updateFilters();
+}
 
 
 /**
@@ -973,22 +1017,6 @@ void ExperimentationController::removeOneSubjectToFilterSessions(QString subject
 }
 
 
-/**
- * @brief Select sessions for every subject
- */
-void ExperimentationController::addAllSubjectsToFilterSessions() {
-    // Get all subjects displayed ids list
-    QStringList tempSubjectIdList;
-    for (SubjectM* subject : _currentExperimentation->allSubjects()->toList()) {
-        tempSubjectIdList.append(subject->displayedId());
-    }
-
-    // Update selected subject ids list
-    setselectedSubjectIdListToFilter(tempSubjectIdList);
-
-    _updateFilters();
-}
-
 
 /**
  * @brief Filter sessions list without any subject
@@ -1038,22 +1066,6 @@ void ExperimentationController::removeOneProtocolToFilterSessions(QString protoc
 }
 
 
-/**
- * @brief Filter sessions list with all protocols
- */
-void ExperimentationController::addAllProtocolsToFilterSessions(){
-    // Get all protocol names list
-    QStringList tempProtocolNameList;
-    for (ProtocolM* protocol : _currentExperimentation->allProtocols()->toList()) {
-        tempProtocolNameList.append(protocol->name());
-    }
-
-    // Update selected protocol names list
-    setselectedProtocolNameListToFilter(tempProtocolNameList);
-
-    qDebug() << "GOOOO " << _selectedProtocolNameListToFilter.count();
-    _updateFilters();
-}
 
 /**
  * @brief Filter sessions list without any protocols
