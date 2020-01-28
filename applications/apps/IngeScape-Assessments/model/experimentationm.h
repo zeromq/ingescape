@@ -239,6 +239,11 @@ public:
     static CassStatement* createBoundUpdateStatement(const ExperimentationM& experimentation);
 
 
+Q_SIGNALS:
+
+    void subjectIdsChanged();
+
+
 private: // Methods
     /**
      * @brief Delete all protocols associated with the given experimentation

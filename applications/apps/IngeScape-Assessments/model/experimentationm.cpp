@@ -92,6 +92,12 @@ void ExperimentationM::clearData()
     _allCharacteristics.deleteAllItems();
 
     // Delete all subjects of our experimentation
+    for (SubjectM* subject : _allSubjects)
+    {
+        if (subject != nullptr) {
+            disconnect(subject, &SubjectM::displayedIdChanged, this, &ExperimentationM::subjectIdsChanged);
+        }
+    }
     _allSubjects.deleteAllItems();
 
     // Delete all protocols of our experimentation
@@ -166,6 +172,10 @@ void ExperimentationM::addSubject(SubjectM* subject)
     {
         // Add to the list
         _allSubjects.append(subject);
+
+        connect(subject, &SubjectM::displayedIdChanged, this, &ExperimentationM::subjectIdsChanged);
+
+        Q_EMIT subjectIdsChanged();
     }
 }
 
@@ -180,6 +190,10 @@ void ExperimentationM::removeSubject(SubjectM* subject)
     {
         // Remove from the list
         _allSubjects.remove(subject);
+
+        disconnect(subject, &SubjectM::displayedIdChanged, this, &ExperimentationM::subjectIdsChanged);
+
+        Q_EMIT subjectIdsChanged();
 
         // Remove related sessions
         removeSessionsRelatedToSubject(subject);

@@ -112,8 +112,8 @@ void ExperimentationController::setcurrentExperimentation(ExperimentationM *valu
         if (_currentExperimentation != nullptr)
         {
             disconnect(_currentExperimentation->allProtocols(), &AbstractI2CustomItemListModel::countChanged, this, &ExperimentationController::addAllProtocolsToFilterSessions);
-            disconnect(_currentExperimentation->allSubjects(), &AbstractI2CustomItemListModel::countChanged, this, &ExperimentationController::addAllSubjectsToFilterSessions);
-
+            //disconnect(_currentExperimentation->allSubjects(), &AbstractI2CustomItemListModel::countChanged, this, &ExperimentationController::addAllSubjectsToFilterSessions);
+            disconnect(_currentExperimentation, &ExperimentationM::subjectIdsChanged, this, &ExperimentationController::_onSubjectIdsOfExperimentationChanged);
 
             // Unload any previous experimentation
             _currentExperimentation->clearData();
@@ -124,7 +124,8 @@ void ExperimentationController::setcurrentExperimentation(ExperimentationM *valu
         if (_currentExperimentation != nullptr)
         {
             connect(_currentExperimentation->allProtocols(), &AbstractI2CustomItemListModel::countChanged, this, &ExperimentationController::addAllProtocolsToFilterSessions);
-            connect(_currentExperimentation->allSubjects(), &AbstractI2CustomItemListModel::countChanged, this, &ExperimentationController::addAllSubjectsToFilterSessions);
+            //connect(_currentExperimentation->allSubjects(), &AbstractI2CustomItemListModel::countChanged, this, &ExperimentationController::addAllSubjectsToFilterSessions);
+            connect(_currentExperimentation, &ExperimentationM::subjectIdsChanged, this, &ExperimentationController::_onSubjectIdsOfExperimentationChanged);
         }
 
         // Manage changes
@@ -425,7 +426,8 @@ void ExperimentationController::onRecordDeletedReceived(QString message)
 /**
  * @brief Filter sessions list with all protocols
  */
-void ExperimentationController::addAllProtocolsToFilterSessions(){
+void ExperimentationController::addAllProtocolsToFilterSessions()
+{
     // Get all protocol names list
     QStringList tempProtocolNameList;
     for (ProtocolM* protocol : _currentExperimentation->allProtocols()->toList()) {
@@ -442,7 +444,8 @@ void ExperimentationController::addAllProtocolsToFilterSessions(){
 /**
  * @brief Select sessions for every subject
  */
-void ExperimentationController::addAllSubjectsToFilterSessions() {
+void ExperimentationController::addAllSubjectsToFilterSessions()
+{
     // Get all subjects displayed ids list
     QStringList tempSubjectIdList;
     for (SubjectM* subject : _currentExperimentation->allSubjects()->toList()) {
@@ -534,7 +537,8 @@ void ExperimentationController::_onTimeLineStateUpdated(QString state)
 /**
  * @brief Called when our timer time out to handle existing record after our current time in our timeline
  */
-void ExperimentationController::_onTimeout_EncounterExistingRecords() {
+void ExperimentationController::_onTimeout_EncounterExistingRecords()
+{
     if ((_nextRecordToHandle != nullptr) && (_isRecording))
     {
         if (_removeOtherRecordsWhileRecording) // User wants to remove other records encountered
@@ -582,6 +586,12 @@ void ExperimentationController::_onTimeout_EncounterExistingRecords() {
             stopToRecord();
         }
     }
+}
+
+
+void ExperimentationController::_onSubjectIdsOfExperimentationChanged()
+{
+    addAllSubjectsToFilterSessions();
 }
 
 
@@ -993,7 +1003,8 @@ void ExperimentationController::stopToRecord()
  * @brief Filter sessions list with one more subject
  * @param subjectId
  */
-void ExperimentationController::addOneSubjectToFilterSessions(QString subjectId){
+void ExperimentationController::addOneSubjectToFilterSessions(QString subjectId)
+{
     QStringList temp = _selectedSubjectIdListToFilter;
     temp.append(subjectId);
 
@@ -1007,7 +1018,8 @@ void ExperimentationController::addOneSubjectToFilterSessions(QString subjectId)
  * @brief Filter sessions list without one more subject
  * @param subjectId
  */
-void ExperimentationController::removeOneSubjectToFilterSessions(QString subjectId){
+void ExperimentationController::removeOneSubjectToFilterSessions(QString subjectId)
+{
     QStringList temp = _selectedSubjectIdListToFilter;
     temp.removeOne(subjectId);
 
@@ -1021,7 +1033,8 @@ void ExperimentationController::removeOneSubjectToFilterSessions(QString subject
 /**
  * @brief Filter sessions list without any subject
  */
-void ExperimentationController::removeAllSubjectsToFilterSessions() {
+void ExperimentationController::removeAllSubjectsToFilterSessions()
+{
     setselectedSubjectIdListToFilter(QStringList());
 
     _updateFilters();
@@ -1033,7 +1046,8 @@ void ExperimentationController::removeAllSubjectsToFilterSessions() {
  * @param subjectId
  * @return
  */
-bool ExperimentationController::isSubjectFilterSessions(QString subjectId){
+bool ExperimentationController::isSubjectFilterSessions(QString subjectId)
+{
     return _selectedSubjectIdListToFilter.contains(subjectId);
 }
 
@@ -1042,7 +1056,8 @@ bool ExperimentationController::isSubjectFilterSessions(QString subjectId){
  * @brief Filter sessions list with one more subject
  * @param protocolName
  */
-void ExperimentationController::addOneProtocolToFilterSessions(QString protocolName){
+void ExperimentationController::addOneProtocolToFilterSessions(QString protocolName)
+{
     QStringList temp = _selectedProtocolNameListToFilter;
     temp.append(protocolName);
 
@@ -1056,7 +1071,8 @@ void ExperimentationController::addOneProtocolToFilterSessions(QString protocolN
  * @brief Filter sessions list without one more protocol
  * @param protocolName
  */
-void ExperimentationController::removeOneProtocolToFilterSessions(QString protocolName){
+void ExperimentationController::removeOneProtocolToFilterSessions(QString protocolName)
+{
     QStringList temp = _selectedProtocolNameListToFilter;
     temp.removeOne(protocolName);
 
@@ -1066,15 +1082,16 @@ void ExperimentationController::removeOneProtocolToFilterSessions(QString protoc
 }
 
 
-
 /**
  * @brief Filter sessions list without any protocols
  */
-void ExperimentationController::removeAllProtocolsToFilterSessions(){
+void ExperimentationController::removeAllProtocolsToFilterSessions()
+{
     setselectedProtocolNameListToFilter(QStringList());
 
     _updateFilters();
 }
+
 
 /**
  * @brief Return true if the session is show for subject name
@@ -1085,7 +1102,9 @@ bool ExperimentationController::isProtocolFilterSessions(QString protocolName) {
     return _selectedProtocolNameListToFilter.contains(protocolName);
 }
 
-void ExperimentationController::_updateFilters() {
+
+void ExperimentationController::_updateFilters()
+{
     // Update the list of subjects and protocol of the filter
     _sessionFilteredList.setselectedSubjectIdList(_selectedSubjectIdListToFilter);
     _sessionFilteredList.setselectedProtocolIdList(_selectedProtocolNameListToFilter);

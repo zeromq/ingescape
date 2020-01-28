@@ -273,6 +273,9 @@ private Q_SLOTS:
     void _onTimeout_EncounterExistingRecords();
 
 
+    void _onSubjectIdsOfExperimentationChanged();
+
+
 
 protected: // Methods
     /**
