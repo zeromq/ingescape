@@ -120,8 +120,11 @@ macro(get_ingescape_version _MAJOR _MINOR _PATCH)
     set(${_MAJOR} ${CMAKE_MATCH_1})
     string(REGEX MATCH "#define INGESCAPE_MINOR ([0-9]*)" _ ${_ADMIN_C_CONTENT})
     set(${_MINOR} ${CMAKE_MATCH_1})
-    string(REGEX MATCH "#define INGESCAPE_MICRO ([0-9]*)" _ ${_ADMIN_C_CONTENT})
-    set(${_PATCH} ${CMAKE_MATCH_1})
+    if (${CI_PIPELINE_ID})
+        set(${_PATCH} ${CI_PIPELINE_ID})
+    else ()
+        set(${_PATCH} "0")
+    endif ()
 endmacro()
 
 # Function to install dependencies on windows
