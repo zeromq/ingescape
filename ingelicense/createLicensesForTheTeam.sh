@@ -82,3 +82,22 @@ echo ""
 echo "Read license for Diota Shiva"
 ingelicense --read ./licenses/DiotaShiva.igslicense
 echo ""
+
+#licenses for eurocontrol
+echo "License for Eurocontrol"
+ingelicense \
+    --id Diota \
+    --customer "Eurocontrol PJ09" \
+    --order Eval \
+    --expiration 2020/12/31 \
+    --editorExpiration 2020/12/31 \
+    --features /Users/steph/Documents/CloudStation/ingescape/code/ingescape/ingelicense/src/features.txt \
+    --agents /Users/steph/Documents/CloudStation/ingescape/code/ingescape/ingelicense/src/agents.txt \
+    --editorOwner "Eurocontrol PJ09" \
+    --features ./src/features.txt \
+    --agents ./src/agents.txt \
+    --output ./licenses/EurocontrolPJ09.igslicense
+echo ""
+echo "Read license for EurocontrolPJ09"
+ingelicense --read ./licenses/EurocontrolPJ09.igslicense
+echo ""
