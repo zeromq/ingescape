@@ -589,6 +589,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                                 DL_FOREACH(agent->licenseCallbacks, el){
                                     el->callback_ptr(agent, IGS_LICENSE_TOO_MANY_AGENTS, el->data);
                                 }
+                                network_Unlock();
                                 return -1;
                             }
 #endif
@@ -753,6 +754,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         DL_FOREACH(agent->licenseCallbacks, el){
                             el->callback_ptr(agent, IGS_LICENSE_TOO_MANY_IOPS, el->data);
                         }
+                        network_Unlock();
                         return -1;
                     }
                     #endif
@@ -1009,6 +1011,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     agent->forcedStop = true;
                     igsAgent_debug(agent, "received STOP command from %s (%s)", name, peer);
                     //stop our zyre loop by returning -1 : this will start the cleaning process
+                    network_Unlock();
                     return -1;
                 }else if (strlen("CLEAR_MAPPING") == strlen(message) && strncmp (message, "CLEAR_MAPPING", strlen("CLEAR_MAPPING")) == 0){
                     igsAgent_debug(agent, "received CLEAR_MAPPING command from %s (%s)", name, peer);
@@ -1581,10 +1584,10 @@ void initLoop (igsAgent_t *agent){
 #elif (defined WIN32 || defined _WIN32)
     agent->ipcEndpoint = strdup("tcp://127.0.0.1:*");
     zsock_t *ipcPublisher = agent->loopElements->ipcPublisher = zsock_new_pub(agent->ipcEndpoint);
-    zsock_set_sndhwm(agent->loopElements->ipcPublisher, agent->network_hwmValue);
     if (ipcPublisher == NULL){
         igsAgent_warn(agent, "Could not create loopback publishing socket (%s)", agent->ipcEndpoint);
     }else{
+        zsock_set_sndhwm(agent->loopElements->ipcPublisher, agent->network_hwmValue);
         bus_zyreLock();
         zyre_set_header(agent->loopElements->node, "loopback", "%s", zsock_endpoint(ipcPublisher));
         bus_zyreUnlock();
