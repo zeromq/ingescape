@@ -1310,13 +1310,6 @@ int triggerMappingUpdate(zloop_t *loop, int timer_id, void *arg){
     return 0;
 }
 
-int unlockAfterStartingLoop(zloop_t *loop, int timer_id, void *arg){
-    //igsAgent_t *agent = (igsAgent_t *)arg;
-    //igsAgent_debugg(agent, "unlocking after loop has started");
-    network_Unlock();
-    return 0;
-}
-
 static void runLoop (zsock_t *mypipe, void *args){
     igsAgent_t *agent = (igsAgent_t *)args;
     
@@ -1365,7 +1358,6 @@ static void runLoop (zsock_t *mypipe, void *args){
     
     zloop_timer(agent->loopElements->loop, 1000, 0, triggerDefinitionUpdate, agent);
     zloop_timer(agent->loopElements->loop, 1000, 0, triggerMappingUpdate, agent);
-    zloop_timer(agent->loopElements->loop, 0, 1, unlockAfterStartingLoop, agent);
     
 #if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
     if (agent->license != NULL && !agent->license->isLicenseValid){
@@ -1736,9 +1728,10 @@ void initLoop (igsAgent_t *agent){
     
     if (canContinue){
         agent->loopElements->agentActor = zactor_new (runLoop, agent);
-    }else{
-        network_Unlock();
     }
+
+    // NB: We can unlock here because zactor_new returns only when the new actor actually started
+    network_Unlock();
 }
 
 ////////////////////////////////////////////////////////////////////////
