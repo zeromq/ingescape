@@ -1490,6 +1490,7 @@ void initLoop (igsAgent_t *agent){
     }else{
         if (agent->loopElements->node == NULL){
             igsAgent_fatal(agent, "Could not create bus node : Agent will interrupt immediately.");
+            network_Unlock();
             return;
         }else{
             bus_zyreLock();
