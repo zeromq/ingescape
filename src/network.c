@@ -589,6 +589,8 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                                 DL_FOREACH(agent->licenseCallbacks, el){
                                     el->callback_ptr(agent, IGS_LICENSE_TOO_MANY_AGENTS, el->data);
                                 }
+                                free(k);
+                                zlist_destroy(&keys);
                                 network_Unlock();
                                 return -1;
                             }
@@ -754,6 +756,8 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         DL_FOREACH(agent->licenseCallbacks, el){
                             el->callback_ptr(agent, IGS_LICENSE_TOO_MANY_IOPS, el->data);
                         }
+                        zmsg_destroy(&msgDuplicate);
+                        zyre_event_destroy(&zyre_event);
                         network_Unlock();
                         return -1;
                     }
@@ -1007,11 +1011,13 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     igsAgent_debug(agent, "send license information to %s", peer);
 #endif
                 }else if (strlen("STOP") == strlen(message) && strncmp (message, "STOP", strlen("STOP")) == 0){
-                    free(message);
                     agent->forcedStop = true;
                     igsAgent_debug(agent, "received STOP command from %s (%s)", name, peer);
-                    //stop our zyre loop by returning -1 : this will start the cleaning process
+                    free(message);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
                     network_Unlock();
+                    //stop our zyre loop by returning -1 : this will start the cleaning process
                     return -1;
                 }else if (strlen("CLEAR_MAPPING") == strlen(message) && strncmp (message, "CLEAR_MAPPING", strlen("CLEAR_MAPPING")) == 0){
                     igsAgent_debug(agent, "received CLEAR_MAPPING command from %s (%s)", name, peer);
@@ -1311,8 +1317,8 @@ int triggerMappingUpdate(zloop_t *loop, int timer_id, void *arg){
 }
 
 static void runLoop (zsock_t *mypipe, void *args){
+    network_Lock();
     igsAgent_t *agent = (igsAgent_t *)args;
-    
     //start zyre now that everything is set
     bus_zyreLock();
     int zyreStartRes = zyre_start (agent->loopElements->node);
@@ -1329,6 +1335,7 @@ static void runLoop (zsock_t *mypipe, void *args){
     void *zpipe = zsock_resolve(mypipe);
     if (zpipe == NULL){
         igsAgent_error(agent, "Could not get the pipe descriptor to the main thread for polling : Agent will interrupt immediately.");
+        network_Unlock();
         return;
     }
     zpipePollItem.socket = zpipe;
@@ -1340,6 +1347,7 @@ static void runLoop (zsock_t *mypipe, void *args){
     void *zsock = zsock_resolve(zyre_socket (agent->loopElements->node));
     if (zsock == NULL){
         igsAgent_error(agent, "Could not get the bus socket for polling : Agent will interrupt immediately.");
+        network_Unlock();
         return;
     }
     zyrePollItem.socket = zsock;
@@ -1365,14 +1373,14 @@ static void runLoop (zsock_t *mypipe, void *args){
         zloop_timer(agent->loopElements->loop, MAX_EXEC_DURATION_DURING_EVAL * 1000, 0, triggerLicenseStop, agent);
     }
 #endif
-    
     zsock_signal (mypipe, 0);
+    network_Unlock();
+    
     igsAgent_debug(agent, "loop starting");
     zloop_start (agent->loopElements->loop); //returns when one of the pollers returns -1
     
     network_Lock();
     igsAgent_debug(agent, "loop stopping...");
-
     //clean
     zyreAgent_t *zagent, *tmpa;
     HASH_ITER(hh, agent->zyreAgents, zagent, tmpa){
@@ -1442,9 +1450,7 @@ static void runLoop (zsock_t *mypipe, void *args){
 }
 
 void initLoop (igsAgent_t *agent){
-    network_Lock();
     igsAgent_debug(agent, "loop init");
-    
 #if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
     if (agent->licenseEnforcement != NULL){
         free(agent->licenseEnforcement);
@@ -1482,7 +1488,6 @@ void initLoop (igsAgent_t *agent){
     }else{
         if (agent->loopElements->node == NULL){
             igsAgent_fatal(agent, "Could not create bus node : Agent will interrupt immediately.");
-            network_Unlock();
             return;
         }else{
             bus_zyreLock();
@@ -1730,9 +1735,6 @@ void initLoop (igsAgent_t *agent){
     if (canContinue){
         agent->loopElements->agentActor = zactor_new (runLoop, agent);
     }
-
-    // NB: We can unlock here because zactor_new returns only when the new actor actually started
-    network_Unlock();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1861,7 +1863,7 @@ int igsAgent_startWithDevice(igsAgent_t *agent, const char *networkDevice, unsig
         //Agent is already active : need to stop it first
         igsAgent_stop(agent);
     }
-    network_Lock();
+    
     agent->isInterrupted = false;
     agent->forcedStop = false;
     agent->loopElements = calloc(1, sizeof(zyreloopElements_t));
@@ -1903,15 +1905,9 @@ int igsAgent_startWithDevice(igsAgent_t *agent, const char *networkDevice, unsig
     license_readLicense(agent);
 #endif
     agent->loopElements->zyrePort = port;
-    network_Unlock();
-    
     initLoop(agent);
-    
-    network_Lock();
     assert (agent->loopElements->agentActor);
     igs_nbOfInternalAgents++;
-    network_Unlock();
-    
     return 1;
 }
 
@@ -2055,8 +2051,7 @@ int igsAgent_stop(igsAgent_t *agent){
         igs_nbOfInternalAgents--;
         //igsAgent_debug(agent, "still %d internal agents running", igs_nbOfInternalAgents);
         #if (defined WIN32 || defined _WIN32)
-        // On Windows, we need to use a sledgehammer to avoid assertion errors
-        // NB: If we don't call zsys_shutdown, the application will crash on exit
+        // On Windows, if we don't call zsys_shutdown, the application will crash on exit
         // (WSASTARTUP assertion failure)
         // NB: Monitoring also uses a zactor, we can not call zsys_shutdown() when it is running
         if (igs_nbOfInternalAgents == 0) {
@@ -2557,7 +2552,6 @@ void igsAgent_setHighWaterMarks(igsAgent_t *agent, int hwmValue){
 }
 
 int igsAgent_timerStart(igsAgent_t *agent, size_t delay, size_t times, igs_timerCallback cb, void *myData){
-    network_Lock();
     if (agent->loopElements == NULL || agent->loopElements->loop == NULL){
         igs_error("agent %s must be started before creating a timer", agent->agentName);
         return -1;
@@ -2566,6 +2560,7 @@ int igsAgent_timerStart(igsAgent_t *agent, size_t delay, size_t times, igs_timer
         igs_error("callback function cannot be NULL");
         return -1;
     }
+    network_Lock();
     igsTimer_t *timer = calloc(1, sizeof(igsTimer_t));
     timer->cb = cb;
     timer->myData = myData;
@@ -2580,6 +2575,7 @@ void igsAgent_timerStop(igsAgent_t *agent, int timerId){
         igs_error("agent must be started to destroy a timer");
         return;
     }
+    network_Lock();
     igsTimer_t *timer = NULL;
     HASH_FIND_INT(agent->loopElements->timers, &timerId, timer);
     if (timer != NULL){
@@ -2589,4 +2585,5 @@ void igsAgent_timerStop(igsAgent_t *agent, int timerId){
     }else{
         igs_error("could not find timer with id %d", timerId);
     }
+    network_Unlock();
 }

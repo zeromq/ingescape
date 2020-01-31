@@ -241,6 +241,7 @@ void igsAgent_monitoringEnable(igsAgent_t *agent, unsigned int period){
     agent->monitor->period = period;
     agent->monitor->status = IGS_NETWORK_OK;
     agent->monitor->monitorActor = zactor_new (monitor_initLoop, agent);
+    assert(agent->monitor->monitorActor);
     igs_nbOfInternalAgents++;
 }
 
