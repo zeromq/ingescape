@@ -386,7 +386,7 @@ binding-csharp-windows-x64:
   script:
     - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
     - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
-    - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
     - Powershell.exe -executionpolicy remotesigned bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64
     - cmake --build bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64 --target IngescapeCSharp --config Release
   artifacts:
@@ -453,7 +453,7 @@ editor-windows-release-x64:
     - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir applications\apps\IngeScape-Editor\build\ReleaseX64
-    - cmake applications\apps\IngeScape-Editor\ -B applications\apps\IngeScape-Editor\build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - cmake applications\apps\IngeScape-Editor\ -B applications\apps\IngeScape-Editor\build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
     - cmake --build applications\apps\IngeScape-Editor\build\ReleaseX64 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -501,7 +501,7 @@ assessments-windows-release-x64:
     - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir applications\apps\IngeScape-Assessments\build\ReleaseX64
-    - cmake applications\apps\IngeScape-Assessments\ -B applications\apps\IngeScape-Assessments\build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - cmake applications\apps\IngeScape-Assessments\ -B applications\apps\IngeScape-Assessments\build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
     - cmake --build applications\apps\IngeScape-Assessments\build\ReleaseX64 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -549,7 +549,7 @@ expe-windows-release-x64:
     - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir applications\apps\IngeScape-Expe\build\ReleaseX64
-    - cmake applications\apps\IngeScape-Expe\ -B applications\apps\IngeScape-Expe\build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - cmake applications\apps\IngeScape-Expe\ -B applications\apps\IngeScape-Expe\build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
     - cmake --build applications\apps\IngeScape-Expe\build\ReleaseX64 --target ALL_BUILD --config Release
   artifacts:
     paths:
