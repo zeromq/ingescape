@@ -145,6 +145,7 @@ QML_DESIGNER_IMPORT_PATH =
 
 # Add the include directory of I2Quick
 INCLUDEPATH += ../../frameworks/I2Quick/include
+INCLUDEPATH += C:\Users\admin\dev\install_dir\include
 
 # Include ingescape library
 !include(../../../builds/ingescape.pri) {

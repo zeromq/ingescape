@@ -73,12 +73,12 @@ win32:{
     HEADERS += $$PWD/../dependencies/windows/unix/unixfunctions.h
 
     #Add librairies
-    LIBS += -L$$(ProgramFiles)/ingescape/lib/ -lzyre -lczmq -llibsodium
+    LIBS += -LC:/Users/admin/dev/install_dir/lib/x64/Debug -lzyre -lczmq -llibsodium
 
     #To get the Ip address into the network.c
     LIBS += -L$$C:/Windows/System32 -lwsock32 -lIPHLPAPI -lws2_32
 
-    INCLUDEPATH += $$(ProgramFiles)/ingescape/include \
+    INCLUDEPATH += C:/Users/admin/dev/install_dir/include \
                    $$PWD/../dependencies/windows/unix \
 }
 
