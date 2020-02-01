@@ -433,8 +433,9 @@ void license_readLicense(igsAgent_t *agent){
         zlist_append(agent->license->licenseDetails, detail);
         detail->features = zhash_new();
         detail->agents = zhash_new();
+        detail->fileName = calloc(128, sizeof(char));
+        sprintf(detail->fileName, "internal data");
         
-        detail->fileName = "internal data";
         igsAgent_debug(agent, "parsing license data");
         //decrypt file
         char *licenseText = NULL;

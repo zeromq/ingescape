@@ -165,7 +165,7 @@ void admin_log(igsAgent_t *agent, igs_logLevel_t level, const char *function, co
             char *name = igsAgent_getAgentName(agent);
             strncat(agent->logFilePath, name, 4095);
             strncat(agent->logFilePath, ".log", 4095);
-            printf("creating default log file %s\n", agent->logFilePath);
+            printf("using log file %s\n", agent->logFilePath);
             free(name);
             if (agent->loopElements != NULL && agent->loopElements->node != NULL){
                 bus_zyreLock();

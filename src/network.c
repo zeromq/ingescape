@@ -1831,6 +1831,8 @@ int network_publishOutput (igsAgent_t *agent, const agent_iop_t *iop){
 }
 
 int network_timerCallback (zloop_t *loop, int timer_id, void *arg){
+    IGS_UNUSED(loop)
+    IGS_UNUSED(timer_id)
     igsTimer_t *timer = (igsTimer_t *)arg;
     timer->cb(timer->timerId, timer->myData);
     return 1;
