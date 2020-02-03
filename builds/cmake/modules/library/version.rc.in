@@ -1,0 +1,52 @@
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+#define VER_FILEVERSION             @INGESCAPE_VERSION_MAJOR@,@INGESCAPE_VERSION_MINOR@,@INGESCAPE_VERSION_PATCH@,0
+#define VER_FILEVERSION_STR         "@INGESCAPE_VERSION_MAJOR@.@INGESCAPE_VERSION_MINOR@.@INGESCAPE_VERSION_PATCH.0\0"
+
+#define VER_PRODUCTVERSION          @INGESCAPE_VERSION_MAJOR,@INGESCAPE_VERSION_MINOR@,0,0
+#define VER_PRODUCTVERSION_STR      "@INGESCAPE_VERSION_MAJOR@.@INGESCAPE_VERSION_MINOR@\0"
+
+#define VER_FILEFLAGS               @WIN32_LIB_FILEFLAGS@
+#define VER_FILETYPE                @WIN32_LIB_FILETYPE@
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION     VER_FILEVERSION
+PRODUCTVERSION  VER_PRODUCTVERSION
+FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
+FILEFLAGS       VER_FILEFLAGS
+FILEOS          VOS__WINDOWS32
+FILETYPE        VER_FILETYPE
+FILESUBTYPE     VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904E4"
+        BEGIN
+            VALUE "CompanyName",      "Ingenuity I/O"
+            VALUE "FileDescription",  "Ingescape library DLL"
+            VALUE "FileVersion",      VER_FILEVERSION_STR
+            VALUE "InternalName",     VER_INTERNALNAME_STR
+            VALUE "LegalCopyright",   VER_LEGALCOPYRIGHT_STR
+            VALUE "LegalTrademarks1", VER_LEGALTRADEMARKS1_STR
+            VALUE "LegalTrademarks2", VER_LEGALTRADEMARKS2_STR
+            VALUE "OriginalFilename", VER_ORIGINALFILENAME_STR
+            VALUE "ProductName",      "ingescape"
+            VALUE "ProductVersion",   VER_PRODUCTVERSION_STR
+        END
+    END
+
+    BLOCK "VarFileInfo"
+    BEGIN
+        /* The following line should only be modified for localized versions.     */
+        /* It consists of any number of WORD,WORD pairs, with each pair           */
+        /* describing a language,codepage combination supported by the file.      */
+        /*                                                                        */
+        /* For example, a file might have values "0x409,1252" indicating that it  */
+        /* supports English language (0x409) in the Windows ANSI codepage (1252). */
+
+        VALUE "Translation", 0x409, 1252
+
+    END
+END
