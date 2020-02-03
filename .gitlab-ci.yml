@@ -984,7 +984,7 @@ lib-installer-linux-x64:
   script:
     - export INGESCAPE_MAJOR=$(grep "#define INGESCAPE_MAJOR" src/admin.c | cut -d ' ' -f3-)
     - export INGESCAPE_MINOR=$(grep "#define INGESCAPE_MINOR" src/admin.c | cut -d ' ' -f3-)
-    - export INGESCAPE_MICRO=$(expr ${CI_PIPELINE_ID} % 1024)
+    - export INGESCAPE_MICRO=$(expr ${CI_PIPELINE_ID} % 1000)
     - export INGESCAPE_VERSION=$INGESCAPE_MAJOR.$INGESCAPE_MINOR.$INGESCAPE_MICRO
     - cd build
     - make package
