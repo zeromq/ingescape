@@ -151,12 +151,24 @@ if(NOT MSVC)
   # needs different preprocessor defines in static builds
   add_library(ingescape_objects OBJECT ${ingescape_sources})
   set_property(TARGET ingescape_objects PROPERTY POSITION_INDEPENDENT_CODE ON)
-endif(NOT MSVC)
+else()
+  if (${CMAKE_BUILD_TYPE} MATCHES "Release")
+    set(WIN32_LIB_FILEFLAGS "0")
+  else ()
+      set(WIN32_LIB_FILEFLAGS "VS_FF_DEBUG")
+  endif()
+endif()
+
 
 # shared
 if(INGESCAPE_BUILD_SHARED)
   if(MSVC)
-    add_library(${PROJECT_NAME} SHARED ${ingescape_sources})
+    set(WIN32_LIB_FILETYPE "VFT_DLL")
+    configure_file(${SOURCE_DIR}/builds/cmake/modules/library/library_version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
+
+    add_library(${PROJECT_NAME} SHARED
+        ${ingescape_sources}
+        ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
 
     if(CMAKE_BUILD_TYPE STREQUAL "Release")
       set_target_properties(${PROJECT_NAME}
@@ -224,7 +236,12 @@ endif()
 # static
 if(INGESCAPE_BUILD_STATIC)
   if(MSVC)
-    add_library(${PROJECT_NAME}-static STATIC ${ingescape_sources})
+    set(WIN32_LIB_FILETYPE "VFT_STATIC_LIB")
+    configure_file(${SOURCE_DIR}/builds/cmake/modules/library/library_version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
+
+    add_library(${PROJECT_NAME}-static STATIC
+        ${ingescape_sources}
+        ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
 
     if(CMAKE_BUILD_TYPE STREQUAL "Release")
       set_target_properties(${PROJECT_NAME}-static

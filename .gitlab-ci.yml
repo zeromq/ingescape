@@ -102,7 +102,7 @@ lib-build-macos:
     - git clean -xfd
     - mkdir -p build
     - mkdir -p release
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/builds/release/ingescape/usr/local/
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/builds/release/ingescape/usr/local/ -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
     - make -C build
     - make -C build DESTDIR=$PWD/release install
     - make -C build DESTDIR=$HOME/builds/release/ingescape/ install
@@ -163,7 +163,7 @@ editor-build-macos:
   script:
     - git clean -xfd
     - mkdir -p applications/apps/IngeScape-Editor/build
-    - cmake -S applications/apps/IngeScape-Editor/ -B applications/apps/IngeScape-Editor/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.9.7/clang_64/;$HOME/builds/release/ingescape/usr/local/"
+    - cmake -S applications/apps/IngeScape-Editor/ -B applications/apps/IngeScape-Editor/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.9.7/clang_64/;$HOME/builds/release/ingescape/usr/local/" -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
     - make -C applications/apps/IngeScape-Editor/build
 #    - 'codesign --force --deep --sign  "Developer ID Application: Ingenuity i/o (56DRT9MG9S)" -v applications/apps/IngeScape-Editor/build/IngeScape-Editor.app'
     - mkdir -p $HOME/builds/release/apps/
@@ -188,7 +188,7 @@ assessments-build-macos:
   script:
     - git clean -xfd
     - mkdir -p applications/apps/IngeScape-Assessments/build
-    - cmake -S applications/apps/IngeScape-Assessments/ -B applications/apps/IngeScape-Assessments/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.9.7/clang_64/;$HOME/builds/release/ingescape/usr/local/"
+    - cmake -S applications/apps/IngeScape-Assessments/ -B applications/apps/IngeScape-Assessments/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.9.7/clang_64/;$HOME/builds/release/ingescape/usr/local/" -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
     - make -C applications/apps/IngeScape-Assessments/build
 #    - 'codesign --force --deep --sign  "Developer ID Application: Ingenuity i/o (56DRT9MG9S)" -v applications/apps/IngeScape-Assessments/build/IngeScape-Assessments.app'
     - mkdir -p $HOME/builds/release/apps/
@@ -214,7 +214,7 @@ expe-build-macos:
   script:
     - git clean -xfd
     - mkdir -p applications/apps/IngeScape-Expe/build
-    - cmake -S applications/apps/IngeScape-Expe/ -B applications/apps/IngeScape-Expe/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.9.7/clang_64/;$HOME/builds/release/ingescape/usr/local/"
+    - cmake -S applications/apps/IngeScape-Expe/ -B applications/apps/IngeScape-Expe/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.9.7/clang_64/;$HOME/builds/release/ingescape/usr/local/" -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
     - make -C applications/apps/IngeScape-Expe/build
 #    - 'codesign --force --deep --sign  "Developer ID Application: Ingenuity i/o (56DRT9MG9S)" -v applications/apps/IngeScape-Expe/build/IngeScape-Expe.app'
     - mkdir -p $HOME/builds/release/apps/
@@ -301,7 +301,7 @@ lib-windows-release-x64:
     - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir build\ReleaseX64
-    - cmake -S . -B build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release -DINGESCAPE_BUILD_STATIC=OFF
+    - cmake -S . -B build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
     - cmake --build build\ReleaseX64 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -323,7 +323,7 @@ lib-windows-release-x86:
     - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir build\ReleaseX86
-    - cmake -S . -B build\ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release -DINGESCAPE_BUILD_STATIC=OFF
+    - cmake -S . -B build\ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
     - cmake --build build\ReleaseX86 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -345,7 +345,7 @@ lib-windows-debug-x64:
     - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir build\DebugX64
-    - cmake -S . -B build\DebugX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Debug -DINGESCAPE_BUILD_STATIC=OFF
+    - cmake -S . -B build\DebugX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Debug -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
     - cmake --build build\DebugX64 --target ALL_BUILD --config Debug
   artifacts:
     paths:
@@ -367,7 +367,7 @@ lib-windows-debug-x86:
     - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x86;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir build\DebugX86
-    - cmake -S . -B build\DebugX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Debug -DINGESCAPE_BUILD_STATIC=OFF
+    - cmake -S . -B build\DebugX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Debug -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
     - cmake --build build\DebugX86 --target ALL_BUILD --config Debug
   artifacts:
     paths:
@@ -386,7 +386,7 @@ binding-csharp-windows-x64:
   script:
     - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
     - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
-    - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release
+    - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
     - Powershell.exe -executionpolicy remotesigned bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64
     - cmake --build bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64 --target IngescapeCSharp --config Release
   artifacts:
@@ -406,7 +406,7 @@ binding-csharp-windows-x86:
   script:
     - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
     - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
-    - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release
+    - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
     - Powershell.exe -executionpolicy remotesigned bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86
     - cmake --build bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86 --target IngescapeCSharp --config Release
   artifacts:
@@ -430,7 +430,7 @@ editor-windows-release-x86:
     - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir applications\apps\IngeScape-Editor\build\ReleaseX86
-    - cmake applications\apps\IngeScape-Editor\ -B applications\apps\IngeScape-Editor\build\ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release
+    - cmake applications\apps\IngeScape-Editor\ -B applications\apps\IngeScape-Editor\build\ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
     - cmake --build applications\apps\IngeScape-Editor\build\ReleaseX86 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -453,7 +453,7 @@ editor-windows-release-x64:
     - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir applications\apps\IngeScape-Editor\build\ReleaseX64
-    - cmake applications\apps\IngeScape-Editor\ -B applications\apps\IngeScape-Editor\build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release
+    - cmake applications\apps\IngeScape-Editor\ -B applications\apps\IngeScape-Editor\build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
     - cmake --build applications\apps\IngeScape-Editor\build\ReleaseX64 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -477,7 +477,7 @@ assessments-windows-release-x86:
     - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir applications\apps\IngeScape-Assessments\build\ReleaseX86
-    - cmake applications\apps\IngeScape-Assessments\ -B applications\apps\IngeScape-Assessments\build\ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release
+    - cmake applications\apps\IngeScape-Assessments\ -B applications\apps\IngeScape-Assessments\build\ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
     - cmake --build applications\apps\IngeScape-Assessments\build\ReleaseX86 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -501,7 +501,7 @@ assessments-windows-release-x64:
     - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir applications\apps\IngeScape-Assessments\build\ReleaseX64
-    - cmake applications\apps\IngeScape-Assessments\ -B applications\apps\IngeScape-Assessments\build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release
+    - cmake applications\apps\IngeScape-Assessments\ -B applications\apps\IngeScape-Assessments\build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
     - cmake --build applications\apps\IngeScape-Assessments\build\ReleaseX64 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -525,7 +525,7 @@ expe-windows-release-x86:
     - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir applications\apps\IngeScape-Expe\build\ReleaseX86
-    - cmake applications\apps\IngeScape-Expe\ -B applications\apps\IngeScape-Expe\build\ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release
+    - cmake applications\apps\IngeScape-Expe\ -B applications\apps\IngeScape-Expe\build\ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
     - cmake --build applications\apps\IngeScape-Expe\build\ReleaseX86 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -549,7 +549,7 @@ expe-windows-release-x64:
     - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
     - mkdir applications\apps\IngeScape-Expe\build\ReleaseX64
-    - cmake applications\apps\IngeScape-Expe\ -B applications\apps\IngeScape-Expe\build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release
+    - cmake applications\apps\IngeScape-Expe\ -B applications\apps\IngeScape-Expe\build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
     - cmake --build applications\apps\IngeScape-Expe\build\ReleaseX64 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -844,7 +844,7 @@ lib-build-linux-x64:
   script:
     - mkdir -p build
     - mkdir -p release
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/builds/release/linux_x64/usr/local/
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/builds/release/linux_x64/usr/local/ -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
     - make -C build
     - make -C build DESTDIR=$PWD/release install
     - make -C build DESTDIR=$HOME/builds/release/linux_x64/ install
@@ -870,7 +870,7 @@ lib-debian-9-release-x64:
   script:
     - git clean -xfd
     - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
     - make -C build
   artifacts:
     paths:
@@ -889,7 +889,7 @@ lib-debian-10-release-x64:
   script:
     - git clean -xfd
     - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
     - make -C build
   artifacts:
     paths:
@@ -908,7 +908,7 @@ lib-centos-7-release-x64:
   script:
     - git clean -xfd
     - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
     - make -C build
   artifacts:
     paths:
@@ -927,7 +927,7 @@ lib-linux-release-armhf:
   script:
     - git clean -xfd
     - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/toolchain.cmake
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/toolchain.cmake -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
     - make -C build
   artifacts:
     paths:
@@ -946,7 +946,7 @@ lib-raspbian-9-release-armhf:
   script:
     - git clean -xfd
     - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/toolchain.cmake
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/toolchain.cmake -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
     - make -C build
   artifacts:
     paths:
@@ -965,7 +965,7 @@ lib-android-release-armv7a-softfp:
   script:
     - git clean -xfd
     - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/${ANDROID_NDK_TOOLCHAIN_FILE}
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/${ANDROID_NDK_TOOLCHAIN_FILE} -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
     - make -C build
   artifacts:
     paths:
@@ -984,7 +984,7 @@ lib-installer-linux-x64:
   script:
     - export INGESCAPE_MAJOR=$(grep "#define INGESCAPE_MAJOR" src/admin.c | cut -d ' ' -f3-)
     - export INGESCAPE_MINOR=$(grep "#define INGESCAPE_MINOR" src/admin.c | cut -d ' ' -f3-)
-    - export INGESCAPE_MICRO=$(grep "#define INGESCAPE_MICRO" src/admin.c | cut -d ' ' -f3-)
+    - export INGESCAPE_MICRO=$(expr ${CI_PIPELINE_ID} % 1000)
     - export INGESCAPE_VERSION=$INGESCAPE_MAJOR.$INGESCAPE_MINOR.$INGESCAPE_MICRO
     - cd build
     - make package
