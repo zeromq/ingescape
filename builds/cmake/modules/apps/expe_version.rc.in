@@ -46,3 +46,5 @@ BEGIN
     END
 END
 
+IDI_ICON1        ICON    DISCARDABLE     "icon_IGS.ico"
+

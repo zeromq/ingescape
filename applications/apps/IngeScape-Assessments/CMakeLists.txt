@@ -254,20 +254,20 @@ endif()
 ########################################################################
 # executable
 ########################################################################
-set(INGESCAPE_ASSESSMENTS_ICON)
+set(INGESCAPE_ASSESSMENTS_RC)
 if (APPLE)
-    set(INGESCAPE_ASSESSMENTS_ICON "${SOURCE_DIR}/icon_Assessments.icns")
-    set_source_files_properties("${INGESCAPE_ASSESSMENTS_ICON}" PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+    set(INGESCAPE_ASSESSMENTS_RC "${SOURCE_DIR}/icon_Assessments.icns")
+    set_source_files_properties("${INGESCAPE_ASSESSMENTS_RC}" PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 elseif (WIN32)
-    set(INGESCAPE_ASSESSMENTS_ICON "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.rc")
-    file(WRITE ${INGESCAPE_ASSESSMENTS_ICON} "IDI_ICON1               ICON    DISCARDABLE     \"icon_Assessments.ico\"")
+    configure_file(${SOURCE_DIR}/../../../builds/cmake/modules/apps/assessments_version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.rc)
+    set(INGESCAPE_ASSESSMENTS_RC "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.rc")
 endif ()
 
 # Create target
 add_executable(${PROJECT_NAME} WIN32 MACOSX_BUNDLE
     ${ingescape_assessments_sources}
     ${ingescape_assessments_ressources}
-    ${INGESCAPE_ASSESSMENTS_ICON}
+    ${INGESCAPE_ASSESSMENTS_RC}
     ${I2QUICK_LIB}
 )
 

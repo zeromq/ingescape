@@ -230,7 +230,7 @@ if (APPLE)
     set(INGESCAPE_EDITOR_RC "${SOURCE_DIR}/icon_IGS.icns")
     set_source_files_properties("${INGESCAPE_EDITOR_RC}" PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 elseif (WIN32)
-    configure_file(${SOURCE_DIR}/../../../builds/cmake/modules/library/editor_version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.rc)
+    configure_file(${SOURCE_DIR}/../../../builds/cmake/modules/apps/editor_version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.rc)
     set(INGESCAPE_EDITOR_RC "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.rc")
 endif ()
 

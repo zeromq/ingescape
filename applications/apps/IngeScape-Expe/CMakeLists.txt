@@ -210,20 +210,20 @@ endif ()
 ########################################################################
 # executable
 ########################################################################
-set(INGESCAPE_EXPE_ICON)
+set(INGESCAPE_EXPE_RC)
 if (APPLE)
-    set(INGESCAPE_EXPE_ICON "${SOURCE_DIR}/icon_IGS.icns")
-    set_source_files_properties("${INGESCAPE_EXPE_ICON}" PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+    set(INGESCAPE_EXPE_RC "${SOURCE_DIR}/icon_IGS.icns")
+    set_source_files_properties("${INGESCAPE_EXPE_RC}" PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 elseif (WIN32)
-    set(INGESCAPE_EXPE_ICON "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.rc")
-    file(WRITE ${INGESCAPE_EXPE_ICON} "IDI_ICON1               ICON    DISCARDABLE     \"icon_IGS.ico\"")
+    configure_file(${SOURCE_DIR}/../../../builds/cmake/modules/apps/expe_version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.rc)
+    set(INGESCAPE_EXPE_RC "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.rc")
 endif ()
 
 # Create target
 add_executable(${PROJECT_NAME} WIN32 MACOSX_BUNDLE
     ${ingescape_expe_sources}
     ${ingescape_expe_ressources}
-    ${INGESCAPE_EXPE_ICON}
+    ${INGESCAPE_EXPE_RC}
     ${I2QUICK_LIB}
 )
 
