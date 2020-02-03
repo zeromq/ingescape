@@ -164,7 +164,7 @@ endif()
 if(INGESCAPE_BUILD_SHARED)
   if(MSVC)
     set(WIN32_LIB_FILETYPE "VFT_DLL")
-    configure_file(${SOURCE_DIR}/builds/cmake/modules/library/version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
+    configure_file(${SOURCE_DIR}/builds/cmake/modules/library/library_version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
 
     add_library(${PROJECT_NAME} SHARED
         ${ingescape_sources}
@@ -237,7 +237,7 @@ endif()
 if(INGESCAPE_BUILD_STATIC)
   if(MSVC)
     set(WIN32_LIB_FILETYPE "VFT_STATIC_LIB")
-    configure_file(${SOURCE_DIR}/builds/cmake/modules/library/version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
+    configure_file(${SOURCE_DIR}/builds/cmake/modules/library/library_version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
 
     add_library(${PROJECT_NAME}-static STATIC
         ${ingescape_sources}
