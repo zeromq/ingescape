@@ -39,7 +39,7 @@ macro(add_ingescape_common_ressources _RESSOURCES)
 endmacro()
 
 if (${CI_PIPELINE_ID})
-    math(EXPR moduloed_pipeline_id "${CI_PIPELINE_ID} % 1024" OUTPUT_FORMAT DECIMAL)
+    math(EXPR moduloed_pipeline_id "${CI_PIPELINE_ID} % 1000" OUTPUT_FORMAT DECIMAL)
 else()
     set(moduloed_pipeline_id "0")
 endif()
