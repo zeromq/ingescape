@@ -888,7 +888,7 @@ I2PopupBase {
         onConfirmed: {
             rootPopup.enabled = true;
             if (license && rootPopup.licensesController) {
-                rootPopup.licensesController.deleteLicense(license.QtObject);
+                rootPopup.licensesController.deleteLicense(license);
             }
         }
 

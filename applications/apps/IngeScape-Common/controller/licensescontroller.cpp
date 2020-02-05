@@ -196,17 +196,24 @@ void LicensesController::updateLicensesPath(QString newLicensesPath)
  */
 bool LicensesController::deleteLicense(LicenseInformationM* licenseInformation)
 {
-    QDir licenseDirectory(_licensesPath);
-    if (licenseDirectory.exists() && licenseDirectory.remove(licenseInformation->fileName()))
+    bool success(false);
+    if (licenseInformation != nullptr)
     {
-        // Success
-        refreshLicensesData();
-        return true;
-    }
+        QDir licenseDirectory(_licensesPath);
+        if (licenseDirectory.exists() && licenseDirectory.remove(licenseInformation->fileName()))
+        {
+            // Success
+            refreshLicensesData();
+            success = true;
+        }
+        else
+        {
+            // Failure
+            qDebug() << "Unable to delete the license file.";
+        }
 
-    // Failure
-    qDebug() << "Unable to delete the license file.";
-    return false;
+    }
+    return success;
 }
 
 
