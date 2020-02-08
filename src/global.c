@@ -14,8 +14,9 @@
 #include "ingescape_private.h"
 
 igsAgent_t *globalAgent = NULL;
-int igs_nbOfInternalAgents = 0;
+int igs_nbOfAgentsInProcess = 0;
 bool igs_Interrupted = false;
+bool igs_shallRaiseFileDescriptorsLimit = true;
 
 void globalforcedStopCB(igsAgent_t *agent, void *myData){
     IGS_UNUSED(myData)

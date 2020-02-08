@@ -30,6 +30,8 @@
 #include <czmq.h>
 #if (defined WIN32 || defined _WIN32)
 #include "unixfunctions.h"
+#else
+#include <sys/resource.h>
 #endif
 #include "uthash/uthash.h"
 #include "uthash/utlist.h"
@@ -430,7 +432,6 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
 
 //manage messages received on the bus
 int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
-    network_Lock();
     igsAgent_t *agent = (igsAgent_t *)arg;
     zyre_t *node = agent->loopElements->node;
     
@@ -591,7 +592,6 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                                 }
                                 free(k);
                                 zlist_destroy(&keys);
-                                network_Unlock();
                                 return -1;
                             }
 #endif
@@ -758,7 +758,6 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         }
                         zmsg_destroy(&msgDuplicate);
                         zyre_event_destroy(&zyre_event);
-                        network_Unlock();
                         return -1;
                     }
                     #endif
@@ -1016,7 +1015,6 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     free(message);
                     zmsg_destroy(&msgDuplicate);
                     zyre_event_destroy(&zyre_event);
-                    network_Unlock();
                     //stop our zyre loop by returning -1 : this will start the cleaning process
                     return -1;
                 }else if (strlen("CLEAR_MAPPING") == strlen(message) && strncmp (message, "CLEAR_MAPPING", strlen("CLEAR_MAPPING")) == 0){
@@ -1245,7 +1243,6 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
         zmsg_destroy(&msgDuplicate);
         zyre_event_destroy(&zyre_event);
     }
-    network_Unlock();
     return 0;
 }
 
@@ -1374,6 +1371,7 @@ static void runLoop (zsock_t *mypipe, void *args){
     }
 #endif
     zsock_signal (mypipe, 0);
+    igs_nbOfAgentsInProcess++;
     network_Unlock();
     
     igsAgent_debug(agent, "loop starting");
@@ -1394,7 +1392,7 @@ static void runLoop (zsock_t *mypipe, void *args){
     bus_zyreLock();
     zyre_stop (agent->loopElements->node);
     bus_zyreUnlock();
-    zclock_sleep (100);
+    //zclock_sleep (100);
     zyre_destroy (&agent->loopElements->node);
     zsock_destroy(&agent->loopElements->publisher);
     if (agent->loopElements->ipcPublisher != NULL){
@@ -1446,6 +1444,7 @@ static void runLoop (zsock_t *mypipe, void *args){
         //TODO : do that for windows also
     }
     igsAgent_debug(agent, "loop stopped");
+    igs_nbOfAgentsInProcess--;
     network_Unlock();
 }
 
@@ -1468,6 +1467,36 @@ void initLoop (igsAgent_t *agent){
     
     //NB: counting the number of IOPs here does not include future
     //definition modifications when the agent is running.
+#endif
+    
+#if defined __unix__ || defined __APPLE__ || defined __linux__
+    if (igs_shallRaiseFileDescriptorsLimit && igs_nbOfAgentsInProcess > 1){
+        struct rlimit limit;
+        if (getrlimit(RLIMIT_NOFILE, &limit) != 0) {
+            igsAgent_error(agent, "getrlimit() failed with errno=%d", errno);
+        }else{
+            rlim_t prevCur = limit.rlim_cur;
+#ifdef __APPLE__
+            limit.rlim_cur = MIN(OPEN_MAX, limit.rlim_max); //OPEN_MAX is the actual per process limit in macOS
+#else
+            limit.rlim_cur = limit.rlim_max;
+#endif
+            if (setrlimit(RLIMIT_NOFILE, &limit) != 0) {
+              igsAgent_error(agent, "setrlimit() failed with errno=%d", errno);
+            }else{
+                if (getrlimit(RLIMIT_NOFILE, &limit) != 0) {
+                  igsAgent_error(agent, "getrlimit() failed with errno=%d", errno);
+                }else{
+                    //FIXME: sockets can be created when initiating a monitor and thus before
+                    //the first start. This shall be secured or it could cause a crash.
+                    //adjust allowed number of sockets per process in ZeroMQ
+                    //zsys_set_max_sockets(0); //0 = use maximum value allowed by the OS
+                    igsAgent_debug(agent, "raised file descriptors limit from %llu to %llu", prevCur, limit.rlim_cur);
+                    igs_shallRaiseFileDescriptorsLimit = false;
+                }
+            }
+        }
+    }
 #endif
 
     agent->network_needToSendDefinitionUpdate = false;
@@ -1909,7 +1938,6 @@ int igsAgent_startWithDevice(igsAgent_t *agent, const char *networkDevice, unsig
     agent->loopElements->zyrePort = port;
     initLoop(agent);
     assert (agent->loopElements->agentActor);
-    igs_nbOfInternalAgents++;
     return 1;
 }
 
@@ -1965,7 +1993,6 @@ int igsAgent_startWithIP(igsAgent_t *agent, const char *ipAddress, unsigned int 
     agent->loopElements->zyrePort = port;
     initLoop(agent);
     assert (agent->loopElements->agentActor);
-    igs_nbOfInternalAgents++;
     return 1;
 }
 
@@ -2030,7 +2057,6 @@ int igsAgent_startWithDeviceOnBroker(igsAgent_t *agent, const char *networkDevic
     agent->loopElements->zyrePort = 0;
     initLoop(agent);
     assert (agent->loopElements->agentActor);
-    igs_nbOfInternalAgents++;
     return 1;
 }
 
@@ -2040,28 +2066,27 @@ int igsAgent_stop(igsAgent_t *agent){
         //interrupting and destroying ingescape thread and zyre layer
         //this will also clean all agent->subscribers
         if (agent->loopElements->node != NULL){
-            //we send message only if zactor is still active, i.e.
+            //we send message only if zyre thread is still active, i.e.
             //if its node still exists
             zstr_sendx (agent->loopElements->agentActor, "$TERM", NULL);
         }
         if (agent->loopElements->agentActor != NULL){
+            //This function will block until runLoop has terminated
             zactor_destroy (&agent->loopElements->agentActor);
         }
         //cleaning agent
         free (agent->loopElements);
         agent->loopElements = NULL;
-        igs_nbOfInternalAgents--;
-        //igsAgent_debug(agent, "still %d internal agents running", igs_nbOfInternalAgents);
-        #if (defined WIN32 || defined _WIN32)
+        //igsAgent_debug(agent, "still %d internal agents running", igs_nbOfAgentsInProcess);
+#if (defined WIN32 || defined _WIN32)
         // On Windows, if we don't call zsys_shutdown, the application will crash on exit
         // (WSASTARTUP assertion failure)
         // NB: Monitoring also uses a zactor, we can not call zsys_shutdown() when it is running
-        if (igs_nbOfInternalAgents == 0) {
+        if (igs_nbOfAgentsInProcess == 0) {
             igsAgent_debug(agent, "calling zsys_shutdown after last agent in process has stopped");
             zsys_shutdown();
         }
-        #endif
-
+#endif
         igsAgent_info(agent, "%s stopped", agent->agentName);
     }else{
         igsAgent_debug(agent, "%s already stopped", agent->agentName);

@@ -374,7 +374,8 @@ typedef struct _igsAgent_t {
 //////////////////  FUNCTIONS  AND SHARED VARIABLES //////////////////
 
 PUBLIC extern igsAgent_t *globalAgent;
-PUBLIC extern int igs_nbOfInternalAgents;
+PUBLIC extern int igs_nbOfAgentsInProcess;
+PUBLIC extern bool igs_shallRaiseFileDescriptorsLimit;
 void initInternalAgentIfNeeded(void);
 
 
