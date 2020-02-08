@@ -1425,15 +1425,11 @@ static void runLoop (zsock_t *mypipe, void *args){
         free(current_timer);
     }
     
-    //call registered interruption callbacks
-    forcedStopCalback_t *cb = NULL;
     if (agent->forcedStop){
+        forcedStopCalback_t *cb = NULL;
         DL_FOREACH(agent->forcedStopCalbacks, cb){
             cb->callback_ptr(agent, cb->myData);
         }
-    }
-    
-    if (agent->forcedStop){
         agent->isInterrupted = true;
         //in case of forced stop, we send SIGINT to our process so
         //that it can be trapped by main thread for a proper stop
@@ -1441,7 +1437,7 @@ static void runLoop (zsock_t *mypipe, void *args){
         igsAgent_debug(agent, "triggering SIGINT");
         kill(agent->loopElements->processId, SIGINT);
         #endif
-        //TODO : do that for windows also
+        //FIXME : find a way to do that for windows as well
     }
     igsAgent_debug(agent, "loop stopped");
     igs_nbOfAgentsInProcess--;
@@ -2077,7 +2073,7 @@ int igsAgent_stop(igsAgent_t *agent){
         //cleaning agent
         free (agent->loopElements);
         agent->loopElements = NULL;
-        //igsAgent_debug(agent, "still %d internal agents running", igs_nbOfAgentsInProcess);
+        //igsAgent_debug(agent, "still %d agents running in process", igs_nbOfAgentsInProcess);
 #if (defined WIN32 || defined _WIN32)
         // On Windows, if we don't call zsys_shutdown, the application will crash on exit
         // (WSASTARTUP assertion failure)

@@ -281,7 +281,7 @@ void igsAgent_monitoringDisable(igsAgent_t *agent){
     free(agent->monitor);
     agent->monitor = NULL;
     igs_nbOfAgentsInProcess--;
-    //igsAgent_debug(agent, "still %d internal agents running", igs_nbOfAgentsInProcess);
+    //igsAgent_debug(agent, "still %d agents running in process", igs_nbOfAgentsInProcess);
 #if (defined WIN32 || defined _WIN32)
     // On Windows, we need to use a sledgehammer to avoid assertion errors
     // NB: If we don't call zsys_shutdown, the application will crash on exit
