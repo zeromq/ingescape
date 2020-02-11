@@ -236,8 +236,13 @@ void ExperimentationController::exportSelectedSessions()
         {
             //QString message = QString("%1=%2").arg(command_ExportSessions, sessionIds.join('|'));
 
+            // FIXME TODO: add a control to set this flag in the QML
+            // if flag = true: we export only the outputs that have a corresponding Dependent Variable in the protocol
+            // if flag = false: we export all IngeScape outputs of the platform
+            bool filterDependentVariables = true;
+
             QString experimentationUID = AssessmentsModelManager::cassUuidToQString(_currentExperimentation->getCassUuid());
-            QString message = QString("%1=%2 EXPE=%3").arg(command_ExportSessions, sessionIds.join('|'), experimentationUID);
+            QString message = QString("%1=%2 EXPE=%3 VD_FILTER=%4").arg(command_ExportSessions, sessionIds.join('|'), experimentationUID, QString::number(filterDependentVariables));
 
             // Send the message "Export Sessions" to the recorder
             IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerIdOfRecorder, message);
