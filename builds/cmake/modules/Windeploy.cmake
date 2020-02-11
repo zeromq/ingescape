@@ -20,7 +20,7 @@ function(windeployqt target qml_src_dir)
         COMMAND "${CMAKE_COMMAND}" -E
             env PATH="${_qt_bin_dir}" "${WINDEPLOYQT_EXECUTABLE}"
                 --verbose 0
-                -xml -concurrent -printsupport -sql -qmldir=\"${qml_src_dir}\"
+                -xml -concurrent -printsupport -qmldir=\"${qml_src_dir}\"
                 \"$<TARGET_FILE:${target}>\"
     )
 
@@ -40,7 +40,7 @@ function(windeployqt target qml_src_dir)
             COMMAND \"${CMAKE_COMMAND}\" -E
                 env PATH=\"${_qt_bin_dir}\" \"${WINDEPLOYQT_EXECUTABLE}\"
                     --dry-run
-                    -xml -concurrent -printsupport -sql -qmldir=\"${qml_src_dir}\"
+                    -xml -concurrent -printsupport -qmldir=\"${qml_src_dir}\"
                     --list mapping
                     \${_file}
             OUTPUT_VARIABLE _output

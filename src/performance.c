@@ -1,0 +1,52 @@
+//
+//  performance.c
+//  ingescape
+//
+//  Created by Stephane Vales on 15/10/2019.
+//  Copyright © 2019 Ingenuity i/o. All rights reserved.
+//
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <czmq.h>
+#include "ingescape_advanced.h"
+#include "ingescape_private.h"
+
+size_t performanceMsgCounter = 0;
+size_t performanceMsgCountTarget = 0;
+size_t performanceMsgSize = 0;
+int64_t performanceStart = 0;
+int64_t performanceStop = 0;
+
+void igsAgent_performanceCheck(igsAgent_t *agent, const char *peerId, size_t msgSize, size_t nbOfMsg){
+    if (agent->loopElements == NULL || agent->loopElements->node == NULL){
+        igsAgent_error(agent, "agent must be started to execute performance tests");
+        return;
+    }
+    if (performanceMsgCountTarget != 0){
+        igsAgent_error(agent, "check already in progress");
+        return;
+    }
+    if (nbOfMsg == 0){
+        igsAgent_error(agent, "nbOfMsg must be greater than zero");
+        return;
+    }
+    
+    performanceMsgCountTarget = nbOfMsg;
+    performanceMsgCounter = 1;
+    performanceMsgSize = msgSize;
+    
+    zmsg_t *msg = zmsg_new();
+    zmsg_addstr(msg, "PING");
+    zmsg_addmem(msg, &performanceMsgCounter, sizeof(size_t));
+    void *mem = malloc(msgSize);
+    zmsg_addmem(msg, mem, msgSize);
+    zyre_t *node = agent->loopElements->node;
+    
+    performanceStart = zclock_usecs();
+    bus_zyreLock();
+    zyre_whisper(node, peerId, &msg);
+    bus_zyreUnlock();
+    free(mem);
+}

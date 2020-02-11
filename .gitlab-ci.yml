@@ -2,20 +2,23 @@
 
 # Define job order
 stages:
-  - build-lib
-  - installer-lib
-  - build-binding
-  - installer-binding
-  - build-apps
-  - installer-apps
-  - deploy-lib
-  - deploy-binding
-  - delivery-lib
-  - delivery-apps
-  - delivery-binding
+  - lib-build
+  - lib-installer
+  - lib-deploy
+  - lib-delivery
+  - lib-delivery-stable
+  - binding-build
+  - binding-installer
+  - binding-deploy
+  - binding-delivery
+  - binding-delivery-stable
+  - apps-build
+  - apps-installer
+  - apps-delivery
+  - apps-delivery-stable
 
 # Define ingescape library files
-.build-lib-files: &build-lib-files
+.lib-build-files:
   only:
     changes:
       - .gitlab-ci.yml
@@ -25,11 +28,9 @@ stages:
       - dependencies/unix/*
       - dependencies/windows/unix/*
       - CMakeLists.txt
-    refs:
-      - master
 
 # Define csharp binding files
-.build-csharp-files: &build-csharp-files
+.binding-build-files:
   only:
     changes:
       - .gitlab-ci.yml
@@ -40,11 +41,9 @@ stages:
       - dependencies/windows/unix/*
       - CMakeLists.txt
       - bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/**/*
-    refs:
-      - master
 
 # Define ingescape editor files
-.build-editor-files: &build-editor-files
+.editor-build-files:
   only:
     changes:
       - .gitlab-ci.yml
@@ -53,14 +52,12 @@ stages:
       - dependencies/yajl/**/*
       - dependencies/unix/*
       - dependencies/windows/unix/*
-      - editor/frameworks/**/*
-      - editor/apps/IngeScape-Common/**/*
-      - editor/apps/IngeScape-Editor/**/*
-    refs:
-      - master
+      - applications/frameworks/**/*
+      - applications/apps/IngeScape-Common/**/*
+      - applications/apps/IngeScape-Editor/**/*
 
 # Define ingescape assessments files
-.build-assessments-files: &build-assessments-files
+.assessments-build-files:
   only:
     changes:
       - .gitlab-ci.yml
@@ -69,14 +66,12 @@ stages:
       - dependencies/yajl/**/*
       - dependencies/unix/*
       - dependencies/windows/unix/*
-      - editor/frameworks/**/*
-      - editor/apps/IngeScape-Common/**/*
-      - editor/apps/IngeScape-Assessments/**/*
-    refs:
-      - master
+      - applications/frameworks/**/*
+      - applications/apps/IngeScape-Common/**/*
+      - applications/apps/IngeScape-Assessments/**/*
 
 # Define ingescape expe files
-.build-expe-files: &build-expe-files
+.expe-build-files:
   only:
     changes:
       - .gitlab-ci.yml
@@ -85,502 +80,492 @@ stages:
       - dependencies/yajl/**/*
       - dependencies/unix/*
       - dependencies/windows/unix/*
-      - editor/frameworks/**/*
-      - editor/apps/IngeScape-Common/**/*
-      - editor/apps/IngeScape-Expe/**/*
-    refs:
-      - master
-
-# Create ingescape library for linux (x86_64)
-lib-linux-release-x64:
-  <<: *build-lib-files
-  stage: build-lib
-  tags:
-    - docker
-  image: ingescape/debian-with-zyre
-  script:
-    - git clean -xfd
-    - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-    - make -C build
-  artifacts:
-    paths:
-      - build
-    name: "lib-linux-release-x64"
-    expire_in: 1 week
-  dependencies: []
-
-# Create ingescape library for Debian 9 (x86_64)
-lib-debian-9-release-x64:
-  <<: *build-lib-files
-  stage: build-lib
-  tags:
-    - docker
-  image: ingescape/debian-9-with-zyre
-  script:
-    - git clean -xfd
-    - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-    - make -C build
-  artifacts:
-    paths:
-      - build
-    name: "lib-debian-9-release-x64"
-    expire_in: 1 week
-  dependencies: []
-
-# Create ingescape library for Debian 10 (x86_64)
-lib-debian-10-release-x64:
-  <<: *build-lib-files
-  stage: build-lib
-  tags:
-    - docker
-  image: ingescape/debian-10-with-zyre
-  script:
-    - git clean -xfd
-    - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-    - make -C build
-  artifacts:
-    paths:
-      - build
-    name: "lib-debian-10-release-x64"
-    expire_in: 1 week
-  dependencies: []
-
-# Create ingescape library for CentOS 7 (x86_64)
-lib-centos-7-release-x64:
-  <<: *build-lib-files
-  stage: build-lib
-  tags:
-    - docker
-  image: ingescape/centos-7-with-zyre
-  script:
-    - git clean -xfd
-    - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-    - make -C build
-  artifacts:
-    paths:
-      - build
-    name: "lib-centos-7-release-x64"
-    expire_in: 1 week
-  dependencies: []
-
-# Create ingescape library for linux (armv7/armhf)
-lib-linux-release-armhf:
-  <<: *build-lib-files
-  stage: build-lib
-  tags:
-    - docker
-  image: ingescape/ubuntu-x-compil-rpi
-  script:
-    - git clean -xfd
-    - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/toolchain.cmake
-    - make -C build
-  artifacts:
-    paths:
-      - build
-    name: "lib-linux-release-armhf"
-    expire_in: 1 week
-  dependencies: []
-
-# Create ingescape library for Raspbian 9 (armv7/armhf)
-lib-raspbian-9-release-armhf:
-  <<: *build-lib-files
-  stage: build-lib
-  tags:
-    - docker
-  image: ingescape/ubuntu-x-compil-rpi
-  script:
-    - git clean -xfd
-    - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/toolchain.cmake
-    - make -C build
-  artifacts:
-    paths:
-      - build
-    name: "lib-raspbian-9-release-armhf"
-    expire_in: 1 week
-  dependencies: []
-
-# Create ingescape library for Android (armv7a softfp)
-lib-android-release-armv7a-softfp:
-  <<: *build-lib-files
-  stage: build-lib
-  tags:
-    - docker
-  image: ingescape/ubuntu-x-compil-android
-  script:
-    - git clean -xfd
-    - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/${ANDROID_NDK_TOOLCHAIN_FILE}
-    - make -C build
-  artifacts:
-    paths:
-      - build
-    name: "lib-android-release-armv7a-softfp"
-    expire_in: 1 week
-  dependencies: []
-
-# Create ingescape library for macos
-lib-macos-release-x64:
-  <<: *build-lib-files
-  stage: build-lib
+      - applications/frameworks/**/*
+      - applications/apps/IngeScape-Common/**/*
+      - applications/apps/IngeScape-Expe/**/*
+      
+#http://patorjk.com/software/taag/#p=display&f=Big&t=Windows
+#                       ____   _____
+#                      / __ \ / ____|
+# _ __ ___   __ _  ___| |  | | (___
+#| '_ ` _ \ / _` |/ __| |  | |\___ \
+#| | | | | | (_| | (__| |__| |____) |
+#|_| |_| |_|\__,_|\___|\____/|_____/
+                                    
+# Build library for macos
+lib-build-macos:
+  extends: .lib-build-files
+  stage: lib-build
   tags:
     - osx
   script:
     - git clean -xfd
-    - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+    - mkdir -p build
+    - mkdir -p release
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/builds/release/ingescape/usr/local/ -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
     - make -C build
+    - make -C build DESTDIR=$PWD/release install
+    - make -C build DESTDIR=$HOME/builds/release/ingescape/ install
+    - cp src/include/ingescape_private.h $HOME/builds/release/ingescape/usr/local/include/ingescape/
+    - cd release/usr/local/
+    - tar zcvf ../../../libingescape.tgz *
+    - cd ../../..
   artifacts:
     paths:
-      - build
-    name: "lib-macos-release-x64"
-    expire_in: 1 week
+      - ./build
+      - ./release
+    name: "lib-build-macos"
+    expire_in: 1 day
+  dependencies: []
+
+
+# Create runtime installer for macos
+#On runner machine:
+#- install Packages from http://s.sudre.free.fr/Software/Packages/about.html
+#- get and install pkg signing certificate from apple developer site
+#- indicate proper developper id in signing command line below
+#- to allow codesign without password, call once: security set-keychain-settings ~/Library/Keychains/login.keychain
+#http://s.sudre.free.fr/Software/documentation/Packages/en/Project_Building.html#4
+#https://eclecticlight.co/2017/03/08/making-an-installer-package-the-easier-way/
+#https://fre.applersg.com/check-packages-expired-certificates-mac-os-x
+#https://help.apple.com/xcode/mac/current/#/dev033e997ca
+lib-installer-macos:
+  extends: .lib-build-files
+  stage: lib-installer
+  tags:
+    - osx
+  script:
+    - make -C build package
+#    - packagesbuild ./builds/xcode/ingescape.pkgproj
+#    - mv ./builds/xcode/build/ingescape.pkg ./builds/xcode/build/ingescape_unsigned.pkg
+#    - 'productsign --sign "Developer ID Installer: Ingenuity i/o (56DRT9MG9S)" ./builds/xcode/build/ingescape_unsigned.pkg ./builds/xcode/build/ingescape.pkg'
+    - mkdir -p $HOME/builds/packages
+#    - cp ./builds/xcode/build/ingescape.pkg $HOME/builds/packages/
+    - cp ./build/ingescape*.pkg $HOME/builds/packages/
+#    - mv ./build/ingescape*.pkg .
+  artifacts:
+    paths:
+      - ./build
+    name: "lib-installer-macos"
+  dependencies:
+    - lib-build-macos
+
+
+# Build ingescape editor for macos
+editor-build-macos:
+  extends: .editor-build-files
+  stage: apps-build
+  variables:
+#    Qt5_DIR: ~/Qt/5.9.7/clang_64/lib/cmake/Qt5
+    GIT_SUBMODULE_STRATEGY: recursive
+  tags:
+    - osx
+  script:
+    - git clean -xfd
+    - mkdir -p applications/apps/IngeScape-Editor/build
+    - cmake -S applications/apps/IngeScape-Editor/ -B applications/apps/IngeScape-Editor/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.9.7/clang_64/;$HOME/builds/release/ingescape/usr/local/" -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - make -C applications/apps/IngeScape-Editor/build
+#    - 'codesign --force --deep --sign  "Developer ID Application: Ingenuity i/o (56DRT9MG9S)" -v applications/apps/IngeScape-Editor/build/IngeScape-Editor.app'
+    - mkdir -p $HOME/builds/release/apps/
+    - rm -Rf $HOME/builds/release/apps/IngeScape-Editor.app
+    - cp -Rf applications/apps/IngeScape-Editor/build/IngeScape-Editor.app $HOME/builds/release/apps/
+  artifacts:
+    paths:
+      - applications/apps/IngeScape-Editor/build
+    name: "editor-build-macos"
+    expire_in: 1 day
+  dependencies: []
+
+# Build ingescape assessments for macos
+assessments-build-macos:
+  extends: .assessments-build-files
+  stage: apps-build
+  variables:
+  #    Qt5_DIR: ~/Qt/5.9.7/clang_64/lib/cmake/Qt5
+    GIT_SUBMODULE_STRATEGY: recursive
+  tags:
+    - osx
+  script:
+    - git clean -xfd
+    - mkdir -p applications/apps/IngeScape-Assessments/build
+    - cmake -S applications/apps/IngeScape-Assessments/ -B applications/apps/IngeScape-Assessments/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.9.7/clang_64/;$HOME/builds/release/ingescape/usr/local/" -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - make -C applications/apps/IngeScape-Assessments/build
+#    - 'codesign --force --deep --sign  "Developer ID Application: Ingenuity i/o (56DRT9MG9S)" -v applications/apps/IngeScape-Assessments/build/IngeScape-Assessments.app'
+    - mkdir -p $HOME/builds/release/apps/
+    - rm -Rf $HOME/builds/release/apps/IngeScape-Assessments.app
+    - cp -Rf applications/apps/IngeScape-Assessments/build/IngeScape-Assessments.app $HOME/builds/release/apps/
+  artifacts:
+    paths:
+      - applications/apps/IngeScape-Assessments/build
+    name: "assessments-build-macos"
+    expire_in: 1 day
+  dependencies: []
+
+
+# Build ingescape expe for macos
+expe-build-macos:
+  extends: .expe-build-files
+  stage: apps-build
+  variables:
+#    Qt5_DIR: ~/Qt/5.9.7/clang_64/lib/cmake/Qt5
+    GIT_SUBMODULE_STRATEGY: recursive
+  tags:
+    - osx
+  script:
+    - git clean -xfd
+    - mkdir -p applications/apps/IngeScape-Expe/build
+    - cmake -S applications/apps/IngeScape-Expe/ -B applications/apps/IngeScape-Expe/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.9.7/clang_64/;$HOME/builds/release/ingescape/usr/local/" -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - make -C applications/apps/IngeScape-Expe/build
+#    - 'codesign --force --deep --sign  "Developer ID Application: Ingenuity i/o (56DRT9MG9S)" -v applications/apps/IngeScape-Expe/build/IngeScape-Expe.app'
+    - mkdir -p $HOME/builds/release/apps/
+    - rm -Rf $HOME/builds/release/apps/IngeScape-Expe.app
+    - cp -Rf applications/apps/IngeScape-Expe/build/IngeScape-Expe.app $HOME/builds/release/apps/
+  artifacts:
+    paths:
+      - applications/apps/IngeScape-Expe/build
+    name: "expe-build-macos"
+    expire_in: 1 day
+  dependencies: []
+
+
+# Create editor installer
+editor-installer-macos:
+  extends: .editor-build-files
+  stage: apps-installer
+  tags:
+    - osx
+  script:
+    - make -C applications/apps/IngeScape-Editor/build package
+  #  - make -C applications/apps/IngeScape-Editor/build package_source
+  artifacts:
+    paths:
+      - applications/apps/IngeScape-Editor/build/IngeScape-Editor-*.dmg
+    name: "editor-installer-macos"
+  dependencies:
+    - editor-build-macos
+
+
+# Create assessments installer
+assessments-installer-macos:
+  extends: .assessments-build-files
+  stage: apps-installer
+  tags:
+    - osx
+  script:
+    - make -C applications/apps/IngeScape-Assessments/build package
+  #  - make -C applications/apps/IngeScape-Assessments/build package_source
+  artifacts:
+    paths:
+      - applications/apps/IngeScape-Assessments/build/IngeScape-Assessments-*.dmg
+    name: "assessments-installer-macos"
+  dependencies:
+    - assessments-build-macos
+
+
+# Create expe installer
+expe-installer-macos:
+  extends: .expe-build-files
+  stage: apps-installer
+  tags:
+    - osx
+  script:
+    - make -C applications/apps/IngeScape-Expe/build package
+  #  - make -C applications/apps/IngeScape-Expe/build package_source
+  artifacts:
+    paths:
+      - applications/apps/IngeScape-Expe/build/IngeScape-Expe-*.dmg
+    name: "expe-installer-macos"
+  dependencies:
+    - expe-build-macos
+
+
+
+#__          ___           _
+#\ \        / (_)         | |
+# \ \  /\  / / _ _ __   __| | _____      _____
+#  \ \/  \/ / | | '_ \ / _` |/ _ \ \ /\ / / __|
+#   \  /\  /  | | | | | (_| | (_) \ V  V /\__ \
+#    \/  \/   |_|_| |_|\__,_|\___/ \_/\_/ |___/
+
+
+# Create ingescape library for windows 64 bits release
+lib-windows-release-x64:
+  extends: .lib-build-files
+  stage: lib-build
+  tags:
+    - windows
+  variables:
+    ARCH: "Release_x64"
+  script:
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
+    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
+    - git clean -xfd
+    - mkdir build\ReleaseX64
+    - cmake -S . -B build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
+    - cmake --build build\ReleaseX64 --target ALL_BUILD --config Release
+  artifacts:
+    paths:
+     - build
+    name: "lib-windows-release-x64"
+    expire_in: 1 day
+  dependencies: []
+
+# Create ingescape library for windows 32 bits release
+lib-windows-release-x86:
+  extends: .lib-build-files
+  stage: lib-build
+  tags:
+    - windows
+  variables:
+    ARCH: "Release_x86"
+  script:
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
+    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
+    - git clean -xfd
+    - mkdir build\ReleaseX86
+    - cmake -S . -B build\ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
+    - cmake --build build\ReleaseX86 --target ALL_BUILD --config Release
+  artifacts:
+    paths:
+     - build
+    name: "lib-windows-release-x86"
+    expire_in: 1 day
+  dependencies: []
+
+# Create ingescape library for windows 64 bits debug
+lib-windows-debug-x64:
+  extends: .lib-build-files
+  stage: lib-build
+  tags:
+    - windows
+  variables:
+    ARCH: "Debug_x64"
+  script:
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
+    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
+    - git clean -xfd
+    - mkdir build\DebugX64
+    - cmake -S . -B build\DebugX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Debug -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
+    - cmake --build build\DebugX64 --target ALL_BUILD --config Debug
+  artifacts:
+    paths:
+     - build
+    name: "lib-windows-debug-x64"
+    expire_in: 1 day
+  dependencies: []
+
+# Create ingescape library for windows 32 bits debug
+lib-windows-debug-x86:
+  extends: .lib-build-files
+  stage: lib-build
+  tags:
+    - windows
+  variables:
+    ARCH: "Debug_x86"
+  script:
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
+    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x86;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
+    - git clean -xfd
+    - mkdir build\DebugX86
+    - cmake -S . -B build\DebugX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Debug -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
+    - cmake --build build\DebugX86 --target ALL_BUILD --config Debug
+  artifacts:
+    paths:
+     - build
+    name: "lib-windows-debug-x86"
+    expire_in: 1 day
   dependencies: []
 
 binding-csharp-windows-x64:
-  <<: *build-csharp-files
-  stage: build-binding
+  extends: .binding-build-files
+  stage: binding-build
   tags:
     - windows
-    - "1"
   variables:
-    DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
+    ARCH: "x64"
   script:
-    - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
-    - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
+    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
+    - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
     - Powershell.exe -executionpolicy remotesigned bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64
     - cmake --build bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64 --target IngescapeCSharp --config Release
   artifacts:
     paths:
      - bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64
     name: "binding-csharp-windows-x64"
-    expire_in: 1 week
+    expire_in: 1 day
   dependencies: []
 
 binding-csharp-windows-x86:
-  <<: *build-csharp-files
-  stage: build-binding
+  extends: .binding-build-files
+  stage: binding-build
   tags:
     - windows
-    - "2"
   variables:
-    DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
+    ARCH: "x86"
   script:
-    - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
-    - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
+    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
+    - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
     - Powershell.exe -executionpolicy remotesigned bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86
     - cmake --build bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86 --target IngescapeCSharp --config Release
   artifacts:
     paths:
      - bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86
     name: "binding-csharp-windows-x86"
-    expire_in: 1 week
-  dependencies: []
-
-# Create ingescape editor for macos
-editor-macos-release-x64:
-  <<: *build-editor-files
-  stage: build-apps
-  variables:
-    Qt5_DIR: ~/Qt/5.9.7/clang_64/lib/cmake/Qt5
-  tags:
-    - osx
-  script:
-    - git clean -xfd
-    - mkdir editor/apps/IngeScape-Editor/build
-    - cmake -S editor/apps/IngeScape-Editor/ -B editor/apps/IngeScape-Editor/build -DCMAKE_BUILD_TYPE=Release
-    - make -C editor/apps/IngeScape-Editor/build
-  artifacts:
-    paths:
-      - editor/apps/IngeScape-Editor/build
-    name: "editor-macos-release-x64"
-    expire_in: 1 week
-  dependencies: []
-
-# Create ingescape assessments for macos
-assessments-macos-release-x64:
-  <<: *build-assessments-files
-  stage: build-apps
-  variables:
-    Qt5_DIR: ~/Qt/5.9.7/clang_64/lib/cmake/Qt5
-    GIT_SUBMODULE_STRATEGY: recursive
-  tags:
-    - osx
-  script:
-    - git clean -xfd
-    - mkdir editor/apps/IngeScape-Assessments/build
-    - cmake -S editor/apps/IngeScape-Assessments/ -B editor/apps/IngeScape-Assessments/build -DCMAKE_BUILD_TYPE=Release
-    - make -C editor/apps/IngeScape-Assessments/build
-  artifacts:
-    paths:
-      - editor/apps/IngeScape-Assessments/build
-    name: "assessments-macos-release-x64"
-    expire_in: 1 week
-  dependencies: []
-
-# Create ingescape expe for macos
-expe-macos-release-x64:
-  <<: *build-expe-files
-  stage: build-apps
-  variables:
-    Qt5_DIR: ~/Qt/5.9.7/clang_64/lib/cmake/Qt5
-    GIT_SUBMODULE_STRATEGY: recursive
-  tags:
-    - osx
-  script:
-    - git clean -xfd
-    - mkdir editor/apps/IngeScape-Expe/build
-    - cmake -S editor/apps/IngeScape-Expe/ -B editor/apps/IngeScape-Expe/build -DCMAKE_BUILD_TYPE=Release
-    - make -C editor/apps/IngeScape-Expe/build
-  artifacts:
-    paths:
-      - editor/apps/IngeScape-Expe/build
-    name: "expe-macos-release-x64"
-    expire_in: 1 week
-  dependencies: []
-
-# Create ingescape library for windows 64 bits release
-lib-windows-release-x64:
-  <<: *build-lib-files
-  stage: build-lib
-  tags:
-    - windows
-    - "1"
-  variables:
-    DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
-  script:
-    - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
-    - git clean -xfd
-    - mkdir build\ReleaseX64
-    - cmake -S . -B build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release -DINGESCAPE_BUILD_STATIC=OFF
-    - cmake --build build\ReleaseX64 --target ALL_BUILD --config Release
-  artifacts:
-    paths:
-     - build
-    name: "lib-windows-release-x64"
-    expire_in: 1 week
-  dependencies: []
-
-# Create ingescape library for windows 32 bits release
-lib-windows-release-x86:
-  <<: *build-lib-files
-  stage: build-lib
-  tags:
-    - windows
-    - "2"
-  variables:
-    DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
-  script:
-    - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
-    - git clean -xfd
-    - mkdir build\ReleaseX86
-    - cmake -S . -B build\ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release -DINGESCAPE_BUILD_STATIC=OFF
-    - cmake --build build\ReleaseX86 --target ALL_BUILD --config Release
-  artifacts:
-    paths:
-     - build
-    name: "lib-windows-release-x86"
-    expire_in: 1 week
-  dependencies: []
-
-# Create ingescape library for windows 64 bits debug
-lib-windows-debug-x64:
-  <<: *build-lib-files
-  stage: build-lib
-  tags:
-    - windows
-    - "1"
-  variables:
-    DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
-  script:
-    - set PATH=%PATH%;C:\Users\admin\dev\Builds\Debug\x64;C:\Users\admin\dev\Builds
-    - git clean -xfd
-    - mkdir build\DebugX64
-    - cmake -S . -B build\DebugX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Debug -DINGESCAPE_BUILD_STATIC=OFF
-    - cmake --build build\DebugX64 --target ALL_BUILD --config Debug
-  artifacts:
-    paths:
-     - build
-    name: "lib-windows-debug-x64"
-    expire_in: 1 week
-  dependencies: []
-
-# Create ingescape library for windows 32 bits debug
-lib-windows-debug-x86:
-  <<: *build-lib-files
-  stage: build-lib
-  tags:
-    - windows
-    - "2"
-  variables:
-    DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
-  script:
-    - set PATH=%PATH%;C:\Users\admin\dev\Builds\Debug\x86;C:\Users\admin\dev\Builds
-    - git clean -xfd
-    - mkdir build\DebugX86
-    - cmake -S . -B build\DebugX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Debug -DINGESCAPE_BUILD_STATIC=OFF
-    - cmake --build build\DebugX86 --target ALL_BUILD --config Debug
-  artifacts:
-    paths:
-     - build
-    name: "lib-windows-debug-x86"
-    expire_in: 1 week
+    expire_in: 1 day
   dependencies: []
 
 # Create ingescape editor for windows
 editor-windows-release-x86:
-  <<: *build-editor-files
-  stage: build-apps
+  extends: .editor-build-files
+  stage: apps-build
   variables:
-    DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
+    ARCH: "Editor_x86"
   tags:
     - windows
-    - "2"
   script:
-    - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
+    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
-    - mkdir editor\apps\IngeScape-Editor\build\ReleaseX86
-    - cmake editor\apps\IngeScape-Editor\ -B editor\apps\IngeScape-Editor\build\ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release
-    - cmake --build editor\apps\IngeScape-Editor\build\ReleaseX86 --target ALL_BUILD --config Release
+    - mkdir applications\apps\IngeScape-Editor\build\ReleaseX86
+    - cmake applications\apps\IngeScape-Editor\ -B applications\apps\IngeScape-Editor\build\ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
+    - cmake --build applications\apps\IngeScape-Editor\build\ReleaseX86 --target ALL_BUILD --config Release
   artifacts:
     paths:
-      - editor\apps\IngeScape-Editor\build
+      - applications\apps\IngeScape-Editor\build
     name: "editor-windows-release-x86"
-    expire_in: 1 week
+    expire_in: 1 day
   dependencies: []
 
 # Create ingescape editor for windows
 editor-windows-release-x64:
-  <<: *build-editor-files
-  stage: build-apps
+  extends: .editor-build-files
+  stage: apps-build
   variables:
-    DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
+    ARCH: "Editor_x64"
   tags:
     - windows
-    - "1"
   script:
-    - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
+    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
-    - mkdir editor\apps\IngeScape-Editor\build\ReleaseX64
-    - cmake editor\apps\IngeScape-Editor\ -B editor\apps\IngeScape-Editor\build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release
-    - cmake --build editor\apps\IngeScape-Editor\build\ReleaseX64 --target ALL_BUILD --config Release
+    - mkdir applications\apps\IngeScape-Editor\build\ReleaseX64
+    - cmake applications\apps\IngeScape-Editor\ -B applications\apps\IngeScape-Editor\build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
+    - cmake --build applications\apps\IngeScape-Editor\build\ReleaseX64 --target ALL_BUILD --config Release
   artifacts:
     paths:
-      - editor\apps\IngeScape-Editor\build
+      - applications\apps\IngeScape-Editor\build
     name: "editor-windows-release-x64"
-    expire_in: 1 week
+    expire_in: 1 day
   dependencies: []
 
 # Create ingescape assessments for windows
 assessments-windows-release-x86:
-  <<: *build-assessments-files
-  stage: build-apps
+  extends: .assessments-build-files
+  stage: apps-build
   variables:
-    DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
     GIT_SUBMODULE_STRATEGY: recursive
+    ARCH: "Assessments_x86"
   tags:
     - windows
-    - "2"
   script:
-    - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
+    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
-    - mkdir editor\apps\IngeScape-Assessments\build\ReleaseX86
-    - cmake editor\apps\IngeScape-Assessments\ -B editor\apps\IngeScape-Assessments\build\ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release
-    - cmake --build editor\apps\IngeScape-Assessments\build\ReleaseX86 --target ALL_BUILD --config Release
+    - mkdir applications\apps\IngeScape-Assessments\build\ReleaseX86
+    - cmake applications\apps\IngeScape-Assessments\ -B applications\apps\IngeScape-Assessments\build\ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
+    - cmake --build applications\apps\IngeScape-Assessments\build\ReleaseX86 --target ALL_BUILD --config Release
   artifacts:
     paths:
-      - editor\apps\IngeScape-Assessments\build
+      - applications\apps\IngeScape-Assessments\build
     name: "assessments-windows-release-x86"
-    expire_in: 1 week
+    expire_in: 1 day
   dependencies: []
 
 # Create ingescape assessments for windows
 assessments-windows-release-x64:
-  <<: *build-assessments-files
-  stage: build-apps
+  extends: .assessments-build-files
+  stage: apps-build
   variables:
-    DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
     GIT_SUBMODULE_STRATEGY: recursive
+    ARCH: "Assessments_x64"
   tags:
     - windows
-    - "1"
   script:
-    - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
+    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
-    - mkdir editor\apps\IngeScape-Assessments\build\ReleaseX64
-    - cmake editor\apps\IngeScape-Assessments\ -B editor\apps\IngeScape-Assessments\build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release
-    - cmake --build editor\apps\IngeScape-Assessments\build\ReleaseX64 --target ALL_BUILD --config Release
+    - mkdir applications\apps\IngeScape-Assessments\build\ReleaseX64
+    - cmake applications\apps\IngeScape-Assessments\ -B applications\apps\IngeScape-Assessments\build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
+    - cmake --build applications\apps\IngeScape-Assessments\build\ReleaseX64 --target ALL_BUILD --config Release
   artifacts:
     paths:
-      - editor\apps\IngeScape-Assessments\build
+      - applications\apps\IngeScape-Assessments\build
     name: "assessments-windows-release-x64"
-    expire_in: 1 week
+    expire_in: 1 day
   dependencies: []
 
 # Create ingescape expe for windows (x86)
 expe-windows-release-x86:
-  <<: *build-expe-files
-  stage: build-apps
+  extends: .expe-build-files
+  stage: apps-build
   variables:
-    DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
     GIT_SUBMODULE_STRATEGY: recursive
+    ARCH: "Expe_x86"
   tags:
     - windows
-    - "2"
   script:
-    - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x86;C:\Users\admin\dev\Builds
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
+    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
-    - mkdir editor\apps\IngeScape-Expe\build\ReleaseX86
-    - cmake editor\apps\IngeScape-Expe\ -B editor\apps\IngeScape-Expe\build\ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release
-    - cmake --build editor\apps\IngeScape-Expe\build\ReleaseX86 --target ALL_BUILD --config Release
+    - mkdir applications\apps\IngeScape-Expe\build\ReleaseX86
+    - cmake applications\apps\IngeScape-Expe\ -B applications\apps\IngeScape-Expe\build\ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
+    - cmake --build applications\apps\IngeScape-Expe\build\ReleaseX86 --target ALL_BUILD --config Release
   artifacts:
     paths:
-      - editor\apps\IngeScape-Expe\build
+      - applications\apps\IngeScape-Expe\build
     name: "expe-windows-release-x86"
-    expire_in: 1 week
+    expire_in: 1 day
   dependencies: []
 
 # Create ingescape expe for windows (x64)
 expe-windows-release-x64:
-  <<: *build-expe-files
-  stage: build-apps
+  extends: .expe-build-files
+  stage: apps-build
   variables:
-    DEPENDENCIES_BUILDS_ROOT: "C:\\Users\\admin\\dev\\Builds"
     Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
     GIT_SUBMODULE_STRATEGY: recursive
+    ARCH: "Expe_x64"
   tags:
     - windows
-    - "1"
   script:
-    - set PATH=%PATH%;C:\Users\admin\dev\Builds\Release\x64;C:\Users\admin\dev\Builds
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
+    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
     - git clean -xfd
-    - mkdir editor\apps\IngeScape-Expe\build\ReleaseX64
-    - cmake editor\apps\IngeScape-Expe\ -B editor\apps\IngeScape-Expe\build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release
-    - cmake --build editor\apps\IngeScape-Expe\build\ReleaseX64 --target ALL_BUILD --config Release
+    - mkdir applications\apps\IngeScape-Expe\build\ReleaseX64
+    - cmake applications\apps\IngeScape-Expe\ -B applications\apps\IngeScape-Expe\build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
+    - cmake --build applications\apps\IngeScape-Expe\build\ReleaseX64 --target ALL_BUILD --config Release
   artifacts:
     paths:
-      - editor\apps\IngeScape-Expe\build
+      - applications\apps\IngeScape-Expe\build
     name: "expe-windows-release-x64"
-    expire_in: 1 week
+    expire_in: 1 day
   dependencies: []
 
 # Create runtime install for windows 32 bits
 lib-installer-runtime-windows-x86:
-  <<: *build-lib-files
-  stage: installer-lib
+  extends: .lib-build-files
+  stage: lib-installer
+  variables:
+    ARCH: "Release_x86"
   tags:
     - windows
-    - "2"
   script:
     - cd build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..
   artifacts:
@@ -593,11 +578,12 @@ lib-installer-runtime-windows-x86:
 
 # Create runtime install for windows 64 bits
 lib-installer-runtime-windows-x64:
-  <<: *build-lib-files
-  stage: installer-lib
+  extends: .lib-build-files
+  stage: lib-installer
+  variables:
+    ARCH: "Release_x64"
   tags:
     - windows
-    - "1"
   script:
     - cd build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..
   artifacts:
@@ -608,32 +594,50 @@ lib-installer-runtime-windows-x64:
   dependencies:
     - lib-windows-release-x64
 
-# Create runtime install for macos 64 bits
-lib-installer-runtime-macos-x64:
-  <<: *build-lib-files
-  stage: installer-lib
+# Create runtime install for windows 32 bits (debug)
+lib-installer-debug-windows-x86:
+  extends: .lib-build-files
+  stage: lib-installer
+  variables:
+    ARCH: "Debug_x86"
   tags:
-    - osx
+    - windows
   script:
-    - make -C build package
-    - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
-    - sed -i '' 's/DARWIN_PACKAGE_FILE_NAME=.*/DARWIN_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
-    - mv build macos_x64
+    - cd build\DebugX86 && cpack --config CPackConfig.cmake -C Debug && cd ..\..
   artifacts:
     paths:
-      - macos_x64/ingescape-*
-      - macos_x64/installIngescapeAndDependencies.sh
-    name: "lib-installer-runtime-macos-x64"
+      - build\DebugX86\ingescape-*.exe
+      - build\DebugX86\ingescape-*.zip
+    name: "lib-installer-debug-windows-x86"
   dependencies:
-    - lib-macos-release-x64
+    - lib-windows-debug-x86
+
+# Create runtime install for windows 64 bits (debug)
+lib-installer-debug-windows-x64:
+  extends: .lib-build-files
+  stage: lib-installer
+  variables:
+    ARCH: "Debug_x64"
+  tags:
+    - windows
+  script:
+    - cd build\DebugX64 && cpack --config CPackConfig.cmake -C Debug && cd ..\..
+  artifacts:
+    paths:
+      - build\DebugX64\ingescape-*.exe
+      - build\DebugX64\ingescape-*.zip
+    name: "lib-installer-debug-windows-x64"
+  dependencies:
+    - lib-windows-debug-x64
 
 # Create runtime install for windows 64 bits
 binding-csharp-installer-windows-x64:
-  <<: *build-csharp-files
-  stage: installer-binding
+  extends: .binding-build-files
+  stage: binding-installer
+  variables:
+    ARCH: "x64"
   tags:
     - windows
-    - "1"
   script:
     - cd bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..\..
   artifacts:
@@ -646,11 +650,12 @@ binding-csharp-installer-windows-x64:
 
 # Create runtime install for windows 32 bits
 binding-csharp-installer-windows-x86:
-  <<: *build-csharp-files
-  stage: installer-binding
+  extends: .binding-build-files
+  stage: binding-installer
+  variables:
+    ARCH: "x86"
   tags:
     - windows
-    - "2"
   script:
     - cd bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..\..
   artifacts:
@@ -661,174 +666,343 @@ binding-csharp-installer-windows-x86:
   dependencies:
     - binding-csharp-windows-x86
 
-# Create editor install for macos 64 bits
-editor-installer-macos-x64:
-  <<: *build-editor-files
-  stage: installer-apps
-  tags:
-    - osx
-  script:
-    - make -C editor/apps/IngeScape-Editor/build package
-  #  - make -C editor/apps/IngeScape-Editor/build package_source
-  artifacts:
-    paths:
-      - editor/apps/IngeScape-Editor/build/IngeScape-Editor-*
-    name: "editor-installer-macos-x64"
-  dependencies:
-    - editor-macos-release-x64
-
 # Create editor install for windows 32 bits
 editor-installer-windows-x86:
-  <<: *build-editor-files
-  stage: installer-apps
+  extends: .editor-build-files
+  stage: apps-installer
+  variables:
+    ARCH: "Editor_x86"
   tags:
     - windows
-    - "2"
   script:
-    - cd editor\apps\IngeScape-Editor\build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
+    - cd applications\apps\IngeScape-Editor\build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
   artifacts:
     paths:
-      - editor\apps\IngeScape-Editor\build\ReleaseX86\IngeScape-Editor-*
+      - applications\apps\IngeScape-Editor\build\ReleaseX86\IngeScape-Editor-*
     name: "editor-installer-windows-x86"
   dependencies:
     - editor-windows-release-x86
 
 # Create editor install for windows 64 bits
 editor-installer-windows-x64:
-  <<: *build-editor-files
-  stage: installer-apps
+  extends: .editor-build-files
+  stage: apps-installer
+  variables:
+    ARCH: "Editor_x64"
   tags:
     - windows
-    - "1"
   script:
-    - cd editor\apps\IngeScape-Editor\build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
+    - cd applications\apps\IngeScape-Editor\build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
   artifacts:
     paths:
-      - editor\apps\IngeScape-Editor\build\ReleaseX64\IngeScape-Editor-*
+      - applications\apps\IngeScape-Editor\build\ReleaseX64\IngeScape-Editor-*
     name: "editor-installer-windows-x64"
   dependencies:
     - editor-windows-release-x64
 
-# Create assessments install for macos 64 bits
-assessments-installer-macos-x64:
-  <<: *build-assessments-files
-  stage: installer-apps
-  tags:
-    - osx
-  script:
-    - make -C editor/apps/IngeScape-Assessments/build package
-  #  - make -C editor/apps/IngeScape-Assessments/build package_source
-  artifacts:
-    paths:
-      - editor/apps/IngeScape-Assessments/build/IngeScape-Assessments-*
-    name: "assessments-installer-macos-x64"
-  dependencies:
-    - assessments-macos-release-x64
-
 # Create assessments install for windows 32 bits
 assessments-installer-windows-x86:
-  <<: *build-assessments-files
-  stage: installer-apps
+  extends: .assessments-build-files
+  stage: apps-installer
+  variables:
+    ARCH: "Assessments_x86"
   tags:
     - windows
-    - "2"
   script:
-    - cd editor\apps\IngeScape-Assessments\build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
+    - cd applications\apps\IngeScape-Assessments\build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
   artifacts:
     paths:
-      - editor\apps\IngeScape-Assessments\build\ReleaseX86\IngeScape-Assessments-*
+      - applications\apps\IngeScape-Assessments\build\ReleaseX86\IngeScape-Assessments-*
     name: "assessments-installer-windows-x86"
   dependencies:
     - assessments-windows-release-x86
 
 # Create assessments install for windows 64 bits
 assessments-installer-windows-x64:
-  <<: *build-assessments-files
-  stage: installer-apps
+  extends: .assessments-build-files
+  stage: apps-installer
+  variables:
+    ARCH: "Assessments_x64"
   tags:
     - windows
-    - "1"
   script:
-    - cd editor\apps\IngeScape-Assessments\build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
+    - cd applications\apps\IngeScape-Assessments\build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
   artifacts:
     paths:
-      - editor\apps\IngeScape-Assessments\build\ReleaseX64\IngeScape-Assessments-*
+      - applications\apps\IngeScape-Assessments\build\ReleaseX64\IngeScape-Assessments-*
     name: "assessments-installer-windows-x64"
   dependencies:
     - assessments-windows-release-x64
 
-# Create expe install for macos 64 bits
-expe-installer-macos-x64:
-  <<: *build-expe-files
-  stage: installer-apps
-  tags:
-    - osx
-  script:
-    - make -C editor/apps/IngeScape-Expe/build package
-  #  - make -C editor/apps/IngeScape-Expe/build package_source
-  artifacts:
-    paths:
-      - editor/apps/IngeScape-Expe/build/IngeScape-Expe-*
-    name: "expe-installer-macos-x64"
-  dependencies:
-    - expe-macos-release-x64
-
 # Create expe install for windows 32 bits
 expe-installer-windows-x86:
-  <<: *build-expe-files
-  stage: installer-apps
+  extends: .expe-build-files
+  stage: apps-installer
+  variables:
+    ARCH: "Expe_x86"
   tags:
     - windows
-    - "2"
   script:
-    - cd editor\apps\IngeScape-Expe\build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
+    - cd applications\apps\IngeScape-Expe\build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
   artifacts:
     paths:
-      - editor\apps\IngeScape-Expe\build\ReleaseX86\IngeScape-Expe-*
+      - applications\apps\IngeScape-Expe\build\ReleaseX86\IngeScape-Expe-*
     name: "expe-installer-windows-x86"
   dependencies:
     - expe-windows-release-x86
 
 # Create expe install for windows 64 bits
 expe-installer-windows-x64:
-  <<: *build-expe-files
-  stage: installer-apps
+  extends: .expe-build-files
+  stage: apps-installer
+  variables:
+    ARCH: "Expe_x64"
   tags:
     - windows
-    - "1"
   script:
-    - cd editor\apps\IngeScape-Expe\build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
+    - cd applications\apps\IngeScape-Expe\build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
   artifacts:
     paths:
-      - editor\apps\IngeScape-Expe\build\ReleaseX64\IngeScape-Expe-*
+      - applications\apps\IngeScape-Expe\build\ReleaseX64\IngeScape-Expe-*
     name: "expe-installer-windows-x64"
   dependencies:
     - expe-windows-release-x64
 
-# Create runtime install for linux 64 bits - Generic ZIP
-lib-installer-runtime-linux-x64:
-  <<: *build-lib-files
-  stage: installer-lib
+# Deploy ingescape in windows to be able to compile agents
+lib-deploy-windows:
+  extends: .lib-build-files
+  stage: lib-deploy
+  tags:
+    - windows
+  script:
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
+    - copy /y src\include\*.h %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\include\ingescape\
+    - copy /y build\ReleaseX64\Release\* %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64\
+    - copy /y build\ReleaseX86\Release\* %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86\
+    - copy /y build\DebugX64\Debug\* %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x64\
+    - copy /y build\DebugX86\Debug\* %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x86\
+  dependencies:
+    - lib-windows-release-x64
+    - lib-windows-release-x86
+    - lib-windows-debug-x64
+    - lib-windows-debug-x86
+  only:
+    refs:
+      - master
+      - stable
+
+# Deploy ingescape binding in windows to be able to compile agents
+binding-deploy-windows-release-x64:
+  extends: .binding-build-files
+  stage: binding-deploy
+  variables:
+    ARCH: "x64"
+  tags:
+    - windows
+  script:
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
+    - copy /y bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64\Release\netstandard2.0\IngescapeCSharp.dll %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64\
+  dependencies:
+    - binding-csharp-windows-x64
+  only:
+    refs:
+      - master
+      - stable
+
+# Deploy ingescape binding in windows to be able to compile agents
+binding-deploy-windows-release-x86:
+  extends: .binding-build-files
+  stage: binding-deploy
+  variables:
+    ARCH: "x86"
+  tags:
+    - windows
+  script:
+    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
+    - copy /y bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86\Release\netstandard2.0\IngescapeCSharp.dll %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86\
+  dependencies:
+    - binding-csharp-windows-x86
+  only:
+    refs:
+      - master
+      - stable
+
+# _      _
+#| |    (_)
+#| |     _ _ __  _   ___  __
+#| |    | | '_ \| | | \ \/ /
+#| |____| | | | | |_| |>  <
+#|______|_|_| |_|\__,_/_/\_\
+
+# Create ingescape library for linux (x64) from our custom libraries
+lib-build-linux-x64:
+  extends: .lib-build-files
+  stage: lib-build
+  image: ingescape/debian-testing-compil
   tags:
     - docker
-  image: ingescape/debian-with-zyre
   script:
-    - make -C build package
-    - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
-    - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
+    - mkdir -p build
+    - mkdir -p release
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/builds/release/linux_x64/usr/local/ -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - make -C build
+    - make -C build DESTDIR=$PWD/release install
+    - make -C build DESTDIR=$HOME/builds/release/linux_x64/ install
+    - cp src/include/ingescape_private.h $HOME/builds/release/linux_x64/usr/local/include/ingescape/
+    - cd release/usr/local/
+    - tar zcvf ../../../libingescape.tgz *
+    - cd ../../..
+  artifacts:
+    paths:
+      - ./build
+      - ./release
+    name: "lib-build-linux-x64"
+    expire_in: 1 day
+  dependencies: []
+
+# Create ingescape library for Debian 9 (x86_64)
+lib-debian-9-release-x64:
+  extends: .lib-build-files
+  stage: lib-build
+  tags:
+    - docker
+  image: ingescape/debian-9-with-zyre
+  script:
+    - git clean -xfd
+    - mkdir build
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - make -C build
+  artifacts:
+    paths:
+      - build
+    name: "lib-debian-9-release-x64"
+    expire_in: 1 day
+  dependencies: []
+
+# Create ingescape library for Debian 10 (x86_64)
+lib-debian-10-release-x64:
+  extends: .lib-build-files
+  stage: lib-build
+  tags:
+    - docker
+  image: ingescape/debian-10-with-zyre
+  script:
+    - git clean -xfd
+    - mkdir build
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - make -C build
+  artifacts:
+    paths:
+      - build
+    name: "lib-debian-10-release-x64"
+    expire_in: 1 day
+  dependencies: []
+
+# Create ingescape library for CentOS 7 (x86_64)
+lib-centos-7-release-x64:
+  extends: .lib-build-files
+  stage: lib-build
+  tags:
+    - docker
+  image: ingescape/centos-7-with-zyre
+  script:
+    - git clean -xfd
+    - mkdir build
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - make -C build
+  artifacts:
+    paths:
+      - build
+    name: "lib-centos-7-release-x64"
+    expire_in: 1 day
+  dependencies: []
+
+# Create ingescape library for linux (armv7/armhf)
+lib-linux-release-armhf:
+  extends: .lib-build-files
+  stage: lib-build
+  tags:
+    - docker
+  image: ingescape/ubuntu-x-compil-rpi
+  script:
+    - git clean -xfd
+    - mkdir build
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/toolchain.cmake -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - make -C build
+  artifacts:
+    paths:
+      - build
+    name: "lib-linux-release-armhf"
+    expire_in: 1 day
+  dependencies: []
+
+# Create ingescape library for Raspbian 9 (armv7/armhf)
+lib-raspbian-9-release-armhf:
+  extends: .lib-build-files
+  stage: lib-build
+  tags:
+    - docker
+  image: ingescape/ubuntu-x-compil-rpi
+  script:
+    - git clean -xfd
+    - mkdir build
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/toolchain.cmake -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - make -C build
+  artifacts:
+    paths:
+      - build
+    name: "lib-raspbian-9-release-armhf"
+    expire_in: 1 day
+  dependencies: []
+
+# Create ingescape library for Android (armv7a softfp)
+lib-android-release-armv7a-softfp:
+  extends: .lib-build-files
+  stage: lib-build
+  tags:
+    - docker
+  image: ingescape/ubuntu-x-compil-android
+  script:
+    - git clean -xfd
+    - mkdir build
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/${ANDROID_NDK_TOOLCHAIN_FILE} -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - make -C build
+  artifacts:
+    paths:
+      - build
+    name: "lib-android-release-armv7a-softfp"
+    expire_in: 1 day
+  dependencies: []
+
+# Create library installer for linux 64 bits
+lib-installer-linux-x64:
+  extends: .lib-build-files
+  stage: lib-installer
+  image: ingescape/debian-testing-compil
+  tags:
+    - docker
+  script:
+    - export INGESCAPE_MAJOR=$(grep "#define INGESCAPE_MAJOR" src/admin.c | cut -d ' ' -f3-)
+    - export INGESCAPE_MINOR=$(grep "#define INGESCAPE_MINOR" src/admin.c | cut -d ' ' -f3-)
+    - export INGESCAPE_MICRO=$(expr ${CI_PIPELINE_ID} % 1000)
+    - export INGESCAPE_VERSION=$INGESCAPE_MAJOR.$INGESCAPE_MINOR.$INGESCAPE_MICRO
+    - cd build
+    - make package
+    - tar xf ingescape-${INGESCAPE_VERSION}-Linux.tar.gz
+    - makeself --target /tmp/ingescape-${INGESCAPE_VERSION} ingescape-${INGESCAPE_VERSION}-Linux installer-ingescape-${INGESCAPE_VERSION}-linux-x64.run "Ingescape library v${INGESCAPE_VERSION}" ./install_script.sh
+    - cd ..
     - mv build linux_x64
   artifacts:
     paths:
-      - linux_x64/ingescape-*
-      - linux_x64/installIngescapeAndDependencies.sh
-    name: "lib-installer-runtime-linux-x64"
+      - ./linux_x64/installer-ingescape-*.run
+    name: "lib-installer-linux-x64"
   dependencies:
-    - lib-linux-release-x64
+    - lib-build-linux-x64
 
 # Create runtime install for linux 64 bits - Debian 9 (stretch)
 lib-installer-runtime-debian-9-x64:
-  <<: *build-lib-files
-  stage: installer-lib
+  extends: .lib-build-files
+  stage: lib-installer
   tags:
     - docker
   image: ingescape/debian-9-with-zyre
@@ -847,8 +1021,8 @@ lib-installer-runtime-debian-9-x64:
 
 # Create runtime install for linux 64 bits - Debian 10 (buster)
 lib-installer-runtime-debian-10-x64:
-  <<: *build-lib-files
-  stage: installer-lib
+  extends: .lib-build-files
+  stage: lib-installer
   tags:
     - docker
   image: ingescape/debian-10-with-zyre
@@ -867,8 +1041,8 @@ lib-installer-runtime-debian-10-x64:
 
 # Create runtime install for linux 64 bits - CentOS
 lib-installer-runtime-centos-x64:
-  <<: *build-lib-files
-  stage: installer-lib
+  extends: .lib-build-files
+  stage: lib-installer
   tags:
     - docker
   image: ingescape/centos-7-with-zyre
@@ -887,8 +1061,8 @@ lib-installer-runtime-centos-x64:
 
 # Create runtime install for linux ARMv7 (armhf) - Generic ZIP
 lib-installer-runtime-linux-armhf:
-  <<: *build-lib-files
-  stage: installer-lib
+  extends: .lib-build-files
+  stage: lib-installer
   tags:
     - docker
   image: ingescape/ubuntu-x-compil-rpi
@@ -907,8 +1081,8 @@ lib-installer-runtime-linux-armhf:
 
 # Create runtime install for linux ARMv7 (armhf) - Raspbian 9 (stretch)
 lib-installer-runtime-raspbian-9-armhf:
-  <<: *build-lib-files
-  stage: installer-lib
+  extends: .lib-build-files
+  stage: lib-installer
   tags:
     - docker
   image: ingescape/ubuntu-x-compil-rpi
@@ -927,8 +1101,8 @@ lib-installer-runtime-raspbian-9-armhf:
 
 # Create runtime install for Android (armv7a softfp) - Generic ZIP
 lib-installer-runtime-android-armv7a-softfp:
-  <<: *build-lib-files
-  stage: installer-lib
+  extends: .lib-build-files
+  stage: lib-installer
   tags:
     - docker
   image: ingescape/ubuntu-x-compil-android
@@ -942,35 +1116,10 @@ lib-installer-runtime-android-armv7a-softfp:
   dependencies:
     - lib-android-release-armv7a-softfp
 
-# Deploy ingescape in mac os X to be able to compile agents
-lib-deploy-macos-release-x64:
-  <<: *build-lib-files
-  stage: deploy-lib
-  tags:
-    - osx
-  script:
-    - make -C build install DESTDIR=~/builds/release/x64
-    - cp src/include/ingescape_private.h ~/builds/release/x64/usr/local/include/ingescape/
-  dependencies:
-    - lib-macos-release-x64
-
-# Deploy ingescape in linux to be able to compile agents
-lib-deploy-linux-release-x64:
-  <<: *build-lib-files
-  stage: deploy-lib
-  tags:
-    - docker
-  image: ingescape/debian-with-zyre
-  script:
-    - make -C build install DESTDIR=~/builds/release/linux_x64
-    - cp src/include/ingescape_private.h ~/builds/release/linux_x64/usr/local/include/ingescape/
-  dependencies:
-    - lib-linux-release-x64
-
 # Deploy ingescape in linux to be able to compile agents
 lib-deploy-debian-9-release-x64:
-  <<: *build-lib-files
-  stage: deploy-lib
+  extends: .lib-build-files
+  stage: lib-deploy
   tags:
     - docker
   image: ingescape/debian-9-with-zyre
@@ -979,11 +1128,15 @@ lib-deploy-debian-9-release-x64:
     - cp src/include/ingescape_private.h ~/builds/release/debian9/usr/local/include/ingescape/
   dependencies:
     - lib-debian-9-release-x64
+  only:
+    refs:
+      - master
+      - stable
 
 # Deploy ingescape in linux to be able to compile agents
 lib-deploy-debian-10-release-x64:
-  <<: *build-lib-files
-  stage: deploy-lib
+  extends: .lib-build-files
+  stage: lib-deploy
   tags:
     - docker
   image: ingescape/debian-10-with-zyre
@@ -992,11 +1145,15 @@ lib-deploy-debian-10-release-x64:
     - cp src/include/ingescape_private.h ~/builds/release/debian10/usr/local/include/ingescape/
   dependencies:
     - lib-debian-10-release-x64
+  only:
+    refs:
+      - master
+      - stable
 
 # Deploy ingescape in linux to be able to compile agents
 lib-deploy-centos-7-release-x64:
-  <<: *build-lib-files
-  stage: deploy-lib
+  extends: .lib-build-files
+  stage: lib-deploy
   tags:
     - docker
   image: ingescape/centos-7-with-zyre
@@ -1005,11 +1162,15 @@ lib-deploy-centos-7-release-x64:
     - cp src/include/ingescape_private.h ~/builds/release/centos7/usr/local/include/ingescape/
   dependencies:
     - lib-centos-7-release-x64
+  only:
+    refs:
+      - master
+      - stable
 
 # Deploy ingescape in linux to be able to compile agents
 lib-deploy-linux-release-armhf:
-  <<: *build-lib-files
-  stage: deploy-lib
+  extends: .lib-build-files
+  stage: lib-deploy
   tags:
     - docker
   image: ingescape/ubuntu-x-compil-rpi
@@ -1018,85 +1179,24 @@ lib-deploy-linux-release-armhf:
     - cp src/include/ingescape_private.h ~/builds/release/armhf/usr/local/include/ingescape/
   dependencies:
     - lib-linux-release-armhf
+  only:
+    refs:
+      - master
+      - stable
 
-# Deploy ingescape in windows to be able to compile agents
-lib-deploy-windows-release-x64:
-  <<: *build-lib-files
-  stage: deploy-lib
-  tags:
-    - windows
-    - "1"
-  script:
-    - copy /y src\include\*.h C:\Users\admin\dev\Builds\include\ingescape\
-    - copy /y build\ReleaseX64\Release\* C:\Users\admin\dev\Builds\Release\x64\
-  dependencies:
-    - lib-windows-release-x64
-
-# Deploy ingescape in windows to be able to compile agents
-lib-deploy-windows-release-x86:
-  <<: *build-lib-files
-  stage: deploy-lib
-  tags:
-    - windows
-    - "2"
-  script:
-    - copy /y src\include\*.h C:\Users\admin\dev\Builds\include\ingescape\
-    - copy /y build\ReleaseX86\Release\* C:\Users\admin\dev\Builds\Release\x86\
-  dependencies:
-    - lib-windows-release-x86
-
-# Deploy ingescape in windows to be able to compile agents
-lib-deploy-windows-debug-x64:
-  <<: *build-lib-files
-  stage: deploy-lib
-  tags:
-    - windows
-  script:
-    - copy /y src\include\*.h C:\Users\admin\dev\Builds\include\ingescape\
-    - copy /y build\DebugX64\Debug\* C:\Users\admin\dev\Builds\Debug\x64\
-  dependencies:
-    - lib-windows-debug-x64
-
-# Deploy ingescape in windows to be able to compile agents
-lib-deploy-windows-debug-x86:
-  <<: *build-lib-files
-  stage: deploy-lib
-  tags:
-    - windows
-  script:
-    - copy /y src\include\*.h C:\Users\admin\dev\Builds\include\ingescape\
-    - copy /y build\DebugX86\Debug\* C:\Users\admin\dev\Builds\Debug\x86\
-  dependencies:
-    - lib-windows-debug-x86
-
-# Deploy ingescape binding in windows to be able to compile agents
-binding-deploy-windows-release-x64:
-  <<: *build-csharp-files
-  stage: deploy-binding
-  tags:
-    - windows
-    - "1"
-  script:
-    - copy /y bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64\Release\netstandard2.0\IngescapeCSharp.dll C:\Users\admin\dev\Builds\Release\x64\
-  dependencies:
-    - binding-csharp-windows-x64
-
-# Deploy ingescape binding in windows to be able to compile agents
-binding-deploy-windows-release-x86:
-  <<: *build-csharp-files
-  stage: deploy-binding
-  tags:
-    - windows
-    - "2"
-  script:
-    - copy /y bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86\Release\netstandard2.0\IngescapeCSharp.dll C:\Users\admin\dev\Builds\Release\x86\
-  dependencies:
-    - binding-csharp-windows-x86
+# _____       _ _
+#|  __ \     | (_)
+#| |  | | ___| |___   _____ _ __ _   _
+#| |  | |/ _ \ | \ \ / / _ \ '__| | | |
+#| |__| |  __/ | |\ V /  __/ |  | |_| |
+#|_____/ \___|_|_| \_/ \___|_|   \__, |
+#                                 __/ |
+#                                |___/
 
 # Deliver installers so they can be downloaded from the website
 lib-delivery-all:
-  <<: *build-lib-files
-  stage: delivery-lib
+  extends: .lib-build-files
+  stage: lib-delivery
   tags:
     - docker
   image: ingescape/alpine-deployment
@@ -1106,6 +1206,249 @@ lib-delivery-all:
     - echo ${SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
     - umask 077
     - echo ${SSH_SECRET} | base64 -d > ssh_secret
+    - umask 022
+    - echo "Deliver Windows x86"
+    - mkdir --parents library/win32
+    - mv build/ReleaseX86/ingescape-*
+         library/win32/
+    - ls library/win32/ | grep -v 'latest_delivery' > library/win32/latest_delivery
+    - echo "Deliver Windows x64"
+    - mkdir --parents library/win64
+    - mv build/ReleaseX64/ingescape-*
+         library/win64/
+    - ls library/win64/ | grep -v 'latest_delivery' > library/win64/latest_delivery
+    - echo "Deliver macos"
+    - mkdir --parents library/macos
+    - mv ./build/ingescape*.pkg library/macos/
+    - ls library/macos/ | grep -v 'latest_delivery' > library/macos/latest_delivery
+    - echo "Deliver generic Linux x64"
+    - mkdir --parents library/linux_x64/
+    - mv linux_x64/* library/linux_x64/
+    - ls library/linux_x64/ | grep -v 'latest_delivery' > library/linux_x64/latest_delivery
+    - echo "Deliver Debian 9 x64"
+    - mkdir --parents library/debian9/
+    - mv debian9_x64/ingescape-*
+         debian9_x64/installIngescapeAndDependencies.sh
+         library/debian9/
+    - ls library/debian9/ | grep -v 'latest_delivery' > library/debian9/latest_delivery
+    - echo "Deliver Debian 10 x64"
+    - mkdir --parents library/debian10/
+    - mv debian10_x64/ingescape-*
+         debian10_x64/installIngescapeAndDependencies.sh
+         library/debian10/
+    - ls library/debian10/ | grep -v 'latest_delivery' > library/debian10/latest_delivery
+    - echo "Deliver CentOS 7 x64"
+    - mkdir --parents library/centos7
+    - mv centos7_x64/ingescape-*
+         centos7_x64/installIngescapeAndDependencies.sh
+         library/centos7/
+    - ls library/centos7/ | grep -v 'latest_delivery' > library/centos7/latest_delivery
+    - echo "Deliver generic Linux armhf"
+    - mkdir --parents library/linux_armhf
+    - mv linux_armhf/ingescape-*
+         linux_armhf/installIngescapeAndDependencies.sh
+         library/linux_armhf/
+    - ls library/linux_armhf/ | grep -v 'latest_delivery' > library/linux_armhf/latest_delivery
+    - echo "Deliver Raspbian 9 armhf"
+    - mkdir --parents library/raspbian9
+    - mv raspbian9_armhf/ingescape-*
+         raspbian9_armhf/installIngescapeAndDependencies.sh
+         library/raspbian9/
+    - ls library/raspbian9/ | grep -v 'latest_delivery' > library/raspbian9/latest_delivery
+    - echo "Deliver Android armv7a (softfp)"
+    - mkdir --parents library/android
+    - mv android/ingescape-*
+         library/android/
+    - ls library/android/ | grep -v 'latest_delivery' > library/android/latest_delivery
+    - echo "Synchronization"
+    - rsync --rsh="ssh -i ssh_secret" --recursive library ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
+  dependencies:
+    - lib-installer-runtime-windows-x86
+    - lib-installer-runtime-windows-x64
+    - lib-installer-macos
+    - lib-installer-linux-x64
+    - lib-installer-runtime-debian-9-x64
+    - lib-installer-runtime-debian-10-x64
+    - lib-installer-runtime-centos-x64
+    - lib-installer-runtime-linux-armhf
+    - lib-installer-runtime-raspbian-9-armhf
+    - lib-installer-runtime-android-armv7a-softfp
+  only:
+    refs:
+      - master
+      - stable
+
+# Deliver installers so they can be downloaded from the website
+editor-delivery-all:
+  extends: .editor-build-files
+  stage: apps-delivery
+  tags:
+    - docker
+  image: ingescape/alpine-deployment
+  script:
+    - echo "Setting up SSH"
+    - mkdir -p ~/.ssh/
+    - echo ${SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
+    - umask 077
+    - echo ${SSH_SECRET} | base64 -d > ssh_secret
+    - umask 022
+    - echo "Deliver Mac OS x64 editor"
+    - mkdir --parents editor/macos
+    - mv applications/apps/IngeScape-Editor/build/IngeScape-Editor-*
+         editor/macos/
+    - ls editor/macos/ | grep -v 'latest_delivery' > editor/macos/latest_delivery
+    - echo "Deliver Windows x86 editor"
+    - mkdir --parents editor/win32
+    - mv applications/apps/IngeScape-Editor/build/ReleaseX86/IngeScape-Editor-*
+         editor/win32/
+    - ls editor/win32/ | grep -v 'latest_delivery' > editor/win32/latest_delivery
+    - echo "Deliver Windows x64 editor"
+    - mkdir --parents editor/win64
+    - mv applications/apps/IngeScape-Editor/build/ReleaseX64/IngeScape-Editor-*
+         editor/win64/
+    - ls editor/win64/ | grep -v 'latest_delivery' > editor/win64/latest_delivery
+    - echo "Synchronization"
+    - rsync --rsh="ssh -i ssh_secret" --recursive editor ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
+  dependencies:
+    - editor-installer-macos
+    - editor-installer-windows-x86
+    - editor-installer-windows-x64
+  only:
+    refs:
+      - master
+      - stable
+
+# Deliver installers so they can be downloaded from the website
+assessments-delivery-all:
+  extends: .assessments-build-files
+  stage: apps-delivery
+  tags:
+    - docker
+  image: ingescape/alpine-deployment
+  script:
+    - echo "Setting up SSH"
+    - mkdir -p ~/.ssh/
+    - echo ${SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
+    - umask 077
+    - echo ${SSH_SECRET} | base64 -d > ssh_secret
+    - umask 022
+    - echo "Deliver Mac OS x64 assessments"
+    - mkdir --parents assessments/macos
+    - mv applications/apps/IngeScape-Assessments/build/IngeScape-Assessments-*
+         assessments/macos/
+    - ls assessments/macos/ | grep -v 'latest_delivery' > assessments/macos/latest_delivery
+    - echo "Deliver Windows x86 assessments"
+    - mkdir --parents assessments/win32
+    - mv applications/apps/IngeScape-Assessments/build/ReleaseX86/IngeScape-Assessments-*
+         assessments/win32/
+    - ls assessments/win32/ | grep -v 'latest_delivery' > assessments/win32/latest_delivery
+    - echo "Deliver Windows x64 assessments"
+    - mkdir --parents assessments/win64
+    - mv applications/apps/IngeScape-Assessments/build/ReleaseX64/IngeScape-Assessments-*
+         assessments/win64/
+    - ls assessments/win64/ | grep -v 'latest_delivery' > assessments/win64/latest_delivery
+    - echo "Synchronization"
+    - rsync --rsh="ssh -i ssh_secret" --recursive assessments ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
+  dependencies:
+    - assessments-installer-macos
+    - assessments-installer-windows-x86
+    - assessments-installer-windows-x64
+  only:
+    refs:
+      - master
+      - stable
+
+# Deliver installers so they can be downloaded from the website
+expe-delivery-all:
+  extends: .expe-build-files
+  stage: apps-delivery
+  tags:
+    - docker
+  image: ingescape/alpine-deployment
+  script:
+    - echo "Setting up SSH"
+    - mkdir -p ~/.ssh/
+    - echo ${SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
+    - umask 077
+    - echo ${SSH_SECRET} | base64 -d > ssh_secret
+    - umask 022
+    - echo "Deliver Mac OS x64 expe"
+    - mkdir --parents expe/macos
+    - mv applications/apps/IngeScape-Expe/build/IngeScape-Expe-*
+         expe/macos/
+    - ls expe/macos/ | grep -v 'latest_delivery' > expe/macos/latest_delivery
+    - echo "Deliver Windows x86 expe"
+    - mkdir --parents expe/win32
+    - mv applications/apps/IngeScape-Expe/build/ReleaseX86/IngeScape-Expe-*
+         expe/win32/
+    - ls expe/win32/ | grep -v 'latest_delivery' > expe/win32/latest_delivery
+    - echo "Deliver Windows x64 expe"
+    - mkdir --parents expe/win64
+    - mv applications/apps/IngeScape-Expe/build/ReleaseX64/IngeScape-Expe-*
+         expe/win64/
+    - ls expe/win64/ | grep -v 'latest_delivery' > expe/win64/latest_delivery
+    - echo "Synchronization"
+    - rsync --rsh="ssh -i ssh_secret" --recursive expe ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
+  dependencies:
+    - expe-installer-macos
+    - expe-installer-windows-x86
+    - expe-installer-windows-x64
+  only:
+    refs:
+      - master
+      - stable
+
+
+# Deliver installers so they can be downloaded from the website
+binding-delivery-all:
+  extends: .binding-build-files
+  stage: binding-delivery
+  tags:
+    - docker
+  image: ingescape/alpine-deployment
+  script:
+    - echo "Setting up SSH"
+    - mkdir -p ~/.ssh/
+    - echo ${SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
+    - umask 077
+    - echo ${SSH_SECRET} | base64 -d > ssh_secret
+    - umask 022
+    - mv bindings _bindings
+    - echo "Deliver Windows x86 binding"
+    - mkdir --parents bindings/CSharp/win32
+    - mv _bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86/IngescapeCSharp-*
+         bindings/CSharp/win32/
+    - ls bindings/CSharp/win32/ | grep -v 'latest_delivery' > bindings/CSharp/win32/latest_delivery
+    - echo "Deliver Windows x64 binding"
+    - mkdir --parents bindings/CSharp/win64
+    - mv _bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64/IngescapeCSharp-*
+         bindings/CSharp/win64/
+    - ls bindings/CSharp/win64/ | grep -v 'latest_delivery' > bindings/CSharp/win64/latest_delivery
+    - echo "Synchronization"
+    - rsync --rsh="ssh -i ssh_secret" --recursive bindings ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
+  dependencies:
+    - binding-csharp-installer-windows-x64
+    - binding-csharp-installer-windows-x86
+  only:
+    refs:
+      - master
+      - stable
+
+# Deliver installers so they can be downloaded from the website
+lib-delivery-all-stable:
+  only:
+    refs:
+      - stable
+  stage: lib-delivery-stable
+  tags:
+    - docker
+  image: ingescape/alpine-deployment
+  script:
+    - echo "Setting up SSH"
+    - mkdir -p ~/.ssh/
+    - echo ${STABLE_SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
+    - umask 077
+    - echo ${STABLE_SSH_SECRET} | base64 -d > ssh_secret
     - umask 022
     - echo "Deliver Windows x86"
     - mkdir --parents library/win32
@@ -1165,12 +1508,11 @@ lib-delivery-all:
          library/android/
     - ls library/android/ | grep -v 'latest_delivery' > library/android/latest_delivery
     - echo "Synchronization"
-    - rsync --rsh="ssh -i ssh_secret" --recursive library ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
+    - rsync --rsh="ssh -i ssh_secret" --recursive library ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST}:${STABLE_DELIVERY_DESTINATION}
   dependencies:
     - lib-installer-runtime-windows-x86
     - lib-installer-runtime-windows-x64
-    - lib-installer-runtime-macos-x64
-    - lib-installer-runtime-linux-x64
+    - lib-installer-macos
     - lib-installer-runtime-debian-9-x64
     - lib-installer-runtime-debian-10-x64
     - lib-installer-runtime-centos-x64
@@ -1179,130 +1521,135 @@ lib-delivery-all:
     - lib-installer-runtime-android-armv7a-softfp
 
 # Deliver installers so they can be downloaded from the website
-editor-delivery-all:
-  <<: *build-editor-files
-  stage: delivery-apps
+editor-delivery-all-stable:
+  only:
+    refs:
+      - stable
+  stage: apps-delivery
   tags:
     - docker
   image: ingescape/alpine-deployment
   script:
     - echo "Setting up SSH"
     - mkdir -p ~/.ssh/
-    - echo ${SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
+    - echo ${STABL_SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
     - umask 077
-    - echo ${SSH_SECRET} | base64 -d > ssh_secret
+    - echo ${STABLE_SSH_SECRET} | base64 -d > ssh_secret
     - umask 022
-    - mv editor _editor
     - echo "Deliver Mac OS x64 editor"
     - mkdir --parents editor/macos
-    - mv _editor/apps/IngeScape-Editor/build/IngeScape-Editor-*
+    - mv applications/apps/IngeScape-Editor/build/IngeScape-Editor-*
          editor/macos/
     - ls editor/macos/ | grep -v 'latest_delivery' > editor/macos/latest_delivery
     - echo "Deliver Windows x86 editor"
     - mkdir --parents editor/win32
-    - mv _editor/apps/IngeScape-Editor/build/ReleaseX86/IngeScape-Editor-*
+    - mv applications/apps/IngeScape-Editor/build/ReleaseX86/IngeScape-Editor-*
          editor/win32/
     - ls editor/win32/ | grep -v 'latest_delivery' > editor/win32/latest_delivery
     - echo "Deliver Windows x64 editor"
     - mkdir --parents editor/win64
-    - mv _editor/apps/IngeScape-Editor/build/ReleaseX64/IngeScape-Editor-*
+    - mv applications/apps/IngeScape-Editor/build/ReleaseX64/IngeScape-Editor-*
          editor/win64/
     - ls editor/win64/ | grep -v 'latest_delivery' > editor/win64/latest_delivery
     - echo "Synchronization"
-    - rsync --rsh="ssh -i ssh_secret" --recursive editor ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
+    - rsync --rsh="ssh -i ssh_secret" --recursive editor ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST}:${STABLE_DELIVERY_DESTINATION}
   dependencies:
-    - editor-installer-macos-x64
+    - editor-installer-macos
     - editor-installer-windows-x86
     - editor-installer-windows-x64
 
 # Deliver installers so they can be downloaded from the website
-assessments-delivery-all:
-  <<: *build-assessments-files
-  stage: delivery-apps
+assessments-delivery-all-stable:
+  only:
+    refs:
+      - stable
+  stage: apps-delivery
   tags:
     - docker
   image: ingescape/alpine-deployment
   script:
     - echo "Setting up SSH"
     - mkdir -p ~/.ssh/
-    - echo ${SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
+    - echo ${STABLE_SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
     - umask 077
-    - echo ${SSH_SECRET} | base64 -d > ssh_secret
+    - echo ${STABLE_SSH_SECRET} | base64 -d > ssh_secret
     - umask 022
-    - mv editor _editor
     - echo "Deliver Mac OS x64 assessments"
     - mkdir --parents assessments/macos
-    - mv _editor/apps/IngeScape-Assessments/build/IngeScape-Assessments-*
+    - mv applications/apps/IngeScape-Assessments/build/IngeScape-Assessments-*
          assessments/macos/
     - ls assessments/macos/ | grep -v 'latest_delivery' > assessments/macos/latest_delivery
     - echo "Deliver Windows x86 assessments"
     - mkdir --parents assessments/win32
-    - mv _editor/apps/IngeScape-Assessments/build/ReleaseX86/IngeScape-Assessments-*
+    - mv applications/apps/IngeScape-Assessments/build/ReleaseX86/IngeScape-Assessments-*
          assessments/win32/
     - ls assessments/win32/ | grep -v 'latest_delivery' > assessments/win32/latest_delivery
     - echo "Deliver Windows x64 assessments"
     - mkdir --parents assessments/win64
-    - mv _editor/apps/IngeScape-Assessments/build/ReleaseX64/IngeScape-Assessments-*
+    - mv applications/apps/IngeScape-Assessments/build/ReleaseX64/IngeScape-Assessments-*
          assessments/win64/
     - ls assessments/win64/ | grep -v 'latest_delivery' > assessments/win64/latest_delivery
     - echo "Synchronization"
-    - rsync --rsh="ssh -i ssh_secret" --recursive assessments ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
+    - rsync --rsh="ssh -i ssh_secret" --recursive assessments ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST}:${STABLE_DELIVERY_DESTINATION}
   dependencies:
-    - assessments-installer-macos-x64
+    - assessments-installer-macos
     - assessments-installer-windows-x86
     - assessments-installer-windows-x64
 
 # Deliver installers so they can be downloaded from the website
-expe-delivery-all:
-  <<: *build-expe-files
-  stage: delivery-apps
+expe-delivery-all-stable:
+  only:
+    refs:
+      - stable
+  stage: apps-delivery
   tags:
     - docker
   image: ingescape/alpine-deployment
   script:
     - echo "Setting up SSH"
     - mkdir -p ~/.ssh/
-    - echo ${SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
+    - echo ${STABLE_SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
     - umask 077
-    - echo ${SSH_SECRET} | base64 -d > ssh_secret
+    - echo ${STABLE_SSH_SECRET} | base64 -d > ssh_secret
     - umask 022
-    - mv editor _editor
     - echo "Deliver Mac OS x64 expe"
     - mkdir --parents expe/macos
-    - mv _editor/apps/IngeScape-Expe/build/IngeScape-Expe-*
+    - mv applications/apps/IngeScape-Expe/build/IngeScape-Expe-*
          expe/macos/
     - ls expe/macos/ | grep -v 'latest_delivery' > expe/macos/latest_delivery
     - echo "Deliver Windows x86 expe"
     - mkdir --parents expe/win32
-    - mv _editor/apps/IngeScape-Expe/build/ReleaseX86/IngeScape-Expe-*
+    - mv applications/apps/IngeScape-Expe/build/ReleaseX86/IngeScape-Expe-*
          expe/win32/
     - ls expe/win32/ | grep -v 'latest_delivery' > expe/win32/latest_delivery
     - echo "Deliver Windows x64 expe"
     - mkdir --parents expe/win64
-    - mv _editor/apps/IngeScape-Expe/build/ReleaseX64/IngeScape-Expe-*
+    - mv applications/apps/IngeScape-Expe/build/ReleaseX64/IngeScape-Expe-*
          expe/win64/
     - ls expe/win64/ | grep -v 'latest_delivery' > expe/win64/latest_delivery
     - echo "Synchronization"
-    - rsync --rsh="ssh -i ssh_secret" --recursive expe ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
+    - rsync --rsh="ssh -i ssh_secret" --recursive expe ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST}:${STABLE_DELIVERY_DESTINATION}
   dependencies:
-    - expe-installer-macos-x64
+    - expe-installer-macos
     - expe-installer-windows-x86
     - expe-installer-windows-x64
 
 
 # Deliver installers so they can be downloaded from the website
-binding-delivery-all:
-  <<: *build-csharp-files
-  stage: delivery-binding
+binding-delivery-all-stable:
+  only:
+    refs:
+      - stable
+  stage: binding-delivery
   tags:
     - docker
   image: ingescape/alpine-deployment
   script:
     - echo "Setting up SSH"
     - mkdir -p ~/.ssh/
-    - echo ${SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
+    - echo ${STABLE_SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
     - umask 077
-    - echo ${SSH_SECRET} | base64 -d > ssh_secret
+    - echo ${STABLE_SSH_SECRET} | base64 -d > ssh_secret
     - umask 022
     - mv bindings _bindings
     - echo "Deliver Windows x86 binding"
@@ -1316,7 +1663,7 @@ binding-delivery-all:
          bindings/CSharp/win64/
     - ls bindings/CSharp/win64/ | grep -v 'latest_delivery' > bindings/CSharp/win64/latest_delivery
     - echo "Synchronization"
-    - rsync --rsh="ssh -i ssh_secret" --recursive bindings ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
+    - rsync --rsh="ssh -i ssh_secret" --recursive bindings ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST}:${STABLE_DELIVERY_DESTINATION}
   dependencies:
     - binding-csharp-installer-windows-x64
     - binding-csharp-installer-windows-x86

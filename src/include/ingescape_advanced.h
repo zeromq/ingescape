@@ -9,18 +9,6 @@
 #ifndef ingescape_advanced_h
 #define ingescape_advanced_h
 
-#if (defined WIN32 || defined _WIN32)
-#if defined INGESCAPE
-#define PUBLIC __declspec(dllexport)
-#elif defined INGESCAPE_FROM_PRI
-#define PUBLIC
-#else
-#define PUBLIC __declspec(dllimport)
-#endif
-#else
-#define PUBLIC
-#endif
-
 #include <czmq.h>
 #include "ingescape.h"
 
@@ -40,8 +28,24 @@ extern "C" {
 //void igs_setBusEndpoint(const char *endpoint); //usefull only with gossip discovery - TODO
 //void igs_connectAgentOnEndpoint(const char *endpoint); //not officially supported in Zyre 2.0.x yet
 PUBLIC void igs_setPublishingPort(unsigned int port);
+PUBLIC void igs_setLogStreamPort(unsigned int port);
 PUBLIC void igs_setDiscoveryInterval(unsigned int interval); //in milliseconds
 PUBLIC void igs_setAgentTimeout(unsigned int duration); //in milliseconds
+
+//sends number of messages with defiend size and displays performance
+//information when finished (information displayed as INFO-evel log)
+PUBLIC void igs_performanceCheck(const char *peerId, size_t msgSize, size_t nbOfMsg);
+
+//Timers can be created to call code a certain number of times,
+//each time after a certain delay. 0 times means repeating forever.
+//Timers must be created after starting an agent.
+typedef void (igs_timerCallback) (int timerId, void *myData);
+PUBLIC int igs_timerStart(size_t delay, size_t times, igs_timerCallback cb, void *myData); //returns timer id or -1 if error
+PUBLIC void igs_timerStop(int timerId);
+
+//Set high water marks (HWM) for the publish/subscribe sockets.
+//Setting HWM to 0 means that they are disabled.
+PUBLIC void igs_setHighWaterMarks(int hwmValue);
 
 //IngeScape provides an integrated monitor to detect events relative to the network
 //Warning: once igs_monitoringEnable has been called, igs_monitoringDisable must be
@@ -74,8 +78,8 @@ PUBLIC int igs_readInputAsZMQMsg(const char *name, zmsg_t **msg); //msg must be 
 //////////////////////////////////////////////////
 //internal bus
 typedef void (*igs_BusMessageIncoming) (const char *event, const char *peerID, const char *name,
-                                         const char *address, const char *channel,
-                                         zhash_t *headers, zmsg_t *msg, void *myData);
+                                        const char *address, const char *channel,
+                                        zhash_t *headers, zmsg_t *msg, void *myData);
 PUBLIC int igs_observeBus(igs_BusMessageIncoming cb, void *myData);
 
 PUBLIC void igs_busJoinChannel(const char *channel);

@@ -17,6 +17,9 @@ macro(add_ingescape_sources _SOURCES)
         ${macro_current_dir}/../../../src/license.c
         ${macro_current_dir}/../../../src/monitor.c
         ${macro_current_dir}/../../../src/json.c
+        ${macro_current_dir}/../../../src/performance.c
+        ${macro_current_dir}/../../../src/agent.c
+        ${macro_current_dir}/../../../src/global.c
         ${macro_current_dir}/../../../dependencies/yajl/src/yajl_alloc.c
         ${macro_current_dir}/../../../dependencies/yajl/src/yajl_buf.c
         ${macro_current_dir}/../../../dependencies/yajl/src/yajl_encode.c
@@ -117,8 +120,12 @@ macro(get_ingescape_version _MAJOR _MINOR _PATCH)
     set(${_MAJOR} ${CMAKE_MATCH_1})
     string(REGEX MATCH "#define INGESCAPE_MINOR ([0-9]*)" _ ${_ADMIN_C_CONTENT})
     set(${_MINOR} ${CMAKE_MATCH_1})
-    string(REGEX MATCH "#define INGESCAPE_MICRO ([0-9]*)" _ ${_ADMIN_C_CONTENT})
-    set(${_PATCH} ${CMAKE_MATCH_1})
+    if (${CI_PIPELINE_ID})
+        math(EXPR moduloed_pipeline_id "${CI_PIPELINE_ID} % 1000" OUTPUT_FORMAT DECIMAL)
+        set(${_PATCH} ${moduloed_pipeline_id})
+    else ()
+        set(${_PATCH} "0")
+    endif ()
 endmacro()
 
 # Function to install dependencies on windows
@@ -145,7 +152,8 @@ macro(install_ingescape_dependencies _LIB _HEADERS_PATH _IS_EDITOR)
         if (${_IS_EDITOR})
             install(FILES ${${_FILE_WITHOUT_EXT}_DLL_FILE} DESTINATION . COMPONENT library)
         else ()
-            install(FILES ${${_LIB}} DESTINATION "lib${LIB_SUFFIX}" COMPONENT library)
+            FILE(GLOB all_libs "${_PATH_TO_FILE}/${_FILE_WITHOUT_EXT}*")
+            install(FILES ${all_libs} DESTINATION "lib${LIB_SUFFIX}" COMPONENT library)
             install(FILES ${${_FILE_WITHOUT_EXT}_DLL_FILE} DESTINATION "lib${LIB_SUFFIX}" COMPONENT library)
             install(DIRECTORY ${${_HEADERS_PATH}}/
                 DESTINATION include

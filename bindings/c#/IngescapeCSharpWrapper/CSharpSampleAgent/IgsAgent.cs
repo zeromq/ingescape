@@ -1,17 +1,27 @@
 ﻿using Ingescape;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
 
 namespace CSharpSampleAgent
 {
     class IgsAgent
     {
+        #region Attributes
+
+        private int _count = 0;
+
+        #endregion
+
         #region Callbacks
 
-        public igs_observeCallback callbckPtr;
+        public igs_observeCallback _callbackPtr;
+
+        public igs_callFunction _functionCallPtr;
 
         /// <summary>
         /// 
@@ -23,11 +33,11 @@ namespace CSharpSampleAgent
         /// <param name="valueSize"></param>
         /// <param name="myData"></param>
         void genericCallback(iop_t iopType,
-        [MarshalAs(UnmanagedType.LPStr)] string name,
-        iopType_t valueType,
-        IntPtr value,
-        int valueSize,
-        IntPtr myData)
+                             string name,
+                             iopType_t valueType,
+                             IntPtr value,
+                             int valueSize,
+                             IntPtr myData)
         {
             Console.WriteLine("callback test");
             switch (valueType)
@@ -64,6 +74,64 @@ namespace CSharpSampleAgent
             }
 
         }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="senderAgentName"></param>
+        /// <param name="senderAgentUUID"></param>
+        /// <param name="callName"></param>
+        /// <param name="firstArgument"></param>
+        /// <param name="nbArgs"></param>
+        /// <param name="myData"></param>
+        void cSharpCallFunction(string senderAgentName,
+                                string senderAgentUUID,
+                                string callName,
+                                IntPtr firstArgument,
+                                uint nbArgs,
+                                IntPtr myData)
+        {
+            Console.WriteLine("'{2}' called from '{0}' ({1}) with {3} args:", senderAgentName, senderAgentUUID, callName, nbArgs);
+
+            if (myData != IntPtr.Zero)
+            {
+                string utf8 = Igs.getStringFromPointer(myData);
+                if (!string.IsNullOrEmpty(utf8))
+                {
+                    Console.WriteLine("myData = {0}", utf8);
+                }
+            }
+
+            if (nbArgs == 5)
+            {
+                List<CallArgument> callArgumentsList = Igs.getCallArgumentsList(firstArgument);
+                int i = 0;
+
+                foreach (CallArgument callArgument in callArgumentsList)
+                {
+                    if (callArgument != null)
+                    {
+                        if (callArgument.Type != iopType_t.IGS_DATA_T)
+                        {
+                            Console.WriteLine("{0}: {1} = {2} ({3})", i, callArgument.Name, callArgument.Value, callArgument.Type);
+                        }
+                        else
+                        {
+                            byte[] byteArray = (byte[])callArgument.Value;
+
+                            // WARNING Special case: We know that the data is a string, so we can convert from byte[] to string
+                            string stringData = Encoding.UTF8.GetString(byteArray);
+                            stringData = stringData.TrimEnd('\0');
+
+                            Console.WriteLine("{0}: {1} = {2} ({3})", i, callArgument.Name, stringData, callArgument.Type);
+                        }
+                    }
+                    i++;
+                }
+            }
+        }
+
 
         // License Callback
         public igs_licenseCallback ptrOnLicenseCallbck;
@@ -110,6 +178,7 @@ namespace CSharpSampleAgent
                 Console.WriteLine("ERROR: The loading of the mapping failed !");
             }
 
+            //"name": "C#-Sample (é ç partï)"
             //Igs.setMappingName("A (éç) A");
             string mapName = Igs.getMappingName();
             string mapDescription = Igs.getMappingDescription();
@@ -122,6 +191,105 @@ namespace CSharpSampleAgent
             string agentName = Igs.getAgentName();
             //Igs.setAgentName("test-é-ç");
 
+
+            //
+            // CALLS
+            //
+            #region Calls
+
+            _functionCallPtr = cSharpCallFunction;
+
+            //string callName = "çShàrpCàll";
+            string callName = "cSharpCall";
+            //string callArgName = "àrgÏnt2";
+            string callArgName = "argInt2";
+
+            string strMyData = "My Data (é ç parti)";
+            IntPtr ptrMyData = Igs.getPointerFromString(strMyData);
+
+            Igs.initCall(callName, _functionCallPtr, ptrMyData);
+            Igs.addArgumentToCall(callName, "argBool1", iopType_t.IGS_BOOL_T);
+            Igs.addArgumentToCall(callName, callArgName, iopType_t.IGS_INTEGER_T);
+            //Igs.addArgumentToCall(callName, "argDoùble3", iopType_t.IGS_DOUBLE_T);
+            Igs.addArgumentToCall(callName, "argDouble3", iopType_t.IGS_DOUBLE_T);
+            Igs.addArgumentToCall(callName, "argString4", iopType_t.IGS_STRING_T);
+            Igs.addArgumentToCall(callName, "argData5", iopType_t.IGS_DATA_T);
+
+            uint numberOfCalls = Igs.getNumberOfCalls();
+            Console.WriteLine("Number of Calls = {0}", numberOfCalls);
+
+            //string callName1 = "séndMail";
+            string callName1 = "sendMail";
+            string callName2 = "Call_BIDON";
+            //string callArgName1 = "sùbjéct";
+            string callArgName1 = "subject";
+            string callArgName2 = "Arg_BIDON";
+            
+            bool existCall1 = Igs.checkCallExistence(callName1);
+            bool existCall2 = Igs.checkCallExistence(callName2);
+            bool existCall = Igs.checkCallExistence(callName);
+
+            Console.WriteLine("\nExist Calls: {0}={1} -- {2}={3} -- {4}={5}", callName1, existCall1, callName2, existCall2, callName, existCall);
+
+            bool existCallArg1 = Igs.checkCallArgumentExistence(callName1, callArgName1);
+            bool existCallArg2 = Igs.checkCallArgumentExistence(callName1, callArgName2);
+            bool existCallArg3 = Igs.checkCallArgumentExistence(callName2, callArgName2);
+            bool existCallArg = Igs.checkCallArgumentExistence(callName, callArgName);
+
+            Console.WriteLine("\nExist Call Arg:");
+            Console.WriteLine("{0}.{1}={2}\n{3}.{4}={5}\n{6}.{7}={8}",
+                callName1, callArgName1, existCallArg1,
+                callName1, callArgName2, existCallArg2,
+                callName2, callArgName2, existCallArg3);
+            Console.WriteLine("{0}.{1}={2}",
+                callName, callArgName, existCallArg);
+
+            string inputName1 = "boolean";
+            string inputName2 = "zzzzz";
+
+            bool existIn1 = Igs.checkInputExistence(inputName1);
+            bool existIn2 = Igs.checkInputExistence(inputName2);
+
+            Console.WriteLine("\nExist Inputs: {0}={1} -- {2}={3}", inputName1, existIn1, inputName2, existIn2);
+
+            string[] callsList = Igs.getCallsList();
+            for (int i = 0; i < callsList.Length; i++)
+            {
+                string tmpCallName = callsList[i];
+                uint argsNb = Igs.getNumberOfArgumentsForCall(tmpCallName);
+
+                Console.WriteLine("call {0} -- args nb = {1}", tmpCallName, argsNb);
+            }
+
+
+            IntPtr firstArg = Igs.getFirstArgumentForCall("sendMail");
+            if (firstArg != IntPtr.Zero)
+            {
+                Console.WriteLine("First arg is defined:");
+
+                List<CallArgument> callArgumentsList = Igs.getCallArgumentsList(firstArg);
+                int i = 0;
+
+                foreach (CallArgument callArgument in callArgumentsList)
+                {
+                    if (callArgument != null)
+                    {
+                        if (callArgument.Type != iopType_t.IGS_DATA_T)
+                        {
+                            Console.WriteLine("{0}: {1} = {2} ({3})", i, callArgument.Name, callArgument.Value, callArgument.Type);
+                        }
+                    }
+                    i++;
+                }
+            }
+            else
+            {
+                Console.WriteLine("First arg is NOT defined !");
+            }
+
+            #endregion
+
+
             // Get agent state
             //string checkAgentName = Igs.getAgentName();
             //Console.WriteLine("Agent name = '{0}'", checkAgentName);
@@ -129,12 +297,18 @@ namespace CSharpSampleAgent
             // Get agent state
             string agentState = Igs.getAgentState();
 
-            //Get network list devices
+            // Get network devices and addresses
             string[] netDevicesList = Igs.getNetDevicesList();
-            for (int i = 0; i < netDevicesList.Length; i++)
+            string[] netAddressesList = Igs.getNetAddressesList();
+            if (netDevicesList.Length == netAddressesList.Length)
             {
-                string netDevice = netDevicesList[i];
-                Console.WriteLine("{0}: {1}", i, netDevice);
+                for (int i = 0; i < netDevicesList.Length; i++)
+                {
+                    string netDevice = netDevicesList[i];
+                    string netAddress = netAddressesList[i];
+
+                    Console.WriteLine("{0}: '{1}' with ip {2}", i, netDevice, netAddress);
+                }
             }
  
             // Verbose
@@ -268,7 +442,7 @@ namespace CSharpSampleAgent
 
         public void observeInputs()
         {
-            callbckPtr = genericCallback;
+            _callbackPtr = genericCallback;
 
             //Listing of input
             int nbOfElement = -1;
@@ -281,7 +455,7 @@ namespace CSharpSampleAgent
             for (int i = 0; i < nbOfElement; i++)
             {
                 //Observe the current input    
-                Igs.observeInput(inputsList[i], callbckPtr, myDataPtr);
+                Igs.observeInput(inputsList[i], _callbackPtr, myDataPtr);
             }
         }
 
@@ -305,6 +479,10 @@ namespace CSharpSampleAgent
             Igs.addMappingEntry("impulsion", "Csharp-Sample", "impulsion-out");
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
         public void writeOnInputs()
         {
             //Integer
@@ -324,6 +502,10 @@ namespace CSharpSampleAgent
             result = Igs.writeInputAsImpulsion("impulsion");
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
         public void writeAndReadData()
         {
             byte[] fooBytes;
@@ -359,6 +541,15 @@ namespace CSharpSampleAgent
 
 
         /// <summary>
+        /// Stop our agent
+        /// </summary>
+        public void stop()
+        {
+            Igs.stop();
+        }
+
+
+        /// <summary>
         /// 
         /// </summary>
         public void memoryleakstest()
@@ -384,9 +575,31 @@ namespace CSharpSampleAgent
             }
         }
 
-        public void stop()
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void testSendCall()
         {
-            Igs.stop();
+            IntPtr argsList = IntPtr.Zero;
+
+            _count++;
+            bool even = ((_count % 2) == 0);
+
+            List<CallArgument> argumentsList = new List<CallArgument>();
+            argumentsList.Add(new CallArgument(iopType_t.IGS_INTEGER_T, _count));
+            argumentsList.Add(new CallArgument(iopType_t.IGS_BOOL_T, even));
+            int success = Igs.sendCall("macosAgent", "OTHER_CALL", argumentsList);
+            Console.WriteLine("Send call success ?= {0}", success);
+
+            /*List<CallArgument> argumentsList2 = new List<CallArgument>();
+            argumentsList2.Add(new CallArgument(iopType_t.IGS_STRING_T, "peyruqueou@ingenuity.io"));
+            argumentsList2.Add(new CallArgument(iopType_t.IGS_STRING_T, "v.peyruqueou@gmail.com"));
+            argumentsList2.Add(new CallArgument(iopType_t.IGS_STRING_T, ""));
+            argumentsList2.Add(new CallArgument(iopType_t.IGS_STRING_T, "Test envoi via IngeScape call"));
+            argumentsList2.Add(new CallArgument(iopType_t.IGS_STRING_T, "Salut Vincent, Cordialement, Vincent P."));
+            int success2 = Igs.sendCall("igsMail", "sendMail", argumentsList2);
+            Console.WriteLine("Send call success ?= {0}", success2);*/
         }
 
         #endregion

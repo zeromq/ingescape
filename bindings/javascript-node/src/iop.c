@@ -9,6 +9,84 @@
 #include "../headers/iop.h"
 
 // Wrapper for : 
+// PUBLIC int igs_readInput(const char *name, void **value, size_t *size);
+napi_value node_igs_readInput(napi_env env, napi_callback_info info) {
+    size_t nb_arguments = 1;
+    napi_value argv[nb_arguments];
+
+    // get infos pass in argument
+    get_function_arguments(env, info, nb_arguments, argv);
+
+    // convert infos into C types
+    char * name = convert_napi_to_string(env, argv[0]);
+    void * value = NULL;
+    size_t size;
+
+    //call igs function
+    igs_readInput(name, &value, &size);
+
+    // convert into good type JavaScript
+    napi_value value_napi;
+    iopType_t type = igs_getTypeForInput(name);
+    // void * value will be freed by this function
+    convert_value_IOP_into_napi(env, type, value, size, &value_napi);
+    free(name);
+    return value_napi;
+}
+
+// Wrapper for : 
+// PUBLIC int igs_readOutput(const char *name, void **value, size_t *size);
+napi_value node_igs_readOutput(napi_env env, napi_callback_info info) {
+    size_t nb_arguments = 1;
+    napi_value argv[nb_arguments];
+
+    // get infos pass in argument
+    get_function_arguments(env, info, nb_arguments, argv);
+
+    // convert infos into C types
+    char * name = convert_napi_to_string(env, argv[0]);
+    void * value = NULL;
+    size_t size;
+
+    //call igs function
+    igs_readOutput(name, &value, &size);
+
+    // convert into good type JavaScript
+    napi_value value_napi;
+    iopType_t type = igs_getTypeForOutput(name);
+    // void * value will be freed by this function
+    convert_value_IOP_into_napi(env, type, value, size, &value_napi);
+    free(name);
+    return value_napi;
+}
+
+// Wrapper for : 
+// PUBLIC int igs_readParameter(const char *name, void **value, size_t *size);
+napi_value node_igs_readParameter(napi_env env, napi_callback_info info) {
+    size_t nb_arguments = 1;
+    napi_value argv[nb_arguments];
+
+    // get infos pass in argument
+    get_function_arguments(env, info, nb_arguments, argv);
+
+    // convert infos into C types
+    char * name = convert_napi_to_string(env, argv[0]);
+    void * value = NULL;
+    size_t size;
+
+    //call igs function
+    igs_readParameter(name, &value, &size);
+
+    // convert into good type JavaScript
+    napi_value value_napi;
+    iopType_t type = igs_getTypeForParameter(name);
+    // void * value will be freed by this function
+    convert_value_IOP_into_napi(env, type, value, size, &value_napi);
+    free(name);
+    return value_napi;
+}
+
+// Wrapper for : 
 // PUBLIC bool igs_readInputAsBool(const char *name);
 napi_value node_igs_readInputAsBool(napi_env env, napi_callback_info info) {
     size_t nb_arguments = 1;
@@ -70,13 +148,8 @@ napi_value node_igs_readInputAsString(napi_env env, napi_callback_info info) {
 
     // convert result into napi_value
     napi_value res_convert;
-    if (res != NULL) {
-        convert_string_to_napi(env, res, &res_convert);
-        free(res);
-    }
-    else {
-        convert_null_to_napi(env, &res_convert);
-    }
+    convert_string_to_napi(env, res, &res_convert);
+    free(res);
     return res_convert;
 }
 
@@ -93,7 +166,7 @@ napi_value node_igs_readInputAsData(napi_env env, napi_callback_info info) {
     char * name = convert_napi_to_string(env, argv[0]);
 
     // call igs function
-    void * data;
+    void * data = NULL;
     size_t size;
     igs_readInputAsData(name, &data, &size); 
     free(name);
@@ -101,7 +174,6 @@ napi_value node_igs_readInputAsData(napi_env env, napi_callback_info info) {
     // convert res into napi_value
     napi_value napi_array_buffer;
     convert_data_to_napi(env, data, size, &napi_array_buffer);
-    free(data);
     return napi_array_buffer;
 }
 
@@ -167,13 +239,8 @@ napi_value node_igs_readOutputAsString(napi_env env, napi_callback_info info) {
 
     // convert result into napi_value
     napi_value res_convert;
-    if (res != NULL) {
-        convert_string_to_napi(env, res, &res_convert);
-        free(res);
-    }
-    else {
-        convert_null_to_napi(env, &res_convert);
-    }
+    convert_string_to_napi(env, res, &res_convert);
+    free(res);
     return res_convert;
 }
 
@@ -190,7 +257,7 @@ napi_value node_igs_readOutputAsData(napi_env env, napi_callback_info info) {
     char * name = convert_napi_to_string(env, argv[0]);
 
     // call igs function
-    void * data;
+    void * data = NULL;
     size_t size;
     igs_readOutputAsData(name, &data, &size); 
     free(name);
@@ -198,7 +265,6 @@ napi_value node_igs_readOutputAsData(napi_env env, napi_callback_info info) {
     // convert res into napi_value
     napi_value napi_array_buffer;
     convert_data_to_napi(env, data, size, &napi_array_buffer);
-    free(data);
     return napi_array_buffer;
 }
 
@@ -264,13 +330,8 @@ napi_value node_igs_readParameterAsString(napi_env env, napi_callback_info info)
 
     // convert result into napi_value
     napi_value res_convert;
-    if (res != NULL) {
-        convert_string_to_napi(env, res, &res_convert);
-        free(res);
-    }
-    else {
-        convert_null_to_napi(env, &res_convert);
-    }
+    convert_string_to_napi(env, res, &res_convert);
+    free(res);
     return res_convert;
 }
 
@@ -287,7 +348,7 @@ napi_value node_igs_readParameterAsData(napi_env env, napi_callback_info info) {
     char * name = convert_napi_to_string(env, argv[0]);
 
     // call igs function
-    void * data;
+    void * data = NULL;
     size_t size;
     igs_readParameterAsData(name, &data, &size); 
     free(name);
@@ -295,7 +356,6 @@ napi_value node_igs_readParameterAsData(napi_env env, napi_callback_info info) {
     // convert res into napi_value
     napi_value napi_array_buffer;
     convert_data_to_napi(env, data, size, &napi_array_buffer);
-    free(data);
     return napi_array_buffer;
 }
 
@@ -336,7 +396,7 @@ napi_value node_igs_writeInputAsDouble(napi_env env, napi_callback_info info) {
     char * name = convert_napi_to_string(env, argv[0]);
     double value;
     convert_napi_to_double(env, argv[1], &value);
-
+    
     // call igs function
     int res = igs_writeInputAsDouble(name, value); 
     free(name);
@@ -868,27 +928,13 @@ napi_value node_igs_getParametersNumber(napi_env env, napi_callback_info info) {
 // Wrapper for : 
 // PUBLIC char** igs_getInputsList(long *nbOfElements);
 napi_value node_igs_getInputsList(napi_env env, napi_callback_info info) {
-    napi_status status; //to check status of node_api
-
     // call igs function
     long nbInputs = 0;
     char** inputs = igs_getInputsList(&nbInputs);
 
     // convert char** into napi_value
     napi_value arrayInputs;
-    status = napi_create_array_with_length(env, nbInputs, &arrayInputs);
-    if (status != napi_ok) {
-        napi_throw_error(env, NULL, "N-API : Unable to create array");
-    }
-
-    for (int i = 0; i < nbInputs; i++) {
-        napi_value input_conv;
-        convert_string_to_napi(env, inputs[i], &input_conv);
-        status = napi_set_element(env, arrayInputs, i, input_conv);
-        if (status != napi_ok) {
-            napi_throw_error(env, NULL, "Unable to write element into array");
-        }
-    }
+    convert_string_list_to_napi_array(env, inputs, nbInputs, &arrayInputs);
     //free char ** 
     igs_freeIOPList(&inputs, nbInputs);
     return arrayInputs;
@@ -897,27 +943,13 @@ napi_value node_igs_getInputsList(napi_env env, napi_callback_info info) {
 // Wrapper for : 
 // PUBLIC char** igs_getOutputsList(long *nbOfElements);
 napi_value node_igs_getOutputsList(napi_env env, napi_callback_info info) {
-    napi_status status; //to check status of node_api
-
     // call igs function
     long nbOutputs = 0;
     char** outputs = igs_getOutputsList(&nbOutputs);
 
     // convert char** into napi_value
     napi_value arrayOutputs;
-    status = napi_create_array_with_length(env, nbOutputs, &arrayOutputs);
-    if (status != napi_ok) {
-        napi_throw_error(env, NULL, "N-API : Unable to create array");
-    }
-
-    for (int i = 0; i < nbOutputs; i++) {
-        napi_value output_conv;
-        convert_string_to_napi(env, outputs[i], &output_conv);
-        status = napi_set_element(env, arrayOutputs, i, output_conv);
-        if (status != napi_ok) {
-            napi_throw_error(env, NULL, "Unable to write element into array");
-        }
-    }
+    convert_string_list_to_napi_array(env, outputs, nbOutputs, &arrayOutputs);
     //free char ** 
     igs_freeIOPList(&outputs, nbOutputs);
     return arrayOutputs;
@@ -926,27 +958,13 @@ napi_value node_igs_getOutputsList(napi_env env, napi_callback_info info) {
 // Wrapper for : 
 // PUBLIC char** igs_getParametersList(long *nbOfElements);
 napi_value node_igs_getParametersList(napi_env env, napi_callback_info info) {
-    napi_status status; //to check status of node_api
-
     // call igs function
     long nbParams = 0;
     char** params = igs_getParametersList(&nbParams);
 
     // convert char** into napi_value
     napi_value arrayParams;
-    status = napi_create_array_with_length(env, nbParams, &arrayParams);
-    if (status != napi_ok) {
-        napi_throw_error(env, NULL, "N-API : Unable to create array");
-    }
-
-    for (int i = 0; i < nbParams; i++) {
-        napi_value param_conv;
-        convert_string_to_napi(env, params[i], &param_conv);
-        status = napi_set_element(env, arrayParams, i, param_conv);
-        if (status != napi_ok) {
-            napi_throw_error(env, NULL, "Unable to write element into array");
-        }
-    }
+    convert_string_list_to_napi_array(env, params, nbParams, &arrayParams);
     //free char ** 
     igs_freeIOPList(&params, nbParams);
     return arrayParams;
@@ -1018,56 +1036,11 @@ napi_value node_igs_checkParameterExistence(napi_env env, napi_callback_info inf
     return res_convert;
 }
 
-//  Get enum types for iop types in js
-napi_value node_get_iopType_js(napi_env env, napi_callback_info info) {
-    napi_value object;
-    napi_create_object(env, &object);
-
-    napi_value numberType;
-    convert_int_to_napi(env, IGS_NUMBER_JS, &numberType);
-    napi_set_named_property(env, object, "IGS_NUMBER_T", numberType);
-
-    napi_value stringType;
-    convert_int_to_napi(env, IGS_STRING_JS, &stringType);
-    napi_set_named_property(env, object, "IGS_STRING_T", stringType);
-
-    napi_value boolType;
-    convert_int_to_napi(env, IGS_BOOL_JS, &boolType);
-    napi_set_named_property(env, object, "IGS_BOOL_T", boolType);
-
-    napi_value impulsionType;
-    convert_int_to_napi(env, IGS_IMPULSION_JS, &impulsionType);
-    napi_set_named_property(env, object, "IGS_IMPULSION_T", impulsionType);
-
-    napi_value dataType;
-    convert_int_to_napi(env, IGS_DATA_JS, &dataType);
-    napi_set_named_property(env, object, "IGS_DATA_T", dataType);
-
-    return object;
-}
-
-//  Get enum types for iop types in js
-napi_value node_get_iop_js(napi_env env, napi_callback_info info) {
-    napi_value object;
-    napi_create_object(env, &object);
-
-    napi_value input;
-    convert_int_to_napi(env, IGS_INPUT_T, &input);
-    napi_set_named_property(env, object, "IGS_INPUT_T", input);
-
-    napi_value output;
-    convert_int_to_napi(env, IGS_OUTPUT_T, &output);
-    napi_set_named_property(env, object, "IGS_OUTPUT_T", output);
-
-    napi_value parameter;
-    convert_int_to_napi(env, IGS_PARAMETER_T, &parameter);
-    napi_set_named_property(env, object, "IGS_PARAMETER_T", parameter);
-
-    return object;
-}
-
 // Allow callback for iop ingescape code 
 napi_value init_iop(napi_env env, napi_value exports) {
+    exports = enable_callback_into_js(env, node_igs_readInput, "readInput", exports);
+    exports = enable_callback_into_js(env, node_igs_readOutput, "readOutput", exports);
+    exports = enable_callback_into_js(env, node_igs_readParameter, "readParameter", exports);
     exports = enable_callback_into_js(env, node_igs_readInputAsBool, "readInputAsBool", exports);
     exports = enable_callback_into_js(env, node_igs_readInputAsDouble, "readInputAsNumber", exports);
     exports = enable_callback_into_js(env, node_igs_readInputAsString, "readInputAsString", exports);
@@ -1112,8 +1085,5 @@ napi_value init_iop(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_igs_checkInputExistence, "checkInputExistence", exports);
     exports = enable_callback_into_js(env, node_igs_checkOutputExistence, "checkOutputExistence", exports);
     exports = enable_callback_into_js(env, node_igs_checkParameterExistence, "checkParameterExistence", exports);  
-    exports = enable_callback_into_js(env, node_get_iopType_js, "getIopValueTypes", exports);  
-    exports = enable_callback_into_js(env, node_get_iop_js, "getIopTypes", exports);  
-    
     return exports;
 }

@@ -35,6 +35,7 @@
 #endif
 
 #include "ingescape.h"
+#include "ingescape_agent.h"
 #include "ingescape_advanced.h"
 
 #ifdef __cplusplus
@@ -48,11 +49,13 @@ extern "C" {
 #define MAX_MAPPING_NAME_LENGTH 1024
 #define MAX_DESCRIPTION_LENGTH 4096
 #define MAX_MAPPING_DESCRIPTION_LENGTH 4096
+#define COMMAND_LINE_LENGTH 4096
+
 
 //////////////////  STRUCTURES AND ENUMS   //////////////////
 
 typedef struct igs_observe_callback {
-    igs_observeCallback callback_ptr;
+    igsAgent_observeCallback callback_ptr;
     void* data;
     struct igs_observe_callback *prev;
     struct igs_observe_callback *next;
@@ -87,7 +90,7 @@ typedef struct agent_iop {
 typedef struct call{
     char * name;
     char * description;
-    igs_callFunction cb;
+    igsAgent_callFunction cb;
     void *cbData;
     igs_callArgument_t *arguments;
     struct call *reply;
@@ -113,7 +116,7 @@ typedef struct definition {
     agent_iop_t* outputs_table;
     igs_call_t *calls_table;
     UT_hash_handle hh;
-} definition;
+} igs_definition_t;
 
 /*
  * Define the structure 'mapping_element' which contains mapping between an input and an (one or all) external agent's output :
@@ -144,7 +147,7 @@ typedef struct mapping {
     char* version;
     mapping_element_t* map_elements;
     UT_hash_handle hh;
-} mapping_t;
+} igs_mapping_t;
 
 #define MAX_FILTER_SIZE 1024
 typedef struct mappingFilter {
@@ -158,13 +161,21 @@ typedef struct subscriber_s{
     const char *agentPeerId;
     zsock_t *subscriber;
     zmq_pollitem_t *pollItem;
-    definition *definition;
+    igs_definition_t *definition;
     bool mappedNotificationToSend;
-    mapping_t *mapping;
+    igs_mapping_t *mapping;
     mappingFilter_t *mappingsFilters;
     int timerId;
+    igsAgent_t *agent;
     UT_hash_handle hh;
 } subscriber_t;
+
+typedef struct igsTimer_s{
+    int timerId;
+    igs_timerCallback *cb;
+    void *myData;
+    UT_hash_handle hh;
+} igsTimer_t;
 
 #define NETWORK_DEVICE_LENGTH 256
 #define IP_ADDRESS_LENGTH 256
@@ -172,13 +183,16 @@ typedef struct zyreloopElements{
     char networkDevice[NETWORK_DEVICE_LENGTH];
     char ipAddress[IP_ADDRESS_LENGTH];
     char brokerEndPoint[IP_ADDRESS_LENGTH];
+    int processId;
     int zyrePort;
     zactor_t *agentActor;
     zyre_t *node;
     zsock_t *publisher;
     zsock_t *ipcPublisher;
+    zsock_t *inprocPublisher;
     zsock_t *logger;
     zloop_t *loop;
+    igsTimer_t *timers;
 } zyreloopElements_t;
 
 //zyre agents storage
@@ -228,66 +242,180 @@ typedef struct licenseEnforcement {
 } licenseEnforcement_t;
 
 typedef struct license_callback {
-    igs_licenseCallback callback_ptr;
+    igsAgent_licenseCallback callback_ptr;
     void* data;
     struct license_callback *prev;
     struct license_callback *next;
 } license_callback_t;
-    
 
-//////////////////  FUNCTIONS  //////////////////
+typedef struct monitor {
+    unsigned int period;
+    igs_monitorEvent_t status;
+    zactor_t *monitorActor;
+    zloop_t *loop;
+    unsigned int port;
+    char *networkDevice;
+} monitor_t;
+
+typedef struct monitorCallback {
+    igsAgent_monitorCallback callback_ptr;
+    void *myData;
+    struct monitorCallback *prev;
+    struct monitorCallback *next;
+} monitorCallback_t;
+
+typedef struct muteCallback {
+    igsAgent_muteCallback callback_ptr;
+    void *myData;
+    struct muteCallback *prev;
+    struct muteCallback *next;
+} muteCallback_t;
+
+typedef struct freezeCallback {
+    igsAgent_freezeCallback callback_ptr;
+    void *myData;
+    struct freezeCallback *prev;
+    struct freezeCallback *next;
+} freezeCallback_t;
+
+typedef struct zyreCallback {
+    igsAgent_BusMessageIncoming callback_ptr;
+    void *myData;
+    struct zyreCallback *prev;
+    struct zyreCallback *next;
+} zyreCallback_t;
+
+typedef struct forcedStopCalback {
+    igsAgent_forcedStopCallback callback_ptr;
+    void *myData;
+    struct forcedStopCalback *prev;
+    struct forcedStopCalback *next;
+} forcedStopCalback_t;
+
+typedef struct _igsAgent_t {
+    //definition
+    char definitionPath[IGS_MAX_PATH];
+    igs_definition_t* definition;
+    
+    //mapping
+    char mappingPath[IGS_MAX_PATH];
+    igs_mapping_t *mapping;
+    
+    //network
+    bool isWholeAgentMuted;
+    zyreAgent_t *zyreAgents;
+    bool network_needToSendDefinitionUpdate;
+    bool network_needToUpdateMapping;
+    bool network_RequestOutputsFromMappedAgents;
+    unsigned int network_discoveryInterval;
+    unsigned int network_agentTimeout;
+    unsigned int network_publishingPort;
+    unsigned int network_logStreamPort;
+    subscriber_t *subscribers;
+    zyreloopElements_t *loopElements;
+    char *ipcFolderPath;
+    char *ipcFullPath;
+    char *ipcEndpoint;
+    int network_hwmValue;
+    bool isFrozen;
+    bool canBeFrozen;
+    bool isInterrupted;
+    bool forcedStop;
+    bool allowIpc;
+    bool allowInproc;
+    char agentName[MAX_AGENT_NAME_LENGTH];
+    char agentState[MAX_AGENT_NAME_LENGTH];
+    char commandLine[COMMAND_LINE_LENGTH];
+    char replayChannel[MAX_AGENT_NAME_LENGTH + 16];
+    char callsChannel[MAX_AGENT_NAME_LENGTH + 16];
+    muteCallback_t *muteCallbacks;
+    freezeCallback_t *freezeCallbacks;
+    zyreCallback_t *zyreCallbacks;
+    forcedStopCalback_t *forcedStopCalbacks;
+    
+    //admin
+    FILE *logFile;
+    bool logInStream;
+    bool logInFile;
+    bool logInConsole;
+    bool useColorInConsole;
+    igs_logLevel_t logLevel;
+    char logFilePath[4096];
+    char logContent[2048];
+    char logTime[128];
+    int logNbOfEntries; //for fflush rotation
+
+    //bus
+    serviceHeader_t *serviceHeaders;
+
+    //license
+    licenseEnforcement_t *licenseEnforcement;
+    license_t *license;
+    license_callback_t *licenseCallbacks;
+    char *licensePath;
+    void *licenseData; //overrides licence files
+    size_t licenseDataSize;
+
+    //performance
+    size_t performanceMsgCounter;
+    size_t performanceMsgCountTarget;
+    size_t performanceMsgSize;
+    int64_t performanceStart;
+    int64_t performanceStop;
+    
+    //monitor
+    monitor_t *monitor;
+    monitorCallback_t *monitorCallbacks;
+    bool monitor_shallStartStopAgent;
+
+} igsAgent_t;
+
+
+//////////////////  FUNCTIONS  AND SHARED VARIABLES //////////////////
+
+PUBLIC extern igsAgent_t *globalAgent;
+PUBLIC extern int igs_nbOfInternalAgents;
+void initInternalAgentIfNeeded(void);
+
 
 //  definition
-extern char definitionPath[IGS_MAX_PATH];
-extern definition* igs_internal_definition;
-PUBLIC void definition_freeDefinition (definition* definition);
+PUBLIC void definition_freeDefinition (igs_definition_t* definition);
 
 //  mapping
-extern char mappingPath[IGS_MAX_PATH];
-extern mapping_t *igs_internal_mapping;
-PUBLIC void mapping_freeMapping (mapping_t* map);
+PUBLIC void mapping_freeMapping (igs_mapping_t* map);
 mapping_element_t * mapping_createMappingElement(const char * input_name,
                                                  const char *agent_name,
                                                  const char* output_name);
 unsigned long djb2_hash (unsigned char *str);
-bool mapping_checkCompatibilityInputOutput(agent_iop_t *foundInput, agent_iop_t *foundOutput);
+bool mapping_checkCompatibilityInputOutput(igsAgent_t *agent, agent_iop_t *foundInput, agent_iop_t *foundOutput);
 
 // model
-extern bool isWholeAgentMuted;
-const agent_iop_t* model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void* value, size_t size);
-agent_iop_t* model_findIopByName(const char* name, iop_t type);
+const agent_iop_t* model_writeIOP (igsAgent_t *agent, const char *iopName, iop_t iopType, iopType_t valType, void* value, size_t size);
+agent_iop_t* model_findIopByName(igsAgent_t *agent, const char* name, iop_t type);
 char* model_getIOPValueAsString (agent_iop_t* iop); //returned value must be freed by user
 void model_readWriteLock(void);
 void model_readWriteUnlock(void);
 
 // network
 #define CHANNEL "INGESCAPE_PRIVATE"
-#define AGENT_NAME_DEFAULT "igs_noname"
-
-PUBLIC extern zyreAgent_t *zyreAgents;
-extern bool network_needToSendDefinitionUpdate;
-extern bool network_needToUpdateMapping;
-extern subscriber_t *subscribers;
-extern zyreloopElements_t *agentElements;
-extern char *ipcFolderPath;
-int network_publishOutput (const agent_iop_t *iop);
+#define AGENT_NAME_DEFAULT "no_name"
+int network_publishOutput (igsAgent_t *agent, const agent_iop_t *iop);
 
 // parser
-PUBLIC definition* parser_loadDefinition (const char* json_str);
-PUBLIC definition* parser_loadDefinitionFromPath (const char* file_path);
-char* parser_export_definition (definition* def);
-PUBLIC char* parser_export_mapping(mapping_t* mapp);
-mapping_t* parser_LoadMap (const char* json_str);
-mapping_t* parser_LoadMapFromPath (const char* load_file);
+PUBLIC igs_definition_t* parser_loadDefinition (const char* json_str);
+PUBLIC igs_definition_t* parser_loadDefinitionFromPath (const char* file_path);
+char* parser_export_definition (igs_definition_t* def);
+PUBLIC char* parser_export_mapping(igs_mapping_t* mapp);
+igs_mapping_t* parser_LoadMap (const char* json_str);
+igs_mapping_t* parser_LoadMapFromPath (const char* load_file);
 
 // admin
-extern bool admin_logInStream;
-extern bool admin_logInFile;
-extern char admin_logFile[4096];
-void admin_makeFilePath(const char *from, char *to, size_t size_of_to);
+void admin_makeFilePath(igsAgent_t *agent, const char *from, char *to, size_t size_of_to);
+PUBLIC void admin_log(igsAgent_t *agent, igs_logLevel_t, const char *function, const char *format, ...)  CHECK_PRINTF (4);
 
 //bus
-extern serviceHeader_t *serviceHeaders;
+void bus_zyreLock(void);
+void bus_zyreUnlock(void);
 
 //call
 void call_freeCall(igs_call_t *t);
@@ -299,11 +427,9 @@ int call_freeValuesInArguments(igs_callArgument_t *arg);
 #define MAX_NB_OF_AGENTS 50
 #define MAX_NB_OF_IOP 1000
 #define MAX_EXEC_DURATION_DURING_EVAL 300
-extern license_t *license;
-extern license_callback_t *licenseCallbacks;
 #if !TARGET_OS_IOS
-void license_cleanLicense(void);
-void license_readLicense(void);
+void license_cleanLicense(igsAgent_t *agent);
+void license_readLicense(igsAgent_t *agent);
 #endif
 
 #ifdef __cplusplus

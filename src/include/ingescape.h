@@ -252,9 +252,11 @@ PUBLIC int igs_version(void);
 PUBLIC int igs_protocol(void);
 
 //Utility functions to find network adapters with broadcast capabilities
-//to be used in igs_startWithDevice
+//to be used in igs_startWithDevice and igs_startWithIP
 PUBLIC void igs_getNetdevicesList(char ***devices, int *nb);
 PUBLIC void igs_freeNetdevicesList(char **devices, int nb);
+PUBLIC void igs_getNetaddressesList(char ***addresses, int *nb);
+PUBLIC void igs_freeNetaddressesList(char **addresses, int nb);
 
 
 //Agent command line can be passed here to be used by ingescapeLauncher. If not set,
@@ -302,7 +304,9 @@ PUBLIC char* igs_getLogPath(void); // must be freed by caller
 
 PUBLIC void igs_setLogLevel (igs_logLevel_t level); //set log level in console, default is IGS_LOG_INFO
 PUBLIC igs_logLevel_t igs_getLogLevel(void);
-PUBLIC void igs_log(igs_logLevel_t, const char *function, const char *format, ...)  CHECK_PRINTF (3);
+
+//do not use these functions, use aliases just below
+PUBLIC void igs_log(igs_logLevel_t level, const char *function, const char *format, ...) CHECK_PRINTF (3);
 #define igs_trace(...) igs_log(IGS_LOG_TRACE, __func__, __VA_ARGS__)
 #define igs_debug(...) igs_log(IGS_LOG_DEBUG, __func__, __VA_ARGS__)
 #define igs_info(...)  igs_log(IGS_LOG_INFO, __func__, __VA_ARGS__)
@@ -317,21 +321,31 @@ PUBLIC void igs_setMappingPath(const char *path);
 PUBLIC void igs_writeDefinitionToPath(void);
 PUBLIC void igs_writeMappingToPath(void);
 
-#if defined __unix__ || defined __APPLE__ || defined __linux__
-//IPC is supported on UNIX systems only
-//set/get IPC folder path for the agent (default is /tmp/)
-PUBLIC void igs_setIpcFolderPath(char *path);
-PUBLIC const char* igs_getIpcFolderPath(void);
+//Ingescape automatically detects agents on the same computer and same process (PID)
+//Then, it uses optimized communication for input/output data exchange chosen
+//between TCP, IPC/loopback and inproc.
 
-//IPC is activated by default be can be deactivated here
+//Same IP address but differet PIDs : use IPC or loopback
+//IPC is supported on UNIX systems only. On windows, we use the loopback as an alternative.
+//IPC is activated by default be can be deactivated here.
 PUBLIC void igs_setAllowIpc(bool allow);
 PUBLIC bool igs_getAllowIpc(void);
+#if defined __unix__ || defined __APPLE__ || defined __linux__
+//set IPC folder path for the agent on UNIX systems (default is /tmp/)
+PUBLIC void igs_setIpcFolderPath(char *path);
+PUBLIC const char* igs_getIpcFolderPath(void);
 #endif
+
+//Same IP address and same PID : use inproc
+//Inproc is activated by default be can be deactivated here.
+PUBLIC void igs_setAllowInproc(bool allow);
+PUBLIC bool igs_getAllowInproc(void);
 
 
 //////////////////////////////////////////////////
 //licenses
-#define igs_license(...) igs_log(IGS_LOG_FATAL+1, __func__, __VA_ARGS__)
+PUBLIC void igs_licenseGlobal(const char *function, const char *format, ...) CHECK_PRINTF (2);
+#define igs_license(...) igs_log(IGS_LOG_FATAL + 1, __func__, __VA_ARGS__)
 typedef enum {
     IGS_LICENSE_TIMEOUT = 0,
     IGS_LICENSE_TOO_MANY_AGENTS,
@@ -340,9 +354,9 @@ typedef enum {
 typedef void (*igs_licenseCallback)(igs_license_limit_t limit, void *myData);
 
 #if !defined(TARGET_OS_IOS) || !TARGET_OS_IOS
-// Default licenses path is empty and is automatically set to agent's executable path.
+// Default licenses path is empty and, if so, is automatically set at runtime to agent's executable path.
 // All licenses in path will be examined and used if valid
-// When path is set manually, it takes priority to agent's executable path.
+// When path is set manually, it takes priority over agent's executable path.
 PUBLIC void igs_setLicensePath(const char *path);
 PUBLIC char *igs_getLicensePath(void);
     
@@ -355,6 +369,10 @@ PUBLIC bool igs_checkLicenseForAgent(const char *agentId);
 //or number of agents or number of IOPs has been exceeded in demo mode
 PUBLIC int igs_observeLicense(igs_licenseCallback cb, void *myData);
     
+//This function loads a license in memory and overrides all provided
+//license files.
+PUBLIC void igs_loadLicenseData(const void *data, size_t size);
+
 #endif
     
 #ifdef __cplusplus

@@ -652,8 +652,8 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *args){
                     free(a);
                 }
             }
-        } else if (streq (event, "EVASIVE")){
-            printf ("%s (%s) is being evasive\n", name, peer);
+        } else if (streq (event, "SILENT")){
+            printf ("%s (%s) is being silent\n", name, peer);
         }
         zyre_event_destroy(&zyre_event);
     }

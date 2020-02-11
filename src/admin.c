@@ -30,18 +30,7 @@
 #define INGESCAPE_VERSION ((INGESCAPE_MAJOR * 10000) + (INGESCAPE_MINOR * 100) + INGESCAPE_MICRO)
 
 #define INGESCAPE_PROTOCOL 1
-
-FILE *fp = NULL;
-bool admin_logInStream = false;
-bool admin_logInFile = false;
-bool logInConsole = false;
-bool useColorInConsole = false;
-igs_logLevel_t logLevel = IGS_LOG_INFO;
-char admin_logFile[4096] = "";
-char logContent[2048] = "";
-char logTime[128] = "";
 #define NUMBER_OF_LOGS_FOR_FFLUSH 0
-static int nb_of_entries = 0; //for fflush rotation
 
 #if defined(__unix__) || defined(__linux__) || \
 (defined(__APPLE__) && defined(__MACH__))
@@ -79,7 +68,7 @@ void admin_computeTime(char *dest){
 #endif
     }
 
-void admin_makeFilePath(const char *from, char *to, size_t size_of_to){
+void admin_makeFilePath(igsAgent_t *agent, const char *from, char *to, size_t size_of_to){
     if (from[0] == '~') {
         from++;
 #ifdef _WIN32
@@ -88,7 +77,7 @@ void admin_makeFilePath(const char *from, char *to, size_t size_of_to){
         char *home = getenv("HOME");
 #endif
         if (home == NULL) {
-            igs_error("could not find path for home directory");
+            igsAgent_error(agent, "could not find path for home directory");
         } else {
             strncpy(to, home, size_of_to);
             strncat(to, from, size_of_to);
@@ -145,179 +134,191 @@ int igs_protocol(void){
     return INGESCAPE_PROTOCOL;
 }
 
-void igs_log(igs_logLevel_t level, const char *function, const char *fmt, ...){
+void admin_log(igsAgent_t *agent, igs_logLevel_t level, const char *function, const char *fmt, ...){
     admin_lock();
-
+    initInternalAgentIfNeeded();
+    
     va_list list;
     va_start(list, fmt);
-    vsnprintf(logContent, 2047, fmt, list);
+    vsnprintf(agent->logContent, 2047, fmt, list);
     va_end(list);
     
     //remove final \n if needed
     //TODO: scan the whole string to remove unallowed characters
-    if (logContent[strlen(logContent) - 1] == '\n'){
-        logContent[strlen(logContent) - 1] = '\0';
+    if (agent->logContent[strlen(agent->logContent) - 1] == '\n'){
+        agent->logContent[strlen(agent->logContent) - 1] = '\0';
     }
 
-    if (admin_logInFile){
+    if (agent->logInFile){
         //create default path if current is empty
-        if (strlen(admin_logFile) == 0){
+        if (strlen(agent->logFilePath) == 0){
             char buff[4097] = "";
-            snprintf(admin_logFile, 4095, "~/Documents/IngeScape/logs/");
-            strncpy(buff, admin_logFile, 4096);
-            admin_makeFilePath(buff, admin_logFile, 4096);
-            if (!zsys_file_exists(admin_logFile)){
-                printf("creating log path %s\n", admin_logFile);
-                if(zsys_dir_create(admin_logFile) != 0){
-                    printf("error while creating log path %s\n", admin_logFile);
+            snprintf(agent->logFilePath, 4095, "~/Documents/IngeScape/logs/");
+            strncpy(buff, agent->logFilePath, 4096);
+            admin_makeFilePath(agent, buff, agent->logFilePath, 4096);
+            if (!zsys_file_exists(agent->logFilePath)){
+                printf("creating log path %s\n", agent->logFilePath);
+                if(zsys_dir_create(agent->logFilePath) != 0){
+                    printf("error while creating log path %s\n", agent->logFilePath);
                 }
             }
-            char *name = igs_getAgentName();
-            strncat(admin_logFile, name, 4095);
-            strncat(admin_logFile, ".log", 4095);
-            printf("creating default log file %s\n", admin_logFile);
+            char *name = igsAgent_getAgentName(agent);
+            strncat(agent->logFilePath, name, 4095);
+            strncat(agent->logFilePath, ".log", 4095);
+            printf("using log file %s\n", agent->logFilePath);
             free(name);
-            if (agentElements != NULL && agentElements->node != NULL){
-                zyre_shouts(agentElements->node, CHANNEL, "LOG_FILE_PATH=%s", admin_logFile);
+            if (agent->loopElements != NULL && agent->loopElements->node != NULL){
+                bus_zyreLock();
+                zyre_shouts(agent->loopElements->node, CHANNEL, "LOG_FILE_PATH=%s", agent->logFilePath);
+                bus_zyreUnlock();
             }
         }
-        if (fp == NULL){
-            fp = fopen (admin_logFile,"a");
-            if (fp == NULL){
-                printf("error while trying to create/open log file: %s\n", admin_logFile);
+        if (agent->logFile == NULL){
+            agent->logFile = fopen (agent->logFilePath,"a");
+            if (agent->logFile == NULL){
+                printf("error while trying to create/open log file: %s\n", agent->logFilePath);
             }
         }
-        if (fp != NULL){
-            admin_computeTime(logTime);
-            if (fprintf(fp,"%s;%s;%s;%s\n", logTime, log_levels[level], function, logContent) >= 0){
-                if (++nb_of_entries > NUMBER_OF_LOGS_FOR_FFLUSH){
-                    nb_of_entries = 0;
-                    fflush(fp);
+        if (agent->logFile != NULL){
+            admin_computeTime(agent->logTime);
+            if (fprintf(agent->logFile,"%s;%s;%s;%s;%s\n", agent->agentName, agent->logTime, log_levels[level], function, agent->logContent) >= 0){
+                if (++agent->logNbOfEntries > NUMBER_OF_LOGS_FOR_FFLUSH){
+                    agent->logNbOfEntries = 0;
+                    fflush(agent->logFile);
                 }
             }else{
-                printf("error while writing logs in %s\n", admin_logFile);
+                printf("error while writing logs in %s\n", agent->logFilePath);
             }
         }
     }
-    if ((logInConsole && level >= logLevel) || level >= IGS_LOG_ERROR){
+    if ((agent->logInConsole && level >= agent->logLevel) || level >= IGS_LOG_ERROR){
         if (level >= IGS_LOG_WARN){
-            if (useColorInConsole){
-                fprintf(stderr,"%s%s\x1b[0m;%s;%s\n", log_colors[level], log_levels[level], function, logContent);
+            if (agent->useColorInConsole){
+                fprintf(stderr,"%s;%s%s\x1b[0m;%s;%s\n", agent->agentName, log_colors[level], log_levels[level], function, agent->logContent);
             }else{
-                fprintf(stderr,"%s;%s;%s\n", log_levels[level], function, logContent);
+                fprintf(stderr,"%s;%s;%s;%s\n", agent->agentName, log_levels[level], function, agent->logContent);
             }
         }else{
-            if (useColorInConsole){
-                fprintf(stdout,"%s%s\x1b[0m;%s;%s\n", log_colors[level], log_levels[level], function, logContent);
+            if (agent->useColorInConsole){
+                fprintf(stdout,"%s;%s%s\x1b[0m;%s;%s\n", agent->agentName, log_colors[level], log_levels[level], function, agent->logContent);
             }else{
-                fprintf(stdout,"%s;%s;%s\n", log_levels[level], function, logContent);
+                fprintf(stdout,"%s;%s;%s;%s\n", agent->agentName, log_levels[level], function, agent->logContent);
             }
         }
         
     }
-    if (admin_logInStream && agentElements != NULL && agentElements->logger != NULL){
-        zstr_sendf(agentElements->logger, "%s;%s;%s\n", log_levels[level], function, logContent);
+    if (agent->logInStream && agent->loopElements != NULL && agent->loopElements->logger != NULL){
+        zstr_sendf(agent->loopElements->logger, "%s;%s;%s;%s\n", agent->agentName, log_levels[level], function, agent->logContent);
     }
     admin_unlock();
 
 }
 
-void igs_setLogLevel (igs_logLevel_t level){
-    logLevel = level;
+void igsAgent_setLogLevel (igsAgent_t *agent, igs_logLevel_t level){
+    agent->logLevel = level;
 }
 
-igs_logLevel_t igs_getLogLevel (void) {
-    return logLevel;
+igs_logLevel_t igsAgent_getLogLevel (igsAgent_t *agent) {
+    return agent->logLevel;
 }
 
-void igs_setLogInFile (bool allow){
-    if (allow != admin_logInFile){
-        admin_logInFile = allow;
-        if (agentElements != NULL && agentElements->node != NULL){
+void igsAgent_setLogInFile (igsAgent_t *agent, bool allow){
+    if (allow != agent->logInFile){
+        initInternalAgentIfNeeded();
+        agent->logInFile = allow;
+        if (agent->loopElements != NULL && agent->loopElements->node != NULL){
+            bus_zyreLock();
             if (allow){
-                zyre_shouts(agentElements->node, CHANNEL, "LOG_IN_FILE=1");
+                zyre_shouts(agent->loopElements->node, CHANNEL, "LOG_IN_FILE=1");
             }else{
-                zyre_shouts(agentElements->node, CHANNEL, "LOG_IN_FILE=0");
+                zyre_shouts(agent->loopElements->node, CHANNEL, "LOG_IN_FILE=0");
             }
+            bus_zyreUnlock();
         }
     }
 }
 
-bool igs_getLogInFile (void) {
-    return admin_logInFile;
+bool igsAgent_getLogInFile (igsAgent_t *agent) {
+    return agent->logInFile;
 }
 
-void igs_setVerbose (bool allow){
-    logInConsole = allow;
+void igsAgent_setVerbose (igsAgent_t *agent, bool allow){
+    agent->logInConsole = allow;
 }
 
-bool igs_isVerbose (void) {
-    return logInConsole;
+bool igsAgent_isVerbose (igsAgent_t *agent) {
+    return agent->logInConsole;
 }
 
-void igs_setUseColorVerbose (bool allow){
-    useColorInConsole = allow;
+void igsAgent_setUseColorVerbose (igsAgent_t *agent, bool allow){
+    agent->useColorInConsole = allow;
 }
 
-bool igs_getUseColorVerbose (void) {
-    return useColorInConsole;
+bool igsAgent_getUseColorVerbose (igsAgent_t *agent) {
+    return agent->useColorInConsole;
 }
 
-void igs_setLogStream(bool stream){
-    if (stream != admin_logInStream){
-        if (agentElements != NULL){
+void igsAgent_setLogStream(igsAgent_t *agent, bool stream){
+    if (stream != agent->logInStream){
+        initInternalAgentIfNeeded();
+        if (agent->loopElements != NULL){
             if (stream){
-                igs_warn("agent is already started, log stream cannot be created anymore");
+                igsAgent_warn(agent, "agent is already started, log stream cannot be created anymore");
             }else{
-                igs_warn("agent is already started, log stream cannot be disabled anymore");
+                igsAgent_warn(agent, "agent is already started, log stream cannot be disabled anymore");
             }
             return;
         }
-        admin_logInStream = stream;
-        if (agentElements != NULL && agentElements->node != NULL){
+        agent->logInStream = stream;
+        if (agent->loopElements != NULL && agent->loopElements->node != NULL){
+            bus_zyreLock();
             if (stream){
-                zyre_shouts(agentElements->node, CHANNEL, "LOG_IN_STREAM=1");
+                zyre_shouts(agent->loopElements->node, CHANNEL, "LOG_IN_STREAM=1");
             }else{
-                zyre_shouts(agentElements->node, CHANNEL, "LOG_IN_STREAM=0");
+                zyre_shouts(agent->loopElements->node, CHANNEL, "LOG_IN_STREAM=0");
             }
+            bus_zyreUnlock();
         }
     }
 }
 
-bool igs_getLogStream (void) {
-    return admin_logInStream;
+bool igsAgent_getLogStream (igsAgent_t *agent) {
+    return agent->logInStream;
 }
 
-void igs_setLogPath(const char *path){
+void igsAgent_setLogPath(igsAgent_t *agent, const char *path){
     if ((path != NULL) && (strlen(path) > 0)){
+        initInternalAgentIfNeeded();
         char tmpPath[4096] = "";
         admin_lock();
-        admin_makeFilePath(path, tmpPath, 4095);
+        admin_makeFilePath(agent, path, tmpPath, 4095);
         if (access(tmpPath, W_OK) == -1){
             printf("'%s' is not writable and will not be used\n", tmpPath);
             admin_unlock();
             return;
         }
-        if (strcmp(admin_logFile, tmpPath) == 0){
-            printf("'%s' is already the log path\n", admin_logFile);
+        if (strcmp(agent->logFilePath, tmpPath) == 0){
+            printf("'%s' is already the log path\n", agent->logFilePath);
             admin_unlock();
             return;
         }else{
-            strncpy(admin_logFile, tmpPath, 4096);
+            strncpy(agent->logFilePath, tmpPath, 4096);
         }
-        if (fp != NULL){
-            fflush(fp);
-            fclose(fp);
-            fp = NULL;
+        if (agent->logFile != NULL){
+            fflush(agent->logFile);
+            fclose(agent->logFile);
+            agent->logFile = NULL;
         }
-        fp = fopen (admin_logFile,"a");
-        if (fp == NULL){
-            printf("could NOT create log file at path %s\n", admin_logFile);
+        agent->logFile = fopen(agent->logFilePath,"a");
+        if (agent->logFile == NULL){
+            printf("could NOT create log file at path %s\n", agent->logFilePath);
         }else{
-            printf("switching to new log file: %s\n", admin_logFile);
+            printf("switching to new log file: %s\n", agent->logFilePath);
         }
-        if (fp != NULL && agentElements != NULL && agentElements->node != NULL){
-            zyre_shouts(agentElements->node, CHANNEL, "LOG_FILE_PATH=%s", admin_logFile);
+        if (agent->logFile != NULL && agent->loopElements != NULL && agent->loopElements->node != NULL){
+            bus_zyreLock();
+            zyre_shouts(agent->loopElements->node, CHANNEL, "LOG_FILE_PATH=%s", agent->logFilePath);
+            bus_zyreUnlock();
         }
         admin_unlock();
     }else{
@@ -325,6 +326,6 @@ void igs_setLogPath(const char *path){
     }
 }
 
-char* igs_getLogPath (void) {
-    return strdup(admin_logFile);
+char* igsAgent_getLogPath (igsAgent_t *agent) {
+    return strdup(agent->logFilePath);
 }

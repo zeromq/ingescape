@@ -1,0 +1,44 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qml/theme/IngeScapeTheme.qml</file>
+        <file>qml/ActionsListItem.qml</file>
+        <file>resources/fonts/akrobat/Akrobat-Black.ttf</file>
+        <file>resources/fonts/akrobat/Akrobat-Bold.ttf</file>
+        <file>resources/fonts/akrobat/Akrobat-ExtraBold.ttf</file>
+        <file>resources/fonts/akrobat/Akrobat-ExtraLight.ttf</file>
+        <file>resources/fonts/akrobat/Akrobat-Light.ttf</file>
+        <file>resources/fonts/akrobat/Akrobat-SemiBold.ttf</file>
+        <file>resources/fonts/akrobat/Akrobat-Thin.ttf</file>
+        <file>resources/fonts/akrobat/Akrobat.ttf</file>
+        <file>resources/fonts/blogger-sans/Blogger_Sans-Bold_Italic.ttf</file>
+        <file>resources/fonts/blogger-sans/Blogger_Sans-Bold.ttf</file>
+        <file>resources/fonts/blogger-sans/Blogger_Sans-Italic.ttf</file>
+        <file>resources/fonts/blogger-sans/Blogger_Sans-Light_Italic.ttf</file>
+        <file>resources/fonts/blogger-sans/Blogger_Sans-Light.ttf</file>
+        <file>resources/fonts/blogger-sans/Blogger_Sans-Medium_Italic.ttf</file>
+        <file>resources/fonts/blogger-sans/Blogger_Sans-Medium.ttf</file>
+        <file>resources/fonts/blogger-sans/Blogger_Sans.ttf</file>
+        <file>resources/fonts/titillium/Titillium-Regular.otf</file>
+        <file>resources/SVG/ingescape-pictos.svg</file>
+        <file>qml/theme/LabellessSvgButtonStyle.qml</file>
+        <file>qml/timeline/ActionInTimeLine.qml</file>
+        <file>qml/timeline/ScenarioTimeLine.qml</file>
+        <file>qml/TextAreaWithTimer.qml</file>
+        <file>qml/theme/IngeScapeComboboxStyle.qml</file>
+        <file>qml/IngeScapeToolTipComboboxDelegate.qml</file>
+        <file>qml/theme/IngeScapeScrollViewStyle.qml</file>
+        <file>qml/NetworkConnectionInformationItem.qml</file>
+        <file>qml/widgets/LabellessSvgButton.qml</file>
+        <file>qml/widgets/SvgImage.qml</file>
+        <file>qml/widgets/LabellessSvgButtonCachedImage.qml</file>
+        <file>qml/popup/MenuPopup.qml</file>
+        <file>qml/theme/ButtonStyleOfOption.qml</file>
+        <file>qml/license/ExpanderItem.qml</file>
+        <file>qml/license/LicenseEventPopup.qml</file>
+        <file>qml/license/LicenseInformationView.qml</file>
+        <file>qml/license/LicensePopup.qml</file>
+        <file>qml/popup/ConfirmationPopup.qml</file>
+        <file>qml/popup/SystemInformationPopup.qml</file>
+        <file>qml/timeline/RecordInTimeline.qml</file>
+    </qresource>
+</RCC>

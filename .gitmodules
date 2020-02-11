@@ -1,6 +1,6 @@
 [submodule "doc/themes/hugo-universal"]
 	path = doc/themes/hugo-universal
 	url = https://github.com/devcows/hugo-universal-theme
-[submodule "editor/dependencies/cassandra-cpp-driver"]
-	path = editor/dependencies/cassandra-cpp-driver
+[submodule "applications/dependencies/cassandra-cpp-driver"]
+	path = applications/dependencies/cassandra-cpp-driver
 	url = ../../third-party/cassandra-cpp-driver.git
