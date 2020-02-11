@@ -204,7 +204,7 @@ if(INGESCAPE_BUILD_SHARED)
     endif()
 
   else(MSVC)
-    add_library(${PROJECT_NAME} SHARED $<TARGET_OBJECTS:ingescape_objects>)
+    add_library(${PROJECT_NAME} SHARED ${ingescape_sources})
 
     set_target_properties(${PROJECT_NAME}
                           PROPERTIES PUBLIC_HEADER
@@ -262,7 +262,7 @@ if(INGESCAPE_BUILD_STATIC)
     endif()
   else(MSVC)
     add_library(${PROJECT_NAME}-static STATIC
-                $<TARGET_OBJECTS:ingescape_objects>)
+                ${ingescape_sources})
 
     set_target_properties(${PROJECT_NAME}-static
                           PROPERTIES PUBLIC_HEADER
