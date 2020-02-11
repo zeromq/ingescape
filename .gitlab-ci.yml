@@ -1460,17 +1460,13 @@ lib-delivery-all-stable:
     - mv build/ReleaseX64/ingescape-*
          library/win64/
     - ls library/win64/ | grep -v 'latest_delivery' > library/win64/latest_delivery
-    - echo "Deliver MacOS x64"
+    - echo "Deliver macos"
     - mkdir --parents library/macos
-    - mv macos_x64/ingescape-*
-         macos_x64/installIngescapeAndDependencies.sh
-         library/macos/
+    - mv ./build/ingescape*.pkg library/macos/
     - ls library/macos/ | grep -v 'latest_delivery' > library/macos/latest_delivery
     - echo "Deliver generic Linux x64"
     - mkdir --parents library/linux_x64/
-    - mv linux_x64/ingescape-*
-         linux_x64/installIngescapeAndDependencies.sh
-         library/linux_x64/
+    - mv linux_x64/* library/linux_x64/
     - ls library/linux_x64/ | grep -v 'latest_delivery' > library/linux_x64/latest_delivery
     - echo "Deliver Debian 9 x64"
     - mkdir --parents library/debian9/
