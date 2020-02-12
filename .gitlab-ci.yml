@@ -1509,6 +1509,7 @@ lib-delivery-all-stable:
     - lib-installer-runtime-windows-x86
     - lib-installer-runtime-windows-x64
     - lib-installer-macos
+    - lib-installer-linux-x64
     - lib-installer-runtime-debian-9-x64
     - lib-installer-runtime-debian-10-x64
     - lib-installer-runtime-centos-x64
