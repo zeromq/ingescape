@@ -1460,17 +1460,13 @@ lib-delivery-all-stable:
     - mv build/ReleaseX64/ingescape-*
          library/win64/
     - ls library/win64/ | grep -v 'latest_delivery' > library/win64/latest_delivery
-    - echo "Deliver MacOS x64"
+    - echo "Deliver macos"
     - mkdir --parents library/macos
-    - mv macos_x64/ingescape-*
-         macos_x64/installIngescapeAndDependencies.sh
-         library/macos/
+    - mv ./build/ingescape*.pkg library/macos/
     - ls library/macos/ | grep -v 'latest_delivery' > library/macos/latest_delivery
     - echo "Deliver generic Linux x64"
     - mkdir --parents library/linux_x64/
-    - mv linux_x64/ingescape-*
-         linux_x64/installIngescapeAndDependencies.sh
-         library/linux_x64/
+    - mv linux_x64/* library/linux_x64/
     - ls library/linux_x64/ | grep -v 'latest_delivery' > library/linux_x64/latest_delivery
     - echo "Deliver Debian 9 x64"
     - mkdir --parents library/debian9/
@@ -1513,6 +1509,7 @@ lib-delivery-all-stable:
     - lib-installer-runtime-windows-x86
     - lib-installer-runtime-windows-x64
     - lib-installer-macos
+    - lib-installer-linux-x64
     - lib-installer-runtime-debian-9-x64
     - lib-installer-runtime-debian-10-x64
     - lib-installer-runtime-centos-x64
@@ -1532,7 +1529,7 @@ editor-delivery-all-stable:
   script:
     - echo "Setting up SSH"
     - mkdir -p ~/.ssh/
-    - echo ${STABL_SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
+    - echo ${STABLE_SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
     - umask 077
     - echo ${STABLE_SSH_SECRET} | base64 -d > ssh_secret
     - umask 022
