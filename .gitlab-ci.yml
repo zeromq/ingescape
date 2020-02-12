@@ -1529,7 +1529,7 @@ editor-delivery-all-stable:
   script:
     - echo "Setting up SSH"
     - mkdir -p ~/.ssh/
-    - echo ${STABL_SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
+    - echo ${STABLE_SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
     - umask 077
     - echo ${STABLE_SSH_SECRET} | base64 -d > ssh_secret
     - umask 022
