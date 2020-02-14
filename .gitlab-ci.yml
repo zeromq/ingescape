@@ -165,6 +165,11 @@ editor-build-macos:
     - mkdir -p applications/apps/IngeScape-Editor/build
     - cmake -S applications/apps/IngeScape-Editor/ -B applications/apps/IngeScape-Editor/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.9.7/clang_64/;$HOME/builds/release/ingescape/usr/local/" -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
     - make -C applications/apps/IngeScape-Editor/build
+    # Clean-up moc generation script
+    # NB: We need this step to change the way CMake generates the calls to the 'moc' tool
+    # We need to remove the includes that corresponds to a Qt*.framework directory directly
+    # without removing the subsequent ones to the header directories
+    - sed -i.bak 's@^.*".*/Qt[[:alpha:]]*\.framework",$$@@g' applications/apps/IngeScape-Editor/build/CMakeFiles/IngeScape-Editor_autogen.dir/AutogenInfo.json
 #    - 'codesign --force --deep --sign  "Developer ID Application: Ingenuity i/o (56DRT9MG9S)" -v applications/apps/IngeScape-Editor/build/IngeScape-Editor.app'
     - mkdir -p $HOME/builds/release/apps/
     - rm -Rf $HOME/builds/release/apps/IngeScape-Editor.app
@@ -189,6 +194,11 @@ assessments-build-macos:
     - git clean -xfd
     - mkdir -p applications/apps/IngeScape-Assessments/build
     - cmake -S applications/apps/IngeScape-Assessments/ -B applications/apps/IngeScape-Assessments/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.9.7/clang_64/;$HOME/builds/release/ingescape/usr/local/" -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    # Clean-up moc generation script
+    # NB: We need this step to change the way CMake generates the calls to the 'moc' tool
+    # We need to remove the includes that corresponds to a Qt*.framework directory directly
+    # without removing the subsequent ones to the header directories
+    - sed -i.bak 's@^.*".*/Qt[[:alpha:]]*\.framework",$$@@g' applications/apps/IngeScape-Assessments/build/CMakeFiles/IngeScape-Assessments_autogen.dir/AutogenInfo.json
     - make -C applications/apps/IngeScape-Assessments/build
 #    - 'codesign --force --deep --sign  "Developer ID Application: Ingenuity i/o (56DRT9MG9S)" -v applications/apps/IngeScape-Assessments/build/IngeScape-Assessments.app'
     - mkdir -p $HOME/builds/release/apps/
@@ -215,6 +225,11 @@ expe-build-macos:
     - git clean -xfd
     - mkdir -p applications/apps/IngeScape-Expe/build
     - cmake -S applications/apps/IngeScape-Expe/ -B applications/apps/IngeScape-Expe/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.9.7/clang_64/;$HOME/builds/release/ingescape/usr/local/" -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    # Clean-up moc generation script
+    # NB: We need this step to change the way CMake generates the calls to the 'moc' tool
+    # We need to remove the includes that corresponds to a Qt*.framework directory directly
+    # without removing the subsequent ones to the header directories
+    - sed -i.bak 's@^.*".*/Qt[[:alpha:]]*\.framework",$$@@g' applications/apps/IngeScape-Expe/build/CMakeFiles/IngeScape-Expe_autogen.dir/AutogenInfo.json
     - make -C applications/apps/IngeScape-Expe/build
 #    - 'codesign --force --deep --sign  "Developer ID Application: Ingenuity i/o (56DRT9MG9S)" -v applications/apps/IngeScape-Expe/build/IngeScape-Expe.app'
     - mkdir -p $HOME/builds/release/apps/
