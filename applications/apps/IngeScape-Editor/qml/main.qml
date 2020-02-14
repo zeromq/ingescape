@@ -647,6 +647,13 @@ ApplicationWindow {
     }
 
 
+    onActiveChanged: {
+        if (active)
+        {
+            DebugQuickInspector.currentWindow = mainWindow
+        }
+    }
+
 
     Connections {
         id: connectionsIngescapeEditorC
