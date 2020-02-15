@@ -142,6 +142,13 @@ Window {
         }
     }
 
+    onActiveChanged: {
+        if (active)
+        {
+            DebugQuickInspector.currentWindow = rootItem
+        }
+    }
+
 
     //--------------------------------
     //
@@ -684,12 +691,13 @@ Window {
                                     property var callModel: model ? model.QtObject : null;
 
                                     property int lineHeight: 30
-                                    // QVariantHash is translated as raw JS object
-                                    property int callParamCount: callDelegate.callModel ? callDelegate.callModel.argumentNames.length : 0;
-                                    height : lineHeight + (callParamCount * lineHeight)
+                                    height : childrenRect.height
 
                                     Column {
-                                        anchors.fill: parent
+                                        anchors {
+                                            left: parent.left
+                                            right: parent.right
+                                        }
 
                                         // Name
                                         Text {

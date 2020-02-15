@@ -17,6 +17,7 @@
 
 #include <QObject>
 #include <QtQml>
+#include <QQmlPropertyMap>
 
 #include <I2PropertyHelpers.h>
 extern "C" {
