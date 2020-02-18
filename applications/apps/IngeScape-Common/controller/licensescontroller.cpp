@@ -165,6 +165,9 @@ void LicensesController::updateLicensesPath(QString newLicensesPath)
     {
         qInfo() << "Licenses path changes from" << _licensesPath << "to" << newLicensesPath;
 
+        // Reset error message
+        seterrorMessageWhenLicenseFailed("");
+
         // Update property
         setlicensesPath(newLicensesPath);
 
@@ -232,6 +235,7 @@ bool LicensesController::addLicenses(const QList<QUrl>& licenseUrlList)
     {
         if (licenseUrl.isLocalFile())
         {
+            seterrorMessageWhenLicenseFailed("");
             completeSuccess &= _importLicenseFromFile(QFileInfo(licenseUrl.toLocalFile()));
         }
         else

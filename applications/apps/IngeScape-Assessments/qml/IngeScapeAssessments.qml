@@ -271,7 +271,6 @@ Item {
 
         onClosed: {
             console.log("Popup displayed when an event occurs about the license(s) has just been closed");
-            licensePopup.allowsOnlyQuit = true;
             licensePopup.open();
         }
     }
