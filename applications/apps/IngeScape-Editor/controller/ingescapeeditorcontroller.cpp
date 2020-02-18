@@ -1219,17 +1219,7 @@ void IngeScapeEditorController::_onReplayLoading(int deltaTimeFromTimeLineStart,
                 sethasAPlatformBeenLoadedByUser(false);
             }
 
-            qDebug() << "Received executed actions (DO NOTHING WITH IT RIGHT NOW)" << jsonExecutedActions;
-
-//            if (_scenarioC != nullptr)
-//            {
-//                // Update the current time
-//                _scenarioC->setcurrentTime(QTime::fromMSecsSinceStartOfDay(0));
-
-//                // Import the executed actions for this scenario from JSON
-//                _scenarioC->importExecutedActionsFromJson(0, jsonExecutedActions.toUtf8());
-
-//            }
+            qDebug() << "Received executed actions (DO NOTHING WITH IT RIGHT NOW)" << jsonExecutedActions.size();
 
             Q_EMIT resetTimeLineView(false); // Open timeline view
             Q_EMIT resetMappindView(); // Center mapping view

@@ -19,8 +19,10 @@
 #include <I2PropertyHelpers.h>
 
 #include <model/recordm.h>
+#include <model/actionassessmentm.h>
 #include <model/enums.h>
 #include <cassandra.h>
+
 
 class RecordAssessmentM : public RecordM
 {
@@ -31,6 +33,10 @@ class RecordAssessmentM : public RecordM
 
     // End time in milliseconds of our record in timeline
     I2_QML_PROPERTY(int, endTimeInTimeline)
+
+    // List of executed actions in our record
+    I2_QOBJECT_LISTMODEL(ActionAssessmentM, executionsList)
+
 
 public:
     explicit RecordAssessmentM(QString uid,

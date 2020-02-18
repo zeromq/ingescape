@@ -516,6 +516,37 @@ Item {
                                 }
                             }
 
+                            //
+                            // Records executed actions (only in Assessments)
+                            //
+                            Repeater {
+                                id: recordContentRepeater
+                                model: rootItem.recordsListToShow
+
+                                Item {
+                                    id: executedActionsRecord
+
+                                    width: timeLineController.timeTicksTotalWidth
+                                    height: rootItem.lineHeight * rootItem.linesNumber
+
+                                    property var recordM : model ? model.QtObject : null
+
+                                    Repeater {
+                                        model: recordM ? recordM.executionsList : null
+
+                                        I2SvgItem {
+                                            id : recordExecutedAction
+                                            x : timeLineController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.executionTime, timeLineController.pixelsPerMinute) - width/2;
+                                            y:  model.timelineLine *  IngeScapeTheme.lineInTimeLineHeight + height/2 -2
+                                            width: svgWidth
+                                            height: svgHeight
+                                            svgFileCache: IngeScapeTheme.svgFileIngeScape
+                                            svgElementId: "timelineAction"
+                                        }
+                                    }
+                                }
+                            }
+
                             // dropArea allow dropping actions in timeline
                             DropArea {
                                 anchors.fill: parent
