@@ -126,13 +126,13 @@ void AgentsMappingController::setisLoadedView(bool value)
             }
 
             // All agents are OFF
-//            if (allAgentsOFF)
-//            {
-//                // DE-activate the mapping
-//                IngeScapeModelManager::instance()->setisMappingConnected(false);
-//            }
+            if (allAgentsOFF)
+            {
+                // DE-activate the mapping
+                IngeScapeModelManager::instance()->setisMappingConnected(false);
+            }
             // There have been changes in the mapping while the mapping was UN-activated
-            if (isAddedOrRemovedLink_WhileMappingWasUNactivated)
+            if (IngeScapeModelManager::instance()->isMappingConnected() && isAddedOrRemovedLink_WhileMappingWasUNactivated)
             {
                 qDebug() << "There have been changes in the mapping while the mapping was UN-activated (loaded from JSON). Force to CONTROL ?";
 
