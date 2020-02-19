@@ -153,7 +153,7 @@ INCLUDEPATH += C:\Users\admin\dev\install_dir\include
 }
 
 
-# Include PGIMCommon library
+# Include IngeScape common library
 !include(../IngeScape-Common/IngeScape-Common.pri) {
     error(Could not load Ingescape-Common.pri)
 }
