@@ -26,8 +26,10 @@ QT += qml quick quick-private svg xml concurrent core-private gui-private webvie
 
 CONFIG += c++11 precompiled_header
 
-# Warnings = error
-QMAKE_CXXFLAGS += -Werror
+CONFIG(release, debug|release) {
+    # Warnings = error
+    QMAKE_CXXFLAGS += -Werror
+}
 
 # Use Precompiled headers (PCH)
 PRECOMPILED_HEADER  = stable.h
@@ -221,10 +223,6 @@ mac {
 win32 {
     message(Windows specific rules)
 
-    # Warnings = error
-    QMAKE_CXXFLAGS -= -Werror
-#    QMAKE_CXXFLAGS += /WX
-
     # Custom DESTDIR to avoid useless files (pch, etc.)
     DESTDIR = $${OUT_PWD}/bin
 
@@ -306,8 +304,6 @@ win32 {
 #------------------------
 unix:!mac {
     message(Linux specific rules)
-
-    QMAKE_CXXFLAGS -= -Werror
 
     # Compute the LFLAG associated to our frameworks
     LIBS += -L../../frameworks/I2Quick/Unix -lI2Quick
