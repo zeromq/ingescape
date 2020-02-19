@@ -78,6 +78,8 @@ RecordAssessmentM::RecordAssessmentM(QString uid,
 RecordAssessmentM::~RecordAssessmentM()
 {
     qInfo() << "Delete Model of Record" << _name << "(" << _uid << ") ";
+
+    _executionsList.deleteAllItems();
 }
 /**
  * @brief Static factory method to create an experiment from a CassandraDB record

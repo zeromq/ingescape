@@ -913,6 +913,25 @@ void AbstractScenarioController::_onTimeout_DelayOrExecuteActions()
 }
 
 
+void AbstractScenarioController::resetAllExecutedActionsInScenario()
+{
+    // Look for the current and futures actions
+    for (ActionVM* actionVM : _actionsInTimeLine.toList())
+    {
+        // First line is reserved for live insertions from the palette
+        if (actionVM->lineInTimeLine() == 0)
+        {
+            removeActionVMfromTimeLine(actionVM);
+        }
+        else
+        {
+            // Initialize the action view model at a specific time.
+            actionVM->resetDataFrom(0);
+        }
+    }
+}
+
+
 /**
  * @brief Initialize actions and play (or resume) the scenario
  * - make connections for actions conditions

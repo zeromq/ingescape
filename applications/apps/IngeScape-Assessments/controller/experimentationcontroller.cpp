@@ -19,6 +19,7 @@
 #include <controller/assessmentsmodelmanager.h>
 #include "model/subject/characteristicvaluem.h"
 #include "model/protocol/independentvariablevaluem.h"
+#include "model/eventm.h"
 
 
 /**
@@ -381,11 +382,31 @@ void ExperimentationController::onRecordAddedReceived(QString message){
                                                               jsonOffsetTimeline.toInt());
 
                                 _sessionC->currentSession()->recordsList()->append(record);
+                                qInfo() << "Number of record " << _sessionC->currentSession()->recordsList()->count();
+
+                                // Reset executed action to hide it in timeline view
+                                _sessionC->scenarioC()->resetAllExecutedActionsInScenario();
 
                                 // Update current time of our scenario to correspond to real endtime of our record
-                                _sessionC->scenarioC()->setcurrentTime(QTime::fromMSecsSinceStartOfDay(static_cast<int>(record->endTimeInTimeline())));
+                                _sessionC->scenarioC()->setcurrentTime(QTime::fromMSecsSinceStartOfDay(static_cast<int>(record->endTimeInTimeline() + 1)));
 
-                                qInfo() << "Number of record " << _sessionC->currentSession()->recordsList()->count();
+                                // Add executed actions to our record
+                                CassUuid cassUuidRecord = AssessmentsModelManager::qStringToCassUuid(record->uid());
+                                QList<EventM*> eventsList = AssessmentsModelManager::select<EventM>({ cassUuidRecord });
+                                for (EventM* event : eventsList)
+                                {
+                                    if (event->type() == 9) // 9 is for REC_ACTION_T event type
+                                    {
+                                        QList<ActionAssessmentM*> actionsList = AssessmentsModelManager::select<ActionAssessmentM> ({ cassUuidRecord, event->getTimeCassUuid()});
+
+                                        // Add executed actions in our record
+                                        for (ActionAssessmentM* action : actionsList)
+                                        {
+                                            action->setexecutionTime(static_cast<int>(record->beginDateTime().msecsTo(event->executionDateTime())) + record->startTimeInTimeline());
+                                            record->executionsList()->append(action);
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -393,7 +414,7 @@ void ExperimentationController::onRecordAddedReceived(QString message){
             }
         }
     }
-};
+}
 
 
 /**

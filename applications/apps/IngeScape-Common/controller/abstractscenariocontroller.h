@@ -186,6 +186,9 @@ public:
      */
     Q_INVOKABLE void executeEffectsOfAction(ActionM* action, int lineInTimeLine = 0);
 
+    void resetAllExecutedActionsInScenario();
+
+
 
 Q_SIGNALS:
 
