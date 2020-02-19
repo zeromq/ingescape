@@ -58,6 +58,11 @@ Item {
     {
         if (IngeScapeAssessmentsC.experimentationC && IngeScapeAssessmentsC.experimentationC.sessionC)
         {
+            if (IngeScapeAssessmentsC.experimentationC.isRecorderON && IngeScapeAssessmentsC.experimentationC.isRecording)
+            {
+                IngeScapeAssessmentsC.experimentationC.stopToRecord();
+            }
+
             IngeScapeAssessmentsC.experimentationC.sessionC.currentSession = null;
         }
     }
