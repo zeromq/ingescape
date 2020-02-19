@@ -55,22 +55,22 @@ INCLUDEPATH += $$PWD/../src/include \
 #####################################################################
 
 # Include libsodium library
-!include(../../../../libsodium/builds/qt/libsodium.pri) {
+!include(../../libsodium/builds/qt/libsodium.pri) {
     error(Could not load libsodium.pri)
 }
 
 # Include ZeroMQ library
-!include(../../../../libzmq/builds/qt/libzmq.pri) {
+!include(../../libzmq/builds/qt/libzmq.pri) {
     error(Could not load libzmq.pri)
 }
 
 # Include C ZeroMQ library
-!include(../../../../czmq/builds/qt/czmq.pri) {
+!include(../../czmq/builds/qt/czmq.pri) {
     error(Could not load czmq.pri)
 }
 
 # Include zyre library
-!include(../../../../zyre/builds/qt/zyre.pri) {
+!include(../../zyre/builds/qt/zyre.pri) {
     error(Could not load zyre.pri)
 }
 
