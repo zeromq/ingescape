@@ -18,10 +18,7 @@
 #include <QFileDialog>
 
 extern "C" {
-#include <ingescape.h>
-//#include <ingescape_advanced.h>
-#include <ingescape_private.h>
-//#include <ingescape_agent.h>
+#include "ingescape_private.h"
 }
 
 

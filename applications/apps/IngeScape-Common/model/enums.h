@@ -19,7 +19,12 @@
 #include <QtQml>
 
 #include <I2PropertyHelpers.h>
+
+#ifdef INGESCAPE_FROM_PRI
 #include "ingescape.h"
+#else
+#include <ingescape/ingescape.h>
+#endif
 
 
 //--------------------------------
