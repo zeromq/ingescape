@@ -56,8 +56,10 @@ if (NOT CMAKE_BUILD_TYPE)
 endif ()
 
 add_definitions(-DQT_DEPRECATED_WARNINGS=1)
-add_definitions(-DINGESCAPE_FROM_PRI=1)
-add_definitions(-DWIN32_LEAN_AND_MEAN) # To avoid include of winsock.h by windows.h
+
+if (MSVC)
+    add_definitions(-DWIN32_LEAN_AND_MEAN) # To avoid include of winsock.h by windows.h
+endif()
 
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.10")
 
@@ -102,7 +104,6 @@ add_ingescape_common_headers(ingescape_assessments_headers)
 
 source_group ("Header Files" FILES ${ingescape_assessments_headers})
 
-add_ingescape_include_directory(_INCLUDES_DIRECTORY)
 add_ingescape_common_include_directory(_INCLUDES_DIRECTORY)
 
 list(APPEND _INCLUDES_DIRECTORY
@@ -135,10 +136,10 @@ list(APPEND ingescape_assessments_sources "${SOURCE_DIR}/main.cpp")
 
 add_ingescape_common_sources(ingescape_assessments_sources)
 
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/stable.cpp "#include <stable.h>")
-ADD_MSVC_PRECOMPILED_HEADER("stable.h" ${CMAKE_CURRENT_BINARY_DIR}/stable.cpp ingescape_assessments_sources)
-
-add_ingescape_sources(ingescape_assessments_sources)
+if (MSVC)
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/stable.cpp "#include <stable.h>")
+    ADD_MSVC_PRECOMPILED_HEADER("stable.h" ${CMAKE_CURRENT_BINARY_DIR}/stable.cpp ingescape_assessments_sources)
+endif()
 
 source_group("Source Files" FILES ${ingescape_assessments_sources})
 
@@ -179,11 +180,6 @@ if (UNIX AND NOT APPLE)
         REQUIRED
     )
 endif()
-
-
-# Find ingescape dependencies
-set(pkg_config_libs_private "")
-add_ingescape_libraries_dependencies(_INGESCAPE_LIBS pkg_config_libs_private)
 
 
 # Find I2 Quick dependencies
@@ -300,6 +296,50 @@ if (WIN32)
     target_link_libraries(${PROJECT_NAME} Wtsapi32 user32 Advapi32)
 endif()
 
+
+# Find ingescape dependencies
+find_package (libsodium REQUIRED)
+if (LIBSODIUM_FOUND)
+	include_directories(${LIBSODIUM_INCLUDE_DIRS})
+	target_link_libraries (${PROJECT_NAME} ${LIBSODIUM_LIBRARIES})
+else (LIBSODIUM_FOUND)
+	message(FATAL_ERROR "Dependency not found")
+endif (LIBSODIUM_FOUND)
+
+find_package (libzmq REQUIRED)
+if (LIBZMQ_FOUND)
+	include_directories(${LIBZMQ_INCLUDE_DIRS})
+	target_link_libraries (${PROJECT_NAME} ${LIBZMQ_LIBRARIES})
+else (LIBZMQ_FOUND)
+	message(FATAL_ERROR "Dependency not found")
+endif (LIBZMQ_FOUND)
+
+find_package (czmq REQUIRED)
+if (CZMQ_FOUND)
+	include_directories(${CZMQ_INCLUDE_DIRS})
+	target_link_libraries (${PROJECT_NAME} ${CZMQ_LIBRARIES})
+else (CZMQ_FOUND)
+	message(FATAL_ERROR "Dependency not found")
+endif (CZMQ_FOUND)
+
+find_package (zyre REQUIRED)
+if (ZYRE_FOUND)
+	include_directories(${ZYRE_INCLUDE_DIRS})
+	target_link_libraries (${PROJECT_NAME} ${ZYRE_LIBRARIES})
+else (ZYRE_FOUND)
+	message(FATAL_ERROR "Dependency not found")
+endif (ZYRE_FOUND)
+
+find_package (ingescape REQUIRED)
+if (INGESCAPE_FOUND)
+    include_directories(${INGESCAPE_INCLUDE_DIRS})
+    target_link_libraries (${PROJECT_NAME} ${INGESCAPE_LIBRARIES})
+else (INGESCAPE_FOUND)
+	message(FATAL_ERROR "Dependency not found")
+endif (INGESCAPE_FOUND)
+
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../../src/include) # ingescape_private.h is not packaged with the library; we need to manually include it
 
 
 # Retrieve the absolute path to qmake and then use that path to find
@@ -428,6 +468,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
         set(CPACK_SOURCE_GENERATOR "ZIP")
         # On windows we want to package dependencies with this library
         set(IS_ASSESSMENTS TRUE)
+        install_ingescape_dependencies(INGESCAPE_LIBRARIES INGESCAPE_INCLUDE_DIRS IS_ASSESSMENTS)
         install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS IS_ASSESSMENTS)
         install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS IS_ASSESSMENTS)
         install_ingescape_dependencies(CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS IS_ASSESSMENTS)
