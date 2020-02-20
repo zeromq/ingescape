@@ -268,6 +268,22 @@ endif()
 
 
 # Find ingescape dependencies
+find_package (libsodium REQUIRED)
+if (LIBSODIUM_FOUND)
+	include_directories(${LIBSODIUM_INCLUDE_DIRS})
+	target_link_libraries (${PROJECT_NAME} ${LIBSODIUM_LIBRARIES})
+else (LIBSODIUM_FOUND)
+	message(FATAL_ERROR "Dependency not found")
+endif (LIBSODIUM_FOUND)
+
+find_package (libzmq REQUIRED)
+if (LIBZMQ_FOUND)
+	include_directories(${LIBZMQ_INCLUDE_DIRS})
+	target_link_libraries (${PROJECT_NAME} ${LIBZMQ_LIBRARIES})
+else (LIBZMQ_FOUND)
+	message(FATAL_ERROR "Dependency not found")
+endif (LIBZMQ_FOUND)
+
 find_package (czmq REQUIRED)
 if (CZMQ_FOUND)
 	include_directories(${CZMQ_INCLUDE_DIRS})
@@ -276,6 +292,14 @@ else (CZMQ_FOUND)
 	message(FATAL_ERROR "Dependency not found")
 endif (CZMQ_FOUND)
 
+find_package (zyre REQUIRED)
+if (ZYRE_FOUND)
+	include_directories(${ZYRE_INCLUDE_DIRS})
+	target_link_libraries (${PROJECT_NAME} ${ZYRE_LIBRARIES})
+else (ZYRE_FOUND)
+	message(FATAL_ERROR "Dependency not found")
+endif (ZYRE_FOUND)
+
 find_package (ingescape REQUIRED)
 if (INGESCAPE_FOUND)
     include_directories(${INGESCAPE_INCLUDE_DIRS})
@@ -283,6 +307,7 @@ if (INGESCAPE_FOUND)
 else (INGESCAPE_FOUND)
 	message(FATAL_ERROR "Dependency not found")
 endif (INGESCAPE_FOUND)
+
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../../src/include) # ingescape_private.h is not packaged with the library; we need to manually include it
 
@@ -388,7 +413,6 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
         set(CPACK_SOURCE_GENERATOR "ZIP")
         # On windows we want to package dependencies with this library
         set(IS_EDITOR TRUE)
-        install_ingescape_dependencies(INGESCAPE_LIBRARIES INGESCAPE_INCLUDE_DIRS IS_EDITOR)
         install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS IS_EDITOR)
         install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS IS_EDITOR)
         install_ingescape_dependencies(CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS IS_EDITOR)
