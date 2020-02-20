@@ -42,7 +42,8 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 # Add path to custom macro
 set(INGESCAPE_CMAKE_MODULES_DIR "${SOURCE_DIR}/../../../builds/cmake/modules")
-list(APPEND CMAKE_MODULE_PATH ${INGESCAPE_CMAKE_MODULES_DIR})
+set(INGESCAPE_CMAKE_DEPENDENCIES_DIR "${SOURCE_DIR}/../../../builds/cmake/dependencies")
+list(APPEND CMAKE_MODULE_PATH ${INGESCAPE_CMAKE_MODULES_DIR} ${INGESCAPE_CMAKE_DEPENDENCIES_DIR})
 list(APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}/../../../builds/cmake/modules/apps") # NSIS templates
 include(IngescapeHelper)
 include(IngescapeEditorHelper)
@@ -56,8 +57,10 @@ if (NOT CMAKE_BUILD_TYPE)
 endif ()
 
 add_definitions(-DQT_DEPRECATED_WARNINGS=1)
-add_definitions(-DINGESCAPE_FROM_PRI=1)
-add_definitions(-DWIN32_LEAN_AND_MEAN) # To avoid include of winsock.h by windows.h
+
+if (MSVC)
+    add_definitions(-DWIN32_LEAN_AND_MEAN) # To avoid include of winsock.h by windows.h
+endif()
 
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.10")
 
@@ -104,7 +107,6 @@ add_ingescape_common_headers(ingescape_editor_headers)
 
 source_group ("Header Files" FILES ${ingescape_editor_headers})
 
-add_ingescape_include_directory(_INCLUDES_DIRECTORY)
 add_ingescape_common_include_directory(_INCLUDES_DIRECTORY)
 
 list(APPEND _INCLUDES_DIRECTORY
@@ -146,8 +148,6 @@ if(MSVC)
     file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/stable.cpp "#include <stable.h>")
     ADD_MSVC_PRECOMPILED_HEADER("stable.h" ${CMAKE_CURRENT_BINARY_DIR}/stable.cpp ingescape_editor_sources)
 endif()
-
-add_ingescape_sources(ingescape_editor_sources)
 
 source_group("Source Files" FILES ${ingescape_editor_sources})
 
@@ -192,11 +192,6 @@ if (UNIX AND NOT APPLE)
     )
 endif()
 
-
-
-# Find ingescape dependencies
-set(pkg_config_libs_private "")
-add_ingescape_libraries_dependencies(_INGESCAPE_LIBS pkg_config_libs_private)
 
 # Find I2 Quick dependencies
 add_library(I2Quick SHARED IMPORTED)
@@ -270,6 +265,51 @@ endif()
 if (WIN32)
     target_link_libraries(${PROJECT_NAME} Wtsapi32 user32 Advapi32)
 endif()
+
+
+# Find ingescape dependencies
+find_package (libsodium REQUIRED)
+if (LIBSODIUM_FOUND)
+	include_directories(${LIBSODIUM_INCLUDE_DIRS})
+	target_link_libraries (${PROJECT_NAME} ${LIBSODIUM_LIBRARIES})
+else (LIBSODIUM_FOUND)
+	message(FATAL_ERROR "Dependency not found")
+endif (LIBSODIUM_FOUND)
+
+find_package (libzmq REQUIRED)
+if (LIBZMQ_FOUND)
+	include_directories(${LIBZMQ_INCLUDE_DIRS})
+	target_link_libraries (${PROJECT_NAME} ${LIBZMQ_LIBRARIES})
+else (LIBZMQ_FOUND)
+	message(FATAL_ERROR "Dependency not found")
+endif (LIBZMQ_FOUND)
+
+find_package (czmq REQUIRED)
+if (CZMQ_FOUND)
+	include_directories(${CZMQ_INCLUDE_DIRS})
+	target_link_libraries (${PROJECT_NAME} ${CZMQ_LIBRARIES})
+else (CZMQ_FOUND)
+	message(FATAL_ERROR "Dependency not found")
+endif (CZMQ_FOUND)
+
+find_package (zyre REQUIRED)
+if (ZYRE_FOUND)
+	include_directories(${ZYRE_INCLUDE_DIRS})
+	target_link_libraries (${PROJECT_NAME} ${ZYRE_LIBRARIES})
+else (ZYRE_FOUND)
+	message(FATAL_ERROR "Dependency not found")
+endif (ZYRE_FOUND)
+
+find_package (ingescape REQUIRED)
+if (INGESCAPE_FOUND)
+    include_directories(${INGESCAPE_INCLUDE_DIRS})
+    target_link_libraries (${PROJECT_NAME} ${INGESCAPE_LIBRARIES})
+else (INGESCAPE_FOUND)
+	message(FATAL_ERROR "Dependency not found")
+endif (INGESCAPE_FOUND)
+
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../../src/include) # ingescape_private.h is not packaged with the library; we need to manually include it
 
 
 # Retrieve the absolute path to qmake and then use that path to find
@@ -373,6 +413,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
         set(CPACK_SOURCE_GENERATOR "ZIP")
         # On windows we want to package dependencies with this library
         set(IS_EDITOR TRUE)
+        install_ingescape_dependencies(INGESCAPE_LIBRARIES INGESCAPE_INCLUDE_DIRS IS_EDITOR)
         install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS IS_EDITOR)
         install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS IS_EDITOR)
         install_ingescape_dependencies(CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS IS_EDITOR)
