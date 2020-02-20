@@ -45,6 +45,7 @@ set(INGESCAPE_CMAKE_MODULES_DIR "${SOURCE_DIR}/../../../builds/cmake/modules")
 set(INGESCAPE_CMAKE_DEPENDENCIES_DIR "${SOURCE_DIR}/../../../builds/cmake/dependencies")
 list(APPEND CMAKE_MODULE_PATH ${INGESCAPE_CMAKE_MODULES_DIR} ${INGESCAPE_CMAKE_DEPENDENCIES_DIR})
 list(APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}/../../../builds/cmake/modules/apps") # NSIS templates
+include(IngescapeHelper)
 include(IngescapeEditorHelper)
 
 ########################################################################
@@ -387,6 +388,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
         set(CPACK_SOURCE_GENERATOR "ZIP")
         # On windows we want to package dependencies with this library
         set(IS_EDITOR TRUE)
+        install_ingescape_dependencies(INGESCAPE_LIBRARIES INGESCAPE_INCLUDE_DIRS IS_EDITOR)
         install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS IS_EDITOR)
         install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS IS_EDITOR)
         install_ingescape_dependencies(CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS IS_EDITOR)
