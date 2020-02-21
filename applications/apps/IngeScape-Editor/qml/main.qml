@@ -291,13 +291,13 @@ ApplicationWindow {
                 text: ""
 
                 onTriggered: {
-                    if (IgsModelManager.isMappingConnected) {
+                    if (IgsNetworkController.isStarted) {
                         //console.log("DE-activate mapping");
-                        IgsModelManager.isMappingConnected = false;
+                        IgsNetworkController.stop();
                     }
                     else {
                         //console.log("Activate mapping");
-                        IgsModelManager.isMappingConnected = true;
+                        IgsNetworkController.start(IngeScapeEditorC.networkDevice, "", IngeScapeEditorC.port)
                     }
                 }
             }
@@ -768,7 +768,7 @@ ApplicationWindow {
                 });
 
                 menuPlugUNplugMapping.text = Qt.binding(function() {
-                    return ((IgsModelManager && IgsModelManager.isMappingConnected) ? qsTr("Unplug mapping") : qsTr("Plug mapping"));
+                    return ((IgsNetworkController && IgsNetworkController.isStarted) ? qsTr("Disconnect from the network") : qsTr("Connect to the network"));
                 });
 
                 subWindowsInstantiator.model = Qt.binding(function() {

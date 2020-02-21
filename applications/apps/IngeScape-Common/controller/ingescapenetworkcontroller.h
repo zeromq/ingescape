@@ -109,13 +109,13 @@ public:
      * @param port
      * @return
      */
-    bool start(QString networkDevice, QString ipAddress, uint port);
+    Q_INVOKABLE bool start(QString networkDevice, QString ipAddress, uint port);
 
 
     /**
      * @brief Stop our IngeScape agent
      */
-    void stop();
+    Q_INVOKABLE void stop();
 
 
     /**

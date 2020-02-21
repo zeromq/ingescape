@@ -265,6 +265,8 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
 
     // Connect to signals from network controllers
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::isStartedChanged, this, &IngeScapeEditorController::_onAgentEditorStartedOrStopped);
+
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::networkDeviceIsNotAvailable, this, &IngeScapeEditorController::_onNetworkDeviceIsNotAvailable);
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::networkDeviceIsAvailableAgain, this, &IngeScapeEditorController::_onNetworkDeviceIsAvailableAgain);
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::networkDeviceIpAddressHasChanged, this, &IngeScapeEditorController::_onNetworkDeviceIpAddressHasChanged);
@@ -457,7 +459,10 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     // Start IngeScape
     //
     // Check for an available device and start Ingescape
-    _startIngeScape(true);
+//    _startIngeScape(true);
+
+    // Update available network devices (to have our qml list updated)
+    ingeScapeNetworkC->updateAvailableNetworkDevices();
 
 
     //
@@ -1011,6 +1016,34 @@ bool IngeScapeEditorController::hasPlatformChanged()
 void IngeScapeEditorController::forceCreation()
 {
     qDebug() << "Force the creation of our singleton from QML";
+}
+
+void IngeScapeEditorController::_onAgentEditorStartedOrStopped(bool started)
+{
+     IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
+    if (started)
+    {
+        ingeScapeModelManager->setisMappingConnected(true);
+        _modelManager->setisMappingControlled(_beforeNetworkStop_isMappingControlled);
+    }
+    else {
+        // Disable mapping
+        ingeScapeModelManager->setisMappingConnected(false);
+        _modelManager->setisMappingControlled(false);
+
+        // Simulate an exit for each agent ON
+        ingeScapeModelManager->simulateExitForEachAgentON();
+
+        // Simulate an exit for each launcher
+        ingeScapeModelManager->simulateExitForEachLauncher();
+
+        // Simulate an exit for the recorder
+        if ((_recordsSupervisionC != nullptr) && _recordsSupervisionC->isRecorderON())
+        {
+            _recordsSupervisionC->onRecorderExited(_recordsSupervisionC->peerIdOfRecorder(), _recordsSupervisionC->peerNameOfRecorder());
+        }
+
+    }
 }
 
 
@@ -1805,6 +1838,8 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
 }
 
 
+
+
 /**
  * @brief If checkAvailableNetworkDevices : auto select a network device to start Ingescape
  */
@@ -1864,11 +1899,6 @@ bool IngeScapeEditorController::_startIngeScape(bool checkAvailableNetworkDevice
             }
         }
         success = ingeScapeNetworkC->start(_networkDevice, _ipAddress, _port); //will failed if networkDevice = ""
-        if (success)
-        {
-            ingeScapeModelManager->setisMappingConnected(_beforeNetworkStop_isMappingConnected);
-            _modelManager->setisMappingControlled(_beforeNetworkStop_isMappingControlled);
-        }
     }
     return success;
 }
@@ -1936,27 +1966,11 @@ void IngeScapeEditorController::_stopIngeScape(bool hasToClearPlatform)
         // Save new values
         settings.sync();
 
-        // Disable mapping
-        ingeScapeModelManager->setisMappingConnected(false);
-        _modelManager->setisMappingControlled(false);
-
         // Stop our IngeScape agent
         ingeScapeNetworkC->stop();
 
         // We don't see itself
         ingeScapeNetworkC->setnumberOfEditors(1);
-
-        // Simulate an exit for each agent ON
-        ingeScapeModelManager->simulateExitForEachAgentON();
-
-        // Simulate an exit for each launcher
-        ingeScapeModelManager->simulateExitForEachLauncher();
-
-        // Simulate an exit for the recorder
-        if ((_recordsSupervisionC != nullptr) && _recordsSupervisionC->isRecorderON())
-        {
-            _recordsSupervisionC->onRecorderExited(_recordsSupervisionC->peerIdOfRecorder(), _recordsSupervisionC->peerNameOfRecorder());
-        }
 
         // Has to clear the current platform
         if (hasToClearPlatform)

@@ -272,6 +272,9 @@ Q_SIGNALS:
 
 private Q_SLOTS:
 
+
+    void _onAgentEditorStartedOrStopped(bool started);
+
     /**
      * @brief Called when our application receives an "open file" request
      * @param url
@@ -442,7 +445,6 @@ private:
      * @return
      */
     QJsonDocument _getJsonOfCurrentPlatform();
-
 
     /**
      * @brief If checkAvailableNetworkDevices : auto select a network device to start Ingescape

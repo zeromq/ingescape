@@ -258,19 +258,6 @@ I2CustomRectangle {
         }
     }
 
-    onEditorStartedOnIgsChanged: {
-        if ((!root.editorStartedOnIgs) && (rootPrivate.networkDevicesAvailable))
-        {
-            // Open settings to show user that he has to make a choice for a network device
-            open();
-        }
-        else
-        {
-            // Close settings if editor is (re)started
-            close();
-        }
-    }
-
     onVisibleChanged: {
         if (visible == false) {
             close();
@@ -400,7 +387,7 @@ I2CustomRectangle {
                         visible: true
                         enabled: visible && root.editorStartedOnIgs
 
-                        checked : IgsModelManager ? IgsModelManager.isMappingConnected : false
+                        checked : IgsNetworkController ? IgsNetworkController.isStarted : false
 
                         style: I2SvgToggleButtonStyle {
                             fileCache: IngeScapeTheme.svgFileIngeScape
@@ -418,15 +405,21 @@ I2CustomRectangle {
                         }
 
                         onCheckedChanged: {
-                            if (IgsModelManager) {
-                                IgsModelManager.isMappingConnected = checked;
+                            if (IgsNetworkController) {
+                                if (checked)
+                                {
+                                    IgsNetworkController.start(selectNetworkDeviceCombobox.selectedItem, "", selectPortTextfield.text)
+                                }
+                                else {
+                                    IgsNetworkController.stop();
+                                }
                             }
                         }
 
                         Binding {
                             target: connectButton
                             property: "checked"
-                            value: IgsModelManager.isMappingConnected
+                            value: IgsNetworkController.isStarted
                         }
                     }
 
@@ -440,10 +433,11 @@ I2CustomRectangle {
                             leftMargin: 8
                         }
 
-                        text: (IgsModelManager && IgsModelManager.isMappingConnected) ? qsTr("Connected")
-                                                                   : qsTr("Disconnected")
+                        text: (IgsNetworkController && IgsNetworkController.isStarted)  ? qsTr("ON-line")
+                                                                                        : qsTr("OFF-line")
 
-                        color: (IgsModelManager && IgsModelManager.isMappingConnected) ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor
+                        color: (IgsNetworkController && IgsNetworkController.isStarted) ? IngeScapeTheme.whiteColor
+                                                                                        : IngeScapeTheme.lightGreyColor
                         font {
                             family: IngeScapeTheme.labelFontFamily
                             weight: Font.Bold
@@ -464,7 +458,8 @@ I2CustomRectangle {
 
                        visible : root.editorStartedOnIgs
 
-                       color: (IgsModelManager && IgsModelManager.isMappingConnected) ? IngeScapeTheme.veryLightGreyColor : IngeScapeTheme.lightGreyColor
+                       color: (IgsNetworkController && IgsNetworkController.isStarted) ? IngeScapeTheme.veryLightGreyColor
+                                                                                       : IngeScapeTheme.lightGreyColor
 
                        font {
                            family: IngeScapeTheme.heading2Font

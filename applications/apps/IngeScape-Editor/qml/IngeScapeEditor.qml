@@ -280,8 +280,6 @@ Item {
                 rightMargin: 13
             }
 
-            editorStartedOnIgs: IgsNetworkController ? IgsNetworkController.isStarted : false
-
             currentNetworkDevice: IngeScapeEditorC.networkDevice
             currentPort: IngeScapeEditorC.port
 
