@@ -182,7 +182,7 @@ mac {
 
     # Copy libraries into the MacOS directory of our application
     # NB: libzyre, libzmq, libczmq, libsodium, have to be copied manually because macdeploy won't copy libraries referenced through @rpath
-    librariesToCopy.files += ../../frameworks/I2Quick/Mac/libI2Quick.$${QMAKE_EXTENSION_SHLIB} /usr/local/lib/libczmq.dylib /usr/local/lib/libzyre.dylib /usr/local/lib/libsodium.dylib
+    librariesToCopy.files += ../../frameworks/I2Quick/Mac/libI2Quick.$${QMAKE_EXTENSION_SHLIB}
     librariesToCopy.path = Contents/Frameworks
     QMAKE_BUNDLE_DATA += librariesToCopy
 
