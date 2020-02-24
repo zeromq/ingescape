@@ -69,8 +69,8 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _platformDirectoryPath(""),
     _currentPlatformFilePath(""),
     // Connect mapping in control mode
-    _beforeNetworkStop_isMappingConnected(true),
-    _beforeNetworkStop_isMappingControlled(true)
+    _beforeNetworkStop_isAgentEditorLaunched(false),
+    _beforeNetworkStop_isMappingControlled(false)
 {
     qInfo() << "New IngeScape Editor Controller";
 
@@ -174,7 +174,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     // Settings about "Mapping mode and connect/disconnect"
     //
     settings.beginGroup("mapping");
-    _beforeNetworkStop_isMappingConnected = settings.value("connected", true).toBool();
+    _beforeNetworkStop_isAgentEditorLaunched = settings.value("connected", true).toBool();
     _beforeNetworkStop_isMappingControlled = settings.value("controlled", true).toBool();
     settings.endGroup();
 
@@ -265,6 +265,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
 
     // Connect to signals from network controllers
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::isStartedChanged, _agentsMappingC, &AgentsMappingController::onEditorAgentStartedChanged);
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::isStartedChanged, this, &IngeScapeEditorController::_onAgentEditorStartedOrStopped);
 
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::networkDeviceIsNotAvailable, this, &IngeScapeEditorController::_onNetworkDeviceIsNotAvailable);
@@ -315,8 +316,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
 
     // Connect to signals from model managers
-    connect(ingeScapeModelManager, &IngeScapeModelManager::isMappingConnectedChanged, _agentsMappingC, &AgentsMappingController::onIsMappingConnectedChanged);
-    connect(ingeScapeModelManager, &IngeScapeModelManager::isMappingConnectedChanged, ingeScapeNetworkC, &IngeScapeNetworkController::onIsMappingConnectedChanged);
+//    connect(ingeScapeModelManager, &IngeScapeModelManager::isMappingConnectedChanged, ingeScapeNetworkC, &IngeScapeNetworkController::onIsMappingConnectedChanged);
 
     connect(ingeScapeModelManager, &IngeScapeModelManager::agentModelHasBeenCreated, _hostsSupervisionC, &HostsSupervisionController::onAgentModelHasBeenCreatedORonAgentModelBackOnNetwork);
     connect(ingeScapeModelManager, &IngeScapeModelManager::agentModelWillBeDeleted, _hostsSupervisionC, &HostsSupervisionController::onAgentModelWillBeDeleted);
@@ -1023,13 +1023,12 @@ void IngeScapeEditorController::_onAgentEditorStartedOrStopped(bool started)
      IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
     if (started)
     {
-        ingeScapeModelManager->setisMappingConnected(true);
         _modelManager->setisMappingControlled(_beforeNetworkStop_isMappingControlled);
     }
     else {
-        // Disable mapping
-        ingeScapeModelManager->setisMappingConnected(false);
-        _modelManager->setisMappingControlled(false);
+//        _modelManager->setisMappingControlled(_beforeNetworkStop_isMappingControlled);
+
+        _beforeNetworkStop_isMappingControlled = _modelManager->isMappingControlled();
 
         // Simulate an exit for each agent ON
         ingeScapeModelManager->simulateExitForEachAgentON();
@@ -1511,18 +1510,8 @@ void IngeScapeEditorController::_onNetworkDeviceIsNotAvailable()
     {
         _stopIngeScape(false);
 
-        // Register last mapping connected value in case the attempt to reconnect ingescape failed
-        bool registerLastIsMappingConnected = _beforeNetworkStop_isMappingConnected;
-
-        // Disconnect the mapping
-        _beforeNetworkStop_isMappingConnected = false;
-
         // Try to relaunch editor with an available device
-        bool success = _startIngeScape(true);
-
-        if (!success) {
-            _beforeNetworkStop_isMappingConnected = registerLastIsMappingConnected;
-        }
+        _startIngeScape(true);
     }
     // Else: our agent is not started, we don't need to stop it
 }
@@ -1679,11 +1668,11 @@ bool IngeScapeEditorController::_clearAndLoadPlatformFromFile(QString platformFi
             sethasAPlatformBeenLoadedByUser(true);
         }
 
-        // Force our global mapping to CONTROLLED
-        if (_modelManager != nullptr)
-        {
-            _modelManager->setisMappingControlled(true);
-        }
+//        // Force our global mapping to CONTROLLED
+//        if (_modelManager != nullptr)
+//        {
+//            _modelManager->setisMappingControlled(true);
+//        }
     }
     else
     {
@@ -1939,9 +1928,8 @@ bool IngeScapeEditorController::_restartIngeScape(bool hasToClearPlatform, bool 
 void IngeScapeEditorController::_stopIngeScape(bool hasToClearPlatform)
 {
     IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
-    IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
 
-    if ((ingeScapeNetworkC != nullptr) && (ingeScapeModelManager != nullptr) && (_modelManager != nullptr))
+    if ((ingeScapeNetworkC != nullptr) && (_modelManager != nullptr))
     {
         if (hasToClearPlatform)
         {
@@ -1953,13 +1941,13 @@ void IngeScapeEditorController::_stopIngeScape(bool hasToClearPlatform)
         }
 
         // Save states of our mapping if needed
-        _beforeNetworkStop_isMappingConnected = ingeScapeModelManager->isMappingConnected();
+        _beforeNetworkStop_isAgentEditorLaunched = ingeScapeNetworkC->isStarted();
         _beforeNetworkStop_isMappingControlled = _modelManager->isMappingControlled();
 
         // Update settings file
         IngeScapeSettings &settings = IngeScapeSettings::Instance();
         settings.beginGroup("mapping");
-        settings.setValue("connected", _beforeNetworkStop_isMappingConnected);
+        settings.setValue("connected", _beforeNetworkStop_isAgentEditorLaunched);
         settings.setValue("controlled", _beforeNetworkStop_isMappingControlled);
         settings.endGroup();
 

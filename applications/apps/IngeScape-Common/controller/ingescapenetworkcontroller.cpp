@@ -1283,9 +1283,8 @@ bool IngeScapeNetworkController::sendZMQMessageToAgent(QString agentId, QStringL
  * @brief Add inputs to our application for a list of agent outputs
  * @param agentName
  * @param newOutputsIds
- * @param isMappingConnected
  */
-void IngeScapeNetworkController::addInputsToOurApplicationForAgentOutputs(QString agentName, QStringList newOutputsIds, bool isMappingConnected)
+void IngeScapeNetworkController::addInputsToOurApplicationForAgentOutputs(QString agentName, QStringList newOutputsIds)
 {
     if ((_agentModel != nullptr) && (_agentModel->definition() != nullptr) && !newOutputsIds.isEmpty())
     {
@@ -1355,18 +1354,14 @@ void IngeScapeNetworkController::addInputsToOurApplicationForAgentOutputs(QStrin
                         qCritical() << "Can NOT observe input" << inputName << "on agent" << _igsAgentApplicationName << "Error code:" << resultObserveInput;
                     }
 
-                    // The mapping is activated (connected)
-                    if (isMappingConnected)
-                    {
-                        // Add mapping between our input and this output
-                        unsigned long id = igs_addMappingEntry(inputName.toStdString().c_str(), agentName.toStdString().c_str(), outputName.toStdString().c_str());
+                    // Add mapping between our input and this output
+                    unsigned long id = igs_addMappingEntry(inputName.toStdString().c_str(), agentName.toStdString().c_str(), outputName.toStdString().c_str());
 
-                        if (id > 0) {
-                            //qDebug() << "Mapping added between output" << outputName << "of agent" << agentName << "and input" << inputName << "of agent" << _igsAgentApplicationName << "(id" << id << ")";
-                        }
-                        else {
-                            qCritical() << "Can NOT add mapping between output" << outputName << "of agent" << agentName << "and input" << inputName << "of agent" << _igsAgentApplicationName << "Error code:" << id;
-                        }
+                    if (id > 0) {
+                        //qDebug() << "Mapping added between output" << outputName << "of agent" << agentName << "and input" << inputName << "of agent" << _igsAgentApplicationName << "(id" << id << ")";
+                    }
+                    else {
+                        qCritical() << "Can NOT add mapping between output" << outputName << "of agent" << agentName << "and input" << inputName << "of agent" << _igsAgentApplicationName << "Error code:" << id;
                     }
                 }
                 else {
@@ -1382,12 +1377,9 @@ void IngeScapeNetworkController::addInputsToOurApplicationForAgentOutputs(QStrin
  * @brief Remove inputs from our application for a list of agent outputs
  * @param agentName
  * @param oldOutputsIds
- * @param isMappingConnected
  */
-void IngeScapeNetworkController::removeInputsFromOurApplicationForAgentOutputs(QString agentName, QStringList oldOutputsIds, bool isMappingConnected)
+void IngeScapeNetworkController::removeInputsFromOurApplicationForAgentOutputs(QString agentName, QStringList oldOutputsIds)
 {
-    Q_UNUSED(isMappingConnected)
-
     if ((_agentModel != nullptr) && (_agentModel->definition() != nullptr) && !oldOutputsIds.isEmpty())
     {
         for (QString outputId : oldOutputsIds)
@@ -1439,67 +1431,3 @@ void IngeScapeNetworkController::removeInputsFromOurApplicationForAgentOutputs(Q
         }
     }
 }
-
-
-/**
- * @brief Slot called when the flag "is Mapping Activated" changed
- * @param isMappingConnected
- */
-void IngeScapeNetworkController::onIsMappingConnectedChanged(bool isMappingConnected)
-{
-    if ((_agentModel != nullptr) && (_agentModel->definition() != nullptr))
-    {
-        for (AgentIOPM* input : _agentModel->definition()->inputsList()->toList())
-        {
-            if (input != nullptr)
-            {
-                QString inputName = input->name();
-
-                QStringList agentNameAndIOP = inputName.split(SEPARATOR_AGENT_NAME_AND_IOP);
-                if (agentNameAndIOP.count() == 2)
-                {
-                    QString outputAgentName = agentNameAndIOP.at(0);
-                    QString outputId = agentNameAndIOP.at(1);
-
-                    // Get the name and the value type of the output from its id
-                    QPair<QString, AgentIOPValueTypes::Value> pair = AgentIOPM::getNameAndValueTypeFromId(outputId);
-
-                    if (!pair.first.isEmpty() && (pair.second != AgentIOPValueTypes::UNKNOWN))
-                    {
-                        QString outputName = pair.first;
-                        //AgentIOPValueTypes::Value valueType = pair.second;
-
-                        // Mapping Activated (Connected)
-                        if (isMappingConnected)
-                        {
-                            // Add mapping between our input and this output
-                            unsigned long id = igs_addMappingEntry(inputName.toStdString().c_str(), outputAgentName.toStdString().c_str(), outputName.toStdString().c_str());
-
-                            if (id > 0) {
-                                //qDebug() << "Mapping added between output" << outputName << "of agent" << outputAgentName << "and input" << inputName << "of agent" << _igsAgentApplicationName << "(id" << id << ")";
-                            }
-                            else {
-                                qCritical() << "Can NOT add mapping between output" << outputName << "of agent" << outputAgentName << "and input" << inputName << "of agent" << _igsAgentApplicationName << "Error code:" << id;
-                            }
-                        }
-                        // Mapping DE-activated (DIS-connected)
-                        else
-                        {
-                            // Remove mapping between our input and this output
-                            int resultRemoveMappingEntry = igs_removeMappingEntryWithName(inputName.toStdString().c_str(), outputAgentName.toStdString().c_str(), outputName.toStdString().c_str());
-
-                            if (resultRemoveMappingEntry == 1)
-                            {
-                                //qDebug() << "Mapping removed between output" << outputName << "of agent" << outputAgentName << "and input" << inputName << "of agent" << _igsAgentApplicationName;
-                            }
-                            else {
-                                qCritical() << "Can NOT remove mapping between output" << outputName << "of agent" << outputAgentName << "and input" << inputName << "of agent" << _igsAgentApplicationName << "Error code:" << resultRemoveMappingEntry;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-

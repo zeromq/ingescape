@@ -62,8 +62,7 @@ QObject* IngeScapeModelManager::qmlSingleton(QQmlEngine* engine, QJSEngine* scri
  * @brief Constructor
  * @param parent
  */
-IngeScapeModelManager::IngeScapeModelManager(QObject *parent) : QObject(parent),
-    _isMappingConnected(false)
+IngeScapeModelManager::IngeScapeModelManager(QObject *parent) : QObject(parent)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -104,28 +103,6 @@ IngeScapeModelManager::~IngeScapeModelManager()
         }
     }
     _allAgentsGroupsByName.clear();
-}
-
-
-/**
- * @brief Setter for property "is Mapping Connected"
- * @param value
- */
-void IngeScapeModelManager::setisMappingConnected(bool value)
-{
-    if (_isMappingConnected != value)
-    {
-        _isMappingConnected = value;
-
-        if (_isMappingConnected) {
-            qInfo() << "Mapping CONNECTED";
-        }
-        else {
-            qInfo() << "Mapping DIS-CONNECTED";
-        }
-
-        Q_EMIT isMappingConnectedChanged(value);
-    }
 }
 
 
@@ -1082,7 +1059,7 @@ void IngeScapeModelManager::_onOutputsHaveBeenAddedToAgentsGroupedByName(QList<O
         if (!newOutputsIds.isEmpty() && (IngeScapeNetworkController::instance() != nullptr))
         {
             // Add inputs to our application for these agent outputs
-            IngeScapeNetworkController::instance()->addInputsToOurApplicationForAgentOutputs(agentsGroupedByName->name(), newOutputsIds, _isMappingConnected);
+            IngeScapeNetworkController::instance()->addInputsToOurApplicationForAgentOutputs(agentsGroupedByName->name(), newOutputsIds);
         }
     }
 }
@@ -1110,7 +1087,7 @@ void IngeScapeModelManager::_onOutputsWillBeRemovedFromAgentsGroupedByName(QList
         if (!oldOutputsIds.isEmpty() && (IngeScapeNetworkController::instance() != nullptr))
         {
             // Remove inputs from our application for these agent outputs
-            IngeScapeNetworkController::instance()->removeInputsFromOurApplicationForAgentOutputs(agentsGroupedByName->name(), oldOutputsIds, _isMappingConnected);
+            IngeScapeNetworkController::instance()->removeInputsFromOurApplicationForAgentOutputs(agentsGroupedByName->name(), oldOutputsIds);
         }
     }
 }

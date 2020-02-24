@@ -254,10 +254,9 @@ Q_SIGNALS:
 public Q_SLOTS:
 
     /**
-     * @brief Slot called when the flag "is Mapping Connected" changed
-     * @param isMappingConnected
+     * @brief Slot called when our igs Editor agent is started or stopped
      */
-    void onIsMappingConnectedChanged(bool isMappingConnected);
+    void onEditorAgentStartedChanged(bool isStarted);
 
 
     /**

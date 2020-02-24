@@ -483,7 +483,7 @@ private:
     QString _currentPlatformFilePath;
 
     // States of our mapping when our network was stopped
-    bool _beforeNetworkStop_isMappingConnected;
+    bool _beforeNetworkStop_isAgentEditorLaunched;
     bool _beforeNetworkStop_isMappingControlled;
 
     // Default name to save the platform when exiting
