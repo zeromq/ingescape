@@ -777,11 +777,11 @@ lib-deploy-windows:
   tags:
     - windows
   script:
-    - copy /y src\include\*.h $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\include\ingescape\
-    - copy /y build\ReleaseX64\Release\* $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64\
-    - copy /y build\ReleaseX86\Release\* $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86\
-    - copy /y build\DebugX64\Debug\* $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64\
-    - copy /y build\DebugX86\Debug\* $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x86\
+    - copy src\include\*.h $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\include\ingescape\ -Force
+    - copy build\ReleaseX64\Release\* $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64\ -Force
+    - copy build\ReleaseX86\Release\* $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86\ -Force
+    - copy build\DebugX64\Debug\* $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64\ -Force
+    - copy build\DebugX86\Debug\* $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x86\ -Force
   dependencies:
     - lib-windows-release-x64
     - lib-windows-release-x86
@@ -801,7 +801,7 @@ binding-deploy-windows-release-x64:
   tags:
     - windows
   script:
-    - copy /y bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64\Release\netstandard2.0\IngescapeCSharp.dll $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64\
+    - copy bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64\Release\netstandard2.0\IngescapeCSharp.dll $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64\ -Force
   dependencies:
     - binding-csharp-windows-x64
   only:
@@ -818,7 +818,7 @@ binding-deploy-windows-release-x86:
   tags:
     - windows
   script:
-    - copy /y bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86\Release\netstandard2.0\IngescapeCSharp.dll $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86\
+    - copy bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86\Release\netstandard2.0\IngescapeCSharp.dll $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86\ -Force
   dependencies:
     - binding-csharp-windows-x86
   only:
