@@ -316,8 +316,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
 
     // Connect to signals from model managers
-//    connect(ingeScapeModelManager, &IngeScapeModelManager::isMappingConnectedChanged, ingeScapeNetworkC, &IngeScapeNetworkController::onIsMappingConnectedChanged);
-
     connect(ingeScapeModelManager, &IngeScapeModelManager::agentModelHasBeenCreated, _hostsSupervisionC, &HostsSupervisionController::onAgentModelHasBeenCreatedORonAgentModelBackOnNetwork);
     connect(ingeScapeModelManager, &IngeScapeModelManager::agentModelWillBeDeleted, _hostsSupervisionC, &HostsSupervisionController::onAgentModelWillBeDeleted);
 

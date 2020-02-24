@@ -178,8 +178,6 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
 
 
     // Connect to signals from model managers
-    connect(ingeScapeModelManager, &IngeScapeModelManager::isMappingConnectedChanged, ingeScapeNetworkC, &IngeScapeNetworkController::onIsMappingConnectedChanged);
-
     connect(assessmentsModelManager, &AssessmentsModelManager::isConnectedToDatabaseChanged,
             this, &IngeScapeAssessmentsController::_onIsConnectedToDatabaseChanged);
 
@@ -644,10 +642,6 @@ bool IngeScapeAssessmentsController::_startIngeScape(bool checkAvailableNetworkD
             }
         }
         success = ingeScapeNetworkC->start(_networkDevice, _ipAddress, _port); //will failed if networkDevice = ""
-        if (success)
-        {
-            ingeScapeModelManager->setisMappingConnected(true); // Always enable mapping in assessment
-        }
     }
     return success;
 }
@@ -700,9 +694,6 @@ void IngeScapeAssessmentsController::_stopIngeScape(bool hasToClearPlatform)
         {
             qInfo() << "Stop the network on" << _networkDevice << "with" << _port << "(and KEEP the current platform)";
         }
-
-        // Disable mapping
-        ingeScapeModelManager->setisMappingConnected(false);
 
         // Stop our IngeScape agent
         ingeScapeNetworkC->stop();

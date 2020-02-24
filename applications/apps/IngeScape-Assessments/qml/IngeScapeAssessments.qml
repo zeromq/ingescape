@@ -183,6 +183,17 @@ Item {
         currentPort: IngeScapeAssessmentsC.port
         listOfNetworkDevices: IgsNetworkController ? IgsNetworkController.availableNetworkDevices : null
 
+        onConnectChanged: {
+            if (connect)
+            {
+                IgsNetworkController.start(IngeScapeAssessmentsC.networkDevice, IngeScapeAssessmentsC.ipAddress, IngeScapeAssessmentsC.port);
+            }
+            else
+            {
+                IgsNetworkController.stop();
+            }
+        }
+
         onWillOpenEditionMode: {
             IgsNetworkController.updateAvailableNetworkDevices();
         }
