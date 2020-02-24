@@ -373,9 +373,10 @@ void AgentsMappingController::dropLinkBetweenTwoAgents(AgentInMappingVM* outputA
                 // Get the link name (with format "outputAgent##output-->inputAgent##input") from the list of names (each parts of a mapping element)
                 QString linkName = MappingElementM::getLinkNameFromNamesList(outputAgent->name(), linkOutput->name(), inputAgent->name(), linkInput->name());
 
-                // The global mapping is activated AND the input agent is ON
-                if (IngeScapeNetworkController::instance()->isStarted() && inputAgent->agentsGroupedByName()->isON())
+                if (inputAgent->agentsGroupedByName()->isON())
                 {
+                    // The input agent is ON (and so our igs Editor agent is started)
+
                     // Create a new TEMPORARY link between the two agents
                     link = _createLinkBetweenTwoObjectsInMapping(linkName,
                                                                  outputAgent,
@@ -404,9 +405,10 @@ void AgentsMappingController::dropLinkBetweenTwoAgents(AgentInMappingVM* outputA
                     // Send the message "MAP" to the list of agents
                     IngeScapeNetworkController::instance()->sendStringMessageToAgents(inputAgent->agentsGroupedByName()->peerIdsList(), message);
                 }
-                // The global mapping is NOT activated OR the input agent is OFF
                 else
                 {
+                    // Our igs Editor agent is stopped OR the input agent is OFF
+
                     // Create a new (REAL) link between the two agents
                     link = _createLinkBetweenTwoObjectsInMapping(linkName,
                                                                  outputAgent,
@@ -416,24 +418,20 @@ void AgentsMappingController::dropLinkBetweenTwoAgents(AgentInMappingVM* outputA
                                                                  nullptr,
                                                                  false);
 
-                    if (link != nullptr)
+                    if (IngeScapeNetworkController::instance()->isStarted() && (link != nullptr))
                     {
-                        MappingElementVM* mappingElement = inputAgent->getRemovedMappingElementFromLinkId_WhileMappingWasUNactivated(linkId);
-
-                        // This link has been removed while the mapping was UN-activated...
+                        // Our igs Editor agent is Started BUT our agent is off...
+                        MappingElementVM* mappingElement = inputAgent->getRemovedMappingElementFromLinkId_WhileAgentWasOFF(linkId);
                         if (mappingElement != nullptr)
                         {
-                            // Update the view model of mapping element which have been cleared
-                            link->setmappingElement(mappingElement);
-
-                            // ...just cancel the remove of the link while the global mapping was UN-activated
-                            inputAgent->cancelRemoveLink_WhileMappingWasUNactivated(linkId);
+                            // This link has been removed while the agent was OFF : just cancel the remove of the link while the agent is OFF
+                            link->setmappingElement(mappingElement); // Update the view model of mapping element which have been cleared
+                            inputAgent->cancelRemoveLink_WhileAgentWasOFF(linkId);
                         }
-                        // Add the link while the global mapping is UN-activated
                         else
                         {
-                            //inputAgent->addLink_WhileMappingWasUNactivated(link->uid(), linkInput->uid(), outputAgent->name(), linkOutput->uid());
-                            inputAgent->addLink_WhileMappingWasUNactivated(link->uid(), linkInput->name(), outputAgent->name(), linkOutput->name()); // TODO
+                            // Add the link while the agent is OFF
+                            inputAgent->addLink_WhileAgentIsOFF(link->uid(), linkInput->name(), outputAgent->name(), linkOutput->name());
                         }
                     }
                 }
@@ -1423,7 +1421,7 @@ void AgentsMappingController::_onAgentIsONChanged(bool isON)
             AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentsGroupedByName->name());
             if (agentInMapping != nullptr)
             {
-                // The mapping is activated
+                // Our igs Editor agent is started
                 if (IngeScapeNetworkController::instance()->isStarted())
                 {
                     // OBSERVE
@@ -1449,26 +1447,6 @@ void AgentsMappingController::_onAgentIsONChanged(bool isON)
                             // Cancel all added links while the global mapping was UN-activated
                             agentInMapping->cancelAllAddedLinks_WhileMappingWasUNactivated();
                         }
-
-                        // USELESS
-                        /*if (agentInMapping->hadLinksRemoved_WhileMappingWasUNactivated())
-                        {
-                            // Get the list of all (view models of) removed mapping elements while the global mapping was UN-activated
-                            QList<MappingElementVM*> removedMappingElements = agentInMapping->getRemovedMappingElements_WhileMappingWasUNactivated();
-                            for (MappingElementVM* mappingElement : removedMappingElements)
-                            {
-                                if (mappingElement != nullptr)
-                                {
-                                    qDebug() << "Add removed link" << mappingElement->name() << "while the mapping was disconnected";
-
-                                    // Link the agent (in the global mapping) on its input from the mapping element (add a missing link TO the agent)
-                                    _linkAgentOnInputFromMappingElement(agentInMapping, mappingElement);
-                                }
-                            }
-
-                            // Cancel all removed links while the global mapping was UN-activated
-                            agentInMapping->cancelAllRemovedLinks_WhileMappingWasUNactivated();
-                        }*/
                     }
                     // CONTROL
                     /*else
@@ -2007,9 +1985,9 @@ void AgentsMappingController::_removeLinkBetweenTwoAgents(LinkVM* link)
         {
             qInfo() << "Remove the link between agents" << link->outputObject()->name() << "and" << link->inputObject()->name();
 
-            // The global mapping is activated AND the input agent is ON
             if (inputAgent->agentsGroupedByName()->isON())
             {
+                // The input agent is ON (and our igs Editor agent is started)
                 if (!_hashFromLinkIdToRemovedLink_WaitingReply.contains(link->uid()))
                 {
                     // Insert in the hash table the "(unique) link id" and the link for which we are waiting a reply to the request "remove"
@@ -2032,23 +2010,23 @@ void AgentsMappingController::_removeLinkBetweenTwoAgents(LinkVM* link)
                 // Send the message "UNMAP" to the list of agents
                 IngeScapeNetworkController::instance()->sendStringMessageToAgents(inputAgent->agentsGroupedByName()->peerIdsList(), message);
             }
-            // The global mapping is NOT activated OR the input agent is OFF
             else
             {
-                MappingElementM* mappingElement = inputAgent->getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(link->uid());
-
-                // This link has been added while the mapping was UN-activated...
-                if (mappingElement != nullptr)
+                if (IngeScapeNetworkController::instance()->isStarted())
                 {
-                    // ...just cancel the add of the link while the global mapping is UN-activated
-                    inputAgent->cancelAddLink_WhileMappingWasUNactivated(link->uid());
+                    // Our igs Editor agent is Started BUT our agent is off...
+                    MappingElementM* mappingElement = inputAgent->getAddedMappingElementFromLinkId_WhileAgentWasOFF(link->uid());
+                    if (mappingElement != nullptr)
+                    {
+                        // This link has been added while the agent was off : just cancel the add of the link while the the agent is OFF
+                        inputAgent->cancelAddLink_WhileAgentIsOFF(link->uid());
+                    }
+                    else
+                    {
+                        // Remove the link while the agent is OFF
+                        inputAgent->removeLink_WhileAgentIsOFF(link->uid(), link->mappingElement());
+                    }
                 }
-                // Remove the link while the global mapping is UN-activated
-                else
-                {
-                    inputAgent->removeLink_WhileMappingWasUNactivated(link->uid(), link->mappingElement());
-                }
-
                 // Delete the link between two agents in the mapping
                 _deleteLinkBetweenTwoObjectsInMapping(link);
             }
@@ -2334,7 +2312,7 @@ void AgentsMappingController::_linkAgentOnInputFromMappingElement(AgentInMapping
                             if ((inputAgentFromLink != nullptr) && inputAgentFromLink->getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(link->uid()))
                             {
                                 qDebug() << "There is still the corresponding added Mapping Element" << link->uid() << "while the Mapping was UN-activated";
-                                inputAgentFromLink->mappingElementAdded_CorrespondingLinkAddedWhileMappingWasUNactivated(link->uid());
+                                inputAgentFromLink->cancelAddLink_WhileMappingWasUNactivated(link->uid());
                             }
                         }
                     }

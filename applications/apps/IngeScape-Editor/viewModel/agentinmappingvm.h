@@ -58,6 +58,9 @@ class AgentInMappingVM : public ObjectInMappingVM
     //I2_CPP_NOSIGNAL_PROPERTY(bool, hadLinksRemoved_WhileMappingWasUNactivated)
     I2_QML_PROPERTY_READONLY(bool, hadLinksRemoved_WhileMappingWasUNactivated)
 
+    I2_QML_PROPERTY_READONLY(bool, hadLinksAdded_WhileAgentWasOFF)
+    I2_QML_PROPERTY_READONLY(bool, hadLinksRemoved_WhileAgentWasOFF)
+
     // Mapping currently edited (temporary until the user activate the mapping)
     //I2_CPP_NOSIGNAL_PROPERTY(AgentMappingM*, temporaryMapping)
 
@@ -125,10 +128,22 @@ public:
 
 
     /**
+     * @brief Add a link while the agent is OFF
+     */
+    void addLink_WhileAgentIsOFF(QString linkId, QString inputName, QString outputAgentName, QString outputName);
+
+
+    /**
      * @brief Cancel the add of the link while the global mapping is UN-activated
      * @param linkId
      */
     void cancelAddLink_WhileMappingWasUNactivated(QString linkId);
+
+
+    /**
+     * @brief Cancel the add of the link while the agent is OFF
+     */
+    void cancelAddLink_WhileAgentIsOFF(QString linkId);
 
 
     /**
@@ -146,10 +161,22 @@ public:
 
 
     /**
+     * @brief Get the model of added mapping element (while the agent was OFF) from a link id
+     */
+    MappingElementM* getAddedMappingElementFromLinkId_WhileAgentWasOFF(QString linkId);
+
+
+    /**
      * @brief Get the list of all added link Ids while the global mapping was UN-activated
      * @return
      */
     QList<QString> getAddedLinkIds_WhileMappingWasUNactivated();
+
+
+    /**
+     * @brief Get the list of all added link Ids while the agent was OFF
+     */
+    QList<QString> getAddedLinkIds_WhileAgentWasOFF();
 
 
     /**
@@ -160,10 +187,9 @@ public:
 
 
     /**
-     * @brief A mapping element has just been added and correspond to a link added while the global mapping was UN-activated
-     * @param linkId
+     * @brief Get the list of all (models of) added mapping elements while the agent was OFF
      */
-    void mappingElementAdded_CorrespondingLinkAddedWhileMappingWasUNactivated(QString linkId);
+    QList<MappingElementM*> getAddedMappingElements_WhileAgentWasOFF();
 
 
     /**
@@ -172,6 +198,12 @@ public:
      * @param mappingElement
      */
     void removeLink_WhileMappingWasUNactivated(QString linkId, MappingElementVM* mappingElement);
+
+
+    /**
+     * @brief Remove a link while the agent was OFF
+     */
+    void removeLink_WhileAgentIsOFF(QString linkId, MappingElementVM* mappingElement);
 
 
     /**
@@ -186,6 +218,12 @@ public:
      */
     void cancelRemoveLink_WhileMappingWasUNactivated(QString linkId);
 
+    /**
+     * @brief Cancel the remove of the link while the agent was OFF
+     */
+    void cancelRemoveLink_WhileAgentWasOFF(QString linkId);
+
+
 
     /**
      * @brief Cancel all removed links while the global mapping was UN-activated
@@ -199,6 +237,12 @@ public:
      * @return
      */
     MappingElementVM* getRemovedMappingElementFromLinkId_WhileMappingWasUNactivated(QString linkId);
+
+
+    /**
+     * @brief Get the view model of removed mapping element (while the agent was OFF) from a link id
+     */
+    MappingElementVM* getRemovedMappingElementFromLinkId_WhileAgentWasOFF(QString linkId);
 
 
     /**
@@ -328,8 +372,14 @@ private:
     // Hash table from "(unique) link id" to added link (model of mapping element) while the mapping was UN-activated
     QHash<QString, MappingElementM*> _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated;
 
+    // Hash table from "(unique) link id" to added link (model of mapping element) while the agent was OFF
+    QHash<QString, MappingElementM*> _hashFromLinkIdToAddedMappingElement_WhileAgentWasOFF;
+
     // Hash table from "(unique) link id" to removed link (view model of mapping element) while the mapping was UN-activated
     QHash<QString, MappingElementVM*> _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated;
+
+    // Hash table from "(unique) link id" to removed link (view model of mapping element) while the agent was OFF
+    QHash<QString, MappingElementVM*> _hashFromLinkIdToRemovedMappingElement_WhileAgentWasOFF;
 
 };
 
