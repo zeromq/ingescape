@@ -169,6 +169,9 @@ mac {
 
     LIBS += /usr/local/lib/libcassandra.dylib
 
+    # Include dir for cassandra
+    INCLUDEPATH += /usr/local/include
+
 
     # Copy libraries into the MacOS directory of our application
     # NB: libzyre, libzmq, libczmq, libsodium, have to be copied manually because macdeploy won't copy libraries referenced through @rpath
