@@ -26,8 +26,10 @@ QT += qml quick quick-private svg xml concurrent core-private gui-private
 
 CONFIG += c++11 precompiled_header
 
-# Warnings = error
-QMAKE_CXXFLAGS += -Werror
+CONFIG(release, debug|release) {
+    # Warnings = error
+    QMAKE_CXXFLAGS += -Werror
+}
 
 # Use Precompiled headers (PCH)
 PRECOMPILED_HEADER  = stable.h
