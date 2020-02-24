@@ -28,7 +28,7 @@ I2PopupBase {
     id: rootItem
 
     height: 250
-    width: 360
+    width: 500
 
     anchors.centerIn: parent
 
@@ -105,7 +105,7 @@ I2PopupBase {
 
                 //horizontalAlignment: Text.AlignHCenter
 
-                text: qsTr("Platform has changed while disconnected.\nYou can:")
+                text: qsTr("You are about to connect to the network.You can:")
 
                 color: IngeScapeTheme.whiteColor
                 font {
@@ -139,7 +139,7 @@ I2PopupBase {
                         color: control.enabled ? (control.checked ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor)
                                                : IngeScapeTheme.disabledTextColor
 
-                        text: qsTr("Apply your mapping to the network")
+                        text: qsTr("Apply your mapping to the network (CONTROL mapping mode)")
 
                         font {
                             family: IngeScapeTheme.textFontFamily
@@ -188,7 +188,7 @@ I2PopupBase {
                         color: control.enabled ? (control.checked ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor)
                                                : IngeScapeTheme.disabledTextColor
 
-                        text: qsTr("Use the mapping from the network")
+                        text: qsTr("Use the mapping from the network (OBSERVE mapping mode)")
 
                         font {
                             family: IngeScapeTheme.textFontFamily
@@ -279,9 +279,9 @@ I2PopupBase {
             property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
 
             height: boundingBox.height
-            width: boundingBox.width
+            width: 160
 
-            text: "Cancel"
+            text: "Stay disconnected"
             enabled: true
 
             activeFocusOnPress: true
@@ -326,9 +326,9 @@ I2PopupBase {
            property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
 
             height: boundingBox.height
-            width: boundingBox.width
+            width: 80
 
-            text: "OK"
+            text: "Connect"
             //enabled: checkControl.checked || checkObserve.checked || checkCancel.checked
             enabled: checkControl.checked || checkObserve.checked
 

@@ -47,13 +47,14 @@ class IngeScapeEditorController : public QObject
     Q_OBJECT
 
     // Network settings - network device
-    I2_QML_PROPERTY_READONLY(QString, networkDevice)
+    I2_QML_PROPERTY(QString, networkDevice)
 
     // Network settings - ip address
     I2_QML_PROPERTY_READONLY(QString, ipAddress)
 
     // Network settings - port
-    I2_QML_PROPERTY_READONLY(uint, port)
+    I2_QML_PROPERTY(uint, port)
+
 
     // Flag indicating if the Model/View Model Visualizer is available
     I2_QML_PROPERTY_READONLY(bool, isAvailableModelVisualizer)

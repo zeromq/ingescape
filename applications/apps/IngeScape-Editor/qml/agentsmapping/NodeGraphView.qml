@@ -23,8 +23,7 @@ import INGESCAPE 1.0
 // parent-directory
 import ".." as Editor;
 
-// Popups
-import "../popup/" as Popups;
+
 
 
 Item {
@@ -280,8 +279,7 @@ Item {
         onChangesOnLinksWhileMappingUnactivated: {
             //console.log("QML: on Changes on Links While Mapping Unactivated");
 
-            // Open the popup about mapping modifications
-            mappingModificationsPopup.open();
+
         }
     }
 
@@ -290,14 +288,6 @@ Item {
 
         onResetMappindView: {
             rootItem.showAll();
-        }
-    }
-
-    Component.onCompleted: {
-        if (controller) {
-            //console.log("QML: Graph View completed !");
-            // Update the flag
-            controller.isLoadedView = true;
         }
     }
 
@@ -848,47 +838,7 @@ Item {
             }
         }
 
+
+
     }
-
-
-    //----------------------------------------------------------------------------------
-    //
-    // Mapping Modifications Popup
-    //
-    //----------------------------------------------------------------------------------
-    Popups.MappingModificationsPopup {
-        id: mappingModificationsPopup
-
-        onCancelMappingActivation: {
-            console.log("on Cancel Mapping Activation");
-
-            // UN-activate the mapping
-//            IgsModelManager.isMappingConnected = false;
-        }
-
-        onSwitchToControl: {
-            console.log("on Switch To Control");
-
-            if (IngeScapeEditorC.modelManager)
-            {
-                // UN-activate the mapping
-//                IgsModelManager.isMappingConnected = false;
-
-                // Switch to CONTROL
-                IngeScapeEditorC.modelManager.isMappingControlled = true;
-
-                // Activate the mapping
-//                IgsModelManager.isMappingConnected = true;
-            }
-        }
-
-        onStayToObserve: {
-            console.log("on Stay To Observe");
-
-            if (controller) {
-                controller.resetModificationsWhileMappingWasUNactivated();
-            }
-        }
-    }
-
 }

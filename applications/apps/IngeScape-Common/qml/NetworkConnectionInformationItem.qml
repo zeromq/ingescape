@@ -126,7 +126,9 @@ I2CustomRectangle {
     signal willCloseEditionMode();
 
     // Triggered when we press the "OK" button
-    signal changeNetworkSettings(string networkDevice, int port, bool clearPlatform);
+    signal changeNetworkSettings(string networkDevice, int port);
+
+    signal connectChanged(bool connect);
 
 
     //--------------------------------------------------------
@@ -387,8 +389,6 @@ I2CustomRectangle {
                         visible: true
                         enabled: visible && root.editorStartedOnIgs
 
-                        checked : IgsNetworkController ? IgsNetworkController.isStarted : false
-
                         style: I2SvgToggleButtonStyle {
                             fileCache: IngeScapeTheme.svgFileIngeScape
 
@@ -404,16 +404,9 @@ I2CustomRectangle {
                             labelMargin: 0;
                         }
 
-                        onCheckedChanged: {
-                            if (IgsNetworkController) {
-                                if (checked)
-                                {
-                                    IgsNetworkController.start(selectNetworkDeviceCombobox.selectedItem, "", selectPortTextfield.text)
-                                }
-                                else {
-                                    IgsNetworkController.stop();
-                                }
-                            }
+                        onClicked: {
+                            root.connectChanged(checked);
+                            checked = false;
                         }
 
                         Binding {
@@ -827,7 +820,7 @@ I2CustomRectangle {
                             }
 
                             onClicked: {
-                                root.changeNetworkSettings(selectNetworkDeviceCombobox.selectedItem, selectPortTextfield.text, false);
+                                root.changeNetworkSettings(selectNetworkDeviceCombobox.selectedItem, selectPortTextfield.text);
                             }
                         }
                     }
