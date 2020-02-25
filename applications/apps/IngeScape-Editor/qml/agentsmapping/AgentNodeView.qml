@@ -960,7 +960,7 @@ Rectangle {
             visible: IngeScapeEditorC.isAvailableModelVisualizer
 
             Rectangle {
-                visible: agentMappingVM ? agentMappingVM.hadLinksAdded_WhileMappingWasUNactivated : false
+                visible: agentMappingVM ? agentMappingVM.hadLinksAdded_WhileAgentWasOFF : false
                 color: "red"
                 width: 8
                 height: 8
@@ -971,7 +971,7 @@ Rectangle {
                 }
             }
             Rectangle {
-                visible: agentMappingVM ? agentMappingVM.hadLinksRemoved_WhileMappingWasUNactivated : false
+                visible: agentMappingVM ? agentMappingVM.hadLinksRemoved_WhileAgentWasOFF : false
                 color: "red"
                 width: 8
                 height: 8

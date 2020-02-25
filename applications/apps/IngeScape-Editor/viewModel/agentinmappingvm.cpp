@@ -44,8 +44,6 @@ AgentInMappingVM::AgentInMappingVM(AgentsGroupedByNameVM* agentsGroupedByName,
     _isLockedReduced(false),
     _reducedLinkInputsValueTypeGroup(AgentIOPValueTypeGroups::MIXED),
     _reducedLinkOutputsValueTypeGroup(AgentIOPValueTypeGroups::MIXED),
-    _hadLinksAdded_WhileMappingWasUNactivated(false),
-    _hadLinksRemoved_WhileMappingWasUNactivated(false),
     _hadLinksAdded_WhileAgentWasOFF(false),
     _hadLinksRemoved_WhileAgentWasOFF(false)
 {
@@ -131,8 +129,8 @@ AgentInMappingVM::~AgentInMappingVM()
     }*/
 
     // Free memory
-    cancelAllAddedLinks_WhileMappingWasUNactivated();
-    cancelAllRemovedLinks_WhileMappingWasUNactivated();
+    cancelAllAddedLinks_WhileAgentWasOFF();
+    cancelAllRemovedLinks_WhileAgentWasOFF();
 }
 
 
@@ -177,33 +175,11 @@ LinkOutputVM* AgentInMappingVM::getLinkOutputFromId(QString outputId)
 
 
 /**
- * @brief Add a link while the global mapping is UN-activated
- * @param linkId
- * @param inputName
- * @param outputAgentName
- * @param outputName
- */
-void AgentInMappingVM::addLink_WhileMappingWasUNactivated(QString linkId, QString inputName, QString outputAgentName, QString outputName)
-{
-    qDebug() << "Add Link WhileMappingWasUNactivated" << linkId;
-
-    if (!_hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.contains(linkId))
-    {
-        // Create a model of mapping element with agent names and with input/output names
-        MappingElementM* mappingElement = new MappingElementM(_name, inputName, outputAgentName, outputName);
-
-        _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.insert(linkId, mappingElement);
-
-        sethadLinksAdded_WhileMappingWasUNactivated(true);
-    }
-}
-
-/**
  * @brief Add a link while the agent is OFF
  */
 void AgentInMappingVM::addLink_WhileAgentIsOFF(QString linkId, QString inputName, QString outputAgentName, QString outputName)
 {
-//    qDebug() << "Add Link WhileMappingWasUNactivated" << linkId;
+    qDebug() << "Add Link while agent is OFF " << linkId;
     if (!_hashFromLinkIdToAddedMappingElement_WhileAgentWasOFF.contains(linkId))
     {
         // Create a model of mapping element with agent names and with input/output names
@@ -215,35 +191,13 @@ void AgentInMappingVM::addLink_WhileAgentIsOFF(QString linkId, QString inputName
 
 
 /**
- * @brief Cancel the add of the link while the global mapping is UN-activated
- * @param linkId
- */
-void AgentInMappingVM::cancelAddLink_WhileMappingWasUNactivated(QString linkId)
-{
-    qDebug() << "cancelAddLink_WhileMappingWasUNactivated" << linkId;
-
-    MappingElementM* mappingElement = getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(linkId);
-    if (mappingElement != nullptr)
-    {
-        _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.remove(linkId);
-
-        // Free memory
-        delete mappingElement;
-
-        if (_hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.isEmpty()) {
-            sethadLinksAdded_WhileMappingWasUNactivated(false);
-        }
-    }
-}
-
-
-/**
  * @brief Cancel the add of the link while the agent is OFF
  */
 void AgentInMappingVM::cancelAddLink_WhileAgentIsOFF(QString linkId)
 {
-//    qDebug() << "cancelAddLink_WhileAgentIsOFF" << linkId;
-    MappingElementM* mappingElement = getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(linkId);
+    qDebug() << "cancelAddLink_WhileAgentIsOFF" << linkId;
+
+    MappingElementM* mappingElement = getAddedMappingElementFromLinkId_WhileAgentWasOFF(linkId);
     if (mappingElement != nullptr)
     {
         _hashFromLinkIdToAddedMappingElement_WhileAgentWasOFF.remove(linkId);
@@ -257,31 +211,18 @@ void AgentInMappingVM::cancelAddLink_WhileAgentIsOFF(QString linkId)
 
 
 /**
- * @brief Cancel all added links while the global mapping was UN-activated
+ * @brief Cancel all added links while the agent was OFF
  */
-void AgentInMappingVM::cancelAllAddedLinks_WhileMappingWasUNactivated()
+void AgentInMappingVM::cancelAllAddedLinks_WhileAgentWasOFF()
 {
-    qDebug() << "Cancel all added links while the global mapping was UN-activated";
+    qDebug() << "Cancel all added links while the agent was OFF";
 
-    QList<MappingElementM*> addedMappingElements = _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.values();
-
-    _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.clear();
-    sethadLinksAdded_WhileMappingWasUNactivated(false);
-
-    // Free memory
-    qDeleteAll(addedMappingElements);
+    QList<MappingElementM*> addedMappingElements = _hashFromLinkIdToAddedMappingElement_WhileAgentWasOFF.values();
+    _hashFromLinkIdToAddedMappingElement_WhileAgentWasOFF.clear();
+    sethadLinksAdded_WhileAgentWasOFF(false);
+    qDeleteAll(addedMappingElements); // Free memory
 }
 
-
-/** TODO supprimer
- * @brief Get the model of added mapping element (while the mapping was UN-activated) from a link id
- * @param linkId
- * @return
- */
-MappingElementM* AgentInMappingVM::getAddedMappingElementFromLinkId_WhileMappingWasUNactivated(QString linkId)
-{
-    return _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.value(linkId, nullptr);
-}
 
 /**
  * @brief Get the model of added mapping element (while the agent was OFF) from a link id
@@ -289,16 +230,6 @@ MappingElementM* AgentInMappingVM::getAddedMappingElementFromLinkId_WhileMapping
 MappingElementM *AgentInMappingVM::getAddedMappingElementFromLinkId_WhileAgentWasOFF(QString linkId)
 {
     return _hashFromLinkIdToAddedMappingElement_WhileAgentWasOFF.value(linkId, nullptr);
-}
-
-
-/** TODO supprimer
- * @brief Get the list of all added link Ids while the global mapping was UN-activated
- * @return
- */
-QList<QString> AgentInMappingVM::getAddedLinkIds_WhileMappingWasUNactivated()
-{
-    return _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.keys();
 }
 
 
@@ -311,15 +242,6 @@ QList<QString> AgentInMappingVM::getAddedLinkIds_WhileAgentWasOFF()
 }
 
 
-/** TODO supprimer
- * @brief Get the list of all (models of) added mapping elements while the global mapping was UN-activated
- * @return
- */
-QList<MappingElementM*> AgentInMappingVM::getAddedMappingElements_WhileMappingWasUNactivated()
-{
-    return _hashFromLinkIdToAddedMappingElement_WhileMappingWasUNactivated.values();
-}
-
 /**
  * @brief Get the list of all (models of) added mapping elements while the agent was OFF
  */
@@ -330,74 +252,16 @@ QList<MappingElementM*> AgentInMappingVM::getAddedMappingElements_WhileAgentWasO
 
 
 /**
- * @brief Remove a link while the global mapping is UN-activated
- * @param linkId
- * @param mappingElement
- */
-void AgentInMappingVM::removeLink_WhileMappingWasUNactivated(QString linkId, MappingElementVM* mappingElement)
-{
-    qDebug() << "Remove the link" << linkId << "while the global mapping is UN-activated";
-
-    if ((mappingElement != nullptr) && !_hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.contains(linkId))
-    {
-        _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.insert(linkId, mappingElement);
-
-        sethadLinksRemoved_WhileMappingWasUNactivated(true);
-    }
-}
-
-
-/**
  * @brief Remove a link while the agent was OFF
  */
 void AgentInMappingVM::removeLink_WhileAgentIsOFF(QString linkId, MappingElementVM* mappingElement)
 {
-//    qDebug() << "Remove the link" << linkId << "while the agent is OFF";
+    qDebug() << "Remove the link" << linkId << "while the agent is OFF";
+
     if ((mappingElement != nullptr) && !_hashFromLinkIdToRemovedMappingElement_WhileAgentWasOFF.contains(linkId))
     {
         _hashFromLinkIdToRemovedMappingElement_WhileAgentWasOFF.insert(linkId, mappingElement);
-        sethadLinksRemoved_WhileMappingWasUNactivated(true);
-    }
-}
-
-
-
-/**
- * @brief Remove all links while the global mapping is UN-activated
- */
-void AgentInMappingVM::removeAllLinks_WhileMappingWasUNactivated()
-{
-    qDebug() << "Remove all links while the global mapping is UN-activated";
-
-    if ((_agentsGroupedByName != nullptr) && !_agentsGroupedByName->allMappingElements()->isEmpty())
-    {
-        for (MappingElementVM* mappingElement : _agentsGroupedByName->allMappingElements()->toList())
-        {
-            if (mappingElement != nullptr)
-            {
-                // FIXME: Use "Link Id" instead of "Mapping Element Name"
-                removeLink_WhileMappingWasUNactivated(mappingElement->name(), mappingElement);
-            }
-        }
-    }
-}
-
-
-/**
- * @brief Cancel the remove of the link while the global mapping was UN-activated
- * @param linkId
- */
-void AgentInMappingVM::cancelRemoveLink_WhileMappingWasUNactivated(QString linkId)
-{
-    qDebug() << "Cancel the remove of the link" << linkId << "while the global mapping was UN-activated";
-
-    if (_hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.contains(linkId))
-    {
-        _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.remove(linkId);
-
-        if (_hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.isEmpty()) {
-            sethadLinksRemoved_WhileMappingWasUNactivated(false);
-        }
+        sethadLinksRemoved_WhileAgentWasOFF(true);
     }
 }
 
@@ -407,7 +271,8 @@ void AgentInMappingVM::cancelRemoveLink_WhileMappingWasUNactivated(QString linkI
  */
 void AgentInMappingVM::cancelRemoveLink_WhileAgentWasOFF(QString linkId)
 {
-//    qDebug() << "Cancel the remove of the link" << linkId << "while the agent was OFF";
+    qDebug() << "Cancel the remove of the link" << linkId << "while the agent was OFF";
+
     if (_hashFromLinkIdToRemovedMappingElement_WhileAgentWasOFF.contains(linkId))
     {
         _hashFromLinkIdToRemovedMappingElement_WhileAgentWasOFF.remove(linkId);
@@ -420,26 +285,15 @@ void AgentInMappingVM::cancelRemoveLink_WhileAgentWasOFF(QString linkId)
 
 
 /**
- * @brief Cancel all removed links while the global mapping was UN-activated
+ * @brief Cancel all removed links while the agent was OFF
  */
-void AgentInMappingVM::cancelAllRemovedLinks_WhileMappingWasUNactivated()
+void AgentInMappingVM::cancelAllRemovedLinks_WhileAgentWasOFF()
 {
-    qDebug() << "Cancel all removed links while the global mapping was UN-activated";
+    qDebug() << "Cancel all removed links while the agent was OFF";
 
     // View models of mapping elements are stored and deleted else where
-    _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.clear();
-    sethadLinksRemoved_WhileMappingWasUNactivated(false);
-}
-
-
-/**
- * @brief Get the view model of removed mapping element (while the mapping was UN-activated) from a link id
- * @param linkId
- * @return
- */
-MappingElementVM* AgentInMappingVM::getRemovedMappingElementFromLinkId_WhileMappingWasUNactivated(QString linkId)
-{
-    return _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.value(linkId, nullptr);
+    _hashFromLinkIdToRemovedMappingElement_WhileAgentWasOFF.clear();
+    sethadLinksRemoved_WhileAgentWasOFF(false);
 }
 
 
@@ -453,34 +307,12 @@ MappingElementVM* AgentInMappingVM::getRemovedMappingElementFromLinkId_WhileAgen
 
 
 /**
- * @brief Get the list of all removed link Ids while the global mapping was UN-activated
- * @return
+ * @brief Get the list of all names of removed mapping elements while the agent was OFF
  */
-QList<QString> AgentInMappingVM::getRemovedLinkIds_WhileMappingWasUNactivated()
-{
-    return _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.keys();
-}
-
-
-/**
- * @brief Get the list of all (view models of) removed mapping elements while the global mapping was UN-activated
- * @return
- */
-QList<MappingElementVM*> AgentInMappingVM::getRemovedMappingElements_WhileMappingWasUNactivated()
-{
-    return _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.values();
-}
-
-
-/**
- * @brief Get the list of all names of removed mapping elements while the global mapping was UN-activated
- * @return
- */
-QStringList AgentInMappingVM::getNamesOfRemovedMappingElements_WhileMappingWasUNactivated()
+QStringList AgentInMappingVM::getNamesOfRemovedMappingElements_WhileAgentWasOFF()
 {
     QStringList namesOfRemovedMappingElements;
-
-    for (MappingElementVM* mappingElement : _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.values())
+    for (MappingElementVM* mappingElement : _hashFromLinkIdToRemovedMappingElement_WhileAgentWasOFF.values())
     {
         if ((mappingElement != nullptr) && !mappingElement->name().isEmpty())
         {
@@ -492,28 +324,24 @@ QStringList AgentInMappingVM::getNamesOfRemovedMappingElements_WhileMappingWasUN
 
 
 /**
- * @brief A mapping element has just been removed and correspond to a link removed while the global mapping was UN-activated
- * @param mappingElement
+ * @brief A mapping element has just been removed and correspond to a link removed while the agent was off
  */
-void AgentInMappingVM::mappingElementRemoved_CorrespondingLinkRemovedWhileMappingWasUNactivated(MappingElementVM* mappingElement)
+void AgentInMappingVM::mappingElementRemoved_CorrespondingLinkRemovedWhileAgentWasOFF(MappingElementVM* mappingElement)
 {
     if (mappingElement != nullptr)
     {
         QString linkId = "";
-
-        for (QString iterator : _hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.keys())
+        for (QString iterator : _hashFromLinkIdToRemovedMappingElement_WhileAgentWasOFF.keys())
         {
-            if (_hashFromLinkIdToRemovedMappingElement_WhileMappingWasUNactivated.value(iterator) == mappingElement)
+            if (_hashFromLinkIdToRemovedMappingElement_WhileAgentWasOFF.value(iterator) == mappingElement)
             {
                 linkId = iterator;
                 break;
             }
         }
-
         if (!linkId.isEmpty())
         {
-            // Cancel the remove of the link while the global mapping was UN-activated
-            cancelRemoveLink_WhileMappingWasUNactivated(linkId);
+            cancelRemoveLink_WhileAgentWasOFF(linkId);
         }
     }
 }

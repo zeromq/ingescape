@@ -320,8 +320,6 @@ Item {
         onCancelMappingActivation: {
             console.log("on Cancel Mapping Activation");
 
-            console.log("coucou = " + IgsNetworkController.isStarted)
-
             // UN-activate the mapping
 //            IgsModelManager.isMappingConnected = false;
         }
@@ -343,8 +341,6 @@ Item {
             console.log("on Stay To Observe");
             if (IngeScapeEditorC.modelManager && controller)
             {
-                controller.resetModificationsWhileMappingWasUNactivated();
-
                 // Switch to OBSERVE
                 IngeScapeEditorC.modelManager.isMappingControlled = false;
 
@@ -353,5 +349,4 @@ Item {
             }
         }
     }
-
 }
