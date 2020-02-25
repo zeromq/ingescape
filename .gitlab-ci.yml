@@ -1080,11 +1080,7 @@ lib-delivery-all:
     - lib-installer-runtime-windows-x64
     - lib-installer-macos
     - lib-installer-linux-x64
-    - lib-installer-runtime-debian-9-x64
-    - lib-installer-runtime-debian-10-x64
-    - lib-installer-runtime-centos-x64
     - lib-installer-runtime-linux-armhf
-    - lib-installer-runtime-raspbian-9-armhf
     - lib-installer-runtime-android-armv7a-softfp
   only:
     refs:
@@ -1323,11 +1319,7 @@ lib-delivery-all-stable:
     - lib-installer-runtime-windows-x64
     - lib-installer-macos
     - lib-installer-linux-x64
-    - lib-installer-runtime-debian-9-x64
-    - lib-installer-runtime-debian-10-x64
-    - lib-installer-runtime-centos-x64
     - lib-installer-runtime-linux-armhf
-    - lib-installer-runtime-raspbian-9-armhf
     - lib-installer-runtime-android-armv7a-softfp
 
 # Deliver installers so they can be downloaded from the website
