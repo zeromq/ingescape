@@ -55,7 +55,6 @@ class IngeScapeEditorController : public QObject
     // Network settings - port
     I2_QML_PROPERTY(uint, port)
 
-
     // Flag indicating if the Model/View Model Visualizer is available
     I2_QML_PROPERTY_READONLY(bool, isAvailableModelVisualizer)
 
@@ -184,16 +183,6 @@ public:
       * @param agentsGroupedByDefinition
       */
     Q_INVOKABLE bool isAgentUsedInPlatform(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition);
-
-
-    /**
-     * @brief Re-Start the network with a port and a network device
-     * @param strPort
-     * @param networkDevice
-     * @param hasToClearPlatform
-     * @return true when success
-     */
-    Q_INVOKABLE bool restartNetwork(QString strPort, QString networkDevice, bool hasToClearPlatform);
 
 
     /**
@@ -448,21 +437,15 @@ private:
     QJsonDocument _getJsonOfCurrentPlatform();
 
     /**
-     * @brief If checkAvailableNetworkDevices : auto select a network device to start Ingescape
+     * @brief If _selectedNetwork not available will try to auto select another one
      */
-    bool _startIngeScape(bool checkAvailableNetworkDevices);
+    bool _startIngeScape();
 
 
     /**
      * @brief Restart IngeScape
-     *
-     * @param hasToClearPlatform
-     * @param checkAvailableNetworkDevices
-     *
-     *
-     * @return true if success
      */
-    bool _restartIngeScape(bool hasToClearPlatform, bool checkAvailableNetworkDevices = false);
+    bool _restartIngeScape(bool hasToClearPlatform);
 
 
     /**
@@ -483,9 +466,7 @@ private:
     // Path to the currently opened platform file (*.igsplatform)
     QString _currentPlatformFilePath;
 
-    // States of our mapping when our network was stopped
-    bool _beforeNetworkStop_isAgentEditorLaunched;
-    bool _beforeNetworkStop_isMappingControlled;
+    bool _wasAgentEditorStarted_beforeSystemSleep;
 
     // Default name to save the platform when exiting
     static const QString EXAMPLE_PLATFORM_NAME;

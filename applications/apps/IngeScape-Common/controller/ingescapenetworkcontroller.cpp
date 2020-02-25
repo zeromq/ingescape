@@ -689,6 +689,9 @@ IngeScapeNetworkController::IngeScapeNetworkController(QObject *parent) : QObjec
                                                    definitionDescription);
 
     _agentModel->setdefinition(agentDefinition);
+
+    // Update available network devices
+    updateAvailableNetworkDevices();
 }
 
 
