@@ -74,6 +74,14 @@ Rectangle {
         id: itemMouseArea
         anchors.fill: parent
         hoverEnabled: true
+
+        onDoubleClicked: {
+            if (editDepVarButton.enabled)
+            {
+                // Emit the signal
+                rootItem.editAsked();
+            }
+        }
     }
 
     Row {
@@ -492,8 +500,6 @@ Rectangle {
             onClicked: {
                 // Emit the signal
                 rootItem.editAsked();
-
-                // rootItem.isCurrentlyEditing = true
             }
         }
 

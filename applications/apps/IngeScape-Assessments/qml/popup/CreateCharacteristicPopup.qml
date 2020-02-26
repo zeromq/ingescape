@@ -260,7 +260,8 @@ AssessmentsPopupBase {
 
                     width: 80
                     height: 30
-                    text: "Enum"
+
+                    text: CharacteristicValueTypes.enumToString(CharacteristicValueTypes.CHARACTERISTIC_ENUM)
 
                     exclusiveGroup: exclusiveGroupTypes
 

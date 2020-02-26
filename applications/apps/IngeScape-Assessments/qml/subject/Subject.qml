@@ -64,15 +64,26 @@ Item {
     // Slots
     //
 
+    // Go into edition mode
+    function edit()
+    {
+        if (rootItem.subject) {
+            rootItem.subject.resetTemporaryPropertyValues()
+        }
+
+        rootItem.isCurrentlyEditing = true
+    }
+
     // Discards any edited values and end edition
-    function cancelEdition() {
+    function cancelEdition()
+    {
         rootItem.isCurrentlyEditing = false
     }
 
     // Apply the edited values to the actual subjact properties
-    function applyEdition() {
-        if (rootItem.subject)
-        {
+    function applyEdition()
+    {
+        if (rootItem.subject) {
             rootItem.subject.applyTemporaryPropertyValues()
         }
 
@@ -98,6 +109,14 @@ Item {
             id: characteristicsMouseArea
             anchors.fill: parent
             hoverEnabled: true
+
+            onDoubleClicked: {
+                if (editSubjectButton.enabled)
+                {
+                    // Go into edition mode
+                    edit();
+                }
+            }
         }
 
         Row {
@@ -394,13 +413,8 @@ Item {
                 }
 
                 onClicked: {
-                    // Clean previous temporary
-                    if (rootItem.subject)
-                    {
-                        rootItem.subject.resetTemporaryPropertyValues()
-                    }
-
-                    rootItem.isCurrentlyEditing = true
+                    // Go into edition mode
+                    edit();
                 }
             }
         }

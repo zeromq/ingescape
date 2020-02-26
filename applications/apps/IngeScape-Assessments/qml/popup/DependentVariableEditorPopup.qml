@@ -30,7 +30,8 @@ AssessmentsPopupBase {
 
     anchors.centerIn: parent
 
-    title: "NEW DEPENDENT VARIABLE"
+    title: rootPopup.isEdition ? qsTr("EDIT DEPENDENT VARIABLE")
+                               : qsTr("NEW DEPENDENT VARIABLE")
 
 
     //--------------------------------------------------------
@@ -51,6 +52,8 @@ AssessmentsPopupBase {
     // OR
     // - edit an existing dependent variable
     property DependentVariableM dependentVariableToEdit: null;
+
+    property bool isEdition: false
 
 
     //
