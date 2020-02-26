@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017-2019 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2020 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -9,7 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
- *
+ *      Chloé Roumieu      <roumieu@ingenuity.io>
  */
 
 #include "licensescontroller.h"
@@ -24,8 +24,6 @@ extern "C" {
 
 /**
  * @brief onLicenseCallback
- * @param limit
- * @param myData
  */
 void onLicenseCallback(igs_license_limit_t limit, void *myData)
 {
@@ -68,7 +66,6 @@ void onLicenseCallback(igs_license_limit_t limit, void *myData)
 
 /**
  * @brief Constructor
- * @param parent
  */
 LicensesController::LicensesController(QObject *parent) : QObject(parent),
     _licensesPath(""),
@@ -80,22 +77,12 @@ LicensesController::LicensesController(QObject *parent) : QObject(parent),
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-
-    //
-    // Settings
-    //
+    // Get license path from user's .ini file
     IngeScapeSettings &settings = IngeScapeSettings::Instance();
-
     settings.beginGroup("licenses");
-
-    // Get the default path for "Licenses"
-    QString defaultLicensesPath = IngeScapeUtils::getLicensesPath();
-
+    QString defaultLicensesPath = IngeScapeUtils::getLicensesPath(); // Get the default path for "Licenses"
     _licensesPath = settings.value("directoryPath", QVariant(defaultLicensesPath)).toString();
-
     settings.endGroup();
-
-    qInfo() << "New Licenses Controller with licenses path" << _licensesPath;
 
     // Subcribe to updates
     connect(this, &LicensesController::needsUpdate, this, &LicensesController::_onNeedsUpdate);
@@ -108,6 +95,8 @@ LicensesController::LicensesController(QObject *parent) : QObject(parent),
 
     // Get the data about licenses
     refreshLicensesData();
+
+    qInfo() << "New Licenses Controller with licenses path" << _licensesPath;
 }
 
 
@@ -132,7 +121,8 @@ LicensesController::~LicensesController()
     // Clean-up license details
     _licenseDetailsList.deleteAllItems();
 
-    if (_licenseForAgentNeeded != nullptr) {
+    if (_licenseForAgentNeeded != nullptr)
+    {
         _cleanupLicenseForAgentNeeded();
     }
 }
@@ -140,7 +130,6 @@ LicensesController::~LicensesController()
 
 /**
  * @brief Select a directory with IngeScape licenses
- * @return
  */
 QString LicensesController::selectLicensesDirectory()
 {
@@ -153,7 +142,6 @@ QString LicensesController::selectLicensesDirectory()
 
 /**
  * @brief Update the licenses path
- * @param newLicensesPath
  */
 void LicensesController::updateLicensesPath(QString newLicensesPath)
 {
@@ -191,8 +179,6 @@ void LicensesController::updateLicensesPath(QString newLicensesPath)
 
 /**
  * @brief Delete the given license from the platform and from the filesystem
- * @param licenseInformation
- * @return
  */
 bool LicensesController::deleteLicense(LicenseInformationM* licenseInformation)
 {
@@ -211,7 +197,6 @@ bool LicensesController::deleteLicense(LicenseInformationM* licenseInformation)
             // Failure
             qDebug() << "Unable to delete the license file.";
         }
-
     }
     return success;
 }
@@ -220,8 +205,6 @@ bool LicensesController::deleteLicense(LicenseInformationM* licenseInformation)
 /**
  * @brief Copy the license file from the given path the the current license directory
  * then refresh the global license information
- * @param licenseFilePath
- * @return
  */
 bool LicensesController::addLicenses(const QList<QUrl>& licenseUrlList)
 {
@@ -240,9 +223,7 @@ bool LicensesController::addLicenses(const QList<QUrl>& licenseUrlList)
             completeSuccess = false;
         }
     }
-
     refreshLicensesData();
-
     return completeSuccess;
 }
 
@@ -257,7 +238,6 @@ void LicensesController::importLicense()
                                                             "Import IGS license",
                                                             QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation),
                                                             "IGS License (*.igslicense)");
-
     if (!platformFilePath.isEmpty())
     {
         QFileInfo licenseFile(platformFilePath);
@@ -266,10 +246,10 @@ void LicensesController::importLicense()
         // Do not import from the license path
         if (!importFromLicensePath && _importLicenseFromFile(licenseFile))
         {
+            seterrorMessageWhenLicenseFailed("");
             refreshLicensesData();
         }
     }
-
 }
 
 
@@ -283,7 +263,6 @@ void LicensesController::refreshLicensesData()
 
     if (globalAgent->license != nullptr)
     {
-
         if (_mergedLicense != nullptr)
         {
             LicenseInformationM* temp = _mergedLicense;
@@ -337,8 +316,6 @@ void LicensesController::setNecessaryLicenseForAgent(const char * agentName, con
 
 /**
  * @brief Import (copy) the given license file to the license directory
- * @param licenseFile
- * @return true on success. false otherwise.
  */
 bool LicensesController::_importLicenseFromFile(const QFileInfo& licenseFile)
 {
@@ -381,15 +358,16 @@ void LicensesController::_cleanupLicenseForAgentNeeded()
 
 /**
  * @brief Check license for agent needed
- * @return true on success. false otherwise.
- */
+*/
 bool LicensesController::_checkLicenseForAgentNeeded() {
     bool agentHandleByLicense = true;
-    if ((_licenseForAgentNeeded != nullptr) && (!igs_checkLicenseForAgent(_licenseForAgentNeeded->agentId))) {
+    if ((_licenseForAgentNeeded != nullptr) && (!igs_checkLicenseForAgent(_licenseForAgentNeeded->agentId)))
+    {
         seterrorMessageWhenLicenseFailed("No valid license for the agent : " + QString(globalAgent->agentName));
         agentHandleByLicense = false;
     }
-    else {
+    else
+    {
         seterrorMessageWhenLicenseFailed("");
         agentHandleByLicense = true;
     }

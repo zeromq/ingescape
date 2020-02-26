@@ -241,7 +241,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
     // Connect to signals from our licenses manager
     connect(_licensesC, &LicensesController::licensesUpdated, this, &IngeScapeEditorController::_onLicensesUpdated);
-
+    connect(_licensesC, &LicensesController::licenseLimitationReached, this, &IngeScapeEditorController::_onLicenseLimitationReached);
 
     // Connect to signals from network controllers
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::isStartedChanged, _agentsMappingC, &AgentsMappingController::onEditorAgentStartedChanged);
@@ -1490,10 +1490,18 @@ void IngeScapeEditorController::_onExpeExited(QString peerId, QString peerName)
 void IngeScapeEditorController::_onLicensesUpdated()
 {
     qDebug() << "on License Updated";
-    if (!IngeScapeNetworkController::instance()->isStarted())
+    if (IngeScapeNetworkController::instance()->isStarted())
     {
         _restartIngeScape(false);
     }
+}
+
+/**
+ * @brief Slot called when user's license limitations are reached
+ */
+void IngeScapeEditorController::_onLicenseLimitationReached()
+{
+    stopIngeScape(false);
 }
 
 

@@ -375,6 +375,12 @@ private Q_SLOTS:
 
 
     /**
+     * @brief Slot called when user's license limitations are reached
+     */
+    void _onLicenseLimitationReached();
+
+
+    /**
      * @brief Called when our network device is not available
      */
     void _onNetworkDeviceIsNotAvailable();

@@ -41,26 +41,6 @@ I2PopupBase {
     //--------------------------------------------------------
     //
     //
-    // Functions
-    //
-    //
-    //--------------------------------------------------------
-
-    // function allowing to validate the form
-    function validate() {
-        if (rootPopup.licensesController)
-        {
-            rootPopup.licensesController.updateLicensesPath(txtLicensesPath.text);
-        }
-
-        // Close our popup
-        rootPopup.close();
-    }
-
-
-    //--------------------------------------------------------
-    //
-    //
     // Callbacks
     //
     //
@@ -80,7 +60,7 @@ I2PopupBase {
 
     Keys.onReturnPressed: {
         //console.log("QML: Return Pressed");
-        rootPopup.validate();
+        rootPopup.close();
     }
 
 
@@ -260,7 +240,6 @@ I2PopupBase {
                                 var directoryPath = rootPopup.licensesController.selectLicensesDirectory();
                                 if (directoryPath) {
                                     txtLicensesPath.text = directoryPath;
-
                                     rootPopup.licensesController.updateLicensesPath(directoryPath);
                                 }
                             }
@@ -674,7 +653,8 @@ I2PopupBase {
                 }
 
                 onClicked: {
-                    if (rootPopup.licensesController) {
+                    if (rootPopup.licensesController)
+                    {
                         rootPopup.licensesController.importLicense();
                     }
                 }
@@ -744,7 +724,7 @@ I2PopupBase {
                 width: boundingBox.width
 
                 activeFocusOnPress: true
-                text: (rootPopup.licensesController && (rootPopup.licensesController.errorMessageWhenLicenseFailed !== "")) ? qsTr("Quit") : qsTr("OK")
+                text: qsTr("OK")
 
                 style: I2SvgButtonStyle {
                     fileCache: IngeScapeTheme.svgFileIngeScape
@@ -765,16 +745,8 @@ I2PopupBase {
                 }
 
                 onClicked: {
-                    if (rootPopup.licensesController && (rootPopup.licensesController.errorMessageWhenLicenseFailed !== ""))
-                    {
-                        console.info("QML: QUIT on License Popup")
-                        Qt.quit(); // Close main window
-                    }
-                    else
-                    {
-//                        console.log("QML: OK on License Popup")
-                        rootPopup.validate();
-                    }
+//                    console.log("QML: OK on License Popup")
+                    rootPopup.close();
                 }
             }
         }
