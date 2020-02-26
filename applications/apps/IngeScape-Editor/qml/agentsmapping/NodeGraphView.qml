@@ -39,7 +39,7 @@ Item {
     //--------------------------------
 
     // Controller associated to our view
-    property var controller: null;
+    property AgentsMappingController controller: null;
 
     // Minimum scale factor
     readonly property real minimumScale: 0.25;

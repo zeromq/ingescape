@@ -55,6 +55,8 @@ class IngeScapeEditorController : public QObject
     // Network settings - port
     I2_QML_PROPERTY(uint, port)
 
+    I2_QML_PROPERTY_READONLY(bool, ingescapeShouldBeStartedAtLaunch)
+
     // Flag indicating if the Model/View Model Visualizer is available
     I2_QML_PROPERTY_READONLY(bool, isAvailableModelVisualizer)
 
@@ -225,6 +227,17 @@ public:
      * @return
      */
     Q_INVOKABLE bool hasPlatformChanged();
+
+
+    /**
+     * @brief If _selectedNetwork not available will try to auto select another one
+     */
+    Q_INVOKABLE bool startIngeScape();
+
+    /**
+     * @brief Stop IngeScape
+     */
+    Q_INVOKABLE void stopIngeScape(bool hasToClearPlatform);
 
 
 public Q_SLOTS:
@@ -436,24 +449,11 @@ private:
      */
     QJsonDocument _getJsonOfCurrentPlatform();
 
-    /**
-     * @brief If _selectedNetwork not available will try to auto select another one
-     */
-    bool _startIngeScape();
-
 
     /**
      * @brief Restart IngeScape
      */
     bool _restartIngeScape(bool hasToClearPlatform);
-
-
-    /**
-     * @brief Stop IngeScape
-     *
-     * @param hasToClearPlatform
-     */
-    void _stopIngeScape(bool hasToClearPlatform);
 
 
 private:

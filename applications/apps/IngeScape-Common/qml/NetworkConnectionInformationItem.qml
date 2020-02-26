@@ -142,6 +142,9 @@ I2CustomRectangle {
     {
         if (!rootPrivate.isEditionModeOpened)
         {
+            // Update our list of available network devices
+            IgsNetworkController.updateAvailableNetworkDevices();
+
             // Notify change
             root.willOpenEditionMode();
 
@@ -416,7 +419,7 @@ I2CustomRectangle {
                         }
                     }
 
-                    // Text CONNECTED/DISCONNECTED
+                    // Text ONLINE/OFFLINE
                     Text {
                         id: textInfoPart1
                         anchors {
@@ -426,8 +429,8 @@ I2CustomRectangle {
                             leftMargin: 8
                         }
 
-                        text: (IgsNetworkController && IgsNetworkController.isStarted)  ? qsTr("ON-line")
-                                                                                        : qsTr("OFF-line")
+                        text: (IgsNetworkController && IgsNetworkController.isStarted)  ? qsTr("ONline")
+                                                                                        : qsTr("OFFline")
 
                         color: (IgsNetworkController && IgsNetworkController.isStarted) ? IngeScapeTheme.whiteColor
                                                                                         : IngeScapeTheme.lightGreyColor

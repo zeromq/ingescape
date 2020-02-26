@@ -105,7 +105,7 @@ I2PopupBase {
 
                 //horizontalAlignment: Text.AlignHCenter
 
-                text: qsTr("You are about to connect to the network.You can:")
+                text: qsTr("You are about to connect to the network. You can :")
 
                 color: IngeScapeTheme.whiteColor
                 font {
