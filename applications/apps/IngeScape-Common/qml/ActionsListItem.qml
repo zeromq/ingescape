@@ -150,7 +150,7 @@ Item {
                     // Open the editor of our action
                     rootItem.controller.openActionEditorWithModel(rootItem.action);
                 }
-                else if (rootItem.controller && rootItem.action )
+                else if (rootItem.controller && rootItem.action)
                 {
                     console.log("QML: play action '" + rootItem.action.name + "'");
 
@@ -309,7 +309,6 @@ Item {
 
         Row {
             id: rightRow
-
             anchors {
                 top: parent.top
                 bottom: parent.bottom
@@ -317,18 +316,19 @@ Item {
                 rightMargin: 6
             }
 
+            visible: (rootItem.actionItemIsHovered || popupActionOptions.isOpened)
+
             spacing: 12
 
             LabellessSvgButton {
                 id: playButton
-
                 anchors.verticalCenter: parent.verticalCenter
-
-                visible: rootItem.actionItemIsHovered || popupActionOptions.isOpened
 
                 pressedID: releasedID + "-pressed"
                 releasedID: "list-play"
                 disabledID: releasedID
+
+                visible: IgsNetworkController.isStarted && rightRow.visible
 
                 onClicked: {
                     console.log("QML: play action '" + rootItem.action.name + "'");
@@ -346,10 +346,7 @@ Item {
 
             LabellessSvgButton {
                 id: btnOptions
-
                 anchors.verticalCenter: parent.verticalCenter
-
-                visible: rootItem.actionItemIsHovered || popupActionOptions.isOpened
 
                 releasedID: "button-options"
                 pressedID: releasedID + "-pressed"
@@ -367,11 +364,7 @@ Item {
 
             LabellessSvgButton {
                 id: removeButton
-
                 anchors.verticalCenter: parent.verticalCenter
-
-                //visible: rootItem.actionItemIsSelected
-                visible: rootItem.actionItemIsHovered || popupActionOptions.isOpened
 
                 pressedID: releasedID + "-pressed"
                 releasedID: "delete"

@@ -97,10 +97,7 @@ Item {
                 fill : "transparent"
 
                 DropArea {
-
-                    anchors {
-                        fill : parent
-                    }
+                    anchors.fill : parent
                     enabled: model.modelM === null
 
                     keys: ["ActionsListItem"]
@@ -131,7 +128,7 @@ Item {
                 Button {
                     anchors.fill: parent
                     visible: model.modelM !== null
-                    enabled: visible
+                    enabled: visible && IgsNetworkController.isStarted
 
                     text: model.modelM ? model.modelM.name : ""
 
@@ -157,17 +154,17 @@ Item {
                     onClicked: {
                         if (controller && model.modelM)
                         {
-                            if (controller.isPlaying) {
+                            if (controller.isPlaying)
+                            {
                                 controller.addActionVMAtCurrentTime(model.modelM);
                             }
-                            else {
+                            else
+                            {
                                 controller.executeEffectsOfAction(model.modelM);
                             }
                         }
                     }
                 }
-
-
 
                 LabellessSvgButton {
                     id: btnremoveAction

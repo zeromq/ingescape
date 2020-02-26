@@ -189,7 +189,6 @@ Item {
         }
     }
 
-
     Connections {
         target: IngeScapeEditorC.licensesC.mergedLicense
 
@@ -492,6 +491,8 @@ Item {
             property string currentID : IngeScapeEditorC.scenarioC && IngeScapeEditorC.scenarioC.isPlaying ? "timeline-pause" : "timeline-play"
 
             enabled: IgsNetworkController.isStarted
+
+            opacity: enabled ? 1.0 : 0.4
 
             releasedID: currentID
             pressedID: currentID + "-pressed"
