@@ -173,127 +173,6 @@ void AbstractScenarioController::importScenarioFromJson(QJsonObject jsonScenario
 
 
 /**
- * @brief Import the executed actions for a scenario from JSON
- * @param byteArrayOfJson
- */
-void AbstractScenarioController::importExecutedActionsFromJson(int deltaTimeFromTimeLineStart, QByteArray byteArrayOfJson)
-{
-    // Clear our timeline to show only executed actions
-    _clearTimeline();
-
-    QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArrayOfJson);
-    if (jsonDocument.isObject())
-    {
-        QJsonObject jsonRoot = jsonDocument.object();
-        if (jsonRoot.contains("Actions"))
-        {
-            QJsonValue jsonExecutedActions = jsonRoot.value("Actions");
-            if (jsonExecutedActions.isArray())
-            {
-                for (QJsonValue iterator : jsonExecutedActions.toArray())
-                {
-                    QJsonObject jsonExecutedAction = iterator.toObject();
-
-                    if (jsonExecutedAction.contains("id_action") && jsonExecutedAction.contains("line_action")
-                            && jsonExecutedAction.contains("time_action"))
-                    {
-                        int actionId = jsonExecutedAction.value("id_action").toInt();
-                        int lineIndexInTimeLine = jsonExecutedAction.value("line_action").toInt();
-                        int executionTime = jsonExecutedAction.value("time_action").toInt() + deltaTimeFromTimeLineStart;
-
-                        // Reset data from our begin of our timeline for new ActionVM added
-                        ActionVM* actionAdded = addExecutedActionToTimeline(actionId, lineIndexInTimeLine, executionTime);
-                        actionAdded->resetDataFrom(deltaTimeFromTimeLineStart);
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-/**
- * @brief Import an executed action in our timeline : create a new action view model
- * ONLY if no action view model already exists for the actionID
- * at lineIndexInTimeline and executionTime
- */
-ActionVM* AbstractScenarioController::addExecutedActionToTimeline(int actionId, int lineIndexInTimeLine, int executionTime)
-{
-    qDebug() << "Executed action" << actionId << "on line" << lineIndexInTimeLine << "at" << executionTime << "ms";
-
-    // Get the list of view models of action with its (unique) id
-    QList<ActionVM*> listOfActionVM = _getListOfActionVMwithId(actionId);
-
-    // Check if the executed action has already a view model in our timeline
-    ActionVM* associatedVMAction = nullptr;
-
-    // Delta time to check if executed action has the same time that another action in timeline
-    int deltaTime = 150;
-
-    // Search if an ActionVM is already in our timeline
-    for (ActionVM* actionVM : listOfActionVM)
-    {
-        if ((actionVM != nullptr) && (actionVM->lineInTimeLine() == lineIndexInTimeLine))
-        {
-            if (((actionVM->startTime() - deltaTime) <= executionTime)
-                    && ((actionVM->startTime() + deltaTime) >= executionTime))
-            {
-                // Executed action is already in our scenario and its ValidationType is IMMEDIATE, replace it as executed
-                associatedVMAction = actionVM;
-                break;
-            }
-            else if (((actionVM->startTime() - deltaTime) <= executionTime)
-                && ((actionVM->endTime() + deltaTime) >= executionTime))
-            {
-                // Executed action is already in our scenario and its ValidationType is FOREVER OR CUSTOM , replace it as executed
-                associatedVMAction = actionVM;
-                associatedVMAction->rearmCurrentActionExecution(executionTime);
-                break;
-            }
-        }
-    }
-
-    // Associated Action VM not found, we create one
-    if (associatedVMAction == nullptr)
-    {
-        // Get the model of action with its (unique) id
-        ActionM* action = IngeScapeModelManager::instance()->getActionWithId(actionId);
-
-        // Create new Action View Model
-        if (action != nullptr) {
-            associatedVMAction = new ActionVM(action, executionTime);
-            associatedVMAction->setlineInTimeLine(lineIndexInTimeLine);
-
-            // Set end time to start time to show an IMMEDIATE action, even if its ValidationType is FOREVER OR CUSTOM
-            associatedVMAction->setendTime(executionTime);
-
-            // Add the new action VM to our hash table
-            listOfActionVM.append(associatedVMAction);
-            _hashFromUidToViewModelsOfAction.insert(actionId, listOfActionVM);
-
-            // Add the action VM to the timeline
-            _actionsInTimeLine.append(associatedVMAction);
-        }
-    }
-
-    // Feedback of executed actions in timeline
-    if ((associatedVMAction != nullptr) && (associatedVMAction->currentExecution() != nullptr))
-    {
-        associatedVMAction->currentExecution()->setisExecuted(true);
-    }
-
-    // TO FIX : Maybe more efficient ?
-    // Get the "Sorted" list of view models of action with the index of the line (in the time line)
-    /*I2CustomItemSortFilterListModel<ActionVM>* sortedListOfActionVM = _getSortedListOfActionVMwithLineIndex(lineIndexInTimeLine);
-    if (sortedListOfActionVM != nullptr)
-    {
-    }*/
-
-    return associatedVMAction;
-}
-
-
-/**
   * @brief Remove an action from the list and delete it
   * @param action
   */
@@ -1030,6 +909,25 @@ void AbstractScenarioController::_onTimeout_DelayOrExecuteActions()
 
     if (_isPlaying) {
         _timerToRegularlyDelayActions.start(INTERVAL_DELAY_ACTIONS);
+    }
+}
+
+
+void AbstractScenarioController::resetAllExecutedActionsInScenario()
+{
+    // Look for the current and futures actions
+    for (ActionVM* actionVM : _actionsInTimeLine.toList())
+    {
+        // First line is reserved for live insertions from the palette
+        if (actionVM->lineInTimeLine() == 0)
+        {
+            removeActionVMfromTimeLine(actionVM);
+        }
+        else
+        {
+            // Initialize the action view model at a specific time.
+            actionVM->resetDataFrom(0);
+        }
     }
 }
 

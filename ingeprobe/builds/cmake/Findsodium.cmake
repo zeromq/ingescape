@@ -25,8 +25,8 @@ if (WIN32)
 		# target is 32 bit
 		set(_MY_PROGRAM_FILES_PATH "ProgramFiles(x86)")
 	endif ("${CMAKE_GENERATOR}" MATCHES "(Win64|IA64)")
-	set(PC_SODIUM_INCLUDE_HINTS "$ENV{${_MY_PROGRAM_FILES_PATH}}\\Ingescape\\include\\")
-	set(PC_SODIUM_LIBRARY_HINTS "$ENV{${_MY_PROGRAM_FILES_PATH}}\\Ingescape\\lib\\")
+	set(PC_SODIUM_INCLUDE_HINTS "C:\\Users\\admin\\dev\\install_dir\\include")
+	set(PC_SODIUM_LIBRARY_HINTS "C:\\Users\\admin\\dev\\install_dir\\lib\\x64\\Debug")
 endif (WIN32)
 
 find_path (

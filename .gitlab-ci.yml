@@ -297,11 +297,9 @@ lib-windows-release-x64:
   variables:
     ARCH: "Release_x64"
   script:
-    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
-    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
-    - git clean -xfd
+    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
     - mkdir build\ReleaseX64
-    - cmake -S . -B build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
+    - cmake -S . -B build\ReleaseX64 -G"$env:CURRENT_CMAKE_GENERATOR Win64" -DCMAKE_BUILD_TYPE=Release -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
     - cmake --build build\ReleaseX64 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -319,11 +317,9 @@ lib-windows-release-x86:
   variables:
     ARCH: "Release_x86"
   script:
-    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
-    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
-    - git clean -xfd
+    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
     - mkdir build\ReleaseX86
-    - cmake -S . -B build\ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
+    - cmake -S . -B build\ReleaseX86 -G"$env:CURRENT_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
     - cmake --build build\ReleaseX86 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -341,11 +337,9 @@ lib-windows-debug-x64:
   variables:
     ARCH: "Debug_x64"
   script:
-    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
-    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
-    - git clean -xfd
+    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
     - mkdir build\DebugX64
-    - cmake -S . -B build\DebugX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Debug -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
+    - cmake -S . -B build\DebugX64 -G"$env:CURRENT_CMAKE_GENERATOR Win64" -DCMAKE_BUILD_TYPE=Debug -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
     - cmake --build build\DebugX64 --target ALL_BUILD --config Debug
   artifacts:
     paths:
@@ -363,11 +357,9 @@ lib-windows-debug-x86:
   variables:
     ARCH: "Debug_x86"
   script:
-    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
-    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x86;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
-    - git clean -xfd
+    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x86;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
     - mkdir build\DebugX86
-    - cmake -S . -B build\DebugX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Debug -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
+    - cmake -S . -B build\DebugX86 -G"$env:CURRENT_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Debug -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
     - cmake --build build\DebugX86 --target ALL_BUILD --config Debug
   artifacts:
     paths:
@@ -384,9 +376,8 @@ binding-csharp-windows-x64:
   variables:
     ARCH: "x64"
   script:
-    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
-    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
-    - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
+    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
+    - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64 -G"$env:CURRENT_CMAKE_GENERATOR Win64" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
     - Powershell.exe -executionpolicy remotesigned bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64
     - cmake --build bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64 --target IngescapeCSharp --config Release
   artifacts:
@@ -404,9 +395,8 @@ binding-csharp-windows-x86:
   variables:
     ARCH: "x86"
   script:
-    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
-    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
-    - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
+    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
+    - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86 -G"$env:CURRENT_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
     - Powershell.exe -executionpolicy remotesigned bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86
     - cmake --build bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86 --target IngescapeCSharp --config Release
   artifacts:
@@ -426,11 +416,9 @@ editor-windows-release-x86:
   tags:
     - windows
   script:
-    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
-    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
-    - git clean -xfd
+    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
     - mkdir applications\apps\IngeScape-Editor\build\ReleaseX86
-    - cmake applications\apps\IngeScape-Editor\ -B applications\apps\IngeScape-Editor\build\ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
+    - cmake applications\apps\IngeScape-Editor\ -B applications\apps\IngeScape-Editor\build\ReleaseX86 -G"$env:CURRENT_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
     - cmake --build applications\apps\IngeScape-Editor\build\ReleaseX86 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -449,11 +437,9 @@ editor-windows-release-x64:
   tags:
     - windows
   script:
-    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
-    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
-    - git clean -xfd
+    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
     - mkdir applications\apps\IngeScape-Editor\build\ReleaseX64
-    - cmake applications\apps\IngeScape-Editor\ -B applications\apps\IngeScape-Editor\build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
+    - cmake applications\apps\IngeScape-Editor\ -B applications\apps\IngeScape-Editor\build\ReleaseX64 -G"$env:CURRENT_CMAKE_GENERATOR Win64" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
     - cmake --build applications\apps\IngeScape-Editor\build\ReleaseX64 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -473,11 +459,9 @@ assessments-windows-release-x86:
   tags:
     - windows
   script:
-    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
-    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
-    - git clean -xfd
+    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
     - mkdir applications\apps\IngeScape-Assessments\build\ReleaseX86
-    - cmake applications\apps\IngeScape-Assessments\ -B applications\apps\IngeScape-Assessments\build\ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
+    - cmake applications\apps\IngeScape-Assessments\ -B applications\apps\IngeScape-Assessments\build\ReleaseX86 -G"$env:CURRENT_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
     - cmake --build applications\apps\IngeScape-Assessments\build\ReleaseX86 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -497,11 +481,9 @@ assessments-windows-release-x64:
   tags:
     - windows
   script:
-    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
-    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
-    - git clean -xfd
+    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
     - mkdir applications\apps\IngeScape-Assessments\build\ReleaseX64
-    - cmake applications\apps\IngeScape-Assessments\ -B applications\apps\IngeScape-Assessments\build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
+    - cmake applications\apps\IngeScape-Assessments\ -B applications\apps\IngeScape-Assessments\build\ReleaseX64 -G"$env:CURRENT_CMAKE_GENERATOR Win64" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
     - cmake --build applications\apps\IngeScape-Assessments\build\ReleaseX64 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -521,11 +503,9 @@ expe-windows-release-x86:
   tags:
     - windows
   script:
-    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
-    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
-    - git clean -xfd
+    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
     - mkdir applications\apps\IngeScape-Expe\build\ReleaseX86
-    - cmake applications\apps\IngeScape-Expe\ -B applications\apps\IngeScape-Expe\build\ReleaseX86 -G"%CURRENT_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
+    - cmake applications\apps\IngeScape-Expe\ -B applications\apps\IngeScape-Expe\build\ReleaseX86 -G"$env:CURRENT_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
     - cmake --build applications\apps\IngeScape-Expe\build\ReleaseX86 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -545,11 +525,9 @@ expe-windows-release-x64:
   tags:
     - windows
   script:
-    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
-    - set PATH=%PATH%;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64;%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds
-    - git clean -xfd
+    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
     - mkdir applications\apps\IngeScape-Expe\build\ReleaseX64
-    - cmake applications\apps\IngeScape-Expe\ -B applications\apps\IngeScape-Expe\build\ReleaseX64 -G"%CURRENT_CMAKE_GENERATOR% Win64" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=%CI_PIPELINE_ID%
+    - cmake applications\apps\IngeScape-Expe\ -B applications\apps\IngeScape-Expe\build\ReleaseX64 -G"$env:CURRENT_CMAKE_GENERATOR Win64" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
     - cmake --build applications\apps\IngeScape-Expe\build\ReleaseX64 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -567,7 +545,9 @@ lib-installer-runtime-windows-x86:
   tags:
     - windows
   script:
-    - cd build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..
+    - cd build\ReleaseX86
+    - cpack --config CPackConfig.cmake
+    - cd ..\..
   artifacts:
     paths:
       - build\ReleaseX86\ingescape-*.exe
@@ -585,7 +565,9 @@ lib-installer-runtime-windows-x64:
   tags:
     - windows
   script:
-    - cd build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..
+    - cd build\ReleaseX64
+    - cpack --config CPackConfig.cmake
+    - cd ..\..
   artifacts:
     paths:
       - build\ReleaseX64\ingescape-*.exe
@@ -603,7 +585,9 @@ lib-installer-debug-windows-x86:
   tags:
     - windows
   script:
-    - cd build\DebugX86 && cpack --config CPackConfig.cmake -C Debug && cd ..\..
+    - cd build\DebugX86
+    - cpack --config CPackConfig.cmake -C Debug
+    - cd ..\..
   artifacts:
     paths:
       - build\DebugX86\ingescape-*.exe
@@ -621,7 +605,9 @@ lib-installer-debug-windows-x64:
   tags:
     - windows
   script:
-    - cd build\DebugX64 && cpack --config CPackConfig.cmake -C Debug && cd ..\..
+    - cd build\DebugX64
+    - cpack --config CPackConfig.cmake -C Debug
+    - cd ..\..
   artifacts:
     paths:
       - build\DebugX64\ingescape-*.exe
@@ -639,7 +625,9 @@ binding-csharp-installer-windows-x64:
   tags:
     - windows
   script:
-    - cd bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..\..
+    - cd "bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64"
+    - cpack --config CPackConfig.cmake
+    - cd ..\..\..\..\..\..
   artifacts:
     paths:
       - bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64\IngescapeCSharp-*.exe
@@ -657,7 +645,9 @@ binding-csharp-installer-windows-x86:
   tags:
     - windows
   script:
-    - cd bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..\..
+    - cd "bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86"
+    - cpack --config CPackConfig.cmake
+    - cd ..\..\..\..\..\..
   artifacts:
     paths:
       - bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86\IngescapeCSharp-*.exe
@@ -675,7 +665,9 @@ editor-installer-windows-x86:
   tags:
     - windows
   script:
-    - cd applications\apps\IngeScape-Editor\build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
+    - cd applications\apps\IngeScape-Editor\build\ReleaseX86
+    - cpack --config CPackConfig.cmake
+    - cd ..\..\..\..\..
   artifacts:
     paths:
       - applications\apps\IngeScape-Editor\build\ReleaseX86\IngeScape-Editor-*
@@ -692,7 +684,9 @@ editor-installer-windows-x64:
   tags:
     - windows
   script:
-    - cd applications\apps\IngeScape-Editor\build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
+    - cd applications\apps\IngeScape-Editor\build\ReleaseX64
+    - cpack --config CPackConfig.cmake
+    - cd ..\..\..\..\..
   artifacts:
     paths:
       - applications\apps\IngeScape-Editor\build\ReleaseX64\IngeScape-Editor-*
@@ -709,7 +703,9 @@ assessments-installer-windows-x86:
   tags:
     - windows
   script:
-    - cd applications\apps\IngeScape-Assessments\build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
+    - cd applications\apps\IngeScape-Assessments\build\ReleaseX86
+    - cpack --config CPackConfig.cmake
+    - cd ..\..\..\..\..
   artifacts:
     paths:
       - applications\apps\IngeScape-Assessments\build\ReleaseX86\IngeScape-Assessments-*
@@ -726,7 +722,9 @@ assessments-installer-windows-x64:
   tags:
     - windows
   script:
-    - cd applications\apps\IngeScape-Assessments\build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
+    - cd applications\apps\IngeScape-Assessments\build\ReleaseX64
+    - cpack --config CPackConfig.cmake
+    - cd ..\..\..\..\..
   artifacts:
     paths:
       - applications\apps\IngeScape-Assessments\build\ReleaseX64\IngeScape-Assessments-*
@@ -743,7 +741,9 @@ expe-installer-windows-x86:
   tags:
     - windows
   script:
-    - cd applications\apps\IngeScape-Expe\build\ReleaseX86 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
+    - cd applications\apps\IngeScape-Expe\build\ReleaseX86
+    - cpack --config CPackConfig.cmake
+    - cd ..\..\..\..\..
   artifacts:
     paths:
       - applications\apps\IngeScape-Expe\build\ReleaseX86\IngeScape-Expe-*
@@ -760,7 +760,9 @@ expe-installer-windows-x64:
   tags:
     - windows
   script:
-    - cd applications\apps\IngeScape-Expe\build\ReleaseX64 && cpack --config CPackConfig.cmake && cd ..\..\..\..\..
+    - cd applications\apps\IngeScape-Expe\build\ReleaseX64
+    - cpack --config CPackConfig.cmake
+    - cd ..\..\..\..\..
   artifacts:
     paths:
       - applications\apps\IngeScape-Expe\build\ReleaseX64\IngeScape-Expe-*
@@ -775,12 +777,11 @@ lib-deploy-windows:
   tags:
     - windows
   script:
-    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
-    - copy /y src\include\*.h %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\include\ingescape\
-    - copy /y build\ReleaseX64\Release\* %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64\
-    - copy /y build\ReleaseX86\Release\* %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86\
-    - copy /y build\DebugX64\Debug\* %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x64\
-    - copy /y build\DebugX86\Debug\* %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Debug\x86\
+    - copy src\include\*.h $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\include\ingescape\ -Force
+    - copy build\ReleaseX64\Release\* $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64\ -Force
+    - copy build\ReleaseX86\Release\* $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86\ -Force
+    - copy build\DebugX64\Debug\* $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64\ -Force
+    - copy build\DebugX86\Debug\* $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x86\ -Force
   dependencies:
     - lib-windows-release-x64
     - lib-windows-release-x86
@@ -800,8 +801,7 @@ binding-deploy-windows-release-x64:
   tags:
     - windows
   script:
-    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
-    - copy /y bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64\Release\netstandard2.0\IngescapeCSharp.dll %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64\
+    - copy bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64\Release\netstandard2.0\IngescapeCSharp.dll $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64\ -Force
   dependencies:
     - binding-csharp-windows-x64
   only:
@@ -818,8 +818,7 @@ binding-deploy-windows-release-x86:
   tags:
     - windows
   script:
-    - net use %DEPLOYMENT_WINDOWS_NET_SHARE% /user:%DEPLOYMENT_WINDOWS_USER% %DEPLOYMENT_WINDOWS_PASSWORD%
-    - copy /y bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86\Release\netstandard2.0\IngescapeCSharp.dll %DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x86\
+    - copy bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86\Release\netstandard2.0\IngescapeCSharp.dll $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86\ -Force
   dependencies:
     - binding-csharp-windows-x86
   only:
@@ -834,6 +833,10 @@ binding-deploy-windows-release-x86:
 #| |____| | | | | |_| |>  <
 #|______|_|_| |_|\__,_/_/\_\
 
+##
+## x64
+##
+
 # Create ingescape library for linux (x64) from our custom libraries
 lib-build-linux-x64:
   extends: .lib-build-files
@@ -843,134 +846,13 @@ lib-build-linux-x64:
     - docker
   script:
     - mkdir -p build
-    - mkdir -p release
     - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/builds/release/linux_x64/usr/local/ -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
     - make -C build
-    - make -C build DESTDIR=$PWD/release install
-    - make -C build DESTDIR=$HOME/builds/release/linux_x64/ install
-    - cp src/include/ingescape_private.h $HOME/builds/release/linux_x64/usr/local/include/ingescape/
-    - cd release/usr/local/
-    - tar zcvf ../../../libingescape.tgz *
-    - cd ../../..
   artifacts:
     paths:
       - ./build
       - ./release
     name: "lib-build-linux-x64"
-    expire_in: 1 day
-  dependencies: []
-
-# Create ingescape library for Debian 9 (x86_64)
-lib-debian-9-release-x64:
-  extends: .lib-build-files
-  stage: lib-build
-  tags:
-    - docker
-  image: ingescape/debian-9-with-zyre
-  script:
-    - git clean -xfd
-    - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
-    - make -C build
-  artifacts:
-    paths:
-      - build
-    name: "lib-debian-9-release-x64"
-    expire_in: 1 day
-  dependencies: []
-
-# Create ingescape library for Debian 10 (x86_64)
-lib-debian-10-release-x64:
-  extends: .lib-build-files
-  stage: lib-build
-  tags:
-    - docker
-  image: ingescape/debian-10-with-zyre
-  script:
-    - git clean -xfd
-    - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
-    - make -C build
-  artifacts:
-    paths:
-      - build
-    name: "lib-debian-10-release-x64"
-    expire_in: 1 day
-  dependencies: []
-
-# Create ingescape library for CentOS 7 (x86_64)
-lib-centos-7-release-x64:
-  extends: .lib-build-files
-  stage: lib-build
-  tags:
-    - docker
-  image: ingescape/centos-7-with-zyre
-  script:
-    - git clean -xfd
-    - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
-    - make -C build
-  artifacts:
-    paths:
-      - build
-    name: "lib-centos-7-release-x64"
-    expire_in: 1 day
-  dependencies: []
-
-# Create ingescape library for linux (armv7/armhf)
-lib-linux-release-armhf:
-  extends: .lib-build-files
-  stage: lib-build
-  tags:
-    - docker
-  image: ingescape/ubuntu-x-compil-rpi
-  script:
-    - git clean -xfd
-    - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/toolchain.cmake -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
-    - make -C build
-  artifacts:
-    paths:
-      - build
-    name: "lib-linux-release-armhf"
-    expire_in: 1 day
-  dependencies: []
-
-# Create ingescape library for Raspbian 9 (armv7/armhf)
-lib-raspbian-9-release-armhf:
-  extends: .lib-build-files
-  stage: lib-build
-  tags:
-    - docker
-  image: ingescape/ubuntu-x-compil-rpi
-  script:
-    - git clean -xfd
-    - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/toolchain.cmake -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
-    - make -C build
-  artifacts:
-    paths:
-      - build
-    name: "lib-raspbian-9-release-armhf"
-    expire_in: 1 day
-  dependencies: []
-
-# Create ingescape library for Android (armv7a softfp)
-lib-android-release-armv7a-softfp:
-  extends: .lib-build-files
-  stage: lib-build
-  tags:
-    - docker
-  image: ingescape/ubuntu-x-compil-android
-  script:
-    - git clean -xfd
-    - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/${ANDROID_NDK_TOOLCHAIN_FILE} -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
-    - make -C build
-  artifacts:
-    paths:
-      - build
-    name: "lib-android-release-armv7a-softfp"
     expire_in: 1 day
   dependencies: []
 
@@ -999,65 +881,46 @@ lib-installer-linux-x64:
   dependencies:
     - lib-build-linux-x64
 
-# Create runtime install for linux 64 bits - Debian 9 (stretch)
-lib-installer-runtime-debian-9-x64:
+# Deploy ingescape to be able to compile agents
+lib-deploy-linux-release-armhf:
   extends: .lib-build-files
-  stage: lib-installer
+  stage: lib-deploy
   tags:
     - docker
-  image: ingescape/debian-9-with-zyre
+  image: ingescape/debian-testing-compil
   script:
-    - make -C build package
-    - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
-    - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
-    - mv build debian9_x64
-  artifacts:
-    paths:
-      - debian9_x64/ingescape-*
-      - debian9_x64/installIngescapeAndDependencies.sh
-    name: "lib-installer-runtime-debian-9-x64"
+    - make -C build DESTDIR=$HOME/builds/release/linux_x64/ install
+    - cp src/include/ingescape_private.h $HOME/builds/release/linux_x64/usr/local/include/ingescape/
   dependencies:
-    - lib-debian-9-release-x64
+    - lib-build-linux-x64
+  only:
+    refs:
+      - master
+      - stable
 
-# Create runtime install for linux 64 bits - Debian 10 (buster)
-lib-installer-runtime-debian-10-x64:
-  extends: .lib-build-files
-  stage: lib-installer
-  tags:
-    - docker
-  image: ingescape/debian-10-with-zyre
-  script:
-    - make -C build package
-    - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
-    - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
-    - mv build debian10_x64
-  artifacts:
-    paths:
-      - debian10_x64/ingescape-*
-      - debian10_x64/installIngescapeAndDependencies.sh
-    name: "lib-installer-runtime-debian-10-x64"
-  dependencies:
-    - lib-debian-10-release-x64
 
-# Create runtime install for linux 64 bits - CentOS
-lib-installer-runtime-centos-x64:
+##
+## armhf (RPi)
+##
+
+# Create ingescape library for linux (armv7/armhf)
+lib-linux-release-armhf:
   extends: .lib-build-files
-  stage: lib-installer
+  stage: lib-build
   tags:
     - docker
-  image: ingescape/centos-7-with-zyre
+  image: ingescape/ubuntu-x-compil-rpi
   script:
-    - make -C build package
-    - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
-    - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
-    - mv build centos7_x64
+    - git clean -xfd
+    - mkdir build
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/toolchain.cmake -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - make -C build
   artifacts:
     paths:
-      - centos7_x64/ingescape-*
-      - centos7_x64/installIngescapeAndDependencies.sh
-    name: "lib-installer-runtime-centos-x64"
-  dependencies:
-    - lib-centos-7-release-x64
+      - ./build
+    name: "lib-linux-release-armhf"
+    expire_in: 1 day
+  dependencies: []
 
 # Create runtime install for linux ARMv7 (armhf) - Generic ZIP
 lib-installer-runtime-linux-armhf:
@@ -1067,37 +930,63 @@ lib-installer-runtime-linux-armhf:
     - docker
   image: ingescape/ubuntu-x-compil-rpi
   script:
-    - make -C build package
-    - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
-    - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
+    - export INGESCAPE_MAJOR=$(grep "#define INGESCAPE_MAJOR" src/admin.c | cut -d ' ' -f3-)
+    - export INGESCAPE_MINOR=$(grep "#define INGESCAPE_MINOR" src/admin.c | cut -d ' ' -f3-)
+    - export INGESCAPE_MICRO=$(expr ${CI_PIPELINE_ID} % 1000)
+    - export INGESCAPE_VERSION=$INGESCAPE_MAJOR.$INGESCAPE_MINOR.$INGESCAPE_MICRO
+    - cd build
+    - make package
+    - tar xf ingescape-${INGESCAPE_VERSION}-Linux.tar.gz
+    - makeself --target /tmp/ingescape-${INGESCAPE_VERSION} ingescape-${INGESCAPE_VERSION}-Linux installer-ingescape-${INGESCAPE_VERSION}-linux-armhf.run "Ingescape library v${INGESCAPE_VERSION}" ./install_script.sh
+    - cd ..
     - mv build linux_armhf
   artifacts:
     paths:
-      - linux_armhf/ingescape-*
-      - linux_armhf/installIngescapeAndDependencies.sh
+      - ./linux_armhf/installer-ingescape-*.run
     name: "lib-installer-runtime-linux-armhf"
   dependencies:
     - lib-linux-release-armhf
 
-# Create runtime install for linux ARMv7 (armhf) - Raspbian 9 (stretch)
-lib-installer-runtime-raspbian-9-armhf:
+# Deploy ingescape to be able to compile agents
+lib-deploy-linux-release-armhf:
   extends: .lib-build-files
-  stage: lib-installer
+  stage: lib-deploy
   tags:
     - docker
   image: ingescape/ubuntu-x-compil-rpi
   script:
-    - make -C build package
-    - cp dependencies/unix/installIngescapeAndDependencies.sh build/installIngescapeAndDependencies.sh
-    - sed -i 's/LINUX_PACKAGE_FILE_NAME=.*/LINUX_PACKAGE_FILE_NAME="'$(ls -l build/ | grep ingescape- | rev | cut -d' ' -f 1 | cut -d'.' -f2- | rev | uniq)'"/' build/installIngescapeAndDependencies.sh
-    - mv build raspbian9_armhf
+    - make -C build install DESTDIR=~/builds/release/armhf
+    - cp src/include/ingescape_private.h ~/builds/release/armhf/usr/local/include/ingescape/
+  dependencies:
+    - lib-linux-release-armhf
+  only:
+    refs:
+      - master
+      - stable
+
+
+##
+## armv7a (Android)
+##
+
+# Create ingescape library for Android (armv7a softfp)
+lib-android-release-armv7a-softfp:
+  extends: .lib-build-files
+  stage: lib-build
+  tags:
+    - docker
+  image: ingescape/ubuntu-x-compil-android
+  script:
+    - git clean -xfd
+    - mkdir build
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/${ANDROID_NDK_TOOLCHAIN_FILE} -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - make -C build
   artifacts:
     paths:
-      - raspbian9_armhf/ingescape-*
-      - raspbian9_armhf/installIngescapeAndDependencies.sh
-    name: "lib-installer-runtime-raspbian-9-armhf"
-  dependencies:
-    - lib-raspbian-9-release-armhf
+      - build
+    name: "lib-android-release-armv7a-softfp"
+    expire_in: 1 day
+  dependencies: []
 
 # Create runtime install for Android (armv7a softfp) - Generic ZIP
 lib-installer-runtime-android-armv7a-softfp:
@@ -1116,73 +1005,23 @@ lib-installer-runtime-android-armv7a-softfp:
   dependencies:
     - lib-android-release-armv7a-softfp
 
-# Deploy ingescape in linux to be able to compile agents
-lib-deploy-debian-9-release-x64:
+# Deploy ingescape to be able to compile agents
+lib-deploy-linux-release-armv7a-softfp:
   extends: .lib-build-files
   stage: lib-deploy
   tags:
     - docker
-  image: ingescape/debian-9-with-zyre
+  image: ingescape/ubuntu-x-compil-android
   script:
-    - make -C build install DESTDIR=~/builds/release/debian9
-    - cp src/include/ingescape_private.h ~/builds/release/debian9/usr/local/include/ingescape/
+    - make -C build install DESTDIR=~/builds/release/armv7a-sf
+    - cp src/include/ingescape_private.h ~/builds/release/armv7a-sf/usr/local/include/ingescape/
   dependencies:
-    - lib-debian-9-release-x64
+    - lib-android-release-armv7a-softfp
   only:
     refs:
       - master
       - stable
 
-# Deploy ingescape in linux to be able to compile agents
-lib-deploy-debian-10-release-x64:
-  extends: .lib-build-files
-  stage: lib-deploy
-  tags:
-    - docker
-  image: ingescape/debian-10-with-zyre
-  script:
-    - make -C build install DESTDIR=~/builds/release/debian10
-    - cp src/include/ingescape_private.h ~/builds/release/debian10/usr/local/include/ingescape/
-  dependencies:
-    - lib-debian-10-release-x64
-  only:
-    refs:
-      - master
-      - stable
-
-# Deploy ingescape in linux to be able to compile agents
-lib-deploy-centos-7-release-x64:
-  extends: .lib-build-files
-  stage: lib-deploy
-  tags:
-    - docker
-  image: ingescape/centos-7-with-zyre
-  script:
-    - make -C build install DESTDIR=~/builds/release/centos7
-    - cp src/include/ingescape_private.h ~/builds/release/centos7/usr/local/include/ingescape/
-  dependencies:
-    - lib-centos-7-release-x64
-  only:
-    refs:
-      - master
-      - stable
-
-# Deploy ingescape in linux to be able to compile agents
-lib-deploy-linux-release-armhf:
-  extends: .lib-build-files
-  stage: lib-deploy
-  tags:
-    - docker
-  image: ingescape/ubuntu-x-compil-rpi
-  script:
-    - make -C build install DESTDIR=~/builds/release/armhf
-    - cp src/include/ingescape_private.h ~/builds/release/armhf/usr/local/include/ingescape/
-  dependencies:
-    - lib-linux-release-armhf
-  only:
-    refs:
-      - master
-      - stable
 
 # _____       _ _
 #|  __ \     | (_)
@@ -1225,36 +1064,10 @@ lib-delivery-all:
     - mkdir --parents library/linux_x64/
     - mv linux_x64/* library/linux_x64/
     - ls library/linux_x64/ | grep -v 'latest_delivery' > library/linux_x64/latest_delivery
-    - echo "Deliver Debian 9 x64"
-    - mkdir --parents library/debian9/
-    - mv debian9_x64/ingescape-*
-         debian9_x64/installIngescapeAndDependencies.sh
-         library/debian9/
-    - ls library/debian9/ | grep -v 'latest_delivery' > library/debian9/latest_delivery
-    - echo "Deliver Debian 10 x64"
-    - mkdir --parents library/debian10/
-    - mv debian10_x64/ingescape-*
-         debian10_x64/installIngescapeAndDependencies.sh
-         library/debian10/
-    - ls library/debian10/ | grep -v 'latest_delivery' > library/debian10/latest_delivery
-    - echo "Deliver CentOS 7 x64"
-    - mkdir --parents library/centos7
-    - mv centos7_x64/ingescape-*
-         centos7_x64/installIngescapeAndDependencies.sh
-         library/centos7/
-    - ls library/centos7/ | grep -v 'latest_delivery' > library/centos7/latest_delivery
     - echo "Deliver generic Linux armhf"
     - mkdir --parents library/linux_armhf
-    - mv linux_armhf/ingescape-*
-         linux_armhf/installIngescapeAndDependencies.sh
-         library/linux_armhf/
+    - mv linux_armhf/* library/linux_armhf/
     - ls library/linux_armhf/ | grep -v 'latest_delivery' > library/linux_armhf/latest_delivery
-    - echo "Deliver Raspbian 9 armhf"
-    - mkdir --parents library/raspbian9
-    - mv raspbian9_armhf/ingescape-*
-         raspbian9_armhf/installIngescapeAndDependencies.sh
-         library/raspbian9/
-    - ls library/raspbian9/ | grep -v 'latest_delivery' > library/raspbian9/latest_delivery
     - echo "Deliver Android armv7a (softfp)"
     - mkdir --parents library/android
     - mv android/ingescape-*
@@ -1267,11 +1080,7 @@ lib-delivery-all:
     - lib-installer-runtime-windows-x64
     - lib-installer-macos
     - lib-installer-linux-x64
-    - lib-installer-runtime-debian-9-x64
-    - lib-installer-runtime-debian-10-x64
-    - lib-installer-runtime-centos-x64
     - lib-installer-runtime-linux-armhf
-    - lib-installer-runtime-raspbian-9-armhf
     - lib-installer-runtime-android-armv7a-softfp
   only:
     refs:
@@ -1460,17 +1269,13 @@ lib-delivery-all-stable:
     - mv build/ReleaseX64/ingescape-*
          library/win64/
     - ls library/win64/ | grep -v 'latest_delivery' > library/win64/latest_delivery
-    - echo "Deliver MacOS x64"
+    - echo "Deliver macos"
     - mkdir --parents library/macos
-    - mv macos_x64/ingescape-*
-         macos_x64/installIngescapeAndDependencies.sh
-         library/macos/
+    - mv ./build/ingescape*.pkg library/macos/
     - ls library/macos/ | grep -v 'latest_delivery' > library/macos/latest_delivery
     - echo "Deliver generic Linux x64"
     - mkdir --parents library/linux_x64/
-    - mv linux_x64/ingescape-*
-         linux_x64/installIngescapeAndDependencies.sh
-         library/linux_x64/
+    - mv linux_x64/* library/linux_x64/
     - ls library/linux_x64/ | grep -v 'latest_delivery' > library/linux_x64/latest_delivery
     - echo "Deliver Debian 9 x64"
     - mkdir --parents library/debian9/
@@ -1513,11 +1318,8 @@ lib-delivery-all-stable:
     - lib-installer-runtime-windows-x86
     - lib-installer-runtime-windows-x64
     - lib-installer-macos
-    - lib-installer-runtime-debian-9-x64
-    - lib-installer-runtime-debian-10-x64
-    - lib-installer-runtime-centos-x64
+    - lib-installer-linux-x64
     - lib-installer-runtime-linux-armhf
-    - lib-installer-runtime-raspbian-9-armhf
     - lib-installer-runtime-android-armv7a-softfp
 
 # Deliver installers so they can be downloaded from the website
@@ -1532,7 +1334,7 @@ editor-delivery-all-stable:
   script:
     - echo "Setting up SSH"
     - mkdir -p ~/.ssh/
-    - echo ${STABL_SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
+    - echo ${STABLE_SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
     - umask 077
     - echo ${STABLE_SSH_SECRET} | base64 -d > ssh_secret
     - umask 022

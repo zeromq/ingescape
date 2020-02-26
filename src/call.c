@@ -233,6 +233,7 @@ int igsAgent_initCall(igsAgent_t *agent, const char *name, igsAgent_callFunction
                     t->name = strndup(name, MAX_STRING_MSG_LENGTH);
                 }
                 HASH_ADD_STR(agent->definition->calls_table, name, t);
+                agent->network_needToSendDefinitionUpdate = true;
             }
             t->cb = cb;
             t->cbData = myData;
@@ -253,6 +254,7 @@ int igsAgent_removeCall(igsAgent_t *agent, const char *name){
     }else{
         HASH_DEL(agent->definition->calls_table, t);
         call_freeCall(t);
+        agent->network_needToSendDefinitionUpdate = true;
     }
     return 1;
 }
@@ -286,6 +288,7 @@ int igsAgent_addArgumentToCall(igsAgent_t *agent, const char *callName, const ch
         a->size = 0;
         a->type = type;
         LL_APPEND(t->arguments, a);
+        agent->network_needToSendDefinitionUpdate = true;
     }
     return 1;
 }
@@ -314,6 +317,7 @@ int igsAgent_removeArgumentFromCall(igsAgent_t *agent, const char *callName, con
                 }
                 free(arg);
                 found = true;
+                agent->network_needToSendDefinitionUpdate = true;
                 break;
             }
         }

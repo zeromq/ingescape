@@ -58,6 +58,11 @@ Item {
     {
         if (IngeScapeAssessmentsC.experimentationC && IngeScapeAssessmentsC.experimentationC.sessionC)
         {
+            if (IngeScapeAssessmentsC.experimentationC.isRecorderON && IngeScapeAssessmentsC.experimentationC.isRecording)
+            {
+                IngeScapeAssessmentsC.experimentationC.stopToRecord();
+            }
+
             IngeScapeAssessmentsC.experimentationC.sessionC.currentSession = null;
         }
     }
@@ -271,7 +276,6 @@ Item {
 
         onClosed: {
             console.log("Popup displayed when an event occurs about the license(s) has just been closed");
-            licensePopup.allowsOnlyQuit = true;
             licensePopup.open();
         }
     }

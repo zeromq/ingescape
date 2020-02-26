@@ -31,10 +31,6 @@ I2PopupBase {
     // Our controller
     property LicensesController licensesController: null
 
-    // Flag indicating if we prevent the user to continue to use our Application
-    // We display only the button "Quit"
-    property bool allowsOnlyQuit: false
-
     // Property to correctly size the popup when there are several licenses to show
     property real maxHeight : parent.height - 40 // 40 to let a margin above and below our popup
 
@@ -74,20 +70,16 @@ I2PopupBase {
         if (rootPopup.licensesController) {
             txtLicensesPath.text = rootPopup.licensesController.licensesPath;
         }
-
-        // Set the focus to catch keyboard press on Return/Escape
-        rootPopup.focus = true;
+        rootPopup.focus = true; // Set the focus to catch keyboard press on Return/Escape
     }
 
     Keys.onEscapePressed: {
         //console.log("QML: Escape Pressed");
-
         rootPopup.close();
     }
 
     Keys.onReturnPressed: {
         //console.log("QML: Return Pressed");
-
         rootPopup.validate();
     }
 
@@ -121,7 +113,6 @@ I2PopupBase {
     //
     Item {
         id: containerPopup
-
         anchors {
             top: parent.top
             right: parent.right
@@ -129,24 +120,20 @@ I2PopupBase {
             left: parent.left
             leftMargin: 18
         }
-
         height: childrenRect.height
 
         // Header content : Title and license directory path
         Item {
             id: header
-
             anchors {
                 top: parent.top
                 right: parent.right
                 left: parent.left
             }
-
             height: childrenRect.height
 
             Text {
                 id: title
-
                 anchors {
                     top: parent.top
                     topMargin: 25
@@ -284,25 +271,20 @@ I2PopupBase {
 
             Item {
                 id: errorMessage
-
                 anchors {
                     top: directoryPathItem.bottom
                     topMargin: 10
                     left: parent.left
                     right: parent.right
                 }
-
                 height: (errorText.text === "") ? 0 : 30
-                visible: (errorText.text !== "")
+                visible: (rootPopup.licensesController && (rootPopup.licensesController.errorMessageWhenLicenseFailed !== ""))
 
                 SvgImage {
                     id: errorPicto
-
                     anchors.verticalCenter: parent.verticalCenter
-
-                    svgElementId : "mapping-mode-message-warning"
-
                     height: errorPicto.svgheight
+                    svgElementId : "mapping-mode-message-warning"                    
                 }
 
                 Text {
@@ -314,15 +296,6 @@ I2PopupBase {
                     }
 
                     wrapMode: Text.WordWrap
-
-                    Connections {
-                        target: rootPopup.licensesController
-
-                        onLicenseLimitationReached: {
-                            errorMessage.visible = true
-                        }
-                    }
-
                     text: rootPopup.licensesController ? rootPopup.licensesController.errorMessageWhenLicenseFailed : ""
 
                     color: IngeScapeTheme.orangeColor
@@ -333,8 +306,6 @@ I2PopupBase {
                     }
                 }
             }
-
-
 
 
             // Vertical space
@@ -352,32 +323,27 @@ I2PopupBase {
         // Content when user have one license or more
         Item {
             id: content
-
             anchors {
                 top: header.bottom
                 topMargin: 20
                 right: parent.right
                 left: parent.left
             }
-
             height: childrenRect.height
 
             visible: rootPopup.licensesController.licenseDetailsList && rootPopup.licensesController.licenseDetailsList.count > 0
 
             Column {
                 id: summary
-
                 anchors {
                     top: parent.top
                     left: parent.left
                     right: parent.right
                 }
-
                 spacing : 10
 
                 Text {
                     id : summaryTitle
-
                     anchors {
                         left: parent.left
                         leftMargin: 10
@@ -396,64 +362,52 @@ I2PopupBase {
 
                 Rectangle {
                     id: summarySeparator
-
                     anchors {
                         left: parent.left
                         right: parent.right
                     }
-
                     height: 1
-
                     color: IngeScapeTheme.whiteColor
                 }
 
                 LicenseInformationView {
                     id: summaryView
-
                     anchors {
                        right: parent.right
                        left: parent.left
                     }
-
                     licenseInformation: rootPopup.licensesController.mergedLicense
                 }
             }
 
             Item {
                 id: licensesDetails
-
                 anchors {
                     top: summary.bottom
                     topMargin : 25
                     left: parent.left
                     right: parent.right
                 }
-
                 height: childrenRect.height
 
                 Item {
                     id: onlyOneLicenseView
-
                     anchors {
                         top: parent.top
                         right: parent.right
                         left: parent.left
                     }
-
-                    visible: rootPopup.licensesController.licenseDetailsList.count === 1
-
                     height : childrenRect.height
+                    visible: rootPopup.licensesController.licenseDetailsList.count === 1
 
                     property LicenseInformationM model : rootPopup.licensesController.licenseDetailsList.count === 1 ? rootPopup.licensesController.licenseDetailsList.get(0) : null
 
                     LabellessSvgButton {
                         id: buttonDelete
-
                         anchors {
                             top: parent.top
                             right: parent.right
                         }
-
                         enabled: true
 
                         releasedID: "delete-license"
@@ -461,9 +415,6 @@ I2PopupBase {
                         disabledID: "delete-license-pressed"
 
                         onClicked: {
-                            // Disable root popup while other popup isn't closed
-                            rootPopup.enabled = false;
-
                             // Open delete confirmation popup
                             deleteConfirmationPopup.license = onlyOneLicenseView.model
                             deleteConfirmationPopup.open();
@@ -472,7 +423,6 @@ I2PopupBase {
 
                     SvgImage {
                         id: licenseFilePicto
-
                         anchors {
                             verticalCenter : buttonDelete.verticalCenter
                             left: parent.left
@@ -485,7 +435,6 @@ I2PopupBase {
 
                     Text {
                         id : licenseFileText
-
                         anchors {
                             verticalCenter: licenseFilePicto.verticalCenter
                             left: licenseFilePicto.right
@@ -504,29 +453,24 @@ I2PopupBase {
 
                     Rectangle {
                         id: endSeparator
-
                         anchors {
                             left: parent.left
                             right: parent.right
                             top: buttonDelete.bottom
                             topMargin : 10
                         }
-
                         height: 1
-
                         color: IngeScapeTheme.whiteColor
                     }
                 }
 
                 Item {
                     id: severalLicensesView
-
                     anchors {
                         top: parent.top
                         right: parent.right
                         left: parent.left
                     }
-
                     height: severalLicensesView.visible ? rootPopup.maxHeight - licensesDetails.y - content.y - footer.height
                                                         : 0 // To resize popup
 
@@ -538,7 +482,6 @@ I2PopupBase {
 
                     Text {
                         id : detailsTitle
-
                         anchors {
                             top: parent.top
                             left: parent.left
@@ -558,22 +501,18 @@ I2PopupBase {
 
                     Rectangle {
                         id: detailsSeparator
-
                         anchors {
                             left: parent.left
                             right: parent.right
                             top: detailsTitle.bottom
                             topMargin : 10
                         }
-
                         height: 1
-
                         color: IngeScapeTheme.whiteColor
                     }
 
                     ScrollView {
                         id: detailsScrollView
-
                         anchors {
                             top: detailsSeparator.bottom
                             topMargin: 10
@@ -597,12 +536,10 @@ I2PopupBase {
                                     left : parent.left
                                     right : parent.right
                                 }
-
                                 height: childrenRect.height
 
                                 ExpanderItem {
                                     id: expanderLicense
-
                                     anchors {
                                         left : parent.left
                                         right : parent.right
@@ -618,13 +555,11 @@ I2PopupBase {
 
                                     data : Item {
                                         id: expandingLicenseInfosContainer
-
                                         width: parent.width
-                                        height: expandingLicenseInfos.height + expandingLicenseInfos.anchors.topMargin + expandingLicenseInfos.anchors.bottomMargin
+                                        height: (expandingLicenseInfos.height + expandingLicenseInfos.anchors.topMargin + expandingLicenseInfos.anchors.bottomMargin)
 
                                         LicenseInformationView {
                                             id: expandingLicenseInfos
-
                                             anchors {
                                                 top: parent.top
                                                 topMargin: 10
@@ -633,7 +568,6 @@ I2PopupBase {
                                                 rightMargin: 40
                                                 left: parent.left
                                                 leftMargin: 40
-
                                             }
 
                                             simplifiedWiew: false
@@ -644,17 +578,14 @@ I2PopupBase {
 
                                 Item {
                                     id: containerButton
-
                                     anchors {
                                         top: parent.top
                                         right: parent.right
                                     }
-
                                     height: 35
 
                                     LabellessSvgButton {
                                         id: btnDeleteSeveralLicense
-
                                         anchors {
                                             right: parent.right
                                             rightMargin: 40
@@ -668,11 +599,8 @@ I2PopupBase {
                                         disabledID: "delete-license-pressed"
 
                                         onClicked: {
-                                            // Disable root popup while other popup isn't closed
-                                            rootPopup.enabled = false;
-
                                             // Open delete confirmation popup
-                                            deleteConfirmationPopup.license = model
+                                            deleteConfirmationPopup.license = model.QtObject
                                             deleteConfirmationPopup.open();
                                         }
                                     }
@@ -688,21 +616,18 @@ I2PopupBase {
         // Content when user have no license
         Item {
             id: noLicenseContent
-
             anchors.fill: content
-
             visible: !content.visible
 
             Text {
                 id: noLicenseContentText
-
                 anchors {
                     left: parent.left
                     right: parent.right
                     verticalCenter: parent.verticalCenter
                 }
 
-                text: "No license file found.\n " + rootPopup.extraInformationOnNoLicense + "\n\n\nTo change this, please set the license directory above,\ndrop a license file here \nor use the \"Import...\" button below."
+                text: qsTr("No license file found.\n " + rootPopup.extraInformationOnNoLicense + "\n\n\nTo change this, please set the license directory above,\ndrop a license file here \nor use the \"Import...\" button below.")
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
 
@@ -722,7 +647,7 @@ I2PopupBase {
                 width: boundingBox.width
 
                 activeFocusOnPress: true
-                text: "Import..."
+                text: qsTr("Import...")
 
                 anchors {
                     top: noLicenseContentText.bottom
@@ -799,34 +724,27 @@ I2PopupBase {
         // Footer content : Button "OK"
         Item {
             id: footer
-
             anchors {
                 top: content.bottom
                 right : parent.right
                 left: parent.left
             }
-
             height: 70
+
 
             Button {
                 id: okButton
-
                 anchors {
                     verticalCenter: parent.verticalCenter
                     right: parent.right
                 }
 
                 property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
-
                 height: boundingBox.height
                 width: boundingBox.width
 
                 activeFocusOnPress: true
-                text: (rootPopup.allowsOnlyQuit || (rootPopup.licensesController && !rootPopup.licensesController.isLicenseValidForAgentNeeded)) ? qsTr("Quit") : qsTr("OK")
-
-                anchors {
-                    verticalCenter: parent.verticalCenter
-                }
+                text: (rootPopup.licensesController && (rootPopup.licensesController.errorMessageWhenLicenseFailed !== "")) ? qsTr("Quit") : qsTr("OK")
 
                 style: I2SvgButtonStyle {
                     fileCache: IngeScapeTheme.svgFileIngeScape
@@ -847,12 +765,10 @@ I2PopupBase {
                 }
 
                 onClicked: {
-                    if (rootPopup.allowsOnlyQuit || (rootPopup.licensesController && !rootPopup.licensesController.isLicenseValidForAgentNeeded))
+                    if (rootPopup.licensesController && (rootPopup.licensesController.errorMessageWhenLicenseFailed !== ""))
                     {
                         console.info("QML: QUIT on License Popup")
-
-                        // Quit our application (close the main window)
-                        Qt.quit();
+                        Qt.quit(); // Close main window
                     }
                     else
                     {
@@ -869,31 +785,28 @@ I2PopupBase {
     // Delete Confirmation Popup
     //
 
-    // Feedback layer on root popup when it is disabled
-    Rectangle {
+    // Overlay layer used to display delete confirmation popup
+    I2Layer {
+        id: licensePopupLayer
         anchors.fill: parent
-
-        visible : !rootPopup.enabled
-
-        color: '#99000000';
+        objectName: "licensePopupLayer"
     }
 
     ConfirmationPopup {
         id: deleteConfirmationPopup
 
-        property var license: null
+        property LicenseInformationM license: null
 
-        confirmationText: "You will definitely lose all the rights this license grants you.\nDo you want to delete it completely?"
+        layerColor : '#99000000';
+        layerObjectName : 'licensePopupLayer';
+
+        confirmationText: qsTr("You will definitely lose all the rights this license grants you.\nDo you want to delete it completely ?")
 
         onConfirmed: {
-            rootPopup.enabled = true;
-            if (license && rootPopup.licensesController) {
+            if (deleteConfirmationPopup.license && rootPopup.licensesController)
+            {
                 rootPopup.licensesController.deleteLicense(license);
             }
-        }
-
-        onCancelled: {
-            rootPopup.enabled = true;
         }
     }
 }

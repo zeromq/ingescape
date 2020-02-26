@@ -114,21 +114,6 @@ public:
 
 
     /**
-     * @brief Import the executed actions for a scenario from JSON
-     * @param byteArrayOfJson
-     */
-    void importExecutedActionsFromJson(int deltaTimeFromTimeLineStart, QByteArray byteArrayOfJson);
-
-    /**
-
-     * @brief Import an executed action in our timeline : create a new action view model
-     * ONLY if no action view model already exists for the actionID
-     * at lineIndexInTimeline and executionTime
-     */
-    ActionVM* addExecutedActionToTimeline(int actionId, int lineIndexInTimeLine, int executionTime);
-
-
-    /**
       * @brief Remove an action from the list and delete it
       * @param action
       */
@@ -200,6 +185,9 @@ public:
      * @param lineInTimeLine
      */
     Q_INVOKABLE void executeEffectsOfAction(ActionM* action, int lineInTimeLine = 0);
+
+    void resetAllExecutedActionsInScenario();
+
 
 
 Q_SIGNALS:

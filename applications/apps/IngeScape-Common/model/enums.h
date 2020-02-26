@@ -20,6 +20,12 @@
 
 #include <I2PropertyHelpers.h>
 
+#ifdef INGESCAPE_FROM_PRI
+#include "ingescape.h"
+#else
+#include <ingescape/ingescape.h>
+#endif
+
 
 //--------------------------------
 //
@@ -57,7 +63,13 @@ I2_ENUM(AgentIOPValueTypeGroups, NUMBER, STRING, IMPULSION, DATA, MIXED, UNKNOWN
 /**
   * Types of log
   */
-I2_ENUM_CUSTOM(LogTypes, IGS_LOG_TRACE, IGS_LOG_DEBUG, IGS_LOG_INFO, IGS_LOG_WARNING, IGS_LOG_ERROR, IGS_LOG_FATAL)
+I2_ENUM_CUSTOM(LogTypes,
+               IGS_APPS_LOG_TRACE = IGS_LOG_TRACE,
+               IGS_APPS_LOG_DEBUG = IGS_LOG_DEBUG,
+               IGS_APPS_LOG_INFO = IGS_LOG_INFO,
+               IGS_APPS_LOG_WARNING = IGS_LOG_WARN,
+               IGS_APPS_LOG_ERROR = IGS_LOG_ERROR,
+               IGS_APPS_LOG_FATAL = IGS_LOG_FATAL)
 
 
 //--------------------------------

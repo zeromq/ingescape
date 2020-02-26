@@ -17,10 +17,15 @@
 
 #include <QObject>
 #include <QtQml>
+#include <QQmlPropertyMap>
 
 #include <I2PropertyHelpers.h>
 extern "C" {
-    #include <ingescape_advanced.h>
+#ifdef INGESCAPE_FROM_PRI
+#include "ingescape_advanced.h"
+#else
+#include <ingescape/ingescape_advanced.h>
+#endif
 }
 
 #include <model/enums.h>

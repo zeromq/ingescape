@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{70769A56-0F77-41E4-9152-82BCC22B9E14}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\admin\dev\ingescape\dependencies\yajl\src\api;C:\Users\admin\dev\ingescape\dependencies\yajl\src;C:\Users\admin\dev\ingescape\dependencies\windows\unix;C:\Users\admin\dev\ingescape\src\include;C:\Users\admin\dev\install_dir\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\admin\dev\install_dir\lib\x86\Debug;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\admin\dev\ingescape\dependencies\yajl\src\api;C:\Users\admin\dev\ingescape\dependencies\yajl\src;C:\Users\admin\dev\ingescape\dependencies\windows\unix;C:\Users\admin\dev\ingescape\src\include;C:\Users\admin\dev\install_dir\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(MSBuildProjectDirectory)\..\..\dependencies\yajl\src\api;$(MSBuildProjectDirectory)\..\..\dependencies\yajl\src;$(MSBuildProjectDirectory)\..\..\dependencies\windows\unix;$(MSBuildProjectDirectory)\..\..\src\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>C:\Users\admin\dev\ingescape\dependencies\yajl\src\api;C:\Users\admin\dev\ingescape\dependencies\yajl\src;C:\Users\admin\dev\ingescape\dependencies\windows\unix;C:\Users\admin\dev\ingescape\src\include;C:\Users\admin\dev\install_dir\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <AdditionalOptions>/DINGESCAPE %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalOptions>/DINGESCAPE %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalOptions>/DINGESCAPE %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\..\zyre\include;$(MSBuildProjectDirectory)\..\..\..\czmq\include;$(MSBuildProjectDirectory)\..\..\..\libzmq\include;$(MSBuildProjectDirectory)\..\..\..\libsodium\src\libsodium\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>ws2_32.lib;$(MSBuildProjectDirectory)\..\..\..\libsodium\bin\x64\Debug\v141\dynamic\libsodium.lib;$(MSBuildProjectDirectory)\..\..\..\libzmq\lib\Debug\libzmq-v141-mt-gd-4_3_3.lib;$(MSBuildProjectDirectory)\..\..\..\czmq\bin\x64\Debug\v141\dynamic\libczmq.lib;$(MSBuildProjectDirectory)\..\..\..\zyre\bin\x64\Debug\v141\dynamic\libzyre.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>MKDIR ..\..\include\ingescape
+COPY /Y ..\..\src\include\* ..\..\include\ingescape\</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalOptions>/DINGESCAPE %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\ingescape\dependencies\windows\unix\getopt.h" />
+    <ClInclude Include="..\ingescape\dependencies\windows\unix\unixfunctions.h" />
+    <ClInclude Include="..\ingescape\dependencies\yajl\src\yajl_alloc.h" />
+    <ClInclude Include="..\ingescape\dependencies\yajl\src\yajl_buf.h" />
+    <ClInclude Include="..\ingescape\dependencies\yajl\src\yajl_bytestack.h" />
+    <ClInclude Include="..\ingescape\dependencies\yajl\src\yajl_encode.h" />
+    <ClInclude Include="..\ingescape\dependencies\yajl\src\yajl_lex.h" />
+    <ClInclude Include="..\ingescape\dependencies\yajl\src\yajl_parser.h" />
+    <ClInclude Include="..\ingescape\src\include\ingescape.h" />
+    <ClInclude Include="..\ingescape\src\include\ingescape_advanced.h" />
+    <ClInclude Include="..\ingescape\src\include\ingescape_agent.h" />
+    <ClInclude Include="..\ingescape\src\include\ingescape_private.h" />
+    <ClInclude Include="..\ingescape\src\include\uthash\libut.h" />
+    <ClInclude Include="..\ingescape\src\include\uthash\ringbuf.h" />
+    <ClInclude Include="..\ingescape\src\include\uthash\utarray.h" />
+    <ClInclude Include="..\ingescape\src\include\uthash\uthash.h" />
+    <ClInclude Include="..\ingescape\src\include\uthash\utlist.h" />
+    <ClInclude Include="..\ingescape\src\include\uthash\utmm.h" />
+    <ClInclude Include="..\ingescape\src\include\uthash\utringbuffer.h" />
+    <ClInclude Include="..\ingescape\src\include\uthash\utstring.h" />
+    <ClInclude Include="..\ingescape\src\include\uthash\utvector.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\libsodium\builds\msvc\vs2017\libsodium\libsodium.vcxproj">
+      <Project>{a185b162-6cb6-4502-b03f-b56f7699a8d9}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\dependencies\windows\unix\unixfunctions.c" />
+    <ClCompile Include="..\..\dependencies\yajl\src\yajl.c" />
+    <ClCompile Include="..\..\dependencies\yajl\src\yajl_alloc.c" />
+    <ClCompile Include="..\..\dependencies\yajl\src\yajl_buf.c" />
+    <ClCompile Include="..\..\dependencies\yajl\src\yajl_encode.c" />
+    <ClCompile Include="..\..\dependencies\yajl\src\yajl_gen.c" />
+    <ClCompile Include="..\..\dependencies\yajl\src\yajl_lex.c" />
+    <ClCompile Include="..\..\dependencies\yajl\src\yajl_parser.c" />
+    <ClCompile Include="..\..\dependencies\yajl\src\yajl_tree.c" />
+    <ClCompile Include="..\..\dependencies\yajl\src\yajl_version.c" />
+    <ClCompile Include="..\..\src\admin.c" />
+    <ClCompile Include="..\..\src\agent.c" />
+    <ClCompile Include="..\..\src\bus.c" />
+    <ClCompile Include="..\..\src\call.c" />
+    <ClCompile Include="..\..\src\definition.c" />
+    <ClCompile Include="..\..\src\global.c" />
+    <ClCompile Include="..\..\src\json.c" />
+    <ClCompile Include="..\..\src\license.c" />
+    <ClCompile Include="..\..\src\mapping.c" />
+    <ClCompile Include="..\..\src\model.c" />
+    <ClCompile Include="..\..\src\monitor.c" />
+    <ClCompile Include="..\..\src\network.c" />
+    <ClCompile Include="..\..\src\parser.c" />
+    <ClCompile Include="..\..\src\performance.c" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

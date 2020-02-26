@@ -50,6 +50,33 @@ INCLUDEPATH += $$PWD/../src/include \
 
 #####################################################################
 #
+# Dependencies
+#
+#####################################################################
+
+# Include libsodium library
+!include(../../libsodium/builds/qt/libsodium.pri) {
+    error(Could not load libsodium.pri)
+}
+
+# Include ZeroMQ library
+!include(../../libzmq/builds/qt/libzmq.pri) {
+    error(Could not load libzmq.pri)
+}
+
+# Include C ZeroMQ library
+!include(../../czmq/builds/qt/czmq.pri) {
+    error(Could not load czmq.pri)
+}
+
+# Include zyre library
+!include(../../zyre/builds/qt/zyre.pri) {
+    error(Could not load zyre.pri)
+}
+
+
+#####################################################################
+#
 # OS specific rules
 #
 #####################################################################
@@ -72,14 +99,10 @@ win32:{
 
     HEADERS += $$PWD/../dependencies/windows/unix/unixfunctions.h
 
-    #Add librairies
-    LIBS += -L$$(ProgramFiles)/ingescape/lib/ -lzyre -lczmq -llibsodium
-
     #To get the Ip address into the network.c
     LIBS += -L$$C:/Windows/System32 -lwsock32 -lIPHLPAPI -lws2_32
 
-    INCLUDEPATH += $$(ProgramFiles)/ingescape/include \
-                   $$PWD/../dependencies/windows/unix \
+    INCLUDEPATH += $$PWD/../dependencies/windows/unix
 }
 
 
@@ -90,18 +113,12 @@ win32:{
 mac:{
     message("Scope is macos...")
 
-    # NB: use ios { } for ios sub-rules
-    INCLUDEPATH += /usr/local/include
-
     #
     # Option 1: generic version (relative paths)
     # - pros: add /usr/local/lib to the list of search directories of our application
     #         It can help it to find extra librairies
     #
     # - cons: may create a conflict with brew installs (libjpeg, libpng, libtiff)
-
-    #LIBS += -L/usr/local/lib -lzmq -lczmq -lzyre -lyajl
-
 
     #
     # Option 2: specific version (absolute paths)
@@ -111,17 +128,7 @@ mac:{
     # - cons: all required librairies must be linked explictly
     #         AND does not work if libraries are installed in another directory
     LIBS += -framework CoreFoundation
-    LIBS += /usr/local/lib/libczmq.dylib
-    LIBS += /usr/local/lib/libzyre.dylib
-    LIBS += /usr/local/lib/libsodium.dylib
 }
-
-unix:!mac {
-    INCLUDEPATH += /usr/local/include
-    LIBS += -lczmq -lzyre -lsodium
-}
-
-
 
 #
 # Unix except macOS and iOS
@@ -137,12 +144,7 @@ unix:!mac {
 
         message("Compilation android scope...")
 
-        INCLUDEPATH += /usr/local/include
-
         # Add librairies
         libs_path = $$PWD/../dependencies/android/libs-armeabi-v7a
-
-        #LIBS += $$quote(-L$$libs_path/) -lzmq -lczmq -lzyre -lsodium
-        LIBS += $$quote(-L$$libs_path/) -lczmq -lzyre -llibsodium \
     }
 }

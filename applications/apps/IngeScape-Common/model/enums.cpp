@@ -23,22 +23,22 @@ QString LogTypes::enumToString(int value)
 {
     switch (value)
     {
-    case LogTypes::IGS_LOG_TRACE:
+    case LogTypes::IGS_APPS_LOG_TRACE:
         return tr("TRACE");
 
-    case LogTypes::IGS_LOG_DEBUG:
+    case LogTypes::IGS_APPS_LOG_DEBUG:
         return tr("DEBUG");
 
-    case LogTypes::IGS_LOG_INFO:
+    case LogTypes::IGS_APPS_LOG_INFO:
         return tr("INFO");
 
-    case LogTypes::IGS_LOG_WARNING:
+    case LogTypes::IGS_APPS_LOG_WARNING:
         return tr("WARNING");
 
-    case LogTypes::IGS_LOG_ERROR:
+    case LogTypes::IGS_APPS_LOG_ERROR:
         return tr("ERROR");
 
-    case LogTypes::IGS_LOG_FATAL:
+    case LogTypes::IGS_APPS_LOG_FATAL:
         return tr("FATAL");
 
     default:

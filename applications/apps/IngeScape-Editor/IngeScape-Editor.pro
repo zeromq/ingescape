@@ -26,8 +26,10 @@ QT += qml quick quick-private svg xml concurrent core-private gui-private webvie
 
 CONFIG += c++11 precompiled_header
 
-# Warnings = error
-QMAKE_CXXFLAGS += -Werror
+CONFIG(release, debug|release) {
+    # Warnings = error
+    QMAKE_CXXFLAGS += -Werror
+}
 
 # Use Precompiled headers (PCH)
 PRECOMPILED_HEADER  = stable.h
@@ -152,7 +154,7 @@ INCLUDEPATH += ../../frameworks/I2Quick/include
 }
 
 
-# Include PGIMCommon library
+# Include IngeScape common library
 !include(../IngeScape-Common/IngeScape-Common.pri) {
     error(Could not load Ingescape-Common.pri)
 }
@@ -180,7 +182,7 @@ mac {
 
     # Copy libraries into the MacOS directory of our application
     # NB: libzyre, libzmq, libczmq, libsodium, have to be copied manually because macdeploy won't copy libraries referenced through @rpath
-    librariesToCopy.files += ../../frameworks/I2Quick/Mac/libI2Quick.$${QMAKE_EXTENSION_SHLIB} /usr/local/lib/libczmq.dylib /usr/local/lib/libzyre.dylib /usr/local/lib/libsodium.dylib
+    librariesToCopy.files += ../../frameworks/I2Quick/Mac/libI2Quick.$${QMAKE_EXTENSION_SHLIB}
     librariesToCopy.path = Contents/Frameworks
     QMAKE_BUNDLE_DATA += librariesToCopy
 
@@ -219,10 +221,6 @@ mac {
 #------------------------
 win32 {
     message(Windows specific rules)
-
-    # Warnings = error
-    QMAKE_CXXFLAGS -= -Werror
-#    QMAKE_CXXFLAGS += /WX
 
     # Custom DESTDIR to avoid useless files (pch, etc.)
     DESTDIR = $${OUT_PWD}/bin
@@ -305,8 +303,6 @@ win32 {
 #------------------------
 unix:!mac {
     message(Linux specific rules)
-
-    QMAKE_CXXFLAGS -= -Werror
 
     # Compute the LFLAG associated to our frameworks
     LIBS += -L../../frameworks/I2Quick/Unix -lI2Quick

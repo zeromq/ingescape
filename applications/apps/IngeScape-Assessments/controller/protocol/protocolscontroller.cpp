@@ -186,7 +186,7 @@ void ProtocolsController::duplicateProtocol(ProtocolM* protocol)
             }
 
             // Copy each dependent variables
-            for (DependentVariableM* dependentVariable : newProtocol->dependentVariables()->toList())
+            for (DependentVariableM* dependentVariable : protocol->dependentVariables()->toList())
             {
                 if (dependentVariable != nullptr)
                 {

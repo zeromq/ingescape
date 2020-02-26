@@ -277,21 +277,19 @@ void SessionController::_oncurrentSessionChanged(SessionM* previousSession, Sess
                 {
                     CassUuid cassUuidRecord = AssessmentsModelManager::qStringToCassUuid(record->uid());
 
+                    record->executionsList()->clear();
                     QList<EventM*> eventsList = AssessmentsModelManager::select<EventM>({ cassUuidRecord });
-
                     for (EventM* event : eventsList)
                     {
                         if (event->type() == 9) // 9 is for REC_ACTION_T event type
                         {
                             QList<ActionAssessmentM*> actionsList = AssessmentsModelManager::select<ActionAssessmentM> ({ cassUuidRecord, event->getTimeCassUuid()});
 
-                            // Add executed actions in our timeline
+                            // Add executed actions in our record
                             for (ActionAssessmentM* action : actionsList)
                             {
-                                // Calculate real execution time of the action
-                                int executionTime = static_cast<int>(record->beginDateTime().msecsTo(event->executionDateTime())) + record->startTimeInTimeline();
-
-                                _scenarioC->addExecutedActionToTimeline(action->actionId(), action->timelineLine(), executionTime);
+                                action->setexecutionTime(static_cast<int>(record->beginDateTime().msecsTo(event->executionDateTime())) + record->startTimeInTimeline());
+                                record->executionsList()->append(action);
                             }
                         }
                     }

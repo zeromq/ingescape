@@ -39,7 +39,6 @@
 		9762EDFA1EAE55D2002062A1 /* utstring.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79961EA7B112003153EF /* utstring.h */; };
 		9762EDFB1EAE55D2002062A1 /* utvector.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79971EA7B112003153EF /* utvector.h */; };
 		9768B2AE22830F0E00310410 /* json.c in Sources */ = {isa = PBXBuildFile; fileRef = 9768B2AD22830F0E00310410 /* json.c */; };
-		976A8FB323F1BEEB00CAA795 /* libsodium.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 976A8FAF23F1BEEB00CAA795 /* libsodium.a */; };
 		976A93DC23F3035300CAA795 /* libczmq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 976A93A423F3032F00CAA795 /* libczmq.a */; };
 		976A93DD23F3035300CAA795 /* libzmq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 976A92B523F3032300CAA795 /* libzmq.a */; };
 		976A93DE23F3035300CAA795 /* libzyre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 976A93D723F3033800CAA795 /* libzyre.a */; };
@@ -157,6 +156,7 @@
 		97ABC93C2282EC5D00215310 /* monitor.c in Sources */ = {isa = PBXBuildFile; fileRef = 97ABC93B2282EC5D00215310 /* monitor.c */; };
 		97ABC93D2282EC5D00215310 /* monitor.c in Sources */ = {isa = PBXBuildFile; fileRef = 97ABC93B2282EC5D00215310 /* monitor.c */; };
 		97C55F9D2389B8DF00D0EDB2 /* ingescape_agent.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9738215023832BBF00D466DC /* ingescape_agent.h */; };
+		97C7AAAF23F809F500DC02C2 /* libsodium.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 976A8FAF23F1BEEB00CAA795 /* libsodium.a */; };
 		97FAC32B2244C88A0036293B /* yajl.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 973D1BB22226916D00D363BF /* yajl.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		97FAC32E2247BE920036293B /* license.c in Sources */ = {isa = PBXBuildFile; fileRef = 97FAC32C2247BE920036293B /* license.c */; };
 /* End PBXBuildFile section */
@@ -1036,6 +1036,27 @@
 			proxyType = 2;
 			remoteGlobalIDString = A9EE3799F4D14C2D843CA7A0;
 			remoteInfo = zyre_selftest;
+		};
+		97C7A9E223F800A900DC02C2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 981DAA1570B249AE8F598111;
+			remoteInfo = test_peer;
+		};
+		97C7A9E423F800A900DC02C2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 660FF5770FA749F7B3C1D750;
+			remoteInfo = unittest_curve_encoding;
+		};
+		97C7A9FF23F800A900DC02C2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A93AF23F3033800CAA795 /* zyre.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 7AA950A59CED4E40BEDAD008;
+			remoteInfo = chat;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -2065,6 +2086,8 @@
 		97A2128B22391A0D00ACCFB0 /* libzyre.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libzyre.dylib; path = ../../../../../../../../../usr/local/Cellar/zyre/2.0.0/lib/libzyre.dylib; sourceTree = "<group>"; };
 		97A2128C22391A0D00ACCFB0 /* libczmq.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libczmq.dylib; path = ../../../../../../../../../usr/local/Cellar/czmq/4.2.0/lib/libczmq.dylib; sourceTree = "<group>"; };
 		97ABC93B2282EC5D00215310 /* monitor.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = monitor.c; sourceTree = "<group>"; };
+		97C7AA0123F8013800DC02C2 /* libsodium.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsodium.a; path = ../../../libsodium/src/libsodium/libs/libsodium.a; sourceTree = "<group>"; };
+		97C7AAAD23F809CC00DC02C2 /* libsodium.23.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsodium.23.dylib; path = ../../../../../../../../../usr/local/lib/libsodium.23.dylib; sourceTree = "<group>"; };
 		97C926AB1EB23ED100D2B0CE /* ingescape_private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ingescape_private.h; sourceTree = "<group>"; };
 		97FAC32C2247BE920036293B /* license.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = license.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -2074,11 +2097,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				97C7AAAF23F809F500DC02C2 /* libsodium.a in Frameworks */,
 				976A93E023F305F300CAA795 /* libc++.tbd in Frameworks */,
 				976A93DC23F3035300CAA795 /* libczmq.a in Frameworks */,
 				976A93DD23F3035300CAA795 /* libzmq.a in Frameworks */,
 				976A93DE23F3035300CAA795 /* libzyre.a in Frameworks */,
-				976A8FB323F1BEEB00CAA795 /* libsodium.a in Frameworks */,
 				973D1BB32226920700D363BF /* yajl.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2118,6 +2141,8 @@
 		9762EDE21EAE54D5002062A1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				97C7AAAD23F809CC00DC02C2 /* libsodium.23.dylib */,
+				97C7AA0123F8013800DC02C2 /* libsodium.a */,
 				976A93DF23F305F300CAA795 /* libc++.tbd */,
 				976A8FB123F1BEEB00CAA795 /* libczmq.a */,
 				976A8FAF23F1BEEB00CAA795 /* libsodium.a */,
@@ -2187,6 +2212,7 @@
 				976A92FF23F3032300CAA795 /* test_pair_inproc */,
 				976A930123F3032300CAA795 /* test_pair_ipc */,
 				976A930323F3032300CAA795 /* test_pair_tcp */,
+				97C7A9E323F800A900DC02C2 /* test_peer */,
 				976A930523F3032300CAA795 /* test_poller */,
 				976A930723F3032300CAA795 /* test_probe_router */,
 				976A930923F3032300CAA795 /* test_proxy */,
@@ -2246,6 +2272,7 @@
 				976A937523F3032300CAA795 /* test_zmq_poll_fd */,
 				976A937723F3032300CAA795 /* libtestutil.a */,
 				976A937923F3032300CAA795 /* libtestutil-static.a */,
+				97C7A9E523F800A900DC02C2 /* unittest_curve_encoding */,
 				976A937B23F3032300CAA795 /* unittest_ip_resolver */,
 				976A937D23F3032300CAA795 /* unittest_mtrie */,
 				976A937F23F3032300CAA795 /* unittest_poller */,
@@ -2274,6 +2301,7 @@
 		976A93B023F3033800CAA795 /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				97C7AA0023F800A900DC02C2 /* chat */,
 				976A93CB23F3033800CAA795 /* perf_local */,
 				976A93CD23F3033800CAA795 /* perf_remote */,
 				976A93CF23F3033800CAA795 /* zpinger */,
@@ -4614,6 +4642,27 @@
 			fileType = "compiled.mach-o.executable";
 			path = zyre_selftest;
 			remoteRef = 976A93DA23F3033800CAA795 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		97C7A9E323F800A900DC02C2 /* test_peer */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_peer;
+			remoteRef = 97C7A9E223F800A900DC02C2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		97C7A9E523F800A900DC02C2 /* unittest_curve_encoding */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = unittest_curve_encoding;
+			remoteRef = 97C7A9E423F800A900DC02C2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		97C7AA0023F800A900DC02C2 /* chat */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = chat;
+			remoteRef = 97C7A9FF23F800A900DC02C2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */

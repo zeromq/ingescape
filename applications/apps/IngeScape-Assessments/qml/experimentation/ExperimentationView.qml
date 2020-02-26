@@ -361,29 +361,6 @@ Item {
                     height: 62
 
                     style: IngeScapeAssessmentsSvgAndTextButtonStyle {
-                        text: qsTr("SUBJECTS")
-
-                        releasedID: "subjects"
-                        pressedID: releasedID
-                        rolloverID: releasedID
-                        disabledID: releasedID
-                    }
-
-                    onClicked: {
-                        console.log("QML: Open the 'Subjects View' popup");
-                        if (rootItem.experimentationC)
-                        {
-                            rootItem.experimentationC.isSelectingSessions = false // Close mode "export session"
-                        }
-                        subjectsViewPopup.open()
-                    }
-                }
-
-                Button {
-                    width: parent.width
-                    height: 62
-
-                    style: IngeScapeAssessmentsSvgAndTextButtonStyle {
                         text: qsTr("PROTOCOLS")
 
                         releasedID: "tasks"
@@ -399,6 +376,29 @@ Item {
                             rootItem.experimentationC.isSelectingSessions = false // Close mode "export session"
                         }
                         protocolsViewPopup.open();
+                    }
+                }
+
+                Button {
+                    width: parent.width
+                    height: 62
+
+                    style: IngeScapeAssessmentsSvgAndTextButtonStyle {
+                        text: qsTr("SUBJECTS")
+
+                        releasedID: "subjects"
+                        pressedID: releasedID
+                        rolloverID: releasedID
+                        disabledID: releasedID
+                    }
+
+                    onClicked: {
+                        console.log("QML: Open the 'Subjects View' popup");
+                        if (rootItem.experimentationC)
+                        {
+                            rootItem.experimentationC.isSelectingSessions = false // Close mode "export session"
+                        }
+                        subjectsViewPopup.open()
                     }
                 }
 

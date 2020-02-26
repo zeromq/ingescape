@@ -29,7 +29,9 @@ class ActionAssessmentM : public QObject
     I2_CPP_PROPERTY(int, actionId)
 
     // Action's line in timeline
-    I2_CPP_PROPERTY(int, timelineLine)
+    I2_QML_PROPERTY_READONLY(int, timelineLine)
+
+    I2_QML_PROPERTY(int, executionTime)
 
 
 public:
