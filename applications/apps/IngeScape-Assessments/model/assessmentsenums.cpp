@@ -15,7 +15,7 @@
 #include "assessmentsenums.h"
 
 /**
- * @brief Enum "LogTypes" to string
+ * @brief Enum to string
  * @param value
  * @return
  */
@@ -27,16 +27,19 @@ QString CharacteristicValueTypes::enumToString(int value)
         return tr("Unknown");
 
     case CharacteristicValueTypes::INTEGER:
-        return tr("Integer");
+        //return tr("Integer");
+        return tr("Integer number");
 
     case CharacteristicValueTypes::DOUBLE:
-        return tr("Double");
+        //return tr("Double");
+        return tr("Real number");
 
     case CharacteristicValueTypes::TEXT:
         return tr("Text");
 
     case CharacteristicValueTypes::CHARACTERISTIC_ENUM:
-        return tr("Enum");
+        //return tr("Enum");
+        return tr("Enumeration");
 
     default:
         return "";
@@ -45,7 +48,7 @@ QString CharacteristicValueTypes::enumToString(int value)
 
 
 /**
- * @brief Enum "LogTypes" to string
+ * @brief Enum to string
  * @param value
  * @return
  */
@@ -57,16 +60,49 @@ QString IndependentVariableValueTypes::enumToString(int value)
         return tr("Unknown");
 
     case IndependentVariableValueTypes::INTEGER:
-        return tr("Integer");
+        //return tr("Integer");
+        return tr("Integer number");
 
     case IndependentVariableValueTypes::DOUBLE:
-        return tr("Double");
+        //return tr("Double");
+        return tr("Real number");
 
     case CharacteristicValueTypes::TEXT:
         return tr("Text");
 
     case IndependentVariableValueTypes::INDEPENDENT_VARIABLE_ENUM:
-        return tr("Enum");
+        //return tr("Enum");
+        return tr("Enumeration");
+
+    default:
+        return "";
+    }
+}
+
+
+/**
+ * @brief Enum to string
+ * @param value
+ * @return
+ */
+QString ValueTypes::enumToString(int value)
+{
+    switch (value)
+    {
+    case ValueTypes::UNKNOWN:
+        return tr("Unknown");
+
+    case ValueTypes::INTEGER:
+        return tr("Integer number");
+
+    case ValueTypes::DOUBLE:
+        return tr("Real number");
+
+    case ValueTypes::TEXT:
+        return tr("Text");
+
+    case ValueTypes::ENUM:
+        return tr("Enumeration");
 
     default:
         return "";

@@ -32,6 +32,10 @@ I2_ENUM_CUSTOM(CharacteristicValueTypes, UNKNOWN, INTEGER, DOUBLE, TEXT, CHARACT
 I2_ENUM_CUSTOM(IndependentVariableValueTypes, UNKNOWN, INTEGER, DOUBLE, TEXT, INDEPENDENT_VARIABLE_ENUM)
 
 
+// Types of the value for a characteristic or an independent variable
+I2_ENUM_CUSTOM(ValueTypes, UNKNOWN, INTEGER, DOUBLE, TEXT, ENUM)
+
+
 /**
  * @brief The AssessmentsEnums class is a helper for enumerations and constants specific to the "Assessments" application
  */
