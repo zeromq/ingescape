@@ -420,7 +420,7 @@ void AgentsMappingController::dropLinkBetweenTwoAgents(AgentInMappingVM* outputA
 
                     if (link != nullptr)
                     {
-                        // Our igs Editor agent is Started BUT our agent is off...
+                        // Our igs Editor agent is Started OR our agent is off...
                         MappingElementVM* mappingElement = inputAgent->getRemovedMappingElementFromLinkId_WhileAgentWasOFF(linkId);
                         if (mappingElement != nullptr)
                         {
@@ -1308,81 +1308,35 @@ void AgentsMappingController::_onAgentIsONChanged(bool isON)
     if (isON && (_modelManager != nullptr))
     {
         AgentsGroupedByNameVM* agentsGroupedByName = qobject_cast<AgentsGroupedByNameVM*>(sender());
-        if ((agentsGroupedByName != nullptr) && !agentsGroupedByName->name().isEmpty())
+        AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentsGroupedByName->name());
+
+        if (_modelManager->isMappingControlled())
         {
-            AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentsGroupedByName->name());
+            // CONTROL mode
             if (agentInMapping != nullptr)
             {
-                // Agent is already in our mapping
-                if (!_modelManager->isMappingControlled())
-                {
-                    // OBSERVE mode : Reset all added and removed links while agent was OFF
-                    if ((agentInMapping != nullptr) && agentInMapping->hadLinksAdded_WhileAgentWasOFF())
-                    {
-                        // Get the list of all added link Ids while the agent was OFF
-                        QList<QString> addedLinkIds = agentInMapping->getAddedLinkIds_WhileAgentWasOFF();
-                        for (QString linkId : addedLinkIds)
-                        {
-                            qDebug() << "Remove added link" << linkId << "while the mapping was disconnected";
-
-                            // Get the view model of link which corresponds to a mapping element
-                            LinkVM* link = getLinkInMappingFromId(linkId);
-                            if (link != nullptr)
-                            {
-                                _deleteLinkBetweenTwoObjectsInMapping(link);
-                            }
-                        }
-                        agentInMapping->cancelAllAddedLinks_WhileAgentWasOFF();
-                    }
-
-                    if ((agentInMapping != nullptr) && agentInMapping->hadLinksRemoved_WhileAgentWasOFF())
-                    {
-                        // Get the list of all (view models of) removed mapping elements while the global mapping was UN-activated
-                        QList<MappingElementVM*> removedMappingElements = agentInMapping->getRemovedMappingElements_WhileAgentWasOFF();
-                        for (MappingElementVM* mappingElement : removedMappingElements)
-                        {
-                            if (mappingElement != nullptr)
-                            {
-                                qDebug() << "Add removed link" << mappingElement->name() << "while the mapping was disconnected";
-                                _linkAgentOnInputFromMappingElement(agentInMapping, mappingElement);
-                            }
-                        }
-                        agentInMapping->cancelAllRemovedLinks_WhileAgentWasOFF();
-                    }
-                }
-                else
-                {
-                    // CONTROL mode :
-                    QString jsonOfMapping = _getJSONofMappingOfAgentInGlobalMapping(agentInMapping);
-                    QString message = QString("%1%2").arg(command_LoadMapping, jsonOfMapping);
-
-                    // Send the message to the agent (list of models of agent)
-                    // FIXME: JSON can be too big for a string
-                    IngeScapeNetworkController::instance()->sendStringMessageToAgents(agentInMapping->agentsGroupedByName()->peerIdsList(), message);
-                }
+                // The agent is already in our global mapping : Send the message "LOAD THIS MAPPING" to this agent with our current mapping
+                QString jsonOfMapping = _getJSONofMappingOfAgentInGlobalMapping(agentInMapping);
+                QString message = QString("%1%2").arg(command_LoadMapping, jsonOfMapping);
+                IngeScapeNetworkController::instance()->sendStringMessageToAgents(agentsGroupedByName->peerIdsList(), message); // FIXME: JSON can be too big for a string
             }
             else
             {
-                // Agent is NOT in our mapping
-                if (!_modelManager->isMappingControlled())
-                {
-                    // OBSERVE mode : Add it in our mapping mode in OBSERVE mode
-                    double randomMax = static_cast<double>(RAND_MAX);
-
-                    // Get a random position in the current window
-                    QPointF position = _getRandomPosition(randomMax);
-                    // Default with of the new agent
-                    qreal width = AgentInMappingVM::DEFAULT_WIDTH;
-
-                    // Create a new agent in the global mapping (with an "Agents Grouped by Name") at a specific position
-                    agentInMapping = _createAgentInMappingAtPosition(agentsGroupedByName, position, width);
-                    if (agentInMapping != nullptr)
-                    {
-                        // Link the agent in the global mapping on its inputs (add all missing links TO the agent) and on its outputs (add all missing links FROM the agent)
-                        _linkAgentOnInputs(agentInMapping);
-                        _linkAgentOnOutputs(agentInMapping);
-                    }
-                }
+                // The agent is NOT in the global mapping : Send the message "Clear Mapping" to this agent
+                IngeScapeNetworkController::instance()->sendStringMessageToAgents(agentsGroupedByName->peerIdsList(), command_ClearMapping);
+            }
+        }
+        else {
+            // OBSERVE mode
+            if (agentInMapping != nullptr)
+            {
+                // The agent is already in the global mapping
+                _cancelAllAddedAndRemovedLink_WhileAgentWasOFF(agentInMapping);
+            }
+            else
+            {
+                // The agent is NOT in the global mapping
+                _addAgentInGlobalMappingWithMissingLink(agentsGroupedByName);
             }
         }
     }
@@ -1391,80 +1345,48 @@ void AgentsMappingController::_onAgentIsONChanged(bool isON)
 
 /**
  * @brief Slot called when a model of agent "ON" has been added to an agent(s grouped by name)
- * @param model
  */
 void AgentsMappingController::_onAgentModelONhasBeenAdded(AgentM* model)
 {
     // Model of Agent ON
-    if ((model != nullptr) && model->isON() && !model->name().isEmpty() && !model->peerId().isEmpty()
-            && IngeScapeNetworkController::instance()->isStarted()) // TODO Verify ne devrait jamais arriver
+    if ((model != nullptr) && model->isON() && !model->name().isEmpty() && !model->peerId().isEmpty() && (_modelManager != nullptr))
     {
         QString agentName = model->name();
 
         // Get the (view model of) agent in the global mapping from the agent name
         AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);
 
-        // CONTROL
-        if ((_modelManager != nullptr) && _modelManager->isMappingControlled())
+        if (_modelManager->isMappingControlled())
         {
-            // The agent is already in the global mapping
+            // CONTROL mode
             if (agentInMapping != nullptr)
             {
-                qDebug() << "CONTROL:" << agentName << "is ON and in the global mapping --> LOAD the MAPPING !";
-
-                // Get the JSON of the mapping of the agent as displayed in the global mapping
+                // The agent is already in our global mapping : Send the message "LOAD THIS MAPPING" to this agent with our current mapping
                 QString jsonOfMapping = _getJSONofMappingOfAgentInGlobalMapping(agentInMapping);
-
                 QString message = QString("%1%2").arg(command_LoadMapping, jsonOfMapping);
-
-                // Send the message "LOAD THIS MAPPING" to this agent
-                // FIXME: JSON can be too big for a string
-                IngeScapeNetworkController::instance()->sendStringMessageToAgent(model->peerId(), message);
+                IngeScapeNetworkController::instance()->sendStringMessageToAgent(model->peerId(), message); // FIXME: JSON can be too big for a string
             }
-            // The agent is NOT in the global mapping
             else
             {
-                qDebug() << "CONTROL:" << agentName << "is ON but NOT in the global mapping --> CLEAR its MAPPING !";
-
-                // Send the message "Clear Mapping" to this agent
+                // The agent is NOT in the global mapping : Send the message "Clear Mapping" to this agent
                 IngeScapeNetworkController::instance()->sendStringMessageToAgent(model->peerId(), command_ClearMapping);
             }
         }
-        // OBSERVE
         else
         {
-            // The agent is already in the global mapping
+            // OBSERVE mode
             if (agentInMapping != nullptr)
             {
-                qDebug() << "OBSERVE:" << agentName << "is ON and in the global mapping --> Nothing to do";
+                // The agent is already in the global mapping
+                _cancelAllAddedAndRemovedLink_WhileAgentWasOFF(agentInMapping);
             }
-            // The agent is NOT in the global mapping
             else
             {
-                qDebug() << "OBSERVE:" << agentName << "is ON but NOT in the global mapping --> ADD to the global mapping !";
-
-                double randomMax = static_cast<double>(RAND_MAX);
-
-                // Get a random position in the current window
-                QPointF position = _getRandomPosition(randomMax);
-                // Default with of the new agent
-                qreal width = AgentInMappingVM::DEFAULT_WIDTH;
-
-                // Get the (view model of) agents grouped for the name
+                // The agent is NOT in the global mapping
                 AgentsGroupedByNameVM* agentsGroupedByName = IngeScapeModelManager::instance()->getAgentsGroupedForName(agentName);
                 if (agentsGroupedByName != nullptr)
                 {
-                    // Create a new agent in the global mapping (with an "Agents Grouped by Name") at a specific position
-                    agentInMapping = _createAgentInMappingAtPosition(agentsGroupedByName, position, width);
-                    if (agentInMapping != nullptr)
-                    {
-                        // No need to add links on inputs now, because the mapping will be received after the creation of this agent(s grouped by name)
-                        // Link the agent in the global mapping on its inputs (add all missing links TO the agent)
-                        _linkAgentOnInputs(agentInMapping);
-
-                        // Link the agent in the global mapping on its outputs (add all missing links FROM the agent)
-                        _linkAgentOnOutputs(agentInMapping);
-                    }
+                    _addAgentInGlobalMappingWithMissingLink(agentsGroupedByName);
                 }
             }
         }
@@ -2008,53 +1930,6 @@ void AgentsMappingController::_removeAllLinksWithAgent(AgentInMappingVM* agent)
 
 
 /**
- * @brief Update the global mapping with agents ON and their links
- */
-void AgentsMappingController::_updateMappingWithAgentsONandLinks()
-{
-    double randomMax = static_cast<double>(RAND_MAX);
-
-    // Traverse the list of all "agents grouped by name"
-    for (AgentsGroupedByNameVM* agentsGroupedByName : IngeScapeModelManager::instance()->allAgentsGroupsByName()->toList())
-    {
-        // Only when the agent(s) is ON
-        if ((agentsGroupedByName != nullptr) && agentsGroupedByName->isON() && !agentsGroupedByName->name().isEmpty())
-        {
-            AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentsGroupedByName->name());
-
-            // This agent(s) is NOT yet in the global mapping
-            if (agentInMapping == nullptr)
-            {
-                // Get a random position in the current window
-                QPointF position = _getRandomPosition(randomMax);
-                // Default with of the new agent
-                qreal width = AgentInMappingVM::DEFAULT_WIDTH;
-
-                // Create a new agent in the global mapping (with an "Agents Grouped by Name") at a specific position
-                _createAgentInMappingAtPosition(agentsGroupedByName, position, width);
-            }
-        }
-    }
-
-    // Link all agents in the global mapping
-    for (AgentInMappingVM* agentInMapping : _allAgentsInMapping.toList())
-    {
-        if (agentInMapping != nullptr)
-        {
-            // Link the agent in the global mapping on its inputs (add all missing links TO the agent)
-            _linkAgentOnInputs(agentInMapping);
-
-            // Link the agent in the global mapping on its outputs (add all missing links FROM the agent)
-            _linkAgentOnOutputs(agentInMapping);
-        }
-    }
-
-    // Notify the QML to fit the view
-    Q_EMIT fitToView();
-}
-
-
-/**
  * @brief Link an agent (in the global mapping) on its inputs (add all missing links TO an agent)
  * @param agentInMapping
  */
@@ -2439,3 +2314,72 @@ QString AgentsMappingController::_getJSONofMappingOfAgentInGlobalMapping(AgentIn
     return jsonOfMapping;
 }
 
+
+/**
+ * @brief Usefull when we are in "OBSERVE" mode and a new agent is coming on the network and it was not present in the mapping
+ */
+void AgentsMappingController::_addAgentInGlobalMappingWithMissingLink(AgentsGroupedByNameVM* agentsGroupedByName)
+{
+    if (agentsGroupedByName != nullptr)
+    {
+        double randomMax = static_cast<double>(RAND_MAX);
+
+        // Get a random position in the current window
+        QPointF position = _getRandomPosition(randomMax);
+        // Default with of the new agent
+        qreal width = AgentInMappingVM::DEFAULT_WIDTH;
+
+        // Create a new agent in the global mapping (with an "Agents Grouped by Name") at a specific position
+        AgentInMappingVM* agentInMapping = _createAgentInMappingAtPosition(agentsGroupedByName, position, width);
+        if (agentInMapping != nullptr)
+        {
+            // Link the agent in the global mapping on its inputs (add all missing links TO the agent) and on its outputs (add all missing links FROM the agent)
+            _linkAgentOnInputs(agentInMapping);
+            _linkAgentOnOutputs(agentInMapping);
+        }
+    }
+
+    // Notify the QML to fit the view
+    Q_EMIT fitToView();
+}
+
+
+/**
+ * @brief Usefull when we are in "OBSERVE" mode and a new agent is comming on the network and it was not present in the mapping
+ */
+void AgentsMappingController::_cancelAllAddedAndRemovedLink_WhileAgentWasOFF(AgentInMappingVM* agentInMapping)
+{
+    if (agentInMapping != nullptr)
+    {
+        if (agentInMapping->hadLinksAdded_WhileAgentWasOFF())
+        {
+            // Get the list of all added link Ids while the agent was OFF
+            QList<QString> addedLinkIds = agentInMapping->getAddedLinkIds_WhileAgentWasOFF();
+            for (QString linkId : addedLinkIds)
+            {
+                qDebug() << "Remove added link" << linkId << "while the agent was OFF";
+                LinkVM* link = getLinkInMappingFromId(linkId);
+                if (link != nullptr)
+                {
+                    _deleteLinkBetweenTwoObjectsInMapping(link);
+                }
+            }
+            agentInMapping->cancelAllAddedLinks_WhileAgentWasOFF();
+        }
+
+        if (agentInMapping->hadLinksRemoved_WhileAgentWasOFF())
+        {
+            // Get the list of all (view models of) removed mapping elements while the global mapping was UN-activated
+            QList<MappingElementVM*> removedMappingElements = agentInMapping->getRemovedMappingElements_WhileAgentWasOFF();
+            for (MappingElementVM* mappingElement : removedMappingElements)
+            {
+                if (mappingElement != nullptr)
+                {
+                    qDebug() << "Add removed link" << mappingElement->name() << "while the agent was OFF";
+                    _linkAgentOnInputFromMappingElement(agentInMapping, mappingElement);
+                }
+            }
+            agentInMapping->cancelAllRemovedLinks_WhileAgentWasOFF();
+        }
+    }
+}

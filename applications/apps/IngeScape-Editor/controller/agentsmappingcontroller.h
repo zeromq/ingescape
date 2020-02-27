@@ -418,12 +418,6 @@ private:
 
 
     /**
-     * @brief Update the global mapping with agents ON and their links
-     */
-    void _updateMappingWithAgentsONandLinks();
-
-
-    /**
      * @brief Link an agent (in the global mapping) on its inputs (add all missing links TO an agent)
      * @param agentInMapping
      */
@@ -505,6 +499,16 @@ private:
      * @return
      */
     QString _getJSONofMappingOfAgentInGlobalMapping(AgentInMappingVM* agentInMapping);
+
+    /**
+     * @brief Usefull when we are in "OBSERVE" mode and a new agent is coming on the network and it was not present in the mapping
+     */
+    void _addAgentInGlobalMappingWithMissingLink(AgentsGroupedByNameVM* agentsGroupedByName);
+
+    /**
+     * @brief Usefull when we are in "OBSERVE" mode and a new agent is comming on the network and it was not present in the mapping
+     */
+    void _cancelAllAddedAndRemovedLink_WhileAgentWasOFF(AgentInMappingVM* agentInMapping);
 
 
 private:
