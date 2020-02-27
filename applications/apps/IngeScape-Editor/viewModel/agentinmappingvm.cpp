@@ -307,6 +307,16 @@ MappingElementVM* AgentInMappingVM::getRemovedMappingElementFromLinkId_WhileAgen
 
 
 /**
+ * @brief Get the list of all (view models of) removed mapping elements while the agent was OFF
+ * @return
+ */
+QList<MappingElementVM*> AgentInMappingVM::getRemovedMappingElements_WhileAgentWasOFF()
+{
+    return _hashFromLinkIdToRemovedMappingElement_WhileAgentWasOFF.values();
+}
+
+
+/**
  * @brief Get the list of all names of removed mapping elements while the agent was OFF
  */
 QStringList AgentInMappingVM::getNamesOfRemovedMappingElements_WhileAgentWasOFF()

@@ -170,6 +170,13 @@ public:
 
 
     /**
+     * @brief Get the list of all (view models of) removed mapping elements while the agent was OFF
+     * @return
+     */
+    QList<MappingElementVM*> getRemovedMappingElements_WhileAgentWasOFF();
+
+
+    /**
      * @brief Get the list of all names of removed mapping elements while the agent was OFF
      */
     QStringList getNamesOfRemovedMappingElements_WhileAgentWasOFF();

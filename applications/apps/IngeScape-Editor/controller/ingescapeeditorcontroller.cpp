@@ -244,7 +244,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_licensesC, &LicensesController::licenseLimitationReached, this, &IngeScapeEditorController::_onLicenseLimitationReached);
 
     // Connect to signals from network controllers
-    connect(ingeScapeNetworkC, &IngeScapeNetworkController::isStartedChanged, _agentsMappingC, &AgentsMappingController::onEditorAgentStartedChanged);
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::isStartedChanged, this, &IngeScapeEditorController::_onAgentEditorStartedOrStopped);
 
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::networkDeviceIsNotAvailable, this, &IngeScapeEditorController::_onNetworkDeviceIsNotAvailable);

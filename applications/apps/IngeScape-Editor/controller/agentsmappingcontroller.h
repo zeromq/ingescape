@@ -248,12 +248,6 @@ Q_SIGNALS:
 public Q_SLOTS:
 
     /**
-     * @brief Slot called when our igs Editor agent is started or stopped
-     */
-    void onEditorAgentStartedChanged(bool isStarted);
-
-
-    /**
      * @brief Slot called when a new view model of agents grouped by name has been created
      * @param agentsGroupedByName
      */
