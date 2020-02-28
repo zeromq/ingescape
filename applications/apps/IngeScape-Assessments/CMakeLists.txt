@@ -389,7 +389,7 @@ if (APPLE)
             add_custom_command(
                 TARGET ${PROJECT_NAME}
                 POST_BUILD
-                COMMAND ${CMAKE_INSTALL_NAME_TOOL} -change `otool -L $<TARGET_FILE_DIR:${PROJECT_NAME}>/../Frameworks/libssl.1.0.0.dylib | grep libcrypto.1.0.0.dylib | cut -f 1 -d ' '` "@executable_path/../Frameworks/libcrypto.1.0.0.dylib" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Frameworks/libssl.1.0.0.dylib"
+                COMMAND ${CMAKE_INSTALL_NAME_TOOL} -change `otool -L $<TARGET_FILE_DIR:${PROJECT_NAME}>/../Frameworks/libssl.1.1.dylib | grep libcrypto.1.1.dylib | cut -f 1 -d ' '` "@executable_path/../Frameworks/libcrypto.1.1.dylib" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Frameworks/libssl.1.1.dylib"
             )
         endif()
 
