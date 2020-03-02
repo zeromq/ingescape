@@ -147,7 +147,7 @@ public:
     /**
      * @brief Delete agents OFF
      */
-    void deleteAgentsOFF();
+    Q_INVOKABLE void deleteAgentsOFF();
 
 
     /**

@@ -154,6 +154,7 @@ Rectangle {
     //
     //--------------------------------
 
+    signal deleteAgentInMapping();
 
 
     //--------------------------------
@@ -1002,10 +1003,9 @@ Rectangle {
             releasedID: "delete"
             disabledID : releasedID
 
-
             opacity: rootItem.agentItemIsHovered ? 1 : 0
 
-            visible: (opacity !== 0)
+            visible: (rootItem.agentsGroupedByName && !rootItem.agentsGroupedByName.isON)
             enabled: visible
 
             Behavior on opacity {
@@ -1013,11 +1013,7 @@ Rectangle {
             }
 
             onClicked: {
-                if (controller)
-                {
-                    // Delete our agent
-                    controller.deleteAgentInMapping(rootItem.agentMappingVM);
-                }
+                rootItem.deleteAgentInMapping()
             }
         }
 
@@ -1139,5 +1135,4 @@ Rectangle {
             }
         }
     }
-
 }

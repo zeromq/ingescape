@@ -783,6 +783,11 @@ Item {
                                 setZoomLevel(1)
                             }
                         }
+
+                        onDeleteAgentInMapping: {
+                            deleteConfirmationPopup.myAgent = agent.agentsGroupedByName;
+                            deleteConfirmationPopup.open();
+                        }
                     }
                 }
 
@@ -837,8 +842,23 @@ Item {
                              (dropGhost.agent && IngeScapeEditorC.agentsMappingC && !IngeScapeEditorC.agentsMappingC.getAgentInMappingFromName(dropGhost.agent.name))
             }
         }
+    }
 
+    //
+    // Popup about Delete Confirmation
+    //
+    ConfirmationPopup {
+        id: deleteConfirmationPopup
 
+        property AgentsGroupedByNameVM myAgent: null;
 
+        confirmationText: "This agent is used in the platform.\nDo you want to completely delete it?"
+
+        onConfirmed: {
+            if (deleteConfirmationPopup.myAgent)
+            {
+                deleteConfirmationPopup.myAgent.deleteAgentsOFF();
+            }
+        }
     }
 }
