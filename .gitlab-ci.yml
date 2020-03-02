@@ -866,8 +866,7 @@ lib-installer-linux-x64:
   script:
     - export INGESCAPE_MAJOR=$(grep "#define INGESCAPE_MAJOR" src/admin.c | cut -d ' ' -f3-)
     - export INGESCAPE_MINOR=$(grep "#define INGESCAPE_MINOR" src/admin.c | cut -d ' ' -f3-)
-    - export INGESCAPE_MICRO=$(expr ${CI_PIPELINE_ID} % 1000)
-    - export INGESCAPE_VERSION=$INGESCAPE_MAJOR.$INGESCAPE_MINOR.$INGESCAPE_MICRO
+    - export INGESCAPE_VERSION=$INGESCAPE_MAJOR.$INGESCAPE_MINOR.$CI_PIPELINE_ID
     - cd build
     - make package
     - tar xf ingescape-${INGESCAPE_VERSION}-Linux.tar.gz
@@ -932,8 +931,7 @@ lib-installer-runtime-linux-armhf:
   script:
     - export INGESCAPE_MAJOR=$(grep "#define INGESCAPE_MAJOR" src/admin.c | cut -d ' ' -f3-)
     - export INGESCAPE_MINOR=$(grep "#define INGESCAPE_MINOR" src/admin.c | cut -d ' ' -f3-)
-    - export INGESCAPE_MICRO=$(expr ${CI_PIPELINE_ID} % 1000)
-    - export INGESCAPE_VERSION=$INGESCAPE_MAJOR.$INGESCAPE_MINOR.$INGESCAPE_MICRO
+    - export INGESCAPE_VERSION=$INGESCAPE_MAJOR.$INGESCAPE_MINOR.$CI_PIPELINE_ID
     - cd build
     - make package
     - tar xf ingescape-${INGESCAPE_VERSION}-Linux.tar.gz
