@@ -209,6 +209,10 @@ if(INGESCAPE_BUILD_SHARED)
     set_target_properties(${PROJECT_NAME}
                           PROPERTIES PUBLIC_HEADER
                                      "${public_headers}"
+                                     #FRAMEWORK TRUE
+                                     #FRAMEWORK_VERSION C
+                                     #MACOSX_FRAMEWORK_IDENTIFIER com.ingescape
+                                     #XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "MyAccount Developer"
                                      DEFINE_SYMBOL
                                      "INGESCAPE_EXPORTS"
                                      SOVERSION
@@ -225,6 +229,8 @@ if(INGESCAPE_BUILD_SHARED)
 
   install(TARGETS ${PROJECT_NAME}
           EXPORT ${PROJECT_NAME}-targets
+          FRAMEWORK DESTINATION "Frameworks" # .framework file
+                  COMPONENT library
           LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
                   COMPONENT library
           ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
