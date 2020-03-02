@@ -48,8 +48,6 @@ if (APPLE)
     math(EXPR pipeline_id1 "${pipeline_id} / 1000" OUTPUT_FORMAT DECIMAL)
     math(EXPR pipeline_id2 "${pipeline_id} % 1000" OUTPUT_FORMAT DECIMAL)
     set(pipeline_id "${pipeline_id1}.${pipeline_id2}")
-elseif (MSVC)
-    set(pipeline_id "0.${pipeline_id}")
 endif ()
 
 # Macro to get ingescape editor version from pro file
