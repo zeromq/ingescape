@@ -39,10 +39,16 @@ macro(add_ingescape_common_ressources _RESSOURCES)
 endmacro()
 
 if (${CI_PIPELINE_ID})
-    math(EXPR moduloed_pipeline_id "${CI_PIPELINE_ID} % 1000" OUTPUT_FORMAT DECIMAL)
+    math(EXPR pipeline_id "${CI_PIPELINE_ID}" OUTPUT_FORMAT DECIMAL)
 else()
-    set(moduloed_pipeline_id "0")
+    set(pipeline_id "0")
 endif()
+
+if (APPLE)
+    math(EXPR pipeline_id1 "${pipeline_id} / 1000" OUTPUT_FORMAT DECIMAL)
+    math(EXPR pipeline_id2 "${pipeline_id} % 1000" OUTPUT_FORMAT DECIMAL)
+    set(pipeline_id "${pipeline_id1}.${pipeline_id2}")
+endif ()
 
 # Macro to get ingescape editor version from pro file
 macro(get_ingescape_editor_version _MAJOR _MINOR _PATCH _BUILD)
@@ -51,9 +57,7 @@ macro(get_ingescape_editor_version _MAJOR _MINOR _PATCH _BUILD)
     set(${_MAJOR} ${CMAKE_MATCH_1})
     string(REGEX MATCH "VERSION_MINOR = ([0-9]*)" _ ${_EDITOR_PRO_CONTENT})
     set(${_MINOR} ${CMAKE_MATCH_1})
-    set(${_PATCH} ${moduloed_pipeline_id})
-    string(REGEX MATCH "VERSION_BUILD = ([0-9]*)" _ ${_EDITOR_PRO_CONTENT})
-    set(${_BUILD} ${CMAKE_MATCH_1})
+    set(${_BUILD} ${pipeline_id})
 endmacro()
 
 # Macro to get ingescape assessments version from pro file
