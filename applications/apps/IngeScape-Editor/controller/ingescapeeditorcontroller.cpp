@@ -989,9 +989,6 @@ bool IngeScapeEditorController::startIngeScape()
 }
 
 
-/**
- * @brief Stop IngeScape
- */
 void IngeScapeEditorController::stopIngeScape(bool hasToClearPlatform)
 {
     IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
@@ -1020,6 +1017,21 @@ void IngeScapeEditorController::stopIngeScape(bool hasToClearPlatform)
             clearCurrentPlatform();
         }
     }
+}
+
+
+bool IngeScapeEditorController::restartIngeScape(bool hasToClearPlatform)
+{
+    if (hasToClearPlatform)
+    {
+        qInfo() << "Restart the network on" << _networkDevice << "with" << _port << "(and CLEAR the current platform)";
+    }
+    else
+    {
+        qInfo() << "Restart the network on" << _networkDevice << "with" << _port << "(and KEEP the current platform)";
+    }
+    stopIngeScape(hasToClearPlatform);
+    return startIngeScape();
 }
 
 
@@ -1491,7 +1503,7 @@ void IngeScapeEditorController::_onLicensesUpdated()
     qDebug() << "on License Updated";
     if (IngeScapeNetworkController::instance()->isStarted())
     {
-        _restartIngeScape(false);
+        restartIngeScape(false);
     }
 }
 
@@ -1543,7 +1555,7 @@ void IngeScapeEditorController::_onNetworkDeviceIpAddressHasChanged()
 
     if (IngeScapeNetworkController::instance()->isStarted())
     {
-        _restartIngeScape(false);
+        restartIngeScape(false);
     }
 }
 
@@ -1822,19 +1834,3 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
 }
 
 
-/**
- * @brief Restart IngeScape
- */
-bool IngeScapeEditorController::_restartIngeScape(bool hasToClearPlatform)
-{
-    if (hasToClearPlatform)
-    {
-        qInfo() << "Restart the network on" << _networkDevice << "with" << _port << "(and CLEAR the current platform)";
-    }
-    else
-    {
-        qInfo() << "Restart the network on" << _networkDevice << "with" << _port << "(and KEEP the current platform)";
-    }
-    stopIngeScape(hasToClearPlatform);
-    return startIngeScape();
-}

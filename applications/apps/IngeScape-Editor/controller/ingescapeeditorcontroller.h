@@ -234,10 +234,8 @@ public:
      */
     Q_INVOKABLE bool startIngeScape();
 
-    /**
-     * @brief Stop IngeScape
-     */
     Q_INVOKABLE void stopIngeScape(bool hasToClearPlatform);
+    Q_INVOKABLE bool restartIngeScape(bool hasToClearPlatform);
 
 
 public Q_SLOTS:
@@ -454,12 +452,6 @@ private:
      * @return
      */
     QJsonDocument _getJsonOfCurrentPlatform();
-
-
-    /**
-     * @brief Restart IngeScape
-     */
-    bool _restartIngeScape(bool hasToClearPlatform);
 
 
 private:
