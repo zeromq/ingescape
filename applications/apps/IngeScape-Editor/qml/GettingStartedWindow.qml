@@ -22,7 +22,7 @@ import I2Quick 1.0
 import INGESCAPE 1.0
 
 
-Window {
+WindowBlockTouches {
     id: rootItem
 
     title: qsTr("Getting started")

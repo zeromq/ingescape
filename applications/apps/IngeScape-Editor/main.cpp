@@ -151,7 +151,8 @@ void registerCustomQmlTypes()
     //
     //----------------
     qmlRegisterType<CollapsibleColumn>("INGESCAPE", 1, 0, "CollapsibleColumn");
-    qmlRegisterType<QQuickWindowBlockTouches>("INGESCAPE", 1, 0, "WindowBlockTouches");
+    qmlRegisterRevision<QQuickWindow, 1>("INGESCAPE", 1, 0);
+    qmlRegisterType<QQuickWindowBlockTouches, 1>("INGESCAPE", 1, 0, "WindowBlockTouches");
     qmlRegisterType<TextFieldDoubleValidator>("INGESCAPE", 1, 0, "TextFieldDoubleValidator");
     qmlRegisterSingletonType<NumberConstants>("INGESCAPE", 1, 0, "NumberConstants", &NumberConstants::qmlSingleton);
 

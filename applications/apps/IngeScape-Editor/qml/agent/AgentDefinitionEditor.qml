@@ -24,7 +24,7 @@ import INGESCAPE 1.0
 //import "../theme" as Theme;
 
 
-Window {
+WindowBlockTouches {
     id: rootItem
 
     title: model.QtObject ? model.QtObject.name
@@ -139,13 +139,6 @@ Window {
 
             // Raises the window in the windowing system.
             rootItem.raise();
-        }
-    }
-
-    onActiveChanged: {
-        if (active)
-        {
-            DebugQuickInspector.currentWindow = rootItem
         }
     }
 
