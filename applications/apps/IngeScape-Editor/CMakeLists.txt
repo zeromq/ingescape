@@ -91,11 +91,7 @@ endif(NOT MSVC)
 ########################################################################
 get_ingescape_editor_version(INGESCAPE_EDITOR_VERSION_MAJOR INGESCAPE_EDITOR_VERSION_MINOR INGESCAPE_EDITOR_VERSION_BUILD)
 set(INGESCAPE_EDITOR_VERSION "${INGESCAPE_EDITOR_VERSION_MAJOR}.${INGESCAPE_EDITOR_VERSION_MINOR}.${INGESCAPE_EDITOR_VERSION_BUILD}")
-if (MSVC)
-    add_definitions(-DVERSION="${INGESCAPE_EDITOR_VERSION}.0")
-else (MSVC)
-    add_definitions(-DVERSION="${INGESCAPE_EDITOR_VERSION}")
-endif ()
+add_definitions(-DVERSION="${INGESCAPE_EDITOR_VERSION}")
 message(STATUS "Detected INGESCAPE Editor Version - ${INGESCAPE_EDITOR_VERSION}")
 
 ########################################################################
