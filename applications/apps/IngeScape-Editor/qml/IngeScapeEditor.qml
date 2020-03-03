@@ -76,12 +76,9 @@ Item {
     // function allowing to open the history panel
     //
     function openHistory() {
-        //console.log("QML: function openHistory()");
-
         historyPanel.show();
-
-        // Raises the window in the windowing system
         historyPanel.raise();
+        historyPanel.requestActivate();
     }
 
 
@@ -738,12 +735,7 @@ Item {
                 }
 
                 onOpenHistory : {
-                    //console.log("QML: slot onOpenHistory");
-
-                    historyPanel.show();
-
-                    // Raises the window in the windowing system
-                    historyPanel.raise();
+                    rootItem.openHistory();
                 }
             }
         }
@@ -771,7 +763,7 @@ Item {
                     IngeScapeEditorC.addOpenedWindow(actionEditor);
                 }
 
-                onClosingVersion: {
+                onClosing: {
                     IngeScapeEditorC.closeActionEditor(model.QtObject);
                 }
             }
@@ -801,7 +793,7 @@ Item {
                     IngeScapeEditorC.addOpenedWindow(logStreamPanel);
                 }
 
-                onClosingVersion: {
+                onClosing: {
                     IngeScapeEditorC.closeLogStreamController(model.QtObject);
                 }
             }
