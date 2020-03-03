@@ -40,6 +40,9 @@ class I2QUICK_EXPORT I2SortFilterProxyModel : public QSortFilterProxyModel
     // => the number of items in our list after sorting and filtering data
     Q_PROPERTY (int count READ count NOTIFY countChanged)
 
+    //  Previous count
+    Q_PROPERTY (int previousCount READ previousCount NOTIFY previousCountChanged)
+
     // Count property to get the number of items in our source model
     // => raw items count of our source model i.e. the number of items of our source model list
     Q_PROPERTY (int sourceModelCount READ sourceModelCount NOTIFY sourceModelCountChanged)
@@ -59,7 +62,7 @@ public:
     /**
       * @brief Destructor
       */
-    ~I2SortFilterProxyModel();
+    ~I2SortFilterProxyModel() Q_DECL_OVERRIDE;
 
 
     /**
@@ -81,6 +84,13 @@ public:
      * @return
      */
     int count() const;
+
+
+    /**
+     * @brief Get the number of items in our list before sorting and filtering
+     * @return
+     */
+    int previousCount() const;
 
 
     /**
@@ -185,6 +195,12 @@ Q_SIGNALS:
      * @brief Called when our count property has changed
      */
     void countChanged();
+
+
+    /**
+     * @brief Called when our previousCount property has changed
+     */
+    void previousCountChanged();
 
 
     /**
@@ -391,6 +407,9 @@ protected:
 
     // Previous number of items (after filtering) in our sort-filter proxy model
     int _lastResultCount;
+
+    // Previous number of items (before filtering) in our sort-filter proxy model
+    int _lastPreviousCount;
 };
 
 

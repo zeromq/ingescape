@@ -61,13 +61,13 @@
         I2CustomItemListModel<{type}> _{name}; // Protected list used to store our items
     \endcode
 */
-#define I2_QOBJECT_LISTMODEL(type, name) \
-      Q_PROPERTY(AbstractI2CustomItemListModel * name READ name CONSTANT) \
-    public: \
-        I2CustomItemListModel<type> * name() { \
-            return &_##name; \
-        } \
-    protected: \
+#define I2_QOBJECT_LISTMODEL(type, name)                                    \
+        Q_PROPERTY(AbstractI2CustomItemListModel * name READ name CONSTANT) \
+    public:                                                                 \
+        I2CustomItemListModel<type> * name() {                              \
+            return &_##name;                                                \
+        }                                                                   \
+    protected:                                                              \
         I2CustomItemListModel<type> _##name;
 
 
@@ -86,13 +86,13 @@
         I2CustomItemSortFilterListModel<{type}> _{name}; // Protected sort/filter proxy
     \endcode
 */
-#define I2_QOBJECT_SORTFILTERPROXY(type, name) \
-      Q_PROPERTY(AbstractI2CustomItemSortFilterProxyModel * name READ name CONSTANT) \
-    public: \
-        I2CustomItemSortFilterProxyModel<type> * name() { \
-            return &_##name; \
-        } \
-    protected: \
+#define I2_QOBJECT_SORTFILTERPROXY(type, name)                                          \
+        Q_PROPERTY(AbstractI2CustomItemSortFilterProxyModel * name READ name CONSTANT)  \
+    public:                                                                             \
+        I2CustomItemSortFilterProxyModel<type> * name() {                               \
+            return &_##name;                                                            \
+        }                                                                               \
+    protected:                                                                          \
         I2CustomItemSortFilterProxyModel<type> _##name;
 
 
@@ -111,13 +111,13 @@
         I2CustomItemSortFilterListModel<{type}> _{name}; // Protected list used to store our items
     \endcode
 */
-#define I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(type, name) \
-      Q_PROPERTY(AbstractI2CustomItemSortFilterProxyModel* name READ name CONSTANT) \
-    public: \
-        I2CustomItemSortFilterListModel<type> * name() { \
-            return &_##name; \
-        } \
-    protected: \
+#define I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(type, name)                           \
+        Q_PROPERTY(AbstractI2CustomItemSortFilterProxyModel* name READ name CONSTANT)   \
+    public:                                                                             \
+        I2CustomItemSortFilterListModel<type> * name() {                                \
+            return &_##name;                                                            \
+        }                                                                               \
+    protected:                                                                          \
         I2CustomItemSortFilterListModel<type> _##name;
 
 

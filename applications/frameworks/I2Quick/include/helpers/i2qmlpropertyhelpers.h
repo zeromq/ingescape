@@ -81,30 +81,30 @@
         qreal _x;
     \endcode
 */
-#define I2_QML_PROPERTY(type, name) \
+#define I2_QML_PROPERTY(type, name)                                           \
         Q_PROPERTY (type name READ name WRITE set##name NOTIFY name##Changed) \
-    public: \
-        type name () const { \
-            return _##name ; \
-        } \
-        virtual bool set##name (type value) { \
-            bool hasChanged = false; \
-            if (_##name != value) { \
-                _##name = value; \
-                hasChanged = true; \
-                Q_EMIT name##Changed(value); \
-            } \
-            return hasChanged; \
-        } \
-    Q_SIGNALS: \
-        void name##Changed (type value); \
-    protected: \
+    public:                                                                   \
+        type name () const {                                                  \
+            return _##name ;                                                  \
+        }                                                                     \
+        virtual bool set##name (type value) {                                 \
+            bool hasChanged = false;                                          \
+            if (_##name != value) {                                           \
+                _##name = value;                                              \
+                hasChanged = true;                                            \
+                Q_EMIT name##Changed(value);                                  \
+            }                                                                 \
+            return hasChanged;                                                \
+        }                                                                     \
+    Q_SIGNALS:                                                                \
+        void name##Changed (type value);                                      \
+    protected:                                                                \
         type _##name;
 
 
 /*!
    Define a property that is readable/writable from QML with a standard setter method
-   that use qFuzzyCompare (fuzzy equal comparison)
+   that uses qFuzzyCompare (fuzzy equal comparison) instead of "=="
    NB: it should be used for double and float numbers
 
    \param type The C++ type of our property
@@ -143,24 +143,24 @@
         qreal _x;
     \endcode
 */
-#define I2_QML_PROPERTY_FUZZY_COMPARE(type, name) \
+#define I2_QML_PROPERTY_FUZZY_COMPARE(type, name)                             \
         Q_PROPERTY (type name READ name WRITE set##name NOTIFY name##Changed) \
-    public: \
-        type name () const { \
-            return _##name ; \
-        } \
-        virtual bool set##name (type value) { \
-            bool hasChanged = false; \
-            if (!qFuzzyCompare(_##name, value)) { \
-                _##name = value; \
-                hasChanged = true; \
-                Q_EMIT name##Changed(value); \
-            } \
-            return hasChanged; \
-        } \
-    Q_SIGNALS: \
-        void name##Changed (type value); \
-    protected: \
+    public:                                                                   \
+        type name () const {                                                  \
+            return _##name ;                                                  \
+        }                                                                     \
+        virtual bool set##name (type value) {                                 \
+            bool hasChanged = false;                                          \
+            if (!qFuzzyCompare(_##name, value)) {                             \
+                _##name = value;                                              \
+                hasChanged = true;                                            \
+                Q_EMIT name##Changed(value);                                  \
+            }                                                                 \
+            return hasChanged;                                                \
+        }                                                                     \
+    Q_SIGNALS:                                                                \
+        void name##Changed (type value);                                      \
+    protected:                                                                \
         type _##name;
 
 
@@ -217,34 +217,34 @@
     \endcode
 */
 #define I2_QML_PROPERTY_DELETE_PROOF(type, name) \
-        Q_PROPERTY (type name READ name WRITE set##name NOTIFY name##Changed) \
-    public: \
-        type name () const { \
-            return _##name ; \
-        } \
-        virtual bool set##name (type value) { \
-            bool hasChanged = false; \
-            if (_##name != value) { \
-                if (_##name != nullptr) { \
-                    disconnect(_##name, SIGNAL(destroyed(QObject *)), this, nullptr); \
-                } \
-                _##name = value; \
-                if (_##name != nullptr) { \
+        Q_PROPERTY (type name READ name WRITE set##name NOTIFY name##Changed)                                    \
+    public:                                                                                                      \
+        type name () const {                                                                                     \
+            return _##name ;                                                                                     \
+        }                                                                                                        \
+        virtual bool set##name (type value) {                                                                    \
+            bool hasChanged = false;                                                                             \
+            if (_##name != value) {                                                                              \
+                if (_##name != nullptr) {                                                                        \
+                    disconnect(_##name, SIGNAL(destroyed(QObject *)), this, nullptr);                            \
+                }                                                                                                \
+                _##name = value;                                                                                 \
+                if (_##name != nullptr) {                                                                        \
                     connect(_##name, SIGNAL(destroyed(QObject *)), this, SLOT(_on##name##Destroyed(QObject *))); \
-                } \
-                hasChanged = true; \
-                Q_EMIT name##Changed(value); \
-            } \
-            return hasChanged; \
-        } \
-    Q_SIGNALS: \
-        void name##Changed (type value); \
-    private Q_SLOTS: \
-        void _on##name##Destroyed(QObject*) { \
-            _##name = nullptr; \
-            Q_EMIT name##Changed(nullptr); \
-        } \
-    protected: \
+                }                                                                                                \
+                hasChanged = true;                                                                               \
+                Q_EMIT name##Changed(value);                                                                     \
+            }                                                                                                    \
+            return hasChanged;                                                                                   \
+        }                                                                                                        \
+    Q_SIGNALS:                                                                                                   \
+        void name##Changed (type value);                                                                         \
+    private Q_SLOTS:                                                                                             \
+        void _on##name##Destroyed(QObject*) {                                                                    \
+            _##name = nullptr;                                                                                   \
+            Q_EMIT name##Changed(nullptr);                                                                       \
+        }                                                                                                        \
+    protected:                                                                                                   \
         type _##name;
 
 
@@ -282,16 +282,16 @@
         qreal _x;
     \endcode
 */
-#define I2_QML_PROPERTY_CUSTOM_SETTER(type, name) \
+#define I2_QML_PROPERTY_CUSTOM_SETTER(type, name)                             \
         Q_PROPERTY (type name READ name WRITE set##name NOTIFY name##Changed) \
-    public: \
-        type name () const { \
-            return _##name ; \
-        } \
-        virtual void set##name (type value); \
-    Q_SIGNALS: \
-        void name##Changed (type value); \
-    protected: \
+    public:                                                                   \
+        type name () const {                                                  \
+            return _##name ;                                                  \
+        }                                                                     \
+        virtual void set##name (type value);                                  \
+    Q_SIGNALS:                                                                \
+        void name##Changed (type value);                                      \
+    protected:                                                                \
         type _##name;
 
 
@@ -328,16 +328,16 @@
         qreal _x;
     \endcode
 */
-#define I2_QML_PROPERTY_CUSTOM_SETTER_WITH_BOOL_RETURN(type, name) \
+#define I2_QML_PROPERTY_CUSTOM_SETTER_WITH_BOOL_RETURN(type, name)            \
         Q_PROPERTY (type name READ name WRITE set##name NOTIFY name##Changed) \
-    public: \
-        type name () const { \
-            return _##name ; \
-        } \
-        virtual bool set##name (type value); \
-    Q_SIGNALS: \
-        void name##Changed (type value); \
-    protected: \
+    public:                                                                   \
+        type name () const {                                                  \
+            return _##name ;                                                  \
+        }                                                                     \
+        virtual bool set##name (type value);                                  \
+    Q_SIGNALS:                                                                \
+        void name##Changed (type value);                                      \
+    protected:                                                                \
         type _##name;
 
 
@@ -381,31 +381,31 @@
         qreal _x;
     \endcode
 */
-#define I2_QML_PROPERTY_READONLY(type, name) \
-        Q_PROPERTY (type name READ name NOTIFY name##Changed) \
-    public: \
-        type name () const { \
-            return _##name ; \
-        } \
-        bool set##name (type value) { \
-            bool hasChanged = false; \
-            if (_##name != value) { \
-                _##name = value; \
-                hasChanged = true; \
-                Q_EMIT name##Changed(value); \
-            } \
-            return hasChanged; \
-        } \
-    Q_SIGNALS: \
-        void name##Changed (type value); \
-    protected: \
+#define I2_QML_PROPERTY_READONLY(type, name)                    \
+        Q_PROPERTY (type name READ name NOTIFY name##Changed)   \
+    public:                                                     \
+        type name () const {                                    \
+            return _##name ;                                    \
+        }                                                       \
+        bool set##name (type value) {                           \
+            bool hasChanged = false;                            \
+            if (_##name != value) {                             \
+                _##name = value;                                \
+                hasChanged = true;                              \
+                Q_EMIT name##Changed(value);                    \
+            }                                                   \
+            return hasChanged;                                  \
+        }                                                       \
+    Q_SIGNALS:                                                  \
+        void name##Changed (type value);                        \
+    protected:                                                  \
         type _##name;
 
 
 
 /*!
    Define a property that is readable from QML and readable/writable from C++
-   with a standard setter method that uses a fuzzy comparison
+   with a standard setter method that uses qFuzzyCompare instead of "=="
 
    \param type The C++ type of our property
    \param name The name of our property
@@ -442,24 +442,24 @@
         qreal _x;
     \endcode
 */
-#define I2_QML_PROPERTY_READONLY_FUZZY_COMPARE(type, name) \
-        Q_PROPERTY (type name READ name NOTIFY name##Changed) \
-    public: \
-        type name () const { \
-            return _##name ; \
-        } \
-        bool set##name (type value) { \
-            bool hasChanged = false; \
-            if (!qFuzzyCompare(_##name, value)) { \
-                _##name = value; \
-                hasChanged = true; \
-                Q_EMIT name##Changed(value); \
-            } \
-            return hasChanged; \
-        } \
-    Q_SIGNALS: \
-        void name##Changed (type value); \
-    protected: \
+#define I2_QML_PROPERTY_READONLY_FUZZY_COMPARE(type, name)      \
+        Q_PROPERTY (type name READ name NOTIFY name##Changed)   \
+    public:                                                     \
+        type name () const {                                    \
+            return _##name ;                                    \
+        }                                                       \
+        bool set##name (type value) {                           \
+            bool hasChanged = false;                            \
+            if (!qFuzzyCompare(_##name, value)) {               \
+                _##name = value;                                \
+                hasChanged = true;                              \
+                Q_EMIT name##Changed(value);                    \
+            }                                                   \
+            return hasChanged;                                  \
+        }                                                       \
+    Q_SIGNALS:                                                  \
+        void name##Changed (type value);                        \
+    protected:                                                  \
         type _##name;
 
 
@@ -514,35 +514,35 @@
         QObject* _x;
     \endcode
 */
-#define I2_QML_PROPERTY_READONLY_DELETE_PROOF(type, name) \
-        Q_PROPERTY (type name READ name NOTIFY name##Changed) \
-    public: \
-        type name () const { \
-            return _##name ; \
-        } \
-        virtual bool set##name (type value) { \
-            bool hasChanged = false; \
-            if (_##name != value) { \
-                if (_##name != nullptr) {\
-                    disconnect(_##name, SIGNAL(destroyed(QObject *)), this, nullptr); \
-                } \
-                _##name = value; \
-                if (_##name != nullptr) { \
-                    connect(_##name, SIGNAL(destroyed(QObject *)), this, SLOT(_on##name##Destroyed(QObject *))); \
-                } \
-                hasChanged = true; \
-                Q_EMIT name##Changed(value); \
-            } \
-            return hasChanged; \
-        } \
-    Q_SIGNALS: \
-        void name##Changed (type value); \
-    private Q_SLOTS: \
-        void _on##name##Destroyed(QObject*) { \
-            _##name = nullptr; \
-            Q_EMIT name##Changed(nullptr); \
-        } \
-    protected: \
+#define I2_QML_PROPERTY_READONLY_DELETE_PROOF(type, name)                                                           \
+        Q_PROPERTY (type name READ name NOTIFY name##Changed)                                                       \
+    public:                                                                                                         \
+        type name () const {                                                                                        \
+            return _##name ;                                                                                        \
+        }                                                                                                           \
+        virtual bool set##name (type value) {                                                                       \
+            bool hasChanged = false;                                                                                \
+            if (_##name != value) {                                                                                 \
+                if (_##name != nullptr) {                                                                           \
+                    disconnect(_##name, SIGNAL(destroyed(QObject *)), this, nullptr);                               \
+                }                                                                                                   \
+                _##name = value;                                                                                    \
+                if (_##name != nullptr) {                                                                           \
+                    connect(_##name, SIGNAL(destroyed(QObject *)), this, SLOT(_on##name##Destroyed(QObject *)));    \
+                }                                                                                                   \
+                hasChanged = true;                                                                                  \
+                Q_EMIT name##Changed(value);                                                                        \
+            }                                                                                                       \
+            return hasChanged;                                                                                      \
+        }                                                                                                           \
+    Q_SIGNALS:                                                                                                      \
+        void name##Changed (type value);                                                                            \
+    private Q_SLOTS:                                                                                                \
+        void _on##name##Destroyed(QObject*) {                                                                       \
+            _##name = nullptr;                                                                                      \
+            Q_EMIT name##Changed(nullptr);                                                                          \
+        }                                                                                                           \
+    protected:                                                                                                      \
         type _##name;
 
 
@@ -579,16 +579,16 @@
         qreal _x;
     \endcode
 */
-#define I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(type, name) \
-        Q_PROPERTY (type name READ name NOTIFY name##Changed) \
-    public: \
-        type name () const { \
-            return _##name ; \
-        } \
-        void set##name (type value); \
-    Q_SIGNALS: \
-        void name##Changed (type value); \
-    protected: \
+#define I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(type, name)      \
+        Q_PROPERTY (type name READ name NOTIFY name##Changed)   \
+    public:                                                     \
+        type name () const {                                    \
+            return _##name ;                                    \
+        }                                                       \
+        virtual void set##name (type value);                    \
+    Q_SIGNALS:                                                  \
+        void name##Changed (type value);                        \
+    protected:                                                  \
         type _##name;
 
 
@@ -626,15 +626,52 @@
     \endcode
 */
 #define I2_QML_PROPERTY_READONLY_CUSTOM_SETTER_WITH_BOOL_RETURN(type, name) \
-        Q_PROPERTY (type name READ name NOTIFY name##Changed) \
-    public: \
-        type name () const { \
-            return _##name ; \
-        } \
-        bool set##name (type value); \
-    Q_SIGNALS: \
-        void name##Changed (type value); \
-    protected: \
+        Q_PROPERTY (type name READ name NOTIFY name##Changed)               \
+    public:                                                                 \
+        type name () const {                                                \
+            return _##name ;                                                \
+        }                                                                   \
+        virtual bool set##name (type value);                                \
+    Q_SIGNALS:                                                              \
+        void name##Changed (type value);                                    \
+    protected:                                                              \
+        type _##name;
+
+
+
+
+/*!
+   Define a property that is readable from QML and stores an object constant
+
+   \param type The C++ type of our property (must be an object class)
+   \param name The name of our property
+
+    It generates the following code :
+    \code
+        {type} _{name}; // Protected variable used to store the current value
+        {type}* {name}(); // Public getter method
+    \endcode
+
+    NB: The property name is not capitalized in the setter name (x => setx and not setX)
+
+    For example, I2_QML_PROPERTY_OBJECT_CONSTANT (QObject, x) will generate the following code section:
+    \code
+        Q_PROPERTY (QObject* x READ x CONSTANT)
+    public:
+        QObject* x() const {
+            return &_x;
+        }
+    protected:
+        QObject _x;
+    \endcode
+*/
+#define I2_QML_PROPERTY_OBJECT_CONSTANT(type, name)     \
+        Q_PROPERTY (type * name READ name CONSTANT)     \
+    public:                                             \
+        type * name ()  {                               \
+            return &_##name ;                           \
+        }                                               \
+    protected:                                          \
         type _##name;
 
 

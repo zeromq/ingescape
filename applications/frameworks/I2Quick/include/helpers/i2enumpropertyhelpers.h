@@ -60,13 +60,13 @@
         I2EnumListModel<{type} *> _{name}; // Protected list used to store our items
     \endcode
 */
-#define I2_ENUM_LISTMODEL(type, name) \
-      Q_PROPERTY(AbstractI2EnumListModel * name READ name CONSTANT) \
-    public: \
-        AbstractI2EnumListModel * name() { \
-            return &_##name; \
-        } \
-    protected: \
+#define I2_ENUM_LISTMODEL(type, name)                                   \
+        Q_PROPERTY(AbstractI2EnumListModel * name READ name CONSTANT)   \
+    public:                                                             \
+        AbstractI2EnumListModel * name() {                              \
+            return &_##name;                                            \
+        }                                                               \
+    protected:                                                          \
         I2EnumListModel<type> _##name;
 
 
@@ -101,62 +101,62 @@
   \endcode
 
   */
-#define I2_ENUM(name, ...) \
-    class name : public I2AbstractQmlEnumClass { \
-        Q_OBJECT \
-    public: \
-        explicit name(QObject* parent = nullptr) : I2AbstractQmlEnumClass(parent) { \
-        } \
-        enum Value { __VA_ARGS__ }; \
-        Q_ENUM (Value) \
-        static QObject *qmlSingleton(QQmlEngine *engine, QJSEngine *scriptEngine) { \
-            Q_UNUSED(engine); \
-            Q_UNUSED(scriptEngine); \
-            return new name (); \
-        } \
-        int getEnumeratorIndex() Q_DECL_OVERRIDE { \
-            return staticMetaObject.indexOfEnumerator("Value"); \
-        } \
-        QMetaEnum getEnumerator(int index) Q_DECL_OVERRIDE { \
-            return staticMetaObject.enumerator(index); \
-        } \
-        Q_INVOKABLE QList<name::Value> allValues() { \
-            QList<name::Value> result; \
-            static int enumIndex = getEnumeratorIndex(); \
-            if (enumIndex != -1) { \
-                QMetaEnum enumType = getEnumerator(enumIndex); \
-                for (int index = 0; index < enumType.keyCount(); ++index) { \
-                    name::Value currentEnumItemValue = static_cast<name::Value>(enumType.value(index)); \
-                    result.append(currentEnumItemValue); \
-                } \
-            } \
-            return result; \
-        } \
-        static QString staticEnumToString(int value) { \
-            name instance; \
-            return instance.enumToString(value); \
-        } \
-        static QString staticEnumToKey(int value) { \
-            name instance; \
-            return instance.enumToKey(value); \
-        } \
-        static int staticEnumFromKey(QString key) { \
-            name instance; \
-            return instance.enumFromKey(std::move(key)); \
-        } \
-        static QStringList staticAllKeys() { \
-            name instance; \
-            return instance.allKeys(); \
-        } \
-        static QList<name::Value> staticAllValues() { \
-            name instance; \
-            return instance.allValues(); \
-        } \
+#define I2_ENUM(name, ...)                                                                                          \
+    class name : public I2AbstractQmlEnumClass {                                                                    \
+        Q_OBJECT                                                                                                    \
+    public:                                                                                                         \
+        explicit name(QObject* parent = nullptr) : I2AbstractQmlEnumClass(parent) {                                 \
+        }                                                                                                           \
+        enum Value { __VA_ARGS__ };                                                                                 \
+        Q_ENUM (Value)                                                                                              \
+        static QObject *qmlSingleton(QQmlEngine *engine, QJSEngine *scriptEngine) {                                 \
+            Q_UNUSED(engine);                                                                                       \
+            Q_UNUSED(scriptEngine);                                                                                 \
+            return new name ();                                                                                     \
+        }                                                                                                           \
+        int getEnumeratorIndex() Q_DECL_OVERRIDE {                                                                  \
+            return staticMetaObject.indexOfEnumerator("Value");                                                     \
+        }                                                                                                           \
+        QMetaEnum getEnumerator(int index) Q_DECL_OVERRIDE {                                                        \
+            return staticMetaObject.enumerator(index);                                                              \
+        }                                                                                                           \
+        Q_INVOKABLE QList<name::Value> allValues() {                                                                \
+            QList<name::Value> result;                                                                              \
+            static int enumIndex = getEnumeratorIndex();                                                            \
+            if (enumIndex != -1) {                                                                                  \
+                QMetaEnum enumType = getEnumerator(enumIndex);                                                      \
+                for (int index = 0; index < enumType.keyCount(); ++index) {                                         \
+                    name::Value currentEnumItemValue = static_cast<name::Value>(enumType.value(index));             \
+                    result.append(currentEnumItemValue);                                                            \
+                }                                                                                                   \
+            }                                                                                                       \
+            return result;                                                                                          \
+        }                                                                                                           \
+        static QString staticEnumToString(int value) {                                                              \
+            name instance;                                                                                          \
+            return instance.enumToString(value);                                                                    \
+        }                                                                                                           \
+        static QString staticEnumToKey(int value) {                                                                 \
+            name instance;                                                                                          \
+            return instance.enumToKey(value);                                                                       \
+        }                                                                                                           \
+        static int staticEnumFromKey(QString key) {                                                                 \
+            name instance;                                                                                          \
+            return instance.enumFromKey(std::move(key));                                                            \
+        }                                                                                                           \
+        static QStringList staticAllKeys() {                                                                        \
+            name instance;                                                                                          \
+            return instance.allKeys();                                                                              \
+        }                                                                                                           \
+        static QList<name::Value> staticAllValues() {                                                               \
+            name instance;                                                                                          \
+            return instance.allValues();                                                                            \
+        }                                                                                                           \
         static void qmlRegister(const char* uri, int versionMajor, int versionMinor, const char* qmlName = #name) { \
-            qmlRegisterSingletonType<name>(uri, versionMajor, versionMinor, qmlName, &name::qmlSingleton); \
-        } \
-    }; \
-    QML_DECLARE_TYPE(name) \
+            qmlRegisterSingletonType<name>(uri, versionMajor, versionMinor, qmlName, &name::qmlSingleton);          \
+        }                                                                                                           \
+    };                                                                                                              \
+    QML_DECLARE_TYPE(name)                                                                                          \
     Q_DECLARE_METATYPE(name::Value)
 
 
@@ -185,63 +185,63 @@
   \endcode
 
   */
-#define I2_ENUM_CUSTOM(name, ...) \
-    class name : public I2AbstractQmlEnumClass { \
-        Q_OBJECT \
-    public: \
-        explicit name(QObject* parent = nullptr) : I2AbstractQmlEnumClass(parent) { \
-        } \
-        enum Value { __VA_ARGS__ }; \
-        Q_ENUM (Value) \
-        static QObject *qmlSingleton(QQmlEngine *engine, QJSEngine *scriptEngine) { \
-            Q_UNUSED(engine); \
-            Q_UNUSED(scriptEngine); \
-            return new name (); \
-        } \
-        Q_INVOKABLE virtual QString enumToString(int value) Q_DECL_OVERRIDE; \
-        int getEnumeratorIndex() Q_DECL_OVERRIDE { \
-            return staticMetaObject.indexOfEnumerator("Value"); \
-        } \
-        QMetaEnum getEnumerator(int index) Q_DECL_OVERRIDE { \
-            return staticMetaObject.enumerator(index); \
-        } \
-        Q_INVOKABLE QList<name::Value> allValues() { \
-            QList<name::Value> result; \
-            static int enumIndex = getEnumeratorIndex(); \
-            if (enumIndex != -1) { \
-                QMetaEnum enumType = getEnumerator(enumIndex); \
-                for (int index = 0; index < enumType.keyCount(); ++index) { \
-                    name::Value currentEnumItemValue = static_cast<name::Value>(enumType.value(index)); \
-                    result.append(currentEnumItemValue); \
-                } \
-            } \
-            return result; \
-        } \
-        static QString staticEnumToString(int value) { \
-            name instance; \
-            return instance.enumToString(value); \
-        } \
-        static QString staticEnumToKey(int value) { \
-            name instance; \
-            return instance.enumToKey(value); \
-        } \
-        static int staticEnumFromKey(QString key) { \
-            name instance; \
-            return instance.enumFromKey(std::move(key)); \
-        } \
-        static QStringList staticAllKeys() { \
-            name instance; \
-            return instance.allKeys(); \
-        } \
-        static QList<name::Value> staticAllValues() { \
-            name instance; \
-            return instance.allValues(); \
-        } \
+#define I2_ENUM_CUSTOM(name, ...)                                                                                   \
+    class name : public I2AbstractQmlEnumClass {                                                                    \
+        Q_OBJECT                                                                                                    \
+    public:                                                                                                         \
+        explicit name(QObject* parent = nullptr) : I2AbstractQmlEnumClass(parent) {                                 \
+        }                                                                                                           \
+        enum Value { __VA_ARGS__ };                                                                                 \
+        Q_ENUM (Value)                                                                                              \
+        static QObject *qmlSingleton(QQmlEngine *engine, QJSEngine *scriptEngine) {                                 \
+            Q_UNUSED(engine);                                                                                       \
+            Q_UNUSED(scriptEngine);                                                                                 \
+            return new name ();                                                                                     \
+        }                                                                                                           \
+        Q_INVOKABLE virtual QString enumToString(int value) Q_DECL_OVERRIDE;                                        \
+        int getEnumeratorIndex() Q_DECL_OVERRIDE {                                                                  \
+            return staticMetaObject.indexOfEnumerator("Value");                                                     \
+        }                                                                                                           \
+        QMetaEnum getEnumerator(int index) Q_DECL_OVERRIDE {                                                        \
+            return staticMetaObject.enumerator(index);                                                              \
+        }                                                                                                           \
+        Q_INVOKABLE QList<name::Value> allValues() {                                                                \
+            QList<name::Value> result;                                                                              \
+            static int enumIndex = getEnumeratorIndex();                                                            \
+            if (enumIndex != -1) {                                                                                  \
+                QMetaEnum enumType = getEnumerator(enumIndex);                                                      \
+                for (int index = 0; index < enumType.keyCount(); ++index) {                                         \
+                    name::Value currentEnumItemValue = static_cast<name::Value>(enumType.value(index));             \
+                    result.append(currentEnumItemValue);                                                            \
+                }                                                                                                   \
+            }                                                                                                       \
+            return result;                                                                                          \
+        }                                                                                                           \
+        static QString staticEnumToString(int value) {                                                              \
+            name instance;                                                                                          \
+            return instance.enumToString(value);                                                                    \
+        }                                                                                                           \
+        static QString staticEnumToKey(int value) {                                                                 \
+            name instance;                                                                                          \
+            return instance.enumToKey(value);                                                                       \
+        }                                                                                                           \
+        static int staticEnumFromKey(QString key) {                                                                 \
+            name instance;                                                                                          \
+            return instance.enumFromKey(std::move(key));                                                            \
+        }                                                                                                           \
+        static QStringList staticAllKeys() {                                                                        \
+            name instance;                                                                                          \
+            return instance.allKeys();                                                                              \
+        }                                                                                                           \
+        static QList<name::Value> staticAllValues() {                                                               \
+            name instance;                                                                                          \
+            return instance.allValues();                                                                            \
+        }                                                                                                           \
         static void qmlRegister(const char* uri, int versionMajor, int versionMinor, const char* qmlName = #name) { \
-            qmlRegisterSingletonType<name>(uri, versionMajor, versionMinor, qmlName, &name::qmlSingleton); \
-        } \
-    }; \
-    QML_DECLARE_TYPE(name) \
+            qmlRegisterSingletonType<name>(uri, versionMajor, versionMinor, qmlName, &name::qmlSingleton);          \
+        }                                                                                                           \
+    };                                                                                                              \
+    QML_DECLARE_TYPE(name)                                                                                          \
     Q_DECLARE_METATYPE(name::Value)
 
 
