@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2020 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -10,7 +10,7 @@
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *      Alexandre Lemort   <lemort@ingenuity.io>
- *
+ *      Chloé Roumieu      <roumieu@ingenuity.io>
  */
 
 #ifndef AGENTSMAPPINGCONTROLLER_H
@@ -284,15 +284,15 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Slot called when the flag "is ON" of an agent(s grouped by name) changed
-     * @param isON
+     * @brief Slot called when the flag "is ON" of an agent(s grouped by name) changed (only happens when we are online)
+     * It means that our agent was ALREADY in our platform
      */
     void _onAgentIsONChanged(bool isON);
 
 
     /**
-     * @brief Slot called when a model of agent "ON" has been added to an agent(s grouped by name)
-     * @param model
+     * @brief Slot called when a model of agent "ON" has been added to an agent(s grouped by name) (only happens when we are online)
+     * It means that our agent was NOT in our platform
      */
     void _onAgentModelONhasBeenAdded(AgentM* model);
 
@@ -359,19 +359,12 @@ private:
 
     /**
      * @brief Create a new agent in the global mapping with an "Agents Grouped by Name" and at a specific position
-     * @param agentsGroupedByName
-     * @param position
-     * @return
      */
     AgentInMappingVM* _createAgentInMappingAtPosition(AgentsGroupedByNameVM* agentsGroupedByName, QPointF position, qreal width);
 
 
     /**
      * @brief Create a new action in the global mapping with a unique id, with a model of action and at a specific position
-     * @param uid
-     * @param action
-     * @param position
-     * @return
      */
     ActionInMappingVM* _createActionInMappingAtPosition(QString uid, ActionM* action, QPointF position, qreal width);
 
@@ -419,22 +412,18 @@ private:
 
     /**
      * @brief Link an agent (in the global mapping) on its inputs (add all missing links TO an agent)
-     * @param agentInMapping
      */
     void _linkAgentOnInputs(AgentInMappingVM* agentInMapping);
 
 
     /**
      * @brief Link an agent (in the global mapping) on its input from a mapping element (add a missing link TO an agent)
-     * @param inputAgent
-     * @param mappingElement
      */
     void _linkAgentOnInputFromMappingElement(AgentInMappingVM* inputAgent, MappingElementVM* mappingElement);
 
 
     /**
      * @brief Link an agent (in the global mapping) on its outputs (add all missing links FROM an agent)
-     * @param agentInMapping
      */
     void _linkAgentOnOutputs(AgentInMappingVM* agentInMapping);
 
@@ -499,16 +488,6 @@ private:
      * @return
      */
     QString _getJSONofMappingOfAgentInGlobalMapping(AgentInMappingVM* agentInMapping);
-
-    /**
-     * @brief Usefull when we are in "OBSERVE" mode and a new agent is coming on the network and it was not present in the mapping
-     */
-    void _addAgentInGlobalMappingWithMissingLink(AgentsGroupedByNameVM* agentsGroupedByName);
-
-    /**
-     * @brief Usefull when we are in "OBSERVE" mode and a new agent is comming on the network and it was not present in the mapping
-     */
-    void _cancelAllAddedAndRemovedLink_WhileAgentWasOFF(AgentInMappingVM* agentInMapping);
 
 
 private:
