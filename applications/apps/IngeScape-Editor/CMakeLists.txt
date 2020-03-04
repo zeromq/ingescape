@@ -209,7 +209,8 @@ elseif (WIN32)
     set_target_properties(I2Quick PROPERTIES IMPORTED_LOCATION "${SOURCE_DIR}/../../frameworks/I2Quick/${_MY_LIB_FOLDER}/I2Quick.dll")
     install(FILES "${SOURCE_DIR}/../../frameworks/I2Quick/${_MY_LIB_FOLDER}/I2Quick.dll" DESTINATION .)
 else ()
-    #TODO Add so for unix
+    set(I2QUICK_LIB "${SOURCE_DIR}/../../frameworks/I2Quick/Unix/libI2Quick.so")
+    set_target_properties(I2Quick PROPERTIES IMPORTED_LOCATION "${I2QUICK_LIB}")
 endif ()
 
 ########################################################################
