@@ -347,7 +347,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     }
 
 
-
     // Check if there is a pending "open file" request
     // NB: We must perform this check because IngeScapeEditorController is created asynchronously
     bool hasPendingOpenFileRequest = false;
@@ -431,10 +430,15 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     }
 
     //
-    // Start IngeScape (if it was started last time)
+    // Try to find an available network device and start IngeScape (if it was started last time and _networkDevice available)
     //
     _modelManager->setisMappingControlled(wasMappingControlled);
-    if (wasAgentEditorStarted)
+    if (!ingeScapeNetworkC->isAvailableNetworkDevice(_networkDevice))
+    {
+        // Last device choose is no more available, try to select another one with auto find
+        setnetworkDevice(_autoFindAnAvailableDevice());
+    }
+    if (wasAgentEditorStarted && (_networkDevice != ""))
     {
         setingescapeShouldBeStartedAtLaunch(true);
     }
@@ -933,7 +937,6 @@ bool IngeScapeEditorController::startIngeScape()
     bool success = false;
     IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
     IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
-    IngeScapeSettings &settings = IngeScapeSettings::Instance();
 
     // Always update available network devices (to have our qml list updated)
     ingeScapeNetworkC->updateAvailableNetworkDevices();
@@ -943,47 +946,10 @@ bool IngeScapeEditorController::startIngeScape()
     {
         if (!ingeScapeNetworkC->isAvailableNetworkDevice(_networkDevice))
         {
-            int nbDevices = ingeScapeNetworkC->availableNetworkDevices().count();
-            QStringList devicesAddresses = ingeScapeNetworkC->availableNetworkDevicesAddresses();
-            if (nbDevices == 0 )
-            {
-                 setnetworkDevice("");
-            }
-            else if (nbDevices == 1)
-            {
-                 // Use the only available network device
-                setnetworkDevice(ingeScapeNetworkC->availableNetworkDevices().at(0));
-            }
-            else if ((nbDevices == 2)
-                     && ((devicesAddresses.at(0) == "127.0.0.1")||(devicesAddresses.at(1) == "127.0.0.1")))
-            {
-                // 2 available devices, one is the loopback : we pick the device that is NOT the loopback
-                if (devicesAddresses.at(0) == "127.0.0.1")
-                {
-                    setnetworkDevice(ingeScapeNetworkC->availableNetworkDevices().at(1));
-                }
-                else
-                {
-                    setnetworkDevice(ingeScapeNetworkC->availableNetworkDevices().at(0));
-                }
-            }
-            else
-            {
-                // Several devices available : look last saving
-                settings.beginGroup("network");
-                QString lastSaveNetworkDevice = settings.value("networkDevice", QVariant("")).toString();
-                settings.endGroup();
-                if (!ingeScapeNetworkC->isAvailableNetworkDevice(lastSaveNetworkDevice))
-                {
-                    // User have to choose a device to launch editor
-                    setnetworkDevice("");
-                }
-                else {
-                    setnetworkDevice(lastSaveNetworkDevice);
-                }
-            }
+            // Selected device is no more available, try to select another one with auto find
+            setnetworkDevice(_autoFindAnAvailableDevice());
         }
-        success = ingeScapeNetworkC->start(_networkDevice, _ipAddress, _port); //will failed if networkDevice = ""
+        success = ingeScapeNetworkC->start(_networkDevice, _ipAddress, _port); // will failed if networkDevice = ""
     }
     return success;
 }
@@ -1834,3 +1800,37 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
 }
 
 
+/**
+ * @brief Return a network device choose with the logic of an igs agent :
+ * If there is only one or if there are 2 and one of them is a loopback return a network device
+ * Else return ""
+ */
+QString IngeScapeEditorController::_autoFindAnAvailableDevice()
+{
+    IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
+    int nbDevices = ingeScapeNetworkC->availableNetworkDevices().count();
+    QStringList devicesAddresses = ingeScapeNetworkC->availableNetworkDevicesAddresses();
+    if (nbDevices == 1)
+    {
+         // Use the only available network device
+        return ingeScapeNetworkC->availableNetworkDevices().at(0);
+    }
+    else if ((nbDevices == 2)
+             && ((devicesAddresses.at(0) == "127.0.0.1")||(devicesAddresses.at(1) == "127.0.0.1")))
+    {
+        // 2 available devices, one is the loopback : we pick the device that is NOT the loopback
+        if (devicesAddresses.at(0) == "127.0.0.1")
+        {
+            return ingeScapeNetworkC->availableNetworkDevices().at(1);
+        }
+        else
+        {
+            return ingeScapeNetworkC->availableNetworkDevices().at(0);
+        }
+    }
+    else
+    {
+        // No device or several devices available
+        return "";
+    }
+}

@@ -454,6 +454,14 @@ private:
     QJsonDocument _getJsonOfCurrentPlatform();
 
 
+    /**
+     * @brief Return a network device choose with the logic of an igs agent :
+     * If there is only one or if there are 2 and one of them is a loopback return a network device
+     * Else return ""
+     */
+    QString _autoFindAnAvailableDevice();
+
+
 private:
     // To subscribe to termination signals
     TerminationSignalWatcher *_terminationSignalWatcher;
