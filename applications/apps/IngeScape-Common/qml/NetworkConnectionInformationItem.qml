@@ -42,11 +42,6 @@ I2CustomRectangle {
     // Content width of our component
     readonly property alias contentWidth: content.width
 
-    // Flag indicating if editor is started on ingescape platform
-    // NB : if false, it means that no network devices were available
-    //      or that user have to make a choice to launch the editor on igs platform
-    property bool editorStartedOnIgs: true
-
     // Current network device
     property string currentNetworkDevice: ""
 
@@ -55,20 +50,6 @@ I2CustomRectangle {
 
     // Duration of animations in milliseconds (250 ms => default duration of QML animations)
     property int animationDuration: 250
-
-    // List of network devices
-    property alias listOfNetworkDevices: selectNetworkDeviceCombobox.model
-
-    // Selected index of our list of network devices
-    property alias listOfNetworkDevicesSelectedIndex: selectNetworkDeviceCombobox.selectedIndex;
-
-    // Auto-close timeout in milliseconds
-    property alias autoCloseTimeoutInMilliseconds: autoCloseTimer.interval
-
-    // Open settings button source appearance
-    property string settingsReleasedId : "mapping-mode-settings"
-    property string settingsHighlightedId: "mapping-mode-settings-hover"
-    property string settingsPressedId : "mapping-mode-settings-pressed"
 
     //
     // Configure our item
@@ -96,20 +77,21 @@ I2CustomRectangle {
     QtObject {
         id: rootPrivate
 
-        // Flag indicating if we can perform animations
-        property bool canPerformAnimations: false
-
         // Flag indicating if our edition mode is opened
         property bool isEditionModeOpened: false
-
-        // Flag indicating if we can auto-close our edition mode
-        property bool canAutoCloseEditionMode: false
 
         // Boolean indicating if we must highlight our component
         property bool mustBeHighlighted : !root.isEditionModeOpened && contentMouseArea.enabled && contentMouseArea.containsMouse && !contentMouseArea.pressed
 
         // Flag indicating if some network devices are available
-        property bool networkDevicesAvailable : root.listOfNetworkDevices.length > 0
+        property bool networkDevicesAvailable : selectNetworkDeviceCombobox.model && (selectNetworkDeviceCombobox.model.length > 0)
+
+       onNetworkDevicesAvailableChanged: {
+           if (!rootPrivate.networkDevicesAvailable)
+           {
+               root.close();
+           }
+       }
     }
 
 
@@ -119,16 +101,11 @@ I2CustomRectangle {
     //
     //--------------------------------------------------------
 
-    // Triggered when our edition mode will be opened
-    signal willOpenEditionMode();
-
-    // Triggered when our edition mode will be closed
-    signal willCloseEditionMode();
-
     // Triggered when we press the "OK" button
     signal changeNetworkSettings(string networkDevice, int port);
 
-    signal connectChanged(bool connect);
+    // Triggered when we press the "ONLINE/OFFLINE" toggle
+    signal connectChanged(bool wasOnlineBeforeConnectChanged);
 
 
     //--------------------------------------------------------
@@ -145,86 +122,43 @@ I2CustomRectangle {
             // Update our list of available network devices
             IgsNetworkController.updateAvailableNetworkDevices();
 
-            // Notify change
-            root.willOpenEditionMode();
-
             // Update internal states
             rootPrivate.isEditionModeOpened = true;
-            rootPrivate.canAutoCloseEditionMode = true;
+
+            // Close our combobox
+            selectNetworkDeviceCombobox.close();
 
             // Get focus
             root.forceActiveFocus();
-
-            // Reset UI
-            // - network device
-            resetComboboxSelectNetworkDevice();
-            // - port
-            selectPortTextfield.text = Qt.binding(function() {
-               return root.currentPort;
-            });
         }
     }
 
     // Close our widget
     function close()
     {
-        if (rootPrivate.isEditionModeOpened)
+        if (root.checkValues() && rootPrivate.isEditionModeOpened)
         {
-            // Stop our timer
-            autoCloseTimer.stop();
-
-            // Notify change
-            root.willCloseEditionMode();
-
             // Update internal states
             rootPrivate.isEditionModeOpened = false;
-            rootPrivate.canAutoCloseEditionMode = false;
         }
     }
 
-    // Reset our combobox used to select a network device
-    function resetComboboxSelectNetworkDevice()
-    {
-        // Close our combobox
-        selectNetworkDeviceCombobox.close();
-
-        // Update selected index
-        selectNetworkDeviceCombobox.selectedIndex = Qt.binding(function() {
-            var index = (
-                         (root.listOfNetworkDevices)
-                         ? root.listOfNetworkDevices.indexOf(root.currentNetworkDevice)
-                         : -1
-                        );
-
-            // When our current network device is offline, we try to help our end-users
-            // by selecting a network device when we can i.e. when there is a single network device available
-            return (
-                    (index >= 0)
-                    ? index
-                    : (((root.listOfNetworkDevices) && (root.listOfNetworkDevices.length === 1)) ? 0 : -1)
-                   );
-        });
-    }
-
     // Check if values are valid or not
-    function checkValues(index, networkDevice, port, forceQmlUpdate)
+    function checkValues()
     {
+        var index = selectNetworkDeviceCombobox.selectedIndex;
+        var networkDevice = selectNetworkDeviceCombobox.selectedItem;
+        var port = selectPortTextfield.text;
+
         return (
                 // Coherent values
                 (index >= 0)
                 && (networkDevice !== "")
                 && (port !== "")
                 // Values are still available
-                && listOfNetworkDevices
-                && (listOfNetworkDevices.indexOf(networkDevice) >= 0)
+                && IgsNetworkController
+                && (IgsNetworkController.availableNetworkDevices.indexOf(networkDevice) >= 0)
                 );
-    }
-
-    // Reset auto-close timer
-    function resetAutoCloseTimer()
-    {
-        rootPrivate.canAutoCloseEditionMode = false;
-        rootPrivate.canAutoCloseEditionMode = true;
     }
 
 
@@ -235,51 +169,39 @@ I2CustomRectangle {
     //--------------------------------------------------------
 
     Behavior on color {
-        enabled: rootPrivate.canPerformAnimations
         ColorAnimation {
             duration: root.animationDuration
         }
     }
 
     Behavior on borderColor {
-        enabled: rootPrivate.canPerformAnimations
         ColorAnimation {
             duration: root.animationDuration
         }
     }
 
-    Component.onCompleted: {
-        rootPrivate.canPerformAnimations = true;
-    }
-
-    onListOfNetworkDevicesChanged: {
-        resetComboboxSelectNetworkDevice();
-
-        rootPrivate.networkDevicesAvailable = root.listOfNetworkDevices.length > 0;
-        if (!rootPrivate.networkDevicesAvailable) {
+    onCurrentNetworkDeviceChanged: {
+        if ((root.currentNetworkDevice === "") && rootPrivate.networkDevicesAvailable)
+        {
+            // Open component to force user to make a choice
+            open();
+        }
+        else
+        {
             close();
         }
     }
 
     onVisibleChanged: {
-        if (visible == false) {
+        if (!visible)
+        {
             close();
         }
-    }
 
-    // Timer used to auto-close our edition mode
-    Timer {
-        id: autoCloseTimer
-        running: root.editorStartedOnIgs && rootPrivate.canAutoCloseEditionMode
-                 && !(selectNetworkDeviceCombobox.comboList.visible || selectPortTextfield.activeFocus)
-
-        repeat: false
-        triggeredOnStart: false
-
-        interval: 20000
-
-        onTriggered: {
-            root.close();
+        if (visible && (root.currentNetworkDevice === "") && rootPrivate.networkDevicesAvailable)
+        {
+            // Open component to force user to make a choice
+            open();
         }
     }
 
@@ -322,19 +244,13 @@ I2CustomRectangle {
                 hoverEnabled: true
 
                 onClicked: {
-                    if (rootPrivate.isEditionModeOpened && root.editorStartedOnIgs)
+                    if (rootPrivate.isEditionModeOpened)
                     {
                         root.close();
                     }
-                    else if (!rootPrivate.isEditionModeOpened)
+                    else
                     {
                         root.open();
-                    }
-                }
-
-                onPositionChanged: {
-                    if (rootPrivate.isEditionModeOpened) {
-                        resetAutoCloseTimer();
                     }
                 }
 
@@ -348,10 +264,10 @@ I2CustomRectangle {
                     }
                     visible: rootPrivate.networkDevicesAvailable
 
+                    pressedID: "mapping-mode-settings-pressed"
                     releasedID: rootPrivate.mustBeHighlighted ? (contentMouseArea.pressed ? buttonOpenSettings.pressedID
-                                                                                          : root.settingsHighlightedId)
-                                                              : root.settingsReleasedId
-                    pressedID: root.settingsPressedId
+                                                                                          : "mapping-mode-settings-hover")
+                                                              : "mapping-mode-settings"
 
                     Controls2.ToolTip {
                         delay: Qt.styleHints.mousePressAndHoldInterval
@@ -389,8 +305,7 @@ I2CustomRectangle {
                             topMargin: 15
                         }
 
-                        visible: true
-                        enabled: visible && root.editorStartedOnIgs
+                        enabled: ((root.currentNetworkDevice !== "") && (root.currentPort !== ""))
 
                         style: I2SvgToggleButtonStyle {
                             fileCache: IngeScapeTheme.svgFileIngeScape
@@ -408,8 +323,8 @@ I2CustomRectangle {
                         }
 
                         onClicked: {
-                            root.connectChanged(checked);
                             checked = false;
+                            root.connectChanged(IgsNetworkController.isStarted);
                         }
 
                         Binding {
@@ -451,7 +366,7 @@ I2CustomRectangle {
                            top: connectButton.bottom
                        }
 
-                       visible : root.editorStartedOnIgs
+                       visible : ((root.currentNetworkDevice !== "") && (root.currentNetworkDevice !== ""))
 
                        color: (IgsNetworkController && IgsNetworkController.isStarted) ? IngeScapeTheme.veryLightGreyColor
                                                                                        : IngeScapeTheme.lightGreyColor
@@ -536,14 +451,12 @@ I2CustomRectangle {
             clip: (height !== childrenRect.height)
 
             Behavior on height {
-                enabled: rootPrivate.canPerformAnimations
                 NumberAnimation {
                     duration: root.animationDuration
                 }
             }
 
             Behavior on opacity {
-                enabled: rootPrivate.canPerformAnimations
                 NumberAnimation {
                     duration: root.animationDuration
                 }
@@ -596,8 +509,8 @@ I2CustomRectangle {
 
                 placeholderText: qsTr("Select a network device...")
 
-                model: null
-                selectedIndex: -1
+                model: IgsNetworkController ? IgsNetworkController.availableNetworkDevices : null
+                selectedIndex: (root.currentNetworkDevice !== "") ? IgsNetworkController.availableNetworkDevices.indexOf(root.currentNetworkDevice) : -1
 
                 delegate: customDelegate.component
 
@@ -622,10 +535,6 @@ I2CustomRectangle {
                         return selectNetworkDeviceCombobox.modelToString(selectNetworkDeviceCombobox.model[index]);
                     }
                 }
-
-                onSelectedIndexChanged: {
-                    root.resetAutoCloseTimer();
-                }
             }
 
             // Select port
@@ -648,14 +557,12 @@ I2CustomRectangle {
 
             TextField {
                 id: selectPortTextfield
-
                 anchors {
                     left: parent.left
                     right: parent.right
                     top: labelPort.bottom
                     topMargin: 9
                 }
-
                 height: 22
 
                 verticalAlignment: TextInput.AlignVCenter
@@ -681,15 +588,10 @@ I2CustomRectangle {
                         left: 3
                         right: 3
                     }
-
                     font {
                         pixelSize:15
                         family: IngeScapeTheme.textFontFamily
                     }
-                }
-
-                onTextChanged: {
-                    root.resetAutoCloseTimer();
                 }
             }
 
@@ -714,7 +616,6 @@ I2CustomRectangle {
                         top: parent.top
                     }
                     height: actions.buttonBoundingBox.height
-
                     spacing: 15
 
                     // Cancel button
@@ -726,7 +627,7 @@ I2CustomRectangle {
                         }
                         width: actions.buttonBoundingBox.width
 
-                        visible: root.editorStartedOnIgs
+                        visible: (root.currentNetworkDevice !== "") // If no current device, user have to choose one (mandatory !)
 
                         activeFocusOnPress: true
 
@@ -764,10 +665,7 @@ I2CustomRectangle {
                         }
                         width: actions.buttonBoundingBox.width
 
-                        enabled: root.checkValues(selectNetworkDeviceCombobox.selectedIndex,
-                                                  selectNetworkDeviceCombobox.selectedItem,
-                                                  selectPortTextfield.text,
-                                                  (root.listOfNetworkDevices ? root.listOfNetworkDevices.length : 0))
+                        enabled: root.checkValues()
                         activeFocusOnPress: true
 
                         text: qsTr("OK")
@@ -791,6 +689,7 @@ I2CustomRectangle {
 
                         onClicked: {
                             root.changeNetworkSettings(selectNetworkDeviceCombobox.selectedItem, selectPortTextfield.text);
+                            root.close();
                         }
                     }
                 }
@@ -808,9 +707,7 @@ I2CustomRectangle {
     // layer used to display comboboxes
     I2Layer {
         id: overlayLayerComboBox
-
         objectName: "overlayLayerComboBox"
-
         anchors.fill: parent
     }
 }

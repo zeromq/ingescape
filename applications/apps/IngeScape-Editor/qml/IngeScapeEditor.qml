@@ -279,8 +279,6 @@ Item {
             currentNetworkDevice: IngeScapeEditorC.networkDevice
             currentPort: IngeScapeEditorC.port
 
-            listOfNetworkDevices: IgsNetworkController ? IgsNetworkController.availableNetworkDevices : null
-
             // Add extra selection for mapping mode
             // NB : extraContent property of NetworkConnectionInformationItem
             Item {
@@ -376,13 +374,13 @@ Item {
             }
 
             onConnectChanged: {
-                if (connect)
+                if (wasOnlineBeforeConnectChanged)
                 {
-                    mappingModificationsPopup.open();
+                    IngeScapeEditorC.stopIngeScape(false);
                 }
                 else
                 {
-                    IngeScapeEditorC.stopIngeScape(false);
+                    mappingModificationsPopup.open();
                 }
             }
 
@@ -393,7 +391,6 @@ Item {
                 {
                      IngeScapeEditorC.restartIngeScape(false);
                 }
-                close();
             }
         }
     }

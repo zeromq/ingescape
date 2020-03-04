@@ -164,7 +164,6 @@ Item {
 
     NetworkConnectionInformationItem {
         id: networkConnectionInformationItem
-
         anchors {
             top: parent.top
             topMargin: 20
@@ -178,39 +177,24 @@ Item {
                         // And always in session view
                         || (IngeScapeAssessmentsC.experimentationC.sessionC && IngeScapeAssessmentsC.experimentationC.sessionC.currentSession)))
 
-        editorStartedOnIgs: IgsNetworkController ? IgsNetworkController.isStarted : false
         currentNetworkDevice: IngeScapeAssessmentsC.networkDevice
         currentPort: IngeScapeAssessmentsC.port
-        listOfNetworkDevices: IgsNetworkController ? IgsNetworkController.availableNetworkDevices : null
 
         onConnectChanged: {
-            if (connect)
+            if (wasOnlineBeforeConnectChanged)
             {
-                IgsNetworkController.start(IngeScapeAssessmentsC.networkDevice, IngeScapeAssessmentsC.ipAddress, IngeScapeAssessmentsC.port);
+                IngeScapeAssessmentsC.stopIngeScape(false);
             }
             else
             {
-                IgsNetworkController.stop();
+                IngeScapeAssessmentsC.startIngeScape();
             }
-        }
-
-        onWillOpenEditionMode: {
-            IgsNetworkController.updateAvailableNetworkDevices();
         }
 
         onChangeNetworkSettings: {
-            if (IgsNetworkController.isAvailableNetworkDevice(networkDevice))
-            {
-                var success = IngeScapeAssessmentsC.restartNetwork(port, networkDevice, clearPlatform);
-                if (success)
-                {
-                    close();
-                }
-                else
-                {
-                    console.error("Network cannot be (re)started on device " + networkDevice + " and port " + port);
-                }
-            }
+            IngeScapeAssessmentsC.networkDevice = networkDevice;
+            IngeScapeAssessmentsC.port = port;
+            IngeScapeAssessmentsC.restartIngeScape(false);
         }
     }
 

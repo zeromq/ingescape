@@ -42,13 +42,13 @@ class IngeScapeAssessmentsController : public QObject
     Q_OBJECT
 
     // Network settings - network device
-    I2_QML_PROPERTY_READONLY(QString, networkDevice)
+    I2_QML_PROPERTY(QString, networkDevice)
 
     // Network settings - ip address
     I2_QML_PROPERTY_READONLY(QString, ipAddress)
 
     // Network settings - port
-    I2_QML_PROPERTY_READONLY(uint, port)
+    I2_QML_PROPERTY(uint, port)
 
     // Path to the directory with IngeScape licenses
     I2_QML_PROPERTY_READONLY(QString, licensesPath)
@@ -108,13 +108,12 @@ public:
 
 
     /**
-     * @brief Re-Start the network with a port and a network device
-     * @param strPort
-     * @param networkDevice
-     * @param hasToClearPlatform
-     * @return true when success
+     * @brief If _networkDevice not available will try to auto select another one
      */
-    Q_INVOKABLE bool restartNetwork(QString strPort, QString networkDevice, bool hasToClearPlatform);
+    Q_INVOKABLE bool startIngeScape();
+
+    Q_INVOKABLE void stopIngeScape(bool hasToClearPlatform);
+    Q_INVOKABLE bool restartIngeScape(bool hasToClearPlatform);
 
 
 public Q_SLOTS:
@@ -175,34 +174,6 @@ private Q_SLOTS:
      * @param value
      */
     void _onCurrentExperimentationChanged(ExperimentationM* currentExperimentation);
-
-
-private:
-
-    /**
-     * @brief If checkAvailableNetworkDevices : auto select a network device to start Ingescape
-     */
-    bool _startIngeScape(bool checkAvailableNetworkDevices);
-
-
-    /**
-     * @brief Restart IngeScape
-     *
-     * @param hasToClearPlatform
-     * @param checkAvailableNetworkDevices
-     *
-     *
-     * @return true if success
-     */
-    bool _restartIngeScape(bool hasToClearPlatform, bool checkAvailableNetworkDevices = false);
-
-
-    /**
-     * @brief Stop IngeScape
-     *
-     * @param hasToClearPlatform
-     */
-    void _stopIngeScape(bool hasToClearPlatform);
 
 
 private:
