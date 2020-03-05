@@ -1,7 +1,22 @@
 #!/bin/sh
+
+currentLocation=$PWD
+
+if [ -e /usr/local/bin/brew ]; then
+    echo "Removing zeromq stack from homebrew if needed"
+    brew remove -f zyre czmq zeromq libsodium
+else
+    echo "Installing homebrew"
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+fi
+echo "Checking and installing system dependencies"
+brew install autoconf automake cmake libtool pkgconfig
+
 if [ ! -e ../../../libsodium ]; then
-    echo "Clone the libsodium repo at the same level as this one"
-    exit
+    echo "Cloning libsodium"
+    cd ../../..
+    git clone -b stable ssh://git@gitlab.ingescape.com:22222/third-party/libsodium.git
+    cd $currentLocation
 fi
 cd ../../../libsodium
 ./autogen.sh && ./configure && make
@@ -9,9 +24,10 @@ sudo make install
 cp -R ./src/libsodium/.libs ./src/libsodium/libs
 
 if [ ! -e ../libzmq ]; then
-    echo "Clone the libzmq repo at the same level as this one"
-    cd ../ingescape/dependencies/macos
-    exit
+    echo "Cloning libzmq"
+    cd ..
+    git clone ssh://git@gitlab.ingescape.com:22222/third-party/libzmq.git
+    cd libzmq
 fi
 cd ../libzmq
 mkdir build
@@ -22,9 +38,10 @@ mkdir -p builds/xcode
 cmake -S . -B builds/xcode -DCMAKE_BUILD_TYPE=Debug -DWITH_LIBSODIUM=ON -DENABLE_DRAFTS=ON -G "Xcode"
 
 if [ ! -e ../czmq ]; then
-    echo "Clone the czmq repo at the same level as this one"
-    cd ../ingescape/dependencies/macos
-    exit
+    echo "Cloning czmq"
+    cd ..
+    git clone ssh://git@gitlab.ingescape.com:22222/third-party/czmq.git
+    cd czmq
 fi
 cd ../czmq
 mkdir build
@@ -35,9 +52,10 @@ mkdir -p builds/xcode
 cmake -S . -B builds/xcode -DCMAKE_BUILD_TYPE=Debug -DENABLE_DRAFTS=ON -G "Xcode"
 
 if [ ! -e ../zyre ]; then
-    echo "Clone the zyre repo at the same level as this one"
-    cd ../ingescape/dependencies/macos
-    exit
+    echo "Cloning zyre"
+    cd ..
+    git clone ssh://git@gitlab.ingescape.com:22222/third-party/zyre.git
+    cd zyre
 fi
 cd ../zyre
 mkdir build
