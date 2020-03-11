@@ -10,6 +10,7 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
 # Add path to custom macro
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/dependencies")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/modules")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/modules/library")
 
@@ -129,17 +130,55 @@ set(ingescape_private_headers
 
 source_group("Header Files" FILES ${ingescape_private_headers} ${ingescape_headers_to_install})
 
-# ##############################################################################
-# dependencies
-# ##############################################################################
-# Will be used to add flags to pkg-config useful when apps want to statically
-# link
-set(pkg_config_libs_private "")
-add_ingescape_libraries_dependencies(MORE_LIBRARIES pkg_config_libs_private)
-set(pkgconfig_name_libzmq "libzmq >= 4")
-set(pkgconfig_name_libczmq "libczmq >= 4")
-set(pkgconfig_name_libzyre "libzyre >= 2")
-set(pkgconfig_name_libsodium "libsodium")
+
+########################################################################
+# Dependencies
+########################################################################
+find_package(libsodium REQUIRED)
+IF (LIBSODIUM_FOUND)
+  include_directories(${LIBSODIUM_INCLUDE_DIRS})
+  list(APPEND MORE_LIBRARIES ${LIBSODIUM_LIBRARIES})
+ELSE (LIBSODIUM_FOUND)
+  message( FATAL_ERROR "libsodium not found." )
+ENDIF (LIBSODIUM_FOUND)
+
+find_package(libzmq REQUIRED)
+IF (LIBZMQ_FOUND)
+  include_directories(${LIBZMQ_INCLUDE_DIRS})
+  list(APPEND MORE_LIBRARIES ${LIBZMQ_LIBRARIES})
+ELSE (LIBZMQ_FOUND)
+  message( FATAL_ERROR "libzmq not found." )
+ENDIF (LIBZMQ_FOUND)
+
+find_package(czmq REQUIRED)
+IF (CZMQ_FOUND)
+  include_directories(${CZMQ_INCLUDE_DIRS})
+  list(APPEND MORE_LIBRARIES ${CZMQ_LIBRARIES})
+ELSE (CZMQ_FOUND)
+  message( FATAL_ERROR "czmq not found." )
+ENDIF (CZMQ_FOUND)
+
+find_package(zyre REQUIRED)
+IF (ZYRE_FOUND)
+  include_directories(${ZYRE_INCLUDE_DIRS})
+  list(APPEND MORE_LIBRARIES ${ZYRE_LIBRARIES})
+ELSE (ZYRE_FOUND)
+  message( FATAL_ERROR "zyre not found." )
+ENDIF (ZYRE_FOUND)
+
+IF (APPLE)
+  list(APPEND MORE_LIBRARIES "-framework CoreFoundation")
+ENDIF (APPLE)
+
+if (MSVC)
+    # required libraries for msvc
+    list(APPEND MORE_LIBRARIES ws2_32)
+elseif (MINGW)
+    # required libraries for mingw
+    list(APPEND MORE_LIBRARIES -lws2_32)
+elseif (CYGWIN)
+    # required libraries for cygwin
+endif()
 
 # ##############################################################################
 # library
@@ -237,7 +276,15 @@ if(INGESCAPE_BUILD_SHARED)
 
   # Add linked dependencies
   #FIXME All private here ?
-  target_link_libraries(${PROJECT_NAME} PRIVATE ${MORE_LIBRARIES})
+  message(STATUS "MORE_LIBRARIES: ${MORE_LIBRARIES}")
+  target_link_libraries(${PROJECT_NAME} 
+    PRIVATE 
+      ${MORE_LIBRARIES}
+#      czmq
+#      libsodium
+#      libzmq
+#      zyre
+  )
 
   # Header files
   target_include_directories(${PROJECT_NAME}
@@ -248,10 +295,6 @@ if(INGESCAPE_BUILD_SHARED)
       ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/yajl/src/api
       $<$<BOOL:${WIN32}>:${CMAKE_CURRENT_SOURCE_DIR}/dependencies/windows/unix>
   )
-
-  if (CMAKE_BUILD_TYPE STREQUAL "Release")
-    target_compile_options(${PROJECT_NAME} PRIVATE "-O2")
-  endif()
 
   install(TARGETS ${PROJECT_NAME}
           EXPORT ${PROJECT_NAME}-targets
