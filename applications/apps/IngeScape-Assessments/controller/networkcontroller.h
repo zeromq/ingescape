@@ -66,6 +66,8 @@ Q_SIGNALS:
      */
     void deletedRecordReceived(QString message);
 
+    void exportedRecordReceived();
+
 
 public Q_SLOTS:
 

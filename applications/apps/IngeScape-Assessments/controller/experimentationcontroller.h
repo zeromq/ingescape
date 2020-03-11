@@ -48,6 +48,8 @@ class ExperimentationController : public QObject
     I2_QML_PROPERTY(RecordAssessmentM*, nextRecordToHandle)
     I2_QML_PROPERTY(bool, removeOtherRecordsWhileRecording) // If false, it means that recording have to stop at first other record encounter
 
+    I2_QML_PROPERTY_READONLY(QString, exportSessionsMessage)
+
 
 public:
 
@@ -224,6 +226,9 @@ public Q_SLOTS:
      * @param message (id of the record)
      */
     void onRecordDeletedReceived(QString message);
+
+
+    void onExportedRecordReceived();
 
 
     /**

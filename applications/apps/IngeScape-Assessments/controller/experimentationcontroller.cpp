@@ -37,7 +37,8 @@ ExperimentationController::ExperimentationController(QObject *parent) : QObject(
     _selectedSubjectIdListToFilter(QStringList()),
     _selectedProtocolNameListToFilter(QStringList()),
     _nextRecordToHandle(nullptr),
-    _removeOtherRecordsWhileRecording(false)
+    _removeOtherRecordsWhileRecording(false),
+    _exportSessionsMessage("")
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -448,6 +449,16 @@ void ExperimentationController::onRecordDeletedReceived(QString message)
             }
         }
     }
+}
+
+
+void ExperimentationController::onExportedRecordReceived()
+{
+    setexportSessionsMessage("Selected sessions exported successfully");
+
+    QTimer::singleShot(1500, [this]() {
+        this->setexportSessionsMessage("");
+    } );
 }
 
 

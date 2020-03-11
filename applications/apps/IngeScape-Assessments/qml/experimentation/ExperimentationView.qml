@@ -1112,6 +1112,28 @@ Item {
                     }
                 }
 
+                Text {
+                    id: exportSessionsMessage
+
+                    anchors {
+                        verticalCenter: parent.verticalCenter
+                        //horizontalCenter: parent.horizontalCenter
+                        right: parent.right
+                        rightMargin: 10
+                    }
+
+                    text: rootItem.experimentationC.exportSessionsMessage
+                    visible: (exportSessionsMessage.text.length > 0)
+
+                    color: IngeScapeTheme.whiteColor
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        pixelSize: 18
+                        bold: true
+                    }
+                }
+
+
                 Button {
                     id: cancelButton
 
@@ -1125,32 +1147,13 @@ Item {
                     height: boundingBox.height
                     width: boundingBox.width
 
+                    visible: !exportSessionsMessage.visible
+
                     activeFocusOnPress: true
 
                     style: IngeScapeAssessmentsButtonStyle {
                         text: "Cancel"
                     }
-
-//                    style: ButtonStyle {
-//                        background: Rectangle {
-//                            anchors.fill: parent
-//                            radius: 5
-//                            color: control.pressed ? IngeScapeTheme.lightGreyColor : (control.hovered ? IngeScapeTheme.veryLightGreyColor : "transparent")
-//                        }
-
-//                        label: Text {
-//                            text: "Cancel"
-//                            verticalAlignment: Text.AlignVCenter
-//                            horizontalAlignment: Text.AlignHCenter
-//                            color: IngeScapeAssessmentsTheme.regularDarkBlueHeader
-
-//                            font {
-//                                family: IngeScapeTheme.textFontFamily
-//                                weight: Font.Medium
-//                                pixelSize: 16
-//                            }
-//                        }
-//                    }
 
                     onClicked: {
                         if (rootItem.experimentationC) {
@@ -1171,6 +1174,8 @@ Item {
                     }
                     height: boundingBox.height
                     width: 150 // boundingBox.width
+
+                    visible: !exportSessionsMessage.visible
 
                     activeFocusOnPress: true
                     enabled: rootItem.experimentationC && (rootItem.experimentationC.selectedSessions.count > 0)
