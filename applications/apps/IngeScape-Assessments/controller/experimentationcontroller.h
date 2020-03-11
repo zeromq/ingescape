@@ -88,8 +88,10 @@ public:
 
     /**
      * @brief Export the list of selected sessions
+     * @param filterDependentVariables if flag = true: we export only the outputs that have a corresponding Dependent Variable in the protocol
+     *  Else (flag = false): we export all IngeScape outputs of the platform
      */
-    Q_INVOKABLE void exportSelectedSessions();
+    Q_INVOKABLE void exportSelectedSessions(bool filterDependentVariables);
 
 
     /**

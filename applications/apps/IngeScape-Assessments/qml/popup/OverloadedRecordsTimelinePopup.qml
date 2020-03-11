@@ -45,10 +45,10 @@ AssessmentsPopupBase {
     //--------------------------------
 
     // Signal raised when user confirm that he wants to remove records encountered while recording
-    signal removeOtherRecordsWhileRecording()
+    signal removeOtherRecordsWhileRecording();
 
     // Signal raised when user confirm that he wants to stop its record when it encounters others
-    signal stopRecordingWhenEncounterOtherRecords()
+    signal stopRecordingWhenEncounterOtherRecords();
 
 
     //--------------------------------

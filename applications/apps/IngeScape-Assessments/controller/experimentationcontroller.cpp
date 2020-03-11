@@ -215,12 +215,19 @@ void ExperimentationController::deleteSession(SessionM* session)
 
 /**
  * @brief Export the list of selected sessions
+ * @param filterDependentVariables if flag = true: we export only the outputs that have a corresponding Dependent Variable in the protocol
+ *  Else (flag = false): we export all IngeScape outputs of the platform
  */
-void ExperimentationController::exportSelectedSessions()
+void ExperimentationController::exportSelectedSessions(bool filterDependentVariables)
 {
     if ((_currentExperimentation != nullptr) && !_selectedSessions.isEmpty())
     {
-        qInfo() << "Export" << _selectedSessions.count() << "selected sessions of" << _currentExperimentation->name() << "(to file)...";
+        if (filterDependentVariables) {
+            qInfo() << "Export ONLY Dependent Variables of" << _selectedSessions.count() << "selected sessions of" << _currentExperimentation->name() << "(to file)...";
+        }
+        else {
+            qInfo() << "Export ALL outputs of" << _selectedSessions.count() << "selected sessions of" << _currentExperimentation->name() << "(to file)...";
+        }
 
         QStringList sessionIds;
 
@@ -236,11 +243,6 @@ void ExperimentationController::exportSelectedSessions()
         if (_isRecorderON && !sessionIds.isEmpty())
         {
             //QString message = QString("%1=%2").arg(command_ExportSessions, sessionIds.join('|'));
-
-            // FIXME TODO: add a control to set this flag in the QML
-            // if flag = true: we export only the outputs that have a corresponding Dependent Variable in the protocol
-            // if flag = false: we export all IngeScape outputs of the platform
-            bool filterDependentVariables = true;
 
             QString experimentationUID = AssessmentsModelManager::cassUuidToQString(_currentExperimentation->getCassUuid());
             QString message = QString("%1=%2 EXPE=%3 VD_FILTER=%4").arg(command_ExportSessions, sessionIds.join('|'), experimentationUID, QString::number(filterDependentVariables));

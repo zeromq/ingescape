@@ -1159,7 +1159,6 @@ Item {
                     }
                 }
 
-                // TODO MAYBE
                 Button {
                     id: exportToFileButton
 
@@ -1181,11 +1180,7 @@ Item {
                     }
 
                     onClicked: {
-                        if (rootItem.experimentationC)
-                        {
-                            //console.log("QML: Export " + rootItem.experimentationC.selectedSessions.count + " selected sessions (to file)...");
-                            rootItem.experimentationC.exportSelectedSessions();
-                        }
+                        exportViewPopup.open();
                     }
                 }
             }
@@ -1359,16 +1354,32 @@ Item {
     //
     // Export View (popup)
     //
-    /*Export.ExportView {
+    Export.ExportView {
         id: exportViewPopup
 
         anchors.centerIn: parent
 
-        width: parent.width - subScreensMargin
-        height: parent.height - subScreensMargin
+        //width: parent.width - subScreensMargin
+        //height: parent.height - subScreensMargin
 
-        controller: IngeScapeAssessmentsC.exportC
-    }*/
+        //controller: IngeScapeAssessmentsC.exportC
+
+        onExportAllOutputs: {
+            if (rootItem.experimentationC)
+            {
+                //console.log("QML: Export ALL outputs of " + rootItem.experimentationC.selectedSessions.count + " selected sessions (to file)...");
+                rootItem.experimentationC.exportSelectedSessions(false);
+            }
+        }
+
+        onExportOnlyDependentVariables: {
+            if (rootItem.experimentationC)
+            {
+                //console.log("QML: Export ONLY Dependent Variables of " + rootItem.experimentationC.selectedSessions.count + " selected sessions (to file)...");
+                rootItem.experimentationC.exportSelectedSessions(true);
+            }
+        }
+    }
 
 
     Popup.DeleteConfirmationPopup {
