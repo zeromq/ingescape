@@ -4,36 +4,25 @@
 # Project setup
 # ##############################################################################
 cmake_minimum_required(VERSION 3.13.1)
-project(ingescape HOMEPAGE_URL https://ingescape.com)
+project(ingescape HOMEPAGE_URL https://ingescape.com LANGUAGES C)
 
-enable_language(C)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
-set(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
-# Select flags
-set(CMAKE_C_FLAGS_RELEASE "-O2")
 # Add path to custom macro
-set(INGESCAPE_CMAKE_MODULES_DIR "${SOURCE_DIR}/builds/cmake/modules")
-list(APPEND CMAKE_MODULE_PATH ${INGESCAPE_CMAKE_MODULES_DIR})
-list(APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}/builds/cmake/modules/library")
-# NSIS templates
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/modules")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/modules/library")
+
+# Include custom helpers
 include(IngescapeHelper)
 include(IdentifyOS)
 
-# ##############################################################################
-# options
-# ##############################################################################
 # Default build mode is debug
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Debug)
 endif()
-add_definitions(-DINGESCAPE=1 -DTARGET_OS_IOS=0)
 
-# ##############################################################################
-# plateform specific
-# ##############################################################################
+# Check C compiler flags but not on MSVC
 if(NOT MSVC)
   include(CheckCCompilerFlag)
   foreach(_CCOPT
@@ -78,51 +67,67 @@ if(NOT MSVC)
   endforeach()
 endif()
 
-# ##############################################################################
-# version
-# ##############################################################################
 # gets version from admin.c file
-get_ingescape_version(INGESCAPE_VERSION_MAJOR INGESCAPE_VERSION_MINOR
-                      INGESCAPE_VERSION_PATCH)
-set(
-  INGESCAPE_VERSION
-  "${INGESCAPE_VERSION_MAJOR}.${INGESCAPE_VERSION_MINOR}.${INGESCAPE_VERSION_PATCH}"
-  )
+get_ingescape_version(INGESCAPE_VERSION_MAJOR INGESCAPE_VERSION_MINOR INGESCAPE_VERSION_PATCH)
+set( INGESCAPE_VERSION "${INGESCAPE_VERSION_MAJOR}.${INGESCAPE_VERSION_MINOR}.${INGESCAPE_VERSION_PATCH}")
 message(STATUS "Detected INGESCAPE Version - ${INGESCAPE_VERSION}")
 
 # ##############################################################################
-# includes
+# Source files
 # ##############################################################################
-set(ingescape_headers_to_install src/include/ingescape.h
-				 src/include/ingescape_agent.h
-                                 src/include/ingescape_advanced.h)
+list(APPEND ingescape_sources
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/definition.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/mapping.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/model.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/network.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/parser.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/admin.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/bus.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/call.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/license.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/monitor.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/json.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/performance.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/agent.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/global.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/yajl/src/yajl_alloc.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/yajl/src/yajl_buf.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/yajl/src/yajl_encode.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/yajl/src/yajl_gen.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/yajl/src/yajl_lex.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/yajl/src/yajl_parser.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/yajl/src/yajl_tree.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/yajl/src/yajl_version.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/yajl/src/yajl.c
+    $<$<BOOL:${WIN32}>:${CMAKE_CURRENT_SOURCE_DIR}/dependencies/windows/unix/unixfunctions.c>
+    $<$<BOOL:${WIN32}>:${CMAKE_CURRENT_BINARY_DIR}/version.rc>
+)
 
-set(ingescape_headers
-    ${ingescape_headers_to_install}
-    src/include/ingescape_private.h
-    src/include/uthash/libut.h
-    src/include/uthash/ringbuf.h
-    src/include/uthash/utarray.h
-    src/include/uthash/uthash.h
-    src/include/uthash/utlist.h
-    src/include/uthash/utmm.h
-    src/include/uthash/utringbuffer.h
-    src/include/uthash/utstring.h
-    src/include/uthash/utvector.h)
-
-source_group("Header Files" FILES ${ingescape_headers})
-install(FILES ${ingescape_headers_to_install}
-        DESTINATION include/ingescape
-        COMPONENT library)
-
-add_ingescape_include_directory(_INCLUDES_DIRECTORY)
-include_directories(${_INCLUDES_DIRECTORY})
-
-# ##############################################################################
-# Sources files
-# ##############################################################################
-add_ingescape_sources(ingescape_sources)
 source_group("Source Files" FILES ${ingescape_sources})
+
+# ##############################################################################
+# Header files
+# ##############################################################################
+set(ingescape_headers_to_install
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ingescape.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ingescape_agent.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ingescape_advanced.h
+)
+
+set(ingescape_private_headers
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ingescape_private.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/include/uthash/libut.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/include/uthash/ringbuf.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/include/uthash/utarray.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/include/uthash/uthash.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/include/uthash/utlist.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/include/uthash/utmm.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/include/uthash/utringbuffer.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/include/uthash/utstring.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/include/uthash/utvector.h
+)
+
+source_group("Header Files" FILES ${ingescape_private_headers} ${ingescape_headers_to_install})
 
 # ##############################################################################
 # dependencies
@@ -142,38 +147,42 @@ set(pkgconfig_name_libsodium "libsodium")
 option(INGESCAPE_BUILD_SHARED "Whether or not to build the shared object" ON)
 option(INGESCAPE_BUILD_STATIC "Whether or not to build the static archive" ON)
 
+
 if(NOT INGESCAPE_BUILD_SHARED AND NOT INGESCAPE_BUILD_STATIC)
   message(FATAL_ERROR "Neither static nor shared library build enabled")
 endif()
 
+
 if(NOT MSVC)
   # avoid building everything twice for shared + static only on *nix, as Windows
   # needs different preprocessor defines in static builds
-  add_library(ingescape_objects OBJECT ${ingescape_sources})
-  set_property(TARGET ingescape_objects PROPERTY POSITION_INDEPENDENT_CODE ON)
+  #FIXME This is a good idea but it's not used anymore. Let's fix that!
+  #add_library(ingescape_objects OBJECT ${ingescape_sources})
+  #set_property(TARGET ingescape_objects PROPERTY POSITION_INDEPENDENT_CODE ON)
 else()
+  # WIN32_LIB_FILEFLAGS is used in the RC file that will register the DLL version
   if (${CMAKE_BUILD_TYPE} MATCHES "Release")
     set(WIN32_LIB_FILEFLAGS "0")
   else ()
       set(WIN32_LIB_FILEFLAGS "VS_FF_DEBUG")
   endif()
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/modules/library/library_version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
 endif()
 
 
 # shared
 if(INGESCAPE_BUILD_SHARED)
-  if(MSVC)
-    set(WIN32_LIB_FILETYPE "VFT_DLL")
-    configure_file(${SOURCE_DIR}/builds/cmake/modules/library/library_version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
+  add_library(${PROJECT_NAME} SHARED ${ingescape_sources})
 
-    add_library(${PROJECT_NAME} SHARED
-        ${ingescape_sources}
-        ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
+  if(MSVC)
+    # WIN32_LIB_FILETYPE is used in the RC file that will register the DLL version
+    set(WIN32_LIB_FILETYPE "VFT_DLL")
+
 
     if(CMAKE_BUILD_TYPE STREQUAL "Release")
       set_target_properties(${PROJECT_NAME}
                             PROPERTIES PUBLIC_HEADER
-                                       "${public_headers}"
+                                       "${ingescape_headers_to_install}"
                                        DEFINE_SYMBOL
                                        "INGESCAPE_EXPORTS"
                                        SOVERSION
@@ -185,7 +194,7 @@ if(INGESCAPE_BUILD_SHARED)
     else()
       set_target_properties(${PROJECT_NAME}
                             PROPERTIES PUBLIC_HEADER
-                                       "${public_headers}"
+                                       "${ingescape_headers_to_install}"
                                        DEFINE_SYMBOL
                                        "INGESCAPE_EXPORTS"
                                        SOVERSION
@@ -204,11 +213,9 @@ if(INGESCAPE_BUILD_SHARED)
     endif()
 
   else(MSVC)
-    add_library(${PROJECT_NAME} SHARED ${ingescape_sources})
-
     set_target_properties(${PROJECT_NAME}
                           PROPERTIES PUBLIC_HEADER
-                                     "${public_headers}"
+                                     "${ingescape_headers_to_install}"
                                      #FRAMEWORK TRUE
                                      #FRAMEWORK_VERSION C
                                      #MACOSX_FRAMEWORK_IDENTIFIER com.ingescape
@@ -225,7 +232,26 @@ if(INGESCAPE_BUILD_SHARED)
                                      "lib")
   endif(MSVC)
 
+  # Add compilation #defines to the target
+  target_compile_definitions(${PROJECT_NAME} PRIVATE INGESCAPE=1;TARGET_OS_IOS=0)
+
+  # Add linked dependencies
+  #FIXME All private here ?
   target_link_libraries(${PROJECT_NAME} PRIVATE ${MORE_LIBRARIES})
+
+  # Header files
+  target_include_directories(${PROJECT_NAME}
+    PUBLIC
+      $<INSTALL_INTERFACE:include>
+      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/include>
+    PRIVATE
+      ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/yajl/src/api
+      $<$<BOOL:${WIN32}>:${CMAKE_CURRENT_SOURCE_DIR}/dependencies/windows/unix>
+  )
+
+  if (CMAKE_BUILD_TYPE STREQUAL "Release")
+    target_compile_options(${PROJECT_NAME} PRIVATE "-O2")
+  endif()
 
   install(TARGETS ${PROJECT_NAME}
           EXPORT ${PROJECT_NAME}-targets
@@ -241,18 +267,16 @@ endif()
 
 # static
 if(INGESCAPE_BUILD_STATIC)
+  add_library(${PROJECT_NAME}-static STATIC ${ingescape_sources})
   if(MSVC)
+    # WIN32_LIB_FILETYPE is used in the RC file that will register the DLL version
     set(WIN32_LIB_FILETYPE "VFT_STATIC_LIB")
-    configure_file(${SOURCE_DIR}/builds/cmake/modules/library/library_version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
-
-    add_library(${PROJECT_NAME}-static STATIC
-        ${ingescape_sources}
-        ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/modules/library/library_version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
 
     if(CMAKE_BUILD_TYPE STREQUAL "Release")
       set_target_properties(${PROJECT_NAME}-static
                             PROPERTIES PUBLIC_HEADER
-                                       "${public_headers}"
+                                       "${ingescape_headers_to_install}"
                                        COMPILE_DEFINITIONS
                                        "INGESCAPE_STATIC"
                                        OUTPUT_NAME
@@ -260,19 +284,16 @@ if(INGESCAPE_BUILD_STATIC)
     else()
       set_target_properties(${PROJECT_NAME}-static
                             PROPERTIES PUBLIC_HEADER
-                                       "${public_headers}"
+                                       "${ingescape_headers_to_install}"
                                        COMPILE_DEFINITIONS
                                        "INGESCAPE_STATIC"
                                        OUTPUT_NAME
                                        "ingescaped_static")
     endif()
   else(MSVC)
-    add_library(${PROJECT_NAME}-static STATIC
-                ${ingescape_sources})
-
     set_target_properties(${PROJECT_NAME}-static
                           PROPERTIES PUBLIC_HEADER
-                                     "${public_headers}"
+                                     "${ingescape_headers_to_install}"
                                      COMPILE_DEFINITIONS
                                      "INGESCAPE_STATIC"
                                      OUTPUT_NAME
@@ -281,7 +302,27 @@ if(INGESCAPE_BUILD_STATIC)
                                      "lib")
   endif(MSVC)
 
+  # Header files
+  target_include_directories(${PROJECT_NAME}-static
+    PUBLIC
+      $<INSTALL_INTERFACE:include>
+      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/include>
+    PRIVATE
+      ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/yajl/src/api
+      $<$<BOOL:${WIN32}>:${CMAKE_CURRENT_SOURCE_DIR}/dependencies/windows/unix>
+  )
+
+  # Add compilation #defines to the target
+  target_compile_definitions(${PROJECT_NAME}-static PRIVATE INGESCAPE=1;TARGET_OS_IOS=0)
+
+  # Add linked dependencies
+  #FIXME All private here ?
   target_link_libraries(${PROJECT_NAME}-static PRIVATE ${MORE_LIBRARIES})
+
+  # Release build compile with -O2 flag
+  if (${CMAKE_BUILD_TYPE} MATCHES "Release")
+      target_compile_options(${PROJECT_NAME}-static PRIVATE "-O2")
+  endif()
 
   install(TARGETS ${PROJECT_NAME}-static
           EXPORT ${PROJECT_NAME}-targets
@@ -293,6 +334,10 @@ if(INGESCAPE_BUILD_STATIC)
                   COMPONENT library)
 endif()
 
+install(FILES ${ingescape_headers_to_install}
+        DESTINATION include/ingescape
+        COMPONENT library)
+
 # ##############################################################################
 # pkgconfig
 # ##############################################################################
@@ -302,7 +347,7 @@ set(exec_prefix "\${prefix}")
 set(libdir "\${prefix}/lib${LIB_SUFFIX}")
 set(includedir "\${prefix}/include")
 set(pkg_config_defines "")
-configure_file("${SOURCE_DIR}/src/libingescape.pc.in"
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/libingescape.pc.in"
                "${CMAKE_CURRENT_BINARY_DIR}/libingescape.pc" @ONLY)
 
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libingescape.pc"
@@ -340,7 +385,7 @@ write_basic_package_version_file(
 
 # uninstall target
 if(NOT TARGET uninstall)
-  configure_file("${SOURCE_DIR}/builds/cmake/cmake_uninstall.cmake.in"
+  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/cmake_uninstall.cmake.in"
                  "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
                  IMMEDIATE
                  @ONLY)
@@ -372,7 +417,7 @@ if((WIN32) OR (CMAKE_BUILD_TYPE STREQUAL "Release"))
   
   set(
     CPACK_SOURCE_IGNORE_FILES
-    "${SOURCE_DIR}/bindings/;${SOURCE_DIR}/build/;${SOURCE_DIR}/.git/;${SOURCE_DIR}/doc/;${SOURCE_DIR}/applications/;${SOURCE_DIR}/ingeprobe/;${SOURCE_DIR}/packaging/"
+    "${CMAKE_CURRENT_SOURCE_DIR}/bindings/;${CMAKE_CURRENT_SOURCE_DIR}/build/;${CMAKE_CURRENT_SOURCE_DIR}/.git/;${CMAKE_CURRENT_SOURCE_DIR}/doc/;${CMAKE_CURRENT_SOURCE_DIR}/applications/;${CMAKE_CURRENT_SOURCE_DIR}/ingeprobe/;${CMAKE_CURRENT_SOURCE_DIR}/packaging/"
     )
 
   if(WIN32)
@@ -462,7 +507,7 @@ if((WIN32) OR (CMAKE_BUILD_TYPE STREQUAL "Release"))
     if(ANDROID)
       set(CPACK_GENERATOR "ZIP")
     else()
-      install(FILES "${SOURCE_DIR}/dependencies/unix/install_script.sh"
+      install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/unix/install_script.sh"
               DESTINATION "."
               PERMISSIONS OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
               COMPONENT library)
