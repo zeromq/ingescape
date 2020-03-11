@@ -573,14 +573,7 @@ void AgentInMappingVM::_onInputsWillBeRemoved(QList<InputVM*> oldInputs)
 
     if (!tempLinkInputs.isEmpty())
     {
-        // FIXME TODO I2 Quick: Allow to remove a QList
-        //_linkInputsList.remove(tempLinkInputs);
-        for (LinkInputVM* linkInput : tempLinkInputs)
-        {
-            if (linkInput != nullptr) {
-                _linkInputsList.remove(linkInput);
-            }
-        }
+        _linkInputsList.remove(tempLinkInputs);
 
         Q_EMIT linkInputsListWillBeRemoved(tempLinkInputs);
 
@@ -651,14 +644,7 @@ void AgentInMappingVM::_onOutputsWillBeRemoved(QList<OutputVM*> oldOutputs)
 
     if (!tempLinkOutputs.isEmpty())
     {
-        // FIXME TODO I2 Quick: Allow to remove a QList
-        //_linkOutputsList.remove(tempLinkOutputs);
-        for (LinkOutputVM* linkOutput : tempLinkOutputs)
-        {
-            if (linkOutput != nullptr) {
-                _linkOutputsList.remove(linkOutput);
-            }
-        }
+        _linkOutputsList.remove(tempLinkOutputs);
 
         Q_EMIT linkOutputsListWillBeRemoved(tempLinkOutputs);
 

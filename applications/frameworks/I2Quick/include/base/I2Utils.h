@@ -1,7 +1,7 @@
 /*
  *	I2Quick
  *
- *  Copyright (c) 2016-2019 Ingenuity i/o. All rights reserved.
+ *  Copyright (c) 2016-2020 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -143,6 +143,24 @@ public:
      * @return
      */
     static QString getSubDirectoryPathInDocuments(QString subDirectoryName);
+
+
+    /**
+     * @brief Get (and create if needed) the root path of the current application
+     * "[App Location]/[Root Directory Name]/"
+     * @param rootDirectoryName
+     * @return
+     */
+    static QString getRootPathInApplicationFolder(QString rootDirectoryName = "App");
+
+
+    /**
+     * @brief Get (and create if needed) the path of the sub directory of the current application
+     * "[App Location]/[Root Directory Name]/[Sub Directory Name]"
+     * @param subDirectoryName
+     * @return
+     */
+    static QString getSubDirectoryPathInApplicationFolder(QString subDirectoryName);
 
 };
 

@@ -87,14 +87,9 @@ endif()
 ########################################################################
 # version
 ########################################################################
-get_ingescape_expe_version(INGESCAPE_EXPE_VERSION_MAJOR INGESCAPE_EXPE_VERSION_MINOR INGESCAPE_EXPE_VERSION_PATCH INGESCAPE_EXPE_VERSION_BUILD)
-
-set(INGESCAPE_EXPE_VERSION "${INGESCAPE_EXPE_VERSION_MAJOR}.${INGESCAPE_EXPE_VERSION_MINOR}.${INGESCAPE_EXPE_VERSION_PATCH}")
-if (WIN32)
-    add_definitions(-DVERSION="${INGESCAPE_EXPE_VERSION}.${INGESCAPE_EXPE_VERSION_BUILD}")
-else (WIN32)
-    add_definitions(-DVERSION="${INGESCAPE_EXPE_VERSION}")
-endif (WIN32)
+get_ingescape_expe_version(INGESCAPE_EXPE_VERSION_MAJOR INGESCAPE_EXPE_VERSION_MINOR INGESCAPE_EXPE_VERSION_BUILD)
+set(INGESCAPE_EXPE_VERSION "${INGESCAPE_EXPE_VERSION_MAJOR}.${INGESCAPE_EXPE_VERSION_MINOR}.${INGESCAPE_EXPE_VERSION_BUILD}")
+add_definitions(-DVERSION="${INGESCAPE_EXPE_VERSION}")
 message(STATUS "Detected INGESCAPE Expe Version - ${INGESCAPE_EXPE_VERSION}")
 
 ########################################################################

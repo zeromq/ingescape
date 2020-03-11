@@ -30,7 +30,8 @@ AssessmentsPopupBase {
 
     anchors.centerIn: parent
 
-    title: "NEW INDEPENDENT VARIABLE"
+    title: rootPopup.isEdition ? qsTr("EDIT INDEPENDENT VARIABLE")
+                               : qsTr("NEW INDEPENDENT VARIABLE")
 
 
     //--------------------------------------------------------
@@ -57,6 +58,8 @@ AssessmentsPopupBase {
     // OR
     // - edit an existing independent variable
     property IndependentVariableM independentVariableToEdit: null;
+
+    property bool isEdition: false
 
 
     //
@@ -361,26 +364,27 @@ AssessmentsPopupBase {
 
                     width: 80
                     height: 28
-                    text: "Enum"
+
+                    text: IndependentVariableValueTypes.enumToString(IndependentVariableValueTypes.INDEPENDENT_VARIABLE_ENUM)
 
                     exclusiveGroup: exclusiveGroupTypes
 
-                    checked: ((rootPopup.selectedType > -1) && (rootPopup.selectedType === CharacteristicValueTypes.CHARACTERISTIC_ENUM))
+                    checked: ((rootPopup.selectedType > -1) && (rootPopup.selectedType === IndependentVariableValueTypes.INDEPENDENT_VARIABLE_ENUM))
 
                     style: Theme.IngeScapeRadioButtonStyle { }
 
                     onCheckedChanged: {
                         if (checked) {
-                            console.log("Select IndependentVariable Value Type: Enum (" + CharacteristicValueTypes.CHARACTERISTIC_ENUM + ")");
+                            console.log("Select IndependentVariable Value Type: Enum (" + IndependentVariableValueTypes.INDEPENDENT_VARIABLE_ENUM + ")");
 
-                            rootPopup.selectedType = CharacteristicValueTypes.CHARACTERISTIC_ENUM;
+                            rootPopup.selectedType = IndependentVariableValueTypes.INDEPENDENT_VARIABLE_ENUM;
                         }
                     }
 
                     Binding {
                         target: enumRadioButton
                         property: "checked"
-                        value: ((rootPopup.selectedType > -1) && (rootPopup.selectedType === CharacteristicValueTypes.CHARACTERISTIC_ENUM))
+                        value: ((rootPopup.selectedType > -1) && (rootPopup.selectedType === IndependentVariableValueTypes.INDEPENDENT_VARIABLE_ENUM))
                     }
                 }
 
@@ -401,7 +405,7 @@ AssessmentsPopupBase {
                     color: IngeScapeTheme.veryLightGreyColor
 
                     // Selected type is "Enum"
-                    visible: (rootPopup.selectedType === CharacteristicValueTypes.CHARACTERISTIC_ENUM)
+                    visible: (rootPopup.selectedType === IndependentVariableValueTypes.INDEPENDENT_VARIABLE_ENUM)
 
                     Item {
                         anchors {

@@ -68,6 +68,12 @@ public: // Helpers to switch between role and property name
 public: // List API
 
     /**
+     * @brief Reserve space for alloc elements
+     * @param alloc
+     */
+    virtual void reserve(int alloc) = 0;
+
+    /**
      * @brief Get the size of our list
      * @return
      * NB: Equivalent to count()
@@ -497,7 +503,7 @@ public: // QAbstractListModel API
      */
     int rowCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE
     {
-        Q_UNUSED(parent);
+        Q_UNUSED(parent)
         return _list.size();
     }
 
@@ -548,11 +554,14 @@ public: // QAbstractListModel API
 
                 // Update our list
                 beginInsertRows(QModelIndex(), rowCount(), rowCount() + items.size() - 1);
+                // - subscribe to each item
                 for (auto item: items)
                 {
                     _subscribeToItem(item);
-                    _list.append(item);
                 }
+                // - append all items at once
+                _list.append(items);
+
                 endInsertRows();
 
                 // Update properties (count, etc.)
@@ -579,11 +588,14 @@ public: // QAbstractListModel API
                 {
                     // Update our list
                     beginInsertRows(QModelIndex(), rowCount(), rowCount() + itemsToAdd.size() - 1);
+                    // - subscribe to each item
                     for (auto item: itemsToAdd)
                     {
                         _subscribeToItem(item);
-                        _list.append(item);
                     }
+                    // - append all items at once
+                    _list.append(itemsToAdd);
+
                     endInsertRows();
 
                     // Update properties (count, etc.)
@@ -664,7 +676,7 @@ public: // QAbstractListModel API
      */
     bool removeRow(int row, const QModelIndex& parent = QModelIndex())
     {
-        Q_UNUSED(parent);
+        Q_UNUSED(parent)
 
         bool result = false;
 
@@ -706,7 +718,7 @@ public: // QAbstractListModel API
      */
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) Q_DECL_OVERRIDE
     {
-        Q_UNUSED(parent);
+        Q_UNUSED(parent)
 
         bool result = false;
 
@@ -990,6 +1002,16 @@ public: // Helpers to switch between role and property name
 public: // List API
 
     /**
+     * @brief Reserve space for alloc elements
+     * @param alloc
+     */
+    void reserve(int alloc) Q_DECL_OVERRIDE
+    {
+        _list.reserve(alloc);
+    }
+
+
+    /**
      * @brief Get the size of our list
      * @return
      * NB: Equivalent to count()
@@ -1183,6 +1205,21 @@ public: // List API
             {
                 qWarning() << "I2CustomItemListModel<" << CustomItemType::staticMetaObject.className() << "> warning: can not remove item" << item << " because it has an invalid type";
             }
+        }
+    }
+
+
+    /**
+     * @brief Remove all items from the given list
+     * @param itemListToRemove
+     *
+     * NB: item will be removed from our list BUT WILL NOT BE DELETED
+     */
+    void remove(const QList<CustomItemType*>& itemListToRemove)
+    {
+        for (CustomItemType* item : itemListToRemove)
+        {
+            remove(static_cast<CustomItemType* >(item));
         }
     }
 

@@ -175,6 +175,7 @@ void SubjectsController::createNewSubject()
         QDateTime now = QDateTime::currentDateTime();
 
         QString displayedId = now.toString("S-yyMMdd-hhmmss-zzz");
+        //QString displayedId = now.toString("S-hhmmss");
 
         // Create a new subject
         SubjectM* subject = _insertSubjectIntoDB(_currentExperimentation->getCassUuid(), displayedId);

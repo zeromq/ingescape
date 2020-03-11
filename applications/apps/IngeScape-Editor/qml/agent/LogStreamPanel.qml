@@ -85,6 +85,8 @@ WindowBlockTouches {
 
             // Raises the window in the windowing system.
             rootItem.raise();
+            // and give it keyboard focus
+            rootItem.requestActivate();
         }
     }
 

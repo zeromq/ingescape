@@ -55,13 +55,13 @@
         I2CustomItemHashModel<{type}> _{name};    // Protected hashtable used to store our items
     \endcode
 */
-#define I2_QOBJECT_HASHMODEL(type, name) \
-      Q_PROPERTY(AbstractI2CustomItemHashModel * name READ name CONSTANT) \
-    public: \
-        I2CustomItemHashModel<type> * name() { \
-            return &_##name; \
-        } \
-    protected: \
+#define I2_QOBJECT_HASHMODEL(type, name)                                        \
+        Q_PROPERTY(AbstractI2CustomItemHashModel * name READ name CONSTANT)     \
+    public:                                                                     \
+        I2CustomItemHashModel<type> * name() {                                  \
+            return &_##name;                                                    \
+        }                                                                       \
+    protected:                                                                  \
         I2CustomItemHashModel<type> _##name;
 
 

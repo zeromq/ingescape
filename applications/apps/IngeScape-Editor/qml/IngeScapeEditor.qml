@@ -18,6 +18,7 @@ import QtQuick 2.8
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
 import QtQuick.Controls 2.0 as Controls2
+import QtQml 2.2
 
 import I2Quick 1.0
 import QtQuick.Window 2.3
@@ -58,9 +59,11 @@ Item {
     // Flag indicating if an explicit request to open the Getting Started window has been performed.
     // Avoid opening the window at startup is none of the internet or the local page if accessible.
     property bool requestGettingStarted: false
-
     property bool gettingStartedOpen: false
     property GettingStartedWindow gettingStartedWindow: null
+
+    // "Fake" model to create output history on the fly like the other secondary windows
+    property var outputHistoryFakeModel: null
 
 
 
@@ -72,16 +75,20 @@ Item {
     //
     //--------------------------------------------------------
 
+    signal raiseOutputHistory();
+
     //
     // function allowing to open the history panel
     //
     function openHistory() {
-        //console.log("QML: function openHistory()");
-
-        historyPanel.show();
-
-        // Raises the window in the windowing system
-        historyPanel.raise();
+        if (outputHistoryFakeModel)
+        {
+            raiseOutputHistory();
+        }
+        else
+        {
+            outputHistoryFakeModel = 1
+        }
     }
 
 
@@ -738,12 +745,7 @@ Item {
                 }
 
                 onOpenHistory : {
-                    //console.log("QML: slot onOpenHistory");
-
-                    historyPanel.show();
-
-                    // Raises the window in the windowing system
-                    historyPanel.raise();
+                    rootItem.openHistory();
                 }
             }
         }
@@ -771,7 +773,7 @@ Item {
                     IngeScapeEditorC.addOpenedWindow(actionEditor);
                 }
 
-                onClosingVersion: {
+                onClosing: {
                     IngeScapeEditorC.closeActionEditor(model.QtObject);
                 }
             }
@@ -801,7 +803,7 @@ Item {
                     IngeScapeEditorC.addOpenedWindow(logStreamPanel);
                 }
 
-                onClosingVersion: {
+                onClosing: {
                     IngeScapeEditorC.closeLogStreamController(model.QtObject);
                 }
             }
@@ -812,30 +814,45 @@ Item {
     //
     // History Panel
     //
-    Agent.HistoryPanel {
-        id: historyPanel
+    Instantiator {
+        model: rootItem.outputHistoryFakeModel
 
-        Component.onCompleted: {
-            // Center window
-            x = rootItem.Window.window.x + rootItem.Window.width/2 - historyPanel.width/2;
-            y = rootItem.Window.window.y + rootItem.Window.height/2 - historyPanel.height/2;
+        delegate: Agent.HistoryPanel {
+            id: historyPanel
+
+            visible: true
+
+            Connections {
+                target: rootItem
+
+                onRaiseOutputHistory: {
+                    raise();
+                    requestActivated();
+                }
+            }
+
+            Component.onCompleted: {
+                // Center window
+                x = rootItem.Window.window.x + rootItem.Window.width/2 - historyPanel.width/2;
+                y = rootItem.Window.window.y + rootItem.Window.height/2 - historyPanel.height/2;
+            }
+
+            onClosing: {
+                console.log("CLosing output history")
+                rootItem.outputHistoryFakeModel = null
+            }
         }
 
-        onVisibleChanged: {
-            //console.log("onVisibleChanged of historyPanel: visible = " + historyPanel.visible);
+        onObjectAdded: {
+            // Add this window to the list of opened windows
+            IngeScapeEditorC.addOpenedWindow(historyPanel);
+        }
 
-            if (visible) {
-                // Add this window to the list of opened windows
-                IngeScapeEditorC.addOpenedWindow(historyPanel);
-            }
-            else {
-                // Remove this window from the list of opened windows
-                IngeScapeEditorC.removeOpenedWindow(historyPanel);
-            }
+        onObjectRemoved: {
+            // Remove this window from the list of opened windows
+            IngeScapeEditorC.removeOpenedWindow(historyPanel);
         }
     }
-
-
 
 
     //

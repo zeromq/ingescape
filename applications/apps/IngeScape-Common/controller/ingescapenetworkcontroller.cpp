@@ -964,7 +964,7 @@ bool IngeScapeNetworkController::isAvailableNetworkDevice(QString networkDevice)
  */
 void IngeScapeNetworkController::manageShoutedMessage(QString peerId, QString peerName, zmsg_t* zMessage)
 {
-    uint count = (uint)zmsg_size(zMessage);
+    uint count = static_cast<uint>(zmsg_size(zMessage));
 
     QString messagePart1 = zmsg_popstr(zMessage);
 
@@ -982,11 +982,12 @@ void IngeScapeNetworkController::manageShoutedMessage(QString peerId, QString pe
 
         for (uint i = 1; i < count; i++)
         {
-            // FIXME TODO: use generic zmsg_pop and zframe_t (instead of zmsg_popstr and char*)
-            //zframe_t* messagePart_i = zmsg_pop(zMessage);
-            QString messagePart_i = zmsg_popstr(zMessage);
-
-            messageOthersParts.append(messagePart_i);
+            zframe_t* frame = zmsg_pop(zMessage);
+            if (frame != nullptr)
+            {
+                messageOthersParts.append( QString(zframe_strdup(frame)) );
+                zframe_destroy(&frame);
+            }
         }
 
         Q_EMIT shoutedMessageReceived(peerId, peerName, messagePart1, messageOthersParts);
@@ -1004,7 +1005,7 @@ void IngeScapeNetworkController::manageShoutedMessage(QString peerId, QString pe
  */
 void IngeScapeNetworkController::manageWhisperedMessage(QString peerId, QString peerName, zmsg_t* zMessage)
 {
-    uint count = (uint)zmsg_size(zMessage);
+    uint count = static_cast<uint>(zmsg_size(zMessage));
 
     QString messagePart1 = zmsg_popstr(zMessage);
 
@@ -1040,11 +1041,12 @@ void IngeScapeNetworkController::manageWhisperedMessage(QString peerId, QString 
 
         for (uint i = 1; i < count; i++)
         {
-            // FIXME TODO: use generic zmsg_pop and zframe_t (instead of zmsg_popstr and char*)
-            //zframe_t* messagePart_i = zmsg_pop(zMessage);
-            QString messagePart_i = zmsg_popstr(zMessage);
-
-            messageOthersParts.append(messagePart_i);
+            zframe_t* frame = zmsg_pop(zMessage);
+            if (frame != nullptr)
+            {
+                messageOthersParts.append( QString(zframe_strdup(frame)) );
+                zframe_destroy(&frame);
+            }
         }
 
         Q_EMIT whisperedMessageReceived(peerId, peerName, messagePart1, messageOthersParts);

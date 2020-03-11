@@ -87,14 +87,9 @@ endif()
 ########################################################################
 # version
 ########################################################################
-get_ingescape_assessments_version(INGESCAPE_ASSESSMENTS_VERSION_MAJOR INGESCAPE_ASSESSMENTS_VERSION_MINOR INGESCAPE_ASSESSMENTS_VERSION_PATCH INGESCAPE_ASSESSMENTS_VERSION_BUILD)
-
-set(INGESCAPE_ASSESSMENTS_VERSION "${INGESCAPE_ASSESSMENTS_VERSION_MAJOR}.${INGESCAPE_ASSESSMENTS_VERSION_MINOR}.${INGESCAPE_ASSESSMENTS_VERSION_PATCH}")
-if (WIN32)
-    add_definitions(-DVERSION="${INGESCAPE_ASSESSMENTS_VERSION}.${INGESCAPE_ASSESSMENTS_VERSION_BUILD}")
-else (WIN32)
-    add_definitions(-DVERSION="${INGESCAPE_ASSESSMENTS_VERSION}")
-endif (WIN32)
+get_ingescape_editor_version(INGESCAPE_ASSESSMENTS_VERSION_MAJOR INGESCAPE_ASSESSMENTS_VERSION_MINOR INGESCAPE_ASSESSMENTS_VERSION_BUILD)
+set(INGESCAPE_ASSESSMENTS_VERSION "${INGESCAPE_ASSESSMENTS_VERSION_MAJOR}.${INGESCAPE_ASSESSMENTS_VERSION_MINOR}.${INGESCAPE_ASSESSMENTS_VERSION_BUILD}")
+add_definitions(-DVERSION="${INGESCAPE_ASSESSMENTS_VERSION}")
 message(STATUS "Detected INGESCAPE Assessments Version - ${INGESCAPE_ASSESSMENTS_VERSION}")
 
 ########################################################################
@@ -389,7 +384,7 @@ if (APPLE)
             add_custom_command(
                 TARGET ${PROJECT_NAME}
                 POST_BUILD
-                COMMAND ${CMAKE_INSTALL_NAME_TOOL} -change `otool -L $<TARGET_FILE_DIR:${PROJECT_NAME}>/../Frameworks/libssl.1.0.0.dylib | grep libcrypto.1.0.0.dylib | cut -f 1 -d ' '` "@executable_path/../Frameworks/libcrypto.1.0.0.dylib" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Frameworks/libssl.1.0.0.dylib"
+                COMMAND ${CMAKE_INSTALL_NAME_TOOL} -change `otool -L $<TARGET_FILE_DIR:${PROJECT_NAME}>/../Frameworks/libssl.1.1.dylib | grep libcrypto.1.1.dylib | cut -f 1 -d ' '` "@executable_path/../Frameworks/libcrypto.1.1.dylib" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Frameworks/libssl.1.1.dylib"
             )
         endif()
 

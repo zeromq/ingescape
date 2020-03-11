@@ -162,6 +162,7 @@ Item {
                 rootItem.protocolsController.initTemporaryIndependentVariable(null);
 
                 // Open the popup
+                independentVariablePopup.isEdition = false;
                 independentVariablePopup.open();
             }
         }
@@ -271,6 +272,7 @@ Item {
                             rootItem.protocolsController.initTemporaryIndependentVariable(indepVarDelegate.independentVarModel);
 
                             // Open the popup
+                            independentVariablePopup.isEdition = true;
                             independentVariablePopup.open();
                         }
                     }
@@ -354,6 +356,7 @@ Item {
                 rootItem.protocolsController.initTemporaryDependentVariable(null);
 
                 // Open the popup
+                dependentVariablePopup.isEdition = false;
                 dependentVariablePopup.open();
             }
         }
@@ -466,6 +469,7 @@ Item {
                             rootItem.protocolsController.initTemporaryDependentVariable(depVarDelegate.dependentVariableModel);
 
                             // Open the popup
+                            dependentVariablePopup.isEdition = true;
                             dependentVariablePopup.open();
                         }
                     }
@@ -501,7 +505,7 @@ Item {
 
         independentVariableToEdit: rootItem.protocolsController.temporaryIndependentVariable
 
-        onIndependentVariableIsEdited : {
+        onIndependentVariableIsEdited: {
             if (rootItem.protocolsController)
             {
                 if (rootItem.independentVariableCurrentlyEdited) {

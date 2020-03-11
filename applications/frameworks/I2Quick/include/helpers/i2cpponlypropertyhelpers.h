@@ -79,24 +79,25 @@
         qreal _x;
     \endcode
 */
-#define I2_CPP_PROPERTY(type, name) \
-    public: \
-        type name () const { \
-            return _##name ; \
-        } \
-        virtual bool set##name (type value) { \
-            bool hasChanged = false; \
-            if (_##name != value) { \
-                _##name = value; \
-                hasChanged = true; \
-                Q_EMIT name##Changed(value); \
-            } \
-            return hasChanged; \
-        } \
-    Q_SIGNALS: \
-        void name##Changed (type value); \
-    protected: \
+#define I2_CPP_PROPERTY(type, name)                        \
+    public:                                                \
+        type name () const {                               \
+            return _##name ;                               \
+        }                                                  \
+        virtual bool set##name (type value) {              \
+            bool hasChanged = false;                       \
+            if (_##name != value) {                        \
+                _##name = value;                           \
+                hasChanged = true;                         \
+                Q_EMIT name##Changed(value);               \
+            }                                              \
+            return hasChanged;                             \
+        }                                                  \
+    Q_SIGNALS:                                             \
+        void name##Changed (type value);                   \
+    protected:                                             \
         type _##name;
+
 
 
 /*!
@@ -138,23 +139,23 @@
         qreal _x;
     \endcode
 */
-#define I2_CPP_PROPERTY_FUZZY_COMPARE(type, name) \
-    public: \
-        type name () const { \
-            return _##name ; \
-        } \
-        virtual bool set##name (type value) { \
-            bool hasChanged = false; \
-            if (!qFuzzyCompare(_##name, value)) { \
-                _##name = value; \
-                hasChanged = true; \
-                Q_EMIT name##Changed(value); \
-            } \
-            return hasChanged; \
-        } \
-    Q_SIGNALS: \
-        void name##Changed (type value); \
-    protected: \
+#define I2_CPP_PROPERTY_FUZZY_COMPARE(type, name)          \
+    public:                                                \
+        type name () const {                               \
+            return _##name ;                               \
+        }                                                  \
+        virtual bool set##name (type value) {              \
+            bool hasChanged = false;                       \
+            if (!qFuzzyCompare(_##name, value)) {          \
+                _##name = value;                           \
+                hasChanged = true;                         \
+                Q_EMIT name##Changed(value);               \
+            }                                              \
+            return hasChanged;                             \
+        }                                                  \
+    Q_SIGNALS:                                             \
+        void name##Changed (type value);                   \
+    protected:                                             \
         type _##name;
 
 
@@ -209,34 +210,34 @@
         QObject* _x;
     \endcode
 */
-#define I2_CPP_PROPERTY_DELETE_PROOF(type, name) \
-    public: \
-        type name () const { \
-            return _##name ; \
-        } \
-        virtual bool set##name (type value) { \
-            bool hasChanged = false; \
-            if (_##name != value) { \
-                if (_##name != nullptr) {\
-                    disconnect(_##name, SIGNAL(destroyed(QObject *)), this, nullptr); \
-                } \
-                _##name = value; \
-                if (_##name != nullptr) { \
+#define I2_CPP_PROPERTY_DELETE_PROOF(type, name)                                                                 \
+    public:                                                                                                      \
+        type name () const {                                                                                     \
+            return _##name ;                                                                                     \
+        }                                                                                                        \
+        virtual bool set##name (type value) {                                                                    \
+            bool hasChanged = false;                                                                             \
+            if (_##name != value) {                                                                              \
+                if (_##name != nullptr) {                                                                        \
+                    disconnect(_##name, SIGNAL(destroyed(QObject *)), this, nullptr);                            \
+                }                                                                                                \
+                _##name = value;                                                                                 \
+                if (_##name != nullptr) {                                                                        \
                     connect(_##name, SIGNAL(destroyed(QObject *)), this, SLOT(_on##name##Destroyed(QObject *))); \
-                } \
-                hasChanged = true; \
-                Q_EMIT name##Changed(value); \
-            } \
-            return hasChanged; \
-        } \
-    Q_SIGNALS: \
-        void name##Changed (type value); \
-    private Q_SLOTS: \
-        void _on##name##Destroyed(QObject*) { \
-            _##name = nullptr; \
-            Q_EMIT name##Changed(nullptr); \
-        } \
-    protected: \
+                }                                                                                                \
+                hasChanged = true;                                                                               \
+                Q_EMIT name##Changed(value);                                                                     \
+            }                                                                                                    \
+            return hasChanged;                                                                                   \
+        }                                                                                                        \
+    Q_SIGNALS:                                                                                                   \
+        void name##Changed (type value);                                                                         \
+    private Q_SLOTS:                                                                                             \
+        void _on##name##Destroyed(QObject*) {                                                                    \
+            _##name = nullptr;                                                                                   \
+            Q_EMIT name##Changed(nullptr);                                                                       \
+        }                                                                                                        \
+    protected:                                                                                                   \
         type _##name;
 
 
@@ -271,15 +272,15 @@
         qreal _x;
     \endcode
 */
-#define I2_CPP_PROPERTY_CUSTOM_SETTER(type, name) \
-    public: \
-        type name () const { \
-            return _##name ; \
-        } \
-        virtual void set##name (type value); \
-    Q_SIGNALS: \
-        void name##Changed (type value); \
-    protected: \
+#define I2_CPP_PROPERTY_CUSTOM_SETTER(type, name)          \
+    public:                                                \
+        type name () const {                               \
+            return _##name ;                               \
+        }                                                  \
+        virtual void set##name (type value);               \
+    Q_SIGNALS:                                             \
+        void name##Changed (type value);                   \
+    protected:                                             \
         type _##name;
 
 
@@ -317,14 +318,14 @@
     \endcode
 */
 #define I2_CPP_PROPERTY_CUSTOM_SETTER_WITH_BOOL_RETURN(type, name) \
-    public: \
-        type name () const { \
-            return _##name ; \
-        } \
-        virtual bool set##name (type value); \
-    Q_SIGNALS: \
-        void name##Changed (type value); \
-    protected: \
+    public:                                                        \
+        type name () const {                                       \
+            return _##name ;                                       \
+        }                                                          \
+        virtual bool set##name (type value);                       \
+    Q_SIGNALS:                                                     \
+        void name##Changed (type value);                           \
+    protected:                                                     \
         type _##name;
 
 
@@ -358,13 +359,13 @@
         qreal _x;
     \endcode
 */
-#define I2_CPP_PROPERTY_CUSTOM_GETTER_AND_SETTER(type, name) \
-    public: \
-        type name (); \
-        virtual void set##name (type value); \
-    Q_SIGNALS: \
-        void name##Changed (type value); \
-    protected: \
+#define I2_CPP_PROPERTY_CUSTOM_GETTER_AND_SETTER(type, name)       \
+    public:                                                        \
+        type name ();                                              \
+        virtual void set##name (type value);                       \
+    Q_SIGNALS:                                                     \
+        void name##Changed (type value);                           \
+    protected:                                                     \
         type _##name;
 
 
@@ -399,12 +400,12 @@
     \endcode
 */
 #define I2_CPP_PROPERTY_CUSTOM_GETTER_AND_SETTER_WITH_BOOL_RETURN(type, name) \
-    public: \
-        type name (); \
-        virtual bool set##name (type value); \
-    Q_SIGNALS: \
-        void name##Changed (type value); \
-    protected: \
+    public:                                                                   \
+        type name ();                                                         \
+        virtual bool set##name (type value);                                  \
+    Q_SIGNALS:                                                                \
+        void name##Changed (type value);                                      \
+    protected:                                                                \
         type _##name;
 
 
@@ -457,20 +458,20 @@
         qreal _x;
     \endcode
 */
-#define I2_CPP_NOSIGNAL_PROPERTY(type, name) \
-    public: \
-        type name () const { \
-            return _##name ; \
-        } \
-        virtual bool set##name (type value) { \
-            bool hasChanged = false; \
-            if (_##name != value) { \
-                _##name = value; \
-                hasChanged = true; \
-            } \
-            return hasChanged; \
-        } \
-    protected: \
+#define I2_CPP_NOSIGNAL_PROPERTY(type, name)               \
+    public:                                                \
+        type name () const {                               \
+            return _##name ;                               \
+        }                                                  \
+        virtual bool set##name (type value) {              \
+            bool hasChanged = false;                       \
+            if (_##name != value) {                        \
+                _##name = value;                           \
+                hasChanged = true;                         \
+            }                                              \
+            return hasChanged;                             \
+        }                                                  \
+    protected:                                             \
         type _##name;
 
 
@@ -510,19 +511,19 @@
     \endcode
 */
 #define I2_CPP_NOSIGNAL_PROPERTY_FUZZY_COMPARE(type, name) \
-    public: \
-        type name () const { \
-            return _##name ; \
-        } \
-        virtual bool set##name (type value) { \
-            bool hasChanged = false; \
-            if (!qFuzzyCompare(_##name, value)) { \
-                _##name = value; \
-                hasChanged = true; \
-            } \
-            return hasChanged; \
-        } \
-    protected: \
+    public:                                                \
+        type name () const {                               \
+            return _##name ;                               \
+        }                                                  \
+        virtual bool set##name (type value) {              \
+            bool hasChanged = false;                       \
+            if (!qFuzzyCompare(_##name, value)) {          \
+                _##name = value;                           \
+                hasChanged = true;                         \
+            }                                              \
+            return hasChanged;                             \
+        }                                                  \
+    protected:                                             \
         type _##name;
 
 
@@ -572,30 +573,30 @@
         QObject* _x;
     \endcode
 */
-#define I2_CPP_NOSIGNAL_PROPERTY_DELETE_PROOF(type, name) \
-    public: \
-        type name () const { \
-            return _##name ; \
-        } \
-        virtual bool set##name (type value) { \
-            bool hasChanged = false; \
-            if (_##name != value) { \
-                if (_##name != nullptr) {\
-                    disconnect(_##name, SIGNAL(destroyed(QObject *)), this, nullptr); \
-                } \
-                _##name = value; \
-                if (_##name != nullptr) { \
+#define I2_CPP_NOSIGNAL_PROPERTY_DELETE_PROOF(type, name)                                                        \
+    public:                                                                                                      \
+        type name () const {                                                                                     \
+            return _##name ;                                                                                     \
+        }                                                                                                        \
+        virtual bool set##name (type value) {                                                                    \
+            bool hasChanged = false;                                                                             \
+            if (_##name != value) {                                                                              \
+                if (_##name != nullptr) {                                                                        \
+                    disconnect(_##name, SIGNAL(destroyed(QObject *)), this, nullptr);                            \
+                }                                                                                                \
+                _##name = value;                                                                                 \
+                if (_##name != nullptr) {                                                                        \
                     connect(_##name, SIGNAL(destroyed(QObject *)), this, SLOT(_on##name##Destroyed(QObject *))); \
-                } \
-                hasChanged = true; \
-            } \
-            return hasChanged; \
-        } \
-    private Q_SLOTS: \
-        void _on##name##Destroyed(QObject*) { \
-            _##name = nullptr; \
-        } \
-    protected: \
+                }                                                                                                \
+                hasChanged = true;                                                                               \
+            }                                                                                                    \
+            return hasChanged;                                                                                   \
+        }                                                                                                        \
+    private Q_SLOTS:                                                                                             \
+        void _on##name##Destroyed(QObject*) {                                                                    \
+            _##name = nullptr;                                                                                   \
+        }                                                                                                        \
+    protected:                                                                                                   \
         type _##name;
 
 
@@ -628,12 +629,12 @@
     \endcode
 */
 #define I2_CPP_NOSIGNAL_PROPERTY_CUSTOM_SETTER(type, name) \
-    public: \
-        type name () const { \
-            return _##name ; \
-        } \
-        virtual void set##name (type value); \
-    protected: \
+    public:                                                \
+        type name () const {                               \
+            return _##name ;                               \
+        }                                                  \
+        virtual void set##name (type value);               \
+    protected:                                             \
         type _##name;
 
 
@@ -668,12 +669,12 @@
     \endcode
 */
 #define I2_CPP_NOSIGNAL_PROPERTY_CUSTOM_SETTER_WITH_BOOL_RETURN(type, name) \
-    public: \
-        type name () const { \
-            return _##name ; \
-        } \
-        virtual bool set##name (type value); \
-    protected: \
+    public:                                                                 \
+        type name () const {                                                \
+            return _##name ;                                                \
+        }                                                                   \
+        virtual bool set##name (type value);                                \
+    protected:                                                              \
         type _##name;
 
 
@@ -705,10 +706,10 @@
     \endcode
 */
 #define I2_CPP_NOSIGNAL_PROPERTY_CUSTOM_GETTER_AND_SETTER(type, name) \
-    public: \
-        type name (); \
-        virtual void set##name (type value); \
-    protected: \
+    public:                                                           \
+        type name ();                                                 \
+        virtual void set##name (type value);                          \
+    protected:                                                        \
         type _##name;
 
 
@@ -740,10 +741,10 @@
     \endcode
 */
 #define I2_CPP_NOSIGNAL_PROPERTY_CUSTOM_GETTER_AND_SETTER_WITH_BOOL_RETURN(type, name) \
-    public: \
-        type name (); \
-        virtual bool set##name (type value); \
-    protected: \
+    public:                                                                            \
+        type name ();                                                                  \
+        virtual bool set##name (type value);                                           \
+    protected:                                                                         \
         type _##name;
 
 

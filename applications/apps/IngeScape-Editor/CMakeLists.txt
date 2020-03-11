@@ -89,14 +89,9 @@ endif(NOT MSVC)
 ########################################################################
 # version
 ########################################################################
-get_ingescape_editor_version(INGESCAPE_EDITOR_VERSION_MAJOR INGESCAPE_EDITOR_VERSION_MINOR INGESCAPE_EDITOR_VERSION_PATCH INGESCAPE_EDITOR_VERSION_BUILD)
-
-set(INGESCAPE_EDITOR_VERSION "${INGESCAPE_EDITOR_VERSION_MAJOR}.${INGESCAPE_EDITOR_VERSION_MINOR}.${INGESCAPE_EDITOR_VERSION_PATCH}")
-if (WIN32)
-    add_definitions(-DVERSION="${INGESCAPE_EDITOR_VERSION}.${INGESCAPE_EDITOR_VERSION_BUILD}")
-else (WIN32)
-    add_definitions(-DVERSION="${INGESCAPE_EDITOR_VERSION}")
-endif (WIN32)
+get_ingescape_editor_version(INGESCAPE_EDITOR_VERSION_MAJOR INGESCAPE_EDITOR_VERSION_MINOR INGESCAPE_EDITOR_VERSION_BUILD)
+set(INGESCAPE_EDITOR_VERSION "${INGESCAPE_EDITOR_VERSION_MAJOR}.${INGESCAPE_EDITOR_VERSION_MINOR}.${INGESCAPE_EDITOR_VERSION_BUILD}")
+add_definitions(-DVERSION="${INGESCAPE_EDITOR_VERSION}")
 message(STATUS "Detected INGESCAPE Editor Version - ${INGESCAPE_EDITOR_VERSION}")
 
 ########################################################################
@@ -214,7 +209,8 @@ elseif (WIN32)
     set_target_properties(I2Quick PROPERTIES IMPORTED_LOCATION "${SOURCE_DIR}/../../frameworks/I2Quick/${_MY_LIB_FOLDER}/I2Quick.dll")
     install(FILES "${SOURCE_DIR}/../../frameworks/I2Quick/${_MY_LIB_FOLDER}/I2Quick.dll" DESTINATION .)
 else ()
-    #TODO Add so for unix
+    set(I2QUICK_LIB "${SOURCE_DIR}/../../frameworks/I2Quick/Unix/libI2Quick.so")
+    set_target_properties(I2Quick PROPERTIES IMPORTED_LOCATION "${I2QUICK_LIB}")
 endif ()
 
 ########################################################################
@@ -383,7 +379,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
     set(CPACK_PACKAGE_VERSION ${INGESCAPE_EDITOR_VERSION})
     set(CPACK_PACKAGE_VERSION_MAJOR "${INGESCAPE_EDITOR_VERSION_MAJOR}")
     set(CPACK_PACKAGE_VERSION_MINOR "${INGESCAPE_EDITOR_VERSION_MINOR}")
-    set(CPACK_PACKAGE_VERSION_PATCH "${INGESCAPE_EDITOR_VERSION_PATCH}")
+    set(CPACK_PACKAGE_VERSION_PATCH "${INGESCAPE_EDITOR_VERSION_BUILD}")
     set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}")
 
     # Installers for 32- vs. 64-bit CMake:
