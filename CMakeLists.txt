@@ -138,7 +138,10 @@ find_package(libsodium REQUIRED)
 find_package(ZeroMQ 4.3.3 REQUIRED)
 find_package(czmq 4.2.1 REQUIRED)
 find_package(zyre 2.0.1 REQUIRED)
-find_library(CORE_FRAMEWORK CoreFoundation)
+
+if (APPLE)
+  find_library(CORE_FRAMEWORK CoreFoundation)
+endif (APPLE)
 
 # ##############################################################################
 # library
@@ -238,10 +241,9 @@ if(INGESCAPE_BUILD_SHARED)
   target_link_libraries(${PROJECT_NAME} 
     PRIVATE 
       czmq
-      libsodium
       libzmq
       zyre
-      ${CORE_FRAMEWORK}
+      $<$<BOOL:${APPLE}>:${CORE_FRAMEWORK}>
       $<$<BOOL:${WIN32}>:ws2_32>
   )
 
@@ -321,12 +323,10 @@ if(INGESCAPE_BUILD_STATIC)
   #FIXME All private here ?
   target_link_libraries(${PROJECT_NAME}-static
     PRIVATE 
-      ${MORE_LIBRARIES}
       czmq
-      libsodium
       libzmq
       zyre
-      ${CORE_FRAMEWORK}
+      $<$<BOOL:${APPLE}>:${CORE_FRAMEWORK}>
       $<$<BOOL:${WIN32}>:ws2_32>
   )
 
@@ -578,7 +578,7 @@ if(NOT MSVC)
 endif()
 message(STATUS "")
 
-#[= [
+#[=[
 get_cmake_property(_variableNames VARIABLES)
 list (SORT _variableNames)
 foreach (_variableName ${_variableNames})
