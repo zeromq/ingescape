@@ -3,39 +3,6 @@
 
 set(macro_current_dir ${CMAKE_CURRENT_LIST_DIR} CACHE INTERNAL "")
 
-# Macro to add ingescape sources in given var
-macro(add_ingescape_sources _SOURCES)
-    list(APPEND ${_SOURCES}
-        ${macro_current_dir}/../../../src/definition.c
-        ${macro_current_dir}/../../../src/mapping.c
-        ${macro_current_dir}/../../../src/model.c
-        ${macro_current_dir}/../../../src/network.c
-        ${macro_current_dir}/../../../src/parser.c
-        ${macro_current_dir}/../../../src/admin.c
-        ${macro_current_dir}/../../../src/bus.c
-        ${macro_current_dir}/../../../src/call.c
-        ${macro_current_dir}/../../../src/license.c
-        ${macro_current_dir}/../../../src/monitor.c
-        ${macro_current_dir}/../../../src/json.c
-        ${macro_current_dir}/../../../src/performance.c
-        ${macro_current_dir}/../../../src/agent.c
-        ${macro_current_dir}/../../../src/global.c
-        ${macro_current_dir}/../../../dependencies/yajl/src/yajl_alloc.c
-        ${macro_current_dir}/../../../dependencies/yajl/src/yajl_buf.c
-        ${macro_current_dir}/../../../dependencies/yajl/src/yajl_encode.c
-        ${macro_current_dir}/../../../dependencies/yajl/src/yajl_gen.c
-        ${macro_current_dir}/../../../dependencies/yajl/src/yajl_lex.c
-        ${macro_current_dir}/../../../dependencies/yajl/src/yajl_parser.c
-        ${macro_current_dir}/../../../dependencies/yajl/src/yajl_tree.c
-        ${macro_current_dir}/../../../dependencies/yajl/src/yajl_version.c
-        ${macro_current_dir}/../../../dependencies/yajl/src/yajl.c
-    )
-
-    IF (WIN32)
-        list(APPEND ${_SOURCES} ${macro_current_dir}/../../../dependencies/windows/unix/unixfunctions.c)
-    ENDIF (WIN32)
-endmacro()
-
 # Macro to add ingescape header directory in given var
 macro(add_ingescape_include_directory _HEADERS)
     list(APPEND ${_HEADERS} "${macro_current_dir}/../../../src/include")
@@ -44,73 +11,6 @@ macro(add_ingescape_include_directory _HEADERS)
     IF (WIN32)
 		list(APPEND ${_HEADERS} "${macro_current_dir}/../../../dependencies/windows/unix")
     ENDIF (WIN32)
-endmacro()
-
-# Macro to add ingescape libs dependencies in given var
-macro(add_ingescape_libraries_dependencies _LIBS _pkg_config_libs_private)
-    list(APPEND CMAKE_MODULE_PATH "${macro_current_dir}/../dependencies")
-
-    ########################################################################
-    # LIBSODIUM dependency
-    ########################################################################
-    find_package(libsodium REQUIRED)
-    IF (LIBSODIUM_FOUND)
-        include_directories(${LIBSODIUM_INCLUDE_DIRS})
-        list(APPEND ${_LIBS} ${LIBSODIUM_LIBRARIES})
-        set(${_pkg_config_libs_private} "${${_pkg_config_libs_private}} -lsodium")
-    ELSE (LIBSODIUM_FOUND)
-        message( FATAL_ERROR "libsodium not found." )
-    ENDIF (LIBSODIUM_FOUND)
-
-    ########################################################################
-    # LIBZMQ dependency
-    ########################################################################
-    find_package(libzmq REQUIRED)
-    IF (LIBZMQ_FOUND)
-        include_directories(${LIBZMQ_INCLUDE_DIRS})
-        list(APPEND ${_LIBS} ${LIBZMQ_LIBRARIES})
-        set(${_pkg_config_libs_private} "${${_pkg_config_libs_private}} -lzmq")
-    ELSE (LIBZMQ_FOUND)
-        message( FATAL_ERROR "libzmq not found." )
-    ENDIF (LIBZMQ_FOUND)
-
-    ########################################################################
-    # CZMQ dependency
-    ########################################################################
-    find_package(czmq REQUIRED)
-    IF (CZMQ_FOUND)
-        include_directories(${CZMQ_INCLUDE_DIRS})
-        list(APPEND ${_LIBS} ${CZMQ_LIBRARIES})
-        set(${_pkg_config_libs_private} "${${_pkg_config_libs_private}} -lczmq")
-    ELSE (CZMQ_FOUND)
-        message( FATAL_ERROR "czmq not found." )
-    ENDIF (CZMQ_FOUND)
-
-    ########################################################################
-    # ZYRE dependency
-    ########################################################################
-    find_package(zyre REQUIRED)
-    IF (ZYRE_FOUND)
-        include_directories(${ZYRE_INCLUDE_DIRS})
-        list(APPEND ${_LIBS} ${ZYRE_LIBRARIES})
-        set(${_pkg_config_libs_private} "${${_pkg_config_libs_private}} -lzyre")
-    ELSE (ZYRE_FOUND)
-        message( FATAL_ERROR "zyre not found." )
-    ENDIF (ZYRE_FOUND)
-
-    IF (APPLE)
-        list(APPEND ${_LIBS} "-framework CoreFoundation")
-    ENDIF (APPLE)
-    
-    if (MSVC)
-        # required libraries for msvc
-        list(APPEND ${_LIBS} ws2_32)
-    elseif (MINGW)
-        # required libraries for mingw
-        list(APPEND ${_LIBS} -lws2_32)
-    elseif (CYGWIN)
-        # required libraries for cygwin
-    endif()
 endmacro()
 
 # Macro to get ingescape version from C source file
