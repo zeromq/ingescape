@@ -135,50 +135,10 @@ source_group("Header Files" FILES ${ingescape_private_headers} ${ingescape_heade
 # Dependencies
 ########################################################################
 find_package(libsodium REQUIRED)
-IF (LIBSODIUM_FOUND)
-  include_directories(${LIBSODIUM_INCLUDE_DIRS})
-  list(APPEND MORE_LIBRARIES ${LIBSODIUM_LIBRARIES})
-ELSE (LIBSODIUM_FOUND)
-  message( FATAL_ERROR "libsodium not found." )
-ENDIF (LIBSODIUM_FOUND)
-
-find_package(libzmq REQUIRED)
-IF (LIBZMQ_FOUND)
-  include_directories(${LIBZMQ_INCLUDE_DIRS})
-  list(APPEND MORE_LIBRARIES ${LIBZMQ_LIBRARIES})
-ELSE (LIBZMQ_FOUND)
-  message( FATAL_ERROR "libzmq not found." )
-ENDIF (LIBZMQ_FOUND)
-
-find_package(czmq REQUIRED)
-IF (CZMQ_FOUND)
-  include_directories(${CZMQ_INCLUDE_DIRS})
-  list(APPEND MORE_LIBRARIES ${CZMQ_LIBRARIES})
-ELSE (CZMQ_FOUND)
-  message( FATAL_ERROR "czmq not found." )
-ENDIF (CZMQ_FOUND)
-
-find_package(zyre REQUIRED)
-IF (ZYRE_FOUND)
-  include_directories(${ZYRE_INCLUDE_DIRS})
-  list(APPEND MORE_LIBRARIES ${ZYRE_LIBRARIES})
-ELSE (ZYRE_FOUND)
-  message( FATAL_ERROR "zyre not found." )
-ENDIF (ZYRE_FOUND)
-
-IF (APPLE)
-  list(APPEND MORE_LIBRARIES "-framework CoreFoundation")
-ENDIF (APPLE)
-
-if (MSVC)
-    # required libraries for msvc
-    list(APPEND MORE_LIBRARIES ws2_32)
-elseif (MINGW)
-    # required libraries for mingw
-    list(APPEND MORE_LIBRARIES -lws2_32)
-elseif (CYGWIN)
-    # required libraries for cygwin
-endif()
+find_package(ZeroMQ 4.3.3 REQUIRED)
+find_package(czmq 4.2.1 REQUIRED)
+find_package(zyre 2.0.1 REQUIRED)
+find_library(CORE_FRAMEWORK CoreFoundation)
 
 # ##############################################################################
 # library
@@ -275,15 +235,14 @@ if(INGESCAPE_BUILD_SHARED)
   target_compile_definitions(${PROJECT_NAME} PRIVATE INGESCAPE=1;TARGET_OS_IOS=0)
 
   # Add linked dependencies
-  #FIXME All private here ?
-  message(STATUS "MORE_LIBRARIES: ${MORE_LIBRARIES}")
   target_link_libraries(${PROJECT_NAME} 
     PRIVATE 
-      ${MORE_LIBRARIES}
-#      czmq
-#      libsodium
-#      libzmq
-#      zyre
+      czmq
+      libsodium
+      libzmq
+      zyre
+      ${CORE_FRAMEWORK}
+      $<$<BOOL:${WIN32}>:ws2_32>
   )
 
   # Header files
@@ -360,7 +319,16 @@ if(INGESCAPE_BUILD_STATIC)
 
   # Add linked dependencies
   #FIXME All private here ?
-  target_link_libraries(${PROJECT_NAME}-static PRIVATE ${MORE_LIBRARIES})
+  target_link_libraries(${PROJECT_NAME}-static
+    PRIVATE 
+      ${MORE_LIBRARIES}
+      czmq
+      libsodium
+      libzmq
+      zyre
+      ${CORE_FRAMEWORK}
+      $<$<BOOL:${WIN32}>:ws2_32>
+  )
 
   # Release build compile with -O2 flag
   if (${CMAKE_BUILD_TYPE} MATCHES "Release")
@@ -495,12 +463,10 @@ if((WIN32) OR (CMAKE_BUILD_TYPE STREQUAL "Release"))
     set(CPACK_GENERATOR "NSIS;ZIP")
     # On windows we want to package these libraries
     set(IS_EDITOR FALSE)
-    install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS
-                                   IS_EDITOR)
-    install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS
-                                   IS_EDITOR)
-    install_ingescape_dependencies(CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS IS_EDITOR)
-    install_ingescape_dependencies(ZYRE_LIBRARIES ZYRE_INCLUDE_DIRS IS_EDITOR)
+    # install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS IS_EDITOR)
+   #install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS IS_EDITOR)
+   #install_ingescape_dependencies(CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS IS_EDITOR)
+   #install_ingescape_dependencies(ZYRE_LIBRARIES ZYRE_INCLUDE_DIRS IS_EDITOR)
 
     file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/README.txt
          "The bin directory is empty after installation on purpose.\r\n"
@@ -535,18 +501,18 @@ if((WIN32) OR (CMAKE_BUILD_TYPE STREQUAL "Release"))
 
     set(CPACK_GENERATOR "productbuild")
     set(IS_EDITOR FALSE)
-    install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS IS_EDITOR)
-    install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS IS_EDITOR)
-    install_ingescape_dependencies(CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS IS_EDITOR)
-    install_ingescape_dependencies(ZYRE_LIBRARIES ZYRE_INCLUDE_DIRS IS_EDITOR)
+    #install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS IS_EDITOR)
+    #install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS IS_EDITOR)
+    #install_ingescape_dependencies(CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS IS_EDITOR)
+    #install_ingescape_dependencies(ZYRE_LIBRARIES ZYRE_INCLUDE_DIRS IS_EDITOR)
 
   else()
     set(CPACK_MONOLITHIC_INSTALL ON)
     set(IS_EDITOR FALSE)
-    install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS IS_EDITOR)
-    install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS IS_EDITOR)
-    install_ingescape_dependencies(CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS IS_EDITOR)
-    install_ingescape_dependencies(ZYRE_LIBRARIES ZYRE_INCLUDE_DIRS IS_EDITOR)
+    #install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS IS_EDITOR)
+    #install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS IS_EDITOR)
+    #install_ingescape_dependencies(CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS IS_EDITOR)
+    #install_ingescape_dependencies(ZYRE_LIBRARIES ZYRE_INCLUDE_DIRS IS_EDITOR)
     if(ANDROID)
       set(CPACK_GENERATOR "ZIP")
     else()
@@ -611,3 +577,12 @@ if(NOT MSVC)
   endif()
 endif()
 message(STATUS "")
+
+#[= [
+get_cmake_property(_variableNames VARIABLES)
+list (SORT _variableNames)
+foreach (_variableName ${_variableNames})
+    message(STATUS "${_variableName}=${${_variableName}}")
+endforeach()
+#]=]
+
