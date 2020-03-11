@@ -32,14 +32,14 @@ QString CharacteristicValueTypes::enumToString(int value)
 
     case CharacteristicValueTypes::DOUBLE:
         //return tr("Double");
-        return tr("Real number");
+        return tr("Floating number");
 
     case CharacteristicValueTypes::TEXT:
         return tr("Text");
 
     case CharacteristicValueTypes::CHARACTERISTIC_ENUM:
-        //return tr("Enum");
-        return tr("Enumeration");
+        return tr("Enum");
+        //return tr("Enumeration");
 
     default:
         return "";
@@ -65,14 +65,14 @@ QString IndependentVariableValueTypes::enumToString(int value)
 
     case IndependentVariableValueTypes::DOUBLE:
         //return tr("Double");
-        return tr("Real number");
+        return tr("Floating number");
 
     case CharacteristicValueTypes::TEXT:
         return tr("Text");
 
     case IndependentVariableValueTypes::INDEPENDENT_VARIABLE_ENUM:
-        //return tr("Enum");
-        return tr("Enumeration");
+        return tr("Enum");
+        //return tr("Enumeration");
 
     default:
         return "";
@@ -96,7 +96,7 @@ QString ValueTypes::enumToString(int value)
         return tr("Integer number");
 
     case ValueTypes::DOUBLE:
-        return tr("Real number");
+        return tr("Floating number");
 
     case ValueTypes::TEXT:
         return tr("Text");
