@@ -136,8 +136,11 @@ source_group("Header Files" FILES ${ingescape_private_headers} ${ingescape_heade
 ########################################################################
 find_package(libsodium REQUIRED)
 find_package(ZeroMQ 4.3.3 REQUIRED)
+message(STATUS "Found ZeroMQ version: ${ZeroMQ_VERSION}")
 find_package(czmq 4.2.1 REQUIRED)
+message(STATUS "Found czmq version: ${czmq_VERSION}")
 find_package(zyre 2.0.1 REQUIRED)
+message(STATUS "Found zyre version: ${zyre_VERSION}")
 
 if (APPLE)
   find_library(CORE_FRAMEWORK CoreFoundation)
@@ -178,7 +181,7 @@ if(INGESCAPE_BUILD_SHARED)
     # WIN32_LIB_FILETYPE is used in the RC file that will register the DLL version
     set(WIN32_LIB_FILETYPE "VFT_DLL")
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/modules/library/library_version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
-    target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/version.rc
+    target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
 
     set_target_properties(${PROJECT_NAME}
                             PROPERTIES
@@ -217,7 +220,7 @@ if(INGESCAPE_BUILD_SHARED)
   target_link_libraries(${PROJECT_NAME}
     PRIVATE
       czmq
-      libsodium
+      ${LIBSODIUM_LIBRARIES}
       libzmq
       zyre
       $<$<BOOL:${APPLE}>:${CORE_FRAMEWORK}>
@@ -249,16 +252,14 @@ endif()
 
 # static
 if(INGESCAPE_BUILD_STATIC)
-  add_library(${PROJECT_NAME}-static STATIC
-    ${ingescape_sources}
-    ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
+  add_library(${PROJECT_NAME}-static STATIC ${ingescape_sources})
 
   # OS specifig target properties
   if(MSVC)
     # WIN32_LIB_FILETYPE is used in the RC file that will register the DLL version
     set(WIN32_LIB_FILETYPE "VFT_STATIC_LIB")
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/modules/library/library_version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
-    target_sources(${PROJECT_NAME}-static PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/version.rc
+    target_sources(${PROJECT_NAME}-static PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
 
     set_target_properties(${PROJECT_NAME}-static
                             PROPERTIES
@@ -280,7 +281,7 @@ if(INGESCAPE_BUILD_STATIC)
   target_link_libraries(${PROJECT_NAME}-static
     PRIVATE
       czmq
-      libsodium
+      ${LIBSODIUM_LIBRARIES}
       libzmq
       zyre
       $<$<BOOL:${APPLE}>:${CORE_FRAMEWORK}>
@@ -313,9 +314,6 @@ if(INGESCAPE_BUILD_STATIC)
                   COMPONENT library)
 endif()
 
-if (MSVC)
-endif(MSVC)
-
 # Install public include files
 install(FILES ${ingescape_headers_to_install}
         DESTINATION include/ingescape
@@ -346,7 +344,6 @@ if (WIN32)
 else()
   set(CMAKECONFIG_INSTALL_DIR "share/cmake/ingescape" CACHE STRING "install path for ingescapeConfig.cmake")
 endif(WIN32)
-message(STATUS "CMAKECONFIG_INSTALL_DIR: ${CMAKECONFIG_INSTALL_DIR}")
 
 # Export ingescapeTargets.cmake
 export(EXPORT ${PROJECT_NAME}-targets FILE "${CMAKE_CURRENT_BINARY_DIR}/ingescapeTargets.cmake")
