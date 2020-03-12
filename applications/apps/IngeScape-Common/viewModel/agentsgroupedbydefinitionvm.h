@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2020 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -9,7 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
- *
+ *      Chloé Roumieu      <roumieu@ingenuity.io>
  */
 
 #ifndef AGENTSGROUPEDBYDEFINITIONVM_H
@@ -93,22 +93,15 @@ class AgentsGroupedByDefinitionVM : public QObject
     // Flag indicating if the option "View Log Stream" is enabled
     I2_QML_PROPERTY_READONLY(bool, isEnabledViewLogStream)
 
+    // Flag indicating if our agents grouped by definition are selected in our agents list view
+    // NB: only set by AgentsGroupedByNameVM
+    I2_QML_PROPERTY_READONLY(bool, isSelected)
 
 public:
-    /**
-     * @brief Constructor
-     * @param agentName
-     * @param definition
-     * @param parent
-     */
+
     explicit AgentsGroupedByDefinitionVM(QString agentName,
                                          DefinitionM* definition,
                                          QObject *parent = nullptr);
-
-
-    /**
-     * @brief Destructor
-     */
     ~AgentsGroupedByDefinitionVM();
 
 

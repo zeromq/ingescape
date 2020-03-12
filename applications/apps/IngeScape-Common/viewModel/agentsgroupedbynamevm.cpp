@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2020 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -9,18 +9,14 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
- *
+ *      Chloé Roumieu      <roumieu@ingenuity.io
  */
 
 #include "agentsgroupedbynamevm.h"
 #include <controller/ingescapemodelmanager.h>
 #include <controller/ingescapenetworkcontroller.h>
 
-/**
- * @brief Constructor
- * @param agentName
- * @param parent
- */
+
 AgentsGroupedByNameVM::AgentsGroupedByNameVM(QString agentName,
                                              QObject *parent) : QObject(parent),
     _name(agentName),
@@ -47,9 +43,6 @@ AgentsGroupedByNameVM::AgentsGroupedByNameVM(QString agentName,
 }
 
 
-/**
- * @brief Destructor
- */
 AgentsGroupedByNameVM::~AgentsGroupedByNameVM()
 {
     qInfo() << "Delete View Model of Agents grouped by name" << _name;
@@ -58,6 +51,28 @@ AgentsGroupedByNameVM::~AgentsGroupedByNameVM()
     clearBeforeDeletion();
 }
 
+/**
+ * @brief When agents grouped by name are selected, all their agents grouped by definitions are selected too
+ */
+void AgentsGroupedByNameVM::setisSelected(bool value)
+{
+    if (_isSelected != value)
+    {
+        for (AgentsGroupedByDefinitionVM* agentGroupedByDef : _allAgentsGroupsByDefinition)
+        {
+            agentGroupedByDef->setisSelected(_isSelected);
+        }
+
+        _isSelected = value;
+
+        for (AgentsGroupedByDefinitionVM* agentGroupedByDef : _allAgentsGroupsByDefinition)
+        {
+            agentGroupedByDef->setisSelected(_isSelected);
+        }
+
+        Q_EMIT isSelectedChanged(value);
+    }
+}
 
 /**
  * @brief Clear our agent just before its deletion

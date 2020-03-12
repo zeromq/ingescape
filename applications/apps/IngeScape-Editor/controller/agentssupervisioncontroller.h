@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2020 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -10,7 +10,7 @@
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *      Alexandre Lemort   <lemort@ingenuity.io>
- *
+ *      Chloé Roumieu      <roumieu@ingenuity.io>
  */
 
 #ifndef AGENTSSUPERVISIONCONTROLLER_H
@@ -18,7 +18,6 @@
 
 #include <QObject>
 #include <QtQml>
-
 #include <I2PropertyHelpers.h>
 #include <controller/editormodelmanager.h>
 #include <viewModel/agentsgroupedbydefinitionvm.h>
@@ -34,30 +33,21 @@ class AgentsSupervisionController : public QObject
     // Sorted list of agents
     I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(AgentsGroupedByDefinitionVM, agentsList)
 
-    // Selected agent in the agents list
-    I2_QML_PROPERTY_DELETE_PROOF(AgentsGroupedByDefinitionVM*, selectedAgent)
-
 
 public:
-    /**
-     * @brief Constructor
-     * @param parent
-     */
+
     explicit AgentsSupervisionController(QObject *parent = nullptr);
-
-
-    /**
-     * @brief Destructor
-     */
     ~AgentsSupervisionController();
-
 
     /**
      * @brief Remove the agent from the list and delete it
-     * @param agent
      */
     Q_INVOKABLE void deleteAgentInList(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition);
 
+    /**
+     * @brief Get Agents grouped by name for this definition
+     */
+    Q_INVOKABLE AgentsGroupedByNameVM* getAgentsGroupedByName(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition);
 
 Q_SIGNALS:
 

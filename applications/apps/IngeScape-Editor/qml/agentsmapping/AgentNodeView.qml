@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2020 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -11,7 +11,7 @@
  *      Alexandre Lemort    <lemort@ingenuity.io>
  *      Justine Limoges     <limoges@ingenuity.io>
  *      Vincent Peyruqueou  <peyruqueou@ingenuity.io>
- *
+ *      Chloé Roumieu       <roumieu@ingenuity.io>
  */
 
 import QtQuick 2.8
@@ -41,7 +41,7 @@ Rectangle {
     // Model associated to our QML item
     property AgentInMappingVM agentMappingVM: null
 
-    property var agentsGroupedByName: agentMappingVM ? agentMappingVM.agentsGroupedByName : null
+    property AgentsGroupedByNameVM agentsGroupedByName: agentMappingVM ? agentMappingVM.agentsGroupedByName : null
 
     property string agentName: agentMappingVM ? agentMappingVM.name : ""
 
@@ -58,10 +58,6 @@ Rectangle {
 
     // Flag indicating if the mouse is hover our agent
     property bool agentItemIsHovered: mouseArea.containsMouse
-
-    // To check if our item is selected or not
-    property bool _isSelected: (controller && rootItem.agentMappingVM && (controller.selectedAgent === rootItem.agentMappingVM))
-
 
     // Duration of expand/collapse animation in milliseconds (250 ms => default duration of QML animations)
     property int _expandCollapseAnimationDuration: 250
@@ -90,7 +86,7 @@ Rectangle {
 
     border {
         color: IngeScapeTheme.selectionColor
-        width: rootItem._isSelected ? 1 : 0
+        width: (rootItem.agentsGroupedByName && rootItem.agentsGroupedByName.isSelected) ? 1 : 0
     }
 
 
@@ -189,13 +185,15 @@ Rectangle {
         }
 
         onClicked: {
-            if (controller && agentMappingVM) {
-                if (controller.selectedAgent === agentMappingVM)
+            if (rootItem.controller && rootItem.agentsGroupedByName)
+            {
+                if (rootItem.agentsGroupedByName.isSelected)
                 {
-                    controller.selectedAgent = null;
+                    rootItem.controller.selectedAgent = null
                 }
-                else {
-                    controller.selectedAgent = agentMappingVM;
+                else
+                {
+                    rootItem.controller.selectedAgent = rootItem.agentsGroupedByName;
                 }
             }
         }

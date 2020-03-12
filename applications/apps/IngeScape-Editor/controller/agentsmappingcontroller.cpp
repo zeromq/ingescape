@@ -22,12 +22,6 @@
 #include <controller/ingescapenetworkcontroller.h>
 
 
-/**
- * @brief Constructor
- * @param modelManager
- * @param directoryPath
- * @param parent
- */
 AgentsMappingController::AgentsMappingController(EditorModelManager* modelManager,
                                                  QObject *parent) : QObject(parent),
       _viewWidth(1920 - 320), // Full HD - Width of left panel
@@ -49,10 +43,6 @@ AgentsMappingController::AgentsMappingController(EditorModelManager* modelManage
 
 }
 
-
-/**
- * @brief Destructor
- */
 AgentsMappingController::~AgentsMappingController()
 {
     // Clean-up current selections
@@ -85,17 +75,30 @@ AgentsMappingController::~AgentsMappingController()
 }
 
 
-/**
- * @brief Setter for property "is Loaded View"
- * @param value
- */
 void AgentsMappingController::setisLoadedView(bool value)
 {
     if (_isLoadedView != value)
     {
         _isLoadedView = value;
-
         Q_EMIT isLoadedViewChanged(value);
+    }
+}
+
+void AgentsMappingController::setselectedAgent(AgentsGroupedByNameVM *value)
+{
+    if (_selectedAgent != value)
+    {
+        if (_selectedAgent != nullptr)
+        {
+            _selectedAgent->setisSelected(false);
+        }
+        _selectedAgent = value;
+
+        if (_selectedAgent != nullptr)
+        {
+            _selectedAgent->setisSelected(true);
+        }
+        Q_EMIT selectedAgentChanged(value);
     }
 }
 
@@ -140,7 +143,8 @@ void AgentsMappingController::deleteAgentInMapping(AgentInMappingVM* agent)
         //qDebug() << "Delete the agent" << agent->name() << "in the Mapping";
 
         // Unselect our agent if needed
-        if (_selectedAgent == agent) {
+        if (_selectedAgent == agent->agentsGroupedByName())
+        {
             setselectedAgent(nullptr);
         }
 
@@ -312,7 +316,7 @@ void AgentsMappingController::dropAgentNameToMappingAtPosition(const QString& ag
                 _linkAgentOnOutputs(agentInMapping);
 
                 // Selects this new agent
-                setselectedAgent(agentInMapping);
+                setselectedAgent(agentsGroupedByName);
             }
         }
     }

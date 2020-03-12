@@ -54,8 +54,8 @@ class AgentsMappingController : public QObject
     // Flag indicating if our mapping is empty
     I2_QML_PROPERTY_READONLY(bool, isEmptyMapping)
 
-    // Selected agent in the mapping
-    I2_QML_PROPERTY_DELETE_PROOF(AgentInMappingVM*, selectedAgent)
+    // Selected agents grouped by name (in both mapping & agents list views)
+    I2_QML_PROPERTY_CUSTOM_SETTER(AgentsGroupedByNameVM*, selectedAgent)
 
     // Selected action in the mapping
     I2_QML_PROPERTY_DELETE_PROOF(ActionInMappingVM*, selectedAction)
@@ -68,18 +68,9 @@ class AgentsMappingController : public QObject
 
 
 public:
-    /**
-     * @brief Constructor
-     * @param modelManager
-     * @param parent
-     */
+
     explicit AgentsMappingController(EditorModelManager* modelManager,
                                      QObject *parent = nullptr);
-
-
-    /**
-     * @brief Destructor
-     */
     ~AgentsMappingController();
 
 

@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2020 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -9,7 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
- *
+ *      Chloé Roumieu      <roumieu@ingenuity.io>
  */
 
 #ifndef AGENTSGROUPEDBYNAMEVM_H
@@ -76,19 +76,14 @@ class AgentsGroupedByNameVM : public QObject
     // Flag indicate if the agent is in the current platform
     I2_QML_PROPERTY(bool, isAgentGroupedByNameInCurrentPlatform)
 
+    // Flag indicating if our agents grouped by name are selected in view
+    I2_QML_PROPERTY_CUSTOM_SETTER(bool, isSelected)
+
+
 public:
-    /**
-     * @brief Constructor
-     * @param agentName
-     * @param parent
-     */
+
     explicit AgentsGroupedByNameVM(QString agentName,
                                    QObject *parent = nullptr);
-
-
-    /**
-     * @brief Destructor
-     */
     ~AgentsGroupedByNameVM();
 
 
