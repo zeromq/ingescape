@@ -167,10 +167,10 @@ public:
 
 
     /**
-      * @brief Clear the current platform (agents, mappings, actions, palette, timeline actions)
-      *        by deleting all existing data
+      * @brief Disconnect the editor, clear the current platform (agents, mappings, actions, palette, timeline actions)
+      * & init new filename
       */
-    Q_INVOKABLE void clearCurrentPlatform();
+    Q_INVOKABLE void createNewPlatform();
 
 
     /**
@@ -234,8 +234,8 @@ public:
      */
     Q_INVOKABLE bool startIngeScape();
 
-    Q_INVOKABLE void stopIngeScape(bool hasToClearPlatform);
-    Q_INVOKABLE bool restartIngeScape(bool hasToClearPlatform);
+    Q_INVOKABLE void stopIngeScape();
+    Q_INVOKABLE bool restartIngeScape();
 
 
 public Q_SLOTS:
@@ -418,16 +418,19 @@ private:
 
     /**
      * @brief Load the platform from a JSON file
-     * @param platformFilePath
-     * @return
      */
     bool _loadPlatformFromFile(QString platformFilePath);
 
 
     /**
+     * @brief Clear the current platform (agents, mappings, actions, palette, timeline actions, hosts)
+     * by deleting all existing data
+     */
+    void _clearCurrentPlatform();
+
+
+    /**
      * @brief Clear our current platform and load a new platform from a given file
-     * @param platformFilePath
-     * @return
      */
     bool _clearAndLoadPlatformFromFile(QString platformFilePath);
 

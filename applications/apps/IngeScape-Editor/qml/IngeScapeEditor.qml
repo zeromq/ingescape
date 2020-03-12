@@ -376,7 +376,7 @@ Item {
             onConnectChanged: {
                 if (wasOnlineBeforeConnectChanged)
                 {
-                    IngeScapeEditorC.stopIngeScape(false);
+                    IngeScapeEditorC.stopIngeScape();
                 }
                 else
                 {
@@ -389,7 +389,7 @@ Item {
                 IngeScapeEditorC.networkDevice = networkDevice;
                 if (IgsNetworkController.isStarted)
                 {
-                     IngeScapeEditorC.restartIngeScape(false);
+                     IngeScapeEditorC.restartIngeScape();
                 }
             }
         }
@@ -834,7 +834,7 @@ Item {
 
         onCancelMappingActivation: {
             console.log("on Cancel Mapping Activation");
-            IngeScapeEditorC.stopIngeScape(false);
+            IngeScapeEditorC.stopIngeScape();
         }
 
         onSwitchToControl: {

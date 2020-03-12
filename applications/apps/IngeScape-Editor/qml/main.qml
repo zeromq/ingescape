@@ -83,7 +83,8 @@ ApplicationWindow {
                         IngeScapeEditorC.recordsSupervisionC.selectedRecord = null;
                         IngeScapeEditorC.platformNameBeforeLoadReplay = "";
                     }
-                    IngeScapeEditorC.clearCurrentPlatform();
+
+                    IngeScapeEditorC.createNewPlatform();
                 }
             }
 
@@ -102,6 +103,8 @@ ApplicationWindow {
                     {
                         IngeScapeEditorC.recordsSupervisionC.selectedRecord = null;
                     }
+
+
 
                     IngeScapeEditorC.loadPlatformFromSelectedFile();
                 }

@@ -468,7 +468,7 @@ IngeScapeEditorController::~IngeScapeEditorController()
     IngeScapeNetworkController::instance()->stopMonitoring();
 
     // 2- Stop IngeScape
-    stopIngeScape(false);
+    stopIngeScape();
 
     // Unsubscribe to OS events
     disconnect(OSUtils::instance(), &OSUtils::systemSleep, this, &IngeScapeEditorController::_onSystemSleep);
@@ -652,6 +652,11 @@ void IngeScapeEditorController::loadPlatformFromSelectedFile()
 
     if (!platformFilePath.isEmpty())
     {
+        if (IngeScapeNetworkController::instance()->isStarted())
+        {
+            stopIngeScape();
+        }
+
         _clearAndLoadPlatformFromFile(platformFilePath);
     }
     else
@@ -702,57 +707,19 @@ void IngeScapeEditorController::savePlatformToCurrentlyLoadedFile()
  * @brief Clear the current platform (agents, mappings, actions, palette, timeline actions, hosts)
  * by deleting all existing data
  */
-void IngeScapeEditorController::clearCurrentPlatform()
+void IngeScapeEditorController::createNewPlatform()
 {
-    qInfo() << "Clear Current Platform (" << _currentPlatformName << ")";
+    if (IngeScapeNetworkController::instance()->isStarted())
+    {
+        stopIngeScape();
+    }
 
     // Update the current platform name
     setcurrentPlatformName(NEW_PLATFORM_NAME);
     _currentPlatformFilePath = QString("%1%2.igsplatform").arg(_platformDirectoryPath, NEW_PLATFORM_NAME);
     sethasAPlatformBeenLoadedByUser(false);
 
-    // Clear the current mapping
-    if (_agentsMappingC != nullptr) {
-        _agentsMappingC->clearMapping();
-    }
-
-    // Clear the current scenario
-    if (_scenarioC != nullptr) {
-        _scenarioC->clearScenario();
-    }
-
-    if (_hostsSupervisionC != nullptr)
-    {
-        // Delete hosts OFF
-        _hostsSupervisionC->deleteHostsOFF();
-    }
-
-    IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
-    if (ingeScapeModelManager != nullptr)
-    {
-        // Delete all published values
-        ingeScapeModelManager->deleteAllPublishedValues();
-
-        // Delete all (models of) actions
-        ingeScapeModelManager->deleteAllActions();
-
-        // Delete agents OFF
-        QStringList namesListOfAgentsON = ingeScapeModelManager->deleteAgentsOFF();
-
-        if (_valuesHistoryC != nullptr)
-        {
-            // Set both list of agent names with agents ON
-            _valuesHistoryC->setAgentNamesList(namesListOfAgentsON);
-        }
-    }
-
-    if (_timeLineC != nullptr) {
-        // Reset timeline parameters
-        _timeLineC->resetTimeline();
-    }
-
-    Q_EMIT resetTimeLineView(false); // Close timeline view
-    Q_EMIT resetMappindView(); // Center mapping view
+    _clearCurrentPlatform();
 }
 
 
@@ -955,48 +922,30 @@ bool IngeScapeEditorController::startIngeScape()
 }
 
 
-void IngeScapeEditorController::stopIngeScape(bool hasToClearPlatform)
+void IngeScapeEditorController::stopIngeScape()
 {
+    // Deactivate mapping distribution each time our editor is OFFLINE for more security
+    _modelManager->setisMappingControlled(false);
+
     IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
 
     if ((ingeScapeNetworkC != nullptr) && (_modelManager != nullptr))
     {
-        if (hasToClearPlatform)
-        {
-            qInfo() << "Stop the network on" << _networkDevice << "with" << _port << "(and CLEAR the current platform)";
-        }
-        else
-        {
-            qInfo() << "Stop the network on" << _networkDevice << "with" << _port << "(and KEEP the current platform)";
-        }
+        qInfo() << "Stop the network on" << _networkDevice << "with" << _port;
 
         // Stop our IngeScape agent
         ingeScapeNetworkC->stop();
 
         // We don't see itself
         ingeScapeNetworkC->setnumberOfEditors(1);
-
-        // Has to clear the current platform
-        if (hasToClearPlatform)
-        {
-            // Clear the current platform by deleting all existing data
-            clearCurrentPlatform();
-        }
     }
 }
 
 
-bool IngeScapeEditorController::restartIngeScape(bool hasToClearPlatform)
+bool IngeScapeEditorController::restartIngeScape()
 {
-    if (hasToClearPlatform)
-    {
-        qInfo() << "Restart the network on" << _networkDevice << "with" << _port << "(and CLEAR the current platform)";
-    }
-    else
-    {
-        qInfo() << "Restart the network on" << _networkDevice << "with" << _port << "(and KEEP the current platform)";
-    }
-    stopIngeScape(hasToClearPlatform);
+    qInfo() << "Restart the network on" << _networkDevice << "with" << _port;
+    stopIngeScape();
     return startIngeScape();
 }
 
@@ -1209,7 +1158,7 @@ void IngeScapeEditorController::_onReplayLoading(int deltaTimeFromTimeLineStart,
         }
 
         // First, clear the current platform by deleting all existing data
-        clearCurrentPlatform();
+        _clearCurrentPlatform();
 
         QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonPlatform.toUtf8());
 
@@ -1255,7 +1204,7 @@ void IngeScapeEditorController::_onReplayUNloaded()
     // and current platform is a "NEW PLATFORM"
     if (_platformNameBeforeLoadReplay != "")
     {
-        clearCurrentPlatform();
+        _clearCurrentPlatform();
         _currentPlatformFilePath = QString("%1%2.igsplatform").arg(_platformDirectoryPath, _platformNameBeforeLoadReplay);
         _platformNameBeforeLoadReplay = "";
 
@@ -1469,7 +1418,7 @@ void IngeScapeEditorController::_onLicensesUpdated()
     qDebug() << "on License Updated";
     if (IngeScapeNetworkController::instance()->isStarted())
     {
-        restartIngeScape(false);
+        restartIngeScape();
     }
 }
 
@@ -1478,7 +1427,7 @@ void IngeScapeEditorController::_onLicensesUpdated()
  */
 void IngeScapeEditorController::_onLicenseLimitationReached()
 {
-    stopIngeScape(false);
+    stopIngeScape();
 }
 
 
@@ -1491,8 +1440,7 @@ void IngeScapeEditorController::_onNetworkDeviceIsNotAvailable()
 
     if (IngeScapeNetworkController::instance()->isStarted())
     {
-        stopIngeScape(false);
-        startIngeScape(); // Try to relaunch editor with an available device
+        restartIngeScape();
     }
 }
 
@@ -1521,7 +1469,7 @@ void IngeScapeEditorController::_onNetworkDeviceIpAddressHasChanged()
 
     if (IngeScapeNetworkController::instance()->isStarted())
     {
-        restartIngeScape(false);
+        restartIngeScape();
     }
 }
 
@@ -1538,7 +1486,7 @@ void IngeScapeEditorController::_onSystemSleep()
     {
         _wasAgentEditorStarted_beforeSystemSleep = true;
         IngeScapeNetworkController::instance()->stopMonitoring(); // to save energy
-        stopIngeScape(false);
+        stopIngeScape();
     }
 }
 
@@ -1623,6 +1571,58 @@ bool IngeScapeEditorController::_loadPlatformFromFile(QString platformFilePath)
     return success;
 }
 
+/**
+ * @brief Clear the current platform (agents, mappings, actions, palette, timeline actions, hosts)
+ * by deleting all existing data
+ */
+void IngeScapeEditorController::_clearCurrentPlatform()
+{
+    qInfo() << "Clear Current Platform (" << _currentPlatformName << ")";
+
+    // Clear the current mapping
+    if (_agentsMappingC != nullptr) {
+        _agentsMappingC->clearMapping();
+    }
+
+    // Clear the current scenario
+    if (_scenarioC != nullptr) {
+        _scenarioC->clearScenario();
+    }
+
+    if (_hostsSupervisionC != nullptr)
+    {
+        // Delete hosts OFF
+        _hostsSupervisionC->deleteHostsOFF();
+    }
+
+    IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
+    if (ingeScapeModelManager != nullptr)
+    {
+        // Delete all published values
+        ingeScapeModelManager->deleteAllPublishedValues();
+
+        // Delete all (models of) actions
+        ingeScapeModelManager->deleteAllActions();
+
+        // Delete agents OFF
+        QStringList namesListOfAgentsON = ingeScapeModelManager->deleteAgentsOFF();
+
+        if (_valuesHistoryC != nullptr)
+        {
+            // Set both list of agent names with agents ON
+            _valuesHistoryC->setAgentNamesList(namesListOfAgentsON);
+        }
+    }
+
+    if (_timeLineC != nullptr) {
+        // Reset timeline parameters
+        _timeLineC->resetTimeline();
+    }
+
+    Q_EMIT resetTimeLineView(false); // Close timeline view
+    Q_EMIT resetMappindView(); // Center mapping view
+}
+
 
 
 /**
@@ -1635,7 +1635,7 @@ bool IngeScapeEditorController::_clearAndLoadPlatformFromFile(QString platformFi
     if (!platformFilePath.isEmpty())
     {
         // First, clear the current platform by deleting all existing data
-        clearCurrentPlatform();
+        _clearCurrentPlatform();
 
         // Load the platform from JSON file
         succeeded = _loadPlatformFromFile(platformFilePath);
