@@ -148,8 +148,6 @@ endif (APPLE)
 # ##############################################################################
 option(INGESCAPE_BUILD_SHARED "Whether or not to build the shared object" ON)
 option(INGESCAPE_BUILD_STATIC "Whether or not to build the static archive" ON)
-
-
 if(NOT INGESCAPE_BUILD_SHARED AND NOT INGESCAPE_BUILD_STATIC)
   message(FATAL_ERROR "Neither static nor shared library build enabled")
 endif()
@@ -176,36 +174,16 @@ endif()
 if(INGESCAPE_BUILD_SHARED)
   add_library(${PROJECT_NAME} SHARED ${ingescape_sources})
 
+  # OS specifig target properties
   if(MSVC)
     # WIN32_LIB_FILETYPE is used in the RC file that will register the DLL version
     set(WIN32_LIB_FILETYPE "VFT_DLL")
 
-
-    if(CMAKE_BUILD_TYPE STREQUAL "Release")
-      set_target_properties(${PROJECT_NAME}
-                            PROPERTIES PUBLIC_HEADER
-                                       "${ingescape_headers_to_install}"
-                                       DEFINE_SYMBOL
-                                       "INGESCAPE_EXPORTS"
-                                       SOVERSION
-                                       "${INGESCAPE_VERSION_MAJOR}"
-                                       VERSION
-                                       "${INGESCAPE_VERSION}"
-                                       OUTPUT_NAME
-                                       "ingescape")
-    else()
-      set_target_properties(${PROJECT_NAME}
-                            PROPERTIES PUBLIC_HEADER
-                                       "${ingescape_headers_to_install}"
-                                       DEFINE_SYMBOL
-                                       "INGESCAPE_EXPORTS"
-                                       SOVERSION
-                                       "${INGESCAPE_VERSION_MAJOR}"
-                                       VERSION
-                                       "${INGESCAPE_VERSION}"
-                                       OUTPUT_NAME
-                                       "ingescaped")
-    endif()
+    set_target_properties(${PROJECT_NAME}
+                            PROPERTIES
+                              OUTPUT_NAME_RELEASE "ingescape"
+                              OUTPUT_NAME_DEBUG "ingescaped"
+    )
 
     math(EXPR BITS "8*${CMAKE_SIZEOF_VOID_P}")
     if (${BITS} EQUAL 64)
@@ -216,30 +194,27 @@ if(INGESCAPE_BUILD_SHARED)
 
   else(MSVC)
     set_target_properties(${PROJECT_NAME}
-                          PROPERTIES PUBLIC_HEADER
-                                     "${ingescape_headers_to_install}"
-                                     #FRAMEWORK TRUE
-                                     #FRAMEWORK_VERSION C
-                                     #MACOSX_FRAMEWORK_IDENTIFIER com.ingescape
-                                     #XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "MyAccount Developer"
-                                     DEFINE_SYMBOL
-                                     "INGESCAPE_EXPORTS"
-                                     SOVERSION
-                                     "${INGESCAPE_VERSION_MAJOR}"
-                                     VERSION
-                                     "${INGESCAPE_VERSION}"
-                                     OUTPUT_NAME
-                                     "ingescape"
-                                     PREFIX
-                                     "lib")
+                            PROPERTIES
+                              #PUBLIC_HEADER "${ingescape_headers_to_install}"
+                              #TODO We do not generate a Framework yet.
+                              #FRAMEWORK TRUE
+                              #FRAMEWORK_VERSION C
+                              #MACOSX_FRAMEWORK_IDENTIFIER com.ingescape
+                              #XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "MyAccount Developer"
+                              VERSION "${INGESCAPE_VERSION}" # Current version
+                              SOVERSION "${INGESCAPE_VERSION_MAJOR}.0.0" # Compatibility version
+                              OUTPUT_NAME "ingescape"
+                              PREFIX "lib"
+    )
   endif(MSVC)
 
   # Add compilation #defines to the target
   target_compile_definitions(${PROJECT_NAME} PRIVATE INGESCAPE=1;TARGET_OS_IOS=0)
 
   # Add linked dependencies
-  target_link_libraries(${PROJECT_NAME} 
-    PRIVATE 
+  #FIXME All private here ?
+  target_link_libraries(${PROJECT_NAME}
+    PRIVATE
       czmq
       libzmq
       zyre
@@ -261,50 +236,48 @@ if(INGESCAPE_BUILD_SHARED)
           EXPORT ${PROJECT_NAME}-targets
           FRAMEWORK DESTINATION "Frameworks" # .framework file
                   COMPONENT library
-          LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
+          LIBRARY DESTINATION "lib" # .so file
                   COMPONENT library
-          ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
+          ARCHIVE DESTINATION "lib" # .lib file
                   COMPONENT library
-          RUNTIME DESTINATION "lib${LIB_SUFFIX}" # .dll file
+          RUNTIME DESTINATION "lib" # .dll file
                   COMPONENT library)
 endif()
 
 # static
 if(INGESCAPE_BUILD_STATIC)
   add_library(${PROJECT_NAME}-static STATIC ${ingescape_sources})
+
+  # OS specifig target properties
   if(MSVC)
     # WIN32_LIB_FILETYPE is used in the RC file that will register the DLL version
     set(WIN32_LIB_FILETYPE "VFT_STATIC_LIB")
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/modules/library/library_version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
 
-    if(CMAKE_BUILD_TYPE STREQUAL "Release")
-      set_target_properties(${PROJECT_NAME}-static
-                            PROPERTIES PUBLIC_HEADER
-                                       "${ingescape_headers_to_install}"
-                                       COMPILE_DEFINITIONS
-                                       "INGESCAPE_STATIC"
-                                       OUTPUT_NAME
-                                       "ingescape_static")
-    else()
-      set_target_properties(${PROJECT_NAME}-static
-                            PROPERTIES PUBLIC_HEADER
-                                       "${ingescape_headers_to_install}"
-                                       COMPILE_DEFINITIONS
-                                       "INGESCAPE_STATIC"
-                                       OUTPUT_NAME
-                                       "ingescaped_static")
-    endif()
+    set_target_properties(${PROJECT_NAME}-static
+                            PROPERTIES
+                            OUTPUT_NAME_RELEASE "ingescape_static"
+                            OUTPUT_NAME_DEBUG "ingescaped_static")
+
   else(MSVC)
     set_target_properties(${PROJECT_NAME}-static
-                          PROPERTIES PUBLIC_HEADER
-                                     "${ingescape_headers_to_install}"
-                                     COMPILE_DEFINITIONS
-                                     "INGESCAPE_STATIC"
-                                     OUTPUT_NAME
-                                     "ingescape"
-                                     PREFIX
-                                     "lib")
+                          PROPERTIES
+                            OUTPUT_NAME "ingescape"
+                            PREFIX "lib")
   endif(MSVC)
+
+  # Add compilation #defines to the target
+  target_compile_definitions(${PROJECT_NAME}-static PRIVATE INGESCAPE=1;TARGET_OS_IOS=0)
+
+  # Add linked dependencies
+  #FIXME All private here ?
+  target_link_libraries(${PROJECT_NAME}-static
+    PRIVATE
+      czmq
+      libzmq
+      zyre
+      $<$<BOOL:${APPLE}>:${CORE_FRAMEWORK}>
+      $<$<BOOL:${WIN32}>:ws2_32>
+  )
 
   # Header files
   target_include_directories(${PROJECT_NAME}-static
@@ -316,20 +289,6 @@ if(INGESCAPE_BUILD_STATIC)
       $<$<BOOL:${WIN32}>:${CMAKE_CURRENT_SOURCE_DIR}/dependencies/windows/unix>
   )
 
-  # Add compilation #defines to the target
-  target_compile_definitions(${PROJECT_NAME}-static PRIVATE INGESCAPE=1;TARGET_OS_IOS=0)
-
-  # Add linked dependencies
-  #FIXME All private here ?
-  target_link_libraries(${PROJECT_NAME}-static
-    PRIVATE 
-      czmq
-      libzmq
-      zyre
-      $<$<BOOL:${APPLE}>:${CORE_FRAMEWORK}>
-      $<$<BOOL:${WIN32}>:ws2_32>
-  )
-
   # Release build compile with -O2 flag
   if (${CMAKE_BUILD_TYPE} MATCHES "Release")
       target_compile_options(${PROJECT_NAME}-static PRIVATE "-O2")
@@ -337,14 +296,15 @@ if(INGESCAPE_BUILD_STATIC)
 
   install(TARGETS ${PROJECT_NAME}-static
           EXPORT ${PROJECT_NAME}-targets
-          LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
+          LIBRARY DESTINATION "lib" # .so file
                   COMPONENT library
-          ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
+          ARCHIVE DESTINATION "lib" # .lib file
                   COMPONENT library
-          RUNTIME DESTINATION "lib${LIB_SUFFIX}" # .dll file
+          RUNTIME DESTINATION "lib" # .dll file
                   COMPONENT library)
 endif()
 
+# Install public include files
 install(FILES ${ingescape_headers_to_install}
         DESTINATION include/ingescape
         COMPONENT library)
@@ -369,30 +329,39 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libingescape.pc"
 # installation
 # ##############################################################################
 include(CMakePackageConfigHelpers)
-if(WIN32)
-  set(CMAKECONFIG_INSTALL_DIR
-      "CMake"
-      CACHE STRING "install path for ingescapeConfig.cmake")
+if (WIN32)
+  set(CMAKECONFIG_INSTALL_DIR "lib" CACHE STRING "install path for ingescapeConfig.cmake")
 else()
-  # GNUInstallDirs "DATADIR" wrong here; CMake search path wants "share".
-  set(CMAKECONFIG_INSTALL_DIR
-      "share/cmake/ingescape"
-      CACHE STRING "install path for ingescapeConfig.cmake")
-endif()
+  set(CMAKECONFIG_INSTALL_DIR "share/cmake/ingescape" CACHE STRING "install path for ingescapeConfig.cmake")
+endif(WIN32)
+message(STATUS "CMAKECONFIG_INSTALL_DIR: ${CMAKECONFIG_INSTALL_DIR}")
 
-if(NOT CMAKE_VERSION VERSION_LESS 3.0)
-  export(EXPORT ${PROJECT_NAME}-targets
-         FILE "${CMAKE_CURRENT_BINARY_DIR}/ingescapeTargets.cmake")
-endif()
+# Export ingescapeTargets.cmake
+export(EXPORT ${PROJECT_NAME}-targets FILE "${CMAKE_CURRENT_BINARY_DIR}/ingescapeTargets.cmake")
+
+# Generate ingescapeConfig.cmake
 configure_package_config_file(
   builds/cmake/Config.cmake.in
   "${CMAKE_CURRENT_BINARY_DIR}/ingescapeConfig.cmake"
-  INSTALL_DESTINATION
-  ${CMAKECONFIG_INSTALL_DIR})
+  INSTALL_DESTINATION ${CMAKECONFIG_INSTALL_DIR}
+)
+
+# Generate ingescapeConfigVersion.cmake
 write_basic_package_version_file(
   ${CMAKE_CURRENT_BINARY_DIR}/ingescapeConfigVersion.cmake
   VERSION ${INGESCAPE_VERSION}
-  COMPATIBILITY AnyNewerVersion)
+  COMPATIBILITY AnyNewerVersion
+)
+
+# Install CMake config and target files
+install(FILES
+  ${CMAKE_CURRENT_BINARY_DIR}/ingescapeConfig.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/ingescapeConfigVersion.cmake
+  DESTINATION ${CMAKECONFIG_INSTALL_DIR})
+
+install(EXPORT ${PROJECT_NAME}-targets
+  FILE ingescapeTargets.cmake
+  DESTINATION ${CMAKECONFIG_INSTALL_DIR})
 
 # uninstall target
 if(NOT TARGET uninstall)
@@ -402,8 +371,7 @@ if(NOT TARGET uninstall)
                  @ONLY)
 
   add_custom_target(uninstall
-                    COMMAND ${CMAKE_COMMAND} -P
-                            ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+                    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 endif()
 
 # ##############################################################################
@@ -425,7 +393,7 @@ if((WIN32) OR (CMAKE_BUILD_TYPE STREQUAL "Release"))
   set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}")
   set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
   set(CPACK_STRIP_FILES TRUE)
-  
+ 
   set(
     CPACK_SOURCE_IGNORE_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/bindings/;${CMAKE_CURRENT_SOURCE_DIR}/build/;${CMAKE_CURRENT_SOURCE_DIR}/.git/;${CMAKE_CURRENT_SOURCE_DIR}/doc/;${CMAKE_CURRENT_SOURCE_DIR}/applications/;${CMAKE_CURRENT_SOURCE_DIR}/ingeprobe/;${CMAKE_CURRENT_SOURCE_DIR}/packaging/"
@@ -481,12 +449,12 @@ if((WIN32) OR (CMAKE_BUILD_TYPE STREQUAL "Release"))
     set(CPACK_COMPONENTS_ALL library)
     set(CPACK_PACKAGING_INSTALL_PREFIX "/usr/local")
     set(CPACK_SYSTEM_NAME "macos")
-    
+   
     #set(CPACK_PRODUCTBUILD_IDENTITY_NAME "Developer ID Installer: Ingenuity i/o (56DRT9MG9S)")
     #set(CPACK_PRODUCTBUILD_KEYCHAIN_PATH "$ENV{HOME}/Library/Keychains/login.keychain")
     #set(CPACK_PKGBUILD_IDENTITY_NAME "Developer ID Installer: Ingenuity i/o (56DRT9MG9S)")
     #set(CPACK_PKGBUILD_KEYCHAIN_PATH "$ENV{HOME}/Library/Keychains/login.keychain")
-    
+   
     set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_SOURCE_DIR}/builds/xcode/WELCOME.txt")
     set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/builds/xcode/README.txt")
 
@@ -495,7 +463,7 @@ if((WIN32) OR (CMAKE_BUILD_TYPE STREQUAL "Release"))
     configure_file("${CMAKE_CURRENT_SOURCE_DIR}/LICENSE"
                    "${CMAKE_BINARY_DIR}/LICENSE.txt" COPYONLY)
     set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_BINARY_DIR}/LICENSE.txt")
-    
+   
     set(CPACK_PREFLIGHT_LIBRARY_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/builds/xcode/preflight.sh")
     set(CPACK_POSTFLIGHT_LIBRARY_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/builds/xcode/postflight.sh")
 
