@@ -340,7 +340,7 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libingescape.pc"
 # ##############################################################################
 include(CMakePackageConfigHelpers)
 if (WIN32)
-  set(CMAKECONFIG_INSTALL_DIR "lib" CACHE STRING "install path for ingescapeConfig.cmake")
+  set(CMAKECONFIG_INSTALL_DIR "CMake" CACHE STRING "install path for ingescapeConfig.cmake")
 else()
   set(CMAKECONFIG_INSTALL_DIR "share/cmake/ingescape" CACHE STRING "install path for ingescapeConfig.cmake")
 endif(WIN32)
