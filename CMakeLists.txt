@@ -166,7 +166,6 @@ else()
   else ()
       set(WIN32_LIB_FILEFLAGS "VS_FF_DEBUG")
   endif()
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/modules/library/library_version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
 endif()
 
 
@@ -178,6 +177,8 @@ if(INGESCAPE_BUILD_SHARED)
   if(MSVC)
     # WIN32_LIB_FILETYPE is used in the RC file that will register the DLL version
     set(WIN32_LIB_FILETYPE "VFT_DLL")
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/modules/library/library_version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
+    target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/version.rc
 
     set_target_properties(${PROJECT_NAME}
                             PROPERTIES
@@ -216,6 +217,7 @@ if(INGESCAPE_BUILD_SHARED)
   target_link_libraries(${PROJECT_NAME}
     PRIVATE
       czmq
+      libsodium
       libzmq
       zyre
       $<$<BOOL:${APPLE}>:${CORE_FRAMEWORK}>
@@ -228,6 +230,7 @@ if(INGESCAPE_BUILD_SHARED)
       $<INSTALL_INTERFACE:include>
       $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/include>
     PRIVATE
+      ${LIBSODIUM_INCLUDE_DIRS}
       ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/yajl/src/api
       $<$<BOOL:${WIN32}>:${CMAKE_CURRENT_SOURCE_DIR}/dependencies/windows/unix>
   )
@@ -246,17 +249,21 @@ endif()
 
 # static
 if(INGESCAPE_BUILD_STATIC)
-  add_library(${PROJECT_NAME}-static STATIC ${ingescape_sources})
+  add_library(${PROJECT_NAME}-static STATIC
+    ${ingescape_sources}
+    ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
 
   # OS specifig target properties
   if(MSVC)
     # WIN32_LIB_FILETYPE is used in the RC file that will register the DLL version
     set(WIN32_LIB_FILETYPE "VFT_STATIC_LIB")
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/modules/library/library_version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
+    target_sources(${PROJECT_NAME}-static PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/version.rc
 
     set_target_properties(${PROJECT_NAME}-static
                             PROPERTIES
-                            OUTPUT_NAME_RELEASE "ingescape_static"
-                            OUTPUT_NAME_DEBUG "ingescaped_static")
+                              OUTPUT_NAME_RELEASE "ingescape_static"
+                              OUTPUT_NAME_DEBUG "ingescaped_static")
 
   else(MSVC)
     set_target_properties(${PROJECT_NAME}-static
@@ -273,6 +280,7 @@ if(INGESCAPE_BUILD_STATIC)
   target_link_libraries(${PROJECT_NAME}-static
     PRIVATE
       czmq
+      libsodium
       libzmq
       zyre
       $<$<BOOL:${APPLE}>:${CORE_FRAMEWORK}>
@@ -285,6 +293,7 @@ if(INGESCAPE_BUILD_STATIC)
       $<INSTALL_INTERFACE:include>
       $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/include>
     PRIVATE
+      ${LIBSODIUM_INCLUDE_DIRS}
       ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/yajl/src/api
       $<$<BOOL:${WIN32}>:${CMAKE_CURRENT_SOURCE_DIR}/dependencies/windows/unix>
   )
@@ -303,6 +312,9 @@ if(INGESCAPE_BUILD_STATIC)
           RUNTIME DESTINATION "lib" # .dll file
                   COMPONENT library)
 endif()
+
+if (MSVC)
+endif(MSVC)
 
 # Install public include files
 install(FILES ${ingescape_headers_to_install}
