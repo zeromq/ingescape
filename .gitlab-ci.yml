@@ -777,10 +777,10 @@ lib-deploy-windows:
   tags:
     - windows
   script:
-    - cmake --install .\build\ReleaseX64 --config Release --prefix=$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64
-    - cmake --install .\build\ReleaseX86 --config Release --prefix=$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86
-    - cmake --install .\build\DebugX64 --config Debug --prefix=$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64
-    - cmake --install .\build\DebugX86 --config Debug --prefix=$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x86
+    - cmake --install .\build\ReleaseX64 --config Release --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64
+    - cmake --install .\build\ReleaseX86 --config Release --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86
+    - cmake --install .\build\DebugX64 --config Debug --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64
+    - cmake --install .\build\DebugX86 --config Debug --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x86
   dependencies:
     - lib-windows-release-x64
     - lib-windows-release-x86
