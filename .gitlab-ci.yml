@@ -778,9 +778,13 @@ lib-deploy-windows:
     - windows
   script:
     - cmake --install .\build\ReleaseX64 --config Release --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64
+    - copy .\src\include\ingescape_private.h $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64\include -Force
     - cmake --install .\build\ReleaseX86 --config Release --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86
+    - copy .\src\include\ingescape_private.h $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86\include -Force
     - cmake --install .\build\DebugX64 --config Debug --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64
+    - copy .\src\include\ingescape_private.h $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64\include -Force
     - cmake --install .\build\DebugX86 --config Debug --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x86
+    - copy .\src\include\ingescape_private.h $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x86\include -Force
   dependencies:
     - lib-windows-release-x64
     - lib-windows-release-x86
