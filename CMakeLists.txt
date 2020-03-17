@@ -70,7 +70,7 @@ endif()
 
 # gets version from admin.c file
 get_ingescape_version(INGESCAPE_VERSION_MAJOR INGESCAPE_VERSION_MINOR INGESCAPE_VERSION_PATCH)
-set( INGESCAPE_VERSION "${INGESCAPE_VERSION_MAJOR}.${INGESCAPE_VERSION_MINOR}.${INGESCAPE_VERSION_PATCH}")
+set(INGESCAPE_VERSION "${INGESCAPE_VERSION_MAJOR}.${INGESCAPE_VERSION_MINOR}.${INGESCAPE_VERSION_PATCH}")
 message(STATUS "Detected INGESCAPE Version - ${INGESCAPE_VERSION}")
 
 # ##############################################################################
@@ -543,12 +543,4 @@ if(NOT MSVC)
   endif()
 endif()
 message(STATUS "")
-
-#[=[
-get_cmake_property(_variableNames VARIABLES)
-list (SORT _variableNames)
-foreach (_variableName ${_variableNames})
-    message(STATUS "${_variableName}=${${_variableName}}")
-endforeach()
-#]=]
 

@@ -1,17 +1,6 @@
 # Some helper for ingescape library
 # Like add source, used in library and editor
-
 set(macro_current_dir ${CMAKE_CURRENT_LIST_DIR} CACHE INTERNAL "")
-
-# Macro to add ingescape header directory in given var
-macro(add_ingescape_include_directory _HEADERS)
-    list(APPEND ${_HEADERS} "${macro_current_dir}/../../../src/include")
-    list(APPEND ${_HEADERS} "${macro_current_dir}/../../../dependencies/yajl/src/api")
-	
-    IF (WIN32)
-		list(APPEND ${_HEADERS} "${macro_current_dir}/../../../dependencies/windows/unix")
-    ENDIF (WIN32)
-endmacro()
 
 # Macro to get ingescape version from C source file
 macro(get_ingescape_version _MAJOR _MINOR _PATCH)
@@ -40,66 +29,9 @@ macro(get_ingescape_version _MAJOR _MINOR _PATCH)
     endif ()
 endmacro()
 
-macro(install_igs_lib_dependencies)
-  # NB: libsodium library is already defined by Findlibsodium.cmake (LIBSODIUM_LIBRARIES)
-
-  # ZeroMQ dll/lib built with MSVC follow the Boost naming convention
-  # https://github.com/zeromq/czmq/issues/577
-  # https://github.com/zeromq/czmq/issues/1972
-  set(_zmq_version ${ZeroMQ_VERSION_MAJOR}_${ZeroMQ_VERSION_MINOR}_${ZeroMQ_VERSION_PATCH})
-  set(_zmq_debug_names
-      "libzmq-${CMAKE_VS_PLATFORM_TOOLSET}-mt-gd-${_zmq_version}" # Debug, BUILD_SHARED
-      "libzmq-${CMAKE_VS_PLATFORM_TOOLSET}-mt-sgd-${_zmq_version}" # Debug, BUILD_STATIC
-      "libzmq-mt-gd-${_zmq_version}" # Debug, BUILD_SHARED
-      "libzmq-mt-sgd-${_zmq_version}" # Debug, BUILD_STATIC
-  )
-
-  set(_zmq_release_names
-      "libzmq-${CMAKE_VS_PLATFORM_TOOLSET}-mt-${_zmq_version}" # Release|RelWithDebInfo|MinSizeRel, BUILD_SHARED
-      "libzmq-${CMAKE_VS_PLATFORM_TOOLSET}-mt-s-${_zmq_version}" # Release|RelWithDebInfo|MinSizeRel, BUILD_STATIC
-      "libzmq-mt-${_zmq_version}" # Release|RelWithDebInfo|MinSizeRel, BUILD_SHARED
-      "libzmq-mt-s-${_zmq_version}" # Release|RelWithDebInfo|MinSizeRel, BUILD_STATIC
-  )
-
-  find_library(
-    ZEROMQ_LIB
-    NAMES
-      zmq
-      ${_zmq_release_names}
-      ${_zmq_debug_names}
-  )
-
-  find_library(CZMQ_LIB NAMES czmq)
-  find_library(ZYRE_LIB NAMES zyre)
-
-  if (LIBSODIUM_LIBRARIES STREQUAL "LIBSODIUM_LIBRARIES-NOTFOUND")
-    # ERROR
-    message(WARNING "The libsodium library could not be found. It won't be copyed during the installation phase.")
-  else()
-	install_ingescape_dependencies(LIBSODIUM_LIBRARIES FALSE)
-  endif()
-  if (ZEROMQ_LIB STREQUAL "ZEROMQ_LIB-NOTFOUND")
-    # ERROR
-    message(WARNING "The ZeroMQ library could not be found. It won't be copyed during the installation phase.")
-  else()
-	install_ingescape_dependencies(ZEROMQ_LIB FALSE)
-  endif()
-  if (CZMQ_LIB STREQUAL "CZMQ_LIB-NOTFOUND")
-    # ERROR
-    message(WARNING "The czmq library could not be found. It won't be copyed during the installation phase.")
-  else()
-	install_ingescape_dependencies(CZMQ_LIB FALSE)
-  endif()
-  if (ZYRE_LIB STREQUAL "ZYRE_LIB-NOTFOUND")
-    # ERROR
-    message(WARNING "The zyre library could not be found. It won't be copyed during the installation phase.")
-  else()
-	install_ingescape_dependencies(ZYRE_LIB FALSE)
-  endif()
-endmacro()
-
-# Function to install dependencies on windows
-macro(install_ingescape_dependencies _LIB _IS_EDITOR)
+# Function to install DLL files corresponding to the given LIB files.
+#NB: Coded to work to install SO and DYLIB files. Not extensively tested though.
+macro(_install_dll_from_lib _LIB _IS_EDITOR)
     # Get path and file name from lib file
     get_filename_component(_PATH_TO_FILE ${${_LIB}} DIRECTORY)
     get_filename_component(_FILE_NAME ${${_LIB}} NAME)
@@ -138,5 +70,65 @@ macro(install_ingescape_dependencies _LIB _IS_EDITOR)
             install(FILES ${all_libs} DESTINATION "lib${LIB_SUFFIX}" COMPONENT library)
             install(FILES ${${_FILE_WITHOUT_EXT}_DLL_FILE} DESTINATION "lib${LIB_SUFFIX}" COMPONENT library)
         endif()
+	else()
+		message(WARNING "Could not find DLL file relative to ${_LIB}. It won't be installed.")
     endif()
+endmacro()
+
+macro(install_igs_lib_dependencies)
+  # NB: libsodium library is already defined by Findlibsodium.cmake (LIBSODIUM_LIBRARIES)
+
+  # ZeroMQ dll/lib built with MSVC follow the Boost naming convention
+  # https://github.com/zeromq/czmq/issues/577
+  # https://github.com/zeromq/czmq/issues/1972
+  set(_zmq_version ${ZeroMQ_VERSION_MAJOR}_${ZeroMQ_VERSION_MINOR}_${ZeroMQ_VERSION_PATCH})
+  set(_zmq_debug_names
+      "libzmq-${CMAKE_VS_PLATFORM_TOOLSET}-mt-gd-${_zmq_version}" # Debug, BUILD_SHARED
+      "libzmq-${CMAKE_VS_PLATFORM_TOOLSET}-mt-sgd-${_zmq_version}" # Debug, BUILD_STATIC
+      "libzmq-mt-gd-${_zmq_version}" # Debug, BUILD_SHARED
+      "libzmq-mt-sgd-${_zmq_version}" # Debug, BUILD_STATIC
+  )
+
+  set(_zmq_release_names
+      "libzmq-${CMAKE_VS_PLATFORM_TOOLSET}-mt-${_zmq_version}" # Release|RelWithDebInfo|MinSizeRel, BUILD_SHARED
+      "libzmq-${CMAKE_VS_PLATFORM_TOOLSET}-mt-s-${_zmq_version}" # Release|RelWithDebInfo|MinSizeRel, BUILD_STATIC
+      "libzmq-mt-${_zmq_version}" # Release|RelWithDebInfo|MinSizeRel, BUILD_SHARED
+      "libzmq-mt-s-${_zmq_version}" # Release|RelWithDebInfo|MinSizeRel, BUILD_STATIC
+  )
+
+  find_library(
+    ZEROMQ_LIB
+    NAMES
+      zmq
+      ${_zmq_release_names}
+      ${_zmq_debug_names}
+  )
+
+  find_library(CZMQ_LIB NAMES czmq)
+  find_library(ZYRE_LIB NAMES zyre)
+
+  if (LIBSODIUM_LIBRARIES STREQUAL "LIBSODIUM_LIBRARIES-NOTFOUND")
+    # ERROR
+    message(WARNING "The libsodium library could not be found. It won't be copyed during the installation phase.")
+  else()
+	_install_dll_from_lib(LIBSODIUM_LIBRARIES FALSE)
+  endif()
+  if (ZEROMQ_LIB STREQUAL "ZEROMQ_LIB-NOTFOUND")
+    # ERROR
+    message(WARNING "The ZeroMQ library could not be found. It won't be copyed during the installation phase.")
+  else()
+	_install_dll_from_lib(ZEROMQ_LIB FALSE)
+  endif()
+  if (CZMQ_LIB STREQUAL "CZMQ_LIB-NOTFOUND")
+    # ERROR
+    message(WARNING "The czmq library could not be found. It won't be copyed during the installation phase.")
+  else()
+	_install_dll_from_lib(CZMQ_LIB FALSE)
+  endif()
+  if (ZYRE_LIB STREQUAL "ZYRE_LIB-NOTFOUND")
+    # ERROR
+    message(WARNING "The zyre library could not be found. It won't be copyed during the installation phase.")
+  else()
+	_install_dll_from_lib(ZYRE_LIB FALSE)
+  endif()
 endmacro()
