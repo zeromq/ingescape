@@ -180,7 +180,6 @@ void AgentsMappingController::deleteActionInMapping(ActionInMappingVM* action)
 
 /**
  * @brief Remove a link between two objects in the mapping
- * @param link
  */
 void AgentsMappingController::removeLinkBetweenTwoObjectsInMapping(LinkVM* link)
 {
@@ -1523,7 +1522,6 @@ void AgentsMappingController::_onLinkInputsListHaveBeenAdded(const QList<LinkInp
 
 /**
  * @brief Slot called when some view models of link outputs have been added to an agent in mapping
- * @param addedlinkOutputs
  */
 void AgentsMappingController::_onLinkOutputsListHaveBeenAdded(const QList<LinkOutputVM*>& addedlinkOutputs)
 {
@@ -1538,7 +1536,6 @@ void AgentsMappingController::_onLinkOutputsListHaveBeenAdded(const QList<LinkOu
 
 /**
  * @brief Slot called when some view models of link inputs will be removed from an agent in mapping
- * @param removedLinkInputs
  */
 void AgentsMappingController::_onLinkInputsListWillBeRemoved(const QList<LinkInputVM*>& removedLinkInputs)
 {
@@ -1553,8 +1550,10 @@ void AgentsMappingController::_onLinkInputsListWillBeRemoved(const QList<LinkInp
                 AgentInMappingVM* inputAgent = qobject_cast<AgentInMappingVM*>(link->inputObject());
                 if ((inputAgent != nullptr) && (inputAgent == agentInMapping) && removedLinkInputs.contains(link->linkInput()))
                 {
-                    // Delete the link between two agents in the mapping
-                    _deleteLinkBetweenTwoObjectsInMapping(link);
+                    // We delete our link because its output is going to be deleted
+                    // NB: at this time, our input agent is necessarily OFF because we have delete it
+                    // We will not have trouble to unmap and delete linkVM with this function
+                    removeLinkBetweenTwoObjectsInMapping(link);
                 }
             }
         }
@@ -1564,15 +1563,12 @@ void AgentsMappingController::_onLinkInputsListWillBeRemoved(const QList<LinkInp
 
 /**
  * @brief Slot called when some view models of link outputs will be removed from an agent in mapping
- * @param removedLinkOutputs
  */
 void AgentsMappingController::_onLinkOutputsListWillBeRemoved(const QList<LinkOutputVM*>& removedLinkOutputs)
 {
     AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
     if ((agentInMapping != nullptr) && !removedLinkOutputs.isEmpty())
-    {
-        qDebug() << "_on Link Outputs List will be Removed from agent" << agentInMapping->name() << removedLinkOutputs.count();
-
+    {       
         // Traverse the list of all links
         for (LinkVM* link : _allLinksInMapping.toList())
         {
@@ -1581,14 +1577,29 @@ void AgentsMappingController::_onLinkOutputsListWillBeRemoved(const QList<LinkOu
                 AgentInMappingVM* outputAgent = qobject_cast<AgentInMappingVM*>(link->outputObject());
                 if ((outputAgent != nullptr) && (outputAgent == agentInMapping) && removedLinkOutputs.contains(link->linkOutput()))
                 {
-                    if (link->mappingElement() != nullptr)
+                    // We delete our link because its input is going to be deleted
+                    // NB : mappings on linkOutputVM can affect mapping of other agent ON so we have a particular case of _removeLinkBetweenTwoAgents
+                    AgentInMappingVM* inputAgent = qobject_cast<AgentInMappingVM*>(link->inputObject());
+                    if ((inputAgent != nullptr) && (inputAgent->agentsGroupedByName() != nullptr) && (inputAgent->agentsGroupedByName()->isON()))
                     {
-                        // Add a "Waiting Mapping Element" on the output agent (name)
-                        _addWaitingMappingElementOnOutputAgent(link->outputObject()->name(), link->mappingElement());
-                    }
+                        // If input agent is ON : we only send command to our agent
+                        // (not set our link as temporary because its linkOutput is going to be destroyed)
+                        QStringList message = {
+                            command_UnmapAgents,
+                            link->linkInput()->name(),
+                            link->outputObject()->name(),
+                            link->linkOutput()->name()
+                        };
+                        IngeScapeNetworkController::instance()->sendStringMessageToAgents(inputAgent->agentsGroupedByName()->peerIdsList(), message);
 
-                    // Delete the link between two agents in the mapping
-                    _deleteLinkBetweenTwoObjectsInMapping(link);
+                        // We delete it just after because its input is going to be deleted
+                        _deleteLinkBetweenTwoObjectsInMapping(link);
+                    }
+                    else
+                    {
+                        // Normal case
+                        removeLinkBetweenTwoObjectsInMapping(link);
+                    }
                 }
             }
         }

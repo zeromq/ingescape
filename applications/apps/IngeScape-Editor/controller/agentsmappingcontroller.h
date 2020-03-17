@@ -89,7 +89,6 @@ public:
 
     /**
      * @brief Remove a link between two objects in the mapping
-     * @param link
      */
     Q_INVOKABLE void removeLinkBetweenTwoObjectsInMapping(LinkVM* link);
 
@@ -304,7 +303,6 @@ private Q_SLOTS:
 
     /**
      * @brief Slot called when some view models of link outputs have been added to an agent in mapping
-     * @param addedlinkOutputs
      */
     void _onLinkOutputsListHaveBeenAdded(const QList<LinkOutputVM*>& addedlinkOutputs);
 
@@ -318,7 +316,6 @@ private Q_SLOTS:
 
     /**
      * @brief Slot called when some view models of link outputs will be removed from an agent in mapping
-     * @param removedLinkOutputs
      */
     void _onLinkOutputsListWillBeRemoved(const QList<LinkOutputVM*>& removedLinkOutputs);
 
