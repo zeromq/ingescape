@@ -4,8 +4,12 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 
+
 namespace Ingescape
 {
+       
+    public struct impulsion{}
+
     #region Enums
 
     public enum iop_t { IGS_INPUT_T = 1, IGS_OUTPUT_T, IGS_PARAMETER_T };
@@ -15,42 +19,121 @@ namespace Ingescape
 
     #endregion
 
-    #region Callbacks
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void igs_observeCallback(iop_t iopType,
-                                        [MarshalAs(UnmanagedType.LPStr)] string name,
-                                        iopType_t valueType,
-                                        IntPtr value,
-                                        int valueSize, // FIXME uint
-                                        IntPtr myData);
-
-    // Callback model to handle calls received by our agent
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void igs_callFunction([MarshalAs(UnmanagedType.LPStr)] string senderAgentName,
-                                          [MarshalAs(UnmanagedType.LPStr)] string senderAgentUUID,
-                                          [MarshalAs(UnmanagedType.LPStr)] string callName,
-                                          IntPtr firstArgument,
-                                          uint nbArgs,
-                                          IntPtr myData);
-
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void igs_forcedStopCallback(IntPtr myData);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void igs_muteCallback(bool isMuted, IntPtr myData);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void igs_freezeCallback(bool isPaused, IntPtr myData);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void igs_licenseCallback(igs_license_limit_t limit, IntPtr myData);
-
-    #endregion
-
+   
     public class Igs
-    {
+    {        
+
+         #region Callbacks
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void igs_observeCallbackC(iop_t iopType,
+                                            [MarshalAs(UnmanagedType.LPStr)] string name,
+                                            iopType_t valueType,
+                                            IntPtr value,
+                                            uint valueSize, 
+                                            IntPtr myData);
+
+        public delegate void igs_observeCallback(iop_t iopType, ref string name, iopType_t valueType, object value, object myData);
+
+        // Callback model to handle calls received by our agent
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void igs_callFunctionC([MarshalAs(UnmanagedType.LPStr)] string senderAgentName,
+                                            [MarshalAs(UnmanagedType.LPStr)] string senderAgentUUID,
+                                            [MarshalAs(UnmanagedType.LPStr)] string callName,
+                                            IntPtr firstArgument,
+                                            uint nbArgs,
+                                            IntPtr myData);
+
+        public delegate void igs_callFunction(ref string senderAgentName, ref string senderAgentUUID, ref string callName, List<CallArgument> arguments, object myData);
+
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void igs_forcedStopCallbackC(IntPtr myData);
+        public delegate void igs_forcedStopCallback(object myData);
+
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void igs_muteCallbackC(bool isMuted, IntPtr myData);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void igs_freezeCallbackC(bool isPaused, IntPtr myData);
+        public delegate void igs_muteAndFreezeCallback(bool isMutedOrPaused, object myData);
+
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        
+        private delegate void igs_licenseCallbackC(igs_license_limit_t limit, IntPtr myData);
+        public delegate void igs_licenseCallback(igs_license_limit_t limit, object myData);
+
+        #endregion
+
+        static void OnIOPCallback(iop_t iopType,
+                                [MarshalAs(UnmanagedType.LPStr)] string name, iopType_t valueType,
+                                IntPtr value,
+                                uint valueSize,
+                                IntPtr myData)
+        {
+            GCHandle gCHandleData = GCHandle.FromIntPtr(myData);
+            Tuple<igs_observeCallback, object> tuple = (Tuple<igs_observeCallback, object>)gCHandleData.Target;
+            object data = tuple.Item2;
+            igs_observeCallback CSharpFunction = tuple.Item1;           
+            object newValue = null;
+            switch (valueType)
+            {
+                case iopType_t.IGS_BOOL_T: 
+                    newValue = Igs.PtrToBool(value); 
+                    break;
+                case iopType_t.IGS_DATA_T:
+                    newValue = PtrToData(value,(int)valueSize);
+                    break;
+                case iopType_t.IGS_DOUBLE_T:
+                    newValue = PtrToDouble(value);
+                    break;
+                case iopType_t.IGS_IMPULSION_T:
+                    break;
+                case iopType_t.IGS_INTEGER_T:
+                    newValue = PtrToInt(value);
+                    break;
+                case iopType_t.IGS_STRING_T:
+                    newValue = PtrToString(value);
+                    break;
+            }
+            CSharpFunction(iopType, ref name, valueType,newValue,data);            
+        }
+
+        static void OnForcedStopCallback(IntPtr myData)
+        {
+            Tuple<igs_forcedStopCallback, object> tupleData = (Tuple<igs_forcedStopCallback, object>)GCHandle.FromIntPtr(myData).Target;
+            igs_forcedStopCallback CSharpFunction = tupleData.Item1;
+            object data = tupleData.Item2;
+            CSharpFunction(data);
+        }
+
+        static void OnMutedOrFreezeCallback(bool isMutedOrFreeze, IntPtr myData)
+        {
+            Tuple<igs_muteAndFreezeCallback, object> tupleData = (Tuple<igs_muteAndFreezeCallback, object>)GCHandle.FromIntPtr(myData).Target;
+            igs_muteAndFreezeCallback CSharpFunction = tupleData.Item1;
+            object data = tupleData.Item2;
+            CSharpFunction(isMutedOrFreeze,data);
+        }
+
+        static void OnCallCallback([MarshalAs(UnmanagedType.LPStr)] string senderAgentName,
+                                   [MarshalAs(UnmanagedType.LPStr)] string senderAgentUUID,
+                                   [MarshalAs(UnmanagedType.LPStr)] string callName,
+                                   IntPtr firstArgument,
+                                   uint nbArgs,
+                                   IntPtr myData)
+        {
+            GCHandle gCHandle = GCHandle.FromIntPtr(myData);
+            Tuple<igs_callFunction, object> tuple = (Tuple<igs_callFunction, object>)gCHandle.Target;
+            object data = tuple.Item2;
+            igs_callFunction CSharpFunction = tuple.Item1;
+            List<CallArgument> callArguments = getCallArgumentsList(firstArgument);
+            CSharpFunction(ref senderAgentName, ref senderAgentUUID, ref callName, callArguments,data);
+        }
+
+
+
         #region Path to library C IngeScape
 
         //Librairie x86 debug
@@ -105,8 +188,15 @@ namespace Ingescape
 
         //register a callback when the agent is forced to stop by the ingescape platform
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void igs_observeForcedStop([MarshalAs(UnmanagedType.FunctionPtr)] igs_forcedStopCallback cb, IntPtr myData);
-        public static void observeForcedStop(igs_forcedStopCallback cb, IntPtr myData) { igs_observeForcedStop(cb, myData); }
+        private static extern void igs_observeForcedStop([MarshalAs(UnmanagedType.FunctionPtr)] igs_forcedStopCallbackC cb, IntPtr myData);
+        public static void observeForcedStop(igs_forcedStopCallback cbSharp, object myData) 
+        { 
+            Tuple<igs_forcedStopCallback, object> tupleData = new Tuple<igs_forcedStopCallback, object>(cbSharp, myData);
+            GCHandle gCHandle = GCHandle.Alloc(tupleData);
+            IntPtr data = GCHandle.ToIntPtr(gCHandle);
+
+            igs_observeForcedStop(OnForcedStopCallback, data); 
+        }
 
         //terminate the agent with trigger of SIGINT and call to the registered igs_forcedStopCallbacks
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -161,8 +251,14 @@ namespace Ingescape
         public static bool isMuted() { return igs_isMuted(); }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void igs_observeMute([MarshalAs(UnmanagedType.FunctionPtr)] igs_muteCallback cb, IntPtr myData);
-        public static void observeMute(igs_muteCallback cb, IntPtr myData) { igs_observeMute(cb, myData); }
+        private static extern void igs_observeMute([MarshalAs(UnmanagedType.FunctionPtr)] igs_muteCallbackC cb, IntPtr myData);
+        public static void observeMute(igs_muteAndFreezeCallback cbSharp, object myData) 
+        { 
+            Tuple<igs_muteAndFreezeCallback, object> tupleData = new Tuple<igs_muteAndFreezeCallback, object>(cbSharp, myData);
+            GCHandle gCHandle = GCHandle.Alloc(tupleData);
+            IntPtr data = GCHandle.ToIntPtr(gCHandle);
+            igs_observeMute(OnMutedOrFreezeCallback, data); 
+        }
 
         //freeze and unfreeze the agent
         //When freezed, agent will not send anything on its outputs and
@@ -182,8 +278,14 @@ namespace Ingescape
         public static int unfreeze() { return igs_unfreeze(); }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_observeFreeze(igs_freezeCallback cb, IntPtr myData);
-        public static int observeFreeze(igs_freezeCallback cb, IntPtr myData) { return igs_observeFreeze(cb, myData); }
+        private static extern int igs_observeFreeze(igs_freezeCallbackC cb, IntPtr myData);
+        public static int observeFreeze(igs_muteAndFreezeCallback cbSharp, object myData) 
+        { 
+            Tuple<igs_muteAndFreezeCallback, object> tupleData = new Tuple<igs_muteAndFreezeCallback, object>(cbSharp, myData);
+            GCHandle gCHandle = GCHandle.Alloc(tupleData);
+            IntPtr data = GCHandle.ToIntPtr(gCHandle);
+            return igs_observeFreeze(OnMutedOrFreezeCallback, data); 
+        }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_setCanBeFrozen(bool canBeFrozen);
@@ -201,19 +303,7 @@ namespace Ingescape
 
         // IOP Model : Inputs, Outputs and Parameters read/write/check/observe/mute
 
-        // read IOP using void* 
-        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_readInput(string name, IntPtr[] value, ref uint size);
-        public static int readInput(string name, IntPtr[] value, ref uint size) { return igs_readInput(name, value, ref size); }
-
-        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_readOutput(string name, IntPtr[] value, ref uint size);
-        public static int readOutput(string name, IntPtr[] value, ref uint size) { return igs_readOutput(name, value, ref size); }
-
-        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_readParameter(string name, IntPtr[] value, ref uint size);
-        public static int readParameter(string name, IntPtr[] value, ref uint size) { return igs_readParameter(name, value, ref size); }
-
+        
         //read per type
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern bool igs_readInputAsBool([MarshalAs(UnmanagedType.LPStr)] string name);
@@ -324,97 +414,174 @@ namespace Ingescape
             uint size = 0;
             IntPtr ptr = IntPtr.Zero;
             int success = igs_readParameterAsData(name, ref ptr, ref size);
-
             data = new byte[size];
-
-            // Copies data from an unmanaged memory pointer to a managed 8-bit unsigned integer array.
-            // Copy the content of the IntPtr to the byte array
-            // FIXME: size has type "size_t" in language C. The corresponding type in C# is uint. But "Marshal.Copy(...)" does not accept uint for parameter "length"
             Marshal.Copy(ptr, data, 0, (int)size);
-
             return success;
         }
 
-        //write per type
+        /// <summary>
+        /// Value can take the following types : int,double,string,double ( or float ),byte[],impulsion
+        /// </summary>
+        public static int writeInput(string inputName, object value){
+            if(value.GetType() == typeof(bool)){
+                return igs_writeInputAsBool(inputName, (bool)value);
+            }
+            if(value.GetType() == typeof(byte[])){
+                try
+                {
+                    uint size = Convert.ToUInt32(((byte[])value).Length);
+                    return igs_writeInputAsData(inputName, (byte[])value, size);
+                }
+                catch (OverflowException){
+                    igs_log(igs_logLevel_t.IGS_LOG_DEBUG,"writeInput","Data size is ouside of the range of uint32",inputName);
+                    return 0;
+                }                
+            }
+            if(value.GetType() == typeof(double)){
+                return igs_writeInputAsDouble(inputName, (double)value);
+            }
+            if(value.GetType() == typeof(float)){
+                return igs_writeInputAsDouble(inputName, Convert.ToDouble(Convert.ToDecimal(value)));
+            }
+            if(value.GetType() == typeof(int)){
+                return igs_writeInputAsInt(inputName, (int)value);
+            }
+            if(value.GetType() == typeof(string)){
+                string strANSI = _stringFromUTF8_ToANSI((string)value);
+                return igs_writeInputAsString(inputName, strANSI);
+            } 
+            if(value.GetType() == typeof(impulsion)){
+                return igs_writeInputAsImpulsion(inputName);
+            }             
+            return 0;
+        }
+
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_writeInputAsBool([MarshalAs(UnmanagedType.LPStr)] string name, bool value);
-        public static int writeInputAsBool(string name, bool value) { return igs_writeInputAsBool(name, value); }
-
+        
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_writeInputAsInt([MarshalAs(UnmanagedType.LPStr)] string name, int value);
-        public static int writeInputAsInt(string name, int value) { return igs_writeInputAsInt(name, value); }
-
-        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        
+         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_writeInputAsDouble([MarshalAs(UnmanagedType.LPStr)] string name, double value);
-        public static int writeInputAsDouble(string name, double value) { return igs_writeInputAsDouble(name, value); }
-
+        
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_writeInputAsString([MarshalAs(UnmanagedType.LPStr)] string name, [MarshalAs(UnmanagedType.LPStr)] string value);
-        public static int writeInputAsString(string name, string value)
-        {
-            string strANSI = _stringFromUTF8_ToANSI(value);
-            return igs_writeInputAsString(name, strANSI);
-        }
+        private static extern int igs_writeInputAsString([MarshalAs(UnmanagedType.LPStr)] string name, [MarshalAs(UnmanagedType.LPStr)] string value); 
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_writeInputAsImpulsion([MarshalAs(UnmanagedType.LPStr)] string name);
-        public static int writeInputAsImpulsion(string name) { return igs_writeInputAsImpulsion(name); }
-
+        
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_writeInputAsData([MarshalAs(UnmanagedType.LPStr)] string name, byte[] value, uint size);
-        public static int writeInputAsData(string name, byte[] value, uint size) { return igs_writeInputAsData(name, value, size); }
-
+        
+        
+        
+        /// <summary>
+        /// Value can take the following types : int,double,string,double ( or float ),byte[],impulsion
+        /// </summary>
+        public static int writeOutput(string outputName, object value){
+            if(value.GetType() == typeof(bool)){
+                return igs_writeOutputAsBool(outputName, (bool)value);
+            }
+            if(value.GetType() == typeof(byte[])){
+                try
+                {
+                    uint size = Convert.ToUInt32(((byte[])value).Length);
+                    return igs_writeOutputAsData(outputName, (byte[])value, size);
+                }
+                catch (OverflowException){
+                    igs_log(igs_logLevel_t.IGS_LOG_DEBUG,"writeOutput","Data size is ouside of the range of uint32",outputName);
+                    return 0;
+                }                
+            }
+            if(value.GetType() == typeof(double)){
+                return igs_writeOutputAsDouble(outputName, (double)value);
+            }
+            if(value.GetType() == typeof(float)){
+                return igs_writeOutputAsDouble(outputName, Convert.ToDouble(Convert.ToDecimal(value)));
+            }
+            if(value.GetType() == typeof(int)){
+                return igs_writeOutputAsInt(outputName, (int)value);
+            }
+            if(value.GetType() == typeof(string)){
+                string strANSI = _stringFromUTF8_ToANSI((string)value);
+                return igs_writeOutputAsString(outputName, strANSI);
+            } 
+            if(value.GetType() == typeof(impulsion)){
+                return igs_writeOutputAsImpulsion(outputName);
+            }             
+            return 0;
+        }
+        
+        
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_writeOutputAsBool([MarshalAs(UnmanagedType.LPStr)] string name, bool value);
-        public static int writeOutputAsBool(string name, bool value) { return igs_writeOutputAsBool(name, value); }
-
+        
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_writeOutputAsInt([MarshalAs(UnmanagedType.LPStr)] string name, int value);
-        public static int writeOutputAsInt(string name, int value) { return igs_writeOutputAsInt(name, value); }
-
+        
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_writeOutputAsDouble([MarshalAs(UnmanagedType.LPStr)] string name, double value);
-        public static int writeOutputAsDouble(string name, double value) { return igs_writeOutputAsDouble(name, value); }
-
+        
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_writeOutputAsString([MarshalAs(UnmanagedType.LPStr)] string name, [MarshalAs(UnmanagedType.LPStr)] string value);
-        public static int writeOutputAsString(string name, string value)
-        {
-            string strANSI = _stringFromUTF8_ToANSI(value);
-            return igs_writeOutputAsString(name, strANSI);
-        }
-
+        
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_writeOutputAsImpulsion([MarshalAs(UnmanagedType.LPStr)] string name);
-        public static int writeOutputAsImpulsion(string name) { return igs_writeOutputAsImpulsion(name); }
-
+        
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_writeOutputAsData([MarshalAs(UnmanagedType.LPStr)] string name, byte[] value, uint size);
-        public static int writeOutputAsData(string name, byte[] value, uint size) { return igs_writeOutputAsData(name, value, size); }
-
+        
+        
+        /// <summary>
+        /// Value can take the following types : int,double,string,double ( or float ),byte[],impulsion
+        /// </summary>
+        public static int writeParameter(string parameterName, object value){
+            if(value.GetType() == typeof(bool)){
+                return igs_writeParameterAsBool(parameterName, (bool)value);
+            }
+            if(value.GetType() == typeof(byte[])){
+                try
+                {
+                    uint size = Convert.ToUInt32(((byte[])value).Length);
+                    return igs_writeParameterAsData(parameterName, (byte[])value, size);
+                }
+                catch (OverflowException){
+                    igs_log(igs_logLevel_t.IGS_LOG_DEBUG,"writeParameter","Data size is ouside of the range of uint32",parameterName);
+                    return 0;
+                }                
+            }
+            if(value.GetType() == typeof(double)){
+                return igs_writeParameterAsDouble(parameterName, (double)value);
+            }
+            if(value.GetType() == typeof(float)){
+                return igs_writeParameterAsDouble(parameterName, Convert.ToDouble(Convert.ToDecimal(value)));
+            }
+            if(value.GetType() == typeof(int)){
+                return igs_writeParameterAsInt(parameterName, (int)value);
+            }
+            if(value.GetType() == typeof(string)){
+                string strANSI = _stringFromUTF8_ToANSI((string)value);
+                return igs_writeParameterAsString(parameterName, strANSI);
+            }             
+            return 0;
+        }
+        
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_writeParameterAsBool([MarshalAs(UnmanagedType.LPStr)] string name, bool value);
-        public static int writeParameterAsBool(string name, bool value) { return igs_writeParameterAsBool(name, value); }
-
+        
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_writeParameterAsInt([MarshalAs(UnmanagedType.LPStr)] string name, int value);
-        public static int writeParameterAsInt(string name, int value) { return igs_writeParameterAsInt(name, value); }
-
+        
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_writeParameterAsDouble([MarshalAs(UnmanagedType.LPStr)] string name, double value);
-        public static int writeParameterAsDouble(string name, double value) { return igs_writeParameterAsDouble(name, value); }
-
+        
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_writeParameterAsString([MarshalAs(UnmanagedType.LPStr)] string name, [MarshalAs(UnmanagedType.LPStr)] string value);
-        public static int writeParameterAsString(string name, string value)
-        {
-            string strANSI = _stringFromUTF8_ToANSI(value);
-            return igs_writeParameterAsString(name, strANSI);
-        }
-
+        
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_writeParameterAsData([MarshalAs(UnmanagedType.LPStr)] string name, byte[] value, uint size);
-        public static int writeParameterAsData(string name, byte[] value, uint size) { return igs_writeParameterAsData(name, value, size); }
+        
 
         //clear IOP data in memory without having to write the IOP
         //(relevant for IOPs with IGS_DATA_T type only)
@@ -433,21 +600,35 @@ namespace Ingescape
         // Observe writing to an IOP
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_observeInput([MarshalAs(UnmanagedType.LPStr)] string name,
-            [MarshalAs(UnmanagedType.FunctionPtr)] igs_observeCallback cb,
+            [MarshalAs(UnmanagedType.FunctionPtr)] igs_observeCallbackC cb,
             IntPtr myData);
-        public static void observeInput(string name, igs_observeCallback cb, IntPtr myData) { igs_observeInput(name, cb, myData); }
+        public static void observeInput(string inputName, igs_observeCallback callback, object myData)
+        {
+            Tuple<igs_observeCallback, object> tupleData = new Tuple<igs_observeCallback, object>(callback, myData);
+            GCHandle gCHandle = GCHandle.Alloc(tupleData);
+            IntPtr data = GCHandle.ToIntPtr(gCHandle);
+            igs_observeInput(inputName, OnIOPCallback, data);
+        }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_observeOutput([MarshalAs(UnmanagedType.LPStr)] string name, 
-            igs_observeCallback cb,
-            IntPtr myData);
-        public static int observeOutput(string name, igs_observeCallback cb, IntPtr myData) { return igs_observeOutput(name, cb, myData); }
+        private static extern int igs_observeOutput([MarshalAs(UnmanagedType.LPStr)] string name, igs_observeCallbackC cb, IntPtr myData);
+        public static int observeOutput(string outputName, igs_observeCallback callback, object myData)
+        {
+            Tuple<igs_observeCallback, object> tupleData = new Tuple<igs_observeCallback, object>(callback, myData);
+            GCHandle gCHandle = GCHandle.Alloc(tupleData);
+            IntPtr data = GCHandle.ToIntPtr(gCHandle);
+            return igs_observeOutput(outputName, OnIOPCallback, data);
+        }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_observeParameter([MarshalAs(UnmanagedType.LPStr)] string name, 
-            igs_observeCallback cb,
-            IntPtr myData);
-        public static int observeParameter(string name, igs_observeCallback cb, IntPtr myData) { return igs_observeParameter(name, cb, myData); }
+        private static extern int igs_observeParameter([MarshalAs(UnmanagedType.LPStr)] string name, igs_observeCallbackC cb,IntPtr myData);
+        public static int observeParameter(string ParameterName, igs_observeCallback callback, object myData)
+        {
+            Tuple<igs_observeCallback, object> tupleData = new Tuple<igs_observeCallback, object>(callback, myData);
+            GCHandle gCHandle = GCHandle.Alloc(tupleData);
+            IntPtr data = GCHandle.ToIntPtr(gCHandle);
+            return igs_observeParameter(ParameterName, OnIOPCallback, data);
+        }
 
         //mute or unmute an IOP
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -576,7 +757,8 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_freeIOPList(ref IntPtr list, int nbOfElements);
-        public static void freeIOPList(ref IntPtr list, int nbOfElements) { igs_freeIOPList(ref list, nbOfElements); }
+        
+        //public static void freeIOPList(ref IntPtr list, int nbOfElements) { igs_freeIOPList(ref list, nbOfElements); }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.I1)]
@@ -669,15 +851,18 @@ namespace Ingescape
         // Edit the definition using the API
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_createInput([MarshalAs(UnmanagedType.LPStr)] string name, iopType_t value_type, IntPtr value, uint size); //value must be copied in function
-        public static int createInput(string name, iopType_t value_type, IntPtr value, uint size) { return igs_createInput(name, value_type, value, size); } //value must be copied in function
+        public static int createInput(string name, iopType_t value_type, uint size) { return igs_createInput(name, value_type, IntPtr.Zero, size); } //value must be copied in function
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_createOutput([MarshalAs(UnmanagedType.LPStr)] string name, iopType_t type, IntPtr value, uint size); //value must be copied in function
-        public static int createOutput(string name, iopType_t type, IntPtr value, uint size) { return igs_createOutput(name, type, value, size); }  //value must be copied in function
+        public static int createOutput(string name, iopType_t type, uint size) 
+        { 
+            return igs_createOutput(name, type, IntPtr.Zero, size); 
+        }  //value must be copied in function
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_createParameter([MarshalAs(UnmanagedType.LPStr)] string name, iopType_t type, IntPtr value, uint size); //value must be copied in function
-        public static int createParameter(string name, iopType_t type, IntPtr value, uint size) { return igs_createParameter(name, type, value, size); }  //value must be copied in function
+        public static int createParameter(string name, iopType_t type,  uint size) { return igs_createParameter(name, type, IntPtr.Zero, size); }  //value must be copied in function
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_removeInput([MarshalAs(UnmanagedType.LPStr)] string name);
@@ -837,7 +1022,12 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_cloneArgumentsList(IntPtr list);
-        public static IntPtr cloneArgumentsList(IntPtr list) { return igs_cloneArgumentsList(list); }
+        public static List<CallArgument> cloneArgumentsList(List<CallArgument> list) 
+        {
+            //TO Check
+            List<CallArgument> newCallArguments = new List<CallArgument>(list);
+            return newCallArguments;
+        }
 
 
         // Send a call to another agent
@@ -848,6 +1038,7 @@ namespace Ingescape
         private static extern int igs_sendCall([MarshalAs(UnmanagedType.LPStr)] string agentNameOrUUID,
                                                [MarshalAs(UnmanagedType.LPStr)] string callName,
                                                ref IntPtr list);
+
 
 
         /// <summary>
@@ -920,11 +1111,14 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_initCall([MarshalAs(UnmanagedType.LPStr)] string name,
-                                               [MarshalAs(UnmanagedType.FunctionPtr)] igs_callFunction cb,
+                                               [MarshalAs(UnmanagedType.FunctionPtr)] igs_callFunctionC cb,
                                                IntPtr myData);
-        public static int initCall(string name, igs_callFunction cb, IntPtr myData)
+        public static int initCall(string name, igs_callFunction cbCSharp, object myData)
         {
-            return igs_initCall(name, cb, myData);
+            Tuple<igs_callFunction, object> tupleData = new Tuple<igs_callFunction, object>(cbCSharp, myData);
+            GCHandle gCHandle = GCHandle.Alloc(tupleData);
+            IntPtr data = GCHandle.ToIntPtr(gCHandle);
+            return igs_initCall(name, OnCallCallback, data);
         }
 
 
@@ -989,7 +1183,11 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_getFirstArgumentForCall([MarshalAs(UnmanagedType.LPStr)] string name);
-        public static IntPtr getFirstArgumentForCall(string name) { return igs_getFirstArgumentForCall(name); }
+        public static object getFirstArgumentForCall(string name) 
+        { 
+            IntPtr intPtr = igs_getFirstArgumentForCall(name); 
+            return intPtr;
+        }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern uint igs_getNumberOfArgumentsForCall([MarshalAs(UnmanagedType.LPStr)] string name);
@@ -1219,12 +1417,45 @@ namespace Ingescape
         //////////////////////////////////////////////////
         #region Helpers
 
+        private static double PtrToDouble(IntPtr ptr)
+        {
+            double[] dValue = new double[1];
+            Marshal.Copy(ptr, dValue, 0,1);
+
+            
+            return dValue[0];
+        }
+        private static int PtrToInt(IntPtr ptr)
+        {
+            int[] iValue = new int[1];
+            Marshal.Copy(ptr, iValue, 0,1);
+            return iValue[0];
+        }
+        private static bool PtrToBool(IntPtr ptr)
+        {
+            int[] ibValue = new int[1];
+            Marshal.Copy(ptr, ibValue, 0,1);
+            bool bValue = Convert.ToBoolean(ibValue[0]);
+            return bValue;
+        }
+        private static byte[] PtrToData(IntPtr ptr, int size)
+        {
+            byte[] dataValue = new byte[size];
+            Marshal.Copy(ptr, dataValue, 0,size);            
+            return dataValue;
+        }
+        private static string PtrToString(IntPtr ptr)
+        {
+           return  Marshal.PtrToStringAuto(ptr);
+        }
+        
+
         /// <summary>
         /// Get a list of CallArgument from a pointer on the first argument of an IngeScape call
         /// </summary>
         /// <param name="ptrArgument"></param>
         /// <returns></returns>
-        public static List<CallArgument> getCallArgumentsList(IntPtr ptrArgument)
+        private static List<CallArgument> getCallArgumentsList(IntPtr ptrArgument)
         {
             List<CallArgument> callArgumentsList = new List<CallArgument>();
 
@@ -1296,7 +1527,7 @@ namespace Ingescape
         /// </summary>
         /// <param name="ptr"></param>
         /// <returns></returns>
-        public static string getStringFromPointer(IntPtr ptr)
+        private static string getStringFromPointer(IntPtr ptr)
         {
             // Copies all characters up to the first null character from an unmanaged ANSI string to a managed String, and widens each ANSI character to Unicode.
             string strANSI = Marshal.PtrToStringAnsi(ptr);
@@ -1310,7 +1541,7 @@ namespace Ingescape
         /// </summary>
         /// <param name="strUTF8"></param>
         /// <returns></returns>
-        public static IntPtr getPointerFromString(string strUTF8)
+        private static IntPtr getPointerFromString(string strUTF8)
         {
             string strANSI = _stringFromUTF8_ToANSI(strUTF8);
 
