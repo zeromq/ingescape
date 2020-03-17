@@ -851,18 +851,15 @@ namespace Ingescape
         // Edit the definition using the API
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_createInput([MarshalAs(UnmanagedType.LPStr)] string name, iopType_t value_type, IntPtr value, uint size); //value must be copied in function
-        public static int createInput(string name, iopType_t value_type, uint size) { return igs_createInput(name, value_type, IntPtr.Zero, size); } //value must be copied in function
+        public static int createInput(string name, iopType_t value_type) { return igs_createInput(name, value_type, IntPtr.Zero, 0); } //value must be copied in function
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_createOutput([MarshalAs(UnmanagedType.LPStr)] string name, iopType_t type, IntPtr value, uint size); //value must be copied in function
-        public static int createOutput(string name, iopType_t type, uint size) 
-        { 
-            return igs_createOutput(name, type, IntPtr.Zero, size); 
-        }  //value must be copied in function
+        public static int createOutput(string name, iopType_t type) { return igs_createOutput(name, type, IntPtr.Zero, 0);}  //value must be copied in function
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_createParameter([MarshalAs(UnmanagedType.LPStr)] string name, iopType_t type, IntPtr value, uint size); //value must be copied in function
-        public static int createParameter(string name, iopType_t type,  uint size) { return igs_createParameter(name, type, IntPtr.Zero, size); }  //value must be copied in function
+        public static int createParameter(string name, iopType_t type) { return igs_createParameter(name, type, IntPtr.Zero, 0); }  //value must be copied in function
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_removeInput([MarshalAs(UnmanagedType.LPStr)] string name);
@@ -1446,7 +1443,7 @@ namespace Ingescape
         }
         private static string PtrToString(IntPtr ptr)
         {
-           return  Marshal.PtrToStringAuto(ptr);
+           return  Marshal.PtrToStringAnsi(ptr);
         }
         
 
