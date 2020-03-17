@@ -81,13 +81,6 @@ public:
 
 
     /**
-     * @brief Remove the agent from the mapping and delete the view model
-     * @param agent
-     */
-    Q_INVOKABLE void deleteAgentInMapping(AgentInMappingVM* agent);
-
-
-    /**
      * @brief Remove the action from the mapping and delete the view model
      * @param action
      */
@@ -362,14 +355,6 @@ private:
 
     /**
      * @brief Create a link between two objects in the mapping
-     * @param linkName
-     * @param outputObject
-     * @param linkOutput
-     * @param inputObject
-     * @param linkInput
-     * @param mappingElement
-     * @param isTemporary
-     * @return
      */
     LinkVM* _createLinkBetweenTwoObjectsInMapping(const QString& linkName,
                                                   ObjectInMappingVM* outputObject,
@@ -379,10 +364,14 @@ private:
                                                   MappingElementVM* mappingElement = nullptr,
                                                   bool isTemporary = false);
 
+    /**
+     * @brief Remove the agent from the mapping and delete the view model
+     */
+    void _deleteAgentInMapping(AgentInMappingVM* agent);
+
 
     /**
      * @brief Remove a link between two agents from the mapping
-     * @param link
      */
     void _removeLinkBetweenTwoAgents(LinkVM* link);
 
@@ -392,13 +381,6 @@ private:
      * @param link
      */
     void _deleteLinkBetweenTwoObjectsInMapping(LinkVM* link);
-
-
-    /**
-     * @brief Remove all the links with an agent
-     * @param agent
-     */
-    void _removeAllLinksWithAgent(AgentInMappingVM* agent);
 
 
     /**

@@ -120,7 +120,7 @@ void AgentsMappingController::clearMapping()
 
     // 2- Delete all agents in mapping
     for (AgentInMappingVM* agent : _allAgentsInMapping.toList()) {
-        deleteAgentInMapping(agent);
+        _deleteAgentInMapping(agent);
     }
 
     // 3- Delete all actions in mapping
@@ -129,40 +129,6 @@ void AgentsMappingController::clearMapping()
     }
 
 //    qInfo() << "The Mapping is empty !";
-}
-
-
-/**
- * @brief Remove the agent from the mapping and delete the view model
- * @param agent
- */
-void AgentsMappingController::deleteAgentInMapping(AgentInMappingVM* agent)
-{
-    if (agent != nullptr)
-    {
-        //qDebug() << "Delete the agent" << agent->name() << "in the Mapping";
-
-        // Unselect our agent if needed
-        if (_selectedAgent == agent->agentsGroupedByName())
-        {
-            setselectedAgent(nullptr);
-        }
-
-        // DIS-connect to signals from this agent in mapping
-        disconnect(agent, nullptr, this, nullptr);
-
-        // Remove from the hash table
-        _hashFromNameToAgentInMapping.remove(agent->name());
-
-        // Remove all the links with this agent
-        _removeAllLinksWithAgent(agent);
-
-        // Remove from the list to update view (QML)
-        _allAgentsInMapping.remove(agent);
-
-        // Free memory
-        delete agent;
-    }
 }
 
 
@@ -1241,7 +1207,7 @@ void AgentsMappingController::onAgentsGroupedByNameWillBeDeleted(AgentsGroupedBy
         if (agentInMapping != nullptr)
         {
             // Delete this agent in the mapping
-            deleteAgentInMapping(agentInMapping);
+            _deleteAgentInMapping(agentInMapping);
         }
     }
 }
@@ -1741,14 +1707,6 @@ ActionInMappingVM* AgentsMappingController::_createActionInMappingAtPosition(QSt
 
 /**
  * @brief Create a link between two objects in the mapping
- * @param linkName
- * @param outputObject
- * @param linkOutput
- * @param inputObject
- * @param linkInput
- * @param mappingElement
- * @param isTemporary
- * @return
  */
 LinkVM* AgentsMappingController::_createLinkBetweenTwoObjectsInMapping(const QString& linkName,
                                                                        ObjectInMappingVM* outputObject,
@@ -1802,8 +1760,39 @@ LinkVM* AgentsMappingController::_createLinkBetweenTwoObjectsInMapping(const QSt
 
 
 /**
+ * @brief Remove the agent from the mapping and delete the view model
+ */
+void AgentsMappingController::_deleteAgentInMapping(AgentInMappingVM* agent)
+{
+    if (agent != nullptr)
+    {
+        //qDebug() << "Delete the agent" << agent->name() << "in the Mapping";
+
+        // Unselect our agent if needed
+        if (_selectedAgent == agent->agentsGroupedByName())
+        {
+            setselectedAgent(nullptr);
+        }
+
+        // DIS-connect to signals from this agent in mapping
+        disconnect(agent, nullptr, this, nullptr);
+
+        // Remove from the hash table
+        _hashFromNameToAgentInMapping.remove(agent->name());
+
+        // _allLinksInMapping is clear with agents inputs/outputs deletion
+
+        // Remove from the list to update view (QML)
+        _allAgentsInMapping.remove(agent);
+
+        // Free memory
+        delete agent;
+    }
+}
+
+
+/**
  * @brief Remove a link between two agents from the mapping
- * @param link
  */
 void AgentsMappingController::_removeLinkBetweenTwoAgents(LinkVM* link)
 {
@@ -1893,41 +1882,6 @@ void AgentsMappingController::_deleteLinkBetweenTwoObjectsInMapping(LinkVM* link
 
         // Free memory
         delete link;
-    }
-}
-
-
-/**
- * @brief Remove all the links with an agent
- * @param agent
- */
-void AgentsMappingController::_removeAllLinksWithAgent(AgentInMappingVM* agent)
-{
-    if ((agent != nullptr) && (agent->agentsGroupedByName() != nullptr))
-    {
-        qDebug() << "Remove all Links with agent" << agent->name();
-
-        for (LinkVM* link : _allLinksInMapping.toList())
-        {
-            if ( (link != nullptr) && ((link->outputObject() == agent) || (link->inputObject() == agent)) )
-            {
-                if (link->outputObject() == agent)
-                {
-                    // Add a "Waiting Mapping Element" on the output agent (name)
-                   _addWaitingMappingElementOnOutputAgent(link->outputObject()->name(), link->mappingElement());
-                }
-
-                // Delete the link between two objects in the mapping
-                _deleteLinkBetweenTwoObjectsInMapping(link);
-            }
-        }
-
-        // Our igs Editor agent is started AND the agent is ON
-        if (agent->agentsGroupedByName()->isON())
-        {
-            // Send the message "Clear Mapping" to these agents
-            IngeScapeNetworkController::instance()->sendStringMessageToAgents(agent->agentsGroupedByName()->peerIdsList(), command_ClearMapping);
-        }
     }
 }
 
