@@ -26,7 +26,9 @@ CONFIG += c++11 precompiled_header
 
 CONFIG(release, debug|release) {
     # Warnings = error
-    QMAKE_CXXFLAGS += -Werror
+	#NB: Deactivated when ingescape & its dependencies were introduced as .pri sub-projects.
+	#    They come with quite a lot of warnings....
+    #QMAKE_CXXFLAGS += -Werror
 }
 
 # Use Precompiled headers (PCH)
