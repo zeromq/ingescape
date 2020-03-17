@@ -467,8 +467,6 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
     elseif ( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
         set(CPACK_GENERATOR "DragNDrop")
         set(CPACK_SOURCE_GENERATOR "TGZ")
-        #FIXME TODO We will package dependencies within the ingescape.framework. Will be needed when ingescape.framework will be a thing.
-        install_apps_dependencies()
     else ()
         #TODO Add unix target
     endif ()
