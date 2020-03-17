@@ -68,20 +68,20 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "10.10")
 # plateform specific
 ########################################################################
 if (NOT MSVC)
-	include(CheckCXXCompilerFlag)
+    include(CheckCXXCompilerFlag)
     include(CheckCCompilerFlag)
-	foreach(_OPT -fPIC -pipe -pedantic -Wall -Wextra -W -Wpointer-arith -Wwrite-strings -Wunused -Wshadow -Winline -Wnested-externs -Wno-long-long -Wfloat-equal -Wno-multichar -Wsign-compare -Wundef -Wno-format-nonliteral -Wendif-labels -Wstrict-prototypes -Wstrict-aliasing=3 -Wcast-align -Wtype-limits -Wold-style-declaration -Wmissing-parameter-type -Wempty-body -Wclobbered -Wignored-qualifiers -Wconversion -Wno-sign-conversion -Wvla -Wdouble-promotion -Wno-system-headers -Wno-pedantic-ms-format)
-		# surprisingly, CHECK_C_COMPILER_FLAG needs a new variable to store each new
-		# test result in.
-		check_cxx_compiler_flag(${_OPT} OPT${_OPT}_CXX)
-		if(OPT${_OPT}_CXX)
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_OPT}")
-		endif()
+    foreach(_OPT -fPIC -pipe -pedantic -Wall -Wextra -W -Wpointer-arith -Wwrite-strings -Wunused -Wshadow -Winline -Wnested-externs -Wno-long-long -Wfloat-equal -Wno-multichar -Wsign-compare -Wundef -Wno-format-nonliteral -Wendif-labels -Wstrict-prototypes -Wstrict-aliasing=3 -Wcast-align -Wtype-limits -Wold-style-declaration -Wmissing-parameter-type -Wempty-body -Wclobbered -Wignored-qualifiers -Wconversion -Wno-sign-conversion -Wvla -Wdouble-promotion -Wno-system-headers -Wno-pedantic-ms-format)
+        # surprisingly, CHECK_C_COMPILER_FLAG needs a new variable to store each new
+        # test result in.
+        check_cxx_compiler_flag(${_OPT} OPT${_OPT}_CXX)
+        if(OPT${_OPT}_CXX)
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_OPT}")
+        endif()
         check_c_compiler_flag(${_OPT} OPT${_OPT}_C)
         if(OPT${_OPT}_C)
           set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${_OPT}")
         endif()
-	endforeach()
+    endforeach()
 endif()
 
 ########################################################################
@@ -165,8 +165,8 @@ find_package(Qt5 NO_MODULE COMPONENTS
 
 if (APPLE)
     find_package(Qt5 NO_MODULE COMPONENTS
-	QuickWidgets
-	REQUIRED
+    QuickWidgets
+    REQUIRED
     )
 endif()
 
@@ -296,34 +296,34 @@ endif()
 # Find ingescape dependencies
 find_package (libsodium REQUIRED)
 if (LIBSODIUM_FOUND)
-	include_directories(${LIBSODIUM_INCLUDE_DIRS})
-	target_link_libraries (${PROJECT_NAME} ${LIBSODIUM_LIBRARIES})
+    include_directories(${LIBSODIUM_INCLUDE_DIRS})
+    target_link_libraries (${PROJECT_NAME} ${LIBSODIUM_LIBRARIES})
 else (LIBSODIUM_FOUND)
-	message(FATAL_ERROR "Dependency not found")
+    message(FATAL_ERROR "Dependency not found")
 endif (LIBSODIUM_FOUND)
 
 find_package (ZeroMQ REQUIRED)
 if (ZeroMQ_FOUND)
-	include_directories(${ZeroMQ_INCLUDE_DIRS})
-	target_link_libraries (${PROJECT_NAME} libzmq)
+    include_directories(${ZeroMQ_INCLUDE_DIRS})
+    target_link_libraries (${PROJECT_NAME} libzmq)
 else (ZeroMQ_FOUND)
-	message(FATAL_ERROR "Dependency not found")
+    message(FATAL_ERROR "Dependency not found")
 endif (ZeroMQ_FOUND)
 
 find_package (czmq REQUIRED)
 if (czmq_FOUND)
-	include_directories(${czmq_INCLUDE_DIRS})
-	target_link_libraries (${PROJECT_NAME} czmq)
+    include_directories(${czmq_INCLUDE_DIRS})
+    target_link_libraries (${PROJECT_NAME} czmq)
 else (czmq_FOUND)
-	message(FATAL_ERROR "Dependency not found")
+    message(FATAL_ERROR "Dependency not found")
 endif (czmq_FOUND)
 
 find_package (zyre REQUIRED)
 if (zyre_FOUND)
-	include_directories(${zyre_INCLUDE_DIRS})
-	target_link_libraries (${PROJECT_NAME} zyre)
+    include_directories(${zyre_INCLUDE_DIRS})
+    target_link_libraries (${PROJECT_NAME} zyre)
 else (zyre_FOUND)
-	message(FATAL_ERROR "Dependency not found")
+    message(FATAL_ERROR "Dependency not found")
 endif (zyre_FOUND)
 
 find_package (ingescape REQUIRED)
@@ -331,7 +331,7 @@ if (ingescape_FOUND)
     include_directories(${ingescape_INCLUDE_DIRS})
     target_link_libraries (${PROJECT_NAME} ingescape)
 else (ingescape_FOUND)
-	message(FATAL_ERROR "Dependency not found")
+    message(FATAL_ERROR "Dependency not found")
 endif (ingescape_FOUND)
 
 
@@ -463,21 +463,18 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
         set(CPACK_GENERATOR "NSIS;ZIP")
         set(CPACK_SOURCE_GENERATOR "ZIP")
         # On windows we want to package dependencies with this library
-        set(IS_ASSESSMENTS TRUE)
-        #install_ingescape_dependencies(INGESCAPE_LIBRARIES INGESCAPE_INCLUDE_DIRS IS_ASSESSMENTS)
-        #install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS IS_ASSESSMENTS)
-        #install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS IS_ASSESSMENTS)
-        #install_ingescape_dependencies(CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS IS_ASSESSMENTS)
-        #install_ingescape_dependencies(ZYRE_LIBRARIES ZYRE_INCLUDE_DIRS IS_ASSESSMENTS)
+        install_apps_dependencies()
     elseif ( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
         set(CPACK_GENERATOR "DragNDrop")
         set(CPACK_SOURCE_GENERATOR "TGZ")
+        #FIXME TODO We will package dependencies within the ingescape.framework. Will be needed when ingescape.framework will be a thing.
+        install_apps_dependencies()
     else ()
         #TODO Add unix target
     endif ()
 
-	set(CPACK_PACKAGE_EXECUTABLES "${PROJECT_NAME}" "${PROJECT_NAME}")
-	set(CPACK_CREATE_DESKTOP_LINKS "${PROJECT_NAME}" "${PROJECT_NAME}")
+    set(CPACK_PACKAGE_EXECUTABLES "${PROJECT_NAME}" "${PROJECT_NAME}")
+    set(CPACK_CREATE_DESKTOP_LINKS "${PROJECT_NAME}" "${PROJECT_NAME}")
 
     include (CPack)
 endif()
