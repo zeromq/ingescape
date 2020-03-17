@@ -218,10 +218,11 @@ if(INGESCAPE_BUILD_SHARED)
   # Add linked dependencies
   #FIXME All private here ?
   target_link_libraries(${PROJECT_NAME}
-    PRIVATE
+    PUBLIC
       czmq
-      ${LIBSODIUM_LIBRARIES}
       libzmq
+    PRIVATE
+      ${LIBSODIUM_LIBRARIES}
       zyre
       $<$<BOOL:${APPLE}>:${CORE_FRAMEWORK}>
       $<$<BOOL:${WIN32}>:ws2_32>
@@ -241,6 +242,8 @@ if(INGESCAPE_BUILD_SHARED)
   install(TARGETS ${PROJECT_NAME}
           EXPORT ${PROJECT_NAME}-targets
           FRAMEWORK DESTINATION "Frameworks" # .framework file
+                  COMPONENT library
+          PUBLIC_HEADER DESTINATION include
                   COMPONENT library
           LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
                   COMPONENT library
@@ -439,7 +442,7 @@ if((WIN32) OR (CMAKE_BUILD_TYPE STREQUAL "Release"))
 
     set(CPACK_GENERATOR "NSIS;ZIP")
     # On windows we want to package these libraries
-	install_igs_lib_dependencies()
+    install_igs_lib_dependencies()
 
     file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/README.txt
          "The bin directory is empty after installation on purpose.\r\n"
@@ -473,12 +476,12 @@ if((WIN32) OR (CMAKE_BUILD_TYPE STREQUAL "Release"))
     set(CPACK_POSTFLIGHT_LIBRARY_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/builds/xcode/postflight.sh")
 
     set(CPACK_GENERATOR "productbuild")
-	#FIXME TODO We will package dependencies within the ingescape.framework. Will be needed when ingescape.framework will be a thing.
-	#install_igs_lib_dependencies()
+    #FIXME TODO We will package dependencies within the ingescape.framework. Will be needed when ingescape.framework will be a thing.
+    #install_igs_lib_dependencies()
 
   else()
     set(CPACK_MONOLITHIC_INSTALL ON)
-	#FIXME TODO Define a strategy for dependencies for linux
+    #FIXME TODO Define a strategy for dependencies for linux
     if(ANDROID)
       set(CPACK_GENERATOR "ZIP")
     else()
@@ -500,6 +503,79 @@ if((WIN32) OR (CMAKE_BUILD_TYPE STREQUAL "Release"))
 
   include(CPack)
 endif()
+
+# Variable holding the ZMQ public headers to install with ingescape
+#NB: This variable is manually set from the CMakeLists.txt from ZeroMQ
+get_target_property(ZMQ_PUBLIC_HEADERS_DIR libzmq INTERFACE_INCLUDE_DIRECTORIES)
+set(ZMQ_PUBLIC_HEADERS
+    ${ZMQ_PUBLIC_HEADERS_DIR}/zmq.h
+    ${ZMQ_PUBLIC_HEADERS_DIR}/zmq_utils.h
+)
+
+# Variable holding the czmq public headers to install with ingescape
+#NB: This variable is manually set from the CMakeLists.txt from czmq
+get_target_property(CZMQ_PUBLIC_HEADERS_DIR czmq INTERFACE_INCLUDE_DIRECTORIES)
+set (CZMQ_PUBLIC_HEADERS
+    ${CZMQ_PUBLIC_HEADERS_DIR}/czmq_library.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/czmq_prelude.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/czmq.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zactor.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zarmour.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zcert.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zcertstore.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zchunk.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zclock.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zconfig.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zdigest.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zdir.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zdir_patch.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zfile.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zframe.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zhash.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zhashx.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/ziflist.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zlist.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zlistx.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zloop.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zmsg.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zpoller.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zsock.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zstr.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zsys.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zuuid.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zauth.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zbeacon.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zgossip.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zmonitor.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zproxy.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zrex.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zgossip_msg.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zsock_option.inc
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zgossip_engine.inc
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zhash_primes.inc
+    ${CZMQ_PUBLIC_HEADERS_DIR}/sha1.inc_c
+    ${CZMQ_PUBLIC_HEADERS_DIR}/sha1.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/slre.inc_c
+    ${CZMQ_PUBLIC_HEADERS_DIR}/slre.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/readme.txt
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zargs.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zproc.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/ztimerset.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/ztrie.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zhttp_client.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zhttp_server.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zhttp_server_options.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zhttp_request.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zhttp_response.h
+)
+
+# Install czmq & ZeroMQ headers since they are in our INTERFACE
+install(FILES 
+    ${ZMQ_PUBLIC_HEADERS}
+	${CZMQ_PUBLIC_HEADERS}
+	DESTINATION
+	include
+)
 
 # ##############################################################################
 # summary
@@ -543,4 +619,3 @@ if(NOT MSVC)
   endif()
 endif()
 message(STATUS "")
-
