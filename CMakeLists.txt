@@ -242,11 +242,11 @@ if(INGESCAPE_BUILD_SHARED)
           EXPORT ${PROJECT_NAME}-targets
           FRAMEWORK DESTINATION "Frameworks" # .framework file
                   COMPONENT library
-          LIBRARY DESTINATION "lib" # .so file
+          LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
                   COMPONENT library
-          ARCHIVE DESTINATION "lib" # .lib file
+          ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
                   COMPONENT library
-          RUNTIME DESTINATION "lib" # .dll file
+          RUNTIME DESTINATION "lib${LIB_SUFFIX}" # .dll file
                   COMPONENT library)
 endif()
 
@@ -306,11 +306,11 @@ if(INGESCAPE_BUILD_STATIC)
 
   install(TARGETS ${PROJECT_NAME}-static
           EXPORT ${PROJECT_NAME}-targets
-          LIBRARY DESTINATION "lib" # .so file
+          LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
                   COMPONENT library
-          ARCHIVE DESTINATION "lib" # .lib file
+          ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
                   COMPONENT library
-          RUNTIME DESTINATION "lib" # .dll file
+          RUNTIME DESTINATION "lib${LIB_SUFFIX}" # .dll file
                   COMPONENT library)
 endif()
 
@@ -439,11 +439,7 @@ if((WIN32) OR (CMAKE_BUILD_TYPE STREQUAL "Release"))
 
     set(CPACK_GENERATOR "NSIS;ZIP")
     # On windows we want to package these libraries
-    set(IS_EDITOR FALSE)
-    # install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS IS_EDITOR)
-   #install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS IS_EDITOR)
-   #install_ingescape_dependencies(CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS IS_EDITOR)
-   #install_ingescape_dependencies(ZYRE_LIBRARIES ZYRE_INCLUDE_DIRS IS_EDITOR)
+	install_igs_lib_dependencies()
 
     file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/README.txt
          "The bin directory is empty after installation on purpose.\r\n"
@@ -463,7 +459,7 @@ if((WIN32) OR (CMAKE_BUILD_TYPE STREQUAL "Release"))
     #set(CPACK_PRODUCTBUILD_KEYCHAIN_PATH "$ENV{HOME}/Library/Keychains/login.keychain")
     #set(CPACK_PKGBUILD_IDENTITY_NAME "Developer ID Installer: Ingenuity i/o (56DRT9MG9S)")
     #set(CPACK_PKGBUILD_KEYCHAIN_PATH "$ENV{HOME}/Library/Keychains/login.keychain")
-   
+
     set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_SOURCE_DIR}/builds/xcode/WELCOME.txt")
     set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/builds/xcode/README.txt")
 
@@ -477,19 +473,12 @@ if((WIN32) OR (CMAKE_BUILD_TYPE STREQUAL "Release"))
     set(CPACK_POSTFLIGHT_LIBRARY_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/builds/xcode/postflight.sh")
 
     set(CPACK_GENERATOR "productbuild")
-    set(IS_EDITOR FALSE)
-    #install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS IS_EDITOR)
-    #install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS IS_EDITOR)
-    #install_ingescape_dependencies(CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS IS_EDITOR)
-    #install_ingescape_dependencies(ZYRE_LIBRARIES ZYRE_INCLUDE_DIRS IS_EDITOR)
+	#FIXME TODO We will package dependencies within the ingescape.framework. Will be needed when ingescape.framework will be a thing.
+	#install_igs_lib_dependencies()
 
   else()
     set(CPACK_MONOLITHIC_INSTALL ON)
-    set(IS_EDITOR FALSE)
-    #install_ingescape_dependencies(LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS IS_EDITOR)
-    #install_ingescape_dependencies(LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS IS_EDITOR)
-    #install_ingescape_dependencies(CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS IS_EDITOR)
-    #install_ingescape_dependencies(ZYRE_LIBRARIES ZYRE_INCLUDE_DIRS IS_EDITOR)
+	#FIXME TODO Define a strategy for dependencies for linux
     if(ANDROID)
       set(CPACK_GENERATOR "ZIP")
     else()
