@@ -884,7 +884,7 @@ lib-installer-linux-x64:
     - lib-build-linux-x64
 
 # Deploy ingescape to be able to compile agents
-lib-deploy-linux-release-armhf:
+lib-deploy-linux-release-x64:
   extends: .lib-build-files
   stage: lib-deploy
   tags:
