@@ -116,7 +116,7 @@ public:
     /**
      * @brief Sets specified value in the registry under HKCU\Software\Classes, which is mapped to HKCR then.
      */
-    bool SetHkcrUserRegKey(QString key, const QString &value, const QString &valueName = QString::null);
+    bool SetHkcrUserRegKey(QString key, const QString &value, const QString &valueName = QString());
 
 
     /**
