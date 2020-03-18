@@ -54,10 +54,11 @@ namespace Ingescape
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate void igs_muteCallbackC(bool isMuted, IntPtr myData);
+        public delegate void igs_muteCallback(bool isMuted, object myData);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate void igs_freezeCallbackC(bool isPaused, IntPtr myData);
-        public delegate void igs_muteAndFreezeCallback(bool isMutedOrPaused, object myData);
+        public delegate void igs_freezeCallback(bool isPaused, object myData);
 
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -66,6 +67,12 @@ namespace Ingescape
         public delegate void igs_licenseCallback(igs_license_limit_t limit, object myData);
 
         #endregion
+
+        private static igs_observeCallbackC _OnIOPCallback;
+        private static igs_forcedStopCallbackC _OnForcedStopCallback;
+        private static igs_freezeCallbackC _OnFreezeCallback;
+        private static igs_muteCallbackC _OnMutedCallback;
+        private static igs_callFunctionC _OnCallCallback;
 
         static void OnIOPCallback(iop_t iopType,
                                 [MarshalAs(UnmanagedType.LPStr)] string name, iopType_t valueType,
@@ -109,12 +116,20 @@ namespace Ingescape
             CSharpFunction(data);
         }
 
-        static void OnMutedOrFreezeCallback(bool isMutedOrFreeze, IntPtr myData)
+        static void OnMutedCallback(bool isMuted, IntPtr myData)
         {
-            Tuple<igs_muteAndFreezeCallback, object> tupleData = (Tuple<igs_muteAndFreezeCallback, object>)GCHandle.FromIntPtr(myData).Target;
-            igs_muteAndFreezeCallback CSharpFunction = tupleData.Item1;
+            Tuple<igs_muteCallback, object> tupleData = (Tuple<igs_muteCallback, object>)GCHandle.FromIntPtr(myData).Target;
+            igs_muteCallback CSharpFunction = tupleData.Item1;
             object data = tupleData.Item2;
-            CSharpFunction(isMutedOrFreeze,data);
+            CSharpFunction(isMuted, data);
+        }
+
+        static void OnFreezeCallback(bool isFreeze, IntPtr myData)
+        {
+            Tuple<igs_freezeCallback, object> tupleData = (Tuple<igs_freezeCallback, object>)GCHandle.FromIntPtr(myData).Target;
+            igs_freezeCallback CSharpFunction = tupleData.Item1;
+            object data = tupleData.Item2;
+            CSharpFunction(isFreeze, data);
         }
 
         static void OnCallCallback([MarshalAs(UnmanagedType.LPStr)] string senderAgentName,
@@ -194,8 +209,11 @@ namespace Ingescape
             Tuple<igs_forcedStopCallback, object> tupleData = new Tuple<igs_forcedStopCallback, object>(cbSharp, myData);
             GCHandle gCHandle = GCHandle.Alloc(tupleData);
             IntPtr data = GCHandle.ToIntPtr(gCHandle);
-
-            igs_observeForcedStop(OnForcedStopCallback, data); 
+            if(_OnForcedStopCallback == null)
+            {
+                _OnForcedStopCallback = OnForcedStopCallback;
+            }
+            igs_observeForcedStop(_OnForcedStopCallback, data); 
         }
 
         //terminate the agent with trigger of SIGINT and call to the registered igs_forcedStopCallbacks
@@ -252,12 +270,16 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_observeMute([MarshalAs(UnmanagedType.FunctionPtr)] igs_muteCallbackC cb, IntPtr myData);
-        public static void observeMute(igs_muteAndFreezeCallback cbSharp, object myData) 
+        public static void observeMute(igs_muteCallback cbSharp, object myData) 
         { 
-            Tuple<igs_muteAndFreezeCallback, object> tupleData = new Tuple<igs_muteAndFreezeCallback, object>(cbSharp, myData);
+            Tuple<igs_muteCallback, object> tupleData = new Tuple<igs_muteCallback, object>(cbSharp, myData);
             GCHandle gCHandle = GCHandle.Alloc(tupleData);
             IntPtr data = GCHandle.ToIntPtr(gCHandle);
-            igs_observeMute(OnMutedOrFreezeCallback, data); 
+            if(_OnMutedCallback == null)
+            {
+                _OnMutedCallback = OnMutedCallback;
+            }
+            igs_observeMute(_OnMutedCallback, data); 
         }
 
         //freeze and unfreeze the agent
@@ -279,12 +301,16 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_observeFreeze(igs_freezeCallbackC cb, IntPtr myData);
-        public static int observeFreeze(igs_muteAndFreezeCallback cbSharp, object myData) 
+        public static int observeFreeze(igs_freezeCallback cbSharp, object myData) 
         { 
-            Tuple<igs_muteAndFreezeCallback, object> tupleData = new Tuple<igs_muteAndFreezeCallback, object>(cbSharp, myData);
+            Tuple<igs_freezeCallback, object> tupleData = new Tuple<igs_freezeCallback, object>(cbSharp, myData);
             GCHandle gCHandle = GCHandle.Alloc(tupleData);
             IntPtr data = GCHandle.ToIntPtr(gCHandle);
-            return igs_observeFreeze(OnMutedOrFreezeCallback, data); 
+            if(_OnFreezeCallback == null)
+            {
+                _OnFreezeCallback = OnFreezeCallback;
+            }
+            return igs_observeFreeze(_OnFreezeCallback, data); 
         }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -607,7 +633,12 @@ namespace Ingescape
             Tuple<igs_observeCallback, object> tupleData = new Tuple<igs_observeCallback, object>(callback, myData);
             GCHandle gCHandle = GCHandle.Alloc(tupleData);
             IntPtr data = GCHandle.ToIntPtr(gCHandle);
-            igs_observeInput(inputName, OnIOPCallback, data);
+
+            if(_OnIOPCallback == null) {
+                _OnIOPCallback = OnIOPCallback;
+            }
+            
+            igs_observeInput(inputName, _OnIOPCallback, data);
         }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -617,7 +648,11 @@ namespace Ingescape
             Tuple<igs_observeCallback, object> tupleData = new Tuple<igs_observeCallback, object>(callback, myData);
             GCHandle gCHandle = GCHandle.Alloc(tupleData);
             IntPtr data = GCHandle.ToIntPtr(gCHandle);
-            return igs_observeOutput(outputName, OnIOPCallback, data);
+            if (_OnIOPCallback == null)
+            {
+                _OnIOPCallback = OnIOPCallback;
+            }
+            return igs_observeOutput(outputName, _OnIOPCallback, data);
         }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -627,7 +662,11 @@ namespace Ingescape
             Tuple<igs_observeCallback, object> tupleData = new Tuple<igs_observeCallback, object>(callback, myData);
             GCHandle gCHandle = GCHandle.Alloc(tupleData);
             IntPtr data = GCHandle.ToIntPtr(gCHandle);
-            return igs_observeParameter(ParameterName, OnIOPCallback, data);
+            if (_OnIOPCallback == null)
+            {
+                _OnIOPCallback = OnIOPCallback;
+            }
+            return igs_observeParameter(ParameterName, _OnIOPCallback, data);
         }
 
         //mute or unmute an IOP
@@ -1115,7 +1154,11 @@ namespace Ingescape
             Tuple<igs_callFunction, object> tupleData = new Tuple<igs_callFunction, object>(cbCSharp, myData);
             GCHandle gCHandle = GCHandle.Alloc(tupleData);
             IntPtr data = GCHandle.ToIntPtr(gCHandle);
-            return igs_initCall(name, OnCallCallback, data);
+            if(_OnCallCallback == null)
+            {
+                _OnCallCallback = OnCallCallback;
+            }
+            return igs_initCall(name, _OnCallCallback, data);
         }
 
 
