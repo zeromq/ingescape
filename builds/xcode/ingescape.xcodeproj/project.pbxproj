@@ -12,6 +12,7 @@
 		9725395B23564B230071A9BA /* performance.c in Sources */ = {isa = PBXBuildFile; fileRef = 9725395923564B230071A9BA /* performance.c */; };
 		972A52641FD1733E00711352 /* admin.c in Sources */ = {isa = PBXBuildFile; fileRef = 972A52631FD1733E00711352 /* admin.c */; };
 		972A52651FD1733E00711352 /* admin.c in Sources */ = {isa = PBXBuildFile; fileRef = 972A52631FD1733E00711352 /* admin.c */; };
+		97317BD62422565D007C88B3 /* libsodium.23.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97317BD5242255F8007C88B3 /* libsodium.23.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		9736B37B238414E200A97173 /* agent.c in Sources */ = {isa = PBXBuildFile; fileRef = 9736B37A238414E200A97173 /* agent.c */; };
 		9736B37C238414E200A97173 /* agent.c in Sources */ = {isa = PBXBuildFile; fileRef = 9736B37A238414E200A97173 /* agent.c */; };
 		9738214C23832B7400D466DC /* global.c in Sources */ = {isa = PBXBuildFile; fileRef = 9738214B23832B7400D466DC /* global.c */; };
@@ -1213,6 +1214,7 @@
 			dstSubfolderSpec = 10;
 			files = (
 				97FAC32B2244C88A0036293B /* yajl.framework in CopyFiles */,
+				97317BD62422565D007C88B3 /* libsodium.23.dylib in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1221,6 +1223,7 @@
 /* Begin PBXFileReference section */
 		9725395923564B230071A9BA /* performance.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = performance.c; sourceTree = "<group>"; };
 		972A52631FD1733E00711352 /* admin.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = admin.c; sourceTree = "<group>"; };
+		97317BD5242255F8007C88B3 /* libsodium.23.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libsodium.23.dylib; sourceTree = "<group>"; };
 		9736B37A238414E200A97173 /* agent.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = agent.c; sourceTree = "<group>"; };
 		9738214B23832B7400D466DC /* global.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = global.c; sourceTree = "<group>"; };
 		9738215023832BBF00D466DC /* ingescape_agent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ingescape_agent.h; sourceTree = "<group>"; };
@@ -2082,12 +2085,8 @@
 		979A7D261EA8A86F003153EF /* zuuid.api */ = {isa = PBXFileReference; lastKnownFileType = text; path = zuuid.api; sourceTree = "<group>"; };
 		979A7D281EA8A86F003153EF /* zyre.api */ = {isa = PBXFileReference; lastKnownFileType = text; path = zyre.api; sourceTree = "<group>"; };
 		979A7D291EA8A86F003153EF /* zyre_event.api */ = {isa = PBXFileReference; lastKnownFileType = text; path = zyre_event.api; sourceTree = "<group>"; };
-		97A0FC64224AB0EB00D7E972 /* libsodium.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsodium.dylib; path = ../../../../../../../../../usr/local/Cellar/libsodium/1.0.17/lib/libsodium.dylib; sourceTree = "<group>"; };
-		97A2128B22391A0D00ACCFB0 /* libzyre.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libzyre.dylib; path = ../../../../../../../../../usr/local/Cellar/zyre/2.0.0/lib/libzyre.dylib; sourceTree = "<group>"; };
-		97A2128C22391A0D00ACCFB0 /* libczmq.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libczmq.dylib; path = ../../../../../../../../../usr/local/Cellar/czmq/4.2.0/lib/libczmq.dylib; sourceTree = "<group>"; };
 		97ABC93B2282EC5D00215310 /* monitor.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = monitor.c; sourceTree = "<group>"; };
 		97C7AA0123F8013800DC02C2 /* libsodium.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsodium.a; path = ../../../libsodium/src/libsodium/libs/libsodium.a; sourceTree = "<group>"; };
-		97C7AAAD23F809CC00DC02C2 /* libsodium.23.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsodium.23.dylib; path = ../../../../../../../../../usr/local/lib/libsodium.23.dylib; sourceTree = "<group>"; };
 		97C926AB1EB23ED100D2B0CE /* ingescape_private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ingescape_private.h; sourceTree = "<group>"; };
 		97FAC32C2247BE920036293B /* license.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = license.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -2141,16 +2140,13 @@
 		9762EDE21EAE54D5002062A1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				97C7AAAD23F809CC00DC02C2 /* libsodium.23.dylib */,
+				97317BD5242255F8007C88B3 /* libsodium.23.dylib */,
 				97C7AA0123F8013800DC02C2 /* libsodium.a */,
 				976A93DF23F305F300CAA795 /* libc++.tbd */,
 				976A8FB123F1BEEB00CAA795 /* libczmq.a */,
 				976A8FAF23F1BEEB00CAA795 /* libsodium.a */,
 				976A8FAE23F1BEEB00CAA795 /* libzmq.a */,
 				976A8FB023F1BEEB00CAA795 /* libzyre.a */,
-				97A0FC64224AB0EB00D7E972 /* libsodium.dylib */,
-				97A2128C22391A0D00ACCFB0 /* libczmq.dylib */,
-				97A2128B22391A0D00ACCFB0 /* libzyre.dylib */,
 				9762EDE31EAE54D6002062A1 /* libczmq.dylib */,
 				9762EDE41EAE54D6002062A1 /* libsodium.dylib */,
 				9762EDE51EAE54D6002062A1 /* libzmq.dylib */,
@@ -4716,7 +4712,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = NO;
@@ -4749,7 +4745,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = NO;
