@@ -244,6 +244,7 @@ typedef struct igsJSONNode {
 PUBLIC void igs_JSONTreeFree(igsJSONTreeNode_t **node);
 PUBLIC igsJSONTreeNode_t* igs_JSONTreeParseFromFile(const char *path);
 PUBLIC igsJSONTreeNode_t* igs_JSONTreeParseFromString(const char *content);
+PUBLIC char* igs_JSONTreeDump(igsJSONTreeNode_t *value); //returned value must be freed by caller
 
 /* Tree node can handle queries to retrieve sub-nodes
  Important notes :

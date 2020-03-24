@@ -346,7 +346,7 @@ igsJSONTreeNode_t* igs_JSONTreeParseFromFile(const char *path){
         igs_error("parsing error (%s) : %s", path, errbuf);
     }
     zchunk_destroy(&data);
-    zfile_close(file);
+    zfile_destroy(&file);
     return node;
 }
 
@@ -375,6 +375,58 @@ bool igs_JSONTreeIsValueAnInteger(igsJSONTreeNode_t *value){
 
 bool igs_JSONTreeIsValueADouble(igsJSONTreeNode_t *value){
     return IGSYAJL_IS_DOUBLE((igsyajl_val)value);
+}
+
+void igs_JSONTreedumpIterate(igsJSON_t json, igsJSONTreeNode_t *value){
+    if (value == NULL)
+        return;
+    switch (value->type) {
+        case IGS_JSON_STRING:
+            igs_JSONaddString(json, value->u.string);
+            break;
+        case IGS_JSON_NUMBER:
+            if (igs_JSONTreeIsValueAnInteger(value)){
+                igs_JSONaddInt(json, value->u.number.i);
+            }else{
+                igs_JSONaddDouble(json, value->u.number.d);
+            }
+            break;
+        case IGS_JSON_MAP: //igsyajl_t_object
+            igs_JSONopenMap(json);
+            for (size_t i = 0; i < value->u.object.len; i++){
+                igs_JSONaddString(json, value->u.object.keys[i]);
+                igs_JSONTreedumpIterate(json, value->u.object.values[i]);
+            }
+            igs_JSONcloseMap(json);
+            break;
+        case IGS_JSON_ARRAY: //igsyajl_t_array
+            igs_JSONopenArray(json);
+            for (size_t i = 0; i < value->u.array.len; i++){
+                igs_JSONTreedumpIterate(json, value->u.array.values[i]);
+            }
+            igs_JSONcloseArray(json);
+            break;
+        case IGS_JSON_TRUE:
+            igs_JSONaddBool(json, true);
+            break;
+        case IGS_JSON_FALSE:
+            igs_JSONaddBool(json, false);
+            break;
+        case IGS_JSON_NULL:
+            igs_JSONaddNULL(json);
+            break;
+        default:
+            break;
+    }
+}
+
+char* igs_JSONTreeDump(igsJSONTreeNode_t *value){
+    igsJSON_t json = igs_JSONinit();
+    igs_JSONTreedumpIterate(json, value);
+    //igs_JSONprint(json);
+    char *res = igs_JSONdump(json);
+    igs_JSONfree(&json);
+    return res;
 }
 
 // TEST SCRIPT
