@@ -275,3 +275,108 @@ PyObject * version_wrapper(PyObject * self, PyObject * args)
     ret = PyLong_FromLong(version);
     return ret;
 }
+
+//wrapper for igs_trace
+PyObject * trace_wrapper(PyObject * self, PyObject * args)
+{
+    char * log;
+    PyObject * ret;
+    
+    
+    // parse and cast into a bool the useColorVerbose argument given in python
+    if (!PyArg_ParseTuple(args, "s", &log)) {
+        return NULL;
+    }
+    
+    igs_trace(log);
+    
+    ret = PyLong_FromLong(1);
+    return ret;
+}
+
+PyObject * debug_wrapper(PyObject * self, PyObject * args)
+{
+    char * log;
+    PyObject * ret;
+    
+    
+    // parse and cast into a bool the useColorVerbose argument given in python
+    if (!PyArg_ParseTuple(args, "s", &log)) {
+        return NULL;
+    }
+    
+    igs_debug(log);
+    
+    ret = PyLong_FromLong(1);
+    return ret;
+}
+
+
+PyObject * info_wrapper(PyObject * self, PyObject * args)
+{
+    char * log;
+    PyObject * ret;
+    
+    
+    // parse and cast into a bool the useColorVerbose argument given in python
+    if (!PyArg_ParseTuple(args, "s", &log)) {
+        return NULL;
+    }
+    
+    igs_info(log);
+    
+    ret = PyLong_FromLong(1);
+    return ret;
+}
+
+
+PyObject * warn_wrapper(PyObject * self, PyObject * args)
+{
+    char * log;
+    PyObject * ret;
+    
+    
+    // parse and cast into a bool the useColorVerbose argument given in python
+    if (!PyArg_ParseTuple(args, "s", &log)) {
+        return NULL;
+    }
+    
+    igs_warn(log);
+    
+    ret = PyLong_FromLong(1);
+    return ret;
+}
+
+PyObject * error_wrapper(PyObject * self, PyObject * args)
+{
+    char * log;
+    PyObject * ret;
+    
+    
+    // parse and cast into a bool the useColorVerbose argument given in python
+    if (!PyArg_ParseTuple(args, "s", &log)) {
+        return NULL;
+    }
+    
+    igs_error(log);
+    
+    ret = PyLong_FromLong(1);
+    return ret;
+}
+
+PyObject * fatal_wrapper(PyObject * self, PyObject * args)
+{
+    char * log;
+    PyObject * ret;
+    
+    
+    // parse and cast into a bool the useColorVerbose argument given in python
+    if (!PyArg_ParseTuple(args, "s", &log)) {
+        return NULL;
+    }
+    
+    igs_fatal(log);
+    
+    ret = PyLong_FromLong(1);
+    return ret;
+}

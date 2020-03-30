@@ -62,6 +62,17 @@ PyObject * writeMappingToPath_wrapper(PyObject * self, PyObject * args);
 //wrapper for igs_version
 PyObject * version_wrapper(PyObject * self, PyObject * args);
 
+PyObject * trace_wrapper(PyObject * self, PyObject * args);
+
+PyObject * debug_wrapper(PyObject * self, PyObject * args);
+
+PyObject * info_wrapper(PyObject * self, PyObject * args);
+
+PyObject * warn_wrapper(PyObject * self, PyObject * args);
+
+PyObject * error_wrapper(PyObject * self, PyObject * args);
+
+PyObject * fatal_wrapper(PyObject * self, PyObject * args);
 
 PyDoc_STRVAR(
             setDefinitionPathDoc,

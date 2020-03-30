@@ -24,6 +24,7 @@
 #include "freezecallback.h"
 #include "data.h"
 #include "stopcallback.h"
+#include "call.h"
 
 
 /*
@@ -223,6 +224,27 @@ static PyMethodDef ingescapeMethods[] =
     {"igs_busSendDataToAgent", igs_busSendDataToAgent_wrapper, METH_VARARGS, busSendDataToAgentDoc},
     {"igs_busAddServiceDescription", igs_busAddServiceDescription_wrapper, METH_VARARGS, busAddServiceDescriptionDoc},
     {"igs_busRemoveServiceDescription", igs_busRemoveServiceDescription_wrapper, METH_VARARGS, busremoveServiceDescriptionDoc},
+    
+    // calls
+    {"igs_sendCall", sendCall_wrapper, METH_VARARGS, "test calls"},
+    {"igs_removeCall", removeCall_wrapper, METH_VARARGS, "test calls"},
+    {"igs_addArgumentToCall", addArgumentToCall_wrapper, METH_VARARGS, "test calls"},
+    {"igs_removeArgumentFromCall", removeArgumentFromCall_wrapper, METH_VARARGS, "test calls"},
+    {"igs_getNumberOfCalls", getNumberOfCalls_wrapper, METH_VARARGS, "test calls"},
+    {"igs_checkCallExistence", checkCallExistence_wrapper, METH_VARARGS, "test calls"},
+    {"igs_getCallsList", getCallsList_wrapper, METH_VARARGS, "test calls"},
+    {"igs_getNumberOfArgumentForCall", getNumberOfArgumentForCall_wrapper, METH_VARARGS, "test calls"},
+    {"igs_getArgumentListForCall", getArgumentListForCall_wrapper, METH_VARARGS, "test calls"},
+    {"igs_checkCallArgumentExistence", checkCallArgumentExistence_wrapper, METH_VARARGS, "test calls"},
+    {"igs_initCall", initCall_wrapper, METH_VARARGS, "test calls"},
+    
+//    //logging
+//    {"igs_trace", trace_wrapper, METH_VARARGS, "test logging"},
+//    {"igs_debug", debug_wrapper, METH_VARARGS, "test logging"},
+//    {"igs_info", info_wrapper, METH_VARARGS, "test logging"},
+//    {"igs_warn", warn_wrapper, METH_VARARGS, "test logging"},
+//    {"igs_error", error_wrapper, METH_VARARGS, "test logging"},
+//    {"igs_fatal", fatal_wrapper, METH_VARARGS, "test logging"},
     
     {NULL, NULL, 0, NULL}       /* Sentinel */
 };
