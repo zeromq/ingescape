@@ -104,8 +104,6 @@ ApplicationWindow {
                         IngeScapeEditorC.recordsSupervisionC.selectedRecord = null;
                     }
 
-
-
                     IngeScapeEditorC.loadPlatformFromSelectedFile();
                 }
             }

@@ -53,8 +53,23 @@ AgentsMappingController::~AgentsMappingController()
     // DIS-connect from signal "Count Changed" from the list of agents in mapping
     disconnect(&_allAgentsInMapping, nullptr, this, nullptr);
 
-    // Clear the current mapping
-    clearMapping();
+    // Clear the hash table from "output agent name" to a list of waiting mapping elements (where the agent is involved as "output agent")
+    _hashFromOutputAgentNameToListOfWaitingMappingElements.clear();
+
+    // 1- Delete all links
+    for (LinkVM* link : _allLinksInMapping.toList()) {
+        _deleteLinkBetweenTwoObjectsInMapping(link);
+    }
+
+    // 2- Delete all agents in mapping
+    for (AgentInMappingVM* agent : _allAgentsInMapping.toList()) {
+        _deleteAgentInMapping(agent);
+    }
+
+    // 3- Delete all actions in mapping
+    for (ActionInMappingVM* action : _allActionsInMapping.toList()) {
+        deleteActionInMapping(action);
+    }
 
     // Delete all links
     _hashFromIdToLinkInMapping.clear();
@@ -104,31 +119,27 @@ void AgentsMappingController::setselectedAgent(AgentsGroupedByNameVM *value)
 
 
 /**
- * @brief Clear the current mapping
+ * @brief Delete all agents OFF and their mappings and all actions
  */
 void AgentsMappingController::clearMapping()
 {
-    qInfo() << "Clear the current mapping";
+//    qInfo() << "Clear the current mapping";
 
     // Clear the hash table from "output agent name" to a list of waiting mapping elements (where the agent is involved as "output agent")
     _hashFromOutputAgentNameToListOfWaitingMappingElements.clear();
 
-    // 1- Delete all links
-    for (LinkVM* link : _allLinksInMapping.toList()) {
-        _deleteLinkBetweenTwoObjectsInMapping(link);
-    }
-
-    // 2- Delete all agents in mapping
+    // 1- Delete all agents OFF in mapping
     for (AgentInMappingVM* agent : _allAgentsInMapping.toList()) {
-        _deleteAgentInMapping(agent);
+        if (agent->agentsGroupedByName() != nullptr)
+        {
+            agent->agentsGroupedByName()->deleteAgentsOFF();
+        }
     }
 
-    // 3- Delete all actions in mapping
+    // 2- Delete all actions in mapping
     for (ActionInMappingVM* action : _allActionsInMapping.toList()) {
         deleteActionInMapping(action);
     }
-
-//    qInfo() << "The Mapping is empty !";
 }
 
 

@@ -647,16 +647,14 @@ void IngeScapeEditorController::loadPlatformFromSelectedFile()
     QString platformFilePath = QFileDialog::getOpenFileName(nullptr,
                                                             tr("Open platform"),
                                                             _platformDirectoryPath,
-                                                            tr("Platform (*.igsplatform *.json)")
-                                                            );
-
+                                                            tr("Platform (*.igsplatform *.json)"));
     if (!platformFilePath.isEmpty())
     {
-        if (IngeScapeNetworkController::instance()->isStarted())
+        if (IngeScapeNetworkController::instance()->isStarted() && (_modelManager != nullptr))
         {
-            stopIngeScape();
+            // if we are connected, we are in observe mode
+            _modelManager->setisMappingControlled(false);
         }
-
         _clearAndLoadPlatformFromFile(platformFilePath);
     }
     else
@@ -709,9 +707,10 @@ void IngeScapeEditorController::savePlatformToCurrentlyLoadedFile()
  */
 void IngeScapeEditorController::createNewPlatform()
 {
-    if (IngeScapeNetworkController::instance()->isStarted())
+    if (IngeScapeNetworkController::instance()->isStarted() && (_modelManager != nullptr))
     {
-        stopIngeScape();
+        // if we are connected, we are in observe mode
+        _modelManager->setisMappingControlled(false);
     }
 
     // Update the current platform name
@@ -1579,7 +1578,7 @@ void IngeScapeEditorController::_clearCurrentPlatform()
 {
     qInfo() << "Clear Current Platform (" << _currentPlatformName << ")";
 
-    // Clear the current mapping
+    // Clear agents OFF and their mapping
     if (_agentsMappingC != nullptr) {
         _agentsMappingC->clearMapping();
     }

@@ -380,7 +380,15 @@ Item {
                 }
                 else
                 {
-                    mappingModificationsPopup.open();
+                    if (IngeScapeEditorC.modelManager && IngeScapeEditorC.agentsMappingC && IngeScapeEditorC.agentsMappingC.isEmptyMapping)
+                    {
+                        IngeScapeEditorC.modelManager.isMappingControlled = false;
+                        IngeScapeEditorC.startIngeScape();
+                    }
+                    else
+                    {
+                        mappingModificationsPopup.open();
+                    }
                 }
             }
 
