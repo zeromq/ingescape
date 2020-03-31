@@ -475,8 +475,6 @@ private:
     // Path to the currently opened platform file (*.igsplatform)
     QString _currentPlatformFilePath;
 
-    bool _wasAgentEditorStarted_beforeSystemSleep;
-
     // Default name to save the platform when exiting
     static const QString EXAMPLE_PLATFORM_NAME;
 

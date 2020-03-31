@@ -68,8 +68,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _platformNameBeforeLoadReplay(""),
     _terminationSignalWatcher(nullptr),
     _platformDirectoryPath(""),
-    _currentPlatformFilePath(""),
-    _wasAgentEditorStarted_beforeSystemSleep(false)
+    _currentPlatformFilePath("")
 {
     qInfo() << "New IngeScape Editor Controller";
 
@@ -432,7 +431,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     //
     // Try to find an available network device and start IngeScape (if it was started last time and _networkDevice available)
     //
-    _modelManager->setisMappingControlled(wasMappingControlled);
+
     if (!ingeScapeNetworkC->isAvailableNetworkDevice(_networkDevice))
     {
         // Last device choose is no more available, try to select another one with auto find
@@ -440,7 +439,15 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     }
     if (wasAgentEditorStarted && (_networkDevice != ""))
     {
-        setingescapeShouldBeStartedAtLaunch(true);
+        if (wasMappingControlled)
+        {
+            setingescapeShouldBeStartedAtLaunch(true); // TODO rename
+        }
+        else
+        {
+            _modelManager->setisMappingControlled(false);
+            startIngeScape();
+        }
     }
 
     //
@@ -923,7 +930,7 @@ bool IngeScapeEditorController::startIngeScape()
 
 void IngeScapeEditorController::stopIngeScape()
 {
-    // Deactivate mapping distribution each time our editor is OFFLINE for more security
+    // Deactivate mapping distribution each time our editor is OFFLINE
     _modelManager->setisMappingControlled(false);
 
     IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
@@ -1450,7 +1457,6 @@ void IngeScapeEditorController::_onNetworkDeviceIsNotAvailable()
 void IngeScapeEditorController::_onNetworkDeviceIsAvailableAgain()
 {
     qDebug() << Q_FUNC_INFO;
-
     // Start IngeScape if not already started (it means that ingescape did not restart yet)
     if (!IngeScapeNetworkController::instance()->isStarted())
     {
@@ -1465,7 +1471,6 @@ void IngeScapeEditorController::_onNetworkDeviceIsAvailableAgain()
 void IngeScapeEditorController::_onNetworkDeviceIpAddressHasChanged()
 {
     qDebug() << Q_FUNC_INFO;
-
     if (IngeScapeNetworkController::instance()->isStarted())
     {
         restartIngeScape();
@@ -1479,11 +1484,8 @@ void IngeScapeEditorController::_onNetworkDeviceIpAddressHasChanged()
 void IngeScapeEditorController::_onSystemSleep()
 {
     qDebug() << Q_FUNC_INFO;
-
-    _wasAgentEditorStarted_beforeSystemSleep = false;
     if (IngeScapeNetworkController::instance()->isStarted())
     {
-        _wasAgentEditorStarted_beforeSystemSleep = true;
         IngeScapeNetworkController::instance()->stopMonitoring(); // to save energy
         stopIngeScape();
     }
@@ -1495,10 +1497,7 @@ void IngeScapeEditorController::_onSystemSleep()
  */
 void IngeScapeEditorController::_onSystemWake()
 {  
-    if (_wasAgentEditorStarted_beforeSystemSleep)
-    {
-        startIngeScape();
-    }
+    // DO nothing, editor is OFFLINE
 }
 
 
