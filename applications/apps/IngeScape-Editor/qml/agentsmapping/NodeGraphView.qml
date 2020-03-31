@@ -275,12 +275,6 @@ Item {
         onResetZoom: {
             rootItem.setZoomLevel(1);
         }
-
-        onChangesOnLinksWhileMappingUnactivated: {
-            //console.log("QML: on Changes on Links While Mapping Unactivated");
-
-
-        }
     }
 
     Connections {

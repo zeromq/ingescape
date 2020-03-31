@@ -214,16 +214,7 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when the user activates the mapping in mode OBSERVE
-     * while he made some changes on the links betwwen agents.
-     * These changes will be lost if the user stay in mode OBSERVE
-     */
-    void changesOnLinksWhileMappingUnactivated();
-
-
-    /**
      * @brief Signal emitted when an action has to be executed
-     * @param action
      */
     void executeAction(ActionM* action);
 

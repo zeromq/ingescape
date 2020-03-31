@@ -103,7 +103,6 @@ ApplicationWindow {
                     {
                         IngeScapeEditorC.recordsSupervisionC.selectedRecord = null;
                     }
-
                     IngeScapeEditorC.loadPlatformFromSelectedFile();
                 }
             }
@@ -285,25 +284,6 @@ ApplicationWindow {
 
         Menu {
             title: qsTr("Mapping")
-
-            MenuItem {
-                id: menuPlugUNplugMapping
-
-                text: ""
-
-                onTriggered: {
-                    if (IgsNetworkController.isStarted) {
-                        //console.log("DE-activate mapping");
-                        IgsNetworkController.stop();
-                    }
-                    else {
-                        //console.log("Activate mapping");
-                        IgsNetworkController.start(IngeScapeEditorC.networkDevice, "", IngeScapeEditorC.port)
-                    }
-                }
-            }
-
-            MenuSeparator {}
 
             MenuItem {
                 text: qsTr("Zoom In")
@@ -766,10 +746,6 @@ ApplicationWindow {
 
                 mainWindow.licensesController = Qt.binding(function() {
                    return IngeScapeEditorC.licensesC;
-                });
-
-                menuPlugUNplugMapping.text = Qt.binding(function() {
-                    return ((IgsNetworkController && IgsNetworkController.isStarted) ? qsTr("Disconnect from the network") : qsTr("Connect to the network"));
                 });
 
                 subWindowsInstantiator.model = Qt.binding(function() {

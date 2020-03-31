@@ -49,6 +49,5 @@
         <file>resources/gettingStarted/gettingStarted.js</file>
         <file>resources/gettingStarted/styles.css</file>
         <file>qml/popup/RemoteNotificationPopup.qml</file>
-        <file>qml/IngeScapeToolTipComboboxDelegateMappingMode.qml</file>
     </qresource>
 </RCC>
