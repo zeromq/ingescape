@@ -325,7 +325,7 @@ Item {
                         topMargin: 10
                     }
 
-                    checked: IngeScapeEditorC.modelManager.isMappingControlled
+                    checked: IngeScapeEditorC.modelManager.imposeMappingToAgentsON
                     activeFocusOnPress: true
 
                     style: CheckBoxStyle {
@@ -362,13 +362,13 @@ Item {
                     }
 
                     onCheckedChanged: {
-                        IngeScapeEditorC.modelManager.isMappingControlled = checked;
+                        IngeScapeEditorC.modelManager.imposeMappingToAgentsON = checked;
                     }
 
                     Binding {
                         target: imposeMappingToAgentsON
                         property: "checked"
-                        value: IngeScapeEditorC.modelManager.isMappingControlled
+                        value: IngeScapeEditorC.modelManager.imposeMappingToAgentsON
                     }
                 }
             }
@@ -382,7 +382,7 @@ Item {
                 {
                     if (IngeScapeEditorC.modelManager && IngeScapeEditorC.agentsMappingC && IngeScapeEditorC.agentsMappingC.isEmptyMapping)
                     {
-                        IngeScapeEditorC.modelManager.isMappingControlled = false;
+                        IngeScapeEditorC.modelManager.imposeMappingToAgentsON = false;
                         IngeScapeEditorC.startIngeScape();
                     }
                     else
@@ -840,26 +840,25 @@ Item {
     Popup.MappingModificationsPopup {
         id: mappingModificationsPopup
 
-        onCancelMappingActivation: {
-            console.log("on Cancel Mapping Activation");
+        onStayDisconnect: {
+//            console.log("on Stay disconnect");
             IngeScapeEditorC.stopIngeScape();
         }
 
-        onSwitchToControl: {
-            console.log("on Switch To Control");
-
+        onChooseImposeMapping: {
+//            console.log("on Switch To Mapping imposed");
             if (IngeScapeEditorC.modelManager)
             {
-                IngeScapeEditorC.modelManager.isMappingControlled = true;
+                IngeScapeEditorC.modelManager.imposeMappingToAgentsON = true;
                 IngeScapeEditorC.startIngeScape();
             }
         }
 
-        onStayToObserve: {
-            console.log("on Switch To Observe");
+        onChooseNotImposeMapping : {
+//            console.log("on Switch To Mapping NOT imposed");
             if (IngeScapeEditorC.modelManager)
             {
-                IngeScapeEditorC.modelManager.isMappingControlled = false;
+                IngeScapeEditorC.modelManager.imposeMappingToAgentsON = false;
                 IngeScapeEditorC.startIngeScape();
             }
         }
@@ -869,9 +868,6 @@ Item {
     // Overlay layer used to display streaming
     I2Layer {
         id: streamingLayer
-
-        objectName: "streamingLayer"
-
         anchors {
             left: leftPanel.right
             top: parent.top
@@ -879,5 +875,6 @@ Item {
             right: parent.right
             fill: null
         }
+        objectName: "streamingLayer"
     }
 }

@@ -134,7 +134,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
     // MAPPING settings
     settings.beginGroup("mapping");
-    bool wasMappingControlled = settings.value("controlled", true).toBool();
+    bool wasMappingImposed = settings.value("imposedToNetwork", true).toBool();
     settings.endGroup();
 
     // DEBUG settings
@@ -439,13 +439,13 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     }
     if (wasAgentEditorStarted && (_networkDevice != ""))
     {
-        if (wasMappingControlled)
+        if (wasMappingImposed)
         {
             setingescapeShouldBeStartedAtLaunch(true); // TODO rename
         }
         else
         {
-            _modelManager->setisMappingControlled(false);
+            // Start ingescape (_modelManager imposeMappingToAgentsON is FALSE)
             startIngeScape();
         }
     }
@@ -659,8 +659,8 @@ void IngeScapeEditorController::loadPlatformFromSelectedFile()
     {
         if (IngeScapeNetworkController::instance()->isStarted() && (_modelManager != nullptr))
         {
-            // if we are connected, we are in observe mode
-            _modelManager->setisMappingControlled(false);
+            // if we are connected, we don't impose mapping to the network anymore
+            _modelManager->setimposeMappingToAgentsON(false);
         }
         _clearAndLoadPlatformFromFile(platformFilePath);
     }
@@ -716,8 +716,8 @@ void IngeScapeEditorController::createNewPlatform()
 {
     if (IngeScapeNetworkController::instance()->isStarted() && (_modelManager != nullptr))
     {
-        // if we are connected, we are in observe mode
-        _modelManager->setisMappingControlled(false);
+        // if we are connected, we don't impose mapping to the network anymore
+        _modelManager->setimposeMappingToAgentsON(false);
     }
 
     // Update the current platform name
@@ -745,7 +745,7 @@ void IngeScapeEditorController::processBeforeClosing()
     settings.endGroup();
 
     settings.beginGroup("mapping");
-    settings.setValue("controlled", _modelManager->isMappingControlled());
+    settings.setValue("imposedToNetwork", _modelManager->imposeMappingToAgentsON());
     settings.endGroup();
 
     settings.beginGroup("platform");
@@ -931,7 +931,7 @@ bool IngeScapeEditorController::startIngeScape()
 void IngeScapeEditorController::stopIngeScape()
 {
     // Deactivate mapping distribution each time our editor is OFFLINE
-    _modelManager->setisMappingControlled(false);
+    _modelManager->setimposeMappingToAgentsON(false);
 
     IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
 

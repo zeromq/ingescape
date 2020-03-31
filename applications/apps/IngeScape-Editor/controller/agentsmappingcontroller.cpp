@@ -1300,7 +1300,7 @@ void AgentsMappingController::_onAgentIsONChanged(bool isON)
         AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentsGroupedByName->name());
         if (agentInMapping != nullptr)
         {
-            if (_modelManager->isMappingControlled())
+            if (_modelManager->imposeMappingToAgentsON())
             {
                 // We IMPOSE the mapping of agent that connect on our network
                 // Send the message "LOAD THIS MAPPING" to this agent with our current mapping
@@ -1357,7 +1357,7 @@ void AgentsMappingController::_onAgentModelONhasBeenAdded(AgentM* model)
     // Model of Agent ON
     if ((model != nullptr) && model->isON() && !model->name().isEmpty() && !model->peerId().isEmpty() && (_modelManager != nullptr))
     {
-        if (_modelManager->isMappingControlled())
+        if (_modelManager->imposeMappingToAgentsON())
         {
             // We IMPOSE the mapping of agent that connect on our network
             // Send the message "CLEAR MAPPING" to this agent

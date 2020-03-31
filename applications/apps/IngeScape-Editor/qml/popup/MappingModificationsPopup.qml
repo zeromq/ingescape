@@ -1,34 +1,30 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2020 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
  *
- *
  *	Contributors:
  *      Justine Limoges <limoges@ingenuity.io>
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *      Chloé Roumieu      <roumieu@ingenuity.io>
  */
 
 import QtQuick 2.0
-
 import QtQuick 2.8
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
 import QtQuick.Window 2.3
 
 import I2Quick 1.0
-
 import INGESCAPE 1.0
-
 
 I2PopupBase {
     id: rootItem
-
-    height: 250
-    width: 500
+    height: 230
+    width: 750
 
     anchors.centerIn: parent
 
@@ -43,15 +39,9 @@ I2PopupBase {
     //
     //--------------------------------
 
-    //
-    signal cancelMappingActivation();
-
-    //
-    signal switchToControl();
-
-    //
-    signal stayToObserve();
-
+    signal stayDisconnect()
+    signal chooseImposeMapping()
+    signal chooseNotImposeMapping()
 
 
     //--------------------------------
@@ -62,9 +52,8 @@ I2PopupBase {
 
     onOpened: {
         // Reset check-boxes
-        checkControl.checked = false;
-        checkObserve.checked = false;
-        //checkCancel.checked = false;
+        checkNotImpose.checked = false;
+        checkImpose.checked = false;
     }
 
 
@@ -75,10 +64,7 @@ I2PopupBase {
     //--------------------------------
 
     Rectangle {
-
-        anchors {
-            fill: parent
-        }
+        anchors.fill: parent
         radius: 5
         border {
             width: 2
@@ -97,16 +83,10 @@ I2PopupBase {
 
             Text {
                 id: title
-
-                anchors {
-                    left: parent.left
-                }
+                anchors.left: parent.left
                 height: 25
 
-                //horizontalAlignment: Text.AlignHCenter
-
-                text: qsTr("You are about to connect to the network. You can :")
-
+                text: qsTr("You are about to connect to the network. For agents that arrived on the network, you can choose to :")
                 color: IngeScapeTheme.whiteColor
                 font {
                     family: IngeScapeTheme.textFontFamily
@@ -119,11 +99,8 @@ I2PopupBase {
             }
 
             CheckBox {
-                id: checkControl
-
-                anchors {
-                    left: parent.left
-                }
+                id: checkNotImpose
+                anchors.left: parent.left
                 height: 25
 
                 checked: false
@@ -139,8 +116,7 @@ I2PopupBase {
                         color: control.enabled ? (control.checked ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor)
                                                : IngeScapeTheme.disabledTextColor
 
-                        text: qsTr("Apply your mapping to the network (CONTROL mapping mode)")
-
+                        text:qsTr("NOT impose your platform's mapping on them (and maybe lose your platform's mappings)")
                         font {
                             family: IngeScapeTheme.textFontFamily
                             pixelSize: 16
@@ -168,16 +144,13 @@ I2PopupBase {
             }
 
             CheckBox {
-                id: checkObserve
-
-                anchors {
-                    left: parent.left
-                }
+                id: checkImpose
+                anchors.left: parent.left
                 height: 25
 
                 checked: false
                 exclusiveGroup: exclusiveGroup
-                activeFocusOnPress: true;
+                activeFocusOnPress: true
 
                 style: CheckBoxStyle {
                     label: Text {
@@ -188,8 +161,7 @@ I2PopupBase {
                         color: control.enabled ? (control.checked ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor)
                                                : IngeScapeTheme.disabledTextColor
 
-                        text: qsTr("Use the mapping from the network (OBSERVE mapping mode)")
-
+                        text: qsTr("Impose your platform's mapping on them (at the risk of losing existing mapping on the network)")
                         font {
                             family: IngeScapeTheme.textFontFamily
                             pixelSize: 16
@@ -215,60 +187,10 @@ I2PopupBase {
                     }
                 }
             }
-
-            /*CheckBox {
-                id: checkCancel
-
-                anchors {
-                    left: parent.left
-                }
-                height: 25
-
-                checked: false
-                exclusiveGroup: exclusiveGroup
-                activeFocusOnPress: true;
-
-                style: CheckBoxStyle {
-                    label: Text {
-                        anchors {
-                            verticalCenter: parent.verticalCenter
-                            verticalCenterOffset: 2
-                        }
-                        color: control.enabled ? (control.checked ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor)
-                                               : IngeScapeTheme.disabledTextColor
-
-                        text: qsTr("Remain disconnected")
-
-                        font {
-                            family: IngeScapeTheme.textFontFamily
-                            pixelSize: 16
-                        }
-                    }
-
-                    indicator: Rectangle {
-                        implicitWidth: 14
-                        implicitHeight: 14
-                        radius: height / 2
-                        border.width: 0
-                        color: control.enabled ? IngeScapeTheme.darkBlueGreyColor : IngeScapeTheme.disabledTextColor
-
-                        Rectangle {
-                            anchors.centerIn: parent
-                            visible: control.checked
-                            width: 8
-                            height: 8
-                            radius: height / 2
-                            border.width: 0
-                            color: IngeScapeTheme.whiteColor
-                        }
-                    }
-                }
-            }*/
         }
 
         Button {
             id: btnCancel
-
             anchors {
                 bottom: parent.bottom
                 bottomMargin: 20
@@ -283,7 +205,6 @@ I2PopupBase {
 
             text: "Stay disconnected"
             enabled: true
-
             activeFocusOnPress: true
 
             style: I2SvgButtonStyle {
@@ -305,32 +226,25 @@ I2PopupBase {
             }
 
             onClicked: {
-                // Close our popup
                 rootItem.close();
-
-                // Emit the signal "Cancel Mapping Activation"
-                rootItem.cancelMappingActivation();
+                rootItem.stayDisconnect();
             }
         }
 
         Button {
             id: btnOK
-
             anchors {
                 bottom: parent.bottom
                 bottomMargin: 20
                 right: parent.right
                 rightMargin: 20
             }
-
-           property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
-
+            property var boundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
             height: boundingBox.height
             width: 80
 
             text: "Connect"
-            //enabled: checkControl.checked || checkObserve.checked || checkCancel.checked
-            enabled: checkControl.checked || checkObserve.checked
+            enabled: checkImpose.checked || checkNotImpose.checked
 
             activeFocusOnPress: true
 
@@ -353,26 +267,16 @@ I2PopupBase {
             }
 
             onClicked: {
-                // Close our popup
                 rootItem.close();
-
-                // CONTROL
-                if (checkControl.checked)
+                // Raise right signal
+                if (checkImpose.checked)
                 {
-                    // Emit the signal "Switch to Control"
-                    rootItem.switchToControl();
+                    rootItem.chooseImposeMapping();
                 }
-                // OBSERVE
-                else if (checkObserve.checked)
+                else if (checkNotImpose.checked)
                 {
-                    // Emit the signal "Stay to Observe"
-                    rootItem.stayToObserve();
+                    rootItem.chooseNotImposeMapping();
                 }
-                /*else if (checkCancel.checked)
-                {
-                    // Emit the signal "Cancel Mapping Activation"
-                    rootItem.cancelMappingActivation();
-                }*/
             }
         }
     }
