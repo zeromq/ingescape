@@ -2167,7 +2167,7 @@
 		976A923E23F3032300CAA795 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				976A92B323F3032300CAA795 /* libzmq.dylib */,
+				976A92B323F3032300CAA795 /* libzmq.5.2.3.dylib */,
 				976A92B523F3032300CAA795 /* libzmq.a */,
 				976A92B723F3032300CAA795 /* libobjects.a */,
 				976A92B923F3032300CAA795 /* test_ancillaries */,
@@ -2283,7 +2283,7 @@
 		976A938923F3032F00CAA795 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				976A93A223F3032F00CAA795 /* libczmq.dylib */,
+				976A93A223F3032F00CAA795 /* libczmq.4.2.1.dylib */,
 				976A93A423F3032F00CAA795 /* libczmq.a */,
 				976A93A623F3032F00CAA795 /* libczmq_objects.a */,
 				976A93A823F3032F00CAA795 /* czmq_selftest */,
@@ -2303,7 +2303,7 @@
 				976A93CF23F3033800CAA795 /* zpinger */,
 				976A93D123F3033800CAA795 /* ztester_beacon */,
 				976A93D323F3033800CAA795 /* ztester_gossip */,
-				976A93D523F3033800CAA795 /* libzyre.dylib */,
+				976A93D523F3033800CAA795 /* libzyre.2.0.1.dylib */,
 				976A93D723F3033800CAA795 /* libzyre.a */,
 				976A93D923F3033800CAA795 /* libzyre_objects.a */,
 				976A93DB23F3033800CAA795 /* zyre_selftest */,
@@ -3709,7 +3709,7 @@
 		979A79701EA7B0D6003153EF /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1020;
+				LastUpgradeCheck = 1140;
 				ORGANIZATIONNAME = "Ingenuity i/o";
 				TargetAttributes = {
 					9762EDCC1EAE5414002062A1 = {
@@ -3776,10 +3776,9 @@
 			remoteRef = 973D1BB12226916D00D363BF /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92B323F3032300CAA795 /* libzmq.dylib */ = {
+		976A92B323F3032300CAA795 /* libzmq.5.2.3.dylib */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
-			name = libzmq.dylib;
 			path = libzmq.5.2.3.dylib;
 			remoteRef = 976A92B223F3032300CAA795 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
@@ -4526,10 +4525,9 @@
 			remoteRef = 976A938623F3032300CAA795 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A93A223F3032F00CAA795 /* libczmq.dylib */ = {
+		976A93A223F3032F00CAA795 /* libczmq.4.2.1.dylib */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
-			name = libczmq.dylib;
 			path = libczmq.4.2.1.dylib;
 			remoteRef = 976A93A123F3032F00CAA795 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
@@ -4611,10 +4609,9 @@
 			remoteRef = 976A93D223F3033800CAA795 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A93D523F3033800CAA795 /* libzyre.dylib */ = {
+		976A93D523F3033800CAA795 /* libzyre.2.0.1.dylib */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
-			name = libzyre.dylib;
 			path = libzyre.2.0.1.dylib;
 			remoteRef = 976A93D423F3033800CAA795 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
@@ -4712,7 +4709,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = NO;
@@ -4745,7 +4742,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = NO;
