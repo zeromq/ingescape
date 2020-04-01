@@ -117,6 +117,8 @@ void igs_JSONaddDouble(igsJSON_t json, double value){
     }
 }
 void igs_JSONaddString(igsJSON_t json, const char *value){
+    if (value == NULL)
+        value = "";
     igsyajl_gen g = (igsyajl_gen) json;
     igsyajl_gen_status status = igsyajl_gen_string(g, (unsigned const char *)value, strlen(value));
     if (status != igsyajl_gen_status_ok){
