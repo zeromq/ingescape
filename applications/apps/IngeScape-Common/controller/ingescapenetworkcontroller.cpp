@@ -944,7 +944,7 @@ void IngeScapeNetworkController::updateAvailableNetworkDevices()
     setavailableNetworkDevices(networkDevices);
     setavailableNetworkDevicesAddresses(networkDeviceAddresses);
 
-    qInfo() << "Update available Network Devices:" << _availableNetworkDevices;
+//    qInfo() << "Update available Network Devices:" << _availableNetworkDevices;
 }
 
 

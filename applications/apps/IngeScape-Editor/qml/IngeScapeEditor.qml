@@ -162,7 +162,7 @@ Item {
         // FIXME Several popup may appear at startup depending on the current platform configuration. Need to prioritize them and maybe show them sequentialy, not on top of each other.
 
         // First, we check if ingescape should be started at launch
-        if (IngeScapeEditorC.ingescapeShouldBeStartedAtLaunch)
+        if (IngeScapeEditorC.editorShouldBeOnlineAndImposeMappingAtLaunch)
         {
             mappingModificationsPopup.open();
         }
@@ -330,7 +330,7 @@ Item {
 
                     style: CheckBoxStyle {
                         label: Text {
-                            text: qsTr("Impose platform's mapping on agents that connect to the network")
+                            text: qsTr("Impose platform's mapping on agents that arrive on the network")
                             elide: Text.ElideRight
                             wrapMode: Text.Wrap
 

@@ -47,15 +47,17 @@ class IngeScapeEditorController : public QObject
     Q_OBJECT
 
     // Network settings - network device
-    I2_QML_PROPERTY(QString, networkDevice)
+    I2_QML_PROPERTY_CUSTOM_SETTER(QString, networkDevice)
 
     // Network settings - ip address
     I2_QML_PROPERTY_READONLY(QString, ipAddress)
 
     // Network settings - port
-    I2_QML_PROPERTY(uint, port)
+    I2_QML_PROPERTY_CUSTOM_SETTER(uint, port)
 
-    I2_QML_PROPERTY_READONLY(bool, ingescapeShouldBeStartedAtLaunch)
+    // Flag indicating if editor was ONLINE and imposed mapping to agents ON last time
+    // At launch, allow us to open popup to warn user
+    I2_QML_PROPERTY_READONLY(bool, editorShouldBeOnlineAndImposeMappingAtLaunch)
 
     // Flag indicating if the Model/View Model Visualizer is available
     I2_QML_PROPERTY_READONLY(bool, isAvailableModelVisualizer)

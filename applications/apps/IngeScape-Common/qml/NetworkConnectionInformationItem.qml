@@ -117,11 +117,8 @@ I2CustomRectangle {
     // Open our widget
     function open()
     {
-        if (!rootPrivate.isEditionModeOpened)
+        if (!rootPrivate.isEditionModeOpened && rootPrivate.networkDevicesAvailable)
         {
-            // Update our list of available network devices
-            IgsNetworkController.updateAvailableNetworkDevices();
-
             // Update internal states
             rootPrivate.isEditionModeOpened = true;
 
@@ -183,8 +180,8 @@ I2CustomRectangle {
     onCurrentNetworkDeviceChanged: {
         if ((root.currentNetworkDevice === "") && rootPrivate.networkDevicesAvailable)
         {
-            // Open component to force user to make a choice
-            open();
+            selectNetworkDeviceCombobox.selectedIndex = -1;
+            open(); // Open component to force user to make a choice
         }
         else
         {
@@ -244,6 +241,9 @@ I2CustomRectangle {
                 hoverEnabled: true
 
                 onClicked: {
+                    // Update our list of available network devices
+                    IgsNetworkController.updateAvailableNetworkDevices();
+
                     if (rootPrivate.isEditionModeOpened)
                     {
                         root.close();

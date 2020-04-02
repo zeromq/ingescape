@@ -41,13 +41,12 @@ const QString IngeScapeEditorController::SPECIAL_EMPTY_LAST_PLATFORM = "empty";
 
 /**
  * @brief Constructor
- * @param parent
  */
 IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(parent),
     _networkDevice(""),
     _ipAddress(""),
     _port(0),
-    _ingescapeShouldBeStartedAtLaunch(false),
+    _editorShouldBeOnlineAndImposeMappingAtLaunch(false),
     _isAvailableModelVisualizer(false),
     _isVisibleModelVisualizer(false),
     _snapshotDirectory(""),
@@ -126,7 +125,10 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     settings.beginGroup("network");
     _networkDevice = settings.value("networkDevice", QVariant("")).toString();
     _ipAddress = settings.value("ipAddress", QVariant("")).toString();
-    _port = settings.value("port", QVariant(0)).toUInt();
+    _port = settings.value("port", QVariant(5670)).toUInt();
+
+
+
     qInfo() << "Network Device:" << _networkDevice << "-- IP address:" << _ipAddress << "-- Port" << QString::number(_port);
 
     bool wasAgentEditorStarted = settings.value("connected", true).toBool();
@@ -428,27 +430,45 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
         connect(IngescapeApplication::instance(), &IngescapeApplication::openFileRequest, this, &IngeScapeEditorController::_onOpenFileRequest);
     }
 
+
     //
-    // Try to find an available network device and start IngeScape (if it was started last time and _networkDevice available)
+    // Editor ONLINE/OFFLINE, mapping imposed/NOT imposed at launch ...
     //
 
-    if (!ingeScapeNetworkC->isAvailableNetworkDevice(_networkDevice))
+    ingeScapeNetworkC->updateAvailableNetworkDevices();
+    if (_networkDevice.isEmpty())
     {
-        // Last device choose is no more available, try to select another one with auto find
+        // User don't choose a network device last time (or it is first launch) ...
+        // Try to auto select one network device
         setnetworkDevice(_autoFindAnAvailableDevice());
     }
-    if (wasAgentEditorStarted && (_networkDevice != ""))
+
+    if (ingeScapeNetworkC->isAvailableNetworkDevice(_networkDevice))
     {
-        if (wasMappingImposed)
+        // Start monitoring to detect events relative to our network config
+        ingeScapeNetworkC->startMonitoring(_networkDevice, _port);
+
+        if (wasAgentEditorStarted && ingeScapeNetworkC->isAvailableNetworkDevice(_networkDevice))
         {
-            setingescapeShouldBeStartedAtLaunch(true); // TODO rename
-        }
-        else
-        {
-            // Start ingescape (_modelManager imposeMappingToAgentsON is FALSE)
-            startIngeScape();
+            // User was ONLINE last time (or it is first launch)
+            if (wasMappingImposed)
+            {
+                // Mapping was imposed, we verify with user
+                seteditorShouldBeOnlineAndImposeMappingAtLaunch(true);
+            }
+            else
+            {
+                // Mapping was NOT imposed, we can start ingescape
+                startIngeScape();
+            }
         }
     }
+    else
+    {
+        // Reset network device : user can't connect editor with this network device
+        setnetworkDevice("");
+    }
+
 
     //
     // Subscribe to system signals to interceipt interruption and termination signals
@@ -618,6 +638,42 @@ QObject* IngeScapeEditorController::qmlSingleton(QQmlEngine* engine, QJSEngine* 
     return new IngeScapeEditorController();
 }
 
+
+void IngeScapeEditorController::setnetworkDevice(QString value)
+{
+    if (value != _networkDevice)
+    {
+        _networkDevice = value;
+
+        // Restart monitoring to detect events relative to our new network config
+        if (!_networkDevice.isEmpty())
+        {
+            IngeScapeNetworkController::instance()->stopMonitoring();
+            IngeScapeNetworkController::instance()->startMonitoring(_networkDevice, _port);
+        }
+
+        qDebug() << "Set network device " << _networkDevice << " " << igs_isMonitoringEnabled();
+
+        Q_EMIT networkDeviceChanged(value);
+    }
+}
+
+void IngeScapeEditorController::setport(uint value)
+{
+    if (value != _port)
+    {
+        _port = value;
+
+        // Restart monitoring to detect events relative to our new network config
+        if (!_networkDevice.isEmpty())
+        {
+            IngeScapeNetworkController::instance()->stopMonitoring();
+            IngeScapeNetworkController::instance()->startMonitoring(_networkDevice, _port);
+        }
+
+        Q_EMIT portChanged(value);
+    }
+}
 
 /**
  * @brief Custom setter for the gettingStartedShowAtStartup property.
@@ -911,18 +967,10 @@ bool IngeScapeEditorController::startIngeScape()
     IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
     IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
 
-    // Always update available network devices (to have our qml list updated)
-    ingeScapeNetworkC->updateAvailableNetworkDevices();
-
     if ((ingeScapeNetworkC != nullptr) && (ingeScapeModelManager != nullptr)
             && (_modelManager != nullptr))
     {
-        if (!ingeScapeNetworkC->isAvailableNetworkDevice(_networkDevice))
-        {
-            // Selected device is no more available, try to select another one with auto find
-            setnetworkDevice(_autoFindAnAvailableDevice());
-        }
-        success = ingeScapeNetworkC->start(_networkDevice, _ipAddress, _port); // will failed if networkDevice = ""
+        success = ingeScapeNetworkC->start(_networkDevice, _ipAddress, _port); // will failed if networkDevice is not available
     }
     return success;
 }
@@ -1438,7 +1486,7 @@ void IngeScapeEditorController::_onLicenseLimitationReached()
 
 
 /**
- * @brief Called when our network device is not available
+ * @brief Called when our network device is no more available
  */
 void IngeScapeEditorController::_onNetworkDeviceIsNotAvailable()
 {
@@ -1446,8 +1494,9 @@ void IngeScapeEditorController::_onNetworkDeviceIsNotAvailable()
 
     if (IngeScapeNetworkController::instance()->isStarted())
     {
-        restartIngeScape();
+        stopIngeScape();
     }
+    setnetworkDevice("");
 }
 
 
@@ -1457,11 +1506,7 @@ void IngeScapeEditorController::_onNetworkDeviceIsNotAvailable()
 void IngeScapeEditorController::_onNetworkDeviceIsAvailableAgain()
 {
     qDebug() << Q_FUNC_INFO;
-    // Start IngeScape if not already started (it means that ingescape did not restart yet)
-    if (!IngeScapeNetworkController::instance()->isStarted())
-    {
-        startIngeScape();
-    }
+    // N.B. : If we want to restart our editor, it is here
 }
 
 
@@ -1484,9 +1529,11 @@ void IngeScapeEditorController::_onNetworkDeviceIpAddressHasChanged()
 void IngeScapeEditorController::_onSystemSleep()
 {
     qDebug() << Q_FUNC_INFO;
+    // Stop monitoring to save energy (will be relaunch on system wake)
+    IngeScapeNetworkController::instance()->stopMonitoring();
+
     if (IngeScapeNetworkController::instance()->isStarted())
     {
-        IngeScapeNetworkController::instance()->stopMonitoring(); // to save energy
         stopIngeScape();
     }
 }
@@ -1497,7 +1544,10 @@ void IngeScapeEditorController::_onSystemSleep()
  */
 void IngeScapeEditorController::_onSystemWake()
 {  
-    // DO nothing, editor is OFFLINE
+    // Restart monitoring to detect events relative to our expected network
+    IngeScapeNetworkController::instance()->startMonitoring(_networkDevice, _port);
+
+    // Not relaunch the editor, stay OFFLINE
 }
 
 
@@ -1507,15 +1557,6 @@ void IngeScapeEditorController::_onSystemWake()
 void IngeScapeEditorController::_onSystemNetworkConfigurationsUpdated()
 {
     IngeScapeNetworkController::instance()->updateAvailableNetworkDevices();
-
-    // TODO think about it
-    // If Ingescape is not started try to restarted if there is at least, one network device available
-    // N.B: useful when last network device is always unaivalable and another network device become available
-//    if ((!IngeScapeNetworkController::instance()->isStarted())
-//            && (IngeScapeNetworkController::instance()->availableNetworkDevices().count() > 0))
-//    {
-//        startIngeScape();
-//    }
 }
 
 
@@ -1806,6 +1847,7 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
 QString IngeScapeEditorController::_autoFindAnAvailableDevice()
 {
     IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
+    ingeScapeNetworkC->updateAvailableNetworkDevices();
     int nbDevices = ingeScapeNetworkC->availableNetworkDevices().count();
     QStringList devicesAddresses = ingeScapeNetworkC->availableNetworkDevicesAddresses();
     if (nbDevices == 1)
