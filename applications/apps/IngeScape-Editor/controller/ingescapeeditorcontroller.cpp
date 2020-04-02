@@ -432,7 +432,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
 
     //
-    // Editor ONLINE/OFFLINE, mapping imposed/NOT imposed at launch ...
+    // Editor ONLINE/OFFLINE, mapping imposed/NOT imposed at launch, open popup to warn user ...
     //
 
     // Configure impose/not impose mapping
@@ -452,11 +452,13 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
         // Start monitoring to detect events relative to our network config
         ingeScapeNetworkC->startMonitoring(_networkDevice, _port);
 
-        // Connect editor if necessar
+        // Connect editor if necessary
         if (wasAgentEditorStarted && ingeScapeNetworkC->isAvailableNetworkDevice(_networkDevice))
         {
             // User was ONLINE last time (or it is first launch)
-            if (_agentsMappingC->imposeMappingToAgentsON())
+            // N.B. : TODO FIXME : check first launch with existing .ini file is not the final solution
+            //        Maybe, we can use this popup when agents launch on network are radically different from our platform/there is no agents launched on network ?
+            if (_agentsMappingC->imposeMappingToAgentsON() && (!settings.areDefaultSettings()))
             {
                 // Mapping was imposed, we verify with user
                 seteditorShouldBeOnlineAndImposeMappingAtLaunch(true);
@@ -1472,10 +1474,7 @@ void IngeScapeEditorController::_onExpeExited(QString peerId, QString peerName)
 void IngeScapeEditorController::_onLicensesUpdated()
 {
     qDebug() << "on License Updated";
-    if (IngeScapeNetworkController::instance()->isStarted())
-    {
-        restartIngeScape();
-    }
+    // DO nothing
 }
 
 /**

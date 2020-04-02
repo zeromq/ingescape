@@ -331,9 +331,11 @@ int main(int argc, char *argv[])
         QString settingsDirectoryPath = IngeScapeUtils::getSettingsPath();
         QString settingsFilePath = QString("%1IngeScape-Editor.ini").arg(settingsDirectoryPath);
 
+        bool areDefaultSettings = false;
         QFile settingsFile(settingsFilePath);
         if (!settingsFile.exists())
         {
+            areDefaultSettings = true;
             // Copy our .ini file
             if (QFile::copy(":/settings/IngeScape-Editor.ini", settingsFilePath))
             {
@@ -355,7 +357,7 @@ int main(int argc, char *argv[])
         if (settingsFile.exists()) {
             // Load our settings
             IngeScapeSettings &settings = IngeScapeSettings::Instance(settingsFilePath);
-
+            settings.setareDefaultSettings(areDefaultSettings);
             qDebug() << "Settings" << settings.fileName();
         }
     }
@@ -402,7 +404,6 @@ int main(int argc, char *argv[])
     // Register our custom QML types
     //
     registerCustomQmlTypes();
-
 
 
     //

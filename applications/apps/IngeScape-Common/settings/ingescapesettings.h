@@ -10,7 +10,7 @@
  *	Contributors:
  *      Alexandre Lemort    <lemort@ingenuity.io>
  *      Vincent Peyruqueou  <peyruqueou@ingenuity.io>
- *
+ *      Chloé Roumieu       <roumieu@ingenuity.io>
  */
 
 #ifndef INGESCAPESETTINGS_H
@@ -27,6 +27,11 @@
  */
 class IngeScapeSettings : public QSettings
 {
+
+    // Flag indicating if settings loaded are from default file .ini in our application (must be set in main)
+    // Used to know if it is the first time that user launch app
+   I2_CPP_NOSIGNAL_PROPERTY(bool, areDefaultSettings)
+
 
 public:
 

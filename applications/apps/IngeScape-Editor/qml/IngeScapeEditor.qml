@@ -401,7 +401,11 @@ Item {
                 IngeScapeEditorC.networkDevice = networkDevice;
                 if (IgsNetworkController.isStarted)
                 {
-                     IngeScapeEditorC.restartIngeScape();
+                    if (IngeScapeEditorC.agentsMappingC)
+                    {
+                        IngeScapeEditorC.agentsMappingC.imposeMappingToAgentsON = false;
+                    }
+                    IngeScapeEditorC.restartIngeScape();
                 }
             }
         }
