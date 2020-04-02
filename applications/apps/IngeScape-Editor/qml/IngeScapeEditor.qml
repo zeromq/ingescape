@@ -310,7 +310,7 @@ Item {
                         topMargin: 10
                     }
 
-                    checked: IngeScapeEditorC.modelManager.imposeMappingToAgentsON
+                    checked: IngeScapeEditorC.agentsMappingC.imposeMappingToAgentsON
                     activeFocusOnPress: true
 
                     style: CheckBoxStyle {
@@ -358,14 +358,17 @@ Item {
                         else
                         {
                             // No risk: Editor is OFFLINE or Editor is ONLINE and user don't want to impose mapping
-                            IngeScapeEditorC.modelManager.imposeMappingToAgentsON = checked;
+                            if (IngeScapeEditorC.agentsMappingC)
+                            {
+                                IngeScapeEditorC.agentsMappingC.imposeMappingToAgentsON = checked;
+                            }
                         }
                     }
 
                     Binding {
                         target: imposeMappingToAgentsON
                         property: "checked"
-                        value: IngeScapeEditorC.modelManager.imposeMappingToAgentsON
+                        value: (IngeScapeEditorC.agentsMappingC && IngeScapeEditorC.agentsMappingC.imposeMappingToAgentsON)
                     }
                 }
             }
@@ -377,9 +380,9 @@ Item {
                 }
                 else
                 {
-                    if (IngeScapeEditorC.modelManager)
+                    if (IngeScapeEditorC.agentsMappingC)
                     {
-                        if (IngeScapeEditorC.modelManager.imposeMappingToAgentsON)
+                        if (IngeScapeEditorC.agentsMappingC.imposeMappingToAgentsON)
                         {
                             // Open popup to warn the user that he can modify existing mappings on the network
                             warnImposeMappingPopup.open();
@@ -837,7 +840,7 @@ Item {
     //
     // Popup to warn user that he is about to apply its mapping on the network
     //
-    //N.B: this popup appears only when editor 1) is online and user check impose mapping or 2) is offline and user had check impose mapping and user try to connect
+    // N.B: this popup appears only when editor 1) is online and user check impose mapping or 2) is offline and user had check impose mapping and user try to connect
     ConfirmationPopup {
         id: warnImposeMappingPopup
         width: 600
@@ -846,9 +849,9 @@ Item {
 
         onConfirmed: {
             // Change impose mapping : we are in case (1) of our popup opening
-            if (IngeScapeEditorC.modelManager)
+            if (IngeScapeEditorC.agentsMappingC)
             {
-                IngeScapeEditorC.modelManager.imposeMappingToAgentsON = true;
+                IngeScapeEditorC.agentsMappingC.imposeMappingToAgentsON = true;
             }
 
             // Start editor if not : we are in case (2) of our popup opening

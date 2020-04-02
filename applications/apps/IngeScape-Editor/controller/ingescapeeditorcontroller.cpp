@@ -225,7 +225,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _recordsSupervisionC = new RecordsSupervisionController(this);
 
     // Create the controller to manage the agents mapping
-    _agentsMappingC = new AgentsMappingController(_modelManager, this);
+    _agentsMappingC = new AgentsMappingController(this);
 
     // Create the controller to manage the call home at startup
     _callHomeC = new CallHomeController(this);
@@ -436,7 +436,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     //
 
     // Configure impose/not impose mapping
-    _modelManager->setimposeMappingToAgentsON(wasMappingImposed);
+    _agentsMappingC->setimposeMappingToAgentsON(wasMappingImposed);
 
     // Network device choice handle
     ingeScapeNetworkC->updateAvailableNetworkDevices();
@@ -456,7 +456,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
         if (wasAgentEditorStarted && ingeScapeNetworkC->isAvailableNetworkDevice(_networkDevice))
         {
             // User was ONLINE last time (or it is first launch)
-            if (_modelManager->imposeMappingToAgentsON())
+            if (_agentsMappingC->imposeMappingToAgentsON())
             {
                 // Mapping was imposed, we verify with user
                 seteditorShouldBeOnlineAndImposeMappingAtLaunch(true);
@@ -721,7 +721,7 @@ void IngeScapeEditorController::loadPlatformFromSelectedFile()
         if (IngeScapeNetworkController::instance()->isStarted() && (_modelManager != nullptr))
         {
             // if we are connected, we don't impose mapping to the network anymore
-            _modelManager->setimposeMappingToAgentsON(false);
+            _agentsMappingC->setimposeMappingToAgentsON(false);
         }
         _clearAndLoadPlatformFromFile(platformFilePath);
     }
@@ -778,7 +778,7 @@ void IngeScapeEditorController::createNewPlatform()
     if (IngeScapeNetworkController::instance()->isStarted() && (_modelManager != nullptr))
     {
         // if we are connected, we don't impose mapping to the network anymore
-        _modelManager->setimposeMappingToAgentsON(false);
+        _agentsMappingC->setimposeMappingToAgentsON(false);
     }
 
     // Update the current platform name
@@ -806,7 +806,7 @@ void IngeScapeEditorController::processBeforeClosing()
     settings.endGroup();
 
     settings.beginGroup("mapping");
-    settings.setValue("imposedToNetwork", _modelManager->imposeMappingToAgentsON());
+    settings.setValue("imposedToNetwork", _agentsMappingC->imposeMappingToAgentsON());
     settings.endGroup();
 
     settings.beginGroup("platform");

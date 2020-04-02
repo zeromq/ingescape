@@ -19,7 +19,7 @@
 #include <QObject>
 #include <QtQml>
 #include <I2PropertyHelpers.h>
-#include <controller/editormodelmanager.h>
+#include <controller/ingescapemodelmanager.h>
 #include <viewModel/agentinmappingvm.h>
 #include <viewModel/mapping/actioninmappingvm.h>
 #include <viewModel/link/linkvm.h>
@@ -31,6 +31,9 @@
 class AgentsMappingController : public QObject
 {
     Q_OBJECT
+
+    // Flag indicating if the editor impose its mapping to agents that arrived on the network when it is ONLINE
+    I2_QML_PROPERTY(bool, imposeMappingToAgentsON)
 
     // Size of the mapping view
     I2_QML_PROPERTY_FUZZY_COMPARE(double, viewWidth)
@@ -69,13 +72,12 @@ class AgentsMappingController : public QObject
 
 public:
 
-    explicit AgentsMappingController(EditorModelManager* modelManager,
-                                     QObject *parent = nullptr);
+    explicit AgentsMappingController(QObject *parent = nullptr);
     ~AgentsMappingController();
 
 
     /**
-     * @brief Clear the current mapping
+     * @brief Delete all agents OFF and their mappings and all actions
      */
     void clearMapping();
 
@@ -452,9 +454,6 @@ private:
 
 
 private:
-
-    // Manager for the data model of IngeScape
-    EditorModelManager* _modelManager;
 
     // Hash table from agent name to the (view model of) agent in mapping
     QHash<QString, AgentInMappingVM*> _hashFromNameToAgentInMapping;

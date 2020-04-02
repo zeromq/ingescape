@@ -56,8 +56,7 @@
  * @brief Constructor
  * @param parent
  */
-EditorModelManager::EditorModelManager(QObject *parent) : QObject(parent),
-    _imposeMappingToAgentsON(false)
+EditorModelManager::EditorModelManager(QObject *parent) : QObject(parent)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);

@@ -22,8 +22,8 @@
 #include <controller/ingescapenetworkcontroller.h>
 
 
-AgentsMappingController::AgentsMappingController(EditorModelManager* modelManager,
-                                                 QObject *parent) : QObject(parent),
+AgentsMappingController::AgentsMappingController(QObject *parent) : QObject(parent),
+      _imposeMappingToAgentsON(false),
       _viewWidth(1920 - 320), // Full HD - Width of left panel
       _viewHeight(1080 - 100), // Full HD - Height of top & bottom bars of OS
       _xSpawnZoneOffset(0),
@@ -32,8 +32,7 @@ AgentsMappingController::AgentsMappingController(EditorModelManager* modelManage
       _selectedAgent(nullptr),
       _selectedAction(nullptr),
       _selectedLink(nullptr),
-      _isLoadedView(false),
-      _modelManager(modelManager)
+      _isLoadedView(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -84,9 +83,6 @@ AgentsMappingController::~AgentsMappingController()
     // Delete all actions in the mapping
     _hashFromUidToActionInMapping.clear();
     _allActionsInMapping.deleteAllItems();
-
-    // Reset pointers
-    _modelManager = nullptr;
 }
 
 
@@ -1294,13 +1290,13 @@ void AgentsMappingController::_onAllAgentsInMappingChanged()
  */
 void AgentsMappingController::_onAgentIsONChanged(bool isON)
 {
-    if (isON && (_modelManager != nullptr))
+    if (isON)
     {
         AgentsGroupedByNameVM* agentsGroupedByName = qobject_cast<AgentsGroupedByNameVM*>(sender());
         AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentsGroupedByName->name());
         if (agentInMapping != nullptr)
         {
-            if (_modelManager->imposeMappingToAgentsON())
+            if (_imposeMappingToAgentsON)
             {
                 // We IMPOSE the mapping of agent that connect on our network
                 // Send the message "LOAD THIS MAPPING" to this agent with our current mapping
@@ -1355,9 +1351,9 @@ void AgentsMappingController::_onAgentIsONChanged(bool isON)
 void AgentsMappingController::_onAgentModelONhasBeenAdded(AgentM* model)
 {
     // Model of Agent ON
-    if ((model != nullptr) && model->isON() && !model->name().isEmpty() && !model->peerId().isEmpty() && (_modelManager != nullptr))
+    if ((model != nullptr) && model->isON() && !model->name().isEmpty() && !model->peerId().isEmpty())
     {
-        if (_modelManager->imposeMappingToAgentsON())
+        if (_imposeMappingToAgentsON)
         {
             // We IMPOSE the mapping of agent that connect on our network
             // Send the message "CLEAR MAPPING" to this agent

@@ -28,9 +28,6 @@ class EditorModelManager : public QObject
 {
     Q_OBJECT
 
-    // Flag indicating if the eidtor impose its mapping to agents that arrived on the network
-    I2_QML_PROPERTY(bool, imposeMappingToAgentsON)
-
     // List of opened definitions
     I2_QOBJECT_LISTMODEL(DefinitionM, openedDefinitions)
 
