@@ -431,6 +431,105 @@ char* igs_JSONTreeDump(igsJSONTreeNode_t *value){
     return res;
 }
 
+igsJSONTreeNode_t* igs_JSONTreeClone(igsJSONTreeNode_t *root){
+    if (root == NULL)
+        return NULL;
+    igsJSONTreeNode_t *result = calloc(1, sizeof(igsJSONTreeNode_t));
+    result->type = root->type;
+    
+    switch (root->type) {
+        case IGS_JSON_STRING:
+            result->u.string = strdup(root->u.string);
+            break;
+        case IGS_JSON_NUMBER:
+            if (igs_JSONTreeIsValueAnInteger(root)){
+                result->u.number.i = root->u.number.i;
+            }else{
+                result->u.number.d = root->u.number.d;
+            }
+            if (root->u.number.r != NULL)
+                result->u.number.r = strdup(root->u.number.r);
+            result->u.number.flags = root->u.number.flags;
+            break;
+        case IGS_JSON_MAP: //igsyajl_t_object
+            result->u.object.len = root->u.object.len;
+            result->u.object.keys = calloc(root->u.object.len, sizeof(char*));
+            result->u.object.values = calloc(root->u.object.len, sizeof(igsJSONTreeNode_t*));
+            for (size_t i = 0; i < root->u.object.len; i++){
+                result->u.object.keys[i] = strdup(root->u.object.keys[i]);
+                result->u.object.values[i] = igs_JSONTreeClone(root->u.object.values[i]);
+            }
+            break;
+        case IGS_JSON_ARRAY: //igsyajl_t_array
+            result->u.array.len = root->u.array.len;
+            result->u.array.values = calloc(root->u.array.len, sizeof(igsJSONTreeNode_t*));
+            for (size_t i = 0; i < root->u.array.len; i++){
+                result->u.array.values[i] = igs_JSONTreeClone(root->u.array.values[i]);
+            }
+            break;
+        case IGS_JSON_TRUE:
+            result->u.number.i = true;
+            if (root->u.number.r != NULL)
+                result->u.number.r = strdup(root->u.number.r);
+            result->u.number.flags = root->u.number.flags;
+            break;
+        case IGS_JSON_FALSE:
+            result->u.number.i = false;
+            if (root->u.number.r != NULL)
+                result->u.number.r = strdup(root->u.number.r);
+            result->u.number.flags = root->u.number.flags;
+            break;
+        case IGS_JSON_NULL:
+            break;
+        default:
+            break;
+    }
+    return result;
+}
+
+void igs_JSONaddTree(igsJSON_t json, igsJSONTreeNode_t *tree){
+    if (tree == NULL || json == NULL)
+        return;
+    switch (tree->type) {
+        case IGS_JSON_STRING:
+            igs_JSONaddString(json, tree->u.string);
+            break;
+        case IGS_JSON_NUMBER:
+            if (igs_JSONTreeIsValueAnInteger(tree)){
+                igs_JSONaddInt(json, tree->u.number.i);
+            }else{
+                igs_JSONaddDouble(json, tree->u.number.d);
+            }
+            break;
+        case IGS_JSON_MAP: //igsyajl_t_object
+            igs_JSONopenMap(json);
+            for (size_t i = 0; i < tree->u.object.len; i++){
+                igs_JSONaddString(json, tree->u.object.keys[i]);
+                igs_JSONaddTree(json, tree->u.object.values[i]);
+            }
+            igs_JSONcloseMap(json);
+            break;
+        case IGS_JSON_ARRAY: //igsyajl_t_array
+            igs_JSONopenArray(json);
+            for (size_t i = 0; i < tree->u.array.len; i++){
+                igs_JSONaddTree(json, tree->u.array.values[i]);
+            }
+            igs_JSONcloseArray(json);
+            break;
+        case IGS_JSON_TRUE:
+            igs_JSONaddBool(json, true);
+            break;
+        case IGS_JSON_FALSE:
+            igs_JSONaddBool(json, false);
+            break;
+        case IGS_JSON_NULL:
+            igs_JSONaddNULL(json);
+            break;
+        default:
+            break;
+    }
+}
+
 // TEST SCRIPT
 // to be copied and compiled as a main.c file
 //
