@@ -435,6 +435,10 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     // Editor ONLINE/OFFLINE, mapping imposed/NOT imposed at launch ...
     //
 
+    // Configure impose/not impose mapping
+    _modelManager->setimposeMappingToAgentsON(wasMappingImposed);
+
+    // Network device choice handle
     ingeScapeNetworkC->updateAvailableNetworkDevices();
     if (_networkDevice.isEmpty())
     {
@@ -448,10 +452,11 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
         // Start monitoring to detect events relative to our network config
         ingeScapeNetworkC->startMonitoring(_networkDevice, _port);
 
+        // Connect editor if necessar
         if (wasAgentEditorStarted && ingeScapeNetworkC->isAvailableNetworkDevice(_networkDevice))
         {
             // User was ONLINE last time (or it is first launch)
-            if (wasMappingImposed)
+            if (_modelManager->imposeMappingToAgentsON())
             {
                 // Mapping was imposed, we verify with user
                 seteditorShouldBeOnlineAndImposeMappingAtLaunch(true);
@@ -978,9 +983,6 @@ bool IngeScapeEditorController::startIngeScape()
 
 void IngeScapeEditorController::stopIngeScape()
 {
-    // Deactivate mapping distribution each time our editor is OFFLINE
-    _modelManager->setimposeMappingToAgentsON(false);
-
     IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
 
     if ((ingeScapeNetworkC != nullptr) && (_modelManager != nullptr))

@@ -26,7 +26,6 @@
         <file>qml/agent/AgentFilesPaths.qml</file>
         <file>qml/agent/LogStreamPanel.qml</file>
         <file>qml/popup/MessagePopup.qml</file>
-        <file>qml/popup/MappingModificationsPopup.qml</file>
         <file>qml/scenario/IngeScapeComboboxItemModel.qml</file>
         <file>qml/scenario/IngeScapeComboboxItemModelAgentsIOP.qml</file>
         <file>qml/scenario/IngeScapeToolTipComboboxDelegateAgentsIOP.qml</file>

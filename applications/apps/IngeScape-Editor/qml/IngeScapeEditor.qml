@@ -164,7 +164,7 @@ Item {
         // First, we check if ingescape should be started at launch
         if (IngeScapeEditorC.editorShouldBeOnlineAndImposeMappingAtLaunch)
         {
-            mappingModificationsPopup.open();
+            warnImposeMappingPopup.open();
         }
 
         // ...we check the value of the flag "is Valid License"
@@ -287,22 +287,7 @@ Item {
                     left: parent.left
                     right: parent.right
                 }
-                height: IgsNetworkController.isStarted ? 50 : 0
-
-                opacity: IgsNetworkController.isStarted ? 1 : 0
-                visible:  (height !== 0)
-
-                Behavior on height {
-                    NumberAnimation {
-                        duration: 250
-                    }
-                }
-
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: 250
-                    }
-                }
+                height: 50
 
                 // Separator
                 Rectangle {
@@ -339,7 +324,8 @@ Item {
                                 weight: Font.Normal
                                 pixelSize: 14
                             }
-                            color: control.checked ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor
+                            color: (IgsNetworkController.isStarted && control.checked) ? IngeScapeTheme.whiteColor
+                                                                                       : IngeScapeTheme.lightGreyColor
                         }
 
                         spacing: 7
@@ -361,8 +347,19 @@ Item {
                         }
                     }
 
-                    onCheckedChanged: {
-                        IngeScapeEditorC.modelManager.imposeMappingToAgentsON = checked;
+                    onClicked: {
+                        if (IgsNetworkController.isStarted && checked)
+                        {
+                            // User wants to impose mapping while editor is ONLINE
+                            // open popup to warn him that he can modify existing mappings on the network
+                            checked = false;
+                            warnImposeMappingPopup.open();
+                        }
+                        else
+                        {
+                            // No risk: Editor is OFFLINE or Editor is ONLINE and user don't want to impose mapping
+                            IngeScapeEditorC.modelManager.imposeMappingToAgentsON = checked;
+                        }
                     }
 
                     Binding {
@@ -380,14 +377,18 @@ Item {
                 }
                 else
                 {
-                    if (IngeScapeEditorC.modelManager && IngeScapeEditorC.agentsMappingC && IngeScapeEditorC.agentsMappingC.isEmptyMapping)
+                    if (IngeScapeEditorC.modelManager)
                     {
-                        IngeScapeEditorC.modelManager.imposeMappingToAgentsON = false;
-                        IngeScapeEditorC.startIngeScape();
-                    }
-                    else
-                    {
-                        mappingModificationsPopup.open();
+                        if (IngeScapeEditorC.modelManager.imposeMappingToAgentsON)
+                        {
+                            // Open popup to warn the user that he can modify existing mappings on the network
+                            warnImposeMappingPopup.open();
+                        }
+                        else
+                        {
+                            // Start ingescape (not impose mapping)
+                            IngeScapeEditorC.startIngeScape();
+                        }
                     }
                 }
             }
@@ -830,37 +831,35 @@ Item {
     //
     Popup.RemoteNotificationPopup {
         id: notifPopup
-
         anchors.centerIn: parent
     }
 
     //
-    // Mapping Modifications Popup
+    // Popup to warn user that he is about to apply its mapping on the network
     //
-    Popup.MappingModificationsPopup {
-        id: mappingModificationsPopup
+    //N.B: this popup appears only when editor 1) is online and user check impose mapping or 2) is offline and user had check impose mapping and user try to connect
+    ConfirmationPopup {
+        id: warnImposeMappingPopup
+        width: 600
 
-        onStayDisconnect: {
-//            console.log("on Stay disconnect");
-            IngeScapeEditorC.stopIngeScape();
-        }
+        confirmationText: qsTr("Be careful, you could lose existing mappings on the network.\nDo you want to impose your mappings on agents that will arrive on the network ?")
 
-        onChooseImposeMapping: {
-//            console.log("on Switch To Mapping imposed");
+        onConfirmed: {
+            // Change impose mapping : we are in case (1) of our popup opening
             if (IngeScapeEditorC.modelManager)
             {
                 IngeScapeEditorC.modelManager.imposeMappingToAgentsON = true;
+            }
+
+            // Start editor if not : we are in case (2) of our popup opening
+            if (!IgsNetworkController.isStarted)
+            {
                 IngeScapeEditorC.startIngeScape();
             }
         }
 
-        onChooseNotImposeMapping : {
-//            console.log("on Switch To Mapping NOT imposed");
-            if (IngeScapeEditorC.modelManager)
-            {
-                IngeScapeEditorC.modelManager.imposeMappingToAgentsON = false;
-                IngeScapeEditorC.startIngeScape();
-            }
+        onCancelled: {
+            // DO nothing
         }
     }
 
