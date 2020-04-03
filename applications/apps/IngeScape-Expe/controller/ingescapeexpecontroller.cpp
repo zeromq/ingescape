@@ -39,7 +39,6 @@ IngeScapeExpeController::IngeScapeExpeController(QObject *parent) : QObject(pare
     _timeLineState(TimeLineStates::STOPPED),
     //_isRecording(false),
     _terminationSignalWatcher(nullptr),
-    _beforeNetworkStop_isMappingConnected(true),
     _platformDirectoryPath(""),
     _withRecord(true)
 {
@@ -572,12 +571,6 @@ bool IngeScapeExpeController::_startIngeScape(bool checkAvailableNetworkDevices)
 
         // Start our IngeScape agent with the network device and the port
         success = ingeScapeNetworkC->start(_networkDevice, _ipAddress, _port);
-
-        if (success)
-        {
-            // Re-enable mapping
-            ingeScapeModelManager->setisMappingConnected(_beforeNetworkStop_isMappingConnected);
-        }
     }
 
     if (!success && !_networkDevice.isEmpty())
@@ -636,13 +629,6 @@ void IngeScapeExpeController::_stopIngeScape(bool hasToClearPlatform)
         {
             qInfo() << "Stop the network on" << _networkDevice << "with" << _port << "(and KEEP the current platform)";
         }
-
-        // Save states of our mapping if needed
-        _beforeNetworkStop_isMappingConnected = ingeScapeModelManager->isMappingConnected();
-
-
-        // Disable mapping
-        ingeScapeModelManager->setisMappingConnected(false);
 
         // Stop our IngeScape agent
         ingeScapeNetworkC->stop();

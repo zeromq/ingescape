@@ -250,9 +250,6 @@ private:
     // To subscribe to termination signals
     TerminationSignalWatcher *_terminationSignalWatcher;
 
-    // States of our mapping when our network was stopped
-    bool _beforeNetworkStop_isMappingConnected;
-
     // Path to the directory containing JSON files about platforms
     QString _platformDirectoryPath;
 

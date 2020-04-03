@@ -1397,9 +1397,6 @@ void IngeScapeNetworkController::removeInputsFromOurApplicationForAgentOutputs(Q
 
                 QString inputName = QString("%1%2%3").arg(agentName, SEPARATOR_AGENT_NAME_AND_IOP, outputId);
 
-                // The mapping is activated (connected)
-                //if (isMappingConnected)
-                //{
                 // Remove mapping between our input and this output
                 int resultRemoveMappingEntry = igs_removeMappingEntryWithName(inputName.toStdString().c_str(), agentName.toStdString().c_str(), outputName.toStdString().c_str());
 
@@ -1410,7 +1407,6 @@ void IngeScapeNetworkController::removeInputsFromOurApplicationForAgentOutputs(Q
                 else {
                     qCritical() << "Can NOT remove mapping between output" << outputName << "of agent" << agentName << "and input" << inputName << "of agent" << _igsAgentApplicationName << "Error code:" << resultRemoveMappingEntry;
                 }
-                //}
 
                 // Remove our input
                 int resultRemoveInput = igs_removeInput(inputName.toStdString().c_str());
