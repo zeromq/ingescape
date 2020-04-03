@@ -315,7 +315,7 @@ Item {
 
                     style: CheckBoxStyle {
                         label: Text {
-                            text: qsTr("Impose platform's mapping on agents that arrive on the network")
+                            text: qsTr("Apply platform mapping to connected agents")
                             elide: Text.ElideRight
                             wrapMode: Text.Wrap
 
@@ -849,7 +849,7 @@ Item {
         id: warnImposeMappingPopup
         width: 600
 
-        confirmationText: qsTr("Be careful, you could lose existing mappings on the network.\nDo you want to impose your mappings on agents that will arrive on the network ?")
+        confirmationText: qsTr("Do you want to apply your platform mapping to connected agents ?\nAll agents will overwrite their current mapping.")
 
         onConfirmed: {
             // Change impose mapping : we are in case (1) of our popup opening
@@ -866,7 +866,17 @@ Item {
         }
 
         onCancelled: {
-            // DO nothing
+            // Change impose mapping : we are in case (1) of our popup opening
+            if (IngeScapeEditorC.agentsMappingC)
+            {
+                IngeScapeEditorC.agentsMappingC.imposeMappingToAgentsON = false;
+            }
+
+            // Start editor if not : we are in case (2) of our popup opening
+            if (!IgsNetworkController.isStarted)
+            {
+                IngeScapeEditorC.startIngeScape();
+            }
         }
     }
 
