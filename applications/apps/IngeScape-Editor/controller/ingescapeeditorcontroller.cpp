@@ -41,12 +41,12 @@ const QString IngeScapeEditorController::SPECIAL_EMPTY_LAST_PLATFORM = "empty";
 
 /**
  * @brief Constructor
- * @param parent
  */
 IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(parent),
     _networkDevice(""),
     _ipAddress(""),
     _port(0),
+    _editorShouldBeOnlineAndImposeMappingAtLaunch(false),
     _isAvailableModelVisualizer(false),
     _isVisibleModelVisualizer(false),
     _snapshotDirectory(""),
@@ -67,10 +67,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _platformNameBeforeLoadReplay(""),
     _terminationSignalWatcher(nullptr),
     _platformDirectoryPath(""),
-    _currentPlatformFilePath(""),
-    // Connect mapping in control mode
-    _beforeNetworkStop_isMappingConnected(true),
-    _beforeNetworkStop_isMappingControlled(true)
+    _currentPlatformFilePath("")
 {
     qInfo() << "New IngeScape Editor Controller";
 
@@ -124,60 +121,43 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     //------------------
     IngeScapeSettings &settings = IngeScapeSettings::Instance();
 
-    //
-    // Settings about the "Network"
-    //
+    // NETWORK settings
     settings.beginGroup("network");
-
-    // networkDevice saved is only checked if there is more than 1 network device available
-    // in method _startIngescape
-//    _networkDevice = settings.value("networkDevice", QVariant("")).toString();
+    _networkDevice = settings.value("networkDevice", QVariant("")).toString();
     _ipAddress = settings.value("ipAddress", QVariant("")).toString();
-    _port = settings.value("port", QVariant(0)).toUInt();
+    _port = settings.value("port", QVariant(5670)).toUInt();
+
+
+
     qInfo() << "Network Device:" << _networkDevice << "-- IP address:" << _ipAddress << "-- Port" << QString::number(_port);
 
+    bool wasAgentEditorStarted = settings.value("connected", true).toBool();
     settings.endGroup();
 
+    // MAPPING settings
+    settings.beginGroup("mapping");
+    bool wasMappingImposed = settings.value("imposedToNetwork", true).toBool();
+    settings.endGroup();
 
-    //
-    // Settings about "Debug"
-    //
+    // DEBUG settings
     settings.beginGroup("debug");
-
 #ifdef QT_DEBUG
     _isAvailableModelVisualizer = true;
 #else
     _isAvailableModelVisualizer = settings.value("modelVisualizer", QVariant(false)).toBool();
 #endif
     qDebug() << "The Model/View Model Visualizer is available ?" << _isAvailableModelVisualizer;
-
     settings.endGroup();
 
-
-    //
-    // Settings about "Platform"
-    //
+    // PLATFORM settings
     settings.beginGroup("platform");
     _currentPlatformFilePath = settings.value("last", platformDefaultFilePath).toString();
     settings.endGroup();
 
-
-    //
-    // Settings about "Help"
-    //
+    // HELP settings
     settings.beginGroup("help");
     _gettingStartedShowAtStartup = settings.value("showAtStartup", true).toBool();
     settings.endGroup();
-
-
-    //
-    // Settings about "Mapping mode and connect/disconnect"
-    //
-    settings.beginGroup("mapping");
-    _beforeNetworkStop_isMappingConnected = settings.value("connected", true).toBool();
-    _beforeNetworkStop_isMappingControlled = settings.value("controlled", true).toBool();
-    settings.endGroup();
-
 
     //-------------------------------
     //
@@ -245,7 +225,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _recordsSupervisionC = new RecordsSupervisionController(this);
 
     // Create the controller to manage the agents mapping
-    _agentsMappingC = new AgentsMappingController(_modelManager, this);
+    _agentsMappingC = new AgentsMappingController(this);
 
     // Create the controller to manage the call home at startup
     _callHomeC = new CallHomeController(this);
@@ -262,9 +242,11 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
     // Connect to signals from our licenses manager
     connect(_licensesC, &LicensesController::licensesUpdated, this, &IngeScapeEditorController::_onLicensesUpdated);
-
+    connect(_licensesC, &LicensesController::licenseLimitationReached, this, &IngeScapeEditorController::_onLicenseLimitationReached);
 
     // Connect to signals from network controllers
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::isStartedChanged, this, &IngeScapeEditorController::_onAgentEditorStartedOrStopped);
+
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::networkDeviceIsNotAvailable, this, &IngeScapeEditorController::_onNetworkDeviceIsNotAvailable);
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::networkDeviceIsAvailableAgain, this, &IngeScapeEditorController::_onNetworkDeviceIsAvailableAgain);
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::networkDeviceIpAddressHasChanged, this, &IngeScapeEditorController::_onNetworkDeviceIpAddressHasChanged);
@@ -313,9 +295,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
 
     // Connect to signals from model managers
-    connect(ingeScapeModelManager, &IngeScapeModelManager::isMappingConnectedChanged, _agentsMappingC, &AgentsMappingController::onIsMappingConnectedChanged);
-    connect(ingeScapeModelManager, &IngeScapeModelManager::isMappingConnectedChanged, ingeScapeNetworkC, &IngeScapeNetworkController::onIsMappingConnectedChanged);
-
     connect(ingeScapeModelManager, &IngeScapeModelManager::agentModelHasBeenCreated, _hostsSupervisionC, &HostsSupervisionController::onAgentModelHasBeenCreatedORonAgentModelBackOnNetwork);
     connect(ingeScapeModelManager, &IngeScapeModelManager::agentModelWillBeDeleted, _hostsSupervisionC, &HostsSupervisionController::onAgentModelWillBeDeleted);
 
@@ -367,7 +346,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
         // Emit the signal "Previous Host Parsed" to create the fake host "HOSTNAME_NOT_DEFINED"
         Q_EMIT ingeScapeModelManager->previousHostParsed(HOSTNAME_NOT_DEFINED);
     }
-
 
 
     // Check if there is a pending "open file" request
@@ -437,9 +415,9 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
         }
     }
 
-
-
+    //
     // Application
+    //
     if (IngescapeApplication::instance() != nullptr)
     {
         // Check if there is a pending "open file" request (agent(s) definition (.igsdefinition) or license file (.igslicense))
@@ -454,10 +432,49 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
 
     //
-    // Start IngeScape
+    // Editor ONLINE/OFFLINE, mapping imposed/NOT imposed at launch, open popup to warn user ...
     //
-    // Check for an available device and start Ingescape
-    _startIngeScape(true);
+
+    // Configure impose/not impose mapping
+    _agentsMappingC->setimposeMappingToAgentsON(wasMappingImposed);
+
+    // Network device choice handle
+    ingeScapeNetworkC->updateAvailableNetworkDevices();
+    if (_networkDevice.isEmpty())
+    {
+        // User don't choose a network device last time (or it is first launch) ...
+        // Try to auto select one network device
+        setnetworkDevice(_autoFindAnAvailableDevice());
+    }
+
+    if (ingeScapeNetworkC->isAvailableNetworkDevice(_networkDevice))
+    {
+        // Start monitoring to detect events relative to our network config
+        ingeScapeNetworkC->startMonitoring(_networkDevice, _port);
+
+        // Connect editor if necessary
+        if (wasAgentEditorStarted && ingeScapeNetworkC->isAvailableNetworkDevice(_networkDevice))
+        {
+            // User was ONLINE last time (or it is first launch)
+            // N.B. : TODO FIXME : check first launch with existing .ini file is not the final solution
+            //        Maybe, we can use this popup when agents launch on network are radically different from our platform/there is no agents launched on network ?
+            if (_agentsMappingC->imposeMappingToAgentsON() && (!settings.areDefaultSettings()))
+            {
+                // Mapping was imposed, we verify with user
+                seteditorShouldBeOnlineAndImposeMappingAtLaunch(true);
+            }
+            else
+            {
+                // Mapping was NOT imposed, we can start ingescape
+                startIngeScape();
+            }
+        }
+    }
+    else
+    {
+        // Reset network device : user can't connect editor with this network device
+        setnetworkDevice("");
+    }
 
 
     //
@@ -485,7 +502,7 @@ IngeScapeEditorController::~IngeScapeEditorController()
     IngeScapeNetworkController::instance()->stopMonitoring();
 
     // 2- Stop IngeScape
-    _stopIngeScape(false);
+    stopIngeScape();
 
     // Unsubscribe to OS events
     disconnect(OSUtils::instance(), &OSUtils::systemSleep, this, &IngeScapeEditorController::_onSystemSleep);
@@ -502,7 +519,6 @@ IngeScapeEditorController::~IngeScapeEditorController()
     // Delete all log stream viewers
     _openedLogStreamControllers.deleteAllItems();
 
-
     //
     // Clean-up our TerminationSignalWatcher first
     //
@@ -513,15 +529,12 @@ IngeScapeEditorController::~IngeScapeEditorController()
         _terminationSignalWatcher = nullptr;
     }
 
-
     //
     // Clean-up sub-controllers
     //
-
     if (_timeLineC != nullptr)
     {
         disconnect(_timeLineC);
-
         AbstractTimeActionslineScenarioViewController* temp = _timeLineC;
         settimeLineC(nullptr);
         delete temp;
@@ -531,7 +544,6 @@ IngeScapeEditorController::~IngeScapeEditorController()
     if (_valuesHistoryC != nullptr)
     {
         disconnect(_valuesHistoryC);
-
         ValuesHistoryController* temp = _valuesHistoryC;
         setvaluesHistoryC(nullptr);
         delete temp;
@@ -541,7 +553,6 @@ IngeScapeEditorController::~IngeScapeEditorController()
     if (_agentsMappingC != nullptr)
     {
         disconnect(_agentsMappingC);
-
         AgentsMappingController* temp = _agentsMappingC;
         setagentsMappingC(nullptr);
         delete temp;
@@ -551,7 +562,6 @@ IngeScapeEditorController::~IngeScapeEditorController()
     if (_callHomeC != nullptr)
     {
         disconnect(_callHomeC);
-
         CallHomeController* temp = _callHomeC;
         setcallHomeC(nullptr);
         delete temp;
@@ -561,7 +571,6 @@ IngeScapeEditorController::~IngeScapeEditorController()
     if (_agentsSupervisionC != nullptr)
     {
         disconnect(_agentsSupervisionC);
-
         AgentsSupervisionController* temp = _agentsSupervisionC;
         setagentsSupervisionC(nullptr);
         delete temp;
@@ -571,7 +580,6 @@ IngeScapeEditorController::~IngeScapeEditorController()
     if (_scenarioC != nullptr)
     {
         disconnect(_scenarioC);
-
         ScenarioController* temp = _scenarioC;
         setscenarioC(nullptr);
         delete temp;
@@ -581,7 +589,6 @@ IngeScapeEditorController::~IngeScapeEditorController()
     if (_modelManager != nullptr)
     {
         disconnect(_modelManager);
-
         EditorModelManager* temp = _modelManager;
         setmodelManager(nullptr);
         delete temp;
@@ -597,7 +604,6 @@ IngeScapeEditorController::~IngeScapeEditorController()
     if (_networkC != nullptr)
     {
         disconnect(_networkC);
-
         NetworkController* temp = _networkC;
         setnetworkC(nullptr);
         delete temp;
@@ -613,7 +619,6 @@ IngeScapeEditorController::~IngeScapeEditorController()
     if (_licensesC != nullptr)
     {
         disconnect(_licensesC);
-
         LicensesController* temp = _licensesC;
         setlicensesC(nullptr);
         delete temp;
@@ -640,6 +645,40 @@ QObject* IngeScapeEditorController::qmlSingleton(QQmlEngine* engine, QJSEngine* 
     return new IngeScapeEditorController();
 }
 
+
+void IngeScapeEditorController::setnetworkDevice(QString value)
+{
+    if (value != _networkDevice)
+    {
+        _networkDevice = value;
+
+        // Restart monitoring to detect events relative to our new network config
+        if (!_networkDevice.isEmpty())
+        {
+            IngeScapeNetworkController::instance()->stopMonitoring();
+            IngeScapeNetworkController::instance()->startMonitoring(_networkDevice, _port);
+        }
+
+        Q_EMIT networkDeviceChanged(value);
+    }
+}
+
+void IngeScapeEditorController::setport(uint value)
+{
+    if (value != _port)
+    {
+        _port = value;
+
+        // Restart monitoring to detect events relative to our new network config
+        if (!_networkDevice.isEmpty())
+        {
+            IngeScapeNetworkController::instance()->stopMonitoring();
+            IngeScapeNetworkController::instance()->startMonitoring(_networkDevice, _port);
+        }
+
+        Q_EMIT portChanged(value);
+    }
+}
 
 /**
  * @brief Custom setter for the gettingStartedShowAtStartup property.
@@ -676,11 +715,14 @@ void IngeScapeEditorController::loadPlatformFromSelectedFile()
     QString platformFilePath = QFileDialog::getOpenFileName(nullptr,
                                                             tr("Open platform"),
                                                             _platformDirectoryPath,
-                                                            tr("Platform (*.igsplatform *.json)")
-                                                            );
-
+                                                            tr("Platform (*.igsplatform *.json)"));
     if (!platformFilePath.isEmpty())
     {
+        if (IngeScapeNetworkController::instance()->isStarted() && (_modelManager != nullptr))
+        {
+            // if we are connected, we don't impose mapping to the network anymore
+            _agentsMappingC->setimposeMappingToAgentsON(false);
+        }
         _clearAndLoadPlatformFromFile(platformFilePath);
     }
     else
@@ -731,57 +773,20 @@ void IngeScapeEditorController::savePlatformToCurrentlyLoadedFile()
  * @brief Clear the current platform (agents, mappings, actions, palette, timeline actions, hosts)
  * by deleting all existing data
  */
-void IngeScapeEditorController::clearCurrentPlatform()
+void IngeScapeEditorController::createNewPlatform()
 {
-    qInfo() << "Clear Current Platform (" << _currentPlatformName << ")";
+    if (IngeScapeNetworkController::instance()->isStarted() && (_modelManager != nullptr))
+    {
+        // if we are connected, we don't impose mapping to the network anymore
+        _agentsMappingC->setimposeMappingToAgentsON(false);
+    }
 
     // Update the current platform name
     setcurrentPlatformName(NEW_PLATFORM_NAME);
     _currentPlatformFilePath = QString("%1%2.igsplatform").arg(_platformDirectoryPath, NEW_PLATFORM_NAME);
     sethasAPlatformBeenLoadedByUser(false);
 
-    // Clear the current mapping
-    if (_agentsMappingC != nullptr) {
-        _agentsMappingC->clearMapping();
-    }
-
-    // Clear the current scenario
-    if (_scenarioC != nullptr) {
-        _scenarioC->clearScenario();
-    }
-
-    if (_hostsSupervisionC != nullptr)
-    {
-        // Delete hosts OFF
-        _hostsSupervisionC->deleteHostsOFF();
-    }
-
-    IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
-    if (ingeScapeModelManager != nullptr)
-    {
-        // Delete all published values
-        ingeScapeModelManager->deleteAllPublishedValues();
-
-        // Delete all (models of) actions
-        ingeScapeModelManager->deleteAllActions();
-
-        // Delete agents OFF
-        QStringList namesListOfAgentsON = ingeScapeModelManager->deleteAgentsOFF();
-
-        if (_valuesHistoryC != nullptr)
-        {
-            // Set both list of agent names with agents ON
-            _valuesHistoryC->setAgentNamesList(namesListOfAgentsON);
-        }
-    }
-
-    if (_timeLineC != nullptr) {
-        // Reset timeline parameters
-        _timeLineC->resetTimeline();
-    }
-
-    Q_EMIT resetTimeLineView(false); // Close timeline view
-    Q_EMIT resetMappindView(); // Center mapping view
+    _clearCurrentPlatform();
 }
 
 
@@ -790,8 +795,20 @@ void IngeScapeEditorController::clearCurrentPlatform()
  */
 void IngeScapeEditorController::processBeforeClosing()
 {
-    // Save in the app settings the currently opened platform (to open it at next launch)
+    // Save settings from the app
     IngeScapeSettings &settings = IngeScapeSettings::Instance();
+
+    settings.beginGroup("network");
+    settings.setValue("connected", IngeScapeNetworkController::instance()->isStarted());
+    settings.setValue("networkDevice", _networkDevice);
+    settings.setValue("ipAddress", _ipAddress);
+    settings.setValue("port", _port);
+    settings.endGroup();
+
+    settings.beginGroup("mapping");
+    settings.setValue("imposedToNetwork", _agentsMappingC->imposeMappingToAgentsON());
+    settings.endGroup();
+
     settings.beginGroup("platform");
     // Clear the value if we close with an unsaved new platform
     settings.setValue("last", _hasAPlatformBeenLoadedByUser ? _currentPlatformFilePath : SPECIAL_EMPTY_LAST_PLATFORM);
@@ -837,66 +854,7 @@ bool IngeScapeEditorController::isAgentUsedInPlatform(AgentsGroupedByDefinitionV
             }
         }
     }
-
     return isUsed;
-}
-
-
-/**
- * @brief Re-Start the network with a port and a network device
- * @param strPort
- * @param networkDevice
- * @param hasToClearPlatform
- * @return true when success
- */
-bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkDevice, bool hasToClearPlatform)
-{
-    bool success = false;
-
-    bool isUInt = false;
-    uint port = strPort.toUInt(&isUInt);
-    if (isUInt && (port > 0))
-    {
-        // None changes (Same port, same network device and same licenses path)
-        if ((port == _port) && (networkDevice == _networkDevice))
-        {
-            // Nothing to do
-            success = true;
-        }
-        // Port and Network device
-        else
-        {
-            // Update properties
-            setnetworkDevice(networkDevice);
-            setport(port);
-
-            // Update settings file
-            IngeScapeSettings &settings = IngeScapeSettings::Instance();
-            settings.beginGroup("network");
-            settings.setValue("networkDevice", networkDevice);
-            settings.setValue("port", port);
-            settings.endGroup();
-
-            // Save new values
-            settings.sync();
-
-            // Restart IngeScape
-            success = _restartIngeScape(hasToClearPlatform, false);
-        }
-    }
-    else
-    {
-        if (!isUInt)
-        {
-            qWarning() << "Port" << strPort << "is not an unsigned int !";
-        }
-        else if (port <= 0)
-        {
-            qWarning() << "Port" << strPort << "is negative or null !";
-        }
-    }
-
-    return success;
 }
 
 
@@ -1006,11 +964,73 @@ bool IngeScapeEditorController::hasPlatformChanged()
 
 
 /**
+ * @brief If _selectedNetwork not available will try to auto select another one
+ */
+bool IngeScapeEditorController::startIngeScape()
+{
+    bool success = false;
+    IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
+    IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
+
+    if ((ingeScapeNetworkC != nullptr) && (ingeScapeModelManager != nullptr)
+            && (_modelManager != nullptr))
+    {
+        success = ingeScapeNetworkC->start(_networkDevice, _ipAddress, _port); // will failed if networkDevice is not available
+    }
+    return success;
+}
+
+
+void IngeScapeEditorController::stopIngeScape()
+{
+    IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
+
+    if ((ingeScapeNetworkC != nullptr) && (_modelManager != nullptr))
+    {
+        qInfo() << "Stop the network on" << _networkDevice << "with" << _port;
+
+        // Stop our IngeScape agent
+        ingeScapeNetworkC->stop();
+
+        // We don't see itself
+        ingeScapeNetworkC->setnumberOfEditors(1);
+    }
+}
+
+
+bool IngeScapeEditorController::restartIngeScape()
+{
+    qInfo() << "Restart the network on" << _networkDevice << "with" << _port;
+    stopIngeScape();
+    return startIngeScape();
+}
+
+
+/**
  * @brief Method used to force the creation of our singleton from QML
  */
 void IngeScapeEditorController::forceCreation()
 {
     qDebug() << "Force the creation of our singleton from QML";
+}
+
+void IngeScapeEditorController::_onAgentEditorStartedOrStopped(bool started)
+{
+    IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
+    if (!started)
+    {
+        // Simulate an exit for each agent ON
+        ingeScapeModelManager->simulateExitForEachAgentON();
+
+        // Simulate an exit for each launcher
+        ingeScapeModelManager->simulateExitForEachLauncher();
+
+        // Simulate an exit for the recorder
+        if ((_recordsSupervisionC != nullptr) && _recordsSupervisionC->isRecorderON())
+        {
+            _recordsSupervisionC->onRecorderExited(_recordsSupervisionC->peerIdOfRecorder(), _recordsSupervisionC->peerNameOfRecorder());
+        }
+    }
 }
 
 
@@ -1041,10 +1061,8 @@ void IngeScapeEditorController::_onOpenFileRequest(QUrl url, QString filePath)
 
                 // We need to check if we have a valid license
                 if ((_licensesC != nullptr)
-                    &&
-                    (_licensesC->mergedLicense() != nullptr)
-                    &&
-                    _licensesC->mergedLicense()->editorLicenseValidity())
+                    && (_licensesC->mergedLicense() != nullptr)
+                    && _licensesC->mergedLicense()->editorLicenseValidity())
                 {
                     if (_modelManager != nullptr)
                     {
@@ -1068,7 +1086,6 @@ void IngeScapeEditorController::_onOpenFileRequest(QUrl url, QString filePath)
                 {
                     QList<QUrl> listOfUrls;
                     listOfUrls.append(url);
-
                     _licensesC->addLicenses(listOfUrls);
                 }
             }
@@ -1093,7 +1110,6 @@ void IngeScapeEditorController::_onOpenFileRequest(QUrl url, QString filePath)
 
 /**
  * @brief Slot called when we have to open the "Log Stream" of a list of agents
- * @param models
  */
 void IngeScapeEditorController::_onOpenLogStreamOfAgents(QList<AgentM*> models)
 {
@@ -1120,14 +1136,12 @@ void IngeScapeEditorController::_onOpenLogStreamOfAgents(QList<AgentM*> models)
                 if (logStreamController != nullptr)
                 {
                     qDebug() << "The 'Log Stream' for" << logStreamController->agentName() << "on" << logStreamController->subscriberAddress() << "already exists...bring to front !";
-
                     Q_EMIT logStreamController->bringToFront();
                 }
                 else
                 {
                     // Create a new "Log Stream" controller
                     logStreamController = new LogStreamController(model->name(), model->hostname(), subscriberAddress, this);
-
                     _openedLogStreamControllers.append(logStreamController);
                 }
             }
@@ -1200,7 +1214,7 @@ void IngeScapeEditorController::_onReplayLoading(int deltaTimeFromTimeLineStart,
         }
 
         // First, clear the current platform by deleting all existing data
-        clearCurrentPlatform();
+        _clearCurrentPlatform();
 
         QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonPlatform.toUtf8());
 
@@ -1246,7 +1260,7 @@ void IngeScapeEditorController::_onReplayUNloaded()
     // and current platform is a "NEW PLATFORM"
     if (_platformNameBeforeLoadReplay != "")
     {
-        clearCurrentPlatform();
+        _clearCurrentPlatform();
         _currentPlatformFilePath = QString("%1%2.igsplatform").arg(_platformDirectoryPath, _platformNameBeforeLoadReplay);
         _platformNameBeforeLoadReplay = "";
 
@@ -1443,7 +1457,6 @@ void IngeScapeEditorController::_onExpeExited(QString peerId, QString peerName)
 {
     qInfo() << "Expe exited (" << peerId << ")" << peerName;
 
-    // Check that the peer id matches
     if (_peerIdOfExpe == peerId)
     {
         // Clear
@@ -1459,39 +1472,30 @@ void IngeScapeEditorController::_onExpeExited(QString peerId, QString peerName)
 void IngeScapeEditorController::_onLicensesUpdated()
 {
     qDebug() << "on License Updated";
+    // DO nothing
+}
 
-    // Restart IngeScape
-    // (Do not clear the current platform, do not check available network devices)
-    _restartIngeScape(false, false);
+/**
+ * @brief Slot called when user's license limitations are reached
+ */
+void IngeScapeEditorController::_onLicenseLimitationReached()
+{
+    stopIngeScape();
 }
 
 
 /**
- * @brief Called when our network device is not available
+ * @brief Called when our network device is no more available
  */
 void IngeScapeEditorController::_onNetworkDeviceIsNotAvailable()
 {
     qDebug() << Q_FUNC_INFO;
 
-    // Stop IngeScape if needed
     if (IngeScapeNetworkController::instance()->isStarted())
     {
-        _stopIngeScape(false);
-
-        // Register last mapping connected value in case the attempt to reconnect ingescape failed
-        bool registerLastIsMappingConnected = _beforeNetworkStop_isMappingConnected;
-
-        // Disconnect the mapping
-        _beforeNetworkStop_isMappingConnected = false;
-
-        // Try to relaunch editor with an available device
-        bool success = _startIngeScape(true);
-
-        if (!success) {
-            _beforeNetworkStop_isMappingConnected = registerLastIsMappingConnected;
-        }
+        stopIngeScape();
     }
-    // Else: our agent is not started, we don't need to stop it
+    setnetworkDevice("");
 }
 
 
@@ -1501,12 +1505,7 @@ void IngeScapeEditorController::_onNetworkDeviceIsNotAvailable()
 void IngeScapeEditorController::_onNetworkDeviceIsAvailableAgain()
 {
     qDebug() << Q_FUNC_INFO;
-
-    // Start IngeScape if not already started (it means that ingescape did not restart yet)
-    if (!IngeScapeNetworkController::instance()->isStarted())
-    {
-        _startIngeScape(true);
-    }
+    // N.B. : If we want to restart our editor, it is here
 }
 
 
@@ -1516,10 +1515,10 @@ void IngeScapeEditorController::_onNetworkDeviceIsAvailableAgain()
 void IngeScapeEditorController::_onNetworkDeviceIpAddressHasChanged()
 {
     qDebug() << Q_FUNC_INFO;
-
-    // Restart IngeScape
-    // (Do not clear platform, do no check available network devices)
-    _restartIngeScape(false, false);
+    if (IngeScapeNetworkController::instance()->isStarted())
+    {
+        restartIngeScape();
+    }
 }
 
 
@@ -1529,12 +1528,13 @@ void IngeScapeEditorController::_onNetworkDeviceIpAddressHasChanged()
 void IngeScapeEditorController::_onSystemSleep()
 {
     qDebug() << Q_FUNC_INFO;
-
-    // Stop monitoring to save energy
+    // Stop monitoring to save energy (will be relaunch on system wake)
     IngeScapeNetworkController::instance()->stopMonitoring();
 
-    // Stop IngeScape
-    _stopIngeScape(false);
+    if (IngeScapeNetworkController::instance()->isStarted())
+    {
+        stopIngeScape();
+    }
 }
 
 
@@ -1543,11 +1543,11 @@ void IngeScapeEditorController::_onSystemSleep()
  */
 void IngeScapeEditorController::_onSystemWake()
 {  
-    // Start IngeScape
-    // => we need to check available network devices
-    _startIngeScape(true);
-}
+    // Restart monitoring to detect events relative to our expected network
+    IngeScapeNetworkController::instance()->startMonitoring(_networkDevice, _port);
 
+    // Not relaunch the editor, stay OFFLINE
+}
 
 
 /**
@@ -1556,20 +1556,11 @@ void IngeScapeEditorController::_onSystemWake()
 void IngeScapeEditorController::_onSystemNetworkConfigurationsUpdated()
 {
     IngeScapeNetworkController::instance()->updateAvailableNetworkDevices();
-
-    // If Ingescape is not started try to restarted if there is at least, one network device available
-    // N.B: useful when last network device is always unaivalable and another network device become available
-    if ((!IngeScapeNetworkController::instance()->isStarted())
-            && (IngeScapeNetworkController::instance()->availableNetworkDevices().count() > 0)) {
-        _startIngeScape(true);
-    }
 }
 
 
 /**
  * @brief Load the platform from a JSON file
- * @param platformFilePath
- * @return
  */
 bool IngeScapeEditorController::_loadPlatformFromFile(QString platformFilePath)
 {
@@ -1618,12 +1609,62 @@ bool IngeScapeEditorController::_loadPlatformFromFile(QString platformFilePath)
     return success;
 }
 
+/**
+ * @brief Clear the current platform (agents, mappings, actions, palette, timeline actions, hosts)
+ * by deleting all existing data
+ */
+void IngeScapeEditorController::_clearCurrentPlatform()
+{
+    qInfo() << "Clear Current Platform (" << _currentPlatformName << ")";
+
+    // Clear agents OFF and their mapping
+    if (_agentsMappingC != nullptr) {
+        _agentsMappingC->clearMapping();
+    }
+
+    // Clear the current scenario
+    if (_scenarioC != nullptr) {
+        _scenarioC->clearScenario();
+    }
+
+    if (_hostsSupervisionC != nullptr)
+    {
+        // Delete hosts OFF
+        _hostsSupervisionC->deleteHostsOFF();
+    }
+
+    IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
+    if (ingeScapeModelManager != nullptr)
+    {
+        // Delete all published values
+        ingeScapeModelManager->deleteAllPublishedValues();
+
+        // Delete all (models of) actions
+        ingeScapeModelManager->deleteAllActions();
+
+        // Delete agents OFF
+        QStringList namesListOfAgentsON = ingeScapeModelManager->deleteAgentsOFF();
+
+        if (_valuesHistoryC != nullptr)
+        {
+            // Set both list of agent names with agents ON
+            _valuesHistoryC->setAgentNamesList(namesListOfAgentsON);
+        }
+    }
+
+    if (_timeLineC != nullptr) {
+        // Reset timeline parameters
+        _timeLineC->resetTimeline();
+    }
+
+    Q_EMIT resetTimeLineView(false); // Close timeline view
+    Q_EMIT resetMappindView(); // Center mapping view
+}
+
 
 
 /**
  * @brief Clear our current platform and load a new platform from a given file
- * @param platformFilePath
- * @return
  */
 bool IngeScapeEditorController::_clearAndLoadPlatformFromFile(QString platformFilePath)
 {
@@ -1632,7 +1673,7 @@ bool IngeScapeEditorController::_clearAndLoadPlatformFromFile(QString platformFi
     if (!platformFilePath.isEmpty())
     {
         // First, clear the current platform by deleting all existing data
-        clearCurrentPlatform();
+        _clearCurrentPlatform();
 
         // Load the platform from JSON file
         succeeded = _loadPlatformFromFile(platformFilePath);
@@ -1644,12 +1685,6 @@ bool IngeScapeEditorController::_clearAndLoadPlatformFromFile(QString platformFi
         else
         {
             sethasAPlatformBeenLoadedByUser(true);
-        }
-
-        // Force our global mapping to CONTROLLED
-        if (_modelManager != nullptr)
-        {
-            _modelManager->setisMappingControlled(true);
         }
     }
     else
@@ -1743,10 +1778,8 @@ bool IngeScapeEditorController::_loadPlatformFromJSON(QJsonDocument jsonDocument
         {
             _timeLineC->importTimelineFromJson(jsonRoot.value("timeline").toObject());
         }
-
         success = true;
     }
-
     return success;
 }
 
@@ -1806,163 +1839,37 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
 
 
 /**
- * @brief If checkAvailableNetworkDevices : auto select a network device to start Ingescape
+ * @brief Return a network device choose with the logic of an igs agent :
+ * If there is only one or if there are 2 and one of them is a loopback return a network device
+ * Else return ""
  */
-bool IngeScapeEditorController::_startIngeScape(bool checkAvailableNetworkDevices)
+QString IngeScapeEditorController::_autoFindAnAvailableDevice()
 {
-    bool success = false;
     IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
-    IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
-    IngeScapeSettings &settings = IngeScapeSettings::Instance();
-
-    // Always update available network devices (to have our qml list updated)
     ingeScapeNetworkC->updateAvailableNetworkDevices();
-
-    if ((ingeScapeNetworkC != nullptr) && (ingeScapeModelManager != nullptr)
-            && (_modelManager != nullptr))
+    int nbDevices = ingeScapeNetworkC->availableNetworkDevices().count();
+    QStringList devicesAddresses = ingeScapeNetworkC->availableNetworkDevicesAddresses();
+    if (nbDevices == 1)
     {
-        if (checkAvailableNetworkDevices)
-        {
-            int nbDevices = ingeScapeNetworkC->availableNetworkDevices().count();
-            QStringList devicesAddresses = ingeScapeNetworkC->availableNetworkDevicesAddresses();
-            if (nbDevices == 0 )
-            {
-                 setnetworkDevice("");
-            }
-            else if (nbDevices == 1)
-            {
-                 // Use the only available network device
-                setnetworkDevice(ingeScapeNetworkC->availableNetworkDevices().at(0));
-            }
-            else if ((nbDevices == 2)
-                     && ((devicesAddresses.at(0) == "127.0.0.1")||(devicesAddresses.at(1) == "127.0.0.1")))
-            {
-                // 2 available devices, one is the loopback : we pick the device that is NOT the loopback
-                if (devicesAddresses.at(0) == "127.0.0.1")
-                {
-                    setnetworkDevice(ingeScapeNetworkC->availableNetworkDevices().at(1));
-                }
-                else
-                {
-                    setnetworkDevice(ingeScapeNetworkC->availableNetworkDevices().at(0));
-                }
-            }
-            else
-            {
-                // Several devices available : look last saving
-                settings.beginGroup("network");
-                QString lastSaveNetworkDevice = settings.value("networkDevice", QVariant("")).toString();
-                settings.endGroup();
-                if (!ingeScapeNetworkC->isAvailableNetworkDevice(lastSaveNetworkDevice))
-                {
-                    // User have to choose a device to launch editor
-                    setnetworkDevice("");
-                }
-                else {
-                    setnetworkDevice(lastSaveNetworkDevice);
-                }
-            }
-        }
-        success = ingeScapeNetworkC->start(_networkDevice, _ipAddress, _port); //will failed if networkDevice = ""
-        if (success)
-        {
-            ingeScapeModelManager->setisMappingConnected(_beforeNetworkStop_isMappingConnected);
-            _modelManager->setisMappingControlled(_beforeNetworkStop_isMappingControlled);
-        }
+         // Use the only available network device
+        return ingeScapeNetworkC->availableNetworkDevices().at(0);
     }
-    return success;
-}
-
-
-/**
- * @brief Restart IngeScape
- *
- * @param hasToClearPlatform
- * @param checkAvailableNetworkDevices
- *
- * @return true if success
- */
-bool IngeScapeEditorController::_restartIngeScape(bool hasToClearPlatform, bool checkAvailableNetworkDevices)
-{
-    if (hasToClearPlatform)
+    else if ((nbDevices == 2)
+             && ((devicesAddresses.at(0) == "127.0.0.1")||(devicesAddresses.at(1) == "127.0.0.1")))
     {
-        qInfo() << "Restart the network on" << _networkDevice << "with" << _port << "(and CLEAR the current platform)";
-    }
-    else
-    {
-        qInfo() << "Restart the network on" << _networkDevice << "with" << _port << "(and KEEP the current platform)";
-    }
-
-    // Stop IngeScape
-    _stopIngeScape(hasToClearPlatform);
-
-    // Start IngeScape
-    return _startIngeScape(checkAvailableNetworkDevices);
-}
-
-
-/**
- * @brief Stop IngeScape
- *
- * @param hasToClearPlatform
- */
-void IngeScapeEditorController::_stopIngeScape(bool hasToClearPlatform)
-{
-    IngeScapeNetworkController* ingeScapeNetworkC = IngeScapeNetworkController::instance();
-    IngeScapeModelManager* ingeScapeModelManager = IngeScapeModelManager::instance();
-
-    if ((ingeScapeNetworkC != nullptr) && (ingeScapeModelManager != nullptr) && (_modelManager != nullptr))
-    {
-        if (hasToClearPlatform)
+        // 2 available devices, one is the loopback : we pick the device that is NOT the loopback
+        if (devicesAddresses.at(0) == "127.0.0.1")
         {
-            qInfo() << "Stop the network on" << _networkDevice << "with" << _port << "(and CLEAR the current platform)";
+            return ingeScapeNetworkC->availableNetworkDevices().at(1);
         }
         else
         {
-            qInfo() << "Stop the network on" << _networkDevice << "with" << _port << "(and KEEP the current platform)";
+            return ingeScapeNetworkC->availableNetworkDevices().at(0);
         }
-
-        // Save states of our mapping if needed
-        _beforeNetworkStop_isMappingConnected = ingeScapeModelManager->isMappingConnected();
-        _beforeNetworkStop_isMappingControlled = _modelManager->isMappingControlled();
-
-        // Update settings file
-        IngeScapeSettings &settings = IngeScapeSettings::Instance();
-        settings.beginGroup("mapping");
-        settings.setValue("connected", _beforeNetworkStop_isMappingConnected);
-        settings.setValue("controlled", _beforeNetworkStop_isMappingControlled);
-        settings.endGroup();
-
-        // Save new values
-        settings.sync();
-
-        // Disable mapping
-        ingeScapeModelManager->setisMappingConnected(false);
-        _modelManager->setisMappingControlled(false);
-
-        // Stop our IngeScape agent
-        ingeScapeNetworkC->stop();
-
-        // We don't see itself
-        ingeScapeNetworkC->setnumberOfEditors(1);
-
-        // Simulate an exit for each agent ON
-        ingeScapeModelManager->simulateExitForEachAgentON();
-
-        // Simulate an exit for each launcher
-        ingeScapeModelManager->simulateExitForEachLauncher();
-
-        // Simulate an exit for the recorder
-        if ((_recordsSupervisionC != nullptr) && _recordsSupervisionC->isRecorderON())
-        {
-            _recordsSupervisionC->onRecorderExited(_recordsSupervisionC->peerIdOfRecorder(), _recordsSupervisionC->peerNameOfRecorder());
-        }
-
-        // Has to clear the current platform
-        if (hasToClearPlatform)
-        {
-            // Clear the current platform by deleting all existing data
-            clearCurrentPlatform();
-        }
+    }
+    else
+    {
+        // No device or several devices available
+        return "";
     }
 }

@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2020 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -11,7 +11,7 @@
  *      Alexandre Lemort   <lemort@ingenuity.io>
  *      Justine Limoges    <limoges@ingenuity.io>
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
- *
+ *      Chloé Roumieu      <roumieu@ingenuity.io>
  */
 
 import QtQuick 2.8
@@ -35,11 +35,10 @@ Item {
     //--------------------------------
 
     // Controller associated to our view
-    property var controller : null;
+    property AgentsSupervisionController controller : null;
 
     // Agents Grouped by Definition
-    //property AgentsGroupedByDefinitionVM agentsGroupedByDefinition: null;
-    property var agent: null;
+    property AgentsGroupedByDefinitionVM agent: null;
 
     // true if agent item contains the mouse (rollover)
     property bool agentItemIsHovered : false
@@ -117,7 +116,7 @@ Item {
             }
             width : 6
 
-            visible: controller && rootItem.agent && (controller.selectedAgent === rootItem.agent)
+            visible: (rootItem.agent && rootItem.agent.isSelected)
 
             color: IngeScapeTheme.selectionColor
         }

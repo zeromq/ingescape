@@ -47,13 +47,17 @@ class IngeScapeEditorController : public QObject
     Q_OBJECT
 
     // Network settings - network device
-    I2_QML_PROPERTY_READONLY(QString, networkDevice)
+    I2_QML_PROPERTY_CUSTOM_SETTER(QString, networkDevice)
 
     // Network settings - ip address
     I2_QML_PROPERTY_READONLY(QString, ipAddress)
 
     // Network settings - port
-    I2_QML_PROPERTY_READONLY(uint, port)
+    I2_QML_PROPERTY_CUSTOM_SETTER(uint, port)
+
+    // Flag indicating if editor was ONLINE and imposed mapping to agents ON last time
+    // At launch, allow us to open popup to warn user
+    I2_QML_PROPERTY_READONLY(bool, editorShouldBeOnlineAndImposeMappingAtLaunch)
 
     // Flag indicating if the Model/View Model Visualizer is available
     I2_QML_PROPERTY_READONLY(bool, isAvailableModelVisualizer)
@@ -165,10 +169,10 @@ public:
 
 
     /**
-      * @brief Clear the current platform (agents, mappings, actions, palette, timeline actions)
-      *        by deleting all existing data
+      * @brief Disconnect the editor, clear the current platform (agents, mappings, actions, palette, timeline actions)
+      * & init new filename
       */
-    Q_INVOKABLE void clearCurrentPlatform();
+    Q_INVOKABLE void createNewPlatform();
 
 
     /**
@@ -183,16 +187,6 @@ public:
       * @param agentsGroupedByDefinition
       */
     Q_INVOKABLE bool isAgentUsedInPlatform(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition);
-
-
-    /**
-     * @brief Re-Start the network with a port and a network device
-     * @param strPort
-     * @param networkDevice
-     * @param hasToClearPlatform
-     * @return true when success
-     */
-    Q_INVOKABLE bool restartNetwork(QString strPort, QString networkDevice, bool hasToClearPlatform);
 
 
     /**
@@ -237,6 +231,15 @@ public:
     Q_INVOKABLE bool hasPlatformChanged();
 
 
+    /**
+     * @brief If _selectedNetwork not available will try to auto select another one
+     */
+    Q_INVOKABLE bool startIngeScape();
+
+    Q_INVOKABLE void stopIngeScape();
+    Q_INVOKABLE bool restartIngeScape();
+
+
 public Q_SLOTS:
 
     /**
@@ -271,6 +274,9 @@ Q_SIGNALS:
 
 
 private Q_SLOTS:
+
+
+    void _onAgentEditorStartedOrStopped(bool started);
 
     /**
      * @brief Called when our application receives an "open file" request
@@ -369,6 +375,12 @@ private Q_SLOTS:
 
 
     /**
+     * @brief Slot called when user's license limitations are reached
+     */
+    void _onLicenseLimitationReached();
+
+
+    /**
      * @brief Called when our network device is not available
      */
     void _onNetworkDeviceIsNotAvailable();
@@ -408,16 +420,19 @@ private:
 
     /**
      * @brief Load the platform from a JSON file
-     * @param platformFilePath
-     * @return
      */
     bool _loadPlatformFromFile(QString platformFilePath);
 
 
     /**
+     * @brief Clear the current platform (agents, mappings, actions, palette, timeline actions, hosts)
+     * by deleting all existing data
+     */
+    void _clearCurrentPlatform();
+
+
+    /**
      * @brief Clear our current platform and load a new platform from a given file
-     * @param platformFilePath
-     * @return
      */
     bool _clearAndLoadPlatformFromFile(QString platformFilePath);
 
@@ -445,29 +460,11 @@ private:
 
 
     /**
-     * @brief If checkAvailableNetworkDevices : auto select a network device to start Ingescape
+     * @brief Return a network device choose with the logic of an igs agent :
+     * If there is only one or if there are 2 and one of them is a loopback return a network device
+     * Else return ""
      */
-    bool _startIngeScape(bool checkAvailableNetworkDevices);
-
-
-    /**
-     * @brief Restart IngeScape
-     *
-     * @param hasToClearPlatform
-     * @param checkAvailableNetworkDevices
-     *
-     *
-     * @return true if success
-     */
-    bool _restartIngeScape(bool hasToClearPlatform, bool checkAvailableNetworkDevices = false);
-
-
-    /**
-     * @brief Stop IngeScape
-     *
-     * @param hasToClearPlatform
-     */
-    void _stopIngeScape(bool hasToClearPlatform);
+    QString _autoFindAnAvailableDevice();
 
 
 private:
@@ -479,10 +476,6 @@ private:
 
     // Path to the currently opened platform file (*.igsplatform)
     QString _currentPlatformFilePath;
-
-    // States of our mapping when our network was stopped
-    bool _beforeNetworkStop_isMappingConnected;
-    bool _beforeNetworkStop_isMappingControlled;
 
     // Default name to save the platform when exiting
     static const QString EXAMPLE_PLATFORM_NAME;

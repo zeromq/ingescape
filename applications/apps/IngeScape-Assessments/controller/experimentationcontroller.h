@@ -48,6 +48,8 @@ class ExperimentationController : public QObject
     I2_QML_PROPERTY(RecordAssessmentM*, nextRecordToHandle)
     I2_QML_PROPERTY(bool, removeOtherRecordsWhileRecording) // If false, it means that recording have to stop at first other record encounter
 
+    I2_QML_PROPERTY_READONLY(QString, exportSessionsMessage)
+
 
 public:
 
@@ -88,8 +90,10 @@ public:
 
     /**
      * @brief Export the list of selected sessions
+     * @param filterDependentVariables if flag = true: we export only the outputs that have a corresponding Dependent Variable in the protocol
+     *  Else (flag = false): we export all IngeScape outputs of the platform
      */
-    Q_INVOKABLE void exportSelectedSessions();
+    Q_INVOKABLE void exportSelectedSessions(bool filterDependentVariables);
 
 
     /**
@@ -222,6 +226,9 @@ public Q_SLOTS:
      * @param message (id of the record)
      */
     void onRecordDeletedReceived(QString message);
+
+
+    void onExportedRecordReceived();
 
 
     /**

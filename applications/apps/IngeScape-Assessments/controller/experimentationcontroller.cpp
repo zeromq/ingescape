@@ -37,7 +37,8 @@ ExperimentationController::ExperimentationController(QObject *parent) : QObject(
     _selectedSubjectIdListToFilter(QStringList()),
     _selectedProtocolNameListToFilter(QStringList()),
     _nextRecordToHandle(nullptr),
-    _removeOtherRecordsWhileRecording(false)
+    _removeOtherRecordsWhileRecording(false),
+    _exportSessionsMessage("")
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -215,12 +216,19 @@ void ExperimentationController::deleteSession(SessionM* session)
 
 /**
  * @brief Export the list of selected sessions
+ * @param filterDependentVariables if flag = true: we export only the outputs that have a corresponding Dependent Variable in the protocol
+ *  Else (flag = false): we export all IngeScape outputs of the platform
  */
-void ExperimentationController::exportSelectedSessions()
+void ExperimentationController::exportSelectedSessions(bool filterDependentVariables)
 {
     if ((_currentExperimentation != nullptr) && !_selectedSessions.isEmpty())
     {
-        qInfo() << "Export" << _selectedSessions.count() << "selected sessions of" << _currentExperimentation->name() << "(to file)...";
+        if (filterDependentVariables) {
+            qInfo() << "Export ONLY Dependent Variables of" << _selectedSessions.count() << "selected sessions of" << _currentExperimentation->name() << "(to file)...";
+        }
+        else {
+            qInfo() << "Export ALL outputs of" << _selectedSessions.count() << "selected sessions of" << _currentExperimentation->name() << "(to file)...";
+        }
 
         QStringList sessionIds;
 
@@ -238,7 +246,7 @@ void ExperimentationController::exportSelectedSessions()
             //QString message = QString("%1=%2").arg(command_ExportSessions, sessionIds.join('|'));
 
             QString experimentationUID = AssessmentsModelManager::cassUuidToQString(_currentExperimentation->getCassUuid());
-            QString message = QString("%1=%2 EXPE=%3").arg(command_ExportSessions, sessionIds.join('|'), experimentationUID);
+            QString message = QString("%1=%2 EXPE=%3 VD_FILTER=%4").arg(command_ExportSessions, sessionIds.join('|'), experimentationUID, QString::number(filterDependentVariables));
 
             // Send the message "Export Sessions" to the recorder
             IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerIdOfRecorder, message);
@@ -441,6 +449,16 @@ void ExperimentationController::onRecordDeletedReceived(QString message)
             }
         }
     }
+}
+
+
+void ExperimentationController::onExportedRecordReceived()
+{
+    setexportSessionsMessage("Selected sessions exported successfully");
+
+    QTimer::singleShot(1500, [this]() {
+        this->setexportSessionsMessage("");
+    } );
 }
 
 

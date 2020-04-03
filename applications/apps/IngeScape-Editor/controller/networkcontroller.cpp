@@ -31,7 +31,6 @@ static const QString prefix_DefinitionFilePath = "DEFINITION_FILE_PATH=";
 static const QString prefix_MappingFilePath = "MAPPING_FILE_PATH=";
 
 static const QString prefix_AllRecords = "RECORDS_LIST=";
-static const QString prefix_RecordExported = "RECORD_EXPORTED";
 static const QString prefix_ReplayLoading = "REPLAY_LOADING=";
 static const QString prefix_ReplayLoaded = "REPLAY_LOADED";
 static const QString prefix_ReplayUNloaded = "REPLAY_UNLOADED";

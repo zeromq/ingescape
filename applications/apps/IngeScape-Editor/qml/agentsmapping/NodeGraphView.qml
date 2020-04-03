@@ -23,8 +23,7 @@ import INGESCAPE 1.0
 // parent-directory
 import ".." as Editor;
 
-// Popups
-import "../popup/" as Popups;
+
 
 
 Item {
@@ -40,7 +39,7 @@ Item {
     //--------------------------------
 
     // Controller associated to our view
-    property var controller: null;
+    property AgentsMappingController controller: null;
 
     // Minimum scale factor
     readonly property real minimumScale: 0.25;
@@ -276,13 +275,6 @@ Item {
         onResetZoom: {
             rootItem.setZoomLevel(1);
         }
-
-        onChangesOnLinksWhileMappingUnactivated: {
-            //console.log("QML: on Changes on Links While Mapping Unactivated");
-
-            // Open the popup about mapping modifications
-            mappingModificationsPopup.open();
-        }
     }
 
     Connections {
@@ -290,14 +282,6 @@ Item {
 
         onResetMappindView: {
             rootItem.showAll();
-        }
-    }
-
-    Component.onCompleted: {
-        if (controller) {
-            //console.log("QML: Graph View completed !");
-            // Update the flag
-            controller.isLoadedView = true;
         }
     }
 
@@ -793,6 +777,11 @@ Item {
                                 setZoomLevel(1)
                             }
                         }
+
+                        onDeleteAgentInMapping: {
+                            deleteConfirmationPopup.myAgent = agent.agentsGroupedByName;
+                            deleteConfirmationPopup.open();
+                        }
                     }
                 }
 
@@ -847,48 +836,23 @@ Item {
                              (dropGhost.agent && IngeScapeEditorC.agentsMappingC && !IngeScapeEditorC.agentsMappingC.getAgentInMappingFromName(dropGhost.agent.name))
             }
         }
-
     }
 
-
-    //----------------------------------------------------------------------------------
     //
-    // Mapping Modifications Popup
+    // Popup about Delete Confirmation
     //
-    //----------------------------------------------------------------------------------
-    Popups.MappingModificationsPopup {
-        id: mappingModificationsPopup
+    ConfirmationPopup {
+        id: deleteConfirmationPopup
 
-        onCancelMappingActivation: {
-            console.log("on Cancel Mapping Activation");
+        property AgentsGroupedByNameVM myAgent: null;
 
-            // UN-activate the mapping
-            IgsModelManager.isMappingConnected = false;
-        }
+        confirmationText: "This agent is used in the platform.\nDo you want to completely delete it?"
 
-        onSwitchToControl: {
-            console.log("on Switch To Control");
-
-            if (IngeScapeEditorC.modelManager)
+        onConfirmed: {
+            if (deleteConfirmationPopup.myAgent)
             {
-                // UN-activate the mapping
-                IgsModelManager.isMappingConnected = false;
-
-                // Switch to CONTROL
-                IngeScapeEditorC.modelManager.isMappingControlled = true;
-
-                // Activate the mapping
-                IgsModelManager.isMappingConnected = true;
-            }
-        }
-
-        onStayToObserve: {
-            console.log("on Stay To Observe");
-
-            if (controller) {
-                controller.resetModificationsWhileMappingWasUNactivated();
+                deleteConfirmationPopup.myAgent.deleteAgentsOFF();
             }
         }
     }
-
 }

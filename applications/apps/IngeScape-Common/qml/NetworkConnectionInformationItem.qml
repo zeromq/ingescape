@@ -42,11 +42,6 @@ I2CustomRectangle {
     // Content width of our component
     readonly property alias contentWidth: content.width
 
-    // Flag indicating if editor is started on ingescape platform
-    // NB : if false, it means that no network devices were available
-    //      or that user have to make a choice to launch the editor on igs platform
-    property bool editorStartedOnIgs: true
-
     // Current network device
     property string currentNetworkDevice: ""
 
@@ -56,25 +51,11 @@ I2CustomRectangle {
     // Duration of animations in milliseconds (250 ms => default duration of QML animations)
     property int animationDuration: 250
 
-    // List of network devices
-    property alias listOfNetworkDevices: selectNetworkDeviceCombobox.model
-
-    // Selected index of our list of network devices
-    property alias listOfNetworkDevicesSelectedIndex: selectNetworkDeviceCombobox.selectedIndex;
-
-    // Auto-close timeout in milliseconds
-    property alias autoCloseTimeoutInMilliseconds: autoCloseTimer.interval
-
-    // Open settings button source appearance
-    property string settingsReleasedId : "mapping-mode-settings"
-    property string settingsHighlightedId: "mapping-mode-settings-hover"
-    property string settingsPressedId : "mapping-mode-settings-pressed"
-
     //
     // Configure our item
     //
     width: 243
-    height: contentMouseArea.height
+    height: content.height
 
     // Radius
     topRightRadius: 5
@@ -96,20 +77,21 @@ I2CustomRectangle {
     QtObject {
         id: rootPrivate
 
-        // Flag indicating if we can perform animations
-        property bool canPerformAnimations: false
-
         // Flag indicating if our edition mode is opened
         property bool isEditionModeOpened: false
-
-        // Flag indicating if we can auto-close our edition mode
-        property bool canAutoCloseEditionMode: false
 
         // Boolean indicating if we must highlight our component
         property bool mustBeHighlighted : !root.isEditionModeOpened && contentMouseArea.enabled && contentMouseArea.containsMouse && !contentMouseArea.pressed
 
         // Flag indicating if some network devices are available
-        property bool networkDevicesAvailable : root.listOfNetworkDevices.length > 0
+        property bool networkDevicesAvailable : selectNetworkDeviceCombobox.model && (selectNetworkDeviceCombobox.model.length > 0)
+
+       onNetworkDevicesAvailableChanged: {
+           if (!rootPrivate.networkDevicesAvailable)
+           {
+               root.close();
+           }
+       }
     }
 
 
@@ -119,14 +101,11 @@ I2CustomRectangle {
     //
     //--------------------------------------------------------
 
-    // Triggered when our edition mode will be opened
-    signal willOpenEditionMode();
-
-    // Triggered when our edition mode will be closed
-    signal willCloseEditionMode();
-
     // Triggered when we press the "OK" button
-    signal changeNetworkSettings(string networkDevice, int port, bool clearPlatform);
+    signal changeNetworkSettings(string networkDevice, int port);
+
+    // Triggered when we press the "ONLINE/OFFLINE" toggle
+    signal connectChanged(bool wasOnlineBeforeConnectChanged);
 
 
     //--------------------------------------------------------
@@ -138,88 +117,45 @@ I2CustomRectangle {
     // Open our widget
     function open()
     {
-        if (!rootPrivate.isEditionModeOpened)
+        if (!rootPrivate.isEditionModeOpened && rootPrivate.networkDevicesAvailable)
         {
-            // Notify change
-            root.willOpenEditionMode();
-
             // Update internal states
             rootPrivate.isEditionModeOpened = true;
-            rootPrivate.canAutoCloseEditionMode = true;
+
+            // Close our combobox
+            selectNetworkDeviceCombobox.close();
 
             // Get focus
             root.forceActiveFocus();
-
-            // Reset UI
-            // - network device
-            resetComboboxSelectNetworkDevice();
-            // - port
-            selectPortTextfield.text = Qt.binding(function() {
-               return root.currentPort;
-            });
         }
     }
 
     // Close our widget
     function close()
     {
-        if (rootPrivate.isEditionModeOpened)
+        if (root.checkValues() && rootPrivate.isEditionModeOpened)
         {
-            // Stop our timer
-            autoCloseTimer.stop();
-
-            // Notify change
-            root.willCloseEditionMode();
-
             // Update internal states
             rootPrivate.isEditionModeOpened = false;
-            rootPrivate.canAutoCloseEditionMode = false;
         }
     }
 
-    // Reset our combobox used to select a network device
-    function resetComboboxSelectNetworkDevice()
-    {
-        // Close our combobox
-        selectNetworkDeviceCombobox.close();
-
-        // Update selected index
-        selectNetworkDeviceCombobox.selectedIndex = Qt.binding(function() {
-            var index = (
-                         (root.listOfNetworkDevices)
-                         ? root.listOfNetworkDevices.indexOf(root.currentNetworkDevice)
-                         : -1
-                        );
-
-            // When our current network device is offline, we try to help our end-users
-            // by selecting a network device when we can i.e. when there is a single network device available
-            return (
-                    (index >= 0)
-                    ? index
-                    : (((root.listOfNetworkDevices) && (root.listOfNetworkDevices.length === 1)) ? 0 : -1)
-                   );
-        });
-    }
-
     // Check if values are valid or not
-    function checkValues(index, networkDevice, port, forceQmlUpdate)
+    function checkValues()
     {
+        var index = selectNetworkDeviceCombobox.selectedIndex;
+        var networkDevice = selectNetworkDeviceCombobox.selectedItem;
+        var port = selectPortTextfield.text;
+
         return (
                 // Coherent values
                 (index >= 0)
                 && (networkDevice !== "")
                 && (port !== "")
                 // Values are still available
-                && listOfNetworkDevices
-                && (listOfNetworkDevices.indexOf(networkDevice) >= 0)
+                && IgsNetworkController
+                && (IgsNetworkController.availableNetworkDevices.indexOf(networkDevice) >= 0)
                 );
-    }
-
-    // Reset auto-close timer
-    function resetAutoCloseTimer()
-    {
-        rootPrivate.canAutoCloseEditionMode = false;
-        rootPrivate.canAutoCloseEditionMode = true;
     }
 
 
@@ -230,67 +166,39 @@ I2CustomRectangle {
     //--------------------------------------------------------
 
     Behavior on color {
-        enabled: rootPrivate.canPerformAnimations
-
         ColorAnimation {
             duration: root.animationDuration
         }
     }
 
     Behavior on borderColor {
-        enabled: rootPrivate.canPerformAnimations
-
         ColorAnimation {
             duration: root.animationDuration
         }
     }
 
-    Component.onCompleted: {
-        rootPrivate.canPerformAnimations = true;
-    }
-
-    onListOfNetworkDevicesChanged: {
-        resetComboboxSelectNetworkDevice();
-
-        rootPrivate.networkDevicesAvailable = root.listOfNetworkDevices.length > 0;
-        if (!rootPrivate.networkDevicesAvailable) {
-            close();
-        }
-    }
-
-    onEditorStartedOnIgsChanged: {
-        if ((!root.editorStartedOnIgs) && (rootPrivate.networkDevicesAvailable))
+    onCurrentNetworkDeviceChanged: {
+        if ((root.currentNetworkDevice === "") && rootPrivate.networkDevicesAvailable)
         {
-            // Open settings to show user that he has to make a choice for a network device
-            open();
+            selectNetworkDeviceCombobox.selectedIndex = -1;
+            open(); // Open component to force user to make a choice
         }
         else
         {
-            // Close settings if editor is (re)started
             close();
         }
     }
 
     onVisibleChanged: {
-        if (visible == false) {
+        if (!visible)
+        {
             close();
         }
-    }
 
-    // Timer used to auto-close our edition mode
-    Timer {
-        id: autoCloseTimer
-
-        running: root.editorStartedOnIgs && rootPrivate.canAutoCloseEditionMode
-                 && !(selectNetworkDeviceCombobox.comboList.visible || selectPortTextfield.activeFocus)
-
-        repeat: false
-        triggeredOnStart: false
-
-        interval: 20000
-
-        onTriggered: {
-            root.close();
+        if (visible && (root.currentNetworkDevice === "") && rootPrivate.networkDevicesAvailable)
+        {
+            // Open component to force user to make a choice
+            open();
         }
     }
 
@@ -302,105 +210,102 @@ I2CustomRectangle {
     //--------------------------------------------------------
 
     //
-    // Mouse Area allowing hover & click on our component
+    // Content of our component
     //
-    MouseArea {
-        id: contentMouseArea
-
-        anchors.top : parent.top
-
-        width: parent.width
-        height: childrenRect.height
-
-        enabled: rootPrivate.networkDevicesAvailable
-
-        hoverEnabled: true
-
-        onClicked: {
-            if (rootPrivate.isEditionModeOpened && root.editorStartedOnIgs)
-            {
-                root.close();
-            }
-            else if (!rootPrivate.isEditionModeOpened)
-            {
-                root.open();
-            }
+    Column {
+        id: content
+        anchors {
+            top: parent.top
+            left: parent.left
+            leftMargin: 10
+            right: parent.right
+            rightMargin: 8
         }
 
-        onPositionChanged: {
-            if (rootPrivate.isEditionModeOpened) {
-                resetAutoCloseTimer();
-            }
-        }
-
-
         //
-        // Content of our component
+        // Header of our component (always visible)
         //
-        Column {
-            id: content
-
-            anchors {
-                top: parent.top
-                left: parent.left
-                leftMargin: 10
-                right: parent.right
-                rightMargin: 8
-            }
+        Item {
+            id : header
+            width: parent.width
+            height: headerWithoutExtra.height + extraContentItem.height
 
             //
-            // Header of our component (always visible)
+            // Mouse Area allowing hover & click on our header
             //
+            MouseArea {
+                id: contentMouseArea
+                anchors.fill: parent
+
+                enabled: rootPrivate.networkDevicesAvailable
+                hoverEnabled: true
+
+                onClicked: {
+                    // Update our list of available network devices
+                    IgsNetworkController.updateAvailableNetworkDevices();
+
+                    if (rootPrivate.isEditionModeOpened)
+                    {
+                        root.close();
+                    }
+                    else
+                    {
+                        root.open();
+                    }
+                }
+
+                // Button - Open network settings
+                LabellessSvgButton {
+                    id: buttonOpenSettings
+                    anchors {
+                        right: parent.right
+                        top: parent.top
+                        topMargin: 8
+                    }
+                    visible: rootPrivate.networkDevicesAvailable
+
+                    pressedID: "mapping-mode-settings-pressed"
+                    releasedID: rootPrivate.mustBeHighlighted ? (contentMouseArea.pressed ? buttonOpenSettings.pressedID
+                                                                                          : "mapping-mode-settings-hover")
+                                                              : "mapping-mode-settings"
+
+                    Controls2.ToolTip {
+                        delay: Qt.styleHints.mousePressAndHoldInterval
+                        visible: buttonOpenSettings.enabled && buttonOpenSettings.__behavior.containsMouse
+                        text: qsTr("Edit network settings")
+                    }
+
+                    onClicked: {
+                        rootPrivate.isEditionModeOpened ? root.close() : root.open();
+                    }
+                }
+            }
+
             Item {
-                id : header
-
-                width: parent.width
+                id: headerWithoutExtra
+                anchors {
+                    top: parent.top
+                    left: parent.left
+                    right: parent.right
+                }
                 height: 70
 
-                // Header of our component when editor is online
+                // Header of our component when network device available
                 Item {
                     id: headerContentOnline
                     anchors.fill: parent
-
                     visible: rootPrivate.networkDevicesAvailable
-
-                    // Button - Open network settings
-                    LabellessSvgButton {
-                        id: buttonOpenSettings
-
-                        anchors {
-                            right: parent.right
-                            top: parent.top
-                            topMargin: 8
-                        }
-
-                        releasedID: rootPrivate.mustBeHighlighted ? root.settingsHighlightedId : root.settingsReleasedId
-                        pressedID: root.settingsPressedId
-
-                        onClicked: {
-                            rootPrivate.isEditionModeOpened ? root.close() : root.open();
-                        }
-
-//                        Controls2.ToolTip {
-//                            delay: Qt.styleHints.mousePressAndHoldInterval
-//                            visible: buttonOpenSettings.enabled && buttonOpenSettings.__behavior.containsMouse
-//                            text: qsTr("Edit network settings")
-//                        }
-                    }
 
                     // Toggle - Connect/Disconnect current platform
                     Button {
                         id : connectButton
                         anchors {
                             left: parent.left
-                            top : buttonOpenSettings.verticalCenter
-                            rightMargin: 8
+                            top: parent.top
+                            topMargin: 15
                         }
 
-                        visible: true
-                        enabled: visible && root.editorStartedOnIgs
-
-                        checked : IgsModelManager ? IgsModelManager.isMappingConnected : false
+                        enabled: ((root.currentNetworkDevice !== "") && (root.currentPort !== ""))
 
                         style: I2SvgToggleButtonStyle {
                             fileCache: IngeScapeTheme.svgFileIngeScape
@@ -417,20 +322,19 @@ I2CustomRectangle {
                             labelMargin: 0;
                         }
 
-                        onCheckedChanged: {
-                            if (IgsModelManager) {
-                                IgsModelManager.isMappingConnected = checked;
-                            }
+                        onClicked: {
+                            checked = false;
+                            root.connectChanged(IgsNetworkController.isStarted);
                         }
 
                         Binding {
                             target: connectButton
                             property: "checked"
-                            value: IgsModelManager.isMappingConnected
+                            value: IgsNetworkController.isStarted
                         }
                     }
 
-                    // Text CONNECTED/DISCONNECTED
+                    // Text ONLINE/OFFLINE
                     Text {
                         id: textInfoPart1
                         anchors {
@@ -440,10 +344,11 @@ I2CustomRectangle {
                             leftMargin: 8
                         }
 
-                        text: (IgsModelManager && IgsModelManager.isMappingConnected) ? qsTr("Connected")
-                                                                   : qsTr("Disconnected")
+                        text: (IgsNetworkController && IgsNetworkController.isStarted)  ? qsTr("ONline")
+                                                                                        : qsTr("OFFline")
 
-                        color: (IgsModelManager && IgsModelManager.isMappingConnected) ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor
+                        color: (IgsNetworkController && IgsNetworkController.isStarted) ? IngeScapeTheme.whiteColor
+                                                                                        : IngeScapeTheme.lightGreyColor
                         font {
                             family: IngeScapeTheme.labelFontFamily
                             weight: Font.Bold
@@ -455,17 +360,16 @@ I2CustomRectangle {
                     // Infos about network device and port used
                     Text {
                        id: textInfoPart2
-
                        anchors {
                            left: textInfoPart1.left
                            right: textInfoPart1.right
                            top: connectButton.bottom
                        }
 
-                       visible : root.editorStartedOnIgs
+                       visible : ((root.currentNetworkDevice !== "") && (root.currentNetworkDevice !== ""))
 
-                       color: (IgsModelManager && IgsModelManager.isMappingConnected) ? IngeScapeTheme.veryLightGreyColor : IngeScapeTheme.lightGreyColor
-
+                       color: (IgsNetworkController && IgsNetworkController.isStarted) ? IngeScapeTheme.veryLightGreyColor
+                                                                                       : IngeScapeTheme.lightGreyColor
                        font {
                            family: IngeScapeTheme.heading2Font
                            weight: Font.Normal
@@ -473,43 +377,38 @@ I2CustomRectangle {
                        }
 
                        elide: Text.ElideRight
-
                        text: qsTr("on " + root.currentNetworkDevice + " and port " + root.currentPort)
                    }
                 }
 
-                // Header of our component when editor is offline
+                // Header of our component when no network device is available
                 Item {
                     id: headerContentOffline
-
                     anchors {
                         top: parent.top
                         bottom: parent.bottom
                         horizontalCenter: parent.horizontalCenter
                     }
-
                     width: childrenRect.width
+                    height: visible ? 70 : 0
 
                     visible: !headerContentOnline.visible
 
                     SvgImage {
                         id: warningPicto
-
                         anchors.verticalCenter: parent.verticalCenter
-
                         svgElementId : "mapping-mode-message-warning"
                     }
 
                     Text {
                         id: message
-
                         anchors {
                             left: warningPicto.right
                             leftMargin: 15
                             verticalCenter: parent.verticalCenter
                         }
 
-                        text: "No network device"
+                        text: qsTr("No network device")
 
                         color: IngeScapeTheme.lightGreyColor
                         font {
@@ -520,320 +419,277 @@ I2CustomRectangle {
                         }
                     }
                 }
+
+            }
+
+            // Item that will contain our extra content
+            // NB: our extra content must have a fixed width and a fixed height
+            //     It MUST NOT rely on anchors
+            Item {
+                id: extraContentItem
+                anchors {
+                    top: headerWithoutExtra.bottom
+                    left: parent.left
+                    right: parent.right
+                }
+                height: childrenRect.height
+                width: childrenRect.width
+            }
+        }
+
+        //
+        // Network settings (only visible when it is opened)
+        //
+        Item {
+            id: editNetworkSettings
+            width: parent.width
+            height: (rootPrivate.isEditionModeOpened) ?  childrenRect.height : 0
+
+            opacity: (rootPrivate.isEditionModeOpened) ? 1 : 0
+            visible: (height !== 0)
+
+            clip: (height !== childrenRect.height)
+
+            Behavior on height {
+                NumberAnimation {
+                    duration: root.animationDuration
+                }
+            }
+
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: root.animationDuration
+                }
+            }
+
+            // First separator
+            Rectangle {
+                id: separator
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    top: parent.top
+                }
+                height: 1
+                color: IngeScapeTheme.editorsBackgroundBorderColor
+            }
+
+            // Select network device
+            Text {
+                id: labelNetworkDevice
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    top: separator.bottom
+                    topMargin: 14
+                }
+
+                text: qsTr("Network device")
+                color: IngeScapeTheme.lightGreyColor
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    pixelSize: 16
+                }
+            }
+
+            I2ComboboxStringList {
+                id: selectNetworkDeviceCombobox
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    top: labelNetworkDevice.bottom
+                    topMargin: 9
+                }
+                height : 22
+
+                style: IngeScapeComboboxStyle {}
+                scrollViewStyle: IngeScapeScrollViewStyle {}
+
+                _mouseArea.hoverEnabled: true
+
+                placeholderText: qsTr("Select a network device...")
+
+                model: IgsNetworkController ? IgsNetworkController.availableNetworkDevices : null
+                selectedIndex: (root.currentNetworkDevice !== "") ? IgsNetworkController.availableNetworkDevices.indexOf(root.currentNetworkDevice) : -1
+
+                delegate: customDelegate.component
+
+                IngeScapeToolTipComboboxDelegate {
+                    id: customDelegate
+
+                    comboboxStyle: selectNetworkDeviceCombobox.style
+                    selection: selectNetworkDeviceCombobox.selectedIndex
+
+                    height: selectNetworkDeviceCombobox.height
+                    width:  selectNetworkDeviceCombobox.width
+
+                    // Called from the component's MouseArea
+                    // 'index' is the index of the clicked component inside the model.
+                    function onDelegateClicked(index) {
+                        selectNetworkDeviceCombobox.onDelegateClicked(index)
+                    }
+
+                    // Called from the component to get the text of the current item to display
+                    // 'index' is the index of the component to be displayed inside the model.
+                    function getItemText(index) {
+                        return selectNetworkDeviceCombobox.modelToString(selectNetworkDeviceCombobox.model[index]);
+                    }
+                }
+            }
+
+            // Select port
+            Text {
+                id: labelPort
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    top: selectNetworkDeviceCombobox.bottom
+                    topMargin: 18
+                }
+
+                text: qsTr("Port")
+                color: IngeScapeTheme.lightGreyColor
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    pixelSize: 16
+                }
+            }
+
+            TextField {
+                id: selectPortTextfield
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    top: labelPort.bottom
+                    topMargin: 9
+                }
+                height: 22
+
+                verticalAlignment: TextInput.AlignVCenter
+
+                text: root.currentPort
+
+                validator: IntValidator {
+                    bottom: 1
+                    top: 65535
+                }
+
+                style: I2TextFieldStyle {
+                    backgroundColor: IngeScapeTheme.darkBlueGreyColor
+                    borderColor: IngeScapeTheme.whiteColor
+                    borderErrorColor: IngeScapeTheme.redColor
+                    radiusTextBox: 1
+                    borderWidth: 0
+                    borderWidthActive: 1
+                    textIdleColor: IngeScapeTheme.whiteColor
+                    textDisabledColor: IngeScapeTheme.darkGreyColor
+
+                    padding {
+                        left: 3
+                        right: 3
+                    }
+                    font {
+                        pixelSize:15
+                        family: IngeScapeTheme.textFontFamily
+                    }
+                }
             }
 
 
-            //
-            // Network settings (only visible when it is opened)
-            //
+            // Actions
             Item {
-                id: editNetworkSettings
-
-                width: parent.width
-                height: (rootPrivate.isEditionModeOpened) ?  childrenRect.height : 0
-
-                opacity: (rootPrivate.isEditionModeOpened) ? 1 : 0
-
-                visible: (height !== 0)
-
-                clip: (height !== childrenRect.height)
-
-                Behavior on height {
-                    enabled: rootPrivate.canPerformAnimations
-
-                    NumberAnimation {
-                        duration: root.animationDuration
-                    }
+                id: actions
+                anchors {
+                    top: selectPortTextfield.bottom
+                    left: parent.left
+                    right: parent.right
+                    topMargin: 25
                 }
 
-                Behavior on opacity {
-                    enabled: rootPrivate.canPerformAnimations
+                height: 43
 
-                    NumberAnimation {
-                        duration: root.animationDuration
-                    }
-                }
+                property var buttonBoundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
 
-
-                // First separator
-                Rectangle {
-                    id: separator
-
+                Row {
                     anchors {
-                        left: parent.left
                         right: parent.right
                         top: parent.top
                     }
+                    height: actions.buttonBoundingBox.height
+                    spacing: 15
 
-                    height: 1
-
-                    color: IngeScapeTheme.editorsBackgroundBorderColor
-                }
-
-
-                // Item that will contain our extra content
-                // NB: our extra content must have a fixed width and a fixed height
-                //     It MUST NOT rely on anchors
-                Item {
-                    id: extraContentItem
-
-                    anchors {
-                        top: separator.top
-                        left: parent.left
-                    }
-
-                    height: childrenRect.height
-                    width: childrenRect.width
-                }
-
-
-                // Select network device
-                Text {
-                    id: labelNetworkDevice
-
-                    anchors {
-                        left: parent.left
-                        right: parent.right
-                        top: extraContentItem.bottom
-                        topMargin: 14
-                    }
-
-                    text: qsTr("Network device")
-
-                    color: IngeScapeTheme.lightGreyColor
-
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        pixelSize: 16
-                    }
-                }
-
-                I2ComboboxStringList {
-                    id: selectNetworkDeviceCombobox
-
-                    anchors {
-                        left: parent.left
-                        right: parent.right
-                        top: labelNetworkDevice.bottom
-                        topMargin: 9
-                    }
-
-                    height : 22
-
-                    style: IngeScapeComboboxStyle {}
-                    scrollViewStyle: IngeScapeScrollViewStyle {}
-
-                    _mouseArea.hoverEnabled: true
-
-                    placeholderText: qsTr("Select a network device...")
-
-                    model: null
-                    selectedIndex: -1
-
-                    delegate: customDelegate.component
-
-                    IngeScapeToolTipComboboxDelegate {
-                        id: customDelegate
-
-                        comboboxStyle: selectNetworkDeviceCombobox.style
-                        selection: selectNetworkDeviceCombobox.selectedIndex
-
-                        height: selectNetworkDeviceCombobox.height
-                        width:  selectNetworkDeviceCombobox.width
-
-                        // Called from the component's MouseArea
-                        // 'index' is the index of the clicked component inside the model.
-                        function onDelegateClicked(index) {
-                            selectNetworkDeviceCombobox.onDelegateClicked(index)
-                        }
-
-                        // Called from the component to get the text of the current item to display
-                        // 'index' is the index of the component to be displayed inside the model.
-                        function getItemText(index) {
-                            return selectNetworkDeviceCombobox.modelToString(selectNetworkDeviceCombobox.model[index]);
-                        }
-                    }
-
-                    onSelectedIndexChanged: {
-                        root.resetAutoCloseTimer();
-                    }
-                }
-
-
-                // Select port
-                Text {
-                    id: labelPort
-                    anchors {
-                        left: parent.left
-                        right: parent.right
-                        top: selectNetworkDeviceCombobox.bottom
-                        topMargin: 18
-                    }
-
-                    text: qsTr("Port")
-
-                    color: IngeScapeTheme.lightGreyColor
-
-                    font {
-                        family: IngeScapeTheme.textFontFamily
-                        pixelSize: 16
-                    }
-                }
-
-                TextField {
-                    id: selectPortTextfield
-
-                    anchors {
-                        left: parent.left
-                        right: parent.right
-                        top: labelPort.bottom
-                        topMargin: 9
-                    }
-
-                    height: 22
-
-                    verticalAlignment: TextInput.AlignVCenter
-
-                    text: root.currentPort
-
-                    validator: IntValidator {
-                        bottom: 1
-                        top: 65535
-                    }
-
-                    style: I2TextFieldStyle {
-                        backgroundColor: IngeScapeTheme.darkBlueGreyColor
-                        borderColor: IngeScapeTheme.whiteColor
-                        borderErrorColor: IngeScapeTheme.redColor
-                        radiusTextBox: 1
-                        borderWidth: 0
-                        borderWidthActive: 1
-                        textIdleColor: IngeScapeTheme.whiteColor
-                        textDisabledColor: IngeScapeTheme.darkGreyColor
-
-                        padding {
-                            left: 3
-                            right: 3
-                        }
-
-                        font {
-                            pixelSize:15
-                            family: IngeScapeTheme.textFontFamily
-                        }
-                    }
-
-                    onTextChanged: {
-                        root.resetAutoCloseTimer();
-                    }
-                }
-
-
-                // Actions
-                Item {
-                    id: actions
-
-                    anchors {
-                        top: selectPortTextfield.bottom
-                        left: parent.left
-                        right: parent.right
-                        topMargin: 25
-                    }
-
-                    height: 43
-
-                    property var buttonBoundingBox: IngeScapeTheme.svgFileIngeScape.boundsOnElement("button");
-
-                    Row {
+                    // Cancel button
+                    Button {
+                        id: buttonCancel
                         anchors {
-                            right: parent.right
                             top: parent.top
+                            bottom: parent.bottom
+                        }
+                        width: actions.buttonBoundingBox.width
+
+                        visible: (root.currentNetworkDevice !== "") // If no current device, user have to choose one (mandatory !)
+
+                        activeFocusOnPress: true
+
+                        text: qsTr("Cancel")
+
+                        style: I2SvgButtonStyle {
+                            fileCache: IngeScapeTheme.svgFileIngeScape
+
+                            pressedID: releasedID + "-pressed"
+                            releasedID: "button"
+                            disabledID: releasedID + "-disabled"
+
+                            font {
+                                family: IngeScapeTheme.textFontFamily
+                                weight : Font.Medium
+                                pixelSize : 16
+                            }
+                            labelColorPressed: IngeScapeTheme.blackColor
+                            labelColorReleased: IngeScapeTheme.whiteColor
+                            labelColorDisabled: IngeScapeTheme.whiteColor
+
                         }
 
-                        height: actions.buttonBoundingBox.height
+                        onClicked: {
+                            root.close();
+                        }
+                    }
 
-                        spacing: 15
+                    // Ok button
+                    Button {
+                        id: buttonOk
+                        anchors {
+                            top: parent.top
+                            bottom: parent.bottom
+                        }
+                        width: actions.buttonBoundingBox.width
 
-                        // Cancel button
-                        Button {
-                            id: buttonCancel
+                        enabled: root.checkValues()
+                        activeFocusOnPress: true
 
-                            anchors {
-                                top: parent.top
-                                bottom: parent.bottom
+                        text: qsTr("OK")
+
+                        style: I2SvgButtonStyle {
+                            fileCache: IngeScapeTheme.svgFileIngeScape
+
+                            pressedID: releasedID + "-pressed"
+                            releasedID: "button"
+                            disabledID: releasedID + "-disabled"
+
+                            font {
+                                family: IngeScapeTheme.textFontFamily
+                                weight: Font.Medium
+                                pixelSize: 16
                             }
-
-                            visible: root.editorStartedOnIgs
-
-                            width: actions.buttonBoundingBox.width
-
-                            activeFocusOnPress: true
-
-                            text: qsTr("Cancel")
-
-                            style: I2SvgButtonStyle {
-                                fileCache: IngeScapeTheme.svgFileIngeScape
-
-                                pressedID: releasedID + "-pressed"
-                                releasedID: "button"
-                                disabledID: releasedID + "-disabled"
-
-                                font {
-                                    family: IngeScapeTheme.textFontFamily
-                                    weight : Font.Medium
-                                    pixelSize : 16
-                                }
-                                labelColorPressed: IngeScapeTheme.blackColor
-                                labelColorReleased: IngeScapeTheme.whiteColor
-                                labelColorDisabled: IngeScapeTheme.whiteColor
-
-                            }
-
-                            onClicked: {
-                                root.close();
-                            }
+                            labelColorPressed: IngeScapeTheme.blackColor
+                            labelColorReleased: IngeScapeTheme.whiteColor
+                            labelColorDisabled: IngeScapeTheme.greyColor
                         }
 
-                        // Ok button
-                        Button {
-                            id: buttonOk
-
-                            anchors {
-                                top: parent.top
-                                bottom: parent.bottom
-                            }
-
-                            width: actions.buttonBoundingBox.width
-
-                            enabled: root.checkValues(selectNetworkDeviceCombobox.selectedIndex,
-                                                      selectNetworkDeviceCombobox.selectedItem,
-                                                      selectPortTextfield.text,
-                                                      (root.listOfNetworkDevices ? root.listOfNetworkDevices.length : 0)
-                                                      )
-
-                            activeFocusOnPress: true
-
-                            text: qsTr("OK")
-
-                            style: I2SvgButtonStyle {
-                                fileCache: IngeScapeTheme.svgFileIngeScape
-
-                                pressedID: releasedID + "-pressed"
-                                releasedID: "button"
-                                disabledID: releasedID + "-disabled"
-
-                                font {
-                                    family: IngeScapeTheme.textFontFamily
-                                    weight: Font.Medium
-                                    pixelSize: 16
-                                }
-                                labelColorPressed: IngeScapeTheme.blackColor
-                                labelColorReleased: IngeScapeTheme.whiteColor
-                                labelColorDisabled: IngeScapeTheme.greyColor
-                            }
-
-                            onClicked: {
-                                root.changeNetworkSettings(selectNetworkDeviceCombobox.selectedItem, selectPortTextfield.text, false);
-                            }
+                        onClicked: {
+                            root.changeNetworkSettings(selectNetworkDeviceCombobox.selectedItem, selectPortTextfield.text);
+                            root.close();
                         }
                     }
                 }
@@ -851,9 +707,7 @@ I2CustomRectangle {
     // layer used to display comboboxes
     I2Layer {
         id: overlayLayerComboBox
-
         objectName: "overlayLayerComboBox"
-
         anchors.fill: parent
     }
 }

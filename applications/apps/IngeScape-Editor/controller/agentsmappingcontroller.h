@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2020 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -10,7 +10,7 @@
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *      Alexandre Lemort   <lemort@ingenuity.io>
- *
+ *      Chloé Roumieu      <roumieu@ingenuity.io>
  */
 
 #ifndef AGENTSMAPPINGCONTROLLER_H
@@ -19,7 +19,7 @@
 #include <QObject>
 #include <QtQml>
 #include <I2PropertyHelpers.h>
-#include <controller/editormodelmanager.h>
+#include <controller/ingescapemodelmanager.h>
 #include <viewModel/agentinmappingvm.h>
 #include <viewModel/mapping/actioninmappingvm.h>
 #include <viewModel/link/linkvm.h>
@@ -31,6 +31,9 @@
 class AgentsMappingController : public QObject
 {
     Q_OBJECT
+
+    // Flag indicating if the editor impose its mapping to agents that arrived on the network when it is ONLINE
+    I2_QML_PROPERTY(bool, imposeMappingToAgentsON)
 
     // Size of the mapping view
     I2_QML_PROPERTY_FUZZY_COMPARE(double, viewWidth)
@@ -54,8 +57,8 @@ class AgentsMappingController : public QObject
     // Flag indicating if our mapping is empty
     I2_QML_PROPERTY_READONLY(bool, isEmptyMapping)
 
-    // Selected agent in the mapping
-    I2_QML_PROPERTY_DELETE_PROOF(AgentInMappingVM*, selectedAgent)
+    // Selected agents grouped by name (in both mapping & agents list views)
+    I2_QML_PROPERTY_CUSTOM_SETTER(AgentsGroupedByNameVM*, selectedAgent)
 
     // Selected action in the mapping
     I2_QML_PROPERTY_DELETE_PROOF(ActionInMappingVM*, selectedAction)
@@ -68,32 +71,15 @@ class AgentsMappingController : public QObject
 
 
 public:
-    /**
-     * @brief Constructor
-     * @param modelManager
-     * @param parent
-     */
-    explicit AgentsMappingController(EditorModelManager* modelManager,
-                                     QObject *parent = nullptr);
 
-
-    /**
-     * @brief Destructor
-     */
+    explicit AgentsMappingController(QObject *parent = nullptr);
     ~AgentsMappingController();
 
 
     /**
-     * @brief Clear the current mapping
+     * @brief Delete all agents OFF and their mappings and all actions
      */
     void clearMapping();
-
-
-    /**
-     * @brief Remove the agent from the mapping and delete the view model
-     * @param agent
-     */
-    Q_INVOKABLE void deleteAgentInMapping(AgentInMappingVM* agent);
 
 
     /**
@@ -105,7 +91,6 @@ public:
 
     /**
      * @brief Remove a link between two objects in the mapping
-     * @param link
      */
     Q_INVOKABLE void removeLinkBetweenTwoObjectsInMapping(LinkVM* link);
 
@@ -204,12 +189,6 @@ public:
     void importMappingFromJson(QJsonArray jsonArrayOfAgentsInMapping);
 
 
-    /**
-     * @brief Reset the modifications made while the mapping was UN-activated
-     */
-    Q_INVOKABLE void resetModificationsWhileMappingWasUNactivated();
-
-
 Q_SIGNALS:
 
     /**
@@ -237,28 +216,12 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when the user activates the mapping in mode OBSERVE
-     * while he made some changes on the links betwwen agents.
-     * These changes will be lost if the user stay in mode OBSERVE
-     */
-    void changesOnLinksWhileMappingUnactivated();
-
-
-    /**
      * @brief Signal emitted when an action has to be executed
-     * @param action
      */
     void executeAction(ActionM* action);
 
 
 public Q_SLOTS:
-
-    /**
-     * @brief Slot called when the flag "is Mapping Connected" changed
-     * @param isMappingConnected
-     */
-    void onIsMappingConnectedChanged(bool isMappingConnected);
-
 
     /**
      * @brief Slot called when a new view model of agents grouped by name has been created
@@ -297,15 +260,15 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Slot called when the flag "is ON" of an agent(s grouped by name) changed
-     * @param isON
+     * @brief Slot called when the flag "is ON" of an agent(s grouped by name) changed (only happens when we are online)
+     * It means that our agent was ALREADY in our platform
      */
     void _onAgentIsONChanged(bool isON);
 
 
     /**
-     * @brief Slot called when a model of agent "ON" has been added to an agent(s grouped by name)
-     * @param model
+     * @brief Slot called when a model of agent "ON" has been added to an agent(s grouped by name) (only happens when we are online)
+     * It means that our agent was NOT in our platform
      */
     void _onAgentModelONhasBeenAdded(AgentM* model);
 
@@ -333,7 +296,6 @@ private Q_SLOTS:
 
     /**
      * @brief Slot called when some view models of link outputs have been added to an agent in mapping
-     * @param addedlinkOutputs
      */
     void _onLinkOutputsListHaveBeenAdded(const QList<LinkOutputVM*>& addedlinkOutputs);
 
@@ -347,7 +309,6 @@ private Q_SLOTS:
 
     /**
      * @brief Slot called when some view models of link outputs will be removed from an agent in mapping
-     * @param removedLinkOutputs
      */
     void _onLinkOutputsListWillBeRemoved(const QList<LinkOutputVM*>& removedLinkOutputs);
 
@@ -372,33 +333,18 @@ private:
 
     /**
      * @brief Create a new agent in the global mapping with an "Agents Grouped by Name" and at a specific position
-     * @param agentsGroupedByName
-     * @param position
-     * @return
      */
     AgentInMappingVM* _createAgentInMappingAtPosition(AgentsGroupedByNameVM* agentsGroupedByName, QPointF position, qreal width);
 
 
     /**
      * @brief Create a new action in the global mapping with a unique id, with a model of action and at a specific position
-     * @param uid
-     * @param action
-     * @param position
-     * @return
      */
     ActionInMappingVM* _createActionInMappingAtPosition(QString uid, ActionM* action, QPointF position, qreal width);
 
 
     /**
      * @brief Create a link between two objects in the mapping
-     * @param linkName
-     * @param outputObject
-     * @param linkOutput
-     * @param inputObject
-     * @param linkInput
-     * @param mappingElement
-     * @param isTemporary
-     * @return
      */
     LinkVM* _createLinkBetweenTwoObjectsInMapping(const QString& linkName,
                                                   ObjectInMappingVM* outputObject,
@@ -408,10 +354,14 @@ private:
                                                   MappingElementVM* mappingElement = nullptr,
                                                   bool isTemporary = false);
 
+    /**
+     * @brief Remove the agent from the mapping and delete the view model
+     */
+    void _deleteAgentInMapping(AgentInMappingVM* agent);
+
 
     /**
      * @brief Remove a link between two agents from the mapping
-     * @param link
      */
     void _removeLinkBetweenTwoAgents(LinkVM* link);
 
@@ -424,36 +374,19 @@ private:
 
 
     /**
-     * @brief Remove all the links with an agent
-     * @param agent
-     */
-    void _removeAllLinksWithAgent(AgentInMappingVM* agent);
-
-
-    /**
-     * @brief Update the global mapping with agents ON and their links
-     */
-    void _updateMappingWithAgentsONandLinks();
-
-
-    /**
      * @brief Link an agent (in the global mapping) on its inputs (add all missing links TO an agent)
-     * @param agentInMapping
      */
     void _linkAgentOnInputs(AgentInMappingVM* agentInMapping);
 
 
     /**
      * @brief Link an agent (in the global mapping) on its input from a mapping element (add a missing link TO an agent)
-     * @param inputAgent
-     * @param mappingElement
      */
     void _linkAgentOnInputFromMappingElement(AgentInMappingVM* inputAgent, MappingElementVM* mappingElement);
 
 
     /**
      * @brief Link an agent (in the global mapping) on its outputs (add all missing links FROM an agent)
-     * @param agentInMapping
      */
     void _linkAgentOnOutputs(AgentInMappingVM* agentInMapping);
 
@@ -522,9 +455,6 @@ private:
 
 private:
 
-    // Manager for the data model of IngeScape
-    EditorModelManager* _modelManager;
-
     // Hash table from agent name to the (view model of) agent in mapping
     QHash<QString, AgentInMappingVM*> _hashFromNameToAgentInMapping;
 
@@ -542,9 +472,6 @@ private:
 
     // Hash table from "output agent name" to a list of waiting mapping elements (where the agent is involved as "output agent")
     QHash<QString, QList<MappingElementVM*>> _hashFromOutputAgentNameToListOfWaitingMappingElements;
-
-    // Hash table from "output agent name" to a list of waiting mapping elements (where the agent is involved as "output agent") while the mapping was UN-activated
-    //QHash<QString, QList<MappingElementVM*>> _hashFromOutputAgentNameToListOfWaitingMappingElements_WhileMappingWasUNactivated;
 
     // Hash table from "(unique) link id" to the added link (for which we are waiting a reply to the request "add")
     QHash<QString, LinkVM*> _hashFromLinkIdToAddedLink_WaitingReply;

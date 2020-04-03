@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2020 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -10,22 +10,16 @@
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *      Alexandre Lemort   <lemort@ingenuity.io>
- *
+ *      Chloé Roumieu      <roumieu@ingenuity.io>
  */
 
 #include "agentssupervisioncontroller.h"
-
 #include <QQmlEngine>
 #include <QDebug>
 #include <controller/ingescapenetworkcontroller.h>
 
 
-/**
- * @brief Constructor
- * @param parent
- */
-AgentsSupervisionController::AgentsSupervisionController(QObject *parent) : QObject(parent),
-    _selectedAgent(nullptr)
+AgentsSupervisionController::AgentsSupervisionController(QObject *parent) : QObject(parent)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -38,14 +32,8 @@ AgentsSupervisionController::AgentsSupervisionController(QObject *parent) : QObj
 }
 
 
-/**
- * @brief Destructor
- */
 AgentsSupervisionController::~AgentsSupervisionController()
 {
-    // Clean-up current selection
-    setselectedAgent(nullptr);
-
     _hashFromDefinitionNameToDefinitionsList.clear();
 
     //_mapFromNameToAgentViewModelsList.clear();
@@ -58,7 +46,6 @@ AgentsSupervisionController::~AgentsSupervisionController()
 
 /**
  * @brief Remove the agent from the list and delete it
- * @param agent
  */
 void AgentsSupervisionController::deleteAgentInList(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition)
 {
@@ -72,6 +59,18 @@ void AgentsSupervisionController::deleteAgentInList(AgentsGroupedByDefinitionVM*
             agentsGroupedByName->deleteAgentsGroupedByDefinition(agentsGroupedByDefinition);
         }
     }
+}
+
+/**
+ * @brief Get Agents grouped by name for this definition
+ */
+AgentsGroupedByNameVM* AgentsSupervisionController::getAgentsGroupedByName(AgentsGroupedByDefinitionVM* agentsGroupedByDefinition)
+{
+    if (agentsGroupedByDefinition != nullptr)
+    {
+        return IngeScapeModelManager::instance()->getAgentsGroupedForName(agentsGroupedByDefinition->name());
+    }
+    return nullptr;
 }
 
 
@@ -128,11 +127,6 @@ void AgentsSupervisionController::onAgentsGroupedByDefinitionWillBeDeleted(Agent
 {
     if (agentsGroupedByDefinition != nullptr)
     {
-        // Unselect our agent if needed
-        if (_selectedAgent == agentsGroupedByDefinition) {
-            setselectedAgent(nullptr);
-        }
-
         // DIS-connect to signals from this view model of agents grouped by definition
         disconnect(agentsGroupedByDefinition, nullptr, this, nullptr);
 

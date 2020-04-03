@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2020 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -10,7 +10,7 @@
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *      Alexandre Lemort   <lemort@ingenuity.io>
- *
+ *      Chloé Roumieu      <roumieu@ingenuity.io>
  */
 
 #include "editormodelmanager.h"
@@ -56,8 +56,7 @@
  * @brief Constructor
  * @param parent
  */
-EditorModelManager::EditorModelManager(QObject *parent) : QObject(parent),
-    _isMappingControlled(true)
+EditorModelManager::EditorModelManager(QObject *parent) : QObject(parent)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -75,28 +74,6 @@ EditorModelManager::~EditorModelManager()
 
     // Clear all opened definitions
     _openedDefinitions.clear();
-}
-
-
-/**
- * @brief Setter for property "is Mapping Controlled"
- * @param value
- */
-void EditorModelManager::setisMappingControlled(bool value)
-{
-    if (_isMappingControlled != value)
-    {
-        _isMappingControlled = value;
-
-        if (_isMappingControlled) {
-            qInfo() << "Mapping Controlled";
-        }
-        else {
-            qInfo() << "Mapping Observed";
-        }
-
-        Q_EMIT isMappingControlledChanged(value);
-    }
 }
 
 

@@ -572,11 +572,8 @@ void AbstractScenarioController::executeEffectsOfAction(ActionM* action, int lin
 {
     if ((action != nullptr) && !action->effectsList()->isEmpty())
     {
-        // Active the mapping if needed
-        if (!IngeScapeModelManager::instance()->isMappingConnected())
-        {
-            IngeScapeModelManager::instance()->setisMappingConnected(true);
-        }
+        // TODO : before -> Active the mapping if needed
+        //        now -> don't execute actions ??
 
         QString message = QString("%1=%2|%3").arg(command_ExecutedAction,
                                                   QString::number(action->uid()),
@@ -941,11 +938,8 @@ void AbstractScenarioController::_initActionsAndPlayOrResumeScenario()
 {
     int currentTimeInMilliSeconds = _currentTime.msecsSinceStartOfDay();
 
-    // Active the mapping if needed
-    if (!IngeScapeModelManager::instance()->isMappingConnected())
-    {
-        IngeScapeModelManager::instance()->setisMappingConnected(true);
-    }
+    // TODO : before -> Active the mapping if needed
+    //        now -> don't execute actions ??
 
     // Disconnect from signals
     for (ActionVM* actionVM : _listOfActionsToEvaluate.toList())

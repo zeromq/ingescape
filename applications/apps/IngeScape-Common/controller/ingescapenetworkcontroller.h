@@ -109,13 +109,13 @@ public:
      * @param port
      * @return
      */
-    bool start(QString networkDevice, QString ipAddress, uint port);
+    Q_INVOKABLE bool start(QString networkDevice, QString ipAddress, uint port);
 
 
     /**
      * @brief Stop our IngeScape agent
      */
-    void stop();
+    Q_INVOKABLE void stop();
 
 
     /**
@@ -253,18 +253,16 @@ public:
      * @brief Add inputs to our application for a list of agent outputs
      * @param agentName
      * @param newOutputsIds
-     * @param isMappingConnected
      */
-    void addInputsToOurApplicationForAgentOutputs(QString agentName, QStringList newOutputsIds, bool isMappingConnected);
+    void addInputsToOurApplicationForAgentOutputs(QString agentName, QStringList newOutputsIds);
 
 
     /**
      * @brief Remove inputs from our application for a list of agent outputs
      * @param agentName
      * @param oldOutputsIds
-     * @param isMappingConnected
      */
-    void removeInputsFromOurApplicationForAgentOutputs(QString agentName, QStringList oldOutputsIds, bool isMappingConnected);
+    void removeInputsFromOurApplicationForAgentOutputs(QString agentName, QStringList oldOutputsIds);
 
 
 Q_SIGNALS:
@@ -458,15 +456,6 @@ Q_SIGNALS:
      * @param messageOthersParts
      */
     void whisperedMessageReceived(QString peerId, QString peerName, QString messagePart1, QStringList messageOthersParts);
-
-
-public Q_SLOTS:
-
-    /**
-     * @brief Slot called when the flag "is Mapping Activated" changed
-     * @param isMappingConnected
-     */
-    void onIsMappingConnectedChanged(bool isMappingConnected);
 
 
 private:

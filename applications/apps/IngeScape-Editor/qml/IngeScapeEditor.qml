@@ -17,14 +17,12 @@
 import QtQuick 2.8
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
-import QtQuick.Controls 2.0 as Controls2
 import QtQml 2.2
-
+import QtQuick.Controls 2.0 as Controls2
 import I2Quick 1.0
 import QtQuick.Window 2.3
 
 import INGESCAPE 1.0
-
 
 // agent sub-directory
 import "agent" as Agent
@@ -44,7 +42,6 @@ import "popup" as Popup
 
 Item {
     id: rootItem
-
     anchors.fill: parent
 
 
@@ -164,6 +161,12 @@ Item {
     Component.onCompleted: {
         // FIXME Several popup may appear at startup depending on the current platform configuration. Need to prioritize them and maybe show them sequentialy, not on top of each other.
 
+        // First, we check if ingescape should be started at launch
+        if (IngeScapeEditorC.editorShouldBeOnlineAndImposeMappingAtLaunch)
+        {
+            warnImposeMappingPopup.open();
+        }
+
         // ...we check the value of the flag "is Valid License"
         if (IngeScapeEditorC.licensesC && IngeScapeEditorC.licensesC.mergedLicense && !IngeScapeEditorC.licensesC.mergedLicense.editorLicenseValidity)
         {
@@ -185,7 +188,6 @@ Item {
             openLicensePopup();
         }
     }
-
 
     Connections {
         target: IngeScapeEditorC.licensesC.mergedLicense
@@ -252,7 +254,6 @@ Item {
     //
     Item {
         id: centerPanel
-
         anchors {
             left: leftPanel.right
             right: parent.right
@@ -260,19 +261,14 @@ Item {
             bottom: bottomPanel.top
         }
 
-
         AgentsMappingView {
             id: agentsMappingView
-
             anchors.fill: parent
-
             controller: IngeScapeEditorC.agentsMappingC
         }
 
-
         NetworkConnectionInformationItem {
             id: networkConfigurationInfo
-
             anchors {
                 top: parent.top
                 topMargin: 15
@@ -280,196 +276,136 @@ Item {
                 rightMargin: 13
             }
 
-            editorStartedOnIgs: IgsNetworkController ? IgsNetworkController.isStarted : false
-
             currentNetworkDevice: IngeScapeEditorC.networkDevice
             currentPort: IngeScapeEditorC.port
-
-            listOfNetworkDevices: IgsNetworkController ? IgsNetworkController.availableNetworkDevices : null
-
-            settingsReleasedId : IngeScapeEditorC.modelManager.isMappingControlled ? "mapping-mode-control" : "mapping-mode-observe"
-            settingsHighlightedId: IngeScapeEditorC.modelManager.isMappingControlled ? "mapping-mode-control" : "mapping-mode-observe"
-            settingsPressedId : IngeScapeEditorC.modelManager.isMappingControlled ? "mapping-mode-control" : "mapping-mode-observe"
-
 
             // Add extra selection for mapping mode
             // NB : extraContent property of NetworkConnectionInformationItem
             Item {
-                id: mappingForm
+                id: addingHeaderOnline
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                }
+                height: 50
 
-                // Must have fixed height and width
-                height: fullLabelMappingMode.height + fullLabelMappingMode.anchors.topMargin +
-                        selectMappingModeCombobox.height + selectMappingModeCombobox.anchors.topMargin +
-                        lowSeparator.height + lowSeparator.anchors.topMargin
-                width: networkConfigurationInfo.contentWidth
-
-                property bool resMappingControlled: selectMappingModeCombobox.selectedIndex === 0
-
-                Item {
-                    id: fullLabelMappingMode
+                // Separator
+                Rectangle {
+                    id: separatorHeader
                     anchors {
                         left: parent.left
                         right: parent.right
                         top: parent.top
-                        topMargin: 13
                     }
-
-                    height: childrenRect.height
-
-                    Text {
-                        id: labelMappingMode
-
-                        anchors {
-                            left: parent.left
-                            top: parent.top
-                        }
-
-                        text: qsTr("Mapping mode")
-
-                        color: IngeScapeTheme.lightGreyColor
-
-                        font {
-                            family: IngeScapeTheme.textFontFamily
-                            pixelSize: 16
-                        }
-                    }
-
-                    LabellessSvgButton {
-                        id: infoMappingMode
-
-                        anchors {
-                            left: labelMappingMode.right
-                            leftMargin: 5
-                            verticalCenter: labelMappingMode.verticalCenter
-                        }
-
-                        pressedID: "mapping-mode-info"
-                        releasedID: "mapping-mode-info"
-
-                        Controls2.ToolTip {
-                            delay: Qt.styleHints.mousePressAndHoldInterval
-                            visible: infoMappingMode.enabled && infoMappingMode.__behavior.containsMouse
-                            text: qsTr("TODO description")
-                        }
-                    }
-                }
-
-                I2ComboboxStringList {
-                    id: selectMappingModeCombobox
-
-                    anchors {
-                        left: parent.left
-                        right: parent.right
-                        top: fullLabelMappingMode.bottom
-                        topMargin: 9
-                    }
-
-                    height : 22
-
-                    style: IngeScapeComboboxStyle {}
-                    scrollViewStyle: IngeScapeScrollViewStyle {}
-
-                    _mouseArea.hoverEnabled: true
-
-                    placeholderText: qsTr("Select a network device...")
-
-                    model: ["CONTROL", "OBSERVE"]
-                    selectedIndex: IngeScapeEditorC.modelManager.isMappingControlled ? 0 : 1;
-
-
-                    // We change the text anchor to shift it to the right of the picto.
-                    // We cannot use
-                    //   anchors.left: containerPictoSelected.right
-                    // since containerPictoSelected and the text element are not siblings.
-                    _textAnchor.leftMargin: containerPictoSelected.x + containerPictoSelected.width
-
-                    Item {
-                        id: containerPictoSelected
-
-                        anchors {
-                            left: parent.left
-                            verticalCenter: parent.verticalCenter
-                        }
-
-                        width : 25
-                        height: childrenRect.height
-
-                        SvgImage {
-                            id: picto
-
-                            anchors {
-                                horizontalCenter: parent.horizontalCenter
-                            }
-
-                            svgElementId : (selectMappingModeCombobox.selectedItem === "CONTROL") ? "mapping-mode-control" : "mapping-mode-observe"
-                        }
-                    }
-
-                    delegate: customDelegate.component
-
-                    IngeScapeToolTipComboboxDelegateMappingMode {
-                        id: customDelegate
-
-                        comboboxStyle: selectMappingModeCombobox.style
-                        selection: selectMappingModeCombobox.selectedIndex
-
-                        height: selectMappingModeCombobox.height
-                        width:  selectMappingModeCombobox.width
-
-                        // Called from the component's MouseArea
-                        // 'index' is the index of the clicked component inside the model.
-                        function onDelegateClicked(index) {
-                            selectMappingModeCombobox.onDelegateClicked(index)
-                        }
-
-                        // Called from the component to get the text of the current item to display
-                        // 'index' is the index of the component to be displayed inside the model.
-                        function getItemText(index) {
-                            return selectMappingModeCombobox.modelToString(selectMappingModeCombobox.model[index]);
-                        }
-                    }
-                }
-
-                // Second separator
-                Rectangle {
-                    id: lowSeparator
-
-                    anchors {
-                        left: parent.left
-                        right: parent.right
-                        top: selectMappingModeCombobox.bottom
-                        topMargin: 15
-                    }
-
                     height: 1
-
                     color: IngeScapeTheme.editorsBackgroundBorderColor
+                }
+
+                CheckBox {
+                    id : imposeMappingToAgentsON
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                        top: separatorHeader.bottom
+                        topMargin: 10
+                    }
+
+                    checked: IngeScapeEditorC.agentsMappingC.imposeMappingToAgentsON
+                    activeFocusOnPress: true
+
+                    style: CheckBoxStyle {
+                        label: Text {
+                            text: qsTr("Impose platform's mapping on agents that arrive on the network")
+                            elide: Text.ElideRight
+                            wrapMode: Text.Wrap
+
+                            font {
+                                family: IngeScapeTheme.heading2Font
+                                weight: Font.Normal
+                                pixelSize: 14
+                            }
+                            color: (IgsNetworkController.isStarted && control.checked) ? IngeScapeTheme.whiteColor
+                                                                                       : IngeScapeTheme.lightGreyColor
+                        }
+
+                        spacing: 7
+
+                        indicator: Rectangle {
+                            id: indicatorCheckBox
+                            implicitWidth: 16
+                            implicitHeight: 16
+                            anchors.top: parent.top
+                            border.width: 0
+                            color: IngeScapeTheme.blueGreyColor
+
+                            I2SvgItem {
+                                visible: control.checked
+                                anchors.centerIn: parent
+                                svgFileCache: IngeScapeTheme.svgFileIngeScape
+                                svgElementId: "check";
+                            }
+                        }
+                    }
+
+                    onClicked: {
+                        if (IgsNetworkController.isStarted && checked)
+                        {
+                            // User wants to impose mapping while editor is ONLINE
+                            // open popup to warn him that he can modify existing mappings on the network
+                            checked = false;
+                            warnImposeMappingPopup.open();
+                        }
+                        else
+                        {
+                            // No risk: Editor is OFFLINE or Editor is ONLINE and user don't want to impose mapping
+                            if (IngeScapeEditorC.agentsMappingC)
+                            {
+                                IngeScapeEditorC.agentsMappingC.imposeMappingToAgentsON = checked;
+                            }
+                        }
+                    }
+
+                    Binding {
+                        target: imposeMappingToAgentsON
+                        property: "checked"
+                        value: (IngeScapeEditorC.agentsMappingC && IngeScapeEditorC.agentsMappingC.imposeMappingToAgentsON)
+                    }
                 }
             }
 
-            onWillOpenEditionMode: {
-                // Update our list of available network devices
-                IgsNetworkController.updateAvailableNetworkDevices();
-
-                // Select right mapping mode
-                selectMappingModeCombobox.selectedIndex = IngeScapeEditorC.modelManager.isMappingControlled ? 0 : 1;
+            onConnectChanged: {
+                if (wasOnlineBeforeConnectChanged)
+                {
+                    IngeScapeEditorC.stopIngeScape();
+                }
+                else
+                {
+                    if (IngeScapeEditorC.agentsMappingC)
+                    {
+                        if (IngeScapeEditorC.agentsMappingC.imposeMappingToAgentsON)
+                        {
+                            // Open popup to warn the user that he can modify existing mappings on the network
+                            warnImposeMappingPopup.open();
+                        }
+                        else
+                        {
+                            // Start ingescape (not impose mapping)
+                            IngeScapeEditorC.startIngeScape();
+                        }
+                    }
+                }
             }
 
             onChangeNetworkSettings: {
-                if (IgsNetworkController.isAvailableNetworkDevice(networkDevice))
+                IngeScapeEditorC.port = port;
+                IngeScapeEditorC.networkDevice = networkDevice;
+                if (IgsNetworkController.isStarted)
                 {
-                    // Re-Start the Network
-                    var success = IngeScapeEditorC.restartNetwork(port, networkDevice, clearPlatform);
-                    if (success)
+                    if (IngeScapeEditorC.agentsMappingC)
                     {
-                        // Apply mapping mode
-                        IngeScapeEditorC.modelManager.isMappingControlled = mappingForm.resMappingControlled;
-                        close();
+                        IngeScapeEditorC.agentsMappingC.imposeMappingToAgentsON = false;
                     }
-                    else
-                    {
-                        console.error("Network cannot be (re)started on device " + networkDevice + " and port " + port);
-                    }
+                    IngeScapeEditorC.restartIngeScape();
                 }
             }
         }
@@ -498,6 +434,10 @@ Item {
             id: playButton
 
             property string currentID : IngeScapeEditorC.scenarioC && IngeScapeEditorC.scenarioC.isPlaying ? "timeline-pause" : "timeline-play"
+
+            enabled: IgsNetworkController.isStarted
+
+            opacity: enabled ? 1.0 : 0.4
 
             releasedID: currentID
             pressedID: currentID + "-pressed"
@@ -898,16 +838,42 @@ Item {
     //
     Popup.RemoteNotificationPopup {
         id: notifPopup
-
         anchors.centerIn: parent
     }
+
+    //
+    // Popup to warn user that he is about to apply its mapping on the network
+    //
+    // N.B: this popup appears only when editor 1) is online and user check impose mapping or 2) is offline and user had check impose mapping and user try to connect
+    ConfirmationPopup {
+        id: warnImposeMappingPopup
+        width: 600
+
+        confirmationText: qsTr("Be careful, you could lose existing mappings on the network.\nDo you want to impose your mappings on agents that will arrive on the network ?")
+
+        onConfirmed: {
+            // Change impose mapping : we are in case (1) of our popup opening
+            if (IngeScapeEditorC.agentsMappingC)
+            {
+                IngeScapeEditorC.agentsMappingC.imposeMappingToAgentsON = true;
+            }
+
+            // Start editor if not : we are in case (2) of our popup opening
+            if (!IgsNetworkController.isStarted)
+            {
+                IngeScapeEditorC.startIngeScape();
+            }
+        }
+
+        onCancelled: {
+            // DO nothing
+        }
+    }
+
 
     // Overlay layer used to display streaming
     I2Layer {
         id: streamingLayer
-
-        objectName: "streamingLayer"
-
         anchors {
             left: leftPanel.right
             top: parent.top
@@ -915,5 +881,6 @@ Item {
             right: parent.right
             fill: null
         }
+        objectName: "streamingLayer"
     }
 }

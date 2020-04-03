@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2020 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -11,7 +11,7 @@
  *      Alexandre Lemort   <lemort@ingenuity.io>
  *      Justine Limoges    <limoges@ingenuity.io>
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
- *
+ *      Chloé Roumieu      <roumieu@ingenuity.io>
  */
 
 import QtQuick 2.8
@@ -110,9 +110,9 @@ Item {
     MouseArea {
         anchors.fill: parent
         onClicked: {
-            if (agentsSupervisionController.selectedAgent)
+            if (IngeScapeEditorC.agentsMappingC && IngeScapeEditorC.agentsMappingC.selectedAgent)
             {
-                agentsSupervisionController.selectedAgent = null;
+                IngeScapeEditorC.agentsMappingC.selectedAgent = null;
             }
         }
     }
@@ -430,15 +430,16 @@ Item {
                     cursorShape: mouseArea.drag.active ? Qt.ClosedHandCursor : Qt.OpenHandCursor
 
                     onPressed: {
-                        if (agentsSupervisionController) {
-                            if (agentsSupervisionController.selectedAgent === model.QtObject)
+                        if (agentsSupervisionController && IngeScapeEditorC.agentsMappingC)
+                        {
+                            if (model.QtObject.isSelected)
                             {
-                                agentsSupervisionController.selectedAgent = null;
+                                IngeScapeEditorC.agentsMappingC.selectedAgent = null;
                             }
-                            else {
-                                agentsSupervisionController.selectedAgent = model.QtObject;
+                            else
+                            {
+                                IngeScapeEditorC.agentsMappingC.selectedAgent = agentsSupervisionController.getAgentsGroupedByName(model.QtObject);
                             }
-
                         }
 
                         // Find our layer and reparent our popup in it

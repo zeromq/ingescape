@@ -10,7 +10,7 @@
  *	Contributors:
  *      Alexandre Lemort    <lemort@ingenuity.io>
  *      Vincent Peyruqueou  <peyruqueou@ingenuity.io>
- *
+ *      Chloé Roumieu       <roumieu@ingenuity.io>
  */
 
 #include "ingescapesettings.h"
@@ -33,7 +33,8 @@ IngeScapeSettings& IngeScapeSettings::Instance(QString settingsFilePath)
  * @brief Constructor
  * @param settingsFilePath File path of our settings
  */
-IngeScapeSettings::IngeScapeSettings(QString settingsFilePath) : QSettings(settingsFilePath, QSettings::IniFormat)
+IngeScapeSettings::IngeScapeSettings(QString settingsFilePath) : QSettings(settingsFilePath, QSettings::IniFormat),
+    _areDefaultSettings(false)
 {
     if (!settingsFilePath.isEmpty())
     {

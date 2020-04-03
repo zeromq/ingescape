@@ -46,37 +46,24 @@ class LicensesController : public QObject
 
 public:
 
-    /**
-     * @brief Constructor
-     * @param parent
-     */
     explicit LicensesController(QObject *parent = nullptr);
-
-
-    /**
-     * @brief Destructor
-     */
     ~LicensesController();
 
 
     /**
      * @brief Select a directory with IngeScape licenses
-     * @return
      */
     Q_INVOKABLE QString selectLicensesDirectory();
 
 
     /**
      * @brief Update the licenses path
-     * @param newLicensesPath
      */
     Q_INVOKABLE void updateLicensesPath(QString newLicensesPath);
 
 
     /**
      * @brief Delete the given license from the platform and from the filesystem
-     * @param licenseInformation
-     * @return
      */
     Q_INVOKABLE bool deleteLicense(LicenseInformationM* licenseInformation);
 
@@ -84,8 +71,6 @@ public:
     /**
      * @brief Copy the license file from the given path the the current license directory
      * then refresh the global license information
-     * @param licenseFilePath
-     * @return
      */
     Q_INVOKABLE bool addLicenses(const QList<QUrl>& licenseUrlList);
 
@@ -138,8 +123,6 @@ protected Q_SLOTS:
 private:
     /**
      * @brief Import (copy) the given license file to the license directory
-     * @param licenseFile
-     * @return true on success. false otherwise.
      */
     bool _importLicenseFromFile(const QFileInfo& licenseFile);
 
@@ -150,7 +133,6 @@ private:
 
     /**
      * @brief Check license for agent needed
-     * @return true on success. false otherwise.
      */
     bool _checkLicenseForAgentNeeded();
 

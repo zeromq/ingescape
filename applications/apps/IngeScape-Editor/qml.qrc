@@ -26,7 +26,6 @@
         <file>qml/agent/AgentFilesPaths.qml</file>
         <file>qml/agent/LogStreamPanel.qml</file>
         <file>qml/popup/MessagePopup.qml</file>
-        <file>qml/popup/MappingModificationsPopup.qml</file>
         <file>qml/scenario/IngeScapeComboboxItemModel.qml</file>
         <file>qml/scenario/IngeScapeComboboxItemModelAgentsIOP.qml</file>
         <file>qml/scenario/IngeScapeToolTipComboboxDelegateAgentsIOP.qml</file>
@@ -49,6 +48,5 @@
         <file>resources/gettingStarted/gettingStarted.js</file>
         <file>resources/gettingStarted/styles.css</file>
         <file>qml/popup/RemoteNotificationPopup.qml</file>
-        <file>qml/IngeScapeToolTipComboboxDelegateMappingMode.qml</file>
     </qresource>
 </RCC>

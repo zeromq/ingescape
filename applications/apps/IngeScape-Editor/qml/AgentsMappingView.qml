@@ -25,6 +25,9 @@ import INGESCAPE 1.0
 import "agentsmapping" as AgentsMapping
 //import "theme" as Theme
 
+// Popups
+import "./popup/" as Popups;
+
 Item {
     id: rootItem
 
@@ -39,17 +42,18 @@ Item {
     // Controller associated to our view
     property AgentsMappingController controller : null;
 
-    property bool isMappingControlled: IngeScapeEditorC.modelManager ? IngeScapeEditorC.modelManager.isMappingControlled : false
-
-
     //-----------------------------------------
     //
-    // Functions
+    // Behaviors
     //
     //-----------------------------------------
 
-
-
+    Component.onCompleted: {
+        if (rootItem.controller)
+        {
+            rootItem.controller.isLoadedView = true;
+        }
+    }
 
     //--------------------------------
     //
@@ -59,29 +63,27 @@ Item {
 
     Item {
         id: content
-
         anchors.fill: parent
 
         onWidthChanged: {
-            if (controller) {
+            if (controller)
+            {
                 controller.viewWidth = width;
             }
         }
         onHeightChanged: {
-            if (controller) {
+            if (controller)
+            {
                 controller.viewHeight = height;
             }
         }
-
 
         //
         // Node graph view
         //
         AgentsMapping.NodeGraphView {
             id: nodeGraphView
-
             anchors.fill: parent
-
             controller: rootItem.controller
         }
     }

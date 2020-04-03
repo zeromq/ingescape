@@ -83,7 +83,8 @@ ApplicationWindow {
                         IngeScapeEditorC.recordsSupervisionC.selectedRecord = null;
                         IngeScapeEditorC.platformNameBeforeLoadReplay = "";
                     }
-                    IngeScapeEditorC.clearCurrentPlatform();
+
+                    IngeScapeEditorC.createNewPlatform();
                 }
             }
 
@@ -102,7 +103,6 @@ ApplicationWindow {
                     {
                         IngeScapeEditorC.recordsSupervisionC.selectedRecord = null;
                     }
-
                     IngeScapeEditorC.loadPlatformFromSelectedFile();
                 }
             }
@@ -284,25 +284,6 @@ ApplicationWindow {
 
         Menu {
             title: qsTr("Mapping")
-
-            MenuItem {
-                id: menuPlugUNplugMapping
-
-                text: ""
-
-                onTriggered: {
-                    if (IgsModelManager.isMappingConnected) {
-                        //console.log("DE-activate mapping");
-                        IgsModelManager.isMappingConnected = false;
-                    }
-                    else {
-                        //console.log("Activate mapping");
-                        IgsModelManager.isMappingConnected = true;
-                    }
-                }
-            }
-
-            MenuSeparator {}
 
             MenuItem {
                 text: qsTr("Zoom In")
@@ -765,10 +746,6 @@ ApplicationWindow {
 
                 mainWindow.licensesController = Qt.binding(function() {
                    return IngeScapeEditorC.licensesC;
-                });
-
-                menuPlugUNplugMapping.text = Qt.binding(function() {
-                    return ((IgsModelManager && IgsModelManager.isMappingConnected) ? qsTr("Unplug mapping") : qsTr("Plug mapping"));
                 });
 
                 subWindowsInstantiator.model = Qt.binding(function() {

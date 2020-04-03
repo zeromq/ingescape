@@ -36,9 +36,6 @@ class IngeScapeModelManager : public QObject
 {
     Q_OBJECT
 
-    // Flag indicating if our global mapping is connected (activated)
-    I2_QML_PROPERTY_CUSTOM_SETTER(bool, isMappingConnected)
-
     // List of all groups (of agents) grouped by name
     I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(AgentsGroupedByNameVM, allAgentsGroupsByName)
 

@@ -1,7 +1,7 @@
 /*
  *	IngeScape Editor
  *
- *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2020 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -9,7 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
- *
+ *      Chloé Roumieu      <roumieu@ingenuity.io>
  */
 
 #ifndef EDITORMODELMANAGER_H
@@ -27,9 +27,6 @@
 class EditorModelManager : public QObject
 {
     Q_OBJECT
-
-    // Flag indicating if our global mapping is controlled (or passive)
-    I2_QML_PROPERTY_CUSTOM_SETTER(bool, isMappingControlled)
 
     // List of opened definitions
     I2_QOBJECT_LISTMODEL(DefinitionM, openedDefinitions)
