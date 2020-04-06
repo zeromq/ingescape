@@ -184,7 +184,6 @@ public:
 
     /**
      * @brief Import the global mapping (of agents) from JSON
-     * @param jsonArrayOfAgentsInMapping
      */
     void importMappingFromJson(QJsonArray jsonArrayOfAgentsInMapping);
 

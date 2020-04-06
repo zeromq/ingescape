@@ -115,6 +115,7 @@ Rectangle {
         target: rootItem.agentMappingVM
         property: "position"
         value: Qt.point(rootItem.x, rootItem.y)
+        when: mouseArea.drag.active
     }
 
     //

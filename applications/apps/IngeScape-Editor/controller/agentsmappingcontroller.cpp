@@ -121,6 +121,9 @@ void AgentsMappingController::clearMapping()
 {
 //    qInfo() << "Clear the current mapping";
 
+    setselectedAgent(nullptr);
+    setselectedAction(nullptr);
+
     // Clear the hash table from "output agent name" to a list of waiting mapping elements (where the agent is involved as "output agent")
     _hashFromOutputAgentNameToListOfWaitingMappingElements.clear();
 
@@ -784,7 +787,6 @@ QJsonArray AgentsMappingController::exportGlobalMappingToJSON()
 
 /**
  * @brief Import the global mapping (of agents) from JSON
- * @param jsonArrayOfAgentsInMapping
  */
 void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgentsInMapping)
 {
@@ -824,13 +826,11 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
                     }
                 }
 
-
                 //
                 // Actions Mapping
                 //
                 // Get the value for key "actions_mapping"
                 QJsonValue jsonActionsMapping = jsonObjectInMapping.value("actions_mapping");
-
 
                 //
                 // Agent
@@ -905,9 +905,18 @@ void AgentsMappingController::importMappingFromJson(QJsonArray jsonArrayOfAgents
                         {
                             //qDebug() << "Position:" << position.x() << position.y() << "is defined for" << agentName << "with" << agentsGroupedByName->models()->count() << "models";
 
-                            // Create a new agent in the global mapping (with the "Agents Grouped by Name") at a specific position
-                            AgentInMappingVM* agentInMapping = _createAgentInMappingAtPosition(agentsGroupedByName, position, width);
-
+                            AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentsGroupedByName->name());
+                            if (agentInMapping != nullptr)
+                            {
+                                // Agent is already in our mapping, we force its position and its width
+                                agentInMapping->setwidth(width);
+                                agentInMapping->setposition(position);
+                            }
+                            else
+                            {
+                                // Agent still not exist in our mapping we create a new agent in global mapping at a specific position
+                                _createAgentInMappingAtPosition(agentsGroupedByName, position, width);
+                            }
 
                             // If there are some mapping elements, save the pair [agent, its mapping] in the list
                             // We will create the corresponding links when all agents would have been added to the global mapping
