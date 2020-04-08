@@ -74,6 +74,10 @@ PyObject * error_wrapper(PyObject * self, PyObject * args);
 
 PyObject * fatal_wrapper(PyObject * self, PyObject * args);
 
+PyObject * setLogLevel_wrapper(PyObject * self, PyObject * args);
+
+PyObject * getLogLevel_wrapper(PyObject * self, PyObject * args);
+
 PyDoc_STRVAR(
             setDefinitionPathDoc,
              "igs_setDefinitionPath()\n"

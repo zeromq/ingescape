@@ -380,3 +380,34 @@ PyObject * fatal_wrapper(PyObject * self, PyObject * args)
     ret = PyLong_FromLong(1);
     return ret;
 }
+
+PyObject * setLogLevel_wrapper(PyObject * self, PyObject * args)
+{
+    int * logLevel;
+    PyObject * ret;
+    
+    
+    // parse and cast into a bool the useColorVerbose argument given in python
+    if (!PyArg_ParseTuple(args, "i", &logLevel)) {
+        return NULL;
+    }
+    if(logLevel<5){
+        igs_setLogLevel(logLevel);
+        
+        ret = PyLong_FromLong(1);
+        return ret;
+    }else{
+        return PyLong_FromLong(0);
+    }
+}
+
+PyObject * getLogLevel_wrapper(PyObject * self, PyObject * args)
+{
+    PyObject * ret;
+    
+    
+    int log = igs_getLogLevel();
+    
+    ret = PyLong_FromLong(log);
+    return ret;
+}

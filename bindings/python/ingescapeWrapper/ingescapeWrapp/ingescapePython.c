@@ -239,6 +239,8 @@ static PyMethodDef ingescapeMethods[] =
     {"igs_initCall", initCall_wrapper, METH_VARARGS, "test calls"},
     
 //    //logging
+    {"igs_setLogLevel", setLogLevel_wrapper, METH_VARARGS, "set log level, \n Trace = 0, ..."},
+    {"igs_getLogLevel", getLogLevel_wrapper, METH_VARARGS, "get log level, \n Trace = 0, ..."},
 //    {"igs_trace", trace_wrapper, METH_VARARGS, "test logging"},
 //    {"igs_debug", debug_wrapper, METH_VARARGS, "test logging"},
 //    {"igs_info", info_wrapper, METH_VARARGS, "test logging"},
