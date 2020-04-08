@@ -391,14 +391,11 @@ PyObject * setLogLevel_wrapper(PyObject * self, PyObject * args)
     if (!PyArg_ParseTuple(args, "i", &logLevel)) {
         return NULL;
     }
-    if(logLevel<5){
-        igs_setLogLevel(logLevel);
-        
-        ret = PyLong_FromLong(1);
-        return ret;
-    }else{
-        return PyLong_FromLong(0);
-    }
+    igs_setLogLevel(logLevel);
+    
+    ret = PyLong_FromLong(1);
+    return ret;
+
 }
 
 PyObject * getLogLevel_wrapper(PyObject * self, PyObject * args)
