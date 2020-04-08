@@ -18,6 +18,9 @@ extern "C" {
 
 #define MAX_STRING_MSG_LENGTH 4096
 
+//////////////////////////////////////////////////
+// Advanced admin functions
+
 //Start the agent using a broker instead of selfdiscovery
 //NB: an ingescape broker must be running and available at the provided endpoint.
 //Endpoints have the form tcp://ip_address:port
@@ -67,16 +70,17 @@ typedef enum {
 } igs_monitorEvent_t;
 typedef void (*igs_monitorCallback)(igs_monitorEvent_t event, const char *device, const char *ipAddress, void *myData);
 PUBLIC void igs_monitor(igs_monitorCallback cb, void *myData);
-    
+
+
 //////////////////////////////////////////////////
-//data serialization using ZeroMQ
+// Data serialization using ZeroMQ
 //TODO: give code examples here or link to documentation for zmsg and zframe
 PUBLIC int igs_writeOutputAsZMQMsg(const char *name, zmsg_t *msg);
 PUBLIC int igs_readInputAsZMQMsg(const char *name, zmsg_t **msg); //msg must be freed by caller using zmsg_destroy
 
 
 //////////////////////////////////////////////////
-//internal bus
+// Bus channels
 typedef void (*igs_BusMessageIncoming) (const char *event, const char *peerID, const char *name,
                                         const char *address, const char *channel,
                                         zhash_t *headers, zmsg_t *msg, void *myData);
@@ -97,8 +101,9 @@ PUBLIC int igs_busSendZMQMsgToAgent(const char *agentNameOrPeerID, zmsg_t **msg_
 PUBLIC void igs_busAddServiceDescription(const char *key, const char *value);
 PUBLIC void igs_busRemoveServiceDescription(const char *key);
 
+
 //////////////////////////////////////////////////
-//Calls Model : create, remove, call, react
+//Calls : create, remove, call, react
 /*NOTES:
  - one and only one mandatory callback per call, set using igs_handleCall : generates warning if cb missing when loading definition or receiving call
  - one optional reply per call
@@ -135,8 +140,8 @@ PUBLIC void igs_addDataToArgumentsList(igs_callArgument_t **list, void *value, s
 PUBLIC void igs_destroyArgumentsList(igs_callArgument_t **list);
 PUBLIC igs_callArgument_t *igs_cloneArgumentsList(igs_callArgument_t *list);
 
-//send a call to another agent
-//requires to pass agent name or UUID, call name and a list of arguments
+//SEND a call to another agent
+//requires to pass agent name or UUID, call name and a list of arguments specific to the call
 //passed arguments list will be deallocated and destroyed
 PUBLIC int igs_sendCall(const char *agentNameOrUUID, const char *callName, igs_callArgument_t **list);
 
@@ -148,7 +153,7 @@ typedef void (*igs_callFunction)(const char *senderAgentName, const char *sender
                                  void* myData);
 
 
-//manage calls supported by our agent
+//MANAGE calls supported by our agent
 //Calls can be created either by code or by loading a definition. The function below will
 //create a call if it does not exist or will attach callback and data if they are
 //stil undefined. Warning: only one callback can be attached to a call (further attempts
@@ -159,7 +164,7 @@ PUBLIC int igs_addArgumentToCall(const char *callName, const char *argName, iopT
 PUBLIC int igs_removeArgumentFromCall(const char *callName, const char *argName); //removes first occurence with this name
 
 
-//manage optional reply
+//MANAGE optional reply
 //NB: a reply can be seen as a subcall used to answer to sender upon call reception.
 //PUBLIC int igs_addReplyToCall(const char *callName, const char *replyName);
 //PUBLIC int igs_addArgumentToReplyForCall(const char *callName, const char *argName, iopType_t type);
@@ -181,9 +186,9 @@ PUBLIC bool igs_checkCallArgumentExistence(const char *callName, const char *arg
 //PUBLIC bool igs_isReplyAddedForCall(const char *name);
 //PUBLIC bool igs_checkCallReplyArgumentExistence(const char *callName, const char *argName);
 
+
 //////////////////////////////////////////////////
 //JSON facilities
-
 typedef struct _igsJSON* igsJSON_t;
 PUBLIC void igs_JSONfree(igsJSON_t *json);
 
