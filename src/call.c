@@ -347,7 +347,8 @@ int igsAgent_sendCall(igsAgent_t *agent, const char *agentNameOrUUID, const char
                 HASH_FIND_STR(agt->subscriber->definition->calls_table, callName, call);
                 if (call != NULL){
                     size_t nbArguments = 0;
-                    LL_COUNT(*list, arg, nbArguments);
+                    if (list != NULL && *list != NULL)
+                        LL_COUNT(*list, arg, nbArguments);
                     size_t definedNbArguments = 0;
                     LL_COUNT(call->arguments, arg, definedNbArguments);
                     if (nbArguments != definedNbArguments){
@@ -364,36 +365,38 @@ int igsAgent_sendCall(igsAgent_t *agent, const char *agentNameOrUUID, const char
             zmsg_t *msg = zmsg_new();
             zmsg_addstr(msg, "CALL");
             zmsg_addstr(msg, callName);
-            LL_FOREACH(*list, arg){
-                zframe_t *frame = NULL;
-                switch (arg->type) {
-                    case IGS_BOOL_T:
-                        frame = zframe_new(&arg->b, sizeof(int));
-                        break;
-                    case IGS_INTEGER_T:
-                        frame = zframe_new(&arg->i, sizeof(int));
-                        break;
-                    case IGS_DOUBLE_T:
-                        frame = zframe_new(&arg->d, sizeof(double));
-                        break;
-                    case IGS_STRING_T:{
-                        if (arg->c != NULL){
-                            frame = zframe_new(arg->c, strlen(arg->c)+1);
-                        }else{
-                            frame = zframe_new(NULL, 0);
+            if (list != NULL){
+                LL_FOREACH(*list, arg){
+                    zframe_t *frame = NULL;
+                    switch (arg->type) {
+                        case IGS_BOOL_T:
+                            frame = zframe_new(&arg->b, sizeof(int));
+                            break;
+                        case IGS_INTEGER_T:
+                            frame = zframe_new(&arg->i, sizeof(int));
+                            break;
+                        case IGS_DOUBLE_T:
+                            frame = zframe_new(&arg->d, sizeof(double));
+                            break;
+                        case IGS_STRING_T:{
+                            if (arg->c != NULL){
+                                frame = zframe_new(arg->c, strlen(arg->c)+1);
+                            }else{
+                                frame = zframe_new(NULL, 0);
+                            }
+                            break;
                         }
-                        break;
+                            
+                        case IGS_DATA_T:
+                            frame = zframe_new(arg->data, arg->size);
+                            break;
+                            
+                        default:
+                            break;
                     }
-                        
-                    case IGS_DATA_T:
-                        frame = zframe_new(arg->data, arg->size);
-                        break;
-                        
-                    default:
-                        break;
-                }
-                if (frame != NULL){
-                    zmsg_add(msg, frame);
+                    if (frame != NULL){
+                        zmsg_add(msg, frame);
+                    }
                 }
             }
             bus_zyreLock();
@@ -407,8 +410,10 @@ int igsAgent_sendCall(igsAgent_t *agent, const char *agentNameOrUUID, const char
     if (!found){
         igsAgent_error(agent, "could not find an agent with name or UUID : %s", agentNameOrUUID);
     }
-    call_freeCallArguments(*list);
-    *list = NULL;
+    if (list != NULL && *list != NULL){
+        call_freeCallArguments(*list);
+        *list = NULL;
+    }
     return 1;
 }
 
