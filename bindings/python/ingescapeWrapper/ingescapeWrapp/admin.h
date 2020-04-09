@@ -80,6 +80,10 @@ PyObject * getLogLevel_wrapper(PyObject * self, PyObject * args);
 
 PyObject * setLicensePath_wrapper(PyObject * self, PyObject * args);
 
+PyObject * igs_getNetdevicesList_wrapper(PyObject * self, PyObject * args);
+
+PyObject * igs_getNetadressesList_wrapper(PyObject * self, PyObject * args);
+
 PyDoc_STRVAR(
             setDefinitionPathDoc,
              "igs_setDefinitionPath()\n"

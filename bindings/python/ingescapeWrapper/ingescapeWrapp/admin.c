@@ -425,3 +425,43 @@ PyObject * setLicensePath_wrapper(PyObject * self, PyObject * args)
     return ret;
     
 }
+
+PyObject * igs_getNetdevicesList_wrapper(PyObject * self, PyObject * args)
+{
+    PyObject * ret;
+    
+    
+    char **resultList;
+    int nbList;
+    igs_getNetdevicesList(&resultList, &nbList);
+    
+    // build the resulting list into a Python object.
+    ret = PyList_New(nbList);
+    int i ;
+    for (i = 0; i < nbList; i++){
+        //set items of the python list one by one
+        PyList_SetItem(ret, i, PyBytes_FromString(resultList[i]));
+    }
+    igs_freeNetdevicesList(resultList, nbList);
+    return ret;
+}
+
+PyObject * igs_getNetadressesList_wrapper(PyObject * self, PyObject * args)
+{
+    PyObject * ret;
+    
+    
+    char **resultList;
+    int nbList;
+    igs_getNetaddressesList(&resultList, &nbList);
+    
+    // build the resulting list into a Python object.
+    ret = PyList_New(nbList);
+    int i ;
+    for (i = 0; i < nbList; i++){
+        //set items of the python list one by one
+        PyList_SetItem(ret, i, PyBytes_FromString(resultList[i]));
+    }
+    igs_freeNetaddressesList(resultList, nbList);
+    return ret;
+}
