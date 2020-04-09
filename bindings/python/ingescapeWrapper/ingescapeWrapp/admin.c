@@ -408,3 +408,20 @@ PyObject * getLogLevel_wrapper(PyObject * self, PyObject * args)
     ret = PyLong_FromLong(log);
     return ret;
 }
+
+PyObject * setLicensePath_wrapper(PyObject * self, PyObject * args)
+{
+    char * licensePath;
+    PyObject * ret;
+    
+    
+    // parse and cast into a bool the useColorVerbose argument given in python
+    if (!PyArg_ParseTuple(args, "s", &licensePath)) {
+        return NULL;
+    }
+    igs_setLicensePath(licensePath);
+    
+    ret = PyLong_FromLong(1);
+    return ret;
+    
+}

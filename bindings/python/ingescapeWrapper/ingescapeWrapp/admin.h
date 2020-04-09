@@ -78,6 +78,8 @@ PyObject * setLogLevel_wrapper(PyObject * self, PyObject * args);
 
 PyObject * getLogLevel_wrapper(PyObject * self, PyObject * args);
 
+PyObject * setLicensePath_wrapper(PyObject * self, PyObject * args);
+
 PyDoc_STRVAR(
             setDefinitionPathDoc,
              "igs_setDefinitionPath()\n"
