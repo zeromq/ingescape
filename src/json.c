@@ -530,6 +530,66 @@ void igs_JSONaddTree(igsJSON_t json, igsJSONTreeNode_t *tree){
     }
 }
 
+igsJSONTreeNode_t* igs_JSONgetTree(igsJSON_t json){
+    char *dump = igs_JSONdump(json);
+    igsJSONTreeNode_t *res = igs_JSONTreeParseFromString(dump);
+    free(dump);
+    return res;
+}
+
+void igs_JSONTreeInsertInArray(igsJSONTreeNode_t *array, igsJSONTreeNode_t *nodeToInsert){
+    if (array == NULL || array->type != IGS_JSON_ARRAY){
+        igs_error("target node must be an array");
+        return;
+    }
+    if (nodeToInsert == NULL){
+        igs_error("node to insert cannot be NULL");
+        return;
+    }
+    
+    size_t size = array->u.array.len;
+    array->u.array.values = realloc(array->u.array.values, size + 1);
+    assert(array->u.array.values);
+    array->u.array.values[size] = igs_JSONTreeClone(nodeToInsert);
+    array->u.array.len += 1;
+}
+
+void igs_JSONTreeInsertInMap(igsJSONTreeNode_t *map, const char *key, igsJSONTreeNode_t *nodeToInsert){
+    if (map == NULL || map->type != IGS_JSON_MAP){
+        igs_error("target node must be a map");
+        return;
+    }
+    if (key == NULL){
+        igs_error("key cannot be NULL");
+        return;
+    }
+    if (nodeToInsert == NULL){
+        igs_error("node to insert cannot be NULL");
+        return;
+    }
+    size_t size = map->u.object.len;
+    bool knownKey = false;
+    size_t index = size;
+    for (size_t i = 0; i < size; i++){
+        if (streq(map->u.object.keys[i], key)){
+            knownKey = true;
+            index = i;
+            break;
+        }
+    }
+    if (knownKey){
+        igs_JSONTreeFree(&(map->u.object.values[index]));
+    }else{
+        map->u.object.values = realloc(map->u.object.values, size + 1);
+        map->u.object.keys = realloc(map->u.object.keys, size + 1);
+        assert(map->u.object.values);
+        assert(map->u.object.keys);
+        map->u.object.keys[index] = strdup(key);
+        map->u.object.len += 1;
+    }
+    map->u.object.values[index] = igs_JSONTreeClone(nodeToInsert);
+}
+
 // TEST SCRIPT
 // to be copied and compiled as a main.c file
 //

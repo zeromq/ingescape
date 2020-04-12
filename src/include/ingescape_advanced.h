@@ -252,11 +252,18 @@ PUBLIC igsJSONTreeNode_t* igs_JSONTreeParseFromString(const char *content);
 PUBLIC igsJSONTreeNode_t* igs_JSONTreeClone(igsJSONTreeNode_t *tree); //returned value must be freed by caller
 PUBLIC char* igs_JSONTreeDump(igsJSONTreeNode_t *tree); //returned value must be freed by caller
 
-PUBLIC void igs_JSONaddTree(igsJSON_t json, igsJSONTreeNode_t *tree); //crossover function between tree and sax modes
+PUBLIC void igs_JSONaddTree(igsJSON_t json, igsJSONTreeNode_t *tree);
+PUBLIC igsJSONTreeNode_t* igs_JSONgetTree(igsJSON_t json); //returned value must be freed by caller
+
+//add node at the end of an array
+PUBLIC void igs_JSONTreeInsertInArray(igsJSONTreeNode_t *array, igsJSONTreeNode_t *nodeToInsert); //does NOT take ownership of node to insert
+
+//add node (or replace if it already existis) in map based on named key
+PUBLIC void igs_JSONTreeInsertInMap(igsJSONTreeNode_t *map, const char *key, igsJSONTreeNode_t *nodeToInsert); //does NOT take ownership of node to insert
 
 /* Tree node can handle queries to retrieve sub-nodes
  Important notes :
- - returned value must not be freed manually : it is owned by the node
+ - returned value must NOT be freed manually : it is owned by the node
  - returned structure contains a type that shall be checked to handle actual contained value(s)
  */
 PUBLIC igsJSONTreeNode_t* igs_JSONTreeGetNodeAtPath(igsJSONTreeNode_t *node, const char **path);
