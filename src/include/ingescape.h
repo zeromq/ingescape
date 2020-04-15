@@ -46,6 +46,7 @@ extern "C" {
 PUBLIC int igs_startWithDevice(const char *networkDevice, unsigned int port);
 PUBLIC int igs_startWithIP(const char *ipAddress, unsigned int port);
 PUBLIC int igs_stop(void);
+PUBLIC bool igs_isStarted(void);
 
 //There are four non-exclusive ways to stop the execution of an ingescape agent:
 //1- calling igs_stop from the hosting app's threads reacting on user actions or external events

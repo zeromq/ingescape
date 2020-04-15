@@ -2093,6 +2093,14 @@ int igsAgent_stop(igsAgent_t *agent){
     return 1;
 }
 
+bool igsAgent_isStarted(igsAgent_t *agent){
+    if (agent != NULL && agent->loopElements != NULL
+        && agent->loopElements->loop != NULL){
+        return true;
+    }else{
+        return false;
+    }
+}
 
 int igsAgent_setAgentName(igsAgent_t *agent, const char *name){
     if ((name == NULL) || (strlen(name) == 0)){

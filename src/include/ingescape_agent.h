@@ -30,6 +30,7 @@ PUBLIC void igsAgent_destroy(igsAgent_t **agent);
 PUBLIC int igsAgent_startWithDevice(igsAgent_t *agent, const char *networkDevice, unsigned int port);
 PUBLIC int igsAgent_startWithIP(igsAgent_t *agent, const char *ipAddress, unsigned int port);
 PUBLIC int igsAgent_stop(igsAgent_t *agent);
+PUBLIC bool igsAgent_isStarted(igsAgent_t *agent);
 
 typedef void (*igsAgent_forcedStopCallback)(igsAgent_t *agent, void *myData);
 PUBLIC void igsAgent_observeForcedStop(igsAgent_t *agent, igsAgent_forcedStopCallback cb, void *myData);

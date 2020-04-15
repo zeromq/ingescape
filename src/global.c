@@ -48,6 +48,11 @@ int igs_stop(void){
     return igsAgent_stop(globalAgent);
 }
 
+bool igs_isStarted(void){
+    initInternalAgentIfNeeded();
+    return igsAgent_isStarted(globalAgent);
+}
+
 
 typedef struct {
     igs_forcedStopCallback cb;
