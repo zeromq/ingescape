@@ -27,9 +27,9 @@ AgentsGroupedByNameVM::AgentsGroupedByNameVM(QString agentName,
     _numberOfAgentsOFF(0),
     _currentMapping(nullptr),
     _isAgentGroupedByNameInCurrentPlatform(true),
+    _isSelected(false),
     _canBeDeleted_whenListOfAllAgentsGroupsByDefinition_isEmpty(true),
     _agentsGroupedByDefinitionNULL(nullptr)
-
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
