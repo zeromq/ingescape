@@ -1466,7 +1466,7 @@ void initLoop (igsAgent_t *agent){
 #endif
     
 #if defined __unix__ || defined __APPLE__ || defined __linux__
-    if (igs_shallRaiseFileDescriptorsLimit && igs_nbOfAgentsInProcess > 1){
+    if (igs_shallRaiseFileDescriptorsLimit){// && igs_nbOfAgentsInProcess > 1){
         struct rlimit limit;
         if (getrlimit(RLIMIT_NOFILE, &limit) != 0) {
             igsAgent_error(agent, "getrlimit() failed with errno=%d", errno);
