@@ -395,7 +395,8 @@ if(NOT CMAKE_TOOLCHAIN_FILE)
     FILES
       ${ZMQ_PUBLIC_HEADERS}
       ${CZMQ_PUBLIC_HEADERS}
-    TYPE INCLUDE
+    DESTINATION
+      include
     COMPONENT library
 	)
 
