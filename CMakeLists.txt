@@ -390,13 +390,106 @@ if(NOT CMAKE_TOOLCHAIN_FILE)
 		${CZMQ_PUBLIC_HEADERS_DIR}/zhttp_response.h
 	)
 
+	# Variable holding the sodium public headers to install with ingescape
+	#NB: This variable is manually set from the sodium installation
+  set(SODIUM_PUBLIC_HEADERS
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium.h
+  )
+  set(SODIUM_PUBLIC_HEADERS_SUBDIR
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/core.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_aead_aes256gcm.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_aead_chacha20poly1305.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_aead_xchacha20poly1305.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_auth.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_auth_hmacsha256.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_auth_hmacsha512.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_auth_hmacsha512256.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_box.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_box_curve25519xchacha20poly1305.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_box_curve25519xsalsa20poly1305.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_core_ed25519.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_core_ristretto255.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_core_hchacha20.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_core_hsalsa20.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_core_salsa20.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_core_salsa2012.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_core_salsa208.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_generichash.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_generichash_blake2b.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_hash.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_hash_sha256.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_hash_sha512.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_kdf.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_kdf_blake2b.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_kx.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_onetimeauth.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_onetimeauth_poly1305.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_pwhash.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_pwhash_argon2i.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_pwhash_argon2id.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_pwhash_scryptsalsa208sha256.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_scalarmult.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_scalarmult_curve25519.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_scalarmult_ed25519.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_scalarmult_ristretto255.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_secretbox.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_secretbox_xchacha20poly1305.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_secretbox_xsalsa20poly1305.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_secretstream_xchacha20poly1305.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_shorthash.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_shorthash_siphash24.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_sign.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_sign_ed25519.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_sign_edwards25519sha512batch.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_stream.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_stream_chacha20.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_stream_salsa20.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_stream_salsa2012.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_stream_salsa208.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_stream_xchacha20.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_stream_xsalsa20.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_verify_16.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_verify_32.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_verify_64.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/export.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/randombytes.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/randombytes_internal_random.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/randombytes_sysrandom.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/runtime.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/utils.h
+    ${LIBSODIUM_INCLUDE_DIRS}/sodium/version.h
+  )
+
+	# Variable holding the zyre public headers to install with ingescape
+  #NB: This variable is manually set from the zyre CMakeLists.txt file
+  get_target_property(ZYRE_PUBLIC_HEADERS_DIR zyre INTERFACE_INCLUDE_DIRECTORIES)
+  set(ZYRE_PUBLIC_HEADERS
+    ${ZYRE_PUBLIC_HEADERS_DIR}/zyre_library.h
+    ${ZYRE_PUBLIC_HEADERS_DIR}/zyre.h
+    ${ZYRE_PUBLIC_HEADERS_DIR}/zyre_event.h
+    ${ZYRE_PUBLIC_HEADERS_DIR}/zre_msg.h
+    ${ZYRE_PUBLIC_HEADERS_DIR}/zyre_peer.h
+    ${ZYRE_PUBLIC_HEADERS_DIR}/zyre_group.h
+    ${ZYRE_PUBLIC_HEADERS_DIR}/zyre_election.h
+    ${ZYRE_PUBLIC_HEADERS_DIR}/zyre_node.h
+  )
+
 	# Install czmq & ZeroMQ headers since they are in our INTERFACE
 	install(
     FILES
+      ${SODIUM_PUBLIC_HEADERS}
       ${ZMQ_PUBLIC_HEADERS}
       ${CZMQ_PUBLIC_HEADERS}
+      ${ZYRE_PUBLIC_HEADERS}
     DESTINATION
       include
+    COMPONENT library
+	)
+  install(
+    FILES
+      ${SODIUM_PUBLIC_HEADERS_SUBDIR}
+    DESTINATION
+      include/sodium
     COMPONENT library
 	)
 
