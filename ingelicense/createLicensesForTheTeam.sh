@@ -8,8 +8,8 @@ do
     echo "License for $m"
     ingelicense --expiration 2021/12/31 \
         --editorExpiration 2021/12/31 \
-        --features /Users/steph/Documents/CloudStation/ingescape/code/ingescape/ingelicense/src/features.txt \
-        --agents /Users/steph/Documents/CloudStation/ingescape/code/ingescape/ingelicense/src/agents.txt \
+        --features /Users/steph/code/ingescape/ingescape/ingelicense/src/features.txt \
+        --agents /Users/steph/code/ingescape/ingescape/ingelicense/src/agents.txt \
         --customer $m \
         --editorOwner $m \
         --features ./src/features.txt \
@@ -34,8 +34,8 @@ ingelicense \
     --order ORFE \
     --expiration 2050/12/31 \
     --editorExpiration 2050/12/31 \
-    --features /Users/steph/Documents/CloudStation/ingescape/code/ingescape/ingelicense/src/features.txt \
-    --agents /Users/steph/Documents/CloudStation/ingescape/code/ingescape/ingelicense/src/agents.txt \
+    --features /Users/steph/code/ingescape/ingescape/ingelicense/src/features.txt \
+    --agents /Users/steph/code/ingescape/ingescape/ingelicense/src/agents.txt \
     --editorOwner "Jérome Barbé" \
     --features ./src/features.txt \
     --agents ./src/agents.txt \
@@ -53,8 +53,8 @@ ingelicense \
     --order Eval \
     --expiration 2020/12/31 \
     --editorExpiration 2020/12/31 \
-    --features /Users/steph/Documents/CloudStation/ingescape/code/ingescape/ingelicense/src/features.txt \
-    --agents /Users/steph/Documents/CloudStation/ingescape/code/ingescape/ingelicense/src/agents.txt \
+    --features /Users/steph/code/ingescape/ingescape/ingelicense/src/features.txt \
+    --agents /Users/steph/code/ingescape/ingescape/ingelicense/src/agents.txt \
     --editorOwner "Christophe Chastanet" \
     --features ./src/features.txt \
     --agents ./src/agents.txt \
@@ -72,8 +72,8 @@ ingelicense \
     --order Eval \
     --expiration 2020/12/31 \
     --editorExpiration 2020/12/31 \
-    --features /Users/steph/Documents/CloudStation/ingescape/code/ingescape/ingelicense/src/features.txt \
-    --agents /Users/steph/Documents/CloudStation/ingescape/code/ingescape/ingelicense/src/agents.txt \
+    --features /Users/steph/code/ingescape/ingescape/ingelicense/src/features.txt \
+    --agents /Users/steph/code/ingescape/ingescape/ingelicense/src/agents.txt \
     --editorOwner "Shiva team" \
     --features ./src/features.txt \
     --agents ./src/agents.txt \
@@ -91,13 +91,32 @@ ingelicense \
     --order Eval \
     --expiration 2020/12/31 \
     --editorExpiration 2020/12/31 \
-    --features /Users/steph/Documents/CloudStation/ingescape/code/ingescape/ingelicense/src/features.txt \
-    --agents /Users/steph/Documents/CloudStation/ingescape/code/ingescape/ingelicense/src/agents.txt \
+    --features /Users/steph/code/ingescape/ingescape/ingelicense/src/features.txt \
+    --agents /Users/steph/code/ingescape/ingescape/ingelicense/src/agents.txt \
     --editorOwner "Eurocontrol PJ09" \
     --features ./src/features.txt \
     --agents ./src/agents.txt \
     --output ./licenses/EurocontrolPJ09.igslicense
 echo ""
 echo "Read license for EurocontrolPJ09"
+ingelicense --read ./licenses/EurocontrolPJ09.igslicense
+echo ""
+
+#licenses for NATO SACT
+echo "License for NATO SACT"
+ingelicense \
+    --id Diota \
+    --customer "NATO SACT" \
+    --order Eval \
+    --expiration 2025/12/31 \
+    --editorExpiration 2025/12/31 \
+    --features /Users/steph/code/ingescape/ingescape/ingelicense/src/features.txt \
+    --agents /Users/steph/code/ingescape/ingescape/ingelicense/src/agents.txt \
+    --editorOwner "NATO SACT" \
+    --features ./src/features.txt \
+    --agents ./src/agents.txt \
+    --output ./licenses/EurocontrolPJ09.igslicense
+echo ""
+echo "Read license for NATO SACT"
 ingelicense --read ./licenses/EurocontrolPJ09.igslicense
 echo ""
