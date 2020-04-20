@@ -554,7 +554,7 @@ if((WIN32) OR (CMAKE_BUILD_TYPE STREQUAL "Release"))
 
     set(CPACK_GENERATOR "productbuild")
     #FIXME TODO We will package dependencies within the ingescape.framework. Will be needed when ingescape.framework will be a thing.
-    #install_igs_lib_dependencies()
+    install_igs_lib_dependencies()
 
   else()
     set(CPACK_MONOLITHIC_INSTALL ON)
