@@ -391,12 +391,15 @@ if(NOT CMAKE_TOOLCHAIN_FILE)
 	)
 
 	# Install czmq & ZeroMQ headers since they are in our INTERFACE
-	install(FILES
-		${ZMQ_PUBLIC_HEADERS}
-		${CZMQ_PUBLIC_HEADERS}
-		DESTINATION
-		include
+	install(
+    FILES
+      ${ZMQ_PUBLIC_HEADERS}
+      ${CZMQ_PUBLIC_HEADERS}
+    TYPE INCLUDE
+    COMPONENT library
 	)
+
+  message(STATUS "ZMQ and CZMQ files installed")
 endif(NOT CMAKE_TOOLCHAIN_FILE)
 
 # ##############################################################################
