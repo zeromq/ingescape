@@ -325,73 +325,73 @@ install(FILES ${ingescape_headers_to_install}
 # Install headers from libzmq and czmq
 #FIXME Exclude from x-compil builds for now due to pipeline errors with CPack
 if(NOT CMAKE_TOOLCHAIN_FILE)
-	# Variable holding the ZMQ public headers to install with ingescape
-	#NB: This variable is manually set from the CMakeLists.txt from ZeroMQ
-	get_target_property(ZMQ_PUBLIC_HEADERS_DIR libzmq INTERFACE_INCLUDE_DIRECTORIES)
-	set(ZMQ_PUBLIC_HEADERS
-		${ZMQ_PUBLIC_HEADERS_DIR}/zmq.h
-		${ZMQ_PUBLIC_HEADERS_DIR}/zmq_utils.h
-	)
+  # Variable holding the ZMQ public headers to install with ingescape
+  #NB: This variable is manually set from the CMakeLists.txt from ZeroMQ
+  get_target_property(ZMQ_PUBLIC_HEADERS_DIR libzmq INTERFACE_INCLUDE_DIRECTORIES)
+  set(ZMQ_PUBLIC_HEADERS
+    ${ZMQ_PUBLIC_HEADERS_DIR}/zmq.h
+    ${ZMQ_PUBLIC_HEADERS_DIR}/zmq_utils.h
+  )
 
-	# Variable holding the czmq public headers to install with ingescape
-	#NB: This variable is manually set from the CMakeLists.txt from czmq
-	get_target_property(CZMQ_PUBLIC_HEADERS_DIR czmq INTERFACE_INCLUDE_DIRECTORIES)
-	set (CZMQ_PUBLIC_HEADERS
-		${CZMQ_PUBLIC_HEADERS_DIR}/czmq_library.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/czmq_prelude.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/czmq.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zactor.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zarmour.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zcert.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zcertstore.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zchunk.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zclock.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zconfig.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zdigest.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zdir.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zdir_patch.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zfile.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zframe.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zhash.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zhashx.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/ziflist.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zlist.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zlistx.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zloop.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zmsg.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zpoller.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zsock.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zstr.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zsys.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zuuid.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zauth.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zbeacon.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zgossip.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zmonitor.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zproxy.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zrex.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zgossip_msg.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zsock_option.inc
-		${CZMQ_PUBLIC_HEADERS_DIR}/zgossip_engine.inc
-		${CZMQ_PUBLIC_HEADERS_DIR}/zhash_primes.inc
-		${CZMQ_PUBLIC_HEADERS_DIR}/sha1.inc_c
-		${CZMQ_PUBLIC_HEADERS_DIR}/sha1.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/slre.inc_c
-		${CZMQ_PUBLIC_HEADERS_DIR}/slre.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/readme.txt
-		${CZMQ_PUBLIC_HEADERS_DIR}/zargs.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zproc.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/ztimerset.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/ztrie.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zhttp_client.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zhttp_server.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zhttp_server_options.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zhttp_request.h
-		${CZMQ_PUBLIC_HEADERS_DIR}/zhttp_response.h
-	)
+  # Variable holding the czmq public headers to install with ingescape
+  #NB: This variable is manually set from the CMakeLists.txt from czmq
+  get_target_property(CZMQ_PUBLIC_HEADERS_DIR czmq INTERFACE_INCLUDE_DIRECTORIES)
+  set (CZMQ_PUBLIC_HEADERS
+    ${CZMQ_PUBLIC_HEADERS_DIR}/czmq_library.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/czmq_prelude.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/czmq.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zactor.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zarmour.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zcert.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zcertstore.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zchunk.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zclock.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zconfig.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zdigest.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zdir.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zdir_patch.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zfile.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zframe.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zhash.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zhashx.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/ziflist.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zlist.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zlistx.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zloop.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zmsg.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zpoller.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zsock.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zstr.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zsys.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zuuid.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zauth.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zbeacon.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zgossip.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zmonitor.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zproxy.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zrex.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zgossip_msg.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zsock_option.inc
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zgossip_engine.inc
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zhash_primes.inc
+    ${CZMQ_PUBLIC_HEADERS_DIR}/sha1.inc_c
+    ${CZMQ_PUBLIC_HEADERS_DIR}/sha1.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/slre.inc_c
+    ${CZMQ_PUBLIC_HEADERS_DIR}/slre.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/readme.txt
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zargs.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zproc.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/ztimerset.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/ztrie.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zhttp_client.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zhttp_server.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zhttp_server_options.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zhttp_request.h
+    ${CZMQ_PUBLIC_HEADERS_DIR}/zhttp_response.h
+  )
 
-	# Variable holding the sodium public headers to install with ingescape
-	#NB: This variable is manually set from the sodium installation
+  # Variable holding the sodium public headers to install with ingescape
+  #NB: This variable is manually set from the sodium installation
   set(SODIUM_PUBLIC_HEADERS
     ${LIBSODIUM_INCLUDE_DIRS}/sodium.h
   )
@@ -460,7 +460,7 @@ if(NOT CMAKE_TOOLCHAIN_FILE)
     ${LIBSODIUM_INCLUDE_DIRS}/sodium/version.h
   )
 
-	# Variable holding the zyre public headers to install with ingescape
+  # Variable holding the zyre public headers to install with ingescape
   #NB: This variable is manually set from the zyre CMakeLists.txt file
   get_target_property(ZYRE_PUBLIC_HEADERS_DIR zyre INTERFACE_INCLUDE_DIRECTORIES)
   set(ZYRE_PUBLIC_HEADERS
@@ -474,8 +474,8 @@ if(NOT CMAKE_TOOLCHAIN_FILE)
     ${ZYRE_PUBLIC_HEADERS_DIR}/zyre_node.h
   )
 
-	# Install czmq & ZeroMQ headers since they are in our INTERFACE
-	install(
+  # Install czmq & ZeroMQ headers since they are in our INTERFACE
+  install(
     FILES
       ${SODIUM_PUBLIC_HEADERS}
       ${ZMQ_PUBLIC_HEADERS}
@@ -484,14 +484,14 @@ if(NOT CMAKE_TOOLCHAIN_FILE)
     DESTINATION
       include
     COMPONENT library
-	)
+  )
   install(
     FILES
       ${SODIUM_PUBLIC_HEADERS_SUBDIR}
     DESTINATION
       include/sodium
     COMPONENT library
-	)
+  )
 
   message(STATUS "ZMQ and CZMQ files installed")
 endif(NOT CMAKE_TOOLCHAIN_FILE)
