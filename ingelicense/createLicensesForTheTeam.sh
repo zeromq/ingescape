@@ -115,7 +115,7 @@ ingelicense \
     --editorOwner "NATO SACT" \
     --features ./src/features.txt \
     --agents ./src/agents.txt \
-    --output ./licenses/EurocontrolPJ09.igslicense
+    --output ./licenses/NATO_SACT.igslicense
 echo ""
 echo "Read license for NATO SACT"
 ingelicense --read ./licenses/EurocontrolPJ09.igslicense
