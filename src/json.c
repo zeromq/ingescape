@@ -336,8 +336,13 @@ void igs_JSONTreeFree(igsJSONTreeNode_t **node){
 
 igsJSONTreeNode_t* igs_JSONTreeParseFromFile(const char *path){
     zfile_t *file = zfile_new (NULL, path);
-    if (file == NULL || !zfile_is_regular(file) || !zfile_is_readable(file) || zfile_input(file)){
-        igs_error("could not open %s", path);
+    if (file == NULL || !zfile_is_regular(file) || !zfile_is_readable(file) || zfile_input(file) != 0){
+        if (!zfile_is_regular(file))
+            igs_error("not a regular file : %s", path);
+        if (!zfile_is_readable(file))
+            igs_error("not readable file : %s", path);
+        if (zfile_input(file) != 0)
+            igs_error("could not open %s", path);
         return NULL;
     }
     char errbuf[1024] = "unknown error";
