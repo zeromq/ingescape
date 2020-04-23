@@ -282,13 +282,35 @@ PyObject * trace_wrapper(PyObject * self, PyObject * args)
     char * log;
     PyObject * ret;
     
-    
     // parse and cast into a bool the useColorVerbose argument given in python
     if (!PyArg_ParseTuple(args, "s", &log)) {
         return NULL;
     }
     
-    igs_trace(log);
+    PyFrameObject* frame = PyEval_GetFrame();
+    Py_INCREF(frame);
+    PyObject *function = frame->f_code->co_name;
+    Py_INCREF(function);
+    Py_DECREF(frame);
+    
+    PyObject* funcTuple = Py_BuildValue("(O)", function);
+    Py_DECREF(function);
+    if (!funcTuple) return 0;
+    const char* functionStr = 0;
+    if (!PyArg_ParseTuple(funcTuple, "s", &functionStr)) {
+        Py_DECREF(args);
+        return 0;
+    }
+    
+    /* s now points to a const char* - use it, delete args when done */
+    
+    Py_DECREF(funcTuple);
+    
+    if(strcmp(functionStr, "<module>") == 0){
+        igs_log(IGS_LOG_TRACE, "main", log);
+    }else{
+        igs_log(IGS_LOG_DEBUG, functionStr, log);
+    }
     
     ret = PyLong_FromLong(1);
     return ret;
@@ -299,13 +321,35 @@ PyObject * debug_wrapper(PyObject * self, PyObject * args)
     char * log;
     PyObject * ret;
     
-    
     // parse and cast into a bool the useColorVerbose argument given in python
     if (!PyArg_ParseTuple(args, "s", &log)) {
         return NULL;
     }
     
-    igs_debug(log);
+    PyFrameObject* frame = PyEval_GetFrame();
+    Py_INCREF(frame);
+    PyObject *function = frame->f_code->co_name;
+    Py_INCREF(function);
+    Py_DECREF(frame);
+    
+    PyObject* funcTuple = Py_BuildValue("(O)", function);
+    Py_DECREF(function);
+    if (!funcTuple) return 0;
+    const char* functionStr = 0;
+    if (!PyArg_ParseTuple(funcTuple, "s", &functionStr)) {
+        Py_DECREF(args);
+        return 0;
+    }
+    
+    /* s now points to a const char* - use it, delete args when done */
+    
+    Py_DECREF(funcTuple);
+    
+    if(strcmp(functionStr, "<module>") == 0){
+        igs_log(IGS_LOG_DEBUG, "main", log);
+    }else{
+        igs_log(IGS_LOG_DEBUG, functionStr, log);
+    }
     
     ret = PyLong_FromLong(1);
     return ret;
@@ -317,13 +361,35 @@ PyObject * info_wrapper(PyObject * self, PyObject * args)
     char * log;
     PyObject * ret;
     
-    
     // parse and cast into a bool the useColorVerbose argument given in python
     if (!PyArg_ParseTuple(args, "s", &log)) {
         return NULL;
     }
     
-    igs_info(log);
+    PyFrameObject* frame = PyEval_GetFrame();
+    Py_INCREF(frame);
+    PyObject *function = frame->f_code->co_name;
+    Py_INCREF(function);
+    Py_DECREF(frame);
+    
+    PyObject* funcTuple = Py_BuildValue("(O)", function);
+    Py_DECREF(function);
+    if (!funcTuple) return 0;
+    const char* functionStr = 0;
+    if (!PyArg_ParseTuple(funcTuple, "s", &functionStr)) {
+        Py_DECREF(args);
+        return 0;
+    }
+    
+    /* s now points to a const char* - use it, delete args when done */
+    
+    Py_DECREF(funcTuple);
+    
+    if(strcmp(functionStr, "<module>") == 0){
+        igs_log(IGS_LOG_INFO, "main", log);
+    }else{
+        igs_log(IGS_LOG_INFO, functionStr, log);
+    }
     
     ret = PyLong_FromLong(1);
     return ret;
@@ -335,13 +401,35 @@ PyObject * warn_wrapper(PyObject * self, PyObject * args)
     char * log;
     PyObject * ret;
     
-    
     // parse and cast into a bool the useColorVerbose argument given in python
     if (!PyArg_ParseTuple(args, "s", &log)) {
         return NULL;
     }
     
-    igs_warn(log);
+    PyFrameObject* frame = PyEval_GetFrame();
+    Py_INCREF(frame);
+    PyObject *function = frame->f_code->co_name;
+    Py_INCREF(function);
+    Py_DECREF(frame);
+    
+    PyObject* funcTuple = Py_BuildValue("(O)", function);
+    Py_DECREF(function);
+    if (!funcTuple) return 0;
+    const char* functionStr = 0;
+    if (!PyArg_ParseTuple(funcTuple, "s", &functionStr)) {
+        Py_DECREF(args);
+        return 0;
+    }
+    
+    /* s now points to a const char* - use it, delete args when done */
+    
+    Py_DECREF(funcTuple);
+    
+    if(strcmp(functionStr, "<module>") == 0){
+        igs_log(IGS_LOG_WARN, "main", log);
+    }else{
+        igs_log(IGS_LOG_WARN, functionStr, log);
+    }
     
     ret = PyLong_FromLong(1);
     return ret;
@@ -352,13 +440,35 @@ PyObject * error_wrapper(PyObject * self, PyObject * args)
     char * log;
     PyObject * ret;
     
-    
     // parse and cast into a bool the useColorVerbose argument given in python
     if (!PyArg_ParseTuple(args, "s", &log)) {
         return NULL;
     }
     
-    igs_error(log);
+    PyFrameObject* frame = PyEval_GetFrame();
+    Py_INCREF(frame);
+    PyObject *function = frame->f_code->co_name;
+    Py_INCREF(function);
+    Py_DECREF(frame);
+    
+    PyObject* funcTuple = Py_BuildValue("(O)", function);
+    Py_DECREF(function);
+    if (!funcTuple) return 0;
+    const char* functionStr = 0;
+    if (!PyArg_ParseTuple(funcTuple, "s", &functionStr)) {
+        Py_DECREF(args);
+        return 0;
+    }
+    
+    /* s now points to a const char* - use it, delete args when done */
+    
+    Py_DECREF(funcTuple);
+    
+    if(strcmp(functionStr, "<module>") == 0){
+        igs_log(IGS_LOG_ERROR, "main", log);
+    }else{
+        igs_log(IGS_LOG_ERROR, functionStr, log);
+    }
     
     ret = PyLong_FromLong(1);
     return ret;
@@ -369,14 +479,35 @@ PyObject * fatal_wrapper(PyObject * self, PyObject * args)
     char * log;
     PyObject * ret;
     
-    
     // parse and cast into a bool the useColorVerbose argument given in python
     if (!PyArg_ParseTuple(args, "s", &log)) {
         return NULL;
     }
     
-    igs_fatal(log);
+    PyFrameObject* frame = PyEval_GetFrame();
+    Py_INCREF(frame);
+    PyObject *function = frame->f_code->co_name;
+    Py_INCREF(function);
+    Py_DECREF(frame);
     
+    PyObject* funcTuple = Py_BuildValue("(O)", function);
+    Py_DECREF(function);
+    if (!funcTuple) return 0;
+    const char* functionStr = 0;
+    if (!PyArg_ParseTuple(funcTuple, "s", &functionStr)) {
+        Py_DECREF(args);
+        return 0;
+    }
+    
+    /* s now points to a const char* - use it, delete args when done */
+    
+    Py_DECREF(funcTuple);
+    if(strcmp(functionStr, "<module>") == 0){
+        igs_log(IGS_LOG_FATAL, "main", log);
+    }else{
+        igs_log(IGS_LOG_FATAL, functionStr, log);
+    }
+
     ret = PyLong_FromLong(1);
     return ret;
 }

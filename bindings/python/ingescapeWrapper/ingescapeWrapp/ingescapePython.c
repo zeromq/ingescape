@@ -245,12 +245,12 @@ static PyMethodDef ingescapeMethods[] =
     //logging
     {"igs_setLogLevel", setLogLevel_wrapper, METH_VARARGS, "set log level, \n Trace = 0, ..."},
     {"igs_getLogLevel", getLogLevel_wrapper, METH_VARARGS, "get log level, \n Trace = 0, ..."},
-//    {"igs_trace", trace_wrapper, METH_VARARGS, "test logging"},
-//    {"igs_debug", debug_wrapper, METH_VARARGS, "test logging"},
-//    {"igs_info", info_wrapper, METH_VARARGS, "test logging"},
-//    {"igs_warn", warn_wrapper, METH_VARARGS, "test logging"},
-//    {"igs_error", error_wrapper, METH_VARARGS, "test logging"},
-//    {"igs_fatal", fatal_wrapper, METH_VARARGS, "test logging"},
+    {"igs_trace", trace_wrapper, METH_VARARGS, "test logging"},
+    {"igs_debug", debug_wrapper, METH_VARARGS, "test logging"},
+    {"igs_info", info_wrapper, METH_VARARGS, "test logging"},
+    {"igs_warn", warn_wrapper, METH_VARARGS, "test logging"},
+    {"igs_error", error_wrapper, METH_VARARGS, "test logging"},
+    {"igs_fatal", fatal_wrapper, METH_VARARGS, "test logging"},
     
     {NULL, NULL, 0, NULL}       /* Sentinel */
 };
