@@ -7,7 +7,7 @@
 //
 
 #include "call.h"
-#include <Python/Python.h>
+#include <Python.h>
 #include <ingescape/ingescape_advanced.h>
 #include "uthash/utlist.h"
 

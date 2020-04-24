@@ -15,10 +15,12 @@ link_args = ["-lingescape"]
 inc_dirs = ["/usr/local/include/"]
 src = ["ingescapePython.c", "admin.c", "data.c", "definition.c", "mapping.c", "freezecallback.c", "init.c", "input.c", "observecallback.c", "output.c", "parameter.c", "start.c", "stopcallback.c", "advanced.c", "call.c"]
 
+headers =["admin.h", "data.h", "definition.h", "mapping.h", "freezecallback.h", "init.h", "input.h", "observecallback.h", "output.h", "parameter.h", "start.h", "stopcallback.h", "advanced.h", "call.h"]
+
 # the c extension module
 
-extension_mod = Extension("ingescape", src, extra_compile_args=["-g"],  extra_link_args=[ "-lingescape"] )
+extension_mod = Extension("ingescape", src, extra_compile_args=["-g"],  extra_link_args=[ "-lingescape"], include_dirs = [""] )
 setup(name                = "ingescape",
-      version             = "8.0.1",
+      version             = "99.0.2",
       license             = "Copyright © 2018-2020 ingenuity. All rights reserved.",
       ext_modules         = [extension_mod])

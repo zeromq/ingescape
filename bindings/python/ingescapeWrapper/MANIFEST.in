@@ -1,0 +1,4 @@
+include *.h
+include *.c
+include *.py
+include uthash/*.h

@@ -10,7 +10,7 @@
 #define admin_h
 
 #include <Python.h>
-#include <frameobject.h>
+#include <Python/frameobject.h>
 
 //wrapper for igs_setCommandLine
 PyObject * setCommandLine_wrapper(PyObject * self, PyObject * args);

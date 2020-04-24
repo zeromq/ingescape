@@ -23,7 +23,7 @@ Python3 and python3-dev for python3's Python.h
 ===================================================
 
 In a terminal :
-    python3 setup.py install
+    ./install.sh
 
 ---------------------EXAMPLES----------------------
 ===================================================
