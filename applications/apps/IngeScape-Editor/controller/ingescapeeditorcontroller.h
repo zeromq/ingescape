@@ -264,7 +264,7 @@ Q_SIGNALS:
     /**
       * @brief Signal emitted to reset the mapping view
       */
-    void resetMappindView();
+    void resetMappingView();
 
 
     /**

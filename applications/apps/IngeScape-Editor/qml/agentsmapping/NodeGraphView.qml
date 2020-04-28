@@ -268,10 +268,6 @@ Item {
             rootItem.zoomOut();
         }
 
-        onFitToView: {
-            rootItem.showAll();
-        }
-
         onResetZoom: {
             rootItem.setZoomLevel(1);
         }
@@ -280,7 +276,7 @@ Item {
     Connections {
         target: IngeScapeEditorC
 
-        onResetMappindView: {
+        onResetMappingView: {
             rootItem.showAll();
         }
     }

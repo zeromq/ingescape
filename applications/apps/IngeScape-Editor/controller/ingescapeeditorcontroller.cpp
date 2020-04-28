@@ -1236,7 +1236,7 @@ void IngeScapeEditorController::_onReplayLoading(int deltaTimeFromTimeLineStart,
             qDebug() << "Received executed actions (DO NOTHING WITH IT RIGHT NOW)" << jsonExecutedActions.size();
 
             Q_EMIT resetTimeLineView(false); // Open timeline view
-            Q_EMIT resetMappindView(); // Center mapping view
+            Q_EMIT resetMappingView(); // Center mapping view
         }
         else
         {
@@ -1593,7 +1593,7 @@ bool IngeScapeEditorController::_loadPlatformFromFile(QString platformFilePath)
                 }
 
                 Q_EMIT resetTimeLineView(false); // Close timeline view
-                Q_EMIT resetMappindView(); // Center mapping view
+                Q_EMIT resetMappingView(); // Center mapping view
             }
             else
             {
@@ -1658,7 +1658,7 @@ void IngeScapeEditorController::_clearCurrentPlatform()
     }
 
     Q_EMIT resetTimeLineView(false); // Close timeline view
-    Q_EMIT resetMappindView(); // Center mapping view
+    Q_EMIT resetMappingView(); // Center mapping view
 }
 
 

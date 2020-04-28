@@ -209,12 +209,6 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Emitted to fit all nodes in our view
-     */
-    void fitToView();
-
-
-    /**
      * @brief Signal emitted when an action has to be executed
      */
     void executeAction(ActionM* action);

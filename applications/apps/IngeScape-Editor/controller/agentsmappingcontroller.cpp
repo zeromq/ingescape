@@ -1201,7 +1201,6 @@ void AgentsMappingController::onAgentsGroupedByNameHasBeenCreated(AgentsGroupedB
 
         // Add new agent in our mapping
         _createAgentInMappingAtPosition(agentsGroupedByName, position, width);
-        Q_EMIT fitToView(); // Notify the QML to fit the view
     }
 }
 
@@ -1387,7 +1386,6 @@ void AgentsMappingController::_onAgentModelONhasBeenAdded(AgentM* model)
                     _linkAgentOnInputs(agentInMapping);
                     _linkAgentOnOutputs(agentInMapping);
                 }
-                Q_EMIT fitToView(); // Notify the QML to fit the view
             }
         }
     }

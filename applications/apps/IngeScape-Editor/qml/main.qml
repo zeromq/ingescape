@@ -315,9 +315,9 @@ ApplicationWindow {
                 text: qsTr("Fit all in view")
 
                 onTriggered: {
-                    if (IngeScapeEditorC.agentsMappingC)
+                    if (IngeScapeEditorC)
                     {
-                        IngeScapeEditorC.agentsMappingC.fitToView();
+                        IngeScapeEditorC.resetMappingView();
                     }
                 }
             }
@@ -710,9 +710,11 @@ ApplicationWindow {
             }
 
             onVisibleChanged: {
-                if (visible) {
-                    if (IngeScapeEditorC.agentsMappingC) {
-                        IngeScapeEditorC.agentsMappingC.fitToView();
+                if (visible)
+                {
+                    if (IngeScapeEditorC)
+                    {
+                        IngeScapeEditorC.resetMappingView();
                     }
                 }
             }
