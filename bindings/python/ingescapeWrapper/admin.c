@@ -514,7 +514,7 @@ PyObject * fatal_wrapper(PyObject * self, PyObject * args)
 
 PyObject * setLogLevel_wrapper(PyObject * self, PyObject * args)
 {
-    int * logLevel;
+    int logLevel;
     PyObject * ret;
     
     
