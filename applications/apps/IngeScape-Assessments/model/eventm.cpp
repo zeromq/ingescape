@@ -64,7 +64,7 @@ EventM::EventM(CassUuid recordCassUuid,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    qInfo() << "New Model of Event at " << _executionDateTime << " of type " << _type;
+    //qInfo() << "New Model of Event at " << _executionDateTime << " of type " << _type;
 }
 
 
@@ -72,7 +72,7 @@ EventM::EventM(CassUuid recordCassUuid,
  * @brief Destructor
  */
 EventM::~EventM() {
-    qInfo() << "Delete Model of Event";
+    //qInfo() << "Delete Model of Event";
 }
 
 
