@@ -287,7 +287,9 @@ void network_cleanAndFreeSubscriber(igsAgent_t *agent, subscriber_t *subscriber)
         DL_DELETE(subscriber->mappingsFilters,elt);
         free(elt);
     }
-    zloop_poller_end(agent->loopElements->loop , subscriber->pollItem);
+    if (agent->loopElements != NULL){
+        zloop_poller_end(agent->loopElements->loop , subscriber->pollItem);
+    }
     zsock_destroy(&subscriber->subscriber);
     if (subscriber->agentName)
         free((char*)subscriber->agentName);
