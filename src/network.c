@@ -300,7 +300,7 @@ void network_cleanAndFreeSubscriber(igsAgent_t *agent, subscriber_t *subscriber)
     if (subscriber->subscriber)
         free(subscriber->subscriber);
     subscriber->subscriber = NULL;
-    if (subscriber->timerId != -1){
+    if (agent->loopElements != NULL && subscriber->timerId != -1){
         zloop_timer_end(agent->loopElements->loop, subscriber->timerId);
         subscriber->timerId = -2;
     }
@@ -1400,55 +1400,60 @@ static void runLoop (zsock_t *mypipe, void *args){
         network_cleanAndFreeSubscriber(agent, s);
     }
     bus_zyreLock();
-    zyre_stop (agent->loopElements->node);
+    if (agent->loopElements != NULL)
+        zyre_stop (agent->loopElements->node);
     bus_zyreUnlock();
     //zclock_sleep (100);
-    zyre_destroy (&agent->loopElements->node);
-    zsock_destroy(&agent->loopElements->publisher);
-    if (agent->loopElements->ipcPublisher != NULL){
-        zsock_destroy(&agent->loopElements->ipcPublisher);
+    if (agent->loopElements != NULL){
+        zyre_destroy (&agent->loopElements->node);
+        zsock_destroy(&agent->loopElements->publisher);
+        if (agent->loopElements->ipcPublisher != NULL){
+            zsock_destroy(&agent->loopElements->ipcPublisher);
 #if defined __unix__ || defined __APPLE__ || defined __linux__
-        if (agent->ipcFullPath != NULL){
-            zsys_file_delete(agent->ipcFullPath); //destroy ipcPath in file system
-            //NB: ipcPath is based on peer id which is unique. It will never be used again.
-            free(agent->ipcFullPath);
-            agent->ipcFullPath = NULL;
-        }
+            if (agent->ipcFullPath != NULL){
+                zsys_file_delete(agent->ipcFullPath); //destroy ipcPath in file system
+                //NB: ipcPath is based on peer id which is unique. It will never be used again.
+                free(agent->ipcFullPath);
+                agent->ipcFullPath = NULL;
+            }
 #endif
+        }
+        if (agent->loopElements->inprocPublisher != NULL){
+            zsock_destroy(&agent->loopElements->inprocPublisher);
+        }
+        if (agent->loopElements->logger != NULL){
+            zsock_destroy(&agent->loopElements->logger);
+        }
+        
+        zloop_destroy (&agent->loopElements->loop);
+        
+        igsTimer_t *current_timer, *tmp_timer;
+        HASH_ITER(hh, agent->loopElements->timers, current_timer, tmp_timer){
+            HASH_DEL(agent->loopElements->timers, current_timer);
+            free(current_timer);
+        }
+        
+        if (agent->forcedStop){
+            forcedStopCalback_t *cb = NULL;
+            DL_FOREACH(agent->forcedStopCalbacks, cb){
+                cb->callback_ptr(agent, cb->myData);
+            }
+            agent->isInterrupted = true;
+            //in case of forced stop, we send SIGINT to our process so
+            //that it can be trapped by main thread for a proper stop
+            #if defined __unix__ || defined __APPLE__ || defined __linux__
+            igsAgent_debug(agent, "triggering SIGINT");
+            kill(agent->loopElements->processId, SIGINT);
+            #endif
+            //FIXME : find a way to do that for windows as well
+        }
+        free(agent->loopElements);
+        agent->loopElements = NULL;
     }
-    if (agent->loopElements->inprocPublisher != NULL){
-        zsock_destroy(&agent->loopElements->inprocPublisher);
-    }
-    free(agent->ipcEndpoint);
+    if (agent->ipcEndpoint)
+        free(agent->ipcEndpoint);
     agent->ipcEndpoint = NULL;
     
-    if (agent->loopElements->logger != NULL){
-        zsock_destroy(&agent->loopElements->logger);
-    }
-    
-    zloop_destroy (&agent->loopElements->loop);
-    assert (agent->loopElements->loop == NULL);
-    
-    igsTimer_t *current_timer, *tmp_timer;
-    HASH_ITER(hh, agent->loopElements->timers, current_timer, tmp_timer){
-        HASH_DEL(agent->loopElements->timers, current_timer);
-        free(current_timer);
-    }
-    
-    if (agent->forcedStop){
-        forcedStopCalback_t *cb = NULL;
-        DL_FOREACH(agent->forcedStopCalbacks, cb){
-            cb->callback_ptr(agent, cb->myData);
-        }
-        agent->isInterrupted = true;
-        //in case of forced stop, we send SIGINT to our process so
-        //that it can be trapped by main thread for a proper stop
-        #if defined __unix__ || defined __APPLE__ || defined __linux__
-        igsAgent_debug(agent, "triggering SIGINT");
-        kill(agent->loopElements->processId, SIGINT);
-        #endif
-        //FIXME : find a way to do that for windows as well
-    }
     igsAgent_debug(agent, "loop stopped");
     igs_nbOfAgentsInProcess--;
     network_Unlock();
@@ -2080,9 +2085,6 @@ int igsAgent_stop(igsAgent_t *agent){
             //This function will block until runLoop has terminated
             zactor_destroy (&agent->loopElements->agentActor);
         }
-        //cleaning agent
-        free (agent->loopElements);
-        agent->loopElements = NULL;
         //igsAgent_debug(agent, "still %d agents running in process", igs_nbOfAgentsInProcess);
 #if (defined WIN32 || defined _WIN32)
         // On Windows, if we don't call zsys_shutdown, the application will crash on exit
