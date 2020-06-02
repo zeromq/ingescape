@@ -522,6 +522,7 @@ void license_readLicense(igsAgent_t *agent){
                 while (ent != NULL) {
                     zfile_t *new = zfile_new(agent->licensePath, ent->d_name);
                     const char *name = zfile_filename(new, agent->licensePath);
+                    igsAgent_debug(agent, "scan %s", name);
                     const char *extension = license_getFilenameExt(name);
                     if (strcmp(extension, "igslicense") == 0
                         && !zfile_is_directory(new)
@@ -535,6 +536,7 @@ void license_readLicense(igsAgent_t *agent){
                 closedir (dir);
             } else {
                 // could not open directory
+                igsAgent_error(agent, "could not open %s", agent->licensePath);
             }
             igsAgent_debug(agent, "%zu license(s) found", zlist_size(filesList));
             if (zlist_size(filesList) > 0){

@@ -257,6 +257,11 @@ void sendMappingToAgent(igsAgent_t *agent, const char *peerId, const char *mappi
 }
 
 void network_cleanAndFreeSubscriber(igsAgent_t *agent, subscriber_t *subscriber){
+    if (agent == NULL)
+        return;
+    if (subscriber == NULL){
+        igsAgent_error(agent, "subscriber cannot be NULL");
+    }
     igsAgent_debug(agent, "cleaning subscription to %s\n", subscriber->agentName);
     #if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
     agent->licenseEnforcement->currentAgentsNb--;
@@ -284,10 +289,14 @@ void network_cleanAndFreeSubscriber(igsAgent_t *agent, subscriber_t *subscriber)
     }
     zloop_poller_end(agent->loopElements->loop , subscriber->pollItem);
     zsock_destroy(&subscriber->subscriber);
-    free((char*)subscriber->agentName);
-    free((char*)subscriber->agentPeerId);
-    free(subscriber->pollItem);
-    free(subscriber->subscriber);
+    if (subscriber->agentName)
+        free((char*)subscriber->agentName);
+    if (subscriber->agentPeerId)
+        free((char*)subscriber->agentPeerId);
+    if (subscriber->pollItem)
+        free(subscriber->pollItem);
+    if (subscriber->subscriber)
+        free(subscriber->subscriber);
     subscriber->subscriber = NULL;
     if (subscriber->timerId != -1){
         zloop_timer_end(agent->loopElements->loop, subscriber->timerId);
@@ -295,7 +304,6 @@ void network_cleanAndFreeSubscriber(igsAgent_t *agent, subscriber_t *subscriber)
     }
     HASH_DEL(agent->subscribers, subscriber);
     free(subscriber);
-    subscriber = NULL;
 //    int n = HASH_COUNT(agent->subscribers);
 //    igsAgent_debug(agent, "%d agent->subscribers in the list\n", n);
 //    subscriber_t *s, *tmps;
