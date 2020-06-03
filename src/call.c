@@ -87,7 +87,7 @@ bool call_addValuesToArgumentsFromMessage(const char *name, igs_callArgument_t *
                 current->data = calloc(1, size);
                 memcpy(current->data, zframe_data(f), size);
                 break;
-                
+
             default:
                 break;
         }
@@ -151,7 +151,7 @@ igs_callArgument_t *igs_cloneArgumentsList(igs_callArgument_t *list){
                     new->data = calloc(1, arg->size);
                     memcpy(new->data, arg->data, arg->size);
                     break;
-                    
+
                 default:
                     break;
             }
@@ -195,7 +195,7 @@ void igs_addStringToArgumentsList(igs_callArgument_t **list, const char *value){
         new->c = NULL;
         new->size = 0;
     }
-    
+
     LL_APPEND(*list, new);
 }
 
@@ -386,11 +386,11 @@ int igsAgent_sendCall(igsAgent_t *agent, const char *agentNameOrUUID, const char
                             }
                             break;
                         }
-                            
+
                         case IGS_DATA_T:
                             frame = zframe_new(arg->data, arg->size);
                             break;
-                            
+
                         default:
                             break;
                     }
@@ -404,15 +404,16 @@ int igsAgent_sendCall(igsAgent_t *agent, const char *agentNameOrUUID, const char
             zyre_whisper(agent->loopElements->node, agt->peerId, &msg);
             bus_zyreUnlock();
             igsAgent_debug(agent, "sent call %s to %s", callName, agentNameOrUUID);
-            
+
         }
-    }
-    if (!found){
-        igsAgent_error(agent, "could not find an agent with name or UUID : %s", agentNameOrUUID);
     }
     if (list != NULL && *list != NULL){
         call_freeCallArguments(*list);
         *list = NULL;
+    }
+    if (!found){
+        igsAgent_error(agent, "could not find an agent with name or UUID : %s", agentNameOrUUID);
+        return -1;
     }
     return 1;
 }
