@@ -11,6 +11,10 @@
 #include <ingescape/ingescape_advanced.h>
 #include "uthash/utlist.h"
 
+#if (defined WIN32 || defined _WIN32)
+#include "unixfunctions.h"
+#endif
+
 
 /* igs_sendCall
  *Function in c that wrapp all the send call dynamic in python

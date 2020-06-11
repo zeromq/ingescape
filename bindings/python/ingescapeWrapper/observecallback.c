@@ -10,6 +10,10 @@
 #include <ingescape/ingescape.h>
 #include "uthash/utlist.h"
 
+#if (defined WIN32 || defined _WIN32)
+#include "unixfunctions.h"
+#endif
+
 typedef struct observeCallback {
     char *nameArg;      // name of the iop
     PyObject *call;     //observeCallback
