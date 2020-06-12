@@ -56,22 +56,22 @@ INCLUDEPATH += $$PWD/../src/include \
 
 CONFIG(debug, debug|release) {
     # Include libsodium library
-    !include(../../libsodium/builds/qt/libsodium.pri) {
+    !include(../../../third-party/libsodium/builds/qt/libsodium.pri) {
         error(Could not load libsodium.pri)
     }
 
     # Include ZeroMQ library
-    !include(../../libzmq/builds/qt/libzmq.pri) {
+    !include(../../../third-party/libzmq/builds/qt/libzmq.pri) {
         error(Could not load libzmq.pri)
     }
 
     # Include C ZeroMQ library
-    !include(../../czmq/builds/qt/czmq.pri) {
+    !include(../../../third-party/czmq/builds/qt/czmq.pri) {
         error(Could not load czmq.pri)
     }
 
     # Include zyre library
-    !include(../../zyre/builds/qt/zyre.pri) {
+    !include(../../../third-party/zyre/builds/qt/zyre.pri) {
         error(Could not load zyre.pri)
     }
 }
@@ -125,7 +125,8 @@ mac:{
     message("Scope is macos...")
 
     CONFIG(release, debug|release) {
-        INCLUDEPATH += /usr/local/include
+        #INCLUDEPATH += /usr/local/include
+        INCLUDEPATH += $$(HOME)/builds/sysroot/usr/local/include
     }
 
     #
@@ -146,9 +147,12 @@ mac:{
     LIBS += -framework CoreFoundation
 
     CONFIG(release, debug|release) {
-        LIBS += /usr/local/lib/libczmq.dylib
-        LIBS += /usr/local/lib/libzyre.dylib
-        LIBS += /usr/local/lib/libsodium.dylib
+        #LIBS += /usr/local/lib/libczmq.dylib
+        #LIBS += /usr/local/lib/libzyre.dylib
+        #LIBS += /usr/local/lib/libsodium.dylib
+        LIBS += $$(HOME)/builds/sysroot/usr/local/lib/libczmq.dylib
+        LIBS += $$(HOME)/builds/sysroot/usr/local/lib/libzyre.dylib
+        LIBS += $$(HOME)/builds/sysroot/usr/local/lib/libsodium.dylib
     }
 }
 

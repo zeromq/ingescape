@@ -12,7 +12,6 @@
 		9725395B23564B230071A9BA /* performance.c in Sources */ = {isa = PBXBuildFile; fileRef = 9725395923564B230071A9BA /* performance.c */; };
 		972A52641FD1733E00711352 /* admin.c in Sources */ = {isa = PBXBuildFile; fileRef = 972A52631FD1733E00711352 /* admin.c */; };
 		972A52651FD1733E00711352 /* admin.c in Sources */ = {isa = PBXBuildFile; fileRef = 972A52631FD1733E00711352 /* admin.c */; };
-		97317BD62422565D007C88B3 /* libsodium.23.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97317BD5242255F8007C88B3 /* libsodium.23.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		9736B37B238414E200A97173 /* agent.c in Sources */ = {isa = PBXBuildFile; fileRef = 9736B37A238414E200A97173 /* agent.c */; };
 		9736B37C238414E200A97173 /* agent.c in Sources */ = {isa = PBXBuildFile; fileRef = 9736B37A238414E200A97173 /* agent.c */; };
 		9738214C23832B7400D466DC /* global.c in Sources */ = {isa = PBXBuildFile; fileRef = 9738214B23832B7400D466DC /* global.c */; };
@@ -40,9 +39,14 @@
 		9762EDFA1EAE55D2002062A1 /* utstring.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79961EA7B112003153EF /* utstring.h */; };
 		9762EDFB1EAE55D2002062A1 /* utvector.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79971EA7B112003153EF /* utvector.h */; };
 		9768B2AE22830F0E00310410 /* json.c in Sources */ = {isa = PBXBuildFile; fileRef = 9768B2AD22830F0E00310410 /* json.c */; };
-		976A93DC23F3035300CAA795 /* libczmq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 976A93A423F3032F00CAA795 /* libczmq.a */; };
-		976A93DD23F3035300CAA795 /* libzmq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 976A92B523F3032300CAA795 /* libzmq.a */; };
-		976A93DE23F3035300CAA795 /* libzyre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 976A93D723F3033800CAA795 /* libzyre.a */; };
+		976A483C2493A6C300075CA2 /* libczmq.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 976A47FF2493A5F300075CA2 /* libczmq.dylib */; };
+		976A483D2493A6C300075CA2 /* libsodium.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 976A46932493A5D200075CA2 /* libsodium.dylib */; };
+		976A483E2493A6C300075CA2 /* libzmq.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 976A470C2493A5E000075CA2 /* libzmq.dylib */; };
+		976A483F2493A6C300075CA2 /* libzyre.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 976A48352493A60300075CA2 /* libzyre.dylib */; };
+		976A48402493A6D400075CA2 /* libsodium.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 976A46932493A5D200075CA2 /* libsodium.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		976A48412493A6D400075CA2 /* libzmq.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 976A470C2493A5E000075CA2 /* libzmq.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		976A48422493A6D400075CA2 /* libczmq.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 976A47FF2493A5F300075CA2 /* libczmq.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		976A48432493A6D400075CA2 /* libzyre.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 976A48352493A60300075CA2 /* libzyre.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		976A93E023F305F300CAA795 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 976A93DF23F305F300CAA795 /* libc++.tbd */; };
 		9772A52720BDE42700729D59 /* call.c in Sources */ = {isa = PBXBuildFile; fileRef = 9772A52620BDE42700729D59 /* call.c */; };
 		9772A52820BDE42700729D59 /* call.c in Sources */ = {isa = PBXBuildFile; fileRef = 9772A52620BDE42700729D59 /* call.c */; };
@@ -157,7 +161,6 @@
 		97ABC93C2282EC5D00215310 /* monitor.c in Sources */ = {isa = PBXBuildFile; fileRef = 97ABC93B2282EC5D00215310 /* monitor.c */; };
 		97ABC93D2282EC5D00215310 /* monitor.c in Sources */ = {isa = PBXBuildFile; fileRef = 97ABC93B2282EC5D00215310 /* monitor.c */; };
 		97C55F9D2389B8DF00D0EDB2 /* ingescape_agent.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9738215023832BBF00D466DC /* ingescape_agent.h */; };
-		97C7AAAF23F809F500DC02C2 /* libsodium.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 976A8FAF23F1BEEB00CAA795 /* libsodium.a */; };
 		97FAC32B2244C88A0036293B /* yajl.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 973D1BB22226916D00D363BF /* yajl.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		97FAC32E2247BE920036293B /* license.c in Sources */ = {isa = PBXBuildFile; fileRef = 97FAC32C2247BE920036293B /* license.c */; };
 /* End PBXBuildFile section */
@@ -177,887 +180,901 @@
 			remoteGlobalIDString = 9762EDB21EAE530B002062A1;
 			remoteInfo = "yajl-macos";
 		};
-		976A92B223F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A46902493A5D200075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A468B2493A5D200075CA2 /* sodium.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 70C0FFDC52764AB9B1AB3751;
+			remoteGlobalIDString = 9717517124913828005B2CFB;
+			remoteInfo = "sodium-static";
+		};
+		976A46922493A5D200075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A468B2493A5D200075CA2 /* sodium.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 971754F224913D8C005B2CFB;
+			remoteInfo = sodium;
+		};
+		976A470B2493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 353B1B44841D41E3AC2651AE;
 			remoteInfo = libzmq;
 		};
-		976A92B423F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A470D2493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = FE9D660D1D6C4B66AC5531F2;
+			remoteGlobalIDString = B5693FF052614A42A74A9B1D;
 			remoteInfo = "libzmq-static";
 		};
-		976A92B623F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A470F2493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 1A3A27A143D9437BB217E73C;
+			remoteGlobalIDString = CBA9F875C95647638405F2FA;
 			remoteInfo = objects;
 		};
-		976A92B823F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A47112493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 77D2FB31642F46FEB026DEBD;
+			remoteGlobalIDString = D0239F50A020496282AE78FD;
 			remoteInfo = test_ancillaries;
 		};
-		976A92BA23F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A47132493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 681CE065A2514527AB1EDEA4;
+			remoteGlobalIDString = 2033C684B59F497E894189C4;
 			remoteInfo = test_app_meta;
 		};
-		976A92BC23F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A47152493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 11DFB48CCC584141BFFD4E81;
+			remoteGlobalIDString = 2E17387054454DF79EBB029B;
 			remoteInfo = test_atomics;
 		};
-		976A92BE23F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A47172493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 6F47C934B87245FD955D10AD;
+			remoteGlobalIDString = 202A3A6942F94FBEA880C446;
 			remoteInfo = test_base85;
 		};
-		976A92C023F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A47192493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = D4F2F6FFA4254EFC9061EE2A;
+			remoteGlobalIDString = F31B917DA4354F8980A50873;
 			remoteInfo = test_bind_after_connect_tcp;
 		};
-		976A92C223F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A471B2493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 1B1B96081ABC48919F1D5D9F;
+			remoteGlobalIDString = 5F3EB18625AB472F827DB7A3;
 			remoteInfo = test_bind_src_address;
 		};
-		976A92C423F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A471D2493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = B9A04989D2E04EB78696ADAD;
+			remoteGlobalIDString = 4504E8498CCA4A85906F22F7;
 			remoteInfo = test_capabilities;
 		};
-		976A92C623F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A471F2493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 85B128F219F9410C8C42B645;
+			remoteGlobalIDString = A6FBAF5CABA84D339CD19867;
 			remoteInfo = test_client_server;
 		};
-		976A92C823F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A47212493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 6757E531FADD434781F66E1D;
+			remoteGlobalIDString = 2FCDD418F8CB461C83F005B8;
 			remoteInfo = test_conflate;
 		};
-		976A92CA23F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A47232493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 7125EE78BE6F4E65A3189507;
+			remoteGlobalIDString = D62AE5A7149A40AE9DACD2F1;
 			remoteInfo = test_connect_resolve;
 		};
-		976A92CC23F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A47252493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 784FA21670F64A1A8BEF11EE;
+			remoteGlobalIDString = BDB24451388A48E4BD0F9B75;
 			remoteInfo = test_connect_rid;
 		};
-		976A92CE23F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A47272493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 9DD5D8E312C04717BD13F4A0;
+			remoteGlobalIDString = 831FF086DEF749C48AA09C58;
 			remoteInfo = test_ctx_destroy;
 		};
-		976A92D023F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A47292493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 7080114F5CA84D6889025C71;
+			remoteGlobalIDString = 6CA914EA9B944AD290571848;
 			remoteInfo = test_ctx_options;
 		};
-		976A92D223F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A472B2493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 1D7D87C637C541CDB3CC0134;
+			remoteGlobalIDString = 123847FB96474ED1A33961AE;
 			remoteInfo = test_dgram;
 		};
-		976A92D423F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A472D2493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 3C1C2AF333554BB5B05C0788;
+			remoteGlobalIDString = E195A3DFE9014526AA3C866D;
 			remoteInfo = test_diffserv;
 		};
-		976A92D623F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A472F2493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = DA3FDC5EA308412186CD6803;
+			remoteGlobalIDString = D5797BEC0B174C968A1643C4;
 			remoteInfo = test_disconnect_inproc;
 		};
-		976A92D823F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A47312493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 93DCAFA53B7F4E02A7A2D8DE;
+			remoteGlobalIDString = 7865159CE0614B76988E5B59;
 			remoteInfo = test_filter_ipc;
 		};
-		976A92DA23F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A47332493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 7F8122002E324CDCADBB01EC;
+			remoteGlobalIDString = 16075533857A4F3694F07C7E;
 			remoteInfo = test_fork;
 		};
-		976A92DC23F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A47352493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = C2537D88342D4107B5DF5624;
+			remoteGlobalIDString = 8270200A71164D05B93A3CC0;
 			remoteInfo = test_getsockopt_memset;
 		};
-		976A92DE23F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A47372493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 754809ED56A74BC79D6DDE6F;
+			remoteGlobalIDString = 5499BCE5925741B1BF466757;
 			remoteInfo = test_heartbeats;
 		};
-		976A92E023F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A47392493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 144E71BA500F4E34A4286714;
+			remoteGlobalIDString = D044F3F8E9834182A9B022DB;
 			remoteInfo = test_hwm;
 		};
-		976A92E223F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A473B2493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 8CDCAD3D86D94B219A640480;
+			remoteGlobalIDString = 7C4E61F3EFA440B1B440D250;
 			remoteInfo = test_hwm_pubsub;
 		};
-		976A92E423F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A473D2493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 17922CD30823470BB5F9366A;
+			remoteGlobalIDString = 63D42E6AC3E044BE908D2751;
 			remoteInfo = test_immediate;
 		};
-		976A92E623F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A473F2493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = CBDEC7E1DFD548C3A7A969CF;
+			remoteGlobalIDString = DA1E34E421F443CDA0009D59;
 			remoteInfo = test_inproc_connect;
 		};
-		976A92E823F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A47412493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 0329A5CAE37F4AF5B0C84764;
+			remoteGlobalIDString = E91063749C174D84ACD5E2B7;
 			remoteInfo = test_invalid_rep;
 		};
-		976A92EA23F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A47432493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 86801CFF0F45452F8FEE7874;
+			remoteGlobalIDString = A82B5642B4D245348FCE8F83;
 			remoteInfo = test_iov;
 		};
-		976A92EC23F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A47452493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = DAC2C5AC3744467097E98BE7;
+			remoteGlobalIDString = 79A6704A92284518ACAFFD05;
 			remoteInfo = test_ipc_wildcard;
 		};
-		976A92EE23F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A47472493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 46E25DEDCDC94F4291C48638;
+			remoteGlobalIDString = 2D0C0714A0194EC09A611030;
 			remoteInfo = test_issue_566;
 		};
-		976A92F023F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A47492493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = E54B092C29B3442EA80D0D08;
+			remoteGlobalIDString = 680D9B807E834E9C911DF9A1;
 			remoteInfo = test_last_endpoint;
 		};
-		976A92F223F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A474B2493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 75302D412E764102B35C73BF;
+			remoteGlobalIDString = B6EBCE26EC5D42E6BF9F33B3;
 			remoteInfo = test_many_sockets;
 		};
-		976A92F423F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A474D2493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 95FABE8FCED84D9292BFE437;
+			remoteGlobalIDString = AD2850C4A1F54912A2CC102C;
 			remoteInfo = test_metadata;
 		};
-		976A92F623F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A474F2493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 0188E9B3763D4245BA662E46;
+			remoteGlobalIDString = 478F5E4A2A004284B56735AA;
 			remoteInfo = test_mock_pub_sub;
 		};
-		976A92F823F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A47512493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = B9EB7EE430BB44E4AD82784A;
+			remoteGlobalIDString = BFB1E512E1294FF8B1C024BE;
 			remoteInfo = test_monitor;
 		};
-		976A92FA23F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A47532493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 7B2381CFD022450FBBF3043C;
+			remoteGlobalIDString = 8D018E7C7638480F98BDB5DA;
 			remoteInfo = test_msg_ffn;
 		};
-		976A92FC23F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A47552493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = AF034E31F0B9471DB665E17E;
+			remoteGlobalIDString = C7395F2B14F94BB0B1A2A74E;
 			remoteInfo = test_msg_flags;
 		};
-		976A92FE23F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A47572493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 9CC427614F7F48A0979BB059;
+			remoteGlobalIDString = 131F54B9879D415C9587D3E1;
 			remoteInfo = test_pair_inproc;
 		};
-		976A930023F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A47592493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = CCC53355BEE14BCF98B3D4AC;
+			remoteGlobalIDString = 13085C17E3754330AF78D6BD;
 			remoteInfo = test_pair_ipc;
 		};
-		976A930223F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A475B2493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 273E1173291B4D7387E99A22;
+			remoteGlobalIDString = 2AF9167A5D48400B9E9B30F1;
 			remoteInfo = test_pair_tcp;
 		};
-		976A930423F3032300CAA795 /* PBXContainerItemProxy */ = {
+		976A475D2493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = B5581109728B4C9AA6E484F0;
-			remoteInfo = test_poller;
-		};
-		976A930623F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = A1C5A6019B6649D18972E7B1;
-			remoteInfo = test_probe_router;
-		};
-		976A930823F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 4721FB6BE37F4778A8EA3576;
-			remoteInfo = test_proxy;
-		};
-		976A930A23F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 93EA9890A2D042F8B415B146;
-			remoteInfo = test_proxy_hwm;
-		};
-		976A930C23F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 1A443795839749C6A09E466B;
-			remoteInfo = test_proxy_single_socket;
-		};
-		976A930E23F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = BCF65DA083124892A530C546;
-			remoteInfo = test_proxy_terminate;
-		};
-		976A931023F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 6DA1DCCF1CB74A3392CCF83A;
-			remoteInfo = test_pub_invert_matching;
-		};
-		976A931223F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 52A4842AB874431D99477619;
-			remoteInfo = test_radio_dish;
-		};
-		976A931423F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = AD977AC1E5B641FA8FF658C3;
-			remoteInfo = test_rebind_ipc;
-		};
-		976A931623F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 278DA4CE8C2F4A2285E4D559;
-			remoteInfo = test_reconnect_ivl;
-		};
-		976A931823F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 043B14594029477E81B69A72;
-			remoteInfo = test_req_correlate;
-		};
-		976A931A23F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 66D00584720743FEB280E8F7;
-			remoteInfo = test_req_relaxed;
-		};
-		976A931C23F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 3E830E7BA34A449781BD2F58;
-			remoteInfo = test_reqrep_device;
-		};
-		976A931E23F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 9BB5AFB3DB2A4C348A6FA717;
-			remoteInfo = test_reqrep_inproc;
-		};
-		976A932023F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 711A587A60D4461CA932ADE6;
-			remoteInfo = test_reqrep_ipc;
-		};
-		976A932223F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 4CB169BAB6B142CDA26A89FF;
-			remoteInfo = test_reqrep_tcp;
-		};
-		976A932423F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = D815BD1851FB4D9EAE982295;
-			remoteInfo = test_router_handover;
-		};
-		976A932623F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 1A76DCA8611446618EC9FCFF;
-			remoteInfo = test_router_mandatory;
-		};
-		976A932823F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 7F99C9755BBC460BA5B9FC61;
-			remoteInfo = test_router_mandatory_hwm;
-		};
-		976A932A23F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 3838CB56CE4543B88E499481;
-			remoteInfo = test_router_notify;
-		};
-		976A932C23F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 05239171B6864B83B01E17FA;
-			remoteInfo = test_scatter_gather;
-		};
-		976A932E23F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 37A2CFE6F6864AE595D6681B;
-			remoteInfo = test_security_curve;
-		};
-		976A933023F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = A1E9A0EAB7CF4CF3B779279E;
-			remoteInfo = test_security_gssapi;
-		};
-		976A933223F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = C29331C6F6DF42398A788BC6;
-			remoteInfo = test_security_no_zap_handler;
-		};
-		976A933423F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = CE1942532D554F3E8F2AE112;
-			remoteInfo = test_security_null;
-		};
-		976A933623F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = F3787C226FE84FDCAB9A546B;
-			remoteInfo = test_security_plain;
-		};
-		976A933823F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 4F1DC5D2829A40B5BA0F4DE9;
-			remoteInfo = test_security_zap;
-		};
-		976A933A23F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 04340B187E6C4405ADAA24DE;
-			remoteInfo = test_setsockopt;
-		};
-		976A933C23F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 5D1B98B7C45040EE9E453692;
-			remoteInfo = test_shutdown_stress;
-		};
-		976A933E23F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 071FD0B4AD0743E0A6C63369;
-			remoteInfo = test_socket_null;
-		};
-		976A934023F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = A411FF2299A44929B6856C0D;
-			remoteInfo = test_sockopt_hwm;
-		};
-		976A934223F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = B872974EAF8841048F0600EA;
-			remoteInfo = test_sodium;
-		};
-		976A934423F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = C644EC1463264123B63F12A9;
-			remoteInfo = test_spec_dealer;
-		};
-		976A934623F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 3DB415EF64DE440B92DF536A;
-			remoteInfo = test_spec_pushpull;
-		};
-		976A934823F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 364A5381A2DA4515AFDCD24A;
-			remoteInfo = test_spec_rep;
-		};
-		976A934A23F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 0344F938C0A94F5DB59878AE;
-			remoteInfo = test_spec_req;
-		};
-		976A934C23F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 8E7108D2B95A4D7AB6A4D9A4;
-			remoteInfo = test_spec_router;
-		};
-		976A934E23F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 85086CBBE4654FDB8ADA3472;
-			remoteInfo = test_srcfd;
-		};
-		976A935023F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = C25DB3D62BBB4E47B251F84E;
-			remoteInfo = test_stream;
-		};
-		976A935223F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 21B96DCF250B470E9A56BCFE;
-			remoteInfo = test_stream_disconnect;
-		};
-		976A935423F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 60A4F129BBB94C069E1C047E;
-			remoteInfo = test_stream_empty;
-		};
-		976A935623F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 3467CC9C8ECB4569A15896C6;
-			remoteInfo = test_stream_exceeds_buffer;
-		};
-		976A935823F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 36F0D52BF31D4FF6ABEA8D95;
-			remoteInfo = test_stream_timeout;
-		};
-		976A935A23F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 8EF29E8F3CD2406D8FDF37AB;
-			remoteInfo = test_sub_forward;
-		};
-		976A935C23F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = CEF335D2E6E74650B2F739BF;
-			remoteInfo = test_system;
-		};
-		976A935E23F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 18E927D7F3C74EB19218EBE8;
-			remoteInfo = test_term_endpoint;
-		};
-		976A936023F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = A22E85AA5B35456C9A31CEDE;
-			remoteInfo = test_thread_safe;
-		};
-		976A936223F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = AFE87A5FD61D49E096F73367;
-			remoteInfo = test_timeo;
-		};
-		976A936423F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 8F9FF758BF2E4DD3816E5BF1;
-			remoteInfo = test_timers;
-		};
-		976A936623F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 00577E58CB66422C9686EC06;
-			remoteInfo = test_unbind_wildcard;
-		};
-		976A936823F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = D9C24DD6C9A543AF8F1D6B20;
-			remoteInfo = test_use_fd;
-		};
-		976A936A23F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = FD216F5CD2344835902A424D;
-			remoteInfo = test_xpub_manual;
-		};
-		976A936C23F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 448DE1DA2049490E93CC2BE8;
-			remoteInfo = test_xpub_manual_last_value;
-		};
-		976A936E23F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 4ED025D7266641F795B2EE5F;
-			remoteInfo = test_xpub_nodrop;
-		};
-		976A937023F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 3B4EBB0CBB8E4D5BAF20CD4B;
-			remoteInfo = test_xpub_verbose;
-		};
-		976A937223F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 70F0D631531646048C1E7E17;
-			remoteInfo = test_xpub_welcome_msg;
-		};
-		976A937423F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = A1C9AFD8095C46D78F04CD6C;
-			remoteInfo = test_zmq_poll_fd;
-		};
-		976A937623F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 562E0168E7474E3D9D13B6B6;
-			remoteInfo = testutil;
-		};
-		976A937823F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = DC4D70E87CA2478E8B20BFD1;
-			remoteInfo = "testutil-static";
-		};
-		976A937A23F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = A37E678AF4BA447DABDDF33B;
-			remoteInfo = unittest_ip_resolver;
-		};
-		976A937C23F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 7711465E4A0D4F52B41F0006;
-			remoteInfo = unittest_mtrie;
-		};
-		976A937E23F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 9ABC76CC481145A696EC6430;
-			remoteInfo = unittest_poller;
-		};
-		976A938023F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = AFE58C53A47D4BA39AEE2DB1;
-			remoteInfo = unittest_radix_tree;
-		};
-		976A938223F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 1D118ECD3D8C4FCBA8DD0673;
-			remoteInfo = unittest_udp_address;
-		};
-		976A938423F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 08296B75C9C54B658F76649D;
-			remoteInfo = unittest_ypipe;
-		};
-		976A938623F3032300CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 49D86475BA094C4CBABDC824;
-			remoteInfo = unity;
-		};
-		976A93A123F3032F00CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A938823F3032F00CAA795 /* czmq.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = BCA87D4ED89B471B83E95CD5;
-			remoteInfo = czmq;
-		};
-		976A93A323F3032F00CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A938823F3032F00CAA795 /* czmq.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 2D6AC85BBECE4291A9630DAE;
-			remoteInfo = "czmq-static";
-		};
-		976A93A523F3032F00CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A938823F3032F00CAA795 /* czmq.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = B8BD9F5580744D07A3465195;
-			remoteInfo = czmq_objects;
-		};
-		976A93A723F3032F00CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A938823F3032F00CAA795 /* czmq.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = AB2615ECD99549A7AF0D55B9;
-			remoteInfo = czmq_selftest;
-		};
-		976A93A923F3032F00CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A938823F3032F00CAA795 /* czmq.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 9F04212A0DF4415F9E25B340;
-			remoteInfo = test_randof;
-		};
-		976A93AB23F3032F00CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A938823F3032F00CAA795 /* czmq.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 41D9AB8648854D09AA24D5CA;
-			remoteInfo = zmakecert;
-		};
-		976A93AD23F3032F00CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A938823F3032F00CAA795 /* czmq.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = DD9356D1E56440ECA56BD63E;
-			remoteInfo = zsp;
-		};
-		976A93CA23F3033800CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A93AF23F3033800CAA795 /* zyre.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 1E72B5D9686649E691EC43F8;
-			remoteInfo = perf_local;
-		};
-		976A93CC23F3033800CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A93AF23F3033800CAA795 /* zyre.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = AC6CBDCE03B348EBB715BFFE;
-			remoteInfo = perf_remote;
-		};
-		976A93CE23F3033800CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A93AF23F3033800CAA795 /* zyre.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = B2854D9389A742DABF0F593C;
-			remoteInfo = zpinger;
-		};
-		976A93D023F3033800CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A93AF23F3033800CAA795 /* zyre.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 949A9D0A36CD4A4DA61BF501;
-			remoteInfo = ztester_beacon;
-		};
-		976A93D223F3033800CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A93AF23F3033800CAA795 /* zyre.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 0D8DBBB00C1A45D284356045;
-			remoteInfo = ztester_gossip;
-		};
-		976A93D423F3033800CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A93AF23F3033800CAA795 /* zyre.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = D397F861293D4D24BE553FE4;
-			remoteInfo = zyre;
-		};
-		976A93D623F3033800CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A93AF23F3033800CAA795 /* zyre.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = B859745CF7B04821A8167B74;
-			remoteInfo = "zyre-static";
-		};
-		976A93D823F3033800CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A93AF23F3033800CAA795 /* zyre.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = BC7BD263A8E64F5C9D26AA40;
-			remoteInfo = zyre_objects;
-		};
-		976A93DA23F3033800CAA795 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A93AF23F3033800CAA795 /* zyre.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = A9EE3799F4D14C2D843CA7A0;
-			remoteInfo = zyre_selftest;
-		};
-		97C7A9E223F800A900DC02C2 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 981DAA1570B249AE8F598111;
+			remoteGlobalIDString = 95DFC575A3FF4715BAB0ED0A;
 			remoteInfo = test_peer;
 		};
-		97C7A9E423F800A900DC02C2 /* PBXContainerItemProxy */ = {
+		976A475F2493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 660FF5770FA749F7B3C1D750;
+			remoteGlobalIDString = D0EB54F379BA433794922217;
+			remoteInfo = test_poller;
+		};
+		976A47612493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = CE6F0C3573584A68A089C059;
+			remoteInfo = test_probe_router;
+		};
+		976A47632493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B5FF81EB57564339928BA54C;
+			remoteInfo = test_proxy;
+		};
+		976A47652493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B23A4C019F824AE0925A2F66;
+			remoteInfo = test_proxy_hwm;
+		};
+		976A47672493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 30570D1A8E7E4603A177310E;
+			remoteInfo = test_proxy_single_socket;
+		};
+		976A47692493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 6128E68411A44F7A87C7F0C8;
+			remoteInfo = test_proxy_terminate;
+		};
+		976A476B2493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 9ACA9A9B2AEC41DD910D28F1;
+			remoteInfo = test_pub_invert_matching;
+		};
+		976A476D2493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 5DF5FD6E6DD34A1EA6AD4294;
+			remoteInfo = test_radio_dish;
+		};
+		976A476F2493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1B7AAC2C99EF4EA39B99C78C;
+			remoteInfo = test_rebind_ipc;
+		};
+		976A47712493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = F7E66D22ADC142F09729383E;
+			remoteInfo = test_reconnect_ivl;
+		};
+		976A47732493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = CE679C9BA5F64E39849B5006;
+			remoteInfo = test_req_correlate;
+		};
+		976A47752493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = C180FEFF200F4F6D985D75D8;
+			remoteInfo = test_req_relaxed;
+		};
+		976A47772493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1A0B29E9805D4869962F9F33;
+			remoteInfo = test_reqrep_device;
+		};
+		976A47792493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3D194FC369944FF3BB52B559;
+			remoteInfo = test_reqrep_inproc;
+		};
+		976A477B2493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = F672137ECD484D5093479E70;
+			remoteInfo = test_reqrep_ipc;
+		};
+		976A477D2493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = ADA21CE9DC3747C99D1A3874;
+			remoteInfo = test_reqrep_tcp;
+		};
+		976A477F2493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 227304246C494EC4B8CB8031;
+			remoteInfo = test_router_handover;
+		};
+		976A47812493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 88844496F3FD427996FE9EA1;
+			remoteInfo = test_router_mandatory;
+		};
+		976A47832493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3583D6E43DDB4FA187D10263;
+			remoteInfo = test_router_mandatory_hwm;
+		};
+		976A47852493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = C438B83BE57349B08DC028AC;
+			remoteInfo = test_router_notify;
+		};
+		976A47872493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D51E952C35D34C4EAC2FF7ED;
+			remoteInfo = test_scatter_gather;
+		};
+		976A47892493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 9DFDE6DDF78E43878F09F713;
+			remoteInfo = test_security_curve;
+		};
+		976A478B2493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = C47710858C914AEE96351AC4;
+			remoteInfo = test_security_gssapi;
+		};
+		976A478D2493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8CD384B7892542E2A2640E7C;
+			remoteInfo = test_security_no_zap_handler;
+		};
+		976A478F2493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = F20493C5774642B4A7D0331E;
+			remoteInfo = test_security_null;
+		};
+		976A47912493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = AA4B1322E1434C9894AF51CE;
+			remoteInfo = test_security_plain;
+		};
+		976A47932493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 63C8F6A10A154D15A9F19E1C;
+			remoteInfo = test_security_zap;
+		};
+		976A47952493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 285F8D8E481D4F8F876B096C;
+			remoteInfo = test_setsockopt;
+		};
+		976A47972493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = F599E2E5609F4B23A6622AF5;
+			remoteInfo = test_shutdown_stress;
+		};
+		976A47992493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 4A85E2A360044823B59B344E;
+			remoteInfo = test_socket_null;
+		};
+		976A479B2493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 30C7F4443609463EBECC18BD;
+			remoteInfo = test_sockopt_hwm;
+		};
+		976A479D2493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E42865D5CF834DAA967C3881;
+			remoteInfo = test_sodium;
+		};
+		976A479F2493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 79558A2E80704CDF8D5701DF;
+			remoteInfo = test_spec_dealer;
+		};
+		976A47A12493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D3A3E4ED2A5C4952ACCDCD0D;
+			remoteInfo = test_spec_pushpull;
+		};
+		976A47A32493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 2D03F60F28EF419B990DDEC5;
+			remoteInfo = test_spec_rep;
+		};
+		976A47A52493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 55C613C764CC4FE08EEF7F41;
+			remoteInfo = test_spec_req;
+		};
+		976A47A72493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 9136D499D70341688A688060;
+			remoteInfo = test_spec_router;
+		};
+		976A47A92493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = DEC79F0A8D244F73B04ED151;
+			remoteInfo = test_srcfd;
+		};
+		976A47AB2493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 365D63F5ECB849B3B837C8AC;
+			remoteInfo = test_stream;
+		};
+		976A47AD2493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = EB95679CB04847BA9A4F1927;
+			remoteInfo = test_stream_disconnect;
+		};
+		976A47AF2493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = BB9B0D485D0746428682C0A3;
+			remoteInfo = test_stream_empty;
+		};
+		976A47B12493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = FE80DA6B1DA34BAABF03E4DA;
+			remoteInfo = test_stream_exceeds_buffer;
+		};
+		976A47B32493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 28D42211F8054ED4BA358E79;
+			remoteInfo = test_stream_timeout;
+		};
+		976A47B52493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1016306DB83F4DF79B2F0E90;
+			remoteInfo = test_sub_forward;
+		};
+		976A47B72493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D9519E1F702A4F72A811A147;
+			remoteInfo = test_system;
+		};
+		976A47B92493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1AE89FB58D8D4DB6928A16E7;
+			remoteInfo = test_term_endpoint;
+		};
+		976A47BB2493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = EA71EE9733FA47DF97368D41;
+			remoteInfo = test_thread_safe;
+		};
+		976A47BD2493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 20152E30E9084F1291DE189E;
+			remoteInfo = test_timeo;
+		};
+		976A47BF2493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 142B0580E5FC491BA6B9A743;
+			remoteInfo = test_timers;
+		};
+		976A47C12493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3FE914DE1CFE42978DEE1269;
+			remoteInfo = test_unbind_wildcard;
+		};
+		976A47C32493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = BF6D348E7F7C432A9E5884DD;
+			remoteInfo = test_use_fd;
+		};
+		976A47C52493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D65B98AD78374CE78E806FBE;
+			remoteInfo = test_xpub_manual;
+		};
+		976A47C72493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 773D375CC6084E018F677B10;
+			remoteInfo = test_xpub_manual_last_value;
+		};
+		976A47C92493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 5C3871385FE84EEF95212472;
+			remoteInfo = test_xpub_nodrop;
+		};
+		976A47CB2493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 0874D45C89204C17BE8F61F9;
+			remoteInfo = test_xpub_verbose;
+		};
+		976A47CD2493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 06399330CB534A8492A2D7D2;
+			remoteInfo = test_xpub_welcome_msg;
+		};
+		976A47CF2493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D1B7C23204C34F66AF87A098;
+			remoteInfo = test_zmq_poll_fd;
+		};
+		976A47D12493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = FE9EC941667B41C699351F07;
+			remoteInfo = testutil;
+		};
+		976A47D32493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D07F2939326B4726B6C2FFEC;
+			remoteInfo = "testutil-static";
+		};
+		976A47D52493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = F8907539213B4DC8AB0AE81D;
 			remoteInfo = unittest_curve_encoding;
 		};
-		97C7A9FF23F800A900DC02C2 /* PBXContainerItemProxy */ = {
+		976A47D72493A5E000075CA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 976A93AF23F3033800CAA795 /* zyre.xcodeproj */;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 7AA950A59CED4E40BEDAD008;
+			remoteGlobalIDString = FD93DC53440047F981D0C97B;
+			remoteInfo = unittest_ip_resolver;
+		};
+		976A47D92493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3D2DCB273C2945B3A674ADBC;
+			remoteInfo = unittest_mtrie;
+		};
+		976A47DB2493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1F134EC32093441CB8663528;
+			remoteInfo = unittest_poller;
+		};
+		976A47DD2493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 91D1307C965F4F7380D9F239;
+			remoteInfo = unittest_radix_tree;
+		};
+		976A47DF2493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 59ACEC5B4E2C40459EE0B2F6;
+			remoteInfo = unittest_udp_address;
+		};
+		976A47E12493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 045F6615D36F44C6A843590A;
+			remoteInfo = unittest_ypipe;
+		};
+		976A47E32493A5E000075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D175228A809447AFA2FBBACA;
+			remoteInfo = unity;
+		};
+		976A47FE2493A5F300075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A47E52493A5F200075CA2 /* czmq.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 2B68E714D6F948568BA636D6;
+			remoteInfo = czmq;
+		};
+		976A48002493A5F300075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A47E52493A5F200075CA2 /* czmq.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B69ED842088D417B8DAF9E3E;
+			remoteInfo = "czmq-static";
+		};
+		976A48022493A5F300075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A47E52493A5F200075CA2 /* czmq.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = CB241B4B5174493AA27B1233;
+			remoteInfo = czmq_objects;
+		};
+		976A48042493A5F300075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A47E52493A5F200075CA2 /* czmq.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 7544797E116C44E4B45DA27D;
+			remoteInfo = czmq_selftest;
+		};
+		976A48062493A5F300075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A47E52493A5F200075CA2 /* czmq.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1D988B1BCA844BC38E730BEE;
+			remoteInfo = test_randof;
+		};
+		976A48082493A5F300075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A47E52493A5F200075CA2 /* czmq.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E14879F0B3F442B8B324ABCC;
+			remoteInfo = zmakecert;
+		};
+		976A480A2493A5F300075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A47E52493A5F200075CA2 /* czmq.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 54D76E010E074A1288F77882;
+			remoteInfo = zsp;
+		};
+		976A48282493A60300075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A480C2493A60200075CA2 /* zyre.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 300573A804DC42E58F68FAC9;
 			remoteInfo = chat;
+		};
+		976A482A2493A60300075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A480C2493A60200075CA2 /* zyre.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 198DEBE851D5462B92A2B161;
+			remoteInfo = perf_local;
+		};
+		976A482C2493A60300075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A480C2493A60200075CA2 /* zyre.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 5DFFBE02C99C4181886CD973;
+			remoteInfo = perf_remote;
+		};
+		976A482E2493A60300075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A480C2493A60200075CA2 /* zyre.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8BE3B63A5EE041DDAA98CFDD;
+			remoteInfo = zpinger;
+		};
+		976A48302493A60300075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A480C2493A60200075CA2 /* zyre.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 917166D6748E426C81561AF4;
+			remoteInfo = ztester_beacon;
+		};
+		976A48322493A60300075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A480C2493A60200075CA2 /* zyre.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3E7AA2690D894F719E30EBF2;
+			remoteInfo = ztester_gossip;
+		};
+		976A48342493A60300075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A480C2493A60200075CA2 /* zyre.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 0BE38A1325B840BCBDE9114B;
+			remoteInfo = zyre;
+		};
+		976A48362493A60300075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A480C2493A60200075CA2 /* zyre.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 737E37F68343421380235164;
+			remoteInfo = "zyre-static";
+		};
+		976A48382493A60300075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A480C2493A60200075CA2 /* zyre.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = DD1B3A6A68FF419FA19BF122;
+			remoteInfo = zyre_objects;
+		};
+		976A483A2493A60300075CA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A480C2493A60200075CA2 /* zyre.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = BD5074159FC447A59B77CA52;
+			remoteInfo = zyre_selftest;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -1213,8 +1230,11 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				976A48402493A6D400075CA2 /* libsodium.dylib in CopyFiles */,
+				976A48412493A6D400075CA2 /* libzmq.dylib in CopyFiles */,
+				976A48422493A6D400075CA2 /* libczmq.dylib in CopyFiles */,
+				976A48432493A6D400075CA2 /* libzyre.dylib in CopyFiles */,
 				97FAC32B2244C88A0036293B /* yajl.framework in CopyFiles */,
-				97317BD62422565D007C88B3 /* libsodium.23.dylib in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1239,13 +1259,14 @@
 		97645AA1209704F800F7D47F /* example_definition.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = example_definition.json; path = ../../resources/example_definition.json; sourceTree = "<group>"; };
 		97645AA2209704F800F7D47F /* example_mapping.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = example_mapping.json; path = ../../resources/example_mapping.json; sourceTree = "<group>"; };
 		9768B2AD22830F0E00310410 /* json.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = json.c; sourceTree = "<group>"; };
+		976A468B2493A5D200075CA2 /* sodium.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = sodium.xcodeproj; path = "../../../../third-party/libsodium/builds/xcode/sodium.xcodeproj"; sourceTree = "<group>"; };
+		976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ZeroMQ.xcodeproj; path = "../../../../third-party/libzmq/builds/xcode/ZeroMQ.xcodeproj"; sourceTree = "<group>"; };
+		976A47E52493A5F200075CA2 /* czmq.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = czmq.xcodeproj; path = "../../../../third-party/czmq/builds/xcode/czmq.xcodeproj"; sourceTree = "<group>"; };
+		976A480C2493A60200075CA2 /* zyre.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = zyre.xcodeproj; path = "../../../../third-party/zyre/builds/xcode/zyre.xcodeproj"; sourceTree = "<group>"; };
 		976A8FAE23F1BEEB00CAA795 /* libzmq.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libzmq.a; path = ../../../../../../../../../usr/local/lib/libzmq.a; sourceTree = "<group>"; };
 		976A8FAF23F1BEEB00CAA795 /* libsodium.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsodium.a; path = ../../../../../../../../../usr/local/lib/libsodium.a; sourceTree = "<group>"; };
 		976A8FB023F1BEEB00CAA795 /* libzyre.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libzyre.a; path = ../../../../../../../../../usr/local/lib/libzyre.a; sourceTree = "<group>"; };
 		976A8FB123F1BEEB00CAA795 /* libczmq.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libczmq.a; path = ../../../../../../../../../usr/local/lib/libczmq.a; sourceTree = "<group>"; };
-		976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ZeroMQ.xcodeproj; path = ../../../libzmq/builds/xcode/ZeroMQ.xcodeproj; sourceTree = "<group>"; };
-		976A938823F3032F00CAA795 /* czmq.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = czmq.xcodeproj; path = ../../../czmq/builds/xcode/czmq.xcodeproj; sourceTree = "<group>"; };
-		976A93AF23F3033800CAA795 /* zyre.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = zyre.xcodeproj; path = ../../../zyre/builds/xcode/zyre.xcodeproj; sourceTree = "<group>"; };
 		976A93DF23F305F300CAA795 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/usr/lib/libc++.tbd"; sourceTree = DEVELOPER_DIR; };
 		9772A52620BDE42700729D59 /* call.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = call.c; sourceTree = "<group>"; };
 		977C24791F03F4FA00CA1675 /* ingescape.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ingescape.h; sourceTree = "<group>"; };
@@ -2096,11 +2117,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				97C7AAAF23F809F500DC02C2 /* libsodium.a in Frameworks */,
+				976A483C2493A6C300075CA2 /* libczmq.dylib in Frameworks */,
+				976A483D2493A6C300075CA2 /* libsodium.dylib in Frameworks */,
+				976A483E2493A6C300075CA2 /* libzmq.dylib in Frameworks */,
+				976A483F2493A6C300075CA2 /* libzyre.dylib in Frameworks */,
 				976A93E023F305F300CAA795 /* libc++.tbd in Frameworks */,
-				976A93DC23F3035300CAA795 /* libczmq.a in Frameworks */,
-				976A93DD23F3035300CAA795 /* libzmq.a in Frameworks */,
-				976A93DE23F3035300CAA795 /* libzyre.a in Frameworks */,
 				973D1BB32226920700D363BF /* yajl.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2164,149 +2185,158 @@
 			name = resources;
 			sourceTree = "<group>";
 		};
-		976A923E23F3032300CAA795 /* Products */ = {
+		976A468C2493A5D200075CA2 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				976A92B323F3032300CAA795 /* libzmq.5.2.3.dylib */,
-				976A92B523F3032300CAA795 /* libzmq.a */,
-				976A92B723F3032300CAA795 /* libobjects.a */,
-				976A92B923F3032300CAA795 /* test_ancillaries */,
-				976A92BB23F3032300CAA795 /* test_app_meta */,
-				976A92BD23F3032300CAA795 /* test_atomics */,
-				976A92BF23F3032300CAA795 /* test_base85 */,
-				976A92C123F3032300CAA795 /* test_bind_after_connect_tcp */,
-				976A92C323F3032300CAA795 /* test_bind_src_address */,
-				976A92C523F3032300CAA795 /* test_capabilities */,
-				976A92C723F3032300CAA795 /* test_client_server */,
-				976A92C923F3032300CAA795 /* test_conflate */,
-				976A92CB23F3032300CAA795 /* test_connect_resolve */,
-				976A92CD23F3032300CAA795 /* test_connect_rid */,
-				976A92CF23F3032300CAA795 /* test_ctx_destroy */,
-				976A92D123F3032300CAA795 /* test_ctx_options */,
-				976A92D323F3032300CAA795 /* test_dgram */,
-				976A92D523F3032300CAA795 /* test_diffserv */,
-				976A92D723F3032300CAA795 /* test_disconnect_inproc */,
-				976A92D923F3032300CAA795 /* test_filter_ipc */,
-				976A92DB23F3032300CAA795 /* test_fork */,
-				976A92DD23F3032300CAA795 /* test_getsockopt_memset */,
-				976A92DF23F3032300CAA795 /* test_heartbeats */,
-				976A92E123F3032300CAA795 /* test_hwm */,
-				976A92E323F3032300CAA795 /* test_hwm_pubsub */,
-				976A92E523F3032300CAA795 /* test_immediate */,
-				976A92E723F3032300CAA795 /* test_inproc_connect */,
-				976A92E923F3032300CAA795 /* test_invalid_rep */,
-				976A92EB23F3032300CAA795 /* test_iov */,
-				976A92ED23F3032300CAA795 /* test_ipc_wildcard */,
-				976A92EF23F3032300CAA795 /* test_issue_566 */,
-				976A92F123F3032300CAA795 /* test_last_endpoint */,
-				976A92F323F3032300CAA795 /* test_many_sockets */,
-				976A92F523F3032300CAA795 /* test_metadata */,
-				976A92F723F3032300CAA795 /* test_mock_pub_sub */,
-				976A92F923F3032300CAA795 /* test_monitor */,
-				976A92FB23F3032300CAA795 /* test_msg_ffn */,
-				976A92FD23F3032300CAA795 /* test_msg_flags */,
-				976A92FF23F3032300CAA795 /* test_pair_inproc */,
-				976A930123F3032300CAA795 /* test_pair_ipc */,
-				976A930323F3032300CAA795 /* test_pair_tcp */,
-				97C7A9E323F800A900DC02C2 /* test_peer */,
-				976A930523F3032300CAA795 /* test_poller */,
-				976A930723F3032300CAA795 /* test_probe_router */,
-				976A930923F3032300CAA795 /* test_proxy */,
-				976A930B23F3032300CAA795 /* test_proxy_hwm */,
-				976A930D23F3032300CAA795 /* test_proxy_single_socket */,
-				976A930F23F3032300CAA795 /* test_proxy_terminate */,
-				976A931123F3032300CAA795 /* test_pub_invert_matching */,
-				976A931323F3032300CAA795 /* test_radio_dish */,
-				976A931523F3032300CAA795 /* test_rebind_ipc */,
-				976A931723F3032300CAA795 /* test_reconnect_ivl */,
-				976A931923F3032300CAA795 /* test_req_correlate */,
-				976A931B23F3032300CAA795 /* test_req_relaxed */,
-				976A931D23F3032300CAA795 /* test_reqrep_device */,
-				976A931F23F3032300CAA795 /* test_reqrep_inproc */,
-				976A932123F3032300CAA795 /* test_reqrep_ipc */,
-				976A932323F3032300CAA795 /* test_reqrep_tcp */,
-				976A932523F3032300CAA795 /* test_router_handover */,
-				976A932723F3032300CAA795 /* test_router_mandatory */,
-				976A932923F3032300CAA795 /* test_router_mandatory_hwm */,
-				976A932B23F3032300CAA795 /* test_router_notify */,
-				976A932D23F3032300CAA795 /* test_scatter_gather */,
-				976A932F23F3032300CAA795 /* test_security_curve */,
-				976A933123F3032300CAA795 /* test_security_gssapi */,
-				976A933323F3032300CAA795 /* test_security_no_zap_handler */,
-				976A933523F3032300CAA795 /* test_security_null */,
-				976A933723F3032300CAA795 /* test_security_plain */,
-				976A933923F3032300CAA795 /* test_security_zap */,
-				976A933B23F3032300CAA795 /* test_setsockopt */,
-				976A933D23F3032300CAA795 /* test_shutdown_stress */,
-				976A933F23F3032300CAA795 /* test_socket_null */,
-				976A934123F3032300CAA795 /* test_sockopt_hwm */,
-				976A934323F3032300CAA795 /* test_sodium */,
-				976A934523F3032300CAA795 /* test_spec_dealer */,
-				976A934723F3032300CAA795 /* test_spec_pushpull */,
-				976A934923F3032300CAA795 /* test_spec_rep */,
-				976A934B23F3032300CAA795 /* test_spec_req */,
-				976A934D23F3032300CAA795 /* test_spec_router */,
-				976A934F23F3032300CAA795 /* test_srcfd */,
-				976A935123F3032300CAA795 /* test_stream */,
-				976A935323F3032300CAA795 /* test_stream_disconnect */,
-				976A935523F3032300CAA795 /* test_stream_empty */,
-				976A935723F3032300CAA795 /* test_stream_exceeds_buffer */,
-				976A935923F3032300CAA795 /* test_stream_timeout */,
-				976A935B23F3032300CAA795 /* test_sub_forward */,
-				976A935D23F3032300CAA795 /* test_system */,
-				976A935F23F3032300CAA795 /* test_term_endpoint */,
-				976A936123F3032300CAA795 /* test_thread_safe */,
-				976A936323F3032300CAA795 /* test_timeo */,
-				976A936523F3032300CAA795 /* test_timers */,
-				976A936723F3032300CAA795 /* test_unbind_wildcard */,
-				976A936923F3032300CAA795 /* test_use_fd */,
-				976A936B23F3032300CAA795 /* test_xpub_manual */,
-				976A936D23F3032300CAA795 /* test_xpub_manual_last_value */,
-				976A936F23F3032300CAA795 /* test_xpub_nodrop */,
-				976A937123F3032300CAA795 /* test_xpub_verbose */,
-				976A937323F3032300CAA795 /* test_xpub_welcome_msg */,
-				976A937523F3032300CAA795 /* test_zmq_poll_fd */,
-				976A937723F3032300CAA795 /* libtestutil.a */,
-				976A937923F3032300CAA795 /* libtestutil-static.a */,
-				97C7A9E523F800A900DC02C2 /* unittest_curve_encoding */,
-				976A937B23F3032300CAA795 /* unittest_ip_resolver */,
-				976A937D23F3032300CAA795 /* unittest_mtrie */,
-				976A937F23F3032300CAA795 /* unittest_poller */,
-				976A938123F3032300CAA795 /* unittest_radix_tree */,
-				976A938323F3032300CAA795 /* unittest_udp_address */,
-				976A938523F3032300CAA795 /* unittest_ypipe */,
-				976A938723F3032300CAA795 /* libunity.a */,
+				976A46912493A5D200075CA2 /* libsodium.a */,
+				976A46932493A5D200075CA2 /* libsodium.dylib */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		976A938923F3032F00CAA795 /* Products */ = {
+		976A46952493A5DF00075CA2 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				976A93A223F3032F00CAA795 /* libczmq.4.2.1.dylib */,
-				976A93A423F3032F00CAA795 /* libczmq.a */,
-				976A93A623F3032F00CAA795 /* libczmq_objects.a */,
-				976A93A823F3032F00CAA795 /* czmq_selftest */,
-				976A93AA23F3032F00CAA795 /* test_randof */,
-				976A93AC23F3032F00CAA795 /* zmakecert */,
-				976A93AE23F3032F00CAA795 /* zsp */,
+				976A470C2493A5E000075CA2 /* libzmq.dylib */,
+				976A470E2493A5E000075CA2 /* libzmq.a */,
+				976A47102493A5E000075CA2 /* libobjects.a */,
+				976A47122493A5E000075CA2 /* test_ancillaries */,
+				976A47142493A5E000075CA2 /* test_app_meta */,
+				976A47162493A5E000075CA2 /* test_atomics */,
+				976A47182493A5E000075CA2 /* test_base85 */,
+				976A471A2493A5E000075CA2 /* test_bind_after_connect_tcp */,
+				976A471C2493A5E000075CA2 /* test_bind_src_address */,
+				976A471E2493A5E000075CA2 /* test_capabilities */,
+				976A47202493A5E000075CA2 /* test_client_server */,
+				976A47222493A5E000075CA2 /* test_conflate */,
+				976A47242493A5E000075CA2 /* test_connect_resolve */,
+				976A47262493A5E000075CA2 /* test_connect_rid */,
+				976A47282493A5E000075CA2 /* test_ctx_destroy */,
+				976A472A2493A5E000075CA2 /* test_ctx_options */,
+				976A472C2493A5E000075CA2 /* test_dgram */,
+				976A472E2493A5E000075CA2 /* test_diffserv */,
+				976A47302493A5E000075CA2 /* test_disconnect_inproc */,
+				976A47322493A5E000075CA2 /* test_filter_ipc */,
+				976A47342493A5E000075CA2 /* test_fork */,
+				976A47362493A5E000075CA2 /* test_getsockopt_memset */,
+				976A47382493A5E000075CA2 /* test_heartbeats */,
+				976A473A2493A5E000075CA2 /* test_hwm */,
+				976A473C2493A5E000075CA2 /* test_hwm_pubsub */,
+				976A473E2493A5E000075CA2 /* test_immediate */,
+				976A47402493A5E000075CA2 /* test_inproc_connect */,
+				976A47422493A5E000075CA2 /* test_invalid_rep */,
+				976A47442493A5E000075CA2 /* test_iov */,
+				976A47462493A5E000075CA2 /* test_ipc_wildcard */,
+				976A47482493A5E000075CA2 /* test_issue_566 */,
+				976A474A2493A5E000075CA2 /* test_last_endpoint */,
+				976A474C2493A5E000075CA2 /* test_many_sockets */,
+				976A474E2493A5E000075CA2 /* test_metadata */,
+				976A47502493A5E000075CA2 /* test_mock_pub_sub */,
+				976A47522493A5E000075CA2 /* test_monitor */,
+				976A47542493A5E000075CA2 /* test_msg_ffn */,
+				976A47562493A5E000075CA2 /* test_msg_flags */,
+				976A47582493A5E000075CA2 /* test_pair_inproc */,
+				976A475A2493A5E000075CA2 /* test_pair_ipc */,
+				976A475C2493A5E000075CA2 /* test_pair_tcp */,
+				976A475E2493A5E000075CA2 /* test_peer */,
+				976A47602493A5E000075CA2 /* test_poller */,
+				976A47622493A5E000075CA2 /* test_probe_router */,
+				976A47642493A5E000075CA2 /* test_proxy */,
+				976A47662493A5E000075CA2 /* test_proxy_hwm */,
+				976A47682493A5E000075CA2 /* test_proxy_single_socket */,
+				976A476A2493A5E000075CA2 /* test_proxy_terminate */,
+				976A476C2493A5E000075CA2 /* test_pub_invert_matching */,
+				976A476E2493A5E000075CA2 /* test_radio_dish */,
+				976A47702493A5E000075CA2 /* test_rebind_ipc */,
+				976A47722493A5E000075CA2 /* test_reconnect_ivl */,
+				976A47742493A5E000075CA2 /* test_req_correlate */,
+				976A47762493A5E000075CA2 /* test_req_relaxed */,
+				976A47782493A5E000075CA2 /* test_reqrep_device */,
+				976A477A2493A5E000075CA2 /* test_reqrep_inproc */,
+				976A477C2493A5E000075CA2 /* test_reqrep_ipc */,
+				976A477E2493A5E000075CA2 /* test_reqrep_tcp */,
+				976A47802493A5E000075CA2 /* test_router_handover */,
+				976A47822493A5E000075CA2 /* test_router_mandatory */,
+				976A47842493A5E000075CA2 /* test_router_mandatory_hwm */,
+				976A47862493A5E000075CA2 /* test_router_notify */,
+				976A47882493A5E000075CA2 /* test_scatter_gather */,
+				976A478A2493A5E000075CA2 /* test_security_curve */,
+				976A478C2493A5E000075CA2 /* test_security_gssapi */,
+				976A478E2493A5E000075CA2 /* test_security_no_zap_handler */,
+				976A47902493A5E000075CA2 /* test_security_null */,
+				976A47922493A5E000075CA2 /* test_security_plain */,
+				976A47942493A5E000075CA2 /* test_security_zap */,
+				976A47962493A5E000075CA2 /* test_setsockopt */,
+				976A47982493A5E000075CA2 /* test_shutdown_stress */,
+				976A479A2493A5E000075CA2 /* test_socket_null */,
+				976A479C2493A5E000075CA2 /* test_sockopt_hwm */,
+				976A479E2493A5E000075CA2 /* test_sodium */,
+				976A47A02493A5E000075CA2 /* test_spec_dealer */,
+				976A47A22493A5E000075CA2 /* test_spec_pushpull */,
+				976A47A42493A5E000075CA2 /* test_spec_rep */,
+				976A47A62493A5E000075CA2 /* test_spec_req */,
+				976A47A82493A5E000075CA2 /* test_spec_router */,
+				976A47AA2493A5E000075CA2 /* test_srcfd */,
+				976A47AC2493A5E000075CA2 /* test_stream */,
+				976A47AE2493A5E000075CA2 /* test_stream_disconnect */,
+				976A47B02493A5E000075CA2 /* test_stream_empty */,
+				976A47B22493A5E000075CA2 /* test_stream_exceeds_buffer */,
+				976A47B42493A5E000075CA2 /* test_stream_timeout */,
+				976A47B62493A5E000075CA2 /* test_sub_forward */,
+				976A47B82493A5E000075CA2 /* test_system */,
+				976A47BA2493A5E000075CA2 /* test_term_endpoint */,
+				976A47BC2493A5E000075CA2 /* test_thread_safe */,
+				976A47BE2493A5E000075CA2 /* test_timeo */,
+				976A47C02493A5E000075CA2 /* test_timers */,
+				976A47C22493A5E000075CA2 /* test_unbind_wildcard */,
+				976A47C42493A5E000075CA2 /* test_use_fd */,
+				976A47C62493A5E000075CA2 /* test_xpub_manual */,
+				976A47C82493A5E000075CA2 /* test_xpub_manual_last_value */,
+				976A47CA2493A5E000075CA2 /* test_xpub_nodrop */,
+				976A47CC2493A5E000075CA2 /* test_xpub_verbose */,
+				976A47CE2493A5E000075CA2 /* test_xpub_welcome_msg */,
+				976A47D02493A5E000075CA2 /* test_zmq_poll_fd */,
+				976A47D22493A5E000075CA2 /* libtestutil.a */,
+				976A47D42493A5E000075CA2 /* libtestutil-static.a */,
+				976A47D62493A5E000075CA2 /* unittest_curve_encoding */,
+				976A47D82493A5E000075CA2 /* unittest_ip_resolver */,
+				976A47DA2493A5E000075CA2 /* unittest_mtrie */,
+				976A47DC2493A5E000075CA2 /* unittest_poller */,
+				976A47DE2493A5E000075CA2 /* unittest_radix_tree */,
+				976A47E02493A5E000075CA2 /* unittest_udp_address */,
+				976A47E22493A5E000075CA2 /* unittest_ypipe */,
+				976A47E42493A5E000075CA2 /* libunity.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		976A93B023F3033800CAA795 /* Products */ = {
+		976A47E62493A5F200075CA2 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				97C7AA0023F800A900DC02C2 /* chat */,
-				976A93CB23F3033800CAA795 /* perf_local */,
-				976A93CD23F3033800CAA795 /* perf_remote */,
-				976A93CF23F3033800CAA795 /* zpinger */,
-				976A93D123F3033800CAA795 /* ztester_beacon */,
-				976A93D323F3033800CAA795 /* ztester_gossip */,
-				976A93D523F3033800CAA795 /* libzyre.2.0.1.dylib */,
-				976A93D723F3033800CAA795 /* libzyre.a */,
-				976A93D923F3033800CAA795 /* libzyre_objects.a */,
-				976A93DB23F3033800CAA795 /* zyre_selftest */,
+				976A47FF2493A5F300075CA2 /* libczmq.dylib */,
+				976A48012493A5F300075CA2 /* libczmq.a */,
+				976A48032493A5F300075CA2 /* libczmq_objects.a */,
+				976A48052493A5F300075CA2 /* czmq_selftest */,
+				976A48072493A5F300075CA2 /* test_randof */,
+				976A48092493A5F300075CA2 /* zmakecert */,
+				976A480B2493A5F300075CA2 /* zsp */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		976A480D2493A60200075CA2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				976A48292493A60300075CA2 /* chat */,
+				976A482B2493A60300075CA2 /* perf_local */,
+				976A482D2493A60300075CA2 /* perf_remote */,
+				976A482F2493A60300075CA2 /* zpinger */,
+				976A48312493A60300075CA2 /* ztester_beacon */,
+				976A48332493A60300075CA2 /* ztester_gossip */,
+				976A48352493A60300075CA2 /* libzyre.dylib */,
+				976A48372493A60300075CA2 /* libzyre.a */,
+				976A48392493A60300075CA2 /* libzyre_objects.a */,
+				976A483B2493A60300075CA2 /* zyre_selftest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2314,9 +2344,10 @@
 		979A796F1EA7B0D6003153EF = {
 			isa = PBXGroup;
 			children = (
-				976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */,
-				976A938823F3032F00CAA795 /* czmq.xcodeproj */,
-				976A93AF23F3033800CAA795 /* zyre.xcodeproj */,
+				976A468B2493A5D200075CA2 /* sodium.xcodeproj */,
+				976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */,
+				976A47E52493A5F200075CA2 /* czmq.xcodeproj */,
+				976A480C2493A60200075CA2 /* zyre.xcodeproj */,
 				973D1BAA2226916D00D363BF /* yajl.xcodeproj */,
 				979A79BC1EA8A86F003153EF /* ios */,
 				979A79841EA7B112003153EF /* src */,
@@ -3737,20 +3768,24 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 976A938923F3032F00CAA795 /* Products */;
-					ProjectRef = 976A938823F3032F00CAA795 /* czmq.xcodeproj */;
+					ProductGroup = 976A47E62493A5F200075CA2 /* Products */;
+					ProjectRef = 976A47E52493A5F200075CA2 /* czmq.xcodeproj */;
+				},
+				{
+					ProductGroup = 976A468C2493A5D200075CA2 /* Products */;
+					ProjectRef = 976A468B2493A5D200075CA2 /* sodium.xcodeproj */;
 				},
 				{
 					ProductGroup = 973D1BAB2226916D00D363BF /* Products */;
 					ProjectRef = 973D1BAA2226916D00D363BF /* yajl.xcodeproj */;
 				},
 				{
-					ProductGroup = 976A923E23F3032300CAA795 /* Products */;
-					ProjectRef = 976A923D23F3032300CAA795 /* ZeroMQ.xcodeproj */;
+					ProductGroup = 976A46952493A5DF00075CA2 /* Products */;
+					ProjectRef = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
 				},
 				{
-					ProductGroup = 976A93B023F3033800CAA795 /* Products */;
-					ProjectRef = 976A93AF23F3033800CAA795 /* zyre.xcodeproj */;
+					ProductGroup = 976A480D2493A60200075CA2 /* Products */;
+					ProjectRef = 976A480C2493A60200075CA2 /* zyre.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -3776,886 +3811,903 @@
 			remoteRef = 973D1BB12226916D00D363BF /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92B323F3032300CAA795 /* libzmq.5.2.3.dylib */ = {
+		976A46912493A5D200075CA2 /* libsodium.a */ = {
 			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.dylib";
-			path = libzmq.5.2.3.dylib;
-			remoteRef = 976A92B223F3032300CAA795 /* PBXContainerItemProxy */;
+			fileType = archive.ar;
+			path = libsodium.a;
+			remoteRef = 976A46902493A5D200075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92B523F3032300CAA795 /* libzmq.a */ = {
+		976A46932493A5D200075CA2 /* libsodium.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			path = libsodium.dylib;
+			remoteRef = 976A46922493A5D200075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A470C2493A5E000075CA2 /* libzmq.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			name = libzmq.dylib;
+			path = libzmq.5.2.3.dylib;
+			remoteRef = 976A470B2493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A470E2493A5E000075CA2 /* libzmq.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libzmq.a;
-			remoteRef = 976A92B423F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A470D2493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92B723F3032300CAA795 /* libobjects.a */ = {
+		976A47102493A5E000075CA2 /* libobjects.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libobjects.a;
-			remoteRef = 976A92B623F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A470F2493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92B923F3032300CAA795 /* test_ancillaries */ = {
+		976A47122493A5E000075CA2 /* test_ancillaries */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_ancillaries;
-			remoteRef = 976A92B823F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A47112493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92BB23F3032300CAA795 /* test_app_meta */ = {
+		976A47142493A5E000075CA2 /* test_app_meta */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_app_meta;
-			remoteRef = 976A92BA23F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A47132493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92BD23F3032300CAA795 /* test_atomics */ = {
+		976A47162493A5E000075CA2 /* test_atomics */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_atomics;
-			remoteRef = 976A92BC23F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A47152493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92BF23F3032300CAA795 /* test_base85 */ = {
+		976A47182493A5E000075CA2 /* test_base85 */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_base85;
-			remoteRef = 976A92BE23F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A47172493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92C123F3032300CAA795 /* test_bind_after_connect_tcp */ = {
+		976A471A2493A5E000075CA2 /* test_bind_after_connect_tcp */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_bind_after_connect_tcp;
-			remoteRef = 976A92C023F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A47192493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92C323F3032300CAA795 /* test_bind_src_address */ = {
+		976A471C2493A5E000075CA2 /* test_bind_src_address */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_bind_src_address;
-			remoteRef = 976A92C223F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A471B2493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92C523F3032300CAA795 /* test_capabilities */ = {
+		976A471E2493A5E000075CA2 /* test_capabilities */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_capabilities;
-			remoteRef = 976A92C423F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A471D2493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92C723F3032300CAA795 /* test_client_server */ = {
+		976A47202493A5E000075CA2 /* test_client_server */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_client_server;
-			remoteRef = 976A92C623F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A471F2493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92C923F3032300CAA795 /* test_conflate */ = {
+		976A47222493A5E000075CA2 /* test_conflate */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_conflate;
-			remoteRef = 976A92C823F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A47212493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92CB23F3032300CAA795 /* test_connect_resolve */ = {
+		976A47242493A5E000075CA2 /* test_connect_resolve */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_connect_resolve;
-			remoteRef = 976A92CA23F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A47232493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92CD23F3032300CAA795 /* test_connect_rid */ = {
+		976A47262493A5E000075CA2 /* test_connect_rid */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_connect_rid;
-			remoteRef = 976A92CC23F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A47252493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92CF23F3032300CAA795 /* test_ctx_destroy */ = {
+		976A47282493A5E000075CA2 /* test_ctx_destroy */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_ctx_destroy;
-			remoteRef = 976A92CE23F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A47272493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92D123F3032300CAA795 /* test_ctx_options */ = {
+		976A472A2493A5E000075CA2 /* test_ctx_options */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_ctx_options;
-			remoteRef = 976A92D023F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A47292493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92D323F3032300CAA795 /* test_dgram */ = {
+		976A472C2493A5E000075CA2 /* test_dgram */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_dgram;
-			remoteRef = 976A92D223F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A472B2493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92D523F3032300CAA795 /* test_diffserv */ = {
+		976A472E2493A5E000075CA2 /* test_diffserv */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_diffserv;
-			remoteRef = 976A92D423F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A472D2493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92D723F3032300CAA795 /* test_disconnect_inproc */ = {
+		976A47302493A5E000075CA2 /* test_disconnect_inproc */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_disconnect_inproc;
-			remoteRef = 976A92D623F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A472F2493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92D923F3032300CAA795 /* test_filter_ipc */ = {
+		976A47322493A5E000075CA2 /* test_filter_ipc */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_filter_ipc;
-			remoteRef = 976A92D823F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A47312493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92DB23F3032300CAA795 /* test_fork */ = {
+		976A47342493A5E000075CA2 /* test_fork */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_fork;
-			remoteRef = 976A92DA23F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A47332493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92DD23F3032300CAA795 /* test_getsockopt_memset */ = {
+		976A47362493A5E000075CA2 /* test_getsockopt_memset */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_getsockopt_memset;
-			remoteRef = 976A92DC23F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A47352493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92DF23F3032300CAA795 /* test_heartbeats */ = {
+		976A47382493A5E000075CA2 /* test_heartbeats */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_heartbeats;
-			remoteRef = 976A92DE23F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A47372493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92E123F3032300CAA795 /* test_hwm */ = {
+		976A473A2493A5E000075CA2 /* test_hwm */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_hwm;
-			remoteRef = 976A92E023F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A47392493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92E323F3032300CAA795 /* test_hwm_pubsub */ = {
+		976A473C2493A5E000075CA2 /* test_hwm_pubsub */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_hwm_pubsub;
-			remoteRef = 976A92E223F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A473B2493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92E523F3032300CAA795 /* test_immediate */ = {
+		976A473E2493A5E000075CA2 /* test_immediate */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_immediate;
-			remoteRef = 976A92E423F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A473D2493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92E723F3032300CAA795 /* test_inproc_connect */ = {
+		976A47402493A5E000075CA2 /* test_inproc_connect */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_inproc_connect;
-			remoteRef = 976A92E623F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A473F2493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92E923F3032300CAA795 /* test_invalid_rep */ = {
+		976A47422493A5E000075CA2 /* test_invalid_rep */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_invalid_rep;
-			remoteRef = 976A92E823F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A47412493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92EB23F3032300CAA795 /* test_iov */ = {
+		976A47442493A5E000075CA2 /* test_iov */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_iov;
-			remoteRef = 976A92EA23F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A47432493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92ED23F3032300CAA795 /* test_ipc_wildcard */ = {
+		976A47462493A5E000075CA2 /* test_ipc_wildcard */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_ipc_wildcard;
-			remoteRef = 976A92EC23F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A47452493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92EF23F3032300CAA795 /* test_issue_566 */ = {
+		976A47482493A5E000075CA2 /* test_issue_566 */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_issue_566;
-			remoteRef = 976A92EE23F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A47472493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92F123F3032300CAA795 /* test_last_endpoint */ = {
+		976A474A2493A5E000075CA2 /* test_last_endpoint */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_last_endpoint;
-			remoteRef = 976A92F023F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A47492493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92F323F3032300CAA795 /* test_many_sockets */ = {
+		976A474C2493A5E000075CA2 /* test_many_sockets */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_many_sockets;
-			remoteRef = 976A92F223F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A474B2493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92F523F3032300CAA795 /* test_metadata */ = {
+		976A474E2493A5E000075CA2 /* test_metadata */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_metadata;
-			remoteRef = 976A92F423F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A474D2493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92F723F3032300CAA795 /* test_mock_pub_sub */ = {
+		976A47502493A5E000075CA2 /* test_mock_pub_sub */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_mock_pub_sub;
-			remoteRef = 976A92F623F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A474F2493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92F923F3032300CAA795 /* test_monitor */ = {
+		976A47522493A5E000075CA2 /* test_monitor */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_monitor;
-			remoteRef = 976A92F823F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A47512493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92FB23F3032300CAA795 /* test_msg_ffn */ = {
+		976A47542493A5E000075CA2 /* test_msg_ffn */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_msg_ffn;
-			remoteRef = 976A92FA23F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A47532493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92FD23F3032300CAA795 /* test_msg_flags */ = {
+		976A47562493A5E000075CA2 /* test_msg_flags */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_msg_flags;
-			remoteRef = 976A92FC23F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A47552493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A92FF23F3032300CAA795 /* test_pair_inproc */ = {
+		976A47582493A5E000075CA2 /* test_pair_inproc */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_pair_inproc;
-			remoteRef = 976A92FE23F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A47572493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A930123F3032300CAA795 /* test_pair_ipc */ = {
+		976A475A2493A5E000075CA2 /* test_pair_ipc */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_pair_ipc;
-			remoteRef = 976A930023F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A47592493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A930323F3032300CAA795 /* test_pair_tcp */ = {
+		976A475C2493A5E000075CA2 /* test_pair_tcp */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_pair_tcp;
-			remoteRef = 976A930223F3032300CAA795 /* PBXContainerItemProxy */;
+			remoteRef = 976A475B2493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A930523F3032300CAA795 /* test_poller */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_poller;
-			remoteRef = 976A930423F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A930723F3032300CAA795 /* test_probe_router */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_probe_router;
-			remoteRef = 976A930623F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A930923F3032300CAA795 /* test_proxy */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_proxy;
-			remoteRef = 976A930823F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A930B23F3032300CAA795 /* test_proxy_hwm */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_proxy_hwm;
-			remoteRef = 976A930A23F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A930D23F3032300CAA795 /* test_proxy_single_socket */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_proxy_single_socket;
-			remoteRef = 976A930C23F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A930F23F3032300CAA795 /* test_proxy_terminate */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_proxy_terminate;
-			remoteRef = 976A930E23F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A931123F3032300CAA795 /* test_pub_invert_matching */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_pub_invert_matching;
-			remoteRef = 976A931023F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A931323F3032300CAA795 /* test_radio_dish */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_radio_dish;
-			remoteRef = 976A931223F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A931523F3032300CAA795 /* test_rebind_ipc */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_rebind_ipc;
-			remoteRef = 976A931423F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A931723F3032300CAA795 /* test_reconnect_ivl */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_reconnect_ivl;
-			remoteRef = 976A931623F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A931923F3032300CAA795 /* test_req_correlate */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_req_correlate;
-			remoteRef = 976A931823F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A931B23F3032300CAA795 /* test_req_relaxed */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_req_relaxed;
-			remoteRef = 976A931A23F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A931D23F3032300CAA795 /* test_reqrep_device */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_reqrep_device;
-			remoteRef = 976A931C23F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A931F23F3032300CAA795 /* test_reqrep_inproc */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_reqrep_inproc;
-			remoteRef = 976A931E23F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A932123F3032300CAA795 /* test_reqrep_ipc */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_reqrep_ipc;
-			remoteRef = 976A932023F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A932323F3032300CAA795 /* test_reqrep_tcp */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_reqrep_tcp;
-			remoteRef = 976A932223F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A932523F3032300CAA795 /* test_router_handover */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_router_handover;
-			remoteRef = 976A932423F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A932723F3032300CAA795 /* test_router_mandatory */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_router_mandatory;
-			remoteRef = 976A932623F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A932923F3032300CAA795 /* test_router_mandatory_hwm */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_router_mandatory_hwm;
-			remoteRef = 976A932823F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A932B23F3032300CAA795 /* test_router_notify */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_router_notify;
-			remoteRef = 976A932A23F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A932D23F3032300CAA795 /* test_scatter_gather */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_scatter_gather;
-			remoteRef = 976A932C23F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A932F23F3032300CAA795 /* test_security_curve */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_security_curve;
-			remoteRef = 976A932E23F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A933123F3032300CAA795 /* test_security_gssapi */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_security_gssapi;
-			remoteRef = 976A933023F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A933323F3032300CAA795 /* test_security_no_zap_handler */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_security_no_zap_handler;
-			remoteRef = 976A933223F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A933523F3032300CAA795 /* test_security_null */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_security_null;
-			remoteRef = 976A933423F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A933723F3032300CAA795 /* test_security_plain */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_security_plain;
-			remoteRef = 976A933623F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A933923F3032300CAA795 /* test_security_zap */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_security_zap;
-			remoteRef = 976A933823F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A933B23F3032300CAA795 /* test_setsockopt */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_setsockopt;
-			remoteRef = 976A933A23F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A933D23F3032300CAA795 /* test_shutdown_stress */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_shutdown_stress;
-			remoteRef = 976A933C23F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A933F23F3032300CAA795 /* test_socket_null */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_socket_null;
-			remoteRef = 976A933E23F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A934123F3032300CAA795 /* test_sockopt_hwm */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_sockopt_hwm;
-			remoteRef = 976A934023F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A934323F3032300CAA795 /* test_sodium */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_sodium;
-			remoteRef = 976A934223F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A934523F3032300CAA795 /* test_spec_dealer */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_spec_dealer;
-			remoteRef = 976A934423F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A934723F3032300CAA795 /* test_spec_pushpull */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_spec_pushpull;
-			remoteRef = 976A934623F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A934923F3032300CAA795 /* test_spec_rep */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_spec_rep;
-			remoteRef = 976A934823F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A934B23F3032300CAA795 /* test_spec_req */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_spec_req;
-			remoteRef = 976A934A23F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A934D23F3032300CAA795 /* test_spec_router */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_spec_router;
-			remoteRef = 976A934C23F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A934F23F3032300CAA795 /* test_srcfd */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_srcfd;
-			remoteRef = 976A934E23F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A935123F3032300CAA795 /* test_stream */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_stream;
-			remoteRef = 976A935023F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A935323F3032300CAA795 /* test_stream_disconnect */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_stream_disconnect;
-			remoteRef = 976A935223F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A935523F3032300CAA795 /* test_stream_empty */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_stream_empty;
-			remoteRef = 976A935423F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A935723F3032300CAA795 /* test_stream_exceeds_buffer */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_stream_exceeds_buffer;
-			remoteRef = 976A935623F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A935923F3032300CAA795 /* test_stream_timeout */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_stream_timeout;
-			remoteRef = 976A935823F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A935B23F3032300CAA795 /* test_sub_forward */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_sub_forward;
-			remoteRef = 976A935A23F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A935D23F3032300CAA795 /* test_system */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_system;
-			remoteRef = 976A935C23F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A935F23F3032300CAA795 /* test_term_endpoint */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_term_endpoint;
-			remoteRef = 976A935E23F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A936123F3032300CAA795 /* test_thread_safe */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_thread_safe;
-			remoteRef = 976A936023F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A936323F3032300CAA795 /* test_timeo */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_timeo;
-			remoteRef = 976A936223F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A936523F3032300CAA795 /* test_timers */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_timers;
-			remoteRef = 976A936423F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A936723F3032300CAA795 /* test_unbind_wildcard */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_unbind_wildcard;
-			remoteRef = 976A936623F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A936923F3032300CAA795 /* test_use_fd */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_use_fd;
-			remoteRef = 976A936823F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A936B23F3032300CAA795 /* test_xpub_manual */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_xpub_manual;
-			remoteRef = 976A936A23F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A936D23F3032300CAA795 /* test_xpub_manual_last_value */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_xpub_manual_last_value;
-			remoteRef = 976A936C23F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A936F23F3032300CAA795 /* test_xpub_nodrop */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_xpub_nodrop;
-			remoteRef = 976A936E23F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A937123F3032300CAA795 /* test_xpub_verbose */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_xpub_verbose;
-			remoteRef = 976A937023F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A937323F3032300CAA795 /* test_xpub_welcome_msg */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_xpub_welcome_msg;
-			remoteRef = 976A937223F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A937523F3032300CAA795 /* test_zmq_poll_fd */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_zmq_poll_fd;
-			remoteRef = 976A937423F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A937723F3032300CAA795 /* libtestutil.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libtestutil.a;
-			remoteRef = 976A937623F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A937923F3032300CAA795 /* libtestutil-static.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = "libtestutil-static.a";
-			remoteRef = 976A937823F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A937B23F3032300CAA795 /* unittest_ip_resolver */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = unittest_ip_resolver;
-			remoteRef = 976A937A23F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A937D23F3032300CAA795 /* unittest_mtrie */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = unittest_mtrie;
-			remoteRef = 976A937C23F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A937F23F3032300CAA795 /* unittest_poller */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = unittest_poller;
-			remoteRef = 976A937E23F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A938123F3032300CAA795 /* unittest_radix_tree */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = unittest_radix_tree;
-			remoteRef = 976A938023F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A938323F3032300CAA795 /* unittest_udp_address */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = unittest_udp_address;
-			remoteRef = 976A938223F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A938523F3032300CAA795 /* unittest_ypipe */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = unittest_ypipe;
-			remoteRef = 976A938423F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A938723F3032300CAA795 /* libunity.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libunity.a;
-			remoteRef = 976A938623F3032300CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A93A223F3032F00CAA795 /* libczmq.4.2.1.dylib */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.dylib";
-			path = libczmq.4.2.1.dylib;
-			remoteRef = 976A93A123F3032F00CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A93A423F3032F00CAA795 /* libczmq.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libczmq.a;
-			remoteRef = 976A93A323F3032F00CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A93A623F3032F00CAA795 /* libczmq_objects.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libczmq_objects.a;
-			remoteRef = 976A93A523F3032F00CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A93A823F3032F00CAA795 /* czmq_selftest */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = czmq_selftest;
-			remoteRef = 976A93A723F3032F00CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A93AA23F3032F00CAA795 /* test_randof */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_randof;
-			remoteRef = 976A93A923F3032F00CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A93AC23F3032F00CAA795 /* zmakecert */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = zmakecert;
-			remoteRef = 976A93AB23F3032F00CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A93AE23F3032F00CAA795 /* zsp */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = zsp;
-			remoteRef = 976A93AD23F3032F00CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A93CB23F3033800CAA795 /* perf_local */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = perf_local;
-			remoteRef = 976A93CA23F3033800CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A93CD23F3033800CAA795 /* perf_remote */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = perf_remote;
-			remoteRef = 976A93CC23F3033800CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A93CF23F3033800CAA795 /* zpinger */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = zpinger;
-			remoteRef = 976A93CE23F3033800CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A93D123F3033800CAA795 /* ztester_beacon */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = ztester_beacon;
-			remoteRef = 976A93D023F3033800CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A93D323F3033800CAA795 /* ztester_gossip */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = ztester_gossip;
-			remoteRef = 976A93D223F3033800CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A93D523F3033800CAA795 /* libzyre.2.0.1.dylib */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.dylib";
-			path = libzyre.2.0.1.dylib;
-			remoteRef = 976A93D423F3033800CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A93D723F3033800CAA795 /* libzyre.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libzyre.a;
-			remoteRef = 976A93D623F3033800CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A93D923F3033800CAA795 /* libzyre_objects.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libzyre_objects.a;
-			remoteRef = 976A93D823F3033800CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		976A93DB23F3033800CAA795 /* zyre_selftest */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = zyre_selftest;
-			remoteRef = 976A93DA23F3033800CAA795 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		97C7A9E323F800A900DC02C2 /* test_peer */ = {
+		976A475E2493A5E000075CA2 /* test_peer */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = test_peer;
-			remoteRef = 97C7A9E223F800A900DC02C2 /* PBXContainerItemProxy */;
+			remoteRef = 976A475D2493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		97C7A9E523F800A900DC02C2 /* unittest_curve_encoding */ = {
+		976A47602493A5E000075CA2 /* test_poller */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_poller;
+			remoteRef = 976A475F2493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47622493A5E000075CA2 /* test_probe_router */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_probe_router;
+			remoteRef = 976A47612493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47642493A5E000075CA2 /* test_proxy */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_proxy;
+			remoteRef = 976A47632493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47662493A5E000075CA2 /* test_proxy_hwm */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_proxy_hwm;
+			remoteRef = 976A47652493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47682493A5E000075CA2 /* test_proxy_single_socket */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_proxy_single_socket;
+			remoteRef = 976A47672493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A476A2493A5E000075CA2 /* test_proxy_terminate */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_proxy_terminate;
+			remoteRef = 976A47692493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A476C2493A5E000075CA2 /* test_pub_invert_matching */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_pub_invert_matching;
+			remoteRef = 976A476B2493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A476E2493A5E000075CA2 /* test_radio_dish */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_radio_dish;
+			remoteRef = 976A476D2493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47702493A5E000075CA2 /* test_rebind_ipc */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_rebind_ipc;
+			remoteRef = 976A476F2493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47722493A5E000075CA2 /* test_reconnect_ivl */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_reconnect_ivl;
+			remoteRef = 976A47712493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47742493A5E000075CA2 /* test_req_correlate */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_req_correlate;
+			remoteRef = 976A47732493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47762493A5E000075CA2 /* test_req_relaxed */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_req_relaxed;
+			remoteRef = 976A47752493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47782493A5E000075CA2 /* test_reqrep_device */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_reqrep_device;
+			remoteRef = 976A47772493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A477A2493A5E000075CA2 /* test_reqrep_inproc */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_reqrep_inproc;
+			remoteRef = 976A47792493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A477C2493A5E000075CA2 /* test_reqrep_ipc */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_reqrep_ipc;
+			remoteRef = 976A477B2493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A477E2493A5E000075CA2 /* test_reqrep_tcp */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_reqrep_tcp;
+			remoteRef = 976A477D2493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47802493A5E000075CA2 /* test_router_handover */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_router_handover;
+			remoteRef = 976A477F2493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47822493A5E000075CA2 /* test_router_mandatory */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_router_mandatory;
+			remoteRef = 976A47812493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47842493A5E000075CA2 /* test_router_mandatory_hwm */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_router_mandatory_hwm;
+			remoteRef = 976A47832493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47862493A5E000075CA2 /* test_router_notify */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_router_notify;
+			remoteRef = 976A47852493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47882493A5E000075CA2 /* test_scatter_gather */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_scatter_gather;
+			remoteRef = 976A47872493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A478A2493A5E000075CA2 /* test_security_curve */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_security_curve;
+			remoteRef = 976A47892493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A478C2493A5E000075CA2 /* test_security_gssapi */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_security_gssapi;
+			remoteRef = 976A478B2493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A478E2493A5E000075CA2 /* test_security_no_zap_handler */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_security_no_zap_handler;
+			remoteRef = 976A478D2493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47902493A5E000075CA2 /* test_security_null */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_security_null;
+			remoteRef = 976A478F2493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47922493A5E000075CA2 /* test_security_plain */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_security_plain;
+			remoteRef = 976A47912493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47942493A5E000075CA2 /* test_security_zap */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_security_zap;
+			remoteRef = 976A47932493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47962493A5E000075CA2 /* test_setsockopt */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_setsockopt;
+			remoteRef = 976A47952493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47982493A5E000075CA2 /* test_shutdown_stress */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_shutdown_stress;
+			remoteRef = 976A47972493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A479A2493A5E000075CA2 /* test_socket_null */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_socket_null;
+			remoteRef = 976A47992493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A479C2493A5E000075CA2 /* test_sockopt_hwm */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_sockopt_hwm;
+			remoteRef = 976A479B2493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A479E2493A5E000075CA2 /* test_sodium */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_sodium;
+			remoteRef = 976A479D2493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47A02493A5E000075CA2 /* test_spec_dealer */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_spec_dealer;
+			remoteRef = 976A479F2493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47A22493A5E000075CA2 /* test_spec_pushpull */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_spec_pushpull;
+			remoteRef = 976A47A12493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47A42493A5E000075CA2 /* test_spec_rep */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_spec_rep;
+			remoteRef = 976A47A32493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47A62493A5E000075CA2 /* test_spec_req */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_spec_req;
+			remoteRef = 976A47A52493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47A82493A5E000075CA2 /* test_spec_router */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_spec_router;
+			remoteRef = 976A47A72493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47AA2493A5E000075CA2 /* test_srcfd */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_srcfd;
+			remoteRef = 976A47A92493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47AC2493A5E000075CA2 /* test_stream */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_stream;
+			remoteRef = 976A47AB2493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47AE2493A5E000075CA2 /* test_stream_disconnect */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_stream_disconnect;
+			remoteRef = 976A47AD2493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47B02493A5E000075CA2 /* test_stream_empty */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_stream_empty;
+			remoteRef = 976A47AF2493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47B22493A5E000075CA2 /* test_stream_exceeds_buffer */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_stream_exceeds_buffer;
+			remoteRef = 976A47B12493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47B42493A5E000075CA2 /* test_stream_timeout */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_stream_timeout;
+			remoteRef = 976A47B32493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47B62493A5E000075CA2 /* test_sub_forward */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_sub_forward;
+			remoteRef = 976A47B52493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47B82493A5E000075CA2 /* test_system */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_system;
+			remoteRef = 976A47B72493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47BA2493A5E000075CA2 /* test_term_endpoint */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_term_endpoint;
+			remoteRef = 976A47B92493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47BC2493A5E000075CA2 /* test_thread_safe */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_thread_safe;
+			remoteRef = 976A47BB2493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47BE2493A5E000075CA2 /* test_timeo */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_timeo;
+			remoteRef = 976A47BD2493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47C02493A5E000075CA2 /* test_timers */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_timers;
+			remoteRef = 976A47BF2493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47C22493A5E000075CA2 /* test_unbind_wildcard */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_unbind_wildcard;
+			remoteRef = 976A47C12493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47C42493A5E000075CA2 /* test_use_fd */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_use_fd;
+			remoteRef = 976A47C32493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47C62493A5E000075CA2 /* test_xpub_manual */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_xpub_manual;
+			remoteRef = 976A47C52493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47C82493A5E000075CA2 /* test_xpub_manual_last_value */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_xpub_manual_last_value;
+			remoteRef = 976A47C72493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47CA2493A5E000075CA2 /* test_xpub_nodrop */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_xpub_nodrop;
+			remoteRef = 976A47C92493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47CC2493A5E000075CA2 /* test_xpub_verbose */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_xpub_verbose;
+			remoteRef = 976A47CB2493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47CE2493A5E000075CA2 /* test_xpub_welcome_msg */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_xpub_welcome_msg;
+			remoteRef = 976A47CD2493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47D02493A5E000075CA2 /* test_zmq_poll_fd */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_zmq_poll_fd;
+			remoteRef = 976A47CF2493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47D22493A5E000075CA2 /* libtestutil.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libtestutil.a;
+			remoteRef = 976A47D12493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47D42493A5E000075CA2 /* libtestutil-static.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libtestutil-static.a";
+			remoteRef = 976A47D32493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47D62493A5E000075CA2 /* unittest_curve_encoding */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = unittest_curve_encoding;
-			remoteRef = 97C7A9E423F800A900DC02C2 /* PBXContainerItemProxy */;
+			remoteRef = 976A47D52493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		97C7AA0023F800A900DC02C2 /* chat */ = {
+		976A47D82493A5E000075CA2 /* unittest_ip_resolver */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = unittest_ip_resolver;
+			remoteRef = 976A47D72493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47DA2493A5E000075CA2 /* unittest_mtrie */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = unittest_mtrie;
+			remoteRef = 976A47D92493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47DC2493A5E000075CA2 /* unittest_poller */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = unittest_poller;
+			remoteRef = 976A47DB2493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47DE2493A5E000075CA2 /* unittest_radix_tree */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = unittest_radix_tree;
+			remoteRef = 976A47DD2493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47E02493A5E000075CA2 /* unittest_udp_address */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = unittest_udp_address;
+			remoteRef = 976A47DF2493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47E22493A5E000075CA2 /* unittest_ypipe */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = unittest_ypipe;
+			remoteRef = 976A47E12493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47E42493A5E000075CA2 /* libunity.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libunity.a;
+			remoteRef = 976A47E32493A5E000075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A47FF2493A5F300075CA2 /* libczmq.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			name = libczmq.dylib;
+			path = libczmq.4.2.1.dylib;
+			remoteRef = 976A47FE2493A5F300075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A48012493A5F300075CA2 /* libczmq.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libczmq.a;
+			remoteRef = 976A48002493A5F300075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A48032493A5F300075CA2 /* libczmq_objects.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libczmq_objects.a;
+			remoteRef = 976A48022493A5F300075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A48052493A5F300075CA2 /* czmq_selftest */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = czmq_selftest;
+			remoteRef = 976A48042493A5F300075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A48072493A5F300075CA2 /* test_randof */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_randof;
+			remoteRef = 976A48062493A5F300075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A48092493A5F300075CA2 /* zmakecert */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = zmakecert;
+			remoteRef = 976A48082493A5F300075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A480B2493A5F300075CA2 /* zsp */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = zsp;
+			remoteRef = 976A480A2493A5F300075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A48292493A60300075CA2 /* chat */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = chat;
-			remoteRef = 97C7A9FF23F800A900DC02C2 /* PBXContainerItemProxy */;
+			remoteRef = 976A48282493A60300075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A482B2493A60300075CA2 /* perf_local */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = perf_local;
+			remoteRef = 976A482A2493A60300075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A482D2493A60300075CA2 /* perf_remote */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = perf_remote;
+			remoteRef = 976A482C2493A60300075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A482F2493A60300075CA2 /* zpinger */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = zpinger;
+			remoteRef = 976A482E2493A60300075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A48312493A60300075CA2 /* ztester_beacon */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = ztester_beacon;
+			remoteRef = 976A48302493A60300075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A48332493A60300075CA2 /* ztester_gossip */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = ztester_gossip;
+			remoteRef = 976A48322493A60300075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A48352493A60300075CA2 /* libzyre.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			name = libzyre.dylib;
+			path = libzyre.2.0.1.dylib;
+			remoteRef = 976A48342493A60300075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A48372493A60300075CA2 /* libzyre.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libzyre.a;
+			remoteRef = 976A48362493A60300075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A48392493A60300075CA2 /* libzyre_objects.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libzyre_objects.a;
+			remoteRef = 976A48382493A60300075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		976A483B2493A60300075CA2 /* zyre_selftest */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = zyre_selftest;
+			remoteRef = 976A483A2493A60300075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -4721,12 +4773,15 @@
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../../src/include",
 					"$(SRCROOT)/../../dependencies/yajl/src/api",
-					/usr/local/include,
+					"$(SRCROOT)/../../../../third-party/libzmq/include",
+					"$(SRCROOT)/../../../../third-party/czmq/include",
+					"$(SRCROOT)/../../../../third-party/zyre/include",
+					"$(SRCROOT)/../../../../third-party/libsodium/src/libsodium/include",
 				);
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = "";
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ingescape;
 				PRODUCT_NAME = ingescape;
@@ -4754,12 +4809,15 @@
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../../src/include",
 					"$(SRCROOT)/../../dependencies/yajl/src/api",
-					/usr/local/include,
+					"$(SRCROOT)/../../../../third-party/libzmq/include",
+					"$(SRCROOT)/../../../../third-party/czmq/include",
+					"$(SRCROOT)/../../../../third-party/zyre/include",
+					"$(SRCROOT)/../../../../third-party/libsodium/src/libsodium/include",
 				);
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = "";
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ingescape;
 				PRODUCT_NAME = ingescape;

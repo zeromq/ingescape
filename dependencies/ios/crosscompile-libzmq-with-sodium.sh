@@ -86,7 +86,7 @@ mkdir -p $COMPILE_DESTINATION/output/$target
 ./configure --prefix="$COMPILE_DESTINATION/output/$target" --disable-shared --disable-sqlite --host=$hosttarget-apple-darwin --with-libsodium
 
 make clean
-make
+make -j8
 make install
 }
 

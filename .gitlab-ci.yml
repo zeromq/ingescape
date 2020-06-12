@@ -102,11 +102,11 @@ lib-build-macos:
     - git clean -xfd
     - mkdir -p build
     - mkdir -p release
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/builds/release/ingescape/usr/local/ -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/builds/sysroot/usr/local/ -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
     - make -C build
     - make -C build DESTDIR=$PWD/release install
-    - make -C build DESTDIR=$HOME/builds/release/ingescape/ install
-    - cp src/include/ingescape_private.h $HOME/builds/release/ingescape/usr/local/include/ingescape/
+    - make -C build DESTDIR=$HOME/builds/sysroot/ install
+    - cp src/include/ingescape_private.h $HOME/builds/sysroot/usr/local/include/ingescape/
     - cd release/usr/local/
     - tar zcvf ../../../libingescape.tgz *
     - cd ../../..
@@ -163,12 +163,12 @@ editor-build-macos:
   script:
     - git clean -xfd
     - mkdir -p applications/apps/IngeScape-Editor/build
-    - cmake -S applications/apps/IngeScape-Editor/ -B applications/apps/IngeScape-Editor/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.9.7/clang_64/;$HOME/builds/release/ingescape/usr/local/" -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - cmake -S applications/apps/IngeScape-Editor/ -B applications/apps/IngeScape-Editor/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.9.7/clang_64/;$HOME/builds/sysroot/usr/local/" -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
     - make -C applications/apps/IngeScape-Editor/build
 #    - 'codesign --force --deep --sign  "Developer ID Application: Ingenuity i/o (56DRT9MG9S)" -v applications/apps/IngeScape-Editor/build/IngeScape-Editor.app'
-    - mkdir -p $HOME/builds/release/apps/
-    - rm -Rf $HOME/builds/release/apps/IngeScape-Editor.app
-    - cp -Rf applications/apps/IngeScape-Editor/build/IngeScape-Editor.app $HOME/builds/release/apps/
+    - mkdir -p $HOME/builds/sysroot/Applications/
+    - rm -Rf $HOME/builds/sysroot/Applications/IngeScape-Editor.app
+    - cp -Rf applications/apps/IngeScape-Editor/build/IngeScape-Editor.app $HOME/builds/sysroot/Applications/
   artifacts:
     paths:
       - applications/apps/IngeScape-Editor/build
@@ -188,12 +188,12 @@ assessments-build-macos:
   script:
     - git clean -xfd
     - mkdir -p applications/apps/IngeScape-Assessments/build
-    - cmake -S applications/apps/IngeScape-Assessments/ -B applications/apps/IngeScape-Assessments/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.9.7/clang_64/;$HOME/builds/release/ingescape/usr/local/" -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - cmake -S applications/apps/IngeScape-Assessments/ -B applications/apps/IngeScape-Assessments/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.9.7/clang_64/;$HOME/builds/sysroot/usr/local/" -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
     - make -C applications/apps/IngeScape-Assessments/build
 #    - 'codesign --force --deep --sign  "Developer ID Application: Ingenuity i/o (56DRT9MG9S)" -v applications/apps/IngeScape-Assessments/build/IngeScape-Assessments.app'
-    - mkdir -p $HOME/builds/release/apps/
-    - rm -Rf $HOME/builds/release/apps/IngeScape-Assessments.app
-    - cp -Rf applications/apps/IngeScape-Assessments/build/IngeScape-Assessments.app $HOME/builds/release/apps/
+    - mkdir -p $HOME/builds/sysroot/Applications/
+    - rm -Rf $HOME/builds/sysroot/Applications/IngeScape-Assessments.app
+    - cp -Rf applications/apps/IngeScape-Assessments/build/IngeScape-Assessments.app $HOME/builds/sysroot/Applications/
   artifacts:
     paths:
       - applications/apps/IngeScape-Assessments/build
@@ -214,12 +214,12 @@ expe-build-macos:
   script:
     - git clean -xfd
     - mkdir -p applications/apps/IngeScape-Expe/build
-    - cmake -S applications/apps/IngeScape-Expe/ -B applications/apps/IngeScape-Expe/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.9.7/clang_64/;$HOME/builds/release/ingescape/usr/local/" -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - cmake -S applications/apps/IngeScape-Expe/ -B applications/apps/IngeScape-Expe/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.9.7/clang_64/;$HOME/builds/sysroot/usr/local/" -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
     - make -C applications/apps/IngeScape-Expe/build
 #    - 'codesign --force --deep --sign  "Developer ID Application: Ingenuity i/o (56DRT9MG9S)" -v applications/apps/IngeScape-Expe/build/IngeScape-Expe.app'
-    - mkdir -p $HOME/builds/release/apps/
-    - rm -Rf $HOME/builds/release/apps/IngeScape-Expe.app
-    - cp -Rf applications/apps/IngeScape-Expe/build/IngeScape-Expe.app $HOME/builds/release/apps/
+    - mkdir -p $HOME/builds/sysroot/Applications/
+    - rm -Rf $HOME/builds/sysroot/Applications/IngeScape-Expe.app
+    - cp -Rf applications/apps/IngeScape-Expe/build/IngeScape-Expe.app $HOME/builds/sysroot/Applications/
   artifacts:
     paths:
       - applications/apps/IngeScape-Expe/build
