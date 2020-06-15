@@ -1,4 +1,7 @@
 Due to the specificities of IOS and the requirements for cross compilation, we gathered all the dependencies inside a dedicated folder.
 
 The ZMQ/Zyre suite is compile using cross compilation scripts doing all the job from the git checkout to the assembling of include files and static libraries. The ingescape iOS Xcode project expects all the corresponding files to be present but there is no need to push them into git.
+
+WARNING: curl, zmq, xzmq and zyre shall be installed on the system before running the command below. This could be improved by properly setting root in autotools projects for each library.
+
 To compile the zyre suite for iOS, just run ./crosscompile_zyre_suite.sh
