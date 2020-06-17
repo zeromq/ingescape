@@ -339,6 +339,7 @@ int igsAgent_sendCall(igsAgent_t *agent, const char *agentNameOrUUID, const char
         if (strcmp(agt->name, agentNameOrUUID) == 0 || strcmp(agt->peerId, agentNameOrUUID) == 0){
             //we found a matching agent
             igs_callArgument_t *arg = NULL;
+            found = true;
             if (agt->subscriber == NULL || agt->subscriber->definition == NULL){
                 igsAgent_warn(agent, "definition is unknown for %s : cannot verify call before sending it", agentNameOrUUID);
                 //continue; //commented to allow sending the message anyway
@@ -361,7 +362,6 @@ int igsAgent_sendCall(igsAgent_t *agent, const char *agentNameOrUUID, const char
                     continue;
                 }
             }
-            found = true;
             zmsg_t *msg = zmsg_new();
             zmsg_addstr(msg, "CALL");
             zmsg_addstr(msg, callName);
