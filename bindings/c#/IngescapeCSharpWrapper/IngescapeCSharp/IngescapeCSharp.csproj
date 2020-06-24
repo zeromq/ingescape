@@ -21,4 +21,8 @@
     <DefineConstants>RELEASEx64</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>TRACE;UNITY_EDITOR,UNITY_STANDALONE</DefineConstants>
+  </PropertyGroup>
+
 </Project>
