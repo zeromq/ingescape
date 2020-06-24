@@ -1249,23 +1249,28 @@ namespace Ingescape
             uint nbOfElements = 0;
 
             IntPtr intPtr = igs_getCallsList(ref nbOfElements);
-
-            IntPtr[] intPtrArray = new IntPtr[nbOfElements];
-
-            // Copy the pointer to the array of pointers
-            Marshal.Copy(intPtr, intPtrArray, 0, (int)nbOfElements);
-
-            // Fill the string array
-            string[] list = new string[nbOfElements];
-            for (int i = 0; i < nbOfElements; i++)
+            if (nbOfElements != 0)
             {
-                list[i] = Marshal.PtrToStringAnsi(intPtrArray[i]);
+                IntPtr[] intPtrArray = new IntPtr[nbOfElements];
+
+                // Copy the pointer to the array of pointers
+                Marshal.Copy(intPtr, intPtrArray, 0, (int)nbOfElements);
+
+                // Fill the string array
+                string[] list = new string[nbOfElements];
+                for (int i = 0; i < nbOfElements; i++)
+                {
+                    list[i] = Marshal.PtrToStringAnsi(intPtrArray[i]);
+                }
+
+                // Release memory
+                igs_freeCallsList(intPtr, nbOfElements);
+
+                return list;
             }
+            else return null;
 
-            // Release memory
-            igs_freeCallsList(intPtr, nbOfElements);
-
-            return list;
+            
         }
 
         // PUBLIC void igs_freeCallsList(char **list, size_t nbOfCalls);
