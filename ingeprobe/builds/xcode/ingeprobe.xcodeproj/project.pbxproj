@@ -937,6 +937,7 @@
 		974E36812493D92E00444009 /* libzyre.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libzyre.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		974E36862493D93900444009 /* zyre.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = zyre.xcodeproj; path = "../../../../../third-party/zyre/builds/xcode/zyre.xcodeproj"; sourceTree = "<group>"; };
 		974E36B72493D94A00444009 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
+		976BB39C24A48C6C002A6EE5 /* ingeprobe.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ingeprobe.entitlements; sourceTree = "<group>"; };
 		976FFCC422BD57E5000876BF /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		976FFCC622BD57E5000876BF /* utlist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utlist.h; sourceTree = "<group>"; };
 		976FFCC722BD57E5000876BF /* ringbuf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ringbuf.h; sourceTree = "<group>"; };
@@ -1178,6 +1179,7 @@
 		978D6DE41CB26F9B0082016E = {
 			isa = PBXGroup;
 			children = (
+				976BB39C24A48C6C002A6EE5 /* ingeprobe.entitlements */,
 				974E36862493D93900444009 /* zyre.xcodeproj */,
 				974E36512493D8C900444009 /* sodium.xcodeproj */,
 				974E35002493D8C800444009 /* ZeroMQ.xcodeproj */,
@@ -1227,6 +1229,7 @@
 				TargetAttributes = {
 					978D6DEC1CB26F9B0082016E = {
 						CreatedOnToolsVersion = 7.3;
+						DevelopmentTeam = 56DRT9MG9S;
 					};
 				};
 			};
@@ -2286,7 +2289,10 @@
 		978D6DF51CB26F9B0082016E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_ENTITLEMENTS = ingeprobe.entitlements;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				DEVELOPMENT_TEAM = 56DRT9MG9S;
+				ENABLE_HARDENED_RUNTIME = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../../../../../third-party/libsodium/src/libsodium/include",
 					"$(SRCROOT)/../../../../../third-party/czmq/include",
@@ -2294,6 +2300,7 @@
 					"$(SRCROOT)/../../../../../third-party/zyre/include",
 				);
 				LIBRARY_SEARCH_PATHS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = com.ingescape.ingeprobe;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -2301,7 +2308,10 @@
 		978D6DF61CB26F9B0082016E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_ENTITLEMENTS = ingeprobe.entitlements;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				DEVELOPMENT_TEAM = 56DRT9MG9S;
+				ENABLE_HARDENED_RUNTIME = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../../../../../third-party/libsodium/src/libsodium/include",
 					"$(SRCROOT)/../../../../../third-party/czmq/include",
@@ -2309,6 +2319,7 @@
 					"$(SRCROOT)/../../../../../third-party/zyre/include",
 				);
 				LIBRARY_SEARCH_PATHS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = com.ingescape.ingeprobe;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

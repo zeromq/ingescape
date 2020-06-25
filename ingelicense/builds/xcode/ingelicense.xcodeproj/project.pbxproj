@@ -870,6 +870,7 @@
 		974E33A12493D89700444009 /* ZeroMQ.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ZeroMQ.xcodeproj; path = "../../../../../third-party/libzmq/builds/xcode/ZeroMQ.xcodeproj"; sourceTree = "<group>"; };
 		974E34F22493D89700444009 /* sodium.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = sodium.xcodeproj; path = "../../../../../third-party/libsodium/builds/xcode/sodium.xcodeproj"; sourceTree = "<group>"; };
 		974E34FE2493D8B000444009 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
+		976BB2F624A48C29002A6EE5 /* ingelicense.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ingelicense.entitlements; sourceTree = "<group>"; };
 		976FFCAD22BD5708000876BF /* ingelicense */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ingelicense; sourceTree = BUILT_PRODUCTS_DIR; };
 		976FFCB822BD5729000876BF /* agents.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = agents.txt; sourceTree = "<group>"; };
 		976FFCB922BD5729000876BF /* features.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = features.txt; sourceTree = "<group>"; };
@@ -1035,6 +1036,7 @@
 		976FFCA422BD5708000876BF = {
 			isa = PBXGroup;
 			children = (
+				976BB2F624A48C29002A6EE5 /* ingelicense.entitlements */,
 				974E34F22493D89700444009 /* sodium.xcodeproj */,
 				974E33A12493D89700444009 /* ZeroMQ.xcodeproj */,
 				974E337A2493D89700444009 /* czmq.xcodeproj */,
@@ -1105,7 +1107,7 @@
 		976FFCA522BD5708000876BF /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1100;
+				LastUpgradeCheck = 1150;
 				ORGANIZATIONNAME = "Ingenuity i/o";
 				TargetAttributes = {
 					976FFCAC22BD5708000876BF = {
@@ -2102,16 +2104,18 @@
 		976FFCB522BD5708000876BF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ingelicense.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 56DRT9MG9S;
+				ENABLE_HARDENED_RUNTIME = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../../../../../third-party/czmq/include",
 					"$(SRCROOT)/../../../../../third-party/libzmq/include",
 					"$(SRCROOT)/../../../../../third-party/libsodium/src/libsodium/include",
 				);
 				LIBRARY_SEARCH_PATHS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.ingsecape.ingelicense;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ingescape.ingelicense;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -2119,16 +2123,18 @@
 		976FFCB622BD5708000876BF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ingelicense.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 56DRT9MG9S;
+				ENABLE_HARDENED_RUNTIME = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../../../../../third-party/czmq/include",
 					"$(SRCROOT)/../../../../../third-party/libzmq/include",
 					"$(SRCROOT)/../../../../../third-party/libsodium/src/libsodium/include",
 				);
 				LIBRARY_SEARCH_PATHS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.ingsecape.ingelicense;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ingescape.ingelicense;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
