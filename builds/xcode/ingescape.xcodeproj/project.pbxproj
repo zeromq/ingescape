@@ -39,15 +39,11 @@
 		9762EDFA1EAE55D2002062A1 /* utstring.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79961EA7B112003153EF /* utstring.h */; };
 		9762EDFB1EAE55D2002062A1 /* utvector.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79971EA7B112003153EF /* utvector.h */; };
 		9768B2AE22830F0E00310410 /* json.c in Sources */ = {isa = PBXBuildFile; fileRef = 9768B2AD22830F0E00310410 /* json.c */; };
-		976A483C2493A6C300075CA2 /* libczmq.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 976A47FF2493A5F300075CA2 /* libczmq.dylib */; };
-		976A483D2493A6C300075CA2 /* libsodium.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 976A46932493A5D200075CA2 /* libsodium.dylib */; };
-		976A483E2493A6C300075CA2 /* libzmq.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 976A470C2493A5E000075CA2 /* libzmq.dylib */; };
-		976A483F2493A6C300075CA2 /* libzyre.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 976A48352493A60300075CA2 /* libzyre.dylib */; };
-		976A48402493A6D400075CA2 /* libsodium.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 976A46932493A5D200075CA2 /* libsodium.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		976A48412493A6D400075CA2 /* libzmq.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 976A470C2493A5E000075CA2 /* libzmq.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		976A48422493A6D400075CA2 /* libczmq.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 976A47FF2493A5F300075CA2 /* libczmq.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		976A48432493A6D400075CA2 /* libzyre.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 976A48352493A60300075CA2 /* libzyre.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		976A93E023F305F300CAA795 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 976A93DF23F305F300CAA795 /* libc++.tbd */; };
+		976BB8E724A4AC5C002A6EE5 /* libczmq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 976A48012493A5F300075CA2 /* libczmq.a */; };
+		976BB8E824A4AC5C002A6EE5 /* libsodium.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 976A46912493A5D200075CA2 /* libsodium.a */; };
+		976BB8E924A4AC5C002A6EE5 /* libzmq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 976A470E2493A5E000075CA2 /* libzmq.a */; };
+		976BB8EA24A4AC64002A6EE5 /* libzyre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 976A48372493A60300075CA2 /* libzyre.a */; };
 		9772A52720BDE42700729D59 /* call.c in Sources */ = {isa = PBXBuildFile; fileRef = 9772A52620BDE42700729D59 /* call.c */; };
 		9772A52820BDE42700729D59 /* call.c in Sources */ = {isa = PBXBuildFile; fileRef = 9772A52620BDE42700729D59 /* call.c */; };
 		977C247A1F03F4FA00CA1675 /* ingescape.h in Headers */ = {isa = PBXBuildFile; fileRef = 977C24791F03F4FA00CA1675 /* ingescape.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1230,10 +1226,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				976A48402493A6D400075CA2 /* libsodium.dylib in CopyFiles */,
-				976A48412493A6D400075CA2 /* libzmq.dylib in CopyFiles */,
-				976A48422493A6D400075CA2 /* libczmq.dylib in CopyFiles */,
-				976A48432493A6D400075CA2 /* libzyre.dylib in CopyFiles */,
 				97FAC32B2244C88A0036293B /* yajl.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1387,10 +1379,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				976A483C2493A6C300075CA2 /* libczmq.dylib in Frameworks */,
-				976A483D2493A6C300075CA2 /* libsodium.dylib in Frameworks */,
-				976A483E2493A6C300075CA2 /* libzmq.dylib in Frameworks */,
-				976A483F2493A6C300075CA2 /* libzyre.dylib in Frameworks */,
+				976BB8EA24A4AC64002A6EE5 /* libzyre.a in Frameworks */,
+				976BB8E724A4AC5C002A6EE5 /* libczmq.a in Frameworks */,
+				976BB8E824A4AC5C002A6EE5 /* libsodium.a in Frameworks */,
+				976BB8E924A4AC5C002A6EE5 /* libzmq.a in Frameworks */,
 				976A93E023F305F300CAA795 /* libc++.tbd in Frameworks */,
 				973D1BB32226920700D363BF /* yajl.framework in Frameworks */,
 			);
