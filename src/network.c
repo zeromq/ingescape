@@ -1447,8 +1447,6 @@ static void runLoop (zsock_t *mypipe, void *args){
             #endif
             //FIXME : find a way to do that for windows as well
         }
-        free(agent->loopElements);
-        agent->loopElements = NULL;
     }
     if (agent->ipcEndpoint)
         free(agent->ipcEndpoint);
@@ -1516,7 +1514,7 @@ void initLoop (igsAgent_t *agent){
     bool canContinue = true;
     //prepare zyre
     bus_zyreLock();
-    agent->loopElements->node = zyre_new (agent->agentName);
+    agent->loopElements->node = zyre_new(agent->agentName);
     //zyre_set_verbose(agent->loopElements->node);
     bus_zyreUnlock();
     if (strlen(agent->loopElements->brokerEndPoint) > 0){
@@ -1773,7 +1771,7 @@ void initLoop (igsAgent_t *agent){
 //    freeaddrinfo(info);
     
     if (canContinue){
-        agent->loopElements->agentActor = zactor_new (runLoop, agent);
+        agent->loopElements->agentActor = zactor_new(runLoop, agent);
     }
 }
 
@@ -2076,15 +2074,17 @@ int igsAgent_stop(igsAgent_t *agent){
     if (agent->loopElements != NULL){
         //interrupting and destroying ingescape thread and zyre layer
         //this will also clean all agent->subscribers
-        if (agent->loopElements->node != NULL){
-            //we send message only if zyre thread is still active, i.e.
-            //if its node still exists
-            zstr_sendx (agent->loopElements->agentActor, "$TERM", NULL);
-        }
         if (agent->loopElements->agentActor != NULL){
+            if (!agent->forcedStop){
+                //NB: if agent has been forcibly stopped, actor is already stopping
+                //and this command would deadlock.
+                zstr_sendx (agent->loopElements->agentActor, "$TERM", NULL);
+            }
             //This function will block until runLoop has terminated
-            zactor_destroy (&agent->loopElements->agentActor);
+            zactor_destroy(&agent->loopElements->agentActor);
         }
+        free(agent->loopElements);
+        agent->loopElements = NULL;
         //igsAgent_debug(agent, "still %d agents running in process", igs_nbOfAgentsInProcess);
 #if (defined WIN32 || defined _WIN32)
         // On Windows, if we don't call zsys_shutdown, the application will crash on exit
