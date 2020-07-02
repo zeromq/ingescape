@@ -173,7 +173,9 @@ void admin_log(igsAgent_t *agent, igs_logLevel_t level, const char *function, co
                 bus_zyreUnlock();
             }
         }
-        if (agent->logFile == NULL){
+        if (agent->logFile == NULL || !zsys_file_exists(agent->logFilePath)){
+            if (agent->logFile != NULL)
+                fclose(agent->logFile);
             agent->logFile = fopen (agent->logFilePath,"a");
             if (agent->logFile == NULL){
                 printf("error while trying to create/open log file: %s\n", agent->logFilePath);
@@ -181,7 +183,7 @@ void admin_log(igsAgent_t *agent, igs_logLevel_t level, const char *function, co
         }
         if (agent->logFile != NULL){
             admin_computeTime(agent->logTime);
-            if (fprintf(agent->logFile,"%s;%s;%s;%s;%s\n", agent->agentName, agent->logTime, log_levels[level], function, agent->logContent) >= 0){
+            if (fprintf(agent->logFile,"%s;%s;%s;%s;%s\n", agent->agentName, agent->logTime, log_levels[level], function, agent->logContent) > 0){
                 if (++agent->logNbOfEntries > NUMBER_OF_LOGS_FOR_FFLUSH){
                     agent->logNbOfEntries = 0;
                     fflush(agent->logFile);
@@ -292,6 +294,13 @@ void igsAgent_setLogPath(igsAgent_t *agent, const char *path){
         char tmpPath[4096] = "";
         admin_lock();
         admin_makeFilePath(agent, path, tmpPath, 4095);
+        if (!zsys_file_exists(tmpPath)){
+            zfile_t *newF = zfile_new(NULL, tmpPath);
+            if (newF != NULL){
+                zfile_output(newF);
+            }
+            zfile_destroy(&newF);
+        }
         if (access(tmpPath, W_OK) == -1){
             printf("'%s' is not writable and will not be used\n", tmpPath);
             admin_unlock();
