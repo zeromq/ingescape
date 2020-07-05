@@ -14,8 +14,8 @@
 		972A52651FD1733E00711352 /* admin.c in Sources */ = {isa = PBXBuildFile; fileRef = 972A52631FD1733E00711352 /* admin.c */; };
 		9736B37B238414E200A97173 /* agent.c in Sources */ = {isa = PBXBuildFile; fileRef = 9736B37A238414E200A97173 /* agent.c */; };
 		9736B37C238414E200A97173 /* agent.c in Sources */ = {isa = PBXBuildFile; fileRef = 9736B37A238414E200A97173 /* agent.c */; };
-		9738214C23832B7400D466DC /* global.c in Sources */ = {isa = PBXBuildFile; fileRef = 9738214B23832B7400D466DC /* global.c */; };
-		9738214D23832B7400D466DC /* global.c in Sources */ = {isa = PBXBuildFile; fileRef = 9738214B23832B7400D466DC /* global.c */; };
+		9738214C23832B7400D466DC /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = 9738214B23832B7400D466DC /* core.c */; };
+		9738214D23832B7400D466DC /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = 9738214B23832B7400D466DC /* core.c */; };
 		9738215123832BBF00D466DC /* ingescape_agent.h in Headers */ = {isa = PBXBuildFile; fileRef = 9738215023832BBF00D466DC /* ingescape_agent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		973D1BB32226920700D363BF /* yajl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 973D1BB22226916D00D363BF /* yajl.framework */; };
 		973D1BC62226958500D363BF /* libyajl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 973D1BB02226916D00D363BF /* libyajl.a */; };
@@ -1236,7 +1236,7 @@
 		9725395923564B230071A9BA /* performance.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = performance.c; sourceTree = "<group>"; };
 		972A52631FD1733E00711352 /* admin.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = admin.c; sourceTree = "<group>"; };
 		9736B37A238414E200A97173 /* agent.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = agent.c; sourceTree = "<group>"; };
-		9738214B23832B7400D466DC /* global.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = global.c; sourceTree = "<group>"; };
+		9738214B23832B7400D466DC /* core.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = core.c; sourceTree = "<group>"; };
 		9738215023832BBF00D466DC /* ingescape_agent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ingescape_agent.h; sourceTree = "<group>"; };
 		973D1BAA2226916D00D363BF /* yajl.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = yajl.xcodeproj; path = ../../dependencies/yajl/yajl.xcodeproj; sourceTree = "<group>"; };
 		973DC287207A93E6004C1D80 /* bus.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = bus.c; sourceTree = "<group>"; };
@@ -1635,7 +1635,7 @@
 				97ABC93B2282EC5D00215310 /* monitor.c */,
 				9768B2AD22830F0E00310410 /* json.c */,
 				9725395923564B230071A9BA /* performance.c */,
-				9738214B23832B7400D466DC /* global.c */,
+				9738214B23832B7400D466DC /* core.c */,
 				9736B37A238414E200A97173 /* agent.c */,
 			);
 			name = src;
@@ -2841,7 +2841,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9738214D23832B7400D466DC /* global.c in Sources */,
+				9738214D23832B7400D466DC /* core.c in Sources */,
 				97574A9022870C5100C31B99 /* json.c in Sources */,
 				9762EDDA1EAE547B002062A1 /* definition.c in Sources */,
 				9772A52820BDE42700729D59 /* call.c in Sources */,
@@ -2869,7 +2869,7 @@
 				973DC288207A93E6004C1D80 /* bus.c in Sources */,
 				9768B2AE22830F0E00310410 /* json.c in Sources */,
 				9736B37B238414E200A97173 /* agent.c in Sources */,
-				9738214C23832B7400D466DC /* global.c in Sources */,
+				9738214C23832B7400D466DC /* core.c in Sources */,
 				9725395A23564B230071A9BA /* performance.c in Sources */,
 				979A799F1EA7B112003153EF /* mapping.c in Sources */,
 				972A52641FD1733E00711352 /* admin.c in Sources */,

@@ -569,9 +569,9 @@ int igsAgent_removeMappingEntryWithName(igs_agent_t *agent, const char *fromOurI
 
 void igsAgent_setMappingPath(igs_agent_t *agent, const char *path){
     strncpy(agent->mappingPath, path, IGS_MAX_PATH_LENGTH - 1);
-    if (agent->loopElements != NULL && agent->loopElements->node != NULL){
+    if (coreContext != NULL && coreContext->node != NULL){
         bus_zyreLock();
-        zyre_shouts(agent->loopElements->node, CHANNEL, "MAPPING_FILE_PATH=%s", agent->mappingPath);
+        zyre_shouts(coreContext->node, IGS_PRIVATE_CHANNEL, "MAPPING_FILE_PATH=%s", agent->mappingPath);
         bus_zyreUnlock();
     }
 }

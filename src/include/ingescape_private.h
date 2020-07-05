@@ -192,7 +192,7 @@ typedef struct igs_license_enforcement {
 } igs_license_enforcement_t;
 
 typedef struct igs_license_callback {
-    igsAgent_licenseCallback callback_ptr;
+    igs_licenseCallback callback_ptr;
     void* data;
     struct igs_license_callback *prev;
     struct igs_license_callback *next;
@@ -211,7 +211,7 @@ typedef struct igs_monitor {
 } igs_monitor_t;
 
 typedef struct igs_monitor_callback {
-    igsAgent_monitorCallback callback_ptr;
+    igs_monitorCallback callback_ptr;
     void *myData;
     struct igs_monitor_callback *prev;
     struct igs_monitor_callback *next;
@@ -274,6 +274,7 @@ typedef struct igs_core_context{
     char *network_ipcFolderPath;
     char *network_ipcFullPath;
     char *network_ipcEndpoint;
+    bool network_shallRaiseFileDescriptorsLimit;
     
     zactor_t *agentActor;
     zyre_t *node;
@@ -359,9 +360,8 @@ typedef struct igs_agent {
 PUBLIC extern igs_core_context_t *coreContext;
 PUBLIC extern igs_agent_t *coreAgent;
 //PUBLIC extern int igs_nbOfAgentsInProcess;
-//PUBLIC extern bool igs_shallRaiseFileDescriptorsLimit;
-void initInternalAgentIfNeeded(void);
-
+void core_initCoreAgent(void);
+void core_initCoreContext(void);
 
 //  definition
 PUBLIC void definition_freeDefinition (igs_definition_t* definition);
@@ -382,8 +382,8 @@ void model_readWriteLock(void);
 void model_readWriteUnlock(void);
 
 // network
-#define CHANNEL "INGESCAPE_PRIVATE"
-#define AGENT_NAME_DEFAULT "no_name"
+#define IGS_PRIVATE_CHANNEL "INGESCAPE_PRIVATE"
+#define IGS_DEFAULT_AGENT_NAME "no_name"
 int network_publishOutput (igs_agent_t *agent, const igs_iop_t *iop);
 
 // parser

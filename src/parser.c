@@ -1121,7 +1121,7 @@ int igsAgent_loadDefinition (igs_agent_t *agent, const char* json_str){
         agent->definition = tmp;
         //Check the name of agent from network layer
         char *name = igsAgent_getAgentName(agent);
-        if(strcmp(name, AGENT_NAME_DEFAULT) == 0){
+        if(strcmp(name, IGS_DEFAULT_AGENT_NAME) == 0){
             //The name of the agent is default : we change it to definition name
             igsAgent_setAgentName(agent, agent->definition->name);
         }//else
@@ -1164,7 +1164,7 @@ int igsAgent_loadDefinitionFromPath (igs_agent_t *agent, const char* file_path){
         agent->definition = tmp;
         //Check the name of agent from network layer
         char *name = igsAgent_getAgentName(agent);
-        if(strcmp(name, AGENT_NAME_DEFAULT) == 0){
+        if(strcmp(name, IGS_DEFAULT_AGENT_NAME) == 0){
             //The name of the agent is default : we change it to definition name
             igsAgent_setAgentName(agent, agent->definition->name);
         }//else

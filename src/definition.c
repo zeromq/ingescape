@@ -492,9 +492,9 @@ int igsAgent_removeParameter(igs_agent_t *agent, const char *name){
 
 void igsAgent_setDefinitionPath(igs_agent_t *agent, const char *path){
     strncpy(agent->definitionPath, path, IGS_MAX_PATH_LENGTH - 1);
-    if (agent->loopElements != NULL && agent->loopElements->node != NULL){
+    if (coreContext != NULL && coreContext->node != NULL){
         bus_zyreLock();
-        zyre_shouts(agent->loopElements->node, CHANNEL, "DEFINITION_FILE_PATH=%s", agent->definitionPath);
+        zyre_shouts(coreContext->node, IGS_PRIVATE_CHANNEL, "DEFINITION_FILE_PATH=%s", agent->definitionPath);
         bus_zyreUnlock();
     }
 }

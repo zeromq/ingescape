@@ -400,8 +400,8 @@ int igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, const cha
                 }
             }
             bus_zyreLock();
-            zyre_shouts(agent->loopElements->node, agent->callsChannel, "%s to %s", callName, agentNameOrUUID);
-            zyre_whisper(agent->loopElements->node, agt->peerId, &msg);
+            zyre_shouts(coreContext->node, agent->callsChannel, "%s to %s", callName, agentNameOrUUID);
+            zyre_whisper(coreContext->node, agt->peerId, &msg);
             bus_zyreUnlock();
             igsAgent_debug(agent, "sent call %s to %s", callName, agentNameOrUUID);
 

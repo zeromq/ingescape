@@ -27,7 +27,7 @@ extern "C" {
 //Selected network device must be able to reach the endpoint address.
 //PUBLIC int igs_startWithDeviceOnBroker(const char *networkDevice, const char *brokerEndpoint);
     
-//network configuration and monitoring
+//network configuration
 //void igs_setBusEndpoint(const char *endpoint); //usefull only with gossip discovery - TODO
 //void igs_connectAgentOnEndpoint(const char *endpoint); //not officially supported in Zyre 2.0.x yet
 PUBLIC void igs_setPublishingPort(unsigned int port);

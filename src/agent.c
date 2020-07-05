@@ -13,17 +13,11 @@
 
 igs_agent_t *igsAgent_new(void){
     igs_agent_t *agent = calloc(1, sizeof(igs_agent_t));
-    agent->network_discoveryInterval = 1000;
-    agent->network_agentTimeout = 30000;
-    agent->network_hwmValue = 1000;
-    agent->allowIpc = true;
-    agent->allowInproc = true;
-    agent->logLevel = IGS_LOG_INFO;
-    sprintf(agent->agentName, AGENT_NAME_DEFAULT);
+    sprintf(agent->agentName, IGS_DEFAULT_AGENT_NAME);
     return agent;
 }
 void igsAgent_destroy(igs_agent_t **agent){
-    igsAgent_stop(*agent);
+    //TODO: clean all agent structure properly
     free(*agent);
     *agent = NULL;
 }

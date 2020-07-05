@@ -78,8 +78,6 @@ static const char *loadDefinitionPrefix = "LOAD_THIS_DEFINITION#";
 
 #define DEFAULT_IPC_PATH "/tmp/"
 
-igs_core_context_t *coreContext = NULL;
-
 #if defined(__unix__) || defined(__linux__) || \
 (defined(__APPLE__) && defined(__MACH__))
 pthread_mutex_t *network_Mutex = NULL;
@@ -183,7 +181,7 @@ int triggerMappingNotificationToNewcomer(zloop_t *loop, int timer_id, void *arg)
     
     if (subscriber->mappedNotificationToSend){
         bus_zyreLock();
-        zyre_whispers(agent->loopElements->node, subscriber->agentPeerId, "REQUEST_OUPUTS");
+        zyre_whispers(coreContext->node, subscriber->agentPeerId, "REQUEST_OUPUTS");
         bus_zyreUnlock();
         subscriber->mappedNotificationToSend = false;
     }
@@ -219,7 +217,7 @@ int network_manageSubscriberMapping(igs_agent_t *agent, igs_subscriber_t *subscr
                     if (!subscriber->mappedNotificationToSend && agent->network_RequestOutputsFromMappedAgents){
                         subscriber->mappedNotificationToSend = true;
                         subscriber->agent = agent;
-                        subscriber->timerId = zloop_timer(agent->loopElements->loop, 500, 1, triggerMappingNotificationToNewcomer, subscriber);
+                        subscriber->timerId = zloop_timer(coreContext->loop, 500, 1, triggerMappingNotificationToNewcomer, subscriber);
                     }
                 }
                 //NOTE: we do not clean subscriptions here because we cannot check if
@@ -234,10 +232,10 @@ void sendDefinitionToAgent(igs_agent_t *agent, const char *peerId, const char *d
 {
     if(peerId != NULL &&  def != NULL)
     {
-        if(agent->loopElements->node != NULL)
+        if(coreContext->node != NULL)
         {
             bus_zyreLock();
-            zyre_whispers(agent->loopElements->node, peerId, "%s%s", definitionPrefix, def);
+            zyre_whispers(coreContext->node, peerId, "%s%s", definitionPrefix, def);
             bus_zyreUnlock();
         } else {
             igsAgent_warn(agent, "Could not send our definition to %s : our agent is not connected",peerId);
@@ -248,9 +246,9 @@ void sendDefinitionToAgent(igs_agent_t *agent, const char *peerId, const char *d
 void sendMappingToAgent(igs_agent_t *agent, const char *peerId, const char *mapping)
 {
     if(peerId != NULL &&  mapping != NULL){
-        if(agent->loopElements->node != NULL){
+        if(coreContext->node != NULL){
             bus_zyreLock();
-            zyre_whispers(agent->loopElements->node, peerId, "%s%s", mappingPrefix, mapping);
+            zyre_whispers(coreContext->node, peerId, "%s%s", mappingPrefix, mapping);
             bus_zyreUnlock();
         } else {
             igsAgent_warn(agent, "Could not send our mapping to %s : our agent is not connected",peerId);
@@ -289,8 +287,8 @@ void network_cleanAndFreeSubscriber(igs_agent_t *agent, igs_subscriber_t *subscr
         DL_DELETE(subscriber->mappingsFilters,elt);
         free(elt);
     }
-    if (agent->loopElements != NULL){
-        zloop_poller_end(agent->loopElements->loop , subscriber->pollItem);
+    if (coreContext != NULL){
+        zloop_poller_end(coreContext->loop , subscriber->pollItem);
     }
     zsock_destroy(&subscriber->subscriber);
     if (subscriber->agentName)
@@ -302,8 +300,8 @@ void network_cleanAndFreeSubscriber(igs_agent_t *agent, igs_subscriber_t *subscr
     if (subscriber->subscriber)
         free(subscriber->subscriber);
     subscriber->subscriber = NULL;
-    if (agent->loopElements != NULL && subscriber->timerId != -1){
-        zloop_timer_end(agent->loopElements->loop, subscriber->timerId);
+    if (coreContext != NULL && subscriber->timerId != -1){
+        zloop_timer_end(coreContext->loop, subscriber->timerId);
         subscriber->timerId = -2;
     }
     HASH_DEL(agent->subscribers, subscriber);
@@ -445,7 +443,7 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
 //manage messages received on the bus
 int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
     igs_agent_t *agent = (igs_agent_t *)arg;
-    zyre_t *node = agent->loopElements->node;
+    zyre_t *node = coreContext->node;
     
     if (item->revents & ZMQ_POLLIN){
         zyre_event_t *zyre_event = zyre_event_new (node);
@@ -512,11 +510,11 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                             bool useInproc = false;
                             const char *ipcAddress = NULL;
                             const char *inprocAddress = NULL;
-                            if (strcmp(agent->loopElements->ipAddress, incomingIpAddress) == 0){
+                            if (strcmp(coreContext->ipAddress, incomingIpAddress) == 0){
                                 //same IP address : we can try to use ipc (or loopback on windows) instead of TCP
                                 //or we can use inproc if both agents are in the same process
                                 int pid = atoi(zyre_event_header(zyre_event, "pid"));
-                                if (agent->loopElements->processId == pid){
+                                if (coreContext->processId == pid){
                                     //same ip address and same process : we can use inproc
                                     inprocAddress = zyre_event_header(zyre_event, "inproc");
                                     if (inprocAddress != NULL){
@@ -545,7 +543,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                                 //we have a reconnection with same peerId
                                 igsAgent_debug(agent, "Peer id %s was connected before with agent name %s : reset and recreate subscription", peer, subscriber->agentName);
                                 HASH_DEL(agent->subscribers, subscriber);
-                                zloop_poller_end(agent->loopElements->loop , subscriber->pollItem);
+                                zloop_poller_end(coreContext->loop , subscriber->pollItem);
                                 zsock_destroy(&subscriber->subscriber);
                                 free((char*)subscriber->agentName);
                                 free((char*)subscriber->agentPeerId);
@@ -557,7 +555,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                                 }
                                 subscriber->subscriber = NULL;
                                 if (subscriber->timerId != -1){
-                                    zloop_timer_end(agent->loopElements->loop, subscriber->timerId);
+                                    zloop_timer_end(coreContext->loop, subscriber->timerId);
                                     subscriber->timerId = -1;
                                 }
                                 free(subscriber);
@@ -591,7 +589,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                             subscriber->pollItem->fd = 0;
                             subscriber->pollItem->events = ZMQ_POLLIN;
                             subscriber->pollItem->revents = 0;
-                            zloop_poller (agent->loopElements->loop, subscriber->pollItem, manageSubscription, (void*)subscriber);
+                            zloop_poller (coreContext->loop, subscriber->pollItem, manageSubscription, (void*)subscriber);
                             zloop_poller_set_tolerant(loop, subscriber->pollItem);
 #if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
                             agent->licenseEnforcement->currentAgentsNb++;
@@ -619,7 +617,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
             }
         } else if (streq (event, "JOIN")){
             igsAgent_debug(agent, "+%s has joined %s", name, group);
-            if (streq(group, CHANNEL)){
+            if (streq(group, IGS_PRIVATE_CHANNEL)){
                 //definition is sent to every newcomer on the channel (whether it is a ingescape agent or not)
                 char * definitionStr = NULL;
                 definitionStr = parser_export_definition(agent->definition);
@@ -639,17 +637,17 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 //we also send our frozen and muted states, and other usefull information
                 if (agent->isWholeAgentMuted){
                     bus_zyreLock();
-                    zyre_whispers(agent->loopElements->node, peer, "MUTED=1");
+                    zyre_whispers(coreContext->node, peer, "MUTED=1");
                     bus_zyreUnlock();
                 }
                 if (agent->isFrozen){
                     bus_zyreLock();
-                    zyre_whispers(agent->loopElements->node, peer, "FROZEN=1");
+                    zyre_whispers(coreContext->node, peer, "FROZEN=1");
                     bus_zyreUnlock();
                 }
                 if (strlen(agent->agentState) > 0){
                     bus_zyreLock();
-                    zyre_whispers(agent->loopElements->node, peer, "STATE=%s", agent->agentState);
+                    zyre_whispers(coreContext->node, peer, "STATE=%s", agent->agentState);
                     bus_zyreUnlock();
                 }
                 if (agent->definition != NULL){
@@ -657,30 +655,30 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     HASH_ITER(hh, agent->definition->outputs_table, current_iop, tmp_iop) {
                         if (current_iop->is_muted && current_iop->name != NULL){
                             bus_zyreLock();
-                            zyre_whispers(agent->loopElements->node, peer, "OUTPUT_MUTED %s", current_iop->name);
+                            zyre_whispers(coreContext->node, peer, "OUTPUT_MUTED %s", current_iop->name);
                             bus_zyreUnlock();
                         }
                     }
                 }
                 if (agent->logInStream){
                     bus_zyreLock();
-                    zyre_whispers(agent->loopElements->node, peer, "LOG_IN_STREAM=1");
+                    zyre_whispers(coreContext->node, peer, "LOG_IN_STREAM=1");
                     bus_zyreUnlock();
                 }
                 if (agent->logInFile){
                     bus_zyreLock();
-                    zyre_whispers(agent->loopElements->node, peer, "LOG_IN_FILE=1");
-                    zyre_whispers(agent->loopElements->node, peer, "LOG_FILE_PATH=%s", agent->logFilePath);
+                    zyre_whispers(coreContext->node, peer, "LOG_IN_FILE=1");
+                    zyre_whispers(coreContext->node, peer, "LOG_FILE_PATH=%s", agent->logFilePath);
                     bus_zyreUnlock();
                 }
                 if (strlen(agent->definitionPath) > 0){
                     bus_zyreLock();
-                    zyre_whispers(agent->loopElements->node, peer, "DEFINITION_FILE_PATH=%s", agent->definitionPath);
+                    zyre_whispers(coreContext->node, peer, "DEFINITION_FILE_PATH=%s", agent->definitionPath);
                     bus_zyreUnlock();
                 }
                 if (strlen(agent->mappingPath) > 0){
                     bus_zyreLock();
-                    zyre_whispers(agent->loopElements->node, peer, "MAPPING_FILE_PATH=%s", agent->mappingPath);
+                    zyre_whispers(coreContext->node, peer, "MAPPING_FILE_PATH=%s", agent->mappingPath);
                     bus_zyreUnlock();
                 }
                 
@@ -1151,7 +1149,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         if (call != NULL ){
                             if (call->cb != NULL){
                                 bus_zyreLock();
-                                zyre_shouts(agent->loopElements->node, agent->callsChannel, "%s from %s (%s)", callName, name, peer);
+                                zyre_shouts(coreContext->node, agent->callsChannel, "%s from %s (%s)", callName, name, peer);
                                 bus_zyreUnlock();
                                 size_t nbArgs = 0;
                                 igs_callArgument_t *_arg = NULL;
@@ -1330,7 +1328,7 @@ static void runLoop (zsock_t *mypipe, void *args){
     igs_agent_t *agent = (igs_agent_t *)args;
     //start zyre now that everything is set
     bus_zyreLock();
-    int zyreStartRes = zyre_start (agent->loopElements->node);
+    int zyreStartRes = zyre_start (coreContext->node);
     bus_zyreUnlock();
     if (zyreStartRes == -1){
         igsAgent_error(agent, "Could not start bus node : Agent will interrupt immediately.");
@@ -1353,7 +1351,7 @@ static void runLoop (zsock_t *mypipe, void *args){
     zpipePollItem.revents = 0;
 
     //zyre socket
-    void *zsock = zsock_resolve(zyre_socket (agent->loopElements->node));
+    void *zsock = zsock_resolve(zyre_socket (coreContext->node));
     if (zsock == NULL){
         igsAgent_error(agent, "Could not get the bus socket for polling : Agent will interrupt immediately.");
         network_Unlock();
@@ -1364,22 +1362,22 @@ static void runLoop (zsock_t *mypipe, void *args){
     zyrePollItem.events = ZMQ_POLLIN;
     zyrePollItem.revents = 0;
 
-    agent->loopElements->loop = zloop_new ();
-    assert (agent->loopElements->loop);
-    zloop_set_verbose (agent->loopElements->loop, false);
+    coreContext->loop = zloop_new ();
+    assert (coreContext->loop);
+    zloop_set_verbose (coreContext->loop, false);
 
-    zloop_poller (agent->loopElements->loop, &zpipePollItem, manageParent, agent);
-    zloop_poller_set_tolerant(agent->loopElements->loop, &zpipePollItem);
-    zloop_poller (agent->loopElements->loop, &zyrePollItem, manageBusIncoming, agent);
-    zloop_poller_set_tolerant(agent->loopElements->loop, &zyrePollItem);
+    zloop_poller (coreContext->loop, &zpipePollItem, manageParent, agent);
+    zloop_poller_set_tolerant(coreContext->loop, &zpipePollItem);
+    zloop_poller (coreContext->loop, &zyrePollItem, manageBusIncoming, agent);
+    zloop_poller_set_tolerant(coreContext->loop, &zyrePollItem);
     
-    zloop_timer(agent->loopElements->loop, 1000, 0, triggerDefinitionUpdate, agent);
-    zloop_timer(agent->loopElements->loop, 1000, 0, triggerMappingUpdate, agent);
+    zloop_timer(coreContext->loop, 1000, 0, triggerDefinitionUpdate, agent);
+    zloop_timer(coreContext->loop, 1000, 0, triggerMappingUpdate, agent);
     
 #if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
     if (agent->license != NULL && !agent->license->isLicenseValid){
         igs_license("License is not valid : starting timer for demonstration mode (%d seconds)...", MAX_EXEC_DURATION_DURING_EVAL);
-        zloop_timer(agent->loopElements->loop, MAX_EXEC_DURATION_DURING_EVAL * 1000, 0, triggerLicenseStop, agent);
+        zloop_timer(coreContext->loop, MAX_EXEC_DURATION_DURING_EVAL * 1000, 0, triggerLicenseStop, agent);
     }
 #endif
     zsock_signal (mypipe, 0);
@@ -1387,7 +1385,7 @@ static void runLoop (zsock_t *mypipe, void *args){
     network_Unlock();
     
     igsAgent_debug(agent, "loop starting");
-    zloop_start (agent->loopElements->loop); //returns when one of the pollers returns -1
+    zloop_start (coreContext->loop); //returns when one of the pollers returns -1
     
     network_Lock();
     igsAgent_debug(agent, "loop stopping...");
@@ -1402,15 +1400,15 @@ static void runLoop (zsock_t *mypipe, void *args){
         network_cleanAndFreeSubscriber(agent, s);
     }
     bus_zyreLock();
-    if (agent->loopElements != NULL)
-        zyre_stop (agent->loopElements->node);
+    if (coreContext != NULL)
+        zyre_stop (coreContext->node);
     bus_zyreUnlock();
     //zclock_sleep (100);
-    if (agent->loopElements != NULL){
-        zyre_destroy (&agent->loopElements->node);
-        zsock_destroy(&agent->loopElements->publisher);
-        if (agent->loopElements->ipcPublisher != NULL){
-            zsock_destroy(&agent->loopElements->ipcPublisher);
+    if (coreContext != NULL){
+        zyre_destroy (&coreContext->node);
+        zsock_destroy(&coreContext->publisher);
+        if (coreContext->ipcPublisher != NULL){
+            zsock_destroy(&coreContext->ipcPublisher);
 #if defined __unix__ || defined __APPLE__ || defined __linux__
             if (agent->ipcFullPath != NULL){
                 zsys_file_delete(agent->ipcFullPath); //destroy ipcPath in file system
@@ -1420,18 +1418,18 @@ static void runLoop (zsock_t *mypipe, void *args){
             }
 #endif
         }
-        if (agent->loopElements->inprocPublisher != NULL){
-            zsock_destroy(&agent->loopElements->inprocPublisher);
+        if (coreContext->inprocPublisher != NULL){
+            zsock_destroy(&coreContext->inprocPublisher);
         }
-        if (agent->loopElements->logger != NULL){
-            zsock_destroy(&agent->loopElements->logger);
+        if (coreContext->logger != NULL){
+            zsock_destroy(&coreContext->logger);
         }
         
-        zloop_destroy (&agent->loopElements->loop);
+        zloop_destroy (&coreContext->loop);
         
         igs_timer_t *current_timer, *tmp_timer;
-        HASH_ITER(hh, agent->loopElements->timers, current_timer, tmp_timer){
-            HASH_DEL(agent->loopElements->timers, current_timer);
+        HASH_ITER(hh, coreContext->timers, current_timer, tmp_timer){
+            HASH_DEL(coreContext->timers, current_timer);
             free(current_timer);
         }
         
@@ -1445,7 +1443,7 @@ static void runLoop (zsock_t *mypipe, void *args){
             //that it can be trapped by main thread for a proper stop
             #if defined __unix__ || defined __APPLE__ || defined __linux__
             igsAgent_debug(agent, "triggering SIGINT");
-            kill(agent->loopElements->processId, SIGINT);
+            kill(coreContext->processId, SIGINT);
             #endif
             //FIXME : find a way to do that for windows as well
         }
@@ -1516,82 +1514,82 @@ void initLoop (igs_agent_t *agent){
     bool canContinue = true;
     //prepare zyre
     bus_zyreLock();
-    agent->loopElements->node = zyre_new(agent->agentName);
-    //zyre_set_verbose(agent->loopElements->node);
+    coreContext->node = zyre_new(agent->agentName);
+    //zyre_set_verbose(coreContext->node);
     bus_zyreUnlock();
-    if (strlen(agent->loopElements->brokerEndPoint) > 0){
+    if (strlen(coreContext->brokerEndPoint) > 0){
         bus_zyreLock();
-        zyre_set_verbose(agent->loopElements->node);
-        zyre_gossip_connect(agent->loopElements->node,
-                            "%s", agent->loopElements->brokerEndPoint);
+        zyre_set_verbose(coreContext->node);
+        zyre_gossip_connect(coreContext->node,
+                            "%s", coreContext->brokerEndPoint);
         bus_zyreUnlock();
     }else{
-        if (agent->loopElements->node == NULL){
+        if (coreContext->node == NULL){
             igsAgent_fatal(agent, "Could not create bus node : Agent will interrupt immediately.");
             return;
         }else{
             bus_zyreLock();
-            zyre_set_interface(agent->loopElements->node, agent->loopElements->networkDevice);
-            zyre_set_port(agent->loopElements->node, agent->loopElements->zyrePort);
+            zyre_set_interface(coreContext->node, coreContext->networkDevice);
+            zyre_set_port(coreContext->node, coreContext->zyrePort);
             bus_zyreUnlock();
         }
     }
     bus_zyreLock();
-    zyre_set_interval(agent->loopElements->node, agent->network_discoveryInterval);
-    zyre_set_expired_timeout(agent->loopElements->node, agent->network_agentTimeout);
+    zyre_set_interval(coreContext->node, agent->network_discoveryInterval);
+    zyre_set_expired_timeout(coreContext->node, agent->network_agentTimeout);
     bus_zyreUnlock();
     
     //join ingescape private channel
     bus_zyreLock();
-    zyre_join(agent->loopElements->node, CHANNEL);
+    zyre_join(coreContext->node, IGS_PRIVATE_CHANNEL);
     bus_zyreUnlock();
     
     //create channel for replay
     snprintf(agent->replayChannel, IGS_MAX_AGENT_NAME_LENGTH + 15, "%s-IGS-REPLAY", agent->agentName);
     bus_zyreLock();
-    zyre_join(agent->loopElements->node, agent->replayChannel);
+    zyre_join(coreContext->node, agent->replayChannel);
     bus_zyreUnlock();
     
     //create channel for calls feedback
     snprintf(agent->callsChannel, IGS_MAX_AGENT_NAME_LENGTH + 15, "%s-IGS-CALLS", agent->agentName);
     bus_zyreLock();
-    zyre_join(agent->loopElements->node, agent->callsChannel);
+    zyre_join(coreContext->node, agent->callsChannel);
     bus_zyreUnlock();
     
     //Add version and protocol to headers
     bus_zyreLock();
-    zyre_set_header(agent->loopElements->node, "ingescape", "v%d.%d.%d", (int)igs_version()/10000, (int)(igs_version() %10000)/100, (int)(igs_version() %100));
-    zyre_set_header(agent->loopElements->node, "protocol", "v%d", igs_protocol());
+    zyre_set_header(coreContext->node, "ingescape", "v%d.%d.%d", (int)igs_version()/10000, (int)(igs_version() %10000)/100, (int)(igs_version() %100));
+    zyre_set_header(coreContext->node, "protocol", "v%d", igs_protocol());
     bus_zyreUnlock();
     
     //Add stored headers to zyre
     igs_service_header_t *el, *tmp;
     bus_zyreLock();
     HASH_ITER(hh, agent->serviceHeaders, el, tmp){
-        zyre_set_header(agent->loopElements->node, el->key, "%s", el->value);
+        zyre_set_header(coreContext->node, el->key, "%s", el->value);
     }
     bus_zyreUnlock();
     
     //start TCP publisher
     char endpoint[512];
     if (agent->network_publishingPort == 0){
-        snprintf(endpoint, 511, "tcp://%s:*", agent->loopElements->ipAddress);
+        snprintf(endpoint, 511, "tcp://%s:*", coreContext->ipAddress);
     }else{
-        snprintf(endpoint, 511, "tcp://%s:%d", agent->loopElements->ipAddress, agent->network_publishingPort);
+        snprintf(endpoint, 511, "tcp://%s:%d", coreContext->ipAddress, agent->network_publishingPort);
     }
-    agent->loopElements->publisher = zsock_new_pub(endpoint);
-    if (agent->loopElements->publisher == NULL){
+    coreContext->publisher = zsock_new_pub(endpoint);
+    if (coreContext->publisher == NULL){
         igsAgent_error(agent, "Could not create publishing socket (%s): Agent will interrupt immediately.", endpoint);
         canContinue = false;
     }else{
-        zsock_set_sndhwm(agent->loopElements->publisher, agent->network_hwmValue);
-        strncpy(endpoint, zsock_endpoint(agent->loopElements->publisher), 256);
+        zsock_set_sndhwm(coreContext->publisher, agent->network_hwmValue);
+        strncpy(endpoint, zsock_endpoint(coreContext->publisher), 256);
         char *insert = endpoint + strlen(endpoint) - 1;
         while (*insert != ':' && insert > endpoint) {
             insert--;
         }
         bus_zyreLock();
-        zyre_set_header(agent->loopElements->node, "publisher", "%s", insert + 1);
+        zyre_set_header(coreContext->node, "publisher", "%s", insert + 1);
         bus_zyreUnlock();
     }
 
@@ -1605,83 +1603,83 @@ void initLoop (igs_agent_t *agent){
         igsAgent_warn(agent, "Expected IPC directory %s does not exist : create it to remove this warning", agent->ipcFolderPath);
     }
     bus_zyreLock();
-    agent->ipcFullPath = calloc(1, strlen(agent->ipcFolderPath)+strlen(zyre_uuid(agent->loopElements->node))+2);
-    sprintf(agent->ipcFullPath, "%s/%s", agent->ipcFolderPath, zyre_uuid(agent->loopElements->node));
-    agent->ipcEndpoint = calloc(1, strlen(agent->ipcFolderPath)+strlen(zyre_uuid(agent->loopElements->node))+8);
-    sprintf(agent->ipcEndpoint, "ipc://%s/%s", agent->ipcFolderPath, zyre_uuid(agent->loopElements->node));
+    agent->ipcFullPath = calloc(1, strlen(agent->ipcFolderPath)+strlen(zyre_uuid(coreContext->node))+2);
+    sprintf(agent->ipcFullPath, "%s/%s", agent->ipcFolderPath, zyre_uuid(coreContext->node));
+    agent->ipcEndpoint = calloc(1, strlen(agent->ipcFolderPath)+strlen(zyre_uuid(coreContext->node))+8);
+    sprintf(agent->ipcEndpoint, "ipc://%s/%s", agent->ipcFolderPath, zyre_uuid(coreContext->node));
     bus_zyreUnlock();
-    zsock_t *ipcPublisher = agent->loopElements->ipcPublisher = zsock_new_pub(agent->ipcEndpoint);
+    zsock_t *ipcPublisher = coreContext->ipcPublisher = zsock_new_pub(agent->ipcEndpoint);
     if (ipcPublisher == NULL){
         igsAgent_warn(agent, "Could not create IPC publishing socket (%s)", agent->ipcEndpoint);
     }else{
-        zsock_set_sndhwm(agent->loopElements->ipcPublisher, agent->network_hwmValue);
+        zsock_set_sndhwm(coreContext->ipcPublisher, agent->network_hwmValue);
         bus_zyreLock();
-        zyre_set_header(agent->loopElements->node, "ipc", "%s", agent->ipcEndpoint);
+        zyre_set_header(coreContext->node, "ipc", "%s", agent->ipcEndpoint);
         bus_zyreUnlock();
     }
 #elif (defined WIN32 || defined _WIN32)
     agent->ipcEndpoint = strdup("tcp://127.0.0.1:*");
-    zsock_t *ipcPublisher = agent->loopElements->ipcPublisher = zsock_new_pub(agent->ipcEndpoint);
+    zsock_t *ipcPublisher = coreContext->ipcPublisher = zsock_new_pub(agent->ipcEndpoint);
     if (ipcPublisher == NULL){
         igsAgent_warn(agent, "Could not create loopback publishing socket (%s)", agent->ipcEndpoint);
     }else{
-        zsock_set_sndhwm(agent->loopElements->ipcPublisher, agent->network_hwmValue);
+        zsock_set_sndhwm(coreContext->ipcPublisher, agent->network_hwmValue);
         bus_zyreLock();
-        zyre_set_header(agent->loopElements->node, "loopback", "%s", zsock_endpoint(ipcPublisher));
+        zyre_set_header(coreContext->node, "loopback", "%s", zsock_endpoint(ipcPublisher));
         bus_zyreUnlock();
     }
 #endif
     
     //start inproc publisher
     bus_zyreLock();
-    char *inprocEndpoint = calloc(1, sizeof(char) * (12 + strlen(zyre_uuid(agent->loopElements->node))));
-    sprintf(inprocEndpoint, "inproc://%s", zyre_uuid(agent->loopElements->node));
+    char *inprocEndpoint = calloc(1, sizeof(char) * (12 + strlen(zyre_uuid(coreContext->node))));
+    sprintf(inprocEndpoint, "inproc://%s", zyre_uuid(coreContext->node));
     bus_zyreUnlock();
-    agent->loopElements->inprocPublisher = zsock_new_pub(inprocEndpoint);
-    if (agent->loopElements->inprocPublisher == NULL){
+    coreContext->inprocPublisher = zsock_new_pub(inprocEndpoint);
+    if (coreContext->inprocPublisher == NULL){
         igsAgent_warn(agent, "Could not create inproc publishing socket (%s)", inprocEndpoint);
         canContinue = false;
     }else{
-        zsock_set_sndhwm(agent->loopElements->inprocPublisher, agent->network_hwmValue);
+        zsock_set_sndhwm(coreContext->inprocPublisher, agent->network_hwmValue);
         bus_zyreLock();
-        zyre_set_header(agent->loopElements->node, "inproc", "%s", inprocEndpoint);
+        zyre_set_header(coreContext->node, "inproc", "%s", inprocEndpoint);
         bus_zyreUnlock();
     }
     
     //start logger stream if needed
     if (agent->logInStream){
         if (agent->network_logStreamPort == 0){
-            sprintf(endpoint, "tcp://%s:*", agent->loopElements->ipAddress);
+            sprintf(endpoint, "tcp://%s:*", coreContext->ipAddress);
         } else {
-            sprintf(endpoint, "tcp://%s:%d", agent->loopElements->ipAddress, agent->network_logStreamPort);
+            sprintf(endpoint, "tcp://%s:%d", coreContext->ipAddress, agent->network_logStreamPort);
         }
-        agent->loopElements->logger = zsock_new_pub(endpoint);
-        if (agent->loopElements->logger == NULL){
+        coreContext->logger = zsock_new_pub(endpoint);
+        if (coreContext->logger == NULL){
             igsAgent_error(agent, "Could not create log stream socket (%s): Agent will interrupt immediately.", endpoint);
             canContinue = false;
         } else {
-            zsock_set_sndhwm(agent->loopElements->logger, agent->network_hwmValue);
-            strncpy(endpoint, zsock_endpoint(agent->loopElements->logger), 256);
+            zsock_set_sndhwm(coreContext->logger, agent->network_hwmValue);
+            strncpy(endpoint, zsock_endpoint(coreContext->logger), 256);
             char *insert = endpoint + strlen(endpoint) - 1;
             while (*insert != ':' && insert > endpoint) {
                 insert--;
             }
             bus_zyreLock();
-            zyre_set_header(agent->loopElements->node, "logger", "%s", insert + 1);
+            zyre_set_header(coreContext->node, "logger", "%s", insert + 1);
             bus_zyreUnlock();
         }
     }
     
     //set other headers for agent
     bus_zyreLock();
-    zyre_set_header(agent->loopElements->node, "canBeFrozen", "%i", agent->canBeFrozen);
+    zyre_set_header(coreContext->node, "canBeFrozen", "%i", agent->canBeFrozen);
     bus_zyreUnlock();
 
 #if defined __unix__ || defined __APPLE__ || defined __linux__
     ssize_t ret;
-    agent->loopElements->processId = getpid();
+    coreContext->processId = getpid();
     bus_zyreLock();
-    zyre_set_header(agent->loopElements->node, "pid", "%i", agent->loopElements->processId);
+    zyre_set_header(coreContext->node, "pid", "%i", coreContext->processId);
     bus_zyreUnlock();
     
     if (strlen(agent->commandLine) == 0){
@@ -1692,7 +1690,7 @@ void initLoop (igs_agent_t *agent){
         ret = 1;
 #elif TARGET_OS_OSX
         char pathbuf[PROC_PIDPATHINFO_MAXSIZE];
-        ret = proc_pidpath (agent->loopElements->processId, pathbuf, sizeof(pathbuf));
+        ret = proc_pidpath (coreContext->processId, pathbuf, sizeof(pathbuf));
 #endif
 #else
         char pathbuf[4*1024];
@@ -1700,16 +1698,16 @@ void initLoop (igs_agent_t *agent){
         ret = readlink("/proc/self/exe", pathbuf, sizeof(pathbuf));
 #endif
         if ( ret <= 0 ) {
-            igsAgent_error(agent, "PID %d: proc_pidpath () - %s", agent->loopElements->processId, strerror(errno));
+            igsAgent_error(agent, "PID %d: proc_pidpath () - %s", coreContext->processId, strerror(errno));
         } else {
-            igsAgent_debug(agent, "proc %d: %s", agent->loopElements->processId, pathbuf);
+            igsAgent_debug(agent, "proc %d: %s", coreContext->processId, pathbuf);
         }
         bus_zyreLock();
-        zyre_set_header(agent->loopElements->node, "commandline", "%s", pathbuf);
+        zyre_set_header(coreContext->node, "commandline", "%s", pathbuf);
         bus_zyreUnlock();
     }else{
         bus_zyreLock();
-        zyre_set_header(agent->loopElements->node, "commandline", "%s", agent->commandLine);
+        zyre_set_header(coreContext->node, "commandline", "%s", agent->commandLine);
         bus_zyreUnlock();
     }
 #endif
@@ -1732,17 +1730,17 @@ void initLoop (igs_agent_t *agent){
 #endif
         
         bus_zyreLock();
-        zyre_set_header(agent->loopElements->node, "commandline", "%s", exeFilePath);
+        zyre_set_header(coreContext->node, "commandline", "%s", exeFilePath);
         bus_zyreUnlock();
     }else{
         bus_zyreLock();
-        zyre_set_header(agent->loopElements->node, "commandline", "%s", agent->commandLine);
+        zyre_set_header(coreContext->node, "commandline", "%s", agent->commandLine);
         bus_zyreUnlock();
     }
     DWORD pid = GetCurrentProcessId();
-    agent->loopElements->processId = (int)pid;
+    coreContext->processId = (int)pid;
     bus_zyreLock();
-    zyre_set_header(agent->loopElements->node, "pid", "%i", (int)pid);
+    zyre_set_header(coreContext->node, "pid", "%i", (int)pid);
     bus_zyreUnlock();
 #endif
 
@@ -1754,7 +1752,7 @@ void initLoop (igs_agent_t *agent){
         WSACleanup();
     #endif
     bus_zyreLock();
-    zyre_set_header(agent->loopElements->node, "hostname", "%s", hostname);
+    zyre_set_header(coreContext->node, "hostname", "%s", hostname);
     bus_zyreUnlock();
     //code for Fully Qualified Domain Name if needed someday
 //    struct addrinfo hints, *info, *p;
@@ -1773,7 +1771,7 @@ void initLoop (igs_agent_t *agent){
 //    freeaddrinfo(info);
     
     if (canContinue){
-        agent->loopElements->agentActor = zactor_new(runLoop, agent);
+        coreContext->agentActor = zactor_new(runLoop, agent);
     }
 }
 
@@ -1789,7 +1787,7 @@ int network_publishOutput (igs_agent_t *agent, const igs_iop_t *iop){
     }
     
     model_readWriteLock();
-    if(agent->loopElements != NULL && agent->loopElements->publisher != NULL && iop != NULL)
+    if(coreContext != NULL && coreContext->publisher != NULL && iop != NULL)
     {
         if(!agent->isWholeAgentMuted && !iop->is_muted && iop->name != NULL && !agent->isFrozen)
         {
@@ -1828,22 +1826,22 @@ int network_publishOutput (igs_agent_t *agent, const igs_iop_t *iop){
             }
             zmsg_t *msgBis = zmsg_dup(msg);
             //successively publish to TCP, IPC and inproc
-            if (zmsg_send(&msg, agent->loopElements->publisher) != 0){
+            if (zmsg_send(&msg, coreContext->publisher) != 0){
                 igsAgent_error(agent, "Could not publish output %s on the network\n",iop->name);
                 zmsg_destroy(&msgBis);
             }else{
                 result = 1;
                 zmsg_t *msgTer = zmsg_dup(msgBis);
-                if (agent->loopElements->ipcPublisher != NULL){
+                if (coreContext->ipcPublisher != NULL){
                     //publisher can be NULL on IOS or for read/write problems with assigned IPC path
                     //in both cases, an error message has been issued at start
-                    if (zmsg_send(&msgBis, agent->loopElements->ipcPublisher) != 0){
+                    if (zmsg_send(&msgBis, coreContext->ipcPublisher) != 0){
                         igsAgent_error(agent, "Could not publish output %s using IPC\n",iop->name);
                         zmsg_destroy(&msgBis);
                     }
                 }
-                if (agent->loopElements->inprocPublisher != NULL){
-                    if (zmsg_send(&msgTer, agent->loopElements->inprocPublisher) != 0){
+                if (coreContext->inprocPublisher != NULL){
+                    if (zmsg_send(&msgTer, coreContext->inprocPublisher) != 0){
                         igsAgent_error(agent, "Could not publish output %s using inproc\n",iop->name);
                         zmsg_destroy(&msgTer);
                     }
@@ -1901,17 +1899,17 @@ int igs_startWithDevice(const char *networkDevice, unsigned int port){
         return 0;
     }
     
-    if (agent->loopElements != NULL){
+    if (coreContext != NULL){
         //Agent is already active : need to stop it first
         igsAgent_stop(agent);
     }
     
     agent->isInterrupted = false;
     agent->forcedStop = false;
-    agent->loopElements = calloc(1, sizeof(igs_network_context_t));
-    strncpy(agent->loopElements->networkDevice, networkDevice, IGS_NETWORK_DEVICE_LENGTH-1);
-    agent->loopElements->brokerEndPoint[0] = '\0';
-    agent->loopElements->ipAddress[0] = '\0';
+    coreContext = calloc(1, sizeof(igs_network_context_t));
+    strncpy(coreContext->networkDevice, networkDevice, IGS_NETWORK_DEVICE_LENGTH-1);
+    coreContext->brokerEndPoint[0] = '\0';
+    coreContext->ipAddress[0] = '\0';
     
 #if (defined WIN32 || defined _WIN32)
     WORD version_requested = MAKEWORD (2, 2);
@@ -1929,26 +1927,26 @@ int igs_startWithDevice(const char *networkDevice, unsigned int port){
 //        printf (" - name=%s address=%s netmask=%s broadcast=%s\n",
 //                name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist));
         if (strcmp(name, networkDevice) == 0){
-            strncpy(agent->loopElements->ipAddress, ziflist_address (iflist), IGS_IP_ADDRESS_LENGTH-1);
-            igsAgent_info(agent, "Starting with ip address %s and port %d on device %s", agent->loopElements->ipAddress, port, networkDevice);
+            strncpy(coreContext->ipAddress, ziflist_address (iflist), IGS_IP_ADDRESS_LENGTH-1);
+            igsAgent_info(agent, "Starting with ip address %s and port %d on device %s", coreContext->ipAddress, port, networkDevice);
             break;
         }
         name = ziflist_next (iflist);
     }
     ziflist_destroy (&iflist);
     
-    if (strlen(agent->loopElements->ipAddress) == 0){
+    if (strlen(coreContext->ipAddress) == 0){
         igsAgent_error(agent, "IP address could not be determined on device %s : our agent will NOT start", networkDevice);
-        free(agent->loopElements);
-        agent->loopElements = NULL;
+        free(coreContext);
+        coreContext = NULL;
         return 0;
     }
 #if !TARGET_OS_IOS
     license_readLicense(agent);
 #endif
-    agent->loopElements->zyrePort = port;
+    coreContext->zyrePort = port;
     initLoop(agent);
-    assert (agent->loopElements->agentActor);
+    assert (coreContext->agentActor);
     return 1;
 }
 
@@ -1958,15 +1956,15 @@ int igs_startWithIP(const char *ipAddress, unsigned int port){
         return 0;
     }
     
-    if (agent->loopElements != NULL){
+    if (coreContext != NULL){
         //Agent is already active : need to stop it first
         igsAgent_stop(agent);
     }
     agent->isInterrupted = false;
     agent->forcedStop = false;
-    agent->loopElements = calloc(1, sizeof(igs_network_context_t));
-    agent->loopElements->brokerEndPoint[0] = '\0';
-    strncpy(agent->loopElements->ipAddress, ipAddress, IGS_IP_ADDRESS_LENGTH-1);
+    coreContext = calloc(1, sizeof(igs_network_context_t));
+    coreContext->brokerEndPoint[0] = '\0';
+    strncpy(coreContext->ipAddress, ipAddress, IGS_IP_ADDRESS_LENGTH-1);
     
 #if (defined WIN32 || defined _WIN32)
     WORD version_requested = MAKEWORD (2, 2);
@@ -1984,26 +1982,26 @@ int igs_startWithIP(const char *ipAddress, unsigned int port){
 //        printf (" - name=%s address=%s netmask=%s broadcast=%s\n",
 //                name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist));
         if (strcmp(ziflist_address (iflist), ipAddress) == 0){
-            strncpy(agent->loopElements->networkDevice, name, 15);
-            igsAgent_info(agent, "Starting with ip address %s and port %d on device %s", ipAddress, port, agent->loopElements->networkDevice);
+            strncpy(coreContext->networkDevice, name, 15);
+            igsAgent_info(agent, "Starting with ip address %s and port %d on device %s", ipAddress, port, coreContext->networkDevice);
             break;
         }
         name = ziflist_next (iflist);
     }
     ziflist_destroy (&iflist);
     
-    if (strlen(agent->loopElements->networkDevice) == 0){
+    if (strlen(coreContext->networkDevice) == 0){
         igsAgent_error(agent, "Device name could not be determined for IP address %s : our agent will NOT start", ipAddress);
-        agent->loopElements = NULL;
-        free(agent->loopElements);
+        coreContext = NULL;
+        free(coreContext);
         return 0;
     }
 #if !TARGET_OS_IOS
     license_readLicense(agent);
 #endif
-    agent->loopElements->zyrePort = port;
+    coreContext->zyrePort = port;
     initLoop(agent);
-    assert (agent->loopElements->agentActor);
+    assert (coreContext->agentActor);
     return 1;
 }
 
@@ -2018,16 +2016,16 @@ int igsAgent_startWithDeviceOnBroker(igs_agent_t *agent, const char *networkDevi
         return 0;
     }
     
-    if (agent->loopElements != NULL){
+    if (coreContext != NULL){
         igsAgent_stop(agent);
     }
     agent->isInterrupted = false;
     agent->forcedStop = false;
     
-    agent->loopElements = calloc(1, sizeof(igs_network_context_t));
-    strncpy(agent->loopElements->brokerEndPoint, brokerEndpoint, IGS_IP_ADDRESS_LENGTH-1);
-    strncpy(agent->loopElements->networkDevice, networkDevice, IGS_NETWORK_DEVICE_LENGTH-1);
-    agent->loopElements->ipAddress[0] = '\0';
+    coreContext = calloc(1, sizeof(igs_network_context_t));
+    strncpy(coreContext->brokerEndPoint, brokerEndpoint, IGS_IP_ADDRESS_LENGTH-1);
+    strncpy(coreContext->networkDevice, networkDevice, IGS_NETWORK_DEVICE_LENGTH-1);
+    coreContext->ipAddress[0] = '\0';
     
 #if (defined WIN32 || defined _WIN32)
     WORD version_requested = MAKEWORD (2, 2);
@@ -2045,48 +2043,48 @@ int igsAgent_startWithDeviceOnBroker(igs_agent_t *agent, const char *networkDevi
         //        printf (" - name=%s address=%s netmask=%s broadcast=%s\n",
         //                name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist));
         if (strcmp(name, networkDevice) == 0){
-            strncpy(agent->loopElements->ipAddress, ziflist_address (iflist), IGS_IP_ADDRESS_LENGTH-1);
+            strncpy(coreContext->ipAddress, ziflist_address (iflist), IGS_IP_ADDRESS_LENGTH-1);
             igsAgent_info(agent, "Starting with ip address %s on device %s with broker %s",
-                      agent->loopElements->ipAddress,
+                      coreContext->ipAddress,
                       networkDevice,
-                      agent->loopElements->brokerEndPoint);
+                      coreContext->brokerEndPoint);
             break;
         }
         name = ziflist_next (iflist);
     }
     ziflist_destroy (&iflist);
     
-    if (strlen(agent->loopElements->ipAddress) == 0){
+    if (strlen(coreContext->ipAddress) == 0){
         igsAgent_error(agent, "IP address could not be determined on device %s : our agent will NOT start", networkDevice);
-        free(agent->loopElements);
-        agent->loopElements = NULL;
+        free(coreContext);
+        coreContext = NULL;
         return 0;
     }
 #if !TARGET_OS_IOS
     license_readLicense(agent);
 #endif
-    agent->loopElements->zyrePort = 0;
+    coreContext->zyrePort = 0;
     initLoop(agent);
-    assert (agent->loopElements->agentActor);
+    assert (coreContext->agentActor);
     return 1;
 }
 
 
 int igs_stop(){
-    if (agent->loopElements != NULL){
+    if (coreContext != NULL){
         //interrupting and destroying ingescape thread and zyre layer
         //this will also clean all agent->subscribers
-        if (agent->loopElements->agentActor != NULL){
+        if (coreContext->agentActor != NULL){
             if (!agent->forcedStop){
                 //NB: if agent has been forcibly stopped, actor is already stopping
                 //and this command would deadlock.
-                zstr_sendx (agent->loopElements->agentActor, "$TERM", NULL);
+                zstr_sendx (coreContext->agentActor, "$TERM", NULL);
             }
             //This function will block until runLoop has terminated
-            zactor_destroy(&agent->loopElements->agentActor);
+            zactor_destroy(&coreContext->agentActor);
         }
-        free(agent->loopElements);
-        agent->loopElements = NULL;
+        free(coreContext);
+        coreContext = NULL;
         //igsAgent_debug(agent, "still %d agents running in process", igs_nbOfAgentsInProcess);
 #if (defined WIN32 || defined _WIN32)
         // On Windows, if we don't call zsys_shutdown, the application will crash on exit
@@ -2108,8 +2106,8 @@ int igs_stop(){
 }
 
 bool igs_isStarted(){
-    if (agent != NULL && agent->loopElements != NULL
-        && agent->loopElements->loop != NULL){
+    if (agent != NULL && coreContext != NULL
+        && coreContext->loop != NULL){
         return true;
     }else{
         return false;
@@ -2129,11 +2127,11 @@ int igsAgent_setAgentName(igs_agent_t *agent, const char *name){
     char ipAddress[IGS_IP_ADDRESS_LENGTH] = "";
     int zyrePort = 0;
     bool needRestart = false;
-    if (agent->loopElements != NULL){
+    if (coreContext != NULL){
         //Agent is already started, zyre actor needs to be recreated
-        strncpy(networkDevice, agent->loopElements->networkDevice, IGS_NETWORK_DEVICE_LENGTH);
-        strncpy(ipAddress, agent->loopElements->ipAddress, IGS_IP_ADDRESS_LENGTH);
-        zyrePort = agent->loopElements->zyrePort;
+        strncpy(networkDevice, coreContext->networkDevice, IGS_NETWORK_DEVICE_LENGTH);
+        strncpy(ipAddress, coreContext->ipAddress, IGS_IP_ADDRESS_LENGTH);
+        zyrePort = coreContext->zyrePort;
         igsAgent_stop(agent);
         needRestart = true;
     }
@@ -2177,9 +2175,9 @@ int igsAgent_freeze(igs_agent_t *agent){
     if(agent->isFrozen == false)
     {
         igsAgent_debug(agent, "Agent frozen");
-        if ((agent->loopElements != NULL) && (agent->loopElements->node != NULL)){
+        if ((coreContext != NULL) && (coreContext->node != NULL)){
             bus_zyreLock();
-            zyre_shouts(agent->loopElements->node, CHANNEL, "FROZEN=1");
+            zyre_shouts(coreContext->node, IGS_PRIVATE_CHANNEL, "FROZEN=1");
             bus_zyreUnlock();
         }
         agent->isFrozen = true;
@@ -2201,9 +2199,9 @@ int igsAgent_unfreeze(igs_agent_t *agent){
     if(agent->isFrozen == true)
     {
         igsAgent_debug(agent, "Agent resumed (unfrozen)");
-        if ((agent->loopElements != NULL) && (agent->loopElements->node != NULL)){
+        if ((coreContext != NULL) && (coreContext->node != NULL)){
             bus_zyreLock();
-            zyre_shouts(agent->loopElements->node, CHANNEL, "FROZEN=0");
+            zyre_shouts(coreContext->node, IGS_PRIVATE_CHANNEL, "FROZEN=0");
             bus_zyreUnlock();
         }
         agent->isFrozen = false;
@@ -2239,9 +2237,9 @@ int igsAgent_setAgentState(igs_agent_t *agent, const char *state){
     if (strcmp(state, agent->agentState) != 0){
         strncpy(agent->agentState, state, IGS_MAX_AGENT_NAME_LENGTH-1);
         igsAgent_debug(agent, "changed to %s", agent->agentState);
-        if (agent->loopElements != NULL && agent->loopElements->node != NULL){
+        if (coreContext != NULL && coreContext->node != NULL){
             bus_zyreLock();
-            zyre_shouts(agent->loopElements->node, CHANNEL, "STATE=%s", agent->agentState);
+            zyre_shouts(coreContext->node, IGS_PRIVATE_CHANNEL, "STATE=%s", agent->agentState);
             bus_zyreUnlock();
         }
     }
@@ -2256,12 +2254,12 @@ char *igsAgent_getAgentState(igs_agent_t *agent){
 
 void igsAgent_setCanBeFrozen(igs_agent_t *agent, bool canBeFrozen){
     agent->canBeFrozen = canBeFrozen;
-    if (agent->loopElements != NULL && agent->loopElements->node != NULL){
+    if (coreContext != NULL && coreContext->node != NULL){
         bus_zyreLock();
         //update header for information to agents not arrived yet
-        zyre_set_header(agent->loopElements->node, "canBeFrozen", "%i", agent->canBeFrozen);
+        zyre_set_header(coreContext->node, "canBeFrozen", "%i", agent->canBeFrozen);
         //send real time notification for agents already there
-        zyre_shouts(agent->loopElements->node, CHANNEL, "CANBEFROZEN=%i", canBeFrozen);
+        zyre_shouts(coreContext->node, IGS_PRIVATE_CHANNEL, "CANBEFROZEN=%i", canBeFrozen);
         bus_zyreUnlock();
         igsAgent_debug(agent, "changed to %d", canBeFrozen);
     }
@@ -2277,9 +2275,9 @@ int igsAgent_mute(igs_agent_t *agent){
     if (!agent->isWholeAgentMuted)
     {
         agent->isWholeAgentMuted = true;
-        if ((agent->loopElements != NULL) && (agent->loopElements->node != NULL)){
+        if ((coreContext != NULL) && (coreContext->node != NULL)){
             bus_zyreLock();
-            zyre_shouts(agent->loopElements->node, CHANNEL, "MUTED=%i", agent->isWholeAgentMuted);
+            zyre_shouts(coreContext->node, IGS_PRIVATE_CHANNEL, "MUTED=%i", agent->isWholeAgentMuted);
             bus_zyreUnlock();
         }
         igs_mute_callback_t *elt;
@@ -2295,9 +2293,9 @@ int igsAgent_unmute(igs_agent_t *agent){
     if (agent->isWholeAgentMuted)
     {
         agent->isWholeAgentMuted = false;
-        if ((agent->loopElements != NULL) && (agent->loopElements->node != NULL)){
+        if ((coreContext != NULL) && (coreContext->node != NULL)){
             bus_zyreLock();
-            zyre_shouts(agent->loopElements->node, CHANNEL, "MUTED=%i", agent->isWholeAgentMuted);
+            zyre_shouts(coreContext->node, IGS_PRIVATE_CHANNEL, "MUTED=%i", agent->isWholeAgentMuted);
             bus_zyreUnlock();
         }
         igs_mute_callback_t *elt;
@@ -2505,25 +2503,25 @@ void igsAgent_observeForcedStop(igs_agent_t *agent, igsAgent_forcedStopCallback 
 }
 
 void igs_setDiscoveryInterval(unsigned int interval){
-    if (agent->loopElements != NULL && agent->loopElements->node != NULL){
+    if (coreContext != NULL && coreContext->node != NULL){
         bus_zyreLock();
-        zyre_set_interval(agent->loopElements->node, interval);
+        zyre_set_interval(coreContext->node, interval);
         bus_zyreUnlock();
     }
     agent->network_discoveryInterval = interval;
 }
 
 void igs_setAgentTimeout(unsigned int duration){
-    if (agent->loopElements != NULL && agent->loopElements->node != NULL){
+    if (coreContext != NULL && coreContext->node != NULL){
         bus_zyreLock();
-        zyre_set_expired_timeout(agent->loopElements->node, duration);
+        zyre_set_expired_timeout(coreContext->node, duration);
         bus_zyreUnlock();
     }
     agent->network_agentTimeout = duration;
 }
 
 void igs_setPublishingPort(unsigned int port){
-    if (agent->loopElements != NULL && agent->loopElements->publisher != NULL){
+    if (coreContext != NULL && coreContext->publisher != NULL){
         igsAgent_error(agent, "agent is already started : stop it first to change its publishing port");
         return;
     }
@@ -2531,7 +2529,7 @@ void igs_setPublishingPort(unsigned int port){
 }
 
 void igs_setLogStreamPort(unsigned int port){
-    if (agent->loopElements != NULL && agent->loopElements->logger != NULL){
+    if (coreContext != NULL && coreContext->logger != NULL){
         igsAgent_error(agent, "agent is already started : stop it first to change its logger port");
         return;
     }
@@ -2585,9 +2583,9 @@ void igs_setHighWaterMarks(int hwmValue){
         igsAgent_error(agent, "HWM value must be zero or higher");
         return;
     }
-    if (agent->loopElements != NULL && agent->loopElements->publisher != NULL){
-        zsock_set_sndhwm(agent->loopElements->publisher, hwmValue);
-        zsock_set_sndhwm(agent->loopElements->logger, hwmValue);
+    if (coreContext != NULL && coreContext->publisher != NULL){
+        zsock_set_sndhwm(coreContext->publisher, hwmValue);
+        zsock_set_sndhwm(coreContext->logger, hwmValue);
         igs_subscriber_t *tmp = NULL, *subs = NULL;
         HASH_ITER(hh, agent->subscribers, subs, tmp){
             zsock_set_rcvhwm(subs->subscriber, hwmValue);
@@ -2597,7 +2595,7 @@ void igs_setHighWaterMarks(int hwmValue){
 }
 
 int igs_timerStart(size_t delay, size_t times, igs_timerCallback cb, void *myData){
-    if (agent->loopElements == NULL || agent->loopElements->loop == NULL){
+    if (coreContext == NULL || coreContext->loop == NULL){
         igs_error("agent %s must be started before creating a timer", agent->agentName);
         return -1;
     }
@@ -2609,23 +2607,23 @@ int igs_timerStart(size_t delay, size_t times, igs_timerCallback cb, void *myDat
     igs_timer_t *timer = calloc(1, sizeof(igs_timer_t));
     timer->cb = cb;
     timer->myData = myData;
-    timer->timerId = zloop_timer(agent->loopElements->loop, delay, times, network_timerCallback, timer);
-    HASH_ADD_INT(agent->loopElements->timers, timerId, timer);
+    timer->timerId = zloop_timer(coreContext->loop, delay, times, network_timerCallback, timer);
+    HASH_ADD_INT(coreContext->timers, timerId, timer);
     network_Unlock();
     return timer->timerId;
 }
 
 void igs_timerStop(int timerId){
-    if (agent->loopElements->loop == NULL){
+    if (coreContext->loop == NULL){
         igs_error("agent must be started to destroy a timer");
         return;
     }
     network_Lock();
     igs_timer_t *timer = NULL;
-    HASH_FIND_INT(agent->loopElements->timers, &timerId, timer);
+    HASH_FIND_INT(coreContext->timers, &timerId, timer);
     if (timer != NULL){
-        zloop_timer_end(agent->loopElements->loop, timerId);
-        HASH_DEL(agent->loopElements->timers, timer);
+        zloop_timer_end(coreContext->loop, timerId);
+        HASH_DEL(coreContext->timers, timer);
         free(timer);
     }else{
         igs_error("could not find timer with id %d", timerId);
