@@ -209,7 +209,7 @@ void igs_addDataToArgumentsList(igs_callArgument_t **list, void *value, size_t s
 }
 
 
-int igsAgent_initCall(igsAgent_t *agent, const char *name, igsAgent_callFunction cb, void *myData){
+int igsAgent_initCall(igs_agent_t *agent, const char *name, igsAgent_callFunction cb, void *myData){
     igs_call_t *t = NULL;
     if(agent->definition == NULL){
         agent->definition = calloc(1, sizeof(igs_definition_t));
@@ -242,7 +242,7 @@ int igsAgent_initCall(igsAgent_t *agent, const char *name, igsAgent_callFunction
     return 1;
 }
 
-int igsAgent_removeCall(igsAgent_t *agent, const char *name){
+int igsAgent_removeCall(igs_agent_t *agent, const char *name){
     igs_call_t *t = NULL;
     if(agent->definition == NULL){
         igsAgent_error(agent, "No definition available yet");
@@ -259,7 +259,7 @@ int igsAgent_removeCall(igsAgent_t *agent, const char *name){
     return 1;
 }
 
-int igsAgent_addArgumentToCall(igsAgent_t *agent, const char *callName, const char *argName, iopType_t type){
+int igsAgent_addArgumentToCall(igs_agent_t *agent, const char *callName, const char *argName, iopType_t type){
     igs_call_t *t = NULL;
     if(agent->definition == NULL){
         igsAgent_error(agent, "No definition available yet");
@@ -293,7 +293,7 @@ int igsAgent_addArgumentToCall(igsAgent_t *agent, const char *callName, const ch
     return 1;
 }
 
-int igsAgent_removeArgumentFromCall(igsAgent_t *agent, const char *callName, const char *argName){
+int igsAgent_removeArgumentFromCall(igs_agent_t *agent, const char *callName, const char *argName){
     igs_call_t *t = NULL;
     if(agent->definition == NULL){
         igsAgent_error(agent, "No definition available yet");
@@ -328,12 +328,12 @@ int igsAgent_removeArgumentFromCall(igsAgent_t *agent, const char *callName, con
     return 1;
 }
 
-int igsAgent_sendCall(igsAgent_t *agent, const char *agentNameOrUUID, const char *callName, igs_callArgument_t **list){
+int igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, const char *callName, igs_callArgument_t **list){
     if (agentNameOrUUID == NULL || strlen(agentNameOrUUID) == 0){
         igsAgent_error(agent, "agent name or UUID must not be NULL or empty");
         return -1;
     }
-    zyreAgent_t *agt = NULL, *tmp = NULL;
+    igs_zyre_agent_t *agt = NULL, *tmp = NULL;
     bool found = false;
     HASH_ITER(hh, agent->zyreAgents, agt, tmp){
         if (strcmp(agt->name, agentNameOrUUID) == 0 || strcmp(agt->peerId, agentNameOrUUID) == 0){
@@ -418,7 +418,7 @@ int igsAgent_sendCall(igsAgent_t *agent, const char *agentNameOrUUID, const char
     return 1;
 }
 
-size_t igsAgent_getNumberOfCalls(igsAgent_t *agent){
+size_t igsAgent_getNumberOfCalls(igs_agent_t *agent){
     if (agent->definition == NULL){
         igsAgent_warn(agent, "definition is NULL");
         return 0;
@@ -426,7 +426,7 @@ size_t igsAgent_getNumberOfCalls(igsAgent_t *agent){
     return HASH_COUNT(agent->definition->calls_table);
 }
 
-bool igsAgent_checkCallExistence(igsAgent_t *agent, const char *name){
+bool igsAgent_checkCallExistence(igs_agent_t *agent, const char *name){
     if (agent->definition == NULL)
         return false;
     igs_call_t *t = NULL;
@@ -438,7 +438,7 @@ bool igsAgent_checkCallExistence(igsAgent_t *agent, const char *name){
     }
 }
 
-char** igsAgent_getCallsList(igsAgent_t *agent, size_t *nbOfElements){
+char** igsAgent_getCallsList(igs_agent_t *agent, size_t *nbOfElements){
     if (agent->definition == NULL){
         *nbOfElements = 0;
         return NULL;
@@ -469,7 +469,7 @@ void igs_freeCallsList(char **list, size_t nbOfCalls){
     free(list);
 }
 
-igs_callArgument_t* igsAgent_getFirstArgumentForCall(igsAgent_t *agent, const char *callName){
+igs_callArgument_t* igsAgent_getFirstArgumentForCall(igs_agent_t *agent, const char *callName){
     if (callName == NULL || strlen(callName) == 0){
         igsAgent_error(agent, "call name cannot be NULL or empty");
         return NULL;
@@ -487,7 +487,7 @@ igs_callArgument_t* igsAgent_getFirstArgumentForCall(igsAgent_t *agent, const ch
     return t->arguments;
 }
 
-size_t igsAgent_getNumberOfArgumentsForCall(igsAgent_t *agent, const char *callName){
+size_t igsAgent_getNumberOfArgumentsForCall(igs_agent_t *agent, const char *callName){
     if (callName == NULL || strlen(callName) == 0){
         igsAgent_error(agent, "call name cannot be NULL or empty");
         return 0;
@@ -508,7 +508,7 @@ size_t igsAgent_getNumberOfArgumentsForCall(igsAgent_t *agent, const char *callN
     return nb;
 }
 
-bool igsAgent_checkCallArgumentExistence(igsAgent_t *agent, const char *callName, const char *argName){
+bool igsAgent_checkCallArgumentExistence(igs_agent_t *agent, const char *callName, const char *argName){
     if (callName == NULL || strlen(callName) == 0){
         igsAgent_error(agent, "call name cannot be NULL or empty");
         return false;

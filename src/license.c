@@ -278,7 +278,7 @@ void switchToBundlePath(char **path){
 //parse license file content
 //NB: because several license files can be parsed, this function
 //takes the least restricting values found in the files
-void license_parseLine(const char *command, const char *data, license_t *myLicense){
+void license_parseLine(const char *command, const char *data, igs_license_t *myLicense){
     if (strcmp(command, "id") == 0 && data != NULL){
         if (myLicense->id != NULL){
             free(myLicense->id);
@@ -326,7 +326,7 @@ void license_parseLine(const char *command, const char *data, license_t *myLicen
     }else if (strcmp(command, "feature") == 0){
         zhash_insert(myLicense->features, data, NULL);
     }else if (strcmp(command, "agent") == 0){
-        licenseForAgent_t *l = calloc(1, sizeof(licenseForAgent_t));
+        igs_license_for_agent_t *l = calloc(1, sizeof(igs_license_for_agent_t));
         char agentId[256] = "";
         char agentName[256] = "";
         sscanf(data, "%255s %255s", agentId, agentName);
@@ -339,7 +339,7 @@ void license_parseLine(const char *command, const char *data, license_t *myLicen
 ////////////////////////////////////////////////////////////////////////
 // PRIVATE API
 ////////////////////////////////////////////////////////////////////////
-void license_cleanLicense(igsAgent_t *agent){
+void license_cleanLicense(igs_agent_t *agent){
     license_readWriteLock();
     if (agent->license != NULL){
         if (agent->license->id != NULL){
@@ -358,7 +358,7 @@ void license_cleanLicense(igsAgent_t *agent){
             zhash_destroy(&agent->license->features);
         }
         if (agent->license->agents != NULL){
-            licenseForAgent_t *l = zhash_first(agent->license->agents);
+            igs_license_for_agent_t *l = zhash_first(agent->license->agents);
             while (l != NULL){
                 if (l->agentId != NULL)
                     free(l->agentId);
@@ -370,7 +370,7 @@ void license_cleanLicense(igsAgent_t *agent){
             zhash_destroy(&agent->license->agents);
         }
         if (agent->license->licenseDetails != NULL){
-            license_t *detail = zlist_first(agent->license->licenseDetails);
+            igs_license_t *detail = zlist_first(agent->license->licenseDetails);
             while (detail != NULL){
                 if (detail->id != NULL){
                     free(detail->id);
@@ -391,7 +391,7 @@ void license_cleanLicense(igsAgent_t *agent){
                     zhash_destroy(&detail->features);
                 }
                 if (detail->agents != NULL){
-                    licenseForAgent_t *l = zhash_first(detail->agents);
+                    igs_license_for_agent_t *l = zhash_first(detail->agents);
                     while (l != NULL){
                         if (l->agentId != NULL)
                             free(l->agentId);
@@ -413,7 +413,7 @@ void license_cleanLicense(igsAgent_t *agent){
     license_readWriteUnlock();
 }
 
-void license_readLicense(igsAgent_t *agent){
+void license_readLicense(igs_agent_t *agent){
     if (agent->license == NULL){
         if (sodium_init() != 0) {
             //nothing to do ?
@@ -425,11 +425,11 @@ void license_readLicense(igsAgent_t *agent){
     
     if (agent->licenseData != NULL){
         // USE LICENSE DATA (and not files)
-        agent->license = calloc(1, sizeof(license_t));
+        agent->license = calloc(1, sizeof(igs_license_t));
         agent->license->features = zhash_new();
         agent->license->agents = zhash_new();
         agent->license->licenseDetails = zlist_new();
-        license_t *detail = calloc(1, sizeof(license_t));
+        igs_license_t *detail = calloc(1, sizeof(igs_license_t));
         zlist_append(agent->license->licenseDetails, detail);
         detail->features = zhash_new();
         detail->agents = zhash_new();
@@ -540,7 +540,7 @@ void license_readLicense(igsAgent_t *agent){
             }
             igsAgent_debug(agent, "%zu license(s) found", zlist_size(filesList));
             if (zlist_size(filesList) > 0){
-                agent->license = calloc(1, sizeof(license_t));
+                agent->license = calloc(1, sizeof(igs_license_t));
                 agent->license->features = zhash_new();
                 agent->license->agents = zhash_new();
                 agent->license->licenseDetails = zlist_new();
@@ -549,7 +549,7 @@ void license_readLicense(igsAgent_t *agent){
             //iterate on license files in folder
             zfile_t *file = zlist_first(filesList);
             while (file != NULL) {
-                license_t *detail = calloc(1, sizeof(license_t));
+                igs_license_t *detail = calloc(1, sizeof(igs_license_t));
                 zlist_append(agent->license->licenseDetails, detail);
                 detail->features = zhash_new();
                 detail->agents = zhash_new();
@@ -591,7 +591,7 @@ void license_readLicense(igsAgent_t *agent){
     //go through details to apply least contraining values in main license struct
     //NB: in case of using license raw data, there will only be one detail whereas
     //when using files, there will be one detail by file.
-    license_t *detail = NULL;
+    igs_license_t *detail = NULL;
     if (agent->license != NULL && agent->license->licenseDetails != NULL){
         detail = zlist_first(agent->license->licenseDetails);
     }
@@ -658,8 +658,8 @@ void license_readLicense(igsAgent_t *agent){
             k = zlist_first(agents);
             while (k != NULL){
                 if (zhash_lookup(agent->license->agents, k) == NULL){
-                    licenseForAgent_t *l = zhash_lookup(detail->agents, k);
-                    licenseForAgent_t *l_dup = calloc(1, sizeof(licenseForAgent_t));
+                    igs_license_for_agent_t *l = zhash_lookup(detail->agents, k);
+                    igs_license_for_agent_t *l_dup = calloc(1, sizeof(igs_license_for_agent_t));
                     l_dup->agentId = strdup(l->agentId);
                     l_dup->agentName = strdup(l->agentName);
                     zhash_insert(agent->license->agents, k, l_dup);
@@ -694,7 +694,7 @@ void license_readLicense(igsAgent_t *agent){
     // SET LICENSE DEFAULTS WHERE NEEDED
     if (agent->license == NULL){
         igs_license("no license found in %s : switching to demonstration mode", agent->licensePath);
-        agent->license = calloc(1, sizeof(license_t));
+        agent->license = calloc(1, sizeof(igs_license_t));
         agent->license->features = zhash_new();
         agent->license->agents = zhash_new();
     }
@@ -724,7 +724,7 @@ void license_readLicense(igsAgent_t *agent){
 ////////////////////////////////////////////////////////////////////////
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
-void igsAgent_setLicensePath(igsAgent_t *agent, const char *path){
+void igs_setLicensePath(const char *path){
     char reviewedPath[4096] = "";
     admin_makeFilePath(agent, path, reviewedPath, 4096);
     if (zsys_file_exists(reviewedPath)){
@@ -736,15 +736,15 @@ void igsAgent_setLicensePath(igsAgent_t *agent, const char *path){
         igs_license("%s does not exist", reviewedPath);
     }
 }
-char *igsAgent_getLicensePath(igsAgent_t *agent){
+char *igs_getLicensePath(){
     return strdup(agent->licensePath);
 }
 
-bool igsAgent_checkLicense(igsAgent_t *agent, const char *agentId){
+bool igs_checkLicense(const char *agentId){
     license_readLicense(agent);
     if (agentId == NULL)
         return false;
-    licenseForAgent_t *l = zhash_first(agent->license->agents);
+    igs_license_for_agent_t *l = zhash_first(agent->license->agents);
     while (l != NULL) {
         if (l->agentId != NULL
             && strcmp(agentId, l->agentId) == 0){
@@ -755,15 +755,15 @@ bool igsAgent_checkLicense(igsAgent_t *agent, const char *agentId){
     return false;
 }
 
-int igsAgent_observeLicense(igsAgent_t *agent, igsAgent_licenseCallback cb, void *myData){
-    license_callback_t *l = (license_callback_t *)calloc(1, sizeof(license_callback_t));
+int igs_observeLicense(igsAgent_licenseCallback cb, void *myData){
+    igs_license_callback_t *l = (igs_license_callback_t *)calloc(1, sizeof(igs_license_callback_t));
     l->callback_ptr = cb;
     l->data = myData;
     DL_APPEND(agent->licenseCallbacks, l);
     return 1;
 }
 
-void igsAgent_loadLicenseData(igsAgent_t *agent, const void *data, size_t size){
+void igs_loadLicenseData(const void *data, size_t size){
     if (data == NULL){
         igs_license("license data cannot be NULL");
         return;

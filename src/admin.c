@@ -68,7 +68,7 @@ void admin_computeTime(char *dest){
 #endif
     }
 
-void admin_makeFilePath(igsAgent_t *agent, const char *from, char *to, size_t size_of_to){
+void admin_makeFilePath(igs_agent_t *agent, const char *from, char *to, size_t size_of_to){
     if (from[0] == '~') {
         from++;
 #ifdef _WIN32
@@ -125,7 +125,7 @@ void admin_unlock(void) {
 ////////////////////////////////////////////////////////////////////////
 
 int igs_version(void){
-    igs_debug("IngeScape version : %d.%d.%d\n", INGESCAPE_MAJOR, INGESCAPE_MINOR, INGESCAPE_MICRO);
+    //igs_debug("IngeScape version : %d.%d.%d\n", INGESCAPE_MAJOR, INGESCAPE_MINOR, INGESCAPE_MICRO);
     return INGESCAPE_VERSION;
 }
 
@@ -134,7 +134,7 @@ int igs_protocol(void){
     return INGESCAPE_PROTOCOL;
 }
 
-void admin_log(igsAgent_t *agent, igs_logLevel_t level, const char *function, const char *fmt, ...){
+void admin_log(igs_agent_t *agent, igs_logLevel_t level, const char *function, const char *fmt, ...){
     admin_lock();
     initInternalAgentIfNeeded();
     
@@ -216,15 +216,15 @@ void admin_log(igsAgent_t *agent, igs_logLevel_t level, const char *function, co
 
 }
 
-void igsAgent_setLogLevel (igsAgent_t *agent, igs_logLevel_t level){
+void igs_setLogLevel (igs_logLevel_t level){
     agent->logLevel = level;
 }
 
-igs_logLevel_t igsAgent_getLogLevel (igsAgent_t *agent) {
+igs_logLevel_t igs_getLogLevel () {
     return agent->logLevel;
 }
 
-void igsAgent_setLogInFile (igsAgent_t *agent, bool allow){
+void igs_setLogInFile (bool allow){
     if (allow != agent->logInFile){
         initInternalAgentIfNeeded();
         agent->logInFile = allow;
@@ -240,27 +240,27 @@ void igsAgent_setLogInFile (igsAgent_t *agent, bool allow){
     }
 }
 
-bool igsAgent_getLogInFile (igsAgent_t *agent) {
+bool igs_getLogInFile () {
     return agent->logInFile;
 }
 
-void igsAgent_setVerbose (igsAgent_t *agent, bool allow){
+void igs_setVerbose (bool allow){
     agent->logInConsole = allow;
 }
 
-bool igsAgent_isVerbose (igsAgent_t *agent) {
+bool igs_isVerbose () {
     return agent->logInConsole;
 }
 
-void igsAgent_setUseColorVerbose (igsAgent_t *agent, bool allow){
+void igs_setUseColorVerbose (bool allow){
     agent->useColorInConsole = allow;
 }
 
-bool igsAgent_getUseColorVerbose (igsAgent_t *agent) {
+bool igs_getUseColorVerbose() {
     return agent->useColorInConsole;
 }
 
-void igsAgent_setLogStream(igsAgent_t *agent, bool stream){
+void igs_setLogStream(bool stream){
     if (stream != agent->logInStream){
         initInternalAgentIfNeeded();
         if (agent->loopElements != NULL){
@@ -284,11 +284,11 @@ void igsAgent_setLogStream(igsAgent_t *agent, bool stream){
     }
 }
 
-bool igsAgent_getLogStream (igsAgent_t *agent) {
+bool igs_getLogStream () {
     return agent->logInStream;
 }
 
-void igsAgent_setLogPath(igsAgent_t *agent, const char *path){
+void igs_setLogPath(const char *path){
     if ((path != NULL) && (strlen(path) > 0)){
         initInternalAgentIfNeeded();
         char tmpPath[4096] = "";
@@ -335,6 +335,6 @@ void igsAgent_setLogPath(igsAgent_t *agent, const char *path){
     }
 }
 
-char* igsAgent_getLogPath (igsAgent_t *agent) {
+char* igs_getLogPath () {
     return strdup(agent->logFilePath);
 }

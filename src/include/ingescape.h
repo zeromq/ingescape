@@ -42,13 +42,13 @@ extern "C" {
 //////////////////////////////////////////////////
 // Initialization and control
 
-//start & stop the agent
+//start & stop ingescape
 PUBLIC int igs_startWithDevice(const char *networkDevice, unsigned int port);
 PUBLIC int igs_startWithIP(const char *ipAddress, unsigned int port);
 PUBLIC int igs_stop(void);
 PUBLIC bool igs_isStarted(void);
 
-//There are four non-exclusive ways to stop the execution of an ingescape agent:
+//There are four non-exclusive ways to stop the execution of ingescape:
 //1- calling igs_stop from the hosting app's threads reacting on user actions or external events
 //2- handling SIGINT in the hosting app to call igs_stop and stop the rest of the app properly
 //3- monitoring the status of igs_Interrupted in the hosting app
@@ -96,27 +96,20 @@ PUBLIC bool igs_canBeFrozen(void);
 //IOP Model : Inputs, Outputs and Parameters read/write/check/observe/mute
 
 typedef enum {
-    IGS_INPUT_T = 1, ///< input of an agent.
-    IGS_OUTPUT_T,    ///< output of an agent.
-    IGS_PARAMETER_T  ///< parameter of an agent.
+    IGS_INPUT_T = 1,
+    IGS_OUTPUT_T,
+    IGS_PARAMETER_T
 } iop_t;
 
 typedef enum {
-    IGS_INTEGER_T = 1,  ///< integer value type
-    IGS_DOUBLE_T,       ///< double value type
-    IGS_STRING_T,       ///< string value type
-    IGS_BOOL_T,         ///< bool value type
-    IGS_IMPULSION_T,    ///< impulsion value type
-    IGS_DATA_T,         ///< data value type
-    IGS_UNKNOWN_T       ///< for unknown parsed types
+    IGS_INTEGER_T = 1,
+    IGS_DOUBLE_T,
+    IGS_STRING_T,
+    IGS_BOOL_T,
+    IGS_IMPULSION_T,
+    IGS_DATA_T,
+    IGS_UNKNOWN_T
 } iopType_t;
-
-//read IOP using void*
-// value : pointer to actual value, initialized by function, to be freed by user
-// size : size of returned value
-PUBLIC int igs_readInput(const char *name, void **value, size_t *size);
-PUBLIC int igs_readOutput(const char *name, void **value, size_t *size);
-PUBLIC int igs_readParameter(const char *name, void **value, size_t *size);
 
 //read per type
 PUBLIC bool igs_readInputAsBool(const char *name);
@@ -157,6 +150,14 @@ PUBLIC int igs_writeParameterAsInt(const char *name, int value);
 PUBLIC int igs_writeParameterAsDouble(const char *name, double value);
 PUBLIC int igs_writeParameterAsString(const char *name, const char *value);
 PUBLIC int igs_writeParameterAsData(const char *name, void *value, size_t size);
+
+//read IOP using memory space - use only when per-type read functions cannot
+// value : pointer to actual value, initialized by function, to be freed by user
+// size : size of returned value
+PUBLIC int igs_readInput(const char *name, void **value, size_t *size);
+PUBLIC int igs_readOutput(const char *name, void **value, size_t *size);
+PUBLIC int igs_readParameter(const char *name, void **value, size_t *size);
+
 
 //clear IOP data in memory without having to write the IOP
 //(relevant for IOPs with IGS_DATA_T type only)
@@ -220,7 +221,7 @@ PUBLIC int igs_removeParameter(const char *name);
 
 
 //////////////////////////////////////////////////
-//mapping
+//Mappings
 
 //load / set / get mapping
 PUBLIC int igs_loadMapping (const char* json_str);
@@ -242,11 +243,10 @@ PUBLIC int igs_removeMappingEntryWithName(const char *fromOurInput, const char *
 
 
 //////////////////////////////////////////////////
-//administration, configuration & utilities
+//Administration, configuration & utilities
 
 //IngeScape library version
 //returns MAJOR*10000 + MINOR*100 + MICRO
-//displays MAJOR.MINOR.MICRO in console
 PUBLIC int igs_version(void);
 
 //IngeScape protocol version
@@ -345,7 +345,6 @@ PUBLIC bool igs_getAllowInproc(void);
 
 //////////////////////////////////////////////////
 //licenses
-PUBLIC void igs_licenseGlobal(const char *function, const char *format, ...) CHECK_PRINTF (2);
 #define igs_license(...) igs_log(IGS_LOG_FATAL + 1, __func__, __VA_ARGS__)
 typedef enum {
     IGS_LICENSE_TIMEOUT = 0,

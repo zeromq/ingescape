@@ -60,7 +60,7 @@ void bus_zyreUnlock(void) {
 ////////////////////////////////////////////////////////////////////////
 // PUBLIC FUNCTIONS
 ////////////////////////////////////////////////////////////////////////
-void igsAgent_busJoinChannel(igsAgent_t *agent, const char *channel){
+void igsAgent_busJoinChannel(igs_agent_t *agent, const char *channel){
     if (strcmp(CHANNEL, channel) == 0){
         igsAgent_error(agent, "channel name %s is reserved and cannot be joined", channel);
         return;
@@ -73,7 +73,7 @@ void igsAgent_busJoinChannel(igsAgent_t *agent, const char *channel){
         igsAgent_error(agent, "igs_startWithDevice or igs_startWithIP must be called before joining a channel");
     }
 }
-void igsAgent_busLeaveChannel(igsAgent_t *agent, const char *channel){
+void igsAgent_busLeaveChannel(igs_agent_t *agent, const char *channel){
     if (agent->loopElements != NULL && agent->loopElements->node != NULL){
         bus_zyreLock();
         zyre_leave(agent->loopElements->node, channel);
@@ -83,7 +83,7 @@ void igsAgent_busLeaveChannel(igsAgent_t *agent, const char *channel){
     }
 }
 
-int igsAgent_busSendStringToChannel(igsAgent_t *agent, const char *channel, const char *msg, ...){
+int igsAgent_busSendStringToChannel(igs_agent_t *agent, const char *channel, const char *msg, ...){
     if (channel == NULL){
         igsAgent_debug(agent, "channel is NULL");
         return 0;
@@ -109,7 +109,7 @@ int igsAgent_busSendStringToChannel(igsAgent_t *agent, const char *channel, cons
     return res;
 }
 
-int igsAgent_busSendDataToChannel(igsAgent_t *agent, const char *channel, void *data, size_t size){
+int igsAgent_busSendDataToChannel(igs_agent_t *agent, const char *channel, void *data, size_t size){
     if (channel == NULL){
         igsAgent_debug(agent, "channel is NULL");
         return 0;
@@ -133,7 +133,7 @@ int igsAgent_busSendDataToChannel(igsAgent_t *agent, const char *channel, void *
     return res;
 }
 
-int igsAgent_busSendZMQMsgToChannel(igsAgent_t *agent, const char *channel, zmsg_t **msg_p){
+int igsAgent_busSendZMQMsgToChannel(igs_agent_t *agent, const char *channel, zmsg_t **msg_p){
     if (channel == NULL){
         igsAgent_debug(agent, "channel is NULL");
         return 0;
@@ -154,7 +154,7 @@ int igsAgent_busSendZMQMsgToChannel(igsAgent_t *agent, const char *channel, zmsg
     return res;
 }
 
-int igsAgent_busSendStringToAgent(igsAgent_t *agent, const char *agentNameOrPeerID, const char *msg, ...){
+int igsAgent_busSendStringToAgent(igs_agent_t *agent, const char *agentNameOrPeerID, const char *msg, ...){
     if (agent->loopElements == NULL || agent->loopElements->node == NULL){
         igsAgent_error(agent, "igs_startWithDevice or igs_startWithIP must be called before trying to send a message");
         return -1;
@@ -163,7 +163,7 @@ int igsAgent_busSendStringToAgent(igsAgent_t *agent, const char *agentNameOrPeer
         igsAgent_debug(agent, "agentNameOrPeerID is NULL");
         return 0;
     }
-    zyreAgent_t *el, *tmp;
+    igs_zyre_agent_t *el, *tmp;
     int res = 1;
     HASH_ITER(hh, agent->zyreAgents, el, tmp){
         if (strcmp(el->name, agentNameOrPeerID) == 0 || strcmp(el->peerId, agentNameOrPeerID) == 0){
@@ -181,7 +181,7 @@ int igsAgent_busSendStringToAgent(igsAgent_t *agent, const char *agentNameOrPeer
     return res;
 }
 
-int igsAgent_busSendDataToAgent(igsAgent_t *agent, const char *agentNameOrPeerID, void *data, size_t size){
+int igsAgent_busSendDataToAgent(igs_agent_t *agent, const char *agentNameOrPeerID, void *data, size_t size){
     if (agent->loopElements == NULL || agent->loopElements->node == NULL){
         igsAgent_error(agent, "igs_startWithDevice or igs_startWithIP must be called before trying to send a message");
         return -1;
@@ -190,7 +190,7 @@ int igsAgent_busSendDataToAgent(igsAgent_t *agent, const char *agentNameOrPeerID
         igsAgent_debug(agent, "agentNameOrPeerID is NULL");
         return 0;
     }
-    zyreAgent_t *el, *tmp;
+    igs_zyre_agent_t *el, *tmp;
     int res = 1;
     HASH_ITER(hh, agent->zyreAgents, el, tmp){
         if (strcmp(el->name, agentNameOrPeerID) == 0 || strcmp(el->peerId, agentNameOrPeerID) == 0){
@@ -206,7 +206,7 @@ int igsAgent_busSendDataToAgent(igsAgent_t *agent, const char *agentNameOrPeerID
     return res;
 }
 
-int igsAgent_busSendZMQMsgToAgent(igsAgent_t *agent, const char *agentNameOrPeerID, zmsg_t **msg_p){
+int igsAgent_busSendZMQMsgToAgent(igs_agent_t *agent, const char *agentNameOrPeerID, zmsg_t **msg_p){
     if (agent->loopElements == NULL || agent->loopElements->node == NULL){
         igsAgent_error(agent, "igs_startWithDevice or igs_startWithIP must be called before trying to send a message");
         return -1;
@@ -215,7 +215,7 @@ int igsAgent_busSendZMQMsgToAgent(igsAgent_t *agent, const char *agentNameOrPeer
         igsAgent_debug(agent, "agentNameOrPeerID is NULL");
         return 0;
     }
-    zyreAgent_t *el, *tmp;
+    igs_zyre_agent_t *el, *tmp;
     int res = 1;
     HASH_ITER(hh, agent->zyreAgents, el, tmp){
         if (strcmp(el->name, agentNameOrPeerID) == 0 || strcmp(el->peerId, agentNameOrPeerID) == 0){
@@ -230,7 +230,7 @@ int igsAgent_busSendZMQMsgToAgent(igsAgent_t *agent, const char *agentNameOrPeer
     return res;
 }
 
-void igsAgent_busAddServiceDescription(igsAgent_t *agent, const char *key, const char *value){
+void igsAgent_busAddServiceDescription(igs_agent_t *agent, const char *key, const char *value){
     if (strcmp(key, "publisher") != 0
         && strcmp(key, "logger") != 0
         && strcmp(key, "canBeFrozen") != 0
@@ -238,13 +238,13 @@ void igsAgent_busAddServiceDescription(igsAgent_t *agent, const char *key, const
         && strcmp(key, "commandline") != 0
         && strcmp(key, "hostname") != 0)
     {
-        serviceHeader_t *header;
+        igs_service_header_t *header;
         HASH_FIND_STR(agent->serviceHeaders, key, header);
         if (header != NULL){
             igsAgent_error(agent, "service key '%s' already defined : new value will be ignored", key);
             return;
         }
-        header = calloc(1, sizeof(serviceHeader_t));
+        header = calloc(1, sizeof(igs_service_header_t));
         header->key = strndup(key, MAX_STRING_MSG_LENGTH);
         header->value = strndup(value, MAX_STRING_MSG_LENGTH * 16);
         HASH_ADD_STR(agent->serviceHeaders, key, header);
@@ -253,7 +253,7 @@ void igsAgent_busAddServiceDescription(igsAgent_t *agent, const char *key, const
     }
 }
 
-void igsAgent_busRemoveServiceDescription(igsAgent_t *agent, const char *key){
+void igsAgent_busRemoveServiceDescription(igs_agent_t *agent, const char *key){
     if (strcmp(key, "publisher") != 0
         && strcmp(key, "logger") != 0
         && strcmp(key, "canBeFrozen") != 0
@@ -261,7 +261,7 @@ void igsAgent_busRemoveServiceDescription(igsAgent_t *agent, const char *key){
         && strcmp(key, "commandline") != 0
         && strcmp(key, "hostname") != 0)
     {
-        serviceHeader_t *header;
+        igs_service_header_t *header;
         HASH_FIND_STR(agent->serviceHeaders, key, header);
         if (header == NULL){
             igsAgent_warn(agent, "service key '%s' does not exist", key);

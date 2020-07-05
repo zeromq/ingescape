@@ -19,7 +19,7 @@ size_t performanceMsgSize = 0;
 int64_t performanceStart = 0;
 int64_t performanceStop = 0;
 
-void igsAgent_performanceCheck(igsAgent_t *agent, const char *peerId, size_t msgSize, size_t nbOfMsg){
+void igs_performanceCheck(const char *peerId, size_t msgSize, size_t nbOfMsg){
     if (agent->loopElements == NULL || agent->loopElements->node == NULL){
         igsAgent_error(agent, "agent must be started to execute performance tests");
         return;

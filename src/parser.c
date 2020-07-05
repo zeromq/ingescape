@@ -39,7 +39,7 @@
 #define MAP_NO_DESCRIPTION "NO_DESCRIPTION"
 #define MAP_NO_VERSION "NO_VERSION"
 
-char definition_path[IGS_MAX_PATH] = "";
+char definition_path[IGS_MAX_PATH_LENGTH] = "";
 
 iopType_t string_to_value_type(const char* str) {
     
@@ -113,8 +113,8 @@ const char* boolean_to_string (bool boolean) {
 ////////////////////////////////////////
 // IOP parsing
 
-//parse an agent_iop_t data and add it to the corresponding hash table
-static void json_add_iop_to_hash (agent_iop_t **hasht, iop_t type,
+//parse an igs_iop_t data and add it to the corresponding hash table
+static void json_add_iop_to_hash (igs_iop_t **hasht, iop_t type,
                                    igsyajl_val obj){
     const char *name = NULL;
     iopType_t valType = IGS_UNKNOWN_T;
@@ -138,10 +138,10 @@ static void json_add_iop_to_hash (agent_iop_t **hasht, iop_t type,
         }
     }
     
-    agent_iop_t *iop = NULL;
+    igs_iop_t *iop = NULL;
     if (name != NULL){
         //handle name, value type and value
-        char *n = strndup(name, MAX_IOP_NAME_LENGTH);
+        char *n = strndup(name, IGS_MAX_IOP_NAME_LENGTH);
         bool spaceInName = false;
         size_t lengthOfN = strlen(n);
         size_t i = 0;
@@ -156,7 +156,7 @@ static void json_add_iop_to_hash (agent_iop_t **hasht, iop_t type,
         }
         HASH_FIND_STR(*hasht, n, iop);
         if (iop == NULL){
-            iop = calloc (1, sizeof (agent_iop_t));
+            iop = calloc (1, sizeof (igs_iop_t));
             iop->name = n;
             iop->value_type = valType;
             switch (iop->value_type) {
@@ -192,9 +192,9 @@ static void json_add_iop_to_hash (agent_iop_t **hasht, iop_t type,
     }
 }
 
-//parse a tab of agent_iop_t data and add them into the corresponding hash table
+//parse a tab of igs_iop_t data and add them into the corresponding hash table
 static void json_add_iops (igsyajl_val node, const char** path, iop_t type,
-                           agent_iop_t **hasht) {
+                           igs_iop_t **hasht) {
     igsyajl_val v;
     v = igsyajl_tree_get(node, path, igsyajl_t_array);
 
@@ -235,7 +235,7 @@ static void json_parse_call_arguments (igs_call_t *call, igsyajl_val arguments){
                 }
                 
                 if (name != NULL){
-                    char *n = strndup(name, MAX_IOP_NAME_LENGTH);
+                    char *n = strndup(name, IGS_MAX_IOP_NAME_LENGTH);
                     bool spaceInName = false;
                     size_t lengthOfN = strlen(n);
                     size_t _i = 0;
@@ -292,7 +292,7 @@ static void json_add_call_to_hash (igs_call_t **hasht, igsyajl_val obj){
     }
     char *n = NULL;
     if (name != NULL){
-        n = strndup(name, MAX_IOP_NAME_LENGTH);
+        n = strndup(name, IGS_MAX_IOP_NAME_LENGTH);
         bool spaceInName = false;
         size_t lengthOfN = strlen(n);
         size_t i = 0;
@@ -315,7 +315,7 @@ static void json_add_call_to_hash (igs_call_t **hasht, igsyajl_val obj){
         call = calloc(1, sizeof(igs_call_t));
         call->name = n;
         if (description != NULL)
-            call->description = strndup(description, MAX_DESCRIPTION_LENGTH);
+            call->description = strndup(description, IGS_MAX_DESCRIPTION_LENGTH);
         if (arguments != NULL){
             json_parse_call_arguments(call, arguments);
         }
@@ -470,7 +470,7 @@ static igs_definition_t* json_parse_definition (igsyajl_val node) {
 }
 
 // parse a tab of mapping output type and add them into the corresponding hash table
-static void json_add_map_out_to_hash (mapping_element_t** hasht,
+static void json_add_map_out_to_hash (igs_mapping_element_t** hasht,
                                        igsyajl_val current_map_out){
 
     const char* input_name = NULL;
@@ -485,7 +485,7 @@ static void json_add_map_out_to_hash (mapping_element_t** hasht,
     if (v){
         input_name = IGSYAJL_GET_STRING(v);
     }
-    char *reviewedFromOurInput = strndup(input_name, MAX_IOP_NAME_LENGTH);
+    char *reviewedFromOurInput = strndup(input_name, IGS_MAX_IOP_NAME_LENGTH);
     bool spaceInName = false;
     size_t lengthOfReviewedFromOurInput = strlen(reviewedFromOurInput);
     size_t i = 0;
@@ -505,7 +505,7 @@ static void json_add_map_out_to_hash (mapping_element_t** hasht,
     if (v){
         agent_name = IGSYAJL_GET_STRING(v);
     }
-    char *reviewedToAgent = strndup(agent_name, MAX_IOP_NAME_LENGTH);
+    char *reviewedToAgent = strndup(agent_name, IGS_MAX_IOP_NAME_LENGTH);
     size_t lengthOfReviewedToAgent = strlen(reviewedToAgent);
     spaceInName = false;
     for (i = 0; i < lengthOfReviewedToAgent; i++){
@@ -524,7 +524,7 @@ static void json_add_map_out_to_hash (mapping_element_t** hasht,
     if (v){
         output_name = IGSYAJL_GET_STRING(v);
     }
-    char *reviewedWithOutput = strndup(output_name, MAX_IOP_NAME_LENGTH);
+    char *reviewedWithOutput = strndup(output_name, IGS_MAX_IOP_NAME_LENGTH);
     size_t lengthOfReviewedWithOutput = strlen(reviewedWithOutput);
     spaceInName = false;
     for (i = 0; i < lengthOfReviewedWithOutput; i++){
@@ -548,13 +548,13 @@ static void json_add_map_out_to_hash (mapping_element_t** hasht,
     unsigned long h = djb2_hash((unsigned char *)mashup);
     free (mashup);
     
-    mapping_element_t *tmp = NULL;
+    igs_mapping_element_t *tmp = NULL;
     if (*hasht != NULL){
         HASH_FIND(hh, *hasht, &h, sizeof(unsigned long), tmp);
     }
     if (tmp == NULL){
         //element does not exist yet : create and register it
-        mapping_element_t *new = mapping_createMappingElement(reviewedFromOurInput, reviewedToAgent, reviewedWithOutput);
+        igs_mapping_element_t *new = mapping_createMappingElement(reviewedFromOurInput, reviewedToAgent, reviewedWithOutput);
         new->id = h;
         HASH_ADD(hh, *hasht, id, sizeof(unsigned long), new);
     }
@@ -564,7 +564,7 @@ static void json_add_map_out_to_hash (mapping_element_t** hasht,
 }
 
 // parse a tab of mapping category type and add them into the corresponding hash table
-static void json_add_map_cat_to_hash (mapping_element_t** hasht,
+static void json_add_map_cat_to_hash (igs_mapping_element_t** hasht,
                                        igsyajl_val current_map_out){
     IGS_UNUSED(hasht)
     IGS_UNUSED(current_map_out)
@@ -731,8 +731,8 @@ static void json_dump_call (igsyajl_gen *g, igs_call_t *call) {
     igsyajl_gen_map_close(*g);
 }
 
-// convert an agent_iop_t structure into json string
-static void json_dump_iop (igsyajl_gen *g, agent_iop_t* aiop) {
+// convert an igs_iop_t structure into json string
+static void json_dump_iop (igsyajl_gen *g, igs_iop_t* aiop) {
     
     igsyajl_gen_map_open(*g);
     
@@ -789,7 +789,7 @@ static void json_dump_iop (igsyajl_gen *g, agent_iop_t* aiop) {
 static void json_dump_definition (igsyajl_gen *g, igs_definition_t* def) {
     
     unsigned int hashCount = 0;
-    agent_iop_t *d;
+    igs_iop_t *d;
     
     igsyajl_gen_map_open(*g);
     
@@ -872,7 +872,7 @@ static void json_dump_definition (igsyajl_gen *g, igs_definition_t* def) {
 }
 
 //convert a mapping_out structure into json string
-static void json_dump_mapping_out (igsyajl_gen *g, mapping_element_t* mapp_out) {
+static void json_dump_mapping_out (igsyajl_gen *g, igs_mapping_element_t* mapp_out) {
 
     igsyajl_gen_map_open(*g);
 
@@ -911,7 +911,7 @@ static void json_dump_mapping_out (igsyajl_gen *g, mapping_element_t* mapp_out) 
 static void json_dump_mapping (igsyajl_gen *g, igs_mapping_t* mapp) {
 
     unsigned int hashCount = 0;
-    mapping_element_t *currentMapOut = NULL;
+    igs_mapping_element_t *currentMapOut = NULL;
 
     if(mapp != NULL)
     {
@@ -1097,7 +1097,7 @@ igs_mapping_t* parser_LoadMapFromPath (const char* path){
 ////////////////////////////////////////////////////////////////////////
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
-int igsAgent_loadDefinition (igsAgent_t *agent, const char* json_str){
+int igsAgent_loadDefinition (igs_agent_t *agent, const char* json_str){
     
     //Check if the json string is null
     if(json_str == NULL)
@@ -1134,7 +1134,7 @@ int igsAgent_loadDefinition (igsAgent_t *agent, const char* json_str){
 }
 
 
-int igsAgent_loadDefinitionFromPath (igsAgent_t *agent, const char* file_path){
+int igsAgent_loadDefinitionFromPath (igs_agent_t *agent, const char* file_path){
     
     //Check if the json string is null
     if(file_path == NULL){
@@ -1156,7 +1156,7 @@ int igsAgent_loadDefinitionFromPath (igsAgent_t *agent, const char* file_path){
         igsAgent_debug(agent, "igs_loadDefinitionFromPath : %s caused an error and was ignored\n", file_path);
         return -1;
     }else{
-        strncpy(definition_path, file_path, IGS_MAX_PATH - 1);
+        strncpy(definition_path, file_path, IGS_MAX_PATH_LENGTH - 1);
         if (agent->definition != NULL){
             definition_freeDefinition(agent->definition);
             agent->definition = NULL;

@@ -13,53 +13,29 @@
 #include "ingescape_agent.h"
 #include "ingescape_private.h"
 
-igsAgent_t *globalAgent = NULL;
-int igs_nbOfAgentsInProcess = 0;
-bool igs_Interrupted = false;
-bool igs_shallRaiseFileDescriptorsLimit = true;
+igs_agent_t *coreAgent = NULL;
+//int igs_nbOfAgentsInProcess = 0;
+//bool igs_shallRaiseFileDescriptorsLimit = true;
 
-void globalforcedStopCB(igsAgent_t *agent, void *myData){
+void globalforcedStopCB(igs_agent_t *agent, void *myData){
     IGS_UNUSED(myData)
     IGS_UNUSED(agent)
     igs_Interrupted = true;
 }
 
 void initInternalAgentIfNeeded(){
-    if (globalAgent == NULL){
-        globalAgent = igsAgent_new();
-        igsAgent_observeForcedStop(globalAgent, globalforcedStopCB, NULL);
+    if (coreAgent == NULL){
+        coreAgent = igsAgent_new();
+        igsAgent_observeForcedStop(coreAgent, globalforcedStopCB, NULL);
     }
 }
-
-int igs_startWithDevice(const char *networkDevice, unsigned int port){
-    initInternalAgentIfNeeded();
-    igs_Interrupted = false;
-    return igsAgent_startWithDevice(globalAgent, networkDevice, port);
-}
-
-int igs_startWithIP(const char *ipAddress, unsigned int port){
-    initInternalAgentIfNeeded();
-    igs_Interrupted = false;
-    return igsAgent_startWithIP(globalAgent, ipAddress, port);
-}
-
-int igs_stop(void){
-    initInternalAgentIfNeeded();
-    return igsAgent_stop(globalAgent);
-}
-
-bool igs_isStarted(void){
-    initInternalAgentIfNeeded();
-    return igsAgent_isStarted(globalAgent);
-}
-
 
 typedef struct {
     igs_forcedStopCallback cb;
     void *myData;
 } observeForcedStopCbWrapper_t;
 
-void global_observeForcedStopCallback(igsAgent_t *agent, void *myData){
+void global_observeForcedStopCallback(igs_agent_t *agent, void *myData){
     IGS_UNUSED(agent)
     observeForcedStopCbWrapper_t *wrap = (observeForcedStopCbWrapper_t *)myData;
     wrap->cb(wrap->myData);
@@ -70,47 +46,42 @@ void igs_observeForcedStop(igs_forcedStopCallback cb, void *myData){
     observeForcedStopCbWrapper_t *wrap = calloc(1, sizeof(observeForcedStopCbWrapper_t));
     wrap->cb = cb;
     wrap->myData = myData;
-    igsAgent_observeForcedStop(globalAgent, global_observeForcedStopCallback, wrap);
-}
-
-void igs_die(void){
-    initInternalAgentIfNeeded();
-    igsAgent_die(globalAgent);
+    igsAgent_observeForcedStop(coreAgent, global_observeForcedStopCallback, wrap);
 }
 
 int igs_setAgentName(const char *name){
     initInternalAgentIfNeeded();
-    return igsAgent_setAgentName(globalAgent, name);
+    return igsAgent_setAgentName(coreAgent, name);
 }
 
 char *igs_getAgentName(void){
     initInternalAgentIfNeeded();
-    return igsAgent_getAgentName(globalAgent);
+    return igsAgent_getAgentName(coreAgent);
 }
 
 int igs_setAgentState(const char *state){
     initInternalAgentIfNeeded();
-    return igsAgent_setAgentState(globalAgent, state);
+    return igsAgent_setAgentState(coreAgent, state);
 }
 
 char *igs_getAgentState(void){
     initInternalAgentIfNeeded();
-    return igsAgent_getAgentState(globalAgent);
+    return igsAgent_getAgentState(coreAgent);
 }
 
 int igs_mute(void){
     initInternalAgentIfNeeded();
-    return igsAgent_mute(globalAgent);
+    return igsAgent_mute(coreAgent);
 }
 
 int igs_unmute(void){
     initInternalAgentIfNeeded();
-    return igsAgent_unmute(globalAgent);
+    return igsAgent_unmute(coreAgent);
 }
 
 bool igs_isMuted(void){
     initInternalAgentIfNeeded();
-    return igsAgent_isMuted(globalAgent);
+    return igsAgent_isMuted(coreAgent);
 }
 
 typedef struct {
@@ -118,7 +89,7 @@ typedef struct {
     void *myData;
 } observeMuteCbWrapper_t;
 
-void global_observeMuteCallback(igsAgent_t *agent, bool isMuted, void *myData){
+void global_observeMuteCallback(igs_agent_t *agent, bool isMuted, void *myData){
     IGS_UNUSED(agent)
     observeMuteCbWrapper_t *wrap = (observeMuteCbWrapper_t *)myData;
     wrap->cb(isMuted, wrap->myData);
@@ -129,22 +100,22 @@ int igs_observeMute(igs_muteCallback cb, void *myData){
     observeMuteCbWrapper_t *wrap = calloc(1, sizeof(observeMuteCbWrapper_t));
     wrap->cb = cb;
     wrap->myData = myData;
-    return igsAgent_observeMute(globalAgent, global_observeMuteCallback, wrap);
+    return igsAgent_observeMute(coreAgent, global_observeMuteCallback, wrap);
 }
 
 int igs_freeze(void){
     initInternalAgentIfNeeded();
-    return igsAgent_freeze(globalAgent);
+    return igsAgent_freeze(coreAgent);
 }
 
 bool igs_isFrozen(void){
     initInternalAgentIfNeeded();
-    return igsAgent_isFrozen(globalAgent);
+    return igsAgent_isFrozen(coreAgent);
 }
 
 int igs_unfreeze(void){
     initInternalAgentIfNeeded();
-    return igsAgent_unfreeze(globalAgent);
+    return igsAgent_unfreeze(coreAgent);
 }
 
 typedef struct {
@@ -152,7 +123,7 @@ typedef struct {
     void *myData;
 } observeFreezeCbWrapper_t;
 
-void global_observeFreezeCallback(igsAgent_t *agent, bool isPaused, void *myData){
+void global_observeFreezeCallback(igs_agent_t *agent, bool isPaused, void *myData){
     IGS_UNUSED(agent)
     observeFreezeCbWrapper_t *wrap = (observeFreezeCbWrapper_t *)myData;
     wrap->cb(isPaused, wrap->myData);
@@ -163,209 +134,209 @@ int igs_observeFreeze(igs_freezeCallback cb, void *myData){
     observeFreezeCbWrapper_t *wrap = calloc(1, sizeof(observeFreezeCbWrapper_t));
     wrap->cb = cb;
     wrap->myData = myData;
-    return igsAgent_observeFreeze(globalAgent, cb, wrap);
+    return igsAgent_observeFreeze(coreAgent, cb, wrap);
 }
 
 void igs_setCanBeFrozen(bool canBeFrozen){
     initInternalAgentIfNeeded();
-    igsAgent_setCanBeFrozen(globalAgent, canBeFrozen);
+    igsAgent_setCanBeFrozen(coreAgent, canBeFrozen);
 }
 
 bool igs_canBeFrozen(void){
     initInternalAgentIfNeeded();
-    return igsAgent_canBeFrozen(globalAgent);
+    return igsAgent_canBeFrozen(coreAgent);
 }
 
 
 //IOP
 int igs_readInput(const char *name, void **value, size_t *size){
     initInternalAgentIfNeeded();
-    return igsAgent_readInput(globalAgent, name, value, size);
+    return igsAgent_readInput(coreAgent, name, value, size);
 }
 
 int igs_readOutput(const char *name, void **value, size_t *size){
     initInternalAgentIfNeeded();
-    return igsAgent_readOutput(globalAgent, name, value, size);
+    return igsAgent_readOutput(coreAgent, name, value, size);
 }
 
 int igs_readParameter(const char *name, void **value, size_t *size){
     initInternalAgentIfNeeded();
-    return igsAgent_readParameter(globalAgent, name, value, size);
+    return igsAgent_readParameter(coreAgent, name, value, size);
 }
 
 bool igs_readInputAsBool(const char *name){
     initInternalAgentIfNeeded();
-    return igsAgent_readInputAsBool(globalAgent, name);
+    return igsAgent_readInputAsBool(coreAgent, name);
 }
 
 int igs_readInputAsInt(const char *name){
     initInternalAgentIfNeeded();
-    return igsAgent_readInputAsInt(globalAgent, name);
+    return igsAgent_readInputAsInt(coreAgent, name);
 }
 
 double igs_readInputAsDouble(const char *name){
     initInternalAgentIfNeeded();
-    return igsAgent_readInputAsDouble(globalAgent, name);
+    return igsAgent_readInputAsDouble(coreAgent, name);
 }
 
 char* igs_readInputAsString(const char *name){
     initInternalAgentIfNeeded();
-    return igsAgent_readInputAsString(globalAgent, name);
+    return igsAgent_readInputAsString(coreAgent, name);
 }
 
 int igs_readInputAsData(const char *name, void **data, size_t *size){
     initInternalAgentIfNeeded();
-    return igsAgent_readInputAsData(globalAgent, name, data, size);
+    return igsAgent_readInputAsData(coreAgent, name, data, size);
 }
 
 bool igs_readOutputAsBool(const char *name){
     initInternalAgentIfNeeded();
-    return igsAgent_readOutputAsBool(globalAgent, name);
+    return igsAgent_readOutputAsBool(coreAgent, name);
 }
 
 int igs_readOutputAsInt(const char *name){
     initInternalAgentIfNeeded();
-    return igsAgent_readOutputAsInt(globalAgent, name);
+    return igsAgent_readOutputAsInt(coreAgent, name);
 }
 
 double igs_readOutputAsDouble(const char *name){
     initInternalAgentIfNeeded();
-    return igsAgent_readOutputAsDouble(globalAgent, name);
+    return igsAgent_readOutputAsDouble(coreAgent, name);
 }
 
 char* igs_readOutputAsString(const char *name){
     initInternalAgentIfNeeded();
-    return igsAgent_readOutputAsString(globalAgent, name);
+    return igsAgent_readOutputAsString(coreAgent, name);
 }
 
 int igs_readOutputAsData(const char *name, void **data, size_t *size){
     initInternalAgentIfNeeded();
-    return igsAgent_readOutputAsData(globalAgent, name, data, size);
+    return igsAgent_readOutputAsData(coreAgent, name, data, size);
 }
 
 bool igs_readParameterAsBool(const char *name){
     initInternalAgentIfNeeded();
-    return igsAgent_readParameterAsBool(globalAgent, name);
+    return igsAgent_readParameterAsBool(coreAgent, name);
 }
 
 int igs_readParameterAsInt(const char *name){
     initInternalAgentIfNeeded();
-    return igsAgent_readParameterAsInt(globalAgent, name);
+    return igsAgent_readParameterAsInt(coreAgent, name);
 }
 
 double igs_readParameterAsDouble(const char *name){
     initInternalAgentIfNeeded();
-    return igsAgent_readParameterAsDouble(globalAgent, name);
+    return igsAgent_readParameterAsDouble(coreAgent, name);
 }
 
 char* igs_readParameterAsString(const char *name){
     initInternalAgentIfNeeded();
-    return igsAgent_readParameterAsString(globalAgent, name);
+    return igsAgent_readParameterAsString(coreAgent, name);
 }
 
 int igs_readParameterAsData(const char *name, void **data, size_t *size){
     initInternalAgentIfNeeded();
-    return igsAgent_readParameterAsData(globalAgent, name, data, size);
+    return igsAgent_readParameterAsData(coreAgent, name, data, size);
 }
 
 int igs_writeInputAsBool(const char *name, bool value){
     initInternalAgentIfNeeded();
-    return igsAgent_writeInputAsBool(globalAgent, name, value);
+    return igsAgent_writeInputAsBool(coreAgent, name, value);
 }
 
 int igs_writeInputAsInt(const char *name, int value){
     initInternalAgentIfNeeded();
-    return igsAgent_writeInputAsInt(globalAgent, name, value);
+    return igsAgent_writeInputAsInt(coreAgent, name, value);
 }
 
 int igs_writeInputAsDouble(const char *name, double value){
     initInternalAgentIfNeeded();
-    return igsAgent_writeInputAsDouble(globalAgent, name, value);
+    return igsAgent_writeInputAsDouble(coreAgent, name, value);
 }
 
 int igs_writeInputAsString(const char *name, const char *value){
     initInternalAgentIfNeeded();
-    return igsAgent_writeInputAsString(globalAgent, name, value);
+    return igsAgent_writeInputAsString(coreAgent, name, value);
 }
 
 int igs_writeInputAsImpulsion(const char *name){
     initInternalAgentIfNeeded();
-    return igsAgent_writeInputAsImpulsion(globalAgent, name);
+    return igsAgent_writeInputAsImpulsion(coreAgent, name);
 }
 
 int igs_writeInputAsData(const char *name, void *value, size_t size){
     initInternalAgentIfNeeded();
-    return igsAgent_writeInputAsData(globalAgent, name, value, size);
+    return igsAgent_writeInputAsData(coreAgent, name, value, size);
 }
 
 int igs_writeOutputAsBool(const char *name, bool value){
     initInternalAgentIfNeeded();
-    return igsAgent_writeOutputAsBool(globalAgent, name, value);
+    return igsAgent_writeOutputAsBool(coreAgent, name, value);
 }
 
 int igs_writeOutputAsInt(const char *name, int value){
     initInternalAgentIfNeeded();
-    return igsAgent_writeOutputAsInt(globalAgent, name, value);
+    return igsAgent_writeOutputAsInt(coreAgent, name, value);
 }
 
 int igs_writeOutputAsDouble(const char *name, double value){
     initInternalAgentIfNeeded();
-    return igsAgent_writeOutputAsDouble(globalAgent, name, value);
+    return igsAgent_writeOutputAsDouble(coreAgent, name, value);
 }
 
 int igs_writeOutputAsString(const char *name, const char *value){
     initInternalAgentIfNeeded();
-    return igsAgent_writeOutputAsString(globalAgent, name, value);
+    return igsAgent_writeOutputAsString(coreAgent, name, value);
 }
 
 int igs_writeOutputAsImpulsion(const char *name){
     initInternalAgentIfNeeded();
-    return igsAgent_writeOutputAsImpulsion(globalAgent, name);
+    return igsAgent_writeOutputAsImpulsion(coreAgent, name);
 }
 
 int igs_writeOutputAsData(const char *name, void *value, size_t size){
     initInternalAgentIfNeeded();
-    return igsAgent_writeOutputAsData(globalAgent, name, value, size);
+    return igsAgent_writeOutputAsData(coreAgent, name, value, size);
 }
 
 int igs_writeParameterAsBool(const char *name, bool value){
     initInternalAgentIfNeeded();
-    return igsAgent_writeParameterAsBool(globalAgent, name, value);
+    return igsAgent_writeParameterAsBool(coreAgent, name, value);
 }
 
 int igs_writeParameterAsInt(const char *name, int value){
     initInternalAgentIfNeeded();
-    return igsAgent_writeParameterAsInt(globalAgent, name, value);
+    return igsAgent_writeParameterAsInt(coreAgent, name, value);
 }
 
 int igs_writeParameterAsDouble(const char *name, double value){
     initInternalAgentIfNeeded();
-    return igsAgent_writeParameterAsDouble(globalAgent, name, value);
+    return igsAgent_writeParameterAsDouble(coreAgent, name, value);
 }
 
 int igs_writeParameterAsString(const char *name, const char *value){
     initInternalAgentIfNeeded();
-    return igsAgent_writeParameterAsString(globalAgent, name, value);
+    return igsAgent_writeParameterAsString(coreAgent, name, value);
 }
 
 int igs_writeParameterAsData(const char *name, void *value, size_t size){
     initInternalAgentIfNeeded();
-    return igsAgent_writeParameterAsData(globalAgent, name, value, size);
+    return igsAgent_writeParameterAsData(coreAgent, name, value, size);
 }
 
 void igs_clearDataForInput(const char *name){
     initInternalAgentIfNeeded();
-    igsAgent_clearDataForInput(globalAgent, name);
+    igsAgent_clearDataForInput(coreAgent, name);
 }
 
 void igs_clearDataForOutput(const char *name){
     initInternalAgentIfNeeded();
-    igsAgent_clearDataForOutput(globalAgent, name);
+    igsAgent_clearDataForOutput(coreAgent, name);
 }
 
 void igs_clearDataForParameter(const char *name){
     initInternalAgentIfNeeded();
-    igsAgent_clearDataForParameter(globalAgent, name);
+    igsAgent_clearDataForParameter(coreAgent, name);
 }
 
 typedef struct {
@@ -373,7 +344,7 @@ typedef struct {
     void *myData;
 } observeIOPCbWrapper_t;
 
-void global_observeIOPCallback(igsAgent_t *agent, iop_t iopType, const char *name, iopType_t valueType, void *value, size_t valueSize, void *myData){
+void global_observeIOPCallback(igs_agent_t *agent, iop_t iopType, const char *name, iopType_t valueType, void *value, size_t valueSize, void *myData){
     IGS_UNUSED(agent)
     observeIOPCbWrapper_t *wrap = (observeIOPCbWrapper_t *)myData;
     wrap->cb(iopType, name, valueType, value, valueSize, wrap->myData);
@@ -384,7 +355,7 @@ int igs_observeInput(const char *name, igs_observeCallback cb, void *myData){
     observeIOPCbWrapper_t *wrap = calloc(1, sizeof(observeIOPCbWrapper_t));
     wrap->cb = cb;
     wrap->myData = myData;
-    return igsAgent_observeInput(globalAgent, name, global_observeIOPCallback, wrap);
+    return igsAgent_observeInput(coreAgent, name, global_observeIOPCallback, wrap);
 }
 
 int igs_observeOutput(const char *name, igs_observeCallback cb, void * myData){
@@ -392,7 +363,7 @@ int igs_observeOutput(const char *name, igs_observeCallback cb, void * myData){
     observeIOPCbWrapper_t *wrap = calloc(1, sizeof(observeIOPCbWrapper_t));
     wrap->cb = cb;
     wrap->myData = myData;
-    return igsAgent_observeOutput(globalAgent, name, global_observeIOPCallback, wrap);
+    return igsAgent_observeOutput(coreAgent, name, global_observeIOPCallback, wrap);
 }
 
 int igs_observeParameter(const char *name, igs_observeCallback cb, void * myData){
@@ -400,372 +371,270 @@ int igs_observeParameter(const char *name, igs_observeCallback cb, void * myData
     observeIOPCbWrapper_t *wrap = calloc(1, sizeof(observeIOPCbWrapper_t));
     wrap->cb = cb;
     wrap->myData = myData;
-    return igsAgent_observeParameter(globalAgent, name, global_observeIOPCallback, wrap);
+    return igsAgent_observeParameter(coreAgent, name, global_observeIOPCallback, wrap);
 }
 
 int igs_muteOutput(const char *name){
     initInternalAgentIfNeeded();
-    return igsAgent_muteOutput(globalAgent, name);
+    return igsAgent_muteOutput(coreAgent, name);
 }
 
 int igs_unmuteOutput(const char *name){
     initInternalAgentIfNeeded();
-    return igsAgent_unmuteOutput(globalAgent, name);
+    return igsAgent_unmuteOutput(coreAgent, name);
 }
 
 bool igs_isOutputMuted(const char *name){
     initInternalAgentIfNeeded();
-    return igsAgent_isOutputMuted(globalAgent, name);
+    return igsAgent_isOutputMuted(coreAgent, name);
 }
 
 iopType_t igs_getTypeForInput(const char *name){
     initInternalAgentIfNeeded();
-    return igsAgent_getTypeForInput(globalAgent, name);
+    return igsAgent_getTypeForInput(coreAgent, name);
 }
 
 iopType_t igs_getTypeForOutput(const char *name){
     initInternalAgentIfNeeded();
-    return igsAgent_getTypeForOutput(globalAgent, name);
+    return igsAgent_getTypeForOutput(coreAgent, name);
 }
 
 iopType_t igs_getTypeForParameter(const char *name){
     initInternalAgentIfNeeded();
-    return igsAgent_getTypeForParameter(globalAgent, name);
+    return igsAgent_getTypeForParameter(coreAgent, name);
 }
 
 int igs_getInputsNumber(void){
     initInternalAgentIfNeeded();
-    return igsAgent_getInputsNumber(globalAgent);
+    return igsAgent_getInputsNumber(coreAgent);
 }
 
 int igs_getOutputsNumber(void){
     initInternalAgentIfNeeded();
-    return igsAgent_getOutputsNumber(globalAgent);
+    return igsAgent_getOutputsNumber(coreAgent);
 }
 
 int igs_getParametersNumber(void){
     initInternalAgentIfNeeded();
-    return igsAgent_getParametersNumber(globalAgent);
+    return igsAgent_getParametersNumber(coreAgent);
 }
 
 char** igs_getInputsList(long *nbOfElements){
     initInternalAgentIfNeeded();
-    return igsAgent_getInputsList(globalAgent, nbOfElements);
+    return igsAgent_getInputsList(coreAgent, nbOfElements);
 }
 
 char** igs_getOutputsList(long *nbOfElements){
     initInternalAgentIfNeeded();
-    return igsAgent_getOutputsList(globalAgent, nbOfElements);
+    return igsAgent_getOutputsList(coreAgent, nbOfElements);
 }
 
 char** igs_getParametersList(long *nbOfElements){
     initInternalAgentIfNeeded();
-    return igsAgent_getParametersList(globalAgent, nbOfElements);
+    return igsAgent_getParametersList(coreAgent, nbOfElements);
 }
 
 bool igs_checkInputExistence(const char *name){
     initInternalAgentIfNeeded();
-    return igsAgent_checkInputExistence(globalAgent, name);
+    return igsAgent_checkInputExistence(coreAgent, name);
 }
 
 bool igs_checkOutputExistence(const char *name){
     initInternalAgentIfNeeded();
-    return igsAgent_checkOutputExistence(globalAgent, name);
+    return igsAgent_checkOutputExistence(coreAgent, name);
 }
 
 bool igs_checkParameterExistence(const char *name){
     initInternalAgentIfNeeded();
-    return igsAgent_checkParameterExistence(globalAgent, name);
+    return igsAgent_checkParameterExistence(coreAgent, name);
 }
 
 
 //definition
 int igs_loadDefinition (const char* json_str){
     initInternalAgentIfNeeded();
-    return igsAgent_loadDefinition(globalAgent, json_str);
+    return igsAgent_loadDefinition(coreAgent, json_str);
 }
 
 int igs_loadDefinitionFromPath (const char* file_path){
     initInternalAgentIfNeeded();
-    return igsAgent_loadDefinitionFromPath(globalAgent, file_path);
+    return igsAgent_loadDefinitionFromPath(coreAgent, file_path);
 }
 
 int igs_clearDefinition(void){
     initInternalAgentIfNeeded();
-    return igsAgent_clearDefinition(globalAgent);
+    return igsAgent_clearDefinition(coreAgent);
 }
 
 char* igs_getDefinition(void){
     initInternalAgentIfNeeded();
-    return igsAgent_getDefinition(globalAgent);
+    return igsAgent_getDefinition(coreAgent);
 }
 
 char *igs_getDefinitionName(void){
     initInternalAgentIfNeeded();
-    return igsAgent_getDefinitionName(globalAgent);
+    return igsAgent_getDefinitionName(coreAgent);
 }
  //returned char* must be freed by caller
 char *igs_getDefinitionDescription(void){
     initInternalAgentIfNeeded();
-    return igsAgent_getDefinitionDescription(globalAgent);
+    return igsAgent_getDefinitionDescription(coreAgent);
 }
  //returned char* must be freed by caller
 char *igs_getDefinitionVersion(void){
     initInternalAgentIfNeeded();
-    return igsAgent_getDefinitionVersion(globalAgent);
+    return igsAgent_getDefinitionVersion(coreAgent);
 }
  //returned char* must be freed by caller
 int igs_setDefinitionName(const char *name){
     initInternalAgentIfNeeded();
-    return igsAgent_setDefinitionName(globalAgent, name);
+    return igsAgent_setDefinitionName(coreAgent, name);
 }
 
 int igs_setDefinitionDescription(const char *description){
     initInternalAgentIfNeeded();
-    return igsAgent_setDefinitionDescription(globalAgent, description);
+    return igsAgent_setDefinitionDescription(coreAgent, description);
 }
 
 int igs_setDefinitionVersion(const char *version){
     initInternalAgentIfNeeded();
-    return igsAgent_setDefinitionVersion(globalAgent, version);
+    return igsAgent_setDefinitionVersion(coreAgent, version);
 }
 
 int igs_createInput(const char *name, iopType_t type, void *value, size_t size){
     initInternalAgentIfNeeded();
-    return igsAgent_createInput(globalAgent, name, type, value, size);
+    return igsAgent_createInput(coreAgent, name, type, value, size);
 }
 
 int igs_createOutput(const char *name, iopType_t type, void *value, size_t size){
     initInternalAgentIfNeeded();
-    return igsAgent_createOutput(globalAgent, name, type, value, size);
+    return igsAgent_createOutput(coreAgent, name, type, value, size);
 }
 
 int igs_createParameter(const char *name, iopType_t type, void *value, size_t size){
     initInternalAgentIfNeeded();
-    return igsAgent_createParameter(globalAgent, name, type, value, size);
+    return igsAgent_createParameter(coreAgent, name, type, value, size);
 }
 
 int igs_removeInput(const char *name){
     initInternalAgentIfNeeded();
-    return igsAgent_removeInput(globalAgent, name);
+    return igsAgent_removeInput(coreAgent, name);
 }
 
 int igs_removeOutput(const char *name){
     initInternalAgentIfNeeded();
-    return igsAgent_removeOutput(globalAgent, name);
+    return igsAgent_removeOutput(coreAgent, name);
 }
 
 int igs_removeParameter(const char *name){
     initInternalAgentIfNeeded();
-    return igsAgent_removeParameter(globalAgent, name);
+    return igsAgent_removeParameter(coreAgent, name);
 }
 
 
 //mapping
 int igs_loadMapping (const char* json_str){
     initInternalAgentIfNeeded();
-    return igsAgent_loadMapping(globalAgent, json_str);
+    return igsAgent_loadMapping(coreAgent, json_str);
 }
 
 int igs_loadMappingFromPath (const char* file_path){
     initInternalAgentIfNeeded();
-    return igsAgent_loadMappingFromPath(globalAgent, file_path);
+    return igsAgent_loadMappingFromPath(coreAgent, file_path);
 }
 
 int igs_clearMapping(void){
     initInternalAgentIfNeeded();
-    return igsAgent_clearMapping(globalAgent);
+    return igsAgent_clearMapping(coreAgent);
 }
 
 char* igs_getMapping(void){
     initInternalAgentIfNeeded();
-    return igsAgent_getMapping(globalAgent);
+    return igsAgent_getMapping(coreAgent);
 }
 
 char *igs_getMappingName(void){
     initInternalAgentIfNeeded();
-    return igsAgent_getMapping(globalAgent);
+    return igsAgent_getMapping(coreAgent);
 }
 
 char *igs_getMappingDescription(void){
     initInternalAgentIfNeeded();
-    return igsAgent_getMappingDescription(globalAgent);
+    return igsAgent_getMappingDescription(coreAgent);
 }
 
 char *igs_getMappingVersion(void){
     initInternalAgentIfNeeded();
-    return igsAgent_getMappingVersion(globalAgent);
+    return igsAgent_getMappingVersion(coreAgent);
 }
 
 int igs_setMappingName(const char *name){
     initInternalAgentIfNeeded();
-    return igsAgent_setMappingName(globalAgent, name);
+    return igsAgent_setMappingName(coreAgent, name);
 }
 
 int igs_setMappingDescription(const char *description){
     initInternalAgentIfNeeded();
-    return igsAgent_setMappingDescription(globalAgent, description);
+    return igsAgent_setMappingDescription(coreAgent, description);
 }
 
 int igs_setMappingVersion(const char *version){
     initInternalAgentIfNeeded();
-    return igsAgent_setMappingVersion(globalAgent, version);
+    return igsAgent_setMappingVersion(coreAgent, version);
 }
 
 int igs_getMappingEntriesNumber(void){
     initInternalAgentIfNeeded();
-    return igsAgent_getMappingEntriesNumber(globalAgent);
+    return igsAgent_getMappingEntriesNumber(coreAgent);
 }
 
 unsigned long igs_addMappingEntry(const char *fromOurInput, const char *toAgent, const char *withOutput){
     initInternalAgentIfNeeded();
-    return igsAgent_addMappingEntry(globalAgent, fromOurInput, toAgent, withOutput);
+    return igsAgent_addMappingEntry(coreAgent, fromOurInput, toAgent, withOutput);
 }
  //returns mapping id or zero or below if creation failed
 int igs_removeMappingEntryWithId(unsigned long theId){
     initInternalAgentIfNeeded();
-    return igsAgent_removeMappingEntryWithId(globalAgent, theId);
+    return igsAgent_removeMappingEntryWithId(coreAgent, theId);
 }
 
 int igs_removeMappingEntryWithName(const char *fromOurInput, const char *toAgent, const char *withOutput){
     initInternalAgentIfNeeded();
-    return igsAgent_removeMappingEntryWithName(globalAgent, fromOurInput, toAgent, withOutput);
+    return igsAgent_removeMappingEntryWithName(coreAgent, fromOurInput, toAgent, withOutput);
 }
 
 
 //admin
-void igs_setCommandLine(const char *line){
-    initInternalAgentIfNeeded();
-    igsAgent_setCommandLine(globalAgent, line);
-}
-
-void igs_setCommandLineFromArgs(int argc, const char * argv[]){
-    initInternalAgentIfNeeded();
-    igsAgent_setCommandLineFromArgs(globalAgent, argc, argv);
-}
 
 void igs_setRequestOutputsFromMappedAgents(bool notify){
     initInternalAgentIfNeeded();
-    igsAgent_setRequestOutputsFromMappedAgents(globalAgent, notify);
+    igsAgent_setRequestOutputsFromMappedAgents(coreAgent, notify);
 }
 
 bool igs_getRequestOutputsFromMappedAgents(void){
     initInternalAgentIfNeeded();
-    return igsAgent_getRequestOutputsFromMappedAgents(globalAgent);
+    return igsAgent_getRequestOutputsFromMappedAgents(coreAgent);
 }
 
 
 void igs_setDefinitionPath(const char *path){
     initInternalAgentIfNeeded();
-    igsAgent_setDefinitionPath(globalAgent, path);
+    igsAgent_setDefinitionPath(coreAgent, path);
 }
 
 void igs_setMappingPath(const char *path){
     initInternalAgentIfNeeded();
-    igsAgent_setMappingPath(globalAgent, path);
+    igsAgent_setMappingPath(coreAgent, path);
 }
 
 void igs_writeDefinitionToPath(void){
     initInternalAgentIfNeeded();
-    igsAgent_writeDefinitionToPath(globalAgent);
+    igsAgent_writeDefinitionToPath(coreAgent);
 }
 
 void igs_writeMappingToPath(void){
     initInternalAgentIfNeeded();
-    igsAgent_writeMappingToPath(globalAgent);
-}
-
-void igs_setAllowIpc(bool allow){
-    initInternalAgentIfNeeded();
-    igsAgent_setAllowIpc(globalAgent, allow);
-}
-
-bool igs_getAllowIpc(void){
-    initInternalAgentIfNeeded();
-    return igsAgent_getAllowIpc(globalAgent);
-}
-
-void igs_setAllowInproc(bool allow){
-    initInternalAgentIfNeeded();
-    igsAgent_setAllowInproc(globalAgent, allow);
-}
-
-bool igs_getAllowInproc(void){
-    initInternalAgentIfNeeded();
-    return igsAgent_getAllowInproc(globalAgent);
-}
-
-#if defined __unix__ || defined __APPLE__ || defined __linux__
-void igs_setIpcFolderPath(char *path){
-    initInternalAgentIfNeeded();
-    igsAgent_setIpcFolderPath(globalAgent, path);
-}
-
-const char* igs_getIpcFolderPath(void){
-    initInternalAgentIfNeeded();
-    return igsAgent_getIpcFolderPath(globalAgent);
-}
-#endif
-
-void igs_setVerbose(bool verbose){
-    initInternalAgentIfNeeded();
-    igsAgent_setVerbose(globalAgent, verbose);
-}
-
-bool igs_isVerbose(void){
-    initInternalAgentIfNeeded();
-    return igsAgent_isVerbose(globalAgent);
-}
-
-void igs_setUseColorVerbose(bool useColor){
-    initInternalAgentIfNeeded();
-    igsAgent_setUseColorVerbose(globalAgent, useColor);
-}
-
-bool igs_getUseColorVerbose(void){
-    initInternalAgentIfNeeded();
-    return igsAgent_getUseColorVerbose(globalAgent);
-}
-
-void igs_setLogStream(bool useLogStream){
-    initInternalAgentIfNeeded();
-    igsAgent_setLogStream(globalAgent, useLogStream);
-}
-
-bool igs_getLogStream(void){
-    initInternalAgentIfNeeded();
-    return igsAgent_getLogStream(globalAgent);
-}
-
-void igs_setLogInFile(bool useLogFile){
-    initInternalAgentIfNeeded();
-    igsAgent_setLogInFile(globalAgent, useLogFile);
-}
-
-bool igs_getLogInFile(void){
-    initInternalAgentIfNeeded();
-    return igsAgent_getLogInFile(globalAgent);
-}
-
-void igs_setLogPath(const char *path){
-    initInternalAgentIfNeeded();
-    igsAgent_setLogPath(globalAgent, path);
-}
-
-char* igs_getLogPath(void){
-    initInternalAgentIfNeeded();
-    return igsAgent_getLogPath(globalAgent);
-}
-
-
-void igs_setLogLevel (igs_logLevel_t level){
-    initInternalAgentIfNeeded();
-    igsAgent_setLogLevel(globalAgent, level);
-}
-
-igs_logLevel_t igs_getLogLevel(void){
-    initInternalAgentIfNeeded();
-    return igsAgent_getLogLevel(globalAgent);
+    igsAgent_writeMappingToPath(coreAgent);
 }
 
 void igs_log(igs_logLevel_t level, const char *function, const char *format, ...){
@@ -775,147 +644,18 @@ void igs_log(igs_logLevel_t level, const char *function, const char *format, ...
     char content[MAX_STRING_MSG_LENGTH] = "";
     vsnprintf(content, MAX_STRING_MSG_LENGTH - 1, format, list);
     va_end(list);
-    admin_log(globalAgent, level, function, "%s", content);
+    admin_log(coreAgent, level, function, "%s", content);
 }
-
-//licenses
-#if !defined(TARGET_OS_IOS) || !TARGET_OS_IOS
-void igs_setLicensePath(const char *path){
-    initInternalAgentIfNeeded();
-    igsAgent_setLicensePath(globalAgent, path);
-}
-
-char *igs_getLicensePath(void){
-    initInternalAgentIfNeeded();
-    return igsAgent_getLicensePath(globalAgent);
-}
-
-bool igs_checkLicenseForAgent(const char *agentId){
-    initInternalAgentIfNeeded();
-    return igsAgent_checkLicense(globalAgent, agentId);
-}
-
-typedef struct {
-    igs_licenseCallback cb;
-    void *myData;
-} observeLicenseCbWrapper_t;
-
-void global_observeLicenseCallback(igsAgent_t *agent, igs_license_limit_t limit, void *myData){
-    IGS_UNUSED(agent)
-    observeLicenseCbWrapper_t *wrap = (observeLicenseCbWrapper_t *)myData;
-    wrap->cb(limit, wrap->myData);
-}
-
-int igs_observeLicense(igs_licenseCallback cb, void *myData){
-    initInternalAgentIfNeeded();
-    observeLicenseCbWrapper_t *wrap = calloc(1, sizeof(observeLicenseCbWrapper_t));
-    wrap->cb = cb;
-    wrap->myData = myData;
-    return igsAgent_observeLicense(globalAgent, global_observeLicenseCallback, wrap);
-}
-
-void igs_loadLicenseData(const void *data, size_t size){
-    initInternalAgentIfNeeded();
-    igsAgent_loadLicenseData(globalAgent, data, size);
-}
-#endif
-
 
 //ADVANCED
-void igs_setPublishingPort(unsigned int port){
-    initInternalAgentIfNeeded();
-    igsAgent_setPublishingPort(globalAgent, port);
-}
-
-void igs_setLogStreamPort(unsigned int port){
-    initInternalAgentIfNeeded();
-    igsAgent_setLogStreamPort(globalAgent, port);
-}
-
-void igs_setDiscoveryInterval(unsigned int interval){
-    initInternalAgentIfNeeded();
-    igsAgent_setDiscoveryInterval(globalAgent, interval);
-}
-
-void igs_setAgentTimeout(unsigned int duration){
-    initInternalAgentIfNeeded();
-    igsAgent_setAgentTimeout(globalAgent, duration);
-}
-
-void igs_performanceCheck(const char *peerId, size_t msgSize, size_t nbOfMsg){
-    initInternalAgentIfNeeded();
-    igsAgent_performanceCheck(globalAgent, peerId, msgSize, nbOfMsg);
-}
-
-int igs_timerStart(size_t delay, size_t times, igs_timerCallback cb, void *myData){
-    initInternalAgentIfNeeded();
-    return igsAgent_timerStart(globalAgent, delay, times, cb, myData);
-}
-
-void igs_timerStop(int timerId){
-    initInternalAgentIfNeeded();
-    igsAgent_timerStop(globalAgent, timerId);
-}
-
-void igs_setHighWaterMarks(int hwmValue){
-    initInternalAgentIfNeeded();
-    igsAgent_setHighWaterMarks(globalAgent, hwmValue);
-}
-
-
-void igs_monitoringEnable(unsigned int period){
-    initInternalAgentIfNeeded();
-    igsAgent_monitoringEnable(globalAgent, period);
-}
-
-void igs_monitoringEnableWithExpectedDevice(unsigned int period, const char* networkDevice, unsigned int port){
-    initInternalAgentIfNeeded();
-    igsAgent_monitoringEnableWithExpectedDevice(globalAgent, period, networkDevice, port);
-}
-
-void igs_monitoringDisable(void){
-    initInternalAgentIfNeeded();
-    igsAgent_monitoringDisable(globalAgent);
-}
-
-bool igs_isMonitoringEnabled(void){
-    initInternalAgentIfNeeded();
-    return igsAgent_isMonitoringEnabled(globalAgent);
-}
-
-typedef struct {
-    igs_monitorCallback cb;
-    void *myData;
-} observeMonitorCbWrapper_t;
-
-void global_observeMonitorCallback(igsAgent_t *agent, igs_monitorEvent_t event, const char *device, const char *ipAddress, void *myData){
-    IGS_UNUSED(agent)
-    observeMonitorCbWrapper_t *wrap = (observeMonitorCbWrapper_t *)myData;
-    wrap->cb(event, device, ipAddress, wrap->myData);
-}
-
-void igs_monitor(igs_monitorCallback cb, void *myData){
-    initInternalAgentIfNeeded();
-    observeMonitorCbWrapper_t *wrap = calloc(1, sizeof(observeMonitorCbWrapper_t));
-    wrap->cb = cb;
-    wrap->myData = myData;
-    igsAgent_monitor(globalAgent, global_observeMonitorCallback, wrap);
-}
-
-void igs_monitoringShallStartStopAgent(bool flag){
-    initInternalAgentIfNeeded();
-    igsAgent_monitoringShallStartStopAgent(globalAgent, flag);
-}
-
-
 int igs_writeOutputAsZMQMsg(const char *name, zmsg_t *msg){
     initInternalAgentIfNeeded();
-    return igsAgent_writeOutputAsZMQMsg(globalAgent, name, msg);
+    return igsAgent_writeOutputAsZMQMsg(coreAgent, name, msg);
 }
 
 int igs_readInputAsZMQMsg(const char *name, zmsg_t **msg){
     initInternalAgentIfNeeded();
-    return igsAgent_readInputAsZMQMsg(globalAgent, name, msg);
+    return igsAgent_readInputAsZMQMsg(coreAgent, name, msg);
 }
 
 typedef struct {
@@ -923,7 +663,7 @@ typedef struct {
     void *myData;
 } observeBusCbWrapper_t;
 
-void global_observeBusCallback(igsAgent_t *agent, const char *event, const char *peerID, const char *name,
+void global_observeBusCallback(igs_agent_t *agent, const char *event, const char *peerID, const char *name,
                                const char *address, const char *channel,
                                zhash_t *headers, zmsg_t *msg, void *myData){
     IGS_UNUSED(agent)
@@ -936,36 +676,36 @@ int igs_observeBus(igs_BusMessageIncoming cb, void *myData){
     observeBusCbWrapper_t *wrap = calloc(1, sizeof(observeBusCbWrapper_t));
     wrap->cb = cb;
     wrap->myData = myData;
-    return igsAgent_observeBus(globalAgent, global_observeBusCallback, wrap);
+    return igsAgent_observeBus(coreAgent, global_observeBusCallback, wrap);
 }
 
 void igs_busJoinChannel(const char *channel){
     initInternalAgentIfNeeded();
-    igsAgent_busJoinChannel(globalAgent, channel);
+    igsAgent_busJoinChannel(coreAgent, channel);
 }
 
 void igs_busLeaveChannel(const char *channel){
     initInternalAgentIfNeeded();
-    igsAgent_busLeaveChannel(globalAgent, channel);
+    igsAgent_busLeaveChannel(coreAgent, channel);
 }
 
 int igs_busSendStringToChannel(const char *channel, const char *msg, ...){
     initInternalAgentIfNeeded();
     va_list list;
     va_start(list, msg);
-    int res = igsAgent_busSendStringToChannel(globalAgent, channel, msg, list);
+    int res = igsAgent_busSendStringToChannel(coreAgent, channel, msg, list);
     va_end(list);
     return res;
 }
 
 int igs_busSendDataToChannel(const char *channel, void *data, size_t size){
     initInternalAgentIfNeeded();
-    return igsAgent_busSendDataToChannel(globalAgent, channel, data, size);
+    return igsAgent_busSendDataToChannel(coreAgent, channel, data, size);
 }
 
 int igs_busSendZMQMsgToChannel(const char *channel, zmsg_t **msg_p){
     initInternalAgentIfNeeded();
-    return igsAgent_busSendZMQMsgToChannel(globalAgent, channel, msg_p);
+    return igsAgent_busSendZMQMsgToChannel(coreAgent, channel, msg_p);
 }
 
 int igs_busSendStringToAgent(const char *agentNameOrPeerID, const char *msg, ...){
@@ -975,34 +715,34 @@ int igs_busSendStringToAgent(const char *agentNameOrPeerID, const char *msg, ...
     char content[MAX_STRING_MSG_LENGTH] = "";
     vsnprintf(content, MAX_STRING_MSG_LENGTH - 1, msg, list);
     va_end(list);
-    int res = igsAgent_busSendStringToAgent(globalAgent, agentNameOrPeerID, "%s", content);
+    int res = igsAgent_busSendStringToAgent(coreAgent, agentNameOrPeerID, "%s", content);
     return res;
 }
 
 int igs_busSendDataToAgent(const char *agentNameOrPeerID, void *data, size_t size){
     initInternalAgentIfNeeded();
-    return igsAgent_busSendDataToAgent(globalAgent, agentNameOrPeerID, data, size);
+    return igsAgent_busSendDataToAgent(coreAgent, agentNameOrPeerID, data, size);
 }
 
 int igs_busSendZMQMsgToAgent(const char *agentNameOrPeerID, zmsg_t **msg_p){
     initInternalAgentIfNeeded();
-    return igsAgent_busSendZMQMsgToAgent(globalAgent, agentNameOrPeerID, msg_p);
+    return igsAgent_busSendZMQMsgToAgent(coreAgent, agentNameOrPeerID, msg_p);
 }
 
 void igs_busAddServiceDescription(const char *key, const char *value){
     initInternalAgentIfNeeded();
-    igsAgent_busAddServiceDescription(globalAgent, key, value);
+    igsAgent_busAddServiceDescription(coreAgent, key, value);
 }
 
 void igs_busRemoveServiceDescription(const char *key){
     initInternalAgentIfNeeded();
-    igsAgent_busRemoveServiceDescription(globalAgent, key);
+    igsAgent_busRemoveServiceDescription(coreAgent, key);
 }
 
 
 int igs_sendCall(const char *agentNameOrUUID, const char *callName, igs_callArgument_t **list){
     initInternalAgentIfNeeded();
-    return igsAgent_sendCall(globalAgent, agentNameOrUUID, callName, list);
+    return igsAgent_sendCall(coreAgent, agentNameOrUUID, callName, list);
 }
 
 typedef struct {
@@ -1010,7 +750,7 @@ typedef struct {
     void *myData;
 } callCbWrapper_t;
 
-void global_callCallback(igsAgent_t *agent, const char *senderAgentName, const char *senderAgentUUID,
+void global_callCallback(igs_agent_t *agent, const char *senderAgentName, const char *senderAgentUUID,
                          const char *callName, igs_callArgument_t *firstArgument, size_t nbArgs,
                          void* myData){
     IGS_UNUSED(agent)
@@ -1023,50 +763,50 @@ int igs_initCall(const char *name, igs_callFunction cb, void *myData){
     callCbWrapper_t *wrap = calloc(1, sizeof(callCbWrapper_t));
     wrap->cb = cb;
     wrap->myData = myData;
-    return igsAgent_initCall(globalAgent, name, global_callCallback, wrap);
+    return igsAgent_initCall(coreAgent, name, global_callCallback, wrap);
 }
 
 int igs_removeCall(const char *name){
     initInternalAgentIfNeeded();
-    return igsAgent_removeCall(globalAgent, name);
+    return igsAgent_removeCall(coreAgent, name);
 }
 
 int igs_addArgumentToCall(const char *callName, const char *argName, iopType_t type){
     initInternalAgentIfNeeded();
-    return igsAgent_addArgumentToCall(globalAgent, callName, argName, type);
+    return igsAgent_addArgumentToCall(coreAgent, callName, argName, type);
 }
 
 int igs_removeArgumentFromCall(const char *callName, const char *argName){
     initInternalAgentIfNeeded();
-    return igsAgent_removeArgumentFromCall(globalAgent, callName, argName);
+    return igsAgent_removeArgumentFromCall(coreAgent, callName, argName);
 }
  //removes first occurence with this name
 size_t igs_getNumberOfCalls(void){
     initInternalAgentIfNeeded();
-    return igsAgent_getNumberOfCalls(globalAgent);
+    return igsAgent_getNumberOfCalls(coreAgent);
 }
 
 bool igs_checkCallExistence(const char *name){
     initInternalAgentIfNeeded();
-    return igsAgent_checkCallExistence(globalAgent, name);
+    return igsAgent_checkCallExistence(coreAgent, name);
 }
 
 char** igs_getCallsList(size_t *nbOfElements){
     initInternalAgentIfNeeded();
-    return igsAgent_getCallsList(globalAgent, nbOfElements);
+    return igsAgent_getCallsList(coreAgent, nbOfElements);
 }
 
 igs_callArgument_t* igs_getFirstArgumentForCall(const char *callName){
     initInternalAgentIfNeeded();
-    return igsAgent_getFirstArgumentForCall(globalAgent, callName);
+    return igsAgent_getFirstArgumentForCall(coreAgent, callName);
 }
 
 size_t igs_getNumberOfArgumentsForCall(const char *callName){
     initInternalAgentIfNeeded();
-    return igsAgent_getNumberOfArgumentsForCall(globalAgent, callName);
+    return igsAgent_getNumberOfArgumentsForCall(coreAgent, callName);
 }
 
 bool igs_checkCallArgumentExistence(const char *callName, const char *argName){
     initInternalAgentIfNeeded();
-    return igsAgent_checkCallArgumentExistence(globalAgent, callName, argName);
+    return igsAgent_checkCallArgumentExistence(coreAgent, callName, argName);
 }

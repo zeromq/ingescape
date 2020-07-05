@@ -11,10 +11,10 @@
 #include "ingescape_private.h"
 
 //Timer callback to check network 
-int monitor_triggerNetworkCheck(zloop_t *loop, int timer_id, void *arg){
+int igs_monitor_triggerNetworkCheck(zloop_t *loop, int timer_id, void *arg){
     IGS_UNUSED(loop)
     IGS_UNUSED(timer_id)
-    igsAgent_t *agent = (igsAgent_t *)arg;
+    igs_agent_t *agent = (igs_agent_t *)arg;
 
 #if (defined WIN32 || defined _WIN32)
     WORD version_requested = MAKEWORD (2, 2);
@@ -26,7 +26,7 @@ int monitor_triggerNetworkCheck(zloop_t *loop, int timer_id, void *arg){
 #endif
     
     bool foundNetworkDevice = false;
-    monitorCallback_t *cb = NULL;
+    igs_monitor_callback_t *cb = NULL;
     ziflist_t *iflist = ziflist_new ();
     assert (iflist);
     const char *name = ziflist_first (iflist);
@@ -181,7 +181,7 @@ int monitor_triggerNetworkCheck(zloop_t *loop, int timer_id, void *arg){
 //manage messages from the parent thread
 int monitor_manageParent (zloop_t *loop, zmq_pollitem_t *item, void *arg){
     IGS_UNUSED(loop)
-    igsAgent_t *agent = (igsAgent_t *)arg;
+    igs_agent_t *agent = (igs_agent_t *)arg;
     
     if (item->revents & ZMQ_POLLIN)
     {
@@ -206,7 +206,7 @@ int monitor_manageParent (zloop_t *loop, zmq_pollitem_t *item, void *arg){
 }
 
 static void monitor_initLoop (zsock_t *pipe, void *args){
-    igsAgent_t *agent = (igsAgent_t *)args;
+    igs_agent_t *agent = (igs_agent_t *)args;
     zsock_signal (pipe, 0);
     
     agent->monitor->loop = zloop_new ();
@@ -225,19 +225,19 @@ static void monitor_initLoop (zsock_t *pipe, void *args){
     
     zloop_poller (agent->monitor->loop, &zpipePollItem, monitor_manageParent, agent);
     zloop_poller_set_tolerant(agent->monitor->loop, &zpipePollItem);
-    zloop_timer(agent->monitor->loop, agent->monitor->period, 0, monitor_triggerNetworkCheck, agent);
+    zloop_timer(agent->monitor->loop, agent->monitor->period, 0, igs_monitor_triggerNetworkCheck, agent);
     
     zloop_start (agent->monitor->loop);
 
     zloop_destroy(&agent->monitor->loop);
 }
 
-void igsAgent_monitoringEnable(igsAgent_t *agent, unsigned int period){
+void igs_monitoringEnable(unsigned int period){
     if (agent->monitor != NULL){
         igsAgent_warn(agent, "monitor is already started");
         return;
     }
-    agent->monitor = (monitor_t *)calloc(1, sizeof(monitor_t));
+    agent->monitor = (igs_monitor_t *)calloc(1, sizeof(igs_monitor_t));
     agent->monitor->period = period;
     agent->monitor->status = IGS_NETWORK_OK;
     agent->monitor->monitorActor = zactor_new (monitor_initLoop, agent);
@@ -245,14 +245,14 @@ void igsAgent_monitoringEnable(igsAgent_t *agent, unsigned int period){
     igs_nbOfAgentsInProcess++;
 }
 
-void igsAgent_monitoringEnableWithExpectedDevice(igsAgent_t *agent, unsigned int period,
+void igs_monitoringEnableWithExpectedDevice(unsigned int period,
                                                  const char* networkDevice, unsigned int port){
     if (agent->monitor != NULL){
         igsAgent_warn(agent, "monitor is already started");
         return;
     }
 
-    agent->monitor = (monitor_t *)calloc(1, sizeof(monitor_t));
+    agent->monitor = (igs_monitor_t *)calloc(1, sizeof(igs_monitor_t));
     agent->monitor->period = period;
     agent->monitor->status = IGS_NETWORK_OK;
 
@@ -268,7 +268,7 @@ void igsAgent_monitoringEnableWithExpectedDevice(igsAgent_t *agent, unsigned int
     igs_nbOfAgentsInProcess++;
 }
 
-void igsAgent_monitoringDisable(igsAgent_t *agent){
+void igs_monitoringDisable(){
     if (agent->monitor == NULL){
         igsAgent_warn(agent, "monitor is not started");
         return;
@@ -295,13 +295,13 @@ void igsAgent_monitoringDisable(igsAgent_t *agent){
 #endif
 }
 
-bool igsAgent_isMonitoringEnabled(igsAgent_t *agent){
+bool igs_isMonitoringEnabled(){
     return (agent->monitor != NULL);
 }
 
-void igsAgent_monitor(igsAgent_t *agent, igsAgent_monitorCallback cb, void *myData){
+void igs_monitor(igsAgent_monitorCallback cb, void *myData){
     if (cb != NULL){
-        monitorCallback_t *newCb = calloc(1, sizeof(monitorCallback_t));
+        igs_monitor_callback_t *newCb = calloc(1, sizeof(igs_monitor_callback_t));
         newCb->callback_ptr = cb;
         newCb->myData = myData;
         DL_APPEND(agent->monitorCallbacks, newCb);
@@ -310,6 +310,6 @@ void igsAgent_monitor(igsAgent_t *agent, igsAgent_monitorCallback cb, void *myDa
     }
 }
 
-void igsAgent_monitoringShallStartStopAgent(igsAgent_t *agent, bool flag){
+void igs_monitoringShallStartStopAgent(bool flag){
     agent->monitor_shallStartStopAgent = flag;
 }

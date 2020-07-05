@@ -78,6 +78,8 @@ static const char *loadDefinitionPrefix = "LOAD_THIS_DEFINITION#";
 
 #define DEFAULT_IPC_PATH "/tmp/"
 
+igs_core_context_t *coreContext = NULL;
+
 #if defined(__unix__) || defined(__linux__) || \
 (defined(__APPLE__) && defined(__MACH__))
 pthread_mutex_t *network_Mutex = NULL;
@@ -126,12 +128,12 @@ void network_Unlock(void) {
     }
 }
 
-int subscribeToPublisherOutput(igsAgent_t *agent, subscriber_t *subscriber, const char *outputName)
+int subscribeToPublisherOutput(igs_agent_t *agent, igs_subscriber_t *subscriber, const char *outputName)
 {
     if(outputName != NULL && strlen(outputName) > 0)
     {
         bool filterAlreadyExists = false;
-        mappingFilter_t *filter = NULL;
+        igs_mappings_filter_t *filter = NULL;
         DL_FOREACH(subscriber->mappingsFilters, filter){
             if (strcmp(filter->filter, outputName) == 0){
                 filterAlreadyExists = true;
@@ -142,8 +144,8 @@ int subscribeToPublisherOutput(igsAgent_t *agent, subscriber_t *subscriber, cons
             // Set subscriber to the output filter
             igsAgent_debug(agent, "Subscribe to agent %s output %s",subscriber->agentName,outputName);
             zsock_set_subscribe(subscriber->subscriber, outputName);
-            mappingFilter_t *f = calloc(1, sizeof(mappingFilter_t));
-            strncpy(f->filter, outputName, MAX_FILTER_SIZE-1);
+            igs_mappings_filter_t *f = calloc(1, sizeof(igs_mappings_filter_t));
+            strncpy(f->filter, outputName, IGS_MAX_AGENT_NAME_LENGTH - 1);
             DL_APPEND(subscriber->mappingsFilters, f);
         }else{
             //printf("\n****************\nFILTER BIS %s - %s\n***************\n", subscriber->agent->agentName, outputName);
@@ -153,11 +155,11 @@ int subscribeToPublisherOutput(igsAgent_t *agent, subscriber_t *subscriber, cons
     return -1;
 }
 
-int unsubscribeToPublisherOutput(igsAgent_t *agent, subscriber_t *subscriber, const char *outputName)
+int unsubscribeToPublisherOutput(igs_agent_t *agent, igs_subscriber_t *subscriber, const char *outputName)
 {
     if(outputName != NULL && strlen(outputName) > 0)
     {
-        mappingFilter_t *filter = NULL;
+        igs_mappings_filter_t *filter = NULL;
         DL_FOREACH(subscriber->mappingsFilters, filter){
             if (strcmp(filter->filter, outputName) == 0){
                 igsAgent_debug(agent, "Unsubscribe to agent %s output %s",agent->agentName,outputName);
@@ -176,8 +178,8 @@ int triggerMappingNotificationToNewcomer(zloop_t *loop, int timer_id, void *arg)
     IGS_UNUSED(loop)
     IGS_UNUSED(timer_id)
     
-    subscriber_t *subscriber = (subscriber_t *)arg;
-    igsAgent_t *agent = subscriber->agent;
+    igs_subscriber_t *subscriber = (igs_subscriber_t *)arg;
+    igs_agent_t *agent = subscriber->agent;
     
     if (subscriber->mappedNotificationToSend){
         bus_zyreLock();
@@ -188,20 +190,20 @@ int triggerMappingNotificationToNewcomer(zloop_t *loop, int timer_id, void *arg)
     return 0;
 }
 
-int network_manageSubscriberMapping(igsAgent_t *agent, subscriber_t *subscriber){
+int network_manageSubscriberMapping(igs_agent_t *agent, igs_subscriber_t *subscriber){
     //get mapping elements for this subscriber
-    mapping_element_t *el, *tmp;
+    igs_mapping_element_t *el, *tmp;
     if (agent->mapping != NULL){
         HASH_ITER(hh, agent->mapping->map_elements, el, tmp){
             if (strcmp(subscriber->agentName, el->agent_name)==0 || strcmp(el->agent_name, "*") == 0){
                 //mapping element is compatible with subscriber name
                 //check if we find a compatible output in subscriber definition
-                agent_iop_t *foundOutput = NULL;
+                igs_iop_t *foundOutput = NULL;
                 if (subscriber->definition != NULL){
                     HASH_FIND_STR(subscriber->definition->outputs_table, el->output_name, foundOutput);
                 }
                 //check if we find a valid input in our own definition
-                agent_iop_t *foundInput = NULL;
+                igs_iop_t *foundInput = NULL;
                 if (agent->definition != NULL){
                     HASH_FIND_STR(agent->definition->inputs_table, el->input_name, foundInput);
                 }
@@ -228,7 +230,7 @@ int network_manageSubscriberMapping(igsAgent_t *agent, subscriber_t *subscriber)
     return 0;
 }
 
-void sendDefinitionToAgent(igsAgent_t *agent, const char *peerId, const char *def)
+void sendDefinitionToAgent(igs_agent_t *agent, const char *peerId, const char *def)
 {
     if(peerId != NULL &&  def != NULL)
     {
@@ -243,7 +245,7 @@ void sendDefinitionToAgent(igsAgent_t *agent, const char *peerId, const char *de
     }
 }
 
-void sendMappingToAgent(igsAgent_t *agent, const char *peerId, const char *mapping)
+void sendMappingToAgent(igs_agent_t *agent, const char *peerId, const char *mapping)
 {
     if(peerId != NULL &&  mapping != NULL){
         if(agent->loopElements->node != NULL){
@@ -256,7 +258,7 @@ void sendMappingToAgent(igsAgent_t *agent, const char *peerId, const char *mappi
     }
 }
 
-void network_cleanAndFreeSubscriber(igsAgent_t *agent, subscriber_t *subscriber){
+void network_cleanAndFreeSubscriber(igs_agent_t *agent, igs_subscriber_t *subscriber){
     if (agent == NULL)
         return;
     if (subscriber == NULL){
@@ -281,7 +283,7 @@ void network_cleanAndFreeSubscriber(igsAgent_t *agent, subscriber_t *subscriber)
         mapping_freeMapping(subscriber->mapping);
     }
     //clean the subscriber itself
-    mappingFilter_t *elt, *tmp;
+    igs_mappings_filter_t *elt, *tmp;
     DL_FOREACH_SAFE(subscriber->mappingsFilters,elt,tmp) {
         zsock_set_unsubscribe(subscriber->subscriber, elt->filter);
         DL_DELETE(subscriber->mappingsFilters,elt);
@@ -308,7 +310,7 @@ void network_cleanAndFreeSubscriber(igsAgent_t *agent, subscriber_t *subscriber)
     free(subscriber);
 //    int n = HASH_COUNT(agent->subscribers);
 //    igsAgent_debug(agent, "%d agent->subscribers in the list\n", n);
-//    subscriber_t *s, *tmps;
+//    igs_subscriber_t *s, *tmps;
 //    HASH_ITER(hh, agent->subscribers, s, tmps){
 //        igsAgent_debug(agent, "\tsubscriber : %s - %s\n", s->agentName, s->agentPeerId);
 //    }
@@ -321,7 +323,7 @@ void network_cleanAndFreeSubscriber(igsAgent_t *agent, subscriber_t *subscriber)
 //manage messages from the parent thread
 int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *arg){
     IGS_UNUSED(loop)
-    igsAgent_t *agent = (igsAgent_t *)arg;
+    igs_agent_t *agent = (igs_agent_t *)arg;
 
     if (item->revents & ZMQ_POLLIN)
     {
@@ -346,7 +348,7 @@ int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *arg){
 }
 
 //function actually handling messages from one of the publisher agents we subscribed to
-int handleSubscriptionMessage(igsAgent_t *agent, zmsg_t *msg, subscriber_t *subscriber){
+int handleSubscriptionMessage(igs_agent_t *agent, zmsg_t *msg, igs_subscriber_t *subscriber){
     
     if(subscriber == NULL){
         igsAgent_error(agent, "subscriber is NULL");
@@ -388,13 +390,13 @@ int handleSubscriptionMessage(igsAgent_t *agent, zmsg_t *msg, subscriber_t *subs
         //try to find mapping elements matching with this subscriber's output
         //and update mapped input(s) value accordingly
         //TODO : some day, optimize mapping storage to avoid iterating
-        mapping_element_t *elmt, *tmp;
+        igs_mapping_element_t *elmt, *tmp;
         HASH_ITER(hh, agent->mapping->map_elements, elmt, tmp) {
             if (strcmp(elmt->agent_name, subscriber->agentName) == 0
                 && strcmp(elmt->output_name, output) == 0){
                 //we have a match on emitting agent name and its ouput name :
                 //still need to check the targeted input existence in our definition
-                agent_iop_t *foundInput = NULL;
+                igs_iop_t *foundInput = NULL;
                 if (agent->definition->inputs_table != NULL){
                     HASH_FIND_STR(agent->definition->inputs_table, elmt->input_name, foundInput);
                 }
@@ -429,8 +431,8 @@ int handleSubscriptionMessage(igsAgent_t *agent, zmsg_t *msg, subscriber_t *subs
 //manage incoming messages from one of the publisher agents we subscribed to
 int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
     IGS_UNUSED(loop)
-    subscriber_t *subscriber = (subscriber_t *)arg;
-    igsAgent_t *agent = subscriber->agent;
+    igs_subscriber_t *subscriber = (igs_subscriber_t *)arg;
+    igs_agent_t *agent = subscriber->agent;
     
     if (item->revents & ZMQ_POLLIN && strlen(subscriber->agentPeerId) > 0){
         zmsg_t *msg = zmsg_recv(item->socket);
@@ -442,7 +444,7 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
 
 //manage messages received on the bus
 int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
-    igsAgent_t *agent = (igsAgent_t *)arg;
+    igs_agent_t *agent = (igs_agent_t *)arg;
     zyre_t *node = agent->loopElements->node;
     
     if (item->revents & ZMQ_POLLIN){
@@ -459,16 +461,16 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
         //parse event
         if (streq (event, "ENTER")){
             igsAgent_debug(agent, "->%s has entered the network with peer id %s and endpoint %s", name, peer, address);
-            zyreAgent_t *zagent = NULL;
+            igs_zyre_agent_t *zagent = NULL;
             HASH_FIND_STR(agent->zyreAgents, peer, zagent);
             if (zagent == NULL){
-                zagent = calloc(1, sizeof(zyreAgent_t));
+                zagent = calloc(1, sizeof(igs_zyre_agent_t));
                 zagent->reconnected = 0;
                 zagent->subscriber = NULL;
                 zagent->hasJoinedPrivateChannel = false;
-                strncpy(zagent->peerId, peer, NAME_BUFFER_SIZE-1);
+                strncpy(zagent->peerId, peer, IGS_MAX_PEER_ID_LENGTH - 1);
                 HASH_ADD_STR(agent->zyreAgents, peerId, zagent);
-                strncpy(zagent->name, name, NAME_BUFFER_SIZE-1);
+                strncpy(zagent->name, name, IGS_MAX_AGENT_NAME_LENGTH - 1);
                 assert(headers);
                 char *k;
                 const char *v;
@@ -537,7 +539,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                             *insert = ':';
                             //add port to the endpoint to compose it fully
                             strcat(endpointAddress, v);
-                            subscriber_t *subscriber;
+                            igs_subscriber_t *subscriber;
                             HASH_FIND_STR(agent->subscribers, peer, subscriber);
                             if (subscriber != NULL){
                                 //we have a reconnection with same peerId
@@ -561,7 +563,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                                 free(subscriber);
                                 subscriber = NULL;
                             }
-                            subscriber = calloc(1, sizeof(subscriber_t));
+                            subscriber = calloc(1, sizeof(igs_subscriber_t));
                             zagent->subscriber = subscriber;
                             subscriber->agent = agent;
                             subscriber->agentName = strdup(name);
@@ -596,9 +598,9 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                             //igs_license("%ld agents (adding %s)", agent->licenseEnforcement->currentAgentsNb, name);
                             if (agent->licenseEnforcement->currentAgentsNb > agent->license->platformNbAgents){
                                 igs_license("Maximum number of allowed agents (%d) is exceeded : agent will stop", agent->license->platformNbAgents);
-                                license_callback_t *el = NULL;
+                                igs_license_callback_t *el = NULL;
                                 DL_FOREACH(agent->licenseCallbacks, el){
-                                    el->callback_ptr(agent, IGS_LICENSE_TOO_MANY_AGENTS, el->data);
+                                    el->callback_ptr(agent,IGS_LICENSE_TOO_MANY_AGENTS, el->data);
                                 }
                                 free(k);
                                 zlist_destroy(&keys);
@@ -651,7 +653,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     bus_zyreUnlock();
                 }
                 if (agent->definition != NULL){
-                    agent_iop_t *current_iop, *tmp_iop;
+                    igs_iop_t *current_iop, *tmp_iop;
                     HASH_ITER(hh, agent->definition->outputs_table, current_iop, tmp_iop) {
                         if (current_iop->is_muted && current_iop->name != NULL){
                             bus_zyreLock();
@@ -682,7 +684,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     bus_zyreUnlock();
                 }
                 
-                zyreAgent_t *zagent = NULL;
+                igs_zyre_agent_t *zagent = NULL;
                 HASH_FIND_STR(agent->zyreAgents, peer, zagent);
                 if (zagent != NULL){
                     zagent->hasJoinedPrivateChannel = true;
@@ -738,7 +740,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 
                 // Load definition from string content
                 igs_definition_t *newDefinition = parser_loadDefinition(strDefinition);
-                subscriber_t *subscriber;
+                igs_subscriber_t *subscriber;
                 HASH_FIND_STR(agent->subscribers, peer, subscriber);
                 
                 if (newDefinition != NULL && newDefinition->name != NULL && subscriber != NULL){
@@ -762,9 +764,9 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     //igs_license("%ld iops (adding %s)", agent->licenseEnforcement->currentIOPNb, name);
                     if (agent->licenseEnforcement->currentIOPNb > agent->license->platformNbIOPs){
                         igs_license("Maximum number of allowed IOPs (%d) is exceeded : agent will stop", agent->license->platformNbIOPs);
-                        license_callback_t *el = NULL;
+                        igs_license_callback_t *el = NULL;
                         DL_FOREACH(agent->licenseCallbacks, el){
-                            el->callback_ptr(agent, IGS_LICENSE_TOO_MANY_IOPS, el->data);
+                            el->callback_ptr(agent,IGS_LICENSE_TOO_MANY_IOPS, el->data);
                         }
                         zmsg_destroy(&msgDuplicate);
                         zyre_event_destroy(&zyre_event);
@@ -787,7 +789,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
             }
             //check if message is an EXTERNAL mapping
             else if(strlen(message) >= strlen(mappingPrefix) && strncmp (message, mappingPrefix, strlen(mappingPrefix)) == 0){
-                subscriber_t *subscriber = NULL;
+                igs_subscriber_t *subscriber = NULL;
                 HASH_FIND_STR(agent->subscribers, peer, subscriber);
                 if (subscriber == NULL){
                     igsAgent_error(agent, "Could not find internal structure for agent %s", name);
@@ -843,7 +845,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 //load definition
                 igsAgent_loadDefinition(agent, strDefinition);
                 //recheck mapping towards our new definition
-                subscriber_t *s, *tmp;
+                igs_subscriber_t *s, *tmp;
                 HASH_ITER(hh, agent->subscribers, s, tmp){
                     network_manageSubscriberMapping(agent, s);
                 }
@@ -865,7 +867,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     }
                     agent->mapping = m;
                     //check and activate mapping
-                    subscriber_t *s, *tmp;
+                    igs_subscriber_t *s, *tmp;
                     HASH_ITER(hh, agent->subscribers, s, tmp){
                         network_manageSubscriberMapping(agent, s);
                     }
@@ -884,7 +886,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     zmsg_t *omsg = zmsg_new();
                     zmsg_addstr(omsg, "OUTPUTS");
                     for (i = 0; i < nbOutputs; i++){
-                        agent_iop_t * found_iop = model_findIopByName(agent, outputsList[i],IGS_OUTPUT_T);
+                        igs_iop_t * found_iop = model_findIopByName(agent, outputsList[i],IGS_OUTPUT_T);
                         if (found_iop != NULL){
                             switch (found_iop->value_type) {
                                 case IGS_INTEGER_T:
@@ -933,7 +935,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     bus_zyreUnlock();
                     free(outputsList);
                 }else if (strlen("OUTPUTS") == strlen(message) && strncmp (message, "OUTPUTS", strlen("OUTPUTS")) == 0){
-                    subscriber_t *foundSubscriber = NULL;
+                    igs_subscriber_t *foundSubscriber = NULL;
                     HASH_FIND_STR(agent->subscribers, peer, foundSubscriber);
                     if (foundSubscriber){
                         handleSubscriptionMessage(agent, msgDuplicate, foundSubscriber);
@@ -944,8 +946,8 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     
                 }else if (strlen("GET_CURRENT_INPUTS") == strlen(message) && strncmp (message, "GET_CURRENT_INPUTS", strlen("GET_CURRENT_INPUTS")) == 0){
                     zmsg_t *resp = zmsg_new();
-                    agent_iop_t *inputs = agent->definition->inputs_table;
-                    agent_iop_t *current = NULL;
+                    igs_iop_t *inputs = agent->definition->inputs_table;
+                    igs_iop_t *current = NULL;
                     zmsg_addstr(resp, "CURRENT_INPUTS");
                     model_readWriteLock();
                     for (current = inputs; current != NULL; current = current->hh.next){
@@ -960,8 +962,8 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     igsAgent_debug(agent, "send input values to %s", peer);
                 }else if (strlen("GET_CURRENT_PARAMETERS") == strlen(message) && strncmp (message, "GET_CURRENT_PARAMETERS", strlen("GET_CURRENT_PARAMETERS")) == 0){
                     zmsg_t *resp = zmsg_new();
-                    agent_iop_t *inputs = agent->definition->params_table;
-                    agent_iop_t *current = NULL;
+                    igs_iop_t *inputs = agent->definition->params_table;
+                    igs_iop_t *current = NULL;
                     zmsg_addstr(resp, "CURRENT_PARAMETERS");
                     model_readWriteLock();
                     for (current = inputs; current != NULL; current = current->hh.next){
@@ -1006,7 +1008,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                             zmsg_addstr(resp, feature);
                             feature = zhash_next(agent->license->features);
                         }
-                        licenseForAgent_t *licForAgent = zhash_first(agent->license->agents);
+                        igs_license_for_agent_t *licForAgent = zhash_first(agent->license->agents);
                         while (licForAgent != NULL) {
                             zmsg_addstr(resp, "agent");
                             zmsg_addstr(resp, licForAgent->agentId);
@@ -1218,7 +1220,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
             free(message);
         } else if (streq (event, "EXIT")){
             igsAgent_debug(agent, "<-%s (%s) exited", name, peer);
-            zyreAgent_t *a = NULL;
+            igs_zyre_agent_t *a = NULL;
             HASH_FIND_STR(agent->zyreAgents, peer, a);
             if (a != NULL){
                 if (a->reconnected > 0){
@@ -1229,7 +1231,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     HASH_DEL(agent->zyreAgents, a);
                     free(a);
                     // Try to find the subscriber to destory
-                    subscriber_t *subscriber = NULL;
+                    igs_subscriber_t *subscriber = NULL;
                     HASH_FIND_STR(agent->subscribers, peer, subscriber);
                     if (subscriber != NULL){
                         network_cleanAndFreeSubscriber(agent, subscriber);
@@ -1239,7 +1241,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
         }
         
         //handle callbacks
-        zyreCallback_t *elt;
+        igs_zyre_callback_t *elt;
         DL_FOREACH(agent->zyreCallbacks,elt){
             if (zyre_event != NULL){
                 zmsg_t *dup = zmsg_dup(msg);
@@ -1260,14 +1262,14 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
 int triggerDefinitionUpdate(zloop_t *loop, int timer_id, void *arg){
     IGS_UNUSED(loop)
     IGS_UNUSED(timer_id)
-    igsAgent_t *agent = (igsAgent_t *)arg;
+    igs_agent_t *agent = (igs_agent_t *)arg;
 
     if (agent->network_needToSendDefinitionUpdate){
         model_readWriteLock();
         char * definitionStr = NULL;
         definitionStr = parser_export_definition(agent->definition);
         if (definitionStr != NULL){
-            zyreAgent_t *a, *tmp;
+            igs_zyre_agent_t *a, *tmp;
             HASH_ITER(hh, agent->zyreAgents, a, tmp){
                 if (a->hasJoinedPrivateChannel){
                     sendDefinitionToAgent(agent, a->peerId, definitionStr);
@@ -1287,11 +1289,11 @@ int triggerDefinitionUpdate(zloop_t *loop, int timer_id, void *arg){
 int triggerLicenseStop(zloop_t *loop, int timer_id, void *arg){
     IGS_UNUSED(loop);
     IGS_UNUSED(timer_id);
-    igsAgent_t *agent = (igsAgent_t *)arg;
+    igs_agent_t *agent = (igs_agent_t *)arg;
     igs_license("Runtime duration limit has been reached : stopping ingescape now");
-    license_callback_t *el = NULL;
+    igs_license_callback_t *el = NULL;
     DL_FOREACH(agent->licenseCallbacks, el){
-        el->callback_ptr(agent, IGS_LICENSE_TIMEOUT, el->data);
+        el->callback_ptr(agent,IGS_LICENSE_TIMEOUT, el->data);
     }
     return -1;
 }
@@ -1300,13 +1302,13 @@ int triggerLicenseStop(zloop_t *loop, int timer_id, void *arg){
 int triggerMappingUpdate(zloop_t *loop, int timer_id, void *arg){
     IGS_UNUSED(loop)
     IGS_UNUSED(timer_id)
-    igsAgent_t *agent = (igsAgent_t *)arg;
+    igs_agent_t *agent = (igs_agent_t *)arg;
 
     if (agent->network_needToUpdateMapping){
         char *mappingStr = NULL;
         mappingStr = parser_export_mapping(agent->mapping);
         if (mappingStr != NULL){
-            zyreAgent_t *a, *tmp;
+            igs_zyre_agent_t *a, *tmp;
             HASH_ITER(hh, agent->zyreAgents, a, tmp){
                 if (a->hasJoinedPrivateChannel){
                     sendMappingToAgent(agent, a->peerId, mappingStr);
@@ -1314,7 +1316,7 @@ int triggerMappingUpdate(zloop_t *loop, int timer_id, void *arg){
             }
             free(mappingStr);
         }
-        subscriber_t *s, *tmp;
+        igs_subscriber_t *s, *tmp;
         HASH_ITER(hh, agent->subscribers, s, tmp){
             network_manageSubscriberMapping(agent, s);
         }
@@ -1325,7 +1327,7 @@ int triggerMappingUpdate(zloop_t *loop, int timer_id, void *arg){
 
 static void runLoop (zsock_t *mypipe, void *args){
     network_Lock();
-    igsAgent_t *agent = (igsAgent_t *)args;
+    igs_agent_t *agent = (igs_agent_t *)args;
     //start zyre now that everything is set
     bus_zyreLock();
     int zyreStartRes = zyre_start (agent->loopElements->node);
@@ -1390,12 +1392,12 @@ static void runLoop (zsock_t *mypipe, void *args){
     network_Lock();
     igsAgent_debug(agent, "loop stopping...");
     //clean
-    zyreAgent_t *zagent, *tmpa;
+    igs_zyre_agent_t *zagent, *tmpa;
     HASH_ITER(hh, agent->zyreAgents, zagent, tmpa){
         HASH_DEL(agent->zyreAgents, zagent);
         free(zagent);
     }
-    subscriber_t *s, *tmps;
+    igs_subscriber_t *s, *tmps;
     HASH_ITER(hh, agent->subscribers, s, tmps) {
         network_cleanAndFreeSubscriber(agent, s);
     }
@@ -1427,14 +1429,14 @@ static void runLoop (zsock_t *mypipe, void *args){
         
         zloop_destroy (&agent->loopElements->loop);
         
-        igsTimer_t *current_timer, *tmp_timer;
+        igs_timer_t *current_timer, *tmp_timer;
         HASH_ITER(hh, agent->loopElements->timers, current_timer, tmp_timer){
             HASH_DEL(agent->loopElements->timers, current_timer);
             free(current_timer);
         }
         
         if (agent->forcedStop){
-            forcedStopCalback_t *cb = NULL;
+            igs_forced_stop_calback_t *cb = NULL;
             DL_FOREACH(agent->forcedStopCalbacks, cb){
                 cb->callback_ptr(agent, cb->myData);
             }
@@ -1457,13 +1459,13 @@ static void runLoop (zsock_t *mypipe, void *args){
     network_Unlock();
 }
 
-void initLoop (igsAgent_t *agent){
+void initLoop (igs_agent_t *agent){
     igsAgent_debug(agent, "loop init");
 #if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
     if (agent->licenseEnforcement != NULL){
         free(agent->licenseEnforcement);
     }
-    agent->licenseEnforcement = calloc(1, sizeof(licenseEnforcement_t));
+    agent->licenseEnforcement = calloc(1, sizeof(igs_license_enforcement_t));
     //count our own presence and IOPs
     agent->licenseEnforcement->currentAgentsNb = 1;
     if (agent->definition != NULL){
@@ -1545,13 +1547,13 @@ void initLoop (igsAgent_t *agent){
     bus_zyreUnlock();
     
     //create channel for replay
-    snprintf(agent->replayChannel, MAX_AGENT_NAME_LENGTH + 15, "%s-IGS-REPLAY", agent->agentName);
+    snprintf(agent->replayChannel, IGS_MAX_AGENT_NAME_LENGTH + 15, "%s-IGS-REPLAY", agent->agentName);
     bus_zyreLock();
     zyre_join(agent->loopElements->node, agent->replayChannel);
     bus_zyreUnlock();
     
     //create channel for calls feedback
-    snprintf(agent->callsChannel, MAX_AGENT_NAME_LENGTH + 15, "%s-IGS-CALLS", agent->agentName);
+    snprintf(agent->callsChannel, IGS_MAX_AGENT_NAME_LENGTH + 15, "%s-IGS-CALLS", agent->agentName);
     bus_zyreLock();
     zyre_join(agent->loopElements->node, agent->callsChannel);
     bus_zyreUnlock();
@@ -1563,7 +1565,7 @@ void initLoop (igsAgent_t *agent){
     bus_zyreUnlock();
     
     //Add stored headers to zyre
-    serviceHeader_t *el, *tmp;
+    igs_service_header_t *el, *tmp;
     bus_zyreLock();
     HASH_ITER(hh, agent->serviceHeaders, el, tmp){
         zyre_set_header(agent->loopElements->node, el->key, "%s", el->value);
@@ -1779,7 +1781,7 @@ void initLoop (igsAgent_t *agent){
 // PRIVATE API
 ////////////////////////////////////////////////////////////////////////
 
-int network_publishOutput (igsAgent_t *agent, const agent_iop_t *iop){
+int network_publishOutput (igs_agent_t *agent, const igs_iop_t *iop){
     int result = 0;
     if (iop == NULL){
         igsAgent_warn(agent, "passed IOP is NULL");
@@ -1871,14 +1873,14 @@ int network_publishOutput (igsAgent_t *agent, const agent_iop_t *iop){
 int network_timerCallback (zloop_t *loop, int timer_id, void *arg){
     IGS_UNUSED(loop)
     IGS_UNUSED(timer_id)
-    igsTimer_t *timer = (igsTimer_t *)arg;
+    igs_timer_t *timer = (igs_timer_t *)arg;
     timer->cb(timer->timerId, timer->myData);
     return 1;
 }
 
-int igsAgent_observeBus(igsAgent_t *agent, igsAgent_BusMessageIncoming cb, void *myData){
+int igsAgent_observeBus(igs_agent_t *agent, igsAgent_BusMessageIncoming cb, void *myData){
     if (cb != NULL){
-        zyreCallback_t *newCb = calloc(1, sizeof(zyreCallback_t));
+        igs_zyre_callback_t *newCb = calloc(1, sizeof(igs_zyre_callback_t));
         newCb->callback_ptr = cb;
         newCb->myData = myData;
         DL_APPEND(agent->zyreCallbacks, newCb);
@@ -1893,7 +1895,7 @@ int igsAgent_observeBus(igsAgent_t *agent, igsAgent_BusMessageIncoming cb, void 
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
 
-int igsAgent_startWithDevice(igsAgent_t *agent, const char *networkDevice, unsigned int port){
+int igs_startWithDevice(const char *networkDevice, unsigned int port){
     if ((networkDevice == NULL) || (strlen(networkDevice) == 0)){
         igsAgent_error(agent, "networkDevice cannot be NULL or empty");
         return 0;
@@ -1906,8 +1908,8 @@ int igsAgent_startWithDevice(igsAgent_t *agent, const char *networkDevice, unsig
     
     agent->isInterrupted = false;
     agent->forcedStop = false;
-    agent->loopElements = calloc(1, sizeof(zyreloopElements_t));
-    strncpy(agent->loopElements->networkDevice, networkDevice, NETWORK_DEVICE_LENGTH-1);
+    agent->loopElements = calloc(1, sizeof(igs_network_context_t));
+    strncpy(agent->loopElements->networkDevice, networkDevice, IGS_NETWORK_DEVICE_LENGTH-1);
     agent->loopElements->brokerEndPoint[0] = '\0';
     agent->loopElements->ipAddress[0] = '\0';
     
@@ -1927,7 +1929,7 @@ int igsAgent_startWithDevice(igsAgent_t *agent, const char *networkDevice, unsig
 //        printf (" - name=%s address=%s netmask=%s broadcast=%s\n",
 //                name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist));
         if (strcmp(name, networkDevice) == 0){
-            strncpy(agent->loopElements->ipAddress, ziflist_address (iflist), IP_ADDRESS_LENGTH-1);
+            strncpy(agent->loopElements->ipAddress, ziflist_address (iflist), IGS_IP_ADDRESS_LENGTH-1);
             igsAgent_info(agent, "Starting with ip address %s and port %d on device %s", agent->loopElements->ipAddress, port, networkDevice);
             break;
         }
@@ -1950,7 +1952,7 @@ int igsAgent_startWithDevice(igsAgent_t *agent, const char *networkDevice, unsig
     return 1;
 }
 
-int igsAgent_startWithIP(igsAgent_t *agent, const char *ipAddress, unsigned int port){
+int igs_startWithIP(const char *ipAddress, unsigned int port){
     if ((ipAddress == NULL) || (strlen(ipAddress) == 0)){
         igsAgent_error(agent, "IP address cannot be NULL or empty");
         return 0;
@@ -1962,9 +1964,9 @@ int igsAgent_startWithIP(igsAgent_t *agent, const char *ipAddress, unsigned int 
     }
     agent->isInterrupted = false;
     agent->forcedStop = false;
-    agent->loopElements = calloc(1, sizeof(zyreloopElements_t));
+    agent->loopElements = calloc(1, sizeof(igs_network_context_t));
     agent->loopElements->brokerEndPoint[0] = '\0';
-    strncpy(agent->loopElements->ipAddress, ipAddress, IP_ADDRESS_LENGTH-1);
+    strncpy(agent->loopElements->ipAddress, ipAddress, IGS_IP_ADDRESS_LENGTH-1);
     
 #if (defined WIN32 || defined _WIN32)
     WORD version_requested = MAKEWORD (2, 2);
@@ -2005,7 +2007,7 @@ int igsAgent_startWithIP(igsAgent_t *agent, const char *ipAddress, unsigned int 
     return 1;
 }
 
-int igsAgent_startWithDeviceOnBroker(igsAgent_t *agent, const char *networkDevice, const char *brokerEndpoint){
+int igsAgent_startWithDeviceOnBroker(igs_agent_t *agent, const char *networkDevice, const char *brokerEndpoint){
     //TODO: manage a list of brokers instead of just one
     if ((brokerEndpoint == NULL) || (strlen(brokerEndpoint) == 0)){
         igsAgent_error(agent, "brokerIpAddress cannot be NULL or empty");
@@ -2022,9 +2024,9 @@ int igsAgent_startWithDeviceOnBroker(igsAgent_t *agent, const char *networkDevic
     agent->isInterrupted = false;
     agent->forcedStop = false;
     
-    agent->loopElements = calloc(1, sizeof(zyreloopElements_t));
-    strncpy(agent->loopElements->brokerEndPoint, brokerEndpoint, IP_ADDRESS_LENGTH-1);
-    strncpy(agent->loopElements->networkDevice, networkDevice, NETWORK_DEVICE_LENGTH-1);
+    agent->loopElements = calloc(1, sizeof(igs_network_context_t));
+    strncpy(agent->loopElements->brokerEndPoint, brokerEndpoint, IGS_IP_ADDRESS_LENGTH-1);
+    strncpy(agent->loopElements->networkDevice, networkDevice, IGS_NETWORK_DEVICE_LENGTH-1);
     agent->loopElements->ipAddress[0] = '\0';
     
 #if (defined WIN32 || defined _WIN32)
@@ -2043,7 +2045,7 @@ int igsAgent_startWithDeviceOnBroker(igsAgent_t *agent, const char *networkDevic
         //        printf (" - name=%s address=%s netmask=%s broadcast=%s\n",
         //                name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist));
         if (strcmp(name, networkDevice) == 0){
-            strncpy(agent->loopElements->ipAddress, ziflist_address (iflist), IP_ADDRESS_LENGTH-1);
+            strncpy(agent->loopElements->ipAddress, ziflist_address (iflist), IGS_IP_ADDRESS_LENGTH-1);
             igsAgent_info(agent, "Starting with ip address %s on device %s with broker %s",
                       agent->loopElements->ipAddress,
                       networkDevice,
@@ -2070,7 +2072,7 @@ int igsAgent_startWithDeviceOnBroker(igsAgent_t *agent, const char *networkDevic
 }
 
 
-int igsAgent_stop(igsAgent_t *agent){
+int igs_stop(){
     if (agent->loopElements != NULL){
         //interrupting and destroying ingescape thread and zyre layer
         //this will also clean all agent->subscribers
@@ -2105,7 +2107,7 @@ int igsAgent_stop(igsAgent_t *agent){
     return 1;
 }
 
-bool igsAgent_isStarted(igsAgent_t *agent){
+bool igs_isStarted(){
     if (agent != NULL && agent->loopElements != NULL
         && agent->loopElements->loop != NULL){
         return true;
@@ -2114,7 +2116,7 @@ bool igsAgent_isStarted(igsAgent_t *agent){
     }
 }
 
-int igsAgent_setAgentName(igsAgent_t *agent, const char *name){
+int igsAgent_setAgentName(igs_agent_t *agent, const char *name){
     if ((name == NULL) || (strlen(name) == 0)){
         igsAgent_error(agent, "Agent name cannot be NULL or empty");
         return 0;
@@ -2123,20 +2125,20 @@ int igsAgent_setAgentName(igsAgent_t *agent, const char *name){
         //nothing to do
         return 1;
     }
-    char networkDevice[NETWORK_DEVICE_LENGTH] = "";
-    char ipAddress[IP_ADDRESS_LENGTH] = "";
+    char networkDevice[IGS_NETWORK_DEVICE_LENGTH] = "";
+    char ipAddress[IGS_IP_ADDRESS_LENGTH] = "";
     int zyrePort = 0;
     bool needRestart = false;
     if (agent->loopElements != NULL){
         //Agent is already started, zyre actor needs to be recreated
-        strncpy(networkDevice, agent->loopElements->networkDevice, NETWORK_DEVICE_LENGTH);
-        strncpy(ipAddress, agent->loopElements->ipAddress, IP_ADDRESS_LENGTH);
+        strncpy(networkDevice, agent->loopElements->networkDevice, IGS_NETWORK_DEVICE_LENGTH);
+        strncpy(ipAddress, agent->loopElements->ipAddress, IGS_IP_ADDRESS_LENGTH);
         zyrePort = agent->loopElements->zyrePort;
         igsAgent_stop(agent);
         needRestart = true;
     }
-    char *n = strndup(name, MAX_AGENT_NAME_LENGTH);
-    if (strlen(name) > MAX_AGENT_NAME_LENGTH){
+    char *n = strndup(name, IGS_MAX_AGENT_NAME_LENGTH);
+    if (strlen(name) > IGS_MAX_AGENT_NAME_LENGTH){
         igsAgent_warn(agent, "Agent name '%s' exceeds maximum size and will be truncated to '%s'", name, n);
     }
     bool spaceInName = false;
@@ -2151,7 +2153,7 @@ int igsAgent_setAgentName(igsAgent_t *agent, const char *name){
     if (spaceInName){
         igsAgent_warn(agent, "Spaces are not allowed in agent name: %s has been renamed to %s", name, n);
     }
-    strncpy(agent->agentName, n, MAX_AGENT_NAME_LENGTH-1);
+    strncpy(agent->agentName, n, IGS_MAX_AGENT_NAME_LENGTH-1);
     free(n);
     
     if (needRestart){
@@ -2162,12 +2164,12 @@ int igsAgent_setAgentName(igsAgent_t *agent, const char *name){
 }
 
 
-char *igsAgent_getAgentName(igsAgent_t *agent){
+char *igsAgent_getAgentName(igs_agent_t *agent){
     return strdup(agent->agentName);
 }
 
 
-int igsAgent_freeze(igsAgent_t *agent){
+int igsAgent_freeze(igs_agent_t *agent){
     if (!agent->canBeFrozen){
         igsAgent_error(agent, "agent is requested to be frozen but is still set to 'can't be Frozen' : call igs_setCanBeFrozen to change this");
         return 0;
@@ -2181,7 +2183,7 @@ int igsAgent_freeze(igsAgent_t *agent){
             bus_zyreUnlock();
         }
         agent->isFrozen = true;
-        freezeCallback_t *elt;
+        igs_freeze_callback_t *elt;
         DL_FOREACH(agent->freezeCallbacks,elt){
             elt->callback_ptr(agent->isFrozen, elt->myData);
         }
@@ -2190,12 +2192,12 @@ int igsAgent_freeze(igsAgent_t *agent){
 }
 
 
-bool igsAgent_isFrozen(igsAgent_t *agent){
+bool igsAgent_isFrozen(igs_agent_t *agent){
     return agent->isFrozen;
 }
 
 
-int igsAgent_unfreeze(igsAgent_t *agent){
+int igsAgent_unfreeze(igs_agent_t *agent){
     if(agent->isFrozen == true)
     {
         igsAgent_debug(agent, "Agent resumed (unfrozen)");
@@ -2205,7 +2207,7 @@ int igsAgent_unfreeze(igsAgent_t *agent){
             bus_zyreUnlock();
         }
         agent->isFrozen = false;
-        freezeCallback_t *elt;
+        igs_freeze_callback_t *elt;
         DL_FOREACH(agent->freezeCallbacks,elt){
             elt->callback_ptr(agent->isFrozen, elt->myData);
         }
@@ -2214,9 +2216,9 @@ int igsAgent_unfreeze(igsAgent_t *agent){
 }
 
 
-int igsAgent_observeFreeze(igsAgent_t *agent, igsAgent_freezeCallback cb, void *myData){
+int igsAgent_observeFreeze(igs_agent_t *agent, igsAgent_freezeCallback cb, void *myData){
     if (cb != NULL){
-        freezeCallback_t *newCb = calloc(1, sizeof(freezeCallback_t));
+        igs_freeze_callback_t *newCb = calloc(1, sizeof(igs_freeze_callback_t));
         newCb->callback_ptr = cb;
         newCb->myData = myData;
         DL_APPEND(agent->freezeCallbacks, newCb);
@@ -2228,14 +2230,14 @@ int igsAgent_observeFreeze(igsAgent_t *agent, igsAgent_freezeCallback cb, void *
 }
 
 
-int igsAgent_setAgentState(igsAgent_t *agent, const char *state){
+int igsAgent_setAgentState(igs_agent_t *agent, const char *state){
     if (state == NULL){
         igsAgent_error(agent, "state can not be NULL");
         return 0;
     }
     
     if (strcmp(state, agent->agentState) != 0){
-        strncpy(agent->agentState, state, MAX_AGENT_NAME_LENGTH-1);
+        strncpy(agent->agentState, state, IGS_MAX_AGENT_NAME_LENGTH-1);
         igsAgent_debug(agent, "changed to %s", agent->agentState);
         if (agent->loopElements != NULL && agent->loopElements->node != NULL){
             bus_zyreLock();
@@ -2247,12 +2249,12 @@ int igsAgent_setAgentState(igsAgent_t *agent, const char *state){
 }
 
 
-char *igsAgent_getAgentState(igsAgent_t *agent){
+char *igsAgent_getAgentState(igs_agent_t *agent){
     return strdup(agent->agentState);
 }
 
 
-void igsAgent_setCanBeFrozen(igsAgent_t *agent, bool canBeFrozen){
+void igsAgent_setCanBeFrozen(igs_agent_t *agent, bool canBeFrozen){
     agent->canBeFrozen = canBeFrozen;
     if (agent->loopElements != NULL && agent->loopElements->node != NULL){
         bus_zyreLock();
@@ -2266,12 +2268,12 @@ void igsAgent_setCanBeFrozen(igsAgent_t *agent, bool canBeFrozen){
 }
 
 
-bool igsAgent_canBeFrozen (igsAgent_t *agent){
+bool igsAgent_canBeFrozen (igs_agent_t *agent){
     return agent->canBeFrozen;
 }
 
 
-int igsAgent_mute(igsAgent_t *agent){
+int igsAgent_mute(igs_agent_t *agent){
     if (!agent->isWholeAgentMuted)
     {
         agent->isWholeAgentMuted = true;
@@ -2280,7 +2282,7 @@ int igsAgent_mute(igsAgent_t *agent){
             zyre_shouts(agent->loopElements->node, CHANNEL, "MUTED=%i", agent->isWholeAgentMuted);
             bus_zyreUnlock();
         }
-        muteCallback_t *elt;
+        igs_mute_callback_t *elt;
         DL_FOREACH(agent->muteCallbacks,elt){
             elt->callback_ptr(agent, agent->isWholeAgentMuted, elt->myData);
         }
@@ -2289,7 +2291,7 @@ int igsAgent_mute(igsAgent_t *agent){
 }
 
 
-int igsAgent_unmute(igsAgent_t *agent){
+int igsAgent_unmute(igs_agent_t *agent){
     if (agent->isWholeAgentMuted)
     {
         agent->isWholeAgentMuted = false;
@@ -2298,7 +2300,7 @@ int igsAgent_unmute(igsAgent_t *agent){
             zyre_shouts(agent->loopElements->node, CHANNEL, "MUTED=%i", agent->isWholeAgentMuted);
             bus_zyreUnlock();
         }
-        muteCallback_t *elt;
+        igs_mute_callback_t *elt;
         DL_FOREACH(agent->muteCallbacks,elt){
             elt->callback_ptr(agent, agent->isWholeAgentMuted, elt->myData);
         }
@@ -2307,14 +2309,14 @@ int igsAgent_unmute(igsAgent_t *agent){
 }
 
 
-bool igsAgent_isMuted(igsAgent_t *agent){
+bool igsAgent_isMuted(igs_agent_t *agent){
     return agent->isWholeAgentMuted;
 }
 
 
-int igsAgent_observeMute(igsAgent_t *agent, igsAgent_muteCallback cb, void *myData){
+int igsAgent_observeMute(igs_agent_t *agent, igsAgent_muteCallback cb, void *myData){
     if (cb != NULL){
-        muteCallback_t *newCb = calloc(1, sizeof(muteCallback_t));
+        igs_mute_callback_t *newCb = calloc(1, sizeof(igs_mute_callback_t));
         newCb->callback_ptr = cb;
         newCb->myData = myData;
         DL_APPEND(agent->muteCallbacks, newCb);
@@ -2327,22 +2329,22 @@ int igsAgent_observeMute(igsAgent_t *agent, igsAgent_muteCallback cb, void *myDa
 }
 
 
-void igsAgent_die(igsAgent_t *agent){
+void igs_die(){
     agent->forcedStop = true;
     igsAgent_stop(agent);
 }
 
-void igsAgent_setCommandLine(igsAgent_t *agent, const char *line){
-    strncpy(agent->commandLine, line, COMMAND_LINE_LENGTH-1);
+void igs_setCommandLine(const char *line){
+    strncpy(agent->commandLine, line, IGS_COMMAND_LINE_LENGTH-1);
     igsAgent_debug(agent, "Command line set to %s", agent->commandLine);
 }
 
-void igsAgent_setCommandLineFromArgs(igsAgent_t *agent, int argc, const char * argv[]){
+void igs_setCommandLineFromArgs(int argc, const char * argv[]){
     if (argc < 1 || argv == NULL || argv[0] == NULL){
         igsAgent_error(agent, "passed args must at least contain one element");
         return;
     }
-    char cmd[COMMAND_LINE_LENGTH] = "";
+    char cmd[IGS_COMMAND_LINE_LENGTH] = "";
     
 #if defined __linux__ || defined __APPLE__ || defined __unix__
     size_t ret;
@@ -2367,7 +2369,7 @@ void igsAgent_setCommandLineFromArgs(igsAgent_t *agent, int argc, const char * a
     } else {
         igsAgent_debug(agent, "proc %d: %s", pid, pathbuf);
     }
-    if (strlen(pathbuf) < COMMAND_LINE_LENGTH){
+    if (strlen(pathbuf) < IGS_COMMAND_LINE_LENGTH){
         strcat(cmd, pathbuf);
     }else{
         igsAgent_error(agent, "path is too long: %s", pathbuf);
@@ -2390,7 +2392,7 @@ void igsAgent_setCommandLineFromArgs(igsAgent_t *agent, int argc, const char * a
     
     int i = 1;
     for (; i<argc; i++){
-        if (strlen(cmd) + strlen(argv[i]) + 2 > COMMAND_LINE_LENGTH){ // 2 is for space and EOL
+        if (strlen(cmd) + strlen(argv[i]) + 2 > IGS_COMMAND_LINE_LENGTH){ // 2 is for space and EOL
             igsAgent_error(agent, "passed arguments exceed buffer size: concatenation will stop here with '%s'", cmd);
             break;
         }else{
@@ -2398,16 +2400,16 @@ void igsAgent_setCommandLineFromArgs(igsAgent_t *agent, int argc, const char * a
         }
         strcat(cmd, argv[i]);
     }
-    strncpy(agent->commandLine, cmd, COMMAND_LINE_LENGTH);
+    strncpy(agent->commandLine, cmd, IGS_COMMAND_LINE_LENGTH);
     igsAgent_debug(agent, "Command line set to %s", agent->commandLine);
 }
 
-void igsAgent_setRequestOutputsFromMappedAgents(igsAgent_t *agent, bool notify){
+void igsAgent_setRequestOutputsFromMappedAgents(igs_agent_t *agent, bool notify){
     agent->network_RequestOutputsFromMappedAgents = notify;
     igsAgent_debug(agent, "changed to %d", notify);
 }
 
-bool igsAgent_getRequestOutputsFromMappedAgents(igsAgent_t *agent){
+bool igsAgent_getRequestOutputsFromMappedAgents(igs_agent_t *agent){
     return agent->network_RequestOutputsFromMappedAgents;
 }
 
@@ -2433,8 +2435,8 @@ void igs_getNetdevicesList(char ***devices, int *nb){
         //        printf (" - name=%s address=%s netmask=%s broadcast=%s\n",
         //                name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist));
         if (devices != NULL){
-            (*devices)[currentDeviceNb] = calloc(NETWORK_DEVICE_LENGTH+1, sizeof(char));
-            strncpy((*devices)[currentDeviceNb], name, NETWORK_DEVICE_LENGTH);
+            (*devices)[currentDeviceNb] = calloc(IGS_NETWORK_DEVICE_LENGTH+1, sizeof(char));
+            strncpy((*devices)[currentDeviceNb], name, IGS_NETWORK_DEVICE_LENGTH);
         }
         currentDeviceNb++;
         name = ziflist_next (iflist);
@@ -2491,9 +2493,9 @@ void igs_freeNetaddressesList(char **addresses, int nb){
     igs_freeNetdevicesList(addresses, nb);
 }
 
-void igsAgent_observeForcedStop(igsAgent_t *agent, igsAgent_forcedStopCallback cb, void *myData){
+void igsAgent_observeForcedStop(igs_agent_t *agent, igsAgent_forcedStopCallback cb, void *myData){
     if (cb != NULL){
-        forcedStopCalback_t *newCb = calloc(1, sizeof(forcedStopCalback_t));
+        igs_forced_stop_calback_t *newCb = calloc(1, sizeof(igs_forced_stop_calback_t));
         newCb->callback_ptr = cb;
         newCb->myData = myData;
         DL_APPEND(agent->forcedStopCalbacks, newCb);
@@ -2502,7 +2504,7 @@ void igsAgent_observeForcedStop(igsAgent_t *agent, igsAgent_forcedStopCallback c
     }
 }
 
-void igsAgent_setDiscoveryInterval(igsAgent_t *agent, unsigned int interval){
+void igs_setDiscoveryInterval(unsigned int interval){
     if (agent->loopElements != NULL && agent->loopElements->node != NULL){
         bus_zyreLock();
         zyre_set_interval(agent->loopElements->node, interval);
@@ -2511,7 +2513,7 @@ void igsAgent_setDiscoveryInterval(igsAgent_t *agent, unsigned int interval){
     agent->network_discoveryInterval = interval;
 }
 
-void igsAgent_setAgentTimeout(igsAgent_t *agent, unsigned int duration){
+void igs_setAgentTimeout(unsigned int duration){
     if (agent->loopElements != NULL && agent->loopElements->node != NULL){
         bus_zyreLock();
         zyre_set_expired_timeout(agent->loopElements->node, duration);
@@ -2520,7 +2522,7 @@ void igsAgent_setAgentTimeout(igsAgent_t *agent, unsigned int duration){
     agent->network_agentTimeout = duration;
 }
 
-void igsAgent_setPublishingPort(igsAgent_t *agent, unsigned int port){
+void igs_setPublishingPort(unsigned int port){
     if (agent->loopElements != NULL && agent->loopElements->publisher != NULL){
         igsAgent_error(agent, "agent is already started : stop it first to change its publishing port");
         return;
@@ -2528,7 +2530,7 @@ void igsAgent_setPublishingPort(igsAgent_t *agent, unsigned int port){
     agent->network_publishingPort = port;
 }
 
-void igsAgent_setLogStreamPort(igsAgent_t *agent, unsigned int port){
+void igs_setLogStreamPort(unsigned int port){
     if (agent->loopElements != NULL && agent->loopElements->logger != NULL){
         igsAgent_error(agent, "agent is already started : stop it first to change its logger port");
         return;
@@ -2537,7 +2539,7 @@ void igsAgent_setLogStreamPort(igsAgent_t *agent, unsigned int port){
 }
 
 #if defined __unix__ || defined __APPLE__ || defined __linux__
-void igsAgent_setIpcFolderPath(igsAgent_t *agent, char *path){
+void igs_setIpcFolderPath(char *path){
     if (strcmp(path, DEFAULT_IPC_PATH) == 0
         || (agent->ipcFolderPath != NULL && strcmp(path, agent->ipcFolderPath) == 0)){
         igsAgent_debug(agent, "IPC folder path already is '%s'", path);
@@ -2557,28 +2559,28 @@ void igsAgent_setIpcFolderPath(igsAgent_t *agent, char *path){
     }
 }
 
-const char* igsAgent_getIpcFolderPath(igsAgent_t *agent){
+const char* igsAgent_getIpcFolderPath(){
     return agent->ipcFolderPath;
 }
 #endif
 
-void igsAgent_setAllowInproc(igsAgent_t *agent, bool allow){
+void igs_setAllowInproc(bool allow){
     agent->allowInproc = allow;
 }
 
-bool igsAgent_getAllowInproc(igsAgent_t *agent){
+bool igs_getAllowInproc(){
     return agent->allowInproc;
 }
 
-void igsAgent_setAllowIpc(igsAgent_t *agent, bool allow){
+void igs_setAllowIpc(bool allow){
     agent->allowIpc = allow;
 }
 
-bool igsAgent_getAllowIpc(igsAgent_t *agent){
+bool igs_getAllowIpc(){
     return agent->allowIpc;
 }
 
-void igsAgent_setHighWaterMarks(igsAgent_t *agent, int hwmValue){
+void igs_setHighWaterMarks(int hwmValue){
     if (hwmValue < 0){
         igsAgent_error(agent, "HWM value must be zero or higher");
         return;
@@ -2586,7 +2588,7 @@ void igsAgent_setHighWaterMarks(igsAgent_t *agent, int hwmValue){
     if (agent->loopElements != NULL && agent->loopElements->publisher != NULL){
         zsock_set_sndhwm(agent->loopElements->publisher, hwmValue);
         zsock_set_sndhwm(agent->loopElements->logger, hwmValue);
-        subscriber_t *tmp = NULL, *subs = NULL;
+        igs_subscriber_t *tmp = NULL, *subs = NULL;
         HASH_ITER(hh, agent->subscribers, subs, tmp){
             zsock_set_rcvhwm(subs->subscriber, hwmValue);
         }
@@ -2594,7 +2596,7 @@ void igsAgent_setHighWaterMarks(igsAgent_t *agent, int hwmValue){
     agent->network_hwmValue = hwmValue;
 }
 
-int igsAgent_timerStart(igsAgent_t *agent, size_t delay, size_t times, igs_timerCallback cb, void *myData){
+int igs_timerStart(size_t delay, size_t times, igs_timerCallback cb, void *myData){
     if (agent->loopElements == NULL || agent->loopElements->loop == NULL){
         igs_error("agent %s must be started before creating a timer", agent->agentName);
         return -1;
@@ -2604,7 +2606,7 @@ int igsAgent_timerStart(igsAgent_t *agent, size_t delay, size_t times, igs_timer
         return -1;
     }
     network_Lock();
-    igsTimer_t *timer = calloc(1, sizeof(igsTimer_t));
+    igs_timer_t *timer = calloc(1, sizeof(igs_timer_t));
     timer->cb = cb;
     timer->myData = myData;
     timer->timerId = zloop_timer(agent->loopElements->loop, delay, times, network_timerCallback, timer);
@@ -2613,13 +2615,13 @@ int igsAgent_timerStart(igsAgent_t *agent, size_t delay, size_t times, igs_timer
     return timer->timerId;
 }
 
-void igsAgent_timerStop(igsAgent_t *agent, int timerId){
+void igs_timerStop(int timerId){
     if (agent->loopElements->loop == NULL){
         igs_error("agent must be started to destroy a timer");
         return;
     }
     network_Lock();
-    igsTimer_t *timer = NULL;
+    igs_timer_t *timer = NULL;
     HASH_FIND_INT(agent->loopElements->timers, &timerId, timer);
     if (timer != NULL){
         zloop_timer_end(agent->loopElements->loop, timerId);
