@@ -395,7 +395,7 @@ igs_mapping_t* parser_LoadMap (const char* json_str);
 igs_mapping_t* parser_LoadMapFromPath (const char* load_file);
 
 // admin
-void admin_makeFilePath(igs_agent_t *agent, const char *from, char *to, size_t size_of_to);
+void admin_makeFilePath(const char *from, char *to, size_t size_of_to);
 PUBLIC void admin_log(igs_agent_t *agent, igs_logLevel_t, const char *function, const char *format, ...)  CHECK_PRINTF (4);
 
 //bus
@@ -413,8 +413,8 @@ int call_freeValuesInArguments(igs_callArgument_t *arg);
 #define MAX_NB_OF_IOP 1000
 #define MAX_EXEC_DURATION_DURING_EVAL 300
 #if !TARGET_OS_IOS
-void license_cleanLicense(igs_agent_t *agent);
-void license_readLicense(igs_agent_t *agent);
+void license_cleanLicense(void);
+void license_readLicense(void);
 #endif
 
 #ifdef __cplusplus

@@ -335,7 +335,7 @@ int igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, const cha
     }
     igs_zyre_agent_t *agt = NULL, *tmp = NULL;
     bool found = false;
-    HASH_ITER(hh, agent->zyreAgents, agt, tmp){
+    HASH_ITER(hh, coreContext->zyreAgents, agt, tmp){
         if (strcmp(agt->name, agentNameOrUUID) == 0 || strcmp(agt->peerId, agentNameOrUUID) == 0){
             //we found a matching agent
             igs_callArgument_t *arg = NULL;
@@ -400,7 +400,7 @@ int igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, const cha
                 }
             }
             bus_zyreLock();
-            zyre_shouts(coreContext->node, agent->callsChannel, "%s to %s", callName, agentNameOrUUID);
+            zyre_shouts(coreContext->node, coreContext->callsChannel, "%s to %s", callName, agentNameOrUUID);
             zyre_whisper(coreContext->node, agt->peerId, &msg);
             bus_zyreUnlock();
             igsAgent_debug(agent, "sent call %s to %s", callName, agentNameOrUUID);

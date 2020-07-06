@@ -68,7 +68,7 @@ void admin_computeTime(char *dest){
 #endif
     }
 
-void admin_makeFilePath(igs_agent_t *agent, const char *from, char *to, size_t size_of_to){
+void admin_makeFilePath(const char *from, char *to, size_t size_of_to){
     if (from[0] == '~') {
         from++;
 #ifdef _WIN32
@@ -77,7 +77,7 @@ void admin_makeFilePath(igs_agent_t *agent, const char *from, char *to, size_t s
         char *home = getenv("HOME");
 #endif
         if (home == NULL) {
-            igsAgent_error(agent, "could not find path for home directory");
+            igs_error("could not find path for home directory");
         } else {
             strncpy(to, home, size_of_to);
             strncat(to, from, size_of_to);
@@ -140,94 +140,94 @@ void admin_log(igs_agent_t *agent, igs_logLevel_t level, const char *function, c
     
     va_list list;
     va_start(list, fmt);
-    vsnprintf(agent->logContent, 2047, fmt, list);
+    vsnprintf(coreContext->logContent, 2047, fmt, list);
     va_end(list);
     
     //remove final \n if needed
     //TODO: scan the whole string to remove unallowed characters
-    if (agent->logContent[strlen(agent->logContent) - 1] == '\n'){
-        agent->logContent[strlen(agent->logContent) - 1] = '\0';
+    if (coreContext->logContent[strlen(coreContext->logContent) - 1] == '\n'){
+        coreContext->logContent[strlen(coreContext->logContent) - 1] = '\0';
     }
 
-    if (agent->logInFile){
+    if (coreContext->logInFile){
         //create default path if current is empty
-        if (strlen(agent->logFilePath) == 0){
+        if (strlen(coreContext->logFilePath) == 0){
             char buff[4097] = "";
-            snprintf(agent->logFilePath, 4095, "~/Documents/IngeScape/logs/");
-            strncpy(buff, agent->logFilePath, 4096);
-            admin_makeFilePath(agent, buff, agent->logFilePath, 4096);
-            if (!zsys_file_exists(agent->logFilePath)){
-                printf("creating log path %s\n", agent->logFilePath);
-                if(zsys_dir_create(agent->logFilePath) != 0){
-                    printf("error while creating log path %s\n", agent->logFilePath);
+            snprintf(coreContext->logFilePath, 4095, "~/Documents/IngeScape/logs/");
+            strncpy(buff, coreContext->logFilePath, 4096);
+            admin_makeFilePath(buff, coreContext->logFilePath, 4096);
+            if (!zsys_file_exists(coreContext->logFilePath)){
+                printf("creating log path %s\n", coreContext->logFilePath);
+                if(zsys_dir_create(coreContext->logFilePath) != 0){
+                    printf("error while creating log path %s\n", coreContext->logFilePath);
                 }
             }
             char *name = igsAgent_getAgentName(agent);
-            strncat(agent->logFilePath, name, 4095);
-            strncat(agent->logFilePath, ".log", 4095);
-            printf("using log file %s\n", agent->logFilePath);
+            strncat(coreContext->logFilePath, name, 4095);
+            strncat(coreContext->logFilePath, ".log", 4095);
+            printf("using log file %s\n", coreContext->logFilePath);
             free(name);
             if (coreContext != NULL && coreContext->node != NULL){
                 bus_zyreLock();
-                zyre_shouts(coreContext->node, IGS_PRIVATE_CHANNEL, "LOG_FILE_PATH=%s", agent->logFilePath);
+                zyre_shouts(coreContext->node, IGS_PRIVATE_CHANNEL, "LOG_FILE_PATH=%s", coreContext->logFilePath);
                 bus_zyreUnlock();
             }
         }
-        if (agent->logFile == NULL || !zsys_file_exists(agent->logFilePath)){
-            if (agent->logFile != NULL)
-                fclose(agent->logFile);
-            agent->logFile = fopen (agent->logFilePath,"a");
-            if (agent->logFile == NULL){
-                printf("error while trying to create/open log file: %s\n", agent->logFilePath);
+        if (coreContext->logFile == NULL || !zsys_file_exists(coreContext->logFilePath)){
+            if (coreContext->logFile != NULL)
+                fclose(coreContext->logFile);
+            coreContext->logFile = fopen (coreContext->logFilePath,"a");
+            if (coreContext->logFile == NULL){
+                printf("error while trying to create/open log file: %s\n", coreContext->logFilePath);
             }
         }
-        if (agent->logFile != NULL){
-            admin_computeTime(agent->logTime);
-            if (fprintf(agent->logFile,"%s;%s;%s;%s;%s\n", agent->agentName, agent->logTime, log_levels[level], function, agent->logContent) > 0){
-                if (++agent->logNbOfEntries > NUMBER_OF_LOGS_FOR_FFLUSH){
-                    agent->logNbOfEntries = 0;
-                    fflush(agent->logFile);
+        if (coreContext->logFile != NULL){
+            admin_computeTime(coreContext->logTime);
+            if (fprintf(coreContext->logFile,"%s;%s;%s;%s;%s\n", agent->agentName, coreContext->logTime, log_levels[level], function, coreContext->logContent) > 0){
+                if (++coreContext->logNbOfEntries > NUMBER_OF_LOGS_FOR_FFLUSH){
+                    coreContext->logNbOfEntries = 0;
+                    fflush(coreContext->logFile);
                 }
             }else{
-                printf("error while writing logs in %s\n", agent->logFilePath);
+                printf("error while writing logs in %s\n", coreContext->logFilePath);
             }
         }
     }
-    if ((agent->logInConsole && level >= agent->logLevel) || level >= IGS_LOG_ERROR){
+    if ((coreContext->logInConsole && level >= coreContext->logLevel) || level >= IGS_LOG_ERROR){
         if (level >= IGS_LOG_WARN){
-            if (agent->useColorInConsole){
-                fprintf(stderr,"%s;%s%s\x1b[0m;%s;%s\n", agent->agentName, log_colors[level], log_levels[level], function, agent->logContent);
+            if (coreContext->useColorInConsole){
+                fprintf(stderr,"%s;%s%s\x1b[0m;%s;%s\n", agent->agentName, log_colors[level], log_levels[level], function, coreContext->logContent);
             }else{
-                fprintf(stderr,"%s;%s;%s;%s\n", agent->agentName, log_levels[level], function, agent->logContent);
+                fprintf(stderr,"%s;%s;%s;%s\n", agent->agentName, log_levels[level], function, coreContext->logContent);
             }
         }else{
-            if (agent->useColorInConsole){
-                fprintf(stdout,"%s;%s%s\x1b[0m;%s;%s\n", agent->agentName, log_colors[level], log_levels[level], function, agent->logContent);
+            if (coreContext->useColorInConsole){
+                fprintf(stdout,"%s;%s%s\x1b[0m;%s;%s\n", agent->agentName, log_colors[level], log_levels[level], function, coreContext->logContent);
             }else{
-                fprintf(stdout,"%s;%s;%s;%s\n", agent->agentName, log_levels[level], function, agent->logContent);
+                fprintf(stdout,"%s;%s;%s;%s\n", agent->agentName, log_levels[level], function, coreContext->logContent);
             }
         }
         
     }
-    if (agent->logInStream && coreContext != NULL && coreContext->logger != NULL){
-        zstr_sendf(coreContext->logger, "%s;%s;%s;%s\n", agent->agentName, log_levels[level], function, agent->logContent);
+    if (coreContext->logInStream && coreContext != NULL && coreContext->logger != NULL){
+        zstr_sendf(coreContext->logger, "%s;%s;%s;%s\n", agent->agentName, log_levels[level], function, coreContext->logContent);
     }
     admin_unlock();
 
 }
 
 void igs_setLogLevel (igs_logLevel_t level){
-    agent->logLevel = level;
+    coreContext->logLevel = level;
 }
 
 igs_logLevel_t igs_getLogLevel () {
-    return agent->logLevel;
+    return coreContext->logLevel;
 }
 
 void igs_setLogInFile (bool allow){
-    if (allow != agent->logInFile){
+    if (allow != coreContext->logInFile){
         core_initCoreAgent();
-        agent->logInFile = allow;
+        coreContext->logInFile = allow;
         if (coreContext != NULL && coreContext->node != NULL){
             bus_zyreLock();
             if (allow){
@@ -241,37 +241,37 @@ void igs_setLogInFile (bool allow){
 }
 
 bool igs_getLogInFile () {
-    return agent->logInFile;
+    return coreContext->logInFile;
 }
 
 void igs_setVerbose (bool allow){
-    agent->logInConsole = allow;
+    coreContext->logInConsole = allow;
 }
 
 bool igs_isVerbose () {
-    return agent->logInConsole;
+    return coreContext->logInConsole;
 }
 
 void igs_setUseColorVerbose (bool allow){
-    agent->useColorInConsole = allow;
+    coreContext->useColorInConsole = allow;
 }
 
 bool igs_getUseColorVerbose() {
-    return agent->useColorInConsole;
+    return coreContext->useColorInConsole;
 }
 
 void igs_setLogStream(bool stream){
-    if (stream != agent->logInStream){
+    if (stream != coreContext->logInStream){
         core_initCoreAgent();
         if (coreContext != NULL){
             if (stream){
-                igsAgent_warn(agent, "agent is already started, log stream cannot be created anymore");
+                igs_warn("agent is already started, log stream cannot be created anymore");
             }else{
-                igsAgent_warn(agent, "agent is already started, log stream cannot be disabled anymore");
+                igs_warn("agent is already started, log stream cannot be disabled anymore");
             }
             return;
         }
-        agent->logInStream = stream;
+        coreContext->logInStream = stream;
         if (coreContext != NULL && coreContext->node != NULL){
             bus_zyreLock();
             if (stream){
@@ -285,7 +285,7 @@ void igs_setLogStream(bool stream){
 }
 
 bool igs_getLogStream () {
-    return agent->logInStream;
+    return coreContext->logInStream;
 }
 
 void igs_setLogPath(const char *path){
@@ -293,7 +293,7 @@ void igs_setLogPath(const char *path){
         core_initCoreAgent();
         char tmpPath[4096] = "";
         admin_lock();
-        admin_makeFilePath(agent, path, tmpPath, 4095);
+        admin_makeFilePath(path, tmpPath, 4095);
         if (!zsys_file_exists(tmpPath)){
             zfile_t *newF = zfile_new(NULL, tmpPath);
             if (newF != NULL){
@@ -306,27 +306,27 @@ void igs_setLogPath(const char *path){
             admin_unlock();
             return;
         }
-        if (strcmp(agent->logFilePath, tmpPath) == 0){
-            printf("'%s' is already the log path\n", agent->logFilePath);
+        if (strcmp(coreContext->logFilePath, tmpPath) == 0){
+            printf("'%s' is already the log path\n", coreContext->logFilePath);
             admin_unlock();
             return;
         }else{
-            strncpy(agent->logFilePath, tmpPath, 4096);
+            strncpy(coreContext->logFilePath, tmpPath, 4096);
         }
-        if (agent->logFile != NULL){
-            fflush(agent->logFile);
-            fclose(agent->logFile);
-            agent->logFile = NULL;
+        if (coreContext->logFile != NULL){
+            fflush(coreContext->logFile);
+            fclose(coreContext->logFile);
+            coreContext->logFile = NULL;
         }
-        agent->logFile = fopen(agent->logFilePath,"a");
-        if (agent->logFile == NULL){
-            printf("could NOT create log file at path %s\n", agent->logFilePath);
+        coreContext->logFile = fopen(coreContext->logFilePath,"a");
+        if (coreContext->logFile == NULL){
+            printf("could NOT create log file at path %s\n", coreContext->logFilePath);
         }else{
-            printf("switching to new log file: %s\n", agent->logFilePath);
+            printf("switching to new log file: %s\n", coreContext->logFilePath);
         }
-        if (agent->logFile != NULL && coreContext != NULL && coreContext->node != NULL){
+        if (coreContext->logFile != NULL && coreContext != NULL && coreContext->node != NULL){
             bus_zyreLock();
-            zyre_shouts(coreContext->node, IGS_PRIVATE_CHANNEL, "LOG_FILE_PATH=%s", agent->logFilePath);
+            zyre_shouts(coreContext->node, IGS_PRIVATE_CHANNEL, "LOG_FILE_PATH=%s", coreContext->logFilePath);
             bus_zyreUnlock();
         }
         admin_unlock();
@@ -336,5 +336,5 @@ void igs_setLogPath(const char *path){
 }
 
 char* igs_getLogPath () {
-    return strdup(agent->logFilePath);
+    return strdup(coreContext->logFilePath);
 }
