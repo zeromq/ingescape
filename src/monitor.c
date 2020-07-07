@@ -186,7 +186,7 @@ int monitor_manageParent (zloop_t *loop, zmq_pollitem_t *item, void *arg){
     {
         zmsg_t *msg = zmsg_recv ((zsock_t *)item->socket);
         if (!msg){
-            igs_error("Could not read message from main thread : Agent will interrupt immediately.");
+            igs_error("Could not read message from main thread : Ingescape will interrupt immediately.");
             return -1;
         }
         char *command = zmsg_popstr (msg);

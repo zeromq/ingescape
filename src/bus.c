@@ -163,9 +163,9 @@ int igsAgent_busSendStringToAgent(igs_agent_t *agent, const char *agentNameOrPee
         igsAgent_debug(agent, "agentNameOrPeerID is NULL");
         return 0;
     }
-    igs_zyre_agent_t *el, *tmp;
+    igs_zyre_peer_t *el, *tmp;
     int res = 1;
-    HASH_ITER(hh, coreContext->zyreAgents, el, tmp){
+    HASH_ITER(hh, coreContext->zyrePeers, el, tmp){
         if (strcmp(el->name, agentNameOrPeerID) == 0 || strcmp(el->peerId, agentNameOrPeerID) == 0){
             char content[MAX_STRING_MSG_LENGTH] = "";
             va_list list;
@@ -190,9 +190,9 @@ int igsAgent_busSendDataToAgent(igs_agent_t *agent, const char *agentNameOrPeerI
         igsAgent_debug(agent, "agentNameOrPeerID is NULL");
         return 0;
     }
-    igs_zyre_agent_t *el, *tmp;
+    igs_zyre_peer_t *el, *tmp;
     int res = 1;
-    HASH_ITER(hh, coreContext->zyreAgents, el, tmp){
+    HASH_ITER(hh, coreContext->zyrePeers, el, tmp){
         if (strcmp(el->name, agentNameOrPeerID) == 0 || strcmp(el->peerId, agentNameOrPeerID) == 0){
             zframe_t *frame = zframe_new(data, size);
             zmsg_t *msg = zmsg_new();
@@ -215,9 +215,9 @@ int igsAgent_busSendZMQMsgToAgent(igs_agent_t *agent, const char *agentNameOrPee
         igsAgent_debug(agent, "agentNameOrPeerID is NULL");
         return 0;
     }
-    igs_zyre_agent_t *el, *tmp;
+    igs_zyre_peer_t *el, *tmp;
     int res = 1;
-    HASH_ITER(hh, coreContext->zyreAgents, el, tmp){
+    HASH_ITER(hh, coreContext->zyrePeers, el, tmp){
         if (strcmp(el->name, agentNameOrPeerID) == 0 || strcmp(el->peerId, agentNameOrPeerID) == 0){
             zmsg_t *msg = zmsg_dup(*msg_p);
             bus_zyreLock();

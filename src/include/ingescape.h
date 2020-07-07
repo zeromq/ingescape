@@ -28,6 +28,9 @@ extern "C" {
 #define PUBLIC
 #endif
 
+#define IGS_SUCCESS 0
+#define IGS_FAILURE 1
+
 // GCC and clang can validate format strings for functions that act like printf
 // this is used to check the logging functions
 #if defined (__GNUC__) && (__GNUC__ >= 2)
@@ -48,12 +51,12 @@ PUBLIC int igs_startWithIP(const char *ipAddress, unsigned int port);
 PUBLIC int igs_stop(void);
 PUBLIC bool igs_isStarted(void);
 
-//There are four non-exclusive ways to stop the execution of ingescape:
-//1- calling igs_stop from the hosting app's threads reacting on user actions or external events
+//There are four non-exclusive ways to stop the execution of ingescape in a process:
+//1- calling igs_stop from the hosting app's threads by reaction to user actions or external events
 //2- handling SIGINT in the hosting app to call igs_stop and stop the rest of the app properly
 //3- monitoring the status of igs_Interrupted in the hosting app
 //4- using an igs_forcedStopCallback (see below) and calling code ON THE MAIN APP THREAD from it
-//In any case, igs_stop MUST NEVER BE CALLED directly from any ingeScape callback, as it would cause a thread deadlock.
+//In any case, igs_stop MUST NEVER BE CALLED directly from any ingeScape callback, as it would cause a deadlock.
 
 PUBLIC extern bool igs_Interrupted; //true when the ingescape library triggered SIGINT when forced to stop
 typedef void (*igs_forcedStopCallback)(void *myData);
@@ -358,12 +361,12 @@ typedef void (*igs_licenseCallback)(igs_license_limit_t limit, void *myData);
 // All licenses in path will be examined and used if valid
 // When path is set manually, it takes priority over agent's executable path.
 PUBLIC void igs_setLicensePath(const char *path);
-PUBLIC char *igs_getLicensePath(void);
+PUBLIC char *igs_getLicensePath(void); //must be freed by caller
     
 //Any agent developer can use this function to check the license against her/his agent's unique id.
 //IDs are provided by the ingescape team.
 //Returns true if check is OK.
-PUBLIC bool igs_checkLicenseForAgent(const char *agentId);
+PUBLIC bool igs_checkLicense(const char *agentId);
 
 //use this callback mechanism to be notified when the timer
 //or number of agents or number of IOPs has been exceeded in demo mode

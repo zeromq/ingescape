@@ -183,7 +183,7 @@ void admin_log(igs_agent_t *agent, igs_logLevel_t level, const char *function, c
         }
         if (coreContext->logFile != NULL){
             admin_computeTime(coreContext->logTime);
-            if (fprintf(coreContext->logFile,"%s;%s;%s;%s;%s\n", agent->agentName, coreContext->logTime, log_levels[level], function, coreContext->logContent) > 0){
+            if (fprintf(coreContext->logFile,"%s;%s;%s;%s;%s\n", agent->name, coreContext->logTime, log_levels[level], function, coreContext->logContent) > 0){
                 if (++coreContext->logNbOfEntries > NUMBER_OF_LOGS_FOR_FFLUSH){
                     coreContext->logNbOfEntries = 0;
                     fflush(coreContext->logFile);
@@ -196,21 +196,21 @@ void admin_log(igs_agent_t *agent, igs_logLevel_t level, const char *function, c
     if ((coreContext->logInConsole && level >= coreContext->logLevel) || level >= IGS_LOG_ERROR){
         if (level >= IGS_LOG_WARN){
             if (coreContext->useColorInConsole){
-                fprintf(stderr,"%s;%s%s\x1b[0m;%s;%s\n", agent->agentName, log_colors[level], log_levels[level], function, coreContext->logContent);
+                fprintf(stderr,"%s;%s%s\x1b[0m;%s;%s\n", agent->name, log_colors[level], log_levels[level], function, coreContext->logContent);
             }else{
-                fprintf(stderr,"%s;%s;%s;%s\n", agent->agentName, log_levels[level], function, coreContext->logContent);
+                fprintf(stderr,"%s;%s;%s;%s\n", agent->name, log_levels[level], function, coreContext->logContent);
             }
         }else{
             if (coreContext->useColorInConsole){
-                fprintf(stdout,"%s;%s%s\x1b[0m;%s;%s\n", agent->agentName, log_colors[level], log_levels[level], function, coreContext->logContent);
+                fprintf(stdout,"%s;%s%s\x1b[0m;%s;%s\n", agent->name, log_colors[level], log_levels[level], function, coreContext->logContent);
             }else{
-                fprintf(stdout,"%s;%s;%s;%s\n", agent->agentName, log_levels[level], function, coreContext->logContent);
+                fprintf(stdout,"%s;%s;%s;%s\n", agent->name, log_levels[level], function, coreContext->logContent);
             }
         }
         
     }
     if (coreContext->logInStream && coreContext != NULL && coreContext->logger != NULL){
-        zstr_sendf(coreContext->logger, "%s;%s;%s;%s\n", agent->agentName, log_levels[level], function, coreContext->logContent);
+        zstr_sendf(coreContext->logger, "%s;%s;%s;%s\n", agent->name, log_levels[level], function, coreContext->logContent);
     }
     admin_unlock();
 

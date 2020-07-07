@@ -53,6 +53,7 @@ extern "C" {
 #define IGS_IP_ADDRESS_LENGTH 1024
 #define IGS_MAX_PEER_ID_LENGTH 128
 
+typedef struct igs_core_context igs_core_context_t;
 
 //////////////////  IOP/CALL  STRUCTURES AND ENUMS   //////////////////
 
@@ -118,26 +119,26 @@ typedef struct igs_mapping{
 } igs_mapping_t;
 
 typedef struct igs_mappings_filter {
-    char filter[IGS_MAX_IOP_NAME_LENGTH];
+    char *filter;
     struct igs_mappings_filter *next, *prev;
 } igs_mappings_filter_t;
 
-
 //////////////////  NETWORK  STRUCTURES AND ENUMS   //////////////////
 
-typedef struct igs_subscriber{
-    const char *agentName;
-    const char *agentPeerId;
+//remote agent we are subscribing to
+typedef struct igs_remote_agent{
+    char *uuid;
+    char *name;
+    char *peerId;
+    igs_core_context_t *context;
     zsock_t *subscriber;
-    zmq_pollitem_t *pollItem;
     igs_definition_t *definition;
-    bool mappedNotificationToSend;
+    bool isMappingNotificationSet;
     igs_mapping_t *mapping;
     igs_mappings_filter_t *mappingsFilters;
     int timerId;
-    igs_agent_t *agent;
     UT_hash_handle hh;
-} igs_subscriber_t;
+} igs_remote_agent_t;
 
 typedef struct igs_timer{
     int timerId;
@@ -146,14 +147,13 @@ typedef struct igs_timer{
     UT_hash_handle hh;
 } igs_timer_t;
 
-typedef struct igs_zyre_agent {
-    char peerId[IGS_MAX_PEER_ID_LENGTH];
-    char name[IGS_MAX_AGENT_NAME_LENGTH];
-    igs_subscriber_t *subscriber;
+typedef struct igs_zyre_peer {
+    char *peerId;
+    char *name;
     int reconnected;
     bool hasJoinedPrivateChannel;
     UT_hash_handle hh;
-} igs_zyre_agent_t;
+} igs_zyre_peer_t;
 
 typedef struct igs_service_header {
     char *key;
@@ -253,18 +253,23 @@ typedef struct igs_forced_stop_calback {
  a set of agents at a process level.
  */
 typedef struct igs_core_context{
-    char networkDevice[IGS_NETWORK_DEVICE_LENGTH];
-    char ipAddress[IGS_IP_ADDRESS_LENGTH];
-    char brokerEndPoint[IGS_IP_ADDRESS_LENGTH];
+    char *networkDevice;
+    char *ipAddress;
+    char *brokerEndPoint;
+    char *commandLine;
+    char *replayChannel;
+    char *callsChannel;
+    
     int processId;
-    char commandLine[IGS_COMMAND_LINE_LENGTH];
-    char replayChannel[IGS_MAX_AGENT_NAME_LENGTH + 16];
-    char callsChannel[IGS_MAX_AGENT_NAME_LENGTH + 16];
     bool isInterrupted;
     bool forcedStop;
-    bool allowIpc;
-    bool allowInproc;
+    igs_forced_stop_calback_t *forcedStopCalbacks;
+    bool isFrozen;
+    bool canBeFrozen;
+    igs_freeze_callback_t *freezeCallbacks;
     
+    bool network_allowIpc;
+    bool network_allowInproc;
     int network_zyrePort;
     int network_hwmValue;
     unsigned int network_discoveryInterval;
@@ -276,7 +281,12 @@ typedef struct igs_core_context{
     char *network_ipcEndpoint;
     bool network_shallRaiseFileDescriptorsLimit;
     
-    zactor_t *agentActor;
+    igs_zyre_peer_t *zyrePeers;
+    igs_zyre_callback_t *zyreCallbacks;
+    igs_agent_t *agents;
+    igs_remote_agent_t *remoteAgents; //those our agents subscribed to
+    
+    zactor_t *networkActor;
     zyre_t *node;
     zsock_t *publisher;
     zsock_t *ipcPublisher;
@@ -285,10 +295,6 @@ typedef struct igs_core_context{
     zloop_t *loop;
     
     igs_timer_t *timers;
-    igs_zyre_agent_t *zyreAgents;
-    igs_zyre_callback_t *zyreCallbacks;
-    igs_agent_t *agentsInProcess;
-    igs_forced_stop_calback_t *forcedStopCalbacks;
     
     //admin
     FILE *logFile;
@@ -297,9 +303,9 @@ typedef struct igs_core_context{
     bool logInConsole;
     bool useColorInConsole;
     igs_logLevel_t logLevel;
-    char logFilePath[4096];
-    char logContent[2048];
-    char logTime[128];
+    char *logFilePath;
+    char *logContent;
+    char *logTime;
     int logNbOfEntries; //for fflush rotation
     
     //bus
@@ -320,7 +326,7 @@ typedef struct igs_core_context{
     int64_t performanceStart;
     int64_t performanceStop;
     
-    //monitor
+    //network monitor
     igs_monitor_t *monitor;
     igs_monitor_callback_t *monitorCallbacks;
     bool monitor_shallStartStopAgent;
@@ -333,35 +339,39 @@ typedef struct igs_core_context{
  for all the shared resources.
  */
 typedef struct igs_agent {
+    const char *uuid;
+    char *name;
+    char *state;
+    
+    igs_core_context_t *context;
+    
     //definition
-    char definitionPath[IGS_MAX_PATH_LENGTH];
+    char *definitionPath;
     igs_definition_t* definition;
     
     //mapping
-    char mappingPath[IGS_MAX_PATH_LENGTH];
+    char *mappingPath;
     igs_mapping_t *mapping;
     
     //network
-    bool isWholeAgentMuted;
     bool network_needToSendDefinitionUpdate;
     bool network_needToUpdateMapping;
     bool network_RequestOutputsFromMappedAgents;
-    igs_subscriber_t *subscribers;
-    bool isFrozen;
-    bool canBeFrozen;
-    char agentName[IGS_MAX_AGENT_NAME_LENGTH];
-    char agentState[IGS_MAX_AGENT_NAME_LENGTH];
+    
+    bool isWholeAgentMuted;
     igs_mute_callback_t *muteCallbacks;
-    igs_freeze_callback_t *freezeCallbacks;
+    
+    UT_hash_handle hh;
 } igs_agent_t;
 
 
 //////////////////  SHARED FUNCTIONS  AND  VARIABLES //////////////////
+
+//default context and agent
 PUBLIC extern igs_core_context_t *coreContext;
 PUBLIC extern igs_agent_t *coreAgent;
-//PUBLIC extern int igs_nbOfAgentsInProcess;
 void core_initCoreAgent(void);
-void core_initCoreContext(void);
+void core_initContext(void);
 
 //  definition
 PUBLIC void definition_freeDefinition (igs_definition_t* definition);
@@ -372,7 +382,7 @@ igs_mapping_element_t * mapping_createMappingElement(const char * input_name,
                                                  const char *agent_name,
                                                  const char* output_name);
 unsigned long djb2_hash (unsigned char *str);
-bool mapping_checkCompatibilityInputOutput(igs_agent_t *agent, igs_iop_t *foundInput, igs_iop_t *foundOutput);
+bool mapping_checkInputOutputCompatibility(igs_agent_t *agent, igs_iop_t *foundInput, igs_iop_t *foundOutput);
 
 // model
 const igs_iop_t* model_writeIOP (igs_agent_t *agent, const char *iopName, iop_t iopType, iopType_t valType, void* value, size_t size);
@@ -413,8 +423,8 @@ int call_freeValuesInArguments(igs_callArgument_t *arg);
 #define MAX_NB_OF_IOP 1000
 #define MAX_EXEC_DURATION_DURING_EVAL 300
 #if !TARGET_OS_IOS
-void license_cleanLicense(void);
-void license_readLicense(void);
+void license_cleanLicense(igs_core_context_t *context);
+void license_readLicense(igs_core_context_t *context);
 #endif
 
 #ifdef __cplusplus

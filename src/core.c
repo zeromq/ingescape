@@ -15,18 +15,21 @@
 
 igs_core_context_t *coreContext = NULL;
 igs_agent_t *coreAgent = NULL;
-//int igs_nbOfAgentsInProcess = 0;
 
 
 //////////////////  CORE CONTEXT //////////////////
-void core_initCoreContext(){
+void core_initContext(){
     if (coreContext == NULL){
         coreContext = calloc(1, sizeof(struct igs_core_context));
+
+        //default values for context variables
+        //NB: other values stay at zero / NULL until they are changed
+        //by other functions.
+        coreContext->network_allowIpc = true;
+        coreContext->network_allowInproc = true;
+        coreContext->network_hwmValue = 1000;
         coreContext->network_discoveryInterval = 1000;
         coreContext->network_agentTimeout = 30000;
-        coreContext->network_hwmValue = 1000;
-        coreContext->allowIpc = true;
-        coreContext->allowInproc = true;
         coreContext->logLevel = IGS_LOG_INFO;
         coreContext->network_shallRaiseFileDescriptorsLimit = true;
     }
@@ -40,6 +43,7 @@ void core_forcedStopCB(igs_agent_t *agent, void *myData){
 }
 
 void core_initCoreAgent(){
+    core_initContext();
     if (coreAgent == NULL){
         coreAgent = igsAgent_new();
         igsAgent_observeForcedStop(coreAgent, core_forcedStopCB, NULL);

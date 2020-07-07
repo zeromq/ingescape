@@ -13,7 +13,7 @@
 
 igs_agent_t *igsAgent_new(void){
     igs_agent_t *agent = calloc(1, sizeof(igs_agent_t));
-    sprintf(agent->agentName, IGS_DEFAULT_AGENT_NAME);
+    sprintf(agent->name, IGS_DEFAULT_AGENT_NAME);
     return agent;
 }
 void igsAgent_destroy(igs_agent_t **agent){
@@ -25,18 +25,18 @@ void igsAgent_destroy(igs_agent_t **agent){
 
 
 int igsAgent_activate(void){
-    
+    return EXIT_SUCCESS;
 }
 
 int igsAgent_deactivate(void){
-    
+    return EXIT_SUCCESS;
 }
 
-//void igsAgent_log(igs_logLevel_t level, const char *function, igs_agent_t *agent, const char *format, ...){
-//    va_list list;
-//    va_start(list, format);
-//    char content[MAX_STRING_MSG_LENGTH] = "";
-//    vsnprintf(content, MAX_STRING_MSG_LENGTH - 1, format, list);
-//    va_end(list);
-//    admin_log(agent, level, function, "%s", content);
-//}
+void igsAgent_log(igs_logLevel_t level, const char *function, igs_agent_t *agent, const char *format, ...){
+    va_list list;
+    va_start(list, format);
+    char content[MAX_STRING_MSG_LENGTH] = "";
+    vsnprintf(content, MAX_STRING_MSG_LENGTH - 1, format, list);
+    va_end(list);
+    admin_log(agent, level, function, "%s", content);
+}

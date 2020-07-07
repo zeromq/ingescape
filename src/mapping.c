@@ -103,7 +103,7 @@ igs_mapping_element_t * mapping_createMappingElement(const char * input_name,
     return new_map_elmt;
 }
 
-bool mapping_checkCompatibilityInputOutput(igs_agent_t *agent, igs_iop_t *input, igs_iop_t *output){
+bool mapping_checkInputOutputCompatibility(igs_agent_t *agent, igs_iop_t *input, igs_iop_t *output){
     //for compatibility, only DATA outputs imply limitations
     //the rest is handled correctly in model_writeIOP
     bool isCompatible = true;
