@@ -33,25 +33,16 @@ PUBLIC int igsAgent_deactivate(void);
 typedef void (*igsAgent_forcedStopCallback)(igs_agent_t *agent, void *myData);
 PUBLIC void igsAgent_observeForcedStop(igs_agent_t *agent, igsAgent_forcedStopCallback cb, void *myData);
 
-PUBLIC int igsAgent_setAgentName(igs_agent_t *agent, const char *name);
-PUBLIC char *igsAgent_getAgentName(igs_agent_t *agent); //char* must be freed by caller
-PUBLIC int igsAgent_setAgentState(igs_agent_t *agent, const char *state);
-PUBLIC char *igsAgent_getAgentState(igs_agent_t *agent); //char* must be freed by caller
+PUBLIC int igsAgent_setName(igs_agent_t *agent, const char *name);
+PUBLIC char *igsAgent_getName(igs_agent_t *agent); //char* must be freed by caller
+PUBLIC int igsAgent_setState(igs_agent_t *agent, const char *state);
+PUBLIC char *igsAgent_getState(igs_agent_t *agent); //char* must be freed by caller
 
 PUBLIC int igsAgent_mute(igs_agent_t *agent);
 PUBLIC int igsAgent_unmute(igs_agent_t *agent);
 PUBLIC bool igsAgent_isMuted(igs_agent_t *agent);
 typedef void (*igsAgent_muteCallback)(igs_agent_t *Agent, bool isMuted, void *myData);
 PUBLIC int igsAgent_observeMute(igs_agent_t *agent, igsAgent_muteCallback cb, void *myData);
-
-PUBLIC int igsAgent_freeze(igs_agent_t *agent);
-PUBLIC bool igsAgent_isFrozen(igs_agent_t *agent);
-PUBLIC int igsAgent_unfreeze(igs_agent_t *agent);
-typedef void (*igsAgent_freezeCallback)(bool isPaused, void *myData);
-PUBLIC int igsAgent_observeFreeze(igs_agent_t *agent, igsAgent_freezeCallback cb, void *myData);
-PUBLIC void igsAgent_setCanBeFrozen(igs_agent_t *agent, bool canBeFrozen);
-PUBLIC bool igsAgent_canBeFrozen(igs_agent_t *agent);
-
 
 //IOP read, write, creation, destruction, introspection
 PUBLIC int igsAgent_readInput(igs_agent_t *agent, const char *name, void **value, size_t *size);

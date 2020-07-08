@@ -402,7 +402,7 @@ int igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, const cha
             bus_zyreLock();
             zyre_shouts(agent->context->node, agent->context->callsChannel, "%s to %s", callName, agentNameOrUUID);
             //FIXME: add agent uuid to message
-            zyre_whisper(agent->context->node, remote->peerId, &msg);
+            zyre_whisper(agent->context->node, remote->peer->peerId, &msg);
             bus_zyreUnlock();
             igsAgent_debug(agent, "sent call %s to %s", callName, agentNameOrUUID);
 

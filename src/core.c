@@ -32,6 +32,7 @@ void core_initContext(){
         coreContext->network_agentTimeout = 30000;
         coreContext->logLevel = IGS_LOG_INFO;
         coreContext->network_shallRaiseFileDescriptorsLimit = true;
+        coreContext->network_ipcFolderPath = strdup(IGS_DEFAULT_IPC_FOLDER_PATH);
     }
 }
 

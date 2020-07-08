@@ -63,9 +63,6 @@ typedef void (*igs_forcedStopCallback)(void *myData);
 //register a callback when the agent is forced to stop by the ingescape platform
 PUBLIC void igs_observeForcedStop(igs_forcedStopCallback cb, void *myData);
 
-//terminate the agent with trigger of SIGINT and call to the registered igs_forcedStopCallbacks
-PUBLIC void igs_die(void);
-
 //agent name set and get
 PUBLIC int igs_setAgentName(const char *name);
 PUBLIC char *igs_getAgentName(void); //char* must be freed by caller
@@ -88,7 +85,7 @@ PUBLIC int igs_observeMute(igs_muteCallback cb, void *myData);
 //are up to the developer and can be controlled using callbacks and igs_observeFreeze
 PUBLIC int igs_freeze(void);
 PUBLIC bool igs_isFrozen(void);
-PUBLIC int igs_unfreeze(void);
+PUBLIC void igs_unfreeze(void);
 typedef void (*igs_freezeCallback)(bool isPaused, void *myData);
 PUBLIC int igs_observeFreeze(igs_freezeCallback cb, void *myData);
 PUBLIC void igs_setCanBeFrozen(bool canBeFrozen);

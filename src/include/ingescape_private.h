@@ -52,6 +52,8 @@ extern "C" {
 #define IGS_NETWORK_DEVICE_LENGTH 1024
 #define IGS_IP_ADDRESS_LENGTH 1024
 #define IGS_MAX_PEER_ID_LENGTH 128
+#define IGS_DEFAULT_IPC_FOLDER_PATH "/tmp/"
+
 
 typedef struct igs_core_context igs_core_context_t;
 
@@ -125,13 +127,21 @@ typedef struct igs_mappings_filter {
 
 //////////////////  NETWORK  STRUCTURES AND ENUMS   //////////////////
 
+typedef struct igs_zyre_peer {
+    char *peerId;
+    char *name;
+    zsock_t *subscriber; //link to the peer's publisher socket
+    int reconnected;
+    bool hasJoinedPrivateChannel;
+    UT_hash_handle hh;
+} igs_zyre_peer_t;
+
 //remote agent we are subscribing to
 typedef struct igs_remote_agent{
     char *uuid;
     char *name;
-    char *peerId;
+    igs_zyre_peer_t *peer;
     igs_core_context_t *context;
-    zsock_t *subscriber;
     igs_definition_t *definition;
     bool isMappingNotificationSet;
     igs_mapping_t *mapping;
@@ -146,14 +156,6 @@ typedef struct igs_timer{
     void *myData;
     UT_hash_handle hh;
 } igs_timer_t;
-
-typedef struct igs_zyre_peer {
-    char *peerId;
-    char *name;
-    int reconnected;
-    bool hasJoinedPrivateChannel;
-    UT_hash_handle hh;
-} igs_zyre_peer_t;
 
 typedef struct igs_service_header {
     char *key;
@@ -225,7 +227,7 @@ typedef struct igs_mute_callback {
 } igs_mute_callback_t;
 
 typedef struct igs_freeze_callback {
-    igsAgent_freezeCallback callback_ptr;
+    igs_freezeCallback callback_ptr;
     void *myData;
     struct igs_freeze_callback *prev;
     struct igs_freeze_callback *next;
@@ -263,7 +265,6 @@ typedef struct igs_core_context{
     int processId;
     bool isInterrupted;
     bool forcedStop;
-    igs_forced_stop_calback_t *forcedStopCalbacks;
     bool isFrozen;
     bool canBeFrozen;
     igs_freeze_callback_t *freezeCallbacks;
@@ -344,6 +345,7 @@ typedef struct igs_agent {
     char *state;
     
     igs_core_context_t *context;
+    igs_forced_stop_calback_t *forcedStopCalbacks;
     
     //definition
     char *definitionPath;
@@ -421,7 +423,7 @@ int call_freeValuesInArguments(igs_callArgument_t *arg);
 #define ENABLE_LICENSE_ENFORCEMENT 1
 #define MAX_NB_OF_AGENTS 50
 #define MAX_NB_OF_IOP 1000
-#define MAX_EXEC_DURATION_DURING_EVAL 300
+#define IGS_MAX_EXEC_DURATION_DURING_EVAL 300
 #if !TARGET_OS_IOS
 void license_cleanLicense(igs_core_context_t *context);
 void license_readLicense(igs_core_context_t *context);
