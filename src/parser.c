@@ -999,8 +999,8 @@ igs_definition_t * parser_loadDefinitionFromPath (const char* path) {
 }
 
 
-char* parser_export_definition (igs_definition_t* def) {
-    
+char* parser_export_definition(igs_definition_t* def){
+    assert(def);
     char* result = NULL;
     if (def != NULL){
         const unsigned char * json_str = NULL;

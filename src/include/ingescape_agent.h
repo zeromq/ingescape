@@ -18,7 +18,7 @@ extern "C" {
 
 //agent creation and destruction
 typedef struct igs_agent igs_agent_t;
-PUBLIC igs_agent_t *igsAgent_new(void);
+PUBLIC igs_agent_t *igsAgent_new(const char *name);
 PUBLIC void igsAgent_destroy(igs_agent_t **agent);
 
 /*
@@ -33,10 +33,10 @@ PUBLIC int igsAgent_deactivate(void);
 typedef void (*igsAgent_forcedStopCallback)(igs_agent_t *agent, void *myData);
 PUBLIC void igsAgent_observeForcedStop(igs_agent_t *agent, igsAgent_forcedStopCallback cb, void *myData);
 
-PUBLIC int igsAgent_setName(igs_agent_t *agent, const char *name);
-PUBLIC char *igsAgent_getName(igs_agent_t *agent); //char* must be freed by caller
-PUBLIC int igsAgent_setState(igs_agent_t *agent, const char *state);
-PUBLIC char *igsAgent_getState(igs_agent_t *agent); //char* must be freed by caller
+PUBLIC int igsAgent_setAgentName(igs_agent_t *agent, const char *name);
+PUBLIC char *igsAgent_getAgentName(igs_agent_t *agent); //char* must be freed by caller
+PUBLIC int igsAgent_setAgentState(igs_agent_t *agent, const char *state);
+PUBLIC char *igsAgent_getAgentState(igs_agent_t *agent); //char* must be freed by caller
 
 PUBLIC int igsAgent_mute(igs_agent_t *agent);
 PUBLIC int igsAgent_unmute(igs_agent_t *agent);
@@ -158,21 +158,6 @@ PUBLIC void igsAgent_writeMappingToPath(igs_agent_t *agent);
 
 PUBLIC int igsAgent_writeOutputAsZMQMsg(igs_agent_t *agent, const char *name, zmsg_t *msg);
 PUBLIC int igsAgent_readInputAsZMQMsg(igs_agent_t *agent, const char *name, zmsg_t **msg); //msg must be freed by caller using zmsg_destroy
-
-typedef void (*igsAgent_BusMessageIncoming) (igs_agent_t *agent, const char *event, const char *peerID, const char *name,
-                                             const char *address, const char *channel,
-                                             zhash_t *headers, zmsg_t *msg, void *myData);
-PUBLIC int igsAgent_observeBus(igs_agent_t *agent, igsAgent_BusMessageIncoming cb, void *myData);
-PUBLIC void igsAgent_busJoinChannel(igs_agent_t *agent, const char *channel);
-PUBLIC void igsAgent_busLeaveChannel(igs_agent_t *agent, const char *channel);
-PUBLIC int igsAgent_busSendStringToChannel(igs_agent_t *agent, const char *channel, const char *msg, ...);
-PUBLIC int igsAgent_busSendDataToChannel(igs_agent_t *agent, const char *channel, void *data, size_t size);
-PUBLIC int igsAgent_busSendZMQMsgToChannel(igs_agent_t *agent, const char *channel, zmsg_t **msg_p); //destroys message after sending it
-PUBLIC int igsAgent_busSendStringToAgent(igs_agent_t *agent, const char *agentNameOrPeerID, const char *msg, ...);
-PUBLIC int igsAgent_busSendDataToAgent(igs_agent_t *agent, const char *agentNameOrPeerID, void *data, size_t size);
-PUBLIC int igsAgent_busSendZMQMsgToAgent(igs_agent_t *agent, const char *agentNameOrPeerID, zmsg_t **msg_p); //destroys message after sending it
-PUBLIC void igsAgent_busAddServiceDescription(igs_agent_t *agent, const char *key, const char *value);
-PUBLIC void igsAgent_busRemoveServiceDescription(igs_agent_t *agent, const char *key);
 
 PUBLIC int igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, const char *callName, igs_callArgument_t **list);
 typedef void (*igsAgent_callFunction)(igs_agent_t *agent, const char *senderAgentName, const char *senderAgentUUID,

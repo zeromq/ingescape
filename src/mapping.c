@@ -568,10 +568,16 @@ int igsAgent_removeMappingEntryWithName(igs_agent_t *agent, const char *fromOurI
 }
 
 void igsAgent_setMappingPath(igs_agent_t *agent, const char *path){
-    strncpy(agent->mappingPath, path, IGS_MAX_PATH_LENGTH - 1);
-    if (coreContext != NULL && coreContext->node != NULL){
+    assert(path);
+    if (agent->mappingPath != NULL)
+        free(agent->definitionPath);
+    agent->mappingPath = strndup(path, IGS_MAX_PATH_LENGTH);
+    if (coreContext->networkActor != NULL && coreContext->node != NULL){
         bus_zyreLock();
-        zyre_shouts(coreContext->node, IGS_PRIVATE_CHANNEL, "MAPPING_FILE_PATH=%s", agent->mappingPath);
+        zmsg_t *msg = zmsg_new();
+        zmsg_addstrf(msg, "MAPPING_FILE_PATH=%s", agent->definitionPath);
+        zmsg_addstr(msg, agent->uuid);
+        zyre_shout(coreContext->node, IGS_PRIVATE_CHANNEL, &msg);
         bus_zyreUnlock();
     }
 }

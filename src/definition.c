@@ -212,12 +212,6 @@ int igsAgent_clearDefinition(igs_agent_t *agent){
     }
     agent->definition = calloc(1, sizeof(igs_definition_t));
     agent->definition->name = igsAgent_getAgentName(agent);
-    agent->definition->description = NULL;
-    agent->definition->version = NULL;
-    agent->definition->params_table = NULL;
-    agent->definition->inputs_table = NULL;
-    agent->definition->outputs_table = NULL;
-    agent->definition->calls_table = NULL;
     agent->network_needToSendDefinitionUpdate = true;
     return 1;
 }
@@ -491,10 +485,16 @@ int igsAgent_removeParameter(igs_agent_t *agent, const char *name){
 }
 
 void igsAgent_setDefinitionPath(igs_agent_t *agent, const char *path){
-    strncpy(agent->definitionPath, path, IGS_MAX_PATH_LENGTH - 1);
-    if (coreContext != NULL && coreContext->node != NULL){
+    assert(path);
+    if (agent->definitionPath != NULL)
+        free(agent->definitionPath);
+    agent->definitionPath = strndup(path, IGS_MAX_PATH_LENGTH);
+    if (coreContext->networkActor != NULL && coreContext->node != NULL){
         bus_zyreLock();
-        zyre_shouts(coreContext->node, IGS_PRIVATE_CHANNEL, "DEFINITION_FILE_PATH=%s", agent->definitionPath);
+        zmsg_t *msg = zmsg_new();
+        zmsg_addstrf(msg, "DEFINITION_FILE_PATH=%s", agent->definitionPath);
+        zmsg_addstr(msg, agent->uuid);
+        zyre_shout(coreContext->node, IGS_PRIVATE_CHANNEL, &msg);
         bus_zyreUnlock();
     }
 }

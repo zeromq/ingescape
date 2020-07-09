@@ -24,12 +24,12 @@
 #include "ingescape.h"
 #include "ingescape_private.h"
 
-#define INGESCAPE_MAJOR 1
+#define INGESCAPE_MAJOR 2
 #define INGESCAPE_MINOR 0
 #define INGESCAPE_MICRO 0 //replaced by gitlab-ci build number
 #define INGESCAPE_VERSION ((INGESCAPE_MAJOR * 10000) + (INGESCAPE_MINOR * 100) + INGESCAPE_MICRO)
 
-#define INGESCAPE_PROTOCOL 1
+#define INGESCAPE_PROTOCOL 2
 #define NUMBER_OF_LOGS_FOR_FFLUSH 0
 
 #if defined(__unix__) || defined(__linux__) || \
@@ -47,6 +47,11 @@ static const char *log_colors[] = {
     "\x1b[94m", "\x1b[36m", "\x1b[32m", "\x1b[33m", "\x1b[31m", "\x1b[35m", "\x1b[35m"
 };
 
+#define LOG_TIME_LENGTH 128
+char logContent[IGS_MAX_LOG_LENGTH] = "";
+char logContentForFile[2*IGS_MAX_LOG_LENGTH] = "";
+char logTime[LOG_TIME_LENGTH] = "";
+
 ////////////////////////////////////////////////////////////////////////
 // INTERNAL FUNCTIONS
 ////////////////////////////////////////////////////////////////////////
@@ -57,13 +62,13 @@ void admin_computeTime(char *dest){
     gettimeofday(&tick, NULL);
     time_t t = tick.tv_sec;
     struct tm *tm = localtime(&t);
-    snprintf(dest,128,"%02d/%02d/%d;%02d:%02d:%02d.%06ld",
+    snprintf(dest,LOG_TIME_LENGTH,"%02d/%02d/%d;%02d:%02d:%02d.%06ld",
              tm->tm_mday, tm->tm_mon + 1, tm->tm_year + 1900, tm->tm_hour, tm->tm_min, tm->tm_sec, tick.tv_usec);
 #else
     struct timeval tick;
     gettimeofday(&tick, NULL);
     struct tm *tm = localtime(&tick.tv_sec);
-    snprintf(dest,128,"%02d/%02d/%d;%02d:%02d:%02d.%06d",
+    snprintf(dest,LOG_TIME_LENGTH,"%02d/%02d/%d;%02d:%02d:%02d.%06d",
              tm->tm_mday, tm->tm_mon + 1, tm->tm_year + 1900, tm->tm_hour, tm->tm_min, tm->tm_sec, (int)tick.tv_usec);
 #endif
     }
@@ -130,43 +135,50 @@ int igs_version(void){
 }
 
 int igs_protocol(void){
-    igs_debug("IngeScape protocol version : %d\n", INGESCAPE_PROTOCOL);
+    //igs_debug("IngeScape protocol version : %d\n", INGESCAPE_PROTOCOL);
     return INGESCAPE_PROTOCOL;
 }
 
 void admin_log(igs_agent_t *agent, igs_logLevel_t level, const char *function, const char *fmt, ...){
+    assert(agent);
+    assert(function);
+    assert(fmt);
     admin_lock();
-    core_initCoreAgent();
     
     va_list list;
     va_start(list, fmt);
-    vsnprintf(coreContext->logContent, 2047, fmt, list);
+    vsnprintf(logContent, IGS_MAX_LOG_LENGTH, fmt, list);
     va_end(list);
     
-    //remove final \n if needed
-    //TODO: scan the whole string to remove unallowed characters
-    if (coreContext->logContent[strlen(coreContext->logContent) - 1] == '\n'){
-        coreContext->logContent[strlen(coreContext->logContent) - 1] = '\0';
+    //scan the whole string to transform unallowed characters
+    int j = 0;
+    for (int i = 0; i < strlen(logContent); i++){
+        if (logContent[i] == '\n'){
+            logContentForFile[j] = '\\';
+            logContentForFile[j+1] = 'n';
+            j++;
+        }else{
+            logContentForFile[j] = logContent[i];
+        }
+        j++;
     }
 
     if (coreContext->logInFile){
         //create default path if current is empty
-        if (strlen(coreContext->logFilePath) == 0){
-            char buff[4097] = "";
-            snprintf(coreContext->logFilePath, 4095, "~/Documents/IngeScape/logs/");
-            strncpy(buff, coreContext->logFilePath, 4096);
-            admin_makeFilePath(buff, coreContext->logFilePath, 4096);
+        if (coreContext->logFile == NULL && strlen(coreContext->logFilePath) == 0){
+            char buff[IGS_MAX_PATH_LENGTH] = "";
+            snprintf(coreContext->logFilePath, IGS_MAX_PATH_LENGTH, "~/Documents/IngeScape/logs/");
+            strncpy(buff, coreContext->logFilePath, IGS_MAX_PATH_LENGTH);
+            admin_makeFilePath(buff, coreContext->logFilePath, IGS_MAX_PATH_LENGTH);
             if (!zsys_file_exists(coreContext->logFilePath)){
                 printf("creating log path %s\n", coreContext->logFilePath);
                 if(zsys_dir_create(coreContext->logFilePath) != 0){
                     printf("error while creating log path %s\n", coreContext->logFilePath);
                 }
             }
-            char *name = igsAgent_getAgentName(agent);
-            strncat(coreContext->logFilePath, name, 4095);
-            strncat(coreContext->logFilePath, ".log", 4095);
+            strncat(coreContext->logFilePath, agent->name, IGS_MAX_PATH_LENGTH);
+            strncat(coreContext->logFilePath, ".log", IGS_MAX_PATH_LENGTH);
             printf("using log file %s\n", coreContext->logFilePath);
-            free(name);
             if (coreContext != NULL && coreContext->node != NULL){
                 bus_zyreLock();
                 zyre_shouts(coreContext->node, IGS_PRIVATE_CHANNEL, "LOG_FILE_PATH=%s", coreContext->logFilePath);
@@ -174,16 +186,14 @@ void admin_log(igs_agent_t *agent, igs_logLevel_t level, const char *function, c
             }
         }
         if (coreContext->logFile == NULL || !zsys_file_exists(coreContext->logFilePath)){
-            if (coreContext->logFile != NULL)
-                fclose(coreContext->logFile);
             coreContext->logFile = fopen (coreContext->logFilePath,"a");
             if (coreContext->logFile == NULL){
                 printf("error while trying to create/open log file: %s\n", coreContext->logFilePath);
             }
         }
         if (coreContext->logFile != NULL){
-            admin_computeTime(coreContext->logTime);
-            if (fprintf(coreContext->logFile,"%s;%s;%s;%s;%s\n", agent->name, coreContext->logTime, log_levels[level], function, coreContext->logContent) > 0){
+            admin_computeTime(logTime);
+            if (fprintf(coreContext->logFile,"%s;%s;%s;%s;%s\n", agent->name, logTime, log_levels[level], function, logContentForFile) > 0){
                 if (++coreContext->logNbOfEntries > NUMBER_OF_LOGS_FOR_FFLUSH){
                     coreContext->logNbOfEntries = 0;
                     fflush(coreContext->logFile);
@@ -196,44 +206,52 @@ void admin_log(igs_agent_t *agent, igs_logLevel_t level, const char *function, c
     if ((coreContext->logInConsole && level >= coreContext->logLevel) || level >= IGS_LOG_ERROR){
         if (level >= IGS_LOG_WARN){
             if (coreContext->useColorInConsole){
-                fprintf(stderr,"%s;%s%s\x1b[0m;%s;%s\n", agent->name, log_colors[level], log_levels[level], function, coreContext->logContent);
+                fprintf(stderr,"%s;%s%s\x1b[0m;%s;%s\n", agent->name, log_colors[level], log_levels[level], function, logContent);
             }else{
-                fprintf(stderr,"%s;%s;%s;%s\n", agent->name, log_levels[level], function, coreContext->logContent);
+                fprintf(stderr,"%s;%s;%s;%s\n", agent->name, log_levels[level], function, logContent);
             }
         }else{
             if (coreContext->useColorInConsole){
-                fprintf(stdout,"%s;%s%s\x1b[0m;%s;%s\n", agent->name, log_colors[level], log_levels[level], function, coreContext->logContent);
+                fprintf(stdout,"%s;%s%s\x1b[0m;%s;%s\n", agent->name, log_colors[level], log_levels[level], function, logContent);
             }else{
-                fprintf(stdout,"%s;%s;%s;%s\n", agent->name, log_levels[level], function, coreContext->logContent);
+                fprintf(stdout,"%s;%s;%s;%s\n", agent->name, log_levels[level], function, logContent);
             }
         }
         
     }
     if (coreContext->logInStream && coreContext != NULL && coreContext->logger != NULL){
-        zstr_sendf(coreContext->logger, "%s;%s;%s;%s\n", agent->name, log_levels[level], function, coreContext->logContent);
+        zstr_sendf(coreContext->logger, "%s;%s;%s;%s\n", agent->name, log_levels[level], function, logContentForFile);
     }
     admin_unlock();
 
 }
 
 void igs_setLogLevel (igs_logLevel_t level){
+    core_initContext();
     coreContext->logLevel = level;
 }
 
 igs_logLevel_t igs_getLogLevel () {
+    core_initContext();
     return coreContext->logLevel;
 }
 
 void igs_setLogInFile (bool allow){
+    core_initContext();
     if (allow != coreContext->logInFile){
-        core_initCoreAgent();
         coreContext->logInFile = allow;
-        if (coreContext != NULL && coreContext->node != NULL){
+        if (coreContext->networkActor != NULL && coreContext->node != NULL){
             bus_zyreLock();
-            if (allow){
-                zyre_shouts(coreContext->node, IGS_PRIVATE_CHANNEL, "LOG_IN_FILE=1");
-            }else{
-                zyre_shouts(coreContext->node, IGS_PRIVATE_CHANNEL, "LOG_IN_FILE=0");
+            igs_agent_t *agent, *tmp;
+            HASH_ITER(hh, coreContext->agents, agent, tmp){
+                zmsg_t *msg = zmsg_new();
+                zmsg_addstr(msg, agent->uuid);
+                if (allow){
+                    zmsg_addstr(msg, "LOG_IN_FILE=1");
+                }else{
+                    zmsg_addstr(msg, "LOG_IN_FILE=0");
+                }
+                zyre_shout(coreContext->node, IGS_PRIVATE_CHANNEL, &msg);
             }
             bus_zyreUnlock();
         }
@@ -241,28 +259,33 @@ void igs_setLogInFile (bool allow){
 }
 
 bool igs_getLogInFile () {
+    core_initContext();
     return coreContext->logInFile;
 }
 
 void igs_setVerbose (bool allow){
+    core_initContext();
     coreContext->logInConsole = allow;
 }
 
 bool igs_isVerbose () {
+    core_initContext();
     return coreContext->logInConsole;
 }
 
 void igs_setUseColorVerbose (bool allow){
+    core_initContext();
     coreContext->useColorInConsole = allow;
 }
 
 bool igs_getUseColorVerbose() {
+    core_initContext();
     return coreContext->useColorInConsole;
 }
 
 void igs_setLogStream(bool stream){
+    core_initContext();
     if (stream != coreContext->logInStream){
-        core_initCoreAgent();
         if (coreContext != NULL){
             if (stream){
                 igs_warn("agent is already started, log stream cannot be created anymore");
@@ -274,10 +297,16 @@ void igs_setLogStream(bool stream){
         coreContext->logInStream = stream;
         if (coreContext != NULL && coreContext->node != NULL){
             bus_zyreLock();
-            if (stream){
-                zyre_shouts(coreContext->node, IGS_PRIVATE_CHANNEL, "LOG_IN_STREAM=1");
-            }else{
-                zyre_shouts(coreContext->node, IGS_PRIVATE_CHANNEL, "LOG_IN_STREAM=0");
+            igs_agent_t *agent, *tmp;
+            HASH_ITER(hh, coreContext->agents, agent, tmp){
+                zmsg_t *msg = zmsg_new();
+                zmsg_addstr(msg, agent->uuid);
+                if (stream){
+                    zmsg_addstr(msg, "LOG_IN_STREAM=1");
+                }else{
+                    zmsg_addstr(msg, "LOG_IN_STREAM=0");
+                }
+                zyre_shout(coreContext->node, IGS_PRIVATE_CHANNEL, &msg);
             }
             bus_zyreUnlock();
         }
@@ -285,12 +314,13 @@ void igs_setLogStream(bool stream){
 }
 
 bool igs_getLogStream () {
+    core_initContext();
     return coreContext->logInStream;
 }
 
 void igs_setLogPath(const char *path){
+    core_initContext();
     if ((path != NULL) && (strlen(path) > 0)){
-        core_initCoreAgent();
         char tmpPath[4096] = "";
         admin_lock();
         admin_makeFilePath(path, tmpPath, 4095);
@@ -326,7 +356,14 @@ void igs_setLogPath(const char *path){
         }
         if (coreContext->logFile != NULL && coreContext != NULL && coreContext->node != NULL){
             bus_zyreLock();
-            zyre_shouts(coreContext->node, IGS_PRIVATE_CHANNEL, "LOG_FILE_PATH=%s", coreContext->logFilePath);
+            
+            igs_agent_t *agent, *tmp;
+            HASH_ITER(hh, coreContext->agents, agent, tmp){
+                zmsg_t *msg = zmsg_new();
+                zmsg_addstr(msg, agent->uuid);
+                zmsg_addstrf(msg, "LOG_FILE_PATH=%s", coreContext->logFilePath);
+                zyre_shout(coreContext->node, IGS_PRIVATE_CHANNEL, &msg);
+            }
             bus_zyreUnlock();
         }
         admin_unlock();
@@ -336,5 +373,6 @@ void igs_setLogPath(const char *path){
 }
 
 char* igs_getLogPath () {
+    core_initContext();
     return strdup(coreContext->logFilePath);
 }

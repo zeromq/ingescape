@@ -12,7 +12,7 @@
 
 //Timer callback to check network 
 int igs_monitor_triggerNetworkCheck(zloop_t *loop, int timer_id, void *arg){
-    core_initCoreAgent();
+    core_initAgent();
     IGS_UNUSED(loop)
     IGS_UNUSED(timer_id)
     IGS_UNUSED(arg)

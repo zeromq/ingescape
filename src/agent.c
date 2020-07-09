@@ -11,13 +11,24 @@
 #include "ingescape_private.h"
 #include "ingescape_agent.h"
 
-igs_agent_t *igsAgent_new(void){
+igs_agent_t *igsAgent_new(const char *name){
     igs_agent_t *agent = calloc(1, sizeof(igs_agent_t));
-    sprintf(agent->name, IGS_DEFAULT_AGENT_NAME);
+    zuuid_t *uuid = zuuid_new();
+    agent->uuid = strdup(zuuid_str(uuid));
+    zuuid_destroy(&uuid);
+    agent->name = strndup((name == NULL)?IGS_DEFAULT_AGENT_NAME:name, IGS_MAX_AGENT_NAME_LENGTH);
     return agent;
 }
 void igsAgent_destroy(igs_agent_t **agent){
-    //TODO: clean all agent structure properly
+    if ((*agent)->uuid != NULL)
+        free((*agent)->uuid);
+    if ((*agent)->name != NULL)
+        free((*agent)->name);
+    if ((*agent)->definitionPath != NULL)
+        free((*agent)->definitionPath);
+    if ((*agent)->mappingPath != NULL)
+        free((*agent)->mappingPath);
+    //FIXME: handle def and mapping destruction
     free(*agent);
     *agent = NULL;
 }

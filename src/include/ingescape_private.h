@@ -48,6 +48,7 @@ extern "C" {
 #define IGS_MAX_DEFINITION_NAME_LENGTH 1024
 #define IGS_MAX_MAPPING_NAME_LENGTH 1024
 #define IGS_MAX_DESCRIPTION_LENGTH 4096
+#define IGS_MAX_LOG_LENGTH 4096
 #define IGS_COMMAND_LINE_LENGTH 4096
 #define IGS_NETWORK_DEVICE_LENGTH 1024
 #define IGS_IP_ADDRESS_LENGTH 1024
@@ -234,7 +235,7 @@ typedef struct igs_freeze_callback {
 } igs_freeze_callback_t;
 
 typedef struct igs_zyre_callback {
-    igsAgent_BusMessageIncoming callback_ptr;
+    igs_BusMessageIncoming callback_ptr;
     void *myData;
     struct igs_zyre_callback *prev;
     struct igs_zyre_callback *next;
@@ -304,9 +305,7 @@ typedef struct igs_core_context{
     bool logInConsole;
     bool useColorInConsole;
     igs_logLevel_t logLevel;
-    char *logFilePath;
-    char *logContent;
-    char *logTime;
+    char logFilePath[IGS_MAX_PATH_LENGTH];
     int logNbOfEntries; //for fflush rotation
     
     //bus
@@ -340,7 +339,7 @@ typedef struct igs_core_context{
  for all the shared resources.
  */
 typedef struct igs_agent {
-    const char *uuid;
+    char *uuid;
     char *name;
     char *state;
     
@@ -372,7 +371,7 @@ typedef struct igs_agent {
 //default context and agent
 PUBLIC extern igs_core_context_t *coreContext;
 PUBLIC extern igs_agent_t *coreAgent;
-void core_initCoreAgent(void);
+void core_initAgent(void);
 void core_initContext(void);
 
 //  definition

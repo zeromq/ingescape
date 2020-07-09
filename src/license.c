@@ -522,7 +522,7 @@ void license_readLicense(igs_core_context_t *context){
                 while (ent != NULL) {
                     zfile_t *new = zfile_new(context->licensePath, ent->d_name);
                     const char *name = zfile_filename(new, context->licensePath);
-                    igs_debug("scan %s", name);
+                    //igs_debug("scan %s", name);
                     const char *extension = license_getFilenameExt(name);
                     if (strcmp(extension, "igslicense") == 0
                         && !zfile_is_directory(new)
