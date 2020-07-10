@@ -1115,8 +1115,7 @@ int igsAgent_loadDefinition (igs_agent_t *agent, const char* json_str){
         return -1;
     }else{
         if (agent->definition != NULL){
-            definition_freeDefinition(agent->definition);
-            agent->definition = NULL;
+            definition_freeDefinition(&agent->definition);
         }
         agent->definition = tmp;
         //Check the name of agent from network layer
@@ -1158,8 +1157,7 @@ int igsAgent_loadDefinitionFromPath (igs_agent_t *agent, const char* file_path){
     }else{
         strncpy(definition_path, file_path, IGS_MAX_PATH_LENGTH - 1);
         if (agent->definition != NULL){
-            definition_freeDefinition(agent->definition);
-            agent->definition = NULL;
+            definition_freeDefinition(&agent->definition);
         }
         agent->definition = tmp;
         //Check the name of agent from network layer

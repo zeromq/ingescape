@@ -116,12 +116,8 @@ void network_Lock(void)   {
 }
 
 void network_Unlock(void) {
-    if (network_Mutex != NULL){
-        pthread_mutex_unlock(network_Mutex);
-    }else{
-        igs_fatal("mutex was NULL\n");
-        assert(false);
-    }
+    assert(network_Mutex);
+    pthread_mutex_unlock(network_Mutex);
 }
 
 bool checkMessageAgainstPrefix(char *message, const char *prefix){
@@ -144,7 +140,7 @@ void cleanAndFreeZyrePeer(igs_zyre_peer_t **zyrePeer){
 }
 
 //Adds proper filter to 'subscribe' socket for a spectific output of a given remote agent
-int subscribeToRemoteAgentOutput(igs_remote_agent_t *remoteAgent, const char *outputName){
+void subscribeToRemoteAgentOutput(igs_remote_agent_t *remoteAgent, const char *outputName){
     assert(remoteAgent);
     assert(outputName);
     if(strlen(outputName) > 0){
@@ -167,13 +163,11 @@ int subscribeToRemoteAgentOutput(igs_remote_agent_t *remoteAgent, const char *ou
         }else{
             //printf("\n****************\nFILTER BIS %s - %s\n***************\n", subscriber->agent->name, outputName);
         }
-        return 1;
     }
-    return -1;
 }
 
 //Removes filter to 'subscribe' socket for a spectific output of a given remote agent
-int unsubscribeToRemoteAgentOutput(igs_remote_agent_t *remoteAgent, const char *outputName){
+void unsubscribeToRemoteAgentOutput(igs_remote_agent_t *remoteAgent, const char *outputName){
     assert(remoteAgent);
     assert(outputName);
     if(strlen(outputName) > 0){
@@ -189,9 +183,7 @@ int unsubscribeToRemoteAgentOutput(igs_remote_agent_t *remoteAgent, const char *
                 break;
             }
         }
-        return 1;
     }
-    return -1;
 }
 
 //Timer callback to send REQUEST_OUPUTS notification for an agent we subscribed to
@@ -203,16 +195,19 @@ int triggerMappingNotificationToNewcomer(zloop_t *loop, int timer_id, void *arg)
     assert(remoteAgent->context);
     assert(remoteAgent->context->node);
     
-    if (remoteAgent->isMappingNotificationSet){
+    if (remoteAgent->shallSendMappingNotification){
         bus_zyreLock();
-        zyre_whispers(remoteAgent->context->node, remoteAgent->peer->peerId, "REQUEST_OUPUTS");
+        zmsg_t *msg = zmsg_new();
+        zmsg_addstr(msg, "REQUEST_OUPUTS");
+        zmsg_addstr(msg, remoteAgent->uuid);
+        zyre_whisper(remoteAgent->context->node, remoteAgent->peer->peerId, &msg);
         bus_zyreUnlock();
-        remoteAgent->isMappingNotificationSet = false;
+        remoteAgent->shallSendMappingNotification = false;
     }
     return 0;
 }
 
-int network_manageMappingsToRemoteAgent(igs_agent_t *agent, igs_remote_agent_t *remoteAgent){
+int network_configureMappingsToRemoteAgent(igs_agent_t *agent, igs_remote_agent_t *remoteAgent){
     assert(agent);
     assert(remoteAgent);
     igs_mapping_element_t *el, *tmp;
@@ -240,8 +235,8 @@ int network_manageMappingsToRemoteAgent(igs_agent_t *agent, igs_remote_agent_t *
                     subscribeToRemoteAgentOutput(remoteAgent, el->output_name);
                     
                     //mapping was successful : we set timer to notify remote agent if not already done
-                    if (!remoteAgent->isMappingNotificationSet && agent->network_RequestOutputsFromMappedAgents){
-                        remoteAgent->isMappingNotificationSet = true;
+                    if (!remoteAgent->shallSendMappingNotification && agent->network_requestOutputsFromMappedAgents){
+                        remoteAgent->shallSendMappingNotification = true;
                         remoteAgent->timerId = zloop_timer(coreContext->loop, 500, 1, triggerMappingNotificationToNewcomer, remoteAgent);
                     }
                 }
@@ -285,7 +280,7 @@ void cleanAndFreeRemoteAgent(igs_remote_agent_t **remoteAgent){
     assert(remoteAgent);
     assert(*remoteAgent);
     assert((*remoteAgent)->context);
-    igs_debug("cleaning subscription to %s\n", (*remoteAgent)->name);
+    igs_debug("cleaning remote agent %s\n", (*remoteAgent)->name);
     #if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
     (*remoteAgent)->context->licenseEnforcement->currentAgentsNb--;
     #endif
@@ -297,11 +292,11 @@ void cleanAndFreeRemoteAgent(igs_remote_agent_t **remoteAgent){
                                                                       HASH_COUNT((*remoteAgent)->definition->params_table));
         //igs_license("license: %ld agents and %ld iops (%s)", agent->licenseEnforcement->currentAgentsNb, agent->licenseEnforcement->currentIOPNb, subscriber->name);
         #endif
-        definition_freeDefinition((*remoteAgent)->definition);
+        definition_freeDefinition(&(*remoteAgent)->definition);
     }
     //clean the agent mapping
     if((*remoteAgent)->mapping != NULL){
-        mapping_freeMapping((*remoteAgent)->mapping);
+        mapping_freeMapping(&(*remoteAgent)->mapping);
     }
     //clean the remoteAgent itself
     igs_mappings_filter_t *elt, *tmp;
@@ -370,10 +365,10 @@ void handlePublicationFromRemoteAgent(zmsg_t *msg, igs_remote_agent_t *remoteAge
         return;
     }
     
-    //Publication does not provide information about the targetted agents.
-    //At this stage, we only know that one or more of our agents are targetted.
-    //We'll need to iterate through our agents and their mapping to check which
-    //inputs need to be changed on which agent.
+    //Publication does not provide information about the targeted agents.
+    //At this stage, we only know that one or more of our agents are targeted.
+    //We need to iterate through our agents and their mapping to check which
+    //inputs need to be updated on which agent.
     igs_agent_t *agent, *tmpAgent;
     HASH_ITER(hh, remoteAgent->context->agents, agent, tmpAgent){
         zmsg_t *dup = zmsg_dup(msg);
@@ -407,7 +402,7 @@ void handlePublicationFromRemoteAgent(zmsg_t *msg, igs_remote_agent_t *remoteAge
             }
             //try to find mapping elements matching with this subscriber's output
             //and update mapped input(s) value accordingly
-            //TODO : some day, optimize mapping storage to avoid iterating
+            //TODO : optimize mapping storage to avoid iterating
             igs_mapping_element_t *elmt, *tmp;
             HASH_ITER(hh, agent->mapping->map_elements, elmt, tmp) {
                 if (strcmp(elmt->agent_name, remoteAgent->name) == 0
@@ -781,8 +776,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                                                                   HASH_COUNT(remoteAgent->definition->params_table));
                     //igs_license("%ld iops (cleaning %s)", agent->licenseEnforcement->currentIOPNb, name);
 #endif
-                    definition_freeDefinition(remoteAgent->definition);
-                    remoteAgent->definition = NULL;
+                    definition_freeDefinition(&remoteAgent->definition);
                 }
 #if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
                 context->licenseEnforcement->currentIOPNb += (HASH_COUNT(newDefinition->inputs_table) +
@@ -807,13 +801,12 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 //We check here because remote agent definition is required to handle received data.
                 igs_agent_t *agent, *tmp;
                 HASH_ITER(hh, context->agents, agent, tmp){
-                    network_manageMappingsToRemoteAgent(agent, remoteAgent);
+                    network_configureMappingsToRemoteAgent(agent, remoteAgent);
                 }
             }else{
                 igs_error("Received definition from remote agent %s is NULL or has no name", remoteAgent->name);
                 if(newDefinition != NULL) {
-                    definition_freeDefinition(newDefinition);
-                    newDefinition = NULL;
+                    definition_freeDefinition(&newDefinition);
                 }
             }
             free(strDefinition);
@@ -842,7 +835,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             }else{
                 igs_debug("Received mapping from agent %s is empty", name);
                 if(remoteAgent != NULL && remoteAgent->mapping != NULL) {
-                    mapping_freeMapping(remoteAgent->mapping);
+                    mapping_freeMapping(&remoteAgent->mapping);
                     remoteAgent->mapping = NULL;
                 }
             }
@@ -851,7 +844,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 //look if this agent already has a mapping
                 if(remoteAgent->mapping != NULL){
                     igs_debug("Mapping already exists for agent %s : new mapping will overwrite the previous one...", name);
-                    mapping_freeMapping(remoteAgent->mapping);
+                    mapping_freeMapping(&remoteAgent->mapping);
                     remoteAgent->mapping = NULL;
                 }
                 
@@ -859,7 +852,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 remoteAgent->mapping = newMapping;
             }else{
                 if(newMapping != NULL) {
-                    mapping_freeMapping(newMapping);
+                    mapping_freeMapping(&newMapping);
                     newMapping = NULL;
                 }
             }
@@ -883,7 +876,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             //recheck mapping towards our new definition
             igs_remote_agent_t *remote, *tmp;
             HASH_ITER(hh, context->remoteAgents, remote, tmp){
-                network_manageMappingsToRemoteAgent(agent, remote);
+                network_configureMappingsToRemoteAgent(agent, remote);
             }
             free(strDefinition);
         }
@@ -904,13 +897,13 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             igs_mapping_t *m = parser_LoadMap(strMapping);
             if (m != NULL){
                 if (agent->mapping != NULL){
-                    mapping_freeMapping(agent->mapping);
+                    mapping_freeMapping(&agent->mapping);
                 }
                 agent->mapping = m;
                 //check and activate mapping
                 igs_remote_agent_t *remote, *tmp;
                 HASH_ITER(hh, context->remoteAgents, remote, tmp){
-                    network_manageMappingsToRemoteAgent(agent, remote);
+                    network_configureMappingsToRemoteAgent(agent, remote);
                 }
                 agent->network_needToUpdateMapping = true;
             }
@@ -1478,7 +1471,7 @@ int triggerMappingUpdate(zloop_t *loop, int timer_id, void *arg){
             }
             igs_remote_agent_t *remote, *tmp;
             HASH_ITER(hh, context->remoteAgents, remote, tmp){
-                network_manageMappingsToRemoteAgent(agent, remote);
+                network_configureMappingsToRemoteAgent(agent, remote);
             }
             agent->network_needToUpdateMapping = false;
         }
@@ -1502,6 +1495,19 @@ int triggerLicenseStop(zloop_t *loop, int timer_id, void *arg){
 static void runLoop (zsock_t *mypipe, void *args){
     network_Lock();
     igs_core_context_t *context = (igs_core_context_t *)args;
+    assert(context);
+    assert(context->node);
+    assert(context->ipcPublisher);
+    assert(context->publisher);
+    assert(context->licenseEnforcement);
+    assert(context->replayChannel);
+    assert(context->callsChannel);
+    assert(context->network_ipcFullPath);
+    assert(context->network_ipcEndpoint);
+    #if defined __unix__ || defined __APPLE__ || defined __linux__
+    assert(context->inprocPublisher);
+    #endif
+    
     //start zyre now that everything is set
     bus_zyreLock();
     int zyreStartRes = zyre_start (coreContext->node);
@@ -1529,75 +1535,81 @@ static void runLoop (zsock_t *mypipe, void *args){
     zsock_signal (mypipe, 0);
     network_Unlock();
     
+    
+    /////////////////////
     igs_debug("loop starting");
     zloop_start (context->loop); //returns when one of the pollers returns -1
+    /////////////////////
+    
     
     network_Lock();
-    igs_debug("loop stopping...");
-    //clean
+    igs_debug("loop stopping..."); //clean dynamic part of the context
+    
     igs_zyre_peer_t *zyrePeer, *tmpPeer;
     HASH_ITER(hh, context->zyrePeers, zyrePeer, tmpPeer){
         HASH_DEL(context->zyrePeers, zyrePeer);
         cleanAndFreeZyrePeer(&zyrePeer);
     }
+    
     igs_remote_agent_t *remote, *tmpremote;
     HASH_ITER(hh, context->remoteAgents, remote, tmpremote) {
+        HASH_DEL(context->remoteAgents, remote);
         cleanAndFreeRemoteAgent(&remote);
     }
-    bus_zyreLock();
-    if (context != NULL)
-        zyre_stop (context->node);
-    bus_zyreUnlock();
-    //zclock_sleep (100);
-    if (context != NULL){
-        zyre_destroy (&context->node);
-        zsock_destroy(&context->publisher);
-        if (context->ipcPublisher != NULL){
-            zsock_destroy(&context->ipcPublisher);
-#if defined __unix__ || defined __APPLE__ || defined __linux__
-            if (context->network_ipcFullPath != NULL){
-                zsys_file_delete(context->network_ipcFullPath); //destroy ipcPath in file system
-                //NB: ipcPath is based on peer id which is unique. It will never be used again.
-                free(context->network_ipcFullPath);
-                context->network_ipcFullPath = NULL;
-            }
-#endif
-        }
-        if (context->inprocPublisher != NULL){
-            zsock_destroy(&context->inprocPublisher);
-        }
-        if (context->logger != NULL){
-            zsock_destroy(&context->logger);
-        }
-        
-        zloop_destroy (&context->loop);
-        
-        igs_timer_t *current_timer, *tmp_timer;
-        HASH_ITER(hh, context->timers, current_timer, tmp_timer){
-            HASH_DEL(context->timers, current_timer);
-            free(current_timer);
-        }
-        
-        if (context->forcedStop){
-            igs_forced_stop_calback_t *cb = NULL;
-            igs_agent_t *a, *tmp;
-            HASH_ITER(hh, context->agents, a, tmp){
-                DL_FOREACH(a->forcedStopCalbacks, cb){
-                    cb->callback_ptr(a, cb->myData);
-                }
-            }
-            context->isInterrupted = true;
-            //in case of forced stop, we send SIGINT to our process so
-            //that it can be trapped by main thread for a proper stop
-            #if defined __unix__ || defined __APPLE__ || defined __linux__
-            igs_debug("triggering SIGINT");
-            kill(context->processId, SIGINT);
-            #endif
-            //FIXME : find a way to do that for windows as well
-        }
+    
+    igs_timer_t *current_timer, *tmp_timer;
+    HASH_ITER(hh, context->timers, current_timer, tmp_timer){
+        HASH_DEL(context->timers, current_timer);
+        free(current_timer);
     }
-    if (context->network_ipcEndpoint)
-        free(context->network_ipcEndpoint);
+    
+    //zmq stack cleaning
+    zloop_destroy (&context->loop);
+    zyre_stop (context->node);
+    zyre_destroy (&context->node);
+    zsock_destroy(&context->publisher);
+    zsock_destroy(&context->ipcPublisher);
+#if defined __unix__ || defined __APPLE__ || defined __linux__
+    zsys_file_delete(context->network_ipcFullPath); //destroy ipcPath in file system
+    //NB: ipcPath is based on peer id which is unique. It will never be used again.
+    free(context->network_ipcFullPath);
+    context->network_ipcFullPath = NULL;
+#endif
+    if (context->inprocPublisher != NULL){
+        zsock_destroy(&context->inprocPublisher);
+    }
+    if (context->logger != NULL){
+        zsock_destroy(&context->logger);
+    }
+    
+    //handle forced stop if needed
+    if (context->forcedStop){
+        igs_forced_stop_calback_t *cb = NULL;
+        igs_agent_t *a, *tmp;
+        HASH_ITER(hh, context->agents, a, tmp){
+            DL_FOREACH(a->forcedStopCalbacks, cb){
+                cb->callback_ptr(a, cb->myData);
+            }
+        }
+        context->isInterrupted = true;
+        //in case of forced stop, we send SIGINT to our process so
+        //that it can be trapped by main thread for a proper stop
+#if defined __unix__ || defined __APPLE__ || defined __linux__
+        igs_debug("triggering SIGINT for process");
+        kill(context->processId, SIGINT);
+#endif
+    }
+    
+    //clean remaining dynamic data
+    free(context->licenseEnforcement);
+    context->licenseEnforcement = NULL;
+    free(context->replayChannel);
+    context->replayChannel = NULL;
+    free(context->callsChannel);
+    context->callsChannel = NULL;
+    free(context->network_ipcFullPath);
+    context->network_ipcFullPath = NULL;
+    free(context->network_ipcEndpoint);
     context->network_ipcEndpoint = NULL;
     
     igs_debug("loop stopped");
@@ -1605,7 +1617,8 @@ static void runLoop (zsock_t *mypipe, void *args){
 }
 
 void initLoop (igs_core_context_t *context){
-    core_initAgent();
+    core_initAgent(); //to be sure to have a default agent name
+    
     igs_debug("loop init");
 #if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
     if (context->licenseEnforcement != NULL){
@@ -1666,8 +1679,7 @@ void initLoop (igs_core_context_t *context){
     if (context->brokerEndPoint != NULL){
         bus_zyreLock();
         zyre_set_verbose(context->node);
-        zyre_gossip_connect(context->node,
-                            "%s", context->brokerEndPoint);
+        zyre_gossip_connect(context->node,"%s", context->brokerEndPoint);
         bus_zyreUnlock();
     }else{
         if (context->node == NULL){
@@ -1683,10 +1695,6 @@ void initLoop (igs_core_context_t *context){
     bus_zyreLock();
     zyre_set_interval(context->node, context->network_discoveryInterval);
     zyre_set_expired_timeout(context->node, context->network_agentTimeout);
-    bus_zyreUnlock();
-    
-    //join ingescape private channel
-    bus_zyreLock();
     zyre_join(context->node, IGS_PRIVATE_CHANNEL);
     bus_zyreUnlock();
     
@@ -1761,8 +1769,8 @@ void initLoop (igs_core_context_t *context){
     context->network_ipcEndpoint = calloc(1, strlen(context->network_ipcFolderPath)+strlen(zyre_uuid(context->node))+8);
     sprintf(context->network_ipcEndpoint, "ipc://%s/%s", context->network_ipcFolderPath, zyre_uuid(context->node));
     bus_zyreUnlock();
-    zsock_t *ipcPublisher = context->ipcPublisher = zsock_new_pub(context->network_ipcEndpoint);
-    if (ipcPublisher == NULL){
+    context->ipcPublisher = zsock_new_pub(context->network_ipcEndpoint);
+    if (context->ipcPublisher == NULL){
         igs_error("Could not create IPC publishing socket '%s'", context->network_ipcEndpoint);
         canContinue = false;
     }else{
@@ -1800,6 +1808,7 @@ void initLoop (igs_core_context_t *context){
         zyre_set_header(context->node, "inproc", "%s", inprocEndpoint);
         bus_zyreUnlock();
     }
+    free(inprocEndpoint);
     
     //start logger stream if needed
     if (context->logInStream){
@@ -1909,21 +1918,6 @@ void initLoop (igs_core_context_t *context){
     bus_zyreLock();
     zyre_set_header(context->node, "hostname", "%s", hostname);
     bus_zyreUnlock();
-    //code for Fully Qualified Domain Name if needed someday
-//    struct addrinfo hints, *info, *p;
-//    int gai_result;
-//    memset(&hints, 0, sizeof hints);
-//    hints.ai_family = AF_UNSPEC; /*either IPV4 or IPV6*/
-//    hints.ai_socktype = SOCK_STREAM;
-//    hints.ai_flags = AI_CANONNAME;
-//    if ((gai_result = getaddrinfo(hostname, "http", &hints, &info)) != 0) {
-//        igsAgent_debug(agent, "getaddrinfo error: %s\n", gai_strerror(gai_result));
-//        exit(1);
-//    }
-//    for(p = info; p != NULL; p = p->ai_next) {
-//        igsAgent_debug(agent, "hostname: %s\n", p->ai_canonname);
-//    }
-//    freeaddrinfo(info);
     
     if (canContinue){
         context->networkActor = zactor_new(runLoop, context);
@@ -2045,7 +2039,7 @@ int igs_observeBus(igs_BusMessageIncoming cb, void *myData){
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
 
-int igs_startWithDevice(const char *networkDevice, unsigned int port){
+igs_result_t igs_startWithDevice(const char *networkDevice, unsigned int port){
     core_initContext();
     if ((networkDevice == NULL) || (strlen(networkDevice) == 0)){
         igs_error("networkDevice cannot be NULL or empty");
@@ -2097,7 +2091,7 @@ int igs_startWithDevice(const char *networkDevice, unsigned int port){
     return IGS_SUCCESS;
 }
 
-int igs_startWithIP(const char *ipAddress, unsigned int port){
+igs_result_t igs_startWithIP(const char *ipAddress, unsigned int port){
     core_initContext();
     if ((ipAddress == NULL) || (strlen(ipAddress) == 0)){
         igs_error("IP address cannot be NULL or empty");
@@ -2149,7 +2143,7 @@ int igs_startWithIP(const char *ipAddress, unsigned int port){
     return IGS_SUCCESS;
 }
 
-int igs_startWithDeviceOnBroker(const char *networkDevice, const char *brokerEndpoint){
+igs_result_t igs_startWithDeviceOnBroker(const char *networkDevice, const char *brokerEndpoint){
     core_initContext();
     //TODO: manage a list of brokers instead of just one
     if ((brokerEndpoint == NULL) || (strlen(brokerEndpoint) == 0)){
@@ -2211,7 +2205,7 @@ int igs_startWithDeviceOnBroker(const char *networkDevice, const char *brokerEnd
 }
 
 
-int igs_stop(){
+igs_result_t igs_stop(){
     if (coreContext->networkActor != NULL){
         //interrupting and destroying ingescape thread and zyre layer
         //this will also clean all agent->subscribers
@@ -2220,7 +2214,6 @@ int igs_stop(){
             //and this command would deadlock.
             zstr_sendx (coreContext->networkActor, "$TERM", NULL);
         }
-        //This function will block until runLoop has terminated
         zactor_destroy(&coreContext->networkActor);
 #if (defined WIN32 || defined _WIN32)
         // On Windows, if we don't call zsys_shutdown, the application will crash on exit
@@ -2297,7 +2290,7 @@ int igsAgent_setAgentName(igs_agent_t *agent, const char *name){
         }
     }
     if (spaceInName){
-        igsAgent_warn(agent, "Spaces are not allowed in agent name: %s has been renamed to %s", name, n);
+        igsAgent_warn(agent, "Spaces are not allowed in agent name: '%s' has been renamed to '%s'", name, n);
     }
     agent->name = n;
     
@@ -2570,12 +2563,12 @@ void igs_setCommandLineFromArgs(int argc, const char * argv[]){
 }
 
 void igsAgent_setRequestOutputsFromMappedAgents(igs_agent_t *agent, bool notify){
-    agent->network_RequestOutputsFromMappedAgents = notify;
+    agent->network_requestOutputsFromMappedAgents = notify;
     igsAgent_debug(agent, "changed to %d", notify);
 }
 
 bool igsAgent_getRequestOutputsFromMappedAgents(igs_agent_t *agent){
-    return agent->network_RequestOutputsFromMappedAgents;
+    return agent->network_requestOutputsFromMappedAgents;
 }
 
 #define MAX_NUMBER_OF_NETDEVICES 16
@@ -2709,10 +2702,9 @@ void igs_setLogStreamPort(unsigned int port){
 
 #if defined __unix__ || defined __APPLE__ || defined __linux__
 void igs_setIpcFolderPath(char *path){
+    assert(path);
     core_initContext();
-    if (streq(path, coreContext->network_ipcFolderPath)){
-        igs_debug("IPC folder path already is '%s'", path);
-    }else{
+    if (coreContext->network_ipcFolderPath == NULL || !streq(path, coreContext->network_ipcFolderPath)){
         if (*path == '/'){
             if (coreContext->network_ipcFolderPath != NULL){
                 free(coreContext->network_ipcFolderPath);

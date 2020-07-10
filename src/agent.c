@@ -19,28 +19,64 @@ igs_agent_t *igsAgent_new(const char *name){
     agent->name = strndup((name == NULL)?IGS_DEFAULT_AGENT_NAME:name, IGS_MAX_AGENT_NAME_LENGTH);
     return agent;
 }
+
 void igsAgent_destroy(igs_agent_t **agent){
     if ((*agent)->uuid != NULL)
         free((*agent)->uuid);
     if ((*agent)->name != NULL)
         free((*agent)->name);
+    if ((*agent)->state != NULL)
+        free((*agent)->state);
     if ((*agent)->definitionPath != NULL)
         free((*agent)->definitionPath);
     if ((*agent)->mappingPath != NULL)
         free((*agent)->mappingPath);
-    //FIXME: handle def and mapping destruction
+    
+    igs_forced_stop_calback_t *forceCb, *tmp;
+    DL_FOREACH_SAFE((*agent)->forcedStopCalbacks, forceCb, tmp){
+        DL_DELETE((*agent)->forcedStopCalbacks, forceCb);
+        free(forceCb);
+    }
+    igs_mute_callback_t *muteCb, *mutetmp;
+    DL_FOREACH_SAFE((*agent)->muteCallbacks, muteCb, mutetmp){
+        DL_DELETE((*agent)->muteCallbacks, muteCb);
+        free(muteCb);
+    }
+    if ((*agent)->mapping)
+        mapping_freeMapping(&(*agent)->mapping);
+    if ((*agent)->definition)
+        definition_freeDefinition(&(*agent)->definition);
+    
     free(*agent);
     *agent = NULL;
 }
 
-
-
-int igsAgent_activate(void){
-    return EXIT_SUCCESS;
+int igsAgent_activate(igs_agent_t *agent){
+    assert(agent);
+    core_initContext();
+    igs_agent_t *a = NULL;
+    HASH_FIND_STR(coreContext->agents, agent->uuid, a);
+    if (a != NULL){
+        igs_error("agent %s (%s) is already activated", agent->name, agent->uuid);
+        return IGS_FAILURE;
+    }else{
+        HASH_ADD_STR(coreContext->agents, uuid, agent);
+    }
+    return IGS_SUCCESS;
 }
 
-int igsAgent_deactivate(void){
-    return EXIT_SUCCESS;
+int igsAgent_deactivate(igs_agent_t *agent){
+    assert(agent);
+    core_initContext();
+    igs_agent_t *a = NULL;
+    HASH_FIND_STR(coreContext->agents, agent->uuid, a);
+    if (a != NULL){
+        HASH_DEL(coreContext->agents, agent);
+    }else{
+        igs_error("agent %s (%s) is not activated", agent->name, agent->uuid);
+        return IGS_FAILURE;
+    }
+    return IGS_SUCCESS;
 }
 
 void igsAgent_log(igs_logLevel_t level, const char *function, igs_agent_t *agent, const char *format, ...){

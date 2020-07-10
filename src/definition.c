@@ -147,43 +147,46 @@ igs_iop_t* definition_createIop(igs_agent_t *agent, const char *name, iop_t type
 ////////////////////////////////////////////////////////////////////////
 // PRIVATE API
 ////////////////////////////////////////////////////////////////////////
-void definition_freeDefinition (igs_definition_t* def) {
-    if (def->name != NULL){
-        free((char*)def->name);
-        def->name = NULL;
+void definition_freeDefinition (igs_definition_t **def) {
+    assert(def);
+    assert(*def);
+    if ((*def)->name != NULL){
+        free((char*)(*def)->name);
+        (*def)->name = NULL;
     }
-    if (def->description != NULL){
-        free((char*)def->description);
-        def->description = NULL;
+    if ((*def)->description != NULL){
+        free((char*)(*def)->description);
+        (*def)->description = NULL;
     }
-    if (def->version != NULL){
-        free((char*)def->version);
-        def->version = NULL;
+    if ((*def)->version != NULL){
+        free((char*)(*def)->version);
+        (*def)->version = NULL;
     }
     model_readWriteLock();
     igs_iop_t *current_iop, *tmp_iop;
-    HASH_ITER(hh, def->params_table, current_iop, tmp_iop) {
-        HASH_DEL(def->params_table,current_iop);
+    HASH_ITER(hh, (*def)->params_table, current_iop, tmp_iop) {
+        HASH_DEL((*def)->params_table,current_iop);
         definition_freeIOP(current_iop);
         current_iop = NULL;
     }
-    HASH_ITER(hh, def->inputs_table, current_iop, tmp_iop) {
-        HASH_DEL(def->inputs_table,current_iop);
+    HASH_ITER(hh, (*def)->inputs_table, current_iop, tmp_iop) {
+        HASH_DEL((*def)->inputs_table,current_iop);
         definition_freeIOP(current_iop);
         current_iop = NULL;
     }
-    HASH_ITER(hh, def->outputs_table, current_iop, tmp_iop) {
-        HASH_DEL(def->outputs_table,current_iop);
+    HASH_ITER(hh, (*def)->outputs_table, current_iop, tmp_iop) {
+        HASH_DEL((*def)->outputs_table,current_iop);
         definition_freeIOP(current_iop);
         current_iop = NULL;
     }
     model_readWriteUnlock();
     igs_call_t *call, *tmpCall;
-    HASH_ITER(hh, def->calls_table, call, tmpCall) {
-        HASH_DEL(def->calls_table,call);
+    HASH_ITER(hh, (*def)->calls_table, call, tmpCall) {
+        HASH_DEL((*def)->calls_table,call);
         call_freeCall(call);
     }
-    free(def);
+    free(*def);
+    *def = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -208,7 +211,7 @@ int igsAgent_clearDefinition(igs_agent_t *agent){
     //Free the structure definition loaded
     igsAgent_debug(agent, "Clear our definition and initiate an empty one");
     if(agent->definition != NULL){
-        definition_freeDefinition(agent->definition);
+        definition_freeDefinition(&agent->definition);
     }
     agent->definition = calloc(1, sizeof(igs_definition_t));
     agent->definition->name = igsAgent_getAgentName(agent);
@@ -500,6 +503,11 @@ void igsAgent_setDefinitionPath(igs_agent_t *agent, const char *path){
 }
 
 void igsAgent_writeDefinitionToPath(igs_agent_t *agent){
+    assert(agent);
+    if (agent->definition == NULL){
+        igsAgent_error(agent, "definition is NULL and cannot be written to path");
+        return;
+    }
     FILE *fp = NULL;
     fp = fopen (agent->definitionPath,"w+");
     if (fp == NULL){

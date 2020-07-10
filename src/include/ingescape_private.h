@@ -144,7 +144,7 @@ typedef struct igs_remote_agent{
     igs_zyre_peer_t *peer;
     igs_core_context_t *context;
     igs_definition_t *definition;
-    bool isMappingNotificationSet;
+    bool shallSendMappingNotification;
     igs_mapping_t *mapping;
     igs_mappings_filter_t *mappingsFilters;
     int timerId;
@@ -195,7 +195,7 @@ typedef struct igs_license_enforcement {
 } igs_license_enforcement_t;
 
 typedef struct igs_license_callback {
-    igs_licenseCallback callback_ptr;
+    igs_licenseCallback *callback_ptr;
     void* data;
     struct igs_license_callback *prev;
     struct igs_license_callback *next;
@@ -256,48 +256,19 @@ typedef struct igs_forced_stop_calback {
  a set of agents at a process level.
  */
 typedef struct igs_core_context{
-    char *networkDevice;
-    char *ipAddress;
-    char *brokerEndPoint;
-    char *commandLine;
-    char *replayChannel;
-    char *callsChannel;
     
-    int processId;
-    bool isInterrupted;
-    bool forcedStop;
-    bool isFrozen;
-    bool canBeFrozen;
-    igs_freeze_callback_t *freezeCallbacks;
-    
-    bool network_allowIpc;
-    bool network_allowInproc;
-    int network_zyrePort;
-    int network_hwmValue;
-    unsigned int network_discoveryInterval;
-    unsigned int network_agentTimeout;
-    unsigned int network_publishingPort;
-    unsigned int network_logStreamPort;
-    char *network_ipcFolderPath;
-    char *network_ipcFullPath;
-    char *network_ipcEndpoint;
-    bool network_shallRaiseFileDescriptorsLimit;
-    
-    igs_zyre_peer_t *zyrePeers;
-    igs_zyre_callback_t *zyreCallbacks;
-    igs_agent_t *agents;
-    igs_remote_agent_t *remoteAgents; //those our agents subscribed to
-    
-    zactor_t *networkActor;
-    zyre_t *node;
-    zsock_t *publisher;
-    zsock_t *ipcPublisher;
-    zsock_t *inprocPublisher;
-    zsock_t *logger;
-    zloop_t *loop;
-    
-    igs_timer_t *timers;
-    
+    ////////////////////////////////////////////
+    //persisting data with setters and getters or
+    //managed automatically
+    //
+    //license
+    igs_license_t *license;
+    igs_license_callback_t *licenseCallbacks;
+    char *licensePath;
+    void *licenseData; //overrides licence files
+    size_t licenseDataSize;
+    //bus
+    igs_service_header_t *serviceHeaders;
     //admin
     FILE *logFile;
     bool logInStream;
@@ -307,24 +278,54 @@ typedef struct igs_core_context{
     igs_logLevel_t logLevel;
     char logFilePath[IGS_MAX_PATH_LENGTH];
     int logNbOfEntries; //for fflush rotation
-    
-    //bus
-    igs_service_header_t *serviceHeaders;
-
-    //license
-    igs_license_enforcement_t *licenseEnforcement;
-    igs_license_t *license;
-    igs_license_callback_t *licenseCallbacks;
-    char *licensePath;
-    void *licenseData; //overrides licence files
-    size_t licenseDataSize;
-
+    //network
+    bool network_allowIpc;
+    bool network_allowInproc;
+    int network_zyrePort;
+    int network_hwmValue;
+    unsigned int network_discoveryInterval;
+    unsigned int network_agentTimeout;
+    unsigned int network_publishingPort;
+    unsigned int network_logStreamPort;
+    bool network_shallRaiseFileDescriptorsLimit;
+    bool isInterrupted;
+    bool forcedStop;
+    bool isFrozen;
+    bool canBeFrozen;
+    igs_freeze_callback_t *freezeCallbacks;
     //performance
     size_t performanceMsgCounter;
     size_t performanceMsgCountTarget;
     size_t performanceMsgSize;
     int64_t performanceStart;
     int64_t performanceStop;
+    
+    //initiated at start, cleaned at stop
+    char *networkDevice;
+    char *ipAddress;
+    char *brokerEndPoint;
+    
+    //initiated at initLoop, cleaned at loop stop
+    char *commandLine;
+    char *replayChannel;
+    char *callsChannel;
+    igs_license_enforcement_t *licenseEnforcement;
+    igs_timer_t *timers; //set manually, destroyed automatically
+    int processId;
+    char *network_ipcFolderPath;
+    char *network_ipcFullPath;
+    char *network_ipcEndpoint;
+    igs_zyre_peer_t *zyrePeers;
+    igs_zyre_callback_t *zyreCallbacks;
+    igs_agent_t *agents;
+    igs_remote_agent_t *remoteAgents; //those our agents subscribed to
+    zactor_t *networkActor;
+    zyre_t *node;
+    zsock_t *publisher;
+    zsock_t *ipcPublisher;
+    zsock_t *inprocPublisher;
+    zsock_t *logger;
+    zloop_t *loop;
     
     //network monitor
     igs_monitor_t *monitor;
@@ -357,7 +358,7 @@ typedef struct igs_agent {
     //network
     bool network_needToSendDefinitionUpdate;
     bool network_needToUpdateMapping;
-    bool network_RequestOutputsFromMappedAgents;
+    bool network_requestOutputsFromMappedAgents;
     
     bool isWholeAgentMuted;
     igs_mute_callback_t *muteCallbacks;
@@ -375,10 +376,10 @@ void core_initAgent(void);
 void core_initContext(void);
 
 //  definition
-PUBLIC void definition_freeDefinition (igs_definition_t* definition);
+PUBLIC void definition_freeDefinition (igs_definition_t **definition);
 
 //  mapping
-PUBLIC void mapping_freeMapping (igs_mapping_t* map);
+PUBLIC void mapping_freeMapping (igs_mapping_t **map);
 igs_mapping_element_t * mapping_createMappingElement(const char * input_name,
                                                  const char *agent_name,
                                                  const char* output_name);

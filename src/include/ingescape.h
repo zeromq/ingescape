@@ -28,8 +28,10 @@ extern "C" {
 #define PUBLIC
 #endif
 
-#define IGS_SUCCESS 0
-#define IGS_FAILURE 1
+typedef enum{
+    IGS_SUCCESS = 0,
+    IGS_FAILURE
+} igs_result_t;
 
 // GCC and clang can validate format strings for functions that act like printf
 // this is used to check the logging functions
@@ -46,9 +48,9 @@ extern "C" {
 // Initialization and control
 
 //start & stop ingescape
-PUBLIC int igs_startWithDevice(const char *networkDevice, unsigned int port);
-PUBLIC int igs_startWithIP(const char *ipAddress, unsigned int port);
-PUBLIC int igs_stop(void);
+PUBLIC igs_result_t igs_startWithDevice(const char *networkDevice, unsigned int port);
+PUBLIC igs_result_t igs_startWithIP(const char *ipAddress, unsigned int port);
+PUBLIC igs_result_t igs_stop(void);
 PUBLIC bool igs_isStarted(void);
 
 //There are four non-exclusive ways to stop the execution of ingescape in a process:
@@ -292,17 +294,16 @@ typedef enum {
 } igs_logLevel_t;
 
 //logs management
-PUBLIC void igs_setVerbose(bool verbose); //enable logs in console (ERROR and FATAL are always displayed)
+PUBLIC void igs_setVerbose(bool); //enable logs in console (ERROR and FATAL are always displayed)
 PUBLIC bool igs_isVerbose(void);
-PUBLIC void igs_setUseColorVerbose(bool useColor); //use colors in console
+PUBLIC void igs_setUseColorVerbose(bool); //use colors in console
 PUBLIC bool igs_getUseColorVerbose(void);
-PUBLIC void igs_setLogStream(bool useLogStream); //enable logs in socket stream
+PUBLIC void igs_setLogStream(bool); //enable logs in socket stream
 PUBLIC bool igs_getLogStream(void);
-PUBLIC void igs_setLogInFile(bool useLogFile); //enable logs in file
+PUBLIC void igs_setLogInFile(bool); //enable logs in file
 PUBLIC bool igs_getLogInFile(void);
 PUBLIC void igs_setLogPath(const char *path); //default directory is ~/ on UNIX systems and current PATH on Windows
 PUBLIC char* igs_getLogPath(void); // must be freed by caller
-
 PUBLIC void igs_setLogLevel (igs_logLevel_t level); //set log level in console, default is IGS_LOG_INFO
 PUBLIC igs_logLevel_t igs_getLogLevel(void);
 
@@ -351,14 +352,14 @@ typedef enum {
     IGS_LICENSE_TOO_MANY_AGENTS,
     IGS_LICENSE_TOO_MANY_IOPS
 } igs_license_limit_t;
-typedef void (*igs_licenseCallback)(igs_license_limit_t limit, void *myData);
+typedef void (igs_licenseCallback)(igs_license_limit_t limit, void *myData);
 
 #if !defined(TARGET_OS_IOS) || !TARGET_OS_IOS
 // Default licenses path is empty and, if so, is automatically set at runtime to agent's executable path.
 // All licenses in path will be examined and used if valid
 // When path is set manually, it takes priority over agent's executable path.
 PUBLIC void igs_setLicensePath(const char *path);
-PUBLIC char *igs_getLicensePath(void); //must be freed by caller
+PUBLIC char* igs_getLicensePath(void); //must be freed by caller
     
 //Any agent developer can use this function to check the license against her/his agent's unique id.
 //IDs are provided by the ingescape team.

@@ -58,25 +58,28 @@ void mapping_freeMappingElement (igs_mapping_element_t* mapElmt){
 // PRIVATE API
 ////////////////////////////////////////////////////////////////////////
 
-void mapping_freeMapping (igs_mapping_t* map) {
-    if (map == NULL){
+void mapping_freeMapping (igs_mapping_t **map) {
+    assert (map);
+    assert(*map);
+    if ((*map) == NULL){
         return;
     }
-    if (map->name != NULL){
-        free(map->name);
+    if ((*map)->name != NULL){
+        free((*map)->name);
     }
-    if (map->description != NULL){
-        free(map->description);
+    if ((*map)->description != NULL){
+        free((*map)->description);
     }
-    if (map->version != NULL){
-        free(map->version);
+    if ((*map)->version != NULL){
+        free((*map)->version);
     }
     igs_mapping_element_t *current_map_elmt, *tmp_map_elmt;
-    HASH_ITER(hh, map->map_elements, current_map_elmt, tmp_map_elmt) {
-        HASH_DEL(map->map_elements,current_map_elmt);
+    HASH_ITER(hh, (*map)->map_elements, current_map_elmt, tmp_map_elmt) {
+        HASH_DEL((*map)->map_elements,current_map_elmt);
         mapping_freeMappingElement(current_map_elmt);
     }
-    free(map);
+    free(*map);
+    *map = NULL;
 }
 
 igs_mapping_element_t * mapping_createMappingElement(const char * input_name,
@@ -190,7 +193,7 @@ int igsAgent_loadMappingFromPath (igs_agent_t *agent, const char* file_path){
 int igsAgent_clearMapping(igs_agent_t *agent){
     igsAgent_debug(agent, "Clear current mapping if needed and initiate an empty one");
     if(agent->mapping != NULL){
-        mapping_freeMapping(agent->mapping);
+        mapping_freeMapping(&agent->mapping);
     }
     agent->mapping = calloc(1, sizeof(struct igs_mapping));
     agent->mapping->name = NULL;
@@ -583,6 +586,11 @@ void igsAgent_setMappingPath(igs_agent_t *agent, const char *path){
 }
 
 void igsAgent_writeMappingToPath(igs_agent_t *agent){
+    assert(agent);
+    if (agent->mapping == NULL){
+        igsAgent_error(agent, "mapping is NULL and cannot be written to path");
+        return;
+    }
     FILE *fp = NULL;
     fp = fopen (agent->mappingPath,"w+");
     if (fp == NULL){

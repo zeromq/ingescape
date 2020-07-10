@@ -21,14 +21,14 @@ typedef struct igs_agent igs_agent_t;
 PUBLIC igs_agent_t *igsAgent_new(const char *name);
 PUBLIC void igsAgent_destroy(igs_agent_t **agent);
 
+//Attach and detach agent from context
+PUBLIC int igsAgent_activate(igs_agent_t *agent);
+PUBLIC int igsAgent_deactivate(igs_agent_t *agent);
+
 /*
  All the functions below behave the same as the functions presented
  in ingescape.h, except that they take an agent instance as first argument.
  */
-
-//initialization
-PUBLIC int igsAgent_activate(void);
-PUBLIC int igsAgent_deactivate(void);
 
 typedef void (*igsAgent_forcedStopCallback)(igs_agent_t *agent, void *myData);
 PUBLIC void igsAgent_observeForcedStop(igs_agent_t *agent, igsAgent_forcedStopCallback cb, void *myData);

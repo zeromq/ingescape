@@ -414,6 +414,7 @@ void license_cleanLicense(igs_core_context_t *context){
 }
 
 void license_readLicense(igs_core_context_t *context){
+    assert(context);
     if (context->license == NULL){
         if (sodium_init() != 0) {
             //nothing to do ?
@@ -725,23 +726,36 @@ void license_readLicense(igs_core_context_t *context){
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
 void igs_setLicensePath(const char *path){
+    if (path == NULL){
+        igs_error("path cannot be NULL");
+        return;
+    }
     core_initContext();
-    char reviewedPath[4096] = "";
-    admin_makeFilePath(path, reviewedPath, 4096);
+    char reviewedPath[IGS_MAX_PATH_LENGTH] = "";
+    admin_makeFilePath(path, reviewedPath, IGS_MAX_PATH_LENGTH);
     if (zsys_file_exists(reviewedPath)){
         if (coreContext->licensePath != NULL){
             free(coreContext->licensePath);
         }
         coreContext->licensePath = strdup(reviewedPath);
     }else{
-        igs_license("%s does not exist", reviewedPath);
+        igs_error("'%s' does not exist, path was not changed", reviewedPath);
     }
 }
 char *igs_getLicensePath(){
-    return strdup(coreContext->licensePath);
+    core_initContext();
+    if (coreContext->licensePath){
+        return strdup(coreContext->licensePath);
+    }else{
+        return NULL;
+    }
 }
 
 bool igs_checkLicense(const char *agentId){
+    if (agentId == NULL){
+        igs_error("agent id is NULL");
+        return false;
+    }
     core_initContext();
     license_readLicense(coreContext);
     if (agentId == NULL)
@@ -757,7 +771,7 @@ bool igs_checkLicense(const char *agentId){
     return false;
 }
 
-int igs_observeLicense(igs_licenseCallback cb, void *myData){
+int igs_observeLicense(igs_licenseCallback *cb, void *myData){
     core_initContext();
     igs_license_callback_t *l = (igs_license_callback_t *)calloc(1, sizeof(igs_license_callback_t));
     l->callback_ptr = cb;
@@ -769,7 +783,7 @@ int igs_observeLicense(igs_licenseCallback cb, void *myData){
 void igs_loadLicenseData(const void *data, size_t size){
     core_initContext();
     if (data == NULL){
-        igs_license("license data cannot be NULL");
+        igs_error("license data is NULL");
         return;
     }
     if (coreContext->licenseData != NULL)
