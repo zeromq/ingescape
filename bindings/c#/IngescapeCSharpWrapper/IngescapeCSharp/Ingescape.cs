@@ -66,6 +66,22 @@ namespace Ingescape
         private delegate void igs_licenseCallbackC(igs_license_limit_t limit, IntPtr myData);
         public delegate void igs_licenseCallback(igs_license_limit_t limit, object myData);
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void igs_BusMessageIncomingC([MarshalAs(UnmanagedType.LPStr)] string eventInfo,
+                                   [MarshalAs(UnmanagedType.LPStr)] string peerID,
+                                   [MarshalAs(UnmanagedType.LPStr)] string name,
+                                   [MarshalAs(UnmanagedType.LPStr)] string address,
+                                   [MarshalAs(UnmanagedType.LPStr)] string channel,
+                                   IntPtr zHashHeader,
+                                   IntPtr zMsg,
+                                   IntPtr myData);
+        public delegate void igs_BusMessageIncoming(ref string eventInfo,
+                                   ref string peerID,
+                                   ref string name,
+                                   ref string address,
+                                   ref string channel,
+                                   object myData); //FIX ME add cmzq types
+
         #endregion
 
         private static igs_observeCallbackC _OnIOPCallback;
@@ -73,6 +89,7 @@ namespace Ingescape
         private static igs_freezeCallbackC _OnFreezeCallback;
         private static igs_muteCallbackC _OnMutedCallback;
         private static igs_callFunctionC _OnCallCallback;
+        private static igs_BusMessageIncomingC _OnBusIncoming;
 
         static void OnIOPCallback(iop_t iopType,
                                 [MarshalAs(UnmanagedType.LPStr)] string name, iopType_t valueType,
@@ -147,6 +164,21 @@ namespace Ingescape
             CSharpFunction(ref senderAgentName, ref senderAgentUUID, ref callName, callArguments, data);
         }
 
+        static void OnBusCallBack([MarshalAs(UnmanagedType.LPStr)] string eventInfo,
+                                   [MarshalAs(UnmanagedType.LPStr)] string peerID,
+                                   [MarshalAs(UnmanagedType.LPStr)] string name,
+                                   [MarshalAs(UnmanagedType.LPStr)] string address,
+                                   [MarshalAs(UnmanagedType.LPStr)] string channel,
+                                   IntPtr zHashHeader,
+                                   IntPtr zMsg,
+                                   IntPtr myData)
+        {
+            GCHandle gCHandleData = GCHandle.FromIntPtr(myData);
+            Tuple<igs_BusMessageIncoming, object> tuple = (Tuple<igs_BusMessageIncoming, object>)gCHandleData.Target;
+            object data = tuple.Item2;
+            igs_BusMessageIncoming CSharpFunction = tuple.Item1;
+            CSharpFunction(ref eventInfo, ref peerID, ref name, ref address, ref channel, data);
+        }
 
 
         #region Path to library C IngeScape
@@ -1059,6 +1091,7 @@ namespace Ingescape
         //////////////////////////////////////////////////
         #region Calls
 
+
         // Send CALLS to other agents
 
         [StructLayout(LayoutKind.Explicit)]
@@ -1305,6 +1338,25 @@ namespace Ingescape
         #endregion
 
         //////////////////////////////////////////////////
+        #region Bus
+
+        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int igs_observeBus(igs_BusMessageIncomingC cb, IntPtr myData);
+        public static int igs_observeBus(igs_BusMessageIncoming cbSharp, object myData)
+        {
+            Tuple<igs_BusMessageIncoming, object> tupleData = new Tuple<igs_BusMessageIncoming, object>(cbSharp, myData);
+            GCHandle gCHandle = GCHandle.Alloc(tupleData);
+            IntPtr data = GCHandle.ToIntPtr(gCHandle);
+            if (_OnBusIncoming == null)
+            {
+                _OnBusIncoming = OnBusCallBack;
+            }
+            return igs_observeBus(_OnBusIncoming, data);
+        }
+
+        #endregion
+
+        //////////////////////////////////////////////////
         // Administration, configuration & utilities
 
         //IngeScape library version
@@ -1338,6 +1390,7 @@ namespace Ingescape
             for (int i = 0; i < nb; i++)
             {
                 string isoString = PtrToStringISO(ptrArrayOfDevices[i]);
+
                 devicesArray[i] = isoString;
             }
 
