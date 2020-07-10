@@ -49,6 +49,7 @@ void core_initAgent(){
     if (coreAgent == NULL){
         coreAgent = igsAgent_new(IGS_DEFAULT_AGENT_NAME);
         igsAgent_observeForcedStop(coreAgent, core_forcedStopCB, NULL);
+        coreAgent->context = coreContext;
     }
 }
 

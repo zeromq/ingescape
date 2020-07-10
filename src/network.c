@@ -1833,11 +1833,6 @@ void initLoop (igs_core_context_t *context){
             bus_zyreUnlock();
         }
     }
-    
-    //set other headers for agent
-    bus_zyreLock();
-    zyre_set_header(context->node, "canBeFrozen", "%i", context->canBeFrozen);
-    bus_zyreUnlock();
 
 #if defined __unix__ || defined __APPLE__ || defined __linux__
     ssize_t ret;
@@ -2303,16 +2298,17 @@ int igsAgent_setAgentName(igs_agent_t *agent, const char *name){
 
 
 char *igsAgent_getAgentName(igs_agent_t *agent){
-    return strdup(agent->name);
+    assert(agent);
+    if (agent->name == NULL){
+        return NULL;
+    }else{
+        return strdup(agent->name);
+    }
 }
 
 
 int igs_freeze(void){
     core_initContext();
-    if (!coreContext->canBeFrozen){
-        igs_error("ingescape is requested to be frozen but is still set to 'can't be Frozen' : call igs_setCanBeFrozen to change this");
-        return IGS_FAILURE;
-    }
     if(coreContext->isFrozen == false){
         igs_debug("Ingescape is frozen");
         if ((coreContext != NULL) && (coreContext->node != NULL)){
@@ -2382,49 +2378,33 @@ int igs_observeFreeze(igs_freezeCallback cb, void *myData){
 
 
 int igsAgent_setAgentState(igs_agent_t *agent, const char *state){
+    assert(agent);
     if (state == NULL){
         igsAgent_error(agent, "state can not be NULL");
         return IGS_FAILURE;
     }
     
-    if (streq(state, agent->state) != 0){
+    if (agent->state == NULL || !streq(state, agent->state)){
         if (agent->state != NULL)
             free(agent->state);
         agent->state = strndup(state, IGS_MAX_AGENT_NAME_LENGTH);
-        igsAgent_debug(agent, "changed to %s", agent->state);
         if (agent->context->node != NULL){
             bus_zyreLock();
             zyre_shouts(agent->context->node, IGS_PRIVATE_CHANNEL, "STATE=%s", agent->state);
             bus_zyreUnlock();
         }
     }
-    return 1;
+    return IGS_SUCCESS;
 }
 
 
 char *igsAgent_getAgentState(igs_agent_t *agent){
-    return strdup(agent->state);
-}
-
-
-void igs_setCanBeFrozen(bool canBeFrozen){
-    core_initContext();
-    coreContext->canBeFrozen = canBeFrozen;
-    if (coreContext->networkActor != NULL && coreContext->node != NULL){
-        bus_zyreLock();
-        //update header for information to agents not arrived yet
-        zyre_set_header(coreContext->node, "canBeFrozen", "%i", coreContext->canBeFrozen);
-        //send real time notification for agents already there
-        zyre_shouts(coreContext->node, IGS_PRIVATE_CHANNEL, "CANBEFROZEN=%i", canBeFrozen);
-        bus_zyreUnlock();
-        igs_debug("changed to %d", canBeFrozen);
+    assert(agent);
+    if (agent->state == NULL){
+        return NULL;
+    }else{
+        return strdup(agent->state);
     }
-}
-
-
-bool igs_canBeFrozen (){
-    core_initContext();
-    return coreContext->canBeFrozen;
 }
 
 
@@ -2489,7 +2469,16 @@ int igsAgent_observeMute(igs_agent_t *agent, igsAgent_muteCallback cb, void *myD
     return 1;
 }
 
+char* igs_getCommandLine(void){
+    if (coreContext->commandLine == NULL){
+        return NULL;
+    }else{
+        return strndup(coreContext->commandLine, IGS_COMMAND_LINE_LENGTH);
+    }
+}
+
 void igs_setCommandLine(const char *line){
+    assert(line);
     core_initContext();
     if (coreContext->commandLine != NULL)
         free(coreContext->commandLine);
@@ -2558,13 +2547,13 @@ void igs_setCommandLineFromArgs(int argc, const char * argv[]){
         }
         strcat(cmd, argv[i]);
     }
-    strncpy(coreContext->commandLine, cmd, IGS_COMMAND_LINE_LENGTH);
-    igs_debug("Command line set to %s", coreContext->commandLine);
+    if (coreContext->commandLine != NULL)
+        free(coreContext->commandLine);
+    coreContext->commandLine = strndup(cmd, IGS_COMMAND_LINE_LENGTH);
 }
 
 void igsAgent_setRequestOutputsFromMappedAgents(igs_agent_t *agent, bool notify){
     agent->network_requestOutputsFromMappedAgents = notify;
-    igsAgent_debug(agent, "changed to %d", notify);
 }
 
 bool igsAgent_getRequestOutputsFromMappedAgents(igs_agent_t *agent){

@@ -233,7 +233,6 @@ int igsAgent_busSendZMQMsgToAgent(igs_agent_t *agent, const char *agentNameOrPee
 void igsAgent_busAddServiceDescription(igs_agent_t *agent, const char *key, const char *value){
     if (strcmp(key, "publisher") != 0
         && strcmp(key, "logger") != 0
-        && strcmp(key, "canBeFrozen") != 0
         && strcmp(key, "pid") != 0
         && strcmp(key, "commandline") != 0
         && strcmp(key, "hostname") != 0)
@@ -256,7 +255,6 @@ void igsAgent_busAddServiceDescription(igs_agent_t *agent, const char *key, cons
 void igsAgent_busRemoveServiceDescription(igs_agent_t *agent, const char *key){
     if (strcmp(key, "publisher") != 0
         && strcmp(key, "logger") != 0
-        && strcmp(key, "canBeFrozen") != 0
         && strcmp(key, "pid") != 0
         && strcmp(key, "commandline") != 0
         && strcmp(key, "hostname") != 0)

@@ -71,7 +71,7 @@ PUBLIC char *igs_getAgentName(void); //char* must be freed by caller
 
 //control agent state
 PUBLIC int igs_setAgentState(const char *state);
-PUBLIC char *igs_getAgentState(void); //char* must be freed by caller
+PUBLIC char* igs_getAgentState(void); //must be freed by caller
 
 //mute the agent ouputs
 PUBLIC int igs_mute(void);
@@ -90,8 +90,6 @@ PUBLIC bool igs_isFrozen(void);
 PUBLIC void igs_unfreeze(void);
 typedef void (*igs_freezeCallback)(bool isPaused, void *myData);
 PUBLIC int igs_observeFreeze(igs_freezeCallback cb, void *myData);
-PUBLIC void igs_setCanBeFrozen(bool canBeFrozen);
-PUBLIC bool igs_canBeFrozen(void);
 
 
 //////////////////////////////////////////////////
@@ -266,6 +264,7 @@ PUBLIC void igs_freeNetaddressesList(char **addresses, int nb);
 //command line is initialized with exec path without any parameter.
 PUBLIC void igs_setCommandLine(const char *line);
 PUBLIC void igs_setCommandLineFromArgs(int argc, const char * argv[]); //first element is replaced by absolute exec path on UNIX
+PUBLIC char* igs_getCommandLine(void); //must be freed by caller
 
 
 //When mapping other agents, it is possible to request the

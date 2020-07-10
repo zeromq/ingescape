@@ -291,7 +291,6 @@ typedef struct igs_core_context{
     bool isInterrupted;
     bool forcedStop;
     bool isFrozen;
-    bool canBeFrozen;
     igs_freeze_callback_t *freezeCallbacks;
     //performance
     size_t performanceMsgCounter;
