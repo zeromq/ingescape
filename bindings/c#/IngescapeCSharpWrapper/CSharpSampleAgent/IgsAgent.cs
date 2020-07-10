@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
@@ -13,595 +15,266 @@ namespace CSharpSampleAgent
     {
         #region Attributes
 
-        private int _count = 0;
+        private int _igsPort = 5670;
+        private string _igsDevice = "Connexion au réseau local";
+        private string _mappingPath = "";
+        private string _licensePath = "";
+        private bool _verbose = false;
+        private string _documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        private bool initialized = false;
 
         #endregion
 
         #region Callbacks
 
-        public igs_observeCallback _callbackPtr;
 
-        public igs_callFunction _functionCallPtr;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="iopType"></param>
-        /// <param name="name"></param>
-        /// <param name="valueType"></param>
-        /// <param name="value"></param>
-        /// <param name="valueSize"></param>
-        /// <param name="myData"></param>
-        void genericCallback(iop_t iopType,
-                             string name,
-                             iopType_t valueType,
-                             IntPtr value,
-                             int valueSize,
-                             IntPtr myData)
+        static void OnInputCallback(iop_t iopType,
+                                ref string name,
+                                iopType_t valueType,
+                                object value,
+                                object myData)
         {
-            Console.WriteLine("callback test");
-            switch (valueType)
+            if (valueType == iopType_t.IGS_IMPULSION_T)
             {
-                case iopType_t.IGS_BOOL_T:
-                    bool stateReceived = Igs.readInputAsBool("boolean");
-                    Console.WriteLine("Callback sur 'boolean' input : " + stateReceived.ToString());
-                    break;
-
-                case iopType_t.IGS_DATA_T:
-                    break;
-
-                case iopType_t.IGS_DOUBLE_T:
-                    double doubleReceived = Igs.readInputAsDouble("double");
-                    Console.WriteLine("Callback sur 'double' input : " + doubleReceived.ToString());
-                    break;
-
-                case iopType_t.IGS_IMPULSION_T:
-                    Console.WriteLine("Callback sur 'impulsion' input");
-                    break;
-
-                case iopType_t.IGS_INTEGER_T:
-                    //int valueReceived = Igs.readInputAsInt("integer");
-                    //Console.WriteLine("Callback sur 'integer' input : " + valueReceived.ToString());
-                    break;
-
-                case iopType_t.IGS_STRING_T:
-                    string msg = Igs.readInputAsString("string");
-                    Console.WriteLine("Callback sur 'string' input : " + msg);
-                    break;
-
-                default:
-                    break;
-            }
-
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="senderAgentName"></param>
-        /// <param name="senderAgentUUID"></param>
-        /// <param name="callName"></param>
-        /// <param name="firstArgument"></param>
-        /// <param name="nbArgs"></param>
-        /// <param name="myData"></param>
-        void cSharpCallFunction(string senderAgentName,
-                                string senderAgentUUID,
-                                string callName,
-                                IntPtr firstArgument,
-                                uint nbArgs,
-                                IntPtr myData)
-        {
-            Console.WriteLine("'{2}' called from '{0}' ({1}) with {3} args:", senderAgentName, senderAgentUUID, callName, nbArgs);
-
-            if (myData != IntPtr.Zero)
-            {
-                string utf8 = Igs.getStringFromPointer(myData);
-                if (!string.IsNullOrEmpty(utf8))
-                {
-                    Console.WriteLine("myData = {0}", utf8);
-                }
-            }
-
-            if (nbArgs == 5)
-            {
-                List<CallArgument> callArgumentsList = Igs.getCallArgumentsList(firstArgument);
-                int i = 0;
-
-                foreach (CallArgument callArgument in callArgumentsList)
-                {
-                    if (callArgument != null)
-                    {
-                        if (callArgument.Type != iopType_t.IGS_DATA_T)
-                        {
-                            Console.WriteLine("{0}: {1} = {2} ({3})", i, callArgument.Name, callArgument.Value, callArgument.Type);
-                        }
-                        else
-                        {
-                            byte[] byteArray = (byte[])callArgument.Value;
-
-                            // WARNING Special case: We know that the data is a string, so we can convert from byte[] to string
-                            string stringData = Encoding.UTF8.GetString(byteArray);
-                            stringData = stringData.TrimEnd('\0');
-
-                            Console.WriteLine("{0}: {1} = {2} ({3})", i, callArgument.Name, stringData, callArgument.Type);
-                        }
-                    }
-                    i++;
-                }
-            }
-        }
-
-
-        // License Callback
-        public igs_licenseCallback ptrOnLicenseCallbck;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="limit"></param>
-        /// <param name="myData"></param>
-        void onLicenseCallback(igs_license_limit_t limit, IntPtr myData)
-        {
-            Console.WriteLine("onLicenseCallback " + limit);
-        }
-
-        #endregion
-
-        #region Constructor
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        public IgsAgent()
-        {
-            //Load a definition from file
-            int success = Igs.loadDefinitionFromPath("../../../data/igs-csharp-sample-def.json");
-            if (success == 1) {
-                Console.WriteLine("The loading of the definition succeeded");
-            }
-            else {
-                Console.WriteLine("ERROR: The loading of the definition failed !");
-            }
-
-            //Igs.setDefinitionName("A (éç) A");
-            string defName = Igs.getDefinitionName();
-            string defDescription = Igs.getDefinitionDescription();
-            Console.WriteLine("Definition: Name = '{0}' -- Description = '{1}'", defName, defDescription);
-
-            //Load mapping from file
-            success = Igs.loadMappingFromPath("../../../data/igs-csharp-sample-mapping.json");
-            if (success == 1) {
-                Console.WriteLine("The loading of the mapping succeeded");
-            }
-            else {
-                Console.WriteLine("ERROR: The loading of the mapping failed !");
-            }
-
-            //"name": "C#-Sample (é ç partï)"
-            //Igs.setMappingName("A (éç) A");
-            string mapName = Igs.getMappingName();
-            string mapDescription = Igs.getMappingDescription();
-            Console.WriteLine("Mapping: Name = '{0}' -- Description = '{1}'", mapName, mapDescription);
-
-            //Get mapping version 
-            string mappingVersion = Igs.getMappingVersion();
-
-            //Get agent name
-            string agentName = Igs.getAgentName();
-            //Igs.setAgentName("test-é-ç");
-
-
-            //
-            // CALLS
-            //
-            #region Calls
-
-            _functionCallPtr = cSharpCallFunction;
-
-            //string callName = "çShàrpCàll";
-            string callName = "cSharpCall";
-            //string callArgName = "àrgÏnt2";
-            string callArgName = "argInt2";
-
-            string strMyData = "My Data (é ç parti)";
-            IntPtr ptrMyData = Igs.getPointerFromString(strMyData);
-
-            Igs.initCall(callName, _functionCallPtr, ptrMyData);
-            Igs.addArgumentToCall(callName, "argBool1", iopType_t.IGS_BOOL_T);
-            Igs.addArgumentToCall(callName, callArgName, iopType_t.IGS_INTEGER_T);
-            //Igs.addArgumentToCall(callName, "argDoùble3", iopType_t.IGS_DOUBLE_T);
-            Igs.addArgumentToCall(callName, "argDouble3", iopType_t.IGS_DOUBLE_T);
-            Igs.addArgumentToCall(callName, "argString4", iopType_t.IGS_STRING_T);
-            Igs.addArgumentToCall(callName, "argData5", iopType_t.IGS_DATA_T);
-
-            uint numberOfCalls = Igs.getNumberOfCalls();
-            Console.WriteLine("Number of Calls = {0}", numberOfCalls);
-
-            //string callName1 = "séndMail";
-            string callName1 = "sendMail";
-            string callName2 = "Call_BIDON";
-            //string callArgName1 = "sùbjéct";
-            string callArgName1 = "subject";
-            string callArgName2 = "Arg_BIDON";
-            
-            bool existCall1 = Igs.checkCallExistence(callName1);
-            bool existCall2 = Igs.checkCallExistence(callName2);
-            bool existCall = Igs.checkCallExistence(callName);
-
-            Console.WriteLine("\nExist Calls: {0}={1} -- {2}={3} -- {4}={5}", callName1, existCall1, callName2, existCall2, callName, existCall);
-
-            bool existCallArg1 = Igs.checkCallArgumentExistence(callName1, callArgName1);
-            bool existCallArg2 = Igs.checkCallArgumentExistence(callName1, callArgName2);
-            bool existCallArg3 = Igs.checkCallArgumentExistence(callName2, callArgName2);
-            bool existCallArg = Igs.checkCallArgumentExistence(callName, callArgName);
-
-            Console.WriteLine("\nExist Call Arg:");
-            Console.WriteLine("{0}.{1}={2}\n{3}.{4}={5}\n{6}.{7}={8}",
-                callName1, callArgName1, existCallArg1,
-                callName1, callArgName2, existCallArg2,
-                callName2, callArgName2, existCallArg3);
-            Console.WriteLine("{0}.{1}={2}",
-                callName, callArgName, existCallArg);
-
-            string inputName1 = "boolean";
-            string inputName2 = "zzzzz";
-
-            bool existIn1 = Igs.checkInputExistence(inputName1);
-            bool existIn2 = Igs.checkInputExistence(inputName2);
-
-            Console.WriteLine("\nExist Inputs: {0}={1} -- {2}={3}", inputName1, existIn1, inputName2, existIn2);
-
-            string[] callsList = Igs.getCallsList();
-            for (int i = 0; i < callsList.Length; i++)
-            {
-                string tmpCallName = callsList[i];
-                uint argsNb = Igs.getNumberOfArgumentsForCall(tmpCallName);
-
-                Console.WriteLine("call {0} -- args nb = {1}", tmpCallName, argsNb);
-            }
-
-
-            IntPtr firstArg = Igs.getFirstArgumentForCall("sendMail");
-            if (firstArg != IntPtr.Zero)
-            {
-                Console.WriteLine("First arg is defined:");
-
-                List<CallArgument> callArgumentsList = Igs.getCallArgumentsList(firstArg);
-                int i = 0;
-
-                foreach (CallArgument callArgument in callArgumentsList)
-                {
-                    if (callArgument != null)
-                    {
-                        if (callArgument.Type != iopType_t.IGS_DATA_T)
-                        {
-                            Console.WriteLine("{0}: {1} = {2} ({3})", i, callArgument.Name, callArgument.Value, callArgument.Type);
-                        }
-                    }
-                    i++;
-                }
+                Console.WriteLine("On Input Callback... Impulsion");
             }
             else
             {
-                Console.WriteLine("First arg is NOT defined !");
-            }
-
-            #endregion
-
-
-            // Get agent state
-            //string checkAgentName = Igs.getAgentName();
-            //Console.WriteLine("Agent name = '{0}'", checkAgentName);
-
-            // Get agent state
-            string agentState = Igs.getAgentState();
-
-            // Get network devices and addresses
-            string[] netDevicesList = Igs.getNetDevicesList();
-            string[] netAddressesList = Igs.getNetAddressesList();
-            if (netDevicesList.Length == netAddressesList.Length)
-            {
-                for (int i = 0; i < netDevicesList.Length; i++)
+                if (valueType == iopType_t.IGS_DATA_T)
                 {
-                    string netDevice = netDevicesList[i];
-                    string netAddress = netAddressesList[i];
-
-                    Console.WriteLine("{0}: '{1}' with ip {2}", i, netDevice, netAddress);
+                    string converted = Encoding.UTF8.GetString((byte[])value, 0, ((byte[])value).Length);
+                    Console.WriteLine("On Input Callback... value : " + converted);
+                }
+                else
+                {
+                    Console.WriteLine("On Input Callback... value : " + value);
                 }
             }
- 
-            // Verbose
-            Igs.setVerbose(true);
-            //bool isVerbose = Igs.isVerbose();
-            //Console.WriteLine("Is verbose: " + isVerbose);
+        }
 
-            string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            string licensePath = string.Format(@"{0}\IngeScape\licenses\", documentsPath);
-            //string licensePath = string.Format(@"{0}\IngeScape\licenses_aççents_égüe\", documentsPath);
-            Console.WriteLine("documentsPath: {0} -- licensePath: {1}", documentsPath, licensePath);
-            Igs.setLicensePath(licensePath);
+        static void OnOutputCallback(iop_t iopType,
+                                ref string name,
+                                iopType_t valueType,
+                                object value,
+                                object myData)
+        {
+            if (valueType == iopType_t.IGS_IMPULSION_T)
+            {
+                Console.WriteLine("On Output Callback... impulsion");
+            }
+            else
+            {
+                if (valueType == iopType_t.IGS_DATA_T)
+                {
+                    string converted = Encoding.UTF8.GetString((byte[])value, 0, ((byte[])value).Length);
+                    Console.WriteLine("On Output Callback... value : " + converted);
+                }
+                else
+                {
+                    Console.WriteLine("On Output Callback... value : " + value);
+                }
+            }
+        }
 
-            string checkLicensePath = Igs.getLicensePath();
-            Console.WriteLine("get License Path: '{0}'", checkLicensePath);
+        static void ForcedStopCB(object data)
+        {
+            IgsAgent script = (IgsAgent)data;
+            Console.WriteLine("ForcedStop ...");
+            
+        }
 
-            ////Color Verbose
-            //Igs.setUseColorVerbose(true);
-            //bool isColorVerbose = Igs.getUseColorVerbose();
-            //Console.WriteLine("Is colored verbose : " + isColorVerbose);
+        
 
-            ////Log Stream
-            //Igs.setLogStream(true);
-            //bool isLogStream = Igs.getLogStream();
-            //Console.WriteLine("Is log stream : " + isLogStream);
-
-            ////Log in file
-            //Igs.setLogInFile(true);
-            //bool isLogFile = Igs.getLogInFile();
-            //Console.WriteLine("Is log file : " + isLogFile);
-
-            ////Log path
-            //Igs.setLogPath("testLogFile.txt");
-            //string logPath = Igs.getLogPath();
-            //Console.WriteLine("Log file path : " + logPath);
-
-            // Log level
-            Igs.setLogLevel(igs_logLevel_t.IGS_LOG_TRACE);
-            igs_logLevel_t logLevel = Igs.getLogLevel();
-            Console.WriteLine("Log level: " + logLevel);
-
-            ptrOnLicenseCallbck = onLicenseCallback;
-
-            // Observe license error
-            Igs.observeLicense(ptrOnLicenseCallbck, IntPtr.Zero);
-
-            // 
-            //Igs.checkLicenseForAgent("");
+        static void OnParameterCallback(iop_t iopType,
+                               ref string name,
+                               iopType_t valueType,
+                               object value,
+                               object myData)
+        {
+            if (valueType == iopType_t.IGS_IMPULSION_T)
+            {
+                Console.WriteLine("On Parameter Callback... impulsion");
+            }
+            else
+            {
+                if (valueType == iopType_t.IGS_DATA_T)
+                {
+                    string converted = Encoding.UTF8.GetString((byte[])value, 0, ((byte[])value).Length);
+                    Console.WriteLine("On Parameter Callback... value : " + converted);
+                }
+                else
+                {
+                    Console.WriteLine("On Parameter Callback... value : " + value);
+                }
+            }
+        }
 
 
-            // getting app parameters
-            string igsNetDevice = ConfigurationManager.AppSettings["igsNetDevice"];
-            //string igsIP = ConfigurationManager.AppSettings["igsIP"];
-            int igsPort = int.Parse(ConfigurationManager.AppSettings["igsNetPort"]);
-            Console.WriteLine("Parameters: Net device='{0}' -- Net port={1}", igsNetDevice, igsPort);
+        static void CallExampleCB(ref string senderAgentName,
+                                    ref string senderAgentUUID,
+                                    ref string callName,
+                                    List<CallArgument> callArguments,
+                                    object myData)
+        {
+            Console.WriteLine("CallBack of CallExampleCB ...");
+        }
 
-            //Start the agent on the network
-            Igs.startWithDevice(igsNetDevice, igsPort);
-
-            //TODO : implement test of the command line functions
+        static void OnObserveBus(ref string eventInfo,
+                                   ref string peerID,
+                                   ref string name,
+                                   ref string address,
+                                   ref string channel,
+                                   object myData)
+        {
+            if(eventInfo == "JOIN")
+            {
+                Console.WriteLine("peerId : " + peerID + " name : " + name + " JOIN with address : " + address);
+            }
+            else if(eventInfo == "EXIT")
+            {
+                Console.WriteLine("peerId : " + peerID + " name : " + name + " EXIT with address : " + address);
+            }
         }
 
         #endregion
 
-        #region Methods
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public void readGenericFunctions()
+        public int GetPort()
         {
-            /*
-             * Input
-             */
-            //Write a value
-            //string str = "helloword-input";
-            string str = "helloword-é-ç-input";
-            Igs.writeInputAsString("string", str);
-
-            //Use the generic function to read the value of the input
-            IntPtr[] intPtrArray = new IntPtr[1];
-            uint size = 0;
-            Igs.readInput("string", intPtrArray, ref size);
-            string value = Marshal.PtrToStringAnsi(intPtrArray[0]);
-
-            //Print the value
-            Console.WriteLine("Value of the input string : " + value);
-
-            /*
-             * Output
-             */
-            //Write a value
-            //str = "helloword-out";
-            str = "helloword-é-ç-output";
-            Igs.writeOutputAsString("string-out", str);
-
-            //Use the generic function to read the value of the output
-            //intPtrArray = new IntPtr[1];
-            Igs.readOutput("string-out", intPtrArray, ref size);
-            value = Marshal.PtrToStringAnsi(intPtrArray[0]);
-
-            //Print the value
-            Console.WriteLine("Value of the output string : " + value);
-
-            /*
-             * Parameter
-             */
-            //Write a value
-            str = "helloword-é-ç-param";
-            Igs.writeParameterAsString("string-param", str);
-
-            //Use the generic function to read the value of the parameter
-            //intPtrArray = new IntPtr[1];
-            Igs.readParameter("string-param", intPtrArray, ref size);
-            value = Marshal.PtrToStringAnsi(intPtrArray[0]);
-
-            //Print the value
-            Console.WriteLine("Value of the parameter string : " + value);
+            return _igsPort;
         }
 
-        public void writeInLog(string msg)
+        public string GetDevice()
         {
-            //Test the log file function
-            Igs.log(igs_logLevel_t.IGS_LOG_INFO, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
-
-            //Test the function like macro function wrapping
-            Igs.igs_warn(msg);
-
-            Console.WriteLine("write in log : " + msg);
+            return _igsDevice;
         }
 
-        public void observeInputs()
+        public int init()
         {
-            _callbackPtr = genericCallback;
-
-            //Listing of input
-            int nbOfElement = -1;
-            string[] inputsList = Igs.getInputsList(ref nbOfElement);
-
-            string myData = "MyData";
-            IntPtr myDataPtr = Marshal.StringToHGlobalAnsi(myData);
-
-            //Fill the string tab
-            for (int i = 0; i < nbOfElement; i++)
+            if (!initialized)
             {
-                //Observe the current input    
-                Igs.observeInput(inputsList[i], _callbackPtr, myDataPtr);
-            }
-        }
+                initialized = true;
+                _licensePath = _documentsPath + "/IngeScape/licenses";
+                int index;
+                List<string> argsList = Environment.GetCommandLineArgs().ToList();
+                foreach (string arg in argsList)
+                {
+                    string argWithoutDashs = arg.Replace("-", "");
+                    switch (argWithoutDashs)
+                    {
+                        case "verbose":
+                            _verbose = true;
+                            break;
+                        case "license":
+                            index = argsList.IndexOf(arg);
+                            _licensePath = argsList[index + 1];
+                            break;
+                        case "mapping":
+                            break;
+                        case "port":
+                            index = argsList.IndexOf(arg);
+                            _igsPort = Convert.ToInt32(argsList[index + 1]);
+                            break;
+                        case "device":
+                            index = argsList.IndexOf(arg);
+                            _igsDevice = argsList[index + 1];
+                            break;
+                        case "help":
+                            print_usage();
+                            Environment.Exit(0);
+                            break;
 
-        public void createDefDynamically()
-        {
-            Igs.createInput("string", iopType_t.IGS_STRING_T, IntPtr.Zero, 0);
-            Igs.createInput("impulsion", iopType_t.IGS_IMPULSION_T, IntPtr.Zero, 0);
-            Igs.createInput("data", iopType_t.IGS_DATA_T, IntPtr.Zero, 0);
+                    }
+                }
 
-            Igs.createParameter("string-param", iopType_t.IGS_STRING_T, IntPtr.Zero, 0);
-            //Igs.createParameter("impulsion-param", iopType_t.IGS_IMPULSION_T, IntPtr.Zero, 0);
+                Igs.setAgentName("CSharpSample");
+                Igs.setDefinitionName("CSharpSample def");
+                Igs.setDefinitionVersion("1.0");
+                Igs.setDefinitionDescription("CSharpSample");
+                Igs.setLicensePath(_licensePath);
+                Igs.setLogLevel(igs_logLevel_t.IGS_LOG_DEBUG);
+                Igs.setVerbose(_verbose);
+                Igs.setLogInFile(true);
+                Igs.setLogStream(true);
 
-            Igs.createOutput("string-out", iopType_t.IGS_STRING_T, IntPtr.Zero, 0);
-            Igs.createOutput("impulsion-out", iopType_t.IGS_IMPULSION_T, IntPtr.Zero, 0);
-            Igs.createOutput("data-out", iopType_t.IGS_DATA_T, IntPtr.Zero, 0);
-        }
+                System.Text.Encoding encoding = System.Text.Encoding.GetEncoding(System.Text.Encoding.Default.BodyName);
+                string[] netDevicesList = Igs.getNetDevicesList();
+                foreach (string netDevice in netDevicesList)
+                {
+                    Console.WriteLine("netDevice " + netDevice);
+                }
 
-        public void createMappingDynamically()
-        {
-            Igs.addMappingEntry("string", "Csharp-Sample", "string-out");
-            Igs.addMappingEntry("impulsion", "Csharp-Sample", "impulsion-out");
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public void writeOnInputs()
-        {
-            //Integer
-            int value = 100;
-            int result = -1;
-            result = Igs.writeInputAsInt("integer", value);
-
-            //Double
-            double val = 100.111;
-            result = Igs.writeInputAsDouble("double", val);
-
-            //String
-            string msg = "Helloword";
-            result = Igs.writeInputAsString("string", msg);
-
-            //Impulsion
-            result = Igs.writeInputAsImpulsion("impulsion");
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public void writeAndReadData()
-        {
-            byte[] fooBytes;
-
-            //Initialize object
-            Foo foo = new Foo();
-            Console.WriteLine("foo X={0}, Y={1} will be written on output", foo.FooX, foo.FooY);
-
-            //Serialize object to byte array
-            BinaryFormatter bf = new BinaryFormatter();
-            MemoryStream ms = new MemoryStream();
-            bf.Serialize(ms, foo);
-            fooBytes = ms.ToArray();
-
-            //Write on output
-            uint size = (uint)fooBytes.Length;
-            //uint size = Convert.ToUInt32(fooBytes.Length);
-            Igs.writeOutputAsData("data-out", fooBytes, size);
-
-            //Read data
-            byte[] data = new byte[]{};
-            Igs.readOutputAsData("data-out", ref data);
-
-            //Deserialize          
-            BinaryFormatter formatter = new BinaryFormatter();
-            MemoryStream msRead = new MemoryStream(data);
-            Foo readFoo = (Foo)formatter.Deserialize(msRead);
-            if (readFoo != null)
-            {
-                Console.WriteLine("Foo X={0} Y={1} has been read", readFoo.FooX, readFoo.FooY);
-            }
-        }
-
-
-        /// <summary>
-        /// Stop our agent
-        /// </summary>
-        public void stop()
-        {
-            Igs.stop();
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public void memoryleakstest()
-        {
-            for (int i = 0; i < 1000; i++)
-            {
-                int result = -1;
+               
                 
-                //Integer
-                int value = 100;
-                result = Igs.writeInputAsInt("integer", value);
+                // Pass our class instance (this) in paramater of the IngeScape callback(s) 
+                Igs.observeForcedStop(ForcedStopCB, this);
 
-                //Double
-                double val = 100.111;
-                result = Igs.writeInputAsDouble("double", val);
+                Igs.createInput("boolInput", iopType_t.IGS_BOOL_T);
+                Igs.createInput("stringInput", iopType_t.IGS_STRING_T);
+                Igs.createInput("intInput", iopType_t.IGS_INTEGER_T);
+                Igs.createInput("doubleInput", iopType_t.IGS_DOUBLE_T);
+                Igs.createInput("impulsionInput", iopType_t.IGS_IMPULSION_T);
+                Igs.createInput("dataInput", iopType_t.IGS_DATA_T);
 
-                //String
-                string msg = string.Format("Helloword {0}", i);
-                result = Igs.writeOutputAsString("string-out", msg);
+                Igs.observeInput("boolInput", OnInputCallback, this);
+                Igs.observeInput("stringInput", OnInputCallback, this);
+                Igs.observeInput("intInput", OnInputCallback, this);
+                Igs.observeInput("doubleInput", OnInputCallback, this);
+                Igs.observeInput("impulsionInput", OnInputCallback, this);
+                Igs.observeInput("dataInput", OnInputCallback, this);
 
-                //Impulsion
-                result = Igs.writeOutputAsImpulsion("impulsion-out");
+                Igs.createOutput("boolOutput", iopType_t.IGS_BOOL_T);
+                Igs.createOutput("stringOutput", iopType_t.IGS_STRING_T);
+                Igs.createOutput("intOutput", iopType_t.IGS_INTEGER_T);
+                Igs.createOutput("doubleOutput", iopType_t.IGS_DOUBLE_T);
+                Igs.createOutput("impulsionOutput", iopType_t.IGS_IMPULSION_T);
+                Igs.createOutput("dataOutput", iopType_t.IGS_DATA_T);
+
+                Igs.observeOutput("boolOutput", OnOutputCallback, this);
+                Igs.observeOutput("stringOutput", OnOutputCallback, this);
+                Igs.observeOutput("intOutput", OnOutputCallback, this);
+                Igs.observeOutput("doubleOutput", OnOutputCallback, this);
+                Igs.observeOutput("impulsionOutput", OnOutputCallback, this);
+                Igs.observeOutput("dataOutput", OnOutputCallback, this);
+
+                Igs.createParameter("boolParameter", iopType_t.IGS_BOOL_T);
+                Igs.createParameter("stringParameter", iopType_t.IGS_STRING_T);
+                Igs.createParameter("intParameter", iopType_t.IGS_INTEGER_T);
+                Igs.createParameter("doubleParameter", iopType_t.IGS_DOUBLE_T);
+                Igs.createParameter("impulsionParameter", iopType_t.IGS_IMPULSION_T);
+                Igs.createParameter("dataParameter", iopType_t.IGS_DATA_T);
+
+                Igs.observeParameter("boolParameter", OnParameterCallback, this);
+                Igs.observeParameter("stringParameter", OnParameterCallback, this);
+                Igs.observeParameter("intParameter", OnParameterCallback, this);
+                Igs.observeParameter("doubleParameter", OnParameterCallback, this);
+                Igs.observeParameter("impulsionParameter", OnParameterCallback, this);
+                Igs.observeParameter("dataParameter", OnParameterCallback, this);
+
+                Igs.igs_observeBus(OnObserveBus, this);
+
+
+                #region initCall 
+
+                int res = Igs.initCall("CallExample", CallExampleCB, this);
+
+                #endregion
+
+                return Igs.startWithDevice(_igsDevice, _igsPort);
             }
+            return 0;
+           
         }
 
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public void testSendCall()
+        void print_usage()
         {
-            IntPtr argsList = IntPtr.Zero;
-
-            _count++;
-            bool even = ((_count % 2) == 0);
-
-            List<CallArgument> argumentsList = new List<CallArgument>();
-            argumentsList.Add(new CallArgument(iopType_t.IGS_INTEGER_T, _count));
-            argumentsList.Add(new CallArgument(iopType_t.IGS_BOOL_T, even));
-            int success = Igs.sendCall("macosAgent", "OTHER_CALL", argumentsList);
-            Console.WriteLine("Send call success ?= {0}", success);
-
-            /*List<CallArgument> argumentsList2 = new List<CallArgument>();
-            argumentsList2.Add(new CallArgument(iopType_t.IGS_STRING_T, "peyruqueou@ingenuity.io"));
-            argumentsList2.Add(new CallArgument(iopType_t.IGS_STRING_T, "v.peyruqueou@gmail.com"));
-            argumentsList2.Add(new CallArgument(iopType_t.IGS_STRING_T, ""));
-            argumentsList2.Add(new CallArgument(iopType_t.IGS_STRING_T, "Test envoi via IngeScape call"));
-            argumentsList2.Add(new CallArgument(iopType_t.IGS_STRING_T, "Salut Vincent, Cordialement, Vincent P."));
-            int success2 = Igs.sendCall("igsMail", "sendMail", argumentsList2);
-            Console.WriteLine("Send call success ?= {0}", success2);*/
+            Console.Write("Usage example: unitySample --verbose --port 5670 --device en0\n");
+            Console.Write("\nthese parameters have default value (indicated here above):\n");
+            Console.Write(String.Format("--mapping : path to the mapping file (default: {0})\n", "none"));
+            Console.Write("--verbose : enable verbose mode in the application (default is disabled)\n");
+            Console.Write(String.Format("--port port_number : port used for autodiscovery between agents (default: %d)\n", _igsPort));
+            Console.Write("--device device_name : name of the network device to be used (useful if several devices available)\n");
+            Console.Write(String.Format("--license path : path to the ingescape licenses files (default: %s)\n", _licensePath));
         }
-
-        #endregion
     }
 }

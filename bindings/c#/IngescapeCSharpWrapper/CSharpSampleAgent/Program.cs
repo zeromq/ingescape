@@ -6,11 +6,13 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Ingescape;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace CSharpSampleAgent
 {
     class Program
     {
+       
         static void Main(string[] args)
         {
             ConsoleKeyInfo cki;
@@ -18,36 +20,22 @@ namespace CSharpSampleAgent
 
             Console.WriteLine(" ------------C# agent sample ------------");
 
-            Console.WriteLine("IntPtr.Size = " + IntPtr.Size);
+            IgsAgent agent = new IgsAgent();
+            int res = agent.init();
 
-            //Intanciate Igs agent middleware
-            IgsAgent igsAgent = new IgsAgent();
-
-            //Add inputs, output & parameter dynamically
-            igsAgent.createDefDynamically();
-
+            if (res == 1)
+            {
+                Console.WriteLine(string.Format("IngeScape started with device : {0} and port : {1}", agent.GetDevice(), agent.GetPort()));
+            }
 
 
-            //Add mapping dynamically
-            igsAgent.createMappingDynamically();
 
-            //Write on outputs
-            igsAgent.writeOnInputs();
 
-            //Observe all inputs
-            igsAgent.observeInputs();
-
-            //Read inputs
-            igsAgent.readGenericFunctions();
-
-            //Write & Read data
-            igsAgent.writeAndReadData();
-
-            //int iteration = 0;
-            //string msg = null;
             while (true)
             {
-                Console.Write("Press 'X' to quit \nPress 'A' to write in log \nPress 'S' to send a call \n");
+                Console.Write("Press 'X' to quit \n");
+                Console.WriteLine("Press 'S' to stop \n");
+                Console.WriteLine("Press 'R' to start \n");
 
                 // Start a console read operation. Do not display the input.
                 cki = Console.ReadKey(true);
@@ -55,21 +43,17 @@ namespace CSharpSampleAgent
                 // Exit if the user pressed the 'X' key.
                 if (cki.Key == ConsoleKey.X)
                 {
-                    igsAgent.stop();
+                    Igs.stop();
+                    Environment.Exit(0);
                     break;
                 }
-                // If the user pressed the 'A' key.
-                else if (cki.Key == ConsoleKey.A)
+                if (cki.Key == ConsoleKey.S)
                 {
-                    //Loop of potential functions raising memory leaks
-                    //Write input type int, double, impulsion, string 1000 times
-                    //The memory increase. it seems to have no relation with the c# but more with the C implementation
-                    igsAgent.memoryleakstest();
+                    Igs.stop();  
                 }
-                // If the user pressed the 'S' key.
-                else if (cki.Key == ConsoleKey.S)
+                if (cki.Key == ConsoleKey.R)
                 {
-                    igsAgent.testSendCall();
+                    Igs.startWithDevice("Wi-Fi",2009);
                 }
             }
         }
