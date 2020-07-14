@@ -828,7 +828,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 strMapping[strlen(message)- strlen(mappingPrefix)] = '\0';
                 
                 //load mapping from string content
-                newMapping = parser_LoadMap(strMapping);
+                newMapping = parser_loadMapping(strMapping);
                 if (newMapping == NULL){
                     igs_error("Received mapping for agent %s could not be parsed properly", name);
                 }
@@ -894,7 +894,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             strMapping[strlen(message)- strlen(loadMappingPrefix)] = '\0';
             
             // Load mapping from string content
-            igs_mapping_t *m = parser_LoadMap(strMapping);
+            igs_mapping_t *m = parser_loadMapping(strMapping);
             if (m != NULL){
                 if (agent->mapping != NULL){
                     mapping_freeMapping(&agent->mapping);
@@ -922,7 +922,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 
                 igs_debug("Responding to outputs request received from %s", name);
                 //send all outputs via whisper to agent that mapped us
-                long nbOutputs = 0;
+                size_t nbOutputs = 0;
                 char **outputsList = NULL;
                 outputsList = igsAgent_getOutputsList(agent, &nbOutputs);
                 int i = 0;
@@ -2250,7 +2250,7 @@ bool igs_isStarted(){
     }
 }
 
-int igsAgent_setAgentName(igs_agent_t *agent, const char *name){
+igs_result_t igsAgent_setAgentName(igs_agent_t *agent, const char *name){
     if ((name == NULL) || (strlen(name) == 0)){
         igsAgent_error(agent, "Agent name cannot be NULL or empty");
         return IGS_FAILURE;
@@ -2307,10 +2307,9 @@ char *igsAgent_getAgentName(igs_agent_t *agent){
 }
 
 
-int igs_freeze(void){
+igs_result_t igs_freeze(void){
     core_initContext();
     if(coreContext->isFrozen == false){
-        igs_debug("Ingescape is frozen");
         if ((coreContext != NULL) && (coreContext->node != NULL)){
             bus_zyreLock();
             igs_agent_t *agent, *tmp;
@@ -2341,7 +2340,6 @@ bool igs_isFrozen(void){
 void igs_unfreeze(void){
     core_initContext();
     if(coreContext->isFrozen == true){
-        igs_debug("Ingescape resumed (unfrozen)");
         if ((coreContext->networkActor != NULL) && (coreContext->node != NULL)){
             bus_zyreLock();
             igs_agent_t *agent, *tmp;
@@ -2362,7 +2360,7 @@ void igs_unfreeze(void){
 }
 
 
-int igs_observeFreeze(igs_freezeCallback cb, void *myData){
+void igs_observeFreeze(igs_freezeCallback cb, void *myData){
     core_initContext();
     if (cb != NULL){
         igs_freeze_callback_t *newCb = calloc(1, sizeof(igs_freeze_callback_t));
@@ -2371,16 +2369,14 @@ int igs_observeFreeze(igs_freezeCallback cb, void *myData){
         DL_APPEND(coreContext->freezeCallbacks, newCb);
     }else{
         igs_warn("callback is null");
-        return 0;
     }
-    return 1;
 }
 
 
-int igsAgent_setAgentState(igs_agent_t *agent, const char *state){
+igs_result_t igsAgent_setAgentState(igs_agent_t *agent, const char *state){
     assert(agent);
     if (state == NULL){
-        igsAgent_error(agent, "state can not be NULL");
+        igsAgent_error(agent, "state cannot be NULL");
         return IGS_FAILURE;
     }
     
@@ -2408,7 +2404,7 @@ char *igsAgent_getAgentState(igs_agent_t *agent){
 }
 
 
-int igsAgent_mute(igs_agent_t *agent){
+igs_result_t igsAgent_mute(igs_agent_t *agent){
     if (!agent->isWholeAgentMuted)
     {
         agent->isWholeAgentMuted = true;
@@ -2429,7 +2425,7 @@ int igsAgent_mute(igs_agent_t *agent){
 }
 
 
-int igsAgent_unmute(igs_agent_t *agent){
+igs_result_t igsAgent_unmute(igs_agent_t *agent){
     if (agent->isWholeAgentMuted)
     {
         agent->isWholeAgentMuted = false;
@@ -2455,7 +2451,7 @@ bool igsAgent_isMuted(igs_agent_t *agent){
 }
 
 
-int igsAgent_observeMute(igs_agent_t *agent, igsAgent_muteCallback cb, void *myData){
+void igsAgent_observeMute(igs_agent_t *agent, igsAgent_muteCallback cb, void *myData){
     if (cb != NULL){
         igs_mute_callback_t *newCb = calloc(1, sizeof(igs_mute_callback_t));
         newCb->callback_ptr = cb;
@@ -2464,9 +2460,7 @@ int igsAgent_observeMute(igs_agent_t *agent, igsAgent_muteCallback cb, void *myD
     }
     else{
         igsAgent_warn(agent, "callback is null");
-        return 0;
     }
-    return 1;
 }
 
 char* igs_getCommandLine(void){

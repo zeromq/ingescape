@@ -66,30 +66,30 @@ typedef void (*igs_forcedStopCallback)(void *myData);
 PUBLIC void igs_observeForcedStop(igs_forcedStopCallback cb, void *myData);
 
 //agent name set and get
-PUBLIC int igs_setAgentName(const char *name);
+PUBLIC igs_result_t igs_setAgentName(const char *name);
 PUBLIC char *igs_getAgentName(void); //char* must be freed by caller
 
 //control agent state
-PUBLIC int igs_setAgentState(const char *state);
+PUBLIC igs_result_t igs_setAgentState(const char *state);
 PUBLIC char* igs_getAgentState(void); //must be freed by caller
 
 //mute the agent ouputs
-PUBLIC int igs_mute(void);
-PUBLIC int igs_unmute(void);
+PUBLIC igs_result_t igs_mute(void);
+PUBLIC igs_result_t igs_unmute(void);
 PUBLIC bool igs_isMuted(void);
 typedef void (*igs_muteCallback)(bool isMuted, void *myData);
-PUBLIC int igs_observeMute(igs_muteCallback cb, void *myData);
+PUBLIC void igs_observeMute(igs_muteCallback cb, void *myData);
 
 //freeze and unfreeze the agent
 //When freezed, agent will not send anything on its outputs and
 //its inputs are not reactive to external data.
 //NB: the internal semantics of freeze and unfreeze for a given agent
 //are up to the developer and can be controlled using callbacks and igs_observeFreeze
-PUBLIC int igs_freeze(void);
+PUBLIC igs_result_t igs_freeze(void);
 PUBLIC bool igs_isFrozen(void);
 PUBLIC void igs_unfreeze(void);
 typedef void (*igs_freezeCallback)(bool isPaused, void *myData);
-PUBLIC int igs_observeFreeze(igs_freezeCallback cb, void *myData);
+PUBLIC void igs_observeFreeze(igs_freezeCallback cb, void *myData);
 
 
 //////////////////////////////////////////////////
@@ -116,47 +116,47 @@ PUBLIC bool igs_readInputAsBool(const char *name);
 PUBLIC int igs_readInputAsInt(const char *name);
 PUBLIC double igs_readInputAsDouble(const char *name);
 PUBLIC char* igs_readInputAsString(const char *name); //returned char* must be freed by caller
-PUBLIC int igs_readInputAsData(const char *name, void **data, size_t *size); //returned data must be freed by caller
+PUBLIC igs_result_t igs_readInputAsData(const char *name, void **data, size_t *size); //returned data must be freed by caller
 
 PUBLIC bool igs_readOutputAsBool(const char *name);
 PUBLIC int igs_readOutputAsInt(const char *name);
 PUBLIC double igs_readOutputAsDouble(const char *name);
 PUBLIC char* igs_readOutputAsString(const char *name); //returned char* must be freed by caller
-PUBLIC int igs_readOutputAsData(const char *name, void **data, size_t *size); //returned data must be freed by caller
+PUBLIC igs_result_t igs_readOutputAsData(const char *name, void **data, size_t *size); //returned data must be freed by caller
 
 PUBLIC bool igs_readParameterAsBool(const char *name);
 PUBLIC int igs_readParameterAsInt(const char *name);
 PUBLIC double igs_readParameterAsDouble(const char *name);
 PUBLIC char* igs_readParameterAsString(const char *name); //returned char* must be freed by caller
-PUBLIC int igs_readParameterAsData(const char *name, void **data, size_t *size); //returned data must be freed by caller
+PUBLIC igs_result_t igs_readParameterAsData(const char *name, void **data, size_t *size); //returned data must be freed by caller
 
 //write per type
-PUBLIC int igs_writeInputAsBool(const char *name, bool value);
-PUBLIC int igs_writeInputAsInt(const char *name, int value);
-PUBLIC int igs_writeInputAsDouble(const char *name, double value);
-PUBLIC int igs_writeInputAsString(const char *name, const char *value);
-PUBLIC int igs_writeInputAsImpulsion(const char *name);
-PUBLIC int igs_writeInputAsData(const char *name, void *value, size_t size);
+PUBLIC igs_result_t igs_writeInputAsBool(const char *name, bool value);
+PUBLIC igs_result_t igs_writeInputAsInt(const char *name, int value);
+PUBLIC igs_result_t igs_writeInputAsDouble(const char *name, double value);
+PUBLIC igs_result_t igs_writeInputAsString(const char *name, const char *value);
+PUBLIC igs_result_t igs_writeInputAsImpulsion(const char *name);
+PUBLIC igs_result_t igs_writeInputAsData(const char *name, void *value, size_t size);
 
-PUBLIC int igs_writeOutputAsBool(const char *name, bool value);
-PUBLIC int igs_writeOutputAsInt(const char *name, int value);
-PUBLIC int igs_writeOutputAsDouble(const char *name, double value);
-PUBLIC int igs_writeOutputAsString(const char *name, const char *value);
-PUBLIC int igs_writeOutputAsImpulsion(const char *name);
-PUBLIC int igs_writeOutputAsData(const char *name, void *value, size_t size);
+PUBLIC igs_result_t igs_writeOutputAsBool(const char *name, bool value);
+PUBLIC igs_result_t igs_writeOutputAsInt(const char *name, int value);
+PUBLIC igs_result_t igs_writeOutputAsDouble(const char *name, double value);
+PUBLIC igs_result_t igs_writeOutputAsString(const char *name, const char *value);
+PUBLIC igs_result_t igs_writeOutputAsImpulsion(const char *name);
+PUBLIC igs_result_t igs_writeOutputAsData(const char *name, void *value, size_t size);
 
-PUBLIC int igs_writeParameterAsBool(const char *name, bool value);
-PUBLIC int igs_writeParameterAsInt(const char *name, int value);
-PUBLIC int igs_writeParameterAsDouble(const char *name, double value);
-PUBLIC int igs_writeParameterAsString(const char *name, const char *value);
-PUBLIC int igs_writeParameterAsData(const char *name, void *value, size_t size);
+PUBLIC igs_result_t igs_writeParameterAsBool(const char *name, bool value);
+PUBLIC igs_result_t igs_writeParameterAsInt(const char *name, int value);
+PUBLIC igs_result_t igs_writeParameterAsDouble(const char *name, double value);
+PUBLIC igs_result_t igs_writeParameterAsString(const char *name, const char *value);
+PUBLIC igs_result_t igs_writeParameterAsData(const char *name, void *value, size_t size);
 
-//read IOP using memory space - use only when per-type read functions cannot
+//read IOP using memory space - use only when per-type read functions cannot.
 // value : pointer to actual value, initialized by function, to be freed by user
 // size : size of returned value
-PUBLIC int igs_readInput(const char *name, void **value, size_t *size);
-PUBLIC int igs_readOutput(const char *name, void **value, size_t *size);
-PUBLIC int igs_readParameter(const char *name, void **value, size_t *size);
+PUBLIC igs_result_t igs_readInput(const char *name, void **value, size_t *size);
+PUBLIC igs_result_t igs_readOutput(const char *name, void **value, size_t *size);
+PUBLIC igs_result_t igs_readParameter(const char *name, void **value, size_t *size);
 
 
 //clear IOP data in memory without having to write the IOP
@@ -167,13 +167,13 @@ PUBLIC void igs_clearDataForParameter(const char *name);
 
 //observe writing to an IOP
 typedef void (*igs_observeCallback)(iop_t iopType, const char *name, iopType_t valueType, void *value, size_t valueSize, void *myData);
-PUBLIC int igs_observeInput(const char *name, igs_observeCallback cb, void *myData);
-PUBLIC int igs_observeOutput(const char *name, igs_observeCallback cb, void * myData);
-PUBLIC int igs_observeParameter(const char *name, igs_observeCallback cb, void * myData);
+PUBLIC void igs_observeInput(const char *name, igs_observeCallback cb, void *myData);
+PUBLIC void igs_observeOutput(const char *name, igs_observeCallback cb, void * myData);
+PUBLIC void igs_observeParameter(const char *name, igs_observeCallback cb, void * myData);
 
 //mute or unmute an IOP
-PUBLIC int igs_muteOutput(const char *name);
-PUBLIC int igs_unmuteOutput(const char *name);
+PUBLIC igs_result_t igs_muteOutput(const char *name);
+PUBLIC igs_result_t igs_unmuteOutput(const char *name);
 PUBLIC bool igs_isOutputMuted(const char *name);
 
 //check IOP type, lists and existence
@@ -181,14 +181,14 @@ PUBLIC iopType_t igs_getTypeForInput(const char *name);
 PUBLIC iopType_t igs_getTypeForOutput(const char *name);
 PUBLIC iopType_t igs_getTypeForParameter(const char *name);
 
-PUBLIC int igs_getInputsNumber(void);
-PUBLIC int igs_getOutputsNumber(void);
-PUBLIC int igs_getParametersNumber(void);
+PUBLIC size_t igs_getInputsNumber(void);
+PUBLIC size_t igs_getOutputsNumber(void);
+PUBLIC size_t igs_getParametersNumber(void);
 
-PUBLIC char** igs_getInputsList(long *nbOfElements); //returned char** must be freed using igs_freeIOPList
-PUBLIC char** igs_getOutputsList(long *nbOfElements); //returned char** must be freed using igs_freeIOPList
-PUBLIC char** igs_getParametersList(long *nbOfElements); //returned char** must be freed using igs_freeIOPList
-PUBLIC void igs_freeIOPList(char ***list, long nbOfElements);
+PUBLIC char** igs_getInputsList(size_t *nbOfElements); //returned char** must be freed using igs_freeIOPList
+PUBLIC char** igs_getOutputsList(size_t *nbOfElements); //returned char** must be freed using igs_freeIOPList
+PUBLIC char** igs_getParametersList(size_t *nbOfElements); //returned char** must be freed using igs_freeIOPList
+PUBLIC void igs_freeIOPList(char ***list, size_t nbOfElements);
 
 PUBLIC bool igs_checkInputExistence(const char *name);
 PUBLIC bool igs_checkOutputExistence(const char *name);
@@ -199,47 +199,47 @@ PUBLIC bool igs_checkParameterExistence(const char *name);
 //Definitions
 
 //load / set / get definition
-PUBLIC int igs_loadDefinition (const char* json_str);
-PUBLIC int igs_loadDefinitionFromPath (const char* file_path);
-PUBLIC int igs_clearDefinition(void); //clears definition data for the agent
+PUBLIC igs_result_t igs_loadDefinition (const char* json_str);
+PUBLIC igs_result_t igs_loadDefinitionFromPath (const char* file_path);
+PUBLIC void igs_clearDefinition(void); //clears definition data for the agent
 PUBLIC char* igs_getDefinition(void); //returns json string, must be freed by caller
 PUBLIC char *igs_getDefinitionName(void); //returned char* must be freed by caller
 PUBLIC char *igs_getDefinitionDescription(void); //returned char* must be freed by caller
 PUBLIC char *igs_getDefinitionVersion(void); //returned char* must be freed by caller
-PUBLIC int igs_setDefinitionName(const char *name);
-PUBLIC int igs_setDefinitionDescription(const char *description);
-PUBLIC int igs_setDefinitionVersion(const char *version);
+PUBLIC igs_result_t igs_setDefinitionName(const char *name);
+PUBLIC igs_result_t igs_setDefinitionDescription(const char *description);
+PUBLIC igs_result_t igs_setDefinitionVersion(const char *version);
 
 //edit the definition using the API
-PUBLIC int igs_createInput(const char *name, iopType_t value_type, void *value, size_t size);
-PUBLIC int igs_createOutput(const char *name, iopType_t type, void *value, size_t size);
-PUBLIC int igs_createParameter(const char *name, iopType_t type, void *value, size_t size);
+PUBLIC igs_result_t igs_createInput(const char *name, iopType_t value_type, void *value, size_t size);
+PUBLIC igs_result_t igs_createOutput(const char *name, iopType_t type, void *value, size_t size);
+PUBLIC igs_result_t igs_createParameter(const char *name, iopType_t type, void *value, size_t size);
 
-PUBLIC int igs_removeInput(const char *name);
-PUBLIC int igs_removeOutput(const char *name);
-PUBLIC int igs_removeParameter(const char *name);
+PUBLIC igs_result_t igs_removeInput(const char *name);
+PUBLIC igs_result_t igs_removeOutput(const char *name);
+PUBLIC igs_result_t igs_removeParameter(const char *name);
 
 
 //////////////////////////////////////////////////
 //Mappings
 
 //load / set / get mapping
-PUBLIC int igs_loadMapping (const char* json_str);
-PUBLIC int igs_loadMappingFromPath (const char* file_path);
-PUBLIC int igs_clearMapping(void); //clears all mapping for the agent
+PUBLIC igs_result_t igs_loadMapping (const char* json_str);
+PUBLIC igs_result_t igs_loadMappingFromPath (const char* file_path);
+PUBLIC void igs_clearMapping(void); //clears all mapping for the agent
 PUBLIC char* igs_getMapping(void); //returns json string, must be freed by caller
 PUBLIC char *igs_getMappingName(void); //returned char* must be freed by caller
 PUBLIC char *igs_getMappingDescription(void); //returned char* must be freed by caller
 PUBLIC char *igs_getMappingVersion(void); //returned char* must be freed by caller
+PUBLIC igs_result_t igs_setMappingName(const char *name);
+PUBLIC igs_result_t igs_setMappingDescription(const char *description);
+PUBLIC igs_result_t igs_setMappingVersion(const char *version);
 
 //edit mapping using the API
-PUBLIC int igs_setMappingName(const char *name);
-PUBLIC int igs_setMappingDescription(const char *description);
-PUBLIC int igs_setMappingVersion(const char *version);
 PUBLIC int igs_getMappingEntriesNumber(void); //number of entries in the mapping output type
 PUBLIC unsigned long igs_addMappingEntry(const char *fromOurInput, const char *toAgent, const char *withOutput); //returns mapping id or zero or below if creation failed
-PUBLIC int igs_removeMappingEntryWithId(unsigned long theId);
-PUBLIC int igs_removeMappingEntryWithName(const char *fromOurInput, const char *toAgent, const char *withOutput);
+PUBLIC igs_result_t igs_removeMappingEntryWithId(unsigned long theId);
+PUBLIC igs_result_t igs_removeMappingEntryWithName(const char *fromOurInput, const char *toAgent, const char *withOutput);
 
 
 //////////////////////////////////////////////////

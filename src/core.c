@@ -72,7 +72,7 @@ void igs_observeForcedStop(igs_forcedStopCallback cb, void *myData){
     igsAgent_observeForcedStop(coreAgent, core_observeForcedStopCallback, wrap);
 }
 
-int igs_setAgentName(const char *name){
+igs_result_t igs_setAgentName(const char *name){
     core_initAgent();
     return igsAgent_setAgentName(coreAgent, name);
 }
@@ -82,7 +82,7 @@ char *igs_getAgentName(void){
     return igsAgent_getAgentName(coreAgent);
 }
 
-int igs_setAgentState(const char *state){
+igs_result_t igs_setAgentState(const char *state){
     core_initAgent();
     return igsAgent_setAgentState(coreAgent, state);
 }
@@ -92,12 +92,12 @@ char *igs_getAgentState(void){
     return igsAgent_getAgentState(coreAgent);
 }
 
-int igs_mute(void){
+igs_result_t igs_mute(void){
     core_initAgent();
     return igsAgent_mute(coreAgent);
 }
 
-int igs_unmute(void){
+igs_result_t igs_unmute(void){
     core_initAgent();
     return igsAgent_unmute(coreAgent);
 }
@@ -118,12 +118,12 @@ void core_observeMuteCallback(igs_agent_t *agent, bool isMuted, void *myData){
     wrap->cb(isMuted, wrap->myData);
 }
 
-int igs_observeMute(igs_muteCallback cb, void *myData){
+void igs_observeMute(igs_muteCallback cb, void *myData){
     core_initAgent();
     observeMuteCbWrapper_t *wrap = calloc(1, sizeof(observeMuteCbWrapper_t));
     wrap->cb = cb;
     wrap->myData = myData;
-    return igsAgent_observeMute(coreAgent, core_observeMuteCallback, wrap);
+    igsAgent_observeMute(coreAgent, core_observeMuteCallback, wrap);
 }
 
 typedef struct {
@@ -138,17 +138,17 @@ void core_observeFreezeCallback(igs_agent_t *agent, bool isPaused, void *myData)
 }
 
 //IOP
-int igs_readInput(const char *name, void **value, size_t *size){
+igs_result_t igs_readInput(const char *name, void **value, size_t *size){
     core_initAgent();
     return igsAgent_readInput(coreAgent, name, value, size);
 }
 
-int igs_readOutput(const char *name, void **value, size_t *size){
+igs_result_t igs_readOutput(const char *name, void **value, size_t *size){
     core_initAgent();
     return igsAgent_readOutput(coreAgent, name, value, size);
 }
 
-int igs_readParameter(const char *name, void **value, size_t *size){
+igs_result_t igs_readParameter(const char *name, void **value, size_t *size){
     core_initAgent();
     return igsAgent_readParameter(coreAgent, name, value, size);
 }
@@ -173,7 +173,7 @@ char* igs_readInputAsString(const char *name){
     return igsAgent_readInputAsString(coreAgent, name);
 }
 
-int igs_readInputAsData(const char *name, void **data, size_t *size){
+igs_result_t igs_readInputAsData(const char *name, void **data, size_t *size){
     core_initAgent();
     return igsAgent_readInputAsData(coreAgent, name, data, size);
 }
@@ -198,7 +198,7 @@ char* igs_readOutputAsString(const char *name){
     return igsAgent_readOutputAsString(coreAgent, name);
 }
 
-int igs_readOutputAsData(const char *name, void **data, size_t *size){
+igs_result_t igs_readOutputAsData(const char *name, void **data, size_t *size){
     core_initAgent();
     return igsAgent_readOutputAsData(coreAgent, name, data, size);
 }
@@ -223,92 +223,92 @@ char* igs_readParameterAsString(const char *name){
     return igsAgent_readParameterAsString(coreAgent, name);
 }
 
-int igs_readParameterAsData(const char *name, void **data, size_t *size){
+igs_result_t igs_readParameterAsData(const char *name, void **data, size_t *size){
     core_initAgent();
     return igsAgent_readParameterAsData(coreAgent, name, data, size);
 }
 
-int igs_writeInputAsBool(const char *name, bool value){
+igs_result_t igs_writeInputAsBool(const char *name, bool value){
     core_initAgent();
     return igsAgent_writeInputAsBool(coreAgent, name, value);
 }
 
-int igs_writeInputAsInt(const char *name, int value){
+igs_result_t igs_writeInputAsInt(const char *name, int value){
     core_initAgent();
     return igsAgent_writeInputAsInt(coreAgent, name, value);
 }
 
-int igs_writeInputAsDouble(const char *name, double value){
+igs_result_t igs_writeInputAsDouble(const char *name, double value){
     core_initAgent();
     return igsAgent_writeInputAsDouble(coreAgent, name, value);
 }
 
-int igs_writeInputAsString(const char *name, const char *value){
+igs_result_t igs_writeInputAsString(const char *name, const char *value){
     core_initAgent();
     return igsAgent_writeInputAsString(coreAgent, name, value);
 }
 
-int igs_writeInputAsImpulsion(const char *name){
+igs_result_t igs_writeInputAsImpulsion(const char *name){
     core_initAgent();
     return igsAgent_writeInputAsImpulsion(coreAgent, name);
 }
 
-int igs_writeInputAsData(const char *name, void *value, size_t size){
+igs_result_t igs_writeInputAsData(const char *name, void *value, size_t size){
     core_initAgent();
     return igsAgent_writeInputAsData(coreAgent, name, value, size);
 }
 
-int igs_writeOutputAsBool(const char *name, bool value){
+igs_result_t igs_writeOutputAsBool(const char *name, bool value){
     core_initAgent();
     return igsAgent_writeOutputAsBool(coreAgent, name, value);
 }
 
-int igs_writeOutputAsInt(const char *name, int value){
+igs_result_t igs_writeOutputAsInt(const char *name, int value){
     core_initAgent();
     return igsAgent_writeOutputAsInt(coreAgent, name, value);
 }
 
-int igs_writeOutputAsDouble(const char *name, double value){
+igs_result_t igs_writeOutputAsDouble(const char *name, double value){
     core_initAgent();
     return igsAgent_writeOutputAsDouble(coreAgent, name, value);
 }
 
-int igs_writeOutputAsString(const char *name, const char *value){
+igs_result_t igs_writeOutputAsString(const char *name, const char *value){
     core_initAgent();
     return igsAgent_writeOutputAsString(coreAgent, name, value);
 }
 
-int igs_writeOutputAsImpulsion(const char *name){
+igs_result_t igs_writeOutputAsImpulsion(const char *name){
     core_initAgent();
     return igsAgent_writeOutputAsImpulsion(coreAgent, name);
 }
 
-int igs_writeOutputAsData(const char *name, void *value, size_t size){
+igs_result_t igs_writeOutputAsData(const char *name, void *value, size_t size){
     core_initAgent();
     return igsAgent_writeOutputAsData(coreAgent, name, value, size);
 }
 
-int igs_writeParameterAsBool(const char *name, bool value){
+igs_result_t igs_writeParameterAsBool(const char *name, bool value){
     core_initAgent();
     return igsAgent_writeParameterAsBool(coreAgent, name, value);
 }
 
-int igs_writeParameterAsInt(const char *name, int value){
+igs_result_t igs_writeParameterAsInt(const char *name, int value){
     core_initAgent();
     return igsAgent_writeParameterAsInt(coreAgent, name, value);
 }
 
-int igs_writeParameterAsDouble(const char *name, double value){
+igs_result_t igs_writeParameterAsDouble(const char *name, double value){
     core_initAgent();
     return igsAgent_writeParameterAsDouble(coreAgent, name, value);
 }
 
-int igs_writeParameterAsString(const char *name, const char *value){
+igs_result_t igs_writeParameterAsString(const char *name, const char *value){
     core_initAgent();
     return igsAgent_writeParameterAsString(coreAgent, name, value);
 }
 
-int igs_writeParameterAsData(const char *name, void *value, size_t size){
+igs_result_t igs_writeParameterAsData(const char *name, void *value, size_t size){
     core_initAgent();
     return igsAgent_writeParameterAsData(coreAgent, name, value, size);
 }
@@ -339,36 +339,36 @@ void core_observeIOPCallback(igs_agent_t *agent, iop_t iopType, const char *name
     wrap->cb(iopType, name, valueType, value, valueSize, wrap->myData);
 }
 
-int igs_observeInput(const char *name, igs_observeCallback cb, void *myData){
+void igs_observeInput(const char *name, igs_observeCallback cb, void *myData){
     core_initAgent();
     observeIOPCbWrapper_t *wrap = calloc(1, sizeof(observeIOPCbWrapper_t));
     wrap->cb = cb;
     wrap->myData = myData;
-    return igsAgent_observeInput(coreAgent, name, core_observeIOPCallback, wrap);
+    igsAgent_observeInput(coreAgent, name, core_observeIOPCallback, wrap);
 }
 
-int igs_observeOutput(const char *name, igs_observeCallback cb, void * myData){
+void igs_observeOutput(const char *name, igs_observeCallback cb, void * myData){
     core_initAgent();
     observeIOPCbWrapper_t *wrap = calloc(1, sizeof(observeIOPCbWrapper_t));
     wrap->cb = cb;
     wrap->myData = myData;
-    return igsAgent_observeOutput(coreAgent, name, core_observeIOPCallback, wrap);
+    igsAgent_observeOutput(coreAgent, name, core_observeIOPCallback, wrap);
 }
 
-int igs_observeParameter(const char *name, igs_observeCallback cb, void * myData){
+void igs_observeParameter(const char *name, igs_observeCallback cb, void * myData){
     core_initAgent();
     observeIOPCbWrapper_t *wrap = calloc(1, sizeof(observeIOPCbWrapper_t));
     wrap->cb = cb;
     wrap->myData = myData;
-    return igsAgent_observeParameter(coreAgent, name, core_observeIOPCallback, wrap);
+    igsAgent_observeParameter(coreAgent, name, core_observeIOPCallback, wrap);
 }
 
-int igs_muteOutput(const char *name){
+igs_result_t igs_muteOutput(const char *name){
     core_initAgent();
     return igsAgent_muteOutput(coreAgent, name);
 }
 
-int igs_unmuteOutput(const char *name){
+igs_result_t igs_unmuteOutput(const char *name){
     core_initAgent();
     return igsAgent_unmuteOutput(coreAgent, name);
 }
@@ -393,32 +393,32 @@ iopType_t igs_getTypeForParameter(const char *name){
     return igsAgent_getTypeForParameter(coreAgent, name);
 }
 
-int igs_getInputsNumber(void){
+size_t igs_getInputsNumber(void){
     core_initAgent();
     return igsAgent_getInputsNumber(coreAgent);
 }
 
-int igs_getOutputsNumber(void){
+size_t igs_getOutputsNumber(void){
     core_initAgent();
     return igsAgent_getOutputsNumber(coreAgent);
 }
 
-int igs_getParametersNumber(void){
+size_t igs_getParametersNumber(void){
     core_initAgent();
     return igsAgent_getParametersNumber(coreAgent);
 }
 
-char** igs_getInputsList(long *nbOfElements){
+char** igs_getInputsList(size_t *nbOfElements){
     core_initAgent();
     return igsAgent_getInputsList(coreAgent, nbOfElements);
 }
 
-char** igs_getOutputsList(long *nbOfElements){
+char** igs_getOutputsList(size_t *nbOfElements){
     core_initAgent();
     return igsAgent_getOutputsList(coreAgent, nbOfElements);
 }
 
-char** igs_getParametersList(long *nbOfElements){
+char** igs_getParametersList(size_t *nbOfElements){
     core_initAgent();
     return igsAgent_getParametersList(coreAgent, nbOfElements);
 }
@@ -440,19 +440,19 @@ bool igs_checkParameterExistence(const char *name){
 
 
 //definition
-int igs_loadDefinition (const char* json_str){
+igs_result_t igs_loadDefinition (const char* json_str){
     core_initAgent();
     return igsAgent_loadDefinition(coreAgent, json_str);
 }
 
-int igs_loadDefinitionFromPath (const char* file_path){
+igs_result_t igs_loadDefinitionFromPath (const char* file_path){
     core_initAgent();
     return igsAgent_loadDefinitionFromPath(coreAgent, file_path);
 }
 
-int igs_clearDefinition(void){
+void igs_clearDefinition(void){
     core_initAgent();
-    return igsAgent_clearDefinition(coreAgent);
+    igsAgent_clearDefinition(coreAgent);
 }
 
 char* igs_getDefinition(void){
@@ -475,66 +475,66 @@ char *igs_getDefinitionVersion(void){
     return igsAgent_getDefinitionVersion(coreAgent);
 }
  //returned char* must be freed by caller
-int igs_setDefinitionName(const char *name){
+igs_result_t igs_setDefinitionName(const char *name){
     core_initAgent();
     return igsAgent_setDefinitionName(coreAgent, name);
 }
 
-int igs_setDefinitionDescription(const char *description){
+igs_result_t igs_setDefinitionDescription(const char *description){
     core_initAgent();
     return igsAgent_setDefinitionDescription(coreAgent, description);
 }
 
-int igs_setDefinitionVersion(const char *version){
+igs_result_t igs_setDefinitionVersion(const char *version){
     core_initAgent();
     return igsAgent_setDefinitionVersion(coreAgent, version);
 }
 
-int igs_createInput(const char *name, iopType_t type, void *value, size_t size){
+igs_result_t igs_createInput(const char *name, iopType_t type, void *value, size_t size){
     core_initAgent();
     return igsAgent_createInput(coreAgent, name, type, value, size);
 }
 
-int igs_createOutput(const char *name, iopType_t type, void *value, size_t size){
+igs_result_t igs_createOutput(const char *name, iopType_t type, void *value, size_t size){
     core_initAgent();
     return igsAgent_createOutput(coreAgent, name, type, value, size);
 }
 
-int igs_createParameter(const char *name, iopType_t type, void *value, size_t size){
+igs_result_t igs_createParameter(const char *name, iopType_t type, void *value, size_t size){
     core_initAgent();
     return igsAgent_createParameter(coreAgent, name, type, value, size);
 }
 
-int igs_removeInput(const char *name){
+igs_result_t igs_removeInput(const char *name){
     core_initAgent();
     return igsAgent_removeInput(coreAgent, name);
 }
 
-int igs_removeOutput(const char *name){
+igs_result_t igs_removeOutput(const char *name){
     core_initAgent();
     return igsAgent_removeOutput(coreAgent, name);
 }
 
-int igs_removeParameter(const char *name){
+igs_result_t igs_removeParameter(const char *name){
     core_initAgent();
     return igsAgent_removeParameter(coreAgent, name);
 }
 
 
 //mapping
-int igs_loadMapping (const char* json_str){
+igs_result_t igs_loadMapping (const char* json_str){
     core_initAgent();
     return igsAgent_loadMapping(coreAgent, json_str);
 }
 
-int igs_loadMappingFromPath (const char* file_path){
+igs_result_t igs_loadMappingFromPath (const char* file_path){
     core_initAgent();
     return igsAgent_loadMappingFromPath(coreAgent, file_path);
 }
 
-int igs_clearMapping(void){
+void igs_clearMapping(void){
     core_initAgent();
-    return igsAgent_clearMapping(coreAgent);
+    igsAgent_clearMapping(coreAgent);
 }
 
 char* igs_getMapping(void){
@@ -544,7 +544,7 @@ char* igs_getMapping(void){
 
 char *igs_getMappingName(void){
     core_initAgent();
-    return igsAgent_getMapping(coreAgent);
+    return igsAgent_getMappingName(coreAgent);
 }
 
 char *igs_getMappingDescription(void){
@@ -557,17 +557,17 @@ char *igs_getMappingVersion(void){
     return igsAgent_getMappingVersion(coreAgent);
 }
 
-int igs_setMappingName(const char *name){
+igs_result_t igs_setMappingName(const char *name){
     core_initAgent();
     return igsAgent_setMappingName(coreAgent, name);
 }
 
-int igs_setMappingDescription(const char *description){
+igs_result_t igs_setMappingDescription(const char *description){
     core_initAgent();
     return igsAgent_setMappingDescription(coreAgent, description);
 }
 
-int igs_setMappingVersion(const char *version){
+igs_result_t igs_setMappingVersion(const char *version){
     core_initAgent();
     return igsAgent_setMappingVersion(coreAgent, version);
 }
@@ -582,12 +582,12 @@ unsigned long igs_addMappingEntry(const char *fromOurInput, const char *toAgent,
     return igsAgent_addMappingEntry(coreAgent, fromOurInput, toAgent, withOutput);
 }
  //returns mapping id or zero or below if creation failed
-int igs_removeMappingEntryWithId(unsigned long theId){
+igs_result_t igs_removeMappingEntryWithId(unsigned long theId){
     core_initAgent();
     return igsAgent_removeMappingEntryWithId(coreAgent, theId);
 }
 
-int igs_removeMappingEntryWithName(const char *fromOurInput, const char *toAgent, const char *withOutput){
+igs_result_t igs_removeMappingEntryWithName(const char *fromOurInput, const char *toAgent, const char *withOutput){
     core_initAgent();
     return igsAgent_removeMappingEntryWithName(coreAgent, fromOurInput, toAgent, withOutput);
 }
@@ -637,12 +637,12 @@ void igs_log(igs_logLevel_t level, const char *function, const char *format, ...
 }
 
 //ADVANCED
-int igs_writeOutputAsZMQMsg(const char *name, zmsg_t *msg){
+igs_result_t igs_writeOutputAsZMQMsg(const char *name, zmsg_t *msg){
     core_initAgent();
     return igsAgent_writeOutputAsZMQMsg(coreAgent, name, msg);
 }
 
-int igs_readInputAsZMQMsg(const char *name, zmsg_t **msg){
+igs_result_t igs_readInputAsZMQMsg(const char *name, zmsg_t **msg){
     core_initAgent();
     return igsAgent_readInputAsZMQMsg(coreAgent, name, msg);
 }

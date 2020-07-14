@@ -455,17 +455,6 @@ static igs_definition_t* json_parse_definition (igsyajl_val node) {
     path[1] = STR_CALLS;
     json_add_calls (node, path, &def->calls_table);
 
-//    path[1] = STR_CATEGORIES;
-//    v = igsyajl_tree_get(node, path, igsyajl_t_array);
-//    if (v && IGSYAJL_IS_ARRAY(v)){
-//        unsigned int  i;
-//        for (i = 0; i < v->u.array.len; i++ ){
-//            igsyajl_val obj = v->u.array.values[i];
-//            if( obj && IGSYAJL_IS_OBJECT(obj))
-//                json_add_category_to_hash (&def->categories, obj);
-//        }
-//    }
-
     return def;
 }
 
@@ -967,34 +956,25 @@ static void json_dump_mapping (igsyajl_gen *g, igs_mapping_t* mapp) {
 // PRIVATE API
 ////////////////////////////////////////////////////////////////////////
 igs_definition_t* parser_loadDefinition (const char* json_str) {
-    
     igs_definition_t *def = NULL;
     igsyajl_val node;
-    
-    json_callize(json_str, &node);
-    def = json_parse_definition(node);
-    
-    igsyajl_tree_free(node);
-    node = NULL;
-    
+    if (json_callize(json_str, &node) != 0){
+        def = json_parse_definition(node);
+        igsyajl_tree_free(node);
+    }
     return def;
 }
 
 
 igs_definition_t * parser_loadDefinitionFromPath (const char* path) {
-    
     char *json_str = NULL;
     igs_definition_t *def = NULL;
-    
     json_str = json_fetch(path);
     if (!json_str)
-        return 0;
+        return NULL;
     
     def = parser_loadDefinition(json_str);
-    
     free (json_str);
-    json_str = NULL;
-    
     return def;
 }
 
@@ -1030,6 +1010,30 @@ char* parser_export_definition(igs_definition_t* def){
 }
 
 
+igs_mapping_t* parser_loadMapping(const char* json_str){
+    igs_mapping_t *map = NULL;
+    igsyajl_val node;
+    if (json_callize(json_str, &node) != 0){
+        map = json_parse_mapping(node);
+        igsyajl_tree_free(node);
+    }
+    return map;
+}
+
+
+igs_mapping_t* parser_loadMappingFromPath (const char* path){
+    char *json_str = NULL;
+    igs_mapping_t *map = NULL;
+    json_str = json_fetch(path);
+    if (!json_str)
+        return NULL;
+    
+    map = parser_loadMapping(json_str);
+    free (json_str);
+    return map;
+}
+
+
 char* parser_export_mapping(igs_mapping_t *mapp){
     char* result = NULL;
     if (mapp != NULL){
@@ -1058,61 +1062,22 @@ char* parser_export_mapping(igs_mapping_t *mapp){
 }
 
 
-igs_mapping_t* parser_LoadMap(const char* json_str){
-    
-    igs_mapping_t *mapp = NULL;
-    igsyajl_val node;
-    
-    json_callize(json_str, &node);
-    mapp = json_parse_mapping (node);
-    
-    //Copy the mapp structure to the global variable map
-    //copy_to_map_global(mapp);
-    
-    igsyajl_tree_free(node);
-    node = NULL;
-    
-    return mapp;
-}
-
-
-igs_mapping_t* parser_LoadMapFromPath (const char* path){
-    
-    char *json_str = NULL;
-    igs_mapping_t *mapp = NULL;
-    
-    json_str = json_fetch(path);
-    if (!json_str)
-        return NULL;
-    
-    mapp = parser_LoadMap(json_str);
-    
-    free (json_str);
-    json_str = NULL;
-    
-    return mapp;
-}
-
-
 ////////////////////////////////////////////////////////////////////////
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
-int igsAgent_loadDefinition (igs_agent_t *agent, const char* json_str){
-    
+igs_result_t igsAgent_loadDefinition (igs_agent_t *agent, const char* json_str){
+    assert(agent);
     //Check if the json string is null
-    if(json_str == NULL)
-    {
-        igsAgent_debug(agent, "igs_loadDefinition : json string is null \n");
-        return 0;
+    if(json_str == NULL){
+        igsAgent_debug(agent, "json string is null");
+        return IGS_FAILURE;
     }
 
     //Try to load definition
     igs_definition_t *tmp = parser_loadDefinition(json_str);
-
-    if(tmp == NULL)
-    {
-        igsAgent_debug(agent, "igs_loadDefinition : json string caused an error and was ignored\n%s\n", json_str );
-        return -1;
+    if(tmp == NULL){
+        igsAgent_debug(agent, "json string caused an error and was ignored");
+        return IGS_FAILURE;
     }else{
         if (agent->definition != NULL){
             definition_freeDefinition(&agent->definition);
@@ -1129,31 +1094,28 @@ int igsAgent_loadDefinition (igs_agent_t *agent, const char* json_str){
         agent->network_needToSendDefinitionUpdate = true;
     }
 
-    return 1;
+    return IGS_SUCCESS;
 }
 
 
-int igsAgent_loadDefinitionFromPath (igs_agent_t *agent, const char* file_path){
-    
+igs_result_t igsAgent_loadDefinitionFromPath (igs_agent_t *agent, const char* file_path){
+    assert(agent);
     //Check if the json string is null
     if(file_path == NULL){
-        igsAgent_error(agent, "Json file path is NULL");
-        return 0;
+        igsAgent_error(agent, "json path is NULL");
+        return IGS_FAILURE;
     }
     
     if (strlen(file_path) == 0){
-        igsAgent_debug(agent, "Json file path is empty");
-        return 1;
+        igsAgent_debug(agent, "json path is empty");
+        return IGS_FAILURE;
     }
 
     //Try to load definition
     igs_definition_t *tmp = parser_loadDefinitionFromPath(file_path);
-    
-
-    if(tmp == NULL)
-    {
-        igsAgent_debug(agent, "igs_loadDefinitionFromPath : %s caused an error and was ignored\n", file_path);
-        return -1;
+    if(tmp == NULL){
+        igsAgent_debug(agent, "json file content at '%s' caused an error and was ignored", file_path);
+        return IGS_FAILURE;
     }else{
         strncpy(definition_path, file_path, IGS_MAX_PATH_LENGTH - 1);
         if (agent->definition != NULL){
@@ -1171,6 +1133,6 @@ int igsAgent_loadDefinitionFromPath (igs_agent_t *agent, const char* file_path){
         agent->network_needToSendDefinitionUpdate = true;
     }
 
-    return 1;
+    return IGS_SUCCESS;
 }
 

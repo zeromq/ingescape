@@ -75,8 +75,8 @@ PUBLIC void igs_monitor(igs_monitorCallback cb, void *myData);
 //////////////////////////////////////////////////
 // Data serialization using ZeroMQ
 //TODO: give code examples here or link to documentation for zmsg and zframe
-PUBLIC int igs_writeOutputAsZMQMsg(const char *name, zmsg_t *msg);
-PUBLIC int igs_readInputAsZMQMsg(const char *name, zmsg_t **msg); //msg must be freed by caller using zmsg_destroy
+PUBLIC igs_result_t igs_writeOutputAsZMQMsg(const char *name, zmsg_t *msg);
+PUBLIC igs_result_t igs_readInputAsZMQMsg(const char *name, zmsg_t **msg); //msg must be freed by caller using zmsg_destroy
 
 
 //////////////////////////////////////////////////

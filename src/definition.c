@@ -106,7 +106,7 @@ igs_iop_t* definition_createIop(igs_agent_t *agent, const char *name, iop_t type
         }
     }
     if (spaceInName){
-        igsAgent_error(agent, "Spaces are not allowed in IOP name: %s has been renamed to %s", name, n);
+        igsAgent_warn(agent, "spaces are not allowed in IOP name: %s has been renamed to %s", name, n);
     }
     iop->name = n;
     iop->type = type;
@@ -192,22 +192,7 @@ void definition_freeDefinition (igs_definition_t **def) {
 ////////////////////////////////////////////////////////////////////////
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
-
-/**
- *  \defgroup loadSetGetDefFct Agent's definition: Load / Clear / Set / Get functions
- *
- */
-
-/**
- * \fn int igs_clearDefinition()
- * \ingroup loadSetGetDefFct
- * \brief Clear the internal definition of the agent.
- *        Free all members of the structure igs_definition_loaded & agent->definition.
- *        But the pointer of these structure is not free and stay allocated.
- * \return 1 if ok else 0
- */
-int igsAgent_clearDefinition(igs_agent_t *agent){
-
+void igsAgent_clearDefinition(igs_agent_t *agent){
     //Free the structure definition loaded
     igsAgent_debug(agent, "Clear our definition and initiate an empty one");
     if(agent->definition != NULL){
@@ -216,7 +201,6 @@ int igsAgent_clearDefinition(igs_agent_t *agent){
     agent->definition = calloc(1, sizeof(igs_definition_t));
     agent->definition->name = igsAgent_getAgentName(agent);
     agent->network_needToSendDefinitionUpdate = true;
-    return 1;
 }
 
 char* igsAgent_getDefinition(igs_agent_t *agent){
@@ -251,14 +235,14 @@ char *igsAgent_getDefinitionVersion(igs_agent_t *agent){
     }
 }
 
-int igsAgent_setDefinitionName(igs_agent_t *agent, const char *name){
+igs_result_t igsAgent_setDefinitionName(igs_agent_t *agent, const char *name){
     if (name == NULL){
         igsAgent_error(agent, "Definition name cannot be NULL");
-        return 0;
+        return IGS_FAILURE;
     }
     if (strlen(name) == 0){
         igsAgent_error(agent, "Definition name cannot be empty");
-        return -1;
+        return IGS_FAILURE;
     }
     
     if(agent->definition == NULL){
@@ -269,17 +253,17 @@ int igsAgent_setDefinitionName(igs_agent_t *agent, const char *name){
     }
     agent->definition->name = strndup(name, IGS_MAX_DEFINITION_NAME_LENGTH);
     agent->network_needToSendDefinitionUpdate = true;
-    return 1;
+    return IGS_SUCCESS;
 }
 
-int igsAgent_setDefinitionDescription(igs_agent_t *agent, const char *description){
+igs_result_t igsAgent_setDefinitionDescription(igs_agent_t *agent, const char *description){
     if(description == NULL){
         igsAgent_error(agent, "Definition description cannot be NULL");
-        return 0;
+        return IGS_FAILURE;
     }
     if (strlen(description) == 0){
         igsAgent_error(agent, "Definition description cannot be empty\n");
-        return -1;
+        return IGS_FAILURE;
     }
     if(agent->definition == NULL){
         agent->definition = calloc(1, sizeof(igs_definition_t));
@@ -289,17 +273,17 @@ int igsAgent_setDefinitionDescription(igs_agent_t *agent, const char *descriptio
     }
     agent->definition->description = strndup(description, IGS_MAX_DESCRIPTION_LENGTH);
     agent->network_needToSendDefinitionUpdate = true;
-    return 1;
+    return IGS_SUCCESS;
 }
 
-int igsAgent_setDefinitionVersion(igs_agent_t *agent, const char *version){
+igs_result_t igsAgent_setDefinitionVersion(igs_agent_t *agent, const char *version){
     if(version == NULL){
         igsAgent_error(agent, "Definition version cannot be NULL");
-        return 0;
+        return IGS_FAILURE;
     }
     if (strlen(version) == 0){
         igsAgent_error(agent, "Definition version cannot be empty");
-        return -1;
+        return IGS_FAILURE;
     }
     if(agent->definition == NULL){
         agent->definition = calloc(1, sizeof(igs_definition_t));
@@ -309,182 +293,121 @@ int igsAgent_setDefinitionVersion(igs_agent_t *agent, const char *version){
     }
     agent->definition->version = strndup(version, 64);
     agent->network_needToSendDefinitionUpdate = true;
-    return 1;
+    return IGS_SUCCESS;
 }
 
-/**
- *  \defgroup EditDefFct  Agent's definition: Edit functions
- *
- */
-
-/**
- * \fn igs_createInput(const char *name, iopType_t type, void *value)
- * \ingroup EditDefFct
- * \brief Create and add an input for the agent
- *
- * \param name The name of the Iop
- * \param value_type The Iop type : input, output or parameter
- * \param value The pointer on the value (the value will be copied)
- * \return The error. 1 is OK, 0 not able to add in definition loaded, -1 not able to add in definition live
- */
-
-int igsAgent_createInput(igs_agent_t *agent, const char *name, iopType_t value_type, void *value, size_t size){
+igs_result_t igsAgent_createInput(igs_agent_t *agent, const char *name, iopType_t value_type, void *value, size_t size){
     if (name == NULL || strlen (name) == 0){
         igsAgent_error(agent, "Input name cannot be NULL or empty");
-        return -1;
+        return IGS_FAILURE;
     }
     if(agent->definition == NULL){
         agent->definition = calloc(1, sizeof(igs_definition_t));
     }
     igs_iop_t *iop = definition_createIop(agent, name, IGS_INPUT_T, value_type, value, size);
     if (iop == NULL){
-        return -1;
+        return IGS_FAILURE;
     }
     agent->network_needToSendDefinitionUpdate = true;
-    return 1;
+    return IGS_SUCCESS;
 }
 
-/**
- * \fn igs_createOutput(const char *name, iopType_t type, void *value)
- * \ingroup EditDefFct
- * \brief Create and add a output for the agent
- *
- * \param name The name of the Iop
- * \param value_type The Iop type : input, output or parameter
- * \param value The pointer on the value (the value will be copied)
- * \return The error. 1 is OK, 0 not able to add in definition loaded, -1 not able to add in definition live
- */
-
-int igsAgent_createOutput(igs_agent_t *agent, const char *name, iopType_t value_type, void *value, size_t size){
+igs_result_t igsAgent_createOutput(igs_agent_t *agent, const char *name, iopType_t value_type, void *value, size_t size){
     if (name == NULL || strlen (name) == 0){
         igsAgent_error(agent, "Output name cannot be NULL or empty");
-        return -1;
+        return IGS_FAILURE;
     }
     if(agent->definition == NULL){
         agent->definition = calloc(1, sizeof(igs_definition_t));
     }
     igs_iop_t* iop = definition_createIop(agent, name, IGS_OUTPUT_T, value_type, value, size);
     if (iop == NULL){
-        return -1;
+        return IGS_FAILURE;
     }
     agent->network_needToSendDefinitionUpdate = true;
-    return 1;
+    return IGS_SUCCESS;
 }
 
-/**
- * \fn igs_createParameter(const char *name, iopType_t type, void *value)
- * \ingroup EditDefFct
- * \brief Create and add a parameter for the agent
- *
- * \param name The name of the Iop
- * \param value_type The Iop type : input, output or parameter
- * \param value The pointer on the value (the value will be copied)
- * \return The error. 1 is OK, 0 not able to add in definition loaded, -1 not able to add in definition live
- */
-int igsAgent_createParameter(igs_agent_t *agent, const char *name, iopType_t value_type, void *value, size_t size){
+igs_result_t igsAgent_createParameter(igs_agent_t *agent, const char *name, iopType_t value_type, void *value, size_t size){
     if (name == NULL || strlen (name) == 0){
         igsAgent_error(agent, "Parameter name cannot be NULL or empty");
-        return -1;
+        return IGS_FAILURE;
     }
     if(agent->definition == NULL){
         agent->definition = calloc(1, sizeof(igs_definition_t));
     }
     igs_iop_t* iop = definition_createIop(agent, name, IGS_PARAMETER_T, value_type, value, size);
     if (iop == NULL){
-        return -1;
+        return IGS_FAILURE;
     }
     agent->network_needToSendDefinitionUpdate = true;
-    return 1;
+    return IGS_SUCCESS;
 }
 
-/**
- * \fn igs_removeInput(const char *name)
- * \ingroup EditDefFct
- * \brief Remove and free an input for the agent
- *
- * \param name The name of the Iop
- * \return The error. 1 is OK, 0 Definition loaded is NULL, -1 Definition live is NULL, -2 An error occurs while finding the iop by name
- */
-int igsAgent_removeInput(igs_agent_t *agent, const char *name){
+igs_result_t igsAgent_removeInput(igs_agent_t *agent, const char *name){
     if (name == NULL){
         igsAgent_error(agent, "Input name cannot be NULL or empty");
-        return -1;
+        return IGS_FAILURE;
     }
     if(agent->definition == NULL){
         igsAgent_error(agent, "No definition available yet");
-        return -1;
+        return IGS_FAILURE;
     }
     igs_iop_t * iop = model_findIopByName(agent, name,IGS_INPUT_T);
     if(iop == NULL){
-        igsAgent_warn(agent, "The input %s could not be found", name);
-        return -2;
+        igsAgent_error(agent, "The input %s could not be found", name);
+        return IGS_FAILURE;
     }
     model_readWriteLock();
     HASH_DEL(agent->definition->inputs_table, iop);
     definition_freeIOP(iop);
     model_readWriteUnlock();
     agent->network_needToSendDefinitionUpdate = true;
-    return 1;
+    return IGS_SUCCESS;
 }
 
-/**
- * \fn igs_removeOutput(const char *name)
- * \ingroup EditDefFct
- * \brief Remove and free a output for the agent
- *
- * \param name The name of the Iop
- * \return The error. 1 is OK, 0 Definition loaded is NULL, -1 Definition live is NULL, -2 An error occurs while finding the iop by name
- */
-int igsAgent_removeOutput(igs_agent_t *agent, const char *name){
+igs_result_t igsAgent_removeOutput(igs_agent_t *agent, const char *name){
     if (name == NULL){
         igsAgent_error(agent, "Output name cannot be NULL or empty");
-        return -1;
+        return IGS_FAILURE;
     }
     if(agent->definition == NULL){
         igsAgent_error(agent, "No definition available yet");
-        return -1;
+        return IGS_FAILURE;
     }
     igs_iop_t * iop = model_findIopByName(agent, name,IGS_OUTPUT_T);
     if(iop == NULL){
-        igsAgent_warn(agent, "The output %s could not be found", name);
-        return -2;
+        igsAgent_error(agent, "The output %s could not be found", name);
+        return IGS_FAILURE;
     }
     model_readWriteLock();
     HASH_DEL(agent->definition->outputs_table, iop);
     definition_freeIOP(iop);
     model_readWriteUnlock();
     agent->network_needToSendDefinitionUpdate = true;
-    return 1;
+    return IGS_SUCCESS;
 }
 
-/**
- * \fn igs_removeParameter(const char *name)
- * \ingroup EditDefFct
- * \brief Remove and free a output for the agent
- *
- * \param name The name of the Iop
- * \return The error. 1 is OK, 0 Definition loaded is NULL, -1 Definition live is NULL, -2 An error occurs while finding the iop by name
- */
-int igsAgent_removeParameter(igs_agent_t *agent, const char *name){
+igs_result_t igsAgent_removeParameter(igs_agent_t *agent, const char *name){
     if (name == NULL){
         igsAgent_error(agent, "Parameter name cannot be NULL or empty");
-        return -1;
+        return IGS_FAILURE;
     }
     if(agent->definition == NULL){
         igsAgent_error(agent, "No definition available yet");
-        return -1;
+        return IGS_FAILURE;
     }
     igs_iop_t * iop = model_findIopByName(agent, name,IGS_PARAMETER_T);
     if(iop == NULL){
-        igsAgent_warn(agent, "The parameter %s could not be found", name);
-        return -2;
+        igsAgent_error(agent, "The parameter %s could not be found", name);
+        return IGS_FAILURE;
     }
     model_readWriteLock();
     HASH_DEL(agent->definition->params_table, iop);
     definition_freeIOP(iop);
     model_readWriteUnlock();
     agent->network_needToSendDefinitionUpdate = true;
-    return 1;
+    return IGS_SUCCESS;
 }
 
 void igsAgent_setDefinitionPath(igs_agent_t *agent, const char *path){

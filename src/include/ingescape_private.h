@@ -402,8 +402,8 @@ PUBLIC igs_definition_t* parser_loadDefinition (const char* json_str);
 PUBLIC igs_definition_t* parser_loadDefinitionFromPath (const char* file_path);
 char* parser_export_definition (igs_definition_t* def);
 PUBLIC char* parser_export_mapping(igs_mapping_t* mapp);
-igs_mapping_t* parser_LoadMap (const char* json_str);
-igs_mapping_t* parser_LoadMapFromPath (const char* load_file);
+igs_mapping_t* parser_loadMapping (const char* json_str);
+igs_mapping_t* parser_loadMappingFromPath (const char* load_file);
 
 // admin
 void admin_makeFilePath(const char *from, char *to, size_t size_of_to);
