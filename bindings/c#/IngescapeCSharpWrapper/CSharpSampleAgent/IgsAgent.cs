@@ -251,7 +251,7 @@ namespace CSharpSampleAgent
                 Igs.observeParameter("impulsionParameter", OnParameterCallback, this);
                 Igs.observeParameter("dataParameter", OnParameterCallback, this);
 
-                Igs.igs_observeBus(OnObserveBus, this);
+                Igs.observeBus(OnObserveBus, this);
 
 
                 #region initCall 
