@@ -582,7 +582,7 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *args){
                         a->publisherPort = strndup(v,6); //port is 5 digits max
                     }
                 }else if(strncmp(k,"logger", strlen("logger")) == 0){
-                    //this is a ingescape agent, we store its publishing port
+                    //this is an ingescape agent, we store its publishing port
                     if (a != NULL){
                         if (a->logPort != NULL) {
                             free(a->logPort);
@@ -599,17 +599,21 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *args){
         } else if (streq (event, "LEAVE")){
             printf ("-%s has left %s\n", name, group);
         } else if (streq (event, "SHOUT")){
-            char *message;
+            char *message = NULL;
+            printf ("#%s[%s]: ", group, name);
             while ((message = zmsg_popstr(msg))) {
-                printf ("#%s[%s]: %s\n", group, name, message);
+                printf ("%s | ", message);
                 free (message);
             }
+            printf("\n");
         } else if (streq (event, "WHISPER")){
-            char *message;
+            char *message = NULL;
+            printf ("#whisper[%s]: ", name);
             while ((message = zmsg_popstr(msg))) {
-                printf ("#whisper[%s] : %s\n", name, message);
+                printf ("%s | ", message);
                 free (message);
             }
+            printf("\n");
         } else if (streq (event, "EXIT")){
             if (!zEl->useGossip){
                 printf ("B<-%s exited\n", name);

@@ -125,12 +125,13 @@ bool checkMessageAgainstPrefix(char *message, const char *prefix){
         return false;
     if (prefix == NULL)
         return false;
-    return (strlen(message) > strlen(prefix) && strncmp (message, prefix, strlen(prefix)) == 0);
+    return (strlen(message) >= strlen(prefix) && strncmp (message, prefix, strlen(prefix)) == 0);
 }
 
 void cleanAndFreeZyrePeer(igs_zyre_peer_t **zyrePeer){
     assert(zyrePeer);
     assert(*zyrePeer);
+    igs_debug("cleaning zyre peer %s (%s)", (*zyrePeer)->name, (*zyrePeer)->peerId);
     if ((*zyrePeer)->peerId != NULL)
         free((*zyrePeer)->peerId);
     if ((*zyrePeer)->name != NULL)
@@ -258,6 +259,7 @@ void sendDefinitionToZyrePeer(igs_agent_t *agent, const char *peer, const char *
     zmsg_t *msg = zmsg_new();
     zmsg_addstrf(msg, "%s%s", definitionPrefix, def);
     zmsg_addstr(msg, agent->uuid);
+    zmsg_addstr(msg, agent->name);
     zyre_whisper(coreContext->node, peer, &msg);
     bus_zyreUnlock();
 }
@@ -280,7 +282,7 @@ void cleanAndFreeRemoteAgent(igs_remote_agent_t **remoteAgent){
     assert(remoteAgent);
     assert(*remoteAgent);
     assert((*remoteAgent)->context);
-    igs_debug("cleaning remote agent %s\n", (*remoteAgent)->name);
+    igs_debug("cleaning remote agent %s (%s)", (*remoteAgent)->name, (*remoteAgent)->uuid);
     #if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
     (*remoteAgent)->context->licenseEnforcement->currentAgentsNb--;
     #endif
@@ -305,21 +307,17 @@ void cleanAndFreeRemoteAgent(igs_remote_agent_t **remoteAgent){
         DL_DELETE((*remoteAgent)->mappingsFilters,elt);
         free(elt);
     }
-    if ((*remoteAgent)->context->loop != NULL){
+    if ((*remoteAgent)->context->loop != NULL && (*remoteAgent)->peer->subscriber != NULL){
         zloop_reader_end((*remoteAgent)->context->loop, (*remoteAgent)->peer->subscriber);
     }
-    zsock_destroy(&(*remoteAgent)->peer->subscriber);
     if ((*remoteAgent)->uuid)
         free((*remoteAgent)->uuid);
     if ((*remoteAgent)->name)
         free((*remoteAgent)->name);
-    if ((*remoteAgent)->peer->peerId)
-        free((*remoteAgent)->peer->peerId);
-    if ((*remoteAgent)->context->loop != NULL && (*remoteAgent)->timerId >= 0){
+    if ((*remoteAgent)->context->loop != NULL && (*remoteAgent)->timerId > 0){
         zloop_timer_end((*remoteAgent)->context->loop, (*remoteAgent)->timerId);
         (*remoteAgent)->timerId = -2;
     }
-    HASH_DEL((*remoteAgent)->context->remoteAgents, *remoteAgent);
     free(*remoteAgent);
     *remoteAgent = NULL;
 }
@@ -563,7 +561,6 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                             igs_debug("Subscription created for %s at %s (tcp)",zyrePeer->name, endpointAddress);
                         }
                         assert(zyrePeer->subscriber);
-                        HASH_ADD_STR(context->zyrePeers, peerId, zyrePeer);
                         zloop_reader(loop, zyrePeer->subscriber, manageRemoteAgent, context);
 #if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
                         context->licenseEnforcement->currentAgentsNb++;
@@ -615,7 +612,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 }else{
                     sendMappingToZyrePeer(agent, peer, "");
                 }
-                if (agent->definition != NULL){
+                if (agent->definition != NULL && agent->definition->outputs_table != NULL){
                     igs_iop_t *current_iop, *tmp_iop;
                     HASH_ITER(hh, agent->definition->outputs_table, current_iop, tmp_iop) {
                         if (current_iop->is_muted && current_iop->name != NULL){
@@ -637,7 +634,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                     zyre_whisper(context->node, peer, &msg);
                     bus_zyreUnlock();
                 }
-                if (strlen(agent->state) > 0){
+                if (agent->state != NULL){
                     bus_zyreLock();
                     zmsg_t *msg = zmsg_new();
                     zmsg_addstrf(msg, "STATE=%s", agent->state);
@@ -645,7 +642,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                     zyre_whisper(context->node, peer, &msg);
                     bus_zyreUnlock();
                 }
-                if (strlen(agent->definitionPath) > 0){
+                if (agent->definitionPath != NULL){
                     bus_zyreLock();
                     zmsg_t *msg = zmsg_new();
                     zmsg_addstrf(msg, "DEFINITION_FILE_PATH=%s", agent->definitionPath);
@@ -653,7 +650,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                     zyre_whisper(context->node, peer, &msg);
                     bus_zyreUnlock();
                 }
-                if (strlen(agent->mappingPath) > 0){
+                if (agent->mappingPath != NULL){
                     bus_zyreLock();
                     zmsg_t *msg = zmsg_new();
                     zmsg_addstrf(msg, "MAPPING_FILE_PATH=%s", agent->mappingPath);
@@ -751,10 +748,32 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
         
         //check if message is an EXTERNAL definition
         if(checkMessageAgainstPrefix(message, definitionPrefix)){
-            //identify remote agent
+            //identify remote agent or create it if unknown.
+            //NB: we suppose that remoate agent creation is achived when
+            //The agent sends its definition for the first time. This means
+            //that agents without definition are considered a nonsense.
             char *uuid = zmsg_popstr (msgDuplicate);
+            char *remoteAgentName = zmsg_popstr (msgDuplicate);
             igs_remote_agent_t *remoteAgent = NULL;
             HASH_FIND_STR(context->remoteAgents, uuid, remoteAgent);
+            if (remoteAgent == NULL){
+                remoteAgent = calloc(1, sizeof(igs_remote_agent_t));
+                remoteAgent->context = context;
+                remoteAgent->uuid = uuid;
+                remoteAgent->name = remoteAgentName;
+                igs_zyre_peer_t *zyrePeer = NULL;
+                HASH_FIND_STR(context->zyrePeers, peer, zyrePeer);
+                assert(zyrePeer);
+                remoteAgent->peer = zyrePeer;
+                HASH_ADD_STR(context->remoteAgents, uuid, remoteAgent);
+            }else{
+                //we already know this agent
+                free(uuid);
+                if (remoteAgent->name != NULL)
+                    free(remoteAgent->name);
+                remoteAgent->name = remoteAgentName;
+                uuid = NULL;
+            }
             assert(remoteAgent);
             
             // Extract definition from message
@@ -1195,7 +1214,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                     igsAgent_writeParameterAsString(agent, _name, value);//last paramter is used for DATA only
                 }
                 
-            }else if (checkMessageAgainstPrefix(message, "MAP")){
+            }else if (checkMessageAgainstPrefix(message, "MAP") && !checkMessageAgainstPrefix(message, "MAPPING_FILE_PATH")){
                 //identify agent
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
@@ -1508,6 +1527,14 @@ static void runLoop (zsock_t *mypipe, void *args){
     assert(context->inprocPublisher);
     #endif
     
+    //iterate on agents to avoid sending definition and mapping update at startup
+    //to all peers (they will receive def & map when joining INGESCAPE_PRIVATE)
+    igs_agent_t *agent, *tmp;
+    HASH_ITER(hh, context->agents, agent, tmp){
+        agent->network_needToUpdateMapping = false;
+        agent->network_needToSendDefinitionUpdate = false;
+    }
+    
     //start zyre now that everything is set
     bus_zyreLock();
     int zyreStartRes = zyre_start (coreContext->node);
@@ -1545,16 +1572,16 @@ static void runLoop (zsock_t *mypipe, void *args){
     network_Lock();
     igs_debug("loop stopping..."); //clean dynamic part of the context
     
-    igs_zyre_peer_t *zyrePeer, *tmpPeer;
-    HASH_ITER(hh, context->zyrePeers, zyrePeer, tmpPeer){
-        HASH_DEL(context->zyrePeers, zyrePeer);
-        cleanAndFreeZyrePeer(&zyrePeer);
-    }
-    
     igs_remote_agent_t *remote, *tmpremote;
     HASH_ITER(hh, context->remoteAgents, remote, tmpremote) {
         HASH_DEL(context->remoteAgents, remote);
         cleanAndFreeRemoteAgent(&remote);
+    }
+    
+    igs_zyre_peer_t *zyrePeer, *tmpPeer;
+    HASH_ITER(hh, context->zyrePeers, zyrePeer, tmpPeer){
+        HASH_DEL(context->zyrePeers, zyrePeer);
+        cleanAndFreeZyrePeer(&zyrePeer);
     }
     
     igs_timer_t *current_timer, *tmp_timer;
