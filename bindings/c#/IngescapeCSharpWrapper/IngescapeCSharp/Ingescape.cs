@@ -1342,7 +1342,7 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_observeBus(igs_BusMessageIncomingC cb, IntPtr myData);
-        public static int igs_observeBus(igs_BusMessageIncoming cbSharp, object myData)
+        public static int observeBus(igs_BusMessageIncoming cbSharp, object myData)
         {
             Tuple<igs_BusMessageIncoming, object> tupleData = new Tuple<igs_BusMessageIncoming, object>(cbSharp, myData);
             GCHandle gCHandle = GCHandle.Alloc(tupleData);
