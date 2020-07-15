@@ -666,25 +666,29 @@ void core_callCallback(igs_agent_t *agent, const char *senderAgentName, const ch
     wrap->cb(senderAgentName, senderAgentUUID, callName, firstArgument, nbArgs, wrap->myData);
 }
 
-int igs_initCall(const char *name, igs_callFunction cb, void *myData){
+igs_result_t igs_initCall(const char *name, igs_callFunction cb, void *myData){
     core_initAgent();
+    if (cb == NULL){
+        igs_error("callback cannot be NULL");
+        return IGS_FAILURE;
+    }
     callCbWrapper_t *wrap = calloc(1, sizeof(callCbWrapper_t));
     wrap->cb = cb;
     wrap->myData = myData;
     return igsAgent_initCall(coreAgent, name, core_callCallback, wrap);
 }
 
-int igs_removeCall(const char *name){
+igs_result_t igs_removeCall(const char *name){
     core_initAgent();
     return igsAgent_removeCall(coreAgent, name);
 }
 
-int igs_addArgumentToCall(const char *callName, const char *argName, iopType_t type){
+igs_result_t igs_addArgumentToCall(const char *callName, const char *argName, iopType_t type){
     core_initAgent();
     return igsAgent_addArgumentToCall(coreAgent, callName, argName, type);
 }
 
-int igs_removeArgumentFromCall(const char *callName, const char *argName){
+igs_result_t igs_removeArgumentFromCall(const char *callName, const char *argName){
     core_initAgent();
     return igsAgent_removeArgumentFromCall(coreAgent, callName, argName);
 }

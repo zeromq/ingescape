@@ -163,10 +163,10 @@ PUBLIC int igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, co
 typedef void (*igsAgent_callFunction)(igs_agent_t *agent, const char *senderAgentName, const char *senderAgentUUID,
                                       const char *callName, igs_callArgument_t *firstArgument, size_t nbArgs,
                                       void* myData);
-PUBLIC int igsAgent_initCall(igs_agent_t *agent, const char *name, igsAgent_callFunction cb, void *myData);
-PUBLIC int igsAgent_removeCall(igs_agent_t *agent, const char *name);
-PUBLIC int igsAgent_addArgumentToCall(igs_agent_t *agent, const char *callName, const char *argName, iopType_t type);
-PUBLIC int igsAgent_removeArgumentFromCall(igs_agent_t *agent, const char *callName, const char *argName); //removes first occurence with this name
+PUBLIC igs_result_t igsAgent_initCall(igs_agent_t *agent, const char *name, igsAgent_callFunction cb, void *myData);
+PUBLIC igs_result_t igsAgent_removeCall(igs_agent_t *agent, const char *name);
+PUBLIC igs_result_t igsAgent_addArgumentToCall(igs_agent_t *agent, const char *callName, const char *argName, iopType_t type);
+PUBLIC igs_result_t igsAgent_removeArgumentFromCall(igs_agent_t *agent, const char *callName, const char *argName); //removes first occurence with this name
 PUBLIC size_t igsAgent_getNumberOfCalls(igs_agent_t *agent);
 PUBLIC bool igsAgent_checkCallExistence(igs_agent_t *agent, const char *name);
 PUBLIC char** igsAgent_getCallsList(igs_agent_t *agent, size_t *nbOfElements); //returned char** shall be freed by caller

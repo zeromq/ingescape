@@ -158,10 +158,10 @@ typedef void (*igs_callFunction)(const char *senderAgentName, const char *sender
 //create a call if it does not exist or will attach callback and data if they are
 //stil undefined. Warning: only one callback can be attached to a call (further attempts
 //will be ignored and signaled by an error log).
-PUBLIC int igs_initCall(const char *name, igs_callFunction cb, void *myData);
-PUBLIC int igs_removeCall(const char *name);
-PUBLIC int igs_addArgumentToCall(const char *callName, const char *argName, iopType_t type);
-PUBLIC int igs_removeArgumentFromCall(const char *callName, const char *argName); //removes first occurence with this name
+PUBLIC igs_result_t igs_initCall(const char *name, igs_callFunction cb, void *myData);
+PUBLIC igs_result_t igs_removeCall(const char *name);
+PUBLIC igs_result_t igs_addArgumentToCall(const char *callName, const char *argName, iopType_t type);
+PUBLIC igs_result_t igs_removeArgumentFromCall(const char *callName, const char *argName); //removes first occurence with this name
 
 
 //MANAGE optional reply
@@ -175,7 +175,7 @@ PUBLIC int igs_removeArgumentFromCall(const char *callName, const char *argName)
 PUBLIC size_t igs_getNumberOfCalls(void);
 PUBLIC bool igs_checkCallExistence(const char *name);
 PUBLIC char** igs_getCallsList(size_t *nbOfElements); //returned char** shall be freed by caller
-PUBLIC void igs_freeCallsList(char **list, size_t nbOfCalls);
+PUBLIC void igs_freeCallsList(char ***list, size_t nbOfCalls);
 
 PUBLIC igs_callArgument_t* igs_getFirstArgumentForCall(const char *callName);
 PUBLIC size_t igs_getNumberOfArgumentsForCall(const char *callName);
