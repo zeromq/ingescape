@@ -51,7 +51,7 @@ void core_initAgent(){
         igsAgent_observeForcedStop(coreAgent, core_forcedStopCB, NULL);
         coreAgent->context = coreContext;
         zuuid_t *uuid = zuuid_new();
-        coreAgent->uuid = strdup(zuuid_str_canonical(uuid));
+        coreAgent->uuid = strdup(zuuid_str(uuid));
         HASH_ADD_STR(coreContext->agents, uuid, coreAgent);
         zuuid_destroy(&uuid);
     }

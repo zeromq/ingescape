@@ -237,7 +237,7 @@ PUBLIC igs_result_t igs_setMappingVersion(const char *version);
 
 //edit mapping using the API
 PUBLIC int igs_getMappingEntriesNumber(void); //number of entries in the mapping output type
-PUBLIC unsigned long igs_addMappingEntry(const char *fromOurInput, const char *toAgent, const char *withOutput); //returns mapping id or zero or below if creation failed
+PUBLIC unsigned long igs_addMappingEntry(const char *fromOurInput, const char *toAgent, const char *withOutput); //returns mapping id or zero if creation failed
 PUBLIC igs_result_t igs_removeMappingEntryWithId(unsigned long theId);
 PUBLIC igs_result_t igs_removeMappingEntryWithName(const char *fromOurInput, const char *toAgent, const char *withOutput);
 

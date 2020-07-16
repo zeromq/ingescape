@@ -144,7 +144,7 @@ typedef struct igs_remote_agent{
     igs_zyre_peer_t *peer;
     igs_core_context_t *context;
     igs_definition_t *definition;
-    bool shallSendMappingNotification;
+    bool shallSendOutputsRequest;
     igs_mapping_t *mapping;
     igs_mappings_filter_t *mappingsFilters;
     int timerId;

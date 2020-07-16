@@ -145,10 +145,12 @@ void subscribeToRemoteAgentOutput(igs_remote_agent_t *remoteAgent, const char *o
     assert(remoteAgent);
     assert(outputName);
     if(strlen(outputName) > 0){
+        char filterValue[IGS_MAX_IOP_NAME_LENGTH + 33] = ""; //33 is UUID length + separator
+        snprintf(filterValue, IGS_MAX_IOP_NAME_LENGTH + 33, "%s-%s", remoteAgent->uuid, outputName);
         bool filterAlreadyExists = false;
         igs_mappings_filter_t *filter = NULL;
         DL_FOREACH(remoteAgent->mappingsFilters, filter){
-            if (strcmp(filter->filter, outputName) == 0){
+            if (strcmp(filter->filter, filterValue) == 0){
                 filterAlreadyExists = true;
                 break;
             }
@@ -156,10 +158,10 @@ void subscribeToRemoteAgentOutput(igs_remote_agent_t *remoteAgent, const char *o
         if (!filterAlreadyExists){
             // Set subscriber to the output filter
             assert(remoteAgent->peer->subscriber);
-            igs_debug("Subscribe to agent %s output %s",remoteAgent->name,outputName);
-            zsock_set_subscribe(remoteAgent->peer->subscriber, outputName);
+            igs_debug("subscribe to agent %s output %s (%s)",remoteAgent->name,outputName, filterValue);
+            zsock_set_subscribe(remoteAgent->peer->subscriber, filterValue);
             igs_mappings_filter_t *f = calloc(1, sizeof(igs_mappings_filter_t));
-            f->filter = strndup(outputName, IGS_MAX_IOP_NAME_LENGTH);
+            f->filter = strdup(filterValue);
             DL_APPEND(remoteAgent->mappingsFilters, f);
         }else{
             //printf("\n****************\nFILTER BIS %s - %s\n***************\n", subscriber->agent->name, outputName);
@@ -176,7 +178,7 @@ void unsubscribeToRemoteAgentOutput(igs_remote_agent_t *remoteAgent, const char 
         DL_FOREACH(remoteAgent->mappingsFilters, filter){
             if (strcmp(filter->filter, outputName) == 0){
                 assert(remoteAgent->peer->subscriber);
-                igs_debug("Unsubscribe to agent %s output %s",remoteAgent->name,outputName);
+                igs_debug("unsubscribe to agent %s output %s",remoteAgent->name,outputName);
                 zsock_set_unsubscribe(remoteAgent->peer->subscriber, outputName);
                 free(filter->filter);
                 DL_DELETE(remoteAgent->mappingsFilters, filter);
@@ -188,7 +190,7 @@ void unsubscribeToRemoteAgentOutput(igs_remote_agent_t *remoteAgent, const char 
 }
 
 //Timer callback to send REQUEST_OUPUTS notification for an agent we subscribed to
-int triggerMappingNotificationToNewcomer(zloop_t *loop, int timer_id, void *arg){
+int triggerOutputsRequestToNewcomer(zloop_t *loop, int timer_id, void *arg){
     IGS_UNUSED(loop)
     IGS_UNUSED(timer_id)
     igs_remote_agent_t *remoteAgent = (igs_remote_agent_t *)arg;
@@ -196,14 +198,14 @@ int triggerMappingNotificationToNewcomer(zloop_t *loop, int timer_id, void *arg)
     assert(remoteAgent->context);
     assert(remoteAgent->context->node);
     
-    if (remoteAgent->shallSendMappingNotification){
+    if (remoteAgent->shallSendOutputsRequest){
         bus_zyreLock();
         zmsg_t *msg = zmsg_new();
         zmsg_addstr(msg, "REQUEST_OUPUTS");
         zmsg_addstr(msg, remoteAgent->uuid);
         zyre_whisper(remoteAgent->context->node, remoteAgent->peer->peerId, &msg);
         bus_zyreUnlock();
-        remoteAgent->shallSendMappingNotification = false;
+        remoteAgent->shallSendOutputsRequest = false;
     }
     return 0;
 }
@@ -236,9 +238,9 @@ int network_configureMappingsToRemoteAgent(igs_agent_t *agent, igs_remote_agent_
                     subscribeToRemoteAgentOutput(remoteAgent, el->output_name);
                     
                     //mapping was successful : we set timer to notify remote agent if not already done
-                    if (!remoteAgent->shallSendMappingNotification && agent->network_requestOutputsFromMappedAgents){
-                        remoteAgent->shallSendMappingNotification = true;
-                        remoteAgent->timerId = zloop_timer(coreContext->loop, 500, 1, triggerMappingNotificationToNewcomer, remoteAgent);
+                    if (!remoteAgent->shallSendOutputsRequest && agent->network_requestOutputsFromMappedAgents){
+                        remoteAgent->shallSendOutputsRequest = true;
+                        remoteAgent->timerId = zloop_timer(coreContext->loop, 500, 1, triggerOutputsRequestToNewcomer, remoteAgent);
                     }
                 }
                 //NOTE: we do not clean subscriptions here because we cannot check if
@@ -439,14 +441,24 @@ void handlePublicationFromRemoteAgent(zmsg_t *msg, igs_remote_agent_t *remoteAge
 }
 
 //manage incoming messages from one of the remote agents agents we subscribed to
-int manageRemoteAgent (zloop_t *loop, zsock_t *socket, void *arg){
+int manageRemotePublication (zloop_t *loop, zsock_t *socket, void *arg){
     IGS_UNUSED(loop)
     igs_core_context_t *context = (igs_core_context_t *)arg;
     assert(socket);
     assert(context);
     
     zmsg_t *msg = zmsg_recv(socket);
+    char *outputName = zmsg_popstr(msg);
+    char uuid[33] = ""; //33 is UUID length + terminal 0
+    snprintf(uuid, 33, "%s", outputName);
+    outputName = outputName + 33;
+    
+    //We push the output name again at the beginning of
+    //the message for proper use by handlePublicationFromRemoteAgent
+    zmsg_pushstr(msg, outputName);
+    
     igs_remote_agent_t *remoteAgent = NULL;
+    HASH_FIND_STR(context->remoteAgents, uuid, remoteAgent);
     handlePublicationFromRemoteAgent(msg, remoteAgent);
     zmsg_destroy(&msg);
     return 0;
@@ -561,7 +573,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                             igs_debug("Subscription created for %s at %s (tcp)",zyrePeer->name, endpointAddress);
                         }
                         assert(zyrePeer->subscriber);
-                        zloop_reader(loop, zyrePeer->subscriber, manageRemoteAgent, context);
+                        zloop_reader(loop, zyrePeer->subscriber, manageRemotePublication, context);
 #if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
                         context->licenseEnforcement->currentAgentsNb++;
                         //igs_license("%ld agents (adding %s)", agent->licenseEnforcement->currentAgentsNb, name);
@@ -752,8 +764,8 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             //NB: we suppose that remoate agent creation is achived when
             //The agent sends its definition for the first time. This means
             //that agents without definition are considered a nonsense.
-            char *uuid = zmsg_popstr (msgDuplicate);
-            char *remoteAgentName = zmsg_popstr (msgDuplicate);
+            char *uuid = zmsg_popstr(msgDuplicate);
+            char *remoteAgentName = zmsg_popstr(msgDuplicate);
             igs_remote_agent_t *remoteAgent = NULL;
             HASH_FIND_STR(context->remoteAgents, uuid, remoteAgent);
             if (remoteAgent == NULL){
@@ -947,6 +959,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 int i = 0;
                 zmsg_t *omsg = zmsg_new();
                 zmsg_addstr(omsg, "OUTPUTS");
+                zmsg_addstr(omsg, uuid);
                 //NB: in normal publish/subscribe communications, publisher does
                 //not know who it publishes to. We keep this principle here by
                 //NOT adding any uuid inside the message.
@@ -1001,13 +1014,13 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 bus_zyreUnlock();
                 free(outputsList);
                 
-            }else if (checkMessageAgainstPrefix(message, "OUPUTS")){
+            }else if (checkMessageAgainstPrefix(message, "OUTPUTS")){
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_remote_agent_t *remoteAgent = NULL;
                 HASH_FIND_STR(context->remoteAgents, uuid, remoteAgent);
                 assert(remoteAgent);
-                handlePublicationFromRemoteAgent(msgDuplicate, remoteAgent);
                 igs_debug("privately received output values from %s (%s)", remoteAgent->name, remoteAgent->uuid);
+                handlePublicationFromRemoteAgent(msgDuplicate, remoteAgent);
                 
             }else if (checkMessageAgainstPrefix(message, "GET_CURRENT_INPUTS")){
                 //identify agent
@@ -1953,6 +1966,7 @@ void initLoop (igs_core_context_t *context){
 int network_publishOutput (igs_agent_t *agent, const igs_iop_t *iop){
     assert(agent);
     assert(agent->context);
+    assert(agent->uuid);
     assert(iop);
     assert(iop->name);
     int result = 0;
@@ -1963,33 +1977,33 @@ int network_publishOutput (igs_agent_t *agent, const igs_iop_t *iop){
         if(!agent->isWholeAgentMuted && !iop->is_muted && !agent->context->isFrozen)
         {
             zmsg_t *msg = zmsg_new();
-            zmsg_addstr(msg, iop->name);
+            zmsg_addstrf(msg, "%s-%s", agent->uuid, iop->name);
             zmsg_addstrf(msg, "%d", iop->value_type);
             switch (iop->value_type) {
                 case IGS_INTEGER_T:
                     zmsg_addmem(msg, &(iop->value.i), sizeof(int));
-                    igsAgent_debug(agent, "publish %s -> %d",iop->name,iop->value.i);
+                    igsAgent_debug(agent, "%s publishes %s -> %d", agent->uuid, iop->name, iop->value.i);
                     break;
                 case IGS_DOUBLE_T:
                     zmsg_addmem(msg, &(iop->value.d), sizeof(double));
-                    igsAgent_debug(agent, "publish %s -> %f",iop->name,iop->value.d);
+                    igsAgent_debug(agent, "%s publishes %s -> %f", agent->uuid, iop->name, iop->value.d);
                     break;
                 case IGS_BOOL_T:
                     zmsg_addmem(msg, &(iop->value.b), sizeof(bool));
-                    igsAgent_debug(agent, "publish %s -> %d",iop->name,iop->value.b);
+                    igsAgent_debug(agent, "%s publishes %s -> %d", agent->uuid, iop->name, iop->value.b);
                     break;
                 case IGS_STRING_T:
                     zmsg_addstr(msg, iop->value.s);
-                    igsAgent_debug(agent, "publish %s -> %s",iop->name,iop->value.s);
+                    igsAgent_debug(agent, "%s publishes %s -> '%s'", agent->uuid, iop->name, iop->value.s);
                     break;
                 case IGS_IMPULSION_T:
                     zmsg_addmem(msg, NULL, 0);
-                    igsAgent_debug(agent, "publish impulsion %s",iop->name);
+                    igsAgent_debug(agent, "%s publishes impulsion %s", agent->uuid, iop->name);
                     break;
                 case IGS_DATA_T:{
                     zframe_t *frame = zframe_new(iop->value.data, iop->valueSize);
                     zmsg_append(msg, &frame);
-                    igsAgent_debug(agent, "publish data %s",iop->name);
+                    igsAgent_debug(agent, "%s publishes data %s (%zu bytes)", agent->uuid, iop->name, iop->valueSize);
                 }
                     break;
                 default:
