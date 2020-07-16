@@ -713,14 +713,12 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             //NB: we start by popping agent uuid because nothing makes sense without it
             //This is different in the WHISPER messages.
             igs_agent_t *targetAgent = NULL;
-            char *uuid = NULL;
-            if (zmsg_size(msgDuplicate) >= 2){
-                uuid = zmsg_popstr (msgDuplicate);
-            }
+            char *uuid = zmsg_popstr (msgDuplicate);
             HASH_FIND_STR(context->agents, uuid, targetAgent);
             if (targetAgent == NULL){
                 igs_error("message received on %s, sent by %s(%s) does not provide a valid agent uuid",
                           group, name, peer);
+                assert(targetAgent);
             }else{
                 char *input = zmsg_popstr (msgDuplicate);
                 iopType_t inputType = igsAgent_getTypeForInput(targetAgent, input);
@@ -778,6 +776,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 assert(zyrePeer);
                 remoteAgent->peer = zyrePeer;
                 HASH_ADD_STR(context->remoteAgents, uuid, remoteAgent);
+                igs_info("registering agent %s(%s)", uuid, remoteAgentName);
             }else{
                 //we already know this agent
                 free(uuid);
@@ -1073,6 +1072,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             }else if (checkMessageAgainstPrefix(message, "GET_LICENSE_INFO")){
 #if !TARGET_OS_IOS
                 zmsg_t *resp = zmsg_new();
+                zmsg_addstr(resp, "LICENSE_INFO");
                 if (context->license == NULL){
                     zmsg_addstr(resp, "no license available");
                 }else{
@@ -1126,7 +1126,6 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 return -1;
                 
             }else if (checkMessageAgainstPrefix(message, "CLEAR_MAPPING")){
-                //identify agent
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
