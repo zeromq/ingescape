@@ -84,22 +84,24 @@ PUBLIC igs_result_t igs_readInputAsZMQMsg(const char *name, zmsg_t **msg); //msg
 typedef void (*igs_BusMessageIncoming) (const char *event, const char *peerID, const char *name,
                                         const char *address, const char *channel,
                                         zhash_t *headers, zmsg_t *msg, void *myData);
-PUBLIC int igs_observeBus(igs_BusMessageIncoming cb, void *myData);
+PUBLIC igs_result_t igs_observeBus(igs_BusMessageIncoming cb, void *myData);
 
-PUBLIC void igs_busJoinChannel(const char *channel);
-PUBLIC void igs_busLeaveChannel(const char *channel);
+PUBLIC igs_result_t igs_busJoinChannel(const char *channel);
+PUBLIC igs_result_t igs_busLeaveChannel(const char *channel);
 
-PUBLIC int igs_busSendStringToChannel(const char *channel, const char *msg, ...);
-PUBLIC int igs_busSendDataToChannel(const char *channel, void *data, size_t size);
-PUBLIC int igs_busSendZMQMsgToChannel(const char *channel, zmsg_t **msg_p); //destroys message after sending it
+PUBLIC igs_result_t igs_busSendStringToChannel(const char *channel, const char *msg, ...);
+PUBLIC igs_result_t igs_busSendDataToChannel(const char *channel, void *data, size_t size);
+PUBLIC igs_result_t igs_busSendZMQMsgToChannel(const char *channel, zmsg_t **msg_p); //destroys message after sending it
 
-// the functions below support mutiple agents with same name
-PUBLIC int igs_busSendStringToAgent(const char *agentNameOrPeerID, const char *msg, ...);
-PUBLIC int igs_busSendDataToAgent(const char *agentNameOrPeerID, void *data, size_t size);
-PUBLIC int igs_busSendZMQMsgToAgent(const char *agentNameOrPeerID, zmsg_t **msg_p); //destroys message after sending it
+// Sending message to an agent by name or by uuid
+//NB: peer ids and names are also supported by these functions but are used only if no agent is found first
+//NB: if several agents share the same name, all will receive the message if addressed by name
+PUBLIC igs_result_t igs_busSendStringToAgent(const char *agentNameOrAgentIdOrPeerID, const char *msg, ...);
+PUBLIC igs_result_t igs_busSendDataToAgent(const char *agentNameOrAgentIdOrPeerID, void *data, size_t size);
+PUBLIC igs_result_t igs_busSendZMQMsgToAgent(const char *agentNameOrAgentIdOrPeerID, zmsg_t **msg_p); //destroys message after sending it
 
-PUBLIC void igs_busAddServiceDescription(const char *key, const char *value);
-PUBLIC void igs_busRemoveServiceDescription(const char *key);
+PUBLIC igs_result_t igs_busAddServiceDescription(const char *key, const char *value);
+PUBLIC igs_result_t igs_busRemoveServiceDescription(const char *key);
 
 
 //////////////////////////////////////////////////
@@ -143,7 +145,7 @@ PUBLIC igs_callArgument_t *igs_cloneArgumentsList(igs_callArgument_t *list);
 //SEND a call to another agent
 //requires to pass agent name or UUID, call name and a list of arguments specific to the call
 //passed arguments list will be deallocated and destroyed
-PUBLIC int igs_sendCall(const char *agentNameOrUUID, const char *callName, igs_callArgument_t **list);
+PUBLIC igs_result_t igs_sendCall(const char *agentNameOrUUID, const char *callName, igs_callArgument_t **list);
 
 
 //CREATE CALLS for our agent

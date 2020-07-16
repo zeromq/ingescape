@@ -131,7 +131,7 @@ bool checkMessageAgainstPrefix(char *message, const char *prefix){
 void cleanAndFreeZyrePeer(igs_zyre_peer_t **zyrePeer){
     assert(zyrePeer);
     assert(*zyrePeer);
-    igs_debug("cleaning zyre peer %s (%s)", (*zyrePeer)->name, (*zyrePeer)->peerId);
+    igs_debug("cleaning peer %s (%s)", (*zyrePeer)->name, (*zyrePeer)->peerId);
     if ((*zyrePeer)->peerId != NULL)
         free((*zyrePeer)->peerId);
     if ((*zyrePeer)->name != NULL)
@@ -2058,7 +2058,7 @@ int network_timerCallback (zloop_t *loop, int timer_id, void *arg){
     return 1;
 }
 
-int igs_observeBus(igs_BusMessageIncoming cb, void *myData){
+igs_result_t igs_observeBus(igs_BusMessageIncoming cb, void *myData){
     if (cb != NULL){
         igs_zyre_callback_t *newCb = calloc(1, sizeof(igs_zyre_callback_t));
         newCb->callback_ptr = cb;
@@ -2305,7 +2305,7 @@ igs_result_t igsAgent_setAgentName(igs_agent_t *agent, const char *name){
     int zyrePort = 0;
     bool needRestart = false;
     if (coreContext->networkActor != NULL){
-        //Ingescape is already started, zyre peer needs to be recreated
+        //Ingescape is already started, peer needs to be recreated
         strncpy(networkDevice, coreContext->networkDevice, IGS_NETWORK_DEVICE_LENGTH);
         strncpy(ipAddress, coreContext->ipAddress, IGS_IP_ADDRESS_LENGTH);
         zyrePort = coreContext->network_zyrePort;

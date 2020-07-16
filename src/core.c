@@ -652,7 +652,7 @@ igs_result_t igs_readInputAsZMQMsg(const char *name, zmsg_t **msg){
 }
 
 
-int igs_sendCall(const char *agentNameOrUUID, const char *callName, igs_callArgument_t **list){
+igs_result_t igs_sendCall(const char *agentNameOrUUID, const char *callName, igs_callArgument_t **list){
     core_initAgent();
     return igsAgent_sendCall(coreAgent, agentNameOrUUID, callName, list);
 }

@@ -368,25 +368,26 @@ igs_result_t igsAgent_removeArgumentFromCall(igs_agent_t *agent, const char *cal
     return IGS_SUCCESS;
 }
 
-int igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, const char *callName, igs_callArgument_t **list){
+igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, const char *callName, igs_callArgument_t **list){
     assert(agent);
     if (agentNameOrUUID == NULL || strlen(agentNameOrUUID) == 0){
         igsAgent_error(agent, "agent name or UUID must not be NULL or empty");
-        return -1;
+        return IGS_FAILURE;
     }
-    igs_remote_agent_t *remote = NULL, *tmp = NULL;
+    igs_remote_agent_t *remoteAgent = NULL, *tmp = NULL;
     bool found = false;
-    HASH_ITER(hh, agent->context->remoteAgents, remote, tmp){
-        if (streq(remote->name, agentNameOrUUID) || streq(remote->uuid, agentNameOrUUID)){
+    //iteration because multiple agents can have the same name
+    HASH_ITER(hh, agent->context->remoteAgents, remoteAgent, tmp){
+        if (streq(remoteAgent->name, agentNameOrUUID) || streq(remoteAgent->uuid, agentNameOrUUID)){
             //we found a matching agent
             igs_callArgument_t *arg = NULL;
             found = true;
-            if (remote->definition == NULL){
+            if (remoteAgent->definition == NULL){
                 igsAgent_warn(agent, "definition is unknown for %s : cannot verify call before sending it", agentNameOrUUID);
                 //continue; //commented to allow sending the message anyway
             }else{
                 igs_call_t *call = NULL;
-                HASH_FIND_STR(remote->definition->calls_table, callName, call);
+                HASH_FIND_STR(remoteAgent->definition->calls_table, callName, call);
                 if (call != NULL){
                     size_t nbArguments = 0;
                     if (list != NULL && *list != NULL)
@@ -405,6 +406,7 @@ int igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, const cha
             }
             zmsg_t *msg = zmsg_new();
             zmsg_addstr(msg, "CALL");
+            zmsg_addstr(msg, remoteAgent->uuid);
             zmsg_addstr(msg, callName);
             if (list != NULL){
                 LL_FOREACH(*list, arg){
@@ -427,23 +429,19 @@ int igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, const cha
                             }
                             break;
                         }
-
                         case IGS_DATA_T:
                             frame = zframe_new(arg->data, arg->size);
                             break;
-
                         default:
                             break;
                     }
-                    if (frame != NULL){
-                        zmsg_add(msg, frame);
-                    }
+                    assert(frame);
+                    zmsg_add(msg, frame);
                 }
             }
             bus_zyreLock();
-            zyre_shouts(agent->context->node, agent->context->callsChannel, "%s to %s", callName, agentNameOrUUID);
-            //FIXME: add agent uuid to message
-            zyre_whisper(agent->context->node, remote->peer->peerId, &msg);
+            zyre_shouts(agent->context->node, agent->context->callsChannel, "call %s.%s", agentNameOrUUID, callName);
+            zyre_whisper(agent->context->node, remoteAgent->peer->peerId, &msg);
             bus_zyreUnlock();
             igsAgent_debug(agent, "sent call %s to %s", callName, agentNameOrUUID);
 
@@ -455,9 +453,9 @@ int igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, const cha
     }
     if (!found){
         igsAgent_error(agent, "could not find an agent with name or UUID : %s", agentNameOrUUID);
-        return -1;
+        return IGS_FAILURE;
     }
-    return 1;
+    return IGS_SUCCESS;
 }
 
 size_t igsAgent_getNumberOfCalls(igs_agent_t *agent){

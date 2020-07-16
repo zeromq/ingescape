@@ -159,7 +159,8 @@ PUBLIC void igsAgent_writeMappingToPath(igs_agent_t *agent);
 PUBLIC igs_result_t igsAgent_writeOutputAsZMQMsg(igs_agent_t *agent, const char *name, zmsg_t *msg);
 PUBLIC igs_result_t igsAgent_readInputAsZMQMsg(igs_agent_t *agent, const char *name, zmsg_t **msg); //msg must be freed by caller using zmsg_destroy
 
-PUBLIC int igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, const char *callName, igs_callArgument_t **list);
+//calls
+PUBLIC igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, const char *callName, igs_callArgument_t **list);
 typedef void (*igsAgent_callFunction)(igs_agent_t *agent, const char *senderAgentName, const char *senderAgentUUID,
                                       const char *callName, igs_callArgument_t *firstArgument, size_t nbArgs,
                                       void* myData);

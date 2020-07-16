@@ -60,43 +60,54 @@ void bus_zyreUnlock(void) {
 ////////////////////////////////////////////////////////////////////////
 // PUBLIC FUNCTIONS
 ////////////////////////////////////////////////////////////////////////
-void igsAgent_busJoinChannel(igs_agent_t *agent, const char *channel){
+igs_result_t igs_busJoinChannel(const char *channel){
+    assert(channel && strlen(channel) > 0);
     if (strcmp(IGS_PRIVATE_CHANNEL, channel) == 0){
-        igsAgent_error(agent, "channel name %s is reserved and cannot be joined", channel);
-        return;
+        igs_error("channel name %s is reserved and cannot be joined", channel);
+        return IGS_FAILURE;
     }
-    if (coreContext != NULL && coreContext->node != NULL){
+    if (coreContext->networkActor != NULL && coreContext->node != NULL){
         bus_zyreLock();
         zyre_join(coreContext->node, channel);
         bus_zyreUnlock();
     }else{
-        igsAgent_error(agent, "igs_startWithDevice or igs_startWithIP must be called before joining a channel");
+        igs_error("Ingescape must be started before joining a channel");
+        return IGS_FAILURE;
     }
+    return IGS_SUCCESS;
 }
-void igsAgent_busLeaveChannel(igs_agent_t *agent, const char *channel){
-    if (coreContext != NULL && coreContext->node != NULL){
+
+igs_result_t igs_busLeaveChannel(const char *channel){
+    assert(channel && strlen(channel) > 0);
+    if (coreContext->networkActor != NULL && coreContext->node != NULL){
         bus_zyreLock();
         zyre_leave(coreContext->node, channel);
         bus_zyreUnlock();
     }else{
-        igsAgent_error(agent, "igs_startWithDevice or igs_startWithIP must be called before leaving a channel");
+        igs_error("Ingescape is not started, this command is useless");
+        return IGS_FAILURE;
     }
+    return IGS_SUCCESS;
 }
 
-int igsAgent_busSendStringToChannel(igs_agent_t *agent, const char *channel, const char *msg, ...){
+igs_result_t igs_busSendStringToChannel(const char *channel, const char *msg, ...){
     if (channel == NULL){
-        igsAgent_debug(agent, "channel is NULL");
-        return 0;
+        igs_error("channel is NULL");
+        return IGS_FAILURE;
+    }
+    if (msg == NULL){
+        igs_error("message is NULL");
+        return IGS_FAILURE;
     }
     if (strcmp(IGS_PRIVATE_CHANNEL, channel) == 0){
-        igsAgent_error(agent, "channel name %s is reserved and cannot be used", channel);
-        return -1;
+        igs_error("channel name %s is reserved and cannot be used", channel);
+        return IGS_FAILURE;
     }
     if (coreContext == NULL || coreContext->node == NULL){
-        igsAgent_error(agent, "igs_startWithDevice or igs_startWithIP must be called before trying to send a message");
-        return -1;
+        igs_error("Ingescape must be started before trying to send a message");
+        return IGS_FAILURE;
     }
-    int res = 1;
+    int res = IGS_SUCCESS;
     char content[MAX_STRING_MSG_LENGTH] = "";
     va_list list;
     va_start(list, msg);
@@ -104,133 +115,230 @@ int igsAgent_busSendStringToChannel(igs_agent_t *agent, const char *channel, con
     va_end(list);
     bus_zyreLock();
     if (zyre_shouts(coreContext->node, channel, "%s", content) != 0)
-        res = -1;
+        res = IGS_FAILURE;
     bus_zyreUnlock();
     return res;
 }
 
-int igsAgent_busSendDataToChannel(igs_agent_t *agent, const char *channel, void *data, size_t size){
+igs_result_t igs_busSendDataToChannel(const char *channel, void *data, size_t size){
     if (channel == NULL){
-        igsAgent_debug(agent, "channel is NULL");
-        return 0;
+        igs_error("channel is NULL");
+        return IGS_FAILURE;
+    }
+    if (data == NULL){
+        igs_error("data is NULL");
+        return IGS_FAILURE;
     }
     if (strcmp(IGS_PRIVATE_CHANNEL, channel) == 0){
-        igsAgent_error(agent, "channel name %s is reserved and cannot be used", channel);
-        return -1;
+        igs_error("channel name %s is reserved and cannot be used", channel);
+        return IGS_FAILURE;
     }
     if (coreContext == NULL || coreContext->node == NULL){
-        igsAgent_error(agent, "igs_startWithDevice or igs_startWithIP must be called before trying to send a message");
-        return -1;
+        igs_error("Ingescape must be started before trying to send a message");
+        return IGS_FAILURE;
     }
-    int res = 1;
+    int res = IGS_SUCCESS;
     zframe_t *frame = zframe_new(data, size);
     zmsg_t *msg = zmsg_new();
     zmsg_append(msg, &frame);
     bus_zyreLock();
     if(zyre_shout(coreContext->node, channel, &msg) != 0)
-        res = -1;
+        res = IGS_FAILURE;
     bus_zyreUnlock();
     return res;
 }
 
-int igsAgent_busSendZMQMsgToChannel(igs_agent_t *agent, const char *channel, zmsg_t **msg_p){
+igs_result_t igs_busSendZMQMsgToChannel(const char *channel, zmsg_t **msg_p){
     if (channel == NULL){
-        igsAgent_debug(agent, "channel is NULL");
-        return 0;
+        igs_error("channel is NULL");
+        return IGS_FAILURE;
+    }
+    if (msg_p == NULL || *msg_p == NULL){
+        igs_error("message is NULL");
+        return IGS_FAILURE;
     }
     if (strcmp(IGS_PRIVATE_CHANNEL, channel) == 0){
-        igsAgent_error(agent, "channel name %s is reserved and cannot be used", channel);
-        return -1;
+        igs_error("channel name %s is reserved and cannot be used", channel);
+        return IGS_FAILURE;
     }
     if (coreContext == NULL || coreContext->node == NULL){
-        igsAgent_error(agent, "igs_startWithDevice or igs_startWithIP must be called before trying to send a message");
-        return -1;
+        igs_error("Ingescape must be started before trying to send a message");
+        return IGS_FAILURE;
     }
-    int res = 1;
+    int res = IGS_SUCCESS;
     bus_zyreLock();
     if (zyre_shout(coreContext->node, channel, msg_p) != 0)
-        res = -1;
+        res = IGS_FAILURE;
     bus_zyreUnlock();
     return res;
 }
 
-int igsAgent_busSendStringToAgent(igs_agent_t *agent, const char *agentNameOrPeerID, const char *msg, ...){
+igs_result_t igs_busSendStringToAgent(const char *agentNameOrAgentIdOrPeerID, const char *msg, ...){
     if (coreContext == NULL || coreContext->node == NULL){
-        igsAgent_error(agent, "igs_startWithDevice or igs_startWithIP must be called before trying to send a message");
-        return -1;
+        igs_error("Ingescape must be started before trying to send a message");
+        return IGS_FAILURE;
     }
-    if (agentNameOrPeerID == NULL){
-        igsAgent_debug(agent, "agentNameOrPeerID is NULL");
-        return 0;
+    if (agentNameOrAgentIdOrPeerID == NULL){
+        igs_error("agentNameOrAgentIdOrPeerID is NULL");
+        return IGS_FAILURE;
     }
-    igs_zyre_peer_t *el, *tmp;
-    int res = 1;
-    HASH_ITER(hh, coreContext->zyrePeers, el, tmp){
-        if (strcmp(el->name, agentNameOrPeerID) == 0 || strcmp(el->peerId, agentNameOrPeerID) == 0){
+    if (msg == NULL){
+        igs_error("message is NULL");
+        return IGS_FAILURE;
+    }
+    bool hasSent = false;
+    int res = IGS_SUCCESS;
+    //we iterate first on agents
+    igs_remote_agent_t *agent, *tmpAgent;
+    HASH_ITER(hh, coreContext->remoteAgents, agent, tmpAgent){
+        if (streq(agent->name, agentNameOrAgentIdOrPeerID) || streq(agent->uuid, agentNameOrAgentIdOrPeerID)){
             char content[MAX_STRING_MSG_LENGTH] = "";
             va_list list;
             va_start(list, msg);
             vsnprintf(content, MAX_STRING_MSG_LENGTH - 1, msg, list);
             va_end(list);
             bus_zyreLock();
-            if (zyre_whispers(coreContext->node, el->peerId, "%s", content) != 0)
-                res = -1;
+            zmsg_t *msg = zmsg_new();
+            zmsg_addstr(msg, content);
+            zmsg_addstr(msg, agent->uuid);
+            if (zyre_whisper(coreContext->node, agent->peer->peerId, &msg) != 0)
+                res = IGS_FAILURE;
             bus_zyreUnlock();
+            hasSent = true;
+            //NB: no break to support multiple agents with same name
+        }
+    }
+    
+    //if no agent found, we iterate on peers
+    if (!hasSent){
+        igs_zyre_peer_t *el, *tmp;
+        HASH_ITER(hh, coreContext->zyrePeers, el, tmp){
+            if (strcmp(el->name, agentNameOrAgentIdOrPeerID) == 0 || strcmp(el->peerId, agentNameOrAgentIdOrPeerID) == 0){
+                char content[MAX_STRING_MSG_LENGTH] = "";
+                va_list list;
+                va_start(list, msg);
+                vsnprintf(content, MAX_STRING_MSG_LENGTH - 1, msg, list);
+                va_end(list);
+                bus_zyreLock();
+                if (zyre_whispers(coreContext->node, el->peerId, "%s", content) != 0)
+                    res = IGS_FAILURE;
+                bus_zyreUnlock();
+            }
         }
     }
     return res;
 }
 
-int igsAgent_busSendDataToAgent(igs_agent_t *agent, const char *agentNameOrPeerID, void *data, size_t size){
+igs_result_t igs_busSendDataToAgent(const char *agentNameOrAgentIdOrPeerID, void *data, size_t size){
     if (coreContext == NULL || coreContext->node == NULL){
-        igsAgent_error(agent, "igs_startWithDevice or igs_startWithIP must be called before trying to send a message");
-        return -1;
+        igs_error("Ingescape must be started before trying to send a message");
+        return IGS_FAILURE;
     }
-    if (agentNameOrPeerID == NULL){
-        igsAgent_debug(agent, "agentNameOrPeerID is NULL");
-        return 0;
+    if (agentNameOrAgentIdOrPeerID == NULL){
+        igs_error("agentNameOrAgentIdOrPeerID is NULL");
+        return IGS_FAILURE;
     }
-    igs_zyre_peer_t *el, *tmp;
-    int res = 1;
-    HASH_ITER(hh, coreContext->zyrePeers, el, tmp){
-        if (strcmp(el->name, agentNameOrPeerID) == 0 || strcmp(el->peerId, agentNameOrPeerID) == 0){
+    if (data == NULL){
+        igs_error("data is NULL");
+        return IGS_FAILURE;
+    }
+    bool hasSent = false;
+    int res = IGS_SUCCESS;
+    //we iterate first on agents
+    igs_remote_agent_t *agent, *tmpAgent;
+    HASH_ITER(hh, coreContext->remoteAgents, agent, tmpAgent){
+        if (streq(agent->name, agentNameOrAgentIdOrPeerID) || streq(agent->uuid, agentNameOrAgentIdOrPeerID)){
             zframe_t *frame = zframe_new(data, size);
             zmsg_t *msg = zmsg_new();
             zmsg_append(msg, &frame);
+            zmsg_addstr(msg, agent->uuid);
             bus_zyreLock();
-            if (zyre_whisper(coreContext->node, el->peerId, &msg) != 0)
-                res = -1;
+            if (zyre_whisper(coreContext->node, agent->peer->peerId, &msg) != 0)
+                res = IGS_FAILURE;
             bus_zyreUnlock();
+            hasSent = true;
+            //NB: no break to support multiple agents with same name
+        }
+    }
+    
+    //if no agent found, we iterate on peers
+    if (!hasSent){
+        igs_zyre_peer_t *el, *tmp;
+        HASH_ITER(hh, coreContext->zyrePeers, el, tmp){
+            if (strcmp(el->name, agentNameOrAgentIdOrPeerID) == 0 || strcmp(el->peerId, agentNameOrAgentIdOrPeerID) == 0){
+                zframe_t *frame = zframe_new(data, size);
+                zmsg_t *msg = zmsg_new();
+                zmsg_append(msg, &frame);
+                bus_zyreLock();
+                if (zyre_whisper(coreContext->node, el->peerId, &msg) != 0)
+                    res = IGS_FAILURE;
+                bus_zyreUnlock();
+            }
         }
     }
     return res;
 }
 
-int igsAgent_busSendZMQMsgToAgent(igs_agent_t *agent, const char *agentNameOrPeerID, zmsg_t **msg_p){
+igs_result_t igs_busSendZMQMsgToAgent(const char *agentNameOrAgentIdOrPeerID, zmsg_t **msg_p){
     if (coreContext == NULL || coreContext->node == NULL){
-        igsAgent_error(agent, "igs_startWithDevice or igs_startWithIP must be called before trying to send a message");
-        return -1;
+        igs_error("Ingescape must be started before trying to send a message");
+        return IGS_FAILURE;
     }
-    if (agentNameOrPeerID == NULL){
-        igsAgent_debug(agent, "agentNameOrPeerID is NULL");
-        return 0;
+    if (agentNameOrAgentIdOrPeerID == NULL){
+        igs_error("agentNameOrAgentIdOrPeerID is NULL");
+        return IGS_FAILURE;
     }
-    igs_zyre_peer_t *el, *tmp;
-    int res = 1;
-    HASH_ITER(hh, coreContext->zyrePeers, el, tmp){
-        if (strcmp(el->name, agentNameOrPeerID) == 0 || strcmp(el->peerId, agentNameOrPeerID) == 0){
-            zmsg_t *msg = zmsg_dup(*msg_p);
+    if (msg_p == NULL || *msg_p == NULL){
+        igs_error("data is NULL");
+        return IGS_FAILURE;
+    }
+    bool hasSent = false;
+    int res = IGS_SUCCESS;
+    //we iterate first on agents
+    igs_remote_agent_t *agent, *tmpAgent;
+    HASH_ITER(hh, coreContext->remoteAgents, agent, tmpAgent){
+        if (streq(agent->name, agentNameOrAgentIdOrPeerID) || streq(agent->uuid, agentNameOrAgentIdOrPeerID)){
+            zmsg_t *dup = zmsg_dup(*msg_p);
+            zmsg_addstr(dup, agent->uuid); //add agent uuid at the end of the message
             bus_zyreLock();
-            if (zyre_whisper(coreContext->node, el->peerId, &msg) != 0)
-                res = -1;
+            if (zyre_whisper(coreContext->node, agent->peer->peerId, &dup) != 0)
+                res = IGS_FAILURE;
             bus_zyreUnlock();
+            hasSent = true;
+            //NB: no break to support multiple agents with same name
         }
     }
-    zmsg_destroy(msg_p);
+    
+    //if no agent found, we iterate on peers
+    if (!hasSent){
+        igs_zyre_peer_t *el, *tmp;
+        HASH_ITER(hh, coreContext->zyrePeers, el, tmp){
+            if (strcmp(el->name, agentNameOrAgentIdOrPeerID) == 0 || strcmp(el->peerId, agentNameOrAgentIdOrPeerID) == 0){
+                zmsg_t *dup = zmsg_dup(*msg_p);
+                bus_zyreLock();
+                if (zyre_whisper(coreContext->node, el->peerId, &dup) != 0)
+                    res = IGS_FAILURE;
+                bus_zyreUnlock();
+                hasSent = true;
+            }
+        }
+    }
+    
+    if (hasSent)
+        zmsg_destroy(msg_p);
+    
     return res;
 }
 
-void igsAgent_busAddServiceDescription(igs_agent_t *agent, const char *key, const char *value){
+igs_result_t igs_busAddServiceDescription(const char *key, const char *value){
+    if (key == NULL){
+        igs_error("key is NULL");
+        return IGS_FAILURE;
+    }
+    if (value == NULL){
+        igs_error("value is NULL");
+        return IGS_FAILURE;
+    }
     if (strcmp(key, "publisher") != 0
         && strcmp(key, "logger") != 0
         && strcmp(key, "pid") != 0
@@ -240,19 +348,25 @@ void igsAgent_busAddServiceDescription(igs_agent_t *agent, const char *key, cons
         igs_service_header_t *header;
         HASH_FIND_STR(coreContext->serviceHeaders, key, header);
         if (header != NULL){
-            igsAgent_error(agent, "service key '%s' already defined : new value will be ignored", key);
-            return;
+            igs_error("service key '%s' already defined : new value will be ignored", key);
+            return IGS_FAILURE;
         }
         header = calloc(1, sizeof(igs_service_header_t));
         header->key = strndup(key, MAX_STRING_MSG_LENGTH);
         header->value = strndup(value, MAX_STRING_MSG_LENGTH * 16);
         HASH_ADD_STR(coreContext->serviceHeaders, key, header);
     }else{
-        igsAgent_warn(agent, "service key '%s' is reserved and cannot be edited", key);
+        igs_error("service key '%s' is reserved and cannot be edited", key);
+        return IGS_FAILURE;
     }
+    return IGS_SUCCESS;
 }
 
-void igsAgent_busRemoveServiceDescription(igs_agent_t *agent, const char *key){
+igs_result_t igs_busRemoveServiceDescription(const char *key){
+    if (key == NULL){
+        igs_error("key is NULL");
+        return IGS_FAILURE;
+    }
     if (strcmp(key, "publisher") != 0
         && strcmp(key, "logger") != 0
         && strcmp(key, "pid") != 0
@@ -262,17 +376,20 @@ void igsAgent_busRemoveServiceDescription(igs_agent_t *agent, const char *key){
         igs_service_header_t *header;
         HASH_FIND_STR(coreContext->serviceHeaders, key, header);
         if (header == NULL){
-            igsAgent_warn(agent, "service key '%s' does not exist", key);
-            return;
+            igs_error("service key '%s' does not exist", key);
+            return IGS_FAILURE;
         }
         HASH_DEL(coreContext->serviceHeaders, header);
         free(header->key);
         free(header->value);
         free(header);
         if (coreContext != NULL && coreContext->node != NULL){
-            igsAgent_warn(agent, "agent is started : restart the agent to actually remove the service");
+            igs_error("agent is started : restart the agent to actually remove the service description");
+            return IGS_FAILURE;
         }
     }else{
-        igsAgent_warn(agent, "service key '%s' is reserved and cannot be removed", key);
+        igs_error("service key '%s' is reserved and cannot be removed", key);
+        return IGS_FAILURE;
     }
+    return IGS_SUCCESS;
 }
