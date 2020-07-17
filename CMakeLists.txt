@@ -90,7 +90,7 @@ list(APPEND ingescape_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/src/json.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/performance.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/agent.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/global.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core.c
     ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/yajl/src/yajl_alloc.c
     ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/yajl/src/yajl_buf.c
     ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/yajl/src/yajl_encode.c

@@ -877,7 +877,6 @@ const igs_iop_t* model_writeIOP (igs_agent_t *agent, const char *iopName, iop_t 
                     break;
             }
             outSize = iop->valueSize = 0;
-            igsAgent_debug(agent, "set impulsion %s", iopName);
         }
             break;
         case IGS_DATA_T:{
@@ -1109,7 +1108,8 @@ igs_result_t igsAgent_writeOutputAsBool(igs_agent_t *agent, const char *name, bo
         return IGS_FAILURE;
     }
     const igs_iop_t *iop = model_writeIOP(agent, name, IGS_OUTPUT_T, IGS_BOOL_T, &value, sizeof(bool));
-    network_publishOutput(agent, iop);
+    if (iop)
+        network_publishOutput(agent, iop);
     
     return (iop == NULL)?IGS_FAILURE : IGS_SUCCESS;
 }
@@ -1120,7 +1120,8 @@ igs_result_t igsAgent_writeOutputAsInt(igs_agent_t *agent, const char *name, int
         return IGS_FAILURE;
     }
     const igs_iop_t *iop = model_writeIOP(agent, name, IGS_OUTPUT_T, IGS_INTEGER_T, &value, sizeof(int));
-    network_publishOutput(agent, iop);
+    if (iop)
+        network_publishOutput(agent, iop);
 
     return (iop == NULL)?IGS_FAILURE : IGS_SUCCESS;
 }
@@ -1131,7 +1132,8 @@ igs_result_t igsAgent_writeOutputAsDouble(igs_agent_t *agent, const char *name, 
         return IGS_FAILURE;
     }
     const igs_iop_t *iop = model_writeIOP(agent, name, IGS_OUTPUT_T, IGS_DOUBLE_T, &value, sizeof(double));
-    network_publishOutput(agent, iop);
+    if (iop)
+        network_publishOutput(agent, iop);
 
     return (iop == NULL)?IGS_FAILURE : IGS_SUCCESS;
 }
@@ -1143,7 +1145,8 @@ igs_result_t igsAgent_writeOutputAsString(igs_agent_t *agent, const char *name, 
     }
     size_t length = (value == NULL)?0:strlen(value)+1;
     const igs_iop_t *iop = model_writeIOP(agent, name, IGS_OUTPUT_T, IGS_STRING_T, (char *)value, length);
-    network_publishOutput(agent, iop);
+    if (iop)
+        network_publishOutput(agent, iop);
 
     return (iop == NULL)?IGS_FAILURE : IGS_SUCCESS;
 }
@@ -1154,7 +1157,8 @@ igs_result_t igsAgent_writeOutputAsImpulsion(igs_agent_t *agent, const char *nam
         return IGS_FAILURE;
     }
     const igs_iop_t *iop = model_writeIOP(agent, name, IGS_OUTPUT_T, IGS_IMPULSION_T, NULL, 0);
-    network_publishOutput(agent, iop);
+    if (iop)
+        network_publishOutput(agent, iop);
 
     return (iop == NULL)?IGS_FAILURE : IGS_SUCCESS;
 }
@@ -1165,7 +1169,8 @@ igs_result_t igsAgent_writeOutputAsData(igs_agent_t *agent, const char *name, vo
         return IGS_FAILURE;
     }
     const igs_iop_t *iop = model_writeIOP(agent, name, IGS_OUTPUT_T, IGS_DATA_T, value, size);
-    network_publishOutput(agent, iop);
+    if (iop)
+        network_publishOutput(agent, iop);
     
     return (iop == NULL)?IGS_FAILURE : IGS_SUCCESS;
 }
@@ -1179,7 +1184,8 @@ igs_result_t igsAgent_writeOutputAsZMQMsg(igs_agent_t *agent, const char *name, 
     void *value = zframe_data(frame);
     size_t size = zframe_size(frame);
     const igs_iop_t *iop = model_writeIOP(agent, name, IGS_OUTPUT_T, IGS_DATA_T, value, size);
-    network_publishOutput(agent, iop);
+    if (iop)
+        network_publishOutput(agent, iop);
     zframe_destroy(&frame);
     return (iop == NULL)?IGS_FAILURE : IGS_SUCCESS;
 }
