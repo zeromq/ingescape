@@ -1418,7 +1418,11 @@ igs_result_t igsAgent_muteOutput(igs_agent_t *agent, const char *name){
     iop->is_muted = true;
     if (coreContext != NULL && coreContext->node != NULL){
         bus_zyreLock();
-        zyre_shouts(coreContext->node, IGS_PRIVATE_CHANNEL, "OUTPUT_MUTED %s", name);
+        zmsg_t *msg = zmsg_new();
+        zmsg_addstr(msg, "OUTPUT_MUTED");
+        zmsg_addstr(msg, name);
+        zmsg_addstr(msg, agent->uuid);
+        zyre_shout(coreContext->node, IGS_PRIVATE_CHANNEL, &msg);
         bus_zyreUnlock();
     }
     return IGS_SUCCESS;
@@ -1433,7 +1437,11 @@ igs_result_t igsAgent_unmuteOutput(igs_agent_t *agent, const char *name){
     iop->is_muted = false;
     if (coreContext != NULL && coreContext->node != NULL){
         bus_zyreLock();
-        zyre_shouts(coreContext->node, IGS_PRIVATE_CHANNEL, "OUTPUT_UNMUTED %s", name);
+        zmsg_t *msg = zmsg_new();
+        zmsg_addstr(msg, "OUTPUT_UNMUTED");
+        zmsg_addstr(msg, name);
+        zmsg_addstr(msg, agent->uuid);
+        zyre_shout(coreContext->node, IGS_PRIVATE_CHANNEL, &msg);
         bus_zyreUnlock();
     }
     return IGS_SUCCESS;

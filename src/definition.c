@@ -416,9 +416,11 @@ void igsAgent_setDefinitionPath(igs_agent_t *agent, const char *path){
         free(agent->definitionPath);
     agent->definitionPath = strndup(path, IGS_MAX_PATH_LENGTH);
     if (coreContext->networkActor != NULL && coreContext->node != NULL){
+        assert(streq(agent->definitionPath, "/tmp/new_definition_path.json"));
         bus_zyreLock();
         zmsg_t *msg = zmsg_new();
-        zmsg_addstrf(msg, "DEFINITION_FILE_PATH=%s", agent->definitionPath);
+        zmsg_addstr(msg, "DEFINITION_FILE_PATH");
+        zmsg_addstr(msg, agent->definitionPath);
         zmsg_addstr(msg, agent->uuid);
         zyre_shout(coreContext->node, IGS_PRIVATE_CHANNEL, &msg);
         bus_zyreUnlock();
@@ -433,8 +435,9 @@ void igsAgent_writeDefinitionToPath(igs_agent_t *agent){
     }
     FILE *fp = NULL;
     fp = fopen (agent->definitionPath,"w+");
+    igsAgent_fatal(agent, "save to path %s", agent->definitionPath);
     if (fp == NULL){
-        igsAgent_error(agent, "Could not open %s for writing", agent->definitionPath);
+        igsAgent_error(agent, "Could not open '%s' for writing", agent->definitionPath);
     }else{
         char *def = parser_export_definition(agent->definition);
         fprintf(fp, "%s", def);

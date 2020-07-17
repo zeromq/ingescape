@@ -120,14 +120,6 @@ void network_Unlock(void) {
     pthread_mutex_unlock(network_Mutex);
 }
 
-bool checkMessageAgainstPrefix(char *message, const char *prefix){
-    if (message == NULL)
-        return false;
-    if (prefix == NULL)
-        return false;
-    return (strlen(message) >= strlen(prefix) && strncmp (message, prefix, strlen(prefix)) == 0);
-}
-
 void cleanAndFreeZyrePeer(igs_zyre_peer_t **zyrePeer){
     assert(zyrePeer);
     assert(*zyrePeer);
@@ -189,7 +181,7 @@ void unsubscribeToRemoteAgentOutput(igs_remote_agent_t *remoteAgent, const char 
     }
 }
 
-//Timer callback to send REQUEST_OUPUTS notification for an agent we subscribed to
+//Timer callback to send GET_CURRENT_OUTPUTS notification for an agent we subscribed to
 int triggerOutputsRequestToNewcomer(zloop_t *loop, int timer_id, void *arg){
     IGS_UNUSED(loop)
     IGS_UNUSED(timer_id)
@@ -201,7 +193,7 @@ int triggerOutputsRequestToNewcomer(zloop_t *loop, int timer_id, void *arg){
     if (remoteAgent->shallSendOutputsRequest){
         bus_zyreLock();
         zmsg_t *msg = zmsg_new();
-        zmsg_addstr(msg, "REQUEST_OUPUTS");
+        zmsg_addstr(msg, "GET_CURRENT_OUTPUTS");
         zmsg_addstr(msg, remoteAgent->uuid);
         zyre_whisper(remoteAgent->context->node, remoteAgent->peer->peerId, &msg);
         bus_zyreUnlock();
@@ -259,7 +251,8 @@ void sendDefinitionToZyrePeer(igs_agent_t *agent, const char *peer, const char *
     assert(def);
     bus_zyreLock();
     zmsg_t *msg = zmsg_new();
-    zmsg_addstrf(msg, "%s%s", definitionPrefix, def);
+    zmsg_addstr(msg, definitionPrefix);
+    zmsg_addstr(msg, def);
     zmsg_addstr(msg, agent->uuid);
     zmsg_addstr(msg, agent->name);
     zyre_whisper(coreContext->node, peer, &msg);
@@ -274,7 +267,8 @@ void sendMappingToZyrePeer(igs_agent_t *agent, const char *peer, const char *map
     assert(mapping);
     bus_zyreLock();
     zmsg_t *msg = zmsg_new();
-    zmsg_addstrf(msg, "%s%s", mappingPrefix, mapping);
+    zmsg_addstr(msg, mappingPrefix);
+    zmsg_addstr(msg, mapping);
     zmsg_addstr(msg, agent->uuid);
     zyre_whisper(coreContext->node, peer, &msg);
     bus_zyreUnlock();
@@ -630,7 +624,8 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                         if (current_iop->is_muted && current_iop->name != NULL){
                             bus_zyreLock();
                             zmsg_t *msg = zmsg_new();
-                            zmsg_addstrf(msg, "OUTPUT_MUTED %s", current_iop->name);
+                            zmsg_addstr(msg, "OUTPUT_MUTED");
+                            zmsg_addstr(msg, current_iop->name);
                             zmsg_addstr(msg, agent->uuid);
                             zyre_whisper(context->node, peer, &msg);
                             bus_zyreUnlock();
@@ -641,7 +636,8 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 if (agent->isWholeAgentMuted){
                     bus_zyreLock();
                     zmsg_t *msg = zmsg_new();
-                    zmsg_addstr(msg, "MUTED=1");
+                    zmsg_addstr(msg, "MUTED");
+                    zmsg_addstr(msg, "1");
                     zmsg_addstr(msg, agent->uuid);
                     zyre_whisper(context->node, peer, &msg);
                     bus_zyreUnlock();
@@ -649,7 +645,8 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 if (agent->state != NULL){
                     bus_zyreLock();
                     zmsg_t *msg = zmsg_new();
-                    zmsg_addstrf(msg, "STATE=%s", agent->state);
+                    zmsg_addstr(msg, "STATE");
+                    zmsg_addstr(msg, agent->state);
                     zmsg_addstr(msg, agent->uuid);
                     zyre_whisper(context->node, peer, &msg);
                     bus_zyreUnlock();
@@ -657,7 +654,8 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 if (agent->definitionPath != NULL){
                     bus_zyreLock();
                     zmsg_t *msg = zmsg_new();
-                    zmsg_addstrf(msg, "DEFINITION_FILE_PATH=%s", agent->definitionPath);
+                    zmsg_addstr(msg, "DEFINITION_FILE_PATH");
+                    zmsg_addstr(msg, agent->definitionPath);
                     zmsg_addstr(msg, agent->uuid);
                     zyre_whisper(context->node, peer, &msg);
                     bus_zyreUnlock();
@@ -665,7 +663,8 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 if (agent->mappingPath != NULL){
                     bus_zyreLock();
                     zmsg_t *msg = zmsg_new();
-                    zmsg_addstrf(msg, "MAPPING_FILE_PATH=%s", agent->mappingPath);
+                    zmsg_addstr(msg, "MAPPING_FILE_PATH");
+                    zmsg_addstr(msg, agent->mappingPath);
                     zmsg_addstr(msg, agent->uuid);
                     zyre_whisper(context->node, peer, &msg);
                     bus_zyreUnlock();
@@ -673,7 +672,8 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 if (context->isFrozen){
                     bus_zyreLock();
                     zmsg_t *msg = zmsg_new();
-                    zmsg_addstrf(msg, "FROZEN=1");
+                    zmsg_addstr(msg, "FROZEN");
+                    zmsg_addstr(msg, "1");
                     zmsg_addstr(msg, agent->uuid);
                     zyre_whisper(context->node, peer, &msg);
                     bus_zyreUnlock();
@@ -681,7 +681,8 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 if (context->logInStream){
                     bus_zyreLock();
                     zmsg_t *msg = zmsg_new();
-                    zmsg_addstrf(msg, "LOG_IN_STREAM=1");
+                    zmsg_addstr(msg, "LOG_IN_STREAM");
+                    zmsg_addstr(msg, "1");
                     zmsg_addstr(msg, agent->uuid);
                     zyre_whisper(context->node, peer, &msg);
                     bus_zyreUnlock();
@@ -689,11 +690,13 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 if (context->logInFile){
                     bus_zyreLock();
                     zmsg_t *msg = zmsg_new();
-                    zmsg_addstrf(msg, "LOG_IN_FILE=1");
+                    zmsg_addstr(msg, "LOG_IN_FILE");
+                    zmsg_addstr(msg, "1");
                     zmsg_addstr(msg, agent->uuid);
                     zyre_whisper(context->node, peer, &msg);
                     msg = zmsg_new();
-                    zmsg_addstrf(msg, "LOG_FILE_PATH=%s", context->logFilePath);
+                    zmsg_addstr(msg, "LOG_FILE_PATH");
+                    zmsg_addstr(msg, context->logFilePath);
                     zmsg_addstr(msg, agent->uuid);
                     zyre_whisper(context->node, peer, &msg);
                     bus_zyreUnlock();
@@ -754,16 +757,18 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             }
         }
     } else if(streq (event, "WHISPER")){
-        char *message = zmsg_popstr (msgDuplicate);
+        char *title = zmsg_popstr (msgDuplicate);
         
-        //check if message is an EXTERNAL definition
-        if(checkMessageAgainstPrefix(message, definitionPrefix)){
+        //check if title is an EXTERNAL definition
+        if(streq(title, definitionPrefix)){
             //identify remote agent or create it if unknown.
-            //NB: we suppose that remoate agent creation is achived when
-            //The agent sends its definition for the first time. This means
-            //that agents without definition are considered a nonsense.
+            //NB: we suppose that remote agent creation is achieved when
+            //the agent sends its definition for the first time.
+            //Agents without definition are considered impossible.
+            char* strDefinition = zmsg_popstr(msgDuplicate);
             char *uuid = zmsg_popstr(msgDuplicate);
             char *remoteAgentName = zmsg_popstr(msgDuplicate);
+            
             igs_remote_agent_t *remoteAgent = NULL;
             HASH_FIND_STR(context->remoteAgents, uuid, remoteAgent);
             if (remoteAgent == NULL){
@@ -786,11 +791,6 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 uuid = NULL;
             }
             assert(remoteAgent);
-            
-            // Extract definition from message
-            char* strDefinition = calloc(strlen(message)- strlen(definitionPrefix)+1, sizeof(char));
-            memcpy(strDefinition, &message[strlen(definitionPrefix)], strlen(message)- strlen(definitionPrefix));
-            strDefinition[strlen(message)- strlen(definitionPrefix)] = '\0';
             
             // Load definition from string content
             igs_definition_t *newDefinition = parser_loadDefinition(strDefinition);
@@ -841,22 +841,17 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             }
             free(strDefinition);
         }
-        //check if message is an EXTERNAL mapping
-        else if(checkMessageAgainstPrefix(message, mappingPrefix)){
+        //check if title is an EXTERNAL mapping
+        else if(streq(title, mappingPrefix)){
             //identify remote agent
+            char* strMapping = zmsg_popstr (msgDuplicate);
             char *uuid = zmsg_popstr (msgDuplicate);
             igs_remote_agent_t *remoteAgent = NULL;
             HASH_FIND_STR(context->remoteAgents, uuid, remoteAgent);
             assert(remoteAgent);
             
-            char* strMapping = NULL;
             igs_mapping_t *newMapping = NULL;
-            if (strlen(message) != strlen(mappingPrefix)){
-                //extract mapping from message
-                strMapping = calloc(strlen(message)- strlen(mappingPrefix)+1, sizeof(char));
-                memcpy(strMapping, &message[strlen(mappingPrefix)], strlen(message)- strlen(mappingPrefix));
-                strMapping[strlen(message)- strlen(mappingPrefix)] = '\0';
-                
+            if (strlen(mappingPrefix) > 0){
                 //load mapping from string content
                 newMapping = parser_loadMapping(strMapping);
                 if (newMapping == NULL){
@@ -888,18 +883,14 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             }
             free(strMapping);
         }
-        //check if message is DEFINITION TO BE LOADED
-        else if (checkMessageAgainstPrefix(message, loadDefinitionPrefix)){
+        //check if title is DEFINITION TO BE LOADED
+        else if (streq(title, loadDefinitionPrefix)){
             //identify agent
+            char* strDefinition = zmsg_popstr (msgDuplicate);
             char *uuid = zmsg_popstr (msgDuplicate);
             igs_agent_t *agent = NULL;
             HASH_FIND_STR(context->agents, uuid, agent);
             assert(agent);
-            
-            // Extract definition from message
-            char* strDefinition = calloc(strlen(message)- strlen(loadDefinitionPrefix)+1, sizeof(char));
-            memcpy(strDefinition, &message[strlen(loadDefinitionPrefix)], strlen(message)- strlen(loadDefinitionPrefix));
-            strDefinition[strlen(message)- strlen(loadDefinitionPrefix)] = '\0';
             
             //load definition
             igsAgent_loadDefinition(agent, strDefinition);
@@ -910,18 +901,14 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             }
             free(strDefinition);
         }
-        //check if message is MAPPING TO BE LOADED
-        else if (checkMessageAgainstPrefix(message, loadMappingPrefix)){
+        //check if title is MAPPING TO BE LOADED
+        else if (streq(title, loadMappingPrefix)){
             //identify agent
+            char* strMapping = zmsg_popstr (msgDuplicate);
             char *uuid = zmsg_popstr (msgDuplicate);
             igs_agent_t *agent = NULL;
             HASH_FIND_STR(context->agents, uuid, agent);
             assert(agent);
-            
-            // Extract mapping from message
-            char* strMapping = calloc(strlen(message)- strlen(loadMappingPrefix)+1, sizeof(char));
-            memcpy(strMapping, &message[strlen(loadMappingPrefix)], strlen(message)- strlen(loadMappingPrefix));
-            strMapping[strlen(message)- strlen(loadMappingPrefix)] = '\0';
             
             // Load mapping from string content
             igs_mapping_t *m = parser_loadMapping(strMapping);
@@ -939,81 +926,71 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             }
             free(strMapping);
             
-        }else if (message){
+        }else{
             //
             //OTHER SUPPORTED MESSAGES
             //
-            if (checkMessageAgainstPrefix(message, "REQUEST_OUPUTS")){
+            if (streq(title, "GET_CURRENT_OUTPUTS")){
                 //identify agent
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
                 assert(agent);
                 
-                igs_debug("Responding to outputs request received from %s", name);
-                //send all outputs via whisper to agent that mapped us
-                size_t nbOutputs = 0;
-                char **outputsList = NULL;
-                outputsList = igsAgent_getOutputsList(agent, &nbOutputs);
-                int i = 0;
-                zmsg_t *omsg = zmsg_new();
-                zmsg_addstr(omsg, "OUTPUTS");
-                zmsg_addstr(omsg, uuid);
-                //NB: in normal publish/subscribe communications, publisher does
-                //not know who it publishes to. We keep this principle here by
-                //NOT adding any uuid inside the message.
-                //See handlePublicationFromRemoteAgent for the reception part.
-                for (i = 0; i < nbOutputs; i++){
-                    igs_iop_t * found_iop = model_findIopByName(agent, outputsList[i],IGS_OUTPUT_T);
-                    if (found_iop != NULL){
-                        switch (found_iop->value_type) {
-                            case IGS_INTEGER_T:
-                                zmsg_addstr(omsg, found_iop->name);
-                                zmsg_addstrf(omsg, "%d", found_iop->value_type);
-                                zmsg_addmem(omsg, &(found_iop->value.i), sizeof(int));
-                                break;
-                            case IGS_DOUBLE_T:
-                                zmsg_addstr(omsg, found_iop->name);
-                                zmsg_addstrf(omsg, "%d", found_iop->value_type);
-                                zmsg_addmem(omsg, &(found_iop->value.d), sizeof(double));
-                                break;
-                            case IGS_STRING_T:
-                                zmsg_addstr(omsg, found_iop->name);
-                                zmsg_addstrf(omsg, "%d", found_iop->value_type);
-                                zmsg_addstr(omsg, found_iop->value.s);
-                                break;
-                            case IGS_BOOL_T:
-                                zmsg_addstr(omsg, found_iop->name);
-                                zmsg_addstrf(omsg, "%d", found_iop->value_type);
-                                zmsg_addmem(omsg, &(found_iop->value.b), sizeof(bool));
-                                break;
-                            case IGS_IMPULSION_T:
-                                //disabled
-                                //                                    zmsg_addstr(omsg, found_iop->name);
-                                //                                    zmsg_addstrf(omsg, "%d", found_iop->value_type);
-                                //                                    zmsg_addmem(omsg, NULL, 0);
-                                break;
-                            case IGS_DATA_T:
-                                //disabled
-                                //                                    zmsg_addstr(omsg, found_iop->name);
-                                //                                    zmsg_addstrf(omsg, "%d", found_iop->value_type);
-                                //                                    zmsg_addmem(omsg, (found_iop->value.data), found_iop->valueSize);
-                                break;
-                                
-                            default:
-                                break;
-                        }
-                        
-                        
-                        free(outputsList[i]);
+                model_readWriteLock();
+                zmsg_t *msg = zmsg_new();
+                zmsg_addstr(msg, "CURRENT_OUTPUTS");
+                zmsg_addstr(msg, agent->uuid);
+                igs_iop_t *outputs = agent->definition->outputs_table;
+                igs_iop_t *current = NULL;
+                for (current = outputs; current != NULL; current = current->hh.next){
+                    switch (current->value_type) {
+                        case IGS_INTEGER_T:
+                            zmsg_addstr(msg, current->name);
+                            zmsg_addstrf(msg, "%d", current->value_type);
+                            zmsg_addmem(msg, &(current->value.i), sizeof(int));
+                            break;
+                        case IGS_DOUBLE_T:
+                            zmsg_addstr(msg, current->name);
+                            zmsg_addstrf(msg, "%d", current->value_type);
+                            zmsg_addmem(msg, &(current->value.d), sizeof(double));
+                            break;
+                        case IGS_STRING_T:
+                            zmsg_addstr(msg, current->name);
+                            zmsg_addstrf(msg, "%d", current->value_type);
+                            zmsg_addstr(msg, current->value.s);
+                            break;
+                        case IGS_BOOL_T:
+                            zmsg_addstr(msg, current->name);
+                            zmsg_addstrf(msg, "%d", current->value_type);
+                            zmsg_addmem(msg, &(current->value.b), sizeof(bool));
+                            break;
+                        case IGS_IMPULSION_T:
+                            //FIXME: we had to disable outputs sending for data and impulsions but
+                            //this is not consistent with inputs and parameters
+                            //disabled
+                            //                                    zmsg_addstr(msg, found_iop->name);
+                            //                                    zmsg_addstrf(msg, "%d", found_iop->value_type);
+                            //                                    zmsg_addmem(msg, NULL, 0);
+                            break;
+                        case IGS_DATA_T:
+                            //disabled
+                            //                                    zmsg_addstr(msg, found_iop->name);
+                            //                                    zmsg_addstrf(msg, "%d", found_iop->value_type);
+                            //                                    zmsg_addmem(msg, (found_iop->value.data), found_iop->valueSize);
+                            break;
+                            
+                        default:
+                            break;
                     }
                 }
+                model_readWriteUnlock();
                 bus_zyreLock();
-                zyre_whisper(node, peer, &omsg);
+                igs_debug("send output values to %s", peer);
+                zyre_whisper(node, peer, &msg);
                 bus_zyreUnlock();
-                free(outputsList);
                 
-            }else if (checkMessageAgainstPrefix(message, "OUTPUTS")){
+            }else if (streq(title, "CURRENT_OUTPUTS")){
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_remote_agent_t *remoteAgent = NULL;
                 HASH_FIND_STR(context->remoteAgents, uuid, remoteAgent);
@@ -1021,55 +998,119 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 igs_debug("privately received output values from %s (%s)", remoteAgent->name, remoteAgent->uuid);
                 handlePublicationFromRemoteAgent(msgDuplicate, remoteAgent);
                 
-            }else if (checkMessageAgainstPrefix(message, "GET_CURRENT_INPUTS")){
+            }else if (streq(title, "GET_CURRENT_INPUTS")){
                 //identify agent
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
                 assert(agent);
                 
-                zmsg_t *resp = zmsg_new();
-                igs_iop_t *inputs = agent->definition->inputs_table;
-                igs_iop_t *current = NULL;
-                zmsg_addstr(resp, "CURRENT_INPUTS");
-                zmsg_addstr(resp, agent->uuid);
                 model_readWriteLock();
-                for (current = inputs; current != NULL; current = current->hh.next){
-                    zmsg_addstr(resp, current->name);
-                    zmsg_addmem(resp, &current->type, sizeof(iop_t));
-                    zmsg_addmem(resp, &current->value, current->valueSize);
+                zmsg_t *msg = zmsg_new();
+                zmsg_addstr(msg, "CURRENT_INPUTS");
+                zmsg_addstr(msg, agent->uuid);
+                igs_iop_t *outputs = agent->definition->inputs_table;
+                igs_iop_t *current = NULL;
+                for (current = outputs; current != NULL; current = current->hh.next){
+                    switch (current->value_type) {
+                        case IGS_INTEGER_T:
+                            zmsg_addstr(msg, current->name);
+                            zmsg_addstrf(msg, "%d", current->value_type);
+                            zmsg_addmem(msg, &(current->value.i), sizeof(int));
+                            break;
+                        case IGS_DOUBLE_T:
+                            zmsg_addstr(msg, current->name);
+                            zmsg_addstrf(msg, "%d", current->value_type);
+                            zmsg_addmem(msg, &(current->value.d), sizeof(double));
+                            break;
+                        case IGS_STRING_T:
+                            zmsg_addstr(msg, current->name);
+                            zmsg_addstrf(msg, "%d", current->value_type);
+                            zmsg_addstr(msg, current->value.s);
+                            break;
+                        case IGS_BOOL_T:
+                            zmsg_addstr(msg, current->name);
+                            zmsg_addstrf(msg, "%d", current->value_type);
+                            zmsg_addmem(msg, &(current->value.b), sizeof(bool));
+                            break;
+                        case IGS_IMPULSION_T:
+                            zmsg_addstr(msg, current->name);
+                            zmsg_addstrf(msg, "%d", current->value_type);
+                            zmsg_addmem(msg, NULL, 0);
+                            break;
+                        case IGS_DATA_T:
+                            zmsg_addstr(msg, current->name);
+                            zmsg_addstrf(msg, "%d", current->value_type);
+                            zmsg_addmem(msg, (current->value.data), current->valueSize);
+                            break;
+                            
+                        default:
+                            break;
+                    }
                 }
                 model_readWriteUnlock();
                 bus_zyreLock();
-                zyre_whisper(node, peer, &resp);
-                bus_zyreUnlock();
                 igs_debug("send input values to %s", peer);
+                zyre_whisper(node, peer, &msg);
+                bus_zyreUnlock();
                 
-            }else if (checkMessageAgainstPrefix(message, "GET_CURRENT_PARAMETERS")){
+            }else if (streq(title, "GET_CURRENT_PARAMETERS")){
                 //identify agent
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
                 assert(agent);
                 
-                zmsg_t *resp = zmsg_new();
-                igs_iop_t *inputs = agent->definition->params_table;
-                igs_iop_t *current = NULL;
-                zmsg_addstr(resp, "CURRENT_PARAMETERS");
-                zmsg_addstr(resp, agent->uuid);
                 model_readWriteLock();
-                for (current = inputs; current != NULL; current = current->hh.next){
-                    zmsg_addstr(resp, current->name);
-                    zmsg_addmem(resp, &current->type, sizeof(iop_t));
-                    zmsg_addmem(resp, &current->value, current->valueSize);
+                zmsg_t *msg = zmsg_new();
+                zmsg_addstr(msg, "CURRENT_PARAMETERS");
+                zmsg_addstr(msg, agent->uuid);
+                igs_iop_t *outputs = agent->definition->params_table;
+                igs_iop_t *current = NULL;
+                for (current = outputs; current != NULL; current = current->hh.next){
+                    switch (current->value_type) {
+                        case IGS_INTEGER_T:
+                            zmsg_addstr(msg, current->name);
+                            zmsg_addstrf(msg, "%d", current->value_type);
+                            zmsg_addmem(msg, &(current->value.i), sizeof(int));
+                            break;
+                        case IGS_DOUBLE_T:
+                            zmsg_addstr(msg, current->name);
+                            zmsg_addstrf(msg, "%d", current->value_type);
+                            zmsg_addmem(msg, &(current->value.d), sizeof(double));
+                            break;
+                        case IGS_STRING_T:
+                            zmsg_addstr(msg, current->name);
+                            zmsg_addstrf(msg, "%d", current->value_type);
+                            zmsg_addstr(msg, current->value.s);
+                            break;
+                        case IGS_BOOL_T:
+                            zmsg_addstr(msg, current->name);
+                            zmsg_addstrf(msg, "%d", current->value_type);
+                            zmsg_addmem(msg, &(current->value.b), sizeof(bool));
+                            break;
+                        case IGS_IMPULSION_T:
+                            zmsg_addstr(msg, current->name);
+                            zmsg_addstrf(msg, "%d", current->value_type);
+                            zmsg_addmem(msg, NULL, 0);
+                            break;
+                        case IGS_DATA_T:
+                            zmsg_addstr(msg, current->name);
+                            zmsg_addstrf(msg, "%d", current->value_type);
+                            zmsg_addmem(msg, (current->value.data), current->valueSize);
+                            break;
+                            
+                        default:
+                            break;
+                    }
                 }
                 model_readWriteUnlock();
                 bus_zyreLock();
-                zyre_whisper(node, peer, &resp);
-                bus_zyreUnlock();
                 igs_debug("send parameters values to %s", peer);
+                zyre_whisper(node, peer, &msg);
+                bus_zyreUnlock();
                 
-            }else if (checkMessageAgainstPrefix(message, "GET_LICENSE_INFO")){
+            }else if (streq(title, "GET_LICENSE_INFO")){
 #if !TARGET_OS_IOS
                 zmsg_t *resp = zmsg_new();
                 zmsg_addstr(resp, "LICENSE_INFO");
@@ -1116,16 +1157,16 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 igs_debug("send license information to %s", peer);
 #endif
                 
-            }else if (checkMessageAgainstPrefix(message, "STOP")){
+            }else if (streq(title, "STOP")){
                 context->forcedStop = true;
                 igs_debug("received STOP command from %s (%s)", name, peer);
-                free(message);
+                free(title);
                 zmsg_destroy(&msgDuplicate);
                 zyre_event_destroy(&zyre_event);
                 //stop our zyre loop by returning -1 : this will start the cleaning process
                 return -1;
                 
-            }else if (checkMessageAgainstPrefix(message, "CLEAR_MAPPING")){
+            }else if (streq(title, "CLEAR_MAPPING")){
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
@@ -1134,177 +1175,158 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 igs_debug("received CLEAR_MAPPING command from %s (%s)", name, peer);
                 igsAgent_clearMapping(agent);
                 
-            }else if (checkMessageAgainstPrefix(message, "FREEZE")){
+            }else if (streq(title, "FREEZE")){
                 igs_debug("received FREEZE command from %s (%s)", name, peer);
                 igs_freeze();
                 
-            }else if (checkMessageAgainstPrefix(message, "UNFREEZE")){
+            }else if (streq(title, "UNFREEZE")){
                 igs_debug("received UNFREEZE command from %s (%s)", name, peer);
                 igs_unfreeze();
                 
-            }else if (checkMessageAgainstPrefix(message, "MUTE_ALL")){
+            }else if (streq(title, "MUTE_ALL")){
                 igs_debug("received MUTE_ALL command from %s (%s)", name, peer);
                 igs_agent_t *agent, *tmp;
                 HASH_ITER(hh, context->agents, agent, tmp){
                     igsAgent_mute(agent);
                 }
                 
-            }else if (checkMessageAgainstPrefix(message, "UNMUTE_ALL")){
+            }else if (streq(title, "UNMUTE_ALL")){
                 igs_debug("received UNMUTE_ALL command from %s (%s)", name, peer);
                 igs_agent_t *agent, *tmp;
                 HASH_ITER(hh, context->agents, agent, tmp){
                     igsAgent_unmute(agent);
                 }
                 
-            }else if (checkMessageAgainstPrefix(message, "MUTE")){
-                //identify agent
+            }else if (streq(title, "MUTE")){
+                char *iopName = zmsg_popstr (msgDuplicate);
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
                 assert(agent);
                 
                 igs_debug("received MUTE command from %s (%s)", name, peer);
-                char *subStr = message + strlen("MUTE") + 1;
-                igsAgent_muteOutput(agent, subStr);
+                igsAgent_muteOutput(agent, iopName);
                 
-            }else if (checkMessageAgainstPrefix(message, "UNMUTE")){
-                //identify agent
+            }else if (streq(title, "UNMUTE")){
+                char *iopName = zmsg_popstr (msgDuplicate);
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
                 assert(agent);
                 
                 igs_debug("received UNMUTE command from %s (%s)", name, peer);
-                char *subStr = message + strlen("UNMUTE") + 1;
-                igsAgent_unmuteOutput(agent,subStr);
+                igsAgent_unmuteOutput(agent,iopName);
                 
-            }else if (checkMessageAgainstPrefix(message, "SET_INPUT")){
-                //identify agent
+            }else if (streq(title, "SET_INPUT")){
+                char *iopName = zmsg_popstr (msgDuplicate);
+                char *value = zmsg_popstr (msgDuplicate);
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
                 assert(agent);
                 
                 igs_debug("received SET_INPUT command from %s (%s)", name, peer);
-                char *subStr = message + strlen("SET_INPUT") + 1;
-                char *_name, *value;
-                _name = strtok (subStr," ");
-                value = strtok (NULL,"\0");
-                if (_name != NULL && value != NULL){
-                    igsAgent_writeInputAsString(agent, _name, value);//last parameter is used for DATA only
+                if (iopName != NULL && value != NULL){
+                    igsAgent_writeInputAsString(agent, iopName, value);
                 }
                 
-            }else if (checkMessageAgainstPrefix(message, "SET_OUTPUT")){
-                //identify agent
+            }else if (streq(title, "SET_OUTPUT")){
+                char *iopName = zmsg_popstr (msgDuplicate);
+                char *value = zmsg_popstr (msgDuplicate);
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
                 assert(agent);
                 
                 igs_debug("received SET_OUTPUT command from %s (%s)", name, peer);
-                char *subStr = message + strlen("SET_OUTPUT") + 1;
-                char *_name, *value;
-                _name = strtok (subStr," ");
-                value = strtok (NULL,"\0");
-                if (_name != NULL && value != NULL){
-                    igsAgent_writeOutputAsString(agent, _name, value);//last paramter is used for DATA only
+                if (iopName != NULL && value != NULL){
+                    igsAgent_writeOutputAsString(agent, iopName, value);
                 }
                 
-            }else if (checkMessageAgainstPrefix(message, "SET_PARAMETER")){
-                //identify agent
+            }else if (streq(title, "SET_PARAMETER")){
+                char *iopName = zmsg_popstr (msgDuplicate);
+                char *value = zmsg_popstr (msgDuplicate);
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
                 assert(agent);
                 
                 igs_debug("received SET_PARAMETER command from %s (%s)", name, peer);
-                char *subStr = message + strlen("SET_PARAMETER") + 1;
-                char *_name, *value;
-                _name = strtok (subStr," ");
-                value = strtok (NULL,"\0");
-                if (_name != NULL && value != NULL){
-                    igsAgent_writeParameterAsString(agent, _name, value);//last paramter is used for DATA only
+                if (iopName != NULL && value != NULL){
+                    igsAgent_writeParameterAsString(agent, iopName, value);
                 }
                 
-            }else if (checkMessageAgainstPrefix(message, "MAP") && !checkMessageAgainstPrefix(message, "MAPPING_FILE_PATH")){
-                //identify agent
+            }else if (streq(title, "MAP")){
+                char *input = zmsg_popstr (msgDuplicate);
+                char *remoteAgent = zmsg_popstr (msgDuplicate);
+                char *output = zmsg_popstr (msgDuplicate);
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
                 assert(agent);
                 
                 igs_debug("received MAP command from %s (%s)", name, peer);
-                char *subStr = message + strlen("MAP") + 1;
-                char *input, *agt, *output;
-                input = strtok (subStr," ");
-                agt = strtok (NULL," ");
-                output = strtok (NULL," ");
-                if (input != NULL && agent != NULL && output != NULL){
-                    igsAgent_addMappingEntry(agent, input, agt, output);
+                if (input != NULL && remoteAgent != NULL && output != NULL){
+                    igsAgent_addMappingEntry(agent, input, remoteAgent, output);
                 }
                 
-            }else if (checkMessageAgainstPrefix(message, "UNMAP")){
-                //identify agent
+            }else if (streq(title, "UNMAP")){
+                char *input = zmsg_popstr (msgDuplicate);
+                char *remoteAgent = zmsg_popstr (msgDuplicate);
+                char *output = zmsg_popstr (msgDuplicate);
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
                 assert(agent);
                 
                 igs_debug("received UNMAP command from %s (%s)", name, peer);
-                char *subStr = message + strlen("UNMAP") + 1;
-                char *input, *agt, *output;
-                input = strtok (subStr," ");
-                agt = strtok (NULL," ");
-                output = strtok (NULL," ");
-                if (input != NULL && agent != NULL && output != NULL){
-                    igsAgent_removeMappingEntryWithName(agent, input, agt, output);
+                if (input != NULL && remoteAgent != NULL && output != NULL){
+                    igsAgent_removeMappingEntryWithName(agent, input, remoteAgent, output);
                 }
             }
             //admin API
-            else if (checkMessageAgainstPrefix(message, "ENABLE_LOG_STREAM")){
+            else if (streq(title, "ENABLE_LOG_STREAM")){
                 igs_debug("received ENABLE_LOG_STREAM command from %s (%s)", name, peer);
                 igs_setLogStream(true);
             }
-            else if (checkMessageAgainstPrefix(message, "DISABLE_LOG_STREAM")){
+            else if (streq(title, "DISABLE_LOG_STREAM")){
                 igs_debug("received DISABLE_LOG_STREAM command from %s (%s)", name, peer);
                 igs_setLogStream(false);
             }
-            else if (checkMessageAgainstPrefix(message, "ENABLE_LOG_FILE")){
+            else if (streq(title, "ENABLE_LOG_FILE")){
                 igs_debug("received ENABLE_LOG_FILE command from %s (%s)", name, peer);
                 igs_setLogInFile(true);
             }
-            else if (checkMessageAgainstPrefix(message, "DISABLE_LOG_FILE")){
+            else if (streq(title, "DISABLE_LOG_FILE")){
                 igs_debug("received DISABLE_LOG_FILE command from %s (%s)", name, peer);
                 igs_setLogInFile(false);
             }
-            else if (checkMessageAgainstPrefix(message, "SET_LOG_PATH")){
+            else if (streq(title, "SET_LOG_PATH")){
+                char *logPath = zmsg_popstr (msgDuplicate);
                 igs_debug("received SET_LOG_PATH command from %s (%s)", name, peer);
-                char *subStr = message + strlen("SET_LOG_PATH") + 1;
-                igs_setLogPath(subStr);
+                igs_setLogPath(logPath);
             }
-            else if (checkMessageAgainstPrefix(message, "SET_DEFINITION_PATH")){
-                //identify agent
+            else if (streq(title, "SET_DEFINITION_PATH")){
+                char *definitionPath = zmsg_popstr (msgDuplicate);
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
                 assert(agent);
                 
                 igs_debug("received SET_DEFINITION_PATH command from %s (%s)", name, peer);
-                char *subStr = message + strlen("SET_DEFINITION_PATH") + 1;
-                igsAgent_setDefinitionPath(agent, subStr);
+                igsAgent_setDefinitionPath(agent, definitionPath);
             }
-            else if (checkMessageAgainstPrefix(message, "SET_MAPPING_PATH")){
-                //identify agent
+            else if (streq(title, "SET_MAPPING_PATH")){
+                char *mappingPath = zmsg_popstr (msgDuplicate);
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
                 assert(agent);
                          
                 igs_debug("received SET_MAPPING_PATH command from %s (%s)", name, peer);
-                char *subStr = message + strlen("SET_MAPPING_PATH") + 1;
-                igsAgent_setMappingPath(agent, subStr);
+                igsAgent_setMappingPath(agent, mappingPath);
             }
-            else if (checkMessageAgainstPrefix(message, "SAVE_DEFINITION_TO_PATH")){
+            else if (streq(title, "SAVE_DEFINITION_TO_PATH")){
                 //identify agent
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
@@ -1314,7 +1336,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 igs_debug("received SAVE_DEFINITION_TO_PATH command from %s (%s)", name, peer);
                 igsAgent_writeDefinitionToPath(agent);
             }
-            else if (checkMessageAgainstPrefix(message, "SAVE_MAPPING_TO_PATH")){
+            else if (streq(title, "SAVE_MAPPING_TO_PATH")){
                 //identify agent
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
@@ -1325,7 +1347,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 igsAgent_writeMappingToPath(agent);
             }
             //CALLS
-            else if (streq (message, "CALL")){
+            else if (streq (title, "CALL")){
                 //identify agent
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
@@ -1357,7 +1379,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 }
             }
             //Performance
-            else if (strcmp (message, "PING") == 0){
+            else if (strcmp (title, "PING") == 0){
                 //we are pinged by another agent
                 zframe_t *countF = zmsg_pop(msgDuplicate);
                 size_t count = 0;
@@ -1372,7 +1394,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 zyre_whisper(node, peer, &back);
                 bus_zyreUnlock();
             }
-            else if (strcmp (message, "PONG") == 0){
+            else if (strcmp (title, "PONG") == 0){
                 //continue performance measurement
                 zframe_t *countF = zmsg_pop(msgDuplicate);
                 size_t count = 0;
@@ -1404,7 +1426,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 }
             }
         }
-        free(message);
+        free(title);
     } else if (streq (event, "EXIT")){
         igs_debug("<-%s (%s) exited", name, peer);
         igs_zyre_peer_t *zyrePeer = NULL;
@@ -2355,7 +2377,8 @@ igs_result_t igs_freeze(void){
             igs_agent_t *agent, *tmp;
             HASH_ITER(hh, coreContext->agents, agent, tmp){
                 zmsg_t *msg = zmsg_new();
-                zmsg_addstrf(msg, "FROZEN=1");
+                zmsg_addstr(msg, "FROZEN");
+                zmsg_addstr(msg, "1");
                 zmsg_addstr(msg, agent->uuid);
                 zyre_shout(coreContext->node, IGS_PRIVATE_CHANNEL, &msg);
             }
@@ -2385,7 +2408,8 @@ void igs_unfreeze(void){
             igs_agent_t *agent, *tmp;
             HASH_ITER(hh, coreContext->agents, agent, tmp){
                 zmsg_t *msg = zmsg_new();
-                zmsg_addstrf(msg, "FROZEN=0");
+                zmsg_addstr(msg, "FROZEN");
+                zmsg_addstr(msg, "0");
                 zmsg_addstr(msg, agent->uuid);
                 zyre_shout(coreContext->node, IGS_PRIVATE_CHANNEL, &msg);
             }
@@ -2426,7 +2450,11 @@ igs_result_t igsAgent_setAgentState(igs_agent_t *agent, const char *state){
         agent->state = strndup(state, IGS_MAX_AGENT_NAME_LENGTH);
         if (agent->context->node != NULL){
             bus_zyreLock();
-            zyre_shouts(agent->context->node, IGS_PRIVATE_CHANNEL, "STATE=%s", agent->state);
+            zmsg_t *msg = zmsg_new();
+            zmsg_addstr(msg, "STATE");
+            zmsg_addstr(msg, agent->state);
+            zmsg_addstr(msg, agent->uuid);
+            zyre_shout(agent->context->node, IGS_PRIVATE_CHANNEL, &msg);
             bus_zyreUnlock();
         }
     }
@@ -2451,7 +2479,8 @@ igs_result_t igsAgent_mute(igs_agent_t *agent){
         if ((agent->context->networkActor != NULL) && (agent->context->node != NULL)){
             bus_zyreLock();
             zmsg_t *msg = zmsg_new();
-            zmsg_addstrf(msg, "MUTED=%i", agent->isWholeAgentMuted);
+            zmsg_addstr(msg, "MUTED");
+            zmsg_addstrf(msg, "%i", agent->isWholeAgentMuted);
             zmsg_addstr(msg, agent->uuid);
             zyre_shout(agent->context->node, IGS_PRIVATE_CHANNEL, &msg);
             bus_zyreUnlock();
@@ -2472,7 +2501,8 @@ igs_result_t igsAgent_unmute(igs_agent_t *agent){
         if ((agent->context->networkActor != NULL) && (agent->context->node != NULL)){
             bus_zyreLock();
             zmsg_t *msg = zmsg_new();
-            zmsg_addstrf(msg, "MUTED=%i", agent->isWholeAgentMuted);
+            zmsg_addstr(msg, "MUTED");
+            zmsg_addstrf(msg, "%i", agent->isWholeAgentMuted);
             zmsg_addstr(msg, agent->uuid);
             zyre_shout(agent->context->node, IGS_PRIVATE_CHANNEL, &msg);
             bus_zyreUnlock();

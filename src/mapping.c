@@ -162,7 +162,7 @@ igs_result_t igsAgent_loadMappingFromPath (igs_agent_t *agent, const char* file_
 }
 
 void igsAgent_clearMapping(igs_agent_t *agent){
-    igsAgent_debug(agent, "Clear current mapping if needed and initiate an empty one");
+    igsAgent_debug(agent, "clear current mapping if needed and initiate an empty one");
     if(agent->mapping != NULL){
         mapping_freeMapping(&agent->mapping);
     }
@@ -464,12 +464,13 @@ igs_result_t igsAgent_removeMappingEntryWithName(igs_agent_t *agent, const char 
 void igsAgent_setMappingPath(igs_agent_t *agent, const char *path){
     assert(path);
     if (agent->mappingPath != NULL)
-        free(agent->definitionPath);
+        free(agent->mappingPath);
     agent->mappingPath = strndup(path, IGS_MAX_PATH_LENGTH);
     if (coreContext->networkActor != NULL && coreContext->node != NULL){
         bus_zyreLock();
         zmsg_t *msg = zmsg_new();
-        zmsg_addstrf(msg, "MAPPING_FILE_PATH=%s", agent->definitionPath);
+        zmsg_addstr(msg, "MAPPING_FILE_PATH");
+        zmsg_addstr(msg, agent->mappingPath);
         zmsg_addstr(msg, agent->uuid);
         zyre_shout(coreContext->node, IGS_PRIVATE_CHANNEL, &msg);
         bus_zyreUnlock();

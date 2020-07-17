@@ -182,7 +182,11 @@ void admin_log(igs_agent_t *agent, igs_logLevel_t level, const char *function, c
             printf("using log file %s\n", coreContext->logFilePath);
             if (coreContext != NULL && coreContext->node != NULL){
                 bus_zyreLock();
-                zyre_shouts(coreContext->node, IGS_PRIVATE_CHANNEL, "LOG_FILE_PATH=%s", coreContext->logFilePath);
+                zmsg_t *msg = zmsg_new();
+                zmsg_addstr(msg, "LOG_FILE_PATH");
+                zmsg_addstr(msg, coreContext->logFilePath);
+                zmsg_addstr(msg, agent->uuid);
+                zyre_shout(coreContext->node, IGS_PRIVATE_CHANNEL, &msg);
                 bus_zyreUnlock();
             }
         }
@@ -246,12 +250,13 @@ void igs_setLogInFile (bool allow){
             igs_agent_t *agent, *tmp;
             HASH_ITER(hh, coreContext->agents, agent, tmp){
                 zmsg_t *msg = zmsg_new();
-                zmsg_addstr(msg, agent->uuid);
+                zmsg_addstr(msg, "LOG_IN_FILE");
                 if (allow){
-                    zmsg_addstr(msg, "LOG_IN_FILE=1");
+                    zmsg_addstr(msg, "1");
                 }else{
-                    zmsg_addstr(msg, "LOG_IN_FILE=0");
+                    zmsg_addstr(msg, "0");
                 }
+                zmsg_addstr(msg, agent->uuid);
                 zyre_shout(coreContext->node, IGS_PRIVATE_CHANNEL, &msg);
             }
             bus_zyreUnlock();
@@ -301,12 +306,13 @@ void igs_setLogStream(bool stream){
             igs_agent_t *agent, *tmp;
             HASH_ITER(hh, coreContext->agents, agent, tmp){
                 zmsg_t *msg = zmsg_new();
-                zmsg_addstr(msg, agent->uuid);
+                zmsg_addstr(msg, "LOG_IN_STREAM");
                 if (stream){
-                    zmsg_addstr(msg, "LOG_IN_STREAM=1");
+                    zmsg_addstr(msg, "1");
                 }else{
-                    zmsg_addstr(msg, "LOG_IN_STREAM=0");
+                    zmsg_addstr(msg, "0");
                 }
+                zmsg_addstr(msg, agent->uuid);
                 zyre_shout(coreContext->node, IGS_PRIVATE_CHANNEL, &msg);
             }
             bus_zyreUnlock();
@@ -361,8 +367,9 @@ void igs_setLogPath(const char *path){
             igs_agent_t *agent, *tmp;
             HASH_ITER(hh, coreContext->agents, agent, tmp){
                 zmsg_t *msg = zmsg_new();
+                zmsg_addstr(msg, "LOG_FILE_PATH");
+                zmsg_addstr(msg, coreContext->logFilePath);
                 zmsg_addstr(msg, agent->uuid);
-                zmsg_addstrf(msg, "LOG_FILE_PATH=%s", coreContext->logFilePath);
                 zyre_shout(coreContext->node, IGS_PRIVATE_CHANNEL, &msg);
             }
             bus_zyreUnlock();

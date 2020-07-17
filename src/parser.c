@@ -1085,7 +1085,7 @@ igs_result_t igsAgent_loadDefinition (igs_agent_t *agent, const char* json_str){
         agent->definition = tmp;
         //Check the name of agent from network layer
         char *name = igsAgent_getAgentName(agent);
-        if(strcmp(name, IGS_DEFAULT_AGENT_NAME) == 0){
+        if(streq(name, IGS_DEFAULT_AGENT_NAME)){
             //The name of the agent is default : we change it to definition name
             igsAgent_setAgentName(agent, agent->definition->name);
         }//else
