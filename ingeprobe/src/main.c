@@ -67,7 +67,7 @@ typedef struct agent {
     zsock_t *logger;
     zmq_pollitem_t *loggerPoller;
     UT_hash_handle hh;
-} agent;
+} agent_t;
 
 ///////////////////////////////////////////////////////////////////////////////
 // ZYRE AGENT MANAGEMENT
@@ -76,14 +76,14 @@ typedef struct agent {
 typedef struct zyreloopElements{
     char *name;
     zyre_t *node;
-    agent *agents;
+    agent_t *agents;
     bool useGossip;
 } zyreloopElements_t;
 
 //manage incoming messages from one of the publisher agent we subscribed to
 int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
     UNUSED(loop);
-    agent *a = (agent *)arg;
+    agent_t *a = (agent_t *)arg;
     if (item->revents & ZMQ_POLLIN ){
         zmsg_t *msg = zmsg_recv(a->subscriber);
         size_t s = zmsg_size(msg);
@@ -174,7 +174,7 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
 //manage incoming messages from one of the logger agent we subscribed to
 int manageLog (zloop_t *loop, zmq_pollitem_t *item, void *arg){
     UNUSED(loop);
-    agent *a = (agent *)arg;
+    agent_t *a = (agent_t *)arg;
     if (item->revents & ZMQ_POLLIN ){
         zmsg_t *msg = zmsg_recv(a->logger);
         size_t s = zmsg_size(msg);
@@ -229,7 +229,7 @@ int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *args){
             else if (streq (command, "WHISPER")) {
                 char *peer = zmsg_popstr (msg);
                 char *string = zmsg_popstr (msg);
-                agent *a = NULL;
+                agent_t *a = NULL;
                 for(a = zEl->agents; a != NULL; a = a->hh.next) {
                     if (strcmp(a->name, peer) == 0 || strcmp(a->uuid, peer) == 0){
                         //NB: no break here beacause we allow whispering several agents
@@ -242,7 +242,7 @@ int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *args){
             }
             else if (streq (command, "WHISPERALL")) {
                 char *string = zmsg_popstr (msg);
-                agent *a = NULL;
+                agent_t *a = NULL;
                 for(a = zEl->agents; a != NULL; a = a->hh.next) {
                     zyre_whispers (node, a->uuid, "%s", string);
                 }
@@ -276,12 +276,27 @@ int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *args){
                 }
                 zlist_destroy(&all_groups);
             }
+            else if(streq (command, "CALL")){
+                char *callTarget = zmsg_popstr (msg);
+                char *callArgs = zmsg_popstr (msg);
+                agent_t *a = NULL;
+                HASH_FIND_STR(zEl->agents, callTarget, a);
+                if (a != NULL){
+                    //FIXME: for the moment we only send calls without any argument
+                    zmsg_t *callMsg = zmsg_new();
+                    zmsg_addstr(callMsg, "CALL");
+                    zmsg_addstr(callMsg, callArgs);
+                    zyre_whisper(node, a->uuid, &callMsg);
+                }else{
+                    printf("unknown agent %s\n", callTarget);
+                }
+            }
             else if(streq (command, "PEERS")){
                 zlist_t *peers = zyre_peers(node);
                 char *p;
                 printf("@peers:\n");
                 while ((p = (char *)zlist_pop(peers))) {
-                    agent *a = NULL;
+                    agent_t *a = NULL;
                     HASH_FIND_STR(zEl->agents, p, a);
                     if (a != NULL){
                         printf("\t%s -> %s\n", a->name, p);
@@ -320,7 +335,7 @@ int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *args){
             }
             else if (streq (command, "SUBSCRIBE")) {
                 char *peer = zmsg_popstr (msg);
-                agent *a = NULL;
+                agent_t *a = NULL;
                 for(a = zEl->agents; a != NULL; a = a->hh.next) {
                     //NB: no break here because we allow subscribing to several agents
                     //having the same name
@@ -370,9 +385,9 @@ int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *args){
             else if (streq (command, "SUBSCRIBE2")) {
                 char *peer = zmsg_popstr (msg);
                 char *output = zmsg_popstr (msg);
-                agent *a = NULL;
+                agent_t *a = NULL;
                 for(a = zEl->agents; a != NULL; a = a->hh.next) {
-                    //NB: no break here beacause we allow subscribing to several agents
+                    //NB: no break here because we allow subscribing to several agents
                     //having the same name
                     if (strcmp(a->name, peer) == 0 || strcmp(a->uuid, peer) == 0){
                         if (a->publisherPort == NULL){
@@ -421,7 +436,7 @@ int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *args){
             }
             else if (streq (command, "LOG")) {
                 char *peer = zmsg_popstr (msg);
-                agent *a = NULL;
+                agent_t *a = NULL;
                 for(a = zEl->agents; a != NULL; a = a->hh.next) {
                     if (strcmp(a->name, peer) == 0 || strcmp(a->uuid, peer) == 0){
                         if (a->logPort == NULL){
@@ -464,7 +479,7 @@ int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *args){
             }
             else if (streq (command, "UNSUBSCRIBE")) {
                 char *peer = zmsg_popstr (msg);
-                agent *a = NULL;
+                agent_t *a = NULL;
                 for(a = zEl->agents; a != NULL; a = a->hh.next) {
                     //NB: no break here beacause we allow subscribing to several agents
                     //having the same name
@@ -489,7 +504,7 @@ int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *args){
             }
             else if (streq (command, "UNLOG")) {
                 char *peer = zmsg_popstr (msg);
-                agent *a = NULL;
+                agent_t *a = NULL;
                 for(a = zEl->agents; a != NULL; a = a->hh.next) {
                     //NB: no break here beacause we allow subscribing to several agents
                     //having the same name
@@ -546,10 +561,10 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *args){
                 printf ("G->%s has entered the network with peer id %s and endpoint %s\n", name, peer, address);
             }
             //printf ("->%s has entered the network with peer id %s and endpoint %s\n", name, peer, address);
-            agent *a = NULL;
+            agent_t *a = NULL;
             HASH_FIND_STR(zEl->agents, peer, a);
             if (a == NULL){
-                a = calloc(1, sizeof(agent));
+                a = calloc(1, sizeof(agent_t));
                 a->reconnected = 0;
                 a->uuid = strndup(peer, NAME_BUFFER_SIZE);
                 a->name = strndup(name, NAME_BUFFER_SIZE);
@@ -617,7 +632,7 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *args){
                 printf ("G<-%s exited\n", name);
             }
             //printf ("<-%s exited\n", name);
-            agent *a = NULL;
+            agent_t *a = NULL;
             HASH_FIND_STR(zEl->agents, peer, a);
             if (a != NULL){
                 if (a->reconnected > 0){
@@ -782,7 +797,7 @@ zyre_actor (zsock_t *pipe, void *args)
     //clean
     zloop_destroy (&loop);
     assert (loop == NULL);
-    agent *current, *tmp;
+    agent_t *current, *tmp;
     HASH_ITER(hh, zEl->agents, current, tmp) {
         HASH_DEL(zEl->agents,current);
         free(current->name);
@@ -1130,6 +1145,13 @@ int main (int argc, char *argv [])
                         }
                         if (gossipActor != NULL){
                             zstr_sendx (gossipActor, "SUBSCRIBE2", param1, param2, NULL);
+                        }
+                    } else if (strcmp(command, "call") == 0){
+                        if (beaconActor != NULL){
+                            zstr_sendx (beaconActor, "CALL", param1, param2, NULL);
+                        }
+                        if (gossipActor != NULL){
+                            zstr_sendx (gossipActor, "CALL", param1, param2, NULL);
                         }
                     }
                 }else{
