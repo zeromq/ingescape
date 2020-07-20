@@ -649,8 +649,6 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *args){
                 HASH_ADD_STR(context->agents, uuid, agent);
                 parseCallsFromDefinition(strDefinition, &(agent->calls));
                 free(strDefinition);
-                free(uuid);
-                free(remoteAgentName);
             } else if (strncmp(message, "EXTERNAL_DEFINITION#", strlen("EXTERNAL_DEFINITION#")) == 0){
                 //v1 or v0 protocol
                 char *definition = message + strlen("EXTERNAL_DEFINITION#");
@@ -964,11 +962,12 @@ void print_commands(){
     printf("/whisper peer message : sends a message to a specific peer\n\t(peer can be name or uuid)\n");
     printf("/shout channel_name message : sends a message to a specific channel\n");
     printf("/whisperall message : sends a message to all peers individually\n");
-    printf("/subscribe peer : subscribes to ingescape outputs for ALL AGENTS in this peer\n\t(peer can be  name or uuid)\n");
+    printf("/subscribe agent : subscribes to all ingescape outputs for this agent\n\t(agent can be  name or uuid)\n");
     printf("/subscribe agent output : subscribes to ingescape agent specific output\n\t(agent can be  name or uuid)\n");
     printf("/unsubscribe peer : cancel all subscriptions to ingescape peer outputs\n\t(peer can be  name or uuid)\n");
     printf("/log peer : subscribes to ingescape agent log stream\n\t(peer can be name or uuid)\n");
     printf("/unlog peer : cancel subscription to ingescape agent log stream\n\t(peer can be name or uuid)\n");
+    printf("/call agent call_name ... : sends a call to agent for specified call_name wth parameters\n");
     printf("\n");
 }
 
