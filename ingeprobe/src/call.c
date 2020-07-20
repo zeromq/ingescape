@@ -120,10 +120,25 @@ bool addArgumentsToCallMessage(zmsg_t *msg, call_t *call, const char *arguments)
     char buffer[4096] = "";
     int myInt = 0;
     double myDouble = 0;
+    bool lookForSimpleQuote = false;
+    bool lookForDoubleQuote = false;
     LL_FOREACH(call->arguments, arg){
         zframe_t *frame = NULL;
         size_t offset = 0;
-        while (arguments[offset] != ' ' && arguments[offset] != '\0') {
+        if (arguments[0] == '\''){
+            lookForSimpleQuote = true;
+            arguments = arguments + 1;
+        }
+        if (arguments[0] == '\"'){
+            lookForDoubleQuote = true;
+            arguments = arguments + 1;
+        }
+        while (arguments[offset] != '\0'
+               && (lookForSimpleQuote || lookForDoubleQuote || arguments[offset] != ' ')
+               && ((lookForSimpleQuote && arguments[offset] != '\'')
+                   || (lookForDoubleQuote && arguments[offset] != '"')
+                   || (!lookForDoubleQuote && !lookForSimpleQuote))
+               ){
             offset++;
         }
         strncpy(buffer, arguments, offset);
@@ -131,6 +146,14 @@ bool addArgumentsToCallMessage(zmsg_t *msg, call_t *call, const char *arguments)
         if (strlen(buffer) == 0){
             printf("error: call misses arguments\n");
             return false;
+        }
+        if (lookForSimpleQuote){
+            lookForSimpleQuote = false;
+            offset += 1;
+        }
+        if (lookForDoubleQuote){
+            lookForDoubleQuote = false;
+            offset += 1;
         }
         switch (arg->type) {
             case IGS_BOOL_T:
@@ -153,9 +176,8 @@ bool addArgumentsToCallMessage(zmsg_t *msg, call_t *call, const char *arguments)
                 }
                 break;
             }
-                
             case IGS_DATA_T:
-                frame = zframe_new(NULL, 0);
+                frame = zframe_from(buffer);
                 break;
                 
             default:
