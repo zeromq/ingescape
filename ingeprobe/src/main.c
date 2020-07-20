@@ -223,12 +223,12 @@ int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *args){
             else if (streq (command, "WHISPER")) {
                 char *peer = zmsg_popstr (msg);
                 char *string = zmsg_popstr (msg);
-                peer_t *a = NULL;
-                for(a = context->peers; a != NULL; a = a->hh.next) {
-                    if (strcmp(a->name, peer) == 0 || strcmp(a->uuid, peer) == 0){
+                peer_t *p, *tmp;
+                HASH_ITER(hh, context->peers, p, tmp){
+                    if (strcmp(p->name, peer) == 0 || strcmp(p->uuid, peer) == 0){
                         //NB: no break here beacause we allow whispering several peers
                         //having the same name
-                        zyre_whispers (node, a->uuid, "%s", string);
+                        zyre_whispers (node, p->uuid, "%s", string);
                     }
                 }
                 free(peer);
@@ -236,8 +236,8 @@ int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *args){
             }
             else if (streq (command, "WHISPERALL")) {
                 char *string = zmsg_popstr (msg);
-                peer_t *p = NULL;
-                for(p = context->peers; p != NULL; p = p->hh.next) {
+                peer_t *p, *tmp;
+                HASH_ITER(hh, context->peers, p, tmp){
                     zyre_whispers (node, p->uuid, "%s", string);
                 }
                 free(string);
@@ -350,8 +350,12 @@ int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *args){
             }
             else if (streq (command, "SUBSCRIBE")) {
                 char *agentId = zmsg_popstr (msg);
-                agent_t *agent = NULL;
-                for(agent = context->agents; agent != NULL; agent = agent->hh.next) {
+                agent_t *agent, *tmp;
+                size_t nbAgents = HASH_COUNT(context->agents);
+                if (nbAgents == 0){
+                    printf("no agent : join INGESCAPE_PRIVATE to receive agents definitions\n");
+                }
+                HASH_ITER(hh, context->agents, agent, tmp){
                     //NB: no break here because we allow subscribing to several peers
                     //having the same name
                     if (strcmp(agent->name, agentId) == 0 || strcmp(agent->uuid, agentId) == 0){
@@ -394,8 +398,12 @@ int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *args){
             else if (streq (command, "SUBSCRIBE2")) {
                 char *agentId = zmsg_popstr (msg);
                 char *output = zmsg_popstr (msg);
-                agent_t *agent = NULL;
-                for(agent = context->agents; agent != NULL; agent = agent->hh.next) {
+                size_t nbAgents = HASH_COUNT(context->agents);
+                if (nbAgents == 0){
+                    printf("no agent : join INGESCAPE_PRIVATE to receive agents definitions\n");
+                }
+                agent_t *agent, *tmp;
+                HASH_ITER(hh, context->agents, agent, tmp){
                     //NB: no break here because we allow subscribing to several peers
                     //having the same name
                     if (strcmp(agent->name, agentId) == 0 || strcmp(agent->uuid, agentId) == 0){
@@ -446,8 +454,8 @@ int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *args){
             }
             else if (streq (command, "LOG")) {
                 char *peerId = zmsg_popstr (msg);
-                peer_t *p = NULL;
-                for(p = context->peers; p != NULL; p = p->hh.next) {
+                peer_t *p, *tmp;
+                HASH_ITER(hh, context->peers, p, tmp){
                     if (strcmp(p->name, peerId) == 0 || strcmp(p->uuid, peerId) == 0){
                         if (p->logPort == NULL){
                             printf("Found peer %s but its log port is NULL : command has been ignored\n", peerId);
@@ -483,8 +491,8 @@ int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *args){
             }
             else if (streq (command, "UNSUBSCRIBE")) {
                 char *agentId = zmsg_popstr (msg);
-                agent_t *agent = NULL;
-                for(agent = context->agents; agent != NULL; agent = agent->hh.next) {
+                agent_t *agent, *tmp;
+                HASH_ITER(hh, context->agents, agent, tmp){
                     //NB: no break here beacause we allow unsubscribing to several peers
                     //having the same name
                     if (strcmp(agent->name, agentId) == 0 || strcmp(agent->uuid, agentId) == 0){
@@ -505,8 +513,8 @@ int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *args){
             }
             else if (streq (command, "UNLOG")) {
                 char *peerId = zmsg_popstr (msg);
-                peer_t *p = NULL;
-                for(p = context->peers; p != NULL; p = p->hh.next) {
+                peer_t *p, *tmp;
+                HASH_ITER(hh, context->peers, p, tmp){
                     //NB: no break here beacause we allow subscribing to several peers
                     //having the same name
                     if (strcmp(p->name, peerId) == 0 || strcmp(p->uuid, peerId) == 0){
