@@ -13,6 +13,8 @@
 		974E36B62493D94300444009 /* libzyre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 974E36B12493D93A00444009 /* libzyre.a */; };
 		974E36B82493D94A00444009 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 974E36B72493D94A00444009 /* libc++.tbd */; };
 		976FFCD122BD57E5000876BF /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 976FFCCF22BD57E5000876BF /* main.c */; };
+		97F9FB3E24C47C4D00A4A3A0 /* call.c in Sources */ = {isa = PBXBuildFile; fileRef = 97F9FB3D24C47C4D00A4A3A0 /* call.c */; };
+		97F9FC0324C47FE200A4A3A0 /* libyajl-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 97F9FC0224C47FDB00A4A3A0 /* libyajl-static.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -912,6 +914,27 @@
 			remoteGlobalIDString = A6ADDDFA52254DACA8EE2DA7;
 			remoteInfo = zyre_selftest;
 		};
+		97F9FBFD24C47FDB00A4A3A0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97F9FBF724C47FDA00A4A3A0 /* yajl.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 9716CA461EA21C6A004F0AC0;
+			remoteInfo = "yajl-ios";
+		};
+		97F9FBFF24C47FDB00A4A3A0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97F9FBF724C47FDA00A4A3A0 /* yajl.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 9762EDB21EAE530B002062A1;
+			remoteInfo = "yajl-xcode";
+		};
+		97F9FC0124C47FDB00A4A3A0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97F9FBF724C47FDA00A4A3A0 /* yajl.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 97F9FBE824C47F8000A4A3A0;
+			remoteInfo = "yajl-static";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -956,6 +979,10 @@
 		978D6DED1CB26F9B0082016E /* ingeprobe */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ingeprobe; sourceTree = BUILT_PRODUCTS_DIR; };
 		97A2128422383DD000ACCFB0 /* libsodium.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsodium.a; path = ../../../../../../../../usr/local/Cellar/libsodium/1.0.17/lib/libsodium.a; sourceTree = "<group>"; };
 		97A2128622383DE200ACCFB0 /* libzmq.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libzmq.a; path = ../../../../../../../../usr/local/Cellar/zeromq/4.3.1_1/lib/libzmq.a; sourceTree = "<group>"; };
+		97F9FB3C24C47C4D00A4A3A0 /* call.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = call.h; sourceTree = "<group>"; };
+		97F9FB3D24C47C4D00A4A3A0 /* call.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = call.c; sourceTree = "<group>"; };
+		97F9FBF524C47FCB00A4A3A0 /* libyajl-static.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libyajl-static.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		97F9FBF724C47FDA00A4A3A0 /* yajl.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = yajl.xcodeproj; path = ../../../dependencies/yajl/yajl.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -963,6 +990,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				97F9FC0324C47FE200A4A3A0 /* libyajl-static.a in Frameworks */,
 				974E36B82493D94A00444009 /* libc++.tbd in Frameworks */,
 				974E36B62493D94300444009 /* libzyre.a in Frameworks */,
 				974E36832493D92E00444009 /* libczmq.a in Frameworks */,
@@ -977,6 +1005,7 @@
 		9709EE192094B2270056023F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				97F9FBF524C47FCB00A4A3A0 /* libyajl-static.a */,
 				974E36B72493D94A00444009 /* libc++.tbd */,
 				974E36812493D92E00444009 /* libzyre.a */,
 				976FFCD422BD5832000876BF /* libczmq.a */,
@@ -996,7 +1025,7 @@
 		974E35012493D8C800444009 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				974E35782493D8C900444009 /* libzmq.dylib */,
+				974E35782493D8C900444009 /* libzmq.5.2.3.dylib */,
 				974E357A2493D8C900444009 /* libzmq.a */,
 				974E357C2493D8C900444009 /* libobjects.a */,
 				974E357E2493D8C900444009 /* test_ancillaries */,
@@ -1121,7 +1150,7 @@
 		974E365B2493D8C900444009 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				974E36742493D8C900444009 /* libczmq.dylib */,
+				974E36742493D8C900444009 /* libczmq.4.2.1.dylib */,
 				974E36762493D8C900444009 /* libczmq.a */,
 				974E36782493D8C900444009 /* libczmq_objects.a */,
 				974E367A2493D8C900444009 /* czmq_selftest */,
@@ -1141,7 +1170,7 @@
 				974E36A92493D93A00444009 /* zpinger */,
 				974E36AB2493D93A00444009 /* ztester_beacon */,
 				974E36AD2493D93A00444009 /* ztester_gossip */,
-				974E36AF2493D93A00444009 /* libzyre.dylib */,
+				974E36AF2493D93A00444009 /* libzyre.2.0.1.dylib */,
 				974E36B12493D93A00444009 /* libzyre.a */,
 				974E36B32493D93A00444009 /* libzyre_objects.a */,
 				974E36B52493D93A00444009 /* zyre_selftest */,
@@ -1155,6 +1184,8 @@
 				976FFCC422BD57E5000876BF /* Makefile */,
 				976FFCC522BD57E5000876BF /* uthash */,
 				976FFCCF22BD57E5000876BF /* main.c */,
+				97F9FB3C24C47C4D00A4A3A0 /* call.h */,
+				97F9FB3D24C47C4D00A4A3A0 /* call.c */,
 			);
 			name = src;
 			path = ../../src;
@@ -1180,6 +1211,7 @@
 			isa = PBXGroup;
 			children = (
 				976BB39C24A48C6C002A6EE5 /* ingeprobe.entitlements */,
+				97F9FBF724C47FDA00A4A3A0 /* yajl.xcodeproj */,
 				974E36862493D93900444009 /* zyre.xcodeproj */,
 				974E36512493D8C900444009 /* sodium.xcodeproj */,
 				974E35002493D8C800444009 /* ZeroMQ.xcodeproj */,
@@ -1194,6 +1226,16 @@
 			isa = PBXGroup;
 			children = (
 				978D6DED1CB26F9B0082016E /* ingeprobe */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		97F9FBF824C47FDA00A4A3A0 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				97F9FBFE24C47FDB00A4A3A0 /* libyajl.a */,
+				97F9FC0024C47FDB00A4A3A0 /* yajl.framework */,
+				97F9FC0224C47FDB00A4A3A0 /* libyajl-static.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1254,6 +1296,10 @@
 					ProjectRef = 974E36512493D8C900444009 /* sodium.xcodeproj */;
 				},
 				{
+					ProductGroup = 97F9FBF824C47FDA00A4A3A0 /* Products */;
+					ProjectRef = 97F9FBF724C47FDA00A4A3A0 /* yajl.xcodeproj */;
+				},
+				{
 					ProductGroup = 974E35012493D8C800444009 /* Products */;
 					ProjectRef = 974E35002493D8C800444009 /* ZeroMQ.xcodeproj */;
 				},
@@ -1270,10 +1316,9 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		974E35782493D8C900444009 /* libzmq.dylib */ = {
+		974E35782493D8C900444009 /* libzmq.5.2.3.dylib */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
-			name = libzmq.dylib;
 			path = libzmq.5.2.3.dylib;
 			remoteRef = 974E35772493D8C900444009 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
@@ -2048,10 +2093,9 @@
 			remoteRef = 974E36582493D8C900444009 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		974E36742493D8C900444009 /* libczmq.dylib */ = {
+		974E36742493D8C900444009 /* libczmq.4.2.1.dylib */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
-			name = libczmq.dylib;
 			path = libczmq.4.2.1.dylib;
 			remoteRef = 974E36732493D8C900444009 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
@@ -2140,10 +2184,9 @@
 			remoteRef = 974E36AC2493D93A00444009 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		974E36AF2493D93A00444009 /* libzyre.dylib */ = {
+		974E36AF2493D93A00444009 /* libzyre.2.0.1.dylib */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
-			name = libzyre.dylib;
 			path = libzyre.2.0.1.dylib;
 			remoteRef = 974E36AE2493D93A00444009 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
@@ -2169,6 +2212,27 @@
 			remoteRef = 974E36B42493D93A00444009 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		97F9FBFE24C47FDB00A4A3A0 /* libyajl.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libyajl.a;
+			remoteRef = 97F9FBFD24C47FDB00A4A3A0 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		97F9FC0024C47FDB00A4A3A0 /* yajl.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = yajl.framework;
+			remoteRef = 97F9FBFF24C47FDB00A4A3A0 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		97F9FC0224C47FDB00A4A3A0 /* libyajl-static.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libyajl-static.a";
+			remoteRef = 97F9FC0124C47FDB00A4A3A0 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -2177,6 +2241,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				976FFCD122BD57E5000876BF /* main.c in Sources */,
+				97F9FB3E24C47C4D00A4A3A0 /* call.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2298,6 +2363,7 @@
 					"$(SRCROOT)/../../../../../third-party/czmq/include",
 					"$(SRCROOT)/../../../../../third-party/libzmq/include",
 					"$(SRCROOT)/../../../../../third-party/zyre/include",
+					"$(SRCROOT)/../../../dependencies/yajl/src/api/",
 				);
 				LIBRARY_SEARCH_PATHS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ingescape.ingeprobe;
@@ -2317,6 +2383,7 @@
 					"$(SRCROOT)/../../../../../third-party/czmq/include",
 					"$(SRCROOT)/../../../../../third-party/libzmq/include",
 					"$(SRCROOT)/../../../../../third-party/zyre/include",
+					"$(SRCROOT)/../../../dependencies/yajl/src/api/",
 				);
 				LIBRARY_SEARCH_PATHS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ingescape.ingeprobe;
