@@ -2797,15 +2797,12 @@ void igs_freeNetaddressesList(char **addresses, int nb){
 }
 
 void igs_observeForcedStop(igs_forcedStopCallback cb, void *myData){
+    assert(cb);
     core_initContext();
-    if (cb != NULL){
-        igs_forced_stop_calback_t *newCb = calloc(1, sizeof(igs_forced_stop_calback_t));
-        newCb->callback_ptr = cb;
-        newCb->myData = myData;
-        DL_APPEND(coreContext->forcedStopCalbacks, newCb);
-    }else{
-        igs_warn("callback is null");
-    }
+    igs_forced_stop_calback_t *newCb = calloc(1, sizeof(igs_forced_stop_calback_t));
+    newCb->callback_ptr = cb;
+    newCb->myData = myData;
+    DL_APPEND(coreContext->forcedStopCalbacks, newCb);
 }
 
 void igs_setDiscoveryInterval(unsigned int interval){

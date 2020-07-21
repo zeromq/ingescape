@@ -12,6 +12,7 @@
 #include "ingescape_agent.h"
 
 igs_agent_t *igsAgent_new(const char *name, bool activateImmediately){
+    assert(name);
     igs_agent_t *agent = calloc(1, sizeof(igs_agent_t));
     zuuid_t *uuid = zuuid_new();
     agent->uuid = strdup(zuuid_str(uuid));
@@ -23,7 +24,10 @@ igs_agent_t *igsAgent_new(const char *name, bool activateImmediately){
 }
 
 void igsAgent_destroy(igs_agent_t **agent){
-    igsAgent_activate(*agent);
+    assert(agent);
+    assert(*agent);
+    if (igsAgent_isActivated(*agent))
+        igsAgent_deactivate(*agent);
     if ((*agent)->uuid != NULL)
         free((*agent)->uuid);
     if ((*agent)->name != NULL)
@@ -49,7 +53,7 @@ void igsAgent_destroy(igs_agent_t **agent){
     *agent = NULL;
 }
 
-int igsAgent_activate(igs_agent_t *agent){
+igs_result_t igsAgent_activate(igs_agent_t *agent){
     assert(agent);
     core_initContext();
     igs_agent_t *a = NULL;
@@ -65,7 +69,7 @@ int igsAgent_activate(igs_agent_t *agent){
     return IGS_SUCCESS;
 }
 
-int igsAgent_deactivate(igs_agent_t *agent){
+igs_result_t igsAgent_deactivate(igs_agent_t *agent){
     assert(agent);
     core_initContext();
     igs_agent_t *a = NULL;
@@ -85,6 +89,17 @@ int igsAgent_deactivate(igs_agent_t *agent){
         return IGS_FAILURE;
     }
     return IGS_SUCCESS;
+}
+
+bool igsAgent_isActivated(igs_agent_t *agent){
+    assert(agent);
+    igs_agent_t *a = NULL;
+    HASH_FIND_STR(coreContext->agents, agent->uuid, a);
+    if (a != NULL){
+        return true;
+    }else{
+        return false;
+    }
 }
 
 void igsAgent_log(igs_logLevel_t level, const char *function, igs_agent_t *agent, const char *format, ...){

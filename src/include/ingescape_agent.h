@@ -22,8 +22,9 @@ PUBLIC igs_agent_t *igsAgent_new(const char *name, bool activateImmediately);
 PUBLIC void igsAgent_destroy(igs_agent_t **agent);
 
 //Attach and detach agent from context
-PUBLIC int igsAgent_activate(igs_agent_t *agent);
-PUBLIC int igsAgent_deactivate(igs_agent_t *agent);
+PUBLIC igs_result_t igsAgent_activate(igs_agent_t *agent);
+PUBLIC igs_result_t igsAgent_deactivate(igs_agent_t *agent);
+PUBLIC bool igsAgent_isActivated(igs_agent_t *agent);
 
 /*
  All the functions below behave the same as the functions presented
