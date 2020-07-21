@@ -395,7 +395,7 @@ void model_readWriteUnlock(void);
 // network
 #define IGS_PRIVATE_CHANNEL "INGESCAPE_PRIVATE"
 #define IGS_DEFAULT_AGENT_NAME "no_name"
-int network_publishOutput (igs_agent_t *agent, const igs_iop_t *iop);
+igs_result_t network_publishOutput (igs_agent_t *agent, const igs_iop_t *iop);
 
 // parser
 PUBLIC igs_definition_t* parser_loadDefinition (const char* json_str);

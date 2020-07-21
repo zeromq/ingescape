@@ -580,6 +580,7 @@ int manageRemotePublication (zloop_t *loop, zsock_t *socket, void *arg){
     
     igs_remote_agent_t *remoteAgent = NULL;
     HASH_FIND_STR(context->remoteAgents, uuid, remoteAgent);
+    assert(remoteAgent);
     handlePublicationFromRemoteAgent(msg, remoteAgent);
     zmsg_destroy(&msg);
     return 0;
@@ -1556,6 +1557,9 @@ int triggerDefinitionUpdate(zloop_t *loop, int timer_id, void *arg){
                 }
                 free(definitionStr);
             }
+            //NB: this is not optimal to resend state details on definition change but it
+            //is the cleanest way to send state on after-start agent activation.
+            //State details are still sent individually when they change.
             sendStateTo(agent, IGS_PRIVATE_CHANNEL, false);
             agent->network_needToSendDefinitionUpdate = false;
             //when definition changes, mapping may need to be updated as well
@@ -2048,75 +2052,99 @@ void initLoop (igs_core_context_t *context){
 // PRIVATE API
 ////////////////////////////////////////////////////////////////////////
 
-int network_publishOutput (igs_agent_t *agent, const igs_iop_t *iop){
+igs_result_t network_publishOutput (igs_agent_t *agent, const igs_iop_t *iop){
     assert(agent);
     assert(agent->context);
     assert(agent->uuid);
     assert(iop);
     assert(iop->name);
-    int result = 0;
+    int result = IGS_SUCCESS;
     
-    model_readWriteLock();
-    if(agent->context->publisher != NULL)
+    
+    if(agent->context->networkActor && agent->context->publisher)
     {
         if(!agent->isWholeAgentMuted && !iop->is_muted && !agent->context->isFrozen)
         {
+            model_readWriteLock();
             zmsg_t *msg = zmsg_new();
             zmsg_addstrf(msg, "%s-%s", agent->uuid, iop->name);
             zmsg_addstrf(msg, "%d", iop->value_type);
             switch (iop->value_type) {
                 case IGS_INTEGER_T:
                     zmsg_addmem(msg, &(iop->value.i), sizeof(int));
-                    igsAgent_debug(agent, "%s publishes %s -> %d", agent->uuid, iop->name, iop->value.i);
+                    igsAgent_debug(agent, "%s(%s) publishes %s -> %d",
+                                   agent->name, agent->uuid, iop->name, iop->value.i);
                     break;
                 case IGS_DOUBLE_T:
                     zmsg_addmem(msg, &(iop->value.d), sizeof(double));
-                    igsAgent_debug(agent, "%s publishes %s -> %f", agent->uuid, iop->name, iop->value.d);
+                    igsAgent_debug(agent, "%s(%s) publishes %s -> %f",
+                                   agent->name, agent->uuid, iop->name, iop->value.d);
                     break;
                 case IGS_BOOL_T:
                     zmsg_addmem(msg, &(iop->value.b), sizeof(bool));
-                    igsAgent_debug(agent, "%s publishes %s -> %d", agent->uuid, iop->name, iop->value.b);
+                    igsAgent_debug(agent, "%s(%s) publishes %s -> %d",
+                                   agent->name, agent->uuid, iop->name, iop->value.b);
                     break;
                 case IGS_STRING_T:
                     zmsg_addstr(msg, iop->value.s);
-                    igsAgent_debug(agent, "%s publishes %s -> '%s'", agent->uuid, iop->name, iop->value.s);
+                    igsAgent_debug(agent, "%s(%s) publishes %s -> '%s'",
+                                   agent->name, agent->uuid, iop->name, iop->value.s);
                     break;
                 case IGS_IMPULSION_T:
                     zmsg_addmem(msg, NULL, 0);
-                    igsAgent_debug(agent, "%s publishes impulsion %s", agent->uuid, iop->name);
+                    igsAgent_debug(agent, "%s(%s) publishes impulsion %s",
+                                   agent->name, agent->uuid, iop->name);
                     break;
                 case IGS_DATA_T:{
                     zframe_t *frame = zframe_new(iop->value.data, iop->valueSize);
                     zmsg_append(msg, &frame);
-                    igsAgent_debug(agent, "%s publishes data %s (%zu bytes)", agent->uuid, iop->name, iop->valueSize);
+                    igsAgent_debug(agent, "%s(%s) publishes data %s (%zu bytes)",
+                                   agent->name, agent->uuid, iop->name, iop->valueSize);
                 }
                     break;
                 default:
                     break;
             }
+            
+            //1- publish to TCP
             zmsg_t *msgBis = zmsg_dup(msg);
-            //successively publish to TCP, IPC and inproc
+            zmsg_t *msgTer = zmsg_dup(msg);
+            zmsg_t *msgQuater = zmsg_dup(msg);
             if (zmsg_send(&msg, coreContext->publisher) != 0){
                 igsAgent_error(agent, "Could not publish output %s on the network\n",iop->name);
-                zmsg_destroy(&msgBis);
-            }else{
-                result = 1;
-                zmsg_t *msgTer = zmsg_dup(msgBis);
-                if (coreContext->ipcPublisher != NULL){
-                    //publisher can be NULL on IOS or for read/write problems with assigned IPC path
-                    //in both cases, an error message has been issued at start
-                    if (zmsg_send(&msgBis, coreContext->ipcPublisher) != 0){
-                        igsAgent_error(agent, "Could not publish output %s using IPC\n",iop->name);
-                        zmsg_destroy(&msgBis);
-                    }
-                }
-                if (coreContext->inprocPublisher != NULL){
-                    if (zmsg_send(&msgTer, coreContext->inprocPublisher) != 0){
-                        igsAgent_error(agent, "Could not publish output %s using inproc\n",iop->name);
-                        zmsg_destroy(&msgTer);
-                    }
+                zmsg_destroy(&msg);
+                result = IGS_FAILURE;
+            }
+            //2- publish to IPC
+            if (coreContext->ipcPublisher != NULL){
+                //publisher can be NULL on IOS or for read/write problems with assigned IPC path
+                //in both cases, an error message has been issued at start
+                if (zmsg_send(&msgBis, coreContext->ipcPublisher) != 0){
+                    igsAgent_error(agent, "Could not publish output %s using IPC\n",iop->name);
+                    zmsg_destroy(&msgBis);
+                    result = IGS_FAILURE;
                 }
             }
+            //3- publish to inproc
+            if (coreContext->inprocPublisher != NULL){
+                if (zmsg_send(&msgTer, coreContext->inprocPublisher) != 0){
+                    igsAgent_error(agent, "Could not publish output %s using inproc\n",iop->name);
+                    zmsg_destroy(&msgTer);
+                    result = IGS_FAILURE;
+                }
+            }
+            //4- distribute publication to other agents inside our context without using network
+            free(zmsg_popstr(msgQuater)); //remove composite uuid/iop name
+            zmsg_pushstr(msgQuater, iop->name); //replace it by simple iop name
+            //Generate a temporary fake remote agent, containing only
+            //necessary information for handlePublicationFromRemoteAgent.
+            igs_remote_agent_t *fakeRemote = calloc(1, sizeof(igs_remote_agent_t));
+            fakeRemote->context = coreContext;
+            fakeRemote->name = agent->name;
+            model_readWriteUnlock(); //to avoid deadlock inside handlePublicationFromRemoteAgent
+            handlePublicationFromRemoteAgent(msgQuater, fakeRemote);
+            free(fakeRemote);
+            
         }else{
             if (agent->isWholeAgentMuted){
                 igsAgent_debug(agent, "Should publish output %s but the agent has been muted",iop->name);
@@ -2130,8 +2158,8 @@ int network_publishOutput (igs_agent_t *agent, const igs_iop_t *iop){
         }
     }else{
         igsAgent_warn(agent, "agent not started : could not publish output %s", iop->name);
+        result = IGS_FAILURE;
     }
-    model_readWriteUnlock();
     return result;
 }
 
