@@ -1419,18 +1419,18 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 assert(agent);
                 
                 char *callName = zmsg_popstr(msgDuplicate);
-                igs_call_t *call = NULL;
                 if (agent->definition != NULL && agent->definition->calls_table != NULL){
+                    igs_call_t *call = NULL;
                     HASH_FIND_STR(agent->definition->calls_table, callName, call);
                     if (call != NULL ){
                         if (call->cb != NULL){
                             bus_zyreLock();
-                            zyre_shouts(context->node, context->callsChannel, "%s from %s (%s)", callName, name, peer);
+                            zyre_shouts(context->node, context->callsChannel, "%s from %s (%s)", callName, agent->name, agent->uuid);
                             bus_zyreUnlock();
                             size_t nbArgs = 0;
                             igs_callArgument_t *_arg = NULL;
                             LL_COUNT(call->arguments, _arg, nbArgs);
-                            if (call_addValuesToArgumentsFromMessage(callName, call->arguments, msgDuplicate)){
+                            if (call_addValuesToArgumentsFromMessage(callName, call->arguments, msgDuplicate) == IGS_SUCCESS){
                                 (call->cb)(agent, name, peer, callName, call->arguments, nbArgs, call->cbData);
                                 call_freeValuesInArguments(call->arguments);
                             }
@@ -2133,7 +2133,7 @@ igs_result_t network_publishOutput (igs_agent_t *agent, const igs_iop_t *iop){
                     result = IGS_FAILURE;
                 }
             }
-            //4- distribute publication to other agents inside our context without using network
+            //4- distribute publication message to other agents inside our context without using network
             free(zmsg_popstr(msgQuater)); //remove composite uuid/iop name
             zmsg_pushstr(msgQuater, iop->name); //replace it by simple iop name
             //Generate a temporary fake remote agent, containing only

@@ -415,8 +415,9 @@ void bus_zyreUnlock(void);
 
 //call
 void call_freeCall(igs_call_t *t);
-bool call_addValuesToArgumentsFromMessage(const char *name, igs_callArgument_t *arg, zmsg_t *msg);
-int call_freeValuesInArguments(igs_callArgument_t *arg);
+igs_result_t call_addValuesToArgumentsFromMessage(const char *name, igs_callArgument_t *arg, zmsg_t *msg);
+igs_result_t call_copyArguments(igs_callArgument_t *source, igs_callArgument_t *destination);
+void call_freeValuesInArguments(igs_callArgument_t *arg);
 
 //license
 #define ENABLE_LICENSE_ENFORCEMENT 1
