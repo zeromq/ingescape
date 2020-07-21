@@ -18,7 +18,7 @@ extern "C" {
 
 //agent creation and destruction
 typedef struct igs_agent igs_agent_t;
-PUBLIC igs_agent_t *igsAgent_new(const char *name);
+PUBLIC igs_agent_t *igsAgent_new(const char *name, bool activateImmediately);
 PUBLIC void igsAgent_destroy(igs_agent_t **agent);
 
 //Attach and detach agent from context

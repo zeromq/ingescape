@@ -47,13 +47,10 @@ void core_forcedStopCB(igs_agent_t *agent, void *myData){
 void core_initAgent(){
     core_initContext();
     if (coreAgent == NULL){
-        coreAgent = igsAgent_new(IGS_DEFAULT_AGENT_NAME);
+        coreAgent = igsAgent_new(IGS_DEFAULT_AGENT_NAME, false);
         igsAgent_observeForcedStop(coreAgent, core_forcedStopCB, NULL);
         coreAgent->context = coreContext;
-        zuuid_t *uuid = zuuid_new();
-        coreAgent->uuid = strdup(zuuid_str(uuid));
         HASH_ADD_STR(coreContext->agents, uuid, coreAgent);
-        zuuid_destroy(&uuid);
     }
 }
 

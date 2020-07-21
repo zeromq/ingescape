@@ -274,6 +274,133 @@ void sendMappingToZyrePeer(igs_agent_t *agent, const char *peer, const char *map
     bus_zyreUnlock();
 }
 
+void sendStateTo(igs_agent_t *agent, const char *peerOrChannel, bool isForPeer){
+    assert(agent);
+    assert(agent->context);
+    assert(agent->context->node);
+    assert(peerOrChannel);
+    igs_core_context_t *context = agent->context;
+    if (agent->definition != NULL && agent->definition->outputs_table != NULL){
+        igs_iop_t *current_iop, *tmp_iop;
+        HASH_ITER(hh, agent->definition->outputs_table, current_iop, tmp_iop) {
+            if (current_iop->is_muted && current_iop->name != NULL){
+                bus_zyreLock();
+                zmsg_t *msg = zmsg_new();
+                zmsg_addstr(msg, "OUTPUT_MUTED");
+                zmsg_addstr(msg, current_iop->name);
+                zmsg_addstr(msg, agent->uuid);
+                if (isForPeer){
+                    zyre_whisper(context->node, peerOrChannel, &msg);
+                }else{
+                    zyre_shout(context->node, peerOrChannel, &msg);
+                }
+                bus_zyreUnlock();
+            }
+        }
+    }
+    //we also send our frozen and muted states, and other usefull information
+    if (agent->isWholeAgentMuted){
+        bus_zyreLock();
+        zmsg_t *msg = zmsg_new();
+        zmsg_addstr(msg, "MUTED");
+        zmsg_addstr(msg, "1");
+        zmsg_addstr(msg, agent->uuid);
+        if (isForPeer){
+            zyre_whisper(context->node, peerOrChannel, &msg);
+        }else{
+            zyre_shout(context->node, peerOrChannel, &msg);
+        }
+        bus_zyreUnlock();
+    }
+    if (agent->state != NULL){
+        bus_zyreLock();
+        zmsg_t *msg = zmsg_new();
+        zmsg_addstr(msg, "STATE");
+        zmsg_addstr(msg, agent->state);
+        zmsg_addstr(msg, agent->uuid);
+        if (isForPeer){
+            zyre_whisper(context->node, peerOrChannel, &msg);
+        }else{
+            zyre_shout(context->node, peerOrChannel, &msg);
+        }
+        bus_zyreUnlock();
+    }
+    if (agent->definitionPath != NULL){
+        bus_zyreLock();
+        zmsg_t *msg = zmsg_new();
+        zmsg_addstr(msg, "DEFINITION_FILE_PATH");
+        zmsg_addstr(msg, agent->definitionPath);
+        zmsg_addstr(msg, agent->uuid);
+        if (isForPeer){
+            zyre_whisper(context->node, peerOrChannel, &msg);
+        }else{
+            zyre_shout(context->node, peerOrChannel, &msg);
+        }
+        bus_zyreUnlock();
+    }
+    if (agent->mappingPath != NULL){
+        bus_zyreLock();
+        zmsg_t *msg = zmsg_new();
+        zmsg_addstr(msg, "MAPPING_FILE_PATH");
+        zmsg_addstr(msg, agent->mappingPath);
+        zmsg_addstr(msg, agent->uuid);
+        if (isForPeer){
+            zyre_whisper(context->node, peerOrChannel, &msg);
+        }else{
+            zyre_shout(context->node, peerOrChannel, &msg);
+        }
+        bus_zyreUnlock();
+    }
+    if (context->isFrozen){
+        bus_zyreLock();
+        zmsg_t *msg = zmsg_new();
+        zmsg_addstr(msg, "FROZEN");
+        zmsg_addstr(msg, "1");
+        zmsg_addstr(msg, agent->uuid);
+        if (isForPeer){
+            zyre_whisper(context->node, peerOrChannel, &msg);
+        }else{
+            zyre_shout(context->node, peerOrChannel, &msg);
+        }
+        bus_zyreUnlock();
+    }
+    if (context->logInStream){
+        bus_zyreLock();
+        zmsg_t *msg = zmsg_new();
+        zmsg_addstr(msg, "LOG_IN_STREAM");
+        zmsg_addstr(msg, "1");
+        zmsg_addstr(msg, agent->uuid);
+        if (isForPeer){
+            zyre_whisper(context->node, peerOrChannel, &msg);
+        }else{
+            zyre_shout(context->node, peerOrChannel, &msg);
+        }
+        bus_zyreUnlock();
+    }
+    if (context->logInFile){
+        bus_zyreLock();
+        zmsg_t *msg = zmsg_new();
+        zmsg_addstr(msg, "LOG_IN_FILE");
+        zmsg_addstr(msg, "1");
+        zmsg_addstr(msg, agent->uuid);
+        if (isForPeer){
+            zyre_whisper(context->node, peerOrChannel, &msg);
+        }else{
+            zyre_shout(context->node, peerOrChannel, &msg);
+        }
+        msg = zmsg_new();
+        zmsg_addstr(msg, "LOG_FILE_PATH");
+        zmsg_addstr(msg, context->logFilePath);
+        zmsg_addstr(msg, agent->uuid);
+        if (isForPeer){
+            zyre_whisper(context->node, peerOrChannel, &msg);
+        }else{
+            zyre_shout(context->node, peerOrChannel, &msg);
+        }
+        bus_zyreUnlock();
+    }
+}
+
 void cleanAndFreeRemoteAgent(igs_remote_agent_t **remoteAgent){
     assert(remoteAgent);
     assert(*remoteAgent);
@@ -618,89 +745,8 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 }else{
                     sendMappingToZyrePeer(agent, peer, "");
                 }
-                if (agent->definition != NULL && agent->definition->outputs_table != NULL){
-                    igs_iop_t *current_iop, *tmp_iop;
-                    HASH_ITER(hh, agent->definition->outputs_table, current_iop, tmp_iop) {
-                        if (current_iop->is_muted && current_iop->name != NULL){
-                            bus_zyreLock();
-                            zmsg_t *msg = zmsg_new();
-                            zmsg_addstr(msg, "OUTPUT_MUTED");
-                            zmsg_addstr(msg, current_iop->name);
-                            zmsg_addstr(msg, agent->uuid);
-                            zyre_whisper(context->node, peer, &msg);
-                            bus_zyreUnlock();
-                        }
-                    }
-                }
-                //we also send our frozen and muted states, and other usefull information
-                if (agent->isWholeAgentMuted){
-                    bus_zyreLock();
-                    zmsg_t *msg = zmsg_new();
-                    zmsg_addstr(msg, "MUTED");
-                    zmsg_addstr(msg, "1");
-                    zmsg_addstr(msg, agent->uuid);
-                    zyre_whisper(context->node, peer, &msg);
-                    bus_zyreUnlock();
-                }
-                if (agent->state != NULL){
-                    bus_zyreLock();
-                    zmsg_t *msg = zmsg_new();
-                    zmsg_addstr(msg, "STATE");
-                    zmsg_addstr(msg, agent->state);
-                    zmsg_addstr(msg, agent->uuid);
-                    zyre_whisper(context->node, peer, &msg);
-                    bus_zyreUnlock();
-                }
-                if (agent->definitionPath != NULL){
-                    bus_zyreLock();
-                    zmsg_t *msg = zmsg_new();
-                    zmsg_addstr(msg, "DEFINITION_FILE_PATH");
-                    zmsg_addstr(msg, agent->definitionPath);
-                    zmsg_addstr(msg, agent->uuid);
-                    zyre_whisper(context->node, peer, &msg);
-                    bus_zyreUnlock();
-                }
-                if (agent->mappingPath != NULL){
-                    bus_zyreLock();
-                    zmsg_t *msg = zmsg_new();
-                    zmsg_addstr(msg, "MAPPING_FILE_PATH");
-                    zmsg_addstr(msg, agent->mappingPath);
-                    zmsg_addstr(msg, agent->uuid);
-                    zyre_whisper(context->node, peer, &msg);
-                    bus_zyreUnlock();
-                }
-                if (context->isFrozen){
-                    bus_zyreLock();
-                    zmsg_t *msg = zmsg_new();
-                    zmsg_addstr(msg, "FROZEN");
-                    zmsg_addstr(msg, "1");
-                    zmsg_addstr(msg, agent->uuid);
-                    zyre_whisper(context->node, peer, &msg);
-                    bus_zyreUnlock();
-                }
-                if (context->logInStream){
-                    bus_zyreLock();
-                    zmsg_t *msg = zmsg_new();
-                    zmsg_addstr(msg, "LOG_IN_STREAM");
-                    zmsg_addstr(msg, "1");
-                    zmsg_addstr(msg, agent->uuid);
-                    zyre_whisper(context->node, peer, &msg);
-                    bus_zyreUnlock();
-                }
-                if (context->logInFile){
-                    bus_zyreLock();
-                    zmsg_t *msg = zmsg_new();
-                    zmsg_addstr(msg, "LOG_IN_FILE");
-                    zmsg_addstr(msg, "1");
-                    zmsg_addstr(msg, agent->uuid);
-                    zyre_whisper(context->node, peer, &msg);
-                    msg = zmsg_new();
-                    zmsg_addstr(msg, "LOG_FILE_PATH");
-                    zmsg_addstr(msg, context->logFilePath);
-                    zmsg_addstr(msg, agent->uuid);
-                    zyre_whisper(context->node, peer, &msg);
-                    bus_zyreUnlock();
-                }
+                //and so is the state of our internal variables
+                sendStateTo(agent, peer, true);
             }
             
             igs_zyre_peer_t *zyrePeer = NULL;
@@ -755,6 +801,23 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                     free(input);
                 }
             }
+        }else if (streq(group, IGS_PRIVATE_CHANNEL)){
+            char *title = zmsg_popstr (msgDuplicate);
+            if (streq(title, "REMOTE_AGENT_EXIT")){
+                char *uuid = zmsg_popstr (msgDuplicate);
+                igs_remote_agent_t *remote = NULL;
+                HASH_FIND_STR(context->remoteAgents, uuid, remote);
+                if (remote){
+                    igs_error("%s (%s) exited", remote->name, uuid);
+                    HASH_DEL(context->remoteAgents, remote);
+                    cleanAndFreeRemoteAgent(&remote);
+                }else{
+                    igs_error("%s is not a known remote agent", uuid);
+                }
+                if (uuid)
+                    free(uuid);
+            }
+            free(title);
         }
     } else if(streq (event, "WHISPER")){
         char *title = zmsg_popstr (msgDuplicate);
@@ -1485,14 +1548,15 @@ int triggerDefinitionUpdate(zloop_t *loop, int timer_id, void *arg){
             char * definitionStr = NULL;
             definitionStr = parser_export_definition(agent->definition);
             if (definitionStr != NULL){
-                igs_zyre_peer_t *a, *tmp;
-                HASH_ITER(hh, context->zyrePeers, a, tmp){
-                    if (a->hasJoinedPrivateChannel){
-                        sendDefinitionToZyrePeer(agent, a->peerId, definitionStr);
+                igs_zyre_peer_t *p, *tmp;
+                HASH_ITER(hh, context->zyrePeers, p, tmp){
+                    if (p->hasJoinedPrivateChannel){
+                        sendDefinitionToZyrePeer(agent, p->peerId, definitionStr);
                     }
                 }
                 free(definitionStr);
             }
+            sendStateTo(agent, IGS_PRIVATE_CHANNEL, false);
             agent->network_needToSendDefinitionUpdate = false;
             //when definition changes, mapping may need to be updated as well
             agent->network_needToUpdateMapping = true;
@@ -1918,9 +1982,9 @@ void initLoop (igs_core_context_t *context){
         ret = readlink("/proc/self/exe", pathbuf, sizeof(pathbuf));
 #endif
         if ( ret <= 0 ) {
-            igs_error("PID %d: proc_pidpath () - %s", context->processId, strerror(errno));
+            igs_debug("PID %d: proc_pidpath () - %s", context->processId, strerror(errno));
         } else {
-            igs_error("proc %d: %s", context->processId, pathbuf);
+            igs_debug("proc %d: %s", context->processId, pathbuf);
         }
         bus_zyreLock();
         zyre_set_header(context->node, "commandline", "%s", pathbuf);

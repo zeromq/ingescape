@@ -11,16 +11,19 @@
 #include "ingescape_private.h"
 #include "ingescape_agent.h"
 
-igs_agent_t *igsAgent_new(const char *name){
+igs_agent_t *igsAgent_new(const char *name, bool activateImmediately){
     igs_agent_t *agent = calloc(1, sizeof(igs_agent_t));
     zuuid_t *uuid = zuuid_new();
     agent->uuid = strdup(zuuid_str(uuid));
     zuuid_destroy(&uuid);
     agent->name = strndup((name == NULL)?IGS_DEFAULT_AGENT_NAME:name, IGS_MAX_AGENT_NAME_LENGTH);
+    if (activateImmediately)
+        igsAgent_activate(agent);
     return agent;
 }
 
 void igsAgent_destroy(igs_agent_t **agent){
+    igsAgent_activate(*agent);
     if ((*agent)->uuid != NULL)
         free((*agent)->uuid);
     if ((*agent)->name != NULL)
@@ -60,7 +63,9 @@ int igsAgent_activate(igs_agent_t *agent){
         igs_error("agent %s (%s) is already activated", agent->name, agent->uuid);
         return IGS_FAILURE;
     }else{
+        agent->context = coreContext;
         HASH_ADD_STR(coreContext->agents, uuid, agent);
+        agent->network_needToSendDefinitionUpdate = true; //will also trigger mapping update
     }
     return IGS_SUCCESS;
 }
@@ -72,6 +77,14 @@ int igsAgent_deactivate(igs_agent_t *agent){
     HASH_FIND_STR(coreContext->agents, agent->uuid, a);
     if (a != NULL){
         HASH_DEL(coreContext->agents, agent);
+        agent->context = NULL;
+        if (coreContext->networkActor && coreContext->node){
+            zmsg_t *msg = zmsg_new();
+            zmsg_addstr(msg, "REMOTE_AGENT_EXIT");
+            zmsg_addstr(msg, agent->uuid);
+            zmsg_addstr(msg, agent->name);
+            zyre_shout(coreContext->node, IGS_PRIVATE_CHANNEL, &msg);
+        }
     }else{
         igs_error("agent %s (%s) is not activated", agent->name, agent->uuid);
         return IGS_FAILURE;
