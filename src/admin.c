@@ -140,6 +140,7 @@ int igs_protocol(void){
 }
 
 void admin_log(igs_agent_t *agent, igs_logLevel_t level, const char *function, const char *fmt, ...){
+    core_initAgent();
     assert(agent);
     assert(function);
     assert(fmt);
@@ -177,16 +178,19 @@ void admin_log(igs_agent_t *agent, igs_logLevel_t level, const char *function, c
                     printf("error while creating log path %s\n", coreContext->logFilePath);
                 }
             }
-            strncat(coreContext->logFilePath, agent->name, IGS_MAX_PATH_LENGTH);
+            strncat(coreContext->logFilePath, coreAgent->name, IGS_MAX_PATH_LENGTH);
             strncat(coreContext->logFilePath, ".log", IGS_MAX_PATH_LENGTH);
             printf("using log file %s\n", coreContext->logFilePath);
             if (coreContext != NULL && coreContext->node != NULL){
                 bus_zyreLock();
-                zmsg_t *msg = zmsg_new();
-                zmsg_addstr(msg, "LOG_FILE_PATH");
-                zmsg_addstr(msg, coreContext->logFilePath);
-                zmsg_addstr(msg, agent->uuid);
-                zyre_shout(coreContext->node, IGS_PRIVATE_CHANNEL, &msg);
+                igs_agent_t *a, *tmp;
+                HASH_ITER(hh, coreContext->agents, a, tmp){
+                    zmsg_t *msg = zmsg_new();
+                    zmsg_addstr(msg, "LOG_FILE_PATH");
+                    zmsg_addstr(msg, coreContext->logFilePath);
+                    zmsg_addstr(msg, a->uuid);
+                    zyre_shout(coreContext->node, IGS_PRIVATE_CHANNEL, &msg);
+                }
                 bus_zyreUnlock();
             }
         }
@@ -228,7 +232,6 @@ void admin_log(igs_agent_t *agent, igs_logLevel_t level, const char *function, c
         zstr_sendf(coreContext->logger, "%s;%s;%s;%s\n", agent->name, log_levels[level], function, logContentForFile);
     }
     admin_unlock();
-
 }
 
 void igs_setLogLevel (igs_logLevel_t level){
@@ -363,7 +366,6 @@ void igs_setLogPath(const char *path){
         }
         if (coreContext->logFile != NULL && coreContext != NULL && coreContext->node != NULL){
             bus_zyreLock();
-            
             igs_agent_t *agent, *tmp;
             HASH_ITER(hh, coreContext->agents, agent, tmp){
                 zmsg_t *msg = zmsg_new();
