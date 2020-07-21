@@ -67,7 +67,7 @@ echo ""
 #licenses for diota
 echo "License for Diota Shiva"
 ingelicense \
-    --id Diota \
+    --id DiotaShiva \
     --customer DiotaShiva \
     --order Eval \
     --expiration 2020/12/31 \
@@ -86,7 +86,7 @@ echo ""
 #licenses for eurocontrol
 echo "License for Eurocontrol"
 ingelicense \
-    --id Diota \
+    --id EurocontrolPJ09 \
     --customer "Eurocontrol PJ09" \
     --order Eval \
     --expiration 2020/12/31 \
@@ -105,18 +105,18 @@ echo ""
 #licenses for NATO SACT
 echo "License for NATO SACT"
 ingelicense \
-    --id Diota \
-    --customer "NATO SACT" \
-    --order Eval \
-    --expiration 2025/12/31 \
-    --editorExpiration 2025/12/31 \
+    --id NATO-ACT \
+    --customer "NATO ACT" \
+    --order I2-20-014-NATO \
+    --expiration 2040/12/31 \
+    --editorExpiration 2021/07/31 \
     --features /Users/steph/code/ingescape/ingescape/ingelicense/src/features.txt \
     --agents /Users/steph/code/ingescape/ingescape/ingelicense/src/agents.txt \
-    --editorOwner "NATO SACT" \
+    --editorOwner "NATO ACT" \
     --features ./src/features.txt \
     --agents ./src/agents.txt \
     --output ./licenses/NATO_SACT.igslicense
 echo ""
-echo "Read license for NATO SACT"
-ingelicense --read ./licenses/EurocontrolPJ09.igslicense
+echo "Read license for NATO ACT"
+ingelicense --read ./licenses/NATO_SACT.igslicense
 echo ""
