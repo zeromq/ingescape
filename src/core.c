@@ -38,9 +38,8 @@ void core_initContext(){
 }
 
 //////////////////  CORE AGENT //////////////////
-void core_forcedStopCB(igs_agent_t *agent, void *myData){
+void core_forcedStopCB(void *myData){
     IGS_UNUSED(myData)
-    IGS_UNUSED(agent)
     igs_Interrupted = true;
 }
 
@@ -48,29 +47,10 @@ void core_initAgent(){
     core_initContext();
     if (coreAgent == NULL){
         coreAgent = igsAgent_new(IGS_DEFAULT_AGENT_NAME, false);
-        igsAgent_observeForcedStop(coreAgent, core_forcedStopCB, NULL);
+        igs_observeForcedStop(core_forcedStopCB, NULL);
         coreAgent->context = coreContext;
         HASH_ADD_STR(coreContext->agents, uuid, coreAgent);
     }
-}
-
-typedef struct {
-    igs_forcedStopCallback cb;
-    void *myData;
-} observeForcedStopCbWrapper_t;
-
-void core_observeForcedStopCallback(igs_agent_t *agent, void *myData){
-    IGS_UNUSED(agent)
-    observeForcedStopCbWrapper_t *wrap = (observeForcedStopCbWrapper_t *)myData;
-    wrap->cb(wrap->myData);
-}
-
-void igs_observeForcedStop(igs_forcedStopCallback cb, void *myData){
-    core_initAgent();
-    observeForcedStopCbWrapper_t *wrap = calloc(1, sizeof(observeForcedStopCbWrapper_t));
-    wrap->cb = cb;
-    wrap->myData = myData;
-    igsAgent_observeForcedStop(coreAgent, core_observeForcedStopCallback, wrap);
 }
 
 igs_result_t igs_setAgentName(const char *name){

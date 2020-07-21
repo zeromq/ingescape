@@ -30,9 +30,6 @@ PUBLIC int igsAgent_deactivate(igs_agent_t *agent);
  in ingescape.h, except that they take an agent instance as first argument.
  */
 
-typedef void (*igsAgent_forcedStopCallback)(igs_agent_t *agent, void *myData);
-PUBLIC void igsAgent_observeForcedStop(igs_agent_t *agent, igsAgent_forcedStopCallback cb, void *myData);
-
 PUBLIC igs_result_t igsAgent_setAgentName(igs_agent_t *agent, const char *name);
 PUBLIC char *igsAgent_getAgentName(igs_agent_t *agent); //char* must be freed by caller
 PUBLIC igs_result_t igsAgent_setAgentState(igs_agent_t *agent, const char *state);

@@ -242,7 +242,7 @@ typedef struct igs_zyre_callback {
 } igs_zyre_callback_t;
 
 typedef struct igs_forced_stop_calback {
-    igsAgent_forcedStopCallback callback_ptr;
+    igs_forcedStopCallback callback_ptr;
     void *myData;
     struct igs_forced_stop_calback *prev;
     struct igs_forced_stop_calback *next;
@@ -267,8 +267,10 @@ typedef struct igs_core_context{
     char *licensePath;
     void *licenseData; //overrides licence files
     size_t licenseDataSize;
+    
     //bus
     igs_service_header_t *serviceHeaders;
+    
     //admin
     FILE *logFile;
     bool logInStream;
@@ -278,6 +280,7 @@ typedef struct igs_core_context{
     igs_logLevel_t logLevel;
     char logFilePath[IGS_MAX_PATH_LENGTH];
     int logNbOfEntries; //for fflush rotation
+    
     //network
     bool network_allowIpc;
     bool network_allowInproc;
@@ -292,12 +295,19 @@ typedef struct igs_core_context{
     bool forcedStop;
     bool isFrozen;
     igs_freeze_callback_t *freezeCallbacks;
+    igs_forced_stop_calback_t *forcedStopCalbacks;
+    
     //performance
     size_t performanceMsgCounter;
     size_t performanceMsgCountTarget;
     size_t performanceMsgSize;
     int64_t performanceStart;
     int64_t performanceStop;
+    
+    //network monitor
+    igs_monitor_t *monitor;
+    igs_monitor_callback_t *monitorCallbacks;
+    bool monitor_shallStartStopAgent;
     
     //initiated at start, cleaned at stop
     char *networkDevice;
@@ -326,11 +336,6 @@ typedef struct igs_core_context{
     zsock_t *logger;
     zloop_t *loop;
     
-    //network monitor
-    igs_monitor_t *monitor;
-    igs_monitor_callback_t *monitorCallbacks;
-    bool monitor_shallStartStopAgent;
-    
 } igs_core_context_t;
 
 /*
@@ -344,7 +349,6 @@ typedef struct igs_agent {
     char *state;
     
     igs_core_context_t *context;
-    igs_forced_stop_calback_t *forcedStopCalbacks;
     
     //definition
     char *definitionPath;

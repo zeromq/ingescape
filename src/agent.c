@@ -35,11 +35,6 @@ void igsAgent_destroy(igs_agent_t **agent){
     if ((*agent)->mappingPath != NULL)
         free((*agent)->mappingPath);
     
-    igs_forced_stop_calback_t *forceCb, *tmp;
-    DL_FOREACH_SAFE((*agent)->forcedStopCalbacks, forceCb, tmp){
-        DL_DELETE((*agent)->forcedStopCalbacks, forceCb);
-        free(forceCb);
-    }
     igs_mute_callback_t *muteCb, *mutetmp;
     DL_FOREACH_SAFE((*agent)->muteCallbacks, muteCb, mutetmp){
         DL_DELETE((*agent)->muteCallbacks, muteCb);

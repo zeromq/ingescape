@@ -1716,8 +1716,8 @@ static void runLoop (zsock_t *mypipe, void *args){
         igs_forced_stop_calback_t *cb = NULL;
         igs_agent_t *a, *tmp;
         HASH_ITER(hh, context->agents, a, tmp){
-            DL_FOREACH(a->forcedStopCalbacks, cb){
-                cb->callback_ptr(a, cb->myData);
+            DL_FOREACH(context->forcedStopCalbacks, cb){
+                cb->callback_ptr(cb->myData);
             }
         }
         context->isInterrupted = true;
@@ -2796,14 +2796,15 @@ void igs_freeNetaddressesList(char **addresses, int nb){
     igs_freeNetdevicesList(addresses, nb);
 }
 
-void igsAgent_observeForcedStop(igs_agent_t *agent, igsAgent_forcedStopCallback cb, void *myData){
+void igs_observeForcedStop(igs_forcedStopCallback cb, void *myData){
+    core_initContext();
     if (cb != NULL){
         igs_forced_stop_calback_t *newCb = calloc(1, sizeof(igs_forced_stop_calback_t));
         newCb->callback_ptr = cb;
         newCb->myData = myData;
-        DL_APPEND(agent->forcedStopCalbacks, newCb);
+        DL_APPEND(coreContext->forcedStopCalbacks, newCb);
     }else{
-        igsAgent_warn(agent, "callback is null");
+        igs_warn("callback is null");
     }
 }
 
