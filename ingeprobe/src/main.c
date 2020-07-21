@@ -624,6 +624,23 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *args){
             printf ("-%s has left %s\n", name, channel);
         } else if (streq (event, "SHOUT")){
             char *message = zmsg_popstr(msg);
+            if (streq(message, "REMOTE_AGENT_EXIT")){
+                char *uuid = zmsg_popstr(msg);
+                agent_t *agent = NULL;
+                HASH_FIND_STR(context->agents, uuid, agent);
+                if (agent){
+                    HASH_DEL(context->agents,agent);
+                    printf("[IGS] %s (%s) exited\n", agent->name, agent->uuid);
+                    free(agent->name);
+                    free(agent->uuid);
+                    if (agent->calls != NULL){
+                        freeCalls(&(agent->calls));
+                    }
+                    free(agent);
+                }
+                zmsg_pushstr(msg, uuid); //put uuid back into message
+                free(uuid);
+            }
             printf("#%s:%s(%s) - %s |", channel, name, peerId, message);
             free(message);
             while ((message = zmsg_popstr(msg))){
@@ -710,6 +727,7 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *args){
                     HASH_ITER(hh, context->agents, a, atmp){
                         if (a->peer == peer){
                             //this agent lost its peer : remove
+                            printf("cleaning agent %s(%s)\n", a->name, a->uuid);
                             HASH_DEL(context->agents,a);
                             free(a->name);
                             free(a->uuid);
@@ -719,7 +737,7 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *args){
                             free(a);
                         }
                     }
-                    
+                    printf("cleaning peer %s(%s)\n", peer->name, peer->uuid);
                     HASH_DEL(context->peers, peer);
                     free(peer->name);
                     free(peer->uuid);
