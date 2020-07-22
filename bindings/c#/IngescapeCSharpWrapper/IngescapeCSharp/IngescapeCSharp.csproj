@@ -14,11 +14,11 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <DefineConstants>DEBUG;TRACE;UNITY_EDITOR,UNITY_STANDALONE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;UTF8_ENCODING</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <DefineConstants>RELEASEx64</DefineConstants>
+    <DefineConstants>RELEASEx64,UNITY_EDITOR,UNITY_STANDALONE</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
