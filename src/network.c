@@ -1474,9 +1474,9 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                     igs_info("message size: %zu bytes", context->performanceMsgSize);
                     igs_info("roundtrip count: %zu", context->performanceMsgCountTarget);
                     igs_info("average latency: %.3f µs", ((double) context->performanceStop - (double) context->performanceStart) / context->performanceMsgCountTarget);
-                    double throughput = (size_t) ((double) context->performanceMsgCountTarget / ((double) context->performanceStop - (double) context->performanceStart) * 1000000);
+                    size_t throughput = (size_t) ((double) context->performanceMsgCountTarget / ((double) context->performanceStop - (double) context->performanceStart) * 1000000);
                     double megabytes = (double) throughput * context->performanceMsgSize / (1024*1024);
-                    igs_info("average roundtrip throughput: %d msg/s", (int)throughput);
+                    igs_info("average roundtrip throughput: %zu msg/s", (size_t)throughput);
                     igs_info("average roundtrip throughput: %.3f MB/s", megabytes);
                     context->performanceMsgCountTarget = 0;
                 } else {
@@ -1916,7 +1916,7 @@ void initLoop (igs_core_context_t *context){
         igs_error("Could not create loopback publishing socket (%s)", context->network_ipcEndpoint);
         canContinue = false;
     }else{
-        zsock_set_sndhwm(context->ipcPublisher, agent->network_hwmValue);
+        zsock_set_sndhwm(context->ipcPublisher, context->network_hwmValue);
         bus_zyreLock();
         zyre_set_header(context->node, "loopback", "%s", zsock_endpoint(ipcPublisher));
         bus_zyreUnlock();
@@ -2004,18 +2004,18 @@ void initLoop (igs_core_context_t *context){
 #if (defined WIN32 || defined _WIN32)
     WSADATA wsaData;
     WSAStartup(MAKEWORD(2,2), &wsaData);
-    if (strlen(agent->commandLine) == 0){
+    if (strlen(context->commandLine) == 0){
         //command line was not set manually : we try to get exec path instead
 
         // Use GetModuleFileName() to get exec path
-        char exeFilePath[IGS_MAX_PATH];
+        char exeFilePath[IGS_MAX_PATH_LENGTH];
 #ifdef UNICODE
         WCHAR temp[IGS_MAX_PATH];
-        GetModuleFileName(NULL,temp,IGS_MAX_PATH);
+        GetModuleFileName(NULL,temp,IGS_MAX_PATH_LENGTH);
         //Conversion in char *
         wcstombs_s(NULL,exeFilePath,sizeof(exeFilePath),temp,sizeof(temp));
 #else
-        GetModuleFileName(NULL,exeFilePath,IGS_MAX_PATH);
+        GetModuleFileName(NULL,exeFilePath,IGS_MAX_PATH_LENGTH);
 #endif
         
         bus_zyreLock();
@@ -2023,7 +2023,7 @@ void initLoop (igs_core_context_t *context){
         bus_zyreUnlock();
     }else{
         bus_zyreLock();
-        zyre_set_header(context->node, "commandline", "%s", agent->commandLine);
+        zyre_set_header(context->node, "commandline", "%s", context->commandLine);
         bus_zyreUnlock();
     }
     DWORD pid = GetCurrentProcessId();
@@ -2368,9 +2368,11 @@ igs_result_t igs_stop(){
 #if (defined WIN32 || defined _WIN32)
         // On Windows, if we don't call zsys_shutdown, the application will crash on exit
         // (WSASTARTUP assertion failure)
-        // NB: Monitoring also uses a zactor, we can not call zsys_shutdown() when it is running
-        igs_debug("calling zsys_shutdown");
-        zsys_shutdown();
+        // NB: Monitoring also uses a zactor, we cannot call zsys_shutdown() when it is running
+        if (coreContext->monitor == NULL){
+            igs_debug("calling zsys_shutdown");
+            zsys_shutdown();
+        }
 #endif
         igs_info("agent stopped");
     }else{
@@ -2682,14 +2684,14 @@ void igs_setCommandLineFromArgs(int argc, const char * argv[]){
     
 #elif (defined WIN32 || defined _WIN32)
     // Use GetModuleFileName() to get exec path, argv[0] do not contain full path
-    char exeFilePath[IGS_MAX_PATH];
+    char exeFilePath[IGS_MAX_PATH_LENGTH];
 #ifdef UNICODE
-    WCHAR temp[IGS_MAX_PATH];
-    GetModuleFileName(NULL,temp,IGS_MAX_PATH);
+    WCHAR temp[IGS_MAX_PATH_LENGTH];
+    GetModuleFileName(NULL,temp,IGS_MAX_PATH_LENGTH);
     //Conversion in char *
     wcstombs_s(NULL,exeFilePath,sizeof(exeFilePath),temp,sizeof(temp));
 #else
-    GetModuleFileName(NULL,exeFilePath,IGS_MAX_PATH);
+    GetModuleFileName(NULL,exeFilePath,IGS_MAX_PATH_LENGTH);
 #endif
     strcat(cmd, exeFilePath);
 #endif

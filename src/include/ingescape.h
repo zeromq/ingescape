@@ -367,7 +367,7 @@ PUBLIC bool igs_checkLicense(const char *agentId);
 
 //use this callback mechanism to be notified when the timer
 //or number of agents or number of IOPs has been exceeded in demo mode
-PUBLIC int igs_observeLicense(igs_licenseCallback cb, void *myData);
+PUBLIC void igs_observeLicense(igs_licenseCallback cb, void *myData);
     
 //This function loads a license in memory and overrides all provided
 //license files.

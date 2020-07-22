@@ -6,6 +6,10 @@
 //  Copyright © 2019 Ingenuity i/o. All rights reserved.
 //
 
+#if (defined WIN32 || defined _WIN32)
+#include "unixfunctions.h"
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "ingescape_private.h"

@@ -281,11 +281,10 @@ void igs_monitoringDisable(){
     coreContext->monitor = NULL;
     //igsAgent_debug(agent, "still %d agents running in process", igs_nbOfAgentsInProcess);
 #if (defined WIN32 || defined _WIN32)
-    // On Windows, we need to use a sledgehammer to avoid assertion errors
-    // NB: If we don't call zsys_shutdown, the application will crash on exit
+    // NB: If we don't call zsys_shutdown on windows, the application will crash on exit
     // (WSASTARTUP assertion failure)
-    if (igs_nbOfAgentsInProcess == 0) {
-        igsAgent_debug(agent, "calling zsys_shutdown after last agent in process has stopped");
+    if (coreContext->networkActor == NULL) {
+        igs_debug("calling zsys_shutdown");
         zsys_shutdown();
     }
 #endif

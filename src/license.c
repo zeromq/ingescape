@@ -486,13 +486,13 @@ void license_readLicense(igs_core_context_t *context){
             WSAStartup(MAKEWORD(2,2), &wsaData);
 
             // Use GetModuleFileName() to get exec path
-            char pathbuf[IGS_MAX_PATH];
+            char pathbuf[IGS_MAX_PATH_LENGTH];
         #ifdef UNICODE
-            WCHAR temp[IGS_MAX_PATH];
-            GetModuleFileName(NULL,temp,IGS_MAX_PATH);
+            WCHAR temp[IGS_MAX_PATH_LENGTH];
+            GetModuleFileName(NULL,temp,IGS_MAX_PATH_LENGTH);
             wcstombs_s(NULL,pathbuf,sizeof(pathbuf),temp,sizeof(temp));
         #else
-            GetModuleFileName(NULL,pathbuf,IGS_MAX_PATH);
+            GetModuleFileName(NULL,pathbuf,IGS_MAX_PATH_LENGTH);
         #endif
         #endif
             //remove exec name from exec path
@@ -771,13 +771,12 @@ bool igs_checkLicense(const char *agentId){
     return false;
 }
 
-int igs_observeLicense(igs_licenseCallback *cb, void *myData){
+void igs_observeLicense(igs_licenseCallback cb, void *myData){
     core_initContext();
     igs_license_callback_t *l = (igs_license_callback_t *)calloc(1, sizeof(igs_license_callback_t));
     l->callback_ptr = cb;
     l->data = myData;
     DL_APPEND(coreContext->licenseCallbacks, l);
-    return 1;
 }
 
 void igs_loadLicenseData(const void *data, size_t size){

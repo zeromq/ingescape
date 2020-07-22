@@ -491,7 +491,7 @@ char **model_getIopList(igs_agent_t *agent, size_t *nbOfElements, iop_t type){
         default:
             break;
     }
-    long N = (*nbOfElements) = HASH_COUNT(hash);
+    size_t N = (*nbOfElements) = HASH_COUNT(hash);
     if(N < 1)
         return NULL;
     
