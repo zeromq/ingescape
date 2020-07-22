@@ -1762,7 +1762,7 @@ namespace Ingescape
 
             byte[] buffer = new byte[len];
             Marshal.Copy(native, buffer, 0, buffer.Length);
-            Encoding iso = Encoding.GetEncoding("Windows-1252");
+            Encoding iso = Encoding.GetEncoding("ISO-8859-1");
             return iso.GetString(buffer);
         }
 
@@ -1770,7 +1770,7 @@ namespace Ingescape
         {
             //ISO-8859-1
             native += "\0";
-            byte[] bytes = Encoding.GetEncoding("Windows-1252").GetBytes(native);
+            byte[] bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(native);
             Console.WriteLine(BitConverter.ToString(bytes));
             IntPtr ptr = Marshal.AllocHGlobal(bytes.Length);
 
