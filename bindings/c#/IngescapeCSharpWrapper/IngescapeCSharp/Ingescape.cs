@@ -215,7 +215,7 @@ namespace Ingescape
 
 #if UTF8_ENCODING
         //start & stop the agent
-        [DllImport(ingescapeDLLPath)]//, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_startWithDevice(IntPtr networkDevice, int port);
         public static int startWithDevice(string networkDevice, int port)
         {
