@@ -218,12 +218,8 @@ namespace Ingescape
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_startWithDevice(IntPtr networkDevice, int port);
         public static int startWithDevice(string networkDevice, int port)
-        {
-            //ISO-8859-1
-            byte[] networkDevicesBytes = Encoding.GetEncoding("Windows-1252").GetBytes(networkDevice);
-            IntPtr networkDevicePtr = Marshal.AllocHGlobal(networkDevicesBytes.Length);
-
-            Marshal.Copy(networkDevicesBytes, 0, networkDevicePtr, networkDevicesBytes.Length);
+        {            
+            IntPtr networkDevicePtr = StringUTF8ToPtr(networkDevice);            
 
             int result = igs_startWithDevice(networkDevicePtr, port);
 
@@ -1766,8 +1762,20 @@ namespace Ingescape
 
             byte[] buffer = new byte[len];
             Marshal.Copy(native, buffer, 0, buffer.Length);
-            Encoding iso = Encoding.GetEncoding("ISO-8859-1");
+            Encoding iso = Encoding.GetEncoding("Windows-1252");
             return iso.GetString(buffer);
+        }
+
+        public static IntPtr StringUTF8ToPtr(string native)
+        {
+            //ISO-8859-1
+            native += "\0";
+            byte[] bytes = Encoding.GetEncoding("Windows-1252").GetBytes(native);
+            Console.WriteLine(BitConverter.ToString(bytes));
+            IntPtr ptr = Marshal.AllocHGlobal(bytes.Length);
+
+            Marshal.Copy(bytes, 0, ptr, bytes.Length);
+            return ptr;
         }
 
         #endregion
