@@ -907,8 +907,8 @@ binding-deploy-windows-release-x86:
       - master
       - stable
 
-      # Deploy ingescape binding in windows to be able to compile agents
-binding-deploy-windows-release-x64:
+# Deploy ingescape binding in windows to be able to compile agents
+binding-deploy-windows-release-x64-utf8:
   extends: .binding-build-files
   stage: binding-deploy
   variables:
@@ -925,7 +925,7 @@ binding-deploy-windows-release-x64:
       - stable
 
 # Deploy ingescape binding in windows to be able to compile agents
-binding-deploy-windows-release-x86:
+binding-deploy-windows-release-x86-utf8:
   extends: .binding-build-files
   stage: binding-deploy
   variables:
