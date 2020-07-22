@@ -7,20 +7,20 @@
 DEFINES += INGESCAPE_FROM_PRI
 
 SOURCES += \
-    $$PWD/../src/definition.c \
-    $$PWD/../src/mapping.c \
-    $$PWD/../src/model.c \
-    $$PWD/../src/network.c \
-    $$PWD/../src/parser.c \
-    $$PWD/../src/admin.c \
-    $$PWD/../src/bus.c \
-    $$PWD/../src/call.c \
-    $$PWD/../src/license.c \
-    $$PWD/../src/monitor.c \
-    $$PWD/../src/json.c \
-    $$PWD/../src/performance.c \
-    $$PWD/../src/global.c \
-    $$PWD/../src/agent.c \
+    $$PWD/../src/igs_core.c \
+    $$PWD/../src/igs_definition.c \
+    $$PWD/../src/igs_mapping.c \
+    $$PWD/../src/igs_model.c \
+    $$PWD/../src/igs_network.c \
+    $$PWD/../src/igs_parser.c \
+    $$PWD/../src/igs_admin.c \
+    $$PWD/../src/igs_bus.c \
+    $$PWD/../src/igs_call.c \
+    $$PWD/../src/igs_license.c \
+    $$PWD/../src/igs_monitor.c \
+    $$PWD/../src/igs_json.c \
+    $$PWD/../src/igs_performance.c \
+    $$PWD/../src/igs_agent.c \
     $$PWD/../dependencies/yajl/src/yajl_alloc.c \
     $$PWD/../dependencies/yajl/src/yajl_buf.c \
     $$PWD/../dependencies/yajl/src/yajl_encode.c \
@@ -47,6 +47,7 @@ HEADERS += \
 INCLUDEPATH += $$PWD/../src/include \
                $$PWD/../dependencies/yajl/src/api
 
+#CONFIG += object_parallel_to_source
 
 #####################################################################
 #

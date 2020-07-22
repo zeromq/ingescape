@@ -4,7 +4,7 @@ set(macro_current_dir ${CMAKE_CURRENT_LIST_DIR} CACHE INTERNAL "")
 
 # Macro to get ingescape version from C source file
 macro(get_ingescape_version _MAJOR _MINOR _PATCH)
-    file(READ ${macro_current_dir}/../../../src/admin.c _ADMIN_C_CONTENT)
+    file(READ ${macro_current_dir}/../../../src/igs_admin.c _ADMIN_C_CONTENT)
     string(REGEX MATCH "#define INGESCAPE_MAJOR ([0-9]*)" _ ${_ADMIN_C_CONTENT})
     set(${_MAJOR} ${CMAKE_MATCH_1})
     string(REGEX MATCH "#define INGESCAPE_MINOR ([0-9]*)" _ ${_ADMIN_C_CONTENT})

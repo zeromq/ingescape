@@ -77,20 +77,20 @@ message(STATUS "Detected INGESCAPE Version - ${INGESCAPE_VERSION}")
 # Source files
 # ##############################################################################
 list(APPEND ingescape_sources
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/definition.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/mapping.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/network.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/parser.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/admin.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/bus.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/call.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/license.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/monitor.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/json.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/performance.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/agent.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/core.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/igs_definition.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/igs_mapping.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/igs_model.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/igs_network.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/igs_parser.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/igs_admin.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/igs_bus.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/igs_call.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/igs_license.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/igs_monitor.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/igs_json.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/igs_performance.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/igs_agent.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/igs_core.c
     ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/yajl/src/yajl_alloc.c
     ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/yajl/src/yajl_buf.c
     ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/yajl/src/yajl_encode.c
