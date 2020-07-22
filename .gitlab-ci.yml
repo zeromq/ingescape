@@ -712,7 +712,7 @@ binding-csharp-installer-windows-x64-utf8:
       - bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64-UTF8\IngescapeCSharp-*.zip
     name: "binding-csharp-installer-windows-x64"
   dependencies:
-    - binding-csharp-windows-x64
+    - binding-csharp-windows-x64-utf8
 
 # Create runtime install for windows 32 bits
 binding-csharp-installer-windows-x86-utf8:
