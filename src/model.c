@@ -1354,7 +1354,7 @@ void igs_freeIOPList(char ***list, size_t nbOfElements){
     if (list != NULL && *list != NULL){
         if (nbOfElements < 1)
             return;
-        int i = 0;
+        size_t i = 0;
         for (i = 0; i < nbOfElements; i++){
             if ((*list)[i] != NULL){
                 free((*list)[i]);

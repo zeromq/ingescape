@@ -588,6 +588,7 @@ int manageRemotePublication (zloop_t *loop, zsock_t *socket, void *arg){
 
 //manage messages received on the bus
 int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
+    IGS_UNUSED(socket);
     igs_core_context_t *context = (igs_core_context_t *)arg;
     assert(context);
     zyre_t *node = context->node;
@@ -1002,46 +1003,46 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 assert(agent);
                 
                 model_readWriteLock();
-                zmsg_t *msg = zmsg_new();
-                zmsg_addstr(msg, "CURRENT_OUTPUTS");
-                zmsg_addstr(msg, agent->uuid);
+                zmsg_t *msgToSend = zmsg_new();
+                zmsg_addstr(msgToSend, "CURRENT_OUTPUTS");
+                zmsg_addstr(msgToSend, agent->uuid);
                 igs_iop_t *outputs = agent->definition->outputs_table;
                 igs_iop_t *current = NULL;
                 for (current = outputs; current != NULL; current = current->hh.next){
                     switch (current->value_type) {
                         case IGS_INTEGER_T:
-                            zmsg_addstr(msg, current->name);
-                            zmsg_addstrf(msg, "%d", current->value_type);
-                            zmsg_addmem(msg, &(current->value.i), sizeof(int));
+                            zmsg_addstr(msgToSend, current->name);
+                            zmsg_addstrf(msgToSend, "%d", current->value_type);
+                            zmsg_addmem(msgToSend, &(current->value.i), sizeof(int));
                             break;
                         case IGS_DOUBLE_T:
-                            zmsg_addstr(msg, current->name);
-                            zmsg_addstrf(msg, "%d", current->value_type);
-                            zmsg_addmem(msg, &(current->value.d), sizeof(double));
+                            zmsg_addstr(msgToSend, current->name);
+                            zmsg_addstrf(msgToSend, "%d", current->value_type);
+                            zmsg_addmem(msgToSend, &(current->value.d), sizeof(double));
                             break;
                         case IGS_STRING_T:
-                            zmsg_addstr(msg, current->name);
-                            zmsg_addstrf(msg, "%d", current->value_type);
-                            zmsg_addstr(msg, current->value.s);
+                            zmsg_addstr(msgToSend, current->name);
+                            zmsg_addstrf(msgToSend, "%d", current->value_type);
+                            zmsg_addstr(msgToSend, current->value.s);
                             break;
                         case IGS_BOOL_T:
-                            zmsg_addstr(msg, current->name);
-                            zmsg_addstrf(msg, "%d", current->value_type);
-                            zmsg_addmem(msg, &(current->value.b), sizeof(bool));
+                            zmsg_addstr(msgToSend, current->name);
+                            zmsg_addstrf(msgToSend, "%d", current->value_type);
+                            zmsg_addmem(msgToSend, &(current->value.b), sizeof(bool));
                             break;
                         case IGS_IMPULSION_T:
                             //FIXME: we had to disable outputs sending for data and impulsions but
                             //this is not consistent with inputs and parameters
                             //disabled
-                            //                                    zmsg_addstr(msg, found_iop->name);
-                            //                                    zmsg_addstrf(msg, "%d", found_iop->value_type);
-                            //                                    zmsg_addmem(msg, NULL, 0);
+                            //                                    zmsg_addstr(msgToSend, found_iop->name);
+                            //                                    zmsg_addstrf(msgToSend, "%d", found_iop->value_type);
+                            //                                    zmsg_addmem(msgToSend, NULL, 0);
                             break;
                         case IGS_DATA_T:
                             //disabled
-                            //                                    zmsg_addstr(msg, found_iop->name);
-                            //                                    zmsg_addstrf(msg, "%d", found_iop->value_type);
-                            //                                    zmsg_addmem(msg, (found_iop->value.data), found_iop->valueSize);
+                            //                                    zmsg_addstr(msgToSend, found_iop->name);
+                            //                                    zmsg_addstrf(msgToSend, "%d", found_iop->value_type);
+                            //                                    zmsg_addmem(msgToSend, (found_iop->value.data), found_iop->valueSize);
                             break;
                             
                         default:
@@ -1051,7 +1052,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 model_readWriteUnlock();
                 bus_zyreLock();
                 igs_debug("send output values to %s", peer);
-                zyre_whisper(node, peer, &msg);
+                zyre_whisper(node, peer, &msgToSend);
                 bus_zyreUnlock();
                 
             }else if (streq(title, "CURRENT_OUTPUTS")){
@@ -1070,42 +1071,42 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 assert(agent);
                 
                 model_readWriteLock();
-                zmsg_t *msg = zmsg_new();
-                zmsg_addstr(msg, "CURRENT_INPUTS");
-                zmsg_addstr(msg, agent->uuid);
+                zmsg_t *msgToSend = zmsg_new();
+                zmsg_addstr(msgToSend, "CURRENT_INPUTS");
+                zmsg_addstr(msgToSend, agent->uuid);
                 igs_iop_t *outputs = agent->definition->inputs_table;
                 igs_iop_t *current = NULL;
                 for (current = outputs; current != NULL; current = current->hh.next){
                     switch (current->value_type) {
                         case IGS_INTEGER_T:
-                            zmsg_addstr(msg, current->name);
-                            zmsg_addstrf(msg, "%d", current->value_type);
-                            zmsg_addmem(msg, &(current->value.i), sizeof(int));
+                            zmsg_addstr(msgToSend, current->name);
+                            zmsg_addstrf(msgToSend, "%d", current->value_type);
+                            zmsg_addmem(msgToSend, &(current->value.i), sizeof(int));
                             break;
                         case IGS_DOUBLE_T:
-                            zmsg_addstr(msg, current->name);
-                            zmsg_addstrf(msg, "%d", current->value_type);
-                            zmsg_addmem(msg, &(current->value.d), sizeof(double));
+                            zmsg_addstr(msgToSend, current->name);
+                            zmsg_addstrf(msgToSend, "%d", current->value_type);
+                            zmsg_addmem(msgToSend, &(current->value.d), sizeof(double));
                             break;
                         case IGS_STRING_T:
-                            zmsg_addstr(msg, current->name);
-                            zmsg_addstrf(msg, "%d", current->value_type);
-                            zmsg_addstr(msg, current->value.s);
+                            zmsg_addstr(msgToSend, current->name);
+                            zmsg_addstrf(msgToSend, "%d", current->value_type);
+                            zmsg_addstr(msgToSend, current->value.s);
                             break;
                         case IGS_BOOL_T:
-                            zmsg_addstr(msg, current->name);
-                            zmsg_addstrf(msg, "%d", current->value_type);
-                            zmsg_addmem(msg, &(current->value.b), sizeof(bool));
+                            zmsg_addstr(msgToSend, current->name);
+                            zmsg_addstrf(msgToSend, "%d", current->value_type);
+                            zmsg_addmem(msgToSend, &(current->value.b), sizeof(bool));
                             break;
                         case IGS_IMPULSION_T:
-                            zmsg_addstr(msg, current->name);
-                            zmsg_addstrf(msg, "%d", current->value_type);
-                            zmsg_addmem(msg, NULL, 0);
+                            zmsg_addstr(msgToSend, current->name);
+                            zmsg_addstrf(msgToSend, "%d", current->value_type);
+                            zmsg_addmem(msgToSend, NULL, 0);
                             break;
                         case IGS_DATA_T:
-                            zmsg_addstr(msg, current->name);
-                            zmsg_addstrf(msg, "%d", current->value_type);
-                            zmsg_addmem(msg, (current->value.data), current->valueSize);
+                            zmsg_addstr(msgToSend, current->name);
+                            zmsg_addstrf(msgToSend, "%d", current->value_type);
+                            zmsg_addmem(msgToSend, (current->value.data), current->valueSize);
                             break;
                             
                         default:
@@ -1115,7 +1116,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 model_readWriteUnlock();
                 bus_zyreLock();
                 igs_debug("send input values to %s", peer);
-                zyre_whisper(node, peer, &msg);
+                zyre_whisper(node, peer, &msgToSend);
                 bus_zyreUnlock();
                 
             }else if (streq(title, "GET_CURRENT_PARAMETERS")){
@@ -1126,42 +1127,42 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 assert(agent);
                 
                 model_readWriteLock();
-                zmsg_t *msg = zmsg_new();
-                zmsg_addstr(msg, "CURRENT_PARAMETERS");
-                zmsg_addstr(msg, agent->uuid);
+                zmsg_t *msgToSend = zmsg_new();
+                zmsg_addstr(msgToSend, "CURRENT_PARAMETERS");
+                zmsg_addstr(msgToSend, agent->uuid);
                 igs_iop_t *outputs = agent->definition->params_table;
                 igs_iop_t *current = NULL;
                 for (current = outputs; current != NULL; current = current->hh.next){
                     switch (current->value_type) {
                         case IGS_INTEGER_T:
-                            zmsg_addstr(msg, current->name);
-                            zmsg_addstrf(msg, "%d", current->value_type);
-                            zmsg_addmem(msg, &(current->value.i), sizeof(int));
+                            zmsg_addstr(msgToSend, current->name);
+                            zmsg_addstrf(msgToSend, "%d", current->value_type);
+                            zmsg_addmem(msgToSend, &(current->value.i), sizeof(int));
                             break;
                         case IGS_DOUBLE_T:
-                            zmsg_addstr(msg, current->name);
-                            zmsg_addstrf(msg, "%d", current->value_type);
-                            zmsg_addmem(msg, &(current->value.d), sizeof(double));
+                            zmsg_addstr(msgToSend, current->name);
+                            zmsg_addstrf(msgToSend, "%d", current->value_type);
+                            zmsg_addmem(msgToSend, &(current->value.d), sizeof(double));
                             break;
                         case IGS_STRING_T:
-                            zmsg_addstr(msg, current->name);
-                            zmsg_addstrf(msg, "%d", current->value_type);
-                            zmsg_addstr(msg, current->value.s);
+                            zmsg_addstr(msgToSend, current->name);
+                            zmsg_addstrf(msgToSend, "%d", current->value_type);
+                            zmsg_addstr(msgToSend, current->value.s);
                             break;
                         case IGS_BOOL_T:
-                            zmsg_addstr(msg, current->name);
-                            zmsg_addstrf(msg, "%d", current->value_type);
-                            zmsg_addmem(msg, &(current->value.b), sizeof(bool));
+                            zmsg_addstr(msgToSend, current->name);
+                            zmsg_addstrf(msgToSend, "%d", current->value_type);
+                            zmsg_addmem(msgToSend, &(current->value.b), sizeof(bool));
                             break;
                         case IGS_IMPULSION_T:
-                            zmsg_addstr(msg, current->name);
-                            zmsg_addstrf(msg, "%d", current->value_type);
-                            zmsg_addmem(msg, NULL, 0);
+                            zmsg_addstr(msgToSend, current->name);
+                            zmsg_addstrf(msgToSend, "%d", current->value_type);
+                            zmsg_addmem(msgToSend, NULL, 0);
                             break;
                         case IGS_DATA_T:
-                            zmsg_addstr(msg, current->name);
-                            zmsg_addstrf(msg, "%d", current->value_type);
-                            zmsg_addmem(msg, (current->value.data), current->valueSize);
+                            zmsg_addstr(msgToSend, current->name);
+                            zmsg_addstrf(msgToSend, "%d", current->value_type);
+                            zmsg_addmem(msgToSend, (current->value.data), current->valueSize);
                             break;
                             
                         default:
@@ -1171,7 +1172,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 model_readWriteUnlock();
                 bus_zyreLock();
                 igs_debug("send parameters values to %s", peer);
-                zyre_whisper(node, peer, &msg);
+                zyre_whisper(node, peer, &msgToSend);
                 bus_zyreUnlock();
                 
             }else if (streq(title, "GET_LICENSE_INFO")){
@@ -1549,8 +1550,8 @@ int triggerDefinitionUpdate(zloop_t *loop, int timer_id, void *arg){
             char * definitionStr = NULL;
             definitionStr = parser_export_definition(agent->definition);
             if (definitionStr != NULL){
-                igs_zyre_peer_t *p, *tmp;
-                HASH_ITER(hh, context->zyrePeers, p, tmp){
+                igs_zyre_peer_t *p, *ptmp;
+                HASH_ITER(hh, context->zyrePeers, p, ptmp){
                     if (p->hasJoinedPrivateChannel){
                         sendDefinitionToZyrePeer(agent, p->peerId, definitionStr);
                     }
@@ -1582,16 +1583,16 @@ int triggerMappingUpdate(zloop_t *loop, int timer_id, void *arg){
             char *mappingStr = NULL;
             mappingStr = parser_export_mapping(agent->mapping);
             if (mappingStr != NULL){
-                igs_zyre_peer_t *a, *tmp;
-                HASH_ITER(hh, context->zyrePeers, a, tmp){
-                    if (a->hasJoinedPrivateChannel){
-                        sendMappingToZyrePeer(agent, a->peerId, mappingStr);
+                igs_zyre_peer_t *p, *ptmp;
+                HASH_ITER(hh, context->zyrePeers, p, ptmp){
+                    if (p->hasJoinedPrivateChannel){
+                        sendMappingToZyrePeer(agent, p->peerId, mappingStr);
                     }
                 }
                 free(mappingStr);
             }
-            igs_remote_agent_t *remote, *tmp;
-            HASH_ITER(hh, context->remoteAgents, remote, tmp){
+            igs_remote_agent_t *remote, *rtmp;
+            HASH_ITER(hh, context->remoteAgents, remote, rtmp){
                 network_configureMappingsToRemoteAgent(agent, remote);
             }
             agent->network_needToUpdateMapping = false;
@@ -1714,8 +1715,8 @@ static void runLoop (zsock_t *mypipe, void *args){
     //handle forced stop if needed
     if (context->forcedStop){
         igs_forced_stop_calback_t *cb = NULL;
-        igs_agent_t *a, *tmp;
-        HASH_ITER(hh, context->agents, a, tmp){
+        igs_agent_t *a, *atmp;
+        HASH_ITER(hh, context->agents, a, atmp){
             DL_FOREACH(context->forcedStopCalbacks, cb){
                 cb->callback_ptr(cb->myData);
             }

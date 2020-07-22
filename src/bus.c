@@ -198,10 +198,10 @@ igs_result_t igs_busSendStringToAgent(const char *agentNameOrAgentIdOrPeerID, co
             vsnprintf(content, MAX_STRING_MSG_LENGTH - 1, msg, list);
             va_end(list);
             bus_zyreLock();
-            zmsg_t *msg = zmsg_new();
-            zmsg_addstr(msg, content);
-            zmsg_addstr(msg, agent->uuid);
-            if (zyre_whisper(coreContext->node, agent->peer->peerId, &msg) != 0)
+            zmsg_t *msgToSend = zmsg_new();
+            zmsg_addstr(msgToSend, content);
+            zmsg_addstr(msgToSend, agent->uuid);
+            if (zyre_whisper(coreContext->node, agent->peer->peerId, &msgToSend) != 0)
                 res = IGS_FAILURE;
             bus_zyreUnlock();
             hasSent = true;

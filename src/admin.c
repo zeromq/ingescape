@@ -152,8 +152,8 @@ void admin_log(igs_agent_t *agent, igs_logLevel_t level, const char *function, c
     va_end(list);
     
     //scan the whole string to transform unallowed characters
-    int j = 0;
-    for (int i = 0; i < strlen(logContent); i++){
+    size_t j = 0;
+    for (size_t i = 0; i < strlen(logContent); i++){
         if (logContent[i] == '\n'){
             logContentForFile[j] = '\\';
             logContentForFile[j+1] = 'n';
