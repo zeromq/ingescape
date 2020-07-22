@@ -659,7 +659,7 @@ binding-csharp-installer-windows-x64:
   extends: .binding-build-files
   stage: binding-installer
   variables:
-    ARCH: "x64"
+    ARCH: "x64-utf8"
   tags:
     - windows
   script:
@@ -679,7 +679,7 @@ binding-csharp-installer-windows-x86:
   extends: .binding-build-files
   stage: binding-installer
   variables:
-    ARCH: "x86"
+    ARCH: "x86-utf8"
   tags:
     - windows
   script:
@@ -912,7 +912,7 @@ binding-deploy-windows-release-x64-utf8:
   extends: .binding-build-files
   stage: binding-deploy
   variables:
-    ARCH: "x64"
+    ARCH: "x64-utf8"
   tags:
     - windows
   script:
@@ -929,7 +929,7 @@ binding-deploy-windows-release-x86-utf8:
   extends: .binding-build-files
   stage: binding-deploy
   variables:
-    ARCH: "x86"
+    ARCH: "x86-utf8"
   tags:
     - windows
   script:
