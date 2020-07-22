@@ -213,14 +213,14 @@ namespace Ingescape
         // Initialization and control
 
 
-#if UNITY_EDITOR || UNITY_STANDALONE
+#if UTF8_ENCODING
         //start & stop the agent
         [DllImport(ingescapeDLLPath)]//, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_startWithDevice(IntPtr networkDevice, int port);
         public static int startWithDevice(string networkDevice, int port)
         {
-
-            byte[] networkDevicesBytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(networkDevice);
+            //ISO-8859-1
+            byte[] networkDevicesBytes = Encoding.GetEncoding("Windows-1252").GetBytes(networkDevice);
             IntPtr networkDevicePtr = Marshal.AllocHGlobal(networkDevicesBytes.Length);
 
             Marshal.Copy(networkDevicesBytes, 0, networkDevicePtr, networkDevicesBytes.Length);
