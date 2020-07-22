@@ -16,7 +16,7 @@ namespace CSharpSampleAgent
         #region Attributes
 
         private int _igsPort = 5670;
-        private string _igsDevice = "Connexion au réseau local";
+        private string _igsDevice = "Wi-Fi";
         private string _mappingPath = "";
         private string _licensePath = "";
         private bool _verbose = false;
@@ -203,8 +203,7 @@ namespace CSharpSampleAgent
                 {
                     Console.WriteLine("netDevice " + netDevice);
                 }
-
-               
+                              
                 
                 // Pass our class instance (this) in paramater of the IngeScape callback(s) 
                 Igs.observeForcedStop(ForcedStopCB, this);
