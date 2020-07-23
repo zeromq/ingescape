@@ -105,8 +105,6 @@ lib-build-macos:
     - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/builds/sysroot/usr/local/ -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
     - make -j8 -C build
     - make -C build DESTDIR=$PWD/release install
-    - make -C build DESTDIR=$HOME/builds/sysroot/ install
-    - cp src/include/ingescape_private.h $HOME/builds/sysroot/usr/local/include/ingescape/
     - cd release/usr/local/
     - tar zcvf ../../../libingescape.tgz *
     - cd ../../..
@@ -149,6 +147,22 @@ lib-installer-macos:
     name: "lib-installer-macos"
   dependencies:
     - lib-build-macos
+
+
+lib-deploy-macos:
+  extends: .lib-build-files
+  stage: lib-deploy
+  tags:
+    - osx
+  script:
+    - make -C build DESTDIR=$HOME/builds/sysroot/ install
+    - cp src/include/ingescape_private.h $HOME/builds/sysroot/usr/local/include/ingescape/
+  dependencies:
+    - lib-build-macos
+  only:
+    refs:
+    - master
+    - stable
 
 
 # Build ingescape editor for macos
