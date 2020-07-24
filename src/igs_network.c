@@ -761,48 +761,42 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
     } else if (streq (event, "SHOUT")){
         if (streq(group, context->replayChannel)){
             //this is a replay message for one of our inputs
-            //NB: we start by popping agent uuid because nothing makes sense without it
-            //This is different in the WHISPER messages.
-            igs_agent_t *targetAgent = NULL;
-            char *uuid = zmsg_popstr (msgDuplicate);
-            HASH_FIND_STR(context->agents, uuid, targetAgent);
-            if (targetAgent == NULL){
-                igs_error("message received on %s, sent by %s(%s) does not provide a valid agent uuid",
-                          group, name, peer);
-                assert(targetAgent);
-            }else{
-                char *input = zmsg_popstr (msgDuplicate);
-                iopType_t inputType = igsAgent_getTypeForInput(targetAgent, input);
-                
-                if (inputType > 0 && zmsg_size(msgDuplicate) > 0){
-                    zframe_t *frame = NULL;
-                    void *data = NULL;
-                    size_t size = 0;
-                    if (inputType == IGS_STRING_T){
-                        char * value = NULL;
-                        value = zmsg_popstr(msgDuplicate);
-                        igs_debug("replaying %s (%s)", input, value);
-                        igsAgent_writeInputAsString(targetAgent, input, value);
-                        if (value != NULL){
+            char *agentName = zmsg_popstr (msgDuplicate);
+            char *input = zmsg_popstr (msgDuplicate);
+            assert(agentName);
+            assert(input);
+
+            char *value = NULL;
+            zframe_t *frame = NULL;
+            void *data = NULL;
+            size_t size = 0;
+            igs_agent_t *targetAgent, *targettmp;
+            HASH_ITER(hh, context->agents, targetAgent, targettmp){
+                if (streq(agentName, targetAgent->name)){
+                    iopType_t inputType = igsAgent_getTypeForInput(targetAgent, input);
+                    if (zmsg_size(msgDuplicate) > 0){
+                        igs_debug("replaying %s.%s", agentName, input);
+                        if (inputType == IGS_STRING_T){
+                            value = zmsg_popstr(msgDuplicate);
+                            assert(value);
+                            igsAgent_writeInputAsString(targetAgent, input, value);
                             free(value);
-                        }
-                    }else{
-                        igs_debug("replaying %s", input);
-                        frame = zmsg_pop(msgDuplicate);
-                        data = zframe_data(frame);
-                        size = zframe_size(frame);
-                        model_writeIOP(targetAgent, input, IGS_INPUT_T, inputType, data, size);
-                        if (frame != NULL){
+                        }else{
+                            frame = zmsg_pop(msgDuplicate);
+                            assert(frame);
+                            data = zframe_data(frame);
+                            size = zframe_size(frame);
+                            model_writeIOP(targetAgent, input, IGS_INPUT_T, inputType, data, size);
                             zframe_destroy(&frame);
                         }
+                    }else{
+                        igsAgent_error(targetAgent, "replay message for input %s is not correct and was ignored", input);
                     }
-                }else{
-                    igsAgent_error(targetAgent, "replay message for input %s is not correct and was ignored", input);
-                }
-                if (input != NULL){
-                    free(input);
                 }
             }
+            free(agentName);
+            free(input);
+            
         }else if (streq(group, IGS_PRIVATE_CHANNEL)){
             char *title = zmsg_popstr (msgDuplicate);
             if (streq(title, "REMOTE_AGENT_EXIT")){
