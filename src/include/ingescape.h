@@ -363,7 +363,7 @@ PUBLIC char* igs_getLicensePath(void); //must be freed by caller
 //Any agent developer can use this function to check the license against her/his agent's unique id.
 //IDs are provided by the ingescape team.
 //Returns true if check is OK.
-PUBLIC bool igs_checkLicense(const char *agentId);
+PUBLIC bool igs_checkLicenseForAgent(const char *agentId);
 
 //use this callback mechanism to be notified when the timer
 //or number of agents or number of IOPs has been exceeded in demo mode

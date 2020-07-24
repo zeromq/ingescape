@@ -751,7 +751,7 @@ char *igs_getLicensePath(){
     }
 }
 
-bool igs_checkLicense(const char *agentId){
+bool igs_checkLicenseForAgent(const char *agentId){
     if (agentId == NULL){
         igs_error("agent id is NULL");
         return false;
