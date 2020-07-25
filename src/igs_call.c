@@ -270,13 +270,11 @@ void igs_addDataToArgumentsList(igs_callArgument_t **list, void *value, size_t s
 
 igs_result_t igsAgent_initCall(igs_agent_t *agent, const char *name, igsAgent_callFunction cb, void *myData){
     assert(agent);
+    assert(name && strlen(name) > 0);
+    assert(cb);
     igs_call_t *t = NULL;
     if(agent->definition == NULL){
         agent->definition = calloc(1, sizeof(igs_definition_t));
-    }
-    if (name == NULL || strlen(name) == 0){
-        igsAgent_error(agent, "call name cannot be NULL or empty");
-        return IGS_FAILURE;
     }
     HASH_FIND_STR(agent->definition->calls_table, name, t);
     if (t != NULL && t->cb != NULL){
@@ -308,18 +306,15 @@ igs_result_t igsAgent_initCall(igs_agent_t *agent, const char *name, igsAgent_ca
 
 igs_result_t igsAgent_removeCall(igs_agent_t *agent, const char *name){
     assert(agent);
+    assert(name);
     igs_call_t *t = NULL;
     if(agent->definition == NULL){
         igsAgent_error(agent, "No definition available yet");
         return IGS_FAILURE;
     }
-    if (name == NULL || strlen(name) == 0){
-        igsAgent_error(agent, "call name cannot be NULL or empty");
-        return IGS_FAILURE;
-    }
     HASH_FIND_STR(agent->definition->calls_table, name, t);
     if (t == NULL){
-        igsAgent_error(agent, "call with name %s does not exist", name);
+        igsAgent_error(agent, "call with name '%s' does not exist", name);
         return IGS_FAILURE;
     }else{
         HASH_DEL(agent->definition->calls_table, t);
@@ -331,13 +326,11 @@ igs_result_t igsAgent_removeCall(igs_agent_t *agent, const char *name){
 
 igs_result_t igsAgent_addArgumentToCall(igs_agent_t *agent, const char *callName, const char *argName, iopType_t type){
     assert(agent);
+    assert(callName);
+    assert(argName && strlen(argName) > 0);
     igs_call_t *t = NULL;
     if(agent->definition == NULL){
         igsAgent_error(agent, "No definition available yet");
-        return IGS_FAILURE;
-    }
-    if (callName == NULL || strlen(callName) == 0){
-        igsAgent_error(agent, "call name cannot be NULL or empty");
         return IGS_FAILURE;
     }
     HASH_FIND_STR(agent->definition->calls_table, callName, t);
@@ -389,13 +382,11 @@ igs_result_t igsAgent_addArgumentToCall(igs_agent_t *agent, const char *callName
 
 igs_result_t igsAgent_removeArgumentFromCall(igs_agent_t *agent, const char *callName, const char *argName){
     assert(agent);
+    assert(callName);
+    assert(argName);
     igs_call_t *t = NULL;
     if(agent->definition == NULL){
         igsAgent_error(agent, "No definition available yet");
-        return IGS_FAILURE;
-    }
-    if (callName == NULL || strlen(callName) == 0){
-        igsAgent_error(agent, "call name cannot be NULL or empty");
         return IGS_FAILURE;
     }
     HASH_FIND_STR(agent->definition->calls_table, callName, t);
@@ -429,13 +420,10 @@ igs_result_t igsAgent_removeArgumentFromCall(igs_agent_t *agent, const char *cal
 
 igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, const char *callName, igs_callArgument_t **list){
     assert(agent);
+    assert(agentNameOrUUID);
     assert(callName);
     assert(list);
     assert(*list);
-    if (agentNameOrUUID == NULL || strlen(agentNameOrUUID) == 0){
-        igsAgent_error(agent, "agent name or UUID must not be NULL or empty");
-        return IGS_FAILURE;
-    }
     
     bool found = false;
     

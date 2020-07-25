@@ -46,11 +46,10 @@ void definition_freeIOP (igs_iop_t* iop){
     free(iop);
 }
 
-int definition_addIopToDefinition(igs_agent_t *agent, igs_iop_t *iop, iop_t iop_type, igs_definition_t *def){
-    if(def == NULL){
-        igsAgent_error(agent, "Cannot add IOP %s to NULL definition", iop->name);
-        return 0;
-    }
+igs_result_t definition_addIOPToDefinition(igs_agent_t *agent, igs_iop_t *iop, iop_t iop_type, igs_definition_t *def){
+    assert(agent);
+    assert(iop);
+    assert(def);
     model_readWriteLock();
     igs_iop_t *previousIOP = NULL;
     switch (iop_type) {
@@ -69,7 +68,7 @@ int definition_addIopToDefinition(igs_agent_t *agent, igs_iop_t *iop, iop_t iop_
     if(previousIOP != NULL){
         igsAgent_error(agent, "%s already exists and cannot be overwritten", iop->name);
         model_readWriteUnlock();
-        return 0;
+        return IGS_FAILURE;
     }
     switch (iop_type) {
         case IGS_INPUT_T:
@@ -85,16 +84,14 @@ int definition_addIopToDefinition(igs_agent_t *agent, igs_iop_t *iop, iop_t iop_
             break;
     }
     model_readWriteUnlock();
-    return 1;
+    return IGS_SUCCESS;
 }
 
-igs_iop_t* definition_createIop(igs_agent_t *agent, const char *name, iop_t type, iopType_t value_type, void *value, size_t size){
-    if (agent->definition == NULL){
-        igsAgent_error(agent, "Cannot add IOP %s to NULL definition", name);
-        return NULL;
-    }
-    igs_iop_t *iop = NULL;
-    iop = calloc (1, sizeof(igs_iop_t));
+igs_iop_t* definition_createIOP(igs_agent_t *agent, const char *name, iop_t type, iopType_t value_type, void *value, size_t size){
+    assert(agent);
+    assert(name);
+    assert(agent->definition);
+    igs_iop_t *iop = calloc (1, sizeof(igs_iop_t));
     char *n = strndup(name, IGS_MAX_IOP_NAME_LENGTH);
     bool spaceInName = false;
     size_t lengthOfN = strlen(n);
@@ -106,14 +103,14 @@ igs_iop_t* definition_createIop(igs_agent_t *agent, const char *name, iop_t type
         }
     }
     if (spaceInName){
-        igsAgent_warn(agent, "spaces are not allowed in IOP name: %s has been renamed to %s", name, n);
+        igsAgent_warn(agent, "spaces are not allowed in IOP name: '%s' has been renamed to '%s'", name, n);
     }
     iop->name = n;
     iop->type = type;
     iop->value_type = value_type;
     switch (type) {
         case IGS_INPUT_T:
-            if (definition_addIopToDefinition(agent, iop, IGS_INPUT_T, agent->definition) < 1){
+            if (definition_addIOPToDefinition(agent, iop, IGS_INPUT_T, agent->definition) != IGS_SUCCESS){
                 model_readWriteLock();
                 definition_freeIOP(iop);
                 model_readWriteUnlock();
@@ -121,7 +118,7 @@ igs_iop_t* definition_createIop(igs_agent_t *agent, const char *name, iop_t type
             }
             break;
         case IGS_OUTPUT_T:
-            if (definition_addIopToDefinition(agent, iop, IGS_OUTPUT_T, agent->definition) < 1){
+            if (definition_addIOPToDefinition(agent, iop, IGS_OUTPUT_T, agent->definition) != IGS_SUCCESS){
                 model_readWriteLock();
                 definition_freeIOP(iop);
                 model_readWriteUnlock();
@@ -129,7 +126,7 @@ igs_iop_t* definition_createIop(igs_agent_t *agent, const char *name, iop_t type
             }
             break;
         case IGS_PARAMETER_T:
-            if (definition_addIopToDefinition(agent, iop, IGS_PARAMETER_T, agent->definition) < 1){
+            if (definition_addIOPToDefinition(agent, iop, IGS_PARAMETER_T, agent->definition) != IGS_SUCCESS){
                 model_readWriteLock();
                 definition_freeIOP(iop);
                 model_readWriteUnlock();
@@ -193,6 +190,7 @@ void definition_freeDefinition (igs_definition_t **def) {
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
 void igsAgent_clearDefinition(igs_agent_t *agent){
+    assert(agent);
     //Free the structure definition loaded
     igsAgent_debug(agent, "Clear our definition and initiate an empty one");
     if(agent->definition != NULL){
@@ -204,6 +202,7 @@ void igsAgent_clearDefinition(igs_agent_t *agent){
 }
 
 char* igsAgent_getDefinition(igs_agent_t *agent){
+    assert(agent);
     char * def = NULL;
     if(agent->definition == NULL)
         return NULL;
@@ -212,6 +211,7 @@ char* igsAgent_getDefinition(igs_agent_t *agent){
 }
 
 char *igsAgent_getDefinitionName(igs_agent_t *agent){
+    assert(agent);
     if (agent->definition != NULL && agent->definition->name != NULL){
         return strdup(agent->definition->name);
     }else{
@@ -220,6 +220,7 @@ char *igsAgent_getDefinitionName(igs_agent_t *agent){
 }
 
 char *igsAgent_getDefinitionDescription(igs_agent_t *agent){
+    assert(agent);
     if (agent->definition != NULL && agent->definition->description != NULL){
         return strdup(agent->definition->description);
     }else{
@@ -228,6 +229,7 @@ char *igsAgent_getDefinitionDescription(igs_agent_t *agent){
 }
 
 char *igsAgent_getDefinitionVersion(igs_agent_t *agent){
+    assert(agent);
     if (agent->definition != NULL && agent->definition->version != NULL){
         return strdup(agent->definition->version);
     }else{
@@ -235,15 +237,9 @@ char *igsAgent_getDefinitionVersion(igs_agent_t *agent){
     }
 }
 
-igs_result_t igsAgent_setDefinitionName(igs_agent_t *agent, const char *name){
-    if (name == NULL){
-        igsAgent_error(agent, "Definition name cannot be NULL");
-        return IGS_FAILURE;
-    }
-    if (strlen(name) == 0){
-        igsAgent_error(agent, "Definition name cannot be empty");
-        return IGS_FAILURE;
-    }
+void igsAgent_setDefinitionName(igs_agent_t *agent, const char *name){
+    assert(agent);
+    assert(name);
     
     if(agent->definition == NULL){
         agent->definition = calloc(1, sizeof(igs_definition_t));
@@ -253,18 +249,11 @@ igs_result_t igsAgent_setDefinitionName(igs_agent_t *agent, const char *name){
     }
     agent->definition->name = strndup(name, IGS_MAX_DEFINITION_NAME_LENGTH);
     agent->network_needToSendDefinitionUpdate = true;
-    return IGS_SUCCESS;
 }
 
-igs_result_t igsAgent_setDefinitionDescription(igs_agent_t *agent, const char *description){
-    if(description == NULL){
-        igsAgent_error(agent, "Definition description cannot be NULL");
-        return IGS_FAILURE;
-    }
-    if (strlen(description) == 0){
-        igsAgent_error(agent, "Definition description cannot be empty\n");
-        return IGS_FAILURE;
-    }
+void igsAgent_setDefinitionDescription(igs_agent_t *agent, const char *description){
+    assert(agent);
+    assert(description);
     if(agent->definition == NULL){
         agent->definition = calloc(1, sizeof(igs_definition_t));
     }
@@ -273,18 +262,11 @@ igs_result_t igsAgent_setDefinitionDescription(igs_agent_t *agent, const char *d
     }
     agent->definition->description = strndup(description, IGS_MAX_DESCRIPTION_LENGTH);
     agent->network_needToSendDefinitionUpdate = true;
-    return IGS_SUCCESS;
 }
 
-igs_result_t igsAgent_setDefinitionVersion(igs_agent_t *agent, const char *version){
-    if(version == NULL){
-        igsAgent_error(agent, "Definition version cannot be NULL");
-        return IGS_FAILURE;
-    }
-    if (strlen(version) == 0){
-        igsAgent_error(agent, "Definition version cannot be empty");
-        return IGS_FAILURE;
-    }
+void igsAgent_setDefinitionVersion(igs_agent_t *agent, const char *version){
+    assert(agent);
+    assert(version);
     if(agent->definition == NULL){
         agent->definition = calloc(1, sizeof(igs_definition_t));
     }
@@ -293,18 +275,15 @@ igs_result_t igsAgent_setDefinitionVersion(igs_agent_t *agent, const char *versi
     }
     agent->definition->version = strndup(version, 64);
     agent->network_needToSendDefinitionUpdate = true;
-    return IGS_SUCCESS;
 }
 
 igs_result_t igsAgent_createInput(igs_agent_t *agent, const char *name, iopType_t value_type, void *value, size_t size){
-    if (name == NULL || strlen (name) == 0){
-        igsAgent_error(agent, "Input name cannot be NULL or empty");
-        return IGS_FAILURE;
-    }
+    assert(agent);
+    assert(name && strlen(name) > 0);
     if(agent->definition == NULL){
         agent->definition = calloc(1, sizeof(igs_definition_t));
     }
-    igs_iop_t *iop = definition_createIop(agent, name, IGS_INPUT_T, value_type, value, size);
+    igs_iop_t *iop = definition_createIOP(agent, name, IGS_INPUT_T, value_type, value, size);
     if (iop == NULL){
         return IGS_FAILURE;
     }
@@ -313,14 +292,12 @@ igs_result_t igsAgent_createInput(igs_agent_t *agent, const char *name, iopType_
 }
 
 igs_result_t igsAgent_createOutput(igs_agent_t *agent, const char *name, iopType_t value_type, void *value, size_t size){
-    if (name == NULL || strlen (name) == 0){
-        igsAgent_error(agent, "Output name cannot be NULL or empty");
-        return IGS_FAILURE;
-    }
+    assert(agent);
+    assert(name && strlen(name) > 0);
     if(agent->definition == NULL){
         agent->definition = calloc(1, sizeof(igs_definition_t));
     }
-    igs_iop_t* iop = definition_createIop(agent, name, IGS_OUTPUT_T, value_type, value, size);
+    igs_iop_t* iop = definition_createIOP(agent, name, IGS_OUTPUT_T, value_type, value, size);
     if (iop == NULL){
         return IGS_FAILURE;
     }
@@ -329,14 +306,12 @@ igs_result_t igsAgent_createOutput(igs_agent_t *agent, const char *name, iopType
 }
 
 igs_result_t igsAgent_createParameter(igs_agent_t *agent, const char *name, iopType_t value_type, void *value, size_t size){
-    if (name == NULL || strlen (name) == 0){
-        igsAgent_error(agent, "Parameter name cannot be NULL or empty");
-        return IGS_FAILURE;
-    }
+    assert(agent);
+    assert(name && strlen(name) > 0);
     if(agent->definition == NULL){
         agent->definition = calloc(1, sizeof(igs_definition_t));
     }
-    igs_iop_t* iop = definition_createIop(agent, name, IGS_PARAMETER_T, value_type, value, size);
+    igs_iop_t* iop = definition_createIOP(agent, name, IGS_PARAMETER_T, value_type, value, size);
     if (iop == NULL){
         return IGS_FAILURE;
     }
@@ -345,10 +320,8 @@ igs_result_t igsAgent_createParameter(igs_agent_t *agent, const char *name, iopT
 }
 
 igs_result_t igsAgent_removeInput(igs_agent_t *agent, const char *name){
-    if (name == NULL){
-        igsAgent_error(agent, "Input name cannot be NULL or empty");
-        return IGS_FAILURE;
-    }
+    assert(agent);
+    assert(name);
     if(agent->definition == NULL){
         igsAgent_error(agent, "No definition available yet");
         return IGS_FAILURE;
@@ -367,10 +340,8 @@ igs_result_t igsAgent_removeInput(igs_agent_t *agent, const char *name){
 }
 
 igs_result_t igsAgent_removeOutput(igs_agent_t *agent, const char *name){
-    if (name == NULL){
-        igsAgent_error(agent, "Output name cannot be NULL or empty");
-        return IGS_FAILURE;
-    }
+    assert(agent);
+    assert(name);
     if(agent->definition == NULL){
         igsAgent_error(agent, "No definition available yet");
         return IGS_FAILURE;
@@ -389,10 +360,8 @@ igs_result_t igsAgent_removeOutput(igs_agent_t *agent, const char *name){
 }
 
 igs_result_t igsAgent_removeParameter(igs_agent_t *agent, const char *name){
-    if (name == NULL){
-        igsAgent_error(agent, "Parameter name cannot be NULL or empty");
-        return IGS_FAILURE;
-    }
+    assert(agent);
+    assert(name);
     if(agent->definition == NULL){
         igsAgent_error(agent, "No definition available yet");
         return IGS_FAILURE;
@@ -411,6 +380,7 @@ igs_result_t igsAgent_removeParameter(igs_agent_t *agent, const char *name){
 }
 
 void igsAgent_setDefinitionPath(igs_agent_t *agent, const char *path){
+    assert(agent);
     assert(path);
     if (agent->definitionPath != NULL)
         free(agent->definitionPath);

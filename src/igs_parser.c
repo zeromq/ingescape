@@ -1067,12 +1067,7 @@ char* parser_export_mapping(igs_mapping_t *mapp){
 ////////////////////////////////////////////////////////////////////////
 igs_result_t igsAgent_loadDefinition (igs_agent_t *agent, const char* json_str){
     assert(agent);
-    //Check if the json string is null
-    if(json_str == NULL){
-        igsAgent_debug(agent, "json string is null");
-        return IGS_FAILURE;
-    }
-
+    assert(json_str);
     //Try to load definition
     igs_definition_t *tmp = parser_loadDefinition(json_str);
     if(tmp == NULL){
@@ -1093,24 +1088,13 @@ igs_result_t igsAgent_loadDefinition (igs_agent_t *agent, const char* json_str){
         free(name);
         agent->network_needToSendDefinitionUpdate = true;
     }
-
     return IGS_SUCCESS;
 }
 
 
 igs_result_t igsAgent_loadDefinitionFromPath (igs_agent_t *agent, const char* file_path){
     assert(agent);
-    //Check if the json string is null
-    if(file_path == NULL){
-        igsAgent_error(agent, "json path is NULL");
-        return IGS_FAILURE;
-    }
-    
-    if (strlen(file_path) == 0){
-        igsAgent_debug(agent, "json path is empty");
-        return IGS_FAILURE;
-    }
-
+    assert(file_path);
     //Try to load definition
     igs_definition_t *tmp = parser_loadDefinitionFromPath(file_path);
     if(tmp == NULL){
@@ -1132,7 +1116,6 @@ igs_result_t igsAgent_loadDefinitionFromPath (igs_agent_t *agent, const char* fi
         free(name);
         agent->network_needToSendDefinitionUpdate = true;
     }
-
     return IGS_SUCCESS;
 }
 

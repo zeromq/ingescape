@@ -50,7 +50,7 @@ typedef enum{
 //start & stop ingescape
 PUBLIC igs_result_t igs_startWithDevice(const char *networkDevice, unsigned int port);
 PUBLIC igs_result_t igs_startWithIP(const char *ipAddress, unsigned int port);
-PUBLIC igs_result_t igs_stop(void);
+PUBLIC void igs_stop(void);
 PUBLIC bool igs_isStarted(void);
 
 //There are four non-exclusive ways to stop the execution of ingescape in a process:
@@ -66,16 +66,16 @@ typedef void (*igs_forcedStopCallback)(void *myData);
 PUBLIC void igs_observeForcedStop(igs_forcedStopCallback cb, void *myData);
 
 //agent name set and get
-PUBLIC igs_result_t igs_setAgentName(const char *name);
+PUBLIC void igs_setAgentName(const char *name);
 PUBLIC char *igs_getAgentName(void); //char* must be freed by caller
 
 //control agent state
-PUBLIC igs_result_t igs_setAgentState(const char *state);
+PUBLIC void igs_setAgentState(const char *state);
 PUBLIC char* igs_getAgentState(void); //must be freed by caller
 
 //mute the agent ouputs
-PUBLIC igs_result_t igs_mute(void);
-PUBLIC igs_result_t igs_unmute(void);
+PUBLIC void igs_mute(void);
+PUBLIC void igs_unmute(void);
 PUBLIC bool igs_isMuted(void);
 typedef void (*igs_muteCallback)(bool isMuted, void *myData);
 PUBLIC void igs_observeMute(igs_muteCallback cb, void *myData);
@@ -172,8 +172,8 @@ PUBLIC void igs_observeOutput(const char *name, igs_observeCallback cb, void * m
 PUBLIC void igs_observeParameter(const char *name, igs_observeCallback cb, void * myData);
 
 //mute or unmute an IOP
-PUBLIC igs_result_t igs_muteOutput(const char *name);
-PUBLIC igs_result_t igs_unmuteOutput(const char *name);
+PUBLIC void igs_muteOutput(const char *name);
+PUBLIC void igs_unmuteOutput(const char *name);
 PUBLIC bool igs_isOutputMuted(const char *name);
 
 //check IOP type, lists and existence
@@ -206,9 +206,9 @@ PUBLIC char* igs_getDefinition(void); //returns json string, must be freed by ca
 PUBLIC char *igs_getDefinitionName(void); //returned char* must be freed by caller
 PUBLIC char *igs_getDefinitionDescription(void); //returned char* must be freed by caller
 PUBLIC char *igs_getDefinitionVersion(void); //returned char* must be freed by caller
-PUBLIC igs_result_t igs_setDefinitionName(const char *name);
-PUBLIC igs_result_t igs_setDefinitionDescription(const char *description);
-PUBLIC igs_result_t igs_setDefinitionVersion(const char *version);
+PUBLIC void igs_setDefinitionName(const char *name);
+PUBLIC void igs_setDefinitionDescription(const char *description);
+PUBLIC void igs_setDefinitionVersion(const char *version);
 
 //edit the definition using the API
 PUBLIC igs_result_t igs_createInput(const char *name, iopType_t value_type, void *value, size_t size);
@@ -231,12 +231,12 @@ PUBLIC char* igs_getMapping(void); //returns json string, must be freed by calle
 PUBLIC char *igs_getMappingName(void); //returned char* must be freed by caller
 PUBLIC char *igs_getMappingDescription(void); //returned char* must be freed by caller
 PUBLIC char *igs_getMappingVersion(void); //returned char* must be freed by caller
-PUBLIC igs_result_t igs_setMappingName(const char *name);
-PUBLIC igs_result_t igs_setMappingDescription(const char *description);
-PUBLIC igs_result_t igs_setMappingVersion(const char *version);
+PUBLIC void igs_setMappingName(const char *name);
+PUBLIC void igs_setMappingDescription(const char *description);
+PUBLIC void igs_setMappingVersion(const char *version);
 
 //edit mapping using the API
-PUBLIC int igs_getMappingEntriesNumber(void); //number of entries in the mapping output type
+PUBLIC size_t igs_getMappingEntriesNumber(void); //number of entries in the mapping output type
 PUBLIC unsigned long igs_addMappingEntry(const char *fromOurInput, const char *toAgent, const char *withOutput); //returns mapping id or zero if creation failed
 PUBLIC igs_result_t igs_removeMappingEntryWithId(unsigned long theId);
 PUBLIC igs_result_t igs_removeMappingEntryWithName(const char *fromOurInput, const char *toAgent, const char *withOutput);

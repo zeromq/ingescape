@@ -90,11 +90,9 @@ char* model_doubleToString(const double value){
     return str;
 }
 
-static int model_observe(igs_agent_t *agent, const char* name, iop_t iopType, igsAgent_observeCallback cb, void* myData){
-
+static void model_observe(igs_agent_t *agent, const char* name, iop_t iopType, igsAgent_observeCallback cb, void* myData){
     //find the iop
     igs_iop_t *iop = model_findIopByName(agent, (char*) name, iopType);
-
     // Check if the input has been returned.
     if(iop == NULL){
         const char *t = NULL;
@@ -113,23 +111,13 @@ static int model_observe(igs_agent_t *agent, const char* name, iop_t iopType, ig
                 break;
         }
         igsAgent_error(agent, "Cannot find %s %s", t, name);
-        return 0;
+        return;
     }
-
-    //callback not defined
-    if(cb == NULL) {
-        igsAgent_error(agent, "Callback cannot be NULL (called for %s)", name);
-        return 0;
-    }
-
     igs_observe_callback_t *new_callback = malloc(sizeof(igs_observe_callback_t));
     new_callback->callback_ptr = cb;
     new_callback->data = myData;
     DL_APPEND(iop->callbacks, new_callback);
-
     //igsAgent_debug(agent, "observe iop with name %s and type %d\n", name, iopType);
-
-    return 1;
 }
 
 iopType_t model_getTypeForIOP(igs_agent_t *agent, const char *name, iop_t type){
@@ -509,6 +497,7 @@ char **model_getIopList(igs_agent_t *agent, size_t *nbOfElements, iop_t type){
 // PRIVATE API
 ////////////////////////////////////////////////////////////////////////
 char* model_getIOPValueAsString (igs_iop_t* iop){
+    assert(iop);
     char *str_value = NULL;
     if(iop != NULL){
         switch (iop->value_type) {
@@ -546,6 +535,8 @@ char* model_getIOPValueAsString (igs_iop_t* iop){
 }
 
 const igs_iop_t* model_writeIOP (igs_agent_t *agent, const char *iopName, iop_t iopType, iopType_t valType, void* value, size_t size){
+    assert(agent);
+    assert(iopName);
     igs_iop_t *iop = model_findIopByName(agent, (char*) iopName, iopType);
     if(iop == NULL){
         igsAgent_error(agent, "%s not found for writing", iopName);
@@ -962,39 +953,57 @@ igs_iop_t * model_findIopByName(igs_agent_t *agent, const char *name, iop_t type
 
 // --------------------------------  READ ------------------------------------//
 
-int igsAgent_readInput(igs_agent_t *agent, const char *name, void **value, size_t *size){
+igs_result_t igsAgent_readInput(igs_agent_t *agent, const char *name, void **value, size_t *size){
+    assert(agent);
+    assert(name);
     return igsAgent_readIOP(agent, name, IGS_INPUT_T, value, size);
 }
 
-int igsAgent_readOutput(igs_agent_t *agent, const char *name, void **value, size_t *size){
+igs_result_t igsAgent_readOutput(igs_agent_t *agent, const char *name, void **value, size_t *size){
+    assert(agent);
+    assert(name);
     return igsAgent_readIOP(agent, name, IGS_OUTPUT_T, value, size);
 }
 
-int igsAgent_readParameter(igs_agent_t *agent, const char *name, void **value, size_t *size){
+igs_result_t igsAgent_readParameter(igs_agent_t *agent, const char *name, void **value, size_t *size){
+    assert(agent);
+    assert(name);
     return igsAgent_readIOP(agent, name, IGS_PARAMETER_T, value, size);
 }
 
 bool igsAgent_readInputAsBool(igs_agent_t *agent, const char *name){
+    assert(agent);
+    assert(name);
     return model_readIopAsBool(agent, name, IGS_INPUT_T);
 }
 
 int igsAgent_readInputAsInt(igs_agent_t *agent, const char *name){
+    assert(agent);
+    assert(name);
     return model_readIopAsInt(agent, name, IGS_INPUT_T);
 }
 
 double igsAgent_readInputAsDouble(igs_agent_t *agent, const char *name){
+    assert(agent);
+    assert(name);
     return model_readIopAsDouble(agent, name, IGS_INPUT_T);
 }
 
 char* igsAgent_readInputAsString(igs_agent_t *agent, const char *name){
+    assert(agent);
+    assert(name);
     return model_readIopAsString(agent, name, IGS_INPUT_T);
 }
 
 igs_result_t igsAgent_readInputAsData(igs_agent_t *agent, const char *name, void **data, size_t *size){
+    assert(agent);
+    assert(name);
     return model_readIopAsData(agent, name, IGS_INPUT_T, data, size);
 }
 
 igs_result_t igsAgent_readInputAsZMQMsg(igs_agent_t *agent, const char *name, zmsg_t **msg){
+    assert(agent);
+    assert(name);
     void *data = NULL;
     size_t size = 0;
     int ret = model_readIopAsData(agent, name, IGS_INPUT_T, &data, &size);
@@ -1006,107 +1015,113 @@ igs_result_t igsAgent_readInputAsZMQMsg(igs_agent_t *agent, const char *name, zm
 }
 
 bool igsAgent_readOutputAsBool(igs_agent_t *agent, const char *name){
+    assert(agent);
+    assert(name);
     return model_readIopAsBool(agent, name, IGS_OUTPUT_T);
 }
 
 int igsAgent_readOutputAsInt(igs_agent_t *agent, const char *name){
+    assert(agent);
+    assert(name);
     return model_readIopAsInt(agent, name, IGS_OUTPUT_T);
 }
 
 double igsAgent_readOutputAsDouble(igs_agent_t *agent, const char *name){
+    assert(agent);
+    assert(name);
     return model_readIopAsDouble(agent, name, IGS_OUTPUT_T);
 }
 
 char* igsAgent_readOutputAsString(igs_agent_t *agent, const char *name){
+    assert(agent);
+    assert(name);
     return model_readIopAsString(agent, name, IGS_OUTPUT_T);
 }
 
 igs_result_t igsAgent_readOutputAsData(igs_agent_t *agent, const char *name, void **data, size_t *size){
+    assert(agent);
+    assert(name);
     return model_readIopAsData(agent, name, IGS_OUTPUT_T, data, size);
 }
 
 bool igsAgent_readParameterAsBool(igs_agent_t *agent, const char *name){
+    assert(agent);
+    assert(name);
     return model_readIopAsBool(agent, name, IGS_PARAMETER_T);
 }
 
 int igsAgent_readParameterAsInt(igs_agent_t *agent, const char *name){
+    assert(agent);
+    assert(name);
     return model_readIopAsInt(agent, name, IGS_PARAMETER_T);
 }
 
 double igsAgent_readParameterAsDouble(igs_agent_t *agent, const char *name){
+    assert(agent);
+    assert(name);
     return model_readIopAsDouble(agent, name, IGS_PARAMETER_T);
 }
 
 char* igsAgent_readParameterAsString(igs_agent_t *agent, const char *name){
+    assert(agent);
+    assert(name);
     return model_readIopAsString(agent, name, IGS_PARAMETER_T);
 }
 
 igs_result_t igsAgent_readParameterAsData(igs_agent_t *agent, const char *name, void **data, size_t *size){
+    assert(agent);
+    assert(name);
     return model_readIopAsData(agent, name, IGS_PARAMETER_T, data, size);
 }
 
 // --------------------------------  WRITE ------------------------------------//
 
 igs_result_t igsAgent_writeInputAsBool(igs_agent_t *agent, const char *name, bool value){
-    if (name == NULL || strlen(name) == 0){
-        igsAgent_error(agent, "Input name cannot be NULL or empty");
-        return IGS_FAILURE;
-    }
+    assert(agent);
+    assert(name);
     const igs_iop_t *iop = model_writeIOP(agent, name, IGS_INPUT_T, IGS_BOOL_T, &value, sizeof(bool));
     return (iop == NULL)?IGS_FAILURE : IGS_SUCCESS;
 }
 
 igs_result_t igsAgent_writeInputAsInt(igs_agent_t *agent, const char *name, int value){
-    if (name == NULL || strlen(name) == 0){
-        igsAgent_error(agent, "Input name cannot be NULL or empty");
-        return IGS_FAILURE;
-    }
+    assert(agent);
+    assert(name);
     const igs_iop_t *iop = model_writeIOP(agent, name, IGS_INPUT_T, IGS_INTEGER_T, &value, sizeof(int));
     return (iop == NULL)?IGS_FAILURE : IGS_SUCCESS;
 }
 
 igs_result_t igsAgent_writeInputAsDouble(igs_agent_t *agent, const char *name, double value){
-    if (name == NULL || strlen(name) == 0){
-        igsAgent_error(agent, "Input name cannot be NULL or empty");
-        return IGS_FAILURE;
-    }
+    assert(agent);
+    assert(name);
     const igs_iop_t *iop = model_writeIOP(agent, name, IGS_INPUT_T, IGS_DOUBLE_T, &value, sizeof(double));
     return (iop == NULL)?IGS_FAILURE : IGS_SUCCESS;
 }
 
 igs_result_t igsAgent_writeInputAsString(igs_agent_t *agent, const char *name, const char *value){
-    if (name == NULL || strlen(name) == 0){
-        igsAgent_error(agent, "Input name cannot be NULL or empty");
-        return IGS_FAILURE;
-    }
+    assert(agent);
+    assert(name);
     size_t valueLength = (value == NULL) ? 0 : strlen(value)+1;
     const igs_iop_t *iop = model_writeIOP(agent, name, IGS_INPUT_T, IGS_STRING_T, (char *)value, valueLength);
     return (iop == NULL)?IGS_FAILURE : IGS_SUCCESS;
 }
 
 igs_result_t igsAgent_writeInputAsImpulsion(igs_agent_t *agent, const char *name){
-    if (name == NULL || strlen(name) == 0){
-        igsAgent_error(agent, "Input name cannot be NULL or empty");
-        return IGS_FAILURE;
-    }
+    assert(agent);
+    assert(name);
     const igs_iop_t *iop = model_writeIOP(agent, name, IGS_INPUT_T, IGS_IMPULSION_T, NULL, 0);
     return (iop == NULL)?IGS_FAILURE : IGS_SUCCESS;
 }
 
 igs_result_t igsAgent_writeInputAsData(igs_agent_t *agent, const char *name, void *value, size_t size){
-    if (name == NULL || strlen(name) == 0){
-        igsAgent_error(agent, "Input name cannot be NULL or empty");
-        return IGS_FAILURE;
-    }
+    assert(agent);
+    assert(name);
     const igs_iop_t *iop = model_writeIOP(agent, name, IGS_INPUT_T, IGS_DATA_T, value, size);
     return (iop == NULL)?IGS_FAILURE : IGS_SUCCESS;
 }
 
 igs_result_t igsAgent_writeOutputAsBool(igs_agent_t *agent, const char *name, bool value){
-    if (name == NULL || strlen(name) == 0){
-        igsAgent_error(agent, "Output name cannot be NULL or empty");
-        return IGS_FAILURE;
-    }
+    assert(agent);
+    assert(name);
     const igs_iop_t *iop = model_writeIOP(agent, name, IGS_OUTPUT_T, IGS_BOOL_T, &value, sizeof(bool));
     if (iop)
         network_publishOutput(agent, iop);
@@ -1115,10 +1130,8 @@ igs_result_t igsAgent_writeOutputAsBool(igs_agent_t *agent, const char *name, bo
 }
 
 igs_result_t igsAgent_writeOutputAsInt(igs_agent_t *agent, const char *name, int value){
-    if (name == NULL || strlen(name) == 0){
-        igsAgent_error(agent, "Output name cannot be NULL or empty");
-        return IGS_FAILURE;
-    }
+    assert(agent);
+    assert(name);
     const igs_iop_t *iop = model_writeIOP(agent, name, IGS_OUTPUT_T, IGS_INTEGER_T, &value, sizeof(int));
     if (iop)
         network_publishOutput(agent, iop);
@@ -1127,10 +1140,8 @@ igs_result_t igsAgent_writeOutputAsInt(igs_agent_t *agent, const char *name, int
 }
 
 igs_result_t igsAgent_writeOutputAsDouble(igs_agent_t *agent, const char *name, double value){
-    if (name == NULL || strlen(name) == 0){
-        igsAgent_error(agent, "Output name cannot be NULL or empty");
-        return IGS_FAILURE;
-    }
+    assert(agent);
+    assert(name);
     const igs_iop_t *iop = model_writeIOP(agent, name, IGS_OUTPUT_T, IGS_DOUBLE_T, &value, sizeof(double));
     if (iop)
         network_publishOutput(agent, iop);
@@ -1139,10 +1150,8 @@ igs_result_t igsAgent_writeOutputAsDouble(igs_agent_t *agent, const char *name, 
 }
 
 igs_result_t igsAgent_writeOutputAsString(igs_agent_t *agent, const char *name, const char *value){
-    if (name == NULL || strlen(name) == 0){
-        igsAgent_error(agent, "Output name cannot be NULL or empty");
-        return IGS_FAILURE;
-    }
+    assert(agent);
+    assert(name);
     size_t length = (value == NULL)?0:strlen(value)+1;
     const igs_iop_t *iop = model_writeIOP(agent, name, IGS_OUTPUT_T, IGS_STRING_T, (char *)value, length);
     if (iop)
@@ -1152,10 +1161,8 @@ igs_result_t igsAgent_writeOutputAsString(igs_agent_t *agent, const char *name, 
 }
 
 igs_result_t igsAgent_writeOutputAsImpulsion(igs_agent_t *agent, const char *name){
-    if (name == NULL || strlen(name) == 0){
-        igsAgent_error(agent, "Output name cannot be NULL or empty");
-        return IGS_FAILURE;
-    }
+    assert(agent);
+    assert(name);
     const igs_iop_t *iop = model_writeIOP(agent, name, IGS_OUTPUT_T, IGS_IMPULSION_T, NULL, 0);
     if (iop)
         network_publishOutput(agent, iop);
@@ -1164,10 +1171,8 @@ igs_result_t igsAgent_writeOutputAsImpulsion(igs_agent_t *agent, const char *nam
 }
 
 igs_result_t igsAgent_writeOutputAsData(igs_agent_t *agent, const char *name, void *value, size_t size){
-    if (name == NULL || strlen(name) == 0){
-        igsAgent_error(agent, "Output name cannot be NULL or empty");
-        return IGS_FAILURE;
-    }
+    assert(agent);
+    assert(name);
     const igs_iop_t *iop = model_writeIOP(agent, name, IGS_OUTPUT_T, IGS_DATA_T, value, size);
     if (iop)
         network_publishOutput(agent, iop);
@@ -1176,10 +1181,9 @@ igs_result_t igsAgent_writeOutputAsData(igs_agent_t *agent, const char *name, vo
 }
 
 igs_result_t igsAgent_writeOutputAsZMQMsg(igs_agent_t *agent, const char *name, zmsg_t *msg){
-    if (name == NULL || strlen(name) == 0){
-        igsAgent_error(agent, "Output name cannot be NULL or empty");
-        return IGS_FAILURE;
-    }
+    assert(agent);
+    assert(name);
+    assert(msg);
     zframe_t *frame = zmsg_encode(msg);
     void *value = zframe_data(frame);
     size_t size = zframe_size(frame);
@@ -1191,52 +1195,44 @@ igs_result_t igsAgent_writeOutputAsZMQMsg(igs_agent_t *agent, const char *name, 
 }
 
 igs_result_t igsAgent_writeParameterAsBool(igs_agent_t *agent, const char *name, bool value){
-    if (name == NULL || strlen(name) == 0){
-        igsAgent_error(agent, "Parameter name cannot be NULL or empty");
-        return IGS_FAILURE;
-    }
+    assert(agent);
+    assert(name);
     const igs_iop_t *iop = model_writeIOP(agent, name, IGS_PARAMETER_T, IGS_BOOL_T, &value, sizeof(bool));
     return (iop == NULL)?IGS_FAILURE : IGS_SUCCESS;
 }
 
 igs_result_t igsAgent_writeParameterAsInt(igs_agent_t *agent, const char *name, int value){
-    if (name == NULL || strlen(name) == 0){
-        igsAgent_error(agent, "Parameter name cannot be NULL or empty");
-        return IGS_FAILURE;
-    }
+    assert(agent);
+    assert(name);
     const igs_iop_t *iop = model_writeIOP(agent, name, IGS_PARAMETER_T, IGS_INTEGER_T, &value, sizeof(int));
     return (iop == NULL)?IGS_FAILURE : IGS_SUCCESS;
 }
 
 igs_result_t igsAgent_writeParameterAsDouble(igs_agent_t *agent, const char *name, double value){
-    if (name == NULL || strlen(name) == 0){
-        igsAgent_error(agent, "Parameter name cannot be NULL or empty");
-        return IGS_FAILURE;
-    }
+    assert(agent);
+    assert(name);
     const igs_iop_t *iop = model_writeIOP(agent, name, IGS_PARAMETER_T, IGS_DOUBLE_T, &value, sizeof(double));
     return (iop == NULL)?IGS_FAILURE : IGS_SUCCESS;
 }
 
 igs_result_t igsAgent_writeParameterAsString(igs_agent_t *agent, const char *name, const char *value){
-    if (name == NULL || strlen(name) == 0){
-        igsAgent_error(agent, "Parameter name cannot be NULL or empty");
-        return IGS_FAILURE;
-    }
+    assert(agent);
+    assert(name);
     size_t valueLength = (value == NULL) ? 0 : strlen(value)+1;
     const igs_iop_t *iop = model_writeIOP(agent, name, IGS_PARAMETER_T, IGS_STRING_T, (char *)value, valueLength);
     return (iop == NULL)?IGS_FAILURE : IGS_SUCCESS;
 }
 
 igs_result_t igsAgent_writeParameterAsData(igs_agent_t *agent, const char *name, void *value, size_t size){
-    if (name == NULL || strlen(name) == 0){
-        igsAgent_error(agent, "Parameter name cannot be NULL or empty");
-        return IGS_FAILURE;
-    }
+    assert(agent);
+    assert(name);
     const igs_iop_t *iop = model_writeIOP(agent, name, IGS_PARAMETER_T, IGS_DATA_T, value, size);
     return (iop == NULL)?IGS_FAILURE : IGS_SUCCESS;
 }
 
 void igsAgent_clearDataForInput(igs_agent_t *agent, const char *name){
+    assert(agent);
+    assert(name);
     igs_iop_t *iop = model_findIopByName(agent, name, IGS_INPUT_T);
     if (iop != NULL && iop->value_type == IGS_DATA_T && iop->value.data != NULL){
         free(iop->value.data);
@@ -1254,6 +1250,8 @@ void igsAgent_clearDataForInput(igs_agent_t *agent, const char *name){
 }
 
 void igsAgent_clearDataForOutput(igs_agent_t *agent, const char *name){
+    assert(agent);
+    assert(name);
     igs_iop_t *iop = model_findIopByName(agent, name, IGS_OUTPUT_T);
     if (iop != NULL && iop->value_type == IGS_DATA_T && iop->value.data != NULL){
         free(iop->value.data);
@@ -1271,6 +1269,8 @@ void igsAgent_clearDataForOutput(igs_agent_t *agent, const char *name){
 }
 
 void igsAgent_clearDataForParameter(igs_agent_t *agent, const char *name){
+    assert(agent);
+    assert(name);
     igs_iop_t *iop = model_findIopByName(agent, name, IGS_PARAMETER_T);
     if (iop != NULL && iop->value_type == IGS_DATA_T && iop->value.data != NULL){
         free(iop->value.data);
@@ -1290,6 +1290,8 @@ void igsAgent_clearDataForParameter(igs_agent_t *agent, const char *name){
 // --------------------------------  INTROSPECTION ------------------------------------//
 
 iopType_t igsAgent_getTypeForInput(igs_agent_t *agent, const char *name){
+    assert(agent);
+    assert(name);
     if((name == NULL) || (strlen(name) == 0)){
         igsAgent_error(agent, "Input name cannot be NULL or empty");
         return IGS_UNKNOWN_T;
@@ -1298,6 +1300,8 @@ iopType_t igsAgent_getTypeForInput(igs_agent_t *agent, const char *name){
 }
 
 iopType_t igsAgent_getTypeForOutput(igs_agent_t *agent, const char *name){
+    assert(agent);
+    assert(name);
     if((name == NULL) || (strlen(name) == 0)){
         igsAgent_error(agent, "Output name cannot be NULL or empty");
         return IGS_UNKNOWN_T;
@@ -1306,6 +1310,8 @@ iopType_t igsAgent_getTypeForOutput(igs_agent_t *agent, const char *name){
 }
 
 iopType_t igsAgent_getTypeForParameter(igs_agent_t *agent, const char *name){
+    assert(agent);
+    assert(name);
     if((name == NULL) || (strlen(name) == 0)){
         igsAgent_error(agent, "Parameter name cannot be NULL or empty");
         return IGS_UNKNOWN_T;
@@ -1313,7 +1319,8 @@ iopType_t igsAgent_getTypeForParameter(igs_agent_t *agent, const char *name){
     return model_getTypeForIOP(agent, name, IGS_PARAMETER_T);
 }
 
-int igsAgent_getInputsNumber(igs_agent_t *agent){
+size_t igsAgent_getInputsNumber(igs_agent_t *agent){
+    assert(agent);
     if(agent->definition == NULL){
         igsAgent_warn(agent, "definition is NULL");
         return 0;
@@ -1321,7 +1328,8 @@ int igsAgent_getInputsNumber(igs_agent_t *agent){
     return HASH_COUNT(agent->definition->inputs_table);
 }
 
-int igsAgent_getOutputsNumber(igs_agent_t *agent){
+size_t igsAgent_getOutputsNumber(igs_agent_t *agent){
+    assert(agent);
     if(agent->definition == NULL){
         igsAgent_warn(agent, "definition is NULL");
         return 0;
@@ -1329,7 +1337,8 @@ int igsAgent_getOutputsNumber(igs_agent_t *agent){
     return HASH_COUNT(agent->definition->outputs_table);
 }
 
-int igsAgent_getParametersNumber(igs_agent_t *agent){
+size_t igsAgent_getParametersNumber(igs_agent_t *agent){
+    assert(agent);
     if(agent->definition == NULL){
         igsAgent_warn(agent, "definition is NULL");
         return 0;
@@ -1338,14 +1347,17 @@ int igsAgent_getParametersNumber(igs_agent_t *agent){
 }
 
 char ** igsAgent_getInputsList(igs_agent_t *agent, size_t *nbOfElements){
+    assert(agent);
     return model_getIopList(agent, nbOfElements, IGS_INPUT_T);
 }
 
 char ** igsAgent_getOutputsList(igs_agent_t *agent, size_t *nbOfElements){
+    assert(agent);
     return model_getIopList(agent, nbOfElements, IGS_OUTPUT_T);
 }
 
 char ** igsAgent_getParametersList(igs_agent_t *agent, size_t *nbOfElements){
+    assert(agent);
     return model_getIopList(agent, nbOfElements, IGS_PARAMETER_T);
 }
 
@@ -1366,33 +1378,27 @@ void igs_freeIOPList(char ***list, size_t nbOfElements){
 }
 
 bool igsAgent_checkInputExistence(igs_agent_t *agent, const char *name){
+    assert(agent);
+    assert(name);
     if (agent->definition == NULL){
-        return false;
-    }
-    if((name == NULL) || (strlen(name) == 0)){
-        igsAgent_error(agent, "Input name cannot be NULL or empty\n");
         return false;
     }
     return model_checkIOPExistence(agent, name, agent->definition->inputs_table);
 }
 
 bool igsAgent_checkOutputExistence(igs_agent_t *agent, const char *name){
+    assert(agent);
+    assert(name);
     if (agent->definition == NULL){
-        return false;
-    }
-    if((name == NULL) || (strlen(name) == 0)){
-        igsAgent_warn(agent, "Output name cannot be NULL or empty");
         return false;
     }
     return model_checkIOPExistence(agent, name, agent->definition->outputs_table);
 }
 
 bool igsAgent_checkParameterExistence(igs_agent_t *agent, const char *name){
+    assert(agent);
+    assert(name);
     if (agent->definition == NULL){
-        return false;
-    }
-    if((name == NULL) || (strlen(name) == 0)){
-        igsAgent_warn(agent, "Parameter name cannot be NULL or empty");
         return false;
     }
     return model_checkIOPExistence(agent, name, agent->definition->params_table);
@@ -1400,26 +1406,35 @@ bool igsAgent_checkParameterExistence(igs_agent_t *agent, const char *name){
 
 // --------------------------------  OBSERVE ------------------------------------//
 
-int igsAgent_observeInput(igs_agent_t *agent, const char *name, igsAgent_observeCallback cb, void *myData){
-    return model_observe(agent, name, IGS_INPUT_T, cb, myData);
+void igsAgent_observeInput(igs_agent_t *agent, const char *name, igsAgent_observeCallback cb, void *myData){
+    assert(agent);
+    assert(name);
+    assert(cb);
+    model_observe(agent, name, IGS_INPUT_T, cb, myData);
 }
 
-int igsAgent_observeOutput(igs_agent_t *agent, const char *name, igsAgent_observeCallback cb, void * myData){
-    return model_observe(agent, name, IGS_OUTPUT_T, cb, myData);
+void igsAgent_observeOutput(igs_agent_t *agent, const char *name, igsAgent_observeCallback cb, void * myData){
+    assert(agent);
+    assert(name);
+    assert(cb);
+    model_observe(agent, name, IGS_OUTPUT_T, cb, myData);
 }
 
-int igsAgent_observeParameter(igs_agent_t *agent, const char *name, igsAgent_observeCallback cb, void * myData){
-    return model_observe(agent, name, IGS_PARAMETER_T, cb, myData);
+void igsAgent_observeParameter(igs_agent_t *agent, const char *name, igsAgent_observeCallback cb, void * myData){
+    assert(agent);
+    assert(name);
+    assert(cb);
+    model_observe(agent, name, IGS_PARAMETER_T, cb, myData);
 }
 
 // --------------------------------  MUTE ------------------------------------//
 
 
-igs_result_t igsAgent_muteOutput(igs_agent_t *agent, const char *name){
+void igsAgent_muteOutput(igs_agent_t *agent, const char *name){
     igs_iop_t *iop = model_findIopByName(agent, (char*) name, IGS_OUTPUT_T);
     if(iop == NULL || iop->type != IGS_OUTPUT_T){
-        igsAgent_warn(agent, "Output '%s' not found", name);
-        return IGS_FAILURE;
+        igsAgent_error(agent, "Output '%s' not found", name);
+        return;
     }
     iop->is_muted = true;
     if (coreContext != NULL && coreContext->node != NULL){
@@ -1431,14 +1446,13 @@ igs_result_t igsAgent_muteOutput(igs_agent_t *agent, const char *name){
         zyre_shout(coreContext->node, IGS_PRIVATE_CHANNEL, &msg);
         bus_zyreUnlock();
     }
-    return IGS_SUCCESS;
 }
 
-igs_result_t igsAgent_unmuteOutput(igs_agent_t *agent, const char *name){
+void igsAgent_unmuteOutput(igs_agent_t *agent, const char *name){
     igs_iop_t *iop = model_findIopByName(agent, (char*) name,IGS_OUTPUT_T);
     if(iop == NULL || iop->type != IGS_OUTPUT_T){
-        igsAgent_warn(agent, "Output '%s' not found", name);
-        return IGS_FAILURE;
+        igsAgent_error(agent, "Output '%s' not found", name);
+        return;
     }
     iop->is_muted = false;
     if (coreContext != NULL && coreContext->node != NULL){
@@ -1450,7 +1464,6 @@ igs_result_t igsAgent_unmuteOutput(igs_agent_t *agent, const char *name){
         zyre_shout(coreContext->node, IGS_PRIVATE_CHANNEL, &msg);
         bus_zyreUnlock();
     }
-    return IGS_SUCCESS;
 }
 
 bool igsAgent_isOutputMuted(igs_agent_t *agent, const char *name){

@@ -2166,17 +2166,12 @@ int network_timerCallback (zloop_t *loop, int timer_id, void *arg){
     return 1;
 }
 
-igs_result_t igs_observeBus(igs_BusMessageIncoming cb, void *myData){
-    if (cb != NULL){
-        igs_zyre_callback_t *newCb = calloc(1, sizeof(igs_zyre_callback_t));
-        newCb->callback_ptr = cb;
-        newCb->myData = myData;
-        DL_APPEND(coreContext->zyreCallbacks, newCb);
-    }else{
-        igs_error("callback is null");
-        return IGS_FAILURE;
-    }
-    return IGS_SUCCESS;
+void igs_observeBus(igs_BusMessageIncoming cb, void *myData){
+    assert(cb);
+    igs_zyre_callback_t *newCb = calloc(1, sizeof(igs_zyre_callback_t));
+    newCb->callback_ptr = cb;
+    newCb->myData = myData;
+    DL_APPEND(coreContext->zyreCallbacks, newCb);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2184,11 +2179,9 @@ igs_result_t igs_observeBus(igs_BusMessageIncoming cb, void *myData){
 ////////////////////////////////////////////////////////////////////////
 
 igs_result_t igs_startWithDevice(const char *networkDevice, unsigned int port){
+    assert(networkDevice);
+    assert(port > 0);
     core_initContext();
-    if ((networkDevice == NULL) || (strlen(networkDevice) == 0)){
-        igs_error("networkDevice cannot be NULL or empty");
-        return IGS_FAILURE;
-    }
     
     if (coreContext->networkActor != NULL){
         //Agent is active : need to stop it first
@@ -2236,11 +2229,9 @@ igs_result_t igs_startWithDevice(const char *networkDevice, unsigned int port){
 }
 
 igs_result_t igs_startWithIP(const char *ipAddress, unsigned int port){
+    assert(ipAddress);
+    assert(port > 0);
     core_initContext();
-    if ((ipAddress == NULL) || (strlen(ipAddress) == 0)){
-        igs_error("IP address cannot be NULL or empty");
-        return IGS_FAILURE;
-    }
     
     if (coreContext->networkActor != NULL){
         //Agent is already active : need to stop it first
@@ -2288,16 +2279,10 @@ igs_result_t igs_startWithIP(const char *ipAddress, unsigned int port){
 }
 
 igs_result_t igs_startWithDeviceOnBroker(const char *networkDevice, const char *brokerEndpoint){
+    assert(networkDevice);
+    assert(brokerEndpoint);
     core_initContext();
     //TODO: manage a list of brokers instead of just one
-    if ((brokerEndpoint == NULL) || (strlen(brokerEndpoint) == 0)){
-        igs_error("brokerIpAddress cannot be NULL or empty");
-        return IGS_FAILURE;
-    }
-    if ((networkDevice == NULL) || (strlen(networkDevice) == 0)){
-        igs_error("networkDevice cannot be NULL or empty");
-        return IGS_FAILURE;
-    }
     
     if (coreContext->networkActor != NULL){
         //Agent is already active : need to stop it first
@@ -2349,7 +2334,7 @@ igs_result_t igs_startWithDeviceOnBroker(const char *networkDevice, const char *
 }
 
 
-igs_result_t igs_stop(){
+void igs_stop(){
     if (coreContext->networkActor != NULL){
         //interrupting and destroying ingescape thread and zyre layer
         //this will also clean all agent->subscribers
@@ -2389,7 +2374,6 @@ igs_result_t igs_stop(){
 #if !TARGET_OS_IOS
     license_cleanLicense(coreContext);
 #endif
-    return IGS_SUCCESS;
 }
 
 bool igs_isStarted(){
@@ -2401,14 +2385,12 @@ bool igs_isStarted(){
     }
 }
 
-igs_result_t igsAgent_setAgentName(igs_agent_t *agent, const char *name){
-    if ((name == NULL) || (strlen(name) == 0)){
-        igsAgent_error(agent, "Agent name cannot be NULL or empty");
-        return IGS_FAILURE;
-    }
-    if (strcmp(agent->name, name) == 0){
+void igsAgent_setAgentName(igs_agent_t *agent, const char *name){
+    assert(agent);
+    assert(name && strlen(name) > 0);
+    if (streq(agent->name, name)){
         //nothing to do
-        return IGS_SUCCESS;
+        return;
     }
     char networkDevice[IGS_NETWORK_DEVICE_LENGTH] = "";
     char ipAddress[IGS_IP_ADDRESS_LENGTH] = "";
@@ -2444,7 +2426,6 @@ igs_result_t igsAgent_setAgentName(igs_agent_t *agent, const char *name){
         igs_startWithIP(ipAddress, zyrePort);
     }
     igsAgent_debug(agent, "Agent name is %s", agent->name);
-    return IGS_SUCCESS;
 }
 
 
@@ -2526,12 +2507,9 @@ void igs_observeFreeze(igs_freezeCallback cb, void *myData){
 }
 
 
-igs_result_t igsAgent_setAgentState(igs_agent_t *agent, const char *state){
+void igsAgent_setAgentState(igs_agent_t *agent, const char *state){
     assert(agent);
-    if (state == NULL){
-        igsAgent_error(agent, "state cannot be NULL");
-        return IGS_FAILURE;
-    }
+    assert(state);
     
     if (agent->state == NULL || !streq(state, agent->state)){
         if (agent->state != NULL)
@@ -2547,7 +2525,6 @@ igs_result_t igsAgent_setAgentState(igs_agent_t *agent, const char *state){
             bus_zyreUnlock();
         }
     }
-    return IGS_SUCCESS;
 }
 
 
@@ -2561,7 +2538,7 @@ char *igsAgent_getAgentState(igs_agent_t *agent){
 }
 
 
-igs_result_t igsAgent_mute(igs_agent_t *agent){
+void igsAgent_mute(igs_agent_t *agent){
     if (!agent->isWholeAgentMuted)
     {
         agent->isWholeAgentMuted = true;
@@ -2579,11 +2556,10 @@ igs_result_t igsAgent_mute(igs_agent_t *agent){
             elt->callback_ptr(agent, agent->isWholeAgentMuted, elt->myData);
         }
     }
-    return 1;
 }
 
 
-igs_result_t igsAgent_unmute(igs_agent_t *agent){
+void igsAgent_unmute(igs_agent_t *agent){
     if (agent->isWholeAgentMuted)
     {
         agent->isWholeAgentMuted = false;
@@ -2601,7 +2577,6 @@ igs_result_t igsAgent_unmute(igs_agent_t *agent){
             elt->callback_ptr(agent, agent->isWholeAgentMuted, elt->myData);
         }
     }
-    return 1;
 }
 
 

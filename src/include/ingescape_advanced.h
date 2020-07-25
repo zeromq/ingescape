@@ -74,7 +74,6 @@ PUBLIC void igs_monitor(igs_monitorCallback cb, void *myData);
 
 //////////////////////////////////////////////////
 // Data serialization using ZeroMQ
-//TODO: give code examples here or link to documentation for zmsg and zframe
 PUBLIC igs_result_t igs_writeOutputAsZMQMsg(const char *name, zmsg_t *msg);
 PUBLIC igs_result_t igs_readInputAsZMQMsg(const char *name, zmsg_t **msg); //msg must be freed by caller using zmsg_destroy
 
@@ -84,10 +83,10 @@ PUBLIC igs_result_t igs_readInputAsZMQMsg(const char *name, zmsg_t **msg); //msg
 typedef void (*igs_BusMessageIncoming) (const char *event, const char *peerID, const char *name,
                                         const char *address, const char *channel,
                                         zhash_t *headers, zmsg_t *msg, void *myData);
-PUBLIC igs_result_t igs_observeBus(igs_BusMessageIncoming cb, void *myData);
+PUBLIC void igs_observeBus(igs_BusMessageIncoming cb, void *myData);
 
 PUBLIC igs_result_t igs_busJoinChannel(const char *channel);
-PUBLIC igs_result_t igs_busLeaveChannel(const char *channel);
+PUBLIC void igs_busLeaveChannel(const char *channel);
 
 PUBLIC igs_result_t igs_busSendStringToChannel(const char *channel, const char *msg, ...);
 PUBLIC igs_result_t igs_busSendDataToChannel(const char *channel, void *data, size_t size);

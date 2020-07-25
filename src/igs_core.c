@@ -53,9 +53,9 @@ void core_initAgent(){
     }
 }
 
-igs_result_t igs_setAgentName(const char *name){
+void igs_setAgentName(const char *name){
     core_initAgent();
-    return igsAgent_setAgentName(coreAgent, name);
+    igsAgent_setAgentName(coreAgent, name);
 }
 
 char *igs_getAgentName(void){
@@ -63,9 +63,9 @@ char *igs_getAgentName(void){
     return igsAgent_getAgentName(coreAgent);
 }
 
-igs_result_t igs_setAgentState(const char *state){
+void igs_setAgentState(const char *state){
     core_initAgent();
-    return igsAgent_setAgentState(coreAgent, state);
+    igsAgent_setAgentState(coreAgent, state);
 }
 
 char *igs_getAgentState(void){
@@ -73,14 +73,14 @@ char *igs_getAgentState(void){
     return igsAgent_getAgentState(coreAgent);
 }
 
-igs_result_t igs_mute(void){
+void igs_mute(void){
     core_initAgent();
-    return igsAgent_mute(coreAgent);
+    igsAgent_mute(coreAgent);
 }
 
-igs_result_t igs_unmute(void){
+void igs_unmute(void){
     core_initAgent();
-    return igsAgent_unmute(coreAgent);
+    igsAgent_unmute(coreAgent);
 }
 
 bool igs_isMuted(void){
@@ -344,14 +344,14 @@ void igs_observeParameter(const char *name, igs_observeCallback cb, void * myDat
     igsAgent_observeParameter(coreAgent, name, core_observeIOPCallback, wrap);
 }
 
-igs_result_t igs_muteOutput(const char *name){
+void igs_muteOutput(const char *name){
     core_initAgent();
-    return igsAgent_muteOutput(coreAgent, name);
+    igsAgent_muteOutput(coreAgent, name);
 }
 
-igs_result_t igs_unmuteOutput(const char *name){
+void igs_unmuteOutput(const char *name){
     core_initAgent();
-    return igsAgent_unmuteOutput(coreAgent, name);
+    igsAgent_unmuteOutput(coreAgent, name);
 }
 
 bool igs_isOutputMuted(const char *name){
@@ -456,19 +456,19 @@ char *igs_getDefinitionVersion(void){
     return igsAgent_getDefinitionVersion(coreAgent);
 }
  //returned char* must be freed by caller
-igs_result_t igs_setDefinitionName(const char *name){
+void igs_setDefinitionName(const char *name){
     core_initAgent();
-    return igsAgent_setDefinitionName(coreAgent, name);
+    igsAgent_setDefinitionName(coreAgent, name);
 }
 
-igs_result_t igs_setDefinitionDescription(const char *description){
+void igs_setDefinitionDescription(const char *description){
     core_initAgent();
-    return igsAgent_setDefinitionDescription(coreAgent, description);
+    igsAgent_setDefinitionDescription(coreAgent, description);
 }
 
-igs_result_t igs_setDefinitionVersion(const char *version){
+void igs_setDefinitionVersion(const char *version){
     core_initAgent();
-    return igsAgent_setDefinitionVersion(coreAgent, version);
+    igsAgent_setDefinitionVersion(coreAgent, version);
 }
 
 igs_result_t igs_createInput(const char *name, iopType_t type, void *value, size_t size){
@@ -538,22 +538,22 @@ char *igs_getMappingVersion(void){
     return igsAgent_getMappingVersion(coreAgent);
 }
 
-igs_result_t igs_setMappingName(const char *name){
+void igs_setMappingName(const char *name){
     core_initAgent();
-    return igsAgent_setMappingName(coreAgent, name);
+    igsAgent_setMappingName(coreAgent, name);
 }
 
-igs_result_t igs_setMappingDescription(const char *description){
+void igs_setMappingDescription(const char *description){
     core_initAgent();
-    return igsAgent_setMappingDescription(coreAgent, description);
+    igsAgent_setMappingDescription(coreAgent, description);
 }
 
-igs_result_t igs_setMappingVersion(const char *version){
+void igs_setMappingVersion(const char *version){
     core_initAgent();
-    return igsAgent_setMappingVersion(coreAgent, version);
+    igsAgent_setMappingVersion(coreAgent, version);
 }
 
-int igs_getMappingEntriesNumber(void){
+size_t igs_getMappingEntriesNumber(void){
     core_initAgent();
     return igsAgent_getMappingEntriesNumber(coreAgent);
 }
@@ -649,10 +649,6 @@ void core_callCallback(igs_agent_t *agent, const char *senderAgentName, const ch
 
 igs_result_t igs_initCall(const char *name, igs_callFunction cb, void *myData){
     core_initAgent();
-    if (cb == NULL){
-        igs_error("callback cannot be NULL");
-        return IGS_FAILURE;
-    }
     callCbWrapper_t *wrap = calloc(1, sizeof(callCbWrapper_t));
     wrap->cb = cb;
     wrap->myData = myData;

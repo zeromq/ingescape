@@ -31,21 +31,21 @@ PUBLIC bool igsAgent_isActivated(igs_agent_t *agent);
  in ingescape.h, except that they take an agent instance as first argument.
  */
 
-PUBLIC igs_result_t igsAgent_setAgentName(igs_agent_t *agent, const char *name);
+PUBLIC void igsAgent_setAgentName(igs_agent_t *agent, const char *name);
 PUBLIC char *igsAgent_getAgentName(igs_agent_t *agent); //char* must be freed by caller
-PUBLIC igs_result_t igsAgent_setAgentState(igs_agent_t *agent, const char *state);
+PUBLIC void igsAgent_setAgentState(igs_agent_t *agent, const char *state);
 PUBLIC char *igsAgent_getAgentState(igs_agent_t *agent); //char* must be freed by caller
 
-PUBLIC igs_result_t igsAgent_mute(igs_agent_t *agent);
-PUBLIC igs_result_t igsAgent_unmute(igs_agent_t *agent);
+PUBLIC void igsAgent_mute(igs_agent_t *agent);
+PUBLIC void igsAgent_unmute(igs_agent_t *agent);
 PUBLIC bool igsAgent_isMuted(igs_agent_t *agent);
 typedef void (*igsAgent_muteCallback)(igs_agent_t *Agent, bool isMuted, void *myData);
 PUBLIC void igsAgent_observeMute(igs_agent_t *agent, igsAgent_muteCallback cb, void *myData);
 
 //IOP read, write, creation, destruction, introspection
-PUBLIC int igsAgent_readInput(igs_agent_t *agent, const char *name, void **value, size_t *size);
-PUBLIC int igsAgent_readOutput(igs_agent_t *agent, const char *name, void **value, size_t *size);
-PUBLIC int igsAgent_readParameter(igs_agent_t *agent, const char *name, void **value, size_t *size);
+PUBLIC igs_result_t igsAgent_readInput(igs_agent_t *agent, const char *name, void **value, size_t *size);
+PUBLIC igs_result_t igsAgent_readOutput(igs_agent_t *agent, const char *name, void **value, size_t *size);
+PUBLIC igs_result_t igsAgent_readParameter(igs_agent_t *agent, const char *name, void **value, size_t *size);
 PUBLIC bool igsAgent_readInputAsBool(igs_agent_t *agent, const char *name);
 PUBLIC int igsAgent_readInputAsInt(igs_agent_t *agent, const char *name);
 PUBLIC double igsAgent_readInputAsDouble(igs_agent_t *agent, const char *name);
@@ -83,19 +83,19 @@ PUBLIC void igsAgent_clearDataForOutput(igs_agent_t *agent, const char *name);
 PUBLIC void igsAgent_clearDataForParameter(igs_agent_t *agent, const char *name);
 
 typedef void (*igsAgent_observeCallback)(igs_agent_t *agent, iop_t iopType, const char *name, iopType_t valueType, void *value, size_t valueSize, void *myData);
-PUBLIC int igsAgent_observeInput(igs_agent_t *agent, const char *name, igsAgent_observeCallback cb, void *myData);
-PUBLIC int igsAgent_observeOutput(igs_agent_t *agent, const char *name, igsAgent_observeCallback cb, void * myData);
-PUBLIC int igsAgent_observeParameter(igs_agent_t *agent, const char *name, igsAgent_observeCallback cb, void * myData);
+PUBLIC void igsAgent_observeInput(igs_agent_t *agent, const char *name, igsAgent_observeCallback cb, void *myData);
+PUBLIC void igsAgent_observeOutput(igs_agent_t *agent, const char *name, igsAgent_observeCallback cb, void * myData);
+PUBLIC void igsAgent_observeParameter(igs_agent_t *agent, const char *name, igsAgent_observeCallback cb, void * myData);
 
-PUBLIC igs_result_t igsAgent_muteOutput(igs_agent_t *agent, const char *name);
-PUBLIC igs_result_t igsAgent_unmuteOutput(igs_agent_t *agent, const char *name);
+PUBLIC void igsAgent_muteOutput(igs_agent_t *agent, const char *name);
+PUBLIC void igsAgent_unmuteOutput(igs_agent_t *agent, const char *name);
 PUBLIC bool igsAgent_isOutputMuted(igs_agent_t *agent, const char *name);
 PUBLIC iopType_t igsAgent_getTypeForInput(igs_agent_t *agent, const char *name);
 PUBLIC iopType_t igsAgent_getTypeForOutput(igs_agent_t *agent, const char *name);
 PUBLIC iopType_t igsAgent_getTypeForParameter(igs_agent_t *agent, const char *name);
-PUBLIC int igsAgent_getInputsNumber(igs_agent_t *agent);
-PUBLIC int igsAgent_getOutputsNumber(igs_agent_t *agent);
-PUBLIC int igsAgent_getParametersNumber(igs_agent_t *agent);
+PUBLIC size_t igsAgent_getInputsNumber(igs_agent_t *agent);
+PUBLIC size_t igsAgent_getOutputsNumber(igs_agent_t *agent);
+PUBLIC size_t igsAgent_getParametersNumber(igs_agent_t *agent);
 PUBLIC char** igsAgent_getInputsList(igs_agent_t *agent, size_t *nbOfElements); //returned char** must be freed using igs_freeIOPList
 PUBLIC char** igsAgent_getOutputsList(igs_agent_t *agent, size_t *nbOfElements); //returned char** must be freed using igs_freeIOPList
 PUBLIC char** igsAgent_getParametersList(igs_agent_t *agent, size_t *nbOfElements); //returned char** must be freed using igs_freeIOPList
@@ -111,9 +111,9 @@ PUBLIC char* igsAgent_getDefinition(igs_agent_t *agent);
 PUBLIC char *igsAgent_getDefinitionName(igs_agent_t *agent); //returned char* must be freed by caller
 PUBLIC char *igsAgent_getDefinitionDescription(igs_agent_t *agent); //returned char* must be freed by caller
 PUBLIC char *igsAgent_getDefinitionVersion(igs_agent_t *agent); //returned char* must be freed by caller
-PUBLIC igs_result_t igsAgent_setDefinitionName(igs_agent_t *agent, const char *name);
-PUBLIC igs_result_t igsAgent_setDefinitionDescription(igs_agent_t *agent, const char *description);
-PUBLIC igs_result_t igsAgent_setDefinitionVersion(igs_agent_t *agent, const char *version);
+PUBLIC void igsAgent_setDefinitionName(igs_agent_t *agent, const char *name);
+PUBLIC void igsAgent_setDefinitionDescription(igs_agent_t *agent, const char *description);
+PUBLIC void igsAgent_setDefinitionVersion(igs_agent_t *agent, const char *version);
 PUBLIC igs_result_t igsAgent_createInput(igs_agent_t *agent, const char *name, iopType_t value_type, void*value, size_t size);
 PUBLIC igs_result_t igsAgent_createOutput(igs_agent_t *agent, const char *name, iopType_t type, void *value, size_t size);
 PUBLIC igs_result_t igsAgent_createParameter(igs_agent_t *agent, const char *name, iopType_t type, void *value, size_t size);
@@ -129,10 +129,10 @@ PUBLIC char* igsAgent_getMapping(igs_agent_t *agent); //returns json string, mus
 PUBLIC char *igsAgent_getMappingName(igs_agent_t *agent); //returned char* must be freed by caller
 PUBLIC char *igsAgent_getMappingDescription(igs_agent_t *agent); //returned char* must be freed by caller
 PUBLIC char *igsAgent_getMappingVersion(igs_agent_t *agent); //returned char* must be freed by caller
-PUBLIC igs_result_t igsAgent_setMappingName(igs_agent_t *agent, const char *name);
-PUBLIC igs_result_t igsAgent_setMappingDescription(igs_agent_t *agent, const char *description);
-PUBLIC igs_result_t igsAgent_setMappingVersion(igs_agent_t *agent, const char *version);
-PUBLIC int igsAgent_getMappingEntriesNumber(igs_agent_t *agent);
+PUBLIC void igsAgent_setMappingName(igs_agent_t *agent, const char *name);
+PUBLIC void igsAgent_setMappingDescription(igs_agent_t *agent, const char *description);
+PUBLIC void igsAgent_setMappingVersion(igs_agent_t *agent, const char *version);
+PUBLIC size_t igsAgent_getMappingEntriesNumber(igs_agent_t *agent);
 PUBLIC unsigned long igsAgent_addMappingEntry(igs_agent_t *agent, const char *fromOurInput, const char *toAgent, const char *withOutput);
 PUBLIC igs_result_t igsAgent_removeMappingEntryWithId(igs_agent_t *agent, unsigned long theId);
 PUBLIC igs_result_t igsAgent_removeMappingEntryWithName(igs_agent_t *agent, const char *fromOurInput, const char *toAgent, const char *withOutput);

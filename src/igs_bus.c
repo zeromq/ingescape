@@ -77,28 +77,20 @@ igs_result_t igs_busJoinChannel(const char *channel){
     return IGS_SUCCESS;
 }
 
-igs_result_t igs_busLeaveChannel(const char *channel){
+void igs_busLeaveChannel(const char *channel){
     assert(channel && strlen(channel) > 0);
     if (coreContext->networkActor != NULL && coreContext->node != NULL){
         bus_zyreLock();
         zyre_leave(coreContext->node, channel);
         bus_zyreUnlock();
     }else{
-        igs_error("Ingescape is not started, this command is useless");
-        return IGS_FAILURE;
+        igs_warn("Ingescape is not started, this command will be useless");
     }
-    return IGS_SUCCESS;
 }
 
 igs_result_t igs_busSendStringToChannel(const char *channel, const char *msg, ...){
-    if (channel == NULL){
-        igs_error("channel is NULL");
-        return IGS_FAILURE;
-    }
-    if (msg == NULL){
-        igs_error("message is NULL");
-        return IGS_FAILURE;
-    }
+    assert(channel);
+    assert(msg);
     if (strcmp(IGS_PRIVATE_CHANNEL, channel) == 0){
         igs_error("channel name %s is reserved and cannot be used", channel);
         return IGS_FAILURE;
@@ -121,14 +113,7 @@ igs_result_t igs_busSendStringToChannel(const char *channel, const char *msg, ..
 }
 
 igs_result_t igs_busSendDataToChannel(const char *channel, void *data, size_t size){
-    if (channel == NULL){
-        igs_error("channel is NULL");
-        return IGS_FAILURE;
-    }
-    if (data == NULL){
-        igs_error("data is NULL");
-        return IGS_FAILURE;
-    }
+    assert(channel);
     if (strcmp(IGS_PRIVATE_CHANNEL, channel) == 0){
         igs_error("channel name %s is reserved and cannot be used", channel);
         return IGS_FAILURE;
@@ -149,14 +134,9 @@ igs_result_t igs_busSendDataToChannel(const char *channel, void *data, size_t si
 }
 
 igs_result_t igs_busSendZMQMsgToChannel(const char *channel, zmsg_t **msg_p){
-    if (channel == NULL){
-        igs_error("channel is NULL");
-        return IGS_FAILURE;
-    }
-    if (msg_p == NULL || *msg_p == NULL){
-        igs_error("message is NULL");
-        return IGS_FAILURE;
-    }
+    assert(channel);
+    assert(msg_p);
+    assert(*msg_p);
     if (strcmp(IGS_PRIVATE_CHANNEL, channel) == 0){
         igs_error("channel name %s is reserved and cannot be used", channel);
         return IGS_FAILURE;
@@ -174,16 +154,10 @@ igs_result_t igs_busSendZMQMsgToChannel(const char *channel, zmsg_t **msg_p){
 }
 
 igs_result_t igs_busSendStringToAgent(const char *agentNameOrAgentIdOrPeerID, const char *msg, ...){
+    assert(agentNameOrAgentIdOrPeerID);
+    assert(msg);
     if (coreContext == NULL || coreContext->node == NULL){
         igs_error("Ingescape must be started before trying to send a message");
-        return IGS_FAILURE;
-    }
-    if (agentNameOrAgentIdOrPeerID == NULL){
-        igs_error("agentNameOrAgentIdOrPeerID is NULL");
-        return IGS_FAILURE;
-    }
-    if (msg == NULL){
-        igs_error("message is NULL");
         return IGS_FAILURE;
     }
     bool hasSent = false;
@@ -230,16 +204,9 @@ igs_result_t igs_busSendStringToAgent(const char *agentNameOrAgentIdOrPeerID, co
 }
 
 igs_result_t igs_busSendDataToAgent(const char *agentNameOrAgentIdOrPeerID, void *data, size_t size){
+    assert(agentNameOrAgentIdOrPeerID);
     if (coreContext == NULL || coreContext->node == NULL){
         igs_error("Ingescape must be started before trying to send a message");
-        return IGS_FAILURE;
-    }
-    if (agentNameOrAgentIdOrPeerID == NULL){
-        igs_error("agentNameOrAgentIdOrPeerID is NULL");
-        return IGS_FAILURE;
-    }
-    if (data == NULL){
-        igs_error("data is NULL");
         return IGS_FAILURE;
     }
     bool hasSent = false;
@@ -280,16 +247,11 @@ igs_result_t igs_busSendDataToAgent(const char *agentNameOrAgentIdOrPeerID, void
 }
 
 igs_result_t igs_busSendZMQMsgToAgent(const char *agentNameOrAgentIdOrPeerID, zmsg_t **msg_p){
+    assert(agentNameOrAgentIdOrPeerID);
+    assert(msg_p);
+    assert(*msg_p);
     if (coreContext == NULL || coreContext->node == NULL){
         igs_error("Ingescape must be started before trying to send a message");
-        return IGS_FAILURE;
-    }
-    if (agentNameOrAgentIdOrPeerID == NULL){
-        igs_error("agentNameOrAgentIdOrPeerID is NULL");
-        return IGS_FAILURE;
-    }
-    if (msg_p == NULL || *msg_p == NULL){
-        igs_error("data is NULL");
         return IGS_FAILURE;
     }
     bool hasSent = false;
@@ -331,14 +293,8 @@ igs_result_t igs_busSendZMQMsgToAgent(const char *agentNameOrAgentIdOrPeerID, zm
 }
 
 igs_result_t igs_busAddServiceDescription(const char *key, const char *value){
-    if (key == NULL){
-        igs_error("key is NULL");
-        return IGS_FAILURE;
-    }
-    if (value == NULL){
-        igs_error("value is NULL");
-        return IGS_FAILURE;
-    }
+    assert(key);
+    assert(value);
     if (strcmp(key, "publisher") != 0
         && strcmp(key, "logger") != 0
         && strcmp(key, "pid") != 0
@@ -363,10 +319,7 @@ igs_result_t igs_busAddServiceDescription(const char *key, const char *value){
 }
 
 igs_result_t igs_busRemoveServiceDescription(const char *key){
-    if (key == NULL){
-        igs_error("key is NULL");
-        return IGS_FAILURE;
-    }
+    assert(key);
     if (strcmp(key, "publisher") != 0
         && strcmp(key, "logger") != 0
         && strcmp(key, "pid") != 0
