@@ -139,7 +139,7 @@ private:
 
 private :
     // Agent with license needed for the application
-    licenseForAgent_t* _licenseForAgentNeeded;
+    igs_license_for_agent_t* _licenseForAgentNeeded;
 };
 
 QML_DECLARE_TYPE(LicensesController)

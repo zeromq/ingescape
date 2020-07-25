@@ -79,7 +79,7 @@ public:
      * @param licenseObject
      * @param parent
      */
-    LicenseInformationM(const license_t* licenseObject, QObject* parent = nullptr);
+    LicenseInformationM(const igs_license_t* licenseObject, QObject* parent = nullptr);
 };
 
 /**
