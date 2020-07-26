@@ -455,11 +455,13 @@ int manageParent (zloop_t *loop, zsock_t *pipe, void *arg){
     IGS_UNUSED(arg)
 
     zmsg_t *msg = zmsg_recv(pipe);
-    if (!msg){
-        igs_error("Could not read message from main thread : Ingescape will interrupt immediately.");
-        return -1;
-    }
+    assert(msg);
     char *command = zmsg_popstr (msg);
+    if (command == NULL){
+        igs_error("command is NULL for parent message: aborting");
+        zmsg_destroy(&msg);
+        return 0;
+    }
     if (streq (command, "$TERM")){
         free (command);
         zmsg_destroy (&msg);
@@ -504,8 +506,23 @@ void handlePublicationFromRemoteAgent(zmsg_t *msg, igs_remote_agent_t *remoteAge
             // 2 : output ioptType
             // 3 : value of the output as a string or zframe
             output = zmsg_popstr(dup);
+            if (output == NULL){
+                igs_error("output name is NULL in received publication : aborting");
+                break;
+            }
             vType = zmsg_popstr(dup);
+            if (vType == NULL){
+                igs_error("output type is NULL in received publication : aborting");
+                free(output);
+                break;
+            }
             valueType = atoi(vType);
+            if (valueType < IGS_INTEGER_T || valueType > IGS_DATA_T){
+                igs_error("output type is not valid (%d) in received publication : aborting", valueType);
+                free(output);
+                free(vType);
+                break;
+            }
             free(vType);
             vType = NULL;
             
@@ -516,8 +533,16 @@ void handlePublicationFromRemoteAgent(zmsg_t *msg, igs_remote_agent_t *remoteAge
             //get data before iterating to all the mapping elements using it
             if (valueType == IGS_STRING_T){
                 value = zmsg_popstr(dup);
+                if (value == NULL){
+                    igs_error("value is NULL in received publication : aborting");
+                    break;
+                }
             }else{
                 frame = zmsg_pop(dup);
+                if (frame == NULL){
+                    igs_error("value is NULL in received publication : aborting");
+                    break;
+                }
                 data = zframe_data(frame);
                 size = zframe_size(frame);
             }
@@ -570,17 +595,30 @@ int manageRemotePublication (zloop_t *loop, zsock_t *socket, void *arg){
     
     zmsg_t *msg = zmsg_recv(socket);
     char *outputName = zmsg_popstr(msg);
+    if (outputName == NULL){
+        igs_error("output name is NULL in received publication : aborting");
+        return 0;
+    }
     char uuid[33] = ""; //33 is UUID length + terminal 0
+    if (strlen(outputName) < 33){
+        igs_error("output name '%s' is missing information : aborting", outputName);
+        free(outputName);
+        return 0;
+    }
     snprintf(uuid, 33, "%s", outputName);
-    outputName = outputName + 33;
+    char *realOutputName = outputName + 33;
     
     //ATTENTION: We push the output name again at the beginning of
     //the message for proper use by handlePublicationFromRemoteAgent
-    zmsg_pushstr(msg, outputName);
+    zmsg_pushstr(msg, realOutputName);
+    free(outputName);
     
     igs_remote_agent_t *remoteAgent = NULL;
     HASH_FIND_STR(context->remoteAgents, uuid, remoteAgent);
-    assert(remoteAgent);
+    if (remoteAgent == NULL){
+        igs_error("no remote agent with uuid '%s' : aborting", uuid);
+        return 0;
+    }
     handlePublicationFromRemoteAgent(msg, remoteAgent);
     zmsg_destroy(&msg);
     return 0;
@@ -763,8 +801,19 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             //this is a replay message for one of our inputs
             char *agentName = zmsg_popstr (msgDuplicate);
             char *input = zmsg_popstr (msgDuplicate);
-            assert(agentName);
-            assert(input);
+            if (agentName == NULL){
+                igs_error("agent name is NULL for replay message from %s(%s): aborting", name, peer);
+                zmsg_destroy(&msgDuplicate);
+                zyre_event_destroy(&zyre_event);
+                return 0;
+            }
+            if (input == NULL){
+                igs_error("input is NULL for replay message from %s(%s): aborting", name, peer);
+                free(agentName);
+                zmsg_destroy(&msgDuplicate);
+                zyre_event_destroy(&zyre_event);
+                return 0;
+            }
 
             char *value = NULL;
             zframe_t *frame = NULL;
@@ -778,12 +827,26 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                         igs_debug("replaying %s.%s", agentName, input);
                         if (inputType == IGS_STRING_T){
                             value = zmsg_popstr(msgDuplicate);
-                            assert(value);
+                            if (value == NULL){
+                                igs_error("value is NULL for replay message from %s(%s): aborting", name, peer);
+                                free(agentName);
+                                free(input);
+                                zmsg_destroy(&msgDuplicate);
+                                zyre_event_destroy(&zyre_event);
+                                return 0;
+                            }
                             igsAgent_writeInputAsString(targetAgent, input, value);
                             free(value);
                         }else{
                             frame = zmsg_pop(msgDuplicate);
-                            assert(frame);
+                            if (frame == NULL){
+                                igs_error("value is NULL for replay message from %s(%s): aborting", name, peer);
+                                free(agentName);
+                                free(input);
+                                zmsg_destroy(&msgDuplicate);
+                                zyre_event_destroy(&zyre_event);
+                                return 0;
+                            }
                             data = zframe_data(frame);
                             size = zframe_size(frame);
                             model_writeIOP(targetAgent, input, IGS_INPUT_T, inputType, data, size);
@@ -817,6 +880,12 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
         }
     } else if(streq (event, "WHISPER")){
         char *title = zmsg_popstr (msgDuplicate);
+        if (title == NULL){
+            igs_error("no header in message received from %s(%s): aborting", name, peer);
+            zmsg_destroy(&msgDuplicate);
+            zyre_event_destroy(&zyre_event);
+            return 0;
+        }
         
         //check if title is an EXTERNAL definition
         if(streq(title, definitionPrefix)){
@@ -825,8 +894,29 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             //the agent sends its definition for the first time.
             //Agents without definition are considered impossible.
             char* strDefinition = zmsg_popstr(msgDuplicate);
+            if (strDefinition == NULL){
+                igs_error("no valid definition in %s message received from %s(%s): aborting", title, name, peer);
+                zmsg_destroy(&msgDuplicate);
+                zyre_event_destroy(&zyre_event);
+                return 0;
+            }
             char *uuid = zmsg_popstr(msgDuplicate);
+            if (uuid == NULL){
+                igs_error("no valid uuid in %s message received from %s(%s): aborting", title, name, peer);
+                free(strDefinition);
+                zmsg_destroy(&msgDuplicate);
+                zyre_event_destroy(&zyre_event);
+                return 0;
+            }
             char *remoteAgentName = zmsg_popstr(msgDuplicate);
+            if (remoteAgentName == NULL){
+                igs_error("no valid agent name in %s message received from %s(%s): aborting", title, name, peer);
+                free(strDefinition);
+                free(uuid);
+                zmsg_destroy(&msgDuplicate);
+                zyre_event_destroy(&zyre_event);
+                return 0;
+            }
             
             igs_remote_agent_t *remoteAgent = NULL;
             HASH_FIND_STR(context->remoteAgents, uuid, remoteAgent);
@@ -904,10 +994,30 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
         else if(streq(title, mappingPrefix)){
             //identify remote agent
             char* strMapping = zmsg_popstr (msgDuplicate);
+            if (strMapping == NULL){
+                igs_error("no valid mapping in %s message received from %s(%s): aborting", title, name, peer);
+                zmsg_destroy(&msgDuplicate);
+                zyre_event_destroy(&zyre_event);
+                return 0;
+            }
             char *uuid = zmsg_popstr (msgDuplicate);
+            if (strMapping == NULL){
+                igs_error("uuid is NULL in %s message received from %s(%s): aborting", title, name, peer);
+                free(strMapping);
+                zmsg_destroy(&msgDuplicate);
+                zyre_event_destroy(&zyre_event);
+                return 0;
+            }
             igs_remote_agent_t *remoteAgent = NULL;
             HASH_FIND_STR(context->remoteAgents, uuid, remoteAgent);
-            assert(remoteAgent);
+            if (remoteAgent == NULL){
+                igs_error("no known remote agent with uuid '%s': aborting", uuid);
+                free(strMapping);
+                free(uuid);
+                zmsg_destroy(&msgDuplicate);
+                zyre_event_destroy(&zyre_event);
+                return 0;
+            }
             
             igs_mapping_t *newMapping = NULL;
             if (strlen(mappingPrefix) > 0){
@@ -946,10 +1056,24 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
         else if (streq(title, loadDefinitionPrefix)){
             //identify agent
             char* strDefinition = zmsg_popstr (msgDuplicate);
+            if (strDefinition == NULL){
+                igs_error("no valid definition in %s message received from %s(%s): aborting", title, name, peer);
+                zmsg_destroy(&msgDuplicate);
+                zyre_event_destroy(&zyre_event);
+                return 0;
+            }
             char *uuid = zmsg_popstr (msgDuplicate);
             igs_agent_t *agent = NULL;
             HASH_FIND_STR(context->agents, uuid, agent);
-            assert(agent);
+            if (agent == NULL){
+                igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                free(strDefinition);
+                if (uuid)
+                    free(uuid);
+                zmsg_destroy(&msgDuplicate);
+                zyre_event_destroy(&zyre_event);
+                return 0;
+            }
             
             //load definition
             igsAgent_loadDefinition(agent, strDefinition);
@@ -959,15 +1083,30 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 network_configureMappingsToRemoteAgent(agent, remote);
             }
             free(strDefinition);
+            free(uuid);
         }
         //check if title is MAPPING TO BE LOADED
         else if (streq(title, loadMappingPrefix)){
             //identify agent
             char* strMapping = zmsg_popstr (msgDuplicate);
+            if (strMapping == NULL){
+                igs_error("no valid mapping in %s message received from %s(%s): aborting", title, name, peer);
+                zmsg_destroy(&msgDuplicate);
+                zyre_event_destroy(&zyre_event);
+                return 0;
+            }
             char *uuid = zmsg_popstr (msgDuplicate);
             igs_agent_t *agent = NULL;
             HASH_FIND_STR(context->agents, uuid, agent);
-            assert(agent);
+            if (agent == NULL){
+                igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                free(strMapping);
+                if (uuid)
+                    free(uuid);
+                zmsg_destroy(&msgDuplicate);
+                zyre_event_destroy(&zyre_event);
+                return 0;
+            }
             
             // Load mapping from string content
             igs_mapping_t *m = parser_loadMapping(strMapping);
@@ -984,6 +1123,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 agent->network_needToUpdateMapping = true;
             }
             free(strMapping);
+            free(uuid);
             
         }else{
             //
@@ -994,7 +1134,14 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
-                assert(agent);
+                if (agent == NULL){
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    if (uuid)
+                        free(uuid);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 
                 model_readWriteLock();
                 zmsg_t *msgToSend = zmsg_new();
@@ -1048,21 +1195,37 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 igs_debug("send output values to %s", peer);
                 zyre_whisper(node, peer, &msgToSend);
                 bus_zyreUnlock();
+                free(uuid);
                 
             }else if (streq(title, "CURRENT_OUTPUTS")){
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_remote_agent_t *remoteAgent = NULL;
                 HASH_FIND_STR(context->remoteAgents, uuid, remoteAgent);
-                assert(remoteAgent);
+                if (remoteAgent == NULL){
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    if (uuid)
+                        free(uuid);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 igs_debug("privately received output values from %s (%s)", remoteAgent->name, remoteAgent->uuid);
                 handlePublicationFromRemoteAgent(msgDuplicate, remoteAgent);
+                free(uuid);
                 
             }else if (streq(title, "GET_CURRENT_INPUTS")){
                 //identify agent
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
-                assert(agent);
+                if (agent == NULL){
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    if (uuid)
+                        free(uuid);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 
                 model_readWriteLock();
                 zmsg_t *msgToSend = zmsg_new();
@@ -1112,13 +1275,21 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 igs_debug("send input values to %s", peer);
                 zyre_whisper(node, peer, &msgToSend);
                 bus_zyreUnlock();
+                free(uuid);
                 
             }else if (streq(title, "GET_CURRENT_PARAMETERS")){
                 //identify agent
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
-                assert(agent);
+                if (agent == NULL){
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    if (uuid)
+                        free(uuid);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 
                 model_readWriteLock();
                 zmsg_t *msgToSend = zmsg_new();
@@ -1168,6 +1339,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 igs_debug("send parameters values to %s", peer);
                 zyre_whisper(node, peer, &msgToSend);
                 bus_zyreUnlock();
+                free(uuid);
                 
             }else if (streq(title, "GET_LICENSE_INFO")){
 #if !TARGET_OS_IOS
@@ -1229,10 +1401,18 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
-                assert(agent);
+                if (agent == NULL){
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    if (uuid)
+                        free(uuid);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 
                 igs_debug("received CLEAR_MAPPING command from %s (%s)", name, peer);
                 igsAgent_clearMapping(agent);
+                free(uuid);
                 
             }else if (streq(title, "FREEZE")){
                 igs_debug("received FREEZE command from %s (%s)", name, peer);
@@ -1258,90 +1438,267 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 
             }else if (streq(title, "MUTE")){
                 char *iopName = zmsg_popstr (msgDuplicate);
+                if (iopName == NULL){
+                    igs_error("no valid iop name in %s message received from %s(%s): aborting", title, name, peer);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
-                assert(agent);
+                if (agent == NULL){
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    if (uuid)
+                        free(uuid);
+                    free(iopName);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 
                 igs_debug("received MUTE command from %s (%s)", name, peer);
                 igsAgent_muteOutput(agent, iopName);
+                free(iopName);
+                free(uuid);
                 
             }else if (streq(title, "UNMUTE")){
                 char *iopName = zmsg_popstr (msgDuplicate);
+                if (iopName == NULL){
+                    igs_error("no valid iop name in %s message received from %s(%s): aborting", title, name, peer);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
-                assert(agent);
+                if (agent == NULL){
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    if (uuid)
+                        free(uuid);
+                    free(iopName);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 
                 igs_debug("received UNMUTE command from %s (%s)", name, peer);
                 igsAgent_unmuteOutput(agent,iopName);
+                free(iopName);
+                free(uuid);
                 
             }else if (streq(title, "SET_INPUT")){
                 char *iopName = zmsg_popstr (msgDuplicate);
+                if (iopName == NULL){
+                    igs_error("no valid iop name in %s message received from %s(%s): aborting", title, name, peer);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 char *value = zmsg_popstr (msgDuplicate);
+                if (value == NULL){
+                    igs_error("no valid value in %s message received from %s(%s): aborting", title, name, peer);
+                    free(iopName);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
-                assert(agent);
+                if (agent == NULL){
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    if (uuid)
+                        free(uuid);
+                    free(iopName);
+                    free(value);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 
                 igs_debug("received SET_INPUT command from %s (%s)", name, peer);
                 if (iopName != NULL && value != NULL){
                     igsAgent_writeInputAsString(agent, iopName, value);
                 }
+                free(iopName);
+                free(value);
+                free(uuid);
                 
             }else if (streq(title, "SET_OUTPUT")){
                 char *iopName = zmsg_popstr (msgDuplicate);
+                if (iopName == NULL){
+                    igs_error("no valid iop name in %s message received from %s(%s): aborting", title, name, peer);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 char *value = zmsg_popstr (msgDuplicate);
+                if (value == NULL){
+                    igs_error("no valid value in %s message received from %s(%s): aborting", title, name, peer);
+                    free(iopName);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
-                assert(agent);
+                if (agent == NULL){
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    if (uuid)
+                        free(uuid);
+                    free(iopName);
+                    free(value);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 
                 igs_debug("received SET_OUTPUT command from %s (%s)", name, peer);
                 if (iopName != NULL && value != NULL){
                     igsAgent_writeOutputAsString(agent, iopName, value);
                 }
+                free(iopName);
+                free(value);
+                free(uuid);
                 
             }else if (streq(title, "SET_PARAMETER")){
                 char *iopName = zmsg_popstr (msgDuplicate);
+                if (iopName == NULL){
+                    igs_error("no valid iop name in %s message received from %s(%s): aborting", title, name, peer);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 char *value = zmsg_popstr (msgDuplicate);
+                if (value == NULL){
+                    igs_error("no valid value in %s message received from %s(%s): aborting", title, name, peer);
+                    free(iopName);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
-                assert(agent);
+                if (agent == NULL){
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    if (uuid)
+                        free(uuid);
+                    free(iopName);
+                    free(value);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 
                 igs_debug("received SET_PARAMETER command from %s (%s)", name, peer);
                 if (iopName != NULL && value != NULL){
                     igsAgent_writeParameterAsString(agent, iopName, value);
                 }
+                free(iopName);
+                free(value);
+                free(uuid);
                 
             }else if (streq(title, "MAP")){
                 char *input = zmsg_popstr (msgDuplicate);
+                if (input == NULL){
+                    igs_error("no valid input in %s message received from %s(%s): aborting", title, name, peer);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 char *remoteAgent = zmsg_popstr (msgDuplicate);
+                if (remoteAgent == NULL){
+                    igs_error("no valid agent name in %s message received from %s(%s): aborting", title, name, peer);
+                    free(input);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 char *output = zmsg_popstr (msgDuplicate);
+                if (output == NULL){
+                    igs_error("no valid output in %s message received from %s(%s): aborting", title, name, peer);
+                    free(input);
+                    free(remoteAgent);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
-                assert(agent);
+                if (agent == NULL){
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    if (uuid)
+                        free(uuid);
+                    free(input);
+                    free(remoteAgent);
+                    free(output);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 
                 igs_debug("received MAP command from %s (%s)", name, peer);
                 if (input != NULL && remoteAgent != NULL && output != NULL){
                     igsAgent_addMappingEntry(agent, input, remoteAgent, output);
                 }
+                free(input);
+                free(remoteAgent);
+                free(output);
+                free(uuid);
                 
             }else if (streq(title, "UNMAP")){
                 char *input = zmsg_popstr (msgDuplicate);
+                if (input == NULL){
+                    igs_error("no valid input in %s message received from %s(%s): aborting", title, name, peer);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 char *remoteAgent = zmsg_popstr (msgDuplicate);
+                if (remoteAgent == NULL){
+                    igs_error("no valid agent name in %s message received from %s(%s): aborting", title, name, peer);
+                    free(input);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 char *output = zmsg_popstr (msgDuplicate);
+                if (output == NULL){
+                    igs_error("no valid output in %s message received from %s(%s): aborting", title, name, peer);
+                    free(input);
+                    free(remoteAgent);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
-                assert(agent);
+                if (agent == NULL){
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    if (uuid)
+                        free(uuid);
+                    free(input);
+                    free(remoteAgent);
+                    free(output);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 
                 igs_debug("received UNMAP command from %s (%s)", name, peer);
                 if (input != NULL && remoteAgent != NULL && output != NULL){
                     igsAgent_removeMappingEntryWithName(agent, input, remoteAgent, output);
                 }
+                free(input);
+                free(remoteAgent);
+                free(output);
+                free(uuid);
             }
             //admin API
             else if (streq(title, "ENABLE_LOG_STREAM")){
@@ -1367,43 +1724,91 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             }
             else if (streq(title, "SET_DEFINITION_PATH")){
                 char *definitionPath = zmsg_popstr (msgDuplicate);
+                if (definitionPath == NULL){
+                    igs_error("no valid definition path in %s message received from %s(%s): aborting", title, name, peer);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
-                assert(agent);
+                if (agent == NULL){
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    if (uuid)
+                        free(uuid);
+                    free(definitionPath);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 
                 igs_debug("received SET_DEFINITION_PATH command from %s (%s)", name, peer);
                 igsAgent_setDefinitionPath(agent, definitionPath);
+                free(definitionPath);
+                free(uuid);
             }
             else if (streq(title, "SET_MAPPING_PATH")){
                 char *mappingPath = zmsg_popstr (msgDuplicate);
+                if (mappingPath == NULL){
+                    igs_error("no valid mapping path in %s message received from %s(%s): aborting", title, name, peer);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
-                assert(agent);
+                if (agent == NULL){
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    if (uuid)
+                        free(uuid);
+                    free(mappingPath);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                          
                 igs_debug("received SET_MAPPING_PATH command from %s (%s)", name, peer);
                 igsAgent_setMappingPath(agent, mappingPath);
+                free(mappingPath);
+                free(uuid);
             }
             else if (streq(title, "SAVE_DEFINITION_TO_PATH")){
                 //identify agent
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
-                assert(agent);
+                if (agent == NULL){
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    if (uuid)
+                        free(uuid);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 
                 igs_debug("received SAVE_DEFINITION_TO_PATH command from %s (%s)", name, peer);
                 igsAgent_writeDefinitionToPath(agent);
+                free(uuid);
             }
             else if (streq(title, "SAVE_MAPPING_TO_PATH")){
                 //identify agent
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
-                assert(agent);
+                if (agent == NULL){
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    if (uuid)
+                        free(uuid);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 
                 igs_debug("received SAVE_MAPPING_TO_PATH command from %s (%s)", name, peer);
                 igsAgent_writeMappingToPath(agent);
+                free(uuid);
             }
             //CALLS
             else if (streq (title, "CALL")){
@@ -1411,9 +1816,23 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
-                assert(agent);
+                if (agent == NULL){
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    if (uuid)
+                        free(uuid);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 
                 char *callName = zmsg_popstr(msgDuplicate);
+                if (callName == NULL){
+                    igs_error("no valid call name in %s message received from %s(%s): aborting", title, name, peer);
+                    free(uuid);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 if (agent->definition != NULL && agent->definition->calls_table != NULL){
                     igs_call_t *call = NULL;
                     HASH_FIND_STR(agent->definition->calls_table, callName, call);
@@ -1436,6 +1855,8 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                         igsAgent_warn(agent, "agent %s has no call named %s", name, callName);
                     }
                 }
+                free(uuid);
+                free(callName);
             }
             //Performance
             else if (strcmp (title, "PING") == 0){
@@ -1526,7 +1947,6 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
     }
     zmsg_destroy(&msgDuplicate);
     zyre_event_destroy(&zyre_event);
-        
     return 0;
 }
 
@@ -1570,6 +1990,7 @@ int triggerMappingUpdate(zloop_t *loop, int timer_id, void *arg){
     IGS_UNUSED(loop)
     IGS_UNUSED(timer_id)
     igs_core_context_t *context = (igs_core_context_t *)arg;
+    assert(context);
 
     igs_agent_t *agent, *tmp;
     HASH_ITER(hh, context->agents, agent, tmp){
