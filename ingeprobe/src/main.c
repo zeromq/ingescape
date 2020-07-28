@@ -681,21 +681,21 @@ int manageIncoming (zloop_t *loop, zsock_t *socket, void *args){
             HASH_FIND_STR(context->agents, uuid, agent);
             if (agent == NULL){
                 agent = calloc(1, sizeof(agent_t));
+                agent->uuid = uuid;
+                agent->name = remoteAgentName;
+                HASH_ADD_STR(context->agents, uuid, agent);
                 peer_t *p = NULL;
                 HASH_FIND_STR(context->peers, peerId, p);
                 assert(p);
                 agent->peer = p;
+            }else if (!streq(remoteAgentName, agent->name)){
+                if (agent->name != NULL)
+                    free(agent->name);
+                agent->name = remoteAgentName;
             }
-            if (agent->name != NULL)
-                free(agent->name);
-            if (agent->uuid != NULL)
-                free(agent->uuid);
-            agent->name = remoteAgentName;
-            agent->uuid = uuid;
-            HASH_ADD_STR(context->agents, uuid, agent);
             parseCallsFromDefinition(strDefinition, &(agent->calls));
             free(strDefinition);
-        } else if (strncmp(message, "EXTERNAL_DEFINITION#", strlen("EXTERNAL_DEFINITION#")) == 0){
+        }else if (strncmp(message, "EXTERNAL_DEFINITION#", strlen("EXTERNAL_DEFINITION#")) == 0){
             //v1 or v0 protocol
             char *definition = message + strlen("EXTERNAL_DEFINITION#");
             agent_t *agent = NULL;
@@ -963,6 +963,15 @@ void print_usage(){
     printf("\tNB: zyre endpoint can be tcp, ipc or inproc\n");
 }
 
+/*
+ Other commands to add:
+ - agents list
+ - map, clear mapping, unmap
+ - mute, unmute, freeze, unfreeze
+ - license info
+ - stop
+ - link log with log stream enabling
+ */
 void print_commands(){
     printf("---------------------------------\n");
     printf("Supported commands:\n");
@@ -982,7 +991,7 @@ void print_commands(){
     printf("/unsubscribe peer : cancel all subscriptions to ingescape peer outputs\n\t(peer can be  name or uuid)\n");
     printf("/log peer : subscribes to ingescape agent log stream\n\t(peer can be name or uuid)\n");
     printf("/unlog peer : cancel subscription to ingescape agent log stream\n\t(peer can be name or uuid)\n");
-    printf("/write agent i|o|p iop_name value : write value to agent (name or uuid) for specified input/output/parameter\n");
+    printf("/write agent i|o|p iop_name value : sends value to agent (name or uuid) for specified input/output/parameter\n");
     printf("/call agent call_name ... : sends a call to agent for specified call_name wth parameters\n");
     printf("\n");
 }
