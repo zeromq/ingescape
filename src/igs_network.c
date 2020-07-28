@@ -546,30 +546,32 @@ void handlePublicationFromRemoteAgent(zmsg_t *msg, igs_remote_agent_t *remoteAge
                 data = zframe_data(frame);
                 size = zframe_size(frame);
             }
-            //try to find mapping elements matching with this subscriber's output
-            //and update mapped input(s) value accordingly
-            //TODO : optimize mapping storage to avoid iterating
-            igs_mapping_element_t *elmt, *tmp;
-            HASH_ITER(hh, agent->mapping->map_elements, elmt, tmp) {
-                if (strcmp(elmt->agent_name, remoteAgent->name) == 0
-                    && strcmp(elmt->output_name, output) == 0){
-                    //we have a match on emitting agent name and its ouput name :
-                    //still need to check the targeted input existence in our definition
-                    igs_iop_t *foundInput = NULL;
-                    if (agent->definition->inputs_table != NULL){
-                        HASH_FIND_STR(agent->definition->inputs_table, elmt->input_name, foundInput);
-                    }
-                    if (foundInput == NULL){
-                        igsAgent_warn(agent, "Input %s is missing in our definition but expected in our mapping with %s.%s",
-                                      elmt->input_name,
-                                      elmt->agent_name,
-                                      elmt->output_name);
-                    }else{
-                        //we have a fully matching mapping element : write from received output to our input
-                        if (valueType == IGS_STRING_T){
-                            model_writeIOP(agent, elmt->input_name, IGS_INPUT_T, valueType, value, strlen(value)+1);
+            if (agent->mapping){
+                //try to find mapping elements matching with this subscriber's output
+                //and update mapped input(s) value accordingly
+                //TODO : optimize mapping storage to avoid iterating
+                igs_mapping_element_t *elmt, *tmp;
+                HASH_ITER(hh, agent->mapping->map_elements, elmt, tmp) {
+                    if (strcmp(elmt->agent_name, remoteAgent->name) == 0
+                        && strcmp(elmt->output_name, output) == 0){
+                        //we have a match on emitting agent name and its ouput name :
+                        //still need to check the targeted input existence in our definition
+                        igs_iop_t *foundInput = NULL;
+                        if (agent->definition->inputs_table != NULL){
+                            HASH_FIND_STR(agent->definition->inputs_table, elmt->input_name, foundInput);
+                        }
+                        if (foundInput == NULL){
+                            igsAgent_warn(agent, "Input %s is missing in our definition but expected in our mapping with %s.%s",
+                                          elmt->input_name,
+                                          elmt->agent_name,
+                                          elmt->output_name);
                         }else{
-                            model_writeIOP(agent, elmt->input_name, IGS_INPUT_T, valueType, data, size);
+                            //we have a fully matching mapping element : write from received output to our input
+                            if (valueType == IGS_STRING_T){
+                                model_writeIOP(agent, elmt->input_name, IGS_INPUT_T, valueType, value, strlen(value)+1);
+                            }else{
+                                model_writeIOP(agent, elmt->input_name, IGS_INPUT_T, valueType, data, size);
+                            }
                         }
                     }
                 }
@@ -1211,6 +1213,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 }
                 igs_debug("privately received output values from %s (%s)", remoteAgent->name, remoteAgent->uuid);
                 handlePublicationFromRemoteAgent(msgDuplicate, remoteAgent);
+                zmsg_destroy(&msgDuplicate);
                 free(uuid);
                 
             }else if (streq(title, "GET_CURRENT_INPUTS")){
@@ -2187,34 +2190,6 @@ void initLoop (igs_core_context_t *context){
     //definition modifications when the agent is running.
 #endif
     
-#if defined __unix__ || defined __APPLE__ || defined __linux__
-    if (context->network_shallRaiseFileDescriptorsLimit){
-        struct rlimit limit;
-        if (getrlimit(RLIMIT_NOFILE, &limit) != 0) {
-            igs_error("getrlimit() failed with errno=%d", errno);
-        }else{
-            rlim_t prevCur = limit.rlim_cur;
-#ifdef __APPLE__
-            limit.rlim_cur = MIN(OPEN_MAX, limit.rlim_max); //OPEN_MAX is the actual per process limit in macOS
-#else
-            limit.rlim_cur = limit.rlim_max;
-#endif
-            if (setrlimit(RLIMIT_NOFILE, &limit) != 0) {
-              igs_error("setrlimit() failed with errno=%d", errno);
-            }else{
-                if (getrlimit(RLIMIT_NOFILE, &limit) != 0) {
-                  igs_error("getrlimit() failed with errno=%d", errno);
-                }else{
-                    //adjust allowed number of sockets per process in ZeroMQ
-                    zsys_set_max_sockets(0); //0 = use maximum value allowed by the OS
-                    igs_debug("raised file descriptors limit from %llu to %llu", prevCur, limit.rlim_cur);
-                    context->network_shallRaiseFileDescriptorsLimit = false;
-                }
-            }
-        }
-    }
-#endif
-
     bool canContinue = true;
     //prepare zyre
     bus_zyreLock();
@@ -2559,6 +2534,7 @@ igs_result_t network_publishOutput (igs_agent_t *agent, const igs_iop_t *iop){
             fakeRemote->name = agent->name;
             model_readWriteUnlock(); //to avoid deadlock inside handlePublicationFromRemoteAgent
             handlePublicationFromRemoteAgent(msgQuater, fakeRemote);
+            zmsg_destroy(&msgQuater);
             free(fakeRemote);
             
         }else{
@@ -2774,9 +2750,9 @@ void igs_stop(){
             zsys_shutdown();
         }
 #endif
-        igs_info("agent stopped");
+        igs_info("peer stopped");
     }else{
-        igs_debug("agent already stopped");
+        igs_debug("peer already stopped");
     }
     
     if (coreContext->networkDevice != NULL){
@@ -2813,18 +2789,6 @@ void igsAgent_setAgentName(igs_agent_t *agent, const char *name){
         //nothing to do
         return;
     }
-    char networkDevice[IGS_NETWORK_DEVICE_LENGTH] = "";
-    char ipAddress[IGS_IP_ADDRESS_LENGTH] = "";
-    int zyrePort = 0;
-    bool needRestart = false;
-    if (coreContext->networkActor != NULL){
-        //Ingescape is already started, peer needs to be recreated
-        strncpy(networkDevice, coreContext->networkDevice, IGS_NETWORK_DEVICE_LENGTH);
-        strncpy(ipAddress, coreContext->ipAddress, IGS_IP_ADDRESS_LENGTH);
-        zyrePort = coreContext->network_zyrePort;
-        igs_stop();
-        needRestart = true;
-    }
     char *n = strndup(name, IGS_MAX_AGENT_NAME_LENGTH);
     if (strlen(name) > IGS_MAX_AGENT_NAME_LENGTH){
         igsAgent_warn(agent, "Agent name '%s' exceeds maximum size and will be truncated to '%s'", name, n);
@@ -2839,14 +2803,13 @@ void igsAgent_setAgentName(igs_agent_t *agent, const char *name){
         }
     }
     if (spaceInName){
-        igsAgent_warn(agent, "Spaces are not allowed in agent name: '%s' has been renamed to '%s'", name, n);
+        igsAgent_warn(agent, "Spaces are not allowed in agent name: '%s' has been changed to '%s'", name, n);
     }
+    char *previous = agent->name;
     agent->name = n;
-    
-    if (needRestart){
-        igs_startWithIP(ipAddress, zyrePort);
-    }
-    igsAgent_debug(agent, "Agent name is %s", agent->name);
+    agent->network_needToSendDefinitionUpdate = true;
+    igsAgent_debug(agent, "Agent (%s) name changed from %s to %s", agent->uuid, previous, agent->name);
+    free(previous);
 }
 
 
@@ -3297,6 +3260,38 @@ void igs_setHighWaterMarks(int hwmValue){
         }
     }
     coreContext->network_hwmValue = hwmValue;
+}
+
+void igs_raiseSocketsLimit(){
+#if defined __unix__ || defined __APPLE__ || defined __linux__
+    if (coreContext->network_shallRaiseFileDescriptorsLimit){
+        struct rlimit limit;
+        if (getrlimit(RLIMIT_NOFILE, &limit) != 0) {
+            igs_error("getrlimit() failed with errno=%d", errno);
+        }else{
+            rlim_t prevCur = limit.rlim_cur;
+#ifdef __APPLE__
+            limit.rlim_cur = MIN(OPEN_MAX, limit.rlim_max); //OPEN_MAX is the actual per process limit in macOS
+#else
+            limit.rlim_cur = limit.rlim_max;
+#endif
+            if (setrlimit(RLIMIT_NOFILE, &limit) != 0) {
+                igs_error("setrlimit() failed with errno=%d", errno);
+            }else{
+                if (getrlimit(RLIMIT_NOFILE, &limit) != 0) {
+                    igs_error("getrlimit() failed with errno=%d", errno);
+                }else{
+                    //adjust allowed number of sockets per process in ZeroMQ
+                    zsys_set_max_sockets(0); //0 = use maximum value allowed by the OS
+                    igs_debug("raised file descriptors limit from %llu to %llu", prevCur, limit.rlim_cur);
+                    coreContext->network_shallRaiseFileDescriptorsLimit = false;
+                }
+            }
+        }
+    }
+#else
+    igs_info("this function has no effect on non-UNIX systems");
+#endif
 }
 
 int igs_timerStart(size_t delay, size_t times, igs_timerCallback cb, void *myData){
