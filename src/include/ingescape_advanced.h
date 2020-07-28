@@ -34,6 +34,7 @@ PUBLIC void igs_setPublishingPort(unsigned int port);
 PUBLIC void igs_setLogStreamPort(unsigned int port);
 PUBLIC void igs_setDiscoveryInterval(unsigned int interval); //in milliseconds
 PUBLIC void igs_setAgentTimeout(unsigned int duration); //in milliseconds
+PUBLIC void igs_raiseSocketsLimit(void); //UNIX only, to be called before any ingescape or ZeroMQ activity
 
 //sends number of messages with defiend size and displays performance
 //information when finished (information displayed as INFO-evel log)
