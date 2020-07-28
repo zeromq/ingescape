@@ -11,65 +11,53 @@
 
 #ifndef CALLBACK_IGS
 #define CALLBACK_IGS
-typedef struct CallbackForcedStopJS {
+
+typedef struct ThreadsafeContext {
     napi_threadsafe_function threadsafe_func;
     napi_ref ref_myData;
-    struct CallbackForcedStopJS *prev, *next;
-} CallbackForcedStopJS;
+    struct ThreadsafeContext *prev, *next;
+} ThreadsafeContext;
 
-typedef struct CallbackMuteJS {
+
+typedef struct ArgsCallbackMuteJS {
 	bool isMuted;
-    napi_threadsafe_function threadsafe_func;
     napi_ref ref_myData;
-    struct CallbackMuteJS *prev, *next;
-} CallbackMuteJS;
+} ArgsCallbackMuteJS;
 
-typedef struct CallbackFreezeJS {
+typedef struct ArgsCallbackFreezeJS {
 	bool isPaused;
-    napi_threadsafe_function threadsafe_func;
     napi_ref ref_myData;
-    struct CallbackFreezeJS *prev, *next;
-} CallbackFreezeJS;
+} ArgsCallbackFreezeJS;
 
-typedef struct CallbackIopJS {
+typedef struct ArgsCallbackIopJS {
 	iop_t iopType;
 	char* name;
 	iopType_t valueType;
 	void* value;
 	size_t valueSize;
-    napi_threadsafe_function threadsafe_func;
     napi_ref ref_myData;
-    struct CallbackIopJS *prev, *next;
-} CallbackIopJS;
+} ArgsCallbackIopJS;
 
-typedef struct CallbackLicense {
+typedef struct ArgsCallbackLicense {
     igs_license_limit_t limit;
-    napi_threadsafe_function threadsafe_func;
     napi_ref ref_myData;
-    struct CallbackLicense *prev, *next;
-} CallbackLicense;
+} ArgsCallbackLicense;
 
-typedef struct CallbackCall {
+typedef struct ArgsCallbackCall {
     char *senderAgentName;
     char *senderAgentUUID;
     char *callName;
     igs_callArgument_t *firstArgument;
     size_t nbArgs;
-    
-    napi_threadsafe_function threadsafe_func;
     napi_ref ref_myData;
-    struct CallbackCall *prev, *next;
-} CallbackCall;
+} ArgsCallbackCall;
 
-typedef struct CallbackMonitor {
+typedef struct ArgsCallbackMonitor {
     igs_monitorEvent_t event;
     char *device;
     char *ipAddress;
-    
-    napi_threadsafe_function threadsafe_func;
     napi_ref ref_myData;
-    struct CallbackMonitor *prev, *next;
-} CallbackMonitor;
+} ArgsCallbackMonitor;
 #endif
 
 // Free allocated memory for callbacks during lifetime of the agent
