@@ -256,6 +256,18 @@ int manageParent (zloop_t *loop, zsock_t *socket, void *args){
             }
             zlist_destroy(&all_channels);
         }
+        else if(streq (command, "AGENTS")){
+            peer_t *peer, *ptmp;
+            HASH_ITER(hh, context->peers, peer, ptmp){
+                printf("in peer '%s' (%s) - %s:\n", peer->name, peer->uuid, peer->endpoint);
+                agent_t *a = NULL, *atmp;
+                HASH_ITER(hh, context->agents, a, atmp){
+                    if (a->peer == peer){
+                        printf("\t'%s' (%s)\n", a->name, a->uuid);
+                    }
+                }
+            }
+        }
         else if(streq (command, "WRITE")){
             char *target = zmsg_popstr (msg);
             char *args = zmsg_popstr (msg);
@@ -386,15 +398,16 @@ int manageParent (zloop_t *loop, zsock_t *socket, void *args){
                         printf("Found agent %s but its peer publisher port is NULL : command has been ignored\n", agentId);
                         continue;
                     }
+                    
                     if (agent->peer->subscriber != NULL){
                         //subscriber to this agent is already active:
                         //we just have to add internal pub/sub command
                         zsock_set_subscribe(agent->peer->subscriber, "");
                         continue;
                     }
+                    
                     char endpointAddress[128];
                     strncpy(endpointAddress, agent->peer->endpoint, 128);
-                    
                     // IP adress extraction
                     char *insert = endpointAddress + strlen(endpointAddress);
                     bool extractOK = true;
@@ -434,16 +447,22 @@ int manageParent (zloop_t *loop, zsock_t *socket, void *args){
                         printf("found agent %s but its peer publisher port is NULL : command has been ignored\n", agentId);
                         continue;
                     }
+                    
                     if (agent->peer->subscriber != NULL){
                         //subscriber to this agent is already active:
                         //we just have to add internal pub/sub command
-                        zsock_set_subscribe(agent->peer->subscriber, output);
+                        if (streq(agent->peer->protocol, "v1")){
+                            zsock_set_subscribe(agent->peer->subscriber, output);
+                        }else if (streq(agent->peer->protocol, "v2")){
+                            char filterValue[4096 + 33] = ""; //33 is UUID length + separator
+                            snprintf(filterValue, 4096 + 33, "%s-%s", agent->uuid, output);
+                            zsock_set_subscribe(agent->peer->subscriber, filterValue);
+                        }
                         continue;
                     }
                     
                     char endpointAddress[128];
                     strncpy(endpointAddress, agent->peer->endpoint, 128);
-                    
                     // IP adress extraction
                     char *insert = endpointAddress + strlen(endpointAddress);
                     bool extractOK = true;
@@ -466,7 +485,6 @@ int manageParent (zloop_t *loop, zsock_t *socket, void *args){
                             snprintf(filterValue, 4096 + 33, "%s-%s", agent->uuid, output);
                             zsock_set_subscribe(agent->peer->subscriber, filterValue);
                         }
-                        
                         zloop_reader(loop, agent->peer->subscriber, manageSubscription, agent);
                         printf("subscriber created for %s on output %s\n", agent->name, output);
                     }
@@ -474,6 +492,28 @@ int manageParent (zloop_t *loop, zsock_t *socket, void *args){
             }
             free(agentId);
             free(output);
+        }
+        else if (streq (command, "UNSUBSCRIBE")) {
+            char *agentId = zmsg_popstr (msg);
+            agent_t *agent, *tmp;
+            HASH_ITER(hh, context->agents, agent, tmp){
+                //NB: no break here beacause we allow unsubscribing to several peers
+                //having the same name
+                if (strcmp(agent->name, agentId) == 0 || strcmp(agent->uuid, agentId) == 0){
+                    if (agent->peer->publisherPort == NULL){
+                        printf("found peer %s but its publisher port is NULL : command has been ignored\n", agentId);
+                        continue;
+                    }
+                    if (agent->peer->subscriber == NULL){
+                        printf("found peer %s but its subscriber socket is NULL : command has been ignored\n", agentId);
+                        continue;
+                    }else{
+                        zloop_reader_end(loop, agent->peer->subscriber);
+                        zsock_destroy(&(agent->peer->subscriber));
+                    }
+                }
+            }
+            free(agentId);
         }
         else if (streq (command, "LOG")) {
             char *peerId = zmsg_popstr (msg);
@@ -512,33 +552,11 @@ int manageParent (zloop_t *loop, zsock_t *socket, void *args){
             }
             free(peerId);
         }
-        else if (streq (command, "UNSUBSCRIBE")) {
-            char *agentId = zmsg_popstr (msg);
-            agent_t *agent, *tmp;
-            HASH_ITER(hh, context->agents, agent, tmp){
-                //NB: no break here beacause we allow unsubscribing to several peers
-                //having the same name
-                if (strcmp(agent->name, agentId) == 0 || strcmp(agent->uuid, agentId) == 0){
-                    if (agent->peer->publisherPort == NULL){
-                        printf("found peer %s but its publisher port is NULL : command has been ignored\n", agentId);
-                        continue;
-                    }
-                    if (agent->peer->subscriber == NULL){
-                        printf("found peer %s but its subscriber socket is NULL : command has been ignored\n", agentId);
-                        continue;
-                    }else{
-                        zloop_reader_end(loop, agent->peer->subscriber);
-                        zsock_destroy(&(agent->peer->subscriber));
-                    }
-                }
-            }
-            free(agentId);
-        }
         else if (streq (command, "UNLOG")) {
             char *peerId = zmsg_popstr (msg);
             peer_t *p, *tmp;
             HASH_ITER(hh, context->peers, p, tmp){
-                //NB: no break here beacause we allow subscribing to several peers
+                //NB: no break here because we allow subscribing to several peers
                 //having the same name
                 if (strcmp(p->name, peerId) == 0 || strcmp(p->uuid, peerId) == 0){
                     if (p->logPort == NULL){
@@ -552,6 +570,57 @@ int manageParent (zloop_t *loop, zsock_t *socket, void *args){
                         zloop_reader_end(loop, p->logger);
                         zsock_destroy(&(p->logger));
                     }
+                }
+            }
+            free(peerId);
+        }
+        else if (streq (command, "LICENSE")) {
+            char *peerId = zmsg_popstr (msg);
+            peer_t *p, *tmp;
+            HASH_ITER(hh, context->peers, p, tmp){
+                //NB: no break here because multiple peers can have the same name
+                if (strcmp(p->name, peerId) == 0 || strcmp(p->uuid, peerId) == 0){
+                    zyre_whispers(node, p->uuid, "GET_LICENSE_INFO");
+                }
+            }
+            free(peerId);
+        }
+        else if (streq (command, "START_AGENT")) {
+            char *uuid = zmsg_popstr (msg);
+            char *agentName = zmsg_popstr (msg);
+            peer_t *p, *tmp;
+            HASH_ITER(hh, context->peers, p, tmp){
+                //NB: no break here because multiple peers can have the same name
+                if (strcmp(p->name, uuid) == 0 || strcmp(p->uuid, uuid) == 0){
+                    zmsg_t *msg = zmsg_new();
+                    zmsg_addstr(msg, "START_AGENT");
+                    zmsg_addstr(msg, agentName);
+                    zyre_whisper(node, p->uuid, &msg);
+                }
+            }
+            free(uuid);
+        }
+        else if (streq (command, "STOP_AGENT")) {
+            char *uuid = zmsg_popstr (msg);
+            agent_t *agent, *tmp;
+            HASH_ITER(hh, context->agents, agent, tmp){
+                //NB: no break here because multiple agents can have the same name
+                if (strcmp(agent->name, uuid) == 0 || strcmp(agent->uuid, uuid) == 0){
+                    zmsg_t *msg = zmsg_new();
+                    zmsg_addstr(msg, "STOP_AGENT");
+                    zmsg_addstr(msg, agent->uuid);
+                    zyre_whisper(node, agent->peer->uuid, &msg);
+                }
+            }
+            free(uuid);
+        }
+        else if (streq (command, "STOP_PEER")) {
+            char *peerId = zmsg_popstr (msg);
+            peer_t *p, *tmp;
+            HASH_ITER(hh, context->peers, p, tmp){
+                //NB: no break here because multiple peers can have the same name
+                if (strcmp(p->name, peerId) == 0 || strcmp(p->uuid, peerId) == 0){
+                    zyre_whispers(node, p->uuid, "STOP_PEER");
                 }
             }
             free(peerId);
@@ -965,11 +1034,8 @@ void print_usage(){
 
 /*
  Other commands to add:
- - agents list
  - map, clear mapping, unmap
  - mute, unmute, freeze, unfreeze
- - license info
- - stop
  - link log with log stream enabling
  */
 void print_commands(){
@@ -977,6 +1043,7 @@ void print_commands(){
     printf("Supported commands:\n");
     printf("/quit : cleanly stop the application\n");
     printf("/verbose : triggers verbose mode for detailed activity information\n");
+    printf("\nzyre layer:\n");
     printf("/peers : list all connected peers at the time (name -> uuid)\n");
     printf("/channels : list all existing channels at the time\n");
     printf("/join channel_name : joins a specific channel\n");
@@ -986,9 +1053,15 @@ void print_commands(){
     printf("/whisper peer message : sends a message to a specific peer\n\t(peer can be name or uuid)\n");
     printf("/shout channel_name message : sends a message to a specific channel\n");
     printf("/whisperall message : sends a message to all peers individually\n");
+    printf("/license peer : gets license information for this peer\n\t(peer can be  name or uuid)\n");
+    printf("/stop_peer peer : stops this peer and all attached agents\n\t(peer can be  name or uuid)\n");
+    printf("\ningescape layer:\n");
+    printf("/agents : list all agents by peer\n");
+    //printf("/start agent : starts this agent\n\t(agent can be  name or uuid)\n");
+    printf("/stop agent : stops this agent\n\t(agent can be  name or uuid)\n");
     printf("/subscribe agent : subscribes to all ingescape outputs for this agent\n\t(agent can be  name or uuid)\n");
     printf("/subscribe agent output : subscribes to ingescape agent specific output\n\t(agent can be  name or uuid)\n");
-    printf("/unsubscribe peer : cancel all subscriptions to ingescape peer outputs\n\t(peer can be  name or uuid)\n");
+    printf("/unsubscribe agent : cancel all subscriptions to ingescape agent outputs\n\t(agent can be  name or uuid)\n");
     printf("/log peer : subscribes to ingescape agent log stream\n\t(peer can be name or uuid)\n");
     printf("/unlog peer : cancel subscription to ingescape agent log stream\n\t(peer can be name or uuid)\n");
     printf("/write agent i|o|p iop_name value : sends value to agent (name or uuid) for specified input/output/parameter\n");
@@ -1165,6 +1238,13 @@ int main (int argc, char *argv [])
                         if (gossipActor != NULL){
                             zstr_sendx (gossipActor, "LEAVEALL", NULL);
                         }
+                    }else if (strcmp(command, "agents") == 0){
+                        if (beaconActor != NULL){
+                            zstr_sendx (beaconActor, "AGENTS", NULL);
+                        }
+                        if (gossipActor != NULL){
+                            zstr_sendx (gossipActor, "AGENTS", NULL);
+                        }
                     }else if (strcmp(command, "help") == 0){
                         print_commands();
                     }else if (strcmp(command, "quit") == 0){
@@ -1227,6 +1307,27 @@ int main (int argc, char *argv [])
                         if (gossipActor != NULL){
                             zstr_sendx (gossipActor, "UNLOG", param1, NULL);
                         }
+                    }else if (strcmp(command, "license") == 0){
+                        if (beaconActor != NULL){
+                            zstr_sendx (beaconActor, "LICENSE", param1, NULL);
+                        }
+                        if (gossipActor != NULL){
+                            zstr_sendx (gossipActor, "LICENSE", param1, NULL);
+                        }
+                    }else if (strcmp(command, "stop_peer") == 0){
+                        if (beaconActor != NULL){
+                            zstr_sendx (beaconActor, "STOP_PEER", param1, NULL);
+                        }
+                        if (gossipActor != NULL){
+                            zstr_sendx (gossipActor, "STOP_PEER", param1, NULL);
+                        }
+                    }else if (strcmp(command, "stop") == 0){
+                        if (beaconActor != NULL){
+                            zstr_sendx (beaconActor, "STOP_AGENT", param1, NULL);
+                        }
+                        if (gossipActor != NULL){
+                            zstr_sendx (gossipActor, "STOP_AGENT", param1, NULL);
+                        }
                     }
                 }else if (matches == 3) {
                     //printf("Received command: %s + %s + %s\n", command, param1, param2);
@@ -1265,6 +1366,13 @@ int main (int argc, char *argv [])
                         }
                         if (gossipActor != NULL){
                             zstr_sendx (gossipActor, "CALL", param1, param2, NULL);
+                        }
+                    } else if (strcmp(command, "start") == 0){
+                        if (beaconActor != NULL){
+                            zstr_sendx (beaconActor, "START_AGENT", param1, param2, NULL);
+                        }
+                        if (gossipActor != NULL){
+                            zstr_sendx (gossipActor, "START_AGENT", param1, param2, NULL);
                         }
                     }
                 }else{
