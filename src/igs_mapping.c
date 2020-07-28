@@ -146,7 +146,7 @@ igs_result_t igsAgent_loadMappingFromPath (igs_agent_t *agent, const char* file_
         igsAgent_error(agent, "mapping could not be loaded from path '%s'", file_path);
         return IGS_FAILURE;
     }else{
-        strncpy(agent->mappingPath, file_path, IGS_MAX_PATH_LENGTH - 1);
+        agent->mappingPath = strndup(file_path, IGS_MAX_PATH_LENGTH - 1);
         agent->mapping = tmp;
         agent->network_needToUpdateMapping = true;
     }
