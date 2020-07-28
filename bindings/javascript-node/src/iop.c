@@ -28,8 +28,9 @@ napi_value node_igs_readInput(napi_env env, napi_callback_info info) {
     // convert into good type JavaScript
     napi_value value_napi;
     iopType_t type = igs_getTypeForInput(name);
-    // void * value will be freed by this function
     convert_value_IOP_into_napi(env, type, value, size, &value_napi);
+
+    free(value);
     free(name);
     return value_napi;
 }
@@ -54,8 +55,9 @@ napi_value node_igs_readOutput(napi_env env, napi_callback_info info) {
     // convert into good type JavaScript
     napi_value value_napi;
     iopType_t type = igs_getTypeForOutput(name);
-    // void * value will be freed by this function
     convert_value_IOP_into_napi(env, type, value, size, &value_napi);
+
+    free(value);
     free(name);
     return value_napi;
 }
@@ -80,8 +82,9 @@ napi_value node_igs_readParameter(napi_env env, napi_callback_info info) {
     // convert into good type JavaScript
     napi_value value_napi;
     iopType_t type = igs_getTypeForParameter(name);
-    // void * value will be freed by this function
     convert_value_IOP_into_napi(env, type, value, size, &value_napi);
+
+    free(value);
     free(name);
     return value_napi;
 }
@@ -174,6 +177,7 @@ napi_value node_igs_readInputAsData(napi_env env, napi_callback_info info) {
     // convert res into napi_value
     napi_value napi_array_buffer;
     convert_data_to_napi(env, data, size, &napi_array_buffer);
+    free(data);
     return napi_array_buffer;
 }
 
@@ -265,6 +269,7 @@ napi_value node_igs_readOutputAsData(napi_env env, napi_callback_info info) {
     // convert res into napi_value
     napi_value napi_array_buffer;
     convert_data_to_napi(env, data, size, &napi_array_buffer);
+    free(data);
     return napi_array_buffer;
 }
 
@@ -356,6 +361,7 @@ napi_value node_igs_readParameterAsData(napi_env env, napi_callback_info info) {
     // convert res into napi_value
     napi_value napi_array_buffer;
     convert_data_to_napi(env, data, size, &napi_array_buffer);
+    free(data);
     return napi_array_buffer;
 }
 
