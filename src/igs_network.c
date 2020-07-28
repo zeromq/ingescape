@@ -1022,7 +1022,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             }
             
             igs_mapping_t *newMapping = NULL;
-            if (strlen(mappingPrefix) > 0){
+            if (strlen(strMapping) > 0){
                 //load mapping from string content
                 newMapping = parser_loadMapping(strMapping);
                 if (newMapping == NULL){
@@ -1391,9 +1391,48 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 igs_debug("send license information to %s", peer);
 #endif
                 
-            }else if (streq(title, "STOP")){
+            }
+            //TODO: to make this command work, we need to register deactivated agent.
+            //At the moment, deactivated agents are not stored by any ingescape
+            //structure and are managed directly by the developer.
+//            else if (streq(title, "START_AGENT")){
+//                char *agentName = zmsg_popstr (msgDuplicate);
+//                if (agentName == NULL){
+//                    igs_error("no agent name in %s message received from %s(%s): aborting", title, name, peer);
+//                    zmsg_destroy(&msgDuplicate);
+//                    zyre_event_destroy(&zyre_event);
+//                    return 0;
+//                }
+//
+//                igs_debug("received 'START_AGENT %s' command from %s (%s)", agentName, name, peer);
+//                igs_agent_t *a, *tmp;
+//                HASH_ITER(hh, context->agents, a, tmp){
+//                    if (streq(a->name, agentName)){
+//                        igs_info("activating agent %s (%s)", a->name, a->uuid);
+//                        igsAgent_activate(a);
+//                    }
+//                }
+//
+//            }
+            else if (streq(title, "STOP_AGENT")){
+                char *uuid = zmsg_popstr (msgDuplicate);
+                igs_agent_t *agent = NULL;
+                HASH_FIND_STR(context->agents, uuid, agent);
+                if (agent == NULL){
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    if (uuid)
+                        free(uuid);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
+                igs_debug("received STOP_AGENT command from %s (%s)", name, peer);
+                igs_info("deactivating agent %s (%s)", agent->name, agent->uuid);
+                igsAgent_deactivate(agent);
+                
+            }else if (streq(title, "STOP_PEER")){
                 context->forcedStop = true;
-                igs_debug("received STOP command from %s (%s)", name, peer);
+                igs_debug("received STOP_PEER command from %s (%s)", name, peer);
                 free(title);
                 zmsg_destroy(&msgDuplicate);
                 zyre_event_destroy(&zyre_event);
@@ -2037,16 +2076,18 @@ static void runLoop (zsock_t *mypipe, void *args){
     igs_core_context_t *context = (igs_core_context_t *)args;
     assert(context);
     assert(context->node);
-    assert(context->ipcPublisher);
     assert(context->publisher);
-    assert(context->licenseEnforcement);
     assert(context->replayChannel);
     assert(context->callsChannel);
+#if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
+    assert(context->licenseEnforcement);
+#endif
+#if defined __unix__ || (defined __APPLE__ && !TARGET_OS_IOS) || defined __linux__
     assert(context->network_ipcFullPath);
     assert(context->network_ipcEndpoint);
-    #if defined __unix__ || defined __APPLE__ || defined __linux__
+    assert(context->ipcPublisher);
     assert(context->inprocPublisher);
-    #endif
+#endif
     
     //iterate on agents to avoid sending definition and mapping update at startup
     //to all peers (they will receive def & map when joining INGESCAPE_PRIVATE)
@@ -2117,15 +2158,17 @@ static void runLoop (zsock_t *mypipe, void *args){
     zyre_destroy (&context->node);
     zsock_destroy(&context->publisher);
     zsock_destroy(&context->ipcPublisher);
-#if defined __unix__ || defined __APPLE__ || defined __linux__
+#if defined __unix__ || (defined __APPLE__ && !TARGET_OS_IOS) || defined __linux__
     zsys_file_delete(context->network_ipcFullPath); //destroy ipcPath in file system
     //NB: ipcPath is based on peer id which is unique. It will never be used again.
     free(context->network_ipcFullPath);
     context->network_ipcFullPath = NULL;
 #endif
+#if (!TARGET_OS_IOS)
     if (context->inprocPublisher != NULL){
         zsock_destroy(&context->inprocPublisher);
     }
+#endif
     if (context->logger != NULL){
         zsock_destroy(&context->logger);
     }
@@ -2149,16 +2192,22 @@ static void runLoop (zsock_t *mypipe, void *args){
     }
     
     //clean remaining dynamic data
-    free(context->licenseEnforcement);
-    context->licenseEnforcement = NULL;
+    if (context->licenseEnforcement){
+        free(context->licenseEnforcement);
+        context->licenseEnforcement = NULL;
+    }
     free(context->replayChannel);
     context->replayChannel = NULL;
     free(context->callsChannel);
     context->callsChannel = NULL;
-    free(context->network_ipcFullPath);
-    context->network_ipcFullPath = NULL;
-    free(context->network_ipcEndpoint);
-    context->network_ipcEndpoint = NULL;
+    if (context->network_ipcFullPath){
+        free(context->network_ipcFullPath);
+        context->network_ipcFullPath = NULL;
+    }
+    if (context->network_ipcEndpoint){
+        free(context->network_ipcEndpoint);
+        context->network_ipcEndpoint = NULL;
+    }
     
     igs_debug("loop stopped");
     network_Unlock();
@@ -2272,7 +2321,7 @@ void initLoop (igs_core_context_t *context){
     }
 
     //start ipc publisher
-#if defined __unix__ || defined __APPLE__ || defined __linux__
+#if defined __unix__ || (defined __APPLE__ && ! TARGET_OS_IOS) || defined __linux__
     if (context->network_ipcFolderPath == NULL){
         context->network_ipcFolderPath = strdup(IGS_DEFAULT_IPC_FOLDER_PATH);
     }
@@ -2314,6 +2363,7 @@ void initLoop (igs_core_context_t *context){
 #endif
     
     //start inproc publisher
+#if (!TARGET_OS_IOS)
     bus_zyreLock();
     char *inprocEndpoint = calloc(1, sizeof(char) * (12 + strlen(zyre_uuid(context->node))));
     sprintf(inprocEndpoint, "inproc://%s", zyre_uuid(context->node));
@@ -2329,6 +2379,7 @@ void initLoop (igs_core_context_t *context){
         bus_zyreUnlock();
     }
     free(inprocEndpoint);
+#endif
     
     //start logger stream if needed
     if (context->logInStream){
