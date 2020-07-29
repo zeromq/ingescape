@@ -241,12 +241,12 @@ typedef struct igs_zyre_callback {
     struct igs_zyre_callback *next;
 } igs_zyre_callback_t;
 
-typedef struct igs_forced_stop_calback {
-    igs_forcedStopCallback callback_ptr;
+typedef struct igs_external_stop_calback {
+    igs_externalStopCallback callback_ptr;
     void *myData;
-    struct igs_forced_stop_calback *prev;
-    struct igs_forced_stop_calback *next;
-} igs_forced_stop_calback_t;
+    struct igs_external_stop_calback *prev;
+    struct igs_external_stop_calback *next;
+} igs_external_stop_calback_t;
 
 
 //////////////////  MAIN  STRUCTURES   //////////////////
@@ -291,11 +291,10 @@ typedef struct igs_core_context{
     unsigned int network_publishingPort;
     unsigned int network_logStreamPort;
     bool network_shallRaiseFileDescriptorsLimit;
-    bool isInterrupted;
-    bool forcedStop;
+    bool externalStop;
     bool isFrozen;
     igs_freeze_callback_t *freezeCallbacks;
-    igs_forced_stop_calback_t *forcedStopCalbacks;
+    igs_external_stop_calback_t *externalStopCalbacks;
     
     //performance
     size_t performanceMsgCounter;

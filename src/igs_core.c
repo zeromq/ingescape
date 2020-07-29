@@ -15,7 +15,6 @@
 
 igs_core_context_t *coreContext = NULL;
 igs_agent_t *coreAgent = NULL;
-bool igs_Interrupted = false;
 
 
 //////////////////  CORE CONTEXT //////////////////
@@ -38,16 +37,15 @@ void core_initContext(){
 }
 
 //////////////////  CORE AGENT //////////////////
-void core_forcedStopCB(void *myData){
+void core_externalStopCB(void *myData){
     IGS_UNUSED(myData)
-    igs_Interrupted = true;
 }
 
 void core_initAgent(){
     core_initContext();
     if (coreAgent == NULL){
         coreAgent = igsAgent_new(IGS_DEFAULT_AGENT_NAME, false);
-        igs_observeForcedStop(core_forcedStopCB, NULL);
+        igs_observeExternalStop(core_externalStopCB, NULL);
         coreAgent->context = coreContext;
         HASH_ADD_STR(coreContext->agents, uuid, coreAgent);
     }

@@ -462,7 +462,7 @@ int manageParent (zloop_t *loop, zsock_t *pipe, void *arg){
         zmsg_destroy(&msg);
         return 0;
     }
-    if (streq (command, "$TERM")){
+    if (streq (command, "STOP_LOOP")){
         free (command);
         zmsg_destroy (&msg);
         return -1;
@@ -1431,7 +1431,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 igsAgent_deactivate(agent);
                 
             }else if (streq(title, "STOP_PEER")){
-                context->forcedStop = true;
+                context->externalStop = true;
                 igs_debug("received STOP_PEER command from %s (%s)", name, peer);
                 free(title);
                 zmsg_destroy(&msgDuplicate);
@@ -2173,22 +2173,15 @@ static void runLoop (zsock_t *mypipe, void *args){
         zsock_destroy(&context->logger);
     }
     
-    //handle forced stop if needed
-    if (context->forcedStop){
-        igs_forced_stop_calback_t *cb = NULL;
+    //handle external stop if needed
+    if (context->externalStop){
+        igs_external_stop_calback_t *cb = NULL;
         igs_agent_t *a, *atmp;
         HASH_ITER(hh, context->agents, a, atmp){
-            DL_FOREACH(context->forcedStopCalbacks, cb){
+            DL_FOREACH(context->externalStopCalbacks, cb){
                 cb->callback_ptr(cb->myData);
             }
         }
-        context->isInterrupted = true;
-        //in case of forced stop, we send SIGINT to our process so
-        //that it can be trapped by main thread for a proper stop
-#if defined __unix__ || defined __APPLE__ || defined __linux__
-        igs_debug("triggering SIGINT for process");
-        kill(context->processId, SIGINT);
-#endif
     }
     
     //clean remaining dynamic data
@@ -2210,6 +2203,7 @@ static void runLoop (zsock_t *mypipe, void *args){
     }
     
     igs_debug("loop stopped");
+    zstr_send(mypipe, "LOOP_STOPPED");
     network_Unlock();
 }
 
@@ -2217,6 +2211,7 @@ void initLoop (igs_core_context_t *context){
     core_initAgent(); //to be sure to have a default agent name
     
     igs_debug("loop init");
+    network_Lock();
 #if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
     if (context->licenseEnforcement != NULL){
         free(context->licenseEnforcement);
@@ -2239,6 +2234,7 @@ void initLoop (igs_core_context_t *context){
     //definition modifications when the agent is running.
 #endif
     
+    context->externalStop = false;
     bool canContinue = true;
     //prepare zyre
     bus_zyreLock();
@@ -2484,6 +2480,7 @@ void initLoop (igs_core_context_t *context){
     bus_zyreLock();
     zyre_set_header(context->node, "hostname", "%s", hostname);
     bus_zyreUnlock();
+    network_Unlock();
     
     if (canContinue){
         context->networkActor = zactor_new(runLoop, context);
@@ -2786,10 +2783,10 @@ void igs_stop(){
     if (coreContext->networkActor != NULL){
         //interrupting and destroying ingescape thread and zyre layer
         //this will also clean all agent->subscribers
-        if (!coreContext->forcedStop){
+        if (!coreContext->externalStop){
             //NB: if agent has been forcibly stopped, actor is already stopping
             //and this command would deadlock.
-            zstr_sendx (coreContext->networkActor, "$TERM", NULL);
+            zstr_send(coreContext->networkActor, "STOP_LOOP");
         }
         zactor_destroy(&coreContext->networkActor);
 #if (defined WIN32 || defined _WIN32)
@@ -2801,9 +2798,9 @@ void igs_stop(){
             zsys_shutdown();
         }
 #endif
-        igs_info("peer stopped");
+        igs_info("ingescape stopped properly");
     }else{
-        igs_debug("peer already stopped");
+        igs_debug("ingescape already stopped");
     }
     
     if (coreContext->networkDevice != NULL){
@@ -3203,13 +3200,13 @@ void igs_freeNetaddressesList(char **addresses, int nb){
     igs_freeNetdevicesList(addresses, nb);
 }
 
-void igs_observeForcedStop(igs_forcedStopCallback cb, void *myData){
+void igs_observeExternalStop(igs_externalStopCallback cb, void *myData){
     assert(cb);
     core_initContext();
-    igs_forced_stop_calback_t *newCb = calloc(1, sizeof(igs_forced_stop_calback_t));
+    igs_external_stop_calback_t *newCb = calloc(1, sizeof(igs_external_stop_calback_t));
     newCb->callback_ptr = cb;
     newCb->myData = myData;
-    DL_APPEND(coreContext->forcedStopCalbacks, newCb);
+    DL_APPEND(coreContext->externalStopCalbacks, newCb);
 }
 
 void igs_setDiscoveryInterval(unsigned int interval){
@@ -3343,6 +3340,15 @@ void igs_raiseSocketsLimit(){
 #else
     igs_info("this function has no effect on non-UNIX systems");
 #endif
+}
+
+zsock_t* igs_getPipeToIngescape(void){
+    if (coreContext->networkActor != NULL){
+        return zactor_sock(coreContext->networkActor);
+    }else{
+        igs_warn("ingescape is not started yet");
+        return NULL;
+    }
 }
 
 int igs_timerStart(size_t delay, size_t times, igs_timerCallback cb, void *myData){
