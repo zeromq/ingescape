@@ -48,8 +48,8 @@ namespace Ingescape
 
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate void igs_forcedStopCallbackC(IntPtr myData);
-        public delegate void igs_forcedStopCallback(object myData);
+        private delegate void igs_externalStopCallbackC(IntPtr myData);
+        public delegate void igs_externalStopCallback(object myData);
 
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -85,7 +85,7 @@ namespace Ingescape
         #endregion
 
         private static igs_observeCallbackC _OnIOPCallback;
-        private static igs_forcedStopCallbackC _OnForcedStopCallback;
+        private static igs_externalStopCallbackC _OnForcedStopCallback;
         private static igs_freezeCallbackC _OnFreezeCallback;
         private static igs_muteCallbackC _OnMutedCallback;
         private static igs_callFunctionC _OnCallCallback;
@@ -127,8 +127,8 @@ namespace Ingescape
 
         static void OnForcedStopCallback(IntPtr myData)
         {
-            Tuple<igs_forcedStopCallback, object> tupleData = (Tuple<igs_forcedStopCallback, object>)GCHandle.FromIntPtr(myData).Target;
-            igs_forcedStopCallback CSharpFunction = tupleData.Item1;
+            Tuple<igs_externalStopCallback, object> tupleData = (Tuple<igs_externalStopCallback, object>)GCHandle.FromIntPtr(myData).Target;
+            igs_externalStopCallback CSharpFunction = tupleData.Item1;
             object data = tupleData.Item2;
             CSharpFunction(data);
         }
@@ -256,17 +256,17 @@ namespace Ingescape
 
         //register a callback when the agent is forced to stop by the ingescape platform
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void igs_observeForcedStop([MarshalAs(UnmanagedType.FunctionPtr)] igs_forcedStopCallbackC cb, IntPtr myData);
-        public static void observeForcedStop(igs_forcedStopCallback cbSharp, object myData)
+        private static extern void igs_observeExternalStop([MarshalAs(UnmanagedType.FunctionPtr)] igs_externalStopCallbackC cb, IntPtr myData);
+        public static void observeExternalStop(igs_externalStopCallback cbSharp, object myData)
         {
-            Tuple<igs_forcedStopCallback, object> tupleData = new Tuple<igs_forcedStopCallback, object>(cbSharp, myData);
+            Tuple<igs_externalStopCallback, object> tupleData = new Tuple<igs_externalStopCallback, object>(cbSharp, myData);
             GCHandle gCHandle = GCHandle.Alloc(tupleData);
             IntPtr data = GCHandle.ToIntPtr(gCHandle);
             if (_OnForcedStopCallback == null)
             {
                 _OnForcedStopCallback = OnForcedStopCallback;
             }
-            igs_observeForcedStop(_OnForcedStopCallback, data);
+            igs_observeExternalStop(_OnForcedStopCallback, data);
         }
 
         //terminate the agent with trigger of SIGINT and call to the registered igs_forcedStopCallbacks

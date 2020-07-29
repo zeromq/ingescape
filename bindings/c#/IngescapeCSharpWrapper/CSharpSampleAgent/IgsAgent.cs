@@ -206,7 +206,7 @@ namespace CSharpSampleAgent
                               
                 
                 // Pass our class instance (this) in paramater of the IngeScape callback(s) 
-                Igs.observeForcedStop(ForcedStopCB, this);
+                Igs.observeExternalStop(ForcedStopCB, this);
 
                 Igs.createInput("boolInput", iopType_t.IGS_BOOL_T);
                 Igs.createInput("stringInput", iopType_t.IGS_STRING_T);
