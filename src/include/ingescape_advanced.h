@@ -27,13 +27,14 @@ extern "C" {
 //Selected network device must be able to reach the endpoint address.
 //PUBLIC int igs_startWithDeviceOnBroker(const char *networkDevice, const char *brokerEndpoint);
     
-//network configuration and monitoring
+//network configuration
 //void igs_setBusEndpoint(const char *endpoint); //usefull only with gossip discovery - TODO
 //void igs_connectAgentOnEndpoint(const char *endpoint); //not officially supported in Zyre 2.0.x yet
 PUBLIC void igs_setPublishingPort(unsigned int port);
 PUBLIC void igs_setLogStreamPort(unsigned int port);
 PUBLIC void igs_setDiscoveryInterval(unsigned int interval); //in milliseconds
 PUBLIC void igs_setAgentTimeout(unsigned int duration); //in milliseconds
+PUBLIC void igs_raiseSocketsLimit(void); //UNIX only, to be called before any ingescape or ZeroMQ activity
 
 //sends number of messages with defiend size and displays performance
 //information when finished (information displayed as INFO-evel log)
@@ -74,9 +75,8 @@ PUBLIC void igs_monitor(igs_monitorCallback cb, void *myData);
 
 //////////////////////////////////////////////////
 // Data serialization using ZeroMQ
-//TODO: give code examples here or link to documentation for zmsg and zframe
-PUBLIC int igs_writeOutputAsZMQMsg(const char *name, zmsg_t *msg);
-PUBLIC int igs_readInputAsZMQMsg(const char *name, zmsg_t **msg); //msg must be freed by caller using zmsg_destroy
+PUBLIC igs_result_t igs_writeOutputAsZMQMsg(const char *name, zmsg_t *msg);
+PUBLIC igs_result_t igs_readInputAsZMQMsg(const char *name, zmsg_t **msg); //msg must be freed by caller using zmsg_destroy
 
 
 //////////////////////////////////////////////////
@@ -84,22 +84,24 @@ PUBLIC int igs_readInputAsZMQMsg(const char *name, zmsg_t **msg); //msg must be 
 typedef void (*igs_BusMessageIncoming) (const char *event, const char *peerID, const char *name,
                                         const char *address, const char *channel,
                                         zhash_t *headers, zmsg_t *msg, void *myData);
-PUBLIC int igs_observeBus(igs_BusMessageIncoming cb, void *myData);
+PUBLIC void igs_observeBus(igs_BusMessageIncoming cb, void *myData);
 
-PUBLIC void igs_busJoinChannel(const char *channel);
+PUBLIC igs_result_t igs_busJoinChannel(const char *channel);
 PUBLIC void igs_busLeaveChannel(const char *channel);
 
-PUBLIC int igs_busSendStringToChannel(const char *channel, const char *msg, ...);
-PUBLIC int igs_busSendDataToChannel(const char *channel, void *data, size_t size);
-PUBLIC int igs_busSendZMQMsgToChannel(const char *channel, zmsg_t **msg_p); //destroys message after sending it
+PUBLIC igs_result_t igs_busSendStringToChannel(const char *channel, const char *msg, ...);
+PUBLIC igs_result_t igs_busSendDataToChannel(const char *channel, void *data, size_t size);
+PUBLIC igs_result_t igs_busSendZMQMsgToChannel(const char *channel, zmsg_t **msg_p); //destroys message after sending it
 
-// the functions below support mutiple agents with same name
-PUBLIC int igs_busSendStringToAgent(const char *agentNameOrPeerID, const char *msg, ...);
-PUBLIC int igs_busSendDataToAgent(const char *agentNameOrPeerID, void *data, size_t size);
-PUBLIC int igs_busSendZMQMsgToAgent(const char *agentNameOrPeerID, zmsg_t **msg_p); //destroys message after sending it
+// Sending message to an agent by name or by uuid
+//NB: peer ids and names are also supported by these functions but are used only if no agent is found first
+//NB: if several agents share the same name, all will receive the message if addressed by name
+PUBLIC igs_result_t igs_busSendStringToAgent(const char *agentNameOrAgentIdOrPeerID, const char *msg, ...);
+PUBLIC igs_result_t igs_busSendDataToAgent(const char *agentNameOrAgentIdOrPeerID, void *data, size_t size);
+PUBLIC igs_result_t igs_busSendZMQMsgToAgent(const char *agentNameOrAgentIdOrPeerID, zmsg_t **msg_p); //destroys message after sending it
 
-PUBLIC void igs_busAddServiceDescription(const char *key, const char *value);
-PUBLIC void igs_busRemoveServiceDescription(const char *key);
+PUBLIC igs_result_t igs_busAddServiceDescription(const char *key, const char *value);
+PUBLIC igs_result_t igs_busRemoveServiceDescription(const char *key);
 
 
 //////////////////////////////////////////////////
@@ -143,7 +145,7 @@ PUBLIC igs_callArgument_t *igs_cloneArgumentsList(igs_callArgument_t *list);
 //SEND a call to another agent
 //requires to pass agent name or UUID, call name and a list of arguments specific to the call
 //passed arguments list will be deallocated and destroyed
-PUBLIC int igs_sendCall(const char *agentNameOrUUID, const char *callName, igs_callArgument_t **list);
+PUBLIC igs_result_t igs_sendCall(const char *agentNameOrUUID, const char *callName, igs_callArgument_t **list);
 
 
 //CREATE CALLS for our agent
@@ -158,10 +160,10 @@ typedef void (*igs_callFunction)(const char *senderAgentName, const char *sender
 //create a call if it does not exist or will attach callback and data if they are
 //stil undefined. Warning: only one callback can be attached to a call (further attempts
 //will be ignored and signaled by an error log).
-PUBLIC int igs_initCall(const char *name, igs_callFunction cb, void *myData);
-PUBLIC int igs_removeCall(const char *name);
-PUBLIC int igs_addArgumentToCall(const char *callName, const char *argName, iopType_t type);
-PUBLIC int igs_removeArgumentFromCall(const char *callName, const char *argName); //removes first occurence with this name
+PUBLIC igs_result_t igs_initCall(const char *name, igs_callFunction cb, void *myData);
+PUBLIC igs_result_t igs_removeCall(const char *name);
+PUBLIC igs_result_t igs_addArgumentToCall(const char *callName, const char *argName, iopType_t type);
+PUBLIC igs_result_t igs_removeArgumentFromCall(const char *callName, const char *argName); //removes first occurence with this name
 
 
 //MANAGE optional reply
@@ -175,7 +177,7 @@ PUBLIC int igs_removeArgumentFromCall(const char *callName, const char *argName)
 PUBLIC size_t igs_getNumberOfCalls(void);
 PUBLIC bool igs_checkCallExistence(const char *name);
 PUBLIC char** igs_getCallsList(size_t *nbOfElements); //returned char** shall be freed by caller
-PUBLIC void igs_freeCallsList(char **list, size_t nbOfCalls);
+PUBLIC void igs_freeCallsList(char ***list, size_t nbOfCalls);
 
 PUBLIC igs_callArgument_t* igs_getFirstArgumentForCall(const char *callName);
 PUBLIC size_t igs_getNumberOfArgumentsForCall(const char *callName);

@@ -11,6 +11,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <czmq.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,6 +29,11 @@ extern "C" {
 #define PUBLIC
 #endif
 
+typedef enum{
+    IGS_SUCCESS = 0,
+    IGS_FAILURE
+} igs_result_t;
+
 // GCC and clang can validate format strings for functions that act like printf
 // this is used to check the logging functions
 #if defined (__GNUC__) && (__GNUC__ >= 2)
@@ -42,121 +48,126 @@ extern "C" {
 //////////////////////////////////////////////////
 // Initialization and control
 
-//start & stop the agent
-PUBLIC int igs_startWithDevice(const char *networkDevice, unsigned int port);
-PUBLIC int igs_startWithIP(const char *ipAddress, unsigned int port);
-PUBLIC int igs_stop(void);
+//start & stop ingescape
+PUBLIC igs_result_t igs_startWithDevice(const char *networkDevice, unsigned int port);
+PUBLIC igs_result_t igs_startWithIP(const char *ipAddress, unsigned int port);
+PUBLIC void igs_stop(void);
 PUBLIC bool igs_isStarted(void);
 
-//There are four non-exclusive ways to stop the execution of an ingescape agent:
-//1- calling igs_stop from the hosting app's threads reacting on user actions or external events
-//2- handling SIGINT in the hosting app to call igs_stop and stop the rest of the app properly
-//3- monitoring the status of igs_Interrupted in the hosting app
-//4- using an igs_forcedStopCallback (see below) and calling code ON THE MAIN APP THREAD from it
-//In any case, igs_stop MUST NEVER BE CALLED directly from any ingeScape callback, as it would cause a thread deadlock.
-
-PUBLIC extern bool igs_Interrupted; //true when the ingescape library triggered SIGINT when forced to stop
-typedef void (*igs_forcedStopCallback)(void *myData);
-//register a callback when the agent is forced to stop by the ingescape platform
-PUBLIC void igs_observeForcedStop(igs_forcedStopCallback cb, void *myData);
-
-//terminate the agent with trigger of SIGINT and call to the registered igs_forcedStopCallbacks
-PUBLIC void igs_die(void);
+/*
+ Ingescape can be stopped either from the applications itself or from the network.
+ When ingescape is stopped from the network, the application can be notified and
+ take actions such as also stopping, enter a specific mode, etc.
+ 
+ To stop ingescape from its hosting application, just call igs_stop().
+ 
+ To be notified that Ingescape has been stopped, one can by order of
+ preference:
+ - read the pipe socket to ingescape and expect a "LOOP_STOPPED" message
+ - register a callabck with igs_observeExternalStop - WARNING: this callback
+ will be executed from the ingescape thread with potential thread-safety issues
+ depending on your application structure.
+ - periodically check igs_isStarted()
+ In any case, igs_stop MUST NEVER BE CALLED directly from any Ingescape callback,
+ as it would cause a deadlock.
+ */
+PUBLIC zsock_t* igs_getPipeToIngescape(void); //socket to get stop event from ingescape in a thread-safe manner
+typedef void (*igs_externalStopCallback)(void *myData);
+PUBLIC void igs_observeExternalStop(igs_externalStopCallback cb, void *myData);
 
 //agent name set and get
-PUBLIC int igs_setAgentName(const char *name);
+PUBLIC void igs_setAgentName(const char *name);
 PUBLIC char *igs_getAgentName(void); //char* must be freed by caller
 
 //control agent state
-PUBLIC int igs_setAgentState(const char *state);
-PUBLIC char *igs_getAgentState(void); //char* must be freed by caller
+PUBLIC void igs_setAgentState(const char *state);
+PUBLIC char* igs_getAgentState(void); //must be freed by caller
 
 //mute the agent ouputs
-PUBLIC int igs_mute(void);
-PUBLIC int igs_unmute(void);
+PUBLIC void igs_mute(void);
+PUBLIC void igs_unmute(void);
 PUBLIC bool igs_isMuted(void);
 typedef void (*igs_muteCallback)(bool isMuted, void *myData);
-PUBLIC int igs_observeMute(igs_muteCallback cb, void *myData);
+PUBLIC void igs_observeMute(igs_muteCallback cb, void *myData);
 
 //freeze and unfreeze the agent
 //When freezed, agent will not send anything on its outputs and
 //its inputs are not reactive to external data.
 //NB: the internal semantics of freeze and unfreeze for a given agent
 //are up to the developer and can be controlled using callbacks and igs_observeFreeze
-PUBLIC int igs_freeze(void);
+PUBLIC igs_result_t igs_freeze(void);
 PUBLIC bool igs_isFrozen(void);
-PUBLIC int igs_unfreeze(void);
+PUBLIC void igs_unfreeze(void);
 typedef void (*igs_freezeCallback)(bool isPaused, void *myData);
-PUBLIC int igs_observeFreeze(igs_freezeCallback cb, void *myData);
-PUBLIC void igs_setCanBeFrozen(bool canBeFrozen);
-PUBLIC bool igs_canBeFrozen(void);
+PUBLIC void igs_observeFreeze(igs_freezeCallback cb, void *myData);
 
 
 //////////////////////////////////////////////////
 //IOP Model : Inputs, Outputs and Parameters read/write/check/observe/mute
 
 typedef enum {
-    IGS_INPUT_T = 1, ///< input of an agent.
-    IGS_OUTPUT_T,    ///< output of an agent.
-    IGS_PARAMETER_T  ///< parameter of an agent.
+    IGS_INPUT_T = 1,
+    IGS_OUTPUT_T,
+    IGS_PARAMETER_T
 } iop_t;
 
 typedef enum {
-    IGS_INTEGER_T = 1,  ///< integer value type
-    IGS_DOUBLE_T,       ///< double value type
-    IGS_STRING_T,       ///< string value type
-    IGS_BOOL_T,         ///< bool value type
-    IGS_IMPULSION_T,    ///< impulsion value type
-    IGS_DATA_T,         ///< data value type
-    IGS_UNKNOWN_T       ///< for unknown parsed types
+    IGS_INTEGER_T = 1,
+    IGS_DOUBLE_T,
+    IGS_STRING_T,
+    IGS_BOOL_T,
+    IGS_IMPULSION_T,
+    IGS_DATA_T,
+    IGS_UNKNOWN_T
 } iopType_t;
-
-//read IOP using void*
-// value : pointer to actual value, initialized by function, to be freed by user
-// size : size of returned value
-PUBLIC int igs_readInput(const char *name, void **value, size_t *size);
-PUBLIC int igs_readOutput(const char *name, void **value, size_t *size);
-PUBLIC int igs_readParameter(const char *name, void **value, size_t *size);
 
 //read per type
 PUBLIC bool igs_readInputAsBool(const char *name);
 PUBLIC int igs_readInputAsInt(const char *name);
 PUBLIC double igs_readInputAsDouble(const char *name);
 PUBLIC char* igs_readInputAsString(const char *name); //returned char* must be freed by caller
-PUBLIC int igs_readInputAsData(const char *name, void **data, size_t *size); //returned data must be freed by caller
+PUBLIC igs_result_t igs_readInputAsData(const char *name, void **data, size_t *size); //returned data must be freed by caller
 
 PUBLIC bool igs_readOutputAsBool(const char *name);
 PUBLIC int igs_readOutputAsInt(const char *name);
 PUBLIC double igs_readOutputAsDouble(const char *name);
 PUBLIC char* igs_readOutputAsString(const char *name); //returned char* must be freed by caller
-PUBLIC int igs_readOutputAsData(const char *name, void **data, size_t *size); //returned data must be freed by caller
+PUBLIC igs_result_t igs_readOutputAsData(const char *name, void **data, size_t *size); //returned data must be freed by caller
 
 PUBLIC bool igs_readParameterAsBool(const char *name);
 PUBLIC int igs_readParameterAsInt(const char *name);
 PUBLIC double igs_readParameterAsDouble(const char *name);
 PUBLIC char* igs_readParameterAsString(const char *name); //returned char* must be freed by caller
-PUBLIC int igs_readParameterAsData(const char *name, void **data, size_t *size); //returned data must be freed by caller
+PUBLIC igs_result_t igs_readParameterAsData(const char *name, void **data, size_t *size); //returned data must be freed by caller
 
 //write per type
-PUBLIC int igs_writeInputAsBool(const char *name, bool value);
-PUBLIC int igs_writeInputAsInt(const char *name, int value);
-PUBLIC int igs_writeInputAsDouble(const char *name, double value);
-PUBLIC int igs_writeInputAsString(const char *name, const char *value);
-PUBLIC int igs_writeInputAsImpulsion(const char *name);
-PUBLIC int igs_writeInputAsData(const char *name, void *value, size_t size);
+PUBLIC igs_result_t igs_writeInputAsBool(const char *name, bool value);
+PUBLIC igs_result_t igs_writeInputAsInt(const char *name, int value);
+PUBLIC igs_result_t igs_writeInputAsDouble(const char *name, double value);
+PUBLIC igs_result_t igs_writeInputAsString(const char *name, const char *value);
+PUBLIC igs_result_t igs_writeInputAsImpulsion(const char *name);
+PUBLIC igs_result_t igs_writeInputAsData(const char *name, void *value, size_t size);
 
-PUBLIC int igs_writeOutputAsBool(const char *name, bool value);
-PUBLIC int igs_writeOutputAsInt(const char *name, int value);
-PUBLIC int igs_writeOutputAsDouble(const char *name, double value);
-PUBLIC int igs_writeOutputAsString(const char *name, const char *value);
-PUBLIC int igs_writeOutputAsImpulsion(const char *name);
-PUBLIC int igs_writeOutputAsData(const char *name, void *value, size_t size);
+PUBLIC igs_result_t igs_writeOutputAsBool(const char *name, bool value);
+PUBLIC igs_result_t igs_writeOutputAsInt(const char *name, int value);
+PUBLIC igs_result_t igs_writeOutputAsDouble(const char *name, double value);
+PUBLIC igs_result_t igs_writeOutputAsString(const char *name, const char *value);
+PUBLIC igs_result_t igs_writeOutputAsImpulsion(const char *name);
+PUBLIC igs_result_t igs_writeOutputAsData(const char *name, void *value, size_t size);
 
-PUBLIC int igs_writeParameterAsBool(const char *name, bool value);
-PUBLIC int igs_writeParameterAsInt(const char *name, int value);
-PUBLIC int igs_writeParameterAsDouble(const char *name, double value);
-PUBLIC int igs_writeParameterAsString(const char *name, const char *value);
-PUBLIC int igs_writeParameterAsData(const char *name, void *value, size_t size);
+PUBLIC igs_result_t igs_writeParameterAsBool(const char *name, bool value);
+PUBLIC igs_result_t igs_writeParameterAsInt(const char *name, int value);
+PUBLIC igs_result_t igs_writeParameterAsDouble(const char *name, double value);
+PUBLIC igs_result_t igs_writeParameterAsString(const char *name, const char *value);
+PUBLIC igs_result_t igs_writeParameterAsData(const char *name, void *value, size_t size);
+
+//read IOP using memory space - use only when per-type read functions cannot.
+// value : pointer to actual value, initialized by function, to be freed by user
+// size : size of returned value
+PUBLIC igs_result_t igs_readInput(const char *name, void **value, size_t *size);
+PUBLIC igs_result_t igs_readOutput(const char *name, void **value, size_t *size);
+PUBLIC igs_result_t igs_readParameter(const char *name, void **value, size_t *size);
+
 
 //clear IOP data in memory without having to write the IOP
 //(relevant for IOPs with IGS_DATA_T type only)
@@ -166,13 +177,13 @@ PUBLIC void igs_clearDataForParameter(const char *name);
 
 //observe writing to an IOP
 typedef void (*igs_observeCallback)(iop_t iopType, const char *name, iopType_t valueType, void *value, size_t valueSize, void *myData);
-PUBLIC int igs_observeInput(const char *name, igs_observeCallback cb, void *myData);
-PUBLIC int igs_observeOutput(const char *name, igs_observeCallback cb, void * myData);
-PUBLIC int igs_observeParameter(const char *name, igs_observeCallback cb, void * myData);
+PUBLIC void igs_observeInput(const char *name, igs_observeCallback cb, void *myData);
+PUBLIC void igs_observeOutput(const char *name, igs_observeCallback cb, void * myData);
+PUBLIC void igs_observeParameter(const char *name, igs_observeCallback cb, void * myData);
 
 //mute or unmute an IOP
-PUBLIC int igs_muteOutput(const char *name);
-PUBLIC int igs_unmuteOutput(const char *name);
+PUBLIC void igs_muteOutput(const char *name);
+PUBLIC void igs_unmuteOutput(const char *name);
 PUBLIC bool igs_isOutputMuted(const char *name);
 
 //check IOP type, lists and existence
@@ -180,14 +191,14 @@ PUBLIC iopType_t igs_getTypeForInput(const char *name);
 PUBLIC iopType_t igs_getTypeForOutput(const char *name);
 PUBLIC iopType_t igs_getTypeForParameter(const char *name);
 
-PUBLIC int igs_getInputsNumber(void);
-PUBLIC int igs_getOutputsNumber(void);
-PUBLIC int igs_getParametersNumber(void);
+PUBLIC size_t igs_getInputsNumber(void);
+PUBLIC size_t igs_getOutputsNumber(void);
+PUBLIC size_t igs_getParametersNumber(void);
 
-PUBLIC char** igs_getInputsList(long *nbOfElements); //returned char** must be freed using igs_freeIOPList
-PUBLIC char** igs_getOutputsList(long *nbOfElements); //returned char** must be freed using igs_freeIOPList
-PUBLIC char** igs_getParametersList(long *nbOfElements); //returned char** must be freed using igs_freeIOPList
-PUBLIC void igs_freeIOPList(char ***list, long nbOfElements);
+PUBLIC char** igs_getInputsList(size_t *nbOfElements); //returned char** must be freed using igs_freeIOPList
+PUBLIC char** igs_getOutputsList(size_t *nbOfElements); //returned char** must be freed using igs_freeIOPList
+PUBLIC char** igs_getParametersList(size_t *nbOfElements); //returned char** must be freed using igs_freeIOPList
+PUBLIC void igs_freeIOPList(char ***list, size_t nbOfElements);
 
 PUBLIC bool igs_checkInputExistence(const char *name);
 PUBLIC bool igs_checkOutputExistence(const char *name);
@@ -198,55 +209,54 @@ PUBLIC bool igs_checkParameterExistence(const char *name);
 //Definitions
 
 //load / set / get definition
-PUBLIC int igs_loadDefinition (const char* json_str);
-PUBLIC int igs_loadDefinitionFromPath (const char* file_path);
-PUBLIC int igs_clearDefinition(void); //clears definition data for the agent
+PUBLIC igs_result_t igs_loadDefinition (const char* json_str);
+PUBLIC igs_result_t igs_loadDefinitionFromPath (const char* file_path);
+PUBLIC void igs_clearDefinition(void); //clears definition data for the agent
 PUBLIC char* igs_getDefinition(void); //returns json string, must be freed by caller
 PUBLIC char *igs_getDefinitionName(void); //returned char* must be freed by caller
 PUBLIC char *igs_getDefinitionDescription(void); //returned char* must be freed by caller
 PUBLIC char *igs_getDefinitionVersion(void); //returned char* must be freed by caller
-PUBLIC int igs_setDefinitionName(const char *name);
-PUBLIC int igs_setDefinitionDescription(const char *description);
-PUBLIC int igs_setDefinitionVersion(const char *version);
+PUBLIC void igs_setDefinitionName(const char *name);
+PUBLIC void igs_setDefinitionDescription(const char *description);
+PUBLIC void igs_setDefinitionVersion(const char *version);
 
 //edit the definition using the API
-PUBLIC int igs_createInput(const char *name, iopType_t value_type, void *value, size_t size);
-PUBLIC int igs_createOutput(const char *name, iopType_t type, void *value, size_t size);
-PUBLIC int igs_createParameter(const char *name, iopType_t type, void *value, size_t size);
+PUBLIC igs_result_t igs_createInput(const char *name, iopType_t value_type, void *value, size_t size);
+PUBLIC igs_result_t igs_createOutput(const char *name, iopType_t type, void *value, size_t size);
+PUBLIC igs_result_t igs_createParameter(const char *name, iopType_t type, void *value, size_t size);
 
-PUBLIC int igs_removeInput(const char *name);
-PUBLIC int igs_removeOutput(const char *name);
-PUBLIC int igs_removeParameter(const char *name);
+PUBLIC igs_result_t igs_removeInput(const char *name);
+PUBLIC igs_result_t igs_removeOutput(const char *name);
+PUBLIC igs_result_t igs_removeParameter(const char *name);
 
 
 //////////////////////////////////////////////////
-//mapping
+//Mappings
 
 //load / set / get mapping
-PUBLIC int igs_loadMapping (const char* json_str);
-PUBLIC int igs_loadMappingFromPath (const char* file_path);
-PUBLIC int igs_clearMapping(void); //clears all mapping for the agent
+PUBLIC igs_result_t igs_loadMapping (const char* json_str);
+PUBLIC igs_result_t igs_loadMappingFromPath (const char* file_path);
+PUBLIC void igs_clearMapping(void); //clears all mapping for the agent
 PUBLIC char* igs_getMapping(void); //returns json string, must be freed by caller
 PUBLIC char *igs_getMappingName(void); //returned char* must be freed by caller
 PUBLIC char *igs_getMappingDescription(void); //returned char* must be freed by caller
 PUBLIC char *igs_getMappingVersion(void); //returned char* must be freed by caller
+PUBLIC void igs_setMappingName(const char *name);
+PUBLIC void igs_setMappingDescription(const char *description);
+PUBLIC void igs_setMappingVersion(const char *version);
 
 //edit mapping using the API
-PUBLIC int igs_setMappingName(const char *name);
-PUBLIC int igs_setMappingDescription(const char *description);
-PUBLIC int igs_setMappingVersion(const char *version);
-PUBLIC int igs_getMappingEntriesNumber(void); //number of entries in the mapping output type
-PUBLIC unsigned long igs_addMappingEntry(const char *fromOurInput, const char *toAgent, const char *withOutput); //returns mapping id or zero or below if creation failed
-PUBLIC int igs_removeMappingEntryWithId(unsigned long theId);
-PUBLIC int igs_removeMappingEntryWithName(const char *fromOurInput, const char *toAgent, const char *withOutput);
+PUBLIC size_t igs_getMappingEntriesNumber(void); //number of entries in the mapping output type
+PUBLIC unsigned long igs_addMappingEntry(const char *fromOurInput, const char *toAgent, const char *withOutput); //returns mapping id or zero if creation failed
+PUBLIC igs_result_t igs_removeMappingEntryWithId(unsigned long theId);
+PUBLIC igs_result_t igs_removeMappingEntryWithName(const char *fromOurInput, const char *toAgent, const char *withOutput);
 
 
 //////////////////////////////////////////////////
-//administration, configuration & utilities
+//Administration, configuration & utilities
 
 //IngeScape library version
 //returns MAJOR*10000 + MINOR*100 + MICRO
-//displays MAJOR.MINOR.MICRO in console
 PUBLIC int igs_version(void);
 
 //IngeScape protocol version
@@ -264,6 +274,7 @@ PUBLIC void igs_freeNetaddressesList(char **addresses, int nb);
 //command line is initialized with exec path without any parameter.
 PUBLIC void igs_setCommandLine(const char *line);
 PUBLIC void igs_setCommandLineFromArgs(int argc, const char * argv[]); //first element is replaced by absolute exec path on UNIX
+PUBLIC char* igs_getCommandLine(void); //must be freed by caller
 
 
 //When mapping other agents, it is possible to request the
@@ -292,17 +303,16 @@ typedef enum {
 } igs_logLevel_t;
 
 //logs management
-PUBLIC void igs_setVerbose(bool verbose); //enable logs in console (ERROR and FATAL are always displayed)
+PUBLIC void igs_setVerbose(bool); //enable logs in console (ERROR and FATAL are always displayed)
 PUBLIC bool igs_isVerbose(void);
-PUBLIC void igs_setUseColorVerbose(bool useColor); //use colors in console
+PUBLIC void igs_setUseColorVerbose(bool); //use colors in console
 PUBLIC bool igs_getUseColorVerbose(void);
-PUBLIC void igs_setLogStream(bool useLogStream); //enable logs in socket stream
+PUBLIC void igs_setLogStream(bool); //enable logs in socket stream
 PUBLIC bool igs_getLogStream(void);
-PUBLIC void igs_setLogInFile(bool useLogFile); //enable logs in file
+PUBLIC void igs_setLogInFile(bool); //enable logs in file
 PUBLIC bool igs_getLogInFile(void);
 PUBLIC void igs_setLogPath(const char *path); //default directory is ~/ on UNIX systems and current PATH on Windows
 PUBLIC char* igs_getLogPath(void); // must be freed by caller
-
 PUBLIC void igs_setLogLevel (igs_logLevel_t level); //set log level in console, default is IGS_LOG_INFO
 PUBLIC igs_logLevel_t igs_getLogLevel(void);
 
@@ -345,21 +355,20 @@ PUBLIC bool igs_getAllowInproc(void);
 
 //////////////////////////////////////////////////
 //licenses
-PUBLIC void igs_licenseGlobal(const char *function, const char *format, ...) CHECK_PRINTF (2);
 #define igs_license(...) igs_log(IGS_LOG_FATAL + 1, __func__, __VA_ARGS__)
 typedef enum {
     IGS_LICENSE_TIMEOUT = 0,
     IGS_LICENSE_TOO_MANY_AGENTS,
     IGS_LICENSE_TOO_MANY_IOPS
 } igs_license_limit_t;
-typedef void (*igs_licenseCallback)(igs_license_limit_t limit, void *myData);
+typedef void (igs_licenseCallback)(igs_license_limit_t limit, void *myData);
 
 #if !defined(TARGET_OS_IOS) || !TARGET_OS_IOS
 // Default licenses path is empty and, if so, is automatically set at runtime to agent's executable path.
 // All licenses in path will be examined and used if valid
 // When path is set manually, it takes priority over agent's executable path.
 PUBLIC void igs_setLicensePath(const char *path);
-PUBLIC char *igs_getLicensePath(void);
+PUBLIC char* igs_getLicensePath(void); //must be freed by caller
     
 //Any agent developer can use this function to check the license against her/his agent's unique id.
 //IDs are provided by the ingescape team.
@@ -368,7 +377,7 @@ PUBLIC bool igs_checkLicenseForAgent(const char *agentId);
 
 //use this callback mechanism to be notified when the timer
 //or number of agents or number of IOPs has been exceeded in demo mode
-PUBLIC int igs_observeLicense(igs_licenseCallback cb, void *myData);
+PUBLIC void igs_observeLicense(igs_licenseCallback cb, void *myData);
     
 //This function loads a license in memory and overrides all provided
 //license files.

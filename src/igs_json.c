@@ -586,7 +586,7 @@ void igs_JSONTreeInsertInMap(igsJSONTreeNode_t *map, const char *key, igsJSONTre
         igs_JSONTreeFree(&(map->u.object.values[index]));
     }else{
         map->u.object.values = realloc(map->u.object.values, size + 1);
-        map->u.object.keys = realloc(map->u.object.keys, size + 1);
+        map->u.object.keys = (const char **) realloc(map->u.object.keys, size + 1);
         assert(map->u.object.values);
         assert(map->u.object.keys);
         map->u.object.keys[index] = strdup(key);

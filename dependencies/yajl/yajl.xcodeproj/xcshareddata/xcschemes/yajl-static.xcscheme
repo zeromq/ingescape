@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "9716CA451EA21C6A004F0AC0"
-               BuildableName = "libyajl.a"
-               BlueprintName = "yajl-ios"
+               BlueprintIdentifier = "97F9FBE724C47F8000A4A3A0"
+               BuildableName = "libyajl-static.a"
+               BlueprintName = "yajl-static"
                ReferencedContainer = "container:yajl.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -50,9 +50,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "9716CA451EA21C6A004F0AC0"
-            BuildableName = "libyajl.a"
-            BlueprintName = "yajl-ios"
+            BlueprintIdentifier = "97F9FBE724C47F8000A4A3A0"
+            BuildableName = "libyajl-static.a"
+            BlueprintName = "yajl-static"
             ReferencedContainer = "container:yajl.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

@@ -261,7 +261,7 @@ void LicensesController::refreshLicensesData()
     // Allows to update data about licenses
     igs_checkLicenseForAgent(nullptr);
 
-    if (globalAgent->license != nullptr)
+    if (coreContext->license != nullptr)
     {
         if (_mergedLicense != nullptr)
         {
@@ -270,20 +270,20 @@ void LicensesController::refreshLicensesData()
             delete temp;
         }
 
-        setmergedLicense(new LicenseInformationM(globalAgent->license));
+        setmergedLicense(new LicenseInformationM(coreContext->license));
         _licenseDetailsList.deleteAllItems();
 
         //
         // License details
         //
-        if ((globalAgent->license->licenseDetails != nullptr) && (zlist_size(globalAgent->license->licenseDetails) > 0))
+        if ((coreContext->license->licenseDetails != nullptr) && (zlist_size(coreContext->license->licenseDetails) > 0))
         {
-            license_t* detail = static_cast<license_t*>(zlist_first(globalAgent->license->licenseDetails));
+            igs_license_t* detail = static_cast<igs_license_t*>(zlist_first(coreContext->license->licenseDetails));
             while (detail != nullptr)
             {
                 LicenseInformationM* licenseDetails = new LicenseInformationM(detail);
                 _licenseDetailsList.append(licenseDetails);
-                detail = static_cast<license_t*>(zlist_next(globalAgent->license->licenseDetails));
+                detail = static_cast<igs_license_t*>(zlist_next(coreContext->license->licenseDetails));
             }
         }
 
@@ -305,7 +305,7 @@ void LicensesController::setNecessaryLicenseForAgent(const char * agentName, con
     }
 
     // Update name and id of license for agent
-    _licenseForAgentNeeded = new licenseForAgent_t();
+    _licenseForAgentNeeded = new igs_license_for_agent_t();
     _licenseForAgentNeeded->agentName = strdup(agentName);
     _licenseForAgentNeeded->agentId = strdup(agentID);
 
@@ -363,7 +363,7 @@ bool LicensesController::_checkLicenseForAgentNeeded() {
     bool agentHandleByLicense = true;
     if ((_licenseForAgentNeeded != nullptr) && (!igs_checkLicenseForAgent(_licenseForAgentNeeded->agentId)))
     {
-        seterrorMessageWhenLicenseFailed("No valid license for the agent : " + QString(globalAgent->agentName));
+        seterrorMessageWhenLicenseFailed("No valid license for agent id " + QString(_licenseForAgentNeeded->agentId));
         agentHandleByLicense = false;
     }
     else

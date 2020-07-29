@@ -675,10 +675,7 @@ IngeScapeNetworkController::IngeScapeNetworkController(QObject *parent) : QObjec
 
 
     // Begin to observe incoming messages on the bus
-    int result = igs_observeBus(&onIncommingBusMessageCallback, this);
-    if (result == 0) {
-        qCritical() << "The callback on zyre messages has NOT been registered !";
-    }
+    igs_observeBus(&onIncommingBusMessageCallback, this);
 
     // Create the model of our agent "IngeScape"
     _agentModel = new AgentM(_igsAgentApplicationName);
@@ -1348,14 +1345,7 @@ void IngeScapeNetworkController::addInputsToOurApplicationForAgentOutputs(QStrin
                     _agentModel->definition()->inputsList()->append(input);
 
                     // Begin the observe of this input
-                    int resultObserveInput = igs_observeInput(inputName.toStdString().c_str(), onObserveInputCallback, this);
-
-                    if (resultObserveInput == 1) {
-                        //qDebug() << "Observe input" << inputName << "on agent" << _igsAgentApplicationName;
-                    }
-                    else {
-                        qCritical() << "Can NOT observe input" << inputName << "on agent" << _igsAgentApplicationName << "Error code:" << resultObserveInput;
-                    }
+                    igs_observeInput(inputName.toStdString().c_str(), onObserveInputCallback, this);
 
                     // Add mapping between our input and this output
                     unsigned long id = igs_addMappingEntry(inputName.toStdString().c_str(), agentName.toStdString().c_str(), outputName.toStdString().c_str());

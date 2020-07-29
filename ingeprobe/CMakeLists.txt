@@ -5,6 +5,7 @@ set(CMAKE_MODULES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake")
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_MODULES_DIR})
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src) # for local headers
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/yajl/src/api)
 
 if(WIN32)
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/windows)
@@ -16,7 +17,19 @@ if(UNIX AND NOT APPLE)
 endif()
 
 # set(SOURCES main.c)
-file(GLOB SOURCES "src/*.c")
+list(APPEND SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/main.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/call.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/yajl/src/yajl_alloc.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/yajl/src/yajl_buf.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/yajl/src/yajl_encode.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/yajl/src/yajl_gen.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/yajl/src/yajl_lex.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/yajl/src/yajl_parser.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/yajl/src/yajl_tree.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/yajl/src/yajl_version.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/yajl/src/yajl.c
+)
 
 add_executable(ingeprobe ${SOURCES})
 

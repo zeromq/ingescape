@@ -20,7 +20,7 @@
  * @param licenseObject
  * @param parent
  */
-LicenseInformationM::LicenseInformationM(const license_t* licenseObject, QObject* parent)
+LicenseInformationM::LicenseInformationM(const igs_license_t* licenseObject, QObject* parent)
     : QObject (parent)
     , _licenseId("")
     , _customers("")
@@ -67,11 +67,11 @@ LicenseInformationM::LicenseInformationM(const license_t* licenseObject, QObject
 
         // Extract agents allowed
         QStringList agents;
-        licenseForAgent_t *agent = static_cast<licenseForAgent_t*>(zhash_first(licenseObject->agents));
+        igs_license_for_agent_t *agent = static_cast<igs_license_for_agent_t*>(zhash_first(licenseObject->agents));
         while (agent != nullptr)
         {
             agents.append(QString(agent->agentName));
-            agent = static_cast<licenseForAgent_t*>(zhash_next(licenseObject->agents));
+            agent = static_cast<igs_license_for_agent_t*>(zhash_next(licenseObject->agents));
         }
         setagents(agents);
     }

@@ -13,6 +13,8 @@
 		974E36B62493D94300444009 /* libzyre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 974E36B12493D93A00444009 /* libzyre.a */; };
 		974E36B82493D94A00444009 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 974E36B72493D94A00444009 /* libc++.tbd */; };
 		976FFCD122BD57E5000876BF /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 976FFCCF22BD57E5000876BF /* main.c */; };
+		97F9FB3E24C47C4D00A4A3A0 /* call.c in Sources */ = {isa = PBXBuildFile; fileRef = 97F9FB3D24C47C4D00A4A3A0 /* call.c */; };
+		97F9FC0324C47FE200A4A3A0 /* libyajl-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 97F9FC0224C47FDB00A4A3A0 /* libyajl-static.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -912,6 +914,125 @@
 			remoteGlobalIDString = A6ADDDFA52254DACA8EE2DA7;
 			remoteInfo = zyre_selftest;
 		};
+		97C2E10724D0574A00FE3598 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 974E35002493D8C800444009 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 794F927680864E28918313E6;
+			remoteInfo = test_bind_curve_fuzzer;
+		};
+		97C2E10924D0574A00FE3598 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 974E35002493D8C800444009 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = CAB7C2390B4642DF9949C918;
+			remoteInfo = test_bind_fuzzer;
+		};
+		97C2E10B24D0574A00FE3598 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 974E35002493D8C800444009 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D6182BB5B6AA4816B03F494E;
+			remoteInfo = test_bind_null_fuzzer;
+		};
+		97C2E10D24D0574A00FE3598 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 974E35002493D8C800444009 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = BFFE77E1BCA44D9EA04D9734;
+			remoteInfo = test_channel;
+		};
+		97C2E10F24D0574A00FE3598 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 974E35002493D8C800444009 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1B04542E55634C8CA83661CE;
+			remoteInfo = test_connect_curve_fuzzer;
+		};
+		97C2E11124D0574A00FE3598 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 974E35002493D8C800444009 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 9B2A7126693F4660A356AD2B;
+			remoteInfo = test_connect_fuzzer;
+		};
+		97C2E11324D0574A00FE3598 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 974E35002493D8C800444009 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 55F6B31ED5A344C6B854B982;
+			remoteInfo = test_connect_null_fuzzer;
+		};
+		97C2E11524D0574A00FE3598 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 974E35002493D8C800444009 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8A1A6F2B61984933A35FD2BA;
+			remoteInfo = test_disconnect_msg;
+		};
+		97C2E11724D0574A00FE3598 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 974E35002493D8C800444009 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B23F4B79AA2F4FCE9198CD3C;
+			remoteInfo = test_hello_msg;
+		};
+		97C2E11924D0574A00FE3598 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 974E35002493D8C800444009 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 4AD3F62558794E13A6219795;
+			remoteInfo = test_msg_init;
+		};
+		97C2E11B24D0574A00FE3598 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 974E35002493D8C800444009 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = FD101ACDF9FE4398803AA2D0;
+			remoteInfo = test_reconnect_options;
+		};
+		97C2E11D24D0574A00FE3598 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 974E35002493D8C800444009 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = BCB4B1052C3D405692898B4D;
+			remoteInfo = test_socks;
+		};
+		97C2E11F24D0574A00FE3598 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 974E35002493D8C800444009 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 6EC912915DA844A4B1B1547E;
+			remoteInfo = test_ws_transport;
+		};
+		97C2E12124D0574A00FE3598 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 974E35002493D8C800444009 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 2DE83047BCA448D2AF95AE71;
+			remoteInfo = test_z85_decode_fuzzer;
+		};
+		97F9FBFD24C47FDB00A4A3A0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97F9FBF724C47FDA00A4A3A0 /* yajl.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 9716CA461EA21C6A004F0AC0;
+			remoteInfo = "yajl-ios";
+		};
+		97F9FBFF24C47FDB00A4A3A0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97F9FBF724C47FDA00A4A3A0 /* yajl.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 9762EDB21EAE530B002062A1;
+			remoteInfo = "yajl-xcode";
+		};
+		97F9FC0124C47FDB00A4A3A0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97F9FBF724C47FDA00A4A3A0 /* yajl.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 97F9FBE824C47F8000A4A3A0;
+			remoteInfo = "yajl-static";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -956,6 +1077,10 @@
 		978D6DED1CB26F9B0082016E /* ingeprobe */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ingeprobe; sourceTree = BUILT_PRODUCTS_DIR; };
 		97A2128422383DD000ACCFB0 /* libsodium.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsodium.a; path = ../../../../../../../../usr/local/Cellar/libsodium/1.0.17/lib/libsodium.a; sourceTree = "<group>"; };
 		97A2128622383DE200ACCFB0 /* libzmq.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libzmq.a; path = ../../../../../../../../usr/local/Cellar/zeromq/4.3.1_1/lib/libzmq.a; sourceTree = "<group>"; };
+		97F9FB3C24C47C4D00A4A3A0 /* call.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = call.h; sourceTree = "<group>"; };
+		97F9FB3D24C47C4D00A4A3A0 /* call.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = call.c; sourceTree = "<group>"; };
+		97F9FBF524C47FCB00A4A3A0 /* libyajl-static.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libyajl-static.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		97F9FBF724C47FDA00A4A3A0 /* yajl.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = yajl.xcodeproj; path = ../../../dependencies/yajl/yajl.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -963,6 +1088,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				97F9FC0324C47FE200A4A3A0 /* libyajl-static.a in Frameworks */,
 				974E36B82493D94A00444009 /* libc++.tbd in Frameworks */,
 				974E36B62493D94300444009 /* libzyre.a in Frameworks */,
 				974E36832493D92E00444009 /* libczmq.a in Frameworks */,
@@ -977,6 +1103,7 @@
 		9709EE192094B2270056023F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				97F9FBF524C47FCB00A4A3A0 /* libyajl-static.a */,
 				974E36B72493D94A00444009 /* libc++.tbd */,
 				974E36812493D92E00444009 /* libzyre.a */,
 				976FFCD422BD5832000876BF /* libczmq.a */,
@@ -1004,10 +1131,17 @@
 				974E35822493D8C900444009 /* test_atomics */,
 				974E35842493D8C900444009 /* test_base85 */,
 				974E35862493D8C900444009 /* test_bind_after_connect_tcp */,
+				97C2E10824D0574A00FE3598 /* test_bind_curve_fuzzer */,
+				97C2E10A24D0574A00FE3598 /* test_bind_fuzzer */,
+				97C2E10C24D0574A00FE3598 /* test_bind_null_fuzzer */,
 				974E35882493D8C900444009 /* test_bind_src_address */,
 				974E358A2493D8C900444009 /* test_capabilities */,
+				97C2E10E24D0574A00FE3598 /* test_channel */,
 				974E358C2493D8C900444009 /* test_client_server */,
 				974E358E2493D8C900444009 /* test_conflate */,
+				97C2E11024D0574A00FE3598 /* test_connect_curve_fuzzer */,
+				97C2E11224D0574A00FE3598 /* test_connect_fuzzer */,
+				97C2E11424D0574A00FE3598 /* test_connect_null_fuzzer */,
 				974E35902493D8C900444009 /* test_connect_resolve */,
 				974E35922493D8C900444009 /* test_connect_rid */,
 				974E35942493D8C900444009 /* test_ctx_destroy */,
@@ -1015,10 +1149,12 @@
 				974E35982493D8C900444009 /* test_dgram */,
 				974E359A2493D8C900444009 /* test_diffserv */,
 				974E359C2493D8C900444009 /* test_disconnect_inproc */,
+				97C2E11624D0574A00FE3598 /* test_disconnect_msg */,
 				974E359E2493D8C900444009 /* test_filter_ipc */,
 				974E35A02493D8C900444009 /* test_fork */,
 				974E35A22493D8C900444009 /* test_getsockopt_memset */,
 				974E35A42493D8C900444009 /* test_heartbeats */,
+				97C2E11824D0574A00FE3598 /* test_hello_msg */,
 				974E35A62493D8C900444009 /* test_hwm */,
 				974E35A82493D8C900444009 /* test_hwm_pubsub */,
 				974E35AA2493D8C900444009 /* test_immediate */,
@@ -1034,6 +1170,7 @@
 				974E35BE2493D8C900444009 /* test_monitor */,
 				974E35C02493D8C900444009 /* test_msg_ffn */,
 				974E35C22493D8C900444009 /* test_msg_flags */,
+				97C2E11A24D0574A00FE3598 /* test_msg_init */,
 				974E35C42493D8C900444009 /* test_pair_inproc */,
 				974E35C62493D8C900444009 /* test_pair_ipc */,
 				974E35C82493D8C900444009 /* test_pair_tcp */,
@@ -1048,6 +1185,7 @@
 				974E35DA2493D8C900444009 /* test_radio_dish */,
 				974E35DC2493D8C900444009 /* test_rebind_ipc */,
 				974E35DE2493D8C900444009 /* test_reconnect_ivl */,
+				97C2E11C24D0574A00FE3598 /* test_reconnect_options */,
 				974E35E02493D8C900444009 /* test_req_correlate */,
 				974E35E22493D8C900444009 /* test_req_relaxed */,
 				974E35E42493D8C900444009 /* test_reqrep_device */,
@@ -1069,6 +1207,7 @@
 				974E36042493D8C900444009 /* test_shutdown_stress */,
 				974E36062493D8C900444009 /* test_socket_null */,
 				974E36082493D8C900444009 /* test_sockopt_hwm */,
+				97C2E11E24D0574A00FE3598 /* test_socks */,
 				974E360A2493D8C900444009 /* test_sodium */,
 				974E360C2493D8C900444009 /* test_spec_dealer */,
 				974E360E2493D8C900444009 /* test_spec_pushpull */,
@@ -1089,11 +1228,13 @@
 				974E362C2493D8C900444009 /* test_timers */,
 				974E362E2493D8C900444009 /* test_unbind_wildcard */,
 				974E36302493D8C900444009 /* test_use_fd */,
+				97C2E12024D0574A00FE3598 /* test_ws_transport */,
 				974E36322493D8C900444009 /* test_xpub_manual */,
 				974E36342493D8C900444009 /* test_xpub_manual_last_value */,
 				974E36362493D8C900444009 /* test_xpub_nodrop */,
 				974E36382493D8C900444009 /* test_xpub_verbose */,
 				974E363A2493D8C900444009 /* test_xpub_welcome_msg */,
+				97C2E12224D0574A00FE3598 /* test_z85_decode_fuzzer */,
 				974E363C2493D8C900444009 /* test_zmq_poll_fd */,
 				974E363E2493D8C900444009 /* libtestutil.a */,
 				974E36402493D8C900444009 /* libtestutil-static.a */,
@@ -1155,6 +1296,8 @@
 				976FFCC422BD57E5000876BF /* Makefile */,
 				976FFCC522BD57E5000876BF /* uthash */,
 				976FFCCF22BD57E5000876BF /* main.c */,
+				97F9FB3C24C47C4D00A4A3A0 /* call.h */,
+				97F9FB3D24C47C4D00A4A3A0 /* call.c */,
 			);
 			name = src;
 			path = ../../src;
@@ -1180,6 +1323,7 @@
 			isa = PBXGroup;
 			children = (
 				976BB39C24A48C6C002A6EE5 /* ingeprobe.entitlements */,
+				97F9FBF724C47FDA00A4A3A0 /* yajl.xcodeproj */,
 				974E36862493D93900444009 /* zyre.xcodeproj */,
 				974E36512493D8C900444009 /* sodium.xcodeproj */,
 				974E35002493D8C800444009 /* ZeroMQ.xcodeproj */,
@@ -1194,6 +1338,16 @@
 			isa = PBXGroup;
 			children = (
 				978D6DED1CB26F9B0082016E /* ingeprobe */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		97F9FBF824C47FDA00A4A3A0 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				97F9FBFE24C47FDB00A4A3A0 /* libyajl.a */,
+				97F9FC0024C47FDB00A4A3A0 /* yajl.framework */,
+				97F9FC0224C47FDB00A4A3A0 /* libyajl-static.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1252,6 +1406,10 @@
 				{
 					ProductGroup = 974E36522493D8C900444009 /* Products */;
 					ProjectRef = 974E36512493D8C900444009 /* sodium.xcodeproj */;
+				},
+				{
+					ProductGroup = 97F9FBF824C47FDA00A4A3A0 /* Products */;
+					ProjectRef = 97F9FBF724C47FDA00A4A3A0 /* yajl.xcodeproj */;
 				},
 				{
 					ProductGroup = 974E35012493D8C800444009 /* Products */;
@@ -2166,6 +2324,125 @@
 			remoteRef = 974E36B42493D93A00444009 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		97C2E10824D0574A00FE3598 /* test_bind_curve_fuzzer */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_bind_curve_fuzzer;
+			remoteRef = 97C2E10724D0574A00FE3598 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		97C2E10A24D0574A00FE3598 /* test_bind_fuzzer */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_bind_fuzzer;
+			remoteRef = 97C2E10924D0574A00FE3598 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		97C2E10C24D0574A00FE3598 /* test_bind_null_fuzzer */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_bind_null_fuzzer;
+			remoteRef = 97C2E10B24D0574A00FE3598 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		97C2E10E24D0574A00FE3598 /* test_channel */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_channel;
+			remoteRef = 97C2E10D24D0574A00FE3598 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		97C2E11024D0574A00FE3598 /* test_connect_curve_fuzzer */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_connect_curve_fuzzer;
+			remoteRef = 97C2E10F24D0574A00FE3598 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		97C2E11224D0574A00FE3598 /* test_connect_fuzzer */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_connect_fuzzer;
+			remoteRef = 97C2E11124D0574A00FE3598 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		97C2E11424D0574A00FE3598 /* test_connect_null_fuzzer */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_connect_null_fuzzer;
+			remoteRef = 97C2E11324D0574A00FE3598 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		97C2E11624D0574A00FE3598 /* test_disconnect_msg */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_disconnect_msg;
+			remoteRef = 97C2E11524D0574A00FE3598 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		97C2E11824D0574A00FE3598 /* test_hello_msg */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_hello_msg;
+			remoteRef = 97C2E11724D0574A00FE3598 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		97C2E11A24D0574A00FE3598 /* test_msg_init */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_msg_init;
+			remoteRef = 97C2E11924D0574A00FE3598 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		97C2E11C24D0574A00FE3598 /* test_reconnect_options */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_reconnect_options;
+			remoteRef = 97C2E11B24D0574A00FE3598 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		97C2E11E24D0574A00FE3598 /* test_socks */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_socks;
+			remoteRef = 97C2E11D24D0574A00FE3598 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		97C2E12024D0574A00FE3598 /* test_ws_transport */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_ws_transport;
+			remoteRef = 97C2E11F24D0574A00FE3598 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		97C2E12224D0574A00FE3598 /* test_z85_decode_fuzzer */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_z85_decode_fuzzer;
+			remoteRef = 97C2E12124D0574A00FE3598 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		97F9FBFE24C47FDB00A4A3A0 /* libyajl.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libyajl.a;
+			remoteRef = 97F9FBFD24C47FDB00A4A3A0 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		97F9FC0024C47FDB00A4A3A0 /* yajl.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = yajl.framework;
+			remoteRef = 97F9FBFF24C47FDB00A4A3A0 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		97F9FC0224C47FDB00A4A3A0 /* libyajl-static.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libyajl-static.a";
+			remoteRef = 97F9FC0124C47FDB00A4A3A0 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -2174,6 +2451,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				976FFCD122BD57E5000876BF /* main.c in Sources */,
+				97F9FB3E24C47C4D00A4A3A0 /* call.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2295,6 +2573,7 @@
 					"$(SRCROOT)/../../../../../third-party/czmq/include",
 					"$(SRCROOT)/../../../../../third-party/libzmq/include",
 					"$(SRCROOT)/../../../../../third-party/zyre/include",
+					"$(SRCROOT)/../../../dependencies/yajl/src/api/",
 				);
 				LIBRARY_SEARCH_PATHS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ingescape.ingeprobe;
@@ -2314,6 +2593,7 @@
 					"$(SRCROOT)/../../../../../third-party/czmq/include",
 					"$(SRCROOT)/../../../../../third-party/libzmq/include",
 					"$(SRCROOT)/../../../../../third-party/zyre/include",
+					"$(SRCROOT)/../../../dependencies/yajl/src/api/",
 				);
 				LIBRARY_SEARCH_PATHS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ingescape.ingeprobe;
