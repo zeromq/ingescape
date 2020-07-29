@@ -11,11 +11,11 @@
 ThreadsafeContext *headThreadsafeContexts = NULL;
 
 ////////////////////////////////////
-//  Observe forced stop
+//  Observe external stop
 //
 
-// Function to callback forced stop JS function 
-static void cbForcedStop_into_js(napi_env env, napi_value js_callback, void* ctx, void* data) {
+// Function to callback external stop JS function 
+static void cbExternalStop_into_js(napi_env env, napi_value js_callback, void* ctx, void* data) {
     napi_status status;
     napi_ref ref_myData = (napi_ref) data;
     napi_value argv[1];
@@ -46,16 +46,16 @@ static void cbForcedStop_into_js(napi_env env, napi_value js_callback, void* ctx
 }
 
 // type defined forced stop C function
-void forcedStopCallback (void *myData) {
+void externalStopCallback (void *myData) {
     ThreadsafeContext * threadsafeContext = (ThreadsafeContext *) myData;
 
-    // call our threadsafe function cbForcedStop_into_js
+    // call our threadsafe function cbExternalStop_into_js
     napi_call_threadsafe_function(threadsafeContext->threadsafe_func, threadsafeContext->ref_myData, napi_tsfn_nonblocking);
 }
 
 // Wrapper for : 
-// PUBLIC void igs_observeForcedStop(igs_forcedStopCallback cb, void *myData);
-napi_value node_igs_observeForcedStop(napi_env env, napi_callback_info info) {
+// PUBLIC void igs_observeExternalStop(igs_externalStopCallback cb, void *myData);
+napi_value node_igs_observeExternalStop(napi_env env, napi_callback_info info) {
     size_t nb_arguments = 2;
     napi_status status; //to check status of node_api
     napi_value argv[nb_arguments];
@@ -69,12 +69,12 @@ napi_value node_igs_observeForcedStop(napi_env env, napi_callback_info info) {
 
     //create threadsafe function
     napi_value async_name;
-    status = napi_create_string_utf8(env, "Ingescape/CallbackForcedStop", NAPI_AUTO_LENGTH, &async_name);
+    status = napi_create_string_utf8(env, "Ingescape/CallbackExternalStop", NAPI_AUTO_LENGTH, &async_name);
     if (status != napi_ok) {
         triggerException(env, NULL, "Invalid name for async_name napi_value.");
     }
     status = napi_create_threadsafe_function(env, argv[0], NULL, async_name, 0, 1, NULL, NULL, NULL, 
-    cbForcedStop_into_js, &(threadsafeContext->threadsafe_func));
+    cbExternalStop_into_js, &(threadsafeContext->threadsafe_func));
     if (status != napi_ok) {
         triggerException(env, NULL, "Impossible to create threadsafe function.");
     }
@@ -96,7 +96,7 @@ napi_value node_igs_observeForcedStop(napi_env env, napi_callback_info info) {
     }  
 
     // call igs function
-    igs_observeForcedStop(forcedStopCallback, threadsafeContext);
+    igs_observeExternalStop(externalStopCallback, threadsafeContext);
     return NULL;
 }
 
@@ -196,10 +196,8 @@ napi_value node_igs_observeMute(napi_env env, napi_callback_info info) {
     }  
 
     // call igs function
-    int res = igs_observeMute(muteCallback, threadsafeContext);
-    napi_value res_convert;
-    convert_int_to_napi(env, res, &res_convert);
-    return res_convert;
+    igs_observeMute(muteCallback, threadsafeContext);
+    return NULL;
 }
 
 
@@ -298,10 +296,8 @@ napi_value node_igs_observeFreeze(napi_env env, napi_callback_info info) {
     }  
 
     // call igs function
-    int res = igs_observeFreeze(freezeCallback, threadsafeContext);
-    napi_value res_convert;
-    convert_int_to_napi(env, res, &res_convert);
-    return res_convert;
+    igs_observeFreeze(freezeCallback, threadsafeContext);
+    return NULL;
 }
 
 
@@ -412,12 +408,9 @@ napi_value node_igs_observeInput(napi_env env, napi_callback_info info) {
     } 
 
     // call igs function
-    int res = igs_observeInput(name, observeCallback, threadsafeContext);
-
+    igs_observeInput(name, observeCallback, threadsafeContext);
     free(name);
-    napi_value res_convert;
-    convert_int_to_napi(env, res, &res_convert);
-    return res_convert;
+    return NULL;
 }
 
 // Wrapper for : 
@@ -465,12 +458,9 @@ napi_value node_igs_observeOutput(napi_env env, napi_callback_info info) {
     } 
 
     // call igs function
-    int res = igs_observeOutput(name, observeCallback, threadsafeContext);
+    igs_observeOutput(name, observeCallback, threadsafeContext);
     free(name);
-
-    napi_value res_convert;
-    convert_int_to_napi(env, res, &res_convert);
-    return res_convert;
+    return NULL;
 }
 
 // Wrapper for : 
@@ -518,11 +508,9 @@ napi_value node_igs_observeParameter(napi_env env, napi_callback_info info) {
     }
 
     // call igs function
-    int res = igs_observeParameter(name, observeCallback, threadsafeContext);
+    igs_observeParameter(name, observeCallback, threadsafeContext);
     free(name);
-    napi_value res_convert;
-    convert_int_to_napi(env, res, &res_convert);
-    return res_convert;
+    return NULL;
 }
 
 
@@ -620,10 +608,8 @@ napi_value node_igs_observeLicense (napi_env env, napi_callback_info info) {
     }
 
     // Call igs function
-    int res = igs_observeLicense(licenseCallback, threadsafeContext);
-    napi_value res_convert;
-    convert_int_to_napi(env, res, &res_convert);
-    return res_convert;
+    igs_observeLicense(licenseCallback, threadsafeContext);
+    return NULL;
 }
 
 
@@ -866,7 +852,7 @@ void free_data_cb() {
 
 // Allow callback for observe ingescape code 
 napi_value init_callback_igs(napi_env env, napi_value exports) {
-    exports = enable_callback_into_js(env, node_igs_observeForcedStop, "observeForcedStop", exports);
+    exports = enable_callback_into_js(env, node_igs_observeExternalStop, "observeExternalStop", exports);
     exports = enable_callback_into_js(env, node_igs_observeMute, "observeMute", exports);
     exports = enable_callback_into_js(env, node_igs_observeFreeze, "observeFreeze", exports);
     exports = enable_callback_into_js(env, node_igs_observeInput, "observeInput", exports);

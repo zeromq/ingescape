@@ -1,6 +1,6 @@
 {
   "name": "ingescape",
-  "version": "0.9.1",
+  "version": "2.0.0",
   "description": "Ingescape module for NodeJS",
   "gypfile": true,
   "main": "./build/Release/ingescape",
