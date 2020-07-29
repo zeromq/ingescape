@@ -60,52 +60,10 @@ napi_value node_igs_startWithIP(napi_env env, napi_callback_info info) {
 // PUBLIC int igs_stop(void);
 napi_value node_igs_stop(napi_env env, napi_callback_info info) {
     // call igs function
-    int res = igs_stop();
+    igs_stop();
 
     // free callbacks memory
     free_data_cb();
-
-    // convert return value into N-API value
-    napi_value res_convert;
-    convert_int_to_napi(env, res, &res_convert);
-    return res_convert;
-}
-
-// Wrapper for : 
-// PUBLIC extern bool igs_Interrupted; (read)
-napi_value node_igs_isInterrupted(napi_env env, napi_callback_info info) {
-    // convert public extern igs_Interrupted into N-API value
-    napi_value napi_return;
-    convert_bool_to_napi(env, igs_Interrupted, &napi_return);
-    return napi_return;
-}
-
-// Wrapper for : 
-// PUBLIC extern bool igs_Interrupted; (modify)
-napi_value node_igs_setIsInterrupted(napi_env env, napi_callback_info info) {
-    size_t nb_arguments = 1;
-    napi_value argv[nb_arguments];
-
-    // get infos pass in argument
-    get_function_arguments(env, info, nb_arguments, argv);
-
-    // convert infos into C types
-    bool isInterrupted;
-    convert_napi_to_bool(env, argv[0], &isInterrupted);
-
-    // call igs function
-    igs_Interrupted = isInterrupted;
-    return NULL;
-}
-
-// Wrapper for : 
-// PUBLIC void igs_die(void);
-napi_value node_igs_die(napi_env env, napi_callback_info info) {
-    igs_die();
-
-    // free callbacks memory
-    free_data_cb();
-    
     return NULL;
 }
 
@@ -122,13 +80,9 @@ napi_value node_igs_setAgentName(napi_env env, napi_callback_info info) {
     char * name = convert_napi_to_string(env, argv[0]);
 
     // call igs function
-    int res = igs_setAgentName(name);
+    igs_setAgentName(name);
     free(name);
-
-    // convert return value into N-API value
-    napi_value res_convert;
-    convert_int_to_napi(env, res, &res_convert);
-    return res_convert;
+    return NULL;
 }
 
 // Wrapper for : 
@@ -157,13 +111,9 @@ napi_value node_igs_setAgentState(napi_env env, napi_callback_info info) {
     char * state = convert_napi_to_string(env, argv[0]);
 
     // call igs function
-    int res = igs_setAgentState(state);
+    igs_setAgentState(state);
     free(state);
-
-    // convert return value into N-API value
-    napi_value res_convert;
-    convert_int_to_napi(env, res, &res_convert);
-    return res_convert;
+    return NULL;
 }
 
 // Wrapper for : 
@@ -183,24 +133,16 @@ napi_value node_igs_getAgentState(napi_env env, napi_callback_info info) {
 // PUBLIC int igs_mute(void);
 napi_value node_igs_mute(napi_env env, napi_callback_info info) {
     // call igs function
-    int res = igs_mute();
-
-    // convert return value into N-API value
-    napi_value res_convert;
-    convert_int_to_napi(env, res, &res_convert);
-    return res_convert;
+    igs_mute();
+    return NULL;
 }
 
 // Wrapper for : 
 // PUBLIC int igs_unmute(void);
 napi_value node_igs_unmute(napi_env env, napi_callback_info info) {
     // call igs function
-    int res = igs_unmute();
-
-    // convert return value into N-API value
-    napi_value res_convert;
-    convert_int_to_napi(env, res, &res_convert);
-    return res_convert;
+    igs_unmute();
+    return NULL;
 }
 
 // Wrapper for : 
@@ -243,42 +185,8 @@ napi_value node_igs_isFrozen(napi_env env, napi_callback_info info) {
 // PUBLIC int igs_unfreeze(void);
 napi_value node_igs_unfreeze(napi_env env, napi_callback_info info) {
     // call igs function
-    int res = igs_unfreeze();
-
-    // convert return value into N-API value
-    napi_value res_convert;
-    convert_int_to_napi(env, res, &res_convert);
-    return res_convert;
-}
-
-// Wrapper for : 
-// PUBLIC void igs_setCanBeFrozen(bool canBeFrozen);
-napi_value node_igs_setCanBeFrozen(napi_env env, napi_callback_info info) {
-    size_t nb_arguments = 1;
-    napi_value argv[nb_arguments];
-
-    // get infos pass in argument
-    get_function_arguments(env, info, nb_arguments, argv);
-
-    // convert infos into C types
-    bool canBeFrozen;
-    convert_napi_to_bool(env, argv[0], &canBeFrozen);
-
-    // call igs function
-    igs_setCanBeFrozen(canBeFrozen);
+    igs_unfreeze();
     return NULL;
-}
-
-// Wrapper for : 
-// PUBLIC bool igs_canBeFrozen(void);
-napi_value node_igs_canBeFrozen(napi_env env, napi_callback_info info) {
-    // call igs function
-    bool return_value = igs_canBeFrozen();
-
-    // convert return value into N-API value
-    napi_value napi_return;
-    convert_bool_to_napi(env, return_value, &napi_return);
-    return napi_return;
 }
 
 // Wrapper for : 
@@ -340,9 +248,6 @@ napi_value init_initialization(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_igs_startWithDevice, "startWithDevice", exports);
     exports = enable_callback_into_js(env, node_igs_startWithIP, "startWithIP", exports);
     exports = enable_callback_into_js(env, node_igs_stop, "stop", exports);
-    exports = enable_callback_into_js(env, node_igs_isInterrupted, "isInterrupted", exports);
-    exports = enable_callback_into_js(env, node_igs_setIsInterrupted, "setIsInterrupted", exports);
-    exports = enable_callback_into_js(env, node_igs_die, "die", exports);
     exports = enable_callback_into_js(env, node_igs_setAgentName, "setAgentName", exports);
     exports = enable_callback_into_js(env, node_igs_getAgentName, "getAgentName", exports);
     exports = enable_callback_into_js(env, node_igs_setAgentState, "setAgentState", exports);
@@ -353,8 +258,6 @@ napi_value init_initialization(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_igs_freeze, "freeze", exports);
     exports = enable_callback_into_js(env, node_igs_isFrozen, "isFrozen", exports);
     exports = enable_callback_into_js(env, node_igs_unfreeze, "unfreeze", exports);
-    exports = enable_callback_into_js(env, node_igs_setCanBeFrozen, "setCanBeFrozen", exports);
-    exports = enable_callback_into_js(env, node_igs_canBeFrozen, "canBeFrozen", exports);
     exports = enable_callback_into_js(env, node_igs_setPublishingPort, "setPublishingPort", exports);
     exports = enable_callback_into_js(env, node_igs_setDiscoveryInterval, "setDiscoveryInterval", exports);
     exports = enable_callback_into_js(env, node_igs_setAgentTimeout, "setAgentTimeout", exports);

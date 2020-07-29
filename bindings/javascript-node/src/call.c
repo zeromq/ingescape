@@ -155,7 +155,7 @@ napi_value node_igs_getCallsList(napi_env env, napi_callback_info info) {
     napi_value arrayCalls;
     convert_string_list_to_napi_array(env, callsList, nbElement, &arrayCalls);
     //free char ** 
-    igs_freeCallsList(callsList, nbElement);
+    igs_freeCallsList(&callsList, nbElement);
     return arrayCalls;
 }
 

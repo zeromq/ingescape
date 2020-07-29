@@ -767,13 +767,9 @@ napi_value node_igs_muteOutput(napi_env env, napi_callback_info info) {
     char * name = convert_napi_to_string(env, argv[0]);
 
     // call igs function
-    int res = igs_muteOutput(name);
+    igs_muteOutput(name);
     free(name);
-
-    // convert return value into N-API value
-    napi_value res_convert;
-    convert_int_to_napi(env, res, &res_convert);
-    return res_convert;
+    return NULL;
 }
 
 // Wrapper for : 
@@ -789,13 +785,9 @@ napi_value node_igs_unmuteOutput(napi_env env, napi_callback_info info) {
     char * name = convert_napi_to_string(env, argv[0]);
 
     // call igs function
-    int res = igs_unmuteOutput(name);
+    igs_unmuteOutput(name);
     free(name);
-
-    // convert return value into N-API value
-    napi_value res_convert;
-    convert_int_to_napi(env, res, &res_convert);
-    return res_convert;
+    return NULL;
 }
 
 // Wrapper for : 
@@ -935,7 +927,7 @@ napi_value node_igs_getParametersNumber(napi_env env, napi_callback_info info) {
 // PUBLIC char** igs_getInputsList(long *nbOfElements);
 napi_value node_igs_getInputsList(napi_env env, napi_callback_info info) {
     // call igs function
-    long nbInputs = 0;
+    size_t nbInputs = 0;
     char** inputs = igs_getInputsList(&nbInputs);
 
     // convert char** into napi_value
@@ -950,7 +942,7 @@ napi_value node_igs_getInputsList(napi_env env, napi_callback_info info) {
 // PUBLIC char** igs_getOutputsList(long *nbOfElements);
 napi_value node_igs_getOutputsList(napi_env env, napi_callback_info info) {
     // call igs function
-    long nbOutputs = 0;
+    size_t nbOutputs = 0;
     char** outputs = igs_getOutputsList(&nbOutputs);
 
     // convert char** into napi_value
@@ -965,7 +957,7 @@ napi_value node_igs_getOutputsList(napi_env env, napi_callback_info info) {
 // PUBLIC char** igs_getParametersList(long *nbOfElements);
 napi_value node_igs_getParametersList(napi_env env, napi_callback_info info) {
     // call igs function
-    long nbParams = 0;
+    size_t nbParams = 0;
     char** params = igs_getParametersList(&nbParams);
 
     // convert char** into napi_value

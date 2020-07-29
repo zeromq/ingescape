@@ -56,12 +56,8 @@ napi_value node_igs_loadMappingFromPath(napi_env env, napi_callback_info info) {
 // PUBLIC int igs_clearMapping(void); 
 napi_value node_igs_clearMapping(napi_env env, napi_callback_info info) {
     // call igs function
-    int res = igs_clearMapping();
-
-    // convert result into napi_value
-    napi_value res_convert;
-    convert_int_to_napi(env, res, &res_convert);
-    return res_convert;
+    igs_clearMapping();
+    return NULL;
 }
 
 // Wrapper for : 
@@ -129,13 +125,9 @@ napi_value node_igs_setMappingName(napi_env env, napi_callback_info info) {
     char * name = convert_napi_to_string(env, argv[0]);
 
     // call igs function
-    int res = igs_setMappingName(name);
+    igs_setMappingName(name);
     free(name);
-
-    // convert result into napi_value
-    napi_value res_convert;
-    convert_int_to_napi(env, res, &res_convert);
-    return res_convert;
+    return NULL;
 }
 
 // Wrapper for : 
@@ -151,13 +143,9 @@ napi_value node_igs_setMappingDescription(napi_env env, napi_callback_info info)
     char * desc = convert_napi_to_string(env, argv[0]);
 
     // call igs function
-    int res = igs_setMappingDescription(desc);
+    igs_setMappingDescription(desc);
     free(desc);
-
-    // convert result into napi_value
-    napi_value res_convert;
-    convert_int_to_napi(env, res, &res_convert);
-    return res_convert;
+    return NULL;
 }
 
 // Wrapper for : 
@@ -173,13 +161,9 @@ napi_value node_igs_setMappingVersion(napi_env env, napi_callback_info info) {
     char * version = convert_napi_to_string(env, argv[0]);
 
     // call igs function
-    int res = igs_setMappingVersion(version);
+    igs_setMappingVersion(version);
     free(version);
-
-    // convert result into napi_value
-    napi_value res_convert;
-    convert_int_to_napi(env, res, &res_convert);
-    return res_convert;
+    return NULL;
 }
 
 // Wrapper for : 
