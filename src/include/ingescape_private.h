@@ -248,6 +248,13 @@ typedef struct igs_external_stop_calback {
     struct igs_external_stop_calback *next;
 } igs_external_stop_calback_t;
 
+typedef struct igs_activate_calback {
+    igsAgent_activateCallback callback_ptr;
+    void *myData;
+    struct igs_activate_calback *prev;
+    struct igs_activate_calback *next;
+} igs_activate_calback_t;
+
 
 //////////////////  MAIN  STRUCTURES   //////////////////
 
@@ -348,6 +355,8 @@ typedef struct igs_agent {
     char *state;
     
     igs_core_context_t *context;
+    
+    igs_activate_calback_t *activateCallbacks;
     
     //definition
     char *definitionPath;

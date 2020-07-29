@@ -43,6 +43,11 @@ void igsAgent_destroy(igs_agent_t **agent){
     if ((*agent)->mappingPath != NULL)
         free((*agent)->mappingPath);
     
+    igs_activate_calback_t *activateCb, *activatetmp;
+    DL_FOREACH_SAFE((*agent)->activateCallbacks, activateCb, activatetmp){
+        DL_DELETE((*agent)->activateCallbacks, activateCb);
+        free(activateCb);
+    }
     igs_mute_callback_t *muteCb, *mutetmp;
     DL_FOREACH_SAFE((*agent)->muteCallbacks, muteCb, mutetmp){
         DL_DELETE((*agent)->muteCallbacks, muteCb);
@@ -68,6 +73,10 @@ igs_result_t igsAgent_activate(igs_agent_t *agent){
     }else{
         agent->context = coreContext;
         HASH_ADD_STR(coreContext->agents, uuid, agent);
+        igs_activate_calback_t *cb;
+        DL_FOREACH(agent->activateCallbacks, cb){
+            cb->callback_ptr(agent, true, cb->myData);
+        }
         agent->network_needToSendDefinitionUpdate = true; //will also trigger mapping update
     }
     return IGS_SUCCESS;
@@ -81,6 +90,10 @@ igs_result_t igsAgent_deactivate(igs_agent_t *agent){
     if (a != NULL){
         HASH_DEL(coreContext->agents, agent);
         agent->context = NULL;
+        igs_activate_calback_t *cb;
+        DL_FOREACH(agent->activateCallbacks, cb){
+            cb->callback_ptr(agent, false, cb->myData);
+        }
         if (coreContext->networkActor && coreContext->node){
             zmsg_t *msg = zmsg_new();
             zmsg_addstr(msg, "REMOTE_AGENT_EXIT");
@@ -104,6 +117,15 @@ bool igsAgent_isActivated(igs_agent_t *agent){
     }else{
         return false;
     }
+}
+
+void igsAgent_observeActivate(igs_agent_t *agent, igsAgent_activateCallback cb, void *myData){
+    assert(agent);
+    assert(cb);
+    igs_activate_calback_t *newCb = calloc(1, sizeof(igs_activate_calback_t));
+    newCb->callback_ptr = cb;
+    newCb->myData = myData;
+    DL_APPEND(agent->activateCallbacks, newCb);
 }
 
 void igsAgent_log(igs_logLevel_t level, const char *function, igs_agent_t *agent, const char *format, ...){

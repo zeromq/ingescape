@@ -3020,15 +3020,12 @@ bool igsAgent_isMuted(igs_agent_t *agent){
 
 
 void igsAgent_observeMute(igs_agent_t *agent, igsAgent_muteCallback cb, void *myData){
-    if (cb != NULL){
-        igs_mute_callback_t *newCb = calloc(1, sizeof(igs_mute_callback_t));
-        newCb->callback_ptr = cb;
-        newCb->myData = myData;
-        DL_APPEND(agent->muteCallbacks, newCb);
-    }
-    else{
-        igsAgent_warn(agent, "callback is null");
-    }
+    assert(agent);
+    assert(cb);
+    igs_mute_callback_t *newCb = calloc(1, sizeof(igs_mute_callback_t));
+    newCb->callback_ptr = cb;
+    newCb->myData = myData;
+    DL_APPEND(agent->muteCallbacks, newCb);
 }
 
 char* igs_getCommandLine(void){

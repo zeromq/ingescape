@@ -25,6 +25,8 @@ PUBLIC void igsAgent_destroy(igs_agent_t **agent);
 PUBLIC igs_result_t igsAgent_activate(igs_agent_t *agent);
 PUBLIC igs_result_t igsAgent_deactivate(igs_agent_t *agent);
 PUBLIC bool igsAgent_isActivated(igs_agent_t *agent);
+typedef void (*igsAgent_activateCallback)(igs_agent_t *Agent, bool isActivated, void *myData);
+PUBLIC void igsAgent_observeActivate(igs_agent_t *agent, igsAgent_activateCallback cb, void *myData);
 
 /*
  All the functions below behave the same as the functions presented
