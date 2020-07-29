@@ -2133,6 +2133,7 @@ static void runLoop (zsock_t *mypipe, void *args){
     
     network_Lock();
     igs_debug("loop stopping..."); //clean dynamic part of the context
+    zloop_destroy (&context->loop);
     
     igs_remote_agent_t *remote, *tmpremote;
     HASH_ITER(hh, context->remoteAgents, remote, tmpremote) {
@@ -2153,7 +2154,6 @@ static void runLoop (zsock_t *mypipe, void *args){
     }
     
     //zmq stack cleaning
-    zloop_destroy (&context->loop);
     zyre_stop (context->node);
     zyre_destroy (&context->node);
     zsock_destroy(&context->publisher);
@@ -2822,10 +2822,12 @@ void igs_stop(){
 }
 
 bool igs_isStarted(){
-    if (coreContext->networkActor != NULL
-        && coreContext->loop != NULL){
+    network_Lock();
+    if (coreContext->loop != NULL){
+        network_Unlock();
         return true;
     }else{
+        network_Unlock();
         return false;
     }
 }
