@@ -459,6 +459,7 @@ igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, 
             }
             zmsg_t *msg = zmsg_new();
             zmsg_addstr(msg, "CALL");
+            zmsg_addstr(msg, agent->uuid);
             zmsg_addstr(msg, remoteAgent->uuid);
             zmsg_addstr(msg, callName);
             if (list != NULL){
