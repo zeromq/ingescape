@@ -41,7 +41,7 @@ void stop(void *myData){
 }
 
 // wrapper for igs_observeForcedStop
-PyObject * igs_observeForcedStop_wrapper(PyObject *self, PyObject *args)
+PyObject * igs_observeExternalStop_wrapper(PyObject *self, PyObject *args)
 {
     PyObject *temp;
     PyObject arg;
@@ -67,12 +67,7 @@ PyObject * igs_observeForcedStop_wrapper(PyObject *self, PyObject *args)
     newElt->call = temp;
     DL_APPEND(stopList, newElt);
     
-    igs_observeForcedStop(stop, NULL);
-    
-    //return 1 if ok
-    PyObject *result;
-    result = PyLong_FromLong(1);
-    return result;
-    
+    igs_observeExternalStop(stop, NULL);
+    return PyLong_FromLong(1);
 }
 

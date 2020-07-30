@@ -87,7 +87,7 @@ PyDoc_STRVAR(
              "param fromOurInput The string which contains the name of the input mapped. Can't be NULL.\n"
              "param toAgent The string which contains the name of the extern agent. Can't be NULL.\n"
              "param withOutput The string which contains the name of the output mapped of the extern agent. Can't be NULL.\n "
-             "return The error.\n 1 is OK.\n  0 Our input name to be mapped cannot be NULL or empty.\n -1 Agent name to be mapped cannot be NULL or empty.\n -2 Extern agent output name to be mapped cannot be NULL or empty.\n -3 The structure igs_internal_mapping is NULL.\n -4 The structure mapping out is NULL.\n");
+             "return The error.\n 0 is ok\n");
 
 PyDoc_STRVAR(
              removeMappingEntryWithIdDoc,
@@ -96,7 +96,7 @@ PyDoc_STRVAR(
              "\n"
              "this function allows the user to remove a mapping in table by its id.\n"
              "param theId The id of the mapping.Cannot be negative.\n"
-             "Return The error.\n 1 is OK.\n  0 The id of the mapping cannot be negative.\n -1 The structure igs_internal_mapping is NULL.\n -2 The structure mapping out is NULL.\n");
+             "Return The error.\n 0 is ok\n");
 
 PyDoc_STRVAR(
              addMappingEntriesDoc,
@@ -107,7 +107,7 @@ PyDoc_STRVAR(
              "param fromOurInput The string which contains the name of the input to be mapped. Can't be NULL.\n"
              "Param toAgent The string which contains the name of the extern agent. Can't be NULL. \n"
              "param withOutput The string which contains the name of the output of the extern agent to be mapped. Can't be NULL.\n"
-             "return The error.\n 1 is OK.\n 0 Our input name to be mapped cannot be NULL or empty.\n -1 Agent name to be mapped cannot be NULL or empty.\n -2 Extern agent output name to be mapped cannot be NULL or empty.\n");
+             "return The error.\n 0 is ok\n");
 
 PyDoc_STRVAR(
              getMappingEntriesNumberDoc,
@@ -123,7 +123,7 @@ PyDoc_STRVAR(
              "--\n"
              "\n"
              "load Mapping in variable 'igs_Mapping_loaded' & copy in 'igs_internal_Mapping' from a json string\n"
-             "return The error.\n 1 is OK, 0 json string is NULL, -1 Mapping file has not been loaded");
+             "return The error.\n 0 is ok\n");
 
 PyDoc_STRVAR(
              loadMappingFromPathDoc,
@@ -131,7 +131,7 @@ PyDoc_STRVAR(
              "--\n"
              "\n"
              "load Mapping in variable 'igs_Mapping_loaded' & copy in 'igs_internal_Mapping' from a file path\n"
-             "return The error.\n 1 is OK, 0 json string is NULL, -1 Mapping file has not been loaded");
+             "return The error.\n 0 is ok\n");
 
 PyDoc_STRVAR(
              clearMappingDoc,
@@ -140,7 +140,8 @@ PyDoc_STRVAR(
              "\n"
              "Clear the internal Mapping of the agent.\n"
              "Free all members of the structure igs_Mapping_loaded & igs_internal_Mapping.\n"
-             "But the pointer of these structure is not free and stay allocated.\n return 1 if ok else 0");
+             "But the pointer of these structure is not free and stay allocated.\n"
+             "Return 0 if ok\n");
 
 PyDoc_STRVAR(
              getMappingDoc,
@@ -185,7 +186,7 @@ PyDoc_STRVAR(
              "\n"
              "the agent Mapping name setter."
              "\n return The loaded Mapping name string .\n"
-             "return The error.\n 1 is OK, 0 Agent description is empty");
+             "return The error.\n 0 is ok\n");
 
 PyDoc_STRVAR(
              setMappingDescriptionDoc,
@@ -193,7 +194,7 @@ PyDoc_STRVAR(
              "--\n"
              "\n"
              "the agent Mapping description setter."
-             "\n return The error.\n 1 is OK, 0 Agent description is NULL, -1 Agent description is empty\n");
+             "\n return The error.\n 0 is ok\n");
 
 PyDoc_STRVAR(
              setMappingVersionDoc,
@@ -201,7 +202,7 @@ PyDoc_STRVAR(
              "--\n"
              "\n"
              "the agent Mapping version setter."
-             "\n return The error.\n 1 is OK, 0 Agent description is NULL, -1 Agent version is empty");
+             "\n return The error.\n 0 is ok\n");
 
 
 #endif /* mapping_h */

@@ -108,7 +108,7 @@ PyDoc_STRVAR(
              "--\n"
              "\n"
              "Create and add an Output for the agent.\n"
-             "return The error.\n 1 is OK, 0 not able to add in definition loaded, -1 not able to add in definition live");
+             "return The error.\n 0 is ok\n");
 
 PyDoc_STRVAR(
              muteOutputDoc,
@@ -116,7 +116,7 @@ PyDoc_STRVAR(
              "--\n"
              "\n"
              "Mute an Output of the agent.\n"
-             "return The error.\n  1 if correct or 0\n");
+             "return The error.\n  0 is ok\n");
 
 PyDoc_STRVAR(
              unmuteOutputDoc,
@@ -124,7 +124,7 @@ PyDoc_STRVAR(
              "--\n"
              "\n"
              "Unmute an Output of the agent.\n"
-             "return The error.\n  1 if correct or 0\n");
+             "return The error.\n  0 is ok\n");
 
 PyDoc_STRVAR(
              isOutputMutedDoc,

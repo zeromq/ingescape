@@ -41,21 +41,24 @@ PyDoc_STRVAR(
              "igs_writeInputAsData(nameOfInput, dataSerialized, sizeOfDataSerialized)\n"
              "--\n"
              "\n"
-             "write a value as data into an agent's input.\n return 1 if ok else 0");
+             "write a value as data into an agent's input.\n" 
+             "Return 0 if ok\n");
 
 PyDoc_STRVAR(
              writeOutputAsDataDoc,
              "igs_writeOutputAsData(nameOfOuput, dataSerialized, sizeOfDataSerialized)\n"
              "--\n"
              "\n"
-             "write a value as data into an agent's Ouput.\n return 1 if ok else 0");
+             "write a value as data into an agent's Ouput.\n"
+             "Return 0 if ok\n"); 
 
 PyDoc_STRVAR(
              writeParameterAsDataDoc,
              "igs_writeParameterAsData(nameOfParameter, dataSerialized, sizeOfDataSerialized)\n"
              "--\n"
              "\n"
-             "write a value as data into an agent's Parameter.\n return 1 if ok else 0");
+             "write a value as data into an agent's Parameter.\n"
+             "Return 0 if ok\n");
 
 //igs_writeOutputAsData
  PyObject * writeOutputAsData_wrapper(PyObject * self, PyObject * args);

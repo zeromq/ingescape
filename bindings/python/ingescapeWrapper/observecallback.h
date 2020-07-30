@@ -21,7 +21,7 @@ PyDoc_STRVAR(
              "param input The string which contains the name of the input we want to observe. Can't be NULL.\n"
              "param callback is the function we want to be executed when the input is changed. Can't be NULL.\n"
              "param args A tuple containing the args of the callback in python. Can't be NULL.\n "
-             "return The error.\n 1 is OK.\n  0 if not\n");
+             "return The error.\n 0 is ok\n");
 
 PyDoc_STRVAR(
              observeOutputDoc,
@@ -33,7 +33,7 @@ PyDoc_STRVAR(
              "param output The string which contains the name of the input we want to observe. Can't be NULL.\n"
              "param callback is the function we want to be executed when the output is changed. Can't be NULL.\n"
              "param args A tuple containing the args of the callback in python. Can't be NULL.\n "
-             "return The error.\n 1 is OK.\n  0 if not\n");
+             "return The error.\n 0 is ok\n");
 
 PyDoc_STRVAR(
              observeParameterDoc,
@@ -45,7 +45,7 @@ PyDoc_STRVAR(
              "param parameter The string which contains the name of the parameter we want to observe. Can't be NULL.\n"
              "param callback is the function we want to be executed when the parameter is changed. Can't be NULL.\n"
              "param args A tuple containing the args of the callback in python. Can't be NULL.\n "
-             "return The error.\n 1 is OK.\n  0 if not\n");
+             "return The error.\n 0 is ok\n");
 
  PyObject * igs_observeInput_wrapper(PyObject *self, PyObject *args);
 

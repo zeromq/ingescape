@@ -16,39 +16,25 @@
     char * name;
     void * value;
     size_t * size;
-    
     int result;
-    PyObject * ret;
     
     if (!PyArg_ParseTuple(args, "sii", &name, &value, &size)) {
         return NULL;
     }
-
     result = igs_readInput(name, value, size);
-    
-    // build the resulting string into a Python object.
-    ret = PyLong_FromLong(result);
-    free(&result);
-    
-    return ret;
+    return PyLong_FromLong(result);
 }
 
 //igs_readInputAsBool
  PyObject * readInputAsBool_wrapper(PyObject * self, PyObject * args)
 {
     char * name;
-    bool result;
-    PyObject * ret;
-    
     // parse arguments :  the name of the input
     if (!PyArg_ParseTuple(args, "s", &name)) {
         return NULL;
     }
-    
-    result = igs_readInputAsBool(name);
-    
     // build the resulting bool into a Python object and return it
-    if (result) {
+    if (igs_readInputAsBool(name)) {
         Py_RETURN_TRUE;
     } else{
         Py_RETURN_FALSE;
@@ -60,19 +46,13 @@
 {
     char * name;
     int result;
-    PyObject * ret;
-    
     // parse arguments
     if (!PyArg_ParseTuple(args, "s", &name)) {
         return NULL;
     }
 
     result = igs_readInputAsInt(name);
-    
-    // build the resulting int into a Python object.
-    ret = PyLong_FromLong(result);
-    free(&result);
-    return ret;
+    return PyLong_FromLong(result);
 }
 
 //igs_readInputAsDouble
@@ -80,19 +60,13 @@
 {
     char * name;
     double result;
-    
-    PyObject * ret;
-    
+
     // parse arguments
     if (!PyArg_ParseTuple(args, "s", &name)) {
         return NULL;
     }
     result = igs_readInputAsDouble(name);
-
-    // build the resulting double into a Python object.
-    ret = PyFloat_FromDouble(result);
-    free(&result);
-    return ret;
+    return PyFloat_FromDouble(result);
 }
 
 
@@ -102,20 +76,22 @@
     char * name;
     char * result;
     PyObject * ret;
-    
+
     // parse arguments
     if (!PyArg_ParseTuple(args, "s", &name)) {
         return NULL;
     }
-
     result = igs_readInputAsString(name);
-
     // build the resulting string into a Python object.
-    ret = PyBytes_FromString(result);
-    free(&result);
-    return ret;
+    if(result != NULL){
+        ret = PyBytes_FromString(result);
+        free(&result);
+        return ret;
+    }else{
+        return PyBytes_FromString("");
+    }
+    
 }
-
 
 //igs_writeInputAsBool
  PyObject * writeInputAsBool_wrapper(PyObject * self, PyObject * args)
@@ -123,9 +99,6 @@
     char * name;
     PyObject *value;
     int result;
-    
-    PyObject * ret;
-    
     // parse arguments : the name of the input and the bool we want to write
     if (!PyArg_ParseTuple(args, "sO", &name, &value)) {
         return NULL;
@@ -136,11 +109,7 @@
     }else{
         result = igs_writeInputAsBool(name, false);
     }
-
-    // build the resulting int into a Python object.
-    ret = PyLong_FromLong(result);
-    free(&result);
-    return ret;
+    return PyLong_FromLong(result);
 }
 
 //igs_writeInputAsInt
@@ -149,20 +118,12 @@
     char * name;
     int value;
     int result;
-    
-    PyObject * ret;
-    
     // parse arguments : the name of the iop and the int
     if (!PyArg_ParseTuple(args, "si", &name, &value)) {
         return NULL;
     }
-
     result = igs_writeInputAsInt(name, value);
-
-    // build the resulting int into a Python object.
-    ret = PyLong_FromLong(result);
-    free(&result);
-    return ret;
+    return PyLong_FromLong(result);
 }
 
 //igs_writeInputAsDouble
@@ -171,18 +132,13 @@
     char * name;
     double value;
     int result;
-    PyObject * ret;
     
     // parse arguments : the iop aand the double
     if (!PyArg_ParseTuple(args, "sd", &name, &value)) {
         return NULL;
     }
-
     result = igs_writeInputAsDouble(name, value);
-
-    ret = PyLong_FromLong(result);
-    free(&result);
-    return ret;
+    return PyLong_FromLong(result);
 }
 
 //igs_writeInputAsString
@@ -191,18 +147,12 @@
     char * name;
     char * value;
     int result;
-    PyObject * ret;
-    
     // parse arguments : the iop and the string
     if (!PyArg_ParseTuple(args, "ss", &name, &value)) {
         return NULL;
     }
-
     result = igs_writeInputAsString(name, value);
-
-    ret = PyLong_FromLong(result);
-    free(&result);
-    return ret;
+    return PyLong_FromLong(result);
 }
 
 //igs_writeInputAsImpulsion
@@ -210,50 +160,31 @@
 {
     char * name;
     int result;
-    PyObject * ret;
-    
     // parse arguments : the name of the iop
     if (!PyArg_ParseTuple(args, "s", &name)) {
         return NULL;
     }
-
     result = igs_writeInputAsImpulsion(name);
-
-    ret = PyLong_FromLong(result);
-    free(&result);
-    return ret;
+    return PyLong_FromLong(result);
 }
 
 //igs_getTypeForInput
  PyObject * getTypeForInput_wrapper(PyObject * self, PyObject * args)
 {
     char* name;
-    int result;
-    PyObject * ret;
-    
     // parse the name of the input and cast into a char*
     if (!PyArg_ParseTuple(args, "s", &name)) {
         return NULL;
     }
-
-    result = igs_getTypeForInput(name);
-
-    ret = PyLong_FromLong(result);
-    free(&result);
-    return ret;
+    int result = igs_getTypeForInput(name);
+    return PyLong_FromLong(result);
 }
 
 //igs_getInputsNumber
  PyObject * getInputsNumber_wrapper(PyObject * self, PyObject * args)
 {
-    int result;
-    PyObject * ret;
-
-    result = igs_getInputsNumber();
-
-    ret = PyLong_FromLong(result);
-    free(&result);
-    return ret;
+     int result = igs_getInputsNumber();
+    return PyLong_FromLong(result);
 }
 
 
@@ -285,23 +216,15 @@
  PyObject * checkInputExistence_wrapper(PyObject * self, PyObject * args)
 {
     char * name;
-    bool result;
-    PyObject * ret;
-    
     // parse the name of the input
     if (!PyArg_ParseTuple(args, "s", &name)) {
         return NULL;
     }
-
-    result = igs_checkInputExistence(name);
-
-    if (result) {
-        ret = Py_True;
+    if (igs_checkInputExistence(name)) {
+          Py_RETURN_TRUE;
     } else{
-        ret = Py_False;
+        Py_RETURN_FALSE;
     }
-    free(&result);
-    return ret;
 }
 
 
@@ -313,20 +236,13 @@
     int _type;
     void *value;
     long size;
-    
     int result;
-    
-    PyObject * ret;
     
     // parse and cast all the arguments for igs_createInput
     if (!PyArg_ParseTuple(args, "siOi", &name, &_type, &value, &size)) {
         return NULL;
     }
     type = (iopType_t)(_type);
-
     result = igs_createInput(name, type, value, sizeof(PyObject));
-
-    ret = PyLong_FromLong(result);
-    free(&result);
-    return ret;
+    return PyLong_FromLong(result);
 }

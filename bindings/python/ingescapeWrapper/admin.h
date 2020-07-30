@@ -46,7 +46,7 @@ PyObject * setLogPath_wrapper(PyObject * self, PyObject * args);
 PyObject * getLogPath_wrapper(PyObject * self, PyObject * args);
 
 //wrapper for igs_interrupted
-PyObject * interrupted_wrapper(PyObject * self, PyObject * args);
+PyObject * isStarted_wrapper(PyObject * self, PyObject * args);
 
 //wrapper for igs_setDefinitionPath
 PyObject * setDefinitionPath_wrapper(PyObject * self, PyObject * args);

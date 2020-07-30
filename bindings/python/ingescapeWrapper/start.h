@@ -22,9 +22,6 @@
 //igs_stop
  PyObject * stop_wrapper(PyObject * self, PyObject * args);
 
-//igs_die
- PyObject * die_wrapper(PyObject * self, PyObject * args);
-
 PyDoc_STRVAR(
              startWithDeviceDoc,
              "igs_startWithDevice(device, port)\n"
@@ -45,12 +42,5 @@ PyDoc_STRVAR(
              "--\n"
              "\n"
              "stop the agent properly");
-
-PyDoc_STRVAR(
-             dieDoc,
-             "igs_die()\n"
-             "--\n"
-             "\n"
-             "kill the agent");
 
 #endif /* start_h */
