@@ -106,13 +106,14 @@ void LogMessageHandler(QtMsgType type, const QMessageLogContext& context, const 
  */
 void registerCustomQmlTypes()
 {
+    const char* uri = "INGESCAPE";
 
     //---------------
     //
     // Enums
     //
     //---------------
-    qmlRegisterSingletonType<ReplayStates>("INGESCAPE", 1, 0, "ReplayStates", &ReplayStates::qmlSingleton);
+    qmlRegisterSingletonType<ReplayStates>(uri, 1, 0, "ReplayStates", &ReplayStates::qmlSingleton);
 
 
     //----------------
@@ -121,18 +122,18 @@ void registerCustomQmlTypes()
     //
     //----------------
     // Singleton used as primary access point to our controllers
-    qmlRegisterSingletonType<IngeScapeEditorController>("INGESCAPE", 1, 0, "IngeScapeEditorC", &IngeScapeEditorController::qmlSingleton);
+    qmlRegisterSingletonType<IngeScapeEditorController>(uri, 1, 0, "IngeScapeEditorC", &IngeScapeEditorController::qmlSingleton);
 
     // sub-controllers
-    qmlRegisterUncreatableType<ActionEditorController>("INGESCAPE", 1, 0, "ActionEditorController", "Internal Class");
-    qmlRegisterUncreatableType<AgentsMappingController>("INGESCAPE", 1, 0, "AgentsMappingController", "Internal Class");
-    qmlRegisterUncreatableType<AgentsSupervisionController>("INGESCAPE", 1, 0, "AgentsSupervisionController", "Internal Class");
-    qmlRegisterUncreatableType<EditorModelManager>("INGESCAPE", 1, 0, "EditorModelManager", "Internal Class");
-    qmlRegisterUncreatableType<HostsSupervisionController>("INGESCAPE", 1, 0, "HostsSupervisionController", "Internal Class");
-    qmlRegisterUncreatableType<LogStreamController>("INGESCAPE", 1, 0, "LogStreamController", "Internal Class");
-    qmlRegisterUncreatableType<NetworkController>("INGESCAPE", 1, 0, "NetworkController", "Internal Class");
-    qmlRegisterUncreatableType<RecordsSupervisionController>("INGESCAPE", 1, 0, "RecordsSupervisionController", "Internal Class");
-    qmlRegisterUncreatableType<ValuesHistoryController>("INGESCAPE", 1, 0, "ValuesHistoryController", "Internal Class");
+    qmlRegisterUncreatableType<ActionEditorController>(uri, 1, 0, "ActionEditorController", "Internal Class");
+    qmlRegisterUncreatableType<AgentsMappingController>(uri, 1, 0, "AgentsMappingController", "Internal Class");
+    qmlRegisterUncreatableType<AgentsSupervisionController>(uri, 1, 0, "AgentsSupervisionController", "Internal Class");
+    qmlRegisterUncreatableType<EditorModelManager>(uri, 1, 0, "EditorModelManager", "Internal Class");
+    qmlRegisterUncreatableType<HostsSupervisionController>(uri, 1, 0, "HostsSupervisionController", "Internal Class");
+    qmlRegisterUncreatableType<LogStreamController>(uri, 1, 0, "LogStreamController", "Internal Class");
+    qmlRegisterUncreatableType<NetworkController>(uri, 1, 0, "NetworkController", "Internal Class");
+    qmlRegisterUncreatableType<RecordsSupervisionController>(uri, 1, 0, "RecordsSupervisionController", "Internal Class");
+    qmlRegisterUncreatableType<ValuesHistoryController>(uri, 1, 0, "ValuesHistoryController", "Internal Class");
 
 
     //----------------
@@ -140,9 +141,9 @@ void registerCustomQmlTypes()
     // Sort and Filter
     //
     //----------------
-    qmlRegisterUncreatableType<LogsSortFilter>("INGESCAPE", 1, 0, "LogsSortFilter", "Internal class");
-    qmlRegisterUncreatableType<AgentsInHostSortFilter>("INGESCAPE", 1, 0, "AgentsInHostSortFilter", "Internal class");
-    qmlRegisterUncreatableType<ValuesHistorySortFilter>("INGESCAPE", 1, 0, "ValuesHistorySortFilter", "Internal class");
+    qmlRegisterUncreatableType<LogsSortFilter>(uri, 1, 0, "LogsSortFilter", "Internal class");
+    qmlRegisterUncreatableType<AgentsInHostSortFilter>(uri, 1, 0, "AgentsInHostSortFilter", "Internal class");
+    qmlRegisterUncreatableType<ValuesHistorySortFilter>(uri, 1, 0, "ValuesHistorySortFilter", "Internal class");
 
 
     //----------------
@@ -150,11 +151,11 @@ void registerCustomQmlTypes()
     // Misc.
     //
     //----------------
-    qmlRegisterType<CollapsibleColumn>("INGESCAPE", 1, 0, "CollapsibleColumn");
-    qmlRegisterRevision<QQuickWindow, 1>("INGESCAPE", 1, 0);
-    qmlRegisterType<QQuickWindowBlockTouches, 1>("INGESCAPE", 1, 0, "WindowBlockTouches");
-    qmlRegisterType<TextFieldDoubleValidator>("INGESCAPE", 1, 0, "TextFieldDoubleValidator");
-    qmlRegisterSingletonType<NumberConstants>("INGESCAPE", 1, 0, "NumberConstants", &NumberConstants::qmlSingleton);
+    qmlRegisterType<CollapsibleColumn>(uri, 1, 0, "CollapsibleColumn");
+    qmlRegisterRevision<QQuickWindow, 1>(uri, 1, 0);
+    qmlRegisterType<QQuickWindowBlockTouches, 1>(uri, 1, 0, "WindowBlockTouches");
+    qmlRegisterType<TextFieldDoubleValidator>(uri, 1, 0, "TextFieldDoubleValidator");
+    qmlRegisterSingletonType<NumberConstants>(uri, 1, 0, "NumberConstants", &NumberConstants::qmlSingleton);
 
 
     //----------------
@@ -162,8 +163,8 @@ void registerCustomQmlTypes()
     // Models
     //
     //----------------
-    //qmlRegisterUncreatableType<ActionMappingM>("INGESCAPE", 1, 0, "ActionMappingM", "Internal class");
-    qmlRegisterUncreatableType<LogM>("INGESCAPE", 1, 0, "LogM", "Internal class");
+    //qmlRegisterUncreatableType<ActionMappingM>(uri, 1, 0, "ActionMappingM", "Internal class");
+    qmlRegisterUncreatableType<LogM>(uri, 1, 0, "LogM", "Internal class");
 
 
     //---------------
@@ -171,15 +172,15 @@ void registerCustomQmlTypes()
     // View Models
     //
     //---------------
-    qmlRegisterUncreatableType<ActionInMappingVM>("INGESCAPE", 1, 0, "ActionInMappingVM", "Internal class");
-    qmlRegisterUncreatableType<AgentInMappingVM>("INGESCAPE", 1, 0, "AgentInMappingVM", "Internal class");
-    qmlRegisterUncreatableType<HostVM>("INGESCAPE", 1, 0, "HostVM", "Internal class");
-    qmlRegisterUncreatableType<LinkConnectorVM>("INGESCAPE", 1, 0, "LinkConnectorVM", "Internal class");
-    qmlRegisterUncreatableType<LinkInputVM>("INGESCAPE", 1, 0, "LinkInputVM", "Internal class");
-    qmlRegisterUncreatableType<LinkOutputVM>("INGESCAPE", 1, 0, "LinkOutputVM", "Internal class");
-    qmlRegisterUncreatableType<LinkVM>("INGESCAPE", 1, 0, "LinkVM", "Internal class");
-    qmlRegisterUncreatableType<ObjectInMappingVM>("INGESCAPE", 1, 0, "ObjectInMappingVM", "Internal class");
-    qmlRegisterUncreatableType<RecordVM>("INGESCAPE", 1, 0, "RecordVM", "Internal class");
+    qmlRegisterUncreatableType<ActionInMappingVM>(uri, 1, 0, "ActionInMappingVM", "Internal class");
+    qmlRegisterUncreatableType<AgentInMappingVM>(uri, 1, 0, "AgentInMappingVM", "Internal class");
+    qmlRegisterUncreatableType<HostVM>(uri, 1, 0, "HostVM", "Internal class");
+    qmlRegisterUncreatableType<LinkConnectorVM>(uri, 1, 0, "LinkConnectorVM", "Internal class");
+    qmlRegisterUncreatableType<LinkInputVM>(uri, 1, 0, "LinkInputVM", "Internal class");
+    qmlRegisterUncreatableType<LinkOutputVM>(uri, 1, 0, "LinkOutputVM", "Internal class");
+    qmlRegisterUncreatableType<LinkVM>(uri, 1, 0, "LinkVM", "Internal class");
+    qmlRegisterUncreatableType<ObjectInMappingVM>(uri, 1, 0, "ObjectInMappingVM", "Internal class");
+    qmlRegisterUncreatableType<RecordVM>(uri, 1, 0, "RecordVM", "Internal class");
 
 
     //------------------
@@ -188,25 +189,25 @@ void registerCustomQmlTypes()
     //
     //------------------
     // - Singleton used to enable consistent app styling through predefined colors, fonts, etc.
-    qmlRegisterSingletonType(QUrl("qrc:/qml/theme/IngeScapeEditorTheme.qml"), "INGESCAPE", 1, 0, "IngeScapeEditorTheme");
+    qmlRegisterSingletonType(QUrl("qrc:/qml/theme/IngeScapeEditorTheme.qml"), uri, 1, 0, "IngeScapeEditorTheme");
 
     // - Combobox for ItemModel with tooltip delegate
-    qmlRegisterType(QUrl("qrc:/qml/scenario/IngeScapeComboboxItemModel.qml"), "INGESCAPE", 1, 0, "IngeScapeComboboxItemModel");
+    qmlRegisterType(QUrl("qrc:/qml/scenario/IngeScapeComboboxItemModel.qml"), uri, 1, 0, "IngeScapeComboboxItemModel");
 
     // - Combobox for Agents IOP model with a custom tooltip delegate to show the color circles
-    qmlRegisterType(QUrl("qrc:/qml/scenario/IngeScapeComboboxItemModelAgentsIOP.qml"), "INGESCAPE", 1, 0, "IngeScapeComboboxItemModelAgentsIOP");
+    qmlRegisterType(QUrl("qrc:/qml/scenario/IngeScapeComboboxItemModelAgentsIOP.qml"), uri, 1, 0, "IngeScapeComboboxItemModelAgentsIOP");
 
     // - Combobox delegate for Agents IOP comboboxes to show the color circles
-    qmlRegisterType(QUrl("qrc:/qml/scenario/IngeScapeToolTipComboboxDelegateAgentsIOP.qml"), "INGESCAPE", 1, 0, "IngeScapeToolTipComboboxDelegateAgentsIOP");
+    qmlRegisterType(QUrl("qrc:/qml/scenario/IngeScapeToolTipComboboxDelegateAgentsIOP.qml"), uri, 1, 0, "IngeScapeToolTipComboboxDelegateAgentsIOP");
 
     // - StringValidator for text fields
-    qmlRegisterType(QUrl("qrc:/qml/validator/StringValidator.qml"), "INGESCAPE", 1, 0, "StringValidator");
+    qmlRegisterType(QUrl("qrc:/qml/validator/StringValidator.qml"), uri, 1, 0, "StringValidator");
 
     // - DoubleValidator for text fields
-    qmlRegisterType(QUrl("qrc:/qml/validator/BoundsDoubleValidator.qml"), "INGESCAPE", 1, 0, "BoundsDoubleValidator");
+    qmlRegisterType(QUrl("qrc:/qml/validator/BoundsDoubleValidator.qml"), uri, 1, 0, "BoundsDoubleValidator");
 
     // - Int32Validator for text fields
-    qmlRegisterType(QUrl("qrc:/qml/validator/Int32Validator.qml"), "INGESCAPE", 1, 0, "Int32Validator");
+    qmlRegisterType(QUrl("qrc:/qml/validator/Int32Validator.qml"), uri, 1, 0, "Int32Validator");
 
 }
 

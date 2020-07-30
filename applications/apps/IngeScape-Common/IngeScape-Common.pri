@@ -10,6 +10,7 @@ SOURCES += \
     $$PWD/model/agent/definition/callm.cpp \
     $$PWD/ingescapecommon.cpp \
     $$PWD/model/licenseinformationm.cpp \
+    $$PWD/model/peerm.cpp \
     $$PWD/platformsupport/IngescapeApplication.cpp \
     $$PWD/platformsupport/IngescapeApplicationQmlHelper.cpp \
     $$PWD/platformsupport/linuxutils.cpp \
@@ -65,6 +66,7 @@ SOURCES += \
 HEADERS += \
     $$PWD/controller/callhomecontroller.h \
     $$PWD/model/agent/definition/callm.h \
+    $$PWD/model/peerm.h \
     $$PWD/platformsupport/IngescapeApplication.h \
     $$PWD/platformsupport/IngescapeApplicationQmlHelper.h \
     $$PWD/platformsupport/linuxutils.h \

@@ -59,7 +59,7 @@ void onBusMessageIncommingCallback(const char *event,
             QString ipAddress = "";
 
             // Get IP address (Example of peerAddress: "tcp://10.0.0.17:49153")
-            if (peerAddress.length() > 6)
+            if (peerAddress.startsWith("tcp://"))
             {
                 // Remove "tcp://" and then split IP address and port
                 QStringList ipAddressAndPort = peerAddress.remove(0, 6).split(":");
@@ -70,11 +70,7 @@ void onBusMessageIncommingCallback(const char *event,
             }
 
             // Initialize properties related to message headers
-            bool isIngeScapeLauncher = false;
-            bool isIngeScapeRecorder = false;
-            bool isIngeScapeEditor = false;
-            bool isIngeScapeAssessments = false;
-            bool isIngeScapeExpe = false;
+            IngeScapeTypes::Value igsType = IngeScapeTypes::UNKNOWN;
             QString hostname = "";
             QString commandLine = "";
             QString loggerPort = "";
@@ -84,133 +80,118 @@ void onBusMessageIncommingCallback(const char *event,
             size_t nbKeys = zlist_size(keys);
             if (nbKeys > 0)
             {
-                char *k;
-                char *v;
-                QString key = "";
-                QString value = "";
+                igsType = IngeScapeTypes::AGENT; // At least, it is an agent
 
-                while ((k = static_cast<char*>(zlist_pop(keys))))
+                char *key;
+                char *value;
+
+                while ((key = static_cast<char*>(zlist_pop(keys))))
                 {
-                    v = static_cast<char*>(zhash_lookup(headers, k));
+                    value = static_cast<char*>(zhash_lookup(headers, key));
 
-                    key = QString(k);
-                    value = QString(v);
-
-                    if ((key == "isLauncher") && (value == "1")) {
-                        isIngeScapeLauncher = true;
+                    if (streq(key, "isLauncher") && streq(value, "1")) {
+                        igsType = IngeScapeTypes::LAUNCHER;
                     }
-                    else if ((key == "isRecorder") && (value == "1")) {
-                        isIngeScapeRecorder = true;
+                    else if (streq(key, "isRecorder") && streq(value, "1")) {
+                        igsType = IngeScapeTypes::RECORDER;
                     }
-                    else if ((key == "isEditor") && (value == "1")) {
-                        isIngeScapeEditor = true;
+                    else if (streq(key, "isEditor") && streq(value, "1")) {
+                        igsType = IngeScapeTypes::EDITOR;
                     }
-                    else if ((key == "isAssessments") && (value == "1")) {
-                        isIngeScapeAssessments = true;
+                    else if (streq(key, "isAssessments") && streq(value, "1")) {
+                        igsType = IngeScapeTypes::ASSESSMENTS;
                     }
-                    else if ((key == "isExpe") && (value == "1")) {
-                        isIngeScapeExpe = true;
+                    else if (streq(key, "isExpe") && streq(value, "1")) {
+                        igsType = IngeScapeTypes::EXPE;
                     }
-                    else if (key == "hostname") {
-                        hostname = value;
+                    else if (streq(key, "hostname")) {
+                        hostname = QString(value);
                     }
-                    else if (key == "commandline") {
-                        commandLine = value;
+                    else if (streq(key, "commandline")) {
+                        commandLine = QString(value);
                     }
-                    else if (key == "logger") {
-                        loggerPort = value;
+                    else if (streq(key, "logger")) {
+                        loggerPort = QString(value);
                     }
-                    else if (key == "videoStream") {
-                        streamingPort = value;
+                    else if (streq(key, "videoStream")) {
+                        streamingPort = QString(value);
                     }
 
-                    if (k) {
-                        free(k);
+                    if (key) {
+                        free(key);
                     }
                 }
             }
             zlist_destroy(&keys);
 
-
-            // IngeScape LAUNCHER
-            if (isIngeScapeLauncher)
+            if (igsType != IngeScapeTypes::UNKNOWN)
             {
-                qDebug() << "Our zyre event is about IngeScape LAUNCHER";
+                PeerM* peer = ingeScapeNetworkC->createEnteredPeer(igsType, peerId, peerName, ipAddress);
+                if (peer != nullptr)
+                {
+                    switch (igsType)
+                    {
+                    case IngeScapeTypes::AGENT:
+                    {
+                        ingeScapeNetworkC->setnumberOfAgents(ingeScapeNetworkC->numberOfAgents() + 1);
 
-                // Save the peer id of this launcher
-                ingeScapeNetworkC->manageEnteredPeerId(peerId, IngeScapeTypes::LAUNCHER);
-                ingeScapeNetworkC->setnumberOfLaunchers(ingeScapeNetworkC->numberOfLaunchers() + 1);
+                        Q_EMIT ingeScapeNetworkC->agentEntered(peerId, peerName, ipAddress, hostname, commandLine, loggerPort);
+                    }
+                        break;
 
-                if (peerName.endsWith(suffix_Launcher)) {
-                    hostname = peerName.left(peerName.length() - suffix_Launcher.length());
+                    case IngeScapeTypes::LAUNCHER:
+                    {
+                        ingeScapeNetworkC->setnumberOfLaunchers(ingeScapeNetworkC->numberOfLaunchers() + 1);
+
+                        if (peerName.endsWith(suffix_Launcher)) {
+                            hostname = peerName.left(peerName.length() - suffix_Launcher.length());
+                        }
+
+                        Q_EMIT ingeScapeNetworkC->launcherEntered(peerId, hostname, ipAddress, streamingPort);
+                    }
+                        break;
+
+                    case IngeScapeTypes::RECORDER:
+                    {
+                        ingeScapeNetworkC->setnumberOfRecorders(ingeScapeNetworkC->numberOfRecorders() + 1);
+
+                        Q_EMIT ingeScapeNetworkC->recorderEntered(peerId, peerName, ipAddress, hostname);
+                    }
+                        break;
+
+                    case IngeScapeTypes::EDITOR:
+                    {
+                        ingeScapeNetworkC->setnumberOfEditors(ingeScapeNetworkC->numberOfEditors() + 1);
+
+                        Q_EMIT ingeScapeNetworkC->editorEntered(peerId, peerName, ipAddress, hostname);
+                    }
+                        break;
+
+                    case IngeScapeTypes::ASSESSMENTS:
+                    {
+                        ingeScapeNetworkC->setnumberOfAssessments(ingeScapeNetworkC->numberOfAssessments() + 1);
+
+                        Q_EMIT ingeScapeNetworkC->assessmentsEntered(peerId, peerName, ipAddress, hostname);
+                    }
+                        break;
+
+                    case IngeScapeTypes::EXPE:
+                    {
+                        ingeScapeNetworkC->setnumberOfExpes(ingeScapeNetworkC->numberOfExpes() + 1);
+
+                        Q_EMIT ingeScapeNetworkC->expeEntered(peerId, peerName, ipAddress, hostname);
+                    }
+                        break;
+
+                    default:
+                        break;
+                    }
                 }
-
-                // Emit the signal "Launcher Entered"
-                Q_EMIT ingeScapeNetworkC->launcherEntered(peerId, hostname, ipAddress, streamingPort);
-            }
-            // IngeScape RECORDER
-            else if (isIngeScapeRecorder)
-            {
-                qDebug() << "Our zyre event is about IngeScape RECORDER";
-
-                // Save the peer id of this recorder
-                ingeScapeNetworkC->manageEnteredPeerId(peerId, IngeScapeTypes::RECORDER);
-                ingeScapeNetworkC->setnumberOfRecorders(ingeScapeNetworkC->numberOfRecorders() + 1);
-
-                // Emit the signal "Recorder Entered"
-                Q_EMIT ingeScapeNetworkC->recorderEntered(peerId, peerName, ipAddress, hostname);
-            }
-            // IngeScape EDITOR
-            else if (isIngeScapeEditor)
-            {
-                qDebug() << "Our zyre event is about IngeScape EDITOR";
-
-                // Save the peer id of this editor
-                ingeScapeNetworkC->manageEnteredPeerId(peerId, IngeScapeTypes::EDITOR);
-                ingeScapeNetworkC->setnumberOfEditors(ingeScapeNetworkC->numberOfEditors() + 1);
-
-                // Emit the signal "Editor Entered"
-                Q_EMIT ingeScapeNetworkC->editorEntered(peerId, peerName, ipAddress, hostname);
-            }
-            // IngeScape ASSESSMENTS
-            else if (isIngeScapeAssessments)
-            {
-                qDebug() << "Our zyre event is about IngeScape ASSESSMENTS";
-
-                // Save the peer id of this recorder
-                ingeScapeNetworkC->manageEnteredPeerId(peerId, IngeScapeTypes::ASSESSMENTS);
-                ingeScapeNetworkC->setnumberOfAssessments(ingeScapeNetworkC->numberOfAssessments() + 1);
-
-                // Emit the signal "Assessments Entered"
-                Q_EMIT ingeScapeNetworkC->assessmentsEntered(peerId, peerName, ipAddress, hostname);
-            }
-            // IngeScape EXPE
-            else if (isIngeScapeExpe)
-            {
-                qDebug() << "Our zyre event is about IngeScape EXPE";
-
-                // Save the peer id of this recorder
-                ingeScapeNetworkC->manageEnteredPeerId(peerId, IngeScapeTypes::EXPE);
-                ingeScapeNetworkC->setnumberOfExpes(ingeScapeNetworkC->numberOfExpes() + 1);
-
-                // Emit the signal "Expe Entered"
-                Q_EMIT ingeScapeNetworkC->expeEntered(peerId, peerName, ipAddress, hostname);
-            }
-            // IngeScape AGENT
-            else if (nbKeys > 0)
-            {
-                qDebug() << "Our zyre event is about IngeScape AGENT on" << hostname;
-
-                // Save the peer id of this agent
-                ingeScapeNetworkC->manageEnteredPeerId(peerId, IngeScapeTypes::AGENT);
-                ingeScapeNetworkC->setnumberOfAgents(ingeScapeNetworkC->numberOfAgents() + 1);
-
-                // Emit the signal "Agent Entered"
-                Q_EMIT ingeScapeNetworkC->agentEntered(peerId, peerName, ipAddress, hostname, commandLine, loggerPort);
             }
             else {
-                qDebug() << "Our zyre event is about an element without headers, we ignore it !";
+                qWarning() << "Our zyre event is about an element without headers, we ignore it !";
             }
+
         }
         // SHOUT
         else if (streq(event, "SHOUT"))
@@ -237,84 +218,85 @@ void onBusMessageIncommingCallback(const char *event,
         {
             qDebug() << QString("<-- %1 (%2) exited").arg(peerName, peerId);
 
-            // Get the IngeScape type of a peer id
-            IngeScapeTypes::Value ingeScapeType = ingeScapeNetworkC->getIngeScapeTypeOfPeerId(peerId);
-
-            switch (ingeScapeType)
+            PeerM* peer = ingeScapeNetworkC->getPeerWithId(peerId);
+            if (peer != nullptr)
             {
-            // IngeScape AGENT
-            case IngeScapeTypes::AGENT:
-            {
-                // Emit the signal "Agent Exited"
-                Q_EMIT ingeScapeNetworkC->agentExited(peerId, peerName);
+                switch (peer->igsType())
+                {
+                // IngeScape AGENT
+                case IngeScapeTypes::AGENT:
+                {
+                    // Emit the signal "Agent Exited"
+                    Q_EMIT ingeScapeNetworkC->agentExited(peerId, peerName);
 
-                ingeScapeNetworkC->setnumberOfAgents(ingeScapeNetworkC->numberOfAgents() - 1);
+                    ingeScapeNetworkC->setnumberOfAgents(ingeScapeNetworkC->numberOfAgents() - 1);
 
-                break;
-            }
-            // IngeScape LAUNCHER
-            case IngeScapeTypes::LAUNCHER:
-            {
-                QString hostname = "";
+                    break;
+                }
+                    // IngeScape LAUNCHER
+                case IngeScapeTypes::LAUNCHER:
+                {
+                    QString hostname = "";
 
-                if (peerName.endsWith(suffix_Launcher)) {
-                    hostname = peerName.left(peerName.length() - suffix_Launcher.length());
+                    if (peerName.endsWith(suffix_Launcher)) {
+                        hostname = peerName.left(peerName.length() - suffix_Launcher.length());
+                    }
+
+                    // Emit the signal "Launcher Exited"
+                    Q_EMIT ingeScapeNetworkC->launcherExited(peerId, hostname);
+
+                    ingeScapeNetworkC->setnumberOfLaunchers(ingeScapeNetworkC->numberOfLaunchers() - 1);
+
+                    break;
+                }
+                    // IngeScape RECORDER
+                case IngeScapeTypes::RECORDER:
+                {
+                    // Emit the signal "Recorder Exited"
+                    Q_EMIT ingeScapeNetworkC->recorderExited(peerId, peerName);
+
+                    ingeScapeNetworkC->setnumberOfRecorders(ingeScapeNetworkC->numberOfRecorders() - 1);
+
+                    break;
+                }
+                    // IngeScape EDITOR
+                case IngeScapeTypes::EDITOR:
+                {
+                    // Emit the signal "Editor Exited"
+                    Q_EMIT ingeScapeNetworkC->editorExited(peerId, peerName);
+
+                    ingeScapeNetworkC->setnumberOfEditors(ingeScapeNetworkC->numberOfEditors() - 1);
+
+                    break;
+                }
+                    // IngeScape ASSESSMENTS
+                case IngeScapeTypes::ASSESSMENTS:
+                {
+                    // Emit the signal "Assessments Exited"
+                    Q_EMIT ingeScapeNetworkC->assessmentsExited(peerId, peerName);
+
+                    ingeScapeNetworkC->setnumberOfAssessments(ingeScapeNetworkC->numberOfAssessments() - 1);
+
+                    break;
+                }
+                    // IngeScape EXPE
+                case IngeScapeTypes::EXPE:
+                {
+                    // Emit the signal "Expe Exited"
+                    Q_EMIT ingeScapeNetworkC->expeExited(peerId, peerName);
+
+                    ingeScapeNetworkC->setnumberOfExpes(ingeScapeNetworkC->numberOfExpes() - 1);
+
+                    break;
+                }
+                default:
+                    qWarning() << "Unknown peer id" << peerId << "(" << peerName << ")";
+                    break;
                 }
 
-                // Emit the signal "Launcher Exited"
-                Q_EMIT ingeScapeNetworkC->launcherExited(peerId, hostname);
-
-                ingeScapeNetworkC->setnumberOfLaunchers(ingeScapeNetworkC->numberOfLaunchers() - 1);
-
-                break;
+                // Delete the peer which exited the network
+                ingeScapeNetworkC->deleteExitedPeer(peer);
             }
-            // IngeScape RECORDER
-            case IngeScapeTypes::RECORDER:
-            {
-                // Emit the signal "Recorder Exited"
-                Q_EMIT ingeScapeNetworkC->recorderExited(peerId, peerName);
-
-                ingeScapeNetworkC->setnumberOfRecorders(ingeScapeNetworkC->numberOfRecorders() - 1);
-
-                break;
-            }
-            // IngeScape EDITOR
-            case IngeScapeTypes::EDITOR:
-            {
-                // Emit the signal "Editor Exited"
-                Q_EMIT ingeScapeNetworkC->editorExited(peerId, peerName);
-
-                ingeScapeNetworkC->setnumberOfEditors(ingeScapeNetworkC->numberOfEditors() - 1);
-
-                break;
-            }
-            // IngeScape ASSESSMENTS
-            case IngeScapeTypes::ASSESSMENTS:
-            {
-                // Emit the signal "Assessments Exited"
-                Q_EMIT ingeScapeNetworkC->assessmentsExited(peerId, peerName);
-
-                ingeScapeNetworkC->setnumberOfAssessments(ingeScapeNetworkC->numberOfAssessments() - 1);
-
-                break;
-            }
-            // IngeScape EXPE
-            case IngeScapeTypes::EXPE:
-            {
-                // Emit the signal "Expe Exited"
-                Q_EMIT ingeScapeNetworkC->expeExited(peerId, peerName);
-
-                ingeScapeNetworkC->setnumberOfExpes(ingeScapeNetworkC->numberOfExpes() - 1);
-
-                break;
-            }
-            default:
-                qWarning() << "Unknown peer id" << peerId << "(" << peerName << ")";
-                break;
-            }
-
-            // Manage the peer id which exited the network
-            ingeScapeNetworkC->manageExitedPeerId(peerId);
         }
         // JOIN (group)
         /*else if (streq(event, "JOIN"))
@@ -850,43 +832,39 @@ void IngeScapeNetworkController::stopMonitoring()
 }
 
 
-/**
- * @brief Get the IngeScape type of a peer id
- * @param peerId
- * @return
- */
-IngeScapeTypes::Value IngeScapeNetworkController::getIngeScapeTypeOfPeerId(QString peerId)
+PeerM* IngeScapeNetworkController::getPeerWithId(QString peerId)
 {
-    if (_hashFromPeerIdToIngeScapeType.contains(peerId)) {
-        return _hashFromPeerIdToIngeScapeType.value(peerId);
+    return _hashFromUidToPeer.value(peerId, nullptr);
+}
+
+
+/**
+ * @brief Create a peer which entered the network
+ */
+PeerM* IngeScapeNetworkController::createEnteredPeer(IngeScapeTypes::Value igsType, QString peerId, QString peerName, QString ipAddress)
+{
+    PeerM* peer = nullptr;
+    if (!_hashFromUidToPeer.contains(peerId))
+    {
+        peer = new PeerM(igsType, peerId, peerName, ipAddress);
+        _hashFromUidToPeer.insert(peerId, peer);
     }
     else {
-        return IngeScapeTypes::UNKNOWN;
+        qCritical() << "There is already a peer with the id" << peerId;
     }
+    return peer;
 }
 
 
 /**
- * @brief Manage a peer id which entered the network
- * @param peerId
- * @param ingeScapeType
+ * @brief Delete a peer which exited the network
  */
-void IngeScapeNetworkController::manageEnteredPeerId(QString peerId, IngeScapeTypes::Value ingeScapeType)
+void IngeScapeNetworkController::deleteExitedPeer(PeerM* peer)
 {
-    if (!_hashFromPeerIdToIngeScapeType.contains(peerId)) {
-        _hashFromPeerIdToIngeScapeType.insert(peerId, ingeScapeType);
-    }
-}
-
-
-/**
- * @brief Manage a peer id which exited the network
- * @param peerId
- */
-void IngeScapeNetworkController::manageExitedPeerId(QString peerId)
-{
-    if (_hashFromPeerIdToIngeScapeType.contains(peerId)) {
-        _hashFromPeerIdToIngeScapeType.remove(peerId);
+    if ((peer != nullptr) && _hashFromUidToPeer.contains(peer->uid()))
+    {
+        _hashFromUidToPeer.remove(peer->uid());
+        peer->deleteLater();
     }
 }
 

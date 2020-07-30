@@ -24,6 +24,7 @@
 #include "I2PropertyHelpers.h"
 #include <model/enums.h>
 #include <model/publishedvaluem.h>
+#include "model/peerm.h"
 #include <model/agent/agentm.h>
 
 
@@ -149,27 +150,19 @@ public:
     void stopMonitoring();
 
 
-    /**
-     * @brief Get the IngeScape type of a peer id
-     * @param peerId
-     * @return
-     */
-    IngeScapeTypes::Value getIngeScapeTypeOfPeerId(QString peerId);
+    PeerM* getPeerWithId(QString peerId);
 
 
     /**
-     * @brief Manage a peer id which entered the network
-     * @param peerId
-     * @param ingeScapeType
+     * @brief Create a peer which entered the network
      */
-    void manageEnteredPeerId(QString peerId, IngeScapeTypes::Value ingeScapeType);
+    PeerM* createEnteredPeer(IngeScapeTypes::Value igsType, QString peerId, QString peerName, QString ipAddress);
 
 
     /**
-     * @brief Manage a peer id which exited the network
-     * @param peerId
+     * @brief Delete a peer which exited the network
      */
-    void manageExitedPeerId(QString peerId);
+    void deleteExitedPeer(PeerM* peer);
 
 
     /**
@@ -461,8 +454,8 @@ private:
     // Name of our "IngeScape" agent that correspond to our application
     QString _igsAgentApplicationName;
 
-    // Hash table from a peer id to a type of IngeScape elements on the network
-    QHash<QString, IngeScapeTypes::Value> _hashFromPeerIdToIngeScapeType;
+    // Hash table from an uid to a peer on the network
+    QHash<QString, PeerM*> _hashFromUidToPeer;
 
     // Last agruments of start
     QString _lastArgumentsOfStart_networkDevice;
