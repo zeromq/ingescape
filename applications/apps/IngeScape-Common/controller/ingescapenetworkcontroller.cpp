@@ -1075,14 +1075,12 @@ bool IngeScapeNetworkController::sendStringMessageToAgent(QString agentId, QStri
     if (!agentId.isEmpty() && !message.isEmpty())
     {
         // Use IngeScape to send the message to the agent
-        int result = igs_busSendStringToAgent(agentId.toStdString().c_str(),
-                                              "%s",
-                                              message.toStdString().c_str());
-
-        if (result == 1)
+        igs_result_t result = igs_busSendStringToAgent(agentId.toStdString().c_str(),
+                                                       "%s",
+                                                       message.toStdString().c_str());
+        if (result == IGS_SUCCESS)
         {
             success = true;
-
             qInfo() << "Message" << message << "to peer" << agentId << "sent successfully";
         }
         else {
@@ -1120,15 +1118,13 @@ bool IngeScapeNetworkController::sendStringMessageToAgent(QString agentId, QStri
                 QString string2 = message.at(1);
 
                 // Use IngeScape to send the message to the agent
-                int result = igs_busSendStringToAgent(agentId.toStdString().c_str(),
+                igs_result_t result = igs_busSendStringToAgent(agentId.toStdString().c_str(),
                                                       format.toStdString().c_str(),
                                                       string1.toStdString().c_str(),
                                                       string2.toStdString().c_str());
-
-                if (result == 1)
+                if (result == IGS_SUCCESS)
                 {
                     success = true;
-
                     qInfo() << "Message" << message << "to peer" << agentId << "sent successfully";
                 }
                 else {
@@ -1143,16 +1139,14 @@ bool IngeScapeNetworkController::sendStringMessageToAgent(QString agentId, QStri
                 QString string3 = message.at(2);
 
                 // Use IngeScape to send the message to the agent
-                int result = igs_busSendStringToAgent(agentId.toStdString().c_str(),
+                igs_result_t result = igs_busSendStringToAgent(agentId.toStdString().c_str(),
                                                       format.toStdString().c_str(),
                                                       string1.toStdString().c_str(),
                                                       string2.toStdString().c_str(),
                                                       string3.toStdString().c_str());
-
-                if (result == 1)
+                if (result == IGS_SUCCESS)
                 {
                     success = true;
-
                     qInfo() << "Message" << message << "to peer" << agentId << "sent successfully";
                 }
                 else {
@@ -1168,17 +1162,16 @@ bool IngeScapeNetworkController::sendStringMessageToAgent(QString agentId, QStri
                 QString string4 = message.at(3);
 
                 // Use IngeScape to send the message to the agent
-                int result = igs_busSendStringToAgent(agentId.toStdString().c_str(),
+                igs_result_t result = igs_busSendStringToAgent(agentId.toStdString().c_str(),
                                                    format.toStdString().c_str(),
                                                    string1.toStdString().c_str(),
                                                    string2.toStdString().c_str(),
                                                    string3.toStdString().c_str(),
                                                    string4.toStdString().c_str());
 
-                if (result == 1)
+                if (result == IGS_SUCCESS)
                 {
                     success = true;
-
                     qInfo() << "Message" << message << "to peer" << agentId << "sent successfully";
                 }
                 else {
@@ -1264,9 +1257,8 @@ bool IngeScapeNetworkController::sendZMQMessageToAgent(QString agentId, QStringL
         }
 
         // Send ZMQ message to the recorder
-        int result = igs_busSendZMQMsgToAgent(agentId.toStdString().c_str(), &zMsg);
-
-        if (result == 1)
+        igs_result_t result = igs_busSendZMQMsgToAgent(agentId.toStdString().c_str(), &zMsg);
+        if (result == IGS_SUCCESS)
         {
             success = true;
 

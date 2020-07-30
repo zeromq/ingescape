@@ -105,11 +105,11 @@ void NetworkController::sendCommandExecutionStatusToExpe(QString peerIdOfExpe, Q
     if (!peerIdOfExpe.isEmpty())
     {
         // Send the execution status of command with parameters to the peer id of the expe
-        int success = igs_busSendStringToAgent(peerIdOfExpe.toStdString().c_str(),
-                                               "%s=%s STATUS=%d",
-                                               command.toStdString().c_str(),
-                                               commandParameters.toStdString().c_str(),
-                                               status);
+        igs_result_t success = igs_busSendStringToAgent(peerIdOfExpe.toStdString().c_str(),
+                                                        "%s=%s STATUS=%d",
+                                                        command.toStdString().c_str(),
+                                                        commandParameters.toStdString().c_str(),
+                                                        status);
 
         qInfo() << "Send execution status" << status << "of command" << command << "with parameters" << commandParameters << "to expe" << peerIdOfExpe << "with success ?" << success;
     }
