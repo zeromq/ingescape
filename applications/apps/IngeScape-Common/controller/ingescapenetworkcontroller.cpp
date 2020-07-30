@@ -524,8 +524,8 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
                     // On peut utiliser directement value plutôt que de re-générer un tableau de bytes ??
                     // On stocke dans un dossier le media (eg video, son, image) et on log le path et le start time ??
                     //void* data = NULL;
-                    //int result = igs_readInputAsData(name, &data, &valueSize);
-                    //if (result == 1) {
+                    //igs_result_t result = igs_readInputAsData(name, &data, &valueSize);
+                    //if (result == IGS_SUCCESS) {
                         // data must be a char* to have automatic conversion
                         //QByteArray newValue = QByteArray(data, valueSize);
                         //currentValue = QVariant(newValue);
@@ -652,7 +652,10 @@ IngeScapeNetworkController::IngeScapeNetworkController(QObject *parent) : QObjec
     //QString jsonOfMapping = QString(jsonDocument.toJson(QJsonDocument::Indented));
     //QString jsonOfMapping = QString(jsonDocument.toJson(QJsonDocument::Compact));
 
-    igs_loadDefinition(definitionByDefault.toStdString().c_str());
+    igs_result_t result = igs_loadDefinition(definitionByDefault.toStdString().c_str());
+    if (result == IGS_FAILURE) {
+        qCritical() << "Fail to load the definition of the Editor" << definitionByDefault;
+    }
 
 
     //
@@ -666,7 +669,10 @@ IngeScapeNetworkController::IngeScapeNetworkController(QObject *parent) : QObjec
                                   \"mapping_out\": [],   \
                                   \"mapping_cat\": [] }}";
 
-    igs_loadMapping(mappingByDefault.toStdString().c_str());
+    result = igs_loadMapping(mappingByDefault.toStdString().c_str());
+    if (result == IGS_FAILURE) {
+        qCritical() << "Fail to load the mapping of the Editor" << mappingByDefault;
+    }
 
 
     // Configure IGS monitoring
@@ -724,7 +730,7 @@ bool IngeScapeNetworkController::start(QString networkDevice, QString ipAddress,
 {
     if (!_isStarted)
     {
-        int agentStarted = 0;
+        igs_result_t agentStarted = IGS_FAILURE;
 
         // Start service with network device
         if (!networkDevice.isEmpty())
@@ -739,13 +745,13 @@ bool IngeScapeNetworkController::start(QString networkDevice, QString ipAddress,
         }
 
         // Start service with ip address (if start with network device has failed)
-        if ((agentStarted != 1) && !ipAddress.isEmpty())
+        if ((agentStarted == IGS_FAILURE) && !ipAddress.isEmpty())
         {
             agentStarted = igs_startWithIP(ipAddress.toStdString().c_str(), port);
         }
 
         // Log status
-        if (agentStarted == 1)
+        if (agentStarted == IGS_SUCCESS)
         {
             // Update internal state
             setisStarted(true);
@@ -1300,7 +1306,7 @@ void IngeScapeNetworkController::addInputsToOurApplicationForAgentOutputs(QStrin
 
                 QString inputName = QString("%1%2%3").arg(agentName, SEPARATOR_AGENT_NAME_AND_IOP, outputId);
 
-                int resultCreateInput = 0;
+                igs_result_t resultCreateInput = IGS_FAILURE;
 
                 switch (valueType)
                 {
@@ -1334,7 +1340,7 @@ void IngeScapeNetworkController::addInputsToOurApplicationForAgentOutputs(QStrin
                 }
                 }
 
-                if (resultCreateInput == 1)
+                if (resultCreateInput == IGS_SUCCESS)
                 {
                     qDebug() << "Input" << inputName << "created on agent" << _igsAgentApplicationName << "with value type" << AgentIOPValueTypes::staticEnumToString(valueType);
 
@@ -1388,20 +1394,18 @@ void IngeScapeNetworkController::removeInputsFromOurApplicationForAgentOutputs(Q
                 QString inputName = QString("%1%2%3").arg(agentName, SEPARATOR_AGENT_NAME_AND_IOP, outputId);
 
                 // Remove mapping between our input and this output
-                int resultRemoveMappingEntry = igs_removeMappingEntryWithName(inputName.toStdString().c_str(), agentName.toStdString().c_str(), outputName.toStdString().c_str());
-
-                if (resultRemoveMappingEntry == 1)
+                igs_result_t resultRemoveMappingEntry = igs_removeMappingEntryWithName(inputName.toStdString().c_str(), agentName.toStdString().c_str(), outputName.toStdString().c_str());
+                if (resultRemoveMappingEntry == IGS_FAILURE)
                 {
-                    //qDebug() << "Mapping removed between output" << outputName << "of agent" << agentName << "and input" << inputName << "of agent" << _igsAgentApplicationName;
-                }
-                else {
                     qCritical() << "Can NOT remove mapping between output" << outputName << "of agent" << agentName << "and input" << inputName << "of agent" << _igsAgentApplicationName << "Error code:" << resultRemoveMappingEntry;
                 }
+                /*else {
+                    qDebug() << "Mapping removed between output" << outputName << "of agent" << agentName << "and input" << inputName << "of agent" << _igsAgentApplicationName;
+                }*/
 
                 // Remove our input
-                int resultRemoveInput = igs_removeInput(inputName.toStdString().c_str());
-
-                if (resultRemoveInput == 1)
+                igs_result_t resultRemoveInput = igs_removeInput(inputName.toStdString().c_str());
+                if (resultRemoveInput == IGS_SUCCESS)
                 {
                     qDebug() << "Input" << inputName << "removed on agent" << _igsAgentApplicationName << "with value type" << AgentIOPValueTypes::staticEnumToString(valueType);
 
