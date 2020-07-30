@@ -661,10 +661,9 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             if (s > 0){
                 igs_debug("Handling headers for agent %s", name);
             }
-            while ((k = (char *)zlist_pop(keys))) {
+            while (strcpy(k, (char *)zlist_pop(keys))) {//k = (char *)zlist_pop(keys)
                 v = zyre_event_header (zyre_event,k);
                 igs_debug("\t%s -> %s", k, v);
-                
                 // we extract the publisher adress to subscribe to from the zyre message header
                 if(strncmp(k,"publisher", strlen("publisher")) == 0)
                 {
