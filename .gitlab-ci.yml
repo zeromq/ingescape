@@ -993,8 +993,8 @@ lib-installer-linux-x64:
   tags:
     - docker
   script:
-    - export INGESCAPE_MAJOR=$(grep "#define INGESCAPE_MAJOR" src/admin.c | cut -d ' ' -f3-)
-    - export INGESCAPE_MINOR=$(grep "#define INGESCAPE_MINOR" src/admin.c | cut -d ' ' -f3-)
+    - export INGESCAPE_MAJOR=$(grep "#define INGESCAPE_MAJOR" src/igs_admin.c | cut -d ' ' -f3-)
+    - export INGESCAPE_MINOR=$(grep "#define INGESCAPE_MINOR" src/igs_admin.c | cut -d ' ' -f3-)
     - export INGESCAPE_VERSION=$INGESCAPE_MAJOR.$INGESCAPE_MINOR.$CI_PIPELINE_ID
     - cd build
     - make package
@@ -1058,8 +1058,8 @@ lib-installer-runtime-linux-armhf:
     - docker
   image: ingescape/ubuntu-x-compil-rpi
   script:
-    - export INGESCAPE_MAJOR=$(grep "#define INGESCAPE_MAJOR" src/admin.c | cut -d ' ' -f3-)
-    - export INGESCAPE_MINOR=$(grep "#define INGESCAPE_MINOR" src/admin.c | cut -d ' ' -f3-)
+    - export INGESCAPE_MAJOR=$(grep "#define INGESCAPE_MAJOR" src/igs_admin.c | cut -d ' ' -f3-)
+    - export INGESCAPE_MINOR=$(grep "#define INGESCAPE_MINOR" src/igs_admin.c | cut -d ' ' -f3-)
     - export INGESCAPE_VERSION=$INGESCAPE_MAJOR.$INGESCAPE_MINOR.$CI_PIPELINE_ID
     - cd build
     - make package
