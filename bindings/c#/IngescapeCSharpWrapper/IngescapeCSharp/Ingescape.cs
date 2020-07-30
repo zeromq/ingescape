@@ -243,8 +243,12 @@ namespace Ingescape
         public static igs_result_t startWithIP(string ipAddress, int port) { return igs_startWithIP(ipAddress, port); }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_stop();
-        public static int stop() { return igs_stop(); }
+        private static extern void igs_stop();
+        public static void stop() { igs_stop(); }
+
+        [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern bool igs_isStarted();
+        public static bool isStarted() { return igs_isStarted(); }
 
         //There are four non-exclusive ways to stop the execution of an ingescape agent:
         //1- calling igs_stop from the hosting app's threads reacting on user actions or external events
