@@ -2613,6 +2613,8 @@ int network_timerCallback (zloop_t *loop, int timer_id, void *arg){
 
 void igs_observeBus(igs_BusMessageIncoming cb, void *myData){
     assert(cb);
+    core_initContext();
+
     igs_zyre_callback_t *newCb = calloc(1, sizeof(igs_zyre_callback_t));
     newCb->callback_ptr = cb;
     newCb->myData = myData;
