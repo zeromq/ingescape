@@ -16,20 +16,13 @@
     char * name;
     long size;
     Py_buffer buf;
-    
     int  result;
-    PyObject * ret;
-    
     // parse and cast the name, data and size argument given in python
     if (!PyArg_ParseTuple(args, "sy*k", &name, &buf, &size)) {
         return NULL;
     }
-
     result = igs_writeOutputAsData(name, buf.buf, size);
-    
-    // cast the result of the function into a python object and return it
-    ret = PyLong_FromLong(result);
-    return ret;
+    return PyLong_FromLong(result);
 }
 
 
@@ -83,19 +76,14 @@
     char * name;
     long size;
     Py_buffer buf;
-    
     int  result;
-    PyObject * ret;
     
     // parse and cast the name, data and size argument given in python
     if (!PyArg_ParseTuple(args, "sy*k", &name, &buf, &size)) {
         return NULL;
     }
-
     result = igs_writeInputAsData(name, buf.buf, size);
-
-    ret = PyLong_FromLong(result);
-    return ret;
+    return PyLong_FromLong(result);
 }
 
 
@@ -105,19 +93,14 @@
     char * name;
     long size;
     Py_buffer buf;
-    
     int  result;
-    PyObject * ret;
     
     // parse and cast the name, data and size argument given in python
     if (!PyArg_ParseTuple(args, "sy*k", &name, &buf, &size)) {
         return NULL;
     }
-
     result = igs_writeParameterAsData(name, buf.buf, size);
-
-    ret = PyLong_FromLong(result);
-    return ret;
+    return PyLong_FromLong(result);
 }
 
 

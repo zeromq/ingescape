@@ -50,6 +50,6 @@ extension_mod = Extension("ingescape", src,
 setup(name =  "ingescape",
       author = "Natanael Vaugien",
       author_email = "vaugien@ingenuity.io",
-      version =  "0.0.16",
+      version =  "0.2.0",
       license =  "Copyright © 2018-2020 ingenuity. All rights reserved.",
       ext_modules = [extension_mod])

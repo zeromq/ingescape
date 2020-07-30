@@ -11,15 +11,6 @@
 
 #include <Python.h>
 
-//{"igs_getDefinition", getDefinition_wrapper, METH_NOARGS, "the agent definition getter.\n return The loaded definition string in json format (allocated).\n NULL if igs_definition_loaded was not initialized.\n"},
-//{"igs_getDefinitionName", getDefinitionName_wrapper, METH_NOARGS, "IngeScape Definition Name Getter"},
-//{"igs_getDefinitionDescription", getDefinitionDescription_wrapper, METH_NOARGS, "IngeScape Definition Description Getter"},
-//{"igs_getDefinitionVersion", getDefinitionVersion_wrapper, METH_NOARGS, "IngeScape Definition Version Getter"},
-//
-////set definition
-//{"igs_setDefinitionName", setDefinitionName_wrapper, METH_VARARGS, "Definition Name setter"},
-//{"igs_setDefinitionDescription", setDefinitionDescription_wrapper, METH_VARARGS, "the agent definition description setter.\n param description The string which contains the description of the agent.\n Can't be NULL.\n return The error.\n 1 is OK, 0 Agent description is NULL, -1 Agent description is empty"},
-//{"igs_setDefinitionVersion", setDefinitionVersion_wrapper, METH_VARARGS, "the agent definition version setter.\n param version The string which contains the version of the agent.\n Can't be NULL.\n return The error.\n 1 is OK, 0 Agent version is NULL, -1 Agent version is empty"},
 
 PyDoc_STRVAR(
              loadDefinitionDoc,
@@ -27,7 +18,7 @@ PyDoc_STRVAR(
              "--\n"
              "\n"
              "load definition in variable 'igs_definition_loaded' & copy in 'igs_internal_definition' from a json string\n"
-             "return The error.\n 1 is OK, 0 json string is NULL, -1 Definition file has not been loaded");
+             "return The error.\n 0 is ok\n");
 
 PyDoc_STRVAR(
              loadDefinitionFromPathDoc,
@@ -35,7 +26,7 @@ PyDoc_STRVAR(
              "--\n"
              "\n"
              "load definition in variable 'igs_definition_loaded' & copy in 'igs_internal_definition' from a file path\n"
-             "return The error.\n 1 is OK, 0 json string is NULL, -1 Definition file has not been loaded");
+             "return The error.\n 0 is ok\n");
 
 PyDoc_STRVAR(
              clearDefinitionDoc,
@@ -44,7 +35,7 @@ PyDoc_STRVAR(
              "\n"
              "Clear the internal definition of the agent.\n"
              "Free all members of the structure igs_definition_loaded & igs_internal_definition.\n"
-             "But the pointer of these structure is not free and stay allocated.\n return 1 if ok else 0");
+             "But the pointer of these structure is not free and stay allocated.\n return 0 if ok\n");
 
 PyDoc_STRVAR(
              getDefinitionDoc,
@@ -89,7 +80,7 @@ PyDoc_STRVAR(
              "\n"
              "the agent definition name setter."
              "\n return The loaded definition name string .\n"
-             "return The error.\n 1 is OK, 0 Agent description is empty");
+             "return The error.\n 0 is ok\n");
 
 PyDoc_STRVAR(
              setDefinitionDescriptionDoc,
@@ -97,7 +88,7 @@ PyDoc_STRVAR(
              "--\n"
              "\n"
              "the agent definition description setter."
-             "\n return The error.\n 1 is OK, 0 Agent description is NULL, -1 Agent description is empty\n");
+             "\n return The error.\n 0 is ok\n");
 
 PyDoc_STRVAR(
              setDefinitionVersionDoc,
@@ -105,7 +96,7 @@ PyDoc_STRVAR(
              "--\n"
              "\n"
              "the agent definition version setter."
-             "\n return The error.\n 1 is OK, 0 Agent description is NULL, -1 Agent version is empty");
+             "\n return The error.\n 0 is ok\n");
 
 PyDoc_STRVAR(
              removeInputDoc,
@@ -114,7 +105,7 @@ PyDoc_STRVAR(
              "\n"
              "Remove and free an input for the agent.\n"
              "return The error.\n "
-             "1 is OK, 0 Definition loaded is NULL, -1 Definition live is NULL, -2 An error occurs while finding the iop by name.\n");
+             "0 is ok\n");
 
 PyDoc_STRVAR(
              removeOutputDoc,
@@ -123,7 +114,7 @@ PyDoc_STRVAR(
              "\n"
              "Remove and free an Output for the agent.\n"
              "return The error.\n "
-             "1 is OK, 0 Definition loaded is NULL, -1 Definition live is NULL, -2 An error occurs while finding the iop by name.\n");
+             "0 is ok\n");
              
 PyDoc_STRVAR(
              removeParameterDoc,
@@ -132,7 +123,7 @@ PyDoc_STRVAR(
              "\n"
              "Remove and free an Parameter for the agent.\n"
              "return The error.\n "
-             "1 is OK, 0 Definition loaded is NULL, -1 Definition live is NULL, -2 An error occurs while finding the iop by name.\n");
+             "0 is ok\n");
 
 
 //igs_loadDefinition

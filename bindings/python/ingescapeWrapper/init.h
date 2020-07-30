@@ -39,12 +39,6 @@
 // wrapper for igs_unfreeze
  PyObject * unfreeze_wrapper(PyObject * self, PyObject * args);
 
-// wrapper for igs_setCanBeFrozen
- PyObject * setCanBeFrozen_wrapper(PyObject * self, PyObject * args);
-
-// wrapper for igs_canBeFrozen
- PyObject * canBeFrozen_wrapper(PyObject * self, PyObject * args);
-
 // wrapper for igs_isFrozen
  PyObject * isFrozen_wrapper(PyObject * self, PyObject * args);
 
@@ -117,19 +111,5 @@ PyDoc_STRVAR(
              "--\n"
              "\n"
              "return True if the agent is frozen");
-
-PyDoc_STRVAR(
-             setCanBeFrozenDoc,
-             "igs_setCanBeFrozen()\n"
-             "--\n"
-             "\n"
-             "Set or unset frozen mode on the agent");
-
-PyDoc_STRVAR(
-             canBeFrozenDoc,
-             "igs_canBeFrozen()\n"
-             "--\n"
-             "\n"
-             "return True if the agent can be frozen");
 
 #endif /* init_h */

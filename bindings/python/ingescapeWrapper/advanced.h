@@ -53,7 +53,7 @@ PyDoc_STRVAR(
              "--\n"
              "\n"
              "Send the string 'msg' to the channel\n"
-             "Return 1 if ok else return 0 \n");
+             "Return 0 if ok\n");
 
 PyDoc_STRVAR(
              busSendDataToChannelDoc,
@@ -62,7 +62,7 @@ PyDoc_STRVAR(
              "\n"
              "Send data to the channel\n"
              "Data is a buffer containing data and size an int \n"
-             "Return 1 if ok else return 0 \n");
+             "Return 0 if ok\n");
 
 PyDoc_STRVAR(
              busSendStringToAgentDoc,
@@ -70,7 +70,7 @@ PyDoc_STRVAR(
              "--\n"
              "\n"
              "Send the string 'msg' to the agent\n"
-             "Return 1 if ok else return 0 \n");
+             "Return 0 if ok\n");
 
 PyDoc_STRVAR(
              busSendDataToAgentDoc,
@@ -79,7 +79,7 @@ PyDoc_STRVAR(
              "\n"
              "Send data to the agent\n"
              "Data is a buffer containing data and size an int \n"
-             "Return 1 if ok else return 0 \n");
+             "Return 0 if ok\n");
 
 PyDoc_STRVAR(
              busAddServiceDescriptionDoc,

@@ -58,9 +58,7 @@ PyObject * igs_observeInput_wrapper(PyObject *self, PyObject *args)
         }
     }
     Py_XINCREF(temp);       // Add a reference to new callback
-    
     temparglist = Py_BuildValue("(O)", arg);    //cast arglist into a tuple
-    
     Py_INCREF(temparglist);     // Add a reference to arglist
     
     // add the callback to the list of Callback
@@ -69,19 +67,14 @@ PyObject * igs_observeInput_wrapper(PyObject *self, PyObject *args)
     newElt->arglist = temparglist;
     newElt->call = temp;
     DL_APPEND(observeList, newElt);
-    int ret = igs_observeInput(input, observe, input);
-    
-    //return 1 if ok
-    PyObject *result;
-    result = PyLong_FromLong(ret);
-    return result;
+    igs_observeInput(input, observe, input);
+    return PyLong_FromLong(0);
     
 }
 
 
 PyObject * igs_observeOutput_wrapper(PyObject *self, PyObject *args)
 {
-    
     PyObject *temp;
     PyObject *temparglist;
     PyObject *arg;
@@ -96,9 +89,7 @@ PyObject * igs_observeOutput_wrapper(PyObject *self, PyObject *args)
     }
     
     Py_XINCREF(temp);         // Add a reference to new callback
-    
     temparglist = Py_BuildValue("(O)", arg);    //cast arglist into a tuple
-    
     Py_XINCREF(temparglist);         // Add a reference to arglist
     
     // add the callback to the list of Callback
@@ -107,13 +98,8 @@ PyObject * igs_observeOutput_wrapper(PyObject *self, PyObject *args)
     newElt->arglist = temparglist;
     newElt->call = temp;
     DL_APPEND(observeList, newElt);
-    int ret = igs_observeOutput(output, observe, output);
-    
-    //return 1 if ok
-    PyObject *result;
-    result = PyLong_FromLong(ret);
-    return result;
-    
+    igs_observeOutput(output, observe, output);
+    return PyLong_FromLong(0);
 }
 
 PyObject * igs_observeParameter_wrapper(PyObject *self, PyObject *args)
@@ -132,9 +118,7 @@ PyObject * igs_observeParameter_wrapper(PyObject *self, PyObject *args)
     }
     
     Py_XINCREF(temp);         // Add a reference to new callback
-    
     temparglist = Py_BuildValue("(O)", arg);        //cast arglist into a tuple
-    
     Py_XINCREF(temparglist);         // Add a reference to arglist
     
     // add the callback to the list of Callback
@@ -143,12 +127,7 @@ PyObject * igs_observeParameter_wrapper(PyObject *self, PyObject *args)
     newElt->arglist = temparglist;
     newElt->call = temp;
     DL_APPEND(observeList, newElt);
-    int ret = igs_observeInput(param, observe, param);
-    
-    //return 1 if ok
-    PyObject *result;
-    result = PyLong_FromLong(ret);
-    return result;
-    
+    igs_observeInput(param, observe, param);
+    return PyLong_FromLong(0);
 }
 
