@@ -38,7 +38,7 @@ IngeScapeSettings::IngeScapeSettings(QString settingsFilePath) : QSettings(setti
 {
     if (!settingsFilePath.isEmpty())
     {
-        qDebug() << "Nouveau Fichier de configuration:" << settingsFilePath;
+        qDebug() << "Configuration file at" << settingsFilePath;
     }
     else
     {

@@ -633,7 +633,7 @@ ApplicationWindow {
 
         ignoreUnknownSignals: true
 
-        onOpenPopupFailedToLoadAgentDefinition: {
+        function onOpenPopupFailedToLoadAgentDefinition() {
             popupFailedToLoadAgentDefinition.open();
         }
     }

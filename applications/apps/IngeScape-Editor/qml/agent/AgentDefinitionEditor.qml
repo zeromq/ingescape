@@ -134,9 +134,7 @@ WindowBlockTouches {
 
         //ignoreUnknownSignals: true
 
-        onBringToFront: {
-            //console.log("QML of Agent Definition Editor: onBringToFront");
-
+        function onBringToFront() {
             // Raises the window in the windowing system.
             rootItem.raise();
             // and give it keyboard focus

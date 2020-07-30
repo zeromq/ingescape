@@ -260,15 +260,15 @@ Item {
 
         ignoreUnknownSignals: true
 
-        onZoomIn: {
+        function onZoomIn() {
             rootItem.zoomIn();
         }
 
-        onZoomOut: {
+        function onZoomOut() {
             rootItem.zoomOut();
         }
 
-        onResetZoom: {
+        function onResetZoom() {
             rootItem.setZoomLevel(1);
         }
     }
@@ -276,7 +276,7 @@ Item {
     Connections {
         target: IngeScapeEditorC
 
-        onResetMappingView: {
+        function onResetMappingView() {
             rootItem.showAll();
         }
     }

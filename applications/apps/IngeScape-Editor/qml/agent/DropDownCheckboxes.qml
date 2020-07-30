@@ -265,7 +265,7 @@ Item {
                     Connections {
                         target: popup
 
-                        onOpened : {
+                        function onOpened() {
                             popupOpen();
                         }
                     }

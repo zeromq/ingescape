@@ -184,7 +184,7 @@ Item {
     Connections {
         target: IngeScapeEditorC
 
-        onOpenPopupLicense: {
+        function onOpenPopupLicense() {
             openLicensePopup();
         }
     }
@@ -192,9 +192,9 @@ Item {
     Connections {
         target: IngeScapeEditorC.licensesC.mergedLicense
 
-        onEditorLicenseValidityChanged: {
+        function onEditorLicenseValidityChanged(newValue) {
             console.log("QML (IngeScape Editor): on is Editor License Valid Changed");
-            if (IngeScapeEditorC.licensesC && IngeScapeEditorC.licensesC.mergedLicense && !IngeScapeEditorC.licensesC.mergedLicense.editorLicenseValidity) {
+            if (IngeScapeEditorC.licensesC && IngeScapeEditorC.licensesC.mergedLicense && !newValue) {
                 openLicensePopup();
             }
         }
@@ -203,7 +203,7 @@ Item {
     Connections {
         target: IngeScapeEditorC.licensesC
 
-        onLicenseLimitationReached: {
+        function onLicenseLimitationReached() {
             console.log("QML (IngeScape Editor): on License Limitation Reached");
             openLicenseEventPopup();
         }
@@ -213,8 +213,8 @@ Item {
     Connections {
         target: gettingStartedWindow
 
-        onVisibleChanged: {
-            rootItem.gettingStartedOpen = gettingStartedWindow.visible;
+        function onVisibleChanged(newValue) {
+            rootItem.gettingStartedOpen = newValue;
         }
     }
 
@@ -222,7 +222,7 @@ Item {
     Connections {
         target: notifPopup
 
-        onClosed: {
+        function onClosed() {
             // We check if we must open the getting started window
             if (IngeScapeEditorC.gettingStartedShowAtStartup)
             {
@@ -230,7 +230,7 @@ Item {
             }
         }
 
-        onNoNotification : {
+        function onNoNotification() {
             // We check if we must open the getting started window
             if (IngeScapeEditorC.gettingStartedShowAtStartup)
             {
@@ -548,10 +548,10 @@ Item {
                 Connections {
                     target: IngeScapeEditorC.recordsSupervisionC
 
-                    onIsRecorderONChanged: {
+                    function onIsRecorderONChanged(newValue) {
                         //console.log("on Is Recorder ON changed: " + IngeScapeEditorC.recordsSupervisionC.isRecorderON);
 
-                        if (IngeScapeEditorC.recordsSupervisionC && !IngeScapeEditorC.recordsSupervisionC.isRecorderON) {
+                        if (IngeScapeEditorC.recordsSupervisionC && !newValue) {
                             leftPanelTabs.currentIndex = 0;
                         }
                     }
@@ -765,7 +765,7 @@ Item {
             Connections {
                 target: rootItem
 
-                onRaiseOutputHistory: {
+                function onRaiseOutputHistory() {
                     raise();
                     requestActivated();
                 }

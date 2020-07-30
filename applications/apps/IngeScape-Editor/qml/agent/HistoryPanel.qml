@@ -338,7 +338,8 @@ WindowBlockTouches {
 
                     Connections {
                         target : dropDown.popup
-                        onOpened : {
+
+                        function onOpened() {
                             // update agents checkboxes states when the pop up is opening
                             if (controller) {
                                 filterAgentCB.checked = controller.areShownValuesOfAgent(modelData);
@@ -348,7 +349,8 @@ WindowBlockTouches {
 
                     Connections {
                         target : rootItem
-                        onClickAllAgents : {
+
+                        function onClickAllAgents() {
                             // update agents checkboxes states when the "pop up is opening   "All Agents" check box is selected or unselected
                             if (controller) {
                                 filterAgentCB.checked = controller.areShownValuesOfAgent(modelData);

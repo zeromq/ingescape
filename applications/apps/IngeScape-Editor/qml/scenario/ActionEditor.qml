@@ -88,8 +88,7 @@ WindowBlockTouches {
 
         //ignoreUnknownSignals: true
 
-        onBringToFront: {
-            //console.log("QML of Action Editor: onBringToFront");
+        function onBringToFront() {
 
             // Raises the window in the windowing system.
             rootItem.raise();
@@ -191,7 +190,7 @@ WindowBlockTouches {
             // Name
             //
             Item {
-                id : nameItem
+                id: nameItem
                 anchors {
                     left : parent.left
                     right : parent.right
@@ -1140,7 +1139,7 @@ WindowBlockTouches {
             // Conditions
             //
             Item {
-                id : conditionsItem
+                id: conditionsItem
                 anchors {
                     left : parent.left
                     right : parent.right
@@ -1681,7 +1680,7 @@ WindowBlockTouches {
                                             bottom: parent.bottom
                                         }
 
-                                        iopVM: rectToName.myCondition.modelM.agentIOP
+                                        iopVM: rectToName.myCondition.modelM ? rectToName.myCondition.modelM.agentIOP : null
                                         forceHide: !rectToName.myCondition || (rectToName.myCondition.conditionType !== ActionEffectTypes.VALUE)
 
                                         function getModelValue() {
@@ -1757,7 +1756,8 @@ WindowBlockTouches {
             // Advanced modes
             //
             Item {
-                id : advancedModesItem
+                id: advancedModesItem
+
                 anchors {
                     left : parent.left
                     right : parent.right
@@ -1783,7 +1783,8 @@ WindowBlockTouches {
                 property bool isOpened: false
 
                 Connections {
-                    target : rootItem
+                    target: rootItem
+
                     Component.onCompleted : {
                         // make the advanced modes visible if there are some modes checked
                         if (actionM && (actionM.shallRevert || actionM.shallRearm)) {

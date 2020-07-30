@@ -76,8 +76,7 @@ Item {
     Connections {
         target: mainController
 
-        onResetTimeLineView: {
-//            console.log("QML: onResetTimeLineView")
+        function onResetTimeLineView(showIt) {
             isReduced = !showIt;
             contentArea.contentX = 0;
             contentArea.contentY = 0;

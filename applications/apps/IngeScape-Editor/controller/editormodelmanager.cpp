@@ -61,7 +61,6 @@ EditorModelManager::EditorModelManager(QObject *parent) : QObject(parent)
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    qInfo() << "New IngeScape Editor Model Manager";
 }
 
 

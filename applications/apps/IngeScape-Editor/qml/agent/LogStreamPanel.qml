@@ -80,9 +80,7 @@ WindowBlockTouches {
 
         //ignoreUnknownSignals: true
 
-        onBringToFront: {
-            //console.log("QML of Log Stream Panel: onBringToFront");
-
+        function onBringToFront() {
             // Raises the window in the windowing system.
             rootItem.raise();
             // and give it keyboard focus
@@ -330,8 +328,9 @@ WindowBlockTouches {
                     }
 
                     Connections {
-                        target : dropDown.popup
-                        onOpened : {
+                        target: dropDown.popup
+
+                        function onOpened() {
                             // update checkbox state when the pop up is opening
                             if (rootItem.controller) {
                                 filterLogTypeCB.checked = rootItem.controller.isSelectedLogType(model.value);
@@ -340,9 +339,9 @@ WindowBlockTouches {
                     }
 
                     Connections {
-                        target : rootItem
+                        target: rootItem
 
-                        onClickAllLogTypes : {
+                        function onClickAllLogTypes() {
                             // update checkbox state when the special check box "All Log Types" is selected or unselected
                             if (rootItem.controller) {
                                 filterLogTypeCB.checked = rootItem.controller.isSelectedLogType(model.value);
