@@ -2441,7 +2441,7 @@ void initLoop (igs_core_context_t *context){
 #if (defined WIN32 || defined _WIN32)
     WSADATA wsaData;
     WSAStartup(MAKEWORD(2,2), &wsaData);
-    if (strlen(context->commandLine) == 0){
+    if ((context->commandLine == NULL) || (strlen(context->commandLine) == 0)) {
         //command line was not set manually : we try to get exec path instead
 
         // Use GetModuleFileName() to get exec path
