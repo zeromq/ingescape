@@ -21,9 +21,10 @@ namespace CSharpSampleAgent
             Console.WriteLine(" ------------C# agent sample ------------");
 
             IgsAgent agent = new IgsAgent();
-            int res = agent.init();
+            //igs_result_t res = agent.init();
+            igs_result_t res = agent.init();
 
-            if (res == 1)
+            if (res == 0)
             {
                 Console.WriteLine(string.Format("IngeScape started with device : {0} and port : {1}", agent.GetDevice(), agent.GetPort()));
             }
