@@ -313,10 +313,9 @@ public Q_SLOTS:
      * @param ipAddress
      * @param hostname
      * @param commandLine
-     * @param canBeFrozen
      * @param loggerPort
      */
-    void onAgentEntered(QString peerId, QString agentName, QString ipAddress, QString hostname, QString commandLine, bool canBeFrozen, QString loggerPort);
+    void onAgentEntered(QString peerId, QString agentName, QString ipAddress, QString hostname, QString commandLine, QString loggerPort);
 
 
     /**

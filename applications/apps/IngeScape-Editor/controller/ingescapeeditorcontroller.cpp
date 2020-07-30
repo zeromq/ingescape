@@ -265,7 +265,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::valuePublished, ingeScapeModelManager, &IngeScapeModelManager::onValuePublished);
 
     connect(_networkC, &NetworkController::isMutedFromAgentUpdated, _modelManager, &EditorModelManager::onisMutedFromAgentUpdated);
-    connect(_networkC, &NetworkController::canBeFrozenFromAgentUpdated, _modelManager, &EditorModelManager::onCanBeFrozenFromAgentUpdated);
     connect(_networkC, &NetworkController::isFrozenFromAgentUpdated, _modelManager, &EditorModelManager::onIsFrozenFromAgentUpdated);
     connect(_networkC, &NetworkController::isMutedFromOutputOfAgentUpdated, _modelManager, &EditorModelManager::onIsMutedFromOutputOfAgentUpdated);
     connect(_networkC, &NetworkController::agentStateChanged, _modelManager, &EditorModelManager::onAgentStateChanged);

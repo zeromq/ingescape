@@ -29,7 +29,6 @@ AgentsGroupedByDefinitionVM::AgentsGroupedByDefinitionVM(QString agentName,
     _hostnames(""),
     _canBeRestarted(false),
     _isMuted(false),
-    _canBeFrozen(false),
     _isFrozen(false),
     _clonesNumber(0),
     _state(""),
@@ -420,7 +419,6 @@ void AgentsGroupedByDefinitionVM::_onModelsChanged()
                 connect(model, &AgentM::isONChanged, this, &AgentsGroupedByDefinitionVM::_onIsONofModelChanged);
                 connect(model, &AgentM::canBeRestartedChanged, this, &AgentsGroupedByDefinitionVM::_onCanBeRestartedOfModelChanged);
                 connect(model, &AgentM::isMutedChanged, this, &AgentsGroupedByDefinitionVM::_onIsMutedOfModelChanged);
-                connect(model, &AgentM::canBeFrozenChanged, this, &AgentsGroupedByDefinitionVM::_onCanBeFrozenOfModelChanged);
                 connect(model, &AgentM::isFrozenChanged, this, &AgentsGroupedByDefinitionVM::_onIsFrozenOfModelChanged);
                 connect(model, &AgentM::loggerPortChanged, this, &AgentsGroupedByDefinitionVM::_onLoggerPortOfModelChanged);
                 connect(model, &AgentM::hasLogInStreamChanged, this, &AgentsGroupedByDefinitionVM::_onHasLogInStreamOfModelChanged);
@@ -633,35 +631,6 @@ void AgentsGroupedByDefinitionVM::_onIsMutedOfModelChanged(bool isMuted)
             }
         }
         setisMuted(globalIsMuted);
-    }
-}
-
-
-/**
- * @brief Slot called when the flag "can be Frozen" of a model changed
- * @param canBeFrozen
- */
-void AgentsGroupedByDefinitionVM::_onCanBeFrozenOfModelChanged(bool canBeFrozen)
-{
-    // Most of the time, there is only one model
-    if (_models.count() == 1)
-    {
-        setcanBeFrozen(canBeFrozen);
-    }
-    // Several models
-    else
-    {
-        bool globalCanBeFrozen = false;
-
-        for (AgentM* model : _models.toList())
-        {
-            if ((model != nullptr) && model->canBeFrozen())
-            {
-                globalCanBeFrozen = true;
-                break;
-            }
-        }
-        setcanBeFrozen(globalCanBeFrozen);
     }
 }
 
@@ -982,7 +951,6 @@ void AgentsGroupedByDefinitionVM::_updateWithAllModels()
     int clonesNumber = 0;
     bool globalCanBeRestarted = false;
     bool globalIsMuted = false;
-    bool globalCanBeFrozen = false;
     bool globalIsFrozen = false;
     bool globalIsEnabledViewLogStream = false;
     bool globalHasLogInStream = false;
@@ -1014,7 +982,6 @@ void AgentsGroupedByDefinitionVM::_updateWithAllModels()
             //clonesNumber = 1;
             globalCanBeRestarted = model->canBeRestarted();
             globalIsMuted = model->isMuted();
-            globalCanBeFrozen = model->canBeFrozen();
             globalIsFrozen = model->isFrozen();
             globalIsEnabledViewLogStream = !model->loggerPort().isEmpty();
             globalHasLogInStream = model->hasLogInStream();
@@ -1062,10 +1029,6 @@ void AgentsGroupedByDefinitionVM::_updateWithAllModels()
 
                 if (!globalIsMuted && model->isMuted()) {
                     globalIsMuted = true;
-                }
-
-                if (!globalCanBeFrozen && model->canBeFrozen()) {
-                    globalCanBeFrozen = true;
                 }
 
                 if (!globalIsFrozen && model->isFrozen()) {
@@ -1134,7 +1097,6 @@ void AgentsGroupedByDefinitionVM::_updateWithAllModels()
 
     setcanBeRestarted(globalCanBeRestarted);
     setisMuted(globalIsMuted);
-    setcanBeFrozen(globalCanBeFrozen);
     setisFrozen(globalIsFrozen);
     setisEnabledViewLogStream(globalIsEnabledViewLogStream);
     sethasLogInStream(globalHasLogInStream);

@@ -19,7 +19,6 @@
 
 
 static const QString prefix_Muted = "MUTED=";
-static const QString prefix_CanBeFrozen = "CANBEFROZEN=";
 static const QString prefix_Frozen = "FROZEN=";
 static const QString prefix_OutputMuted = "OUTPUT_MUTED ";
 static const QString prefix_OutputUnmuted = "OUTPUT_UNMUTED ";
@@ -134,18 +133,6 @@ void NetworkController::_onShoutedMessageReceived(QString peerId, QString peerNa
         }
         else {
             Q_EMIT isMutedFromAgentUpdated(peerId, false);
-        }
-    }
-    // CAN BE FROZEN / CAN NOT BE FROZEN
-    else if (message.startsWith(prefix_CanBeFrozen))
-    {
-        QString canBeFrozen = message.remove(0, prefix_CanBeFrozen.length());
-
-        if (canBeFrozen == "1") {
-            Q_EMIT canBeFrozenFromAgentUpdated(peerId, true);
-        }
-        else {
-            Q_EMIT canBeFrozenFromAgentUpdated(peerId, false);
         }
     }
     // FROZEN / UN-FROZEN

@@ -490,7 +490,7 @@ Item {
             LabellessSvgButton {
                 id: freezeButton
 
-                visible: model.canBeFrozen && model.isON
+                visible: model.isON
                 enabled : visible
 
                 fileCache: IngeScapeEditorTheme.svgFileIngeScapeEditor

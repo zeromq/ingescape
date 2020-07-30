@@ -716,10 +716,9 @@ void IngeScapeModelManager::deleteAllPublishedValues()
  * @param ipAddress
  * @param hostname
  * @param commandLine
- * @param canBeFrozen
  * @param loggerPort
  */
-void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QString ipAddress, QString hostname, QString commandLine, bool canBeFrozen, QString loggerPort)
+void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QString ipAddress, QString hostname, QString commandLine, QString loggerPort)
 {
     if (!peerId.isEmpty() && !agentName.isEmpty() && !ipAddress.isEmpty())
     {
@@ -735,7 +734,6 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
             //agent->setcommandLine(commandLine);
 
             // Usefull ?
-            agent->setcanBeFrozen(canBeFrozen);
             agent->setloggerPort(loggerPort);
 
             // Update the state (flag "is ON")
@@ -756,9 +754,7 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
                                      ipAddress,
                                      true);
 
-            if (agent != nullptr)
-            {
-                agent->setcanBeFrozen(canBeFrozen);
+            if (agent != nullptr) {
                 agent->setloggerPort(loggerPort);
             }
         }

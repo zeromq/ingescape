@@ -292,10 +292,9 @@ Q_SIGNALS:
      * @param ipAddress
      * @param hostname
      * @param commandLine
-     * @param canBeFrozen
      * @param loggerPort
      */
-    void agentEntered(QString peerId, QString peerName, QString ipAddress, QString hostname, QString commandLine, bool canBeFrozen, QString loggerPort);
+    void agentEntered(QString peerId, QString peerName, QString ipAddress, QString hostname, QString commandLine, QString loggerPort);
 
 
     /**

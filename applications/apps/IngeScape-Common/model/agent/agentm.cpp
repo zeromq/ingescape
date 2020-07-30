@@ -43,7 +43,6 @@ AgentM::AgentM(QString name,
     _isON(isON),
     _canBeRestarted(false),
     _isMuted(false),
-    _canBeFrozen(false),
     _isFrozen(false),
     _definition(nullptr),
     _mapping(nullptr),
@@ -187,7 +186,6 @@ void AgentM::clearNetworkData()
 
     // Reset other properties
     setisMuted(false);
-    setcanBeFrozen(false);
     setisFrozen(false);
     setstate("");
     setloggerPort("");

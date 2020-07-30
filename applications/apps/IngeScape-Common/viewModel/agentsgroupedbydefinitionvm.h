@@ -63,9 +63,6 @@ class AgentsGroupedByDefinitionVM : public QObject
     // Flag indicating if our agent is muted
     I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(bool, isMuted)
 
-    // Flag indicating if our agent can be frozen
-    I2_QML_PROPERTY_READONLY(bool, canBeFrozen)
-
     // Flag indicating if our agent is frozen
     I2_QML_PROPERTY_READONLY(bool, isFrozen)
 
@@ -290,13 +287,6 @@ private Q_SLOTS:
      * @param isMuted
      */
     void _onIsMutedOfModelChanged(bool isMuted);
-
-
-    /**
-     * @brief Slot called when the flag "can be Frozen" of a model changed
-     * @param canBeFrozen
-     */
-    void _onCanBeFrozenOfModelChanged(bool canBeFrozen);
 
 
     /**

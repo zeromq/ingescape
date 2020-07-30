@@ -295,20 +295,6 @@ void EditorModelManager::onisMutedFromAgentUpdated(QString peerId, bool isMuted)
 
 
 /**
- * @brief Slot called when the flag "can be Frozen" from an agent updated
- * @param peerId
- * @param canBeFrozen
- */
-void EditorModelManager::onCanBeFrozenFromAgentUpdated(QString peerId, bool canBeFrozen)
-{
-    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromPeerId(peerId);
-    if (agent != nullptr) {
-        agent->setcanBeFrozen(canBeFrozen);
-    }
-}
-
-
-/**
  * @brief Slot called when the flag "is Frozen" from an agent updated
  * @param peerId
  * @param isFrozen

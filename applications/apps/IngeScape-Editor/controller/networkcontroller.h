@@ -131,14 +131,6 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when the flag "can be Frozen" from an agent updated
-     * @param peerId
-     * @param canBeFrozen
-     */
-    void canBeFrozenFromAgentUpdated(QString peerId, bool canBeFrozen);
-
-
-    /**
      * @brief Signal emitted when the flag "is Frozen" from an agent updated
      * @param peerId
      * @param isFrozen

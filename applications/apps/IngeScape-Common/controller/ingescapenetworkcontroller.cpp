@@ -31,26 +31,25 @@ static const int PUBLISHED_VALUE_MAXIMUM_STRING_LENGTH = 4096;
 
 
 /**
- * @brief Callback for incomming messages on the bus
- * @param evt
- * @param peer
- * @param name
- * @param address
- * @param channel
- * @param headers
- * @param msg
- * @param myData
+ * @brief Callback for messages incomming on the bus
  */
-void onIncommingBusMessageCallback(const char *event, const char *peer, const char *name, const char *address, const char *channel, zhash_t *headers, zmsg_t *msg, void *myData)
+void onBusMessageIncommingCallback(const char *event,
+                                   const char *peer_id,
+                                   const char *peer_name,
+                                   const char *peer_address,
+                                   const char *channel,
+                                   zhash_t *headers,
+                                   zmsg_t *msg,
+                                   void *myData)
 {
     Q_UNUSED(channel)
 
     IngeScapeNetworkController* ingeScapeNetworkC = static_cast<IngeScapeNetworkController*>(myData);
     if (ingeScapeNetworkC != nullptr)
     {
-        QString peerId = QString(peer);
-        QString peerName = QString(name);
-        QString peerAddress = QString(address);
+        QString peerId = QString(peer_id);
+        QString peerName = QString(peer_name);
+        QString peerAddress = QString(peer_address);
 
         // ENTER
         if (streq(event, "ENTER"))
@@ -77,7 +76,6 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             bool isIngeScapeAssessments = false;
             bool isIngeScapeExpe = false;
             QString hostname = "";
-            bool canBeFrozen = false;
             QString commandLine = "";
             QString loggerPort = "";
             QString streamingPort = "";
@@ -98,38 +96,23 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                     key = QString(k);
                     value = QString(v);
 
-                    if (key == "isLauncher") {
-                        if (value == "1") {
-                            isIngeScapeLauncher = true;
-                        }
+                    if ((key == "isLauncher") && (value == "1")) {
+                        isIngeScapeLauncher = true;
                     }
-                    else if (key == "isRecorder") {
-                        if (value == "1") {
-                            isIngeScapeRecorder = true;
-                        }
+                    else if ((key == "isRecorder") && (value == "1")) {
+                        isIngeScapeRecorder = true;
                     }
-                    else if (key == "isEditor") {
-                        if (value == "1") {
-                            isIngeScapeEditor = true;
-                        }
+                    else if ((key == "isEditor") && (value == "1")) {
+                        isIngeScapeEditor = true;
                     }
-                    else if (key == "isAssessments") {
-                        if (value == "1") {
-                            isIngeScapeAssessments = true;
-                        }
+                    else if ((key == "isAssessments") && (value == "1")) {
+                        isIngeScapeAssessments = true;
                     }
-                    else if (key == "isExpe") {
-                        if (value == "1") {
-                            isIngeScapeExpe = true;
-                        }
+                    else if ((key == "isExpe") && (value == "1")) {
+                        isIngeScapeExpe = true;
                     }
                     else if (key == "hostname") {
                         hostname = value;
-                    }
-                    else if (key == "canBeFrozen") {
-                        if (value == "1") {
-                            canBeFrozen = true;
-                        }
                     }
                     else if (key == "commandline") {
                         commandLine = value;
@@ -223,21 +206,11 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                 ingeScapeNetworkC->setnumberOfAgents(ingeScapeNetworkC->numberOfAgents() + 1);
 
                 // Emit the signal "Agent Entered"
-                Q_EMIT ingeScapeNetworkC->agentEntered(peerId, peerName, ipAddress, hostname, commandLine, canBeFrozen, loggerPort);
+                Q_EMIT ingeScapeNetworkC->agentEntered(peerId, peerName, ipAddress, hostname, commandLine, loggerPort);
             }
             else {
                 qDebug() << "Our zyre event is about an element without headers, we ignore it !";
             }
-        }
-        // JOIN (group)
-        else if (streq(event, "JOIN"))
-        {
-            //qDebug() << QString("++ %1 has joined %2").arg(peerName, group);
-        }
-        // LEAVE (group)
-        else if (streq(event, "LEAVE"))
-        {
-            //qDebug() << QString("-- %1 has left %2").arg(peerName, group);
         }
         // SHOUT
         else if (streq(event, "SHOUT"))
@@ -343,6 +316,14 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             // Manage the peer id which exited the network
             ingeScapeNetworkC->manageExitedPeerId(peerId);
         }
+        // JOIN (group)
+        /*else if (streq(event, "JOIN"))
+        {
+        }*/
+        // LEAVE (group)
+        /*else if (streq(event, "LEAVE"))
+        {
+        }*/
     }
 }
 
@@ -681,7 +662,7 @@ IngeScapeNetworkController::IngeScapeNetworkController(QObject *parent) : QObjec
 
 
     // Begin to observe incoming messages on the bus
-    igs_observeBus(&onIncommingBusMessageCallback, this);
+    igs_observeBus(&onBusMessageIncommingCallback, this);
 
     // Create the model of our agent "IngeScape"
     _agentModel = new AgentM(_igsAgentApplicationName);

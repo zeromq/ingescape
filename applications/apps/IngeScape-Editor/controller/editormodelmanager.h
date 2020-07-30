@@ -113,14 +113,6 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot called when the flag "can be Frozen" from an agent updated
-     * @param peerId
-     * @param canBeFrozen
-     */
-    void onCanBeFrozenFromAgentUpdated(QString peerId, bool canBeFrozen);
-
-
-    /**
      * @brief Slot called when the flag "is Frozen" from an agent updated
      * @param peerId
      * @param isFrozen
