@@ -101,7 +101,7 @@ PyDoc_STRVAR(
              "--\n"
              "\n"
              "Create and add an Parameter for the agent.\n"
-             "return The error.\n 1 is OK, 0 not able to add in definition loaded, -1 not able to add in definition live");
+             "return The error.\n 0 is ok\n");
 
 //igs_readparameterAsBool
  PyObject * readParameterAsBool_wrapper(PyObject * self, PyObject * args);

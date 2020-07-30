@@ -20,7 +20,7 @@ PyDoc_STRVAR(
              "When the agent is frozen the associated callback will be called.\n \n"
              "param callback is the function we want to be executed when the agent is frozen. Can't be NULL.\n"
              "param args A tuple containing the arguments of the callback in python. Can't be NULL.\n "
-             "return The error.\n 1 is OK.\n  0 if not\n");
+             "return The error.\n 0 is ok\n");
 
 // wrapper for igs_observeFreeze
 PyObject * igs_observeFreeze_wrapper(PyObject *self, PyObject *args);

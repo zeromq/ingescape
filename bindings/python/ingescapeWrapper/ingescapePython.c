@@ -57,11 +57,6 @@ static PyMethodDef ingescapeMethods[] =
     {"igs_freeze", freeze_wrapper, METH_NOARGS, freezeDoc},
     {"igs_unfreeze", unfreeze_wrapper, METH_NOARGS, unfreezeDoc},
     {"igs_isFrozen", isFrozen_wrapper, METH_NOARGS, isfrozenDoc},
-    {"igs_setCanBeFrozen", setCanBeFrozen_wrapper, METH_VARARGS, setCanBeFrozenDoc},
-    {"igs_canBeFrozen", canBeFrozen_wrapper, METH_NOARGS, canBeFrozenDoc},
-
-    //terminate the agent and trigger the forcedStopCallbacks
-    {"igs_die", die_wrapper, METH_NOARGS, dieDoc},
 
     //read input per type
     {"igs_readInputAsBool", readInputAsBool_wrapper, METH_VARARGS, readInputAsBoolDoc},
@@ -196,14 +191,14 @@ static PyMethodDef ingescapeMethods[] =
     {"igs_getUseColorVerbose", getUseColorVerbose_wrapper, METH_NOARGS, getUseColorVerboseDoc},
     {"igs_setLogPath", setLogPath_wrapper, METH_VARARGS, setLogPathDoc},
     {"igs_getLogPath", getLogPath_wrapper, METH_NOARGS, getLogPathDoc},
-    {"igs_interrupted", interrupted_wrapper, METH_NOARGS, interruptedDoc},
+    {"igs_isStarted", isStarted_wrapper, METH_NOARGS, interruptedDoc},
     
     //observe Iop, freeze and forced stop
     {"igs_observeInput", igs_observeInput_wrapper, METH_VARARGS, observeInputDoc},
     {"igs_observeOutput", igs_observeOutput_wrapper, METH_VARARGS, observeOutputDoc},
     {"igs_observeParameter", igs_observeParameter_wrapper, METH_VARARGS, observeParameterDoc},
     {"igs_observeFreeze", igs_observeFreeze_wrapper, METH_VARARGS, observeFreezeDoc},
-    {"igs_observeForcedStop", igs_observeForcedStop_wrapper, METH_VARARGS, observeForcedStopDoc},
+    {"igs_observeExternalStop", igs_observeExternalStop_wrapper, METH_VARARGS, observeForcedStopDoc},
 
     //resources file management
     {"igs_setDefinitionPath", setDefinitionPath_wrapper, METH_VARARGS, setDefinitionPathDoc},

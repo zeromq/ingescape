@@ -18,35 +18,24 @@
     void * value;
     size_t * size;
     int result;
-    PyObject * ret;
-    
     // parse arguments :  the name of the output, the value and the size
     if (!PyArg_ParseTuple(args, "ssi", &name, &value, &size)) {
         return NULL;
     }
-
     result = igs_readParameter(name, value, size);
-
-    ret = PyLong_FromLong(result);
-    free(&result);
-    return ret;
+    return PyLong_FromLong(result);
 }
 
 //igs_readparameterAsBool
  PyObject * readParameterAsBool_wrapper(PyObject * self, PyObject * args)
 {
     char * name;
-    bool result;
-    
     // parse argument and cast it : the name of the output
     if (!PyArg_ParseTuple(args, "s", &name)) {
         return NULL;
     }
-
-    result = igs_readParameterAsBool(name);
-    
     // build the resulting bool into a Python object.
-    if (result) {
+    if (igs_readParameterAsBool(name)) {
         Py_RETURN_TRUE;
     } else{
         Py_RETURN_FALSE;
@@ -58,19 +47,12 @@
 {
     char * name;
     int result;
-    
-    PyObject * ret;
-    
     // parse argument and cast it : the name of the Parameter
     if (!PyArg_ParseTuple(args, "s", &name)) {
         return NULL;
     }
-    
     result = igs_readParameterAsInt(name);
-
-    ret = PyLong_FromLong(result);
-    free(&result);
-    return ret;
+    return PyLong_FromLong(result);
 }
 
 //igs_readParameterAsDouble
@@ -78,18 +60,12 @@
 {
     char * name;
     double result;
-    PyObject * ret;
-    
     // parse argument and cast it : the name of the Parameter
     if (!PyArg_ParseTuple(args, "s", &name)) {
         return NULL;
     }
-
     result = igs_readParameterAsDouble(name);
-
-    ret = PyFloat_FromDouble(result);
-    free(&result);
-    return ret;
+    return PyFloat_FromDouble(result);
 }
 
 
@@ -99,17 +75,18 @@
     char * name;
     char * result;
     PyObject * ret;
-    
     // parse argument and cast it : the name of the Parameter
     if (!PyArg_ParseTuple(args, "s", &name)) {
         return NULL;
     }
-
     result = igs_readParameterAsString(name);
-
-    ret = PyBytes_FromString(result);
-    free(&result);
-    return ret;
+    if(result != NULL){
+        ret = PyBytes_FromString(result);
+        free(&result);
+        return ret;
+    }else{
+        return PyBytes_FromString("");
+    }
 }
 
 //igs_writeParameterAsBool
@@ -118,9 +95,6 @@
     char * name;
     PyObject *value;
     int result;
-    
-    PyObject * ret;
-    
     // parse arguments and cast them : name of the param and the boolean
     if (!PyArg_ParseTuple(args, "sO", &name, &value)) {
         return NULL;
@@ -131,10 +105,7 @@
     }else{
         result = igs_writeParameterAsBool(name, false);
     }
-
-    ret = PyLong_FromLong(result);
-    free(&result);
-    return ret;
+    return PyLong_FromLong(result);
 }
 
 //igs_writeParameterAsInt
@@ -143,22 +114,12 @@
     char * name;
     int value;
     int result;
-    PyObject * ret;
-    
     // parse arguments and cast them : the name and the integer
     if (!PyArg_ParseTuple(args, "si", &name, &value)) {
         return NULL;
     }
-    
-    // run the actual function
-    
     result = igs_writeParameterAsInt(name, value);
-    
-    
-    // build the resulting double into a Python object.
-    ret = PyLong_FromLong(result);
-    free(&result);
-    return ret;
+    return PyLong_FromLong(result);
 }
 
 //igs_writeParameterAsDouble
@@ -167,17 +128,11 @@
     char * name;
     double value;
     int result;
-    PyObject * ret;
-
     if (!PyArg_ParseTuple(args, "sd", &name, &value)) {
         return NULL;
     }
-    
     result = igs_writeParameterAsDouble(name, value);
-
-    ret = PyLong_FromLong(result);
-    free(&result);
-    return ret;
+    return PyLong_FromLong(result);
 }
 
 //igs_writeParameterAsString
@@ -186,18 +141,11 @@
     char * name;
     char * value;
     int result;
-    
-    PyObject * ret;
-
     if (!PyArg_ParseTuple(args, "ss", &name, &value)) {
         return NULL;
     }
-    
     result = igs_writeParameterAsString(name, value);
-
-    ret = PyLong_FromLong(result);
-    free(&result);
-    return ret;
+    return PyLong_FromLong(result);
 }
 
 
@@ -206,31 +154,19 @@
 {
     char* name;
     int result;
-    PyObject * ret;
-    
     if (!PyArg_ParseTuple(args, "s", &name)) {
         return NULL;
     }
-
     result = igs_getTypeForParameter(name);
-
-    ret = PyLong_FromLong(result);
-    free(&result);
-    return ret;
+    return PyLong_FromLong(result);
 }
 
 
 //igs_getParametersNumber
  PyObject * getParametersNumber_wrapper(PyObject * self, PyObject * args)
 {
-    int result;
-    PyObject * ret;
-    
-    result = igs_getParametersNumber();
-
-    ret = PyLong_FromLong(result);
-    free(&result);
-    return ret;
+    int result = igs_getParametersNumber();
+    return PyLong_FromLong(result);
 }
 
 
@@ -243,9 +179,7 @@
     if (!PyArg_ParseTuple(args, "i", &nbOfElements)) {
         return NULL;
     }
-    
     char **result = igs_getParametersList(&nbOfElements);
-    
     // create a Python List and add element one by one
     ret = PyList_New(nbOfElements);
     int i ;
@@ -260,23 +194,15 @@
  PyObject * checkParametersExistence_wrapper(PyObject * self, PyObject * args)
 {
     char * name;
-    bool result;
-    PyObject * ret;
-
     if (!PyArg_ParseTuple(args, "s", &name)) {
         return NULL;
     }
-    result = igs_checkParameterExistence(name);
-    
-    
     // build the resulting double into a Python object.
-    if (result) {
-        ret = Py_True;
-    } else{
-        ret = Py_False;
+    if (igs_checkParameterExistence(name)) {
+        Py_RETURN_TRUE;
+    }else{
+        Py_RETURN_FALSE;
     }
-    free(&result);
-    return ret;
 }
 
 //igs_createParameter
@@ -288,17 +214,11 @@
     void *value;
     long size;
     int result;
-    PyObject * ret;
-
     if (!PyArg_ParseTuple(args, "siOi", &name, &_type, &value, &size)) {
         return NULL;
     }
     // get the type of the parameter
     type = (iopType_t)(_type);
-
     result = igs_createParameter(name, type, value, sizeof(PyObject));
-
-    ret = PyLong_FromLong(result);
-    free(&result);
-    return ret;
+    return PyLong_FromLong(result);
 }

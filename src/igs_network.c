@@ -1855,13 +1855,17 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             //CALLS
             else if (streq (title, "CALL")){
                 //identify agent
-                char *uuid = zmsg_popstr (msgDuplicate);
-                igs_agent_t *agent = NULL;
-                HASH_FIND_STR(context->agents, uuid, agent);
-                if (agent == NULL){
-                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
-                    if (uuid)
-                        free(uuid);
+                char *callerUuid = zmsg_popstr (msgDuplicate);
+                char *calleeUuid = zmsg_popstr (msgDuplicate);
+
+                igs_agent_t *calleeAgent = NULL;
+                HASH_FIND_STR(context->agents, calleeUuid, calleeAgent);
+                if (calleeAgent == NULL){
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", calleeUuid, title, name, peer);
+                    if (callerUuid)
+                        free(callerUuid);
+                    if (calleeUuid)
+                        free(calleeUuid);
                     zmsg_destroy(&msgDuplicate);
                     zyre_event_destroy(&zyre_event);
                     return 0;
@@ -1870,34 +1874,38 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 char *callName = zmsg_popstr(msgDuplicate);
                 if (callName == NULL){
                     igs_error("no valid call name in %s message received from %s(%s): aborting", title, name, peer);
-                    free(uuid);
+                    if (callerUuid)
+                        free(callerUuid);
+                    if (calleeUuid)
+                        free(calleeUuid);
                     zmsg_destroy(&msgDuplicate);
                     zyre_event_destroy(&zyre_event);
                     return 0;
                 }
-                if (agent->definition != NULL && agent->definition->calls_table != NULL){
+                if (calleeAgent->definition != NULL && calleeAgent->definition->calls_table != NULL){
                     igs_call_t *call = NULL;
-                    HASH_FIND_STR(agent->definition->calls_table, callName, call);
+                    HASH_FIND_STR(calleeAgent->definition->calls_table, callName, call);
                     if (call != NULL ){
                         if (call->cb != NULL){
                             bus_zyreLock();
-                            zyre_shouts(context->node, context->callsChannel, "%s from %s (%s)", callName, agent->name, agent->uuid);
+                            zyre_shouts(context->node, context->callsChannel, "%s from %s (%s)", callName, name, peer);
                             bus_zyreUnlock();
                             size_t nbArgs = 0;
                             igs_callArgument_t *_arg = NULL;
                             LL_COUNT(call->arguments, _arg, nbArgs);
                             if (call_addValuesToArgumentsFromMessage(callName, call->arguments, msgDuplicate) == IGS_SUCCESS){
-                                (call->cb)(agent, name, peer, callName, call->arguments, nbArgs, call->cbData);
+                                (call->cb)(calleeAgent, name, callerUuid, callName, call->arguments, nbArgs, call->cbData);
                                 call_freeValuesInArguments(call->arguments);
                             }
                         }else{
-                            igsAgent_warn(agent, "no defined callback to handle received call %s", callName);
+                            igsAgent_warn(calleeAgent, "no defined callback to handle received call %s", callName);
                         }
                     }else{
-                        igsAgent_warn(agent, "agent %s has no call named %s", name, callName);
+                        igsAgent_warn(calleeAgent, "agent %s has no call named %s", name, callName);
                     }
                 }
-                free(uuid);
+                free(callerUuid);
+                free(calleeUuid);
                 free(callName);
             }
             //Performance
@@ -2613,6 +2621,8 @@ int network_timerCallback (zloop_t *loop, int timer_id, void *arg){
 
 void igs_observeBus(igs_BusMessageIncoming cb, void *myData){
     assert(cb);
+    core_initContext();
+
     igs_zyre_callback_t *newCb = calloc(1, sizeof(igs_zyre_callback_t));
     newCb->callback_ptr = cb;
     newCb->myData = myData;

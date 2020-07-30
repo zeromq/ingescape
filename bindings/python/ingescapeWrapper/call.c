@@ -103,13 +103,9 @@ PyObject * sendCall_wrapper(PyObject * self, PyObject * args)
             printf("Type should be 1:bool, 2:int, 3:double, 4:char*, 5:data\n");
             return PyLong_FromLong(-1);
         }
-
     }
-
     int result = igs_sendCall(agentNameOrUUID, callName, &argumentList);
-    PyObject *ret = PyLong_FromLong(result);
-    
-    return ret;
+    return PyLong_FromLong(result);
 }
 
 
@@ -119,19 +115,12 @@ PyObject * sendCall_wrapper(PyObject * self, PyObject * args)
 PyObject * removeCall_wrapper(PyObject * self, PyObject * args){
     char *name;
     int result;
-    PyObject * ret;
-    
     // parse arguments
     if (!PyArg_ParseTuple(args, "s", &name)) {
         return NULL;
     }
-    
     result = igs_removeCall(name);
-    
-    ret = PyLong_FromLong(result);
-    free(&result);
-    
-    return ret;
+    return PyLong_FromLong(result);
 }
 
 /* igs_addArgumentToCall
@@ -141,20 +130,13 @@ PyObject * addArgumentToCall_wrapper(PyObject * self, PyObject * args){
     char *callName;
     char *argName;
     int type;
-    int result;
-    PyObject * ret;
-    
+    int result;    
     // parse arguments
     if (!PyArg_ParseTuple(args, "ssi", &callName, &argName, &type)) {
         return PyLong_FromLong(-1);
     }
-    
     result = igs_addArgumentToCall(callName, argName, type);
-    
-    ret = PyLong_FromLong(result);
-    free(&result);
-    
-    return ret;
+    return PyLong_FromLong(result);
 }
 
 
@@ -165,19 +147,12 @@ PyObject * removeArgumentFromCall_wrapper(PyObject * self, PyObject * args){
     char *callName;
     char *argName;
     int result;
-    PyObject * ret;
-    
     // parse arguments
     if (!PyArg_ParseTuple(args, "ss", &callName, &argName)) {
         return PyLong_FromLong(-1);
     }
-    
     result = igs_removeArgumentFromCall(callName, argName);
-    
-    ret = PyLong_FromLong(result);
-    free(&result);
-    
-    return ret;
+    return PyLong_FromLong(result);
 }
 
 //igs_getNumberOfCalls
@@ -185,35 +160,22 @@ PyObject * getNumberOfCalls_wrapper(PyObject * self, PyObject * args)
 {
     size_t result;
     PyObject * ret;
-    
     result = igs_getNumberOfCalls();
-    
-    ret = PyLong_FromLong(result);
-    free(&result);
-    return ret;
+    return PyLong_FromLong(result);
 }
 
 //igs_checkCallExistence
 PyObject * checkCallExistence_wrapper(PyObject * self, PyObject * args)
 {
     char * name;
-    bool result;
-    PyObject * ret;
-    
     if (!PyArg_ParseTuple(args, "s", &name)) {
         return NULL;
     }
-    result = igs_checkCallExistence(name);
-    
-    
-    // build the resulting double into a Python object.
-    if (result) {
-        ret = Py_True;
-    } else{
-        ret = Py_False;
+    if (igs_checkCallExistence(name)) {
+        Py_RETURN_TRUE;
+    }else{
+        Py_RETURN_FALSE;
     }
-    free(&result);
-    return ret;
 }
 
 //igs_getCallsList
@@ -232,7 +194,6 @@ PyObject * getCallsList_wrapper(PyObject * self, PyObject * args)
         PyTuple_SetItem(ret, i, PyBytes_FromString(result[i]));
     }
     igs_freeCallsList(result, nbOfElements);
-    
     return ret;
 }
 
@@ -240,14 +201,11 @@ PyObject * getCallsList_wrapper(PyObject * self, PyObject * args)
 PyObject * getNumberOfArgumentForCall_wrapper(PyObject * self, PyObject * args)
 {
     char* callName;
-    
     // parse the number of element
     if (!PyArg_ParseTuple(args, "s", &callName)) {
         return NULL;
     }
-    
     size_t result = igs_getNumberOfArgumentsForCall(callName);
-    
     return PyLong_FromLong(result);
 }
 
@@ -281,23 +239,14 @@ PyObject * checkCallArgumentExistence_wrapper(PyObject * self, PyObject * args)
 {
     char * callName;
     char * argName;
-    bool result;
-    PyObject * ret;
-    
     if (!PyArg_ParseTuple(args, "ss", &callName, &argName)) {
         return NULL;
     }
-    result = igs_checkCallArgumentExistence(callName, argName);
-    
-    
-    // build the resulting double into a Python object.
-    if (result) {
-        ret = Py_True;
-    } else{
-        ret = Py_False;
+    if (igs_checkCallArgumentExistence(callName, argName)) {
+        Py_RETURN_TRUE;
+    }else{
+        Py_RETURN_FALSE;
     }
-    free(&result);
-    return ret;
 }
 
 typedef struct callCallback {
@@ -398,9 +347,6 @@ PyObject * initCall_wrapper(PyObject *self, PyObject *args)
     if (ret == 1){
         DL_APPEND(callList, newElt);
     }
-    //return 1 if ok
-    PyObject *result;
-    result = PyLong_FromLong(ret);
-    return result;
+    return PyLong_FromLong(ret);
 
 }

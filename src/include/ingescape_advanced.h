@@ -81,7 +81,7 @@ PUBLIC igs_result_t igs_readInputAsZMQMsg(const char *name, zmsg_t **msg); //msg
 
 //////////////////////////////////////////////////
 // Bus channels
-typedef void (*igs_BusMessageIncoming) (const char *event, const char *peerID, const char *name,
+typedef void (*igs_BusMessageIncoming) (const char *event, const char *peerID, const char *peerName,
                                         const char *address, const char *channel,
                                         zhash_t *headers, zmsg_t *msg, void *myData);
 PUBLIC void igs_observeBus(igs_BusMessageIncoming cb, void *myData);

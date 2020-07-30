@@ -14,17 +14,12 @@
 PyObject * setCommandLine_wrapper(PyObject * self, PyObject * args)
 {
     char * line;
-    PyObject * ret;
-    
     // parse and cast the line argument given in python
     if (!PyArg_ParseTuple(args, "s", &line)) {
         return NULL;
     }
-    
     igs_setCommandLine(line);
-    // if everything is ok return 1
-    ret = PyLong_FromLong(1);
-    return ret;
+    return PyLong_FromLong(0);
 }
 
 
@@ -32,174 +27,135 @@ PyObject * setCommandLine_wrapper(PyObject * self, PyObject * args)
 PyObject * setVerbose_wrapper(PyObject * self, PyObject * args)
 {
     bool verbose;
-    PyObject * ret;
-    
     // parse and cast the verbose argument given in python
     if (!PyArg_ParseTuple(args, "b", &verbose)) {
         return NULL;
     }
-
     igs_setVerbose(verbose);
-
-    ret = PyLong_FromLong(1);
-    return ret;
+    return PyLong_FromLong(0);  
 }
 
 //wrapper for igs_getVerbose
 PyObject * getVerbose_wrapper(PyObject * self, PyObject * args)
 {
     bool verbose;
-    PyObject * ret;
-
     verbose = igs_isVerbose();
-    
     // build the resulting bool into a Python boolean and return it
-    if(verbose){
-        ret = Py_True;
+     if(verbose){
+        Py_RETURN_TRUE;
     }else{
-        ret = Py_False;
+        Py_RETURN_FALSE;
     }
-    return ret;
 }
 
 //wrapper for igs_setLogStream
 PyObject * setLogStream_wrapper(PyObject * self, PyObject * args)
 {
     bool stream;
-    PyObject * ret;
-    
     // parse and cast into a bool the stream argument given in python
     if (!PyArg_ParseTuple(args, "b", &stream)) {
         return NULL;
     }
-
     igs_setLogStream(stream);
-
-    ret = PyLong_FromLong(1);
-    return ret;
+    return PyLong_FromLong(0);
 }
 
 //wrapper for igs_getLogStream
 PyObject * getLogStream_wrapper(PyObject * self, PyObject * args)
 {
     bool stream;
-    PyObject * ret;
-
     stream = igs_getLogStream();
-    
     // build the resulting bool into a Python boolean and return it
     if(stream){
-        ret = Py_True;
+        Py_RETURN_TRUE;
     }else{
-        ret = Py_False;
+        Py_RETURN_FALSE;
     }
-    return ret;
 }
 
 //wrapper for igs_setLogInFile
 PyObject * setLogInFile_wrapper(PyObject * self, PyObject * args)
 {
     bool useLogFile;
-    PyObject * ret;
-    
      // parse and cast into a bool the useLogFile argument given in python
     if (!PyArg_ParseTuple(args, "b", &useLogFile)) {
         return NULL;
     }
-
     igs_setLogInFile(useLogFile);
-
-    ret = PyLong_FromLong(1);
-    return ret;
+    return PyLong_FromLong(0);
 }
 
 //wrapper for igs_getLogInFile
 PyObject * getLogInFile_wrapper(PyObject * self, PyObject * args)
 {
     bool useLogFile;
-    PyObject * ret;
-
     useLogFile = igs_getLogInFile();
-    
     // build the resulting bool into a Python boolean and return it
     if(useLogFile){
-        ret = Py_True;
+        Py_RETURN_TRUE;
     }else{
-        ret = Py_False;
+        Py_RETURN_FALSE;
     }
-    return ret;
 }
 
 //wrapper for igs_setUseColorVerbose
 PyObject * setUseColorVerbose_wrapper(PyObject * self, PyObject * args)
 {
     bool useColorVerbose;
-    PyObject * ret;
-
     // parse and cast into a bool the useColorVerbose argument given in python
     if (!PyArg_ParseTuple(args, "b", &useColorVerbose)) {
         return NULL;
     }
-
     igs_setUseColorVerbose(useColorVerbose);
-
-    ret = PyLong_FromLong(1);
-    return ret;
+    return PyLong_FromLong(0);
 }
 
 //wrapper for igs_getUseColorVerbose
 PyObject * getUseColorVerbose_wrapper(PyObject * self, PyObject * args)
 {
     bool useColorVerbose;
-    PyObject * ret;
-
     useColorVerbose = igs_getUseColorVerbose();
-    
     // build the resulting bool into a Python boolean and return it
     if(useColorVerbose){
-        ret = Py_True;
+        Py_RETURN_TRUE;
     }else{
-        ret = Py_False;
+        Py_RETURN_FALSE;
     }
-    return ret;
 }
 
 //wrapper for igs_setLogPath
 PyObject * setLogPath_wrapper(PyObject * self, PyObject * args)
 {
     char * path;
-    PyObject * ret;
-
-    
     // parse and cast into a bool the useColorVerbose argument given in python
     if (!PyArg_ParseTuple(args, "s", &path)) {
         return NULL;
     }
-
     igs_setLogPath(path);
-
-    ret = PyLong_FromLong(1);
-    return ret;
+    return PyLong_FromLong(0);
 }
 
 //wrapper for igs_getLogPath
 PyObject * getLogPath_wrapper(PyObject * self, PyObject * args)
 {
     char * path;
-    PyObject * ret;
-
+    PyObject *ret;
     path = igs_getLogPath();
-    
     // build the resulting char* into a Python bytes and return it
-    ret = PyBytes_FromString(path);
-    return ret;
+    if(path != NULL){
+        ret = PyBytes_FromString(path);
+        free(&path);
+        return ret;
+    }else{
+        return PyBytes_FromString("");
+    }
 }
 
 
-//wrapper for igs_interrupted
-PyObject * interrupted_wrapper(PyObject * self, PyObject * args)
+//wrapper for igs_isStarted
+PyObject * isStarted_wrapper(PyObject * self, PyObject * args)
 {
-    if (igs_Interrupted){
+    if (igs_isStarted()){
         Py_RETURN_TRUE;
     }else{
         Py_RETURN_FALSE;
@@ -211,76 +167,53 @@ PyObject * interrupted_wrapper(PyObject * self, PyObject * args)
 PyObject * setDefinitionPath_wrapper(PyObject * self, PyObject * args)
 {
     char * path;
-    PyObject * ret;
-    
     // parse and cast into a char* the string path given in python
     if (!PyArg_ParseTuple(args, "s", &path)) {
         return NULL;
     }
-    
     igs_setDefinitionPath(path);
-
-    ret = PyLong_FromLong(1);
-    return ret;
+    return PyLong_FromLong(0);
 }
 
 //wrapper for igs_setMappingPath
 PyObject * setMappingPath_wrapper(PyObject * self, PyObject * args)
 {
     char * path;
-    PyObject * ret;
-    
     // parse and cast into a char* the string path given in python
     if (!PyArg_ParseTuple(args, "s", &path)) {
         return NULL;
     }
-
     igs_setMappingPath(path);
-
-    ret = PyLong_FromLong(1);
-    return ret;
+    return PyLong_FromLong(0);
 }
 
 //wrapper for igs_writeDefinitionToPath
 PyObject * writeDefinitionToPath_wrapper(PyObject * self, PyObject * args)
 {
-    PyObject * ret;
-    
     igs_writeDefinitionToPath();
-
-    ret = PyLong_FromLong(1);
-    return ret;
+    return PyLong_FromLong(0);
 }
 
 
 //wrapper for igs_writeMappingToPath
 PyObject * writeMappingToPath_wrapper(PyObject * self, PyObject * args)
 {
-    PyObject * ret;
-
     igs_writeMappingToPath();
-
-    ret = PyLong_FromLong(1);
-    return ret;
+    return PyLong_FromLong(0);
 }
 
 //wrapper for igs_version
 PyObject * version_wrapper(PyObject * self, PyObject * args)
 {
     int version;
-    PyObject* ret;
-
     version = igs_version();
-
-    ret = PyLong_FromLong(version);
-    return ret;
+    return PyLong_FromLong(version);
 }
 
 //wrapper for igs_trace
 PyObject * trace_wrapper(PyObject * self, PyObject * args)
 {
     char * log;
-    PyObject * ret;
     
     // parse and cast into a bool the useColorVerbose argument given in python
     if (!PyArg_ParseTuple(args, "s", &log)) {
@@ -307,19 +240,16 @@ PyObject * trace_wrapper(PyObject * self, PyObject * args)
     Py_DECREF(funcTuple);
     
     if(strcmp(functionStr, "<module>") == 0){
-        igs_log(IGS_LOG_TRACE, "main", log);
+        igs_log(IGS_LOG_TRACE, "main", "%s", log);
     }else{
-        igs_log(IGS_LOG_DEBUG, functionStr, log);
+        igs_log(IGS_LOG_DEBUG, functionStr, "%s", log);
     }
-    
-    ret = PyLong_FromLong(1);
-    return ret;
+    return PyLong_FromLong(0);
 }
 
 PyObject * debug_wrapper(PyObject * self, PyObject * args)
 {
     char * log;
-    PyObject * ret;
     
     // parse and cast into a bool the useColorVerbose argument given in python
     if (!PyArg_ParseTuple(args, "s", &log)) {
@@ -346,20 +276,17 @@ PyObject * debug_wrapper(PyObject * self, PyObject * args)
     Py_DECREF(funcTuple);
     
     if(strcmp(functionStr, "<module>") == 0){
-        igs_log(IGS_LOG_DEBUG, "main", log);
+        igs_log(IGS_LOG_DEBUG, "main", "%s", log);
     }else{
-        igs_log(IGS_LOG_DEBUG, functionStr, log);
+        igs_log(IGS_LOG_DEBUG, functionStr, "%s", log);
     }
-    
-    ret = PyLong_FromLong(1);
-    return ret;
+    return PyLong_FromLong(0);
 }
 
 
 PyObject * info_wrapper(PyObject * self, PyObject * args)
 {
     char * log;
-    PyObject * ret;
     
     // parse and cast into a bool the useColorVerbose argument given in python
     if (!PyArg_ParseTuple(args, "s", &log)) {
@@ -386,20 +313,17 @@ PyObject * info_wrapper(PyObject * self, PyObject * args)
     Py_DECREF(funcTuple);
     
     if(strcmp(functionStr, "<module>") == 0){
-        igs_log(IGS_LOG_INFO, "main", log);
+        igs_log(IGS_LOG_INFO, "main", "%s", log);
     }else{
-        igs_log(IGS_LOG_INFO, functionStr, log);
+        igs_log(IGS_LOG_INFO, functionStr, "%s", log);
     }
-    
-    ret = PyLong_FromLong(1);
-    return ret;
+    return PyLong_FromLong(0);
 }
 
 
 PyObject * warn_wrapper(PyObject * self, PyObject * args)
 {
     char * log;
-    PyObject * ret;
     
     // parse and cast into a bool the useColorVerbose argument given in python
     if (!PyArg_ParseTuple(args, "s", &log)) {
@@ -426,19 +350,16 @@ PyObject * warn_wrapper(PyObject * self, PyObject * args)
     Py_DECREF(funcTuple);
     
     if(strcmp(functionStr, "<module>") == 0){
-        igs_log(IGS_LOG_WARN, "main", log);
+        igs_log(IGS_LOG_WARN, "main", "%s", log);
     }else{
-        igs_log(IGS_LOG_WARN, functionStr, log);
+        igs_log(IGS_LOG_WARN, functionStr, "%s", log);
     }
-    
-    ret = PyLong_FromLong(1);
-    return ret;
+    return PyLong_FromLong(0);
 }
 
 PyObject * error_wrapper(PyObject * self, PyObject * args)
 {
     char * log;
-    PyObject * ret;
     
     // parse and cast into a bool the useColorVerbose argument given in python
     if (!PyArg_ParseTuple(args, "s", &log)) {
@@ -465,19 +386,16 @@ PyObject * error_wrapper(PyObject * self, PyObject * args)
     Py_DECREF(funcTuple);
     
     if(strcmp(functionStr, "<module>") == 0){
-        igs_log(IGS_LOG_ERROR, "main", log);
+        igs_log(IGS_LOG_ERROR, "main", "%s", log);
     }else{
-        igs_log(IGS_LOG_ERROR, functionStr, log);
+        igs_log(IGS_LOG_ERROR, functionStr, "%s", log);
     }
-    
-    ret = PyLong_FromLong(1);
-    return ret;
+    return PyLong_FromLong(0);
 }
 
 PyObject * fatal_wrapper(PyObject * self, PyObject * args)
 {
     char * log;
-    PyObject * ret;
     
     // parse and cast into a bool the useColorVerbose argument given in python
     if (!PyArg_ParseTuple(args, "s", &log)) {
@@ -496,72 +414,52 @@ PyObject * fatal_wrapper(PyObject * self, PyObject * args)
     const char* functionStr = 0;
     if (!PyArg_ParseTuple(funcTuple, "s", &functionStr)) {
         Py_DECREF(args);
-        return 0;
+        return PyLong_FromLong(1);
     }
     
     /* s now points to a const char* - use it, delete args when done */
     
     Py_DECREF(funcTuple);
     if(strcmp(functionStr, "<module>") == 0){
-        igs_log(IGS_LOG_FATAL, "main", log);
+        igs_log(IGS_LOG_FATAL, "main", "%s", log);
     }else{
-        igs_log(IGS_LOG_FATAL, functionStr, log);
+        igs_log(IGS_LOG_FATAL, functionStr, "%s", log);
     }
-
-    ret = PyLong_FromLong(1);
-    return ret;
+    return PyLong_FromLong(0);
 }
 
 PyObject * setLogLevel_wrapper(PyObject * self, PyObject * args)
 {
     int logLevel;
-    PyObject * ret;
-    
-    
     // parse and cast into a bool the useColorVerbose argument given in python
     if (!PyArg_ParseTuple(args, "i", &logLevel)) {
         return NULL;
     }
     igs_setLogLevel(logLevel);
-    
-    ret = PyLong_FromLong(1);
-    return ret;
-
+    return PyLong_FromLong(0);
 }
 
 PyObject * getLogLevel_wrapper(PyObject * self, PyObject * args)
 {
-    PyObject * ret;
-    
-    
     int log = igs_getLogLevel();
-    
-    ret = PyLong_FromLong(log);
-    return ret;
+    return PyLong_FromLong(log);
 }
 
 PyObject * setLicensePath_wrapper(PyObject * self, PyObject * args)
 {
     char * licensePath;
-    PyObject * ret;
-    
-    
     // parse and cast into a bool the useColorVerbose argument given in python
     if (!PyArg_ParseTuple(args, "s", &licensePath)) {
         return NULL;
     }
     igs_setLicensePath(licensePath);
-    
-    ret = PyLong_FromLong(1);
-    return ret;
+    return PyLong_FromLong(0);
     
 }
 
 PyObject * igs_getNetdevicesList_wrapper(PyObject * self, PyObject * args)
 {
     PyObject * ret;
-    
-    
     char **resultList;
     int nbList;
     igs_getNetdevicesList(&resultList, &nbList);
@@ -580,8 +478,6 @@ PyObject * igs_getNetdevicesList_wrapper(PyObject * self, PyObject * args)
 PyObject * igs_getNetadressesList_wrapper(PyObject * self, PyObject * args)
 {
     PyObject * ret;
-    
-    
     char **resultList;
     int nbList;
     igs_getNetaddressesList(&resultList, &nbList);

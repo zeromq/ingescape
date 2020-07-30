@@ -139,7 +139,7 @@ namespace CSharpSampleAgent
         #endregion
 
 
-        public int GetPort()
+        public uint GetPort()
         {
             return _igsPort;
         }
@@ -149,7 +149,8 @@ namespace CSharpSampleAgent
             return _igsDevice;
         }
 
-        public int init()
+        //public igs_result_t init()
+        public igs_result_t init()
         {
             if (!initialized)
             {
@@ -173,7 +174,7 @@ namespace CSharpSampleAgent
                             break;
                         case "port":
                             index = argsList.IndexOf(arg);
-                            _igsPort = Convert.ToInt32(argsList[index + 1]);
+                            _igsPort = Convert.ToUInt32(argsList[index + 1]);
                             break;
                         case "device":
                             index = argsList.IndexOf(arg);

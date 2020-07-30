@@ -5,13 +5,13 @@ VisualStudioVersion = 15.0.28307.1000
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ingescape", "ingescape.vcxproj", "{70769A56-0F77-41E4-9152-82BCC22B9E14}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libsodium", "..\..\..\libsodium\builds\msvc\vs2017\libsodium\libsodium.vcxproj", "{A185B162-6CB6-4502-B03F-B56F7699A8D9}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libsodium", "..\..\..\..\third-party\libsodium\builds\msvc\vs2017\libsodium\libsodium.vcxproj", "{A185B162-6CB6-4502-B03F-B56F7699A8D9}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libzmq", "..\..\..\libzmq\builds\msvc\vs2017\x64\libzmq.vcxproj", "{F1B953DB-2496-3DB5-835F-EF2766DA64EE}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libzmq", "..\..\..\..\third-party\libzmq\builds\msvc\vs2017\x64\libzmq.vcxproj", "{F1B953DB-2496-3DB5-835F-EF2766DA64EE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libczmq", "..\..\..\czmq\builds\msvc\vs2017\libczmq\libczmq.vcxproj", "{0C4A2E28-8C9E-4B27-85D9-BB679AD84AC7}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libczmq", "..\..\..\..\third-party\czmq\builds\msvc\vs2017\libczmq\libczmq.vcxproj", "{0C4A2E28-8C9E-4B27-85D9-BB679AD84AC7}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libzyre", "..\..\..\zyre\builds\msvc\vs2017\libzyre\libzyre.vcxproj", "{BF621796-B478-4FC7-9332-0D76AC83319D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libzyre", "..\..\..\..\third-party\zyre\builds\msvc\vs2017\libzyre\libzyre.vcxproj", "{BF621796-B478-4FC7-9332-0D76AC83319D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

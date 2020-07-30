@@ -62,13 +62,8 @@ void freeze(bool isPaused, void *myData){
     newElt->call = temp;
     newElt->arglist = temparglist;
     DL_APPEND(freezeList, newElt);
-
-    PyObject *result;
-    int ret = igs_observeFreeze(freeze, NULL);
-
-    result = PyLong_FromLong(ret);
     
-    return result;
-    
+    igs_observeFreeze(freeze, NULL);
+    return PyLong_FromLong(0);
 }
 
