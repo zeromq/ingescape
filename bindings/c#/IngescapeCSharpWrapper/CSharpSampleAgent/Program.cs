@@ -21,13 +21,8 @@ namespace CSharpSampleAgent
             Console.WriteLine(" ------------C# agent sample ------------");
 
             IgsAgent agent = new IgsAgent();
-            //igs_result_t res = agent.init();
-            igs_result_t res = agent.init();
-
-            if (res == 0)
-            {
-                Console.WriteLine(string.Format("IngeScape started with device : {0} and port : {1}", agent.GetDevice(), agent.GetPort()));
-            }
+            agent.init();
+            
 
 
 
@@ -54,9 +49,16 @@ namespace CSharpSampleAgent
                 }
                 if (cki.Key == ConsoleKey.R)
                 {
-                    Igs.startWithDevice("Wi-Fi",2009);
+                    if(Igs.isStarted())
+                    {
+                        Igs.stop();
+                    }                    
+                    igs_result_t res = Igs.startWithDevice(agent.GetDevice(), agent.GetPort());
+                    IgsAgent.printStartResult(res, agent.GetDevice(), agent.GetPort());
                 }
             }
         }
+
+       
     }
 }

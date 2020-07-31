@@ -15,7 +15,7 @@ namespace CSharpSampleAgent
     {
         #region Attributes
 
-        private int _igsPort = 5670;
+        private uint _igsPort = 4567;
         private string _igsDevice = "Wi-Fi";
         private string _mappingPath = "";
         private string _licensePath = "";
@@ -126,13 +126,20 @@ namespace CSharpSampleAgent
                                    ref string channel,
                                    object myData)
         {
-            if(eventInfo == "JOIN")
+            switch(eventInfo)
             {
-                Console.WriteLine("peerId : " + peerID + " name : " + name + " JOIN with address : " + address);
-            }
-            else if(eventInfo == "EXIT")
-            {
-                Console.WriteLine("peerId : " + peerID + " name : " + name + " EXIT with address : " + address);
+                case "WHISPER":
+                    Console.WriteLine("UUId : " + peerID + " name : " + name + " WHISPER with address : " + address);
+                    break;
+                case "SHOUT":
+                    Console.WriteLine("UUId : " + peerID + " name : " + name + " SHOUT with address : " + address);
+                    break;
+                case "JOIN":
+                    Console.WriteLine("UUId : " + peerID + " name : " + name + " JOIN with address : " + address);
+                    break;
+                case "EXIT":
+                    Console.WriteLine("UUId : " + peerID + " name : " + name + " EXIT with address : " + address);
+                    break;
             }
         }
 
@@ -150,7 +157,7 @@ namespace CSharpSampleAgent
         }
 
         //public igs_result_t init()
-        public igs_result_t init()
+        public void init()
         {
             if (!initialized)
             {
@@ -204,31 +211,44 @@ namespace CSharpSampleAgent
                 {
                     Console.WriteLine("netDevice " + netDevice);
                 }
-                              
-                
+
+                igs_result_t res;
+
                 // Pass our class instance (this) in paramater of the IngeScape callback(s) 
                 Igs.observeExternalStop(ForcedStopCB, this);
 
-                Igs.createInput("boolInput", iopType_t.IGS_BOOL_T);
-                Igs.createInput("stringInput", iopType_t.IGS_STRING_T);
-                Igs.createInput("intInput", iopType_t.IGS_INTEGER_T);
-                Igs.createInput("doubleInput", iopType_t.IGS_DOUBLE_T);
-                Igs.createInput("impulsionInput", iopType_t.IGS_IMPULSION_T);
-                Igs.createInput("dataInput", iopType_t.IGS_DATA_T);
+                res = Igs.createInput("boolInput", iopType_t.IGS_BOOL_T);
+                Console.WriteLine(string.Format("boolInput creating ... : {0} ", res));
+                res = Igs.createInput("stringInput", iopType_t.IGS_STRING_T);
+                Console.WriteLine(string.Format("stringInput creating ... : {0}", res));
+                res = Igs.createInput("intInput", iopType_t.IGS_INTEGER_T);
+                Console.WriteLine(string.Format("intInput creating ... : {0}", res));
+                res = Igs.createInput("doubleInput", iopType_t.IGS_DOUBLE_T);
+                Console.WriteLine(string.Format("doubleInput creating ... : {0}", res));
+                res = Igs.createInput("impulsionInput", iopType_t.IGS_IMPULSION_T);
+                Console.WriteLine(string.Format("impulsionInput creating ... : {0}", res));
+                res = Igs.createInput("dataInput", iopType_t.IGS_DATA_T);
+                Console.WriteLine(string.Format("dataInput creating ... : {0}", res));
 
-                Igs.observeInput("boolInput", OnInputCallback, this);
                 Igs.observeInput("stringInput", OnInputCallback, this);
+                Igs.observeInput("boolInput", OnInputCallback, this);
                 Igs.observeInput("intInput", OnInputCallback, this);
                 Igs.observeInput("doubleInput", OnInputCallback, this);
                 Igs.observeInput("impulsionInput", OnInputCallback, this);
                 Igs.observeInput("dataInput", OnInputCallback, this);
-
-                Igs.createOutput("boolOutput", iopType_t.IGS_BOOL_T);
-                Igs.createOutput("stringOutput", iopType_t.IGS_STRING_T);
-                Igs.createOutput("intOutput", iopType_t.IGS_INTEGER_T);
-                Igs.createOutput("doubleOutput", iopType_t.IGS_DOUBLE_T);
-                Igs.createOutput("impulsionOutput", iopType_t.IGS_IMPULSION_T);
-                Igs.createOutput("dataOutput", iopType_t.IGS_DATA_T);
+                 
+                res = Igs.createOutput("boolOutput", iopType_t.IGS_BOOL_T);
+                Console.WriteLine(string.Format("boolOutput creating ... : {0}", res));
+                res = Igs.createOutput("stringOutput", iopType_t.IGS_STRING_T);
+                Console.WriteLine(string.Format("stringOutput creating ... : {0}", res));
+                res = Igs.createOutput("intOutput", iopType_t.IGS_INTEGER_T);
+                Console.WriteLine(string.Format("intOutput creating ... : {0}", res));
+                res = Igs.createOutput("doubleOutput", iopType_t.IGS_DOUBLE_T);
+                Console.WriteLine(string.Format("doubleOutput creating ... : {0}", res));
+                res = Igs.createOutput("impulsionOutput", iopType_t.IGS_IMPULSION_T);
+                Console.WriteLine(string.Format("impulsionOutput creating ... : {0}", res));
+                res = Igs.createOutput("dataOutput", iopType_t.IGS_DATA_T);
+                Console.WriteLine(string.Format("dataOutput creating ... : {0}", res));
 
                 Igs.observeOutput("boolOutput", OnOutputCallback, this);
                 Igs.observeOutput("stringOutput", OnOutputCallback, this);
@@ -236,13 +256,19 @@ namespace CSharpSampleAgent
                 Igs.observeOutput("doubleOutput", OnOutputCallback, this);
                 Igs.observeOutput("impulsionOutput", OnOutputCallback, this);
                 Igs.observeOutput("dataOutput", OnOutputCallback, this);
-
-                Igs.createParameter("boolParameter", iopType_t.IGS_BOOL_T);
-                Igs.createParameter("stringParameter", iopType_t.IGS_STRING_T);
-                Igs.createParameter("intParameter", iopType_t.IGS_INTEGER_T);
-                Igs.createParameter("doubleParameter", iopType_t.IGS_DOUBLE_T);
-                Igs.createParameter("impulsionParameter", iopType_t.IGS_IMPULSION_T);
-                Igs.createParameter("dataParameter", iopType_t.IGS_DATA_T);
+                
+                res = Igs.createParameter("boolParameter", iopType_t.IGS_BOOL_T);
+                Console.WriteLine(string.Format("boolParameter creating ... : {0}", res));
+                res = Igs.createParameter("stringParameter", iopType_t.IGS_STRING_T);
+                Console.WriteLine(string.Format("stringParameter creating ... : {0}", res));
+                res = Igs.createParameter("intParameter", iopType_t.IGS_INTEGER_T);
+                Console.WriteLine(string.Format("intParameter creating ... : {0}", res));
+                res = Igs.createParameter("doubleParameter", iopType_t.IGS_DOUBLE_T);
+                Console.WriteLine(string.Format("doubleParameter creating ... : {0}", res));
+                res = Igs.createParameter("impulsionParameter", iopType_t.IGS_IMPULSION_T);
+                Console.WriteLine(string.Format("impulsionParameter creating ... : {0}", res));
+                res = Igs.createParameter("dataParameter", iopType_t.IGS_DATA_T);
+                Console.WriteLine(string.Format("dataParameter creating ... : {0}", res));
 
                 Igs.observeParameter("boolParameter", OnParameterCallback, this);
                 Igs.observeParameter("stringParameter", OnParameterCallback, this);
@@ -256,13 +282,14 @@ namespace CSharpSampleAgent
 
                 #region initCall 
 
-                int res = Igs.initCall("CallExample", CallExampleCB, this);
+                res = Igs.initCall("CallExample", CallExampleCB, this);
+                Console.WriteLine(string.Format("CallExample loading result : {0}",res.ToString()));
 
                 #endregion
 
-                return Igs.startWithDevice(_igsDevice, _igsPort);
+                res = Igs.startWithDevice(_igsDevice, _igsPort);
+                printStartResult(res, _igsDevice, _igsPort);
             }
-            return 0;
            
         }
 
@@ -275,6 +302,15 @@ namespace CSharpSampleAgent
             Console.Write(String.Format("--port port_number : port used for autodiscovery between agents (default: %d)\n", _igsPort));
             Console.Write("--device device_name : name of the network device to be used (useful if several devices available)\n");
             Console.Write(String.Format("--license path : path to the ingescape licenses files (default: %s)\n", _licensePath));
+        }
+
+        public static void printStartResult(igs_result_t res,string device,uint port)
+        {
+            Console.WriteLine(string.Format("Agent starting result : {0}", res.ToString()));
+            if (res == 0)
+            {
+                Console.WriteLine(string.Format("Agent started with device : {0} and port : {1}", device, port));
+            }
         }
     }
 }
