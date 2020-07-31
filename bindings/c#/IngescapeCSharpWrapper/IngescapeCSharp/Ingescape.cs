@@ -1298,8 +1298,8 @@ namespace Ingescape
                 }
 
                 // Release memory
-                igs_freeCallsList(intPtr, nbOfElements);
-
+                igs_freeCallsList(ref intPtr, nbOfElements);
+                //Marshal.FreeHGlobal(intPtr);
                 return list;
             }
             else return null;
@@ -1309,7 +1309,7 @@ namespace Ingescape
 
         // PUBLIC void igs_freeCallsList(char **list, size_t nbOfCalls);
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void igs_freeCallsList(IntPtr list, uint nbOfCalls);
+        private static extern void igs_freeCallsList(ref IntPtr list, uint nbOfCalls);
         //public static void freeCallsList(IntPtr list, uint nbOfCalls) { igs_freeCallsList(list, nbOfCalls); }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]

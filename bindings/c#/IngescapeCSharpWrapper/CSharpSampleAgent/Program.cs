@@ -32,6 +32,7 @@ namespace CSharpSampleAgent
                 Console.Write("Press 'X' to quit \n");
                 Console.WriteLine("Press 'S' to stop \n");
                 Console.WriteLine("Press 'R' to start \n");
+                Console.WriteLine("Press 'T' to show calls \n");
 
                 // Start a console read operation. Do not display the input.
                 cki = Console.ReadKey(true);
@@ -55,6 +56,14 @@ namespace CSharpSampleAgent
                     }                    
                     igs_result_t res = Igs.startWithDevice(agent.GetDevice(), agent.GetPort());
                     IgsAgent.printStartResult(res, agent.GetDevice(), agent.GetPort());
+                }
+                if (cki.Key == ConsoleKey.T)
+                {
+                    string[] calls = Igs.getCallsList();
+                    foreach(string call in calls)
+                    {
+                        Console.WriteLine(call);
+                    }
                 }
             }
         }
