@@ -1852,20 +1852,35 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 igsAgent_writeMappingToPath(agent);
                 free(uuid);
             }
-            //CALLS
             else if (streq (title, "CALL")){
                 //identify agent
                 char *callerUuid = zmsg_popstr (msgDuplicate);
                 char *calleeUuid = zmsg_popstr (msgDuplicate);
+                
+                igs_agent_t *callerAgent = NULL;
+                HASH_FIND_STR(context->remoteAgents, callerUuid, callerAgent);
+                if (callerAgent == NULL){
+                    HASH_FIND_STR(context->agents, callerUuid, callerAgent);
+                    if (callerAgent == NULL){
+                        igs_error("no caller agent with uuid '%s' in %s message received from %s(%s): aborting", callerUuid, title, name, peer);
+                        if (calleeUuid)
+                            free(calleeUuid);
+                        if (callerUuid)
+                            free(callerUuid);
+                        zmsg_destroy(&msgDuplicate);
+                        zyre_event_destroy(&zyre_event);
+                        return 0;
+                    }
+                }
 
                 igs_agent_t *calleeAgent = NULL;
                 HASH_FIND_STR(context->agents, calleeUuid, calleeAgent);
                 if (calleeAgent == NULL){
-                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", calleeUuid, title, name, peer);
-                    if (callerUuid)
-                        free(callerUuid);
+                    igs_error("no callee agent with uuid '%s' in %s message received from %s(%s): aborting", calleeUuid, title, name, peer);
                     if (calleeUuid)
                         free(calleeUuid);
+                    if (callerUuid)
+                        free(callerUuid);
                     zmsg_destroy(&msgDuplicate);
                     zyre_event_destroy(&zyre_event);
                     return 0;
@@ -1873,11 +1888,9 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 
                 char *callName = zmsg_popstr(msgDuplicate);
                 if (callName == NULL){
-                    igs_error("no valid call name in %s message received from %s(%s): aborting", title, name, peer);
-                    if (callerUuid)
-                        free(callerUuid);
-                    if (calleeUuid)
-                        free(calleeUuid);
+                    igs_error("no call name in %s message received from %s(%s): aborting", title, name, peer);
+                    free(callerUuid);
+                    free(calleeUuid);
                     zmsg_destroy(&msgDuplicate);
                     zyre_event_destroy(&zyre_event);
                     return 0;
@@ -1888,20 +1901,20 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                     if (call != NULL ){
                         if (call->cb != NULL){
                             bus_zyreLock();
-                            zyre_shouts(context->node, context->callsChannel, "%s from %s (%s)", callName, name, peer);
+                            zyre_shouts(context->node, context->callsChannel, "%s from %s (%s)", callName, callerAgent->name, callerUuid);
                             bus_zyreUnlock();
                             size_t nbArgs = 0;
                             igs_callArgument_t *_arg = NULL;
                             LL_COUNT(call->arguments, _arg, nbArgs);
                             if (call_addValuesToArgumentsFromMessage(callName, call->arguments, msgDuplicate) == IGS_SUCCESS){
-                                (call->cb)(calleeAgent, name, callerUuid, callName, call->arguments, nbArgs, call->cbData);
+                                (call->cb)(calleeAgent, callerAgent->name, callerUuid, callName, call->arguments, nbArgs, call->cbData);
                                 call_freeValuesInArguments(call->arguments);
                             }
                         }else{
                             igsAgent_warn(calleeAgent, "no defined callback to handle received call %s", callName);
                         }
                     }else{
-                        igsAgent_warn(calleeAgent, "agent %s has no call named %s", name, callName);
+                        igsAgent_warn(calleeAgent, "agent %s(%s) has no call named %s", calleeAgent->name, calleeUuid, callName);
                     }
                 }
                 free(callerUuid);
@@ -2619,24 +2632,22 @@ int network_timerCallback (zloop_t *loop, int timer_id, void *arg){
     return 1;
 }
 
+////////////////////////////////////////////////////////////////////////
+// PUBLIC API
+////////////////////////////////////////////////////////////////////////
 void igs_observeBus(igs_BusMessageIncoming cb, void *myData){
-    assert(cb);
     core_initContext();
-
+    assert(cb);
     igs_zyre_callback_t *newCb = calloc(1, sizeof(igs_zyre_callback_t));
     newCb->callback_ptr = cb;
     newCb->myData = myData;
     DL_APPEND(coreContext->zyreCallbacks, newCb);
 }
 
-////////////////////////////////////////////////////////////////////////
-// PUBLIC API
-////////////////////////////////////////////////////////////////////////
-
 igs_result_t igs_startWithDevice(const char *networkDevice, unsigned int port){
+    core_initAgent();
     assert(networkDevice);
     assert(port > 0);
-    core_initContext();
     
     if (coreContext->networkActor != NULL){
         //Agent is active : need to stop it first
@@ -2686,7 +2697,7 @@ igs_result_t igs_startWithDevice(const char *networkDevice, unsigned int port){
 igs_result_t igs_startWithIP(const char *ipAddress, unsigned int port){
     assert(ipAddress);
     assert(port > 0);
-    core_initContext();
+    core_initAgent();
     
     if (coreContext->networkActor != NULL){
         //Agent is already active : need to stop it first
@@ -2734,9 +2745,9 @@ igs_result_t igs_startWithIP(const char *ipAddress, unsigned int port){
 }
 
 igs_result_t igs_startWithDeviceOnBroker(const char *networkDevice, const char *brokerEndpoint){
+    core_initAgent();
     assert(networkDevice);
     assert(brokerEndpoint);
-    core_initContext();
     //TODO: manage a list of brokers instead of just one
     
     if (coreContext->networkActor != NULL){
@@ -2790,6 +2801,7 @@ igs_result_t igs_startWithDeviceOnBroker(const char *networkDevice, const char *
 
 
 void igs_stop(){
+    core_initContext();
     if (coreContext->networkActor != NULL){
         //interrupting and destroying ingescape thread and zyre layer
         //this will also clean all agent->subscribers
@@ -2832,6 +2844,7 @@ void igs_stop(){
 }
 
 bool igs_isStarted(){
+    core_initContext();
     network_Lock();
     if (coreContext->loop != NULL){
         network_Unlock();
@@ -2954,7 +2967,6 @@ void igs_observeFreeze(igs_freezeCallback cb, void *myData){
 void igsAgent_setAgentState(igs_agent_t *agent, const char *state){
     assert(agent);
     assert(state);
-    
     if (agent->state == NULL || !streq(state, agent->state)){
         if (agent->state != NULL)
             free(agent->state);
@@ -2983,6 +2995,7 @@ char *igsAgent_getAgentState(igs_agent_t *agent){
 
 
 void igsAgent_mute(igs_agent_t *agent){
+    assert(agent);
     if (!agent->isWholeAgentMuted)
     {
         agent->isWholeAgentMuted = true;
@@ -3004,6 +3017,7 @@ void igsAgent_mute(igs_agent_t *agent){
 
 
 void igsAgent_unmute(igs_agent_t *agent){
+    assert(agent);
     if (agent->isWholeAgentMuted)
     {
         agent->isWholeAgentMuted = false;
@@ -3025,6 +3039,7 @@ void igsAgent_unmute(igs_agent_t *agent){
 
 
 bool igsAgent_isMuted(igs_agent_t *agent){
+    assert(agent);
     return agent->isWholeAgentMuted;
 }
 
@@ -3039,6 +3054,7 @@ void igsAgent_observeMute(igs_agent_t *agent, igsAgent_muteCallback cb, void *my
 }
 
 char* igs_getCommandLine(void){
+    core_initContext();
     if (coreContext->commandLine == NULL){
         return NULL;
     }else{
@@ -3047,8 +3063,8 @@ char* igs_getCommandLine(void){
 }
 
 void igs_setCommandLine(const char *line){
-    assert(line);
     core_initContext();
+    assert(line);
     if (coreContext->commandLine != NULL)
         free(coreContext->commandLine);
     coreContext->commandLine = strndup(line, IGS_COMMAND_LINE_LENGTH);
@@ -3056,6 +3072,7 @@ void igs_setCommandLine(const char *line){
 }
 
 void igs_setCommandLineFromArgs(int argc, const char * argv[]){
+    core_initContext();
     if (argc < 1 || argv == NULL || argv[0] == NULL){
         igs_error("passed args must at least contain one element");
         return;
@@ -3210,8 +3227,8 @@ void igs_freeNetaddressesList(char **addresses, int nb){
 }
 
 void igs_observeExternalStop(igs_externalStopCallback cb, void *myData){
+    core_initAgent();
     assert(cb);
-    core_initContext();
     igs_external_stop_calback_t *newCb = calloc(1, sizeof(igs_external_stop_calback_t));
     newCb->callback_ptr = cb;
     newCb->myData = myData;
@@ -3258,8 +3275,8 @@ void igs_setLogStreamPort(unsigned int port){
 
 #if defined __unix__ || defined __APPLE__ || defined __linux__
 void igs_setIpcFolderPath(char *path){
-    assert(path);
     core_initContext();
+    assert(path);
     if (coreContext->network_ipcFolderPath == NULL || !streq(path, coreContext->network_ipcFolderPath)){
         if (*path == '/'){
             if (coreContext->network_ipcFolderPath != NULL){
@@ -3320,6 +3337,7 @@ void igs_setHighWaterMarks(int hwmValue){
 }
 
 void igs_raiseSocketsLimit(){
+    core_initContext();
 #if defined __unix__ || defined __APPLE__ || defined __linux__
     if (coreContext->network_shallRaiseFileDescriptorsLimit){
         struct rlimit limit;
@@ -3352,6 +3370,7 @@ void igs_raiseSocketsLimit(){
 }
 
 zsock_t* igs_getPipeToIngescape(void){
+    core_initContext();
     if (coreContext->networkActor != NULL){
         return zactor_sock(coreContext->networkActor);
     }else{
@@ -3362,7 +3381,7 @@ zsock_t* igs_getPipeToIngescape(void){
 
 int igs_timerStart(size_t delay, size_t times, igs_timerCallback cb, void *myData){
     core_initContext();
-    if (coreContext == NULL || coreContext->loop == NULL){
+    if (coreContext->loop == NULL){
         igs_error("Ingescape must be started to create a timer");
         return -1;
     }

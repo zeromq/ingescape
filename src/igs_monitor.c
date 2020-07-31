@@ -232,6 +232,7 @@ static void monitor_initLoop (zsock_t *pipe, void *args){
 }
 
 void igs_monitoringEnable(unsigned int period){
+    core_initContext();
     if (coreContext->monitor != NULL){
         igs_warn("monitor is already started");
         return;
@@ -245,6 +246,7 @@ void igs_monitoringEnable(unsigned int period){
 
 void igs_monitoringEnableWithExpectedDevice(unsigned int period,
                                             const char* networkDevice, unsigned int port){
+    core_initContext();
     if (coreContext->monitor != NULL){
         igs_warn("monitor is already started");
         return;
@@ -266,6 +268,7 @@ void igs_monitoringEnableWithExpectedDevice(unsigned int period,
 }
 
 void igs_monitoringDisable(){
+    core_initContext();
     if (coreContext->monitor == NULL){
         igs_warn("monitor is not started");
         return;
@@ -291,10 +294,12 @@ void igs_monitoringDisable(){
 }
 
 bool igs_isMonitoringEnabled(){
+    core_initContext();
     return (coreContext->monitor != NULL);
 }
 
 void igs_monitor(igs_monitorCallback cb, void *myData){
+    core_initContext();
     if (cb != NULL){
         igs_monitor_callback_t *newCb = calloc(1, sizeof(igs_monitor_callback_t));
         newCb->callback_ptr = cb;
@@ -306,5 +311,6 @@ void igs_monitor(igs_monitorCallback cb, void *myData){
 }
 
 void igs_monitoringShallStartStopAgent(bool flag){
+    core_initContext();
     coreContext->monitor_shallStartStopAgent = flag;
 }

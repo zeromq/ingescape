@@ -140,7 +140,6 @@ int igs_protocol(void){
 }
 
 void admin_log(igs_agent_t *agent, igs_logLevel_t level, const char *function, const char *fmt, ...){
-    core_initAgent();
     assert(agent);
     assert(function);
     assert(fmt);

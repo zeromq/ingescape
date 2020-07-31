@@ -61,6 +61,7 @@ void bus_zyreUnlock(void) {
 // PUBLIC FUNCTIONS
 ////////////////////////////////////////////////////////////////////////
 igs_result_t igs_busJoinChannel(const char *channel){
+    core_initContext();
     assert(channel && strlen(channel) > 0);
     if (strcmp(IGS_PRIVATE_CHANNEL, channel) == 0){
         igs_error("channel name %s is reserved and cannot be joined", channel);
@@ -78,6 +79,7 @@ igs_result_t igs_busJoinChannel(const char *channel){
 }
 
 void igs_busLeaveChannel(const char *channel){
+    core_initContext();
     assert(channel && strlen(channel) > 0);
     if (coreContext->networkActor != NULL && coreContext->node != NULL){
         bus_zyreLock();
@@ -89,13 +91,14 @@ void igs_busLeaveChannel(const char *channel){
 }
 
 igs_result_t igs_busSendStringToChannel(const char *channel, const char *msg, ...){
+    core_initContext();
     assert(channel);
     assert(msg);
     if (strcmp(IGS_PRIVATE_CHANNEL, channel) == 0){
         igs_error("channel name %s is reserved and cannot be used", channel);
         return IGS_FAILURE;
     }
-    if (coreContext == NULL || coreContext->node == NULL){
+    if (coreContext->node == NULL){
         igs_error("Ingescape must be started before trying to send a message");
         return IGS_FAILURE;
     }
@@ -113,12 +116,13 @@ igs_result_t igs_busSendStringToChannel(const char *channel, const char *msg, ..
 }
 
 igs_result_t igs_busSendDataToChannel(const char *channel, void *data, size_t size){
+    core_initContext();
     assert(channel);
     if (strcmp(IGS_PRIVATE_CHANNEL, channel) == 0){
         igs_error("channel name %s is reserved and cannot be used", channel);
         return IGS_FAILURE;
     }
-    if (coreContext == NULL || coreContext->node == NULL){
+    if (coreContext->node == NULL){
         igs_error("Ingescape must be started before trying to send a message");
         return IGS_FAILURE;
     }
@@ -134,6 +138,7 @@ igs_result_t igs_busSendDataToChannel(const char *channel, void *data, size_t si
 }
 
 igs_result_t igs_busSendZMQMsgToChannel(const char *channel, zmsg_t **msg_p){
+    core_initContext();
     assert(channel);
     assert(msg_p);
     assert(*msg_p);
@@ -141,7 +146,7 @@ igs_result_t igs_busSendZMQMsgToChannel(const char *channel, zmsg_t **msg_p){
         igs_error("channel name %s is reserved and cannot be used", channel);
         return IGS_FAILURE;
     }
-    if (coreContext == NULL || coreContext->node == NULL){
+    if (coreContext->node == NULL){
         igs_error("Ingescape must be started before trying to send a message");
         return IGS_FAILURE;
     }
@@ -154,9 +159,10 @@ igs_result_t igs_busSendZMQMsgToChannel(const char *channel, zmsg_t **msg_p){
 }
 
 igs_result_t igs_busSendStringToAgent(const char *agentNameOrAgentIdOrPeerID, const char *msg, ...){
+    core_initContext();
     assert(agentNameOrAgentIdOrPeerID);
     assert(msg);
-    if (coreContext == NULL || coreContext->node == NULL){
+    if (coreContext->node == NULL){
         igs_error("Ingescape must be started before trying to send a message");
         return IGS_FAILURE;
     }
@@ -204,8 +210,9 @@ igs_result_t igs_busSendStringToAgent(const char *agentNameOrAgentIdOrPeerID, co
 }
 
 igs_result_t igs_busSendDataToAgent(const char *agentNameOrAgentIdOrPeerID, void *data, size_t size){
+    core_initContext();
     assert(agentNameOrAgentIdOrPeerID);
-    if (coreContext == NULL || coreContext->node == NULL){
+    if (coreContext->node == NULL){
         igs_error("Ingescape must be started before trying to send a message");
         return IGS_FAILURE;
     }
@@ -247,10 +254,11 @@ igs_result_t igs_busSendDataToAgent(const char *agentNameOrAgentIdOrPeerID, void
 }
 
 igs_result_t igs_busSendZMQMsgToAgent(const char *agentNameOrAgentIdOrPeerID, zmsg_t **msg_p){
+    core_initContext();
     assert(agentNameOrAgentIdOrPeerID);
     assert(msg_p);
     assert(*msg_p);
-    if (coreContext == NULL || coreContext->node == NULL){
+    if (coreContext->node == NULL){
         igs_error("Ingescape must be started before trying to send a message");
         return IGS_FAILURE;
     }
@@ -293,6 +301,7 @@ igs_result_t igs_busSendZMQMsgToAgent(const char *agentNameOrAgentIdOrPeerID, zm
 }
 
 igs_result_t igs_busAddServiceDescription(const char *key, const char *value){
+    core_initContext();
     assert(key);
     assert(value);
     if (strcmp(key, "publisher") != 0
@@ -319,6 +328,7 @@ igs_result_t igs_busAddServiceDescription(const char *key, const char *value){
 }
 
 igs_result_t igs_busRemoveServiceDescription(const char *key){
+    core_initContext();
     assert(key);
     if (strcmp(key, "publisher") != 0
         && strcmp(key, "logger") != 0
