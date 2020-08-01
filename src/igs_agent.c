@@ -23,6 +23,7 @@ igs_agent_t *igsAgent_new(const char *name, bool activateImmediately){
     agent->uuid = strdup(zuuid_str(uuid));
     zuuid_destroy(&uuid);
     agent->name = strndup((name == NULL)?IGS_DEFAULT_AGENT_NAME:name, IGS_MAX_AGENT_NAME_LENGTH);
+    zhash_insert(coreContext->createdAgents, agent->uuid, agent);
     if (activateImmediately)
         igsAgent_activate(agent);
     return agent;
@@ -58,7 +59,7 @@ void igsAgent_destroy(igs_agent_t **agent){
         mapping_freeMapping(&(*agent)->mapping);
     if ((*agent)->definition)
         definition_freeDefinition(&(*agent)->definition);
-    
+    zhash_delete(coreContext->createdAgents, (*agent)->uuid);
     free(*agent);
     *agent = NULL;
 }

@@ -1392,28 +1392,26 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
 #endif
                 
             }
-            //TODO: to make this command work, we need to register deactivated agent.
-            //At the moment, deactivated agents are not stored by any ingescape
-            //structure and are managed directly by the developer.
-//            else if (streq(title, "START_AGENT")){
-//                char *agentName = zmsg_popstr (msgDuplicate);
-//                if (agentName == NULL){
-//                    igs_error("no agent name in %s message received from %s(%s): aborting", title, name, peer);
-//                    zmsg_destroy(&msgDuplicate);
-//                    zyre_event_destroy(&zyre_event);
-//                    return 0;
-//                }
-//
-//                igs_debug("received 'START_AGENT %s' command from %s (%s)", agentName, name, peer);
-//                igs_agent_t *a, *tmp;
-//                HASH_ITER(hh, context->agents, a, tmp){
-//                    if (streq(a->name, agentName)){
-//                        igs_info("activating agent %s (%s)", a->name, a->uuid);
-//                        igsAgent_activate(a);
-//                    }
-//                }
-//
-//            }
+            else if (streq(title, "START_AGENT")){
+                char *agentName = zmsg_popstr (msgDuplicate);
+                if (agentName == NULL){
+                    igs_error("no agent name in %s message received from %s(%s): aborting", title, name, peer);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
+
+                igs_debug("received 'START_AGENT %s' command from %s (%s)", agentName, name, peer);
+                igs_agent_t *a = zhash_first(coreContext->createdAgents);
+                while (a) {
+                    if (streq(a->name, agentName)){
+                        igs_info("activating agent %s (%s)", a->name, a->uuid);
+                        igsAgent_activate(a);
+                    }
+                    a = zhash_next(coreContext->createdAgents);
+                }
+
+            }
             else if (streq(title, "STOP_AGENT")){
                 char *uuid = zmsg_popstr (msgDuplicate);
                 igs_agent_t *agent = NULL;
@@ -1426,7 +1424,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                     zyre_event_destroy(&zyre_event);
                     return 0;
                 }
-                igs_debug("received STOP_AGENT command from %s (%s)", name, peer);
+                igs_debug("received 'STOP_AGENT %s' command from %s (%s)", uuid, name, peer);
                 igs_info("deactivating agent %s (%s)", agent->name, agent->uuid);
                 igsAgent_deactivate(agent);
                 
@@ -1857,20 +1855,17 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 char *callerUuid = zmsg_popstr (msgDuplicate);
                 char *calleeUuid = zmsg_popstr (msgDuplicate);
                 
-                igs_agent_t *callerAgent = NULL;
+                igs_remote_agent_t *callerAgent = NULL;
                 HASH_FIND_STR(context->remoteAgents, callerUuid, callerAgent);
                 if (callerAgent == NULL){
-                    HASH_FIND_STR(context->agents, callerUuid, callerAgent);
-                    if (callerAgent == NULL){
-                        igs_error("no caller agent with uuid '%s' in %s message received from %s(%s): aborting", callerUuid, title, name, peer);
-                        if (calleeUuid)
-                            free(calleeUuid);
-                        if (callerUuid)
-                            free(callerUuid);
-                        zmsg_destroy(&msgDuplicate);
-                        zyre_event_destroy(&zyre_event);
-                        return 0;
-                    }
+                    igs_error("no caller agent with uuid '%s' in %s message received from %s(%s): aborting", callerUuid, title, name, peer);
+                    if (calleeUuid)
+                        free(calleeUuid);
+                    if (callerUuid)
+                        free(callerUuid);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
                 }
 
                 igs_agent_t *calleeAgent = NULL;
