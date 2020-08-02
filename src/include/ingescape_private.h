@@ -333,6 +333,7 @@ typedef struct igs_core_context{
     igs_zyre_peer_t *zyrePeers;
     igs_zyre_callback_t *zyreCallbacks;
     igs_agent_t *agents;
+    zhash_t *createdAgents;
     igs_remote_agent_t *remoteAgents; //those our agents subscribed to
     zactor_t *networkActor;
     zyre_t *node;

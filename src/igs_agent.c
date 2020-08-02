@@ -16,12 +16,14 @@
 #include "ingescape_agent.h"
 
 igs_agent_t *igsAgent_new(const char *name, bool activateImmediately){
+    core_initContext();
     assert(name);
     igs_agent_t *agent = calloc(1, sizeof(igs_agent_t));
     zuuid_t *uuid = zuuid_new();
     agent->uuid = strdup(zuuid_str(uuid));
     zuuid_destroy(&uuid);
     agent->name = strndup((name == NULL)?IGS_DEFAULT_AGENT_NAME:name, IGS_MAX_AGENT_NAME_LENGTH);
+    zhash_insert(coreContext->createdAgents, agent->uuid, agent);
     if (activateImmediately)
         igsAgent_activate(agent);
     return agent;
@@ -57,14 +59,13 @@ void igsAgent_destroy(igs_agent_t **agent){
         mapping_freeMapping(&(*agent)->mapping);
     if ((*agent)->definition)
         definition_freeDefinition(&(*agent)->definition);
-    
+    zhash_delete(coreContext->createdAgents, (*agent)->uuid);
     free(*agent);
     *agent = NULL;
 }
 
 igs_result_t igsAgent_activate(igs_agent_t *agent){
     assert(agent);
-    core_initContext();
     igs_agent_t *a = NULL;
     HASH_FIND_STR(coreContext->agents, agent->uuid, a);
     if (a != NULL){
@@ -84,7 +85,6 @@ igs_result_t igsAgent_activate(igs_agent_t *agent){
 
 igs_result_t igsAgent_deactivate(igs_agent_t *agent){
     assert(agent);
-    core_initContext();
     igs_agent_t *a = NULL;
     HASH_FIND_STR(coreContext->agents, agent->uuid, a);
     if (a != NULL){
@@ -129,6 +129,9 @@ void igsAgent_observeActivate(igs_agent_t *agent, igsAgent_activateCallback cb, 
 }
 
 void igsAgent_log(igs_logLevel_t level, const char *function, igs_agent_t *agent, const char *format, ...){
+    assert(function);
+    assert(agent);
+    assert(format);
     va_list list;
     va_start(list, format);
     char content[MAX_STRING_MSG_LENGTH] = "";

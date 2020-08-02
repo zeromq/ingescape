@@ -726,11 +726,11 @@ void license_readLicense(igs_core_context_t *context){
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
 void igs_setLicensePath(const char *path){
+    core_initContext();
     if (path == NULL){
         igs_error("path cannot be NULL");
         return;
     }
-    core_initContext();
     char reviewedPath[IGS_MAX_PATH_LENGTH] = "";
     admin_makeFilePath(path, reviewedPath, IGS_MAX_PATH_LENGTH);
     if (zsys_file_exists(reviewedPath)){
@@ -752,11 +752,11 @@ char *igs_getLicensePath(){
 }
 
 bool igs_checkLicenseForAgent(const char *agentId){
+    core_initContext();
     if (agentId == NULL){
         igs_error("agent id is NULL");
         return false;
     }
-    core_initContext();
     license_readLicense(coreContext);
     if (agentId == NULL)
         return false;

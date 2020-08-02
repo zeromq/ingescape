@@ -20,7 +20,8 @@ int64_t performanceStart = 0;
 int64_t performanceStop = 0;
 
 void igs_performanceCheck(const char *peerId, size_t msgSize, size_t nbOfMsg){
-    if (coreContext == NULL || coreContext->node == NULL){
+    core_initContext();
+    if (coreContext->node == NULL){
         igs_error("agent must be started to execute performance tests");
         return;
     }

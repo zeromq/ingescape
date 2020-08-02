@@ -201,7 +201,8 @@ namespace Ingescape
         // Ingescape dll directory is in PATH, put just ingescape for dll import will :
         // For windows : add <name>.dll and search in PATH
         // For Unix/OsX : add lib<name>.dll and search in PATH
-        private const string ingescapeDLLPath = "ingescape";
+        private const string ingescapeDLLPath = "ingescape"; 
+        //private const string ingescapeDLLPath = "D:\\Ingescape_debug\\lib-windows-debug-x64\\build\\DebugX64\\Debug\\ingescaped.dll";
 
         #endregion
 
@@ -1156,7 +1157,7 @@ namespace Ingescape
         // passed arguments list will be deallocated and destroyed
         // PUBLIC int igs_sendCall(const char *agentNameOrUUID, const char *callName, igs_callArgument_t **list);
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_sendCall([MarshalAs(UnmanagedType.LPStr)] string agentNameOrUUID,
+        private static extern igs_result_t igs_sendCall([MarshalAs(UnmanagedType.LPStr)] string agentNameOrUUID,
                                                [MarshalAs(UnmanagedType.LPStr)] string callName,
                                                ref IntPtr list);
 
@@ -1170,7 +1171,7 @@ namespace Ingescape
         /// <param name="callName"></param>
         /// <param name="argumentsList"></param>
         /// <returns></returns>
-        public static int sendCall(string agentNameOrUUID, string callName, List<CallArgument> argumentsList)
+        public static igs_result_t sendCall(string agentNameOrUUID, string callName, List<CallArgument> argumentsList)
         {
             IntPtr ptr = IntPtr.Zero;
 
@@ -1213,7 +1214,7 @@ namespace Ingescape
             Console.WriteLine("call {0}-->{1}", agentNameOrUUID, callName);
             //Igs.sendCall("macosAgent", "OTHER_CALL", ref argsList);
 
-            int success = igs_sendCall(agentNameOrUUID, callName, ref ptr);
+            igs_result_t success = igs_sendCall(agentNameOrUUID, callName, ref ptr);
 
             // Free memory
             igs_destroyArgumentsList(ref ptr);
@@ -1231,10 +1232,10 @@ namespace Ingescape
         //will be ignored and signaled by an error log).
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_initCall([MarshalAs(UnmanagedType.LPStr)] string name,
+        private static extern igs_result_t igs_initCall([MarshalAs(UnmanagedType.LPStr)] string name,
                                                [MarshalAs(UnmanagedType.FunctionPtr)] igs_callFunctionC cb,
                                                IntPtr myData);
-        public static int initCall(string name, igs_callFunction cbCSharp, object myData)
+        public static igs_result_t initCall(string name, igs_callFunction cbCSharp, object myData)
         {
             Tuple<igs_callFunction, object> tupleData = new Tuple<igs_callFunction, object>(cbCSharp, myData);
             GCHandle gCHandle = GCHandle.Alloc(tupleData);
@@ -1248,16 +1249,16 @@ namespace Ingescape
 
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_removeCall([MarshalAs(UnmanagedType.LPStr)] string name);
-        public static int removeCall(string name) { return igs_removeCall(name); }
+        private static extern igs_result_t igs_removeCall([MarshalAs(UnmanagedType.LPStr)] string name);
+        public static igs_result_t removeCall(string name) { return igs_removeCall(name); }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_addArgumentToCall([MarshalAs(UnmanagedType.LPStr)] string callName, [MarshalAs(UnmanagedType.LPStr)] string argName, iopType_t type);
-        public static int addArgumentToCall(string callName, string argName, iopType_t type) { return igs_addArgumentToCall(callName, argName, type); }
+        private static extern igs_result_t igs_addArgumentToCall([MarshalAs(UnmanagedType.LPStr)] string callName, [MarshalAs(UnmanagedType.LPStr)] string argName, iopType_t type);
+        public static igs_result_t addArgumentToCall(string callName, string argName, iopType_t type) { return igs_addArgumentToCall(callName, argName, type); }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_removeArgumentFromCall([MarshalAs(UnmanagedType.LPStr)] string callName, [MarshalAs(UnmanagedType.LPStr)] string argName);
-        public static int removeArgumentFromCall(string callName, string argName) { return igs_removeArgumentFromCall(callName, argName); }
+        private static extern igs_result_t igs_removeArgumentFromCall([MarshalAs(UnmanagedType.LPStr)] string callName, [MarshalAs(UnmanagedType.LPStr)] string argName);
+        public static igs_result_t removeArgumentFromCall(string callName, string argName) { return igs_removeArgumentFromCall(callName, argName); }
 
         // Introspection for calls, arguments and replies
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -1297,8 +1298,8 @@ namespace Ingescape
                 }
 
                 // Release memory
-                igs_freeCallsList(intPtr, nbOfElements);
-
+                igs_freeCallsList(ref intPtr, nbOfElements);
+                //Marshal.FreeHGlobal(intPtr);
                 return list;
             }
             else return null;
@@ -1308,7 +1309,7 @@ namespace Ingescape
 
         // PUBLIC void igs_freeCallsList(char **list, size_t nbOfCalls);
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void igs_freeCallsList(IntPtr list, uint nbOfCalls);
+        private static extern void igs_freeCallsList(ref IntPtr list, uint nbOfCalls);
         //public static void freeCallsList(IntPtr list, uint nbOfCalls) { igs_freeCallsList(list, nbOfCalls); }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -1775,7 +1776,7 @@ namespace Ingescape
             //ISO-8859-1
             native += "\0";
             byte[] bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(native);
-            Console.WriteLine(BitConverter.ToString(bytes));
+            //Console.WriteLine(BitConverter.ToString(bytes));
             IntPtr ptr = Marshal.AllocHGlobal(bytes.Length);
 
             Marshal.Copy(bytes, 0, ptr, bytes.Length);

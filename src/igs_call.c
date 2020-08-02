@@ -422,8 +422,7 @@ igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, 
     assert(agent);
     assert(agentNameOrUUID);
     assert(callName);
-    assert(list);
-    assert(*list);
+    assert((list == NULL) || (*list != NULL));
     
     bool found = false;
     
@@ -529,7 +528,7 @@ igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, 
                         continue;
                     }else{
                         //update call arguments values with new ones
-                        if(call->arguments){
+                        if (call->arguments && (list != NULL)){
                             call_copyArguments(*list, call->arguments);
                         }
                         if (call->cb != NULL){
@@ -554,8 +553,10 @@ igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, 
         }
     }
     
-    call_freeCallArguments(*list);
-    *list = NULL;
+    if ((list != NULL) && (*list!=NULL)){
+        call_freeCallArguments(*list);
+        *list = NULL;
+    }
     
     if (!found){
         igsAgent_error(agent, "could not find an agent with name or UUID : %s", agentNameOrUUID);

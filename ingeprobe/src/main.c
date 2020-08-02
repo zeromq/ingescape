@@ -1057,7 +1057,7 @@ void print_commands(){
     printf("/stop_peer peer : stops this peer and all attached agents\n\t(peer can be  name or uuid)\n");
     printf("\ningescape layer:\n");
     printf("/agents : list all agents by peer\n");
-    //printf("/start agent : starts this agent\n\t(agent can be  name or uuid)\n");
+    printf("/start peer agent : starts an agent on designated peer\n\t(agent is name, peer can be  name or uuid)\n");
     printf("/stop agent : stops this agent\n\t(agent can be  name or uuid)\n");
     printf("/subscribe agent : subscribes to all ingescape outputs for this agent\n\t(agent can be  name or uuid)\n");
     printf("/subscribe agent output : subscribes to ingescape agent specific output\n\t(agent can be  name or uuid)\n");
