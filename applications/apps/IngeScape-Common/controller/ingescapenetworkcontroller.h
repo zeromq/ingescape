@@ -34,8 +34,9 @@ extern "C" {
 }
 
 
-static const QString prefix_Definition = "EXTERNAL_DEFINITION#";
-static const QString prefix_Mapping = "EXTERNAL_MAPPING#";
+static const QString MESSAGE_DEFINITION = "EXTERNAL_DEFINITION#";
+static const QString MESSAGE_MAPPING = "EXTERNAL_MAPPING#";
+static const QString MESSAGE_REMOTE_AGENT_EXIT = "REMOTE_AGENT_EXIT";
 
 
 /**
@@ -181,20 +182,14 @@ public:
 
     /**
      * @brief Manage a "Shouted" message
-     * @param peerId
-     * @param peerName
-     * @param zMessage
      */
-    void manageShoutedMessage(QString peerId, QString peerName, zmsg_t* zMessage);
+    void manageShoutedMessage(PeerM* peer, zmsg_t* zMessage);
 
 
     /**
      * @brief Manage a "Whispered" message
-     * @param peerId
-     * @param peerName
-     * @param zMessage
      */
-    void manageWhisperedMessage(QString peerId, QString peerName, zmsg_t* zMessage);
+    void manageWhisperedMessage(PeerM* peer, zmsg_t* zMessage);
 
 
     /**
@@ -389,20 +384,14 @@ Q_SIGNALS:
 
     /**
      * @brief Signal emitted when an agent definition has been received
-     * @param peer id
-     * @param peer name
-     * @param definitionJSON
      */
-    void definitionReceived(QString peerId, QString peerName, QString definitionJSON);
+    void definitionReceived(PeerM* peer, QString agentUid, QString agentName, QString definitionJSON);
 
 
     /**
      * @brief Signal emitted when an agent mapping has been received
-     * @param peerId
-     * @param peerName
-     * @param mappingJSON
      */
-    void mappingReceived(QString peerId, QString peerName, QString mappingJSON);
+    void mappingReceived(PeerM* peer, QString agentUid, QString mappingJSON);
 
 
     /**

@@ -121,7 +121,7 @@ QJsonArray EditorModelManager::exportAgentsToJSON()
                         // Hostname and Command Line must be defined to be added to the array of clones
                         if ((model != nullptr) && !model->hostname().isEmpty() && !model->commandLine().isEmpty())
                         {
-                            qDebug() << "Export" << model->name() << "on" << model->hostname() << "at" << model->commandLine() << "(" << model->peerId() << ")";
+                            qDebug() << "Export" << model->name() << "on" << model->hostname() << "at" << model->commandLine();
 
                             QJsonObject jsonClone = QJsonObject();
                             jsonClone.insert("hostname", model->hostname());

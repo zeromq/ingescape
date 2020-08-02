@@ -21,22 +21,18 @@
 
 /**
  * @brief Constructor
- * @param name
- * @param peerId
- * @param ipAddress
- * @param hostname
- * @param commandLine
- * @param parent
  */
 AgentM::AgentM(QString name,
-               QString peerId,
+               QString uid,
+               PeerM* peer,
                QString ipAddress,
                QString hostname,
                QString commandLine,
                bool isON,
                QObject *parent) : QObject(parent),
     _name(name),
-    _peerId(peerId),
+    _uid(uid),
+    _peer(peer),
     _address(ipAddress),
     _hostname(hostname),
     _commandLine(commandLine),
@@ -57,7 +53,7 @@ AgentM::AgentM(QString name,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    qInfo() << "New Model of Agent" << _name << "(" << _peerId << ") on" << _hostname << "(" << _address << ") and command" << _commandLine;
+    qInfo() << "New Model of Agent" << _name << "(" << _uid << ") on" << _hostname << "(" << _address << ") and command" << _commandLine;
 }
 
 
@@ -66,7 +62,7 @@ AgentM::AgentM(QString name,
  */
 AgentM::~AgentM()
 {
-    qInfo() << "Delete Model of Agent" << _name << "(" << _peerId << ") on" << _hostname << "(" << _address << ") and command" << _commandLine;
+    qInfo() << "Delete Model of Agent" << _name << "(" << _uid << ") on" << _hostname << "(" << _address << ") and command" << _commandLine;
 
     // Delete our agent definition
     if (_definition != nullptr) {
@@ -85,6 +81,8 @@ AgentM::~AgentM()
         setmapping(nullptr);
         delete temp;
     }
+
+    setpeer(nullptr);
 }
 
 
@@ -175,9 +173,13 @@ void AgentM::setisMutedOfOutput(bool isMuted, QString outputName)
  */
 void AgentM::clearNetworkData()
 {
-    Q_EMIT networkDataWillBeCleared(_peerId);
+    if (_peer != nullptr)
+    {
+        // FIXME TODO "Q_EMIT networkDataWillBeCleared(_peer->uid())" ?
+        Q_EMIT networkDataWillBeCleared(_peer->uid());
+        setpeer(nullptr);
+    }
 
-    setpeerId("");
     setaddress("");
     sethostname(HOSTNAME_NOT_DEFINED);
     setcommandLine("");

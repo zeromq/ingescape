@@ -1359,18 +1359,18 @@ void AgentsMappingController::_onAgentIsONChanged(bool isON)
 void AgentsMappingController::_onAgentModelONhasBeenAdded(AgentM* model)
 {
     // Model of Agent ON
-    if ((model != nullptr) && model->isON() && !model->name().isEmpty() && !model->peerId().isEmpty())
+    if ((model != nullptr) && model->isON() && !model->name().isEmpty()
+            && (model->peer() != nullptr))
     {
         if (_imposeMappingToAgentsON)
         {
             // We IMPOSE the mapping of agent that connect on our network
             // Send the message "CLEAR MAPPING" to this agent
-            IngeScapeNetworkController::instance()->sendStringMessageToAgent(model->peerId(), command_ClearMapping);
+            IngeScapeNetworkController::instance()->sendStringMessageToAgent(model->peer()->uid(), command_ClearMapping);
         }
         else
         {
-            QString agentName = model->name();
-            AgentsGroupedByNameVM* agentsGroupedByName = IngeScapeModelManager::instance()->getAgentsGroupedForName(agentName);
+            AgentsGroupedByNameVM* agentsGroupedByName = IngeScapeModelManager::instance()->getAgentsGroupedForName(model->name());
             if (agentsGroupedByName != nullptr)
             {
                 // Get a random position in the current window

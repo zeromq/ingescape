@@ -158,10 +158,10 @@ void HostVM::startAgent(AgentM* agent)
  */
 void HostVM::stopAgent(AgentM* agent)
 {
-    if (agent != nullptr)
+    if ((agent != nullptr) && (agent->peer() != nullptr))
     {
         // Send the message "Stop Agent" to this host (IngeScape Launcher)
-        IngeScapeNetworkController::instance()->sendStringMessageToAgent(agent->peerId(), command_StopAgent);
+        IngeScapeNetworkController::instance()->sendStringMessageToAgent(agent->peer()->uid(), command_StopAgent);
     }
 }
 
@@ -170,7 +170,8 @@ void HostVM::stopAgent(AgentM* agent)
  * @brief Add an agent model to list and connect to its isONChanged signal
  * @param agent
  */
-void HostVM::addAgentModelToList(AgentM* agent) {
+void HostVM::addAgentModelToList(AgentM* agent)
+{
     if (!_agentsList.contains(agent))
     {
         // Update flag about number of agents ON

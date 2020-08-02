@@ -21,6 +21,7 @@
 
 #include <I2PropertyHelpers.h>
 
+#include "model/peerm.h"
 #include <model/agent/definition/definitionm.h>
 #include <model/agent/mapping/agentmappingm.h>
 
@@ -35,8 +36,10 @@ class AgentM : public QObject
     // Name of our agent
     I2_QML_PROPERTY(QString, name)
 
-    // Peer ID of our agent (unique identifier)
-    I2_QML_PROPERTY_READONLY(QString, peerId)
+    // Unique identifier of our agent
+    I2_QML_PROPERTY_READONLY(QString, uid)
+
+    I2_QML_PROPERTY(PeerM*, peer)
 
     // IP address of our agent
     I2_QML_PROPERTY_READONLY(QString, address)
@@ -92,15 +95,17 @@ public:
     /**
      * @brief Constructor
      * @param name
-     * @param peerId optional (empty by default)
-     * @param ipAddress optional (empty by default)
-     * @param hostname optional (default value)
-     * @param commandLine optional (empty by default)
-     * @param isON optional (false by default)
+     * @param uid optional
+     * @param peer optional
+     * @param ipAddress optional
+     * @param hostname optional
+     * @param commandLine optional
+     * @param isON optional
      * @param parent
      */
     explicit AgentM(QString name,
-                    QString peerId = "",
+                    QString uid = "",
+                    PeerM* peer = nullptr,
                     QString ipAddress = "",
                     QString hostname = HOSTNAME_NOT_DEFINED,
                     QString commandLine = "",

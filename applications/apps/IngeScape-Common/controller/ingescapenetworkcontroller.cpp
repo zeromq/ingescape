@@ -135,7 +135,7 @@ void onBusMessageIncommingCallback(const char *event,
                     {
                         ingeScapeNetworkC->setnumberOfAgents(ingeScapeNetworkC->numberOfAgents() + 1);
 
-                        Q_EMIT ingeScapeNetworkC->agentEntered(peerId, peerName, ipAddress, hostname, commandLine, loggerPort);
+                        //Q_EMIT ingeScapeNetworkC->agentEntered(peerId, peerName, ipAddress, hostname, commandLine, loggerPort);
                     }
                         break;
 
@@ -198,8 +198,9 @@ void onBusMessageIncommingCallback(const char *event,
         {
             zmsg_t* msg_dup = zmsg_dup(msg);
 
-            // Manage the "Shouted" message
-            ingeScapeNetworkC->manageShoutedMessage(peerId, peerName, msg_dup);
+            PeerM* peer = ingeScapeNetworkC->getPeerWithId(peerId);
+
+            ingeScapeNetworkC->manageShoutedMessage(peer, msg_dup);
 
             zmsg_destroy(&msg_dup);
         }
@@ -208,8 +209,9 @@ void onBusMessageIncommingCallback(const char *event,
         {
             zmsg_t* msg_dup = zmsg_dup(msg);
 
-            // Manage the "Whispered" message
-            ingeScapeNetworkC->manageWhisperedMessage(peerId, peerName, msg_dup);
+            PeerM* peer = ingeScapeNetworkC->getPeerWithId(peerId);
+
+            ingeScapeNetworkC->manageWhisperedMessage(peer, msg_dup);
 
             zmsg_destroy(&msg_dup);
         }
@@ -923,101 +925,126 @@ bool IngeScapeNetworkController::isAvailableNetworkDevice(QString networkDevice)
 
 /**
  * @brief Manage a "Shouted" message
- * @param peerId
- * @param peerName
- * @param zMessage
  */
-void IngeScapeNetworkController::manageShoutedMessage(QString peerId, QString peerName, zmsg_t* zMessage)
+void IngeScapeNetworkController::manageShoutedMessage(PeerM* peer, zmsg_t* zMessage)
 {
-    uint count = static_cast<uint>(zmsg_size(zMessage));
-
-    QString messagePart1 = zmsg_popstr(zMessage);
-
-    qDebug() << "SHOUTED message '" << messagePart1 << "' with" << count << "parts for agent" << peerName << "(" << peerId << ")";
-
-    // Message contains only one string
-    if (count == 1)
+    if ((peer != nullptr) && (zMessage != nullptr))
     {
-        Q_EMIT shoutedMessageReceived(peerId, peerName, messagePart1);
-    }
-    // Message contains several parts
-    else //if (count > 1)
-    {
-        QStringList messageOthersParts;
+        uint count = static_cast<uint>(zmsg_size(zMessage));
 
-        for (uint i = 1; i < count; i++)
+        QString messageType = zmsg_popstr(zMessage);
+
+        qDebug() << "SHOUTED message '" << messageType << "' with" << count << "parts for peer" << peer->name() << "(" << peer->uid() << ")";
+
+        if (messageType == MESSAGE_REMOTE_AGENT_EXIT)
         {
-            zframe_t* frame = zmsg_pop(zMessage);
-            if (frame != nullptr)
-            {
-                messageOthersParts.append( QString(zframe_strdup(frame)) );
-                zframe_destroy(&frame);
-            }
+            QString agentUid = zmsg_popstr(zMessage);
+
+            qDebug() << agentUid << "exited !!!";
         }
 
-        Q_EMIT shoutedMessageReceived(peerId, peerName, messagePart1, messageOthersParts);
-    }
+        // Message contains only one string
+        /*if (count == 1)
+        {
+            Q_EMIT shoutedMessageReceived(peerId, peerName, messagePart1);
+        }
+        // Message contains several parts
+        else //if (count > 1)
+        {
+            QStringList messageOthersParts;
 
-    //qDebug() << "Not yet managed SHOUTED message '" << messagePart1 << "' with" << count << "parts for agent" << peerName << "(" << peerId << ")";
+            for (uint i = 1; i < count; i++)
+            {
+                zframe_t* frame = zmsg_pop(zMessage);
+                if (frame != nullptr)
+                {
+                    messageOthersParts.append( QString(zframe_strdup(frame)) );
+                    zframe_destroy(&frame);
+                }
+            }
+
+            Q_EMIT shoutedMessageReceived(peerId, peerName, messagePart1, messageOthersParts);
+        }*/
+
+        //qDebug() << "Not yet managed SHOUTED message '" << messagePart1 << "' with" << count << "parts for agent" << peerName << "(" << peerId << ")";
+    }
 }
 
 
 /**
  * @brief Manage a "Whispered" message
- * @param peerId
- * @param peerName
- * @param zMessage
  */
-void IngeScapeNetworkController::manageWhisperedMessage(QString peerId, QString peerName, zmsg_t* zMessage)
+void IngeScapeNetworkController::manageWhisperedMessage(PeerM* peer, zmsg_t* zMessage)
 {
-    uint count = static_cast<uint>(zmsg_size(zMessage));
-
-    QString messagePart1 = zmsg_popstr(zMessage);
-
-    //qDebug() << "WHISPERED message '" << messagePart1 << "' with" << count << "parts for agent" << peerName << "(" << peerId << ")";
-
-    // Message contains only one string
-    if (count == 1)
+    if ((peer != nullptr) && (zMessage != nullptr))
     {
-        // An agent DEFINITION has been received
-        if (messagePart1.startsWith(prefix_Definition))
-        {
-            QString definitionJSON = messagePart1.remove(0, prefix_Definition.length());
+        uint count = static_cast<uint>(zmsg_size(zMessage));
 
-            Q_EMIT definitionReceived(peerId, peerName, definitionJSON);
+        QString messageType = zmsg_popstr(zMessage);
+
+        qDebug() << "WHISPERED message '" << messageType << "' with" << count << "parts for peer" << peer->name() << "(" << peer->uid() << ")";
+
+        // An agent DEFINITION has been received
+        if (messageType == MESSAGE_DEFINITION)
+        {
+            QString definitionJSON = zmsg_popstr(zMessage);
+            QString agentUid = zmsg_popstr(zMessage);
+            QString agentName = zmsg_popstr(zMessage);
+
+            Q_EMIT definitionReceived(peer, agentUid, agentName, definitionJSON);
         }
         // An agent MAPPING has been received
-        else if (messagePart1.startsWith(prefix_Mapping))
+        else if (messageType == MESSAGE_MAPPING)
         {
-            QString mappingJSON = messagePart1.remove(0, prefix_Mapping.length());
+            QString mappingJSON = zmsg_popstr(zMessage);
+            QString agentUid = zmsg_popstr(zMessage);
 
-            Q_EMIT mappingReceived(peerId, peerName, mappingJSON);
+            Q_EMIT mappingReceived(peer, agentUid, mappingJSON);
         }
-        // Other message has been received
-        else
-        {
-            Q_EMIT whisperedMessageReceived(peerId, peerName, messagePart1);
-        }
-    }
-    // Message contains several parts
-    else //if (count > 1)
-    {
-        QStringList messageOthersParts;
 
-        for (uint i = 1; i < count; i++)
+        // Message contains only one string
+        /*if (count == 1)
         {
-            zframe_t* frame = zmsg_pop(zMessage);
-            if (frame != nullptr)
+            // An agent DEFINITION has been received
+            if (messagePart1.startsWith(prefix_Definition))
             {
-                messageOthersParts.append( QString(zframe_strdup(frame)) );
-                zframe_destroy(&frame);
+                QString definitionJSON = messagePart1.remove(0, prefix_Definition.length());
+
+                Q_EMIT definitionReceived(peerId, peerName, definitionJSON);
+            }
+            // An agent MAPPING has been received
+            else if (messagePart1.startsWith(prefix_Mapping))
+            {
+                QString mappingJSON = messagePart1.remove(0, prefix_Mapping.length());
+
+                Q_EMIT mappingReceived(peerId, peerName, mappingJSON);
+            }
+            // Other message has been received
+            else
+            {
+                Q_EMIT whisperedMessageReceived(peerId, peerName, messagePart1);
             }
         }
+        // Message contains several parts
+        else //if (count > 1)
+        {
+            QStringList messageOthersParts;
 
-        Q_EMIT whisperedMessageReceived(peerId, peerName, messagePart1, messageOthersParts);
+            for (uint i = 1; i < count; i++)
+            {
+                zframe_t* frame = zmsg_pop(zMessage);
+                if (frame != nullptr)
+                {
+                    messageOthersParts.append( QString(zframe_strdup(frame)) );
+                    zframe_destroy(&frame);
+                }
+            }
+
+            Q_EMIT whisperedMessageReceived(peerId, peerName, messagePart1, messageOthersParts);
+        }*/
+
+        //qDebug() << "Not yet managed WHISPERED message '" << messagePart1 << "' with" << count << "parts for agent" << peerName << "(" << peerId << ")";
     }
-
-    //qDebug() << "Not yet managed WHISPERED message '" << messagePart1 << "' with" << count << "parts for agent" << peerName << "(" << peerId << ")";
 }
 
 

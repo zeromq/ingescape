@@ -176,6 +176,26 @@ AgentM* IngeScapeModelManager::createAgentModel(QString agentName,
     return agent;
 }
 
+AgentM* IngeScapeModelManager::createAgentModel(PeerM* peer,
+                                                QString agentUid,
+                                                QString agentName,
+                                                DefinitionM* definition,
+                                                bool isON)
+{
+    AgentM* agent = new AgentM(agentName,
+                               agentUid,
+                               peer,
+                               "",
+                               HOSTNAME_NOT_DEFINED,
+                               "",
+                               isON,
+                               this);
+
+    // FIXME TBC
+
+    return agent;
+}
+
 
 /**
  * @brief Delete a model of agent
@@ -884,17 +904,31 @@ void IngeScapeModelManager::onLauncherExited(QString peerId, QString hostName)
 
 /**
  * @brief Slot called when an agent definition has been received and must be processed
- * @param peer Id
- * @param agent name
- * @param definition in JSON format
  */
-void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentName, QString definitionJSON)
+void IngeScapeModelManager::onDefinitionReceived(PeerM* peer, QString agentUid, QString agentName, QString definitionJSON)
 {
-    Q_UNUSED(agentName)
+    AgentM* agent = getAgentModelFromPeerId(agentUid);
 
-    AgentM* agent = getAgentModelFromPeerId(peerId);
+    // An agent with this uid already exist
+    if (agent != nullptr)
+    {
 
-    if ((agent != nullptr) && !definitionJSON.isEmpty())
+    }
+    // New uid --> new agent
+    else
+    {
+        // Create the new model of agent definition from JSON
+        DefinitionM* newDefinition = JsonHelper::createModelOfAgentDefinitionFromBytes(definitionJSON.toUtf8());
+
+        // Create a new model of agent
+        agent = createAgentModel(peer,
+                                 agentUid,
+                                 agentName,
+                                 newDefinition,
+                                 true);
+    }
+
+    /*if ((agent != nullptr) && !definitionJSON.isEmpty())
     {
         // Save the previous agent definition
         DefinitionM* previousDefinition = agent->definition();
@@ -925,20 +959,18 @@ void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentNa
                 }
             }
         }
-    }
+    }*/
 }
 
 
 /**
  * @brief Slot called when an agent mapping has been received and must be processed
- * @param peer Id
- * @param agent name
- * @param mapping in JSON format
  */
-void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName, QString mappingJSON)
+void IngeScapeModelManager::onMappingReceived(PeerM* peer, QString agentUid, QString mappingJSON)
 {
-    AgentM* agent = getAgentModelFromPeerId(peerId);
+    Q_UNUSED(peer)
 
+    AgentM* agent = getAgentModelFromPeerId(agentUid);
     if (agent != nullptr)
     {
         // Save the previous agent mapping
@@ -948,13 +980,13 @@ void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName,
 
         if (mappingJSON.isEmpty())
         {
-            QString mappingName = QString("EMPTY MAPPING of %1").arg(agentName);
+            QString mappingName = QString("EMPTY MAPPING of %1").arg(agent->name());
             newMapping = new AgentMappingM(mappingName, "", "");
         }
         else
         {
             // Create the new model of agent mapping from the JSON
-            newMapping = JsonHelper::createModelOfAgentMappingFromBytes(agentName, mappingJSON.toUtf8());
+            newMapping = JsonHelper::createModelOfAgentMappingFromBytes(agent->name(), mappingJSON.toUtf8());
         }
 
         if (newMapping != nullptr)

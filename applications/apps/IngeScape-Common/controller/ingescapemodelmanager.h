@@ -22,6 +22,7 @@
 #include <model/enums.h>
 #include <model/jsonhelper.h>
 #include <model/publishedvaluem.h>
+#include <model/peerm.h>
 #include <model/hostm.h>
 #include <viewModel/agentsgroupedbynamevm.h>
 
@@ -91,6 +92,12 @@ public:
                              QString commandLine = "",
                              QString peerId = "",
                              QString ipAddress = "",
+                             bool isON = false);
+
+    AgentM* createAgentModel(PeerM* peer,
+                             QString agentUid,
+                             QString agentName,
+                             DefinitionM* definition = nullptr,
                              bool isON = false);
 
 
@@ -345,20 +352,14 @@ public Q_SLOTS:
 
     /**
      * @brief Slot called when an agent definition has been received and must be processed
-     * @param peer Id
-     * @param agent name
-     * @param definition in JSON format
      */
-    void onDefinitionReceived(QString peerId, QString agentName, QString definitionJSON);
+    void onDefinitionReceived(PeerM* peer, QString agentUid, QString agentName, QString definitionJSON);
 
 
     /**
      * @brief Slot called when an agent mapping has been received and must be processed
-     * @param peer Id
-     * @param agent name
-     * @param mapping in JSON format
      */
-    void onMappingReceived(QString peerId, QString agentName, QString mappingJSON);
+    void onMappingReceived(PeerM* peer, QString agentUid, QString mappingJSON);
 
 
     /**
@@ -415,8 +416,8 @@ private:
 
 private:
 
-    // Map from a "peer id" to a model of agent
-    QHash<QString, AgentM*> _hashFromPeerIdToAgent;
+    // Map from uid to a model of agent
+    QHash<QString, AgentM*> _hashFromUidToAgent;
 
     // Hash table from a name to the group of agents with this name
     QHash<QString, AgentsGroupedByNameVM*> _hashFromNameToAgentsGrouped;
