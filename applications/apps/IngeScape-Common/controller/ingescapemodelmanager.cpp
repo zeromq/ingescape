@@ -942,59 +942,61 @@ void IngeScapeModelManager::onLauncherExited(PeerM* peer)
  */
 void IngeScapeModelManager::onDefinitionReceived(PeerM* peer, QString agentUid, QString agentName, QString definitionJSON)
 {
-    AgentM* agent = getAgentModelFromUid(agentUid);
-
-    // An agent with this uid already exist
-    if (agent != nullptr)
-    {
-        // FIXME TODO onDefinitionReceived
-    }
-    // New uid --> new agent
-    else
+    if (peer != nullptr)
     {
         // Create the new model of agent definition from JSON
         DefinitionM* newDefinition = JsonHelper::createModelOfAgentDefinitionFromBytes(definitionJSON.toUtf8());
 
-        // Create a new model of agent
-        agent = createAgentModel(peer,
-                                 agentUid,
-                                 agentName,
-                                 newDefinition,
-                                 true);
-    }
-
-    /*if ((agent != nullptr) && !definitionJSON.isEmpty())
-    {
-        // Save the previous agent definition
-        DefinitionM* previousDefinition = agent->definition();
-
-        // Create the new model of agent definition from JSON
-        DefinitionM* newDefinition = JsonHelper::createModelOfAgentDefinitionFromBytes(definitionJSON.toUtf8());
-
-        if (newDefinition != nullptr)
+        AgentM* agent = getAgentModelFromUid(agentUid);
+        if (agent != nullptr) // An agent with this uid already exist
         {
-            // The 2 definitions are strictly identical (only when an agent is back on the network !)
-            if ((previousDefinition != nullptr) && (*previousDefinition == *newDefinition))
+            if (agent->name() != agentName)
             {
-                qDebug() << "The received definition is exactly the same" << newDefinition->name() << "and version" << newDefinition->version();
+                qInfo() << "The name of agent with UID" << agentUid << "has changed from" << agent->name() << "to" << agentName;
 
-                // Free memory (new definition will not be used)
-                if (newDefinition != nullptr) {
-                    delete newDefinition;
-                }
+                // FIXME TODO: Manage renamed agent !
+                //agent->setname(agentName); Manage AgentsGroupedByName...
             }
-            else
-            {
-                // Set this new definition to the agent
-                agent->setdefinition(newDefinition);
 
-                // Free memory (previous definition is not used anymore)
-                if (previousDefinition != nullptr) {
-                    delete previousDefinition;
+            if (!agent->isON())
+            {
+                qInfo() << "The agent" << agentName << "with UID" << agentUid << "on" << peer->hostname() << "(" << peer->uid() << ") is back on the network !";
+                agent->setisON(true);
+            }
+
+            DefinitionM* previousDefinition = agent->definition();
+
+            if (newDefinition != nullptr)
+            {
+                // The 2 definitions are strictly identical (only when an agent is back on the network !)
+                if ((previousDefinition != nullptr) && (*previousDefinition == *newDefinition))
+                {
+                    qDebug() << "The received definition" << newDefinition->name() << "(version" << newDefinition->version() << ") is exactly the same";
+
+                    delete newDefinition; // Free memory (new definition will not be used)
+                }
+                else
+                {
+                    agent->setdefinition(newDefinition); // Set this new definition to the agent
+
+                    if (previousDefinition != nullptr) {
+                        delete previousDefinition; // Free memory (previous definition is not used anymore)
+                    }
                 }
             }
         }
-    }*/
+        else // New uid --> new agent
+        {
+            agent = createAgentModel(peer,
+                                     agentUid,
+                                     agentName,
+                                     newDefinition,
+                                     true);
+        }
+    }
+    else {
+        qCritical() << Q_FUNC_INFO << "We receive a definition for the agent" << agentName << "(" << agentUid << ") but the peer is NULL !";
+    }
 }
 
 
