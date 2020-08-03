@@ -950,6 +950,20 @@ void IngeScapeModelManager::onDefinitionReceived(PeerM* peer, QString agentUid, 
         AgentM* agent = getAgentModelFromUid(agentUid);
         if (agent != nullptr) // An agent with this uid already exist
         {
+            if (agent->peer() != peer)
+            {
+                PeerM* previousPeer = agent->peer();
+                agent->setpeer(peer);
+
+                if (previousPeer != nullptr) {
+                    qInfo() << "The peer of agent with UID" << agentUid << "has changed from" << previousPeer->uid() << "to" << peer->uid();
+                    //previousPeer->deleteLater(); // Wa can't delete it now because this peer can be used by another agent
+                }
+                else {
+                    qInfo() << "The peer of agent with UID" << agentUid << "has changed to" << peer->uid();
+                }
+            }
+
             if (agent->name() != agentName)
             {
                 qInfo() << "The name of agent with UID" << agentUid << "has changed from" << agent->name() << "to" << agentName;
@@ -971,7 +985,7 @@ void IngeScapeModelManager::onDefinitionReceived(PeerM* peer, QString agentUid, 
                 // The 2 definitions are strictly identical (only when an agent is back on the network !)
                 if ((previousDefinition != nullptr) && (*previousDefinition == *newDefinition))
                 {
-                    qDebug() << "The received definition" << newDefinition->name() << "(version" << newDefinition->version() << ") is exactly the same";
+                    //qDebug() << "The received definition" << newDefinition->name() << "(version" << newDefinition->version() << ") is exactly the same";
 
                     delete newDefinition; // Free memory (new definition will not be used)
                 }

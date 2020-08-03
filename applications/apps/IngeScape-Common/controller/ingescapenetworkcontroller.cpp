@@ -195,8 +195,6 @@ void onBusMessageIncommingCallback(const char *event,
                     default:
                         break;
                     }
-
-                    //Q_EMIT ingeScapeNetworkC->peerHasBeenCreated(peer);
                 }
             }
             else {
@@ -303,9 +301,8 @@ void onBusMessageIncommingCallback(const char *event,
                     break;
                 }
 
-                // FIXME TODO: when to free memory ?
-                // Delete the peer which exited the network
-                //ingeScapeNetworkC->deleteExitedPeer(peer);
+                // The peer will be deleted later
+                ingeScapeNetworkC->removeExitedPeerId(peerId);
             }
         }
         // JOIN (group)
@@ -880,20 +877,10 @@ PeerM* IngeScapeNetworkController::createEnteredPeer(IngeScapeTypes::Value igsTy
 }
 
 
-/**
- * @brief Delete a peer which exited the network
- */
-void IngeScapeNetworkController::deleteExitedPeer(PeerM* peer)
+void IngeScapeNetworkController::removeExitedPeerId(QString peerId)
 {
-    if (peer != nullptr)
-    {
-        //Q_EMIT peerWillBeDeleted(peer);
-
-        if (_hashFromUidToPeer.contains(peer->uid())) {
-            _hashFromUidToPeer.remove(peer->uid());
-        }
-
-        peer->deleteLater();
+    if (_hashFromUidToPeer.contains(peerId)) {
+        _hashFromUidToPeer.remove(peerId);
     }
 }
 

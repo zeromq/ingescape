@@ -162,12 +162,7 @@ public:
                              QString ipAddress,
                              QString hostname,
                              QString commandLine);
-
-
-    /**
-     * @brief Delete a peer which exited the network
-     */
-    void deleteExitedPeer(PeerM* peer);
+    void removeExitedPeerId(QString peerId);
 
 
     /**
@@ -276,9 +271,6 @@ Q_SIGNALS:
      */
     void networkDeviceIpAddressHasChanged(QString newIpAddress);
 
-
-    //void peerHasBeenCreated(PeerM* peer);
-    //void peerWillBeDeleted(PeerM* peer);
 
     // Signal emitted when an "IngeScape Agent" enter/quit the network
     void peerOfAgentsEntered(PeerM* peer);
