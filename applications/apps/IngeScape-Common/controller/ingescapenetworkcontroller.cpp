@@ -861,7 +861,16 @@ PeerM* IngeScapeNetworkController::createEnteredPeer(IngeScapeTypes::Value igsTy
     PeerM* peer = nullptr;
     if (!_hashFromUidToPeer.contains(peerId))
     {
-        peer = new PeerM(igsType, peerId, peerName, ipAddress, hostname, commandLine);
+        peer = new PeerM(igsType,
+                         peerId,
+                         peerName,
+                         ipAddress,
+                         hostname,
+                         commandLine,
+                         true);
+
+        peer->moveToThread(qApp->thread()); // Move from IngeScape thread to UI thread
+
         _hashFromUidToPeer.insert(peerId, peer);
     }
     else {

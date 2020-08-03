@@ -768,8 +768,6 @@ void IngeScapeModelManager::onPeerOfAgentsEntered(PeerM* peer)
 {
     if ((peer != nullptr) && (peer->igsType() == IngeScapeTypes::AGENT))
     {
-        peer->setParent(this); // Move from IngeScape thread to UI thread
-
         // FIXME onPeerOfAgentsEntered
 
         /*AgentM* agent = getAgentModelFromPeerId(peerId);

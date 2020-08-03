@@ -43,7 +43,7 @@ public:
                    QString ipAddress,
                    QString hostname,
                    QString commandLine,
-                   bool isON = true,
+                   bool isON,
                    QObject *parent = nullptr);
     ~PeerM();
 
