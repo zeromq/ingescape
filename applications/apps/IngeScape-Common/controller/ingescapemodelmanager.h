@@ -87,13 +87,13 @@ public:
      * @param isON optional (false by default)
      * @return
      */
-    AgentM* createAgentModel(QString agentName,
+    /*AgentM* createAgentModel(QString agentName,
                              DefinitionM* definition = nullptr,
                              QString hostname = HOSTNAME_NOT_DEFINED,
                              QString commandLine = "",
                              QString peerId = "",
                              QString ipAddress = "",
-                             bool isON = false);
+                             bool isON = false);*/
 
     AgentM* createAgentModel(PeerM* peer,
                              QString agentUid,

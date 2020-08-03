@@ -500,8 +500,10 @@ bool IngeScapeModelManager::importAgentOrAgentsListFromFilePath(QString filePath
                     DefinitionM* agentDefinition = JsonHelper::createModelOfAgentDefinitionFromJSON(jsonDefinition.toObject());
                     if (agentDefinition != nullptr)
                     {
+                        // FIXME importAgentOrAgentsListFromFilePath createAgentModel
+
                         // Create a new model of agent with the name of the definition
-                        createAgentModel(agentDefinition->name(), agentDefinition);
+                        //createAgentModel(agentDefinition->name(), agentDefinition);
                     }
                     // An error occured, the definition is NULL
                     else {
@@ -612,7 +614,9 @@ bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
                         }
 
                         // Create a new model of agent
-                        createAgentModel(agentName, copyOfDefinition);
+                        //createAgentModel(agentName, copyOfDefinition);
+
+                        // FIXME importAgentsListFromJson createAgentModel
                     }
                     // There are some clones with a defined hostname
                     else
@@ -651,10 +655,12 @@ bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
                                         }
 
                                         // Create a new model of agent
-                                        createAgentModel(agentName,
+                                        /*createAgentModel(agentName,
                                                          copyOfDefinition,
                                                          hostName,
-                                                         commandLine);
+                                                         commandLine);*/
+
+                                        // FIXME importAgentsListFromJson createAgentModel
                                     }
                                 }
                             }

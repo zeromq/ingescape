@@ -59,8 +59,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _valuesHistoryC(nullptr),
     _licensesC(nullptr),
     _timeLineC(nullptr),
-    _peerIdOfExpe(""),
-    _peerNameOfExpe(""),
+    _peerOfExpe(nullptr),
     _currentPlatformName(EXAMPLE_PLATFORM_NAME),
     _hasAPlatformBeenLoadedByUser(false),
     _gettingStartedShowAtStartup(true),
@@ -1286,17 +1285,18 @@ void IngeScapeEditorController::_onLoadPlatformFileFromPath(QString platformFile
     bool success = _clearAndLoadPlatformFromFile(platformFilePath);
 
     // Send command to Ingescape-Expe if needed
-    if ((_networkC != nullptr) && !_peerIdOfExpe.isEmpty())
+    if ((_networkC != nullptr) && (_peerOfExpe != nullptr)
+            && !_peerOfExpe->uid().isEmpty())
     {
         // Reply by sending the command execution status to Expe
-        _networkC->sendCommandExecutionStatusToExpe(_peerIdOfExpe,
+        _networkC->sendCommandExecutionStatusToExpe(_peerOfExpe->uid(),
                                                     command_LoadPlatformFile,
                                                     platformFilePath,
                                                     static_cast<int>(success));
     }
     else
     {
-        qWarning() << "Peer Id of Expe is empty" << _peerIdOfExpe;
+        qWarning() << "Peer of Expe is NULL";
     }
 }
 
@@ -1422,50 +1422,46 @@ void IngeScapeEditorController::_onTimeLineStateUpdated(QString state)
     }
 
     // Notify the Expe app
-    if (!_peerIdOfExpe.isEmpty())
+    if ((_peerOfExpe != nullptr) && !_peerOfExpe->uid().isEmpty())
     {
-        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerIdOfExpe, notificationAndParameters);
+        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerOfExpe->uid(),
+                                                                         notificationAndParameters);
     }
 }
 
 
 /**
  * @brief Slot called when an expe enter the network
- * @param peerId
- * @param peerName
- * @param ipAddress
- * @param hostname
  */
-void IngeScapeEditorController::_onExpeEntered(QString peerId, QString peerName, QString ipAddress, QString hostname)
+void IngeScapeEditorController::_onExpeEntered(PeerM* peer)
 {
-    qInfo() << "Expe entered (" << peerId << ")" << peerName << "on" << hostname << "(" << ipAddress << ")";
-
-    // Check that the peer id of the Expe is empty
-    if (_peerIdOfExpe.isEmpty() && !peerId.isEmpty() && !peerName.isEmpty())
+    if (peer != nullptr)
     {
-        setpeerIdOfExpe(peerId);
-        setpeerNameOfExpe(peerName);
-    }
-    else {
-        qCritical() << "We are already connected to an expe:" << _peerNameOfExpe << "(" << _peerIdOfExpe << ")";
+        qInfo() << "Expe entered" << peer->name() << "(" << peer->uid() << ") on" << peer->hostname() << "(" << peer->ipAddress() << ")";
+
+        if (_peerOfExpe == nullptr) {
+            setpeerOfExpe(peer);
+        }
+        else {
+            qCritical() << "We are already connected to an expe:" << _peerOfExpe->name() << "(" << _peerOfExpe->uid() << ")";
+        }
     }
 }
 
 
 /**
  * @brief Slot called when an expe quit the network
- * @param peerId
- * @param peerName
  */
-void IngeScapeEditorController::_onExpeExited(QString peerId, QString peerName)
+void IngeScapeEditorController::_onExpeExited(PeerM* peer)
 {
-    qInfo() << "Expe exited (" << peerId << ")" << peerName;
-
-    if (_peerIdOfExpe == peerId)
+    if (peer != nullptr)
     {
-        // Clear
-        setpeerIdOfExpe("");
-        setpeerNameOfExpe("");
+        qInfo() << "Expe exited" << peer->name() << "(" << peer->uid() << ")";
+
+        if (_peerOfExpe == peer)
+        {
+            setpeerOfExpe(nullptr);
+        }
     }
 }
 

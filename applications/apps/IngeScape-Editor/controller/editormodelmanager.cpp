@@ -259,11 +259,13 @@ void EditorModelManager::duplicateAgentWithNewCommandLine(AgentM* agent, QString
              copyOfDefinition = agent->definition()->copy();
          }
 
+         // FIXME duplicateAgentWithNewCommandLine: newCommandLine --> new Peer ?
+
          // Duplicate the agent with the new command line
-         IngeScapeModelManager::instance()->createAgentModel(agent->name(),
+         /*IngeScapeModelManager::instance()->createAgentModel(agent->name(),
                                                              copyOfDefinition,
                                                              agent->peer()->hostname(),
-                                                             newCommandLine);
+                                                             newCommandLine);*/
     }
 }
 

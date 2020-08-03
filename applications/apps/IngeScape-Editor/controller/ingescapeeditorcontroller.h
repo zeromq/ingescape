@@ -107,11 +107,8 @@ class IngeScapeEditorController : public QObject
     // List of opened windows
     I2_QOBJECT_LISTMODEL(QObject, openedWindows)
 
-    // Peer id of the IngeScape agent "Expe"
-    I2_CPP_NOSIGNAL_PROPERTY(QString, peerIdOfExpe)
-
-    // Peer name of the IngeScape agent "Expe"
-    I2_CPP_NOSIGNAL_PROPERTY(QString, peerNameOfExpe)
+    // Peer of the IngeScape (agent) "Expe"
+    I2_CPP_NOSIGNAL_PROPERTY(PeerM*, peerOfExpe)
 
     // Name of the current IngeScape platform
     I2_QML_PROPERTY_READONLY(QString, currentPlatformName)
@@ -350,22 +347,9 @@ private Q_SLOTS:
     void _onTimeLineStateUpdated(QString state);
 
 
-    /**
-     * @brief Slot called when an expe enter the network
-     * @param peerId
-     * @param peerName
-     * @param ipAddress
-     * @param hostname
-     */
-    void _onExpeEntered(QString peerId, QString peerName, QString ipAddress, QString hostname);
-
-
-    /**
-     * @brief Slot called when an expe quit the network
-     * @param peerId
-     * @param peerName
-     */
-    void _onExpeExited(QString peerId, QString peerName);
+    // Slot called when an expe enter/quit the network
+    void _onExpeEntered(PeerM* peer);
+    void _onExpeExited(PeerM* peer);
 
 
     /**

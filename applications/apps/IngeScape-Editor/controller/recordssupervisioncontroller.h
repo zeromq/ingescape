@@ -37,7 +37,7 @@ class RecordsSupervisionController : public QObject
 {
     Q_OBJECT
 
-    // Peer of the recorder
+    // Peer of the IngeScape recorder
     I2_CPP_NOSIGNAL_PROPERTY(PeerM*, peerOfRecorder)
 
     // Flag indicating is there is a recorder with state ON
