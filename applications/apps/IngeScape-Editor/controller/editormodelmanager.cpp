@@ -285,11 +285,13 @@ void EditorModelManager::onAgentsGroupedByNameHasBeenCreated(AgentsGroupedByName
 
 
 /**
- * @brief Slot called when the flag "is Muted" from an agent updated
+ * @brief Slot called when the flag "is Muted" from an agent has been updated
  */
-void EditorModelManager::onisMutedFromAgentUpdated(QString uid, bool isMuted)
+void EditorModelManager::onisMutedFromAgentUpdated(QString peerId, QString agentUid, bool isMuted)
 {
-    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromUid(uid);
+    Q_UNUSED(peerId)
+
+    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromUid(agentUid);
     if (agent != nullptr) {
         agent->setisMuted(isMuted);
     }

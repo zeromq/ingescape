@@ -123,11 +123,9 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when the flag "is Muted" from an agent updated
-     * @param peerId
-     * @param isMuted
+     * @brief Signal emitted when the flag "is Muted" from an agent has been updated
      */
-    void isMutedFromAgentUpdated(QString peerId, bool isMuted);
+    void isMutedFromAgentUpdated(QString peerId, QString agentUid, bool isMuted);
 
 
     /**
@@ -248,41 +246,17 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Slot called when a "Shouted" message (with one part) has been received
-     * @param peerId
-     * @param peerName
-     * @param message
+     * @brief Slot called when a "Shouted" message has been received
      */
-    void _onShoutedMessageReceived(QString peerId, QString peerName, QString message);
+    //void _onShoutedMessageReceived(PeerM* peer, QString message);
+    void _onShoutedMessageReceived(PeerM* peer, QString messageType, QStringList messageParameters);
 
 
     /**
-     * @brief Slot called when a "Shouted" message (with several parts) has been received
-     * @param peerId
-     * @param peerName
-     * @param messagePart1
-     * @param messageOthersParts
+     * @brief Slot called when a "Whispered" message has been received
      */
-    void _onShoutedMessageReceived(QString peerId, QString peerName, QString messagePart1, QStringList messageOthersParts);
-
-
-    /**
-     * @brief Slot called when "Whispered" message (with one part) has been received
-     * @param peerId
-     * @param peerName
-     * @param message
-     */
-    void _onWhisperedMessageReceived(QString peerId, QString peerName, QString message);
-
-
-    /**
-     * @brief Slot called when "Whispered" message (with several parts) has been received
-     * @param peerId
-     * @param peerName
-     * @param messagePart1
-     * @param messageOthersParts
-     */
-    void _onWhisperedMessageReceived(QString peerId, QString peerName, QString messagePart1, QStringList messageOthersParts);
+    //void _onWhisperedMessageReceived(PeerM* peer, QString message);
+    void _onWhisperedMessageReceived(PeerM* peer, QString messageType, QStringList messageParameters);
 
 };
 

@@ -956,6 +956,18 @@ void IngeScapeNetworkController::manageShoutedMessage(PeerM* peer, zmsg_t* zMess
 
             Q_EMIT agentExited(peer, agentUid);
         }
+        else
+        {
+            QStringList messageParameters;
+
+            for (uint i = 1; i < count; i++)
+            {
+                QString parameter = zmsg_popstr(zMessage);
+                messageParameters.append(parameter);
+            }
+
+            Q_EMIT shoutedMessageReceived(peer, messageType, messageParameters);
+        }
 
         // Message contains only one string
         /*if (count == 1)
@@ -979,8 +991,6 @@ void IngeScapeNetworkController::manageShoutedMessage(PeerM* peer, zmsg_t* zMess
 
             Q_EMIT shoutedMessageReceived(peerId, peerName, messagePart1, messageOthersParts);
         }*/
-
-        //qDebug() << "Not yet managed SHOUTED message '" << messagePart1 << "' with" << count << "parts for agent" << peerName << "(" << peerId << ")";
     }
 }
 
@@ -1014,6 +1024,18 @@ void IngeScapeNetworkController::manageWhisperedMessage(PeerM* peer, zmsg_t* zMe
             QString agentUid = zmsg_popstr(zMessage);
 
             Q_EMIT mappingReceived(peer, agentUid, mappingJSON);
+        }
+        else
+        {
+            QStringList messageParameters;
+
+            for (uint i = 1; i < count; i++)
+            {
+                QString parameter = zmsg_popstr(zMessage);
+                messageParameters.append(parameter);
+            }
+
+            Q_EMIT whisperedMessageReceived(peer, messageType, messageParameters);
         }
 
         // Message contains only one string
@@ -1056,8 +1078,6 @@ void IngeScapeNetworkController::manageWhisperedMessage(PeerM* peer, zmsg_t* zMe
 
             Q_EMIT whisperedMessageReceived(peerId, peerName, messagePart1, messageOthersParts);
         }*/
-
-        //qDebug() << "Not yet managed WHISPERED message '" << messagePart1 << "' with" << count << "parts for agent" << peerName << "(" << peerId << ")";
     }
 }
 

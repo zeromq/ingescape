@@ -105,11 +105,9 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot called when the flag "is Muted" from an agent updated
-     * @param peerId
-     * @param isMuted
+     * @brief Slot called when the flag "is Muted" from an agent has been updated
      */
-    void onisMutedFromAgentUpdated(QString uid, bool isMuted);
+    void onisMutedFromAgentUpdated(QString peerId, QString agentUid, bool isMuted);
 
 
     /**
