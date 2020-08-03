@@ -138,11 +138,11 @@ void onBusMessageIncommingCallback(const char *event,
                     {
                     case IngeScapeTypes::AGENT:
                     {
-                        ingeScapeNetworkC->setnumberOfAgents(ingeScapeNetworkC->numberOfAgents() + 1);
+                        ingeScapeNetworkC->setnumberOfPeersOfAgents(ingeScapeNetworkC->numberOfPeersOfAgents() + 1);
 
                         peer->setloggerPort(loggerPort);
 
-                        Q_EMIT ingeScapeNetworkC->agentEntered(peer);
+                        Q_EMIT ingeScapeNetworkC->peerOfAgentsEntered(peer);
                     }
                         break;
 
@@ -234,14 +234,16 @@ void onBusMessageIncommingCallback(const char *event,
             PeerM* peer = ingeScapeNetworkC->getPeerWithId(peerId);
             if (peer != nullptr)
             {
+                peer->setisON(false);
+
                 switch (peer->igsType())
                 {
                 // IngeScape AGENT
                 case IngeScapeTypes::AGENT:
                 {
-                    Q_EMIT ingeScapeNetworkC->agentExited(peer);
+                    Q_EMIT ingeScapeNetworkC->peerOfAgentsExited(peer);
 
-                    ingeScapeNetworkC->setnumberOfAgents(ingeScapeNetworkC->numberOfAgents() - 1);
+                    ingeScapeNetworkC->setnumberOfPeersOfAgents(ingeScapeNetworkC->numberOfPeersOfAgents() - 1);
 
                     break;
                 }
@@ -301,8 +303,9 @@ void onBusMessageIncommingCallback(const char *event,
                     break;
                 }
 
+                // FIXME TODO: when to free memory ?
                 // Delete the peer which exited the network
-                ingeScapeNetworkC->deleteExitedPeer(peer);
+                //ingeScapeNetworkC->deleteExitedPeer(peer);
             }
         }
         // JOIN (group)
@@ -585,7 +588,7 @@ IngeScapeNetworkController::IngeScapeNetworkController(QObject *parent) : QObjec
     _isStarted(false),
     _automaticallyStartStopOnMonitorEvents(false),
     _agentModel(nullptr),
-    _numberOfAgents(0),
+    _numberOfPeersOfAgents(0),
     _numberOfLaunchers(0),
     _numberOfRecorders(0),
     _numberOfEditors(0),
@@ -767,7 +770,7 @@ void IngeScapeNetworkController::stop()
         setisStarted(false);
 
         // Reset counters
-        setnumberOfAgents(0);
+        setnumberOfPeersOfAgents(0);
         setnumberOfLaunchers(0);
         setnumberOfRecorders(0);
         setnumberOfEditors(0);
@@ -955,7 +958,7 @@ void IngeScapeNetworkController::manageShoutedMessage(PeerM* peer, zmsg_t* zMess
         {
             QString agentUid = zmsg_popstr(zMessage);
 
-            qDebug() << agentUid << "exited !!!";
+            Q_EMIT agentExited(peer, agentUid);
         }
 
         // Message contains only one string

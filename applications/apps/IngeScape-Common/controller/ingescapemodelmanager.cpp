@@ -694,9 +694,9 @@ void IngeScapeModelManager::simulateExitForEachAgentON()
     {
         if ((agent != nullptr) && (agent->peer() != nullptr)
             && agent->isON())
-        {
+        {   
             // Simulate an exit for this agent
-            onAgentExited(agent->peer());
+            onAgentExited(agent->peer(), agent->uid());
         }
     }
 }
@@ -762,16 +762,16 @@ void IngeScapeModelManager::deleteAllPublishedValues()
 
 
 /**
- * @brief Slot called when an agent enter the network
+ * @brief Slot called when a peer of agent(s) enter the network
  */
-void IngeScapeModelManager::onAgentEntered(PeerM* peer)
+void IngeScapeModelManager::onPeerOfAgentsEntered(PeerM* peer)
 {
-    if ((peer != nullptr) && (peer->igsType() == IngeScapeTypes::AGENT)
-            && !peer->uid().isEmpty() && !peer->name().isEmpty() && !peer->ipAddress().isEmpty())
+    if ((peer != nullptr) && (peer->igsType() == IngeScapeTypes::AGENT))
     {
         peer->setParent(this); // Move from IngeScape thread to UI thread
 
-        // FIXME onAgentEntered
+        // FIXME onPeerOfAgentsEntered
+
         /*AgentM* agent = getAgentModelFromPeerId(peerId);
 
         // An agent with this peer id already exist
@@ -813,22 +813,27 @@ void IngeScapeModelManager::onAgentEntered(PeerM* peer)
 
 
 /**
- * @brief Slot called when an agent quit the network
+ * @brief Slot called when a peer of agent(s) quit the network
  */
-void IngeScapeModelManager::onAgentExited(PeerM* peer)
+void IngeScapeModelManager::onPeerOfAgentsExited(PeerM* peer)
 {
     if ((peer != nullptr) && (peer->igsType() == IngeScapeTypes::AGENT))
     {
-        // FIXME onAgentExited
+        // FIXME onPeerOfAgentsExited
+    }
+}
 
-        /*AgentM* agent = getAgentModelFromPeerId(peerId);
-        if (agent != nullptr)
-        {
-            qInfo() << "The agent" << agentName << "with peer id" << peerId << "exited from the network !";
 
-            // Update the state (flag "is ON")
-            agent->setisON(false);
-        }*/
+void IngeScapeModelManager::onAgentExited(PeerM* peer, QString agentUid)
+{
+    Q_UNUSED(peer)
+
+    AgentM* agent = getAgentModelFromUid(agentUid);
+    if (agent != nullptr)
+    {
+        qInfo() << "The agent" << agent->name() << "with UID" << agentUid << "exited from the network !";
+
+        agent->setisON(false);
     }
 }
 

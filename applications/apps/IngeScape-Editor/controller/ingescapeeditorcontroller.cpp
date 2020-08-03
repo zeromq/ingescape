@@ -250,7 +250,8 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::networkDeviceIsAvailableAgain, this, &IngeScapeEditorController::_onNetworkDeviceIsAvailableAgain);
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::networkDeviceIpAddressHasChanged, this, &IngeScapeEditorController::_onNetworkDeviceIpAddressHasChanged);
 
-    connect(ingeScapeNetworkC, &IngeScapeNetworkController::agentEntered, ingeScapeModelManager, &IngeScapeModelManager::onAgentEntered);
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::peerOfAgentsEntered, ingeScapeModelManager, &IngeScapeModelManager::onPeerOfAgentsEntered);
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::peerOfAgentsExited, ingeScapeModelManager, &IngeScapeModelManager::onPeerOfAgentsExited);
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::agentExited, ingeScapeModelManager, &IngeScapeModelManager::onAgentExited);
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::launcherEntered, ingeScapeModelManager, &IngeScapeModelManager::onLauncherEntered);
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::launcherExited, ingeScapeModelManager, &IngeScapeModelManager::onLauncherExited);

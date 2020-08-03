@@ -312,9 +312,11 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 
-    // Slot called when an agent enter/quit the network
-    void onAgentEntered(PeerM* peer);
-    void onAgentExited(PeerM* peer);
+    // Slot called when a peer of agent(s) enter/quit the network
+    void onPeerOfAgentsEntered(PeerM* peer);
+    void onPeerOfAgentsExited(PeerM* peer);
+    // Slot called when an agent quit the network
+    void onAgentExited(PeerM* peer, QString agentUid);
 
 
     // Slot called when a launcher enter/quit the network

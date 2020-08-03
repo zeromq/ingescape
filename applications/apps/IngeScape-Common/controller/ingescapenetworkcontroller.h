@@ -64,7 +64,7 @@ class IngeScapeNetworkController : public QObject
     I2_QML_PROPERTY_READONLY(AgentM*, agentModel)
 
     // Number of each type of IngeScape applications
-    I2_QML_PROPERTY_READONLY(int, numberOfAgents)
+    I2_QML_PROPERTY_READONLY(int, numberOfPeersOfAgents)
     I2_QML_PROPERTY_READONLY(int, numberOfLaunchers)
     I2_QML_PROPERTY_READONLY(int, numberOfRecorders)
     I2_QML_PROPERTY_READONLY(int, numberOfEditors)
@@ -280,10 +280,10 @@ Q_SIGNALS:
     //void peerHasBeenCreated(PeerM* peer);
     //void peerWillBeDeleted(PeerM* peer);
 
-
     // Signal emitted when an "IngeScape Agent" enter/quit the network
-    void agentEntered(PeerM* peer);
-    void agentExited(PeerM* peer);
+    void peerOfAgentsEntered(PeerM* peer);
+    void peerOfAgentsExited(PeerM* peer);
+    void agentExited(PeerM* peer, QString agentUid);
 
 
     // Signal emitted when an "IngeScape Launcher" enter/quit the network
