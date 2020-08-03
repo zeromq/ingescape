@@ -349,8 +349,8 @@ Item {
                     delay: 400
                     visible: mouseAreaAgent.containsMouse
 
-                    text: model ? model.name + " (" + model.peerId + ")\n" + model.commandLine
-                                : ""
+                    text: model && model.peer ? model.name + " (" + model.peer.uid + ")\n" + model.peer.commandLine
+                                              : ""
                 }
 
                 // Agent Options button

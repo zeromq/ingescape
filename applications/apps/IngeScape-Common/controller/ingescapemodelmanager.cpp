@@ -957,7 +957,7 @@ void IngeScapeModelManager::onDefinitionReceived(PeerM* peer, QString agentUid, 
 
                 if (previousPeer != nullptr) {
                     qInfo() << "The peer of agent with UID" << agentUid << "has changed from" << previousPeer->uid() << "to" << peer->uid();
-                    //previousPeer->deleteLater(); // Wa can't delete it now because this peer can be used by another agent
+                    //previousPeer->deleteLater(); // FIXME TODO: We can't delete it now because this peer can be used by another agent
                 }
                 else {
                     qInfo() << "The peer of agent with UID" << agentUid << "has changed to" << peer->uid();

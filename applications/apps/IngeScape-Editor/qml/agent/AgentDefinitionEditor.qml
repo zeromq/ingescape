@@ -532,7 +532,7 @@ WindowBlockTouches {
                                                 height : width
                                                 radius : width/2
 
-                                                color: IngeScapeEditorTheme.colorOfIOPTypeWithConditions(model.agentIOPValueTypeGroup, true);
+                                                color: IngeScapeEditorTheme.colorOfIOPTypeWithConditions(model.QtObject.agentIOPValueTypeGroup, true);
                                             }
 
                                             Text {
