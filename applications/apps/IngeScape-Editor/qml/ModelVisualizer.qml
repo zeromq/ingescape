@@ -106,7 +106,7 @@ Rectangle {
             }
 
             Text {
-                text: IgsNetworkController ? "- " + IgsNetworkController.numberOfAgents + " agents"
+                text: IgsNetworkController ? "- " + IgsNetworkController.numberOfPeersOfAgents + " peers of agent(s)"
                                            : ""
 
                 color: "white"
@@ -304,7 +304,7 @@ Rectangle {
                                             property AgentM agentM: model.QtObject
 
                                             width: childrenRect.width
-                                            height: 35
+                                            height: 55
 
                                             color: agentM.isON ? "#2222CC" : "#222277"
                                             border {
@@ -312,42 +312,59 @@ Rectangle {
                                                 color: IngeScapeTheme.editorsBackgroundBorderColor
                                             }
 
-                                            Row {
-                                                spacing: 15
-
+                                            Column {
                                                 anchors {
                                                     left: parent.left
                                                     top: parent.top
                                                     margins: 2
                                                 }
+                                                spacing: 2
 
-                                                Text {
-                                                    text: agentM.hostname
-                                                    width: 150
-                                                    color: agentM.isON ? "white" : "#888888"
-                                                    font {
-                                                        pointSize: 14
-                                                        weight: Font.Bold
+                                                Row {
+                                                    spacing: 10
+
+                                                    Text {
+                                                        text: agentM.name
+                                                        width: 250
+                                                        color: agentM.isON ? "white" : "#888888"
+                                                        font {
+                                                            pointSize: 14
+                                                            weight: Font.Bold
+                                                        }
+                                                    }
+
+                                                    Text {
+                                                        text: "uid: " + agentM.uid
+                                                        color: agentM.isON ? "white" : "#888888"
+                                                    }
+                                                }
+
+                                                Row {
+                                                    spacing: 10
+
+                                                    Text {
+                                                        text: "host: " + (agentM.peer ? agentM.peer.hostname : "")
+                                                        width: 250
+                                                        color: agentM.isON ? "white" : "#888888"
+                                                        font {
+                                                            pointSize: 14
+                                                            weight: Font.Bold
+                                                        }
+                                                    }
+
+                                                    Text {
+                                                        text: "peer: " + (agentM.peer ? agentM.peer.uid : "")
+                                                        color: agentM.isON ? "white" : "#888888"
                                                     }
                                                 }
 
                                                 Text {
-                                                    text: agentM.peerId
+                                                    text: agentM.peer ? agentM.peer.commandLine : ""
                                                     color: agentM.isON ? "white" : "#888888"
-                                                }
-                                            }
-
-                                            Text {
-                                                anchors {
-                                                    left: parent.left
-                                                    bottom: parent.bottom
-                                                    margins: 2
+                                                    width: 690
+                                                    elide: Text.ElideLeft
                                                 }
 
-                                                text: agentM.commandLine
-                                                color: agentM.isON ? "white" : "#888888"
-                                                width: 690
-                                                elide: Text.ElideLeft
                                             }
                                         }
                                     }
