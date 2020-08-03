@@ -16,25 +16,22 @@
 
 /**
  * @brief Constructor
- * @param name
- * @param peerId
- * @param ipAddress
- * @param parent
  */
 HostM::HostM(QString name,
-             QString peerId,
-             QString ipAddress,
-             QString streamingPort,
+             PeerM* peer,
              QObject *parent) : QObject(parent),
     _name(name),
-    _peerId(peerId),
-    _ipAddress(ipAddress),
-    _streamingPort(streamingPort)
+    _peer(peer)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    qInfo() << "New Model of Host" << _name << "(" << _peerId << ") at" << _ipAddress;
+    if (_peer != nullptr) {
+        qInfo() << "New Model of Host" << _name << "at" << _peer->ipAddress();
+    }
+    else {
+        qInfo() << "New Model of Host" << _name << "with no peer";
+    }
 }
 
 
@@ -43,5 +40,21 @@ HostM::HostM(QString name,
  */
 HostM::~HostM()
 {
-    qInfo() << "Delete Model of Host" << _name << "(" << _peerId << ") at" << _ipAddress;
+    if (_peer != nullptr) {
+        qInfo() << "Delete Model of Host" << _name << "at" << _peer->ipAddress();
+    }
+    else {
+        qInfo() << "Delete Model of Host" << _name << "with no peer";
+    }
+}
+
+
+void HostM::setpeer(PeerM *value)
+{
+    if (_peer != value)
+    {
+        _peer = value;
+
+        Q_EMIT peerChanged(value);
+    }
 }

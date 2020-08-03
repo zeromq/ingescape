@@ -25,17 +25,11 @@
 AgentM::AgentM(QString name,
                QString uid,
                PeerM* peer,
-               QString ipAddress,
-               QString hostname,
-               QString commandLine,
                bool isON,
                QObject *parent) : QObject(parent),
     _name(name),
     _uid(uid),
     _peer(peer),
-    _address(ipAddress),
-    _hostname(hostname),
-    _commandLine(commandLine),
     _isON(isON),
     _canBeRestarted(false),
     _isMuted(false),
@@ -43,7 +37,6 @@ AgentM::AgentM(QString name,
     _definition(nullptr),
     _mapping(nullptr),
     _state(""),
-    _loggerPort(""),
     _hasLogInStream(false),
     _hasLogInFile(false),
     _logFilePath(""),
@@ -53,7 +46,12 @@ AgentM::AgentM(QString name,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    qInfo() << "New Model of Agent" << _name << "(" << _uid << ") on" << _hostname << "(" << _address << ") and command" << _commandLine;
+    if (_peer != nullptr) {
+        qInfo() << "New Model of Agent" << _name << "(" << _uid << ") on" << _peer->hostname() << "and command" << _peer->commandLine();
+    }
+    else {
+        qInfo() << "New Model of Agent" << _name << "(" << _uid << "with no peer";
+    }
 }
 
 
@@ -62,7 +60,12 @@ AgentM::AgentM(QString name,
  */
 AgentM::~AgentM()
 {
-    qInfo() << "Delete Model of Agent" << _name << "(" << _uid << ") on" << _hostname << "(" << _address << ") and command" << _commandLine;
+    if (_peer != nullptr) {
+        qInfo() << "Delete Model of Agent" << _name << "(" << _uid << ") on" << _peer->hostname() << "and command" << _peer->commandLine();
+    }
+    else {
+        qInfo() << "New Model of Agent" << _name << "(" << _uid << "with no peer";
+    }
 
     // Delete our agent definition
     if (_definition != nullptr) {
@@ -134,6 +137,17 @@ void AgentM::setdefinition(DefinitionM *value)
 }
 
 
+void AgentM::setpeer(PeerM *value)
+{
+    if (_peer != value)
+    {
+        _peer = value;
+
+        Q_EMIT peerChanged(value);
+    }
+}
+
+
 /**
  * @brief Setter for property "Mapping"
  * @param value
@@ -180,9 +194,6 @@ void AgentM::clearNetworkData()
         setpeer(nullptr);
     }
 
-    setaddress("");
-    sethostname(HOSTNAME_NOT_DEFINED);
-    setcommandLine("");
     setisON(false);
     setcanBeRestarted(false);
 
@@ -190,7 +201,6 @@ void AgentM::clearNetworkData()
     setisMuted(false);
     setisFrozen(false);
     setstate("");
-    setloggerPort("");
     sethasLogInStream(false);
     sethasLogInFile(false);
     setlogFilePath("");

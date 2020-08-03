@@ -118,14 +118,16 @@ QJsonArray EditorModelManager::exportAgentsToJSON()
 
                     for (AgentM* model : agentsGroupedByDefinition->models()->toList())
                     {
+                        // FIXME exportAgentsToJSON
                         // Hostname and Command Line must be defined to be added to the array of clones
-                        if ((model != nullptr) && !model->hostname().isEmpty() && !model->commandLine().isEmpty())
+                        if ((model != nullptr) && (model->peer() != nullptr)
+                                && !model->peer()->hostname().isEmpty() && !model->peer()->commandLine().isEmpty())
                         {
-                            qDebug() << "Export" << model->name() << "on" << model->hostname() << "at" << model->commandLine();
+                            qDebug() << "Export" << model->name() << "on" << model->peer()->hostname() << "at" << model->peer()->commandLine();
 
                             QJsonObject jsonClone = QJsonObject();
-                            jsonClone.insert("hostname", model->hostname());
-                            jsonClone.insert("commandLine", model->commandLine());
+                            jsonClone.insert("hostname", model->peer()->hostname());
+                            jsonClone.insert("commandLine", model->peer()->commandLine());
                             //jsonClone.insert("peerId", model->peerId());
                             //jsonClone.insert("address", model->address());
 
@@ -248,9 +250,9 @@ void EditorModelManager::openDefinition(DefinitionM* definition)
  */
 void EditorModelManager::duplicateAgentWithNewCommandLine(AgentM* agent, QString newCommandLine)
 {
-    if (agent != nullptr)
+    if ((agent != nullptr) && (agent->peer() != nullptr))
     {
-         qDebug() << "Duplicate the agent" << agent->name() << "with the new command line" << newCommandLine << "on" << agent->hostname();
+         qDebug() << "Duplicate the agent" << agent->name() << "with the new command line" << newCommandLine << "on" << agent->peer()->hostname();
 
          DefinitionM* copyOfDefinition = nullptr;
          if (agent->definition() != nullptr) {
@@ -260,7 +262,7 @@ void EditorModelManager::duplicateAgentWithNewCommandLine(AgentM* agent, QString
          // Duplicate the agent with the new command line
          IngeScapeModelManager::instance()->createAgentModel(agent->name(),
                                                              copyOfDefinition,
-                                                             agent->hostname(),
+                                                             agent->peer()->hostname(),
                                                              newCommandLine);
     }
 }
@@ -282,12 +284,10 @@ void EditorModelManager::onAgentsGroupedByNameHasBeenCreated(AgentsGroupedByName
 
 /**
  * @brief Slot called when the flag "is Muted" from an agent updated
- * @param peerId
- * @param isMuted
  */
-void EditorModelManager::onisMutedFromAgentUpdated(QString peerId, bool isMuted)
+void EditorModelManager::onisMutedFromAgentUpdated(QString uid, bool isMuted)
 {
-    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromPeerId(peerId);
+    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromUid(uid);
     if (agent != nullptr) {
         agent->setisMuted(isMuted);
     }
@@ -296,12 +296,10 @@ void EditorModelManager::onisMutedFromAgentUpdated(QString peerId, bool isMuted)
 
 /**
  * @brief Slot called when the flag "is Frozen" from an agent updated
- * @param peerId
- * @param isFrozen
  */
-void EditorModelManager::onIsFrozenFromAgentUpdated(QString peerId, bool isFrozen)
+void EditorModelManager::onIsFrozenFromAgentUpdated(QString uid, bool isFrozen)
 {
-    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromPeerId(peerId);
+    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromUid(uid);
     if (agent != nullptr) {
         agent->setisFrozen(isFrozen);
     }
@@ -310,13 +308,10 @@ void EditorModelManager::onIsFrozenFromAgentUpdated(QString peerId, bool isFroze
 
 /**
  * @brief Slot called when the flag "is Muted" from an output of agent updated
- * @param peerId
- * @param isMuted
- * @param outputName
  */
-void EditorModelManager::onIsMutedFromOutputOfAgentUpdated(QString peerId, bool isMuted, QString outputName)
+void EditorModelManager::onIsMutedFromOutputOfAgentUpdated(QString uid, bool isMuted, QString outputName)
 {
-    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromPeerId(peerId);
+    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromUid(uid);
     if (agent != nullptr) {
         agent->setisMutedOfOutput(isMuted, outputName);
     }
@@ -325,12 +320,10 @@ void EditorModelManager::onIsMutedFromOutputOfAgentUpdated(QString peerId, bool 
 
 /**
  * @brief Slot called when the state of an agent changes
- * @param peerId
- * @param stateName
  */
-void EditorModelManager::onAgentStateChanged(QString peerId, QString stateName)
+void EditorModelManager::onAgentStateChanged(QString uid, QString stateName)
 {
-    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromPeerId(peerId);
+    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromUid(uid);
     if (agent != nullptr) {
         agent->setstate(stateName);
     }
@@ -339,12 +332,10 @@ void EditorModelManager::onAgentStateChanged(QString peerId, QString stateName)
 
 /**
  * @brief Slot called when we receive the flag "Log In Stream" for an agent
- * @param peerId
- * @param hasLogInStream
  */
-void EditorModelManager::onAgentHasLogInStream(QString peerId, bool hasLogInStream)
+void EditorModelManager::onAgentHasLogInStream(QString uid, bool hasLogInStream)
 {
-    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromPeerId(peerId);
+    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromUid(uid);
     if (agent != nullptr) {
         agent->sethasLogInStream(hasLogInStream);
     }
@@ -353,12 +344,10 @@ void EditorModelManager::onAgentHasLogInStream(QString peerId, bool hasLogInStre
 
 /**
  * @brief Slot called when we receive the flag "Log In File" for an agent
- * @param peerId
- * @param hasLogInStream
  */
-void EditorModelManager::onAgentHasLogInFile(QString peerId, bool hasLogInFile)
+void EditorModelManager::onAgentHasLogInFile(QString uid, bool hasLogInFile)
 {
-    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromPeerId(peerId);
+    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromUid(uid);
     if (agent != nullptr) {
         agent->sethasLogInFile(hasLogInFile);
     }
@@ -367,12 +356,10 @@ void EditorModelManager::onAgentHasLogInFile(QString peerId, bool hasLogInFile)
 
 /**
  * @brief Slot called when we receive the path of "Log File" for an agent
- * @param peerId
- * @param logFilePath
  */
-void EditorModelManager::onAgentLogFilePath(QString peerId, QString logFilePath)
+void EditorModelManager::onAgentLogFilePath(QString uid, QString logFilePath)
 {
-    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromPeerId(peerId);
+    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromUid(uid);
     if (agent != nullptr) {
         agent->setlogFilePath(logFilePath);
     }
@@ -381,12 +368,10 @@ void EditorModelManager::onAgentLogFilePath(QString peerId, QString logFilePath)
 
 /**
  * @brief Slot called when we receive the path of "Definition File" for an agent
- * @param peerId
- * @param definitionFilePath
  */
-void EditorModelManager::onAgentDefinitionFilePath(QString peerId, QString definitionFilePath)
+void EditorModelManager::onAgentDefinitionFilePath(QString uid, QString definitionFilePath)
 {
-    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromPeerId(peerId);
+    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromUid(uid);
     if (agent != nullptr) {
         agent->setdefinitionFilePath(definitionFilePath);
     }
@@ -395,12 +380,10 @@ void EditorModelManager::onAgentDefinitionFilePath(QString peerId, QString defin
 
 /**
  * @brief Slot called when we receive the path of "Mapping File" for an agent
- * @param peerId
- * @param mappingFilePath
  */
-void EditorModelManager::onAgentMappingFilePath(QString peerId, QString mappingFilePath)
+void EditorModelManager::onAgentMappingFilePath(QString uid, QString mappingFilePath)
 {
-    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromPeerId(peerId);
+    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromUid(uid);
     if (agent != nullptr) {
         agent->setmappingFilePath(mappingFilePath);
     }

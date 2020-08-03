@@ -19,7 +19,7 @@
 #include <QtQml>
 
 #include <I2PropertyHelpers.h>
-
+#include "model/peerm.h"
 #include <viewModel/recordvm.h>
 #include <model/recordm.h>
 
@@ -37,11 +37,8 @@ class RecordsSupervisionController : public QObject
 {
     Q_OBJECT
 
-    // Peer id of the recorder
-    I2_CPP_NOSIGNAL_PROPERTY(QString, peerIdOfRecorder)
-
-    // Peer name of the recorder
-    I2_CPP_NOSIGNAL_PROPERTY(QString, peerNameOfRecorder)
+    // Peer of the recorder
+    I2_CPP_NOSIGNAL_PROPERTY(PeerM*, peerOfRecorder)
 
     // Flag indicating is there is a recorder with state ON
     I2_QML_PROPERTY_READONLY(bool, isRecorderON)
@@ -148,22 +145,9 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 
-    /**
-     * @brief Slot called when a recorder enter the network
-     * @param peerId
-     * @param peerName
-     * @param ipAddress
-     * @param hostname
-     */
-    void onRecorderEntered(QString peerId, QString peerName, QString ipAddress, QString hostname);
-
-
-    /**
-     * @brief Slot called when a recorder quit the network
-     * @param peerId
-     * @param peerName
-     */
-    void onRecorderExited(QString peerId, QString peerName);
+    // Slot called when a recorder enter/quit the network
+    void onRecorderEntered(PeerM* peer);
+    void onRecorderExited(PeerM* peer);
 
 
     /**

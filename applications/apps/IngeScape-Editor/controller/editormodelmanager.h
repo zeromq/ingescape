@@ -109,7 +109,7 @@ public Q_SLOTS:
      * @param peerId
      * @param isMuted
      */
-    void onisMutedFromAgentUpdated(QString peerId, bool isMuted);
+    void onisMutedFromAgentUpdated(QString uid, bool isMuted);
 
 
     /**
@@ -117,7 +117,7 @@ public Q_SLOTS:
      * @param peerId
      * @param isFrozen
      */
-    void onIsFrozenFromAgentUpdated(QString peerId, bool isFrozen);
+    void onIsFrozenFromAgentUpdated(QString uid, bool isFrozen);
 
 
     /**
@@ -126,7 +126,7 @@ public Q_SLOTS:
      * @param isMuted
      * @param outputName
      */
-    void onIsMutedFromOutputOfAgentUpdated(QString peerId, bool isMuted, QString outputName);
+    void onIsMutedFromOutputOfAgentUpdated(QString uid, bool isMuted, QString outputName);
 
 
     /**
@@ -134,7 +134,7 @@ public Q_SLOTS:
      * @param peerId
      * @param stateName
      */
-    void onAgentStateChanged(QString peerId, QString stateName);
+    void onAgentStateChanged(QString uid, QString stateName);
 
 
     /**
@@ -142,7 +142,7 @@ public Q_SLOTS:
      * @param peerId
      * @param hasLogInStream
      */
-    void onAgentHasLogInStream(QString peerId, bool hasLogInStream);
+    void onAgentHasLogInStream(QString uid, bool hasLogInStream);
 
 
     /**
@@ -150,7 +150,7 @@ public Q_SLOTS:
      * @param peerId
      * @param hasLogInStream
      */
-    void onAgentHasLogInFile(QString peerId, bool hasLogInFile);
+    void onAgentHasLogInFile(QString uid, bool hasLogInFile);
 
 
     /**
@@ -158,7 +158,7 @@ public Q_SLOTS:
      * @param peerId
      * @param logFilePath
      */
-    void onAgentLogFilePath(QString peerId, QString logFilePath);
+    void onAgentLogFilePath(QString uid, QString logFilePath);
 
 
     /**
@@ -166,7 +166,7 @@ public Q_SLOTS:
      * @param peerId
      * @param definitionFilePath
      */
-    void onAgentDefinitionFilePath(QString peerId, QString definitionFilePath);
+    void onAgentDefinitionFilePath(QString uid, QString definitionFilePath);
 
 
     /**
@@ -174,7 +174,7 @@ public Q_SLOTS:
      * @param peerId
      * @param mappingFilePath
      */
-    void onAgentMappingFilePath(QString peerId, QString mappingFilePath);
+    void onAgentMappingFilePath(QString uid, QString mappingFilePath);
 
 
 private Q_SLOTS:

@@ -44,7 +44,7 @@ HostVM::HostVM(QString name,
 
     //qInfo() << "New View Model of Host" << _name;
 
-    if (_modelM != nullptr)
+    if ((_modelM != nullptr) && (_modelM->peer() != nullptr))
     {
         _isON = true;
 
@@ -54,7 +54,7 @@ HostVM::HostVM(QString name,
             qCritical() << "The name of the view model of host" << _name << "does not correspond to the name of the model" << _modelM->name();
         }
 
-        if (!_modelM->streamingPort().isEmpty())
+        if (!_modelM->peer()->streamingPort().isEmpty())
         {
             _canProvideStream = true;
         }
@@ -139,15 +139,16 @@ void HostVM::changeStreamState()
  */
 void HostVM::startAgent(AgentM* agent)
 {
-    if ((agent != nullptr) && (_modelM != nullptr))
+    if ((agent != nullptr) && (agent->peer() != nullptr)
+            && (_modelM != nullptr) && (_modelM->peer() != nullptr))
     {
         QStringList message = {
             command_StartAgent,
-            agent->commandLine()
+            agent->peer()->commandLine()
         };
 
         // Send the message "Start Agent" to this host (IngeScape Launcher)
-        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_modelM->peerId(), message);
+        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_modelM->peer()->uid(), message);
     }
 }
 

@@ -1116,11 +1116,11 @@ void IngeScapeEditorController::_onOpenLogStreamOfAgents(QList<AgentM*> models)
     {
         for (AgentM* model : models)
         {
-            if ((model != nullptr) && model->isON())
+            if ((model != nullptr) && (model->peer() != nullptr) && model->isON())
             {
-                QString subscriberAddress = QString("tcp://%1:%2").arg(model->address(), model->loggerPort());
+                QString subscriberAddress = QString("tcp://%1:%2").arg(model->peer()->ipAddress(), model->peer()->loggerPort());
 
-                qDebug() << "Open the 'Log Stream' of" << model->name() << "(Address:" << model->address() << "+ Logger Port:" << model->loggerPort() << "--> Subscriber Address:" << subscriberAddress << ")";
+                qDebug() << "Open the 'Log Stream' of" << model->name() << "(Address:" << model->peer()->ipAddress() << "+ Logger Port:" << model->peer()->loggerPort() << "--> Subscriber Address:" << subscriberAddress << ")";
 
                 LogStreamController* logStreamController = nullptr;
 
@@ -1140,7 +1140,7 @@ void IngeScapeEditorController::_onOpenLogStreamOfAgents(QList<AgentM*> models)
                 else
                 {
                     // Create a new "Log Stream" controller
-                    logStreamController = new LogStreamController(model->name(), model->hostname(), subscriberAddress, this);
+                    logStreamController = new LogStreamController(model->name(), model->peer()->hostname(), subscriberAddress, this);
                     _openedLogStreamControllers.append(logStreamController);
                 }
             }

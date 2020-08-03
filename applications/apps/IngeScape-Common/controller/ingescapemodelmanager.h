@@ -28,6 +28,7 @@
 
 
 static const QString VERSION_JSON_PLATFORM = QString("1.0");
+//static const QString VERSION_JSON_PLATFORM = QString("2.0");
 
 
 /**
@@ -132,11 +133,9 @@ public:
 
 
     /**
-     * @brief Get the model of agent from a Peer Id
-     * @param peerId
-     * @return
+     * @brief Get the model of agent from a UID
      */
-    AgentM* getAgentModelFromPeerId(QString peerId);
+    AgentM* getAgentModelFromUid(QString uid);
 
 
     /**
@@ -313,41 +312,14 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 
-    /**
-     * @brief Slot called when an agent enter the network
-     * @param peerId
-     * @param agentName
-     * @param ipAddress
-     * @param hostname
-     * @param commandLine
-     * @param loggerPort
-     */
-    void onAgentEntered(QString peerId, QString agentName, QString ipAddress, QString hostname, QString commandLine, QString loggerPort);
+    // Slot called when an agent enter/quit the network
+    void onAgentEntered(PeerM* peer);
+    void onAgentExited(PeerM* peer);
 
 
-    /**
-     * @brief Slot called when an agent quit the network
-     * @param peer Id
-     * @param agent name
-     */
-    void onAgentExited(QString peerId, QString agentName);
-
-
-    /**
-     * @brief Slot called when a launcher enter the network
-     * @param peerId
-     * @param hostName
-     * @param ipAddress
-     */
-    void onLauncherEntered(QString peerId, QString hostName, QString ipAddress, QString streamingPort);
-
-
-    /**
-     * @brief Slot called when a launcher quit the network
-     * @param peerId
-     * @param hostName
-     */
-    void onLauncherExited(QString peerId, QString hostName);
+    // Slot called when a launcher enter/quit the network
+    void onLauncherEntered(PeerM* peer);
+    void onLauncherExited(PeerM* peer);
     
 
     /**

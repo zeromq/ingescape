@@ -135,7 +135,6 @@ public:
     bool startWithPreviousConfiguration();
 
 
-
     /**
      * @brief Start monitoring
      *
@@ -157,7 +156,12 @@ public:
     /**
      * @brief Create a peer which entered the network
      */
-    PeerM* createEnteredPeer(IngeScapeTypes::Value igsType, QString peerId, QString peerName, QString ipAddress);
+    PeerM* createEnteredPeer(IngeScapeTypes::Value igsType,
+                             QString peerId,
+                             QString peerName,
+                             QString ipAddress,
+                             QString hostname,
+                             QString commandLine);
 
 
     /**
@@ -273,113 +277,38 @@ Q_SIGNALS:
     void networkDeviceIpAddressHasChanged(QString newIpAddress);
 
 
-    /**
-     * @brief Signal emitted when an "IngeScape Agent" enter the network
-     * @param peerId
-     * @param peerName
-     * @param ipAddress
-     * @param hostname
-     * @param commandLine
-     * @param loggerPort
-     */
-    void agentEntered(QString peerId, QString peerName, QString ipAddress, QString hostname, QString commandLine, QString loggerPort);
+    //void peerHasBeenCreated(PeerM* peer);
+    //void peerWillBeDeleted(PeerM* peer);
 
 
-    /**
-     * @brief Signal emitted when an "IngeScape Agent" quit the network
-     * @param peer id
-     * @param peer name
-     */
-    void agentExited(QString peerId, QString peerName);
+    // Signal emitted when an "IngeScape Agent" enter/quit the network
+    void agentEntered(PeerM* peer);
+    void agentExited(PeerM* peer);
 
 
-    /**
-     * @brief Signal emitted when an "IngeScape Launcher" enter the network
-     * @param peerId
-     * @param hostname
-     * @param ipAddress
-     */
-    void launcherEntered(QString peerId, QString hostname, QString ipAddress, QString streamingPort);
+    // Signal emitted when an "IngeScape Launcher" enter/quit the network
+    void launcherEntered(PeerM* peer);
+    void launcherExited(PeerM* peer);
 
 
-    /**
-     * @brief Signal emitted when an "IngeScape Launcher" quit the network
-     * @param peerId
-     * @param hostname
-     */
-    void launcherExited(QString peerId, QString hostname);
+    // Signal emitted when an "IngeScape Editor" enter/quit the network
+    void editorEntered(PeerM* peer);
+    void editorExited(PeerM* peer);
 
 
-    /**
-     * @brief Signal emitted when an "IngeScape Editor" enter the network
-     * @param peerId
-     * @param peerName
-     * @param ipAddress
-     * @param hostname
-     */
-    void editorEntered(QString peerId, QString peerName, QString ipAddress, QString hostname);
+    // Signal emitted when an "IngeScape Recorder" enter/quit the network
+    void recorderEntered(PeerM* peer);
+    void recorderExited(PeerM* peer);
 
 
-    /**
-     * @brief Signal emitted when an "IngeScape Editor" quit the network
-     * @param peerId
-     * @param peerName
-     */
-    void editorExited(QString peerId, QString peerName);
+    // Signal emitted when an "IngeScape Expe" enter/quit the network
+    void expeEntered(PeerM* peer);
+    void expeExited(PeerM* peer);
 
 
-    /**
-     * @brief Signal emitted when an "IngeScape Recorder" enter the network
-     * @param peerId
-     * @param peerName
-     * @param ipAddress
-     * @param hostname
-     */
-    void recorderEntered(QString peerId, QString peerName, QString ipAddress, QString hostname);
-
-
-    /**
-     * @brief Signal emitted when an "IngeScape Recorder" quit the network
-     * @param peerId
-     * @param peerName
-     */
-    void recorderExited(QString peerId, QString peerName);
-
-
-    /**
-     * @brief Signal emitted when an "IngeScape Expe" enter the network
-     * @param peerId
-     * @param peerName
-     * @param ipAddress
-     * @param hostname
-     */
-    void expeEntered(QString peerId, QString peerName, QString ipAddress, QString hostname);
-
-
-    /**
-     * @brief Signal emitted when an "IngeScape Expe" quit the network
-     * @param peerId
-     * @param peerName
-     */
-    void expeExited(QString peerId, QString peerName);
-
-
-    /**
-     * @brief Signal emitted when an "IngeScape Assessments" enter the network
-     * @param peerId
-     * @param peerName
-     * @param ipAddress
-     * @param hostname
-     */
-    void assessmentsEntered(QString peerId, QString peerName, QString ipAddress, QString hostname);
-
-
-    /**
-     * @brief Signal emitted when an "IngeScape Assessments" quit the network
-     * @param peerId
-     * @param peerName
-     */
-    void assessmentsExited(QString peerId, QString peerName);
+    // Signal emitted when an "IngeScape Assessments" enter/quit the network
+    void assessmentsEntered(PeerM* peer);
+    void assessmentsExited(PeerM* peer);
 
 
     /**

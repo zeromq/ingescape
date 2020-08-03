@@ -139,7 +139,7 @@ void HostsSupervisionController::onHostModelHasBeenCreated(HostM* host)
             // Associate host with existing agents if necessary
             for (AgentM* agent : _allAgents)
             {
-                if ((agent != nullptr) && (agent->hostname() == hostName))
+                if ((agent != nullptr) && (agent->peer() != nullptr) && (agent->peer()->hostname() == hostName))
                 {
                     qDebug() << "Add (existing) agent" << agent->name() << "to new host" << hostName;
 
@@ -218,17 +218,17 @@ void HostsSupervisionController::onPreviousHostParsed(QString hostName)
  */
 void HostsSupervisionController::onAgentModelHasBeenCreatedORonAgentModelBackOnNetwork(AgentM* agent)
 {
-    if ((agent != nullptr) && !agent->hostname().isEmpty())
+    if ((agent != nullptr) && (agent->peer() != nullptr) && !agent->peer()->hostname().isEmpty())
     {
         _allAgents.append(agent);
 
         // Get the view model of host with its name
-        HostVM* hostVM = _getHostWithName(agent->hostname());
+        HostVM* hostVM = _getHostWithName(agent->peer()->hostname());
 
         if (hostVM == nullptr)
         {
             // Create a view model of host with a name
-            hostVM = _createViewModelOfHost(agent->hostname(), nullptr);
+            hostVM = _createViewModelOfHost(agent->peer()->hostname(), nullptr);
         }
 
         if (hostVM != nullptr)
@@ -245,13 +245,12 @@ void HostsSupervisionController::onAgentModelHasBeenCreatedORonAgentModelBackOnN
  */
 void HostsSupervisionController::onAgentModelWillBeDeleted(AgentM* agent)
 {
-    if ((agent != nullptr) && !agent->hostname().isEmpty())
+    if ((agent != nullptr) && (agent->peer() != nullptr) && !agent->peer()->hostname().isEmpty())
     {
         _allAgents.removeOne(agent);
 
         // Get the view model of host with its name
-        HostVM* hostVM = _getHostWithName(agent->hostname());
-
+        HostVM* hostVM = _getHostWithName(agent->peer()->hostname());
         if (hostVM != nullptr)
         {
             hostVM->removeAgentModelFromList(agent);

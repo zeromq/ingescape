@@ -27,6 +27,13 @@ class PeerM : public QObject
     I2_QML_PROPERTY_READONLY(QString, uid)
     I2_QML_PROPERTY_READONLY(QString, name)
     I2_QML_PROPERTY_READONLY(QString, ipAddress)
+    I2_QML_PROPERTY_READONLY(QString, hostname)
+    I2_QML_PROPERTY(QString, commandLine)
+
+    I2_QML_PROPERTY_READONLY(bool, isON)
+
+    I2_CPP_PROPERTY(QString, loggerPort)
+    I2_CPP_PROPERTY(QString, streamingPort)
 
 
 public:
@@ -34,6 +41,9 @@ public:
                    QString uid,
                    QString name,
                    QString ipAddress,
+                   QString hostname,
+                   QString commandLine,
+                   bool isON = true,
                    QObject *parent = nullptr);
     ~PeerM();
 

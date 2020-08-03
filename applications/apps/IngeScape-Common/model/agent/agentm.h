@@ -20,7 +20,6 @@
 #include <QtQml>
 
 #include <I2PropertyHelpers.h>
-
 #include "model/peerm.h"
 #include <model/agent/definition/definitionm.h>
 #include <model/agent/mapping/agentmappingm.h>
@@ -39,16 +38,7 @@ class AgentM : public QObject
     // Unique identifier of our agent
     I2_QML_PROPERTY_READONLY(QString, uid)
 
-    I2_QML_PROPERTY(PeerM*, peer)
-
-    // IP address of our agent
-    I2_QML_PROPERTY_READONLY(QString, address)
-
-    // Hostname of our agent
-    I2_QML_PROPERTY_READONLY(QString, hostname)
-
-    // Command line of our agent (can be edited from QML)
-    I2_QML_PROPERTY(QString, commandLine)
+    I2_QML_PROPERTY_CUSTOM_SETTER(PeerM*, peer)
 
     // Flag indicating if our agent is ON (vs OFF)
     I2_QML_PROPERTY_READONLY(bool, isON)
@@ -70,9 +60,6 @@ class AgentM : public QObject
 
     // State of our agent
     I2_CPP_PROPERTY(QString, state)
-
-    // Port for log in stream
-    I2_CPP_PROPERTY(QString, loggerPort)
 
     // Flag indicating if our agent has its log in a stream
     I2_CPP_PROPERTY(bool, hasLogInStream)
@@ -97,18 +84,12 @@ public:
      * @param name
      * @param uid optional
      * @param peer optional
-     * @param ipAddress optional
-     * @param hostname optional
-     * @param commandLine optional
      * @param isON optional
      * @param parent
      */
     explicit AgentM(QString name,
                     QString uid = "",
                     PeerM* peer = nullptr,
-                    QString ipAddress = "",
-                    QString hostname = HOSTNAME_NOT_DEFINED,
-                    QString commandLine = "",
                     bool isON = false,
                     QObject *parent = nullptr);
 

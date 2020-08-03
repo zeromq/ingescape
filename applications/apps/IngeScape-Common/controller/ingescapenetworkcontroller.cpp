@@ -126,7 +126,12 @@ void onBusMessageIncommingCallback(const char *event,
 
             if (igsType != IngeScapeTypes::UNKNOWN)
             {
-                PeerM* peer = ingeScapeNetworkC->createEnteredPeer(igsType, peerId, peerName, ipAddress);
+                PeerM* peer = ingeScapeNetworkC->createEnteredPeer(igsType,
+                                                                   peerId,
+                                                                   peerName,
+                                                                   ipAddress,
+                                                                   hostname,
+                                                                   commandLine);
                 if (peer != nullptr)
                 {
                     switch (igsType)
@@ -135,7 +140,9 @@ void onBusMessageIncommingCallback(const char *event,
                     {
                         ingeScapeNetworkC->setnumberOfAgents(ingeScapeNetworkC->numberOfAgents() + 1);
 
-                        //Q_EMIT ingeScapeNetworkC->agentEntered(peerId, peerName, ipAddress, hostname, commandLine, loggerPort);
+                        peer->setloggerPort(loggerPort);
+
+                        Q_EMIT ingeScapeNetworkC->agentEntered(peer);
                     }
                         break;
 
@@ -145,9 +152,11 @@ void onBusMessageIncommingCallback(const char *event,
 
                         if (peerName.endsWith(suffix_Launcher)) {
                             hostname = peerName.left(peerName.length() - suffix_Launcher.length());
+                            peer->sethostname(hostname);
                         }
+                        peer->setstreamingPort(streamingPort);
 
-                        Q_EMIT ingeScapeNetworkC->launcherEntered(peerId, hostname, ipAddress, streamingPort);
+                        Q_EMIT ingeScapeNetworkC->launcherEntered(peer);
                     }
                         break;
 
@@ -155,7 +164,7 @@ void onBusMessageIncommingCallback(const char *event,
                     {
                         ingeScapeNetworkC->setnumberOfRecorders(ingeScapeNetworkC->numberOfRecorders() + 1);
 
-                        Q_EMIT ingeScapeNetworkC->recorderEntered(peerId, peerName, ipAddress, hostname);
+                        Q_EMIT ingeScapeNetworkC->recorderEntered(peer);
                     }
                         break;
 
@@ -163,7 +172,7 @@ void onBusMessageIncommingCallback(const char *event,
                     {
                         ingeScapeNetworkC->setnumberOfEditors(ingeScapeNetworkC->numberOfEditors() + 1);
 
-                        Q_EMIT ingeScapeNetworkC->editorEntered(peerId, peerName, ipAddress, hostname);
+                        Q_EMIT ingeScapeNetworkC->editorEntered(peer);
                     }
                         break;
 
@@ -171,7 +180,7 @@ void onBusMessageIncommingCallback(const char *event,
                     {
                         ingeScapeNetworkC->setnumberOfAssessments(ingeScapeNetworkC->numberOfAssessments() + 1);
 
-                        Q_EMIT ingeScapeNetworkC->assessmentsEntered(peerId, peerName, ipAddress, hostname);
+                        Q_EMIT ingeScapeNetworkC->assessmentsEntered(peer);
                     }
                         break;
 
@@ -179,13 +188,15 @@ void onBusMessageIncommingCallback(const char *event,
                     {
                         ingeScapeNetworkC->setnumberOfExpes(ingeScapeNetworkC->numberOfExpes() + 1);
 
-                        Q_EMIT ingeScapeNetworkC->expeEntered(peerId, peerName, ipAddress, hostname);
+                        Q_EMIT ingeScapeNetworkC->expeEntered(peer);
                     }
                         break;
 
                     default:
                         break;
                     }
+
+                    //Q_EMIT ingeScapeNetworkC->peerHasBeenCreated(peer);
                 }
             }
             else {
@@ -228,8 +239,7 @@ void onBusMessageIncommingCallback(const char *event,
                 // IngeScape AGENT
                 case IngeScapeTypes::AGENT:
                 {
-                    // Emit the signal "Agent Exited"
-                    Q_EMIT ingeScapeNetworkC->agentExited(peerId, peerName);
+                    Q_EMIT ingeScapeNetworkC->agentExited(peer);
 
                     ingeScapeNetworkC->setnumberOfAgents(ingeScapeNetworkC->numberOfAgents() - 1);
 
@@ -238,14 +248,13 @@ void onBusMessageIncommingCallback(const char *event,
                     // IngeScape LAUNCHER
                 case IngeScapeTypes::LAUNCHER:
                 {
-                    QString hostname = "";
-
+                    /*QString hostname = "";
                     if (peerName.endsWith(suffix_Launcher)) {
                         hostname = peerName.left(peerName.length() - suffix_Launcher.length());
-                    }
+                        peer->sethostname(hostname);
+                    }*/
 
-                    // Emit the signal "Launcher Exited"
-                    Q_EMIT ingeScapeNetworkC->launcherExited(peerId, hostname);
+                    Q_EMIT ingeScapeNetworkC->launcherExited(peer);
 
                     ingeScapeNetworkC->setnumberOfLaunchers(ingeScapeNetworkC->numberOfLaunchers() - 1);
 
@@ -254,8 +263,7 @@ void onBusMessageIncommingCallback(const char *event,
                     // IngeScape RECORDER
                 case IngeScapeTypes::RECORDER:
                 {
-                    // Emit the signal "Recorder Exited"
-                    Q_EMIT ingeScapeNetworkC->recorderExited(peerId, peerName);
+                    Q_EMIT ingeScapeNetworkC->recorderExited(peer);
 
                     ingeScapeNetworkC->setnumberOfRecorders(ingeScapeNetworkC->numberOfRecorders() - 1);
 
@@ -264,8 +272,7 @@ void onBusMessageIncommingCallback(const char *event,
                     // IngeScape EDITOR
                 case IngeScapeTypes::EDITOR:
                 {
-                    // Emit the signal "Editor Exited"
-                    Q_EMIT ingeScapeNetworkC->editorExited(peerId, peerName);
+                    Q_EMIT ingeScapeNetworkC->editorExited(peer);
 
                     ingeScapeNetworkC->setnumberOfEditors(ingeScapeNetworkC->numberOfEditors() - 1);
 
@@ -274,8 +281,7 @@ void onBusMessageIncommingCallback(const char *event,
                     // IngeScape ASSESSMENTS
                 case IngeScapeTypes::ASSESSMENTS:
                 {
-                    // Emit the signal "Assessments Exited"
-                    Q_EMIT ingeScapeNetworkC->assessmentsExited(peerId, peerName);
+                    Q_EMIT ingeScapeNetworkC->assessmentsExited(peer);
 
                     ingeScapeNetworkC->setnumberOfAssessments(ingeScapeNetworkC->numberOfAssessments() - 1);
 
@@ -284,8 +290,7 @@ void onBusMessageIncommingCallback(const char *event,
                     // IngeScape EXPE
                 case IngeScapeTypes::EXPE:
                 {
-                    // Emit the signal "Expe Exited"
-                    Q_EMIT ingeScapeNetworkC->expeExited(peerId, peerName);
+                    Q_EMIT ingeScapeNetworkC->expeExited(peer);
 
                     ingeScapeNetworkC->setnumberOfExpes(ingeScapeNetworkC->numberOfExpes() - 1);
 
@@ -843,12 +848,17 @@ PeerM* IngeScapeNetworkController::getPeerWithId(QString peerId)
 /**
  * @brief Create a peer which entered the network
  */
-PeerM* IngeScapeNetworkController::createEnteredPeer(IngeScapeTypes::Value igsType, QString peerId, QString peerName, QString ipAddress)
+PeerM* IngeScapeNetworkController::createEnteredPeer(IngeScapeTypes::Value igsType,
+                                                     QString peerId,
+                                                     QString peerName,
+                                                     QString ipAddress,
+                                                     QString hostname,
+                                                     QString commandLine)
 {
     PeerM* peer = nullptr;
     if (!_hashFromUidToPeer.contains(peerId))
     {
-        peer = new PeerM(igsType, peerId, peerName, ipAddress);
+        peer = new PeerM(igsType, peerId, peerName, ipAddress, hostname, commandLine);
         _hashFromUidToPeer.insert(peerId, peer);
     }
     else {
@@ -863,9 +873,14 @@ PeerM* IngeScapeNetworkController::createEnteredPeer(IngeScapeTypes::Value igsTy
  */
 void IngeScapeNetworkController::deleteExitedPeer(PeerM* peer)
 {
-    if ((peer != nullptr) && _hashFromUidToPeer.contains(peer->uid()))
+    if (peer != nullptr)
     {
-        _hashFromUidToPeer.remove(peer->uid());
+        //Q_EMIT peerWillBeDeleted(peer);
+
+        if (_hashFromUidToPeer.contains(peer->uid())) {
+            _hashFromUidToPeer.remove(peer->uid());
+        }
+
         peer->deleteLater();
     }
 }

@@ -17,6 +17,8 @@
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
+#include "model/peerm.h"
+
 
 /**
  * @brief The HostM class defines a model of host
@@ -28,14 +30,10 @@ class HostM : public QObject
     // Name of our host
     I2_QML_PROPERTY_READONLY(QString, name)
 
-    // Peer ID of our host (unique identifier)
-    I2_QML_PROPERTY_READONLY(QString, peerId)
-
-    // IP address of our host
-    I2_QML_PROPERTY_READONLY(QString, ipAddress)
+    I2_QML_PROPERTY_CUSTOM_SETTER(PeerM*, peer)
 
     // Streaming port of the host
-    I2_QML_PROPERTY_READONLY(QString, streamingPort)
+    //I2_QML_PROPERTY_READONLY(QString, streamingPort)
 
     // Flag indicating if our host is ON (vs OFF)
     //I2_QML_PROPERTY_READONLY(bool, isON)
@@ -44,15 +42,9 @@ class HostM : public QObject
 public:
     /**
      * @brief Constructor
-     * @param name
-     * @param peerId
-     * @param ipAddress
-     * @param parent
      */
     explicit HostM(QString name,
-                   QString peerId,
-                   QString ipAddress,
-                   QString streamingPort,
+                   PeerM* peer = nullptr,
                    QObject *parent = nullptr);
 
 
