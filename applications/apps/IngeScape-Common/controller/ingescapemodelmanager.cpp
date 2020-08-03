@@ -768,7 +768,7 @@ void IngeScapeModelManager::onPeerOfAgentsEntered(PeerM* peer)
 {
     if ((peer != nullptr) && (peer->igsType() == IngeScapeTypes::AGENT))
     {
-        // FIXME onPeerOfAgentsEntered
+        // FIXME onPeerOfAgentsEntered Nothing to do ?
 
         /*AgentM* agent = getAgentModelFromPeerId(peerId);
 
@@ -817,7 +817,17 @@ void IngeScapeModelManager::onPeerOfAgentsExited(PeerM* peer)
 {
     if ((peer != nullptr) && (peer->igsType() == IngeScapeTypes::AGENT))
     {
-        // FIXME onPeerOfAgentsExited
+        for (AgentM* agent : _hashFromUidToAgent.values())
+        {
+            if ((agent != nullptr) && (agent->peer() != nullptr)
+                    && (agent->peer() == peer))
+            {
+                //onAgentExited(peer, agent->uid());
+                agent->setisON(false);
+
+                //agent->setpeer(nullptr); // Loose data about hostname, ip, ...
+            }
+        }
     }
 }
 
