@@ -427,78 +427,80 @@ igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, 
     bool found = false;
     
     //1- iteration on remote agents
-    igs_remote_agent_t *remoteAgent = NULL, *tmp = NULL;
-    HASH_ITER(hh, agent->context->remoteAgents, remoteAgent, tmp){
-        if (streq(remoteAgent->name, agentNameOrUUID) || streq(remoteAgent->uuid, agentNameOrUUID)){
-            //we found a matching agent
-            igs_callArgument_t *arg = NULL;
-            found = true;
-            if (remoteAgent->definition == NULL){
-                igsAgent_warn(agent, "definition is unknown for %s(%s) : cannot verify call before sending it",
-                              remoteAgent->name, agentNameOrUUID);
-                //continue; //commented to allow sending the message anyway
-            }else{
-                igs_call_t *call = NULL;
-                HASH_FIND_STR(remoteAgent->definition->calls_table, callName, call);
-                if (call != NULL){
-                    size_t nbArguments = 0;
-                    if (list != NULL && *list != NULL)
-                        LL_COUNT(*list, arg, nbArguments);
-                    size_t definedNbArguments = 0;
-                    LL_COUNT(call->arguments, arg, definedNbArguments);
-                    if (nbArguments != definedNbArguments){
-                        igsAgent_error(agent, "passed number of arguments is not correct (received: %zu / expected: %zu) : call will not be sent",
-                                  nbArguments, definedNbArguments);
+    if (coreContext->node != NULL){
+        igs_remote_agent_t *remoteAgent = NULL, *tmp = NULL;
+        HASH_ITER(hh, agent->context->remoteAgents, remoteAgent, tmp){
+            if (streq(remoteAgent->name, agentNameOrUUID) || streq(remoteAgent->uuid, agentNameOrUUID)){
+                //we found a matching agent
+                igs_callArgument_t *arg = NULL;
+                found = true;
+                if (remoteAgent->definition == NULL){
+                    igsAgent_warn(agent, "definition is unknown for %s(%s) : cannot verify call before sending it",
+                                  remoteAgent->name, agentNameOrUUID);
+                    //continue; //commented to allow sending the message anyway
+                }else{
+                    igs_call_t *call = NULL;
+                    HASH_FIND_STR(remoteAgent->definition->calls_table, callName, call);
+                    if (call != NULL){
+                        size_t nbArguments = 0;
+                        if (list != NULL && *list != NULL)
+                            LL_COUNT(*list, arg, nbArguments);
+                        size_t definedNbArguments = 0;
+                        LL_COUNT(call->arguments, arg, definedNbArguments);
+                        if (nbArguments != definedNbArguments){
+                            igsAgent_error(agent, "passed number of arguments is not correct (received: %zu / expected: %zu) : call will not be sent",
+                                           nbArguments, definedNbArguments);
+                            continue;
+                        }
+                    }else{
+                        igsAgent_error(agent, "could not find call named %s for %s  : call will not be sent", callName, agentNameOrUUID);
                         continue;
                     }
-                }else{
-                    igsAgent_error(agent, "could not find call named %s for %s  : call will not be sent", callName, agentNameOrUUID);
-                    continue;
                 }
-            }
-            zmsg_t *msg = zmsg_new();
-            zmsg_addstr(msg, "CALL");
-            zmsg_addstr(msg, agent->uuid);
-            zmsg_addstr(msg, remoteAgent->uuid);
-            zmsg_addstr(msg, callName);
-            if (list != NULL){
-                LL_FOREACH(*list, arg){
-                    zframe_t *frame = NULL;
-                    switch (arg->type) {
-                        case IGS_BOOL_T:
-                            frame = zframe_new(&arg->b, sizeof(int));
-                            break;
-                        case IGS_INTEGER_T:
-                            frame = zframe_new(&arg->i, sizeof(int));
-                            break;
-                        case IGS_DOUBLE_T:
-                            frame = zframe_new(&arg->d, sizeof(double));
-                            break;
-                        case IGS_STRING_T:{
-                            if (arg->c != NULL){
-                                frame = zframe_new(arg->c, strlen(arg->c)+1);
-                            }else{
-                                frame = zframe_new(NULL, 0);
+                zmsg_t *msg = zmsg_new();
+                zmsg_addstr(msg, "CALL");
+                zmsg_addstr(msg, agent->uuid);
+                zmsg_addstr(msg, remoteAgent->uuid);
+                zmsg_addstr(msg, callName);
+                if (list != NULL){
+                    LL_FOREACH(*list, arg){
+                        zframe_t *frame = NULL;
+                        switch (arg->type) {
+                            case IGS_BOOL_T:
+                                frame = zframe_new(&arg->b, sizeof(int));
+                                break;
+                            case IGS_INTEGER_T:
+                                frame = zframe_new(&arg->i, sizeof(int));
+                                break;
+                            case IGS_DOUBLE_T:
+                                frame = zframe_new(&arg->d, sizeof(double));
+                                break;
+                            case IGS_STRING_T:{
+                                if (arg->c != NULL){
+                                    frame = zframe_new(arg->c, strlen(arg->c)+1);
+                                }else{
+                                    frame = zframe_new(NULL, 0);
+                                }
+                                break;
                             }
-                            break;
+                            case IGS_DATA_T:
+                                frame = zframe_new(arg->data, arg->size);
+                                break;
+                            default:
+                                break;
                         }
-                        case IGS_DATA_T:
-                            frame = zframe_new(arg->data, arg->size);
-                            break;
-                        default:
-                            break;
+                        assert(frame);
+                        zmsg_add(msg, frame);
                     }
-                    assert(frame);
-                    zmsg_add(msg, frame);
                 }
+                bus_zyreLock();
+                zyre_shouts(agent->context->node, agent->context->callsChannel, "%s(%s) calls %s.%s(%s)",
+                            agent->name, agent->uuid, remoteAgent->name, callName, remoteAgent->uuid);
+                zyre_whisper(agent->context->node, remoteAgent->peer->peerId, &msg);
+                bus_zyreUnlock();
+                igsAgent_debug(agent, "sent call %s to %s(%s)", callName, remoteAgent->name, remoteAgent->uuid);
+                
             }
-            bus_zyreLock();
-            zyre_shouts(agent->context->node, agent->context->callsChannel, "%s(%s) calls %s.%s(%s)",
-                        agent->name, agent->uuid, remoteAgent->name, callName, remoteAgent->uuid);
-            zyre_whisper(agent->context->node, remoteAgent->peer->peerId, &msg);
-            bus_zyreUnlock();
-            igsAgent_debug(agent, "sent call %s to %s(%s)", callName, remoteAgent->name, remoteAgent->uuid);
-
         }
     }
     
@@ -545,8 +547,10 @@ igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, 
             }
 
             bus_zyreLock();
-            zyre_shouts(agent->context->node, agent->context->callsChannel, "%s(%s) calls %s.%s(%s)",
-                        agent->name, agent->uuid, localAgent->name, callName, localAgent->uuid);
+            if (coreContext->node != NULL){
+                zyre_shouts(agent->context->node, agent->context->callsChannel, "%s(%s) calls %s.%s(%s)",
+                            agent->name, agent->uuid, localAgent->name, callName, localAgent->uuid);
+            }
             bus_zyreUnlock();
             igsAgent_debug(agent, "sent call %s to %s(%s)", callName, localAgent->name, localAgent->uuid);
 
