@@ -119,15 +119,15 @@ void AgentsGroupedByDefinitionVM::askStartAgent()
     for (AgentM* model : _models.toList())
     {
         // Check if the model has a hostname
-        if ((model != nullptr) && !model->hostname().isEmpty())
+        if ((model != nullptr) && (model->peer() != nullptr) && !model->peer()->hostname().isEmpty())
         {
             // Get the peer id of the Launcher on this host
-            QString peerIdOfLauncher = IngeScapeModelManager::instance()->getPeerIdOfLauncherOnHost(model->hostname());
+            QString peerIdOfLauncher = IngeScapeModelManager::instance()->getPeerIdOfLauncherOnHost(model->peer()->hostname());
             if (!peerIdOfLauncher.isEmpty())
             {
                 QStringList message = {
                     command_StartAgent,
-                    model->commandLine()
+                    model->peer()->commandLine()
                 };
 
                 // Send the message "Start Agent" to the IngeScape Launcher

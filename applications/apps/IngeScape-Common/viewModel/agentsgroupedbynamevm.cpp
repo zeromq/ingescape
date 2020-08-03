@@ -152,15 +152,15 @@ void AgentsGroupedByNameVM::askStartAgent()
     for (AgentM* model : _models.toList())
     {
         // Check if the model has a hostname
-        if ((model != nullptr) && !model->hostname().isEmpty())
+        if ((model != nullptr) && (model->peer() != nullptr) && !model->peer()->hostname().isEmpty())
         {
             // Get the peer id of the Launcher on this host
-            QString peerIdOfLauncher = IngeScapeModelManager::instance()->getPeerIdOfLauncherOnHost(model->hostname());
+            QString peerIdOfLauncher = IngeScapeModelManager::instance()->getPeerIdOfLauncherOnHost(model->peer()->hostname());
             if (!peerIdOfLauncher.isEmpty())
             {
                 QStringList message = {
                     command_StartAgent,
-                    model->commandLine()
+                    model->peer()->commandLine()
                 };
 
                 // Send the message "Start Agent" to the IngeScape Launcher
@@ -560,7 +560,7 @@ void AgentsGroupedByNameVM::_onIsONofModelChanged(bool isON)
     if (!isON)
     {
         AgentM* model = qobject_cast<AgentM*>(sender());
-        if ((model != nullptr) && !model->hostname().isEmpty())
+        if ((model != nullptr) && (model->peer() != nullptr) && !model->peer()->hostname().isEmpty())
         {
             AgentsGroupedByDefinitionVM* agentsGroupedByDefinition = nullptr;
 
@@ -576,18 +576,19 @@ void AgentsGroupedByNameVM::_onIsONofModelChanged(bool isON)
             if (agentsGroupedByDefinition != nullptr)
             {
                 // Get the list of agent models on the host
-                QList<AgentM*> modelsOnHost = agentsGroupedByDefinition->getModelsOnHost(model->hostname());
+                QList<AgentM*> modelsOnHost = agentsGroupedByDefinition->getModelsOnHost(model->peer()->hostname());
 
                 // At least, 2 models (this one and another one)
                 if (modelsOnHost.count() > 1)
                 {
                     bool hasToDeleteNewModel = false;
-                    QString commandLine = model->commandLine();
+                    QString commandLine = model->peer()->commandLine();
 
                     for (AgentM* iterator : modelsOnHost)
                     {
                         // Same command line and other model is already OFF  --> we consider that it is the same model
-                        if ((iterator != nullptr) && (iterator != model) && !iterator->isON() && (iterator->commandLine() == commandLine))
+                        if ((iterator != nullptr) && (iterator != model) && !iterator->isON()
+                                && (iterator->peer() != nullptr) && (iterator->peer()->commandLine() == commandLine))
                         {
                             // This model is useless from now, we have to delete it
                             hasToDeleteNewModel = true;
@@ -598,7 +599,7 @@ void AgentsGroupedByNameVM::_onIsONofModelChanged(bool isON)
                     // We have to remove this model
                     if (hasToDeleteNewModel)
                     {
-                        qDebug() << "Useless Model of agent" << _name << "on" << model->hostname();
+                        qDebug() << "Useless Model of agent" << _name << "on" << model->peer()->hostname();
 
                         agentsGroupedByDefinition->models()->remove(model);
 
@@ -859,8 +860,8 @@ void AgentsGroupedByNameVM::_updateWithAllModels()
         AgentM* model = _models.at(0);
         if (model != nullptr)
         {
-            if (!model->peerId().isEmpty()) {
-                _peerIdsList = QStringList(model->peerId());
+            if ((model->peer() != nullptr) && !model->peer()->uid().isEmpty()) {
+                _peerIdsList = QStringList(model->peer()->uid());
             }
 
             globalIsON = model->isON();
@@ -884,8 +885,8 @@ void AgentsGroupedByNameVM::_updateWithAllModels()
         {
             if (model != nullptr)
             {
-                if (!model->peerId().isEmpty()) {
-                    _peerIdsList.append(model->peerId());
+                if ((model->peer() != nullptr) && !model->peer()->uid().isEmpty()) {
+                    _peerIdsList.append(model->peer()->uid());
                 }
 
                 if (model->isON())
@@ -925,7 +926,7 @@ void AgentsGroupedByNameVM::_updateWithAllModels()
 void AgentsGroupedByNameVM::_manageJustDefinedAgent(AgentM* model)
 {
     DefinitionM* definition = model->definition();
-    if ((model != nullptr) && (definition != nullptr))
+    if ((model != nullptr) && (model->peer() != nullptr) && (definition != nullptr))
     {
         AgentsGroupedByDefinitionVM* groupOfAgentsWithSameDefinition = nullptr;
 
@@ -945,8 +946,8 @@ void AgentsGroupedByNameVM::_manageJustDefinedAgent(AgentM* model)
         // Exactly the same definition
         if (groupOfAgentsWithSameDefinition != nullptr)
         {
-            QString hostname = model->hostname();
-            QString commandLine = model->commandLine();
+            QString hostname = model->peer()->hostname();
+            QString commandLine = model->peer()->commandLine();
 
             // Hostname is not defined
             // There is already an existing model of agent (in the VM groupOfAgentsWithSameDefinition)
@@ -983,7 +984,8 @@ void AgentsGroupedByNameVM::_manageJustDefinedAgent(AgentM* model)
                         for (AgentM* iterator : modelsOnHost)
                         {
                             // Same command line and existing agent is OFF --> we consider that it is the same model that evolve from OFF to ON
-                            if ((iterator != nullptr) && (iterator->commandLine() == commandLine) && !iterator->isON())
+                            if ((iterator != nullptr) && (iterator->peer() != nullptr)
+                                    && (iterator->peer()->commandLine() == commandLine) && !iterator->isON())
                             {
                                 // We have to replace it by the new one
                                 sameModel = iterator;
@@ -1000,7 +1002,8 @@ void AgentsGroupedByNameVM::_manageJustDefinedAgent(AgentM* model)
                             //if ((iterator != nullptr) && (iterator->commandLine() == commandLine) && iterator->isON())
 
                             // Same command line --> we consider that it is the same model (useless because OFF)
-                            if ((iterator != nullptr) && (iterator->commandLine() == commandLine))
+                            if ((iterator != nullptr) && (iterator->peer() != nullptr)
+                                    && (iterator->peer()->commandLine() == commandLine))
                             {
                                 // The new model is useless, we have to delete it
                                 hasToDeleteNewModel = true;
@@ -1018,11 +1021,11 @@ void AgentsGroupedByNameVM::_manageJustDefinedAgent(AgentM* model)
                         Q_EMIT agentModelHasToBeDeleted(model);
                     }
                     // Else if we have to replace an existing (same) model by the new one
-                    else if (sameModel != nullptr)
+                    else if ((sameModel != nullptr) && (sameModel->peer() != nullptr))
                     {
                         if (groupOfAgentsWithSameDefinition->models()->contains(sameModel))
                         {
-                            qDebug() << "Replace model of agent" << _name << "on" << hostname << "(" << sameModel->peerId() << "-->" << model->peerId() << ")";
+                            qDebug() << "Replace model of agent" << _name << "on" << hostname << "(" << sameModel->peer()->uid() << "-->" << model->peer()->uid() << ")";
 
                             // First add the new model before remove the previous model
                             // (allows to prevent to have 0 model at a given moment and to prevent to emit signal noMoreModelAndUseless that remove the groupOfAgentsWithSameDefinition)
@@ -1104,11 +1107,11 @@ void AgentsGroupedByNameVM::_checkHaveToMergeAgent(AgentM* model)
 void AgentsGroupedByNameVM::_manageNewModelOnHostForGroup(AgentM* model, AgentsGroupedByDefinitionVM* groupOfAgentsWithSameDefinition)
 {
     // Model is ON and its hostname is a real one
-    if ((groupOfAgentsWithSameDefinition != nullptr) && (model != nullptr)
-            && model->isON() && (model->hostname() != HOSTNAME_NOT_DEFINED))
+    if ((groupOfAgentsWithSameDefinition != nullptr) && (model != nullptr) && (model->peer() != nullptr)
+            && model->isON() && (model->peer()->hostname() != HOSTNAME_NOT_DEFINED))
     {
-        QString hostname = model->hostname();
-        QString commandLine = model->commandLine();
+        QString hostname = model->peer()->hostname();
+        QString commandLine = model->peer()->commandLine();
 
         // Get the list of agent models on the host
         QList<AgentM*> modelsOnHost = groupOfAgentsWithSameDefinition->getModelsOnHost(hostname);
@@ -1129,7 +1132,8 @@ void AgentsGroupedByNameVM::_manageNewModelOnHostForGroup(AgentM* model, AgentsG
             for (AgentM* iterator : modelsOnHost)
             {
                 // Same command line and existing agent is OFF --> we consider that it is the same model that evolve from OFF to ON
-                if ((iterator != nullptr) && (iterator->commandLine() == commandLine) && !iterator->isON())
+                if ((iterator != nullptr) && (iterator->peer() != nullptr)
+                        && (iterator->peer()->commandLine() == commandLine) && !iterator->isON())
                 {
                     // We have to replace it by the new one
                     sameModel = iterator;
@@ -1138,11 +1142,11 @@ void AgentsGroupedByNameVM::_manageNewModelOnHostForGroup(AgentM* model, AgentsG
             }
 
             // If we have to replace an existing (same) model by the new one
-            if (sameModel != nullptr)
+            if ((sameModel != nullptr) && (sameModel->peer() != nullptr))
             {
                 if (groupOfAgentsWithSameDefinition->models()->contains(sameModel))
                 {
-                    qDebug() << "Replace model of agent" << _name << "on" << hostname << "(" << sameModel->peerId() << "-->" << model->peerId() << ")";
+                    qDebug() << "Replace model of agent" << _name << "on" << hostname << "(" << sameModel->peer()->uid() << "-->" << model->peer()->uid() << ")";
 
                     // First add the new model before remove the previous model
                     // (allows to prevent to have 0 model at a given moment and to prevent to emit signal noMoreModelAndUseless that remove the groupOfAgentsWithSameDefinition)
