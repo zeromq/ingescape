@@ -67,6 +67,18 @@ napi_value node_igs_stop(napi_env env, napi_callback_info info) {
     return NULL;
 }
 
+// Wrapper for :
+// PUBLIC bool igs_isStarted(void);
+napi_value node_igs_isStarted(napi_env env, napi_callback_info info) {
+    // call igs function
+    bool isStarted = igs_isStarted();
+
+    // convert isStarted into N-API value
+    napi_value napi_return;
+    convert_bool_to_napi(env, isStarted, &napi_return);
+    return napi_return;
+}
+
 // Wrapper for : 
 // PUBLIC int igs_setAgentName(const char *name);
 napi_value node_igs_setAgentName(napi_env env, napi_callback_info info) {
@@ -248,6 +260,7 @@ napi_value init_initialization(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_igs_startWithDevice, "startWithDevice", exports);
     exports = enable_callback_into_js(env, node_igs_startWithIP, "startWithIP", exports);
     exports = enable_callback_into_js(env, node_igs_stop, "stop", exports);
+    exports = enable_callback_into_js(env, node_igs_isStarted, "isStarted", exports);
     exports = enable_callback_into_js(env, node_igs_setAgentName, "setAgentName", exports);
     exports = enable_callback_into_js(env, node_igs_getAgentName, "getAgentName", exports);
     exports = enable_callback_into_js(env, node_igs_setAgentState, "setAgentState", exports);

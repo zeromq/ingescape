@@ -240,8 +240,8 @@ namespace Ingescape
 #endif
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern igs_result_t igs_startWithIP([MarshalAs(UnmanagedType.LPStr)] string ipAddress, int port);
-        public static igs_result_t startWithIP(string ipAddress, int port) { return igs_startWithIP(ipAddress, port); }
+        private static extern igs_result_t igs_startWithIP([MarshalAs(UnmanagedType.LPStr)] string ipAddress, uint port);
+        public static igs_result_t startWithIP(string ipAddress, uint port) { return igs_startWithIP(ipAddress, port); }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_stop();
@@ -1075,12 +1075,12 @@ namespace Ingescape
         public static int getMappingEntriesNumber() { return igs_getMappingEntriesNumber(); } //number of entries in the mapping output type
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_addMappingEntry([MarshalAs(UnmanagedType.LPStr)] string fromOurInput, [MarshalAs(UnmanagedType.LPStr)] string toAgent, [MarshalAs(UnmanagedType.LPStr)] string withOutput); //returns mapping id or zero or below if creation failed
-        public static int addMappingEntry(string fromOurInput, string toAgent, string withOutput) { return igs_addMappingEntry(fromOurInput, toAgent, withOutput); } //returns mapping id or zero or below if creation failed
+        private static extern uint igs_addMappingEntry([MarshalAs(UnmanagedType.LPStr)] string fromOurInput, [MarshalAs(UnmanagedType.LPStr)] string toAgent, [MarshalAs(UnmanagedType.LPStr)] string withOutput); //returns mapping id or zero or below if creation failed
+        public static uint addMappingEntry(string fromOurInput, string toAgent, string withOutput) { return igs_addMappingEntry(fromOurInput, toAgent, withOutput); } //returns mapping id or zero or below if creation failed
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        private static extern igs_result_t igs_removeMappingEntryWithId(int theId);
-        public static igs_result_t removeMappingEntryWithId(int theId) { return igs_removeMappingEntryWithId(theId); }
+        private static extern igs_result_t igs_removeMappingEntryWithId(uint theId);
+        public static igs_result_t removeMappingEntryWithId(uint theId) { return igs_removeMappingEntryWithId(theId); }
 
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern igs_result_t igs_removeMappingEntryWithName([MarshalAs(UnmanagedType.LPStr)] string fromOurInput, [MarshalAs(UnmanagedType.LPStr)] string toAgent, [MarshalAs(UnmanagedType.LPStr)] string withOutput);
