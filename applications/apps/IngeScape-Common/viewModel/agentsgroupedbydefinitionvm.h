@@ -263,9 +263,14 @@ private Q_SLOTS:
 
     /**
      * @brief Slot called when the hostname of a model changed
-     * @param hostname
      */
-    void _onHostnameOfModelChanged(QString hostname);
+    //void _onHostnameOfModelChanged(QString hostname);
+
+
+    /**
+     * @brief Slot called when the "Logger Port" of a model changed
+     */
+    //void _onLoggerPortOfModelChanged(QString loggerPort);
 
 
     /**
@@ -301,13 +306,6 @@ private Q_SLOTS:
      * @param state
      */
     void _onStateOfModelChanged(QString state);
-
-
-    /**
-     * @brief Slot called when the "Logger Port" of a model changed
-     * @param loggerPort
-     */
-    void _onLoggerPortOfModelChanged(QString loggerPort);
 
 
     /**

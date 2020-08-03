@@ -323,8 +323,8 @@ QString IngeScapeModelManager::getPeerIdOfLauncherOnHost(QString hostName)
     // Get the model of host with the name
     HostM* host = getHostModelWithName(hostName);
 
-    if (host != nullptr) {
-        return host->peerId();
+    if ((host != nullptr) && (host->peer() != nullptr)) {
+        return host->peer()->uid();
     }
     else {
         return "";
@@ -684,12 +684,13 @@ bool IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
  */
 void IngeScapeModelManager::simulateExitForEachAgentON()
 {
-    for (AgentM* agent : _hashFromPeerIdToAgent.values())
+    for (AgentM* agent : _hashFromUidToAgent.values())
     {
-        if ((agent != nullptr) && agent->isON())
+        if ((agent != nullptr) && (agent->peer() != nullptr)
+            && agent->isON())
         {
             // Simulate an exit for this agent
-            onAgentExited(agent->peerId(), agent->name());
+            onAgentExited(agent->peer());
         }
     }
 }
@@ -700,12 +701,13 @@ void IngeScapeModelManager::simulateExitForEachAgentON()
  */
 void IngeScapeModelManager::simulateExitForEachLauncher()
 {
-    for (QString hostName : _hashFromNameToHost.keys())
+    for (HostM* host : _hashFromNameToHost.values())
     {
-        if (hostName != HOSTNAME_NOT_DEFINED)
+        if ((host != nullptr) && (host->peer() != nullptr)
+                && (host->name() != HOSTNAME_NOT_DEFINED))
         {
-            // Simulate an exit for this host (name)
-            onLauncherExited("", hostName);
+            // Simulate an exit for this host
+            onLauncherExited(host->peer());
         }
     }
 }
@@ -839,9 +841,9 @@ void IngeScapeModelManager::onLauncherEntered(PeerM* peer)
         HostM* host = getHostModelWithName(hostname);
         if (host == nullptr)
         {
-            // Create a new host
-            host = new HostM(peer, this);
-
+            host = new HostM(hostname,
+                             peer,
+                             this);
             _hashFromNameToHost.insert(host->name(), host);
 
             Q_EMIT hostModelHasBeenCreated(host);
@@ -859,7 +861,9 @@ void IngeScapeModelManager::onLauncherEntered(PeerM* peer)
                 // Traverse the list of its models
                 for (AgentM* agent : agentsGroupedByName->models()->toList())
                 {
-                    if ((agent != nullptr) && (agent->hostname() == hostname) && !agent->commandLine().isEmpty())
+                    if ((agent != nullptr) && (agent->peer() != nullptr)
+                            && (agent->peer()->hostname() == hostname)
+                            && !agent->peer()->commandLine().isEmpty())
                     {
                         // This agent can be restarted
                         agent->setcanBeRestarted(true);
@@ -876,17 +880,18 @@ void IngeScapeModelManager::onLauncherEntered(PeerM* peer)
  */
 void IngeScapeModelManager::onLauncherExited(PeerM* peer)
 {
-    Q_UNUSED(peerId)
-
-    if (!hostName.isEmpty())
+    if ((peer != nullptr) && (peer->igsType() == IngeScapeTypes::LAUNCHER)
+            && !peer->hostname().isEmpty())
     {
+        QString hostname = peer->hostname();
+
         // Get the model of host with the name
-        HostM* host = getHostModelWithName(hostName);
+        HostM* host = getHostModelWithName(hostname);
         if (host != nullptr)
         {
             Q_EMIT hostModelWillBeDeleted(host);
 
-            _hashFromNameToHost.remove(hostName);
+            _hashFromNameToHost.remove(hostname);
 
             // Free memory
             delete host;
@@ -900,7 +905,8 @@ void IngeScapeModelManager::onLauncherExited(PeerM* peer)
                 // Traverse the list of all models
                 for (AgentM* agent : agentsGroupedByName->models()->toList())
                 {
-                    if ((agent != nullptr) && (agent->hostname() == hostName))
+                    if ((agent != nullptr) && (agent->peer() != nullptr)
+                            && (agent->peer()->hostname() == hostname))
                     {
                         // This agent can NOT be restarted
                         agent->setcanBeRestarted(false);
@@ -922,7 +928,7 @@ void IngeScapeModelManager::onDefinitionReceived(PeerM* peer, QString agentUid, 
     // An agent with this uid already exist
     if (agent != nullptr)
     {
-
+        // FIXME TODO onDefinitionReceived
     }
     // New uid --> new agent
     else
@@ -980,7 +986,7 @@ void IngeScapeModelManager::onMappingReceived(PeerM* peer, QString agentUid, QSt
 {
     Q_UNUSED(peer)
 
-    AgentM* agent = getAgentModelFromPeerId(agentUid);
+    AgentM* agent = getAgentModelFromUid(agentUid);
     if (agent != nullptr)
     {
         // Save the previous agent mapping
@@ -1155,9 +1161,10 @@ void IngeScapeModelManager::_onNetworkDataOfAgentWillBeCleared(QString peerId)
         qDebug() << "[Model Manager] on Network Data of agent" << agent->name() << "will be Cleared:" << agent->hostname() << "(" << agent->peerId() << ")";
     }*/
 
-    if (!peerId.isEmpty()) {
+    // FIXME _onNetworkDataOfAgentWillBeCleared
+    /*if (!peerId.isEmpty()) {
         _hashFromPeerIdToAgent.remove(peerId);
-    }
+    }*/
 }
 
 

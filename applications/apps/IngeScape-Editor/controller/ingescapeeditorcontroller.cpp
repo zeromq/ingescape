@@ -1025,9 +1025,9 @@ void IngeScapeEditorController::_onAgentEditorStartedOrStopped(bool started)
         ingeScapeModelManager->simulateExitForEachLauncher();
 
         // Simulate an exit for the recorder
-        if ((_recordsSupervisionC != nullptr) && _recordsSupervisionC->isRecorderON())
+        if ((_recordsSupervisionC != nullptr) && _recordsSupervisionC->isRecorderON() && (_recordsSupervisionC->peerOfRecorder() != nullptr))
         {
-            _recordsSupervisionC->onRecorderExited(_recordsSupervisionC->peerIdOfRecorder(), _recordsSupervisionC->peerNameOfRecorder());
+            _recordsSupervisionC->onRecorderExited(_recordsSupervisionC->peerOfRecorder());
         }
     }
 }
@@ -1158,6 +1158,7 @@ void IngeScapeEditorController::_onStartToRecord()
     QJsonDocument jsonDocument = _getJsonOfCurrentPlatform();
 
     if ((_recordsSupervisionC != nullptr) && _recordsSupervisionC->isRecorderON()
+            && (_recordsSupervisionC->peerOfRecorder() != nullptr)
             && !jsonDocument.isNull() && !jsonDocument.isEmpty())
     {
         QString jsonString = QString::fromUtf8(jsonDocument.toJson(QJsonDocument::Compact));
@@ -1177,7 +1178,7 @@ void IngeScapeEditorController::_onStartToRecord()
         };
 
         // Send a ZMQ message in several parts to the recorder
-        IngeScapeNetworkController::instance()->sendZMQMessageToAgent(_recordsSupervisionC->peerIdOfRecorder(), message);
+        IngeScapeNetworkController::instance()->sendZMQMessageToAgent(_recordsSupervisionC->peerOfRecorder()->uid(), message);
     }
 }
 
@@ -1364,10 +1365,11 @@ void IngeScapeEditorController::_onUpdateRecordState(QString state)
     // STOP (to Record)
     else if (state == STOP)
     {
-        if ((_recordsSupervisionC != nullptr) && _recordsSupervisionC->isRecorderON())
+        if ((_recordsSupervisionC != nullptr) && _recordsSupervisionC->isRecorderON()
+                && (_recordsSupervisionC->peerOfRecorder() != nullptr))
         {
             // Send the message "Stop Record" to the recorder
-            IngeScapeNetworkController::instance()->sendStringMessageToAgent(_recordsSupervisionC->peerIdOfRecorder(),
+            IngeScapeNetworkController::instance()->sendStringMessageToAgent(_recordsSupervisionC->peerOfRecorder()->uid(),
                                                                              command_StopRecord);
         }
     }
@@ -1385,10 +1387,11 @@ void IngeScapeEditorController::_onUpdateRecordState(QString state)
  */
 void IngeScapeEditorController::_onActionWillBeExecuted(QString message)
 {
-    if ((_recordsSupervisionC != nullptr) && _recordsSupervisionC->isRecorderON())
+    if ((_recordsSupervisionC != nullptr) && _recordsSupervisionC->isRecorderON()
+            && (_recordsSupervisionC->peerOfRecorder() != nullptr))
     {
         // Send the message "EXECUTED ACTION" to the recorder
-        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_recordsSupervisionC->peerIdOfRecorder(),
+        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_recordsSupervisionC->peerOfRecorder()->uid(),
                                                                          message);
     }
 }
@@ -1410,10 +1413,12 @@ void IngeScapeEditorController::_onTimeLineStateUpdated(QString state)
 
     QString notificationAndParameters = QString("%1=%2|%3").arg(notif_TimeLineState, state, QString::number(deltaTimeFromTimeLineStart));
 
-    if ((_recordsSupervisionC != nullptr) && _recordsSupervisionC->isRecorderON())
+    if ((_recordsSupervisionC != nullptr) && _recordsSupervisionC->isRecorderON()
+            && (_recordsSupervisionC->peerOfRecorder() != nullptr))
     {
         // Send the message "TIMELINE STATE" to the recorder
-        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_recordsSupervisionC->peerIdOfRecorder(), notificationAndParameters);
+        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_recordsSupervisionC->peerOfRecorder()->uid(),
+                                                                         notificationAndParameters);
     }
 
     // Notify the Expe app

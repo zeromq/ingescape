@@ -415,12 +415,12 @@ void AgentsGroupedByDefinitionVM::_onModelsChanged()
                 //qDebug() << "New model" << model->name() << "ADDED (" << model->peerId() << ")";
 
                 // Connect to signals of the model
-                connect(model, &AgentM::hostnameChanged, this, &AgentsGroupedByDefinitionVM::_onHostnameOfModelChanged);
+                // FIXME connect(model, &AgentM::hostnameChanged, this, &AgentsGroupedByDefinitionVM::_onHostnameOfModelChanged);
+                // FIXME connect(model, &AgentM::loggerPortChanged, this, &AgentsGroupedByDefinitionVM::_onLoggerPortOfModelChanged);
                 connect(model, &AgentM::isONChanged, this, &AgentsGroupedByDefinitionVM::_onIsONofModelChanged);
                 connect(model, &AgentM::canBeRestartedChanged, this, &AgentsGroupedByDefinitionVM::_onCanBeRestartedOfModelChanged);
                 connect(model, &AgentM::isMutedChanged, this, &AgentsGroupedByDefinitionVM::_onIsMutedOfModelChanged);
                 connect(model, &AgentM::isFrozenChanged, this, &AgentsGroupedByDefinitionVM::_onIsFrozenOfModelChanged);
-                connect(model, &AgentM::loggerPortChanged, this, &AgentsGroupedByDefinitionVM::_onLoggerPortOfModelChanged);
                 connect(model, &AgentM::hasLogInStreamChanged, this, &AgentsGroupedByDefinitionVM::_onHasLogInStreamOfModelChanged);
                 connect(model, &AgentM::hasLogInFileChanged, this, &AgentsGroupedByDefinitionVM::_onHasLogInFileOfModelChanged);
                 connect(model, &AgentM::stateChanged, this, &AgentsGroupedByDefinitionVM::_onStateOfModelChanged);
@@ -464,9 +464,8 @@ void AgentsGroupedByDefinitionVM::_onModelsChanged()
 
 /**
  * @brief Slot called when the hostname of a model changed
- * @param hostname
  */
-void AgentsGroupedByDefinitionVM::_onHostnameOfModelChanged(QString hostname)
+/*void AgentsGroupedByDefinitionVM::_onHostnameOfModelChanged(QString hostname)
 {
     // Note: hostname is never empty (default value is HOSTNAME_NOT_DEFINED)
 
@@ -534,7 +533,37 @@ void AgentsGroupedByDefinitionVM::_onHostnameOfModelChanged(QString hostname)
     }
 
     sethostnames(globalHostnames);
-}
+}*/
+
+
+/**
+ * @brief Slot called when the "Logger Port" of a model changed
+ */
+/*void AgentsGroupedByDefinitionVM::_onLoggerPortOfModelChanged(QString loggerPort)
+{
+    // Most of the time, there is only one model
+    if (_models.count() == 1)
+    {
+        // Check that its logger port is defined
+        setisEnabledViewLogStream(!loggerPort.isEmpty());
+    }
+    // Several models
+    else
+    {
+        bool globalIsEnabledViewLogStream = false;
+
+        for (AgentM* model : _models.toList())
+        {
+            // Check that its logger port is defined
+            if ((model != nullptr) && !model->loggerPort().isEmpty())
+            {
+                globalIsEnabledViewLogStream = true;
+                break;
+            }
+        }
+        setisEnabledViewLogStream(globalIsEnabledViewLogStream);
+    }
+}*/
 
 
 /**
@@ -660,37 +689,6 @@ void AgentsGroupedByDefinitionVM::_onIsFrozenOfModelChanged(bool isFrozen)
             }
         }
         setisFrozen(globalIsFrozen);
-    }
-}
-
-
-/**
- * @brief Slot called when the "Logger Port" of a model changed
- * @param loggerPort
- */
-void AgentsGroupedByDefinitionVM::_onLoggerPortOfModelChanged(QString loggerPort)
-{
-    // Most of the time, there is only one model
-    if (_models.count() == 1)
-    {
-        // Check that its logger port is defined
-        setisEnabledViewLogStream(!loggerPort.isEmpty());
-    }
-    // Several models
-    else
-    {
-        bool globalIsEnabledViewLogStream = false;
-
-        for (AgentM* model : _models.toList())
-        {
-            // Check that its logger port is defined
-            if ((model != nullptr) && !model->loggerPort().isEmpty())
-            {
-                globalIsEnabledViewLogStream = true;
-                break;
-            }
-        }
-        setisEnabledViewLogStream(globalIsEnabledViewLogStream);
     }
 }
 
@@ -966,16 +964,20 @@ void AgentsGroupedByDefinitionVM::_updateWithAllModels()
         AgentM* model = _models.at(0);
         if (model != nullptr)
         {
-            if (!model->peerId().isEmpty()) {
-                _peerIdsList = QStringList(model->peerId());
-            }
+            if (model->peer() != nullptr)
+            {
+                if (!model->peer()->uid().isEmpty()) {
+                    _peerIdsList = QStringList(model->peer()->uid());
+                }
 
-            QList<AgentM*> modelsOnHost;
-            modelsOnHost.append(model);
-            _hashFromHostnameToModels.insert(model->hostname(), modelsOnHost);
+                QList<AgentM*> modelsOnHost = QList<AgentM*> { model };
+                _hashFromHostnameToModels.insert(model->peer()->hostname(), modelsOnHost);
 
-            if (model->hostname() != HOSTNAME_NOT_DEFINED) {
-                globalHostnames = model->hostname();
+                if (model->peer()->hostname() != HOSTNAME_NOT_DEFINED) {
+                    globalHostnames = model->peer()->hostname();
+                }
+
+                globalIsEnabledViewLogStream = !model->peer()->loggerPort().isEmpty();
             }
 
             globalIsON = model->isON();
@@ -983,7 +985,6 @@ void AgentsGroupedByDefinitionVM::_updateWithAllModels()
             globalCanBeRestarted = model->canBeRestarted();
             globalIsMuted = model->isMuted();
             globalIsFrozen = model->isFrozen();
-            globalIsEnabledViewLogStream = !model->loggerPort().isEmpty();
             globalHasLogInStream = model->hasLogInStream();
             globalHasLogInFile = model->hasLogInFile();
             globalState = model->state();
@@ -1002,24 +1003,29 @@ void AgentsGroupedByDefinitionVM::_updateWithAllModels()
         {
             if (model != nullptr)
             {
-                if (!model->peerId().isEmpty()) {
-                    _peerIdsList.append(model->peerId());
-                }
+                if (model->peer() != nullptr)
+                {
+                    if (!model->peer()->uid().isEmpty()) {
+                        _peerIdsList.append(model->peer()->uid());
+                    }
 
-                QList<AgentM*> modelsOnHost = getModelsOnHost(model->hostname());
-                modelsOnHost.append(model);
-                _hashFromHostnameToModels.insert(model->hostname(), modelsOnHost);
+                    QString hostname = model->peer()->hostname();
+                    QList<AgentM*> modelsOnHost = getModelsOnHost(hostname);
+                    modelsOnHost.append(model);
+                    _hashFromHostnameToModels.insert(hostname, modelsOnHost);
 
-                if (!temporaryListOfHostnames.contains(model->hostname())) {
-                    temporaryListOfHostnames.append(model->hostname());
+                    if (!temporaryListOfHostnames.contains(hostname)) {
+                        temporaryListOfHostnames.append(hostname);
+                    }
+
+                    if (!globalIsEnabledViewLogStream && !model->peer()->loggerPort().isEmpty()) {
+                        globalIsEnabledViewLogStream = true;
+                    }
                 }
 
                 if (model->isON())
                 {
-                    //if (!globalIsON) {
                     globalIsON = true;
-                    //}
-
                     clonesNumber++;
                 }
 
@@ -1033,10 +1039,6 @@ void AgentsGroupedByDefinitionVM::_updateWithAllModels()
 
                 if (!globalIsFrozen && model->isFrozen()) {
                     globalIsFrozen = true;
-                }
-
-                if (!globalIsEnabledViewLogStream && !model->loggerPort().isEmpty()) {
-                    globalIsEnabledViewLogStream = true;
                 }
 
                 if (!globalHasLogInStream && model->hasLogInStream()) {
