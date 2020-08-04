@@ -122,10 +122,9 @@ Q_SIGNALS:
     void replayEndedReceived();
 
 
-    /**
-     * @brief Signal emitted when the flag "is Muted" from an agent has been updated
-     */
+    // Signal emitted when the flag "is Muted" from an agent/agent output has been updated
     void isMutedFromAgentUpdated(QString peerId, QString agentUid, bool isMuted);
+    void isMutedFromOutputOfAgentUpdated(QString peerId, QString agentUid, bool isMuted, QString outputName);
 
 
     /**
@@ -133,16 +132,7 @@ Q_SIGNALS:
      * @param peerId
      * @param isFrozen
      */
-    void isFrozenFromAgentUpdated(QString peerId, bool isFrozen);
-
-
-    /**
-     * @brief Signal emitted when the flag "is Muted" from an output of agent updated
-     * @param peerId
-     * @param isMuted
-     * @param outputName
-     */
-    void isMutedFromOutputOfAgentUpdated(QString peerId, bool isMuted, QString outputName);
+    void isFrozenFromAgentUpdated(QString peerId, bool isFrozen);    
 
 
     /**

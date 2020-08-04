@@ -104,11 +104,9 @@ public Q_SLOTS:
     void onAgentsGroupedByNameHasBeenCreated(AgentsGroupedByNameVM* agentsGroupedByName);
 
 
-    /**
-     * @brief Slot called when the flag "is Muted" from an agent has been updated
-     */
+    // Slot called when the flag "is Muted" from an agent/agent output has been updated
     void onisMutedFromAgentUpdated(QString peerId, QString agentUid, bool isMuted);
-
+    void onIsMutedFromOutputOfAgentUpdated(QString peerId, QString agentUid, bool isMuted, QString outputName);
 
     /**
      * @brief Slot called when the flag "is Frozen" from an agent updated
@@ -116,15 +114,6 @@ public Q_SLOTS:
      * @param isFrozen
      */
     void onIsFrozenFromAgentUpdated(QString uid, bool isFrozen);
-
-
-    /**
-     * @brief Slot called when the flag "is Muted" from an output of agent updated
-     * @param peerId
-     * @param isMuted
-     * @param outputName
-     */
-    void onIsMutedFromOutputOfAgentUpdated(QString uid, bool isMuted, QString outputName);
 
 
     /**

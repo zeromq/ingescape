@@ -284,9 +284,7 @@ void EditorModelManager::onAgentsGroupedByNameHasBeenCreated(AgentsGroupedByName
 }
 
 
-/**
- * @brief Slot called when the flag "is Muted" from an agent has been updated
- */
+// Slot called when the flag "is Muted" from an agent has been updated
 void EditorModelManager::onisMutedFromAgentUpdated(QString peerId, QString agentUid, bool isMuted)
 {
     Q_UNUSED(peerId)
@@ -294,6 +292,16 @@ void EditorModelManager::onisMutedFromAgentUpdated(QString peerId, QString agent
     AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromUid(agentUid);
     if (agent != nullptr) {
         agent->setisMuted(isMuted);
+    }
+}
+// Slot called when the flag "is Muted" from an agent output has been updated
+void EditorModelManager::onIsMutedFromOutputOfAgentUpdated(QString peerId, QString agentUid, bool isMuted, QString outputName)
+{
+    Q_UNUSED(peerId)
+
+    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromUid(agentUid);
+    if (agent != nullptr) {
+        agent->setisMutedOfOutput(isMuted, outputName);
     }
 }
 
@@ -306,18 +314,6 @@ void EditorModelManager::onIsFrozenFromAgentUpdated(QString uid, bool isFrozen)
     AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromUid(uid);
     if (agent != nullptr) {
         agent->setisFrozen(isFrozen);
-    }
-}
-
-
-/**
- * @brief Slot called when the flag "is Muted" from an output of agent updated
- */
-void EditorModelManager::onIsMutedFromOutputOfAgentUpdated(QString uid, bool isMuted, QString outputName)
-{
-    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromUid(uid);
-    if (agent != nullptr) {
-        agent->setisMutedOfOutput(isMuted, outputName);
     }
 }
 

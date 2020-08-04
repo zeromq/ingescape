@@ -20,8 +20,8 @@
 
 static const QString prefix_Muted = "MUTED";
 static const QString prefix_Frozen = "FROZEN=";
-static const QString prefix_OutputMuted = "OUTPUT_MUTED ";
-static const QString prefix_OutputUnmuted = "OUTPUT_UNMUTED ";
+static const QString prefix_OutputMuted = "OUTPUT_MUTED";
+static const QString prefix_OutputUnmuted = "OUTPUT_UNMUTED";
 static const QString prefix_State = "STATE=";
 static const QString prefix_LogInStream = "LOG_IN_STREAM=";
 static const QString prefix_LogInFile = "LOG_IN_FILE=";
@@ -144,19 +144,18 @@ void NetworkController::_onShoutedMessageReceived(PeerM* peer, QString messageTy
                 Q_EMIT isFrozenFromAgentUpdated(peerId, false);
             }
         }
-        // OUTPUT MUTED
-        else if (messageType.startsWith(prefix_OutputMuted))
+        // OUTPUT MUTED / OUTPUT UN-MUTED
+        else if ((messageType == prefix_OutputMuted) || (messageType == prefix_OutputUnmuted))
         {
-            QString outputName = messageType.remove(0, prefix_OutputMuted.length());
+            QString outputName = messageParameters.at(0);
+            QString agentUid = messageParameters.at(1);
 
-            Q_EMIT isMutedFromOutputOfAgentUpdated(peerId, true, outputName);
-        }
-        // OUTPUT UN-MUTED
-        else if (messageType.startsWith(prefix_OutputUnmuted))
-        {
-            QString outputName = messageType.remove(0, prefix_OutputUnmuted.length());
-
-            Q_EMIT isMutedFromOutputOfAgentUpdated(peerId, false, outputName);
+            if (messageType == prefix_OutputMuted) {
+                Q_EMIT isMutedFromOutputOfAgentUpdated(peerId, agentUid, true, outputName);
+            }
+            else { // (messageType == prefix_OutputUnmuted)
+                Q_EMIT isMutedFromOutputOfAgentUpdated(peerId, agentUid, false, outputName);
+            }
         }
         // STATE
         else if (messageType.startsWith(prefix_State))
@@ -256,19 +255,18 @@ void NetworkController::_onWhisperedMessageReceived(PeerM* peer, QString message
                 Q_EMIT isFrozenFromAgentUpdated(peerId, false);
             }
         }
-        // OUTPUT MUTED
-        else if (messageType.startsWith(prefix_OutputMuted))
+        // OUTPUT MUTED / OUTPUT UN-MUTED
+        else if ((messageType == prefix_OutputMuted) || (messageType == prefix_OutputUnmuted))
         {
-            QString outputName = messageType.remove(0, prefix_OutputMuted.length());
+            QString outputName = messageParameters.at(0);
+            QString agentUid = messageParameters.at(1);
 
-            Q_EMIT isMutedFromOutputOfAgentUpdated(peerId, true, outputName);
-        }
-        // OUTPUT UN-MUTED
-        else if (messageType.startsWith(prefix_OutputUnmuted))
-        {
-            QString outputName = messageType.remove(0, prefix_OutputUnmuted.length());
-
-            Q_EMIT isMutedFromOutputOfAgentUpdated(peerId, false, outputName);
+            if (messageType == prefix_OutputMuted) {
+                Q_EMIT isMutedFromOutputOfAgentUpdated(peerId, agentUid, true, outputName);
+            }
+            else { // (messageType == prefix_OutputUnmuted)
+                Q_EMIT isMutedFromOutputOfAgentUpdated(peerId, agentUid, false, outputName);
+            }
         }
         // STATE
         else if (messageType.startsWith(prefix_State))
