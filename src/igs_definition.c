@@ -386,7 +386,6 @@ void igsAgent_setDefinitionPath(igs_agent_t *agent, const char *path){
         free(agent->definitionPath);
     agent->definitionPath = strndup(path, IGS_MAX_PATH_LENGTH);
     if (coreContext->networkActor != NULL && coreContext->node != NULL){
-        assert(streq(agent->definitionPath, "/tmp/new_definition_path.json"));
         bus_zyreLock();
         zmsg_t *msg = zmsg_new();
         zmsg_addstr(msg, "DEFINITION_FILE_PATH");
