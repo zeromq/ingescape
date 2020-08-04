@@ -906,14 +906,21 @@ void AgentsGroupedByDefinitionVM::_onIsMutedOutputOfModelChanged(bool isMutedOut
  * @param outputName
  */
 void AgentsGroupedByDefinitionVM::_onCommandAskedToAgentAboutOutput(QString command, QString outputName)
-{   
-    QStringList message = {
-        command,
-        outputName
-    };
+{
+    for (AgentM* agent : _models)
+    {
+        if ((agent != nullptr) && (agent->peer() != nullptr) && agent->isON())
+        {
+            QStringList message = {
+                command,
+                outputName,
+                agent->uid()
+            };
 
-    // Send the message to our agent (list of models of agent)
-    IngeScapeNetworkController::instance()->sendStringMessageToAgents(_peerIdsList, message);
+            // Send the message to our agent
+            IngeScapeNetworkController::instance()->sendZMQMessageToAgent(agent->peer()->uid(), message);
+        }
+    }
 }
 
 

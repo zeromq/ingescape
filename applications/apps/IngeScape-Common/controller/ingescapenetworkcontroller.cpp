@@ -1259,17 +1259,12 @@ bool IngeScapeNetworkController::sendStringMessageToAgents(QStringList agentIds,
 }
 
 
-/**
- * @brief Send a ZMQ message in several parts to an agent (identified by its peer id)
- * @param agentId
- * @param messageParts
- * @return
- */
-bool IngeScapeNetworkController::sendZMQMessageToAgent(QString agentId, QStringList messageParts)
+// Send a ZMQ message with several parts to an agent identified by its peer id
+bool IngeScapeNetworkController::sendZMQMessageToAgent(QString peerId, QStringList messageParts)
 {
     bool success = false;
 
-    if (!agentId.isEmpty() && !messageParts.isEmpty())
+    if (!peerId.isEmpty() && !messageParts.isEmpty())
     {
         // Create ZMQ message
         zmsg_t* zMsg = zmsg_new();
@@ -1279,21 +1274,16 @@ bool IngeScapeNetworkController::sendZMQMessageToAgent(QString agentId, QStringL
             zmsg_addstr(zMsg, string.toStdString().c_str());
         }
 
-        // Send ZMQ message to the recorder
-        igs_result_t result = igs_busSendZMQMsgToAgent(agentId.toStdString().c_str(), &zMsg);
+        igs_result_t result = igs_busSendZMQMsgToAgent(peerId.toStdString().c_str(), &zMsg);
         if (result == IGS_SUCCESS)
         {
             success = true;
 
-            // Do not print the JSON file content
-            messageParts.removeLast();
-
-            qInfo() << "Message" << messageParts << "to peer" << agentId << "sent successfully";
+            qInfo() << "Message" << messageParts.at(0) << "with" << messageParts.count() << "frames sent successfully to peer" << peerId;
         }
         else {
-            qWarning() << "Error (" << result << ") during send message" << messageParts << "to peer" << agentId;
+            qCritical() << "Error while sending message" << messageParts.at(0) << "with" << messageParts.count() << "frames to peer" << peerId;
         }
-
         zmsg_destroy(&zMsg);
     }
     return success;

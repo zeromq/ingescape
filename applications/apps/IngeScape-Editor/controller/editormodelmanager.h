@@ -120,12 +120,8 @@ public Q_SLOTS:
     void onAgentStateChanged(QString uid, QString stateName);
 
 
-    /**
-     * @brief Slot called when we receive the flag "Log In Stream" for an agent
-     * @param peerId
-     * @param hasLogInStream
-     */
-    void onAgentHasLogInStream(QString uid, bool hasLogInStream);
+    // Slot called when we receive the flag "Log In Stream" for an agent
+    void onAgentHasLogInStream(QString peerId, QString agentUid, bool hasLogInStream);
 
 
     /**

@@ -193,47 +193,42 @@ public:
 
     /**
      * @brief Send a string message to an agent (identified by its peer id)
-     * @param agentId peer id of the agent
+     * @param peerId peer id of the agent
      * @param message 1 string
      * @return true if successful, false otherwise
      */
-    bool sendStringMessageToAgent(QString agentId, QString message);
+    bool sendStringMessageToAgent(QString peerId, QString message);
 
 
     /**
      * @brief Send a strings list message to an agent (identified by its peer id)
-     * @param agentId peer id of the agent
+     * @param peerId peer id of the agent
      * @param message list of strings
      * @return true if successful, false otherwise
      */
-    bool sendStringMessageToAgent(QString agentId, QStringList message);
+    bool sendStringMessageToAgent(QString peerId, QStringList message);
 
 
     /**
      * @brief Send a string message to a list of agents (identified by their peer id)
-     * @param agentIds peer ids of the agents
+     * @param peerIds peer ids of the agents
      * @param message 1 string
      * @return true if successful, false otherwise
      */
-    bool sendStringMessageToAgents(QStringList agentIds, QString message);
+    bool sendStringMessageToAgents(QStringList peerIds, QString message);
 
 
     /**
-     * @brief Send a strings list message to an agent (identified by its peer id)
-     * @param agentIds peer ids of the agents
+     * @brief Send a strings list message to an agent (identified by their peer id)
+     * @param peerIds peer ids of the agents
      * @param message list of strings
      * @return true if successful, false otherwise
      */
-    bool sendStringMessageToAgents(QStringList agentIds, QStringList message);
+    bool sendStringMessageToAgents(QStringList peerIds, QStringList message);
 
 
-    /**
-     * @brief Send a ZMQ message in several parts to an agent (identified by its peer id)
-     * @param agentId
-     * @param messageParts
-     * @return
-     */
-    bool sendZMQMessageToAgent(QString agentId, QStringList messageParts);
+    // Send a ZMQ message with several parts to an agent identified by its peer id
+    bool sendZMQMessageToAgent(QString peerId, QStringList messageParts);
 
 
     /**

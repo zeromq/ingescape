@@ -139,12 +139,8 @@ Q_SIGNALS:
     void agentStateChanged(QString peerId, QString stateName);
 
 
-    /**
-     * @brief Signal emitted when we receive the flag "Log In Stream" for an agent
-     * @param peerId
-     * @param hasLogInStream
-     */
-    void agentHasLogInStream(QString peerId, bool hasLogInStream);
+    // Signal emitted when we receive the flag "Log In Stream" for an agent
+    void agentHasLogInStream(QString peerId, QString agentUid, bool hasLogInStream);
 
 
     /**

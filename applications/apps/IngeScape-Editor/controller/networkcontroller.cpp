@@ -23,7 +23,7 @@ static const QString prefix_Frozen = "FROZEN";
 static const QString prefix_OutputMuted = "OUTPUT_MUTED";
 static const QString prefix_OutputUnmuted = "OUTPUT_UNMUTED";
 static const QString prefix_State = "STATE=";
-static const QString prefix_LogInStream = "LOG_IN_STREAM=";
+static const QString prefix_LogInStream = "LOG_IN_STREAM";
 static const QString prefix_LogInFile = "LOG_IN_FILE=";
 static const QString prefix_LogFilePath = "LOG_FILE_PATH=";
 static const QString prefix_DefinitionFilePath = "DEFINITION_FILE_PATH=";
@@ -166,15 +166,16 @@ void NetworkController::_onShoutedMessageReceived(PeerM* peer, QString messageTy
             Q_EMIT agentStateChanged(peerId, stateName);
         }
         // LOG IN STREAM
-        else if (messageType.startsWith(prefix_LogInStream))
+        else if (messageType == prefix_LogInStream)
         {
-            QString hasLogInStream = messageType.remove(0, prefix_LogInStream.length());
+            QString hasLogInStream = messageParameters.at(0);
+            QString agentUid = messageParameters.at(1);
 
             if (hasLogInStream == "1") {
-                Q_EMIT agentHasLogInStream(peerId, true);
+                Q_EMIT agentHasLogInStream(peerId, agentUid, true);
             }
             else {
-                Q_EMIT agentHasLogInStream(peerId, false);
+                Q_EMIT agentHasLogInStream(peerId, agentUid, false);
             }
         }
         // LOG IN FILE
@@ -278,15 +279,16 @@ void NetworkController::_onWhisperedMessageReceived(PeerM* peer, QString message
             Q_EMIT agentStateChanged(peerId, stateName);
         }
         // LOG IN STREAM
-        else if (messageType.startsWith(prefix_LogInStream))
+        else if (messageType == prefix_LogInStream)
         {
-            QString hasLogInStream = messageType.remove(0, prefix_LogInStream.length());
+            QString hasLogInStream = messageParameters.at(0);
+            QString agentUid = messageParameters.at(1);
 
             if (hasLogInStream == "1") {
-                Q_EMIT agentHasLogInStream(peerId, true);
+                Q_EMIT agentHasLogInStream(peerId, agentUid, true);
             }
             else {
-                Q_EMIT agentHasLogInStream(peerId, false);
+                Q_EMIT agentHasLogInStream(peerId, agentUid, false);
             }
         }
         // LOG IN FILE

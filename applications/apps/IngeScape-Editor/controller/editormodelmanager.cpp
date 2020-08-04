@@ -330,12 +330,12 @@ void EditorModelManager::onAgentStateChanged(QString uid, QString stateName)
 }
 
 
-/**
- * @brief Slot called when we receive the flag "Log In Stream" for an agent
- */
-void EditorModelManager::onAgentHasLogInStream(QString uid, bool hasLogInStream)
+// Slot called when we receive the flag "Log In Stream" for an agent
+void EditorModelManager::onAgentHasLogInStream(QString peerId, QString agentUid, bool hasLogInStream)
 {
-    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromUid(uid);
+    Q_UNUSED(peerId)
+
+    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromUid(agentUid);
     if (agent != nullptr) {
         agent->sethasLogInStream(hasLogInStream);
     }
