@@ -259,7 +259,7 @@ void LicensesController::importLicense()
 void LicensesController::refreshLicensesData()
 {
     // Allows to update data about licenses
-    igs_checkLicenseForAgent(nullptr);
+    license_readLicense(coreContext);
 
     if (coreContext->license != nullptr)
     {
