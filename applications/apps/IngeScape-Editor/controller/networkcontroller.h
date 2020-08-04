@@ -126,53 +126,26 @@ Q_SIGNALS:
     void isMutedFromAgentUpdated(QString peerId, QString agentUid, bool isMuted);
     void isMutedFromOutputOfAgentUpdated(QString peerId, QString agentUid, bool isMuted, QString outputName);
 
-
     // Signal emitted when the flag "is Frozen" from an agent has been updated
     void isFrozenFromAgentUpdated(QString peerId, QString agentUid, bool isFrozen);
 
-
-    /**
-     * @brief Signal emitted when the state of an agent changes
-     * @param peerId
-     * @param stateName
-     */
-    void agentStateChanged(QString peerId, QString stateName);
-
+    // Signal emitted when the state of an agent has been updated
+    void agentStateChanged(QString peerId, QString agentUid, QString stateName);
 
     // Signal emitted when we receive the flag "Log In Stream" for an agent
     void agentHasLogInStream(QString peerId, QString agentUid, bool hasLogInStream);
 
+    // Signal emitted when we receive the flag "Log In File" for an agent
+    void agentHasLogInFile(QString peerId, QString agentUid, bool hasLogInFile);
 
-    /**
-     * @brief Signal emitted when we receive the flag "Log In File" for an agent
-     * @param peerId
-     * @param hasLogInStream
-     */
-    void agentHasLogInFile(QString peerId, bool hasLogInFile);
+    // Signal emitted when we receive the file path of an agent log
+    void agentLogFilePath(QString peerId, QString agentUid, QString logFilePath);
 
+    // Signal emitted when we receive the file path of an agent Definition
+    void agentDefinitionFilePath(QString peerId, QString agentUid, QString definitionFilePath);
 
-    /**
-     * @brief Signal emitted when we receive the path of "Log File" for an agent
-     * @param peerId
-     * @param logFilePath
-     */
-    void agentLogFilePath(QString peerId, QString logFilePath);
-
-
-    /**
-     * @brief Signal emitted when we receive the path of "Definition File" for an agent
-     * @param peerId
-     * @param definitionFilePath
-     */
-    void agentDefinitionFilePath(QString peerId, QString definitionFilePath);
-
-
-    /**
-     * @brief Signal emitted when we receive the path of "Mapping File" for an agent
-     * @param peerId
-     * @param mappingFilePath
-     */
-    void agentMappingFilePath(QString peerId, QString mappingFilePath);
+    // Signal emitted when we receive the file path of an agent Mapping
+    void agentMappingFilePath(QString peerId, QString agentUid, QString mappingFilePath);
 
 
     /**

@@ -318,12 +318,12 @@ void EditorModelManager::onIsFrozenFromAgentUpdated(QString peerId, QString agen
 }
 
 
-/**
- * @brief Slot called when the state of an agent changes
- */
-void EditorModelManager::onAgentStateChanged(QString uid, QString stateName)
+// Slot called when the state of an agent has been updated
+void EditorModelManager::onAgentStateChanged(QString peerId, QString agentUid, QString stateName)
 {
-    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromUid(uid);
+    Q_UNUSED(peerId)
+
+    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromUid(agentUid);
     if (agent != nullptr) {
         agent->setstate(stateName);
     }
@@ -342,48 +342,48 @@ void EditorModelManager::onAgentHasLogInStream(QString peerId, QString agentUid,
 }
 
 
-/**
- * @brief Slot called when we receive the flag "Log In File" for an agent
- */
-void EditorModelManager::onAgentHasLogInFile(QString uid, bool hasLogInFile)
+// Slot called when we receive the flag "Log In File" for an agent
+void EditorModelManager::onAgentHasLogInFile(QString peerId, QString agentUid, bool hasLogInFile)
 {
-    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromUid(uid);
+    Q_UNUSED(peerId)
+
+    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromUid(agentUid);
     if (agent != nullptr) {
         agent->sethasLogInFile(hasLogInFile);
     }
 }
 
 
-/**
- * @brief Slot called when we receive the path of "Log File" for an agent
- */
-void EditorModelManager::onAgentLogFilePath(QString uid, QString logFilePath)
+// Slot called when we receive the path of the log file for an agent
+void EditorModelManager::onAgentLogFilePath(QString peerId, QString agentUid, QString logFilePath)
 {
-    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromUid(uid);
+    Q_UNUSED(peerId)
+
+    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromUid(agentUid);
     if (agent != nullptr) {
         agent->setlogFilePath(logFilePath);
     }
 }
 
 
-/**
- * @brief Slot called when we receive the path of "Definition File" for an agent
- */
-void EditorModelManager::onAgentDefinitionFilePath(QString uid, QString definitionFilePath)
+// Slot called when we receive the file path of an agent Definition
+void EditorModelManager::onAgentDefinitionFilePath(QString peerId, QString agentUid, QString definitionFilePath)
 {
-    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromUid(uid);
+    Q_UNUSED(peerId)
+
+    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromUid(agentUid);
     if (agent != nullptr) {
         agent->setdefinitionFilePath(definitionFilePath);
     }
 }
 
 
-/**
- * @brief Slot called when we receive the path of "Mapping File" for an agent
- */
-void EditorModelManager::onAgentMappingFilePath(QString uid, QString mappingFilePath)
+// Slot called when we receive the file path of an agent Mapping
+void EditorModelManager::onAgentMappingFilePath(QString peerId, QString agentUid, QString mappingFilePath)
 {
-    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromUid(uid);
+    Q_UNUSED(peerId)
+
+    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromUid(agentUid);
     if (agent != nullptr) {
         agent->setmappingFilePath(mappingFilePath);
     }

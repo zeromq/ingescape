@@ -111,49 +111,23 @@ public Q_SLOTS:
     // Slot called when the flag "is Frozen" from an agent has been updated
     void onIsFrozenFromAgentUpdated(QString peerId, QString agentUid, bool isFrozen);
 
-
-    /**
-     * @brief Slot called when the state of an agent changes
-     * @param peerId
-     * @param stateName
-     */
-    void onAgentStateChanged(QString uid, QString stateName);
-
+    // Slot called when the state of an agent has been updated
+    void onAgentStateChanged(QString peerId, QString agentUid, QString stateName);
 
     // Slot called when we receive the flag "Log In Stream" for an agent
     void onAgentHasLogInStream(QString peerId, QString agentUid, bool hasLogInStream);
 
+    // Slot called when we receive the flag "Log In File" for an agent
+    void onAgentHasLogInFile(QString peerId, QString agentUid, bool hasLogInFile);
 
-    /**
-     * @brief Slot called when we receive the flag "Log In File" for an agent
-     * @param peerId
-     * @param hasLogInStream
-     */
-    void onAgentHasLogInFile(QString uid, bool hasLogInFile);
+    // Slot called when we receive the file path of an agent log
+    void onAgentLogFilePath(QString peerId, QString agentUid, QString logFilePath);
 
+    // Slot called when we receive the file path of an agent Definition
+    void onAgentDefinitionFilePath(QString peerId, QString agentUid, QString definitionFilePath);
 
-    /**
-     * @brief Slot called when we receive the path of "Log File" for an agent
-     * @param peerId
-     * @param logFilePath
-     */
-    void onAgentLogFilePath(QString uid, QString logFilePath);
-
-
-    /**
-     * @brief Slot called when we receive the path of "Definition File" for an agent
-     * @param peerId
-     * @param definitionFilePath
-     */
-    void onAgentDefinitionFilePath(QString uid, QString definitionFilePath);
-
-
-    /**
-     * @brief Slot called when we receive the path of "Mapping File" for an agent
-     * @param peerId
-     * @param mappingFilePath
-     */
-    void onAgentMappingFilePath(QString uid, QString mappingFilePath);
+    // Slot called when we receive the file path of an agent Mapping
+    void onAgentMappingFilePath(QString peerId, QString agentUid, QString mappingFilePath);
 
 
 private Q_SLOTS:

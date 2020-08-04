@@ -22,12 +22,12 @@ static const QString prefix_Muted = "MUTED";
 static const QString prefix_Frozen = "FROZEN";
 static const QString prefix_OutputMuted = "OUTPUT_MUTED";
 static const QString prefix_OutputUnmuted = "OUTPUT_UNMUTED";
-static const QString prefix_State = "STATE=";
+static const QString prefix_State = "STATE";
 static const QString prefix_LogInStream = "LOG_IN_STREAM";
-static const QString prefix_LogInFile = "LOG_IN_FILE=";
-static const QString prefix_LogFilePath = "LOG_FILE_PATH=";
-static const QString prefix_DefinitionFilePath = "DEFINITION_FILE_PATH=";
-static const QString prefix_MappingFilePath = "MAPPING_FILE_PATH=";
+static const QString prefix_LogInFile = "LOG_IN_FILE";
+static const QString prefix_LogFilePath = "LOG_FILE_PATH";
+static const QString prefix_DefinitionFilePath = "DEFINITION_FILE_PATH";
+static const QString prefix_MappingFilePath = "MAPPING_FILE_PATH";
 
 static const QString prefix_AllRecords = "RECORDS_LIST=";
 static const QString prefix_ReplayLoading = "REPLAY_LOADING=";
@@ -159,11 +159,11 @@ void NetworkController::_onShoutedMessageReceived(PeerM* peer, QString messageTy
             }
         }
         // STATE
-        else if (messageType.startsWith(prefix_State))
+        else if (messageType == prefix_State)
         {
-            QString stateName = messageType.remove(0, prefix_State.length());
-
-            Q_EMIT agentStateChanged(peerId, stateName);
+            QString stateName = messageParameters.at(0);
+            QString agentUid = messageParameters.at(1);
+            Q_EMIT agentStateChanged(peerId, agentUid, stateName);
         }
         // LOG IN STREAM
         else if (messageType == prefix_LogInStream)
@@ -179,37 +179,41 @@ void NetworkController::_onShoutedMessageReceived(PeerM* peer, QString messageTy
             }
         }
         // LOG IN FILE
-        else if (messageType.startsWith(prefix_LogInFile))
+        else if (messageType == prefix_LogInFile)
         {
-            QString hasLogInFile = messageType.remove(0, prefix_LogInFile.length());
+            QString hasLogInFile = messageParameters.at(0);
+            QString agentUid = messageParameters.at(1);
 
             if (hasLogInFile == "1") {
-                Q_EMIT agentHasLogInFile(peerId, true);
+                Q_EMIT agentHasLogInFile(peerId, agentUid, true);
             }
             else {
-                Q_EMIT agentHasLogInFile(peerId, false);
+                Q_EMIT agentHasLogInFile(peerId, agentUid, false);
             }
         }
         // LOG FILE PATH
-        else if (messageType.startsWith(prefix_LogFilePath))
+        else if (messageType == prefix_LogFilePath)
         {
-            QString logFilePath = messageType.remove(0, prefix_LogFilePath.length());
+            QString logFilePath = messageParameters.at(0);
+            QString agentUid = messageParameters.at(1);
 
-            Q_EMIT agentLogFilePath(peerId, logFilePath);
+            Q_EMIT agentLogFilePath(peerId, agentUid, logFilePath);
         }
         // DEFINITION FILE PATH
-        else if (messageType.startsWith(prefix_DefinitionFilePath))
+        else if (messageType == prefix_DefinitionFilePath)
         {
-            QString definitionFilePath = messageType.remove(0, prefix_DefinitionFilePath.length());
+            QString definitionFilePath = messageParameters.at(0);
+            QString agentUid = messageParameters.at(1);
 
-            Q_EMIT agentDefinitionFilePath(peerId, definitionFilePath);
+            Q_EMIT agentDefinitionFilePath(peerId, agentUid, definitionFilePath);
         }
         // MAPPING FILE PATH
-        else if (messageType.startsWith(prefix_MappingFilePath))
+        else if (messageType == prefix_MappingFilePath)
         {
-            QString mappingFilePath = messageType.remove(0, prefix_MappingFilePath.length());
+            QString mappingFilePath = messageParameters.at(0);
+            QString agentUid = messageParameters.at(1);
 
-            Q_EMIT agentMappingFilePath(peerId, mappingFilePath);
+            Q_EMIT agentMappingFilePath(peerId, agentUid, mappingFilePath);
         }
         // Unknown
         else
@@ -272,11 +276,11 @@ void NetworkController::_onWhisperedMessageReceived(PeerM* peer, QString message
             }
         }
         // STATE
-        else if (messageType.startsWith(prefix_State))
+        else if (messageType == prefix_State)
         {
-            QString stateName = messageType.remove(0, prefix_State.length());
-
-            Q_EMIT agentStateChanged(peerId, stateName);
+            QString stateName = messageParameters.at(0);
+            QString agentUid = messageParameters.at(1);
+            Q_EMIT agentStateChanged(peerId, agentUid, stateName);
         }
         // LOG IN STREAM
         else if (messageType == prefix_LogInStream)
@@ -292,37 +296,38 @@ void NetworkController::_onWhisperedMessageReceived(PeerM* peer, QString message
             }
         }
         // LOG IN FILE
-        else if (messageType.startsWith(prefix_LogInFile))
+        else if (messageType == prefix_LogInFile)
         {
-            QString hasLogInFile = messageType.remove(0, prefix_LogInFile.length());
+            QString hasLogInFile = messageParameters.at(0);
+            QString agentUid = messageParameters.at(1);
 
             if (hasLogInFile == "1") {
-                Q_EMIT agentHasLogInFile(peerId, true);
+                Q_EMIT agentHasLogInFile(peerId, agentUid, true);
             }
             else {
-                Q_EMIT agentHasLogInFile(peerId, false);
+                Q_EMIT agentHasLogInFile(peerId, agentUid, false);
             }
         }
         // LOG FILE PATH
-        else if (messageType.startsWith(prefix_LogFilePath))
+        else if (messageType == prefix_LogFilePath)
         {
-            QString logFilePath = messageType.remove(0, prefix_LogFilePath.length());
-
-            Q_EMIT agentLogFilePath(peerId, logFilePath);
+            QString logFilePath = messageParameters.at(0);
+            QString agentUid = messageParameters.at(1);
+            Q_EMIT agentLogFilePath(peerId, agentUid, logFilePath);
         }
         // DEFINITION FILE PATH
-        else if (messageType.startsWith(prefix_DefinitionFilePath))
+        else if (messageType == prefix_DefinitionFilePath)
         {
-            QString definitionFilePath = messageType.remove(0, prefix_DefinitionFilePath.length());
-
-            Q_EMIT agentDefinitionFilePath(peerId, definitionFilePath);
+            QString definitionFilePath = messageParameters.at(0);
+            QString agentUid = messageParameters.at(1);
+            Q_EMIT agentDefinitionFilePath(peerId, agentUid, definitionFilePath);
         }
         // MAPPING FILE PATH
-        else if (messageType.startsWith(prefix_MappingFilePath))
+        else if (messageType == prefix_MappingFilePath)
         {
-            QString mappingFilePath = messageType.remove(0, prefix_MappingFilePath.length());
-
-            Q_EMIT agentMappingFilePath(peerId, mappingFilePath);
+            QString mappingFilePath = messageParameters.at(0);
+            QString agentUid = messageParameters.at(1);
+            Q_EMIT agentMappingFilePath(peerId, agentUid, mappingFilePath);
         }
         // The "Recorder app" Started to record
         else if (messageType.startsWith(prefix_RecordStarted))
@@ -418,8 +423,10 @@ void NetworkController::_onWhisperedMessageReceived(PeerM* peer, QString message
             Q_EMIT updateRecordState(state);
         }
         // A replay is currently loading
-        if (messageType == prefix_ReplayLoading)
+        else if (messageType == prefix_ReplayLoading)
         {
+            // FIXME TODO: Test prefix_ReplayLoading
+
             // Check that there are still 3 others parts
             if (messageParameters.count() == 3)
             {

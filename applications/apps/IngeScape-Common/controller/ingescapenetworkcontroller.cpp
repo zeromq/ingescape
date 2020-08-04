@@ -951,7 +951,7 @@ void IngeScapeNetworkController::manageShoutedMessage(PeerM* peer, zmsg_t* zMess
 
         QString messageType = zmsg_popstr(zMessage);
 
-        qDebug() << "SHOUTED message '" << messageType << "' with" << count << "parts for peer" << peer->name() << "(" << peer->uid() << ")";
+        qDebug() << "SHOUTED message '" << messageType << "' with" << count << "frames for peer" << peer->name() << "(" << peer->uid() << ")";
 
         if (messageType == MESSAGE_REMOTE_AGENT_EXIT)
         {
@@ -1009,7 +1009,7 @@ void IngeScapeNetworkController::manageWhisperedMessage(PeerM* peer, zmsg_t* zMe
 
         QString messageType = zmsg_popstr(zMessage);
 
-        qDebug() << "WHISPERED message '" << messageType << "' with" << count << "parts for peer" << peer->name() << "(" << peer->uid() << ")";
+        qDebug() << "WHISPERED message '" << messageType << "' with" << count << "frames for peer" << peer->name() << "(" << peer->uid() << ")";
 
         // An agent DEFINITION has been received
         if (messageType == MESSAGE_DEFINITION)
