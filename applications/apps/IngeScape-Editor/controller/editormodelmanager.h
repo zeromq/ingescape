@@ -108,12 +108,8 @@ public Q_SLOTS:
     void onisMutedFromAgentUpdated(QString peerId, QString agentUid, bool isMuted);
     void onIsMutedFromOutputOfAgentUpdated(QString peerId, QString agentUid, bool isMuted, QString outputName);
 
-    /**
-     * @brief Slot called when the flag "is Frozen" from an agent updated
-     * @param peerId
-     * @param isFrozen
-     */
-    void onIsFrozenFromAgentUpdated(QString uid, bool isFrozen);
+    // Slot called when the flag "is Frozen" from an agent has been updated
+    void onIsFrozenFromAgentUpdated(QString peerId, QString agentUid, bool isFrozen);
 
 
     /**

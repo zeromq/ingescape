@@ -127,12 +127,8 @@ Q_SIGNALS:
     void isMutedFromOutputOfAgentUpdated(QString peerId, QString agentUid, bool isMuted, QString outputName);
 
 
-    /**
-     * @brief Signal emitted when the flag "is Frozen" from an agent updated
-     * @param peerId
-     * @param isFrozen
-     */
-    void isFrozenFromAgentUpdated(QString peerId, bool isFrozen);    
+    // Signal emitted when the flag "is Frozen" from an agent has been updated
+    void isFrozenFromAgentUpdated(QString peerId, QString agentUid, bool isFrozen);
 
 
     /**

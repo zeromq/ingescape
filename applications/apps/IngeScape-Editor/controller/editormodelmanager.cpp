@@ -306,12 +306,12 @@ void EditorModelManager::onIsMutedFromOutputOfAgentUpdated(QString peerId, QStri
 }
 
 
-/**
- * @brief Slot called when the flag "is Frozen" from an agent updated
- */
-void EditorModelManager::onIsFrozenFromAgentUpdated(QString uid, bool isFrozen)
+// Slot called when the flag "is Frozen" from an agent updated
+void EditorModelManager::onIsFrozenFromAgentUpdated(QString peerId, QString agentUid, bool isFrozen)
 {
-    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromUid(uid);
+    Q_UNUSED(peerId)
+
+    AgentM* agent = IngeScapeModelManager::instance()->getAgentModelFromUid(agentUid);
     if (agent != nullptr) {
         agent->setisFrozen(isFrozen);
     }

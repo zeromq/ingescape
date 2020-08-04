@@ -19,7 +19,7 @@
 
 
 static const QString prefix_Muted = "MUTED";
-static const QString prefix_Frozen = "FROZEN=";
+static const QString prefix_Frozen = "FROZEN";
 static const QString prefix_OutputMuted = "OUTPUT_MUTED";
 static const QString prefix_OutputUnmuted = "OUTPUT_UNMUTED";
 static const QString prefix_State = "STATE=";
@@ -133,15 +133,16 @@ void NetworkController::_onShoutedMessageReceived(PeerM* peer, QString messageTy
             }
         }
         // FROZEN / UN-FROZEN
-        else if (messageType.startsWith(prefix_Frozen))
+        else if (messageType == prefix_Frozen)
         {
-            QString isFrozen = messageType.remove(0, prefix_Frozen.length());
+            QString isFrozen = messageParameters.at(0);
+            QString agentUid = messageParameters.at(1);
 
             if (isFrozen == "1") {
-                Q_EMIT isFrozenFromAgentUpdated(peerId, true);
+                Q_EMIT isFrozenFromAgentUpdated(peerId, agentUid, true);
             }
             else {
-                Q_EMIT isFrozenFromAgentUpdated(peerId, false);
+                Q_EMIT isFrozenFromAgentUpdated(peerId, agentUid, false);
             }
         }
         // OUTPUT MUTED / OUTPUT UN-MUTED
@@ -244,15 +245,16 @@ void NetworkController::_onWhisperedMessageReceived(PeerM* peer, QString message
             }
         }
         // FROZEN / UN-FROZEN
-        else if (messageType.startsWith(prefix_Frozen))
+        else if (messageType == prefix_Frozen)
         {
-            QString isFrozen = messageType.remove(0, prefix_Frozen.length());
+            QString isFrozen = messageParameters.at(0);
+            QString agentUid = messageParameters.at(1);
 
             if (isFrozen == "1") {
-                Q_EMIT isFrozenFromAgentUpdated(peerId, true);
+                Q_EMIT isFrozenFromAgentUpdated(peerId, agentUid, true);
             }
             else {
-                Q_EMIT isFrozenFromAgentUpdated(peerId, false);
+                Q_EMIT isFrozenFromAgentUpdated(peerId, agentUid, false);
             }
         }
         // OUTPUT MUTED / OUTPUT UN-MUTED
