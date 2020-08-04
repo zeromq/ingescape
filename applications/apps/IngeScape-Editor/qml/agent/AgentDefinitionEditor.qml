@@ -580,7 +580,7 @@ WindowBlockTouches {
                                         Text {
                                             text: model.displayableCurrentValue
 
-                                            visible: (model.agentIOPType === AgentIOPTypes.OUTPUT)
+                                            visible: (model.QtObject.agentIOPType === AgentIOPTypes.OUTPUT)
 
                                             anchors {
                                                 verticalCenter: parent.verticalCenter
@@ -613,9 +613,8 @@ WindowBlockTouches {
                                                     right : parent.right
                                                 }
 
-                                                visible: (model.agentIOPType === AgentIOPTypes.OUTPUT)
+                                                visible: (model.QtObject.agentIOPType === AgentIOPTypes.OUTPUT)
                                                 enabled: visible
-
 
                                                 pressedID: releasedID + "-pressed"
                                                 //releasedID: model.isMutedOutput ? "active-mute" : "inactive-mute"
