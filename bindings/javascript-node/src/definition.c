@@ -166,29 +166,34 @@ napi_value node_igs_setDefinitionVersion(napi_env env, napi_callback_info info) 
 }
 
 // to convert napi value into C value according to iopType value
-void * convertValueWithGoodType(napi_env env, napi_value value, iopType_js type, size_t* size_convert) {
+void * convertValueWithGoodType(napi_env env, napi_value value, iopType_t type, size_t* size_convert) {
     void * p_value;
     *size_convert = 0;
     switch(type) {
-        case IGS_NUMBER_JS  :
+        case IGS_INTEGER_T  :
+            *size_convert = sizeof(int);
+            p_value = (int *) malloc(*size_convert);
+            convert_napi_to_int(env, value, p_value);
+            break;
+        case IGS_DOUBLE_T  :
             *size_convert = sizeof(double);
             p_value = (double *) malloc(*size_convert);
             convert_napi_to_double(env, value, p_value);
             break;
-        case IGS_STRING_JS  :
+        case IGS_STRING_T  :
             p_value = (char *) convert_napi_to_string(env, value);
             *size_convert = (strlen(p_value)+1) * sizeof(char);
             break;
-        case IGS_BOOL_JS  :
+        case IGS_BOOL_T  :
             *size_convert = sizeof(bool);
             p_value = (bool *) malloc(*size_convert);
             convert_napi_to_bool(env, value, p_value);
             break;
-        case IGS_IMPULSION_JS  :
+        case IGS_IMPULSION_T  :
             *size_convert = 1 * sizeof(char);
             p_value = (char*) "";
             break;
-        case IGS_DATA_JS  :
+        case IGS_DATA_T  :
             convert_napi_to_data(env, value, &p_value, size_convert);
             break;
         default : 
@@ -216,7 +221,7 @@ napi_value node_igs_createInput(napi_env env, napi_callback_info info) {
     void * p_value = convertValueWithGoodType(env, argv[2], type, &size);
 
     // call igs function
-    int res = igs_createInput(name, get_iop_type_t_from_iop_type_js(type), p_value, size);
+    int res = igs_createInput(name, type, p_value, size);
     free(name);
 
     // convert result into napi_value
@@ -242,7 +247,7 @@ napi_value node_igs_createOutput(napi_env env, napi_callback_info info) {
     void * p_value = convertValueWithGoodType(env, argv[2], type, &size);
 
     // call igs function
-    int res = igs_createOutput(name, get_iop_type_t_from_iop_type_js(type), p_value, size);
+    int res = igs_createOutput(name, type, p_value, size);
     free(name);
 
     // convert result into napi_value
@@ -268,7 +273,7 @@ napi_value node_igs_createParameter(napi_env env, napi_callback_info info) {
     void * p_value = convertValueWithGoodType(env, argv[2], type, &size);
 
     // call igs function
-    int res = igs_createParameter(name, get_iop_type_t_from_iop_type_js(type), p_value, size);
+    int res = igs_createParameter(name, type, p_value, size);
     free(name);
 
     // convert result into napi_value

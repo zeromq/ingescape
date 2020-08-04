@@ -75,7 +75,7 @@ napi_value node_igs_addArgumentToCall(napi_env env, napi_callback_info info) {
     convert_napi_to_int(env, argv[2], &type);
 
     // call igs function
-	int res = igs_addArgumentToCall(callName, argName, get_iop_type_t_from_iop_type_js(type));
+	int res = igs_addArgumentToCall(callName, argName, type);
     free(callName);
     free(argName);
 
@@ -201,7 +201,7 @@ napi_value node_igs_getArgumentsForCall(napi_env env, napi_callback_info info) {
             triggerException(env, NULL, "N-API : Unable to set name of argument call.");
         }
 
-        convert_int_to_napi(env, get_iop_type_js_from_iop_type_t(elt->type), &typeArg);
+        convert_int_to_napi(env, elt->type, &typeArg);
         status = napi_set_named_property(env, argumentCall, "type", typeArg);
         if (status != napi_ok) {
             triggerException(env, NULL, "N-API : Unable to set type of argument call.");
