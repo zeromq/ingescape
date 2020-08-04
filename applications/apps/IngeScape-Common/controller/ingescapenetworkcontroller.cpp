@@ -971,29 +971,6 @@ void IngeScapeNetworkController::manageShoutedMessage(PeerM* peer, zmsg_t* zMess
 
             Q_EMIT shoutedMessageReceived(peer, messageType, messageParameters);
         }
-
-        // Message contains only one string
-        /*if (count == 1)
-        {
-            Q_EMIT shoutedMessageReceived(peerId, peerName, messagePart1);
-        }
-        // Message contains several parts
-        else //if (count > 1)
-        {
-            QStringList messageOthersParts;
-
-            for (uint i = 1; i < count; i++)
-            {
-                zframe_t* frame = zmsg_pop(zMessage);
-                if (frame != nullptr)
-                {
-                    messageOthersParts.append( QString(zframe_strdup(frame)) );
-                    zframe_destroy(&frame);
-                }
-            }
-
-            Q_EMIT shoutedMessageReceived(peerId, peerName, messagePart1, messageOthersParts);
-        }*/
     }
 }
 
@@ -1040,47 +1017,6 @@ void IngeScapeNetworkController::manageWhisperedMessage(PeerM* peer, zmsg_t* zMe
 
             Q_EMIT whisperedMessageReceived(peer, messageType, messageParameters);
         }
-
-        // Message contains only one string
-        /*if (count == 1)
-        {
-            // An agent DEFINITION has been received
-            if (messagePart1.startsWith(prefix_Definition))
-            {
-                QString definitionJSON = messagePart1.remove(0, prefix_Definition.length());
-
-                Q_EMIT definitionReceived(peerId, peerName, definitionJSON);
-            }
-            // An agent MAPPING has been received
-            else if (messagePart1.startsWith(prefix_Mapping))
-            {
-                QString mappingJSON = messagePart1.remove(0, prefix_Mapping.length());
-
-                Q_EMIT mappingReceived(peerId, peerName, mappingJSON);
-            }
-            // Other message has been received
-            else
-            {
-                Q_EMIT whisperedMessageReceived(peerId, peerName, messagePart1);
-            }
-        }
-        // Message contains several parts
-        else //if (count > 1)
-        {
-            QStringList messageOthersParts;
-
-            for (uint i = 1; i < count; i++)
-            {
-                zframe_t* frame = zmsg_pop(zMessage);
-                if (frame != nullptr)
-                {
-                    messageOthersParts.append( QString(zframe_strdup(frame)) );
-                    zframe_destroy(&frame);
-                }
-            }
-
-            Q_EMIT whisperedMessageReceived(peerId, peerName, messagePart1, messageOthersParts);
-        }*/
     }
 }
 

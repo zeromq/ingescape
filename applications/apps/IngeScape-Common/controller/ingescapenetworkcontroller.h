@@ -298,34 +298,19 @@ Q_SIGNALS:
     void assessmentsExited(PeerM* peer);
 
 
-    /**
-     * @brief Signal emitted when an agent definition has been received
-     */
+    // Signal emitted when an agent definition has been received
     void definitionReceived(PeerM* peer, QString agentUid, QString agentName, QString definitionJSON);
 
-
-    /**
-     * @brief Signal emitted when an agent mapping has been received
-     */
+    // Signal emitted when an agent mapping has been received
     void mappingReceived(PeerM* peer, QString agentUid, QString mappingJSON);
 
-
-    /**
-     * @brief Signal emitted when a new value has been published
-     * @param publishedValue
-     */
+    // Signal emitted when a new value has been published (on the output of a remote agent)
     void valuePublished(PublishedValueM* publishedValue);
 
-
-    /**
-     * @brief Signal emitted when a "Shouted" message has been received
-     */
+    // Signal emitted when a "Shouted" message has been received
     void shoutedMessageReceived(PeerM* peer, QString messageType, QStringList messageParameters);
 
-
-    /**
-     * @brief Signal emitted when a "Whispered" message has been received
-     */
+    // Signal emitted when a "Whispered" message has been received
     void whisperedMessageReceived(PeerM* peer, QString messageType, QStringList messageParameters);
 
 

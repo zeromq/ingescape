@@ -265,7 +265,8 @@ Item {
 
             elide: Text.ElideRight
 
-            text: host && host.modelM ? host.modelM.ipAddress : ""
+            text: host && host.modelM && host.modelM.peer ? host.modelM.peer.ipAddress
+                                                          : ""
 
             color: IngeScapeTheme.lightBlueGreyColor
             font: IngeScapeTheme.heading2Font
