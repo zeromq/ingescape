@@ -126,7 +126,7 @@ void AgentsGroupedByDefinitionVM::askStartAgent()
             if (!peerIdOfLauncher.isEmpty())
             {
                 QStringList message = {
-                    command_StartAgent,
+                    command_StartPeer,
                     model->peer()->commandLine()
                 };
 
@@ -143,8 +143,8 @@ void AgentsGroupedByDefinitionVM::askStartAgent()
  */
 void AgentsGroupedByDefinitionVM::askStopAgent()
 {
-    // Send the message "Stop Agent" to our agent
-    IngeScapeNetworkController::instance()->sendStringMessageToAgents(_peerIdsList, command_StopAgent);
+    // Send the message "STOP PEER" to our agent
+    IngeScapeNetworkController::instance()->sendStringMessageToAgents(_peerIdsList, command_StopPeer);
 }
 
 
@@ -327,31 +327,58 @@ void AgentsGroupedByDefinitionVM::saveFilesPaths(QString definitionFilePath, QSt
     // Path for definition file changed
     if (definitionFilePath != _definitionFilePath)
     {
-        qDebug() << "Path of definition changed to" << definitionFilePath;
+        qDebug() << "File path of definition changed to" << definitionFilePath;
 
-        QString message = QString("%1 %2").arg(command_SetDefinitionPath, definitionFilePath);
-
-        IngeScapeNetworkController::instance()->sendStringMessageToAgents(_peerIdsList, message);
+        for (AgentM* agent : _models)
+        {
+            if ((agent != nullptr) && (agent->peer() != nullptr) && agent->isON())
+            {
+                QStringList message = {
+                    command_SetDefinitionPath,
+                    definitionFilePath,
+                    agent->uid()
+                };
+                IngeScapeNetworkController::instance()->sendZMQMessageToPeer(agent->peer()->uid(), message);
+            }
+        }
     }
 
     // Path for mapping file changed
     if (mappingFilePath != _mappingFilePath)
     {
-        qDebug() << "Path of mapping changed to" << mappingFilePath;
+        qDebug() << "File path of mapping changed to" << mappingFilePath;
 
-        QString message = QString("%1 %2").arg(command_SetMappingPath, mappingFilePath);
-
-        IngeScapeNetworkController::instance()->sendStringMessageToAgents(_peerIdsList, message);
+        for (AgentM* agent : _models)
+        {
+            if ((agent != nullptr) && (agent->peer() != nullptr) && agent->isON())
+            {
+                QStringList message = {
+                    command_SetMappingPath,
+                    mappingFilePath,
+                    agent->uid()
+                };
+                IngeScapeNetworkController::instance()->sendZMQMessageToPeer(agent->peer()->uid(), message);
+            }
+        }
     }
 
     // Path for log file changed
     if (logFilePath != _logFilePath)
     {
-        qDebug() << "Path of log changed to" << logFilePath;
+        qDebug() << "File path of log changed to" << logFilePath;
 
-        QString message = QString("%1 %2").arg(command_SetLogPath, logFilePath);
-
-        IngeScapeNetworkController::instance()->sendStringMessageToAgents(_peerIdsList, message);
+        for (AgentM* agent : _models)
+        {
+            if ((agent != nullptr) && (agent->peer() != nullptr) && agent->isON())
+            {
+                QStringList message = {
+                    command_SetLogPath,
+                    logFilePath,
+                    agent->uid()
+                };
+                IngeScapeNetworkController::instance()->sendZMQMessageToPeer(agent->peer()->uid(), message);
+            }
+        }
     }
 }
 
@@ -361,7 +388,19 @@ void AgentsGroupedByDefinitionVM::saveFilesPaths(QString definitionFilePath, QSt
  */
 void AgentsGroupedByDefinitionVM::saveDefinitionToPath()
 {
-    IngeScapeNetworkController::instance()->sendStringMessageToAgents(_peerIdsList, command_SaveDefinitionToPath);
+    //IngeScapeNetworkController::instance()->sendStringMessageToAgents(_peerIdsList, command_SaveDefinitionToPath);
+
+    for (AgentM* agent : _models)
+    {
+        if ((agent != nullptr) && (agent->peer() != nullptr) && agent->isON())
+        {
+            QStringList message = {
+                command_SaveDefinitionToPath,
+                agent->uid()
+            };
+            IngeScapeNetworkController::instance()->sendZMQMessageToPeer(agent->peer()->uid(), message);
+        }
+    }
 }
 
 
@@ -370,7 +409,19 @@ void AgentsGroupedByDefinitionVM::saveDefinitionToPath()
  */
 void AgentsGroupedByDefinitionVM::saveMappingToPath()
 {
-    IngeScapeNetworkController::instance()->sendStringMessageToAgents(_peerIdsList, command_SaveMappingToPath);
+    //IngeScapeNetworkController::instance()->sendStringMessageToAgents(_peerIdsList, command_SaveMappingToPath);
+
+    for (AgentM* agent : _models)
+    {
+        if ((agent != nullptr) && (agent->peer() != nullptr) && agent->isON())
+        {
+            QStringList message = {
+                command_SaveMappingToPath,
+                agent->uid()
+            };
+            IngeScapeNetworkController::instance()->sendZMQMessageToPeer(agent->peer()->uid(), message);
+        }
+    }
 }
 
 
@@ -916,9 +967,7 @@ void AgentsGroupedByDefinitionVM::_onCommandAskedToAgentAboutOutput(QString comm
                 outputName,
                 agent->uid()
             };
-
-            // Send the message to our agent
-            IngeScapeNetworkController::instance()->sendZMQMessageToAgent(agent->peer()->uid(), message);
+            IngeScapeNetworkController::instance()->sendZMQMessageToPeer(agent->peer()->uid(), message);
         }
     }
 }

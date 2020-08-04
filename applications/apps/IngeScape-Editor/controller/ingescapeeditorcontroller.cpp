@@ -1176,9 +1176,7 @@ void IngeScapeEditorController::_onStartToRecord()
             QString::number(deltaTimeFromTimeLineStart),
             jsonString
         };
-
-        // Send a ZMQ message in several parts to the recorder
-        IngeScapeNetworkController::instance()->sendZMQMessageToAgent(_recordsSupervisionC->peerOfRecorder()->uid(), message);
+        IngeScapeNetworkController::instance()->sendZMQMessageToPeer(_recordsSupervisionC->peerOfRecorder()->uid(), message);
     }
 }
 

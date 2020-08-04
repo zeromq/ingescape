@@ -96,8 +96,8 @@ static const QString command_LoadDefinition = "LOAD_THIS_DEFINITION#";
 static const QString command_LoadMapping = "LOAD_THIS_MAPPING#";
 static const QString command_ClearMapping = "CLEAR_MAPPING";
 
-static const QString command_StartAgent = "RUN";
-static const QString command_StopAgent = "STOP";
+static const QString command_StartPeer = "RUN";
+static const QString command_StopPeer = "STOP_PEER";
 
 static const QString command_MuteAgent = "MUTE_ALL";
 static const QString command_UnmuteAgent = "UNMUTE_ALL";

@@ -109,11 +109,11 @@ QPair<AgentsGroupedByNameVM*, QStringList> EffectOnAgentM::getAgentAndCommandWit
         switch (_agentEffectValue)
         {
         case AgentEffectValues::ON: {
-            commandAndParameters << command_StartAgent;
+            commandAndParameters << command_StartPeer;
             break;
         }
         case AgentEffectValues::OFF: {
-            commandAndParameters << command_StopAgent;
+            commandAndParameters << command_StopPeer;
             break;
         }
         case AgentEffectValues::MUTE: {
@@ -160,11 +160,11 @@ QPair<QString, QStringList> EffectOnAgentM::getAgentNameAndReverseCommandWithPar
         switch (_agentEffectValue)
         {
         case AgentEffectValues::ON: {
-            reverseCommandAndParameters << command_StopAgent;
+            reverseCommandAndParameters << command_StopPeer;
             break;
         }
         case AgentEffectValues::OFF: {
-            reverseCommandAndParameters << command_StartAgent;
+            reverseCommandAndParameters << command_StartPeer;
             break;
         }
         case AgentEffectValues::MUTE: {

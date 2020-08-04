@@ -196,7 +196,6 @@ void NetworkController::_onShoutedMessageReceived(PeerM* peer, QString messageTy
         {
             QString logFilePath = messageParameters.at(0);
             QString agentUid = messageParameters.at(1);
-
             Q_EMIT agentLogFilePath(peerId, agentUid, logFilePath);
         }
         // DEFINITION FILE PATH

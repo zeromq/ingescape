@@ -143,7 +143,7 @@ void HostVM::startAgent(AgentM* agent)
             && (_modelM != nullptr) && (_modelM->peer() != nullptr))
     {
         QStringList message = {
-            command_StartAgent,
+            command_StartPeer,
             agent->peer()->commandLine()
         };
 
@@ -161,8 +161,8 @@ void HostVM::stopAgent(AgentM* agent)
 {
     if ((agent != nullptr) && (agent->peer() != nullptr))
     {
-        // Send the message "Stop Agent" to this host (IngeScape Launcher)
-        IngeScapeNetworkController::instance()->sendStringMessageToAgent(agent->peer()->uid(), command_StopAgent);
+        // Send the message "STOP PEER" to this host (IngeScape Launcher)
+        IngeScapeNetworkController::instance()->sendStringMessageToAgent(agent->peer()->uid(), command_StopPeer);
     }
 }
 

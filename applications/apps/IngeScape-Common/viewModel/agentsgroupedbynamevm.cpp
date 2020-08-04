@@ -159,7 +159,7 @@ void AgentsGroupedByNameVM::askStartAgent()
             if (!peerIdOfLauncher.isEmpty())
             {
                 QStringList message = {
-                    command_StartAgent,
+                    command_StartPeer,
                     model->peer()->commandLine()
                 };
 
@@ -176,8 +176,8 @@ void AgentsGroupedByNameVM::askStartAgent()
  */
 void AgentsGroupedByNameVM::askStopAgent()
 {
-    // Send the message "Stop Agent" to our agent
-    IngeScapeNetworkController::instance()->sendStringMessageToAgents(_peerIdsList, command_StopAgent);
+    // Send the message "STOP PEER" to our agent
+    IngeScapeNetworkController::instance()->sendStringMessageToAgents(_peerIdsList, command_StopPeer);
 }
 
 

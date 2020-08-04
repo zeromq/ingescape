@@ -1259,8 +1259,8 @@ bool IngeScapeNetworkController::sendStringMessageToAgents(QStringList agentIds,
 }
 
 
-// Send a ZMQ message with several parts to an agent identified by its peer id
-bool IngeScapeNetworkController::sendZMQMessageToAgent(QString peerId, QStringList messageParts)
+// Send a ZMQ message with several strings to a peer
+bool IngeScapeNetworkController::sendZMQMessageToPeer(QString peerId, QStringList messageParts)
 {
     bool success = false;
 
@@ -1278,7 +1278,6 @@ bool IngeScapeNetworkController::sendZMQMessageToAgent(QString peerId, QStringLi
         if (result == IGS_SUCCESS)
         {
             success = true;
-
             qInfo() << "Message" << messageParts.at(0) << "with" << messageParts.count() << "frames sent successfully to peer" << peerId;
         }
         else {

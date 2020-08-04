@@ -227,8 +227,8 @@ public:
     bool sendStringMessageToAgents(QStringList peerIds, QStringList message);
 
 
-    // Send a ZMQ message with several parts to an agent identified by its peer id
-    bool sendZMQMessageToAgent(QString peerId, QStringList messageParts);
+    // Send a ZMQ message with several strings to a peer
+    bool sendZMQMessageToPeer(QString peerId, QStringList messageParts);
 
 
     /**

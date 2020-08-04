@@ -1149,8 +1149,8 @@ void AbstractScenarioController::_executeCommandForAgent(AgentsGroupedByNameVM* 
 
         QString command = commandAndParameters.at(0);
 
-        // START
-        if (command == command_StartAgent)
+        // START PEER
+        if (command == command_StartPeer)
         {
             for (AgentM* model : agentsGroupedByName->models()->toList())
             {
@@ -1175,8 +1175,8 @@ void AbstractScenarioController::_executeCommandForAgent(AgentsGroupedByNameVM* 
                 }
             }
         }
-        // STOP or MUTE/UN-MUTE or FREEZE/UN-FREEZE
-        else if ( (command == command_StopAgent)
+        // STOP PEER or MUTE/UN-MUTE or FREEZE/UN-FREEZE
+        else if ( (command == command_StopPeer)
                   || (command == command_MuteAgent) || (command == command_UnmuteAgent)
                   || (command == command_FreezeAgent) || (command == command_UnfreezeAgent) )
         {
