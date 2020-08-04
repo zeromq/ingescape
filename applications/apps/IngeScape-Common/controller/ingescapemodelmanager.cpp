@@ -201,13 +201,12 @@ AgentM* IngeScapeModelManager::createAgentModel(PeerM* peer,
 
         _hashFromUidToAgent.insert(agentUid, agent);
 
-        // FIXME hostName needed
         // If there is a host with this name...
-        /*if (_hashFromNameToHost.contains(hostName))
+        if ((peer != nullptr) && _hashFromNameToHost.contains(peer->hostname()))
         {
             // ...this agent can be restarted
             agent->setcanBeRestarted(true);
-        }*/
+        }
 
         // Emit the signal "Agent Model has been Created"
         Q_EMIT agentModelHasBeenCreated(agent);
