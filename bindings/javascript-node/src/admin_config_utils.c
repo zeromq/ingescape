@@ -267,15 +267,17 @@ napi_value node_igs_trace(napi_env env, napi_callback_info info) {
 // Wrapper for : 
 // #define igs_debug(...) igs_log(IGS_LOG_DEBUG, __func__, __VA_ARGS__)
 napi_value node_igs_debug(napi_env env, napi_callback_info info) {
-    size_t nb_arguments = 1;
+    size_t nb_arguments = 2;
     napi_value argv[nb_arguments];
   
     // get infos pass in argument
     get_function_arguments(env, info, nb_arguments, argv);
 
     // convert infos into C types & call igs function
-    char * log = convert_napi_to_string(env, argv[0]);
-    igs_debug("%s\n", log);
+    char * function = convert_napi_to_string(env, argv[0]);
+    char * log = convert_napi_to_string(env, argv[1]);
+    igs_log(IGS_LOG_DEBUG, function, "%s\n", log);
+    free(function);
     free(log);
     return NULL;
 }
@@ -283,15 +285,17 @@ napi_value node_igs_debug(napi_env env, napi_callback_info info) {
 // Wrapper for : 
 // #define igs_info(...)  igs_log(IGS_LOG_INFO, __func__, __VA_ARGS__)
 napi_value node_igs_info(napi_env env, napi_callback_info info) {
-    size_t nb_arguments = 1;
+    size_t nb_arguments = 2;
     napi_value argv[nb_arguments];
   
     // get infos pass in argument
     get_function_arguments(env, info, nb_arguments, argv);
 
     // convert infos into C types & call igs function
-    char * log = convert_napi_to_string(env, argv[0]);
-    igs_info("%s\n", log);
+    char * function = convert_napi_to_string(env, argv[0]);
+    char * log = convert_napi_to_string(env, argv[1]);
+    igs_log(IGS_LOG_INFO, function, "%s\n", log);
+    free(function);
     free(log);
     return NULL;
 }
@@ -299,15 +303,17 @@ napi_value node_igs_info(napi_env env, napi_callback_info info) {
 // Wrapper for : 
 // #define igs_warn(...)  igs_log(IGS_LOG_WARN, __func__, __VA_ARGS__)
 napi_value node_igs_warn(napi_env env, napi_callback_info info) {
-    size_t nb_arguments = 1;
+    size_t nb_arguments = 2;
     napi_value argv[nb_arguments];
   
     // get infos pass in argument
     get_function_arguments(env, info, nb_arguments, argv);
 
     // convert infos into C types & call igs function
-    char * log = convert_napi_to_string(env, argv[0]);
-    igs_warn("%s\n", log);
+    char * function = convert_napi_to_string(env, argv[0]);
+    char * log = convert_napi_to_string(env, argv[1]);
+    igs_log(IGS_LOG_WARN, function, "%s\n", log);
+    free(function);
     free(log);
     return NULL;
 }
@@ -315,15 +321,17 @@ napi_value node_igs_warn(napi_env env, napi_callback_info info) {
 // Wrapper for : 
 // #define igs_error(...) igs_log(IGS_LOG_ERROR, __func__, __VA_ARGS__)
 napi_value node_igs_error(napi_env env, napi_callback_info info) {
-    size_t nb_arguments = 1;
+    size_t nb_arguments = 2;
     napi_value argv[nb_arguments];
   
     // get infos pass in argument
     get_function_arguments(env, info, nb_arguments, argv);
 
     // convert infos into C types & call igs function
-    char * log = convert_napi_to_string(env, argv[0]);
-    igs_error("%s\n", log);
+    char * function = convert_napi_to_string(env, argv[0]);
+    char * log = convert_napi_to_string(env, argv[1]);
+    igs_log(IGS_LOG_ERROR, function, "%s\n", log);
+    free(function);
     free(log);
     return NULL;
 }
@@ -331,15 +339,17 @@ napi_value node_igs_error(napi_env env, napi_callback_info info) {
 // Wrapper for : 
 // #define igs_fatal(...) igs_log(IGS_LOG_FATAL, __func__, __VA_ARGS__)
 napi_value node_igs_fatal(napi_env env, napi_callback_info info) {
-    size_t nb_arguments = 1;
+    size_t nb_arguments = 2;
     napi_value argv[nb_arguments];
   
     // get infos pass in argument
     get_function_arguments(env, info, nb_arguments, argv);
 
-    // convert infos into C types & call igs function 
-    char * log = convert_napi_to_string(env, argv[0]);
-    igs_fatal("%s\n", log);
+    // convert infos into C types & call igs function
+    char * function = convert_napi_to_string(env, argv[0]);
+    char * log = convert_napi_to_string(env, argv[1]);
+    igs_log(IGS_LOG_FATAL, function, "%s\n", log);
+    free(function);
     free(log);
     return NULL;
 }
