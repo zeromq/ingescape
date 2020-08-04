@@ -357,7 +357,7 @@ void LogStreamController::_onLogReceived(QDateTime logDateTime, QStringList para
             logContent.remove(length - 1, 1);
         }
 
-        int nLogType = LogTypes::staticEnumFromKey(QString("IGS_LOG_%1").arg(strLogType));
+        int nLogType = LogTypes::staticEnumFromKey(QString("IGS_APPS_LOG_%1").arg(strLogType));
         if (nLogType > -1)
         {
             LogTypes::Value logType = static_cast<LogTypes::Value>(nLogType);

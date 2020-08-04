@@ -203,7 +203,6 @@ void NetworkController::_onShoutedMessageReceived(PeerM* peer, QString messageTy
         {
             QString definitionFilePath = messageParameters.at(0);
             QString agentUid = messageParameters.at(1);
-
             Q_EMIT agentDefinitionFilePath(peerId, agentUid, definitionFilePath);
         }
         // MAPPING FILE PATH
@@ -211,7 +210,6 @@ void NetworkController::_onShoutedMessageReceived(PeerM* peer, QString messageTy
         {
             QString mappingFilePath = messageParameters.at(0);
             QString agentUid = messageParameters.at(1);
-
             Q_EMIT agentMappingFilePath(peerId, agentUid, mappingFilePath);
         }
         // Unknown
