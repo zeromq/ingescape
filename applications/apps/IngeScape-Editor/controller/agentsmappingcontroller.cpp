@@ -1658,14 +1658,19 @@ void AgentsMappingController::_onWriteOnInputOfAgentInMapping(ObjectInMappingVM*
         {
             qDebug() << "Write on Input" << linkInput->input()->name() << "of Agent in Mapping" << agentInMapping->agentsGroupedByName()->name();
 
-            QStringList message = {
-                "SET_INPUT",
-                linkInput->input()->name(),
-                "0"
-            };
-
-            // Send the message "SET INPUT" to the list of agents
-            IngeScapeNetworkController::instance()->sendStringMessageToAgents(agentInMapping->agentsGroupedByName()->peerIdsList(), message);
+            for (AgentM* agent : *agentInMapping->agentsGroupedByName()->models())
+            {
+                if ((agent != nullptr) && (agent->peer() != nullptr) && agent->isON())
+                {
+                    QStringList message = {
+                        "SET_INPUT",
+                        linkInput->input()->name(),
+                        "0",
+                        agent->uid()
+                    };
+                    IngeScapeNetworkController::instance()->sendZMQMessageToPeer(agent->peer()->uid(), message);
+                }
+            }
         }
     }
 }

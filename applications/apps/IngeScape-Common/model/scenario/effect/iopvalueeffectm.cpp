@@ -185,41 +185,42 @@ QPair<AgentsGroupedByNameVM*, QStringList> IOPValueEffectM::getAgentAndCommandWi
     {
         pairAgentAndCommandWithParameters.first = _agent;
 
-        QStringList commandAndParameters;
-
         // SET_INPUT / SET_OUTPUT / SET_PARAMETER
         QString command = QString("SET_%1").arg(AgentIOPTypes::staticEnumToString(_agentIOP->firstModel()->agentIOPType()));
 
-        commandAndParameters << command << _agentIOP->name();
+        QStringList commandAndParameters = {
+            command,
+            _agentIOP->name()
+        };
 
         switch (_agentIOP->firstModel()->agentIOPValueType())
         {
         case AgentIOPValueTypes::INTEGER: {
             // FIXME check that value is an INT
-            commandAndParameters << _value;
+            commandAndParameters.append(_value);
             break;
         }
         case AgentIOPValueTypes::DOUBLE: {
             // FIXME check that value is a DOUBLE
-            commandAndParameters << _value;
+            commandAndParameters.append(_value);
             break;
         }
         case AgentIOPValueTypes::STRING: {
-            commandAndParameters << _value;
+            commandAndParameters.append(_value);
             break;
         }
         case AgentIOPValueTypes::BOOL: {
             // FIXME check that value is a BOOL
-            commandAndParameters << _value;
+            commandAndParameters.append(_value);
             break;
         }
         case AgentIOPValueTypes::IMPULSION: {
             // Simulate a value
-            commandAndParameters << "0";
+            commandAndParameters.append("0");
             break;
         }
         case AgentIOPValueTypes::DATA: {
-            commandAndParameters << _value;
+            commandAndParameters.append(_value);
             break;
         }
         default:
@@ -245,37 +246,38 @@ QPair<QString, QStringList> IOPValueEffectM::getAgentNameAndReverseCommandWithPa
     {
         pairAgentNameAndReverseCommand.first = _agent->name();
 
-        QStringList reverseCommandAndParameters;
-
         // SET_INPUT / SET_OUTPUT / SET_PARAMETER
         QString command = QString("SET_%1").arg(AgentIOPTypes::staticEnumToString(_agentIOP->firstModel()->agentIOPType()));
 
-        reverseCommandAndParameters << command << _agentIOP->name();
+        QStringList reverseCommandAndParameters = {
+            command,
+            _agentIOP->name()
+        };
 
         switch (_agentIOP->firstModel()->agentIOPValueType())
         {
         case AgentIOPValueTypes::INTEGER: {
             // FIXME check if conversion to INT succeeded
-            //reverseCommandAndParameters << QString::number(_agentIOP->currentValue().toInt());
-            reverseCommandAndParameters << _agentIOP->firstModel()->displayableCurrentValue();
+            //reverseCommandAndParameters.append(QString::number(_agentIOP->currentValue().toInt());
+            reverseCommandAndParameters.append(_agentIOP->firstModel()->displayableCurrentValue());
             break;
         }
         case AgentIOPValueTypes::DOUBLE: {
             // FIXME check if conversion to DOUBLE succeeded
-            //reverseCommandAndParameters << QString::number(_agentIOP->currentValue().toDouble());
-            reverseCommandAndParameters << _agentIOP->firstModel()->displayableCurrentValue();
+            //reverseCommandAndParameters.append(QString::number(_agentIOP->currentValue().toDouble());
+            reverseCommandAndParameters.append(_agentIOP->firstModel()->displayableCurrentValue());
             break;
         }
         case AgentIOPValueTypes::STRING: {
-            reverseCommandAndParameters << _agentIOP->firstModel()->currentValue().toString();
+            reverseCommandAndParameters.append(_agentIOP->firstModel()->currentValue().toString());
             break;
         }
         case AgentIOPValueTypes::BOOL: {
             if (_agentIOP->firstModel()->currentValue().toBool()) {
-                reverseCommandAndParameters << "true";
+                reverseCommandAndParameters.append("true");
             }
             else {
-                reverseCommandAndParameters << "false";
+                reverseCommandAndParameters.append("false");
             }
             break;
         }
