@@ -738,6 +738,7 @@ void igs_setLicensePath(const char *path){
             free(coreContext->licensePath);
         }
         coreContext->licensePath = strdup(reviewedPath);
+        license_readLicense(coreContext);
     }else{
         igs_error("'%s' does not exist, path was not changed", reviewedPath);
     }
@@ -752,11 +753,8 @@ char *igs_getLicensePath(){
 }
 
 bool igs_checkLicenseForAgent(const char *agentId){
+    assert(agentId);
     core_initContext();
-    if (agentId == NULL){
-        igs_error("agent id is NULL");
-        return false;
-    }
     license_readLicense(coreContext);
     if (agentId == NULL)
         return false;
