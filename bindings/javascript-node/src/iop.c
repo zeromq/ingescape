@@ -828,12 +828,9 @@ napi_value node_igs_getTypeForInput(napi_env env, napi_callback_info info) {
     int type = igs_getTypeForInput(name);
     free(name);
 
-    //convert into js type
-    int type_js = get_iop_type_js_from_iop_type_t(type);
-
     // convert return value into N-API value
     napi_value res_convert;
-    convert_int_to_napi(env, type_js, &res_convert);
+    convert_int_to_napi(env, type, &res_convert);
     return res_convert;
 }
 
@@ -853,12 +850,9 @@ napi_value node_igs_getTypeForOutput(napi_env env, napi_callback_info info) {
     int type = igs_getTypeForOutput(name);
     free(name);
 
-    //convert into js type
-    int type_js = get_iop_type_js_from_iop_type_t(type);
-
     // convert return value into N-API value
     napi_value res_convert;
-    convert_int_to_napi(env, type_js, &res_convert);
+    convert_int_to_napi(env, type, &res_convert);
     return res_convert;
 }
 
@@ -878,12 +872,9 @@ napi_value node_igs_getTypeForParameter(napi_env env, napi_callback_info info) {
     int type = igs_getTypeForParameter(name);
     free(name);
 
-    //convert into js type
-    int type_js = get_iop_type_js_from_iop_type_t(type);
-
     // convert return value into N-API value
     napi_value res_convert;
-    convert_int_to_napi(env, type_js, &res_convert);
+    convert_int_to_napi(env, type, &res_convert);
     return res_convert;
 }
 

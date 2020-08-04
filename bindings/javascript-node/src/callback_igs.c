@@ -314,7 +314,7 @@ static void cbIOP_into_js(napi_env env, napi_value js_callback, void* ctx, void*
     // Convert args to napi
     convert_int_to_napi(env, argsCallback->iopType, &argv[0]);
     convert_string_to_napi(env, argsCallback->name, &argv[1]);
-    convert_int_to_napi(env, get_iop_type_js_from_iop_type_t(argsCallback->valueType), &argv[2]);
+    convert_int_to_napi(env, argsCallback->valueType, &argv[2]);
     convert_value_IOP_into_napi(env, argsCallback->valueType, argsCallback->value, argsCallback->valueSize, &argv[3]);
     if (argsCallback->ref_myData == NULL) {
         convert_null_to_napi(env, &argv[4]);

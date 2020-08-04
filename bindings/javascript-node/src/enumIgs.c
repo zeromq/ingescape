@@ -45,24 +45,28 @@ napi_value node_get_iopTypes_js(napi_env env, napi_callback_info info) {
     napi_value object;
     napi_create_object(env, &object);
 
-    napi_value numberType;
-    convert_int_to_napi(env, IGS_NUMBER_JS, &numberType);
-    napi_set_named_property(env, object, "IGS_NUMBER_T", numberType);
+    napi_value integerType;
+    convert_int_to_napi(env, IGS_INTEGER_T, &integerType);
+    napi_set_named_property(env, object, "IGS_INTEGER_T", integerType);
+
+    napi_value doubleType;
+    convert_int_to_napi(env, IGS_DOUBLE_T, &doubleType);
+    napi_set_named_property(env, object, "IGS_DOUBLE_T", doubleType);
 
     napi_value stringType;
-    convert_int_to_napi(env, IGS_STRING_JS, &stringType);
+    convert_int_to_napi(env, IGS_STRING_T, &stringType);
     napi_set_named_property(env, object, "IGS_STRING_T", stringType);
 
     napi_value boolType;
-    convert_int_to_napi(env, IGS_BOOL_JS, &boolType);
+    convert_int_to_napi(env, IGS_BOOL_T, &boolType);
     napi_set_named_property(env, object, "IGS_BOOL_T", boolType);
 
     napi_value impulsionType;
-    convert_int_to_napi(env, IGS_IMPULSION_JS, &impulsionType);
+    convert_int_to_napi(env, IGS_IMPULSION_T, &impulsionType);
     napi_set_named_property(env, object, "IGS_IMPULSION_T", impulsionType);
 
     napi_value dataType;
-    convert_int_to_napi(env, IGS_DATA_JS, &dataType);
+    convert_int_to_napi(env, IGS_DATA_T, &dataType);
     napi_set_named_property(env, object, "IGS_DATA_T", dataType);
 
     return object;
