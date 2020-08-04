@@ -524,6 +524,9 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
                                                                           agentIOPValueType,
                                                                           currentValue);
 
+                    // FIXME Instead of moveToThread ? new PublishedValueM in the slot connected to the signal valuePublished ?
+                    publishedValue->moveToThread(qApp->thread()); // Move from IngeScape thread to UI thread
+
                     // Emit the signal "Value Published"
                     Q_EMIT ingeScapeNetworkC->valuePublished(publishedValue);
                 }
