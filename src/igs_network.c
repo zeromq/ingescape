@@ -873,7 +873,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 igs_remote_agent_t *remote = NULL;
                 HASH_FIND_STR(context->remoteAgents, uuid, remote);
                 if (remote){
-                    igs_error("%s (%s) exited", remote->name, uuid);
+                    igs_debug("<-%s (%s) exited", remote->name, uuid);
                     HASH_DEL(context->remoteAgents, remote);
                     igs_agent_event_callback_t *cb;
                     DL_FOREACH(coreContext->agentEventCallbacks, cb){
