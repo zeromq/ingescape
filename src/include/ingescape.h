@@ -106,7 +106,8 @@ typedef enum {
     IGS_AGENT_ENTERED = 0,
     IGS_AGENT_EXITED,
     IGS_PEER_ENTERED,
-    IGS_PEER_EXITED
+    IGS_PEER_EXITED,
+    IGS_AGENT_UPDATED_DEFINITION
 } igs_agent_event_t;
 typedef void (*igs_agentEventCallback)(igs_agent_event_t event, const char *uuid, const char *name, void *myData);
 PUBLIC void igs_observeAgentEvents(igs_agentEventCallback cb, void *myData);

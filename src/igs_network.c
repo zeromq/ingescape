@@ -756,10 +756,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 free(k);
             }
             zlist_destroy(&keys);
-            igs_agent_event_callback_t *cb;
-            DL_FOREACH(coreContext->agentEventCallbacks, cb){
-                cb->callback_ptr(IGS_PEER_ENTERED, peer, name, cb->myData);
-            }
+            agent_propagateAgentEvent(IGS_PEER_ENTERED, peer, name);
         }else{
             //Agent already exists, we set its reconnected flag
             //(this is used below to avoid agent destruction on EXIT received after timeout)
@@ -875,10 +872,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 if (remote){
                     igs_debug("<-%s (%s) exited", remote->name, uuid);
                     HASH_DEL(context->remoteAgents, remote);
-                    igs_agent_event_callback_t *cb;
-                    DL_FOREACH(coreContext->agentEventCallbacks, cb){
-                        cb->callback_ptr(IGS_AGENT_EXITED, uuid, remote->name, cb->myData);
-                    }
+                    agent_propagateAgentEvent(IGS_AGENT_EXITED, uuid, remote->name);
                     cleanAndFreeRemoteAgent(&remote);
                 }else{
                     igs_error("%s is not a known remote agent", uuid);
@@ -996,10 +990,9 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 }
                 
                 if (isAgentNew){
-                    igs_agent_event_callback_t *cb;
-                    DL_FOREACH(coreContext->agentEventCallbacks, cb){
-                        cb->callback_ptr(IGS_AGENT_ENTERED, uuid, remoteAgentName, cb->myData);
-                    }
+                    agent_propagateAgentEvent(IGS_AGENT_ENTERED, uuid, remoteAgentName);
+                }else{
+                    agent_propagateAgentEvent(IGS_AGENT_UPDATED_DEFINITION, uuid, remoteAgentName);
                 }
             }else{
                 igs_error("Received definition from remote agent %s is NULL or has no name", remoteAgent->name);
@@ -1997,18 +1990,12 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                     //destroy all remote agents attached to this peer
                     if (streq(remote->peer->peerId, zyrePeer->peerId)){
                         HASH_DEL(context->remoteAgents, remote);
-                        igs_agent_event_callback_t *cb;
-                        DL_FOREACH(coreContext->agentEventCallbacks, cb){
-                            cb->callback_ptr(IGS_AGENT_EXITED, remote->uuid, remote->name, cb->myData);
-                        }
+                        agent_propagateAgentEvent(IGS_AGENT_EXITED, remote->uuid, remote->name);
                         cleanAndFreeRemoteAgent(&remote);
                     }
                 }
                 HASH_DEL(context->zyrePeers, zyrePeer);
-                igs_agent_event_callback_t *cb;
-                DL_FOREACH(coreContext->agentEventCallbacks, cb){
-                    cb->callback_ptr(IGS_PEER_EXITED, peer, name, cb->myData);
-                }
+                agent_propagateAgentEvent(IGS_PEER_EXITED, peer, name);
                 cleanAndFreeZyrePeer(&zyrePeer);
             }
         }

@@ -15,6 +15,17 @@
 #include "ingescape_private.h"
 #include "ingescape_agent.h"
 
+void agent_propagateAgentEvent(igs_agent_event_t event, const char *uuid, const char *name){
+    //propagate event on all local agents
+    igs_agent_t *agent, *tmp;
+    HASH_ITER(hh, coreContext->agents, agent, tmp){
+        igs_agent_event_callback_t *cb;
+        DL_FOREACH(agent->agentEventCallbacks, cb){
+            cb->callback_ptr(agent, event, uuid, name, cb->myData);
+        }
+    }
+}
+
 igs_agent_t *igsAgent_new(const char *name, bool activateImmediately){
     core_initContext();
     assert(name);
@@ -56,6 +67,11 @@ void igsAgent_destroy(igs_agent_t **agent){
         DL_DELETE((*agent)->muteCallbacks, muteCb);
         free(muteCb);
     }
+    igs_agent_event_callback_t *eventCb, *eventtmp;
+    DL_FOREACH_SAFE((*agent)->agentEventCallbacks, eventCb, eventtmp){
+        DL_DELETE((*agent)->agentEventCallbacks, eventCb);
+        free(eventCb);
+    }
     if ((*agent)->mapping)
         mapping_freeMapping(&(*agent)->mapping);
     if ((*agent)->definition)
@@ -81,10 +97,7 @@ igs_result_t igsAgent_activate(igs_agent_t *agent){
         }
         agent->network_needToSendDefinitionUpdate = true; //will also trigger mapping update
     }
-    igs_agent_event_callback_t *cb;
-    DL_FOREACH(coreContext->agentEventCallbacks, cb){
-        cb->callback_ptr(IGS_AGENT_ENTERED, agent->uuid, agent->name, cb->myData);
-    }
+    agent_propagateAgentEvent(IGS_AGENT_ENTERED, agent->uuid, agent->name);
     return IGS_SUCCESS;
 }
 
@@ -110,10 +123,7 @@ igs_result_t igsAgent_deactivate(igs_agent_t *agent){
         igs_error("agent %s (%s) is not activated", agent->name, agent->uuid);
         return IGS_FAILURE;
     }
-    igs_agent_event_callback_t *cb;
-    DL_FOREACH(coreContext->agentEventCallbacks, cb){
-        cb->callback_ptr(IGS_AGENT_EXITED, agent->uuid, agent->name, cb->myData);
-    }
+    agent_propagateAgentEvent(IGS_AGENT_EXITED, agent->uuid, agent->name);
     return IGS_SUCCESS;
 }
 
@@ -135,6 +145,16 @@ void igsAgent_observeActivate(igs_agent_t *agent, igsAgent_activateCallback cb, 
     newCb->callback_ptr = cb;
     newCb->myData = myData;
     DL_APPEND(agent->activateCallbacks, newCb);
+}
+
+void igsAgent_observeAgentEvents(igs_agent_t *agent, igsAgent_agentEventCallback cb, void *myData){
+    assert(agent);
+    assert(cb);
+    core_initContext();
+    igs_agent_event_callback_t *newCb = calloc(1, sizeof(igs_agent_event_callback_t));
+    newCb->callback_ptr = cb;
+    newCb->myData = myData;
+    DL_APPEND(agent->agentEventCallbacks, newCb);
 }
 
 void igsAgent_log(igs_logLevel_t level, const char *function, igs_agent_t *agent, const char *format, ...){
