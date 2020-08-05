@@ -58,6 +58,13 @@ typedef struct ArgsCallbackMonitor {
     char *ipAddress;
     napi_ref ref_myData;
 } ArgsCallbackMonitor;
+
+typedef struct ArgsCallbackAgentEvent {
+    igs_agent_event_t event;
+    char *uuid;
+    char *name;
+    napi_ref ref_myData;
+} ArgsCallbackAgentEvent;
 #endif
 
 // Free allocated memory for callbacks during lifetime of the agent

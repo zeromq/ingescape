@@ -667,9 +667,9 @@ void callCallback (const char *senderAgentName, const char *senderAgentUUID,
 
     // Initiate all arguments for our threadsafe function
     ArgsCallbackCall* argsCallback = calloc(1, sizeof(ArgsCallbackCall));
-    argsCallback->senderAgentName = strndup(senderAgentName, strlen(senderAgentName));
-    argsCallback->senderAgentUUID = strndup(senderAgentUUID, strlen(senderAgentUUID));
-    argsCallback->callName = strndup(callName, strlen(callName));
+    argsCallback->senderAgentName = strdup(senderAgentName);
+    argsCallback->senderAgentUUID = strdup(senderAgentUUID);
+    argsCallback->callName = strdup(callName);
     argsCallback->firstArgument = igs_cloneArgumentsList(firstArgument); //clone it to keep it
     argsCallback->nbArgs = nbArgs;
     argsCallback->ref_myData = threadsafeContext->ref_myData;
@@ -782,8 +782,8 @@ void monitorCallback (igs_monitorEvent_t event, const char *device, const char *
     // Initiate all arguments for our threadsafe JS function
     ArgsCallbackMonitor* argsCallback = calloc(1, sizeof(ArgsCallbackMonitor)); 
     argsCallback->event = event;
-    argsCallback->device = strndup(device, strlen(device));
-    argsCallback->ipAddress = strndup(ipAddress, strlen(ipAddress));
+    argsCallback->device = strdup(device);
+    argsCallback->ipAddress = strdup(ipAddress);
     argsCallback->ref_myData = threadsafeContext->ref_myData;
 
     // Call our threadsafe function cbMonitor_into_js
@@ -815,7 +815,7 @@ napi_value node_igs_monitor(napi_env env, napi_callback_info info) {
         triggerException(env, NULL, "Impossible to create threadsafe function.");
     }
 
-    //create reference for arguments callback if not null
+    // Create reference for arguments callback if not null
     napi_valuetype value_type;
     status = napi_typeof(env, argv[1], &value_type);
     if (status != napi_ok) {
@@ -833,6 +833,110 @@ napi_value node_igs_monitor(napi_env env, napi_callback_info info) {
 
     // call igs function
     igs_monitor(monitorCallback, threadsafeContext);
+    return NULL;
+}
+
+////////////////////////////////////
+//  Observe Agent Events
+//
+
+// Function to callback agent event JS function 
+static void cbAgentEvent_into_js(napi_env env, napi_value js_callback, void* ctx, void* data) {
+    napi_status status;
+    ArgsCallbackAgentEvent * argsCallback = (ArgsCallbackAgentEvent *) data;
+    napi_value argv[4];
+
+    // Convert args to napi
+    convert_int_to_napi(env, argsCallback->event, &argv[0]);
+    convert_string_to_napi(env, argsCallback->uuid, &argv[1]);
+    convert_string_to_napi(env, argsCallback->name, &argv[2]);
+    if (argsCallback->ref_myData == NULL) {
+        convert_null_to_napi(env, &argv[3]);
+    }
+    else {
+        status = napi_get_reference_value(env, argsCallback->ref_myData, &argv[3]);
+        if (status != napi_ok) {
+            triggerException(env, NULL, "N-API : Unable to get reference value.");
+        }
+    }
+
+    // Free our struct 
+    free(argsCallback->uuid);
+    free(argsCallback->name);
+    free(argsCallback);
+
+    // Since a function call must have a receiver, we use undefined
+    napi_value undefined;
+    status = napi_get_undefined(env, &undefined);
+    if (status != napi_ok) {
+        triggerException(env, NULL, "Impossible to get undefined.");
+    }
+
+    // Callback into JavaScript
+    status = napi_call_function(env, undefined, js_callback, 4, argv, NULL);
+    if (status != napi_ok) {
+        triggerException(env, NULL, "Unable to call javascript function.");
+    }
+}
+
+// Type defined agent event C function
+void agentEventCallback (igs_agent_event_t event, const char *uuid, const char *name, void *myData) {
+    ThreadsafeContext * threadsafeContext = (ThreadsafeContext *) myData;
+
+    // Initiate all arguments for our threadsafe JS function
+    ArgsCallbackAgentEvent* argsCallback = calloc(1, sizeof(ArgsCallbackAgentEvent)); 
+    argsCallback->event = event;
+    argsCallback->uuid = strdup(uuid);
+    argsCallback->name = strdup(name);
+    argsCallback->ref_myData = threadsafeContext->ref_myData;
+
+    // Call our threadsafe function cbMonitor_into_js
+    napi_call_threadsafe_function(threadsafeContext->threadsafe_func, argsCallback, napi_tsfn_nonblocking);
+}   
+
+// Wrapper for
+// PUBLIC void igs_observeAgentEvents(igs_agentEventCallback cb, void *myData)
+napi_value node_igs_observeAgentEvents(napi_env env, napi_callback_info info) {
+    size_t nb_arguments = 2;
+    napi_status status; //to check status of node_api
+    napi_value argv[nb_arguments];
+
+    // Get infos pass in argument
+    get_function_arguments(env, info, nb_arguments, argv);
+
+    // Initiate threadsafe context
+    ThreadsafeContext * threadsafeContext = calloc(1, sizeof(ThreadsafeContext));
+    DL_APPEND(headThreadsafeContexts, threadsafeContext);
+
+    napi_value async_name;
+    status = napi_create_string_utf8(env, "Ingescape/CallbackAgentEvent", NAPI_AUTO_LENGTH, &async_name);
+    if (status != napi_ok) {
+        triggerException(env, NULL, "Invalid name for async_name napi_value.");
+    }
+    status = napi_create_threadsafe_function(env, argv[0], NULL, async_name, 0, 1, NULL, NULL, NULL, 
+    cbAgentEvent_into_js, &(threadsafeContext->threadsafe_func));
+    if (status != napi_ok) {
+        triggerException(env, NULL, "Impossible to create threadsafe function.");
+    }
+
+    // Create reference for arguments callback if not null
+    napi_valuetype value_type;
+    status = napi_typeof(env, argv[1], &value_type);
+    if (status != napi_ok) {
+        triggerException(env, NULL, "N-API : Unable to get napi value type of 2nd argument.");
+    }
+    if ((value_type == napi_null) || (value_type == napi_undefined)) {
+        threadsafeContext->ref_myData = NULL;
+    }
+    else {
+        status = napi_create_reference(env, argv[1], 1, &(threadsafeContext->ref_myData));
+        if (status != napi_ok) {
+            triggerException(env, NULL, "2nd argument must be a JavaScript Object or an Array or null or undefined.");
+        }
+    }
+
+    // Call igs function
+    igs_observeAgentEvents(agentEventCallback, threadsafeContext);
     return NULL;
 }
 
@@ -861,5 +965,6 @@ napi_value init_callback_igs(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_igs_observeLicense, "observeLicense", exports);
     exports = enable_callback_into_js(env, node_igs_initCall, "initCall", exports);
     exports = enable_callback_into_js(env, node_igs_monitor, "monitor", exports);
+    exports = enable_callback_into_js(env, node_igs_observeAgentEvents, "observeAgentEvents", exports);
     return exports;
 }
