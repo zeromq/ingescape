@@ -83,14 +83,14 @@ PUBLIC char *igs_getAgentName(void); //char* must be freed by caller
 PUBLIC void igs_setAgentState(const char *state);
 PUBLIC char* igs_getAgentState(void); //must be freed by caller
 
-//mute the agent ouputs
+//mute the agent
 PUBLIC void igs_mute(void);
 PUBLIC void igs_unmute(void);
 PUBLIC bool igs_isMuted(void);
 typedef void (*igs_muteCallback)(bool isMuted, void *myData);
 PUBLIC void igs_observeMute(igs_muteCallback cb, void *myData);
 
-//freeze and unfreeze the agent
+//freeze the agent
 //When freezed, agent will not send anything on its outputs and
 //its inputs are not reactive to external data.
 //NB: the internal semantics of freeze and unfreeze for a given agent
@@ -100,6 +100,16 @@ PUBLIC bool igs_isFrozen(void);
 PUBLIC void igs_unfreeze(void);
 typedef void (*igs_freezeCallback)(bool isPaused, void *myData);
 PUBLIC void igs_observeFreeze(igs_freezeCallback cb, void *myData);
+
+//observe agents/peers events on the network
+typedef enum {
+    IGS_AGENT_ENTERED = 0,
+    IGS_AGENT_EXITED,
+    IGS_PEER_ENTERED,
+    IGS_PEER_EXITED
+} igs_agent_event_t;
+typedef void (*igs_agentEventCallback)(igs_agent_event_t event, const char *uuid, const char *name, void *myData);
+PUBLIC void igs_observeAgentEvents(igs_agentEventCallback cb, void *myData);
 
 
 //////////////////////////////////////////////////

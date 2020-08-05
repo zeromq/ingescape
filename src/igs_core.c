@@ -98,6 +98,7 @@ void core_observeMuteCallback(igs_agent_t *agent, bool isMuted, void *myData){
 }
 
 void igs_observeMute(igs_muteCallback cb, void *myData){
+    assert(cb);
     core_initAgent();
     observeMuteCbWrapper_t *wrap = calloc(1, sizeof(observeMuteCbWrapper_t));
     wrap->cb = cb;
@@ -114,6 +115,20 @@ void core_observeFreezeCallback(igs_agent_t *agent, bool isPaused, void *myData)
     IGS_UNUSED(agent)
     observeFreezeCbWrapper_t *wrap = (observeFreezeCbWrapper_t *)myData;
     wrap->cb(isPaused, wrap->myData);
+}
+
+typedef struct {
+    igs_agentEventCallback cb;
+    void *myData;
+} observeAgentEventsCbWrapper_t;
+
+void igs_observeAgentEvents(igs_agentEventCallback cb, void *myData){
+    assert(cb);
+    core_initContext();
+    igs_agent_event_callback_t *wrap = calloc(1, sizeof(igs_agent_event_callback_t));
+    wrap->callback_ptr = cb;
+    wrap->myData = myData;
+    DL_APPEND(coreContext->agentEventCallbacks, wrap);
 }
 
 //IOP

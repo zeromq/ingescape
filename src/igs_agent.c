@@ -34,6 +34,7 @@ void igsAgent_destroy(igs_agent_t **agent){
     assert(*agent);
     if (igsAgent_isActivated(*agent))
         igsAgent_deactivate(*agent);
+    
     if ((*agent)->uuid != NULL)
         free((*agent)->uuid);
     if ((*agent)->name != NULL)
@@ -80,6 +81,10 @@ igs_result_t igsAgent_activate(igs_agent_t *agent){
         }
         agent->network_needToSendDefinitionUpdate = true; //will also trigger mapping update
     }
+    igs_agent_event_callback_t *cb;
+    DL_FOREACH(coreContext->agentEventCallbacks, cb){
+        cb->callback_ptr(IGS_AGENT_ENTERED, agent->uuid, agent->name, cb->myData);
+    }
     return IGS_SUCCESS;
 }
 
@@ -104,6 +109,10 @@ igs_result_t igsAgent_deactivate(igs_agent_t *agent){
     }else{
         igs_error("agent %s (%s) is not activated", agent->name, agent->uuid);
         return IGS_FAILURE;
+    }
+    igs_agent_event_callback_t *cb;
+    DL_FOREACH(coreContext->agentEventCallbacks, cb){
+        cb->callback_ptr(IGS_AGENT_EXITED, agent->uuid, agent->name, cb->myData);
     }
     return IGS_SUCCESS;
 }

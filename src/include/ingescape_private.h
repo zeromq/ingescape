@@ -255,6 +255,13 @@ typedef struct igs_activate_calback {
     struct igs_activate_calback *next;
 } igs_activate_calback_t;
 
+typedef struct igs_agentEvent_calback {
+    igs_agentEventCallback callback_ptr;
+    void *myData;
+    struct igs_agentEvent_calback *prev;
+    struct igs_agentEvent_calback *next;
+} igs_agent_event_callback_t;
+
 
 //////////////////  MAIN  STRUCTURES   //////////////////
 
@@ -302,6 +309,7 @@ typedef struct igs_core_context{
     bool isFrozen;
     igs_freeze_callback_t *freezeCallbacks;
     igs_external_stop_calback_t *externalStopCalbacks;
+    igs_agent_event_callback_t *agentEventCallbacks;
     
     //performance
     size_t performanceMsgCounter;
