@@ -232,6 +232,9 @@ void onBusMessageIncommingCallback(const char *event,
             PeerM* peer = ingeScapeNetworkC->getPeerWithId(peerId);
             if (peer != nullptr)
             {
+                // The peer will be deleted later
+                ingeScapeNetworkC->removeExitedPeerId(peerId);
+
                 peer->setisON(false);
 
                 switch (peer->igsType())
@@ -300,9 +303,6 @@ void onBusMessageIncommingCallback(const char *event,
                     qWarning() << "Unknown peer id" << peerId << "(" << peerName << ")";
                     break;
                 }
-
-                // The peer will be deleted later
-                ingeScapeNetworkC->removeExitedPeerId(peerId);
             }
         }
         // JOIN (group)

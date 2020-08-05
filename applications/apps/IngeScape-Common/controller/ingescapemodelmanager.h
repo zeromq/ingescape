@@ -28,7 +28,6 @@
 
 
 static const QString VERSION_JSON_PLATFORM = QString("1.0");
-//static const QString VERSION_JSON_PLATFORM = QString("2.0");
 
 
 /**
@@ -76,29 +75,10 @@ public:
     ~IngeScapeModelManager();
 
 
-    /**
-     * @brief Create a new model of agent with a name, a definition (can be NULL) and some properties
-     * @param agentName
-     * @param definition optional (NULL by default)
-     * @param hostname optional (default value)
-     * @param commandLine optional (empty by default)
-     * @param peerId optional (empty by default)
-     * @param ipAddress optional (empty by default)
-     * @param isON optional (false by default)
-     * @return
-     */
-    /*AgentM* createAgentModel(QString agentName,
-                             DefinitionM* definition = nullptr,
-                             QString hostname = HOSTNAME_NOT_DEFINED,
-                             QString commandLine = "",
-                             QString peerId = "",
-                             QString ipAddress = "",
-                             bool isON = false);*/
-
-    AgentM* createAgentModel(PeerM* peer,
-                             QString agentUid,
-                             QString agentName,
-                             DefinitionM* definition = nullptr,
+    AgentM* createAgentModel(QString agentName,
+                             DefinitionM* definition,
+                             QString agentUid = "",
+                             PeerM* peer = nullptr,
                              bool isON = false);
 
 

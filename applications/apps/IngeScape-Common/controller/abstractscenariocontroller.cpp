@@ -1169,7 +1169,7 @@ void AbstractScenarioController::_executeCommandForAgent(AgentsGroupedByNameVM* 
                             model->peer()->commandLine()
                         };
 
-                        // Send the message "Start Agent" to the IngeScape Launcher
+                        // Send the message "Start Peer" to the IngeScape Launcher
                         IngeScapeNetworkController::instance()->sendStringMessageToAgent(peerIdOfLauncher, message);
                     }
                 }
