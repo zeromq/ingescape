@@ -891,8 +891,30 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             return 0;
         }
         
+        if(streq(title, "PEER_KNOWS_YOU")){
+            //peer has received one of our agents definition
+            //=> all agents in this peer know us
+            char *uuid = zmsg_popstr(msgDuplicate);
+            if (uuid == NULL){
+                igs_error("no valid uuid in %s message received from %s(%s): aborting", title, name, peer);
+                zmsg_destroy(&msgDuplicate);
+                zyre_event_destroy(&zyre_event);
+                return 0;
+            }
+            igs_agent_t *agent = NULL;
+            HASH_FIND_STR(context->agents, uuid, agent);
+            assert(agent);
+            igs_agent_event_callback_t *cb;
+            DL_FOREACH(agent->agentEventCallbacks, cb){
+                //iterate on all remote agents for this peer : all its agents know us
+                igs_remote_agent_t *r, *rtmp;
+                HASH_ITER(hh, coreContext->remoteAgents, r, rtmp){
+                    cb->callback_ptr(agent, IGS_AGENT_KNOWS_US, r->uuid, r->name, cb->myData);
+                }
+            }
+        }
         //check if title is an EXTERNAL definition
-        if(streq(title, definitionPrefix)){
+        else if(streq(title, definitionPrefix)){
             //identify remote agent or create it if unknown.
             //NB: we suppose that remote agent creation is achieved when
             //the agent sends its definition for the first time.
@@ -922,33 +944,32 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 return 0;
             }
             
-            bool isAgentNew = false;
-            igs_remote_agent_t *remoteAgent = NULL;
-            HASH_FIND_STR(context->remoteAgents, uuid, remoteAgent);
-            if (remoteAgent == NULL){
-                remoteAgent = calloc(1, sizeof(igs_remote_agent_t));
-                remoteAgent->context = context;
-                remoteAgent->uuid = strdup(uuid);
-                remoteAgent->name = strndup(remoteAgentName, IGS_MAX_AGENT_NAME_LENGTH);
-                igs_zyre_peer_t *zyrePeer = NULL;
-                HASH_FIND_STR(context->zyrePeers, peer, zyrePeer);
-                assert(zyrePeer);
-                remoteAgent->peer = zyrePeer;
-                HASH_ADD_STR(context->remoteAgents, uuid, remoteAgent);
-                igs_info("registering agent %s(%s)", uuid, remoteAgentName);
-                isAgentNew = true;
-            }else{
-                //we already know this agent
-                if (remoteAgent->name != NULL)
-                    free(remoteAgent->name);
-                remoteAgent->name = strndup(remoteAgentName, IGS_MAX_AGENT_NAME_LENGTH);
-            }
-            assert(remoteAgent);
-            
             // Load definition from string content
             igs_definition_t *newDefinition = parser_loadDefinition(strDefinition);
-            
-            if (newDefinition != NULL && newDefinition->name != NULL && remoteAgent != NULL){
+            if (newDefinition != NULL){
+                bool isAgentNew = false;
+                igs_remote_agent_t *remoteAgent = NULL;
+                HASH_FIND_STR(context->remoteAgents, uuid, remoteAgent);
+                if (remoteAgent == NULL){
+                    remoteAgent = calloc(1, sizeof(igs_remote_agent_t));
+                    remoteAgent->context = context;
+                    remoteAgent->uuid = strdup(uuid);
+                    remoteAgent->name = strndup(remoteAgentName, IGS_MAX_AGENT_NAME_LENGTH);
+                    igs_zyre_peer_t *zyrePeer = NULL;
+                    HASH_FIND_STR(context->zyrePeers, peer, zyrePeer);
+                    assert(zyrePeer);
+                    remoteAgent->peer = zyrePeer;
+                    HASH_ADD_STR(context->remoteAgents, uuid, remoteAgent);
+                    igs_info("registering agent %s(%s)", uuid, remoteAgentName);
+                    isAgentNew = true;
+                }else{
+                    //we already know this agent
+                    if (remoteAgent->name != NULL)
+                        free(remoteAgent->name);
+                    remoteAgent->name = strndup(remoteAgentName, IGS_MAX_AGENT_NAME_LENGTH);
+                }
+                assert(remoteAgent);
+                
                 // Look if this agent already has a definition
                 if(remoteAgent->definition != NULL) {
                     igs_debug("Definition already exists for agent %s : new definition will overwrite the previous one...", name);
@@ -967,7 +988,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                                                                   HASH_COUNT(newDefinition->params_table));
                 //igs_license("%ld iops (adding %s)", agent->licenseEnforcement->currentIOPNb, name);
                 if (context->licenseEnforcement->currentIOPNb > context->license->platformNbIOPs){
-                    igs_license("Maximum number of allowed IOPs (%d) is exceeded : agent will stop", context->license->platformNbIOPs);
+                    igs_license("maximum number of allowed IOPs (%d) is exceeded : agent will stop", context->license->platformNbIOPs);
                     igs_license_callback_t *el = NULL;
                     DL_FOREACH(context->licenseCallbacks, el){
                         el->callback_ptr(IGS_LICENSE_TOO_MANY_IOPS, el->data);
@@ -977,7 +998,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                     return -1;
                 }
 #endif
-                igs_debug("Store definition for remote agent %s", remoteAgent->name);
+                igs_debug("store definition for remote agent %s(%s)", remoteAgent->name, remoteAgent->uuid);
                 remoteAgent->definition = newDefinition;
                 //Check the involvement of this new remote agent and its definition in our agent mappings
                 //and update subscriptions.
@@ -989,14 +1010,15 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 
                 if (isAgentNew){
                     agent_propagateAgentEvent(IGS_AGENT_ENTERED, uuid, remoteAgentName);
+                    zmsg_t *msg = zmsg_new();
+                    zmsg_addstr(msg, "PEER_KNOWS_YOU");
+                    zmsg_addstr(msg, uuid);
+                    zyre_whisper(node, peer, &msg);
                 }else{
                     agent_propagateAgentEvent(IGS_AGENT_UPDATED_DEFINITION, uuid, remoteAgentName);
                 }
             }else{
-                igs_error("Received definition from remote agent %s is NULL or has no name", remoteAgent->name);
-                if(newDefinition != NULL) {
-                    definition_freeDefinition(&newDefinition);
-                }
+                igs_error("received definition from remote agent %s(%s) is NULL : agent will not be registered", remoteAgentName, uuid);
             }
             free(strDefinition);
             free(uuid);
@@ -1036,10 +1058,10 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 //load mapping from string content
                 newMapping = parser_loadMapping(strMapping);
                 if (newMapping == NULL){
-                    igs_error("Received mapping for agent %s could not be parsed properly", name);
+                    igs_error("received mapping for agent %s(%s) could not be parsed properly", remoteAgent->name, remoteAgent->uuid);
                 }
             }else{
-                igs_debug("Received mapping from agent %s is empty", name);
+                igs_debug("received mapping from agent %s(%s) is empty", remoteAgent->name, remoteAgent->uuid);
                 if(remoteAgent != NULL && remoteAgent->mapping != NULL) {
                     mapping_freeMapping(&remoteAgent->mapping);
                     remoteAgent->mapping = NULL;
@@ -1049,12 +1071,12 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             if (newMapping != NULL && remoteAgent != NULL){
                 //look if this agent already has a mapping
                 if(remoteAgent->mapping != NULL){
-                    igs_debug("Mapping already exists for agent %s : new mapping will overwrite the previous one...", name);
+                    igs_debug("mapping already exists for agent %s(%s) : new mapping will overwrite the previous one...", remoteAgent->name, remoteAgent->uuid);
                     mapping_freeMapping(&remoteAgent->mapping);
                     remoteAgent->mapping = NULL;
                 }
                 
-                igs_debug("Store mapping for agent %s", name);
+                igs_debug("store mapping for agent %s(%s)", remoteAgent->name, remoteAgent->uuid);
                 remoteAgent->mapping = newMapping;
             }else{
                 if(newMapping != NULL) {
