@@ -928,8 +928,8 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             if (remoteAgent == NULL){
                 remoteAgent = calloc(1, sizeof(igs_remote_agent_t));
                 remoteAgent->context = context;
-                remoteAgent->uuid = uuid;
-                remoteAgent->name = remoteAgentName;
+                remoteAgent->uuid = strdup(uuid);
+                remoteAgent->name = strndup(remoteAgentName, IGS_MAX_AGENT_NAME_LENGTH);
                 igs_zyre_peer_t *zyrePeer = NULL;
                 HASH_FIND_STR(context->zyrePeers, peer, zyrePeer);
                 assert(zyrePeer);
@@ -939,11 +939,9 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 isAgentNew = true;
             }else{
                 //we already know this agent
-                free(uuid);
                 if (remoteAgent->name != NULL)
                     free(remoteAgent->name);
-                remoteAgent->name = remoteAgentName;
-                uuid = NULL;
+                remoteAgent->name = strndup(remoteAgentName, IGS_MAX_AGENT_NAME_LENGTH);
             }
             assert(remoteAgent);
             
@@ -1001,6 +999,8 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 }
             }
             free(strDefinition);
+            free(uuid);
+            free(remoteAgentName);
         }
         //check if title is an EXTERNAL mapping
         else if(streq(title, mappingPrefix)){
@@ -1013,7 +1013,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 return 0;
             }
             char *uuid = zmsg_popstr (msgDuplicate);
-            if (strMapping == NULL){
+            if (uuid == NULL){
                 igs_error("uuid is NULL in %s message received from %s(%s): aborting", title, name, peer);
                 free(strMapping);
                 zmsg_destroy(&msgDuplicate);
@@ -1063,6 +1063,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 }
             }
             free(strMapping);
+            free(uuid);
         }
         //check if title is DEFINITION TO BE LOADED
         else if (streq(title, loadDefinitionPrefix)){
