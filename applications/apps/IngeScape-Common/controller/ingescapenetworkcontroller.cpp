@@ -138,59 +138,48 @@ void onBusMessageIncommingCallback(const char *event,
                     {
                     case IngeScapeTypes::AGENT:
                     {
-                        ingeScapeNetworkC->setnumberOfPeersOfAgents(ingeScapeNetworkC->numberOfPeersOfAgents() + 1);
-
                         peer->setloggerPort(loggerPort);
 
+                        ingeScapeNetworkC->setnumberOfPeersOfAgents(ingeScapeNetworkC->numberOfPeersOfAgents() + 1);
                         Q_EMIT ingeScapeNetworkC->peerOfAgentsEntered(peer);
                     }
                         break;
 
                     case IngeScapeTypes::LAUNCHER:
                     {
-                        ingeScapeNetworkC->setnumberOfLaunchers(ingeScapeNetworkC->numberOfLaunchers() + 1);
-
                         if (peerName.endsWith(suffix_Launcher)) {
                             hostname = peerName.left(peerName.length() - suffix_Launcher.length());
                             peer->sethostname(hostname);
                         }
                         peer->setstreamingPort(streamingPort);
 
+                        ingeScapeNetworkC->setnumberOfLaunchers(ingeScapeNetworkC->numberOfLaunchers() + 1);
                         Q_EMIT ingeScapeNetworkC->launcherEntered(peer);
-                    }
-                        break;
+                    } break;
 
                     case IngeScapeTypes::RECORDER:
                     {
                         ingeScapeNetworkC->setnumberOfRecorders(ingeScapeNetworkC->numberOfRecorders() + 1);
-
                         Q_EMIT ingeScapeNetworkC->recorderEntered(peer);
-                    }
-                        break;
+                    } break;
 
                     case IngeScapeTypes::EDITOR:
                     {
                         ingeScapeNetworkC->setnumberOfEditors(ingeScapeNetworkC->numberOfEditors() + 1);
-
                         Q_EMIT ingeScapeNetworkC->editorEntered(peer);
-                    }
-                        break;
+                    } break;
 
                     case IngeScapeTypes::ASSESSMENTS:
                     {
                         ingeScapeNetworkC->setnumberOfAssessments(ingeScapeNetworkC->numberOfAssessments() + 1);
-
                         Q_EMIT ingeScapeNetworkC->assessmentsEntered(peer);
-                    }
-                        break;
+                    } break;
 
                     case IngeScapeTypes::EXPE:
                     {
                         ingeScapeNetworkC->setnumberOfExpes(ingeScapeNetworkC->numberOfExpes() + 1);
-
                         Q_EMIT ingeScapeNetworkC->expeEntered(peer);
-                    }
-                        break;
+                    } break;
 
                     default:
                         break;
@@ -207,9 +196,8 @@ void onBusMessageIncommingCallback(const char *event,
         {
             zmsg_t* msg_dup = zmsg_dup(msg);
 
-            PeerM* peer = ingeScapeNetworkC->getPeerWithId(peerId);
-
-            ingeScapeNetworkC->manageShoutedMessage(peer, msg_dup);
+            ingeScapeNetworkC->manageShoutedMessage(ingeScapeNetworkC->getPeerWithId(peerId),
+                                                    msg_dup);
 
             zmsg_destroy(&msg_dup);
         }
@@ -218,9 +206,8 @@ void onBusMessageIncommingCallback(const char *event,
         {
             zmsg_t* msg_dup = zmsg_dup(msg);
 
-            PeerM* peer = ingeScapeNetworkC->getPeerWithId(peerId);
-
-            ingeScapeNetworkC->manageWhisperedMessage(peer, msg_dup);
+            ingeScapeNetworkC->manageWhisperedMessage(ingeScapeNetworkC->getPeerWithId(peerId),
+                                                      msg_dup);
 
             zmsg_destroy(&msg_dup);
         }
@@ -239,66 +226,42 @@ void onBusMessageIncommingCallback(const char *event,
 
                 switch (peer->igsType())
                 {
-                // IngeScape AGENT
                 case IngeScapeTypes::AGENT:
                 {
                     Q_EMIT ingeScapeNetworkC->peerOfAgentsExited(peer);
-
                     ingeScapeNetworkC->setnumberOfPeersOfAgents(ingeScapeNetworkC->numberOfPeersOfAgents() - 1);
+                } break;
 
-                    break;
-                }
-                    // IngeScape LAUNCHER
                 case IngeScapeTypes::LAUNCHER:
                 {
-                    /*QString hostname = "";
-                    if (peerName.endsWith(suffix_Launcher)) {
-                        hostname = peerName.left(peerName.length() - suffix_Launcher.length());
-                        peer->sethostname(hostname);
-                    }*/
-
                     Q_EMIT ingeScapeNetworkC->launcherExited(peer);
-
                     ingeScapeNetworkC->setnumberOfLaunchers(ingeScapeNetworkC->numberOfLaunchers() - 1);
+                } break;
 
-                    break;
-                }
-                    // IngeScape RECORDER
                 case IngeScapeTypes::RECORDER:
                 {
                     Q_EMIT ingeScapeNetworkC->recorderExited(peer);
-
                     ingeScapeNetworkC->setnumberOfRecorders(ingeScapeNetworkC->numberOfRecorders() - 1);
+                } break;
 
-                    break;
-                }
-                    // IngeScape EDITOR
                 case IngeScapeTypes::EDITOR:
                 {
                     Q_EMIT ingeScapeNetworkC->editorExited(peer);
-
                     ingeScapeNetworkC->setnumberOfEditors(ingeScapeNetworkC->numberOfEditors() - 1);
+                } break;
 
-                    break;
-                }
-                    // IngeScape ASSESSMENTS
                 case IngeScapeTypes::ASSESSMENTS:
                 {
                     Q_EMIT ingeScapeNetworkC->assessmentsExited(peer);
-
                     ingeScapeNetworkC->setnumberOfAssessments(ingeScapeNetworkC->numberOfAssessments() - 1);
+                } break;
 
-                    break;
-                }
-                    // IngeScape EXPE
                 case IngeScapeTypes::EXPE:
                 {
                     Q_EMIT ingeScapeNetworkC->expeExited(peer);
-
                     ingeScapeNetworkC->setnumberOfExpes(ingeScapeNetworkC->numberOfExpes() - 1);
+                } break;
 
-                    break;
-                }
                 default:
                     qWarning() << "Unknown peer id" << peerId << "(" << peerName << ")";
                     break;

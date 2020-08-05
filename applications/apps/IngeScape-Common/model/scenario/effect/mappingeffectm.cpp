@@ -274,27 +274,18 @@ QPair<AgentsGroupedByNameVM*, QStringList> MappingEffectM::getAgentAndCommandWit
     {
         pairAgentAndCommandWithParameters.first = _agent;
 
-        QStringList commandAndParameters;
+        QString command = (_mappingEffectValue == MappingEffectValues::MAPPED) ? command_MapAgents
+                                                                               : command_UnmapAgents;
 
-        switch (_mappingEffectValue)
-        {
-        case MappingEffectValues::MAPPED: {
-            commandAndParameters << command_MapAgents;
-            break;
-        }
-        case MappingEffectValues::UNMAPPED: {
-            commandAndParameters << command_UnmapAgents;
-            break;
-        }
-        default:
-            break;
-        }
-
-        commandAndParameters << _input->name() << _outputAgent->name() << _output->name();
+        QStringList commandAndParameters = {
+            command,
+            _input->name(),
+            _outputAgent->name(),
+            _output->name()
+        };
 
         pairAgentAndCommandWithParameters.second = commandAndParameters;
     }
-
     return pairAgentAndCommandWithParameters;
 }
 
@@ -311,23 +302,15 @@ QPair<QString, QStringList> MappingEffectM::getAgentNameAndReverseCommandWithPar
     {
         pairAgentNameAndReverseCommand.first = _agent->name();
 
-        QStringList reverseCommandAndParameters;
+        QString command = (_mappingEffectValue == MappingEffectValues::MAPPED) ? command_UnmapAgents
+                                                                               : command_MapAgents;
 
-        switch (_mappingEffectValue)
-        {
-        case MappingEffectValues::MAPPED: {
-            reverseCommandAndParameters << command_UnmapAgents;
-            break;
-        }
-        case MappingEffectValues::UNMAPPED: {
-            reverseCommandAndParameters << command_MapAgents;
-            break;
-        }
-        default:
-            break;
-        }
-
-        reverseCommandAndParameters << _input->name() << _outputAgent->name() << _output->name();
+        QStringList reverseCommandAndParameters = {
+            command,
+            _input->name(),
+            _outputAgent->name(),
+            _output->name()
+        };
 
         pairAgentNameAndReverseCommand.second = reverseCommandAndParameters;
     }

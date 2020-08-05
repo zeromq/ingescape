@@ -1188,23 +1188,18 @@ void AbstractScenarioController::_executeCommandForAgent(AgentsGroupedByNameVM* 
         {
             if (commandAndParameters.count() == 4)
             {
-                /*QString inputName = commandAndParameters.at(1);
-                QString outputAgentName = commandAndParameters.at(2);
-                QString outputName = commandAndParameters.at(3);
-
-                QStringList message = {
-                    command,
-                    inputName,
-                    outputAgentName,
-                    outputName
-                };*/
-
-                // Send the message to the list of agents
-                //IngeScapeNetworkController::instance()->sendStringMessageToAgents(agentsGroupedByName->peerIdsList(), message);
-                IngeScapeNetworkController::instance()->sendStringMessageToAgents(agentsGroupedByName->peerIdsList(), commandAndParameters);
+                for (AgentM* agent : *agentsGroupedByName->models())
+                {
+                    if ((agent != nullptr) && (agent->peer() != nullptr) && agent->isON())
+                    {
+                        QStringList message = QStringList(commandAndParameters);
+                        message.append(agent->uid());
+                        IngeScapeNetworkController::instance()->sendZMQMessageToPeer(agent->peer()->uid(), message);
+                    }
+                }
             }
             else {
-                qCritical() << "Wrong number of parameters (" << commandAndParameters.count() << ") to map an input of agent" << agentsGroupedByName->name();
+                qCritical() << "Wrong number of parameters (" << commandAndParameters.count() << ") for command" << command << "to map/unmap an input of the agent" << agentsGroupedByName->name();
             }
         }
         // SET_INPUT / SET_OUTPUT / SET_PARAMETER
@@ -1223,7 +1218,7 @@ void AbstractScenarioController::_executeCommandForAgent(AgentsGroupedByNameVM* 
                 }
             }
             else {
-                qCritical() << "Wrong number of parameters (" << commandAndParameters.count() << ") for command" << command << "to set a value to agent" << agentsGroupedByName->name();
+                qCritical() << "Wrong number of parameters (" << commandAndParameters.count() << ") for command" << command << "to set a value to the agent" << agentsGroupedByName->name();
             }
         }
     }

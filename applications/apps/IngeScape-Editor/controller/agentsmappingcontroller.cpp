@@ -374,15 +374,22 @@ void AgentsMappingController::dropLinkBetweenTwoAgents(AgentInMappingVM* outputA
                         qWarning() << "The request" << command_MapAgents << "has already been sent to add the link" << link->uid();
                     }
 
-                    QStringList message = {
-                        command_MapAgents,
-                        linkInput->name(),
-                        outputAgent->name(),
-                        linkOutput->name()
-                    };
+                    // Send the message "MAP" to the agent (can be a list)
+                    for (AgentM* model : *inputAgent->agentsGroupedByName()->models())
+                    {
+                        if ((model != nullptr) && (model->peer() != nullptr) && model->isON())
+                        {
+                            QStringList message = {
+                                command_MapAgents,
+                                linkInput->name(),
+                                outputAgent->name(),
+                                linkOutput->name(),
+                                model->uid()
+                            };
 
-                    // Send the message "MAP" to the list of agents
-                    IngeScapeNetworkController::instance()->sendStringMessageToAgents(inputAgent->agentsGroupedByName()->peerIdsList(), message);
+                            IngeScapeNetworkController::instance()->sendZMQMessageToPeer(model->peer()->uid(), message);
+                        }
+                    }
                 }
                 else
                 {
@@ -1596,15 +1603,23 @@ void AgentsMappingController::_onLinkOutputsListWillBeRemoved(const QList<LinkOu
                     AgentInMappingVM* inputAgent = qobject_cast<AgentInMappingVM*>(link->inputObject());
                     if ((inputAgent != nullptr) && (inputAgent->agentsGroupedByName() != nullptr) && (inputAgent->agentsGroupedByName()->isON()))
                     {
-                        // If input agent is ON : we only send command to our agent
+                        // If input agent is ON : we only send the message "UNMAP" to the agent (can be a list)
                         // (not set our link as temporary because its linkOutput is going to be destroyed)
-                        QStringList message = {
-                            command_UnmapAgents,
-                            link->linkInput()->name(),
-                            link->outputObject()->name(),
-                            link->linkOutput()->name()
-                        };
-                        IngeScapeNetworkController::instance()->sendStringMessageToAgents(inputAgent->agentsGroupedByName()->peerIdsList(), message);
+                        for (AgentM* model : *inputAgent->agentsGroupedByName()->models())
+                        {
+                            if ((model != nullptr) && (model->peer() != nullptr) && model->isON())
+                            {
+                                QStringList message = {
+                                    command_UnmapAgents,
+                                    link->linkInput()->name(),
+                                    link->outputObject()->name(),
+                                    link->linkOutput()->name(),
+                                    model->uid()
+                                };
+
+                                IngeScapeNetworkController::instance()->sendZMQMessageToPeer(model->peer()->uid(), message);
+                            }
+                        }
 
                         // We delete it just after because its input is going to be deleted
                         _deleteLinkBetweenTwoObjectsInMapping(link);
@@ -1851,15 +1866,22 @@ void AgentsMappingController::_removeLinkBetweenTwoAgents(LinkVM* link)
                     qWarning() << "The request" << command_UnmapAgents << "has already been sent to remove the link" << link->uid();
                 }
 
-                QStringList message = {
-                    command_UnmapAgents,
-                    link->linkInput()->name(),
-                    link->outputObject()->name(),
-                    link->linkOutput()->name()
-                };
+                // Send the message "UNMAP" to the agent (can be a list)
+                for (AgentM* model : *inputAgent->agentsGroupedByName()->models())
+                {
+                    if ((model != nullptr) && (model->peer() != nullptr) && model->isON())
+                    {
+                        QStringList message = {
+                            command_UnmapAgents,
+                            link->linkInput()->name(),
+                            link->outputObject()->name(),
+                            link->linkOutput()->name(),
+                            model->uid()
+                        };
 
-                // Send the message "UNMAP" to the list of agents
-                IngeScapeNetworkController::instance()->sendStringMessageToAgents(inputAgent->agentsGroupedByName()->peerIdsList(), message);
+                        IngeScapeNetworkController::instance()->sendZMQMessageToPeer(model->peer()->uid(), message);
+                    }
+                }
             }
             else
             {
