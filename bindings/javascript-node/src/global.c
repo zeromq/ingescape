@@ -262,42 +262,6 @@ napi_value enable_callback_into_js(napi_env env, napi_callback cb, const char * 
     return exports;
 }
 
-iopType_t get_iop_type_t_from_iop_type_js(iopType_js type_js) {
-    switch(type_js) {
-        case IGS_NUMBER_JS  :
-            return IGS_DOUBLE_T;
-        case IGS_STRING_JS  :
-            return IGS_STRING_T;
-        case IGS_BOOL_JS  :
-            return IGS_BOOL_T;
-        case IGS_IMPULSION_JS  :
-            return IGS_IMPULSION_T;
-        case IGS_DATA_JS  :
-            return IGS_DATA_T;
-        default : 
-            return IGS_UNKNOWN_T;
-    }
-}
-
-iopType_js get_iop_type_js_from_iop_type_t(iopType_t type) {
-    switch(type) {
-        case IGS_INTEGER_T  :
-            return IGS_NUMBER_JS;
-        case IGS_DOUBLE_T  :
-            return IGS_NUMBER_JS;
-        case IGS_STRING_T  :
-            return IGS_STRING_JS;
-        case IGS_BOOL_T  :
-            return IGS_BOOL_JS;
-        case IGS_IMPULSION_T  :
-            return IGS_IMPULSION_JS;
-        case IGS_DATA_T  :
-            return IGS_DATA_JS;
-        default : 
-            return -1;
-    }
-}
-
 void getArrayJSFromCallArgumentList(napi_env env, igs_callArgument_t *firstArgument, napi_value *arrayJS) {
     napi_status status;
 
@@ -326,7 +290,7 @@ void getArrayJSFromCallArgumentList(napi_env env, igs_callArgument_t *firstArgum
             triggerException(env, NULL, "N-API : Unable to set name of argument call.");
         }
 
-        convert_int_to_napi(env, get_iop_type_js_from_iop_type_t(elt->type), &typeArg);
+        convert_int_to_napi(env, elt->type, &typeArg);
         status = napi_set_named_property(env, argumentCall, "type", typeArg);
         if (status != napi_ok) {
             triggerException(env, NULL, "N-API : Unable to set type of argument call.");

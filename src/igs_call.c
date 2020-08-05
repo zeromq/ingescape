@@ -453,8 +453,9 @@ igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, 
                             continue;
                         }
                     }else{
-                        igsAgent_error(agent, "could not find call named %s for %s  : call will not be sent", callName, agentNameOrUUID);
-                        continue;
+                        igsAgent_warn(agent, "could not find call named %s for %s (%s) : cannot verify call before sending it",
+                                      callName, remoteAgent->name, remoteAgent->uuid);
+                        //continue; //commented to allow sending the message anyway
                     }
                 }
                 zmsg_t *msg = zmsg_new();
@@ -512,9 +513,9 @@ igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, 
             igs_callArgument_t *arg = NULL;
             found = true;
             if (localAgent->definition == NULL){
-                igsAgent_warn(agent, "definition is unknown for %s(%s) : cannot verify call before sending it",
-                              localAgent->name, agentNameOrUUID);
-                //continue; //commented to allow sending the message anyway
+                igsAgent_error(agent, "definition is unknown for %s(%s) : call will not be sent",
+                               localAgent->name, agentNameOrUUID);
+                continue;
             }else{
                 igs_call_t *call = NULL;
                 HASH_FIND_STR(localAgent->definition->calls_table, callName, call);
@@ -541,7 +542,8 @@ igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, 
                         }
                     }
                 }else{
-                    igsAgent_error(agent, "could not find call named %s for %s  : call will not be sent", callName, agentNameOrUUID);
+                    igsAgent_error(agent, "could not find call named %s for %s (%s) : call will not be sent",
+                                   callName, localAgent->name, localAgent->uuid);
                     continue;
                 }
             }
