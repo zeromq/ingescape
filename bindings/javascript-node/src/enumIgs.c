@@ -136,6 +136,47 @@ napi_value node_get_monitor_event_types(napi_env env, napi_callback_info info) {
     return object;
 }
 
+// Get enum types for igs results (function returns)
+napi_value node_get_igs_result_types(napi_env env, napi_callback_info info) {
+    napi_value object;
+    napi_create_object(env, &object);
+
+    napi_value success;
+    convert_int_to_napi(env, IGS_SUCCESS, &success);
+    napi_set_named_property(env, object, "IGS_SUCCESS", success);
+
+    napi_value failure;
+    convert_int_to_napi(env, IGS_FAILURE, &failure);
+    napi_set_named_property(env, object, "IGS_FAILURE", failure);
+
+    return object;
+}
+
+// Get enum types for agent events
+napi_value node_get_agent_event_types(napi_env env, napi_callback_info info) {
+    napi_value object;
+    napi_create_object(env, &object);
+
+    napi_value agentEnteredType;
+    convert_int_to_napi(env, IGS_AGENT_ENTERED, &agentEnteredType);
+    napi_set_named_property(env, object, "IGS_AGENT_ENTERED", agentEnteredType);
+
+    napi_value agentExitedType;
+    convert_int_to_napi(env, IGS_AGENT_EXITED, &agentExitedType);
+    napi_set_named_property(env, object, "IGS_AGENT_EXITED", agentExitedType);
+
+    napi_value peerEnteredType;
+    convert_int_to_napi(env, IGS_PEER_ENTERED, &peerEnteredType);
+    napi_set_named_property(env, object, "IGS_PEER_ENTERED", peerEnteredType);
+
+    napi_value peerExitedType;
+    convert_int_to_napi(env, IGS_PEER_EXITED, &peerExitedType);
+    napi_set_named_property(env, object, "IGS_PEER_EXITED", peerExitedType);
+
+    return object;
+}
+
+
 // Allow callback for ingescape enums
 napi_value init_enums(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_get_logLevels_js, "getLogLevels", exports);  
@@ -143,5 +184,7 @@ napi_value init_enums(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_get_iops_js, "getIopTypes", exports);  
     exports = enable_callback_into_js(env, node_get_license_limit_types, "getLicenseLimitTypes", exports);
     exports = enable_callback_into_js(env, node_get_monitor_event_types, "getMonitorEventTypes", exports);
+    exports = enable_callback_into_js(env, node_get_igs_result_types, "getIgsResultTypes", exports);
+    exports = enable_callback_into_js(env, node_get_agent_event_types, "getAgentEventTypes", exports);
     return exports;
 }
