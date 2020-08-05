@@ -867,7 +867,7 @@ void IngeScapeModelManager::onLauncherExited(PeerM* peer)
  */
 void IngeScapeModelManager::onDefinitionReceived(PeerM* peer, QString agentUid, QString agentName, QString definitionJSON)
 {
-    if (peer != nullptr)
+    if ((peer != nullptr) && (peer->igsType() == IngeScapeTypes::AGENT))
     {
         // Create the new model of agent definition from JSON
         DefinitionM* newDefinition = JsonHelper::createModelOfAgentDefinitionFromBytes(definitionJSON.toUtf8());
@@ -933,8 +933,14 @@ void IngeScapeModelManager::onDefinitionReceived(PeerM* peer, QString agentUid, 
                                      true);
         }
     }
-    else {
-        qCritical() << Q_FUNC_INFO << "We receive a definition for the agent" << agentName << "(" << agentUid << ") but the peer is NULL !";
+    else
+    {
+        if (peer == nullptr) {
+            qCritical() << Q_FUNC_INFO << "We receive a definition for the agent" << agentName << "(" << agentUid << ") but the peer is NULL !";
+        }
+        else {
+            qDebug() << Q_FUNC_INFO << "We receive a definition from the peer" << peer->name() << "(" << peer->uid() << ") of type" << peer->igsType() << "--> NOT an agent, we ignore its definition !";
+        }
     }
 }
 
@@ -944,36 +950,46 @@ void IngeScapeModelManager::onDefinitionReceived(PeerM* peer, QString agentUid, 
  */
 void IngeScapeModelManager::onMappingReceived(PeerM* peer, QString agentUid, QString mappingJSON)
 {
-    Q_UNUSED(peer)
-
-    AgentM* agent = getAgentModelFromUid(agentUid);
-    if (agent != nullptr)
+    if ((peer != nullptr) && (peer->igsType() == IngeScapeTypes::AGENT))
     {
-        // Save the previous agent mapping
-        AgentMappingM* previousMapping = agent->mapping();
-
-        AgentMappingM* newMapping = nullptr;
-
-        if (mappingJSON.isEmpty())
+        AgentM* agent = getAgentModelFromUid(agentUid);
+        if (agent != nullptr)
         {
-            QString mappingName = QString("EMPTY MAPPING of %1").arg(agent->name());
-            newMapping = new AgentMappingM(mappingName, "", "");
-        }
-        else
-        {
-            // Create the new model of agent mapping from the JSON
-            newMapping = JsonHelper::createModelOfAgentMappingFromBytes(agent->name(), mappingJSON.toUtf8());
-        }
+            // Save the previous agent mapping
+            AgentMappingM* previousMapping = agent->mapping();
 
-        if (newMapping != nullptr)
-        {
-            // Set this new mapping to the agent
-            agent->setmapping(newMapping);
+            AgentMappingM* newMapping = nullptr;
 
-            // Free memory
-            if (previousMapping != nullptr) {
-                delete previousMapping;
+            if (mappingJSON.isEmpty())
+            {
+                QString mappingName = QString("EMPTY MAPPING of %1").arg(agent->name());
+                newMapping = new AgentMappingM(mappingName, "", "");
             }
+            else
+            {
+                // Create the new model of agent mapping from the JSON
+                newMapping = JsonHelper::createModelOfAgentMappingFromBytes(agent->name(), mappingJSON.toUtf8());
+            }
+
+            if (newMapping != nullptr)
+            {
+                // Set this new mapping to the agent
+                agent->setmapping(newMapping);
+
+                // Free memory
+                if (previousMapping != nullptr) {
+                    delete previousMapping;
+                }
+            }
+        }
+    }
+    else
+    {
+        if (peer == nullptr) {
+            qCritical() << Q_FUNC_INFO << "We receive a mapping for the agent" << agentUid << "but the peer is NULL !";
+        }
+        else {
+            qDebug() << Q_FUNC_INFO << "We receive a mapping from the peer" << peer->name() << "(" << peer->uid() << ") of type" << peer->igsType() << "--> NOT an agent, we ignore its mapping !";
         }
     }
 }
