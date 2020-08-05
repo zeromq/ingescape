@@ -928,6 +928,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 return 0;
             }
             
+            bool isAgentNew = false;
             igs_remote_agent_t *remoteAgent = NULL;
             HASH_FIND_STR(context->remoteAgents, uuid, remoteAgent);
             if (remoteAgent == NULL){
@@ -941,10 +942,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 remoteAgent->peer = zyrePeer;
                 HASH_ADD_STR(context->remoteAgents, uuid, remoteAgent);
                 igs_info("registering agent %s(%s)", uuid, remoteAgentName);
-                igs_agent_event_callback_t *cb;
-                DL_FOREACH(coreContext->agentEventCallbacks, cb){
-                    cb->callback_ptr(IGS_AGENT_ENTERED, uuid, remoteAgentName, cb->myData);
-                }
+                isAgentNew = true;
             }else{
                 //we already know this agent
                 free(uuid);
@@ -995,6 +993,13 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 igs_agent_t *agent, *tmp;
                 HASH_ITER(hh, context->agents, agent, tmp){
                     network_configureMappingsToRemoteAgent(agent, remoteAgent);
+                }
+                
+                if (isAgentNew){
+                    igs_agent_event_callback_t *cb;
+                    DL_FOREACH(coreContext->agentEventCallbacks, cb){
+                        cb->callback_ptr(IGS_AGENT_ENTERED, uuid, remoteAgentName, cb->myData);
+                    }
                 }
             }else{
                 igs_error("Received definition from remote agent %s is NULL or has no name", remoteAgent->name);
