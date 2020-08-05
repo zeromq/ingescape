@@ -44,6 +44,9 @@ PUBLIC bool igsAgent_isMuted(igs_agent_t *agent);
 typedef void (*igsAgent_muteCallback)(igs_agent_t *Agent, bool isMuted, void *myData);
 PUBLIC void igsAgent_observeMute(igs_agent_t *agent, igsAgent_muteCallback cb, void *myData);
 
+typedef void (*igsAgent_agentEventCallback)(igs_agent_t *Agent, igs_agent_event_t event, const char *uuid, const char *name, void *myData);
+PUBLIC void igsAgent_observeAgentEvents(igs_agent_t *Agent, igsAgent_agentEventCallback cb, void *myData);
+
 //IOP read, write, creation, destruction, introspection
 PUBLIC igs_result_t igsAgent_readInput(igs_agent_t *agent, const char *name, void **value, size_t *size);
 PUBLIC igs_result_t igsAgent_readOutput(igs_agent_t *agent, const char *name, void **value, size_t *size);

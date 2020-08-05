@@ -107,28 +107,23 @@ void igs_observeMute(igs_muteCallback cb, void *myData){
 }
 
 typedef struct {
-    igs_freezeCallback cb;
-    void *myData;
-} observeFreezeCbWrapper_t;
-
-void core_observeFreezeCallback(igs_agent_t *agent, bool isPaused, void *myData){
-    IGS_UNUSED(agent)
-    observeFreezeCbWrapper_t *wrap = (observeFreezeCbWrapper_t *)myData;
-    wrap->cb(isPaused, wrap->myData);
-}
-
-typedef struct {
     igs_agentEventCallback cb;
     void *myData;
 } observeAgentEventsCbWrapper_t;
 
+void core_observeAgentEventsCallback(igs_agent_t *agent, igs_agent_event_t event, const char *uuid, const char *name, void *myData){
+    IGS_UNUSED(agent)
+    observeAgentEventsCbWrapper_t *wrap = (observeAgentEventsCbWrapper_t *)myData;
+    wrap->cb(event, uuid, name, wrap->myData);
+}
+
 void igs_observeAgentEvents(igs_agentEventCallback cb, void *myData){
     assert(cb);
-    core_initContext();
-    igs_agent_event_callback_t *wrap = calloc(1, sizeof(igs_agent_event_callback_t));
-    wrap->callback_ptr = cb;
+    core_initAgent();
+    observeAgentEventsCbWrapper_t *wrap = calloc(1, sizeof(observeAgentEventsCbWrapper_t));
+    wrap->cb = cb;
     wrap->myData = myData;
-    DL_APPEND(coreContext->agentEventCallbacks, wrap);
+    igsAgent_observeAgentEvents(coreAgent, core_observeAgentEventsCallback, wrap);
 }
 
 //IOP

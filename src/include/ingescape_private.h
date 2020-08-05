@@ -256,7 +256,7 @@ typedef struct igs_activate_calback {
 } igs_activate_calback_t;
 
 typedef struct igs_agentEvent_calback {
-    igs_agentEventCallback callback_ptr;
+    igsAgent_agentEventCallback callback_ptr;
     void *myData;
     struct igs_agentEvent_calback *prev;
     struct igs_agentEvent_calback *next;
@@ -309,7 +309,6 @@ typedef struct igs_core_context{
     bool isFrozen;
     igs_freeze_callback_t *freezeCallbacks;
     igs_external_stop_calback_t *externalStopCalbacks;
-    igs_agent_event_callback_t *agentEventCallbacks;
     
     //performance
     size_t performanceMsgCounter;
@@ -366,6 +365,7 @@ typedef struct igs_agent {
     igs_core_context_t *context;
     
     igs_activate_calback_t *activateCallbacks;
+    igs_agent_event_callback_t *agentEventCallbacks;
     
     //definition
     char *definitionPath;
@@ -428,7 +428,7 @@ igs_mapping_t* parser_loadMappingFromPath (const char* load_file);
 
 // admin
 void admin_makeFilePath(const char *from, char *to, size_t size_of_to);
-PUBLIC void admin_log(igs_agent_t *agent, igs_logLevel_t, const char *function, const char *format, ...)  CHECK_PRINTF (4);
+void admin_log(igs_agent_t *agent, igs_logLevel_t, const char *function, const char *format, ...)  CHECK_PRINTF (4);
 
 //bus
 void bus_zyreLock(void);
@@ -449,6 +449,9 @@ void call_freeValuesInArguments(igs_callArgument_t *arg);
 void license_cleanLicense(igs_core_context_t *context);
 void license_readLicense(igs_core_context_t *context);
 #endif
+
+//agent
+void agent_propagateAgentEvent(igs_agent_event_t event, const char *uuid, const char *name);
 
 #ifdef __cplusplus
 }
