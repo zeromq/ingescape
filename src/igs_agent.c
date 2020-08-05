@@ -97,7 +97,18 @@ igs_result_t igsAgent_activate(igs_agent_t *agent){
         }
         agent->network_needToSendDefinitionUpdate = true; //will also trigger mapping update
     }
+    //notify all other agents inside this context that we arrived
     agent_propagateAgentEvent(IGS_AGENT_ENTERED, agent->uuid, agent->name);
+    //notify this agent with all the other agents already present in the context
+    igs_agent_t *tmp;
+    HASH_ITER(hh, coreContext->agents, a, tmp){
+        if (!streq(a->uuid, agent->uuid)){
+            igs_agent_event_callback_t *cb;
+            DL_FOREACH(agent->agentEventCallbacks, cb){
+                cb->callback_ptr(agent, IGS_AGENT_ENTERED, a->uuid, a->name, cb->myData);
+            }
+        }
+    }
     return IGS_SUCCESS;
 }
 
