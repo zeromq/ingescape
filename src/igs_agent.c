@@ -19,9 +19,11 @@ void agent_propagateAgentEvent(igs_agent_event_t event, const char *uuid, const 
     //propagate event on all local agents
     igs_agent_t *agent, *tmp;
     HASH_ITER(hh, coreContext->agents, agent, tmp){
-        igs_agent_event_callback_t *cb;
-        DL_FOREACH(agent->agentEventCallbacks, cb){
-            cb->callback_ptr(agent, event, uuid, name, cb->myData);
+        if (!streq(uuid, agent->uuid)){
+            igs_agent_event_callback_t *cb;
+            DL_FOREACH(agent->agentEventCallbacks, cb){
+                cb->callback_ptr(agent, event, uuid, name, cb->myData);
+            }
         }
     }
 }
