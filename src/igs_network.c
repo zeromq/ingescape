@@ -906,10 +906,12 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             assert(agent);
             igs_agent_event_callback_t *cb;
             DL_FOREACH(agent->agentEventCallbacks, cb){
-                //iterate on all remote agents for this peer : all its agents know us
+                //iterate on all remote agents *for this peer* : all its agents know us
                 igs_remote_agent_t *r, *rtmp;
                 HASH_ITER(hh, coreContext->remoteAgents, r, rtmp){
-                    cb->callback_ptr(agent, IGS_AGENT_KNOWS_US, r->uuid, r->name, cb->myData);
+                    if (streq(r->peer->peerId, peer)){
+                        cb->callback_ptr(agent, IGS_AGENT_KNOWS_US, r->uuid, r->name, cb->myData);
+                    }
                 }
             }
         }
@@ -2072,6 +2074,7 @@ int triggerDefinitionUpdate(zloop_t *loop, int timer_id, void *arg){
             //State details are still sent individually when they change.
             sendStateTo(agent, IGS_PRIVATE_CHANNEL, false);
             agent->network_needToSendDefinitionUpdate = false;
+            agent_propagateAgentEvent(IGS_AGENT_UPDATED_DEFINITION, agent->uuid, agent->name);
             //when definition changes, mapping may need to be updated as well
             agent->network_needToUpdateMapping = true;
             model_readWriteUnlock();
