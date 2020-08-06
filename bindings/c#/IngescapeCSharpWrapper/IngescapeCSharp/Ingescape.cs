@@ -84,7 +84,7 @@ namespace Ingescape
         #endregion
 
         private static igs_observeCallbackC _OnIOPCallback;
-        private static igs_externalStopCallbackC _OnForcedStopCallback;
+        private static igs_externalStopCallbackC _OnExternalStopCallback;
         private static igs_freezeCallbackC _OnFreezeCallback;
         private static igs_muteCallbackC _OnMutedCallback;
         private static igs_callFunctionC _OnCallCallback;
@@ -124,7 +124,7 @@ namespace Ingescape
             CSharpFunction(iopType, ref name, valueType, newValue, data);
         }
 
-        static void OnForcedStopCallback(IntPtr myData)
+        static void OnExternalStopCallback(IntPtr myData)
         {
             Tuple<igs_externalStopCallback, object> tupleData = (Tuple<igs_externalStopCallback, object>)GCHandle.FromIntPtr(myData).Target;
             igs_externalStopCallback CSharpFunction = tupleData.Item1;
@@ -267,11 +267,11 @@ namespace Ingescape
             Tuple<igs_externalStopCallback, object> tupleData = new Tuple<igs_externalStopCallback, object>(cbSharp, myData);
             GCHandle gCHandle = GCHandle.Alloc(tupleData);
             IntPtr data = GCHandle.ToIntPtr(gCHandle);
-            if (_OnForcedStopCallback == null)
+            if (_OnExternalStopCallback == null)
             {
-                _OnForcedStopCallback = OnForcedStopCallback;
+                _OnExternalStopCallback = OnExternalStopCallback;
             }
-            igs_observeExternalStop(_OnForcedStopCallback, data);
+            igs_observeExternalStop(_OnExternalStopCallback, data);
         }
 
         //terminate the agent with trigger of SIGINT and call to the registered igs_forcedStopCallbacks

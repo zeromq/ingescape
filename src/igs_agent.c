@@ -19,9 +19,11 @@ void agent_propagateAgentEvent(igs_agent_event_t event, const char *uuid, const 
     //propagate event on all local agents
     igs_agent_t *agent, *tmp;
     HASH_ITER(hh, coreContext->agents, agent, tmp){
-        igs_agent_event_callback_t *cb;
-        DL_FOREACH(agent->agentEventCallbacks, cb){
-            cb->callback_ptr(agent, event, uuid, name, cb->myData);
+        if (!streq(uuid, agent->uuid)){
+            igs_agent_event_callback_t *cb;
+            DL_FOREACH(agent->agentEventCallbacks, cb){
+                cb->callback_ptr(agent, event, uuid, name, cb->myData);
+            }
         }
     }
 }
@@ -99,6 +101,7 @@ igs_result_t igsAgent_activate(igs_agent_t *agent){
     }
     //notify all other agents inside this context that we arrived
     agent_propagateAgentEvent(IGS_AGENT_ENTERED, agent->uuid, agent->name);
+    agent_propagateAgentEvent(IGS_AGENT_KNOWS_US, agent->uuid, agent->name);
     //notify this agent with all the other agents already present in the context locally and remotely
     igs_agent_t *tmp;
     HASH_ITER(hh, coreContext->agents, a, tmp){
@@ -106,6 +109,7 @@ igs_result_t igsAgent_activate(igs_agent_t *agent){
             igs_agent_event_callback_t *cb;
             DL_FOREACH(agent->agentEventCallbacks, cb){
                 cb->callback_ptr(agent, IGS_AGENT_ENTERED, a->uuid, a->name, cb->myData);
+                cb->callback_ptr(agent, IGS_AGENT_KNOWS_US, a->uuid, a->name, cb->myData);
             }
         }
     }
@@ -131,11 +135,13 @@ igs_result_t igsAgent_deactivate(igs_agent_t *agent){
             cb->callback_ptr(agent, false, cb->myData);
         }
         if (coreContext->networkActor && coreContext->node){
+            bus_zyreLock();
             zmsg_t *msg = zmsg_new();
             zmsg_addstr(msg, "REMOTE_AGENT_EXIT");
             zmsg_addstr(msg, agent->uuid);
             zmsg_addstr(msg, agent->name);
             zyre_shout(coreContext->node, IGS_PRIVATE_CHANNEL, &msg);
+            bus_zyreUnlock();
         }
     }else{
         igs_error("agent %s (%s) is not activated", agent->name, agent->uuid);
