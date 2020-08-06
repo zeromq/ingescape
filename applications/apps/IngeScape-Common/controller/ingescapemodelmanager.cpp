@@ -875,65 +875,94 @@ void IngeScapeModelManager::onDefinitionReceived(PeerM* peer, QString agentUid, 
         AgentM* agent = getAgentModelFromUid(agentUid);
         if (agent != nullptr) // An agent with this uid already exist
         {
-            if (agent->peer() != peer)
+            QString previousName = agent->name();
+            PeerM* previousPeer = agent->peer();
+            DefinitionM* previousDefinition = agent->definition();
+
+            if (previousPeer != peer) // Peer changed
             {
-                PeerM* previousPeer = agent->peer();
                 agent->setpeer(peer);
 
                 if (previousPeer != nullptr) {
                     qInfo() << "The peer of agent with UID" << agentUid << "has changed from" << previousPeer->uid() << "to" << peer->uid();
-                    //previousPeer->deleteLater(); // FIXME TODO: We can't delete it now because this peer can be used by another agent
+                    //previousPeer->deleteLater(); // FIXME TODO: We can't delete it now because this peer can be used by another agent.
+                    // previousPeer.removeAgent(agent); --> Must be deleted when no more agent will use it
                 }
                 else {
                     qInfo() << "The peer of agent with UID" << agentUid << "has changed to" << peer->uid();
                 }
             }
 
-            if (agent->name() != agentName)
+            if (previousName != agentName) // Name changed
             {
-                qInfo() << "The name of agent with UID" << agentUid << "has changed from" << agent->name() << "to" << agentName;
+                qInfo() << "The name of agent with UID" << agentUid << "has changed from" << previousName << "to" << agentName;
 
-                // FIXME TODO: Manage renamed agent ! Manage AgentsGroupedByName... AgentsGroupedByDef...
-                //agent->setname(agentName);
-            }
-
-            if (!agent->isON())
-            {
-                qInfo() << "The agent" << agentName << "with UID" << agentUid << "on" << peer->hostname() << "(" << peer->uid() << ") is back on the network !";
-                agent->setisON(true);
-
-                // Emit the signal "Agent Model Back On Network"
-                Q_EMIT agentModelBackOnNetwork(agent);
-            }
-
-            DefinitionM* previousDefinition = agent->definition();
-
-            if (newDefinition != nullptr)
-            {
-                // The 2 definitions are strictly identical (only when an agent is back on the network !)
-                if ((previousDefinition != nullptr) && (*previousDefinition == *newDefinition))
+                if (previousPeer != nullptr)
                 {
-                    //qDebug() << "The received definition" << newDefinition->name() << "(version" << newDefinition->version() << ") is exactly the same";
-
-                    delete newDefinition; // Free memory (new definition will not be used)
+                    // Create a peer to store properties "hostName" and "commandLine"
+                    PeerM* ghostOfPeer = new PeerM(IngeScapeTypes::AGENT,
+                                                   "",
+                                                   previousName,
+                                                   "",
+                                                   previousPeer->hostname(),
+                                                   previousPeer->commandLine(),
+                                                   false);
+                    agent->setpeer(ghostOfPeer);
                 }
-                else
-                {
-                    agent->setdefinition(newDefinition); // Set this new definition to the agent
 
-                    if (previousDefinition != nullptr) {
-                        delete previousDefinition; // Free memory (previous definition is not used anymore)
+                //onAgentExited(peer, agentUid);
+                agent->setisON(false);
+
+                // Remove the previous agent from the hash table,
+                // because the following method will add the new agent
+                _hashFromUidToAgent.remove(agentUid);
+                agent->setuid("");
+
+                // New name --> new agent
+                createAgentModel(agentName, // New name
+                                 newDefinition,
+                                 agentUid,  // Re-use uid
+                                 peer,      // Re-use peer
+                                 true);
+            }
+            else // Same name
+            {
+                if (!agent->isON()) // OFF --> ON
+                {
+                    qInfo() << "The agent" << agentName << "with UID" << agentUid << "on" << peer->hostname() << "(" << peer->uid() << ") is back on the network !";
+                    agent->setisON(true);
+
+                    // Emit the signal "Agent Model Back On Network"
+                    Q_EMIT agentModelBackOnNetwork(agent);
+                }
+
+                if (newDefinition != nullptr)
+                {
+                    // The 2 definitions are strictly identical (only when an agent is back on the network !)
+                    if ((previousDefinition != nullptr) && (*previousDefinition == *newDefinition))
+                    {
+                        //qDebug() << "The received definition" << newDefinition->name() << "(version" << newDefinition->version() << ") is exactly the same";
+
+                        delete newDefinition; // Free memory (new definition will not be used)
+                    }
+                    else
+                    {
+                        agent->setdefinition(newDefinition); // Set this new definition to the agent
+
+                        if (previousDefinition != nullptr) {
+                            delete previousDefinition; // Free memory (previous definition is not used anymore)
+                        }
                     }
                 }
             }
         }
         else // New uid --> new agent
         {
-            agent = createAgentModel(agentName,
-                                     newDefinition,
-                                     agentUid,
-                                     peer,
-                                     true);
+            createAgentModel(agentName,
+                             newDefinition,
+                             agentUid,
+                             peer,
+                             true);
         }
     }
     else

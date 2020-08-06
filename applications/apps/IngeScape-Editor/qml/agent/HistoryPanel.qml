@@ -452,13 +452,9 @@ WindowBlockTouches {
 
                 // Content of our scrollview
                 ListView {
-                    model: (controller) ? controller.filteredValues : null
+                    model: controller ? controller.filteredValues : null
 
                     delegate: Item {
-                        anchors {
-                            left : parent.left
-                            right : parent.right
-                        }
                         height : 30
 
                         Row {
