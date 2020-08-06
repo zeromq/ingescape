@@ -112,6 +112,28 @@ napi_value node_igs_readInputAsBool(napi_env env, napi_callback_info info) {
 }
 
 // Wrapper for : 
+// PUBLIC int igs_readInputAsInt(const char *name);
+napi_value node_igs_readInputAsInt(napi_env env, napi_callback_info info) {
+    size_t nb_arguments = 1;
+    napi_value argv[nb_arguments];
+
+    // get infos pass in argument
+    get_function_arguments(env, info, nb_arguments, argv);
+
+    // convert infos into C types
+    char * name = convert_napi_to_string(env, argv[0]);
+
+    // call igs function
+    int res = igs_readInputAsInt(name);
+    free(name);
+
+    // convert result into napi_value
+    napi_value res_convert;
+    convert_int_to_napi(env, res, &res_convert);
+    return res_convert;
+}
+
+// Wrapper for : 
 // PUBLIC double igs_readInputAsDouble(const char *name);
 napi_value node_igs_readInputAsDouble(napi_env env, napi_callback_info info) {
     size_t nb_arguments = 1;
@@ -200,6 +222,28 @@ napi_value node_igs_readOutputAsBool(napi_env env, napi_callback_info info) {
     // convert result into napi_value
     napi_value res_convert;
     convert_bool_to_napi(env, res, &res_convert);
+    return res_convert;
+}
+
+// Wrapper for : 
+// PUBLIC int igs_readOutputAsInt(const char *name);
+napi_value node_igs_readOutputAsInt(napi_env env, napi_callback_info info) {
+    size_t nb_arguments = 1;
+    napi_value argv[nb_arguments];
+
+    // get infos pass in argument
+    get_function_arguments(env, info, nb_arguments, argv);
+
+    // convert infos into C types
+    char * name = convert_napi_to_string(env, argv[0]);
+
+    // call igs function
+    int res = igs_readOutputAsInt(name);
+    free(name);
+
+    // convert result into napi_value
+    napi_value res_convert;
+    convert_int_to_napi(env, res, &res_convert);
     return res_convert;
 }
 
@@ -296,6 +340,28 @@ napi_value node_igs_readParameterAsBool(napi_env env, napi_callback_info info) {
 }
 
 // Wrapper for : 
+// PUBLIC int igs_readParameterAsInt(const char *name);
+napi_value node_igs_readParameterAsInt(napi_env env, napi_callback_info info) {
+    size_t nb_arguments = 1;
+    napi_value argv[nb_arguments];
+
+    // get infos pass in argument
+    get_function_arguments(env, info, nb_arguments, argv);
+
+    // convert infos into C types
+    char * name = convert_napi_to_string(env, argv[0]);
+
+    // call igs function
+    int res = igs_readParameterAsInt(name);
+    free(name);
+
+    // convert result into napi_value
+    napi_value res_convert;
+    convert_int_to_napi(env, res, &res_convert);
+    return res_convert;
+}
+
+// Wrapper for : 
 // PUBLIC double igs_readParameterAsDouble(const char *name);
 napi_value node_igs_readParameterAsDouble(napi_env env, napi_callback_info info) {
     size_t nb_arguments = 1;
@@ -381,6 +447,30 @@ napi_value node_igs_writeInputAsBool(napi_env env, napi_callback_info info) {
 
     // call igs function
     int res = igs_writeInputAsBool(name, value); 
+    free(name);
+
+    // convert result into napi_value
+    napi_value res_convert;
+    convert_int_to_napi(env, res, &res_convert);
+    return res_convert;
+}
+
+// Wrapper for : 
+// PUBLIC int igs_writeInputAsInt(const char *name, int value);
+napi_value node_igs_writeInputAsInt(napi_env env, napi_callback_info info) {
+    size_t nb_arguments = 2;
+    napi_value argv[nb_arguments];
+
+    // get infos pass in argument
+    get_function_arguments(env, info, nb_arguments, argv);
+
+    // convert infos into C types
+    char * name = convert_napi_to_string(env, argv[0]);
+    int value;
+    convert_napi_to_int(env, argv[1], &value);
+    
+    // call igs function
+    int res = igs_writeInputAsInt(name, value); 
     free(name);
 
     // convert result into napi_value
@@ -509,6 +599,30 @@ napi_value node_igs_writeOutputAsBool(napi_env env, napi_callback_info info) {
 }
 
 // Wrapper for : 
+// PUBLIC int igs_writeOutputAsInt(const char *name, int value);
+napi_value node_igs_writeOutputAsInt(napi_env env, napi_callback_info info) {
+    size_t nb_arguments = 2;
+    napi_value argv[nb_arguments];
+
+    // get infos pass in argument
+    get_function_arguments(env, info, nb_arguments, argv);
+
+    // convert infos into C types
+    char * name = convert_napi_to_string(env, argv[0]);
+    int value;
+    convert_napi_to_int(env, argv[1], &value);
+
+    // call igs function
+    int res = igs_writeOutputAsInt(name, value); 
+    free(name);
+
+    // convert result into napi_value
+    napi_value res_convert;
+    convert_int_to_napi(env, res, &res_convert);
+    return res_convert;
+}
+
+// Wrapper for : 
 // PUBLIC int igs_writeOutputAsDouble(const char *name, double value);
 napi_value node_igs_writeOutputAsDouble(napi_env env, napi_callback_info info) {
     size_t nb_arguments = 2;
@@ -619,6 +733,30 @@ napi_value node_igs_writeParameterAsBool(napi_env env, napi_callback_info info) 
 
     // call igs function
     int res = igs_writeParameterAsBool(name, value); 
+    free(name);
+
+    // convert result into napi_value
+    napi_value res_convert;
+    convert_int_to_napi(env, res, &res_convert);
+    return res_convert;
+}
+
+// Wrapper for : 
+// PUBLIC int igs_writeParameterAsInt(const char *name, int value);
+napi_value node_igs_writeParameterAsInt(napi_env env, napi_callback_info info) {
+    size_t nb_arguments = 2;
+    napi_value argv[nb_arguments];
+
+    // get infos pass in argument
+    get_function_arguments(env, info, nb_arguments, argv);
+
+    // convert infos into C types
+    char * name = convert_napi_to_string(env, argv[0]);
+    int value;
+    convert_napi_to_int(env, argv[1], &value);
+
+    // call igs function
+    int res = igs_writeParameterAsInt(name, value); 
     free(name);
 
     // convert result into napi_value
@@ -1031,29 +1169,35 @@ napi_value init_iop(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_igs_readOutput, "readOutput", exports);
     exports = enable_callback_into_js(env, node_igs_readParameter, "readParameter", exports);
     exports = enable_callback_into_js(env, node_igs_readInputAsBool, "readInputAsBool", exports);
-    exports = enable_callback_into_js(env, node_igs_readInputAsDouble, "readInputAsNumber", exports);
+    exports = enable_callback_into_js(env, node_igs_readInputAsInt, "readInputAsInt", exports);
+    exports = enable_callback_into_js(env, node_igs_readInputAsDouble, "readInputAsDouble", exports);
     exports = enable_callback_into_js(env, node_igs_readInputAsString, "readInputAsString", exports);
     exports = enable_callback_into_js(env, node_igs_readInputAsData, "readInputAsData", exports);
     exports = enable_callback_into_js(env, node_igs_readOutputAsBool, "readOutputAsBool", exports);
-    exports = enable_callback_into_js(env, node_igs_readOutputAsDouble, "readOutputAsNumber", exports);
+    exports = enable_callback_into_js(env, node_igs_readOutputAsInt, "readOutputAsInt", exports);
+    exports = enable_callback_into_js(env, node_igs_readOutputAsDouble, "readOutputAsDouble", exports);
     exports = enable_callback_into_js(env, node_igs_readOutputAsString, "readOutputAsString", exports);
     exports = enable_callback_into_js(env, node_igs_readOutputAsData, "readOutputAsData", exports);
     exports = enable_callback_into_js(env, node_igs_readParameterAsBool, "readParameterAsBool", exports);
-    exports = enable_callback_into_js(env, node_igs_readParameterAsDouble, "readParameterAsNumber", exports);
+    exports = enable_callback_into_js(env, node_igs_readParameterAsInt, "readParameterAsInt", exports);
+    exports = enable_callback_into_js(env, node_igs_readParameterAsDouble, "readParameterAsDouble", exports);
     exports = enable_callback_into_js(env, node_igs_readParameterAsString, "readParameterAsString", exports);
     exports = enable_callback_into_js(env, node_igs_readParameterAsData, "readParameterAsData", exports);
     exports = enable_callback_into_js(env, node_igs_writeInputAsBool, "writeInputAsBool", exports);
-    exports = enable_callback_into_js(env, node_igs_writeInputAsDouble, "writeInputAsNumber", exports);
+    exports = enable_callback_into_js(env, node_igs_writeInputAsInt, "writeInputAsInt", exports);
+    exports = enable_callback_into_js(env, node_igs_writeInputAsDouble, "writeInputAsDouble", exports);
     exports = enable_callback_into_js(env, node_igs_writeInputAsString, "writeInputAsString", exports);
     exports = enable_callback_into_js(env, node_igs_writeInputAsImpulsion, "writeInputAsImpulsion", exports);
     exports = enable_callback_into_js(env, node_igs_writeInputAsData, "writeInputAsData", exports);
     exports = enable_callback_into_js(env, node_igs_writeOutputAsBool, "writeOutputAsBool", exports);
-    exports = enable_callback_into_js(env, node_igs_writeOutputAsDouble, "writeOutputAsNumber", exports);
+    exports = enable_callback_into_js(env, node_igs_writeOutputAsInt, "writeOutputAsInt", exports);
+    exports = enable_callback_into_js(env, node_igs_writeOutputAsDouble, "writeOutputAsDouble", exports);
     exports = enable_callback_into_js(env, node_igs_writeOutputAsString, "writeOutputAsString", exports);
     exports = enable_callback_into_js(env, node_igs_writeOutputAsImpulsion, "writeOutputAsImpulsion", exports);
     exports = enable_callback_into_js(env, node_igs_writeOutputAsData, "writeOutputAsData", exports);
     exports = enable_callback_into_js(env, node_igs_writeParameterAsBool, "writeParameterAsBool", exports);
-    exports = enable_callback_into_js(env, node_igs_writeParameterAsDouble, "writeParameterAsNumber", exports);
+    exports = enable_callback_into_js(env, node_igs_writeParameterAsInt, "writeParameterAsInt", exports);
+    exports = enable_callback_into_js(env, node_igs_writeParameterAsDouble, "writeParameterAsDouble", exports);
     exports = enable_callback_into_js(env, node_igs_writeParameterAsString, "writeParameterAsString", exports);
     exports = enable_callback_into_js(env, node_igs_writeParameterAsData, "writeParameterAsData", exports);
     exports = enable_callback_into_js(env, node_igs_clearDataForInput, "clearDataForInput", exports);
