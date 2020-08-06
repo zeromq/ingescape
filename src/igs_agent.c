@@ -135,11 +135,13 @@ igs_result_t igsAgent_deactivate(igs_agent_t *agent){
             cb->callback_ptr(agent, false, cb->myData);
         }
         if (coreContext->networkActor && coreContext->node){
+            bus_zyreLock();
             zmsg_t *msg = zmsg_new();
             zmsg_addstr(msg, "REMOTE_AGENT_EXIT");
             zmsg_addstr(msg, agent->uuid);
             zmsg_addstr(msg, agent->name);
             zyre_shout(coreContext->node, IGS_PRIVATE_CHANNEL, &msg);
+            bus_zyreUnlock();
         }
     }else{
         igs_error("agent %s (%s) is not activated", agent->name, agent->uuid);

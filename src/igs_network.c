@@ -1010,10 +1010,12 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 
                 if (isAgentNew){
                     agent_propagateAgentEvent(IGS_AGENT_ENTERED, uuid, remoteAgentName);
+                    bus_zyreLock();
                     zmsg_t *msg = zmsg_new();
                     zmsg_addstr(msg, "PEER_KNOWS_YOU");
                     zmsg_addstr(msg, uuid);
                     zyre_whisper(node, peer, &msg);
+                    bus_zyreUnlock();
                 }else{
                     agent_propagateAgentEvent(IGS_AGENT_UPDATED_DEFINITION, uuid, remoteAgentName);
                 }
