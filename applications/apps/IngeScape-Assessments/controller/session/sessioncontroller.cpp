@@ -307,7 +307,8 @@ void SessionController::_oncurrentSessionChanged(SessionM* previousSession, Sess
 void SessionController::_onAgentModelONhasBeenAdded(AgentM* model)
 {
     // Model of Agent ON
-    if ((model != nullptr) && model->isON() && !model->name().isEmpty() && !model->peerId().isEmpty()
+    if ((model != nullptr) && model->isON() && !model->name().isEmpty()
+            && (model->peer() != nullptr)
             && (_currentSession != nullptr) && (_currentSession->protocol() != nullptr)
             && (IngeScapeModelManager::instance() != nullptr) && (IngeScapeNetworkController::instance() != nullptr))
     {

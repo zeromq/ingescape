@@ -153,7 +153,8 @@ IngeScapeAssessmentsController::IngeScapeAssessmentsController(QObject *parent) 
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::networkDeviceIsAvailableAgain, this, &IngeScapeAssessmentsController::_onNetworkDeviceIsAvailableAgain);
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::networkDeviceIpAddressHasChanged, this, &IngeScapeAssessmentsController::_onNetworkDeviceIpAddressHasChanged);
 
-    connect(ingeScapeNetworkC, &IngeScapeNetworkController::agentEntered, ingeScapeModelManager, &IngeScapeModelManager::onAgentEntered);
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::peerOfAgentsEntered, ingeScapeModelManager, &IngeScapeModelManager::onPeerOfAgentsEntered);
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::peerOfAgentsExited, ingeScapeModelManager, &IngeScapeModelManager::onPeerOfAgentsExited);
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::agentExited, ingeScapeModelManager, &IngeScapeModelManager::onAgentExited);
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::launcherEntered, ingeScapeModelManager, &IngeScapeModelManager::onLauncherEntered);
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::launcherExited, ingeScapeModelManager, &IngeScapeModelManager::onLauncherExited);
