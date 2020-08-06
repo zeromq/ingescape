@@ -170,14 +170,13 @@ editor-build-macos:
   extends: .editor-build-files
   stage: apps-build
   variables:
-#    Qt5_DIR: ~/Qt/5.9.7/clang_64/lib/cmake/Qt5
     GIT_SUBMODULE_STRATEGY: recursive
   tags:
     - osx
   script:
     - git clean -xfd
     - mkdir -p applications/apps/IngeScape-Editor/build
-    - cmake -S applications/apps/IngeScape-Editor/ -B applications/apps/IngeScape-Editor/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.9.7/clang_64/;$HOME/builds/sysroot/usr/local/" -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - cmake -S applications/apps/IngeScape-Editor/ -B applications/apps/IngeScape-Editor/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.15.0/clang_64/;$HOME/builds/sysroot/usr/local/" -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
     - make -j8 -C applications/apps/IngeScape-Editor/build
 #    - 'codesign --force --deep --sign  "Developer ID Application: Ingenuity i/o (56DRT9MG9S)" -v applications/apps/IngeScape-Editor/build/IngeScape-Editor.app'
     - mkdir -p $HOME/builds/sysroot/Applications/
@@ -195,14 +194,13 @@ assessments-build-macos:
   extends: .assessments-build-files
   stage: apps-build
   variables:
-  #    Qt5_DIR: ~/Qt/5.9.7/clang_64/lib/cmake/Qt5
     GIT_SUBMODULE_STRATEGY: recursive
   tags:
     - osx
   script:
     - git clean -xfd
     - mkdir -p applications/apps/IngeScape-Assessments/build
-    - cmake -S applications/apps/IngeScape-Assessments/ -B applications/apps/IngeScape-Assessments/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.9.7/clang_64/;$HOME/builds/sysroot/usr/local/" -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - cmake -S applications/apps/IngeScape-Assessments/ -B applications/apps/IngeScape-Assessments/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.15.0/clang_64/;$HOME/builds/sysroot/usr/local/" -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
     - make -j8 -C applications/apps/IngeScape-Assessments/build
 #    - 'codesign --force --deep --sign  "Developer ID Application: Ingenuity i/o (56DRT9MG9S)" -v applications/apps/IngeScape-Assessments/build/IngeScape-Assessments.app'
     - mkdir -p $HOME/builds/sysroot/Applications/
@@ -221,14 +219,13 @@ expe-build-macos:
   extends: .expe-build-files
   stage: apps-build
   variables:
-#    Qt5_DIR: ~/Qt/5.9.7/clang_64/lib/cmake/Qt5
     GIT_SUBMODULE_STRATEGY: recursive
   tags:
     - osx
   script:
     - git clean -xfd
     - mkdir -p applications/apps/IngeScape-Expe/build
-    - cmake -S applications/apps/IngeScape-Expe/ -B applications/apps/IngeScape-Expe/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.9.7/clang_64/;$HOME/builds/sysroot/usr/local/" -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - cmake -S applications/apps/IngeScape-Expe/ -B applications/apps/IngeScape-Expe/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.15.0/clang_64/;$HOME/builds/sysroot/usr/local/" -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
     - make -j8 -C applications/apps/IngeScape-Expe/build
 #    - 'codesign --force --deep --sign  "Developer ID Application: Ingenuity i/o (56DRT9MG9S)" -v applications/apps/IngeScape-Expe/build/IngeScape-Expe.app'
     - mkdir -p $HOME/builds/sysroot/Applications/
@@ -463,7 +460,7 @@ editor-windows-release-x86:
   extends: .editor-build-files
   stage: apps-build
   variables:
-    Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
+    Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.15.0\\msvc2019\\lib\\cmake\\Qt5
     ARCH: "Editor_x86"
   tags:
     - windows
@@ -484,7 +481,7 @@ editor-windows-release-x64:
   extends: .editor-build-files
   stage: apps-build
   variables:
-    Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
+    Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.15.0\\msvc2019_64\\lib\\cmake\\Qt5
     ARCH: "Editor_x64"
   tags:
     - windows
@@ -505,7 +502,7 @@ assessments-windows-release-x86:
   extends: .assessments-build-files
   stage: apps-build
   variables:
-    Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
+    Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.15.0\\msvc2019\\lib\\cmake\\Qt5
     GIT_SUBMODULE_STRATEGY: recursive
     ARCH: "Assessments_x86"
   tags:
@@ -527,7 +524,7 @@ assessments-windows-release-x64:
   extends: .assessments-build-files
   stage: apps-build
   variables:
-    Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
+    Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.15.0\\msvc2019_64\\lib\\cmake\\Qt5
     GIT_SUBMODULE_STRATEGY: recursive
     ARCH: "Assessments_x64"
   tags:
@@ -549,7 +546,7 @@ expe-windows-release-x86:
   extends: .expe-build-files
   stage: apps-build
   variables:
-    Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015\\lib\\cmake\\Qt5
+    Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.15.0\\msvc2019\\lib\\cmake\\Qt5
     GIT_SUBMODULE_STRATEGY: recursive
     ARCH: "Expe_x86"
   tags:
@@ -571,7 +568,7 @@ expe-windows-release-x64:
   extends: .expe-build-files
   stage: apps-build
   variables:
-    Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.9.7\\msvc2015_64\\lib\\cmake\\Qt5
+    Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.15.0\\msvc2019_64\\lib\\cmake\\Qt5
     GIT_SUBMODULE_STRATEGY: recursive
     ARCH: "Expe_x64"
   tags:
