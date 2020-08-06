@@ -120,16 +120,21 @@ void network_Unlock(void) {
     pthread_mutex_unlock(network_Mutex);
 }
 
-void cleanAndFreeZyrePeer(igs_zyre_peer_t **zyrePeer){
+void cleanAndFreeZyrePeer(igs_zyre_peer_t **zyrePeer, zloop_t *loop){
     assert(zyrePeer);
     assert(*zyrePeer);
+    assert(loop);
     igs_debug("cleaning peer %s (%s)", (*zyrePeer)->name, (*zyrePeer)->peerId);
     if ((*zyrePeer)->peerId != NULL)
         free((*zyrePeer)->peerId);
     if ((*zyrePeer)->name != NULL)
         free((*zyrePeer)->name);
-    if ((*zyrePeer)->subscriber != NULL)
+    if ((*zyrePeer)->subscriber != NULL){
+        zloop_reader_end(loop, (*zyrePeer)->subscriber);
         zsock_destroy(&((*zyrePeer)->subscriber));
+    }
+    free(*zyrePeer);
+    *zyrePeer = NULL;
 }
 
 //Adds proper filter to 'subscribe' socket for a spectific output of a given remote agent
@@ -429,9 +434,6 @@ void cleanAndFreeRemoteAgent(igs_remote_agent_t **remoteAgent){
         zsock_set_unsubscribe((*remoteAgent)->peer->subscriber, elt->filter);
         DL_DELETE((*remoteAgent)->mappingsFilters,elt);
         free(elt);
-    }
-    if ((*remoteAgent)->context->loop != NULL && (*remoteAgent)->peer->subscriber != NULL){
-        zloop_reader_end((*remoteAgent)->context->loop, (*remoteAgent)->peer->subscriber);
     }
     if ((*remoteAgent)->uuid)
         free((*remoteAgent)->uuid);
@@ -737,6 +739,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                         }
                         assert(zyrePeer->subscriber);
                         zloop_reader(loop, zyrePeer->subscriber, manageRemotePublication, context);
+                        zloop_reader_set_tolerant (loop, zyrePeer->subscriber);
 #if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
                         context->licenseEnforcement->currentAgentsNb++;
                         //igs_license("%ld agents (adding %s)", agent->licenseEnforcement->currentAgentsNb, name);
@@ -2023,7 +2026,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 }
                 HASH_DEL(context->zyrePeers, zyrePeer);
                 agent_propagateAgentEvent(IGS_PEER_EXITED, peer, name);
-                cleanAndFreeZyrePeer(&zyrePeer);
+                cleanAndFreeZyrePeer(&zyrePeer, loop);
             }
         }
     }
@@ -2166,7 +2169,9 @@ static void runLoop (zsock_t *mypipe, void *args){
     assert (context->loop);
     zloop_set_verbose (context->loop, false);
     zloop_reader(context->loop, mypipe, manageParent, context);
+    zloop_reader_set_tolerant (context->loop, mypipe);
     zloop_reader(context->loop, zyre_socket(context->node), manageBusIncoming, context);
+    zloop_reader_set_tolerant (context->loop, zyre_socket(context->node));
     zloop_timer(context->loop, 1000, 0, triggerDefinitionUpdate, context);
     zloop_timer(context->loop, 1000, 0, triggerMappingUpdate, context);
     
@@ -2189,18 +2194,17 @@ static void runLoop (zsock_t *mypipe, void *args){
     
     network_Lock();
     igs_debug("loop stopping..."); //clean dynamic part of the context
+    igs_zyre_peer_t *zyrePeer, *tmpPeer;
+    HASH_ITER(hh, context->zyrePeers, zyrePeer, tmpPeer){
+        HASH_DEL(context->zyrePeers, zyrePeer);
+        cleanAndFreeZyrePeer(&zyrePeer, context->loop);
+    }
     zloop_destroy (&context->loop);
     
     igs_remote_agent_t *remote, *tmpremote;
     HASH_ITER(hh, context->remoteAgents, remote, tmpremote) {
         HASH_DEL(context->remoteAgents, remote);
         cleanAndFreeRemoteAgent(&remote);
-    }
-    
-    igs_zyre_peer_t *zyrePeer, *tmpPeer;
-    HASH_ITER(hh, context->zyrePeers, zyrePeer, tmpPeer){
-        HASH_DEL(context->zyrePeers, zyrePeer);
-        cleanAndFreeZyrePeer(&zyrePeer);
     }
     
     igs_timer_t *current_timer, *tmp_timer;
