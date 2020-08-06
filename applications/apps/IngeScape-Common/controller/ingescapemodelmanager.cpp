@@ -893,14 +893,17 @@ void IngeScapeModelManager::onDefinitionReceived(PeerM* peer, QString agentUid, 
             {
                 qInfo() << "The name of agent with UID" << agentUid << "has changed from" << agent->name() << "to" << agentName;
 
-                // FIXME TODO: Manage renamed agent !
-                //agent->setname(agentName); Manage AgentsGroupedByName...
+                // FIXME TODO: Manage renamed agent ! Manage AgentsGroupedByName... AgentsGroupedByDef...
+                //agent->setname(agentName);
             }
 
             if (!agent->isON())
             {
                 qInfo() << "The agent" << agentName << "with UID" << agentUid << "on" << peer->hostname() << "(" << peer->uid() << ") is back on the network !";
                 agent->setisON(true);
+
+                // Emit the signal "Agent Model Back On Network"
+                Q_EMIT agentModelBackOnNetwork(agent);
             }
 
             DefinitionM* previousDefinition = agent->definition();
@@ -1137,7 +1140,7 @@ void IngeScapeModelManager::_onNetworkDataOfAgentWillBeCleared(QString peerId)
         qDebug() << "[Model Manager] on Network Data of agent" << agent->name() << "will be Cleared:" << agent->hostname() << "(" << agent->peerId() << ")";
     }*/
 
-    // FIXME _onNetworkDataOfAgentWillBeCleared
+    // FIXME _onNetworkDataOfAgentWillBeCleared: we can't clear data because the peer can be used by other agents
     /*if (!peerId.isEmpty()) {
         _hashFromPeerIdToAgent.remove(peerId);
     }*/
