@@ -714,7 +714,9 @@ int manageIncoming (zloop_t *loop, zsock_t *socket, void *args){
         printf ("-%s has left %s\n", name, channel);
     } else if (streq (event, "SHOUT")){
         char *message = zmsg_popstr(msg);
-        if (streq(message, "REMOTE_AGENT_EXIT")){
+        if (message == NULL){
+            //nothing
+        }else if (streq(message, "REMOTE_AGENT_EXIT")){
             char *uuid = zmsg_popstr(msg);
             agent_t *agent = NULL;
             HASH_FIND_STR(context->agents, uuid, agent);
@@ -731,10 +733,11 @@ int manageIncoming (zloop_t *loop, zsock_t *socket, void *args){
             zmsg_pushstr(msg, uuid); //put uuid back into message
             free(uuid);
         }
-        printf("#%s:%s(%s) - %s |", channel, name, peerId, message);
-        free(message);
+        printf("#%s:%s(%s) - %s ", channel, name, peerId, message);
+        if (message)
+            free(message);
         while ((message = zmsg_popstr(msg))){
-            printf("%s |", message);
+            printf("| %s ", message);
             free(message);
         }
         printf("\n");
@@ -742,7 +745,9 @@ int manageIncoming (zloop_t *loop, zsock_t *socket, void *args){
     } else if (streq (event, "WHISPER")){
         zmsg_t *dup = zmsg_dup(msg);
         char *message = zmsg_popstr(dup);
-        if (streq(peer->protocol, "v2") && streq(message, "EXTERNAL_DEFINITION#")){
+        if (message == NULL){
+            //nothing
+        }else if (peer->protocol && streq(peer->protocol, "v2") && streq(message, "EXTERNAL_DEFINITION#")){
             char* strDefinition = zmsg_popstr(dup);
             char *uuid = zmsg_popstr(dup);
             char *remoteAgentName = zmsg_popstr(dup);
@@ -791,10 +796,10 @@ int manageIncoming (zloop_t *loop, zsock_t *socket, void *args){
         
         //print message details
         while ((message = zmsg_popstr(msg))) {
-            printf("#%s(%s) - %s |", name, peerId, message);
+            printf("#%s(%s) - %s ", name, peerId, message);
             free(message);
             while ((message = zmsg_popstr(msg))){
-                printf("%s |", message);
+                printf("| %s ", message);
                 free(message);
             }
             printf("\n");
