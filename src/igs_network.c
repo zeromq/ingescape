@@ -2074,6 +2074,7 @@ int triggerDefinitionUpdate(zloop_t *loop, int timer_id, void *arg){
             //State details are still sent individually when they change.
             sendStateTo(agent, IGS_PRIVATE_CHANNEL, false);
             agent->network_needToSendDefinitionUpdate = false;
+            agent_propagateAgentEvent(IGS_AGENT_UPDATED_DEFINITION, agent->uuid, agent->name);
             //when definition changes, mapping may need to be updated as well
             agent->network_needToUpdateMapping = true;
             model_readWriteUnlock();
