@@ -906,10 +906,12 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             assert(agent);
             igs_agent_event_callback_t *cb;
             DL_FOREACH(agent->agentEventCallbacks, cb){
-                //iterate on all remote agents for this peer : all its agents know us
+                //iterate on all remote agents *for this peer* : all its agents know us
                 igs_remote_agent_t *r, *rtmp;
                 HASH_ITER(hh, coreContext->remoteAgents, r, rtmp){
-                    cb->callback_ptr(agent, IGS_AGENT_KNOWS_US, r->uuid, r->name, cb->myData);
+                    if (streq(r->peer->peerId, peer)){
+                        cb->callback_ptr(agent, IGS_AGENT_KNOWS_US, r->uuid, r->name, cb->myData);
+                    }
                 }
             }
         }
