@@ -466,9 +466,9 @@ void IngeScapeAssessmentsController::stopIngeScape(bool hasToClearPlatform)
         ingeScapeModelManager->simulateExitForEachLauncher();
 
         // Simulate an exit for the recorder
-        if ((_experimentationC != nullptr) && _experimentationC->isRecorderON())
+        if ((_experimentationC != nullptr) && _experimentationC->isRecorderON()  && (_experimentationC->peerOfRecorder() != nullptr))
         {
-            _experimentationC->onRecorderExited(_experimentationC->peerIdOfRecorder(), _experimentationC->peerNameOfRecorder());
+            _experimentationC->onRecorderExited(_experimentationC->peerOfRecorder());
         }
     }
 }

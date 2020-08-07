@@ -32,8 +32,8 @@ class ExperimentationController : public QObject
     I2_QML_PROPERTY_READONLY(SessionController*, sessionC)
     I2_QML_PROPERTY_CUSTOM_SETTER(ExperimentationM*, currentExperimentation)
 
-    I2_CPP_NOSIGNAL_PROPERTY(QString, peerIdOfRecorder)
-    I2_CPP_NOSIGNAL_PROPERTY(QString, peerNameOfRecorder)
+    // Peer of the IngeScape recorder
+    I2_CPP_NOSIGNAL_PROPERTY(PeerM*, peerOfRecorder)
     I2_QML_PROPERTY_READONLY(bool, isRecorderON)
     I2_QML_PROPERTY_READONLY(bool, isRecording)
 
@@ -184,22 +184,9 @@ public:
 
 public Q_SLOTS:
 
-    /**
-     * @brief Slot called when a recorder enter the network
-     * @param peerId
-     * @param peerName
-     * @param ipAddress
-     * @param hostname
-     */
-    void onRecorderEntered(QString peerId, QString peerName, QString ipAddress, QString hostname);
-
-
-    /**
-     * @brief Slot called when a recorder quit the network
-     * @param peerId
-     * @param peerName
-     */
-    void onRecorderExited(QString peerId, QString peerName);
+    // Slot called when a recorder enter/quit the network
+    void onRecorderEntered(PeerM* peer);
+    void onRecorderExited(PeerM* peer);
 
 
     /**
