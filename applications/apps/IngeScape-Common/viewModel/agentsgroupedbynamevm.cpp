@@ -926,7 +926,7 @@ void AgentsGroupedByNameVM::_updateWithAllModels()
 void AgentsGroupedByNameVM::_manageJustDefinedAgent(AgentM* model)
 {
     DefinitionM* definition = model->definition();
-    if ((model != nullptr) && (model->peer() != nullptr) && (definition != nullptr))
+    if ((model != nullptr) && (definition != nullptr))
     {
         AgentsGroupedByDefinitionVM* groupOfAgentsWithSameDefinition = nullptr;
 
@@ -946,8 +946,13 @@ void AgentsGroupedByNameVM::_manageJustDefinedAgent(AgentM* model)
         // Exactly the same definition
         if (groupOfAgentsWithSameDefinition != nullptr)
         {
-            QString hostname = model->peer()->hostname();
-            QString commandLine = model->peer()->commandLine();
+            QString hostname = HOSTNAME_NOT_DEFINED;
+            QString commandLine = "";
+            if (model->peer() != nullptr)
+            {
+                hostname = model->peer()->hostname();
+                commandLine = model->peer()->commandLine();
+            }
 
             // Hostname is not defined
             // There is already an existing model of agent (in the VM groupOfAgentsWithSameDefinition)
@@ -1021,11 +1026,13 @@ void AgentsGroupedByNameVM::_manageJustDefinedAgent(AgentM* model)
                         Q_EMIT agentModelHasToBeDeleted(model);
                     }
                     // Else if we have to replace an existing (same) model by the new one
-                    else if ((sameModel != nullptr) && (sameModel->peer() != nullptr))
+                    else if (sameModel != nullptr)
                     {
                         if (groupOfAgentsWithSameDefinition->models()->contains(sameModel))
                         {
-                            qDebug() << "Replace model of agent" << _name << "on" << hostname << "(" << sameModel->peer()->uid() << "-->" << model->peer()->uid() << ")";
+                            if (sameModel->peer() != nullptr) {
+                                qDebug() << "Replace model of agent" << _name << "on" << hostname << "(" << sameModel->peer()->uid() << "-->" << model->peer()->uid() << ")";
+                            }
 
                             // First add the new model before remove the previous model
                             // (allows to prevent to have 0 model at a given moment and to prevent to emit signal noMoreModelAndUseless that remove the groupOfAgentsWithSameDefinition)
@@ -1107,8 +1114,8 @@ void AgentsGroupedByNameVM::_checkHaveToMergeAgent(AgentM* model)
 void AgentsGroupedByNameVM::_manageNewModelOnHostForGroup(AgentM* model, AgentsGroupedByDefinitionVM* groupOfAgentsWithSameDefinition)
 {
     // Model is ON and its hostname is a real one
-    if ((groupOfAgentsWithSameDefinition != nullptr) && (model != nullptr) && (model->peer() != nullptr)
-            && model->isON() && (model->peer()->hostname() != HOSTNAME_NOT_DEFINED))
+    if ((groupOfAgentsWithSameDefinition != nullptr) && (model != nullptr) && model->isON()
+            && (model->peer() != nullptr) && (model->peer()->hostname() != HOSTNAME_NOT_DEFINED))
     {
         QString hostname = model->peer()->hostname();
         QString commandLine = model->peer()->commandLine();
@@ -1142,11 +1149,13 @@ void AgentsGroupedByNameVM::_manageNewModelOnHostForGroup(AgentM* model, AgentsG
             }
 
             // If we have to replace an existing (same) model by the new one
-            if ((sameModel != nullptr) && (sameModel->peer() != nullptr))
+            if (sameModel != nullptr)
             {
                 if (groupOfAgentsWithSameDefinition->models()->contains(sameModel))
                 {
-                    qDebug() << "Replace model of agent" << _name << "on" << hostname << "(" << sameModel->peer()->uid() << "-->" << model->peer()->uid() << ")";
+                    if (sameModel->peer() != nullptr) {
+                        qDebug() << "Replace model of agent" << _name << "on" << hostname << "(" << sameModel->peer()->uid() << "-->" << model->peer()->uid() << ")";
+                    }
 
                     // First add the new model before remove the previous model
                     // (allows to prevent to have 0 model at a given moment and to prevent to emit signal noMoreModelAndUseless that remove the groupOfAgentsWithSameDefinition)

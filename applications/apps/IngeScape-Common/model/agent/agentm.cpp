@@ -50,7 +50,7 @@ AgentM::AgentM(QString name,
         qInfo() << "New Model of Agent" << _name << "(" << _uid << ") on" << _peer->hostname() << "and command" << _peer->commandLine();
     }
     else {
-        qInfo() << "New Model of Agent" << _name << "(" << _uid << "with no peer";
+        qInfo() << "New Model of Agent" << _name << "(" << _uid << ") with no peer";
     }
 }
 
@@ -64,7 +64,7 @@ AgentM::~AgentM()
         qInfo() << "Delete Model of Agent" << _name << "(" << _uid << ") on" << _peer->hostname() << "and command" << _peer->commandLine();
     }
     else {
-        qInfo() << "New Model of Agent" << _name << "(" << _uid << "with no peer";
+        qInfo() << "New Model of Agent" << _name << "(" << _uid << ") with no peer";
     }
 
     // Delete our agent definition

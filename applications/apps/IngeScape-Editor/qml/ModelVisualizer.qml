@@ -194,9 +194,6 @@ Rectangle {
 
             property AgentsGroupedByNameVM groupByNameVM: model.QtObject
 
-            anchors {
-                left: parent.left
-            }
             width: childrenRect.width + 5
             //height: columnListOfGroupsByDefinition.height + 5
             height: columnListOfGroupsByDefinition.height + columnMappingElements.height + 5
