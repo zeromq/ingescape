@@ -74,48 +74,12 @@ public Q_SLOTS:
 
 private Q_SLOTS:
 
-    // FIXME error: invalid application of 'sizeof' to an incomplete type '_zmsg_t'
-    // Q_STATIC_ASSERT_X(sizeof(T), "Type argument of Q_DECLARE_METATYPE(T*) must be fully defined");
-    //void _onShoutedMessageReceived(QString peerId, QString peerName, zmsg_t* zMessage);
-    //void _onWhisperedMessageReceived(QString peerId, QString peerName, zmsg_t* zMessage);
+    // Slot called when a "Shouted" message has been received
+    void _onShoutedMessageReceived(PeerM* peer, QString messageType, QStringList messageParameters);
 
 
-    /**
-     * @brief Slot called when a "Shouted" message (with one part) has been received
-     * @param peerId
-     * @param peerName
-     * @param message
-     */
-    void _onShoutedMessageReceived(QString peerId, QString peerName, QString message);
-
-
-    /**
-     * @brief Slot called when a "Shouted" message (with several parts) has been received
-     * @param peerId
-     * @param peerName
-     * @param messagePart1
-     * @param messageOthersParts
-     */
-    void _onShoutedMessageReceived(QString peerId, QString peerName, QString messagePart1, QStringList messageOthersParts);
-
-
-    /**
-     * @brief Slot called when "Whispered" message (with one part) has been received
-     * @param peerId
-     * @param peerName
-     * @param message
-     */
-    void _onWhisperedMessageReceived(QString peerId, QString peerName, QString message);
-
-
-    /**
-     * @brief Slot called when "Whispered" message (with several parts) has been received
-     * @param peerId
-     * @param peerName
-     * @param messagePart1
-     * @param messageOthersParts
-     */
-    void _onWhisperedMessageReceived(QString peerId, QString peerName, QString messagePart1, QStringList messageOthersParts);
+    // Slot called when a "Whispered" message has been received
+    void _onWhisperedMessageReceived(PeerM* peer, QString messageType, QStringList messageParameters);
 
 };
 

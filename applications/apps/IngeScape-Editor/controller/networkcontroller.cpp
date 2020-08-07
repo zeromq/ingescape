@@ -215,17 +215,14 @@ void NetworkController::_onShoutedMessageReceived(PeerM* peer, QString messageTy
         // Unknown
         else
         {
-            qWarning() << "Not yet managed SHOUTED message '" << messageType << "' with parameters" << messageParameters << "from peer" << peer->name() << "(" << peer->uid() << ")";
+            qWarning() << "Not yet managed SHOUTED message '" << messageType << "' with parameters" << messageParameters << "from peer" << peer->name() << "(" << peerId << ")";
         }
     }
 }
 
 
 /**
- * @brief Slot called when "Whispered" message (with one part) has been received
- * @param peerId
- * @param peerName
- * @param message
+ * @brief Slot called when a "Whispered" message has been received
  */
 void NetworkController::_onWhisperedMessageReceived(PeerM* peer, QString messageType, QStringList messageParameters)
 {
@@ -443,7 +440,7 @@ void NetworkController::_onWhisperedMessageReceived(PeerM* peer, QString message
         // Unknown
         else
         {
-            qWarning() << "Not yet managed WHISPERED message '" << messageType << "' with parameters" << messageParameters << "from peer" << peer->name() << "(" << peer->uid() << ")";
+            qWarning() << "Not yet managed WHISPERED message '" << messageType << "' with parameters" << messageParameters << "from peer" << peer->name() << "(" << peerId << ")";
         }
     }
 }

@@ -40,15 +40,10 @@ NetworkController::NetworkController(QObject *parent) : QObject(parent)
         // We don't see itself
         ingeScapeNetworkC->setnumberOfAssessments(1);
 
-        connect(ingeScapeNetworkC, SIGNAL(shoutedMessageReceived(QString, QString, QString)),
-                this, SLOT(_onShoutedMessageReceived(QString, QString, QString)));
-        connect(ingeScapeNetworkC, SIGNAL(shoutedMessageReceived(QString, QString, QString, QStringList)),
-                this, SLOT(_onShoutedMessageReceived(QString, QString, QString, QStringList)));
-
-        connect(ingeScapeNetworkC, SIGNAL(whisperedMessageReceived(QString, QString, QString)),
-                this, SLOT(_onWhisperedMessageReceived(QString, QString, QString)));
-        connect(ingeScapeNetworkC, SIGNAL(whisperedMessageReceived(QString, QString, QString, QStringList)),
-                this, SLOT(_onWhisperedMessageReceived(QString, QString, QString, QStringList)));
+        connect(ingeScapeNetworkC, &IngeScapeNetworkController::shoutedMessageReceived,
+                this, &NetworkController::_onShoutedMessageReceived);
+        connect(ingeScapeNetworkC, &IngeScapeNetworkController::whisperedMessageReceived,
+                this, &NetworkController::_onWhisperedMessageReceived);
     }
 }
 
@@ -68,85 +63,61 @@ NetworkController::~NetworkController()
 
 
 /**
- * @brief Slot called when a "Shouted" message (with one part) has been received
- * @param peerId
- * @param peerName
- * @param message
+ * @brief Slot called when a "Shouted" message has been received
  */
-void NetworkController::_onShoutedMessageReceived(QString peerId, QString peerName, QString message)
+void NetworkController::_onShoutedMessageReceived(PeerM* peer, QString messageType, QStringList messageParameters)
 {
-    qDebug() << "Not yet managed SHOUTED message '" << message << "' for agent" << peerName << "(" << peerId << ")";
+    if (peer != nullptr)
+    {
+        QString peerId = peer->uid();
+
+        qWarning() << "Not yet managed SHOUTED message '" << messageType << "' with parameters" << messageParameters << "from peer" << peer->name() << "(" << peer->uid() << ")";
+    }
 }
 
 
 /**
- * @brief Slot called when a "Shouted" message (with several parts) has been received
- * @param peerId
- * @param peerName
- * @param messagePart1
- * @param messageOthersParts
+ * @brief Slot called when a "Whispered" message has been received
  */
-void NetworkController::_onShoutedMessageReceived(QString peerId, QString peerName, QString messagePart1, QStringList messageOthersParts)
+void NetworkController::_onWhisperedMessageReceived(PeerM* peer, QString messageType, QStringList messageParameters)
 {
-    qDebug() << "Not yet managed SHOUTED message '" << messagePart1 << "+" << messageOthersParts << "' for agent" << peerName << "(" << peerId << ")";
-}
-
-
-/**
- * @brief Slot called when "Whispered" message (with one part) has been received
- * @param peerId
- * @param peerName
- * @param message
- */
-void NetworkController::_onWhisperedMessageReceived(QString peerId, QString peerName, QString message)
-{
-
-    /// The "Recorder app" Started to record
-    if (message.startsWith(prefix_RecordStarted))
+    if (peer != nullptr)
     {
-        qInfo() << prefix_RecordStarted;
+        QString peerId = peer->uid();
 
-        Q_EMIT recordStartedReceived(peerId);
-    }
-    else if (message.startsWith(prefix_RecordStopped))
-    {
-        qInfo() << prefix_RecordStopped;
+        // The "Recorder app" Started to record
+        if (messageType.startsWith(prefix_RecordStarted))
+        {
+            qInfo() << prefix_RecordStarted;
 
-        Q_EMIT recordStoppedReceived(peerId);
-    }
-    else if (message.startsWith(prefix_AddedRecord))
-    {
-        message.remove(0, prefix_AddedRecord.length());
+            Q_EMIT recordStartedReceived(peerId);
+        }
+        else if (messageType.startsWith(prefix_RecordStopped))
+        {
+            qInfo() << prefix_RecordStopped;
 
-        Q_EMIT addedRecordReceived(message);
-    }
-    else if (message.startsWith(prefix_DeletedRecord))
-    {
-        message.remove(0, prefix_DeletedRecord.length());
+            Q_EMIT recordStoppedReceived(peerId);
+        }
+        else if (messageType.startsWith(prefix_AddedRecord))
+        {
+            messageType.remove(0, prefix_AddedRecord.length());
 
-        Q_EMIT deletedRecordReceived(message);
-    }
-    else if (message.startsWith(prefix_RecordExported))
-    {
-        Q_EMIT exportedRecordReceived();
-    }
-    else {
-        qDebug() << "Not yet managed WHISPERED message '" << message << "' for agent" << peerName << "(" << peerId << ")";
+            Q_EMIT addedRecordReceived(messageType);
+        }
+        else if (messageType.startsWith(prefix_DeletedRecord))
+        {
+            messageType.remove(0, prefix_DeletedRecord.length());
+
+            Q_EMIT deletedRecordReceived(messageType);
+        }
+        else if (messageType.startsWith(prefix_RecordExported))
+        {
+            Q_EMIT exportedRecordReceived();
+        }
+        else
+        {
+            qWarning() << "Not yet managed WHISPERED message '" << messageType << "' with parameters" << messageParameters << "from peer" << peer->name() << "(" << peerId << ")";
+        }
     }
 }
-
-
-
-/**
- * @brief Slot called when "Whispered" message (with several parts) has been received
- * @param peerId
- * @param peerName
- * @param messagePart1
- * @param messageOthersParts
- */
-void NetworkController::_onWhisperedMessageReceived(QString peerId, QString peerName, QString messagePart1, QStringList messageOthersParts)
-{
-    qDebug() << "Not yet managed WHISPERED message '" << messagePart1 << "+" << messageOthersParts << "' for agent" << peerName << "(" << peerId << ")";
-}
-
 
