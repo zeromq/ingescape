@@ -307,7 +307,8 @@ void SessionController::_oncurrentSessionChanged(SessionM* previousSession, Sess
 void SessionController::_onAgentModelONhasBeenAdded(AgentM* model)
 {
     // Model of Agent ON
-    if ((model != nullptr) && model->isON() && !model->name().isEmpty() && !model->peerId().isEmpty()
+    if ((model != nullptr) && model->isON() && !model->name().isEmpty()
+            && (model->peer() != nullptr)
             && (_currentSession != nullptr) && (_currentSession->protocol() != nullptr)
             && (IngeScapeModelManager::instance() != nullptr) && (IngeScapeNetworkController::instance() != nullptr))
     {
@@ -329,7 +330,7 @@ void SessionController::_onAgentModelONhasBeenAdded(AgentM* model)
 
                 // Send the message "LOAD THIS MAPPING" to this agent
                 // FIXME: JSON can be too big for a string (use Z-Frame instead ?)
-                IngeScapeNetworkController::instance()->sendStringMessageToAgent(model->peerId(), message);
+                IngeScapeNetworkController::instance()->sendStringMessageToAgent(model->peer()->uid(), message);
             }
         }
         // The agent is NOT in the current protocol
@@ -338,7 +339,7 @@ void SessionController::_onAgentModelONhasBeenAdded(AgentM* model)
             qDebug() << agentName << "is ON but NOT in the protocol --> CLEAR its MAPPING !";
 
             // Send the message "Clear Mapping" to this agent
-            IngeScapeNetworkController::instance()->sendStringMessageToAgent(model->peerId(), command_ClearMapping);
+            IngeScapeNetworkController::instance()->sendStringMessageToAgent(model->peer()->uid(), command_ClearMapping);
         }*/
     }
 }

@@ -29,8 +29,7 @@
 ExperimentationController::ExperimentationController(QObject *parent) : QObject(parent),
     _sessionC(nullptr),
     _currentExperimentation(nullptr),
-    _peerIdOfRecorder(""),
-    _peerNameOfRecorder(""),
+    _peerOfRecorder(nullptr),
     _isRecorderON(false),
     _isRecording(false),
     _isSelectingSessions(false),
@@ -241,7 +240,8 @@ void ExperimentationController::exportSelectedSessions(bool filterDependentVaria
             }
         }
 
-        if (_isRecorderON && !sessionIds.isEmpty())
+        if (_isRecorderON && (_peerOfRecorder != nullptr)
+                && !sessionIds.isEmpty())
         {
             //QString message = QString("%1=%2").arg(command_ExportSessions, sessionIds.join('|'));
 
@@ -249,7 +249,7 @@ void ExperimentationController::exportSelectedSessions(bool filterDependentVaria
             QString message = QString("%1=%2 EXPE=%3 VD_FILTER=%4").arg(command_ExportSessions, sessionIds.join('|'), experimentationUID, QString::number(filterDependentVariables));
 
             // Send the message "Export Sessions" to the recorder
-            IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerIdOfRecorder, message);
+            IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerOfRecorder->uid(), message);
         }
     }
 }
@@ -262,19 +262,20 @@ void ExperimentationController::exportSelectedSessions(bool filterDependentVaria
  * @param ipAddress
  * @param hostname
  */
-void ExperimentationController::onRecorderEntered(QString peerId, QString peerName, QString ipAddress, QString hostname)
+void ExperimentationController::onRecorderEntered(PeerM* peer)
 {
-    qInfo() << "Recorder entered (" << peerId << ")" << peerName << "on" << hostname << "(" << ipAddress << ")";
-
-    if (!_isRecorderON && !peerId.isEmpty() && !peerName.isEmpty())
+    if (peer != nullptr)
     {
-        setpeerIdOfRecorder(peerId);
-        setpeerNameOfRecorder(peerName);
+        qInfo() << "Recorder entered" << peer->name() << "(" << peer->uid() << ") on" << peer->hostname() << "(" << peer->ipAddress() << ")";
 
-        setisRecorderON(true);
-    }
-    else {
-        qCritical() << "We are already connected to a recorder:" << _peerNameOfRecorder << "(" << _peerIdOfRecorder << ")";
+        if (!_isRecorderON && (_peerOfRecorder == nullptr))
+        {
+            setpeerOfRecorder(peer);
+            setisRecorderON(true);
+        }
+        else if (_peerOfRecorder != nullptr) {
+            qCritical() << "We are already connected to a recorder:" << _peerOfRecorder->name() << "(" << _peerOfRecorder->uid() << ")";
+        }
     }
 }
 
@@ -284,16 +285,17 @@ void ExperimentationController::onRecorderEntered(QString peerId, QString peerNa
  * @param peerId
  * @param peerName
  */
-void ExperimentationController::onRecorderExited(QString peerId, QString peerName)
+void ExperimentationController::onRecorderExited(PeerM* peer)
 {
-    qInfo() << "Recorder exited (" << peerId << ")" << peerName;
-
-    if (_isRecorderON && (_peerIdOfRecorder == peerId))
+    if (peer != nullptr)
     {
-        setpeerIdOfRecorder("");
-        setpeerNameOfRecorder("");
+        qInfo() << "Recorder exited" << peer->name() << "(" << peer->uid() << ")";
 
-        setisRecorderON(false);
+        if (_isRecorderON && (_peerOfRecorder == peer))
+        {
+            setpeerOfRecorder(nullptr);
+            setisRecorderON(false);
+        }
     }
 }
 
@@ -303,7 +305,8 @@ void ExperimentationController::onRecorderExited(QString peerId, QString peerNam
  */
 void ExperimentationController::onRecordStartedReceived()
 {
-    if(_sessionC != nullptr){
+    if (_sessionC != nullptr)
+    {
         setisRecording(true);
         _sessionC->scenarioC()->playOrResumeTimeLine();
 
@@ -342,7 +345,8 @@ void ExperimentationController::onRecordStartedReceived()
 void ExperimentationController::onRecordStoppedReceived()
 {
     qDebug() << "Record STOPPED" ;
-    if(_sessionC != nullptr){
+    if (_sessionC != nullptr)
+    {
         setisRecording(false);
         _sessionC->scenarioC()->stopTimeLine();
     }
@@ -540,10 +544,10 @@ void ExperimentationController::_onCurrentExperimentationChanged(Experimentation
  */
 void ExperimentationController::_onActionWillBeExecuted(QString message)
 {
-    if (_isRecorderON)
+    if (_isRecorderON && (_peerOfRecorder != nullptr))
     {
         // Send the message "EXECUTED ACTION" to the recorder
-        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerIdOfRecorder, message);
+        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerOfRecorder->uid(), message);
     }
 }
 
@@ -563,12 +567,12 @@ void ExperimentationController::_onTimeLineStateUpdated(QString state)
     }
 
     // Notify the Recorder app
-    if (_isRecorderON)
+    if (_isRecorderON && (_peerOfRecorder != nullptr))
     {
         QString notificationAndParameters = QString("%1=%2|%3").arg(notif_TimeLineState, state, QString::number(deltaTimeFromTimeLineStart));
 
         // Send the message "TIMELINE STATE" to the recorder
-        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerIdOfRecorder, notificationAndParameters);
+        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerOfRecorder->uid(), notificationAndParameters);
     }
 }
 
@@ -578,13 +582,13 @@ void ExperimentationController::_onTimeLineStateUpdated(QString state)
  */
 void ExperimentationController::_onTimeout_EncounterExistingRecords()
 {
-    if ((_nextRecordToHandle != nullptr) && (_isRecording))
+    if ((_nextRecordToHandle != nullptr) && _isRecording && (_peerOfRecorder != nullptr))
     {
         if (_removeOtherRecordsWhileRecording) // User wants to remove other records encountered
         {
             // Notify the recorder that it has to remove entry from the data base
             QString message = QString("%1=%2").arg(command_DeleteRecord, _nextRecordToHandle->uid());
-            IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerIdOfRecorder, message);
+            IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerOfRecorder->uid(), message);
 
             // Clean list of the record just deleted
             _listFuturRecordsToHandle.remove(_nextRecordToHandle);
@@ -903,7 +907,8 @@ bool ExperimentationController::isThereOneRecordAfterStartTime()
  */
 void ExperimentationController::startToRecord()
 {
-    if (!_isRecording && _isRecorderON && (_sessionC != nullptr) && (_sessionC->scenarioC() != nullptr))
+    if (!_isRecording && _isRecorderON && (_peerOfRecorder != nullptr)
+            && (_sessionC != nullptr) && (_sessionC->scenarioC() != nullptr))
     {
         // Current time in our timeline = beginning of user's new record
         int deltaTimeFromTimeLineStart = _sessionC->scenarioC()->currentTime().msecsSinceStartOfDay();
@@ -1001,7 +1006,7 @@ void ExperimentationController::startToRecord()
                         };
 
                         // Send a ZMQ message in several parts to the recorder
-                        IngeScapeNetworkController::instance()->sendZMQMessageToAgent(_peerIdOfRecorder, message);
+                        IngeScapeNetworkController::instance()->sendZMQMessageToPeer(_peerOfRecorder->uid(), message);
 
                         // N.B: Wait for record started received (see ExperimentationController::onRecordStartedReceived)
                     }
@@ -1026,10 +1031,10 @@ void ExperimentationController::startToRecord()
  */
 void ExperimentationController::stopToRecord()
 {
-    if (_isRecording && _isRecorderON)
+    if (_isRecording && _isRecorderON && (_peerOfRecorder != nullptr))
     {
         // Send the message "Stop Record" to the recorder
-        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerIdOfRecorder, command_StopRecord);
+        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_peerOfRecorder->uid(), command_StopRecord);
 
     }
     else {
