@@ -755,8 +755,9 @@ Item {
                                     }
 
                                     Connections {
-                                        target : dropDownSubject.popup
-                                        onOpened : {
+                                        target: dropDownSubject.popup
+
+                                        function onOpened() {
                                             // update subjects checkboxes states when the pop up is opening
                                             if (experimentationC && delegateSubjectCombolist.subjectM) {
                                                 filterSubjectCB.checked = experimentationC.isSubjectFilterSessions(delegateSubjectCombolist.subjectM.displayedId);
@@ -765,8 +766,9 @@ Item {
                                     }
 
                                     Connections {
-                                        target : rootItem
-                                        onClickAllSubject : {
+                                        target: rootItem
+
+                                        function onClickAllSubject() {
                                             // update subjects checkboxes states when the "pop up is opening   "All subjects" check box is selected or unselected
                                             if (rootItem.experimentationC) {
                                                 filterSubjectCB.checked = rootItem.experimentationC.isSubjectFilterSessions(delegateSubjectCombolist.subjectM.displayedId);
@@ -962,8 +964,9 @@ Item {
                                     }
 
                                     Connections {
-                                        target : dropDownProtocol.popup
-                                        onOpened : {
+                                        target: dropDownProtocol.popup
+
+                                        function onOpened() {
                                             // update agents checkboxes states when the pop up is opening
                                             if (rootItem.experimentationC && delegateProtocolComboList.protocolM)
                                             {
@@ -973,8 +976,9 @@ Item {
                                     }
 
                                     Connections {
-                                        target : rootItem
-                                        onClickAllProtocol : {
+                                        target: rootItem
+
+                                        function onClickAllProtocol() {
                                             // update agents checkboxes states when the "pop up is opening  "All Agents" check box is selected or unselected
                                             if (rootItem.experimentationC && delegateProtocolComboList.protocolM)
                                             {

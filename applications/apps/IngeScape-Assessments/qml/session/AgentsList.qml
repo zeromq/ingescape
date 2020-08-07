@@ -62,7 +62,7 @@ Item {
             delegate: MouseArea {
                 id: mouseArea
 
-                width: parent.width
+                width: parent ? parent.width : 1
                 height: 42
 
                 hoverEnabled: true

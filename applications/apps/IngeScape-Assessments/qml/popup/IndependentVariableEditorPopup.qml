@@ -517,7 +517,7 @@ AssessmentsPopupBase {
                                         Connections {
                                             target: rootPopup
 
-                                            onErrorDetectedChanged: {
+                                            function onErrorDetectedChanged(newValue) {
                                                 if (index === rootPopup.errorEnumIndex)
                                                 {
                                                     console.log("update error detected")
@@ -577,7 +577,7 @@ AssessmentsPopupBase {
                                             // If this index is not defined, initialize it with empty string
                                             if (typeof rootPopup.enumTexts[index] === 'undefined') {
 
-                                                console.log("undefined at " + index);
+                                                //console.log("undefined at " + index);
 
                                                 rootPopup.enumTexts[index] = "";
                                             }

@@ -105,13 +105,14 @@ Item {
     Connections {
         target: IngeScapeAssessmentsC.experimentationC
 
-        onCurrentExperimentationChanged: {
-            if (IngeScapeAssessmentsC.experimentationC.currentExperimentation)
-            {                
+        function onCurrentExperimentationChanged(newValue) {
+            if (newValue)
+            {
+                //console.log("QML: on Current Experimentation changed: " + newValue.name);
                 stackview.push(componentExperimentationView); // Add the "Experimentation View" to the stack
             }
             else {
-                console.log("QML: on Current Experimentation changed to NULL");
+                //console.log("QML: on Current Experimentation changed to NULL");
                 stackview.pop(); // Remove the "Experimentation View" from the stack
             }
         }
@@ -120,14 +121,14 @@ Item {
     Connections {
         target: IngeScapeAssessmentsC.experimentationC.sessionC
 
-        onCurrentSessionChanged: {
-            if (IngeScapeAssessmentsC.experimentationC.sessionC.currentSession)
+        function onCurrentSessionChanged(newValue) {
+            if (newValue)
             {
-                console.log("QML: on Current Session changed: " + IngeScapeAssessmentsC.experimentationC.sessionC.currentSession.name);
+                //console.log("QML: on Current Session changed: " + newValue.name);
                 stackview.push(componentSessionView); // Add the "Session view" to the stack
             }
             else {
-                console.log("QML: on Current Session changed to NULL");
+                //console.log("QML: on Current Session changed to NULL");
                 stackview.pop(); // Remove the "Session view" from the stack
             }
         }
@@ -136,9 +137,9 @@ Item {
     Connections {
         target: IngeScapeAssessmentsC.licensesC
 
-        onIsLicenseValidForAgentNeededChanged: {
+        function onIsLicenseValidForAgentNeededChanged(newValue) {
             console.log("QML (IngeScape Assessment): on IsLicenseValidForAgentNeededChanged");
-            if (IngeScapeAssessmentsC.licensesC && !IngeScapeAssessmentsC.licensesC.isLicenseValidForAgentNeeded)
+            if (IngeScapeAssessmentsC.licensesC && !newValue)
             {
                 openLicensePopup();
             }

@@ -413,7 +413,7 @@ AssessmentsPopupBase {
                                         Connections {
                                             target: rootPopup
 
-                                            onErrorDetectedChanged: {
+                                            function onErrorDetectedChanged(newValue) {
                                                 if (index === rootPopup.errorEnumIndex)
                                                 {
                                                     console.log("update error detected")
