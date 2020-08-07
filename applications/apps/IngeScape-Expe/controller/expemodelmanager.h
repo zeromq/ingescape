@@ -30,20 +30,14 @@ class ExpeModelManager : public QObject
 {
     Q_OBJECT
 
-    // Peer id of the editor
-    I2_CPP_NOSIGNAL_PROPERTY(QString, peerIdOfEditor)
-
-    // Peer name of the editor
-    I2_CPP_NOSIGNAL_PROPERTY(QString, peerNameOfEditor)
+    // Peer of the editor
+    I2_CPP_NOSIGNAL_PROPERTY(PeerM*, peerOfEditor)
 
     // Flag indicating is there is an editor with state ON
     I2_QML_PROPERTY_READONLY(bool, isEditorON)
 
-    // Peer id of the recorder
-    I2_CPP_NOSIGNAL_PROPERTY(QString, peerIdOfRecorder)
-
-    // Peer name of the recorder
-    I2_CPP_NOSIGNAL_PROPERTY(QString, peerNameOfRecorder)
+    // Peer of the recorder
+    I2_CPP_NOSIGNAL_PROPERTY(PeerM*, peerOfRecorder)
 
     // Flag indicating is there is a recorder with state ON
     I2_QML_PROPERTY_READONLY(bool, isRecorderON)
@@ -111,40 +105,14 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 
-    /**
-     * @brief Slot called when an editor enter the network
-     * @param peerId
-     * @param peerName
-     * @param ipAddress
-     * @param hostname
-     */
-    void onEditorEntered(QString peerId, QString peerName, QString ipAddress, QString hostname);
+    // Slot called when an "IngeScape Editor" enter/quit the network
+    void onEditorEntered(PeerM* peer);
+    void onEditorExited(PeerM* peer);
 
 
-    /**
-     * @brief Slot called when an editor quit the network
-     * @param peerId
-     * @param peerName
-     */
-    void onEditorExited(QString peerId, QString peerName);
-
-
-    /**
-     * @brief Slot called when a recorder enter the network
-     * @param peerId
-     * @param peerName
-     * @param ipAddress
-     * @param hostname
-     */
-    void onRecorderEntered(QString peerId, QString peerName, QString ipAddress, QString hostname);
-
-
-    /**
-     * @brief Slot called when a recorder quit the network
-     * @param peerId
-     * @param peerName
-     */
-    void onRecorderExited(QString peerId, QString peerName);
+    // Slot called when an "IngeScape Recorder" enter/quit the network
+    void onRecorderEntered(PeerM* peer);
+    void onRecorderExited(PeerM* peer);
 
 
     /**

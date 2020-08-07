@@ -20,11 +20,9 @@
  * @param parent
  */
 ExpeModelManager::ExpeModelManager(QObject *parent) : QObject(parent),
-    _peerIdOfEditor(""),
-    _peerNameOfEditor(),
+    _peerOfEditor(nullptr),
     _isEditorON(false),
-    _peerIdOfRecorder(""),
-    _peerNameOfRecorder(""),
+    _peerOfRecorder(nullptr),
     _isRecorderON(false),
     _currentDirectoryPath(""),
     _currentLoadedPlatform(nullptr)
@@ -268,86 +266,78 @@ void ExpeModelManager::sortPlatformsListInAlphabeticOrder()
 
 /**
  * @brief Slot called when an editor enter the network
- * @param peerId
- * @param peerName
- * @param ipAddress
- * @param hostname
  */
-void ExpeModelManager::onEditorEntered(QString peerId, QString peerName, QString ipAddress, QString hostname)
+void ExpeModelManager::onEditorEntered(PeerM* peer)
 {
-    qInfo() << "Editor entered (" << peerId << ")" << peerName << "on" << hostname << "(" << ipAddress << ")";
-
-    if (!_isEditorON  && !peerId.isEmpty() && !peerName.isEmpty())
+    if (peer != nullptr)
     {
-        setpeerIdOfEditor(peerId);
-        setpeerNameOfEditor(peerName);
+        qInfo() << "Editor entered" << peer->name() << "(" << peer->uid() << ") on" << peer->hostname() << "(" << peer->ipAddress() << ")";
 
-        setisEditorON(true);
-    }
-    else {
-        qCritical() << "We are already connected to an editor:" << _peerNameOfEditor << "(" << _peerIdOfEditor << ")";
+        if (!_isEditorON  && (_peerOfEditor == nullptr))
+        {
+            setpeerOfEditor(peer);
+            setisEditorON(true);
+        }
+        else if (_peerOfEditor != nullptr) {
+            qCritical() << "We are already connected to the editor:" << _peerOfEditor->name() << "(" << _peerOfEditor->uid() << ")";
+        }
     }
 }
 
 
 /**
  * @brief Slot called when an editor quit the network
- * @param peerId
- * @param peerName
  */
-void ExpeModelManager::onEditorExited(QString peerId, QString peerName)
+void ExpeModelManager::onEditorExited(PeerM* peer)
 {
-    qInfo() << "Editor exited (" << peerId << ")" << peerName;
-
-    if (_isEditorON && (_peerIdOfEditor == peerId))
+    if (peer != nullptr)
     {
-        setpeerIdOfEditor("");
-        setpeerNameOfEditor("");
+        qInfo() << "Editor exited" << peer->name() << "(" << peer->uid() << ")";
 
-        setisEditorON(false);
+        if (_isEditorON && (_peerOfEditor == peer))
+        {
+            setpeerOfEditor(nullptr);
+            setisEditorON(false);
+        }
     }
 }
 
 
 /**
  * @brief Slot called when a recorder enter the network
- * @param peerId
- * @param peerName
- * @param ipAddress
- * @param hostname
  */
-void ExpeModelManager::onRecorderEntered(QString peerId, QString peerName, QString ipAddress, QString hostname)
+void ExpeModelManager::onRecorderEntered(PeerM* peer)
 {
-    qInfo() << "Recorder entered (" << peerId << ")" << peerName << "on" << hostname << "(" << ipAddress << ")";
-
-    if (!_isRecorderON  && !peerId.isEmpty() && !peerName.isEmpty())
+    if (peer != nullptr)
     {
-        setpeerIdOfRecorder(peerId);
-        setpeerNameOfRecorder(peerName);
+        qInfo() << "Recorder entered" << peer->name() << "(" << peer->uid() << ") on" << peer->hostname() << "(" << peer->ipAddress() << ")";
 
-        setisRecorderON(true);
-    }
-    else {
-        qCritical() << "We are already connected to a recorder:" << _peerNameOfRecorder << "(" << _peerIdOfRecorder << ")";
+        if (!_isRecorderON && (_peerOfRecorder == nullptr))
+        {
+            setpeerOfRecorder(peer);
+            setisRecorderON(true);
+        }
+        else if (_peerOfRecorder != nullptr) {
+            qCritical() << "We are already connected to the recorder:" << _peerOfRecorder->name() << "(" << _peerOfRecorder->uid() << ")";
+        }
     }
 }
 
 
 /**
  * @brief Slot called when a recorder quit the network
- * @param peerId
- * @param peerName
  */
-void ExpeModelManager::onRecorderExited(QString peerId, QString peerName)
+void ExpeModelManager::onRecorderExited(PeerM* peer)
 {
-    qInfo() << "Recorder exited (" << peerId << ")" << peerName;
-
-    if (_isRecorderON && (_peerIdOfRecorder == peerId))
+    if (peer != nullptr)
     {
-        setpeerIdOfRecorder("");
-        setpeerNameOfRecorder("");
+        qInfo() << "Recorder exited" << peer->name() << "(" << peer->uid() << ")";
 
-        setisRecorderON(false);
+        if (_isRecorderON && (_peerOfRecorder == peer))
+        {
+            setpeerOfRecorder(nullptr);
+            setisRecorderON(false);
+        }
     }
 }
 

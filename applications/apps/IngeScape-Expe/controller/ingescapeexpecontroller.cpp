@@ -143,10 +143,13 @@ IngeScapeExpeController::IngeScapeExpeController(QObject *parent) : QObject(pare
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::editorExited, _modelManager, &ExpeModelManager::onEditorExited);
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::recorderEntered, _modelManager, &ExpeModelManager::onRecorderEntered);
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::recorderExited, _modelManager, &ExpeModelManager::onRecorderExited);
-    connect(ingeScapeNetworkC, &IngeScapeNetworkController::agentEntered, ingeScapeModelManager, &IngeScapeModelManager::onAgentEntered);
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::peerOfAgentsEntered, ingeScapeModelManager, &IngeScapeModelManager::onPeerOfAgentsEntered);
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::peerOfAgentsExited, ingeScapeModelManager, &IngeScapeModelManager::onPeerOfAgentsExited);
     connect(ingeScapeNetworkC, &IngeScapeNetworkController::agentExited, ingeScapeModelManager, &IngeScapeModelManager::onAgentExited);
     //connect(ingeScapeNetworkC, &IngeScapeNetworkController::launcherEntered, ingeScapeModelManager, &IngeScapeModelManager::onLauncherEntered);
     //connect(ingeScapeNetworkC, &IngeScapeNetworkController::launcherExited, ingeScapeModelManager, &IngeScapeModelManager::onLauncherExited);
+
+    connect(ingeScapeNetworkC, &IngeScapeNetworkController::definitionReceived, ingeScapeModelManager, &IngeScapeModelManager::onDefinitionReceived);
 
     connect(_networkC, &NetworkController::statusReceivedAbout_LoadPlatformFile, _modelManager, &ExpeModelManager::onStatusReceivedAbout_LoadPlatformFile);
     connect(_networkC, &NetworkController::timeLineStateUpdated, this, &IngeScapeExpeController::_onTimeLineStateUpdated);
@@ -312,14 +315,15 @@ void IngeScapeExpeController::selectDirectory()
  */
 void IngeScapeExpeController::openPlatform(PlatformM* platform)
 {
-    if ((platform != nullptr) && (_modelManager != nullptr) && _modelManager->isEditorON() && (_networkC != nullptr))
+    if ((platform != nullptr) && (_modelManager != nullptr) && (_networkC != nullptr)
+            && _modelManager->isEditorON() && (_modelManager->peerOfEditor() != nullptr))
     {
         qInfo() << "Open platform" << platform->name() << "at" << platform->filePath();
 
         QString message = QString("%1=%2").arg(command_LoadPlatformFile, platform->filePath());
 
         // Send the message "Load Platform File" to the editor
-        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_modelManager->peerIdOfEditor(), message);
+        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_modelManager->peerOfEditor()->uid(), message);
     }
 }
 
@@ -331,8 +335,9 @@ void IngeScapeExpeController::openPlatform(PlatformM* platform)
  */
 void IngeScapeExpeController::playOrResumeTimeLine(bool withRecord)
 {
-    if ((_modelManager != nullptr) && _modelManager->isEditorON() && (_modelManager->currentLoadedPlatform() != nullptr)
-            && (_networkC != nullptr))
+    if ((_modelManager != nullptr) && (_networkC != nullptr)
+            && _modelManager->isEditorON() && (_modelManager->peerOfEditor() != nullptr)
+            && (_modelManager->currentLoadedPlatform() != nullptr))
     {
         // The current loaded platform is currently recording...
         if (_modelManager->currentLoadedPlatform()->recordState() == RecordStates::RECORDING)
@@ -358,7 +363,7 @@ void IngeScapeExpeController::playOrResumeTimeLine(bool withRecord)
         QString message = QString("%1=%2").arg(command_UpdateTimeLineState, PLAY);
 
         // Send the message "Update TimeLine State" to the editor
-        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_modelManager->peerIdOfEditor(), message);
+        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_modelManager->peerOfEditor()->uid(), message);
     }
 }
 
@@ -368,15 +373,16 @@ void IngeScapeExpeController::playOrResumeTimeLine(bool withRecord)
  */
 void IngeScapeExpeController::pauseTimeLine()
 {
-    if ((_modelManager != nullptr) && _modelManager->isEditorON() && (_modelManager->currentLoadedPlatform() != nullptr)
-            && (_networkC != nullptr))
+    if ((_modelManager != nullptr) && (_networkC != nullptr)
+            && _modelManager->isEditorON() && (_modelManager->peerOfEditor() != nullptr)
+            && (_modelManager->currentLoadedPlatform() != nullptr))
     {
         qInfo() << "Pause the timeline of platform" << _modelManager->currentLoadedPlatform()->name();
 
         QString message = QString("%1=%2").arg(command_UpdateTimeLineState, PAUSE);
 
         // Send the message "Update TimeLine State" to the editor
-        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_modelManager->peerIdOfEditor(), message);
+        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_modelManager->peerOfEditor()->uid(), message);
     }
 }
 
@@ -386,15 +392,16 @@ void IngeScapeExpeController::pauseTimeLine()
  */
 void IngeScapeExpeController::stopTimeLine()
 {
-    if ((_modelManager != nullptr) && _modelManager->isEditorON() && (_modelManager->currentLoadedPlatform() != nullptr)
-            && (_networkC != nullptr))
+    if ((_modelManager != nullptr) && (_networkC != nullptr)
+            && _modelManager->isEditorON() && (_modelManager->peerOfEditor() != nullptr)
+            && (_modelManager->currentLoadedPlatform() != nullptr))
     {
         qInfo() << "STOP the timeline of platform" << _modelManager->currentLoadedPlatform()->name();
 
         QString message = QString("%1=%2").arg(command_UpdateTimeLineState, RESET);
 
         // Send the message "Update TimeLine State" to the editor
-        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_modelManager->peerIdOfEditor(), message);
+        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_modelManager->peerOfEditor()->uid(), message);
 
 
         if (_withRecord)
@@ -643,9 +650,9 @@ void IngeScapeExpeController::_stopIngeScape(bool hasToClearPlatform)
         ingeScapeModelManager->simulateExitForEachLauncher();
 
         // Simulate an exit for the recorder
-        if ((_modelManager != nullptr) && _modelManager->isRecorderON())
+        if ((_modelManager != nullptr) && _modelManager->isRecorderON() && (_modelManager->peerOfRecorder() != nullptr))
         {
-            _modelManager->onRecorderExited(_modelManager->peerIdOfRecorder(), _modelManager->peerNameOfRecorder());
+            _modelManager->onRecorderExited(_modelManager->peerOfRecorder());
         }
     }
 }
@@ -656,15 +663,16 @@ void IngeScapeExpeController::_stopIngeScape(bool hasToClearPlatform)
  */
 void IngeScapeExpeController::_startRecording()
 {
-    if ((_modelManager != nullptr) && _modelManager->isEditorON() && (_modelManager->currentLoadedPlatform() != nullptr)
-            && (_networkC != nullptr))
+    if ((_modelManager != nullptr) && (_networkC != nullptr)
+            && _modelManager->isEditorON() && (_modelManager->peerOfEditor() != nullptr)
+            && (_modelManager->currentLoadedPlatform() != nullptr))
     {
         qInfo() << "Start recording the platform" << _modelManager->currentLoadedPlatform()->name();
 
         QString message = QString("%1=%2").arg(command_UpdateRecordState, START);
 
         // Send the message "Update Record State" to the editor
-        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_modelManager->peerIdOfEditor(), message);
+        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_modelManager->peerOfEditor()->uid(), message);
 
         // FIXME: get state from recorder messages
         _modelManager->currentLoadedPlatform()->setrecordState(RecordStates::RECORDING);
@@ -677,15 +685,16 @@ void IngeScapeExpeController::_startRecording()
  */
 void IngeScapeExpeController::_stopRecording()
 {
-    if ((_modelManager != nullptr) && _modelManager->isEditorON() && (_modelManager->currentLoadedPlatform() != nullptr)
-            && (_networkC != nullptr))
+    if ((_modelManager != nullptr) && (_networkC != nullptr)
+            && _modelManager->isEditorON() && (_modelManager->peerOfEditor() != nullptr)
+            && (_modelManager->currentLoadedPlatform() != nullptr))
     {
         qInfo() << "Stop recording the platform" << _modelManager->currentLoadedPlatform()->name();
 
         QString message = QString("%1=%2").arg(command_UpdateRecordState, STOP);
 
         // Send the message "Update Record State" to the editor
-        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_modelManager->peerIdOfEditor(), message);
+        IngeScapeNetworkController::instance()->sendStringMessageToAgent(_modelManager->peerOfEditor()->uid(), message);
 
 
         // FIXME: get state from recorder messages
