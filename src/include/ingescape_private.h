@@ -446,8 +446,8 @@ void call_freeValuesInArguments(igs_callArgument_t *arg);
 #define MAX_NB_OF_IOP 1000
 #define IGS_MAX_EXEC_DURATION_DURING_EVAL 300
 #if !TARGET_OS_IOS
-void license_cleanLicense(igs_core_context_t *context);
-void license_readLicense(igs_core_context_t *context);
+PUBLIC void license_cleanLicense(igs_core_context_t *context);
+PUBLIC void license_readLicense(igs_core_context_t *context);
 #endif
 
 //agent
