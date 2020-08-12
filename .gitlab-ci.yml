@@ -1025,6 +1025,42 @@ lib-deploy-linux-release-x64:
 
 
 ##
+## CentOS with Qt (VM)
+##
+
+# Create ingescape library for CentOS with Qt
+lib-build-centos-qt:
+  extends: .lib-build-files
+  stage: lib-build
+  tags:
+    - centos-qt
+  script:
+    - mkdir -p build
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/builds/sysroot/usr/local/ -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - make -C build
+  artifacts:
+    paths:
+      - ./build
+    name: "lib-build-centos-qt"
+    expire_in: 1 day
+
+# Deploy ingescape to be able to compile agents
+lib-deploy-centos-qt:
+  extends: .lib-build-files
+  stage: lib-deploy
+  tags:
+    - centos-qt
+  script:
+    - make -C build DESTDIR=/builds/sysroot/ install
+    - cp src/include/ingescape_private.h /builds/sysroot/usr/local/include/ingescape/
+  dependencies:
+    - lib-build-centos-qt
+  only:
+    refs:
+      - master
+      - stable
+
+##
 ## armhf (RPi)
 ##
 
