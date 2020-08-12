@@ -309,6 +309,8 @@ typedef struct igs_core_context{
     bool isFrozen;
     igs_freeze_callback_t *freezeCallbacks;
     igs_external_stop_calback_t *externalStopCalbacks;
+    zlist_t *brokers;
+    char *ourBrokerEndpoint;
     
     //performance
     size_t performanceMsgCounter;
@@ -325,7 +327,7 @@ typedef struct igs_core_context{
     //initiated at start, cleaned at stop
     char *networkDevice;
     char *ipAddress;
-    char *brokerEndPoint;
+    char *ourAgentEndpoint;
     
     //initiated at initLoop, cleaned at loop stop
     char *commandLine;

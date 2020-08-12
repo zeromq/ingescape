@@ -2161,7 +2161,7 @@ static void runLoop (zsock_t *mypipe, void *args){
     int zyreStartRes = zyre_start (coreContext->node);
     bus_zyreUnlock();
     if (zyreStartRes != IGS_SUCCESS){
-        igs_error("Could not start bus node : Ingescape will interrupt immediately.");
+        igs_error("could not start bus node : Ingescape will interrupt immediately.");
         return;
     }
     
@@ -2194,18 +2194,19 @@ static void runLoop (zsock_t *mypipe, void *args){
     
     network_Lock();
     igs_debug("loop stopping..."); //clean dynamic part of the context
-    igs_zyre_peer_t *zyrePeer, *tmpPeer;
-    HASH_ITER(hh, context->zyrePeers, zyrePeer, tmpPeer){
-        HASH_DEL(context->zyrePeers, zyrePeer);
-        cleanAndFreeZyrePeer(&zyrePeer, context->loop);
-    }
-    zloop_destroy (&context->loop);
     
     igs_remote_agent_t *remote, *tmpremote;
     HASH_ITER(hh, context->remoteAgents, remote, tmpremote) {
         HASH_DEL(context->remoteAgents, remote);
         cleanAndFreeRemoteAgent(&remote);
     }
+    
+    igs_zyre_peer_t *zyrePeer, *tmpPeer;
+    HASH_ITER(hh, context->zyrePeers, zyrePeer, tmpPeer){
+        HASH_DEL(context->zyrePeers, zyrePeer);
+        cleanAndFreeZyrePeer(&zyrePeer, context->loop);
+    }
+    zloop_destroy (&context->loop);
     
     igs_timer_t *current_timer, *tmp_timer;
     HASH_ITER(hh, context->timers, current_timer, tmp_timer){
@@ -2299,23 +2300,26 @@ void initLoop (igs_core_context_t *context){
     //prepare zyre
     bus_zyreLock();
     context->node = zyre_new(coreAgent->name);
+    assert(context->node);
     //zyre_set_verbose(context->node);
     bus_zyreUnlock();
-    if (context->brokerEndPoint != NULL){
+    if (context->ourAgentEndpoint){
         bus_zyreLock();
-        zyre_set_verbose(context->node);
-        zyre_gossip_connect(context->node,"%s", context->brokerEndPoint);
+        //zyre_set_verbose(context->node);
+        char *broker = zlist_first(context->brokers);
+        while (broker) {
+            zyre_gossip_connect(context->node, "%s", broker);
+            broker = zlist_next(context->brokers);
+        }
+        zyre_set_endpoint(context->node, "%s", context->ourAgentEndpoint);
+        if (context->ourBrokerEndpoint)
+            zyre_gossip_bind(context->node, "%s", context->ourBrokerEndpoint);
         bus_zyreUnlock();
     }else{
-        if (context->node == NULL){
-            igs_fatal("Could not create bus node : Ingescape will interrupt immediately.");
-            return;
-        }else{
-            bus_zyreLock();
-            zyre_set_interface(context->node, context->networkDevice);
-            zyre_set_port(context->node, context->network_zyrePort);
-            bus_zyreUnlock();
-        }
+        bus_zyreLock();
+        zyre_set_interface(context->node, context->networkDevice);
+        zyre_set_port(context->node, context->network_zyrePort);
+        bus_zyreUnlock();
     }
     bus_zyreLock();
     zyre_set_interval(context->node, context->network_discoveryInterval);
@@ -2356,13 +2360,13 @@ void initLoop (igs_core_context_t *context){
     //start TCP publisher
     char endpoint[512];
     if (context->network_publishingPort == 0){
-        snprintf(endpoint, 511, "tcp://%s:*", context->ipAddress);
+        snprintf(endpoint, 512, "tcp://%s:*", context->ipAddress);
     }else{
-        snprintf(endpoint, 511, "tcp://%s:%d", context->ipAddress, context->network_publishingPort);
+        snprintf(endpoint, 512, "tcp://%s:%d", context->ipAddress, context->network_publishingPort);
     }
     context->publisher = zsock_new_pub(endpoint);
     if (context->publisher == NULL){
-        igs_error("Could not create publishing socket (%s): Ingescape will interrupt immediately.", endpoint);
+        igs_error("could not create publishing socket (%s): Ingescape will interrupt immediately.", endpoint);
         canContinue = false;
     }else{
         zsock_set_sndhwm(context->publisher, context->network_hwmValue);
@@ -2759,7 +2763,7 @@ igs_result_t igs_startWithIP(const char *ipAddress, unsigned int port){
 //                name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist));
         if (strcmp(ziflist_address (iflist), ipAddress) == 0){
             coreContext->networkDevice = strndup(name, IGS_NETWORK_DEVICE_LENGTH);
-            igs_info("Starting with ip address %s and port %d on device %s", ipAddress, port, coreContext->networkDevice);
+            igs_info("starting with ip address %s and port %d on device %s", ipAddress, port, coreContext->networkDevice);
             break;
         }
         name = ziflist_next (iflist);
@@ -2767,7 +2771,7 @@ igs_result_t igs_startWithIP(const char *ipAddress, unsigned int port){
     ziflist_destroy (&iflist);
     
     if (coreContext->networkDevice == NULL){
-        igs_error("Device name could not be determined for IP address %s : our agent will NOT start", ipAddress);
+        igs_error("device name could not be determined for IP address %s : our agent will NOT start", ipAddress);
         igs_stop();
         return IGS_FAILURE;
     }
@@ -2780,59 +2784,50 @@ igs_result_t igs_startWithIP(const char *ipAddress, unsigned int port){
     return IGS_SUCCESS;
 }
 
-igs_result_t igs_startWithDeviceOnBroker(const char *networkDevice, const char *brokerEndpoint){
-    core_initAgent();
-    assert(networkDevice);
+void igs_brokerAdd(const char *brokerEndpoint){
+    core_initContext();
     assert(brokerEndpoint);
-    //TODO: manage a list of brokers instead of just one
-    
+    assert(coreContext->brokers);
+    zlist_append(coreContext->brokers, strdup(brokerEndpoint));
+}
+
+void igs_enableAsBroker(const char *ourBrokerEndpoint){
+    core_initContext();
+    assert(ourBrokerEndpoint);
+    if (coreContext->ourBrokerEndpoint)
+        free(coreContext->ourBrokerEndpoint);
+    coreContext->ourBrokerEndpoint = strdup(ourBrokerEndpoint);
+}
+
+igs_result_t igs_startWithBrokers(const char *agentEndpoint){
+    core_initAgent();
+    assert(agentEndpoint);
+    char address[512] = "";
+    size_t port = 0;
+    sscanf(agentEndpoint, "tcp://%[^:]:%zd", address, &port);
+    assert(strlen(address) > 0);
+    assert(port > 0);
+    coreContext->ipAddress = strdup(address);
     if (coreContext->networkActor != NULL){
         //Agent is already active : need to stop it first
         igs_stop();
     }
+    if (coreContext->ourAgentEndpoint)
+        free(coreContext->ourAgentEndpoint);
+    coreContext->ourAgentEndpoint = strndup(agentEndpoint, IGS_IP_ADDRESS_LENGTH);
     
-    coreContext->brokerEndPoint = strndup(brokerEndpoint, IGS_IP_ADDRESS_LENGTH);
-    coreContext->networkDevice = strndup(networkDevice, IGS_NETWORK_DEVICE_LENGTH);
-    
-#if (defined WIN32 || defined _WIN32)
-    WORD version_requested = MAKEWORD (2, 2);
-    WSADATA wsa_data;
-    int rc = WSAStartup (version_requested, &wsa_data);
-    assert (rc == 0);
-    assert (LOBYTE (wsa_data.wVersion) == 2 &&
-            HIBYTE (wsa_data.wVersion) == 2);
-#endif
-    
-    ziflist_t *iflist = ziflist_new ();
-    assert (iflist);
-    const char *name = ziflist_first (iflist);
-    while (name) {
-        //        printf (" - name=%s address=%s netmask=%s broadcast=%s\n",
-        //                name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist));
-        if (strcmp(name, networkDevice) == 0){
-            coreContext->ipAddress = strndup(ziflist_address (iflist), IGS_IP_ADDRESS_LENGTH);
-            igs_info("Starting with ip address %s on device %s with broker %s",
-                      coreContext->ipAddress,
-                      networkDevice,
-                      coreContext->brokerEndPoint);
-            break;
-        }
-        name = ziflist_next (iflist);
-    }
-    ziflist_destroy (&iflist);
-    
-    if (coreContext->ipAddress){
-        igs_error("IP address could not be determined on device %s : our agent will NOT start", networkDevice);
-        igs_stop();
+    assert(coreContext->brokers);
+    if (zlist_size(coreContext->brokers) == 0){
+        igs_error("no broker to connect to : our agent will NOT start");
         return IGS_FAILURE;
     }
+    
 #if !TARGET_OS_IOS
     license_readLicense(coreContext);
 #endif
-    coreContext->network_zyrePort = 0;
     initLoop(coreContext);
     assert (coreContext->networkActor);
-    return 1;
+    return IGS_SUCCESS;
 }
 
 
@@ -2861,17 +2856,17 @@ void igs_stop(){
         igs_debug("ingescape already stopped");
     }
     
-    if (coreContext->networkDevice != NULL){
+    if (coreContext->networkDevice){
         free(coreContext->networkDevice);
         coreContext->networkDevice = NULL;
     }
-    if (coreContext->ipAddress != NULL){
+    if (coreContext->ipAddress){
         free(coreContext->ipAddress);
         coreContext->ipAddress = NULL;
     }
-    if (coreContext->brokerEndPoint != NULL){
-        free(coreContext->brokerEndPoint);
-        coreContext->brokerEndPoint = NULL;
+    if (coreContext->ourAgentEndpoint){
+        free(coreContext->ourAgentEndpoint);
+        coreContext->ourAgentEndpoint = NULL;
     }
     
 #if !TARGET_OS_IOS

@@ -21,23 +21,46 @@ extern "C" {
 //////////////////////////////////////////////////
 // Advanced admin functions
 
-//Start the agent using a broker instead of selfdiscovery
-//NB: an ingescape broker must be running and available at the provided endpoint.
-//Endpoints have the form tcp://ip_address:port
-//Selected network device must be able to reach the endpoint address.
-//PUBLIC int igs_startWithDeviceOnBroker(const char *networkDevice, const char *brokerEndpoint);
+/*
+ Brokers vs. self-discovery
+ 
+ igs_startWithDevice and igs_startWithIP enable the agents to self-discover
+ using UDP broadcast messages on the passed port. UDP broadcast messages can
+ be blocked on some networks and can make things complex on networks with
+ sub-networks.
+ That is why ingescape also supports the use of brokers to relay discovery
+ using TCP connections. Any agent can be a broker and agents using brokers
+ simply have to use a list of broker endpoints. One broker is enough but
+ several brokers can be set for robustness.
+ 
+ For clarity, it is better is brokers are running permanently on your platform,
+ are run before any other agent using them, and serve only as brokers. But any
+ other architecture is permitted.
+ 
+ Endpoints have the form tcp://ip_address:port
+ • A broker endpoint in igs_brokerAdd is used to connect to a given broker.
+ • The endpoint in igs_setAsBroker is the broker address we should be reached at.
+ • Our agent endpoint in igs_startWithBrokers gives the address and port our
+ agent can be reached at. This endpoint must be valid in the actual network
+ configuration.
+ */
+
+//add a broker endpoint to our list, at least one declared broker is necessary to
+//use igs_startWithBrokers.
+PUBLIC void igs_brokerAdd(const char *brokerEndpoint);
+//optionally declare ourselves as a broker with our own endpoint
+PUBLIC void igs_enableAsBroker(const char *ourBrokerEndpoint);
+PUBLIC igs_result_t igs_startWithBrokers(const char *agentEndpoint);
     
 //network configuration
-//void igs_setBusEndpoint(const char *endpoint); //usefull only with gossip discovery - TODO
-//void igs_connectAgentOnEndpoint(const char *endpoint); //not officially supported in Zyre 2.0.x yet
 PUBLIC void igs_setPublishingPort(unsigned int port);
 PUBLIC void igs_setLogStreamPort(unsigned int port);
 PUBLIC void igs_setDiscoveryInterval(unsigned int interval); //in milliseconds
 PUBLIC void igs_setAgentTimeout(unsigned int duration); //in milliseconds
 PUBLIC void igs_raiseSocketsLimit(void); //UNIX only, to be called before any ingescape or ZeroMQ activity
 
-//sends number of messages with defiend size and displays performance
-//information when finished (information displayed as INFO-evel log)
+//sends number of messages with defined size and displays performance
+//information when finished (information displayed as INFO-level log)
 PUBLIC void igs_performanceCheck(const char *peerId, size_t msgSize, size_t nbOfMsg);
 
 //Timers can be created to call code a certain number of times,
