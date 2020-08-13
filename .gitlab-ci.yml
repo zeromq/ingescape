@@ -24,20 +24,6 @@ stages:
       - dependencies/windows/unix/*
       - CMakeLists.txt
 
-# Define ingescape assessments files
-.assessments-build-files:
-  only:
-    changes:
-      - .gitlab-ci.yml
-      - src/**/*
-      - builds/cmake/**/*
-      - dependencies/yajl/**/*
-      - dependencies/unix/*
-      - dependencies/windows/unix/*
-      - applications/frameworks/**/*
-      - applications/apps/IngeScape-Common/**/*
-      - applications/apps/IngeScape-Assessments/**/*
-
 # Define ingescape expe files
 .expe-build-files:
   only:
@@ -132,30 +118,6 @@ lib-deploy-macos:
     - master
     - stable
 
-# Build ingescape assessments for macos
-assessments-build-macos:
-  extends: .assessments-build-files
-  stage: apps-build
-  variables:
-    GIT_SUBMODULE_STRATEGY: recursive
-  tags:
-    - osx
-  script:
-    - git clean -xfd
-    - mkdir -p applications/apps/IngeScape-Assessments/build
-    - cmake -S applications/apps/IngeScape-Assessments/ -B applications/apps/IngeScape-Assessments/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.15.0/clang_64/;$HOME/builds/sysroot/usr/local/" -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
-    - make -j8 -C applications/apps/IngeScape-Assessments/build
-#    - 'codesign --force --deep --sign  "Developer ID Application: Ingenuity i/o (56DRT9MG9S)" -v applications/apps/IngeScape-Assessments/build/IngeScape-Assessments.app'
-    - mkdir -p $HOME/builds/sysroot/Applications/
-    - rm -Rf $HOME/builds/sysroot/Applications/IngeScape-Assessments.app
-    - cp -Rf applications/apps/IngeScape-Assessments/build/IngeScape-Assessments.app $HOME/builds/sysroot/Applications/
-  artifacts:
-    paths:
-      - applications/apps/IngeScape-Assessments/build
-    name: "assessments-build-macos"
-    expire_in: 1 day
-  dependencies: []
-
 
 # Build ingescape expe for macos
 expe-build-macos:
@@ -181,22 +143,6 @@ expe-build-macos:
     expire_in: 1 day
   dependencies: []
 
-
-# Create assessments installer
-assessments-installer-macos:
-  extends: .assessments-build-files
-  stage: apps-installer
-  tags:
-    - osx
-  script:
-    - make -C applications/apps/IngeScape-Assessments/build package
-  #  - make -C applications/apps/IngeScape-Assessments/build package_source
-  artifacts:
-    paths:
-      - applications/apps/IngeScape-Assessments/build/IngeScape-Assessments-*.dmg
-    name: "assessments-installer-macos"
-  dependencies:
-    - assessments-build-macos
 
 
 # Create expe installer
@@ -302,50 +248,6 @@ lib-windows-debug-x86:
     paths:
      - build
     name: "lib-windows-debug-x86"
-    expire_in: 1 day
-  dependencies: []
-
-# Create ingescape assessments for windows
-assessments-windows-release-x86:
-  extends: .assessments-build-files
-  stage: apps-build
-  variables:
-    Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.15.0\\msvc2019\\lib\\cmake\\Qt5
-    GIT_SUBMODULE_STRATEGY: recursive
-    ARCH: "Assessments_x86"
-  tags:
-    - windows
-  script:
-    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
-    - mkdir applications\apps\IngeScape-Assessments\build\ReleaseX86
-    - cmake applications\apps\IngeScape-Assessments\ -B applications\apps\IngeScape-Assessments\build\ReleaseX86 -G"$env:CURRENT_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
-    - cmake --build applications\apps\IngeScape-Assessments\build\ReleaseX86 --target ALL_BUILD --config Release
-  artifacts:
-    paths:
-      - applications\apps\IngeScape-Assessments\build
-    name: "assessments-windows-release-x86"
-    expire_in: 1 day
-  dependencies: []
-
-# Create ingescape assessments for windows
-assessments-windows-release-x64:
-  extends: .assessments-build-files
-  stage: apps-build
-  variables:
-    Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.15.0\\msvc2019_64\\lib\\cmake\\Qt5
-    GIT_SUBMODULE_STRATEGY: recursive
-    ARCH: "Assessments_x64"
-  tags:
-    - windows
-  script:
-    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
-    - mkdir applications\apps\IngeScape-Assessments\build\ReleaseX64
-    - cmake applications\apps\IngeScape-Assessments\ -B applications\apps\IngeScape-Assessments\build\ReleaseX64 -G"$env:CURRENT_CMAKE_GENERATOR Win64" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
-    - cmake --build applications\apps\IngeScape-Assessments\build\ReleaseX64 --target ALL_BUILD --config Release
-  artifacts:
-    paths:
-      - applications\apps\IngeScape-Assessments\build
-    name: "assessments-windows-release-x64"
     expire_in: 1 day
   dependencies: []
 
@@ -472,44 +374,6 @@ lib-installer-debug-windows-x64:
     name: "lib-installer-debug-windows-x64"
   dependencies:
     - lib-windows-debug-x64
-
-# Create assessments install for windows 32 bits
-assessments-installer-windows-x86:
-  extends: .assessments-build-files
-  stage: apps-installer
-  variables:
-    ARCH: "Assessments_x86"
-  tags:
-    - windows
-  script:
-    - cd applications\apps\IngeScape-Assessments\build\ReleaseX86
-    - cpack --config CPackConfig.cmake
-    - cd ..\..\..\..\..
-  artifacts:
-    paths:
-      - applications\apps\IngeScape-Assessments\build\ReleaseX86\IngeScape-Assessments-*
-    name: "assessments-installer-windows-x86"
-  dependencies:
-    - assessments-windows-release-x86
-
-# Create assessments install for windows 64 bits
-assessments-installer-windows-x64:
-  extends: .assessments-build-files
-  stage: apps-installer
-  variables:
-    ARCH: "Assessments_x64"
-  tags:
-    - windows
-  script:
-    - cd applications\apps\IngeScape-Assessments\build\ReleaseX64
-    - cpack --config CPackConfig.cmake
-    - cd ..\..\..\..\..
-  artifacts:
-    paths:
-      - applications\apps\IngeScape-Assessments\build\ReleaseX64\IngeScape-Assessments-*
-    name: "assessments-installer-windows-x64"
-  dependencies:
-    - assessments-windows-release-x64
 
 # Create expe install for windows 32 bits
 expe-installer-windows-x86:
