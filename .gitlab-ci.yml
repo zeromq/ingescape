@@ -6,11 +6,6 @@ stages:
   - lib-installer
   - lib-deploy
   - lib-delivery
-  - lib-delivery-stable
-  - apps-build
-  - apps-installer
-  - apps-delivery
-  - apps-delivery-stable
 
 # Define ingescape library files
 .lib-build-files:
@@ -24,19 +19,6 @@ stages:
       - dependencies/windows/unix/*
       - CMakeLists.txt
 
-# Define ingescape expe files
-.expe-build-files:
-  only:
-    changes:
-      - .gitlab-ci.yml
-      - src/**/*
-      - builds/cmake/**/*
-      - dependencies/yajl/**/*
-      - dependencies/unix/*
-      - dependencies/windows/unix/*
-      - applications/frameworks/**/*
-      - applications/apps/IngeScape-Common/**/*
-      - applications/apps/IngeScape-Expe/**/*
 
 #http://patorjk.com/software/taag/#p=display&f=Big&t=Windows
 #                       ____   _____
@@ -117,50 +99,6 @@ lib-deploy-macos:
     refs:
     - master
     - stable
-
-
-# Build ingescape expe for macos
-expe-build-macos:
-  extends: .expe-build-files
-  stage: apps-build
-  variables:
-    GIT_SUBMODULE_STRATEGY: recursive
-  tags:
-    - osx
-  script:
-    - git clean -xfd
-    - mkdir -p applications/apps/IngeScape-Expe/build
-    - cmake -S applications/apps/IngeScape-Expe/ -B applications/apps/IngeScape-Expe/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.15.0/clang_64/;$HOME/builds/sysroot/usr/local/" -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
-    - make -j8 -C applications/apps/IngeScape-Expe/build
-#    - 'codesign --force --deep --sign  "Developer ID Application: Ingenuity i/o (56DRT9MG9S)" -v applications/apps/IngeScape-Expe/build/IngeScape-Expe.app'
-    - mkdir -p $HOME/builds/sysroot/Applications/
-    - rm -Rf $HOME/builds/sysroot/Applications/IngeScape-Expe.app
-    - cp -Rf applications/apps/IngeScape-Expe/build/IngeScape-Expe.app $HOME/builds/sysroot/Applications/
-  artifacts:
-    paths:
-      - applications/apps/IngeScape-Expe/build
-    name: "expe-build-macos"
-    expire_in: 1 day
-  dependencies: []
-
-
-
-# Create expe installer
-expe-installer-macos:
-  extends: .expe-build-files
-  stage: apps-installer
-  tags:
-    - osx
-  script:
-    - make -C applications/apps/IngeScape-Expe/build package
-  #  - make -C applications/apps/IngeScape-Expe/build package_source
-  artifacts:
-    paths:
-      - applications/apps/IngeScape-Expe/build/IngeScape-Expe-*.dmg
-    name: "expe-installer-macos"
-  dependencies:
-    - expe-build-macos
-
 
 
 #__          ___           _
@@ -251,49 +189,6 @@ lib-windows-debug-x86:
     expire_in: 1 day
   dependencies: []
 
-# Create ingescape expe for windows (x86)
-expe-windows-release-x86:
-  extends: .expe-build-files
-  stage: apps-build
-  variables:
-    Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.15.0\\msvc2019\\lib\\cmake\\Qt5
-    GIT_SUBMODULE_STRATEGY: recursive
-    ARCH: "Expe_x86"
-  tags:
-    - windows
-  script:
-    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
-    - mkdir applications\apps\IngeScape-Expe\build\ReleaseX86
-    - cmake applications\apps\IngeScape-Expe\ -B applications\apps\IngeScape-Expe\build\ReleaseX86 -G"$env:CURRENT_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
-    - cmake --build applications\apps\IngeScape-Expe\build\ReleaseX86 --target ALL_BUILD --config Release
-  artifacts:
-    paths:
-      - applications\apps\IngeScape-Expe\build
-    name: "expe-windows-release-x86"
-    expire_in: 1 day
-  dependencies: []
-
-# Create ingescape expe for windows (x64)
-expe-windows-release-x64:
-  extends: .expe-build-files
-  stage: apps-build
-  variables:
-    Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.15.0\\msvc2019_64\\lib\\cmake\\Qt5
-    GIT_SUBMODULE_STRATEGY: recursive
-    ARCH: "Expe_x64"
-  tags:
-    - windows
-  script:
-    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
-    - mkdir applications\apps\IngeScape-Expe\build\ReleaseX64
-    - cmake applications\apps\IngeScape-Expe\ -B applications\apps\IngeScape-Expe\build\ReleaseX64 -G"$env:CURRENT_CMAKE_GENERATOR Win64" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
-    - cmake --build applications\apps\IngeScape-Expe\build\ReleaseX64 --target ALL_BUILD --config Release
-  artifacts:
-    paths:
-      - applications\apps\IngeScape-Expe\build
-    name: "expe-windows-release-x64"
-    expire_in: 1 day
-  dependencies: []
 
 # Create runtime install for windows 32 bits
 lib-installer-runtime-windows-x86:
@@ -375,43 +270,6 @@ lib-installer-debug-windows-x64:
   dependencies:
     - lib-windows-debug-x64
 
-# Create expe install for windows 32 bits
-expe-installer-windows-x86:
-  extends: .expe-build-files
-  stage: apps-installer
-  variables:
-    ARCH: "Expe_x86"
-  tags:
-    - windows
-  script:
-    - cd applications\apps\IngeScape-Expe\build\ReleaseX86
-    - cpack --config CPackConfig.cmake
-    - cd ..\..\..\..\..
-  artifacts:
-    paths:
-      - applications\apps\IngeScape-Expe\build\ReleaseX86\IngeScape-Expe-*
-    name: "expe-installer-windows-x86"
-  dependencies:
-    - expe-windows-release-x86
-
-# Create expe install for windows 64 bits
-expe-installer-windows-x64:
-  extends: .expe-build-files
-  stage: apps-installer
-  variables:
-    ARCH: "Expe_x64"
-  tags:
-    - windows
-  script:
-    - cd applications\apps\IngeScape-Expe\build\ReleaseX64
-    - cpack --config CPackConfig.cmake
-    - cd ..\..\..\..\..
-  artifacts:
-    paths:
-      - applications\apps\IngeScape-Expe\build\ReleaseX64\IngeScape-Expe-*
-    name: "expe-installer-windows-x64"
-  dependencies:
-    - expe-windows-release-x64
 
 # Deploy ingescape in windows to be able to compile agents
 lib-deploy-windows:
@@ -733,93 +591,10 @@ lib-delivery-all:
       - master
       - stable
 
-# Deliver installers so they can be downloaded from the website
-assessments-delivery-all:
-  extends: .assessments-build-files
-  stage: apps-delivery
-  tags:
-    - docker
-  image: ingescape/alpine-deployment
-  script:
-    - echo "Setting up SSH"
-    - mkdir -p ~/.ssh/
-    - echo ${SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
-    - umask 077
-    - echo ${SSH_SECRET} | base64 -d > ssh_secret
-    - umask 022
-    - echo "Deliver Mac OS x64 assessments"
-    - mkdir --parents assessments/macos
-    - mv applications/apps/IngeScape-Assessments/build/IngeScape-Assessments-*
-         assessments/macos/
-    - ls assessments/macos/ | grep -v 'latest_delivery' > assessments/macos/latest_delivery
-    - echo "Deliver Windows x86 assessments"
-    - mkdir --parents assessments/win32
-    - mv applications/apps/IngeScape-Assessments/build/ReleaseX86/IngeScape-Assessments-*
-         assessments/win32/
-    - ls assessments/win32/ | grep -v 'latest_delivery' > assessments/win32/latest_delivery
-    - echo "Deliver Windows x64 assessments"
-    - mkdir --parents assessments/win64
-    - mv applications/apps/IngeScape-Assessments/build/ReleaseX64/IngeScape-Assessments-*
-         assessments/win64/
-    - ls assessments/win64/ | grep -v 'latest_delivery' > assessments/win64/latest_delivery
-    - echo "Synchronization"
-    - rsync --rsh="ssh -i ssh_secret" --recursive assessments ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
-  dependencies:
-    - assessments-installer-macos
-    - assessments-installer-windows-x86
-    - assessments-installer-windows-x64
-  only:
-    refs:
-      - master
-      - stable
-
-# Deliver installers so they can be downloaded from the website
-expe-delivery-all:
-  extends: .expe-build-files
-  stage: apps-delivery
-  tags:
-    - docker
-  image: ingescape/alpine-deployment
-  script:
-    - echo "Setting up SSH"
-    - mkdir -p ~/.ssh/
-    - echo ${SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
-    - umask 077
-    - echo ${SSH_SECRET} | base64 -d > ssh_secret
-    - umask 022
-    - echo "Deliver Mac OS x64 expe"
-    - mkdir --parents expe/macos
-    - mv applications/apps/IngeScape-Expe/build/IngeScape-Expe-*
-         expe/macos/
-    - ls expe/macos/ | grep -v 'latest_delivery' > expe/macos/latest_delivery
-    - echo "Deliver Windows x86 expe"
-    - mkdir --parents expe/win32
-    - mv applications/apps/IngeScape-Expe/build/ReleaseX86/IngeScape-Expe-*
-         expe/win32/
-    - ls expe/win32/ | grep -v 'latest_delivery' > expe/win32/latest_delivery
-    - echo "Deliver Windows x64 expe"
-    - mkdir --parents expe/win64
-    - mv applications/apps/IngeScape-Expe/build/ReleaseX64/IngeScape-Expe-*
-         expe/win64/
-    - ls expe/win64/ | grep -v 'latest_delivery' > expe/win64/latest_delivery
-    - echo "Synchronization"
-    - rsync --rsh="ssh -i ssh_secret" --recursive expe ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
-  dependencies:
-    - expe-installer-macos
-    - expe-installer-windows-x86
-    - expe-installer-windows-x64
-  only:
-    refs:
-      - master
-      - stable
-
 
 # Deliver installers so they can be downloaded from the website
 lib-delivery-all-stable:
-  only:
-    refs:
-      - stable
-  stage: lib-delivery-stable
+  stage: lib-delivery
   tags:
     - docker
   image: ingescape/alpine-deployment
@@ -892,79 +667,6 @@ lib-delivery-all-stable:
     - lib-installer-linux-x64
     - lib-installer-runtime-linux-armhf
     - lib-installer-runtime-android-armv7a-softfp
-
-# Deliver installers so they can be downloaded from the website
-assessments-delivery-all-stable:
   only:
     refs:
       - stable
-  stage: apps-delivery
-  tags:
-    - docker
-  image: ingescape/alpine-deployment
-  script:
-    - echo "Setting up SSH"
-    - mkdir -p ~/.ssh/
-    - echo ${STABLE_SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
-    - umask 077
-    - echo ${STABLE_SSH_SECRET} | base64 -d > ssh_secret
-    - umask 022
-    - echo "Deliver Mac OS x64 assessments"
-    - mkdir --parents assessments/macos
-    - mv applications/apps/IngeScape-Assessments/build/IngeScape-Assessments-*
-         assessments/macos/
-    - ls assessments/macos/ | grep -v 'latest_delivery' > assessments/macos/latest_delivery
-    - echo "Deliver Windows x86 assessments"
-    - mkdir --parents assessments/win32
-    - mv applications/apps/IngeScape-Assessments/build/ReleaseX86/IngeScape-Assessments-*
-         assessments/win32/
-    - ls assessments/win32/ | grep -v 'latest_delivery' > assessments/win32/latest_delivery
-    - echo "Deliver Windows x64 assessments"
-    - mkdir --parents assessments/win64
-    - mv applications/apps/IngeScape-Assessments/build/ReleaseX64/IngeScape-Assessments-*
-         assessments/win64/
-    - ls assessments/win64/ | grep -v 'latest_delivery' > assessments/win64/latest_delivery
-    - echo "Synchronization"
-    - rsync --rsh="ssh -i ssh_secret" --recursive assessments ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST}:${STABLE_DELIVERY_DESTINATION}
-  dependencies:
-    - assessments-installer-macos
-    - assessments-installer-windows-x86
-    - assessments-installer-windows-x64
-
-# Deliver installers so they can be downloaded from the website
-expe-delivery-all-stable:
-  only:
-    refs:
-      - stable
-  stage: apps-delivery
-  tags:
-    - docker
-  image: ingescape/alpine-deployment
-  script:
-    - echo "Setting up SSH"
-    - mkdir -p ~/.ssh/
-    - echo ${STABLE_SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
-    - umask 077
-    - echo ${STABLE_SSH_SECRET} | base64 -d > ssh_secret
-    - umask 022
-    - echo "Deliver Mac OS x64 expe"
-    - mkdir --parents expe/macos
-    - mv applications/apps/IngeScape-Expe/build/IngeScape-Expe-*
-         expe/macos/
-    - ls expe/macos/ | grep -v 'latest_delivery' > expe/macos/latest_delivery
-    - echo "Deliver Windows x86 expe"
-    - mkdir --parents expe/win32
-    - mv applications/apps/IngeScape-Expe/build/ReleaseX86/IngeScape-Expe-*
-         expe/win32/
-    - ls expe/win32/ | grep -v 'latest_delivery' > expe/win32/latest_delivery
-    - echo "Deliver Windows x64 expe"
-    - mkdir --parents expe/win64
-    - mv applications/apps/IngeScape-Expe/build/ReleaseX64/IngeScape-Expe-*
-         expe/win64/
-    - ls expe/win64/ | grep -v 'latest_delivery' > expe/win64/latest_delivery
-    - echo "Synchronization"
-    - rsync --rsh="ssh -i ssh_secret" --recursive expe ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST}:${STABLE_DELIVERY_DESTINATION}
-  dependencies:
-    - expe-installer-macos
-    - expe-installer-windows-x86
-    - expe-installer-windows-x64
