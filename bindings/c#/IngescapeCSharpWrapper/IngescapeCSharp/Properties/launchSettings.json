@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "IngescapeCSharp": {
-      "commandName": "Project",
-      "nativeDebugging": true
-    }
-  }
-}

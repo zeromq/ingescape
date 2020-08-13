@@ -1,9 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>qml/main.qml</file>
-        <file>qml/MyItem.qml</file>
-        <file>qml/images/background.png</file>
-        <file>qml/images/pinwheel.png</file>
-        <file>qml/images/pole.png</file>
-    </qresource>
-</RCC>
