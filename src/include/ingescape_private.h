@@ -310,7 +310,14 @@ typedef struct igs_core_context{
     igs_freeze_callback_t *freezeCallbacks;
     igs_external_stop_calback_t *externalStopCalbacks;
     zlist_t *brokers;
+    char *advertisedEndpoint;
     char *ourBrokerEndpoint;
+    
+    //security
+    bool security_isEnabled;
+    zactor_t *security_auth;
+    zcert_t *security_cert;
+    char *security_publicKeysDirectory;
     
     //performance
     size_t performanceMsgCounter;

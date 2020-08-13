@@ -18,11 +18,9 @@ extern "C" {
 
 #define MAX_STRING_MSG_LENGTH 4096
 
-//////////////////////////////////////////////////
-// Advanced admin functions
 
-/*
- Brokers vs. self-discovery
+//////////////////////////////////////////////////
+/*BROKERS VS. SELF-DISCOVERY
  
  igs_startWithDevice and igs_startWithIP enable the agents to self-discover
  using UDP broadcast messages on the passed port. UDP broadcast messages can
@@ -33,36 +31,77 @@ extern "C" {
  simply have to use a list of broker endpoints. One broker is enough but
  several brokers can be set for robustness.
  
- For clarity, it is better is brokers are running permanently on your platform,
- are run before any other agent using them, and serve only as brokers. But any
- other architecture is permitted.
+ For clarity, it is better if brokers are well identified on your platform,
+ started before any agent, and serve only as brokers. But any other architecture
+ is permitted and brokers can be restarted at any time.
  
  Endpoints have the form tcp://ip_address:port
- • A broker endpoint in igs_brokerAdd is used to connect to a given broker.
- • The endpoint in igs_setAsBroker is the broker address we should be reached at.
+ • A broker endpoint in igs_brokerAdd is used to connect to a given broker. Add
+ as many brokers as you want. At least one declared broker is necessary to
+ use igs_startWithBrokers.
+ • The endpoint in igs_setAsBroker is the broker address we should be reached
+ at as a broker if we want to be one. Using igs_setAsBroker makes us a broker
+ when starting.
+ • The endpoint in igs_brokerAdvertiseEndpoint replaces the one declared in
+ igs_startWithBrokers for the registration to the brokers. This function enables
+ passing through NAT and using a public address. Attention: this public address
+ shall make sense to all the agents that will connect to us, independently from
+ their local network.
  • Our agent endpoint in igs_startWithBrokers gives the address and port our
  agent can be reached at. This endpoint must be valid in the actual network
  configuration.
  */
-
-//add a broker endpoint to our list, at least one declared broker is necessary to
-//use igs_startWithBrokers.
 PUBLIC void igs_brokerAdd(const char *brokerEndpoint);
-//optionally declare ourselves as a broker with our own endpoint
 PUBLIC void igs_enableAsBroker(const char *ourBrokerEndpoint);
+PUBLIC void igs_brokerAdvertiseEndpoint(const char *advertisedEndpoint); //parameter can be NULL
 PUBLIC igs_result_t igs_startWithBrokers(const char *agentEndpoint);
-    
-//network configuration
+
+
+//////////////////////////////////////////////////
+/* SECURITY
+ Security is about authentification of other agents and encrypted communications.
+ Both are offered by Ingescape using a public/private keys mechanism relying on ZeroMQ.
+ Security is activated optionally.
+ • If public/private keys are generated on the fly, one obtains the same protection as TLS
+ for HTTPS communications. Thirdparties cannot steal identities and communications are
+ encrypted end-to-end. But any Ingescape agent with security enabled can join a platform.
+ • If public/private keys are stored locally by each agent, no thirdparty can join a platform
+ without having a public key that is well-known by the other agents. This is safer but requires
+ securing and synchronizing local files with each agent accessing its private key and public
+ keys of other agents.
+ 
+ Security is enabled by calling igs_enableSecurity.
+ • If privateKey is NULL, our private key is generated on the fly and any agent with
+ security enabled will be able to connect, publicKeysDirectory will be ignored.
+ • If privateKey is NOT NULL, private key at privateKey path will be used and only
+ agents whose public keys are in publicKeysDirectory will be able to connect.
+ NB: if privateKey is NOT NULL and publicKeysDirectory is NULL or does not exist,
+ security will not be enabled and our agent will not start.
+*/
+PUBLIC igs_result_t igs_enableSecurity(const char *privateKey, const char *publicKeysDirectory);
+
+
+//////////////////////////////////////////////////
+// Advanced admin functions
+
+//NETWORK CONFIGURATION
 PUBLIC void igs_setPublishingPort(unsigned int port);
 PUBLIC void igs_setLogStreamPort(unsigned int port);
 PUBLIC void igs_setDiscoveryInterval(unsigned int interval); //in milliseconds
 PUBLIC void igs_setAgentTimeout(unsigned int duration); //in milliseconds
 PUBLIC void igs_raiseSocketsLimit(void); //UNIX only, to be called before any ingescape or ZeroMQ activity
+//Set high water marks (HWM) for the publish/subscribe sockets.
+//Setting HWM to 0 means that they are disabled.
+PUBLIC void igs_setHighWaterMarks(int hwmValue);
 
+
+//PERFORMANCE CHECK
 //sends number of messages with defined size and displays performance
 //information when finished (information displayed as INFO-level log)
 PUBLIC void igs_performanceCheck(const char *peerId, size_t msgSize, size_t nbOfMsg);
 
+
+//TIMERS
 //Timers can be created to call code a certain number of times,
 //each time after a certain delay. 0 times means repeating forever.
 //Timers must be created after starting an agent.
@@ -70,10 +109,8 @@ typedef void (igs_timerCallback) (int timerId, void *myData);
 PUBLIC int igs_timerStart(size_t delay, size_t times, igs_timerCallback cb, void *myData); //returns timer id or -1 if error
 PUBLIC void igs_timerStop(int timerId);
 
-//Set high water marks (HWM) for the publish/subscribe sockets.
-//Setting HWM to 0 means that they are disabled.
-PUBLIC void igs_setHighWaterMarks(int hwmValue);
 
+//NETWORK MONITORING
 //IngeScape provides an integrated monitor to detect events relative to the network
 //Warning: once igs_monitoringEnable has been called, igs_monitoringDisable must be
 //called to actually stop the monitor. If not stopped, it may cause an error when
@@ -97,13 +134,19 @@ PUBLIC void igs_monitor(igs_monitorCallback cb, void *myData);
 
 
 //////////////////////////////////////////////////
-// Data serialization using ZeroMQ
+// DATA SERIALIZATION using ZeroMQ
+/*
+ These two functions enable sending and receiving on DATA
+ inputs/outputs by using zmsg_t structures. zmsg_t structures
+ offer advanced functionalities for data serialization.
+ More can be found here: http://czmq.zeromq.org/manual:zmsg
+ */
 PUBLIC igs_result_t igs_writeOutputAsZMQMsg(const char *name, zmsg_t *msg);
 PUBLIC igs_result_t igs_readInputAsZMQMsg(const char *name, zmsg_t **msg); //msg must be freed by caller using zmsg_destroy
 
 
 //////////////////////////////////////////////////
-// Bus channels
+// BUS channels
 typedef void (*igs_BusMessageIncoming) (const char *event, const char *peerID, const char *peerName,
                                         const char *address, const char *channel,
                                         zhash_t *headers, zmsg_t *msg, void *myData);
@@ -128,7 +171,7 @@ PUBLIC igs_result_t igs_busRemoveServiceDescription(const char *key);
 
 
 //////////////////////////////////////////////////
-//Calls : create, remove, call, react
+//CALLS : create, remove, call, react
 /*NOTES:
  - one and only one mandatory callback per call, set using igs_handleCall : generates warning if cb missing when loading definition or receiving call
  - one optional reply per call
@@ -178,7 +221,7 @@ typedef void (*igs_callFunction)(const char *senderAgentName, const char *sender
                                  void* myData);
 
 
-//MANAGE calls supported by our agent
+//Manage calls supported by our agent
 //Calls can be created either by code or by loading a definition. The function below will
 //create a call if it does not exist or will attach callback and data if they are
 //stil undefined. Warning: only one callback can be attached to a call (further attempts
@@ -189,7 +232,7 @@ PUBLIC igs_result_t igs_addArgumentToCall(const char *callName, const char *argN
 PUBLIC igs_result_t igs_removeArgumentFromCall(const char *callName, const char *argName); //removes first occurence with this name
 
 
-//MANAGE optional reply
+//Manage optional reply
 //NB: a reply can be seen as a subcall used to answer to sender upon call reception.
 //PUBLIC int igs_addReplyToCall(const char *callName, const char *replyName);
 //PUBLIC int igs_addArgumentToReplyForCall(const char *callName, const char *argName, iopType_t type);
@@ -299,10 +342,6 @@ PUBLIC igsJSONTreeNode_t* igs_JSONTreeGetNodeAtPath(igsJSONTreeNode_t *node, con
 PUBLIC bool igs_JSONTreeIsValueAnInteger(igsJSONTreeNode_t *value);
 PUBLIC bool igs_JSONTreeIsValueADouble(igsJSONTreeNode_t *value);
 
-
-//////////////////////////////////////////////////
-//security
-//TODO when officially supported in Zyre 2.x.x
 
 #ifdef __cplusplus
 }

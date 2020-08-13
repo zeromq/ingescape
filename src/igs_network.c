@@ -69,6 +69,8 @@
     PIP_ADAPTER_UNICAST_ADDRESS pUnicast = NULL;
 #endif
 
+#define IGS_DEFAULT_SECURITY_DIRECTORY "*"
+
 //global parameters
 //prefixes for sending definitions and mappings through zyre
 static const char *definitionPrefix = "EXTERNAL_DEFINITION#";
@@ -663,13 +665,23 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             if (s > 0){
                 igs_debug("Handling headers for agent %s", name);
             }
-            while ((k = (char *)zlist_pop(keys))) {
+            
+            const char *peerPublicKey = NULL;
+            k = zlist_first(keys);
+            while(k){
+                if (streq(k, "X-PUBLICKEY")){
+                    peerPublicKey = zyre_event_header (zyre_event,k);
+                }
+                k = zlist_next(keys);
+            }
+            
+            k = zlist_first(keys);
+            while(k){
                 v = zyre_event_header (zyre_event,k);
                 igs_debug("\t%s -> %s", k, v);
                 
                 // we extract the publisher adress to subscribe to from the zyre message header
-                if(strncmp(k,"publisher", strlen("publisher")) == 0)
-                {
+                if(streq(k,"publisher")){
                     char endpointAddress[128];
                     strncpy(endpointAddress, address, 127);
                     
@@ -738,6 +750,11 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                             igs_debug("Subscription created for %s at %s (tcp)",zyrePeer->name, endpointAddress);
                         }
                         assert(zyrePeer->subscriber);
+                        if (context->security_isEnabled){
+                            assert(peerPublicKey);
+                            zcert_apply(context->security_cert, zyrePeer->subscriber);
+                            zsock_set_curve_serverkey (zyrePeer->subscriber, peerPublicKey);
+                        }
                         zloop_reader(loop, zyrePeer->subscriber, manageRemotePublication, context);
                         zloop_reader_set_tolerant (loop, zyrePeer->subscriber);
 #if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
@@ -756,7 +773,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
 #endif
                     }
                 }
-                free(k);
+                k = zlist_next(keys);
             }
             zlist_destroy(&keys);
             agent_propagateAgentEvent(IGS_PEER_ENTERED, peer, name);
@@ -1016,10 +1033,10 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 if (isAgentNew){
                     agent_propagateAgentEvent(IGS_AGENT_ENTERED, uuid, remoteAgentName);
                     bus_zyreLock();
-                    zmsg_t *msg = zmsg_new();
-                    zmsg_addstr(msg, "PEER_KNOWS_YOU");
-                    zmsg_addstr(msg, uuid);
-                    zyre_whisper(node, peer, &msg);
+                    zmsg_t *msgKnow = zmsg_new();
+                    zmsg_addstr(msgKnow, "PEER_KNOWS_YOU");
+                    zmsg_addstr(msgKnow, uuid);
+                    zyre_whisper(node, peer, &msgKnow);
                     bus_zyreUnlock();
                 }else{
                     agent_propagateAgentEvent(IGS_AGENT_UPDATED_DEFINITION, uuid, remoteAgentName);
@@ -2148,6 +2165,22 @@ static void runLoop (zsock_t *mypipe, void *args){
     assert(context->inprocPublisher);
 #endif
     
+    if (context->security_isEnabled){
+        char publicKeysDirectory[IGS_MAX_PATH_LENGTH] = "";
+        admin_makeFilePath(context->security_publicKeysDirectory, publicKeysDirectory, IGS_MAX_PATH_LENGTH);
+        assert(!context->security_auth);
+        context->security_auth = zactor_new (zauth, NULL);
+        assert(context->security_auth);
+        assert(zstr_send(context->security_auth, "VERBOSE") == 0);
+        assert(zsock_wait(context->security_auth) >= 0);
+//        assert(zstr_sendx(context->security_auth, "ALLOW", ip_address1, ip_address2, ..., NULL) == 0);
+//        assert(zsock_wait(context->security_auth) >= 0);
+        assert(zstr_sendx(context->security_auth, "CURVE", publicKeysDirectory, NULL) == 0);
+        assert(zsock_wait(context->security_auth) >= 0);
+        zyre_set_zcert(context->node, context->security_cert);
+        zyre_set_zap_domain(context->node, "INGESCAPE");
+    }
+    
     //iterate on agents to avoid sending definition and mapping update at startup
     //to all peers (they will receive def & map when joining INGESCAPE_PRIVATE)
     igs_agent_t *agent, *tmp;
@@ -2262,6 +2295,8 @@ static void runLoop (zsock_t *mypipe, void *args){
         free(context->network_ipcEndpoint);
         context->network_ipcEndpoint = NULL;
     }
+    if (coreContext->security_auth)
+        zactor_destroy(&(coreContext->security_auth));
     
     igs_debug("loop stopped");
     zstr_send(mypipe, "LOOP_STOPPED");
@@ -2308,12 +2343,18 @@ void initLoop (igs_core_context_t *context){
         //zyre_set_verbose(context->node);
         char *broker = zlist_first(context->brokers);
         while (broker) {
-            zyre_gossip_connect(context->node, "%s", broker);
+            if (context->security_isEnabled){
+                zyre_gossip_connect_curve(context->node, zcert_public_txt(context->security_cert), "%s", broker);
+            }else{
+                zyre_gossip_connect(context->node, "%s", broker);
+            }
             broker = zlist_next(context->brokers);
         }
         zyre_set_endpoint(context->node, "%s", context->ourAgentEndpoint);
         if (context->ourBrokerEndpoint)
             zyre_gossip_bind(context->node, "%s", context->ourBrokerEndpoint);
+        if (context->advertisedEndpoint)
+            zyre_set_advertised_endpoint(context->node, context->advertisedEndpoint);
         bus_zyreUnlock();
     }else{
         bus_zyreLock();
@@ -2365,20 +2406,20 @@ void initLoop (igs_core_context_t *context){
         snprintf(endpoint, 512, "tcp://%s:%d", context->ipAddress, context->network_publishingPort);
     }
     context->publisher = zsock_new_pub(endpoint);
-    if (context->publisher == NULL){
-        igs_error("could not create publishing socket (%s): Ingescape will interrupt immediately.", endpoint);
-        canContinue = false;
-    }else{
-        zsock_set_sndhwm(context->publisher, context->network_hwmValue);
-        strncpy(endpoint, zsock_endpoint(context->publisher), 256);
-        char *insert = endpoint + strlen(endpoint) - 1;
-        while (*insert != ':' && insert > endpoint) {
-            insert--;
-        }
-        bus_zyreLock();
-        zyre_set_header(context->node, "publisher", "%s", insert + 1);
-        bus_zyreUnlock();
+    assert(context->publisher);
+    if (context->security_isEnabled){
+        zcert_apply(context->security_cert, context->publisher);
+        zsock_set_curve_server (context->publisher, 1);
     }
+    zsock_set_sndhwm(context->publisher, context->network_hwmValue);
+    strncpy(endpoint, zsock_endpoint(context->publisher), 256);
+    char *insert = endpoint + strlen(endpoint) - 1;
+    while (*insert != ':' && insert > endpoint) {
+        insert--;
+    }
+    bus_zyreLock();
+    zyre_set_header(context->node, "publisher", "%s", insert + 1);
+    bus_zyreUnlock();
 
     //start ipc publisher
 #if defined __unix__ || (defined __APPLE__ && ! TARGET_OS_IOS) || defined __linux__
@@ -2399,27 +2440,28 @@ void initLoop (igs_core_context_t *context){
     sprintf(context->network_ipcEndpoint, "ipc://%s/%s", context->network_ipcFolderPath, zyre_uuid(context->node));
     bus_zyreUnlock();
     context->ipcPublisher = zsock_new_pub(context->network_ipcEndpoint);
-    if (context->ipcPublisher == NULL){
-        igs_error("Could not create IPC publishing socket '%s'", context->network_ipcEndpoint);
-        canContinue = false;
-    }else{
-        zsock_set_sndhwm(context->ipcPublisher, context->network_hwmValue);
-        bus_zyreLock();
-        zyre_set_header(context->node, "ipc", "%s", context->network_ipcEndpoint);
-        bus_zyreUnlock();
+    assert(context->ipcPublisher);
+    if (context->security_isEnabled){
+        zcert_apply(context->security_cert, context->ipcPublisher);
+        zsock_set_curve_server (context->ipcPublisher, 1);
     }
+    zsock_set_sndhwm(context->ipcPublisher, context->network_hwmValue);
+    bus_zyreLock();
+    zyre_set_header(context->node, "ipc", "%s", context->network_ipcEndpoint);
+    bus_zyreUnlock();
+    
 #elif (defined WIN32 || defined _WIN32)
     context->network_ipcEndpoint = strdup("tcp://127.0.0.1:*");
     zsock_t *ipcPublisher = context->ipcPublisher = zsock_new_pub(context->network_ipcEndpoint);
-    if (ipcPublisher == NULL){
-        igs_error("Could not create loopback publishing socket (%s)", context->network_ipcEndpoint);
-        canContinue = false;
-    }else{
-        zsock_set_sndhwm(context->ipcPublisher, context->network_hwmValue);
-        bus_zyreLock();
-        zyre_set_header(context->node, "loopback", "%s", zsock_endpoint(ipcPublisher));
-        bus_zyreUnlock();
+    assert(context->ipcPublisher);
+    if (context->security_isEnabled){
+        zcert_apply(context->security_cert, context->ipcPublisher);
+        zsock_set_curve_server (context->ipcPublisher, 1);
     }
+    zsock_set_sndhwm(context->ipcPublisher, context->network_hwmValue);
+    bus_zyreLock();
+    zyre_set_header(context->node, "loopback", "%s", zsock_endpoint(ipcPublisher));
+    bus_zyreUnlock();
 #endif
     
     //start inproc publisher
@@ -2429,15 +2471,15 @@ void initLoop (igs_core_context_t *context){
     sprintf(inprocEndpoint, "inproc://%s", zyre_uuid(context->node));
     bus_zyreUnlock();
     context->inprocPublisher = zsock_new_pub(inprocEndpoint);
-    if (context->inprocPublisher == NULL){
-        igs_error("Could not create inproc publishing socket (%s)", inprocEndpoint);
-        canContinue = false;
-    }else{
-        zsock_set_sndhwm(context->inprocPublisher, context->network_hwmValue);
-        bus_zyreLock();
-        zyre_set_header(context->node, "inproc", "%s", inprocEndpoint);
-        bus_zyreUnlock();
+    assert(context->inprocPublisher);
+    if (context->security_isEnabled){
+        zcert_apply(context->security_cert, context->inprocPublisher);
+        zsock_set_curve_server (context->inprocPublisher, 1);
     }
+    zsock_set_sndhwm(context->inprocPublisher, context->network_hwmValue);
+    bus_zyreLock();
+    zyre_set_header(context->node, "inproc", "%s", inprocEndpoint);
+    bus_zyreUnlock();
     free(inprocEndpoint);
 #endif
     
@@ -2449,20 +2491,20 @@ void initLoop (igs_core_context_t *context){
             sprintf(endpoint, "tcp://%s:%d", context->ipAddress, context->network_logStreamPort);
         }
         context->logger = zsock_new_pub(endpoint);
-        if (context->logger == NULL){
-            igs_error("Could not create log stream socket (%s): Ingescape will interrupt immediately.", endpoint);
-            canContinue = false;
-        } else {
-            zsock_set_sndhwm(context->logger, context->network_hwmValue);
-            strncpy(endpoint, zsock_endpoint(context->logger), 256);
-            char *insert = endpoint + strlen(endpoint) - 1;
-            while (*insert != ':' && insert > endpoint) {
-                insert--;
-            }
-            bus_zyreLock();
-            zyre_set_header(context->node, "logger", "%s", insert + 1);
-            bus_zyreUnlock();
+        assert(context->logger);
+        if (context->security_isEnabled){
+            zcert_apply(context->security_cert, context->logger);
+            zsock_set_curve_server (context->logger, 1);
         }
+        zsock_set_sndhwm(context->logger, context->network_hwmValue);
+        strncpy(endpoint, zsock_endpoint(context->logger), 256);
+        char *insertPoint = endpoint + strlen(endpoint) - 1;
+        while (*insertPoint != ':' && insertPoint > endpoint) {
+            insertPoint--;
+        }
+        bus_zyreLock();
+        zyre_set_header(context->node, "logger", "%s", insertPoint + 1);
+        bus_zyreUnlock();
     }
 
 #if defined __unix__ || defined __APPLE__ || defined __linux__
@@ -2797,6 +2839,20 @@ void igs_enableAsBroker(const char *ourBrokerEndpoint){
     if (coreContext->ourBrokerEndpoint)
         free(coreContext->ourBrokerEndpoint);
     coreContext->ourBrokerEndpoint = strdup(ourBrokerEndpoint);
+}
+
+void igs_brokerAdvertiseEndpoint(const char *advertisedEndpoint){
+    core_initContext();
+    if (coreContext->advertisedEndpoint)
+        free(coreContext->advertisedEndpoint);
+    
+    if (advertisedEndpoint == NULL){
+        igs_info("endpoint advertisement is disabled");
+        coreContext->advertisedEndpoint = NULL;
+    }else{
+        coreContext->advertisedEndpoint = strdup(advertisedEndpoint);
+    }
+        
 }
 
 igs_result_t igs_startWithBrokers(const char *agentEndpoint){
@@ -3264,6 +3320,44 @@ void igs_observeExternalStop(igs_externalStopCallback cb, void *myData){
     newCb->callback_ptr = cb;
     newCb->myData = myData;
     DL_APPEND(coreContext->externalStopCalbacks, newCb);
+}
+
+igs_result_t igs_enableSecurity(const char *privateKey, const char *publicKeysDirectory){
+    core_initContext();
+    if (coreContext->security_cert)
+        zcert_destroy (&(coreContext->security_cert));
+    if (coreContext->security_publicKeysDirectory){
+        free(coreContext->security_publicKeysDirectory);
+        coreContext->security_publicKeysDirectory = NULL;
+    }
+    coreContext->security_isEnabled = false;
+    
+    if (privateKey){
+        char privateKeyPath[IGS_MAX_PATH_LENGTH] = "";
+        admin_makeFilePath(privateKey, privateKeyPath, IGS_MAX_PATH_LENGTH);
+        coreContext->security_cert = zcert_load(privateKeyPath);
+        if (!coreContext->security_cert){
+            igs_error("could not load private key at '%s'", privateKeyPath);
+            return IGS_FAILURE;
+        }
+        if (publicKeysDirectory){
+            char publicKeysPath[IGS_MAX_PATH_LENGTH] = "";
+            admin_makeFilePath(publicKeysDirectory, publicKeysPath, IGS_MAX_PATH_LENGTH);
+            if (!zsys_file_exists(publicKeysPath)){
+                igs_error("public keys directory '%s' does not exist", publicKeysPath);
+                return IGS_FAILURE;
+            }
+            coreContext->security_publicKeysDirectory = strndup(publicKeysPath, IGS_MAX_PATH_LENGTH);
+        }else{
+            igs_error("public keys directory cannot be NULL");
+            return IGS_FAILURE;
+        }
+    }else{
+        coreContext->security_cert = zcert_new();
+        coreContext->security_publicKeysDirectory = strndup(IGS_DEFAULT_SECURITY_DIRECTORY, IGS_MAX_PATH_LENGTH);
+    }
+    coreContext->security_isEnabled = true;
+    return IGS_SUCCESS;
 }
 
 void igs_setDiscoveryInterval(unsigned int interval){
