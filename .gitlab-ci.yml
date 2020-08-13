@@ -7,11 +7,6 @@ stages:
   - lib-deploy
   - lib-delivery
   - lib-delivery-stable
-  - binding-build
-  - binding-installer
-  - binding-deploy
-  - binding-delivery
-  - binding-delivery-stable
   - apps-build
   - apps-installer
   - apps-delivery
@@ -28,19 +23,6 @@ stages:
       - dependencies/unix/*
       - dependencies/windows/unix/*
       - CMakeLists.txt
-
-# Define csharp binding files
-.binding-build-files:
-  only:
-    changes:
-      - .gitlab-ci.yml
-      - src/**/*
-      - builds/cmake/**/*
-      - dependencies/yajl/**/*
-      - dependencies/unix/*
-      - dependencies/windows/unix/*
-      - CMakeLists.txt
-      - bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/**/*
 
 # Define ingescape editor files
 .editor-build-files:
@@ -83,7 +65,7 @@ stages:
       - applications/frameworks/**/*
       - applications/apps/IngeScape-Common/**/*
       - applications/apps/IngeScape-Expe/**/*
-      
+
 #http://patorjk.com/software/taag/#p=display&f=Big&t=Windows
 #                       ____   _____
 #                      / __ \ / ____|
@@ -91,7 +73,7 @@ stages:
 #| '_ ` _ \ / _` |/ __| |  | |\___ \
 #| | | | | | (_| | (__| |__| |____) |
 #|_| |_| |_|\__,_|\___|\____/|_____/
-                                    
+
 # Build library for macos
 lib-build-macos:
   extends: .lib-build-files
@@ -379,82 +361,6 @@ lib-windows-debug-x86:
     expire_in: 1 day
   dependencies: []
 
-binding-csharp-windows-x64:
-  extends: .binding-build-files
-  stage: binding-build
-  tags:
-    - windows
-  variables:
-    ARCH: "x64"
-  script:
-    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
-    - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64 -G"$env:CURRENT_CMAKE_GENERATOR Win64" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
-    - Powershell.exe -executionpolicy remotesigned bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64
-    - cmake --build bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64 --target IngescapeCSharp --config Release
-  artifacts:
-    paths:
-     - bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64
-    name: "binding-csharp-windows-x64"
-    expire_in: 1 day
-  dependencies: []
-
-binding-csharp-windows-x86:
-  extends: .binding-build-files
-  stage: binding-build
-  tags:
-    - windows
-  variables:
-    ARCH: "x86"
-  script:
-    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
-    - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86 -G"$env:CURRENT_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
-    - Powershell.exe -executionpolicy remotesigned bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86
-    - cmake --build bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86 --target IngescapeCSharp --config Release
-  artifacts:
-    paths:
-     - bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86
-    name: "binding-csharp-windows-x86"
-    expire_in: 1 day
-  dependencies: []
-
-binding-csharp-windows-x64-utf8:
-  extends: .binding-build-files
-  stage: binding-build
-  tags:
-    - windows
-  variables:
-    ARCH: "x64-utf8"
-  script:
-    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
-    - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64-UTF8 -G"$env:CURRENT_CMAKE_GENERATOR Win64" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID" -DUTF8_ENCODING=1
-    - Powershell.exe -executionpolicy remotesigned bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64-UTF8
-    - cmake --build bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64-UTF8 --target IngescapeCSharp --config Release
-  artifacts:
-    paths:
-     - bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64-UTF8
-    name: "binding-csharp-windows-x64-utf8"
-    expire_in: 1 day
-  dependencies: []
-
-binding-csharp-windows-x86-utf8:
-  extends: .binding-build-files
-  stage: binding-build
-  tags:
-    - windows
-  variables:
-    ARCH: "x86-utf8"
-  script:
-    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
-    - cmake -S bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/ -B bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86-UTF8 -G"$env:CURRENT_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID" -DUTF8_ENCODING=1
-    - Powershell.exe -executionpolicy remotesigned bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86-UTF8
-    - cmake --build bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86-UTF8 --target IngescapeCSharp --config Release
-  artifacts:
-    paths:
-     - bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86-UTF8
-    name: "binding-csharp-windows-x86-utf8"
-    expire_in: 1 day
-  dependencies: []
-
 # Create ingescape editor for windows
 editor-windows-release-x86:
   extends: .editor-build-files
@@ -665,86 +571,6 @@ lib-installer-debug-windows-x64:
   dependencies:
     - lib-windows-debug-x64
 
-# Create runtime install for windows 64 bits
-binding-csharp-installer-windows-x64:
-  extends: .binding-build-files
-  stage: binding-installer
-  variables:
-    ARCH: "x64"
-  tags:
-    - windows
-  script:
-    - cd "bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64"
-    - cpack --config CPackConfig.cmake
-    - cd ..\..\..\..\..\..
-  artifacts:
-    paths:
-      - bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64\IngescapeCSharp-*.exe
-      - bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64\IngescapeCSharp-*.zip
-    name: "binding-csharp-installer-windows-x64"
-  dependencies:
-    - binding-csharp-windows-x64
-
-# Create runtime install for windows 32 bits
-binding-csharp-installer-windows-x86:
-  extends: .binding-build-files
-  stage: binding-installer
-  variables:
-    ARCH: "x86"
-  tags:
-    - windows
-  script:
-    - cd "bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86"
-    - cpack --config CPackConfig.cmake
-    - cd ..\..\..\..\..\..
-  artifacts:
-    paths:
-      - bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86\IngescapeCSharp-*.exe
-      - bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86\IngescapeCSharp-*.zip
-    name: "binding-csharp-installer-windows-x86"
-  dependencies:
-    - binding-csharp-windows-x86
-
-    # Create runtime install for windows 64 bits
-binding-csharp-installer-windows-x64-utf8:
-  extends: .binding-build-files
-  stage: binding-installer
-  variables:
-    ARCH: "x64-utf8"
-  tags:
-    - windows
-  script:
-    - cd "bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64-UTF8"
-    - cpack --config CPackConfig.cmake
-    - cd ..\..\..\..\..\..
-  artifacts:
-    paths:
-      - bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64-UTF8\IngescapeCSharp-*.exe
-      - bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64-UTF8\IngescapeCSharp-*.zip
-    name: "binding-csharp-installer-windows-x64"
-  dependencies:
-    - binding-csharp-windows-x64-utf8
-
-# Create runtime install for windows 32 bits
-binding-csharp-installer-windows-x86-utf8:
-  extends: .binding-build-files
-  stage: binding-installer
-  variables:
-    ARCH: "x86-utf8"
-  tags:
-    - windows
-  script:
-    - cd "bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86-UTF8"
-    - cpack --config CPackConfig.cmake
-    - cd ..\..\..\..\..\..
-  artifacts:
-    paths:
-      - bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86-UTF8\IngescapeCSharp-*.exe
-      - bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86-UTF8\IngescapeCSharp-*.zip
-    name: "binding-csharp-installer-windows-x86"
-  dependencies:
-    - binding-csharp-windows-x86-utf8
-
 # Create editor install for windows 32 bits
 editor-installer-windows-x86:
   extends: .editor-build-files
@@ -879,74 +705,6 @@ lib-deploy-windows:
     - lib-windows-release-x86
     - lib-windows-debug-x64
     - lib-windows-debug-x86
-  only:
-    refs:
-      - master
-      - stable
-
-# Deploy ingescape binding in windows to be able to compile agents
-binding-deploy-windows-release-x64:
-  extends: .binding-build-files
-  stage: binding-deploy
-  variables:
-    ARCH: "x64"
-  tags:
-    - windows
-  script:
-    - copy bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64\Release\netstandard2.0\IngescapeCSharp.dll $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64\ -Force
-  dependencies:
-    - binding-csharp-windows-x64
-  only:
-    refs:
-      - master
-      - stable
-
-# Deploy ingescape binding in windows to be able to compile agents
-binding-deploy-windows-release-x86:
-  extends: .binding-build-files
-  stage: binding-deploy
-  variables:
-    ARCH: "x86"
-  tags:
-    - windows
-  script:
-    - copy bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86\Release\netstandard2.0\IngescapeCSharp.dll $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86\ -Force
-  dependencies:
-    - binding-csharp-windows-x86
-  only:
-    refs:
-      - master
-      - stable
-
-# Deploy ingescape binding in windows to be able to compile agents
-binding-deploy-windows-release-x64-utf8:
-  extends: .binding-build-files
-  stage: binding-deploy
-  variables:
-    ARCH: "x64-utf8"
-  tags:
-    - windows
-  script:
-    - copy bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64-UTF8\Release\netstandard2.0\IngescapeCSharp.dll $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64-utf8\ -Force
-  dependencies:
-    - binding-csharp-windows-x64-utf8
-  only:
-    refs:
-      - master
-      - stable
-
-# Deploy ingescape binding in windows to be able to compile agents
-binding-deploy-windows-release-x86-utf8:
-  extends: .binding-build-files
-  stage: binding-deploy
-  variables:
-    ARCH: "x86-utf8"
-  tags:
-    - windows
-  script:
-    - copy bindings\c#\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86-UTF8\Release\netstandard2.0\IngescapeCSharp.dll $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86-utf8\ -Force
-  dependencies:
-    - binding-csharp-windows-x86-utf8
   only:
     refs:
       - master
@@ -1369,54 +1127,6 @@ expe-delivery-all:
 
 
 # Deliver installers so they can be downloaded from the website
-binding-delivery-all:
-  extends: .binding-build-files
-  stage: binding-delivery
-  tags:
-    - docker
-  image: ingescape/alpine-deployment
-  script:
-    - echo "Setting up SSH"
-    - mkdir -p ~/.ssh/
-    - echo ${SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
-    - umask 077
-    - echo ${SSH_SECRET} | base64 -d > ssh_secret
-    - umask 022
-    - mv bindings _bindings
-    - echo "Deliver Windows x86 binding"
-    - mkdir --parents bindings/CSharp/win32
-    - mv _bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86/IngescapeCSharp-*
-         bindings/CSharp/win32/
-    - ls bindings/CSharp/win32/ | grep -v 'latest_delivery' > bindings/CSharp/win32/latest_delivery
-    - echo "Deliver Windows x64 binding"
-    - mkdir --parents bindings/CSharp/win64
-    - mv _bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64/IngescapeCSharp-*
-         bindings/CSharp/win64/
-    - ls bindings/CSharp/win64/ | grep -v 'latest_delivery' > bindings/CSharp/win64/latest_delivery
-
-    - echo "Deliver Windows x86 binding UTF8"
-    - mkdir --parents bindings/CSharp/win32-utf8
-    - mv _bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86-UTF8/IngescapeCSharp-*
-         bindings/CSharp/win32-utf8/
-    - ls bindings/CSharp/win32-utf8/ | grep -v 'latest_delivery' > bindings/CSharp/win32-utf8/latest_delivery
-    - echo "Deliver Windows x64 binding UTF8"
-    - mkdir --parents bindings/CSharp/win64-utf8
-    - mv _bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64-UTF8/IngescapeCSharp-*
-         bindings/CSharp/win64-utf8/
-    - ls bindings/CSharp/win64-utf8/ | grep -v 'latest_delivery' > bindings/CSharp/win64-utf8/latest_delivery
-    - echo "Synchronization"
-    - rsync --rsh="ssh -i ssh_secret" --recursive bindings ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
-  dependencies:
-    - binding-csharp-installer-windows-x64
-    - binding-csharp-installer-windows-x86
-    - binding-csharp-installer-windows-x64-utf8
-    - binding-csharp-installer-windows-x86-utf8
-  only:
-    refs:
-      - master
-      - stable
-
-# Deliver installers so they can be downloaded from the website
 lib-delivery-all-stable:
   only:
     refs:
@@ -1608,48 +1318,3 @@ expe-delivery-all-stable:
     - expe-installer-macos
     - expe-installer-windows-x86
     - expe-installer-windows-x64
-
-
-# Deliver installers so they can be downloaded from the website
-binding-delivery-all-stable:
-  only:
-    refs:
-      - stable
-  stage: binding-delivery
-  tags:
-    - docker
-  image: ingescape/alpine-deployment
-  script:
-    - echo "Setting up SSH"
-    - mkdir -p ~/.ssh/
-    - echo ${STABLE_SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
-    - umask 077
-    - echo ${STABLE_SSH_SECRET} | base64 -d > ssh_secret
-    - umask 022
-    - mv bindings _bindings
-    - echo "Deliver Windows x86 binding"
-    - mkdir --parents bindings/CSharp/win32
-    - mv _bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86/IngescapeCSharp-*
-         bindings/CSharp/win32/
-    - ls bindings/CSharp/win32/ | grep -v 'latest_delivery' > bindings/CSharp/win32/latest_delivery
-    - echo "Deliver Windows x64 binding"
-    - mkdir --parents bindings/CSharp/win64
-    - mv _bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64/IngescapeCSharp-*
-         bindings/CSharp/win64/
-    - ls bindings/CSharp/win64/ | grep -v 'latest_delivery' > bindings/CSharp/win64/latest_delivery
-
-     - echo "Deliver Windows x86 binding UTF8"
-    - mkdir --parents bindings/CSharp/win32-utf8
-    - mv _bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86-UTF8/IngescapeCSharp-*
-         bindings/CSharp/win32-utf8/
-    - ls bindings/CSharp/win32-utf8/ | grep -v 'latest_delivery' > bindings/CSharp/win32-utf8/latest_delivery
-    - echo "Deliver Windows x64 binding UTF8"
-    - mkdir --parents bindings/CSharp/win64-utf8
-    - mv _bindings/c#/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64-UTF8/IngescapeCSharp-*
-         bindings/CSharp/win64-utf8/
-    - ls bindings/CSharp/win64-utf8/ | grep -v 'latest_delivery' > bindings/CSharp/win64-utf8/latest_delivery
-    - echo "Synchronization"
-    - rsync --rsh="ssh -i ssh_secret" --recursive bindings ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST}:${STABLE_DELIVERY_DESTINATION}
-  dependencies:
-    - binding-csharp-installer-windows-x64
-    - binding-csharp-installer-windows-x86
