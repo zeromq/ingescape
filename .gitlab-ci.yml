@@ -24,20 +24,6 @@ stages:
       - dependencies/windows/unix/*
       - CMakeLists.txt
 
-# Define ingescape editor files
-.editor-build-files:
-  only:
-    changes:
-      - .gitlab-ci.yml
-      - src/**/*
-      - builds/cmake/**/*
-      - dependencies/yajl/**/*
-      - dependencies/unix/*
-      - dependencies/windows/unix/*
-      - applications/frameworks/**/*
-      - applications/apps/IngeScape-Common/**/*
-      - applications/apps/IngeScape-Editor/**/*
-
 # Define ingescape assessments files
 .assessments-build-files:
   only:
@@ -146,31 +132,6 @@ lib-deploy-macos:
     - master
     - stable
 
-
-# Build ingescape editor for macos
-editor-build-macos:
-  extends: .editor-build-files
-  stage: apps-build
-  variables:
-    GIT_SUBMODULE_STRATEGY: recursive
-  tags:
-    - osx
-  script:
-    - git clean -xfd
-    - mkdir -p applications/apps/IngeScape-Editor/build
-    - cmake -S applications/apps/IngeScape-Editor/ -B applications/apps/IngeScape-Editor/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$HOME/Qt/5.15.0/clang_64/;$HOME/builds/sysroot/usr/local/" -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
-    - make -j8 -C applications/apps/IngeScape-Editor/build
-#    - 'codesign --force --deep --sign  "Developer ID Application: Ingenuity i/o (56DRT9MG9S)" -v applications/apps/IngeScape-Editor/build/IngeScape-Editor.app'
-    - mkdir -p $HOME/builds/sysroot/Applications/
-    - rm -Rf $HOME/builds/sysroot/Applications/IngeScape-Editor.app
-    - cp -Rf applications/apps/IngeScape-Editor/build/IngeScape-Editor.app $HOME/builds/sysroot/Applications/
-  artifacts:
-    paths:
-      - applications/apps/IngeScape-Editor/build
-    name: "editor-build-macos"
-    expire_in: 1 day
-  dependencies: []
-
 # Build ingescape assessments for macos
 assessments-build-macos:
   extends: .assessments-build-files
@@ -219,23 +180,6 @@ expe-build-macos:
     name: "expe-build-macos"
     expire_in: 1 day
   dependencies: []
-
-
-# Create editor installer
-editor-installer-macos:
-  extends: .editor-build-files
-  stage: apps-installer
-  tags:
-    - osx
-  script:
-    - make -C applications/apps/IngeScape-Editor/build package
-  #  - make -C applications/apps/IngeScape-Editor/build package_source
-  artifacts:
-    paths:
-      - applications/apps/IngeScape-Editor/build/IngeScape-Editor-*.dmg
-    name: "editor-installer-macos"
-  dependencies:
-    - editor-build-macos
 
 
 # Create assessments installer
@@ -358,48 +302,6 @@ lib-windows-debug-x86:
     paths:
      - build
     name: "lib-windows-debug-x86"
-    expire_in: 1 day
-  dependencies: []
-
-# Create ingescape editor for windows
-editor-windows-release-x86:
-  extends: .editor-build-files
-  stage: apps-build
-  variables:
-    Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.15.0\\msvc2019\\lib\\cmake\\Qt5
-    ARCH: "Editor_x86"
-  tags:
-    - windows
-  script:
-    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
-    - mkdir applications\apps\IngeScape-Editor\build\ReleaseX86
-    - cmake applications\apps\IngeScape-Editor\ -B applications\apps\IngeScape-Editor\build\ReleaseX86 -G"$env:CURRENT_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
-    - cmake --build applications\apps\IngeScape-Editor\build\ReleaseX86 --target ALL_BUILD --config Release
-  artifacts:
-    paths:
-      - applications\apps\IngeScape-Editor\build
-    name: "editor-windows-release-x86"
-    expire_in: 1 day
-  dependencies: []
-
-# Create ingescape editor for windows
-editor-windows-release-x64:
-  extends: .editor-build-files
-  stage: apps-build
-  variables:
-    Qt5_DIR: C:\\Users\\admin\\dev\\Qt\\5.15.0\\msvc2019_64\\lib\\cmake\\Qt5
-    ARCH: "Editor_x64"
-  tags:
-    - windows
-  script:
-    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
-    - mkdir applications\apps\IngeScape-Editor\build\ReleaseX64
-    - cmake applications\apps\IngeScape-Editor\ -B applications\apps\IngeScape-Editor\build\ReleaseX64 -G"$env:CURRENT_CMAKE_GENERATOR Win64" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
-    - cmake --build applications\apps\IngeScape-Editor\build\ReleaseX64 --target ALL_BUILD --config Release
-  artifacts:
-    paths:
-      - applications\apps\IngeScape-Editor\build
-    name: "editor-windows-release-x64"
     expire_in: 1 day
   dependencies: []
 
@@ -570,44 +472,6 @@ lib-installer-debug-windows-x64:
     name: "lib-installer-debug-windows-x64"
   dependencies:
     - lib-windows-debug-x64
-
-# Create editor install for windows 32 bits
-editor-installer-windows-x86:
-  extends: .editor-build-files
-  stage: apps-installer
-  variables:
-    ARCH: "Editor_x86"
-  tags:
-    - windows
-  script:
-    - cd applications\apps\IngeScape-Editor\build\ReleaseX86
-    - cpack --config CPackConfig.cmake
-    - cd ..\..\..\..\..
-  artifacts:
-    paths:
-      - applications\apps\IngeScape-Editor\build\ReleaseX86\IngeScape-Editor-*
-    name: "editor-installer-windows-x86"
-  dependencies:
-    - editor-windows-release-x86
-
-# Create editor install for windows 64 bits
-editor-installer-windows-x64:
-  extends: .editor-build-files
-  stage: apps-installer
-  variables:
-    ARCH: "Editor_x64"
-  tags:
-    - windows
-  script:
-    - cd applications\apps\IngeScape-Editor\build\ReleaseX64
-    - cpack --config CPackConfig.cmake
-    - cd ..\..\..\..\..
-  artifacts:
-    paths:
-      - applications\apps\IngeScape-Editor\build\ReleaseX64\IngeScape-Editor-*
-    name: "editor-installer-windows-x64"
-  dependencies:
-    - editor-windows-release-x64
 
 # Create assessments install for windows 32 bits
 assessments-installer-windows-x86:
@@ -1006,46 +870,6 @@ lib-delivery-all:
       - stable
 
 # Deliver installers so they can be downloaded from the website
-editor-delivery-all:
-  extends: .editor-build-files
-  stage: apps-delivery
-  tags:
-    - docker
-  image: ingescape/alpine-deployment
-  script:
-    - echo "Setting up SSH"
-    - mkdir -p ~/.ssh/
-    - echo ${SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
-    - umask 077
-    - echo ${SSH_SECRET} | base64 -d > ssh_secret
-    - umask 022
-    - echo "Deliver Mac OS x64 editor"
-    - mkdir --parents editor/macos
-    - mv applications/apps/IngeScape-Editor/build/IngeScape-Editor-*
-         editor/macos/
-    - ls editor/macos/ | grep -v 'latest_delivery' > editor/macos/latest_delivery
-    - echo "Deliver Windows x86 editor"
-    - mkdir --parents editor/win32
-    - mv applications/apps/IngeScape-Editor/build/ReleaseX86/IngeScape-Editor-*
-         editor/win32/
-    - ls editor/win32/ | grep -v 'latest_delivery' > editor/win32/latest_delivery
-    - echo "Deliver Windows x64 editor"
-    - mkdir --parents editor/win64
-    - mv applications/apps/IngeScape-Editor/build/ReleaseX64/IngeScape-Editor-*
-         editor/win64/
-    - ls editor/win64/ | grep -v 'latest_delivery' > editor/win64/latest_delivery
-    - echo "Synchronization"
-    - rsync --rsh="ssh -i ssh_secret" --recursive editor ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
-  dependencies:
-    - editor-installer-macos
-    - editor-installer-windows-x86
-    - editor-installer-windows-x64
-  only:
-    refs:
-      - master
-      - stable
-
-# Deliver installers so they can be downloaded from the website
 assessments-delivery-all:
   extends: .assessments-build-files
   stage: apps-delivery
@@ -1204,44 +1028,6 @@ lib-delivery-all-stable:
     - lib-installer-linux-x64
     - lib-installer-runtime-linux-armhf
     - lib-installer-runtime-android-armv7a-softfp
-
-# Deliver installers so they can be downloaded from the website
-editor-delivery-all-stable:
-  only:
-    refs:
-      - stable
-  stage: apps-delivery
-  tags:
-    - docker
-  image: ingescape/alpine-deployment
-  script:
-    - echo "Setting up SSH"
-    - mkdir -p ~/.ssh/
-    - echo ${STABLE_SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
-    - umask 077
-    - echo ${STABLE_SSH_SECRET} | base64 -d > ssh_secret
-    - umask 022
-    - echo "Deliver Mac OS x64 editor"
-    - mkdir --parents editor/macos
-    - mv applications/apps/IngeScape-Editor/build/IngeScape-Editor-*
-         editor/macos/
-    - ls editor/macos/ | grep -v 'latest_delivery' > editor/macos/latest_delivery
-    - echo "Deliver Windows x86 editor"
-    - mkdir --parents editor/win32
-    - mv applications/apps/IngeScape-Editor/build/ReleaseX86/IngeScape-Editor-*
-         editor/win32/
-    - ls editor/win32/ | grep -v 'latest_delivery' > editor/win32/latest_delivery
-    - echo "Deliver Windows x64 editor"
-    - mkdir --parents editor/win64
-    - mv applications/apps/IngeScape-Editor/build/ReleaseX64/IngeScape-Editor-*
-         editor/win64/
-    - ls editor/win64/ | grep -v 'latest_delivery' > editor/win64/latest_delivery
-    - echo "Synchronization"
-    - rsync --rsh="ssh -i ssh_secret" --recursive editor ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST}:${STABLE_DELIVERY_DESTINATION}
-  dependencies:
-    - editor-installer-macos
-    - editor-installer-windows-x86
-    - editor-installer-windows-x64
 
 # Deliver installers so they can be downloaded from the website
 assessments-delivery-all-stable:
