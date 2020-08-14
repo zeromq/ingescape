@@ -26,18 +26,28 @@
 #include "call.h"
 
 #define UNUSED(x) (void)x;
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 4096
 
 //global application options
 int port = 5670;
 const char *name = "ingeprobe";
 char *netdevice = NULL;
 bool verbose = false;
-bool keepRunning = false;
-bool proxy = false;
-const char *gossipbind = NULL;//"tcp://10.0.0.7:12345";
-const char *gossipconnect = NULL;
-const char *endpoint = NULL;
+
+const char *gossipbind = NULL; //"tcp://10.0.0.8:5659";
+const char *gossipconnect = NULL; //"tcp://10.0.0.8:5661";
+const char *endpoint = NULL; //"tcp://10.0.0.8:5672";
+
+bool useSecurity = false;
+zcert_t *cert = NULL;
+zcert_t *brokerCert = NULL;
+zactor_t *auth = NULL;
+const char *privateKey = "~/Documents/IngeScape/security/ingeprobe.cert_secret";
+const char *brokerKey = NULL; //"~/Documents/IngeScape/security/sparingPartner.cert";
+const char *publicKeys = "~/Documents/IngeScape/security";
+char privateKeyPath[BUFFER_SIZE] = "";
+char brokerKeyPath[BUFFER_SIZE] = "";
+char publicKeysPath[BUFFER_SIZE] = "";
 
 char *outputTypes[] = {"INT", "DOUBLE", "STRING", "BOOL", "IMPULSION", "DATA"};
 
@@ -65,6 +75,7 @@ typedef struct peer {
     char *publisherPort;
     char *logPort;
     char *protocol;
+    char *publicKey;
     zsock_t *subscriber;
     zmq_pollitem_t *subscriberPoller;
     zsock_t *logger;
@@ -423,8 +434,14 @@ int manageParent (zloop_t *loop, zsock_t *socket, void *args){
                         *(insert + 1) = '\0';
                         strcat(endpointAddress, agent->peer->publisherPort);
                         agent->peer->subscriber = zsock_new_sub(endpointAddress, NULL);
+                        if (useSecurity){
+                            assert(agent->peer->publicKey);
+                            zcert_apply(cert, agent->peer->subscriber);
+                            zsock_set_curve_serverkey (agent->peer->subscriber, agent->peer->publicKey);
+                        }
                         zsock_set_subscribe(agent->peer->subscriber, "");
                         zloop_reader(loop, agent->peer->subscriber, manageSubscription, agent);
+                        zloop_reader_set_tolerant(loop, agent->peer->subscriber);
                         printf("Subscriber created for %s\n", agent->name);
                     }
                 }
@@ -481,11 +498,17 @@ int manageParent (zloop_t *loop, zsock_t *socket, void *args){
                         if (streq(agent->peer->protocol, "v1")){
                             zsock_set_subscribe(agent->peer->subscriber, output);
                         }else if (streq(agent->peer->protocol, "v2")){
+                            if (useSecurity){
+                                assert(agent->peer->publicKey);
+                                zcert_apply(cert, agent->peer->subscriber);
+                                zsock_set_curve_serverkey (agent->peer->subscriber, agent->peer->publicKey);
+                            }
                             char filterValue[4096 + 33] = ""; //33 is UUID length + separator
                             snprintf(filterValue, 4096 + 33, "%s-%s", agent->uuid, output);
                             zsock_set_subscribe(agent->peer->subscriber, filterValue);
                         }
                         zloop_reader(loop, agent->peer->subscriber, manageSubscription, agent);
+                        zloop_reader_set_tolerant(loop, agent->peer->subscriber);
                         printf("subscriber created for %s on output %s\n", agent->name, output);
                     }
                 }
@@ -544,8 +567,14 @@ int manageParent (zloop_t *loop, zsock_t *socket, void *args){
                         *(insert + 1) = '\0';
                         strcat(endpointAddress, p->logPort);
                         p->logger = zsock_new_sub(endpointAddress, NULL);
+                        if (useSecurity){
+                            assert(p->publicKey);
+                            zcert_apply(cert, p->logger);
+                            zsock_set_curve_serverkey (p->logger, p->publicKey);
+                        }
                         zsock_set_subscribe(p->logger, "");
                         zloop_reader(loop, p->logger, manageLog, p);
+                        zloop_reader_set_tolerant(loop, p->logger);
                         printf("log stream created for %s\n", p->name);
                     }
                 }
@@ -685,24 +714,26 @@ int manageIncoming (zloop_t *loop, zsock_t *socket, void *args){
         }
         while ((k = (char *)zlist_pop(keys))) {
             v = zyre_event_header (zyre_event,k);
-            if(strncmp(k,"publisher", strlen("publisher")) == 0){
+            if(streq(k,"publisher")){
                 //this is a ingescape agent, we store its publishing port
                 if (peer->publisherPort != NULL) {
                     free(peer->publisherPort);
                 }
                 peer->publisherPort = strndup(v,6); //port is 5 digits max
-            }else if(strncmp(k,"logger", strlen("logger")) == 0){
+            }else if(streq(k,"logger")){
                 //this is a ingescape agent, we store its publishing port
                 if (peer->logPort != NULL) {
                     free(peer->logPort);
                 }
                 peer->logPort = strndup(v,6); //port is 5 digits max
-            }else if(strncmp(k,"protocol", strlen("protocol")) == 0){
+            }else if(streq(k,"protocol")){
                 //this is a ingescape agent, we store its publishing port
                 if (peer->protocol != NULL) {
                     free(peer->protocol);
                 }
                 peer->protocol = strndup(v, 6); //max protocol length
+            }else if(streq(k,"X-PUBLICKEY")){
+                peer->publicKey = strndup(v, 64);
             }
             printf("\t%s -> %s\n", k, v);
             free(k);
@@ -901,7 +932,23 @@ int sendMessage(zloop_t *loop, int timer_id, void *args){
 
 static void zyre_actor(zsock_t *pipe, void *args){
     context_t *context = (context_t *)args;
+    
+    if (useSecurity){
+        auth = zactor_new(zauth, NULL);
+        assert(auth);
+        assert(zstr_send(auth, "VERBOSE") == 0);
+        assert(zsock_wait(auth) >= 0);
+        //assert(zstr_sendx(auth, "ALLOW", ip_address1, ip_address2, ..., NULL) == 0);
+        //assert(zsock_wait(auth) >= 0);
+        assert(zstr_sendx(auth, "CURVE", publicKeysPath, NULL) == 0);
+        assert(zsock_wait(auth) >= 0);
+    }
+    
     zyre_t *node = zyre_new (context->name);
+    if (useSecurity){
+        zyre_set_zcert(node, cert);
+        zyre_set_zap_domain(node, "INGESCAPE");
+    }
     zyre_join(node, "INGESCAPE_PRIVATE");
     context->node = node;
     
@@ -920,27 +967,31 @@ static void zyre_actor(zsock_t *pipe, void *args){
             int res = zyre_set_endpoint(node, "%s", endpoint);
             if (res != 0){
                 printf("impossible to create our endpoint %s ...exiting.", endpoint);
+                return;
             }
             printf("using endpoint %s\n", endpoint);
             if (gossipconnect == NULL && gossipbind == NULL){
-                printf("warning : endpoint specified but no attached gossip information, %s won't reach any other agent", name);
+                printf("endpoint specified but no attached gossip information, %s cannot reach any other agent", name);
+                return;
             }
         }
         if (gossipconnect != NULL){
-            zyre_gossip_connect(node, "%s", gossipconnect);
-            printf("connecting to P2P node at %s\n", gossipconnect);
+            if (useSecurity){
+                zyre_gossip_connect_curve(node, zcert_public_txt(brokerCert), "%s", gossipconnect);
+            }else{
+                zyre_gossip_connect(node, "%s", gossipconnect);
+            }
+            printf("connecting to broker at %s\n", gossipconnect);
         }
         if (gossipbind != NULL){
             zyre_gossip_bind(node, "%s", gossipbind);
-            printf("creating P2P node %s\n", gossipbind);
+            printf("creating broker %s\n", gossipbind);
         }
     }
     
     if (verbose){
         zyre_set_verbose(node);
     }
-    if (!node)
-        return;
     zyre_start (node);
     zsock_signal (pipe, 0); //notify main thread that we are ready
     zyre_print(node);
@@ -949,13 +1000,15 @@ static void zyre_actor(zsock_t *pipe, void *args){
     zloop_set_verbose (loop, verbose);
     
     zloop_reader(loop, pipe, manageParent, context);
+    zloop_reader_set_tolerant(loop, pipe);
     zloop_reader(loop, zyre_socket(node), manageIncoming, context);
+    zloop_reader_set_tolerant(loop, zyre_socket(node));
     
     if (paramMessage != NULL && strlen(paramMessage) > 0){
         zloop_timer(loop, 10, 1, sendMessage, context);
     }
     
-    zloop_start (loop); //start returns when one of the pollers returns -1
+    zloop_start (loop);
     
     printf("shutting down...\n");
     //clean
@@ -967,27 +1020,22 @@ static void zyre_actor(zsock_t *pipe, void *args){
         free(current->name);
         free(current->uuid);
         free(current->endpoint);
-        if (current->publisherPort != NULL){
+        if (current->publicKey)
+            free(current->publicKey);
+        if (current->publisherPort != NULL)
             free(current->publisherPort);
-        }
-        if (current->subscriber != NULL){
+        if (current->subscriber != NULL)
             zsock_destroy(&(current->subscriber));
-        }
-        if (current->subscriberPoller != NULL){
+        if (current->subscriberPoller != NULL)
             free(current->subscriberPoller);
-        }
-        if (current->logPort != NULL){
+        if (current->logPort != NULL)
             free(current->logPort);
-        }
-        if (current->logger != NULL){
+        if (current->logger != NULL)
             zsock_destroy(&(current->logger));
-        }
-        if (current->loggerPoller != NULL){
+        if (current->loggerPoller != NULL)
             free(current->loggerPoller);
-        }
-        if (current->protocol != NULL){
+        if (current->protocol != NULL)
             free(current->protocol);
-        }
         free(current);
     }
     agent_t *agent, *atmp;
@@ -1001,9 +1049,11 @@ static void zyre_actor(zsock_t *pipe, void *args){
         free(agent);
     }
     zyre_stop (node);
-    zclock_sleep (100);
     zyre_destroy (&node);
-    keepRunning = false;
+    if (cert)
+        zcert_destroy(&cert);
+    if (auth)
+        zactor_destroy(&auth);
     free(context);
 }
 
@@ -1017,24 +1067,23 @@ void print_usage(){
     printf("--name peer_name : published name of this peer (default : ingeprobe)\n");
     printf("--noninteractiveloop : non-interactive loop for use as a background application\n");
     printf("--message \"[#channel|peer] message\" : message to send to a channel (indicated with #) or a peer (peer id) at startup and then stop\n");
-    //printf("\n--proxy : run both beacon and gossip instances (default : false)\n");
     
-    printf("\nUDP discovery configuration :\n");
+    printf("\nSelf-discovery (UDP broadcast) :\n");
     printf("--device : name of the network device to be used (shall be set if several devices available)\n");
     printf("--port port_number : port used for autodiscovery between peers (default : 5670)\n");
+    printf("OR\n");
+    printf("Brokers and endpoints :\n");
+    printf("a TCP endpoint looks like : tcp://10.0.0.7:49155\n");
+    printf("--bind endpoint : our address as a broker (optional, use only if you want to be a broker)\n");
+    printf("--connect endpoint : address of a broker to connect to\n");
+    printf("--endpoint endpoint : our ingescape endpoint address (overrides --netdevice and --port)\n");
+    printf("\tNB: using the endpoint disables self-discovery and brokers must be used\n");
     
-    printf("\nOR");
-    printf("\nP2P discovery and fixed endpoint configuration :\n");
-    printf("an endpoint looks like : tcp://10.0.0.7:49155 or ipc:///tmp/feeds/0 or inproc://my-endpoint\n");
-    printf("(ipc is for UNIX systems only)\n");
-    printf("(inproc is for inter-thread communication only)\n");
-    printf("--bind endpoint : our address as a P2P known node\n");
-    printf("--connect endpoint : address of a P2P node to use\n");
-    printf("\tNB: if P2P endpoint restarts, others depending on it may not see it coming back\n");
-    printf("\tNB: in P2P mode, leaving peers are not detected by others\n");
-    printf("--endpoint endpoint : optional custom zyre endpoint address (overrides --netdevice and --port)\n");
-    printf("\tNB: forcing the endpoint disables UDP discovery and P2P must be used\n");
-    printf("\tNB: zyre endpoint can be tcp, ipc or inproc\n");
+    printf("\nSecurity (optional)\n");
+    printf("\n--security : enables security\n");
+    printf("\n--privatekey path : path to the private key we shall use (default: %s)\n", privateKey);
+    printf("\n--brokerkey path : path to the public key we shall use for the broker if needed (optional)\n");
+    printf("\n--publickeys path : path to the directory where to find public keys (default: %s)\n", publicKeys);
 }
 
 /*
@@ -1074,6 +1123,28 @@ void print_commands(){
     printf("\n");
 }
 
+//helper to convert paths starting with ~ to absolute paths
+void makeFilePath(const char *from, char *to, size_t size_of_to) {
+    if (from[0] == '~') {
+        from++;
+#ifdef _WIN32
+        char *home = getenv("USERPROFILE");
+#else
+        char *home = getenv("HOME");
+#endif
+        if (home == NULL) {
+            printf("could not find path for home directory\n");
+        }
+        else {
+            strncpy(to, home, size_of_to);
+            strncat(to, from, size_of_to);
+        }
+    }
+    else {
+        strncpy(to, from, size_of_to);
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // MAIN & OPTIONS & COMMAND INTERPRETER
 //
@@ -1088,7 +1159,6 @@ int main (int argc, char *argv [])
     //The two options l and b expect numbers as argument
     static struct option long_options[] = {
         {"verbose",   no_argument, 0,  'v' },
-        {"proxy",   no_argument, 0,  'r' },
         {"device",      required_argument, 0,  'd' },
         {"port",      required_argument, 0,  'p' },
         {"name",      required_argument, 0,  'n' },
@@ -1098,6 +1168,10 @@ int main (int argc, char *argv [])
         {"bind",      required_argument, 0,  's' },
         {"connect",      required_argument, 0,  'g' },
         {"endpoint",      required_argument, 0,  'e' },
+        {"privatekey",      required_argument, 0,  '0' },
+        {"brokerkey",      required_argument, 0,  '1' },
+        {"publickeys",      required_argument, 0,  '2' },
+        {"security",      no_argument, 0,  '3' },
     };
     
     int long_index =0;
@@ -1137,8 +1211,17 @@ int main (int argc, char *argv [])
             case 'i' :
                 noninteractiveloop = true;
                 break;
-            case 'r' :
-                proxy = true;
+            case '0' :
+                privateKey = optarg;
+                break;
+            case '1' :
+                brokerKey = optarg;
+                break;
+            case '2' :
+                publicKeys = optarg;
+                break;
+            case '3' :
+                useSecurity = true;
                 break;
             case 'h' :
                 print_usage();
@@ -1150,31 +1233,64 @@ int main (int argc, char *argv [])
         }
     }
     
+    if (publicKeys)
+        makeFilePath(publicKeys, publicKeysPath, BUFFER_SIZE);
+    if (privateKey)
+        makeFilePath(privateKey, privateKeyPath, BUFFER_SIZE);
+    if (brokerKey)
+        makeFilePath(brokerKey, brokerKeyPath, BUFFER_SIZE);
+    
+    if (useSecurity){
+        if(zsys_file_exists(privateKeyPath)){
+            cert = zcert_load(privateKeyPath);
+            if (!cert){
+                printf("'%s' does not contain a valid certificate\n", privateKeyPath);
+                return EXIT_FAILURE;
+            }
+            if (strlen(publicKeysPath) == 0 || !zsys_file_exists(publicKeysPath)){
+                printf("public keys path '%s' does not exist\n", publicKeysPath);
+                return EXIT_FAILURE;
+            }
+            if (strlen(brokerKeyPath) > 0){
+                if (!zsys_file_exists(brokerKeyPath)){
+                    printf("broker key path '%s' does not exist\n", brokerKeyPath);
+                    return EXIT_FAILURE;
+                }else{
+                    brokerCert = zcert_load(brokerKeyPath);
+                    if (!brokerCert || !zcert_public_txt(brokerCert)){
+                        printf("'%s' does not contain a valid public key\n", brokerKeyPath);
+                        return EXIT_FAILURE;
+                    }
+                }
+            }
+        }else{
+            printf("private key does not exist at '%s'\n", privateKeyPath);
+            return EXIT_FAILURE;
+        }
+    }
+    
     if (paramMessage != NULL){
         noninteractiveloop = true;
     }
     
     //init zyre
-    zactor_t *beaconActor = NULL;
-    zactor_t *gossipActor = NULL;
+    zactor_t *actor = NULL;
     context_t *context = calloc(1, sizeof(context_t));
     if ((gossipconnect == NULL && gossipbind == NULL && endpoint == NULL)){
         assert(context);
         context->name = strdup(name);
         context->useGossip = false;
-        context->peers = NULL;
-        beaconActor = zactor_new (zyre_actor, context);
-        assert (beaconActor);
+        actor = zactor_new (zyre_actor, context);
+        assert (actor);
     }else{
         if (endpoint != NULL && gossipconnect == NULL && gossipbind == NULL){
-            printf("warning : endpoint specified but no attached P2P parameters, %s won't reach any other agent", name);
+            printf("warning : endpoint specified but no attached broker parameters, %s won't reach any other agent", name);
         }else{
             assert(context);
             context->name = strdup(name);
             context->useGossip = true;
-            context->peers = NULL;
-            gossipActor = zactor_new (zyre_actor, context);
-            assert (gossipActor);
+            actor = zactor_new (zyre_actor, context);
+            assert (actor);
         }
     }
     
@@ -1205,180 +1321,85 @@ int main (int argc, char *argv [])
                     param2[strnlen(param2, BUFFER_SIZE) - 1] = '\0';
                 }
                 // Process command
-                if (matches == -1) {
-                    //printf("Error: could not interpret message %s\n", message + 1);
-                }else if (matches == 1) {
+                if (matches == 1) {
                     if (strcmp(command, "verbose") == 0){
-                        if (beaconActor != NULL){
-                            zstr_sendx (beaconActor, "VERBOSE", NULL);
-                        }
-                        if (gossipActor != NULL){
-                            zstr_sendx (gossipActor, "VERBOSE", NULL);
-                        }
+                        zstr_sendx (actor, "VERBOSE", NULL);
+                        
                     }else if (strcmp(command, "peers") == 0){
-                        if (beaconActor != NULL){
-                            zstr_sendx (beaconActor, "PEERS", NULL);
-                        }
-                        if (gossipActor != NULL){
-                            zstr_sendx (gossipActor, "PEERS", NULL);
-                        }
+                        zstr_sendx (actor, "PEERS", NULL);
+                        
                     }else if (strcmp(command, "channels") == 0){
-                        if (beaconActor != NULL){
-                            zstr_sendx (beaconActor, "CHANNELS", NULL);
-                        }
-                        if (gossipActor != NULL){
-                            zstr_sendx (gossipActor, "CHANNELS", NULL);
-                        }
+                        zstr_sendx (actor, "CHANNELS", NULL);
+                        
                     }else if (strcmp(command, "joinall") == 0){
-                        if (beaconActor != NULL){
-                            zstr_sendx (beaconActor, "JOINALL", NULL);
-                        }
-                        if (gossipActor != NULL){
-                            zstr_sendx (gossipActor, "JOINALL", NULL);
-                        }
+                        zstr_sendx (actor, "JOINALL", NULL);
+                        
                     }else if (strcmp(command, "leaveall") == 0){
-                        if (beaconActor != NULL){
-                            zstr_sendx (beaconActor, "LEAVEALL", NULL);
-                        }
-                        if (gossipActor != NULL){
-                            zstr_sendx (gossipActor, "LEAVEALL", NULL);
-                        }
+                        zstr_sendx (actor, "LEAVEALL", NULL);
+                        
                     }else if (strcmp(command, "agents") == 0){
-                        if (beaconActor != NULL){
-                            zstr_sendx (beaconActor, "AGENTS", NULL);
-                        }
-                        if (gossipActor != NULL){
-                            zstr_sendx (gossipActor, "AGENTS", NULL);
-                        }
+                        zstr_sendx (actor, "AGENTS", NULL);
+                        
                     }else if (strcmp(command, "help") == 0){
                         print_commands();
+                        
                     }else if (strcmp(command, "quit") == 0){
-                        if (beaconActor != NULL){
-                            zstr_sendx (beaconActor, "$TERM", NULL);
-                        }
-                        if (gossipActor != NULL){
-                            zstr_sendx (gossipActor, "$TERM", NULL);
-                        }
+                        zstr_sendx (actor, "$TERM", NULL);
                         break;
                     }
                 }else if (matches == 2) {
                     //printf("Received command: %s + %s\n", command, param1);
                     if (strcmp(command, "join") == 0){
-                        if (beaconActor != NULL){
-                            zstr_sendx (beaconActor, "JOIN", param1, NULL);
-                        }
-                        if (gossipActor != NULL){
-                            zstr_sendx (gossipActor, "JOIN", param1, NULL);
-                        }
+                        zstr_sendx (actor, "JOIN", param1, NULL);
+                        
                     } else if (strcmp(command, "leave") == 0){
-                        if (beaconActor != NULL){
-                            zstr_sendx (beaconActor, "LEAVE", param1, NULL);
-                        }
-                        if (gossipActor != NULL){
-                            zstr_sendx (gossipActor, "LEAVE", param1, NULL);
-                        }
+                        zstr_sendx (actor, "LEAVE", param1, NULL);
+                        
                     }else if (strcmp(command, "whisperall") == 0){
-                        if (beaconActor != NULL){
-                            zstr_sendx (beaconActor, "WHISPERALL", param1, NULL);
-                        }
-                        if (gossipActor != NULL){
-                            zstr_sendx (gossipActor, "WHISPERALL", param1, NULL);
-                        }
+                        zstr_sendx (actor, "WHISPERALL", param1, NULL);
+                        
                     }else if (strcmp(command, "subscribe") == 0){
-                        if (beaconActor != NULL){
-                            zstr_sendx (beaconActor, "SUBSCRIBE", param1, NULL);
-                        }
-                        if (gossipActor != NULL){
-                            zstr_sendx (gossipActor, "SUBSCRIBE", param1, NULL);
-                        }
+                        zstr_sendx (actor, "SUBSCRIBE", param1, NULL);
+                        
                     }else if (strcmp(command, "log") == 0){
-                        if (beaconActor != NULL){
-                            zstr_sendx (beaconActor, "LOG", param1, NULL);
-                        }
-                        if (gossipActor != NULL){
-                            zstr_sendx (gossipActor, "LOG", param1, NULL);
-                        }
+                        zstr_sendx (actor, "LOG", param1, NULL);
+                        
                     }else if (strcmp(command, "unsubscribe") == 0){
-                        if (beaconActor != NULL){
-                            zstr_sendx (beaconActor, "UNSUBSCRIBE", param1, NULL);
-                        }
-                        if (gossipActor != NULL){
-                            zstr_sendx (gossipActor, "UNSUBSCRIBE", param1, NULL);
-                        }
+                        zstr_sendx (actor, "UNSUBSCRIBE", param1, NULL);
+                        
                     }else if (strcmp(command, "unlog") == 0){
-                        if (beaconActor != NULL){
-                            zstr_sendx (beaconActor, "UNLOG", param1, NULL);
-                        }
-                        if (gossipActor != NULL){
-                            zstr_sendx (gossipActor, "UNLOG", param1, NULL);
-                        }
+                        zstr_sendx (actor, "UNLOG", param1, NULL);
+                        
                     }else if (strcmp(command, "license") == 0){
-                        if (beaconActor != NULL){
-                            zstr_sendx (beaconActor, "LICENSE", param1, NULL);
-                        }
-                        if (gossipActor != NULL){
-                            zstr_sendx (gossipActor, "LICENSE", param1, NULL);
-                        }
+                        zstr_sendx (actor, "LICENSE", param1, NULL);
+                        
                     }else if (strcmp(command, "stop_peer") == 0){
-                        if (beaconActor != NULL){
-                            zstr_sendx (beaconActor, "STOP_PEER", param1, NULL);
-                        }
-                        if (gossipActor != NULL){
-                            zstr_sendx (gossipActor, "STOP_PEER", param1, NULL);
-                        }
+                        zstr_sendx (actor, "STOP_PEER", param1, NULL);
+                        
                     }else if (strcmp(command, "stop") == 0){
-                        if (beaconActor != NULL){
-                            zstr_sendx (beaconActor, "STOP_AGENT", param1, NULL);
-                        }
-                        if (gossipActor != NULL){
-                            zstr_sendx (gossipActor, "STOP_AGENT", param1, NULL);
-                        }
+                        zstr_sendx (actor, "STOP_AGENT", param1, NULL);
+                        
                     }
                 }else if (matches == 3) {
                     //printf("Received command: %s + %s + %s\n", command, param1, param2);
                     if (strcmp(command, "whisper") == 0){
-                        //FIXME: check to which actor UUID belongs
-                        if (beaconActor != NULL){
-                            zstr_sendx (beaconActor, "WHISPER", param1, param2, NULL);
-                        }
-                        if (gossipActor != NULL){
-                            zstr_sendx (gossipActor, "WHISPER", param1, param2, NULL);
-                        }
+                        zstr_sendx (actor, "WHISPER", param1, param2, NULL);
+                        
                     } else if (strcmp(command, "shout") == 0){
-                        if (beaconActor != NULL){
-                            zstr_sendx (beaconActor, "SHOUT", param1, param2, NULL);
-                        }
-                        if (gossipActor != NULL){
-                            zstr_sendx (gossipActor, "SHOUT", param1, param2, NULL);
-                        }
+                        zstr_sendx (actor, "SHOUT", param1, param2, NULL);
+                        
                     } else if (strcmp(command, "subscribe") == 0){
-                        if (beaconActor != NULL){
-                            zstr_sendx (beaconActor, "SUBSCRIBE_TO_OUTPUT", param1, param2, NULL);
-                        }
-                        if (gossipActor != NULL){
-                            zstr_sendx (gossipActor, "SUBSCRIBE_TO_OUTPUT", param1, param2, NULL);
-                        }
+                        zstr_sendx (actor, "SUBSCRIBE_TO_OUTPUT", param1, param2, NULL);
+                        
                     } else if (strcmp(command, "write") == 0){
-                        if (beaconActor != NULL){
-                            zstr_sendx (beaconActor, "WRITE", param1, param2, NULL);
-                        }
-                        if (gossipActor != NULL){
-                            zstr_sendx (gossipActor, "WRITE", param1, param2, NULL);
-                        }
+                        zstr_sendx (actor, "WRITE", param1, param2, NULL);
+                        
                     } else if (strcmp(command, "call") == 0){
-                        if (beaconActor != NULL){
-                            zstr_sendx (beaconActor, "CALL", param1, param2, NULL);
-                        }
-                        if (gossipActor != NULL){
-                            zstr_sendx (gossipActor, "CALL", param1, param2, NULL);
-                        }
+                        zstr_sendx (actor, "CALL", param1, param2, NULL);
+                        
                     } else if (strcmp(command, "start") == 0){
-                        if (beaconActor != NULL){
-                            zstr_sendx (beaconActor, "START_AGENT", param1, param2, NULL);
-                        }
-                        if (gossipActor != NULL){
-                            zstr_sendx (gossipActor, "START_AGENT", param1, param2, NULL);
-                        }
+                        zstr_sendx (actor, "START_AGENT", param1, param2, NULL);
+                        
                     }
                 }else{
                     printf("Error: message returned %d matches (%s)\n", matches, message);
@@ -1386,8 +1407,7 @@ int main (int argc, char *argv [])
             }
         }
     }
-    zactor_destroy (&beaconActor);
-    zactor_destroy (&gossipActor);
+    zactor_destroy (&actor);
 
     #ifdef _WIN32
     zsys_shutdown();

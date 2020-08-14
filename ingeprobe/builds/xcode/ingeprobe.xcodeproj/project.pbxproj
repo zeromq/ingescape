@@ -13,6 +13,8 @@
 		974E36B62493D94300444009 /* libzyre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 974E36B12493D93A00444009 /* libzyre.a */; };
 		974E36B82493D94A00444009 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 974E36B72493D94A00444009 /* libc++.tbd */; };
 		976FFCD122BD57E5000876BF /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 976FFCCF22BD57E5000876BF /* main.c */; };
+		9782CCB324E6925500860307 /* ingeprobe.cert in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9782CCB124E6925500860307 /* ingeprobe.cert */; };
+		9782CCB424E6925500860307 /* ingeprobe.cert_secret in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9782CCB224E6925500860307 /* ingeprobe.cert_secret */; };
 		97F9FB3E24C47C4D00A4A3A0 /* call.c in Sources */ = {isa = PBXBuildFile; fileRef = 97F9FB3D24C47C4D00A4A3A0 /* call.c */; };
 		97F9FC0324C47FE200A4A3A0 /* libyajl-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 97F9FC0224C47FDB00A4A3A0 /* libyajl-static.a */; };
 /* End PBXBuildFile section */
@@ -1038,12 +1040,14 @@
 /* Begin PBXCopyFilesBuildPhase section */
 		978D6DEB1CB26F9B0082016E /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
+			buildActionMask = 12;
+			dstPath = certificates;
+			dstSubfolderSpec = 16;
 			files = (
+				9782CCB324E6925500860307 /* ingeprobe.cert in CopyFiles */,
+				9782CCB424E6925500860307 /* ingeprobe.cert_secret in CopyFiles */,
 			);
-			runOnlyForDeploymentPostprocessing = 1;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
@@ -1074,6 +1078,8 @@
 		976FFCD422BD5832000876BF /* libczmq.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libczmq.a; path = ../../../../../../../../../../usr/local/Cellar/czmq/4.2.0/lib/libczmq.a; sourceTree = "<group>"; };
 		976FFCD522BD5832000876BF /* libzmq.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libzmq.a; path = ../../../../../../../../../../usr/local/Cellar/zeromq/4.3.1_1/lib/libzmq.a; sourceTree = "<group>"; };
 		976FFCD622BD5832000876BF /* libzyre.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libzyre.a; path = ../../../../../../../../../../usr/local/Cellar/zyre/2.0.0/lib/libzyre.a; sourceTree = "<group>"; };
+		9782CCB124E6925500860307 /* ingeprobe.cert */ = {isa = PBXFileReference; lastKnownFileType = text; path = ingeprobe.cert; sourceTree = "<group>"; };
+		9782CCB224E6925500860307 /* ingeprobe.cert_secret */ = {isa = PBXFileReference; lastKnownFileType = text; path = ingeprobe.cert_secret; sourceTree = "<group>"; };
 		978D6DED1CB26F9B0082016E /* ingeprobe */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ingeprobe; sourceTree = BUILT_PRODUCTS_DIR; };
 		97A2128422383DD000ACCFB0 /* libsodium.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsodium.a; path = ../../../../../../../../usr/local/Cellar/libsodium/1.0.17/lib/libsodium.a; sourceTree = "<group>"; };
 		97A2128622383DE200ACCFB0 /* libzmq.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libzmq.a; path = ../../../../../../../../usr/local/Cellar/zeromq/4.3.1_1/lib/libzmq.a; sourceTree = "<group>"; };
@@ -1123,7 +1129,7 @@
 		974E35012493D8C800444009 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				974E35782493D8C900444009 /* libzmq.5.2.3.dylib */,
+				974E35782493D8C900444009 /* libzmq.dylib */,
 				974E357A2493D8C900444009 /* libzmq.a */,
 				974E357C2493D8C900444009 /* libobjects.a */,
 				974E357E2493D8C900444009 /* test_ancillaries */,
@@ -1262,7 +1268,7 @@
 		974E365B2493D8C900444009 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				974E36742493D8C900444009 /* libczmq.4.2.1.dylib */,
+				974E36742493D8C900444009 /* libczmq.dylib */,
 				974E36762493D8C900444009 /* libczmq.a */,
 				974E36782493D8C900444009 /* libczmq_objects.a */,
 				974E367A2493D8C900444009 /* czmq_selftest */,
@@ -1282,7 +1288,7 @@
 				974E36A92493D93A00444009 /* zpinger */,
 				974E36AB2493D93A00444009 /* ztester_beacon */,
 				974E36AD2493D93A00444009 /* ztester_gossip */,
-				974E36AF2493D93A00444009 /* libzyre.2.0.1.dylib */,
+				974E36AF2493D93A00444009 /* libzyre.dylib */,
 				974E36B12493D93A00444009 /* libzyre.a */,
 				974E36B32493D93A00444009 /* libzyre_objects.a */,
 				974E36B52493D93A00444009 /* zyre_selftest */,
@@ -1319,6 +1325,15 @@
 			path = uthash;
 			sourceTree = "<group>";
 		};
+		9782CCB024E6921B00860307 /* resources */ = {
+			isa = PBXGroup;
+			children = (
+				9782CCB124E6925500860307 /* ingeprobe.cert */,
+				9782CCB224E6925500860307 /* ingeprobe.cert_secret */,
+			);
+			path = resources;
+			sourceTree = "<group>";
+		};
 		978D6DE41CB26F9B0082016E = {
 			isa = PBXGroup;
 			children = (
@@ -1329,6 +1344,7 @@
 				974E35002493D8C800444009 /* ZeroMQ.xcodeproj */,
 				974E365A2493D8C900444009 /* czmq.xcodeproj */,
 				976FFCC322BD57E5000876BF /* src */,
+				9782CCB024E6921B00860307 /* resources */,
 				978D6DEE1CB26F9B0082016E /* Products */,
 				9709EE192094B2270056023F /* Frameworks */,
 			);
@@ -1428,9 +1444,10 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		974E35782493D8C900444009 /* libzmq.5.2.3.dylib */ = {
+		974E35782493D8C900444009 /* libzmq.dylib */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
+			name = libzmq.dylib;
 			path = libzmq.5.2.3.dylib;
 			remoteRef = 974E35772493D8C900444009 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
@@ -2205,9 +2222,10 @@
 			remoteRef = 974E36582493D8C900444009 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		974E36742493D8C900444009 /* libczmq.4.2.1.dylib */ = {
+		974E36742493D8C900444009 /* libczmq.dylib */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
+			name = libczmq.dylib;
 			path = libczmq.4.2.1.dylib;
 			remoteRef = 974E36732493D8C900444009 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
@@ -2296,9 +2314,10 @@
 			remoteRef = 974E36AC2493D93A00444009 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		974E36AF2493D93A00444009 /* libzyre.2.0.1.dylib */ = {
+		974E36AF2493D93A00444009 /* libzyre.dylib */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
+			name = libzyre.dylib;
 			path = libzyre.2.0.1.dylib;
 			remoteRef = 974E36AE2493D93A00444009 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
@@ -2567,13 +2586,10 @@
 				CODE_SIGN_ENTITLEMENTS = ingeprobe.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				DEVELOPMENT_TEAM = 56DRT9MG9S;
-				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
 				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/../../../../../third-party/libsodium/src/libsodium/include",
-					"$(SRCROOT)/../../../../../third-party/czmq/include",
-					"$(SRCROOT)/../../../../../third-party/libzmq/include",
-					"$(SRCROOT)/../../../../../third-party/zyre/include",
-					"$(SRCROOT)/../../../dependencies/yajl/src/api/",
+					$HOME/builds/sysroot/usr/local/include,
+					"$(SRCROOT)/../../../dependencies/yajl/src/api",
 				);
 				LIBRARY_SEARCH_PATHS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ingescape.ingeprobe;
@@ -2587,13 +2603,10 @@
 				CODE_SIGN_ENTITLEMENTS = ingeprobe.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				DEVELOPMENT_TEAM = 56DRT9MG9S;
-				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
 				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/../../../../../third-party/libsodium/src/libsodium/include",
-					"$(SRCROOT)/../../../../../third-party/czmq/include",
-					"$(SRCROOT)/../../../../../third-party/libzmq/include",
-					"$(SRCROOT)/../../../../../third-party/zyre/include",
-					"$(SRCROOT)/../../../dependencies/yajl/src/api/",
+					$HOME/builds/sysroot/usr/local/include,
+					"$(SRCROOT)/../../../dependencies/yajl/src/api",
 				);
 				LIBRARY_SEARCH_PATHS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ingescape.ingeprobe;
