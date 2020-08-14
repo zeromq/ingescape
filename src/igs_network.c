@@ -466,7 +466,7 @@ int manageParent (zloop_t *loop, zsock_t *pipe, void *arg){
         zmsg_destroy(&msg);
         return 0;
     }
-    if (streq (command, "STOP_LOOP")){
+    if (streq (command, "STOP_LOOP") || streq(command, "$TERM")){
         free (command);
         zmsg_destroy (&msg);
         return -1;
@@ -2921,8 +2921,8 @@ igs_result_t igs_startWithBrokers(const char *agentEndpoint){
     coreContext->ourAgentEndpoint = strndup(agentEndpoint, IGS_IP_ADDRESS_LENGTH);
     
     assert(coreContext->brokers);
-    if (zhash_size(coreContext->brokers) == 0){
-        igs_error("no broker to connect to : our agent will NOT start");
+    if (zhash_size(coreContext->brokers) == 0 && coreContext->ourBrokerEndpoint == NULL){
+        igs_error("no broker to connect to and we do not serve as broker : our agent will NOT start");
         return IGS_FAILURE;
     }
     
