@@ -309,7 +309,7 @@ typedef struct igs_core_context{
     bool isFrozen;
     igs_freeze_callback_t *freezeCallbacks;
     igs_external_stop_calback_t *externalStopCalbacks;
-    zlist_t *brokers;
+    zhash_t *brokers;
     char *advertisedEndpoint;
     char *ourBrokerEndpoint;
     

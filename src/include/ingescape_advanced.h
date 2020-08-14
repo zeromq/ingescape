@@ -51,7 +51,7 @@ extern "C" {
  agent can be reached at. This endpoint must be valid in the actual network
  configuration.
  */
-PUBLIC void igs_brokerAdd(const char *brokerEndpoint);
+PUBLIC igs_result_t igs_brokerAdd(const char *brokerEndpoint);
 PUBLIC void igs_enableAsBroker(const char *ourBrokerEndpoint);
 PUBLIC void igs_brokerAdvertiseEndpoint(const char *advertisedEndpoint); //parameter can be NULL
 PUBLIC igs_result_t igs_startWithBrokers(const char *agentEndpoint);
@@ -79,6 +79,7 @@ PUBLIC igs_result_t igs_startWithBrokers(const char *agentEndpoint);
  security will not be enabled and our agent will not start.
 */
 PUBLIC igs_result_t igs_enableSecurity(const char *privateKey, const char *publicKeysDirectory);
+PUBLIC igs_result_t igs_brokerAddSecure(const char *brokerEndpoint, const char *publicKeyPath);
 
 
 //////////////////////////////////////////////////

@@ -2166,8 +2166,6 @@ static void runLoop (zsock_t *mypipe, void *args){
 #endif
     
     if (context->security_isEnabled){
-        char publicKeysDirectory[IGS_MAX_PATH_LENGTH] = "";
-        admin_makeFilePath(context->security_publicKeysDirectory, publicKeysDirectory, IGS_MAX_PATH_LENGTH);
         assert(!context->security_auth);
         context->security_auth = zactor_new (zauth, NULL);
         assert(context->security_auth);
@@ -2175,10 +2173,8 @@ static void runLoop (zsock_t *mypipe, void *args){
         assert(zsock_wait(context->security_auth) >= 0);
 //        assert(zstr_sendx(context->security_auth, "ALLOW", ip_address1, ip_address2, ..., NULL) == 0);
 //        assert(zsock_wait(context->security_auth) >= 0);
-        assert(zstr_sendx(context->security_auth, "CURVE", publicKeysDirectory, NULL) == 0);
+        assert(zstr_sendx(context->security_auth, "CURVE", context->security_publicKeysDirectory, NULL) == 0);
         assert(zsock_wait(context->security_auth) >= 0);
-        zyre_set_zcert(context->node, context->security_cert);
-        zyre_set_zap_domain(context->node, "INGESCAPE");
     }
     
     //iterate on agents to avoid sending definition and mapping update at startup
@@ -2336,20 +2332,47 @@ void initLoop (igs_core_context_t *context){
     bus_zyreLock();
     context->node = zyre_new(coreAgent->name);
     assert(context->node);
+    if (context->security_isEnabled){
+        if (context->security_cert && context->security_publicKeysDirectory){
+            //NB: zyre_set_zcert MUST be called before zyre_gossip_connect_curve
+            zyre_set_zcert(context->node, context->security_cert);
+            zyre_set_zap_domain(context->node, "INGESCAPE");
+        }else{
+            if (!context->security_cert)
+                igs_error("security is enabled but certificate is missing : aborting");
+            if (!context->security_publicKeysDirectory)
+                igs_error("security is enabled but public keys directory is missing : aborting");
+            bus_zyreUnlock();
+            network_Unlock();
+            return;
+        }
+    }
     //zyre_set_verbose(context->node);
     bus_zyreUnlock();
     if (context->ourAgentEndpoint){
         bus_zyreLock();
         //zyre_set_verbose(context->node);
-        char *broker = zlist_first(context->brokers);
+        zlist_t *brokers = zhash_keys(context->brokers);
+        char *broker = zlist_first(brokers);
         while (broker) {
             if (context->security_isEnabled){
-                zyre_gossip_connect_curve(context->node, zcert_public_txt(context->security_cert), "%s", broker);
+                char *certPath = zhash_lookup(context->brokers, broker);
+                if (strlen(certPath) > 0){
+                    zcert_t *certToGossipServer = zcert_load(certPath);
+                    if (certToGossipServer){
+                        zyre_gossip_connect_curve(context->node, zcert_public_txt(certToGossipServer), "%s", broker);
+                    }else{
+                        igs_warn("could not open certificate '%s' for server '%s' : server is ignored", certPath, broker);
+                    }
+                }else{
+                    igs_warn("no certificate path for server '%s' : server is ignored", broker);
+                }
             }else{
                 zyre_gossip_connect(context->node, "%s", broker);
             }
-            broker = zlist_next(context->brokers);
+            broker = zlist_next(brokers);
         }
+        zlist_destroy(&brokers);
         zyre_set_endpoint(context->node, "%s", context->ourAgentEndpoint);
         if (context->ourBrokerEndpoint)
             zyre_gossip_bind(context->node, "%s", context->ourBrokerEndpoint);
@@ -2826,11 +2849,36 @@ igs_result_t igs_startWithIP(const char *ipAddress, unsigned int port){
     return IGS_SUCCESS;
 }
 
-void igs_brokerAdd(const char *brokerEndpoint){
+igs_result_t igs_brokerAdd(const char *brokerEndpoint){
     core_initContext();
     assert(brokerEndpoint);
     assert(coreContext->brokers);
-    zlist_append(coreContext->brokers, strdup(brokerEndpoint));
+    if (coreContext->security_isEnabled){
+        igs_error("security is enabled : you must use igs_brokerAddSecure instead");
+        return IGS_FAILURE;
+    }
+    if (zhash_insert(coreContext->brokers, strdup(brokerEndpoint), strdup("")) != IGS_SUCCESS){
+        igs_error("could not add '%s' (certainly because it is already added)", brokerEndpoint);
+        return IGS_FAILURE;
+    }
+    return IGS_SUCCESS;
+}
+
+igs_result_t igs_brokerAddSecure(const char *brokerEndpoint, const char *publicKeyPath){
+    core_initContext();
+    assert(brokerEndpoint);
+    assert(publicKeyPath);
+    if (!zsys_file_exists(publicKeyPath)){
+        igs_error("'%s' does not exist for %s", publicKeyPath, brokerEndpoint);
+        return IGS_FAILURE;
+    }
+    assert(coreContext->brokers);
+    if (zhash_insert(coreContext->brokers, strdup(brokerEndpoint),
+                     strndup(publicKeyPath, IGS_MAX_PATH_LENGTH)) != IGS_SUCCESS){
+        igs_error("could not add '%s' (certainly because it is already added)", brokerEndpoint);
+        return IGS_FAILURE;
+    }
+    return IGS_SUCCESS;
 }
 
 void igs_enableAsBroker(const char *ourBrokerEndpoint){
@@ -2873,7 +2921,7 @@ igs_result_t igs_startWithBrokers(const char *agentEndpoint){
     coreContext->ourAgentEndpoint = strndup(agentEndpoint, IGS_IP_ADDRESS_LENGTH);
     
     assert(coreContext->brokers);
-    if (zlist_size(coreContext->brokers) == 0){
+    if (zhash_size(coreContext->brokers) == 0){
         igs_error("no broker to connect to : our agent will NOT start");
         return IGS_FAILURE;
     }
@@ -3330,7 +3378,7 @@ igs_result_t igs_enableSecurity(const char *privateKey, const char *publicKeysDi
         free(coreContext->security_publicKeysDirectory);
         coreContext->security_publicKeysDirectory = NULL;
     }
-    coreContext->security_isEnabled = false;
+    coreContext->security_isEnabled = true;
     
     if (privateKey){
         char privateKeyPath[IGS_MAX_PATH_LENGTH] = "";
@@ -3356,7 +3404,6 @@ igs_result_t igs_enableSecurity(const char *privateKey, const char *publicKeysDi
         coreContext->security_cert = zcert_new();
         coreContext->security_publicKeysDirectory = strndup(IGS_DEFAULT_SECURITY_DIRECTORY, IGS_MAX_PATH_LENGTH);
     }
-    coreContext->security_isEnabled = true;
     return IGS_SUCCESS;
 }
 

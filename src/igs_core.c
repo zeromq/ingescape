@@ -22,8 +22,8 @@ void core_initContext(){
     if (coreContext == NULL){
         coreContext = calloc(1, sizeof(struct igs_core_context));
         coreContext->createdAgents = zhash_new();
-        coreContext->brokers = zlist_new();
-        zlist_autofree(coreContext->brokers);
+        coreContext->brokers = zhash_new();
+        zhash_autofree(coreContext->brokers);
         //default values for context variables
         //NB: other values stay at zero / NULL until they are changed
         //by other functions.
