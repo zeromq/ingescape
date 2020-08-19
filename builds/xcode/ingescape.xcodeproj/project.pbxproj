@@ -1555,7 +1555,7 @@
 		976A46952493A5DF00075CA2 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				976A470C2493A5E000075CA2 /* libzmq.5.2.3.dylib */,
+				976A470C2493A5E000075CA2 /* libzmq.dylib */,
 				976A470E2493A5E000075CA2 /* libzmq.a */,
 				976A47102493A5E000075CA2 /* libobjects.a */,
 				976A47122493A5E000075CA2 /* test_ancillaries */,
@@ -1685,7 +1685,7 @@
 		976A47E62493A5F200075CA2 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				976A47FF2493A5F300075CA2 /* libczmq.4.2.1.dylib */,
+				976A47FF2493A5F300075CA2 /* libczmq.dylib */,
 				976A48012493A5F300075CA2 /* libczmq.a */,
 				976A48032493A5F300075CA2 /* libczmq_objects.a */,
 				976A48052493A5F300075CA2 /* czmq_selftest */,
@@ -1705,7 +1705,7 @@
 				976A482F2493A60300075CA2 /* zpinger */,
 				976A48312493A60300075CA2 /* ztester_beacon */,
 				976A48332493A60300075CA2 /* ztester_gossip */,
-				976A48352493A60300075CA2 /* libzyre.2.0.1.dylib */,
+				976A48352493A60300075CA2 /* libzyre.dylib */,
 				976A48372493A60300075CA2 /* libzyre.a */,
 				976A48392493A60300075CA2 /* libzyre_objects.a */,
 				976A483B2493A60300075CA2 /* zyre_selftest */,
@@ -2069,7 +2069,7 @@
 			remoteRef = 976A46922493A5D200075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A470C2493A5E000075CA2 /* libzmq.5.2.3.dylib */ = {
+		976A470C2493A5E000075CA2 /* libzmq.dylib */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
 			name = libzmq.dylib;
@@ -2833,7 +2833,7 @@
 			remoteRef = 976A47E32493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A47FF2493A5F300075CA2 /* libczmq.4.2.1.dylib */ = {
+		976A47FF2493A5F300075CA2 /* libczmq.dylib */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
 			name = libczmq.dylib;
@@ -2925,7 +2925,7 @@
 			remoteRef = 976A48322493A60300075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A48352493A60300075CA2 /* libzyre.2.0.1.dylib */ = {
+		976A48352493A60300075CA2 /* libzyre.dylib */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
 			name = libzyre.dylib;
@@ -3119,6 +3119,11 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+					ZYRE_BUILD_DRAFT_API,
+				);
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../../src/include",
 					"$(SRCROOT)/../../dependencies/yajl/src/api",
