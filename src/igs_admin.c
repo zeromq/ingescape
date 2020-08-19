@@ -25,7 +25,7 @@
 #include "ingescape_private.h"
 
 #define INGESCAPE_MAJOR 2
-#define INGESCAPE_MINOR 0
+#define INGESCAPE_MINOR 1
 #define INGESCAPE_MICRO 0 //replaced by gitlab-ci build number
 #define INGESCAPE_VERSION ((INGESCAPE_MAJOR * 10000) + (INGESCAPE_MINOR * 100) + INGESCAPE_MICRO)
 
