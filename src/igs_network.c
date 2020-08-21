@@ -1108,6 +1108,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                     newMapping = NULL;
                 }
             }
+            agent_propagateAgentEvent(IGS_AGENT_UPDATED_MAPPING, uuid, remoteAgent->name);
             free(strMapping);
             free(uuid);
         }
@@ -1912,17 +1913,14 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 char *callerUuid = zmsg_popstr (msgDuplicate);
                 char *calleeUuid = zmsg_popstr (msgDuplicate);
                 
+                const char *callerName = name; //default caller name is the one of the peer
                 igs_remote_agent_t *callerAgent = NULL;
                 HASH_FIND_STR(context->remoteAgents, callerUuid, callerAgent);
-                if (callerAgent == NULL){
-                    igs_error("no caller agent with uuid '%s' in %s message received from %s(%s): aborting", callerUuid, title, name, peer);
-                    if (calleeUuid)
-                        free(calleeUuid);
-                    if (callerUuid)
-                        free(callerUuid);
-                    zmsg_destroy(&msgDuplicate);
-                    zyre_event_destroy(&zyre_event);
-                    return 0;
+                if (callerAgent){
+                    //replace caller name by the one of an actual agent
+                    //NB: this will happen all the time, except when ingeprobe
+                    //(which is not an agent) emulates a call.
+                    callerName = callerAgent->name;
                 }
 
                 igs_agent_t *calleeAgent = NULL;
@@ -1953,13 +1951,13 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                     if (call != NULL ){
                         if (call->cb != NULL){
                             bus_zyreLock();
-                            zyre_shouts(context->node, context->callsChannel, "%s from %s (%s)", callName, callerAgent->name, callerUuid);
+                            zyre_shouts(context->node, context->callsChannel, "%s from %s (%s)", callName, callerName, callerUuid);
                             bus_zyreUnlock();
                             size_t nbArgs = 0;
                             igs_callArgument_t *_arg = NULL;
                             LL_COUNT(call->arguments, _arg, nbArgs);
                             if (call_addValuesToArgumentsFromMessage(callName, call->arguments, msgDuplicate) == IGS_SUCCESS){
-                                (call->cb)(calleeAgent, callerAgent->name, callerUuid, callName, call->arguments, nbArgs, call->cbData);
+                                (call->cb)(calleeAgent, callerName, callerUuid, callName, call->arguments, nbArgs, call->cbData);
                                 call_freeValuesInArguments(call->arguments);
                             }
                         }else{
@@ -2129,6 +2127,7 @@ int triggerMappingUpdate(zloop_t *loop, int timer_id, void *arg){
                 network_configureMappingsToRemoteAgent(agent, remote);
             }
             agent->network_needToUpdateMapping = false;
+            agent_propagateAgentEvent(IGS_AGENT_UPDATED_MAPPING, agent->uuid, agent->name);
         }
     }
     return 0;
