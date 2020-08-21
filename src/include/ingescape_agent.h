@@ -9,7 +9,6 @@
 #ifndef ingescape_class_h
 #define ingescape_class_h
 
-#include "ingescape.h"
 #include "ingescape_advanced.h"
 
 #ifdef __cplusplus
@@ -130,6 +129,7 @@ PUBLIC igs_result_t igsAgent_removeParameter(igs_agent_t *agent, const char *nam
 PUBLIC igs_result_t igsAgent_loadMapping (igs_agent_t *agent, const char* json_str);
 PUBLIC igs_result_t igsAgent_loadMappingFromPath (igs_agent_t *agent, const char* file_path);
 PUBLIC void igsAgent_clearMapping(igs_agent_t *agent);
+PUBLIC void igsAgent_clearMappingOnAgent(igs_agent_t *agent, const char *agentName);
 PUBLIC char* igsAgent_getMapping(igs_agent_t *agent); //returns json string, must be freed by caller
 PUBLIC char *igsAgent_getMappingName(igs_agent_t *agent); //returned char* must be freed by caller
 PUBLIC char *igsAgent_getMappingDescription(igs_agent_t *agent); //returned char* must be freed by caller

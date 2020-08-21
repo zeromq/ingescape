@@ -982,7 +982,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                     assert(zyrePeer);
                     remoteAgent->peer = zyrePeer;
                     HASH_ADD_STR(context->remoteAgents, uuid, remoteAgent);
-                    igs_info("registering agent %s(%s)", uuid, remoteAgentName);
+                    igs_debug("registering agent %s(%s)", uuid, remoteAgentName);
                     isAgentNew = true;
                 }else{
                     //we already know this agent
@@ -1042,7 +1042,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                     agent_propagateAgentEvent(IGS_AGENT_UPDATED_DEFINITION, uuid, remoteAgentName);
                 }
             }else{
-                igs_error("received definition from remote agent %s(%s) is NULL : agent will not be registered", remoteAgentName, uuid);
+                igs_error("received definition from remote agent %s(%s) is empty or invalid : agent will not be registered", remoteAgentName, uuid);
             }
             free(strDefinition);
             free(uuid);

@@ -248,7 +248,8 @@ PUBLIC igs_result_t igs_removeParameter(const char *name);
 //load / set / get mapping
 PUBLIC igs_result_t igs_loadMapping (const char* json_str);
 PUBLIC igs_result_t igs_loadMappingFromPath (const char* file_path);
-PUBLIC void igs_clearMapping(void); //clears all mapping for the agent
+PUBLIC void igs_clearMapping(void); //clears all mappings for our agent
+PUBLIC void igs_clearMappingOnAgent(const char *agentName); //clears our mappings for this agent
 PUBLIC char* igs_getMapping(void); //returns json string, must be freed by caller
 PUBLIC char *igs_getMappingName(void); //returned char* must be freed by caller
 PUBLIC char *igs_getMappingDescription(void); //returned char* must be freed by caller

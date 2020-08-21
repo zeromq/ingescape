@@ -155,21 +155,26 @@ igs_result_t igsAgent_loadMappingFromPath (igs_agent_t *agent, const char* file_
 
 void igsAgent_clearMapping(igs_agent_t *agent){
     igsAgent_debug(agent, "clear current mapping if needed and initiate an empty one");
-    if(agent->mapping != NULL){
+    if(agent->mapping){
         mapping_freeMapping(&agent->mapping);
     }
     agent->mapping = calloc(1, sizeof(struct igs_mapping));
     agent->network_needToUpdateMapping = true;
 }
 
-/**
- * \fn char* igs_getMapping()
- * \ingroup loadClearGetMapFct
- * \brief the agent mapping getter
- *
- * \return The loaded mapping string in json format. NULL if agent->mapping was not initialized.
- * \warning Allocate memory that should be freed by the user.
- */
+void igsAgent_clearMappingOnAgent(igs_agent_t *agent, const char *agentName){
+    if (agent->mapping){
+        igs_mapping_element_t *elmt, *tmp;
+        HASH_ITER(hh, agent->mapping->map_elements, elmt, tmp){
+            if (streq(elmt->agent_name, agentName)){
+                HASH_DEL(agent->mapping->map_elements, elmt);
+                mapping_freeMappingElement(elmt);
+            }
+        }
+    }
+}
+
+
 char* igsAgent_getMapping(igs_agent_t *agent){
     char * mappingJson = NULL;
     if(agent->mapping == NULL){

@@ -34,9 +34,7 @@
 #include <iphlpapi.h>
 #endif
 
-#include "ingescape.h"
 #include "ingescape_agent.h"
-#include "ingescape_advanced.h"
 
 #ifdef __cplusplus
 extern "C" {

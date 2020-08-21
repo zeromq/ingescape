@@ -528,6 +528,11 @@ void igs_clearMapping(void){
     igsAgent_clearMapping(coreAgent);
 }
 
+void igs_clearMappingOnAgent(const char *agentName){
+    core_initAgent();
+    igsAgent_clearMappingOnAgent(coreAgent, agentName);
+}
+
 char* igs_getMapping(void){
     core_initAgent();
     return igsAgent_getMapping(coreAgent);

@@ -31,6 +31,34 @@ pthread_mutex_t model_readWriteMutex = NULL;
 // INTERNAL FUNCTIONS
 ////////////////////////////////////////////////////////////////////////
 
+uint8_t* model_stringToBytes (char* string){
+    assert(string);
+    size_t slength = strlen(string);
+    if((slength % 2) != 0){ // must be even
+       return NULL;
+    }
+    size_t dlength = slength / 2;
+    uint8_t* data = calloc(1, dlength);
+    size_t index = 0;
+    while (index < slength) {
+        char c = string[index];
+        int value = 0;
+        if(c >= '0' && c <= '9')
+          value = (c - '0');
+        else if (c >= 'A' && c <= 'F')
+          value = (10 + (c - 'A'));
+        else if (c >= 'a' && c <= 'f')
+          value = (10 + (c - 'a'));
+        else {
+          free(data);
+          return NULL;
+        }
+        data[(index/2)] += value << (((index + 1) % 2) * 4);
+        index++;
+    }
+    return data;
+}
+
 void model_readWriteLock(void)   {
 #if defined(__unix__) || defined(__linux__) || \
 (defined(__APPLE__) && defined(__MACH__))
@@ -798,14 +826,13 @@ const igs_iop_t* model_writeIOP (igs_agent_t *agent, const char *iopName, iop_t 
                     iop->value.data = NULL;
                     size_t s = 0;
                     if (value != NULL){
-                        //warning : when copying string to data, we remove the final '\0'
-                        s = size;
-                        iop->value.data = calloc (1, s);
-                        memcpy(iop->value.data, value, s);
+                        uint8_t *converted = model_stringToBytes(value);
+                        iop->value.data = converted;
+                        s = strlen(value);
                     }
                     outSize = iop->valueSize = s;
                     outValue = iop->value.data;
-                    igsAgent_debug(agent, "set %s data (length: %zu)", iopName, s);
+                    igsAgent_debug(agent, "set %s data (length: %zu) from hex string", iopName, s);
                 }
                     break;
                 default:
