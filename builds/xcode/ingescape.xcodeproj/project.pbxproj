@@ -3296,6 +3296,11 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				DEVELOPMENT_TEAM = 56DRT9MG9S;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+					ZYRE_BUILD_DRAFT_API,
+				);
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../../dependencies/ios/ios/include/",
 					"$(SRCROOT)/../../src/include/",
@@ -3306,6 +3311,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = ingescape;
 				SKIP_INSTALL = YES;
+				VALID_ARCHS = "arm64 arm64e armv7 armv7s i386 MacOSX_x86_64";
 			};
 			name = Debug;
 		};
@@ -3314,6 +3320,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				DEVELOPMENT_TEAM = 56DRT9MG9S;
+				GCC_PREPROCESSOR_DEFINITIONS = ZYRE_BUILD_DRAFT_API;
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../../dependencies/ios/ios/include/",
 					"$(SRCROOT)/../../dependencies/ios/ios/include/",
@@ -3324,6 +3331,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = ingescape;
 				SKIP_INSTALL = YES;
+				VALID_ARCHS = "arm64 arm64e armv7 armv7s i386 MacOSX_x86_64";
 			};
 			name = Release;
 		};
