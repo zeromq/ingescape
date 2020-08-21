@@ -339,7 +339,8 @@ int manageParent (zloop_t *loop, zsock_t *socket, void *args){
                         zmsg_t *callMsg = zmsg_new();
                         zmsg_addstr(callMsg, "CALL");
                         if (streq(p->protocol, "v2")){
-                            //v2 protocol : add agent uuid
+                            //v2 protocol : add our id as caller and callee agent uuid
+                            zmsg_addstr(callMsg, zyre_uuid(context->node));
                             zmsg_addstr(callMsg, a->uuid);
                         }else{
                             //v1 protocol
