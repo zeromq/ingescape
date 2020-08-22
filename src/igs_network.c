@@ -2702,17 +2702,21 @@ igs_result_t network_publishOutput (igs_agent_t *agent, const igs_iop_t *iop){
             igsAgent_warn(agent, "agent not started : could not publish output %s to the network (published to agents in same process only)", iop->name);
         }
         //4- distribute publication message to other agents inside our context without using network
-        free(zmsg_popstr(msgQuater)); //remove composite uuid/iop name
-        zmsg_pushstr(msgQuater, iop->name); //replace it by simple iop name
-        //Generate a temporary fake remote agent, containing only
-        //necessary information for handlePublicationFromRemoteAgent.
-        igs_remote_agent_t *fakeRemote = calloc(1, sizeof(igs_remote_agent_t));
-        fakeRemote->context = coreContext;
-        fakeRemote->name = agent->name;
-        model_readWriteUnlock(); //to avoid deadlock inside handlePublicationFromRemoteAgent
-        handlePublicationFromRemoteAgent(msgQuater, fakeRemote);
-        zmsg_destroy(&msgQuater);
-        free(fakeRemote);
+        if (!agent->isVirtual){
+            free(zmsg_popstr(msgQuater)); //remove composite uuid/iop name
+            zmsg_pushstr(msgQuater, iop->name); //replace it by simple iop name
+            //Generate a temporary fake remote agent, containing only
+            //necessary information for handlePublicationFromRemoteAgent.
+            igs_remote_agent_t *fakeRemote = calloc(1, sizeof(igs_remote_agent_t));
+            fakeRemote->context = coreContext;
+            fakeRemote->name = agent->name;
+            model_readWriteUnlock(); //to avoid deadlock inside handlePublicationFromRemoteAgent
+            handlePublicationFromRemoteAgent(msgQuater, fakeRemote);
+            zmsg_destroy(&msgQuater);
+            free(fakeRemote);
+        }else{
+            model_readWriteUnlock();
+        }
         
     }else{
         if (agent->isWholeAgentMuted){

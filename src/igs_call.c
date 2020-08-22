@@ -506,56 +506,58 @@ igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, 
     }
     
     //2- iteration on local agents
-    igs_agent_t *localAgent, *atmp;
-    HASH_ITER(hh, agent->context->agents, localAgent, atmp){
-        if (streq(localAgent->name, agentNameOrUUID) || streq(localAgent->uuid, agentNameOrUUID)){
-            //we found a matching agent
-            igs_callArgument_t *arg = NULL;
-            found = true;
-            if (localAgent->definition == NULL){
-                igsAgent_error(agent, "definition is unknown for %s(%s) : call will not be sent",
-                               localAgent->name, agentNameOrUUID);
-                continue;
-            }else{
-                igs_call_t *call = NULL;
-                HASH_FIND_STR(localAgent->definition->calls_table, callName, call);
-                if (call != NULL){
-                    size_t nbArguments = 0;
-                    if (list != NULL && *list != NULL)
-                        LL_COUNT(*list, arg, nbArguments);
-                    size_t definedNbArguments = 0;
-                    LL_COUNT(call->arguments, arg, definedNbArguments);
-                    if (nbArguments != definedNbArguments){
-                        igsAgent_error(agent, "passed number of arguments is not correct (received: %zu / expected: %zu) : call will not be sent",
-                                       nbArguments, definedNbArguments);
-                        continue;
-                    }else{
-                        //update call arguments values with new ones
-                        if (call->arguments && (list != NULL)){
-                            call_copyArguments(*list, call->arguments);
-                        }
-                        if (call->cb != NULL){
-                            (call->cb)(localAgent, agent->name, agent->uuid, callName, call->arguments, nbArguments, call->cbData);
-                            call_freeValuesInArguments(call->arguments);
-                        }else{
-                            igsAgent_error(agent, "no defined callback to handle received call %s", callName);
-                        }
-                    }
-                }else{
-                    igsAgent_error(agent, "could not find call named %s for %s (%s) : call will not be sent",
-                                   callName, localAgent->name, localAgent->uuid);
+    if (!agent->isVirtual){
+        igs_agent_t *localAgent, *atmp;
+        HASH_ITER(hh, agent->context->agents, localAgent, atmp){
+            if (streq(localAgent->name, agentNameOrUUID) || streq(localAgent->uuid, agentNameOrUUID)){
+                //we found a matching agent
+                igs_callArgument_t *arg = NULL;
+                found = true;
+                if (localAgent->definition == NULL){
+                    igsAgent_error(agent, "definition is unknown for %s(%s) : call will not be sent",
+                                   localAgent->name, agentNameOrUUID);
                     continue;
+                }else{
+                    igs_call_t *call = NULL;
+                    HASH_FIND_STR(localAgent->definition->calls_table, callName, call);
+                    if (call != NULL){
+                        size_t nbArguments = 0;
+                        if (list != NULL && *list != NULL)
+                            LL_COUNT(*list, arg, nbArguments);
+                        size_t definedNbArguments = 0;
+                        LL_COUNT(call->arguments, arg, definedNbArguments);
+                        if (nbArguments != definedNbArguments){
+                            igsAgent_error(agent, "passed number of arguments is not correct (received: %zu / expected: %zu) : call will not be sent",
+                                           nbArguments, definedNbArguments);
+                            continue;
+                        }else{
+                            //update call arguments values with new ones
+                            if (call->arguments && (list != NULL)){
+                                call_copyArguments(*list, call->arguments);
+                            }
+                            if (call->cb != NULL){
+                                (call->cb)(localAgent, agent->name, agent->uuid, callName, call->arguments, nbArguments, call->cbData);
+                                call_freeValuesInArguments(call->arguments);
+                            }else{
+                                igsAgent_error(agent, "no defined callback to handle received call %s", callName);
+                            }
+                        }
+                    }else{
+                        igsAgent_error(agent, "could not find call named %s for %s (%s) : call will not be sent",
+                                       callName, localAgent->name, localAgent->uuid);
+                        continue;
+                    }
                 }
+                
+                bus_zyreLock();
+                if (coreContext->node != NULL){
+                    zyre_shouts(agent->context->node, agent->context->callsChannel, "%s(%s) calls %s.%s(%s)",
+                                agent->name, agent->uuid, localAgent->name, callName, localAgent->uuid);
+                }
+                bus_zyreUnlock();
+                igsAgent_debug(agent, "sent call %s to %s(%s)", callName, localAgent->name, localAgent->uuid);
+                
             }
-
-            bus_zyreLock();
-            if (coreContext->node != NULL){
-                zyre_shouts(agent->context->node, agent->context->callsChannel, "%s(%s) calls %s.%s(%s)",
-                            agent->name, agent->uuid, localAgent->name, callName, localAgent->uuid);
-            }
-            bus_zyreUnlock();
-            igsAgent_debug(agent, "sent call %s to %s(%s)", callName, localAgent->name, localAgent->uuid);
-
         }
     }
     

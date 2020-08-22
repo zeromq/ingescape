@@ -369,6 +369,15 @@ typedef struct igs_agent {
     char *name;
     char *state;
     
+    /*
+     The concept of virtual agent is used by igsProxy. Virtual
+     agents represent n existing agent which is executed somewhere
+     else. Thus virtual agents should not propagate published
+     outputs and calls to other agents in the same context (i.e.
+     all represented inside the same igsProxy instance).
+     */
+    bool isVirtual;
+    
     igs_core_context_t *context;
     
     igs_activate_calback_t *activateCallbacks;
