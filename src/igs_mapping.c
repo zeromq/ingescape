@@ -132,8 +132,12 @@ igs_result_t igsAgent_loadMapping (igs_agent_t *agent, const char* json_str){
         igsAgent_error(agent, "mapping could not be loaded from json string");
         return IGS_FAILURE;
     }else{
+        model_readWriteLock();
+        if (agent->mapping)
+            mapping_freeMapping(&agent->mapping);
         agent->mapping = tmp;
         agent->network_needToUpdateMapping = true;
+        model_readWriteUnlock();
     }
     return IGS_SUCCESS;
 }
@@ -146,24 +150,28 @@ igs_result_t igsAgent_loadMappingFromPath (igs_agent_t *agent, const char* file_
         igsAgent_error(agent, "mapping could not be loaded from path '%s'", file_path);
         return IGS_FAILURE;
     }else{
+        model_readWriteLock();
+        if (agent->mapping)
+            mapping_freeMapping(&agent->mapping);
         agent->mappingPath = strndup(file_path, IGS_MAX_PATH_LENGTH - 1);
         agent->mapping = tmp;
         agent->network_needToUpdateMapping = true;
+        model_readWriteUnlock();
     }
     return IGS_FAILURE;
 }
 
 void igsAgent_clearMapping(igs_agent_t *agent){
     igsAgent_debug(agent, "clear current mapping if needed and initiate an empty one");
-    if(agent->mapping){
+    if(agent->mapping)
         mapping_freeMapping(&agent->mapping);
-    }
     agent->mapping = calloc(1, sizeof(struct igs_mapping));
     agent->network_needToUpdateMapping = true;
 }
 
 void igsAgent_clearMappingOnAgent(igs_agent_t *agent, const char *agentName){
     if (agent->mapping){
+        model_readWriteLock();
         igs_mapping_element_t *elmt, *tmp;
         HASH_ITER(hh, agent->mapping->map_elements, elmt, tmp){
             if (streq(elmt->agent_name, agentName)){
@@ -171,6 +179,7 @@ void igsAgent_clearMappingOnAgent(igs_agent_t *agent, const char *agentName){
                 mapping_freeMappingElement(elmt);
             }
         }
+        model_readWriteUnlock();
     }
 }
 
@@ -257,7 +266,10 @@ size_t igsAgent_getMappingEntriesNumber(igs_agent_t *agent){
         igsAgent_warn(agent, "No mapping defined yet");
         return 0;
     }
-    return HASH_COUNT(agent->mapping->map_elements);;
+    model_readWriteLock();
+    size_t res = HASH_COUNT(agent->mapping->map_elements);
+    model_readWriteUnlock();
+    return res;
 }
 
 unsigned long igsAgent_addMappingEntry(igs_agent_t *agent,
@@ -318,7 +330,7 @@ unsigned long igsAgent_addMappingEntry(igs_agent_t *agent,
         igsAgent_error(agent, "spaces are not allowed in IOP '%s'", withOutput);
         return 0;
     }
-
+    model_readWriteLock();
     //Check if already initialized, and do it if not
     if(agent->mapping == NULL){
         igsAgent_clearMapping(agent);
@@ -356,6 +368,7 @@ unsigned long igsAgent_addMappingEntry(igs_agent_t *agent,
     free(reviewedFromOurInput);
     free(reviewedToAgent);
     free(reviewedWithOutput);
+    model_readWriteUnlock();
     return hash;
 }
 
@@ -376,9 +389,11 @@ igs_result_t igsAgent_removeMappingEntryWithId(igs_agent_t *agent, unsigned long
         igsAgent_error(agent, "id %ld is not part of the current mapping", theId);
         return IGS_FAILURE;
     }else{
+        model_readWriteLock();
         HASH_DEL(agent->mapping->map_elements, el);
         mapping_freeMappingElement(el);
         agent->network_needToUpdateMapping = true;
+        model_readWriteUnlock();
     }
     return IGS_SUCCESS;
 }
@@ -418,9 +433,11 @@ igs_result_t igsAgent_removeMappingEntryWithName(igs_agent_t *agent, const char 
         igsAgent_error(agent, "mapping combination %s->%s.%s does NOT exist", fromOurInput, toAgent, withOutput);
         return IGS_FAILURE;
     }else{
+        model_readWriteLock();
         HASH_DEL(agent->mapping->map_elements, tmp);
         mapping_freeMappingElement(tmp);
         agent->network_needToUpdateMapping = true;
+        model_readWriteUnlock();
         return IGS_SUCCESS;
     }
 }

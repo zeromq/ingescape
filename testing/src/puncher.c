@@ -1150,9 +1150,10 @@ int main(int argc, const char * argv[]) {
     readResult = igs_readInputAsString("my_string");
     assert(streq(readResult, "3.3"));
     free(readResult);
-    igs_writeInputAsString("my_data", "3.3");
+    assert(igs_writeInputAsString("my_data", "toto") == IGS_FAILURE);
+    assert(igs_writeInputAsString("my_data", "0123456789abcdef") == IGS_SUCCESS);
     igs_readInputAsData("my_data", &data, &dataSize);
-    assert(streq("3.3", (char*)data) && dataSize == strlen("3.3") + 1);
+    assert(dataSize == 16);
     
     data = (void*)"my data";
     dataSize = strlen("my data") + 1;
@@ -1394,12 +1395,56 @@ int main(int argc, const char * argv[]) {
         zloop_destroy(&loop);
         igs_stop();
         exit(EXIT_SUCCESS);
+    }else{
+        if (networkDevice == NULL){
+            //we have no device to start with: try to find one
+            char **devices = NULL;
+            char **addresses = NULL;
+            int nbD = 0;
+            int nbA = 0;
+            igs_getNetdevicesList(&devices, &nbD);
+            igs_getNetaddressesList(&addresses, &nbA);
+            assert(nbD == nbA);
+            if (nbD == 1){
+                //we have exactly one compliant network device available: we use it
+                networkDevice = strdup(devices[0]);
+                igs_info("using %s as default network device (this is the only one available)", networkDevice);
+            }else if (nbD == 2 && (strcmp(addresses[0], "127.0.0.1") == 0 || strcmp(addresses[1], "127.0.0.1") == 0)){
+                //we have two devices, one of which is the loopback
+                //pick the device that is NOT the loopback
+                if (strcmp(addresses[0], "127.0.0.1") == 0){
+                    networkDevice = strdup(devices[1]);
+                }else{
+                    networkDevice = strdup(devices[0]);
+                }
+                igs_info("using %s as default network device (this is the only one available that is not the loopback)", networkDevice);
+            }else{
+                if (nbD == 0){
+                    igs_error("No network device found: aborting.");
+                }else{
+                    igs_error("No network device passed as command line parameter and several are available.");
+                    printf("Please use one of these network devices:\n");
+                    for (int i = 0; i < nbD; i++){
+                        printf("\t%s\n", devices[i]);
+                    }
+                    printf("\n");
+                    print_usage();
+                }
+                exit(EXIT_FAILURE);
+            }
+            igs_freeNetdevicesList(devices, nbD);
+            igs_freeNetaddressesList(addresses, nbD);
+        }
     }
     
     
     igsAgent_activate(firstAgent);
     igs_startWithDevice(networkDevice, port);
     igs_startWithDevice(networkDevice, port); //testing immediate stop + restart
+    igs_stop();
+    igs_stop();
+    igs_stop();
+    igs_startWithDevice(networkDevice, port);
     
     //mainloop management (two modes)
     if (!interactiveloop) {

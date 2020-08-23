@@ -426,6 +426,7 @@ igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, 
     
     bool found = false;
     
+    model_readWriteLock();
     //1- iteration on remote agents
     if (coreContext->node != NULL){
         igs_remote_agent_t *remoteAgent = NULL, *tmp = NULL;
@@ -565,7 +566,7 @@ igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, 
         call_freeCallArguments(*list);
         *list = NULL;
     }
-    
+    model_readWriteUnlock();
     if (!found){
         igsAgent_error(agent, "could not find an agent with name or UUID : %s", agentNameOrUUID);
         return IGS_FAILURE;

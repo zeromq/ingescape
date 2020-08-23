@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "9716CA451EA21C6A004F0AC0"
-               BuildableName = "libyajl.a"
-               BlueprintName = "yajl-ios"
-               ReferencedContainer = "container:yajl.xcodeproj">
+               BlueprintIdentifier = "97D709BA24C1F243008825B0"
+               BuildableName = "sparingPartner"
+               BlueprintName = "sparingPartner"
+               ReferencedContainer = "container:testing.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -40,6 +40,16 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "97D709BA24C1F243008825B0"
+            BuildableName = "sparingPartner"
+            BlueprintName = "sparingPartner"
+            ReferencedContainer = "container:testing.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -47,15 +57,16 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <MacroExpansion>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "9716CA451EA21C6A004F0AC0"
-            BuildableName = "libyajl.a"
-            BlueprintName = "yajl-ios"
-            ReferencedContainer = "container:yajl.xcodeproj">
+            BlueprintIdentifier = "97D709BA24C1F243008825B0"
+            BuildableName = "sparingPartner"
+            BlueprintName = "sparingPartner"
+            ReferencedContainer = "container:testing.xcodeproj">
          </BuildableReference>
-      </MacroExpansion>
+      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
