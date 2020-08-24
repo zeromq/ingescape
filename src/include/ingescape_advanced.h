@@ -78,7 +78,7 @@ PUBLIC igs_result_t igs_startWithBrokers(const char *agentEndpoint);
  NB: if privateKey is NOT NULL and publicKeysDirectory is NULL or does not exist,
  security will not be enabled and our agent will not start.
 */
-PUBLIC igs_result_t igs_enableSecurity(const char *privateKey, const char *publicKeysDirectory);
+PUBLIC igs_result_t igs_enableSecurity(const char *privateKeyFile, const char *publicKeysDirectory);
 PUBLIC igs_result_t igs_brokerAddSecure(const char *brokerEndpoint, const char *publicKeyPath);
 
 
