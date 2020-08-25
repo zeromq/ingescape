@@ -82,6 +82,94 @@ void mapping_freeMapping (igs_mapping_t **map) {
     *map = NULL;
 }
 
+bool mapping_isEqual(const char *firstStr, const char *secondStr){
+    if ((!firstStr && secondStr) || (firstStr && !secondStr))
+        return false;
+    igs_mapping_t *first = parser_loadMapping(firstStr);
+    if (!first)
+        return false;
+    igs_mapping_t *second = parser_loadMapping(secondStr);
+    if (!second){
+        mapping_freeMapping(&first);
+        return false;
+    }
+    
+    bool res = true;
+    if (first->name){
+        if (second->name){
+            if (!streq(first->name, second->name)){
+                res = false;
+                goto END;
+            }
+        }else{
+            res = false;
+            goto END;
+        }
+    } else if (second->name){
+        res = false;
+        goto END;
+    }
+    if (first->description){
+        if (second->description){
+            if (!streq(first->description, second->description)){
+                res = false;
+                goto END;
+            }
+        }else{
+            res = false;
+            goto END;
+        }
+    } else if (second->description){
+        res = false;
+        goto END;
+    }
+    if (first->version){
+        if (second->version){
+            if (!streq(first->version, second->version)){
+                res = false;
+                goto END;
+            }
+        }else{
+            res = false;
+            goto END;
+        }
+    } else if (second->version){
+        res = false;
+        goto END;
+    }
+    
+    if (!first->map_elements){
+        if (second->map_elements){
+            res = false;
+            goto END;
+        }
+    }
+    if (!second->map_elements){
+        res = false;
+        goto END;
+    }
+    size_t firstS = HASH_COUNT(first->map_elements);
+    size_t secondS = HASH_COUNT(second->map_elements);
+    if (firstS != secondS){
+        res = false;
+        goto END;
+    }
+    igs_mapping_element_t *elmt, *tmp, *secondElmt;
+    HASH_ITER(hh, first->map_elements, elmt, tmp){
+        secondElmt = NULL;
+        HASH_FIND(hh, second->map_elements, &elmt->id, sizeof(unsigned long), secondElmt);
+        if (!secondElmt){
+            res = false;
+            goto END;
+        }
+    }
+    
+END:
+    mapping_freeMapping(&first);
+    mapping_freeMapping(&second);
+    return res;
+}
+
 igs_mapping_element_t * mapping_createMappingElement(const char * input_name,
                                                  const char *agent_name,
                                                  const char* output_name){
@@ -136,7 +224,7 @@ igs_result_t igsAgent_loadMapping (igs_agent_t *agent, const char* json_str){
         if (agent->mapping)
             mapping_freeMapping(&agent->mapping);
         agent->mapping = tmp;
-        agent->network_needToUpdateMapping = true;
+        agent->network_needToSendMappingUpdate = true;
         model_readWriteUnlock();
     }
     return IGS_SUCCESS;
@@ -155,7 +243,7 @@ igs_result_t igsAgent_loadMappingFromPath (igs_agent_t *agent, const char* file_
             mapping_freeMapping(&agent->mapping);
         agent->mappingPath = strndup(file_path, IGS_MAX_PATH_LENGTH - 1);
         agent->mapping = tmp;
-        agent->network_needToUpdateMapping = true;
+        agent->network_needToSendMappingUpdate = true;
         model_readWriteUnlock();
     }
     return IGS_FAILURE;
@@ -166,7 +254,7 @@ void igsAgent_clearMapping(igs_agent_t *agent){
     if(agent->mapping)
         mapping_freeMapping(&agent->mapping);
     agent->mapping = calloc(1, sizeof(struct igs_mapping));
-    agent->network_needToUpdateMapping = true;
+    agent->network_needToSendMappingUpdate = true;
 }
 
 void igsAgent_clearMappingOnAgent(igs_agent_t *agent, const char *agentName){
@@ -224,7 +312,7 @@ void igsAgent_setMappingName(igs_agent_t *agent, const char *name){
     //init mapping if neeed
     if(agent->mapping == NULL){
         agent->mapping = calloc(1, sizeof(struct igs_mapping));
-        agent->network_needToUpdateMapping = true;
+        agent->network_needToSendMappingUpdate = true;
     }
     if(agent->mapping->name != NULL){
         free(agent->mapping->name);
@@ -238,7 +326,7 @@ void igsAgent_setMappingDescription(igs_agent_t *agent, const char *description)
     //init mapping if neeed
     if(agent->mapping == NULL){
         agent->mapping = calloc(1, sizeof(struct igs_mapping));
-        agent->network_needToUpdateMapping = true;
+        agent->network_needToSendMappingUpdate = true;
     }
     if(agent->mapping->description != NULL){
         free(agent->mapping->description);
@@ -252,7 +340,7 @@ void igsAgent_setMappingVersion(igs_agent_t *agent, const char *version){
     //init mapping if neeed
     if(agent->mapping == NULL){
         agent->mapping = calloc(1, sizeof(struct igs_mapping));
-        agent->network_needToUpdateMapping = true;
+        agent->network_needToSendMappingUpdate = true;
     }
     if(agent->mapping->version != NULL){
         free(agent->mapping->version);
@@ -361,7 +449,7 @@ unsigned long igsAgent_addMappingEntry(igs_agent_t *agent,
         igs_mapping_element_t *new = mapping_createMappingElement(reviewedFromOurInput, reviewedToAgent, reviewedWithOutput);
         new->id = hash;
         HASH_ADD(hh, agent->mapping->map_elements, id, sizeof(unsigned long), new);
-        agent->network_needToUpdateMapping = true;
+        agent->network_needToSendMappingUpdate = true;
     }else{
         igsAgent_warn(agent, "mapping combination %s->%s.%s already exists (will not be duplicated)", reviewedFromOurInput, reviewedToAgent, reviewedWithOutput);
     }
@@ -392,7 +480,7 @@ igs_result_t igsAgent_removeMappingEntryWithId(igs_agent_t *agent, unsigned long
         model_readWriteLock();
         HASH_DEL(agent->mapping->map_elements, el);
         mapping_freeMappingElement(el);
-        agent->network_needToUpdateMapping = true;
+        agent->network_needToSendMappingUpdate = true;
         model_readWriteUnlock();
     }
     return IGS_SUCCESS;
@@ -436,7 +524,7 @@ igs_result_t igsAgent_removeMappingEntryWithName(igs_agent_t *agent, const char 
         model_readWriteLock();
         HASH_DEL(agent->mapping->map_elements, tmp);
         mapping_freeMappingElement(tmp);
-        agent->network_needToUpdateMapping = true;
+        agent->network_needToSendMappingUpdate = true;
         model_readWriteUnlock();
         return IGS_SUCCESS;
     }

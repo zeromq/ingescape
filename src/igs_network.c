@@ -1089,6 +1089,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 if(remoteAgent != NULL && remoteAgent->mapping != NULL) {
                     mapping_freeMapping(&remoteAgent->mapping);
                     remoteAgent->mapping = NULL;
+                    agent_propagateAgentEvent(IGS_AGENT_UPDATED_MAPPING, uuid, remoteAgent->name);
                 }
             }
             
@@ -1097,18 +1098,13 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 if(remoteAgent->mapping != NULL){
                     igs_debug("mapping already exists for agent %s(%s) : new mapping will overwrite the previous one...", remoteAgent->name, remoteAgent->uuid);
                     mapping_freeMapping(&remoteAgent->mapping);
-                    remoteAgent->mapping = NULL;
                 }
                 
                 igs_debug("store mapping for agent %s(%s)", remoteAgent->name, remoteAgent->uuid);
                 remoteAgent->mapping = newMapping;
-            }else{
-                if(newMapping != NULL) {
-                    mapping_freeMapping(&newMapping);
-                    newMapping = NULL;
-                }
+                agent_propagateAgentEvent(IGS_AGENT_UPDATED_MAPPING, uuid, remoteAgent->name);
             }
-            agent_propagateAgentEvent(IGS_AGENT_UPDATED_MAPPING, uuid, remoteAgent->name);
+            
             free(strMapping);
             free(uuid);
         }
@@ -1169,18 +1165,18 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             }
             
             // Load mapping from string content
-            igs_mapping_t *m = parser_loadMapping(strMapping);
-            if (m != NULL){
+            igs_mapping_t *newMapping = parser_loadMapping(strMapping);
+            if (newMapping){
                 if (agent->mapping != NULL){
                     mapping_freeMapping(&agent->mapping);
                 }
-                agent->mapping = m;
+                agent->mapping = newMapping;
                 //check and activate mapping
                 igs_remote_agent_t *remote, *tmp;
                 HASH_ITER(hh, context->remoteAgents, remote, tmp){
                     network_configureMappingsToRemoteAgent(agent, remote);
                 }
-                agent->network_needToUpdateMapping = true;
+                agent->network_needToSendMappingUpdate = true;
             }
             free(strMapping);
             free(uuid);
@@ -2094,7 +2090,7 @@ int triggerDefinitionUpdate(zloop_t *loop, int timer_id, void *arg){
             agent->network_needToSendDefinitionUpdate = false;
             agent_propagateAgentEvent(IGS_AGENT_UPDATED_DEFINITION, agent->uuid, agent->name);
             //when definition changes, mapping may need to be updated as well
-            agent->network_needToUpdateMapping = true;
+            agent->network_needToSendMappingUpdate = true;
             model_readWriteUnlock();
         }
     }
@@ -2110,7 +2106,7 @@ int triggerMappingUpdate(zloop_t *loop, int timer_id, void *arg){
 
     igs_agent_t *agent, *tmp;
     HASH_ITER(hh, context->agents, agent, tmp){
-        if (agent->network_needToUpdateMapping){
+        if (agent->network_needToSendMappingUpdate){
             char *mappingStr = NULL;
             mappingStr = parser_export_mapping(agent->mapping);
             if (mappingStr != NULL){
@@ -2126,7 +2122,7 @@ int triggerMappingUpdate(zloop_t *loop, int timer_id, void *arg){
             HASH_ITER(hh, context->remoteAgents, remote, rtmp){
                 network_configureMappingsToRemoteAgent(agent, remote);
             }
-            agent->network_needToUpdateMapping = false;
+            agent->network_needToSendMappingUpdate = false;
             agent_propagateAgentEvent(IGS_AGENT_UPDATED_MAPPING, agent->uuid, agent->name);
         }
     }
@@ -2180,7 +2176,7 @@ static void runLoop (zsock_t *mypipe, void *args){
     //to all peers (they will receive def & map when joining INGESCAPE_PRIVATE)
     igs_agent_t *agent, *tmp;
     HASH_ITER(hh, context->agents, agent, tmp){
-        agent->network_needToUpdateMapping = false;
+        agent->network_needToSendMappingUpdate = false;
         agent->network_needToSendDefinitionUpdate = false;
     }
     
@@ -2710,7 +2706,9 @@ igs_result_t network_publishOutput (igs_agent_t *agent, const igs_iop_t *iop){
             igs_remote_agent_t *fakeRemote = calloc(1, sizeof(igs_remote_agent_t));
             fakeRemote->context = coreContext;
             fakeRemote->name = agent->name;
+            
             model_readWriteUnlock(); //to avoid deadlock inside handlePublicationFromRemoteAgent
+            
             handlePublicationFromRemoteAgent(msgQuater, fakeRemote);
             zmsg_destroy(&msgQuater);
             free(fakeRemote);

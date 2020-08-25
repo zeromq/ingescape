@@ -393,7 +393,7 @@ typedef struct igs_agent {
     
     //network
     bool network_needToSendDefinitionUpdate;
-    bool network_needToUpdateMapping;
+    bool network_needToSendMappingUpdate;
     bool network_requestOutputsFromMappedAgents;
     
     bool isWholeAgentMuted;
@@ -417,8 +417,10 @@ PUBLIC void definition_freeDefinition (igs_definition_t **definition);
 //  mapping
 PUBLIC void mapping_freeMapping (igs_mapping_t **map);
 igs_mapping_element_t * mapping_createMappingElement(const char * input_name,
-                                                 const char *agent_name,
-                                                 const char* output_name);
+                                                     const char *agent_name,
+                                                     const char* output_name);
+PUBLIC bool mapping_isEqual(const char *firstStr, const char *secondStr);
+
 unsigned long djb2_hash (unsigned char *str);
 bool mapping_checkInputOutputCompatibility(igs_agent_t *agent, igs_iop_t *foundInput, igs_iop_t *foundOutput);
 
