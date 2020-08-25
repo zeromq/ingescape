@@ -2571,7 +2571,7 @@ void initLoop (igs_core_context_t *context){
         // Use GetModuleFileName() to get exec path
         char exeFilePath[IGS_MAX_PATH_LENGTH];
 #ifdef UNICODE
-        WCHAR temp[IGS_MAX_PATH];
+        WCHAR temp[IGS_MAX_PATH_LENGTH];
         GetModuleFileName(NULL,temp,IGS_MAX_PATH_LENGTH);
         //Conversion in char *
         wcstombs_s(NULL,exeFilePath,sizeof(exeFilePath),temp,sizeof(temp));
