@@ -3502,6 +3502,10 @@ void igs_setHighWaterMarks(int hwmValue){
     }
     if (coreContext->networkActor != NULL && coreContext->publisher != NULL){
         zsock_set_sndhwm(coreContext->publisher, hwmValue);
+        if (coreContext->ipcPublisher)
+            zsock_set_sndhwm(coreContext->ipcPublisher, hwmValue);
+        if (coreContext->inprocPublisher)
+            zsock_set_sndhwm(coreContext->inprocPublisher, hwmValue);
         zsock_set_sndhwm(coreContext->logger, hwmValue);
         igs_zyre_peer_t *tmp = NULL, *peer = NULL;
         HASH_ITER(hh, coreContext->zyrePeers, peer, tmp){
