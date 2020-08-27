@@ -274,6 +274,7 @@ PUBLIC void igs_JSONaddDouble(igsJSON_t json, double value);
 PUBLIC void igs_JSONaddString(igsJSON_t json, const char *value);
 PUBLIC void igs_JSONprint(igsJSON_t json);
 PUBLIC char* igs_JSONdump(igsJSON_t json); //returned value must be freed by caller
+PUBLIC char* igs_JSONcompactDump(igsJSON_t json); //returned value must be freed by caller
 
 // parse a JSON string or file based on parsing events and a callback
 typedef enum {

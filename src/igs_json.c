@@ -148,6 +148,14 @@ char* igs_JSONdump(igsJSON_t json){
         return strdup((char *)buffer);
     }
 }
+char* igs_JSONcompactDump(igsJSON_t json){
+    igsJSON_t dup = igs_JSONinit();
+    igsyajl_gen_config((igsyajl_gen) dup, igsyajl_gen_beautify, 0);
+    igs_JSONaddTree(dup, igs_JSONgetTree(json));
+    char* prettyDump = igs_JSONdump(dup);
+    igs_JSONfree(&dup);
+    return prettyDump;
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
