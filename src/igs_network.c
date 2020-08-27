@@ -467,7 +467,7 @@ int manageParent (zloop_t *loop, zsock_t *pipe, void *arg){
     assert(msg);
     char *command = zmsg_popstr (msg);
     if (command == NULL){
-        igs_error("command is NULL for parent message: aborting");
+        igs_error("command is NULL for parent message: rejecting");
         zmsg_destroy(&msg);
         return 0;
     }
@@ -516,18 +516,18 @@ void handlePublicationFromRemoteAgent(zmsg_t *msg, igs_remote_agent_t *remoteAge
             // 3 : value of the output as a string or zframe
             output = zmsg_popstr(dup);
             if (output == NULL){
-                igs_error("output name is NULL in received publication : aborting");
+                igs_error("output name is NULL in received publication : rejecting");
                 break;
             }
             vType = zmsg_popstr(dup);
             if (vType == NULL){
-                igs_error("output type is NULL in received publication : aborting");
+                igs_error("output type is NULL in received publication : rejecting");
                 free(output);
                 break;
             }
             valueType = atoi(vType);
             if (valueType < IGS_INTEGER_T || valueType > IGS_DATA_T){
-                igs_error("output type is not valid (%d) in received publication : aborting", valueType);
+                igs_error("output type is not valid (%d) in received publication : rejecting", valueType);
                 free(output);
                 free(vType);
                 break;
@@ -543,13 +543,13 @@ void handlePublicationFromRemoteAgent(zmsg_t *msg, igs_remote_agent_t *remoteAge
             if (valueType == IGS_STRING_T){
                 value = zmsg_popstr(dup);
                 if (value == NULL){
-                    igs_error("value is NULL in received publication : aborting");
+                    igs_error("value is NULL in received publication : rejecting");
                     break;
                 }
             }else{
                 frame = zmsg_pop(dup);
                 if (frame == NULL){
-                    igs_error("value is NULL in received publication : aborting");
+                    igs_error("value is NULL in received publication : rejecting");
                     break;
                 }
                 data = zframe_data(frame);
@@ -607,12 +607,12 @@ int manageRemotePublication (zloop_t *loop, zsock_t *socket, void *arg){
     zmsg_t *msg = zmsg_recv(socket);
     char *outputName = zmsg_popstr(msg);
     if (outputName == NULL){
-        igs_error("output name is NULL in received publication : aborting");
+        igs_error("output name is NULL in received publication : rejecting");
         return 0;
     }
     char uuid[33] = ""; //33 is UUID length + terminal 0
     if (strlen(outputName) < 33){
-        igs_error("output name '%s' is missing information : aborting", outputName);
+        igs_error("output name '%s' is missing information : rejecting", outputName);
         free(outputName);
         return 0;
     }
@@ -627,7 +627,7 @@ int manageRemotePublication (zloop_t *loop, zsock_t *socket, void *arg){
     igs_remote_agent_t *remoteAgent = NULL;
     HASH_FIND_STR(context->remoteAgents, uuid, remoteAgent);
     if (remoteAgent == NULL){
-        igs_error("no remote agent with uuid '%s' : aborting", uuid);
+        igs_error("no remote agent with uuid '%s' : rejecting", uuid);
         return 0;
     }
     handlePublicationFromRemoteAgent(msg, remoteAgent);
@@ -830,13 +830,13 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             char *agentName = zmsg_popstr (msgDuplicate);
             char *input = zmsg_popstr (msgDuplicate);
             if (agentName == NULL){
-                igs_error("agent name is NULL for replay message from %s(%s): aborting", name, peer);
+                igs_error("agent name is NULL for replay message from %s(%s): rejecting", name, peer);
                 zmsg_destroy(&msgDuplicate);
                 zyre_event_destroy(&zyre_event);
                 return 0;
             }
             if (input == NULL){
-                igs_error("input is NULL for replay message from %s(%s): aborting", name, peer);
+                igs_error("input is NULL for replay message from %s(%s): rejecting", name, peer);
                 free(agentName);
                 zmsg_destroy(&msgDuplicate);
                 zyre_event_destroy(&zyre_event);
@@ -856,7 +856,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                         if (inputType == IGS_STRING_T){
                             value = zmsg_popstr(msgDuplicate);
                             if (value == NULL){
-                                igs_error("value is NULL for replay message from %s(%s): aborting", name, peer);
+                                igs_error("value is NULL for replay message from %s(%s): rejecting", name, peer);
                                 free(agentName);
                                 free(input);
                                 zmsg_destroy(&msgDuplicate);
@@ -868,7 +868,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                         }else{
                             frame = zmsg_pop(msgDuplicate);
                             if (frame == NULL){
-                                igs_error("value is NULL for replay message from %s(%s): aborting", name, peer);
+                                igs_error("value is NULL for replay message from %s(%s): rejecting", name, peer);
                                 free(agentName);
                                 free(input);
                                 zmsg_destroy(&msgDuplicate);
@@ -910,7 +910,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
     } else if(streq (event, "WHISPER")){
         char *title = zmsg_popstr (msgDuplicate);
         if (title == NULL){
-            igs_error("no header in message received from %s(%s): aborting", name, peer);
+            igs_error("no header in message received from %s(%s): rejecting", name, peer);
             zmsg_destroy(&msgDuplicate);
             zyre_event_destroy(&zyre_event);
             return 0;
@@ -921,7 +921,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             //=> all agents in this peer know us
             char *uuid = zmsg_popstr(msgDuplicate);
             if (uuid == NULL){
-                igs_error("no valid uuid in %s message received from %s(%s): aborting", title, name, peer);
+                igs_error("no valid uuid in %s message received from %s(%s): rejecting", title, name, peer);
                 zmsg_destroy(&msgDuplicate);
                 zyre_event_destroy(&zyre_event);
                 return 0;
@@ -948,14 +948,14 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             //Agents without definition are considered impossible.
             char* strDefinition = zmsg_popstr(msgDuplicate);
             if (strDefinition == NULL){
-                igs_error("no valid definition in %s message received from %s(%s): aborting", title, name, peer);
+                igs_error("no valid definition in %s message received from %s(%s): rejecting", title, name, peer);
                 zmsg_destroy(&msgDuplicate);
                 zyre_event_destroy(&zyre_event);
                 return 0;
             }
             char *uuid = zmsg_popstr(msgDuplicate);
             if (uuid == NULL){
-                igs_error("no valid uuid in %s message received from %s(%s): aborting", title, name, peer);
+                igs_error("no valid uuid in %s message received from %s(%s): rejecting", title, name, peer);
                 free(strDefinition);
                 zmsg_destroy(&msgDuplicate);
                 zyre_event_destroy(&zyre_event);
@@ -963,7 +963,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             }
             char *remoteAgentName = zmsg_popstr(msgDuplicate);
             if (remoteAgentName == NULL){
-                igs_error("no valid agent name in %s message received from %s(%s): aborting", title, name, peer);
+                igs_error("no valid agent name in %s message received from %s(%s): rejecting", title, name, peer);
                 free(strDefinition);
                 free(uuid);
                 zmsg_destroy(&msgDuplicate);
@@ -1070,14 +1070,14 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             //identify remote agent
             char* strMapping = zmsg_popstr (msgDuplicate);
             if (strMapping == NULL){
-                igs_error("no valid mapping in %s message received from %s(%s): aborting", title, name, peer);
+                igs_error("no valid mapping in %s message received from %s(%s): rejecting", title, name, peer);
                 zmsg_destroy(&msgDuplicate);
                 zyre_event_destroy(&zyre_event);
                 return 0;
             }
             char *uuid = zmsg_popstr (msgDuplicate);
             if (uuid == NULL){
-                igs_error("uuid is NULL in %s message received from %s(%s): aborting", title, name, peer);
+                igs_error("uuid is NULL in %s message received from %s(%s): rejecting", title, name, peer);
                 free(strMapping);
                 zmsg_destroy(&msgDuplicate);
                 zyre_event_destroy(&zyre_event);
@@ -1086,7 +1086,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             igs_remote_agent_t *remoteAgent = NULL;
             HASH_FIND_STR(context->remoteAgents, uuid, remoteAgent);
             if (remoteAgent == NULL){
-                igs_error("no known remote agent with uuid '%s': aborting", uuid);
+                igs_error("no known remote agent with uuid '%s': rejecting", uuid);
                 free(strMapping);
                 free(uuid);
                 zmsg_destroy(&msgDuplicate);
@@ -1130,16 +1130,23 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             //identify agent
             char* strDefinition = zmsg_popstr (msgDuplicate);
             if (strDefinition == NULL){
-                igs_error("no valid definition in %s message received from %s(%s): aborting", title, name, peer);
+                igs_error("no valid definition in %s message received from %s(%s): rejecting", title, name, peer);
                 zmsg_destroy(&msgDuplicate);
                 zyre_event_destroy(&zyre_event);
                 return 0;
             }
             char *uuid = zmsg_popstr (msgDuplicate);
+            if (uuid == NULL){
+                igs_error("no valid uuid in %s message received from %s(%s): rejecting", title, name, peer);
+                free(strDefinition);
+                zmsg_destroy(&msgDuplicate);
+                zyre_event_destroy(&zyre_event);
+                return 0;
+            }
             igs_agent_t *agent = NULL;
             HASH_FIND_STR(context->agents, uuid, agent);
             if (agent == NULL){
-                igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                igs_error("no agent with uuid '%s' in %s message received from %s(%s): rejecting", uuid, title, name, peer);
                 free(strDefinition);
                 if (uuid)
                     free(uuid);
@@ -1163,16 +1170,23 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             //identify agent
             char* strMapping = zmsg_popstr (msgDuplicate);
             if (strMapping == NULL){
-                igs_error("no valid mapping in %s message received from %s(%s): aborting", title, name, peer);
+                igs_error("no valid mapping in %s message received from %s(%s): rejecting", title, name, peer);
                 zmsg_destroy(&msgDuplicate);
                 zyre_event_destroy(&zyre_event);
                 return 0;
             }
             char *uuid = zmsg_popstr (msgDuplicate);
+            if (uuid == NULL){
+                igs_error("no valid uuid in %s message received from %s(%s): rejecting", title, name, peer);
+                free(strMapping);
+                zmsg_destroy(&msgDuplicate);
+                zyre_event_destroy(&zyre_event);
+                return 0;
+            }
             igs_agent_t *agent = NULL;
             HASH_FIND_STR(context->agents, uuid, agent);
             if (agent == NULL){
-                igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                igs_error("no agent with uuid '%s' in %s message received from %s(%s): rejecting", uuid, title, name, peer);
                 free(strMapping);
                 if (uuid)
                     free(uuid);
@@ -1205,10 +1219,16 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             if (streq(title, "GET_CURRENT_OUTPUTS")){
                 //identify agent
                 char *uuid = zmsg_popstr (msgDuplicate);
+                if (uuid == NULL){
+                    igs_error("no valid uuid in %s message received from %s(%s): rejecting", title, name, peer);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
                 if (agent == NULL){
-                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): rejecting", uuid, title, name, peer);
                     if (uuid)
                         free(uuid);
                     zmsg_destroy(&msgDuplicate);
@@ -1272,10 +1292,16 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 
             }else if (streq(title, "CURRENT_OUTPUTS")){
                 char *uuid = zmsg_popstr (msgDuplicate);
+                if (uuid == NULL){
+                    igs_error("no valid uuid in %s message received from %s(%s): rejecting", title, name, peer);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 igs_remote_agent_t *remoteAgent = NULL;
                 HASH_FIND_STR(context->remoteAgents, uuid, remoteAgent);
                 if (remoteAgent == NULL){
-                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): rejecting", uuid, title, name, peer);
                     if (uuid)
                         free(uuid);
                     zmsg_destroy(&msgDuplicate);
@@ -1290,10 +1316,16 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             }else if (streq(title, "GET_CURRENT_INPUTS")){
                 //identify agent
                 char *uuid = zmsg_popstr (msgDuplicate);
+                if (uuid == NULL){
+                    igs_error("no valid uuid in %s message received from %s(%s): rejecting", title, name, peer);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
                 if (agent == NULL){
-                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): rejecting", uuid, title, name, peer);
                     if (uuid)
                         free(uuid);
                     zmsg_destroy(&msgDuplicate);
@@ -1354,10 +1386,16 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             }else if (streq(title, "GET_CURRENT_PARAMETERS")){
                 //identify agent
                 char *uuid = zmsg_popstr (msgDuplicate);
+                if (uuid == NULL){
+                    igs_error("no valid uuid in %s message received from %s(%s): rejecting", title, name, peer);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
                 if (agent == NULL){
-                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): rejecting", uuid, title, name, peer);
                     if (uuid)
                         free(uuid);
                     zmsg_destroy(&msgDuplicate);
@@ -1466,7 +1504,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             else if (streq(title, "START_AGENT")){
                 char *agentName = zmsg_popstr (msgDuplicate);
                 if (agentName == NULL){
-                    igs_error("no agent name in %s message received from %s(%s): aborting", title, name, peer);
+                    igs_error("no agent name in %s message received from %s(%s): rejecting", title, name, peer);
                     zmsg_destroy(&msgDuplicate);
                     zyre_event_destroy(&zyre_event);
                     return 0;
@@ -1485,10 +1523,16 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             }
             else if (streq(title, "STOP_AGENT")){
                 char *uuid = zmsg_popstr (msgDuplicate);
+                if (uuid == NULL){
+                    igs_error("no valid uuid in %s message received from %s(%s): rejecting", title, name, peer);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
                 if (agent == NULL){
-                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): rejecting", uuid, title, name, peer);
                     if (uuid)
                         free(uuid);
                     zmsg_destroy(&msgDuplicate);
@@ -1510,10 +1554,16 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 
             }else if (streq(title, "CLEAR_MAPPING")){
                 char *uuid = zmsg_popstr (msgDuplicate);
+                if (uuid == NULL){
+                    igs_error("no valid uuid in %s message received from %s(%s): rejecting", title, name, peer);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
                 if (agent == NULL){
-                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): rejecting", uuid, title, name, peer);
                     if (uuid)
                         free(uuid);
                     zmsg_destroy(&msgDuplicate);
@@ -1550,16 +1600,24 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             }else if (streq(title, "MUTE")){
                 char *iopName = zmsg_popstr (msgDuplicate);
                 if (iopName == NULL){
-                    igs_error("no valid iop name in %s message received from %s(%s): aborting", title, name, peer);
+                    igs_error("no valid iop name in %s message received from %s(%s): rejecting", title, name, peer);
                     zmsg_destroy(&msgDuplicate);
                     zyre_event_destroy(&zyre_event);
                     return 0;
                 }
                 char *uuid = zmsg_popstr (msgDuplicate);
+
+                if (uuid == NULL){
+                    igs_error("no valid uuid in %s message received from %s(%s): rejecting", title, name, peer);
+                    free(iopName);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
                 if (agent == NULL){
-                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): rejecting", uuid, title, name, peer);
                     if (uuid)
                         free(uuid);
                     free(iopName);
@@ -1576,16 +1634,23 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             }else if (streq(title, "UNMUTE")){
                 char *iopName = zmsg_popstr (msgDuplicate);
                 if (iopName == NULL){
-                    igs_error("no valid iop name in %s message received from %s(%s): aborting", title, name, peer);
+                    igs_error("no valid iop name in %s message received from %s(%s): rejecting", title, name, peer);
                     zmsg_destroy(&msgDuplicate);
                     zyre_event_destroy(&zyre_event);
                     return 0;
                 }
                 char *uuid = zmsg_popstr (msgDuplicate);
+                if (uuid == NULL){
+                    igs_error("no valid uuid in %s message received from %s(%s): rejecting", title, name, peer);
+                    free(iopName);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
                 if (agent == NULL){
-                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): rejecting", uuid, title, name, peer);
                     if (uuid)
                         free(uuid);
                     free(iopName);
@@ -1602,24 +1667,32 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             }else if (streq(title, "SET_INPUT")){
                 char *iopName = zmsg_popstr (msgDuplicate);
                 if (iopName == NULL){
-                    igs_error("no valid iop name in %s message received from %s(%s): aborting", title, name, peer);
+                    igs_error("no valid iop name in %s message received from %s(%s): rejecting", title, name, peer);
                     zmsg_destroy(&msgDuplicate);
                     zyre_event_destroy(&zyre_event);
                     return 0;
                 }
                 char *value = zmsg_popstr (msgDuplicate);
                 if (value == NULL){
-                    igs_error("no valid value in %s message received from %s(%s): aborting", title, name, peer);
+                    igs_error("no valid value in %s message received from %s(%s): rejecting", title, name, peer);
                     free(iopName);
                     zmsg_destroy(&msgDuplicate);
                     zyre_event_destroy(&zyre_event);
                     return 0;
                 }
                 char *uuid = zmsg_popstr (msgDuplicate);
+                if (uuid == NULL){
+                    igs_error("no valid uuid in %s message received from %s(%s): rejecting", title, name, peer);
+                    free(iopName);
+                    free(value);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
                 if (agent == NULL){
-                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): rejecting", uuid, title, name, peer);
                     if (uuid)
                         free(uuid);
                     free(iopName);
@@ -1640,24 +1713,32 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             }else if (streq(title, "SET_OUTPUT")){
                 char *iopName = zmsg_popstr (msgDuplicate);
                 if (iopName == NULL){
-                    igs_error("no valid iop name in %s message received from %s(%s): aborting", title, name, peer);
+                    igs_error("no valid iop name in %s message received from %s(%s): rejecting", title, name, peer);
                     zmsg_destroy(&msgDuplicate);
                     zyre_event_destroy(&zyre_event);
                     return 0;
                 }
                 char *value = zmsg_popstr (msgDuplicate);
                 if (value == NULL){
-                    igs_error("no valid value in %s message received from %s(%s): aborting", title, name, peer);
+                    igs_error("no valid value in %s message received from %s(%s): rejecting", title, name, peer);
                     free(iopName);
                     zmsg_destroy(&msgDuplicate);
                     zyre_event_destroy(&zyre_event);
                     return 0;
                 }
                 char *uuid = zmsg_popstr (msgDuplicate);
+                if (uuid == NULL){
+                    igs_error("no valid uuid in %s message received from %s(%s): rejecting", title, name, peer);
+                    free(iopName);
+                    free(value);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
                 if (agent == NULL){
-                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): rejecting", uuid, title, name, peer);
                     if (uuid)
                         free(uuid);
                     free(iopName);
@@ -1678,24 +1759,32 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             }else if (streq(title, "SET_PARAMETER")){
                 char *iopName = zmsg_popstr (msgDuplicate);
                 if (iopName == NULL){
-                    igs_error("no valid iop name in %s message received from %s(%s): aborting", title, name, peer);
+                    igs_error("no valid iop name in %s message received from %s(%s): rejecting", title, name, peer);
                     zmsg_destroy(&msgDuplicate);
                     zyre_event_destroy(&zyre_event);
                     return 0;
                 }
                 char *value = zmsg_popstr (msgDuplicate);
                 if (value == NULL){
-                    igs_error("no valid value in %s message received from %s(%s): aborting", title, name, peer);
+                    igs_error("no valid value in %s message received from %s(%s): rejecting", title, name, peer);
                     free(iopName);
                     zmsg_destroy(&msgDuplicate);
                     zyre_event_destroy(&zyre_event);
                     return 0;
                 }
                 char *uuid = zmsg_popstr (msgDuplicate);
+                if (uuid == NULL){
+                    igs_error("no valid uuid in %s message received from %s(%s): rejecting", title, name, peer);
+                    free(iopName);
+                    free(value);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
                 if (agent == NULL){
-                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): rejecting", uuid, title, name, peer);
                     if (uuid)
                         free(uuid);
                     free(iopName);
@@ -1716,14 +1805,14 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             }else if (streq(title, "MAP")){
                 char *input = zmsg_popstr (msgDuplicate);
                 if (input == NULL){
-                    igs_error("no valid input in %s message received from %s(%s): aborting", title, name, peer);
+                    igs_error("no valid input in %s message received from %s(%s): rejecting", title, name, peer);
                     zmsg_destroy(&msgDuplicate);
                     zyre_event_destroy(&zyre_event);
                     return 0;
                 }
                 char *remoteAgent = zmsg_popstr (msgDuplicate);
                 if (remoteAgent == NULL){
-                    igs_error("no valid agent name in %s message received from %s(%s): aborting", title, name, peer);
+                    igs_error("no valid agent name in %s message received from %s(%s): rejecting", title, name, peer);
                     free(input);
                     zmsg_destroy(&msgDuplicate);
                     zyre_event_destroy(&zyre_event);
@@ -1731,7 +1820,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 }
                 char *output = zmsg_popstr (msgDuplicate);
                 if (output == NULL){
-                    igs_error("no valid output in %s message received from %s(%s): aborting", title, name, peer);
+                    igs_error("no valid output in %s message received from %s(%s): rejecting", title, name, peer);
                     free(input);
                     free(remoteAgent);
                     zmsg_destroy(&msgDuplicate);
@@ -1739,10 +1828,19 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                     return 0;
                 }
                 char *uuid = zmsg_popstr (msgDuplicate);
+                if (uuid == NULL){
+                    igs_error("no valid uuid in %s message received from %s(%s): rejecting", title, name, peer);
+                    free(input);
+                    free(remoteAgent);
+                    free(output);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
                 if (agent == NULL){
-                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): rejecting", uuid, title, name, peer);
                     if (uuid)
                         free(uuid);
                     free(input);
@@ -1765,14 +1863,14 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             }else if (streq(title, "UNMAP")){
                 char *input = zmsg_popstr (msgDuplicate);
                 if (input == NULL){
-                    igs_error("no valid input in %s message received from %s(%s): aborting", title, name, peer);
+                    igs_error("no valid input in %s message received from %s(%s): rejecting", title, name, peer);
                     zmsg_destroy(&msgDuplicate);
                     zyre_event_destroy(&zyre_event);
                     return 0;
                 }
                 char *remoteAgent = zmsg_popstr (msgDuplicate);
                 if (remoteAgent == NULL){
-                    igs_error("no valid agent name in %s message received from %s(%s): aborting", title, name, peer);
+                    igs_error("no valid agent name in %s message received from %s(%s): rejecting", title, name, peer);
                     free(input);
                     zmsg_destroy(&msgDuplicate);
                     zyre_event_destroy(&zyre_event);
@@ -1780,7 +1878,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 }
                 char *output = zmsg_popstr (msgDuplicate);
                 if (output == NULL){
-                    igs_error("no valid output in %s message received from %s(%s): aborting", title, name, peer);
+                    igs_error("no valid output in %s message received from %s(%s): rejecting", title, name, peer);
                     free(input);
                     free(remoteAgent);
                     zmsg_destroy(&msgDuplicate);
@@ -1788,10 +1886,19 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                     return 0;
                 }
                 char *uuid = zmsg_popstr (msgDuplicate);
+                if (uuid == NULL){
+                    igs_error("no valid uuid in %s message received from %s(%s): rejecting", title, name, peer);
+                    free(input);
+                    free(remoteAgent);
+                    free(output);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
                 if (agent == NULL){
-                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): rejecting", uuid, title, name, peer);
                     if (uuid)
                         free(uuid);
                     free(input);
@@ -1836,16 +1943,23 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             else if (streq(title, "SET_DEFINITION_PATH")){
                 char *definitionPath = zmsg_popstr (msgDuplicate);
                 if (definitionPath == NULL){
-                    igs_error("no valid definition path in %s message received from %s(%s): aborting", title, name, peer);
+                    igs_error("no valid definition path in %s message received from %s(%s): rejecting", title, name, peer);
                     zmsg_destroy(&msgDuplicate);
                     zyre_event_destroy(&zyre_event);
                     return 0;
                 }
                 char *uuid = zmsg_popstr (msgDuplicate);
+                if (uuid == NULL){
+                    igs_error("no valid uuid in %s message received from %s(%s): rejecting", title, name, peer);
+                    free(definitionPath);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
                 if (agent == NULL){
-                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): rejecting", uuid, title, name, peer);
                     if (uuid)
                         free(uuid);
                     free(definitionPath);
@@ -1862,16 +1976,23 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             else if (streq(title, "SET_MAPPING_PATH")){
                 char *mappingPath = zmsg_popstr (msgDuplicate);
                 if (mappingPath == NULL){
-                    igs_error("no valid mapping path in %s message received from %s(%s): aborting", title, name, peer);
+                    igs_error("no valid mapping path in %s message received from %s(%s): rejecting", title, name, peer);
                     zmsg_destroy(&msgDuplicate);
                     zyre_event_destroy(&zyre_event);
                     return 0;
                 }
                 char *uuid = zmsg_popstr (msgDuplicate);
+                if (uuid == NULL){
+                    igs_error("no valid uuid in %s message received from %s(%s): rejecting", title, name, peer);
+                    free(mappingPath);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
                 if (agent == NULL){
-                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): rejecting", uuid, title, name, peer);
                     if (uuid)
                         free(uuid);
                     free(mappingPath);
@@ -1888,10 +2009,16 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             else if (streq(title, "SAVE_DEFINITION_TO_PATH")){
                 //identify agent
                 char *uuid = zmsg_popstr (msgDuplicate);
+                if (uuid == NULL){
+                    igs_error("no valid uuid in %s message received from %s(%s): rejecting", title, name, peer);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
                 if (agent == NULL){
-                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): rejecting", uuid, title, name, peer);
                     if (uuid)
                         free(uuid);
                     zmsg_destroy(&msgDuplicate);
@@ -1906,10 +2033,16 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             else if (streq(title, "SAVE_MAPPING_TO_PATH")){
                 //identify agent
                 char *uuid = zmsg_popstr (msgDuplicate);
+                if (uuid == NULL){
+                    igs_error("no valid uuid in %s message received from %s(%s): rejecting", title, name, peer);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
                 igs_agent_t *agent = NULL;
                 HASH_FIND_STR(context->agents, uuid, agent);
                 if (agent == NULL){
-                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): aborting", uuid, title, name, peer);
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): rejecting", uuid, title, name, peer);
                     if (uuid)
                         free(uuid);
                     zmsg_destroy(&msgDuplicate);
@@ -1939,7 +2072,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 igs_agent_t *calleeAgent = NULL;
                 HASH_FIND_STR(context->agents, calleeUuid, calleeAgent);
                 if (calleeAgent == NULL){
-                    igs_error("no callee agent with uuid '%s' in %s message received from %s(%s): aborting", calleeUuid, title, name, peer);
+                    igs_error("no callee agent with uuid '%s' in %s message received from %s(%s): rejecting", calleeUuid, title, name, peer);
                     if (calleeUuid)
                         free(calleeUuid);
                     if (callerUuid)
@@ -1951,7 +2084,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 
                 char *callName = zmsg_popstr(msgDuplicate);
                 if (callName == NULL){
-                    igs_error("no call name in %s message received from %s(%s): aborting", title, name, peer);
+                    igs_error("no call name in %s message received from %s(%s): rejecting", title, name, peer);
                     free(callerUuid);
                     free(calleeUuid);
                     zmsg_destroy(&msgDuplicate);
@@ -2353,9 +2486,9 @@ void initLoop (igs_core_context_t *context){
             zyre_set_zap_domain(context->node, "INGESCAPE");
         }else{
             if (!context->security_cert)
-                igs_error("security is enabled but certificate is missing : aborting");
+                igs_error("security is enabled but certificate is missing : rejecting");
             if (!context->security_publicKeysDirectory)
-                igs_error("security is enabled but public keys directory is missing : aborting");
+                igs_error("security is enabled but public keys directory is missing : rejecting");
             bus_zyreUnlock();
             network_Unlock();
             return;
