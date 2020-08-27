@@ -250,7 +250,7 @@ int network_configureMappingsToRemoteAgent(igs_agent_t *agent, igs_remote_agent_
     return 0;
 }
 
-void sendDefinitionToZyrePeer(igs_agent_t *agent, const char *peer, const char *def){
+void sendDefinitionToZyrePeer(igs_agent_t *agent, const char *peer, const char *def, bool notif){
     assert(agent);
     assert(agent->context);
     assert(agent->context->node);
@@ -262,6 +262,11 @@ void sendDefinitionToZyrePeer(igs_agent_t *agent, const char *peer, const char *
     zmsg_addstr(msg, def);
     zmsg_addstr(msg, agent->uuid);
     zmsg_addstr(msg, agent->name);
+    if (notif){
+        //Agent has been activated during runtime: we must
+        //indicate that our peer already knows the distant peer
+        zmsg_addstr(msg, "1");
+    }
     zyre_whisper(coreContext->node, peer, &msg);
     bus_zyreUnlock();
 }
@@ -793,10 +798,10 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 if (agent->definition != NULL)
                     definitionStr = parser_export_definition(agent->definition);
                 if (definitionStr != NULL){
-                    sendDefinitionToZyrePeer(agent, peer, definitionStr);
+                    sendDefinitionToZyrePeer(agent, peer, definitionStr, false);
                     free(definitionStr);
                 }else{
-                    sendDefinitionToZyrePeer(agent, peer, "");
+                    sendDefinitionToZyrePeer(agent, peer, "", false);
                 }
                 //and so is our mapping
                 char *mappingStr = NULL;
@@ -911,8 +916,8 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             return 0;
         }
         
-        if(streq(title, "PEER_KNOWS_YOU")){
-            //peer has received one of our agents definition
+        if(streq(title, "REMOTE_PEER_KNOWS_AGENT")){
+            //distant peer has received one of our agents definition
             //=> all agents in this peer know us
             char *uuid = zmsg_popstr(msgDuplicate);
             if (uuid == NULL){
@@ -926,7 +931,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             assert(agent);
             igs_agent_event_callback_t *cb;
             DL_FOREACH(agent->agentEventCallbacks, cb){
-                //iterate on all remote agents *for this peer* : all its agents know us
+                //iterate on all remote agents *for this peer* : all its agents know this agent
                 igs_remote_agent_t *r, *rtmp;
                 HASH_ITER(hh, coreContext->remoteAgents, r, rtmp){
                     if (streq(r->peer->peerId, peer)){
@@ -1032,12 +1037,24 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 
                 if (isAgentNew){
                     agent_propagateAgentEvent(IGS_AGENT_ENTERED, uuid, remoteAgentName);
+                    
+                    //Additonal notification flag means that the remtoe agent has been started
+                    //during runtime: remote peer init has already been done and this remote
+                    //agent knows our agents already => propagate to our agents immediately.
+                    char *notification = zmsg_popstr(msgDuplicate);
+                    if (notification){
+                        agent_propagateAgentEvent(IGS_AGENT_KNOWS_US, uuid, remoteAgentName);
+                        free(notification);
+                    }
+                    
+                    //notify remote agent that our agents knows it
                     bus_zyreLock();
                     zmsg_t *msgKnow = zmsg_new();
-                    zmsg_addstr(msgKnow, "PEER_KNOWS_YOU");
+                    zmsg_addstr(msgKnow, "REMOTE_PEER_KNOWS_AGENT");
                     zmsg_addstr(msgKnow, uuid);
                     zyre_whisper(node, peer, &msgKnow);
                     bus_zyreUnlock();
+                    
                 }else{
                     agent_propagateAgentEvent(IGS_AGENT_UPDATED_DEFINITION, uuid, remoteAgentName);
                 }
@@ -2078,9 +2095,10 @@ int triggerDefinitionUpdate(zloop_t *loop, int timer_id, void *arg){
                 igs_zyre_peer_t *p, *ptmp;
                 HASH_ITER(hh, context->zyrePeers, p, ptmp){
                     if (p->hasJoinedPrivateChannel){
-                        sendDefinitionToZyrePeer(agent, p->peerId, definitionStr);
+                        sendDefinitionToZyrePeer(agent, p->peerId, definitionStr, agent->network_activationDuringRuntime);
                     }
                 }
+                agent->network_activationDuringRuntime = false; //reset flag if needed
                 free(definitionStr);
             }
             //NB: this is not optimal to resend state details on definition change but it
@@ -2178,6 +2196,7 @@ static void runLoop (zsock_t *mypipe, void *args){
     HASH_ITER(hh, context->agents, agent, tmp){
         agent->network_needToSendMappingUpdate = false;
         agent->network_needToSendDefinitionUpdate = false;
+        agent->network_activationDuringRuntime = false;
     }
     
     //start zyre now that everything is set

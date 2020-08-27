@@ -395,6 +395,7 @@ typedef struct igs_agent {
     bool network_needToSendDefinitionUpdate;
     bool network_needToSendMappingUpdate;
     bool network_requestOutputsFromMappedAgents;
+    bool network_activationDuringRuntime;
     
     bool isWholeAgentMuted;
     igs_mute_callback_t *muteCallbacks;
