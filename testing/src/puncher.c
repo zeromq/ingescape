@@ -839,7 +839,7 @@ int main(int argc, const char * argv[]) {
     //mapping
     assert(igs_loadMapping("invalid json") == IGS_FAILURE);
     assert(igs_loadMappingFromPath("/does not exist") == IGS_FAILURE);
-    assert(igs_getMapping() == NULL);
+    assert(igs_getMapping()); //intentional memory leak here
     assert(igs_getMappingName() == NULL);
     assert(igs_getMappingDescription() == NULL);
     assert(igs_getMappingVersion() == NULL);

@@ -410,7 +410,7 @@ static int json_callize (const char* json_str, igsyajl_val *node) {
     *node = igsyajl_tree_parse(json_str, errbuf, sizeof(errbuf));
 
     /* parse error handling */
-    if (!node || strlen(errbuf) > 0) {
+    if (!(*node) || strlen(errbuf) > 0) {
         igs_error("could not parse string (%s)", errbuf);
         return 0;
     }
@@ -1011,6 +1011,8 @@ char* parser_export_definition(igs_definition_t* def){
 
 
 igs_mapping_t* parser_loadMapping(const char* json_str){
+    if (!json_str || strlen(json_str) == 0)
+        return NULL;
     igs_mapping_t *map = NULL;
     igsyajl_val node;
     if (json_callize(json_str, &node) != 0){
@@ -1034,10 +1036,10 @@ igs_mapping_t* parser_loadMappingFromPath (const char* path){
 }
 
 
-char* parser_export_mapping(igs_mapping_t *mapp){
+char* parser_export_mapping(igs_mapping_t *mapping){
     char* result = NULL;
-    if (mapp != NULL){
-        const unsigned char * json_str = NULL;
+    if (mapping){
+        const unsigned char *json_str = NULL;
         size_t len;
         igsyajl_gen g;
         
@@ -1047,14 +1049,11 @@ char* parser_export_mapping(igs_mapping_t *mapp){
         
         igsyajl_gen_map_open(g);
         igsyajl_gen_string(g, (const unsigned char *) "mapping", strlen("mapping"));
-        json_dump_mapping(&g, mapp);
+        json_dump_mapping(&g, mapping);
         igsyajl_gen_map_close(g);
         
-        // try to get our dumping result
         if (igsyajl_gen_get_buf(g, &json_str, &len) == igsyajl_gen_status_ok)
-        {
             result = strdup((const char*) json_str);
-        }
         
         igsyajl_gen_free(g);
     }

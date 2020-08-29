@@ -83,14 +83,18 @@ void mapping_freeMapping (igs_mapping_t **map) {
 }
 
 bool mapping_isEqual(const char *firstStr, const char *secondStr){
-    if ((!firstStr && secondStr) || (firstStr && !secondStr))
-        return false;
+    if (!firstStr && !secondStr)
+        return true;
+    
     igs_mapping_t *first = parser_loadMapping(firstStr);
-    if (!first)
-        return false;
     igs_mapping_t *second = parser_loadMapping(secondStr);
-    if (!second){
-        mapping_freeMapping(&first);
+    if (!first && !second)
+        return true;
+    if ((first && !second) || (second && !first)){
+        if (first)
+            mapping_freeMapping(&first);
+        if (second)
+            mapping_freeMapping(&second);
         return false;
     }
     
@@ -145,8 +149,10 @@ bool mapping_isEqual(const char *firstStr, const char *secondStr){
         }
     }
     if (!second->map_elements){
-        res = false;
-        goto END;
+        if (first->map_elements){
+            res = false;
+            goto END;
+        }
     }
     size_t firstS = HASH_COUNT(first->map_elements);
     size_t secondS = HASH_COUNT(second->map_elements);
@@ -215,9 +221,18 @@ bool mapping_checkInputOutputCompatibility(igs_agent_t *agent, igs_iop_t *input,
 igs_result_t igsAgent_loadMapping (igs_agent_t *agent, const char* json_str){
     assert(agent);
     assert(json_str);
+    char *currentMapping = igsAgent_getMapping(agent);
+    if (mapping_isEqual(json_str, currentMapping)){
+        igs_info("new mapping is the same as the current one : nothing to do");
+        if (currentMapping)
+            free(currentMapping);
+        return IGS_SUCCESS;
+    }
+    if (currentMapping)
+        free(currentMapping);
     igs_mapping_t *tmp = parser_loadMapping(json_str);
     if(tmp == NULL){
-        igsAgent_error(agent, "mapping could not be loaded from json string");
+        igsAgent_error(agent, "mapping could not be loaded from json string '%s'", json_str);
         return IGS_FAILURE;
     }else{
         model_readWriteLock();
@@ -251,10 +266,12 @@ igs_result_t igsAgent_loadMappingFromPath (igs_agent_t *agent, const char* file_
 
 void igsAgent_clearMapping(igs_agent_t *agent){
     igsAgent_debug(agent, "clear current mapping if needed and initiate an empty one");
+    model_readWriteLock();
     if(agent->mapping)
         mapping_freeMapping(&agent->mapping);
     agent->mapping = calloc(1, sizeof(struct igs_mapping));
     agent->network_needToSendMappingUpdate = true;
+    model_readWriteUnlock();
 }
 
 void igsAgent_clearMappingOnAgent(igs_agent_t *agent, const char *agentName){
@@ -265,6 +282,7 @@ void igsAgent_clearMappingOnAgent(igs_agent_t *agent, const char *agentName){
             if (streq(elmt->agent_name, agentName)){
                 HASH_DEL(agent->mapping->map_elements, elmt);
                 mapping_freeMappingElement(elmt);
+                agent->network_needToSendMappingUpdate = true;
             }
         }
         model_readWriteUnlock();
@@ -278,7 +296,9 @@ char* igsAgent_getMapping(igs_agent_t *agent){
         igsAgent_warn(agent, "No mapping defined yet");
         return NULL;
     }
+    model_readWriteLock();
     mappingJson = parser_export_mapping(agent->mapping);
+    model_readWriteUnlock();
     return mappingJson;
 }
 
@@ -309,51 +329,40 @@ char* igsAgent_getMappingVersion(igs_agent_t *agent){
 void igsAgent_setMappingName(igs_agent_t *agent, const char *name){
     assert(agent);
     assert(name);
-    //init mapping if neeed
-    if(agent->mapping == NULL){
-        agent->mapping = calloc(1, sizeof(struct igs_mapping));
-        agent->network_needToSendMappingUpdate = true;
-    }
-    if(agent->mapping->name != NULL){
+    assert(agent->mapping);
+    model_readWriteLock();
+    if(agent->mapping->name != NULL)
         free(agent->mapping->name);
-    }
     agent->mapping->name = strndup(name, IGS_MAX_MAPPING_NAME_LENGTH);
+    agent->network_needToSendMappingUpdate = true;
+    model_readWriteUnlock();
 }
 
 void igsAgent_setMappingDescription(igs_agent_t *agent, const char *description){
     assert(agent);
     assert(description);
-    //init mapping if neeed
-    if(agent->mapping == NULL){
-        agent->mapping = calloc(1, sizeof(struct igs_mapping));
-        agent->network_needToSendMappingUpdate = true;
-    }
+    assert(agent->mapping);
     if(agent->mapping->description != NULL){
         free(agent->mapping->description);
     }
+    agent->network_needToSendMappingUpdate = true;
     agent->mapping->description = strndup(description, IGS_MAX_DESCRIPTION_LENGTH);
 }
 
 void igsAgent_setMappingVersion(igs_agent_t *agent, const char *version){
     assert(agent);
     assert(version);
-    //init mapping if neeed
-    if(agent->mapping == NULL){
-        agent->mapping = calloc(1, sizeof(struct igs_mapping));
-        agent->network_needToSendMappingUpdate = true;
-    }
+    assert(agent->mapping);
     if(agent->mapping->version != NULL){
         free(agent->mapping->version);
     }
+    agent->network_needToSendMappingUpdate = true;
     agent->mapping->version = strndup(version, 64);
 }
 
 size_t igsAgent_getMappingEntriesNumber(igs_agent_t *agent){
     assert(agent);
-    if(agent->mapping == NULL){
-        igsAgent_warn(agent, "No mapping defined yet");
-        return 0;
-    }
+    assert(agent->mapping);
     model_readWriteLock();
     size_t res = HASH_COUNT(agent->mapping->map_elements);
     model_readWriteUnlock();
@@ -419,10 +428,7 @@ unsigned long igsAgent_addMappingEntry(igs_agent_t *agent,
         return 0;
     }
     model_readWriteLock();
-    //Check if already initialized, and do it if not
-    if(agent->mapping == NULL){
-        igsAgent_clearMapping(agent);
-    }
+    assert(agent->mapping);
 
     //Add the new mapping element if not already there
     size_t len = strlen(fromOurInput)+strlen(toAgent)+strlen(withOutput)+3+1;
@@ -451,7 +457,8 @@ unsigned long igsAgent_addMappingEntry(igs_agent_t *agent,
         HASH_ADD(hh, agent->mapping->map_elements, id, sizeof(unsigned long), new);
         agent->network_needToSendMappingUpdate = true;
     }else{
-        igsAgent_warn(agent, "mapping combination %s->%s.%s already exists (will not be duplicated)", reviewedFromOurInput, reviewedToAgent, reviewedWithOutput);
+        igsAgent_warn(agent, "mapping combination %s->%s.%s already exists : will not be duplicated",
+                      reviewedFromOurInput, reviewedToAgent, reviewedWithOutput);
     }
     free(reviewedFromOurInput);
     free(reviewedToAgent);
@@ -463,11 +470,8 @@ unsigned long igsAgent_addMappingEntry(igs_agent_t *agent,
 igs_result_t igsAgent_removeMappingEntryWithId(igs_agent_t *agent, unsigned long theId){
     assert(agent);
     assert(theId > 0);
+    assert(agent->mapping);
     igs_mapping_element_t *el = NULL;
-    if(agent->mapping == NULL){
-        igsAgent_error(agent, "no mapping defined yet");
-        return IGS_FAILURE;
-    }
     if(agent->mapping->map_elements == NULL){
         igsAgent_error(agent, "no mapping elements defined yet");
         return IGS_FAILURE;
@@ -492,11 +496,7 @@ igs_result_t igsAgent_removeMappingEntryWithName(igs_agent_t *agent, const char 
     assert(fromOurInput);
     assert(toAgent);
     assert(withOutput);
-    if(agent->mapping == NULL){
-        igsAgent_clearMapping(agent);
-        igsAgent_error(agent, "no mapping defined yet");
-        return IGS_FAILURE;
-    }
+    assert(agent->mapping);
     if(agent->mapping->map_elements == NULL){
         igsAgent_error(agent, "no mapping elements defined yet");
         return IGS_FAILURE;
@@ -533,6 +533,7 @@ igs_result_t igsAgent_removeMappingEntryWithName(igs_agent_t *agent, const char 
 void igsAgent_setMappingPath(igs_agent_t *agent, const char *path){
     assert(agent);
     assert(path);
+    model_readWriteLock();
     if (agent->mappingPath != NULL)
         free(agent->mappingPath);
     agent->mappingPath = strndup(path, IGS_MAX_PATH_LENGTH);
@@ -545,14 +546,13 @@ void igsAgent_setMappingPath(igs_agent_t *agent, const char *path){
         zyre_shout(coreContext->node, IGS_PRIVATE_CHANNEL, &msg);
         bus_zyreUnlock();
     }
+    model_readWriteUnlock();
 }
 
 void igsAgent_writeMappingToPath(igs_agent_t *agent){
     assert(agent);
-    if (agent->mapping == NULL){
-        igsAgent_error(agent, "mapping is NULL and cannot be written to path");
-        return;
-    }
+    assert(agent->mapping);
+    model_readWriteLock();
     FILE *fp = NULL;
     fp = fopen (agent->mappingPath,"w+");
     if (fp == NULL){
@@ -564,4 +564,5 @@ void igsAgent_writeMappingToPath(igs_agent_t *agent){
         fclose(fp);
         free(map);
     }
+    model_readWriteUnlock();
 }

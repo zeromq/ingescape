@@ -37,6 +37,7 @@ igs_agent_t *igsAgent_new(const char *name, bool activateImmediately){
     zuuid_destroy(&uuid);
     agent->name = strndup((name == NULL)?IGS_DEFAULT_AGENT_NAME:name, IGS_MAX_AGENT_NAME_LENGTH);
     zhash_insert(coreContext->createdAgents, agent->uuid, agent);
+    igsAgent_clearMapping(agent); //set valid but empty mapping
     if (activateImmediately)
         igsAgent_activate(agent);
     return agent;
