@@ -3176,11 +3176,8 @@ void igsAgent_setAgentName(igs_agent_t *agent, const char *name){
 
 char *igsAgent_getAgentName(igs_agent_t *agent){
     assert(agent);
-    if (agent->name == NULL){
-        return NULL;
-    }else{
-        return strdup(agent->name);
-    }
+    assert(agent->name);
+    return strdup(agent->name);
 }
 
 

@@ -35,8 +35,9 @@ igs_agent_t *igsAgent_new(const char *name, bool activateImmediately){
     zuuid_t *uuid = zuuid_new();
     agent->uuid = strdup(zuuid_str(uuid));
     zuuid_destroy(&uuid);
-    agent->name = strndup((name == NULL)?IGS_DEFAULT_AGENT_NAME:name, IGS_MAX_AGENT_NAME_LENGTH);
+    agent->name = strndup(name, IGS_MAX_AGENT_NAME_LENGTH);
     zhash_insert(coreContext->createdAgents, agent->uuid, agent);
+    igsAgent_clearDefinition(agent); //set valid but empty definition, only with name equal to agent name
     igsAgent_clearMapping(agent); //set valid but empty mapping
     if (activateImmediately)
         igsAgent_activate(agent);

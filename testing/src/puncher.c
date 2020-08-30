@@ -527,8 +527,8 @@ int main(int argc, const char * argv[]) {
     //definition - part 1
     assert(igs_loadDefinition("invalid json") == IGS_FAILURE);
     assert(igs_loadDefinitionFromPath("/does not exist") == IGS_FAILURE);
-    assert(igs_getDefinition() == NULL);
-    assert(igs_getDefinitionName() == NULL);
+    assert(igs_getDefinition()); //intentional memory leak here
+    assert(streq(igs_getDefinitionName(), "no_name"));
     assert(igs_getDefinitionDescription() == NULL);
     assert(igs_getDefinitionVersion() == NULL);
     igs_setDefinitionName("");

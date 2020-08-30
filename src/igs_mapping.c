@@ -27,59 +27,42 @@ unsigned long djb2_hash (unsigned char *str){
     return hash;
 }
 
-void mapping_freeMappingElement (igs_mapping_element_t* mapElmt){
-    if (mapElmt == NULL){
-        return;
-    }
-    if (mapElmt->input_name != NULL){
-        free(mapElmt->input_name);
-    }
-    if (mapElmt->agent_name != NULL){
-        free(mapElmt->agent_name);
-    }
-    if (mapElmt->output_name != NULL){
-        free(mapElmt->output_name);
-    }
-    free(mapElmt);
+void mapping_freeMappingElement (igs_mapping_element_t **mapElmt){
+    assert(mapElmt);
+    assert(*mapElmt);
+    if ((*mapElmt)->input_name)
+        free((*mapElmt)->input_name);
+    if ((*mapElmt)->agent_name)
+        free((*mapElmt)->agent_name);
+    if ((*mapElmt)->output_name)
+        free((*mapElmt)->output_name);
+    free(*mapElmt);
+    *mapElmt = NULL;
 }
-
-//void free_map_cat (mapping_cat** map_cat){
-//
-//    free((char*)(*map_cat)->agent_name);
-//    (*map_cat)->agent_name = NULL ;
-//
-//    free((char*)(*map_cat)->category_name);
-//    (*map_cat)->category_name = NULL ;
-//
-//    free ((*map_cat));
-//}
 
 ////////////////////////////////////////////////////////////////////////
 // PRIVATE API
 ////////////////////////////////////////////////////////////////////////
 
-void mapping_freeMapping (igs_mapping_t **map) {
-    assert (map);
-    assert(*map);
-    if ((*map) == NULL){
+void mapping_freeMapping (igs_mapping_t **mapping) {
+    assert (mapping);
+    assert(*mapping);
+    if ((*mapping) == NULL){
         return;
     }
-    if ((*map)->name != NULL){
-        free((*map)->name);
-    }
-    if ((*map)->description != NULL){
-        free((*map)->description);
-    }
-    if ((*map)->version != NULL){
-        free((*map)->version);
-    }
+    if ((*mapping)->name)
+        free((*mapping)->name);
+    if ((*mapping)->description)
+        free((*mapping)->description);
+    if ((*mapping)->version)
+        free((*mapping)->version);
     igs_mapping_element_t *current_map_elmt, *tmp_map_elmt;
-    HASH_ITER(hh, (*map)->map_elements, current_map_elmt, tmp_map_elmt) {
-        HASH_DEL((*map)->map_elements,current_map_elmt);
-        mapping_freeMappingElement(current_map_elmt);
+    HASH_ITER(hh, (*mapping)->map_elements, current_map_elmt, tmp_map_elmt) {
+        HASH_DEL((*mapping)->map_elements,current_map_elmt);
+        mapping_freeMappingElement(&current_map_elmt);
     }
-    free(*map);
-    *map = NULL;
+    free(*mapping);
+    *mapping = NULL;
 }
 
 bool mapping_isEqual(const char *firstStr, const char *secondStr){
@@ -177,8 +160,8 @@ END:
 }
 
 igs_mapping_element_t * mapping_createMappingElement(const char * input_name,
-                                                 const char *agent_name,
-                                                 const char* output_name){
+                                                     const char *agent_name,
+                                                     const char* output_name){
     if (input_name == NULL){
         igs_error("Input name is NULL");
         return NULL;
@@ -191,12 +174,10 @@ igs_mapping_element_t * mapping_createMappingElement(const char * input_name,
         igs_error("Output name is NULL");
         return NULL;
     }
-    
     igs_mapping_element_t * new_map_elmt = calloc(1, sizeof(igs_mapping_element_t));
     new_map_elmt->input_name = strdup(input_name);
     new_map_elmt->agent_name = strdup(agent_name);
     new_map_elmt->output_name = strdup(output_name);
-    
     return new_map_elmt;
 }
 
@@ -281,7 +262,7 @@ void igsAgent_clearMappingOnAgent(igs_agent_t *agent, const char *agentName){
         HASH_ITER(hh, agent->mapping->map_elements, elmt, tmp){
             if (streq(elmt->agent_name, agentName)){
                 HASH_DEL(agent->mapping->map_elements, elmt);
-                mapping_freeMappingElement(elmt);
+                mapping_freeMappingElement(&elmt);
                 agent->network_needToSendMappingUpdate = true;
             }
         }
@@ -483,7 +464,7 @@ igs_result_t igsAgent_removeMappingEntryWithId(igs_agent_t *agent, unsigned long
     }else{
         model_readWriteLock();
         HASH_DEL(agent->mapping->map_elements, el);
-        mapping_freeMappingElement(el);
+        mapping_freeMappingElement(&el);
         agent->network_needToSendMappingUpdate = true;
         model_readWriteUnlock();
     }
@@ -523,7 +504,7 @@ igs_result_t igsAgent_removeMappingEntryWithName(igs_agent_t *agent, const char 
     }else{
         model_readWriteLock();
         HASH_DEL(agent->mapping->map_elements, tmp);
-        mapping_freeMappingElement(tmp);
+        mapping_freeMappingElement(&tmp);
         agent->network_needToSendMappingUpdate = true;
         model_readWriteUnlock();
         return IGS_SUCCESS;
@@ -534,10 +515,10 @@ void igsAgent_setMappingPath(igs_agent_t *agent, const char *path){
     assert(agent);
     assert(path);
     model_readWriteLock();
-    if (agent->mappingPath != NULL)
+    if (agent->mappingPath)
         free(agent->mappingPath);
     agent->mappingPath = strndup(path, IGS_MAX_PATH_LENGTH);
-    if (coreContext->networkActor != NULL && coreContext->node != NULL){
+    if (coreContext->networkActor && coreContext->node){
         bus_zyreLock();
         zmsg_t *msg = zmsg_new();
         zmsg_addstr(msg, "MAPPING_FILE_PATH");
@@ -552,13 +533,19 @@ void igsAgent_setMappingPath(igs_agent_t *agent, const char *path){
 void igsAgent_writeMappingToPath(igs_agent_t *agent){
     assert(agent);
     assert(agent->mapping);
+    if (!agent->mappingPath){
+        igsAgent_error(agent, "no path configured to save mapping");
+        return;
+    }
     model_readWriteLock();
     FILE *fp = NULL;
     fp = fopen (agent->mappingPath,"w+");
+    igsAgent_info(agent, "save to path %s", agent->mappingPath);
     if (fp == NULL){
         igsAgent_error(agent, "Could not open %s for writing", agent->mappingPath);
     }else{
         char *map = parser_export_mapping(agent->mapping);
+        assert(map);
         fprintf(fp, "%s", map);
         fflush(fp);
         fclose(fp);

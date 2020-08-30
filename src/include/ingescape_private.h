@@ -66,7 +66,7 @@ typedef struct igs_observe_callback{
 } igs_observe_callback_t;
 
 typedef struct igs_iop{
-    const char* name;
+    char* name;
     iopType_t value_type;
     iop_t type;
     union {
@@ -93,9 +93,9 @@ typedef struct igs_call{
 } igs_call_t;
 
 typedef struct igs_definition{
-    const char* name; //hash key
-    const char* description;
-    const char* version;
+    char* name; //hash key
+    char* description;
+    char* version;
     igs_iop_t* params_table;
     igs_iop_t* inputs_table;
     igs_iop_t* outputs_table;
