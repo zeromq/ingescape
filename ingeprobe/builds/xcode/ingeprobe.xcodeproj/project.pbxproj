@@ -1288,7 +1288,7 @@
 				974E36A92493D93A00444009 /* zpinger */,
 				974E36AB2493D93A00444009 /* ztester_beacon */,
 				974E36AD2493D93A00444009 /* ztester_gossip */,
-				974E36AF2493D93A00444009 /* libzyre.dylib */,
+				974E36AF2493D93A00444009 /* libzyre.2.0.1.dylib */,
 				974E36B12493D93A00444009 /* libzyre.a */,
 				974E36B32493D93A00444009 /* libzyre_objects.a */,
 				974E36B52493D93A00444009 /* zyre_selftest */,
@@ -2314,10 +2314,9 @@
 			remoteRef = 974E36AC2493D93A00444009 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		974E36AF2493D93A00444009 /* libzyre.dylib */ = {
+		974E36AF2493D93A00444009 /* libzyre.2.0.1.dylib */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
-			name = libzyre.dylib;
 			path = libzyre.2.0.1.dylib;
 			remoteRef = 974E36AE2493D93A00444009 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
@@ -2587,6 +2586,11 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				DEVELOPMENT_TEAM = 56DRT9MG9S;
 				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+					ZYRE_BUILD_DRAFT_API,
+				);
 				HEADER_SEARCH_PATHS = (
 					$HOME/builds/sysroot/usr/local/include,
 					"$(SRCROOT)/../../../dependencies/yajl/src/api",
@@ -2604,6 +2608,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				DEVELOPMENT_TEAM = 56DRT9MG9S;
 				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = ZYRE_BUILD_DRAFT_API;
 				HEADER_SEARCH_PATHS = (
 					$HOME/builds/sysroot/usr/local/include,
 					"$(SRCROOT)/../../../dependencies/yajl/src/api",

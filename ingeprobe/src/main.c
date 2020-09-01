@@ -31,7 +31,7 @@
 //global application options
 int port = 5670;
 const char *name = "ingeprobe";
-char *netdevice = NULL;
+char *networkDevice = NULL;
 bool verbose = false;
 
 const char *gossipbind = NULL; //"tcp://10.0.0.8:5659";
@@ -93,9 +93,90 @@ typedef struct agent{
 } agent_t;
 
 ///////////////////////////////////////////////////////////////////////////////
-// ZYRE AGENT MANAGEMENT
-//
+// UTILITIES
 
+#define MAX_NUMBER_OF_NETDEVICES 16
+#define MAX_NETWORK_DEVICE_LENGTH 1024
+
+void getNetdevicesList(char ***devices, int *nb){
+#if (defined WIN32 || defined _WIN32)
+    WORD version_requested = MAKEWORD (2, 2);
+    WSADATA wsa_data;
+    int rc = WSAStartup (version_requested, &wsa_data);
+    assert (rc == 0);
+    assert (LOBYTE (wsa_data.wVersion) == 2 &&
+            HIBYTE (wsa_data.wVersion) == 2);
+#endif
+    if (devices != NULL)
+        *devices = calloc(MAX_NUMBER_OF_NETDEVICES, sizeof(char*));
+    int currentDeviceNb = 0;
+    
+    ziflist_t *iflist = ziflist_new ();
+    assert (iflist);
+    const char *name = ziflist_first (iflist);
+    while (name) {
+        //        printf (" - name=%s address=%s netmask=%s broadcast=%s\n",
+        //                name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist));
+        if (devices != NULL){
+            (*devices)[currentDeviceNb] = calloc(MAX_NETWORK_DEVICE_LENGTH+1, sizeof(char));
+            strncpy((*devices)[currentDeviceNb], name, MAX_NETWORK_DEVICE_LENGTH);
+        }
+        currentDeviceNb++;
+        name = ziflist_next (iflist);
+    }
+    ziflist_destroy (&iflist);
+    *nb = currentDeviceNb;
+#if (defined WIN32 || defined _WIN32)
+    WSACleanup();
+#endif
+}
+
+void getNetaddressesList(char ***addresses, int *nb){
+#if (defined WIN32 || defined _WIN32)
+    WORD version_requested = MAKEWORD (2, 2);
+    WSADATA wsa_data;
+    int rc = WSAStartup (version_requested, &wsa_data);
+    assert (rc == 0);
+    assert (LOBYTE (wsa_data.wVersion) == 2 &&
+            HIBYTE (wsa_data.wVersion) == 2);
+#endif
+    if (addresses != NULL)
+        *addresses = calloc(MAX_NUMBER_OF_NETDEVICES, sizeof(char*));
+    int currentDeviceNb = 0;
+    
+    ziflist_t *iflist = ziflist_new ();
+    assert (iflist);
+    const char *name = ziflist_first (iflist);
+    while (name) {
+        if (addresses != NULL){
+            (*addresses)[currentDeviceNb] = strdup(ziflist_address(iflist));
+        }
+        currentDeviceNb++;
+        name = ziflist_next (iflist);
+    }
+    ziflist_destroy (&iflist);
+    *nb = currentDeviceNb;
+#if (defined WIN32 || defined _WIN32)
+    WSACleanup();
+#endif
+}
+
+void freeNetdevicesList(char **devices, int nb){
+    int i = 0;
+    for (i = 0; i < nb; i++){
+        if (devices != NULL && devices[i] != NULL)
+            free(devices[i]);
+    }
+    if (devices != NULL)
+        free (devices);
+}
+
+void freeNetaddressesList(char **addresses, int nb){
+    freeNetdevicesList(addresses, nb);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// ZYRE AGENT MANAGEMENT
 
 //manage incoming messages from one of the publisher agent we subscribed to
 int manageSubscription (zloop_t *loop, zsock_t *socket, void *arg){
@@ -957,22 +1038,19 @@ static void zyre_actor(zsock_t *pipe, void *args){
         //beacon
         zyre_set_port(node, port);
         printf("using broadcast discovery with port %i", port);
-        if (netdevice != NULL){
-            zyre_set_interface(node, netdevice);
-            printf(" on device %s", netdevice);
-        }
-        printf("\n");
+        zyre_set_interface(node, networkDevice);
+        printf(" on device %s\n", networkDevice);
     }else{
         //gossip
         if (endpoint != NULL){
             int res = zyre_set_endpoint(node, "%s", endpoint);
             if (res != 0){
-                printf("impossible to create our endpoint %s ...exiting.", endpoint);
+                printf("impossible to create our endpoint %s... aborting.", endpoint);
                 return;
             }
             printf("using endpoint %s\n", endpoint);
             if (gossipconnect == NULL && gossipbind == NULL){
-                printf("endpoint specified but no attached gossip information, %s cannot reach any other agent", name);
+                printf("endpoint specified but no attached gossip information, %s cannot reach any other agent : aborting", name);
                 return;
             }
         }
@@ -1063,7 +1141,6 @@ static void zyre_actor(zsock_t *pipe, void *args){
 //
 void print_usage(){
     printf("Usage example: ingeprobe --verbose --port 5670 --name ingeprobe\n");
-    printf("(all parameters are optional)\n");
     printf("--verbose : enable verbose mode in the application\n");
     printf("--name peer_name : published name of this peer (default : ingeprobe)\n");
     printf("--noninteractiveloop : non-interactive loop for use as a background application\n");
@@ -1075,23 +1152,23 @@ void print_usage(){
     printf("OR\n");
     printf("Brokers and endpoints :\n");
     printf("a TCP endpoint looks like : tcp://10.0.0.7:49155\n");
+    printf("--endpoint endpoint : our ingescape endpoint address (overrides --device and --port)\n");
     printf("--bind endpoint : our address as a broker (optional, use only if you want to be a broker)\n");
     printf("--connect endpoint : address of a broker to connect to\n");
-    printf("--endpoint endpoint : our ingescape endpoint address (overrides --netdevice and --port)\n");
-    printf("\tNB: using the endpoint disables self-discovery and brokers must be used\n");
+    printf("NB: using the endpoint disables self-discovery and brokers must be used\n");
     
     printf("\nSecurity (optional)\n");
-    printf("\n--security : enables security\n");
-    printf("\n--privatekey path : path to the private key we shall use (default: %s)\n", privateKey);
-    printf("\n--brokerkey path : path to the public key we shall use for the broker if needed (optional)\n");
-    printf("\n--publickeys path : path to the directory where to find public keys (default: %s)\n", publicKeys);
+    printf("--security : enables security\n");
+    printf("--privatekey path : path to the private key we shall use (default: %s)\n", privateKey);
+    printf("--brokerkey path : path to the public key we shall use for the broker if needed (optional)\n");
+    printf("--publickeys path : path to the directory where to find public keys (default: %s)\n", publicKeys);
 }
 
 /*
  Other commands to add:
  - map, clear mapping, unmap
  - mute, unmute, freeze, unfreeze
- - link log with log stream enabling
+ - make /log enable the log stream
  */
 void print_commands(){
     printf("---------------------------------\n");
@@ -1183,8 +1260,8 @@ int main (int argc, char *argv [])
                 //printf("port: %i\n", port);
                 break;
             case 'd' :
-                netdevice = optarg;
-                //printf("device: %s\n", netdevice);
+                networkDevice = optarg;
+                //printf("device: %s\n", networkDevice);
                 break;
             case 'n' :
                 name = optarg;
@@ -1241,6 +1318,46 @@ int main (int argc, char *argv [])
     if (brokerKey)
         makeFilePath(brokerKey, brokerKeyPath, BUFFER_SIZE);
     
+    if (!endpoint && !networkDevice){
+        //we have no device to start with: try to find one
+        char **devices = NULL;
+        char **addresses = NULL;
+        int nbD = 0;
+        int nbA = 0;
+        getNetdevicesList(&devices, &nbD);
+        getNetaddressesList(&addresses, &nbA);
+        assert(nbD == nbA);
+        if (nbD == 1){
+            //we have exactly one compliant network device available: we use it
+            networkDevice = strdup(devices[0]);
+            printf("using %s as default network device (this is the only one available)\n", networkDevice);
+        }else if (nbD == 2 && (strcmp(addresses[0], "127.0.0.1") == 0 || strcmp(addresses[1], "127.0.0.1") == 0)){
+            //we have two devices, one of which is the loopback
+            //pick the device that is NOT the loopback
+            if (strcmp(addresses[0], "127.0.0.1") == 0){
+                networkDevice = strdup(devices[1]);
+            }else{
+                networkDevice = strdup(devices[0]);
+            }
+            printf("using %s as default network device (this is the only one available that is not the loopback)\n", networkDevice);
+        }else{
+            if (nbD == 0){
+                printf("No network device found: aborting.\n");
+            }else{
+                printf("No network device passed as command line parameter and several are available.\n");
+                printf("Please use one of these network devices:\n");
+                for (int i = 0; i < nbD; i++){
+                    printf("\t%s\n", devices[i]);
+                }
+                printf("\n");
+                print_usage();
+            }
+            exit(EXIT_FAILURE);
+        }
+        freeNetdevicesList(devices, nbD);
+        freeNetaddressesList(addresses, nbD);
+    }
+    
     if (useSecurity){
         if(zsys_file_exists(privateKeyPath)){
             cert = zcert_load(privateKeyPath);
@@ -1277,15 +1394,16 @@ int main (int argc, char *argv [])
     //init zyre
     zactor_t *actor = NULL;
     context_t *context = calloc(1, sizeof(context_t));
-    if ((gossipconnect == NULL && gossipbind == NULL && endpoint == NULL)){
+    if (!endpoint){
         assert(context);
         context->name = strdup(name);
         context->useGossip = false;
         actor = zactor_new (zyre_actor, context);
         assert (actor);
     }else{
-        if (endpoint != NULL && gossipconnect == NULL && gossipbind == NULL){
-            printf("warning : endpoint specified but no attached broker parameters, %s won't reach any other agent", name);
+        if (gossipconnect == NULL && gossipbind == NULL){
+            printf("error : endpoint specified but no attached broker parameters, %s won't reach any other agent, aborting.", name);
+            return EXIT_FAILURE;
         }else{
             assert(context);
             context->name = strdup(name);
