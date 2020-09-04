@@ -336,6 +336,7 @@ int manageParent (zloop_t *loop, zsock_t *socket, void *args){
         }
         else if(streq (command, "JOIN")){
             char *channel = zmsg_popstr (msg);
+            zyre_set_contest_in_group(node, channel);
             zyre_join (node, channel);
             free(channel);
         }
@@ -978,6 +979,8 @@ int manageIncoming (zloop_t *loop, zsock_t *socket, void *args){
         }
     } else if (streq (event, "SILENT")){
         printf ("%s (%s) is being silent\n", name, peerId);
+    } else if (streq (event, "LEADER")){
+        printf ("\\o/ %s(%s) is leader in election '%s'\n", name, peerId, channel);
     }
     zyre_event_destroy(&zyre_event);
     return 0;

@@ -113,10 +113,10 @@ typedef struct {
     void *myData;
 } observeAgentEventsCbWrapper_t;
 
-void core_observeAgentEventsCallback(igs_agent_t *agent, igs_agent_event_t event, const char *uuid, const char *name, void *myData){
+void core_observeAgentEventsCallback(igs_agent_t *agent, igs_agent_event_t event, const char *uuid, const char *name, void *eventData, void *myData){
     IGS_UNUSED(agent)
     observeAgentEventsCbWrapper_t *wrap = (observeAgentEventsCbWrapper_t *)myData;
-    wrap->cb(event, uuid, name, wrap->myData);
+    wrap->cb(event, uuid, name, eventData, wrap->myData);
 }
 
 void igs_observeAgentEvents(igs_agentEventCallback cb, void *myData){
@@ -633,6 +633,16 @@ void igs_log(igs_logLevel_t level, const char *function, const char *format, ...
 }
 
 //ADVANCED
+igs_result_t igs_competeInElection(const char *electionName){
+    core_initAgent();
+    return igsAgent_competeInElection(coreAgent, electionName);
+}
+
+igs_result_t igs_leaveElection(const char *electionName){
+    core_initAgent();
+    return igsAgent_leaveElection(coreAgent, electionName);
+}
+
 igs_result_t igs_writeOutputAsZMQMsg(const char *name, zmsg_t *msg){
     core_initAgent();
     return igsAgent_writeOutputAsZMQMsg(coreAgent, name, msg);

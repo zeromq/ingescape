@@ -15,14 +15,14 @@
 #include "ingescape_private.h"
 #include "ingescape_agent.h"
 
-void agent_propagateAgentEvent(igs_agent_event_t event, const char *uuid, const char *name){
+void agent_propagateAgentEvent(igs_agent_event_t event, const char *uuid, const char *name, void *eventData){
     //propagate event on all local agents
     igs_agent_t *agent, *tmp;
     HASH_ITER(hh, coreContext->agents, agent, tmp){
         if (!streq(uuid, agent->uuid)){
             igs_agent_event_callback_t *cb;
             DL_FOREACH(agent->agentEventCallbacks, cb){
-                cb->callback_ptr(agent, event, uuid, name, cb->myData);
+                cb->callback_ptr(agent, event, uuid, name, eventData, cb->myData);
             }
         }
     }
@@ -104,8 +104,8 @@ igs_result_t igsAgent_activate(igs_agent_t *agent){
     }
     
     //notify all other agents inside this context that we have arrived
-    agent_propagateAgentEvent(IGS_AGENT_ENTERED, agent->uuid, agent->name);
-    agent_propagateAgentEvent(IGS_AGENT_KNOWS_US, agent->uuid, agent->name);
+    agent_propagateAgentEvent(IGS_AGENT_ENTERED, agent->uuid, agent->name, NULL);
+    agent_propagateAgentEvent(IGS_AGENT_KNOWS_US, agent->uuid, agent->name, NULL);
     
     //notify this agent with all the other agents already present in our context locally and remotely
     igs_agent_t *tmp;
@@ -113,9 +113,9 @@ igs_result_t igsAgent_activate(igs_agent_t *agent){
         if (!streq(a->uuid, agent->uuid)){
             igs_agent_event_callback_t *cb;
             DL_FOREACH(agent->agentEventCallbacks, cb){
-                cb->callback_ptr(agent, IGS_AGENT_ENTERED, a->uuid, a->name, cb->myData);
+                cb->callback_ptr(agent, IGS_AGENT_ENTERED, a->uuid, a->name, NULL, cb->myData);
                 //in our local context, other agents already know us
-                cb->callback_ptr(agent, IGS_AGENT_KNOWS_US, a->uuid, a->name, cb->myData);
+                cb->callback_ptr(agent, IGS_AGENT_KNOWS_US, a->uuid, a->name, NULL, cb->myData);
             }
         }
     }
@@ -123,7 +123,7 @@ igs_result_t igsAgent_activate(igs_agent_t *agent){
     HASH_ITER(hh, coreContext->remoteAgents, r, rtmp){
         igs_agent_event_callback_t *cb;
         DL_FOREACH(agent->agentEventCallbacks, cb){
-            cb->callback_ptr(agent, IGS_AGENT_ENTERED, r->uuid, r->name, cb->myData);
+            cb->callback_ptr(agent, IGS_AGENT_ENTERED, r->uuid, r->name, NULL, cb->myData);
         }
     }
     return IGS_SUCCESS;
@@ -153,7 +153,7 @@ igs_result_t igsAgent_deactivate(igs_agent_t *agent){
         igs_error("agent %s (%s) is not activated", agent->name, agent->uuid);
         return IGS_FAILURE;
     }
-    agent_propagateAgentEvent(IGS_AGENT_EXITED, agent->uuid, agent->name);
+    agent_propagateAgentEvent(IGS_AGENT_EXITED, agent->uuid, agent->name, NULL);
     return IGS_SUCCESS;
 }
 

@@ -103,15 +103,16 @@ PUBLIC void igs_observeFreeze(igs_freezeCallback cb, void *myData);
 
 //observe agents/peers events on the network
 typedef enum {
-    IGS_PEER_ENTERED = 1,
-    IGS_PEER_EXITED,
-    IGS_AGENT_ENTERED,
-    IGS_AGENT_UPDATED_DEFINITION,
-    IGS_AGENT_KNOWS_US,
-    IGS_AGENT_EXITED,
-    IGS_AGENT_UPDATED_MAPPING
+    IGS_PEER_ENTERED = 1, //eventData are the peer headers as a zhash_t*
+    IGS_PEER_EXITED, //eventData are NULL
+    IGS_AGENT_ENTERED, //eventData are NULL
+    IGS_AGENT_UPDATED_DEFINITION, //eventData are NULL
+    IGS_AGENT_KNOWS_US, //eventData are NULL
+    IGS_AGENT_EXITED, //eventData are NULL
+    IGS_AGENT_UPDATED_MAPPING, //eventData are NULL
+    IGS_AGENT_WON_ELECTION //eventData is the election name as a const char*
 } igs_agent_event_t;
-typedef void (*igs_agentEventCallback)(igs_agent_event_t event, const char *uuid, const char *name, void *myData);
+typedef void (*igs_agentEventCallback)(igs_agent_event_t event, const char *uuid, const char *name, void *eventData, void *myData);
 PUBLIC void igs_observeAgentEvents(igs_agentEventCallback cb, void *myData);
 
 

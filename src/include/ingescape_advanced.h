@@ -81,6 +81,15 @@ PUBLIC igs_result_t igs_startWithBrokers(const char *agentEndpoint);
 PUBLIC igs_result_t igs_enableSecurity(const char *privateKeyFile, const char *publicKeysDirectory);
 PUBLIC igs_result_t igs_brokerAddSecure(const char *brokerEndpoint, const char *publicKeyPath);
 
+//////////////////////////////////////////////////
+/* MASTER/SLAVE, leadership between agents
+ Create contests between agents and designate a leader.
+ Agents can participate in any contest. The designated leader
+ in a specific context is notified by an agent event.
+ */
+PUBLIC igs_result_t igs_competeInElection(const char *electionName);
+PUBLIC igs_result_t igs_leaveElection(const char *electionName);
+
 
 //////////////////////////////////////////////////
 // Advanced admin functions

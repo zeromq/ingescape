@@ -329,6 +329,9 @@ typedef struct igs_core_context{
     igs_monitor_callback_t *monitorCallbacks;
     bool monitor_shallStartStopAgent;
     
+    //elections
+    zhash_t *elections;
+    
     //initiated at start, cleaned at stop
     char *networkDevice;
     char *ipAddress;
@@ -400,6 +403,8 @@ typedef struct igs_agent {
     bool isWholeAgentMuted;
     igs_mute_callback_t *muteCallbacks;
     
+    zlist_t *elections;
+    
     UT_hash_handle hh;
 } igs_agent_t;
 
@@ -470,7 +475,7 @@ PUBLIC void license_readLicense(igs_core_context_t *context);
 #endif
 
 //agent
-void agent_propagateAgentEvent(igs_agent_event_t event, const char *uuid, const char *name);
+void agent_propagateAgentEvent(igs_agent_event_t event, const char *uuid, const char *name, void *eventData);
 
 #ifdef __cplusplus
 }

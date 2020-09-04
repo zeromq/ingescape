@@ -199,7 +199,7 @@
 		97D708DF24C1EFA2008825B0 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1160;
+				LastUpgradeCheck = 1170;
 				ORGANIZATIONNAME = "Ingenuity i/o";
 				TargetAttributes = {
 					97D7090524C1F137008825B0 = {
@@ -423,6 +423,7 @@
 		97D7090B24C1F137008825B0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 56DRT9MG9S;
 				ENABLE_HARDENED_RUNTIME = NO;
@@ -434,6 +435,7 @@
 		97D7090C24C1F137008825B0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 56DRT9MG9S;
 				ENABLE_HARDENED_RUNTIME = NO;
@@ -445,6 +447,7 @@
 		97D709C024C1F243008825B0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 56DRT9MG9S;
 				ENABLE_HARDENED_RUNTIME = NO;
@@ -456,6 +459,7 @@
 		97D709C124C1F243008825B0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 56DRT9MG9S;
 				ENABLE_HARDENED_RUNTIME = NO;

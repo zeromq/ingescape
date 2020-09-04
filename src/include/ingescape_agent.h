@@ -20,7 +20,7 @@ typedef struct igs_agent igs_agent_t;
 PUBLIC igs_agent_t *igsAgent_new(const char *name, bool activateImmediately);
 PUBLIC void igsAgent_destroy(igs_agent_t **agent);
 
-//Attach and detach agent from context
+//attach and detach agent from context
 PUBLIC igs_result_t igsAgent_activate(igs_agent_t *agent);
 PUBLIC igs_result_t igsAgent_deactivate(igs_agent_t *agent);
 PUBLIC bool igsAgent_isActivated(igs_agent_t *agent);
@@ -28,8 +28,12 @@ typedef void (*igsAgent_activateCallback)(igs_agent_t *Agent, bool isActivated, 
 PUBLIC void igsAgent_observeActivate(igs_agent_t *agent, igsAgent_activateCallback cb, void *myData);
 
 /*
+ NOTICE:
  All the functions below behave the same as the functions presented
- in ingescape.h, except that they take an agent instance as first argument.
+ in ingescape.h, their only addition consists in taking an agent instance
+ as first argument.
+ The rare exceptions in behavior changes are indicated for each affected
+ function.
  */
 
 PUBLIC void igsAgent_setAgentName(igs_agent_t *agent, const char *name);
@@ -43,7 +47,7 @@ PUBLIC bool igsAgent_isMuted(igs_agent_t *agent);
 typedef void (*igsAgent_muteCallback)(igs_agent_t *Agent, bool isMuted, void *myData);
 PUBLIC void igsAgent_observeMute(igs_agent_t *agent, igsAgent_muteCallback cb, void *myData);
 
-typedef void (*igsAgent_agentEventCallback)(igs_agent_t *Agent, igs_agent_event_t event, const char *uuid, const char *name, void *myData);
+typedef void (*igsAgent_agentEventCallback)(igs_agent_t *Agent, igs_agent_event_t event, const char *uuid, const char *name, void *eventData, void *myData);
 PUBLIC void igsAgent_observeAgentEvents(igs_agent_t *Agent, igsAgent_agentEventCallback cb, void *myData);
 
 //IOP read, write, creation, destruction, introspection
@@ -177,6 +181,10 @@ PUBLIC char** igsAgent_getCallsList(igs_agent_t *agent, size_t *nbOfElements); /
 PUBLIC igs_callArgument_t* igsAgent_getFirstArgumentForCall(igs_agent_t *agent, const char *callName);
 PUBLIC size_t igsAgent_getNumberOfArgumentsForCall(igs_agent_t *agent, const char *callName);
 PUBLIC bool igsAgent_checkCallArgumentExistence(igs_agent_t *agent, const char *callName, const char *argName);
+
+//master/slave
+PUBLIC igs_result_t igsAgent_competeInElection(igs_agent_t *agent, const char *electionName);
+PUBLIC igs_result_t igsAgent_leaveElection(igs_agent_t *agent, const char *electionName);
 
 
 #ifdef __cplusplus

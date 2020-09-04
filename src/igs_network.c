@@ -781,7 +781,9 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 k = zlist_next(keys);
             }
             zlist_destroy(&keys);
-            agent_propagateAgentEvent(IGS_PEER_ENTERED, peer, name);
+            zhash_t *headersBis = zhash_dup(headers);
+            agent_propagateAgentEvent(IGS_PEER_ENTERED, peer, name, headersBis);
+            zhash_destroy(&headersBis);
         }else{
             //Agent already exists, we set its reconnected flag
             //(this is used below to avoid agent destruction on EXIT received after timeout)
@@ -897,7 +899,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 if (remote){
                     igs_debug("<-%s (%s) exited", remote->name, uuid);
                     HASH_DEL(context->remoteAgents, remote);
-                    agent_propagateAgentEvent(IGS_AGENT_EXITED, uuid, remote->name);
+                    agent_propagateAgentEvent(IGS_AGENT_EXITED, uuid, remote->name, NULL);
                     cleanAndFreeRemoteAgent(&remote);
                 }else{
                     igs_error("%s is not a known remote agent", uuid);
@@ -935,7 +937,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 igs_remote_agent_t *r, *rtmp;
                 HASH_ITER(hh, coreContext->remoteAgents, r, rtmp){
                     if (streq(r->peer->peerId, peer)){
-                        cb->callback_ptr(agent, IGS_AGENT_KNOWS_US, r->uuid, r->name, cb->myData);
+                        cb->callback_ptr(agent, IGS_AGENT_KNOWS_US, r->uuid, r->name, NULL, cb->myData);
                     }
                 }
             }
@@ -1036,14 +1038,14 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 }
                 
                 if (isAgentNew){
-                    agent_propagateAgentEvent(IGS_AGENT_ENTERED, uuid, remoteAgentName);
+                    agent_propagateAgentEvent(IGS_AGENT_ENTERED, uuid, remoteAgentName, NULL);
                     
                     //Additonal notification flag means that the remtoe agent has been started
                     //during runtime: remote peer init has already been done and this remote
                     //agent knows our agents already => propagate to our agents immediately.
                     char *notification = zmsg_popstr(msgDuplicate);
                     if (notification){
-                        agent_propagateAgentEvent(IGS_AGENT_KNOWS_US, uuid, remoteAgentName);
+                        agent_propagateAgentEvent(IGS_AGENT_KNOWS_US, uuid, remoteAgentName, NULL);
                         free(notification);
                     }
                     
@@ -1056,7 +1058,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                     bus_zyreUnlock();
                     
                 }else{
-                    agent_propagateAgentEvent(IGS_AGENT_UPDATED_DEFINITION, uuid, remoteAgentName);
+                    agent_propagateAgentEvent(IGS_AGENT_UPDATED_DEFINITION, uuid, remoteAgentName, NULL);
                 }
             }else{
                 igs_error("received definition from remote agent %s(%s) is empty or invalid : agent will not be registered", remoteAgentName, uuid);
@@ -1106,7 +1108,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 if(remoteAgent != NULL && remoteAgent->mapping != NULL) {
                     mapping_freeMapping(&remoteAgent->mapping);
                     remoteAgent->mapping = NULL;
-                    agent_propagateAgentEvent(IGS_AGENT_UPDATED_MAPPING, uuid, remoteAgent->name);
+                    agent_propagateAgentEvent(IGS_AGENT_UPDATED_MAPPING, uuid, remoteAgent->name, NULL);
                 }
             }
             
@@ -1119,7 +1121,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 
                 igs_debug("store mapping for agent %s(%s)", remoteAgent->name, remoteAgent->uuid);
                 remoteAgent->mapping = newMapping;
-                agent_propagateAgentEvent(IGS_AGENT_UPDATED_MAPPING, uuid, remoteAgent->name);
+                agent_propagateAgentEvent(IGS_AGENT_UPDATED_MAPPING, uuid, remoteAgent->name, NULL);
             }
             
             free(strMapping);
@@ -2166,6 +2168,31 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             }
         }
         free(title);
+    } else if (streq (event, "LEADER")){
+        const char *ourUuid = zyre_uuid(context->node);
+       
+        if (streq(ourUuid, peer)){
+            //we are leader
+            igs_info("\\o/ peer %s(%s) is leader in %s", name, peer, group);
+            zlist_t *election = zhash_lookup(context->elections, group);
+            assert(election);
+            //inform all our agents participating in the election
+            char *uuid = zlist_first(election);
+            while (uuid) {
+                igs_agent_t *agent = NULL;
+                HASH_FIND_STR(context->agents, uuid, agent);
+                assert(agent);
+                igs_info("\\o/ agent %s(%s) is leader in %s", agent->name, agent->uuid, group);
+                igs_agent_event_callback_t *cb;
+                char *electionName = strdup(group);
+                DL_FOREACH(agent->agentEventCallbacks, cb){
+                    cb->callback_ptr(agent, IGS_AGENT_WON_ELECTION, agent->uuid, agent->name, electionName, cb->myData);
+                }
+                uuid = zlist_next(election);
+            }
+        }else{
+             igs_info("\\o/ peer %s(%s) is leader in %s", name, peer, group);
+        }
     } else if (streq (event, "EXIT")){
         igs_debug("<-%s (%s) exited", name, peer);
         igs_zyre_peer_t *zyrePeer = NULL;
@@ -2181,12 +2208,12 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                     //destroy all remote agents attached to this peer
                     if (streq(remote->peer->peerId, zyrePeer->peerId)){
                         HASH_DEL(context->remoteAgents, remote);
-                        agent_propagateAgentEvent(IGS_AGENT_EXITED, remote->uuid, remote->name);
+                        agent_propagateAgentEvent(IGS_AGENT_EXITED, remote->uuid, remote->name, NULL);
                         cleanAndFreeRemoteAgent(&remote);
                     }
                 }
                 HASH_DEL(context->zyrePeers, zyrePeer);
-                agent_propagateAgentEvent(IGS_PEER_EXITED, peer, name);
+                agent_propagateAgentEvent(IGS_PEER_EXITED, peer, name, NULL);
                 cleanAndFreeZyrePeer(&zyrePeer, loop);
             }
         }
@@ -2239,7 +2266,7 @@ int triggerDefinitionUpdate(zloop_t *loop, int timer_id, void *arg){
             //State details are still sent individually when they change.
             sendStateTo(agent, IGS_PRIVATE_CHANNEL, false);
             agent->network_needToSendDefinitionUpdate = false;
-            agent_propagateAgentEvent(IGS_AGENT_UPDATED_DEFINITION, agent->uuid, agent->name);
+            agent_propagateAgentEvent(IGS_AGENT_UPDATED_DEFINITION, agent->uuid, agent->name, NULL);
             //when definition changes, mapping may need to be updated as well
             agent->network_needToSendMappingUpdate = true;
             model_readWriteUnlock();
@@ -2274,7 +2301,7 @@ int triggerMappingUpdate(zloop_t *loop, int timer_id, void *arg){
                 network_configureMappingsToRemoteAgent(agent, remote);
             }
             agent->network_needToSendMappingUpdate = false;
-            agent_propagateAgentEvent(IGS_AGENT_UPDATED_MAPPING, agent->uuid, agent->name);
+            agent_propagateAgentEvent(IGS_AGENT_UPDATED_MAPPING, agent->uuid, agent->name, NULL);
         }
     }
     return 0;
@@ -2321,6 +2348,19 @@ static void runLoop (zsock_t *mypipe, void *args){
 //        assert(zsock_wait(context->security_auth) >= 0);
         assert(zstr_sendx(context->security_auth, "CURVE", context->security_publicKeysDirectory, NULL) == 0);
         assert(zsock_wait(context->security_auth) >= 0);
+    }
+    
+    if (context->elections){
+        //NB: no need to clean at loop stop because node destruction
+        //will stop elections for this peer and trigger channel leave.
+        zlist_t *keys = zhash_keys(context->elections);
+        char *electionName = zlist_first(keys);
+        while (electionName) {
+            zyre_set_contest_in_group (context->node, electionName);
+            zyre_join (context->node, electionName);
+            electionName = zlist_next(keys);
+        }
+        zlist_destroy(&keys);
     }
     
     //iterate on agents to avoid sending definition and mapping update at startup
@@ -3553,6 +3593,104 @@ igs_result_t igs_enableSecurity(const char *privateKey, const char *publicKeysDi
     }else{
         coreContext->security_cert = zcert_new();
         coreContext->security_publicKeysDirectory = strndup(IGS_DEFAULT_SECURITY_DIRECTORY, IGS_MAX_PATH_LENGTH);
+    }
+    return IGS_SUCCESS;
+}
+
+igs_result_t igsAgent_competeInElection(igs_agent_t *agent, const char *electionName){
+    assert(agent);
+    assert(electionName);
+    if (streq(electionName, IGS_PRIVATE_CHANNEL)){
+        igsAgent_error(agent, "this name is reserved and not allowed for an election name");
+        return IGS_FAILURE;
+    }
+    core_initContext();
+    
+    if (!coreContext->elections)
+        coreContext->elections = zhash_new();
+    
+    //elections hash
+    zlist_t *election = zhash_lookup(coreContext->elections, electionName);
+    if (!election){
+        election = zlist_new();
+        zlist_autofree(election);
+        zhash_insert(coreContext->elections, electionName, election);
+        if (coreContext->node){
+            zyre_set_contest_in_group (coreContext->node, electionName);
+            zyre_join(coreContext->node, electionName);
+        }
+    }else if (zlist_size(election) > 0){
+        char *attendee = zlist_first(election);
+        while (attendee) {
+            if (streq(attendee, agent->uuid)){
+                igsAgent_error(agent, "agent %s(%s) already participates in election %s", agent->name, agent->uuid, electionName);
+                return IGS_FAILURE;
+            }
+            attendee = zlist_next(election);
+        }
+    }
+    zlist_append(election, strdup(agent->uuid));
+    
+    //elections for agent
+    if (!agent->elections){
+        agent->elections = zlist_new();
+        zlist_autofree(agent->elections);
+    }
+    zlist_append(agent->elections, strdup(electionName));
+    
+    return IGS_SUCCESS;
+}
+
+igs_result_t igsAgent_leaveElection(igs_agent_t *agent, const char *electionName){
+    assert(agent);
+    assert(electionName);
+    core_initContext();
+    
+    if (!agent->elections){
+        igsAgent_error(agent, "%s(%s) does not participate in any election", agent->name, agent->uuid);
+        return IGS_FAILURE;
+    }
+    
+    if (!coreContext->elections){
+        igsAgent_error(agent, "no election started at the moment");
+        return IGS_FAILURE;
+    }
+    
+    //elections hash
+    zlist_t *election = zhash_lookup(coreContext->elections, electionName);
+    if (!election){
+        igsAgent_error(agent, "election %s has no attendee", electionName);
+        return IGS_FAILURE;
+    }
+    char *attendee = zlist_first(election);
+    while (attendee) {
+        if (streq(attendee, agent->uuid)){
+            zlist_remove(election, attendee);
+            break;
+        }
+        attendee = zlist_next(election);
+    }
+    if (zlist_size(election) == 0){
+        zhash_delete(coreContext->elections, electionName);
+        zlist_destroy(&election);
+        if (coreContext->node){
+            zyre_leave(coreContext->node, electionName);
+        }
+    }
+    if (zhash_size(coreContext->elections) == 0)
+        zhash_destroy(&coreContext->elections);
+    
+    //elections for agent
+    char *agentElection = zlist_first(agent->elections);
+    while (agentElection) {
+        if (streq(agentElection, electionName)){
+            zlist_remove(agent->elections, agentElection);
+            break;
+        }
+        agentElection = zlist_next(agent->elections);
+    }
+    if (zlist_size(agent->elections) == 0){
+        zlist_destroy(&agent->elections);
     }
     return IGS_SUCCESS;
 }
