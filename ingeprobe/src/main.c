@@ -336,7 +336,7 @@ int manageParent (zloop_t *loop, zsock_t *socket, void *args){
         }
         else if(streq (command, "JOIN")){
             char *channel = zmsg_popstr (msg);
-            zyre_set_contest_in_group(node, channel);
+            //zyre_set_contest_in_group(node, channel);
             zyre_join (node, channel);
             free(channel);
         }
@@ -1034,7 +1034,7 @@ static void zyre_actor(zsock_t *pipe, void *args){
         zyre_set_zcert(node, cert);
         zyre_set_zap_domain(node, "INGESCAPE");
     }
-    zyre_join(node, "INGESCAPE_PRIVATE");
+    //zyre_join(node, "INGESCAPE_PRIVATE");
     context->node = node;
     
     if (!context->useGossip){
