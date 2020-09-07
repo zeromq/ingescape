@@ -82,10 +82,18 @@ PUBLIC igs_result_t igs_enableSecurity(const char *privateKeyFile, const char *p
 PUBLIC igs_result_t igs_brokerAddSecure(const char *brokerEndpoint, const char *publicKeyPath);
 
 //////////////////////////////////////////////////
-/* MASTER/SLAVE, leadership between agents
- Create contests between agents and designate a leader.
- Agents can participate in any contest. The designated leader
- in a specific context is notified by an agent event.
+/* ELECTIONS between agents
+ Create named contests between agents and designate a leader, as soon as they
+ are two or more.
+ • IGS_AGENT_WON_ELECTION means that the election is over and this agent has WON
+ • IGS_AGENT_LOST_ELECTION means that the election is over and this agent has LOST
+ • When only one agent participates in an election, the election does not happen.
+ • When only one agent remains for an election, the election does not happen.
+ At startup, this means that developers must either start their agents as
+ leaders or wait a reasonable amount of time for an election to happen.
+ During runtime, this means that developers shall rely on IGS_AGENT_EXITED
+ events to check if they suddenly are alone in an election and thus shall
+ become leaders.
  */
 PUBLIC igs_result_t igs_competeInElection(const char *electionName);
 PUBLIC igs_result_t igs_leaveElection(const char *electionName);

@@ -101,7 +101,17 @@ PUBLIC void igs_unfreeze(void);
 typedef void (*igs_freezeCallback)(bool isPaused, void *myData);
 PUBLIC void igs_observeFreeze(igs_freezeCallback cb, void *myData);
 
-//observe agents/peers events on the network
+/*observe agents/peers events on the network
+ IGS_PEER_ENTERED: a new peer has entered the network
+ IGS_PEER_EXITED: a peer has left the network (clean exit or timeout)
+ IGS_AGENT_ENTERED: an agent carried by a peer has entered the network
+ IGS_AGENT_UPDATED_DEFINITION: an agent has updated its definition
+ IGS_AGENT_KNOWS_US: an agent is fully ready to communicate with us (calls can be sent)
+ IGS_AGENT_EXITED: an agent has left the netork (peer has left or agent has been deactivated)
+ IGS_AGENT_UPDATED_MAPPING: an agent has updated its mapping
+ IGS_AGENT_WON_ELECTION: THIS AGENT has won an election (via its peer)
+ IGS_AGENT_LOST_ELECTION: THIS AGENT has lost an election (via its peer)
+ */
 typedef enum {
     IGS_PEER_ENTERED = 1, //eventData are the peer headers as a zhash_t*
     IGS_PEER_EXITED, //eventData are NULL
@@ -110,7 +120,8 @@ typedef enum {
     IGS_AGENT_KNOWS_US, //eventData are NULL
     IGS_AGENT_EXITED, //eventData are NULL
     IGS_AGENT_UPDATED_MAPPING, //eventData are NULL
-    IGS_AGENT_WON_ELECTION //eventData is the election name as a const char*
+    IGS_AGENT_WON_ELECTION, //eventData is the election name as a const char*
+    IGS_AGENT_LOST_ELECTION //eventData is the election name as a const char*
 } igs_agent_event_t;
 typedef void (*igs_agentEventCallback)(igs_agent_event_t event, const char *uuid, const char *name, void *eventData, void *myData);
 PUBLIC void igs_observeAgentEvents(igs_agentEventCallback cb, void *myData);

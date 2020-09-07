@@ -2173,26 +2173,33 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
        
         if (streq(ourUuid, peer)){
             //we are leader
-            igs_info("\\o/ peer %s(%s) is leader in %s", name, peer, group);
-            zlist_t *election = zhash_lookup(context->elections, group);
-            assert(election);
-            //inform all our agents participating in the election
-            char *uuid = zlist_first(election);
-            while (uuid) {
-                igs_agent_t *agent = NULL;
-                HASH_FIND_STR(context->agents, uuid, agent);
-                assert(agent);
-                igs_info("\\o/ agent %s(%s) is leader in %s", agent->name, agent->uuid, group);
-                igs_agent_event_callback_t *cb;
-                char *electionName = strdup(group);
-                DL_FOREACH(agent->agentEventCallbacks, cb){
+            igs_info("\\o/ peer %s(%s) -that's us- is leader in '%s'", name, peer, group);
+        }else
+            igs_info("\\o/ peer %s(%s) is leader in '%s'", name, peer, group);
+        
+        zlist_t *election = zhash_lookup(context->elections, group);
+        assert(election);
+        //inform all our agents participating in the election
+        char *uuid = zlist_first(election);
+        while (uuid) {
+            igs_agent_t *agent = NULL;
+            HASH_FIND_STR(context->agents, uuid, agent);
+            assert(agent);
+            if (streq(ourUuid, peer))
+                igs_info("\\o/ agent %s(%s) is leader in '%s'", agent->name, agent->uuid, group);
+            else
+                igs_info("\\o/ agent %s(%s) is NOT leader in '%s'", agent->name, agent->uuid, group);
+            igs_agent_event_callback_t *cb;
+            char *electionName = strdup(group);
+            DL_FOREACH(agent->agentEventCallbacks, cb){
+                if (streq(ourUuid, peer))
                     cb->callback_ptr(agent, IGS_AGENT_WON_ELECTION, agent->uuid, agent->name, electionName, cb->myData);
-                }
-                uuid = zlist_next(election);
+                else
+                    cb->callback_ptr(agent, IGS_AGENT_LOST_ELECTION, agent->uuid, agent->name, electionName, cb->myData);
             }
-        }else{
-             igs_info("\\o/ peer %s(%s) is leader in %s", name, peer, group);
+            uuid = zlist_next(election);
         }
+        
     } else if (streq (event, "EXIT")){
         igs_debug("<-%s (%s) exited", name, peer);
         igs_zyre_peer_t *zyrePeer = NULL;
@@ -2348,19 +2355,6 @@ static void runLoop (zsock_t *mypipe, void *args){
 //        assert(zsock_wait(context->security_auth) >= 0);
         assert(zstr_sendx(context->security_auth, "CURVE", context->security_publicKeysDirectory, NULL) == 0);
         assert(zsock_wait(context->security_auth) >= 0);
-    }
-    
-    if (context->elections){
-        //NB: no need to clean at loop stop because node destruction
-        //will stop elections for this peer and trigger channel leave.
-        zlist_t *keys = zhash_keys(context->elections);
-        char *electionName = zlist_first(keys);
-        while (electionName) {
-            zyre_set_contest_in_group (context->node, electionName);
-            zyre_join (context->node, electionName);
-            electionName = zlist_next(keys);
-        }
-        zlist_destroy(&keys);
     }
     
     //iterate on agents to avoid sending definition and mapping update at startup
@@ -2576,6 +2570,19 @@ void initLoop (igs_core_context_t *context){
     zyre_set_interval(context->node, context->network_discoveryInterval);
     zyre_set_expired_timeout(context->node, context->network_agentTimeout);
     zyre_join(context->node, IGS_PRIVATE_CHANNEL);
+    
+    if (context->elections){
+        //NB: no need to clean at loop stop because node destruction
+        //will stop elections for this peer and trigger channel leave.
+        zlist_t *keys = zhash_keys(context->elections);
+        char *electionName = zlist_first(keys);
+        while (electionName) {
+            zyre_set_contest_in_group (context->node, electionName);
+            zyre_join (context->node, electionName);
+            electionName = zlist_next(keys);
+        }
+        zlist_destroy(&keys);
+    }
     bus_zyreUnlock();
     
     //create channel for replay
@@ -3604,26 +3611,32 @@ igs_result_t igsAgent_competeInElection(igs_agent_t *agent, const char *election
         igsAgent_error(agent, "this name is reserved and not allowed for an election name");
         return IGS_FAILURE;
     }
+    char elName[256] = "\\o/ ";
+    if (strlen(electionName) + strlen(elName) > 255){
+        igsAgent_error(agent, "election name is limited to %lu characters", 255 - strlen(elName));
+        return IGS_FAILURE;
+    }
+    strncat(elName, electionName, 255);
     core_initContext();
     
     if (!coreContext->elections)
         coreContext->elections = zhash_new();
     
     //elections hash
-    zlist_t *election = zhash_lookup(coreContext->elections, electionName);
+    zlist_t *election = zhash_lookup(coreContext->elections, elName);
     if (!election){
         election = zlist_new();
         zlist_autofree(election);
-        zhash_insert(coreContext->elections, electionName, election);
+        zhash_insert(coreContext->elections, elName, election);
         if (coreContext->node){
-            zyre_set_contest_in_group (coreContext->node, electionName);
-            zyre_join(coreContext->node, electionName);
+            zyre_set_contest_in_group (coreContext->node, elName);
+            zyre_join(coreContext->node, elName);
         }
     }else if (zlist_size(election) > 0){
         char *attendee = zlist_first(election);
         while (attendee) {
             if (streq(attendee, agent->uuid)){
-                igsAgent_error(agent, "agent %s(%s) already participates in election %s", agent->name, agent->uuid, electionName);
+                igsAgent_error(agent, "agent %s(%s) already participates in election '%s'", agent->name, agent->uuid, elName);
                 return IGS_FAILURE;
             }
             attendee = zlist_next(election);
@@ -3631,12 +3644,12 @@ igs_result_t igsAgent_competeInElection(igs_agent_t *agent, const char *election
     }
     zlist_append(election, strdup(agent->uuid));
     
-    //elections for agent
+    //elections by agent
     if (!agent->elections){
         agent->elections = zlist_new();
         zlist_autofree(agent->elections);
     }
-    zlist_append(agent->elections, strdup(electionName));
+    zlist_append(agent->elections, strdup(elName));
     
     return IGS_SUCCESS;
 }
@@ -3644,22 +3657,26 @@ igs_result_t igsAgent_competeInElection(igs_agent_t *agent, const char *election
 igs_result_t igsAgent_leaveElection(igs_agent_t *agent, const char *electionName){
     assert(agent);
     assert(electionName);
-    core_initContext();
-    
     if (!agent->elections){
         igsAgent_error(agent, "%s(%s) does not participate in any election", agent->name, agent->uuid);
         return IGS_FAILURE;
     }
-    
     if (!coreContext->elections){
         igsAgent_error(agent, "no election started at the moment");
         return IGS_FAILURE;
     }
+    char elName[256] = "\\o/ ";
+    if (strlen(electionName) + strlen(elName) > 255){
+        igsAgent_error(agent, "election name is limited to %lu characters", 255 - strlen(elName));
+        return IGS_FAILURE;
+    }
+    strncat(elName, electionName, 255);
+    core_initContext();
     
     //elections hash
-    zlist_t *election = zhash_lookup(coreContext->elections, electionName);
+    zlist_t *election = zhash_lookup(coreContext->elections, elName);
     if (!election){
-        igsAgent_error(agent, "election %s has no attendee", electionName);
+        igsAgent_error(agent, "election '%s' has no attendee", elName);
         return IGS_FAILURE;
     }
     char *attendee = zlist_first(election);
@@ -3671,27 +3688,26 @@ igs_result_t igsAgent_leaveElection(igs_agent_t *agent, const char *electionName
         attendee = zlist_next(election);
     }
     if (zlist_size(election) == 0){
-        zhash_delete(coreContext->elections, electionName);
+        zhash_delete(coreContext->elections, elName);
         zlist_destroy(&election);
-        if (coreContext->node){
-            zyre_leave(coreContext->node, electionName);
-        }
+        if (coreContext->node)
+            zyre_leave(coreContext->node, elName);
     }
     if (zhash_size(coreContext->elections) == 0)
         zhash_destroy(&coreContext->elections);
     
-    //elections for agent
+    //elections by agent
     char *agentElection = zlist_first(agent->elections);
     while (agentElection) {
-        if (streq(agentElection, electionName)){
+        if (streq(agentElection, elName)){
             zlist_remove(agent->elections, agentElection);
             break;
         }
         agentElection = zlist_next(agent->elections);
     }
-    if (zlist_size(agent->elections) == 0){
+    if (zlist_size(agent->elections) == 0)
         zlist_destroy(&agent->elections);
-    }
+    
     return IGS_SUCCESS;
 }
 

@@ -1383,6 +1383,18 @@ int main(int argc, const char * argv[]) {
     igsAgent_deactivate(secondAgent);
     assert(puncher_secondAgentExited);
     
+    //elections
+    assert(igs_leaveElection("my election") == IGS_FAILURE);
+    assert(igs_competeInElection("my election") == IGS_SUCCESS);
+    assert(igs_competeInElection("my election") == IGS_FAILURE);
+    assert(igs_competeInElection("INGESCAPE_PRIVATE") == IGS_FAILURE);
+    assert(igs_leaveElection("my election") == IGS_SUCCESS);
+    assert(igs_leaveElection("my election") == IGS_FAILURE);
+    assert(igs_leaveElection("my other election") == IGS_FAILURE);
+    assert(igs_competeInElection("my other election") == IGS_SUCCESS);
+    assert(igs_competeInElection("my other election") == IGS_FAILURE);
+    assert(igs_leaveElection("my other election") == IGS_SUCCESS);
+    assert(igs_leaveElection("my other election") == IGS_FAILURE);
     
     if (autoTests){
         igs_startWithDevice(networkDevice, port);
