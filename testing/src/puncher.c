@@ -42,7 +42,7 @@ bool puncher_firstAgentExited = false;
 bool puncher_secondAgentEntered = false;
 bool puncher_secondAgentKnowsUs = false;
 bool puncher_secondAgentExited = false;
-void agentEvent(igs_agent_event_t event, const char *uuid, const char *name, void *myData){
+void agentEvent(igs_agent_event_t event, const char *uuid, const char *name, void *eventData, void *myData){
     printf("agentEvent: in puncher - %d - %s - %s\n", event, uuid, name);
     if (streq(name, "firstAgent")){
         if (event == IGS_AGENT_ENTERED)
@@ -75,7 +75,7 @@ bool second_firstAgentExited = false;
 bool second_puncherAgentEntered = false;
 bool second_punchergentKnowsUs = false;
 bool second_puncherAgentExited = false;
-void agentEvent2(igs_agent_t *agent, igs_agent_event_t event, const char *uuid, const char *name, void *myData){
+void agentEvent2(igs_agent_t *agent, igs_agent_event_t event, const char *uuid, const char *name, void *eventData, void *myData){
     printf("agentEvent2: in %s - %d - %s - %s\n", igsAgent_getAgentName(agent), event, uuid, name); //memory leak on agent name
     assert(agent == firstAgent || agent == secondAgent);
     if (agent == firstAgent){
@@ -116,8 +116,10 @@ void agentEvent2(igs_agent_t *agent, igs_agent_event_t event, const char *uuid, 
 //callbacks for calls
 void puncherCallCallback(const char *senderAgentName, const char *senderAgentUUID,
                          const char *callName, igs_callArgument_t *firstArgument, size_t nbArgs,
-                         void* myData){
+                         const char *token, void* myData){
     if (autoTestsHaveStarted){
+        assert(token);
+        assert(streq(token, "token"));
         assert(firstArgument->type == IGS_BOOL_T);
         assert(firstArgument->b);
         assert(firstArgument->next->type == IGS_INTEGER_T);
@@ -1354,7 +1356,7 @@ int main(int argc, const char * argv[]) {
     igs_addDoubleToArgumentsList(&list, 13.3);
     igs_addStringToArgumentsList(&list, "my string arg");
     igs_addDataToArgumentsList(&list, data, dataSize);
-    igsAgent_sendCall(firstAgent, "secondAgent", "secondCall", &list);
+    igsAgent_sendCall(firstAgent, "secondAgent", "secondCall", &list, "token");
     
     
     //test agent events in same process
@@ -1511,7 +1513,7 @@ int main(int argc, const char * argv[]) {
                         igs_addDoubleToArgumentsList(&args, 3.0);
                         igs_addStringToArgumentsList(&args, "call string test");
                         igs_addDataToArgumentsList(&args, myOtherData, 64);
-                        igsAgent_sendCall(firstAgent, "secondAgent", "secondCall", &args);
+                        igsAgent_sendCall(firstAgent, "secondAgent", "secondCall", &args, "token");
                     }else if(streq(command, "security")){
                         securityCommand();
                         

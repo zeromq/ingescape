@@ -654,9 +654,10 @@ igs_result_t igs_readInputAsZMQMsg(const char *name, zmsg_t **msg){
 }
 
 
-igs_result_t igs_sendCall(const char *agentNameOrUUID, const char *callName, igs_callArgument_t **list){
+igs_result_t igs_sendCall(const char *agentNameOrUUID, const char *callName,
+                          igs_callArgument_t **list, const char *token){
     core_initAgent();
-    return igsAgent_sendCall(coreAgent, agentNameOrUUID, callName, list);
+    return igsAgent_sendCall(coreAgent, agentNameOrUUID, callName, list, token);
 }
 
 typedef struct {
@@ -665,11 +666,11 @@ typedef struct {
 } callCbWrapper_t;
 
 void core_callCallback(igs_agent_t *agent, const char *senderAgentName, const char *senderAgentUUID,
-                         const char *callName, igs_callArgument_t *firstArgument, size_t nbArgs,
-                         void* myData){
+                       const char *callName, igs_callArgument_t *firstArgument, size_t nbArgs,
+                       const char *token, void* myData){
     IGS_UNUSED(agent)
     callCbWrapper_t *wrap = (callCbWrapper_t *)myData;
-    wrap->cb(senderAgentName, senderAgentUUID, callName, firstArgument, nbArgs, wrap->myData);
+    wrap->cb(senderAgentName, senderAgentUUID, callName, firstArgument, nbArgs, token, wrap->myData);
 }
 
 igs_result_t igs_initCall(const char *name, igs_callFunction cb, void *myData){

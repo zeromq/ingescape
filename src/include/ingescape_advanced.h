@@ -227,16 +227,18 @@ PUBLIC void igs_destroyArgumentsList(igs_callArgument_t **list);
 PUBLIC igs_callArgument_t *igs_cloneArgumentsList(igs_callArgument_t *list);
 
 //SEND a call to another agent
-//requires to pass agent name or UUID, call name and a list of arguments specific to the call
-//passed arguments list will be deallocated and destroyed
-PUBLIC igs_result_t igs_sendCall(const char *agentNameOrUUID, const char *callName, igs_callArgument_t **list);
+//Requires to pass agent a name or UUID, a call name and a list of arguments specific to the call.
+//Token is an optional information to specifically identify a call and help routing replies.
+//Passed arguments list will be deallocated and destroyed by the function.
+PUBLIC igs_result_t igs_sendCall(const char *agentNameOrUUID, const char *callName,
+                                 igs_callArgument_t **list, const char *token);
 
 
 //CREATE CALLS for our agent
 //callback model to handle calls received by our agent
 typedef void (*igs_callFunction)(const char *senderAgentName, const char *senderAgentUUID,
                                  const char *callName, igs_callArgument_t *firstArgument, size_t nbArgs,
-                                 void* myData);
+                                 const char *token, void* myData);
 
 
 //Manage calls supported by our agent

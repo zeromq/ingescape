@@ -167,10 +167,11 @@ PUBLIC igs_result_t igsAgent_writeOutputAsZMQMsg(igs_agent_t *agent, const char 
 PUBLIC igs_result_t igsAgent_readInputAsZMQMsg(igs_agent_t *agent, const char *name, zmsg_t **msg); //msg must be freed by caller using zmsg_destroy
 
 //calls
-PUBLIC igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, const char *callName, igs_callArgument_t **list);
+PUBLIC igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, const char *callName,
+                                      igs_callArgument_t **list, const char *token);
 typedef void (*igsAgent_callFunction)(igs_agent_t *agent, const char *senderAgentName, const char *senderAgentUUID,
                                       const char *callName, igs_callArgument_t *firstArgument, size_t nbArgs,
-                                      void* myData);
+                                      const char *token, void* myData);
 PUBLIC igs_result_t igsAgent_initCall(igs_agent_t *agent, const char *name, igsAgent_callFunction cb, void *myData);
 PUBLIC igs_result_t igsAgent_removeCall(igs_agent_t *agent, const char *name);
 PUBLIC igs_result_t igsAgent_addArgumentToCall(igs_agent_t *agent, const char *callName, const char *argName, iopType_t type);

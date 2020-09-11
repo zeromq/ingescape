@@ -44,7 +44,7 @@ void myIOPCallback(iop_t iopType, const char* name, iopType_t valueType, void* v
 
 void myCallCallback(const char *senderAgentName, const char *senderAgentUUID,
                     const char *callName, igs_callArgument_t *firstArgument, size_t nbArgs,
-                    void* myData){
+                    const char *token, void* myData){
     printf("received call %s from %s(%s) (", callName, senderAgentName, senderAgentUUID);
     igs_callArgument_t *currentArg = firstArgument;
     for (size_t i = 0; i < nbArgs; i++){
@@ -151,7 +151,7 @@ void agentIOPCallback(igs_agent_t *agent, iop_t iopType, const char* name, iopTy
 
 void agentCallCallback(igs_agent_t *agent, const char *senderAgentName, const char *senderAgentUUID,
                        const char *callName, igs_callArgument_t *firstArgument, size_t nbArgs,
-                       void* myData){
+                       const char *token, void* myData){
     char *agentName = igsAgent_getAgentName(agent);
     printf("%s received call %s from %s(%s) (", agentName, callName, senderAgentName, senderAgentUUID);
     free(agentName);
@@ -259,7 +259,7 @@ void callCommand(void){
     igs_addDoubleToArgumentsList(&args, 3.0);
     igs_addStringToArgumentsList(&args, "call string test");
     igs_addDataToArgumentsList(&args, myOtherData, 64);
-    igs_sendCall("sparingPartner", "sparingCall", &args);
+    igs_sendCall("sparingPartner", "sparingCall", &args, "token");
 }
 
 void callCommandSparing(void){
@@ -269,7 +269,7 @@ void callCommandSparing(void){
     igs_addDoubleToArgumentsList(&args, 3.3);
     igs_addStringToArgumentsList(&args, "call string test");
     igs_addDataToArgumentsList(&args, myOtherData, 64);
-    igs_sendCall("puncher", "myCall", &args);
+    igs_sendCall("puncher", "myCall", &args, "token");
 }
 
 void busCommand(void){

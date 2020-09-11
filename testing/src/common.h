@@ -29,7 +29,7 @@ extern void *myOtherData;
 void myIOPCallback(iop_t iopType, const char* name, iopType_t valueType, void* value, size_t valueSize, void* myData);
 void myCallCallback(const char *senderAgentName, const char *senderAgentUUID,
                     const char *callName, igs_callArgument_t *firstArgument, size_t nbArgs,
-                    void* myData);
+                    const char *token, void* myData);
 void myBusCallback(const char *event, const char *peerID, const char *name,
                    const char *address, const char *channel,
                    zhash_t *headers, zmsg_t *msg, void *myData);
@@ -38,7 +38,7 @@ void agentIOPCallback(igs_agent_t *agent, iop_t iopType, const char* name, iopTy
                       void* value, size_t valueSize, void* myData);
 void agentCallCallback(igs_agent_t *agent, const char *senderAgentName, const char *senderAgentUUID,
                        const char *callName, igs_callArgument_t *firstArgument, size_t nbArgs,
-                       void* myData);
+                       const char *token, void* myData);
 
 
 void print_usage(void);

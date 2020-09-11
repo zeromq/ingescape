@@ -418,7 +418,8 @@ igs_result_t igsAgent_removeArgumentFromCall(igs_agent_t *agent, const char *cal
     return IGS_SUCCESS;
 }
 
-igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, const char *callName, igs_callArgument_t **list){
+igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, const char *callName,
+                               igs_callArgument_t **list, const char *token){
     assert(agent);
     assert(agentNameOrUUID);
     assert(callName);
@@ -464,6 +465,10 @@ igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, 
                 zmsg_addstr(msg, agent->uuid);
                 zmsg_addstr(msg, remoteAgent->uuid);
                 zmsg_addstr(msg, callName);
+                if (token)
+                    zmsg_addstr(msg, token);
+                else
+                    zmsg_addstr(msg, "");
                 if (list != NULL){
                     LL_FOREACH(*list, arg){
                         zframe_t *frame = NULL;
@@ -537,7 +542,7 @@ igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, 
                                 call_copyArguments(*list, call->arguments);
                             }
                             if (call->cb != NULL){
-                                (call->cb)(localAgent, agent->name, agent->uuid, callName, call->arguments, nbArguments, call->cbData);
+                                (call->cb)(localAgent, agent->name, agent->uuid, callName, call->arguments, nbArguments, token, call->cbData);
                                 call_freeValuesInArguments(call->arguments);
                             }else{
                                 igsAgent_error(agent, "no defined callback to handle received call %s", callName);

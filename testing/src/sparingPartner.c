@@ -59,7 +59,7 @@ int runAutoTests(zloop_t *loop, int timer_id, void *arg){
     return -1;
 }
 
-void agentEvents(igs_agent_event_t event, const char *uuid, const char *name, void *myData){
+void agentEvents(igs_agent_event_t event, const char *uuid, const char *name, void *eventData, void *myData){
     igs_info("%s - %d", name, event);
     if (streq(name, "puncher") && event == IGS_AGENT_KNOWS_US){
         igs_info("starting auto tests with %s", name);

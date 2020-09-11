@@ -2093,6 +2093,22 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                     zyre_event_destroy(&zyre_event);
                     return 0;
                 }
+                
+                char *token = zmsg_popstr(msgDuplicate);
+                if (token == NULL){
+                    igs_error("no token in %s message received from %s(%s): rejecting", title, name, peer);
+                    free(callerUuid);
+                    free(calleeUuid);
+                    free(callName);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
+                if (strlen(token) == 0){
+                    free(token);
+                    token = NULL;
+                }
+                
                 if (calleeAgent->definition != NULL && calleeAgent->definition->calls_table != NULL){
                     igs_call_t *call = NULL;
                     HASH_FIND_STR(calleeAgent->definition->calls_table, callName, call);
@@ -2105,7 +2121,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                             igs_callArgument_t *_arg = NULL;
                             LL_COUNT(call->arguments, _arg, nbArgs);
                             if (call_addValuesToArgumentsFromMessage(callName, call->arguments, msgDuplicate) == IGS_SUCCESS){
-                                (call->cb)(calleeAgent, callerName, callerUuid, callName, call->arguments, nbArgs, call->cbData);
+                                (call->cb)(calleeAgent, callerName, callerUuid, callName, call->arguments, nbArgs, token, call->cbData);
                                 call_freeValuesInArguments(call->arguments);
                             }
                         }else{
@@ -2118,6 +2134,8 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 free(callerUuid);
                 free(calleeUuid);
                 free(callName);
+                if (token)
+                    free(token);
             }
             //Performance
             else if (strcmp (title, "PING") == 0){

@@ -424,6 +424,7 @@ int manageParent (zloop_t *loop, zsock_t *socket, void *args){
                             //v2 protocol : add our id as caller and callee agent uuid
                             zmsg_addstr(callMsg, zyre_uuid(context->node));
                             zmsg_addstr(callMsg, a->uuid);
+                            zmsg_addstr(callMsg, ""); //token, always empty here
                         }else{
                             //v1 protocol
                             //nothing to do
