@@ -177,7 +177,7 @@ void admin_log(igs_agent_t *agent, igs_logLevel_t level, const char *function, c
                     printf("error while creating log path %s\n", coreContext->logFilePath);
                 }
             }
-            strncat(coreContext->logFilePath, coreAgent->name, IGS_MAX_PATH_LENGTH);
+            strncat(coreContext->logFilePath, agent->name, IGS_MAX_PATH_LENGTH);
             strncat(coreContext->logFilePath, ".log", IGS_MAX_PATH_LENGTH);
             printf("using log file %s\n", coreContext->logFilePath);
             if (coreContext != NULL && coreContext->node != NULL){
