@@ -2104,10 +2104,6 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                     zyre_event_destroy(&zyre_event);
                     return 0;
                 }
-                if (strlen(token) == 0){
-                    free(token);
-                    token = NULL;
-                }
                 
                 if (calleeAgent->definition != NULL && calleeAgent->definition->calls_table != NULL){
                     igs_call_t *call = NULL;
