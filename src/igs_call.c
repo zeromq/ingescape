@@ -436,6 +436,12 @@ igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, 
                 //we found a matching agent
                 igs_callArgument_t *arg = NULL;
                 found = true;
+                
+                /*
+                 We remove verifications on the call on sender side to enable
+                 proper proxy implementation (local proxy does not implement
+                 calls but relays them to remote clients and virutal agents).
+                 
                 if (remoteAgent->definition == NULL){
                     igsAgent_warn(agent, "definition is unknown for %s(%s) : cannot verify call before sending it",
                                   remoteAgent->name, agentNameOrUUID);
@@ -460,6 +466,8 @@ igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, 
                         //continue; //commented to allow sending the message anyway
                     }
                 }
+                */
+                
                 zmsg_t *msg = zmsg_new();
                 zmsg_addstr(msg, "CALL");
                 zmsg_addstr(msg, agent->uuid);
