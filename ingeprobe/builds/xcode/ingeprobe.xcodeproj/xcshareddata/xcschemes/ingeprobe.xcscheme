@@ -50,6 +50,16 @@
             ReferencedContainer = "container:ingeprobe.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "--endpoint tcp://10.0.0.7:5651 --connect tcp://10.0.0.7:5640"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--endpoint tcp://10.0.0.7:5650 --bind tcp://10.0.0.7:5640"
+            isEnabled = "NO">
+         </CommandLineArgument>
+      </CommandLineArguments>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

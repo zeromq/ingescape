@@ -1049,7 +1049,7 @@ static void zyre_actor(zsock_t *pipe, void *args){
         if (endpoint != NULL){
             int res = zyre_set_endpoint(node, "%s", endpoint);
             if (res != 0){
-                printf("impossible to create our endpoint %s... aborting.", endpoint);
+                printf("impossible to create our endpoint %s... aborting.\n", endpoint);
                 return;
             }
             printf("using endpoint %s\n", endpoint);
