@@ -18,15 +18,15 @@ extern "C" {
 #endif
 
 #if (defined WIN32 || defined _WIN32)
-#if defined INGESCAPE
-#define PUBLIC __declspec(dllexport)
-#elif defined INGESCAPE_FROM_PRI
-#define PUBLIC
+    #if defined INGESCAPE
+        #define PUBLIC __declspec(dllexport)
+    #elif defined INGESCAPE_FROM_PRI
+        #define PUBLIC
+    #else
+        #define PUBLIC __declspec(dllimport)
+    #endif
 #else
-#define PUBLIC __declspec(dllimport)
-#endif
-#else
-#define PUBLIC
+    #define PUBLIC
 #endif
 
 typedef enum{
@@ -45,8 +45,9 @@ typedef enum{
 //Macro to avoid "unused parameter" warnings
 #define IGS_UNUSED(x) (void)x;
 
+
 //////////////////////////////////////////////////
-// Initialization and control
+// INITIALIZATION AND CONTROL
 
 //start & stop ingescape
 PUBLIC igs_result_t igs_startWithDevice(const char *networkDevice, unsigned int port);
@@ -61,7 +62,7 @@ PUBLIC bool igs_isStarted(void);
  
  To stop ingescape from its hosting application, just call igs_stop().
  
- To be notified that Ingescape has been stopped, one can by order of
+ To be notified that Ingescape has been stopped, you can, by order of
  preference:
  - read the pipe socket to ingescape and expect a "LOOP_STOPPED" message
  - register a callabck with igs_observeExternalStop - WARNING: this callback
@@ -69,9 +70,9 @@ PUBLIC bool igs_isStarted(void);
  depending on your application structure.
  - periodically check igs_isStarted()
  In any case, igs_stop MUST NEVER BE CALLED directly from any Ingescape callback,
- as it would cause a deadlock.
+ because it would create a deadlock between the main thread and the ingescape thread.
  */
-PUBLIC zsock_t* igs_getPipeToIngescape(void); //socket to get stop event from ingescape in a thread-safe manner
+PUBLIC zsock_t* igs_getPipeToIngescape(void); //zeromq socket to get stop event from ingescape in a thread-safe manner
 typedef void (*igs_externalStopCallback)(void *myData);
 PUBLIC void igs_observeExternalStop(igs_externalStopCallback cb, void *myData);
 
@@ -128,8 +129,7 @@ PUBLIC void igs_observeAgentEvents(igs_agentEventCallback cb, void *myData);
 
 
 //////////////////////////////////////////////////
-//IOP Model : Inputs, Outputs and Parameters read/write/check/observe/mute
-
+// IOP MODEL : Inputs, Outputs and Parameters read/write/check/observe/mute
 typedef enum {
     IGS_INPUT_T = 1,
     IGS_OUTPUT_T,
@@ -193,7 +193,6 @@ PUBLIC igs_result_t igs_readInput(const char *name, void **value, size_t *size);
 PUBLIC igs_result_t igs_readOutput(const char *name, void **value, size_t *size);
 PUBLIC igs_result_t igs_readParameter(const char *name, void **value, size_t *size);
 
-
 //clear IOP data in memory without having to write the IOP
 //(relevant for IOPs with IGS_DATA_T type only)
 PUBLIC void igs_clearDataForInput(const char *name);
@@ -231,8 +230,7 @@ PUBLIC bool igs_checkParameterExistence(const char *name);
 
 
 //////////////////////////////////////////////////
-//Definitions
-
+// DEFINITION
 //load / set / get definition
 PUBLIC igs_result_t igs_loadDefinition (const char* json_str);
 PUBLIC igs_result_t igs_loadDefinitionFromPath (const char* file_path);
@@ -256,8 +254,7 @@ PUBLIC igs_result_t igs_removeParameter(const char *name);
 
 
 //////////////////////////////////////////////////
-//Mappings
-
+// MAPPING
 //load / set / get mapping
 PUBLIC igs_result_t igs_loadMapping (const char* json_str);
 PUBLIC igs_result_t igs_loadMappingFromPath (const char* file_path);
@@ -271,24 +268,33 @@ PUBLIC void igs_setMappingName(const char *name);
 PUBLIC void igs_setMappingDescription(const char *description);
 PUBLIC void igs_setMappingVersion(const char *version);
 
-//edit mapping using the API
+//edit our mapping using the API
 PUBLIC size_t igs_getMappingEntriesNumber(void); //number of entries in the mapping output type
 PUBLIC unsigned long igs_addMappingEntry(const char *fromOurInput, const char *toAgent, const char *withOutput); //returns mapping id or zero if creation failed
 PUBLIC igs_result_t igs_removeMappingEntryWithId(unsigned long theId);
 PUBLIC igs_result_t igs_removeMappingEntryWithName(const char *fromOurInput, const char *toAgent, const char *withOutput);
 
+//When mapping other agents, it is possible to ask the mapped
+//agents to send us their current output values through a dedicated
+//message for our initialization.
+//By default, this behavior is disabled.
+PUBLIC void igs_setRequestOutputsFromMappedAgents(bool notify);
+PUBLIC bool igs_getRequestOutputsFromMappedAgents(void);
+
 
 //////////////////////////////////////////////////
-//Administration, configuration & utilities
+// ADMINISTRATION, CONFIGURATION & UTILITIES
 
-//IngeScape library version
+//LIBRARY VERSION
 //returns MAJOR*10000 + MINOR*100 + MICRO
 PUBLIC int igs_version(void);
 
-//IngeScape protocol version
+//PROTOCOL VERSION
 PUBLIC int igs_protocol(void);
 
-//Utility functions to find network adapters with broadcast capabilities
+
+//NETWORK DEVICES
+//Utility functions to detect network adapters with broadcast capabilities
 //to be used in igs_startWithDevice and igs_startWithIP
 PUBLIC void igs_getNetdevicesList(char ***devices, int *nb);
 PUBLIC void igs_freeNetdevicesList(char **devices, int nb);
@@ -296,6 +302,7 @@ PUBLIC void igs_getNetaddressesList(char ***addresses, int *nb);
 PUBLIC void igs_freeNetaddressesList(char **addresses, int nb);
 
 
+//COMMAND LINE
 //Agent command line can be passed here to be used by ingescapeLauncher. If not set,
 //command line is initialized with exec path without any parameter.
 PUBLIC void igs_setCommandLine(const char *line);
@@ -303,15 +310,7 @@ PUBLIC void igs_setCommandLineFromArgs(int argc, const char * argv[]); //first e
 PUBLIC char* igs_getCommandLine(void); //must be freed by caller
 
 
-//When mapping other agents, it is possible to request the
-//mapped agents to send us their current output values
-//through a private communication for our proper initialization.
-//By default, this behavior is disabled.
-PUBLIC void igs_setRequestOutputsFromMappedAgents(bool notify);
-PUBLIC bool igs_getRequestOutputsFromMappedAgents(void);
-
-
-/* Logs policy
+/* LOGS POLICY
  - fatal : Events that force application termination.
  - error : Events that are fatal to the current operation but not the whole application.
  - warning : Events that can potentially cause application anomalies but that can be recovered automatically (by circumventing or retrying).
@@ -328,7 +327,8 @@ typedef enum {
     IGS_LOG_FATAL
 } igs_logLevel_t;
 
-//logs management
+
+//LOGS MANAGEMENT
 PUBLIC void igs_setVerbose(bool); //enable logs in console (ERROR and FATAL are always displayed)
 PUBLIC bool igs_isVerbose(void);
 PUBLIC void igs_setUseColorVerbose(bool); //use colors in console
@@ -342,7 +342,24 @@ PUBLIC char* igs_getLogPath(void); // must be freed by caller
 PUBLIC void igs_setLogLevel (igs_logLevel_t level); //set log level in console, default is IGS_LOG_INFO
 PUBLIC igs_logLevel_t igs_getLogLevel(void);
 
-//do not use these functions, use aliases just below
+
+/* LOGS REPLAY
+ Logs generate all the necessary information for agent
+ to replay either its received input stimulations or its
+ published outputs. Both cases are handled.
+ Replay happens in a dedicated thread run as soon as
+ igs_replayInputsFromLogFile or igs_replayOutputsFromLogFile
+ is called. These two functions shall thus be called
+ after one of the igs_start* functions.
+ NB: By default, data are not logged due to possible large
+ sizes. Data logging can be enabled using igs_enableDataLogging.
+ */
+//PUBLIC void igs_enableDataLogging(bool enable);
+//PUBLIC void igs_replayInputsFromLogFile(const char *logFilePath);
+//PUBLIC void igs_replayOutputsFromLogFile(const char *logFilePath);
+
+
+//LOG ALIASES
 PUBLIC void igs_log(igs_logLevel_t level, const char *function, const char *format, ...) CHECK_PRINTF (3);
 #define igs_trace(...) igs_log(IGS_LOG_TRACE, __func__, __VA_ARGS__)
 #define igs_debug(...) igs_log(IGS_LOG_DEBUG, __func__, __VA_ARGS__)
@@ -352,35 +369,43 @@ PUBLIC void igs_log(igs_logLevel_t level, const char *function, const char *form
 #define igs_fatal(...) igs_log(IGS_LOG_FATAL, __func__, __VA_ARGS__)
 
 
-//resources file management
+//DEFINITION & MAPPING FILE MANAGEMENT
+/* These functions enable to define and write definition and mapping
+ files for our agent. By default, definition and mapping paths are
+ initialized with igs_loadDefinitionFromPath and igs_loadMappingFromPath.
+ But they can also be configured using these functions to store current
+ definitions.
+ These functions are used remotely by the Ingescape editor to save
+ changes made by a platform administrator.
+ */
 PUBLIC void igs_setDefinitionPath(const char *path);
 PUBLIC void igs_setMappingPath(const char *path);
 PUBLIC void igs_writeDefinitionToPath(void);
 PUBLIC void igs_writeMappingToPath(void);
 
-//Ingescape automatically detects agents on the same computer and same process (PID)
-//Then, it uses optimized communication for input/output data exchange chosen
-//between TCP, IPC/loopback and inproc.
 
-//Same IP address but differet PIDs : use IPC or loopback
-//IPC is supported on UNIX systems only. On windows, we use the loopback as an alternative.
-//IPC is activated by default be can be deactivated here.
+//ADVANCED TRANSPORTS
+/* Ingescape automatically detects agents on the same computer
+ and then uses optimized inter-process communication protocols
+ depending on the operating system.
+ • On UNIX systems, UNIX domain sockets are used that require a
+ path whose default value is '/tmp/ingescape/' completed by the
+ agent UUID.
+ • On Microsoft Windows systems, the loopback is used.
+ Advanced transports are allowed by default and can be disabled
+ using igs_setAllowIpc.
+ */
 PUBLIC void igs_setAllowIpc(bool allow);
 PUBLIC bool igs_getAllowIpc(void);
 #if defined __unix__ || defined __APPLE__ || defined __linux__
-//set IPC folder path for the agent on UNIX systems (default is /tmp/)
+//set IPC folder path on UNIX systems (default is /tmp/ingescape/)
 PUBLIC void igs_setIpcFolderPath(char *path);
 PUBLIC const char* igs_getIpcFolderPath(void);
 #endif
 
-//Same IP address and same PID : use inproc
-//Inproc is activated by default be can be deactivated here.
-PUBLIC void igs_setAllowInproc(bool allow);
-PUBLIC bool igs_getAllowInproc(void);
-
 
 //////////////////////////////////////////////////
-//licenses
+// LICENSES
 #define igs_license(...) igs_log(IGS_LOG_FATAL + 1, __func__, __VA_ARGS__)
 typedef enum {
     IGS_LICENSE_TIMEOUT = 0,
@@ -390,29 +415,32 @@ typedef enum {
 typedef void (igs_licenseCallback)(igs_license_limit_t limit, void *myData);
 
 #if !defined(TARGET_OS_IOS) || !TARGET_OS_IOS
-// Default licenses path is empty and, if so, is automatically set at runtime to agent's executable path.
-// All licenses in path will be examined and used if valid
-// When path is set manually, it takes priority over agent's executable path.
+/* Default licenses path is empty and, if so, is automatically set at runtime
+ to theagent's executable path.
+ All license files in path will be examined and used if valid.
+ When the path is set manually, it takes priority over the agent's executable
+ path.
+ */
 PUBLIC void igs_setLicensePath(const char *path);
 PUBLIC char* igs_getLicensePath(void); //must be freed by caller
     
-//Any agent developer can use this function to check the license against her/his agent's unique id.
-//IDs are provided by the ingescape team.
+//Any agent developer can use this function to check the license against
+//her/his agent's unique id.
+//IDs are provided by the ingescape team. Please contact us.
 //Returns true if check is OK.
 PUBLIC bool igs_checkLicenseForAgent(const char *agentId);
 
-//use this callback mechanism to be notified when the timer
-//or number of agents or number of IOPs has been exceeded in demo mode
+//use this to be notified when the timeror number of agents or number
+//of IOPs has been exceeded in demo mode.
 PUBLIC void igs_observeLicense(igs_licenseCallback cb, void *myData);
     
-//This function loads a license in memory and overrides all provided
-//license files.
+//Load a license in memory and overrides all provided license files.
 PUBLIC void igs_loadLicenseData(const void *data, size_t size);
-
 #endif
-    
+
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* ingescape_public_h */
+#endif /* ingescape_h */

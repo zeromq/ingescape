@@ -81,6 +81,7 @@ PUBLIC igs_result_t igs_startWithBrokers(const char *agentEndpoint);
 PUBLIC igs_result_t igs_enableSecurity(const char *privateKeyFile, const char *publicKeysDirectory);
 PUBLIC igs_result_t igs_brokerAddSecure(const char *brokerEndpoint, const char *publicKeyPath);
 
+
 //////////////////////////////////////////////////
 /* ELECTIONS between agents
  Create named contests between agents and designate a leader, as soon as they
@@ -100,7 +101,7 @@ PUBLIC igs_result_t igs_leaveElection(const char *electionName);
 
 
 //////////////////////////////////////////////////
-// Advanced admin functions
+// ADVANCED ADMIN
 
 //NETWORK CONFIGURATION
 PUBLIC void igs_setPublishingPort(unsigned int port);
@@ -164,7 +165,7 @@ PUBLIC igs_result_t igs_readInputAsZMQMsg(const char *name, zmsg_t **msg); //msg
 
 
 //////////////////////////////////////////////////
-// BUS channels
+// BUS CHANNELS
 typedef void (*igs_BusMessageIncoming) (const char *event, const char *peerID, const char *peerName,
                                         const char *address, const char *channel,
                                         zhash_t *headers, zmsg_t *msg, void *myData);
