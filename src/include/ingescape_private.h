@@ -51,7 +51,7 @@ extern "C" {
 #define IGS_NETWORK_DEVICE_LENGTH 1024
 #define IGS_IP_ADDRESS_LENGTH 1024
 #define IGS_MAX_PEER_ID_LENGTH 128
-#define IGS_DEFAULT_IPC_FOLDER_PATH "/tmp/"
+#define IGS_DEFAULT_IPC_FOLDER_PATH "/tmp/ingescape/"
 
 
 typedef struct igs_core_context igs_core_context_t;
@@ -289,6 +289,7 @@ typedef struct igs_core_context{
     bool logInFile;
     bool logInConsole;
     bool useColorInConsole;
+    bool enableDataLogging;
     igs_logLevel_t logLevel;
     char logFilePath[IGS_MAX_PATH_LENGTH];
     int logNbOfEntries; //for fflush rotation

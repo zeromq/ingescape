@@ -575,7 +575,7 @@ const igs_iop_t* model_writeIOP (igs_agent_t *agent, const char *iopName, iop_t 
     size_t outSize = 0;
     
     model_readWriteLock();
-    //TODO optimize if value is NULL
+    //TODO: optimize if value is NULL
     switch (valType) {
         case IGS_INTEGER_T:{
             switch (iop->value_type) {
@@ -583,19 +583,16 @@ const igs_iop_t* model_writeIOP (igs_agent_t *agent, const char *iopName, iop_t 
                     outSize = iop->valueSize = sizeof(int);
                     iop->value.i = (value == NULL)?0:*(int*)(value);
                     outValue = &(iop->value.i);
-                    igsAgent_debug(agent, "set %s to %i", iopName, iop->value.i);
                     break;
                 case IGS_DOUBLE_T:
                     outSize = iop->valueSize = sizeof(double);
                     iop->value.d = (value == NULL)?0:*(int*)(value);
                     outValue = &(iop->value.d);
-                    igsAgent_debug(agent, "set %s to %lf", iopName, iop->value.d);
                     break;
                 case IGS_BOOL_T:
                     outSize = iop->valueSize = sizeof(bool);
                     iop->value.b = (value == NULL)?false:((*(int*)(value))?true:false);
                     outValue = &(iop->value.b);
-                    igsAgent_debug(agent, "set %s to %i", iopName, iop->value.b);
                     break;
                 case IGS_STRING_T:
                 {
@@ -605,19 +602,16 @@ const igs_iop_t* model_writeIOP (igs_agent_t *agent, const char *iopName, iop_t 
                     if (value == NULL){
                         iop->value.s = strdup("");
                     }else{
-                        char buf[32] = "";
-                        snprintf(buf, 31, "%d", (value == NULL)?0:*(int*)(value));
+                        char buf[256] = "";
+                        snprintf(buf, 256, "%d", (value == NULL)?0:*(int*)(value));
                         iop->value.s = strdup(buf);
                     }
                     outSize = iop->valueSize = (strlen(iop->value.s) + 1)*sizeof(char);
                     outValue = iop->value.s;
-                    igsAgent_debug(agent, "set %s to %s (length: %zu)", iopName, iop->value.s, iop->valueSize - 1);
                 }
                     break;
                 case IGS_IMPULSION_T:
-                    //nothing to do
-                    outSize = iop->valueSize = 0;
-                    igsAgent_debug(agent, "set impulsion %s", iopName);
+                    iop->valueSize = 0;
                     break;
                 case IGS_DATA_T:
                 {
@@ -629,7 +623,6 @@ const igs_iop_t* model_writeIOP (igs_agent_t *agent, const char *iopName, iop_t 
                     memcpy(iop->value.data, value, sizeof(int));
                     outSize = iop->valueSize = sizeof(int);
                     outValue = iop->value.data;
-                    igsAgent_debug(agent, "set %s data (length: %zu)", iopName, iop->valueSize);
                 }
                     break;
                 default:
@@ -645,19 +638,16 @@ const igs_iop_t* model_writeIOP (igs_agent_t *agent, const char *iopName, iop_t 
                     outSize = iop->valueSize = sizeof(int);
                     iop->value.i = (value == NULL)?0:(int)(*(double*)(value));
                     outValue = &(iop->value.i);
-                    igsAgent_debug(agent, "set %s to %i", iopName, iop->value.i);
                     break;
                 case IGS_DOUBLE_T:
                     outSize = iop->valueSize = sizeof(double);
                     iop->value.d = (value == NULL)?0:(double)(*(double*)(value));
                     outValue = &(iop->value.d);
-                    igsAgent_debug(agent, "set %s to %lf", iopName, iop->value.d);
                     break;
                 case IGS_BOOL_T:
                     outSize = iop->valueSize = sizeof(bool);
                     iop->value.b = (value == NULL)?false:(((int)(*(double*)(value)))?true:false);
                     outValue = &(iop->value.b);
-                    igsAgent_debug(agent, "set %s to %i", iopName, iop->value.b);
                     break;
                 case IGS_STRING_T:
                 {
@@ -667,19 +657,16 @@ const igs_iop_t* model_writeIOP (igs_agent_t *agent, const char *iopName, iop_t 
                     if (value == NULL){
                         iop->value.s = strdup("");
                     }else{
-                        char buf[64] = "";
-                        snprintf(buf, 63, "%lf", (value == NULL)?0:*(double*)(value));
+                        char buf[256] = "";
+                        snprintf(buf, 256, "%lf", (value == NULL)?0:*(double*)(value));
                         iop->value.s = strdup(buf);
                     }
                     outSize = iop->valueSize = (strlen(iop->value.s) + 1)*sizeof(char);
                     outValue = iop->value.s;
-                    igsAgent_debug(agent, "set %s to %s (length: %zu)", iopName, iop->value.s, iop->valueSize - 1);
                 }
                     break;
                 case IGS_IMPULSION_T:
-                    //nothing to do
-                    outSize = iop->valueSize = 0;
-                    igsAgent_debug(agent, "set impulsion %s", iopName);
+                    iop->valueSize = 0;
                     break;
                 case IGS_DATA_T:
                 {
@@ -691,7 +678,6 @@ const igs_iop_t* model_writeIOP (igs_agent_t *agent, const char *iopName, iop_t 
                     memcpy(iop->value.data, value, sizeof(double));
                     outSize = iop->valueSize = sizeof(double);
                     outValue = iop->value.data;
-                    igsAgent_debug(agent, "set %s data (length: %zu)", iopName, iop->valueSize);
                 }
                     break;
                 default:
@@ -707,19 +693,16 @@ const igs_iop_t* model_writeIOP (igs_agent_t *agent, const char *iopName, iop_t 
                     outSize = iop->valueSize = sizeof(int);
                     iop->value.i = (value == NULL)?0:*(bool*)(value);
                     outValue = &(iop->value.i);
-                    igsAgent_debug(agent, "set %s to %i", iopName, iop->value.i);
                     break;
                 case IGS_DOUBLE_T:
                     outSize = iop->valueSize = sizeof(double);
                     iop->value.d = (value == NULL)?0:*(bool*)(value);
                     outValue = &(iop->value.d);
-                    igsAgent_debug(agent, "set %s to %lf", iopName, iop->value.d);
                     break;
                 case IGS_BOOL_T:
                     outSize = iop->valueSize = sizeof(bool);
                     iop->value.b = (value == NULL)?false:*(bool*)value;
                     outValue = &(iop->value.b);
-                    igsAgent_debug(agent, "set %s to %i", iopName, iop->value.b);
                     break;
                 case IGS_STRING_T:
                 {
@@ -729,19 +712,16 @@ const igs_iop_t* model_writeIOP (igs_agent_t *agent, const char *iopName, iop_t 
                     if (value == NULL){
                         iop->value.s = strdup("");
                     }else{
-                        char buf[32] = "";
-                        snprintf(buf, 31, "%d", (value == NULL)?0:*(bool*)value);
+                        char buf[256] = "";
+                        snprintf(buf, 256, "%d", (value == NULL)?0:*(bool*)value);
                         iop->value.s = strdup(buf);
                     }
                     outSize = iop->valueSize = (strlen(iop->value.s) + 1)*sizeof(char);
                     outValue = iop->value.s;
-                    igsAgent_debug(agent, "set %s to %s (length: %zu)", iopName, iop->value.s, iop->valueSize - 1);
                 }
                     break;
                 case IGS_IMPULSION_T:
-                    //nothing to do
-                    outSize = iop->valueSize = 0;
-                    igsAgent_debug(agent, "set impulsion %s", iopName);
+                    iop->valueSize = 0;
                     break;
                 case IGS_DATA_T:
                 {
@@ -753,7 +733,6 @@ const igs_iop_t* model_writeIOP (igs_agent_t *agent, const char *iopName, iop_t 
                     memcpy(iop->value.data, value, sizeof(bool));
                     outSize = iop->valueSize = sizeof(bool);
                     outValue = iop->value.data;
-                    igsAgent_debug(agent, "set %s data (length: %zu)", iopName, iop->valueSize);
                 }
                     break;
                 default:
@@ -769,13 +748,11 @@ const igs_iop_t* model_writeIOP (igs_agent_t *agent, const char *iopName, iop_t 
                     outSize = iop->valueSize = sizeof(int);
                     iop->value.i = (value == NULL)?0:atoi((char*)value);
                     outValue = &(iop->value.i);
-                    igsAgent_debug(agent, "set %s to %i", iopName, iop->value.i);
                     break;
                 case IGS_DOUBLE_T:
                     outSize = iop->valueSize = sizeof(double);
                     iop->value.d = (value == NULL)?0:atof((char*)value);
                     outValue = &(iop->value.d);
-                    igsAgent_debug(agent, "set %s to %lf", iopName, iop->value.d);
                     break;
                 case IGS_BOOL_T:
                 {
@@ -796,7 +773,6 @@ const igs_iop_t* model_writeIOP (igs_agent_t *agent, const char *iopName, iop_t 
                 }
                     outSize = iop->valueSize = sizeof(bool);
                     outValue = &(iop->value.b);
-                    igsAgent_debug(agent, "set %s to %i", iopName, iop->value.b);
                     break;
                 case IGS_STRING_T:
                 {
@@ -810,13 +786,10 @@ const igs_iop_t* model_writeIOP (igs_agent_t *agent, const char *iopName, iop_t 
                     }
                     outSize = iop->valueSize = (strlen(iop->value.s) + 1)*sizeof(char);
                     outValue = iop->value.s;
-                    igsAgent_debug(agent, "set %s to %s (length: %zu)", iopName, iop->value.s, iop->valueSize - 1);
                 }
                     break;
                 case IGS_IMPULSION_T:
-                    //nothing to do
-                    outSize = iop->valueSize = 0;
-                    igsAgent_debug(agent, "set impulsion %s", iopName);
+                    iop->valueSize = 0;
                     break;
                 case IGS_DATA_T:
                 {
@@ -838,7 +811,6 @@ const igs_iop_t* model_writeIOP (igs_agent_t *agent, const char *iopName, iop_t 
                     }
                     outSize = iop->valueSize = s;
                     outValue = iop->value.data;
-                    igsAgent_debug(agent, "set %s data (length: %zu) from hex string", iopName, s);
                 }
                     break;
                 default:
@@ -854,19 +826,16 @@ const igs_iop_t* model_writeIOP (igs_agent_t *agent, const char *iopName, iop_t 
                     outSize = iop->valueSize = sizeof(int);
                     iop->value.i = 0;
                     outValue = &(iop->value.i);
-                    igsAgent_debug(agent, "set %s to %i", iopName, iop->value.i);
                     break;
                 case IGS_DOUBLE_T:
                     outSize = iop->valueSize = sizeof(double);
-                    iop->value.d = 0;
+                    iop->value.d = 0.0;
                     outValue = &(iop->value.d);
-                    igsAgent_debug(agent, "set %s to %lf", iopName, iop->value.d);
                     break;
                 case IGS_BOOL_T:
                     outSize = iop->valueSize = sizeof(bool);
                     iop->value.b = false;
                     outValue = &(iop->value.b);
-                    igsAgent_debug(agent, "set %s to %i", iopName, iop->value.b);
                     break;
                 case IGS_STRING_T:
                 {
@@ -876,13 +845,10 @@ const igs_iop_t* model_writeIOP (igs_agent_t *agent, const char *iopName, iop_t 
                     iop->value.s = strdup("");
                     outSize = iop->valueSize = sizeof(char);
                     outValue = iop->value.s;
-                    igsAgent_debug(agent, "set %s to %s (length: %zu)", iopName, iop->value.s, iop->valueSize - 1);
                 }
                     break;
                 case IGS_IMPULSION_T:
-                    //nothing to do
-                    outSize = iop->valueSize = 0;
-                    igsAgent_debug(agent, "set impulsion %s", iopName);
+                    iop->valueSize = 0;
                     break;
                 case IGS_DATA_T:
                 {
@@ -890,9 +856,7 @@ const igs_iop_t* model_writeIOP (igs_agent_t *agent, const char *iopName, iop_t 
                         free(iop->value.data);
                     }
                     iop->value.data = NULL;
-                    outSize = iop->valueSize = 0;
-                    outValue = NULL;
-                    igsAgent_debug(agent, "set %s data (length: %zu)", iopName, iop->valueSize);
+                    iop->valueSize = 0;
                 }
                     break;
                 default:
@@ -900,33 +864,30 @@ const igs_iop_t* model_writeIOP (igs_agent_t *agent, const char *iopName, iop_t 
                     ret = 0;
                     break;
             }
-            outSize = iop->valueSize = 0;
         }
             break;
         case IGS_DATA_T:{
             switch (iop->value_type) {
                 case IGS_INTEGER_T:
-                    igsAgent_warn(agent, "Cannot write data into integer IOP %s", iopName);
+                    igsAgent_warn(agent, "Raw data is not allowed into integer IOP %s", iopName);
                     ret = 0;
                     break;
                 case IGS_DOUBLE_T:
-                    igsAgent_warn(agent, "Cannot write data into double IOP %s", iopName);
+                    igsAgent_warn(agent, "Raw data is not allowed into double IOP %s", iopName);
                     ret = 0;
                     break;
                 case IGS_BOOL_T:
-                    igsAgent_warn(agent, "Cannot write data into boolean IOP %s", iopName);
+                    igsAgent_warn(agent, "Raw data is not allowed into boolean IOP %s", iopName);
                     ret = 0;
                     break;
                 case IGS_STRING_T:
                 {
-                    igsAgent_warn(agent, "Cannot write data into string IOP %s", iopName);
+                    igsAgent_warn(agent, "Raw data is not allowed into string IOP %s", iopName);
                     ret = 0;
                 }
                     break;
                 case IGS_IMPULSION_T:
-                    //nothing to do
-                    outSize = iop->valueSize = 0;
-                    igsAgent_debug(agent, "set impulsion %s", iopName);
+                    iop->valueSize = 0;
                     break;
                 case IGS_DATA_T:
                 {
@@ -938,7 +899,6 @@ const igs_iop_t* model_writeIOP (igs_agent_t *agent, const char *iopName, iop_t 
                     memcpy(iop->value.data, value, size);
                     outSize = iop->valueSize = size;
                     outValue = iop->value.data;
-                    igsAgent_debug(agent, "set %s data (length: %zu)", iopName, size);
                 }
                     break;
                 default:
@@ -954,6 +914,65 @@ const igs_iop_t* model_writeIOP (igs_agent_t *agent, const char *iopName, iop_t 
     model_readWriteUnlock();
     
     if (ret){
+        //compose log entry
+        char *logIOPType = NULL;
+        switch (iopType) {
+            case IGS_INPUT_T:
+                logIOPType = "input";
+                break;
+            case IGS_OUTPUT_T:
+                logIOPType = "output";
+                break;
+            case IGS_PARAMETER_T:
+                logIOPType = "parameter";
+                break;
+            default:
+                break;
+        }
+        char logIOPValueBuffer[256] = "";
+        char *logIOPValue = NULL;
+        switch (iop->value_type) {
+            case IGS_IMPULSION_T:
+                logIOPValue = strdup("impulsion (no value)");
+                break;
+            case IGS_BOOL_T:
+                snprintf(logIOPValueBuffer, 256, "bool %d", iop->value.b);
+                logIOPValue = strdup(logIOPValueBuffer);
+                break;
+            case IGS_INTEGER_T:
+                snprintf(logIOPValueBuffer, 256, "int %d", iop->value.i);
+                logIOPValue = strdup(logIOPValueBuffer);
+                break;
+            case IGS_DOUBLE_T:
+                snprintf(logIOPValueBuffer, 256, "double %f", iop->value.d);
+                logIOPValue = strdup(logIOPValueBuffer);
+                break;
+            case IGS_STRING_T:
+                logIOPValue = calloc(strlen(iop->value.s) + strlen ("string ") + 1, sizeof(char));
+                sprintf(logIOPValue, "string %s", iop->value.s);
+                break;
+            case IGS_DATA_T:{
+                if (iop->valueSize > 0 && coreContext->enableDataLogging){
+                    zchunk_t *chunk = zchunk_new(iop->value.data, iop->valueSize);
+                    char *hexChunk = zchunk_strhex(chunk);
+                    logIOPValue = calloc(strlen(hexChunk) + strlen("data ") + 1, sizeof(char));
+                    sprintf(logIOPValue, "data %s", hexChunk);
+                    free(hexChunk);
+                    zchunk_destroy(&chunk);
+                }else{
+                    snprintf(logIOPValueBuffer, 256, "data |size: %zu bytes", iop->valueSize);
+                    logIOPValue = strdup(logIOPValueBuffer);
+                }
+            }
+                break;
+                
+            default:
+                break;
+        }
+        igsAgent_debug(agent, "set %s %s to %s", logIOPType, iopName, logIOPValue);
+        free(logIOPValue);
+        
+        //handle iop callbacks
         model_runObserveCallbacksForIOP(agent, iop, outValue, outSize);
     }
     return iop;

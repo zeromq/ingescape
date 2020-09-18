@@ -619,7 +619,7 @@ int manageRemotePublication (zloop_t *loop, zsock_t *socket, void *arg){
     snprintf(uuid, 33, "%s", outputName);
     char *realOutputName = outputName + 33;
     
-    //ATTENTION: We push the output name again at the beginning of
+    //NB: We push the output name again at the beginning of
     //the message for proper use by handlePublicationFromRemoteAgent
     zmsg_pushstr(msg, realOutputName);
     free(outputName);

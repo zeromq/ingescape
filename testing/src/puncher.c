@@ -394,6 +394,7 @@ int main(int argc, const char * argv[]) {
     assert(streq(name, "simple_Demo_Agent"));
     free(name);
     name = NULL;
+    igs_setAgentName(agentName); //to set proper log file name
     
     //logs
     assert(!igs_isVerbose());
