@@ -8,6 +8,8 @@ project(ingescape HOMEPAGE_URL https://ingescape.com LANGUAGES C)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
+ADD_DEFINITIONS (-DZYRE_BUILD_DRAFT_API)
+ADD_DEFINITIONS (-DCZMQ_BUILD_DRAFT_API)
 
 # Add path to custom macro
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/dependencies")
