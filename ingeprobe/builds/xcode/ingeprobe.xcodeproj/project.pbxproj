@@ -916,6 +916,13 @@
 			remoteGlobalIDString = A6ADDDFA52254DACA8EE2DA7;
 			remoteInfo = zyre_selftest;
 		};
+		978175092513B04700EFF20F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 974E35002493D8C800444009 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 710668137D334D258982F50F;
+			remoteInfo = test_tcp_accept_filter;
+		};
 		97C2E10724D0574A00FE3598 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 974E35002493D8C800444009 /* ZeroMQ.xcodeproj */;
@@ -1129,7 +1136,7 @@
 		974E35012493D8C800444009 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				974E35782493D8C900444009 /* libzmq.dylib */,
+				974E35782493D8C900444009 /* libzmq.5.2.4.dylib */,
 				974E357A2493D8C900444009 /* libzmq.a */,
 				974E357C2493D8C900444009 /* libobjects.a */,
 				974E357E2493D8C900444009 /* test_ancillaries */,
@@ -1228,6 +1235,7 @@
 				974E36202493D8C900444009 /* test_stream_timeout */,
 				974E36222493D8C900444009 /* test_sub_forward */,
 				974E36242493D8C900444009 /* test_system */,
+				9781750A2513B04700EFF20F /* test_tcp_accept_filter */,
 				974E36262493D8C900444009 /* test_term_endpoint */,
 				974E36282493D8C900444009 /* test_thread_safe */,
 				974E362A2493D8C900444009 /* test_timeo */,
@@ -1268,7 +1276,7 @@
 		974E365B2493D8C900444009 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				974E36742493D8C900444009 /* libczmq.dylib */,
+				974E36742493D8C900444009 /* libczmq.4.2.1.dylib */,
 				974E36762493D8C900444009 /* libczmq.a */,
 				974E36782493D8C900444009 /* libczmq_objects.a */,
 				974E367A2493D8C900444009 /* czmq_selftest */,
@@ -1394,7 +1402,7 @@
 		978D6DE51CB26F9B0082016E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1100;
+				LastUpgradeCheck = 1200;
 				ORGANIZATIONNAME = "Ingenuity i/o";
 				TargetAttributes = {
 					978D6DEC1CB26F9B0082016E = {
@@ -1444,11 +1452,10 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		974E35782493D8C900444009 /* libzmq.dylib */ = {
+		974E35782493D8C900444009 /* libzmq.5.2.4.dylib */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
-			name = libzmq.dylib;
-			path = libzmq.5.2.3.dylib;
+			path = libzmq.5.2.4.dylib;
 			remoteRef = 974E35772493D8C900444009 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -2222,10 +2229,9 @@
 			remoteRef = 974E36582493D8C900444009 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		974E36742493D8C900444009 /* libczmq.dylib */ = {
+		974E36742493D8C900444009 /* libczmq.4.2.1.dylib */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
-			name = libczmq.dylib;
 			path = libczmq.4.2.1.dylib;
 			remoteRef = 974E36732493D8C900444009 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
@@ -2340,6 +2346,13 @@
 			fileType = "compiled.mach-o.executable";
 			path = zyre_selftest;
 			remoteRef = 974E36B42493D93A00444009 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		9781750A2513B04700EFF20F /* test_tcp_accept_filter */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_tcp_accept_filter;
+			remoteRef = 978175092513B04700EFF20F /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		97C2E10824D0574A00FE3598 /* test_bind_curve_fuzzer */ = {
@@ -2500,6 +2513,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -2555,6 +2569,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;

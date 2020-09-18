@@ -1072,6 +1072,13 @@
 			remoteGlobalIDString = BD5074159FC447A59B77CA52;
 			remoteInfo = zyre_selftest;
 		};
+		978170E22513ACCE00EFF20F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 710668137D334D258982F50F;
+			remoteInfo = test_tcp_accept_filter;
+		};
 		97A7653224D95F0400DC4E3F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 976A46942493A5DF00075CA2 /* ZeroMQ.xcodeproj */;
@@ -1555,7 +1562,7 @@
 		976A46952493A5DF00075CA2 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				976A470C2493A5E000075CA2 /* libzmq.5.2.3.dylib */,
+				976A470C2493A5E000075CA2 /* libzmq.dylib */,
 				976A470E2493A5E000075CA2 /* libzmq.a */,
 				976A47102493A5E000075CA2 /* libobjects.a */,
 				976A47122493A5E000075CA2 /* test_ancillaries */,
@@ -1654,6 +1661,7 @@
 				976A47B42493A5E000075CA2 /* test_stream_timeout */,
 				976A47B62493A5E000075CA2 /* test_sub_forward */,
 				976A47B82493A5E000075CA2 /* test_system */,
+				978170E32513ACCE00EFF20F /* test_tcp_accept_filter */,
 				976A47BA2493A5E000075CA2 /* test_term_endpoint */,
 				976A47BC2493A5E000075CA2 /* test_thread_safe */,
 				976A47BE2493A5E000075CA2 /* test_timeo */,
@@ -1685,7 +1693,7 @@
 		976A47E62493A5F200075CA2 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				976A47FF2493A5F300075CA2 /* libczmq.4.2.1.dylib */,
+				976A47FF2493A5F300075CA2 /* libczmq.dylib */,
 				976A48012493A5F300075CA2 /* libczmq.a */,
 				976A48032493A5F300075CA2 /* libczmq_objects.a */,
 				976A48052493A5F300075CA2 /* czmq_selftest */,
@@ -1705,7 +1713,7 @@
 				976A482F2493A60300075CA2 /* zpinger */,
 				976A48312493A60300075CA2 /* ztester_beacon */,
 				976A48332493A60300075CA2 /* ztester_gossip */,
-				976A48352493A60300075CA2 /* libzyre.2.0.1.dylib */,
+				976A48352493A60300075CA2 /* libzyre.dylib */,
 				976A48372493A60300075CA2 /* libzyre.a */,
 				976A48392493A60300075CA2 /* libzyre_objects.a */,
 				976A483B2493A60300075CA2 /* zyre_selftest */,
@@ -1742,21 +1750,21 @@
 		979A79841EA7B112003153EF /* src */ = {
 			isa = PBXGroup;
 			children = (
-				979A79861EA7B112003153EF /* include */,
-				979A79851EA7B112003153EF /* igs_definition.c */,
-				979A79981EA7B112003153EF /* igs_mapping.c */,
-				979A79991EA7B112003153EF /* igs_model.c */,
-				979A799A1EA7B112003153EF /* igs_network.c */,
-				979A799C1EA7B112003153EF /* igs_parser.c */,
 				972A52631FD1733E00711352 /* igs_admin.c */,
+				9736B37A238414E200A97173 /* igs_agent.c */,
 				973DC287207A93E6004C1D80 /* igs_bus.c */,
 				9772A52620BDE42700729D59 /* igs_call.c */,
-				97FAC32C2247BE920036293B /* igs_license.c */,
-				97ABC93B2282EC5D00215310 /* igs_monitor.c */,
-				9768B2AD22830F0E00310410 /* igs_json.c */,
-				9725395923564B230071A9BA /* igs_performance.c */,
 				9738214B23832B7400D466DC /* igs_core.c */,
-				9736B37A238414E200A97173 /* igs_agent.c */,
+				979A79851EA7B112003153EF /* igs_definition.c */,
+				9768B2AD22830F0E00310410 /* igs_json.c */,
+				97FAC32C2247BE920036293B /* igs_license.c */,
+				979A79981EA7B112003153EF /* igs_mapping.c */,
+				979A79991EA7B112003153EF /* igs_model.c */,
+				97ABC93B2282EC5D00215310 /* igs_monitor.c */,
+				979A799A1EA7B112003153EF /* igs_network.c */,
+				979A799C1EA7B112003153EF /* igs_parser.c */,
+				9725395923564B230071A9BA /* igs_performance.c */,
+				979A79861EA7B112003153EF /* include */,
 			);
 			name = src;
 			path = ../../src;
@@ -1984,7 +1992,7 @@
 		979A79701EA7B0D6003153EF /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1170;
+				LastUpgradeCheck = 1200;
 				ORGANIZATIONNAME = "Ingenuity i/o";
 				TargetAttributes = {
 					9762EDCC1EAE5414002062A1 = {
@@ -2069,10 +2077,11 @@
 			remoteRef = 976A46922493A5D200075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A470C2493A5E000075CA2 /* libzmq.5.2.3.dylib */ = {
+		976A470C2493A5E000075CA2 /* libzmq.dylib */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
-			path = libzmq.5.2.3.dylib;
+			name = libzmq.dylib;
+			path = libzmq.5.2.4.dylib;
 			remoteRef = 976A470B2493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -2832,9 +2841,10 @@
 			remoteRef = 976A47E32493A5E000075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A47FF2493A5F300075CA2 /* libczmq.4.2.1.dylib */ = {
+		976A47FF2493A5F300075CA2 /* libczmq.dylib */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
+			name = libczmq.dylib;
 			path = libczmq.4.2.1.dylib;
 			remoteRef = 976A47FE2493A5F300075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
@@ -2923,9 +2933,10 @@
 			remoteRef = 976A48322493A60300075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		976A48352493A60300075CA2 /* libzyre.2.0.1.dylib */ = {
+		976A48352493A60300075CA2 /* libzyre.dylib */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
+			name = libzyre.dylib;
 			path = libzyre.2.0.1.dylib;
 			remoteRef = 976A48342493A60300075CA2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
@@ -2949,6 +2960,13 @@
 			fileType = "compiled.mach-o.executable";
 			path = zyre_selftest;
 			remoteRef = 976A483A2493A60300075CA2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		978170E32513ACCE00EFF20F /* test_tcp_accept_filter */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_tcp_accept_filter;
+			remoteRef = 978170E22513ACCE00EFF20F /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		97A7653324D95F0400DC4E3F /* test_bind_curve_fuzzer */ = {
@@ -3107,7 +3125,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = NO;
@@ -3147,7 +3165,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = NO;
@@ -3206,6 +3224,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -3230,7 +3249,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -3263,6 +3283,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -3281,7 +3302,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
@@ -3303,7 +3325,7 @@
 					"$(SRCROOT)/../../src/include/",
 					"$(SRCROOT)/../../dependencies/yajl/src/api",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../../dependencies/ios/ios/lib/";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = ingescape;
@@ -3323,7 +3345,7 @@
 					"$(SRCROOT)/../../dependencies/ios/ios/include/",
 					"$(SRCROOT)/../../src/include/",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../../dependencies/ios/ios/lib/";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = ingescape;
