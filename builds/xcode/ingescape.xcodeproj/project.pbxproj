@@ -48,6 +48,8 @@
 		9772A52820BDE42700729D59 /* igs_call.c in Sources */ = {isa = PBXBuildFile; fileRef = 9772A52620BDE42700729D59 /* igs_call.c */; };
 		977C247A1F03F4FA00CA1675 /* ingescape.h in Headers */ = {isa = PBXBuildFile; fileRef = 977C24791F03F4FA00CA1675 /* ingescape.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		977C247B1F03F50F00CA1675 /* ingescape.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 977C24791F03F4FA00CA1675 /* ingescape.h */; };
+		97817B7B2514BA4700EFF20F /* igs_replay.c in Sources */ = {isa = PBXBuildFile; fileRef = 97817B7A2514BA4700EFF20F /* igs_replay.c */; };
+		97817B7C2514BA4700EFF20F /* igs_replay.c in Sources */ = {isa = PBXBuildFile; fileRef = 97817B7A2514BA4700EFF20F /* igs_replay.c */; };
 		979A799E1EA7B112003153EF /* igs_definition.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79851EA7B112003153EF /* igs_definition.c */; };
 		979A799F1EA7B112003153EF /* igs_mapping.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79981EA7B112003153EF /* igs_mapping.c */; };
 		979A79A01EA7B112003153EF /* igs_model.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79991EA7B112003153EF /* igs_model.c */; };
@@ -1365,6 +1367,7 @@
 		976A93DF23F305F300CAA795 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/usr/lib/libc++.tbd"; sourceTree = DEVELOPER_DIR; };
 		9772A52620BDE42700729D59 /* igs_call.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = igs_call.c; sourceTree = "<group>"; };
 		977C24791F03F4FA00CA1675 /* ingescape.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ingescape.h; sourceTree = "<group>"; };
+		97817B7A2514BA4700EFF20F /* igs_replay.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = igs_replay.c; sourceTree = "<group>"; };
 		979A79781EA7B0D6003153EF /* libingescape.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libingescape.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		979A79851EA7B112003153EF /* igs_definition.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = igs_definition.c; sourceTree = "<group>"; };
 		979A798F1EA7B112003153EF /* libut.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libut.h; sourceTree = "<group>"; };
@@ -1764,6 +1767,7 @@
 				979A799A1EA7B112003153EF /* igs_network.c */,
 				979A799C1EA7B112003153EF /* igs_parser.c */,
 				9725395923564B230071A9BA /* igs_performance.c */,
+				97817B7A2514BA4700EFF20F /* igs_replay.c */,
 				979A79861EA7B112003153EF /* include */,
 			);
 			name = src;
@@ -3082,6 +3086,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9738214D23832B7400D466DC /* igs_core.c in Sources */,
+				97817B7C2514BA4700EFF20F /* igs_replay.c in Sources */,
 				97574A9022870C5100C31B99 /* igs_json.c in Sources */,
 				9762EDDA1EAE547B002062A1 /* igs_definition.c in Sources */,
 				9772A52820BDE42700729D59 /* igs_call.c in Sources */,
@@ -3108,6 +3113,7 @@
 				979A79A01EA7B112003153EF /* igs_model.c in Sources */,
 				973DC288207A93E6004C1D80 /* igs_bus.c in Sources */,
 				9768B2AE22830F0E00310410 /* igs_json.c in Sources */,
+				97817B7B2514BA4700EFF20F /* igs_replay.c in Sources */,
 				9736B37B238414E200A97173 /* igs_agent.c in Sources */,
 				9738214C23832B7400D466DC /* igs_core.c in Sources */,
 				9725395A23564B230071A9BA /* igs_performance.c in Sources */,

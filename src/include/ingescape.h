@@ -343,22 +343,6 @@ PUBLIC void igs_setLogLevel (igs_logLevel_t level); //set log level in console, 
 PUBLIC igs_logLevel_t igs_getLogLevel(void);
 
 
-/* LOGS REPLAY
- Logs generate all the necessary information for agent
- to replay either its received input stimulations or its
- published outputs. Both cases are handled.
- Replay happens in a dedicated thread run as soon as
- igs_replayInputsFromLogFile or igs_replayOutputsFromLogFile
- is called. These two functions shall thus be called
- after one of the igs_start* functions.
- NB: By default, data are not logged due to possible large
- sizes. Data logging can be enabled using igs_enableDataLogging.
- */
-//PUBLIC void igs_enableDataLogging(bool enable);
-//PUBLIC void igs_replayInputsFromLogFile(const char *logFilePath);
-//PUBLIC void igs_replayOutputsFromLogFile(const char *logFilePath);
-
-
 //LOG ALIASES
 PUBLIC void igs_log(igs_logLevel_t level, const char *function, const char *format, ...) CHECK_PRINTF (3);
 #define igs_trace(...) igs_log(IGS_LOG_TRACE, __func__, __VA_ARGS__)

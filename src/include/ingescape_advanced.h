@@ -114,26 +114,26 @@ PUBLIC void igs_raiseSocketsLimit(void); //UNIX only, to be called before any in
 PUBLIC void igs_setHighWaterMarks(int hwmValue);
 
 
-//PERFORMANCE CHECK
-//sends number of messages with defined size and displays performance
-//information when finished (information displayed as INFO-level log)
+/* PERFORMANCE CHECK
+ sends number of messages with defined size and displays performance
+ information when finished (information displayed as INFO-level log)*/
 PUBLIC void igs_performanceCheck(const char *peerId, size_t msgSize, size_t nbOfMsg);
 
 
-//TIMERS
-//Timers can be created to call code a certain number of times,
-//each time after a certain delay. 0 times means repeating forever.
-//Timers must be created after starting an agent.
+/* TIMERS
+ Timers can be created to call code a certain number of times,
+ each time after a certain delay. 0 times means repeating forever.
+ Timers must be created after starting an agent.*/
 typedef void (igs_timerCallback) (int timerId, void *myData);
 PUBLIC int igs_timerStart(size_t delay, size_t times, igs_timerCallback cb, void *myData); //returns timer id or -1 if error
 PUBLIC void igs_timerStop(int timerId);
 
 
-//NETWORK MONITORING
-//IngeScape provides an integrated monitor to detect events relative to the network
-//Warning: once igs_monitoringEnable has been called, igs_monitoringDisable must be
-//called to actually stop the monitor. If not stopped, it may cause an error when
-//an agent terminates.
+/* NETWORK MONITORING
+ IngeScape provides an integrated monitor to detect events relative to the network
+ Warning: once igs_monitoringEnable has been called, igs_monitoringDisable must be
+ called to actually stop the monitor. If not stopped, it may cause an error when
+ an agent terminates.*/
 PUBLIC void igs_monitoringEnable(unsigned int period); //in milliseconds
 PUBLIC void igs_monitoringEnableWithExpectedDevice(unsigned int period, const char* networkDevice, unsigned int port);
 PUBLIC void igs_monitoringDisable(void);
@@ -150,6 +150,29 @@ typedef enum {
 } igs_monitorEvent_t;
 typedef void (*igs_monitorCallback)(igs_monitorEvent_t event, const char *device, const char *ipAddress, void *myData);
 PUBLIC void igs_monitor(igs_monitorCallback cb, void *myData);
+
+
+/* LOGS REPLAY
+ Logs generate all the necessary information for agent
+ to replay either its received input stimulations or its
+ published outputs. Both cases are handled.
+ Replay happens in a dedicated thread run as soon as
+ igs_replayInputsFromLogFile or igs_replayOutputsFromLogFile
+ is called. These two functions shall thus be called
+ after one of the igs_start* functions.
+ NB: By default, data are not logged due to possible large
+ sizes. Data logging can be enabled using igs_enableDataLogging.
+ */
+typedef enum {
+    IGS_REPLAY_OUTPUT = 1,
+    IGS_REPLAY_INPUT = 2,
+    IGS_REPLAY_CALLS = 4,
+    IGS_REPLAY_PARAMETERS = 8
+} igs_replay_mode_t;
+
+PUBLIC void igs_enableDataLogging(bool enable);
+PUBLIC void igs_replayFromLogFile(const char *logFilePath, size_t speed, const char *startTime, uint replayMode);
+PUBLIC void igs_replayReset(void);
 
 
 //////////////////////////////////////////////////
