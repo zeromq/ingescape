@@ -34,17 +34,17 @@ int igs_monitor_triggerNetworkCheck(zloop_t *loop, int timer_id, void *arg){
     //go through the available devices to check network consistency depending on previous state
     while (name) {
         if (coreContext->monitor->status == IGS_NETWORK_OK){
-            //Agent was previously OK : check if it still is
+            //peer was previously OK : check if it still is
             if (coreContext->node != NULL && strcmp(name, coreContext->networkDevice) == 0){
-                // Agent is started
+                // peer is started
                 foundNetworkDevice = true;
 
-                // Check if IP address has changed : this might cause trouble in agent communication
+                // check if IP address has changed : this might cause trouble in peer communication
                 if (strcmp(coreContext->ipAddress, ziflist_address(iflist)) != 0){
                     igs_warn("IP address has changed from %s to %s",
                              coreContext->ipAddress, ziflist_address(iflist));
 
-                    // Call our callbacks
+                    // call our callbacks
                     DL_FOREACH(coreContext->monitorCallbacks, cb){
                         cb->callback_ptr(IGS_NETWORK_ADDRESS_CHANGED, coreContext->networkDevice,
                                          ziflist_address(iflist), cb->myData);
@@ -54,7 +54,7 @@ int igs_monitor_triggerNetworkCheck(zloop_t *loop, int timer_id, void *arg){
                     if (coreContext->monitor_shallStartStopAgent){
                         unsigned int port = coreContext->network_zyrePort;
                         char *networkDevice = strdup(coreContext->networkDevice);
-                        igs_warn("restarting agent after IP address has changed on %s", networkDevice);
+                        igs_warn("restarting peer after IP address has changed on %s", networkDevice);
                         igs_stop();
                         igs_startWithDevice(networkDevice, port);
                         free(networkDevice);
@@ -62,13 +62,13 @@ int igs_monitor_triggerNetworkCheck(zloop_t *loop, int timer_id, void *arg){
                 }
                 break;
             }
-            // Agent is stopped : check if this is our expected network device
+            // peer is stopped : check if this is our expected network device
             else if ((coreContext->node == NULL)
                      && (coreContext->monitor->networkDevice != NULL)
                      && (strcmp(name, coreContext->monitor->networkDevice) == 0)){
-                // Agent is not started BUT network device is available
+                // peer is not started BUT network device is available
                 foundNetworkDevice = true;
-                //Nothing special to do here
+                // nothing special to do here
                 break;
             }
         } else if (coreContext->monitor->status == IGS_NETWORK_DEVICE_NOT_AVAILABLE) {
@@ -79,22 +79,22 @@ int igs_monitor_triggerNetworkCheck(zloop_t *loop, int timer_id, void *arg){
                 foundNetworkDevice = true;
                 igs_warn("network device %s has come back", coreContext->monitor->networkDevice);
 
-                // Update status
+                // update status
                 coreContext->monitor->status = IGS_NETWORK_OK;
 
-                // Call our callbacks
+                // call our callbacks
                 DL_FOREACH(coreContext->monitorCallbacks, cb){
                     cb->callback_ptr(IGS_NETWORK_OK, coreContext->monitor->networkDevice, NULL, cb->myData);
                 }
 
-                // check if we need to restart it
+                // check if we need to restart peer
                 if (coreContext->monitor_shallStartStopAgent){
                     igs_warn("restarting agent after network device %s is back", coreContext->monitor->networkDevice);
                     igs_stop();
                     igs_startWithDevice(coreContext->monitor->networkDevice, coreContext->monitor->port);
                 }
 
-                // Clean-up
+                // clean-up
                 if (coreContext->monitor->networkDevice != NULL){
                     free(coreContext->monitor->networkDevice);
                     coreContext->monitor->networkDevice = NULL;
@@ -103,10 +103,10 @@ int igs_monitor_triggerNetworkCheck(zloop_t *loop, int timer_id, void *arg){
             }
             else if ((coreContext->node != NULL)
                       && (strcmp(name, coreContext->networkDevice) == 0)){
-                // agent is now started : it was restarted manually
+                // peer is now started : it was restarted manually
                 foundNetworkDevice = true;
 
-                // Update our status
+                // update our status
                 coreContext->monitor->status = IGS_NETWORK_OK;
 
                 // Call our callbacks
@@ -114,9 +114,9 @@ int igs_monitor_triggerNetworkCheck(zloop_t *loop, int timer_id, void *arg){
                     cb->callback_ptr(IGS_NETWORK_OK_AFTER_MANUAL_RESTART, coreContext->networkDevice, coreContext->ipAddress, cb->myData);
                 }
 
-                //NB: we don't need to (re)start our agent because it is already started
+                //NB: we don't need to (re)start our peer because it is already started
 
-                // Clean-up if needed
+                // clean-up
                 if (coreContext->monitor->networkDevice != NULL)
                     free(coreContext->monitor->networkDevice);
                 coreContext->monitor->networkDevice = NULL;
@@ -128,32 +128,32 @@ int igs_monitor_triggerNetworkCheck(zloop_t *loop, int timer_id, void *arg){
     ziflist_destroy (&iflist);
     
     //NB: if expected network device has disappeared, we cannot detect an IP address change before
-    //detecting device disappearance. This has consequences in the logic used here.
+    //detecting device reappearance. This has consequences in the logic used here.
     
     if (!foundNetworkDevice
         && (coreContext->monitor->status != IGS_NETWORK_DEVICE_NOT_AVAILABLE)){
         // we did not find our expected network device and this is new
 
-        // Check if our agent is started
+        // check if our peer is started
         if (coreContext->node != NULL) {
-            //agent is started but network device was not found
+            //peer is started but network device was not found
             igs_warn("network device %s has disappeared", coreContext->networkDevice);
 
-            // Update status
+            // update status
             coreContext->monitor->status = IGS_NETWORK_DEVICE_NOT_AVAILABLE;
 
-            // Save network values before calling our callbacks and igs_stop
+            // save network values before calling our callbacks and igs_stop
             coreContext->monitor->port = coreContext->network_zyrePort;
             if (coreContext->monitor->networkDevice != NULL)
                 free(coreContext->monitor->networkDevice);
             coreContext->monitor->networkDevice = strdup(coreContext->networkDevice);
 
-            // Call our callbacks
+            // call our callbacks
             DL_FOREACH(coreContext->monitorCallbacks, cb){
                 cb->callback_ptr(IGS_NETWORK_DEVICE_NOT_AVAILABLE, coreContext->networkDevice, coreContext->ipAddress, cb->myData);
             }
 
-            // Check if we need to stop it
+            // check if we need to stop peer
             if (coreContext->monitor_shallStartStopAgent){
                 // NB: we use monitor->networkDevice instead of coreContext->networkDevice because callbacks may call igs_stop()
                 igs_warn("stopping agent after network device %s has disappeared", coreContext->monitor->networkDevice);
@@ -161,13 +161,13 @@ int igs_monitor_triggerNetworkCheck(zloop_t *loop, int timer_id, void *arg){
             }
 
         }else if (coreContext->monitor->networkDevice != NULL){
-            //agent is not started AND we have an expected network device
+            //peer is not started AND we have an expected network device
             igs_warn("network device %s not found", coreContext->monitor->networkDevice);
 
-            // Update status
+            // update status
             coreContext->monitor->status = IGS_NETWORK_DEVICE_NOT_AVAILABLE;
 
-            // Call our callbacks
+            // call our callbacks
             DL_FOREACH(coreContext->monitorCallbacks, cb){
                 cb->callback_ptr(IGS_NETWORK_DEVICE_NOT_AVAILABLE, coreContext->monitor->networkDevice, NULL, cb->myData);
             }
@@ -179,55 +179,37 @@ int igs_monitor_triggerNetworkCheck(zloop_t *loop, int timer_id, void *arg){
 }
 
 //manage messages from the parent thread
-int monitor_manageParent (zloop_t *loop, zmq_pollitem_t *item, void *arg){
+int monitor_manageParent (zloop_t *loop, zsock_t *socket, void *arg){
     IGS_UNUSED(loop)
     IGS_UNUSED(arg)
-    if (item->revents & ZMQ_POLLIN)
-    {
-        zmsg_t *msg = zmsg_recv ((zsock_t *)item->socket);
-        if (!msg){
-            igs_error("Could not read message from main thread : Ingescape will interrupt immediately.");
-            return -1;
-        }
-        char *command = zmsg_popstr (msg);
-        if (streq (command, "$TERM")){
-            free (command);
-            zmsg_destroy (&msg);
-            return -1;
-        } else {
-            //nothing to do so far
-        }
-        
+    zmsg_t *msg = zmsg_recv (socket);
+    if (!msg){
+        igs_error("Could not read message from main thread : Ingescape will interrupt immediately.");
+        return -1;
+    }
+    char *command = zmsg_popstr (msg);
+    if (streq (command, "$TERM")){
         free (command);
         zmsg_destroy (&msg);
+        return -1;
+    } else {
+        //nothing to do so far
     }
+    
+    free (command);
+    zmsg_destroy (&msg);
     return 0;
 }
 
 static void monitor_initLoop (zsock_t *pipe, void *args){
     IGS_UNUSED(args)
-    
     coreContext->monitor->loop = zloop_new ();
-    assert (coreContext->monitor->loop);
-    zloop_set_verbose (coreContext->monitor->loop, false);
-    
-    void *zpipe = zsock_resolve(pipe);
-    if (zpipe == NULL){
-        igs_error("Could not get the pipe descriptor to the main thread for polling");
-    }
-    zmq_pollitem_t zpipePollItem;
-    zpipePollItem.socket = zpipe;
-    zpipePollItem.fd = 0;
-    zpipePollItem.events = ZMQ_POLLIN;
-    zpipePollItem.revents = 0;
-    
-    zloop_poller (coreContext->monitor->loop, &zpipePollItem, monitor_manageParent, NULL);
-    zloop_poller_set_tolerant(coreContext->monitor->loop, &zpipePollItem);
+    //zloop_set_verbose (coreContext->monitor->loop, false);
+    zloop_reader(coreContext->monitor->loop, pipe, monitor_manageParent, NULL);
+    zloop_reader_set_tolerant(coreContext->monitor->loop, pipe);
     zloop_timer(coreContext->monitor->loop, coreContext->monitor->period, 0, igs_monitor_triggerNetworkCheck, NULL);
     zsock_signal (pipe, 0);
-    
     zloop_start (coreContext->monitor->loop);
-
     zloop_destroy(&coreContext->monitor->loop);
 }
 
@@ -251,18 +233,15 @@ void igs_monitoringEnableWithExpectedDevice(unsigned int period,
         igs_warn("monitor is already started");
         return;
     }
-
     coreContext->monitor = (igs_monitor_t *)calloc(1, sizeof(igs_monitor_t));
     coreContext->monitor->period = period;
     coreContext->monitor->status = IGS_NETWORK_OK;
-
     if ((networkDevice == NULL) || (strlen(networkDevice) == 0)){
         igs_warn("networkDevice should not be NULL or empty");
     }else{
         coreContext->monitor->networkDevice = strdup(networkDevice);
     }
     coreContext->monitor->port = port;
-
     coreContext->monitor->monitorActor = zactor_new (monitor_initLoop, NULL);
     assert(coreContext->monitor->monitorActor);
 }
