@@ -130,38 +130,43 @@ PUBLIC void igs_timerStop(int timerId);
 
 
 /* NETWORK MONITORING
- IngeScape provides an integrated monitor to detect events relative to the network
- Warning: once igs_monitoringEnable has been called, igs_monitoringDisable must be
+ Ingescape provides an integrated monitor to detect events relative to the network.
+ NB: once igs_monitoringEnable has been called, igs_monitoringDisable must be
  called to actually stop the monitor. If not stopped, it may cause an error when
  an agent terminates.*/
 PUBLIC void igs_monitoringEnable(unsigned int period); //in milliseconds
 PUBLIC void igs_monitoringEnableWithExpectedDevice(unsigned int period, const char* networkDevice, unsigned int port);
 PUBLIC void igs_monitoringDisable(void);
 PUBLIC bool igs_isMonitoringEnabled(void);
-//When the monitor is started and igs_monitoringShallStartStopAgent is set to true :
-// - IP change will cause the agent to restart on the new IP (same device, same port)
-// - Network device disappearance will cause the agent to stop. Agent will restart when device is back.
+/* When the monitor is started and igs_monitoringShallStartStopAgent is set to true :
+ - IP change will cause the agent to restart on the new IP (same device, same port)
+ - Network device disappearance will cause the agent to stop. Agent will restart when device is back.*/
 PUBLIC void igs_monitoringShallStartStopAgent(bool flag);
 typedef enum {
-    IGS_NETWORK_OK = 1, //Default status when the monitor starts
-    IGS_NETWORK_DEVICE_NOT_AVAILABLE, //Status when our network device is not available
-    IGS_NETWORK_ADDRESS_CHANGED, //Status when the IP address of our network device has changed
-    IGS_NETWORK_OK_AFTER_MANUAL_RESTART // Status when our agent has been manually restarted and is now OK
+    IGS_NETWORK_OK = 1, //when the monitor starts
+    IGS_NETWORK_DEVICE_NOT_AVAILABLE, //when our network device is not available
+    IGS_NETWORK_ADDRESS_CHANGED, //when the IP address of our network device has changed
+    IGS_NETWORK_OK_AFTER_MANUAL_RESTART //when our agent has been manually restarted and is now OK
 } igs_monitorEvent_t;
 typedef void (*igs_monitorCallback)(igs_monitorEvent_t event, const char *device, const char *ipAddress, void *myData);
 PUBLIC void igs_monitor(igs_monitorCallback cb, void *myData);
 
 
 /* LOGS REPLAY
- Logs generate all the necessary information for agent
- to replay either its received input stimulations or its
- published outputs. Both cases are handled.
- Replay happens in a dedicated thread run as soon as
- igs_replayInputsFromLogFile or igs_replayOutputsFromLogFile
- is called. These two functions shall thus be called
- after one of the igs_start* functions.
- NB: By default, data are not logged due to possible large
- sizes. Data logging can be enabled using igs_enableDataLogging.
+ Ingescape logs contain all the necessary information for an agent to replay
+ its changes for inputs, outputs, parameters and calls.
+ 
+ Replay happens in a dedicated thread created after calling igs_replayInit:
+ • logFilePath : path to the log file to be read
+ • speed : replay speed. Default is zero, meaning as fast as possible.
+ • startTime : with format hh:mm::s, specifies the time when speed shall be used.
+               Replay as fast as possible before that.
+ • waitForStart : waits for a call to igs_replayStart before starting the replay. Default is false.
+ • replayMode : a boolean composition of igs_replay_mode_t value to decide what shall be replayed.
+ • agent : an OPTIONAL agent name serving as filter when the logs contain activity for multiple agents.
+ 
+ igs_replayTerminate cleans the thread and requires calling igs_replayInit again.
+ Replay thread is cleaned automatically also when the log file has been read completely.
  */
 typedef enum {
     IGS_REPLAY_OUTPUT = 1,
@@ -169,10 +174,11 @@ typedef enum {
     IGS_REPLAY_CALLS = 4,
     IGS_REPLAY_PARAMETERS = 8
 } igs_replay_mode_t;
-
-PUBLIC void igs_enableDataLogging(bool enable);
-PUBLIC void igs_replayFromLogFile(const char *logFilePath, size_t speed, const char *startTime, uint replayMode);
-PUBLIC void igs_replayReset(void);
+PUBLIC void igs_replayInit(const char *logFilePath, size_t speed, const char *startTime,
+                           bool waitForStart, uint replayMode, const char *agent);
+PUBLIC void igs_replayStart(void);
+PUBLIC void igs_replayPause(bool pause);
+PUBLIC void igs_replayTerminate(void);
 
 
 //////////////////////////////////////////////////

@@ -915,7 +915,7 @@ const igs_iop_t* model_writeIOP (igs_agent_t *agent, const char *iopName, iop_t 
     
     if (ret){
         //compose log entry
-        char *logIOPType = NULL;
+        const char *logIOPType = NULL;
         switch (iopType) {
             case IGS_INPUT_T:
                 logIOPType = "input";
@@ -1002,6 +1002,11 @@ igs_iop_t * model_findIopByName(igs_agent_t *agent, const char *name, iop_t type
 ////////////////////////////////////////////////////////////////////////
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
+
+void igs_enableDataLogging(bool enable){
+    core_initContext();
+    coreContext->enableDataLogging = enable;
+}
 
 // --------------------------------  READ ------------------------------------//
 

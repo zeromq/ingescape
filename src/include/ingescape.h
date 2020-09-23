@@ -341,7 +341,7 @@ PUBLIC void igs_setLogPath(const char *path); //default directory is ~/ on UNIX 
 PUBLIC char* igs_getLogPath(void); // must be freed by caller
 PUBLIC void igs_setLogLevel (igs_logLevel_t level); //set log level in console, default is IGS_LOG_INFO
 PUBLIC igs_logLevel_t igs_getLogLevel(void);
-
+PUBLIC void igs_enableDataLogging(bool enable); //log data as hex strings (for replay purposes), default is false.
 
 //LOG ALIASES
 PUBLIC void igs_log(igs_logLevel_t level, const char *function, const char *format, ...) CHECK_PRINTF (3);
