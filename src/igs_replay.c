@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #if (defined WIN32 || defined _WIN32)
+#define timegm _mkgmtime
 #include "unixfunctions.h"
 #endif
 #include "ingescape_private.h"
@@ -40,6 +41,7 @@ iop_t current_actionType = 0;
 char current_iopName[IGS_MAX_IOP_NAME_LENGTH] = "";
 char current_iopData[8192] = "";
 struct tm current_time = {0};
+time_t current_unixTime = 0;
 time_t current_unixMsecTime = 0;
 time_t previous_unixMsecTime = 0;
 
@@ -70,6 +72,7 @@ long long executeCurrentAndFindNextAction(void){
     
     //find next action
     replay_currentLine = zfile_readln(replay_file);
+    replay_nbLines++;
     while (replay_currentLine) {
         bool foundData = false;
         //Try to find an IOP or call log entry
@@ -79,7 +82,6 @@ long long executeCurrentAndFindNextAction(void){
                          &current_time.tm_hour, &current_time.tm_min, &current_time.tm_sec, &current_microsec,
                          current_iopType, current_iopName, current_iopData);
         if (res == 11){
-            printf("%s\n", replay_currentLine);
             //TODO: apply filter on allowed replay types
             if (streq(current_iopType, "input")){
                 current_actionType = IGS_INPUT_T;
@@ -95,12 +97,13 @@ long long executeCurrentAndFindNextAction(void){
         
         if (foundData){
             //compute current time
-            if (replay_speed > 0){
+            if (replay_speed > 0 || (replay_requestedStartTime == 0 && strlen(replay_startTime) > 0)){
                 current_time.tm_year -= 1900;
                 current_time.tm_mon -= 1;
                 current_time.tm_isdst = 0;
-                time_t unixTime = mktime(&current_time);
-                current_unixMsecTime = unixTime * 1000 + (int)(current_microsec / 1000);
+                current_time.tm_gmtoff = 0;
+                current_unixTime = timegm(&current_time);
+                current_unixMsecTime = current_unixTime * 1000 + (int)(current_microsec / 1000);
             }
             
             //compute start time if needed
@@ -112,11 +115,12 @@ long long executeCurrentAndFindNextAction(void){
                 requestedStartTime.tm_mon = current_time.tm_mon;
                 requestedStartTime.tm_mday = current_time.tm_mday;
                 requestedStartTime.tm_isdst = 0;
+                requestedStartTime.tm_gmtoff = 0;
                 int nb = sscanf(replay_startTime, "%d:%d:%d",
                                 &requestedStartTime.tm_hour, &requestedStartTime.tm_min, &requestedStartTime.tm_sec);
                 if(nb == 3){ //we have a valid start time : we activate flag
                     replay_isBeyondStartTime = false;
-                    replay_requestedStartTime = mktime(&requestedStartTime);
+                    replay_requestedStartTime = timegm(&requestedStartTime);
                 }else{
                     igs_error("invalid start time : '%s'", replay_startTime);
                 }
@@ -128,22 +132,22 @@ long long executeCurrentAndFindNextAction(void){
                 long long delta = (long long)((current_unixMsecTime - previous_unixMsecTime) / replay_speed);
                 previous_unixMsecTime = current_unixMsecTime;
                 return delta;
-                
-            } else if (!replay_isBeyondStartTime && current_unixMsecTime >= replay_requestedStartTime){
+            } else if (!replay_isBeyondStartTime && current_unixTime >= replay_requestedStartTime){
                 //we have reached requested start time
                 igs_info("reached start time : %s", replay_startTime);
                 replay_isBeyondStartTime = true;
                 //full-throttle replay (certainly until next entry because we just reached requested start time)
+                previous_unixMsecTime = current_unixMsecTime;
                 return 0;
-                
             } else {
                 //full-throttle replay
+                previous_unixMsecTime = current_unixMsecTime;
                 return 0;
-                
             }
         }else{
             //no usefull data found : continue reading file
             replay_currentLine = zfile_readln(replay_file);
+            replay_nbLines++;
         }
     }
     //reached end of file
@@ -155,6 +159,8 @@ int replayRunThroughLogFile(zloop_t *loop, int timer_id, void *arg){
     IGS_UNUSED(timer_id);
     IGS_UNUSED(arg);
     
+    if (!replay_start)
+        replay_start = zclock_mono();
     if (replay_shallStop)
         return -1;
     if (replay_isPaused) {
@@ -163,7 +169,7 @@ int replayRunThroughLogFile(zloop_t *loop, int timer_id, void *arg){
     
     long long timeToWait = executeCurrentAndFindNextAction();
     while (timeToWait == 0 && !replay_shallStop && !replay_isPaused){
-        //if delta is zero, we continue as fast as we can
+        //if timeToWait is zero, we continue as fast as we can
         timeToWait = executeCurrentAndFindNextAction();
     }
     if (!replay_shallStop && !replay_isPaused){
@@ -249,8 +255,7 @@ void igs_replayTerminateCB(const char *senderAgentName, const char *senderAgentU
 int pipeReadFromOtherThreads(zloop_t *loop, zsock_t *socket, void *arg){
     IGS_UNUSED(loop);
     char *msg = zstr_recv(socket);
-    if (streq(msg, "START_REPLAY") && !replay_canStart){
-        replay_start = zclock_mono();
+    if (streq(msg, "START_REPLAY") && !replay_canStart && !replay_shallStop){
         replay_canStart = true;
         zloop_timer(replay_loop, 0, 1, replayRunThroughLogFile, NULL);
     } else if(streq(msg, "STOP_REPLAY")){
@@ -266,18 +271,22 @@ int pipeReadFromOtherThreads(zloop_t *loop, zsock_t *socket, void *arg){
 void replayRunLoop(zsock_t *pipe, void *args){
     replay_loop = zloop_new();
     if (replay_canStart){
-        replay_start = zclock_mono();
         zloop_timer(replay_loop, 1500, 1, replayRunThroughLogFile, NULL); //1500 ms gives time for network init
     }
     zloop_reader(replay_loop, pipe, pipeReadFromOtherThreads, NULL);
+    zloop_reader_set_tolerant(replay_loop, pipe);
     zsock_signal (pipe, 0);
     
     zloop_start(replay_loop);
     
     replay_end = zclock_mono();
-    if (replay_speed == 0)
+    if (replay_speed == 0){
         igs_info("full throttle replay achieved in %ld milliseconds (%ld lines parsed)",
                  replay_end - replay_start, replay_nbLines);
+        printf("full throttle replay achieved in %ld milliseconds (%ld lines parsed)\n",
+               replay_end - replay_start, replay_nbLines);
+    }
+    replay_start = 0;
     zloop_destroy(&replay_loop);
 }
 
@@ -319,6 +328,9 @@ void igs_replayInit(const char *logFilePath, size_t speed, const char *startTime
     replay_mode = replayMode;
     replay_start = replay_end = 0;
     replay_isPaused = false;
+    replay_nbLines = 0;
+    replay_shallStop = false;
+    replay_isBeyondStartTime = true;
     
     if (waitForStart && !igs_checkCallExistence("igs_replayInit")){
         igs_initCall("igs_replayInit", igs_replayInitCB, NULL);
@@ -350,6 +362,7 @@ void igs_replayPause(bool pause){
 
 void igs_replayTerminate(void){
     if (replay_actor){
+        replay_shallStop = true;
         zstr_send(zactor_sock(replay_actor), "STOP_REPLAY");
         zactor_destroy(&replay_actor);
     }
