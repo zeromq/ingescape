@@ -60,19 +60,19 @@ long long executeCurrentAndFindNextAction(void){
                     switch (current_actionType) {
                         case IGS_REPLAY_INPUT:
                             if(replay_mode & IGS_REPLAY_INPUT){
-                                igs_fatal("replaying %s.%s.%s = (%s) %s", agent->name, "input", current_iopName, current_dataTypeS, current_iopData);
+                                igs_info("replaying %s.%s.%s = (%s) %s", agent->name, "input", current_iopName, current_dataTypeS, current_iopData);
                                 igsAgent_writeInputAsString(agent, current_iopName, current_iopData);
                             }
                             break;
                         case IGS_REPLAY_OUTPUT:
                             if(replay_mode & IGS_REPLAY_OUTPUT){
-                                igs_fatal("replaying %s.%s.%s = (%s) %s", agent->name, "output", current_iopName, current_dataTypeS, current_iopData);
+                                igs_info("replaying %s.%s.%s = (%s) %s", agent->name, "output", current_iopName, current_dataTypeS, current_iopData);
                                 igsAgent_writeOutputAsString(agent, current_iopName, current_iopData);
                             }
                             break;
                         case IGS_REPLAY_PARAMETER:
                             if(replay_mode & IGS_REPLAY_PARAMETER){
-                                igs_fatal("replaying %s.%s.%s = (%s) %s", agent->name, "parameter", current_iopName, current_dataTypeS, current_iopData);
+                                igs_info("replaying %s.%s.%s = (%s) %s", agent->name, "parameter", current_iopName, current_dataTypeS, current_iopData);
                                 igsAgent_writeParameterAsString(agent, current_iopName, current_iopData);
                             }
                             break;
@@ -296,6 +296,7 @@ void igs_replayTerminateCB(const char *senderAgentName, const char *senderAgentU
 //messages from other threads to replay thread
 int pipeReadFromOtherThreads(zloop_t *loop, zsock_t *socket, void *arg){
     IGS_UNUSED(loop);
+    IGS_UNUSED(arg);
     char *msg = zstr_recv(socket);
     if (streq(msg, "START_REPLAY") && !replay_canStart && !replay_shallStop){
         replay_canStart = true;
@@ -311,6 +312,7 @@ int pipeReadFromOtherThreads(zloop_t *loop, zsock_t *socket, void *arg){
 
 //loop for replay trhead
 void replayRunLoop(zsock_t *pipe, void *args){
+    IGS_UNUSED(args);
     replay_loop = zloop_new();
     if (replay_canStart){
         zloop_timer(replay_loop, 1500, 1, replayRunThroughLogFile, NULL); //1500 ms gives time for network init

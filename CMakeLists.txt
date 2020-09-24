@@ -93,6 +93,7 @@ list(APPEND ingescape_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/src/igs_performance.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/igs_agent.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/igs_core.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/igs_replay.c
     ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/yajl/src/yajl_alloc.c
     ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/yajl/src/yajl_buf.c
     ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/yajl/src/yajl_encode.c
