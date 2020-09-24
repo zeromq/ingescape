@@ -142,7 +142,6 @@ long long executeCurrentAndFindNextAction(void){
                 current_time.tm_year -= 1900;
                 current_time.tm_mon -= 1;
                 current_time.tm_isdst = 0;
-                current_time.tm_gmtoff = 0;
                 current_unixTime = timegm(&current_time);
                 current_unixMsecTime = current_unixTime * 1000 + (int)(current_microsec / 1000);
             }
@@ -156,7 +155,6 @@ long long executeCurrentAndFindNextAction(void){
                 requestedStartTime.tm_mon = current_time.tm_mon;
                 requestedStartTime.tm_mday = current_time.tm_mday;
                 requestedStartTime.tm_isdst = 0;
-                requestedStartTime.tm_gmtoff = 0;
                 int nb = sscanf(replay_startTime, "%d:%d:%d",
                                 &requestedStartTime.tm_hour, &requestedStartTime.tm_min, &requestedStartTime.tm_sec);
                 if(nb == 3){ //we have a valid start time : we activate flag
