@@ -10,7 +10,7 @@
 
 unsigned int port = 5669;
 char *agentName = "puncher";
-char *networkDevice = NULL; //can be set to a default device name
+char *networkDevice = "en0"; //can be set to a default device name
 bool verbose = false;
 bool autoTests = false;
 bool autoTestsHaveStarted = false;
@@ -384,6 +384,7 @@ int main(int argc, const char * argv[]) {
                 exit(1);
         }
     }
+    igs_enableDataLogging(true);
     
     //agent name and state
     char *name = igs_getAgentName();
@@ -1398,6 +1399,29 @@ int main(int argc, const char * argv[]) {
     assert(igs_competeInElection("my other election") == IGS_FAILURE);
     assert(igs_leaveElection("my other election") == IGS_SUCCESS);
     assert(igs_leaveElection("my other election") == IGS_FAILURE);
+    
+    //replay
+    igs_replayTerminate();
+//    igs_replayInit("puncher_replay.log",
+//                   0, NULL, false, 0, NULL);
+//    igs_replayInit("puncher_replay.log",
+//                   10, "11:26:12", false, 0, "firstAgent");
+//    igs_replayInit("puncher_replay.log",
+//                   10, "11:26:12", false, IGS_REPLAY_INPUT, "firstAgent");
+//    igs_replayInit("puncher_replay.log",
+//                   10, "11:26:12", false, IGS_REPLAY_INPUT+IGS_REPLAY_OUTPUT, "firstAgent");
+//    igs_replayInit("puncher_replay.log",
+//                   10, "11:26:12", false, IGS_REPLAY_INPUT+IGS_REPLAY_OUTPUT+IGS_REPLAY_PARAMETER, "firstAgent");
+    igs_replayInit("puncher_replay.log",
+                   10, "11:26:12", false, IGS_REPLAY_INPUT+IGS_REPLAY_OUTPUT+IGS_REPLAY_PARAMETER+IGS_REPLAY_CALL, "firstAgent");
+//    igs_replayTerminate();
+//    igs_replayInit("puncher_replay.log",
+//                   100, NULL, false, 0, NULL);
+////    igs_replayTerminate();
+//    igs_replayInit("puncher_replay.log",
+//                   100, NULL, true, 0, NULL);
+//    igs_replayStart();
+//    igs_replayTerminate();
     
     if (autoTests){
         igs_startWithDevice(networkDevice, port);

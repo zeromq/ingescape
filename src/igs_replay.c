@@ -36,9 +36,11 @@ long replay_nbLines = 0;
 //current action to execute
 char current_agent[IGS_MAX_AGENT_NAME_LENGTH] = "";
 int current_microsec = 0;
-char current_iopType[16] = "";
-iop_t current_actionType = 0;
+char current_actionTypeS[16] = "";
+igs_replay_mode_t current_actionType = 0;
 char current_iopName[IGS_MAX_IOP_NAME_LENGTH] = "";
+char current_dataTypeS[64] = "";
+iopType_t current_dataType = IGS_UNKNOWN_T;
 char current_iopData[8192] = "";
 struct tm current_time = {0};
 time_t current_unixTime = 0;
@@ -48,23 +50,43 @@ time_t previous_unixMsecTime = 0;
 
 long long executeCurrentAndFindNextAction(void){
     //execute current action
-    if (current_actionType){
-        switch (current_actionType) {
-            case IGS_INPUT_T:
-                //TODO: input
-                break;
-            case IGS_OUTPUT_T:
-                //TODO: output
-                break;
-            case IGS_PARAMETER_T:
-                //TODO: parameter
-                break;
-                
-            default:{
-                if (current_actionType == IGS_PARAMETER_T + 1){
-                    //TODO: call
+    if (current_actionType && (streq(replay_agent,"") || streq(current_agent, replay_agent))){
+        if (current_dataType == IGS_DATA_T && current_iopData[0] == '|'){
+            //ignore this data entry because it is a size and not actual binary data
+        }else{
+            igs_agent_t *agent, *tmp;
+            HASH_ITER(hh, coreContext->agents, agent, tmp){
+                if (streq(agent->name, current_agent)){
+                    switch (current_actionType) {
+                        case IGS_REPLAY_INPUT:
+                            if(replay_mode & IGS_REPLAY_INPUT){
+                                igs_fatal("replaying %s.%s.%s = (%s) %s", agent->name, "input", current_iopName, current_dataTypeS, current_iopData);
+                                igsAgent_writeInputAsString(agent, current_iopName, current_iopData);
+                            }
+                            break;
+                        case IGS_REPLAY_OUTPUT:
+                            if(replay_mode & IGS_REPLAY_OUTPUT){
+                                igs_fatal("replaying %s.%s.%s = (%s) %s", agent->name, "output", current_iopName, current_dataTypeS, current_iopData);
+                                igsAgent_writeOutputAsString(agent, current_iopName, current_iopData);
+                            }
+                            break;
+                        case IGS_REPLAY_PARAMETER:
+                            if(replay_mode & IGS_REPLAY_PARAMETER){
+                                igs_fatal("replaying %s.%s.%s = (%s) %s", agent->name, "parameter", current_iopName, current_dataTypeS, current_iopData);
+                                igsAgent_writeParameterAsString(agent, current_iopName, current_iopData);
+                            }
+                            break;
+                        case IGS_REPLAY_CALL:
+                            if(replay_mode & IGS_REPLAY_CALL){
+                                //TODO: call
+                            }
+                            break;
+                            
+                        default:{
+                            break;
+                        }
+                    }
                 }
-                break;
             }
         }
     }
@@ -76,20 +98,39 @@ long long executeCurrentAndFindNextAction(void){
     while (replay_currentLine) {
         bool foundData = false;
         //Try to find an IOP or call log entry
-        int res = sscanf((char *)replay_currentLine, "%[^;];%d/%d/%d;%d:%d:%d.%d;DEBUG;model_writeIOP;set %s %s to %s",
+        int res = sscanf((char *)replay_currentLine, "%1023[^;];%d/%d/%d;%d:%d:%d.%d;DEBUG;model_writeIOP;set %15s %1023s to %63s %8191[^\0]",
                          current_agent,
                          &current_time.tm_mday, &current_time.tm_mon, &current_time.tm_year,
                          &current_time.tm_hour, &current_time.tm_min, &current_time.tm_sec, &current_microsec,
-                         current_iopType, current_iopName, current_iopData);
-        if (res == 11){
-            //TODO: apply filter on allowed replay types
-            if (streq(current_iopType, "input")){
-                current_actionType = IGS_INPUT_T;
-            } else if (streq(current_iopType, "output")){
-                current_actionType = IGS_OUTPUT_T;
-            } else if (streq(current_iopType, "parameter")){
-                current_actionType = IGS_PARAMETER_T;
+                         current_actionTypeS, current_iopName, current_dataTypeS, current_iopData);
+        if (res == 12){
+            //printf("line: %s\n", replay_currentLine);
+            if (streq(current_actionTypeS, "input")){
+                current_actionType = IGS_REPLAY_INPUT;
+            } else if (streq(current_actionTypeS, "output")){
+                current_actionType = IGS_REPLAY_OUTPUT;
+            } else if (streq(current_actionTypeS, "parameter")){
+                current_actionType = IGS_REPLAY_PARAMETER;
+            } else {
+                current_actionType = 0;
             }
+            
+            if (streq(current_dataTypeS, "impulsion")){
+                current_dataType = IGS_IMPULSION_T;
+            } else if (streq(current_dataTypeS, "bool")){
+                current_dataType = IGS_BOOL_T;
+            } else if (streq(current_dataTypeS, "int")){
+                current_dataType = IGS_INTEGER_T;
+            } else if (streq(current_dataTypeS, "double")){
+                current_dataType = IGS_DOUBLE_T;
+            } else if (streq(current_dataTypeS, "string")){
+                current_dataType = IGS_STRING_T;
+            } else if (streq(current_dataTypeS, "data")){
+                current_dataType = IGS_DATA_T;
+            } else {
+                current_dataType = IGS_UNKNOWN_T;
+            }
+            
             foundData = true;
         } else {
             //TODO: handle call logs
@@ -199,6 +240,7 @@ void igs_replayInitCB(const char *senderAgentName, const char *senderAgentUUID,
     IGS_UNUSED(nbArgs);
     IGS_UNUSED(token);
     IGS_UNUSED(myData);
+    igs_replayTerminate();
     char *logFilePath = firstArgument->c;
     size_t speed = firstArgument->next->i;
     char *startTime = firstArgument->next->next->c;
@@ -298,6 +340,7 @@ void igs_replayInit(const char *logFilePath, size_t speed, const char *startTime
     assert(logFilePath || waitForStart);
     assert(speed >= 0);
     assert(!startTime || strlen(startTime) < 9);
+    igs_replayTerminate();
     char logFile[IGS_MAX_PATH_LENGTH] = "";
     if (logFilePath){
         admin_makeFilePath(logFilePath, logFile, IGS_MAX_PATH_LENGTH);
@@ -316,16 +359,23 @@ void igs_replayInit(const char *logFilePath, size_t speed, const char *startTime
         }
     }
     replay_speed = speed;
+    
     if (startTime)
         strncpy(replay_startTime, startTime, 8);
     else
         strcpy(replay_startTime, "");
+    
     if (agent)
         strncpy(replay_agent, agent, IGS_MAX_AGENT_NAME_LENGTH);
     else
         strcpy(replay_agent, "");
+    
+    if (!replayMode)
+        replay_mode = IGS_REPLAY_INPUT + IGS_REPLAY_OUTPUT + IGS_REPLAY_PARAMETER + IGS_REPLAY_CALL;
+    else
+        replay_mode = replayMode;
+    
     replay_canStart = !waitForStart;
-    replay_mode = replayMode;
     replay_start = replay_end = 0;
     replay_isPaused = false;
     replay_nbLines = 0;
@@ -354,6 +404,8 @@ void igs_replayInit(const char *logFilePath, size_t speed, const char *startTime
 void igs_replayStart(void){
     if (replay_actor)
         zstr_send(zactor_sock(replay_actor), "START_REPLAY");
+    else
+        igs_error("init replay before starting it");
 }
 
 void igs_replayPause(bool pause){
@@ -369,7 +421,7 @@ void igs_replayTerminate(void){
     if (replay_file)
         zfile_destroy(&replay_file);
     
-    if (igs_checkCallExistence("igs_replayInits")){
+    if (igs_checkCallExistence("igs_replayInit")){
         igs_removeCall("igs_replayInit");
         igs_removeCall("igs_replayStart");
         igs_removeCall("igs_replayPause");

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		97817D6F251CD32400EFF20F /* puncher_replay.log in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97817D68251CD27900EFF20F /* puncher_replay.log */; };
 		9782CBD124E67A9300860307 /* ingescapePuncher.cert in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9782CBCD24E67A2100860307 /* ingescapePuncher.cert */; };
 		9782CBD224E67A9300860307 /* ingescapePuncher.cert_secret in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9782CBD024E67A2100860307 /* ingescapePuncher.cert_secret */; };
 		9782CBD324E67AAC00860307 /* sparingPartner.cert in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9782CBCF24E67A2100860307 /* sparingPartner.cert */; };
@@ -37,6 +38,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		97817D6C251CD31600EFF20F /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 16;
+			files = (
+				97817D6F251CD32400EFF20F /* puncher_replay.log in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		97D7090424C1F137008825B0 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 12;
@@ -62,6 +73,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		97817D68251CD27900EFF20F /* puncher_replay.log */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = puncher_replay.log; sourceTree = "<group>"; };
 		9782CBCD24E67A2100860307 /* ingescapePuncher.cert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ingescapePuncher.cert; sourceTree = "<group>"; };
 		9782CBCE24E67A2100860307 /* sparingPartner.cert_secret */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sparingPartner.cert_secret; sourceTree = "<group>"; };
 		9782CBCF24E67A2100860307 /* sparingPartner.cert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sparingPartner.cert; sourceTree = "<group>"; };
@@ -98,6 +110,7 @@
 		9782CBCA24E679F800860307 /* resources */ = {
 			isa = PBXGroup;
 			children = (
+				97817D68251CD27900EFF20F /* puncher_replay.log */,
 				9782CBCD24E67A2100860307 /* ingescapePuncher.cert */,
 				9782CBD024E67A2100860307 /* ingescapePuncher.cert_secret */,
 				9782CBCF24E67A2100860307 /* sparingPartner.cert */,
@@ -165,6 +178,7 @@
 				97D7090324C1F137008825B0 /* Frameworks */,
 				97D7090424C1F137008825B0 /* CopyFiles */,
 				97F1B41A24C20826006B70AA /* ShellScript */,
+				97817D6C251CD31600EFF20F /* CopyFiles */,
 			);
 			buildRules = (
 			);

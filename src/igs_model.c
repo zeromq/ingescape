@@ -952,13 +952,18 @@ const igs_iop_t* model_writeIOP (igs_agent_t *agent, const char *iopName, iop_t 
                 sprintf(logIOPValue, "string %s", iop->value.s);
                 break;
             case IGS_DATA_T:{
-                if (iop->valueSize > 0 && coreContext->enableDataLogging){
-                    zchunk_t *chunk = zchunk_new(iop->value.data, iop->valueSize);
-                    char *hexChunk = zchunk_strhex(chunk);
-                    logIOPValue = calloc(strlen(hexChunk) + strlen("data ") + 1, sizeof(char));
-                    sprintf(logIOPValue, "data %s", hexChunk);
-                    free(hexChunk);
-                    zchunk_destroy(&chunk);
+                if (coreContext->enableDataLogging){
+                    if (iop->valueSize > 0){
+                        zchunk_t *chunk = zchunk_new(iop->value.data, iop->valueSize);
+                        char *hexChunk = zchunk_strhex(chunk);
+                        logIOPValue = calloc(strlen(hexChunk) + strlen("data ") + 1, sizeof(char));
+                        sprintf(logIOPValue, "data %s", hexChunk);
+                        free(hexChunk);
+                        zchunk_destroy(&chunk);
+                    }else{
+                        logIOPValue = calloc(strlen("data 00") + 1, sizeof(char));
+                        sprintf(logIOPValue, "data 00");
+                    }
                 }else{
                     snprintf(logIOPValueBuffer, 256, "data |size: %zu bytes", iop->valueSize);
                     logIOPValue = strdup(logIOPValueBuffer);

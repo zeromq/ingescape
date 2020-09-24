@@ -163,16 +163,18 @@ PUBLIC void igs_monitor(igs_monitorCallback cb, void *myData);
                Replay as fast as possible before that.
  • waitForStart : waits for a call to igs_replayStart before starting the replay. Default is false.
  • replayMode : a boolean composition of igs_replay_mode_t value to decide what shall be replayed.
+                If mode is zero, all IOP and calls are replayed.
  • agent : an OPTIONAL agent name serving as filter when the logs contain activity for multiple agents.
  
  igs_replayTerminate cleans the thread and requires calling igs_replayInit again.
  Replay thread is cleaned automatically also when the log file has been read completely.
  */
 typedef enum {
-    IGS_REPLAY_OUTPUT = 1,
-    IGS_REPLAY_INPUT = 2,
-    IGS_REPLAY_CALLS = 4,
-    IGS_REPLAY_PARAMETERS = 8
+    IGS_REPLAY_INPUT = 1,
+    IGS_REPLAY_OUTPUT = 2,
+    IGS_REPLAY_PARAMETER = 4,
+    IGS_REPLAY_CALL = 8
+
 } igs_replay_mode_t;
 PUBLIC void igs_replayInit(const char *logFilePath, size_t speed, const char *startTime,
                            bool waitForStart, uint replayMode, const char *agent);
