@@ -3242,6 +3242,13 @@ char *igsAgent_getAgentName(igs_agent_t *agent){
 }
 
 
+char *igsAgent_getAgentUuid(igs_agent_t *agent){
+    assert(agent);
+    assert(agent->uuid);
+    return strdup(agent->uuid);
+}
+
+
 igs_result_t igs_freeze(void){
     core_initContext();
     if(coreContext->isFrozen == false){

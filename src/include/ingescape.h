@@ -80,6 +80,9 @@ PUBLIC void igs_observeExternalStop(igs_externalStopCallback cb, void *myData);
 PUBLIC void igs_setAgentName(const char *name);
 PUBLIC char *igs_getAgentName(void); //char* must be freed by caller
 
+//agent uuid, read-only
+PUBLIC char *igs_getAgentUuid(void); //char* must be freed by caller
+
 //control agent state
 PUBLIC void igs_setAgentState(const char *state);
 PUBLIC char* igs_getAgentState(void); //must be freed by caller

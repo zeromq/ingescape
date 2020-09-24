@@ -38,6 +38,7 @@ PUBLIC void igsAgent_observeActivate(igs_agent_t *agent, igsAgent_activateCallba
 
 PUBLIC void igsAgent_setAgentName(igs_agent_t *agent, const char *name);
 PUBLIC char *igsAgent_getAgentName(igs_agent_t *agent); //char* must be freed by caller
+PUBLIC char *igsAgent_getAgentUuid(igs_agent_t *agent); //char* must be freed by caller
 PUBLIC void igsAgent_setAgentState(igs_agent_t *agent, const char *state);
 PUBLIC char *igsAgent_getAgentState(igs_agent_t *agent); //char* must be freed by caller
 
