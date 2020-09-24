@@ -63,6 +63,11 @@ char *igs_getAgentName(void){
     return igsAgent_getAgentName(coreAgent);
 }
 
+char *igs_getAgentUuid(void){
+    core_initAgent();
+    return igsAgent_getAgentUuid(coreAgent);
+}
+
 void igs_setAgentState(const char *state){
     core_initAgent();
     igsAgent_setAgentState(coreAgent, state);
