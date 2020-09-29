@@ -385,6 +385,7 @@ int main(int argc, const char * argv[]) {
         }
     }
     igs_enableDataLogging(true);
+    igs_enableCallLogging(true);
     
     //agent name and state
     char *name = igs_getAgentName();
@@ -1413,7 +1414,7 @@ int main(int argc, const char * argv[]) {
 //    igs_replayInit("puncher_replay.log",
 //                   10, "11:26:12", false, IGS_REPLAY_INPUT+IGS_REPLAY_OUTPUT+IGS_REPLAY_PARAMETER, "firstAgent");
     igs_replayInit("puncher_replay.log",
-                   10, "11:26:12", false, IGS_REPLAY_INPUT+IGS_REPLAY_OUTPUT+IGS_REPLAY_PARAMETER+IGS_REPLAY_CALL, "firstAgent");
+                   10, "11:26:12", false, IGS_REPLAY_INPUT+IGS_REPLAY_OUTPUT+IGS_REPLAY_PARAMETER+IGS_REPLAY_RECEIVED_CALL+IGS_REPLAY_SENT_CALL, "firstAgent");
 //    igs_replayTerminate();
 //    igs_replayInit("puncher_replay.log",
 //                   100, NULL, false, 0, NULL);

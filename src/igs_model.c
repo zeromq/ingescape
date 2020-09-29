@@ -1013,6 +1013,11 @@ void igs_enableDataLogging(bool enable){
     coreContext->enableDataLogging = enable;
 }
 
+void igs_enableCallLogging(bool enable){
+    core_initContext();
+    coreContext->enableCallLogging = enable;
+}
+
 // --------------------------------  READ ------------------------------------//
 
 igs_result_t igsAgent_readInput(igs_agent_t *agent, const char *name, void **value, size_t *size){

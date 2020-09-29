@@ -91,7 +91,7 @@ igs_result_t call_addValuesToArgumentsFromMessage(const char *name, igs_callArgu
                 current->data = calloc(1, size);
                 memcpy(current->data, zframe_data(f), size);
                 break;
-
+                
             default:
                 break;
         }
@@ -118,8 +118,8 @@ igs_result_t call_copyArguments(igs_callArgument_t *source, igs_callArgument_t *
     igs_callArgument_t *currentS = NULL;
     igs_callArgument_t *currentD = NULL;
     DL_FOREACH(destination, currentD){
-
-        //init for source if needed
+        
+        //init source if needed
         if (currentS == NULL)
             currentS = source;
         
@@ -146,7 +146,7 @@ igs_result_t call_copyArguments(igs_callArgument_t *source, igs_callArgument_t *
                 currentD->data = calloc(1, size);
                 memcpy(currentD->data, currentS->data, size);
                 break;
-
+                
             default:
                 break;
         }
@@ -171,6 +171,102 @@ void call_freeValuesInArguments(igs_callArgument_t *arg){
     }
 }
 
+void call_logSentCall(igs_agent_t *agent, const char *targetAgentName, const char *targetAgentUUID,
+                      const char *callName, igs_callArgument_t *list){
+    char callLog[IGS_MAX_LOG_LENGTH] = "";
+    char *callLogCursor = callLog;
+    callLogCursor += snprintf(callLog, IGS_MAX_LOG_LENGTH, "send call %s(%s).%s", targetAgentName, targetAgentUUID, callName);
+    igs_callArgument_t *currentArg = NULL;
+    LL_FOREACH(list, currentArg){
+        if (callLogCursor - callLog >= IGS_MAX_LOG_LENGTH)
+            break;
+        switch (currentArg->type) {
+            case IGS_BOOL_T:
+                callLogCursor += snprintf(callLogCursor, IGS_MAX_LOG_LENGTH - (callLogCursor - callLog),
+                                          " %d", currentArg->b);
+                break;
+            case IGS_INTEGER_T:
+                callLogCursor += snprintf(callLogCursor, IGS_MAX_LOG_LENGTH - (callLogCursor - callLog),
+                                          " %d", currentArg->i);
+                break;
+            case IGS_DOUBLE_T:
+                callLogCursor += snprintf(callLogCursor, IGS_MAX_LOG_LENGTH - (callLogCursor - callLog),
+                                          " %f", currentArg->d);
+                break;
+            case IGS_STRING_T:
+                callLogCursor += snprintf(callLogCursor, IGS_MAX_LOG_LENGTH - (callLogCursor - callLog),
+                                          " %s", currentArg->c);
+                break;
+            case IGS_DATA_T:{
+                zchunk_t *chunk = zchunk_new(currentArg->data, currentArg->size);
+                char *hexStr = zchunk_strhex(chunk);
+                if (hexStr){
+                    callLogCursor += snprintf(callLogCursor, IGS_MAX_LOG_LENGTH - (callLogCursor - callLog),
+                                              " %s", hexStr);
+                    free(hexStr);
+                } else {
+                    callLogCursor += snprintf(callLogCursor, IGS_MAX_LOG_LENGTH - (callLogCursor - callLog),
+                                              " 00");
+                }
+                zchunk_destroy(&chunk);
+            }
+                break;
+                
+            default:
+                break;
+        }
+    }
+    igsAgent_debug(agent, "%s", callLog);
+}
+
+
+void call_logReceivedCall(igs_agent_t *agent, const char *callerAgentName, const char *callerAgentUUID,
+                          const char *callName, igs_callArgument_t *list){
+    char callLog[IGS_MAX_LOG_LENGTH] = "";
+    char *callLogCursor = callLog;
+    callLogCursor += snprintf(callLog, IGS_MAX_LOG_LENGTH, "received call %s from %s(%s) ", callName, callerAgentName, callerAgentUUID);
+    igs_callArgument_t *currentArg = NULL;
+    LL_FOREACH(list, currentArg){
+        if (callLogCursor - callLog >= IGS_MAX_LOG_LENGTH)
+            break;
+        switch (currentArg->type) {
+            case IGS_BOOL_T:
+                callLogCursor += snprintf(callLogCursor, IGS_MAX_LOG_LENGTH - (callLogCursor - callLog),
+                                          " %d", currentArg->b);
+                break;
+            case IGS_INTEGER_T:
+                callLogCursor += snprintf(callLogCursor, IGS_MAX_LOG_LENGTH - (callLogCursor - callLog),
+                                          " %d", currentArg->i);
+                break;
+            case IGS_DOUBLE_T:
+                callLogCursor += snprintf(callLogCursor, IGS_MAX_LOG_LENGTH - (callLogCursor - callLog),
+                                          " %f", currentArg->d);
+                break;
+            case IGS_STRING_T:
+                callLogCursor += snprintf(callLogCursor, IGS_MAX_LOG_LENGTH - (callLogCursor - callLog),
+                                          " %s", currentArg->c);
+                break;
+            case IGS_DATA_T:{
+                zchunk_t *chunk = zchunk_new(currentArg->data, currentArg->size);
+                char *hexStr = zchunk_strhex(chunk);
+                if (hexStr){
+                    callLogCursor += snprintf(callLogCursor, IGS_MAX_LOG_LENGTH - (callLogCursor - callLog),
+                                              " %s", hexStr);
+                    free(hexStr);
+                } else {
+                    callLogCursor += snprintf(callLogCursor, IGS_MAX_LOG_LENGTH - (callLogCursor - callLog),
+                                              " 00");
+                }
+                zchunk_destroy(&chunk);
+            }
+                break;
+                
+            default:
+                break;
+        }
+    }
+    igsAgent_debug(agent, "%s", callLog);
+}
 ////////////////////////////////////////////////////////////////////////
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
@@ -210,7 +306,7 @@ igs_callArgument_t *igs_cloneArgumentsList(igs_callArgument_t *list){
                     new->data = calloc(1, arg->size);
                     memcpy(new->data, arg->data, arg->size);
                     break;
-
+                    
                 default:
                     break;
             }
@@ -254,7 +350,7 @@ void igs_addStringToArgumentsList(igs_callArgument_t **list, const char *value){
         new->c = NULL;
         new->size = 0;
     }
-
+    
     LL_APPEND(*list, new);
 }
 
@@ -513,7 +609,10 @@ igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, 
                             agent->name, agent->uuid, remoteAgent->name, callName, remoteAgent->uuid);
                 zyre_whisper(agent->context->node, remoteAgent->peer->peerId, &msg);
                 bus_zyreUnlock();
-                igsAgent_debug(agent, "sent call %s to %s(%s)", callName, remoteAgent->name, remoteAgent->uuid);
+                if (coreContext->enableCallLogging)
+                    call_logSentCall(agent, remoteAgent->name, remoteAgent->uuid, callName, *list);
+                else
+                    igsAgent_debug(agent, "calling %s(%s).%s", remoteAgent->name, remoteAgent->uuid, callName);
                 
             }
         }
@@ -552,6 +651,9 @@ igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, 
                             if (call->cb != NULL){
                                 (call->cb)(localAgent, agent->name, agent->uuid, callName, call->arguments, nbArguments, token, call->cbData);
                                 call_freeValuesInArguments(call->arguments);
+                                if (coreContext->enableCallLogging){
+                                    call_logReceivedCall(localAgent, agent->name, agent->uuid, callName, *list);
+                                }
                             }else{
                                 igsAgent_error(agent, "no defined callback to handle received call %s", callName);
                             }
@@ -569,8 +671,10 @@ igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, 
                                 agent->name, agent->uuid, localAgent->name, callName, localAgent->uuid);
                 }
                 bus_zyreUnlock();
-                igsAgent_debug(agent, "sent call %s to %s(%s)", callName, localAgent->name, localAgent->uuid);
-                
+                if (coreContext->enableCallLogging)
+                    call_logSentCall(agent, localAgent->name, localAgent->uuid, callName, *list);
+                else
+                    igsAgent_debug(agent, "calling %s.%s(%s)", localAgent->name, callName, localAgent->uuid);
             }
         }
     }

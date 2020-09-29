@@ -290,6 +290,7 @@ typedef struct igs_core_context{
     bool logInConsole;
     bool useColorInConsole;
     bool enableDataLogging;
+    bool enableCallLogging;
     igs_logLevel_t logLevel;
     char logFilePath[IGS_MAX_PATH_LENGTH];
     int logNbOfEntries; //for fflush rotation
@@ -464,6 +465,8 @@ void call_freeCall(igs_call_t *t);
 PUBLIC igs_result_t call_addValuesToArgumentsFromMessage(const char *name, igs_callArgument_t *arg, zmsg_t *msg);
 igs_result_t call_copyArguments(igs_callArgument_t *source, igs_callArgument_t *destination);
 void call_freeValuesInArguments(igs_callArgument_t *arg);
+void call_logReceivedCall(igs_agent_t *agent, const char *callerAgentName, const char *callerAgentUUID,
+                          const char *callName, igs_callArgument_t *list);
 
 //license
 #define ENABLE_LICENSE_ENFORCEMENT 1

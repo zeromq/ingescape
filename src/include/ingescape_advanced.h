@@ -173,7 +173,8 @@ typedef enum {
     IGS_REPLAY_INPUT = 1,
     IGS_REPLAY_OUTPUT = 2,
     IGS_REPLAY_PARAMETER = 4,
-    IGS_REPLAY_CALL = 8
+    IGS_REPLAY_RECEIVED_CALL = 8,
+    IGS_REPLAY_SENT_CALL = 16
 
 } igs_replay_mode_t;
 PUBLIC void igs_replayInit(const char *logFilePath, size_t speed, const char *startTime,

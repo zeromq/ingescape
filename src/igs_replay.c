@@ -76,9 +76,14 @@ long long executeCurrentAndFindNextAction(void){
                                 igsAgent_writeParameterAsString(agent, current_iopName, current_iopData);
                             }
                             break;
-                        case IGS_REPLAY_CALL:
-                            if(replay_mode & IGS_REPLAY_CALL){
-                                //TODO: call
+                        case IGS_REPLAY_SENT_CALL:
+                            if(replay_mode & IGS_REPLAY_SENT_CALL){
+                                //TODO:
+                            }
+                            break;
+                        case IGS_REPLAY_RECEIVED_CALL:
+                            if(replay_mode & IGS_REPLAY_RECEIVED_CALL){
+                                //TODO:
                             }
                             break;
                             
@@ -371,7 +376,7 @@ void igs_replayInit(const char *logFilePath, size_t speed, const char *startTime
         strcpy(replay_agent, "");
     
     if (!replayMode)
-        replay_mode = IGS_REPLAY_INPUT + IGS_REPLAY_OUTPUT + IGS_REPLAY_PARAMETER + IGS_REPLAY_CALL;
+        replay_mode = IGS_REPLAY_INPUT + IGS_REPLAY_OUTPUT + IGS_REPLAY_PARAMETER + IGS_REPLAY_RECEIVED_CALL + IGS_REPLAY_SENT_CALL;
     else
         replay_mode = replayMode;
     

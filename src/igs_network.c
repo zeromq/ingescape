@@ -2117,6 +2117,9 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                             igs_callArgument_t *_arg = NULL;
                             LL_COUNT(call->arguments, _arg, nbArgs);
                             if (call_addValuesToArgumentsFromMessage(callName, call->arguments, msgDuplicate) == IGS_SUCCESS){
+                                if (coreContext->enableCallLogging){
+                                    call_logReceivedCall(calleeAgent, callerName, callerUuid, callName, call->arguments);
+                                }
                                 (call->cb)(calleeAgent, callerName, callerUuid, callName, call->arguments, nbArgs, token, call->cbData);
                                 call_freeValuesInArguments(call->arguments);
                             }
