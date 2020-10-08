@@ -138,7 +138,7 @@ source_group("Header Files" FILES ${ingescape_private_headers} ${ingescape_heade
 # Dependencies
 ########################################################################
 find_package(libsodium REQUIRED)
-find_package(ZeroMQ 4.3.3 REQUIRED)
+find_package(ZeroMQ 4.3.4 REQUIRED)
 message(STATUS "Found ZeroMQ version: ${ZeroMQ_VERSION}")
 find_package(czmq 4.2.1 REQUIRED)
 message(STATUS "Found czmq version: ${czmq_VERSION}")
