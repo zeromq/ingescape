@@ -1,7 +1,7 @@
 #ifndef IGSYAJL_VERSION_H_
 #define IGSYAJL_VERSION_H_
 
-#include <yajl_common.h>
+#include "yajl_common.h"
 
 #define IGSYAJL_MAJOR 2
 #define IGSYAJL_MINOR 1
