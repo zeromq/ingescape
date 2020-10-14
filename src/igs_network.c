@@ -930,17 +930,18 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             }
             igs_agent_t *agent = NULL;
             HASH_FIND_STR(context->agents, uuid, agent);
-            assert(agent);
-            igs_agent_event_callback_t *cb;
-            DL_FOREACH(agent->agentEventCallbacks, cb){
-                //iterate on all remote agents *for this peer* : all its agents know this agent
-                igs_remote_agent_t *r, *rtmp;
-                HASH_ITER(hh, coreContext->remoteAgents, r, rtmp){
-                    if (streq(r->peer->peerId, peer)){
-                        cb->callback_ptr(agent, IGS_AGENT_KNOWS_US, r->uuid, r->name, NULL, cb->myData);
+            if (agent){
+                igs_agent_event_callback_t *cb;
+                DL_FOREACH(agent->agentEventCallbacks, cb){
+                    //iterate on all remote agents *for this peer* : all its agents know this agent
+                    igs_remote_agent_t *r, *rtmp;
+                    HASH_ITER(hh, coreContext->remoteAgents, r, rtmp){
+                        if (streq(r->peer->peerId, peer)){
+                            cb->callback_ptr(agent, IGS_AGENT_KNOWS_US, r->uuid, r->name, NULL, cb->myData);
+                        }
                     }
                 }
-            }
+            }//else agent has disappeared on our side (disabled or destroyed)
         }
         //check if title is an EXTERNAL definition
         else if(streq(title, definitionPrefix)){
@@ -1040,7 +1041,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 if (isAgentNew){
                     agent_propagateAgentEvent(IGS_AGENT_ENTERED, uuid, remoteAgentName, NULL);
                     
-                    //Additonal notification flag means that the remtoe agent has been started
+                    //Additonal notification flag means that the remote agent has been started
                     //during runtime: remote peer init has already been done and this remote
                     //agent knows our agents already => propagate to our agents immediately.
                     char *notification = zmsg_popstr(msgDuplicate);
