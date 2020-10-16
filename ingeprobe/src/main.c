@@ -369,6 +369,7 @@ int manageParent (zloop_t *loop, zsock_t *socket, void *args){
             char value[BUFFER_SIZE] = "";
             peer_t *p = NULL;
             agent_t *a = NULL, *atmp;
+            bool foundAgent = false;
             //try to find agent with this name or uuid
             HASH_ITER(hh, context->agents, a, atmp){
                 if (streq(a->name, target) || streq(a->uuid, target)){
@@ -392,10 +393,14 @@ int manageParent (zloop_t *loop, zsock_t *socket, void *args){
                         zmsg_addstr(msg, value);
                         zmsg_addstr(msg, a->uuid);
                         zyre_whisper(node, p->uuid, &msg);
+                        foundAgent = true;
                     }else{
                         printf("'%s' has bad format\n", args);
                     }
                 }
+            }
+            if (!foundAgent){
+                printf("no agent with name %s (did you join INGESCAPE_PRIVATE ?)\n", target);
             }
         }
         else if(streq (command, "CALL")){
@@ -424,6 +429,7 @@ int manageParent (zloop_t *loop, zsock_t *socket, void *args){
                             //v2 protocol : add our id as caller and callee agent uuid
                             zmsg_addstr(callMsg, zyre_uuid(context->node));
                             zmsg_addstr(callMsg, a->uuid);
+                            zmsg_addstr(callMsg, callName);
                             zmsg_addstr(callMsg, ""); //token, always empty here
                         }else{
                             //v1 protocol
@@ -439,7 +445,7 @@ int manageParent (zloop_t *loop, zsock_t *socket, void *args){
                 }
             }
             if (!sentCall){
-                printf("unknown agent %s\n", callTarget);
+                printf("unknown agent %s (did you properly join INGESCAPE_PRIVATE ?)\n", callTarget);
             }
         }
         else if(streq (command, "PEERS")){

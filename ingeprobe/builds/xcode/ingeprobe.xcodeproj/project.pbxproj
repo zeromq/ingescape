@@ -1136,7 +1136,7 @@
 		974E35012493D8C800444009 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				974E35782493D8C900444009 /* libzmq.5.2.4.dylib */,
+				974E35782493D8C900444009 /* libzmq.dylib */,
 				974E357A2493D8C900444009 /* libzmq.a */,
 				974E357C2493D8C900444009 /* libobjects.a */,
 				974E357E2493D8C900444009 /* test_ancillaries */,
@@ -1452,9 +1452,10 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		974E35782493D8C900444009 /* libzmq.5.2.4.dylib */ = {
+		974E35782493D8C900444009 /* libzmq.dylib */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
+			name = libzmq.dylib;
 			path = libzmq.5.2.4.dylib;
 			remoteRef = 974E35772493D8C900444009 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
@@ -2538,7 +2539,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -2588,7 +2589,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 			};

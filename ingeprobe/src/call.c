@@ -111,7 +111,6 @@ bool addArgumentsToCallMessage(zmsg_t *msg, call_t *call, const char *arguments)
     assert(call);
     assert(arguments);
     assert(strncmp(arguments, call->name, strlen(call->name)) == 0); //check call name consistency
-    zmsg_addstr(msg, call->name);
     
     void *limit = (void *)(arguments + strlen(arguments));
     //set arguments after call name
