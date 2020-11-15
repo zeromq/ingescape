@@ -8,12 +8,10 @@ do
     echo "License for $m"
     ingelicense --expiration 2021/12/31 \
         --editorExpiration 2021/12/31 \
-        --features /Users/steph/code/i2gitlab/ingescape/ingescape/ingelicense/src/features.txt \
-        --agents /Users/steph/code/i2gitlab/ingescape/ingescape/ingelicense/src/agents.txt \
         --customer $m \
         --editorOwner $m \
-        --features ./src/features.txt \
-        --agents ./src/agents.txt \
+        --features ./configs/features.txt \
+        --agents ./configs/agents.txt \
         --output ./licenses/$m.igslicense
     echo ""
 done
@@ -34,11 +32,9 @@ ingelicense \
     --order ORFE \
     --expiration 2050/12/31 \
     --editorExpiration 2050/12/31 \
-    --features /Users/steph/code/i2gitlab/ingescape/ingescape/ingelicense/src/features.txt \
-    --agents /Users/steph/code/i2gitlab/ingescape/ingescape/ingelicense/src/agents.txt \
     --editorOwner "Jérome Barbé" \
-    --features ./src/features.txt \
-    --agents ./src/agents.txt \
+    --features ./configs/features.txt \
+    --agents ./configs/agents.txt \
     --output ./licenses/AirbusControlDeck.igslicense
 echo ""
 echo "Read license for AirbusControlDeck"
@@ -53,11 +49,9 @@ ingelicense \
     --order Eval \
     --expiration 2020/12/31 \
     --editorExpiration 2020/12/31 \
-    --features /Users/steph/code/i2gitlab/ingescape/ingescape/ingelicense/src/features.txt \
-    --agents /Users/steph/code/i2gitlab/ingescape/ingescape/ingelicense/src/agents.txt \
     --editorOwner "Christophe Chastanet" \
-    --features ./src/features.txt \
-    --agents ./src/agents.txt \
+    --features ./configs/features.txt \
+    --agents ./configs/agents.txt \
     --output ./licenses/Diota.igslicense
 echo ""
 echo "Read license for Diota"
@@ -72,11 +66,9 @@ ingelicense \
     --order Eval \
     --expiration 2020/12/31 \
     --editorExpiration 2020/12/31 \
-    --features /Users/steph/code/i2gitlab/ingescape/ingescape/ingelicense/src/features.txt \
-    --agents /Users/steph/code/i2gitlab/ingescape/ingescape/ingelicense/src/agents.txt \
     --editorOwner "Shiva team" \
-    --features ./src/features.txt \
-    --agents ./src/agents.txt \
+    --features ./configs/features.txt \
+    --agents ./configs/agents.txt \
     --output ./licenses/DiotaShiva.igslicense
 echo ""
 echo "Read license for Diota Shiva"
@@ -91,11 +83,9 @@ ingelicense \
     --order Eval \
     --expiration 2020/12/31 \
     --editorExpiration 2020/12/31 \
-    --features /Users/steph/code/i2gitlab/ingescape/ingescape/ingelicense/src/features.txt \
-    --agents /Users/steph/code/i2gitlab/ingescape/ingescape/ingelicense/src/agents.txt \
     --editorOwner "Eurocontrol PJ09" \
-    --features ./src/features.txt \
-    --agents ./src/agents.txt \
+    --features ./configs/features.txt \
+    --agents ./configs/agents.txt \
     --output ./licenses/EurocontrolPJ09.igslicense
 echo ""
 echo "Read license for EurocontrolPJ09"
@@ -110,11 +100,9 @@ ingelicense \
     --order I2-20-014-NATO \
     --expiration 2040/12/31 \
     --editorExpiration 2021/07/31 \
-    --features /Users/steph/code/i2gitlab/ingescape/ingescape/ingelicense/src/features.txt \
-    --agents /Users/steph/code/i2gitlab/ingescape/ingescape/ingelicense/src/agents.txt \
     --editorOwner "NATO ACT" \
-    --features ./src/features.txt \
-    --agents ./src/agents.txt \
+    --features ./configs/features.txt \
+    --agents ./configs/agents.txt \
     --output ./licenses/NATO_SACT.igslicense
 echo ""
 echo "Read license for NATO ACT"
@@ -129,11 +117,9 @@ ingelicense \
     --order Subcontracting \
     --expiration 2021/03/31 \
     --editorExpiration 2021/03/31 \
-    --features /Users/steph/code/i2gitlab/ingescape/ingescape/ingelicense/src/features.txt \
-    --agents /Users/steph/code/i2gitlab/ingescape/ingescape/ingelicense/src/agents.txt \
     --editorOwner "Waxym" \
-    --features ./src/features.txt \
-    --agents ./src/agents.txt \
+    --features ./configs/features.txt \
+    --agents ./configs/agents.txt \
     --output ./licenses/Waxym.igslicense
 echo ""
 echo "Read license for Waxym"
@@ -149,13 +135,28 @@ ingelicense \
     --order PCVA \
     --expiration 2021/03/31 \
     --editorExpiration 2021/03/31 \
-    --features /Users/steph/code/i2gitlab/ingescape/ingescape/ingelicense/src/features.txt \
-    --agents /Users/steph/code/i2gitlab/ingescape/ingescape/ingelicense/src/agents.txt \
     --editorOwner "Navocap" \
-    --features ./src/features.txt \
-    --agents ./src/agents.txt \
+    --features ./configs/features.txt \
+    --agents ./configs/agents.txt \
     --output ./licenses/Navocap.igslicense
 echo ""
 echo "Read license for Navocap"
 ingelicense --read ./licenses/Navocap.igslicense
+echo ""
+
+#licenses for Bouyer
+echo "License for Bouyer"
+ingelicense \
+    --id Bouyer \
+    --customer "Bouyer" \
+    --order Bouyer \
+    --expiration 2050/12/31 \
+    --editorExpiration 2020/03/31 \
+    --editorOwner "Bouyer" \
+    --features ./configs/features_bouyer.txt \
+    --agents ./configs/agents_bouyer.txt \
+    --output ./licenses/Bouyer.igslicense
+echo ""
+echo "Read license for Bouyer"
+ingelicense --read ./licenses/Bouyer.igslicense
 echo ""
