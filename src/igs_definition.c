@@ -51,6 +51,11 @@ igs_result_t definition_addIOPToDefinition(igs_agent_t *agent, igs_iop_t *iop, i
     assert(iop);
     assert(def);
     model_readWriteLock();
+    //check that this agent has not been destroyed when we were locked
+    if (!agent || !(agent->context)){
+        model_readWriteUnlock();
+        return IGS_SUCCESS;
+    }
     igs_iop_t *previousIOP = NULL;
     switch (iop_type) {
         case IGS_INPUT_T:
@@ -188,6 +193,11 @@ void igsAgent_clearDefinition(igs_agent_t *agent){
         definition_freeDefinition(&agent->definition);
     }
     model_readWriteLock();
+    //check that this agent has not been destroyed when we were locked
+    if (!agent || !(agent->context)){
+        model_readWriteUnlock();
+        return;
+    }
     agent->definition = calloc(1, sizeof(igs_definition_t));
     assert(agent->name);
     agent->definition->name = strdup(agent->name);
@@ -302,6 +312,11 @@ igs_result_t igsAgent_removeInput(igs_agent_t *agent, const char *name){
         return IGS_FAILURE;
     }
     model_readWriteLock();
+    //check that this agent has not been destroyed when we were locked
+    if (!agent || !(agent->context)){
+        model_readWriteUnlock();
+        return IGS_SUCCESS;
+    }
     HASH_DEL(agent->definition->inputs_table, iop);
     definition_freeIOP(&iop);
     model_readWriteUnlock();
@@ -319,6 +334,11 @@ igs_result_t igsAgent_removeOutput(igs_agent_t *agent, const char *name){
         return IGS_FAILURE;
     }
     model_readWriteLock();
+    //check that this agent has not been destroyed when we were locked
+    if (!agent || !(agent->context)){
+        model_readWriteUnlock();
+        return IGS_SUCCESS;
+    }
     HASH_DEL(agent->definition->outputs_table, iop);
     definition_freeIOP(&iop);
     model_readWriteUnlock();
@@ -336,6 +356,11 @@ igs_result_t igsAgent_removeParameter(igs_agent_t *agent, const char *name){
         return IGS_FAILURE;
     }
     model_readWriteLock();
+    //check that this agent has not been destroyed when we were locked
+    if (!agent || !(agent->context)){
+        model_readWriteUnlock();
+        return IGS_SUCCESS;
+    }
     HASH_DEL(agent->definition->params_table, iop);
     definition_freeIOP(&iop);
     model_readWriteUnlock();
@@ -347,6 +372,11 @@ void igsAgent_setDefinitionPath(igs_agent_t *agent, const char *path){
     assert(agent);
     assert(path);
     model_readWriteLock();
+    //check that this agent has not been destroyed when we were locked
+    if (!agent || !(agent->context)){
+        model_readWriteUnlock();
+        return;
+    }
     if (agent->definitionPath)
         free(agent->definitionPath);
     agent->definitionPath = strndup(path, IGS_MAX_PATH_LENGTH);
@@ -370,6 +400,11 @@ void igsAgent_writeDefinitionToPath(igs_agent_t *agent){
         return;
     }
     model_readWriteLock();
+    //check that this agent has not been destroyed when we were locked
+    if (!agent || !(agent->context)){
+        model_readWriteUnlock();
+        return;
+    }
     FILE *fp = NULL;
     fp = fopen (agent->definitionPath,"w+");
     igsAgent_info(agent, "save to path %s", agent->definitionPath);

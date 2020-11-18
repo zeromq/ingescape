@@ -1240,6 +1240,11 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 }
                 
                 model_readWriteLock();
+                //check that this agent has not been destroyed when we were locked
+                if (!agent || !(agent->context)){
+                    model_readWriteUnlock();
+                    return 0;
+                }
                 zmsg_t *msgToSend = zmsg_new();
                 zmsg_addstr(msgToSend, "CURRENT_OUTPUTS");
                 zmsg_addstr(msgToSend, agent->uuid);
@@ -1337,6 +1342,11 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 }
                 
                 model_readWriteLock();
+                //check that this agent has not been destroyed when we were locked
+                if (!agent || !(agent->context)){
+                    model_readWriteUnlock();
+                    return 0;
+                }
                 zmsg_t *msgToSend = zmsg_new();
                 zmsg_addstr(msgToSend, "CURRENT_INPUTS");
                 zmsg_addstr(msgToSend, agent->uuid);
@@ -1407,6 +1417,11 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 }
                 
                 model_readWriteLock();
+                //check that this agent has not been destroyed when we were locked
+                if (!agent || !(agent->context)){
+                    model_readWriteUnlock();
+                    return 0;
+                }
                 zmsg_t *msgToSend = zmsg_new();
                 zmsg_addstr(msgToSend, "CURRENT_PARAMETERS");
                 zmsg_addstr(msgToSend, agent->uuid);
@@ -2274,6 +2289,11 @@ int triggerDefinitionUpdate(zloop_t *loop, int timer_id, void *arg){
     HASH_ITER(hh, context->agents, agent, tmp){
         if (agent->network_needToSendDefinitionUpdate){
             model_readWriteLock();
+            //check that this agent has not been destroyed when we were locked
+            if (!agent || !(agent->context)){
+                model_readWriteUnlock();
+                return 0;
+            }
             char * definitionStr = NULL;
             definitionStr = parser_export_definition(agent->definition);
             if (definitionStr != NULL){
@@ -2842,6 +2862,11 @@ igs_result_t network_publishOutput (igs_agent_t *agent, const igs_iop_t *iop){
     
     if(!agent->isWholeAgentMuted && !iop->is_muted && !agent->context->isFrozen){
         model_readWriteLock();
+        //check that this agent has not been destroyed when we were locked
+        if (!agent || !(agent->context)){
+            model_readWriteUnlock();
+            return IGS_SUCCESS;
+        }
         zmsg_t *msg = zmsg_new();
         zmsg_addstrf(msg, "%s-%s", agent->uuid, iop->name);
         zmsg_addstrf(msg, "%d", iop->value_type);

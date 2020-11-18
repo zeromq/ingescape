@@ -217,6 +217,11 @@ igs_result_t igsAgent_loadMapping (igs_agent_t *agent, const char* json_str){
         return IGS_FAILURE;
     }else{
         model_readWriteLock();
+        //check that this agent has not been destroyed when we were locked
+        if (!agent || !(agent->context)){
+            model_readWriteUnlock();
+            return IGS_FAILURE;
+        }
         if (agent->mapping)
             mapping_freeMapping(&agent->mapping);
         agent->mapping = tmp;
@@ -235,6 +240,11 @@ igs_result_t igsAgent_loadMappingFromPath (igs_agent_t *agent, const char* file_
         return IGS_FAILURE;
     }else{
         model_readWriteLock();
+        //check that this agent has not been destroyed when we were locked
+        if (!agent || !(agent->context)){
+            model_readWriteUnlock();
+            return IGS_FAILURE;
+        }
         if (agent->mapping)
             mapping_freeMapping(&agent->mapping);
         agent->mappingPath = strndup(file_path, IGS_MAX_PATH_LENGTH - 1);
@@ -248,6 +258,11 @@ igs_result_t igsAgent_loadMappingFromPath (igs_agent_t *agent, const char* file_
 void igsAgent_clearMapping(igs_agent_t *agent){
     igsAgent_debug(agent, "clear current mapping if needed and initiate an empty one");
     model_readWriteLock();
+    //check that this agent has not been destroyed when we were locked
+    if (!agent || !(agent->context)){
+        model_readWriteUnlock();
+        return;
+    }
     if(agent->mapping)
         mapping_freeMapping(&agent->mapping);
     agent->mapping = calloc(1, sizeof(struct igs_mapping));
@@ -258,6 +273,11 @@ void igsAgent_clearMapping(igs_agent_t *agent){
 void igsAgent_clearMappingOnAgent(igs_agent_t *agent, const char *agentName){
     if (agent->mapping){
         model_readWriteLock();
+        //check that this agent has not been destroyed when we were locked
+        if (!agent || !(agent->context)){
+            model_readWriteUnlock();
+            return;
+        }
         igs_mapping_element_t *elmt, *tmp;
         HASH_ITER(hh, agent->mapping->map_elements, elmt, tmp){
             if (streq(elmt->agent_name, agentName)){
@@ -278,6 +298,11 @@ char* igsAgent_getMapping(igs_agent_t *agent){
         return NULL;
     }
     model_readWriteLock();
+    //check that this agent has not been destroyed when we were locked
+    if (!agent || !(agent->context)){
+        model_readWriteUnlock();
+        return NULL;
+    }
     mappingJson = parser_export_mapping(agent->mapping);
     model_readWriteUnlock();
     return mappingJson;
@@ -312,6 +337,11 @@ void igsAgent_setMappingName(igs_agent_t *agent, const char *name){
     assert(name);
     assert(agent->mapping);
     model_readWriteLock();
+    //check that this agent has not been destroyed when we were locked
+    if (!agent || !(agent->context)){
+        model_readWriteUnlock();
+        return;
+    }
     if(agent->mapping->name != NULL)
         free(agent->mapping->name);
     agent->mapping->name = strndup(name, IGS_MAX_MAPPING_NAME_LENGTH);
@@ -345,6 +375,11 @@ size_t igsAgent_getMappingEntriesNumber(igs_agent_t *agent){
     assert(agent);
     assert(agent->mapping);
     model_readWriteLock();
+    //check that this agent has not been destroyed when we were locked
+    if (!agent || !(agent->context)){
+        model_readWriteUnlock();
+        return 0;
+    }
     size_t res = HASH_COUNT(agent->mapping->map_elements);
     model_readWriteUnlock();
     return res;
@@ -409,6 +444,11 @@ unsigned long igsAgent_addMappingEntry(igs_agent_t *agent,
         return 0;
     }
     model_readWriteLock();
+    //check that this agent has not been destroyed when we were locked
+    if (!agent || !(agent->context)){
+        model_readWriteUnlock();
+        return 0;
+    }
     assert(agent->mapping);
 
     //Add the new mapping element if not already there
@@ -463,6 +503,11 @@ igs_result_t igsAgent_removeMappingEntryWithId(igs_agent_t *agent, unsigned long
         return IGS_FAILURE;
     }else{
         model_readWriteLock();
+        //check that this agent has not been destroyed when we were locked
+        if (!agent || !(agent->context)){
+            model_readWriteUnlock();
+            return IGS_SUCCESS;
+        }
         HASH_DEL(agent->mapping->map_elements, el);
         mapping_freeMappingElement(&el);
         agent->network_needToSendMappingUpdate = true;
@@ -503,6 +548,11 @@ igs_result_t igsAgent_removeMappingEntryWithName(igs_agent_t *agent, const char 
         return IGS_FAILURE;
     }else{
         model_readWriteLock();
+        //check that this agent has not been destroyed when we were locked
+        if (!agent || !(agent->context)){
+            model_readWriteUnlock();
+            return IGS_SUCCESS;
+        }
         HASH_DEL(agent->mapping->map_elements, tmp);
         mapping_freeMappingElement(&tmp);
         agent->network_needToSendMappingUpdate = true;
@@ -515,6 +565,11 @@ void igsAgent_setMappingPath(igs_agent_t *agent, const char *path){
     assert(agent);
     assert(path);
     model_readWriteLock();
+    //check that this agent has not been destroyed when we were locked
+    if (!agent || !(agent->context)){
+        model_readWriteUnlock();
+        return;
+    }
     if (agent->mappingPath)
         free(agent->mappingPath);
     agent->mappingPath = strndup(path, IGS_MAX_PATH_LENGTH);
@@ -538,6 +593,11 @@ void igsAgent_writeMappingToPath(igs_agent_t *agent){
         return;
     }
     model_readWriteLock();
+    //check that this agent has not been destroyed when we were locked
+    if (!agent || !(agent->context)){
+        model_readWriteUnlock();
+        return;
+    }
     FILE *fp = NULL;
     fp = fopen (agent->mappingPath,"w+");
     igsAgent_info(agent, "save to path %s", agent->mappingPath);

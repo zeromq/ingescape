@@ -575,6 +575,11 @@ const igs_iop_t* model_writeIOP (igs_agent_t *agent, const char *iopName, iop_t 
     size_t outSize = 0;
     
     model_readWriteLock();
+    //check that this agent has not been destroyed when we were locked
+    if (!agent || !(agent->context)){
+        model_readWriteUnlock();
+        return NULL;
+    }
     //TODO: optimize if value is NULL
     switch (valType) {
         case IGS_INTEGER_T:{

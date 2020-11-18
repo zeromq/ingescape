@@ -524,6 +524,12 @@ igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, 
     bool found = false;
     
     model_readWriteLock();
+    //check that this agent has not been destroyed when we were locked
+    if (!agent || !(agent->context)){
+        model_readWriteUnlock();
+        return IGS_SUCCESS;
+    }
+    
     //1- iteration on remote agents
     if (coreContext->node != NULL){
         igs_remote_agent_t *remoteAgent = NULL, *tmp = NULL;
