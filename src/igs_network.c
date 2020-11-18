@@ -497,12 +497,16 @@ void handlePublicationFromRemoteAgent(zmsg_t *msg, igs_remote_agent_t *remoteAge
         return;
     }
     
+    model_readWriteLock();
     //Publication does not provide information about the targeted agents.
     //At this stage, we only know that one or more of our agents are targeted.
     //We need to iterate through our agents and their mapping to check which
     //inputs need to be updated on which agent.
     igs_agent_t *agent, *tmpAgent;
     HASH_ITER(hh, remoteAgent->context->agents, agent, tmpAgent){
+        if (!agent || !agent->uuid || (strlen(agent->uuid) == 0)) {
+            continue;
+        }
         zmsg_t *dup = zmsg_dup(msg);
         size_t msgSize = zmsg_size(dup);
         char *output = NULL;
@@ -555,45 +559,43 @@ void handlePublicationFromRemoteAgent(zmsg_t *msg, igs_remote_agent_t *remoteAge
                 data = zframe_data(frame);
                 size = zframe_size(frame);
             }
-            if (agent->uuid && agent->mapping){
-                //try to find mapping elements matching with this subscriber's output
-                //and update mapped input(s) value accordingly
-                //TODO : optimize mapping storage to avoid iterating
-                igs_mapping_element_t *elmt, *tmp;
-                model_readWriteLock();
-                //check that this agent has not been destroyed when we were locked
-                if (agent && agent->uuid){
-                    HASH_ITER(hh, agent->mapping->map_elements, elmt, tmp) {
-                        if (strcmp(elmt->agent_name, remoteAgent->name) == 0
-                            && strcmp(elmt->output_name, output) == 0){
-                            //we have a match on emitting agent name and its ouput name :
-                            //still need to check the targeted input existence in our definition
-                            igs_iop_t *foundInput = NULL;
-                            if (agent->definition->inputs_table != NULL){
-                                HASH_FIND_STR(agent->definition->inputs_table, elmt->input_name, foundInput);
-                            }
-                            if (foundInput == NULL){
-                                igsAgent_warn(agent, "Input %s is missing in our definition but expected in our mapping with %s.%s",
-                                              elmt->input_name,
-                                              elmt->agent_name,
-                                              elmt->output_name);
+            //try to find mapping elements matching with this subscriber's output
+            //and update mapped input(s) value accordingly
+            //TODO : optimize mapping storage to avoid iterating
+            igs_mapping_element_t *elmt, *tmp;
+            //check that this agent has not been destroyed when we were locked
+            if (agent->mapping){
+                HASH_ITER(hh, agent->mapping->map_elements, elmt, tmp) {
+                    if (strcmp(elmt->agent_name, remoteAgent->name) == 0
+                        && strcmp(elmt->output_name, output) == 0){
+                        //we have a match on emitting agent name and its ouput name :
+                        //still need to check the targeted input existence in our definition
+                        igs_iop_t *foundInput = NULL;
+                        if (agent->definition->inputs_table != NULL){
+                            HASH_FIND_STR(agent->definition->inputs_table, elmt->input_name, foundInput);
+                        }
+                        if (foundInput == NULL){
+                            igsAgent_warn(agent, "Input %s is missing in our definition but expected in our mapping with %s.%s",
+                                          elmt->input_name,
+                                          elmt->agent_name,
+                                          elmt->output_name);
+                        }else{
+                            //we have a fully matching mapping element : write from received output to our input
+                            if (valueType == IGS_STRING_T){
+                                model_readWriteUnlock();
+                                model_writeIOP(agent, elmt->input_name, IGS_INPUT_T, valueType, value, strlen(value)+1);
+                                model_readWriteLock();
+                                
                             }else{
-                                //we have a fully matching mapping element : write from received output to our input
-                                if (valueType == IGS_STRING_T){
-                                    model_readWriteUnlock();
-                                    model_writeIOP(agent, elmt->input_name, IGS_INPUT_T, valueType, value, strlen(value)+1);
-                                    model_readWriteLock();
-                                    
-                                }else{
-                                    model_readWriteUnlock();
-                                    model_writeIOP(agent, elmt->input_name, IGS_INPUT_T, valueType, data, size);
-                                    model_readWriteLock();
-                                }
+                                model_readWriteUnlock();
+                                model_writeIOP(agent, elmt->input_name, IGS_INPUT_T, valueType, data, size);
+                                model_readWriteLock();
                             }
+                            if (!agent->uuid)
+                                break;
                         }
                     }
                 }
-                model_readWriteUnlock();
             }
             if (frame != NULL){
                 zframe_destroy(&frame);
@@ -605,6 +607,7 @@ void handlePublicationFromRemoteAgent(zmsg_t *msg, igs_remote_agent_t *remoteAge
             output = NULL;
         }
     }
+    model_readWriteUnlock();
 }
 
 //manage incoming messages from one of the remote agents agents we subscribed to
