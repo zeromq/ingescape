@@ -561,31 +561,34 @@ void handlePublicationFromRemoteAgent(zmsg_t *msg, igs_remote_agent_t *remoteAge
                 //TODO : optimize mapping storage to avoid iterating
                 igs_mapping_element_t *elmt, *tmp;
                 model_readWriteLock();
-                HASH_ITER(hh, agent->mapping->map_elements, elmt, tmp) {
-                    if (strcmp(elmt->agent_name, remoteAgent->name) == 0
-                        && strcmp(elmt->output_name, output) == 0){
-                        //we have a match on emitting agent name and its ouput name :
-                        //still need to check the targeted input existence in our definition
-                        igs_iop_t *foundInput = NULL;
-                        if (agent->definition->inputs_table != NULL){
-                            HASH_FIND_STR(agent->definition->inputs_table, elmt->input_name, foundInput);
-                        }
-                        if (foundInput == NULL){
-                            igsAgent_warn(agent, "Input %s is missing in our definition but expected in our mapping with %s.%s",
-                                          elmt->input_name,
-                                          elmt->agent_name,
-                                          elmt->output_name);
-                        }else{
-                            //we have a fully matching mapping element : write from received output to our input
-                            if (valueType == IGS_STRING_T){
-                                model_readWriteUnlock();
-                                model_writeIOP(agent, elmt->input_name, IGS_INPUT_T, valueType, value, strlen(value)+1);
-                                model_readWriteLock();
-
+                //check that this agent has not been destroyed when we were locked
+                if (agent && agent->uuid){
+                    HASH_ITER(hh, agent->mapping->map_elements, elmt, tmp) {
+                        if (strcmp(elmt->agent_name, remoteAgent->name) == 0
+                            && strcmp(elmt->output_name, output) == 0){
+                            //we have a match on emitting agent name and its ouput name :
+                            //still need to check the targeted input existence in our definition
+                            igs_iop_t *foundInput = NULL;
+                            if (agent->definition->inputs_table != NULL){
+                                HASH_FIND_STR(agent->definition->inputs_table, elmt->input_name, foundInput);
+                            }
+                            if (foundInput == NULL){
+                                igsAgent_warn(agent, "Input %s is missing in our definition but expected in our mapping with %s.%s",
+                                              elmt->input_name,
+                                              elmt->agent_name,
+                                              elmt->output_name);
                             }else{
-                                model_readWriteUnlock();
-                                model_writeIOP(agent, elmt->input_name, IGS_INPUT_T, valueType, data, size);
-                                model_readWriteLock();
+                                //we have a fully matching mapping element : write from received output to our input
+                                if (valueType == IGS_STRING_T){
+                                    model_readWriteUnlock();
+                                    model_writeIOP(agent, elmt->input_name, IGS_INPUT_T, valueType, value, strlen(value)+1);
+                                    model_readWriteLock();
+                                    
+                                }else{
+                                    model_readWriteUnlock();
+                                    model_writeIOP(agent, elmt->input_name, IGS_INPUT_T, valueType, data, size);
+                                    model_readWriteLock();
+                                }
                             }
                         }
                     }

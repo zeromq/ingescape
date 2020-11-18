@@ -146,7 +146,6 @@ igs_iop_t* definition_createIOP(igs_agent_t *agent, const char *name, iop_t type
 void definition_freeDefinition (igs_definition_t **def) {
     assert(def);
     assert(*def);
-    model_readWriteLock();
     if ((*def)->name != NULL){
         free((char*)(*def)->name);
         (*def)->name = NULL;
@@ -177,7 +176,6 @@ void definition_freeDefinition (igs_definition_t **def) {
         HASH_DEL((*def)->calls_table,call);
         call_freeCall(call);
     }
-    model_readWriteUnlock();
     free(*def);
     *def = NULL;
 }
@@ -189,10 +187,10 @@ void igsAgent_clearDefinition(igs_agent_t *agent){
     assert(agent);
     //Free the structure definition loaded
     igsAgent_debug(agent, "Clear our definition and initiate an empty one");
+    model_readWriteLock();
     if(agent->definition != NULL){
         definition_freeDefinition(&agent->definition);
     }
-    model_readWriteLock();
     //check that this agent has not been destroyed when we were locked
     if (!agent || !(agent->uuid)){
         model_readWriteUnlock();

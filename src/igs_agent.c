@@ -82,11 +82,8 @@ void igsAgent_destroy(igs_agent_t **agent){
     }
     if ((*agent)->mapping)
         mapping_freeMapping(&(*agent)->mapping);
-    
-    model_readWriteUnlock();
     if ((*agent)->definition)
         definition_freeDefinition(&(*agent)->definition);
-    model_readWriteLock();
     free(*agent);
     *agent = NULL;
     model_readWriteUnlock();
