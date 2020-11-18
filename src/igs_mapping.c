@@ -218,7 +218,7 @@ igs_result_t igsAgent_loadMapping (igs_agent_t *agent, const char* json_str){
     }else{
         model_readWriteLock();
         //check that this agent has not been destroyed when we were locked
-        if (!agent || !(agent->context)){
+        if (!agent || !(agent->uuid)){
             model_readWriteUnlock();
             return IGS_FAILURE;
         }
@@ -241,7 +241,7 @@ igs_result_t igsAgent_loadMappingFromPath (igs_agent_t *agent, const char* file_
     }else{
         model_readWriteLock();
         //check that this agent has not been destroyed when we were locked
-        if (!agent || !(agent->context)){
+        if (!agent || !(agent->uuid)){
             model_readWriteUnlock();
             return IGS_FAILURE;
         }
@@ -259,7 +259,7 @@ void igsAgent_clearMapping(igs_agent_t *agent){
     igsAgent_debug(agent, "clear current mapping if needed and initiate an empty one");
     model_readWriteLock();
     //check that this agent has not been destroyed when we were locked
-    if (!agent || !(agent->context)){
+    if (!agent || !(agent->uuid)){
         model_readWriteUnlock();
         return;
     }
@@ -274,7 +274,7 @@ void igsAgent_clearMappingOnAgent(igs_agent_t *agent, const char *agentName){
     if (agent->mapping){
         model_readWriteLock();
         //check that this agent has not been destroyed when we were locked
-        if (!agent || !(agent->context)){
+        if (!agent || !(agent->uuid)){
             model_readWriteUnlock();
             return;
         }
@@ -299,7 +299,7 @@ char* igsAgent_getMapping(igs_agent_t *agent){
     }
     model_readWriteLock();
     //check that this agent has not been destroyed when we were locked
-    if (!agent || !(agent->context)){
+    if (!agent || !(agent->uuid)){
         model_readWriteUnlock();
         return NULL;
     }
@@ -338,7 +338,7 @@ void igsAgent_setMappingName(igs_agent_t *agent, const char *name){
     assert(agent->mapping);
     model_readWriteLock();
     //check that this agent has not been destroyed when we were locked
-    if (!agent || !(agent->context)){
+    if (!agent || !(agent->uuid)){
         model_readWriteUnlock();
         return;
     }
@@ -376,7 +376,7 @@ size_t igsAgent_getMappingEntriesNumber(igs_agent_t *agent){
     assert(agent->mapping);
     model_readWriteLock();
     //check that this agent has not been destroyed when we were locked
-    if (!agent || !(agent->context)){
+    if (!agent || !(agent->uuid)){
         model_readWriteUnlock();
         return 0;
     }
@@ -445,7 +445,7 @@ unsigned long igsAgent_addMappingEntry(igs_agent_t *agent,
     }
     model_readWriteLock();
     //check that this agent has not been destroyed when we were locked
-    if (!agent || !(agent->context)){
+    if (!agent || !(agent->uuid)){
         model_readWriteUnlock();
         return 0;
     }
@@ -504,7 +504,7 @@ igs_result_t igsAgent_removeMappingEntryWithId(igs_agent_t *agent, unsigned long
     }else{
         model_readWriteLock();
         //check that this agent has not been destroyed when we were locked
-        if (!agent || !(agent->context)){
+        if (!agent || !(agent->uuid)){
             model_readWriteUnlock();
             return IGS_SUCCESS;
         }
@@ -549,7 +549,7 @@ igs_result_t igsAgent_removeMappingEntryWithName(igs_agent_t *agent, const char 
     }else{
         model_readWriteLock();
         //check that this agent has not been destroyed when we were locked
-        if (!agent || !(agent->context)){
+        if (!agent || !(agent->uuid)){
             model_readWriteUnlock();
             return IGS_SUCCESS;
         }
@@ -566,7 +566,7 @@ void igsAgent_setMappingPath(igs_agent_t *agent, const char *path){
     assert(path);
     model_readWriteLock();
     //check that this agent has not been destroyed when we were locked
-    if (!agent || !(agent->context)){
+    if (!agent || !(agent->uuid)){
         model_readWriteUnlock();
         return;
     }
@@ -594,7 +594,7 @@ void igsAgent_writeMappingToPath(igs_agent_t *agent){
     }
     model_readWriteLock();
     //check that this agent has not been destroyed when we were locked
-    if (!agent || !(agent->context)){
+    if (!agent || !(agent->uuid)){
         model_readWriteUnlock();
         return;
     }

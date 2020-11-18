@@ -555,11 +555,12 @@ void handlePublicationFromRemoteAgent(zmsg_t *msg, igs_remote_agent_t *remoteAge
                 data = zframe_data(frame);
                 size = zframe_size(frame);
             }
-            if (agent->mapping){
+            if (agent->uuid && agent->mapping){
                 //try to find mapping elements matching with this subscriber's output
                 //and update mapped input(s) value accordingly
                 //TODO : optimize mapping storage to avoid iterating
                 igs_mapping_element_t *elmt, *tmp;
+                model_readWriteLock();
                 HASH_ITER(hh, agent->mapping->map_elements, elmt, tmp) {
                     if (strcmp(elmt->agent_name, remoteAgent->name) == 0
                         && strcmp(elmt->output_name, output) == 0){
@@ -577,13 +578,19 @@ void handlePublicationFromRemoteAgent(zmsg_t *msg, igs_remote_agent_t *remoteAge
                         }else{
                             //we have a fully matching mapping element : write from received output to our input
                             if (valueType == IGS_STRING_T){
+                                model_readWriteUnlock();
                                 model_writeIOP(agent, elmt->input_name, IGS_INPUT_T, valueType, value, strlen(value)+1);
+                                model_readWriteLock();
+
                             }else{
+                                model_readWriteUnlock();
                                 model_writeIOP(agent, elmt->input_name, IGS_INPUT_T, valueType, data, size);
+                                model_readWriteLock();
                             }
                         }
                     }
                 }
+                model_readWriteUnlock();
             }
             if (frame != NULL){
                 zframe_destroy(&frame);
@@ -1241,7 +1248,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 
                 model_readWriteLock();
                 //check that this agent has not been destroyed when we were locked
-                if (!agent || !(agent->context)){
+                if (!agent || !(agent->uuid)){
                     model_readWriteUnlock();
                     return 0;
                 }
@@ -1343,7 +1350,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 
                 model_readWriteLock();
                 //check that this agent has not been destroyed when we were locked
-                if (!agent || !(agent->context)){
+                if (!agent || !(agent->uuid)){
                     model_readWriteUnlock();
                     return 0;
                 }
@@ -1418,7 +1425,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                 
                 model_readWriteLock();
                 //check that this agent has not been destroyed when we were locked
-                if (!agent || !(agent->context)){
+                if (!agent || !(agent->uuid)){
                     model_readWriteUnlock();
                     return 0;
                 }
@@ -2290,7 +2297,7 @@ int triggerDefinitionUpdate(zloop_t *loop, int timer_id, void *arg){
         if (agent->network_needToSendDefinitionUpdate){
             model_readWriteLock();
             //check that this agent has not been destroyed when we were locked
-            if (!agent || !(agent->context)){
+            if (!agent || !(agent->uuid)){
                 model_readWriteUnlock();
                 return 0;
             }
@@ -2863,7 +2870,7 @@ igs_result_t network_publishOutput (igs_agent_t *agent, const igs_iop_t *iop){
     if(!agent->isWholeAgentMuted && !iop->is_muted && !agent->context->isFrozen){
         model_readWriteLock();
         //check that this agent has not been destroyed when we were locked
-        if (!agent || !(agent->context)){
+        if (!agent || !(agent->uuid)){
             model_readWriteUnlock();
             return IGS_SUCCESS;
         }

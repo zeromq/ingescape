@@ -576,7 +576,7 @@ const igs_iop_t* model_writeIOP (igs_agent_t *agent, const char *iopName, iop_t 
     
     model_readWriteLock();
     //check that this agent has not been destroyed when we were locked
-    if (!agent || !(agent->context)){
+    if (!agent || !(agent->uuid)){
         model_readWriteUnlock();
         return NULL;
     }

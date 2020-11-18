@@ -48,12 +48,14 @@ void igsAgent_destroy(igs_agent_t **agent){
     assert(agent);
     assert(*agent);
     model_readWriteLock();
-    (*agent)->context = NULL;
     if (igsAgent_isActivated(*agent))
         igsAgent_deactivate(*agent);
     
-    if ((*agent)->uuid != NULL)
+    zhash_delete(coreContext->createdAgents, (*agent)->uuid);
+    if ((*agent)->uuid != NULL) {
         free((*agent)->uuid);
+        (*agent)->uuid = NULL;
+    }
     if ((*agent)->name != NULL)
         free((*agent)->name);
     if ((*agent)->state != NULL)
@@ -78,13 +80,13 @@ void igsAgent_destroy(igs_agent_t **agent){
         DL_DELETE((*agent)->agentEventCallbacks, eventCb);
         free(eventCb);
     }
-    model_readWriteUnlock();
     if ((*agent)->mapping)
         mapping_freeMapping(&(*agent)->mapping);
+    
+    model_readWriteUnlock();
     if ((*agent)->definition)
         definition_freeDefinition(&(*agent)->definition);
     model_readWriteLock();
-    zhash_delete(coreContext->createdAgents, (*agent)->uuid);
     free(*agent);
     *agent = NULL;
     model_readWriteUnlock();

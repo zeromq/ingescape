@@ -525,7 +525,7 @@ igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, 
     
     model_readWriteLock();
     //check that this agent has not been destroyed when we were locked
-    if (!agent || !(agent->context)){
+    if (!agent || !(agent->uuid)){
         model_readWriteUnlock();
         return IGS_SUCCESS;
     }

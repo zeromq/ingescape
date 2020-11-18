@@ -52,7 +52,7 @@ igs_result_t definition_addIOPToDefinition(igs_agent_t *agent, igs_iop_t *iop, i
     assert(def);
     model_readWriteLock();
     //check that this agent has not been destroyed when we were locked
-    if (!agent || !(agent->context)){
+    if (!agent || !(agent->uuid)){
         model_readWriteUnlock();
         return IGS_SUCCESS;
     }
@@ -194,7 +194,7 @@ void igsAgent_clearDefinition(igs_agent_t *agent){
     }
     model_readWriteLock();
     //check that this agent has not been destroyed when we were locked
-    if (!agent || !(agent->context)){
+    if (!agent || !(agent->uuid)){
         model_readWriteUnlock();
         return;
     }
@@ -313,7 +313,7 @@ igs_result_t igsAgent_removeInput(igs_agent_t *agent, const char *name){
     }
     model_readWriteLock();
     //check that this agent has not been destroyed when we were locked
-    if (!agent || !(agent->context)){
+    if (!agent || !(agent->uuid)){
         model_readWriteUnlock();
         return IGS_SUCCESS;
     }
@@ -335,7 +335,7 @@ igs_result_t igsAgent_removeOutput(igs_agent_t *agent, const char *name){
     }
     model_readWriteLock();
     //check that this agent has not been destroyed when we were locked
-    if (!agent || !(agent->context)){
+    if (!agent || !(agent->uuid)){
         model_readWriteUnlock();
         return IGS_SUCCESS;
     }
@@ -357,7 +357,7 @@ igs_result_t igsAgent_removeParameter(igs_agent_t *agent, const char *name){
     }
     model_readWriteLock();
     //check that this agent has not been destroyed when we were locked
-    if (!agent || !(agent->context)){
+    if (!agent || !(agent->uuid)){
         model_readWriteUnlock();
         return IGS_SUCCESS;
     }
@@ -373,7 +373,7 @@ void igsAgent_setDefinitionPath(igs_agent_t *agent, const char *path){
     assert(path);
     model_readWriteLock();
     //check that this agent has not been destroyed when we were locked
-    if (!agent || !(agent->context)){
+    if (!agent || !(agent->uuid)){
         model_readWriteUnlock();
         return;
     }
@@ -401,7 +401,7 @@ void igsAgent_writeDefinitionToPath(igs_agent_t *agent){
     }
     model_readWriteLock();
     //check that this agent has not been destroyed when we were locked
-    if (!agent || !(agent->context)){
+    if (!agent || !(agent->uuid)){
         model_readWriteUnlock();
         return;
     }
