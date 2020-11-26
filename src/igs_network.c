@@ -594,6 +594,7 @@ void handlePublicationFromRemoteAgent(zmsg_t *msg, igs_remote_agent_t *remoteAge
             free(output);
             output = NULL;
         }
+        zmsg_destroy(&dup);
     }
 }
 
