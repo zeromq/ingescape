@@ -166,20 +166,34 @@ COPY /Y ..\..\src\include\* ..\..\include\ingescape\</Command>
     <ClCompile Include="..\..\dependencies\yajl\src\yajl_parser.c" />
     <ClCompile Include="..\..\dependencies\yajl\src\yajl_tree.c" />
     <ClCompile Include="..\..\dependencies\yajl\src\yajl_version.c" />
-    <ClCompile Include="..\..\src\admin.c" />
-    <ClCompile Include="..\..\src\agent.c" />
-    <ClCompile Include="..\..\src\bus.c" />
-    <ClCompile Include="..\..\src\call.c" />
-    <ClCompile Include="..\..\src\definition.c" />
-    <ClCompile Include="..\..\src\global.c" />
-    <ClCompile Include="..\..\src\json.c" />
-    <ClCompile Include="..\..\src\license.c" />
-    <ClCompile Include="..\..\src\mapping.c" />
-    <ClCompile Include="..\..\src\model.c" />
-    <ClCompile Include="..\..\src\monitor.c" />
-    <ClCompile Include="..\..\src\network.c" />
-    <ClCompile Include="..\..\src\parser.c" />
-    <ClCompile Include="..\..\src\performance.c" />
+    <ClCompile Include="..\..\src\igs_admin.c" />
+    <ClCompile Include="..\..\src\igs_agent.c" />
+    <ClCompile Include="..\..\src\igs_bus.c" />
+    <ClCompile Include="..\..\src\igs_call.c" />
+    <ClCompile Include="..\..\src\igs_definition.c" />
+    <ClCompile Include="..\..\src\igs_global.c" />
+    <ClCompile Include="..\..\src\igs_json.c" />
+    <ClCompile Include="..\..\src\igs_license.c" />
+    <ClCompile Include="..\..\src\igs_mapping.c" />
+    <ClCompile Include="..\..\src\igs_model.c" />
+    <ClCompile Include="..\..\src\igs_monitor.c" />
+    <ClCompile Include="..\..\src\igs_network.c" />
+    <ClCompile Include="..\..\src\igs_parser.c" />
+    <ClCompile Include="..\..\src\igs_performance.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\third-party\czmq\builds\msvc\vs2017\libczmq\libczmq.vcxproj">
+      <Project>{0c4a2e28-8c9e-4b27-85d9-bb679ad84ac7}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\third-party\libsodium\builds\msvc\vs2017\libsodium\libsodium.vcxproj">
+      <Project>{a185b162-6cb6-4502-b03f-b56f7699a8d9}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\third-party\libzmq\builds\msvc\vs2017\x64\libzmq.vcxproj">
+      <Project>{f1b953db-2496-3db5-835f-ef2766da64ee}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\third-party\zyre\builds\msvc\vs2017\libzyre\libzyre.vcxproj">
+      <Project>{bf621796-b478-4fc7-9332-0d76ac83319d}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
