@@ -38,6 +38,61 @@ void core_initContext(){
     }
 }
 
+void igs_cleanContext(void){
+    if (coreContext != NULL){
+        igs_stop();
+        igs_monitoringDisable();
+        if (coreContext->createdAgents){
+            igs_agent_t *a =  (igs_agent_t*) zhash_first(coreContext->createdAgents);
+            while (a) {
+                igsAgent_destroy(&a);
+                a = zhash_next(coreContext->createdAgents);
+            }
+            zhash_destroy(&coreContext->createdAgents);
+        }
+        
+        license_cleanLicense(coreContext);
+        if (coreContext->licensePath != NULL)
+            free(coreContext->licensePath);
+        if (coreContext->licenseData != NULL)
+            free(coreContext->licenseData);
+        
+        if (coreContext->logFile)
+            fclose(coreContext->logFile);
+        
+        igs_freeze_callback_t *freezeElt, *freezeTmp;
+        DL_FOREACH_SAFE(coreContext->freezeCallbacks, freezeElt, freezeTmp){
+            DL_DELETE(coreContext->freezeCallbacks, freezeElt);
+            free(freezeElt);
+        }
+        igs_external_stop_calback_t *stopElt, *stopTmp;
+        DL_FOREACH_SAFE(coreContext->externalStopCalbacks, stopElt, stopTmp){
+            DL_DELETE(coreContext->externalStopCalbacks, stopElt);
+            free(stopElt);
+        }
+        zhash_destroy(&coreContext->brokers);
+        
+        if (coreContext->security_auth)
+            zactor_destroy (&(coreContext->security_auth));
+        if (coreContext->security_cert)
+            zcert_destroy (&(coreContext->security_cert));
+        if (coreContext->security_publicKeysDirectory != NULL)
+            free(coreContext->security_publicKeysDirectory);
+        
+        if (coreContext->elections){
+            zlist_t *e =  (zlist_t*) zhash_first(coreContext->elections);
+            while (e) {
+                zlist_destroy(&e);
+                e = zhash_next(coreContext->elections);
+            }
+            zhash_destroy(&coreContext->elections);
+        }
+        
+        free(coreContext);
+        coreContext = NULL;
+    }
+}
+
 //////////////////  CORE AGENT //////////////////
 void core_externalStopCB(void *myData){
     IGS_UNUSED(myData)

@@ -340,6 +340,7 @@ void license_parseLine(const char *command, const char *data, igs_license_t *myL
 // PRIVATE API
 ////////////////////////////////////////////////////////////////////////
 void license_cleanLicense(igs_core_context_t *context){
+    assert(context);
     license_readWriteLock();
     if (context->license != NULL){
         if (context->license->id != NULL){
@@ -734,9 +735,8 @@ void igs_setLicensePath(const char *path){
     char reviewedPath[IGS_MAX_PATH_LENGTH] = "";
     admin_makeFilePath(path, reviewedPath, IGS_MAX_PATH_LENGTH);
     if (zsys_file_exists(reviewedPath)){
-        if (coreContext->licensePath != NULL){
+        if (coreContext->licensePath != NULL)
             free(coreContext->licensePath);
-        }
         coreContext->licensePath = strdup(reviewedPath);
         license_readLicense(coreContext);
     }else{

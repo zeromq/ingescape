@@ -3686,7 +3686,7 @@ igs_result_t igsAgent_competeInElection(igs_agent_t *agent, const char *election
         coreContext->elections = zhash_new();
     
     //elections hash
-    zlist_t *election = zhash_lookup(coreContext->elections, elName);
+    zlist_t *election = (zlist_t *) zhash_lookup(coreContext->elections, elName);
     if (!election){
         election = zlist_new();
         zlist_autofree(election);

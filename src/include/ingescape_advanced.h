@@ -183,6 +183,13 @@ PUBLIC void igs_replayStart(void);
 PUBLIC void igs_replayPause(bool pause);
 PUBLIC void igs_replayTerminate(void);
 
+/*
+ CLEAN CONTEXT
+ Use this function when you absolutely need to clean all the Ingescape content
+ and you cannot stop your application to do so. This function SHALL NOT be used
+ in production environments.
+ */
+PUBLIC void igs_cleanContext(void);
 
 //////////////////////////////////////////////////
 // DATA SERIALIZATION using ZeroMQ
