@@ -384,6 +384,7 @@ int main(int argc, const char * argv[]) {
                 exit(1);
         }
     }
+    igs_cleanContext();
     igs_enableDataLogging(true);
     igs_enableCallLogging(true);
     
@@ -1413,8 +1414,8 @@ int main(int argc, const char * argv[]) {
 //                   10, "11:26:12", false, IGS_REPLAY_INPUT+IGS_REPLAY_OUTPUT, "firstAgent");
 //    igs_replayInit("puncher_replay.log",
 //                   10, "11:26:12", false, IGS_REPLAY_INPUT+IGS_REPLAY_OUTPUT+IGS_REPLAY_PARAMETER, "firstAgent");
-    igs_replayInit("puncher_replay.log",
-                   10, "11:26:12", false, IGS_REPLAY_INPUT+IGS_REPLAY_OUTPUT+IGS_REPLAY_PARAMETER+IGS_REPLAY_RECEIVED_CALL+IGS_REPLAY_SENT_CALL, "firstAgent");
+//    igs_replayInit("puncher_replay.log",
+//                   10, "11:26:12", false, IGS_REPLAY_INPUT+IGS_REPLAY_OUTPUT+IGS_REPLAY_PARAMETER+IGS_REPLAY_RECEIVED_CALL+IGS_REPLAY_SENT_CALL, "firstAgent");
 //    igs_replayTerminate();
 //    igs_replayInit("puncher_replay.log",
 //                   100, NULL, false, 0, NULL);
@@ -1567,6 +1568,7 @@ int main(int argc, const char * argv[]) {
     igsAgent_destroy(&secondAgent);
     igs_stop();
     igsAgent_destroy(&firstAgent);
+    igs_cleanContext();
 
     return EXIT_SUCCESS;
 }

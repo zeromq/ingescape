@@ -34,7 +34,7 @@
 		973D1BBB2226935400D363BF /* yajl_tree.h in Headers */ = {isa = PBXBuildFile; fileRef = 973D1BB52226935400D363BF /* yajl_tree.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		973D1BBC2226935400D363BF /* yajl_gen.h in Headers */ = {isa = PBXBuildFile; fileRef = 973D1BB62226935400D363BF /* yajl_gen.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		973D1BBD2226935400D363BF /* yajl_common.h in Headers */ = {isa = PBXBuildFile; fileRef = 973D1BB72226935400D363BF /* yajl_common.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		973D1BBE2226935400D363BF /* yajl_version.h in Headers */ = {isa = PBXBuildFile; fileRef = 973D1BB82226935400D363BF /* yajl_version.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		973D1BBE2226935400D363BF /* yajl_version.h in Headers */ = {isa = PBXBuildFile; fileRef = 973D1BB82226935400D363BF /* yajl_version.h */; };
 		973D1BC02226935400D363BF /* yajl_parse.h in Headers */ = {isa = PBXBuildFile; fileRef = 973D1BBA2226935400D363BF /* yajl_parse.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		973D1BC12226937A00D363BF /* yajl_tree.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 973D1BB52226935400D363BF /* yajl_tree.h */; };
 		973D1BC22226937A00D363BF /* yajl_gen.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 973D1BB62226935400D363BF /* yajl_gen.h */; };
@@ -516,6 +516,7 @@
 		9762EDB81EAE530B002062A1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = NO;
 				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -542,6 +543,7 @@
 		9762EDB91EAE530B002062A1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = NO;
 				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;

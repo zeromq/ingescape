@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "97D7090524C1F137008825B0"
-               BuildableName = "puncher"
-               BlueprintName = "puncher"
-               ReferencedContainer = "container:testing.xcodeproj">
+               BlueprintIdentifier = "9762EDB11EAE530B002062A1"
+               BuildableName = "yajl.framework"
+               BlueprintName = "yajl-xcode"
+               ReferencedContainer = "container:yajl.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -40,16 +40,6 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "97D7090524C1F137008825B0"
-            BuildableName = "puncher"
-            BlueprintName = "puncher"
-            ReferencedContainer = "container:testing.xcodeproj">
-         </BuildableReference>
-      </BuildableProductRunnable>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -57,16 +47,15 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "97D7090524C1F137008825B0"
-            BuildableName = "puncher"
-            BlueprintName = "puncher"
-            ReferencedContainer = "container:testing.xcodeproj">
+            BlueprintIdentifier = "9762EDB11EAE530B002062A1"
+            BuildableName = "yajl.framework"
+            BlueprintName = "yajl-xcode"
+            ReferencedContainer = "container:yajl.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
