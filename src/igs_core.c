@@ -51,7 +51,10 @@ void igs_cleanContext(void){
             zhash_destroy(&coreContext->createdAgents);
         }
         
+    #if !TARGET_OS_IOS
         license_cleanLicense(coreContext);
+    #endif
+        
         if (coreContext->licensePath != NULL)
             free(coreContext->licensePath);
         if (coreContext->licenseData != NULL)
