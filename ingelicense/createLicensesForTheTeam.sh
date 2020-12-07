@@ -81,8 +81,8 @@ ingelicense \
     --id EurocontrolPJ09 \
     --customer "Eurocontrol PJ09" \
     --order Eval \
-    --expiration 2020/12/31 \
-    --editorExpiration 2020/12/31 \
+    --expiration 2050/12/31 \
+    --editorExpiration 2050/12/31 \
     --editorOwner "Eurocontrol PJ09" \
     --features ./configs/features.txt \
     --agents ./configs/agents.txt \
