@@ -52,7 +52,10 @@ void igs_cleanContext(void){
         }
         coreAgent = NULL;
         
+    #if !TARGET_OS_IOS
         license_cleanLicense(coreContext);
+    #endif
+        
         if (coreContext->licensePath != NULL)
             free(coreContext->licensePath);
         if (coreContext->licenseData != NULL)
