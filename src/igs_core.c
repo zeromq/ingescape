@@ -50,6 +50,7 @@ void igs_cleanContext(void){
             }
             zhash_destroy(&coreContext->createdAgents);
         }
+        coreAgent = NULL;
         
         license_cleanLicense(coreContext);
         if (coreContext->licensePath != NULL)
