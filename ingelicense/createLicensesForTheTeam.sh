@@ -131,11 +131,11 @@ echo ""
 echo "License for Navocap"
 ingelicense \
     --id Navocap \
-    --customer "Navocap" \
+    --customer "Navocap PCVA" \
     --order PCVA \
-    --expiration 2021/03/31 \
-    --editorExpiration 2021/03/31 \
-    --editorOwner "Navocap" \
+    --expiration 2025/12/31 \
+    --editorExpiration 2025/12/31 \
+    --editorOwner "Navocap PCVA" \
     --features ./configs/features.txt \
     --agents ./configs/agents.txt \
     --output ./licenses/Navocap.igslicense
