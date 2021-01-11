@@ -20,6 +20,12 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/modules/
 include(IngescapeHelper)
 include(IdentifyOS)
 
+# Override default release flags to not define NDEBUG, which CMake sets by default for Release builds
+# NB: The NDEBUG flag compile out all assert() calls, skipping whatever was done in the assert call (function call, computation, etc.)
+# It changes the compiled code from the source code and we don't want that.
+set(CMAKE_C_FLAGS_RELEASE "-O3")
+
+
 # Default build mode is debug
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Debug)
