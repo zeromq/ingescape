@@ -20,11 +20,6 @@ stages:
       - CMakeLists.txt
 
 
-# Submodule strategy
-before_script:
-  - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
-
-
 # Global variables. Can be used by any jobs
 variables:
   VS_CMAKE_GENERATOR: "Visual Studio 15 2017"
@@ -45,6 +40,8 @@ lib-build-macos:
   stage: lib-build
   tags:
     - osx
+  before_script:
+    - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - git clean -xfd
     - mkdir -p build
@@ -129,6 +126,8 @@ lib-windows-release-x64:
     - windows
   variables:
     ARCH: "Release_x64"
+  before_script:
+    - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - mkdir build\ReleaseX64
     - cmake -S . -B build\ReleaseX64 -G"$env:VS_CMAKE_GENERATOR Win64" -DCMAKE_BUILD_TYPE=Release -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
@@ -148,6 +147,8 @@ lib-windows-release-x86:
     - windows
   variables:
     ARCH: "Release_x86"
+  before_script:
+    - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - mkdir build\ReleaseX86
     - cmake -S . -B build\ReleaseX86 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
@@ -167,6 +168,8 @@ lib-windows-debug-x64:
     - windows
   variables:
     ARCH: "Debug_x64"
+  before_script:
+    - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - mkdir build\DebugX64
     - cmake -S . -B build\DebugX64 -G"$env:VS_CMAKE_GENERATOR Win64" -DCMAKE_BUILD_TYPE=Debug -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
@@ -186,6 +189,8 @@ lib-windows-debug-x86:
     - windows
   variables:
     ARCH: "Debug_x86"
+  before_script:
+    - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - mkdir build\DebugX86
     - cmake -S . -B build\DebugX86 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Debug -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
