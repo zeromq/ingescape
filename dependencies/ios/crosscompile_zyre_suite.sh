@@ -2,18 +2,15 @@
 
 #configure xcode path
 sudo xcode-select --switch /Applications/Xcode.app
+cd ..
 
 #get git repos
-git clone ssh://git@gitlab.ingescape.com:2222/third-party/curl.git
-git clone -b stable ssh://git@gitlab.ingescape.com:2222/third-party/libsodium.git
-git clone ssh://git@gitlab.ingescape.com:2222/third-party/libzmq.git
-git clone ssh://git@gitlab.ingescape.com:2222/third-party/czmq.git
-git clone ssh://git@gitlab.ingescape.com:2222/third-party/zyre.git
+git clone ssh://git@gitlab.ingescape.com:22222/third-party/curl.git
 
 #run autoconf (to enable later call to configure in script)
 cd curl
 ./buildconf
-cd ../libsodium
+cd ../sodium
 ./autogen.sh
 cd ../libzmq
 ./autogen.sh
@@ -24,38 +21,44 @@ cd ../zyre
 cd ..
 
 #compile curl required by CZMQ
-./crosscompile.sh $PWD/curl/ libcurl.a
+./ios/crosscompile.sh $PWD/curl/ libcurl.a
 
 #copy curl/output in libsodium
-cp -R curl/output libsodium/
+cp -R curl/output sodium/
 #compile sodium
-./crosscompile.sh $PWD/libsodium/ libsodium.a
+./ios/crosscompile.sh $PWD/sodium/ libsodium.a
 
 #copy libsodium/output in libzmq
-cp -R libsodium/output libzmq/
+cp -R sodium/output libzmq/
 #compile libzmq
-./crosscompile-libzmq-with-sodium.sh $PWD/libzmq/ libzmq.a
+./ios/crosscompile-libzmq-with-sodium.sh $PWD/libzmq/ libzmq.a
 
 #copy libzmq/output in czmq
 cp -R libzmq/output ./czmq/
 #compile czmq
-./crosscompile.sh $PWD/czmq/ libczmq.a
+./ios/crosscompile.sh $PWD/czmq/ libczmq.a
 
 #copy czmq/output in zyre
 cp -R czmq/output ./zyre/
 #compile zyre
-./crosscompile.sh $PWD/zyre/ libzyre.a
+./ios/crosscompile.sh $PWD/zyre/ libzyre.a
 
 #archive and clean
-mkdir ios
-mkdir ios/lib
-mkdir ios/include
-cp ./curl/libcurl.a ./ios/lib/
-cp ./libsodium/libsodium.a ./ios/lib/
-cp ./libzmq/libzmq.a ./ios/lib/
-cp ./czmq/libczmq.a ./ios/lib/
-cp ./zyre/libzyre.a ./ios/lib/
+mkdir -p ios/lib
+mkdir -p ios/include
+mv ./curl/libcurl.a ./ios/lib/
+mv ./sodium/libsodium.a ./ios/lib/
+mv ./libzmq/libzmq.a ./ios/lib/
+mv ./czmq/libczmq.a ./ios/lib/
+mv ./zyre/libzyre.a ./ios/lib/
 cp -R zyre/output/arm64/include/* ./ios/include/
-mkdir ios/perPlatform
+mkdir -p ios/perPlatform
 cp -R zyre/output/* ios/perPlatform/
-rm -Rf curl libzmq czmq zyre libsodium
+
+rm -Rf curl
+rm -Rf sodium/output
+rm -Rf libzmq/output
+rm -Rf czmq/output
+rm -Rf zyre/output
+
+cd ios

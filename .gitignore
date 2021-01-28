@@ -63,3 +63,6 @@ ingelicense/licenses/vincentPeyrqueou.igslicense
 AirbusControlDeck.igslicense
 bindings/c#/IngescapeCSharpWrapper/CSharpSampleAgent/CSharpSampleAgent.csproj.user
 ingelicense/licenses
+dependencies/ios/include
+dependencies/ios/lib
+dependencies/ios/perPlatform

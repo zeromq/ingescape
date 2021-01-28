@@ -143,13 +143,194 @@ source_group("Header Files" FILES ${ingescape_private_headers} ${ingescape_heade
 ########################################################################
 # Dependencies
 ########################################################################
-find_package(libsodium REQUIRED)
-find_package(ZeroMQ 4.3.3 REQUIRED)
-message(STATUS "Found ZeroMQ version: ${ZeroMQ_VERSION}")
-find_package(czmq 4.2.1 REQUIRED)
-message(STATUS "Found czmq version: ${czmq_VERSION}")
-find_package(zyre 2.0.1 REQUIRED)
-message(STATUS "Found zyre version: ${zyre_VERSION}")
+
+
+message(STATUS "Sodium dependency ...")
+if(UNIX)
+  include(ExternalProject)
+  set(SODIUM_SOURCE_DIR
+      ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/sodium)
+  ExternalProject_Add(
+    sodium
+    SOURCE_DIR ${SODIUM_SOURCE_DIR}
+    CMAKE_ARGS ${GLOBAL_DEFAULT_ARGS} ${GLOBAL_THIRDPARTY_LIB_ARGS}
+    BUILD_COMMAND make -j8
+    INSTALL_COMMAND make DESTDIR=${CMAKE_CURRENT_BINARY_DIR}/ install)
+
+
+  set(LIB_DIR "${CMAKE_CURRENT_BINARY_DIR}/usr/local/lib")
+  set(INC_DIR "${CMAKE_CURRENT_BINARY_DIR}/usr/local/include")
+  if(APPLE)
+    set(SODIUM_LIBRARIES "${LIB_DIR}/libsodium.dylib")
+    install(DIRECTORY "${LIB_DIR}" DESTINATION /usr/local PATTERN "*.dylib")
+    install(DIRECTORY "${INC_DIR}" DESTINATION /usr/local PATTERN "*.h")
+  else(APPLE)
+    set(SODIUM_LIBRARIES "${LIB_DIR}/x86_64-linux-gnu/libsodium.so")
+    install(DIRECTORY "${LIB_DIR}/x86_64-linux-gnu" DESTINATION /usr/local PATTERN "*.so")
+    install(DIRECTORY "${INC_DIR}" DESTINATION /usr/local PATTERN "*.h")
+  endif(APPLE)
+endif(UNIX)
+
+if(WIN32)
+    include(ExternalProject)
+    set(SODIUM_SOURCE_DIR
+        ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/sodium)
+    ExternalProject_Add(
+      sodium
+      SOURCE_DIR ${SODIUM_SOURCE_DIR}
+      CMAKE_ARGS ${GLOBAL_DEFAULT_ARGS} ${GLOBAL_THIRDPARTY_LIB_ARGS} -G${CMAKE_GENERATOR} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+      BUILD_COMMAND cmake --build . --target ALL_BUILD --config ${CMAKE_BUILD_TYPE}
+      INSTALL_COMMAND cmake --install . --prefix ${CMAKE_CURRENT_BINARY_DIR} --config ${CMAKE_BUILD_TYPE})
+
+    set(BIN_DIR "${CMAKE_CURRENT_BINARY_DIR}/bin")
+    set(LIB_DIR "${CMAKE_CURRENT_BINARY_DIR}/lib")
+    set(INC_DIR "${CMAKE_CURRENT_BINARY_DIR}/include")
+    set(SODIUM_LIBRARIES "${LIB_DIR}/sodium.lib")
+    install(DIRECTORY "${BIN_DIR}" DESTINATION lib PATTERN "*.dll")
+    install(DIRECTORY "${INC_DIR}" DESTINATION include PATTERN "*.h")
+endif(WIN32)
+
+
+message(STATUS "ZeroMQ dependency ...")
+if(UNIX)
+  include(ExternalProject)
+  set(ZEROMQ_SOURCE_DIR
+      ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libzmq)
+  ExternalProject_Add(
+    libzmq
+    SOURCE_DIR ${ZEROMQ_SOURCE_DIR}
+    CMAKE_ARGS ${GLOBAL_DEFAULT_ARGS} ${GLOBAL_THIRDPARTY_LIB_ARGS} -DWITH_LIBSODIUM=ON -DENABLE_DRAFTS=ON -DCMAKE_PREFIX_PATH=${CMAKE_CURRENT_BINARY_DIR}/usr/local -DWITH_TLS=OFF
+    BUILD_COMMAND make -j8
+    INSTALL_COMMAND make DESTDIR=${CMAKE_CURRENT_BINARY_DIR}/ install)
+
+
+  set(LIB_DIR "${CMAKE_CURRENT_BINARY_DIR}/usr/local/lib")
+  set(INC_DIR "${CMAKE_CURRENT_BINARY_DIR}/usr/local/include")
+  if(APPLE)
+    set(ZEROMQ_LIBRARIES "${LIB_DIR}/libzmq.dylib")
+    install(DIRECTORY "${LIB_DIR}" DESTINATION /usr/local PATTERN "*.dylib")
+    install(DIRECTORY "${INC_DIR}" DESTINATION /usr/local PATTERN "*.h")
+  else(APPLE)
+    set(ZEROMQ_LIBRARIES "${LIB_DIR}/x86_64-linux-gnu/libzmq.so")
+    install(DIRECTORY "${LIB_DIR}/x86_64-linux-gnu" DESTINATION /usr/local PATTERN "*.so")
+    install(DIRECTORY "${INC_DIR}" DESTINATION /usr/local PATTERN "*.h")
+  endif(APPLE)
+
+endif(UNIX)
+
+if(WIN32)
+    include(ExternalProject)
+    set(ZEROMQ_SOURCE_DIR
+        ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libzmq)
+
+    ExternalProject_Add(
+      libzmq
+      SOURCE_DIR ${ZEROMQ_SOURCE_DIR}
+      CMAKE_ARGS ${GLOBAL_DEFAULT_ARGS} ${GLOBAL_THIRDPARTY_LIB_ARGS} -G${CMAKE_GENERATOR} -DCMAKE_PREFIX_PATH="${CMAKE_CURRENT_BINARY_DIR}/bin;${CMAKE_CURRENT_BINARY_DIR}/lib" -DWITH_LIBSODIUM=ON -DBUILD_STATIC=OFF -DENABLE_DRAFTS=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DWITH_TLS=OFF
+      BUILD_COMMAND cmake --build . --target ALL_BUILD --config ${CMAKE_BUILD_TYPE}
+      INSTALL_COMMAND cmake --install . --prefix ${CMAKE_CURRENT_BINARY_DIR} --config ${CMAKE_BUILD_TYPE})
+
+    set(BIN_DIR "${CMAKE_CURRENT_BINARY_DIR}/bin")
+    set(LIB_DIR "${CMAKE_CURRENT_BINARY_DIR}/lib")
+    set(INC_DIR "${CMAKE_CURRENT_BINARY_DIR}/include")
+    install(DIRECTORY "${BIN_DIR}" DESTINATION lib PATTERN "*.dll")
+    install(DIRECTORY "${INC_DIR}" DESTINATION include PATTERN "*.h")
+
+    set(_zmq_version 4_3_4)
+endif(WIN32)
+
+message(STATUS "CZMQ dependency ...")
+if(UNIX)
+  include(ExternalProject)
+  set(CZMQ_SOURCE_DIR
+      ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/czmq)
+  ExternalProject_Add(
+    czmq
+    SOURCE_DIR ${CZMQ_SOURCE_DIR}
+    CMAKE_ARGS ${GLOBAL_DEFAULT_ARGS} ${GLOBAL_THIRDPARTY_LIB_ARGS} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DENABLE_DRAFTS=ON -DCMAKE_PREFIX_PATH=${CMAKE_CURRENT_BINARY_DIR}/usr/local
+    BUILD_COMMAND make -j8
+    INSTALL_COMMAND make DESTDIR=${CMAKE_CURRENT_BINARY_DIR}/ install)
+
+
+  set(LIB_DIR "${CMAKE_CURRENT_BINARY_DIR}/usr/local/lib")
+  set(INC_DIR "${CMAKE_CURRENT_BINARY_DIR}/usr/local/include")
+  if(APPLE)
+    set(CZMQ_LIBRARIES "${LIB_DIR}/libczmq.dylib")
+    install(DIRECTORY "${LIB_DIR}" DESTINATION /usr/local PATTERN "*.dylib")
+    install(DIRECTORY "${INC_DIR}" DESTINATION /usr/local PATTERN "*.h")
+  else(APPLE)
+    set(CZMQ_LIBRARIES "${LIB_DIR}/x86_64-linux-gnu/libczmq.so")
+    install(DIRECTORY "${LIB_DIR}/x86_64-linux-gnu" DESTINATION /usr/local PATTERN "*.so")
+    install(DIRECTORY "${INC_DIR}" DESTINATION /usr/local PATTERN "*.h")
+  endif(APPLE)
+
+endif(UNIX)
+if(WIN32)
+    include(ExternalProject)
+    set(CZMQ_SOURCE_DIR
+        ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/czmq)
+    ExternalProject_Add(
+      czmq
+      SOURCE_DIR ${CZMQ_SOURCE_DIR}
+      CMAKE_ARGS ${GLOBAL_DEFAULT_ARGS} ${GLOBAL_THIRDPARTY_LIB_ARGS} -G${CMAKE_GENERATOR} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DENABLE_DRAFTS=ON -DCMAKE_PREFIX_PATH=${CMAKE_CURRENT_BINARY_DIR} -DCZMQ_BUILD_STATIC=OFF
+      BUILD_COMMAND cmake --build . --target ALL_BUILD --config ${CMAKE_BUILD_TYPE}
+      INSTALL_COMMAND cmake --install . --prefix ${CMAKE_CURRENT_BINARY_DIR} --config ${CMAKE_BUILD_TYPE})
+
+    set(BIN_DIR "${CMAKE_CURRENT_BINARY_DIR}/bin")
+    set(LIB_DIR "${CMAKE_CURRENT_BINARY_DIR}/lib")
+    set(INC_DIR "${CMAKE_CURRENT_BINARY_DIR}/include")
+    set(CZMQ_LIBRARIES "${LIB_DIR}/czmq.lib")
+    install(DIRECTORY "${BIN_DIR}" DESTINATION lib PATTERN "*.dll")
+    install(DIRECTORY "${INC_DIR}" DESTINATION include PATTERN "*.h")
+endif(WIN32)
+
+message(STATUS "Zyre dependency ...")
+if(UNIX)
+  include(ExternalProject)
+  set(ZYRE_SOURCE_DIR
+      ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/zyre)
+  ExternalProject_Add(
+    zyre
+    SOURCE_DIR ${ZYRE_SOURCE_DIR}
+    CMAKE_ARGS ${GLOBAL_DEFAULT_ARGS} ${GLOBAL_THIRDPARTY_LIB_ARGS} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DENABLE_DRAFTS=ON -DCMAKE_PREFIX_PATH=${CMAKE_CURRENT_BINARY_DIR}/usr/local
+    BUILD_COMMAND make -j8
+    INSTALL_COMMAND make DESTDIR=${CMAKE_CURRENT_BINARY_DIR}/ install)
+
+
+  set(LIB_DIR "${CMAKE_CURRENT_BINARY_DIR}/usr/local/lib")
+  set(INC_DIR "${CMAKE_CURRENT_BINARY_DIR}/usr/local/include")
+  if(APPLE)
+    set(ZYRE_LIBRARIES "${LIB_DIR}/libzyre.dylib")
+    install(DIRECTORY "${LIB_DIR}" DESTINATION /usr/local PATTERN "*.dylib")
+    install(DIRECTORY "${INC_DIR}" DESTINATION /usr/local PATTERN "*.h")
+  else(APPLE)
+    set(ZYRE_LIBRARIES "${LIB_DIR}/x86_64-linux-gnu/libzyre.so")
+    install(DIRECTORY "${LIB_DIR}/x86_64-linux-gnu" DESTINATION /usr/local PATTERN "*.so")
+    install(DIRECTORY "${INC_DIR}" DESTINATION /usr/local PATTERN "*.h")
+  endif(APPLE)
+endif(UNIX)
+if(WIN32)
+  include(ExternalProject)
+  set(ZYRE_SOURCE_DIR
+      ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/zyre)
+  ExternalProject_Add(
+    zyre
+    SOURCE_DIR ${ZYRE_SOURCE_DIR}
+    CMAKE_ARGS ${GLOBAL_DEFAULT_ARGS} ${GLOBAL_THIRDPARTY_LIB_ARGS} -DCMAKE_VERBOSE_MAKEFILE=ON -G${CMAKE_GENERATOR} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DENABLE_DRAFTS=ON -DCMAKE_PREFIX_PATH=${CMAKE_CURRENT_BINARY_DIR} -DZYRE_BUILD_STATIC=OFF
+    BUILD_COMMAND cmake --build . --target ALL_BUILD --config ${CMAKE_BUILD_TYPE}
+    INSTALL_COMMAND cmake --install . --prefix ${CMAKE_CURRENT_BINARY_DIR} --config ${CMAKE_BUILD_TYPE})
+
+  set(BIN_DIR "${CMAKE_CURRENT_BINARY_DIR}/bin")
+  set(LIB_DIR "${CMAKE_CURRENT_BINARY_DIR}/lib")
+  set(INC_DIR "${CMAKE_CURRENT_BINARY_DIR}/include")
+  set(ZYRE_LIBRARIES "${LIB_DIR}/zyre.lib")
+  install(DIRECTORY "${BIN_DIR}" DESTINATION lib PATTERN "*.dll")
+  install(DIRECTORY "${INC_DIR}" DESTINATION include PATTERN "*.h")
+endif(WIN32)
+
+#find_package(zyre 2.0.1 REQUIRED)
+#message(STATUS "Found zyre version: ${zyre_VERSION}")
+
 
 if (APPLE)
   find_library(CORE_FRAMEWORK CoreFoundation)
@@ -184,6 +365,31 @@ endif()
 # shared
 if(INGESCAPE_BUILD_SHARED)
   add_library(${PROJECT_NAME} SHARED ${ingescape_sources})
+
+  add_dependencies(libzmq sodium)
+  message(STATUS "SODIUM_LIBRARIES: ${SODIUM_LIBRARIES}")
+  target_link_libraries(${PROJECT_NAME} PRIVATE ${SODIUM_LIBRARIES})
+
+  # We need to specify the full name of the .LIB for ZeroMQ on Windows.
+  if (WIN32)
+    if (CMAKE_BUILD_TYPE STREQUAL "Release")
+      set(ZEROMQ_LIBRARIES "${CMAKE_CURRENT_BINARY_DIR}/lib/libzmq-${CMAKE_VS_PLATFORM_TOOLSET}-mt-${_zmq_version}.lib")
+    else ()
+      set(ZEROMQ_LIBRARIES "${CMAKE_CURRENT_BINARY_DIR}/lib/libzmq-${CMAKE_VS_PLATFORM_TOOLSET}-mt-gd-${_zmq_version}.lib")
+    endif()
+  endif()
+
+  add_dependencies(czmq libzmq)
+  message(STATUS "ZEROMQ_LIBRARIES: ${ZEROMQ_LIBRARIES}")
+  target_link_libraries(${PROJECT_NAME} PRIVATE ${ZEROMQ_LIBRARIES})
+
+  add_dependencies(zyre czmq)
+  message(STATUS "CZMQ_LIBRARIES: ${CZMQ_LIBRARIES}")
+  target_link_libraries(${PROJECT_NAME} PRIVATE ${CZMQ_LIBRARIES})
+
+  add_dependencies(${PROJECT_NAME} zyre)
+  message(STATUS "ZYRE_LIBRARIES: ${ZYRE_LIBRARIES}")
+  target_link_libraries(${PROJECT_NAME} PRIVATE ${ZYRE_LIBRARIES})
 
   # OS specifig target properties
   if(MSVC)
@@ -227,12 +433,7 @@ if(INGESCAPE_BUILD_SHARED)
   # Add linked dependencies
   #FIXME All private here ?
   target_link_libraries(${PROJECT_NAME}
-    PUBLIC
-      czmq
-      libzmq
     PRIVATE
-      ${LIBSODIUM_LIBRARIES}
-      zyre
       $<$<BOOL:${APPLE}>:${CORE_FRAMEWORK}>
       $<$<BOOL:${WIN32}>:ws2_32>
   )
@@ -243,9 +444,10 @@ if(INGESCAPE_BUILD_SHARED)
       $<INSTALL_INTERFACE:include>
       $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/include>
     PRIVATE
-      ${LIBSODIUM_INCLUDE_DIRS}
+      $<$<BOOL:${UNIX}>:${CMAKE_CURRENT_BINARY_DIR}/usr/local/include>
       ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/yajl/src/api
       $<$<BOOL:${WIN32}>:${CMAKE_CURRENT_SOURCE_DIR}/dependencies/windows/unix>
+      $<$<BOOL:${WIN32}>:${CMAKE_CURRENT_BINARY_DIR}/include>
   )
 
   install(TARGETS ${PROJECT_NAME}
@@ -265,6 +467,31 @@ endif()
 # static
 if(INGESCAPE_BUILD_STATIC)
   add_library(${PROJECT_NAME}-static STATIC ${ingescape_sources})
+
+  add_dependencies(libzmq sodium)
+  message(STATUS "SODIUM_LIBRARIES: ${SODIUM_LIBRARIES}")
+  target_link_libraries(${PROJECT_NAME}-static PRIVATE ${SODIUM_LIBRARIES})
+
+  # We need to specify the full name of the .LIB for ZeroMQ on Windows.
+  if (WIN32)
+    if (CMAKE_BUILD_TYPE STREQUAL "Release")
+      set(ZEROMQ_LIBRARIES "${CMAKE_CURRENT_BINARY_DIR}/lib/libzmq-${CMAKE_VS_PLATFORM_TOOLSET}-mt-s-${_zmq_version}.lib")
+    else ()
+      set(ZEROMQ_LIBRARIES "${CMAKE_CURRENT_BINARY_DIR}/lib/libzmq-${CMAKE_VS_PLATFORM_TOOLSET}-mt-sgd-${_zmq_version}.lib")
+    endif()
+  endif()
+
+  add_dependencies(czmq libzmq)
+  message(STATUS "ZEROMQ_LIBRARIES: ${ZEROMQ_LIBRARIES}")
+  target_link_libraries(${PROJECT_NAME}-static PRIVATE ${ZEROMQ_LIBRARIES})
+
+  add_dependencies(zyre czmq)
+  message(STATUS "CZMQ_LIBRARIES: ${CZMQ_LIBRARIES}")
+  target_link_libraries(${PROJECT_NAME}-static PRIVATE ${CZMQ_LIBRARIES})
+
+  add_dependencies(${PROJECT_NAME}-static zyre)
+  message(STATUS "ZYRE_LIBRARIES: ${ZYRE_LIBRARIES}")
+  target_link_libraries(${PROJECT_NAME}-static PRIVATE ${ZYRE_LIBRARIES})
 
   # OS specifig target properties
   if(MSVC)
@@ -292,10 +519,6 @@ if(INGESCAPE_BUILD_STATIC)
   #FIXME All private here ?
   target_link_libraries(${PROJECT_NAME}-static
     PRIVATE
-      czmq
-      ${LIBSODIUM_LIBRARIES}
-      libzmq
-      zyre
       $<$<BOOL:${APPLE}>:${CORE_FRAMEWORK}>
       $<$<BOOL:${WIN32}>:ws2_32>
   )
@@ -306,9 +529,10 @@ if(INGESCAPE_BUILD_STATIC)
       $<INSTALL_INTERFACE:include>
       $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/include>
     PRIVATE
-      ${LIBSODIUM_INCLUDE_DIRS}
+      $<$<BOOL:${UNIX}>:${CMAKE_CURRENT_BINARY_DIR}/usr/local/include>
       ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/yajl/src/api
       $<$<BOOL:${WIN32}>:${CMAKE_CURRENT_SOURCE_DIR}/dependencies/windows/unix>
+      $<$<BOOL:${WIN32}>:${CMAKE_CURRENT_BINARY_DIR}/include>
   )
 
   # Release build compile with -O2 flag
@@ -469,38 +693,26 @@ if(NOT CMAKE_TOOLCHAIN_FILE)
     ${LIBSODIUM_INCLUDE_DIRS}/sodium/version.h
   )
 
-  # Variable holding the zyre public headers to install with ingescape
-  #NB: This variable is manually set from the zyre CMakeLists.txt file
-  get_target_property(ZYRE_PUBLIC_HEADERS_DIR zyre INTERFACE_INCLUDE_DIRECTORIES)
-  set(ZYRE_PUBLIC_HEADERS
-    ${ZYRE_PUBLIC_HEADERS_DIR}/zyre_library.h
-    ${ZYRE_PUBLIC_HEADERS_DIR}/zyre.h
-    ${ZYRE_PUBLIC_HEADERS_DIR}/zyre_event.h
-    ${ZYRE_PUBLIC_HEADERS_DIR}/zre_msg.h
-    ${ZYRE_PUBLIC_HEADERS_DIR}/zyre_peer.h
-    ${ZYRE_PUBLIC_HEADERS_DIR}/zyre_group.h
-    ${ZYRE_PUBLIC_HEADERS_DIR}/zyre_election.h
-    ${ZYRE_PUBLIC_HEADERS_DIR}/zyre_node.h
-  )
 
-  # Install czmq & ZeroMQ headers since they are in our INTERFACE
-  install(
-    FILES
-      ${SODIUM_PUBLIC_HEADERS}
-      ${ZMQ_PUBLIC_HEADERS}
-      ${CZMQ_PUBLIC_HEADERS}
-      ${ZYRE_PUBLIC_HEADERS}
-    DESTINATION
-      include
-    COMPONENT library
-  )
-  install(
-    FILES
-      ${SODIUM_PUBLIC_HEADERS_SUBDIR}
-    DESTINATION
-      include/sodium
-    COMPONENT library
-  )
+
+  #Install czmq & ZeroMQ headers since they are in our INTERFACE
+  # install(
+  #   FILES
+  #     ${SODIUM_PUBLIC_HEADERS}
+  #     ${ZMQ_PUBLIC_HEADERS}
+  #     ${CZMQ_PUBLIC_HEADERS}
+  #     ${ZYRE_PUBLIC_HEADERS}
+  #   DESTINATION
+  #     include
+  #   COMPONENT library
+  # )
+  # install(
+  #   FILES
+  #     ${SODIUM_PUBLIC_HEADERS_SUBDIR}
+  #   DESTINATION
+  #     include/sodium
+  #   COMPONENT library
+  # )
 
   message(STATUS "ZMQ and CZMQ files installed")
 endif(NOT CMAKE_TOOLCHAIN_FILE)
@@ -588,7 +800,7 @@ if((WIN32) OR (CMAKE_BUILD_TYPE STREQUAL "Release"))
   set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}")
   set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
   set(CPACK_STRIP_FILES TRUE)
- 
+
   set(
     CPACK_SOURCE_IGNORE_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/bindings/;${CMAKE_CURRENT_SOURCE_DIR}/build/;${CMAKE_CURRENT_SOURCE_DIR}/.git/;${CMAKE_CURRENT_SOURCE_DIR}/doc/;${CMAKE_CURRENT_SOURCE_DIR}/applications/;${CMAKE_CURRENT_SOURCE_DIR}/ingeprobe/;${CMAKE_CURRENT_SOURCE_DIR}/packaging/"
@@ -624,8 +836,12 @@ if((WIN32) OR (CMAKE_BUILD_TYPE STREQUAL "Release"))
     set(CPACK_MONOLITHIC_INSTALL ON)
 
     set(CPACK_GENERATOR "NSIS;ZIP")
-    # On windows we want to package these libraries
-    install_igs_lib_dependencies()
+
+    # Add dependencies to installation
+    install_dll_from_lib(SODIUM_LIBRARIES)
+    install_dll_from_lib(ZEROMQ_LIBRARIES)
+    install_dll_from_lib(CZMQ_LIBRARIES)
+    install_dll_from_lib(ZYRE_LIBRARIES)
 
     file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/README.txt
          "The bin directory is empty after installation on purpose.\r\n"
@@ -640,7 +856,7 @@ if((WIN32) OR (CMAKE_BUILD_TYPE STREQUAL "Release"))
     set(CPACK_COMPONENTS_ALL library)
     set(CPACK_PACKAGING_INSTALL_PREFIX "/usr/local")
     set(CPACK_SYSTEM_NAME "macos")
-   
+
     #set(CPACK_PRODUCTBUILD_IDENTITY_NAME "Developer ID Installer: Ingenuity i/o (56DRT9MG9S)")
     #set(CPACK_PRODUCTBUILD_KEYCHAIN_PATH "$ENV{HOME}/Library/Keychains/login.keychain")
     #set(CPACK_PKGBUILD_IDENTITY_NAME "Developer ID Installer: Ingenuity i/o (56DRT9MG9S)")
@@ -649,18 +865,22 @@ if((WIN32) OR (CMAKE_BUILD_TYPE STREQUAL "Release"))
     set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_SOURCE_DIR}/builds/xcode/WELCOME.txt")
     set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/builds/xcode/README.txt")
 
+    # Add dependencies to installation
+    install_dll_from_lib(SODIUM_LIBRARIES)
+    install_dll_from_lib(ZEROMQ_LIBRARIES)
+    install_dll_from_lib(CZMQ_LIBRARIES)
+    install_dll_from_lib(ZYRE_LIBRARIES)
+
     # Without extention productbuild will crash So we just copy License file in
     # build folder with an extension
     configure_file("${CMAKE_CURRENT_SOURCE_DIR}/LICENSE"
                    "${CMAKE_BINARY_DIR}/LICENSE.txt" COPYONLY)
     set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_BINARY_DIR}/LICENSE.txt")
-   
+
     set(CPACK_PREFLIGHT_LIBRARY_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/builds/xcode/preflight.sh")
     set(CPACK_POSTFLIGHT_LIBRARY_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/builds/xcode/postflight.sh")
 
     set(CPACK_GENERATOR "productbuild")
-    #FIXME TODO We will package dependencies within the ingescape.framework. Will be needed when ingescape.framework will be a thing.
-    install_igs_lib_dependencies()
 
   else()
     set(CPACK_MONOLITHIC_INSTALL ON)

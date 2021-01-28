@@ -1,6 +1,16 @@
-[submodule "doc/themes/hugo-universal"]
-	path = doc/themes/hugo-universal
-	url = https://github.com/devcows/hugo-universal-theme
-[submodule "applications/dependencies/cassandra-cpp-driver"]
-	path = applications/dependencies/cassandra-cpp-driver
-	url = ../../third-party/cassandra-cpp-driver.git
+[submodule "dependencies/sodium"]
+	path = dependencies/sodium
+	url = ssh://git@gitlab.ingescape.com:22222/third-party/libsodium.git
+	branch = stable
+[submodule "dependencies/libzmq"]
+	path = dependencies/libzmq
+	url = ssh://git@gitlab.ingescape.com:22222/third-party/libzmq.git
+	branch = master
+[submodule "dependencies/czmq"]
+	path = dependencies/czmq
+	url = ssh://git@gitlab.ingescape.com:22222/third-party/czmq.git
+	branch = master
+[submodule "dependencies/zyre"]
+	path = dependencies/zyre
+	url = ssh://git@gitlab.ingescape.com:22222/third-party/zyre.git
+	branch = master
