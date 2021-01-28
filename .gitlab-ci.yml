@@ -20,6 +20,17 @@ stages:
       - CMakeLists.txt
 
 
+# Submodule strategy
+before_script:
+  - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
+
+
+# Global variables. Can be used by any jobs
+variables:
+  VS_CMAKE_GENERATOR: "Visual Studio 15 2017"
+  DEPLOYMENT_WINDOWS_NET_SHARE: "\\\\autan\\gitlab_workspace\\dependencies"
+
+
 #http://patorjk.com/software/taag/#p=display&f=Big&t=Windows
 #                       ____   _____
 #                      / __ \ / ____|
@@ -38,7 +49,7 @@ lib-build-macos:
     - git clean -xfd
     - mkdir -p build
     - mkdir -p release
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/builds/sysroot/usr/local/ -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
     - make -j8 -C build
     - make -C build DESTDIR=$PWD/release install
     - cd release/usr/local/
@@ -97,8 +108,10 @@ lib-deploy-macos:
     - lib-build-macos
   only:
     refs:
-    - master
-    - stable
+      - master
+      - stable
+    variables:
+      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
 
 
 #__          ___           _
@@ -107,7 +120,6 @@ lib-deploy-macos:
 #  \ \/  \/ / | | '_ \ / _` |/ _ \ \ /\ / / __|
 #   \  /\  /  | | | | | (_| | (_) \ V  V /\__ \
 #    \/  \/   |_|_| |_|\__,_|\___/ \_/\_/ |___/
-
 
 # Create ingescape library for windows 64 bits release
 lib-windows-release-x64:
@@ -118,9 +130,8 @@ lib-windows-release-x64:
   variables:
     ARCH: "Release_x64"
   script:
-    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
     - mkdir build\ReleaseX64
-    - cmake -S . -B build\ReleaseX64 -G"$env:CURRENT_CMAKE_GENERATOR Win64" -DCMAKE_BUILD_TYPE=Release -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
+    - cmake -S . -B build\ReleaseX64 -G"$env:VS_CMAKE_GENERATOR Win64" -DCMAKE_BUILD_TYPE=Release -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
     - cmake --build build\ReleaseX64 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -138,9 +149,8 @@ lib-windows-release-x86:
   variables:
     ARCH: "Release_x86"
   script:
-    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
     - mkdir build\ReleaseX86
-    - cmake -S . -B build\ReleaseX86 -G"$env:CURRENT_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
+    - cmake -S . -B build\ReleaseX86 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
     - cmake --build build\ReleaseX86 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -158,9 +168,8 @@ lib-windows-debug-x64:
   variables:
     ARCH: "Debug_x64"
   script:
-    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
     - mkdir build\DebugX64
-    - cmake -S . -B build\DebugX64 -G"$env:CURRENT_CMAKE_GENERATOR Win64" -DCMAKE_BUILD_TYPE=Debug -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
+    - cmake -S . -B build\DebugX64 -G"$env:VS_CMAKE_GENERATOR Win64" -DCMAKE_BUILD_TYPE=Debug -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
     - cmake --build build\DebugX64 --target ALL_BUILD --config Debug
   artifacts:
     paths:
@@ -178,9 +187,8 @@ lib-windows-debug-x86:
   variables:
     ARCH: "Debug_x86"
   script:
-    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x86;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
     - mkdir build\DebugX86
-    - cmake -S . -B build\DebugX86 -G"$env:CURRENT_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Debug -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
+    - cmake -S . -B build\DebugX86 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Debug -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
     - cmake --build build\DebugX86 --target ALL_BUILD --config Debug
   artifacts:
     paths:
@@ -295,6 +303,8 @@ lib-deploy-windows:
     refs:
       - master
       - stable
+    variables:
+      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
 
 # _      _
 #| |    (_)
@@ -307,224 +317,232 @@ lib-deploy-windows:
 ## x64
 ##
 
-# Create ingescape library for linux (x64) from our custom libraries
-lib-build-linux-x64:
-  extends: .lib-build-files
-  stage: lib-build
-  image: ingescape/debian-testing-compil
-  tags:
-    - docker
-  script:
-    - mkdir -p build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/builds/release/linux_x64/usr/local/ -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
-    - make -C build
-  artifacts:
-    paths:
-      - ./build
-      - ./release
-    name: "lib-build-linux-x64"
-    expire_in: 1 day
-  dependencies: []
+# # Create ingescape library for linux (x64) from our custom libraries
+# lib-build-linux-x64:
+#   extends: .lib-build-files
+#   stage: lib-build
+#   image: ingescape/debian-testing-compil
+#   tags:
+#     - docker
+#   script:
+#     - mkdir -p build
+#     - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/builds/release/linux_x64/usr/local/ -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+#     - make -C build
+#   artifacts:
+#     paths:
+#       - ./build
+#       - ./release
+#     name: "lib-build-linux-x64"
+#     expire_in: 1 day
+#   dependencies: []
 
-# Create library installer for linux 64 bits
-lib-installer-linux-x64:
-  extends: .lib-build-files
-  stage: lib-installer
-  image: ingescape/debian-testing-compil
-  tags:
-    - docker
-  script:
-    - export INGESCAPE_MAJOR=$(grep "#define INGESCAPE_MAJOR" src/igs_admin.c | cut -d ' ' -f3-)
-    - export INGESCAPE_MINOR=$(grep "#define INGESCAPE_MINOR" src/igs_admin.c | cut -d ' ' -f3-)
-    - export INGESCAPE_VERSION=$INGESCAPE_MAJOR.$INGESCAPE_MINOR.$CI_PIPELINE_ID
-    - cd build
-    - make package
-    - tar xf ingescape-${INGESCAPE_VERSION}-Linux.tar.gz
-    - makeself --target /tmp/ingescape-${INGESCAPE_VERSION} ingescape-${INGESCAPE_VERSION}-Linux installer-ingescape-${INGESCAPE_VERSION}-linux-x64.run "Ingescape library v${INGESCAPE_VERSION}" ./install_script.sh
-    - cd ..
-    - mv build linux_x64
-  artifacts:
-    paths:
-      - ./linux_x64/installer-ingescape-*.run
-    name: "lib-installer-linux-x64"
-  dependencies:
-    - lib-build-linux-x64
+# # Create library installer for linux 64 bits
+# lib-installer-linux-x64:
+#   extends: .lib-build-files
+#   stage: lib-installer
+#   image: ingescape/debian-testing-compil
+#   tags:
+#     - docker
+#   script:
+#     - export INGESCAPE_MAJOR=$(grep "#define INGESCAPE_MAJOR" src/igs_admin.c | cut -d ' ' -f3-)
+#     - export INGESCAPE_MINOR=$(grep "#define INGESCAPE_MINOR" src/igs_admin.c | cut -d ' ' -f3-)
+#     - export INGESCAPE_VERSION=$INGESCAPE_MAJOR.$INGESCAPE_MINOR.$CI_PIPELINE_ID
+#     - cd build
+#     - make package
+#     - tar xf ingescape-${INGESCAPE_VERSION}-Linux.tar.gz
+#     - makeself --target /tmp/ingescape-${INGESCAPE_VERSION} ingescape-${INGESCAPE_VERSION}-Linux installer-ingescape-${INGESCAPE_VERSION}-linux-x64.run "Ingescape library v${INGESCAPE_VERSION}" ./install_script.sh
+#     - cd ..
+#     - mv build linux_x64
+#   artifacts:
+#     paths:
+#       - ./linux_x64/installer-ingescape-*.run
+#     name: "lib-installer-linux-x64"
+#   dependencies:
+#     - lib-build-linux-x64
 
-# Deploy ingescape to be able to compile agents
-lib-deploy-linux-release-x64:
-  extends: .lib-build-files
-  stage: lib-deploy
-  tags:
-    - docker
-  image: ingescape/debian-testing-compil
-  script:
-    - make -C build DESTDIR=$HOME/builds/release/linux_x64/ install
-    - cp src/include/ingescape_private.h $HOME/builds/release/linux_x64/usr/local/include/ingescape/
-  dependencies:
-    - lib-build-linux-x64
-  only:
-    refs:
-      - master
-      - stable
+# # Deploy ingescape to be able to compile agents
+# lib-deploy-linux-release-x64:
+#   extends: .lib-build-files
+#   stage: lib-deploy
+#   tags:
+#     - docker
+#   image: ingescape/debian-testing-compil
+#   script:
+#     - make -C build DESTDIR=$HOME/builds/release/linux_x64/ install
+#     - cp src/include/ingescape_private.h $HOME/builds/release/linux_x64/usr/local/include/ingescape/
+#   dependencies:
+#     - lib-build-linux-x64
+#   only:
+#     refs:
+#       - master
+#       - stable
+#     variables:
+#       - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
 
 
 ##
 ## CentOS with Qt (VM)
 ##
 
-# Create ingescape library for CentOS with Qt
-lib-build-centos-qt:
-  extends: .lib-build-files
-  stage: lib-build
-  tags:
-    - centos-qt
-  script:
-    - mkdir -p build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/builds/sysroot/usr/local/ -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
-    - make -C build
-  artifacts:
-    paths:
-      - ./build
-    name: "lib-build-centos-qt"
-    expire_in: 1 day
+# # Create ingescape library for CentOS with Qt
+# lib-build-centos-qt:
+#   extends: .lib-build-files
+#   stage: lib-build
+#   tags:
+#     - centos-qt
+#   script:
+#     - mkdir -p build
+#     - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/builds/sysroot/usr/local/ -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+#     - make -C build
+#   artifacts:
+#     paths:
+#       - ./build
+#     name: "lib-build-centos-qt"
+#     expire_in: 1 day
 
-# Deploy ingescape to be able to compile agents
-lib-deploy-centos-qt:
-  extends: .lib-build-files
-  stage: lib-deploy
-  tags:
-    - centos-qt
-  script:
-    - make -C build DESTDIR=/builds/sysroot/ install
-    - cp src/include/ingescape_private.h /builds/sysroot/usr/local/include/ingescape/
-  dependencies:
-    - lib-build-centos-qt
-  only:
-    refs:
-      - master
-      - stable
+# # Deploy ingescape to be able to compile agents
+# lib-deploy-centos-qt:
+#   extends: .lib-build-files
+#   stage: lib-deploy
+#   tags:
+#     - centos-qt
+#   script:
+#     - make -C build DESTDIR=/builds/sysroot/ install
+#     - cp src/include/ingescape_private.h /builds/sysroot/usr/local/include/ingescape/
+#   dependencies:
+#     - lib-build-centos-qt
+#   only:
+#     refs:
+#       - master
+#       - stable
+#     variables:
+#       - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
 
 ##
 ## armhf (RPi)
 ##
 
-# Create ingescape library for linux (armv7/armhf)
-lib-linux-release-armhf:
-  extends: .lib-build-files
-  stage: lib-build
-  tags:
-    - docker
-  image: ingescape/ubuntu-x-compil-rpi
-  script:
-    - git clean -xfd
-    - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/toolchain.cmake -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
-    - make -C build
-  artifacts:
-    paths:
-      - ./build
-    name: "lib-linux-release-armhf"
-    expire_in: 1 day
-  dependencies: []
+# # Create ingescape library for linux (armv7/armhf)
+# lib-linux-release-armhf:
+#   extends: .lib-build-files
+#   stage: lib-build
+#   tags:
+#     - docker
+#   image: ingescape/ubuntu-x-compil-rpi
+#   script:
+#     - git clean -xfd
+#     - mkdir build
+#     - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/toolchain.cmake -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+#     - make -C build
+#   artifacts:
+#     paths:
+#       - ./build
+#     name: "lib-linux-release-armhf"
+#     expire_in: 1 day
+#   dependencies: []
 
-# Create runtime install for linux ARMv7 (armhf) - Generic ZIP
-lib-installer-runtime-linux-armhf:
-  extends: .lib-build-files
-  stage: lib-installer
-  tags:
-    - docker
-  image: ingescape/ubuntu-x-compil-rpi
-  script:
-    - export INGESCAPE_MAJOR=$(grep "#define INGESCAPE_MAJOR" src/igs_admin.c | cut -d ' ' -f3-)
-    - export INGESCAPE_MINOR=$(grep "#define INGESCAPE_MINOR" src/igs_admin.c | cut -d ' ' -f3-)
-    - export INGESCAPE_VERSION=$INGESCAPE_MAJOR.$INGESCAPE_MINOR.$CI_PIPELINE_ID
-    - cd build
-    - make package
-    - tar xf ingescape-${INGESCAPE_VERSION}-Linux.tar.gz
-    - makeself --target /tmp/ingescape-${INGESCAPE_VERSION} ingescape-${INGESCAPE_VERSION}-Linux installer-ingescape-${INGESCAPE_VERSION}-linux-armhf.run "Ingescape library v${INGESCAPE_VERSION}" ./install_script.sh
-    - cd ..
-    - mv build linux_armhf
-  artifacts:
-    paths:
-      - ./linux_armhf/installer-ingescape-*.run
-    name: "lib-installer-runtime-linux-armhf"
-  dependencies:
-    - lib-linux-release-armhf
+# # Create runtime install for linux ARMv7 (armhf) - Generic ZIP
+# lib-installer-runtime-linux-armhf:
+#   extends: .lib-build-files
+#   stage: lib-installer
+#   tags:
+#     - docker
+#   image: ingescape/ubuntu-x-compil-rpi
+#   script:
+#     - export INGESCAPE_MAJOR=$(grep "#define INGESCAPE_MAJOR" src/igs_admin.c | cut -d ' ' -f3-)
+#     - export INGESCAPE_MINOR=$(grep "#define INGESCAPE_MINOR" src/igs_admin.c | cut -d ' ' -f3-)
+#     - export INGESCAPE_VERSION=$INGESCAPE_MAJOR.$INGESCAPE_MINOR.$CI_PIPELINE_ID
+#     - cd build
+#     - make package
+#     - tar xf ingescape-${INGESCAPE_VERSION}-Linux.tar.gz
+#     - makeself --target /tmp/ingescape-${INGESCAPE_VERSION} ingescape-${INGESCAPE_VERSION}-Linux installer-ingescape-${INGESCAPE_VERSION}-linux-armhf.run "Ingescape library v${INGESCAPE_VERSION}" ./install_script.sh
+#     - cd ..
+#     - mv build linux_armhf
+#   artifacts:
+#     paths:
+#       - ./linux_armhf/installer-ingescape-*.run
+#     name: "lib-installer-runtime-linux-armhf"
+#   dependencies:
+#     - lib-linux-release-armhf
 
-# Deploy ingescape to be able to compile agents
-lib-deploy-linux-release-armhf:
-  extends: .lib-build-files
-  stage: lib-deploy
-  tags:
-    - docker
-  image: ingescape/ubuntu-x-compil-rpi
-  script:
-    - make -C build install DESTDIR=~/builds/release/armhf
-    - cp src/include/ingescape_private.h ~/builds/release/armhf/usr/local/include/ingescape/
-  dependencies:
-    - lib-linux-release-armhf
-  only:
-    refs:
-      - master
-      - stable
+# # Deploy ingescape to be able to compile agents
+# lib-deploy-linux-release-armhf:
+#   extends: .lib-build-files
+#   stage: lib-deploy
+#   tags:
+#     - docker
+#   image: ingescape/ubuntu-x-compil-rpi
+#   script:
+#     - make -C build install DESTDIR=~/builds/release/armhf
+#     - cp src/include/ingescape_private.h ~/builds/release/armhf/usr/local/include/ingescape/
+#   dependencies:
+#     - lib-linux-release-armhf
+#   only:
+#     refs:
+#       - master
+#       - stable
+#     variables:
+#       - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
 
 
 ##
 ## armv7a (Android)
 ##
 
-# Create ingescape library for Android (armv7a softfp)
-lib-android-release-armv7a-softfp:
-  extends: .lib-build-files
-  stage: lib-build
-  tags:
-    - docker
-  image: ingescape/ubuntu-x-compil-android
-  script:
-    - git clean -xfd
-    - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/${ANDROID_NDK_TOOLCHAIN_FILE} -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
-    - make -C build
-  artifacts:
-    paths:
-      - build
-    name: "lib-android-release-armv7a-softfp"
-    expire_in: 1 day
-  dependencies: []
+# # Create ingescape library for Android (armv7a softfp)
+# lib-android-release-armv7a-softfp:
+#   extends: .lib-build-files
+#   stage: lib-build
+#   tags:
+#     - docker
+#   image: ingescape/ubuntu-x-compil-android
+#   script:
+#     - git clean -xfd
+#     - mkdir build
+#     - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/${ANDROID_NDK_TOOLCHAIN_FILE} -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+#     - make -C build
+#   artifacts:
+#     paths:
+#       - build
+#     name: "lib-android-release-armv7a-softfp"
+#     expire_in: 1 day
+#   dependencies: []
 
-# Create runtime install for Android (armv7a softfp) - Generic ZIP
-lib-installer-runtime-android-armv7a-softfp:
-  extends: .lib-build-files
-  stage: lib-installer
-  tags:
-    - docker
-  image: ingescape/ubuntu-x-compil-android
-  script:
-    - make -C build package
-    - mv build android
-  artifacts:
-    paths:
-      - android/ingescape-*
-    name: "lib-installer-runtime-android-armv7a-softfp"
-  dependencies:
-    - lib-android-release-armv7a-softfp
+# # Create runtime install for Android (armv7a softfp) - Generic ZIP
+# lib-installer-runtime-android-armv7a-softfp:
+#   extends: .lib-build-files
+#   stage: lib-installer
+#   tags:
+#     - docker
+#   image: ingescape/ubuntu-x-compil-android
+#   script:
+#     - make -C build package
+#     - mv build android
+#   artifacts:
+#     paths:
+#       - android/ingescape-*
+#     name: "lib-installer-runtime-android-armv7a-softfp"
+#   dependencies:
+#     - lib-android-release-armv7a-softfp
 
-# Deploy ingescape to be able to compile agents
-lib-deploy-linux-release-armv7a-softfp:
-  extends: .lib-build-files
-  stage: lib-deploy
-  tags:
-    - docker
-  image: ingescape/ubuntu-x-compil-android
-  script:
-    - make -C build install DESTDIR=~/builds/release/armv7a-sf
-    - cp src/include/ingescape_private.h ~/builds/release/armv7a-sf/usr/local/include/ingescape/
-  dependencies:
-    - lib-android-release-armv7a-softfp
-  only:
-    refs:
-      - master
-      - stable
+# # Deploy ingescape to be able to compile agents
+# lib-deploy-linux-release-armv7a-softfp:
+#   extends: .lib-build-files
+#   stage: lib-deploy
+#   tags:
+#     - docker
+#   image: ingescape/ubuntu-x-compil-android
+#   script:
+#     - make -C build install DESTDIR=~/builds/release/armv7a-sf
+#     - cp src/include/ingescape_private.h ~/builds/release/armv7a-sf/usr/local/include/ingescape/
+#   dependencies:
+#     - lib-android-release-armv7a-softfp
+#   only:
+#     refs:
+#       - master
+#       - stable
+#     variables:
+#       - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
 
 
 # _____       _ _
@@ -564,32 +582,34 @@ lib-delivery-all:
     - mkdir --parents library/macos
     - mv ./build/ingescape*.pkg library/macos/
     - ls library/macos/ | grep -v 'latest_delivery' > library/macos/latest_delivery
-    - echo "Deliver generic Linux x64"
-    - mkdir --parents library/linux_x64/
-    - mv linux_x64/* library/linux_x64/
-    - ls library/linux_x64/ | grep -v 'latest_delivery' > library/linux_x64/latest_delivery
-    - echo "Deliver generic Linux armhf"
-    - mkdir --parents library/linux_armhf
-    - mv linux_armhf/* library/linux_armhf/
-    - ls library/linux_armhf/ | grep -v 'latest_delivery' > library/linux_armhf/latest_delivery
-    - echo "Deliver Android armv7a (softfp)"
-    - mkdir --parents library/android
-    - mv android/ingescape-*
-         library/android/
-    - ls library/android/ | grep -v 'latest_delivery' > library/android/latest_delivery
+    # - echo "Deliver generic Linux x64"
+    # - mkdir --parents library/linux_x64/
+    # - mv linux_x64/* library/linux_x64/
+    # - ls library/linux_x64/ | grep -v 'latest_delivery' > library/linux_x64/latest_delivery
+    # - echo "Deliver generic Linux armhf"
+    # - mkdir --parents library/linux_armhf
+    # - mv linux_armhf/* library/linux_armhf/
+    # - ls library/linux_armhf/ | grep -v 'latest_delivery' > library/linux_armhf/latest_delivery
+    # - echo "Deliver Android armv7a (softfp)"
+    # - mkdir --parents library/android
+    # - mv android/ingescape-*
+    #      library/android/
+    # - ls library/android/ | grep -v 'latest_delivery' > library/android/latest_delivery
     - echo "Synchronization"
     - rsync --rsh="ssh -i ssh_secret" --recursive library ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
   dependencies:
     - lib-installer-runtime-windows-x86
     - lib-installer-runtime-windows-x64
     - lib-installer-macos
-    - lib-installer-linux-x64
-    - lib-installer-runtime-linux-armhf
-    - lib-installer-runtime-android-armv7a-softfp
+    # - lib-installer-linux-x64
+    # - lib-installer-runtime-linux-armhf
+    # - lib-installer-runtime-android-armv7a-softfp
   only:
     refs:
       - master
       - stable
+    variables:
+      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
 
 
 # Deliver installers so they can be downloaded from the website
@@ -619,54 +639,56 @@ lib-delivery-all-stable:
     - mkdir --parents library/macos
     - mv ./build/ingescape*.pkg library/macos/
     - ls library/macos/ | grep -v 'latest_delivery' > library/macos/latest_delivery
-    - echo "Deliver generic Linux x64"
-    - mkdir --parents library/linux_x64/
-    - mv linux_x64/* library/linux_x64/
-    - ls library/linux_x64/ | grep -v 'latest_delivery' > library/linux_x64/latest_delivery
-    - echo "Deliver Debian 9 x64"
-    - mkdir --parents library/debian9/
-    - mv debian9_x64/ingescape-*
-         debian9_x64/installIngescapeAndDependencies.sh
-         library/debian9/
-    - ls library/debian9/ | grep -v 'latest_delivery' > library/debian9/latest_delivery
-    - echo "Deliver Debian 10 x64"
-    - mkdir --parents library/debian10/
-    - mv debian10_x64/ingescape-*
-         debian10_x64/installIngescapeAndDependencies.sh
-         library/debian10/
-    - ls library/debian10/ | grep -v 'latest_delivery' > library/debian10/latest_delivery
-    - echo "Deliver CentOS 7 x64"
-    - mkdir --parents library/centos7
-    - mv centos7_x64/ingescape-*
-         centos7_x64/installIngescapeAndDependencies.sh
-         library/centos7/
-    - ls library/centos7/ | grep -v 'latest_delivery' > library/centos7/latest_delivery
-    - echo "Deliver generic Linux armhf"
-    - mkdir --parents library/linux_armhf
-    - mv linux_armhf/ingescape-*
-         linux_armhf/installIngescapeAndDependencies.sh
-         library/linux_armhf/
-    - ls library/linux_armhf/ | grep -v 'latest_delivery' > library/linux_armhf/latest_delivery
-    - echo "Deliver Raspbian 9 armhf"
-    - mkdir --parents library/raspbian9
-    - mv raspbian9_armhf/ingescape-*
-         raspbian9_armhf/installIngescapeAndDependencies.sh
-         library/raspbian9/
-    - ls library/raspbian9/ | grep -v 'latest_delivery' > library/raspbian9/latest_delivery
-    - echo "Deliver Android armv7a (softfp)"
-    - mkdir --parents library/android
-    - mv android/ingescape-*
-         library/android/
-    - ls library/android/ | grep -v 'latest_delivery' > library/android/latest_delivery
+    # - echo "Deliver generic Linux x64"
+    # - mkdir --parents library/linux_x64/
+    # - mv linux_x64/* library/linux_x64/
+    # - ls library/linux_x64/ | grep -v 'latest_delivery' > library/linux_x64/latest_delivery
+    # - echo "Deliver Debian 9 x64"
+    # - mkdir --parents library/debian9/
+    # - mv debian9_x64/ingescape-*
+    #      debian9_x64/installIngescapeAndDependencies.sh
+    #      library/debian9/
+    # - ls library/debian9/ | grep -v 'latest_delivery' > library/debian9/latest_delivery
+    # - echo "Deliver Debian 10 x64"
+    # - mkdir --parents library/debian10/
+    # - mv debian10_x64/ingescape-*
+    #      debian10_x64/installIngescapeAndDependencies.sh
+    #      library/debian10/
+    # - ls library/debian10/ | grep -v 'latest_delivery' > library/debian10/latest_delivery
+    # - echo "Deliver CentOS 7 x64"
+    # - mkdir --parents library/centos7
+    # - mv centos7_x64/ingescape-*
+    #      centos7_x64/installIngescapeAndDependencies.sh
+    #      library/centos7/
+    # - ls library/centos7/ | grep -v 'latest_delivery' > library/centos7/latest_delivery
+    # - echo "Deliver generic Linux armhf"
+    # - mkdir --parents library/linux_armhf
+    # - mv linux_armhf/ingescape-*
+    #      linux_armhf/installIngescapeAndDependencies.sh
+    #      library/linux_armhf/
+    # - ls library/linux_armhf/ | grep -v 'latest_delivery' > library/linux_armhf/latest_delivery
+    # - echo "Deliver Raspbian 9 armhf"
+    # - mkdir --parents library/raspbian9
+    # - mv raspbian9_armhf/ingescape-*
+    #      raspbian9_armhf/installIngescapeAndDependencies.sh
+    #      library/raspbian9/
+    # - ls library/raspbian9/ | grep -v 'latest_delivery' > library/raspbian9/latest_delivery
+    # - echo "Deliver Android armv7a (softfp)"
+    # - mkdir --parents library/android
+    # - mv android/ingescape-*
+    #      library/android/
+    # - ls library/android/ | grep -v 'latest_delivery' > library/android/latest_delivery
     - echo "Synchronization"
     - rsync --rsh="ssh -i ssh_secret" --recursive library ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST}:${STABLE_DELIVERY_DESTINATION}
   dependencies:
     - lib-installer-runtime-windows-x86
     - lib-installer-runtime-windows-x64
     - lib-installer-macos
-    - lib-installer-linux-x64
-    - lib-installer-runtime-linux-armhf
-    - lib-installer-runtime-android-armv7a-softfp
+    # - lib-installer-linux-x64
+    # - lib-installer-runtime-linux-armhf
+    # - lib-installer-runtime-android-armv7a-softfp
   only:
     refs:
       - stable
+    variables:
+      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
