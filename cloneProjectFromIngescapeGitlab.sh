@@ -58,7 +58,7 @@ do
         echo "Directory ${work_path}/${clone_dir_name} already exists. Ignoring."
     else
         echo "Running 'git clone ssh://git@gitlab.ingescape.com:22222/${p} ${work_path}/${clone_dir_name}'"
-        git clone ssh://git@gitlab.ingescape.com:22222/${p} ${work_path}/${clone_dir_name}
+        git clone --recurse-submodules ssh://git@gitlab.ingescape.com:22222/${p} ${work_path}/${clone_dir_name}
     fi
 done
 echo "-----------------------------------"
