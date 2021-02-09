@@ -12,7 +12,6 @@ ADD_DEFINITIONS (-DZYRE_BUILD_DRAFT_API)
 ADD_DEFINITIONS (-DCZMQ_BUILD_DRAFT_API)
 
 # Add path to custom macro
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/dependencies")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/modules")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/modules/library")
 
@@ -116,10 +115,10 @@ set(ingescape_headers_to_install
     ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ingescape.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ingescape_agent.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ingescape_advanced.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ingescape_private.h
 )
 
 set(ingescape_private_headers
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ingescape_private.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/include/uthash/libut.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/include/uthash/ringbuf.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/include/uthash/utarray.h

@@ -16,7 +16,7 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "9762EDCC1EAE5414002062A1"
                BuildableName = "ingescape.framework"
-               BlueprintName = "ingscape-macos"
+               BlueprintName = "ingscape-macos-framework"
                ReferencedContainer = "container:ingescape.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -52,7 +52,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "9762EDCC1EAE5414002062A1"
             BuildableName = "ingescape.framework"
-            BlueprintName = "ingscape-macos"
+            BlueprintName = "ingscape-macos-framework"
             ReferencedContainer = "container:ingescape.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

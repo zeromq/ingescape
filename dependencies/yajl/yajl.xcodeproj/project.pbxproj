@@ -91,9 +91,13 @@
 		973D1BB72226935400D363BF /* yajl_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yajl_common.h; sourceTree = "<group>"; };
 		973D1BB82226935400D363BF /* yajl_version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yajl_version.h; sourceTree = "<group>"; };
 		973D1BBA2226935400D363BF /* yajl_parse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yajl_parse.h; sourceTree = "<group>"; };
+		974D75D725D29CC60049C183 /* libczmq.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libczmq.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		974D75D925D29CC60049C183 /* libsodium.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libsodium.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		974D75DB25D29CC60049C183 /* libzmq.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libzmq.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		974D75DD25D29CC60049C183 /* libzyre.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libzyre.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		9762EDB21EAE530B002062A1 /* yajl.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = yajl.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9762EDB51EAE530B002062A1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		97F9FBE824C47F8000A4A3A0 /* libyajl-static.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libyajl-static.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		97F9FBE824C47F8000A4A3A0 /* libyajl.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libyajl.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -128,6 +132,7 @@
 				973D1B6E22268E7A00D363BF /* src */,
 				9762EDB31EAE530B002062A1 /* yajl-xcode */,
 				9716CA471EA21C6A004F0AC0 /* Products */,
+				974D75D625D29CC60049C183 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -136,7 +141,7 @@
 			children = (
 				9716CA461EA21C6A004F0AC0 /* libyajl.a */,
 				9762EDB21EAE530B002062A1 /* yajl.framework */,
-				97F9FBE824C47F8000A4A3A0 /* libyajl-static.a */,
+				97F9FBE824C47F8000A4A3A0 /* libyajl.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -174,6 +179,17 @@
 			);
 			name = api;
 			path = src/api;
+			sourceTree = "<group>";
+		};
+		974D75D625D29CC60049C183 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				974D75D725D29CC60049C183 /* libczmq.a */,
+				974D75D925D29CC60049C183 /* libsodium.a */,
+				974D75DB25D29CC60049C183 /* libzmq.a */,
+				974D75DD25D29CC60049C183 /* libzyre.a */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		9762EDB31EAE530B002062A1 /* yajl-xcode */ = {
@@ -232,9 +248,9 @@
 			productReference = 9716CA461EA21C6A004F0AC0 /* libyajl.a */;
 			productType = "com.apple.product-type.library.static";
 		};
-		9762EDB11EAE530B002062A1 /* yajl-xcode */ = {
+		9762EDB11EAE530B002062A1 /* yajl-macos-framework */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 9762EDB71EAE530B002062A1 /* Build configuration list for PBXNativeTarget "yajl-xcode" */;
+			buildConfigurationList = 9762EDB71EAE530B002062A1 /* Build configuration list for PBXNativeTarget "yajl-macos-framework" */;
 			buildPhases = (
 				9762EDAD1EAE530B002062A1 /* Sources */,
 				9762EDAE1EAE530B002062A1 /* Frameworks */,
@@ -245,14 +261,14 @@
 			);
 			dependencies = (
 			);
-			name = "yajl-xcode";
+			name = "yajl-macos-framework";
 			productName = "yajl-xcode";
 			productReference = 9762EDB21EAE530B002062A1 /* yajl.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		97F9FBE724C47F8000A4A3A0 /* yajl-static */ = {
+		97F9FBE724C47F8000A4A3A0 /* yajl-macos-static */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 97F9FBEB24C47F8000A4A3A0 /* Build configuration list for PBXNativeTarget "yajl-static" */;
+			buildConfigurationList = 97F9FBEB24C47F8000A4A3A0 /* Build configuration list for PBXNativeTarget "yajl-macos-static" */;
 			buildPhases = (
 				97F9FBE424C47F8000A4A3A0 /* Headers */,
 				97F9FBE524C47F8000A4A3A0 /* Sources */,
@@ -262,9 +278,9 @@
 			);
 			dependencies = (
 			);
-			name = "yajl-static";
+			name = "yajl-macos-static";
 			productName = yajl;
-			productReference = 97F9FBE824C47F8000A4A3A0 /* libyajl-static.a */;
+			productReference = 97F9FBE824C47F8000A4A3A0 /* libyajl.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -307,8 +323,8 @@
 			projectRoot = "";
 			targets = (
 				9716CA451EA21C6A004F0AC0 /* yajl-ios */,
-				9762EDB11EAE530B002062A1 /* yajl-xcode */,
-				97F9FBE724C47F8000A4A3A0 /* yajl-static */,
+				9762EDB11EAE530B002062A1 /* yajl-macos-framework */,
+				97F9FBE724C47F8000A4A3A0 /* yajl-macos-static */,
 			);
 		};
 /* End PBXProject section */
@@ -580,7 +596,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = yajl;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 			};
@@ -598,7 +614,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_FAST_MATH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = yajl;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 			};
@@ -625,7 +641,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		9762EDB71EAE530B002062A1 /* Build configuration list for PBXNativeTarget "yajl-xcode" */ = {
+		9762EDB71EAE530B002062A1 /* Build configuration list for PBXNativeTarget "yajl-macos-framework" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9762EDB81EAE530B002062A1 /* Debug */,
@@ -634,7 +650,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		97F9FBEB24C47F8000A4A3A0 /* Build configuration list for PBXNativeTarget "yajl-static" */ = {
+		97F9FBEB24C47F8000A4A3A0 /* Build configuration list for PBXNativeTarget "yajl-macos-static" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				97F9FBE924C47F8000A4A3A0 /* Debug */,

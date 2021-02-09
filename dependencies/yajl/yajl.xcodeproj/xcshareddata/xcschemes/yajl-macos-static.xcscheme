@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1230"
+   LastUpgradeVersion = "1240"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "9762EDB11EAE530B002062A1"
-               BuildableName = "yajl.framework"
-               BlueprintName = "yajl-xcode"
+               BlueprintIdentifier = "97F9FBE724C47F8000A4A3A0"
+               BuildableName = "libyajl.a"
+               BlueprintName = "yajl-macos-static"
                ReferencedContainer = "container:yajl.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -50,9 +50,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "9762EDB11EAE530B002062A1"
-            BuildableName = "yajl.framework"
-            BlueprintName = "yajl-xcode"
+            BlueprintIdentifier = "97F9FBE724C47F8000A4A3A0"
+            BuildableName = "libyajl.a"
+            BlueprintName = "yajl-macos-static"
             ReferencedContainer = "container:yajl.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

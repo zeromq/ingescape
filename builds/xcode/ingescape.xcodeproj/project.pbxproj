@@ -22,6 +22,26 @@
 		973DC283207A479F004C1D80 /* ingescape_advanced.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 975512902078EF1900720931 /* ingescape_advanced.h */; };
 		973DC288207A93E6004C1D80 /* igs_bus.c in Sources */ = {isa = PBXBuildFile; fileRef = 973DC287207A93E6004C1D80 /* igs_bus.c */; };
 		973DC289207A93E6004C1D80 /* igs_bus.c in Sources */ = {isa = PBXBuildFile; fileRef = 973DC287207A93E6004C1D80 /* igs_bus.c */; };
+		974D72BF25D298BB0049C183 /* igs_admin.c in Sources */ = {isa = PBXBuildFile; fileRef = 972A52631FD1733E00711352 /* igs_admin.c */; };
+		974D72C025D298BB0049C183 /* igs_agent.c in Sources */ = {isa = PBXBuildFile; fileRef = 9736B37A238414E200A97173 /* igs_agent.c */; };
+		974D72C125D298BB0049C183 /* igs_bus.c in Sources */ = {isa = PBXBuildFile; fileRef = 973DC287207A93E6004C1D80 /* igs_bus.c */; };
+		974D72C225D298BB0049C183 /* igs_call.c in Sources */ = {isa = PBXBuildFile; fileRef = 9772A52620BDE42700729D59 /* igs_call.c */; };
+		974D72C325D298BB0049C183 /* igs_core.c in Sources */ = {isa = PBXBuildFile; fileRef = 9738214B23832B7400D466DC /* igs_core.c */; };
+		974D72C425D298BB0049C183 /* igs_definition.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79851EA7B112003153EF /* igs_definition.c */; };
+		974D72C525D298BB0049C183 /* igs_json.c in Sources */ = {isa = PBXBuildFile; fileRef = 9768B2AD22830F0E00310410 /* igs_json.c */; };
+		974D72C625D298BB0049C183 /* igs_license.c in Sources */ = {isa = PBXBuildFile; fileRef = 97FAC32C2247BE920036293B /* igs_license.c */; };
+		974D72C725D298BB0049C183 /* igs_mapping.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79981EA7B112003153EF /* igs_mapping.c */; };
+		974D72C825D298BB0049C183 /* igs_model.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79991EA7B112003153EF /* igs_model.c */; };
+		974D72C925D298BB0049C183 /* igs_monitor.c in Sources */ = {isa = PBXBuildFile; fileRef = 97ABC93B2282EC5D00215310 /* igs_monitor.c */; };
+		974D72CA25D298BB0049C183 /* igs_network.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A799A1EA7B112003153EF /* igs_network.c */; };
+		974D72CB25D298BB0049C183 /* igs_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A799C1EA7B112003153EF /* igs_parser.c */; };
+		974D72CC25D298BB0049C183 /* igs_performance.c in Sources */ = {isa = PBXBuildFile; fileRef = 9725395923564B230071A9BA /* igs_performance.c */; };
+		974D72CD25D298BB0049C183 /* igs_replay.c in Sources */ = {isa = PBXBuildFile; fileRef = 97817B7A2514BA4700EFF20F /* igs_replay.c */; };
+		974D784725D2BB930049C183 /* libczmq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 97A3BFFA25AF3702004BD834 /* libczmq.a */; };
+		974D784825D2BB930049C183 /* libsodium.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 97A3BDD625AF36B8004BD834 /* libsodium.a */; };
+		974D784925D2BB930049C183 /* libyajl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 97F9FC9924C8794400A4A3A0 /* libyajl.a */; };
+		974D784A25D2BB930049C183 /* libzmq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 97A3BE6525AF36CA004BD834 /* libzmq.a */; };
+		974D784B25D2BB930049C183 /* libzyre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 97A3C04725AF372B004BD834 /* libzyre.a */; };
 		97551291207A449300720931 /* ingescape_advanced.h in Headers */ = {isa = PBXBuildFile; fileRef = 975512902078EF1900720931 /* ingescape_advanced.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		97574A9022870C5100C31B99 /* igs_json.c in Sources */ = {isa = PBXBuildFile; fileRef = 9768B2AD22830F0E00310410 /* igs_json.c */; };
 		9762EDDA1EAE547B002062A1 /* igs_definition.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79851EA7B112003153EF /* igs_definition.c */; };
@@ -177,6 +197,13 @@
 			proxyType = 2;
 			remoteGlobalIDString = 9762EDB21EAE530B002062A1;
 			remoteInfo = "yajl-macos";
+		};
+		974D746B25D29BE10049C183 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97A3BDD025AF36B8004BD834 /* sodium.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 221E64E11F614E5EBB81C2BE;
+			remoteInfo = sodium_objects;
 		};
 		97A3BDD525AF36B8004BD834 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1354,6 +1381,7 @@
 		9738215023832BBF00D466DC /* ingescape_agent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ingescape_agent.h; sourceTree = "<group>"; };
 		973D1BAA2226916D00D363BF /* yajl.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = yajl.xcodeproj; path = ../../dependencies/yajl/yajl.xcodeproj; sourceTree = "<group>"; };
 		973DC287207A93E6004C1D80 /* igs_bus.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = igs_bus.c; sourceTree = "<group>"; };
+		974D720425D298960049C183 /* libingescape.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libingescape.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		975512902078EF1900720931 /* ingescape_advanced.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ingescape_advanced.h; sourceTree = "<group>"; };
 		9762EDCD1EAE5414002062A1 /* ingescape.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ingescape.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9762EDD01EAE5414002062A1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -1488,6 +1516,18 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		974D720225D298960049C183 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				974D784725D2BB930049C183 /* libczmq.a in Frameworks */,
+				974D784825D2BB930049C183 /* libsodium.a in Frameworks */,
+				974D784925D2BB930049C183 /* libyajl.a in Frameworks */,
+				974D784A25D2BB930049C183 /* libzmq.a in Frameworks */,
+				974D784B25D2BB930049C183 /* libzyre.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9762EDC91EAE5414002062A1 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1521,7 +1561,7 @@
 			children = (
 				973D1BB02226916D00D363BF /* libyajl.a */,
 				973D1BB22226916D00D363BF /* yajl.framework */,
-				97F9FC9924C8794400A4A3A0 /* libyajl-static.a */,
+				97F9FC9924C8794400A4A3A0 /* libyajl.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1563,6 +1603,7 @@
 			children = (
 				979A79781EA7B0D6003153EF /* libingescape.a */,
 				9762EDCD1EAE5414002062A1 /* ingescape.framework */,
+				974D720425D298960049C183 /* libingescape.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1755,8 +1796,9 @@
 		97A3BDD125AF36B8004BD834 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				97A3BDD625AF36B8004BD834 /* libsodium.a */,
 				97A3BDD825AF36B8004BD834 /* libsodium.dylib */,
+				97A3BDD625AF36B8004BD834 /* libsodium.a */,
+				974D746C25D29BE10049C183 /* libsodium_objects.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1926,6 +1968,13 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		974D720025D298960049C183 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9762EDCA1EAE5414002062A1 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -1940,9 +1989,26 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		9762EDCC1EAE5414002062A1 /* ingscape-macos */ = {
+		974D720325D298960049C183 /* ingescape-macos-static */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 9762EDD71EAE5414002062A1 /* Build configuration list for PBXNativeTarget "ingscape-macos" */;
+			buildConfigurationList = 974D72BC25D298960049C183 /* Build configuration list for PBXNativeTarget "ingescape-macos-static" */;
+			buildPhases = (
+				974D720025D298960049C183 /* Headers */,
+				974D720125D298960049C183 /* Sources */,
+				974D720225D298960049C183 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "ingescape-macos-static";
+			productName = "ingescape-macos-static";
+			productReference = 974D720425D298960049C183 /* libingescape.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		9762EDCC1EAE5414002062A1 /* ingscape-macos-framework */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9762EDD71EAE5414002062A1 /* Build configuration list for PBXNativeTarget "ingscape-macos-framework" */;
 			buildPhases = (
 				9762EDC81EAE5414002062A1 /* Sources */,
 				9762EDC91EAE5414002062A1 /* Frameworks */,
@@ -1953,7 +2019,7 @@
 			);
 			dependencies = (
 			);
-			name = "ingscape-macos";
+			name = "ingscape-macos-framework";
 			productName = "ingescape-macos";
 			productReference = 9762EDCD1EAE5414002062A1 /* ingescape.framework */;
 			productType = "com.apple.product-type.framework";
@@ -1987,6 +2053,11 @@
 				LastUpgradeCheck = 1230;
 				ORGANIZATIONNAME = "Ingenuity i/o";
 				TargetAttributes = {
+					974D720325D298960049C183 = {
+						CreatedOnToolsVersion = 12.4;
+						DevelopmentTeam = 56DRT9MG9S;
+						ProvisioningStyle = Automatic;
+					};
 					9762EDCC1EAE5414002062A1 = {
 						CreatedOnToolsVersion = 8.3.2;
 						DevelopmentTeam = 56DRT9MG9S;
@@ -2035,7 +2106,8 @@
 			projectRoot = "";
 			targets = (
 				979A79771EA7B0D6003153EF /* ingescape-ios */,
-				9762EDCC1EAE5414002062A1 /* ingscape-macos */,
+				9762EDCC1EAE5414002062A1 /* ingscape-macos-framework */,
+				974D720325D298960049C183 /* ingescape-macos-static */,
 			);
 		};
 /* End PBXProject section */
@@ -2055,6 +2127,13 @@
 			remoteRef = 973D1BB12226916D00D363BF /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		974D746C25D29BE10049C183 /* libsodium_objects.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libsodium_objects.a;
+			remoteRef = 974D746B25D29BE10049C183 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		97A3BDD625AF36B8004BD834 /* libsodium.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -2065,7 +2144,8 @@
 		97A3BDD825AF36B8004BD834 /* libsodium.dylib */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
-			path = libsodium.dylib;
+			name = libsodium.dylib;
+			path = libsodium.23.dylib;
 			remoteRef = 97A3BDD725AF36B8004BD834 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -3059,16 +3139,38 @@
 			remoteRef = 97A3C04A25AF372B004BD834 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		97F9FC9924C8794400A4A3A0 /* libyajl-static.a */ = {
+		97F9FC9924C8794400A4A3A0 /* libyajl.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
-			path = "libyajl-static.a";
+			path = libyajl.a;
 			remoteRef = 97F9FC9824C8794400A4A3A0 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXSourcesBuildPhase section */
+		974D720125D298960049C183 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				974D72BF25D298BB0049C183 /* igs_admin.c in Sources */,
+				974D72C025D298BB0049C183 /* igs_agent.c in Sources */,
+				974D72C125D298BB0049C183 /* igs_bus.c in Sources */,
+				974D72C225D298BB0049C183 /* igs_call.c in Sources */,
+				974D72C325D298BB0049C183 /* igs_core.c in Sources */,
+				974D72C425D298BB0049C183 /* igs_definition.c in Sources */,
+				974D72C525D298BB0049C183 /* igs_json.c in Sources */,
+				974D72C625D298BB0049C183 /* igs_license.c in Sources */,
+				974D72C725D298BB0049C183 /* igs_mapping.c in Sources */,
+				974D72C825D298BB0049C183 /* igs_model.c in Sources */,
+				974D72C925D298BB0049C183 /* igs_monitor.c in Sources */,
+				974D72CA25D298BB0049C183 /* igs_network.c in Sources */,
+				974D72CB25D298BB0049C183 /* igs_parser.c in Sources */,
+				974D72CC25D298BB0049C183 /* igs_performance.c in Sources */,
+				974D72CD25D298BB0049C183 /* igs_replay.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9762EDC81EAE5414002062A1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -3115,6 +3217,65 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		974D720525D298960049C183 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 56DRT9MG9S;
+				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				"GCC_PREPROCESSOR_DEFINITIONS[arch=*]" = (
+					"DEBUG=1",
+					"$(inherited)",
+					ZYRE_BUILD_DRAFT_API,
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../../src/include",
+					"$(SRCROOT)/../../dependencies/yajl/src/api",
+					"$(SRCROOT)/../../dependencies/sodium/src/libsodium/include",
+					"$(SRCROOT)/../../dependencies/libzmq/include",
+					"$(SRCROOT)/../../dependencies/czmq/include",
+					"$(SRCROOT)/../../dependencies/zyre/include",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = ingescape;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		974D720625D298960049C183 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 56DRT9MG9S;
+				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_PREPROCESSOR_DEFINITIONS = ZYRE_BUILD_DRAFT_API;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../../src/include",
+					"$(SRCROOT)/../../dependencies/yajl/src/api",
+					"$(SRCROOT)/../../dependencies/sodium/src/libsodium/include",
+					"$(SRCROOT)/../../dependencies/libzmq/include",
+					"$(SRCROOT)/../../dependencies/czmq/include",
+					"$(SRCROOT)/../../dependencies/zyre/include",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = ingescape;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
 		9762EDD21EAE5414002062A1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3351,7 +3512,16 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		9762EDD71EAE5414002062A1 /* Build configuration list for PBXNativeTarget "ingscape-macos" */ = {
+		974D72BC25D298960049C183 /* Build configuration list for PBXNativeTarget "ingescape-macos-static" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				974D720525D298960049C183 /* Debug */,
+				974D720625D298960049C183 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9762EDD71EAE5414002062A1 /* Build configuration list for PBXNativeTarget "ingscape-macos-framework" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9762EDD21EAE5414002062A1 /* Debug */,

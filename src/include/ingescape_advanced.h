@@ -39,7 +39,7 @@ extern "C" {
  • A broker endpoint in igs_brokerAdd is used to connect to a given broker. Add
  as many brokers as you want. At least one declared broker is necessary to
  use igs_startWithBrokers.
- • The endpoint in igs_setAsBroker is the broker address we should be reached
+ • The endpoint in igs_enableAsBroker is the broker address we should be reached
  at as a broker if we want to be one. Using igs_setAsBroker makes us a broker
  when starting.
  • The endpoint in igs_brokerAdvertiseEndpoint replaces the one declared in
