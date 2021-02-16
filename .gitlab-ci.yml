@@ -105,6 +105,43 @@ lib-deploy-macos:
   needs: [ "lib-build-macos" ]
 
 
+# Build/Deploy ingescape on macos-qt6 runner
+lib-build-macos-qt6:
+  extends: .lib-build-files
+  stage: lib-build
+  tags:
+    - macos-qt6
+  before_script:
+    - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
+  script:
+    - git clean -xfd
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - make -j8 -C build
+  artifacts:
+    paths:
+      - ./build
+    name: "lib-build-macos"
+    expire_in: 1 day
+  dependencies: []
+
+lib-deploy-macos-qt6:
+  extends: .lib-build-files
+  stage: lib-deploy
+  tags:
+    - macos-qt6
+  script:
+    - make -C build DESTDIR=$HOME/builds/sysroot install
+  dependencies:
+    - lib-build-macos-qt6
+  only:
+    refs:
+      - master
+      - stable
+    variables:
+      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
+  needs: [ "lib-build-macos-qt6" ]
+
+
 #__          ___           _
 #\ \        / (_)         | |
 # \ \  /\  / / _ _ __   __| | _____      _____
