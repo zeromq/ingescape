@@ -44,9 +44,7 @@ lib-build-macos:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - git clean -xfd
-    - mkdir -p build
-    - mkdir -p release
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$HOME/builds/sysroot/usr/local -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
     - make -j8 -C build
   artifacts:
     paths:
@@ -86,6 +84,7 @@ lib-installer-macos:
     name: "lib-installer-macos"
   dependencies:
     - lib-build-macos
+  needs: [ "lib-build-macos" ]
 
 
 lib-deploy-macos:
@@ -94,8 +93,7 @@ lib-deploy-macos:
   tags:
     - osx
   script:
-    - make -C build install
-    - cp src/include/ingescape_private.h $HOME/builds/sysroot/usr/local/include/ingescape/
+    - make -C build DESTDIR=$HOME/builds/sysroot install
   dependencies:
     - lib-build-macos
   only:
@@ -104,6 +102,7 @@ lib-deploy-macos:
       - stable
     variables:
       - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
+  needs: [ "lib-build-macos" ]
 
 
 #__          ___           _
@@ -125,7 +124,7 @@ lib-windows-release-x64:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - mkdir build\ReleaseX64
-    - cmake -S . -B build\ReleaseX64 -G"$env:VS_CMAKE_GENERATOR Win64" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64" -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
+    - cmake -S . -B build\ReleaseX64 -G"$env:VS_CMAKE_GENERATOR Win64" -DCMAKE_BUILD_TYPE=Release -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
     - cmake --build build\ReleaseX64 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -146,7 +145,7 @@ lib-windows-release-x86:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - mkdir build\ReleaseX86
-    - cmake -S . -B build\ReleaseX86 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86" -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
+    - cmake -S . -B build\ReleaseX86 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
     - cmake --build build\ReleaseX86 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -167,7 +166,7 @@ lib-windows-debug-x64:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - mkdir build\DebugX64
-    - cmake -S . -B build\DebugX64 -G"$env:VS_CMAKE_GENERATOR Win64" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX="$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64" -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
+    - cmake -S . -B build\DebugX64 -G"$env:VS_CMAKE_GENERATOR Win64" -DCMAKE_BUILD_TYPE=Debug -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
     - cmake --build build\DebugX64 --target ALL_BUILD --config Debug
   artifacts:
     paths:
@@ -188,7 +187,7 @@ lib-windows-debug-x86:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - mkdir build\DebugX86
-    - cmake -S . -B build\DebugX86 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX="$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x86" -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
+    - cmake -S . -B build\DebugX86 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Debug -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
     - cmake --build build\DebugX86 --target ALL_BUILD --config Debug
   artifacts:
     paths:
@@ -217,6 +216,7 @@ lib-installer-runtime-windows-x86:
     name: "lib-installer-runtime-windows-x86"
   dependencies:
     - lib-windows-release-x86
+  needs: [ "lib-windows-release-x86" ]
 
 # Create runtime install for windows 64 bits
 lib-installer-runtime-windows-x64:
@@ -237,6 +237,7 @@ lib-installer-runtime-windows-x64:
     name: "lib-installer-runtime-windows-x64"
   dependencies:
     - lib-windows-release-x64
+  needs: [ "lib-windows-release-x64" ]
 
 # Create runtime install for windows 32 bits (debug)
 lib-installer-debug-windows-x86:
@@ -257,6 +258,7 @@ lib-installer-debug-windows-x86:
     name: "lib-installer-debug-windows-x86"
   dependencies:
     - lib-windows-debug-x86
+  needs: [ "lib-windows-debug-x86" ]
 
 # Create runtime install for windows 64 bits (debug)
 lib-installer-debug-windows-x64:
@@ -277,6 +279,7 @@ lib-installer-debug-windows-x64:
     name: "lib-installer-debug-windows-x64"
   dependencies:
     - lib-windows-debug-x64
+  needs: [ "lib-windows-debug-x64" ]
 
 
 # Deploy ingescape in windows to be able to compile agents
@@ -286,13 +289,13 @@ lib-deploy-windows:
   tags:
     - windows
   script:
-    - cmake --install .\build\ReleaseX64 --config Release
+    - cmake --install .\build\ReleaseX64 --config Release --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64
     - copy .\src\include\ingescape_private.h $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64\include\ingescape -Force
-    - cmake --install .\build\ReleaseX86 --config Release
+    - cmake --install .\build\ReleaseX86 --config Release --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86
     - copy .\src\include\ingescape_private.h $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86\include\ingescape -Force
-    - cmake --install .\build\DebugX64 --config Debug
+    - cmake --install .\build\DebugX64 --config Debug --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64
     - copy .\src\include\ingescape_private.h $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64\include\ingescape -Force
-    - cmake --install .\build\DebugX86 --config Debug
+    - cmake --install .\build\DebugX86 --config Debug --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64
     - copy .\src\include\ingescape_private.h $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x86\include\ingescape -Force
   dependencies:
     - lib-windows-release-x64
@@ -305,6 +308,7 @@ lib-deploy-windows:
       - stable
     variables:
       - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
+  needs: [ "lib-windows-release-x64", "lib-windows-release-x86", "lib-windows-debug-x64", "lib-windows-debug-x86" ]
 
 # _      _
 #| |    (_)
