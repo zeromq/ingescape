@@ -534,7 +534,7 @@ int main(int argc, const char * argv[]) {
     assert(igs_loadDefinition("invalid json") == IGS_FAILURE);
     assert(igs_loadDefinitionFromPath("/does not exist") == IGS_FAILURE);
     assert(igs_getDefinition()); //intentional memory leak here
-    assert(streq(igs_getDefinitionName(), "no_name"));
+    assert(streq(igs_getDefinitionName(), "tester"));
     assert(igs_getDefinitionDescription() == NULL);
     assert(igs_getDefinitionVersion() == NULL);
     igs_setDefinitionName("");
@@ -846,26 +846,7 @@ int main(int argc, const char * argv[]) {
     assert(igs_loadMapping("invalid json") == IGS_FAILURE);
     assert(igs_loadMappingFromPath("/does not exist") == IGS_FAILURE);
     assert(igs_getMapping()); //intentional memory leak here
-    assert(igs_getMappingName() == NULL);
-    assert(igs_getMappingDescription() == NULL);
-    assert(igs_getMappingVersion() == NULL);
     assert(igs_getMappingEntriesNumber() == 0);
-    igs_setMappingName("");
-    igs_setMappingDescription("");
-    igs_setMappingVersion("");
-    //TODO: test loading valid string and file mappings
-    igs_setMappingName("my mapping");
-    char *mappingName = igs_getMappingName();
-    assert(streq(mappingName, "my mapping"));
-    free(mappingName);
-    igs_setMappingDescription("my mapping description");
-    char *mappingDesc = igs_getMappingDescription();
-    free(mappingDesc);
-    assert(streq(mappingDesc, "my mapping description"));
-    igs_setMappingVersion("mapping version");
-    char *mappingVer = igs_getMappingVersion();
-    assert(streq(mappingVer, "mapping version"));
-    free(mappingVer);
     
     assert(igs_addMappingEntry("toto", "other_agent", "tata") != 0);
     long mapId = igs_addMappingEntry("toto", "other_agent", "tata");
@@ -883,11 +864,11 @@ int main(int argc, const char * argv[]) {
     igs_setMappingPath("/tmp/simple Demo Agent mapping.json");
     igs_writeMappingToPath();
     igs_clearMapping();
-    mappingName = igs_getMappingName();
+    char *mappingName = igs_getMappingName();
     assert(mappingName == NULL);
-    mappingDesc = igs_getMappingDescription();
+    char *mappingDesc = igs_getMappingDescription();
     assert(mappingDesc == NULL);
-    mappingVer = igs_getMappingVersion();
+    char *mappingVer = igs_getMappingVersion();
     assert(mappingVer == NULL);
     //TODO: compare exported cleared mapping with reference string
 //    exportedMapping = igs_getMapping();

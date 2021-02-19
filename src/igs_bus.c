@@ -171,7 +171,7 @@ igs_result_t igs_busSendStringToAgent(const char *agentNameOrAgentIdOrPeerID, co
     //we iterate first on agents
     igs_remote_agent_t *agent, *tmpAgent;
     HASH_ITER(hh, coreContext->remoteAgents, agent, tmpAgent){
-        if (streq(agent->name, agentNameOrAgentIdOrPeerID) || streq(agent->uuid, agentNameOrAgentIdOrPeerID)){
+        if (streq(agent->definition->name, agentNameOrAgentIdOrPeerID) || streq(agent->uuid, agentNameOrAgentIdOrPeerID)){
             char content[MAX_STRING_MSG_LENGTH] = "";
             va_list list;
             va_start(list, msg);
@@ -221,7 +221,7 @@ igs_result_t igs_busSendDataToAgent(const char *agentNameOrAgentIdOrPeerID, void
     //we iterate first on agents
     igs_remote_agent_t *agent, *tmpAgent;
     HASH_ITER(hh, coreContext->remoteAgents, agent, tmpAgent){
-        if (streq(agent->name, agentNameOrAgentIdOrPeerID) || streq(agent->uuid, agentNameOrAgentIdOrPeerID)){
+        if (streq(agent->definition->name, agentNameOrAgentIdOrPeerID) || streq(agent->uuid, agentNameOrAgentIdOrPeerID)){
             zframe_t *frame = zframe_new(data, size);
             zmsg_t *msg = zmsg_new();
             zmsg_append(msg, &frame);
@@ -267,7 +267,7 @@ igs_result_t igs_busSendZMQMsgToAgent(const char *agentNameOrAgentIdOrPeerID, zm
     //we iterate first on agents
     igs_remote_agent_t *agent, *tmpAgent;
     HASH_ITER(hh, coreContext->remoteAgents, agent, tmpAgent){
-        if (streq(agent->name, agentNameOrAgentIdOrPeerID) || streq(agent->uuid, agentNameOrAgentIdOrPeerID)){
+        if (streq(agent->definition->name, agentNameOrAgentIdOrPeerID) || streq(agent->uuid, agentNameOrAgentIdOrPeerID)){
             zmsg_t *dup = zmsg_dup(*msg_p);
             zmsg_addstr(dup, agent->uuid); //add agent uuid at the end of the message
             bus_zyreLock();

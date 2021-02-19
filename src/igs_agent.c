@@ -29,15 +29,16 @@ void agent_propagateAgentEvent(igs_agent_event_t event, const char *uuid, const 
 }
 
 igs_agent_t *igsAgent_new(const char *name, bool activateImmediately){
-    core_initContext();
     assert(name);
+    core_initContext();
     igs_agent_t *agent = calloc(1, sizeof(igs_agent_t));
     zuuid_t *uuid = zuuid_new();
     agent->uuid = strdup(zuuid_str(uuid));
     zuuid_destroy(&uuid);
-    agent->name = strndup(name, IGS_MAX_AGENT_NAME_LENGTH);
     zhash_insert(coreContext->createdAgents, agent->uuid, agent);
-    igsAgent_clearDefinition(agent); //set valid but empty definition, only with name equal to agent name
+    igsAgent_clearDefinition(agent); //set valid but empty definition, preserve name
+    assert(agent->definition);
+    agent->definition->name = strndup(name, IGS_MAX_AGENT_NAME_LENGTH); //set definition name manually
     igsAgent_clearMapping(agent); //set valid but empty mapping
     if (activateImmediately)
         igsAgent_activate(agent);
@@ -56,8 +57,6 @@ void igsAgent_destroy(igs_agent_t **agent){
         free((*agent)->uuid);
         (*agent)->uuid = NULL;
     }
-    if ((*agent)->name != NULL)
-        free((*agent)->name);
     if ((*agent)->state != NULL)
         free((*agent)->state);
     if ((*agent)->definitionPath != NULL)
@@ -94,7 +93,7 @@ igs_result_t igsAgent_activate(igs_agent_t *agent){
     igs_agent_t *a = NULL;
     HASH_FIND_STR(coreContext->agents, agent->uuid, a);
     if (a != NULL){
-        igs_error("agent %s (%s) is already activated", agent->name, agent->uuid);
+        igs_error("agent %s (%s) is already activated", agent->definition->name, agent->uuid);
         return IGS_FAILURE;
     }else{
         agent->context = coreContext;
@@ -108,8 +107,8 @@ igs_result_t igsAgent_activate(igs_agent_t *agent){
     }
     
     //notify all other agents inside this context that we have arrived
-    agent_propagateAgentEvent(IGS_AGENT_ENTERED, agent->uuid, agent->name, NULL);
-    agent_propagateAgentEvent(IGS_AGENT_KNOWS_US, agent->uuid, agent->name, NULL);
+    agent_propagateAgentEvent(IGS_AGENT_ENTERED, agent->uuid, agent->definition->name, NULL);
+    agent_propagateAgentEvent(IGS_AGENT_KNOWS_US, agent->uuid, agent->definition->name, NULL);
     
     //notify this agent with all the other agents already present in our context locally and remotely
     igs_agent_t *tmp;
@@ -117,9 +116,9 @@ igs_result_t igsAgent_activate(igs_agent_t *agent){
         if (!streq(a->uuid, agent->uuid)){
             igs_agent_event_callback_t *cb;
             DL_FOREACH(agent->agentEventCallbacks, cb){
-                cb->callback_ptr(agent, IGS_AGENT_ENTERED, a->uuid, a->name, NULL, cb->myData);
+                cb->callback_ptr(agent, IGS_AGENT_ENTERED, a->uuid, a->definition->name, NULL, cb->myData);
                 //in our local context, other agents already know us
-                cb->callback_ptr(agent, IGS_AGENT_KNOWS_US, a->uuid, a->name, NULL, cb->myData);
+                cb->callback_ptr(agent, IGS_AGENT_KNOWS_US, a->uuid, a->definition->name, NULL, cb->myData);
             }
         }
     }
@@ -127,7 +126,7 @@ igs_result_t igsAgent_activate(igs_agent_t *agent){
     HASH_ITER(hh, coreContext->remoteAgents, r, rtmp){
         igs_agent_event_callback_t *cb;
         DL_FOREACH(agent->agentEventCallbacks, cb){
-            cb->callback_ptr(agent, IGS_AGENT_ENTERED, r->uuid, r->name, NULL, cb->myData);
+            cb->callback_ptr(agent, IGS_AGENT_ENTERED, r->uuid, r->definition->name, NULL, cb->myData);
         }
     }
     return IGS_SUCCESS;
@@ -149,15 +148,15 @@ igs_result_t igsAgent_deactivate(igs_agent_t *agent){
             zmsg_t *msg = zmsg_new();
             zmsg_addstr(msg, "REMOTE_AGENT_EXIT");
             zmsg_addstr(msg, agent->uuid);
-            zmsg_addstr(msg, agent->name);
+            zmsg_addstr(msg, agent->definition->name);
             zyre_shout(coreContext->node, IGS_PRIVATE_CHANNEL, &msg);
             bus_zyreUnlock();
         }
     }else{
-        igs_error("agent %s (%s) is not activated", agent->name, agent->uuid);
+        igs_error("agent %s (%s) is not activated", agent->definition->name, agent->uuid);
         return IGS_FAILURE;
     }
-    agent_propagateAgentEvent(IGS_AGENT_EXITED, agent->uuid, agent->name, NULL);
+    agent_propagateAgentEvent(IGS_AGENT_EXITED, agent->uuid, agent->definition->name, NULL);
     return IGS_SUCCESS;
 }
 

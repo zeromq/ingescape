@@ -25,11 +25,11 @@
 #include "ingescape_private.h"
 
 #define INGESCAPE_MAJOR 2
-#define INGESCAPE_MINOR 1
+#define INGESCAPE_MINOR 5
 #define INGESCAPE_MICRO 0 //replaced by gitlab-ci build number
 #define INGESCAPE_VERSION ((INGESCAPE_MAJOR * 10000) + (INGESCAPE_MINOR * 100) + INGESCAPE_MICRO)
 
-#define INGESCAPE_PROTOCOL 2
+#define INGESCAPE_PROTOCOL 3
 #define NUMBER_OF_LOGS_FOR_FFLUSH 0
 
 #if defined(__unix__) || defined(__linux__) || \
@@ -177,7 +177,7 @@ void admin_log(igs_agent_t *agent, igs_logLevel_t level, const char *function, c
                     printf("error while creating log path %s\n", coreContext->logFilePath);
                 }
             }
-            strncat(coreContext->logFilePath, agent->name, IGS_MAX_PATH_LENGTH);
+            strncat(coreContext->logFilePath, agent->definition->name, IGS_MAX_PATH_LENGTH);
             strncat(coreContext->logFilePath, ".log", IGS_MAX_PATH_LENGTH);
             printf("using log file %s\n", coreContext->logFilePath);
             if (coreContext != NULL && coreContext->node != NULL){
@@ -201,7 +201,8 @@ void admin_log(igs_agent_t *agent, igs_logLevel_t level, const char *function, c
         }
         if (coreContext->logFile != NULL){
             admin_computeTime(logTime);
-            if (fprintf(coreContext->logFile,"%s;%s;%s;%s;%s\n", agent->name, logTime, log_levels[level], function, logContentForFile) > 0){
+            if (fprintf(coreContext->logFile,"%s;%s;%s;%s;%s\n",
+                        agent->definition->name, logTime, log_levels[level], function, logContentForFile) > 0){
                 if (++coreContext->logNbOfEntries > NUMBER_OF_LOGS_FOR_FFLUSH){
                     coreContext->logNbOfEntries = 0;
                     fflush(coreContext->logFile);
@@ -214,21 +215,26 @@ void admin_log(igs_agent_t *agent, igs_logLevel_t level, const char *function, c
     if ((coreContext->logInConsole && level >= coreContext->logLevel) || level >= IGS_LOG_ERROR){
         if (level >= IGS_LOG_WARN){
             if (coreContext->useColorInConsole){
-                fprintf(stderr,"%s;%s%s\x1b[0m;%s;%s\n", agent->name, log_colors[level], log_levels[level], function, logContent);
+                fprintf(stderr,"%s;%s%s\x1b[0m;%s;%s\n",
+                        agent->definition->name, log_colors[level], log_levels[level], function, logContent);
             }else{
-                fprintf(stderr,"%s;%s;%s;%s\n", agent->name, log_levels[level], function, logContent);
+                fprintf(stderr,"%s;%s;%s;%s\n",
+                        agent->definition->name, log_levels[level], function, logContent);
             }
         }else{
             if (coreContext->useColorInConsole){
-                fprintf(stdout,"%s;%s%s\x1b[0m;%s;%s\n", agent->name, log_colors[level], log_levels[level], function, logContent);
+                fprintf(stdout,"%s;%s%s\x1b[0m;%s;%s\n",
+                        agent->definition->name, log_colors[level], log_levels[level], function, logContent);
             }else{
-                fprintf(stdout,"%s;%s;%s;%s\n", agent->name, log_levels[level], function, logContent);
+                fprintf(stdout,"%s;%s;%s;%s\n",
+                        agent->definition->name, log_levels[level], function, logContent);
             }
         }
         
     }
     if (coreContext->logInStream && coreContext != NULL && coreContext->logger != NULL){
-        zstr_sendf(coreContext->logger, "%s;%s;%s;%s\n", agent->name, log_levels[level], function, logContentForFile);
+        zstr_sendf(coreContext->logger, "%s;%s;%s;%s\n",
+                   agent->definition->name, log_levels[level], function, logContentForFile);
     }
     admin_unlock();
 }

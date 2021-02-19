@@ -185,20 +185,26 @@ void definition_freeDefinition (igs_definition_t **def) {
 ////////////////////////////////////////////////////////////////////////
 void igsAgent_clearDefinition(igs_agent_t *agent){
     assert(agent);
-    //Free the structure definition loaded
-    igsAgent_debug(agent, "Clear our definition and initiate an empty one");
     model_readWriteLock();
-    if(agent->definition != NULL){
-        definition_freeDefinition(&agent->definition);
-    }
     //check that this agent has not been destroyed when we were locked
     if (!agent || !(agent->uuid)){
         model_readWriteUnlock();
         return;
     }
+    char *previousName = NULL;
+    if (agent->definition){
+        if (agent->definition->name)
+            previousName = strdup(agent->definition->name);
+        definition_freeDefinition(&agent->definition);
+    }
     agent->definition = calloc(1, sizeof(igs_definition_t));
-    assert(agent->name);
-    agent->definition->name = strdup(agent->name);
+    if (previousName){
+        igsAgent_debug(agent, "Reuse previous name '%s'", previousName);
+        agent->definition->name = previousName;
+    }else{
+        igsAgent_debug(agent, "Use default name '%s'", IGS_DEFAULT_AGENT_NAME);
+        agent->definition->name = strdup(IGS_DEFAULT_AGENT_NAME);
+    }
     agent->network_needToSendDefinitionUpdate = true;
     model_readWriteUnlock();
 }
@@ -208,7 +214,7 @@ char* igsAgent_getDefinition(igs_agent_t *agent){
     char * def = NULL;
     if(!agent->definition)
         return NULL;
-    def = parser_export_definition(agent->definition);
+    def = parser_exportDefinition(agent->definition);
     return def;
 }
 
@@ -409,7 +415,7 @@ void igsAgent_writeDefinitionToPath(igs_agent_t *agent){
     if (fp == NULL){
         igsAgent_error(agent, "Could not open '%s' for writing", agent->definitionPath);
     }else{
-        char *def = parser_export_definition(agent->definition);
+        char *def = parser_exportDefinition(agent->definition);
         assert(def);
         fprintf(fp, "%s", def);
         fflush(fp);

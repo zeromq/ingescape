@@ -46,9 +46,11 @@ iopType_t string_to_value_type(const char* str) {
             return IGS_IMPULSION_T;
         if (!strcmp(str, "DATA"))
             return IGS_DATA_T;
+        if (!strcmp(str, "UNKNOWN"))
+            return IGS_UNKNOWN_T;
     }
     
-    igs_error("unknown value type \"%s\" to convert", str);
+    igs_error("unknown value type \"%s\" to convert, returned IGS_UNKNOWN_T", str);
     return IGS_UNKNOWN_T;
 }
 
@@ -61,7 +63,7 @@ bool string_to_boolean(const char* str) {
             return false;
     }
     
-    igs_warn("unknown string \"%s\" to convert", str);
+    igs_warn("unknown string \"%s\" to convert, returned false by default", str);
     return false;
 }
 
@@ -93,821 +95,893 @@ const char* value_type_to_string (iopType_t type) {
             break;
     }
     
-    return "";
+    return NULL;
 }
 
-const char* boolean_to_string (bool boolean) {
-    return (boolean ? "true" : "false");
-}
-
-////////////////////////////////////////
-// IOP parsing
-
-//parse an igs_iop_t data and add it to the corresponding hash table
-static void json_add_iop_to_hash (igs_iop_t **hasht, iop_t type,
-                                   igsyajl_val obj){
-    const char *name = NULL;
-    iopType_t valType = IGS_UNKNOWN_T;
-    igsyajl_val value = NULL;
-
-    if (IGSYAJL_IS_OBJECT(obj)){
-        size_t nb = obj->u.object.len;
-        size_t i = 0;
-        for (i = 0; i < nb; i++){
-            const char *key = obj->u.object.keys[i];
-            if (strcmp("name", key) == 0){
-                name = IGSYAJL_GET_STRING(obj->u.object.values[i]);
-            }else if (strcmp("type", key) == 0){
-                valType = string_to_value_type (IGSYAJL_GET_STRING(obj->u.object.values[i]));
-                if (valType == IGS_UNKNOWN_T){
-                    return;
+//
+//Definition parsing
+//
+igs_definition_t* parser_parseDefinitionFromNode(igsJSONTreeNode_t **json){
+    assert(json);
+    assert(*json);
+    igs_definition_t *definition = NULL;
+    const char *descriptionPath[] = {"definition","description",NULL};
+    const char *versionPath[] = {"definition","version",NULL};
+    const char *inputsPath[] = {"definition","inputs",NULL};
+    const char *outputsPath[] = {"definition","outputs",NULL};
+    const char *parametersPath[] = {"definition","parameters",NULL};
+    const char *callsPath[] = {"definition","calls",NULL};
+    const char *argumentsPath[] = {"arguments",NULL};
+    const char *namePath[] = {"name",NULL};
+    const char *nameAlternatePath[] = {"definition","name",NULL};
+    const char *typePath[] = {"type",NULL};
+    const char *valuePath[] = {"value",NULL};
+    const char *replyPath[] = {"reply",NULL};
+    
+    //name is mandatory
+    igsJSONTreeNode_t *name = igs_JSONTreeGetNodeAtPath(*json, namePath);
+    if (name && name->type == IGS_JSON_STRING & name->u.string != NULL){
+        definition = (igs_definition_t*) calloc (1, sizeof(igs_definition_t));
+        definition->name = strdup(name->u.string);
+    } else {
+        //try alternate path for compatibility
+        name = igs_JSONTreeGetNodeAtPath(*json, nameAlternatePath);
+        if (name && name->type == IGS_JSON_STRING & name->u.string != NULL){
+            definition = (igs_definition_t*) calloc (1, sizeof(igs_definition_t));
+            definition->name = strdup(name->u.string);
+        }else
+            return NULL;
+    }
+        
+    //description
+    igsJSONTreeNode_t *description = igs_JSONTreeGetNodeAtPath(*json, descriptionPath);
+    if (description && description->type == IGS_JSON_STRING & description->u.string != NULL)
+        definition->description = strdup(description->u.string);
+    
+    //version
+    igsJSONTreeNode_t *version = igs_JSONTreeGetNodeAtPath(*json, versionPath);
+    if (version && version->type == IGS_JSON_STRING & version->u.string != NULL)
+        definition->version = strdup(version->u.string);
+    
+    //inputs
+    igsJSONTreeNode_t *inputs = igs_JSONTreeGetNodeAtPath(*json, inputsPath);
+    if (inputs && inputs->type == IGS_JSON_ARRAY){
+        for (size_t i = 0; i < inputs->u.array.len; i++){
+            igsJSONTreeNode_t *iop_name = igs_JSONTreeGetNodeAtPath(inputs->u.array.values[i], namePath);
+            if (iop_name && iop_name->type == IGS_JSON_STRING & iop_name->u.string != NULL){
+                igs_iop_t *iop = NULL;
+                char *correctedName = strndup(iop_name->u.string, IGS_MAX_IOP_NAME_LENGTH);
+                bool spaceInName = false;
+                size_t lengthOfN = strlen(correctedName);
+                size_t k = 0;
+                for (k = 0; k < lengthOfN; k++){
+                    if (correctedName[k] == ' '){
+                        correctedName[k] = '_';
+                        spaceInName = true;
+                    }
                 }
-            }else if (strcmp("value", key) == 0){
-                value = obj->u.object.values[i];
+                if (spaceInName){
+                    igs_warn("Spaces are not allowed in IOP name: %s has been renamed to %s",
+                             iop_name->u.string, correctedName);
+                }
+                HASH_FIND_STR(definition->inputs_table, correctedName, iop);
+                if (iop){
+                    igs_warn("input with name '%s' already exists : ignoring new one", correctedName);
+                    free(correctedName);
+                    continue; //iop with this name already exists
+                }
+                
+                iop = (igs_iop_t *) calloc(1, sizeof(igs_iop_t));
+                iop->type = IGS_INPUT_T;
+                iop->value_type = IGS_UNKNOWN_T;
+                iop->name = correctedName;
+                
+                igsJSONTreeNode_t *iop_type = igs_JSONTreeGetNodeAtPath(inputs->u.array.values[i], typePath);
+                if (iop_type && iop_type->type == IGS_JSON_STRING & iop_type->u.string != NULL){
+                    iop->value_type = string_to_value_type(iop_type->u.string);
+                }
+                
+                igsJSONTreeNode_t *iop_value = igs_JSONTreeGetNodeAtPath(inputs->u.array.values[i], valuePath);
+                if (iop_value){
+                    switch (iop->value_type) {
+                        case IGS_INTEGER_T:
+                            iop->value.i =(int) IGSYAJL_GET_INTEGER (iop_value);
+                            break;
+                        case IGS_DOUBLE_T:
+                            iop->value.d = IGSYAJL_GET_DOUBLE (iop_value);
+                            break;
+                        case IGS_BOOL_T:
+                            if(iop_value->type == IGS_JSON_TRUE)
+                                iop->value.b = true;
+                            else if (iop_value->type == IGS_JSON_TRUE)
+                                iop->value.b = false;
+                            else if (iop_value->type == IGS_JSON_STRING)
+                                iop->value.b = string_to_boolean(iop_value->u.string);
+                            break;
+                        case IGS_STRING_T:
+                            iop->value.s =  (IGSYAJL_IS_STRING(iop_value) ? strdup(iop_value->u.string) : NULL);
+                            break;
+                        case IGS_IMPULSION_T:
+                            //IMPULSION has no value
+                            break;
+                        case IGS_DATA_T:
+                            //FIXME : we store data as string but we should check it and convert it from base64
+                            //data->value.s = strdup (IGSYAJL_IS_STRING(obj->u.object.values[2]) ? obj->u.object.values[2]->u.string : "");
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                HASH_ADD_STR(definition->inputs_table, name, iop);
             }
         }
+    } else if (inputs){
+        igs_error("inputs are not an array : ignoring");
     }
     
-    igs_iop_t *iop = NULL;
-    if (name != NULL){
-        //handle name, value type and value
-        char *n = strndup(name, IGS_MAX_IOP_NAME_LENGTH);
-        bool spaceInName = false;
-        size_t lengthOfN = strlen(n);
-        size_t i = 0;
-        for (i = 0; i < lengthOfN; i++){
-            if (n[i] == ' '){
-                n[i] = '_';
-                spaceInName = true;
+    //outputs
+    igsJSONTreeNode_t *outputs = igs_JSONTreeGetNodeAtPath(*json, outputsPath);
+    if (outputs && outputs->type == IGS_JSON_ARRAY){
+        for (size_t i = 0; i < outputs->u.array.len; i++){
+            igsJSONTreeNode_t *iop_name = igs_JSONTreeGetNodeAtPath(outputs->u.array.values[i], namePath);
+            if (iop_name && iop_name->type == IGS_JSON_STRING & iop_name->u.string != NULL){
+                igs_iop_t *iop = NULL;
+                char *correctedName = strndup(iop_name->u.string, IGS_MAX_IOP_NAME_LENGTH);
+                bool spaceInName = false;
+                size_t lengthOfN = strlen(correctedName);
+                size_t k = 0;
+                for (k = 0; k < lengthOfN; k++){
+                    if (correctedName[k] == ' '){
+                        correctedName[k] = '_';
+                        spaceInName = true;
+                    }
+                }
+                if (spaceInName){
+                    igs_warn("Spaces are not allowed in IOP name: %s has been renamed to %s",
+                             iop_name->u.string, correctedName);
+                }
+                HASH_FIND_STR(definition->outputs_table, correctedName, iop);
+                if (iop){
+                    igs_warn("output with name '%s' already exists : ignoring new one", correctedName);
+                    free(correctedName);
+                    continue; //iop with this name already exists
+                }
+                
+                iop = (igs_iop_t *) calloc(1, sizeof(igs_iop_t));
+                iop->type = IGS_OUTPUT_T;
+                iop->value_type = IGS_UNKNOWN_T;
+                iop->name = correctedName;
+                
+                igsJSONTreeNode_t *iop_type = igs_JSONTreeGetNodeAtPath(outputs->u.array.values[i], typePath);
+                if (iop_type && iop_type->type == IGS_JSON_STRING & iop_type->u.string != NULL){
+                    iop->value_type = string_to_value_type(iop_type->u.string);
+                }
+                
+                igsJSONTreeNode_t *iop_value = igs_JSONTreeGetNodeAtPath(outputs->u.array.values[i], valuePath);
+                if (iop_value){
+                    switch (iop->value_type) {
+                        case IGS_INTEGER_T:
+                            iop->value.i =(int) IGSYAJL_GET_INTEGER (iop_value);
+                            break;
+                        case IGS_DOUBLE_T:
+                            iop->value.d = IGSYAJL_GET_DOUBLE (iop_value);
+                            break;
+                        case IGS_BOOL_T:
+                            if(iop_value->type == IGS_JSON_TRUE)
+                                iop->value.b = true;
+                            else if (iop_value->type == IGS_JSON_TRUE)
+                                iop->value.b = false;
+                            else if (iop_value->type == IGS_JSON_STRING)
+                                iop->value.b = string_to_boolean(iop_value->u.string);
+                            break;
+                        case IGS_STRING_T:
+                            iop->value.s =  (IGSYAJL_IS_STRING(iop_value) ? strdup(iop_value->u.string) : NULL);
+                            break;
+                        case IGS_IMPULSION_T:
+                            //IMPULSION has no value
+                            break;
+                        case IGS_DATA_T:
+                            //FIXME : we store data as string but we should check it and convert it from base64
+                            //data->value.s = strdup (IGSYAJL_IS_STRING(obj->u.object.values[2]) ? obj->u.object.values[2]->u.string : "");
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                HASH_ADD_STR(definition->outputs_table, name, iop);
             }
         }
-        if (spaceInName){
-            igs_warn("Spaces are not allowed in IOP name: %s has been renamed to %s", name, n);
-        }
-        HASH_FIND_STR(*hasht, n, iop);
-        if (iop == NULL){
-            iop = calloc (1, sizeof (igs_iop_t));
-            iop->name = n;
-            iop->value_type = valType;
-            switch (iop->value_type) {
-                case IGS_INTEGER_T:
-                    iop->value.i =(int) IGSYAJL_GET_INTEGER (value);
-                    break;
-                case IGS_DOUBLE_T:
-                    iop->value.d = IGSYAJL_GET_DOUBLE (value);
-                    break;
-                case IGS_BOOL_T:
-                    iop->value.b = string_to_boolean (IGSYAJL_GET_STRING(value));
-                    break;
-                case IGS_STRING_T:
-                    iop->value.s =  (IGSYAJL_IS_STRING(value) ? strdup(value->u.string) : NULL);
-                    break;
-                case IGS_IMPULSION_T:
-                    //IMPULSION has no value
-                    break;
-                case IGS_DATA_T:
-                    //FIXME : we store data as string but we should check it convert it to hexa
-                    //data->value.s = strdup (IGSYAJL_IS_STRING(obj->u.object.values[2]) ? obj->u.object.values[2]->u.string : "");
-                    break;
-                default:
-                    igs_warn("unknown data type to load from json for %s", n);
-                    break;
+    } else if (outputs){
+        igs_error("outputs are not an array : ignoring");
+    }
+    
+    //parameters
+    igsJSONTreeNode_t *parameters = igs_JSONTreeGetNodeAtPath(*json, parametersPath);
+    if (parameters && parameters->type == IGS_JSON_ARRAY){
+        for (size_t i = 0; i < parameters->u.array.len; i++){
+            igsJSONTreeNode_t *iop_name = igs_JSONTreeGetNodeAtPath(parameters->u.array.values[i], namePath);
+            if (iop_name && iop_name->type == IGS_JSON_STRING & iop_name->u.string != NULL){
+                igs_iop_t *iop = NULL;
+                char *correctedName = strndup(iop_name->u.string, IGS_MAX_IOP_NAME_LENGTH);
+                bool spaceInName = false;
+                size_t lengthOfN = strlen(correctedName);
+                size_t k = 0;
+                for (k = 0; k < lengthOfN; k++){
+                    if (correctedName[k] == ' '){
+                        correctedName[k] = '_';
+                        spaceInName = true;
+                    }
+                }
+                if (spaceInName){
+                    igs_warn("Spaces are not allowed in IOP name: %s has been renamed to %s",
+                             iop_name->u.string, correctedName);
+                }
+                HASH_FIND_STR(definition->params_table, correctedName, iop);
+                if (iop){
+                    igs_warn("parameter with name '%s' already exists : ignoring new one", correctedName);
+                    free(correctedName);
+                    continue; //iop with this name already exists
+                }
+                
+                iop = (igs_iop_t *) calloc(1, sizeof(igs_iop_t));
+                iop->type = IGS_PARAMETER_T;
+                iop->value_type = IGS_UNKNOWN_T;
+                iop->name = correctedName;
+                
+                igsJSONTreeNode_t *iop_type = igs_JSONTreeGetNodeAtPath(parameters->u.array.values[i], typePath);
+                if (iop_type && iop_type->type == IGS_JSON_STRING & iop_type->u.string != NULL){
+                    iop->value_type = string_to_value_type(iop_type->u.string);
+                }
+                
+                igsJSONTreeNode_t *iop_value = igs_JSONTreeGetNodeAtPath(parameters->u.array.values[i], valuePath);
+                if (iop_value){
+                    switch (iop->value_type) {
+                        case IGS_INTEGER_T:
+                            iop->value.i =(int) IGSYAJL_GET_INTEGER (iop_value);
+                            break;
+                        case IGS_DOUBLE_T:
+                            iop->value.d = IGSYAJL_GET_DOUBLE (iop_value);
+                            break;
+                        case IGS_BOOL_T:
+                            if(iop_value->type == IGS_JSON_TRUE)
+                                iop->value.b = true;
+                            else if (iop_value->type == IGS_JSON_TRUE)
+                                iop->value.b = false;
+                            else if (iop_value->type == IGS_JSON_STRING)
+                                iop->value.b = string_to_boolean(iop_value->u.string);
+                            break;
+                        case IGS_STRING_T:
+                            iop->value.s =  (IGSYAJL_IS_STRING(iop_value) ? strdup(iop_value->u.string) : NULL);
+                            break;
+                        case IGS_IMPULSION_T:
+                            //IMPULSION has no value
+                            break;
+                        case IGS_DATA_T:
+                            //FIXME : we store data as string but we should check it and convert it from base64
+                            //data->value.s = strdup (IGSYAJL_IS_STRING(obj->u.object.values[2]) ? obj->u.object.values[2]->u.string : "");
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                HASH_ADD_STR(definition->params_table, name, iop);
             }
-            iop->is_muted = false;
-            iop->type = type;
-            HASH_ADD_STR(*hasht, name, iop);
-        }else{
-            igs_warn("%s already exists", n);
         }
+    } else if (parameters){
+        igs_error("parameters are not an array : ignoring");
     }
-}
-
-//parse a tab of igs_iop_t data and add them into the corresponding hash table
-static void json_add_iops (igsyajl_val node, const char** path, iop_t type,
-                           igs_iop_t **hasht) {
-    igsyajl_val v;
-    v = igsyajl_tree_get(node, path, igsyajl_t_array);
-
-    if (v && IGSYAJL_IS_ARRAY(v)){
-        unsigned int  i;
-        for (i = 0; i < v->u.array.len; i++ ){
-            igsyajl_val obj = v->u.array.values[i];
-            if( obj && IGSYAJL_IS_OBJECT(obj))
-                json_add_iop_to_hash (hasht, type, obj);
-        }
-    }
-}
-
-////////////////////////////////////////
-// calls parsing
-
-static void json_parse_call_arguments (igs_call_t *call, igsyajl_val arguments){
-    if (IGSYAJL_IS_ARRAY(arguments)){
-        size_t nbArgs = arguments->u.array.len;
-        size_t i = 0;
-        for (i = 0; i < nbArgs; i++){
-            //iterate on arguments
-            igsyajl_val arg = arguments->u.array.values[i];
-            
-            if (IGSYAJL_IS_OBJECT(arg)){
-                size_t nbKeys = arg->u.object.len;
-                const char *name = NULL;
-                iopType_t valType = IGS_UNKNOWN_T;
-                size_t j = 0;
-                for (j = 0; j < nbKeys; j++){
-                    //iterate on keys for this argument
-                    const char *key = arg->u.object.keys[j];
-                    if (strcmp("name", key) == 0){
-                        name = IGSYAJL_GET_STRING(arg->u.object.values[j]);
-                    }else if (strcmp("type", key) == 0){
-                        valType = string_to_value_type (IGSYAJL_GET_STRING(arg->u.object.values[j]));
+    
+    //calls
+    igsJSONTreeNode_t *calls = igs_JSONTreeGetNodeAtPath(*json, callsPath);
+    if (calls && calls->type == IGS_JSON_ARRAY){
+        for (size_t i = 0; i < calls->u.array.len; i++){
+            igsJSONTreeNode_t *call_name = igs_JSONTreeGetNodeAtPath(calls->u.array.values[i], namePath);
+            if (call_name && call_name->type == IGS_JSON_STRING & call_name->u.string != NULL){
+                igs_call_t *myCall = NULL;
+                char *correctedName = strndup(call_name->u.string, IGS_MAX_IOP_NAME_LENGTH);
+                bool spaceInName = false;
+                size_t lengthOfN = strlen(correctedName);
+                size_t k = 0;
+                for (k = 0; k < lengthOfN; k++){
+                    if (correctedName[k] == ' '){
+                        correctedName[k] = '_';
+                        spaceInName = true;
+                    }
+                }
+                if (spaceInName){
+                    igs_warn("Spaces are not allowed in call name: %s has been renamed to %s",
+                             call_name->u.string, correctedName);
+                }
+                HASH_FIND_STR(definition->calls_table, correctedName, myCall);
+                if (myCall){
+                    igs_warn("call with name '%s' already exists : ignoring new one", correctedName);
+                    free(correctedName);
+                    continue; //call with this name already exists
+                }
+                
+                myCall = (igs_call_t *) calloc(1, sizeof(igs_call_t));
+                myCall->name = correctedName;
+                
+                description = igs_JSONTreeGetNodeAtPath(calls->u.array.values[i], descriptionPath);
+                if (description && description->type == IGS_JSON_STRING & description->u.string != NULL){
+                    myCall->description = strdup(description->u.string);
+                }
+                
+                igsJSONTreeNode_t *arguments = igs_JSONTreeGetNodeAtPath(calls->u.array.values[i], argumentsPath);
+                if (arguments && arguments->type == IGS_JSON_ARRAY){
+                    for (size_t j = 0; j < arguments->u.array.len; j++){
+                        if (arguments->u.array.values[j] && arguments->u.array.values[j]->type == IGS_JSON_MAP){
+                            igsJSONTreeNode_t *argName = igs_JSONTreeGetNodeAtPath(arguments->u.array.values[j], namePath);
+                            if (argName && argName->type == IGS_JSON_STRING && argName->u.string){
+                                char *correctedName = strndup(argName->u.string, IGS_MAX_IOP_NAME_LENGTH);
+                                bool spaceInName = false;
+                                size_t lengthOfN = strlen(correctedName);
+                                size_t k = 0;
+                                for (k = 0; k < lengthOfN; k++){
+                                    if (correctedName[k] == ' '){
+                                        correctedName[k] = '_';
+                                        spaceInName = true;
+                                    }
+                                }
+                                if (spaceInName){
+                                    igs_warn("Spaces are not allowed in call argument name: %s has been renamed to %s",
+                                             argName->u.string, correctedName);
+                                }
+                                igs_callArgument_t *newArg = (igs_callArgument_t*) calloc(1, sizeof(igs_callArgument_t));
+                                newArg->name = correctedName;
+                                igsJSONTreeNode_t *argType = igs_JSONTreeGetNodeAtPath(arguments->u.array.values[j], typePath);
+                                if (argType && argType->type == IGS_JSON_STRING && argType->u.string){
+                                    newArg->type = string_to_value_type(argType->u.string);
+                                }
+                                LL_APPEND(myCall->arguments, newArg);
+                            }
+                        }
                     }
                 }
                 
-                if (name != NULL){
-                    char *n = strndup(name, IGS_MAX_IOP_NAME_LENGTH);
-                    bool spaceInName = false;
-                    size_t lengthOfN = strlen(n);
-                    size_t _i = 0;
-                    for (_i = 0; _i < lengthOfN; _i++){
-                        if (n[_i] == ' '){
-                            n[_i] = '_';
-                            spaceInName = true;
+                igsJSONTreeNode_t *reply = igs_JSONTreeGetNodeAtPath(calls->u.array.values[i], replyPath);
+                if (reply && reply->type == IGS_JSON_MAP){
+                    igsJSONTreeNode_t *replyName = igs_JSONTreeGetNodeAtPath(reply, namePath);
+                    if (replyName && replyName->type == IGS_JSON_STRING && replyName->u.string){
+                        char *correctedName = strndup(replyName->u.string, IGS_MAX_IOP_NAME_LENGTH);
+                        bool spaceInName = false;
+                        size_t lengthOfN = strlen(correctedName);
+                        size_t k = 0;
+                        for (k = 0; k < lengthOfN; k++){
+                            if (correctedName[k] == ' '){
+                                correctedName[k] = '_';
+                                spaceInName = true;
+                            }
                         }
-                    }
-                    if (spaceInName){
-                        igs_warn("Spaces are not allowed in call argument name: %s has been renamed to %s", name, n);
-                    }
-                    if (valType != IGS_UNKNOWN_T){
-                        igs_callArgument_t *callArg = calloc(1, sizeof(igs_callArgument_t));
-                        callArg->name = n;
-                        callArg->type = valType;
-                        LL_APPEND(call->arguments, callArg);
-                    }else{
-                        free(n);
+                        if (spaceInName){
+                            igs_warn("Spaces are not allowed in call argument name: %s has been renamed to %s",
+                                     replyName->u.string, correctedName);
+                        }
+                        igs_call_t *myReply = (igs_call_t *) calloc(1, sizeof(igs_call_t));
+                        myReply->name = correctedName;
+                        
+                        arguments = igs_JSONTreeGetNodeAtPath(reply, argumentsPath);
+                        if (arguments && arguments->type == IGS_JSON_ARRAY){
+                            for (size_t j = 0; j < arguments->u.array.len; j++){
+                                if (arguments->u.array.values[j] && arguments->u.array.values[j]->type == IGS_JSON_MAP){
+                                    igsJSONTreeNode_t *argName = igs_JSONTreeGetNodeAtPath(arguments->u.array.values[j], namePath);
+                                    if (argName && argName->type == IGS_JSON_STRING && argName->u.string){
+                                        char *correctedName = strndup(argName->u.string, IGS_MAX_IOP_NAME_LENGTH);
+                                        bool spaceInName = false;
+                                        size_t lengthOfN = strlen(correctedName);
+                                        size_t k = 0;
+                                        for (k = 0; k < lengthOfN; k++){
+                                            if (correctedName[k] == ' '){
+                                                correctedName[k] = '_';
+                                                spaceInName = true;
+                                            }
+                                        }
+                                        if (spaceInName){
+                                            igs_warn("Spaces are not allowed in call argument name: %s has been renamed to %s",
+                                                     argName->u.string, correctedName);
+                                        }
+                                        igs_callArgument_t *newArg = (igs_callArgument_t*) calloc(1, sizeof(igs_callArgument_t));
+                                        newArg->name = correctedName;
+                                        igsJSONTreeNode_t *argType = igs_JSONTreeGetNodeAtPath(arguments->u.array.values[j], typePath);
+                                        if (argType && argType->type == IGS_JSON_STRING && argType->u.string){
+                                            newArg->type = string_to_value_type(argType->u.string);
+                                        }
+                                        LL_APPEND(myReply->arguments, newArg);
+                                    }
+                                }
+                            }
+                        }
+                        myCall->reply = myReply;
                     }
                 }
-            }else{
-                igs_error("argument is not passed as an object");
+
+                HASH_ADD_STR(definition->calls_table, name, myCall);
             }
         }
-    }else{
-        igs_error("arguments are not passed as an array");
+    } else if (calls){
+        igs_error("calls are not an array : ignoring");
     }
+    
+    igs_JSONTreeFree(json);
+    return definition;
 }
 
-//parse a call and add it to the corresponding hash table
-static void json_add_call_to_hash (igs_call_t **hasht, igsyajl_val obj){
+//
+// Mapping parsing
+//
+igs_mapping_t* parser_parseMappingFromNode(igsJSONTreeNode_t **json){
+    assert(json);
+    assert(*json);
+    igs_mapping_t *mapping = NULL;
+    const char *mappingsPath[] = {"mappings",NULL};
+    //const char *fromAgentPath[] = {"fromAgent",NULL};
+    const char *fromInputPath[] = {"fromInput",NULL};
+    const char *toAgentPath[] = {"toAgent",NULL};
+    const char *toOutputPath[] = {"toOutput",NULL};
+    const char *alternateMappingsPath[] = {"mapping","mapping_out",NULL};
+    const char *alternateFromInputPath[] = {"input_name",NULL};
+    const char *alternateToAgentPath[] = {"agent_name",NULL};
+    const char *alternateToOutputPath[] = {"output_name",NULL};
     
-    const char *name = NULL;
-    const char *description = NULL;
-    igsyajl_val arguments = NULL;
-    igsyajl_val reply = NULL;
-    
-    if (IGSYAJL_IS_OBJECT(obj)){
-        size_t nb = obj->u.object.len;
-        size_t i = 0;
-        for (i = 0; i < nb; i++){
-            const char *key = obj->u.object.keys[i];
-            if (strcmp("name", key) == 0){
-                name = IGSYAJL_GET_STRING(obj->u.object.values[i]);
-            }else if (strcmp("description", key) == 0){
-                description = IGSYAJL_GET_STRING(obj->u.object.values[i]);
-            }else if (strcmp("arguments", key) == 0){
-                arguments = obj->u.object.values[i];
-            }else if (strcmp("reply", key) == 0){
-                reply = obj->u.object.values[i];
-            }
-        }
-    }
-    char *n = NULL;
-    if (name != NULL){
-        n = strndup(name, IGS_MAX_IOP_NAME_LENGTH);
-        bool spaceInName = false;
-        size_t lengthOfN = strlen(n);
-        size_t i = 0;
-        for (i = 0; i < lengthOfN; i++){
-            if (n[i] == ' '){
-                n[i] = '_';
-                spaceInName = true;
-            }
-        }
-        if (spaceInName){
-            igs_warn("Spaces are not allowed in call name: %s has been renamed to %s", name, n);
-        }
-    }else{
-        igs_warn("parsed call with NULL name");
+    bool useAlternate = false;
+    igsJSONTreeNode_t *mappings = igs_JSONTreeGetNodeAtPath(*json, mappingsPath);
+    if (mappings == NULL){
+        mappings = igs_JSONTreeGetNodeAtPath(*json, alternateMappingsPath);
+        if (mappings && mappings->type == IGS_JSON_ARRAY)
+            useAlternate = true;
+        else
+            return NULL;
     }
     
-    igs_call_t *call = NULL;
-    HASH_FIND_STR(*hasht, n, call);
-    if (call == NULL){
-        call = calloc(1, sizeof(igs_call_t));
-        call->name = n;
-        if (description != NULL)
-            call->description = strndup(description, IGS_MAX_DESCRIPTION_LENGTH);
-        if (arguments != NULL){
-            json_parse_call_arguments(call, arguments);
-        }
-        if (reply != NULL && reply->type == igsyajl_t_object
-            && reply->u.object.len >= 2){
-            igs_call_t *callReply = calloc(1, sizeof(igs_call_t));
-            for (size_t i = 0; i < reply->u.object.len; i++){
-                const char *key = reply->u.object.keys[i];
-                if (strcmp(key, STR_NAME) == 0
-                    && reply->u.object.values[i] != NULL
-                    && reply->u.object.values[i]->type == igsyajl_t_string){
-                    callReply->name = strdup(reply->u.object.values[i]->u.string);
-                } else if (strcmp(key, STR_ARGUMENTS) == 0
-                           && reply->u.object.values[i] != NULL
-                           && reply->u.object.values[i]->type == igsyajl_t_array){
-                    json_parse_call_arguments(callReply, reply->u.object.values[i]);
-                }
-            }
-            call->reply = callReply;
-        }
-        HASH_ADD_STR(*hasht, name, call);
-    }else{
-        igs_warn("%s already exists", name);
-    }
-}
-
-//parse a tab of calls and add them into the corresponding hash table
-static void json_add_calls (igsyajl_val node, const char **path, igs_call_t **hasht){
-    igsyajl_val v;
-    v = igsyajl_tree_get(node, path, igsyajl_t_array);
-    
-    if (v && IGSYAJL_IS_ARRAY(v)){
-        unsigned int  i;
-        for (i = 0; i < v->u.array.len; i++ ){
-            igsyajl_val obj = v->u.array.values[i];
-            if( obj && IGSYAJL_IS_OBJECT(obj))
-                json_add_call_to_hash (hasht, obj);
-        }
-    }
-}
-
-////////////////////////////////////////
-// File reading and parsing
-
-// fetch a JSON file and convert it into string readable by the JSON parser
-static char* json_fetch (const char* path) {
-
-    FILE *file;
-    char buff[BUFSIZ];
-    char *js = NULL;
-    int jslen = 0;
-    unsigned int rd;
-
-    file = fopen(path, "r");
-    if (!file){
-        igs_error("file %s not found", path);
-        return 0;
-    }
-
-    /* read the whole config file */
-    do {
-
-        rd = (unsigned int) fread(buff, 1, sizeof(buff) , file);
-        /* file read error handling */
-        if (rd == 0 && !feof(stdin)) {
-            igs_error("could not read %s", path);
-            return 0;
-        }
-
-        /* rebuild the json string */
-        js = realloc(js, jslen + rd + 1);
-        if (!js) {
-            igs_error("could not realloc parsed string");
-            return 0;
-        }
-        strncpy(js + jslen, buff, rd);
-        jslen = jslen + rd;
-
-    }while (rd >= sizeof(buff));
-
-    if (file)
-        fclose(file);
-
-    return js;
-}
-
-// convert JSON string into DOM
-static int json_callize (const char* json_str, igsyajl_val *node) {
-
-    char errbuf[BUFSIZ] = "unknown error";
-    /* we have the whole config file in memory.  let's parse it ... */
-    *node = igsyajl_tree_parse(json_str, errbuf, sizeof(errbuf));
-
-    /* parse error handling */
-    if (!(*node) || strlen(errbuf) > 0) {
-        igs_error("could not parse string (%s)", errbuf);
-        return 0;
-    }
-
-    return 1;
-}
-
-// convert a definition json file into a definition structure
-static igs_definition_t* json_parse_definition (igsyajl_val node) {
-    igs_definition_t *def;
-    igsyajl_val v;
-    def = (igs_definition_t*) calloc(1, sizeof(igs_definition_t));
-    const char * path[] = { STR_DEFINITION, "", (const char *) 0 };
-
-    path[1] = STR_NAME;
-    v = igsyajl_tree_get(node, path, igsyajl_t_any);
-    if (v){
-        def->name = (IGSYAJL_IS_STRING(v) ? strdup((v)->u.string) : NULL);
-    }
-
-    path[1] = STR_DESCRIPTION;
-    v = igsyajl_tree_get(node, path, igsyajl_t_any);
-    if (v){
-        def->description = (IGSYAJL_IS_STRING(v) ? strdup((v)->u.string) : NULL);
-    }
-
-    path[1] = STR_VERSION;
-    v = igsyajl_tree_get(node, path, igsyajl_t_any);
-    if (v){
-        def->version = (IGSYAJL_IS_STRING(v) ? strdup((v)->u.string) : NULL);
-    }
-
-    path[1] = STR_INPUTS;
-    json_add_iops (node, path, IGS_INPUT_T, &def->inputs_table);
-
-    path[1] = STR_OUTPUTS;
-    json_add_iops (node, path, IGS_OUTPUT_T, &def->outputs_table);
-
-    path[1] = STR_PARAMETERS;
-    json_add_iops (node, path, IGS_PARAMETER_T, &def->params_table);
-    
-    path[1] = STR_CALLS;
-    json_add_calls (node, path, &def->calls_table);
-
-    return def;
-}
-
-// parse a tab of mapping output type and add them into the corresponding hash table
-static void json_add_map_out_to_hash (igs_mapping_element_t** hasht,
-                                       igsyajl_val current_map_out){
-
-    const char* input_name = NULL;
-    const char* agent_name = NULL;
-    const char* output_name = NULL;
-    igsyajl_val v;
-    const char * path_in_current[] = { "", (const char *) 0 };
-
-    //input_name
-    path_in_current[0] = "input_name";
-    v = igsyajl_tree_get(current_map_out, path_in_current, igsyajl_t_any);
-    if (v){
-        input_name = IGSYAJL_GET_STRING(v);
-    }
-    char *reviewedFromOurInput = strndup(input_name, IGS_MAX_IOP_NAME_LENGTH);
-    bool spaceInName = false;
-    size_t lengthOfReviewedFromOurInput = strlen(reviewedFromOurInput);
-    size_t i = 0;
-    for (i = 0; i < lengthOfReviewedFromOurInput; i++){
-        if (reviewedFromOurInput[i] == ' '){
-            reviewedFromOurInput[i] = '_';
-            spaceInName = true;
-        }
-    }
-    if (spaceInName){
-        igs_warn("Mapping parser : spaces are not allowed in IOP: %s has been renamed to %s\n", input_name, reviewedFromOurInput);
-    }
-    
-    //agent_name
-    path_in_current[0] = "agent_name";
-    v = igsyajl_tree_get(current_map_out, path_in_current, igsyajl_t_any);
-    if (v){
-        agent_name = IGSYAJL_GET_STRING(v);
-    }
-    char *reviewedToAgent = strndup(agent_name, IGS_MAX_IOP_NAME_LENGTH);
-    size_t lengthOfReviewedToAgent = strlen(reviewedToAgent);
-    spaceInName = false;
-    for (i = 0; i < lengthOfReviewedToAgent; i++){
-        if (reviewedToAgent[i] == ' '){
-            reviewedToAgent[i] = '_';
-            spaceInName = true;
-        }
-    }
-    if (spaceInName){
-        igs_warn("Mapping parser : spaces are not allowed in agent name: %s has been renamed to %s\n", agent_name, reviewedToAgent);
-    }
-    
-    //output_name
-    path_in_current[0] = "output_name";
-    v = igsyajl_tree_get(current_map_out, path_in_current, igsyajl_t_any);
-    if (v){
-        output_name = IGSYAJL_GET_STRING(v);
-    }
-    char *reviewedWithOutput = strndup(output_name, IGS_MAX_IOP_NAME_LENGTH);
-    size_t lengthOfReviewedWithOutput = strlen(reviewedWithOutput);
-    spaceInName = false;
-    for (i = 0; i < lengthOfReviewedWithOutput; i++){
-        if (reviewedWithOutput[i] == ' '){
-            reviewedWithOutput[i] = '_';
-            spaceInName = true;
-        }
-    }
-    if (spaceInName){
-        igs_warn("Mapping parser : spaces are not allowed in IOP: %s has been renamed to %s\n", output_name, reviewedWithOutput);
-    }
-    
-    size_t len = strlen(reviewedFromOurInput)+strlen(reviewedToAgent)+strlen(reviewedWithOutput)+3+1;
-    char *mashup = calloc(1, len*sizeof(char));
-    strcpy(mashup, reviewedFromOurInput);
-    strcat(mashup, ".");//separator
-    strcat(mashup, reviewedToAgent);
-    strcat(mashup, ".");//separator
-    strcat(mashup, reviewedWithOutput);
-    mashup[len -1] = '\0';
-    unsigned long h = djb2_hash((unsigned char *)mashup);
-    free (mashup);
-    
-    igs_mapping_element_t *tmp = NULL;
-    if (*hasht != NULL){
-        HASH_FIND(hh, *hasht, &h, sizeof(unsigned long), tmp);
-    }
-    if (tmp == NULL){
-        //element does not exist yet : create and register it
-        igs_mapping_element_t *new = mapping_createMappingElement(reviewedFromOurInput, reviewedToAgent, reviewedWithOutput);
-        new->id = h;
-        HASH_ADD(hh, *hasht, id, sizeof(unsigned long), new);
-    }
-    free(reviewedFromOurInput);
-    free(reviewedToAgent);
-    free(reviewedWithOutput);
-}
-
-
-// convert a map.json file into a mapping (output & category) structure
-static igs_mapping_t* json_parse_mapping (igsyajl_val node) {
-    igs_mapping_t* mapping;
-    igsyajl_val v;
     mapping = (igs_mapping_t*) calloc(1, sizeof(igs_mapping_t));
-    const char* path[] = { "mapping", "", (const char *) 0 };
-
-    path[1] = STR_NAME;
-    v = igsyajl_tree_get(node, path, igsyajl_t_any);
-    if (v){
-        const char* name = IGSYAJL_GET_STRING(v);
-        mapping->name = strdup (name);
-    }
-
-    path[1] = STR_DESCRIPTION;
-    v = igsyajl_tree_get(node, path, igsyajl_t_any);
-    if (v){
-        const char* description = IGSYAJL_GET_STRING(v);
-        mapping->description = strdup (description);
-    }
-
-    path[1] = STR_VERSION;
-    v = igsyajl_tree_get(node, path, igsyajl_t_any);
-    if (v){
-        const char* version = IGSYAJL_GET_STRING(v);
-        mapping->version = strdup (version);
-    }
-
-    path[1] = "mapping_out";
-    v = igsyajl_tree_get(node, path, igsyajl_t_array);
-    if (v && IGSYAJL_IS_ARRAY(v)){
-        unsigned int  i;
-        for (i = 0; i < v->u.array.len; i++ ){
-            igsyajl_val obj = v->u.array.values[i];
-            if( obj && IGSYAJL_IS_OBJECT(obj))
-                json_add_map_out_to_hash (&mapping->map_elements, obj);
+    
+    //FIXME: we will not use fromAgent in parsing because the received
+    //mappings should all imply our inputs. In the future, we could
+    //check fromAgent to ensure this is us but this requires changing the
+    //internal API to attach parsing to a specific agent instance.
+    for (size_t i = 0; i < mappings->u.array.len; i++){
+        if (mappings->u.array.values[i]->type != IGS_JSON_MAP)
+            continue;
+        char *fromInput = NULL;
+        char *toAgent = NULL;
+        char *toOutput = NULL;
+        igsJSONTreeNode_t *fromInputNode = NULL;
+        igsJSONTreeNode_t *toAgentNode = NULL;
+        igsJSONTreeNode_t *toOutputNode = NULL;
+        if (!useAlternate){
+            fromInputNode = igs_JSONTreeGetNodeAtPath(mappings->u.array.values[i], fromInputPath);
+            toAgentNode = igs_JSONTreeGetNodeAtPath(mappings->u.array.values[i], toAgentPath);
+            toOutputNode = igs_JSONTreeGetNodeAtPath(mappings->u.array.values[i], toOutputPath);
+        }else{
+            fromInputNode = igs_JSONTreeGetNodeAtPath(mappings->u.array.values[i], alternateFromInputPath);
+            toAgentNode = igs_JSONTreeGetNodeAtPath(mappings->u.array.values[i], alternateToAgentPath);
+            toOutputNode = igs_JSONTreeGetNodeAtPath(mappings->u.array.values[i], alternateToOutputPath);
         }
-    }
-
-    return mapping;
-}
-
-/////////////////////////
-// Dumping functions
-
-
-// convert a call into json string
-static void json_dump_call (igsyajl_gen *g, igs_call_t *call) {
-    
-    igsyajl_gen_map_open(*g);
-    
-    igsyajl_gen_string(*g, (const unsigned char *) STR_NAME, strlen(STR_NAME));
-    igsyajl_gen_string(*g, (const unsigned char *) call->name, strlen (call->name));
-    
-    if (call->description != NULL){
-        igsyajl_gen_string(*g, (const unsigned char *) STR_DESCRIPTION, strlen(STR_DESCRIPTION));
-        igsyajl_gen_string(*g, (const unsigned char *) call->description, strlen (call->description));
-    }
-    
-    igs_callArgument_t *arg = NULL;
-    int nbArgs = 0;
-    DL_COUNT(call->arguments, arg, nbArgs);
-    if ((call->arguments != NULL) && (nbArgs > 0)){
-        igsyajl_gen_string(*g, (const unsigned char *) STR_ARGUMENTS, strlen(STR_ARGUMENTS));
-        igsyajl_gen_array_open(*g);
-        DL_FOREACH(call->arguments, arg){
-            igsyajl_gen_map_open(*g);
-            igsyajl_gen_string(*g, (const unsigned char *) STR_NAME, strlen(STR_NAME));
-            igsyajl_gen_string(*g, (const unsigned char *) arg->name, strlen(arg->name));
-            igsyajl_gen_string(*g, (const unsigned char *) STR_TYPE, strlen(STR_TYPE));
-            const char *type = value_type_to_string(arg->type);
-            igsyajl_gen_string(*g, (const unsigned char *) type, strlen(type));
-            igsyajl_gen_map_close(*g);
-        }
-        igsyajl_gen_array_close(*g);
-    }
-    //dump reply
-    if (call->reply != NULL && call->reply->name != NULL){
-        igsyajl_gen_string(*g, (const unsigned char *) STR_REPLY, strlen(STR_REPLY));
-        igsyajl_gen_map_open(*g);
-        
-        igsyajl_gen_string(*g, (const unsigned char *) STR_NAME, strlen(STR_NAME));
-        igsyajl_gen_string(*g, (const unsigned char *) call->reply->name, strlen (call->reply->name));
-        
-        arg = NULL;
-        nbArgs = 0;
-        DL_COUNT(call->reply->arguments, arg, nbArgs);
-        if ((call->reply->arguments != NULL) && (nbArgs > 0)){
-            igsyajl_gen_string(*g, (const unsigned char *) STR_ARGUMENTS, strlen(STR_ARGUMENTS));
-            igsyajl_gen_array_open(*g);
-            DL_FOREACH(call->reply->arguments, arg){
-                igsyajl_gen_map_open(*g);
-                igsyajl_gen_string(*g, (const unsigned char *) STR_NAME, strlen(STR_NAME));
-                igsyajl_gen_string(*g, (const unsigned char *) arg->name, strlen(arg->name));
-                igsyajl_gen_string(*g, (const unsigned char *) STR_TYPE, strlen(STR_TYPE));
-                const char *type = value_type_to_string(arg->type);
-                igsyajl_gen_string(*g, (const unsigned char *) type, strlen(type));
-                igsyajl_gen_map_close(*g);
-            }
-            igsyajl_gen_array_close(*g);
-        }
-        
-        igsyajl_gen_map_close(*g);
-    }
-    
-    igsyajl_gen_map_close(*g);
-}
-
-// convert an igs_iop_t structure into json string
-static void json_dump_iop (igsyajl_gen *g, igs_iop_t* aiop) {
-    
-    igsyajl_gen_map_open(*g);
-    
-    igsyajl_gen_string(*g, (const unsigned char *) STR_NAME, strlen(STR_NAME));
-    igsyajl_gen_string(*g, (const unsigned char *) aiop->name, strlen (aiop->name));
-    
-    igsyajl_gen_string(*g, (const unsigned char *) STR_TYPE, strlen(STR_TYPE));
-    igsyajl_gen_string(*g, (const unsigned char *) value_type_to_string(aiop->value_type), strlen(value_type_to_string(aiop->value_type)));
-    
-    igsyajl_gen_string(*g, (const unsigned char *) STR_VALUE, strlen(STR_VALUE));
-    
-    switch (aiop->value_type) {
-        case IGS_INTEGER_T:
-            igsyajl_gen_integer(*g, aiop->value.i);
-            break;
-
-        case IGS_DOUBLE_T:
-            igsyajl_gen_double(*g, aiop->value.d);
-            break;
-
-        case IGS_BOOL_T:
-            igsyajl_gen_string(*g, (const unsigned char *) boolean_to_string(aiop->value.b), strlen(boolean_to_string(aiop->value.b)));
-            break;
-
-        case IGS_STRING_T:
-            {
-                if (igsyajl_gen_string(*g, (const unsigned char *) aiop->value.s, strlen(aiop->value.s)) == igsyajl_gen_invalid_string)
-                {
-                    igs_warn("Mapping parser : json_dump_iop failed to dump a string value - it may not be a valid UTF8 string - %s\n", aiop->value.s);
-                    igsyajl_gen_string(*g, (const unsigned char *) "", 0);
+        if (fromInputNode && fromInputNode->type == IGS_JSON_STRING && fromInputNode->u.string){
+            char *correctedName = strndup(fromInputNode->u.string, IGS_MAX_IOP_NAME_LENGTH);
+            bool spaceInName = false;
+            size_t lengthOfN = strlen(correctedName);
+            size_t k = 0;
+            for (k = 0; k < lengthOfN; k++){
+                if (correctedName[k] == ' '){
+                    correctedName[k] = '_';
+                    spaceInName = true;
                 }
             }
-            break;
-
-        case IGS_IMPULSION_T:
-            igsyajl_gen_string(*g, (const unsigned char *) "", 0);
-            break;
-
-        case IGS_DATA_T:
-            igsyajl_gen_string(*g, (const unsigned char *) "", 0);
-            break;
-
-        default:
-            {
-                igs_warn("unknown data type to convert in string (%d)", aiop->value_type);
-                igsyajl_gen_string(*g, (const unsigned char *) "", 0);
+            if (spaceInName){
+                igs_warn("Spaces are not allowed in mapping element name: %s has been renamed to %s",
+                         fromInputNode->u.string, correctedName);
             }
-            break;
-    }
-    igsyajl_gen_map_close(*g);
-}
-
-// convert a definition structure into definition.json string
-static void json_dump_definition (igsyajl_gen *g, igs_definition_t* def) {
-    assert(g);
-    assert(def);
-    igs_iop_t *d;
-    igsyajl_gen_map_open(*g);
-    if (def->name){
-        igsyajl_gen_string(*g, (const unsigned char *) STR_NAME, strlen(STR_NAME));
-        igsyajl_gen_string(*g, (const unsigned char *) def->name, strlen (def->name));
-    }
-    if(def->description){
-        igsyajl_gen_string(*g, (const unsigned char *) STR_DESCRIPTION, strlen(STR_DESCRIPTION));
-        igsyajl_gen_string(*g, (const unsigned char *) def->description, strlen (def->description));
-    }
-    if(def->version){
-        igsyajl_gen_string(*g, (const unsigned char *) STR_VERSION, strlen(STR_VERSION));
-        igsyajl_gen_string(*g, (const unsigned char *) def->version, strlen(def->version));
-    }
-    if (def->params_table) {
-        igsyajl_gen_string(*g, (const unsigned char *) STR_PARAMETERS, strlen(STR_PARAMETERS));
-        igsyajl_gen_array_open(*g);
-        for(d=def->params_table; d != NULL; d=d->hh.next) {
-            json_dump_iop (g, d);
+            fromInput = correctedName;
         }
-        igsyajl_gen_array_close(*g);
-    }
-    if (def->inputs_table) {
-        igsyajl_gen_string(*g, (const unsigned char *) STR_INPUTS, strlen(STR_INPUTS));
-        igsyajl_gen_array_open(*g);
-        for(d=def->inputs_table; d != NULL; d=d->hh.next) {
-            json_dump_iop (g, d);
+        if (toAgentNode && toAgentNode->type == IGS_JSON_STRING && toAgentNode->u.string){
+            char *correctedName = strndup(toAgentNode->u.string, IGS_MAX_IOP_NAME_LENGTH);
+            bool spaceInName = false;
+            size_t lengthOfN = strlen(correctedName);
+            size_t k = 0;
+            for (k = 0; k < lengthOfN; k++){
+                if (correctedName[k] == ' '){
+                    correctedName[k] = '_';
+                    spaceInName = true;
+                }
+            }
+            if (spaceInName){
+                igs_warn("Spaces are not allowed in mapping element name: %s has been renamed to %s",
+                         toAgentNode->u.string, correctedName);
+            }
+            toAgent = correctedName;
         }
-        igsyajl_gen_array_close(*g);
-    }
-    if (def->outputs_table) {
-        igsyajl_gen_string(*g, (const unsigned char *) STR_OUTPUTS, strlen(STR_OUTPUTS));
-        igsyajl_gen_array_open(*g);
-        for(d=def->outputs_table; d != NULL; d=d->hh.next) {
-            json_dump_iop (g, d);
+        if (toOutputNode && toOutputNode->type == IGS_JSON_STRING && toOutputNode->u.string){
+            char *correctedName = strndup(toOutputNode->u.string, IGS_MAX_IOP_NAME_LENGTH);
+            bool spaceInName = false;
+            size_t lengthOfN = strlen(correctedName);
+            size_t k = 0;
+            for (k = 0; k < lengthOfN; k++){
+                if (correctedName[k] == ' '){
+                    correctedName[k] = '_';
+                    spaceInName = true;
+                }
+            }
+            if (spaceInName){
+                igs_warn("Spaces are not allowed in mapping element name: %s has been renamed to %s",
+                         toOutputNode->u.string, correctedName);
+            }
+            toOutput = correctedName;
         }
-        igsyajl_gen_array_close(*g);
-    }
-    if (def->calls_table) {
-        igsyajl_gen_string(*g, (const unsigned char *) STR_CALLS, strlen(STR_CALLS));
-        igsyajl_gen_array_open(*g);
-        igs_call_t *t = NULL, *tmp = NULL;
-        HASH_ITER(hh, def->calls_table, t, tmp){
-            json_dump_call (g, t);
+        if (fromInput && toAgent && toOutput){
+            
+            size_t len = strlen(fromInput)+strlen(toAgent)+strlen(toOutput)+3+1;
+            char *mashup = calloc(1, len*sizeof(char));
+            strcpy(mashup, fromInput);
+            strcat(mashup, ".");//separator
+            strcat(mashup, toAgent);
+            strcat(mashup, ".");//separator
+            strcat(mashup, toOutput);
+            mashup[len -1] = '\0';
+            unsigned long h = djb2_hash((unsigned char *)mashup);
+            free(mashup);
+            
+            igs_mapping_element_t *tmp = NULL;
+            HASH_FIND(hh, mapping->map_elements, &h, sizeof(unsigned long), tmp);
+            if (tmp == NULL){
+                //element does not exist yet : create and register it
+                igs_mapping_element_t *new = mapping_createMappingElement(fromInput, toAgent, toOutput);
+                new->id = h;
+                HASH_ADD(hh, mapping->map_elements, id, sizeof(unsigned long), new);
+            }else{
+                igs_error("hash already exists for %s->%s.%s", fromInput, toAgent, toOutput);
+            }
         }
-        igsyajl_gen_array_close(*g);
+        if (fromInput)
+            free(fromInput);
+        if (toAgent)
+            free(toAgent);
+        if (toOutput)
+            free(toOutput);
     }
-    igsyajl_gen_map_close(*g);
-}
-
-//convert a mapping_out structure into json structure
-static void json_dump_mapping_out (igsyajl_gen *g, igs_mapping_element_t* mapp_out) {
-    assert(g);
-    assert(mapp_out);
-    igsyajl_gen_map_open(*g);
-    igsyajl_gen_string(*g, (const unsigned char *) "input_name", strlen("input_name"));
-    igsyajl_gen_string(*g, (const unsigned char *) mapp_out->input_name, strlen (mapp_out->input_name));
-    igsyajl_gen_string(*g, (const unsigned char *) "agent_name", strlen("agent_name"));
-    igsyajl_gen_string(*g, (const unsigned char *) mapp_out->agent_name, strlen(mapp_out->agent_name));
-    igsyajl_gen_string(*g, (const unsigned char *) "output_name", strlen("output_name"));
-    igsyajl_gen_string(*g, (const unsigned char *) mapp_out->output_name, strlen(mapp_out->output_name));
-    igsyajl_gen_map_close(*g);
-}
-
-//convert a mapping structure into mapping.json string
-static void json_dump_mapping (igsyajl_gen *g, igs_mapping_t* mapping) {
-    assert(g);
-    assert(mapping);
-    igs_mapping_element_t *currentMapOut = NULL;
-    igsyajl_gen_map_open(*g);
-    if(mapping->name){
-        igsyajl_gen_string(*g, (const unsigned char *) STR_NAME, strlen(STR_NAME));
-        igsyajl_gen_string(*g, (const unsigned char *) mapping->name, strlen (mapping->name));
-    }
-    if(mapping->description){
-        igsyajl_gen_string(*g, (const unsigned char *) STR_DESCRIPTION, strlen(STR_DESCRIPTION));
-        igsyajl_gen_string(*g, (const unsigned char *) mapping->description, strlen (mapping->description));
-    }
-    if(mapping->version){
-        igsyajl_gen_string(*g, (const unsigned char *) STR_VERSION, strlen(STR_VERSION));
-        igsyajl_gen_string(*g, (const unsigned char *) mapping->version, strlen(mapping->version));
-    }
-    if (mapping->map_elements) {
-        igsyajl_gen_string(*g, (const unsigned char *) "mapping_out", strlen("mapping_out"));
-        igsyajl_gen_array_open(*g);
-        for(currentMapOut = mapping->map_elements; currentMapOut != NULL; currentMapOut=currentMapOut->hh.next) {
-            json_dump_mapping_out(g, currentMapOut);
-        }
-        igsyajl_gen_array_close(*g);
-    }
-    igsyajl_gen_map_close(*g);
+    
+    igs_JSONTreeFree(json);
+    return mapping;
 }
 
 ////////////////////////////////////////////////////////////////////////
 // PRIVATE API
 ////////////////////////////////////////////////////////////////////////
 igs_definition_t* parser_loadDefinition (const char* json_str) {
-    igs_definition_t *def = NULL;
-    igsyajl_val node;
-    if (json_callize(json_str, &node) != 0){
-        def = json_parse_definition(node);
-        igsyajl_tree_free(node);
+    assert(json_str);
+    igsJSONTreeNode_t *json = igs_JSONTreeParseFromString(json_str);
+    if (!json){
+        igs_error("could not parse JSON string : '%s'", json_str);
+        return NULL;
     }
-    return def;
+    if (json->type != IGS_JSON_MAP){
+        igs_error("parsed JSON is not an array : '%s'", json_str);
+        return NULL;
+    }
+    return parser_parseDefinitionFromNode(&json);
 }
 
 
 igs_definition_t * parser_loadDefinitionFromPath (const char* path) {
-    char *json_str = NULL;
-    igs_definition_t *def = NULL;
-    json_str = json_fetch(path);
-    if (!json_str)
+    assert(path);
+    igsJSONTreeNode_t *json = igs_JSONTreeParseFromFile(path);
+    if (!json){
+        igs_error("could not parse JSON file '%s'", path);
         return NULL;
-    
-    def = parser_loadDefinition(json_str);
-    free (json_str);
-    return def;
-}
-
-
-char* parser_export_definition(igs_definition_t* def){
-    assert(def);
-    char* result = NULL;
-    if (def != NULL){
-        const unsigned char * json_str = NULL;
-        size_t len;
-        igsyajl_gen g;
-        
-        g = igsyajl_gen_alloc(NULL);
-        igsyajl_gen_config(g, igsyajl_gen_beautify, 1);
-        igsyajl_gen_config(g, igsyajl_gen_validate_utf8, 1);
-        
-        igsyajl_gen_map_open(g);
-        igsyajl_gen_string(g, (const unsigned char *) STR_DEFINITION, strlen(STR_DEFINITION));
-        
-        if(def != NULL){
-            json_dump_definition(&g, def);
-        }
-        igsyajl_gen_map_close(g);
-        
-        // try to get our dumping result
-        if (igsyajl_gen_get_buf(g, &json_str, &len) == igsyajl_gen_status_ok){
-            result = strdup((const char*) json_str);
-        }
-        
-        igsyajl_gen_free(g);
     }
-    return result;
+    if (json->type != IGS_JSON_MAP){
+        igs_error("parsed JSON at '%s' is not an array", path);
+        return NULL;
+    }
+    return parser_parseDefinitionFromNode(&json);
 }
 
 
 igs_mapping_t* parser_loadMapping(const char* json_str){
-    if (!json_str || strlen(json_str) == 0)
+    assert(json_str);
+    igsJSONTreeNode_t *json = igs_JSONTreeParseFromString(json_str);
+    if (!json){
+        igs_error("could not parse JSON string : '%s'", json_str);
         return NULL;
-    igs_mapping_t *map = NULL;
-    igsyajl_val node;
-    if (json_callize(json_str, &node) != 0){
-        map = json_parse_mapping(node);
-        igsyajl_tree_free(node);
     }
-    return map;
+    if (json->type != IGS_JSON_MAP){
+        igs_error("parsed JSON is not an array : '%s'", json_str);
+        return NULL;
+    }
+    return parser_parseMappingFromNode(&json);
 }
 
 
 igs_mapping_t* parser_loadMappingFromPath (const char* path){
-    char *json_str = NULL;
-    igs_mapping_t *map = NULL;
-    json_str = json_fetch(path);
-    if (!json_str)
+    assert(path);
+    igsJSONTreeNode_t *json = igs_JSONTreeParseFromFile(path);
+    if (!json){
+        igs_error("could not parse JSON file '%s'", path);
         return NULL;
-    
-    map = parser_loadMapping(json_str);
-    free (json_str);
-    return map;
+    }
+    if (json->type != IGS_JSON_MAP){
+        igs_error("parsed JSON at '%s' is not an array", path);
+        return NULL;
+    }
+    return parser_parseMappingFromNode(&json);
 }
 
 
-char* parser_export_mapping(igs_mapping_t *mapping){
-    char* result = NULL;
-    if (mapping){
-        const unsigned char *json_str = NULL;
-        size_t len;
-        igsyajl_gen g;
-        
-        g = igsyajl_gen_alloc(NULL);
-        igsyajl_gen_config(g, igsyajl_gen_beautify, 1);
-        igsyajl_gen_config(g, igsyajl_gen_validate_utf8, 1);
-        
-        igsyajl_gen_map_open(g);
-        igsyajl_gen_string(g, (const unsigned char *) "mapping", strlen("mapping"));
-        json_dump_mapping(&g, mapping);
-        igsyajl_gen_map_close(g);
-        
-        if (igsyajl_gen_get_buf(g, &json_str, &len) == igsyajl_gen_status_ok)
-            result = strdup((const char*) json_str);
-        
-        igsyajl_gen_free(g);
+char* parser_exportDefinition(igs_definition_t* def){
+    assert(def);
+    igsJSON_t json = igs_JSONinit();
+    igs_JSONopenMap(json);
+    igs_JSONaddString(json, STR_DEFINITION);
+    igs_JSONopenMap(json);
+    if (def->name){
+        igs_JSONaddString(json, STR_NAME);
+        igs_JSONaddString(json, def->name);
     }
-    return result;
+    if (def->description){
+        igs_JSONaddString(json, STR_DESCRIPTION);
+        igs_JSONaddString(json, def->description);
+    }
+    if (def->version){
+        igs_JSONaddString(json, STR_VERSION);
+        igs_JSONaddString(json, def->version);
+    }
+    
+    igs_JSONaddString(json, STR_INPUTS);
+    igs_JSONopenArray(json);
+    igs_iop_t *iop, *tmpIop;
+    HASH_ITER(hh, def->inputs_table, iop, tmpIop){
+        igs_JSONopenMap(json);
+        if (iop->name){
+            igs_JSONaddString(json, STR_NAME);
+            igs_JSONaddString(json, iop->name);
+        }
+        igs_JSONaddString(json, STR_TYPE);
+        igs_JSONaddString(json, value_type_to_string(iop->value_type));
+        igs_JSONaddString(json, STR_VALUE);
+        switch (iop->value_type) {
+            case IGS_INTEGER_T:
+                igs_JSONaddInt(json, iop->value.i);
+                break;
+            case IGS_DOUBLE_T:
+                igs_JSONaddDouble(json, iop->value.d);
+                break;
+            case IGS_BOOL_T:
+                igs_JSONaddBool(json, iop->value.b);
+                break;
+            case IGS_STRING_T:
+                igs_JSONaddString(json, iop->value.s);
+                break;
+            case IGS_IMPULSION_T:
+                igs_JSONaddNULL(json);
+                break;
+            case IGS_DATA_T:
+                //FIXME : we store data as string but we should convert it to base 64
+                igs_JSONaddString(json, "");
+                break;
+            default:
+                igs_JSONaddString(json, "");
+                break;
+        }
+        igs_JSONcloseMap(json);
+    }
+    igs_JSONcloseArray(json);
+    
+    igs_JSONaddString(json, STR_OUTPUTS);
+    igs_JSONopenArray(json);
+    HASH_ITER(hh, def->outputs_table, iop, tmpIop){
+        igs_JSONopenMap(json);
+        if (iop->name){
+            igs_JSONaddString(json, STR_NAME);
+            igs_JSONaddString(json, iop->name);
+        }
+        igs_JSONaddString(json, STR_TYPE);
+        igs_JSONaddString(json, value_type_to_string(iop->value_type));
+        igs_JSONaddString(json, STR_VALUE);
+        switch (iop->value_type) {
+            case IGS_INTEGER_T:
+                igs_JSONaddInt(json, iop->value.i);
+                break;
+            case IGS_DOUBLE_T:
+                igs_JSONaddDouble(json, iop->value.d);
+                break;
+            case IGS_BOOL_T:
+                igs_JSONaddBool(json, iop->value.b);
+                break;
+            case IGS_STRING_T:
+                igs_JSONaddString(json, iop->value.s);
+                break;
+            case IGS_IMPULSION_T:
+                igs_JSONaddNULL(json);
+                break;
+            case IGS_DATA_T:
+                //FIXME : we store data as string but we should convert it to base 64
+                igs_JSONaddString(json, "");
+                break;
+            default:
+                igs_JSONaddString(json, "");
+                break;
+        }
+        igs_JSONcloseMap(json);
+    }
+    igs_JSONcloseArray(json);
+    
+    igs_JSONaddString(json, STR_PARAMETERS);
+    igs_JSONopenArray(json);
+    HASH_ITER(hh, def->params_table, iop, tmpIop){
+        igs_JSONopenMap(json);
+        if (iop->name){
+            igs_JSONaddString(json, STR_NAME);
+            igs_JSONaddString(json, iop->name);
+        }
+        igs_JSONaddString(json, STR_TYPE);
+        igs_JSONaddString(json, value_type_to_string(iop->value_type));
+        igs_JSONaddString(json, STR_VALUE);
+        switch (iop->value_type) {
+            case IGS_INTEGER_T:
+                igs_JSONaddInt(json, iop->value.i);
+                break;
+            case IGS_DOUBLE_T:
+                igs_JSONaddDouble(json, iop->value.d);
+                break;
+            case IGS_BOOL_T:
+                igs_JSONaddBool(json, iop->value.b);
+                break;
+            case IGS_STRING_T:
+                igs_JSONaddString(json, iop->value.s);
+                break;
+            case IGS_IMPULSION_T:
+                igs_JSONaddNULL(json);
+                break;
+            case IGS_DATA_T:
+                //FIXME : we store data as string but we should convert it to base 64
+                igs_JSONaddString(json, "");
+                break;
+            default:
+                igs_JSONaddString(json, "");
+                break;
+        }
+        igs_JSONcloseMap(json);
+    }
+    igs_JSONcloseArray(json);
+    
+    igs_JSONaddString(json, STR_CALLS);
+    igs_JSONopenArray(json);
+    igs_call_t *call, *tmpCall;
+    HASH_ITER(hh, def->calls_table, call, tmpCall){
+        igs_JSONopenMap(json);
+        if (call->name){
+            igs_JSONaddString(json, STR_NAME);
+            igs_JSONaddString(json, call->name);
+            if (call->description){
+                igs_JSONaddString(json, STR_DESCRIPTION);
+                igs_JSONaddString(json, call->description);
+            }
+            
+            if (call->arguments){
+                igs_JSONaddString(json, STR_ARGUMENTS);
+                igs_JSONopenArray(json);
+                igs_callArgument_t *argument = NULL;
+                LL_FOREACH(call->arguments, argument){
+                    if (argument->name){
+                        igs_JSONopenMap(json);
+                        igs_JSONaddString(json, STR_NAME);
+                        igs_JSONaddString(json, argument->name);
+                        igs_JSONaddString(json, STR_TYPE);
+                        igs_JSONaddString(json, value_type_to_string(argument->type));
+                        igs_JSONcloseMap(json);
+                    }
+                }
+                igs_JSONcloseArray(json);
+            }
+            
+            if (call->reply){
+                if (call->reply->name){
+                    igs_JSONaddString(json, STR_REPLY);
+                    igs_JSONopenMap(json);
+                    igs_JSONaddString(json, STR_NAME);
+                    igs_JSONaddString(json, call->reply->name);
+                    if (call->reply->description){
+                        igs_JSONaddString(json, STR_DESCRIPTION);
+                        igs_JSONaddString(json, call->reply->description);
+                    }
+                    
+                    if (call->reply->arguments){
+                        igs_JSONaddString(json, STR_ARGUMENTS);
+                        igs_JSONopenArray(json);
+                        igs_callArgument_t *argument = NULL;
+                        LL_FOREACH(call->reply->arguments, argument){
+                            if (argument->name){
+                                igs_JSONopenMap(json);
+                                igs_JSONaddString(json, STR_NAME);
+                                igs_JSONaddString(json, argument->name);
+                                igs_JSONaddString(json, STR_TYPE);
+                                igs_JSONaddString(json, value_type_to_string(argument->type));
+                                igs_JSONcloseMap(json);
+                            }
+                        }
+                        igs_JSONcloseArray(json);
+                    }
+                    igs_JSONcloseMap(json);
+                }
+            }
+        }
+        igs_JSONcloseMap(json);
+    }
+    igs_JSONcloseArray(json);
+    
+    
+    igs_JSONcloseMap(json);
+    igs_JSONcloseMap(json);
+    char *res = igs_JSONdump(json);
+    igs_JSONfree(&json);
+    return res;
+}
+
+char* parser_exportMapping(igs_mapping_t *mapping){
+    assert(mapping);
+    igsJSON_t json = igs_JSONinit();
+    igs_JSONopenMap(json);
+    igs_JSONaddString(json, "mappings");
+    igs_JSONopenArray(json);
+    
+    igs_mapping_element_t *elmt, *tmp;
+    HASH_ITER(hh, mapping->map_elements, elmt, tmp){
+        igs_JSONopenMap(json);
+        if (elmt->fromInput){
+            igs_JSONaddString(json, "fromInput");
+            igs_JSONaddString(json, elmt->fromInput);
+        }
+        if (elmt->toAgent){
+            igs_JSONaddString(json, "toAgent");
+            igs_JSONaddString(json, elmt->toAgent);
+        }
+        if (elmt->toOutput){
+            igs_JSONaddString(json, "toOutput");
+            igs_JSONaddString(json, elmt->toOutput);
+        }
+        igs_JSONcloseMap(json);
+    }
+    
+    igs_JSONcloseArray(json);
+    igs_JSONcloseMap(json);
+    char *res = igs_JSONdump(json);
+    igs_JSONfree(&json);
+    return res;
+}
+
+//legacy mapping export
+char* parser_exportMapping_v2(igs_mapping_t *mapping){
+    assert(mapping);
+    igsJSON_t json = igs_JSONinit();
+    igs_JSONopenMap(json);
+    igs_JSONaddString(json, "mapping");
+    igs_JSONopenMap(json);
+    igs_JSONaddString(json, "mapping_out");
+    igs_JSONopenArray(json);
+    igs_mapping_element_t *elmt, *tmp;
+    HASH_ITER(hh, mapping->map_elements, elmt, tmp){
+        igs_JSONopenMap(json);
+        if (elmt->fromInput){
+            igs_JSONaddString(json, "input_name");
+            igs_JSONaddString(json, elmt->fromInput);
+        }
+        if (elmt->toAgent){
+            igs_JSONaddString(json, "agent_name");
+            igs_JSONaddString(json, elmt->toAgent);
+        }
+        if (elmt->toOutput){
+            igs_JSONaddString(json, "output_name");
+            igs_JSONaddString(json, elmt->toOutput);
+        }
+        igs_JSONcloseMap(json);
+    }
+    igs_JSONcloseArray(json);
+    igs_JSONcloseMap(json);
+    igs_JSONcloseMap(json);
+    
+    char *res = igs_JSONdump(json);
+    igs_JSONfree(&json);
+    return res;
 }
 
 

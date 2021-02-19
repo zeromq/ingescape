@@ -30,12 +30,12 @@ unsigned long djb2_hash (unsigned char *str){
 void mapping_freeMappingElement (igs_mapping_element_t **mapElmt){
     assert(mapElmt);
     assert(*mapElmt);
-    if ((*mapElmt)->input_name)
-        free((*mapElmt)->input_name);
-    if ((*mapElmt)->agent_name)
-        free((*mapElmt)->agent_name);
-    if ((*mapElmt)->output_name)
-        free((*mapElmt)->output_name);
+    if ((*mapElmt)->fromInput)
+        free((*mapElmt)->fromInput);
+    if ((*mapElmt)->toAgent)
+        free((*mapElmt)->toAgent);
+    if ((*mapElmt)->toOutput)
+        free((*mapElmt)->toOutput);
     free(*mapElmt);
     *mapElmt = NULL;
 }
@@ -50,12 +50,6 @@ void mapping_freeMapping (igs_mapping_t **mapping) {
     if ((*mapping) == NULL){
         return;
     }
-    if ((*mapping)->name)
-        free((*mapping)->name);
-    if ((*mapping)->description)
-        free((*mapping)->description);
-    if ((*mapping)->version)
-        free((*mapping)->version);
     igs_mapping_element_t *current_map_elmt, *tmp_map_elmt;
     HASH_ITER(hh, (*mapping)->map_elements, current_map_elmt, tmp_map_elmt) {
         HASH_DEL((*mapping)->map_elements,current_map_elmt);
@@ -82,48 +76,6 @@ bool mapping_isEqual(const char *firstStr, const char *secondStr){
     }
     
     bool res = true;
-    if (first->name){
-        if (second->name){
-            if (!streq(first->name, second->name)){
-                res = false;
-                goto END;
-            }
-        }else{
-            res = false;
-            goto END;
-        }
-    } else if (second->name){
-        res = false;
-        goto END;
-    }
-    if (first->description){
-        if (second->description){
-            if (!streq(first->description, second->description)){
-                res = false;
-                goto END;
-            }
-        }else{
-            res = false;
-            goto END;
-        }
-    } else if (second->description){
-        res = false;
-        goto END;
-    }
-    if (first->version){
-        if (second->version){
-            if (!streq(first->version, second->version)){
-                res = false;
-                goto END;
-            }
-        }else{
-            res = false;
-            goto END;
-        }
-    } else if (second->version){
-        res = false;
-        goto END;
-    }
     
     if (!first->map_elements){
         if (second->map_elements){
@@ -159,25 +111,25 @@ END:
     return res;
 }
 
-igs_mapping_element_t * mapping_createMappingElement(const char * input_name,
-                                                     const char *agent_name,
-                                                     const char* output_name){
-    if (input_name == NULL){
+igs_mapping_element_t * mapping_createMappingElement(const char * fromInput,
+                                                     const char *toAgent,
+                                                     const char* toOutput){
+    if (fromInput == NULL){
         igs_error("Input name is NULL");
         return NULL;
     }
-    if (agent_name == NULL){
+    if (toAgent == NULL){
         igs_error("Agent name is NULL");
         return NULL;
     }
-    if (output_name == NULL){
+    if (toOutput == NULL){
         igs_error("Output name is NULL");
         return NULL;
     }
     igs_mapping_element_t * new_map_elmt = calloc(1, sizeof(igs_mapping_element_t));
-    new_map_elmt->input_name = strdup(input_name);
-    new_map_elmt->agent_name = strdup(agent_name);
-    new_map_elmt->output_name = strdup(output_name);
+    new_map_elmt->fromInput = strdup(fromInput);
+    new_map_elmt->toAgent = strdup(toAgent);
+    new_map_elmt->toOutput = strdup(toOutput);
     return new_map_elmt;
 }
 
@@ -256,7 +208,8 @@ igs_result_t igsAgent_loadMappingFromPath (igs_agent_t *agent, const char* file_
 }
 
 void igsAgent_clearMapping(igs_agent_t *agent){
-    igsAgent_debug(agent, "clear current mapping if needed and initiate an empty one");
+    igsAgent_debug(agent, "clear current mapping for %s and initiate an empty one",
+                   agent->definition->name);
     model_readWriteLock();
     //check that this agent has not been destroyed when we were locked
     if (!agent || !(agent->uuid)){
@@ -280,7 +233,7 @@ void igsAgent_clearMappingOnAgent(igs_agent_t *agent, const char *agentName){
         }
         igs_mapping_element_t *elmt, *tmp;
         HASH_ITER(hh, agent->mapping->map_elements, elmt, tmp){
-            if (streq(elmt->agent_name, agentName)){
+            if (streq(elmt->toAgent, agentName)){
                 HASH_DEL(agent->mapping->map_elements, elmt);
                 mapping_freeMappingElement(&elmt);
                 agent->network_needToSendMappingUpdate = true;
@@ -303,72 +256,39 @@ char* igsAgent_getMapping(igs_agent_t *agent){
         model_readWriteUnlock();
         return NULL;
     }
-    mappingJson = parser_export_mapping(agent->mapping);
+    mappingJson = parser_exportMapping(agent->mapping);
     model_readWriteUnlock();
     return mappingJson;
 }
 
 char* igsAgent_getMappingName(igs_agent_t *agent){
-    if (agent->mapping != NULL && agent->mapping->name != NULL){
-        return strdup(agent->mapping->name);
-    }else{
-        return NULL;
-    }
+    igs_error("this function has no effect because mappings do not have a name anymore");
+    return NULL;
 }
 
 char* igsAgent_getMappingDescription(igs_agent_t *agent){
-    if (agent->mapping != NULL && agent->mapping->description != NULL){
-        return strdup(agent->mapping->description);
-    }else{
-        return NULL;
-    }
+    igs_error("this function has no effect because mappings do not have a description anymore");
+    return NULL;
 }
 
 char* igsAgent_getMappingVersion(igs_agent_t *agent){
-    if (agent->mapping != NULL && agent->mapping->version != NULL){
-        return strdup(agent->mapping->version);
-    }else{
-        return NULL;
-    }
+    igs_error("this function has no effect because mappings do not have a version anymore");
+    return NULL;
 }
 
 void igsAgent_setMappingName(igs_agent_t *agent, const char *name){
-    assert(agent);
-    assert(name);
-    assert(agent->mapping);
-    model_readWriteLock();
-    //check that this agent has not been destroyed when we were locked
-    if (!agent || !(agent->uuid)){
-        model_readWriteUnlock();
-        return;
-    }
-    if(agent->mapping->name != NULL)
-        free(agent->mapping->name);
-    agent->mapping->name = strndup(name, IGS_MAX_MAPPING_NAME_LENGTH);
-    agent->network_needToSendMappingUpdate = true;
-    model_readWriteUnlock();
+    igs_error("this function has no effect because mappings do not have a name anymore");
+    return;
 }
 
 void igsAgent_setMappingDescription(igs_agent_t *agent, const char *description){
-    assert(agent);
-    assert(description);
-    assert(agent->mapping);
-    if(agent->mapping->description != NULL){
-        free(agent->mapping->description);
-    }
-    agent->network_needToSendMappingUpdate = true;
-    agent->mapping->description = strndup(description, IGS_MAX_DESCRIPTION_LENGTH);
+    igs_error("this function has no effect because mappings do not have a description anymore");
+    return;
 }
 
 void igsAgent_setMappingVersion(igs_agent_t *agent, const char *version){
-    assert(agent);
-    assert(version);
-    assert(agent->mapping);
-    if(agent->mapping->version != NULL){
-        free(agent->mapping->version);
-    }
-    agent->network_needToSendMappingUpdate = true;
-    agent->mapping->version = strndup(version, 64);
+    igs_error("this function has no effect because mappings do not have a version anymore");
+    return;
 }
 
 size_t igsAgent_getMappingEntriesNumber(igs_agent_t *agent){
@@ -604,7 +524,7 @@ void igsAgent_writeMappingToPath(igs_agent_t *agent){
     if (fp == NULL){
         igsAgent_error(agent, "Could not open %s for writing", agent->mappingPath);
     }else{
-        char *map = parser_export_mapping(agent->mapping);
+        char *map = parser_exportMapping(agent->mapping);
         assert(map);
         fprintf(fp, "%s", map);
         fflush(fp);
