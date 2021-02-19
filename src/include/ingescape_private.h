@@ -93,30 +93,25 @@ typedef struct igs_call{
 } igs_call_t;
 
 typedef struct igs_definition{
-    char* name; //hash key
+    char* name;
     char* description;
     char* version;
     igs_iop_t* params_table;
     igs_iop_t* inputs_table;
     igs_iop_t* outputs_table;
     igs_call_t *calls_table;
-    UT_hash_handle hh;
 } igs_definition_t;
 
 typedef struct igs_mapping_element{
     unsigned long id;
-    char* input_name;
-    char* agent_name;
-    char* output_name;
+    char* fromInput;
+    char* toAgent;
+    char* toOutput;
     UT_hash_handle hh;
 } igs_mapping_element_t;
 
 typedef struct igs_mapping{
-    char* name;
-    char* description;
-    char* version;
     igs_mapping_element_t* map_elements;
-    UT_hash_handle hh;
 } igs_mapping_t;
 
 typedef struct igs_mappings_filter {
@@ -132,13 +127,13 @@ typedef struct igs_zyre_peer {
     zsock_t *subscriber; //link to the peer's publisher socket
     int reconnected;
     bool hasJoinedPrivateChannel;
+    char *protocol;
     UT_hash_handle hh;
 } igs_zyre_peer_t;
 
 //remote agent we are subscribing to
 typedef struct igs_remote_agent{
     char *uuid;
-    char *name;
     igs_zyre_peer_t *peer;
     igs_core_context_t *context;
     igs_definition_t *definition;
@@ -371,7 +366,6 @@ typedef struct igs_core_context{
  */
 typedef struct igs_agent {
     char *uuid;
-    char *name;
     char *state;
     
     /*
@@ -424,9 +418,9 @@ PUBLIC void definition_freeDefinition (igs_definition_t **definition);
 
 //  mapping
 PUBLIC void mapping_freeMapping (igs_mapping_t **map);
-igs_mapping_element_t * mapping_createMappingElement(const char * input_name,
-                                                     const char *agent_name,
-                                                     const char* output_name);
+igs_mapping_element_t * mapping_createMappingElement(const char * fromInput,
+                                                     const char *toAgent,
+                                                     const char* toOutput);
 PUBLIC bool mapping_isEqual(const char *firstStr, const char *secondStr);
 
 unsigned long djb2_hash (unsigned char *str);
@@ -447,8 +441,9 @@ igs_result_t network_publishOutput (igs_agent_t *agent, const igs_iop_t *iop);
 // parser
 PUBLIC igs_definition_t* parser_loadDefinition (const char* json_str);
 PUBLIC igs_definition_t* parser_loadDefinitionFromPath (const char* file_path);
-PUBLIC char* parser_export_definition (igs_definition_t* def);
-PUBLIC char* parser_export_mapping(igs_mapping_t* mapp);
+PUBLIC char* parser_exportDefinition(igs_definition_t* def);
+PUBLIC char* parser_exportMapping(igs_mapping_t* mapp);
+PUBLIC char* parser_exportMapping_v2(igs_mapping_t* mapp);
 PUBLIC igs_mapping_t* parser_loadMapping (const char* json_str);
 PUBLIC igs_mapping_t* parser_loadMappingFromPath (const char* load_file);
 

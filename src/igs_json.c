@@ -345,6 +345,7 @@ void igs_JSONTreeFree(igsJSONTreeNode_t **node){
 }
 
 igsJSONTreeNode_t* igs_JSONTreeParseFromFile(const char *path){
+    assert(path);
     zfile_t *file = zfile_new (NULL, path);
     if (file == NULL || !zfile_is_regular(file) || !zfile_is_readable(file) || zfile_input(file) != 0){
         if (!zfile_is_regular(file))
@@ -368,6 +369,7 @@ igsJSONTreeNode_t* igs_JSONTreeParseFromFile(const char *path){
 }
 
 igsJSONTreeNode_t* igs_JSONTreeParseFromString(const char *content){
+    assert(content);
     char errbuf[1024] = "unknown error";
     igsJSONTreeNode_t* node = calloc(1, sizeof(igsJSONTreeNode_t));
     node = (igsJSONTreeNode_t*)igsyajl_tree_parse(content, errbuf, sizeof(errbuf));

@@ -56,23 +56,26 @@ long long executeCurrentAndFindNextAction(void){
         }else{
             igs_agent_t *agent, *tmp;
             HASH_ITER(hh, coreContext->agents, agent, tmp){
-                if (streq(agent->name, current_agent)){
+                if (streq(agent->definition->name, current_agent)){
                     switch (current_actionType) {
                         case IGS_REPLAY_INPUT:
                             if(replay_mode & IGS_REPLAY_INPUT){
-                                igs_info("replaying %s.%s.%s = (%s) %s", agent->name, "input", current_iopName, current_dataTypeS, current_iopData);
+                                igs_info("replaying %s.%s.%s = (%s) %s",
+                                         agent->definition->name, "input", current_iopName, current_dataTypeS, current_iopData);
                                 igsAgent_writeInputAsString(agent, current_iopName, current_iopData);
                             }
                             break;
                         case IGS_REPLAY_OUTPUT:
                             if(replay_mode & IGS_REPLAY_OUTPUT){
-                                igs_info("replaying %s.%s.%s = (%s) %s", agent->name, "output", current_iopName, current_dataTypeS, current_iopData);
+                                igs_info("replaying %s.%s.%s = (%s) %s",
+                                         agent->definition->name, "output", current_iopName, current_dataTypeS, current_iopData);
                                 igsAgent_writeOutputAsString(agent, current_iopName, current_iopData);
                             }
                             break;
                         case IGS_REPLAY_PARAMETER:
                             if(replay_mode & IGS_REPLAY_PARAMETER){
-                                igs_info("replaying %s.%s.%s = (%s) %s", agent->name, "parameter", current_iopName, current_dataTypeS, current_iopData);
+                                igs_info("replaying %s.%s.%s = (%s) %s",
+                                         agent->definition->name, "parameter", current_iopName, current_dataTypeS, current_iopData);
                                 igsAgent_writeParameterAsString(agent, current_iopName, current_iopData);
                             }
                             break;

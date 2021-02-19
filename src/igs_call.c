@@ -534,7 +534,7 @@ igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, 
     if (coreContext->node != NULL){
         igs_remote_agent_t *remoteAgent = NULL, *tmp = NULL;
         HASH_ITER(hh, agent->context->remoteAgents, remoteAgent, tmp){
-            if (streq(remoteAgent->name, agentNameOrUUID) || streq(remoteAgent->uuid, agentNameOrUUID)){
+            if (streq(remoteAgent->definition->name, agentNameOrUUID) || streq(remoteAgent->uuid, agentNameOrUUID)){
                 //we found a matching agent
                 igs_callArgument_t *arg = NULL;
                 found = true;
@@ -612,13 +612,13 @@ igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, 
                 }
                 bus_zyreLock();
                 zyre_shouts(agent->context->node, agent->context->callsChannel, "%s(%s) calls %s.%s(%s)",
-                            agent->name, agent->uuid, remoteAgent->name, callName, remoteAgent->uuid);
+                            agent->definition->name, agent->uuid, remoteAgent->definition->name, callName, remoteAgent->uuid);
                 zyre_whisper(agent->context->node, remoteAgent->peer->peerId, &msg);
                 bus_zyreUnlock();
                 if (coreContext->enableCallLogging)
-                    call_logSentCall(agent, remoteAgent->name, remoteAgent->uuid, callName, *list);
+                    call_logSentCall(agent, remoteAgent->definition->name, remoteAgent->uuid, callName, *list);
                 else
-                    igsAgent_debug(agent, "calling %s(%s).%s", remoteAgent->name, remoteAgent->uuid, callName);
+                    igsAgent_debug(agent, "calling %s(%s).%s", remoteAgent->definition->name, remoteAgent->uuid, callName);
                 
             }
         }
@@ -628,13 +628,13 @@ igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, 
     if (!agent->isVirtual){
         igs_agent_t *localAgent, *atmp;
         HASH_ITER(hh, agent->context->agents, localAgent, atmp){
-            if (streq(localAgent->name, agentNameOrUUID) || streq(localAgent->uuid, agentNameOrUUID)){
+            if (streq(localAgent->definition->name, agentNameOrUUID) || streq(localAgent->uuid, agentNameOrUUID)){
                 //we found a matching agent
                 igs_callArgument_t *arg = NULL;
                 found = true;
                 if (localAgent->definition == NULL){
                     igsAgent_error(agent, "definition is unknown for %s(%s) : call will not be sent",
-                                   localAgent->name, agentNameOrUUID);
+                                   localAgent->definition->name, agentNameOrUUID);
                     continue;
                 }else{
                     igs_call_t *call = NULL;
@@ -655,10 +655,10 @@ igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, 
                                 call_copyArguments(*list, call->arguments);
                             }
                             if (call->cb != NULL){
-                                (call->cb)(localAgent, agent->name, agent->uuid, callName, call->arguments, nbArguments, token, call->cbData);
+                                (call->cb)(localAgent, agent->definition->name, agent->uuid, callName, call->arguments, nbArguments, token, call->cbData);
                                 call_freeValuesInArguments(call->arguments);
                                 if (coreContext->enableCallLogging){
-                                    call_logReceivedCall(localAgent, agent->name, agent->uuid, callName, *list);
+                                    call_logReceivedCall(localAgent, agent->definition->name, agent->uuid, callName, *list);
                                 }
                             }else{
                                 igsAgent_error(agent, "no defined callback to handle received call %s", callName);
@@ -666,7 +666,7 @@ igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, 
                         }
                     }else{
                         igsAgent_error(agent, "could not find call named %s for %s (%s) : call will not be sent",
-                                       callName, localAgent->name, localAgent->uuid);
+                                       callName, localAgent->definition->name, localAgent->uuid);
                         continue;
                     }
                 }
@@ -674,13 +674,13 @@ igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, 
                 bus_zyreLock();
                 if (coreContext->node != NULL){
                     zyre_shouts(agent->context->node, agent->context->callsChannel, "%s(%s) calls %s.%s(%s)",
-                                agent->name, agent->uuid, localAgent->name, callName, localAgent->uuid);
+                                agent->definition->name, agent->uuid, localAgent->definition->name, callName, localAgent->uuid);
                 }
                 bus_zyreUnlock();
                 if (coreContext->enableCallLogging)
-                    call_logSentCall(agent, localAgent->name, localAgent->uuid, callName, *list);
+                    call_logSentCall(agent, localAgent->definition->name, localAgent->uuid, callName, *list);
                 else
-                    igsAgent_debug(agent, "calling %s.%s(%s)", localAgent->name, callName, localAgent->uuid);
+                    igsAgent_debug(agent, "calling %s.%s(%s)", localAgent->definition->name, callName, localAgent->uuid);
             }
         }
     }

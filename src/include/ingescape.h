@@ -239,7 +239,7 @@ PUBLIC igs_result_t igs_loadDefinition (const char* json_str);
 PUBLIC igs_result_t igs_loadDefinitionFromPath (const char* file_path);
 PUBLIC void igs_clearDefinition(void); //clears definition data for the agent
 PUBLIC char* igs_getDefinition(void); //returns json string, must be freed by caller
-PUBLIC char *igs_getDefinitionName(void); //returned char* must be freed by caller
+PUBLIC char *igs_getDefinitionName(void); //DEPRECATED in version 2.5, use igs_getAgentName instead
 PUBLIC char *igs_getDefinitionDescription(void); //returned char* must be freed by caller
 PUBLIC char *igs_getDefinitionVersion(void); //returned char* must be freed by caller
 PUBLIC void igs_setDefinitionName(const char *name);
@@ -264,12 +264,14 @@ PUBLIC igs_result_t igs_loadMappingFromPath (const char* file_path);
 PUBLIC void igs_clearMapping(void); //clears all mappings for our agent
 PUBLIC void igs_clearMappingOnAgent(const char *agentName); //clears our mappings for this agent
 PUBLIC char* igs_getMapping(void); //returns json string, must be freed by caller
-PUBLIC char *igs_getMappingName(void); //returned char* must be freed by caller
-PUBLIC char *igs_getMappingDescription(void); //returned char* must be freed by caller
-PUBLIC char *igs_getMappingVersion(void); //returned char* must be freed by caller
-PUBLIC void igs_setMappingName(const char *name);
-PUBLIC void igs_setMappingDescription(const char *description);
-PUBLIC void igs_setMappingVersion(const char *version);
+
+//These functions are deprecated
+PUBLIC char *igs_getMappingName(void); //DISABLED in version 2.5
+PUBLIC char *igs_getMappingDescription(void); //DISABLED in version 2.5
+PUBLIC char *igs_getMappingVersion(void); //DISABLED in version 2.5
+PUBLIC void igs_setMappingName(const char *name); //DISABLED in version 2.5
+PUBLIC void igs_setMappingDescription(const char *description); //DISABLED in version 2.5
+PUBLIC void igs_setMappingVersion(const char *version); //DISABLED in version 2.5
 
 //edit our mapping using the API
 PUBLIC size_t igs_getMappingEntriesNumber(void); //number of entries in the mapping output type
