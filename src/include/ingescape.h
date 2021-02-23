@@ -242,7 +242,7 @@ PUBLIC char* igs_getDefinition(void); //returns json string, must be freed by ca
 PUBLIC char *igs_getDefinitionName(void); //DEPRECATED in version 2.5, use igs_getAgentName instead
 PUBLIC char *igs_getDefinitionDescription(void); //returned char* must be freed by caller
 PUBLIC char *igs_getDefinitionVersion(void); //returned char* must be freed by caller
-PUBLIC void igs_setDefinitionName(const char *name);
+PUBLIC void igs_setDefinitionName(const char *name); //DEPRECATED in version 2.5, use igs_setAgentName instead
 PUBLIC void igs_setDefinitionDescription(const char *description);
 PUBLIC void igs_setDefinitionVersion(const char *version);
 

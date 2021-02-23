@@ -12,7 +12,7 @@ SCRIPT_NAME=$(basename $0)
     CODEROOT=$PWD
     echo "This script will compile Ingescape and its dependencies in a local sysroot directory at $CODEROOT/sysroot and create Xcode projects for each dependency"
     cd $IGS
-    read -p "Do you want ot continue? [yN] " -n 1 -r
+    read -p "Do you want to continue? [yN] " -n 1 -r
     echo
     if [[ ! $REPLY =~ ^[Yy]$ ]]
     then
