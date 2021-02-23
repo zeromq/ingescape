@@ -219,10 +219,8 @@ char* igsAgent_getDefinition(igs_agent_t *agent){
 }
 
 char *igsAgent_getDefinitionName(igs_agent_t *agent){
-    assert(agent);
-    assert(agent->definition);
-    assert(agent->definition->name);
-    return strdup(agent->definition->name);
+    igs_warn("this function is DEPRECATED, use igsAgent_getAgentName instead");
+    return igsAgent_getAgentName(agent);
 }
 
 char *igsAgent_getDefinitionDescription(igs_agent_t *agent){
@@ -244,13 +242,8 @@ char *igsAgent_getDefinitionVersion(igs_agent_t *agent){
 }
 
 void igsAgent_setDefinitionName(igs_agent_t *agent, const char *name){
-    assert(agent);
-    assert(name);
-    assert(agent->definition);
-    assert(agent->definition->name);
-    free(agent->definition->name);
-    agent->definition->name = strndup(name, IGS_MAX_DEFINITION_NAME_LENGTH);
-    agent->network_needToSendDefinitionUpdate = true;
+    igs_warn("this function is DEPRECATED, use igsAgent_setAgentName instead");
+    igsAgent_setAgentName(agent, name);
 }
 
 void igsAgent_setDefinitionDescription(igs_agent_t *agent, const char *description){

@@ -74,6 +74,12 @@ get_ingescape_version(INGESCAPE_VERSION_MAJOR INGESCAPE_VERSION_MINOR INGESCAPE_
 set(INGESCAPE_VERSION "${INGESCAPE_VERSION_MAJOR}.${INGESCAPE_VERSION_MINOR}.${INGESCAPE_VERSION_PATCH}")
 message(STATUS "Detected INGESCAPE Version - ${INGESCAPE_VERSION}")
 
+#compile using universal binaries for macOS
+#enable when migration to Big Sur is achieved on the macOS worker
+#IF(APPLE)
+#  SET(CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE STRING "Build architectures for Mac OS X" FORCE)
+#ENDIF(APPLE)
+
 # ##############################################################################
 # Source files
 # ##############################################################################
