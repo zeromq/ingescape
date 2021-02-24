@@ -1636,6 +1636,48 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                     igsAgent_unmute(agent);
                 }
                 
+            }else if (streq(title, "MUTE_AGENT")){
+                char *uuid = zmsg_popstr (msgDuplicate);
+                if (uuid == NULL){
+                    igs_error("no valid uuid in %s message received from %s(%s): rejecting", title, name, peerUUID);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
+                igs_agent_t *agent = NULL;
+                HASH_FIND_STR(context->agents, uuid, agent);
+                if (agent == NULL){
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): rejecting", uuid, title, name, peerUUID);
+                    if (uuid)
+                        free(uuid);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
+                igs_debug("received MUTE_AGENT command from %s (%s)", name, peerUUID);
+                igsAgent_mute(agent);
+                
+            }else if (streq(title, "UNMUTE_AGENT")){
+                char *uuid = zmsg_popstr (msgDuplicate);
+                if (uuid == NULL){
+                    igs_error("no valid uuid in %s message received from %s(%s): rejecting", title, name, peerUUID);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
+                igs_agent_t *agent = NULL;
+                HASH_FIND_STR(context->agents, uuid, agent);
+                if (agent == NULL){
+                    igs_error("no agent with uuid '%s' in %s message received from %s(%s): rejecting", uuid, title, name, peerUUID);
+                    if (uuid)
+                        free(uuid);
+                    zmsg_destroy(&msgDuplicate);
+                    zyre_event_destroy(&zyre_event);
+                    return 0;
+                }
+                igs_debug("received UNMUTE_AGENT command from %s (%s)", name, peerUUID);
+                igsAgent_unmute(agent);
+                
             }else if (streq(title, "MUTE")){
                 char *iopName = zmsg_popstr (msgDuplicate);
                 if (iopName == NULL){
@@ -1645,7 +1687,6 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                     return 0;
                 }
                 char *uuid = zmsg_popstr (msgDuplicate);
-
                 if (uuid == NULL){
                     igs_error("no valid uuid in %s message received from %s(%s): rejecting", title, name, peerUUID);
                     free(iopName);
