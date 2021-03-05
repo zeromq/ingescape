@@ -294,125 +294,119 @@ void sendStateTo(igs_agent_t *agent, const char *peerOrChannel, bool isForPeer){
     assert(agent->context->node);
     assert(peerOrChannel);
     igs_core_context_t *context = agent->context;
-    if (agent->definition != NULL && agent->definition->outputs_table != NULL){
+    zmsg_t *msg = NULL;
+    
+    if (agent->definition && agent->definition->outputs_table){
         igs_iop_t *current_iop, *tmp_iop;
         HASH_ITER(hh, agent->definition->outputs_table, current_iop, tmp_iop) {
-            if (current_iop->is_muted && current_iop->name != NULL){
+            if (current_iop->name){
                 bus_zyreLock();
-                zmsg_t *msg = zmsg_new();
-                zmsg_addstr(msg, "OUTPUT_MUTED");
+                msg = zmsg_new();
+                zmsg_addstr(msg, (current_iop->is_muted)?"OUTPUT_MUTED":"OUTPUT_UNMUTED");
                 zmsg_addstr(msg, current_iop->name);
                 zmsg_addstr(msg, agent->uuid);
-                if (isForPeer){
+                if (isForPeer)
                     zyre_whisper(context->node, peerOrChannel, &msg);
-                }else{
+                else
                     zyre_shout(context->node, peerOrChannel, &msg);
-                }
                 bus_zyreUnlock();
             }
         }
     }
-    //we also send our frozen and muted states, and other usefull information
-    if (agent->isWholeAgentMuted){
+    
+    bus_zyreLock();
+    msg = zmsg_new();
+    zmsg_addstr(msg, "MUTED");
+    zmsg_addstr(msg, (agent->isWholeAgentMuted)?"1":"0");
+    zmsg_addstr(msg, agent->uuid);
+    if (isForPeer)
+        zyre_whisper(context->node, peerOrChannel, &msg);
+    else
+        zyre_shout(context->node, peerOrChannel, &msg);
+    bus_zyreUnlock();
+    
+    if (agent->state){
         bus_zyreLock();
-        zmsg_t *msg = zmsg_new();
-        zmsg_addstr(msg, "MUTED");
-        zmsg_addstr(msg, "1");
-        zmsg_addstr(msg, agent->uuid);
-        if (isForPeer){
-            zyre_whisper(context->node, peerOrChannel, &msg);
-        }else{
-            zyre_shout(context->node, peerOrChannel, &msg);
-        }
-        bus_zyreUnlock();
-    }
-    if (agent->state != NULL){
-        bus_zyreLock();
-        zmsg_t *msg = zmsg_new();
+        msg = zmsg_new();
         zmsg_addstr(msg, "STATE");
         zmsg_addstr(msg, agent->state);
         zmsg_addstr(msg, agent->uuid);
-        if (isForPeer){
+        if (isForPeer)
             zyre_whisper(context->node, peerOrChannel, &msg);
-        }else{
+        else
             zyre_shout(context->node, peerOrChannel, &msg);
-        }
         bus_zyreUnlock();
     }
-    if (agent->definitionPath != NULL){
+    
+    if (agent->definitionPath){
         bus_zyreLock();
-        zmsg_t *msg = zmsg_new();
+        msg = zmsg_new();
         zmsg_addstr(msg, "DEFINITION_FILE_PATH");
         zmsg_addstr(msg, agent->definitionPath);
         zmsg_addstr(msg, agent->uuid);
-        if (isForPeer){
+        if (isForPeer)
             zyre_whisper(context->node, peerOrChannel, &msg);
-        }else{
+        else
             zyre_shout(context->node, peerOrChannel, &msg);
-        }
         bus_zyreUnlock();
     }
-    if (agent->mappingPath != NULL){
+    
+    if (agent->mappingPath){
         bus_zyreLock();
-        zmsg_t *msg = zmsg_new();
+        msg = zmsg_new();
         zmsg_addstr(msg, "MAPPING_FILE_PATH");
         zmsg_addstr(msg, agent->mappingPath);
         zmsg_addstr(msg, agent->uuid);
-        if (isForPeer){
+        if (isForPeer)
             zyre_whisper(context->node, peerOrChannel, &msg);
-        }else{
+        else
             zyre_shout(context->node, peerOrChannel, &msg);
-        }
         bus_zyreUnlock();
     }
-    if (context->isFrozen){
-        bus_zyreLock();
-        zmsg_t *msg = zmsg_new();
-        zmsg_addstr(msg, "FROZEN");
-        zmsg_addstr(msg, "1");
-        zmsg_addstr(msg, agent->uuid);
-        if (isForPeer){
-            zyre_whisper(context->node, peerOrChannel, &msg);
-        }else{
-            zyre_shout(context->node, peerOrChannel, &msg);
-        }
-        bus_zyreUnlock();
-    }
-    if (context->logInStream){
-        bus_zyreLock();
-        zmsg_t *msg = zmsg_new();
-        zmsg_addstr(msg, "LOG_IN_STREAM");
-        zmsg_addstr(msg, "1");
-        zmsg_addstr(msg, agent->uuid);
-        if (isForPeer){
-            zyre_whisper(context->node, peerOrChannel, &msg);
-        }else{
-            zyre_shout(context->node, peerOrChannel, &msg);
-        }
-        bus_zyreUnlock();
-    }
-    if (context->logInFile){
-        bus_zyreLock();
-        zmsg_t *msg = zmsg_new();
-        zmsg_addstr(msg, "LOG_IN_FILE");
-        zmsg_addstr(msg, "1");
-        zmsg_addstr(msg, agent->uuid);
-        if (isForPeer){
-            zyre_whisper(context->node, peerOrChannel, &msg);
-        }else{
-            zyre_shout(context->node, peerOrChannel, &msg);
-        }
-        msg = zmsg_new();
-        zmsg_addstr(msg, "LOG_FILE_PATH");
-        zmsg_addstr(msg, context->logFilePath);
-        zmsg_addstr(msg, agent->uuid);
-        if (isForPeer){
-            zyre_whisper(context->node, peerOrChannel, &msg);
-        }else{
-            zyre_shout(context->node, peerOrChannel, &msg);
-        }
-        bus_zyreUnlock();
-    }
+    
+    bus_zyreLock();
+    msg = zmsg_new();
+    zmsg_addstr(msg, "FROZEN");
+    zmsg_addstr(msg, (context->isFrozen)?"1":"0");
+    zmsg_addstr(msg, agent->uuid);
+    if (isForPeer)
+        zyre_whisper(context->node, peerOrChannel, &msg);
+    else
+        zyre_shout(context->node, peerOrChannel, &msg);
+    bus_zyreUnlock();
+    
+    bus_zyreLock();
+    msg = zmsg_new();
+    zmsg_addstr(msg, "LOG_IN_STREAM");
+    zmsg_addstr(msg, (context->logInStream)?"1":"0");
+    zmsg_addstr(msg, agent->uuid);
+    if (isForPeer)
+        zyre_whisper(context->node, peerOrChannel, &msg);
+    else
+        zyre_shout(context->node, peerOrChannel, &msg);
+    bus_zyreUnlock();
+    
+    bus_zyreLock();
+    msg = zmsg_new();
+    zmsg_addstr(msg, "LOG_IN_FILE");
+    zmsg_addstr(msg, (context->logInFile)?"1":"0");
+    zmsg_addstr(msg, agent->uuid);
+    if (isForPeer)
+        zyre_whisper(context->node, peerOrChannel, &msg);
+    else
+        zyre_shout(context->node, peerOrChannel, &msg);
+    bus_zyreUnlock();
+    
+    bus_zyreLock();
+    msg = zmsg_new();
+    zmsg_addstr(msg, "LOG_FILE_PATH");
+    zmsg_addstr(msg, context->logFilePath);
+    zmsg_addstr(msg, agent->uuid);
+    if (isForPeer)
+        zyre_whisper(context->node, peerOrChannel, &msg);
+    else
+        zyre_shout(context->node, peerOrChannel, &msg);
+    bus_zyreUnlock();
 }
 
 void cleanAndFreeRemoteAgent(igs_remote_agent_t **remoteAgent){
