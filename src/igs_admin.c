@@ -315,11 +315,7 @@ void igs_setLogStream(bool stream){
             HASH_ITER(hh, coreContext->agents, agent, tmp){
                 zmsg_t *msg = zmsg_new();
                 zmsg_addstr(msg, "LOG_IN_STREAM");
-                if (stream){
-                    zmsg_addstr(msg, "1");
-                }else{
-                    zmsg_addstr(msg, "0");
-                }
+                zmsg_addstr(msg, (stream)?"1":"0");
                 zmsg_addstr(msg, agent->uuid);
                 zyre_shout(coreContext->node, IGS_PRIVATE_CHANNEL, &msg);
             }
