@@ -232,10 +232,9 @@ void admin_log(igs_agent_t *agent, igs_logLevel_t level, const char *function, c
         }
         
     }
-    if (coreContext->logInStream && coreContext != NULL && coreContext->logger != NULL){
+    if (coreContext->logInStream && coreContext && coreContext->logger)
         zstr_sendf(coreContext->logger, "%s;%s;%s;%s\n",
                    agent->definition->name, log_levels[level], function, logContentForFile);
-    }
     admin_unlock();
 }
 
@@ -300,16 +299,8 @@ bool igs_getUseColorVerbose() {
 void igs_setLogStream(bool stream){
     core_initContext();
     if (stream != coreContext->logInStream){
-        if (coreContext->networkActor != NULL){
-            if (stream){
-                igs_error("agent is already started, log stream cannot be created anymore");
-            }else{
-                igs_error("agent is already started, log stream cannot be disabled anymore");
-            }
-            return;
-        }
         coreContext->logInStream = stream;
-        if (coreContext->networkActor != NULL && coreContext->node != NULL){
+        if (coreContext->networkActor && coreContext->node){
             bus_zyreLock();
             igs_agent_t *agent, *tmp;
             HASH_ITER(hh, coreContext->agents, agent, tmp){

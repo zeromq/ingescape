@@ -605,7 +605,7 @@ void handlePublicationFromRemoteAgent(zmsg_t *msg, igs_remote_agent_t *remoteAge
     model_readWriteUnlock();
 }
 
-//manage incoming messages from one of the remote agents agents we subscribed to
+//manage incoming messages from one of the remote agents we subscribed to
 int manageRemotePublication (zloop_t *loop, zsock_t *socket, void *arg){
     IGS_UNUSED(loop)
     igs_core_context_t *context = (igs_core_context_t *)arg;
@@ -613,6 +613,9 @@ int manageRemotePublication (zloop_t *loop, zsock_t *socket, void *arg){
     assert(context);
     
     zmsg_t *msg = zmsg_recv(socket);
+    //The output name now includes the agent uuid as prefix.
+    //We merged them to keep the ZeroMQ PUB/SUB filters working
+    //in a context where a peer now possibly hosts multiple agents.
     char *outputName = zmsg_popstr(msg);
     if (outputName == NULL){
         igs_error("output name is NULL in received publication : rejecting");
@@ -769,6 +772,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                     }
                     zloop_reader(loop, zyrePeer->subscriber, manageRemotePublication, context);
                     zloop_reader_set_tolerant (loop, zyrePeer->subscriber);
+                    
 #if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
                     context->licenseEnforcement->currentAgentsNb++;
                     //igs_license("%ld agents (adding %s)", agent->licenseEnforcement->currentAgentsNb, name);
@@ -2800,37 +2804,37 @@ void initLoop (igs_core_context_t *context){
     free(inprocEndpoint);
 #endif
     
-    //start logger stream if needed
-    if (context->logInStream){
-        if (context->network_logStreamPort == 0){
-            sprintf(endpoint, "tcp://%s:*", context->ipAddress);
-        } else {
-            sprintf(endpoint, "tcp://%s:%d", context->ipAddress, context->network_logStreamPort);
-        }
-        context->logger = zsock_new_pub(endpoint);
-        assert(context->logger);
-        if (context->security_isEnabled){
-            zcert_apply(context->security_cert, context->logger);
-            zsock_set_curve_server (context->logger, 1);
-        }
-        zsock_set_sndhwm(context->logger, context->network_hwmValue);
-        strncpy(endpoint, zsock_endpoint(context->logger), 256);
-        char *insertPoint = endpoint + strlen(endpoint) - 1;
-        while (*insertPoint != ':' && insertPoint > endpoint) {
-            insertPoint--;
-        }
-        bus_zyreLock();
-        zyre_set_header(context->node, "logger", "%s", insertPoint + 1);
-        bus_zyreUnlock();
+    
+    //logger stream
+    if (context->network_logStreamPort == 0){
+        sprintf(endpoint, "tcp://%s:*", context->ipAddress);
+    } else {
+        sprintf(endpoint, "tcp://%s:%d", context->ipAddress, context->network_logStreamPort);
     }
+    context->logger = zsock_new_pub(endpoint);
+    assert(context->logger);
+    if (context->security_isEnabled){
+        zcert_apply(context->security_cert, context->logger);
+        zsock_set_curve_server (context->logger, 1);
+    }
+    zsock_set_sndhwm(context->logger, context->network_hwmValue);
+    strncpy(endpoint, zsock_endpoint(context->logger), 256);
+    char *insertPoint = endpoint + strlen(endpoint) - 1;
+    while (*insertPoint != ':' && insertPoint > endpoint) {
+        insertPoint--;
+    }
+    bus_zyreLock();
+    zyre_set_header(context->node, "logger", "%s", insertPoint + 1);
+    bus_zyreUnlock();
 
+    
+    //process PID and path
 #if defined __unix__ || defined __APPLE__ || defined __linux__
     ssize_t ret;
     context->processId = getpid();
     bus_zyreLock();
     zyre_set_header(context->node, "pid", "%i", context->processId);
     bus_zyreUnlock();
-    
     if (context->commandLine == NULL){
         //command line was not set manually : we try to get exec path instead
 #ifdef __APPLE__
@@ -2846,11 +2850,10 @@ void initLoop (igs_core_context_t *context){
         memset(pathbuf, 0, 4*1024);
         ret = readlink("/proc/self/exe", pathbuf, sizeof(pathbuf));
 #endif
-        if ( ret <= 0 ) {
+        if ( ret <= 0 )
             igs_debug("PID %d: proc_pidpath () - %s", context->processId, strerror(errno));
-        } else {
+        else
             igs_debug("proc %d: %s", context->processId, pathbuf);
-        }
         bus_zyreLock();
         zyre_set_header(context->node, "commandline", "%s", pathbuf);
         bus_zyreUnlock();
@@ -2860,7 +2863,6 @@ void initLoop (igs_core_context_t *context){
         bus_zyreUnlock();
     }
 #endif
-    
 #if (defined WIN32 || defined _WIN32)
     WSADATA wsaData;
     WSAStartup(MAKEWORD(2,2), &wsaData);
@@ -2877,7 +2879,6 @@ void initLoop (igs_core_context_t *context){
 #else
         GetModuleFileName(NULL,exeFilePath,IGS_MAX_PATH_LENGTH);
 #endif
-        
         bus_zyreLock();
         zyre_set_header(context->node, "commandline", "%s", exeFilePath);
         bus_zyreUnlock();
@@ -2893,21 +2894,20 @@ void initLoop (igs_core_context_t *context){
     bus_zyreUnlock();
 #endif
 
-
+    //hostname
     char hostname[1024];
     hostname[1023] = '\0';
     gethostname(hostname, 1023);
     #if (defined WIN32 || defined _WIN32)
-        WSACleanup();
+    WSACleanup();
     #endif
     bus_zyreLock();
     zyre_set_header(context->node, "hostname", "%s", hostname);
     bus_zyreUnlock();
     network_Unlock();
     
-    if (canContinue){
+    if (canContinue)
         context->networkActor = zactor_new(runLoop, context);
-    }
 }
 
 ////////////////////////////////////////////////////////////////////////
