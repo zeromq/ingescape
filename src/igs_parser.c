@@ -29,8 +29,6 @@
 #define STR_TYPE "type"
 #define STR_VALUE "value"
 
-char definition_path[IGS_MAX_PATH_LENGTH] = "";
-
 iopType_t string_to_value_type(const char* str) {
     
     if (str != NULL){
@@ -998,9 +996,14 @@ igs_result_t igsAgent_loadDefinition (igs_agent_t *agent, const char* json_str){
         return IGS_FAILURE;
     }else{
         model_readWriteLock();
-        if (agent->definition != NULL){
-            definition_freeDefinition(&agent->definition);
+        //check that this agent has not been destroyed when we were locked
+        if (!agent || !(agent->uuid)){
+            model_readWriteUnlock();
+            return IGS_FAILURE;
         }
+        
+        if (agent->definition != NULL)
+            definition_freeDefinition(&agent->definition);
         agent->definition = tmp;
         agent->network_needToSendDefinitionUpdate = true;
         model_readWriteUnlock();
@@ -1019,10 +1022,15 @@ igs_result_t igsAgent_loadDefinitionFromPath (igs_agent_t *agent, const char* fi
         return IGS_FAILURE;
     }else{
         model_readWriteLock();
-        strncpy(definition_path, file_path, IGS_MAX_PATH_LENGTH - 1);
-        if (agent->definition != NULL){
-            definition_freeDefinition(&agent->definition);
+        //check that this agent has not been destroyed when we were locked
+        if (!agent || !(agent->uuid)){
+            model_readWriteUnlock();
+            return IGS_FAILURE;
         }
+        
+        if (agent->definition != NULL)
+            definition_freeDefinition(&agent->definition);
+        agent->definitionPath = strndup(file_path, IGS_MAX_PATH_LENGTH - 1);
         agent->definition = tmp;
         agent->network_needToSendDefinitionUpdate = true;
         model_readWriteUnlock();
