@@ -533,65 +533,126 @@ lib-deploy-linux-release-armhf:
 
 
 ##
+## aarch64 (Android)
+##
+
+# Create ingescape library for Android (aarch64)
+lib-android-release-aarch64:
+  extends: .lib-build-files
+  stage: lib-build
+  tags:
+    - docker
+  image: ingescape/ubuntu-x-compil-android-aarch64
+  before_script:
+    - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
+  script:
+    - git clean -xfd
+    - mkdir build
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/${ANDROID_NDK_TOOLCHAIN_FILE} -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - make -C build
+  artifacts:
+    paths:
+      - build
+    name: "lib-android-release-aarch64"
+    expire_in: 1 day
+  dependencies: []
+
+# Create runtime install for Android (aarch64) - Generic ZIP
+lib-installer-runtime-android-aarch64:
+  extends: .lib-build-files
+  stage: lib-installer
+  tags:
+    - docker
+  image: ingescape/ubuntu-x-compil-android-aarch64
+  script:
+    - make -C build package
+    - mv build android-arm64
+  artifacts:
+    paths:
+      - android-arm64/ingescape-*
+    name: "lib-installer-runtime-android-aarch64"
+  dependencies:
+    - lib-android-release-aarch64
+
+# Deploy ingescape to be able to compile agents
+lib-deploy-linux-release-aarch64:
+  extends: .lib-build-files
+  stage: lib-deploy
+  tags:
+    - docker
+  image: ingescape/ubuntu-x-compil-android-aarch64
+  script:
+    - make -C build install DESTDIR=~/builds/release/aarch64
+    - cp src/include/ingescape_private.h ~/builds/release/aarch64/usr/local/include/ingescape/
+  dependencies:
+    - lib-android-release-aarch64
+  only:
+    refs:
+      - master
+      - stable
+    variables:
+      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
+
+##
 ## armv7a (Android)
 ##
 
-# # Create ingescape library for Android (armv7a softfp)
-# lib-android-release-armv7a-softfp:
-#   extends: .lib-build-files
-#   stage: lib-build
-#   tags:
-#     - docker
-#   image: ingescape/ubuntu-x-compil-android
-#   before_script:
-#     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
-#   script:
-#     - git clean -xfd
-#     - mkdir build
-#     - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/${ANDROID_NDK_TOOLCHAIN_FILE} -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
-#     - make -C build
-#   artifacts:
-#     paths:
-#       - build
-#     name: "lib-android-release-armv7a-softfp"
-#     expire_in: 1 day
-#   dependencies: []
-# 
-# # Create runtime install for Android (armv7a softfp) - Generic ZIP
-# lib-installer-runtime-android-armv7a-softfp:
-#   extends: .lib-build-files
-#   stage: lib-installer
-#   tags:
-#     - docker
-#   image: ingescape/ubuntu-x-compil-android
-#   script:
-#     - make -C build package
-#     - mv build android
-#   artifacts:
-#     paths:
-#       - android/ingescape-*
-#     name: "lib-installer-runtime-android-armv7a-softfp"
-#   dependencies:
-#     - lib-android-release-armv7a-softfp
-# 
-# # Deploy ingescape to be able to compile agents
-# lib-deploy-linux-release-armv7a-softfp:
-#   extends: .lib-build-files
-#   stage: lib-deploy
-#   tags:
-#     - docker
-#   image: ingescape/ubuntu-x-compil-android
-#   script:
-#     - make -C build install DESTDIR=~/builds/release/armv7a-sf
-#     - cp src/include/ingescape_private.h ~/builds/release/armv7a-sf/usr/local/include/ingescape/
-#   dependencies:
-#     - lib-android-release-armv7a-softfp
-#   only:
-#     refs:
-#       - master
-#       - stable
-#     variables:
-#       - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
+# Create ingescape library for Android (armv7a softfp)
+lib-android-release-armv7a-softfp:
+  extends: .lib-build-files
+  stage: lib-build
+  tags:
+    - docker
+  image: ingescape/ubuntu-x-compil-android
+  before_script:
+    - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
+  script:
+    - git clean -xfd
+    - mkdir build
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/${ANDROID_NDK_TOOLCHAIN_FILE} -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - make -C build
+  artifacts:
+    paths:
+      - build
+    name: "lib-android-release-armv7a-softfp"
+    expire_in: 1 day
+  dependencies: []
+
+# Create runtime install for Android (armv7a softfp) - Generic ZIP
+lib-installer-runtime-android-armv7a-softfp:
+  extends: .lib-build-files
+  stage: lib-installer
+  tags:
+    - docker
+  image: ingescape/ubuntu-x-compil-android
+  script:
+    - make -C build package
+    - mv build android
+  artifacts:
+    paths:
+      - android/ingescape-*
+    name: "lib-installer-runtime-android-armv7a-softfp"
+  dependencies:
+    - lib-android-release-armv7a-softfp
+
+# Deploy ingescape to be able to compile agents
+lib-deploy-linux-release-armv7a-softfp:
+  extends: .lib-build-files
+  stage: lib-deploy
+  tags:
+    - docker
+  image: ingescape/ubuntu-x-compil-android
+  script:
+    - make -C build install DESTDIR=~/builds/release/armv7a-sf
+    - cp src/include/ingescape_private.h ~/builds/release/armv7a-sf/usr/local/include/ingescape/
+  dependencies:
+    - lib-android-release-armv7a-softfp
+  only:
+    refs:
+      - master
+      - stable
+    variables:
+      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
 
 
 # _____       _ _
@@ -639,12 +700,17 @@ lib-delivery-all:
     - mkdir --parents library/linux_armhf
     - mv linux_armhf/* library/linux_armhf/
     - ls library/linux_armhf/ | grep -v 'latest_delivery' > library/linux_armhf/latest_delivery
-    # - echo "Deliver Android armv7a (softfp)"
-    # - mkdir --parents library/android
-    # - mv android/ingescape-*
-    #      library/android/
-    # - ls library/android/ | grep -v 'latest_delivery' > library/android/latest_delivery
-    # - echo "Synchronization"
+    - echo "Deliver Android armv7a (softfp)"
+    - mkdir --parents library/android
+    - mv android/ingescape-*
+         library/android/
+    - ls library/android/ | grep -v 'latest_delivery' > library/android/latest_delivery
+    - echo "Deliver Android aarch64"
+    - mkdir --parents library/android-arm64
+    - mv android-arm64/ingescape-*
+         library/android-arm64/
+    - ls library/android-arm64/ | grep -v 'latest_delivery' > library/android-arm64/latest_delivery
+    - echo "Synchronization"
     - rsync --rsh="ssh -i ssh_secret" --recursive library ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
   dependencies:
     - lib-installer-runtime-windows-x86
@@ -652,7 +718,8 @@ lib-delivery-all:
     - lib-installer-macos
     - lib-installer-linux-x64
     - lib-installer-runtime-linux-armhf
-    # - lib-installer-runtime-android-armv7a-softfp
+    - lib-installer-runtime-android-armv7a-softfp
+    - lib-installer-runtime-android-aarch64
   only:
     refs:
       - master
@@ -698,11 +765,16 @@ lib-delivery-all-stable:
          linux_armhf/installIngescapeAndDependencies.sh
          library/linux_armhf/
     - ls library/linux_armhf/ | grep -v 'latest_delivery' > library/linux_armhf/latest_delivery
-    # - echo "Deliver Android armv7a (softfp)"
-    # - mkdir --parents library/android
-    # - mv android/ingescape-*
-    #      library/android/
-    # - ls library/android/ | grep -v 'latest_delivery' > library/android/latest_delivery
+    - echo "Deliver Android armv7a (softfp)"
+    - mkdir --parents library/android
+    - mv android/ingescape-*
+         library/android/
+    - ls library/android/ | grep -v 'latest_delivery' > library/android/latest_delivery
+    - echo "Deliver Android aarch64"
+    - mkdir --parents library/android-arm64
+    - mv android-arm64/ingescape-*
+         library/android-arm64/
+    - ls library/android-arm64/ | grep -v 'latest_delivery' > library/android-arm64/latest_delivery
     - echo "Synchronization"
     - rsync --rsh="ssh -i ssh_secret" --recursive library ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST}:${STABLE_DELIVERY_DESTINATION}
   dependencies:
@@ -711,7 +783,8 @@ lib-delivery-all-stable:
     - lib-installer-macos
     - lib-installer-linux-x64
     - lib-installer-runtime-linux-armhf
-    # - lib-installer-runtime-android-armv7a-softfp
+    - lib-installer-runtime-android-armv7a-softfp
+    - lib-installer-runtime-android-aarch64
   only:
     refs:
       - stable
