@@ -150,6 +150,10 @@ void definition_freeDefinition (igs_definition_t **def) {
         free((char*)(*def)->name);
         (*def)->name = NULL;
     }
+    if ((*def)->family != NULL){
+        free((char*)(*def)->family);
+        (*def)->family = NULL;
+    }
     if ((*def)->description != NULL){
         free((char*)(*def)->description);
         (*def)->description = NULL;
@@ -223,27 +227,37 @@ char *igsAgent_getDefinitionName(igs_agent_t *agent){
     return igsAgent_getAgentName(agent);
 }
 
+char* igsAgent_getFamily(igs_agent_t *agent){
+    assert(agent);
+    assert(agent->definition);
+    return (agent->definition->family)?strdup(agent->definition->family):NULL;
+}
+
 char *igsAgent_getDefinitionDescription(igs_agent_t *agent){
     assert(agent);
     assert(agent->definition);
-    if (agent->definition->description){
-        return strdup(agent->definition->description);
-    }else
-        return NULL;
+    return (agent->definition->description)?strdup(agent->definition->description):NULL;
 }
 
 char *igsAgent_getDefinitionVersion(igs_agent_t *agent){
     assert(agent);
     assert(agent->definition);
-    if ( agent->definition->version){
-        return strdup(agent->definition->version);
-    }else
-        return NULL;
+    return (agent->definition->version)?strdup(agent->definition->version):NULL;
 }
 
 void igsAgent_setDefinitionName(igs_agent_t *agent, const char *name){
     igs_warn("this function is DEPRECATED, use igsAgent_setAgentName instead");
     igsAgent_setAgentName(agent, name);
+}
+
+void igsAgent_setFamily(igs_agent_t *agent, const char *family){
+    assert(agent);
+    assert(agent->definition);
+    assert(family);
+    if(agent->definition->family != NULL)
+        free(agent->definition->family);
+    agent->definition->family = strndup(family, 64);
+    agent->network_needToSendDefinitionUpdate = true;
 }
 
 void igsAgent_setDefinitionDescription(igs_agent_t *agent, const char *description){

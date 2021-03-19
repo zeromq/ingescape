@@ -94,6 +94,7 @@ typedef struct igs_call{
 
 typedef struct igs_definition{
     char* name;
+    char* family;
     char* description;
     char* version;
     igs_iop_t* params_table;

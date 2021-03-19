@@ -122,6 +122,16 @@ char *igs_getAgentName(void){
     return igsAgent_getAgentName(coreAgent);
 }
 
+void igs_setFamily(const char *family){
+    core_initAgent();
+    igsAgent_setFamily(coreAgent, family);
+}
+
+char* igs_getFamily(void){
+    core_initAgent();
+    return igsAgent_getFamily(coreAgent);
+}
+
 char *igs_getAgentUuid(void){
     core_initAgent();
     return igsAgent_getAgentUuid(coreAgent);

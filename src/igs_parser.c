@@ -18,6 +18,7 @@
 
 #define STR_DEFINITION "definition"
 #define STR_NAME "name"
+#define STR_FAMILY "family"
 #define STR_DESCRIPTION "description"
 #define STR_VERSION "version"
 #define STR_PARAMETERS "parameters"
@@ -112,6 +113,7 @@ igs_definition_t* parser_parseDefinitionFromNode(igsJSONTreeNode_t **json){
     const char *argumentsPath[] = {"arguments",NULL};
     const char *namePath[] = {"name",NULL};
     const char *nameAlternatePath[] = {"definition","name",NULL};
+    const char *familyPath[] = {"definition","family",NULL};
     const char *typePath[] = {"type",NULL};
     const char *valuePath[] = {"value",NULL};
     const char *replyPath[] = {"reply",NULL};
@@ -130,6 +132,11 @@ igs_definition_t* parser_parseDefinitionFromNode(igsJSONTreeNode_t **json){
         }else
             return NULL;
     }
+    
+    //family
+    igsJSONTreeNode_t *family = igs_JSONTreeGetNodeAtPath(*json, familyPath);
+    if (family && family->type == IGS_JSON_STRING & family->u.string != NULL)
+        definition->family = strdup(family->u.string);
         
     //description
     igsJSONTreeNode_t *description = igs_JSONTreeGetNodeAtPath(*json, descriptionPath);
@@ -715,6 +722,10 @@ char* parser_exportDefinition(igs_definition_t* def){
         igs_JSONaddString(json, STR_NAME);
         igs_JSONaddString(json, def->name);
     }
+    if (def->family){
+        igs_JSONaddString(json, STR_FAMILY);
+        igs_JSONaddString(json, def->family);
+    }
     if (def->description){
         igs_JSONaddString(json, STR_DESCRIPTION);
         igs_JSONaddString(json, def->description);
@@ -1002,8 +1013,12 @@ igs_result_t igsAgent_loadDefinition (igs_agent_t *agent, const char* json_str){
             return IGS_FAILURE;
         }
         
-        if (agent->definition != NULL)
+        if (agent->definition != NULL){
+            if (strneq(agent->definition->name, tmp->name))
+                igsAgent_warn(agent, "agent will change name from %s to %s after loading definition ",
+                              agent->definition->name, tmp->name);
             definition_freeDefinition(&agent->definition);
+        }
         agent->definition = tmp;
         agent->network_needToSendDefinitionUpdate = true;
         model_readWriteUnlock();
@@ -1028,8 +1043,12 @@ igs_result_t igsAgent_loadDefinitionFromPath (igs_agent_t *agent, const char* fi
             return IGS_FAILURE;
         }
         
-        if (agent->definition != NULL)
+        if (agent->definition != NULL){
+            if (strneq(agent->definition->name, tmp->name))
+                igsAgent_warn(agent, "agent will change name from %s to %s after loading definition ",
+                              agent->definition->name, tmp->name);
             definition_freeDefinition(&agent->definition);
+        }
         agent->definitionPath = strndup(file_path, IGS_MAX_PATH_LENGTH - 1);
         agent->definition = tmp;
         agent->network_needToSendDefinitionUpdate = true;

@@ -93,7 +93,7 @@ igs_result_t igsAgent_activate(igs_agent_t *agent){
     igs_agent_t *a = NULL;
     HASH_FIND_STR(coreContext->agents, agent->uuid, a);
     if (a != NULL){
-        igs_error("agent %s (%s) is already activated", agent->definition->name, agent->uuid);
+        igsAgent_error(agent, "agent %s (%s) is already activated", agent->definition->name, agent->uuid);
         return IGS_FAILURE;
     }else{
         agent->context = coreContext;
@@ -153,7 +153,7 @@ igs_result_t igsAgent_deactivate(igs_agent_t *agent){
             bus_zyreUnlock();
         }
     }else{
-        igs_error("agent %s (%s) is not activated", agent->definition->name, agent->uuid);
+        igsAgent_error(agent, "agent %s (%s) is not activated", agent->definition->name, agent->uuid);
         return IGS_FAILURE;
     }
     agent_propagateAgentEvent(IGS_AGENT_EXITED, agent->uuid, agent->definition->name, NULL);
