@@ -388,7 +388,7 @@ int main(int argc, const char * argv[]) {
     igs_enableDataLogging(true);
     igs_enableCallLogging(true);
     
-    //agent name and state
+    //agent name
     char *name = igs_getAgentName();
     assert(streq(name, "no_name"));
     free(name);
@@ -398,6 +398,15 @@ int main(int argc, const char * argv[]) {
     free(name);
     name = NULL;
     igs_setAgentName(agentName); //to set proper log file name
+    
+    //agent family
+    char *family = igs_getFamily();
+    assert(family == NULL);
+    igs_setFamily("family_test");
+    family = igs_getFamily();
+    assert(streq(family, "family_test"));
+    free(family);
+    family = NULL;
     
     //logs
     assert(!igs_isVerbose());
@@ -537,14 +546,9 @@ int main(int argc, const char * argv[]) {
     assert(streq(igs_getDefinitionName(), "tester"));
     assert(igs_getDefinitionDescription() == NULL);
     assert(igs_getDefinitionVersion() == NULL);
-    igs_setDefinitionName("");
     igs_setDefinitionDescription("");
     igs_setDefinitionVersion("");
     //TODO: test loading valid string and file definitions
-    igs_setDefinitionName("my definition");
-    char *defName = igs_getDefinitionName();
-    assert(streq(defName, "my definition"));
-    free(defName);
     igs_setDefinitionDescription("my description");
     char *defDesc = igs_getDefinitionDescription();
     free(defDesc);
@@ -822,12 +826,9 @@ int main(int argc, const char * argv[]) {
     
     igs_clearDefinition();
     name = igs_getAgentName();
-    defName = igs_getDefinitionName();
-    assert(streq(name, defName));
+    assert(streq(name, "tester"));
     free(name);
     name = NULL;
-    free(defName);
-    defName = NULL;
     defDesc = igs_getDefinitionDescription();
     assert(defDesc == NULL);
     defVer = igs_getDefinitionVersion();
@@ -1382,6 +1383,8 @@ int main(int argc, const char * argv[]) {
     assert(igs_competeInElection("my other election") == IGS_FAILURE);
     assert(igs_leaveElection("my other election") == IGS_SUCCESS);
     assert(igs_leaveElection("my other election") == IGS_FAILURE);
+    
+    igs_setFamily("family_test");
     
     //replay
     igs_replayTerminate();

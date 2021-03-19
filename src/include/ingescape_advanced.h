@@ -119,6 +119,12 @@ PUBLIC void igs_setHighWaterMarks(int hwmValue);
  information when finished (information displayed as INFO-level log)*/
 PUBLIC void igs_performanceCheck(const char *peerId, size_t msgSize, size_t nbOfMsg);
 
+/* AGENT FAMILY - optional
+ 32 characters canonical UUID format is commonly expected,
+ default is an empty string, max length is 64 characters*/
+PUBLIC void igs_setFamily(const char *family);
+PUBLIC char* igs_getFamily(void); //char* must be freed by caller
+
 
 /* TIMERS
  Timers can be created to call code a certain number of times,
