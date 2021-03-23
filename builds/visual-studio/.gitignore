@@ -1,0 +1,6 @@
+Debug
+Release
+dependencies
+ingescape.dir
+*.user
+*.filters

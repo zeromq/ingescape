@@ -19,6 +19,10 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/modules/
 include(IngescapeHelper)
 include(IdentifyOS)
 
+# Option to only generate dependencies.
+# Used to setup developmenent environment.
+option(DEPS_ONLY "Only generate dependencies" OFF)
+
 # Override default release flags to not define NDEBUG, which CMake sets by default for Release builds
 # NB: The NDEBUG flag compile out all assert() calls, skipping whatever was done in the assert call (function call, computation, etc.)
 # It changes the compiled code from the source code and we don't want that.
@@ -164,564 +168,560 @@ if (APPLE)
   find_library(CORE_FRAMEWORK CoreFoundation)
 endif (APPLE)
 
-# ##############################################################################
-# library
-# ##############################################################################
-option(INGESCAPE_BUILD_SHARED "Whether or not to build the shared object" ON)
-option(INGESCAPE_BUILD_STATIC "Whether or not to build the static archive" ON)
-if(NOT INGESCAPE_BUILD_SHARED AND NOT INGESCAPE_BUILD_STATIC)
-  message(FATAL_ERROR "Neither static nor shared library build enabled")
-endif()
+if (NOT DEPS_ONLY)
+  # ##############################################################################
+  # library
+  # ##############################################################################
 
-
-if(NOT MSVC)
-  # avoid building everything twice for shared + static only on *nix, as Windows
-  # needs different preprocessor defines in static builds
-  #FIXME This is a good idea but it's not used anymore. Let's fix that!
-  #add_library(ingescape_objects OBJECT ${ingescape_sources})
-  #set_property(TARGET ingescape_objects PROPERTY POSITION_INDEPENDENT_CODE ON)
-else()
-  # WIN32_LIB_FILEFLAGS is used in the RC file that will register the DLL version
-  if (${CMAKE_BUILD_TYPE} MATCHES "Release")
-    set(WIN32_LIB_FILEFLAGS "0")
-  else ()
-      set(WIN32_LIB_FILEFLAGS "VS_FF_DEBUG")
-  endif()
-endif()
-
-
-# shared
-if(INGESCAPE_BUILD_SHARED)
-  add_library(${PROJECT_NAME} SHARED ${ingescape_sources})
-
-  add_dependencies(libzmq sodium)
-  message(STATUS "SODIUM_LIBRARIES: ${SODIUM_LIBRARIES}")
-  target_link_libraries(${PROJECT_NAME} PRIVATE sodium)
-
-  # We need to specify the full name of the .LIB for ZeroMQ on Windows.
-  # if (WIN32)
-  #   if (CMAKE_BUILD_TYPE STREQUAL "Release")
-  #     set(ZEROMQ_LIBRARIES "${CMAKE_INSTALL_PREFIX}/lib/libzmq-${CMAKE_VS_PLATFORM_TOOLSET}-mt-${_zmq_version}.lib")
-  #   else ()
-  #     set(ZEROMQ_LIBRARIES "${CMAKE_INSTALL_PREFIX}/lib/libzmq-${CMAKE_VS_PLATFORM_TOOLSET}-mt-gd-${_zmq_version}.lib")
-  #   endif()
-  # endif()
-
-  add_dependencies(czmq libzmq)
-  message(STATUS "ZEROMQ_LIBRARIES: ${ZEROMQ_LIBRARIES}")
-  target_link_libraries(${PROJECT_NAME} PRIVATE libzmq)
-
-  add_dependencies(zyre czmq)
-  message(STATUS "CZMQ_LIBRARIES: ${CZMQ_LIBRARIES}")
-  target_link_libraries(${PROJECT_NAME} PRIVATE czmq)
-
-  add_dependencies(${PROJECT_NAME} zyre)
-  message(STATUS "ZYRE_LIBRARIES: ${ZYRE_LIBRARIES}")
-  target_link_libraries(${PROJECT_NAME} PRIVATE zyre)
-
-  # OS specifig target properties
-  if(MSVC)
-    # WIN32_LIB_FILETYPE is used in the RC file that will register the DLL version
-    set(WIN32_LIB_FILETYPE "VFT_DLL")
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/modules/library/library_version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
-    target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
-
-    set_target_properties(${PROJECT_NAME}
-                            PROPERTIES
-                              OUTPUT_NAME_RELEASE "ingescape"
-                              OUTPUT_NAME_DEBUG "ingescaped"
-    )
-
-    math(EXPR BITS "8*${CMAKE_SIZEOF_VOID_P}")
-    if (${BITS} EQUAL 64)
-        install(DIRECTORY dependencies/windows/vcredist/ DESTINATION ressources FILES_MATCHING PATTERN "*64.exe")
-    else()
-      install(DIRECTORY dependencies/windows/vcredist/ DESTINATION ressources FILES_MATCHING PATTERN "*86.exe")
-    endif()
-
-  else(MSVC)
-    set_target_properties(${PROJECT_NAME}
-                            PROPERTIES
-                              #PUBLIC_HEADER "${ingescape_headers_to_install}"
-                              #TODO We do not generate a Framework yet.
-                              #FRAMEWORK TRUE
-                              #FRAMEWORK_VERSION C
-                              #MACOSX_FRAMEWORK_IDENTIFIER com.ingescape
-                              #XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "MyAccount Developer"
-                              VERSION "${INGESCAPE_VERSION}" # Current version
-                              SOVERSION "${INGESCAPE_VERSION_MAJOR}.0.0" # Compatibility version
-                              OUTPUT_NAME "ingescape"
-                              PREFIX "lib"
-    )
-  endif(MSVC)
-
-  # Add compilation #defines to the target
-  target_compile_definitions(${PROJECT_NAME} PRIVATE INGESCAPE=1;TARGET_OS_IOS=0)
-
-  # Add linked dependencies
-  #FIXME All private here ?
-  target_link_libraries(${PROJECT_NAME}
-    PRIVATE
-      $<$<BOOL:${APPLE}>:${CORE_FRAMEWORK}>
-      $<$<BOOL:${WIN32}>:ws2_32>
-  )
-
-  # Header files
-  target_include_directories(${PROJECT_NAME}
-    PUBLIC
-      $<INSTALL_INTERFACE:include>
-      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/include>
-    PRIVATE
-      $<$<BOOL:${UNIX}>:${CMAKE_INSTALL_PREFIX}/include>
-      ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/yajl/src/api
-      $<$<BOOL:${WIN32}>:${CMAKE_CURRENT_SOURCE_DIR}/dependencies/windows/unix>
-      $<$<BOOL:${WIN32}>:${CMAKE_INSTALL_PREFIX}/include>
-  )
-
-  install(TARGETS ${PROJECT_NAME}
-          EXPORT ${PROJECT_NAME}-targets
-          FRAMEWORK DESTINATION "Frameworks" # .framework file
-                  COMPONENT library
-          PUBLIC_HEADER DESTINATION include
-                  COMPONENT library
-          LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
-                  COMPONENT library
-          ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
-                  COMPONENT library
-          RUNTIME DESTINATION "lib${LIB_SUFFIX}" # .dll file
-                  COMPONENT library)
-endif()
-
-# static
-if(INGESCAPE_BUILD_STATIC)
-  add_library(${PROJECT_NAME}-static STATIC ${ingescape_sources})
-
-  add_dependencies(libzmq sodium)
-  message(STATUS "SODIUM_LIBRARIES: ${SODIUM_LIBRARIES}")
-  target_link_libraries(${PROJECT_NAME}-static PRIVATE sodium)
-
-  # We need to specify the full name of the .LIB for ZeroMQ on Windows.
-  if (WIN32)
-    if (CMAKE_BUILD_TYPE STREQUAL "Release")
-      set(ZEROMQ_LIBRARIES "${CMAKE_INSTALL_PREFIX}/lib/libzmq-${CMAKE_VS_PLATFORM_TOOLSET}-mt-s-${_zmq_version}.lib")
-    else ()
-      set(ZEROMQ_LIBRARIES "${CMAKE_INSTALL_PREFIX}/lib/libzmq-${CMAKE_VS_PLATFORM_TOOLSET}-mt-sgd-${_zmq_version}.lib")
-    endif()
+  option(INGESCAPE_BUILD_SHARED "Whether or not to build the shared object" ON)
+  option(INGESCAPE_BUILD_STATIC "Whether or not to build the static archive" ON)
+  if(NOT INGESCAPE_BUILD_SHARED AND NOT INGESCAPE_BUILD_STATIC)
+    message(FATAL_ERROR "Neither static nor shared library build enabled")
   endif()
 
-  add_dependencies(czmq libzmq)
-  message(STATUS "ZEROMQ_LIBRARIES: ${ZEROMQ_LIBRARIES}")
-  target_link_libraries(${PROJECT_NAME}-static PRIVATE libzmq)
 
-  add_dependencies(zyre czmq)
-  message(STATUS "CZMQ_LIBRARIES: ${CZMQ_LIBRARIES}")
-  target_link_libraries(${PROJECT_NAME}-static PRIVATE czmq)
-
-  add_dependencies(${PROJECT_NAME}-static zyre)
-  message(STATUS "ZYRE_LIBRARIES: ${ZYRE_LIBRARIES}")
-  target_link_libraries(${PROJECT_NAME}-static PRIVATE zyre)
-
-  # OS specifig target properties
-  if(MSVC)
-    # WIN32_LIB_FILETYPE is used in the RC file that will register the DLL version
-    set(WIN32_LIB_FILETYPE "VFT_STATIC_LIB")
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/modules/library/library_version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
-    target_sources(${PROJECT_NAME}-static PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
-
-    set_target_properties(${PROJECT_NAME}-static
-                            PROPERTIES
-                              OUTPUT_NAME_RELEASE "ingescape_static"
-                              OUTPUT_NAME_DEBUG "ingescaped_static")
-
-  else(MSVC)
-    set_target_properties(${PROJECT_NAME}-static
-                          PROPERTIES
-                            OUTPUT_NAME "ingescape"
-                            PREFIX "lib")
-  endif(MSVC)
-
-  # Add compilation #defines to the target
-  target_compile_definitions(${PROJECT_NAME}-static PRIVATE INGESCAPE=1;TARGET_OS_IOS=0)
-
-  # Add linked dependencies
-  #FIXME All private here ?
-  target_link_libraries(${PROJECT_NAME}-static
-    PRIVATE
-      $<$<BOOL:${APPLE}>:${CORE_FRAMEWORK}>
-      $<$<BOOL:${WIN32}>:ws2_32>
-  )
-
-  # Header files
-  target_include_directories(${PROJECT_NAME}-static
-    PUBLIC
-      $<INSTALL_INTERFACE:include>
-      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/include>
-    PRIVATE
-      $<$<BOOL:${UNIX}>:${CMAKE_INSTALL_PREFIX}/include>
-      ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/yajl/src/api
-      $<$<BOOL:${WIN32}>:${CMAKE_CURRENT_SOURCE_DIR}/dependencies/windows/unix>
-      $<$<BOOL:${WIN32}>:${CMAKE_INSTALL_PREFIX}/include>
-  )
-
-  # Release build compile with -O2 flag
-  if (${CMAKE_BUILD_TYPE} MATCHES "Release")
-      target_compile_options(${PROJECT_NAME}-static PRIVATE "-O2")
-  endif()
-
-  install(TARGETS ${PROJECT_NAME}-static
-          EXPORT ${PROJECT_NAME}-targets
-          LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
-                  COMPONENT library
-          ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
-                  COMPONENT library
-          RUNTIME DESTINATION "lib${LIB_SUFFIX}" # .dll file
-                  COMPONENT library)
-endif()
-
-# Install public include files
-install(FILES ${ingescape_headers_to_install}
-        DESTINATION include/ingescape
-        COMPONENT library)
-
-# Install headers from libzmq and czmq
-#FIXME Exclude from x-compil builds for now due to pipeline errors with CPack
-if(NOT CMAKE_TOOLCHAIN_FILE)
-  # Variable holding the ZMQ public headers to install with ingescape
-  #NB: This variable is manually set from the CMakeLists.txt from ZeroMQ
-  get_target_property(ZMQ_PUBLIC_HEADERS_DIR libzmq INTERFACE_INCLUDE_DIRECTORIES)
-  set(ZMQ_PUBLIC_HEADERS
-    ${ZMQ_PUBLIC_HEADERS_DIR}/zmq.h
-    ${ZMQ_PUBLIC_HEADERS_DIR}/zmq_utils.h
-  )
-
-  # Variable holding the czmq public headers to install with ingescape
-  #NB: This variable is manually set from the CMakeLists.txt from czmq
-  get_target_property(CZMQ_PUBLIC_HEADERS_DIR czmq INTERFACE_INCLUDE_DIRECTORIES)
-  set (CZMQ_PUBLIC_HEADERS
-    ${CZMQ_PUBLIC_HEADERS_DIR}/czmq_library.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/czmq_prelude.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/czmq.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zactor.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zarmour.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zcert.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zcertstore.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zchunk.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zclock.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zconfig.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zdigest.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zdir.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zdir_patch.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zfile.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zframe.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zhash.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zhashx.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/ziflist.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zlist.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zlistx.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zloop.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zmsg.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zpoller.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zsock.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zstr.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zsys.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zuuid.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zauth.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zbeacon.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zgossip.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zmonitor.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zproxy.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zrex.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zgossip_msg.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zsock_option.inc
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zgossip_engine.inc
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zhash_primes.inc
-    ${CZMQ_PUBLIC_HEADERS_DIR}/sha1.inc_c
-    ${CZMQ_PUBLIC_HEADERS_DIR}/sha1.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/slre.inc_c
-    ${CZMQ_PUBLIC_HEADERS_DIR}/slre.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/readme.txt
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zargs.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zproc.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/ztimerset.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/ztrie.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zhttp_client.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zhttp_server.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zhttp_server_options.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zhttp_request.h
-    ${CZMQ_PUBLIC_HEADERS_DIR}/zhttp_response.h
-  )
-
-  # Variable holding the sodium public headers to install with ingescape
-  #NB: This variable is manually set from the sodium installation
-  set(SODIUM_PUBLIC_HEADERS
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium.h
-  )
-  set(SODIUM_PUBLIC_HEADERS_SUBDIR
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/core.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_aead_aes256gcm.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_aead_chacha20poly1305.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_aead_xchacha20poly1305.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_auth.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_auth_hmacsha256.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_auth_hmacsha512.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_auth_hmacsha512256.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_box.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_box_curve25519xchacha20poly1305.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_box_curve25519xsalsa20poly1305.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_core_ed25519.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_core_ristretto255.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_core_hchacha20.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_core_hsalsa20.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_core_salsa20.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_core_salsa2012.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_core_salsa208.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_generichash.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_generichash_blake2b.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_hash.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_hash_sha256.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_hash_sha512.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_kdf.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_kdf_blake2b.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_kx.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_onetimeauth.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_onetimeauth_poly1305.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_pwhash.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_pwhash_argon2i.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_pwhash_argon2id.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_pwhash_scryptsalsa208sha256.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_scalarmult.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_scalarmult_curve25519.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_scalarmult_ed25519.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_scalarmult_ristretto255.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_secretbox.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_secretbox_xchacha20poly1305.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_secretbox_xsalsa20poly1305.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_secretstream_xchacha20poly1305.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_shorthash.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_shorthash_siphash24.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_sign.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_sign_ed25519.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_sign_edwards25519sha512batch.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_stream.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_stream_chacha20.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_stream_salsa20.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_stream_salsa2012.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_stream_salsa208.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_stream_xchacha20.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_stream_xsalsa20.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_verify_16.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_verify_32.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_verify_64.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/export.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/randombytes.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/randombytes_internal_random.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/randombytes_sysrandom.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/runtime.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/utils.h
-    ${LIBSODIUM_INCLUDE_DIRS}/sodium/version.h
-  )
-
-
-
-  #Install czmq & ZeroMQ headers since they are in our INTERFACE
-  # install(
-  #   FILES
-  #     ${SODIUM_PUBLIC_HEADERS}
-  #     ${ZMQ_PUBLIC_HEADERS}
-  #     ${CZMQ_PUBLIC_HEADERS}
-  #     ${ZYRE_PUBLIC_HEADERS}
-  #   DESTINATION
-  #     include
-  #   COMPONENT library
-  # )
-  # install(
-  #   FILES
-  #     ${SODIUM_PUBLIC_HEADERS_SUBDIR}
-  #   DESTINATION
-  #     include/sodium
-  #   COMPONENT library
-  # )
-
-  message(STATUS "ZMQ and CZMQ files installed")
-endif(NOT CMAKE_TOOLCHAIN_FILE)
-
-# ##############################################################################
-# pkgconfig
-# ##############################################################################
-set(VERSION "${INGESCAPE_VERSION}")
-set(prefix "${CMAKE_INSTALL_PREFIX}")
-set(exec_prefix "\${prefix}")
-set(libdir "\${prefix}/lib${LIB_SUFFIX}")
-set(includedir "\${prefix}/include")
-set(pkg_config_defines "")
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/libingescape.pc.in"
-               "${CMAKE_CURRENT_BINARY_DIR}/libingescape.pc" @ONLY)
-
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libingescape.pc"
-        DESTINATION "lib${LIB_SUFFIX}/pkgconfig"
-        COMPONENT library)
-
-# ##############################################################################
-# installation
-# ##############################################################################
-include(CMakePackageConfigHelpers)
-if (WIN32)
-  set(INGESCAPE_CMAKECONFIG_INSTALL_DIR "CMake" CACHE STRING "install path for ingescapeConfig.cmake")
-else()
-  set(INGESCAPE_CMAKECONFIG_INSTALL_DIR "share/cmake/ingescape" CACHE STRING "install path for ingescapeConfig.cmake")
-endif(WIN32)
-
-# Export ingescapeTargets.cmake
-export(EXPORT ${PROJECT_NAME}-targets FILE "${CMAKE_CURRENT_BINARY_DIR}/ingescapeTargets.cmake")
-
-# Generate ingescapeConfig.cmake
-configure_package_config_file(
-  builds/cmake/Config.cmake.in
-  "${CMAKE_CURRENT_BINARY_DIR}/ingescapeConfig.cmake"
-  INSTALL_DESTINATION ${INGESCAPE_CMAKECONFIG_INSTALL_DIR}
-)
-
-# Generate ingescapeConfigVersion.cmake
-write_basic_package_version_file(
-  ${CMAKE_CURRENT_BINARY_DIR}/ingescapeConfigVersion.cmake
-  VERSION ${INGESCAPE_VERSION}
-  COMPATIBILITY AnyNewerVersion
-)
-
-# Install CMake config and target files
-install(FILES
-  ${CMAKE_CURRENT_BINARY_DIR}/ingescapeConfig.cmake
-  ${CMAKE_CURRENT_BINARY_DIR}/ingescapeConfigVersion.cmake
-  DESTINATION ${INGESCAPE_CMAKECONFIG_INSTALL_DIR})
-
-install(EXPORT ${PROJECT_NAME}-targets
-  FILE ingescapeTargets.cmake
-  DESTINATION ${INGESCAPE_CMAKECONFIG_INSTALL_DIR})
-
-# uninstall target
-if(NOT TARGET uninstall)
-  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/cmake_uninstall.cmake.in"
-                 "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
-                 IMMEDIATE
-                 @ONLY)
-
-  add_custom_target(uninstall
-                    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
-endif()
-
-# ##############################################################################
-# installer
-# ##############################################################################
-# Package installer for release build only
-if((WIN32) OR (CMAKE_BUILD_TYPE STREQUAL "Release"))
-  #https://cmake.org/cmake/help/v3.16/module/CPack.html#
-  set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
-  set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "The ${PROJECT_NAME} core library")
-  set(CPACK_PACKAGE_DESCRIPTION "The ${PROJECT_NAME} core library")
-  set(CPACK_PACKAGE_HOMEPAGE_URL "https://ingescape.com")
-  set(CPACK_PACKAGE_VENDOR "ingenuity.io")
-  set(CPACK_PACKAGE_CONTACT "contact@ingescape.com")
-  set(CPACK_PACKAGE_VERSION ${INGESCAPE_VERSION})
-  set(CPACK_PACKAGE_VERSION_MAJOR "${INGESCAPE_VERSION_MAJOR}")
-  set(CPACK_PACKAGE_VERSION_MINOR "${INGESCAPE_VERSION_MINOR}")
-  set(CPACK_PACKAGE_VERSION_PATCH "${INGESCAPE_VERSION_PATCH}")
-  set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}")
-  set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
-  set(CPACK_STRIP_FILES TRUE)
-
-  set(
-    CPACK_SOURCE_IGNORE_FILES
-    "${CMAKE_CURRENT_SOURCE_DIR}/bindings/;${CMAKE_CURRENT_SOURCE_DIR}/build/;${CMAKE_CURRENT_SOURCE_DIR}/.git/;${CMAKE_CURRENT_SOURCE_DIR}/doc/;${CMAKE_CURRENT_SOURCE_DIR}/applications/;${CMAKE_CURRENT_SOURCE_DIR}/ingeprobe/;${CMAKE_CURRENT_SOURCE_DIR}/packaging/"
-    )
-
-  if(WIN32)
-    # Installers for 32- vs. 64-bit CMake: - Root install directory (displayed to
-    # end user at installer-run time) - "NSIS package/display name" (text used in
-    # the installer GUI) - Registry key used to store info about the installation
-    if(CMAKE_CL_64)
-      set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES64")
-      set(CPACK_NSIS_PACKAGE_NAME
-          "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION} (Win64)")
-      set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} (Win64)")
-    else()
-      set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES")
-      set(CPACK_NSIS_PACKAGE_NAME
-          "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION}")
-      set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} (Win32)")
-    endif()
-
-    # NSIS configuration for Windows see https://cmake.org/cmake/help/v3.14/cpack_
-    # gen/nsis.html#cpack_gen:CPack%20NSIS%20Generator
-    set(CPACK_NSIS_DISPLAY_NAME "The ${PROJECT_NAME} core library")
-    set(CPACK_NSIS_PACKAGE_NAME ${PROJECT_NAME})
-    set(CPACK_NSIS_HELP_LINK "https://ingescape.com")
-    set(CPACK_NSIS_CONTACT "contact@ingescape.com")
-    set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
-    set(CPACK_NSIS_MODIFY_PATH ON)
-    set(CPACK_NSIS_URL_INFO_ABOUT ${CMAKE_PROJECT_HOMEPAGE_URL})
-    set(CPACK_NSIS_MENU_LINKS ${CMAKE_PROJECT_HOMEPAGE_URL} "IngeScape Web Site")
-
-    set(CPACK_MONOLITHIC_INSTALL ON)
-
-    set(CPACK_GENERATOR "NSIS;ZIP")
-
-    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/README.txt
-         "The bin directory is empty after installation on purpose.\r\n"
-         "It will contain agents' executables once installed.")
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/README.txt
-            DESTINATION bin
-            COMPONENT library)
-
-  elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    # https://cmake.org/cmake/help/git-stage/cpack_gen/productbuild.html
-    # Without component productbuild will not package any files
-    set(CPACK_COMPONENTS_ALL library)
-    set(CPACK_PACKAGING_INSTALL_PREFIX "/usr/local")
-    set(CPACK_SYSTEM_NAME "macos")
-
-    #set(CPACK_PRODUCTBUILD_IDENTITY_NAME "Developer ID Installer: Ingenuity i/o (56DRT9MG9S)")
-    #set(CPACK_PRODUCTBUILD_KEYCHAIN_PATH "$ENV{HOME}/Library/Keychains/login.keychain")
-    #set(CPACK_PKGBUILD_IDENTITY_NAME "Developer ID Installer: Ingenuity i/o (56DRT9MG9S)")
-    #set(CPACK_PKGBUILD_KEYCHAIN_PATH "$ENV{HOME}/Library/Keychains/login.keychain")
-
-    set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_SOURCE_DIR}/builds/xcode/WELCOME.txt")
-    set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/builds/xcode/README.txt")
-
-    # Without extention productbuild will crash So we just copy License file in
-    # build folder with an extension
-    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/LICENSE"
-                   "${CMAKE_BINARY_DIR}/LICENSE.txt" COPYONLY)
-    set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_BINARY_DIR}/LICENSE.txt")
-
-    set(CPACK_PREFLIGHT_LIBRARY_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/builds/xcode/preflight.sh")
-    set(CPACK_POSTFLIGHT_LIBRARY_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/builds/xcode/postflight.sh")
-
-    set(CPACK_GENERATOR "productbuild")
-
+  if(NOT MSVC)
+    # avoid building everything twice for shared + static only on *nix, as Windows
+    # needs different preprocessor defines in static builds
+    #FIXME This is a good idea but it's not used anymore. Let's fix that!
+    #add_library(ingescape_objects OBJECT ${ingescape_sources})
+    #set_property(TARGET ingescape_objects PROPERTY POSITION_INDEPENDENT_CODE ON)
   else()
-    set(CPACK_MONOLITHIC_INSTALL ON)
-    #FIXME TODO Define a strategy for dependencies for linux
-    if(ANDROID)
-      set(CPACK_GENERATOR "ZIP")
-    else()
-      install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/unix/install_script.sh"
-              DESTINATION "."
-              PERMISSIONS OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
-              COMPONENT library)
-      set(CPACK_GENERATOR "TGZ")
+    # WIN32_LIB_FILEFLAGS is used in the RC file that will register the DLL version
+    if (${CMAKE_BUILD_TYPE} MATCHES "Release")
+      set(WIN32_LIB_FILEFLAGS "0")
+    else ()
+        set(WIN32_LIB_FILEFLAGS "VS_FF_DEBUG")
     endif()
   endif()
 
-  if(MSVC)
-    if( ${BITS} EQUAL 64)
-      set(CPACK_NSIS_WINDOWS_ARCH "x64")
-    else()
-      set(CPACK_NSIS_WINDOWS_ARCH "x32")
-    endif(${BITS} EQUAL 64)
-  endif(MSVC)
 
-  include(CPack)
-endif()
+  # shared
+  if(INGESCAPE_BUILD_SHARED)
+    add_library(${PROJECT_NAME} SHARED ${ingescape_sources})
+
+    add_dependencies(libzmq sodium)
+    target_link_libraries(${PROJECT_NAME} PRIVATE sodium)
+
+    # We need to specify the full name of the .LIB for ZeroMQ on Windows.
+    # if (WIN32)
+    #   if (CMAKE_BUILD_TYPE STREQUAL "Release")
+    #     set(ZEROMQ_LIBRARIES "${CMAKE_INSTALL_PREFIX}/lib/libzmq-${CMAKE_VS_PLATFORM_TOOLSET}-mt-${_zmq_version}.lib")
+    #   else ()
+    #     set(ZEROMQ_LIBRARIES "${CMAKE_INSTALL_PREFIX}/lib/libzmq-${CMAKE_VS_PLATFORM_TOOLSET}-mt-gd-${_zmq_version}.lib")
+    #   endif()
+    # endif()
+
+    add_dependencies(czmq libzmq)
+    target_link_libraries(${PROJECT_NAME} PRIVATE libzmq)
+
+    add_dependencies(zyre czmq)
+    target_link_libraries(${PROJECT_NAME} PRIVATE czmq)
+
+    add_dependencies(${PROJECT_NAME} zyre)
+    target_link_libraries(${PROJECT_NAME} PRIVATE zyre)
+
+    # OS specifig target properties
+    if(MSVC)
+      # WIN32_LIB_FILETYPE is used in the RC file that will register the DLL version
+      set(WIN32_LIB_FILETYPE "VFT_DLL")
+      configure_file(${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/modules/library/library_version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
+      target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
+
+      set_target_properties(${PROJECT_NAME}
+                              PROPERTIES
+                                OUTPUT_NAME_RELEASE "ingescape"
+                                OUTPUT_NAME_DEBUG "ingescaped"
+      )
+
+      math(EXPR BITS "8*${CMAKE_SIZEOF_VOID_P}")
+      if (${BITS} EQUAL 64)
+          install(DIRECTORY dependencies/windows/vcredist/ DESTINATION ressources FILES_MATCHING PATTERN "*64.exe")
+      else()
+        install(DIRECTORY dependencies/windows/vcredist/ DESTINATION ressources FILES_MATCHING PATTERN "*86.exe")
+      endif()
+
+    else(MSVC)
+      set_target_properties(${PROJECT_NAME}
+                              PROPERTIES
+                                #PUBLIC_HEADER "${ingescape_headers_to_install}"
+                                #TODO We do not generate a Framework yet.
+                                #FRAMEWORK TRUE
+                                #FRAMEWORK_VERSION C
+                                #MACOSX_FRAMEWORK_IDENTIFIER com.ingescape
+                                #XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "MyAccount Developer"
+                                VERSION "${INGESCAPE_VERSION}" # Current version
+                                SOVERSION "${INGESCAPE_VERSION_MAJOR}.0.0" # Compatibility version
+                                OUTPUT_NAME "ingescape"
+                                PREFIX "lib"
+      )
+    endif(MSVC)
+
+    # Add compilation #defines to the target
+    target_compile_definitions(${PROJECT_NAME} PRIVATE INGESCAPE=1;TARGET_OS_IOS=0)
+
+    # Add linked dependencies
+    #FIXME All private here ?
+    target_link_libraries(${PROJECT_NAME}
+      PRIVATE
+        $<$<BOOL:${APPLE}>:${CORE_FRAMEWORK}>
+        $<$<BOOL:${WIN32}>:ws2_32>
+    )
+
+    # Header files
+    target_include_directories(${PROJECT_NAME}
+      PUBLIC
+        $<INSTALL_INTERFACE:include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/include>
+      PRIVATE
+        $<$<BOOL:${UNIX}>:${CMAKE_INSTALL_PREFIX}/include>
+        ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/yajl/src/api
+        $<$<BOOL:${WIN32}>:${CMAKE_CURRENT_SOURCE_DIR}/dependencies/windows/unix>
+        $<$<BOOL:${WIN32}>:${CMAKE_INSTALL_PREFIX}/include>
+    )
+
+    install(TARGETS ${PROJECT_NAME}
+            EXPORT ${PROJECT_NAME}-targets
+            FRAMEWORK DESTINATION "Frameworks" # .framework file
+                    COMPONENT library
+            PUBLIC_HEADER DESTINATION include
+                    COMPONENT library
+            LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
+                    COMPONENT library
+            ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
+                    COMPONENT library
+            RUNTIME DESTINATION "lib${LIB_SUFFIX}" # .dll file
+                    COMPONENT library)
+  endif()
+
+  # static
+  if(INGESCAPE_BUILD_STATIC)
+    add_library(${PROJECT_NAME}-static STATIC ${ingescape_sources})
+
+    add_dependencies(libzmq sodium)
+    target_link_libraries(${PROJECT_NAME}-static PRIVATE sodium)
+
+    # We need to specify the full name of the .LIB for ZeroMQ on Windows.
+    if (WIN32)
+      if (CMAKE_BUILD_TYPE STREQUAL "Release")
+        set(ZEROMQ_LIBRARIES "${CMAKE_INSTALL_PREFIX}/lib/libzmq-${CMAKE_VS_PLATFORM_TOOLSET}-mt-s-${_zmq_version}.lib")
+      else ()
+        set(ZEROMQ_LIBRARIES "${CMAKE_INSTALL_PREFIX}/lib/libzmq-${CMAKE_VS_PLATFORM_TOOLSET}-mt-sgd-${_zmq_version}.lib")
+      endif()
+    endif()
+
+    add_dependencies(czmq libzmq)
+    target_link_libraries(${PROJECT_NAME}-static PRIVATE libzmq)
+
+    add_dependencies(zyre czmq)
+    target_link_libraries(${PROJECT_NAME}-static PRIVATE czmq)
+
+    add_dependencies(${PROJECT_NAME}-static zyre)
+    target_link_libraries(${PROJECT_NAME}-static PRIVATE zyre)
+
+    # OS specifig target properties
+    if(MSVC)
+      # WIN32_LIB_FILETYPE is used in the RC file that will register the DLL version
+      set(WIN32_LIB_FILETYPE "VFT_STATIC_LIB")
+      configure_file(${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/modules/library/library_version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
+      target_sources(${PROJECT_NAME}-static PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
+
+      set_target_properties(${PROJECT_NAME}-static
+                              PROPERTIES
+                                OUTPUT_NAME_RELEASE "ingescape_static"
+                                OUTPUT_NAME_DEBUG "ingescaped_static")
+
+    else(MSVC)
+      set_target_properties(${PROJECT_NAME}-static
+                            PROPERTIES
+                              OUTPUT_NAME "ingescape"
+                              PREFIX "lib")
+    endif(MSVC)
+
+    # Add compilation #defines to the target
+    target_compile_definitions(${PROJECT_NAME}-static PRIVATE INGESCAPE=1;TARGET_OS_IOS=0)
+
+    # Add linked dependencies
+    #FIXME All private here ?
+    target_link_libraries(${PROJECT_NAME}-static
+      PRIVATE
+        $<$<BOOL:${APPLE}>:${CORE_FRAMEWORK}>
+        $<$<BOOL:${WIN32}>:ws2_32>
+    )
+
+    # Header files
+    target_include_directories(${PROJECT_NAME}-static
+      PUBLIC
+        $<INSTALL_INTERFACE:include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/include>
+      PRIVATE
+        $<$<BOOL:${UNIX}>:${CMAKE_INSTALL_PREFIX}/include>
+        ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/yajl/src/api
+        $<$<BOOL:${WIN32}>:${CMAKE_CURRENT_SOURCE_DIR}/dependencies/windows/unix>
+        $<$<BOOL:${WIN32}>:${CMAKE_INSTALL_PREFIX}/include>
+    )
+
+    # Release build compile with -O2 flag
+    if (${CMAKE_BUILD_TYPE} MATCHES "Release")
+        target_compile_options(${PROJECT_NAME}-static PRIVATE "-O2")
+    endif()
+
+    install(TARGETS ${PROJECT_NAME}-static
+            EXPORT ${PROJECT_NAME}-targets
+            LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
+                    COMPONENT library
+            ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
+                    COMPONENT library
+            RUNTIME DESTINATION "lib${LIB_SUFFIX}" # .dll file
+                    COMPONENT library)
+  endif()
+
+  # Install public include files
+  install(FILES ${ingescape_headers_to_install}
+          DESTINATION include/ingescape
+          COMPONENT library)
+
+  # Install headers from libzmq and czmq
+  #FIXME Exclude from x-compil builds for now due to pipeline errors with CPack
+  if(NOT CMAKE_TOOLCHAIN_FILE)
+    # Variable holding the ZMQ public headers to install with ingescape
+    #NB: This variable is manually set from the CMakeLists.txt from ZeroMQ
+    get_target_property(ZMQ_PUBLIC_HEADERS_DIR libzmq INTERFACE_INCLUDE_DIRECTORIES)
+    set(ZMQ_PUBLIC_HEADERS
+      ${ZMQ_PUBLIC_HEADERS_DIR}/zmq.h
+      ${ZMQ_PUBLIC_HEADERS_DIR}/zmq_utils.h
+    )
+
+    # Variable holding the czmq public headers to install with ingescape
+    #NB: This variable is manually set from the CMakeLists.txt from czmq
+    get_target_property(CZMQ_PUBLIC_HEADERS_DIR czmq INTERFACE_INCLUDE_DIRECTORIES)
+    set (CZMQ_PUBLIC_HEADERS
+      ${CZMQ_PUBLIC_HEADERS_DIR}/czmq_library.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/czmq_prelude.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/czmq.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zactor.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zarmour.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zcert.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zcertstore.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zchunk.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zclock.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zconfig.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zdigest.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zdir.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zdir_patch.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zfile.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zframe.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zhash.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zhashx.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/ziflist.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zlist.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zlistx.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zloop.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zmsg.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zpoller.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zsock.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zstr.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zsys.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zuuid.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zauth.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zbeacon.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zgossip.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zmonitor.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zproxy.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zrex.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zgossip_msg.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zsock_option.inc
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zgossip_engine.inc
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zhash_primes.inc
+      ${CZMQ_PUBLIC_HEADERS_DIR}/sha1.inc_c
+      ${CZMQ_PUBLIC_HEADERS_DIR}/sha1.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/slre.inc_c
+      ${CZMQ_PUBLIC_HEADERS_DIR}/slre.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/readme.txt
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zargs.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zproc.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/ztimerset.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/ztrie.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zhttp_client.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zhttp_server.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zhttp_server_options.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zhttp_request.h
+      ${CZMQ_PUBLIC_HEADERS_DIR}/zhttp_response.h
+    )
+
+    # Variable holding the sodium public headers to install with ingescape
+    #NB: This variable is manually set from the sodium installation
+    set(SODIUM_PUBLIC_HEADERS
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium.h
+    )
+    set(SODIUM_PUBLIC_HEADERS_SUBDIR
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/core.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_aead_aes256gcm.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_aead_chacha20poly1305.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_aead_xchacha20poly1305.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_auth.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_auth_hmacsha256.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_auth_hmacsha512.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_auth_hmacsha512256.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_box.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_box_curve25519xchacha20poly1305.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_box_curve25519xsalsa20poly1305.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_core_ed25519.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_core_ristretto255.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_core_hchacha20.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_core_hsalsa20.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_core_salsa20.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_core_salsa2012.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_core_salsa208.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_generichash.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_generichash_blake2b.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_hash.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_hash_sha256.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_hash_sha512.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_kdf.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_kdf_blake2b.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_kx.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_onetimeauth.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_onetimeauth_poly1305.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_pwhash.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_pwhash_argon2i.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_pwhash_argon2id.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_pwhash_scryptsalsa208sha256.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_scalarmult.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_scalarmult_curve25519.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_scalarmult_ed25519.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_scalarmult_ristretto255.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_secretbox.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_secretbox_xchacha20poly1305.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_secretbox_xsalsa20poly1305.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_secretstream_xchacha20poly1305.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_shorthash.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_shorthash_siphash24.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_sign.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_sign_ed25519.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_sign_edwards25519sha512batch.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_stream.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_stream_chacha20.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_stream_salsa20.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_stream_salsa2012.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_stream_salsa208.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_stream_xchacha20.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_stream_xsalsa20.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_verify_16.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_verify_32.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/crypto_verify_64.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/export.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/randombytes.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/randombytes_internal_random.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/randombytes_sysrandom.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/runtime.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/utils.h
+      ${LIBSODIUM_INCLUDE_DIRS}/sodium/version.h
+    )
+
+
+
+    #Install czmq & ZeroMQ headers since they are in our INTERFACE
+    # install(
+    #   FILES
+    #     ${SODIUM_PUBLIC_HEADERS}
+    #     ${ZMQ_PUBLIC_HEADERS}
+    #     ${CZMQ_PUBLIC_HEADERS}
+    #     ${ZYRE_PUBLIC_HEADERS}
+    #   DESTINATION
+    #     include
+    #   COMPONENT library
+    # )
+    # install(
+    #   FILES
+    #     ${SODIUM_PUBLIC_HEADERS_SUBDIR}
+    #   DESTINATION
+    #     include/sodium
+    #   COMPONENT library
+    # )
+
+    message(STATUS "ZMQ and CZMQ files installed")
+  endif(NOT CMAKE_TOOLCHAIN_FILE)
+
+  # ##############################################################################
+  # pkgconfig
+  # ##############################################################################
+  set(VERSION "${INGESCAPE_VERSION}")
+  set(prefix "${CMAKE_INSTALL_PREFIX}")
+  set(exec_prefix "\${prefix}")
+  set(libdir "\${prefix}/lib${LIB_SUFFIX}")
+  set(includedir "\${prefix}/include")
+  set(pkg_config_defines "")
+  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/libingescape.pc.in"
+                "${CMAKE_CURRENT_BINARY_DIR}/libingescape.pc" @ONLY)
+
+  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libingescape.pc"
+          DESTINATION "lib${LIB_SUFFIX}/pkgconfig"
+          COMPONENT library)
+
+  # ##############################################################################
+  # installation
+  # ##############################################################################
+  include(CMakePackageConfigHelpers)
+  if (WIN32)
+    set(INGESCAPE_CMAKECONFIG_INSTALL_DIR "CMake" CACHE STRING "install path for ingescapeConfig.cmake")
+  else()
+    set(INGESCAPE_CMAKECONFIG_INSTALL_DIR "share/cmake/ingescape" CACHE STRING "install path for ingescapeConfig.cmake")
+  endif(WIN32)
+
+  # Export ingescapeTargets.cmake
+  export(EXPORT ${PROJECT_NAME}-targets FILE "${CMAKE_CURRENT_BINARY_DIR}/ingescapeTargets.cmake")
+
+  # Generate ingescapeConfig.cmake
+  configure_package_config_file(
+    builds/cmake/Config.cmake.in
+    "${CMAKE_CURRENT_BINARY_DIR}/ingescapeConfig.cmake"
+    INSTALL_DESTINATION ${INGESCAPE_CMAKECONFIG_INSTALL_DIR}
+  )
+
+  # Generate ingescapeConfigVersion.cmake
+  write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/ingescapeConfigVersion.cmake
+    VERSION ${INGESCAPE_VERSION}
+    COMPATIBILITY AnyNewerVersion
+  )
+
+  # Install CMake config and target files
+  install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/ingescapeConfig.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/ingescapeConfigVersion.cmake
+    DESTINATION ${INGESCAPE_CMAKECONFIG_INSTALL_DIR})
+
+  install(EXPORT ${PROJECT_NAME}-targets
+    FILE ingescapeTargets.cmake
+    DESTINATION ${INGESCAPE_CMAKECONFIG_INSTALL_DIR})
+
+  # uninstall target
+  if(NOT TARGET uninstall)
+    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/cmake_uninstall.cmake.in"
+                  "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
+                  IMMEDIATE
+                  @ONLY)
+
+    add_custom_target(uninstall
+                      COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+  endif()
+
+  # ##############################################################################
+  # installer
+  # ##############################################################################
+  # Package installer for release build only
+  if((WIN32) OR (CMAKE_BUILD_TYPE STREQUAL "Release"))
+    #https://cmake.org/cmake/help/v3.16/module/CPack.html#
+    set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
+    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "The ${PROJECT_NAME} core library")
+    set(CPACK_PACKAGE_DESCRIPTION "The ${PROJECT_NAME} core library")
+    set(CPACK_PACKAGE_HOMEPAGE_URL "https://ingescape.com")
+    set(CPACK_PACKAGE_VENDOR "ingenuity.io")
+    set(CPACK_PACKAGE_CONTACT "contact@ingescape.com")
+    set(CPACK_PACKAGE_VERSION ${INGESCAPE_VERSION})
+    set(CPACK_PACKAGE_VERSION_MAJOR "${INGESCAPE_VERSION_MAJOR}")
+    set(CPACK_PACKAGE_VERSION_MINOR "${INGESCAPE_VERSION_MINOR}")
+    set(CPACK_PACKAGE_VERSION_PATCH "${INGESCAPE_VERSION_PATCH}")
+    set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}")
+    set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+    set(CPACK_STRIP_FILES TRUE)
+
+    set(
+      CPACK_SOURCE_IGNORE_FILES
+      "${CMAKE_CURRENT_SOURCE_DIR}/bindings/;${CMAKE_CURRENT_SOURCE_DIR}/build/;${CMAKE_CURRENT_SOURCE_DIR}/.git/;${CMAKE_CURRENT_SOURCE_DIR}/doc/;${CMAKE_CURRENT_SOURCE_DIR}/applications/;${CMAKE_CURRENT_SOURCE_DIR}/ingeprobe/;${CMAKE_CURRENT_SOURCE_DIR}/packaging/"
+      )
+
+    if(WIN32)
+      # Installers for 32- vs. 64-bit CMake: - Root install directory (displayed to
+      # end user at installer-run time) - "NSIS package/display name" (text used in
+      # the installer GUI) - Registry key used to store info about the installation
+      if(CMAKE_CL_64)
+        set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES64")
+        set(CPACK_NSIS_PACKAGE_NAME
+            "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION} (Win64)")
+        set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} (Win64)")
+      else()
+        set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES")
+        set(CPACK_NSIS_PACKAGE_NAME
+            "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION}")
+        set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} (Win32)")
+      endif()
+
+      # NSIS configuration for Windows see https://cmake.org/cmake/help/v3.14/cpack_
+      # gen/nsis.html#cpack_gen:CPack%20NSIS%20Generator
+      set(CPACK_NSIS_DISPLAY_NAME "The ${PROJECT_NAME} core library")
+      set(CPACK_NSIS_PACKAGE_NAME ${PROJECT_NAME})
+      set(CPACK_NSIS_HELP_LINK "https://ingescape.com")
+      set(CPACK_NSIS_CONTACT "contact@ingescape.com")
+      set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
+      set(CPACK_NSIS_MODIFY_PATH ON)
+      set(CPACK_NSIS_URL_INFO_ABOUT ${CMAKE_PROJECT_HOMEPAGE_URL})
+      set(CPACK_NSIS_MENU_LINKS ${CMAKE_PROJECT_HOMEPAGE_URL} "IngeScape Web Site")
+
+      set(CPACK_MONOLITHIC_INSTALL ON)
+
+      set(CPACK_GENERATOR "NSIS;ZIP")
+
+      file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/README.txt
+          "The bin directory is empty after installation on purpose.\r\n"
+          "It will contain agents' executables once installed.")
+      install(FILES ${CMAKE_CURRENT_BINARY_DIR}/README.txt
+              DESTINATION bin
+              COMPONENT library)
+
+    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+      # https://cmake.org/cmake/help/git-stage/cpack_gen/productbuild.html
+      # Without component productbuild will not package any files
+      set(CPACK_COMPONENTS_ALL library)
+      set(CPACK_PACKAGING_INSTALL_PREFIX "/usr/local")
+      set(CPACK_SYSTEM_NAME "macos")
+
+      #set(CPACK_PRODUCTBUILD_IDENTITY_NAME "Developer ID Installer: Ingenuity i/o (56DRT9MG9S)")
+      #set(CPACK_PRODUCTBUILD_KEYCHAIN_PATH "$ENV{HOME}/Library/Keychains/login.keychain")
+      #set(CPACK_PKGBUILD_IDENTITY_NAME "Developer ID Installer: Ingenuity i/o (56DRT9MG9S)")
+      #set(CPACK_PKGBUILD_KEYCHAIN_PATH "$ENV{HOME}/Library/Keychains/login.keychain")
+
+      set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_SOURCE_DIR}/builds/xcode/WELCOME.txt")
+      set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/builds/xcode/README.txt")
+
+      # Without extention productbuild will crash So we just copy License file in
+      # build folder with an extension
+      configure_file("${CMAKE_CURRENT_SOURCE_DIR}/LICENSE"
+                    "${CMAKE_BINARY_DIR}/LICENSE.txt" COPYONLY)
+      set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_BINARY_DIR}/LICENSE.txt")
+
+      set(CPACK_PREFLIGHT_LIBRARY_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/builds/xcode/preflight.sh")
+      set(CPACK_POSTFLIGHT_LIBRARY_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/builds/xcode/postflight.sh")
+
+      set(CPACK_GENERATOR "productbuild")
+
+    else()
+      set(CPACK_MONOLITHIC_INSTALL ON)
+      #FIXME TODO Define a strategy for dependencies for linux
+      if(ANDROID)
+        set(CPACK_GENERATOR "ZIP")
+      else()
+        install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/unix/install_script.sh"
+                DESTINATION "."
+                PERMISSIONS OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+                COMPONENT library)
+        set(CPACK_GENERATOR "TGZ")
+      endif()
+    endif()
+
+    if(MSVC)
+      if( ${BITS} EQUAL 64)
+        set(CPACK_NSIS_WINDOWS_ARCH "x64")
+      else()
+        set(CPACK_NSIS_WINDOWS_ARCH "x32")
+      endif(${BITS} EQUAL 64)
+    endif(MSVC)
+
+    include(CPack)
+  endif()
+
+endif (NOT DEPS_ONLY)
 
 # ##############################################################################
 # summary
