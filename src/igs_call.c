@@ -534,7 +534,8 @@ igs_result_t igsAgent_sendCall(igs_agent_t *agent, const char *agentNameOrUUID, 
     if (coreContext->node != NULL){
         igs_remote_agent_t *remoteAgent = NULL, *tmp = NULL;
         HASH_ITER(hh, agent->context->remoteAgents, remoteAgent, tmp){
-            if (streq(remoteAgent->definition->name, agentNameOrUUID) || streq(remoteAgent->uuid, agentNameOrUUID)){
+            if ((remoteAgent->definition && streq(remoteAgent->definition->name, agentNameOrUUID))
+                || streq(remoteAgent->uuid, agentNameOrUUID)){
                 //we found a matching agent
                 igs_callArgument_t *arg = NULL;
                 found = true;
