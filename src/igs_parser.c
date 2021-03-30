@@ -31,8 +31,7 @@
 #define STR_VALUE "value"
 
 iopType_t string_to_value_type(const char* str) {
-    
-    if (str != NULL){
+    if (str){
         if (!strcmp(str, "INTEGER"))
             return IGS_INTEGER_T;
         if (!strcmp(str, "DOUBLE"))
@@ -48,20 +47,17 @@ iopType_t string_to_value_type(const char* str) {
         if (!strcmp(str, "UNKNOWN"))
             return IGS_UNKNOWN_T;
     }
-    
     igs_error("unknown value type \"%s\" to convert, returned IGS_UNKNOWN_T", str);
     return IGS_UNKNOWN_T;
 }
 
 bool string_to_boolean(const char* str) {
-    if(str != NULL){
+    if(str){
         if (!strcmp(str, "true"))
             return true;
-        
         if (!strcmp(str, "false"))
             return false;
     }
-    
     igs_warn("unknown string \"%s\" to convert, returned false by default", str);
     return false;
 }
@@ -93,7 +89,6 @@ const char* value_type_to_string (iopType_t type) {
             igs_error("unknown iopType_t to convert");
             break;
     }
-    
     return NULL;
 }
 
@@ -111,27 +106,36 @@ igs_definition_t* parser_parseDefinitionFromNode(igsJSONTreeNode_t **json){
     const char *parametersPath[] = {"definition","parameters",NULL};
     const char *callsPath[] = {"definition","calls",NULL};
     const char *argumentsPath[] = {"arguments",NULL};
+    const char *agentNamePath[] = {"definition","name",NULL};
     const char *namePath[] = {"name",NULL};
-    const char *nameAlternatePath[] = {"definition","name",NULL};
     const char *familyPath[] = {"definition","family",NULL};
     const char *typePath[] = {"type",NULL};
     const char *valuePath[] = {"value",NULL};
     const char *replyPath[] = {"reply",NULL};
     
     //name is mandatory
-    igsJSONTreeNode_t *name = igs_JSONTreeGetNodeAtPath(*json, namePath);
+    igsJSONTreeNode_t *name = igs_JSONTreeGetNodeAtPath(*json, agentNamePath);
     if (name && name->type == IGS_JSON_STRING & name->u.string != NULL){
+        char *n = strndup(name->u.string, IGS_MAX_AGENT_NAME_LENGTH);
+        if (strlen(name->u.string) > IGS_MAX_AGENT_NAME_LENGTH){
+            igs_warn("definition name '%s' exceeds maximum size and will be truncated to '%s'", name->u.string, n);
+        }
+        bool spaceInName = false;
+        size_t lengthOfN = strlen(n);
+        size_t i = 0;
+        for (i = 0; i < lengthOfN; i++){
+            if (n[i] == ' '){
+                n[i] = '_';
+                spaceInName = true;
+            }
+        }
+        if (spaceInName)
+            igs_warn("spaces are not allowed in definition name: '%s' has been changed to '%s'", name->u.string, n);
         definition = (igs_definition_t*) calloc (1, sizeof(igs_definition_t));
-        definition->name = strdup(name->u.string);
-    } else {
-        //try alternate path for compatibility
-        name = igs_JSONTreeGetNodeAtPath(*json, nameAlternatePath);
-        if (name && name->type == IGS_JSON_STRING & name->u.string != NULL){
-            definition = (igs_definition_t*) calloc (1, sizeof(igs_definition_t));
-            definition->name = strdup(name->u.string);
-        }else
-            return NULL;
-    }
+        definition->name = n;
+        
+    }else
+        return NULL;
     
     //family
     igsJSONTreeNode_t *family = igs_JSONTreeGetNodeAtPath(*json, familyPath);
@@ -141,7 +145,7 @@ igs_definition_t* parser_parseDefinitionFromNode(igsJSONTreeNode_t **json){
     //description
     igsJSONTreeNode_t *description = igs_JSONTreeGetNodeAtPath(*json, descriptionPath);
     if (description && description->type == IGS_JSON_STRING & description->u.string != NULL)
-        definition->description = strdup(description->u.string);
+        definition->description = strndup(description->u.string, IGS_MAX_DESCRIPTION_LENGTH);
     
     //version
     igsJSONTreeNode_t *version = igs_JSONTreeGetNodeAtPath(*json, versionPath);

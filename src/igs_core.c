@@ -80,8 +80,8 @@ void igs_cleanContext(void){
             zactor_destroy (&(coreContext->security_auth));
         if (coreContext->security_cert)
             zcert_destroy (&(coreContext->security_cert));
-        if (coreContext->security_publicKeysDirectory != NULL)
-            free(coreContext->security_publicKeysDirectory);
+        if (coreContext->security_publicCertificatesDirectory != NULL)
+            free(coreContext->security_publicCertificatesDirectory);
         
         if (coreContext->elections){
             zlist_t *e =  (zlist_t*) zhash_first(coreContext->elections);

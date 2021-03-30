@@ -2449,15 +2449,13 @@ static void runLoop (zsock_t *mypipe, void *args){
     assert(context->inprocPublisher);
 #endif
     
-    if (context->security_isEnabled){
-        assert(!context->security_auth);
+    if (context->security_isEnabled && !context->security_auth){
         context->security_auth = zactor_new (zauth, NULL);
         assert(context->security_auth);
         assert(zstr_send(context->security_auth, "VERBOSE") == 0);
         assert(zsock_wait(context->security_auth) >= 0);
 //        assert(zstr_sendx(context->security_auth, "ALLOW", ip_address1, ip_address2, ..., NULL) == 0);
-//        assert(zsock_wait(context->security_auth) >= 0);
-        assert(zstr_sendx(context->security_auth, "CURVE", context->security_publicKeysDirectory, NULL) == 0);
+        assert(zstr_sendx(context->security_auth, "CURVE", context->security_publicCertificatesDirectory, NULL) == 0);
         assert(zsock_wait(context->security_auth) >= 0);
     }
     
@@ -2472,7 +2470,7 @@ static void runLoop (zsock_t *mypipe, void *args){
     
     //start zyre now that everything is set
     bus_zyreLock();
-    int zyreStartRes = zyre_start (coreContext->node);
+    int zyreStartRes = zyre_start (context->node);
     bus_zyreUnlock();
     if (zyreStartRes != IGS_SUCCESS){
         igs_error("could not start bus node : Ingescape will interrupt immediately.");
@@ -2576,8 +2574,8 @@ static void runLoop (zsock_t *mypipe, void *args){
         free(context->network_ipcEndpoint);
         context->network_ipcEndpoint = NULL;
     }
-    if (coreContext->security_auth)
-        zactor_destroy(&(coreContext->security_auth));
+    if (context->security_auth)
+        zactor_destroy(&(context->security_auth));
     
     igs_debug("loop stopped");
     zstr_send(mypipe, "LOOP_STOPPED");
@@ -2618,15 +2616,15 @@ void initLoop (igs_core_context_t *context){
     context->node = zyre_new(coreAgent->definition->name);
     assert(context->node);
     if (context->security_isEnabled){
-        if (context->security_cert && context->security_publicKeysDirectory){
+        if (context->security_cert && context->security_publicCertificatesDirectory){
             //NB: zyre_set_zcert MUST be called before zyre_gossip_connect_curve
             zyre_set_zcert(context->node, context->security_cert);
             zyre_set_zap_domain(context->node, "INGESCAPE");
         }else{
             if (!context->security_cert)
                 igs_error("security is enabled but certificate is missing : rejecting");
-            if (!context->security_publicKeysDirectory)
-                igs_error("security is enabled but public keys directory is missing : rejecting");
+            if (!context->security_publicCertificatesDirectory)
+                igs_error("security is enabled but public certificates directory is missing : rejecting");
             bus_zyreUnlock();
             network_Unlock();
             return;
@@ -3682,41 +3680,56 @@ void igs_observeExternalStop(igs_externalStopCallback cb, void *myData){
     DL_APPEND(coreContext->externalStopCalbacks, newCb);
 }
 
-igs_result_t igs_enableSecurity(const char *privateKey, const char *publicKeysDirectory){
+igs_result_t igs_enableSecurity(const char *privateCertificateFile, const char *publicCertificatesDirectory){
     core_initContext();
     if (coreContext->security_cert)
         zcert_destroy (&(coreContext->security_cert));
-    if (coreContext->security_publicKeysDirectory){
-        free(coreContext->security_publicKeysDirectory);
-        coreContext->security_publicKeysDirectory = NULL;
+    if (coreContext->security_publicCertificatesDirectory){
+        free(coreContext->security_publicCertificatesDirectory);
+        coreContext->security_publicCertificatesDirectory = NULL;
     }
+    if (coreContext->security_auth)
+        zactor_destroy(&(coreContext->security_auth));
+    
     coreContext->security_isEnabled = true;
     
-    if (privateKey){
+    if (privateCertificateFile){
         char privateKeyPath[IGS_MAX_PATH_LENGTH] = "";
-        admin_makeFilePath(privateKey, privateKeyPath, IGS_MAX_PATH_LENGTH);
+        admin_makeFilePath(privateCertificateFile, privateKeyPath, IGS_MAX_PATH_LENGTH);
         coreContext->security_cert = zcert_load(privateKeyPath);
         if (!coreContext->security_cert){
-            igs_error("could not load private key at '%s'", privateKeyPath);
+            igs_error("could not load private certificate at '%s'", privateKeyPath);
             return IGS_FAILURE;
         }
-        if (publicKeysDirectory){
-            char publicKeysPath[IGS_MAX_PATH_LENGTH] = "";
-            admin_makeFilePath(publicKeysDirectory, publicKeysPath, IGS_MAX_PATH_LENGTH);
-            if (!zsys_file_exists(publicKeysPath)){
-                igs_error("public keys directory '%s' does not exist", publicKeysPath);
+        if (publicCertificatesDirectory){
+            char publicCertificatesPath[IGS_MAX_PATH_LENGTH] = "";
+            admin_makeFilePath(publicCertificatesDirectory, publicCertificatesPath, IGS_MAX_PATH_LENGTH);
+            if (!zsys_file_exists(publicCertificatesPath)){
+                igs_error("public certificates directory '%s' does not exist", publicCertificatesPath);
                 return IGS_FAILURE;
             }
-            coreContext->security_publicKeysDirectory = strndup(publicKeysPath, IGS_MAX_PATH_LENGTH);
+            coreContext->security_publicCertificatesDirectory = strndup(publicCertificatesPath, IGS_MAX_PATH_LENGTH);
         }else{
-            igs_error("public keys directory cannot be NULL");
+            igs_error("private certificate file is not NULL : public certificates directory cannot be NULL");
             return IGS_FAILURE;
         }
     }else{
         coreContext->security_cert = zcert_new();
-        coreContext->security_publicKeysDirectory = strndup(IGS_DEFAULT_SECURITY_DIRECTORY, IGS_MAX_PATH_LENGTH);
+        coreContext->security_publicCertificatesDirectory = strndup(IGS_DEFAULT_SECURITY_DIRECTORY, IGS_MAX_PATH_LENGTH);
     }
+    
+    coreContext->security_auth = zactor_new (zauth, NULL);
+    assert(coreContext->security_auth);
+    assert(zstr_send(coreContext->security_auth, "VERBOSE") == 0);
+    assert(zsock_wait(coreContext->security_auth) >= 0);
+    assert(zstr_sendx(coreContext->security_auth, "CURVE", coreContext->security_publicCertificatesDirectory, NULL) == 0);
+    
     return IGS_SUCCESS;
+}
+
+zactor_t* igs_getZeroMQAuthenticator(void){
+    core_initContext();
+    return coreContext->security_auth;
 }
 
 igs_result_t igsAgent_competeInElection(igs_agent_t *agent, const char *electionName){
