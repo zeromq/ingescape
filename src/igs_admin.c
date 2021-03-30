@@ -212,7 +212,7 @@ void admin_log(igs_agent_t *agent, igs_logLevel_t level, const char *function, c
             }
         }
     }
-    if ((coreContext->logInConsole && level >= coreContext->logLevel) || level >= IGS_LOG_ERROR){
+    if ((coreContext->logInConsole && level >= coreContext->logLevel) || level >= IGS_LOG_WARN){
         if (level >= IGS_LOG_WARN){
             if (coreContext->useColorInConsole){
                 fprintf(stderr,"%s;%s%s\x1b[0m;%s;%s\n",

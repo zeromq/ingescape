@@ -16,8 +16,6 @@
 extern "C" {
 #endif
 
-#define MAX_STRING_MSG_LENGTH 4096
-
 
 //////////////////////////////////////////////////
 /*BROKERS VS. SELF-DISCOVERY
@@ -60,26 +58,32 @@ PUBLIC igs_result_t igs_startWithBrokers(const char *agentEndpoint);
 //////////////////////////////////////////////////
 /* SECURITY
  Security is about authentification of other agents and encrypted communications.
- Both are offered by Ingescape using a public/private keys mechanism relying on ZeroMQ.
- Security is activated optionally.
- • If public/private keys are generated on the fly, one obtains the same protection as TLS
- for HTTPS communications. Thirdparties cannot steal identities and communications are
- encrypted end-to-end. But any Ingescape agent with security enabled can join a platform.
- • If public/private keys are stored locally by each agent, no thirdparty can join a platform
- without having a public key that is well-known by the other agents. This is safer but requires
- securing and synchronizing local files with each agent accessing its private key and public
- keys of other agents.
+ Both are offered by Ingescape with a public/private certificates mechanism relying
+ on ZeroMQ. Security is activated optionally.
+ When security is enabled :
+ • When private certificates are generated on the fly by Ingescape, it provides the
+ same protection as TLS for HTTPS communications. Thirdparties cannot steal identities
+ and  communications are encrypted end-to-end. But any Ingescape agent with security
+ enabled can join a platform.
+ • When private certificates are file-based and secretly owned by each agent, no third
+ party can join a platform without providing an identity that is well-known by the other
+ agents using public certificates. This is safer but requires securing private certificates
+ individually and sharing public certificates between all agents.
  
  Security is enabled by calling igs_enableSecurity.
- • If privateKey is NULL, our private key is generated on the fly and any agent with
- security enabled will be able to connect, publicKeysDirectory will be ignored.
- • If privateKey is NOT NULL, private key at privateKey path will be used and only
- agents whose public keys are in publicKeysDirectory will be able to connect.
- NB: if privateKey is NOT NULL and publicKeysDirectory is NULL or does not exist,
- security will not be enabled and our agent will not start.
+ • If privateCertificateFile is NULL, our private certificate is generated on the fly, and
+ any agent with security enabled will be able to connect to us. Any value provided for
+ publicCertificatesDirectory will be ignored. This is the equivalent of HTTPS/TLS end-to-end
+ encryption without access restriction.
+ • If privateCertificateFile is NOT NULL, the private certificate at privateCertificateFile
+ path will be used and only agents whose public certificates are in publicCertificatesDirectory
+ will be able to connect to us: this is end-ti-end encryption + authentication.
+ NB: if privateCertificateFile is NOT NULL and publicCertificatesDirectory is NULL or does not
+ exist, security will not be enabled and our agent will not start.
 */
-PUBLIC igs_result_t igs_enableSecurity(const char *privateKeyFile, const char *publicKeysDirectory);
-PUBLIC igs_result_t igs_brokerAddSecure(const char *brokerEndpoint, const char *publicKeyPath);
+PUBLIC igs_result_t igs_enableSecurity(const char *privateCertificateFile, const char *publicCertificatesDirectory);
+PUBLIC igs_result_t igs_brokerAddSecure(const char *brokerEndpoint, const char *publicCertificatePath);
+PUBLIC zactor_t* igs_getZeroMQAuthenticator(void);
 
 
 //////////////////////////////////////////////////
@@ -191,7 +195,7 @@ PUBLIC void igs_replayTerminate(void);
 
 /*
  CLEAN CONTEXT
- Use this function when you absolutely need to clean all the Ingescape content
+ Use this function when you absolutely need to clean the whole Ingescape context
  and you cannot stop your application to do so. This function SHALL NOT be used
  in production environments.
  */

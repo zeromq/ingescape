@@ -45,6 +45,18 @@ typedef enum{
 //Macro to avoid "unused parameter" warnings
 #define IGS_UNUSED(x) (void)x;
 
+#define IGS_MAX_PATH_LENGTH 4096
+#define IGS_MAX_IOP_NAME_LENGTH 1024
+#define IGS_MAX_AGENT_NAME_LENGTH 1024
+#define IGS_MAX_DESCRIPTION_LENGTH 4096
+#define IGS_MAX_LOG_LENGTH 4096
+#define IGS_COMMAND_LINE_LENGTH 4096
+#define IGS_NETWORK_DEVICE_LENGTH 1024
+#define IGS_IP_ADDRESS_LENGTH 1024
+#define IGS_MAX_PEER_ID_LENGTH 128
+#define IGS_DEFAULT_IPC_FOLDER_PATH "/tmp/ingescape/"
+#define MAX_STRING_MSG_LENGTH 4096
+
 
 //////////////////////////////////////////////////
 // INITIALIZATION AND CONTROL

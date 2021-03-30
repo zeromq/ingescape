@@ -40,20 +40,6 @@
 extern "C" {
 #endif
 
-#define IGS_MAX_PATH_LENGTH 4096
-#define IGS_MAX_IOP_NAME_LENGTH 1024
-#define IGS_MAX_AGENT_NAME_LENGTH 1024
-#define IGS_MAX_DEFINITION_NAME_LENGTH 1024
-#define IGS_MAX_MAPPING_NAME_LENGTH 1024
-#define IGS_MAX_DESCRIPTION_LENGTH 4096
-#define IGS_MAX_LOG_LENGTH 4096
-#define IGS_COMMAND_LINE_LENGTH 4096
-#define IGS_NETWORK_DEVICE_LENGTH 1024
-#define IGS_IP_ADDRESS_LENGTH 1024
-#define IGS_MAX_PEER_ID_LENGTH 128
-#define IGS_DEFAULT_IPC_FOLDER_PATH "/tmp/ingescape/"
-
-
 typedef struct igs_core_context igs_core_context_t;
 
 //////////////////  IOP/CALL  STRUCTURES AND ENUMS   //////////////////
@@ -313,7 +299,7 @@ typedef struct igs_core_context{
     bool security_isEnabled;
     zactor_t *security_auth;
     zcert_t *security_cert;
-    char *security_publicKeysDirectory;
+    char *security_publicCertificatesDirectory;
     
     //performance
     size_t performanceMsgCounter;
