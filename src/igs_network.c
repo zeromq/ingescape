@@ -3169,17 +3169,25 @@ igs_result_t igs_brokerAdd(const char *brokerEndpoint){
     return IGS_SUCCESS;
 }
 
-igs_result_t igs_brokerAddSecure(const char *brokerEndpoint, const char *publicKeyPath){
+void igs_brokersClear(void){
+    core_initContext();
+    if (coreContext->brokers)
+        zhash_destroy(&(coreContext->brokers));
+    coreContext->brokers = zhash_new();
+    zhash_autofree(coreContext->brokers);
+}
+
+igs_result_t igs_brokerAddSecure(const char *brokerEndpoint, const char *publicCertificatesDirectory){
     core_initContext();
     assert(brokerEndpoint);
-    assert(publicKeyPath);
-    if (!zsys_file_exists(publicKeyPath)){
-        igs_error("'%s' does not exist for %s", publicKeyPath, brokerEndpoint);
+    assert(publicCertificatesDirectory);
+    if (!zsys_file_exists(publicCertificatesDirectory)){
+        igs_error("'%s' does not exist for %s", publicCertificatesDirectory, brokerEndpoint);
         return IGS_FAILURE;
     }
     assert(coreContext->brokers);
     if (zhash_insert(coreContext->brokers, strdup(brokerEndpoint),
-                     strndup(publicKeyPath, IGS_MAX_PATH_LENGTH)) != IGS_SUCCESS){
+                     strndup(publicCertificatesDirectory, IGS_MAX_PATH_LENGTH)) != IGS_SUCCESS){
         igs_error("could not add '%s' (certainly because it is already added)", brokerEndpoint);
         return IGS_FAILURE;
     }

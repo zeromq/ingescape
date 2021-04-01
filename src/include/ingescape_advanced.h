@@ -34,9 +34,10 @@ extern "C" {
  is permitted and brokers can be restarted at any time.
  
  Endpoints have the form tcp://ip_address:port
- • A broker endpoint in igs_brokerAdd is used to connect to a given broker. Add
+ • igs_brokerAdd is used to add brokers to connect to. Add
  as many brokers as you want. At least one declared broker is necessary to
- use igs_startWithBrokers.
+ use igs_startWithBrokers. Use igs_brokersClear to remove all the current
+ brokers.
  • The endpoint in igs_enableAsBroker is the broker address we should be reached
  at as a broker if we want to be one. Using igs_setAsBroker makes us a broker
  when starting.
@@ -50,6 +51,7 @@ extern "C" {
  configuration.
  */
 PUBLIC igs_result_t igs_brokerAdd(const char *brokerEndpoint);
+PUBLIC void igs_brokersClear(void);
 PUBLIC void igs_enableAsBroker(const char *ourBrokerEndpoint);
 PUBLIC void igs_brokerAdvertiseEndpoint(const char *advertisedEndpoint); //parameter can be NULL
 PUBLIC igs_result_t igs_startWithBrokers(const char *agentEndpoint);
@@ -82,7 +84,7 @@ PUBLIC igs_result_t igs_startWithBrokers(const char *agentEndpoint);
  exist, security will not be enabled and our agent will not start.
 */
 PUBLIC igs_result_t igs_enableSecurity(const char *privateCertificateFile, const char *publicCertificatesDirectory);
-PUBLIC igs_result_t igs_brokerAddSecure(const char *brokerEndpoint, const char *publicCertificatePath);
+PUBLIC igs_result_t igs_brokerAddSecure(const char *brokerEndpoint, const char *publicCertificatesDirectory);
 PUBLIC zactor_t* igs_getZeroMQAuthenticator(void);
 
 
