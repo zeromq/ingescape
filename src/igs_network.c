@@ -998,28 +998,28 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                     HASH_FIND_STR(context->zyrePeers, peerUUID, zyrePeer);
                     assert(zyrePeer);
                     remoteAgent->peer = zyrePeer;
+                    remoteAgent->definition = newDefinition;
                     HASH_ADD_STR(context->remoteAgents, uuid, remoteAgent);
                     igs_debug("registering agent %s(%s)", uuid, remoteAgentName);
                     isAgentNew = true;
-                }
+                }else{
                 // else we already know this agent, its definition (possibly including name) has been updated
-                assert(remoteAgent);
-                
-                // Look if this agent already has a definition
-                if(remoteAgent->definition != NULL) {
                     igs_debug("Definition already exists for remote agent %s : new definition will overwrite the previous one...",         remoteAgent->definition->name);
                     if (strneq(remoteAgent->definition->name, newDefinition->name))
                         igs_debug("Remote agent is changing name from %s to %s",
                                   remoteAgent->definition->name, newDefinition->name);
+                    igs_definition_t *oldDef = remoteAgent->definition;
+                    remoteAgent->definition = newDefinition;
 #if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
                     //we remove IOP count from previous definition
-                    context->licenseEnforcement->currentIOPNb -= (HASH_COUNT(remoteAgent->definition->inputs_table) +
-                                                                  HASH_COUNT(remoteAgent->definition->outputs_table) +
-                                                                  HASH_COUNT(remoteAgent->definition->params_table));
+                    context->licenseEnforcement->currentIOPNb -= (HASH_COUNT(oldDef->inputs_table) +
+                                                                  HASH_COUNT(oldDef->outputs_table) +
+                                                                  HASH_COUNT(oldDef->params_table));
                     //igs_license("%ld iops (cleaning %s)", agent->licenseEnforcement->currentIOPNb, name);
 #endif
-                    definition_freeDefinition(&remoteAgent->definition);
+                    definition_freeDefinition(&oldDef);
                 }
+                    assert(remoteAgent);
 #if ENABLE_LICENSE_ENFORCEMENT && !TARGET_OS_IOS
                 context->licenseEnforcement->currentIOPNb += (HASH_COUNT(newDefinition->inputs_table) +
                                                                   HASH_COUNT(newDefinition->outputs_table) +
@@ -1036,7 +1036,7 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
                     return -1;
                 }
 #endif
-                remoteAgent->definition = newDefinition;
+                
                 igs_debug("store definition for remote agent %s(%s)", remoteAgent->definition->name, remoteAgent->uuid);
                 //Check the involvement of this new remote agent and its definition in our agent mappings
                 //and update subscriptions.
