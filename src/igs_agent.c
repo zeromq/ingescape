@@ -35,11 +35,11 @@ igs_agent_t *igsAgent_new(const char *name, bool activateImmediately){
     zuuid_t *uuid = zuuid_new();
     agent->uuid = strdup(zuuid_str(uuid));
     zuuid_destroy(&uuid);
-    zhash_insert(coreContext->createdAgents, agent->uuid, agent);
     igsAgent_clearDefinition(agent); //set valid but empty definition, preserve name
     assert(agent->definition);
     agent->definition->name = strndup(name, IGS_MAX_AGENT_NAME_LENGTH); //set definition name manually
     igsAgent_clearMapping(agent); //set valid but empty mapping
+    zhash_insert(coreContext->createdAgents, agent->uuid, agent);
     if (activateImmediately)
         igsAgent_activate(agent);
     return agent;
@@ -97,13 +97,13 @@ igs_result_t igsAgent_activate(igs_agent_t *agent){
         return IGS_FAILURE;
     }else{
         agent->context = coreContext;
+        agent->network_needToSendDefinitionUpdate = true; //will also trigger mapping update
+        agent->network_activationDuringRuntime = true;
         HASH_ADD_STR(coreContext->agents, uuid, agent);
         igs_activate_calback_t *cb;
         DL_FOREACH(agent->activateCallbacks, cb){
             cb->callback_ptr(agent, true, cb->myData);
         }
-        agent->network_needToSendDefinitionUpdate = true; //will also trigger mapping update
-        agent->network_activationDuringRuntime = true;
     }
     
     //notify all other agents inside this context that we have arrived
