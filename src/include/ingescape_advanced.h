@@ -79,7 +79,7 @@ PUBLIC igs_result_t igs_startWithBrokers(const char *agentEndpoint);
  encryption without access restriction.
  • If privateCertificateFile is NOT NULL, the private certificate at privateCertificateFile
  path will be used and only agents whose public certificates are in publicCertificatesDirectory
- will be able to connect to us: this is end-ti-end encryption + authentication.
+ will be able to connect to us: this is end-to-end encryption + authentication.
  NB: if privateCertificateFile is NOT NULL and publicCertificatesDirectory is NULL or does not
  exist, security will not be enabled and our agent will not start.
 */
@@ -90,17 +90,27 @@ PUBLIC zactor_t* igs_getZeroMQAuthenticator(void);
 
 //////////////////////////////////////////////////
 /* ELECTIONS between agents
- Create named contests between agents and designate a leader, as soon as they
- are two or more.
- • IGS_AGENT_WON_ELECTION means that the election is over and this agent has WON
- • IGS_AGENT_LOST_ELECTION means that the election is over and this agent has LOST
- • When only one agent participates in an election, the election does not happen.
- • When only one agent remains for an election, the election does not happen.
- At startup, this means that developers must either start their agents as
- leaders or wait a reasonable amount of time for an election to happen.
- During runtime, this means that developers shall rely on IGS_AGENT_EXITED
- events to check if they suddenly are alone in an election and thus shall
- become leaders.
+ Create named elections between agents and designate a winner,
+ as soon as they are two agents or more participating.
+ • IGS_AGENT_WON_ELECTION agent event means that the election is
+   over and this agent has WON
+ • IGS_AGENT_LOST_ELECTION agent event means that the election is
+   over and this agent has LOST
+ • The election happens only when at least two agents participate.
+   Nothing happens if only one agent participates.
+ • When only one agent remains in an election after several have
+   joined and left, it is declared winner.
+ At startup, it is up to the developer to decide if an agent shall be
+ considered as winner or wait for a certain amount of time to trigger
+ some behavior. Do not forget that elections take at least some
+ millisconds to be concluded.
+ Agents in the same peer cannot compete one with another. Elections are
+ reserved to agents running on separate peers/processes. If several
+ agents in the same peer participate in the same election, they will
+ all be declared winners or losers all together.
+ The IGS_AGENT_WON_ELECTION and IGS_AGENT_LOST_ELECTION agent events
+ can be triggered MULTIPLE TIMES in a row. Please adjust your agent
+ behavior accordingly.
  */
 PUBLIC igs_result_t igs_competeInElection(const char *electionName);
 PUBLIC igs_result_t igs_leaveElection(const char *electionName);

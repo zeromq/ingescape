@@ -834,8 +834,6 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
             
             zyrePeer->hasJoinedPrivateChannel = true;
         }
-    } else if (streq (event, "LEAVE")){
-        igs_debug("-%s has left %s", name, group);
     } else if (streq (event, "SHOUT")){
         if (streq(group, context->replayChannel)){
             //this is a replay message for one of our inputs
@@ -2262,10 +2260,9 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
         }
         free(title);
     } else if (streq (event, "LEADER")){
-        const char *ourUuid = zyre_uuid(context->node);
-       
-        if (streq(ourUuid, peerUUID)){
-            //we are leader
+        const char *ourPeerUuid = zyre_uuid(context->node);
+        bool isLeader = streq(ourPeerUuid, peerUUID);
+        if (isLeader){
             igs_info("\\o/ peer %s(%s) -that's us- is leader in '%s'", name, peerUUID, group);
         }else
             igs_info("\\o/ peer %s(%s) is leader in '%s'", name, peerUUID, group);
@@ -2273,28 +2270,102 @@ int manageBusIncoming (zloop_t *loop, zsock_t *socket, void *arg){
         zlist_t *election = zhash_lookup(context->elections, group);
         assert(election);
         //inform all our agents participating in the election
-        char *uuid = zlist_first(election);
-        while (uuid) {
+        char *attendeeUUID = zlist_first(election);
+        while (attendeeUUID) {
             igs_agent_t *agent = NULL;
-            HASH_FIND_STR(context->agents, uuid, agent);
+            HASH_FIND_STR(context->agents, attendeeUUID, agent);
             assert(agent);
-            if (streq(ourUuid, peerUUID))
+            if (isLeader)
                 igs_info("\\o/ agent %s(%s) is leader in '%s'", agent->definition->name, agent->uuid, group);
             else
                 igs_info("\\o/ agent %s(%s) is NOT leader in '%s'", agent->definition->name, agent->uuid, group);
             igs_agent_event_callback_t *cb;
             char *electionName = strdup(group);
             DL_FOREACH(agent->agentEventCallbacks, cb){
-                if (streq(ourUuid, peerUUID))
+                if (isLeader)
                     cb->callback_ptr(agent, IGS_AGENT_WON_ELECTION, agent->uuid, agent->definition->name, electionName, cb->myData);
                 else
                     cb->callback_ptr(agent, IGS_AGENT_LOST_ELECTION, agent->uuid, agent->definition->name, electionName, cb->myData);
             }
-            uuid = zlist_next(election);
+            free(electionName);
+            attendeeUUID = zlist_next(election);
+        }
+        
+    } else if (streq (event, "LEAVE")){
+        igs_debug("-%s has left %s", name, group);
+        
+        //check if we are last in an elections channel
+        if (coreContext->elections){
+            zlist_t *elections = zhash_keys(context->elections);
+            char *electionName = zlist_first(elections);
+            while (electionName) {
+                if (streq(electionName, group)){
+                    zlist_t *peerAttendees = zyre_peers_by_group(context->node, electionName);
+                    size_t nb = zlist_size(peerAttendees);
+                    if (nb == 0){
+                        //we are last for this election group
+                        //inform all our agents participating in the election
+                        zlist_t *agentAttendees = (zlist_t *)zhash_lookup(context->elections, electionName);
+                        assert(agentAttendees);
+                        char *attendeeUUID = zlist_first(agentAttendees);
+                        while (attendeeUUID) {
+                            igs_agent_t *agent = NULL;
+                            HASH_FIND_STR(context->agents, attendeeUUID, agent);
+                            assert(agent);
+                            igs_info("\\o/ agent %s(%s) is leader in '%s'", agent->definition->name, agent->uuid, electionName);
+                            igs_agent_event_callback_t *cb;
+                            DL_FOREACH(agent->agentEventCallbacks, cb){
+                                cb->callback_ptr(agent, IGS_AGENT_WON_ELECTION,
+                                                 agent->uuid, agent->definition->name, electionName, cb->myData);
+                            }
+                            attendeeUUID = zlist_next(agentAttendees);
+                        }
+                    }
+                    zlist_destroy(&peerAttendees);
+                }
+                electionName = zlist_next(elections);
+            }
+            zlist_destroy(&elections);
         }
         
     } else if (streq (event, "EXIT")){
         igs_debug("<-%s (%s) exited", name, peerUUID);
+        
+        //check if we are last in an elections channel
+        //FIXME: every time a peer exists, we check empty election channels.
+        //This can make IGS_AGENT_WON_ELECTION notifed multiple times for a given
+        //agent.
+        if (context->elections){
+            zlist_t *elections = zhash_keys(context->elections);
+            char *electionName = zlist_first(elections);
+            while (electionName) {
+                zlist_t *peerAttendees = zyre_peers_by_group(context->node, electionName);
+                size_t nb = zlist_size(peerAttendees);
+                if (nb == 0){
+                    //we are last for this election group
+                    //inform all our agents participating in the election
+                    zlist_t *agentAttendees = (zlist_t *)zhash_lookup(context->elections, electionName);
+                    assert(agentAttendees);
+                    char *attendeeUUID = zlist_first(agentAttendees);
+                    while (attendeeUUID) {
+                        igs_agent_t *agent = NULL;
+                        HASH_FIND_STR(context->agents, attendeeUUID, agent);
+                        assert(agent);
+                        igs_info("\\o/ agent %s(%s) is leader in '%s'", agent->definition->name, agent->uuid, electionName);
+                        igs_agent_event_callback_t *cb;
+                        DL_FOREACH(agent->agentEventCallbacks, cb){
+                                cb->callback_ptr(agent, IGS_AGENT_WON_ELECTION,
+                                                 agent->uuid, agent->definition->name, electionName, cb->myData);
+                        }
+                        attendeeUUID = zlist_next(agentAttendees);
+                    }
+                }
+                zlist_destroy(&peerAttendees);
+                electionName = zlist_next(elections);
+            }
+            zlist_destroy(&elections);
+        }
+        
         igs_zyre_peer_t *zyrePeer = NULL;
         HASH_FIND_STR(context->zyrePeers, peerUUID, zyrePeer);
         if (zyrePeer != NULL){
@@ -2454,7 +2525,8 @@ static void runLoop (zsock_t *mypipe, void *args){
         assert(context->security_auth);
         assert(zstr_send(context->security_auth, "VERBOSE") == 0);
         assert(zsock_wait(context->security_auth) >= 0);
-//        assert(zstr_sendx(context->security_auth, "ALLOW", ip_address1, ip_address2, ..., NULL) == 0);
+        if (!coreContext->security_publicCertificatesDirectory)
+            coreContext->security_publicCertificatesDirectory = strndup(IGS_DEFAULT_SECURITY_DIRECTORY, IGS_MAX_PATH_LENGTH);
         assert(zstr_sendx(context->security_auth, "CURVE", context->security_publicCertificatesDirectory, NULL) == 0);
         assert(zsock_wait(context->security_auth) >= 0);
     }
@@ -3696,8 +3768,6 @@ igs_result_t igs_enableSecurity(const char *privateCertificateFile, const char *
         free(coreContext->security_publicCertificatesDirectory);
         coreContext->security_publicCertificatesDirectory = NULL;
     }
-    if (coreContext->security_auth)
-        zactor_destroy(&(coreContext->security_auth));
     
     coreContext->security_isEnabled = true;
     
@@ -3726,17 +3796,36 @@ igs_result_t igs_enableSecurity(const char *privateCertificateFile, const char *
         coreContext->security_publicCertificatesDirectory = strndup(IGS_DEFAULT_SECURITY_DIRECTORY, IGS_MAX_PATH_LENGTH);
     }
     
-    coreContext->security_auth = zactor_new (zauth, NULL);
-    assert(coreContext->security_auth);
-    assert(zstr_send(coreContext->security_auth, "VERBOSE") == 0);
-    assert(zsock_wait(coreContext->security_auth) >= 0);
-    assert(zstr_sendx(coreContext->security_auth, "CURVE", coreContext->security_publicCertificatesDirectory, NULL) == 0);
+    if (!coreContext->security_auth){
+        coreContext->security_auth = zactor_new (zauth, NULL);
+        assert(coreContext->security_auth);
+        assert(zstr_send(coreContext->security_auth, "VERBOSE") == 0);
+        assert(zsock_wait(coreContext->security_auth) >= 0);
+        if (!coreContext->security_publicCertificatesDirectory)
+            coreContext->security_publicCertificatesDirectory = strndup(IGS_DEFAULT_SECURITY_DIRECTORY, IGS_MAX_PATH_LENGTH);
+        assert(zstr_sendx(coreContext->security_auth, "CURVE", coreContext->security_publicCertificatesDirectory, NULL) == 0);
+        assert(zsock_wait(coreContext->security_auth) >= 0);
+    }else{
+        //auth already exists : we just need to update public certs path
+        assert(zstr_sendx(coreContext->security_auth, "CURVE", coreContext->security_publicCertificatesDirectory, NULL) == 0);
+        assert(zsock_wait(coreContext->security_auth) >= 0);
+    }
     
     return IGS_SUCCESS;
 }
 
 zactor_t* igs_getZeroMQAuthenticator(void){
     core_initContext();
+    if (!coreContext->security_auth){
+        coreContext->security_auth = zactor_new (zauth, NULL);
+        assert(coreContext->security_auth);
+        assert(zstr_send(coreContext->security_auth, "VERBOSE") == 0);
+        assert(zsock_wait(coreContext->security_auth) >= 0);
+        if (!coreContext->security_publicCertificatesDirectory)
+            coreContext->security_publicCertificatesDirectory = strndup(IGS_DEFAULT_SECURITY_DIRECTORY, IGS_MAX_PATH_LENGTH);
+        assert(zstr_sendx(coreContext->security_auth, "CURVE", coreContext->security_publicCertificatesDirectory, NULL) == 0);
+        assert(zsock_wait(coreContext->security_auth) >= 0);
+    }
     return coreContext->security_auth;
 }
 
