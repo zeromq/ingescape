@@ -594,12 +594,15 @@ void license_readLicense(igs_core_context_t *context){
     //NB: in case of using license raw data, there will only be one detail whereas
     //when using files, there will be one detail by file.
     igs_license_t *detail = NULL;
-    if (context->license != NULL && context->license->licenseDetails != NULL){
+    size_t nbOfLicenses = 0;
+    if (context->license && context->license->licenseDetails){
         detail = zlist_first(context->license->licenseDetails);
+        nbOfLicenses = zlist_size(context->license->licenseDetails);
     }
-    while (detail != NULL){
-        if (detail->isLicenseValid){
-            if (detail->id != NULL){
+    
+    while (detail){
+        if (detail->isLicenseValid || nbOfLicenses == 1){
+            if (detail->id){
                 if (context->license->id == NULL){
                     context->license->id = strdup(detail->id);
                 }else{
@@ -609,7 +612,7 @@ void license_readLicense(igs_core_context_t *context){
                     free(tempId);
                 }
             }
-            if (detail->customer != NULL){
+            if (detail->customer){
                 if (context->license->customer == NULL){
                     context->license->customer = strdup(detail->customer);
                 }else{
@@ -670,7 +673,7 @@ void license_readLicense(igs_core_context_t *context){
             }
             zlist_destroy(&agents);
         }
-        if (detail->isEditorLicenseValid){
+        if (detail->isEditorLicenseValid || nbOfLicenses == 1){
             if (detail->editorOwner != NULL){
                 if (context->license->editorOwner == NULL){
                     context->license->editorOwner = strdup(detail->editorOwner);
@@ -702,23 +705,21 @@ void license_readLicense(igs_core_context_t *context){
     }
     //set license parameters to default for uninitialized values
     if (context->license->id == NULL)
-        context->license->id = strdup("Unregistered");
+        context->license->id = strdup("No valid license");
     if (context->license->customer == NULL)
-        context->license->customer = strdup("Unregistered");
+        context->license->customer = strdup("No valid license");
     if (context->license->order == NULL)
-        context->license->order = strdup("none");
-    if (context->license->licenseExpirationDate == 0){
+        context->license->order = strdup("No valid license");
+    if (context->license->licenseExpirationDate == 0)
         context->license->licenseExpirationDate = -1;
-    }
     if (context->license->platformNbAgents == 0)
         context->license->platformNbAgents = MAX_NB_OF_AGENTS;
     if (context->license->platformNbIOPs == 0)
         context->license->platformNbIOPs = MAX_NB_OF_IOP;
     if (context->license->editorOwner == NULL)
-        context->license->editorOwner = strdup("Unregistered");
-    if (context->license->editorExpirationDate == 0){
+        context->license->editorOwner = strdup("No valid license");
+    if (context->license->editorExpirationDate == 0)
         context->license->editorExpirationDate = -1;
-    }
     license_readWriteUnlock();
 }
 
@@ -756,8 +757,6 @@ bool igs_checkLicenseForAgent(const char *agentId){
     assert(agentId);
     core_initContext();
     license_readLicense(coreContext);
-    if (agentId == NULL)
-        return false;
     igs_license_for_agent_t *l = zhash_first(coreContext->license->agents);
     while (l != NULL) {
         if (l->agentId != NULL
