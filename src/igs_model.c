@@ -806,9 +806,9 @@ const igs_iop_t* model_writeIOP (igs_agent_t *agent, const char *iopName, iop_t 
                     if (value != NULL){
                         uint8_t *converted = model_stringToBytes(value);
                         iop->value.data = converted;
-                        if (converted){
-                            s = strlen(value);
-                        }else{
+                        if (converted)
+                            s = strlen(value)/2;
+                        else{
                             igs_error("string %s is not a valid hexadecimal-encoded string", value);
                             model_readWriteUnlock();
                             return NULL;
