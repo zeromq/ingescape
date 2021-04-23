@@ -123,7 +123,7 @@ PUBLIC igs_result_t igs_leaveElection(const char *electionName);
 PUBLIC void igs_setPublishingPort(unsigned int port);
 PUBLIC void igs_setLogStreamPort(unsigned int port);
 PUBLIC void igs_setDiscoveryInterval(unsigned int interval); //in milliseconds
-PUBLIC void igs_setAgentTimeout(unsigned int duration); //in milliseconds
+PUBLIC void igs_setTimeout(unsigned int duration); //in milliseconds
 PUBLIC void igs_raiseSocketsLimit(void); //UNIX only, to be called before any ingescape or ZeroMQ activity
 //Set high water marks (HWM) for the publish/subscribe sockets.
 //Setting HWM to 0 means that they are disabled.
