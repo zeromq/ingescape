@@ -3844,9 +3844,9 @@ igs_result_t igsAgent_competeInElection(igs_agent_t *agent, const char *election
     strncat(elName, electionName, 255);
     core_initContext();
     
+    network_Lock();
     if (!coreContext->elections)
         coreContext->elections = zhash_new();
-    
     //elections hash
     zlist_t *election = (zlist_t *) zhash_lookup(coreContext->elections, elName);
     if (!election){
@@ -3854,8 +3854,10 @@ igs_result_t igsAgent_competeInElection(igs_agent_t *agent, const char *election
         zlist_autofree(election);
         zhash_insert(coreContext->elections, elName, election);
         if (coreContext->node){
+            bus_zyreLock();
             zyre_set_contest_in_group (coreContext->node, elName);
             zyre_join(coreContext->node, elName);
+            bus_zyreUnlock();
         }
     }else if (zlist_size(election) > 0){
         char *attendee = zlist_first(election);
@@ -3863,6 +3865,7 @@ igs_result_t igsAgent_competeInElection(igs_agent_t *agent, const char *election
             if (streq(attendee, agent->uuid)){
                 igsAgent_error(agent, "agent %s(%s) already participates in election '%s'",
                                agent->definition->name, agent->uuid, elName);
+                network_Unlock();
                 return IGS_FAILURE;
             }
             attendee = zlist_next(election);
@@ -3877,6 +3880,7 @@ igs_result_t igsAgent_competeInElection(igs_agent_t *agent, const char *election
     }
     zlist_append(agent->elections, strdup(elName));
     
+    network_Unlock();
     return IGS_SUCCESS;
 }
 
@@ -3900,10 +3904,12 @@ igs_result_t igsAgent_leaveElection(igs_agent_t *agent, const char *electionName
     strncat(elName, electionName, 255);
     core_initContext();
     
+    network_Lock();
     //elections hash
     zlist_t *election = zhash_lookup(coreContext->elections, elName);
     if (!election){
         igsAgent_error(agent, "election '%s' has no attendee", elName);
+        network_Unlock();
         return IGS_FAILURE;
     }
     char *attendee = zlist_first(election);
@@ -3917,8 +3923,11 @@ igs_result_t igsAgent_leaveElection(igs_agent_t *agent, const char *electionName
     if (zlist_size(election) == 0){
         zhash_delete(coreContext->elections, elName);
         zlist_destroy(&election);
-        if (coreContext->node)
+        if (coreContext->node){
+            bus_zyreLock();
             zyre_leave(coreContext->node, elName);
+            bus_zyreUnlock();
+        }
     }
     if (zhash_size(coreContext->elections) == 0)
         zhash_destroy(&coreContext->elections);
@@ -3935,6 +3944,7 @@ igs_result_t igsAgent_leaveElection(igs_agent_t *agent, const char *electionName
     if (zlist_size(agent->elections) == 0)
         zlist_destroy(&agent->elections);
     
+    network_Unlock();
     return IGS_SUCCESS;
 }
 
