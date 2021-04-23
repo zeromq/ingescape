@@ -31,7 +31,7 @@ void core_initContext(){
         coreContext->network_allowInproc = true;
         coreContext->network_hwmValue = 1000;
         coreContext->network_discoveryInterval = 1000;
-        coreContext->network_agentTimeout = 30000;
+        coreContext->network_agentTimeout = 8000;
         coreContext->logLevel = IGS_LOG_INFO;
         coreContext->network_shallRaiseFileDescriptorsLimit = true;
         coreContext->network_ipcFolderPath = strdup(IGS_DEFAULT_IPC_FOLDER_PATH);
