@@ -67,26 +67,31 @@ PUBLIC igs_result_t igs_startWithIP(const char *ipAddress, unsigned int port);
 PUBLIC void igs_stop(void);
 PUBLIC bool igs_isStarted(void);
 
+
 /*
- Ingescape can be stopped either from the applications itself or from the network.
- When ingescape is stopped from the network, the application can be notified and
- take actions such as also stopping, enter a specific mode, etc.
+ Ingescape can be stopped either from the applications itself
+ or from the network. When ingescape is stopped from the network,
+ the application can be notified and take actions such as
+ stopping, entering a specific mode, etc.
  
- To stop ingescape from its hosting application, just call igs_stop().
+ To stop ingescape from its hosting application,
+ just call igs_stop().
  
- To be notified that Ingescape has been stopped, you can, by order of
- preference:
- - read the pipe socket to ingescape and expect a "LOOP_STOPPED" message
- - register a callabck with igs_observeExternalStop - WARNING: this callback
- will be executed from the ingescape thread with potential thread-safety issues
- depending on your application structure.
+ To be notified that Ingescape has been stopped,you can:
+ - read the pipe to ingescape and expect a "LOOP_STOPPED" message
+ - register a callabck with igs_observeExternalStop. WARNING: this
+   callback will be executed from the ingescape thread with potential
+   thread-safety issues depending on your application structure.
  - periodically check igs_isStarted()
- In any case, igs_stop MUST NEVER BE CALLED directly from any Ingescape callback,
- because it would create a deadlock between the main thread and the ingescape thread.
+ In any case, igs_stop MUST NEVER BE CALLED directly from any
+ Ingescape callback, because it would create a deadlock between
+ the main thread and the ingescape thread.
  */
-PUBLIC zsock_t* igs_getPipeToIngescape(void); //zeromq socket to get stop event from ingescape in a thread-safe manner
 typedef void (*igs_externalStopCallback)(void *myData);
 PUBLIC void igs_observeExternalStop(igs_externalStopCallback cb, void *myData);
+//zeromq pipe to receive stop event from ingescape in a thread-safe way
+PUBLIC zsock_t* igs_getPipeToIngescape(void);
+
 
 //agent name set and get
 PUBLIC void igs_setAgentName(const char *name);

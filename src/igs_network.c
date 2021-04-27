@@ -2714,17 +2714,14 @@ void initLoop (igs_core_context_t *context){
                 char *certPath = zhash_lookup(context->brokers, broker);
                 if (strlen(certPath) > 0){
                     zcert_t *certToGossipServer = zcert_load(certPath);
-                    if (certToGossipServer){
+                    if (certToGossipServer)
                         zyre_gossip_connect_curve(context->node, zcert_public_txt(certToGossipServer), "%s", broker);
-                    }else{
-                        igs_warn("could not open certificate '%s' for server '%s' : server is ignored", certPath, broker);
-                    }
-                }else{
-                    igs_warn("no certificate path for server '%s' : server is ignored", broker);
-                }
-            }else{
+                    else
+                        igs_warn("could not open public certificate '%s' for server '%s' : server is ignored", certPath, broker);
+                }else
+                    igs_warn("no public certificate path for server '%s' : server has been ignored", broker);
+            }else
                 zyre_gossip_connect(context->node, "%s", broker);
-            }
             broker = zlist_next(brokers);
         }
         zlist_destroy(&brokers);
@@ -3258,9 +3255,12 @@ igs_result_t igs_brokerAddSecure(const char *brokerEndpoint, const char *publicC
         return IGS_FAILURE;
     }
     assert(coreContext->brokers);
-    if (zhash_insert(coreContext->brokers, strdup(brokerEndpoint),
-                     strndup(publicCertificatesDirectory, IGS_MAX_PATH_LENGTH)) != IGS_SUCCESS){
+    char *endPt = strdup(brokerEndpoint);
+    char *certDir = strndup(publicCertificatesDirectory, IGS_MAX_PATH_LENGTH);
+    if (zhash_insert(coreContext->brokers, endPt, certDir) != IGS_SUCCESS){
         igs_error("could not add '%s' (certainly because it is already added)", brokerEndpoint);
+        free(endPt);
+        free(certDir);
         return IGS_FAILURE;
     }
     return IGS_SUCCESS;
@@ -3762,38 +3762,45 @@ void igs_observeExternalStop(igs_externalStopCallback cb, void *myData){
 
 igs_result_t igs_enableSecurity(const char *privateCertificateFile, const char *publicCertificatesDirectory){
     core_initContext();
-    if (coreContext->security_cert)
-        zcert_destroy (&(coreContext->security_cert));
-    if (coreContext->security_publicCertificatesDirectory){
-        free(coreContext->security_publicCertificatesDirectory);
-        coreContext->security_publicCertificatesDirectory = NULL;
-    }
     
     coreContext->security_isEnabled = true;
     
     if (privateCertificateFile){
         char privateKeyPath[IGS_MAX_PATH_LENGTH] = "";
         admin_makeFilePath(privateCertificateFile, privateKeyPath, IGS_MAX_PATH_LENGTH);
-        coreContext->security_cert = zcert_load(privateKeyPath);
-        if (!coreContext->security_cert){
+        zcert_t *newCertificate = zcert_load(privateKeyPath);
+        if (newCertificate){
+            if (coreContext->security_cert)
+                zcert_destroy (&(coreContext->security_cert));
+            coreContext->security_cert = newCertificate;
+        }else{
             igs_error("could not load private certificate at '%s'", privateKeyPath);
             return IGS_FAILURE;
         }
         if (publicCertificatesDirectory){
             char publicCertificatesPath[IGS_MAX_PATH_LENGTH] = "";
             admin_makeFilePath(publicCertificatesDirectory, publicCertificatesPath, IGS_MAX_PATH_LENGTH);
-            if (!zsys_file_exists(publicCertificatesPath)){
+            if (zsys_file_exists(publicCertificatesPath)){
+                if (coreContext->security_publicCertificatesDirectory)
+                    free(coreContext->security_publicCertificatesDirectory);
+                coreContext->security_publicCertificatesDirectory = strndup(publicCertificatesPath, IGS_MAX_PATH_LENGTH);
+            }else{
                 igs_error("public certificates directory '%s' does not exist", publicCertificatesPath);
                 return IGS_FAILURE;
             }
-            coreContext->security_publicCertificatesDirectory = strndup(publicCertificatesPath, IGS_MAX_PATH_LENGTH);
+           
         }else{
-            igs_error("private certificate file is not NULL : public certificates directory cannot be NULL");
+            igs_error("public certificates directory cannot be NULL when a private certificate is provided");
             return IGS_FAILURE;
         }
     }else{
+        if (coreContext->security_cert)
+            zcert_destroy (&(coreContext->security_cert));
         coreContext->security_cert = zcert_new();
-        coreContext->security_publicCertificatesDirectory = strndup(IGS_DEFAULT_SECURITY_DIRECTORY, IGS_MAX_PATH_LENGTH);
+        assert(coreContext->security_cert);
+        if (coreContext->security_publicCertificatesDirectory)
+            free(coreContext->security_publicCertificatesDirectory);
+        coreContext->security_publicCertificatesDirectory = strdup(IGS_DEFAULT_SECURITY_DIRECTORY);
     }
     
     if (!coreContext->security_auth){
@@ -3812,6 +3819,18 @@ igs_result_t igs_enableSecurity(const char *privateCertificateFile, const char *
     }
     
     return IGS_SUCCESS;
+}
+
+void igs_disableSecurity(void){
+    coreContext->security_isEnabled = false;
+    if (coreContext->security_cert)
+        zcert_destroy (&(coreContext->security_cert));
+    if (coreContext->security_publicCertificatesDirectory){
+        free(coreContext->security_publicCertificatesDirectory);
+        coreContext->security_publicCertificatesDirectory = NULL;
+    }
+    if (coreContext->security_auth)
+        zactor_destroy(&coreContext->security_auth);
 }
 
 zactor_t* igs_getZeroMQAuthenticator(void){
@@ -4017,7 +4036,7 @@ void igs_setAllowInproc(bool allow){
     coreContext->network_allowInproc = allow;
 }
 
-bool igs_getAllowInproc(){
+bool igs_getAllowInproc(void){
     core_initContext();
     return coreContext->network_allowInproc;
 }
