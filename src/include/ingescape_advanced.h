@@ -84,7 +84,8 @@ PUBLIC igs_result_t igs_startWithBrokers(const char *agentEndpoint);
  exist, security will not be enabled and our agent will not start.
 */
 PUBLIC igs_result_t igs_enableSecurity(const char *privateCertificateFile, const char *publicCertificatesDirectory);
-PUBLIC igs_result_t igs_brokerAddSecure(const char *brokerEndpoint, const char *publicCertificatesDirectory);
+PUBLIC void igs_disableSecurity(void);
+PUBLIC igs_result_t igs_brokerAddSecure(const char *brokerEndpoint, const char *pathToPublicCertificateForBroker);
 PUBLIC zactor_t* igs_getZeroMQAuthenticator(void);
 
 
