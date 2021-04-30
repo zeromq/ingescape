@@ -83,9 +83,11 @@ PUBLIC igs_result_t igs_startWithBrokers(const char *agentEndpoint);
  NB: if privateCertificateFile is NOT NULL and publicCertificatesDirectory is NULL or does not
  exist, security will not be enabled and our agent will not start.
 */
-PUBLIC igs_result_t igs_enableSecurity(const char *privateCertificateFile, const char *publicCertificatesDirectory);
+PUBLIC igs_result_t igs_enableSecurity(const char *privateCertificateFile,
+                                       const char *publicCertificatesDirectory);
 PUBLIC void igs_disableSecurity(void);
-PUBLIC igs_result_t igs_brokerAddSecure(const char *brokerEndpoint, const char *pathToPublicCertificateForBroker);
+PUBLIC igs_result_t igs_brokerAddSecure(const char *brokerEndpoint,
+                                        const char *pathToPublicCertificateForBroker);
 PUBLIC zactor_t* igs_getZeroMQAuthenticator(void);
 
 
@@ -146,6 +148,7 @@ PUBLIC char* igs_getFamily(void); //char* must be freed by caller
 /* TIMERS
  Timers can be created to call code a certain number of times,
  each time after a certain delay. 0 times means repeating forever.
+ Delay is expressed in milliseconds.
  Timers must be created after starting an agent.*/
 typedef void (igs_timerCallback) (int timerId, void *myData);
 PUBLIC int igs_timerStart(size_t delay, size_t times, igs_timerCallback cb, void *myData); //returns timer id or -1 if error
@@ -158,7 +161,9 @@ PUBLIC void igs_timerStop(int timerId);
  called to actually stop the monitor. If not stopped, it may cause an error when
  an agent terminates.*/
 PUBLIC void igs_monitoringEnable(unsigned int period); //in milliseconds
-PUBLIC void igs_monitoringEnableWithExpectedDevice(unsigned int period, const char* networkDevice, unsigned int port);
+PUBLIC void igs_monitoringEnableWithExpectedDevice(unsigned int period,
+                                                   const char* networkDevice,
+                                                   unsigned int port);
 PUBLIC void igs_monitoringDisable(void);
 PUBLIC bool igs_isMonitoringEnabled(void);
 /* When the monitor is started and igs_monitoringShallStartStopAgent is set to true :
@@ -166,12 +171,15 @@ PUBLIC bool igs_isMonitoringEnabled(void);
  - Network device disappearance will cause the agent to stop. Agent will restart when device is back.*/
 PUBLIC void igs_monitoringShallStartStopAgent(bool flag);
 typedef enum {
-    IGS_NETWORK_OK = 1, //when the monitor starts
+    IGS_NETWORK_OK = 1, //when the network is OK
     IGS_NETWORK_DEVICE_NOT_AVAILABLE, //when our network device is not available
     IGS_NETWORK_ADDRESS_CHANGED, //when the IP address of our network device has changed
-    IGS_NETWORK_OK_AFTER_MANUAL_RESTART //when our agent has been manually restarted and is now OK
+    IGS_NETWORK_OK_AFTER_MANUAL_RESTART //when our agent has been manually restarted and networkis now OK
 } igs_monitorEvent_t;
-typedef void (*igs_monitorCallback)(igs_monitorEvent_t event, const char *device, const char *ipAddress, void *myData);
+typedef void (*igs_monitorCallback)(igs_monitorEvent_t event,
+                                    const char *device,
+                                    const char *ipAddress,
+                                    void *myData);
 PUBLIC void igs_monitor(igs_monitorCallback cb, void *myData);
 
 
@@ -254,7 +262,7 @@ PUBLIC igs_result_t igs_busRemoveServiceDescription(const char *key);
 //////////////////////////////////////////////////
 //CALLS : create, remove, call, react
 /*NOTES:
- - one and only one mandatory callback per call, set using igs_handleCall : generates warning if cb missing when loading definition or receiving call
+ - one and only one mandatory callback per call, set using igs_initCall : generates warning if cb missing when loading definition or receiving call
  - one optional reply per call
  - reply shall be sent in callabck, using igs_sendCall with sender's UUID or name
  - call names shall be unique for a given agent
@@ -290,7 +298,7 @@ PUBLIC void igs_destroyArgumentsList(igs_callArgument_t **list);
 PUBLIC igs_callArgument_t *igs_cloneArgumentsList(igs_callArgument_t *list);
 
 //SEND a call to another agent
-//Requires to pass agent a name or UUID, a call name and a list of arguments specific to the call.
+//Requires to pass an agent name or UUID, a call name and a list of arguments specific to the call.
 //Token is an optional information to specifically identify a call and help routing replies.
 //Passed arguments list will be deallocated and destroyed by the function.
 PUBLIC igs_result_t igs_sendCall(const char *agentNameOrUUID, const char *callName,
@@ -312,7 +320,7 @@ typedef void (*igs_callFunction)(const char *senderAgentName, const char *sender
 PUBLIC igs_result_t igs_initCall(const char *name, igs_callFunction cb, void *myData);
 PUBLIC igs_result_t igs_removeCall(const char *name);
 PUBLIC igs_result_t igs_addArgumentToCall(const char *callName, const char *argName, iopType_t type);
-PUBLIC igs_result_t igs_removeArgumentFromCall(const char *callName, const char *argName); //removes first occurence with this name
+PUBLIC igs_result_t igs_removeArgumentFromCall(const char *callName, const char *argName); //removes first occurence of an argument with this name
 
 
 //Manage optional reply

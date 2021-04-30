@@ -189,38 +189,7 @@ igs_definition_t* parser_parseDefinitionFromNode(igsJSONTreeNode_t **json){
                 if (iop_type && iop_type->type == IGS_JSON_STRING & iop_type->u.string != NULL){
                     iop->value_type = string_to_value_type(iop_type->u.string);
                 }
-                
-                igsJSONTreeNode_t *iop_value = igs_JSONTreeGetNodeAtPath(inputs->u.array.values[i], valuePath);
-                if (iop_value){
-                    switch (iop->value_type) {
-                        case IGS_INTEGER_T:
-                            iop->value.i =(int) IGSYAJL_GET_INTEGER (iop_value);
-                            break;
-                        case IGS_DOUBLE_T:
-                            iop->value.d = IGSYAJL_GET_DOUBLE (iop_value);
-                            break;
-                        case IGS_BOOL_T:
-                            if(iop_value->type == IGS_JSON_TRUE)
-                                iop->value.b = true;
-                            else if (iop_value->type == IGS_JSON_TRUE)
-                                iop->value.b = false;
-                            else if (iop_value->type == IGS_JSON_STRING)
-                                iop->value.b = string_to_boolean(iop_value->u.string);
-                            break;
-                        case IGS_STRING_T:
-                            iop->value.s =  (IGSYAJL_IS_STRING(iop_value) ? strdup(iop_value->u.string) : NULL);
-                            break;
-                        case IGS_IMPULSION_T:
-                            //IMPULSION has no value
-                            break;
-                        case IGS_DATA_T:
-                            //FIXME : we store data as string but we should check it and convert it from base64
-                            //data->value.s = strdup (IGSYAJL_IS_STRING(obj->u.object.values[2]) ? obj->u.object.values[2]->u.string : "");
-                            break;
-                        default:
-                            break;
-                    }
-                }
+                //NB: inputs do not have initial value in definition => nothing to do here
                 HASH_ADD_STR(definition->inputs_table, name, iop);
             }
         }
@@ -290,8 +259,9 @@ igs_definition_t* parser_parseDefinitionFromNode(igsJSONTreeNode_t **json){
                             //IMPULSION has no value
                             break;
                         case IGS_DATA_T:
-                            //FIXME : we store data as string but we should check it and convert it from base64
-                            //data->value.s = strdup (IGSYAJL_IS_STRING(obj->u.object.values[2]) ? obj->u.object.values[2]->u.string : "");
+                            //we store data as hexa string but we convert it to actual bytes
+                            iop->value.data = (IGSYAJL_IS_STRING(iop_value) ? model_stringToBytes(iop_value->u.string) : NULL);
+                            iop->valueSize = (iop->value.data)? strlen(iop_value->u.string)/2 : 0;
                             break;
                         default:
                             break;
@@ -366,8 +336,8 @@ igs_definition_t* parser_parseDefinitionFromNode(igsJSONTreeNode_t **json){
                             //IMPULSION has no value
                             break;
                         case IGS_DATA_T:
-                            //FIXME : we store data as string but we should check it and convert it from base64
-                            //data->value.s = strdup (IGSYAJL_IS_STRING(obj->u.object.values[2]) ? obj->u.object.values[2]->u.string : "");
+                            //we store data as hexa string but we convert it to actual bytes
+                            iop->value.data = (IGSYAJL_IS_STRING(iop_value) ? model_stringToBytes(iop_value->u.string) : NULL);
                             break;
                         default:
                             break;
@@ -750,31 +720,7 @@ char* parser_exportDefinition(igs_definition_t* def){
         }
         igs_JSONaddString(json, STR_TYPE);
         igs_JSONaddString(json, value_type_to_string(iop->value_type));
-        igs_JSONaddString(json, STR_VALUE);
-        switch (iop->value_type) {
-            case IGS_INTEGER_T:
-                igs_JSONaddInt(json, iop->value.i);
-                break;
-            case IGS_DOUBLE_T:
-                igs_JSONaddDouble(json, iop->value.d);
-                break;
-            case IGS_BOOL_T:
-                igs_JSONaddBool(json, iop->value.b);
-                break;
-            case IGS_STRING_T:
-                igs_JSONaddString(json, iop->value.s);
-                break;
-            case IGS_IMPULSION_T:
-                igs_JSONaddNULL(json);
-                break;
-            case IGS_DATA_T:
-                //FIXME : we store data as string but we should convert it to base 64
-                igs_JSONaddString(json, "");
-                break;
-            default:
-                igs_JSONaddString(json, "");
-                break;
-        }
+        //NB: inputs do not have intial values
         igs_JSONcloseMap(json);
     }
     igs_JSONcloseArray(json);
@@ -806,10 +752,14 @@ char* parser_exportDefinition(igs_definition_t* def){
             case IGS_IMPULSION_T:
                 igs_JSONaddNULL(json);
                 break;
-            case IGS_DATA_T:
-                //FIXME : we store data as string but we should convert it to base 64
-                igs_JSONaddString(json, "");
+            case IGS_DATA_T:{
+                char *dataToStore = (char *)calloc(2 * iop->valueSize + 1, sizeof(char));
+                for (size_t i = 0; i < iop->valueSize; i++)
+                    sprintf(dataToStore + 2*i, "%02X", *((uint8_t *)((char *)iop->value.data +i)));
+                igs_JSONaddString(json, dataToStore);
+                free(dataToStore);
                 break;
+            }
             default:
                 igs_JSONaddString(json, "");
                 break;
@@ -845,10 +795,14 @@ char* parser_exportDefinition(igs_definition_t* def){
             case IGS_IMPULSION_T:
                 igs_JSONaddNULL(json);
                 break;
-            case IGS_DATA_T:
-                //FIXME : we store data as string but we should convert it to base 64
-                igs_JSONaddString(json, "");
+            case IGS_DATA_T:{
+                char *dataToStore = (char *)calloc(2 * iop->valueSize + 1, sizeof(char));
+                for (size_t i = 0; i < iop->valueSize; i++)
+                    sprintf(dataToStore + 2*i, "%02X", *((uint8_t *)((char *)iop->value.data +i)));
+                igs_JSONaddString(json, dataToStore);
+                free(dataToStore);
                 break;
+            }
             default:
                 igs_JSONaddString(json, "");
                 break;

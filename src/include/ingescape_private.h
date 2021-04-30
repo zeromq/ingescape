@@ -414,6 +414,7 @@ unsigned long djb2_hash (unsigned char *str);
 bool mapping_checkInputOutputCompatibility(igs_agent_t *agent, igs_iop_t *foundInput, igs_iop_t *foundOutput);
 
 // model
+uint8_t* model_stringToBytes (char* string);
 const igs_iop_t* model_writeIOP (igs_agent_t *agent, const char *iopName, iop_t iopType, iopType_t valType, void* value, size_t size);
 igs_iop_t* model_findIopByName(igs_agent_t *agent, const char* name, iop_t type);
 char* model_getIOPValueAsString (igs_iop_t* iop); //returned value must be freed by user

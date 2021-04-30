@@ -1141,7 +1141,7 @@ int main(int argc, const char * argv[]) {
     assert(igs_writeInputAsString("my_data", "toto") == IGS_FAILURE);
     assert(igs_writeInputAsString("my_data", "0123456789abcdef") == IGS_SUCCESS);
     igs_readInputAsData("my_data", &data, &dataSize);
-    assert(dataSize == 16);
+    assert(dataSize == 8);
     
     data = (void*)"my data";
     dataSize = strlen("my data") + 1;

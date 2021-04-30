@@ -144,7 +144,11 @@ typedef enum {
     IGS_AGENT_WON_ELECTION, //eventData is the election name as a const char*
     IGS_AGENT_LOST_ELECTION //eventData is the election name as a const char*
 } igs_agent_event_t;
-typedef void (*igs_agentEventCallback)(igs_agent_event_t event, const char *uuid, const char *name, void *eventData, void *myData);
+typedef void (*igs_agentEventCallback)(igs_agent_event_t event,
+                                       const char *uuid,
+                                       const char *name,
+                                       void *eventData,
+                                       void *myData);
 PUBLIC void igs_observeAgentEvents(igs_agentEventCallback cb, void *myData);
 
 
