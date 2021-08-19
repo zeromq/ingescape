@@ -1,0 +1,40 @@
+# Ignore compiled files
+*.o
+
+
+# Ignore Qt user-specific files
+*.pro.user
+*.pro.user.*
+*.qmlproject.user
+*.qmlproject.user.*
+*.qbs.user
+*.qbs.user.*
+CMakeLists.txt.user
+
+
+# Ignore Qt generated files
+.qmake.cache
+.qmake.stash
+*.moc
+moc_*.cpp
+qrc_*.cpp
+ui_*.h
+
+
+# Ignore Qt default build directory
+*build-*
+
+#Ignore build Xcode Path
+build-xcode
+#Ignore Xcode User Pref
+xcuserdata
+
+
+.vs/
+.vscode/
+
+build/
+.deps
+.libs
+dependencies/yajl/build/
+

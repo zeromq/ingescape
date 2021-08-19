@@ -1,0 +1,29 @@
+<project
+    script = "zproject.gsl"
+    name = "ingescape"
+    description = "Model-based framework for broker-free distributed software environments"
+    email = "contact@ingescape.com"
+    url = "https://ingescape.com"
+    license = "MPLv2"
+    repository = "https://gitlab.ingescape.com/ingescape/ingescape-library"
+    check_license_years = "2"
+    unique_class_name = "0"
+    >
+    <include filename = "license.xml" />
+    <version major = "3" minor = "0" patch = "0" />
+    <abi current = "3" revision = "0" age = "0" />
+    <use project = "czmq" />
+    <use project = "zyre" />
+    
+    <header name = "stdbool" />
+    <header name = "stddef" />
+    
+    <class name = "igs json" state = "stable" />
+    <class name = "igs json node" state = "stable" />
+    <class name = "igs service arg" state = "stable"/>
+    <class name = "igs" state = "stable" />
+    <class name = "igsagent" state = "stable" />
+
+    <target name = "*" />
+
+</project>

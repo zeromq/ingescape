@@ -1,0 +1,61 @@
+<class name = "igs_json_node" state = "stable">
+    <!--
+    Copyright (c) the Contributors as noted in the AUTHORS file.
+    This file is part of Ingescape, <tagline d'ingescape>:
+    <url de la page de lib sur le site>.
+
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+    -->
+    JSON framework - tree node api that can be queried
+
+    <method name = "parse from file" singleton="1">
+        DOC_STRING
+        <argument name = "path" type = "string" />
+        <return type = "igs_json_node" fresh = "1" />
+    </method>
+
+    <method name = "parse from str" singleton = "1">
+        DOC_STRING
+        <argument name = "content" type = "string" />
+        <return type = "igs_json_node" fresh = "1" />
+    </method>
+
+    <destructor>
+        DOC_STRING
+    </destructor>
+
+    <method name = "dup">
+        DOC_STRING
+        <return type = "igs_json_node" fresh = "1" />
+    </method>
+
+    <method name = "dump">
+        DOC_STRING
+        <return type = "string" fresh = "1" />
+    </method>
+
+    <method name = "insert">
+        DOC_STRING
+        <argument name = "key" type = "string" />
+        <argument name = "node to insert" type = "igs_json_node" />
+    </method>
+
+    <method name = "find">
+        DOC_STRING
+        <argument name = "path" type = "string" by_reference = "1" mutable="0"/>
+        <return type = "igs_json_node" fresh = "1" />
+    </method>
+
+    <method name = "is integer">
+        DOC_STRING
+        <return type = "boolean" />
+    </method>
+
+    <method name = "is double">
+        DOC_STRING
+        <return type = "boolean" />
+    </method>
+
+</class>

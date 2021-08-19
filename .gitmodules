@@ -1,0 +1,12 @@
+[submodule "dependencies/sodium"]
+	path = dependencies/sodium
+	url = https://github.com/ingescape/libsodium.git
+[submodule "dependencies/libzmq"]
+	path = dependencies/libzmq
+	url = https://github.com/ingescape/libzmq.git
+[submodule "dependencies/czmq"]
+	path = dependencies/czmq
+	url = https://github.com/ingescape/czmq.git
+[submodule "dependencies/zyre"]
+	path = dependencies/zyre
+	url = https://github.com/ingescape/zyre.git

@@ -1,0 +1,106 @@
+<class name = "igs_json" state = "stable">
+    <!--
+    Copyright (c) the Contributors as noted in the AUTHORS file.
+    This file is part of Ingescape, <tagline d'ingescape>:
+    <url de la page de lib sur le site>.
+
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+    -->
+    JSON framework
+
+    <constructor>
+        DOC_STRING
+    </constructor>
+
+    <destructor>
+        DOC_STRING
+    </destructor>
+
+    <method name = "open map">
+        DOC_STRING
+    </method>
+
+    <method name = "close map">
+        DOC_STRING
+    </method>
+
+    <method name = "open array">
+        DOC_STRING
+    </method>
+
+    <method name = "close array">
+        DOC_STRING
+    </method>
+
+    <method name = "add null">
+        DOC_STRING
+    </method>
+
+    <method name = "add bool">
+        DOC_STRING
+        <argument name = "value" type = "boolean" />
+    </method>
+
+    <method name = "add int">
+        DOC_STRING
+        <argument name = "value" type = "msecs"/>
+    </method>
+
+    <method name = "add double">
+        DOC_STRING
+        <argument name = "value" type = "real" size = "8" />
+    </method>
+
+    <method name = "add string">
+        DOC_STRING
+        <argument name = "value" type = "string" />
+    </method>
+
+    <method name = "print">
+        DOC_STRING
+    </method>
+
+    <method name = "dump">
+        DOC_STRING
+        <return type = "string" fresh = "1" />
+    </method>
+
+    <method name = "compact dump">
+        DOC_STRING
+        <return type = "string" fresh = "1" />
+    </method>
+
+    <callback_type name = "fn">
+        DOC_STRING
+        <argument name = "type" type = "igs json value type t" callback = "1" />
+        <argument name = "value" type = "anything" />
+        <argument name = "size" type = "size" />
+        <argument name = "data" type = "anything" />
+    </callback_type>
+
+    <method name = "parse from file" singleton = "1">
+        DOC_STRING
+        <argument name = "path" type = "string" />
+        <argument name = "cb" type = "igs json fn" callback = "1" />
+        <argument name = "data" type = "anything" />
+    </method>
+
+    <method name = "parse from str" singleton = "1">
+        DOC_STRING
+        <argument name = "path" type = "string" />
+        <argument name = "cb" type = "igs json fn" callback = "1" />
+        <argument name = "data" type = "anything" />
+    </method>
+
+    <method name = "insert node">
+        DOC_STRING
+        <argument name = "node" type = "igs_json_node" />
+    </method>
+
+    <method name = "node for">
+        DOC_STRING
+        <return type = "igs_json_node" fresh = "1" />
+    </method>
+</class>
