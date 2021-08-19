@@ -102,8 +102,8 @@ By commodity, Ingescape includes its dependencies as a set of git submodules. Pl
 
 Dependencies are fetched from forks managed by the ingescape team on github and used for long-term industrial maintenance. This is the best way to have a full stack for debugging and contributing to ingescape, using your preferred environment.
 
-	git clone --recurse-submodules http://gitlab.ingescape.com/soum/ingescape-library.git
-	cd ingescape-library
+	git clone --recurse-submodules git://github.com/zeromq/ingescape.git
+	cd ingescape
 	mkdir build
 	cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DOSX_UNIVERSAL=ON \
 	-DCMAKE_OSX_DEPLOYMENT_TARGET=10.11 -DWITH_DEPS=ON
@@ -149,8 +149,8 @@ All the dependencies need to be fetched and installed from their official reposi
     sudo ldconfig
     cd ..
 
-	git clone http://gitlab.ingescape.com/soum/ingescape-library.git
-	cd ingescape-library
+	git clone git://github.com/zeromq/ingescape.git
+	cd ingescape
     mkdir build
 	cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11
 	make -j8 -C build
