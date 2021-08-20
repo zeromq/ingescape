@@ -120,7 +120,7 @@ Dependencies are fetched from forks managed by the ingescape team on github and 
 
 All the dependencies need to be fetched and installed from their official repositories using the latest master or stable tags. Because Ingescape uses draft APIs from CZMQ and Zyre, compilation might rarely break depending on their respective evolutions and the delay to make the necessary updates.
 
- 	git clone --depth 1 -b stable https://github.com/jedisct1/libsodium.git
+    git clone --depth 1 -b stable https://github.com/jedisct1/libsodium.git
     cd libsodium
     ./autogen.sh && ./configure && make check
     make -j8
@@ -131,7 +131,7 @@ All the dependencies need to be fetched and installed from their official reposi
     cd libzmq
     mkdir build
     cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DWITH_LIBSODIUM=ON -DENABLE_DRAFTS=ON -DWITH_TLS=OFF -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11
-    make -j8 -C build check
+    make -j8 -C build
     sudo make -C build install
     sudo ldconfig
     cd ..
@@ -140,7 +140,7 @@ All the dependencies need to be fetched and installed from their official reposi
     cd czmq
     mkdir build
     cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DENABLE_DRAFTS=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11
-    make -j8 -C build check
+    make -j8 -C build
     sudo make -C build install
     sudo ldconfig
     cd ..
@@ -149,18 +149,18 @@ All the dependencies need to be fetched and installed from their official reposi
     cd zyre
     mkdir build
     cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DENABLE_DRAFTS=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11
-    make -j8 -C build check
+    make -j8 -C build
     sudo make -C build install
     sudo ldconfig
     cd ..
 
-	git clone git://github.com/zeromq/ingescape.git
-	cd ingescape
+    git clone git://github.com/zeromq/ingescape.git
+    cd ingescape
     mkdir build
-	cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11
-	make -j8 -C build
-	sudo make -C build install
-	sudo ldconfig
+    cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11
+    make -j8 -C build
+    sudo make -C build install
+    sudo ldconfig
     cd ..
 
 
