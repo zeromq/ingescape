@@ -1,0 +1,12 @@
+prefix=C:/Program Files/ingescape
+exec_prefix=C:/Program Files/ingescape
+libdir=C:/Program Files/ingescape/lib
+includedir=C:/Program Files/ingescape/include
+
+Name: libzmq
+Description: 0MQ c++ library
+Version: 4.3.5
+Libs: -L${libdir} -lzmq
+Libs.private: -lstdc++ 
+Requires.private: 
+Cflags: -I${includedir} 

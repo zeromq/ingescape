@@ -1,0 +1,696 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|Win32">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|Win32">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{6DF21852-05C8-3718-9B1E-56638C23117C}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>sodium</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Configuration)\$(Platform)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">sodium.dir\$(Configuration)\$(Platform)\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">libsodium</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">libsodium</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.dll</TargetExt>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.dll</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\sodium\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">sodium.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">libsodium</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">libsodium</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.dll</TargetExt>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.dll</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\sodium\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">sodium.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">libsodium</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">libsodium</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.dll</TargetExt>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.dll</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</GenerateManifest>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\sodium\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">sodium.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">libsodium</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">libsodium</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.dll</TargetExt>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.dll</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</GenerateManifest>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</GenerateManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(Configuration)\$(Platform)\</OutDir>
+    <IntDir>sodium.dir\$(Configuration)\$(Platform)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(Configuration)\$(Platform)\</OutDir>
+    <IntDir>sodium.dir\$(Configuration)\$(Platform)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\..\..\..\src;..\..\..\..\include;..\..\..\..\dependencies\sodium\src\libsodium\include;..\..\..\..\dependencies\sodium\src\libsodium\include\sodium;..\..\..\..\dependencies\sodium\src\libsodium\crypto_core;..\..\..\..\dependencies\sodium\src\libsodium\crypto_generichash;..\..\..\..\dependencies\sodium\src\libsodium\crypto_onetimeauth;..\..\..\..\dependencies\sodium\src\libsodium\crypto_pwhash;..\..\..\..\dependencies\sodium\src\libsodium\crypto_scalarmult;..\..\..\..\dependencies\sodium\src\libsodium\crypto_shorthash;..\..\..\..\dependencies\sodium\src\libsodium\crypto_sign;..\..\..\..\dependencies\sodium\src\libsodium\crypto_stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;DLL_EXPORT;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR="Debug";SODIUM_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;DLL_EXPORT;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR=\"Debug\";SODIUM_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_core;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_generichash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_onetimeauth;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_scalarmult;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_shorthash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_sign;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_core;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_generichash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_onetimeauth;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_scalarmult;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_shorthash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_sign;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>$(configuration)\$(Platform)/sodium.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/sodium/$(Configuration)\$(Platform)\libsodium.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\..\..\..\src;..\..\..\..\include;..\..\..\..\dependencies\sodium\src\libsodium\include;..\..\..\..\dependencies\sodium\src\libsodium\include\sodium;..\..\..\..\dependencies\sodium\src\libsodium\crypto_core;..\..\..\..\dependencies\sodium\src\libsodium\crypto_generichash;..\..\..\..\dependencies\sodium\src\libsodium\crypto_onetimeauth;..\..\..\..\dependencies\sodium\src\libsodium\crypto_pwhash;..\..\..\..\dependencies\sodium\src\libsodium\crypto_scalarmult;..\..\..\..\dependencies\sodium\src\libsodium\crypto_shorthash;..\..\..\..\dependencies\sodium\src\libsodium\crypto_sign;..\..\..\..\dependencies\sodium\src\libsodium\crypto_stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;DLL_EXPORT;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR="Debug";SODIUM_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;DLL_EXPORT;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR=\"Debug\";SODIUM_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_core;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_generichash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_onetimeauth;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_scalarmult;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_shorthash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_sign;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_core;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_generichash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_onetimeauth;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_scalarmult;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_shorthash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_sign;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x86</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>$(configuration)\$(Platform)/sodium.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/sodium/$(Configuration)\$(Platform)\libsodium.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\..\..\..\src;..\..\..\..\include;..\..\..\..\dependencies\sodium\src\libsodium\include;..\..\..\..\dependencies\sodium\src\libsodium\include\sodium;..\..\..\..\dependencies\sodium\src\libsodium\crypto_core;..\..\..\..\dependencies\sodium\src\libsodium\crypto_generichash;..\..\..\..\dependencies\sodium\src\libsodium\crypto_onetimeauth;..\..\..\..\dependencies\sodium\src\libsodium\crypto_pwhash;..\..\..\..\dependencies\sodium\src\libsodium\crypto_scalarmult;..\..\..\..\dependencies\sodium\src\libsodium\crypto_shorthash;..\..\..\..\dependencies\sodium\src\libsodium\crypto_sign;..\..\..\..\dependencies\sodium\src\libsodium\crypto_stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) -O3</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;DLL_EXPORT;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR="Release";SODIUM_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;DLL_EXPORT;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR=\"Release\";SODIUM_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_core;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_generichash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_onetimeauth;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_scalarmult;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_shorthash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_sign;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_core;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_generichash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_onetimeauth;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_scalarmult;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_shorthash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_sign;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>$(configuration)\$(Platform)/sodium.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/sodium/Release/libsodium.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\..\..\..\src;..\..\..\..\include;..\..\..\..\dependencies\sodium\src\libsodium\include;..\..\..\..\dependencies\sodium\src\libsodium\include\sodium;..\..\..\..\dependencies\sodium\src\libsodium\crypto_core;..\..\..\..\dependencies\sodium\src\libsodium\crypto_generichash;..\..\..\..\dependencies\sodium\src\libsodium\crypto_onetimeauth;..\..\..\..\dependencies\sodium\src\libsodium\crypto_pwhash;..\..\..\..\dependencies\sodium\src\libsodium\crypto_scalarmult;..\..\..\..\dependencies\sodium\src\libsodium\crypto_shorthash;..\..\..\..\dependencies\sodium\src\libsodium\crypto_sign;..\..\..\..\dependencies\sodium\src\libsodium\crypto_stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) -O3</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;DLL_EXPORT;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR="Release";SODIUM_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;DLL_EXPORT;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR=\"Release\";SODIUM_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_core;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_generichash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_onetimeauth;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_scalarmult;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_shorthash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_sign;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_core;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_generichash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_onetimeauth;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_scalarmult;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_shorthash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_sign;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x86</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>$(configuration)\$(Platform)/sodium.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/sodium/Release/libsodium.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_core;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_generichash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_onetimeauth;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_scalarmult;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_shorthash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_sign;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;DLL_EXPORT;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR="MinSizeRel";SODIUM_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;DLL_EXPORT;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR=\"MinSizeRel\";SODIUM_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_core;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_generichash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_onetimeauth;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_scalarmult;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_shorthash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_sign;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_core;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_generichash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_onetimeauth;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_scalarmult;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_shorthash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_sign;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/sodium/MinSizeRel/sodium.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/sodium/MinSizeRel/libsodium.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_core;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_generichash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_onetimeauth;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_scalarmult;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_shorthash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_sign;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;DLL_EXPORT;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR="MinSizeRel";SODIUM_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;DLL_EXPORT;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR=\"MinSizeRel\";SODIUM_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_core;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_generichash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_onetimeauth;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_scalarmult;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_shorthash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_sign;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_core;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_generichash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_onetimeauth;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_scalarmult;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_shorthash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_sign;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/sodium/MinSizeRel/sodium.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/sodium/MinSizeRel/libsodium.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_core;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_generichash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_onetimeauth;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_scalarmult;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_shorthash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_sign;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;DLL_EXPORT;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR="RelWithDebInfo";SODIUM_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;DLL_EXPORT;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR=\"RelWithDebInfo\";SODIUM_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_core;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_generichash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_onetimeauth;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_scalarmult;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_shorthash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_sign;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_core;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_generichash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_onetimeauth;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_scalarmult;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_shorthash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_sign;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/sodium/RelWithDebInfo/sodium.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/sodium/RelWithDebInfo/libsodium.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_core;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_generichash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_onetimeauth;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_scalarmult;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_shorthash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_sign;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;DLL_EXPORT;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR="RelWithDebInfo";SODIUM_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;DLL_EXPORT;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR=\"RelWithDebInfo\";SODIUM_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_core;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_generichash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_onetimeauth;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_scalarmult;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_shorthash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_sign;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_core;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_generichash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_onetimeauth;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_scalarmult;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_shorthash;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_sign;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/sodium/RelWithDebInfo/sodium.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/sodium/RelWithDebInfo/libsodium.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/Admin/Documents/DEV/work/ingescape/dependencies/sodium/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building Custom Rule C:/Users/Admin/Documents/DEV/work/ingescape/dependencies/sodium/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Admin/Documents/DEV/work/ingescape -BC:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64 --check-stamp-file C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/sodium/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Admin/Documents/DEV/work/ingescape -BC:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64 --check-stamp-file C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/sodium/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Program Files\CMake\share\cmake-3.20\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXCompiler.cmake.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXCompilerABI.cpp;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCompilerIdDetection.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCompileFeatures.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCompilerABI.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCompilerId.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeFindBinUtils.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakePackageConfigHelpers.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeParseImplicitIncludeInfo.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeParseLibraryArchitecture.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeTestCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeTestCompilerCommon.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\ADSP-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\ARMCC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\ARMClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\AppleClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Borland-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Clang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Comeau-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Cray-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\GHS-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\HP-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\IAR-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Intel-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\IntelLLVM-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\NVHPC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\PGI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\PathScale-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\SCO-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\TI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Watcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\XL-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\XLClang-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CompilerId\VS-10.vcxproj.in;C:\Program Files\CMake\share\cmake-3.20\Modules\GNUInstallDirs.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Internal\FeatureTesting.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-Determine-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\WriteBasicConfigVersionFile.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\CMakeFiles\3.20.0\CMakeCXXCompiler.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\builds\cmake\Config.cmake.in;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium\version.h.in;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Program Files\CMake\share\cmake-3.20\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXCompiler.cmake.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXCompilerABI.cpp;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCompilerIdDetection.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCompileFeatures.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCompilerABI.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCompilerId.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeFindBinUtils.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakePackageConfigHelpers.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeParseImplicitIncludeInfo.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeParseLibraryArchitecture.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeTestCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeTestCompilerCommon.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\ADSP-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\ARMCC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\ARMClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\AppleClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Borland-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Clang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Comeau-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Cray-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\GHS-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\HP-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\IAR-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Intel-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\IntelLLVM-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\NVHPC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\PGI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\PathScale-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\SCO-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\TI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Watcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\XL-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\XLClang-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CompilerId\VS-10.vcxproj.in;C:\Program Files\CMake\share\cmake-3.20\Modules\GNUInstallDirs.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Internal\FeatureTesting.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-Determine-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\WriteBasicConfigVersionFile.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\CMakeFiles\3.20.0\CMakeCXXCompiler.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\builds\cmake\Config.cmake.in;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium\version.h.in;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\sodium\CMakeFiles\generate.stamp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\sodium\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/Admin/Documents/DEV/work/ingescape/dependencies/sodium/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building Custom Rule C:/Users/Admin/Documents/DEV/work/ingescape/dependencies/sodium/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Admin/Documents/DEV/work/ingescape -BC:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64 --check-stamp-file C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/sodium/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Admin/Documents/DEV/work/ingescape -BC:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64 --check-stamp-file C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/sodium/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Program Files\CMake\share\cmake-3.20\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXCompiler.cmake.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXCompilerABI.cpp;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCompilerIdDetection.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCompileFeatures.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCompilerABI.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCompilerId.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeFindBinUtils.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakePackageConfigHelpers.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeParseImplicitIncludeInfo.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeParseLibraryArchitecture.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeTestCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeTestCompilerCommon.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\ADSP-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\ARMCC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\ARMClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\AppleClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Borland-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Clang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Comeau-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Cray-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\GHS-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\HP-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\IAR-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Intel-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\IntelLLVM-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\NVHPC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\PGI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\PathScale-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\SCO-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\TI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Watcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\XL-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\XLClang-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CompilerId\VS-10.vcxproj.in;C:\Program Files\CMake\share\cmake-3.20\Modules\GNUInstallDirs.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Internal\FeatureTesting.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-Determine-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\WriteBasicConfigVersionFile.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\CMakeFiles\3.20.0\CMakeCXXCompiler.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\builds\cmake\Config.cmake.in;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium\version.h.in;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Program Files\CMake\share\cmake-3.20\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXCompiler.cmake.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXCompilerABI.cpp;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCompilerIdDetection.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCompileFeatures.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCompilerABI.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCompilerId.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeFindBinUtils.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakePackageConfigHelpers.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeParseImplicitIncludeInfo.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeParseLibraryArchitecture.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeTestCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeTestCompilerCommon.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\ADSP-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\ARMCC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\ARMClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\AppleClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Borland-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Clang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Comeau-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Cray-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\GHS-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\HP-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\IAR-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Intel-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\IntelLLVM-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\NVHPC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\PGI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\PathScale-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\SCO-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\TI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Watcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\XL-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\XLClang-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CompilerId\VS-10.vcxproj.in;C:\Program Files\CMake\share\cmake-3.20\Modules\GNUInstallDirs.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Internal\FeatureTesting.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-Determine-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\WriteBasicConfigVersionFile.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\CMakeFiles\3.20.0\CMakeCXXCompiler.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\builds\cmake\Config.cmake.in;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium\version.h.in;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\sodium\CMakeFiles\generate.stamp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\sodium\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/Admin/Documents/DEV/work/ingescape/dependencies/sodium/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Building Custom Rule C:/Users/Admin/Documents/DEV/work/ingescape/dependencies/sodium/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Admin/Documents/DEV/work/ingescape -BC:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64 --check-stamp-file C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/sodium/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Admin/Documents/DEV/work/ingescape -BC:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64 --check-stamp-file C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/sodium/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Program Files\CMake\share\cmake-3.20\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXCompiler.cmake.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXCompilerABI.cpp;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCompilerIdDetection.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCompileFeatures.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCompilerABI.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCompilerId.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeFindBinUtils.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakePackageConfigHelpers.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeParseImplicitIncludeInfo.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeParseLibraryArchitecture.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeTestCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeTestCompilerCommon.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\ADSP-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\ARMCC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\ARMClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\AppleClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Borland-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Clang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Comeau-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Cray-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\GHS-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\HP-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\IAR-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Intel-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\IntelLLVM-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\NVHPC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\PGI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\PathScale-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\SCO-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\TI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Watcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\XL-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\XLClang-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CompilerId\VS-10.vcxproj.in;C:\Program Files\CMake\share\cmake-3.20\Modules\GNUInstallDirs.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Internal\FeatureTesting.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-Determine-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\WriteBasicConfigVersionFile.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\CMakeFiles\3.20.0\CMakeCXXCompiler.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\builds\cmake\Config.cmake.in;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium\version.h.in;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">C:\Program Files\CMake\share\cmake-3.20\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXCompiler.cmake.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXCompilerABI.cpp;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCompilerIdDetection.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCompileFeatures.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCompilerABI.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCompilerId.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeFindBinUtils.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakePackageConfigHelpers.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeParseImplicitIncludeInfo.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeParseLibraryArchitecture.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeTestCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeTestCompilerCommon.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\ADSP-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\ARMCC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\ARMClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\AppleClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Borland-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Clang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Comeau-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Cray-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\GHS-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\HP-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\IAR-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Intel-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\IntelLLVM-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\NVHPC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\PGI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\PathScale-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\SCO-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\TI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Watcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\XL-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\XLClang-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CompilerId\VS-10.vcxproj.in;C:\Program Files\CMake\share\cmake-3.20\Modules\GNUInstallDirs.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Internal\FeatureTesting.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-Determine-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\WriteBasicConfigVersionFile.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\CMakeFiles\3.20.0\CMakeCXXCompiler.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\builds\cmake\Config.cmake.in;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium\version.h.in;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\sodium\CMakeFiles\generate.stamp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\sodium\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/Admin/Documents/DEV/work/ingescape/dependencies/sodium/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Building Custom Rule C:/Users/Admin/Documents/DEV/work/ingescape/dependencies/sodium/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Admin/Documents/DEV/work/ingescape -BC:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64 --check-stamp-file C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/sodium/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Admin/Documents/DEV/work/ingescape -BC:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64 --check-stamp-file C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/sodium/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Program Files\CMake\share\cmake-3.20\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXCompiler.cmake.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXCompilerABI.cpp;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCompilerIdDetection.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCompileFeatures.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCompilerABI.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCompilerId.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeFindBinUtils.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakePackageConfigHelpers.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeParseImplicitIncludeInfo.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeParseLibraryArchitecture.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeTestCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeTestCompilerCommon.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\ADSP-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\ARMCC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\ARMClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\AppleClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Borland-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Clang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Comeau-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Cray-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\GHS-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\HP-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\IAR-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Intel-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\IntelLLVM-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\NVHPC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\PGI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\PathScale-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\SCO-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\TI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Watcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\XL-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\XLClang-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CompilerId\VS-10.vcxproj.in;C:\Program Files\CMake\share\cmake-3.20\Modules\GNUInstallDirs.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Internal\FeatureTesting.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-Determine-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\WriteBasicConfigVersionFile.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\CMakeFiles\3.20.0\CMakeCXXCompiler.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\builds\cmake\Config.cmake.in;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium\version.h.in;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">C:\Program Files\CMake\share\cmake-3.20\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXCompiler.cmake.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXCompilerABI.cpp;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCompilerIdDetection.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCompileFeatures.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCompilerABI.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeDetermineCompilerId.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeFindBinUtils.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakePackageConfigHelpers.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeParseImplicitIncludeInfo.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeParseLibraryArchitecture.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeTestCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeTestCompilerCommon.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\ADSP-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\ARMCC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\ARMClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\AppleClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Borland-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Clang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Comeau-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Cray-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\GHS-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\HP-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\IAR-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Intel-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\IntelLLVM-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\NVHPC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\PGI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\PathScale-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\SCO-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\TI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\Watcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\XL-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\XLClang-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CompilerId\VS-10.vcxproj.in;C:\Program Files\CMake\share\cmake-3.20\Modules\GNUInstallDirs.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Internal\FeatureTesting.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-Determine-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\WriteBasicConfigVersionFile.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\CMakeFiles\3.20.0\CMakeCXXCompiler.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\builds\cmake\Config.cmake.in;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium\version.h.in;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\sodium\CMakeFiles\generate.stamp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\sodium\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_aead\aes256gcm\aesni\aead_aes256gcm_aesni.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_aead\chacha20poly1305\sodium\aead_chacha20poly1305.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_aead\xchacha20poly1305\sodium\aead_xchacha20poly1305.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_auth\crypto_auth.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_auth\hmacsha256\auth_hmacsha256.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_auth\hmacsha512\auth_hmacsha512.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_auth\hmacsha512256\auth_hmacsha512256.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_box\crypto_box.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_box\crypto_box_easy.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_box\crypto_box_seal.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_box\curve25519xchacha20poly1305\box_curve25519xchacha20poly1305.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_box\curve25519xchacha20poly1305\box_seal_curve25519xchacha20poly1305.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_box\curve25519xsalsa20poly1305\box_curve25519xsalsa20poly1305.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_core\ed25519\core_ed25519.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_core\ed25519\core_ristretto255.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_core\ed25519\ref10\ed25519_ref10.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_core\hchacha20\core_hchacha20.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_core\hsalsa20\core_hsalsa20.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_core\hsalsa20\ref2\core_hsalsa20_ref2.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_core\salsa\ref\core_salsa_ref.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_generichash\blake2b\generichash_blake2.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_generichash\blake2b\ref\blake2b-compress-avx2.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_generichash\blake2b\ref\blake2b-compress-ref.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_generichash\blake2b\ref\blake2b-compress-sse41.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_generichash\blake2b\ref\blake2b-compress-ssse3.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_generichash\blake2b\ref\blake2b-ref.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_generichash\blake2b\ref\generichash_blake2b.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_generichash\crypto_generichash.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_hash\crypto_hash.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_hash\sha256\cp\hash_sha256_cp.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_hash\sha256\hash_sha256.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_hash\sha512\cp\hash_sha512_cp.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_hash\sha512\hash_sha512.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_kdf\blake2b\kdf_blake2b.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_kdf\crypto_kdf.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_kx\crypto_kx.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_onetimeauth\crypto_onetimeauth.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_onetimeauth\poly1305\donna\poly1305_donna.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_onetimeauth\poly1305\onetimeauth_poly1305.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_onetimeauth\poly1305\sse2\poly1305_sse2.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash\argon2\argon2-core.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash\argon2\argon2-encoding.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash\argon2\argon2-fill-block-avx2.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash\argon2\argon2-fill-block-avx512f.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash\argon2\argon2-fill-block-ref.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash\argon2\argon2-fill-block-ssse3.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash\argon2\argon2.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash\argon2\blake2b-long.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash\argon2\pwhash_argon2i.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash\argon2\pwhash_argon2id.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash\crypto_pwhash.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash\scryptsalsa208sha256\crypto_scrypt-common.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash\scryptsalsa208sha256\nosse\pwhash_scryptsalsa208sha256_nosse.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash\scryptsalsa208sha256\pbkdf2-sha256.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash\scryptsalsa208sha256\pwhash_scryptsalsa208sha256.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash\scryptsalsa208sha256\scrypt_platform.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_pwhash\scryptsalsa208sha256\sse\pwhash_scryptsalsa208sha256_sse.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_scalarmult\crypto_scalarmult.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_scalarmult\curve25519\ref10\x25519_ref10.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_scalarmult\curve25519\sandy2x\curve25519_sandy2x.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_scalarmult\curve25519\sandy2x\fe51_invert.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_scalarmult\curve25519\sandy2x\fe_frombytes_sandy2x.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_scalarmult\curve25519\scalarmult_curve25519.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_scalarmult\ed25519\ref10\scalarmult_ed25519_ref10.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_scalarmult\ristretto255\ref10\scalarmult_ristretto255_ref10.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_secretbox\crypto_secretbox.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_secretbox\crypto_secretbox_easy.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_secretbox\xchacha20poly1305\secretbox_xchacha20poly1305.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_secretbox\xsalsa20poly1305\secretbox_xsalsa20poly1305.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_secretstream\xchacha20poly1305\secretstream_xchacha20poly1305.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_shorthash\crypto_shorthash.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_shorthash\siphash24\ref\shorthash_siphash24_ref.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_shorthash\siphash24\ref\shorthash_siphashx24_ref.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_shorthash\siphash24\shorthash_siphash24.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_shorthash\siphash24\shorthash_siphashx24.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_sign\crypto_sign.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_sign\ed25519\ref10\keypair.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_sign\ed25519\ref10\obsolete.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_sign\ed25519\ref10\open.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_sign\ed25519\ref10\sign.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_sign\ed25519\sign_ed25519.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream\chacha20\dolbeau\chacha20_dolbeau-avx2.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream\chacha20\dolbeau\chacha20_dolbeau-ssse3.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream\chacha20\ref\chacha20_ref.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream\chacha20\stream_chacha20.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream\crypto_stream.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream\salsa20\ref\salsa20_ref.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream\salsa20\stream_salsa20.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream\salsa20\xmm6\salsa20_xmm6.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream\salsa20\xmm6int\salsa20_xmm6int-avx2.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream\salsa20\xmm6int\salsa20_xmm6int-sse2.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream\salsa2012\ref\stream_salsa2012_ref.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream\salsa2012\stream_salsa2012.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream\salsa208\ref\stream_salsa208_ref.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream\salsa208\stream_salsa208.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream\xchacha20\stream_xchacha20.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_stream\xsalsa20\stream_xsalsa20.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\crypto_verify\sodium\verify.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\randombytes\internal\randombytes_internal_random.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\randombytes\randombytes.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\randombytes\sysrandom\randombytes_sysrandom.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\sodium\codecs.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\sodium\core.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\sodium\runtime.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\sodium\utils.c" />
+    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\sodium\version.c" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

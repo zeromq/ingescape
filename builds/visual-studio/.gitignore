@@ -1,6 +1,7 @@
 Debug
 Release
-dependencies
+x64
+x86
 ingescape.dir
 *.user
 *.filters
