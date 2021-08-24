@@ -134,12 +134,12 @@
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(Configuration)\$(Platform)</OutDir>
-    <IntDir>libzmq.dir\$(Configuration)\$(Platform)</IntDir>
+    <OutDir>$(ProjectDir)\$(Configuration)\$(Platform)</OutDir>
+    <IntDir>$(ProjectDir)\libzmq.dir\$(Configuration)\$(Platform)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(Configuration)\$(Platform)</OutDir>
-    <IntDir>libzmq.dir\$(Configuration)\$(Platform)</IntDir>
+    <OutDir>$(ProjectDir)\$(Configuration)\$(Platform)</OutDir>
+    <IntDir>$(ProjectDir)\libzmq.dir\$(Configuration)\$(Platform)</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -172,13 +172,13 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>..\sodium\$(Configuration)\$(Platform)\sodium.lib;ws2_32.lib;rpcrt4.lib;iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)..\sodium\$(Configuration)\$(Platform)\sodium.lib;ws2_32.lib;rpcrt4.lib;iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/libzmq/lib/Debug/libzmq-v141-mt-gd-4_3_5.lib</ImportLibrary>
-      <ProgramDataBaseFile>$(Configuration)/$(Platform)/libzmq-v141-mt-gd-4_3_5.pdb</ProgramDataBaseFile>
+      <ImportLibrary>$(ProjectDir)/$(Configuration)/$(Platform)/libzmq-v141-mt-gd-4_3_5.lib</ImportLibrary>
+      <ProgramDataBaseFile>$(ProjectDir)/$(Configuration)/$(Platform)/libzmq-v141-mt-gd-4_3_5.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
     </Link>
     <ProjectReference>
@@ -187,7 +187,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\..\src;..\..\..\..\include;..\..\..\..\dependencies\sodium\src\libsodium\include;..\..\..\..\dependencies\libzmq\include;..\..\..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\src;$(ProjectDir)..\..\..\..\include;$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\..\..\dependencies\libzmq\include;$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <DebugInformationFormat>OldStyle</DebugInformationFormat>
@@ -216,13 +216,13 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>..\sodium\$(Configuration)\$(Platform)\sodium.lib;ws2_32.lib;rpcrt4.lib;iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)..\sodium\$(Configuration)\$(Platform)\sodium.lib;ws2_32.lib;rpcrt4.lib;iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x86</AdditionalOptions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/libzmq/lib/Debug/libzmq-v141-mt-gd-4_3_5.lib</ImportLibrary>
-      <ProgramDataBaseFile>$(Configuration)/$(Platform)/libzmq-v141-mt-gd-4_3_5.pdb</ProgramDataBaseFile>
+      <ImportLibrary>$(ProjectDir)/$(Configuration)/$(Platform)/libzmq-v141-mt-gd-4_3_5.lib</ImportLibrary>
+      <ProgramDataBaseFile>$(ProjectDir)/$(Configuration)/$(Platform)/libzmq-v141-mt-gd-4_3_5.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
     </Link>
     <ProjectReference>
@@ -260,13 +260,13 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>..\sodium\$(Configuration)\$(Platform)\sodium.lib;ws2_32.lib;rpcrt4.lib;iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)..\sodium\$(Configuration)\$(Platform)\sodium.lib;ws2_32.lib;rpcrt4.lib;iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/libzmq/lib/Release/libzmq-v141-mt-4_3_5.lib</ImportLibrary>
-      <ProgramDataBaseFile>$(Configuration)/$(Platform)/libzmq-v141-mt-gd-4_3_5.pdb</ProgramDataBaseFile>
+      <ImportLibrary>$(ProjectDir)/$(Configuration)/$(Platform)/libzmq-v141-mt-4_3_5.lib</ImportLibrary>
+      <ProgramDataBaseFile>$(ProjectDir)/$(Configuration)/$(Platform)/libzmq-v141-mt-4_3_5.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
     </Link>
     <ProjectReference>
@@ -275,7 +275,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\..\src;..\..\..\..\include;..\..\..\..\dependencies\sodium\src\libsodium\include;..\..\..\..\dependencies\libzmq\include;..\..\..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\src;$(ProjectDir)..\..\..\..\include;$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\..\..\dependencies\libzmq\include;$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ExceptionHandling>Sync</ExceptionHandling>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -304,13 +304,13 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>..\sodium\$(Configuration)\$(Platform)\sodium.lib;ws2_32.lib;rpcrt4.lib;iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)..\sodium\$(Configuration)\$(Platform)\sodium.lib;ws2_32.lib;rpcrt4.lib;iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x86</AdditionalOptions>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/libzmq/lib/Release/libzmq-v141-mt-4_3_5.lib</ImportLibrary>
-      <ProgramDataBaseFile>$(Configuration)/$(Platform)/libzmq-v141-mt-gd-4_3_5.pdb</ProgramDataBaseFile>
+      <ImportLibrary>$(ProjectDir)/$(Configuration)/$(Platform)/libzmq-v141-mt-4_3_5.lib</ImportLibrary>
+      <ProgramDataBaseFile>$(ProjectDir)/$(Configuration)/$(Platform)/libzmq-v141-mt-4_3_5.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
     </Link>
     <ProjectReference>
@@ -394,7 +394,7 @@
     <Link>
       <AdditionalDependencies>..\sodium\MinSizeRel\sodium.lib;ws2_32.lib;rpcrt4.lib;iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x86</AdditionalOptions>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImportLibrary>C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/libzmq/lib/MinSizeRel/libzmq-v141-mt-4_3_5.lib</ImportLibrary>
@@ -480,7 +480,7 @@
     <Link>
       <AdditionalDependencies>..\sodium\RelWithDebInfo\sodium.lib;ws2_32.lib;rpcrt4.lib;iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x86</AdditionalOptions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImportLibrary>C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/libzmq/lib/RelWithDebInfo/libzmq-v141-mt-4_3_5.lib</ImportLibrary>
