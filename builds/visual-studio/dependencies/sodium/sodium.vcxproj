@@ -92,8 +92,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Configuration)\$(Platform)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">sodium.dir\$(Configuration)\$(Platform)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/$(Configuration)\$(Platform)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/sodium.dir\$(Configuration)\$(Platform)\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">libsodium</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">libsodium</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.dll</TargetExt>
@@ -102,8 +102,8 @@
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\sodium\Release\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">sodium.dir\Release\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)\$(Configuration)\$(Platform)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)\sodium.dir\$(Configuration)\$(Platform)\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">libsodium</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">libsodium</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.dll</TargetExt>
@@ -134,16 +134,16 @@
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(Configuration)\$(Platform)\</OutDir>
-    <IntDir>sodium.dir\$(Configuration)\$(Platform)\</IntDir>
+    <OutDir>$(ProjectDir)/$(Configuration)\$(Platform)\</OutDir>
+    <IntDir>$(ProjectDir)/sodium.dir\$(Configuration)\$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(Configuration)\$(Platform)\</OutDir>
-    <IntDir>sodium.dir\$(Configuration)\$(Platform)\</IntDir>
+    <OutDir>$(ProjectDir)\$(Configuration)\$(Platform)\</OutDir>
+    <IntDir>$(ProjectDir)\sodium.dir\$(Configuration)\$(Platform)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\..\src;..\..\..\..\include;..\..\..\..\dependencies\sodium\src\libsodium\include;..\..\..\..\dependencies\sodium\src\libsodium\include\sodium;..\..\..\..\dependencies\sodium\src\libsodium\crypto_core;..\..\..\..\dependencies\sodium\src\libsodium\crypto_generichash;..\..\..\..\dependencies\sodium\src\libsodium\crypto_onetimeauth;..\..\..\..\dependencies\sodium\src\libsodium\crypto_pwhash;..\..\..\..\dependencies\sodium\src\libsodium\crypto_scalarmult;..\..\..\..\dependencies\sodium\src\libsodium\crypto_shorthash;..\..\..\..\dependencies\sodium\src\libsodium\crypto_sign;..\..\..\..\dependencies\sodium\src\libsodium\crypto_stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\..\..\src;$(ProjectDir)\..\..\..\..\include;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\crypto_core;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\crypto_generichash;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\crypto_onetimeauth;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\crypto_pwhash;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\crypto_scalarmult;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\crypto_shorthash;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\crypto_sign;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\crypto_stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -175,8 +175,8 @@
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>$(configuration)\$(Platform)/sodium.lib</ImportLibrary>
-      <ProgramDataBaseFile>C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/sodium/$(Configuration)\$(Platform)\libsodium.pdb</ProgramDataBaseFile>
+      <ImportLibrary>$(ProjectDir)\$(configuration)\$(Platform)/sodium.lib</ImportLibrary>
+      <ProgramDataBaseFile>$(ProjectDir)/$(configuration)/$(Platform)/libsodium.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
@@ -186,7 +186,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\..\src;..\..\..\..\include;..\..\..\..\dependencies\sodium\src\libsodium\include;..\..\..\..\dependencies\sodium\src\libsodium\include\sodium;..\..\..\..\dependencies\sodium\src\libsodium\crypto_core;..\..\..\..\dependencies\sodium\src\libsodium\crypto_generichash;..\..\..\..\dependencies\sodium\src\libsodium\crypto_onetimeauth;..\..\..\..\dependencies\sodium\src\libsodium\crypto_pwhash;..\..\..\..\dependencies\sodium\src\libsodium\crypto_scalarmult;..\..\..\..\dependencies\sodium\src\libsodium\crypto_shorthash;..\..\..\..\dependencies\sodium\src\libsodium\crypto_sign;..\..\..\..\dependencies\sodium\src\libsodium\crypto_stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\..\..\src;$(ProjectDir)\..\..\..\..\include;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\crypto_core;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\crypto_generichash;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\crypto_onetimeauth;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\crypto_pwhash;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\crypto_scalarmult;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\crypto_shorthash;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\crypto_sign;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\crypto_stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -218,8 +218,8 @@
       <AdditionalOptions>%(AdditionalOptions) /machine:x86</AdditionalOptions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>$(configuration)\$(Platform)/sodium.lib</ImportLibrary>
-      <ProgramDataBaseFile>C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/sodium/$(Configuration)\$(Platform)\libsodium.pdb</ProgramDataBaseFile>
+      <ImportLibrary>$(ProjectDir)\$(configuration)\$(Platform)/sodium.lib</ImportLibrary>
+      <ProgramDataBaseFile>$(ProjectDir)/$(configuration)/$(Platform)/libsodium.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
     </Link>
     <ProjectReference>
@@ -228,7 +228,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\..\src;..\..\..\..\include;..\..\..\..\dependencies\sodium\src\libsodium\include;..\..\..\..\dependencies\sodium\src\libsodium\include\sodium;..\..\..\..\dependencies\sodium\src\libsodium\crypto_core;..\..\..\..\dependencies\sodium\src\libsodium\crypto_generichash;..\..\..\..\dependencies\sodium\src\libsodium\crypto_onetimeauth;..\..\..\..\dependencies\sodium\src\libsodium\crypto_pwhash;..\..\..\..\dependencies\sodium\src\libsodium\crypto_scalarmult;..\..\..\..\dependencies\sodium\src\libsodium\crypto_shorthash;..\..\..\..\dependencies\sodium\src\libsodium\crypto_sign;..\..\..\..\dependencies\sodium\src\libsodium\crypto_stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\..\..\src;$(ProjectDir)\..\..\..\..\include;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\crypto_core;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\crypto_generichash;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\crypto_onetimeauth;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\crypto_pwhash;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\crypto_scalarmult;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\crypto_shorthash;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\crypto_sign;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\crypto_stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) -O3</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ExceptionHandling>
@@ -259,8 +259,8 @@
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>$(configuration)\$(Platform)/sodium.lib</ImportLibrary>
-      <ProgramDataBaseFile>C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/sodium/Release/libsodium.pdb</ProgramDataBaseFile>
+      <ImportLibrary>$(ProjectDir)/$(configuration)/$(Platform)/sodium.lib</ImportLibrary>
+      <ProgramDataBaseFile>$(ProjectDir)/$(configuration)/$(Platform)/libsodium.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
     </Link>
     <ProjectReference>
@@ -269,7 +269,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\..\src;..\..\..\..\include;..\..\..\..\dependencies\sodium\src\libsodium\include;..\..\..\..\dependencies\sodium\src\libsodium\include\sodium;..\..\..\..\dependencies\sodium\src\libsodium\crypto_core;..\..\..\..\dependencies\sodium\src\libsodium\crypto_generichash;..\..\..\..\dependencies\sodium\src\libsodium\crypto_onetimeauth;..\..\..\..\dependencies\sodium\src\libsodium\crypto_pwhash;..\..\..\..\dependencies\sodium\src\libsodium\crypto_scalarmult;..\..\..\..\dependencies\sodium\src\libsodium\crypto_shorthash;..\..\..\..\dependencies\sodium\src\libsodium\crypto_sign;..\..\..\..\dependencies\sodium\src\libsodium\crypto_stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\..\..\src;$(ProjectDir)\..\..\..\..\include;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\crypto_core;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\crypto_generichash;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\crypto_onetimeauth;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\crypto_pwhash;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\crypto_scalarmult;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\crypto_shorthash;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\crypto_sign;$(ProjectDir)\..\..\..\..\dependencies\sodium\src\libsodium\crypto_stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) -O3</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ExceptionHandling>
@@ -300,8 +300,8 @@
       <AdditionalOptions>%(AdditionalOptions) /machine:x86</AdditionalOptions>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>$(configuration)\$(Platform)/sodium.lib</ImportLibrary>
-      <ProgramDataBaseFile>C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/sodium/Release/libsodium.pdb</ProgramDataBaseFile>
+      <ImportLibrary>$(ProjectDir)/$(configuration)/$(Platform)/sodium.lib</ImportLibrary>
+      <ProgramDataBaseFile>$(ProjectDir)/$(configuration)/$(Platform)/libsodium.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
     </Link>
     <ProjectReference>
