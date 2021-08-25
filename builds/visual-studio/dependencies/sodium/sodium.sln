@@ -29,8 +29,7 @@ Global
 		{6DF21852-05C8-3718-9B1E-56638C23117C}.Debug|x86.Build.0 = Debug|Win32
 		{6DF21852-05C8-3718-9B1E-56638C23117C}.MinSizeRel|Win32.ActiveCfg = MinSizeRel|Win32
 		{6DF21852-05C8-3718-9B1E-56638C23117C}.MinSizeRel|Win32.Build.0 = MinSizeRel|Win32
-		{6DF21852-05C8-3718-9B1E-56638C23117C}.MinSizeRel|x64.ActiveCfg = MinSizeRel|x64
-		{6DF21852-05C8-3718-9B1E-56638C23117C}.MinSizeRel|x64.Build.0 = MinSizeRel|x64
+		{6DF21852-05C8-3718-9B1E-56638C23117C}.MinSizeRel|x64.ActiveCfg = MinSizeRel|Win32
 		{6DF21852-05C8-3718-9B1E-56638C23117C}.MinSizeRel|x86.ActiveCfg = MinSizeRel|Win32
 		{6DF21852-05C8-3718-9B1E-56638C23117C}.MinSizeRel|x86.Build.0 = MinSizeRel|Win32
 		{6DF21852-05C8-3718-9B1E-56638C23117C}.Release|Win32.ActiveCfg = Release|Win32
@@ -39,17 +38,17 @@ Global
 		{6DF21852-05C8-3718-9B1E-56638C23117C}.Release|x64.Build.0 = Release|x64
 		{6DF21852-05C8-3718-9B1E-56638C23117C}.Release|x86.ActiveCfg = Release|Win32
 		{6DF21852-05C8-3718-9B1E-56638C23117C}.Release|x86.Build.0 = Release|Win32
-		{6DF21852-05C8-3718-9B1E-56638C23117C}.RelWithDebInfo|Win32.ActiveCfg = RelWithDebInfo|Win32
-		{6DF21852-05C8-3718-9B1E-56638C23117C}.RelWithDebInfo|Win32.Build.0 = RelWithDebInfo|Win32
-		{6DF21852-05C8-3718-9B1E-56638C23117C}.RelWithDebInfo|x64.ActiveCfg = RelWithDebInfo|x64
-		{6DF21852-05C8-3718-9B1E-56638C23117C}.RelWithDebInfo|x64.Build.0 = RelWithDebInfo|x64
-		{6DF21852-05C8-3718-9B1E-56638C23117C}.RelWithDebInfo|x86.ActiveCfg = RelWithDebInfo|Win32
-		{6DF21852-05C8-3718-9B1E-56638C23117C}.RelWithDebInfo|x86.Build.0 = RelWithDebInfo|Win32
+		{6DF21852-05C8-3718-9B1E-56638C23117C}.RelWithDebInfo|Win32.ActiveCfg = Release|Win32
+		{6DF21852-05C8-3718-9B1E-56638C23117C}.RelWithDebInfo|Win32.Build.0 = Release|Win32
+		{6DF21852-05C8-3718-9B1E-56638C23117C}.RelWithDebInfo|x64.ActiveCfg = Release|x64
+		{6DF21852-05C8-3718-9B1E-56638C23117C}.RelWithDebInfo|x64.Build.0 = Release|x64
+		{6DF21852-05C8-3718-9B1E-56638C23117C}.RelWithDebInfo|x86.ActiveCfg = Release|Win32
+		{6DF21852-05C8-3718-9B1E-56638C23117C}.RelWithDebInfo|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {25AAD3D4-EBD4-34CE-858C-1A12F1F21A6C}
+		SolutionGuid = {190E979E-A307-334E-8D8C-A79DE462FA3F}
 	EndGlobalSection
 EndGlobal
