@@ -20,19 +20,7 @@
     <ProjectConfiguration Include="Release|x64">
       <Configuration>Release</Configuration>
       <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="MinSizeRel|x64">
-      <Configuration>MinSizeRel</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="RelWithDebInfo|Win32">
-      <Configuration>RelWithDebInfo</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="RelWithDebInfo|x64">
-      <Configuration>RelWithDebInfo</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
+    </ProjectConfiguration>    
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{2B160CC8-C0B5-318C-958D-38F7389C3D20}</ProjectGuid>
@@ -62,27 +50,7 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v141</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v141</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v141</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v141</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v141</PlatformToolset>
-  </PropertyGroup>
+  </PropertyGroup>  
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
@@ -112,26 +80,6 @@
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq\MinSizeRel\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">czmq.dir\MinSizeRel\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">libczmq</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">libczmq</TargetName>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.dll</TargetExt>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.dll</TargetExt>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkIncremental>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkIncremental>
-    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</GenerateManifest>
-    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq\RelWithDebInfo\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">czmq.dir\RelWithDebInfo\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">libczmq</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">libczmq</TargetName>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.dll</TargetExt>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.dll</TargetExt>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</LinkIncremental>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</LinkIncremental>
-    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</GenerateManifest>
-    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(ProjectDir)\$(Configuration)\$(Platform)\</OutDir>
@@ -159,10 +107,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;DLL_EXPORT;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR=\"Debug\";CZMQ_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\libzmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\libzmq;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\src;$(ProjectDir)..\..\..\..\include;$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\..\..\dependencies\libzmq\include;$(ProjectDir)..\..\..\..\dependencies\czmq\src;$(ProjectDir)..\..\..\..\dependencies\czmq\include;$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\x64\dependencies\czmq;$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\x64\dependencies\libzmq;$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\include\sodium;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\libzmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\libzmq;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\src;$(ProjectDir)..\..\..\..\include;$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\..\..\dependencies\libzmq\include;$(ProjectDir)..\..\..\..\dependencies\czmq\src;$(ProjectDir)..\..\..\..\dependencies\czmq\include;$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\x64\dependencies\czmq;$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\x64\dependencies\libzmq;$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\include\sodium;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -201,10 +149,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;DLL_EXPORT;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR=\"Debug\";CZMQ_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\libzmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\libzmq;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\src;$(ProjectDir)..\..\..\..\include;$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\..\..\dependencies\libzmq\include;$(ProjectDir)..\..\..\..\dependencies\czmq\src;$(ProjectDir)..\..\..\..\dependencies\czmq\include;$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\x64\dependencies\czmq;$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\x64\dependencies\libzmq;$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\include\sodium;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\libzmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\libzmq;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\src;$(ProjectDir)..\..\..\..\include;$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\..\..\dependencies\libzmq\include;$(ProjectDir)..\..\..\..\dependencies\czmq\src;$(ProjectDir)..\..\..\..\dependencies\czmq\include;$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\x64\dependencies\czmq;$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\x64\dependencies\libzmq;$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\include\sodium;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -243,10 +191,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;DLL_EXPORT;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR=\"Release\";CZMQ_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\libzmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\libzmq;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\src;$(ProjectDir)..\..\..\..\include;$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\..\..\dependencies\libzmq\include;$(ProjectDir)..\..\..\..\dependencies\czmq\src;$(ProjectDir)..\..\..\..\dependencies\czmq\include;$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\x64\dependencies\czmq;$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\x64\dependencies\libzmq;$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\include\sodium;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\libzmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\libzmq;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\src;$(ProjectDir)..\..\..\..\include;$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\..\..\dependencies\libzmq\include;$(ProjectDir)..\..\..\..\dependencies\czmq\src;$(ProjectDir)..\..\..\..\dependencies\czmq\include;$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\x64\dependencies\czmq;$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\x64\dependencies\libzmq;$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\include\sodium;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -285,10 +233,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;DLL_EXPORT;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR=\"Release\";CZMQ_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\libzmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\libzmq;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\src;$(ProjectDir)..\..\..\..\include;$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\..\..\dependencies\libzmq\include;$(ProjectDir)..\..\..\..\dependencies\czmq\src;$(ProjectDir)..\..\..\..\dependencies\czmq\include;$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\x64\dependencies\czmq;$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\x64\dependencies\libzmq;$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\include\sodium;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\libzmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\libzmq;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\src;$(ProjectDir)..\..\..\..\include;$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\..\..\dependencies\libzmq\include;$(ProjectDir)..\..\..\..\dependencies\czmq\src;$(ProjectDir)..\..\..\..\dependencies\czmq\include;$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\x64\dependencies\czmq;$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\x64\dependencies\libzmq;$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\include\sodium;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -309,174 +257,8 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\libzmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\libzmq;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-      <ExceptionHandling>Sync</ExceptionHandling>
-      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <Optimization>MinSpace</Optimization>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;DLL_EXPORT;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR="MinSizeRel";CZMQ_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ObjectFileName>$(IntDir)</ObjectFileName>
-      <DebugInformationFormat>
-      </DebugInformationFormat>
-    </ClCompile>
-    <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;DLL_EXPORT;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR=\"MinSizeRel\";CZMQ_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\libzmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\libzmq;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ResourceCompile>
-    <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\libzmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\libzmq;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
-      <HeaderFileName>%(Filename).h</HeaderFileName>
-      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
-      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
-      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
-    </Midl>
-    <Link>
-      <AdditionalDependencies>ws2_32.lib;Rpcrt4.lib;Iphlpapi.lib;..\libzmq\lib\MinSizeRel\libzmq-v141-mt-4_3_5.lib;ws2_32.lib;..\sodium\MinSizeRel\sodium.lib;rpcrt4.lib;iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
-      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/czmq/MinSizeRel/czmq.lib</ImportLibrary>
-      <ProgramDataBaseFile>C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/czmq/MinSizeRel/libczmq.pdb</ProgramDataBaseFile>
-      <SubSystem>Console</SubSystem>
-    </Link>
-    <ProjectReference>
-      <LinkLibraryDependencies>false</LinkLibraryDependencies>
-    </ProjectReference>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\libzmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\libzmq;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-      <ExceptionHandling>Sync</ExceptionHandling>
-      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <Optimization>MinSpace</Optimization>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;DLL_EXPORT;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR="MinSizeRel";CZMQ_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ObjectFileName>$(IntDir)</ObjectFileName>
-      <DebugInformationFormat>
-      </DebugInformationFormat>
-    </ClCompile>
-    <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;DLL_EXPORT;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR=\"MinSizeRel\";CZMQ_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\libzmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\libzmq;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ResourceCompile>
-    <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\libzmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\libzmq;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
-      <HeaderFileName>%(Filename).h</HeaderFileName>
-      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
-      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
-      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
-    </Midl>
-    <Link>
-      <AdditionalDependencies>ws2_32.lib;Rpcrt4.lib;Iphlpapi.lib;..\libzmq\lib\MinSizeRel\libzmq-v141-mt-4_3_5.lib;ws2_32.lib;..\sodium\MinSizeRel\sodium.lib;rpcrt4.lib;iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
-      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/czmq/MinSizeRel/czmq.lib</ImportLibrary>
-      <ProgramDataBaseFile>C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/czmq/MinSizeRel/libczmq.pdb</ProgramDataBaseFile>
-      <SubSystem>Console</SubSystem>
-    </Link>
-    <ProjectReference>
-      <LinkLibraryDependencies>false</LinkLibraryDependencies>
-    </ProjectReference>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\libzmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\libzmq;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <ExceptionHandling>Sync</ExceptionHandling>
-      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <Optimization>MaxSpeed</Optimization>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;DLL_EXPORT;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR="RelWithDebInfo";CZMQ_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ObjectFileName>$(IntDir)</ObjectFileName>
-    </ClCompile>
-    <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;DLL_EXPORT;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR=\"RelWithDebInfo\";CZMQ_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\libzmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\libzmq;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ResourceCompile>
-    <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\libzmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\libzmq;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
-      <HeaderFileName>%(Filename).h</HeaderFileName>
-      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
-      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
-      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
-    </Midl>
-    <Link>
-      <AdditionalDependencies>ws2_32.lib;Rpcrt4.lib;Iphlpapi.lib;..\libzmq\lib\RelWithDebInfo\libzmq-v141-mt-4_3_5.lib;ws2_32.lib;..\sodium\RelWithDebInfo\sodium.lib;rpcrt4.lib;iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/czmq/RelWithDebInfo/czmq.lib</ImportLibrary>
-      <ProgramDataBaseFile>C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/czmq/RelWithDebInfo/libczmq.pdb</ProgramDataBaseFile>
-      <SubSystem>Console</SubSystem>
-    </Link>
-    <ProjectReference>
-      <LinkLibraryDependencies>false</LinkLibraryDependencies>
-    </ProjectReference>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\libzmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\libzmq;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <ExceptionHandling>Sync</ExceptionHandling>
-      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <Optimization>MaxSpeed</Optimization>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;DLL_EXPORT;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR="RelWithDebInfo";CZMQ_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ObjectFileName>$(IntDir)</ObjectFileName>
-    </ClCompile>
-    <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;DLL_EXPORT;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR=\"RelWithDebInfo\";CZMQ_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\libzmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\libzmq;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ResourceCompile>
-    <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Admin\Documents\DEV\work\ingescape\src;C:\Users\Admin\Documents\DEV\work\ingescape\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\libzmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\include;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\libzmq;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\sodium\src\libsodium\include\sodium;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
-      <HeaderFileName>%(Filename).h</HeaderFileName>
-      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
-      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
-      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
-    </Midl>
-    <Link>
-      <AdditionalDependencies>ws2_32.lib;Rpcrt4.lib;Iphlpapi.lib;..\libzmq\lib\RelWithDebInfo\libzmq-v141-mt-4_3_5.lib;ws2_32.lib;..\sodium\RelWithDebInfo\sodium.lib;rpcrt4.lib;iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/czmq/RelWithDebInfo/czmq.lib</ImportLibrary>
-      <ProgramDataBaseFile>C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/czmq/RelWithDebInfo/libczmq.pdb</ProgramDataBaseFile>
-      <SubSystem>Console</SubSystem>
-    </Link>
-    <ProjectReference>
-      <LinkLibraryDependencies>false</LinkLibraryDependencies>
-    </ProjectReference>
-  </ItemDefinitionGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\CMakeLists.txt">
+    <CustomBuild Include="$(ProjectDir)..\..\..\..\dependencies\czmq\CMakeLists.txt">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/Admin/Documents/DEV/work/ingescape/dependencies/czmq/CMakeLists.txt</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building Custom Rule C:/Users/Admin/Documents/DEV/work/ingescape/dependencies/czmq/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
@@ -497,10 +279,10 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Program Files\CMake\share\cmake-3.20\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeConfigurableFile.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakePackageConfigHelpers.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTest.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTestTargets.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTestUseLaunchers.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckCSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckFunctionExists.c;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckFunctionExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFile.c.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFile.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFiles.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckLibraryExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\DartConfiguration.tcl.in;C:\Program Files\CMake\share\cmake-3.20\Modules\FeatureSummary.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindThreads.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\WriteBasicConfigVersionFile.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\CMakeFiles\3.20.0\CMakeCXXCompiler.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\CMakeFiles\CheckIncludeFiles\HAVE_NET_IF_H.c;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq\platform.h.in;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findlibcurl.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findlibmicrohttpd.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findlz4.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findnss.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findsystemd.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Finduuid.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\builds\cmake\Config.cmake.in;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\builds\cmake\Modules\ClangFormat.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\builds\cmake\clang-format-check.sh.in;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\CMakeLists-local.txt;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\libczmq.pc.in;%(AdditionalInputs)</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Program Files\CMake\share\cmake-3.20\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeConfigurableFile.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakePackageConfigHelpers.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTest.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTestTargets.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTestUseLaunchers.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckCSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckFunctionExists.c;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckFunctionExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFile.c.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFile.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFiles.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckLibraryExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\DartConfiguration.tcl.in;C:\Program Files\CMake\share\cmake-3.20\Modules\FeatureSummary.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindThreads.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\WriteBasicConfigVersionFile.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\CMakeFiles\3.20.0\CMakeCXXCompiler.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\CMakeFiles\CheckIncludeFiles\HAVE_NET_IF_H.c;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq\platform.h.in;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findlibcurl.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findlibmicrohttpd.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findlz4.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findnss.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findsystemd.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Finduuid.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\builds\cmake\Config.cmake.in;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\builds\cmake\Modules\ClangFormat.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\builds\cmake\clang-format-check.sh.in;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\CMakeLists-local.txt;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\libczmq.pc.in;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq\CMakeFiles\generate.stamp</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Program Files\CMake\share\cmake-3.20\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeConfigurableFile.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakePackageConfigHelpers.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTest.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTestTargets.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTestUseLaunchers.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckCSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckFunctionExists.c;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckFunctionExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFile.c.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFile.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFiles.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckLibraryExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\DartConfiguration.tcl.in;C:\Program Files\CMake\share\cmake-3.20\Modules\FeatureSummary.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindThreads.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\WriteBasicConfigVersionFile.cmake;$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\x64\CMakeFiles\3.20.0\CMakeCXXCompiler.cmake;$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\x64\CMakeFiles\CheckIncludeFiles\HAVE_NET_IF_H.c;$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\x64\dependencies\czmq\platform.h.in;$(ProjectDir)..\..\..\..\dependencies\czmq\Findlibcurl.cmake;$(ProjectDir)..\..\..\..\dependencies\czmq\Findlibmicrohttpd.cmake;$(ProjectDir)..\..\..\..\dependencies\czmq\Findlz4.cmake;$(ProjectDir)..\..\..\..\dependencies\czmq\Findnss.cmake;$(ProjectDir)..\..\..\..\dependencies\czmq\Findsystemd.cmake;$(ProjectDir)..\..\..\..\dependencies\czmq\Finduuid.cmake;$(ProjectDir)..\..\..\..\dependencies\czmq\builds\cmake\Config.cmake.in;$(ProjectDir)..\..\..\..\dependencies\czmq\builds\cmake\Modules\ClangFormat.cmake;$(ProjectDir)..\..\..\..\dependencies\czmq\builds\cmake\clang-format-check.sh.in;$(ProjectDir)..\..\..\..\dependencies\czmq\src\CMakeLists-local.txt;$(ProjectDir)..\..\..\..\dependencies\czmq\src\libczmq.pc.in;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Program Files\CMake\share\cmake-3.20\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeConfigurableFile.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakePackageConfigHelpers.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTest.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTestTargets.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTestUseLaunchers.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckCSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckFunctionExists.c;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckFunctionExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFile.c.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFile.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFiles.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckLibraryExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\DartConfiguration.tcl.in;C:\Program Files\CMake\share\cmake-3.20\Modules\FeatureSummary.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindThreads.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\WriteBasicConfigVersionFile.cmake;$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\x64\CMakeFiles\3.20.0\CMakeCXXCompiler.cmake;$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\x64\CMakeFiles\CheckIncludeFiles\HAVE_NET_IF_H.c;$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\x64\dependencies\czmq\platform.h.in;$(ProjectDir)..\..\..\..\dependencies\czmq\Findlibcurl.cmake;$(ProjectDir)..\..\..\..\dependencies\czmq\Findlibmicrohttpd.cmake;$(ProjectDir)..\..\..\..\dependencies\czmq\Findlz4.cmake;$(ProjectDir)..\..\..\..\dependencies\czmq\Findnss.cmake;$(ProjectDir)..\..\..\..\dependencies\czmq\Findsystemd.cmake;$(ProjectDir)..\..\..\..\dependencies\czmq\Finduuid.cmake;$(ProjectDir)..\..\..\..\dependencies\czmq\builds\cmake\Config.cmake.in;$(ProjectDir)..\..\..\..\dependencies\czmq\builds\cmake\Modules\ClangFormat.cmake;$(ProjectDir)..\..\..\..\dependencies\czmq\builds\cmake\clang-format-check.sh.in;$(ProjectDir)..\..\..\..\dependencies\czmq\src\CMakeLists-local.txt;$(ProjectDir)..\..\..\..\dependencies\czmq\src\libczmq.pc.in;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\x64\dependencies\czmq\CMakeFiles\generate.stamp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\x64\dependencies\czmq\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/Admin/Documents/DEV/work/ingescape/dependencies/czmq/CMakeLists.txt</Message>
@@ -523,486 +305,308 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Program Files\CMake\share\cmake-3.20\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeConfigurableFile.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakePackageConfigHelpers.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTest.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTestTargets.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTestUseLaunchers.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckCSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckFunctionExists.c;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckFunctionExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFile.c.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFile.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFiles.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckLibraryExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\DartConfiguration.tcl.in;C:\Program Files\CMake\share\cmake-3.20\Modules\FeatureSummary.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindThreads.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\WriteBasicConfigVersionFile.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\CMakeFiles\3.20.0\CMakeCXXCompiler.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\CMakeFiles\CheckIncludeFiles\HAVE_NET_IF_H.c;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq\platform.h.in;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findlibcurl.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findlibmicrohttpd.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findlz4.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findnss.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findsystemd.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Finduuid.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\builds\cmake\Config.cmake.in;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\builds\cmake\Modules\ClangFormat.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\builds\cmake\clang-format-check.sh.in;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\CMakeLists-local.txt;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\libczmq.pc.in;%(AdditionalInputs)</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Program Files\CMake\share\cmake-3.20\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeConfigurableFile.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakePackageConfigHelpers.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTest.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTestTargets.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTestUseLaunchers.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckCSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckFunctionExists.c;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckFunctionExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFile.c.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFile.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFiles.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckLibraryExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\DartConfiguration.tcl.in;C:\Program Files\CMake\share\cmake-3.20\Modules\FeatureSummary.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindThreads.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\WriteBasicConfigVersionFile.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\CMakeFiles\3.20.0\CMakeCXXCompiler.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\CMakeFiles\CheckIncludeFiles\HAVE_NET_IF_H.c;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq\platform.h.in;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findlibcurl.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findlibmicrohttpd.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findlz4.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findnss.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findsystemd.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Finduuid.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\builds\cmake\Config.cmake.in;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\builds\cmake\Modules\ClangFormat.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\builds\cmake\clang-format-check.sh.in;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\CMakeLists-local.txt;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\libczmq.pc.in;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq\CMakeFiles\generate.stamp</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Program Files\CMake\share\cmake-3.20\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeConfigurableFile.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakePackageConfigHelpers.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTest.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTestTargets.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTestUseLaunchers.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckCSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckFunctionExists.c;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckFunctionExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFile.c.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFile.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFiles.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckLibraryExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\DartConfiguration.tcl.in;C:\Program Files\CMake\share\cmake-3.20\Modules\FeatureSummary.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindThreads.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\WriteBasicConfigVersionFile.cmake;$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\x64\CMakeFiles\3.20.0\CMakeCXXCompiler.cmake;$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\x64\CMakeFiles\CheckIncludeFiles\HAVE_NET_IF_H.c;$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\x64\dependencies\czmq\platform.h.in;$(ProjectDir)..\..\..\..\dependencies\czmq\Findlibcurl.cmake;$(ProjectDir)..\..\..\..\dependencies\czmq\Findlibmicrohttpd.cmake;$(ProjectDir)..\..\..\..\dependencies\czmq\Findlz4.cmake;$(ProjectDir)..\..\..\..\dependencies\czmq\Findnss.cmake;$(ProjectDir)..\..\..\..\dependencies\czmq\Findsystemd.cmake;$(ProjectDir)..\..\..\..\dependencies\czmq\Finduuid.cmake;$(ProjectDir)..\..\..\..\dependencies\czmq\builds\cmake\Config.cmake.in;$(ProjectDir)..\..\..\..\dependencies\czmq\builds\cmake\Modules\ClangFormat.cmake;$(ProjectDir)..\..\..\..\dependencies\czmq\builds\cmake\clang-format-check.sh.in;$(ProjectDir)..\..\..\..\dependencies\czmq\src\CMakeLists-local.txt;$(ProjectDir)..\..\..\..\dependencies\czmq\src\libczmq.pc.in;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Program Files\CMake\share\cmake-3.20\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeConfigurableFile.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakePackageConfigHelpers.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTest.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTestTargets.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTestUseLaunchers.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckCSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckFunctionExists.c;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckFunctionExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFile.c.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFile.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFiles.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckLibraryExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\DartConfiguration.tcl.in;C:\Program Files\CMake\share\cmake-3.20\Modules\FeatureSummary.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindThreads.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\WriteBasicConfigVersionFile.cmake;$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\x64\CMakeFiles\3.20.0\CMakeCXXCompiler.cmake;$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\x64\CMakeFiles\CheckIncludeFiles\HAVE_NET_IF_H.c;$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\x64\dependencies\czmq\platform.h.in;$(ProjectDir)..\..\..\..\dependencies\czmq\Findlibcurl.cmake;$(ProjectDir)..\..\..\..\dependencies\czmq\Findlibmicrohttpd.cmake;$(ProjectDir)..\..\..\..\dependencies\czmq\Findlz4.cmake;$(ProjectDir)..\..\..\..\dependencies\czmq\Findnss.cmake;$(ProjectDir)..\..\..\..\dependencies\czmq\Findsystemd.cmake;$(ProjectDir)..\..\..\..\dependencies\czmq\Finduuid.cmake;$(ProjectDir)..\..\..\..\dependencies\czmq\builds\cmake\Config.cmake.in;$(ProjectDir)..\..\..\..\dependencies\czmq\builds\cmake\Modules\ClangFormat.cmake;$(ProjectDir)..\..\..\..\dependencies\czmq\builds\cmake\clang-format-check.sh.in;$(ProjectDir)..\..\..\..\dependencies\czmq\src\CMakeLists-local.txt;$(ProjectDir)..\..\..\..\dependencies\czmq\src\libczmq.pc.in;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\x64\dependencies\czmq\CMakeFiles\generate.stamp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\x64\dependencies\czmq\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/Admin/Documents/DEV/work/ingescape/dependencies/czmq/CMakeLists.txt</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Building Custom Rule C:/Users/Admin/Documents/DEV/work/ingescape/dependencies/czmq/CMakeLists.txt</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Admin/Documents/DEV/work/ingescape -BC:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64 --check-stamp-file C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/czmq/CMakeFiles/generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Admin/Documents/DEV/work/ingescape -BC:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64 --check-stamp-file C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/czmq/CMakeFiles/generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Program Files\CMake\share\cmake-3.20\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeConfigurableFile.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakePackageConfigHelpers.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTest.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTestTargets.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTestUseLaunchers.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckCSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckFunctionExists.c;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckFunctionExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFile.c.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFile.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFiles.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckLibraryExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\DartConfiguration.tcl.in;C:\Program Files\CMake\share\cmake-3.20\Modules\FeatureSummary.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindThreads.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\WriteBasicConfigVersionFile.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\CMakeFiles\3.20.0\CMakeCXXCompiler.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\CMakeFiles\CheckIncludeFiles\HAVE_NET_IF_H.c;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq\platform.h.in;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findlibcurl.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findlibmicrohttpd.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findlz4.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findnss.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findsystemd.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Finduuid.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\builds\cmake\Config.cmake.in;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\builds\cmake\Modules\ClangFormat.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\builds\cmake\clang-format-check.sh.in;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\CMakeLists-local.txt;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\libczmq.pc.in;%(AdditionalInputs)</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">C:\Program Files\CMake\share\cmake-3.20\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeConfigurableFile.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakePackageConfigHelpers.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTest.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTestTargets.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTestUseLaunchers.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckCSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckFunctionExists.c;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckFunctionExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFile.c.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFile.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFiles.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckLibraryExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\DartConfiguration.tcl.in;C:\Program Files\CMake\share\cmake-3.20\Modules\FeatureSummary.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindThreads.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\WriteBasicConfigVersionFile.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\CMakeFiles\3.20.0\CMakeCXXCompiler.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\CMakeFiles\CheckIncludeFiles\HAVE_NET_IF_H.c;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq\platform.h.in;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findlibcurl.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findlibmicrohttpd.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findlz4.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findnss.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findsystemd.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Finduuid.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\builds\cmake\Config.cmake.in;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\builds\cmake\Modules\ClangFormat.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\builds\cmake\clang-format-check.sh.in;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\CMakeLists-local.txt;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\libczmq.pc.in;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq\CMakeFiles\generate.stamp</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq\CMakeFiles\generate.stamp</Outputs>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/Admin/Documents/DEV/work/ingescape/dependencies/czmq/CMakeLists.txt</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Building Custom Rule C:/Users/Admin/Documents/DEV/work/ingescape/dependencies/czmq/CMakeLists.txt</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Admin/Documents/DEV/work/ingescape -BC:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64 --check-stamp-file C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/czmq/CMakeFiles/generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Admin/Documents/DEV/work/ingescape -BC:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64 --check-stamp-file C:/Users/Admin/Documents/DEV/work/ingescape/builds/visual-studio/dependencies/x64/dependencies/czmq/CMakeFiles/generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Program Files\CMake\share\cmake-3.20\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeConfigurableFile.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakePackageConfigHelpers.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTest.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTestTargets.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTestUseLaunchers.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckCSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckFunctionExists.c;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckFunctionExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFile.c.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFile.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFiles.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckLibraryExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\DartConfiguration.tcl.in;C:\Program Files\CMake\share\cmake-3.20\Modules\FeatureSummary.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindThreads.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\WriteBasicConfigVersionFile.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\CMakeFiles\3.20.0\CMakeCXXCompiler.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\CMakeFiles\CheckIncludeFiles\HAVE_NET_IF_H.c;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq\platform.h.in;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findlibcurl.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findlibmicrohttpd.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findlz4.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findnss.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findsystemd.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Finduuid.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\builds\cmake\Config.cmake.in;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\builds\cmake\Modules\ClangFormat.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\builds\cmake\clang-format-check.sh.in;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\CMakeLists-local.txt;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\libczmq.pc.in;%(AdditionalInputs)</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">C:\Program Files\CMake\share\cmake-3.20\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeConfigurableFile.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakePackageConfigHelpers.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTest.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTestTargets.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CTestUseLaunchers.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckCSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckFunctionExists.c;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckFunctionExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFile.c.in;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFile.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckIncludeFiles.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckLibraryExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CheckSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\DartConfiguration.tcl.in;C:\Program Files\CMake\share\cmake-3.20\Modules\FeatureSummary.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\FindThreads.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\WriteBasicConfigVersionFile.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\CMakeFiles\3.20.0\CMakeCXXCompiler.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\CMakeFiles\CheckIncludeFiles\HAVE_NET_IF_H.c;C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq\platform.h.in;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findlibcurl.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findlibmicrohttpd.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findlz4.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findnss.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Findsystemd.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\Finduuid.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\builds\cmake\Config.cmake.in;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\builds\cmake\Modules\ClangFormat.cmake;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\builds\cmake\clang-format-check.sh.in;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\CMakeLists-local.txt;C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\libczmq.pc.in;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq\CMakeFiles\generate.stamp</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">C:\Users\Admin\Documents\DEV\work\ingescape\builds\visual-studio\dependencies\x64\dependencies\czmq\CMakeFiles\generate.stamp</Outputs>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">false</LinkObjects>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>      
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zactor.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zactor.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zarmour.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zarmour.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zcert.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zcert.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zcertstore.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zcertstore.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zchunk.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zchunk.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zclock.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zclock.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zconfig.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zconfig.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zdigest.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zdigest.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zdir.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zdir.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zdir_patch.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zdir_patch.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zfile.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zfile.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zframe.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zframe.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zhash.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zhash.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zhashx.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zhashx.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\ziflist.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\ziflist.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zlist.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zlist.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zlistx.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zlistx.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zloop.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zloop.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zmsg.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zmsg.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zpoller.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zpoller.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zsock.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zsock.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zstr.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zstr.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zsys.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zsys.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zuuid.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zuuid.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zauth.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zauth.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zbeacon.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zbeacon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zgossip.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zgossip.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zmonitor.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zmonitor.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zproxy.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zproxy.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zrex.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zrex.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zgossip_msg.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zgossip_msg.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zargs.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zargs.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zproc.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zproc.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\ztimerset.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\ztimerset.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\ztrie.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\ztrie.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zhttp_client.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zhttp_client.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zhttp_server.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zhttp_server.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zhttp_server_options.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zhttp_server_options.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zhttp_request.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zhttp_request.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zhttp_response.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zhttp_response.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\zosc.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\zosc.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
-    <ClCompile Include="C:\Users\Admin\Documents\DEV\work\ingescape\dependencies\czmq\src\czmq_private_selftest.c">
+    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\czmq\src\czmq_private_selftest.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsCpp</CompileAs>
+      
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
