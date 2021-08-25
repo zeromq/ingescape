@@ -59,13 +59,15 @@ endif()
 
 set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT "${PROJECT_NAME}")
 
-install (TARGETS igsTester RUNTIME DESTINATION bin COMPONENT agent)
-install (TARGETS igsPartner RUNTIME DESTINATION bin COMPONENT agent)
-install(FILES
-	${CMAKE_CURRENT_SOURCE_DIR}/resources/tester.cert
-	${CMAKE_CURRENT_SOURCE_DIR}/resources/tester.cert_secret
-	${CMAKE_CURRENT_SOURCE_DIR}/resources/partner.cert
-	${CMAKE_CURRENT_SOURCE_DIR}/resources/partner.cert_secret
-        DESTINATION "share/ingescape/certificates"
-        PERMISSIONS OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
-        COMPONENT agent)
+if (NOT ${CMAKE_SYSTEM_NAME} STREQUAL "iOS")
+  install (TARGETS igsTester RUNTIME DESTINATION bin COMPONENT agent)
+  install (TARGETS igsPartner RUNTIME DESTINATION bin COMPONENT agent)
+  install(FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/resources/tester.cert
+    ${CMAKE_CURRENT_SOURCE_DIR}/resources/tester.cert_secret
+    ${CMAKE_CURRENT_SOURCE_DIR}/resources/partner.cert
+    ${CMAKE_CURRENT_SOURCE_DIR}/resources/partner.cert_secret
+          DESTINATION "share/ingescape/certificates"
+          PERMISSIONS OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+          COMPONENT agent)
+endif()
