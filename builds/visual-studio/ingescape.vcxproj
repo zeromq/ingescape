@@ -460,16 +460,16 @@
     <ResourceCompile Include="$(ProjectDir)\version.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="$(ProjectDir)dependencies\czmq\czmq.vcxproj">
+    <ProjectReference Include="$(ProjectDir)\dependencies\czmq\czmq.vcxproj">
       <Project>{2b160cc8-c0b5-318c-958d-38f7389c3d20}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(ProjectDir)dependencies\libzmq\libzmq.vcxproj">
+    <ProjectReference Include="$(ProjectDir)\dependencies\libzmq\libzmq.vcxproj">
       <Project>{1728f069-24e8-31bc-8c5e-6b6e0f33f228}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(ProjectDir)dependencies\sodium\sodium.vcxproj">
+    <ProjectReference Include="$(ProjectDir)\dependencies\sodium\sodium.vcxproj">
       <Project>{6df21852-05c8-3718-9b1e-56638c23117c}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(ProjectDir)dependencies\zyre\zyre.vcxproj">
+    <ProjectReference Include="$(ProjectDir)\dependencies\zyre\zyre.vcxproj">
       <Project>{caef1fae-e7fa-376d-b9cf-ee1c3b2ed12a}</Project>
     </ProjectReference>
   </ItemGroup>
