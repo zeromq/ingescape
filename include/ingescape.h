@@ -151,7 +151,8 @@ INGESCAPE_EXPORT bool igs_is_started(void);
  the main thread and the ingescape thread.
  */
 typedef void (igs_forced_stop_fn)(void *my_data);
-INGESCAPE_EXPORT void igs_observe_forced_stop(igs_forced_stop_fn cb, void *my_data);
+INGESCAPE_EXPORT void igs_observe_forced_stop(igs_forced_stop_fn cb,
+                                              void *my_data);
 //zeromq pipe to receive stop event from ingescape in a thread-safe way
 INGESCAPE_EXPORT zsock_t * igs_pipe_to_ingescape(void);
 
@@ -254,10 +255,18 @@ INGESCAPE_EXPORT void igs_definition_set_description(const char *description);
 INGESCAPE_EXPORT void igs_definition_set_version(const char *version);
 
 //edit the definition
-INGESCAPE_EXPORT igs_result_t igs_input_create(const char *name, igs_iop_value_type_t value_type, void *value, size_t size);
-INGESCAPE_EXPORT igs_result_t igs_output_create(const char *name, igs_iop_value_type_t value_type, void *value, size_t size);
-INGESCAPE_EXPORT igs_result_t igs_parameter_create(const char *name, igs_iop_value_type_t value_type, void *value, size_t size);
-
+INGESCAPE_EXPORT igs_result_t igs_input_create(const char *name,
+                                               igs_iop_value_type_t value_type,
+                                               void *value,
+                                               size_t size);
+INGESCAPE_EXPORT igs_result_t igs_output_create(const char *name,
+                                                igs_iop_value_type_t value_type,
+                                                void *value,
+                                                size_t size);
+INGESCAPE_EXPORT igs_result_t igs_parameter_create(const char *name,
+                                                   igs_iop_value_type_t value_type,
+                                                   void *value,
+                                                   size_t size);
 INGESCAPE_EXPORT igs_result_t igs_input_remove(const char *name);
 INGESCAPE_EXPORT igs_result_t igs_output_remove(const char *name);
 INGESCAPE_EXPORT igs_result_t igs_parameter_remove(const char *name);
@@ -368,15 +377,23 @@ INGESCAPE_EXPORT void igs_clear_mappings(void); //clears all our mappings with a
 INGESCAPE_EXPORT void igs_clear_mappings_with_agent(const char *agent_name); //clears our mappings with this agent
 
 //edit our mappings
-INGESCAPE_EXPORT uint64_t igs_mapping_add(const char *from_our_input, const char *to_agent, const char *with_output); //returns mapping id or zero if creation failed
+INGESCAPE_EXPORT uint64_t igs_mapping_add(const char *from_our_input,
+                                          const char *to_agent,
+                                          const char *with_output); //returns mapping id or zero if creation failed
 INGESCAPE_EXPORT igs_result_t igs_mapping_remove_with_id(uint64_t id);
-INGESCAPE_EXPORT igs_result_t igs_mapping_remove_with_name(const char *from_our_input, const char *to_agent, const char *with_output);
+INGESCAPE_EXPORT igs_result_t igs_mapping_remove_with_name(const char *from_our_input,
+                                                           const char *to_agent,
+                                                           const char *with_output);
 
 //edit our splits
 INGESCAPE_EXPORT size_t igs_split_count(void); //number of splits entries
-INGESCAPE_EXPORT uint64_t igs_split_add(const char *from_our_input, const char *to_agent, const char *with_output); //returns split id or zero if creation failed
+INGESCAPE_EXPORT uint64_t igs_split_add(const char *from_our_input,
+                                        const char *to_agent,
+                                        const char *with_output); //returns split id or zero if creation failed
 INGESCAPE_EXPORT igs_result_t igs_split_remove_with_id(uint64_t the_id);
-INGESCAPE_EXPORT igs_result_t igs_split_remove_with_name(const char *from_our_input, const char *to_agent, const char *with_output);
+INGESCAPE_EXPORT igs_result_t igs_split_remove_with_name(const char *from_our_input,
+                                                         const char *to_agent,
+                                                         const char *with_output);
 
 /*When mapping other agents, it is possible to ask the mapped
  agents to send us their current output values through a dedicated
@@ -433,26 +450,24 @@ INGESCAPE_EXPORT igs_result_t igs_service_call (const char *agent_name_or_uuid,
                                                 igs_service_arg_t **list,
                                                 const char *token);
 
-/*create /remove / edit a service within our agent
- NB: Services can be created either by code or by loading a definition. The igs_service_init
- function creates a service if it does not exist or attaches callback function and data if
- they are stil undefined.
+/*create /remove / edit a service offered by our agent
  Warning: only one callback can be attached to a service (further attempts will be ignored
  and signaled by an error log). */
 typedef void (igs_service_fn)(const char *sender_agent_name,
-                               const char *sender_agent_uuid,
-                               const char *service_name,
-                               igs_service_arg_t *first_argument,
-                               size_t args_nbr,
-                               const char *token,
-                               void* my_data);
+                              const char *sender_agent_uuid,
+                              const char *service_name,
+                              igs_service_arg_t *first_argument,
+                              size_t args_nbr,
+                              const char *token,
+                              void* my_data);
 
 INGESCAPE_EXPORT igs_result_t igs_service_init(const char *name, igs_service_fn cb, void *my_data);
 INGESCAPE_EXPORT igs_result_t igs_service_remove(const char *name);
 INGESCAPE_EXPORT igs_result_t igs_service_arg_add(const char *service_name, const char *arg_name, igs_iop_value_type_t type);
-INGESCAPE_EXPORT igs_result_t igs_service_arg_remove(const char *service_name, const char *arg_name); //removes first occurence of an argument with this name
+INGESCAPE_EXPORT igs_result_t igs_service_arg_remove(const char *service_name,
+                                                     const char *arg_name); //removes first occurence of an argument with this name
 
-//introspection for services, arguments and replies
+//introspection for services and their arguments
 INGESCAPE_EXPORT size_t igs_service_count(void);
 INGESCAPE_EXPORT bool igs_service_exists(const char *name);
 INGESCAPE_EXPORT char ** igs_service_list(size_t *services_nbr);//returned char** must be freed using igs_free_services_list
@@ -473,7 +488,10 @@ INGESCAPE_EXPORT bool igs_service_arg_exists(const char *service_name, const cha
 
 typedef void (igs_timer_fn) (int timer_id,
                              void *my_data);
-INGESCAPE_EXPORT int igs_timer_start(size_t delay, size_t times, igs_timer_fn cb, void *my_data); //returns timer id or -1 if error
+INGESCAPE_EXPORT int igs_timer_start(size_t delay,
+                                     size_t times,
+                                     igs_timer_fn cb,
+                                     void *my_data); //returns timer id or -1 if error
 INGESCAPE_EXPORT void igs_timer_stop(int timer_id);
 
 
@@ -765,9 +783,9 @@ typedef enum {
 } igs_monitor_event_t;
 
 typedef void (igs_monitor_fn)(igs_monitor_event_t event,
-                               const char *device,
-                               const char *ip_address,
-                               void *my_data);
+                              const char *device,
+                              const char *ip_address,
+                              void *my_data);
 INGESCAPE_EXPORT void igs_observe_monitor(igs_monitor_fn cb, void *my_data);
 
 

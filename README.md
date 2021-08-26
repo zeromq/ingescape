@@ -34,10 +34,15 @@ Ingescape is a framework for the orchestration of broker-free distributed hetero
 Ingescape brings a neat and easy model-based approach to describe and enforce the communications between agents. The model supports:
 
 - **Data flow** : Agents expose named and typed inputs and outputs. Each agent describes a mapping between its inputs and outputs of other agents resulting in a global data flow architecture. Ingescape data flow uses high-speed, low-latency PUB/SUB communications from outputs of  agents to inputs of other agents, with the optional capability to dispatch data between workers for workload distribution.
+
+
+![three agents mapped together into a platform](./doc/images/three_agents_mapped_together_into_a_platform.png)
+
 - **Request/reply services**: Agents expose named services with named and typed parameters that are equivalent to REST-like web services on one hand and RPC/RMI solutions on the other hand. Any agent can both expose its own services and use services from other agents, without strict client/server segmentations.
 
+![services sequence](./doc/images/services_sequence.png)
 
-Because Ingescape is developed in C, it can be used out of the box in C++ and Objective-C and bindings can be created for practically any programming language on any operating system. At the moment,  official bindings exist for C#, Python, QML Javascript and NodeJS Javascript. Android Java, ORacle JRE Java and web-app Javascript are also supported with some peculiarities. If you need support for another language, please create an issue or - even better - submit your binding as a merge request!
+Because Ingescape is developed in C, it can be used out of the box in C++ and Objective-C and bindings can be created for practically any programming language on any operating system. At the moment,  official bindings exist for C#, Python, QML Javascript and NodeJS Javascript. Android Java, Oracle JRE Java and web-app Javascript are also supported with some peculiarities. If you need support for another language, please create an issue or - even better - submit your binding as a merge request!
 
 
 ## Scope and Goals
@@ -115,7 +120,7 @@ Dependencies are fetched from forks managed by the ingescape team on github and 
 
 All the dependencies need to be fetched and installed from their official repositories using the latest master or stable tags. Because Ingescape uses draft APIs from CZMQ and Zyre, compilation might rarely break depending on their respective evolutions and the delay to make the necessary updates.
 
- 	git clone --depth 1 -b stable https://github.com/jedisct1/libsodium.git
+    git clone --depth 1 -b stable https://github.com/jedisct1/libsodium.git
     cd libsodium
     ./autogen.sh && ./configure && make check
     make -j8
@@ -126,7 +131,7 @@ All the dependencies need to be fetched and installed from their official reposi
     cd libzmq
     mkdir build
     cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DWITH_LIBSODIUM=ON -DENABLE_DRAFTS=ON -DWITH_TLS=OFF -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11
-    make -j8 -C build check
+    make -j8 -C build
     sudo make -C build install
     sudo ldconfig
     cd ..
@@ -135,7 +140,7 @@ All the dependencies need to be fetched and installed from their official reposi
     cd czmq
     mkdir build
     cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DENABLE_DRAFTS=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11
-    make -j8 -C build check
+    make -j8 -C build
     sudo make -C build install
     sudo ldconfig
     cd ..
@@ -144,18 +149,18 @@ All the dependencies need to be fetched and installed from their official reposi
     cd zyre
     mkdir build
     cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DENABLE_DRAFTS=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11
-    make -j8 -C build check
+    make -j8 -C build
     sudo make -C build install
     sudo ldconfig
     cd ..
 
-	git clone git://github.com/zeromq/ingescape.git
-	cd ingescape
+    git clone git://github.com/zeromq/ingescape.git
+    cd ingescape
     mkdir build
-	cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11
-	make -j8 -C build
-	sudo make -C build install
-	sudo ldconfig
+    cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11
+    make -j8 -C build
+    sudo make -C build install
+    sudo ldconfig
     cd ..
 
 
@@ -225,8 +230,11 @@ To illustrate the use of mappings between inputs/outputs and the use of services
 
 Both agents are coded to map their input to each other's output. It is illustrated this way :
 
-In the same way, the services are designed to communicate this way:
-[Ajouter diagramme de séquence avec les deux agents et les deux services]
+![example mapping](./doc/images/example_mapping.png)
+
+Services are designed to communicate this way:
+
+![example services sequence](./doc/images/example_services_sequence.png)
 
 
 ### The code and compilation
