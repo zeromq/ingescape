@@ -563,8 +563,8 @@ int main(int argc, const char * argv[]) {
     //TODO: test loading valid string and file definitions
     igs_definition_set_description("my description");
     char *defDesc = igs_definition_description();
-    free(defDesc);
     assert(streq(defDesc, "my description"));
+	free(defDesc);
     igs_definition_set_version("version");
     char *defVer = igs_definition_version();
     assert(streq(defVer, "version"));
@@ -1043,7 +1043,7 @@ int main(int argc, const char * argv[]) {
 
     assert(igs_split_count() == 0);
     assert(igs_split_add("toto", "other_agent", "tata") != 0);
-    long splitId = igs_split_add("toto", "other_agent", "tata");
+	uint64_t splitId = igs_split_add("toto", "other_agent", "tata");
     assert(splitId > 0);
     assert(igs_split_count() == 1);
     assert(igs_split_remove_with_id(12345) == IGS_FAILURE);
