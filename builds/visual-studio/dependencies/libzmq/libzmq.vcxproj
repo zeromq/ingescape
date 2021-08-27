@@ -1563,8 +1563,6 @@
     </None>
     <None Include="$(ProjectDir)..\..\..\..\dependencies\libzmq\NEWS">
     </None>
-    <ClInclude Include="$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\NSIS.template.in" />
-    <ResourceCompile Include="$(ProjectDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\version.rc" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(ProjectDir)..\sodium\sodium.vcxproj">

@@ -37,5 +37,3 @@ build/
 .deps
 .libs
 dependencies/yajl/build/
-
-builds/visual-studio/dependencies/libzmq/NSIS.template.in
