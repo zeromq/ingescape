@@ -457,7 +457,6 @@
     <ClCompile Include="$(ProjectDir)..\..\src\yajl_tree.c" />
     <ClCompile Include="$(ProjectDir)..\..\src\yajl_version.c" />
     <ClCompile Include="$(ProjectDir)..\..\src\yajl.c" />
-    <ResourceCompile Include="$(ProjectDir)\version.rc" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(ProjectDir)\dependencies\czmq\czmq.vcxproj">
