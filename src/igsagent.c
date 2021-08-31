@@ -77,6 +77,8 @@ void igsagent_destroy (igsagent_t **agent)
         free ((*agent)->services_channel);
     if ((*agent)->calls_channel)
         free ((*agent)->calls_channel);
+    if ((*agent)->igs_channel)
+        free ((*agent)->igs_channel);
 
     igsagent_wrapper_t *activate_cb, *activatetmp;
     DL_FOREACH_SAFE ((*agent)->activate_callbacks, activate_cb, activatetmp)
@@ -130,6 +132,7 @@ igs_result_t igsagent_activate (igsagent_t *agent)
         s_lock_zyre_peer ();
         zyre_join (agent->context->node, agent->services_channel);
         zyre_join (agent->context->node, agent->calls_channel);
+        zyre_join (agent->context->node, agent->igs_channel);
         s_unlock_zyre_peer ();
     }
 
@@ -195,6 +198,7 @@ igs_result_t igsagent_deactivate (igsagent_t *agent)
         zyre_shout (agent->context->node, IGS_PRIVATE_CHANNEL, &msg);
         zyre_leave (agent->context->node, agent->services_channel);
         zyre_leave (agent->context->node, agent->calls_channel);
+        zyre_leave (agent->context->node, agent->igs_channel);
         s_unlock_zyre_peer ();
     }
     agent->context = NULL;

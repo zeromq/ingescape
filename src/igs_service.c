@@ -717,6 +717,11 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                              agent->definition->name, agent->uuid,
                              remote_agent->definition->name, service_name,
                              remote_agent->uuid);
+                zyre_shouts (agent->context->node, agent->igs_channel,
+                             "SERVICE %s(%s) %s.%s(%s)",
+                             agent->definition->name, agent->uuid,
+                             remote_agent->definition->name, service_name,
+                             remote_agent->uuid);
                 zyre_whisper (agent->context->node, remote_agent->peer->peer_id,
                               &msg);
                 s_unlock_zyre_peer ();
@@ -811,6 +816,11 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                                  local_agent->uuid);
                     zyre_shouts (agent->context->node, agent->services_channel,
                                  "%s(%s) services %s.%s(%s)",
+                                 agent->definition->name, agent->uuid,
+                                 local_agent->definition->name, service_name,
+                                 local_agent->uuid);
+                    zyre_shouts (agent->context->node, agent->igs_channel,
+                                 "SERVICE %s(%s) %s.%s(%s)",
                                  agent->definition->name, agent->uuid,
                                  local_agent->definition->name, service_name,
                                  local_agent->uuid);

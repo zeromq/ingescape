@@ -162,6 +162,37 @@ void s_split_trigger_send_message_to_worker (igs_core_context_t *context, char *
                         default:
                             break;
                     }
+                    if (context->node != NULL) {
+                        igsagent_t *local_agent, *atmp;
+                        HASH_ITER(hh, context->agents, local_agent, atmp)
+                        {
+                            if(local_agent
+                               && local_agent->igs_channel
+                               && local_agent->uuid
+                               && strcmp(local_agent->uuid, splitter_uuid) == 0)
+                            {
+                                igs_remote_agent_t *remote_agent, *rtmp;
+                                HASH_ITER(hh, context->remote_agents, remote_agent, rtmp)
+                                {
+                                    if(remote_agent
+                                       && remote_agent->uuid
+                                       && strcmp(remote_agent->uuid, max_credit_worker->agent_uuid) == 0
+                                       && remote_agent->definition->name)
+                                    {
+                                        zyre_shouts (context->node, local_agent->igs_channel,
+                                                     "SPLIT %s(%s).%s %s(%s).%s",
+                                                     local_agent->definition->name,
+                                                     splitter->agent_uuid,
+                                                     output->name,
+                                                     remote_agent->definition->name,
+                                                     max_credit_worker->agent_uuid,
+                                                     max_credit_worker->input_name);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     igs_channel_whisper_zmsg(max_credit_worker->agent_uuid, &readyMessage);
 
                     igs_queued_work_t *tmp = splitter->queued_split;
