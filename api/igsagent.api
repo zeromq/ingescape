@@ -373,12 +373,6 @@
         <return type = "igs result t" callback = "1" />
     </method>
 
-    <method name = "parameter set impulsion">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <return type = "igs result t" callback = "1" />
-    </method>
-
     <method name = "parameter set data">
         DOC_STRING
         <argument name = "name" type = "string" />
