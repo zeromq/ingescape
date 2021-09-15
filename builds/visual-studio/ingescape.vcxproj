@@ -1,0 +1,478 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{B30376DD-096B-3792-AC2B-A4534624E3CB}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>ingescape</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)\$(Configuration)\$(Platform)</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)\ingescape.dir\$(Configuration)\$(Platform)</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ingescaped</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ingescaped</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.dll</TargetExt>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.dll</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)\$(Configuration)\$(Platform)</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)\ingescape.dir\$(Configuration)\$(Platform)</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ingescape</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ingescape</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.dll</TargetExt>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.dll</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(ProjectDir)\$(Configuration)\$(Platform)</OutDir>
+    <IntDir>$(ProjectDir)\ingescape.dir\$(Configuration)\$(Platform)</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(ProjectDir)\$(Configuration)\$(Platform)</OutDir>
+    <IntDir>$(ProjectDir)\ingescape.dir\$(Configuration)\$(Platform)</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\dependencies\libzmq\include;$(ProjectDir)..\..\dependencies\czmq\include;$(ProjectDir)..\..\dependencies\zyre\include;$(ProjectDir)..\..\include;$(ProjectDir)..\..\src;$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir)\dependencies\libzmq;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <CompileAs>CompileAsC</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;INGESCAPE=1;TARGET_OS_IOS=0;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR="Debug";INGESCAPE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;INGESCAPE=1;TARGET_OS_IOS=0;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR=\"Debug\";ingescape_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\dependencies\libzmq\include;$(ProjectDir)..\..\dependencies\czmq\include;$(ProjectDir)..\..\dependencies\zyre\include;$(ProjectDir)..\..\src\include;$(ProjectDir)..\..\dependencies\yajl\src\api;$(ProjectDir)..\..\dependencies\windows\unix;C:\Program Files\ingescape\include;$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir)\dependencies\libzmq;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\dependencies\libzmq\include;$(ProjectDir)..\..\dependencies\czmq\include;$(ProjectDir)..\..\dependencies\zyre\include;$(ProjectDir)..\..\src\include;$(ProjectDir)..\..\dependencies\yajl\src\api;$(ProjectDir)..\..\dependencies\windows\unix;C:\Program Files\ingescape\include;$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir)\dependencies\libzmq;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>$(ProjectDir)dependencies\zyre\$(Configuration)\$(Platform)\zyre.lib;ws2_32.lib;$(ProjectDir)dependencies\czmq\$(Configuration)\$(Platform)\czmq.lib;$(ProjectDir)dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-gd-4_3_5.lib;$(ProjectDir)dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib;rpcrt4.lib;iphlpapi.lib;Rpcrt4.lib;Iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>$(ProjectDir)/$(Configuration)/$(Platform)/ingescaped.lib</ImportLibrary>
+      <ProgramDataBaseFile>$(ProjectDir)/$(Configuration)/$(Platform)/ingescaped.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\dependencies\libzmq\include;$(ProjectDir)..\..\dependencies\czmq\include;$(ProjectDir)..\..\dependencies\zyre\include;$(ProjectDir)..\..\include;$(ProjectDir)..\..\src;$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir)\dependencies\libzmq;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <CompileAs>CompileAsC</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;INGESCAPE=1;TARGET_OS_IOS=0;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR="Debug";INGESCAPE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;INGESCAPE=1;TARGET_OS_IOS=0;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR=\"Debug\";ingescape_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\dependencies\libzmq\include;$(ProjectDir)..\..\dependencies\czmq\include;$(ProjectDir)..\..\dependencies\zyre\include;$(ProjectDir)..\..\src\include;$(ProjectDir)..\..\dependencies\yajl\src\api;$(ProjectDir)..\..\dependencies\windows\unix;C:\Program Files\ingescape\include;$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir)\dependencies\libzmq;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\dependencies\libzmq\include;$(ProjectDir)..\..\dependencies\czmq\include;$(ProjectDir)..\..\dependencies\zyre\include;$(ProjectDir)..\..\src\include;$(ProjectDir)..\..\dependencies\yajl\src\api;$(ProjectDir)..\..\dependencies\windows\unix;C:\Program Files\ingescape\include;$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir)\dependencies\libzmq;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>$(ProjectDir)dependencies\zyre\$(Configuration)\$(Platform)\zyre.lib;ws2_32.lib;$(ProjectDir)dependencies\czmq\$(Configuration)\$(Platform)\czmq.lib;$(ProjectDir)dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-gd-4_3_5.lib;$(ProjectDir)dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib;rpcrt4.lib;iphlpapi.lib;Rpcrt4.lib;Iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x86</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>$(ProjectDir)/$(Configuration)/$(Platform)/ingescaped.lib</ImportLibrary>
+      <ProgramDataBaseFile>$(ProjectDir)/$(Configuration)/$(Platform)/ingescaped.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\dependencies\libzmq\include;$(ProjectDir)..\..\dependencies\czmq\include;$(ProjectDir)..\..\dependencies\zyre\include;$(ProjectDir)..\..\include;$(ProjectDir)..\..\src;$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir)\dependencies\libzmq;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) -O3</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <CompileAs>CompileAsC</CompileAs>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;INGESCAPE=1;TARGET_OS_IOS=0;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR="Release";ingescape_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;INGESCAPE=1;TARGET_OS_IOS=0;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR=\"Release\";ingescape_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\dependencies\libzmq\include;$(ProjectDir)..\..\dependencies\czmq\include;$(ProjectDir)..\..\dependencies\zyre\include;$(ProjectDir)..\..\src\include;$(ProjectDir)..\..\dependencies\yajl\src\api;$(ProjectDir)..\..\dependencies\windows\unix;C:\Program Files\ingescape\include;$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir)\dependencies\libzmq;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\dependencies\libzmq\include;$(ProjectDir)..\..\dependencies\czmq\include;$(ProjectDir)..\..\dependencies\zyre\include;$(ProjectDir)..\..\src\include;$(ProjectDir)..\..\dependencies\yajl\src\api;$(ProjectDir)..\..\dependencies\windows\unix;C:\Program Files\ingescape\include;$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir)\dependencies\libzmq;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>$(ProjectDir)dependencies\zyre\$(Configuration)\$(Platform)\zyre.lib;ws2_32.lib;$(ProjectDir)dependencies\czmq\$(Configuration)\$(Platform)\czmq.lib;$(ProjectDir)dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-4_3_5.lib;$(ProjectDir)dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib;rpcrt4.lib;iphlpapi.lib;Rpcrt4.lib;Iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>$(ProjectDir)/$(Configuration)/$(Platform)/ingescape.lib</ImportLibrary>
+      <ProgramDataBaseFile>$(ProjectDir)/$(Configuration)/$(Platform)/ingescape.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\dependencies\libzmq\include;$(ProjectDir)..\..\dependencies\czmq\include;$(ProjectDir)..\..\dependencies\zyre\include;$(ProjectDir)..\..\include;$(ProjectDir)..\..\src;$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir)\dependencies\libzmq;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) -O3</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <CompileAs>CompileAsC</CompileAs>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;INGESCAPE=1;TARGET_OS_IOS=0;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR="Release";ingescape_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;INGESCAPE=1;TARGET_OS_IOS=0;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR=\"Release\";ingescape_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\dependencies\libzmq\include;$(ProjectDir)..\..\dependencies\czmq\include;$(ProjectDir)..\..\dependencies\zyre\include;$(ProjectDir)..\..\src\include;$(ProjectDir)..\..\dependencies\yajl\src\api;$(ProjectDir)..\..\dependencies\windows\unix;C:\Program Files\ingescape\include;$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir)\dependencies\libzmq;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\dependencies\libzmq\include;$(ProjectDir)..\..\dependencies\czmq\include;$(ProjectDir)..\..\dependencies\zyre\include;$(ProjectDir)..\..\src\include;$(ProjectDir)..\..\dependencies\yajl\src\api;$(ProjectDir)..\..\dependencies\windows\unix;C:\Program Files\ingescape\include;$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir)\dependencies\libzmq;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>$(ProjectDir)dependencies\zyre\$(Configuration)\$(Platform)\zyre.lib;ws2_32.lib;$(ProjectDir)dependencies\czmq\$(Configuration)\$(Platform)\czmq.lib;$(ProjectDir)dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-4_3_5.lib;$(ProjectDir)dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib;rpcrt4.lib;iphlpapi.lib;Rpcrt4.lib;Iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x86</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>$(ProjectDir)/$(Configuration)/$(Platform)/ingescape.lib</ImportLibrary>
+      <ProgramDataBaseFile>$(ProjectDir)/$(Configuration)/$(Platform)/ingescape.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\dependencies\libzmq\include;$(ProjectDir)..\..\dependencies\czmq\include;$(ProjectDir)..\..\dependencies\zyre\include;$(ProjectDir)..\..\src\include;$(ProjectDir)..\..\dependencies\yajl\src\api;$(ProjectDir)..\..\dependencies\windows\unix;C:\Program Files\ingescape\include;$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir)\dependencies\libzmq;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <CompileAs>CompileAsC</CompileAs>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;INGESCAPE=1;TARGET_OS_IOS=0;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR="MinSizeRel";ingescape_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;INGESCAPE=1;TARGET_OS_IOS=0;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR=\"MinSizeRel\";ingescape_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\dependencies\libzmq\include;$(ProjectDir)..\..\dependencies\czmq\include;$(ProjectDir)..\..\dependencies\zyre\include;$(ProjectDir)..\..\src\include;$(ProjectDir)..\..\dependencies\yajl\src\api;$(ProjectDir)..\..\dependencies\windows\unix;C:\Program Files\ingescape\include;$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir)\dependencies\libzmq;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\dependencies\libzmq\include;$(ProjectDir)..\..\dependencies\czmq\include;$(ProjectDir)..\..\dependencies\zyre\include;$(ProjectDir)..\..\src\include;$(ProjectDir)..\..\dependencies\yajl\src\api;$(ProjectDir)..\..\dependencies\windows\unix;C:\Program Files\ingescape\include;$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir)\dependencies\libzmq;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>dependencies\zyre\MinSizeRel\zyre.lib;ws2_32.lib;dependencies\czmq\MinSizeRel\czmq.lib;dependencies\libzmq\lib\MinSizeRel\libzmq-v141-mt-4_3_5.lib;dependencies\sodium\MinSizeRel\sodium.lib;rpcrt4.lib;iphlpapi.lib;ws2_32.lib;Rpcrt4.lib;Iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>$(ProjectDir)/MinSizeRel/ingescape.lib</ImportLibrary>
+      <ProgramDataBaseFile>$(ProjectDir)/MinSizeRel/ingescape.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\dependencies\libzmq\include;$(ProjectDir)..\..\dependencies\czmq\include;$(ProjectDir)..\..\dependencies\zyre\include;$(ProjectDir)..\..\src\include;$(ProjectDir)..\..\dependencies\yajl\src\api;$(ProjectDir)..\..\dependencies\windows\unix;C:\Program Files\ingescape\include;$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir)\dependencies\libzmq;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <CompileAs>CompileAsC</CompileAs>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;INGESCAPE=1;TARGET_OS_IOS=0;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR="MinSizeRel";ingescape_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;INGESCAPE=1;TARGET_OS_IOS=0;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR=\"MinSizeRel\";ingescape_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\dependencies\libzmq\include;$(ProjectDir)..\..\dependencies\czmq\include;$(ProjectDir)..\..\dependencies\zyre\include;$(ProjectDir)..\..\src\include;$(ProjectDir)..\..\dependencies\yajl\src\api;$(ProjectDir)..\..\dependencies\windows\unix;C:\Program Files\ingescape\include;$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir)\dependencies\libzmq;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\dependencies\libzmq\include;$(ProjectDir)..\..\dependencies\czmq\include;$(ProjectDir)..\..\dependencies\zyre\include;$(ProjectDir)..\..\src\include;$(ProjectDir)..\..\dependencies\yajl\src\api;$(ProjectDir)..\..\dependencies\windows\unix;C:\Program Files\ingescape\include;$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir)\dependencies\libzmq;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>dependencies\zyre\MinSizeRel\zyre.lib;ws2_32.lib;dependencies\czmq\MinSizeRel\czmq.lib;dependencies\libzmq\lib\MinSizeRel\libzmq-v141-mt-4_3_5.lib;dependencies\sodium\MinSizeRel\sodium.lib;rpcrt4.lib;iphlpapi.lib;ws2_32.lib;Rpcrt4.lib;Iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>$(ProjectDir)/MinSizeRel/ingescape.lib</ImportLibrary>
+      <ProgramDataBaseFile>$(ProjectDir)/MinSizeRel/ingescape.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\dependencies\libzmq\include;$(ProjectDir)..\..\dependencies\czmq\include;$(ProjectDir)..\..\dependencies\zyre\include;$(ProjectDir)..\..\src\include;$(ProjectDir)..\..\dependencies\yajl\src\api;$(ProjectDir)..\..\dependencies\windows\unix;C:\Program Files\ingescape\include;$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir)\dependencies\libzmq;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <CompileAs>CompileAsC</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;INGESCAPE=1;TARGET_OS_IOS=0;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR="RelWithDebInfo";ingescape_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;INGESCAPE=1;TARGET_OS_IOS=0;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR=\"RelWithDebInfo\";ingescape_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\dependencies\libzmq\include;$(ProjectDir)..\..\dependencies\czmq\include;$(ProjectDir)..\..\dependencies\zyre\include;$(ProjectDir)..\..\src\include;$(ProjectDir)..\..\dependencies\yajl\src\api;$(ProjectDir)..\..\dependencies\windows\unix;C:\Program Files\ingescape\include;$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir)\dependencies\libzmq;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\dependencies\libzmq\include;$(ProjectDir)..\..\dependencies\czmq\include;$(ProjectDir)..\..\dependencies\zyre\include;$(ProjectDir)..\..\src\include;$(ProjectDir)..\..\dependencies\yajl\src\api;$(ProjectDir)..\..\dependencies\windows\unix;C:\Program Files\ingescape\include;$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir)\dependencies\libzmq;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>dependencies\zyre\RelWithDebInfo\zyre.lib;ws2_32.lib;dependencies\czmq\RelWithDebInfo\czmq.lib;dependencies\libzmq\lib\RelWithDebInfo\libzmq-v141-mt-4_3_5.lib;dependencies\sodium\RelWithDebInfo\sodium.lib;rpcrt4.lib;iphlpapi.lib;ws2_32.lib;Rpcrt4.lib;Iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>$(ProjectDir)/RelWithDebInfo/ingescape.lib</ImportLibrary>
+      <ProgramDataBaseFile>$(ProjectDir)/RelWithDebInfo/ingescape.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\dependencies\libzmq\include;$(ProjectDir)..\..\dependencies\czmq\include;$(ProjectDir)..\..\dependencies\zyre\include;$(ProjectDir)..\..\src\include;$(ProjectDir)..\..\dependencies\yajl\src\api;$(ProjectDir)..\..\dependencies\windows\unix;C:\Program Files\ingescape\include;$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir)\dependencies\libzmq;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <CompileAs>CompileAsC</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;INGESCAPE=1;TARGET_OS_IOS=0;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR="RelWithDebInfo";ingescape_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;INGESCAPE=1;TARGET_OS_IOS=0;ZYRE_BUILD_DRAFT_API;CZMQ_BUILD_DRAFT_API;CMAKE_INTDIR=\"RelWithDebInfo\";ingescape_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\dependencies\libzmq\include;$(ProjectDir)..\..\dependencies\czmq\include;$(ProjectDir)..\..\dependencies\zyre\include;$(ProjectDir)..\..\src\include;$(ProjectDir)..\..\dependencies\yajl\src\api;$(ProjectDir)..\..\dependencies\windows\unix;C:\Program Files\ingescape\include;$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir)\dependencies\libzmq;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\dependencies\libzmq\include;$(ProjectDir)..\..\dependencies\czmq\include;$(ProjectDir)..\..\dependencies\zyre\include;$(ProjectDir)..\..\src\include;$(ProjectDir)..\..\dependencies\yajl\src\api;$(ProjectDir)..\..\dependencies\windows\unix;C:\Program Files\ingescape\include;$(ProjectDir)..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir)\dependencies\libzmq;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>dependencies\zyre\RelWithDebInfo\zyre.lib;ws2_32.lib;dependencies\czmq\RelWithDebInfo\czmq.lib;dependencies\libzmq\lib\RelWithDebInfo\libzmq-v141-mt-4_3_5.lib;dependencies\sodium\RelWithDebInfo\sodium.lib;rpcrt4.lib;iphlpapi.lib;ws2_32.lib;Rpcrt4.lib;Iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>$(ProjectDir)/RelWithDebInfo/ingescape.lib</ImportLibrary>
+      <ProgramDataBaseFile>$(ProjectDir)/RelWithDebInfo/ingescape.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="$(ProjectDir)..\..\src\igs_definition.c" />
+    <ClCompile Include="$(ProjectDir)..\..\src\igs_mapping.c" />
+    <ClCompile Include="$(ProjectDir)..\..\src\igs_model.c" />
+    <ClCompile Include="$(ProjectDir)..\..\src\igs_network.c" />
+    <ClCompile Include="$(ProjectDir)..\..\src\igs_parser.c" />
+    <ClCompile Include="$(ProjectDir)..\..\src\igs_admin.c" />
+    <ClCompile Include="$(ProjectDir)..\..\src\igs_service.c" />
+    <ClCompile Include="$(ProjectDir)..\..\src\igs_monitor.c" />
+    <ClCompile Include="$(ProjectDir)..\..\src\igs_json.c" />
+    <ClCompile Include="$(ProjectDir)..\..\src\igs_json_node.c" />
+    <ClCompile Include="$(ProjectDir)..\..\src\igs_performance.c" />
+    <ClCompile Include="$(ProjectDir)..\..\src\igsagent.c" />
+    <ClCompile Include="$(ProjectDir)..\..\src\igs_core.c" />
+    <ClCompile Include="$(ProjectDir)..\..\src\igs_replay.c" />
+    <ClCompile Include="$(ProjectDir)..\..\src\igs_channels.c" />
+    <ClCompile Include="$(ProjectDir)..\..\src\igs_split.c" />
+    <ClCompile Include="$(ProjectDir)..\..\src\yajl_alloc.c" />
+    <ClCompile Include="$(ProjectDir)..\..\src\yajl_buf.c" />
+    <ClCompile Include="$(ProjectDir)..\..\src\yajl_encode.c" />
+    <ClCompile Include="$(ProjectDir)..\..\src\yajl_gen.c" />
+    <ClCompile Include="$(ProjectDir)..\..\src\yajl_lex.c" />
+    <ClCompile Include="$(ProjectDir)..\..\src\yajl_parser.c" />
+    <ClCompile Include="$(ProjectDir)..\..\src\yajl_tree.c" />
+    <ClCompile Include="$(ProjectDir)..\..\src\yajl_version.c" />
+    <ClCompile Include="$(ProjectDir)..\..\src\yajl.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(ProjectDir)\dependencies\czmq\czmq.vcxproj">
+      <Project>{2b160cc8-c0b5-318c-958d-38f7389c3d20}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(ProjectDir)\dependencies\libzmq\libzmq.vcxproj">
+      <Project>{1728f069-24e8-31bc-8c5e-6b6e0f33f228}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(ProjectDir)\dependencies\sodium\sodium.vcxproj">
+      <Project>{6df21852-05c8-3718-9b1e-56638c23117c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(ProjectDir)\dependencies\zyre\zyre.vcxproj">
+      <Project>{caef1fae-e7fa-376d-b9cf-ee1c3b2ed12a}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

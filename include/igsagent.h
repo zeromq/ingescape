@@ -168,7 +168,6 @@ INGESCAPE_EXPORT igs_result_t igsagent_parameter_set_bool (igsagent_t *self, con
 INGESCAPE_EXPORT igs_result_t igsagent_parameter_set_int (igsagent_t *self, const char *name, int value);
 INGESCAPE_EXPORT igs_result_t igsagent_parameter_set_double (igsagent_t *self, const char *name, double value);
 INGESCAPE_EXPORT igs_result_t igsagent_parameter_set_string (igsagent_t *self, const char *name, const char *value);
-INGESCAPE_EXPORT igs_result_t igsagent_parameter_set_impulsion (igsagent_t *self, const char *name);
 INGESCAPE_EXPORT igs_result_t igsagent_parameter_set_data (igsagent_t *self, const char *name, void *value, size_t size);
 
 /*These two functions enable sending and receiving DATA

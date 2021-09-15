@@ -271,12 +271,12 @@ int main(int argc, const char * argv[]) {
             }
         }
     }
-
-    igs_stop();
+    
     if (mainThreadPipe)
         zsock_destroy(&mainThreadPipe);
     if (toMainThreadPipe)
         zsock_destroy(&toMainThreadPipe);
+    igs_stop();
 
     return EXIT_SUCCESS;
 }

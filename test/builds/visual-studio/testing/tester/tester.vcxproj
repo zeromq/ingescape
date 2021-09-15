@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{C5BC2972-990A-4E9A-9373-DC7D4922EBE4}</ProjectGuid>
+    <RootNamespace>testing</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)</OutDir>
+    <IntDir>$(ProjectDir)\$(ProjectName).dir\$(Configuration)\$(Platform)</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)</OutDir>
+    <IntDir>$(ProjectDir)\$(ProjectName).dir\$(Configuration)\$(Platform)</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)</OutDir>
+    <IntDir>$(ProjectDir)\$(ProjectName).dir\$(Configuration)\$(Platform)</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)</OutDir>
+    <IntDir>$(ProjectDir)\$(ProjectName).dir\$(Configuration)\$(Platform)</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\..\include;$(ProjectDir)..\..\..\..\..\src;$(ProjectDir)..\..\..\..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\..\..\..\dependencies\libzmq\include;$(ProjectDir)..\..\..\..\..\dependencies\czmq\include;$(ProjectDir)..\..\..\..\..\dependencies\zyre\include;$(ProjectDir)..\..\..\..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir)..\..\..\..\..\packaging\windows\unix;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <CompileAs>CompileAsC</CompileAs>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>$(ProjectDir)..\..\..\..\..\builds\visual-studio\$(Configuration)\$(Platform)\ingescaped.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-gd-4_3_5.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\czmq.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\zyre.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy "$(SolutionDir)..\..\..\..\builds\visual-studio\$(Configuration)\$(Platform)\ingescaped.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\$(Configuration)\$(Platform)\ingescaped.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\$(Configuration)\$(Platform)\ingescaped.pdb" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\$(Configuration)\$(Platform)\ingescaped.exp" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\$(Configuration)\$(Platform)\ingescaped.ilk" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\libczmq.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\czmq.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\libczmq.pdb" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\czmq.exp" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\libczmq.ilk" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-gd-4_3_5.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-gd-4_3_5.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-gd-4_3_5.pdb" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-gd-4_3_5.exp" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-gd-4_3_5.ilk" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\libsodium.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\libsodium.pdb" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\sodium.exp" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\libsodium.ilk" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\libzyre.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\zyre.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\libzyre.pdb" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\zyre.exp" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\libzyre.ilk" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\..\include;$(ProjectDir)..\..\..\..\..\src;$(ProjectDir)..\..\..\..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\..\..\..\dependencies\libzmq\include;$(ProjectDir)..\..\..\..\..\dependencies\czmq\include;$(ProjectDir)..\..\..\..\..\dependencies\zyre\include;$(ProjectDir)..\..\..\..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir)..\..\..\..\..\packaging\windows\unix;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>$(ProjectDir)..\..\..\..\..\builds\visual-studio\$(Configuration)\$(Platform)\ingescaped.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-gd-4_3_5.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\czmq.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\zyre.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy "$(SolutionDir)..\..\..\..\builds\visual-studio\$(Configuration)\$(Platform)\ingescaped.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\$(Configuration)\$(Platform)\ingescaped.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\$(Configuration)\$(Platform)\ingescaped.pdb" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\$(Configuration)\$(Platform)\ingescaped.exp" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\$(Configuration)\$(Platform)\ingescaped.ilk" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\libczmq.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\czmq.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\libczmq.pdb" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\czmq.exp" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\libczmq.ilk" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-gd-4_3_5.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-gd-4_3_5.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-gd-4_3_5.pdb" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-gd-4_3_5.exp" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-gd-4_3_5.ilk" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\libsodium.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\libsodium.pdb" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\sodium.exp" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\libsodium.ilk" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\libzyre.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\zyre.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\libzyre.pdb" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\zyre.exp" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\libzyre.ilk" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\..\include;$(ProjectDir)..\..\..\..\..\src;$(ProjectDir)..\..\..\..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\..\..\..\dependencies\libzmq\include;$(ProjectDir)..\..\..\..\..\dependencies\czmq\include;$(ProjectDir)..\..\..\..\..\dependencies\zyre\include;$(ProjectDir)..\..\..\..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir)..\..\..\..\..\packaging\windows\unix;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>$(ProjectDir)..\..\..\..\..\builds\visual-studio\$(Configuration)\$(Platform)\ingescape.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-4_3_5.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\czmq.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\zyre.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy "$(SolutionDir)..\..\..\..\builds\visual-studio\$(Configuration)\$(Platform)\ingescape.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\$(Configuration)\$(Platform)\ingescape.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\libczmq.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\czmq.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-4_3_5.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-4_3_5.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\libsodium.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\libzyre.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\zyre.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\..\include;$(ProjectDir)..\..\..\..\..\src;$(ProjectDir)..\..\..\..\..\dependencies\sodium\src\libsodium\include;$(ProjectDir)..\..\..\..\..\dependencies\libzmq\include;$(ProjectDir)..\..\..\..\..\dependencies\czmq\include;$(ProjectDir)..\..\..\..\..\dependencies\zyre\include;$(ProjectDir)..\..\..\..\..\dependencies\sodium\src\libsodium\include\sodium;$(ProjectDir)..\..\..\..\..\packaging\windows\unix;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>$(ProjectDir)..\..\..\..\..\builds\visual-studio\$(Configuration)\$(Platform)\ingescape.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-4_3_5.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\czmq.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\zyre.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy "$(SolutionDir)..\..\..\..\builds\visual-studio\$(Configuration)\$(Platform)\ingescape.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\$(Configuration)\$(Platform)\ingescape.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\libczmq.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\czmq.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-4_3_5.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-4_3_5.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\libsodium.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\libzyre.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\zyre.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\src\common.c" />
+    <ClCompile Include="..\..\..\..\src\tester.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\src\common.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\builds\visual-studio\dependencies\czmq\czmq.vcxproj">
+      <Project>{2b160cc8-c0b5-318c-958d-38f7389c3d20}</Project>
+      <Private>true</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\builds\visual-studio\dependencies\libzmq\libzmq.vcxproj">
+      <Project>{1728f069-24e8-31bc-8c5e-6b6e0f33f228}</Project>
+      <Private>true</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\builds\visual-studio\dependencies\zyre\zyre.vcxproj">
+      <Project>{caef1fae-e7fa-376d-b9cf-ee1c3b2ed12a}</Project>
+      <Private>true</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\builds\visual-studio\ingescape.vcxproj">
+      <Project>{b30376dd-096b-3792-ac2b-a4534624e3cb}</Project>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <Private>true</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
