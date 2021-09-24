@@ -98,7 +98,7 @@ lib-deploy-macos:
     - lib-build-macos
   only:
     refs:
-      - master
+      - main
       - stable
     variables:
       - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
@@ -135,7 +135,7 @@ lib-deploy-macos-qt6:
     - lib-build-macos-qt6
   only:
     refs:
-      - master
+      - main
       - stable
     variables:
       - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
@@ -341,7 +341,7 @@ lib-deploy-windows:
     - lib-windows-debug-x86
   only:
     refs:
-      - master
+      - main
       - stable
     variables:
       - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
@@ -417,7 +417,7 @@ lib-deploy-linux-release-x64:
   needs: [ "lib-build-linux-x64" ]
   only:
     refs:
-      - master
+      - main
       - stable
     variables:
       - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
@@ -458,7 +458,7 @@ lib-deploy-centos-qt:
     - lib-build-centos-qt
   only:
     refs:
-      - master
+      - main
       - stable
     variables:
       - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
@@ -526,7 +526,7 @@ lib-deploy-linux-release-armhf:
     - lib-linux-release-armhf
   only:
     refs:
-      - master
+      - main
       - stable
     variables:
       - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
@@ -588,7 +588,7 @@ lib-deploy-linux-release-aarch64:
     - lib-android-release-aarch64
   only:
     refs:
-      - master
+      - main
       - stable
     variables:
       - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
@@ -649,7 +649,7 @@ lib-deploy-linux-release-armv7a-softfp:
     - lib-android-release-armv7a-softfp
   only:
     refs:
-      - master
+      - main
       - stable
     variables:
       - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
@@ -722,7 +722,7 @@ lib-delivery-all:
     - lib-installer-runtime-android-aarch64
   only:
     refs:
-      - master
+      - main
       - stable
     variables:
       - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
