@@ -96,12 +96,6 @@ lib-deploy-macos:
     - make -C build DESTDIR=$HOME/builds/sysroot install
   dependencies:
     - lib-build-macos
-  only:
-    refs:
-      - main
-      - stable
-    variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
   needs: [ "lib-build-macos" ]
 
 
@@ -133,12 +127,6 @@ lib-deploy-macos-qt6:
     - make -C build DESTDIR=$HOME/builds/sysroot install
   dependencies:
     - lib-build-macos-qt6
-  only:
-    refs:
-      - main
-      - stable
-    variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
   needs: [ "lib-build-macos-qt6" ]
 
 
@@ -339,12 +327,6 @@ lib-deploy-windows:
     - lib-windows-release-x86
     - lib-windows-debug-x64
     - lib-windows-debug-x86
-  only:
-    refs:
-      - main
-      - stable
-    variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
   needs: [ "lib-windows-release-x64", "lib-windows-release-x86", "lib-windows-debug-x64", "lib-windows-debug-x86" ]
 
 # _      _
@@ -415,12 +397,6 @@ lib-deploy-linux-release-x64:
   dependencies:
     - lib-build-linux-x64
   needs: [ "lib-build-linux-x64" ]
-  only:
-    refs:
-      - main
-      - stable
-    variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
 
 
 ##
@@ -456,12 +432,6 @@ lib-deploy-centos-qt:
     - cp include/ingescape_private.h /builds/sysroot/usr/local/include/ingescape/
   dependencies:
     - lib-build-centos-qt
-  only:
-    refs:
-      - main
-      - stable
-    variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
 
 ##
 ## armhf (RPi)
@@ -524,12 +494,6 @@ lib-deploy-linux-release-armhf:
     - cp include/ingescape_private.h ~/builds/release/armhf/usr/local/include/ingescape/
   dependencies:
     - lib-linux-release-armhf
-  only:
-    refs:
-      - main
-      - stable
-    variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
 
 
 ##
@@ -586,12 +550,6 @@ lib-deploy-linux-release-aarch64:
     - cp include/ingescape_private.h ~/builds/release/aarch64/usr/local/include/ingescape/
   dependencies:
     - lib-android-release-aarch64
-  only:
-    refs:
-      - main
-      - stable
-    variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
 
 ##
 ## armv7a (Android)
@@ -647,12 +605,6 @@ lib-deploy-linux-release-armv7a-softfp:
     - cp include/ingescape_private.h ~/builds/release/armv7a-sf/usr/local/include/ingescape/
   dependencies:
     - lib-android-release-armv7a-softfp
-  only:
-    refs:
-      - main
-      - stable
-    variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
 
 
 # _____       _ _
@@ -720,73 +672,3 @@ lib-delivery-all:
     - lib-installer-runtime-linux-armhf
     - lib-installer-runtime-android-armv7a-softfp
     - lib-installer-runtime-android-aarch64
-  only:
-    refs:
-      - main
-      - stable
-    variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
-
-
-# Deliver installers so they can be downloaded from the website
-lib-delivery-all-stable:
-  stage: lib-delivery
-  tags:
-    - docker
-  image: ingescape/alpine-deployment
-  script:
-    - echo "Setting up SSH"
-    - mkdir -p ~/.ssh/
-    - echo ${STABLE_SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
-    - umask 077
-    - echo ${STABLE_SSH_SECRET} | base64 -d > ssh_secret
-    - umask 022
-    - echo "Deliver Windows x86"
-    - mkdir --parents library/win32
-    - mv build/ReleaseX86/ingescape-*
-         library/win32/
-    - ls library/win32/ | grep -v 'latest_delivery' > library/win32/latest_delivery
-    - echo "Deliver Windows x64"
-    - mkdir --parents library/win64
-    - mv build/ReleaseX64/ingescape-*
-         library/win64/
-    - ls library/win64/ | grep -v 'latest_delivery' > library/win64/latest_delivery
-    - echo "Deliver macos"
-    - mkdir --parents library/macos
-    - mv ./build/ingescape*.pkg library/macos/
-    - ls library/macos/ | grep -v 'latest_delivery' > library/macos/latest_delivery
-    - echo "Deliver generic Linux x64"
-    - mkdir --parents library/linux_x64/
-    - mv linux_x64/* library/linux_x64/
-    - ls library/linux_x64/ | grep -v 'latest_delivery' > library/linux_x64/latest_delivery
-    - echo "Deliver generic Linux armhf"
-    - mkdir --parents library/linux_armhf
-    - mv linux_armhf/ingescape-*
-         linux_armhf/installIngescapeAndDependencies.sh
-         library/linux_armhf/
-    - ls library/linux_armhf/ | grep -v 'latest_delivery' > library/linux_armhf/latest_delivery
-    - echo "Deliver Android armv7a (softfp)"
-    - mkdir --parents library/android
-    - mv android/ingescape-*
-         library/android/
-    - ls library/android/ | grep -v 'latest_delivery' > library/android/latest_delivery
-    - echo "Deliver Android aarch64"
-    - mkdir --parents library/android-arm64
-    - mv android-arm64/ingescape-*
-         library/android-arm64/
-    - ls library/android-arm64/ | grep -v 'latest_delivery' > library/android-arm64/latest_delivery
-    - echo "Synchronization"
-    - rsync --rsh="ssh -i ssh_secret" --recursive library ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST}:${STABLE_DELIVERY_DESTINATION}
-  dependencies:
-    - lib-installer-runtime-windows-x86
-    - lib-installer-runtime-windows-x64
-    - lib-installer-macos
-    - lib-installer-linux-x64
-    - lib-installer-runtime-linux-armhf
-    - lib-installer-runtime-android-armv7a-softfp
-    - lib-installer-runtime-android-aarch64
-  only:
-    refs:
-      - stable
-    variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
