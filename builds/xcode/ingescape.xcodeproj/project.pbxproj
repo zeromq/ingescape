@@ -1564,6 +1564,7 @@
 		97AFAD7026C3F77800D0CCB5 /* ingescape_private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ingescape_private.h; sourceTree = "<group>"; };
 		97AFAD7326C3F77800D0CCB5 /* igsagent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = igsagent.h; sourceTree = "<group>"; };
 		97AFAD7626C3F77800D0CCB5 /* ingescape.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ingescape.h; sourceTree = "<group>"; };
+		97D1622C270349D0003D2F54 /* liblz4.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblz4.a; path = ../../../../../../../usr/local/Cellar/lz4/1.9.3/lib/liblz4.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1603,6 +1604,7 @@
 		9762EDE21EAE54D5002062A1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				97D1622C270349D0003D2F54 /* liblz4.a */,
 				976A93DF23F305F300CAA795 /* libc++.tbd */,
 			);
 			name = Frameworks;
@@ -2091,7 +2093,7 @@
 		979A79701EA7B0D6003153EF /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1250;
+				LastUpgradeCheck = 1300;
 				ORGANIZATIONNAME = "Ingenuity i/o";
 				TargetAttributes = {
 					974D720325D298960049C183 = {
@@ -3527,7 +3529,6 @@
 		979A79821EA7B0D6003153EF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = arm64;
 				DEVELOPMENT_TEAM = 56DRT9MG9S;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -3555,7 +3556,6 @@
 		979A79831EA7B0D6003153EF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = arm64;
 				DEVELOPMENT_TEAM = 56DRT9MG9S;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					ZYRE_BUILD_DRAFT_API,
