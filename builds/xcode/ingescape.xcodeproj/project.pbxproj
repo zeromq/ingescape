@@ -7,24 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		8D40229F25F7C60500FCAF1C /* igs_split.c in Sources */ = {isa = PBXBuildFile; fileRef = 8D40229C25F7C60500FCAF1C /* igs_split.c */; };
 		8D4022A025F7C60500FCAF1C /* igs_split.c in Sources */ = {isa = PBXBuildFile; fileRef = 8D40229C25F7C60500FCAF1C /* igs_split.c */; };
 		8D4022A125F7C60500FCAF1C /* igs_split.c in Sources */ = {isa = PBXBuildFile; fileRef = 8D40229C25F7C60500FCAF1C /* igs_split.c */; };
-		970ACB9726C4240B00FE4FA1 /* igs_json_node.c in Sources */ = {isa = PBXBuildFile; fileRef = 970ACB9626C4240B00FE4FA1 /* igs_json_node.c */; };
 		970ACB9826C4240B00FE4FA1 /* igs_json_node.c in Sources */ = {isa = PBXBuildFile; fileRef = 970ACB9626C4240B00FE4FA1 /* igs_json_node.c */; };
 		970ACB9926C4240B00FE4FA1 /* igs_json_node.c in Sources */ = {isa = PBXBuildFile; fileRef = 970ACB9626C4240B00FE4FA1 /* igs_json_node.c */; };
 		970ACC5D26C4263E00FE4FA1 /* igsagent.h in Headers */ = {isa = PBXBuildFile; fileRef = 97AFAD7326C3F77800D0CCB5 /* igsagent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		970ACC5F26C4263E00FE4FA1 /* ingescape.h in Headers */ = {isa = PBXBuildFile; fileRef = 97AFAD7626C3F77800D0CCB5 /* ingescape.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		970ACEAA26CC15B100FE4FA1 /* ingescape_private.h in Headers */ = {isa = PBXBuildFile; fileRef = 97AFAD7026C3F77800D0CCB5 /* ingescape_private.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		9725395A23564B230071A9BA /* igs_performance.c in Sources */ = {isa = PBXBuildFile; fileRef = 9725395923564B230071A9BA /* igs_performance.c */; };
 		9725395B23564B230071A9BA /* igs_performance.c in Sources */ = {isa = PBXBuildFile; fileRef = 9725395923564B230071A9BA /* igs_performance.c */; };
-		972A52641FD1733E00711352 /* igs_admin.c in Sources */ = {isa = PBXBuildFile; fileRef = 972A52631FD1733E00711352 /* igs_admin.c */; };
 		972A52651FD1733E00711352 /* igs_admin.c in Sources */ = {isa = PBXBuildFile; fileRef = 972A52631FD1733E00711352 /* igs_admin.c */; };
-		9736B37B238414E200A97173 /* igsagent.c in Sources */ = {isa = PBXBuildFile; fileRef = 9736B37A238414E200A97173 /* igsagent.c */; };
 		9736B37C238414E200A97173 /* igsagent.c in Sources */ = {isa = PBXBuildFile; fileRef = 9736B37A238414E200A97173 /* igsagent.c */; };
-		9738214C23832B7400D466DC /* igs_core.c in Sources */ = {isa = PBXBuildFile; fileRef = 9738214B23832B7400D466DC /* igs_core.c */; };
 		9738214D23832B7400D466DC /* igs_core.c in Sources */ = {isa = PBXBuildFile; fileRef = 9738214B23832B7400D466DC /* igs_core.c */; };
-		973DC288207A93E6004C1D80 /* igs_channels.c in Sources */ = {isa = PBXBuildFile; fileRef = 973DC287207A93E6004C1D80 /* igs_channels.c */; };
 		973DC289207A93E6004C1D80 /* igs_channels.c in Sources */ = {isa = PBXBuildFile; fileRef = 973DC287207A93E6004C1D80 /* igs_channels.c */; };
 		974D72BF25D298BB0049C183 /* igs_admin.c in Sources */ = {isa = PBXBuildFile; fileRef = 972A52631FD1733E00711352 /* igs_admin.c */; };
 		974D72C025D298BB0049C183 /* igsagent.c in Sources */ = {isa = PBXBuildFile; fileRef = 9736B37A238414E200A97173 /* igsagent.c */; };
@@ -50,166 +43,32 @@
 		9762EDDC1EAE547B002062A1 /* igs_model.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79991EA7B112003153EF /* igs_model.c */; };
 		9762EDDD1EAE547B002062A1 /* igs_network.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A799A1EA7B112003153EF /* igs_network.c */; };
 		9762EDDF1EAE547B002062A1 /* igs_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A799C1EA7B112003153EF /* igs_parser.c */; };
-		9768B2AE22830F0E00310410 /* igs_json.c in Sources */ = {isa = PBXBuildFile; fileRef = 9768B2AD22830F0E00310410 /* igs_json.c */; };
 		976A93E023F305F300CAA795 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 976A93DF23F305F300CAA795 /* libc++.tbd */; };
 		976BFF292695A6E200C90139 /* libczmq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 97A3BFFA25AF3702004BD834 /* libczmq.a */; };
 		976BFF2A2695A6E200C90139 /* libsodium.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 97A3BDD625AF36B8004BD834 /* libsodium.a */; };
 		976BFF2B2695A6E200C90139 /* libzmq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 97A3BE6525AF36CA004BD834 /* libzmq.a */; };
 		976BFF2C2695A6E200C90139 /* libzyre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 97A3C04725AF372B004BD834 /* libzyre.a */; };
-		9772A52720BDE42700729D59 /* igs_service.c in Sources */ = {isa = PBXBuildFile; fileRef = 9772A52620BDE42700729D59 /* igs_service.c */; };
 		9772A52820BDE42700729D59 /* igs_service.c in Sources */ = {isa = PBXBuildFile; fileRef = 9772A52620BDE42700729D59 /* igs_service.c */; };
-		97817B7B2514BA4700EFF20F /* igs_replay.c in Sources */ = {isa = PBXBuildFile; fileRef = 97817B7A2514BA4700EFF20F /* igs_replay.c */; };
 		97817B7C2514BA4700EFF20F /* igs_replay.c in Sources */ = {isa = PBXBuildFile; fileRef = 97817B7A2514BA4700EFF20F /* igs_replay.c */; };
-		979A799E1EA7B112003153EF /* igs_definition.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79851EA7B112003153EF /* igs_definition.c */; };
-		979A799F1EA7B112003153EF /* igs_mapping.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79981EA7B112003153EF /* igs_mapping.c */; };
-		979A79A01EA7B112003153EF /* igs_model.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79991EA7B112003153EF /* igs_model.c */; };
-		979A79A11EA7B112003153EF /* igs_network.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A799A1EA7B112003153EF /* igs_network.c */; };
-		979A79A31EA7B112003153EF /* igs_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A799C1EA7B112003153EF /* igs_parser.c */; };
-		97ABC93C2282EC5D00215310 /* igs_monitor.c in Sources */ = {isa = PBXBuildFile; fileRef = 97ABC93B2282EC5D00215310 /* igs_monitor.c */; };
 		97ABC93D2282EC5D00215310 /* igs_monitor.c in Sources */ = {isa = PBXBuildFile; fileRef = 97ABC93B2282EC5D00215310 /* igs_monitor.c */; };
-		97AFAA6126C2B4C500D0CCB5 /* yajl_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = 97AFAA4C26C2B4C300D0CCB5 /* yajl_parser.c */; };
 		97AFAA6226C2B4C500D0CCB5 /* yajl_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = 97AFAA4C26C2B4C300D0CCB5 /* yajl_parser.c */; };
 		97AFAA6326C2B4C500D0CCB5 /* yajl_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = 97AFAA4C26C2B4C300D0CCB5 /* yajl_parser.c */; };
-		97AFAA6826C2B4C500D0CCB5 /* yajl_gen.c in Sources */ = {isa = PBXBuildFile; fileRef = 97AFAA4F26C2B4C300D0CCB5 /* yajl_gen.c */; };
 		97AFAA6926C2B4C500D0CCB5 /* yajl_gen.c in Sources */ = {isa = PBXBuildFile; fileRef = 97AFAA4F26C2B4C300D0CCB5 /* yajl_gen.c */; };
 		97AFAA6A26C2B4C600D0CCB5 /* yajl_gen.c in Sources */ = {isa = PBXBuildFile; fileRef = 97AFAA4F26C2B4C300D0CCB5 /* yajl_gen.c */; };
-		97AFAA6D26C2B4C600D0CCB5 /* yajl_tree.c in Sources */ = {isa = PBXBuildFile; fileRef = 97AFAA5126C2B4C300D0CCB5 /* yajl_tree.c */; };
 		97AFAA6E26C2B4C600D0CCB5 /* yajl_tree.c in Sources */ = {isa = PBXBuildFile; fileRef = 97AFAA5126C2B4C300D0CCB5 /* yajl_tree.c */; };
 		97AFAA6F26C2B4C600D0CCB5 /* yajl_tree.c in Sources */ = {isa = PBXBuildFile; fileRef = 97AFAA5126C2B4C300D0CCB5 /* yajl_tree.c */; };
-		97AFAA7026C2B4C600D0CCB5 /* yajl_buf.c in Sources */ = {isa = PBXBuildFile; fileRef = 97AFAA5226C2B4C400D0CCB5 /* yajl_buf.c */; };
 		97AFAA7126C2B4C600D0CCB5 /* yajl_buf.c in Sources */ = {isa = PBXBuildFile; fileRef = 97AFAA5226C2B4C400D0CCB5 /* yajl_buf.c */; };
 		97AFAA7226C2B4C600D0CCB5 /* yajl_buf.c in Sources */ = {isa = PBXBuildFile; fileRef = 97AFAA5226C2B4C400D0CCB5 /* yajl_buf.c */; };
-		97AFAA7326C2B4C600D0CCB5 /* yajl_alloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 97AFAA5326C2B4C400D0CCB5 /* yajl_alloc.c */; };
 		97AFAA7426C2B4C600D0CCB5 /* yajl_alloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 97AFAA5326C2B4C400D0CCB5 /* yajl_alloc.c */; };
 		97AFAA7526C2B4C600D0CCB5 /* yajl_alloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 97AFAA5326C2B4C400D0CCB5 /* yajl_alloc.c */; };
-		97AFAA7626C2B4C600D0CCB5 /* yajl_lex.c in Sources */ = {isa = PBXBuildFile; fileRef = 97AFAA5426C2B4C400D0CCB5 /* yajl_lex.c */; };
 		97AFAA7726C2B4C600D0CCB5 /* yajl_lex.c in Sources */ = {isa = PBXBuildFile; fileRef = 97AFAA5426C2B4C400D0CCB5 /* yajl_lex.c */; };
 		97AFAA7826C2B4C600D0CCB5 /* yajl_lex.c in Sources */ = {isa = PBXBuildFile; fileRef = 97AFAA5426C2B4C400D0CCB5 /* yajl_lex.c */; };
-		97AFAA7926C2B4C600D0CCB5 /* yajl_version.c in Sources */ = {isa = PBXBuildFile; fileRef = 97AFAA5526C2B4C400D0CCB5 /* yajl_version.c */; };
 		97AFAA7A26C2B4C600D0CCB5 /* yajl_version.c in Sources */ = {isa = PBXBuildFile; fileRef = 97AFAA5526C2B4C400D0CCB5 /* yajl_version.c */; };
 		97AFAA7B26C2B4C600D0CCB5 /* yajl_version.c in Sources */ = {isa = PBXBuildFile; fileRef = 97AFAA5526C2B4C400D0CCB5 /* yajl_version.c */; };
-		97AFAA7E26C2B4C600D0CCB5 /* yajl_encode.c in Sources */ = {isa = PBXBuildFile; fileRef = 97AFAA5726C2B4C400D0CCB5 /* yajl_encode.c */; };
 		97AFAA7F26C2B4C600D0CCB5 /* yajl_encode.c in Sources */ = {isa = PBXBuildFile; fileRef = 97AFAA5726C2B4C400D0CCB5 /* yajl_encode.c */; };
 		97AFAA8026C2B4C600D0CCB5 /* yajl_encode.c in Sources */ = {isa = PBXBuildFile; fileRef = 97AFAA5726C2B4C400D0CCB5 /* yajl_encode.c */; };
-		97AFAA8D26C2B4C600D0CCB5 /* yajl.c in Sources */ = {isa = PBXBuildFile; fileRef = 97AFAA5E26C2B4C500D0CCB5 /* yajl.c */; };
 		97AFAA8F26C2B4C600D0CCB5 /* yajl.c in Sources */ = {isa = PBXBuildFile; fileRef = 97AFAA5E26C2B4C500D0CCB5 /* yajl.c */; };
 		97AFAA9026C2B5A800D0CCB5 /* yajl.c in Sources */ = {isa = PBXBuildFile; fileRef = 97AFAA5E26C2B4C500D0CCB5 /* yajl.c */; };
-		97AFAB1926C2BCB600D0CCB5 /* sodium.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAACF26C2BC8B00D0CCB5 /* sodium.h */; };
-		97AFAB1A26C2BCB600D0CCB5 /* zmq_utils.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAA9E26C2BC2200D0CCB5 /* zmq_utils.h */; };
-		97AFAB1B26C2BCB600D0CCB5 /* zmq.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAA9F26C2BC2200D0CCB5 /* zmq.h */; };
-		97AFAB1C26C2BCB600D0CCB5 /* czmq_library.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAAF26C2BC4600D0CCB5 /* czmq_library.h */; };
-		97AFAB1D26C2BCB600D0CCB5 /* czmq_prelude.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAC426C2BC4800D0CCB5 /* czmq_prelude.h */; };
-		97AFAB1E26C2BCB600D0CCB5 /* czmq.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAA726C2BC4500D0CCB5 /* czmq.h */; };
-		97AFAB1F26C2BCB600D0CCB5 /* test_zgossip.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAB926C2BC4700D0CCB5 /* test_zgossip.h */; };
-		97AFAB2026C2BCB600D0CCB5 /* zactor.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAB026C2BC4600D0CCB5 /* zactor.h */; };
-		97AFAB2126C2BCB600D0CCB5 /* zargs.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAB526C2BC4700D0CCB5 /* zargs.h */; };
-		97AFAB2226C2BCB600D0CCB5 /* zarmour.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAA126C2BC4500D0CCB5 /* zarmour.h */; };
-		97AFAB2326C2BCB600D0CCB5 /* zauth.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAA426C2BC4500D0CCB5 /* zauth.h */; };
-		97AFAB2426C2BCB600D0CCB5 /* zbeacon.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAA326C2BC4500D0CCB5 /* zbeacon.h */; };
-		97AFAB2526C2BCB600D0CCB5 /* zcert.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAA026C2BC4500D0CCB5 /* zcert.h */; };
-		97AFAB2626C2BCB600D0CCB5 /* zcertstore.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAC226C2BC4800D0CCB5 /* zcertstore.h */; };
-		97AFAB2726C2BCB600D0CCB5 /* zchunk.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAABA26C2BC4700D0CCB5 /* zchunk.h */; };
-		97AFAB2826C2BCB600D0CCB5 /* zclock.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAA926C2BC4600D0CCB5 /* zclock.h */; };
-		97AFAB2926C2BCB600D0CCB5 /* zconfig.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAA226C2BC4500D0CCB5 /* zconfig.h */; };
-		97AFAB2A26C2BCB600D0CCB5 /* zdigest.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAB126C2BC4600D0CCB5 /* zdigest.h */; };
-		97AFAB2B26C2BCB600D0CCB5 /* zdir_patch.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAACA26C2BC4900D0CCB5 /* zdir_patch.h */; };
-		97AFAB2C26C2BCB600D0CCB5 /* zdir.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAABD26C2BC4800D0CCB5 /* zdir.h */; };
-		97AFAB2D26C2BCB600D0CCB5 /* zfile.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAB826C2BC4700D0CCB5 /* zfile.h */; };
-		97AFAB2E26C2BCB600D0CCB5 /* zframe.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAAA26C2BC4600D0CCB5 /* zframe.h */; };
-		97AFAB2F26C2BCB600D0CCB5 /* zgossip.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAB226C2BC4600D0CCB5 /* zgossip.h */; };
-		97AFAB3026C2BCB600D0CCB5 /* zhash.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAB626C2BC4700D0CCB5 /* zhash.h */; };
-		97AFAB3126C2BCB600D0CCB5 /* zhashx.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAABE26C2BC4800D0CCB5 /* zhashx.h */; };
-		97AFAB3226C2BCB600D0CCB5 /* zhttp_client.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAB326C2BC4700D0CCB5 /* zhttp_client.h */; };
-		97AFAB3326C2BCB600D0CCB5 /* zhttp_request.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAC926C2BC4900D0CCB5 /* zhttp_request.h */; };
-		97AFAB3426C2BCB600D0CCB5 /* zhttp_response.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAA826C2BC4500D0CCB5 /* zhttp_response.h */; };
-		97AFAB3526C2BCB600D0CCB5 /* zhttp_server_options.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAABF26C2BC4800D0CCB5 /* zhttp_server_options.h */; };
-		97AFAB3626C2BCB600D0CCB5 /* zhttp_server.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAAB26C2BC4600D0CCB5 /* zhttp_server.h */; };
-		97AFAB3726C2BCB600D0CCB5 /* ziflist.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAA526C2BC4500D0CCB5 /* ziflist.h */; };
-		97AFAB3826C2BCB600D0CCB5 /* zlist.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAC026C2BC4800D0CCB5 /* zlist.h */; };
-		97AFAB3926C2BCB600D0CCB5 /* zlistx.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAAC26C2BC4600D0CCB5 /* zlistx.h */; };
-		97AFAB3A26C2BCB600D0CCB5 /* zloop.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAC526C2BC4900D0CCB5 /* zloop.h */; };
-		97AFAB3B26C2BCB600D0CCB5 /* zmonitor.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAA626C2BC4500D0CCB5 /* zmonitor.h */; };
-		97AFAB3C26C2BCB600D0CCB5 /* zmsg.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAABB26C2BC4800D0CCB5 /* zmsg.h */; };
-		97AFAB3D26C2BCB600D0CCB5 /* zosc.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAB726C2BC4700D0CCB5 /* zosc.h */; };
-		97AFAB3E26C2BCB600D0CCB5 /* zpoller.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAC126C2BC4800D0CCB5 /* zpoller.h */; };
-		97AFAB3F26C2BCB600D0CCB5 /* zproc.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAC326C2BC4800D0CCB5 /* zproc.h */; };
-		97AFAB4026C2BCB600D0CCB5 /* zproxy.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAACB26C2BC4900D0CCB5 /* zproxy.h */; };
-		97AFAB4126C2BCB600D0CCB5 /* zrex.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAABC26C2BC4800D0CCB5 /* zrex.h */; };
-		97AFAB4226C2BCB600D0CCB5 /* zsock.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAAD26C2BC4600D0CCB5 /* zsock.h */; };
-		97AFAB4326C2BCB600D0CCB5 /* zstr.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAAE26C2BC4600D0CCB5 /* zstr.h */; };
-		97AFAB4426C2BCB600D0CCB5 /* zsys.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAC626C2BC4900D0CCB5 /* zsys.h */; };
-		97AFAB4526C2BCB600D0CCB5 /* ztimerset.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAC726C2BC4900D0CCB5 /* ztimerset.h */; };
-		97AFAB4626C2BCB600D0CCB5 /* ztrie.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAC826C2BC4900D0CCB5 /* ztrie.h */; };
-		97AFAB4726C2BCB600D0CCB5 /* zuuid.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAB426C2BC4700D0CCB5 /* zuuid.h */; };
-		97AFAB4826C2BCB600D0CCB5 /* zyre_event.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAACE26C2BC6600D0CCB5 /* zyre_event.h */; };
-		97AFAB4926C2BCB600D0CCB5 /* zyre_library.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAACC26C2BC6600D0CCB5 /* zyre_library.h */; };
-		97AFAB4A26C2BCB600D0CCB5 /* zyre.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAACD26C2BC6600D0CCB5 /* zyre.h */; };
-		97AFAB4C26C2BCD700D0CCB5 /* crypto_stream_salsa2012.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAD126C2BC8B00D0CCB5 /* crypto_stream_salsa2012.h */; };
-		97AFAB4D26C2BCD700D0CCB5 /* crypto_auth.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAD226C2BC8B00D0CCB5 /* crypto_auth.h */; };
-		97AFAB4E26C2BCD700D0CCB5 /* utils.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAD326C2BC8B00D0CCB5 /* utils.h */; };
-		97AFAB4F26C2BCD700D0CCB5 /* crypto_core_hchacha20.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAD426C2BC8B00D0CCB5 /* crypto_core_hchacha20.h */; };
-		97AFAB5026C2BCD700D0CCB5 /* crypto_hash_sha512.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAD526C2BC8B00D0CCB5 /* crypto_hash_sha512.h */; };
-		97AFAB5126C2BCD700D0CCB5 /* core.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAD626C2BC8B00D0CCB5 /* core.h */; };
-		97AFAB5226C2BCD700D0CCB5 /* version.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAD726C2BC8B00D0CCB5 /* version.h */; };
-		97AFAB5326C2BCD700D0CCB5 /* export.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAD826C2BC8B00D0CCB5 /* export.h */; };
-		97AFAB5426C2BCD700D0CCB5 /* crypto_core_salsa20.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAD926C2BC8B00D0CCB5 /* crypto_core_salsa20.h */; };
-		97AFAB5526C2BCD700D0CCB5 /* crypto_shorthash_siphash24.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAADA26C2BC8B00D0CCB5 /* crypto_shorthash_siphash24.h */; };
-		97AFAB5626C2BCD700D0CCB5 /* randombytes.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAADB26C2BC8B00D0CCB5 /* randombytes.h */; };
-		97AFAB5726C2BCD700D0CCB5 /* crypto_hash_sha256.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAADC26C2BC8B00D0CCB5 /* crypto_hash_sha256.h */; };
-		97AFAB5826C2BCD700D0CCB5 /* crypto_stream.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAADE26C2BC8B00D0CCB5 /* crypto_stream.h */; };
-		97AFAB5926C2BCD700D0CCB5 /* crypto_auth_hmacsha512.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAADF26C2BC8B00D0CCB5 /* crypto_auth_hmacsha512.h */; };
-		97AFAB5A26C2BCD700D0CCB5 /* crypto_aead_xchacha20poly1305.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAE026C2BC8B00D0CCB5 /* crypto_aead_xchacha20poly1305.h */; };
-		97AFAB5B26C2BCD700D0CCB5 /* crypto_stream_salsa20.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAE126C2BC8B00D0CCB5 /* crypto_stream_salsa20.h */; };
-		97AFAB5C26C2BCD700D0CCB5 /* crypto_onetimeauth_poly1305.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAE226C2BC8B00D0CCB5 /* crypto_onetimeauth_poly1305.h */; };
-		97AFAB5D26C2BCD700D0CCB5 /* crypto_scalarmult_ristretto255.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAE326C2BC8B00D0CCB5 /* crypto_scalarmult_ristretto255.h */; };
-		97AFAB5E26C2BCD700D0CCB5 /* crypto_kx.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAE426C2BC8B00D0CCB5 /* crypto_kx.h */; };
-		97AFAB5F26C2BCD700D0CCB5 /* crypto_hash.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAE526C2BC8B00D0CCB5 /* crypto_hash.h */; };
-		97AFAB6026C2BCD700D0CCB5 /* crypto_sign.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAE626C2BC8B00D0CCB5 /* crypto_sign.h */; };
-		97AFAB6126C2BCD700D0CCB5 /* crypto_kdf.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAE726C2BC8B00D0CCB5 /* crypto_kdf.h */; };
-		97AFAB6226C2BCD700D0CCB5 /* crypto_auth_hmacsha256.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAE826C2BC8B00D0CCB5 /* crypto_auth_hmacsha256.h */; };
-		97AFAB6326C2BCD700D0CCB5 /* crypto_box.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAE926C2BC8B00D0CCB5 /* crypto_box.h */; };
-		97AFAB6426C2BCD700D0CCB5 /* crypto_verify_32.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAEA26C2BC8B00D0CCB5 /* crypto_verify_32.h */; };
-		97AFAB6526C2BCD700D0CCB5 /* crypto_core_ristretto255.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAEB26C2BC8B00D0CCB5 /* crypto_core_ristretto255.h */; };
-		97AFAB6626C2BCD700D0CCB5 /* crypto_stream_xchacha20.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAEC26C2BC8B00D0CCB5 /* crypto_stream_xchacha20.h */; };
-		97AFAB6726C2BCD700D0CCB5 /* crypto_core_salsa208.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAED26C2BC8B00D0CCB5 /* crypto_core_salsa208.h */; };
-		97AFAB6826C2BCD700D0CCB5 /* crypto_auth_hmacsha512256.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAEE26C2BC8B00D0CCB5 /* crypto_auth_hmacsha512256.h */; };
-		97AFAB6926C2BCD700D0CCB5 /* crypto_aead_chacha20poly1305.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAEF26C2BC8B00D0CCB5 /* crypto_aead_chacha20poly1305.h */; };
-		97AFAB6A26C2BCD700D0CCB5 /* randombytes_sysrandom.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAF026C2BC8B00D0CCB5 /* randombytes_sysrandom.h */; };
-		97AFAB6B26C2BCD700D0CCB5 /* runtime.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAF126C2BC8B00D0CCB5 /* runtime.h */; };
-		97AFAB6C26C2BCD700D0CCB5 /* crypto_stream_salsa208.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAF226C2BC8B00D0CCB5 /* crypto_stream_salsa208.h */; };
-		97AFAB6D26C2BCD700D0CCB5 /* crypto_aead_aes256gcm.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAF326C2BC8B00D0CCB5 /* crypto_aead_aes256gcm.h */; };
-		97AFAB6E26C2BCD700D0CCB5 /* crypto_core_salsa2012.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAF426C2BC8B00D0CCB5 /* crypto_core_salsa2012.h */; };
-		97AFAB6F26C2BCD700D0CCB5 /* crypto_secretbox_xchacha20poly1305.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAF526C2BC8B00D0CCB5 /* crypto_secretbox_xchacha20poly1305.h */; };
-		97AFAB7026C2BCD700D0CCB5 /* crypto_scalarmult.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAF626C2BC8B00D0CCB5 /* crypto_scalarmult.h */; };
-		97AFAB7126C2BCD700D0CCB5 /* crypto_pwhash.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAAF726C2BC8B00D0CCB5 /* crypto_pwhash.h */; };
-		97AFAB7226C2BCD700D0CCB5 /* crypto_verify_16.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAB0126C2BC8B00D0CCB5 /* crypto_verify_16.h */; };
-		97AFAB7326C2BCD700D0CCB5 /* crypto_stream_chacha20.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAB0226C2BC8B00D0CCB5 /* crypto_stream_chacha20.h */; };
-		97AFAB7426C2BCD700D0CCB5 /* crypto_stream_xsalsa20.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAB0326C2BC8B00D0CCB5 /* crypto_stream_xsalsa20.h */; };
-		97AFAB7526C2BCD700D0CCB5 /* crypto_core_hsalsa20.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAB0426C2BC8B00D0CCB5 /* crypto_core_hsalsa20.h */; };
-		97AFAB7626C2BCD700D0CCB5 /* crypto_kdf_blake2b.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAB0526C2BC8B00D0CCB5 /* crypto_kdf_blake2b.h */; };
-		97AFAB7726C2BCD700D0CCB5 /* crypto_scalarmult_curve25519.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAB0626C2BC8B00D0CCB5 /* crypto_scalarmult_curve25519.h */; };
-		97AFAB7826C2BCD700D0CCB5 /* crypto_shorthash.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAB0726C2BC8B00D0CCB5 /* crypto_shorthash.h */; };
-		97AFAB7926C2BCD700D0CCB5 /* crypto_pwhash_argon2id.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAB0826C2BC8B00D0CCB5 /* crypto_pwhash_argon2id.h */; };
-		97AFAB7A26C2BCD700D0CCB5 /* crypto_secretstream_xchacha20poly1305.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAB0926C2BC8B00D0CCB5 /* crypto_secretstream_xchacha20poly1305.h */; };
-		97AFAB7B26C2BCD700D0CCB5 /* crypto_pwhash_scryptsalsa208sha256.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAB0A26C2BC8B00D0CCB5 /* crypto_pwhash_scryptsalsa208sha256.h */; };
-		97AFAB7C26C2BCD700D0CCB5 /* crypto_sign_ed25519.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAB0B26C2BC8B00D0CCB5 /* crypto_sign_ed25519.h */; };
-		97AFAB7D26C2BCD700D0CCB5 /* crypto_onetimeauth.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAB0C26C2BC8B00D0CCB5 /* crypto_onetimeauth.h */; };
-		97AFAB7E26C2BCD700D0CCB5 /* crypto_verify_64.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAB0D26C2BC8B00D0CCB5 /* crypto_verify_64.h */; };
-		97AFAB7F26C2BCD700D0CCB5 /* crypto_box_curve25519xchacha20poly1305.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAB0E26C2BC8B00D0CCB5 /* crypto_box_curve25519xchacha20poly1305.h */; };
-		97AFAB8026C2BCD700D0CCB5 /* crypto_core_ed25519.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAB0F26C2BC8B00D0CCB5 /* crypto_core_ed25519.h */; };
-		97AFAB8126C2BCD700D0CCB5 /* crypto_pwhash_argon2i.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAB1026C2BC8B00D0CCB5 /* crypto_pwhash_argon2i.h */; };
-		97AFAB8226C2BCD700D0CCB5 /* randombytes_internal_random.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAB1126C2BC8B00D0CCB5 /* randombytes_internal_random.h */; };
-		97AFAB8326C2BCD700D0CCB5 /* crypto_generichash.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAB1226C2BC8B00D0CCB5 /* crypto_generichash.h */; };
-		97AFAB8426C2BCD700D0CCB5 /* crypto_secretbox_xsalsa20poly1305.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAB1326C2BC8B00D0CCB5 /* crypto_secretbox_xsalsa20poly1305.h */; };
-		97AFAB8526C2BCD700D0CCB5 /* crypto_secretbox.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAB1426C2BC8B00D0CCB5 /* crypto_secretbox.h */; };
-		97AFAB8626C2BCD700D0CCB5 /* crypto_scalarmult_ed25519.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAB1526C2BC8B00D0CCB5 /* crypto_scalarmult_ed25519.h */; };
-		97AFAB8726C2BCD700D0CCB5 /* crypto_box_curve25519xsalsa20poly1305.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAB1626C2BC8B00D0CCB5 /* crypto_box_curve25519xsalsa20poly1305.h */; };
-		97AFAB8826C2BCD700D0CCB5 /* crypto_generichash_blake2b.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAB1726C2BC8B00D0CCB5 /* crypto_generichash_blake2b.h */; };
-		97AFAB8926C2BCD700D0CCB5 /* crypto_sign_edwards25519sha512batch.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97AFAB1826C2BC8B00D0CCB5 /* crypto_sign_edwards25519sha512batch.h */; };
-		97AFAC8826C2BF3600D0CCB5 /* libzyre.a in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97A3C04725AF372B004BD834 /* libzyre.a */; };
-		97AFAC8926C2BF3600D0CCB5 /* libczmq.a in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97A3BFFA25AF3702004BD834 /* libczmq.a */; };
-		97AFAC8A26C2BF3600D0CCB5 /* libzmq.a in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97A3BE6525AF36CA004BD834 /* libzmq.a */; };
-		97AFAC8B26C2BF3600D0CCB5 /* libsodium.a in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97A3BDD625AF36B8004BD834 /* libsodium.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1231,158 +1090,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		979A79761EA7B0D6003153EF /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = include/ingescape;
-			dstSubfolderSpec = 16;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		97AFAA9526C2BB7800D0CCB5 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = include;
-			dstSubfolderSpec = 16;
-			files = (
-				97AFAB1926C2BCB600D0CCB5 /* sodium.h in CopyFiles */,
-				97AFAB1A26C2BCB600D0CCB5 /* zmq_utils.h in CopyFiles */,
-				97AFAB1B26C2BCB600D0CCB5 /* zmq.h in CopyFiles */,
-				97AFAB1C26C2BCB600D0CCB5 /* czmq_library.h in CopyFiles */,
-				97AFAB1D26C2BCB600D0CCB5 /* czmq_prelude.h in CopyFiles */,
-				97AFAB1E26C2BCB600D0CCB5 /* czmq.h in CopyFiles */,
-				97AFAB1F26C2BCB600D0CCB5 /* test_zgossip.h in CopyFiles */,
-				97AFAB2026C2BCB600D0CCB5 /* zactor.h in CopyFiles */,
-				97AFAB2126C2BCB600D0CCB5 /* zargs.h in CopyFiles */,
-				97AFAB2226C2BCB600D0CCB5 /* zarmour.h in CopyFiles */,
-				97AFAB2326C2BCB600D0CCB5 /* zauth.h in CopyFiles */,
-				97AFAB2426C2BCB600D0CCB5 /* zbeacon.h in CopyFiles */,
-				97AFAB2526C2BCB600D0CCB5 /* zcert.h in CopyFiles */,
-				97AFAB2626C2BCB600D0CCB5 /* zcertstore.h in CopyFiles */,
-				97AFAB2726C2BCB600D0CCB5 /* zchunk.h in CopyFiles */,
-				97AFAB2826C2BCB600D0CCB5 /* zclock.h in CopyFiles */,
-				97AFAB2926C2BCB600D0CCB5 /* zconfig.h in CopyFiles */,
-				97AFAB2A26C2BCB600D0CCB5 /* zdigest.h in CopyFiles */,
-				97AFAB2B26C2BCB600D0CCB5 /* zdir_patch.h in CopyFiles */,
-				97AFAB2C26C2BCB600D0CCB5 /* zdir.h in CopyFiles */,
-				97AFAB2D26C2BCB600D0CCB5 /* zfile.h in CopyFiles */,
-				97AFAB2E26C2BCB600D0CCB5 /* zframe.h in CopyFiles */,
-				97AFAB2F26C2BCB600D0CCB5 /* zgossip.h in CopyFiles */,
-				97AFAB3026C2BCB600D0CCB5 /* zhash.h in CopyFiles */,
-				97AFAB3126C2BCB600D0CCB5 /* zhashx.h in CopyFiles */,
-				97AFAB3226C2BCB600D0CCB5 /* zhttp_client.h in CopyFiles */,
-				97AFAB3326C2BCB600D0CCB5 /* zhttp_request.h in CopyFiles */,
-				97AFAB3426C2BCB600D0CCB5 /* zhttp_response.h in CopyFiles */,
-				97AFAB3526C2BCB600D0CCB5 /* zhttp_server_options.h in CopyFiles */,
-				97AFAB3626C2BCB600D0CCB5 /* zhttp_server.h in CopyFiles */,
-				97AFAB3726C2BCB600D0CCB5 /* ziflist.h in CopyFiles */,
-				97AFAB3826C2BCB600D0CCB5 /* zlist.h in CopyFiles */,
-				97AFAB3926C2BCB600D0CCB5 /* zlistx.h in CopyFiles */,
-				97AFAB3A26C2BCB600D0CCB5 /* zloop.h in CopyFiles */,
-				97AFAB3B26C2BCB600D0CCB5 /* zmonitor.h in CopyFiles */,
-				97AFAB3C26C2BCB600D0CCB5 /* zmsg.h in CopyFiles */,
-				97AFAB3D26C2BCB600D0CCB5 /* zosc.h in CopyFiles */,
-				97AFAB3E26C2BCB600D0CCB5 /* zpoller.h in CopyFiles */,
-				97AFAB3F26C2BCB600D0CCB5 /* zproc.h in CopyFiles */,
-				97AFAB4026C2BCB600D0CCB5 /* zproxy.h in CopyFiles */,
-				97AFAB4126C2BCB600D0CCB5 /* zrex.h in CopyFiles */,
-				97AFAB4226C2BCB600D0CCB5 /* zsock.h in CopyFiles */,
-				97AFAB4326C2BCB600D0CCB5 /* zstr.h in CopyFiles */,
-				97AFAB4426C2BCB600D0CCB5 /* zsys.h in CopyFiles */,
-				97AFAB4526C2BCB600D0CCB5 /* ztimerset.h in CopyFiles */,
-				97AFAB4626C2BCB600D0CCB5 /* ztrie.h in CopyFiles */,
-				97AFAB4726C2BCB600D0CCB5 /* zuuid.h in CopyFiles */,
-				97AFAB4826C2BCB600D0CCB5 /* zyre_event.h in CopyFiles */,
-				97AFAB4926C2BCB600D0CCB5 /* zyre_library.h in CopyFiles */,
-				97AFAB4A26C2BCB600D0CCB5 /* zyre.h in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		97AFAB4B26C2BCBE00D0CCB5 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = include/sodium;
-			dstSubfolderSpec = 16;
-			files = (
-				97AFAB4C26C2BCD700D0CCB5 /* crypto_stream_salsa2012.h in CopyFiles */,
-				97AFAB4D26C2BCD700D0CCB5 /* crypto_auth.h in CopyFiles */,
-				97AFAB4E26C2BCD700D0CCB5 /* utils.h in CopyFiles */,
-				97AFAB4F26C2BCD700D0CCB5 /* crypto_core_hchacha20.h in CopyFiles */,
-				97AFAB5026C2BCD700D0CCB5 /* crypto_hash_sha512.h in CopyFiles */,
-				97AFAB5126C2BCD700D0CCB5 /* core.h in CopyFiles */,
-				97AFAB5226C2BCD700D0CCB5 /* version.h in CopyFiles */,
-				97AFAB5326C2BCD700D0CCB5 /* export.h in CopyFiles */,
-				97AFAB5426C2BCD700D0CCB5 /* crypto_core_salsa20.h in CopyFiles */,
-				97AFAB5526C2BCD700D0CCB5 /* crypto_shorthash_siphash24.h in CopyFiles */,
-				97AFAB5626C2BCD700D0CCB5 /* randombytes.h in CopyFiles */,
-				97AFAB5726C2BCD700D0CCB5 /* crypto_hash_sha256.h in CopyFiles */,
-				97AFAB5826C2BCD700D0CCB5 /* crypto_stream.h in CopyFiles */,
-				97AFAB5926C2BCD700D0CCB5 /* crypto_auth_hmacsha512.h in CopyFiles */,
-				97AFAB5A26C2BCD700D0CCB5 /* crypto_aead_xchacha20poly1305.h in CopyFiles */,
-				97AFAB5B26C2BCD700D0CCB5 /* crypto_stream_salsa20.h in CopyFiles */,
-				97AFAB5C26C2BCD700D0CCB5 /* crypto_onetimeauth_poly1305.h in CopyFiles */,
-				97AFAB5D26C2BCD700D0CCB5 /* crypto_scalarmult_ristretto255.h in CopyFiles */,
-				97AFAB5E26C2BCD700D0CCB5 /* crypto_kx.h in CopyFiles */,
-				97AFAB5F26C2BCD700D0CCB5 /* crypto_hash.h in CopyFiles */,
-				97AFAB6026C2BCD700D0CCB5 /* crypto_sign.h in CopyFiles */,
-				97AFAB6126C2BCD700D0CCB5 /* crypto_kdf.h in CopyFiles */,
-				97AFAB6226C2BCD700D0CCB5 /* crypto_auth_hmacsha256.h in CopyFiles */,
-				97AFAB6326C2BCD700D0CCB5 /* crypto_box.h in CopyFiles */,
-				97AFAB6426C2BCD700D0CCB5 /* crypto_verify_32.h in CopyFiles */,
-				97AFAB6526C2BCD700D0CCB5 /* crypto_core_ristretto255.h in CopyFiles */,
-				97AFAB6626C2BCD700D0CCB5 /* crypto_stream_xchacha20.h in CopyFiles */,
-				97AFAB6726C2BCD700D0CCB5 /* crypto_core_salsa208.h in CopyFiles */,
-				97AFAB6826C2BCD700D0CCB5 /* crypto_auth_hmacsha512256.h in CopyFiles */,
-				97AFAB6926C2BCD700D0CCB5 /* crypto_aead_chacha20poly1305.h in CopyFiles */,
-				97AFAB6A26C2BCD700D0CCB5 /* randombytes_sysrandom.h in CopyFiles */,
-				97AFAB6B26C2BCD700D0CCB5 /* runtime.h in CopyFiles */,
-				97AFAB6C26C2BCD700D0CCB5 /* crypto_stream_salsa208.h in CopyFiles */,
-				97AFAB6D26C2BCD700D0CCB5 /* crypto_aead_aes256gcm.h in CopyFiles */,
-				97AFAB6E26C2BCD700D0CCB5 /* crypto_core_salsa2012.h in CopyFiles */,
-				97AFAB6F26C2BCD700D0CCB5 /* crypto_secretbox_xchacha20poly1305.h in CopyFiles */,
-				97AFAB7026C2BCD700D0CCB5 /* crypto_scalarmult.h in CopyFiles */,
-				97AFAB7126C2BCD700D0CCB5 /* crypto_pwhash.h in CopyFiles */,
-				97AFAB7226C2BCD700D0CCB5 /* crypto_verify_16.h in CopyFiles */,
-				97AFAB7326C2BCD700D0CCB5 /* crypto_stream_chacha20.h in CopyFiles */,
-				97AFAB7426C2BCD700D0CCB5 /* crypto_stream_xsalsa20.h in CopyFiles */,
-				97AFAB7526C2BCD700D0CCB5 /* crypto_core_hsalsa20.h in CopyFiles */,
-				97AFAB7626C2BCD700D0CCB5 /* crypto_kdf_blake2b.h in CopyFiles */,
-				97AFAB7726C2BCD700D0CCB5 /* crypto_scalarmult_curve25519.h in CopyFiles */,
-				97AFAB7826C2BCD700D0CCB5 /* crypto_shorthash.h in CopyFiles */,
-				97AFAB7926C2BCD700D0CCB5 /* crypto_pwhash_argon2id.h in CopyFiles */,
-				97AFAB7A26C2BCD700D0CCB5 /* crypto_secretstream_xchacha20poly1305.h in CopyFiles */,
-				97AFAB7B26C2BCD700D0CCB5 /* crypto_pwhash_scryptsalsa208sha256.h in CopyFiles */,
-				97AFAB7C26C2BCD700D0CCB5 /* crypto_sign_ed25519.h in CopyFiles */,
-				97AFAB7D26C2BCD700D0CCB5 /* crypto_onetimeauth.h in CopyFiles */,
-				97AFAB7E26C2BCD700D0CCB5 /* crypto_verify_64.h in CopyFiles */,
-				97AFAB7F26C2BCD700D0CCB5 /* crypto_box_curve25519xchacha20poly1305.h in CopyFiles */,
-				97AFAB8026C2BCD700D0CCB5 /* crypto_core_ed25519.h in CopyFiles */,
-				97AFAB8126C2BCD700D0CCB5 /* crypto_pwhash_argon2i.h in CopyFiles */,
-				97AFAB8226C2BCD700D0CCB5 /* randombytes_internal_random.h in CopyFiles */,
-				97AFAB8326C2BCD700D0CCB5 /* crypto_generichash.h in CopyFiles */,
-				97AFAB8426C2BCD700D0CCB5 /* crypto_secretbox_xsalsa20poly1305.h in CopyFiles */,
-				97AFAB8526C2BCD700D0CCB5 /* crypto_secretbox.h in CopyFiles */,
-				97AFAB8626C2BCD700D0CCB5 /* crypto_scalarmult_ed25519.h in CopyFiles */,
-				97AFAB8726C2BCD700D0CCB5 /* crypto_box_curve25519xsalsa20poly1305.h in CopyFiles */,
-				97AFAB8826C2BCD700D0CCB5 /* crypto_generichash_blake2b.h in CopyFiles */,
-				97AFAB8926C2BCD700D0CCB5 /* crypto_sign_edwards25519sha512batch.h in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		97AFABC926C2BE6300D0CCB5 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 16;
-			files = (
-				97AFAC8826C2BF3600D0CCB5 /* libzyre.a in CopyFiles */,
-				97AFAC8926C2BF3600D0CCB5 /* libczmq.a in CopyFiles */,
-				97AFAC8A26C2BF3600D0CCB5 /* libzmq.a in CopyFiles */,
-				97AFAC8B26C2BF3600D0CCB5 /* libsodium.a in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		97D978B1207761170097E027 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1409,7 +1116,6 @@
 		976A93DF23F305F300CAA795 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/usr/lib/libc++.tbd"; sourceTree = DEVELOPER_DIR; };
 		9772A52620BDE42700729D59 /* igs_service.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = igs_service.c; sourceTree = "<group>"; };
 		97817B7A2514BA4700EFF20F /* igs_replay.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = igs_replay.c; sourceTree = "<group>"; };
-		979A79781EA7B0D6003153EF /* libingescape.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libingescape.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		979A79851EA7B112003153EF /* igs_definition.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = igs_definition.c; sourceTree = "<group>"; };
 		979A79981EA7B112003153EF /* igs_mapping.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = igs_mapping.c; sourceTree = "<group>"; };
 		979A79991EA7B112003153EF /* igs_model.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = igs_model.c; sourceTree = "<group>"; };
@@ -1564,6 +1270,12 @@
 		97AFAD7026C3F77800D0CCB5 /* ingescape_private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ingescape_private.h; sourceTree = "<group>"; };
 		97AFAD7326C3F77800D0CCB5 /* igsagent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = igsagent.h; sourceTree = "<group>"; };
 		97AFAD7626C3F77800D0CCB5 /* ingescape.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ingescape.h; sourceTree = "<group>"; };
+		97BD80EA27073B3400625AEA /* libczmq.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libczmq.a; path = ../ios/sysroot/lib/libczmq.a; sourceTree = "<group>"; };
+		97BD81A427073B3400625AEA /* libingescape.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libingescape.a; path = ../ios/sysroot/lib/libingescape.a; sourceTree = "<group>"; };
+		97BD81A727073B4E00625AEA /* libzmq.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libzmq.a; path = ../ios/sysroot/lib/libzmq.a; sourceTree = "<group>"; };
+		97BD81A827073B4E00625AEA /* libzyre.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libzyre.a; path = ../ios/sysroot/lib/libzyre.a; sourceTree = "<group>"; };
+		97BD81A927073B4E00625AEA /* libsodium.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsodium.a; path = ../ios/sysroot/lib/libsodium.a; sourceTree = "<group>"; };
+		97D1622C270349D0003D2F54 /* liblz4.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblz4.a; path = ../../../../../../../usr/local/Cellar/lz4/1.9.3/lib/liblz4.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1590,19 +1302,18 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		979A79751EA7B0D6003153EF /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		9762EDE21EAE54D5002062A1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				97BD81A927073B4E00625AEA /* libsodium.a */,
+				97BD81A727073B4E00625AEA /* libzmq.a */,
+				97BD81A827073B4E00625AEA /* libzyre.a */,
+				97BD80EA27073B3400625AEA /* libczmq.a */,
+				97BD81A427073B3400625AEA /* libingescape.a */,
+				97D1622C270349D0003D2F54 /* liblz4.a */,
 				976A93DF23F305F300CAA795 /* libc++.tbd */,
 			);
 			name = Frameworks;
@@ -1627,7 +1338,6 @@
 		979A79791EA7B0D6003153EF /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				979A79781EA7B0D6003153EF /* libingescape.a */,
 				9762EDCD1EAE5414002062A1 /* ingescape.framework */,
 				974D720425D298960049C183 /* libingescape.a */,
 			);
@@ -2065,33 +1775,13 @@
 			productReference = 9762EDCD1EAE5414002062A1 /* ingescape.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		979A79771EA7B0D6003153EF /* ingescape-ios */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 979A79811EA7B0D6003153EF /* Build configuration list for PBXNativeTarget "ingescape-ios" */;
-			buildPhases = (
-				979A79741EA7B0D6003153EF /* Sources */,
-				979A79751EA7B0D6003153EF /* Frameworks */,
-				979A79761EA7B0D6003153EF /* CopyFiles */,
-				97AFAA9526C2BB7800D0CCB5 /* CopyFiles */,
-				97AFAB4B26C2BCBE00D0CCB5 /* CopyFiles */,
-				97AFABC926C2BE6300D0CCB5 /* CopyFiles */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "ingescape-ios";
-			productName = ingescape;
-			productReference = 979A79781EA7B0D6003153EF /* libingescape.a */;
-			productType = "com.apple.product-type.library.static";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		979A79701EA7B0D6003153EF /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1250;
+				LastUpgradeCheck = 1300;
 				ORGANIZATIONNAME = "Ingenuity i/o";
 				TargetAttributes = {
 					974D720325D298960049C183 = {
@@ -2100,11 +1790,6 @@
 						ProvisioningStyle = Automatic;
 					};
 					9762EDCC1EAE5414002062A1 = {
-						CreatedOnToolsVersion = 8.3.2;
-						DevelopmentTeam = 56DRT9MG9S;
-						ProvisioningStyle = Automatic;
-					};
-					979A79771EA7B0D6003153EF = {
 						CreatedOnToolsVersion = 8.3.2;
 						DevelopmentTeam = 56DRT9MG9S;
 						ProvisioningStyle = Automatic;
@@ -2142,7 +1827,6 @@
 			);
 			projectRoot = "";
 			targets = (
-				979A79771EA7B0D6003153EF /* ingescape-ios */,
 				9762EDCC1EAE5414002062A1 /* ingscape-macos-framework */,
 				974D720325D298960049C183 /* ingescape-macos-static */,
 			);
@@ -3236,38 +2920,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		979A79741EA7B0D6003153EF /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				970ACB9726C4240B00FE4FA1 /* igs_json_node.c in Sources */,
-				979A79A11EA7B112003153EF /* igs_network.c in Sources */,
-				97AFAA7626C2B4C600D0CCB5 /* yajl_lex.c in Sources */,
-				97AFAA7E26C2B4C600D0CCB5 /* yajl_encode.c in Sources */,
-				9772A52720BDE42700729D59 /* igs_service.c in Sources */,
-				97AFAA6826C2B4C500D0CCB5 /* yajl_gen.c in Sources */,
-				97ABC93C2282EC5D00215310 /* igs_monitor.c in Sources */,
-				979A79A01EA7B112003153EF /* igs_model.c in Sources */,
-				973DC288207A93E6004C1D80 /* igs_channels.c in Sources */,
-				9768B2AE22830F0E00310410 /* igs_json.c in Sources */,
-				97817B7B2514BA4700EFF20F /* igs_replay.c in Sources */,
-				9736B37B238414E200A97173 /* igsagent.c in Sources */,
-				8D40229F25F7C60500FCAF1C /* igs_split.c in Sources */,
-				9738214C23832B7400D466DC /* igs_core.c in Sources */,
-				97AFAA7326C2B4C600D0CCB5 /* yajl_alloc.c in Sources */,
-				97AFAA6D26C2B4C600D0CCB5 /* yajl_tree.c in Sources */,
-				97AFAA7926C2B4C600D0CCB5 /* yajl_version.c in Sources */,
-				97AFAA6126C2B4C500D0CCB5 /* yajl_parser.c in Sources */,
-				9725395A23564B230071A9BA /* igs_performance.c in Sources */,
-				97AFAA7026C2B4C600D0CCB5 /* yajl_buf.c in Sources */,
-				979A799F1EA7B112003153EF /* igs_mapping.c in Sources */,
-				972A52641FD1733E00711352 /* igs_admin.c in Sources */,
-				979A79A31EA7B112003153EF /* igs_parser.c in Sources */,
-				979A799E1EA7B112003153EF /* igs_definition.c in Sources */,
-				97AFAA8D26C2B4C600D0CCB5 /* yajl.c in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
@@ -3524,60 +3176,6 @@
 			};
 			name = Release;
 		};
-		979A79821EA7B0D6003153EF /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = arm64;
-				DEVELOPMENT_TEAM = 56DRT9MG9S;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-					ZYRE_BUILD_DRAFT_API,
-					CZMQ_BUILD_DRAFT_API,
-				);
-				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/../../src",
-					"$(SRCROOT)/../../include/",
-					"$(SRCROOT)/../../dependencies/libzmq/include",
-					"$(SRCROOT)/../../dependencies/czmq/include",
-					"$(SRCROOT)/../../dependencies/zyre/include",
-					"$(SRCROOT)/../../dependencies/sodium/src/libsodium/include",
-				);
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LIBRARY_SEARCH_PATHS = "";
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = ingescape;
-				SKIP_INSTALL = YES;
-				VALID_ARCHS = "arm64 arm64e armv7 armv7s i386 MacOSX_x86_64";
-			};
-			name = Debug;
-		};
-		979A79831EA7B0D6003153EF /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = arm64;
-				DEVELOPMENT_TEAM = 56DRT9MG9S;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					ZYRE_BUILD_DRAFT_API,
-					CZMQ_BUILD_DRAFT_API,
-				);
-				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/../../src",
-					"$(SRCROOT)/../../include/",
-					"$(SRCROOT)/../../dependencies/libzmq/include",
-					"$(SRCROOT)/../../dependencies/czmq/include",
-					"$(SRCROOT)/../../dependencies/zyre/include",
-					"$(SRCROOT)/../../dependencies/sodium/src/libsodium/include",
-				);
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LIBRARY_SEARCH_PATHS = "";
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = ingescape;
-				SKIP_INSTALL = YES;
-				VALID_ARCHS = "arm64 arm64e armv7 armv7s i386 MacOSX_x86_64";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -3604,15 +3202,6 @@
 			buildConfigurations = (
 				979A797F1EA7B0D6003153EF /* Debug */,
 				979A79801EA7B0D6003153EF /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		979A79811EA7B0D6003153EF /* Build configuration list for PBXNativeTarget "ingescape-ios" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				979A79821EA7B0D6003153EF /* Debug */,
-				979A79831EA7B0D6003153EF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

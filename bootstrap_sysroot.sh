@@ -68,7 +68,7 @@ SCRIPT_NAME=$(basename $0)
         cd czmq
         rm -Rf builds/xcode
         mkdir -p builds/xcode
-        cmake -S . -B builds/xcode -DCMAKE_BUILD_TYPE=Debug -DENABLE_DRAFTS=ON -DCMAKE_PREFIX_PATH=$CODEROOT/sysroot/usr/local/ -G "Xcode" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11
+        cmake -S . -B builds/xcode -DCMAKE_BUILD_TYPE=Debug -DENABLE_DRAFTS=ON -DCMAKE_PREFIX_PATH=$CODEROOT/sysroot/usr/local/ -G "Xcode" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11 -DCZMQ_WITH_LZ4=OFF
         #Hack to enable xcode project embedding
         #because scripts acompanying the xcode project do not manage
         #target folder properly:
