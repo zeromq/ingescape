@@ -131,7 +131,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
 
     // name is mandatory
     igs_json_node_t *name = igs_json_node_find (*json, agent_name_path);
-    if (name && name->type == IGS_JSON_STRING & name->u.string != NULL) {
+    if (name && name->type == IGS_JSON_STRING && name->u.string != NULL) {
         char *n = s_strndup (name->u.string, IGS_MAX_AGENT_NAME_LENGTH);
         if (strlen (name->u.string) > IGS_MAX_AGENT_NAME_LENGTH)
             igs_warn ("definition name '%s' exceeds maximum size and will be "
@@ -159,19 +159,17 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
 
     // family
     igs_json_node_t *family = igs_json_node_find (*json, family_path);
-    if (family && family->type == IGS_JSON_STRING & family->u.string != NULL)
+    if (family && family->type == IGS_JSON_STRING && family->u.string != NULL)
         definition->family = strdup (family->u.string);
 
     // description
     igs_json_node_t *description = igs_json_node_find (*json, description_path);
-    if (description
-        && description->type == IGS_JSON_STRING & description->u.string != NULL)
-        definition->description =
-          s_strndup (description->u.string, IGS_MAX_DESCRIPTION_LENGTH);
+    if (description && description->type == IGS_JSON_STRING && description->u.string != NULL)
+        definition->description = s_strndup (description->u.string, IGS_MAX_DESCRIPTION_LENGTH);
 
     // version
     igs_json_node_t *version = igs_json_node_find (*json, version_path);
-    if (version && version->type == IGS_JSON_STRING & version->u.string != NULL)
+    if (version && version->type == IGS_JSON_STRING && version->u.string != NULL)
         definition->version = strdup (version->u.string);
 
     // inputs
@@ -227,12 +225,9 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
         for (size_t i = 0; i < outputs->u.array.len; i++) {
             igs_json_node_t *iop_name =
               igs_json_node_find (outputs->u.array.values[i], name_path);
-            if (iop_name
-                && iop_name->type == IGS_JSON_STRING
-                     & iop_name->u.string != NULL) {
+            if (iop_name && iop_name->type == IGS_JSON_STRING && iop_name->u.string != NULL) {
                 igs_iop_t *iop = NULL;
-                char *corrected_name =
-                  s_strndup (iop_name->u.string, IGS_MAX_IOP_NAME_LENGTH);
+                char *corrected_name = s_strndup (iop_name->u.string, IGS_MAX_IOP_NAME_LENGTH);
                 bool space_in_name = false;
                 size_t length_ofn = strlen (corrected_name);
                 size_t k = 0;
@@ -263,14 +258,10 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
 
                 igs_json_node_t *iop_type =
                   igs_json_node_find (outputs->u.array.values[i], type_path);
-                if (iop_type
-                    && iop_type->type == IGS_JSON_STRING
-                         & iop_type->u.string != NULL)
-                    iop->value_type =
-                      s_string_to_value_type (iop_type->u.string);
+                if (iop_type && iop_type->type == IGS_JSON_STRING && iop_type->u.string != NULL)
+                    iop->value_type = s_string_to_value_type (iop_type->u.string);
 
-                igs_json_node_t *iop_value =
-                  igs_json_node_find (outputs->u.array.values[i], value_path);
+                igs_json_node_t *iop_value = igs_json_node_find (outputs->u.array.values[i], value_path);
                 if (iop_value) {
                     switch (iop->value_type) {
                         case IGS_INTEGER_T:
@@ -328,12 +319,9 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
         for (size_t i = 0; i < parameters->u.array.len; i++) {
             igs_json_node_t *iop_name =
               igs_json_node_find (parameters->u.array.values[i], name_path);
-            if (iop_name
-                && iop_name->type == IGS_JSON_STRING
-                     & iop_name->u.string != NULL) {
+            if (iop_name && iop_name->type == IGS_JSON_STRING && iop_name->u.string != NULL) {
                 igs_iop_t *iop = NULL;
-                char *corrected_name =
-                  s_strndup (iop_name->u.string, IGS_MAX_IOP_NAME_LENGTH);
+                char *corrected_name = s_strndup (iop_name->u.string, IGS_MAX_IOP_NAME_LENGTH);
                 bool space_in_name = false;
                 size_t length_ofn = strlen (corrected_name);
                 size_t k = 0;
@@ -364,14 +352,11 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
 
                 igs_json_node_t *iop_type =
                   igs_json_node_find (parameters->u.array.values[i], type_path);
-                if (iop_type
-                    && iop_type->type == IGS_JSON_STRING
-                         & iop_type->u.string != NULL)
-                    iop->value_type =
-                      s_string_to_value_type (iop_type->u.string);
+                if (iop_type && iop_type->type == IGS_JSON_STRING && iop_type->u.string != NULL)
+                    iop->value_type = s_string_to_value_type (iop_type->u.string);
 
                 igs_json_node_t *iop_value = igs_json_node_find (
-                  parameters->u.array.values[i], value_path);
+                        parameters->u.array.values[i], value_path);
                 if (iop_value) {
                     switch (iop->value_type) {
                         case IGS_INTEGER_T:
@@ -427,12 +412,9 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
         for (size_t i = 0; i < services->u.array.len; i++) {
             igs_json_node_t *service_name =
               igs_json_node_find (services->u.array.values[i], name_path);
-            if (service_name
-                && service_name->type == IGS_JSON_STRING
-                     & service_name->u.string != NULL) {
+            if (service_name && service_name->type == IGS_JSON_STRING && service_name->u.string != NULL) {
                 igs_service_t *service = NULL;
-                char *corrected_name =
-                  s_strndup (service_name->u.string, IGS_MAX_IOP_NAME_LENGTH);
+                char *corrected_name = s_strndup (service_name->u.string, IGS_MAX_IOP_NAME_LENGTH);
                 bool space_in_name = false;
                 size_t length_ofn = strlen (corrected_name);
                 size_t k = 0;
@@ -462,9 +444,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
 
                 description = igs_json_node_find (services->u.array.values[i],
                                                   description_path);
-                if (description
-                    && description->type == IGS_JSON_STRING
-                         & description->u.string != NULL)
+                if (description && description->type == IGS_JSON_STRING && description->u.string != NULL)
                     service->description = strdup (description->u.string);
 
                 igs_json_node_t *arguments = igs_json_node_find (
