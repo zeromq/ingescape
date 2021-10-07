@@ -37,58 +37,31 @@ void split_remove_worker (igs_core_context_t *context, char *uuid, char *input_n
 {
     assert(uuid);
     assert(context);
-
-    igs_splitter_t *splitter, *splitter_tmp;
-    LL_FOREACH_SAFE(context->splitters, splitter, splitter_tmp)
-    {
-        if(splitter
-           && splitter->agent_uuid
-           && splitter->output_name
-           && splitter->queued_split)
-        {
-            igs_worker_t *worker, *tmpWorker;
-            LL_FOREACH_SAFE(splitter->worker_list, worker, tmpWorker)
-            {
-                assert(worker);
-                assert(worker->agent_uuid);
-                if ((input_name == NULL && strcmp(uuid, worker->agent_uuid) == 0)
-                    || (input_name != NULL && strcmp(uuid, worker->agent_uuid) == 0 && strcmp(input_name, worker->input_name) == 0))
-                {
-                    LL_DELETE(splitter->worker_list, worker);
-                    if(worker->agent_uuid != NULL){
-                        free(worker->agent_uuid);
-                        worker->agent_uuid = NULL;
-                    }
-                    if(worker->input_name != NULL){
-                        free(worker->input_name);
-                        worker->input_name = NULL;
-                    }
-                    free(worker);
-                    worker = NULL;
-                }
+    igs_splitter_t *splitter;
+    LL_FOREACH(context->splitters, splitter){
+        igs_worker_t *worker, *tmpWorker;
+        LL_FOREACH_SAFE(splitter->workers_list, worker, tmpWorker){
+            if (streq(uuid, worker->agent_uuid) &&
+                (!input_name || (input_name && streq(input_name, worker->input_name)))){
+                LL_DELETE(splitter->workers_list, worker);
+                free(worker->agent_uuid);
+                worker->agent_uuid = NULL;
+                free(worker->input_name);
+                worker->input_name = NULL;
+                free(worker);
             }
         }
     }
 }
 
 igs_split_t *split_create_split_element (const char *from_input,
-                                               const char *to_agent,
-                                               const char *to_output)
+                                         const char *to_agent,
+                                         const char *to_output)
 {
-    if (from_input == NULL) {
-        igs_error ("Input name is NULL");
-        return NULL;
-    }
-    if (to_agent == NULL) {
-        igs_error ("Agent name is NULL");
-        return NULL;
-    }
-    if (to_output == NULL) {
-        igs_error ("Output name is NULL");
-        return NULL;
-    }
-    igs_split_t *new_split_elmt =
-      (igs_split_t *) zmalloc (sizeof (igs_split_t));
+    assert (from_input);
+    assert(to_agent);
+    assert(to_output);
+    igs_split_t *new_split_elmt = (igs_split_t *) zmalloc (sizeof (igs_split_t));
     new_split_elmt->from_input = strdup (from_input);
     new_split_elmt->to_agent = strdup (to_agent);
     new_split_elmt->to_output = strdup (to_output);
@@ -102,36 +75,21 @@ void s_split_trigger_send_message_to_worker (igs_core_context_t *context, char *
     assert(output);
 
     igs_splitter_t *splitter = NULL;
-    igs_splitter_t *splitter_tmp = NULL;
-    LL_FOREACH_SAFE(context->splitters, splitter, splitter_tmp)
-    {
-        if(splitter
-           && splitter->agent_uuid && strlen(splitter->agent_uuid)
-           && splitter->output_name && strlen(splitter->output_name)
-           && splitter->worker_list != NULL
-           && strcmp(splitter->agent_uuid, splitter_uuid) == 0
-           && strcmp(splitter->output_name, output->name) == 0)
-        {
+    //FIXME: splitters should be stored in a hash and not a list, and searched by uuid
+    LL_FOREACH(context->splitters, splitter){
+        if(streq(splitter->agent_uuid, splitter_uuid) && streq(splitter->output_name, output->name)){
             igs_worker_t *worker = NULL;
-            igs_worker_t *worker_tmp = NULL;
-            igs_worker_t *max_credit_worker = splitter->worker_list;
-
-            LL_FOREACH_SAFE(splitter->worker_list, worker, worker_tmp)
-            {
-                if(worker != NULL
-                   && worker->agent_uuid != NULL
-                   && worker->input_name != NULL
-                   && max_credit_worker->credit < worker->credit)
+            igs_worker_t *max_credit_worker = NULL;
+            LL_FOREACH(splitter->workers_list, worker){
+                if(!max_credit_worker //init with 1st worker in list
+                   || max_credit_worker->credit < worker->credit //take worker with more credits
+                   || (max_credit_worker->credit == worker->credit //take worker with same credits but less uses
+                       && worker->uses < max_credit_worker->uses))
                     max_credit_worker = worker;
             }
-            if(max_credit_worker != NULL
-               && max_credit_worker->credit > 0)
-            {
-                igs_queued_work_t *queue_element = NULL;
-                size_t queue_count = 0;
-                LL_COUNT(splitter->queued_split, queue_element, queue_count);
-                if(queue_count > 0)
-                {
+            if(max_credit_worker && max_credit_worker->credit > 0){
+                igs_queued_work_t *work = splitter->queued_works;
+                if(work){
                     zmsg_t *readyMessage = zmsg_new();
                     zmsg_addstr(readyMessage, SPLITTER_WORK_MSG);
                     zmsg_addstr(readyMessage, splitter->agent_uuid );
@@ -140,46 +98,44 @@ void s_split_trigger_send_message_to_worker (igs_core_context_t *context, char *
                     zmsg_addstrf(readyMessage, "%d", output->value_type);
                     switch (output->value_type) {
                         case IGS_INTEGER_T:
-                            zmsg_addmem(readyMessage, &(splitter->queued_split->value.i), sizeof(int));
+                            zmsg_addmem(readyMessage, &(work->value.i), sizeof(int));
                             break;
                         case IGS_DOUBLE_T:
-                            zmsg_addmem(readyMessage, &(splitter->queued_split->value.d), sizeof(double));
+                            zmsg_addmem(readyMessage, &(work->value.d), sizeof(double));
                             break;
                         case IGS_BOOL_T:
-                            zmsg_addmem(readyMessage, &(splitter->queued_split->value.b), sizeof(bool));
+                            zmsg_addmem(readyMessage, &(work->value.b), sizeof(bool));
                             break;
                         case IGS_STRING_T:
-                            zmsg_addstr(readyMessage, splitter->queued_split->value.s);
+                            zmsg_addstr(readyMessage, work->value.s);
                             break;
                         case IGS_IMPULSION_T:
                             zmsg_addmem(readyMessage, NULL, 0);
                             break;
                         case IGS_DATA_T:{
-                            zframe_t *frame = zframe_new(splitter->queued_split->value.data, splitter->queued_split->value_size);
-                            zmsg_append(readyMessage, &frame);
-                        }
+                            zframe_t *frame = zframe_new (work->value.data, work->value_size);
+                            zmsg_append(readyMessage, &frame);}
                             break;
                         default:
                             break;
                     }
                     igs_channel_whisper_zmsg(max_credit_worker->agent_uuid, &readyMessage);
-
-                    igs_queued_work_t *tmp = splitter->queued_split;
-                    LL_DELETE(splitter->queued_split, tmp);
-                    switch(tmp->value_type){
+                    
+                    LL_DELETE(splitter->queued_works, work);
+                    switch(work->value_type){
                         case IGS_STRING_T:
-                            free(tmp->value.s);
-                            tmp->value.s = NULL;
+                            free(work->value.s);
+                            work->value.s = NULL;
                             break;
                         case IGS_DATA_T:
-                            free(tmp->value.data);
-                            tmp->value.data = NULL;
+                            free(work->value.data);
+                            work->value.data = NULL;
                             break;
                         default:
                             break;
                     }
-                    free(tmp);
-                    tmp = NULL;
+                    free(work);
+                    max_credit_worker->uses++;
                     max_credit_worker->credit --;
                 }
             }
@@ -188,55 +144,46 @@ void s_split_trigger_send_message_to_worker (igs_core_context_t *context, char *
     }
 }
 
-void split_add_message_to_queue (igs_core_context_t *context, char* agent_uuid, const igs_iop_t *output)
+void split_add_work_to_queue (igs_core_context_t *context, char* agent_uuid, const igs_iop_t *output)
 {
     assert(context);
     assert(agent_uuid);
     assert(output);
     assert(output->name);
 
-    if(context->splitters)
-    {
+    if(context->splitters){
         igs_splitter_t *splitter = NULL;
-        igs_splitter_t *splitter_tmp = NULL;
-        LL_FOREACH_SAFE(context->splitters, splitter, splitter_tmp)
-        {
-            if(splitter != NULL
-               && splitter->agent_uuid && strlen(splitter->agent_uuid)
-               && splitter->output_name && strlen(splitter->output_name)
-               && strncmp(splitter->agent_uuid, agent_uuid, strlen(agent_uuid)) == 0
-               && strncmp(splitter->output_name, output->name, strlen(output->name)) == 0)
-            {
-                if(splitter->worker_list != NULL)
-                {
-                    igs_queued_work_t *new_queue_element = (igs_queued_work_t *)zmalloc(sizeof(igs_queued_work_t));
-                    new_queue_element->value_size = output->value_size;
-                    new_queue_element->value_type = output->value_type;
-                    new_queue_element->next = NULL;
-                    switch (output->value_type) {
-                        case IGS_INTEGER_T:
-                            new_queue_element->value.i = output->value.i;
-                            break;
-                        case IGS_DOUBLE_T:
-                            new_queue_element->value.d = output->value.d;
-                            break;
-                        case IGS_BOOL_T:
-                            new_queue_element->value.b = output->value.b;
-                            break;
-                        case IGS_STRING_T:
-                            new_queue_element->value.s = strdup(output->value.s);
-                            break;
-                        case IGS_IMPULSION_T:
-                            break;
-                        case IGS_DATA_T:
-                            new_queue_element->value.data = (void *)zmalloc( output->value_size);
-                            memcpy(new_queue_element->value.data, output->value.data, output->value_size);
-                            break;
-                        default:
-                            break;
-                    }
-                    LL_APPEND(splitter->queued_split, new_queue_element);
+        LL_FOREACH(context->splitters, splitter){
+            if(splitter->workers_list
+               && streq(splitter->agent_uuid, agent_uuid)
+               && streq(splitter->output_name, output->name)){
+                igs_queued_work_t *new_work = (igs_queued_work_t *) zmalloc (sizeof(igs_queued_work_t));
+                new_work->value_size = output->value_size;
+                new_work->value_type = output->value_type;
+                new_work->next = NULL;
+                switch (output->value_type) {
+                    case IGS_INTEGER_T:
+                        new_work->value.i = output->value.i;
+                        break;
+                    case IGS_DOUBLE_T:
+                        new_work->value.d = output->value.d;
+                        break;
+                    case IGS_BOOL_T:
+                        new_work->value.b = output->value.b;
+                        break;
+                    case IGS_STRING_T:
+                        new_work->value.s = strdup(output->value.s);
+                        break;
+                    case IGS_IMPULSION_T:
+                        break;
+                    case IGS_DATA_T:
+                        new_work->value.data = (void *)zmalloc( output->value_size);
+                        memcpy(new_work->value.data, output->value.data, output->value_size);
+                        break;
+                    default:
+                        break;
                 }
+                LL_APPEND(splitter->queued_works, new_work);
             }
         }
     }
@@ -248,8 +195,8 @@ void split_add_message_to_queue (igs_core_context_t *context, char* agent_uuid, 
 ////////////////////////////////////////////////////////////////////////
 
 
-void s_split_add_credit_to_worker (
-    igs_core_context_t *context, char* splitter_uuid, igs_iop_t* output, char* worker_uuid, char* input_name, int credit, bool new_worker)
+void s_split_add_credit_to_worker (igs_core_context_t *context, char* splitter_uuid, igs_iop_t* output,
+                                   char* worker_uuid, char* input_name, int credit, bool new_worker)
 {
     assert(context);
     assert(splitter_uuid);
@@ -260,100 +207,76 @@ void s_split_add_credit_to_worker (
 
     bool worker_found = false;
     bool splitter_found = false;
-    igs_splitter_t *splitter, *splitter_tmp;
-    LL_FOREACH_SAFE(context->splitters, splitter, splitter_tmp)
-    {
-
-        if(splitter
-           && splitter->agent_uuid != NULL && strlen(splitter->agent_uuid)
-           && splitter->output_name != NULL && strlen(splitter->output_name)
-           && strncmp(splitter->agent_uuid, splitter_uuid, strlen(splitter_uuid)) == 0
-           && strncmp(splitter->output_name, output->name, strlen(output->name)) == 0)
-        {
-            if(splitter->worker_list != NULL){
-                igs_worker_t *worker = NULL;
-                LL_FOREACH(splitter->worker_list, worker)
-                {
-                    if(worker != NULL
-                       && worker->agent_uuid != NULL
-                       && worker->input_name != NULL
-                       && strcmp(worker_uuid, worker->agent_uuid) == 0
-                       && strcmp(input_name, worker->input_name)  == 0)
-                    {
-                        worker->credit += credit;
-                        worker_found = true;
-                    }
+    igs_splitter_t *splitter;
+    LL_FOREACH(context->splitters, splitter){
+        if(splitter->workers_list
+           && streq(splitter->agent_uuid, splitter_uuid)
+           && streq(splitter->output_name, output->name)){
+            igs_worker_t *worker = NULL;
+            int maxUses = 0;
+            LL_FOREACH(splitter->workers_list, worker){
+                if(streq(worker_uuid, worker->agent_uuid)
+                   && streq(input_name, worker->input_name)){
+                    worker->credit += credit;
+                    worker_found = true;
                 }
+                if (maxUses < worker->uses)
+                    maxUses = worker->uses;
             }
-            if(!worker_found && new_worker)
-            {
-                igs_worker_t *new_w = (igs_worker_t *)zmalloc(sizeof(igs_worker_t));
+            if(!worker_found && new_worker){
+                igs_worker_t *new_w = (igs_worker_t *) zmalloc (sizeof(igs_worker_t));
                 new_w->agent_uuid = s_strndup(worker_uuid, strlen(worker_uuid));
                 new_w->input_name = s_strndup(input_name, strlen(input_name));
                 new_w->credit = credit;
-                new_w->next = NULL;
-                LL_APPEND(splitter->worker_list, new_w);
+                new_w->uses = maxUses;
+                LL_APPEND(splitter->workers_list, new_w);
             }
             splitter_found = true;
         }
     }
-
-    if(!splitter_found && new_worker)
-    {
+    if(!splitter_found && new_worker){
         igs_splitter_t *new_splitter = (igs_splitter_t *)zmalloc(sizeof(igs_splitter_t));
         new_splitter->agent_uuid = s_strndup(splitter_uuid, strlen(splitter_uuid));
         new_splitter->output_name = s_strndup(output->name, strlen(output->name));
-        new_splitter->worker_list = NULL;
-        new_splitter->queued_split = NULL;
-        new_splitter->next = NULL;
-
         LL_APPEND(context->splitters, new_splitter);
-
         igs_worker_t *new_w = (igs_worker_t *)zmalloc(sizeof(igs_worker_t));
         new_w->agent_uuid = s_strndup(worker_uuid, strlen(worker_uuid));
         new_w->input_name = s_strndup(input_name, strlen(input_name));
         new_w->credit = credit;
-        new_w->next = NULL;
-        LL_APPEND(new_splitter->worker_list, new_w);
+        LL_APPEND(new_splitter->workers_list, new_w);
     }
     s_split_trigger_send_message_to_worker(context, splitter_uuid, output);
 }
 
-int split_message_from_worker (char *command,
-                                  zmsg_t *msg,
-                                  igs_core_context_t *context)
+int split_message_from_worker (char *command, zmsg_t *msg, igs_core_context_t *context)
 {
+    assert(command);
     assert(context);
-
+    assert(msg);
     char * worker_uuid = zmsg_popstr(msg);
-    if(worker_uuid == NULL)
-    {
+    if(!worker_uuid){
         igs_error ("no valid worker uuid in message %s from worker : rejecting", command);
         return 1;
     }
     char * inputName = zmsg_popstr(msg);
-    if(inputName == NULL)
-    {
+    if(!inputName){
         igs_error ("no valid input name in message %s from worker %s : rejecting", command, worker_uuid);
         free(worker_uuid);
         return 1;
     }
     char * outputName = zmsg_popstr(msg);
-    if(inputName == NULL)
-    {
+    if(!outputName){
         igs_error ("no valid output name in message %s from worker %s : rejecting", command, worker_uuid);
         free(worker_uuid);
-        free(inputName);
+        free(outputName);
         return 1;
     }
     
-    if(streq(command, WORKER_HELLO_MSG))
-    {
+    if(streq(command, WORKER_HELLO_MSG)){
         char *creditStr = zmsg_popstr(msg);
         int credit = atoi(creditStr);
-        char * splitter_uuid = zmsg_popstr(msg);
-        if(splitter_uuid == NULL)
-        {
+        char *splitter_uuid = zmsg_popstr(msg);
+        if(!splitter_uuid){
             igs_error ("no valid splitter uuid in message %s from worker %s : rejecting", command, worker_uuid);
             free(worker_uuid);
             free(inputName);
@@ -364,8 +287,7 @@ int split_message_from_worker (char *command,
         HASH_ITER(hh, context->agents, agent, tmpAgent){
             if (!agent || !agent->uuid || (strlen(agent->uuid) == 0))
                 continue;
-            if(streq(splitter_uuid, agent->uuid))
-            {
+            if(streq(splitter_uuid, agent->uuid)){
                 igs_iop_t *iop, *tmpIop;
                 HASH_ITER(hh, agent->definition->outputs_table, iop, tmpIop){
                     if(!iop || !iop->name)
@@ -381,8 +303,7 @@ int split_message_from_worker (char *command,
         free(splitter_uuid);
     }else if(streq(command, WORKER_READY_MSG)){
         char * splitter_uuid = zmsg_popstr(msg);
-        if(splitter_uuid == NULL)
-        {
+        if(splitter_uuid == NULL){
             igs_error ("no valid splitter uuid in message %s from worker %s : rejecting", command, worker_uuid);
             free(worker_uuid);
             free(inputName);
@@ -393,8 +314,7 @@ int split_message_from_worker (char *command,
         HASH_ITER(hh, context->agents, agent, tmpAgent){
             if (!agent || !agent->uuid || (strlen(agent->uuid) == 0))
                 continue;
-            if(streq(splitter_uuid, agent->uuid))
-            {
+            if(streq(splitter_uuid, agent->uuid)){
                 igs_iop_t *iop, *tmpIop;
                 HASH_ITER(hh, agent->definition->outputs_table, iop, tmpIop){
                     if(!iop || !iop->name)
@@ -417,32 +337,28 @@ int split_message_from_worker (char *command,
 
 int split_message_from_splitter (zmsg_t *msg, igs_core_context_t *context)
 {
+    assert(msg);
     assert(context);
-
     char * splitter_uuid = zmsg_popstr(msg);
-    if(splitter_uuid == NULL)
-    {
+    if(!splitter_uuid){
         igs_error ("no valid splitter uuid in work message from splitter : rejecting");
         return 1;
     }
     char * inputName = zmsg_popstr(msg);
-    if(inputName == NULL)
-    {
+    if(!inputName){
         igs_error ("no valid input name in work message from splitter %s : rejecting", splitter_uuid);
         free(splitter_uuid);
         return 1;
     }
     char * outputName = zmsg_popstr(msg);
-    if(outputName == NULL)
-    {
+    if(!outputName){
         igs_error ("no valid output name in work message from splitter %s : rejecting", splitter_uuid);
         free(splitter_uuid);
         free(inputName);
         return 1;
     }
     char * vType = zmsg_popstr(msg);
-    if(vType == NULL)
-    {
+    if(vType == NULL){
         igs_error ("no valid value type in work message from splitter %s : rejecting", splitter_uuid);
         free(splitter_uuid);
         free(inputName);
@@ -476,7 +392,7 @@ int split_message_from_splitter (zmsg_t *msg, igs_core_context_t *context)
         }
     }else{
         frame = zmsg_pop(msg);
-        if (frame == NULL){
+        if (!frame){
             igs_error("value is NULL in received publication : rejecting");
             free(splitter_uuid);
             free(inputName);
@@ -486,12 +402,11 @@ int split_message_from_splitter (zmsg_t *msg, igs_core_context_t *context)
         data = zframe_data(frame);
         size = zframe_size(frame);
     }
-    if(frame != NULL)
+    if(frame)
         zframe_destroy(&frame);
     
     char * worker_uuid = zmsg_popstr(msg);
-    if(worker_uuid == NULL)
-    {
+    if(!worker_uuid){
         igs_error ("no valid worker uuid in work message from splitter %s : rejecting", splitter_uuid);
         free(splitter_uuid);
         free(inputName);
@@ -513,7 +428,7 @@ int split_message_from_splitter (zmsg_t *msg, igs_core_context_t *context)
             break;
         }
     }
-    if(elt != NULL && elt->uuid != NULL){
+    if(elt && elt->uuid){
         zmsg_t *readyMessage = zmsg_new();
         zmsg_addstr(readyMessage, WORKER_READY_MSG);
         zmsg_addstr(readyMessage, worker_uuid);
