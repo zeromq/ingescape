@@ -153,9 +153,10 @@ typedef struct igs_worker{
     char *agent_uuid;
     int credit;
     struct igs_worker *next;
+    int uses;
 }igs_worker_t;
 
-typedef struct igs_queued_work{
+typedef struct igs_queued_works{
     igs_iop_value_type_t value_type;
     union {
         int i;
@@ -165,14 +166,14 @@ typedef struct igs_queued_work{
         void* data;
     } value;
     size_t value_size;
-    struct igs_queued_work *next;
+    struct igs_queued_works *next;
 }igs_queued_work_t;
 
 typedef struct igs_splitter{
     char *agent_uuid;
     char *output_name;
-    igs_worker_t *worker_list;
-    igs_queued_work_t *queued_split;
+    igs_worker_t *workers_list;
+    igs_queued_work_t *queued_works;
     struct igs_splitter *next;
 }igs_splitter_t;
 
@@ -460,7 +461,7 @@ igs_split_t *
                                                        const char *to_agent,
                                                        const char* to_output);
 void
-    split_add_message_to_queue(igs_core_context_t *context, char* agent_uuid, const igs_iop_t *output);
+    split_add_work_to_queue(igs_core_context_t *context, char* agent_uuid, const igs_iop_t *output);
 void
     split_remove_worker(igs_core_context_t *context, char *worker_uuid, char *input_name);
 

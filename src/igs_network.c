@@ -3633,7 +3633,7 @@ igs_result_t network_publish_output (igsagent_t *agent, const igs_iop_t *iop)
     assert (iop->name);
     int result = IGS_SUCCESS;
 
-    split_add_message_to_queue (agent->context, agent->uuid, iop);
+    split_add_work_to_queue (agent->context, agent->uuid, iop);
 
     if (!agent->is_whole_agent_muted && !iop->is_muted
         && !agent->context->is_frozen) {

@@ -144,23 +144,13 @@ END:
 }
 
 igs_map_t *mapping_create_mapping_element (const char *from_input,
-                                               const char *to_agent,
-                                               const char *to_output)
+                                           const char *to_agent,
+                                           const char *to_output)
 {
-    if (from_input == NULL) {
-        igs_error ("Input name is NULL");
-        return NULL;
-    }
-    if (to_agent == NULL) {
-        igs_error ("Agent name is NULL");
-        return NULL;
-    }
-    if (to_output == NULL) {
-        igs_error ("Output name is NULL");
-        return NULL;
-    }
-    igs_map_t *new_map_elmt =
-      (igs_map_t *) zmalloc (sizeof (igs_map_t));
+    assert(from_input);
+    assert(to_agent);
+    assert(to_output);
+    igs_map_t *new_map_elmt = (igs_map_t *) zmalloc (sizeof (igs_map_t));
     new_map_elmt->from_input = strdup (from_input);
     new_map_elmt->to_agent = strdup (to_agent);
     new_map_elmt->to_output = strdup (to_output);

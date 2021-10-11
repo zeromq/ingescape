@@ -175,6 +175,7 @@ if (WITH_DEPS)
   #czmq
   set(WITH_DISTCLEAN OFF CACHE BOOL "Dis/Enable 'distclean' targets")
   set(CZMQ_WITH_LIBMICROHTTPD OFF CACHE BOOL "Build czmq with libmicrohttpd")
+  set(CZMQ_WITH_LZ4 OFF CACHE BOOL "Build czmq with lz4")
   add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/czmq)
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/czmq/include)
   add_dependencies(czmq libzmq)
