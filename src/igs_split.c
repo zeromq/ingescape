@@ -433,8 +433,6 @@ int split_message_from_splitter (zmsg_t *msg, igs_core_context_t *context)
         data = zframe_data(frame);
         size = zframe_size(frame);
     }
-    if(frame)
-        zframe_destroy(&frame);
     
     char * worker_uuid = zmsg_popstr(msg);
     if(!worker_uuid){
@@ -459,6 +457,8 @@ int split_message_from_splitter (zmsg_t *msg, igs_core_context_t *context)
             break;
         }
     }
+    if(frame)
+        zframe_destroy(&frame);
     if(elt && elt->uuid){
         zmsg_t *readyMessage = zmsg_new();
         zmsg_addstr(readyMessage, WORKER_READY_MSG);
