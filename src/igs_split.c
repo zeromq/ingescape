@@ -126,14 +126,14 @@ void s_split_trigger_send_message_to_worker (igs_core_context_t *context, char *
                             if(local_agent
                                && local_agent->igs_channel
                                && local_agent->uuid
-                               && strcmp(local_agent->uuid, splitter_uuid) == 0)
+                               && streq(local_agent->uuid, splitter_uuid))
                             {
                                 igs_remote_agent_t *remote_agent, *rtmp;
                                 HASH_ITER(hh, context->remote_agents, remote_agent, rtmp)
                                 {
                                     if(remote_agent
                                        && remote_agent->uuid
-                                       && strcmp(remote_agent->uuid, max_credit_worker->agent_uuid) == 0
+                                       && streq(remote_agent->uuid, max_credit_worker->agent_uuid)
                                        && remote_agent->definition->name)
                                     {
                                         zyre_shouts (context->node, local_agent->igs_channel,
