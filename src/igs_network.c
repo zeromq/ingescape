@@ -4120,7 +4120,7 @@ void igsagent_set_name (igsagent_t *agent, const char *name)
         free (agent->igs_channel);
     agent->igs_channel = (char *) zmalloc (strlen (agent->definition->name)
                                                 + strlen ("-IGS") + 1);
-    snprintf (agent->igs_channel, IGS_MAX_AGENT_NAME_LENGTH + 5,
+    snprintf (agent->igs_channel, IGS_MAX_AGENT_NAME_LENGTH + strlen ("-IGS") + 1,
               "%s-IGS", agent->definition->name);
     
     if (agent->context && agent->context->node) {
@@ -4135,7 +4135,7 @@ void igsagent_set_name (igsagent_t *agent, const char *name)
                       "%s-IGS-CALLS", previous);
             char *previous_igs_channel = (char *) zmalloc (
               strlen (previous) + strlen ("-IGS") + 1);
-            snprintf (previous_igs_channel, IGS_MAX_AGENT_NAME_LENGTH + 15,
+            snprintf (previous_igs_channel, IGS_MAX_AGENT_NAME_LENGTH + strlen("-IGS") + 1,
                       "%s-IGS", previous);
             s_lock_zyre_peer ();
             zyre_leave (agent->context->node, previous_calls_channel);
