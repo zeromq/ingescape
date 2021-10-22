@@ -284,7 +284,8 @@ igs_service_arg_t *igs_service_args_clone (igs_service_arg_t *list)
                     new->d = arg->d;
                     break;
                 case IGS_STRING_T:
-                    new->c = strdup (arg->c);
+                    if (arg->c != NULL)
+                        new->c = strdup (arg->c);
                     break;
                 case IGS_DATA_T:
                     new->data = (void *) zmalloc (arg->size);
