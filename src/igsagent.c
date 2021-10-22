@@ -73,10 +73,6 @@ void igsagent_destroy (igsagent_t **agent)
         free ((*agent)->definition_path);
     if ((*agent)->mapping_path)
         free ((*agent)->mapping_path);
-    if ((*agent)->services_channel)
-        free ((*agent)->services_channel);
-    if ((*agent)->calls_channel)
-        free ((*agent)->calls_channel);
     if ((*agent)->igs_channel)
         free ((*agent)->igs_channel);
 
@@ -130,8 +126,6 @@ igs_result_t igsagent_activate (igsagent_t *agent)
 
     if (agent->context && agent->context->node) {
         s_lock_zyre_peer ();
-        zyre_join (agent->context->node, agent->services_channel);
-        zyre_join (agent->context->node, agent->calls_channel);
         zyre_join (agent->context->node, agent->igs_channel);
         s_unlock_zyre_peer ();
     }
@@ -196,8 +190,6 @@ igs_result_t igsagent_deactivate (igsagent_t *agent)
         zmsg_addstr (msg, agent->uuid);
         zmsg_addstr (msg, agent->definition->name);
         zyre_shout (agent->context->node, IGS_PRIVATE_CHANNEL, &msg);
-        zyre_leave (agent->context->node, agent->services_channel);
-        zyre_leave (agent->context->node, agent->calls_channel);
         zyre_leave (agent->context->node, agent->igs_channel);
         s_unlock_zyre_peer ();
     }

@@ -708,23 +708,12 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                     }
                 }
                 s_lock_zyre_peer ();
-                zyre_shouts (agent->context->node, agent->calls_channel,
-                             "%s(%s) calls %s.%s(%s)",
-                             agent->definition->name, agent->uuid,
-                             remote_agent->definition->name, service_name,
-                             remote_agent->uuid);
-                zyre_shouts (agent->context->node, agent->services_channel,
-                             "%s(%s) services %s.%s(%s)",
-                             agent->definition->name, agent->uuid,
-                             remote_agent->definition->name, service_name,
-                             remote_agent->uuid);
                 zyre_shouts (agent->context->node, agent->igs_channel,
-                             "SERVICE %s(%s) %s.%s(%s)",
+                             "SERVICE %s(%s) called %s.%s(%s)",
                              agent->definition->name, agent->uuid,
                              remote_agent->definition->name, service_name,
                              remote_agent->uuid);
-                zyre_whisper (agent->context->node, remote_agent->peer->peer_id,
-                              &msg);
+                zyre_whisper (agent->context->node, remote_agent->peer->peer_id, &msg);
                 s_unlock_zyre_peer ();
                 if (core_context->enable_service_logging)
                     s_service_log_sent_service (agent, remote_agent->definition->name, remote_agent->uuid,
@@ -810,18 +799,8 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
 
                 s_lock_zyre_peer ();
                 if (core_context->node != NULL) {
-                    zyre_shouts (agent->context->node, agent->calls_channel,
-                                 "%s(%s) calls %s.%s(%s)",
-                                 agent->definition->name, agent->uuid,
-                                 local_agent->definition->name, service_name,
-                                 local_agent->uuid);
-                    zyre_shouts (agent->context->node, agent->services_channel,
-                                 "%s(%s) services %s.%s(%s)",
-                                 agent->definition->name, agent->uuid,
-                                 local_agent->definition->name, service_name,
-                                 local_agent->uuid);
                     zyre_shouts (agent->context->node, agent->igs_channel,
-                                 "SERVICE %s(%s) %s.%s(%s)",
+                                 "SERVICE %s(%s) called %s.%s(%s)",
                                  agent->definition->name, agent->uuid,
                                  local_agent->definition->name, service_name,
                                  local_agent->uuid);

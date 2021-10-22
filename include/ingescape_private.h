@@ -298,8 +298,6 @@ struct _igsagent_t {
     bool is_virtual;
 
     igs_core_context_t *context;
-    char *services_channel;
-    char *calls_channel; // DEPRECATED, replaced by services_channel
     char *igs_channel;
     
     igsagent_wrapper_t *activate_callbacks;

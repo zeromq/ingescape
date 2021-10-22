@@ -127,7 +127,7 @@ void s_split_trigger_send_message_to_worker (igs_core_context_t *context, char *
                                 HASH_ITER(hh, context->remote_agents, remote_agent, rtmp){
                                     if(streq(remote_agent->uuid, max_credit_worker->agent_uuid)){
                                         zyre_shouts (context->node, local_agent->igs_channel,
-                                                     "SPLIT %s(%s).%s %s(%s).%s",
+                                                     "SPLIT %s(%s).%s to %s(%s).%s",
                                                      local_agent->definition->name,
                                                      splitter->agent_uuid,
                                                      output->name,
