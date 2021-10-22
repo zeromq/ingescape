@@ -68,16 +68,16 @@ igs_split_t *split_create_split_element (const char *from_input,
     return new_split_elmt;
 }
 
-void s_split_trigger_send_message_to_worker (igs_core_context_t *context, char *splitter_uuid, const igs_iop_t *output)
+void s_split_trigger_send_message_to_worker (igs_core_context_t *context, char *agent_uuid, const igs_iop_t *output)
 {
     assert(context);
-    assert(splitter_uuid);
+    assert(agent_uuid);
     assert(output);
 
     igs_splitter_t *splitter = NULL;
     //FIXME: splitters should be stored in a hash and not a list, and searched by uuid
     LL_FOREACH(context->splitters, splitter){
-        if(streq(splitter->agent_uuid, splitter_uuid) && streq(splitter->output_name, output->name)){
+        if(streq(splitter->agent_uuid, agent_uuid) && streq(splitter->output_name, output->name)){
             igs_worker_t *worker = NULL;
             igs_worker_t *max_credit_worker = NULL;
             LL_FOREACH(splitter->workers_list, worker){
@@ -121,21 +121,11 @@ void s_split_trigger_send_message_to_worker (igs_core_context_t *context, char *
                     }
                     if (context->node != NULL) {
                         igsagent_t *local_agent, *atmp;
-                        HASH_ITER(hh, context->agents, local_agent, atmp)
-                        {
-                            if(local_agent
-                               && local_agent->igs_channel
-                               && local_agent->uuid
-                               && streq(local_agent->uuid, splitter_uuid))
-                            {
+                        HASH_ITER(hh, context->agents, local_agent, atmp){
+                            if(streq(local_agent->uuid, agent_uuid)){
                                 igs_remote_agent_t *remote_agent, *rtmp;
-                                HASH_ITER(hh, context->remote_agents, remote_agent, rtmp)
-                                {
-                                    if(remote_agent
-                                       && remote_agent->uuid
-                                       && streq(remote_agent->uuid, max_credit_worker->agent_uuid)
-                                       && remote_agent->definition->name)
-                                    {
+                                HASH_ITER(hh, context->remote_agents, remote_agent, rtmp){
+                                    if(streq(remote_agent->uuid, max_credit_worker->agent_uuid)){
                                         zyre_shouts (context->node, local_agent->igs_channel,
                                                      "SPLIT %s(%s).%s %s(%s).%s",
                                                      local_agent->definition->name,
@@ -167,7 +157,7 @@ void s_split_trigger_send_message_to_worker (igs_core_context_t *context, char *
                     }
                     free(work);
                     max_credit_worker->uses++;
-                    max_credit_worker->credit --;
+                    max_credit_worker->credit--;
                 }
             }
             break;
@@ -226,11 +216,11 @@ void split_add_work_to_queue (igs_core_context_t *context, char* agent_uuid, con
 ////////////////////////////////////////////////////////////////////////
 
 
-void s_split_add_credit_to_worker (igs_core_context_t *context, char* splitter_uuid, igs_iop_t* output,
+void s_split_add_credit_to_worker (igs_core_context_t *context, char* agent_uuid, igs_iop_t* output,
                                    char* worker_uuid, char* input_name, int credit, bool new_worker)
 {
     assert(context);
-    assert(splitter_uuid);
+    assert(agent_uuid);
     assert(worker_uuid);
     assert(input_name);
     assert(output);
@@ -241,7 +231,7 @@ void s_split_add_credit_to_worker (igs_core_context_t *context, char* splitter_u
     igs_splitter_t *splitter;
     LL_FOREACH(context->splitters, splitter){
         if(splitter->workers_list
-           && streq(splitter->agent_uuid, splitter_uuid)
+           && streq(splitter->agent_uuid, agent_uuid)
            && streq(splitter->output_name, output->name)){
             igs_worker_t *worker = NULL;
             int maxUses = 0;
@@ -267,7 +257,7 @@ void s_split_add_credit_to_worker (igs_core_context_t *context, char* splitter_u
     }
     if(!splitter_found && new_worker){
         igs_splitter_t *new_splitter = (igs_splitter_t *)zmalloc(sizeof(igs_splitter_t));
-        new_splitter->agent_uuid = s_strndup(splitter_uuid, strlen(splitter_uuid));
+        new_splitter->agent_uuid = s_strndup(agent_uuid, strlen(agent_uuid));
         new_splitter->output_name = s_strndup(output->name, strlen(output->name));
         LL_APPEND(context->splitters, new_splitter);
         igs_worker_t *new_w = (igs_worker_t *)zmalloc(sizeof(igs_worker_t));
@@ -276,7 +266,7 @@ void s_split_add_credit_to_worker (igs_core_context_t *context, char* splitter_u
         new_w->credit = credit;
         LL_APPEND(new_splitter->workers_list, new_w);
     }
-    s_split_trigger_send_message_to_worker(context, splitter_uuid, output);
+    s_split_trigger_send_message_to_worker(context, agent_uuid, output);
 }
 
 int split_message_from_worker (char *command, zmsg_t *msg, igs_core_context_t *context)
@@ -306,8 +296,8 @@ int split_message_from_worker (char *command, zmsg_t *msg, igs_core_context_t *c
     if(streq(command, WORKER_HELLO_MSG)){
         char *creditStr = zmsg_popstr(msg);
         int credit = atoi(creditStr);
-        char *splitter_uuid = zmsg_popstr(msg);
-        if(!splitter_uuid){
+        char *agent_uuid = zmsg_popstr(msg);
+        if(!agent_uuid){
             igs_error ("no valid splitter uuid in message %s from worker %s : rejecting", command, worker_uuid);
             free(worker_uuid);
             free(inputName);
@@ -316,9 +306,7 @@ int split_message_from_worker (char *command, zmsg_t *msg, igs_core_context_t *c
         }
         igsagent_t *agent, *tmpAgent;
         HASH_ITER(hh, context->agents, agent, tmpAgent){
-            if (!agent || !agent->uuid || (strlen(agent->uuid) == 0))
-                continue;
-            if(streq(splitter_uuid, agent->uuid)){
+            if(streq(agent_uuid, agent->uuid)){
                 igs_iop_t *iop, *tmpIop;
                 HASH_ITER(hh, agent->definition->outputs_table, iop, tmpIop){
                     if(!iop || !iop->name)
@@ -331,10 +319,10 @@ int split_message_from_worker (char *command, zmsg_t *msg, igs_core_context_t *c
             }
         }
         free(creditStr);
-        free(splitter_uuid);
+        free(agent_uuid);
     }else if(streq(command, WORKER_READY_MSG)){
-        char * splitter_uuid = zmsg_popstr(msg);
-        if(splitter_uuid == NULL){
+        char * agent_uuid = zmsg_popstr(msg);
+        if(agent_uuid == NULL){
             igs_error ("no valid splitter uuid in message %s from worker %s : rejecting", command, worker_uuid);
             free(worker_uuid);
             free(inputName);
@@ -343,9 +331,7 @@ int split_message_from_worker (char *command, zmsg_t *msg, igs_core_context_t *c
         }
         igsagent_t *agent, *tmpAgent;
         HASH_ITER(hh, context->agents, agent, tmpAgent){
-            if (!agent || !agent->uuid || (strlen(agent->uuid) == 0))
-                continue;
-            if(streq(splitter_uuid, agent->uuid)){
+            if(streq(agent_uuid, agent->uuid)){
                 igs_iop_t *iop, *tmpIop;
                 HASH_ITER(hh, agent->definition->outputs_table, iop, tmpIop){
                     if(!iop || !iop->name)
@@ -357,7 +343,7 @@ int split_message_from_worker (char *command, zmsg_t *msg, igs_core_context_t *c
                 }
             }
         }
-        free(splitter_uuid);
+        free(agent_uuid);
     }else if(streq(command, WORKER_GOODBYE_MSG))
         split_remove_worker(context, worker_uuid, inputName);
     free(worker_uuid);
@@ -370,28 +356,28 @@ int split_message_from_splitter (zmsg_t *msg, igs_core_context_t *context)
 {
     assert(msg);
     assert(context);
-    char * splitter_uuid = zmsg_popstr(msg);
-    if(!splitter_uuid){
+    char * agent_uuid = zmsg_popstr(msg);
+    if(!agent_uuid){
         igs_error ("no valid splitter uuid in work message from splitter : rejecting");
         return 1;
     }
     char * inputName = zmsg_popstr(msg);
     if(!inputName){
-        igs_error ("no valid input name in work message from splitter %s : rejecting", splitter_uuid);
-        free(splitter_uuid);
+        igs_error ("no valid input name in work message from splitter %s : rejecting", agent_uuid);
+        free(agent_uuid);
         return 1;
     }
     char * outputName = zmsg_popstr(msg);
     if(!outputName){
-        igs_error ("no valid output name in work message from splitter %s : rejecting", splitter_uuid);
-        free(splitter_uuid);
+        igs_error ("no valid output name in work message from splitter %s : rejecting", agent_uuid);
+        free(agent_uuid);
         free(inputName);
         return 1;
     }
     char * vType = zmsg_popstr(msg);
     if(vType == NULL){
-        igs_error ("no valid value type in work message from splitter %s : rejecting", splitter_uuid);
-        free(splitter_uuid);
+        igs_error ("no valid value type in work message from splitter %s : rejecting", agent_uuid);
+        free(agent_uuid);
         free(inputName);
         free(outputName);
         return 1;
@@ -402,7 +388,7 @@ int split_message_from_splitter (zmsg_t *msg, igs_core_context_t *context)
     vType = NULL;
     if (valueType < IGS_INTEGER_T || valueType > IGS_DATA_T){
         igs_error("input type is not valid (%d) in received publication : rejecting", valueType);
-        free(splitter_uuid);
+        free(agent_uuid);
         free(inputName);
         free(outputName);
         return 1;
@@ -416,7 +402,7 @@ int split_message_from_splitter (zmsg_t *msg, igs_core_context_t *context)
         value = zmsg_popstr(msg);
         if (value == NULL){
             igs_error("value is NULL in received publication : rejecting");
-            free(splitter_uuid);
+            free(agent_uuid);
             free(inputName);
             free(outputName);
             return 1;
@@ -425,7 +411,7 @@ int split_message_from_splitter (zmsg_t *msg, igs_core_context_t *context)
         frame = zmsg_pop(msg);
         if (!frame){
             igs_error("value is NULL in received publication : rejecting");
-            free(splitter_uuid);
+            free(agent_uuid);
             free(inputName);
             free(outputName);
             return 1;
@@ -436,8 +422,8 @@ int split_message_from_splitter (zmsg_t *msg, igs_core_context_t *context)
     
     char * worker_uuid = zmsg_popstr(msg);
     if(!worker_uuid){
-        igs_error ("no valid worker uuid in work message from splitter %s : rejecting", splitter_uuid);
-        free(splitter_uuid);
+        igs_error ("no valid worker uuid in work message from splitter %s : rejecting", agent_uuid);
+        free(agent_uuid);
         free(inputName);
         free(outputName);
         if (data != NULL)
@@ -449,7 +435,7 @@ int split_message_from_splitter (zmsg_t *msg, igs_core_context_t *context)
     
     igsagent_t *tmp, *elt;
     HASH_ITER(hh, core_context->agents, elt, tmp){
-        if (elt && elt->uuid && streq(elt->uuid, worker_uuid)){
+        if (streq(elt->uuid, worker_uuid)){
             if (valueType == IGS_STRING_T)
                 model_write_iop(elt, inputName, IGS_INPUT_T, valueType, value, strlen(value)+1);
             else
@@ -465,10 +451,10 @@ int split_message_from_splitter (zmsg_t *msg, igs_core_context_t *context)
         zmsg_addstr(readyMessage, worker_uuid);
         zmsg_addstr(readyMessage, inputName);
         zmsg_addstr(readyMessage, outputName);
-        igs_channel_whisper_zmsg(splitter_uuid, &readyMessage);
+        igs_channel_whisper_zmsg(agent_uuid, &readyMessage);
     }
     free(worker_uuid);
-    free(splitter_uuid);
+    free(agent_uuid);
     free(inputName);
     free(outputName);
     return 0;
