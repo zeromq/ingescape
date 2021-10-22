@@ -10,7 +10,7 @@ SCRIPT_NAME=$(basename $0)
     IGS=$PWD
     cd ..
     CODEROOT=$PWD
-    echo "This script will compile Ingescape and its dependencies in a local sysroot directory at $CODEROOT/sysroot and create xcode projects for each dependency using cmake. This is a nice way to have everything you need to debug/contribute to Ingescape without installing anything on your system."
+    echo "This script will compile ingescape and its dependencies in a local sysroot directory at $CODEROOT/sysroot and create xcode projects for each dependency using cmake. This is a nice way to have everything you need to debug/contribute to Ingescape without installing anything on your system. NB: if you do not have xcode, just ignore the related error messages."
     cd $IGS
     read -p "Do you want to continue? [yN] " -n 1 -r
     echo
@@ -24,7 +24,7 @@ SCRIPT_NAME=$(basename $0)
 
     echo "Deploying ingescape library and its dependencies in $CODEROOT/sysroot..."
     mkdir build
-    cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=$CODEROOT/sysroot/usr/local/ -DOSX_UNIVERSAL=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11 -DWITH_DEPS=ON
+    cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=$CODEROOT/sysroot/usr/local/ -DOSX_UNIVERSAL=OFF -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11 -DWITH_DEPS=ON
     make -j8 -C build install
     cp src/include/ingescape_private.h $CODEROOT/sysroot/usr/local/include/ingescape/
     rm -Rf build
