@@ -38,7 +38,8 @@ void split_remove_worker (igs_core_context_t *context, char *uuid, char *input_n
     assert(uuid);
     assert(context);
     igs_splitter_t *splitter;
-    LL_FOREACH(context->splitters, splitter){
+    igs_splitter_t *tmp;
+    LL_FOREACH_SAFE(context->splitters, splitter, tmp){
         igs_worker_t *worker, *tmpWorker;
         LL_FOREACH_SAFE(splitter->workers_list, worker, tmpWorker){
             if (streq(uuid, worker->agent_uuid) &&
@@ -50,6 +51,29 @@ void split_remove_worker (igs_core_context_t *context, char *uuid, char *input_n
                 worker->input_name = NULL;
                 free(worker);
             }
+        }
+        if(splitter->workers_list == NULL){
+            LL_DELETE(context->splitters, splitter);
+            free(splitter->agent_uuid);
+            splitter->agent_uuid = NULL;
+            free(splitter->output_name);
+            splitter->output_name = NULL;
+            igs_queued_work_t *elt, *tmp;
+            LL_FOREACH_SAFE(splitter->queued_works, elt, tmp){
+                if(elt->value_type == IGS_DATA_T){
+                    free(elt->value.data);
+                    elt->value.data = NULL;
+                }else if(elt->value_type == IGS_STRING_T){
+                    free(elt->value.s);
+                    elt->value.s = NULL;
+                }
+                free(elt);
+                elt = NULL;
+            }
+            free(splitter->queued_works);
+            splitter->queued_works = NULL;
+            free(splitter);
+            splitter = NULL;
         }
     }
 }
