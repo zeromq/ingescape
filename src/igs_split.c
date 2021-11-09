@@ -60,6 +60,7 @@ void split_remove_worker (igs_core_context_t *context, char *uuid, char *input_n
             splitter->output_name = NULL;
             igs_queued_work_t *elt, *tmp;
             LL_FOREACH_SAFE(splitter->queued_works, elt, tmp){
+                LL_DELETE(splitter->queued_works, elt);
                 if(elt->value_type == IGS_DATA_T){
                     free(elt->value.data);
                     elt->value.data = NULL;
@@ -68,12 +69,10 @@ void split_remove_worker (igs_core_context_t *context, char *uuid, char *input_n
                     elt->value.s = NULL;
                 }
                 free(elt);
-                elt = NULL;
             }
             free(splitter->queued_works);
             splitter->queued_works = NULL;
             free(splitter);
-            splitter = NULL;
         }
     }
 }
