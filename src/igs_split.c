@@ -58,17 +58,17 @@ void split_remove_worker (igs_core_context_t *context, char *uuid, char *input_n
             splitter->agent_uuid = NULL;
             free(splitter->output_name);
             splitter->output_name = NULL;
-            igs_queued_work_t *elt, *tmp;
-            LL_FOREACH_SAFE(splitter->queued_works, elt, tmp){
-                LL_DELETE(splitter->queued_works, elt);
-                if(elt->value_type == IGS_DATA_T){
-                    free(elt->value.data);
-                    elt->value.data = NULL;
-                }else if(elt->value_type == IGS_STRING_T){
-                    free(elt->value.s);
-                    elt->value.s = NULL;
+            igs_queued_work_t *work_elt, *work_tmp;
+            LL_FOREACH_SAFE(splitter->queued_works, work_elt, work_tmp){
+                LL_DELETE(splitter->queued_works, work_elt);
+                if(work_elt->value_type == IGS_DATA_T){
+                    free(work_elt->value.data);
+                    work_elt->value.data = NULL;
+                }else if(work_elt->value_type == IGS_STRING_T){
+                    free(work_elt->value.s);
+                    work_elt->value.s = NULL;
                 }
-                free(elt);
+                free(work_elt);
             }
             free(splitter->queued_works);
             splitter->queued_works = NULL;
