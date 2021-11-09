@@ -253,8 +253,7 @@ void s_split_add_credit_to_worker (igs_core_context_t *context, char* agent_uuid
     bool splitter_found = false;
     igs_splitter_t *splitter;
     LL_FOREACH(context->splitters, splitter){
-        if(splitter->workers_list
-           && streq(splitter->agent_uuid, agent_uuid)
+        if(streq(splitter->agent_uuid, agent_uuid)
            && streq(splitter->output_name, output->name)){
             igs_worker_t *worker = NULL;
             int maxUses = 0;
