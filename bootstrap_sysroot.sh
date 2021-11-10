@@ -26,7 +26,7 @@ SCRIPT_NAME=$(basename $0)
     mkdir build
     cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=$CODEROOT/sysroot/usr/local/ -DOSX_UNIVERSAL=OFF -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11 -DWITH_DEPS=ON
     make -j8 -C build install
-    cp src/include/ingescape_private.h $CODEROOT/sysroot/usr/local/include/ingescape/
+    cp include/ingescape_private.h $CODEROOT/sysroot/usr/local/include/ingescape/
     rm -Rf build
 
     cd dependencies
