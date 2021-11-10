@@ -688,15 +688,12 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 zlist_destroy (&keys);
             }
 
-            const char *peer_public_key =
-              zyre_event_header (zyre_event, "X-PUBLICKEY");
-            const char *protocol_version =
-              zyre_event_header (zyre_event, "protocol");
+            const char *peer_public_key = zyre_event_header (zyre_event, "X-PUBLICKEY");
+            const char *protocol_version = zyre_event_header (zyre_event, "protocol");
             if (protocol_version)
                 zyre_peer->protocol = s_strndup (protocol_version, 16);
 
-            const char *publisher_port =
-              zyre_event_header (zyre_event, "publisher");
+            const char *publisher_port = zyre_event_header (zyre_event, "publisher");
             if (publisher_port) {
                 // we extract the publisher adress to subscribe to from the zyre message
                 // header
@@ -709,8 +706,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 while (*insert != ':') {
                     insert--;
                     if (insert == endpoint_address) {
-                        igs_error ("Could not extract port from address %s",
-                                   address);
+                        igs_error ("Could not extract port from address %s", address);
                         extractOK = false;
                         break;
                     }
@@ -737,12 +733,10 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                         if (context->process_id == pid) {
                             // FIXME: certainly useless with new architecture
                             // same ip address and same process : we can use inproc
-                            inproc_address =
-                              zyre_event_header (zyre_event, "inproc");
+                            inproc_address = zyre_event_header (zyre_event, "inproc");
                             if (inproc_address != NULL) {
                                 use_inproc = true;
-                                igs_debug ("Use address %s to subscribe to %s",
-                                           inproc_address, name);
+                                igs_debug ("Use address %s to subscribe to %s", inproc_address, name);
                             }
                         }
                         else {
@@ -750,13 +744,11 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
 #if defined(__UNIX__)
                             ipc_address = zyre_event_header (zyre_event, "ipc");
 #elif defined(__WINDOWS__)
-                            ipc_address =
-                              zyre_event_header (zyre_event, "loopback");
+                            ipc_address = zyre_event_header (zyre_event, "loopback");
 #endif
                             if (ipc_address != NULL) {
                                 useIPC = true;
-                                igs_debug ("Use address %s to subscribe to %s",
-                                           ipc_address, name);
+                                igs_debug ("Use address %s to subscribe to %s", ipc_address, name);
                             }
                         }
                     }
@@ -764,47 +756,36 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     // add port to the endpoint to compose it fully
                     strcat (endpoint_address, publisher_port);
                     if (context->network_allow_inproc && use_inproc) {
-                        zyre_peer->subscriber =
-                          zsock_new_sub (inproc_address, NULL);
-                        zsock_set_rcvhwm (zyre_peer->subscriber,
-                                          context->network_hwm_value);
+                        zyre_peer->subscriber = zsock_new_sub (inproc_address, NULL);
+                        zsock_set_rcvhwm (zyre_peer->subscriber, context->network_hwm_value);
                         igs_debug ("Subscription created for %s at %s (inproc)",
                                    zyre_peer->name, inproc_address);
                     }
                     else
                     if (context->network_allow_ipc && useIPC) {
-                        zyre_peer->subscriber =
-                          zsock_new_sub (ipc_address, NULL);
-                        zsock_set_rcvhwm (zyre_peer->subscriber,
-                                          context->network_hwm_value);
+                        zyre_peer->subscriber = zsock_new_sub (ipc_address, NULL);
+                        zsock_set_rcvhwm (zyre_peer->subscriber, context->network_hwm_value);
                         igs_debug ("Subscription created for %s at %s (ipc)",
                                    zyre_peer->name, ipc_address);
                     }
                     else {
-                        zyre_peer->subscriber =
-                          zsock_new_sub (endpoint_address, NULL);
-                        zsock_set_rcvhwm (zyre_peer->subscriber,
-                                          context->network_hwm_value);
+                        zyre_peer->subscriber = zsock_new_sub (endpoint_address, NULL);
+                        zsock_set_rcvhwm (zyre_peer->subscriber, context->network_hwm_value);
                         igs_debug ("Subscription created for %s at %s (tcp)",
                                    zyre_peer->name, endpoint_address);
                     }
                     assert (zyre_peer->subscriber);
 
-                    if (context->security_is_enabled) {
-                        assert (peer_public_key);
-                        zcert_apply (context->security_cert,
-                                     zyre_peer->subscriber);
-                        zsock_set_curve_serverkey (zyre_peer->subscriber,
-                                                   peer_public_key);
+                    if (context->security_is_enabled && peer_public_key) {
+                        zcert_apply (context->security_cert, zyre_peer->subscriber);
+                        zsock_set_curve_serverkey (zyre_peer->subscriber, peer_public_key);
                     }
-                    zloop_reader (loop, zyre_peer->subscriber,
-                                  s_manage_remote_publication, context);
+                    zloop_reader (loop, zyre_peer->subscriber, s_manage_remote_publication, context);
                     zloop_reader_set_tolerant (loop, zyre_peer->subscriber);
                 }
             }
             zhash_t *headers_bis = zhash_dup (headers);
-            s_agent_propagate_agent_event (IGS_PEER_ENTERED, peerUUID, name,
-                                           headers_bis);
+            s_agent_propagate_agent_event (IGS_PEER_ENTERED, peerUUID, name, headers_bis);
             zhash_destroy (&headers_bis);
         }
         else {
@@ -2937,18 +2918,15 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
     // NB: as explained earlier, agent may be NULL
     // depending on the event type.
     igs_channels_wrapper_t *elt;
-    DL_FOREACH (context->zyre_callbacks, elt)
-    {
-        if (zyre_event != NULL) {
+    DL_FOREACH (context->zyre_callbacks, elt){
+        if (zyre_event){
             zmsg_t *dup = zmsg_dup (msg);
             elt->callback_ptr (event, peerUUID, name, address, group, headers,
                                dup, elt->my_data);
             zmsg_destroy (&dup);
-        }
-        else {
-            igs_error (
-              "previous callback certainly destroyed the zyre event : next "
-              "callbacks will not be executed");
+        }else{
+            igs_error ("previous callback certainly destroyed the zyre event : next "
+                       "callbacks will not be executed");
             break;
         }
     }
@@ -3226,7 +3204,7 @@ static void s_run_loop (zsock_t *mypipe, void *args)
     if (context->inproc_publisher != NULL)
         zsock_destroy (&context->inproc_publisher);
 #endif
-    if (context->logger != NULL)
+    if (context->logger)
         zsock_destroy (&context->logger);
 
     // handle external stop if needed
