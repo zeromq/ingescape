@@ -1781,7 +1781,7 @@
 		979A79701EA7B0D6003153EF /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1300;
+				LastUpgradeCheck = 1310;
 				ORGANIZATIONNAME = "Ingenuity i/o";
 				TargetAttributes = {
 					974D720325D298960049C183 = {
