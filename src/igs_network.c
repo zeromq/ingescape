@@ -2574,8 +2574,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     igs_warn ("Remote agent %s(%s) uses an older version of Ingescape with deprecated messages. Please upgrade this agent.", caller_name, caller_uuid);
 
                 igs_remote_agent_t *caller_agent = NULL;
-                HASH_FIND_STR (context->remote_agents, caller_uuid,
-                               caller_agent);
+                HASH_FIND_STR (context->remote_agents, caller_uuid, caller_agent);
                 if (caller_agent) {
                     // replace caller name by the one of an actual agent
                     // NB: this will happen all the time, except when ingeprobe
@@ -2640,10 +2639,9 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                             size_t nb_args = 0;
                             igs_service_arg_t *_arg = NULL;
                             LL_COUNT (service->arguments, _arg, nb_args);
-                            if (service_add_values_to_arguments_from_message (
-                                  service_name, service->arguments,
-                                  msg_duplicate)
-                                == IGS_SUCCESS) {
+                            if (service_add_values_to_arguments_from_message (service_name,
+                                                                              service->arguments,
+                                                                              msg_duplicate) == IGS_SUCCESS) {
                                 if (core_context->enable_service_logging)
                                     service_log_received_service (callee_agent, caller_name, caller_uuid,
                                                                   service_name, service->arguments);
@@ -2651,8 +2649,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                                                caller_uuid, service_name,
                                                service->arguments, nb_args,
                                                token, service->cb_data);
-                                service_free_values_in_arguments (
-                                  service->arguments);
+                                service_free_values_in_arguments (service->arguments);
                             }
                         }
                         else
@@ -4049,19 +4046,19 @@ void igsagent_set_name (igsagent_t *agent, const char *name)
           agent,
           "Agent name '%s' exceeds maximum size and will be truncated to '%s'",
           name, n);
-    bool space_in_name = false;
+    bool invalid_name = false;
     size_t length_ofn = strlen (n);
     size_t i = 0;
     for (i = 0; i < length_ofn; i++) {
-        if (n[i] == ' ') {
+        if (n[i] == ' ' || n[i] == '.') {
             n[i] = '_';
-            space_in_name = true;
+            invalid_name = true;
         }
     }
-    if (space_in_name)
+    if (invalid_name)
         igsagent_warn (
           agent,
-          "Spaces are not allowed in agent name: '%s' has been changed to '%s'",
+          "Spaces and dots are not allowed in an agent name: '%s' has been changed to '%s'",
           name, n);
     char *previous = agent->definition->name;
     agent->definition->name = n;

@@ -52,23 +52,21 @@ void service_free_service (igs_service_t *t)
     }
 }
 
-igs_result_t service_add_values_to_arguments_from_message (
-  const char *name, igs_service_arg_t *arg, zmsg_t *msg)
-{
+igs_result_t service_add_values_to_arguments_from_message (const char *name,
+                                                           igs_service_arg_t *arg,
+                                                           zmsg_t *msg){
     size_t nb_frames = zmsg_size (msg);
     size_t nb_args = 0;
     igs_service_arg_t *tmp = NULL;
     DL_COUNT (arg, tmp, nb_args);
     if (nb_frames != nb_args) {
-        igs_error (
-          "arguments count do not match in received message for service %s "
-          "(%zu vs. %zu expected)",
-          name, nb_frames, nb_args);
+        igs_error ("arguments count do not match in received message for service %s "
+                   "(%zu vs. %zu expected)",
+                   name, nb_frames, nb_args);
         return IGS_FAILURE;
     }
     igs_service_arg_t *current = NULL;
-    DL_FOREACH (arg, current)
-    {
+    DL_FOREACH (arg, current){
         zframe_t *f = zmsg_pop (msg);
         size_t size = zframe_size (f);
         switch (current->type) {
