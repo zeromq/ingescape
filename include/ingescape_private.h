@@ -488,6 +488,7 @@ void
 igs_result_t network_publish_output (igsagent_t *agent, const igs_iop_t *iop);
 
 // parser
+PUBLIC igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json);
 PUBLIC igs_definition_t* parser_load_definition (const char* json_str);
 PUBLIC igs_definition_t* parser_load_definition_from_path (const char* file_path);
 PUBLIC char* parser_export_definition(igs_definition_t* def);
