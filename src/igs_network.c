@@ -1078,10 +1078,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 // remote agent definition is required to handle received data.
                 igsagent_t *agent, *tmp;
                 HASH_ITER (hh, context->agents, agent, tmp)
-                {
-                    s_network_configure_mapping_to_remote_agent (agent,
-                                                                  remote_agent);
-                }
+                    s_network_configure_mapping_to_remote_agent (agent, remote_agent);
 
                 if (is_agent_new) {
                     s_agent_propagate_agent_event (IGS_AGENT_ENTERED, uuid,
@@ -3207,14 +3204,8 @@ static void s_run_loop (zsock_t *mypipe, void *args)
     // handle external stop if needed
     if (context->external_stop) {
         igs_forced_stop_wrapper_t *cb = NULL;
-        igsagent_t *a, *atmp;
-        HASH_ITER (hh, context->agents, a, atmp)
-        {
-            DL_FOREACH (context->external_stop_calbacks, cb)
-            {
-                cb->callback_ptr (cb->my_data);
-            }
-        }
+        DL_FOREACH (context->external_stop_calbacks, cb)
+            cb->callback_ptr (cb->my_data);
     }
 
     // clean remaining dynamic data

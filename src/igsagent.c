@@ -22,14 +22,11 @@ void s_agent_propagate_agent_event (igs_agent_event_t event,
 {
     // propagate event on all local agents
     igsagent_t *agent, *tmp;
-    HASH_ITER (hh, core_context->agents, agent, tmp)
-    {
+    HASH_ITER (hh, core_context->agents, agent, tmp){
         if (!streq (uuid, agent->uuid)) {
             igs_agent_event_wrapper_t *cb;
-            DL_FOREACH (agent->agent_event_callbacks, cb)
-            {
-                cb->callback_ptr (agent, event, uuid, name, event_data,
-                                  cb->my_data);
+            DL_FOREACH (agent->agent_event_callbacks, cb){
+                cb->callback_ptr (agent, event, uuid, name, event_data, cb->my_data);
             }
         }
     }

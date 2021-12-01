@@ -346,10 +346,9 @@ void igs_observe_agent_events (igs_agent_events_fn cb, void *my_data)
         sizeof (observe_agent_events_cb_wrapper_t));
     wrap->cb = cb;
     wrap->my_data = my_data;
-    LL_APPEND (agent_event_cb_wrappers,
-               wrap); // store wrapper to delete it later
+    LL_APPEND (agent_event_cb_wrappers, wrap);
     igsagent_observe_agent_events (core_agent,
-                                    core_observe_agent_events_callback, wrap);
+                                   core_observe_agent_events_callback, wrap);
 }
 
 // IOP
