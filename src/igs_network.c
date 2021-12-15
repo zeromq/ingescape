@@ -4676,14 +4676,14 @@ igs_result_t igsagent_election_join (igsagent_t *agent,
             attendee = zlist_next (election);
         }
     }
-    zlist_append (election, strdup (agent->uuid));
+    zlist_append (election, agent->uuid);
 
     // elections by agent
     if (!agent->elections) {
         agent->elections = zlist_new ();
         zlist_autofree (agent->elections);
     }
-    zlist_append (agent->elections, strdup (el_name));
+    zlist_append (agent->elections, el_name);
 
     s_network_unlock ();
     return IGS_SUCCESS;
