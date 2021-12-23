@@ -230,8 +230,8 @@ void split_add_work_to_queue (igs_core_context_t *context, char* agent_uuid, con
                 LL_APPEND(splitter->queued_works, new_work);
             }
         }
+        s_split_trigger_send_message_to_worker(context, agent_uuid, output);
     }
-    s_split_trigger_send_message_to_worker(context, agent_uuid, output);
 }
 
 ////////////////////////////////////////////////////////////////////////
