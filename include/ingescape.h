@@ -333,15 +333,32 @@ INGESCAPE_EXPORT igs_result_t igs_parameter_set_double(const char *name, double 
 INGESCAPE_EXPORT igs_result_t igs_parameter_set_string(const char *name, const char *value);
 INGESCAPE_EXPORT igs_result_t igs_parameter_set_data(const char *name, void *value, size_t size);
 
-/*These two functions enable sending and receiving DATA
+/*Constraints on IOPs
+ Constraints enable verifications upon sending or receiving information
+ with inputs and outputs. The syntax for the constraints is global but
+ some constraints only apply to certain types:
+ • Integers and doubles:
+    - "max 10.123"  : applies a max value on the IOP
+    - "min -10" : applies a min value on the IOP
+    - "range -10..10" : applies a min and max value on the IOP
+ • Strings
+    - "~ regular_expression", e.g. "~ \\d+(\.\\d+)?)":
+        IOP of type STRING must match the regular expression
+ */
+INGESCAPE_EXPORT void igs_constraints_enforce(bool enforce); //default is false
+INGESCAPE_EXPORT igs_result_t igs_input_add_constraint(const char *name, const char *constraint);
+INGESCAPE_EXPORT igs_result_t igs_output_add_constraint(const char *name, const char *constraint);
+INGESCAPE_EXPORT igs_result_t igs_parameter_add_constraint(const char *name, const char *constraint);
+
+/*These two functions enable sending and receiving DATA on
  inputs/outputs by using zmsg_t structures. zmsg_t structures
  offer advanced functionalities for data serialization.
  More can be found here: http://czmq.zeromq.org/manual:zmsg */
 INGESCAPE_EXPORT igs_result_t igs_output_set_zmsg(const char *name, zmsg_t *msg);
 INGESCAPE_EXPORT igs_result_t igs_input_zmsg(const char *name, zmsg_t **msg); //msg is owned by caller
 
-//clear IOP data in memory without having to write an empty value
-//into the IOP. Especially useful for IOPs handling large strings and data.
+/*Clear IOP data in memory without having to write an empty value
+ into the IOP. Especially useful for IOPs handling large strings and data.*/
 INGESCAPE_EXPORT void igs_clear_input(const char *name);
 INGESCAPE_EXPORT void igs_clear_output(const char *name);
 INGESCAPE_EXPORT void igs_clear_parameter(const char *name);

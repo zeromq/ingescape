@@ -84,6 +84,44 @@ typedef struct igs_observe_wrapper{
     struct igs_observe_wrapper *next;
 } igs_observe_wrapper_t;
 
+typedef enum {
+    IGS_CONSTRAINT_MIN = 0,
+    IGS_CONSTRAINT_MAX,
+    IGS_CONSTRAINT_RANGE,
+    IGS_CONSTRAINT_REGEXP
+} igs_constraint_type_t;
+
+typedef struct igs_constraint{
+    igs_constraint_type_t type;
+    union {
+        struct {
+            int min;
+        } min_int;
+        struct {
+            int max;
+        } max_int;
+        struct {
+            int min;
+            int max;
+        } range_int;
+        struct {
+            double min;
+        } min_double;
+        struct {
+            double max;
+        } max_double;
+        struct {
+            double min;
+            double max;
+        } range_double;
+        struct {
+            zrex_t *rex;
+        } regexp;
+    };
+    struct igs_constraint *prev;
+    struct igs_constraint *next;
+} igs_constraint_t;
+
 typedef struct igs_iop{
     char* name;
     igs_iop_value_type_t value_type;
@@ -98,6 +136,7 @@ typedef struct igs_iop{
     size_t value_size;
     bool is_muted;
     igs_observe_wrapper_t *callbacks;
+    igs_constraint_t *constraint;
     UT_hash_handle hh;         /* makes this structure hashable */
 } igs_iop_t;
 
@@ -351,6 +390,7 @@ typedef struct igs_core_context {
     size_t log_file_max_line_length;
     char log_file_path[IGS_MAX_PATH_LENGTH];
     int log_nb_of_entries; //for fflush rotation
+    bool enforce_constraints;
 
     // network
     bool network_allow_ipc;

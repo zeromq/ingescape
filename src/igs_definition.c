@@ -46,6 +46,13 @@ void s_definition_free_iop (igs_iop_t **iop)
             free (cb);
         }
     }
+    if ((*iop)->constraint){
+        igs_constraint_t *constraint = (*iop)->constraint;
+        if (constraint->type == IGS_CONSTRAINT_REGEXP
+            && constraint->regexp.rex)
+            zrex_destroy(&constraint->regexp.rex);
+        free(constraint);
+    }
 
     free (*iop);
     *iop = NULL;

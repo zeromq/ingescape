@@ -226,6 +226,12 @@ void igs_clear_context (void)
     }
 }
 
+void igs_constraints_enforce (bool enforce)
+{
+    core_init_context ();
+    core_context->enforce_constraints = enforce;
+}
+
 //////////////////  CORE AGENT //////////////////
 void core_external_stop_cb (void *my_data)
 {
@@ -542,6 +548,24 @@ igs_result_t igs_parameter_set_data (const char *name, void *value, size_t size)
 {
     core_init_agent ();
     return igsagent_parameter_set_data (core_agent, name, value, size);
+}
+
+igs_result_t igs_input_add_constraint (const char *name, const char *constraint)
+{
+    core_init_agent ();
+    return igsagent_input_add_constraint (core_agent, name, constraint);
+}
+
+igs_result_t igs_output_add_constraint (const char *name, const char *constraint)
+{
+    core_init_agent ();
+    return igsagent_output_add_constraint (core_agent, name, constraint);
+}
+
+igs_result_t igs_parameter_add_constraint (const char *name, const char *constraint)
+{
+    core_init_agent ();
+    return igsagent_parameter_add_constraint (core_agent, name, constraint);
 }
 
 void igs_clear_input (const char *name)
