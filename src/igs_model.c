@@ -136,12 +136,9 @@ void s_model_run_observe_callbacks_for_iop (igsagent_t *agent,
     }
 }
 
-const igs_iop_t *model_write_iop (igsagent_t *agent,
-                                  const char *name,
-                                  igs_iop_type_t type,
-                                  igs_iop_value_type_t value_type,
-                                  void *value,
-                                  size_t size)
+const igs_iop_t *model_write_iop (igsagent_t *agent, const char *name,
+                                  igs_iop_type_t type, igs_iop_value_type_t value_type,
+                                  void *value, size_t size)
 {
     assert (agent);
     assert (name);
@@ -153,6 +150,7 @@ const igs_iop_t *model_write_iop (igsagent_t *agent,
     int ret = 1;
     void *out_value = NULL;
     size_t out_size = 0;
+    char buf[NUMBER_TO_STRING_MAX_LENGTH + 1] = "";
 
     model_read_write_lock ();
     // check that this agent has not been destroyed when we were locked
@@ -162,29 +160,46 @@ const igs_iop_t *model_write_iop (igsagent_t *agent,
     }
     
     //apply constraint if any
-    if (iop->constraint && agent->context->enforce_constraints){
-        if (type == IGS_INTEGER_T){
+    if (iop->constraint && agent->enforce_constraints){
+        if (iop->value_type == IGS_INTEGER_T){
+            int converted_value = 0;
+            switch (value_type) {
+                case IGS_STRING_T:
+                    converted_value = atoi((char *)value);
+                    break;
+                case IGS_DATA_T:
+                    igsagent_error(agent, "constraint type error for %s (value is data and IOP is integer)", iop->name);
+                    model_read_write_unlock ();
+                    return NULL;
+                case IGS_DOUBLE_T:
+                    converted_value = (int)(*(double*)value);
+                    break;
+                default:
+                    converted_value = *(int*)value;
+                    break;
+            }
+            
             switch (iop->constraint->type) {
                 case IGS_CONSTRAINT_MIN:
-                    if (*(int*)value < iop->constraint->min_int.min){
+                    if (converted_value < iop->constraint->min_int.min){
                         igsagent_error(agent, "constraint error for %s (too low)", iop->name);
                         model_read_write_unlock ();
                         return NULL;
                     }
                     break;
                 case IGS_CONSTRAINT_MAX:
-                    if (*(int*)value > iop->constraint->max_int.max){
+                    if (converted_value > iop->constraint->max_int.max){
                         igsagent_error(agent, "constraint error for %s (too high)", iop->name);
                         model_read_write_unlock ();
                         return NULL;
                     }
                     break;
                 case IGS_CONSTRAINT_RANGE:
-                    if (*(int*)value > iop->constraint->range_int.max){
+                    if (converted_value > iop->constraint->range_int.max){
                         igsagent_error(agent, "constraint error for %s (too high)", iop->name);
                         model_read_write_unlock ();
                         return NULL;
-                    }else if (*(int*)value < iop->constraint->range_int.min){
+                    }else if (converted_value < iop->constraint->range_int.min){
                         igsagent_error(agent, "constraint error for %s (too low)", iop->name);
                         model_read_write_unlock ();
                         return NULL;
@@ -194,28 +209,46 @@ const igs_iop_t *model_write_iop (igsagent_t *agent,
                 default:
                     break;
             }
-        }else if(type == IGS_DOUBLE_T){
+        }else if(iop->value_type == IGS_DOUBLE_T){
+            double converted_value = 0;
+            switch (value_type) {
+                case IGS_STRING_T:
+                    converted_value = atof((char *)value);
+                    break;
+                case IGS_DATA_T:
+                    igsagent_error(agent, "constraint type error for %s (value is data and IOP is double)", iop->name);
+                    model_read_write_unlock ();
+                    return NULL;
+                case IGS_INTEGER_T:
+                case IGS_BOOL_T:
+                    converted_value = (double)(*(int*)value);
+                    break;
+                default:
+                    converted_value = *(double*)value;
+                    break;
+            }
+            
             switch (iop->constraint->type) {
                 case IGS_CONSTRAINT_MIN:
-                    if (*(double*)value < iop->constraint->min_double.min){
+                    if (converted_value < iop->constraint->min_double.min){
                         igsagent_error(agent, "constraint error for %s (too low)", iop->name);
                         model_read_write_unlock ();
                         return NULL;
                     }
                     break;
                 case IGS_CONSTRAINT_MAX:
-                    if (*(double*)value > iop->constraint->max_double.max){
+                    if (converted_value > iop->constraint->max_double.max){
                         igsagent_error(agent, "constraint error for %s (too high)", iop->name);
                         model_read_write_unlock ();
                         return NULL;
                     }
                     break;
                 case IGS_CONSTRAINT_RANGE:
-                    if (*(double*)value > iop->constraint->range_double.max){
+                    if (converted_value > iop->constraint->range_double.max){
                         igsagent_error(agent, "constraint error for %s (too high)", iop->name);
                         model_read_write_unlock ();
                         return NULL;
-                    }else if (*(int*)value < iop->constraint->range_double.min){
+                    }else if (converted_value < iop->constraint->range_double.min){
                         igsagent_error(agent, "constraint error for %s (too low)", iop->name);
                         model_read_write_unlock ();
                         return NULL;
@@ -225,13 +258,38 @@ const igs_iop_t *model_write_iop (igsagent_t *agent,
                 default:
                     break;
             }
-        }else if (type == IGS_STRING_T){
-            if (!value){
-                igsagent_error(agent, "constraint error for %s (NULL)", iop->name);
+        }else if (iop->value_type == IGS_STRING_T){
+            char *converted_value = NULL;
+            switch (value_type) {
+                case IGS_STRING_T:
+                    converted_value = (char *)value;
+                    break;
+                case IGS_DATA_T:
+                    igsagent_error(agent, "constraint type error for %s (value is data and IOP is string)", iop->name);
+                    model_read_write_unlock ();
+                    return NULL;
+                case IGS_INTEGER_T:
+                case IGS_BOOL_T:
+                    snprintf (buf, NUMBER_TO_STRING_MAX_LENGTH + 1, "%d",
+                              (value == NULL) ? 0 : *(int *) (value));
+                    converted_value = buf;
+                    break;
+                case IGS_DOUBLE_T:
+                    snprintf (buf, NUMBER_TO_STRING_MAX_LENGTH + 1, "%f",
+                              (value == NULL) ? 0 : *(double *) (value));
+                    converted_value = buf;
+                    break;
+                default:
+                    snprintf (buf, NUMBER_TO_STRING_MAX_LENGTH + 1, "");
+                    converted_value = buf;
+                    break;
+            }
+            if (!converted_value){
+                igsagent_error(agent, "constraint error for %s (value is NULL)", iop->name);
                 model_read_write_unlock ();
                 return NULL;
             }
-            if (!zrex_matches(iop->constraint->regexp.rex, (char*)value)){
+            if (!zrex_matches(iop->constraint->regexp.rex, converted_value)){
                 igsagent_error(agent, "constraint error for %s (not matching regexp)", iop->name);
                 model_read_write_unlock ();
                 return NULL;
@@ -266,7 +324,6 @@ const igs_iop_t *model_write_iop (igsagent_t *agent,
                     if (value == NULL)
                         iop->value.s = strdup ("");
                     else {
-                        char buf[NUMBER_TO_STRING_MAX_LENGTH + 1] = "";
                         snprintf (buf, NUMBER_TO_STRING_MAX_LENGTH + 1, "%d",
                                   (value == NULL) ? 0 : *(int *) (value));
                         iop->value.s = strdup (buf);
@@ -322,7 +379,6 @@ const igs_iop_t *model_write_iop (igsagent_t *agent,
                     if (value == NULL)
                         iop->value.s = strdup ("");
                     else {
-                        char buf[NUMBER_TO_STRING_MAX_LENGTH + 1] = "";
                         snprintf (buf, NUMBER_TO_STRING_MAX_LENGTH + 1, "%lf",
                                   (value == NULL) ? 0 : *(double *) (value));
                         iop->value.s = strdup (buf);
@@ -373,7 +429,6 @@ const igs_iop_t *model_write_iop (igsagent_t *agent,
                     if (value == NULL)
                         iop->value.s = strdup ("");
                     else {
-                        char buf[NUMBER_TO_STRING_MAX_LENGTH + 1] = "";
                         snprintf (buf, NUMBER_TO_STRING_MAX_LENGTH + 1, "%d",
                                   (value == NULL) ? 0 : *(bool *) value);
                         iop->value.s = strdup (buf);
@@ -1411,11 +1466,13 @@ igs_result_t igsagent_parameter_set_data (igsagent_t *agent,
     return (iop == NULL) ? IGS_FAILURE : IGS_SUCCESS;
 }
 
-igs_constraint_t* s_model_parse_constraint(igsagent_t *self, igs_iop_value_type_t type, const char *expression){
+igs_constraint_t* s_model_parse_constraint(igs_iop_value_type_t type,
+                                           const char *expression,char **error){
     assert(expression);
+    assert(error);
     const char *min_exp = "min ([+-]?(\\d*[.])?\\d+)";
     const char *max_exp = "max ([+-]?(\\d*[.])?\\d+)";
-    const char *range_exp = "range ([+-]?(\\d*[.])?\\d+)[ ]*\\.\\.[ ]*([+-]?(\\d*[.])?\\d+)";
+    const char *range_exp = "\\[([+-]?(\\d*[.])?\\d+)\\s*,\\s*([+-]?(\\d*[.])?\\d+)\\]";
     const char *regexp = "~ ([^\n]+)";
     const char *exp1 = NULL;
     const char *exp2 = NULL;
@@ -1432,7 +1489,7 @@ igs_constraint_t* s_model_parse_constraint(igsagent_t *self, igs_iop_value_type_
             c->type = IGS_CONSTRAINT_MIN;
             c->min_double.min = atof(exp1);
         }else
-            igsagent_error(self, "min constraint is allowed on integer and double IOPs only");
+            *error = strdup("min constraint is allowed on integer and double IOPs only");
     }else if (zrex_eq(rex, expression, max_exp)){
         zrex_fetch(rex, &exp1);
         if (type == IGS_INTEGER_T){
@@ -1444,8 +1501,9 @@ igs_constraint_t* s_model_parse_constraint(igsagent_t *self, igs_iop_value_type_
             c->type = IGS_CONSTRAINT_MAX;
             c->max_double.max = atof(exp1);
         }else
-            igsagent_error(self, "max constraint is allowed on integer and double IOPs only");
+            *error = strdup("max constraint is allowed on integer and double IOPs only");
     }else if (zrex_eq(rex, expression, range_exp)){
+        //FIXME: apply verifications on values to check that min <= max
         exp1 = zrex_hit(rex, 1);
         exp2 = zrex_hit(rex, 3);
         if (type == IGS_INTEGER_T){
@@ -1459,7 +1517,7 @@ igs_constraint_t* s_model_parse_constraint(igsagent_t *self, igs_iop_value_type_
             c->range_double.min = atof(exp1);
             c->range_double.max = atof(exp2);
         }else
-            igsagent_error(self, "max constraint is allowed on integer and double IOPs only");
+            *error = strdup("range constraint is allowed on integer and double IOPs only");
     }else if (zrex_eq(rex, expression, regexp)){
         exp1 = zrex_hit(rex, 1);
         if (type == IGS_STRING_T){
@@ -1467,13 +1525,14 @@ igs_constraint_t* s_model_parse_constraint(igsagent_t *self, igs_iop_value_type_
             c->type = IGS_CONSTRAINT_REGEXP;
             c->regexp.rex = zrex_new(exp1);
             if(!zrex_valid(c->regexp.rex)){
-                igsagent_error(self, "'%s' is not a valid regular expression", exp1);
+                *error = strdup("invalid regular expression");
                 zrex_destroy(&c->regexp.rex);
                 free(c);
                 c = NULL;
-            }
+            }else
+                c->regexp.string = strdup(exp1);
         }else
-            igsagent_error(self, "regexp constraint is allowed on string IOPs only");
+            *error = strdup("regexp constraint is allowed on string IOPs only");
     }
     zrex_destroy(&rex);
     return c;
@@ -1518,10 +1577,19 @@ igs_result_t s_model_add_constraint (igsagent_t *self, igs_iop_type_t type,
         igsagent_error (self, "%s already has an applied constraint", name);
         return IGS_FAILURE;
     }
-    iop->constraint = s_model_parse_constraint(self, iop->value_type, constraint);
-    if (!iop->constraint)
+    char *error = NULL;
+    iop->constraint = s_model_parse_constraint(iop->value_type, constraint, &error);
+    if (!iop->constraint){
+        if (error)
+            igsagent_error (self, "%s", error);
         return IGS_FAILURE;
+    }
     return IGS_SUCCESS;
+}
+
+void igsagent_constraints_enforce(igsagent_t *self, bool enforce)
+{
+    self->enforce_constraints = enforce;
 }
 
 igs_result_t igsagent_input_add_constraint (igsagent_t *self, const char *name,

@@ -340,12 +340,12 @@ INGESCAPE_EXPORT igs_result_t igs_parameter_set_data(const char *name, void *val
  • Integers and doubles:
     - "max 10.123"  : applies a max value on the IOP
     - "min -10" : applies a min value on the IOP
-    - "range -10..10" : applies a min and max value on the IOP
+    - "[-10, .1]" : applies a min and max value on the IOP
  • Strings
     - "~ regular_expression", e.g. "~ \\d+(\.\\d+)?)":
         IOP of type STRING must match the regular expression
  */
-INGESCAPE_EXPORT void igs_constraints_enforce(bool enforce); //default is false
+INGESCAPE_EXPORT void igs_constraints_enforce(bool enforce); //default is false, i.e. disabled
 INGESCAPE_EXPORT igs_result_t igs_input_add_constraint(const char *name, const char *constraint);
 INGESCAPE_EXPORT igs_result_t igs_output_add_constraint(const char *name, const char *constraint);
 INGESCAPE_EXPORT igs_result_t igs_parameter_add_constraint(const char *name, const char *constraint);

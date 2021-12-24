@@ -116,6 +116,7 @@ typedef struct igs_constraint{
         } range_double;
         struct {
             zrex_t *rex;
+            char *string;
         } regexp;
     };
     struct igs_constraint *prev;
@@ -341,6 +342,7 @@ struct _igsagent_t {
     
     igsagent_wrapper_t *activate_callbacks;
     igs_agent_event_wrapper_t *agent_event_callbacks;
+    bool enforce_constraints;
 
     // definition
     char *definition_path;
@@ -390,7 +392,6 @@ typedef struct igs_core_context {
     size_t log_file_max_line_length;
     char log_file_path[IGS_MAX_PATH_LENGTH];
     int log_nb_of_entries; //for fflush rotation
-    bool enforce_constraints;
 
     // network
     bool network_allow_ipc;
@@ -521,6 +522,9 @@ void
     model_read_write_lock(void);
 void
     model_read_write_unlock(void);
+igs_constraint_t*
+    s_model_parse_constraint(igs_iop_value_type_t type,
+                             const char *expression,char **error);
 
 // network
 #define IGS_PRIVATE_CHANNEL "INGESCAPE_PRIVATE"

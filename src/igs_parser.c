@@ -31,6 +31,7 @@
 #define STR_REPLY "reply"
 #define STR_TYPE "type"
 #define STR_VALUE "value"
+#define STR_CONSTRAINT "constraint"
 
 #define STR_MAPPINGS "mappings"
 #define STR_SPLITS "splits"
@@ -124,6 +125,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
     const char *arguments_path[] = {STR_ARGUMENTS, NULL};
     const char *agent_name_path[] = {STR_DEFINITION, STR_NAME, NULL};
     const char *name_path[] = {STR_NAME, NULL};
+    const char *constraint_path[] = {STR_CONSTRAINT, NULL};
     const char *family_path[] = {STR_DEFINITION, STR_FAMILY, NULL};
     const char *type_path[] = {STR_TYPE, NULL};
     const char *value_path[] = {STR_VALUE, NULL};
@@ -209,8 +211,16 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                 iop->name = corrected_name;
 
                 igs_json_node_t *iop_type = igs_json_node_find (inputs->u.array.values[i], type_path);
-                if (iop_type && iop_type->type == IGS_JSON_STRING && iop_type->u.string != NULL)
+                if (iop_type && iop_type->type == IGS_JSON_STRING && iop_type->u.string)
                     iop->value_type = s_string_to_value_type (iop_type->u.string);
+                
+                igs_json_node_t *constraint = igs_json_node_find (inputs->u.array.values[i], constraint_path);
+                if (constraint && constraint->type == IGS_JSON_STRING && constraint->u.string){
+                    char *error = NULL;
+                    iop->constraint = s_model_parse_constraint(iop->value_type, constraint->u.string, &error);
+                    if (error)
+                        igs_error ("%s", error);
+                }
 
                 //NB: inputs do not have initial value in definition => nothing to do here
                 HASH_ADD_STR (definition->inputs_table, name, iop);
@@ -260,6 +270,12 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                   igs_json_node_find (outputs->u.array.values[i], type_path);
                 if (iop_type && iop_type->type == IGS_JSON_STRING && iop_type->u.string != NULL)
                     iop->value_type = s_string_to_value_type (iop_type->u.string);
+                
+                igs_json_node_t *constraint = igs_json_node_find (outputs->u.array.values[i], constraint_path);
+                if (constraint && constraint->type == IGS_JSON_STRING && constraint->u.string){
+                    char *error = NULL;
+                    iop->constraint = s_model_parse_constraint(iop->value_type, constraint->u.string, &error);
+                }
 
                 igs_json_node_t *iop_value = igs_json_node_find (outputs->u.array.values[i], value_path);
                 if (iop_value) {
@@ -354,6 +370,12 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                   igs_json_node_find (parameters->u.array.values[i], type_path);
                 if (iop_type && iop_type->type == IGS_JSON_STRING && iop_type->u.string != NULL)
                     iop->value_type = s_string_to_value_type (iop_type->u.string);
+                
+                igs_json_node_t *constraint = igs_json_node_find (parameters->u.array.values[i], constraint_path);
+                if (constraint && constraint->type == IGS_JSON_STRING && constraint->u.string){
+                    char *error = NULL;
+                    iop->constraint = s_model_parse_constraint(iop->value_type, constraint->u.string, &error);
+                }
 
                 igs_json_node_t *iop_value = igs_json_node_find (
                         parameters->u.array.values[i], value_path);
@@ -988,6 +1010,53 @@ char *parser_export_definition (igs_definition_t *def)
         if (iop->name) {
             igs_json_add_string (json, STR_NAME);
             igs_json_add_string (json, iop->name);
+        }
+        char constraint_expression[IGS_MAX_LOG_LENGTH] = "";
+        if (iop->constraint){
+            if (iop->constraint->type == IGS_CONSTRAINT_MIN){
+                if (iop->value_type == IGS_INTEGER_T){
+                    igs_json_add_string (json, STR_CONSTRAINT);
+                    snprintf(constraint_expression, IGS_MAX_LOG_LENGTH, "min %d",
+                             iop->constraint->min_int.min);
+                    igs_json_add_string(json, constraint_expression);
+                }else if (iop->value_type == IGS_DOUBLE_T){
+                    igs_json_add_string (json, STR_CONSTRAINT);
+                    snprintf(constraint_expression, IGS_MAX_LOG_LENGTH, "min %f",
+                             iop->constraint->min_double.min);
+                    igs_json_add_string(json, constraint_expression);
+                }
+            }else if (iop->constraint->type == IGS_CONSTRAINT_MAX){
+                if (iop->value_type == IGS_INTEGER_T){
+                    igs_json_add_string (json, STR_CONSTRAINT);
+                    snprintf(constraint_expression, IGS_MAX_LOG_LENGTH, "max %d",
+                             iop->constraint->max_int.max);
+                    igs_json_add_string(json, constraint_expression);
+                }else if (iop->value_type == IGS_DOUBLE_T){
+                    igs_json_add_string (json, STR_CONSTRAINT);
+                    snprintf(constraint_expression, IGS_MAX_LOG_LENGTH, "max %f",
+                             iop->constraint->max_double.max);
+                    igs_json_add_string(json, constraint_expression);
+                }
+            }else if (iop->constraint->type == IGS_CONSTRAINT_RANGE){
+                if (iop->value_type == IGS_INTEGER_T){
+                    igs_json_add_string (json, STR_CONSTRAINT);
+                    snprintf(constraint_expression, IGS_MAX_LOG_LENGTH, "[%d, %d]",
+                             iop->constraint->range_int.min,
+                             iop->constraint->range_int.max);
+                    igs_json_add_string(json, constraint_expression);
+                }else if (iop->value_type == IGS_DOUBLE_T){
+                    igs_json_add_string (json, STR_CONSTRAINT);
+                    snprintf(constraint_expression, IGS_MAX_LOG_LENGTH, "[%f, %f]",
+                             iop->constraint->range_double.min,
+                             iop->constraint->range_double.max);
+                    igs_json_add_string(json, constraint_expression);
+                }
+            }else if (iop->constraint->type == IGS_CONSTRAINT_REGEXP){
+                igs_json_add_string (json, STR_CONSTRAINT);
+                snprintf(constraint_expression, IGS_MAX_LOG_LENGTH, "~ %s",
+                         iop->constraint->regexp.string);
+                igs_json_add_string(json, constraint_expression);
+            }
         }
         igs_json_add_string (json, STR_TYPE);
         igs_json_add_string (json, s_value_type_to_string (iop->value_type));

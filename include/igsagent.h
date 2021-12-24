@@ -170,6 +170,7 @@ INGESCAPE_EXPORT igs_result_t igsagent_parameter_set_double (igsagent_t *self, c
 INGESCAPE_EXPORT igs_result_t igsagent_parameter_set_string (igsagent_t *self, const char *name, const char *value);
 INGESCAPE_EXPORT igs_result_t igsagent_parameter_set_data (igsagent_t *self, const char *name, void *value, size_t size);
 
+INGESCAPE_EXPORT void igsagent_constraints_enforce(igsagent_t *self, bool enforce); //default is false, i.e. disabled
 INGESCAPE_EXPORT igs_result_t igsagent_input_add_constraint(igsagent_t *self, const char *name, const char *constraint);
 INGESCAPE_EXPORT igs_result_t igsagent_output_add_constraint(igsagent_t *self, const char *name, const char *constraint);
 INGESCAPE_EXPORT igs_result_t igsagent_parameter_add_constraint(igsagent_t *self, const char *name, const char *constraint);

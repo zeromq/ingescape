@@ -226,12 +226,6 @@ void igs_clear_context (void)
     }
 }
 
-void igs_constraints_enforce (bool enforce)
-{
-    core_init_context ();
-    core_context->enforce_constraints = enforce;
-}
-
 //////////////////  CORE AGENT //////////////////
 void core_external_stop_cb (void *my_data)
 {
@@ -358,6 +352,12 @@ void igs_observe_agent_events (igs_agent_events_fn cb, void *my_data)
 }
 
 // IOP
+void igs_constraints_enforce (bool enforce)
+{
+    core_init_agent ();
+    core_agent->enforce_constraints = enforce;
+}
+
 bool igs_input_bool (const char *name)
 {
     core_init_agent ();
