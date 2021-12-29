@@ -19,6 +19,20 @@
 ////////////////////////////////////////////////////////////////////////
 // INTERNAL FUNCTIONS
 ////////////////////////////////////////////////////////////////////////
+void definition_free_constraint (igs_constraint_t **c){
+    assert(c);
+    assert(*c);
+    if ((*c)->type == IGS_CONSTRAINT_REGEXP){
+        if ((*c)->regexp.rex)
+            zrex_destroy(&(*c)->regexp.rex);
+        if ((*c)->regexp.string)
+            free((*c)->regexp.string);
+    }
+    free(*c);
+    *c = NULL;
+}
+
+
 void s_definition_free_iop (igs_iop_t **iop)
 {
     assert (iop);
@@ -47,14 +61,7 @@ void s_definition_free_iop (igs_iop_t **iop)
         }
     }
     if ((*iop)->constraint){
-        igs_constraint_t *constraint = (*iop)->constraint;
-        if (constraint->type == IGS_CONSTRAINT_REGEXP){
-            if (constraint->regexp.rex)
-                zrex_destroy(&constraint->regexp.rex);
-            if (constraint->regexp.string)
-                free(constraint->regexp.string);
-        }
-        free(constraint);
+        definition_free_constraint(&(*iop)->constraint);
     }
 
     free (*iop);

@@ -476,6 +476,8 @@ void
 // definition
 PUBLIC void
     definition_free_definition (igs_definition_t **definition);
+PUBLIC void
+    definition_free_constraint (igs_constraint_t **constraint);
 
 // mapping
 PUBLIC void

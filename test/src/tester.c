@@ -424,77 +424,36 @@ int main(int argc, const char * argv[]) {
     igs_input_create("constraint_data", IGS_DATA_T, 0, 0);
     
     assert(igs_input_add_constraint("constraint_int", "min 10.12") == IGS_SUCCESS); //will set 10 as min constraint
-    assert(igs_input_add_constraint("constraint_int", "min 10.12") == IGS_FAILURE);
-    assert(igs_input_add_constraint("constraint_double", "min 10.12") == IGS_SUCCESS);
-    assert(igs_input_add_constraint("constraint_double", "min 10.12") == IGS_FAILURE);
-    assert(igs_input_add_constraint("constraint_impulsion", "min 10.12") == IGS_FAILURE);
-    assert(igs_input_add_constraint("constraint_bool", "min 10.12") == IGS_FAILURE);
-    assert(igs_input_add_constraint("constraint_string", "min 10.12") == IGS_FAILURE);
-    assert(igs_input_add_constraint("constraint_data", "min 10.12") == IGS_FAILURE);
-    
-    igs_input_remove("constraint_impulsion");
-    igs_input_remove("constraint_int");
-    igs_input_remove("constraint_bool");
-    igs_input_remove("constraint_double");
-    igs_input_remove("constraint_string");
-    igs_input_remove("constraint_data");
-    
-    igs_input_create("constraint_impulsion", IGS_IMPULSION_T, 0, 0);
-    igs_input_create("constraint_int", IGS_INTEGER_T, 0, 0);
-    igs_input_create("constraint_bool", IGS_BOOL_T, 0, 0);
-    igs_input_create("constraint_double", IGS_DOUBLE_T, 0, 0);
-    igs_input_create("constraint_string", IGS_STRING_T, 0, 0);
-    igs_input_create("constraint_data", IGS_DATA_T, 0, 0);
-    
     assert(igs_input_add_constraint("constraint_int", "max 10.12") == IGS_SUCCESS); //will set 10 as max constraint
-    assert(igs_input_add_constraint("constraint_int", "max 10.12") == IGS_FAILURE);
+    assert(igs_input_add_constraint("constraint_int", "[-.1, +10.13]") == IGS_SUCCESS);
+    assert(igs_input_add_constraint("constraint_int", "[-.1  ,  +10.13]") == IGS_SUCCESS);
+    assert(igs_input_add_constraint("constraint_int", "[-.1,+10.13]") == IGS_SUCCESS);
+    assert(igs_input_add_constraint("constraint_int", "[1,-10.13]") == IGS_FAILURE);
+    
+    assert(igs_input_add_constraint("constraint_double", "min 10.12") == IGS_SUCCESS);
     assert(igs_input_add_constraint("constraint_double", "max 10.12") == IGS_SUCCESS);
-    assert(igs_input_add_constraint("constraint_double", "max 10.12") == IGS_FAILURE);
-    assert(igs_input_add_constraint("constraint_impulsion", "max 10.12") == IGS_FAILURE);
+    assert(igs_input_add_constraint("constraint_double", "[-.1, +10.13]") == IGS_SUCCESS);
+    assert(igs_input_add_constraint("constraint_double", "[12.12,12.12]") == IGS_SUCCESS);
+    
+    assert(igs_input_add_constraint("constraint_bool", "min 10.12") == IGS_FAILURE);
     assert(igs_input_add_constraint("constraint_bool", "max 10.12") == IGS_FAILURE);
+    assert(igs_input_add_constraint("constraint_bool", "[1,10.13]") == IGS_FAILURE);
+    
+    assert(igs_input_add_constraint("constraint_impulsion", "min 10.12") == IGS_FAILURE);
+    assert(igs_input_add_constraint("constraint_impulsion", "max 10.12") == IGS_FAILURE);
+    assert(igs_input_add_constraint("constraint_impulsion", "[1,10.13]") == IGS_FAILURE);
+    
+    assert(igs_input_add_constraint("constraint_string", "min 10.12") == IGS_FAILURE);
     assert(igs_input_add_constraint("constraint_string", "max 10.12") == IGS_FAILURE);
+    assert(igs_input_add_constraint("constraint_string", "[1,10.13]") == IGS_FAILURE);
+    
+    assert(igs_input_add_constraint("constraint_data", "min 10.12") == IGS_FAILURE);
     assert(igs_input_add_constraint("constraint_data", "max 10.12") == IGS_FAILURE);
+    assert(igs_input_add_constraint("constraint_data", "[1,-10.13]") == IGS_FAILURE);
     
-    igs_input_remove("constraint_impulsion");
-    igs_input_remove("constraint_int");
-    igs_input_remove("constraint_bool");
-    igs_input_remove("constraint_double");
-    igs_input_remove("constraint_string");
-    igs_input_remove("constraint_data");
-    
-    igs_input_create("constraint_impulsion", IGS_IMPULSION_T, 0, 0);
-    igs_input_create("constraint_int", IGS_INTEGER_T, 0, 0);
-    igs_input_create("constraint_bool", IGS_BOOL_T, 0, 0);
-    igs_input_create("constraint_double", IGS_DOUBLE_T, 0, 0);
-    igs_input_create("constraint_string", IGS_STRING_T, 0, 0);
-    igs_input_create("constraint_data", IGS_DATA_T, 0, 0);
-    
-    assert(igs_input_add_constraint("constraint_int", "range 10.123 .. 312345.123") == IGS_SUCCESS);
-    assert(igs_input_add_constraint("constraint_int", "range 10.123 .. 312345.123") == IGS_FAILURE);
-    assert(igs_input_add_constraint("constraint_double", "range 10.123 .. 312345.123") == IGS_SUCCESS);
-    assert(igs_input_add_constraint("constraint_double", "range 10.123 .. 312345.123") == IGS_FAILURE);
-    assert(igs_input_add_constraint("constraint_impulsion", "range 10.123 .. 312345.123") == IGS_FAILURE);
-    assert(igs_input_add_constraint("constraint_bool", "range 10.123 .. 312345.123") == IGS_FAILURE);
-    assert(igs_input_add_constraint("constraint_string", "range 10.123 .. 312345.123") == IGS_FAILURE);
-    assert(igs_input_add_constraint("constraint_data", "range 10.123 .. 312345.123") == IGS_FAILURE);
-    
-    igs_input_remove("constraint_impulsion");
-    igs_input_remove("constraint_int");
-    igs_input_remove("constraint_bool");
-    igs_input_remove("constraint_double");
-    igs_input_remove("constraint_string");
-    igs_input_remove("constraint_data");
-    
-    igs_input_create("constraint_impulsion", IGS_IMPULSION_T, 0, 0);
-    igs_input_create("constraint_int", IGS_INTEGER_T, 0, 0);
-    igs_input_create("constraint_bool", IGS_BOOL_T, 0, 0);
-    igs_input_create("constraint_double", IGS_DOUBLE_T, 0, 0);
-    igs_input_create("constraint_string", IGS_STRING_T, 0, 0);
-    igs_input_create("constraint_data", IGS_DATA_T, 0, 0);
-    
-    assert(igs_input_add_constraint("constraint_string", "~ [^ +") == IGS_FAILURE);
+    assert(igs_input_add_constraint("constraint_string", "~ [^ +") == IGS_FAILURE); //bad format for regex
     assert(igs_input_add_constraint("constraint_string", "~ (\\d+)") == IGS_SUCCESS);
-    assert(igs_input_add_constraint("constraint_string", "~ (\\d+)") == IGS_FAILURE);
+    assert(igs_input_add_constraint("constraint_string", "~ (\\d+)") == IGS_SUCCESS);
     assert(igs_input_add_constraint("constraint_impulsion", "~ (\\d+)") == IGS_FAILURE);
     assert(igs_input_add_constraint("constraint_int", "~ (\\d+)") == IGS_FAILURE);
     assert(igs_input_add_constraint("constraint_double", "~ (\\d+)") == IGS_FAILURE);

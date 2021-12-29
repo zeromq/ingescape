@@ -337,13 +337,35 @@ INGESCAPE_EXPORT igs_result_t igs_parameter_set_data(const char *name, void *val
  Constraints enable verifications upon sending or receiving information
  with inputs and outputs. The syntax for the constraints is global but
  some constraints only apply to certain types:
- • Integers and doubles:
-    - "max 10.123"  : applies a max value on the IOP
-    - "min -10" : applies a min value on the IOP
-    - "[-10, .1]" : applies a min and max value on the IOP
- • Strings
+ Integers and doubles:
+    - "max 10.123"  : applies a max allowed value on the IOP
+    - "min -10" : applies a min allowed value on the IOP
+    - "[-10, .1]" : applies min and max allowed values on the IOP
+ Strings
     - "~ regular_expression", e.g. "~ \\d+(\.\\d+)?)":
         IOP of type STRING must match the regular expression
+ 
+ Regular expressions are absed on CZMQ integration of SLRE with the
+ following syntax:
+^               Match beginning of a buffer
+$               Match end of a buffer
+()              Grouping and substring capturing
+[...]           Match any character from set,
+    caution: range-based syntax such as [0..9] is NOT supported
+[^...]          Match any character but ones from set
+\s              Match whitespace
+\S              Match non-whitespace
+\d              Match decimal digit
+\r              Match carriage return
+\n              Match newline
++               Match one or more times (greedy)
++?              Match one or more times (non-greedy)
+*               Match zero or more times (greedy)
+*?              Match zero or more times (non-greedy)
+?               Match zero or once
+\xDD            Match byte with hex value 0xDD
+\meta           Match one of the meta character: ^$().[*+?\
+ 
  */
 INGESCAPE_EXPORT void igs_constraints_enforce(bool enforce); //default is false, i.e. disabled
 INGESCAPE_EXPORT igs_result_t igs_input_add_constraint(const char *name, const char *constraint);

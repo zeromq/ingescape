@@ -1479,7 +1479,7 @@ igs_constraint_t* s_model_parse_constraint(igs_iop_value_type_t type,
     igs_constraint_t *c = NULL;
     zrex_t *rex = zrex_new(min_exp);
     if (zrex_matches(rex, expression)){
-        zrex_fetch(rex, &exp1);
+        zrex_fetch(rex, &exp1, NULL);
         if (type == IGS_INTEGER_T){
             c = (igs_constraint_t *)calloc(1, sizeof(igs_constraint_t));
             c->type = IGS_CONSTRAINT_MIN;
@@ -1511,6 +1511,12 @@ igs_constraint_t* s_model_parse_constraint(igs_iop_value_type_t type,
             c->type = IGS_CONSTRAINT_RANGE;
             c->range_int.min = atoi(exp1);
             c->range_int.max = atoi(exp2);
+            if (c->range_int.max < c->range_int.min){
+                char error_msg[IGS_MAX_LOG_LENGTH] = "";
+                snprintf(error_msg, IGS_MAX_LOG_LENGTH, "range min is superior to range max in %s", expression);
+                *error = strdup(error_msg);
+                definition_free_constraint(&c);
+            }
         }else if (type == IGS_DOUBLE_T){
             c = (igs_constraint_t *)calloc(1, sizeof(igs_constraint_t));
             c->type = IGS_CONSTRAINT_RANGE;
@@ -1525,14 +1531,19 @@ igs_constraint_t* s_model_parse_constraint(igs_iop_value_type_t type,
             c->type = IGS_CONSTRAINT_REGEXP;
             c->regexp.rex = zrex_new(exp1);
             if(!zrex_valid(c->regexp.rex)){
-                *error = strdup("invalid regular expression");
+                char error_msg[IGS_MAX_LOG_LENGTH] = "";
+                snprintf(error_msg, IGS_MAX_LOG_LENGTH, "regular expression '%s' is invalid", exp1);
+                *error = strdup(error_msg);
                 zrex_destroy(&c->regexp.rex);
-                free(c);
-                c = NULL;
+                definition_free_constraint(&c);
             }else
                 c->regexp.string = strdup(exp1);
         }else
             *error = strdup("regexp constraint is allowed on string IOPs only");
+    }else{
+        char error_msg[IGS_MAX_LOG_LENGTH] = "";
+        snprintf(error_msg, IGS_MAX_LOG_LENGTH, "expression '%s' did not match the allowed syntax", expression);
+        *error = strdup(error_msg);
     }
     zrex_destroy(&rex);
     return c;
@@ -1574,14 +1585,16 @@ igs_result_t s_model_add_constraint (igsagent_t *self, igs_iop_type_t type,
         return IGS_FAILURE;
     }
     if (iop->constraint){
-        igsagent_error (self, "%s already has an applied constraint", name);
-        return IGS_FAILURE;
+        igsagent_warn (self, "%s already has a constraint that will be removed", name);
+        definition_free_constraint(&iop->constraint);
     }
     char *error = NULL;
     iop->constraint = s_model_parse_constraint(iop->value_type, constraint, &error);
     if (!iop->constraint){
-        if (error)
+        if (error){
             igsagent_error (self, "%s", error);
+            free(error);
+        }
         return IGS_FAILURE;
     }
     return IGS_SUCCESS;
