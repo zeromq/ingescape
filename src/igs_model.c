@@ -1600,6 +1600,46 @@ igs_result_t s_model_add_constraint (igsagent_t *self, igs_iop_type_t type,
     return IGS_SUCCESS;
 }
 
+void s_model_set_description(igsagent_t *self, igs_iop_type_t type,
+                             const char *name,
+                             const char *description)
+{
+    assert(self);
+    assert(name);
+    assert(description);
+    igs_iop_t *iop = NULL;
+    if (type == IGS_INPUT_T) {
+        HASH_FIND_STR (self->definition->inputs_table, name, iop);
+        if (!iop) {
+            igsagent_error (self, "Input %s cannot be found", name);
+            return;
+        }
+    }
+    else
+    if (type == IGS_OUTPUT_T) {
+        HASH_FIND_STR (self->definition->outputs_table, name, iop);
+        if (!iop) {
+            igsagent_error (self, "Output %s cannot be found", name);
+            return;
+        }
+    }
+    else
+    if (type == IGS_PARAMETER_T) {
+        HASH_FIND_STR (self->definition->params_table, name, iop);
+        if (!iop) {
+            igsagent_error (self, "Parameter %s cannot be found", name);
+            return;
+        }
+    }
+    else {
+        igsagent_error (self, "Unknown IOP type %d", type);
+        return;
+    }
+    if (iop->description)
+        free(iop->description);
+    iop->description = s_strndup(description, IGS_MAX_LOG_LENGTH);
+}
+
 void igsagent_constraints_enforce(igsagent_t *self, bool enforce)
 {
     self->enforce_constraints = enforce;
@@ -1621,6 +1661,21 @@ igs_result_t igsagent_parameter_add_constraint (igsagent_t *self, const char *na
                                                 const char *constraint)
 {
     return s_model_add_constraint(self, IGS_PARAMETER_T, name, constraint);
+}
+
+void igsagent_input_set_description(igsagent_t *self, const char *name, const char *description)
+{
+    s_model_set_description(self, IGS_INPUT_T, name, description);
+}
+
+void igsagent_output_set_description(igsagent_t *self, const char *name, const char *description)
+{
+    s_model_set_description(self, IGS_OUTPUT_T, name, description);
+}
+
+void igsagent_parameter_set_description(igsagent_t *self, const char *name, const char *description)
+{
+    s_model_set_description(self, IGS_PARAMETER_T, name, description);
 }
 
 void igsagent_clear_input (igsagent_t *agent, const char *name)

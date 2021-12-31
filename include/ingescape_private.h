@@ -56,7 +56,7 @@ extern "C" {
 
 // strndup utility function (for availability on all platforms)
 extern char *
-    s_strndup(const char *str, size_t chars);
+s_strndup(const char *str, size_t chars);
 
 //  Mutex macros
 #if defined (__UNIX__)
@@ -125,6 +125,7 @@ typedef struct igs_constraint{
 
 typedef struct igs_iop{
     char* name;
+    char *description;
     igs_iop_value_type_t value_type;
     igs_iop_type_t type;
     union {
@@ -327,7 +328,7 @@ typedef struct igs_agent_event_wrapper {
 struct _igsagent_t {
     char *uuid;
     char *state;
-
+    
     /*
      The concept of virtual agent is used by igs_proxy. Virtual
      agents represent n existing agent which is executed somewhere
@@ -336,33 +337,33 @@ struct _igsagent_t {
      all represented inside the same igs_proxy instance).
      */
     bool is_virtual;
-
+    
     igs_core_context_t *context;
     char *igs_channel;
     
     igsagent_wrapper_t *activate_callbacks;
     igs_agent_event_wrapper_t *agent_event_callbacks;
     bool enforce_constraints;
-
+    
     // definition
     char *definition_path;
     igs_definition_t* definition;
-
+    
     // mapping
     char *mapping_path;
     igs_mapping_t *mapping;
-
+    
     //network
     bool network_need_to_send_definition_update;
     bool network_need_to_send_mapping_update;
     bool network_request_outputs_from_mapped_agents;
     bool network_activation_during_runtime;
-
+    
     bool is_whole_agent_muted;
     igs_mute_wrapper_t *mute_callbacks;
-
+    
     zlist_t *elections;
-
+    
     UT_hash_handle hh;
 };
 
@@ -371,14 +372,14 @@ struct _igsagent_t {
  a set of agents at a process level.
  */
 typedef struct igs_core_context {
-
+    
     ////////////////////////////////////////////
     // persisting data with setters and getters or
     // managed automatically
     //
     // channels
     igs_peer_header_t *peer_headers;
-
+    
     // admin
     FILE *log_file;
     bool log_in_stream;
@@ -392,7 +393,7 @@ typedef struct igs_core_context {
     size_t log_file_max_line_length;
     char log_file_path[IGS_MAX_PATH_LENGTH];
     int log_nb_of_entries; //for fflush rotation
-
+    
     // network
     bool network_allow_ipc;
     bool network_allow_inproc;
@@ -410,33 +411,33 @@ typedef struct igs_core_context {
     zhash_t *brokers;
     char *advertised_endpoint;
     char *our_broker_endpoint;
-
+    
     // security
     bool security_is_enabled;
     zactor_t *security_auth;
     zcert_t *security_cert;
     char *security_public_certificates_directory;
-
+    
     // performance
     size_t performance_msg_counter;
     size_t performance_msg_count_target;
     size_t performance_msg_size;
     int64_t performance_start;
     int64_t performance_stop;
-
+    
     // network monitor
     igs_monitor_t *monitor;
     igs_monitor_wrapper_t *monitor_callbacks;
     bool monitor_shall_start_stop_agent;
-
+    
     // elections
     zhash_t *elections;
-
+    
     // initiated at start, cleaned at stop
     char *network_device;
     char *ip_address;
     char *our_agent_endpoint;
-
+    
     // initiated at s_init_loop, cleaned at loop stop
     char *command_line;
     char *replay_channel;
@@ -458,7 +459,7 @@ typedef struct igs_core_context {
     zsock_t *inproc_publisher;
     zsock_t *logger;
     zloop_t *loop;
-
+    
 } igs_core_context_t;
 
 
@@ -468,65 +469,43 @@ typedef struct igs_core_context {
 // default context and agent
 PUBLIC extern igs_core_context_t *core_context;
 PUBLIC extern igsagent_t *core_agent;
-void
-    core_init_agent(void);
-void
-    core_init_context(void);
+void core_init_agent(void);
+void core_init_context(void);
 
 // definition
-PUBLIC void
-    definition_free_definition (igs_definition_t **definition);
-PUBLIC void
-    definition_free_constraint (igs_constraint_t **constraint);
+PUBLIC void definition_free_definition (igs_definition_t **definition);
+PUBLIC void definition_free_constraint (igs_constraint_t **constraint);
 
 // mapping
-PUBLIC void
-    mapping_free_mapping (igs_mapping_t **map);
-igs_map_t *
-     mapping_create_mapping_element(const char * from_input,
-                                    const char *to_agent,
-                                    const char* to_output);
-PUBLIC bool
-    mapping_is_equal(const char *first_str, const char *second_str);
+PUBLIC void mapping_free_mapping (igs_mapping_t **map);
+igs_map_t* mapping_create_mapping_element(const char * from_input,
+                                          const char *to_agent,
+                                          const char* to_output);
+PUBLIC bool mapping_is_equal(const char *first_str, const char *second_str);
 
-uint64_t
-    s_djb2_hash (unsigned char *str);
-bool
-    mapping_check_input_output_compatibility(igsagent_t *agent, igs_iop_t *found_input, igs_iop_t *found_output);
+uint64_t s_djb2_hash (unsigned char *str);
+bool mapping_check_input_output_compatibility(igsagent_t *agent, igs_iop_t *found_input, igs_iop_t *found_output);
 
 // split
-void
-    split_free_split_element (igs_split_t **split_elmt);
-igs_split_t *
-     split_create_split_element(const char * from_input,
-                                                       const char *to_agent,
-                                                       const char* to_output);
-void
-    split_add_work_to_queue(igs_core_context_t *context, char* agent_uuid, const igs_iop_t *output);
-void
-    split_remove_worker(igs_core_context_t *context, char *worker_uuid, char *input_name);
-
-int
-    split_message_from_worker(char *command, zmsg_t *msg, igs_core_context_t *context);
-int
-    split_message_from_splitter(zmsg_t *msg, igs_core_context_t *context);
+void split_free_split_element (igs_split_t **split_elmt);
+igs_split_t* split_create_split_element(const char * from_input,
+                                        const char *to_agent,
+                                        const char* to_output);
+void split_add_work_to_queue(igs_core_context_t *context, char* agent_uuid, const igs_iop_t *output);
+void split_remove_worker(igs_core_context_t *context, char *worker_uuid, char *input_name);
+int split_message_from_worker(char *command, zmsg_t *msg, igs_core_context_t *context);
+int split_message_from_splitter(zmsg_t *msg, igs_core_context_t *context);
 
 // model
-uint8_t*
-    s_model_string_to_bytes (char* string);
-const igs_iop_t*
-     model_write_iop (igsagent_t *agent, const char *iop_name, igs_iop_type_t type, igs_iop_value_type_t val_type, void* value, size_t size);
-igs_iop_t*
-    model_find_iop_by_name(igsagent_t *agent, const char* name, igs_iop_type_t type);
-char*
-    model_get_iop_value_as_string (igs_iop_t* iop); //caller owns returned value
-void
-    model_read_write_lock(void);
-void
-    model_read_write_unlock(void);
-igs_constraint_t*
-    s_model_parse_constraint(igs_iop_value_type_t type,
-                             const char *expression,char **error);
+uint8_t* s_model_string_to_bytes (char* string);
+const igs_iop_t* model_write_iop (igsagent_t *agent, const char *iop_name, igs_iop_type_t type,
+                                  igs_iop_value_type_t val_type, void* value, size_t size);
+igs_iop_t* model_find_iop_by_name(igsagent_t *agent, const char* name, igs_iop_type_t type);
+char* model_get_iop_value_as_string (igs_iop_t* iop); //caller owns returned value
+void model_read_write_lock(void);
+void model_read_write_unlock(void);
+igs_constraint_t* s_model_parse_constraint(igs_iop_value_type_t type,
+                                           const char *expression,char **error);
 
 // network
 #define IGS_PRIVATE_CHANNEL "INGESCAPE_PRIVATE"
@@ -558,7 +537,7 @@ PUBLIC igs_result_t service_add_values_to_arguments_from_message(const char *nam
 igs_result_t service_copy_arguments(igs_service_arg_t *source, igs_service_arg_t *destination);
 void service_free_values_in_arguments(igs_service_arg_t *arg);
 void service_log_received_service(igsagent_t *agent, const char *caller_agent_name, const char *caller_agentuuid,
-                          const char *service_name, igs_service_arg_t *list);
+                                  const char *service_name, igs_service_arg_t *list);
 
 // agent
 void s_agent_propagate_agent_event(igs_agent_event_t event, const char *uuid, const char *name, void *event_data);

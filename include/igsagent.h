@@ -175,6 +175,10 @@ INGESCAPE_EXPORT igs_result_t igsagent_input_add_constraint(igsagent_t *self, co
 INGESCAPE_EXPORT igs_result_t igsagent_output_add_constraint(igsagent_t *self, const char *name, const char *constraint);
 INGESCAPE_EXPORT igs_result_t igsagent_parameter_add_constraint(igsagent_t *self, const char *name, const char *constraint);
 
+INGESCAPE_EXPORT void igsagent_input_set_description(igsagent_t *self, const char *name, const char *description);
+INGESCAPE_EXPORT void igsagent_output_set_description(igsagent_t *self, const char *name, const char *description);
+INGESCAPE_EXPORT void igsagent_parameter_set_description(igsagent_t *self, const char *name, const char *description);
+
 /*These two functions enable sending and receiving DATA
  inputs/outputs by using zmsg_t structures. zmsg_t structures
  offer advanced functionalities for data serialization.

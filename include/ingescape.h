@@ -372,6 +372,11 @@ INGESCAPE_EXPORT igs_result_t igs_input_add_constraint(const char *name, const c
 INGESCAPE_EXPORT igs_result_t igs_output_add_constraint(const char *name, const char *constraint);
 INGESCAPE_EXPORT igs_result_t igs_parameter_add_constraint(const char *name, const char *constraint);
 
+//IOP descriptions
+INGESCAPE_EXPORT void igs_input_set_description(const char *name, const char *description);
+INGESCAPE_EXPORT void igs_output_set_description(const char *name, const char *description);
+INGESCAPE_EXPORT void igs_parameter_set_description(const char *name, const char *description);
+
 /*These two functions enable sending and receiving DATA on
  inputs/outputs by using zmsg_t structures. zmsg_t structures
  offer advanced functionalities for data serialization.

@@ -54,15 +54,15 @@ void s_definition_free_iop (igs_iop_t **iop)
     }
     if ((*iop)->callbacks) {
         igs_observe_wrapper_t *cb, *tmp;
-        DL_FOREACH_SAFE ((*iop)->callbacks, cb, tmp)
-        {
+        DL_FOREACH_SAFE ((*iop)->callbacks, cb, tmp){
             DL_DELETE ((*iop)->callbacks, cb);
             free (cb);
         }
     }
-    if ((*iop)->constraint){
+    if ((*iop)->constraint)
         definition_free_constraint(&(*iop)->constraint);
-    }
+    if ((*iop)->description)
+        free((*iop)->description);
 
     free (*iop);
     *iop = NULL;

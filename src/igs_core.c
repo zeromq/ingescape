@@ -568,6 +568,24 @@ igs_result_t igs_parameter_add_constraint (const char *name, const char *constra
     return igsagent_parameter_add_constraint (core_agent, name, constraint);
 }
 
+void igs_input_set_description(const char *name, const char *description)
+{
+    core_init_agent ();
+    return igsagent_input_set_description (core_agent, name, description);
+}
+
+void igs_output_set_description(const char *name, const char *description)
+{
+    core_init_agent ();
+    return igsagent_output_set_description (core_agent, name, description);
+}
+
+void igs_parameter_set_description(const char *name, const char *description)
+{
+    core_init_agent ();
+    return igsagent_parameter_set_description (core_agent, name, description);
+}
+
 void igs_clear_input (const char *name)
 {
     core_init_agent ();

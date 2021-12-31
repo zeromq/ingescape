@@ -468,7 +468,6 @@ int main(int argc, const char * argv[]) {
     igs_input_remove("constraint_data");
     
     
-    
     //agent family
     char *family = igs_agent_family();
     assert(family == NULL);
@@ -873,9 +872,11 @@ int main(int argc, const char * argv[]) {
     assert(igs_parameter_data("my_data", &data, &dataSize) == IGS_SUCCESS);
     assert(dataSize == 0 && data == NULL);
 
-
     //definition - part 2
-    //TODO: compare exported def, saved file and reference file
+    //TODO: compare exported def, saved file and reference file//iop description
+    igs_input_set_description("my_impulsion", "my iop description here");
+    igs_output_set_description("my_impulsion", "my iop description here");
+    igs_parameter_set_description("my_impulsion", "my iop description here");
     char *exportedDef = igs_definition_json();
     assert(exportedDef);
     igs_definition_set_path("/tmp/simple Demo Agent.json");
@@ -1367,6 +1368,13 @@ int main(int argc, const char * argv[]) {
     igs_split_add("my_string_split", "partner", "sparing_string");
     igs_split_add("my_data_split", "partner", "sparing_data");
 
+    //iop description
+    igs_input_set_description("my_impulsion", "my iop description here");
+    igs_input_set_description("my_impulsion", "my iop description here");
+    igs_output_set_description("my_impulsion", "my iop description here");
+    igs_output_set_description("my_impulsion", "my iop description here");
+    igs_parameter_set_description("my_impulsion", "my iop description here");
+    igs_parameter_set_description("my_impulsion", "my iop description here");
 
     //IOP writing and types conversions
     igs_input_set_impulsion("my_impulsion");
