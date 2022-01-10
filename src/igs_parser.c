@@ -285,7 +285,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                     iop->constraint = s_model_parse_constraint(iop->value_type, constraint->u.string, &error);
                 }
                 
-                igs_json_node_t *iop_description = igs_json_node_find (inputs->u.array.values[i], iop_description_path);
+                igs_json_node_t *iop_description = igs_json_node_find (outputs->u.array.values[i], iop_description_path);
                 if (iop_description && iop_description->type == IGS_JSON_STRING && iop_description->u.string){
                     if (iop->description)
                         free(iop->description);
@@ -392,7 +392,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                     iop->constraint = s_model_parse_constraint(iop->value_type, constraint->u.string, &error);
                 }
                 
-                igs_json_node_t *iop_description = igs_json_node_find (inputs->u.array.values[i], iop_description_path);
+                igs_json_node_t *iop_description = igs_json_node_find (parameters->u.array.values[i], iop_description_path);
                 if (iop_description && iop_description->type == IGS_JSON_STRING && iop_description->u.string){
                     if (iop->description)
                         free(iop->description);
