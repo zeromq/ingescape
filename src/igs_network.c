@@ -2837,7 +2837,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
         igs_debug ("<-%s (%s) exited", name, peerUUID);
 
         // check if we are last in an elections channel
-        // FIXME: every time a peer exists, we check empty election channels.
+        // FIXME: every time a peer exits, we check empty election channels.
         // This can make IGS_AGENT_WON_ELECTION notifed multiple times for a given
         // agent.
         if (context->elections) {
