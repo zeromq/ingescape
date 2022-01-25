@@ -97,6 +97,9 @@ lib-deploy-macos:
   dependencies:
     - lib-build-macos
   needs: [ "lib-build-macos" ]
+  only:
+    refs:
+      - main
 
 
 # Build/Deploy ingescape on macos-qt6 runner
@@ -128,6 +131,9 @@ lib-deploy-macos-qt6:
   dependencies:
     - lib-build-macos-qt6
   needs: [ "lib-build-macos-qt6" ]
+  only:
+    refs:
+      - main
 
 
 #__          ___           _
@@ -328,6 +334,9 @@ lib-deploy-windows:
     - lib-windows-debug-x64
     - lib-windows-debug-x86
   needs: [ "lib-windows-release-x64", "lib-windows-release-x86", "lib-windows-debug-x64", "lib-windows-debug-x86" ]
+  only:
+    refs:
+      - main
 
 # _      _
 #| |    (_)
@@ -397,6 +406,9 @@ lib-deploy-linux-release-x64:
   dependencies:
     - lib-build-linux-x64
   needs: [ "lib-build-linux-x64" ]
+  only:
+    refs:
+      - main
 
 
 ##
@@ -456,6 +468,9 @@ lib-deploy-debian-qt6-x64:
   dependencies:
     - lib-build-debian-qt6-x64
   needs: [ "lib-build-debian-qt6-x64" ]
+  only:
+    refs:
+      - main
 
 
 ##
@@ -491,6 +506,9 @@ lib-deploy-centos-qt:
     - cp include/ingescape_private.h /builds/sysroot/usr/local/include/ingescape/
   dependencies:
     - lib-build-centos-qt
+  only:
+    refs:
+      - main
 
 ##
 ## armhf (RPi)
@@ -553,6 +571,9 @@ lib-deploy-linux-release-armhf:
     - cp include/ingescape_private.h ~/builds/release/armhf/usr/local/include/ingescape/
   dependencies:
     - lib-linux-release-armhf
+  only:
+    refs:
+      - main
 
 
 ##
@@ -609,6 +630,9 @@ lib-deploy-linux-release-aarch64:
     - cp include/ingescape_private.h ~/builds/release/aarch64/usr/local/include/ingescape/
   dependencies:
     - lib-android-release-aarch64
+  only:
+    refs:
+      - main
 
 ##
 ## armv7a (Android)
@@ -664,6 +688,9 @@ lib-deploy-linux-release-armv7a-softfp:
     - cp include/ingescape_private.h ~/builds/release/armv7a-sf/usr/local/include/ingescape/
   dependencies:
     - lib-android-release-armv7a-softfp
+  only:
+    refs:
+      - main
 
 
 # _____       _ _
@@ -731,3 +758,6 @@ lib-delivery-all:
     - lib-installer-runtime-linux-armhf
     - lib-installer-runtime-android-armv7a-softfp
     - lib-installer-runtime-android-aarch64
+  only:
+    refs:
+      - main

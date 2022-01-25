@@ -12,13 +12,6 @@ if(OSX_UNIVERSAL)
     set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "Build universal binaries")
 endif(OSX_UNIVERSAL)
 
-project(ingescape HOMEPAGE_URL https://ingescape.com LANGUAGES C)
-
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_C_STANDARD_REQUIRED ON)
-ADD_DEFINITIONS (-DZYRE_BUILD_DRAFT_API)
-ADD_DEFINITIONS (-DCZMQ_BUILD_DRAFT_API)
-
 # Add path to custom macro
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/modules")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/modules/library")
@@ -26,6 +19,18 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/modules/
 # Include custom helpers
 include(IngescapeHelper)
 include(IdentifyOS)
+
+# gets version from admin.c file
+get_ingescape_version(INGESCAPE_VERSION_MAJOR INGESCAPE_VERSION_MINOR INGESCAPE_VERSION_PATCH)
+set(INGESCAPE_VERSION "${INGESCAPE_VERSION_MAJOR}.${INGESCAPE_VERSION_MINOR}.${INGESCAPE_VERSION_PATCH}")
+message(STATUS "Detected INGESCAPE Version - ${INGESCAPE_VERSION}")
+
+project(ingescape VERSION ${INGESCAPE_VERSION} HOMEPAGE_URL https://ingescape.com LANGUAGES C)
+
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+ADD_DEFINITIONS (-DZYRE_BUILD_DRAFT_API)
+ADD_DEFINITIONS (-DCZMQ_BUILD_DRAFT_API)
 
 # Option to only generate dependencies.
 # Used to setup developmenent environment.
@@ -80,11 +85,6 @@ if(NOT MSVC)
     endif()
   endforeach()
 endif()
-
-# gets version from admin.c file
-get_ingescape_version(INGESCAPE_VERSION_MAJOR INGESCAPE_VERSION_MINOR INGESCAPE_VERSION_PATCH)
-set(INGESCAPE_VERSION "${INGESCAPE_VERSION_MAJOR}.${INGESCAPE_VERSION_MINOR}.${INGESCAPE_VERSION_PATCH}")
-message(STATUS "Detected INGESCAPE Version - ${INGESCAPE_VERSION}")
 
 
 # ##############################################################################
@@ -306,16 +306,17 @@ if (NOT DEPS_ONLY)
 
     install(TARGETS ${PROJECT_NAME}
             EXPORT ${PROJECT_NAME}-targets
+            COMPONENT library
             FRAMEWORK DESTINATION "Frameworks" # .framework file
-                    COMPONENT library
+            COMPONENT library
             PUBLIC_HEADER DESTINATION include
-                    COMPONENT library
+            COMPONENT library
             LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
-                    COMPONENT library
+            COMPONENT library
             ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
-                    COMPONENT library
+            COMPONENT library
             RUNTIME DESTINATION "lib${LIB_SUFFIX}" # .dll file
-                    COMPONENT library)
+            COMPONENT library)
   endif()
 
   # static
@@ -325,18 +326,18 @@ if (NOT DEPS_ONLY)
     if (WITH_DEPS)
       add_dependencies(${PROJECT_NAME}-static zyre)
 
-      target_link_libraries(${PROJECT_NAME}-static PRIVATE sodium)
-      target_link_libraries(${PROJECT_NAME}-static PRIVATE libzmq)
-      target_link_libraries(${PROJECT_NAME}-static PRIVATE czmq)
-      target_link_libraries(${PROJECT_NAME}-static PRIVATE zyre)
+      target_link_libraries(${PROJECT_NAME}-static PRIVATE sodium-static)
+      target_link_libraries(${PROJECT_NAME}-static PRIVATE libzmq-static)
+      target_link_libraries(${PROJECT_NAME}-static PRIVATE czmq-static)
+      target_link_libraries(${PROJECT_NAME}-static PRIVATE zyre-static)
     else ()
       target_link_libraries(${PROJECT_NAME}-static PRIVATE ${LIBSODIUM_LIBRARIES})
       target_include_directories(${PROJECT_NAME}-static PRIVATE ${LIBSODIUM_INCLUDE_DIRS})
-      target_link_libraries(${PROJECT_NAME}-static PRIVATE libzmq)
+      target_link_libraries(${PROJECT_NAME}-static PRIVATE libzmq-static)
       target_include_directories(${PROJECT_NAME}-static PRIVATE ${ZeroMQ_INCLUDE_DIR})
-      target_link_libraries(${PROJECT_NAME}-static PRIVATE czmq)
+      target_link_libraries(${PROJECT_NAME}-static PRIVATE czmq-static)
       target_include_directories(${PROJECT_NAME}-static PRIVATE ${CZMQ_PUBLIC_HEADERS_DIR})
-      target_link_libraries(${PROJECT_NAME}-static PRIVATE zyre)
+      target_link_libraries(${PROJECT_NAME}-static PRIVATE zyre-static)
       target_include_directories(${PROJECT_NAME}-static PRIVATE ${zyre_INCLUDES_DIR})
     endif ()
 
@@ -474,7 +475,10 @@ if (NOT DEPS_ONLY)
   # installer
   # ##############################################################################
   # Package installer for release build only
-  if((WIN32) OR (CMAKE_BUILD_TYPE STREQUAL "Release"))
+  if (${CMAKE_OS_NAME} MATCHES "Debian")
+    set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake")
+    include(Packing-debian)
+  elseif((WIN32) OR (${CMAKE_BUILD_TYPE} STREQUAL "Release"))
     #https://cmake.org/cmake/help/v3.16/module/CPack.html#
     set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_NAME} core library")
