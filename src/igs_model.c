@@ -1491,7 +1491,7 @@ igs_constraint_t* s_model_parse_constraint(igs_iop_value_type_t type,
         }else
             *error = strdup("min constraint is allowed on integer and double IOPs only");
     }else if (zrex_eq(rex, expression, max_exp)){
-        zrex_fetch(rex, &exp1);
+        zrex_fetch(rex, &exp1, NULL);
         if (type == IGS_INTEGER_T){
             c = (igs_constraint_t *)calloc(1, sizeof(igs_constraint_t));
             c->type = IGS_CONSTRAINT_MAX;
