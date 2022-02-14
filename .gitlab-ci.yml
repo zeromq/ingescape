@@ -725,7 +725,8 @@ build-deb-package:
     - docker
   image: debian:11
   script:
-    - apt update && apt install build-essential cmake file git
+    - apt update || apt update
+    - apt install -y build-essential cmake file git
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
     - cmake -S . -B b -DWITH_DEPS=ON -DCMAKE_BUILD_TYPE=Release -DCPACK_COMPONENTS_ALL="Unspecified;library"
     - cmake --build b
@@ -733,7 +734,16 @@ build-deb-package:
     - (cd _packages && dpkg-deb -R ingescape-dev*.deb p && tree p)
     - mkdir debian_x64
     - mv _packages/ingescape-dev*.deb debian_x64
-    - echo "Publish to repo"
+    - echo "Setting up SSH"
+    - mkdir -p ~/.ssh/
+    - echo ${STABLE_SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
+    - umask 077
+    - echo ${STABLE_SSH_SECRET} | base64 -d > ssh_secret
+    - umask 022
+    - echo "Push to repo"
+    - ssh -i ssh_secret ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST} echo Connected
+    #- rsync --rsh="ssh -i ssh_secret" --recursive library ${DELIVERY_USER}@${DELIVERY_HOST}:/home/ingescape/domains/repository.ingescape.com/public_html/debian/pool/main
+    #- ssh -i ssh_secret ${DELIVERY_USER}@${DELIVERY_HOST} /home/ingescape/domains/repository.ingescape.com/refresh_deb_repo.sh
   artifacts:
     paths:
       - debian_x64/ingescape-dev*.deb
