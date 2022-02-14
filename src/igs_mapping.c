@@ -74,9 +74,16 @@ bool mapping_is_equal (const char *first_str, const char *second_str)
 {
     if (!first_str && !second_str)
         return true;
+    //NB: is one is NULL and not the other, we consider
+    //the comparison is false even is the not NULL one
+    //is not valid.
+    if ((first_str && !second_str)
+        || (!first_str && second_str))
+        return false;
 
     igs_mapping_t *first = parser_load_mapping (first_str);
     igs_mapping_t *second = parser_load_mapping (second_str);
+    //if both strings are invalid, we consider the comparison is true
     if (!first && !second)
         return true;
     if ((first && !second) || (second && !first)) {
@@ -86,7 +93,8 @@ bool mapping_is_equal (const char *first_str, const char *second_str)
             mapping_free_mapping (&second);
         return false;
     }
-
+    
+    //beyond this point, both strings are valid JSON
     bool res = true;
 
     if (!first->map_elements) {
@@ -101,24 +109,27 @@ bool mapping_is_equal (const char *first_str, const char *second_str)
             goto END;
         }
     }
+    //comparing number of entries in mapping elements
     size_t firstS = HASH_COUNT (first->map_elements);
     size_t secondS = HASH_COUNT (second->map_elements);
     if (firstS != secondS) {
         res = false;
         goto END;
     }
+    //comparing ids
+    //NB: comparing ids (which are hashes) is sufficient to compare
+    //the whole entries.
     igs_map_t *elmt, *tmp, *second_elmt;
-    HASH_ITER (hh, first->map_elements, elmt, tmp)
-    {
+    HASH_ITER (hh, first->map_elements, elmt, tmp){
         second_elmt = NULL;
-        HASH_FIND (hh, second->map_elements, &elmt->id, sizeof (uint64_t),
-                   second_elmt);
-        if (!second_elmt) {
+        HASH_FIND (hh, second->map_elements, &elmt->id, sizeof (uint64_t), second_elmt);
+        if (!second_elmt){
             res = false;
             goto END;
         }
     }
 
+    //same for splits
     size_t first_split = HASH_COUNT (first->split_elements);
     size_t second_split = HASH_COUNT (second->split_elements);
     if (first_split != second_split) {
@@ -126,11 +137,9 @@ bool mapping_is_equal (const char *first_str, const char *second_str)
         goto END;
     }
     igs_split_t *elmt_split, *tmp_split, *second_elmt_split;
-    HASH_ITER (hh, first->split_elements, elmt_split, tmp_split)
-    {
+    HASH_ITER (hh, first->split_elements, elmt_split, tmp_split){
         second_elmt_split = NULL;
-        HASH_FIND (hh, second->split_elements, &elmt->id, sizeof (uint64_t),
-                   second_elmt_split);
+        HASH_FIND (hh, second->split_elements, &elmt->id, sizeof (uint64_t), second_elmt_split);
         if (!second_elmt_split) {
             res = false;
             goto END;
