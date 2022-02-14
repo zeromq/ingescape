@@ -475,7 +475,8 @@ if (NOT DEPS_ONLY)
   # installer
   # ##############################################################################
   # Package installer for release build only
-  if (${CMAKE_OS_NAME} MATCHES "Debian")
+  option(PACK_TGZ "Force pack ingescape as a TGZ and not a .deb package" OFF)
+  if (${CMAKE_OS_NAME} MATCHES "Debian" AND NOT ${PACK_TGZ})
     set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake")
     include(Packing-debian)
   elseif((WIN32) OR (${CMAKE_BUILD_TYPE} STREQUAL "Release"))
