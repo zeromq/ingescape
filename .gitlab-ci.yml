@@ -560,6 +560,7 @@ lib-installer-runtime-linux-armhf:
     - export INGESCAPE_MAJOR=$(grep "#define INGESCAPE_VERSION_MAJOR" include/ingescape.h | cut -d ' ' -f3-)
     - export INGESCAPE_MINOR=$(grep "#define INGESCAPE_VERSION_MINOR" include/ingescape.h | cut -d ' ' -f3-)
     - export INGESCAPE_VERSION=$INGESCAPE_MAJOR.$INGESCAPE_MINOR.$CI_PIPELINE_ID
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCI_PIPELINE_ID=${CI_PIPELINE_ID} -DPACK_TGZ=ON
     - cd build
     - make package
     - tar xf ingescape-${INGESCAPE_VERSION}-Linux.tar.gz
@@ -711,6 +712,33 @@ lib-deploy-linux-release-armv7a-softfp:
       - main
     variables:
       - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
+
+
+##
+## Debian (.deb package)
+##
+
+build-deb-package:
+  extends: .lib-build-files
+  stage: lib-delivery
+  tags:
+    - docker
+  image: debian:11
+  script:
+    - apt update && apt install build-essential cmake file git
+    - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
+    - cmake -S . -B b -DWITH_DEPS=ON -DCMAKE_BUILD_TYPE=Release -DCPACK_COMPONENTS_ALL="Unspecified;library"
+    - cmake --build b
+    - (cd b && cpack -G DEB)
+    - (cd _packages && dpkg-deb -R ingescape-dev*.deb p && tree p)
+    - mkdir debian_x64
+    - mv _packages/ingescape-dev*.deb debian_x64
+    - echo "Publish to repo"
+  artifacts:
+    paths:
+      - debian_x64/ingescape-dev*.deb
+    name: "ingescape-dev-debian-package"
+  dependencies: []
 
 
 # _____       _ _
