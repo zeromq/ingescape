@@ -5,14 +5,17 @@ option(DEB_NO_STRIP "Do not strip binaries when generating the .deb package" OFF
 if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
     message(STATUS "Debug build, binaries with debug symbols will be used for .deb package")
     set(CPACK_PACKAGE_NAME ${BASE_PACKAGE_NAME}-debug-dev CACHE STRING "The resulting package name")
+    set(CPACK_DEBIAN_PACKAGE_CONFLICTS "${BASE_PACKAGE_NAME}-dev, ${BASE_PACKAGE_NAME}-no-strip-dev")
 elseif (${DEB_NO_STRIP})
     message(STATUS "DEB_NO_STRIP activated, binaries won't be stripped of symbols when generating the .deb package")
     set(CPACK_PACKAGE_NAME ${BASE_PACKAGE_NAME}-no-strip-dev CACHE STRING "The resulting package name")
+    set(CPACK_DEBIAN_PACKAGE_CONFLICTS "${BASE_PACKAGE_NAME}-dev, ${BASE_PACKAGE_NAME}-debug-dev")
 else()
     message(STATUS "Binaries will be stripped of debug symbols.")
     message(STATUS "  Set -DCMAKE_BUILD_TYPE=Debug to create a package with debug symbols.")
     message(STATUS "  Set -DDEB_NO_STRIP=ON to have release binaries not stripped when generating the .deb package.")
     set(CPACK_PACKAGE_NAME ${BASE_PACKAGE_NAME}-dev CACHE STRING "The resulting package name")
+    set(CPACK_DEBIAN_PACKAGE_CONFLICTS "${BASE_PACKAGE_NAME}-debug-dev, ${BASE_PACKAGE_NAME}-no-strip-dev")
 endif()
 
 # which is useful in case of packing only selected components instead of the whole thing
