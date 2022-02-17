@@ -4,7 +4,7 @@ option(DEB_NO_STRIP "Do not strip binaries when generating the .deb package" OFF
 if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
     message(STATUS "Debug build, binaries with debug symbols will be used for .deb package")
     set(CPACK_PACKAGE_NAME ${PROJECT_NAME}-debug-dev CACHE STRING "The resulting package name")
-else (${DEB_NO_STRIP})
+elseif (${DEB_NO_STRIP})
     message(STATUS "DEB_NO_STRIP activated, binaries won't be stripped of symbols when generating the .deb package")
     set(CPACK_PACKAGE_NAME ${PROJECT_NAME}-no-strip-dev CACHE STRING "The resulting package name")
 else()
