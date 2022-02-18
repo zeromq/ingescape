@@ -139,7 +139,7 @@ bool mapping_is_equal (const char *first_str, const char *second_str)
     igs_split_t *elmt_split, *tmp_split, *second_elmt_split;
     HASH_ITER (hh, first->split_elements, elmt_split, tmp_split){
         second_elmt_split = NULL;
-        HASH_FIND (hh, second->split_elements, &elmt->id, sizeof (uint64_t), second_elmt_split);
+        HASH_FIND (hh, second->split_elements, &elmt_split->id, sizeof (uint64_t), second_elmt_split);
         if (!second_elmt_split) {
             res = false;
             goto END;
