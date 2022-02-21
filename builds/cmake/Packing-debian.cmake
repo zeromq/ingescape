@@ -1,12 +1,25 @@
 message(STATUS "Package configuration (only DEB for now)")
+set(BASE_PACKAGE_NAME ${PROJECT_NAME})
+option(DEB_NO_STRIP "Do not strip binaries when generating the .deb package" OFF)
 # these are cache variables, so they could be overwritten with -D,
-set(CPACK_PACKAGE_NAME ${PROJECT_NAME}-dev
-    CACHE STRING "The resulting package name"
-)
+if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+    message(STATUS "Debug build, binaries with debug symbols will be used for .deb package")
+    set(CPACK_PACKAGE_NAME ${BASE_PACKAGE_NAME}-debug-dev CACHE STRING "The resulting package name")
+    set(CPACK_DEBIAN_PACKAGE_CONFLICTS "${BASE_PACKAGE_NAME}-dev, ${BASE_PACKAGE_NAME}-no-strip-dev")
+elseif (${DEB_NO_STRIP})
+    message(STATUS "DEB_NO_STRIP activated, binaries won't be stripped of symbols when generating the .deb package")
+    set(CPACK_PACKAGE_NAME ${BASE_PACKAGE_NAME}-no-strip-dev CACHE STRING "The resulting package name")
+    set(CPACK_DEBIAN_PACKAGE_CONFLICTS "${BASE_PACKAGE_NAME}-dev, ${BASE_PACKAGE_NAME}-debug-dev")
+else()
+    message(STATUS "Binaries will be stripped of debug symbols.")
+    message(STATUS "  Set -DCMAKE_BUILD_TYPE=Debug to create a package with debug symbols.")
+    message(STATUS "  Set -DDEB_NO_STRIP=ON to have release binaries not stripped when generating the .deb package.")
+    set(CPACK_PACKAGE_NAME ${BASE_PACKAGE_NAME}-dev CACHE STRING "The resulting package name")
+    set(CPACK_DEBIAN_PACKAGE_CONFLICTS "${BASE_PACKAGE_NAME}-debug-dev, ${BASE_PACKAGE_NAME}-no-strip-dev")
+endif()
+
 # which is useful in case of packing only selected components instead of the whole thing
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Model-based framework for broker-free distributed software environments - development package"
-    CACHE STRING "Package description summary"
-)
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Model-based framework for broker-free distributed software environments - development package" CACHE STRING "Package description summary")
 set(CPACK_PACKAGE_VENDOR "Ingescape")
 
 set(CPACK_VERBATIM_VARIABLES YES)
@@ -27,11 +40,18 @@ set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Ingenuity I/O <${CPACK_PACKAGE_CONTACT}>")
 set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE
-        DESTINATION ${CPACK_PACKAGING_INSTALL_PREFIX}/share/doc/${PROJECT_NAME}-dev
+        DESTINATION ${CPACK_PACKAGING_INSTALL_PREFIX}/share/doc/${CPACK_PACKAGE_NAME}
         RENAME copyright)
 
+
 # Strip binaries of debuging names and symbols
-set(CPACK_STRIP_FILES YES)
+if ((${CMAKE_BUILD_TYPE} STREQUAL "Debug") OR ${DEB_NO_STRIP})
+    message(STATUS "Binaries will NOT be stripped when generating .deb package")
+    set(CPACK_STRIP_FILES NO)
+else()
+    message(STATUS "Binaries will be stripped when generating .deb package")
+    set(CPACK_STRIP_FILES YES)
+endif()
 
 # Set dependencies line in package control file
 set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS YES)

@@ -101,7 +101,7 @@ lib-deploy-macos:
     refs:
       - main
     variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
+      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
 
 
 # Build/Deploy ingescape on macos-qt6 runner
@@ -137,7 +137,7 @@ lib-deploy-macos-qt6:
     refs:
       - main
     variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
+      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
 
 
 #__          ___           _
@@ -342,7 +342,7 @@ lib-deploy-windows:
     refs:
       - main
     variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
+      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
 
 # _      _
 #| |    (_)
@@ -417,7 +417,7 @@ lib-deploy-linux-release-x64:
     refs:
       - main
     variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
+      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
 
 
 ##
@@ -482,7 +482,7 @@ lib-deploy-debian-qt6-x64:
     refs:
       - main
     variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
+      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
 
 
 ##
@@ -522,7 +522,7 @@ lib-deploy-centos-qt:
     refs:
       - main
     variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
+      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
 
 ##
 ## armhf (RPi)
@@ -590,7 +590,7 @@ lib-deploy-linux-release-armhf:
     refs:
       - main
     variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
+      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
 
 
 ##
@@ -651,7 +651,7 @@ lib-deploy-linux-release-aarch64:
     refs:
       - main
     variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
+      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
 
 ##
 ## armv7a (Android)
@@ -711,7 +711,7 @@ lib-deploy-linux-release-armv7a-softfp:
     refs:
       - main
     variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
+      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
 
 
 ##
@@ -748,6 +748,71 @@ build-deb-package:
     paths:
       - debian_x64/ingescape-dev*.deb
     name: "ingescape-dev-debian-package"
+  dependencies: []
+
+build-no-strip-deb-package:
+  extends: .lib-build-files
+  stage: lib-delivery
+  tags:
+    - docker
+  image: debian:11
+  script:
+    - apt-get update || apt-get update
+    - apt-get install -y build-essential cmake file git tree rsync
+    - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
+    - cmake -S . -B b -DWITH_DEPS=ON -DCMAKE_BUILD_TYPE=Release -DDEB_NO_STRIP=ON -DCPACK_COMPONENTS_ALL="Unspecified;library"
+    - cmake --build b --parallel 6
+    - (cd b && cpack -G DEB)
+    - (cd _packages && dpkg-deb -R ingescape-no-strip-dev*.deb p && tree p)
+    - mkdir debian_x64
+    - mv _packages/ingescape-no-strip-dev*.deb debian_x64
+    - echo "Setting up SSH"
+    - mkdir -p ~/.ssh/
+    - ssh-keyscan -t rsa ingescape.com >> ~/.ssh/known_hosts
+    - umask 077
+    - echo ${STABLE_SSH_SECRET} | base64 -d > ssh_secret
+    - umask 022
+    - echo "Push to repo"
+    - ssh -i ssh_secret ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST} echo Connected
+    - rsync --rsh="ssh -i ssh_secret" debian_x64/ingescape-no-strip-dev*.deb ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST}:/home/ingescape/domains/repository.ingescape.com/public_html/debian/pool/main
+    - ssh -i ssh_secret ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST} /home/ingescape/domains/repository.ingescape.com/refresh_deb_repo.sh
+  artifacts:
+    paths:
+      - debian_x64/ingescape-no-strip-dev*.deb
+    name: "ingescape-no-strip-dev-debian-package"
+  dependencies: []
+
+
+build-debug-deb-package:
+  extends: .lib-build-files
+  stage: lib-delivery
+  tags:
+    - docker
+  image: debian:11
+  script:
+    - apt-get update || apt-get update
+    - apt-get install -y build-essential cmake file git tree rsync
+    - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
+    - cmake -S . -B b -DWITH_DEPS=ON -DCMAKE_BUILD_TYPE=Debug -DCPACK_COMPONENTS_ALL="Unspecified;library"
+    - cmake --build b --parallel 6
+    - (cd b && cpack -G DEB)
+    - (cd _packages && dpkg-deb -R ingescape-debug-dev*.deb p && tree p)
+    - mkdir debian_x64
+    - mv _packages/ingescape-debug-dev*.deb debian_x64
+    - echo "Setting up SSH"
+    - mkdir -p ~/.ssh/
+    - ssh-keyscan -t rsa ingescape.com >> ~/.ssh/known_hosts
+    - umask 077
+    - echo ${STABLE_SSH_SECRET} | base64 -d > ssh_secret
+    - umask 022
+    - echo "Push to repo"
+    - ssh -i ssh_secret ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST} echo Connected
+    - rsync --rsh="ssh -i ssh_secret" debian_x64/ingescape-debug-dev*.deb ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST}:/home/ingescape/domains/repository.ingescape.com/public_html/debian/pool/main
+    - ssh -i ssh_secret ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST} /home/ingescape/domains/repository.ingescape.com/refresh_deb_repo.sh
+  artifacts:
+    paths:
+      - debian_x64/ingescape-debug-dev*.deb
+    name: "ingescape-debug-dev-debian-package"
   dependencies: []
 
 
@@ -820,4 +885,4 @@ lib-delivery-all:
     refs:
       - main
     variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
+      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
