@@ -23,7 +23,7 @@ stages:
 # Global variables. Can be used by any jobs
 variables:
   VS_CMAKE_GENERATOR: "Visual Studio 15 2017"
-  DEPLOYMENT_WINDOWS_NET_SHARE: "\\\\autan\\gitlab_workspace\\dependencies"
+  DEPLOYMENT_WINDOWS_NET_SHARE: "\\\\10.0.0.2\\gitlab_workspace\\dependencies"
 
 
 #http://patorjk.com/software/taag/#p=display&f=Big&t=Windows
