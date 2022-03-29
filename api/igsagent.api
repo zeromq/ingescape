@@ -10,40 +10,10 @@
     -->
     ingescape agent framework
 
-    <callback_type name = "fn">
-        DOC_STRING
-        <argument name = "agent" type = "igsagent" />
-        <argument name = "active" type = "boolean" />
-        <argument name = "data" type = "anything" />
-    </callback_type>
-
-    <callback_type name = "iop fn">
-        DOC_STRING
-        <argument name = "agent" type = "igsagent" />
-        <argument name = "type" type = "igs iop type t" callback = "1" />
-        <argument name = "name" type = "string" />
-        <argument name = "value type" type = "igs iop value type t" callback = "1" />
-        <argument name = "value" type = "anything" />
-        <argument name = "value size" type = "size" />
-        <argument name = "data" type = "anything" />
-    </callback_type>
-
-    <callback_type name = "service fn">
-        DOC_STRING
-        <argument name = "agent" type = "igsagent" />
-        <argument name = "sender agent name" type = "string" />
-        <argument name = "sender agent uuid" type = "string" />
-        <argument name = "service name" type = "string" />
-        <argument name = "first argument" type = "igs_service_arg_t" callback = "1" by_reference = "1" />
-        <argument name = "args nbr" type = "size" />
-        <argument name = "token"  type = "string" />
-        <argument name = "data" type = "anything" />
-    </callback_type>
-
     <constructor>
         DOC_STRING
         <argument name = "name" type = "string" />
-        <argument name = "activate now" type = "boolean" />
+        <argument name = "activate immediately" type = "boolean" />
     </constructor>
 
     <destructor>
@@ -65,10 +35,25 @@
         <return type = "boolean" />
     </method>
 
+    <callback_type name = "fn">
+        DOC_STRING
+        <argument name = "agent" type = "igsagent" />
+        <argument name = "is activated" type = "boolean" />
+        <argument name = "my data" type = "anything" />
+    </callback_type>
+
     <method name = "observe">
         DOC_STRING
         <argument name = "cb" type = "igsagent fn" callback = "1"/>
-        <argument name = "data" type = "anything" />
+        <argument name = "my data" type = "anything" />
+    </method>
+
+    <method name = "log" singleton = "1">
+        DOC_STRING
+        <argument name = "level" type = "igs log level t" callback = "1" />
+        <argument name = "function" type = "string" />
+        <argument name = "agent" type = "igsagent" />
+        <argument name = "format" type = "string" variadic = "1" />
     </method>
 
     <method name = "name">
@@ -133,7 +118,6 @@
         <argument name = "data" type = "anything" />
     </method>
 
-    <!-- agent events -->
     <callback_type name = "agent events fn">
         DOC_STRING
         <argument name = "agent" type = "igsagent" />
@@ -150,7 +134,161 @@
         <argument name = "data" type = "anything" />
     </method>
 
-    <!-- IOP read -->
+    <method name = "definition load str">
+        DOC_STRING
+        <argument name = "json str" type = "string" />
+        <return type = "igs result t" callback = "1" />
+    </method>
+
+    <method name = "definition load file">
+        DOC_STRING
+        <argument name = "file_path" type = "string" />
+        <return type = "igs result t" callback = "1" />
+    </method>
+
+    <method name = "clear definition">
+        DOC_STRING
+    </method>
+
+    <method name = "definition json">
+        DOC_STRING
+        <return type = "string" fresh = "1" />
+    </method>
+
+    <method name = "definition description">
+        DOC_STRING
+        <return type = "string" fresh = "1" />
+    </method>
+
+    <method name = "definition version">
+        DOC_STRING
+        <return type = "string" fresh = "1" />
+    </method>
+
+    <method name = "definition set description">
+        DOC_STRING
+        <argument name = "descritpion" type = "string" />
+    </method>
+
+    <method name = "definition set version">
+        DOC_STRING
+        <argument name = "version" type = "string" />
+    </method>
+
+    <method name = "input create">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "value type" type = "igs iop value type t" callback = "1" /> <!-- callback hack to avoid argument being a pointer -->
+        <argument name = "value" type = "anything" />
+        <argument name = "size" type = "size" />
+        <return type = "igs result t" callback = "1" />
+    </method>
+
+    <method name = "output create">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "value type" type = "igs iop value type t" callback = "1" /> <!-- callback hack to avoid argument being a pointer -->
+        <argument name = "value" type = "anything" />
+        <argument name = "size" type = "size" />
+        <return type = "igs result t" callback = "1" />
+    </method>
+
+    <method name = "parameter create">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "value type" type = "igs iop value type t" callback = "1" /> <!-- callback hack to avoid argument being a pointer -->
+        <argument name = "value" type = "anything" />
+        <argument name = "size" type = "size" />
+        <return type = "igs result t" callback = "1" />
+    </method>
+
+    <method name = "input remove">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <return type = "igs result t" callback = "1" />
+    </method>
+
+    <method name = "output remove">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <return type = "igs result t" callback = "1" />
+    </method>
+
+    <method name = "parameter remove">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <return type = "igs result t" callback = "1" />
+    </method>
+
+    <method name = "input type">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <return type = "igs iop value type t" callback = "1" /> <!-- callback hack to avoid argument being a pointer -->
+    </method>
+
+    <method name = "output type">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <return type = "igs iop value type t" callback = "1" /> <!-- callback hack to avoid argument being a pointer -->
+    </method>
+
+    <method name = "parameter type">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <return type = "igs iop value type t" callback = "1" /> <!-- callback hack to avoid argument being a pointer -->
+    </method>
+
+    <method name = "input count">
+        DOC_STRING
+        <return type = "size" />
+    </method>
+
+    <method name = "output count">
+        DOC_STRING
+        <return type = "size" />
+    </method>
+
+    <method name = "parameter count">
+        DOC_STRING
+        <return type = "size" />
+    </method>
+
+    <method name = "input list">
+        DOC_STRING
+        <argument name = "nb of elements" type = "size" by_reference = "1" />
+        <return type = "string" by_reference = "1" fresh = "1"/>
+    </method>
+
+    <method name = "output list">
+        DOC_STRING
+        <argument name = "nb of elements" type = "size" by_reference = "1" />
+        <return type = "string" by_reference = "1" fresh = "1" />
+    </method>
+
+    <method name = "parameter list">
+        DOC_STRING
+        <argument name = "nb of elements" type = "size" by_reference = "1" />
+        <return type = "string" by_reference = "1" fresh = "1" />
+    </method>
+
+    <method name = "input exists">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <return type = "boolean" />
+    </method>
+
+    <method name = "output exists">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <return type = "boolean" />
+    </method>
+
+    <method name = "parameter exists">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <return type = "boolean" />
+    </method>
+
     <method name = "input bool">
         DOC_STRING
         <argument name = "name" type = "string" />
@@ -180,13 +318,6 @@
         <argument name = "name" type = "string" />
         <argument name = "data" type = "anything" by_reference = "1"/>
         <argument name = "size" type = "size" by_reference = "1" />
-        <return type = "igs result t" callback = "1" />
-    </method>
-
-    <method name = "input zmsg">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <argument name = "msg" type = "zmsg" by_reference = "1"/>
         <return type = "igs result t" callback = "1" />
     </method>
 
@@ -338,13 +469,6 @@
         <return type = "igs result t" callback = "1" />
     </method>
 
-    <method name = "output set zmsg">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <argument name = "value" type = "zmsg" />
-        <return type = "igs result t" callback = "1" />
-    </method>
-
     <method name = "parameter set bool">
         DOC_STRING
         <argument name = "name" type = "string" />
@@ -381,6 +505,64 @@
         <return type = "igs result t" callback = "1" />
     </method>
 
+    <method name = "constraints enforce">
+        DOC_STRING
+        <argument name = "enforce" type = "boolean" />
+    </method>
+
+    <method name = "input add constraint">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "constraint" type = "string" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
+    </method>
+
+    <method name = "output add constraint">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "constraint" type = "string" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
+    </method>
+
+    <method name = "parameter add constraint">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "constraint" type = "string" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
+    </method>
+
+    <method name = "input set description">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "description" type = "string" />
+    </method>
+
+    <method name = "output set description">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "description" type = "string" />
+    </method>
+
+    <method name = "parameter set description">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "description" type = "string" />
+    </method>
+
+    <method name = "input zmsg">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "msg" type = "zmsg" by_reference = "1"/>
+        <return type = "igs result t" callback = "1" />
+    </method>
+
+    <method name = "output set zmsg">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "value" type = "zmsg" />
+        <return type = "igs result t" callback = "1" />
+    </method>
+
     <method name = "clear input">
         DOC_STRING
         <argument name = "name" type = "string" />
@@ -395,6 +577,17 @@
         DOC_STRING
         <argument name = "name" type = "string" />
     </method>
+
+    <callback_type name = "iop fn">
+        DOC_STRING
+        <argument name = "agent" type = "igsagent" />
+        <argument name = "type" type = "igs iop type t" callback = "1" />
+        <argument name = "name" type = "string" />
+        <argument name = "value type" type = "igs iop value type t" callback = "1" />
+        <argument name = "value" type = "anything" />
+        <argument name = "value size" type = "size" />
+        <argument name = "data" type = "anything" />
+    </callback_type>
 
     <method name = "observe input">
         DOC_STRING
@@ -433,161 +626,6 @@
         <return type = "boolean" />
     </method>
 
-    <method name = "input type">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <return type = "igs iop value type t" callback = "1" /> <!-- callback hack to avoid argument being a pointer -->
-    </method>
-
-    <method name = "output type">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <return type = "igs iop value type t" callback = "1" /> <!-- callback hack to avoid argument being a pointer -->
-    </method>
-
-    <method name = "parameter type">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <return type = "igs iop value type t" callback = "1" /> <!-- callback hack to avoid argument being a pointer -->
-    </method>
-
-    <method name = "input count">
-        DOC_STRING
-        <return type = "size" />
-    </method>
-
-    <method name = "output count">
-        DOC_STRING
-        <return type = "size" />
-    </method>
-
-    <method name = "parameter count">
-        DOC_STRING
-        <return type = "size" />
-    </method>
-
-    <method name = "input list">
-        DOC_STRING
-        <argument name = "nb of elements" type = "size" by_reference = "1" />
-        <return type = "string" by_reference = "1" fresh = "1"/>
-    </method>
-
-    <method name = "output list">
-        DOC_STRING
-        <argument name = "nb of elements" type = "size" by_reference = "1" />
-        <return type = "string" by_reference = "1" fresh = "1" />
-    </method>
-
-    <method name = "parameter list">
-        DOC_STRING
-        <argument name = "nb of elements" type = "size" by_reference = "1" />
-        <return type = "string" by_reference = "1" fresh = "1" />
-    </method>
-
-    <method name = "input exists">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <return type = "boolean" />
-    </method>
-
-    <method name = "output exists">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <return type = "boolean" />
-    </method>
-
-    <method name = "parameter exists">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <return type = "boolean" />
-    </method>
-
-    <method name = "definition load str">
-        DOC_STRING
-        <argument name = "json str" type = "string" />
-        <return type = "igs result t" callback = "1" />
-    </method>
-
-    <method name = "definition load file">
-        DOC_STRING
-        <argument name = "file_path" type = "string" />
-        <return type = "igs result t" callback = "1" />
-    </method>
-
-    <method name = "clear definition">
-        DOC_STRING
-    </method>
-
-    <method name = "definition json">
-        DOC_STRING
-        <return type = "string" fresh = "1" />
-    </method>
-
-    <method name = "definition description">
-        DOC_STRING
-        <return type = "string" fresh = "1" />
-    </method>
-
-    <method name = "definition version">
-        DOC_STRING
-        <return type = "string" fresh = "1" />
-    </method>
-
-    <method name = "definition set description">
-        DOC_STRING
-        <argument name = "descritpion" type = "string" />
-    </method>
-
-    <method name = "definition set version">
-        DOC_STRING
-        <argument name = "version" type = "string" />
-    </method>
-
-    <method name = "input create">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <argument name = "value type" type = "igs iop value type t" callback = "1" /> <!-- callback hack to avoid argument being a pointer -->
-        <argument name = "value" type = "anything" />
-        <argument name = "size" type = "size" />
-        <return type = "igs result t" callback = "1" />
-    </method>
-
-    <method name = "output create">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <argument name = "value type" type = "igs iop value type t" callback = "1" /> <!-- callback hack to avoid argument being a pointer -->
-        <argument name = "value" type = "anything" />
-        <argument name = "size" type = "size" />
-        <return type = "igs result t" callback = "1" />
-    </method>
-
-    <method name = "parameter create">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <argument name = "value type" type = "igs iop value type t" callback = "1" /> <!-- callback hack to avoid argument being a pointer -->
-        <argument name = "value" type = "anything" />
-        <argument name = "size" type = "size" />
-        <return type = "igs result t" callback = "1" />
-    </method>
-
-    <method name = "input remove">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <return type = "igs result t" callback = "1" />
-    </method>
-
-    <method name = "output remove">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <return type = "igs result t" callback = "1" />
-    </method>
-
-    <method name = "parameter remove">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <return type = "igs result t" callback = "1" />
-    </method>
-
     <method name = "mappings load str">
         DOC_STRING
         <argument name = "json_str" type = "string" />
@@ -600,15 +638,6 @@
         <return type = "igs result t" callback = "1" />
     </method>
 
-    <method name = "clear mappings">
-        DOC_STRING
-    </method>
-
-    <method name = "clear mappings with agent">
-        DOC_STRING
-        <argument name = "agent_name" type = "string" />
-    </method>
-
     <method name = "mappings json">
         DOC_STRING
         <return type = "string" fresh = "1" />
@@ -617,6 +646,15 @@
     <method name = "mapping count">
         DOC_STRING
         <return type = "size" />
+    </method>
+
+    <method name = "clear mappings">
+        DOC_STRING
+    </method>
+
+    <method name = "clear mappings with agent">
+        DOC_STRING
+        <argument name = "agent_name" type = "string" />
     </method>
 
     <method name = "mapping add">
@@ -641,7 +679,7 @@
         <return type = "igs result t" callback = "1" />
     </method>
 
-    <method name = "splits number">
+    <method name = "split count">
         DOC_STRING
         <return type = "size" />
     </method>
@@ -678,52 +716,26 @@
         <argument name = "notify" type = "boolean" />
     </method>
 
-    <method name = "log" singleton = "1">
-        DOC_STRING
-        <argument name = "level" type = "igs log level t" callback = "1" />
-        <argument name = "function" type = "string" />
-        <argument name = "agent" type = "igsagent" />
-        <argument name = "format" type = "string" variadic = "1" />
-    </method>
-
-    <method name = "definition set path">
-        DOC_STRING
-        <argument name = "path" type = "string" />
-    </method>
-
-    <method name = "mappings set path">
-        DOC_STRING
-        <argument name = "path" type = "string" />
-    </method>
-
-    <method name = "definition save">
-        DOC_STRING
-    </method>
-
-    <method name = "mappings save">
-        DOC_STRING
-    </method>
-
-    <method name = "election join">
-        DOC_STRING
-        <argument name = "election_name" type = "string" />
-        <return type = "igs result t" callback = "1" />
-    </method>
-
-    <method name = "election leave">
-        DOC_STRING
-        <argument name = "election_name" type = "string" />
-        <return type = "igs result t" callback = "1" />
-    </method>
-
     <method name = "service call">
         DOC_STRING
         <argument name = "agent name or uuid" type = "string" />
         <argument name = "service name" type = "string" />
-        <argument name = "list" type="igs_service_arg_t by_reference = "1"/>
+        <argument name = "list" type = "igs_service_arg" by_reference = "1"/>
         <argument name = "token" type = "string" />
         <return type = "igs result t" callback = "1" />
     </method>
+
+    <callback_type name = "service fn">
+        DOC_STRING
+        <argument name = "agent" type = "igsagent" />
+        <argument name = "sender agent name" type = "string" />
+        <argument name = "sender agent uuid" type = "string" />
+        <argument name = "service name" type = "string" />
+        <argument name = "first argument" type = "igs_service_arg" callback = "1" by_reference = "1" />
+        <argument name = "args nbr" type = "size" />
+        <argument name = "token"  type = "string" />
+        <argument name = "data" type = "anything" />
+    </callback_type>
 
     <method name = "service init">
         DOC_STRING
@@ -754,7 +766,7 @@
         <return type = "igs result t" callback = "1" />
     </method>
 
-    <method name = "services number">
+    <method name = "service count">
         DOC_STRING
         <return type = "size" />
     </method>
@@ -774,10 +786,10 @@
     <method name = "service args first">
         DOC_STRING
         <argument name = "service name" type = "string" />
-        <return type = "igs_service_arg_t" callback = "1" by_reference = "1" />
+        <return type = "igs_service_arg" callback = "1" by_reference = "1" />
     </method>
 
-    <method name = "service args number">
+    <method name = "service args count">
         DOC_STRING
         <argument name = "service name" type = "string" />
         <return type = "size" />
@@ -788,6 +800,36 @@
         <argument name = "service name" type = "string" />
         <argument name = "arg name" type = "string" />
         <return type = "boolean" />
+    </method>
+
+    <method name = "election join">
+        DOC_STRING
+        <argument name = "election_name" type = "string" />
+        <return type = "igs result t" callback = "1" />
+    </method>
+
+    <method name = "election leave">
+        DOC_STRING
+        <argument name = "election_name" type = "string" />
+        <return type = "igs result t" callback = "1" />
+    </method>
+
+    <method name = "definition set path">
+        DOC_STRING
+        <argument name = "path" type = "string" />
+    </method>
+
+    <method name = "definition save">
+        DOC_STRING
+    </method>
+
+    <method name = "mappings set path">
+        DOC_STRING
+        <argument name = "path" type = "string" />
+    </method>
+
+    <method name = "mappings save">
+        DOC_STRING
     </method>
 
 </class>

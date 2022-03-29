@@ -31,6 +31,7 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 ADD_DEFINITIONS (-DZYRE_BUILD_DRAFT_API)
 ADD_DEFINITIONS (-DCZMQ_BUILD_DRAFT_API)
+ADD_DEFINITIONS (-DZMQ_BUILD_DRAFT_API)
 
 # Option to only generate dependencies.
 # Used to setup developmenent environment.

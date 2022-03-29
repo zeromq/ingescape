@@ -198,24 +198,22 @@ void s_handle_publication_from_remote_agent (zmsg_t *msg,
             igs_map_t *elmt, *tmp;
             // check that this agent has not been destroyed when we were locked
             if (agent->mapping) {
-                HASH_ITER (hh, agent->mapping->map_elements, elmt, tmp)
-                {
+                HASH_ITER (hh, agent->mapping->map_elements, elmt, tmp){
                     if (streq (elmt->to_agent, remote_agent->definition->name)
                         && streq (elmt->to_output, output)) {
                         // we have a match on emitting agent name and its ouput name :
                         // still need to check the targeted input existence in our
                         // definition
                         igs_iop_t *found_input = NULL;
-                        if (agent->definition->inputs_table != NULL)
+                        if (agent->definition->inputs_table)
                             HASH_FIND_STR (agent->definition->inputs_table,
                                            elmt->from_input, found_input);
-                        if (found_input == NULL)
-                            igsagent_warn (
-                              agent,
-                              "Input %s is missing in our definition but "
-                              "expected in our mapping with %s.%s",
-                              elmt->from_input, elmt->to_agent,
-                              elmt->to_output);
+                        if (!found_input)
+                            igsagent_warn (agent,
+                                           "Input %s is missing in our definition but "
+                                           "expected in our mapping with %s.%s",
+                                           elmt->from_input, elmt->to_agent,
+                                           elmt->to_output);
                         else {
                             // we have a fully matching mapping element : write from received
                             // output to our input

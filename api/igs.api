@@ -27,17 +27,17 @@
     <constant name = "default worker credit" value = "3" />
     <constant name = "default log dir" value = "&quot;~/Documents/IngeScape/logs/&quot;" />
 
-    <method name = "start_with_device" singleton = "1" >
+    <method name = "start with device" singleton = "1" >
         DOC_STRING
         <argument name = "network_device" type = "string" />
-        <argument name = "port" type = "number" size = "4" />
+        <argument name = "port" type = "number" size = "8" />
         <return type = "igs_result_t" callback = "1" />
     </method>
 
-    <method name = "start_with_ip" singleton = "1">
+    <method name = "start with ip" singleton = "1">
         DOC_STRING
         <argument name = "ip_address" type = "string" />
-        <argument name = "port" type = "number" size = "4" />
+        <argument name = "port" type = "number" size = "8" />
         <return type = "igs_result_t" callback = "1" />
     </method>
 
@@ -52,13 +52,13 @@
 
     <callback_type name = "forced stop fn">
         DOC_STRING
-        <argument name = "data" type = "anything" />
+        <argument name = "my data" type = "anything" />
     </callback_type>
 
     <method name = "observe forced stop" singleton = "1">
         DOC_STRING
         <argument name = "cb" type = "igs forced stop fn" callback = "1" />
-        <argument name = "data" type = "anything" />
+        <argument name = "my data" type = "anything" />
     </method>
 
     <method name = "pipe to ingescape" singleton = "1">
@@ -117,13 +117,13 @@
     <callback_type name = "mute fn">
         DOC_STRING
         <argument name = "is_muted" type = "boolean" />
-        <argument name = "data" type = "anything" />
+        <argument name = "my data" type = "anything" />
     </callback_type>
 
     <method name = "observe mute" singleton = "1">
         DOC_STRING
         <argument name = "cb" type = "igs mute fn" callback = "1" />
-        <argument name = "data" type = "anything"/>
+        <argument name = "my data" type = "anything"/>
     </method>
 
     <method name = "freeze" singleton = "1">
@@ -142,13 +142,13 @@
     <callback_type name = "freeze fn">
         DOC_STRING
         <argument name = "is_frozen" type = "boolean" />
-        <argument name = "data" type = "anything" />
+        <argument name = "my data" type = "anything" />
     </callback_type>
 
     <method name = "observe freeze" singleton = "1">
         DOC_STRING
         <argument name = "cb" type = "igs freeze fn" callback = "1" />
-        <argument name = "data" type = "anything" />
+        <argument name = "my data" type = "anything" />
     </method>
 
     <callback_type name = "agent events fn">
@@ -157,386 +157,13 @@
         <argument name = "uuid" type = "string" />
         <argument name = "name" type = "string" />
         <argument name = "event_data" type = "anything" />
-        <argument name = "data" type = "anything" />
+        <argument name = "my data" type = "anything" />
     </callback_type>
 
     <method name = "observe agent events" singleton = "1">
         DOC_STRING
         <argument name = "cb" type = "igs_agent_events_fn" callback = "1" />
-        <argument name = "data" type = "anything" />
-    </method>
-
-    <method name = "input bool" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <return type = "boolean" />
-    </method>
-
-    <method name = "input int" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <return type = "integer" />
-    </method>
-
-    <method name = "input double" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <return type = "real" size = "8" />
-    </method>
-
-    <method name = "input string" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <return type = "string" fresh = "1" />
-    </method>
-
-    <method name = "input data" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <argument name = "value" type = "anything" by_reference = "1" />
-        <argument name = "size" type = "size" by_reference = "1" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-    </method>
-
-    <method name = "input zmsg" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <argument name = "msg" type = "zmsg" by_reference = "1" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-    </method>
-
-    <method name = "output bool" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <return type = "boolean" />
-    </method>
-
-    <method name = "output int" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <return type = "integer" />
-    </method>
-
-    <method name = "output double" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <return type = "real" size = "8" />
-    </method>
-
-    <method name = "output string" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <return type = "string" fresh = "1" />
-    </method>
-
-    <method name = "output data" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <argument name = "value" type = "anything" by_reference = "1" />
-        <argument name = "size" type = "size" by_reference = "1" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-    </method>
-
-    <method name = "parameter bool" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <return type = "boolean" />
-    </method>
-
-    <method name = "parameter int" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <return type = "integer" />
-    </method>
-
-    <method name = "parameter double" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <return type = "real" size = "8" />
-    </method>
-
-    <method name = "parameter string" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <return type = "string" fresh = "1" />
-    </method>
-
-    <method name = "parameter data" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <argument name = "value" type = "anything" by_reference = "1" />
-        <argument name = "size" type = "size" by_reference = "1" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-    </method>
-
-    <method name = "input set bool" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <argument name = "value" type = "boolean" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-    </method>
-
-    <method name = "input set int" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <argument name = "value" type = "integer" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-    </method>
-
-    <method name = "input set double" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <argument name = "value" type = "real"  size = "8" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-    </method>
-
-    <method name = "input set string" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <argument name = "value" type = "string" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-    </method>
-
-    <method name = "input set impulsion" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-    </method>
-
-    <method name = "input set data" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <argument name = "value" type = "anything" />
-        <argument name = "size" type = "size" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-    </method>
-
-    <method name = "output set bool" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <argument name = "value" type = "boolean" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-    </method>
-
-    <method name = "output set int" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <argument name = "value" type = "integer" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-    </method>
-
-    <method name = "output set double" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <argument name = "value" type = "real"  size = "8" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-    </method>
-
-    <method name = "output set string" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <argument name = "value" type = "string" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-    </method>
-
-    <method name = "output set impulsion" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-    </method>
-
-    <method name = "output set data" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <argument name = "value" type = "anything" />
-        <argument name = "size" type = "size" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-    </method>
-
-    <method name = "output set zmsg" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <argument name = "value" type = "zmsg" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-    </method>
-
-    <method name = "parameter set bool" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <argument name = "value" type = "boolean" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-    </method>
-
-    <method name = "parameter set int" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <argument name = "value" type = "integer" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-    </method>
-
-    <method name = "parameter set double" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <argument name = "value" type = "real"  size = "8" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-    </method>
-
-    <method name = "parameter set string" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <argument name = "value" type = "string" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-    </method>
-
-    <method name = "parameter set impulsion" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-    </method>
-
-    <method name = "parameter set data" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <argument name = "value" type = "anything" />
-        <argument name = "size" type = "size" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-    </method>
-
-    <method name = "clear input" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-    </method>
-
-    <method name = "clear output" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-    </method>
-
-    <method name = "clear parameter" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-    </method>
-
-    <callback_type name = "iop fn">
-        DOC_STRING
-        <argument name = "iop_type" type = "igs iop type t" callback = "1"/>
-        <argument name = "name" type = "string" />
-        <argument name = "value_type" type = "igs iop value type t" callback = "1"/>
-        <argument name = "value" type = "anything" />
-        <argument name = "value_size" type = "size" />
-        <argument name = "data" type = "anything" />
-    </callback_type>
-
-    <method name = "observe input" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <argument name = "cb" type = "igs iop fn" callback = "1" />
-        <argument name = "data" type = "anything" />
-    </method>
-
-    <method name = "observe output" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <argument name = "cb" type = "igs iop fn" callback = "1" />
-        <argument name = "data" type = "anything" />
-    </method>
-
-    <method name = "observe parameter" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <argument name = "cb" type = "igs iop fn" callback = "1" />
-        <argument name = "data" type = "anything" />
-    </method>
-
-    <method name = "output mute" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-    </method>
-
-    <method name = "output unmute" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-    </method>
-
-    <method name = "output is muted" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <return type = "boolean" />
-    </method>
-
-    <method name = "input type" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <return type = "igs_iop_value_type_t" callback="1"/>
-    </method>
-
-    <method name = "output type" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <return type = "igs_iop_value_type_t" callback="1"/>
-    </method>
-
-    <method name = "parameter type" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <return type = "igs_iop_value_type_t" callback="1"/>
-    </method>
-
-    <method name = "input count" singleton = "1">
-        DOC_STRING
-        <return type = "size" />
-    </method>
-
-    <method name = "output count" singleton = "1">
-        DOC_STRING
-        <return type = "size" />
-    </method>
-
-    <method name = "parameter count" singleton = "1">
-        DOC_STRING
-        <return type = "size" />
-    </method>
-
-    <method name = "input list" singleton = "1">
-        DOC_STRING
-        <argument name = "nb_of_elements" type = "size" by_reference = "1" />
-        <return type = "string" by_reference = "1" fresh = "1"/>
-    </method>
-
-    <method name = "output list" singleton = "1">
-        DOC_STRING
-        <argument name = "nb_of_elements" type = "size" by_reference = "1" />
-        <return type = "string" by_reference = "1" fresh = "1" />
-    </method>
-
-    <method name = "parameter list" singleton = "1">
-        DOC_STRING
-        <argument name = "nb_of_elements" type = "size" by_reference = "1" />
-        <return type = "string" by_reference = "1" fresh = "1" />
-    </method>
-
-    <method name = "free iop list" singleton = "1">
-        DOC_STRING
-        <argument name = "list" type = "string" by_reference = "1"/>
-        <argument name = "nb_of_elements" type = "size"/>
-    </method>
-
-    <method name = "input exists" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <return type = "boolean" />
-    </method>
-
-    <method name = "output exists" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <return type = "boolean" />
-    </method>
-
-    <method name = "parameter exists" singleton = "1">
-        DOC_STRING
-        <argument name = "name" type = "string" />
-        <return type = "boolean" />
+        <argument name = "my data" type = "anything" />
     </method>
 
     <method name = "definition load str" singleton = "1">
@@ -625,6 +252,423 @@
         <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
     </method>
 
+    <method name = "input type" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <return type = "igs_iop_value_type_t" callback="1"/>
+    </method>
+
+    <method name = "output type" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <return type = "igs_iop_value_type_t" callback="1"/>
+    </method>
+
+    <method name = "parameter type" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <return type = "igs_iop_value_type_t" callback="1"/>
+    </method>
+
+    <method name = "input count" singleton = "1">
+        DOC_STRING
+        <return type = "size" />
+    </method>
+
+    <method name = "output count" singleton = "1">
+        DOC_STRING
+        <return type = "size" />
+    </method>
+
+    <method name = "parameter count" singleton = "1">
+        DOC_STRING
+        <return type = "size" />
+    </method>
+
+    <method name = "input list" singleton = "1">
+        DOC_STRING
+        <argument name = "inputs nbr" type = "size" by_reference = "1" />
+        <return type = "string" by_reference = "1" fresh = "1"/>
+    </method>
+
+    <method name = "output list" singleton = "1">
+        DOC_STRING
+        <argument name = "outputs nbr" type = "size" by_reference = "1" />
+        <return type = "string" by_reference = "1" fresh = "1" />
+    </method>
+
+    <method name = "parameter list" singleton = "1">
+        DOC_STRING
+        <argument name = "parameters nbr" type = "size" by_reference = "1" />
+        <return type = "string" by_reference = "1" fresh = "1" />
+    </method>
+
+    <method name = "free iop list" singleton = "1">
+        DOC_STRING
+        <argument name = "list" type = "string" by_reference = "1"/>
+        <argument name = "iop nbr" type = "size"/>
+    </method>
+
+    <method name = "input exists" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <return type = "boolean" />
+    </method>
+
+    <method name = "output exists" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <return type = "boolean" />
+    </method>
+
+    <method name = "parameter exists" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <return type = "boolean" />
+    </method>
+    
+    <method name = "input bool" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <return type = "boolean" />
+    </method>
+
+    <method name = "input int" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <return type = "integer" />
+    </method>
+
+    <method name = "input double" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <return type = "real" size = "8" />
+    </method>
+
+    <method name = "input string" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <return type = "string" fresh = "1" />
+    </method>
+
+    <method name = "input data" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "data" type = "anything" by_reference = "1" />
+        <argument name = "size" type = "size" by_reference = "1" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
+    </method>
+
+    <method name = "output bool" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <return type = "boolean" />
+    </method>
+
+    <method name = "output int" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <return type = "integer" />
+    </method>
+
+    <method name = "output double" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <return type = "real" size = "8" />
+    </method>
+
+    <method name = "output string" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <return type = "string" fresh = "1" />
+    </method>
+
+    <method name = "output data" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "data" type = "anything" by_reference = "1" />
+        <argument name = "size" type = "size" by_reference = "1" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
+    </method>
+
+    <method name = "parameter bool" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <return type = "boolean" />
+    </method>
+
+    <method name = "parameter int" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <return type = "integer" />
+    </method>
+
+    <method name = "parameter double" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <return type = "real" size = "8" />
+    </method>
+
+    <method name = "parameter string" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <return type = "string" fresh = "1" />
+    </method>
+
+    <method name = "parameter data" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "data" type = "anything" by_reference = "1" />
+        <argument name = "size" type = "size" by_reference = "1" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
+    </method>
+
+    <method name = "input set bool" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "value" type = "boolean" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
+    </method>
+
+    <method name = "input set int" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "value" type = "integer" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
+    </method>
+
+    <method name = "input set double" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "value" type = "real"  size = "8" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
+    </method>
+
+    <method name = "input set string" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "value" type = "string" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
+    </method>
+
+    <method name = "input set impulsion" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
+    </method>
+
+    <method name = "input set data" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "value" type = "anything" />
+        <argument name = "size" type = "size" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
+    </method>
+
+    <method name = "output set bool" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "value" type = "boolean" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
+    </method>
+
+    <method name = "output set int" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "value" type = "integer" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
+    </method>
+
+    <method name = "output set double" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "value" type = "real"  size = "8" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
+    </method>
+
+    <method name = "output set string" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "value" type = "string" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
+    </method>
+
+    <method name = "output set impulsion" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
+    </method>
+
+    <method name = "output set data" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "value" type = "anything" />
+        <argument name = "size" type = "size" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
+    </method>
+
+    <method name = "parameter set bool" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "value" type = "boolean" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
+    </method>
+
+    <method name = "parameter set int" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "value" type = "integer" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
+    </method>
+
+    <method name = "parameter set double" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "value" type = "real"  size = "8" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
+    </method>
+
+    <method name = "parameter set string" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "value" type = "string" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
+    </method>
+
+    <method name = "parameter set impulsion" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
+    </method>
+
+    <method name = "parameter set data" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "value" type = "anything" />
+        <argument name = "size" type = "size" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
+    </method>
+
+    <method name = "constraints enforce" singleton = "1">
+        DOC_STRING
+        <argument name = "enforce" type = "boolean" />
+    </method>
+
+    <method name = "input add constraint" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "constraint" type = "string" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
+    </method>
+
+    <method name = "output add constraint" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "constraint" type = "string" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
+    </method>
+
+    <method name = "parameter add constraint" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "constraint" type = "string" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
+    </method>
+
+    <method name = "input set description" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "description" type = "string" />
+    </method>
+
+    <method name = "output set description" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "description" type = "string" />
+    </method>
+
+    <method name = "parameter set description" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "description" type = "string" />
+    </method>
+
+    <method name = "output set zmsg" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "value" type = "zmsg" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
+    </method>
+
+    <method name = "input zmsg" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "msg" type = "zmsg" by_reference = "1" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
+    </method>
+    
+    <method name = "clear input" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+    </method>
+
+    <method name = "clear output" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+    </method>
+
+    <method name = "clear parameter" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+    </method>
+
+    <callback_type name = "iop fn">
+        DOC_STRING
+        <argument name = "iop_type" type = "igs iop type t" callback = "1"/>
+        <argument name = "name" type = "string" />
+        <argument name = "value_type" type = "igs iop value type t" callback = "1"/>
+        <argument name = "value" type = "anything" />
+        <argument name = "value_size" type = "size" />
+        <argument name = "my data" type = "anything" />
+    </callback_type>
+
+    <method name = "observe input" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "cb" type = "igs iop fn" callback = "1" />
+        <argument name = "my data" type = "anything" />
+    </method>
+
+    <method name = "observe output" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "cb" type = "igs iop fn" callback = "1" />
+        <argument name = "my data" type = "anything" />
+    </method>
+
+    <method name = "observe parameter" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <argument name = "cb" type = "igs iop fn" callback = "1" />
+        <argument name = "my data" type = "anything" />
+    </method>
+
+    <method name = "output mute" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+    </method>
+
+    <method name = "output unmute" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+    </method>
+
+    <method name = "output is muted" singleton = "1">
+        DOC_STRING
+        <argument name = "name" type = "string" />
+        <return type = "boolean" />
+    </method>
+
     <method name = "mapping load str" singleton = "1">
         DOC_STRING
         <argument name = "json_str" type = "string" />
@@ -637,15 +681,6 @@
         <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
     </method>
 
-    <method name = "clear mappings" singleton = "1">
-        DOC_STRING
-    </method>
-
-    <method name = "clear mappings with agent" singleton = "1">
-        DOC_STRING
-        <argument name = "agent_name" type = "string" />
-    </method>
-
     <method name = "mapping json" singleton = "1">
         DOC_STRING
         <return type = "string" fresh = "1" />
@@ -654,6 +689,15 @@
     <method name = "mapping count" singleton = "1">
         DOC_STRING
         <return type = "size" />
+    </method>
+
+    <method name = "clear mappings" singleton = "1">
+        DOC_STRING
+    </method>
+
+    <method name = "clear mappings with agent" singleton = "1">
+        DOC_STRING
+        <argument name = "agent_name" type = "string" />
     </method>
 
     <method name = "mapping add" singleton = "1">
@@ -693,7 +737,7 @@
 
     <method name = "split remove with id" singleton = "1">
         DOC_STRING
-        <argument name = "id" type = "number" size = "8" />
+        <argument name = "the id" type = "number" size = "8" />
         <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
     </method>
 
@@ -705,51 +749,14 @@
         <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
     </method>
 
-    <method name = "mapping outputs request" singleton = "1">
-        DOC_STRING
-        <return type = "boolean" />
-    </method>
-
     <method name = "mapping set outputs request" singleton = "1">
         DOC_STRING
         <argument name = "notify" type = "boolean" />
     </method>
 
-    <method name = "log" singleton = "1" singleton = "1">
+    <method name = "mapping outputs request" singleton = "1">
         DOC_STRING
-        <argument name = "level" type = "igs_log_level_t" callback="1"/>
-        <argument name = "function" type = "string" />
-        <argument name = "format" type = "string" variadic = "1" />
-    </method>
-
-    <method name = "definition set path" singleton = "1">
-        DOC_STRING
-        <argument name = "path" type = "string" />
-    </method>
-
-    <method name = "mapping set path" singleton = "1">
-        DOC_STRING
-        <argument name = "path" type = "string" />
-    </method>
-
-    <method name = "definition save" singleton = "1">
-        DOC_STRING
-    </method>
-
-    <method name = "mapping save" singleton = "1">
-        DOC_STRING
-    </method>
-
-    <method name = "election join" singleton = "1">
-        DOC_STRING
-        <argument name = "election_name" type = "string" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-    </method>
-
-    <method name = "election leave" singleton = "1">
-        DOC_STRING
-        <argument name = "election_name" type = "string" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
+        <return type = "boolean" />
     </method>
 
     <method name = "service args add int" singleton = "1">
@@ -803,37 +810,6 @@
         <return type = "igs_result_t" callback = "1" />
     </method>
 
-    <method name = "service list" singleton = "1">
-        DOC_STRING
-        <argument name = "nb of elements" type = "size" by_reference = "1" />
-        <return type = "string" by_reference = "1" fresh = "1" />
-    </method>
-
-    <method name = "free services list" singleton = "1">
-        DOC_STRING
-        <argument name = "list" type = "string" by_reference = "1" />
-        <argument name = "nb of service" type = "size"/>
-    </method>
-
-    <method name = "service args first" singleton = "1">
-        DOC_STRING
-        <argument name = "service name" type = "string" />
-        <return type = "igs_service_arg_t" callback = "1" by_reference = "1" />
-    </method>
-
-    <method name = "service args number" singleton = "1">
-        DOC_STRING
-        <argument name = "service name" type = "string" />
-        <return type = "size" />
-    </method>
-
-    <method name = "service arg exists" singleton = "1">
-        DOC_STRING
-        <argument name = "service name" type = "string" />
-        <argument name = "arg name" type = "string" />
-        <return type = "boolean" />
-    </method>
-
     <callback_type name = "service fn">
         DOC_STRING
         <argument name = "sender agent name" type = "string" />
@@ -842,14 +818,14 @@
         <argument name = "first argument" type = "igs_service_arg_t" callback = "1" by_reference = "1" />
         <argument name = "args nbr" type = "size" />
         <argument name = "token"  type = "string" />
-        <argument name = "data" type = "anything" />
+        <argument name = "my data" type = "anything" />
     </callback_type>
 
     <method name = "service init" singleton = "1">
         DOC_STRING
         <argument name = "name" type = "string" />
         <argument name = "cb" type = "igs service fn" callback = "1" />
-        <argument name = "data" type = "anything" />
+        <argument name = "my data" type = "anything" />
         <return type = "igs_result_t" callback = "1" />
     </method>
 
@@ -885,155 +861,141 @@
         <return type = "boolean" />
     </method>
 
-    <method name = "version" singleton = "1">
+    <method name = "service list" singleton = "1">
         DOC_STRING
+        <argument name = "nb of elements" type = "size" by_reference = "1" />
+        <return type = "string" by_reference = "1" fresh = "1" />
+    </method>
+
+    <method name = "free services list" singleton = "1">
+        DOC_STRING
+        <argument name = "list" type = "string" by_reference = "1" />
+        <argument name = "services nbr" type = "size"/>
+    </method>
+
+    <method name = "service args first" singleton = "1">
+        DOC_STRING
+        <argument name = "service name" type = "string" />
+        <return type = "igs_service_arg_t" callback = "1" by_reference = "1" />
+    </method>
+
+    <method name = "service args count" singleton = "1">
+        DOC_STRING
+        <argument name = "service name" type = "string" />
+        <return type = "size" />
+    </method>
+
+    <method name = "service arg exists" singleton = "1">
+        DOC_STRING
+        <argument name = "service name" type = "string" />
+        <argument name = "arg name" type = "string" />
+        <return type = "boolean" />
+    </method>
+
+    <callback_type name = "timer fn">
+        DOC_STRING
+        <argument name = "timer_id" type = "integer" />
+        <argument name = "my data" type = "anything" />
+    </callback_type>
+
+    <method name = "timer start" singleton = "1">
+        DOC_STRING
+        <argument name = "delay" type = "size" />
+        <argument name = "times" type = "size" />
+        <argument name = "cb" type = "igs timer fn" callback = "1" />
+        <argument name = "my data" type = "anything" />
         <return type = "integer" />
     </method>
 
-    <method name = "protocol" singleton = "1">
+    <method name = "timer stop" singleton = "1">
         DOC_STRING
-        <return type = "integer" />
+        <argument name = "timer_id" type = "integer" />
     </method>
 
-    <method name = "net devices list" singleton = "1">
+    <callback_type name = "channels fn">
         DOC_STRING
-        <argument name="nb" type="integer" by_reference="1"/>
-        <return type="string" by_reference="1"/>
+        <argument name = "event" type = "string" />
+        <argument name = "peer_id" type = "string" />
+        <argument name = "peer_name" type = "string" />
+        <argument name = "address" type = "string" />
+        <argument name = "channel" type = "string" />
+        <argument name = "headers" type = "zhash" />
+        <argument name = "msg" type = "zmsg" />
+        <argument name = "my data" type = "anything" />
+    </callback_type>
+
+    <method name = "observe channels" singleton = "1">
+        DOC_STRING
+        <argument name = "cb" type = "igs channels fn" callback = "1" />
+        <argument name = "my data" type = "anything" />
     </method>
 
-    <method name = "free net devices list" singleton = "1">
+    <method name = "channel join" singleton = "1">
         DOC_STRING
-        <argument name="devices" type="string" by_reference="1"/>
-        <argument name="nb" type="integer"/>
+        <argument name = "channel" type = "string" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
     </method>
 
-    <method name = "net addresses list" singleton = "1">
+    <method name = "channel leave" singleton = "1">
         DOC_STRING
-        <argument name="nb" type="integer" by_reference="1"/>
-        <return type="string" by_reference="1"/>
+        <argument name = "channel" type = "string" />
     </method>
 
-    <method name = "free net addresses list" singleton = "1">
+    <method name = "channel shout str" singleton = "1">
         DOC_STRING
-        <argument name="addresses" type="string" by_reference="1"/>
-        <argument name="nb" type="integer"/>
+        <argument name = "channel" type = "string" />
+        <argument name = "msg" type = "string" variadic = "1" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
     </method>
 
-    <method name = "set command line" singleton = "1">
+    <method name = "channel shout data" singleton = "1">
         DOC_STRING
-        <argument name = "line" type = "string" />
+        <argument name = "channel" type = "string" />
+        <argument name = "my data" type = "anything" />
+        <argument name = "size" type = "size" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
     </method>
 
-    <method name = "set command line from args" singleton = "1">
+    <method name = "channel shout zmsg" singleton = "1">
         DOC_STRING
-        <argument name = "argc" type = "integer" />
-        <argument name = "argv" type = "string" by_reference = "1" mutable = "1" />
+        <argument name = "channel" type = "string" />
+        <argument name = "msg_p" type = "zmsg" by_reference = "1" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
     </method>
 
-    <method name = "command line" singleton = "1">
+    <method name = "channel whisper str" singleton = "1">
         DOC_STRING
-        <return type = "string" fresh = "1" />
+        <argument name = "agent_name_or_agent_id_or_peer_id" type = "string" />
+        <argument name = "msg" type = "string" variadic = "1" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
     </method>
 
-    <method name = "log set console" singleton = "1">
+    <method name = "channel whisper data" singleton = "1">
         DOC_STRING
-        <argument name = "enable" type = "boolean" />
+        <argument name = "agent_name_or_agent_id_or_peer_id" type = "string" />
+        <argument name = "data" type = "anything" />
+        <argument name = "size" type = "size" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
     </method>
 
-    <method name = "log console" singleton = "1">
+    <method name = "channel whisper zmsg" singleton = "1">
         DOC_STRING
-        <return type = "boolean" />
+        <argument name = "agent_name_or_agent_id_or_peer_id" type = "string" />
+        <argument name = "msg_p" type = "zmsg" by_reference = "1" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
     </method>
 
-    <method name = "log set console color" singleton = "1">
+    <method name = "peer add header" singleton = "1">
         DOC_STRING
-        <argument name = "use_color" type = "boolean" />
+        <argument name = "key" type = "string" />
+        <argument name = "value" type = "string" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
     </method>
 
-    <method name = "log console color" singleton = "1">
+    <method name = "peer remove header" singleton = "1">
         DOC_STRING
-        <return type = "boolean" />
-    </method>
-
-    <method name = "log set stream" singleton = "1">
-        DOC_STRING
-        <argument name = "enable" type = "boolean" />
-    </method>
-
-    <method name = "log stream" singleton = "1">
-        DOC_STRING
-        <return type = "boolean" />
-    </method>
-
-    <method name = "log set file" singleton = "1">
-        DOC_STRING
-        <argument name = "enable" type = "boolean" />
-        <argument name = "log_file_path" type = "string" />
-    </method>
-
-    <method name = "log set file path" singleton = "1">
-        DOC_STRING
-        <argument name = "log_file_path" type = "string" />
-    </method>
-
-    <method name = "log file" singleton = "1">
-        DOC_STRING
-        <return type = "boolean" />
-    </method>
-
-    <method name = "log file path" singleton = "1">
-        DOC_STRING
-        <return type = "string" fresh = "1" />
-    </method>
-
-    <method name = "log set console level" singleton = "1">
-        DOC_STRING
-        <argument name = "level" type = "igs_log_level_t" callback="1"/>
-    </method>
-
-    <method name = "log console level" singleton = "1">
-        DOC_STRING
-        <return type = "igs_log_level_t" callback="1"/>
-    </method>
-
-    <method name = "log include data" singleton = "1">
-        DOC_STRING
-        <argument name = "enable" type = "boolean" />
-    </method>
-
-    <method name = "log include services" singleton = "1">
-        DOC_STRING
-        <argument name = "enable" type = "boolean" />
-    </method>
-
-    <method name = "log set file level" singleton = "1">
-        DOC_STRING
-        <argument name = "level" type = "igs_log_level_t" callback="1"/>
-    </method>
-
-    <method name = "log set file max line length" singleton = "1">
-        DOC_STRING
-        <argument name = "max_length" type = "size"/>
-    </method>
-
-    <method name = "set ipc" singleton = "1">
-        DOC_STRING
-        <argument name = "allow" type = "boolean" />
-    </method>
-
-    <method name = "has ipc" singleton = "1">
-        DOC_STRING
-        <return type = "boolean" />
-    </method>
-
-    <method name = "set ipc dir" singleton = "1">
-        DOC_STRING
-        <argument name = "path" type = "string" />
-    </method>
-
-    <method name = "ipc dir" singleton = "1">
-        DOC_STRING
-        <return type = "string" />
+        <argument name = "key" type = "string" />
+        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
     </method>
 
     <method name = "broker add" singleton = "1">
@@ -1096,6 +1058,182 @@
         <argument name = "election_name" type = "string" />
         <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
     </method>
+    
+    <method name = "log" singleton = "1" singleton = "1">
+        DOC_STRING
+        <argument name = "level" type = "igs_log_level_t" callback="1"/>
+        <argument name = "function" type = "string" />
+        <argument name = "format" type = "string" variadic = "1" />
+    </method>
+
+    <method name = "version" singleton = "1">
+        DOC_STRING
+        <return type = "integer" />
+    </method>
+
+    <method name = "protocol" singleton = "1">
+        DOC_STRING
+        <return type = "integer" />
+    </method>
+
+    <method name = "set command line" singleton = "1">
+        DOC_STRING
+        <argument name = "line" type = "string" />
+    </method>
+
+    <method name = "set command line from args" singleton = "1">
+        DOC_STRING
+        <argument name = "argc" type = "integer" />
+        <argument name = "argv" type = "string" by_reference = "1" mutable = "1" />
+    </method>
+
+    <method name = "command line" singleton = "1">
+        DOC_STRING
+        <return type = "string" fresh = "1" />
+    </method>
+
+    <method name = "log set console" singleton = "1">
+        DOC_STRING
+        <argument name = "enable" type = "boolean" />
+    </method>
+
+    <method name = "log console" singleton = "1">
+        DOC_STRING
+        <return type = "boolean" />
+    </method>
+
+    <method name = "log set console color" singleton = "1">
+        DOC_STRING
+        <argument name = "use_color" type = "boolean" />
+    </method>
+
+    <method name = "log console color" singleton = "1">
+        DOC_STRING
+        <return type = "boolean" />
+    </method>
+
+    <method name = "log set console level" singleton = "1">
+        DOC_STRING
+        <argument name = "level" type = "igs_log_level_t" callback="1"/>
+    </method>
+
+    <method name = "log console level" singleton = "1">
+        DOC_STRING
+        <return type = "igs_log_level_t" callback="1"/>
+    </method>
+
+    <method name = "log set stream" singleton = "1">
+        DOC_STRING
+        <argument name = "enable" type = "boolean" />
+    </method>
+
+    <method name = "log stream" singleton = "1">
+        DOC_STRING
+        <return type = "boolean" />
+    </method>
+
+    <method name = "log set file" singleton = "1">
+        DOC_STRING
+        <argument name = "enable" type = "boolean" />
+        <argument name = "log_file_path" type = "string" />
+    </method>
+
+    <method name = "log set file level" singleton = "1">
+        DOC_STRING
+        <argument name = "level" type = "igs_log_level_t" callback="1"/>
+    </method>
+
+    <method name = "log set file max line length" singleton = "1">
+        DOC_STRING
+        <argument name = "max_length" type = "size"/>
+    </method>
+
+    <method name = "log file" singleton = "1">
+        DOC_STRING
+        <return type = "boolean" />
+    </method>
+    
+    <method name = "log set file path" singleton = "1">
+        DOC_STRING
+        <argument name = "log_file_path" type = "string" />
+    </method>
+
+    <method name = "log file path" singleton = "1">
+        DOC_STRING
+        <return type = "string" fresh = "1" />
+    </method>
+
+    <method name = "log include data" singleton = "1">
+        DOC_STRING
+        <argument name = "enable" type = "boolean" />
+    </method>
+
+    <method name = "log include services" singleton = "1">
+        DOC_STRING
+        <argument name = "enable" type = "boolean" />
+    </method>
+    
+    <method name = "definition set path" singleton = "1">
+        DOC_STRING
+        <argument name = "path" type = "string" />
+    </method>
+
+    <method name = "definition save" singleton = "1">
+        DOC_STRING
+    </method>
+
+    <method name = "mapping set path" singleton = "1">
+        DOC_STRING
+        <argument name = "path" type = "string" />
+    </method>
+
+    <method name = "mapping save" singleton = "1">
+        DOC_STRING
+    </method>
+
+    <method name = "set ipc" singleton = "1">
+        DOC_STRING
+        <argument name = "allow" type = "boolean" />
+    </method>
+
+    <method name = "has ipc" singleton = "1">
+        DOC_STRING
+        <return type = "boolean" />
+    </method>
+
+    <method name = "set ipc dir" singleton = "1">
+        DOC_STRING
+        <argument name = "path" type = "string" />
+    </method>
+
+    <method name = "ipc dir" singleton = "1">
+        DOC_STRING
+        <return type = "string" />
+    </method>
+
+    <method name = "net devices list" singleton = "1">
+        DOC_STRING
+        <argument name="nb" type="integer" by_reference="1"/>
+        <return type="string" by_reference="1"/>
+    </method>
+
+    <method name = "free net devices list" singleton = "1">
+        DOC_STRING
+        <argument name="devices" type="string" by_reference="1"/>
+        <argument name="nb" type="integer"/>
+    </method>
+
+    <method name = "net addresses list" singleton = "1">
+        DOC_STRING
+        <argument name="nb" type="integer" by_reference="1"/>
+        <return type="string" by_reference="1"/>
+    </method>
+
+    <method name = "free net addresses list" singleton = "1">
+        DOC_STRING
+        <argument name="addresses" type="string" by_reference="1"/>
+        <argument name="nb" type="integer"/>
+    </method>
 
     <method name = "net set publishing port" singleton = "1">
         DOC_STRING
@@ -1133,40 +1271,6 @@
         <argument name = "msgs_nbr" type = "size" />
     </method>
 
-    <callback_type name = "timer fn">
-        DOC_STRING
-        <argument name = "timer_id" type = "integer" />
-        <argument name = "data" type = "anything" />
-    </callback_type>
-
-    <method name = "timer start" singleton = "1">
-        DOC_STRING
-        <argument name = "delay" type = "size" />
-        <argument name = "times" type = "size" />
-        <argument name = "cb" type = "igs timer fn" callback = "1" />
-        <argument name = "data" type = "anything" />
-        <return type = "integer" />
-    </method>
-
-    <method name = "timer stop" singleton = "1">
-        DOC_STRING
-        <argument name = "timer_id" type = "integer" />
-    </method>
-
-    <callback_type name = "monitor event fn">
-        DOC_STRING
-        <argument name = "event" type = "igs monitor event t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-        <argument name = "device" type = "string" />
-        <argument name = "ip_address" type = "string" />
-        <argument name = "data" type = "anything" />
-    </callback_type>
-
-    <method name = "observe monitor" singleton = "1">
-        DOC_STRING
-        <argument name = "cb" type = "igs monitor event fn" callback = "1" />
-        <argument name = "data" type = "anything" />
-    </method>
-
     <method name = "monitor start" singleton = "1">
         DOC_STRING
         <argument name = "period" type = "number" size = "4" />
@@ -1192,95 +1296,23 @@
         DOC_STRING
         <argument name = "flag" type = "boolean" />
     </method>
+    
+    <callback_type name = "monitor fn">
+        DOC_STRING
+        <argument name = "event" type = "igs monitor event t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
+        <argument name = "device" type = "string" />
+        <argument name = "ip_address" type = "string" />
+        <argument name = "my data" type = "anything" />
+    </callback_type>
+
+    <method name = "observe monitor" singleton = "1">
+        DOC_STRING
+        <argument name = "cb" type = "igs monitor event fn" callback = "1" />
+        <argument name = "my data" type = "anything" />
+    </method>
 
     <method name = "clear context" singleton = "1">
         DOC_STRING
-    </method>
-
-    <callback_type name = "channels fn">
-        DOC_STRING
-        <argument name = "event" type = "string" />
-        <argument name = "peer_id" type = "string" />
-        <argument name = "peer_name" type = "string" />
-        <argument name = "address" type = "string" />
-        <argument name = "channel" type = "string" />
-        <argument name = "headers" type = "zhash" />
-        <argument name = "msg" type = "zmsg" />
-        <argument name = "data" type = "anything" />
-    </callback_type>
-
-    <method name = "observe channels" singleton = "1">
-        DOC_STRING
-        <argument name = "cb" type = "igs channels fn" callback = "1" />
-        <argument name = "data" type = "anything" />
-    </method>
-
-    <method name = "channel join" singleton = "1">
-        DOC_STRING
-        <argument name = "channel" type = "string" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-    </method>
-
-    <method name = "channel leave" singleton = "1">
-        DOC_STRING
-        <argument name = "channel" type = "string" />
-    </method>
-
-    <method name = "channel shout str" singleton = "1">
-        DOC_STRING
-        <argument name = "channel" type = "string" />
-        <argument name = "msg" type = "string" variadic = "1" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-    </method>
-
-    <method name = "channel shout data" singleton = "1">
-        DOC_STRING
-        <argument name = "channel" type = "string" />
-        <argument name = "data" type = "anything" />
-        <argument name = "size" type = "size" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-    </method>
-
-    <method name = "channel shout zmsg" singleton = "1">
-        DOC_STRING
-        <argument name = "channel" type = "string" />
-        <argument name = "msg_p" type = "zmsg" by_reference = "1" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-    </method>
-
-    <method name = "channel whisper str" singleton = "1">
-        DOC_STRING
-        <argument name = "agent_name_or_agent_id_or_peer_id" type = "string" />
-        <argument name = "msg" type = "string" variadic = "1" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-    </method>
-
-    <method name = "channel whisper data" singleton = "1">
-        DOC_STRING
-        <argument name = "agent_name_or_agent_id_or_peer_id" type = "string" />
-        <argument name = "data" type = "anything" />
-        <argument name = "size" type = "size" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-    </method>
-
-    <method name = "channel whisper zmsg" singleton = "1">
-        DOC_STRING
-        <argument name = "agent_name_or_agent_id_or_peer_id" type = "string" />
-        <argument name = "msg_p" type = "zmsg" by_reference = "1" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-    </method>
-
-    <method name = "peer add header" singleton = "1">
-        DOC_STRING
-        <argument name = "key" type = "string" />
-        <argument name = "value" type = "string" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
-    </method>
-
-    <method name = "peer remove header" singleton = "1">
-        DOC_STRING
-        <argument name = "key" type = "string" />
-        <return type = "igs_result_t" callback = "1" /> <!-- callback hack to avoid the generation of a pointer type -->
     </method>
 
 </class>
