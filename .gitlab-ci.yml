@@ -23,7 +23,7 @@ stages:
 # Global variables. Can be used by any jobs
 variables:
   VS_CMAKE_GENERATOR: "Visual Studio 15 2017"
-  DEPLOYMENT_WINDOWS_NET_SHARE: "\\\\autan\\gitlab_workspace\\dependencies"
+  DEPLOYMENT_WINDOWS_NET_SHARE: "\\\\10.0.0.2\\gitlab_workspace\\dependencies"
 
 
 #http://patorjk.com/software/taag/#p=display&f=Big&t=Windows
@@ -159,7 +159,7 @@ lib-windows-release-x64:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - mkdir build\ReleaseX64
-    - cmake -S . -B build\ReleaseX64 -G"$env:VS_CMAKE_GENERATOR Win64" -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
+    - cmake -S . -B build\ReleaseX64 -G"$env:VS_CMAKE_GENERATOR Win64" -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
     - cmake --build build\ReleaseX64 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -180,7 +180,7 @@ lib-windows-release-x86:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - mkdir build\ReleaseX86
-    - cmake -S . -B build\ReleaseX86 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
+    - cmake -S . -B build\ReleaseX86 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
     - cmake --build build\ReleaseX86 --target ALL_BUILD --config Release
   artifacts:
     paths:
@@ -201,7 +201,7 @@ lib-windows-debug-x64:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - mkdir build\DebugX64
-    - cmake -S . -B build\DebugX64 -G"$env:VS_CMAKE_GENERATOR Win64" -DCMAKE_BUILD_TYPE=Debug -DWITH_DEPS=ON -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
+    - cmake -S . -B build\DebugX64 -G"$env:VS_CMAKE_GENERATOR Win64" -DCMAKE_BUILD_TYPE=Debug -DWITH_DEPS=ON -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
     - cmake --build build\DebugX64 --target ALL_BUILD --config Debug
   artifacts:
     paths:
@@ -222,7 +222,7 @@ lib-windows-debug-x86:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - mkdir build\DebugX86
-    - cmake -S . -B build\DebugX86 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Debug -DWITH_DEPS=ON -DINGESCAPE_BUILD_STATIC=OFF -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
+    - cmake -S . -B build\DebugX86 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Debug -DWITH_DEPS=ON -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
     - cmake --build build\DebugX86 --target ALL_BUILD --config Debug
   artifacts:
     paths:
@@ -627,7 +627,7 @@ lib-installer-runtime-android-aarch64:
   image: ingescape/ubuntu-x-compil-android-aarch64
   script:
     - make -C build package
-    - mv build android-arm64
+    - mv _packages android-arm64
   artifacts:
     paths:
       - android-arm64/ingescape-*
@@ -687,7 +687,7 @@ lib-installer-runtime-android-armv7a-softfp:
   image: ingescape/ubuntu-x-compil-android
   script:
     - make -C build package
-    - mv build android
+    - mv _packages android
   artifacts:
     paths:
       - android/ingescape-*
