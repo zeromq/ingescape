@@ -33,6 +33,9 @@ ADD_DEFINITIONS (-DZYRE_BUILD_DRAFT_API)
 ADD_DEFINITIONS (-DCZMQ_BUILD_DRAFT_API)
 ADD_DEFINITIONS (-DZMQ_BUILD_DRAFT_API)
 
+# Define the PIC compilation flag
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 # Option to only generate dependencies.
 # Used to setup developmenent environment.
 option(DEPS_ONLY "Only generate dependencies" OFF)
