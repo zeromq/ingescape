@@ -354,8 +354,8 @@ if (NOT DEPS_ONLY)
 
       set_target_properties(${PROJECT_NAME}-static
                               PROPERTIES
-                                OUTPUT_NAME_RELEASE "ingescape_static"
-                                OUTPUT_NAME_DEBUG "ingescaped_static")
+                                OUTPUT_NAME_RELEASE "libingescape"
+                                OUTPUT_NAME_DEBUG "libingescaped")
 
     else(MSVC)
       set_target_properties(${PROJECT_NAME}-static
