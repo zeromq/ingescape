@@ -164,6 +164,9 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 option (WITH_DEPS "Build the ZeroMQ stack instead of using the one installed" OFF)
 if (WITH_DEPS)
 
+  # Force any static library to link against the static version of its dependencies in the stack
+  set(ZMQ_STATIC_LINK ON)
+
   #sodium
   add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/sodium)
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/sodium/src/libsodium/include)
@@ -326,7 +329,7 @@ if (NOT DEPS_ONLY)
   # static
   if(INGESCAPE_BUILD_STATIC)
     add_library(${PROJECT_NAME}-static STATIC ${ingescape_sources})
-
+    target_compile_definitions(${PROJECT_NAME}-static PUBLIC INGESCAPE_STATIC)
     if (WITH_DEPS)
       add_dependencies(${PROJECT_NAME}-static zyre)
 
@@ -388,7 +391,11 @@ if (NOT DEPS_ONLY)
 
     # Release build compile with -O2 flag
     if (${CMAKE_BUILD_TYPE} MATCHES "Release")
+      if(MSVC)
+        target_compile_options(${PROJECT_NAME}-static PRIVATE "/O2")
+      else()
         target_compile_options(${PROJECT_NAME}-static PRIVATE "-O2")
+      endif()
     endif()
 
     install(TARGETS ${PROJECT_NAME}-static
