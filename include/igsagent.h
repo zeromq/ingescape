@@ -24,16 +24,16 @@ extern "C" {
 
 ////////////////////////////////////////
 // Agent creation/destruction/activation
-PUBLIC igsagent_t * igsagent_new(const char *name, bool activate_immediately);
-PUBLIC void igsagent_destroy(igsagent_t **agent);
-PUBLIC igs_result_t igsagent_activate(igsagent_t *agent);
-PUBLIC igs_result_t igsagent_deactivate(igsagent_t *agent);
-PUBLIC bool igsagent_is_activated(igsagent_t *agent);
+INGESCAPE_EXPORT igsagent_t * igsagent_new(const char *name, bool activate_immediately);
+INGESCAPE_EXPORT void igsagent_destroy(igsagent_t **agent);
+INGESCAPE_EXPORT igs_result_t igsagent_activate(igsagent_t *agent);
+INGESCAPE_EXPORT igs_result_t igsagent_deactivate(igsagent_t *agent);
+INGESCAPE_EXPORT bool igsagent_is_activated(igsagent_t *agent);
 
 typedef void (igsagent_fn)(igsagent_t *agent,
                            bool is_activated,
                            void *my_data);
-PUBLIC void igsagent_observe(igsagent_t *agent, igsagent_fn cb, void *my_data);
+INGESCAPE_EXPORT void igsagent_observe(igsagent_t *agent, igsagent_fn cb, void *my_data);
 
 
 ////////////////

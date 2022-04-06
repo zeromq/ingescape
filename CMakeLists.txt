@@ -287,7 +287,7 @@ if (NOT DEPS_ONLY)
     endif(MSVC)
 
     # Add compilation #defines to the target
-    target_compile_definitions(${PROJECT_NAME} PRIVATE INGESCAPE=1;TARGET_OS_IOS=0)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE INGESCAPE_EXPORTS=1;TARGET_OS_IOS=0)
 
     # Add linked dependencies
     #FIXME All private here ?
@@ -365,7 +365,7 @@ if (NOT DEPS_ONLY)
     endif(MSVC)
 
     # Add compilation #defines to the target
-    target_compile_definitions(${PROJECT_NAME}-static PRIVATE INGESCAPE=1;TARGET_OS_IOS=0)
+    target_compile_definitions(${PROJECT_NAME}-static PRIVATE INGESCAPE_EXPORTS=1;TARGET_OS_IOS=0)
 
     # Add linked dependencies
     #FIXME All private here ?
