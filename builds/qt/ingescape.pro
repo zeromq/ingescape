@@ -9,7 +9,7 @@ TARGET = ingescape
 TEMPLATE = lib
 CONFIG += plugin
 
-DEFINES += INGESCAPE
+DEFINES += INGESCAPE_EXPORTS
 
 win32:{
     DEFINES +=  _CRT_SECURE_NO_WARNINGS \
@@ -30,4 +30,3 @@ RCC_DIR = tmp
 #include ('ingescape-dev.pri')
 
 include('ingescape.pri')
-
