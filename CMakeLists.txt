@@ -165,7 +165,7 @@ option (WITH_DEPS "Build the ZeroMQ stack instead of using the one installed" OF
 if (WITH_DEPS)
 
   # Force any static library to link against the static version of its dependencies in the stack
-  set(ZMQ_STATIC_LINK ON)
+  set(STATIC_ZMQ_LINK ON)
 
   #sodium
   add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/sodium)
