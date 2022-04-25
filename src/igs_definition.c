@@ -247,8 +247,7 @@ void igsagent_clear_definition (igsagent_t *agent)
             previous_name = strdup (agent->definition->name);
         definition_free_definition (&agent->definition);
     }
-    agent->definition =
-      (igs_definition_t *) zmalloc (sizeof (igs_definition_t));
+    agent->definition = (igs_definition_t *) zmalloc (sizeof (igs_definition_t));
     if (previous_name) {
         agent->definition->name = previous_name;
         igsagent_debug (agent, "Reuse previous name '%s'", previous_name);

@@ -822,9 +822,8 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
     }
     model_read_write_unlock ();
     if (!found) {
-        igsagent_error (agent,
-                         "could not find an agent with name or UUID : %s",
-                         agent_name_or_uuid);
+        igsagent_error (agent, "could not find an agent with name or UUID : %s",
+                        agent_name_or_uuid);
         return IGS_FAILURE;
     }
     return IGS_SUCCESS;

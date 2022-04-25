@@ -52,16 +52,13 @@ void mapping_free_mapping (igs_mapping_t **mapping)
         return;
 
     igs_map_t *current_map_elmt, *tmp_map_elmt;
-    HASH_ITER (hh, (*mapping)->map_elements, current_map_elmt, tmp_map_elmt)
-    {
+    HASH_ITER (hh, (*mapping)->map_elements, current_map_elmt, tmp_map_elmt){
         HASH_DEL ((*mapping)->map_elements, current_map_elmt);
         s_mapping_free_mapping_element (&current_map_elmt);
     }
 
     igs_split_t *current_split_elmt, *tmp_split_elmt;
-    HASH_ITER (hh, (*mapping)->split_elements, current_split_elmt,
-               tmp_split_elmt)
-    {
+    HASH_ITER (hh, (*mapping)->split_elements, current_split_elmt, tmp_split_elmt){
         HASH_DEL ((*mapping)->split_elements, current_split_elmt);
         split_free_split_element (&current_split_elmt);
     }
@@ -413,32 +410,26 @@ uint64_t igsagent_mapping_add (igsagent_t *agent,
     free (mashup);
 
     igs_map_t *tmp = NULL;
-    if (agent->mapping->map_elements != NULL)
-        HASH_FIND (hh, agent->mapping->map_elements, &hash,
-                   sizeof (uint64_t), tmp);
-    if (tmp == NULL) {
+    if (agent->mapping->map_elements)
+        HASH_FIND (hh, agent->mapping->map_elements, &hash,sizeof (uint64_t), tmp);
+    if (!tmp) {
         // element does not exist yet : create and register it
         // check input against definition and reject if input does not exist in
         // definition
         if (!igsagent_input_exists (agent, reviewed_from_our_input))
             igsagent_warn (agent,
-                            "input %s does not exist in our definition (will "
-                            "be stored anyway)",
-                            reviewed_from_our_input);
+                           "input %s does not exist in our definition (will be stored anyway)",
+                           reviewed_from_our_input);
 
-        igs_map_t *new = mapping_create_mapping_element (
-          reviewed_from_our_input, reviewed_to_agent, reviewed_with_output);
+        igs_map_t *new = mapping_create_mapping_element (reviewed_from_our_input, reviewed_to_agent, reviewed_with_output);
         new->id = hash;
-        HASH_ADD (hh, agent->mapping->map_elements, id, sizeof (uint64_t),
-                  new);
+        HASH_ADD (hh, agent->mapping->map_elements, id, sizeof (uint64_t), new);
         agent->network_need_to_send_mapping_update = true;
-    }
-    else
+    } else
         igsagent_warn (agent,
-                        "mapping combination %s->%s.%s already exists : will "
-                        "not be duplicated",
-                        reviewed_from_our_input, reviewed_to_agent,
-                        reviewed_with_output);
+                       "mapping combination %s->%s.%s already exists : will not be duplicated",
+                       reviewed_from_our_input, reviewed_to_agent,
+                       reviewed_with_output);
     free (reviewed_from_our_input);
     free (reviewed_to_agent);
     free (reviewed_with_output);
@@ -460,8 +451,7 @@ igs_result_t igsagent_mapping_remove_with_id (igsagent_t *agent,
     HASH_FIND (hh, agent->mapping->map_elements, &the_id,
                sizeof (uint64_t), el);
     if (el == NULL) {
-        igsagent_error (agent, "id %ld is not part of the current mapping",
-                         the_id);
+        igsagent_error (agent, "id %ld is not part of the current mapping", the_id);
         return IGS_FAILURE;
     }
     model_read_write_lock ();

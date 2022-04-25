@@ -151,7 +151,6 @@ const igs_iop_t *model_write_iop (igsagent_t *agent, const char *name,
     void *out_value = NULL;
     size_t out_size = 0;
     char buf[NUMBER_TO_STRING_MAX_LENGTH + 1] = "";
-
     model_read_write_lock ();
     // check that this agent has not been destroyed when we were locked
     if (!agent || !(agent->uuid)) {
@@ -1335,8 +1334,8 @@ igsagent_output_set_int (igsagent_t *agent, const char *name, int value)
 {
     assert (agent);
     assert (name);
-    const igs_iop_t *iop = model_write_iop (
-      agent, name, IGS_OUTPUT_T, IGS_INTEGER_T, &value, sizeof (int));
+    const igs_iop_t *iop = model_write_iop (agent, name, IGS_OUTPUT_T,
+                                            IGS_INTEGER_T, &value, sizeof (int));
     if (iop)
         network_publish_output (agent, iop);
     return (iop == NULL) ? IGS_FAILURE : IGS_SUCCESS;
@@ -1347,8 +1346,8 @@ igsagent_output_set_double (igsagent_t *agent, const char *name, double value)
 {
     assert (agent);
     assert (name);
-    const igs_iop_t *iop = model_write_iop (
-      agent, name, IGS_OUTPUT_T, IGS_DOUBLE_T, &value, sizeof (double));
+    const igs_iop_t *iop = model_write_iop (agent, name, IGS_OUTPUT_T,
+                                            IGS_DOUBLE_T, &value, sizeof (double));
     if (iop)
         network_publish_output (agent, iop);
     return (iop == NULL) ? IGS_FAILURE : IGS_SUCCESS;
@@ -1361,8 +1360,8 @@ igs_result_t igsagent_output_set_string (igsagent_t *agent,
     assert (agent);
     assert (name);
     size_t length = (value == NULL) ? 0 : strlen (value) + 1;
-    const igs_iop_t *iop = model_write_iop (
-      agent, name, IGS_OUTPUT_T, IGS_STRING_T, (char *) value, length);
+    const igs_iop_t *iop = model_write_iop (agent, name, IGS_OUTPUT_T,
+                                            IGS_STRING_T, (char *) value, length);
     if (iop)
         network_publish_output (agent, iop);
     return (iop == NULL) ? IGS_FAILURE : IGS_SUCCESS;
@@ -1373,8 +1372,7 @@ igs_result_t igsagent_output_set_impulsion (igsagent_t *agent,
 {
     assert (agent);
     assert (name);
-    const igs_iop_t *iop =
-      model_write_iop (agent, name, IGS_OUTPUT_T, IGS_IMPULSION_T, NULL, 0);
+    const igs_iop_t *iop = model_write_iop (agent, name, IGS_OUTPUT_T, IGS_IMPULSION_T, NULL, 0);
     if (iop)
         network_publish_output (agent, iop);
     return (iop == NULL) ? IGS_FAILURE : IGS_SUCCESS;

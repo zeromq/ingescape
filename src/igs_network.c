@@ -128,8 +128,7 @@ void s_handle_publication_from_remote_agent (zmsg_t *msg,
     // We need to iterate through our agents and their mapping to check which
     // inputs need to be updated on which agent.
     igsagent_t *agent, *tmp_agent;
-    HASH_ITER (hh, remote_agent->context->agents, agent, tmp_agent)
-    {
+    HASH_ITER (hh, remote_agent->context->agents, agent, tmp_agent){
         if (!agent || !agent->uuid || (strlen (agent->uuid) == 0))
             continue;
 
@@ -2967,8 +2966,7 @@ int trigger_definition_update (zloop_t *loop, int timer_id, void *arg)
                     }
                 }
             }
-            agent->network_activation_during_runtime =
-              false; // reset flag if needed
+            agent->network_activation_during_runtime = false; // reset flag if needed
             free (definition_str);
             // NB: this is not optimal to resend state details on definition change
             // but it is the cleanest way to send state on after-start agent
