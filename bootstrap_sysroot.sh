@@ -24,7 +24,7 @@ SCRIPT_NAME=$(basename $0)
 
     echo "Deploying ingescape library and its dependencies in $CODEROOT/sysroot..."
     mkdir build
-    cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=$CODEROOT/sysroot/usr/local/ -DOSX_UNIVERSAL=OFF -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11 -DWITH_DEPS=ON
+    cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=$CODEROOT/sysroot/usr/local/ -DOSX_UNIVERSAL=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11 -DWITH_DEPS=ON
     make -j8 -C build install
     cp include/ingescape_private.h $CODEROOT/sysroot/usr/local/include/ingescape/
     rm -Rf build
@@ -52,7 +52,7 @@ SCRIPT_NAME=$(basename $0)
         cd libzmq
         rm -Rf builds/xcode
         mkdir -p builds/xcode
-        cmake -S . -B builds/xcode -DCMAKE_BUILD_TYPE=Debug -DWITH_LIBSODIUM=ON -DENABLE_DRAFTS=ON -DWITH_TLS=OFF -DCMAKE_PREFIX_PATH=$CODEROOT/sysroot/usr/local/ -G "Xcode" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11
+        cmake -S . -B builds/xcode -DCMAKE_BUILD_TYPE=Debug -DWITH_DOCS=OFF -DWITH_LIBSODIUM=ON -DENABLE_DRAFTS=ON -DWITH_TLS=OFF -DCMAKE_PREFIX_PATH=$CODEROOT/sysroot/usr/local/ -G "Xcode" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11
         #Hack to enable xcode project embedding
         #because scripts acompanying the xcode project do not manage
         #target folder properly:
