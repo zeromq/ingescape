@@ -13,18 +13,6 @@
 #ifndef ingescape_private_h
 #define ingescape_private_h
 
-#if defined (__WINDOWS__)
-#if defined INGESCAPE
-#define PUBLIC __declspec(dllexport)
-#elif defined INGESCAPE_FROM_PRI
-#define PUBLIC
-#else
-#define PUBLIC __declspec(dllimport)
-#endif
-#else
-#define PUBLIC
-#endif
-
 #include <stdbool.h>
 #include <string.h>
 #include <zyre.h>
@@ -328,7 +316,7 @@ typedef struct igs_agent_event_wrapper {
 struct _igsagent_t {
     char *uuid;
     char *state;
-    
+
     /*
      The concept of virtual agent is used by igs_proxy. Virtual
      agents represent n existing agent which is executed somewhere
@@ -337,33 +325,33 @@ struct _igsagent_t {
      all represented inside the same igs_proxy instance).
      */
     bool is_virtual;
-    
+
     igs_core_context_t *context;
     char *igs_channel;
-    
+
     igsagent_wrapper_t *activate_callbacks;
     igs_agent_event_wrapper_t *agent_event_callbacks;
     bool enforce_constraints;
-    
+
     // definition
     char *definition_path;
     igs_definition_t* definition;
-    
+
     // mapping
     char *mapping_path;
     igs_mapping_t *mapping;
-    
+
     //network
     bool network_need_to_send_definition_update;
     bool network_need_to_send_mapping_update;
     bool network_request_outputs_from_mapped_agents;
     bool network_activation_during_runtime;
-    
+
     bool is_whole_agent_muted;
     igs_mute_wrapper_t *mute_callbacks;
-    
+
     zlist_t *elections;
-    
+
     UT_hash_handle hh;
 };
 
@@ -372,14 +360,14 @@ struct _igsagent_t {
  a set of agents at a process level.
  */
 typedef struct igs_core_context {
-    
+
     ////////////////////////////////////////////
     // persisting data with setters and getters or
     // managed automatically
     //
     // channels
     igs_peer_header_t *peer_headers;
-    
+
     // admin
     FILE *log_file;
     bool log_in_stream;
@@ -393,7 +381,7 @@ typedef struct igs_core_context {
     size_t log_file_max_line_length;
     char log_file_path[IGS_MAX_PATH_LENGTH];
     int log_nb_of_entries; //for fflush rotation
-    
+
     // network
     bool network_allow_ipc;
     bool network_allow_inproc;
@@ -411,33 +399,33 @@ typedef struct igs_core_context {
     zhash_t *brokers;
     char *advertised_endpoint;
     char *our_broker_endpoint;
-    
+
     // security
     bool security_is_enabled;
     zactor_t *security_auth;
     zcert_t *security_cert;
     char *security_public_certificates_directory;
-    
+
     // performance
     size_t performance_msg_counter;
     size_t performance_msg_count_target;
     size_t performance_msg_size;
     int64_t performance_start;
     int64_t performance_stop;
-    
+
     // network monitor
     igs_monitor_t *monitor;
     igs_monitor_wrapper_t *monitor_callbacks;
     bool monitor_shall_start_stop_agent;
-    
+
     // elections
     zhash_t *elections;
-    
+
     // initiated at start, cleaned at stop
     char *network_device;
     char *ip_address;
     char *our_agent_endpoint;
-    
+
     // initiated at s_init_loop, cleaned at loop stop
     char *command_line;
     char *replay_channel;
@@ -459,7 +447,7 @@ typedef struct igs_core_context {
     zsock_t *inproc_publisher;
     zsock_t *logger;
     zloop_t *loop;
-    
+
 } igs_core_context_t;
 
 
@@ -467,21 +455,21 @@ typedef struct igs_core_context {
 //////////////////  SHARED FUNCTIONS  AND  VARIABLES //////////////////
 
 // default context and agent
-PUBLIC extern igs_core_context_t *core_context;
-PUBLIC extern igsagent_t *core_agent;
+INGESCAPE_EXPORT extern igs_core_context_t *core_context;
+INGESCAPE_EXPORT extern igsagent_t *core_agent;
 void core_init_agent(void);
 void core_init_context(void);
 
 // definition
-PUBLIC void definition_free_definition (igs_definition_t **definition);
-PUBLIC void definition_free_constraint (igs_constraint_t **constraint);
+INGESCAPE_EXPORT void definition_free_definition (igs_definition_t **definition);
+INGESCAPE_EXPORT void definition_free_constraint (igs_constraint_t **constraint);
 
 // mapping
-PUBLIC void mapping_free_mapping (igs_mapping_t **map);
+INGESCAPE_EXPORT void mapping_free_mapping (igs_mapping_t **map);
 igs_map_t* mapping_create_mapping_element(const char * from_input,
                                           const char *to_agent,
                                           const char* to_output);
-PUBLIC bool mapping_is_equal(const char *first_str, const char *second_str);
+INGESCAPE_EXPORT bool mapping_is_equal(const char *first_str, const char *second_str);
 
 uint64_t s_djb2_hash (unsigned char *str);
 bool mapping_check_input_output_compatibility(igsagent_t *agent, igs_iop_t *found_input, igs_iop_t *found_output);
@@ -513,15 +501,15 @@ igs_constraint_t* s_model_parse_constraint(igs_iop_value_type_t type,
 igs_result_t network_publish_output (igsagent_t *agent, const igs_iop_t *iop);
 
 // parser
-PUBLIC igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json);
-PUBLIC igs_definition_t* parser_load_definition (const char* json_str);
-PUBLIC igs_definition_t* parser_load_definition_from_path (const char* file_path);
-PUBLIC char* parser_export_definition(igs_definition_t* def);
-PUBLIC char* parser_export_definition_legacy(igs_definition_t* def);
-PUBLIC char* parser_export_mapping(igs_mapping_t* mapping);
-PUBLIC char* parser_export_mapping_legacy(igs_mapping_t* mapping);
-PUBLIC igs_mapping_t* parser_load_mapping (const char* json_str);
-PUBLIC igs_mapping_t* parser_load_mapping_from_path (const char* load_file);
+INGESCAPE_EXPORT igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json);
+INGESCAPE_EXPORT igs_definition_t* parser_load_definition (const char* json_str);
+INGESCAPE_EXPORT igs_definition_t* parser_load_definition_from_path (const char* file_path);
+INGESCAPE_EXPORT char* parser_export_definition(igs_definition_t* def);
+INGESCAPE_EXPORT char* parser_export_definition_legacy(igs_definition_t* def);
+INGESCAPE_EXPORT char* parser_export_mapping(igs_mapping_t* mapping);
+INGESCAPE_EXPORT char* parser_export_mapping_legacy(igs_mapping_t* mapping);
+INGESCAPE_EXPORT igs_mapping_t* parser_load_mapping (const char* json_str);
+INGESCAPE_EXPORT igs_mapping_t* parser_load_mapping_from_path (const char* load_file);
 
 // admin
 void s_admin_make_file_path(const char *from, char *to, size_t size_of_to);
@@ -533,7 +521,7 @@ void s_unlock_zyre_peer(void);
 
 // service
 void service_free_service(igs_service_t *t);
-PUBLIC igs_result_t service_add_values_to_arguments_from_message(const char *name, igs_service_arg_t *arg, zmsg_t *msg);
+INGESCAPE_EXPORT igs_result_t service_add_values_to_arguments_from_message(const char *name, igs_service_arg_t *arg, zmsg_t *msg);
 igs_result_t service_copy_arguments(igs_service_arg_t *source, igs_service_arg_t *destination);
 void service_free_values_in_arguments(igs_service_arg_t *arg);
 void service_log_received_service(igsagent_t *agent, const char *caller_agent_name, const char *caller_agentuuid,

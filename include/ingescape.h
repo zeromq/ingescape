@@ -1,9 +1,9 @@
 /*  =========================================================================
  ingescape - public library header
- 
+
  Copyright (c) the Contributors as noted in the AUTHORS file.
  This file is part of Ingescape, see https://github.com/zeromq/ingescape.
- 
+
  This Source Code Form is subject to the terms of the Mozilla Public
  License, v. 2.0. If a copy of the MPL was not distributed with this
  file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -40,7 +40,9 @@
 INGESCAPE_MAKE_VERSION(INGESCAPE_VERSION_MAJOR, INGESCAPE_VERSION_MINOR, INGESCAPE_VERSION_PATCH)
 
 #if defined (__WINDOWS__)
-#   if defined INGESCAPE_STATIC
+#   if defined INGESCAPE_FROM_PRI
+#       define INGESCAPE_EXPORT
+#   elif defined INGESCAPE_STATIC
 #       define INGESCAPE_EXPORT
 #   elif defined INGESCAPE_INTERNAL_BUILD
 #       if defined DLL_EXPORT
@@ -65,18 +67,6 @@ INGESCAPE_MAKE_VERSION(INGESCAPE_VERSION_MAJOR, INGESCAPE_VERSION_MINOR, INGESCA
 #       define INGESCAPE_PRIVATE
 #       define INGESCAPE_EXPORT
 #   endif
-#endif
-
-#if defined (__WINDOWS__)
-#if defined INGESCAPE
-#define PUBLIC __declspec(dllexport)
-#elif defined INGESCAPE_FROM_PRI
-#define PUBLIC
-#else
-#define PUBLIC __declspec(dllimport)
-#endif
-#else
-#define PUBLIC
 #endif
 
 // GCC and clang can validate format strings for functions that act like printf
@@ -136,10 +126,10 @@ INGESCAPE_EXPORT bool igs_is_started(void);
  or from the network. When ingescape is stopped from the network,
  the application can be notified and take actions such as
  stopping, entering a specific mode, etc.
- 
+
  To stop ingescape from its hosting application,
  just call igs_stop().
- 
+
  To be notified that Ingescape has been stopped,you can:
  - read the pipe to ingescape and expect a "LOOP_STOPPED" message
  - register a callabck with igs_observe_forced_stop. WARNING: this
@@ -344,7 +334,7 @@ INGESCAPE_EXPORT igs_result_t igs_parameter_set_data(const char *name, void *val
  Strings
     - "~ regular_expression", e.g. "~ \\d+(\.\\d+)?)":
         IOP of type STRING must match the regular expression
- 
+
  Regular expressions are absed on CZMQ integration of SLRE with the
  following syntax:
 ^               Match beginning of a buffer
@@ -365,7 +355,7 @@ $               Match end of a buffer
 ?               Match zero or once
 \xDD            Match byte with hex value 0xDD
 \meta           Match one of the meta character: ^$().[*+?\
- 
+
  */
 INGESCAPE_EXPORT void igs_constraints_enforce(bool enforce); //default is false, i.e. disabled
 INGESCAPE_EXPORT igs_result_t igs_input_add_constraint(const char *name, const char *constraint);
@@ -587,11 +577,11 @@ INGESCAPE_EXPORT igs_result_t igs_peer_remove_header(const char *key);
  using TCP connections. Any agent can be a broker and agents using brokers
  simply have to use a list of broker endpoints. One broker is enough but
  several brokers can be set for robustness.
- 
+
  For clarity, it is better if brokers are well identified on your platform,
  started before any agent, and serve only as brokers. But any other architecture
  is permitted and brokers can be restarted at any time.
- 
+
  Endpoints have the form tcp://ip_address:port
  • igs_brokers_add is used to add brokers to connect to. Add
  as many brokers as you want. At least one declared broker is necessary to
@@ -631,7 +621,7 @@ INGESCAPE_EXPORT igs_result_t igs_start_with_brokers(const char *agent_endpoint)
  party can join a platform without providing an identity that is well-known by the other
  agents using public certificates. This is safer but requires securing private certificates
  individually and sharing public certificates between all agents.
- 
+
  Security is enabled by calling igs_enable_security.
  • If private_certificate_file is NULL, our private certificate is generated on the fly, and
  any agent with security enabled will be able to connect to us. Any value provided for
@@ -843,7 +833,7 @@ INGESCAPE_EXPORT void igs_clear_context(void);
 /* LOGS REPLAY
  Ingescape logs contain all the necessary information for an agent to replay
  its changes for inputs, outputs, parameters and services.
- 
+
  Replay happens in a dedicated thread created after calling igs_replay_init:
  • log_file_path : path to the log file to be read
  • speed : replay speed. Default is zero, meaning as fast as possible.
@@ -853,7 +843,7 @@ INGESCAPE_EXPORT void igs_clear_context(void);
  • replay_mode : a boolean composition of igs_replay_mode_t value to decide what shall be replayed.
  If mode is zero, all IOP and services are replayed.
  • agent : an OPTIONAL agent name serving as filter when the logs contain activity for multiple agents.
- 
+
  igs_replay_terminate cleans the thread and requires calling igs_replay_init again.
  Replay thread is cleaned automatically also when the log file has been read completely.
  NB: replay is still under heavy development, use at your own risk...*/
@@ -863,7 +853,7 @@ typedef enum {
     IGS_REPLAY_PARAMETER = 4,
     IGS_REPLAY_EXECUTE_SERVICE= 8,
     IGS_REPLAY_CALL_SERVICE = 16
-    
+
 } igs_replay_mode_t;
 INGESCAPE_EXPORT void igs_replay_init(const char *log_file_path,
                                       size_t speed,
