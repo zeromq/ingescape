@@ -1690,17 +1690,17 @@ igs_result_t igsagent_definition_load_str (igsagent_t *agent,
         igsagent_debug (agent, "json string caused an error and was ignored");
         return IGS_FAILURE;
     }
-    model_read_write_lock ();
+    model_read_write_lock (__FUNCTION__, __LINE__);
     // check that this agent has not been destroyed when we were locked
     if (!agent || !(agent->uuid)) {
-        model_read_write_unlock ();
+        model_read_write_unlock (__FUNCTION__, __LINE__);
         return IGS_FAILURE;
     }
     igsagent_set_name (agent, tmp->name);
     definition_free_definition (&agent->definition);
     agent->definition = tmp;
     agent->network_need_to_send_definition_update = true;
-    model_read_write_unlock ();
+    model_read_write_unlock (__FUNCTION__, __LINE__);
     return IGS_SUCCESS;
 }
 
@@ -1717,10 +1717,10 @@ igs_result_t igsagent_definition_load_file (igsagent_t *agent,
           file_path);
         return IGS_FAILURE;
     }
-    model_read_write_lock ();
+    model_read_write_lock (__FUNCTION__, __LINE__);
     // check that this agent has not been destroyed when we were locked
     if (!agent || !(agent->uuid)) {
-        model_read_write_unlock ();
+        model_read_write_unlock (__FUNCTION__, __LINE__);
         return IGS_FAILURE;
     }
     igsagent_set_name (agent, tmp->name);
@@ -1728,6 +1728,6 @@ igs_result_t igsagent_definition_load_file (igsagent_t *agent,
     agent->definition_path = s_strndup (file_path, IGS_MAX_PATH_LENGTH - 1);
     agent->definition = tmp;
     agent->network_need_to_send_definition_update = true;
-    model_read_write_unlock ();
+    model_read_write_unlock (__FUNCTION__, __LINE__);
     return IGS_SUCCESS;
 }

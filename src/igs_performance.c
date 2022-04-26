@@ -53,8 +53,8 @@ void igs_net_performance_check (const char *peer_id,
     zyre_t *node = core_context->node;
 
     performance_start = zclock_usecs ();
-    s_lock_zyre_peer ();
+    s_lock_zyre_peer (__FUNCTION__, __LINE__);
     zyre_whisper (node, peer_id, &msg);
-    s_unlock_zyre_peer ();
+    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     free (mem);
 }

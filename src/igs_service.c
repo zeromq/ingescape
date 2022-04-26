@@ -605,10 +605,10 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
 
     bool found = false;
 
-    model_read_write_lock ();
+    model_read_write_lock (__FUNCTION__, __LINE__);
     // check that this agent has not been destroyed when we were locked
     if (!agent || !(agent->uuid)) {
-        model_read_write_unlock ();
+        model_read_write_unlock (__FUNCTION__, __LINE__);
         return IGS_SUCCESS;
     }
 
@@ -705,14 +705,14 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                         zmsg_add (msg, frame);
                     }
                 }
-                s_lock_zyre_peer ();
+                s_lock_zyre_peer (__FUNCTION__, __LINE__);
                 zyre_shouts (agent->context->node, agent->igs_channel,
                              "SERVICE %s(%s) called %s.%s(%s)",
                              agent->definition->name, agent->uuid,
                              remote_agent->definition->name, service_name,
                              remote_agent->uuid);
                 zyre_whisper (agent->context->node, remote_agent->peer->peer_id, &msg);
-                s_unlock_zyre_peer ();
+                s_unlock_zyre_peer (__FUNCTION__, __LINE__);
                 if (core_context->enable_service_logging)
                     s_service_log_sent_service (agent, remote_agent->definition->name, remote_agent->uuid,
                                                 service_name, *list);
@@ -795,7 +795,7 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                     }
                 }
 
-                s_lock_zyre_peer ();
+                s_lock_zyre_peer (__FUNCTION__, __LINE__);
                 if (core_context->node != NULL) {
                     zyre_shouts (agent->context->node, agent->igs_channel,
                                  "SERVICE %s(%s) called %s.%s(%s)",
@@ -803,7 +803,7 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                                  local_agent->definition->name, service_name,
                                  local_agent->uuid);
                 }
-                s_unlock_zyre_peer ();
+                s_unlock_zyre_peer (__FUNCTION__, __LINE__);
 
                 if (core_context->enable_service_logging)
                     s_service_log_sent_service (agent, local_agent->definition->name, local_agent->uuid,
@@ -820,7 +820,7 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
         s_service_free_service_arguments (*list);
         *list = NULL;
     }
-    model_read_write_unlock ();
+    model_read_write_unlock (__FUNCTION__, __LINE__);
     if (!found) {
         igsagent_error (agent, "could not find an agent with name or UUID : %s",
                         agent_name_or_uuid);

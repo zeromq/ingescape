@@ -207,17 +207,17 @@ igs_result_t igsagent_mapping_load_str (igsagent_t *agent,
         return IGS_FAILURE;
     }
     else {
-        model_read_write_lock ();
+        model_read_write_lock (__FUNCTION__, __LINE__);
         // check that this agent has not been destroyed when we were locked
         if (!agent || !(agent->uuid)) {
-            model_read_write_unlock ();
+            model_read_write_unlock (__FUNCTION__, __LINE__);
             return IGS_FAILURE;
         }
         if (agent->mapping)
             mapping_free_mapping (&agent->mapping);
         agent->mapping = tmp;
         agent->network_need_to_send_mapping_update = true;
-        model_read_write_unlock ();
+        model_read_write_unlock (__FUNCTION__, __LINE__);
     }
     return IGS_SUCCESS;
 }
@@ -233,10 +233,10 @@ igs_result_t igsagent_mapping_load_file (igsagent_t *agent,
                          file_path);
         return IGS_FAILURE;
     }
-    model_read_write_lock ();
+    model_read_write_lock (__FUNCTION__, __LINE__);
     // check that this agent has not been destroyed when we were locked
     if (!agent || !(agent->uuid)) {
-        model_read_write_unlock ();
+        model_read_write_unlock (__FUNCTION__, __LINE__);
         return IGS_FAILURE;
     }
     if (agent->mapping)
@@ -244,7 +244,7 @@ igs_result_t igsagent_mapping_load_file (igsagent_t *agent,
     agent->mapping_path = s_strndup (file_path, IGS_MAX_PATH_LENGTH - 1);
     agent->mapping = tmp;
     agent->network_need_to_send_mapping_update = true;
-    model_read_write_unlock ();
+    model_read_write_unlock (__FUNCTION__, __LINE__);
     return IGS_SUCCESS;
 }
 
@@ -253,10 +253,10 @@ void igsagent_clear_mappings (igsagent_t *agent)
     //    igsagent_debug(agent, "clear current mapping for %s and initiate an
     //    empty one",
     //                   agent->definition->name);
-    model_read_write_lock ();
+    model_read_write_lock (__FUNCTION__, __LINE__);
     // check that this agent has not been destroyed when we were locked
     if (!agent || !(agent->uuid)) {
-        model_read_write_unlock ();
+        model_read_write_unlock (__FUNCTION__, __LINE__);
         return;
     }
     if (agent->mapping)
@@ -264,17 +264,17 @@ void igsagent_clear_mappings (igsagent_t *agent)
     agent->mapping =
       (struct igs_mapping *) zmalloc (sizeof (struct igs_mapping));
     agent->network_need_to_send_mapping_update = true;
-    model_read_write_unlock ();
+    model_read_write_unlock (__FUNCTION__, __LINE__);
 }
 
 void igsagent_clear_mappings_with_agent (igsagent_t *agent,
                                           const char *agent_name)
 {
     if (agent->mapping) {
-        model_read_write_lock ();
+        model_read_write_lock (__FUNCTION__, __LINE__);
         // check that this agent has not been destroyed when we were locked
         if (!agent || !(agent->uuid)) {
-            model_read_write_unlock ();
+            model_read_write_unlock (__FUNCTION__, __LINE__);
             return;
         }
         igs_map_t *elmt, *tmp;
@@ -286,7 +286,7 @@ void igsagent_clear_mappings_with_agent (igsagent_t *agent,
                 agent->network_need_to_send_mapping_update = true;
             }
         }
-        model_read_write_unlock ();
+        model_read_write_unlock (__FUNCTION__, __LINE__);
     }
 }
 
@@ -297,14 +297,14 @@ char *igsagent_mapping_json (igsagent_t *agent)
         igsagent_warn (agent, "No mapping defined yet");
         return NULL;
     }
-    model_read_write_lock ();
+    model_read_write_lock (__FUNCTION__, __LINE__);
     // check that this agent has not been destroyed when we were locked
     if (!agent || !(agent->uuid)) {
-        model_read_write_unlock ();
+        model_read_write_unlock (__FUNCTION__, __LINE__);
         return NULL;
     }
     mapping_json = parser_export_mapping (agent->mapping);
-    model_read_write_unlock ();
+    model_read_write_unlock (__FUNCTION__, __LINE__);
     return mapping_json;
 }
 
@@ -312,14 +312,14 @@ size_t igsagent_mapping_count (igsagent_t *agent)
 {
     assert (agent);
     assert (agent->mapping);
-    model_read_write_lock ();
+    model_read_write_lock (__FUNCTION__, __LINE__);
     // check that this agent has not been destroyed when we were locked
     if (!agent || !(agent->uuid)) {
-        model_read_write_unlock ();
+        model_read_write_unlock (__FUNCTION__, __LINE__);
         return 0;
     }
     size_t res = HASH_COUNT (agent->mapping->map_elements);
-    model_read_write_unlock ();
+    model_read_write_unlock (__FUNCTION__, __LINE__);
     return res;
 }
 
@@ -388,10 +388,10 @@ uint64_t igsagent_mapping_add (igsagent_t *agent,
                          with_output);
         return 0;
     }
-    model_read_write_lock ();
+    model_read_write_lock (__FUNCTION__, __LINE__);
     // check that this agent has not been destroyed when we were locked
     if (!agent || !(agent->uuid)) {
-        model_read_write_unlock ();
+        model_read_write_unlock (__FUNCTION__, __LINE__);
         return 0;
     }
     assert (agent->mapping);
@@ -433,7 +433,7 @@ uint64_t igsagent_mapping_add (igsagent_t *agent,
     free (reviewed_from_our_input);
     free (reviewed_to_agent);
     free (reviewed_with_output);
-    model_read_write_unlock ();
+    model_read_write_unlock (__FUNCTION__, __LINE__);
     return hash;
 }
 
@@ -454,16 +454,16 @@ igs_result_t igsagent_mapping_remove_with_id (igsagent_t *agent,
         igsagent_error (agent, "id %ld is not part of the current mapping", the_id);
         return IGS_FAILURE;
     }
-    model_read_write_lock ();
+    model_read_write_lock (__FUNCTION__, __LINE__);
     // check that this agent has not been destroyed when we were locked
     if (!agent || !(agent->uuid)) {
-        model_read_write_unlock ();
+        model_read_write_unlock (__FUNCTION__, __LINE__);
         return IGS_SUCCESS;
     }
     HASH_DEL (agent->mapping->map_elements, el);
     s_mapping_free_mapping_element (&el);
     agent->network_need_to_send_mapping_update = true;
-    model_read_write_unlock ();
+    model_read_write_unlock (__FUNCTION__, __LINE__);
     return IGS_SUCCESS;
 }
 
@@ -503,16 +503,16 @@ igs_result_t igsagent_mapping_remove_with_name (igsagent_t *agent,
                          from_our_input, to_agent, with_output);
         return IGS_FAILURE;
     }
-    model_read_write_lock ();
+    model_read_write_lock (__FUNCTION__, __LINE__);
     // check that this agent has not been destroyed when we were locked
     if (!agent || !(agent->uuid)) {
-        model_read_write_unlock ();
+        model_read_write_unlock (__FUNCTION__, __LINE__);
         return IGS_SUCCESS;
     }
     HASH_DEL (agent->mapping->map_elements, tmp);
     s_mapping_free_mapping_element (&tmp);
     agent->network_need_to_send_mapping_update = true;
-    model_read_write_unlock ();
+    model_read_write_unlock (__FUNCTION__, __LINE__);
     return IGS_SUCCESS;
 }
 
@@ -520,25 +520,25 @@ void igsagent_mapping_set_path (igsagent_t *agent, const char *path)
 {
     assert (agent);
     assert (path);
-    model_read_write_lock ();
+    model_read_write_lock (__FUNCTION__, __LINE__);
     // check that this agent has not been destroyed when we were locked
     if (!agent || !(agent->uuid)) {
-        model_read_write_unlock ();
+        model_read_write_unlock (__FUNCTION__, __LINE__);
         return;
     }
     if (agent->mapping_path)
         free (agent->mapping_path);
     agent->mapping_path = s_strndup (path, IGS_MAX_PATH_LENGTH);
     if (core_context->network_actor && core_context->node) {
-        s_lock_zyre_peer ();
+        s_lock_zyre_peer (__FUNCTION__, __LINE__);
         zmsg_t *msg = zmsg_new ();
         zmsg_addstr (msg, MAPPING_FILE_PATH_MSG);
         zmsg_addstr (msg, agent->mapping_path);
         zmsg_addstr (msg, agent->uuid);
         zyre_shout (core_context->node, IGS_PRIVATE_CHANNEL, &msg);
-        s_unlock_zyre_peer ();
+        s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     }
-    model_read_write_unlock ();
+    model_read_write_unlock (__FUNCTION__, __LINE__);
 }
 
 void igsagent_mapping_save (igsagent_t *agent)
@@ -549,10 +549,10 @@ void igsagent_mapping_save (igsagent_t *agent)
         igsagent_error (agent, "no path configured to save mapping");
         return;
     }
-    model_read_write_lock ();
+    model_read_write_lock (__FUNCTION__, __LINE__);
     // check that this agent has not been destroyed when we were locked
     if (!agent || !(agent->uuid)) {
-        model_read_write_unlock ();
+        model_read_write_unlock (__FUNCTION__, __LINE__);
         return;
     }
     FILE *fp = NULL;
@@ -569,5 +569,5 @@ void igsagent_mapping_save (igsagent_t *agent)
         fclose (fp);
         free (map);
     }
-    model_read_write_unlock ();
+    model_read_write_unlock (__FUNCTION__, __LINE__);
 }

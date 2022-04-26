@@ -157,7 +157,7 @@ void admin_log (igsagent_t *agent,
             strncat (core_context->log_file_path, ".log", IGS_MAX_PATH_LENGTH);
             printf ("using log file %s\n", core_context->log_file_path);
             if (core_context != NULL && core_context->node != NULL) {
-                s_lock_zyre_peer ();
+                s_lock_zyre_peer (__FUNCTION__, __LINE__);
                 igsagent_t *a, *tmp;
                 HASH_ITER (hh, core_context->agents, a, tmp)
                 {
@@ -167,7 +167,7 @@ void admin_log (igsagent_t *agent,
                     zmsg_addstr (msg, a->uuid);
                     zyre_shout (core_context->node, IGS_PRIVATE_CHANNEL, &msg);
                 }
-                s_unlock_zyre_peer ();
+                s_unlock_zyre_peer (__FUNCTION__, __LINE__);
             }
         }
         if (!core_context->log_file
@@ -259,7 +259,7 @@ void igs_log_set_file (bool allow, const char *path)
     if (allow != core_context->log_in_file) {
         core_context->log_in_file = allow;
         if (core_context->network_actor != NULL && core_context->node != NULL) {
-            s_lock_zyre_peer ();
+            s_lock_zyre_peer (__FUNCTION__, __LINE__);
             igsagent_t *agent, *tmp;
             HASH_ITER (hh, core_context->agents, agent, tmp)
             {
@@ -272,7 +272,7 @@ void igs_log_set_file (bool allow, const char *path)
                 zmsg_addstr (msg, agent->uuid);
                 zyre_shout (core_context->node, IGS_PRIVATE_CHANNEL, &msg);
             }
-            s_unlock_zyre_peer ();
+            s_unlock_zyre_peer (__FUNCTION__, __LINE__);
         }
     }
     if (path && strlen (path) > 0) {
@@ -308,7 +308,7 @@ void igs_log_set_file (bool allow, const char *path)
             igs_info ("switching to new log file: %s",
                       core_context->log_file_path);
         if (core_context->log_file && core_context && core_context->node) {
-            s_lock_zyre_peer ();
+            s_lock_zyre_peer (__FUNCTION__, __LINE__);
             igsagent_t *agent, *tmp;
             HASH_ITER (hh, core_context->agents, agent, tmp)
             {
@@ -318,7 +318,7 @@ void igs_log_set_file (bool allow, const char *path)
                 zmsg_addstr (msg, agent->uuid);
                 zyre_shout (core_context->node, IGS_PRIVATE_CHANNEL, &msg);
             }
-            s_unlock_zyre_peer ();
+            s_unlock_zyre_peer (__FUNCTION__, __LINE__);
         }
     }
     else {
@@ -367,7 +367,7 @@ void igs_log_set_stream (bool stream)
     if (stream != core_context->log_in_stream) {
         core_context->log_in_stream = stream;
         if (core_context->network_actor && core_context->node) {
-            s_lock_zyre_peer ();
+            s_lock_zyre_peer (__FUNCTION__, __LINE__);
             igsagent_t *agent, *tmp;
             HASH_ITER (hh, core_context->agents, agent, tmp)
             {
@@ -377,7 +377,7 @@ void igs_log_set_stream (bool stream)
                 zmsg_addstr (msg, agent->uuid);
                 zyre_shout (core_context->node, IGS_PRIVATE_CHANNEL, &msg);
             }
-            s_unlock_zyre_peer ();
+            s_unlock_zyre_peer (__FUNCTION__, __LINE__);
         }
     }
 }
