@@ -683,7 +683,7 @@ lib-deploy-linux-release-armv7a-softfp:
 
 build-deb-packages:
   extends: .lib-build-files
-  stage: lib-delivery
+  stage: delivery
   tags:
     - docker
   image: debian:10
