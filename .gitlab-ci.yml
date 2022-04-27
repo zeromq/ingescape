@@ -3,9 +3,12 @@
 # Define job order
 stages:
   - lib-build
+  - binding-build
+  - binding-test
   - lib-installer
-  - lib-deploy
-  - lib-delivery
+  - binding-package
+  - deploy
+  - delivery
 
 # Define ingescape library files
 .lib-build-files:
@@ -731,6 +734,329 @@ build-deb-packages:
       - $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
 
 
+
+#   _   _           _             _  _____ 
+#  | \ | |         | |           | |/ ____|
+#  |  \| | ___   __| | ___       | | (___  
+#  | . ` |/ _ \ / _` |/ _ \  _   | |\___ \ 
+#  | |\  | (_) | (_| |  __/ | |__| |____) |
+#  |_| \_|\___/ \__,_|\___|  \____/|_____/ 
+
+## Builds                                    
+binding-node-js-macos:
+  stage: binding-build
+  tags:
+    - macos-qt6
+  script:
+    - cd ./bindings/javascript-node/
+    - sed -i .bak 's@/usr/local@<!(echo $HOME)/builds/sysroot/usr/local@g' binding.gyp #update file paths for igs 
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - bindings/javascript-node/prebuilds
+
+binding-node-js-linux:
+  stage: binding-build
+  tags:
+    - docker
+  image: ingescape/ubuntu18.04-node
+  script:
+    - cd ./bindings/javascript-node/
+    - sed -i.bak 's@/usr/local@<!(echo $HOME)/builds/release/linux_x64/usr/local@g' binding.gyp #update file paths for igs 
+    - cat ./binding.gyp
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - bindings/javascript-node/prebuilds
+
+binding-node-js-windows:
+  stage: binding-build
+  tags:
+    - windows
+  script:
+    - cd ./bindings/javascript-node/
+    - (Get-Content -path .\binding.gyp -Raw) -replace 'C:\\\\Program Files\\\\ingescape',"/$env:DEPLOYMENT_WINDOWS_NET_SHARE\\Builds\\Release\\x64" | Set-Content .\binding.gyp #update file paths for igs
+    - npm install --msvs_version=2017
+    - if (Test-Path C:\Users\admin\AppData\Local\Temp\prebuildify) { Remove-Item C:\Users\admin\AppData\Local\Temp\prebuildify -Force -Recurse } #To force prebuildify to re-upload its temporary cache
+    - npm run build --msvs_version=2017
+  artifacts:
+    paths:
+      - bindings/javascript-node/prebuilds
+
+## Tests
+test-node-js-macos:
+  stage: binding-test
+  tags:
+    - macos-qt6
+  script:
+    - cd ./bindings/javascript-node/
+    - npm run test
+  dependencies: 
+    - binding-node-js-macos
+
+test-node-js-linux:
+  stage: binding-test
+  tags:
+    - docker
+  image: ingescape/ubuntu18.04-node
+  script:
+    - cd ./bindings/javascript-node/
+    - npm run test
+  dependencies:
+    - binding-node-js-linux
+
+test-node-js-windows:
+  stage: test
+  tags:
+    - windows
+  script:
+    - cd ./bindings/javascript-node/
+    - npm run test
+  dependencies:
+    - binding-node-js-windows
+
+## Deploy
+deploy-node-js:
+  stage: deploy
+  tags:
+    - docker
+  image: ingescape/ubuntu18.04-node
+  allow_failure: true
+  script:
+    - echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" > ~/.npmrc
+    - cd bindings/javascript-node
+    - npm publish
+  dependencies:
+    - binding-node-js-macos
+    - binding-node-js-linux
+    - binding-node-js-windows
+  only:
+    refs:
+      - master
+      - stable
+    variables:
+      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
+
+#   _____       _   _                 
+#  |  __ \     | | | |                
+#  | |__) |   _| |_| |__   ___  _ __  
+#  |  ___/ | | | __| '_ \ / _ \| '_ \ 
+#  | |   | |_| | |_| | | | (_) | | | |
+#  |_|    \__, |\__|_| |_|\___/|_| |_|
+#          __/ |                      
+#         |___/                       
+
+#Tests
+test-python:
+  stage: binding-test
+  tags:
+    - docker
+  image: ingescape/python-cmake
+  script:
+    - cd bindings/python
+    - mkdir -p ./dependencies/linux/
+    - mkdir -p ./dependencies/include/
+    - cp $HOME/builds/release/linux_x64/usr/local/lib/libingescape.a  ./dependencies/linux/
+    - cp $HOME/builds/release/linux_x64/usr/local/lib/libczmq.a ./dependencies/linux/
+    - cp $HOME/builds/release/linux_x64/usr/local/lib/libzmq.a ./dependencies/linux/
+    - cp $HOME/builds/release/linux_x64/usr/local/lib/libzyre.a ./dependencies/linux/
+    - cp $HOME/builds/release/linux_x64/usr/local/lib/libsodium.a ./dependencies/linux/
+    - cp -r $HOME/builds/release/linux_x64/usr/local/include/* ./dependencies/include/
+    - ./build_and_run_tests.sh
+  dependencies: []
+  needs: []
+  artifacts:
+    paths:
+      - bindings/python/dependencies/*
+
+## Package
+package-python-wheels-windows:
+  stage: binding-package
+  variables:
+    ARCH: "x64"
+  tags:
+    - windows
+  script:
+    - cd ./bindings/python/
+    - mkdir ./dependencies/windows
+    - mkdir ./dependencies/windows/x64
+    - Copy-Item -Path $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64\lib\libingescape.lib -Destination ./dependencies/windows/x64
+    - Copy-Item -Path $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64\lib\libczmq.lib -Destination ./dependencies/windows/x64
+    - Copy-Item -Path $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64\lib\libzmq-v141-mt-s-4_3_5.lib -Destination ./dependencies/windows/x64/libzmq.lib
+    - Copy-Item -Path $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64\lib\libzyre.lib -Destination ./dependencies/windows/x64
+    - Copy-Item -Path $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64\lib\libsodium.lib -Destination ./dependencies/windows/x64
+    - |
+        pushd 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build'
+        cmd /c "vcvarsall.bat x64 & set" |
+        foreach {
+          if ($_ -match "=") {
+            $v = $_.split("="); set-item -force -path "ENV:\$($v[0])"  -value "$($v[1])"
+          }
+        }
+        popd
+
+    - C:\Users\admin\AppData\Local\Programs\Python\Python36\python.exe setup.py bdist_wheel
+    - C:\Users\admin\AppData\Local\Programs\Python\Python37\python.exe setup.py bdist_wheel
+    - C:\Users\admin\AppData\Local\Programs\Python\Python38\python.exe setup.py bdist_wheel
+    - C:\Users\admin\AppData\Local\Programs\Python\Python39\python.exe setup.py bdist_wheel
+  dependencies:
+    - test-python
+  needs:
+    - test-python
+  artifacts:
+    paths:
+      - bindings/python/dist/*
+      - bindings/python/dependencies/*
+  only:
+    refs:
+      - master
+      - stable
+
+package-python-wheels-macos:
+  stage: binding-package
+  tags:
+    - osx
+  image: ingescape/python-cmake
+  script:
+    - cd ./bindings/python/
+    - mkdir -p ./dependencies/macos/
+    - cp  $HOME/builds/sysroot/usr/local/lib/libingescape.a  ./dependencies/macos
+    - cp  $HOME/builds/sysroot/usr/local/lib/libczmq.a ./dependencies/macos
+    - cp  $HOME/builds/sysroot/usr/local/lib/libzmq.a ./dependencies/macos
+    - cp  $HOME/builds/sysroot/usr/local/lib/libzyre.a ./dependencies/macos
+    - cp  $HOME/builds/sysroot/usr/local/lib/libsodium.a ./dependencies/macos
+    - python3 setup.py bdist_wheel
+  dependencies:
+    - test-python
+  needs:
+    - test-python
+  artifacts:
+    paths:
+      - bindings/python/dist/*
+      - bindings/python/dependencies/*
+  only:
+    refs:
+      - master
+      - stable
+
+package-python-wheels-manylinux_2_24_x86_64:
+  stage: binding-package
+  tags:
+    - docker
+  image: quay.io/pypa/manylinux_2_24_x86_64
+  script:
+    - cd ./bindings/python/
+    - python3.8 setup.py bdist_wheel
+    - python3.9 setup.py bdist_wheel
+    - python3.10 setup.py bdist_wheel
+    - |
+        for whl in dist/*.whl; do
+          auditwheel repair "$whl" --plat "manylinux_2_24_x86_64" -w ./wheelhouse/
+        done
+  dependencies:
+    - test-python
+  needs:
+    - test-python
+  artifacts:
+    paths:
+      - bindings/python/wheelhouse/*
+  only:
+    refs:
+      - master
+      - stable
+
+package-python-wheels-manylinux2014_x86_64:
+  stage: binding-package
+  tags:
+    - docker
+  image: quay.io/pypa/manylinux2014_x86_64
+  script:
+    - cd ./bindings/python/
+    - python3.7 setup.py bdist_wheel
+    - python3.8 setup.py bdist_wheel
+    - python3.9 setup.py bdist_wheel
+    - |
+        for whl in dist/*.whl; do
+          auditwheel repair "$whl" --plat "manylinux2014_x86_64" -w ./wheelhouse/
+        done
+  dependencies:
+    - test-python
+  needs:
+    - test-python
+  artifacts:
+    paths:
+      - bindings/python/wheelhouse/*
+  only:
+    refs:
+      - master
+      - stable
+
+package-python-wheels-manylinux2010_x86_64:
+  stage: binding-package
+  tags:
+    - docker
+  image: quay.io/pypa/manylinux2010_x86_64
+  script:
+    - cd ./bindings/python/
+    - python3.7 setup.py bdist_wheel
+    - python3.8 setup.py bdist_wheel
+    - |
+        for whl in dist/*.whl; do
+          auditwheel repair "$whl" --plat "manylinux2010_x86_64" -w ./wheelhouse/
+        done
+  dependencies:
+    - test-python
+  needs:
+    - test-python
+  artifacts:
+    paths:
+      - bindings/python/wheelhouse/*
+  only:
+    refs:
+      - master
+      - stable
+
+#Publish
+publish-python-package:
+  stage: deploy
+  tags:
+    - docker
+  image: ingescape/python-cmake
+  when: manual
+  script:
+    - cd bindings/python
+    - python3 setup.py sdist
+    - python3 -m pip install --upgrade twine
+    - python3 -m twine upload -u ${PYPI_USERNAME} -p ${PYPI_PASSWORD} dist/* wheelhouse/*
+  dependencies:
+    - package-python-wheels-windows
+    - package-python-wheels-macos
+    - package-python-wheels-manylinux_2_24_x86_64
+    - package-python-wheels-manylinux2014_x86_64
+    - package-python-wheels-manylinux2010_x86_64
+  needs:
+    - package-python-wheels-windows
+    - package-python-wheels-macos
+    - package-python-wheels-manylinux_2_24_x86_64
+    - package-python-wheels-manylinux2014_x86_64
+    - package-python-wheels-manylinux2010_x86_64
+  artifacts:
+    paths:
+      - bindings/python/dist/*
+      - bindings/python/wheelhouse/*
+  only:
+    refs:
+      - master
+      - stable
+    variables:
+      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
+
+
+
+
+
 # _____       _ _
 #|  __ \     | (_)
 #| |  | | ___| |___   _____ _ __ _   _
@@ -743,7 +1069,7 @@ build-deb-packages:
 # Deliver installers so they can be downloaded from the website
 lib-delivery-all:
   extends: .lib-build-files
-  stage: lib-delivery
+  stage: delivery
   tags:
     - docker
   image: ingescape/alpine-deployment
