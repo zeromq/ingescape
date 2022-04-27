@@ -92,7 +92,7 @@ lib-installer-macos:
 
 lib-deploy-macos:
   extends: .lib-build-files
-  stage: lib-deploy
+  stage: deploy
   tags:
     - osx
   script:
@@ -128,7 +128,7 @@ lib-build-macos-qt6:
 
 lib-deploy-macos-qt6:
   extends: .lib-build-files
-  stage: lib-deploy
+  stage: deploy
   tags:
     - macos-qt6
   script:
@@ -323,7 +323,7 @@ lib-installer-debug-windows-x64:
 # Deploy ingescape in windows to be able to compile agents
 lib-deploy-windows:
   extends: .lib-build-files
-  stage: lib-deploy
+  stage: deploy
   tags:
     - windows
   script:
@@ -407,7 +407,7 @@ lib-installer-linux-x64:
 # Deploy ingescape to be able to compile agents
 lib-deploy-linux-release-x64:
   extends: .lib-build-files
-  stage: lib-deploy
+  stage: deploy
   tags:
     - docker
   image: ingescape/debian-testing-compil
@@ -473,7 +473,7 @@ lib-installer-debian-qt6-x64:
 # Deploy ingescape to be able to compile agents
 lib-deploy-debian-qt6-x64:
   extends: .lib-build-files
-  stage: lib-deploy
+  stage: deploy
   tags:
     - debian-10-qt6
   script:
@@ -540,7 +540,7 @@ lib-installer-runtime-linux-armhf:
 # Deploy ingescape to be able to compile agents
 lib-deploy-linux-release-armhf:
   extends: .lib-build-files
-  stage: lib-deploy
+  stage: deploy
   tags:
     - docker
   image: ingescape/ubuntu-x-compil-rpi
@@ -601,7 +601,7 @@ lib-installer-runtime-android-aarch64:
 # Deploy ingescape to be able to compile agents
 lib-deploy-linux-release-aarch64:
   extends: .lib-build-files
-  stage: lib-deploy
+  stage: deploy
   tags:
     - docker
   image: ingescape/ubuntu-x-compil-android-aarch64
@@ -661,7 +661,7 @@ lib-installer-runtime-android-armv7a-softfp:
 # Deploy ingescape to be able to compile agents
 lib-deploy-linux-release-armv7a-softfp:
   extends: .lib-build-files
-  stage: lib-deploy
+  stage: deploy
   tags:
     - docker
   image: ingescape/ubuntu-x-compil-android
