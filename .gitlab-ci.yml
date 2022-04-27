@@ -724,6 +724,11 @@ build-deb-packages:
       - debian_x64/ingescape*.deb
     name: "ingescape-dev-debian-package"
   dependencies: []
+  only:
+    refs:
+      - main
+    variables:
+      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
 
 
 # _____       _ _
