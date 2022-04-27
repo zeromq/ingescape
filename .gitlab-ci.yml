@@ -808,7 +808,7 @@ test-node-js-linux:
     - binding-node-js-linux
 
 test-node-js-windows:
-  stage: test
+  stage: binding-test
   tags:
     - windows
   script:
