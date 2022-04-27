@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "CSharpSampleWPF": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

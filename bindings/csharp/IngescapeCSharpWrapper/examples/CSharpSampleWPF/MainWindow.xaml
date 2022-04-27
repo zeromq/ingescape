@@ -1,0 +1,160 @@
+<Window x:Class="CSharpSampleWPFNamespace.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CSharpSampleWPFNamespace"
+        mc:Ignorable="d"
+        x:Name="mainWindow"
+        Title="MainWindow" Height="573" Width="656">
+    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+        <Grid Margin="15,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="110"/>
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="40"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="32"/>
+                <RowDefinition Height="32"/>
+                <RowDefinition Height="32"/>
+                <RowDefinition Height="32"/>
+                <RowDefinition Height="32"/>
+                <RowDefinition Height="32"/>
+                <RowDefinition Height="300"/>
+            </Grid.RowDefinitions>
+
+            <!-- INPUTS -->
+            <Rectangle Stroke="Gray" Grid.RowSpan="7" Grid.ColumnSpan="2" />
+            <Label x:Name="lblTitleInputs"
+                       VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="16" FontWeight="Bold" Grid.ColumnSpan="2" 
+                       Content="Inputs" />
+
+            <Label Content="impulsion"
+                    Grid.Row="1" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" FontWeight="Bold" Margin="39,0,0,0"/>
+            <TextBlock x:Name="TbkImpulsionInput"
+                        Grid.Row="1" VerticalAlignment="Center" Height="16" Grid.Column="1" 
+                        Text="{Binding Path=Agent.ImpulsionICount, Mode=OneWay, StringFormat='Received {0} times'}"/>
+
+            <Label Content="bool"
+                    Grid.Row="2" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" FontWeight="Bold" Margin="69,0,0,0"/>
+            <TextBlock x:Name="TbkBooleanInput" Grid.Row="2" VerticalAlignment="Center" Height="16" Grid.Column="1" Text="{Binding Path=Agent.BoolI}"/>
+
+            <Label Content="int"
+                    Grid.Row="3" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" FontWeight="Bold" Margin="80,0,0,0"/>
+            <TextBlock x:Name="TbkIntegerInput" Grid.Row="3" VerticalAlignment="Center" Height="16" Grid.Column="1" Text="{Binding Path=Agent.IntegerI}"/>
+
+            <Label Content="double"
+                    Grid.Row="4" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" FontWeight="Bold" Margin="56,0,0,0"/>
+            <TextBlock x:Name="TbkDoubleInput" Grid.Row="4" VerticalAlignment="Center" Height="16" Grid.Column="1" Text="{Binding Path=Agent.DoubleI}"/>
+
+            <Label Content="string"
+                    Grid.Row="5" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" FontWeight="Bold" Margin="62,0,0,0"/>
+            <TextBlock x:Name="TbkStringInput" Grid.Row="5" VerticalAlignment="Center" Height="16" Grid.Column="1" Text="{Binding Path=Agent.StringI}"/>
+
+            <Label Content="data"
+                    Grid.Row="6" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" FontWeight="Bold" Margin="70,0,0,0"/>
+            <TextBlock x:Name="TbkDataInput" Grid.Row="6" VerticalAlignment="Center" Height="16" Grid.Column="1" Text="{Binding Path=Agent.DataIString}"/>
+
+            <!-- OUTPUTS -->
+            <Rectangle Stroke="Gray" Grid.RowSpan="7" Grid.ColumnSpan="3" Grid.Column="3" />
+
+            <Label x:Name="LblTitleOutputs"
+                       VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="16" FontWeight="Bold" 
+                       Content="Outputs" Grid.Column="4" Margin="5,0,0,0" />
+
+            <Label Content="impulsion"
+                       Grid.Row="1" Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,5,0"/>
+            <Button x:Name="BtnSendImpulsion"
+                        Grid.Row="1" Grid.Column="5"
+                        Content="P" Width="30" Height="28" FontFamily="Wingdings 2" FontSize="20" FontWeight="Bold" Padding="4,4,1,0"
+                        Click="SendImpulsion" Margin="5,2,5,2"/>
+
+            <Label Content="boolean"
+                       Grid.Row="2" Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,5,0"/>
+            <ComboBox x:Name="ComboBoxBooleanOutput" Grid.Row="2" Grid.Column="4" VerticalAlignment="Center" Height="24">
+                <ComboBoxItem Content="FALSE" IsSelected="True"/>
+                <ComboBoxItem Content="TRUE"/>
+            </ComboBox>
+            <Button x:Name="BtnSendBoolean"
+                        Grid.Row="2" Grid.Column="5"
+                        Content="P" Width="30" Height="28" FontFamily="Wingdings 2" FontSize="20" FontWeight="Bold" Padding="4,4,1,0"
+                        Click="SendBoolean" Margin="5,2,5,2"/>
+
+            <Grid Grid.Row="3" Grid.Column="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Label Content="integer" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,5,0"/>
+                <Label x:Name="LblIntegerOutputError" Content="invalid value" Visibility="Hidden" Foreground="Red" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,5,0"/>
+            </Grid>
+            <TextBox x:Name="TbxIntegerOutput" Grid.Row="3" Grid.Column="4" VerticalAlignment="Center" Height="22" VerticalContentAlignment="Center" TextChanged="IntegerOutputValueChanged"/>
+            <Button x:Name="BtnSendInteger"
+                        Grid.Row="3" Grid.Column="5"
+                        Content="P" Width="30" Height="28" FontFamily="Wingdings 2" FontSize="20" FontWeight="Bold" Padding="4,4,1,0"
+                        Click="SendInteger" IsEnabled="False" Margin="5,2,5,2"/>
+
+            <Grid Grid.Row="4" Grid.Column="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="20.046"/>
+                    <ColumnDefinition Width="34.324"/>
+                </Grid.ColumnDefinitions>
+                <Label Content="double" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" FontWeight="Bold" Grid.ColumnSpan="2"/>
+                <Label x:Name="LblDoubleOutputError" Content="invalid value" Visibility="Hidden" Foreground="Red" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" FontWeight="Bold" Margin="10,0,0,0"/>
+            </Grid>
+            <TextBox x:Name="TbxDoubleOutput" Grid.Row="4" Grid.Column="4" VerticalAlignment="Center" Height="22" VerticalContentAlignment="Center" TextChanged="DoubleOutputValueChanged"/>
+            <Button x:Name="BtnSendDouble"
+                        Grid.Row="4" Grid.Column="5"
+                        Content="P" Width="30" Height="28" FontFamily="Wingdings 2" FontSize="20" FontWeight="Bold" Padding="4,4,1,0"
+                        Click="SendDouble" IsEnabled="False" Margin="5,2,5,2"/>
+
+            <Label Content="string"
+                       Grid.Row="5" Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,5,0"/>
+            <TextBox x:Name="TbxStringOutput" Grid.Row="5" Grid.Column="4" VerticalAlignment="Center" Height="22" VerticalContentAlignment="Center" TextChanged="StringOutputValueChanged"/>
+            <Button x:Name="BtnSendString"
+                        Grid.Row="5" Grid.Column="5"
+                        Content="P" Width="30" Height="28" FontFamily="Wingdings 2" FontSize="20" FontWeight="Bold" Padding="4,4,1,0"
+                        Click="SendString" IsEnabled="False" Margin="5,2,5,2"/>
+
+            <Grid Grid.Row="6" Grid.Column="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Label Content="data" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,5,0"/>
+                <Label x:Name="LblDataOutputError" Content="invalid value" Visibility="Hidden" Foreground="Red" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,5,0"/>
+            </Grid>
+
+            <TextBox x:Name="TbxDataOutput" Grid.Row="6" Grid.Column="4" VerticalAlignment="Center" Height="22" VerticalContentAlignment="Center" TextChanged="DataOutputValueChanged"/>
+            <Button x:Name="BtnSendData"
+                        Grid.Row="6" Grid.Column="5"
+                        Content="P" Width="30" Height="28" FontFamily="Wingdings 2" FontSize="20" FontWeight="Bold" Padding="4,4,1,0"
+                        Click="SendData" IsEnabled="False" Margin="5,2,5,2"/>
+
+            <!-- SERVICES -->
+            <Grid x:Name="test" Margin="0,15,0,15"  Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="6">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Rectangle Stroke="Gray" Grid.Row="0" Grid.RowSpan="3"/>
+
+                <Label x:Name="LblTitleServices"
+                       VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="16" FontWeight="Bold" 
+                       Content="Services"/>
+                <Separator Grid.Row="1"></Separator>
+                <ScrollViewer Margin="10,0,10,2" Grid.Row="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                    <TextBlock x:Name="TbkServices" TextWrapping="Wrap" Text="{Binding Path=Agent.ServicesString}"/>
+                </ScrollViewer>
+            </Grid>
+
+        </Grid>
+    </ScrollViewer>
+</Window>

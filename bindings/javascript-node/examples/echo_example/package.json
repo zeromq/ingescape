@@ -1,0 +1,17 @@
+{
+  "name": "echo_example",
+  "version": "1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "node index.js"
+  },
+  "author": "Chloé Roumieu",
+  "license": "SEE LICENSE IN LICENSE file",
+  "dependencies": {
+    "command-line-args": "*",
+    "ingescape": "*"
+  }
+}
+

@@ -1,0 +1,14 @@
+{
+  "name": "testIGSNode",
+  "version": "1.0.0",
+  "description": "Ingescape binding testing",
+  "main": "test.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "node test.js"
+  },
+  "author": "Chloé Roumieu",
+  "dependencies": {
+    "command-line-args": "^5.2.0"
+  }
+}

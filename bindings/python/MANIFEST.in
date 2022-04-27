@@ -1,0 +1,10 @@
+include ./dependencies/macos/*
+include ./dependencies/linux/*
+include ./dependencies/windows/x64/*
+include ./dependencies/windows/x86/*
+
+include ./dependencies/include/*
+include ./dependencies/include/ingescape/*
+
+include ./includes/*
+include ./includes/uthash/*
