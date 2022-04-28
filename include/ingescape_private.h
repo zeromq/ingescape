@@ -490,7 +490,7 @@ const igs_iop_t* model_write_iop (igsagent_t *agent, const char *iop_name, igs_i
                                   igs_iop_value_type_t val_type, void* value, size_t size);
 igs_iop_t* model_find_iop_by_name(igsagent_t *agent, const char* name, igs_iop_type_t type);
 char* model_get_iop_value_as_string (igs_iop_t* iop); //caller owns returned value
-#define IGS_MODEL_READ_WRITE_MUTEX_DEBUG 1
+#define IGS_MODEL_READ_WRITE_MUTEX_DEBUG 0
 void model_read_write_lock(const char *function, int line);
 void model_read_write_unlock(const char *function, int line);
 igs_constraint_t* s_model_parse_constraint(igs_iop_value_type_t type,

@@ -150,7 +150,6 @@ const igs_iop_t *model_write_iop (igsagent_t *agent, const char *name,
     assert (agent);
     assert (name);
     model_read_write_lock (__FUNCTION__, __LINE__);
-    printf("lock passed \n");
     igs_iop_t *iop = model_find_iop_by_name (agent, name, type);
     if (!iop) {
         igsagent_error (agent, "%s not found for writing", name);
@@ -694,11 +693,12 @@ const igs_iop_t *model_write_iop (igsagent_t *agent, const char *name,
         igsagent_debug (agent, "set %s %s to %s", log_iop_type, name,
                         log_iop_value);
         free (log_iop_value);
-
+        
+        model_read_write_unlock (__FUNCTION__, __LINE__);
         // handle iop callbacks
         s_model_run_observe_callbacks_for_iop (agent, iop, out_value, out_size);
-    }
-    model_read_write_unlock (__FUNCTION__, __LINE__);
+    }else
+        model_read_write_unlock (__FUNCTION__, __LINE__);
     return iop;
 }
 

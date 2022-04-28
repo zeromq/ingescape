@@ -237,9 +237,9 @@ void s_handle_publication_from_remote_agent (zmsg_t *msg,
                     }
                 }
             }
-            if (frame != NULL)
+            if (frame)
                 zframe_destroy (&frame);
-            if (value != NULL)
+            if (value)
                 free (value);
             free (output);
             output = NULL;
@@ -2623,7 +2623,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     HASH_FIND_STR (callee_agent->definition->services_table,
                                    service_name, service);
                     if (service != NULL) {
-                        if (service->cb != NULL) {
+                        if (service->cb) {
                             s_lock_zyre_peer (__FUNCTION__, __LINE__);
                             zyre_shouts (context->node,
                                          callee_agent->igs_channel,
@@ -2637,8 +2637,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                                                                               service->arguments,
                                                                               msg_duplicate) == IGS_SUCCESS) {
                                 if (core_context->enable_service_logging)
-                                    service_log_received_service (callee_agent, caller_name, caller_uuid,
-                                                                  service_name, service->arguments);
+                                    service_log_received_service (callee_agent, caller_name, caller_uuid, service_name, service->arguments);
                                 (service->cb) (callee_agent, caller_name,
                                                caller_uuid, service_name,
                                                service->arguments, nb_args,
@@ -2891,15 +2890,13 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     if (streq (remote->peer->peer_id, zyre_peer->peer_id)) {
                         HASH_DEL (context->remote_agents, remote);
                         split_remove_worker (context, remote->uuid, NULL);
-                        s_agent_propagate_agent_event (
-                          IGS_AGENT_EXITED, remote->uuid,
-                          remote->definition->name, NULL);
+                        s_agent_propagate_agent_event (IGS_AGENT_EXITED, remote->uuid,
+                                                       remote->definition->name, NULL);
                         s_clean_and_free_remote_agent (&remote);
                     }
                 }
                 HASH_DEL (context->zyre_peers, zyre_peer);
-                s_agent_propagate_agent_event (IGS_PEER_EXITED, peerUUID, name,
-                                               NULL);
+                s_agent_propagate_agent_event (IGS_PEER_EXITED, peerUUID, name, NULL);
                 s_clean_and_free_zyre_peer (&zyre_peer, loop);
             }
         }
@@ -2971,9 +2968,11 @@ int trigger_definition_update (zloop_t *loop, int timer_id, void *arg)
             // activation. State details are still sent individually when they change.
             s_send_state_to (agent, IGS_PRIVATE_CHANNEL, false);
             agent->network_need_to_send_definition_update = false;
+            model_read_write_unlock (__FUNCTION__, __LINE__);
             s_agent_propagate_agent_event (IGS_AGENT_UPDATED_DEFINITION,
                                            agent->uuid, agent->definition->name,
                                            NULL);
+            model_read_write_lock (__FUNCTION__, __LINE__);
             // when definition changes, mapping may need to be updated as well
             agent->network_need_to_send_mapping_update = true;
         }
@@ -3023,10 +3022,10 @@ int s_trigger_mapping_update (zloop_t *loop, int timer_id, void *arg)
                 s_network_configure_mapping_to_remote_agent (agent, remote);
             }
             agent->network_need_to_send_mapping_update = false;
+            model_read_write_unlock (__FUNCTION__, __LINE__);
             s_agent_propagate_agent_event (IGS_AGENT_UPDATED_MAPPING,
                                            agent->uuid, agent->definition->name,
                                            NULL);
-            model_read_write_unlock (__FUNCTION__, __LINE__);
         }
     }
     return 0;
@@ -3678,23 +3677,18 @@ igs_result_t network_publish_output (igsagent_t *agent, const igs_iop_t *iop)
               iop->name);
         }
         // 4- distribute publication message to other agents inside our context
-        // without using network
+        // without using the network
         if (!agent->is_virtual) {
             free (zmsg_popstr (msg_quater)); // remove composite uuid/iop name
             zmsg_pushstr (msg_quater,
                           iop->name); // replace it by simple iop name
             // Generate a temporary fake remote agent, containing only
             // necessary information for s_handle_publication_from_remote_agent.
-            igs_remote_agent_t *fake_remote =
-              (igs_remote_agent_t *) zmalloc (sizeof (igs_remote_agent_t));
+            igs_remote_agent_t *fake_remote = (igs_remote_agent_t *) zmalloc (sizeof (igs_remote_agent_t));
             fake_remote->context = core_context;
-            fake_remote->definition =
-              (igs_definition_t *) zmalloc (sizeof (igs_definition_t));
+            fake_remote->definition = (igs_definition_t *) zmalloc (sizeof (igs_definition_t));
             fake_remote->definition->name = agent->definition->name;
-
-            model_read_write_unlock (__FUNCTION__, __LINE__); // to avoid deadlock inside
-                                        // s_handle_publication_from_remote_agent
-
+            model_read_write_unlock (__FUNCTION__, __LINE__); // to avoid deadlock inside s_handle_publication_from_remote_agent
             s_handle_publication_from_remote_agent (msg_quater, fake_remote);
             free (fake_remote->definition);
             free (fake_remote);
@@ -4111,9 +4105,7 @@ void igs_freeze (void)
         core_context->is_frozen = true;
         igs_freeze_wrapper_t *elt;
         DL_FOREACH (core_context->freeze_callbacks, elt)
-        {
             elt->callback_ptr (core_context->is_frozen, elt->my_data);
-        }
     }
 }
 
@@ -4144,9 +4136,7 @@ void igs_unfreeze (void)
         core_context->is_frozen = false;
         igs_freeze_wrapper_t *elt;
         DL_FOREACH (core_context->freeze_callbacks, elt)
-        {
             elt->callback_ptr (core_context->is_frozen, elt->my_data);
-        }
     }
 }
 
@@ -4210,10 +4200,7 @@ void igsagent_mute (igsagent_t *agent)
         }
         igs_mute_wrapper_t *elt;
         DL_FOREACH (agent->mute_callbacks, elt)
-        {
-            elt->callback_ptr (agent, agent->is_whole_agent_muted,
-                               elt->my_data);
-        }
+            elt->callback_ptr (agent, agent->is_whole_agent_muted, elt->my_data);
     }
 }
 
@@ -4234,10 +4221,7 @@ void igsagent_unmute (igsagent_t *agent)
         }
         igs_mute_wrapper_t *elt;
         DL_FOREACH (agent->mute_callbacks, elt)
-        {
-            elt->callback_ptr (agent, agent->is_whole_agent_muted,
-                               elt->my_data);
-        }
+            elt->callback_ptr (agent, agent->is_whole_agent_muted, elt->my_data);
     }
 }
 

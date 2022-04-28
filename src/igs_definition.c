@@ -394,8 +394,8 @@ igs_result_t igsagent_input_remove (igsagent_t *agent, const char *name)
     }
     HASH_DEL (agent->definition->inputs_table, iop);
     s_definition_free_iop (&iop);
-    model_read_write_unlock (__FUNCTION__, __LINE__);
     agent->network_need_to_send_definition_update = true;
+    model_read_write_unlock (__FUNCTION__, __LINE__);
     return IGS_SUCCESS;
 }
 
@@ -417,8 +417,8 @@ igs_result_t igsagent_output_remove (igsagent_t *agent, const char *name)
     }
     HASH_DEL (agent->definition->outputs_table, iop);
     s_definition_free_iop (&iop);
-    model_read_write_unlock (__FUNCTION__, __LINE__);
     agent->network_need_to_send_definition_update = true;
+    model_read_write_unlock (__FUNCTION__, __LINE__);
     return IGS_SUCCESS;
 }
 
@@ -440,8 +440,8 @@ igs_result_t igsagent_parameter_remove (igsagent_t *agent, const char *name)
     }
     HASH_DEL (agent->definition->params_table, iop);
     s_definition_free_iop (&iop);
-    model_read_write_unlock (__FUNCTION__, __LINE__);
     agent->network_need_to_send_definition_update = true;
+    model_read_write_unlock (__FUNCTION__, __LINE__);
     return IGS_SUCCESS;
 }
 

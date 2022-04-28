@@ -104,9 +104,9 @@ igs_result_t igsagent_activate (igsagent_t *agent)
     assert (agent);
     igsagent_t *a = NULL;
     HASH_FIND_STR (core_context->agents, agent->uuid, a);
-    if (a != NULL) {
+    if (a) {
         igsagent_error (agent, "agent %s (%s) is already activated",
-                         agent->definition->name, agent->uuid);
+                        agent->definition->name, agent->uuid);
         return IGS_FAILURE;
     }
     agent->context = core_context;
@@ -116,9 +116,7 @@ igs_result_t igsagent_activate (igsagent_t *agent)
     HASH_ADD_STR (core_context->agents, uuid, agent);
     igsagent_wrapper_t *agent_wrapper_cb;
     DL_FOREACH (agent->activate_callbacks, agent_wrapper_cb)
-    {
         agent_wrapper_cb->callback_ptr (agent, true, agent_wrapper_cb->my_data);
-    }
 
     if (agent->context && agent->context->node) {
         s_lock_zyre_peer (__FUNCTION__, __LINE__);
@@ -150,14 +148,11 @@ igs_result_t igsagent_activate (igsagent_t *agent)
         }
     }
     igs_remote_agent_t *r, *rtmp;
-    HASH_ITER (hh, core_context->remote_agents, r, rtmp)
-    {
+    HASH_ITER (hh, core_context->remote_agents, r, rtmp){
         igs_agent_event_wrapper_t *cb;
         DL_FOREACH (agent->agent_event_callbacks, cb)
-        {
             cb->callback_ptr (agent, IGS_AGENT_ENTERED, r->uuid,
                               r->definition->name, NULL, cb->my_data);
-        }
     }
     return IGS_SUCCESS;
 }
@@ -175,9 +170,7 @@ igs_result_t igsagent_deactivate (igsagent_t *agent)
     HASH_DEL (core_context->agents, agent);
     igsagent_wrapper_t *cb;
     DL_FOREACH (agent->activate_callbacks, cb)
-    {
         cb->callback_ptr (agent, false, cb->my_data);
-    }
     if (agent->context && agent->context->network_actor
         && agent->context->node) {
         s_lock_zyre_peer (__FUNCTION__, __LINE__);

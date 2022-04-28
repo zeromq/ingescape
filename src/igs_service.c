@@ -735,11 +735,8 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                 igs_service_arg_t *arg = NULL;
                 found = true;
                 if (local_agent->definition == NULL) {
-                    igsagent_error (agent,
-                                     "definition is unknown for %s(%s) : "
-                                     "service will not be sent",
-                                     local_agent->definition->name,
-                                     agent_name_or_uuid);
+                    igsagent_error (agent, "definition is unknown for %s(%s) : service will not be sent",
+                                    local_agent->definition->name,agent_name_or_uuid);
                     continue;
                 }
                 else {
@@ -754,43 +751,32 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                         LL_COUNT (service->arguments, arg,
                                   defined_nb_arguments);
                         if (nb_arguments != defined_nb_arguments) {
-                            igsagent_error (
-                              agent,
-                              "passed number of arguments is not correct "
-                              "(received: %zu / "
-                              "expected: %zu) : service will not be sent",
-                              nb_arguments, defined_nb_arguments);
+                            igsagent_error (agent, "passed number of arguments is not correct (received: %zu / "
+                                            "expected: %zu) : service will not be sent", nb_arguments, defined_nb_arguments);
                             continue;
                         }
                         else {
                             // update service arguments values with new ones
-                            if (service->arguments && (list != NULL))
-                                service_copy_arguments (*list,
-                                                        service->arguments);
-                            if (service->cb != NULL) {
+                            if (service->arguments && list)
+                                service_copy_arguments (*list, service->arguments);
+                            if (service->cb) {
+                                model_read_write_unlock (__FUNCTION__, __LINE__);
                                 (service->cb) (local_agent, agent->definition->name,
                                                agent->uuid, service_name, service->arguments,
                                                nb_arguments, token, service->cb_data);
+                                model_read_write_lock (__FUNCTION__, __LINE__);
                                 service_free_values_in_arguments (service->arguments);
-                                if (core_context->enable_service_logging) {
+                                if (core_context->enable_service_logging)
                                     service_log_received_service (local_agent, agent->definition->name,
                                                                   agent->uuid, service_name, *list);
-                                }
                             }
                             else
-                                igsagent_error (agent,
-                                                 "no defined callback to "
-                                                 "handle received service %s",
-                                                 service_name);
+                                igsagent_error (agent, "no defined callback to handle received service %s", service_name);
                         }
                     }
                     else {
-                        igsagent_error (
-                          agent,
-                          "could not find service named %s for %s (%s) : "
-                          "service will not be sent",
-                          service_name, local_agent->definition->name,
-                          local_agent->uuid);
+                        igsagent_error (agent, "could not find service named %s for %s (%s) : service will not be sent",
+                                        service_name, local_agent->definition->name,local_agent->uuid);
                         continue;
                     }
                 }

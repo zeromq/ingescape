@@ -621,17 +621,13 @@ uint64_t igsagent_split_add (igsagent_t *agent,
                 zmsg_addstr (ready_message, from_our_input);
                 zmsg_addstr (ready_message, with_output);
                 zmsg_addstrf (ready_message, "%i", IGS_DEFAULT_WORKER_CREDIT);
-                igs_channel_whisper_zmsg (elt_agent->uuid,
-                                          &ready_message);
+                igs_channel_whisper_zmsg (elt_agent->uuid, &ready_message);
             }
         }
     }
     else
-        igsagent_warn (
-          agent,
-          "split combination %s->%s.%s already exists : will not "
-          "be duplicated",
-          reviewed_from_our_input, reviewed_to_agent, reviewed_with_output);
+        igsagent_warn (agent, "split combination %s->%s.%s already exists : will not "
+                       "be duplicated", reviewed_from_our_input, reviewed_to_agent, reviewed_with_output);
 
     free (reviewed_from_our_input);
     free (reviewed_to_agent);

@@ -332,8 +332,7 @@ void core_observe_agent_events_callback (igsagent_t *agent,
                                          void *my_data)
 {
     IGS_UNUSED (agent)
-    observe_agent_events_cb_wrapper_t *wrap =
-      (observe_agent_events_cb_wrapper_t *) my_data;
+    observe_agent_events_cb_wrapper_t *wrap = (observe_agent_events_cb_wrapper_t *) my_data;
     wrap->cb (event, uuid, name, event_data, wrap->my_data);
 }
 
