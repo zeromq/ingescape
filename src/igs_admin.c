@@ -82,13 +82,13 @@ int igs_protocol (void)
     return INGESCAPE_PROTOCOL;
 }
 
-void admin_log (igsagent_t *agent,
+void admin_log (const char *agent_name,
                 igs_log_level_t level,
                 const char *function,
                 const char *fmt,
                 ...)
 {
-    assert (agent);
+    assert (agent_name);
     assert (function);
     assert (fmt);
 
@@ -131,7 +131,7 @@ void admin_log (igsagent_t *agent,
     
     if (core_context->log_in_stream && core_context->logger)
         zstr_sendf (core_context->logger, "%s;%s;%s;%s\n",
-                    agent->definition->name, log_levels[level], function,
+                    agent_name, log_levels[level], function,
                     full_log_content_rectified);
     
     if (core_context->log_in_file && level >= core_context->log_file_level) {
@@ -152,7 +152,7 @@ void admin_log (igsagent_t *agent,
                     printf ("error while creating log dir %s\n",
                             core_context->log_file_path);
             }
-            strncat (core_context->log_file_path, agent->definition->name,
+            strncat (core_context->log_file_path, agent_name,
                      IGS_MAX_PATH_LENGTH);
             strncat (core_context->log_file_path, ".log", IGS_MAX_PATH_LENGTH);
             printf ("using log file %s\n", core_context->log_file_path);
@@ -195,7 +195,7 @@ void admin_log (igsagent_t *agent,
                       tm->tm_min, tm->tm_sec, (int) tick.tv_usec);
 #endif
             if (fprintf (core_context->log_file, "%s;%s;%s;%s;%s\n",
-                         agent->definition->name, log_time, log_levels[level],
+                         agent_name, log_time, log_levels[level],
                          function, full_log_content_rectified)
                 > 0) {
                 if (++core_context->log_nb_of_entries
@@ -218,19 +218,19 @@ void admin_log (igsagent_t *agent,
         if (level >= IGS_LOG_WARN) {
             if (core_context->use_color_in_console)
                 fprintf (stderr, "%s;%s%s\x1b[0m;%s;%s\n",
-                         agent->definition->name, log_colors[level],
+                         agent_name, log_colors[level],
                          log_levels[level], function, log_content);
             else
-                fprintf (stderr, "%s;%s;%s;%s\n", agent->definition->name,
+                fprintf (stderr, "%s;%s;%s;%s\n", agent_name,
                          log_levels[level], function, log_content);
         }
         else {
             if (core_context->use_color_in_console)
                 fprintf (stdout, "%s;%s%s\x1b[0m;%s;%s\n",
-                         agent->definition->name, log_colors[level],
+                         agent_name, log_colors[level],
                          log_levels[level], function, log_content);
             else
-                fprintf (stdout, "%s;%s;%s;%s\n", agent->definition->name,
+                fprintf (stdout, "%s;%s;%s;%s\n", agent_name,
                          log_levels[level], function, log_content);
         }
     }

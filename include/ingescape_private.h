@@ -399,6 +399,7 @@ typedef struct igs_core_context {
     zhash_t *brokers;
     char *advertised_endpoint;
     char *our_broker_endpoint;
+    char *platform_name;
 
     // security
     bool security_is_enabled;
@@ -514,7 +515,7 @@ INGESCAPE_EXPORT igs_mapping_t* parser_load_mapping_from_path (const char* load_
 
 // admin
 void s_admin_make_file_path(const char *from, char *to, size_t size_of_to);
-void admin_log(igsagent_t *agent, igs_log_level_t, const char *function, const char *format, ...)  CHECK_PRINTF (4);
+void admin_log(const char *agent_name, igs_log_level_t, const char *function, const char *format, ...)  CHECK_PRINTF (4);
 
 // channels
 #define IGS_ZYRE_PEER_MUTEX_DEBUG 0

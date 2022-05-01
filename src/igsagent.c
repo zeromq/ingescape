@@ -236,5 +236,5 @@ void igsagent_log (igs_log_level_t level,
     char content[IGS_MAX_STRING_MSG_LENGTH] = "";
     vsnprintf (content, IGS_MAX_STRING_MSG_LENGTH - 1, format, list);
     va_end (list);
-    admin_log (agent, level, function, "%s", content);
+    admin_log (agent->definition->name, level, function, "%s", content);
 }

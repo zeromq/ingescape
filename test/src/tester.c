@@ -66,6 +66,7 @@ void agentEvent(igs_agent_event_t event, const char *uuid, const char *name, voi
 
 igsagent_t *firstAgent = NULL;
 igsagent_t *secondAgent = NULL;
+igsagent_t *thirdAgent = NULL;
 bool first_secondAgentEntered = false;
 bool first_secondAgentKnowsUs = false;
 bool first_secondAgentExited = false;
@@ -345,8 +346,8 @@ void testerIOPCallback(igs_iop_type_t iopType, const char* name, igs_iop_value_t
 // MAIN & OPTIONS & COMMAND INTERPRETER
 //
 int main(int argc, const char * argv[]) {
-    myData = malloc(32);
-    myOtherData = malloc(64);
+    myData = calloc(1,32);
+    myOtherData = calloc(1,64);
 
     //manage options
     int opt = 0;
@@ -1799,7 +1800,23 @@ int main(int argc, const char * argv[]) {
         igsagent_destroy(&secondAgent);
         igs_stop();
         igsagent_destroy(&firstAgent);
+
+        // Test start igs without default agent
         igs_clear_context();
+        thirdAgent = igsagent_new("ThirdAgent", false);
+        igsagent_definition_set_description(thirdAgent, "Third virtual agent");
+        igsagent_definition_set_version(thirdAgent, "1.0");
+        igsagent_input_create(thirdAgent, "second_impulsion", IGS_IMPULSION_T, NULL, 0);
+        igs_start_with_device(networkDevice, port);
+        igs_stop();
+        igsagent_destroy(&thirdAgent);
+
+        // Test start igs without agent
+        igs_clear_context();
+        igs_start_with_device(networkDevice, port);
+        igs_stop();
+        igs_clear_context();
+
         exit(EXIT_SUCCESS);
     }else{
         //we run normally

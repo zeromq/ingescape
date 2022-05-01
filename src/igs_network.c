@@ -3223,7 +3223,7 @@ static void s_run_loop (zsock_t *mypipe, void *args)
 
 void s_init_loop (igs_core_context_t *context)
 {
-    core_init_agent (); // to be sure to have a default agent name
+    core_init_context (); // to be sure to have a default context
 
     igs_debug ("loop init");
     s_network_lock ();
@@ -3232,8 +3232,15 @@ void s_init_loop (igs_core_context_t *context)
     bool can_continue = true;
     // prepare zyre
     s_lock_zyre_peer (__FUNCTION__, __LINE__);
-    context->node = zyre_new (core_agent->definition->name);
-    assert (context->node);
+    if (streq(IGS_DEFAULT_AGENT_NAME, context->platform_name)) {
+        context->node = zyre_new (NULL);
+        assert (context->node);
+        free(context->platform_name);
+        context->platform_name = strdup(zyre_name(context->node));
+    } else {
+        context->node = zyre_new (context->platform_name);
+        assert (context->node);
+    }
     if (context->security_is_enabled) {
         if (context->security_cert
             && context->security_public_certificates_directory) {
@@ -3324,9 +3331,9 @@ void s_init_loop (igs_core_context_t *context)
     // create channel for replay
     assert (context->replay_channel == NULL);
     context->replay_channel = (char *) zmalloc (
-      strlen (core_agent->definition->name) + strlen ("-IGS-REPLAY") + 1);
+      strlen (context->platform_name) + strlen ("-IGS-REPLAY") + 1);
     snprintf (context->replay_channel, IGS_MAX_AGENT_NAME_LENGTH + 15,
-              "%s-IGS-REPLAY", core_agent->definition->name);
+              "%s-IGS-REPLAY", context->platform_name);
     s_lock_zyre_peer (__FUNCTION__, __LINE__);
     zyre_join (context->node, context->replay_channel);
     s_unlock_zyre_peer (__FUNCTION__, __LINE__);
@@ -3740,7 +3747,7 @@ void igs_observe_channels (igs_channels_fn cb, void *my_data)
 igs_result_t igs_start_with_device (const char *network_device,
                                     unsigned int port)
 {
-    core_init_agent ();
+    core_init_context ();
     assert (network_device);
     assert (port > 0);
 
@@ -3796,7 +3803,7 @@ igs_result_t igs_start_with_ip (const char *ip_address, unsigned int port)
 {
     assert (ip_address);
     assert (port > 0);
-    core_init_agent ();
+    core_init_context ();
 
     if (core_context->network_actor != NULL) {
         // Agent is already active : need to stop it first
@@ -3927,7 +3934,7 @@ void igs_broker_set_advertized_endpoint (const char *advertised_endpoint)
 
 igs_result_t igs_start_with_brokers (const char *agent_endpoint)
 {
-    core_init_agent ();
+    core_init_context ();
     assert (agent_endpoint);
     char address[512] = "";
     size_t port = 0;
@@ -4484,7 +4491,7 @@ void igs_free_net_addresses_list (char **addresses, int nb)
 
 void igs_observe_forced_stop (igs_forced_stop_fn cb, void *my_data)
 {
-    core_init_agent ();
+    core_init_context ();
     assert (cb);
     igs_forced_stop_wrapper_t *new_cb = (igs_forced_stop_wrapper_t *) zmalloc (
       sizeof (igs_forced_stop_wrapper_t));

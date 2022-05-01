@@ -79,6 +79,7 @@ void core_init_context ()
 {
     if (core_context == NULL) {
         core_context = (struct igs_core_context *) zmalloc (sizeof (struct igs_core_context));
+        core_context->platform_name = strdup(IGS_DEFAULT_AGENT_NAME);
         core_context->created_agents = zhash_new ();
         core_context->brokers = zhash_new ();
         zhash_autofree (core_context->brokers);
@@ -221,6 +222,11 @@ void igs_clear_context (void)
             zhash_destroy (&core_context->elections);
         }
 
+        if (core_context->platform_name) {
+            free(core_context->platform_name);
+            core_context->platform_name = NULL;
+        }
+
         free (core_context);
         core_context = NULL;
     }
@@ -247,6 +253,12 @@ void igs_agent_set_name (const char *name)
 {
     core_init_agent ();
     igsagent_set_name (core_agent, name);
+    if (core_agent && core_agent->definition && core_agent->definition->name) {
+        if (core_context->platform_name) {
+            free(core_context->platform_name);
+        }
+        core_context->platform_name = strdup(core_agent->definition->name);
+    }
 }
 
 char *igs_agent_name (void)
@@ -1054,13 +1066,13 @@ void igs_log (igs_log_level_t level,
               const char *format,
               ...)
 {
-    core_init_agent ();
+    core_init_context ();
     va_list list;
     va_start (list, format);
     char content[IGS_MAX_STRING_MSG_LENGTH] = "";
     vsnprintf (content, IGS_MAX_STRING_MSG_LENGTH - 1, format, list);
     va_end (list);
-    admin_log (core_agent, level, function, "%s", content);
+    admin_log (core_context->platform_name, level, function, "%s", content);
 }
 
 // ADVANCED
