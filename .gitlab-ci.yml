@@ -5,6 +5,7 @@ stages:
   - lib-build
   - binding-build
   - binding-test
+  - binding-installer
   - lib-installer
   - binding-package
   - deploy
@@ -25,7 +26,7 @@ stages:
 
 # Global variables. Can be used by any jobs
 variables:
-  VS_CMAKE_GENERATOR: "Visual Studio 15 2017"
+  VS_CMAKE_GENERATOR: "Visual Studio 16 2019"
   DEPLOYMENT_WINDOWS_NET_SHARE: "\\\\10.0.0.2\\gitlab_workspace\\dependencies"
 
 
@@ -1046,8 +1047,268 @@ publish-python-package:
     variables:
       - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
 
+#   _____  _  _   
+#  / ____|| || |_ 
+# | |   |_  __  _|
+# | |    _| || |_ 
+# | |___|_  __  _|
+#  \_____||_||_|  
+                 
+
+binding-csharp-windows-x64-release:
+  stage: binding-build
+  tags:
+    - windows
+  variables:
+    ARCH: "x64"
+  script:
+    - cd bindings
+    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
+    - cmake -S csharp/IngescapeCSharpWrapper/IngescapeCSharp/ -B csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64 -G"$env:VS_CMAKE_GENERATOR Win64" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
+    - Powershell.exe -executionpolicy remotesigned csharp/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64
+    - cmake --build csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64 --target IngescapeCSharp --config Release
+  artifacts:
+    paths:
+     - bindings/csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64
+    name: "binding-csharp-windows-x64-release"
+    expire_in: 1 day
+  dependencies: []
+
+binding-csharp-windows-x64-debug:
+  stage: binding-build
+  tags:
+    - windows
+  variables:
+    ARCH: "x64-debug"
+  script:
+    - cd bindings
+    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
+    - cmake -S csharp/IngescapeCSharpWrapper/IngescapeCSharp/ -B csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/DebugX64 -G"$env:VS_CMAKE_GENERATOR Win64" -DCMAKE_BUILD_TYPE=Debug -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
+    - Powershell.exe -executionpolicy remotesigned csharp/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/DebugX64
+    - cmake --build csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/DebugX64 --target IngescapeCSharp --config Debug
+  artifacts:
+    paths:
+     - bindings/csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/DebugX64
+    name: "binding-csharp-windows-x64-debug"
+    expire_in: 1 day
+  dependencies: []
+
+binding-csharp-windows-x86-release:
+  stage: binding-build
+  tags:
+    - windows
+  variables:
+    ARCH: "x86"
+  script:
+    - cd bindings
+    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
+    - cmake -S csharp/IngescapeCSharpWrapper/IngescapeCSharp/ -B csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
+    - Powershell.exe -executionpolicy remotesigned csharp/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86
+    - cmake --build csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86 --target IngescapeCSharp --config Release
+  artifacts:
+    paths:
+     - bindings/csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86
+    name: "binding-csharp-windows-x86-release"
+    expire_in: 1 day
+  dependencies: []
+
+binding-csharp-windows-x86-debug:
+  stage: binding-build
+  tags:
+    - windows
+  variables:
+    ARCH: "x86-debug"
+  script:
+    - cd bindings
+    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x86;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
+    - cmake -S csharp/IngescapeCSharpWrapper/IngescapeCSharp/ -B csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/DebugX86 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Debug -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
+    - Powershell.exe -executionpolicy remotesigned csharp/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/DebugX86
+    - cmake --build csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/DebugX86 --target IngescapeCSharp --config Debug
+  artifacts:
+    paths:
+     - bindings/csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/DebugX86
+    name: "binding-csharp-windows-x86-debug"
+    expire_in: 1 day
+  dependencies: []
+
+## Tests
+test-csharp-debug:
+  stage: binding-test
+  tags:
+    - windows
+  variables:
+    ARCH: "x64-debug"
+  script:
+    - cd bindings
+    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64\lib;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64\bin"
+    - copy csharp\IngescapeCSharpWrapper\IngescapeCSharp\build\DebugX64\Debug\netstandard2.0\IngescapeCSharp.dll $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64\ -Force
+    - cmake -S csharp/IngescapeCSharpWrapper/unitTest/Tester -B csharp/IngescapeCSharpWrapper/unitTest/Tester/build/DebugX64 -G"$env:VS_CMAKE_GENERATOR Win64" -DCMAKE_BUILD_TYPE=Debug
+    - cmake --build csharp/IngescapeCSharpWrapper/unitTest/Tester/build/DebugX64 --config Debug
+    - C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe csharp/IngescapeCSharpWrapper/unitTest/Tester/build/DebugX64/Debug/Tester.dll /Platform:x64
+  artifacts:
+    paths:
+      - bindings/csharp/IngescapeCSharpWrapper/unitTest/Tester/build/DebugX64
+  dependencies:
+    - binding-csharp-windows-x64-debug
+
+test-csharp-release:
+  stage: binding-test
+  tags:
+    - windows
+  variables:
+    ARCH: "x64-release"
+  script:
+    - cd bindings
+    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64\lib;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64\bin"
+    - copy csharp\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64\Release\netstandard2.0\IngescapeCSharp.dll $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64\ -Force
+    - cmake -S csharp/IngescapeCSharpWrapper/unitTest/Tester -B csharp/IngescapeCSharpWrapper/unitTest/Tester/build/ReleaseX64 -G"$env:VS_CMAKE_GENERATOR Win64" -DCMAKE_BUILD_TYPE=Release
+    - cmake --build csharp/IngescapeCSharpWrapper/unitTest/Tester/build/ReleaseX64 --config Release
+    - C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe csharp/IngescapeCSharpWrapper/unitTest/Tester/build/ReleaseX64/Release/Tester.dll /Platform:x64
+  artifacts:
+    paths:
+      - bindings/csharp/IngescapeCSharpWrapper/unitTest/Tester/build/ReleaseX64
+  dependencies:
+    - binding-csharp-windows-x64-release
+
+## Installers
+# Create runtime install for windows 64 bits
+binding-csharp-installer-windows-x64:
+  stage: binding-installer
+  variables:
+    ARCH: "x64"
+  tags:
+    - windows
+  script:
+    - cd "bindings\csharp\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64"
+    - cpack --config CPackConfig.cmake
+    - cd ..\..\..\..\..\..\..
+  artifacts:
+    paths:
+      - bindings\csharp\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64\IngescapeCSharp-*.exe
+      - bindings\csharp\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64\IngescapeCSharp-*.zip
+    name: "binding-csharp-installer-windows-x64"
+  dependencies:
+    - binding-csharp-windows-x64-release
+
+# Create runtime install for windows 32 bits
+binding-csharp-installer-windows-x86:
+  stage: binding-installer
+  variables:
+    ARCH: "x86"
+  tags:
+    - windows
+  script:
+    - cd "bindings\csharp\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86"
+    - cpack --config CPackConfig.cmake
+    - cd ..\..\..\..\..\..\..
+  artifacts:
+    paths:
+      - bindings\csharp\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86\IngescapeCSharp-*.exe
+      - bindings\csharp\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86\IngescapeCSharp-*.zip
+    name: "binding-csharp-installer-windows-x86"
+  dependencies:
+    - binding-csharp-windows-x86-release
 
 
+## Deploy jobs to be able to compile agents with bindings
+binding-deploy-windows-release-x64:
+  stage: deploy
+  variables:
+    ARCH: "x64"
+  tags:
+    - windows
+  script:
+    - copy bindings\csharp\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64\Release\netstandard2.0\IngescapeCSharp.dll $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64\ -Force
+  dependencies:
+    - binding-csharp-windows-x64-release
+  only:
+    refs:
+      - main
+    variables:
+      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
+
+binding-deploy-windows-release-x86:
+  stage: deploy
+  variables:
+    ARCH: "x86"
+  tags:
+    - windows
+  script:
+    - copy bindings\csharp\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86\Release\netstandard2.0\IngescapeCSharp.dll $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86\ -Force
+  dependencies:
+    - binding-csharp-windows-x86-release
+  only:
+    refs:
+      - main
+    variables:
+      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
+
+## Delivery
+binding-delivery-all:
+  stage: delivery
+  tags:
+    - docker
+  image: ingescape/alpine-deployment
+  script:
+    - echo "Setting up SSH"
+    - mkdir -p ~/.ssh/
+    - echo ${SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
+    - umask 077
+    - echo ${SSH_SECRET} | base64 -d > ssh_secret
+    - umask 022
+    - echo "Deliver Windows x86 binding"
+    - mkdir --parents bindings/CSharp/win32
+    - mv bindings/csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86/IngescapeCSharp-*
+         bindings/CSharp/win32/
+    - ls bindings/CSharp/win32/ | grep -v 'latest_delivery' > bindings/CSharp/win32/latest_delivery
+    - echo "Deliver Windows x64 binding"
+    - mkdir --parents bindings/CSharp/win64
+    - mv bindings/csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64/IngescapeCSharp-*
+         bindings/CSharp/win64/
+    - ls bindings/CSharp/win64/ | grep -v 'latest_delivery' > bindings/CSharp/win64/latest_delivery
+    - echo "Synchronization"
+    - rsync --rsh="ssh -i ssh_secret" --recursive bindings ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
+  dependencies:
+    - binding-csharp-installer-windows-x64
+    - binding-csharp-installer-windows-x86
+  only:
+    refs:
+      - main
+    variables:
+      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
+
+binding-delivery-all-stable:
+  stage: delivery
+  tags:
+    - docker
+  image: ingescape/alpine-deployment
+  script:
+    - echo "Setting up SSH"
+    - mkdir -p ~/.ssh/
+    - echo ${STABLE_SSH_KNOWN_HOSTS} | base64 -d >> ~/.ssh/known_hosts
+    - umask 077
+    - echo ${STABLE_SSH_SECRET} | base64 -d > ssh_secret
+    - umask 022
+    - echo "Deliver Windows x86 binding"
+    - mkdir --parents bindings/CSharp/win32
+    - mv bindings/csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86/IngescapeCSharp-*
+         bindings/CSharp/win32/
+    - ls bindings/CSharp/win32/ | grep -v 'latest_delivery' > bindings/CSharp/win32/latest_delivery
+    - echo "Deliver Windows x64 binding"
+    - mkdir --parents bindings/CSharp/win64
+    - mv bindings/csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64/IngescapeCSharp-*
+         bindings/CSharp/win64/
+    - ls bindings/CSharp/win64/ | grep -v 'latest_delivery' > bindings/CSharp/win64/latest_delivery
+    - echo "Synchronization"
+    - rsync --rsh="ssh -i ssh_secret" --recursive bindings ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST}:${STABLE_DELIVERY_DESTINATION}
+  dependencies:
+    - binding-csharp-installer-windows-x64
+    - binding-csharp-installer-windows-x86
+  only:
+    refs:
+      - stable
+    variables:
+      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
 
 
 # _____       _ _
