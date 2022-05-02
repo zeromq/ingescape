@@ -3323,8 +3323,7 @@ void s_init_loop (igs_core_context_t *context)
 
     // create channel for replay
     assert (context->replay_channel == NULL);
-    context->replay_channel = (char *) zmalloc (
-      strlen (core_agent->definition->name) + strlen ("-IGS-REPLAY") + 1);
+    context->replay_channel = (char *) zmalloc (strlen (core_agent->definition->name) + strlen ("-IGS-REPLAY") + 1);
     snprintf (context->replay_channel, IGS_MAX_AGENT_NAME_LENGTH + 15,
               "%s-IGS-REPLAY", core_agent->definition->name);
     s_lock_zyre_peer (__FUNCTION__, __LINE__);
@@ -3352,9 +3351,7 @@ void s_init_loop (igs_core_context_t *context)
     igs_peer_header_t *el, *tmp;
     s_lock_zyre_peer (__FUNCTION__, __LINE__);
     HASH_ITER (hh, context->peer_headers, el, tmp)
-    {
         zyre_set_header (context->node, el->key, "%s", el->value);
-    }
     s_unlock_zyre_peer (__FUNCTION__, __LINE__);
 
     // start TCP publisher
@@ -4015,15 +4012,22 @@ void igsagent_set_name (igsagent_t *agent, const char *name)
 {
     assert (agent);
     assert (name && strlen (name) > 0);
-    if (streq (agent->definition->name, name))
+    if (streq (agent->definition->name, name)){
+        //in early core_agent init through logs, igs_channel is undefined
+        if (!agent->igs_channel){
+            agent->igs_channel = (char *) zmalloc (strlen (agent->definition->name) + strlen ("-IGS") + 1);
+            snprintf (agent->igs_channel,
+                      IGS_MAX_AGENT_NAME_LENGTH + strlen ("-IGS") + 1,
+                      "%s-IGS", agent->definition->name);
+        }
         return;
+    }
 
     char *n = s_strndup (name, IGS_MAX_AGENT_NAME_LENGTH);
     if (strlen (name) > IGS_MAX_AGENT_NAME_LENGTH)
-        igsagent_warn (
-          agent,
-          "Agent name '%s' exceeds maximum size and will be truncated to '%s'",
-          name, n);
+        igsagent_warn (agent,
+                       "Agent name '%s' exceeds maximum size and will be truncated to '%s'",
+                       name, n);
     bool invalid_name = false;
     size_t length_ofn = strlen (n);
     size_t i = 0;
@@ -4034,10 +4038,9 @@ void igsagent_set_name (igsagent_t *agent, const char *name)
         }
     }
     if (invalid_name)
-        igsagent_warn (
-          agent,
-          "Spaces and dots are not allowed in an agent name: '%s' has been changed to '%s'",
-          name, n);
+        igsagent_warn (agent,
+                       "Spaces and dots are not allowed in an agent name: '%s' has been changed to '%s'",
+                       name, n);
     char *previous = agent->definition->name;
     agent->definition->name = n;
     agent->network_need_to_send_definition_update = true;
@@ -4065,7 +4068,7 @@ void igsagent_set_name (igsagent_t *agent, const char *name)
 
     if (previous) {
         igsagent_debug (agent, "Agent (%s) name changed from %s to %s",
-                         agent->uuid, previous, agent->definition->name);
+                        agent->uuid, previous, agent->definition->name);
         free (previous);
     }
 }

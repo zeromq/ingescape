@@ -39,8 +39,7 @@ igsagent_t *igsagent_new (const char *name, bool activate_immediately)
     zuuid_t *uuid = zuuid_new ();
     agent->uuid = strdup (zuuid_str (uuid));
     zuuid_destroy (&uuid);
-    igsagent_clear_definition (
-      agent); // set valid but empty definition, preserve name
+    igsagent_clear_definition (agent); // set valid but empty definition, preserve name
     igsagent_set_name (agent, name);
     assert (agent->definition);
     igsagent_clear_mappings (agent); // set valid but empty mapping
