@@ -3,14 +3,18 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     
-    <Platforms>AnyCPU;x86;x64</Platforms>
+    <Platforms>x86;x64</Platforms>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <Configurations>Debug;Release;DebugSysroot</Configurations>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Configurations>Debug;Release</Configurations>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Company>Ingenuity</Company>
     <Authors />
     <Copyright>Ingenuity.io</Copyright>
-    <Configurations>Debug;Release;DebugSysroot</Configurations>
+    <Configurations>Debug;Release</Configurations>
+    <UserSecretsId>ce583a44-f9eb-46a9-9cfa-dc93f94a4322</UserSecretsId>
+    <SignAssembly>false</SignAssembly>
+    <AssemblyVersion>3.0.0.0</AssemblyVersion>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
@@ -27,10 +31,6 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <DefineConstants>RELEASE</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugSysroot|x64'">
-    <DefineConstants>TRACE;DEBUG;DEBUG_SYSROOT</DefineConstants>
   </PropertyGroup>
 
 </Project>
