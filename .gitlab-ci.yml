@@ -834,8 +834,7 @@ deploy-node-js:
     - binding-node-js-windows
   only:
     refs:
-      - master
-      - stable
+      - main
     variables:
       - $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
 
@@ -911,8 +910,7 @@ package-python-wheels-windows:
       - bindings/python/dependencies/*
   only:
     refs:
-      - master
-      - stable
+      - main
 
 package-python-wheels-macos:
   stage: binding-package
@@ -938,8 +936,7 @@ package-python-wheels-macos:
       - bindings/python/dependencies/*
   only:
     refs:
-      - master
-      - stable
+      - main
 
 package-python-wheels-manylinux_2_24_x86_64:
   stage: binding-package
@@ -964,8 +961,7 @@ package-python-wheels-manylinux_2_24_x86_64:
       - bindings/python/wheelhouse/*
   only:
     refs:
-      - master
-      - stable
+      - main
 
 package-python-wheels-manylinux2014_x86_64:
   stage: binding-package
@@ -990,8 +986,7 @@ package-python-wheels-manylinux2014_x86_64:
       - bindings/python/wheelhouse/*
   only:
     refs:
-      - master
-      - stable
+      - main
 
 package-python-wheels-manylinux2010_x86_64:
   stage: binding-package
@@ -1015,8 +1010,7 @@ package-python-wheels-manylinux2010_x86_64:
       - bindings/python/wheelhouse/*
   only:
     refs:
-      - master
-      - stable
+      - main
 
 #Publish
 publish-python-package:
@@ -1048,8 +1042,7 @@ publish-python-package:
       - bindings/python/wheelhouse/*
   only:
     refs:
-      - master
-      - stable
+      - main
     variables:
       - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
 
