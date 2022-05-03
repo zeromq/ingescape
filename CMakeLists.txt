@@ -520,12 +520,37 @@ if (NOT DEPS_ONLY)
         set(CPACK_NSIS_PACKAGE_NAME
             "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION} (Win64)")
         set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} (Win64)")
+        if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+        install(FILES 
+            "bindings/csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/DebugX64/Debug/netstandard2.0/IngescapeCSharp.dll"
+            DESTINATION lib
+        )
+        else()
+        install(FILES 
+            "bindings/csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64/Release/netstandard2.0/IngescapeCSharp.dll"
+            DESTINATION lib
+        )
+        endif()
       else()
         set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES")
         set(CPACK_NSIS_PACKAGE_NAME
             "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION}")
         set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} (Win32)")
+        if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+        install(FILES 
+            "bindings/csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/DebugX86/Debug/netstandard2.0/IngescapeCSharp.dll"
+            DESTINATION lib
+        )
+        else()
+        install(FILES 
+            "bindings/csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86/Release/netstandard2.0/IngescapeCSharp.dll"
+            DESTINATION lib
+        )
+        endif()
       endif()
+
+      
+      
 
       # NSIS configuration for Windows see https://cmake.org/cmake/help/v3.14/cpack_
       # gen/nsis.html#cpack_gen:CPack%20NSIS%20Generator
