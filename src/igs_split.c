@@ -490,14 +490,14 @@ size_t igsagent_split_count (igsagent_t *agent)
 {
     assert (agent);
     assert (agent->mapping);
-    model_read_write_lock ();
+    model_read_write_lock (__FUNCTION__, __LINE__);
     // check that this agent has not been destroyed when we were locked
     if (!agent || !(agent->uuid)) {
-        model_read_write_unlock ();
+        model_read_write_unlock (__FUNCTION__, __LINE__);
         return 0;
     }
     size_t res = HASH_COUNT (agent->mapping->split_elements);
-    model_read_write_unlock ();
+    model_read_write_unlock (__FUNCTION__, __LINE__);
     return res;
 }
 
@@ -568,10 +568,10 @@ uint64_t igsagent_split_add (igsagent_t *agent,
                          with_output);
         return 0;
     }
-    model_read_write_lock ();
+    model_read_write_lock (__FUNCTION__, __LINE__);
     // check that this agent has not been destroyed when we were locked
     if (!agent || !(agent->uuid)) {
-        model_read_write_unlock ();
+        model_read_write_unlock (__FUNCTION__, __LINE__);
         return 0;
     }
     assert (agent->mapping);
@@ -621,22 +621,18 @@ uint64_t igsagent_split_add (igsagent_t *agent,
                 zmsg_addstr (ready_message, from_our_input);
                 zmsg_addstr (ready_message, with_output);
                 zmsg_addstrf (ready_message, "%i", IGS_DEFAULT_WORKER_CREDIT);
-                igs_channel_whisper_zmsg (elt_agent->uuid,
-                                          &ready_message);
+                igs_channel_whisper_zmsg (elt_agent->uuid, &ready_message);
             }
         }
     }
     else
-        igsagent_warn (
-          agent,
-          "split combination %s->%s.%s already exists : will not "
-          "be duplicated",
-          reviewed_from_our_input, reviewed_to_agent, reviewed_with_output);
+        igsagent_warn (agent, "split combination %s->%s.%s already exists : will not "
+                       "be duplicated", reviewed_from_our_input, reviewed_to_agent, reviewed_with_output);
 
     free (reviewed_from_our_input);
     free (reviewed_to_agent);
     free (reviewed_with_output);
-    model_read_write_unlock ();
+    model_read_write_unlock (__FUNCTION__, __LINE__);
     return hash;
 }
 
@@ -659,10 +655,10 @@ igs_result_t igsagent_split_remove_with_id (igsagent_t *agent,
         return IGS_FAILURE;
     }
     else {
-        model_read_write_lock ();
+        model_read_write_lock (__FUNCTION__, __LINE__);
         // check that this agent has not been destroyed when we were locked
         if (!agent || !(agent->uuid)) {
-            model_read_write_unlock ();
+            model_read_write_unlock (__FUNCTION__, __LINE__);
             return IGS_SUCCESS;
         }
         HASH_DEL (agent->mapping->split_elements, el);
@@ -674,7 +670,7 @@ igs_result_t igsagent_split_remove_with_id (igsagent_t *agent,
         igs_channel_whisper_zmsg (el->to_agent, &goodbye_message);
         split_free_split_element(&el);
         agent->network_need_to_send_mapping_update = true;
-        model_read_write_unlock ();
+        model_read_write_unlock (__FUNCTION__, __LINE__);
     }
     return IGS_SUCCESS;
 }
@@ -716,10 +712,10 @@ igs_result_t igsagent_split_remove_with_name (igsagent_t *agent,
         return IGS_FAILURE;
     }
 
-    model_read_write_lock ();
+    model_read_write_lock (__FUNCTION__, __LINE__);
     // check that this agent has not been destroyed when we were locked
     if (!agent || !(agent->uuid)) {
-        model_read_write_unlock ();
+        model_read_write_unlock (__FUNCTION__, __LINE__);
         return IGS_SUCCESS;
     }
     HASH_DEL (agent->mapping->split_elements, tmp);
@@ -731,6 +727,6 @@ igs_result_t igsagent_split_remove_with_name (igsagent_t *agent,
     igs_channel_whisper_zmsg (tmp->to_agent, &goodbye_message);
     split_free_split_element (&tmp);
     agent->network_need_to_send_mapping_update = true;
-    model_read_write_unlock ();
+    model_read_write_unlock (__FUNCTION__, __LINE__);
     return IGS_SUCCESS;
 }

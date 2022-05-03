@@ -122,14 +122,13 @@ void s_handle_publication_from_remote_agent (zmsg_t *msg,
         return;
     }
 
-    model_read_write_lock ();
+    model_read_write_lock (__FUNCTION__, __LINE__);
     // Publication does not provide information about the targeted agents.
     // At this stage, we only know that one or more of our agents are targeted.
     // We need to iterate through our agents and their mapping to check which
     // inputs need to be updated on which agent.
     igsagent_t *agent, *tmp_agent;
-    HASH_ITER (hh, remote_agent->context->agents, agent, tmp_agent)
-    {
+    HASH_ITER (hh, remote_agent->context->agents, agent, tmp_agent){
         if (!agent || !agent->uuid || (strlen (agent->uuid) == 0))
             continue;
 
@@ -218,19 +217,19 @@ void s_handle_publication_from_remote_agent (zmsg_t *msg,
                             // we have a fully matching mapping element : write from received
                             // output to our input
                             if (value_type == IGS_STRING_T) {
-                                model_read_write_unlock ();
+                                model_read_write_unlock (__FUNCTION__, __LINE__);
                                 model_write_iop (agent, elmt->from_input,
                                                  IGS_INPUT_T, value_type, value,
                                                  strlen (value) + 1);
-                                model_read_write_lock ();
+                                model_read_write_lock (__FUNCTION__, __LINE__);
 
                             }
                             else {
-                                model_read_write_unlock ();
+                                model_read_write_unlock (__FUNCTION__, __LINE__);
                                 model_write_iop (agent, elmt->from_input,
                                                  IGS_INPUT_T, value_type, data,
                                                  size);
-                                model_read_write_lock ();
+                                model_read_write_lock (__FUNCTION__, __LINE__);
                             }
                             if (!agent->uuid)
                                 break;
@@ -238,16 +237,16 @@ void s_handle_publication_from_remote_agent (zmsg_t *msg,
                     }
                 }
             }
-            if (frame != NULL)
+            if (frame)
                 zframe_destroy (&frame);
-            if (value != NULL)
+            if (value)
                 free (value);
             free (output);
             output = NULL;
         }
         zmsg_destroy (&dup);
     }
-    model_read_write_unlock ();
+    model_read_write_unlock (__FUNCTION__, __LINE__);
 }
 
 // Timer callback to send GET_CURRENT_OUTPUTS notification for an agent we
@@ -264,13 +263,13 @@ int s_trigger_outputs_request_to_newcomer (zloop_t *loop,
     assert (remote_agent->context->node);
 
     if (remote_agent->shall_send_outputs_request) {
-        s_lock_zyre_peer ();
+        s_lock_zyre_peer (__FUNCTION__, __LINE__);
         zmsg_t *msg = zmsg_new ();
         zmsg_addstr (msg, GET_CURRENT_OUTPUTS_MSG);
         zmsg_addstr (msg, remote_agent->uuid);
         zyre_whisper (remote_agent->context->node, remote_agent->peer->peer_id,
                       &msg);
-        s_unlock_zyre_peer ();
+        s_unlock_zyre_peer (__FUNCTION__, __LINE__);
         remote_agent->shall_send_outputs_request = false;
     }
     return 0;
@@ -447,7 +446,7 @@ void s_send_definition_to_zyre_peer (igsagent_t *agent,
     assert (agent->context->node);
     assert (peer);
     assert (def);
-    s_lock_zyre_peer ();
+    s_lock_zyre_peer (__FUNCTION__, __LINE__);
     zmsg_t *msg = zmsg_new ();
     zmsg_addstr (msg, EXTERNAL_DEFINITION_MSG);
     zmsg_addstr (msg, def);
@@ -459,7 +458,7 @@ void s_send_definition_to_zyre_peer (igsagent_t *agent,
         zmsg_addstr (msg, "1");
     }
     zyre_whisper (core_context->node, peer, &msg);
-    s_unlock_zyre_peer ();
+    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
 }
 
 void s_send_mapping_to_zyre_peer (igsagent_t *agent,
@@ -471,13 +470,13 @@ void s_send_mapping_to_zyre_peer (igsagent_t *agent,
     assert (agent->context->node);
     assert (peer);
     assert (mapping);
-    s_lock_zyre_peer ();
+    s_lock_zyre_peer (__FUNCTION__, __LINE__);
     zmsg_t *msg = zmsg_new ();
     zmsg_addstr (msg, EXTERNAL_MAPPING_MSG);
     zmsg_addstr (msg, mapping);
     zmsg_addstr (msg, agent->uuid);
     zyre_whisper (core_context->node, peer, &msg);
-    s_unlock_zyre_peer ();
+    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
 }
 
 void s_send_state_to (igsagent_t *agent,
@@ -496,7 +495,7 @@ void s_send_state_to (igsagent_t *agent,
         HASH_ITER (hh, agent->definition->outputs_table, current_iop, tmp_iop)
         {
             if (current_iop->name) {
-                s_lock_zyre_peer ();
+                s_lock_zyre_peer (__FUNCTION__, __LINE__);
                 msg = zmsg_new ();
                 zmsg_addstr (msg, (current_iop->is_muted) ? OUTPUT_MUTED_MSG
                                                           : OUTPUT_UNMUTED_MSG);
@@ -506,12 +505,12 @@ void s_send_state_to (igsagent_t *agent,
                     zyre_whisper (context->node, peer_or_channel, &msg);
                 else
                     zyre_shout (context->node, peer_or_channel, &msg);
-                s_unlock_zyre_peer ();
+                s_unlock_zyre_peer (__FUNCTION__, __LINE__);
             }
         }
     }
 
-    s_lock_zyre_peer ();
+    s_lock_zyre_peer (__FUNCTION__, __LINE__);
     msg = zmsg_new ();
     zmsg_addstr (msg, AGENT_MUTED_MSG);
     zmsg_addstr (msg, (agent->is_whole_agent_muted) ? "1" : "0");
@@ -520,10 +519,10 @@ void s_send_state_to (igsagent_t *agent,
         zyre_whisper (context->node, peer_or_channel, &msg);
     else
         zyre_shout (context->node, peer_or_channel, &msg);
-    s_unlock_zyre_peer ();
+    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
 
     if (agent->state) {
-        s_lock_zyre_peer ();
+        s_lock_zyre_peer (__FUNCTION__, __LINE__);
         msg = zmsg_new ();
         zmsg_addstr (msg, STATE_MSG);
         zmsg_addstr (msg, agent->state);
@@ -532,11 +531,11 @@ void s_send_state_to (igsagent_t *agent,
             zyre_whisper (context->node, peer_or_channel, &msg);
         else
             zyre_shout (context->node, peer_or_channel, &msg);
-        s_unlock_zyre_peer ();
+        s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     }
 
     if (agent->definition_path) {
-        s_lock_zyre_peer ();
+        s_lock_zyre_peer (__FUNCTION__, __LINE__);
         msg = zmsg_new ();
         zmsg_addstr (msg, DEFINITION_FILE_PATH_MSG);
         zmsg_addstr (msg, agent->definition_path);
@@ -545,11 +544,11 @@ void s_send_state_to (igsagent_t *agent,
             zyre_whisper (context->node, peer_or_channel, &msg);
         else
             zyre_shout (context->node, peer_or_channel, &msg);
-        s_unlock_zyre_peer ();
+        s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     }
 
     if (agent->mapping_path) {
-        s_lock_zyre_peer ();
+        s_lock_zyre_peer (__FUNCTION__, __LINE__);
         msg = zmsg_new ();
         zmsg_addstr (msg, MAPPING_FILE_PATH_MSG);
         zmsg_addstr (msg, agent->mapping_path);
@@ -558,10 +557,10 @@ void s_send_state_to (igsagent_t *agent,
             zyre_whisper (context->node, peer_or_channel, &msg);
         else
             zyre_shout (context->node, peer_or_channel, &msg);
-        s_unlock_zyre_peer ();
+        s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     }
 
-    s_lock_zyre_peer ();
+    s_lock_zyre_peer (__FUNCTION__, __LINE__);
     msg = zmsg_new ();
     zmsg_addstr (msg, FROZEN_MSG);
     zmsg_addstr (msg, (context->is_frozen) ? "1" : "0");
@@ -570,9 +569,9 @@ void s_send_state_to (igsagent_t *agent,
         zyre_whisper (context->node, peer_or_channel, &msg);
     else
         zyre_shout (context->node, peer_or_channel, &msg);
-    s_unlock_zyre_peer ();
+    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
 
-    s_lock_zyre_peer ();
+    s_lock_zyre_peer (__FUNCTION__, __LINE__);
     msg = zmsg_new ();
     zmsg_addstr (msg, LOG_IN_STREAM_MSG);
     zmsg_addstr (msg, (context->log_in_stream) ? "1" : "0");
@@ -581,9 +580,9 @@ void s_send_state_to (igsagent_t *agent,
         zyre_whisper (context->node, peer_or_channel, &msg);
     else
         zyre_shout (context->node, peer_or_channel, &msg);
-    s_unlock_zyre_peer ();
+    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
 
-    s_lock_zyre_peer ();
+    s_lock_zyre_peer (__FUNCTION__, __LINE__);
     msg = zmsg_new ();
     zmsg_addstr (msg, LOG_IN_FILE_MSG);
     zmsg_addstr (msg, (context->log_in_file) ? "1" : "0");
@@ -592,9 +591,9 @@ void s_send_state_to (igsagent_t *agent,
         zyre_whisper (context->node, peer_or_channel, &msg);
     else
         zyre_shout (context->node, peer_or_channel, &msg);
-    s_unlock_zyre_peer ();
+    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
 
-    s_lock_zyre_peer ();
+    s_lock_zyre_peer (__FUNCTION__, __LINE__);
     msg = zmsg_new ();
     zmsg_addstr (msg, LOG_FILE_PATH_MSG);
     zmsg_addstr (msg, context->log_file_path);
@@ -603,7 +602,7 @@ void s_send_state_to (igsagent_t *agent,
         zyre_whisper (context->node, peer_or_channel, &msg);
     else
         zyre_shout (context->node, peer_or_channel, &msg);
-    s_unlock_zyre_peer ();
+    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
 }
 
 void s_clean_and_free_remote_agent (igs_remote_agent_t **remote_agent)
@@ -1094,12 +1093,12 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     }
 
                     // notify remote agent that our agents knows it
-                    s_lock_zyre_peer ();
+                    s_lock_zyre_peer (__FUNCTION__, __LINE__);
                     zmsg_t *msg_know = zmsg_new ();
                     zmsg_addstr (msg_know, REMOTE_PEER_KNOWS_AGENT_MSG);
                     zmsg_addstr (msg_know, uuid);
                     zyre_whisper (node, peerUUID, &msg_know);
-                    s_unlock_zyre_peer ();
+                    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
 
                     // Send ready message for splitter creation if a split exist with
                     // the new remote agent.
@@ -1368,10 +1367,10 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     return 0;
                 }
 
-                model_read_write_lock ();
+                model_read_write_lock (__FUNCTION__, __LINE__);
                 // check that this agent has not been destroyed when we were locked
                 if (!agent || !(agent->uuid)) {
-                    model_read_write_unlock ();
+                    model_read_write_unlock (__FUNCTION__, __LINE__);
                     return 0;
                 }
                 zmsg_t *msg_to_send = zmsg_new ();
@@ -1434,11 +1433,11 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                             break;
                     }
                 }
-                model_read_write_unlock ();
-                s_lock_zyre_peer ();
+                model_read_write_unlock (__FUNCTION__, __LINE__);
+                s_lock_zyre_peer (__FUNCTION__, __LINE__);
                 igs_debug ("send output values to %s", peerUUID);
                 zyre_whisper (node, peerUUID, &msg_to_send);
-                s_unlock_zyre_peer ();
+                s_unlock_zyre_peer (__FUNCTION__, __LINE__);
                 free (uuid);
             }
             else
@@ -1498,10 +1497,10 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     return 0;
                 }
 
-                model_read_write_lock ();
+                model_read_write_lock (__FUNCTION__, __LINE__);
                 // check that this agent has not been destroyed when we were locked
                 if (!agent || !(agent->uuid)) {
-                    model_read_write_unlock ();
+                    model_read_write_unlock (__FUNCTION__, __LINE__);
                     return 0;
                 }
                 zmsg_t *msg_to_send = zmsg_new ();
@@ -1557,11 +1556,11 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                             break;
                     }
                 }
-                model_read_write_unlock ();
-                s_lock_zyre_peer ();
+                model_read_write_unlock (__FUNCTION__, __LINE__);
+                s_lock_zyre_peer (__FUNCTION__, __LINE__);
                 igs_debug ("send input values to %s", peerUUID);
                 zyre_whisper (node, peerUUID, &msg_to_send);
-                s_unlock_zyre_peer ();
+                s_unlock_zyre_peer (__FUNCTION__, __LINE__);
                 free (uuid);
             }
             else
@@ -1590,10 +1589,10 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     return 0;
                 }
 
-                model_read_write_lock ();
+                model_read_write_lock (__FUNCTION__, __LINE__);
                 // check that this agent has not been destroyed when we were locked
                 if (!agent || !(agent->uuid)) {
-                    model_read_write_unlock ();
+                    model_read_write_unlock (__FUNCTION__, __LINE__);
                     return 0;
                 }
                 zmsg_t *msg_to_send = zmsg_new ();
@@ -1649,11 +1648,11 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                             break;
                     }
                 }
-                model_read_write_unlock ();
-                s_lock_zyre_peer ();
+                model_read_write_unlock (__FUNCTION__, __LINE__);
+                s_lock_zyre_peer (__FUNCTION__, __LINE__);
                 igs_debug ("send parameters values to %s", peerUUID);
                 zyre_whisper (node, peerUUID, &msg_to_send);
-                s_unlock_zyre_peer ();
+                s_unlock_zyre_peer (__FUNCTION__, __LINE__);
                 free (uuid);
             }
             else
@@ -2624,13 +2623,13 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     HASH_FIND_STR (callee_agent->definition->services_table,
                                    service_name, service);
                     if (service != NULL) {
-                        if (service->cb != NULL) {
-                            s_lock_zyre_peer ();
+                        if (service->cb) {
+                            s_lock_zyre_peer (__FUNCTION__, __LINE__);
                             zyre_shouts (context->node,
                                          callee_agent->igs_channel,
                                          "CALLED %s from %s (%s)", service_name,
                                          caller_name, caller_uuid);
-                            s_unlock_zyre_peer ();
+                            s_unlock_zyre_peer (__FUNCTION__, __LINE__);
                             size_t nb_args = 0;
                             igs_service_arg_t *_arg = NULL;
                             LL_COUNT (service->arguments, _arg, nb_args);
@@ -2638,8 +2637,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                                                                               service->arguments,
                                                                               msg_duplicate) == IGS_SUCCESS) {
                                 if (core_context->enable_service_logging)
-                                    service_log_received_service (callee_agent, caller_name, caller_uuid,
-                                                                  service_name, service->arguments);
+                                    service_log_received_service (callee_agent, caller_name, caller_uuid, service_name, service->arguments);
                                 (service->cb) (callee_agent, caller_name,
                                                caller_uuid, service_name,
                                                service->arguments, nb_args,
@@ -2678,9 +2676,9 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 zmsg_addstr (back, PONG_MSG);
                 zmsg_addmem (back, &count, sizeof (size_t));
                 zmsg_append (back, &payload);
-                s_lock_zyre_peer ();
+                s_lock_zyre_peer (__FUNCTION__, __LINE__);
                 zyre_whisper (node, peerUUID, &back);
-                s_unlock_zyre_peer ();
+                s_unlock_zyre_peer (__FUNCTION__, __LINE__);
             }
             else
             if (streq (title, PONG_MSG)) {
@@ -2726,9 +2724,9 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     zmsg_addmem (back, &context->performance_msg_counter,
                                  sizeof (size_t));
                     zmsg_append (back, &payload);
-                    s_lock_zyre_peer ();
+                    s_lock_zyre_peer (__FUNCTION__, __LINE__);
                     zyre_whisper (node, peerUUID, &back);
-                    s_unlock_zyre_peer ();
+                    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
                 }
             }
             else
@@ -2892,15 +2890,13 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     if (streq (remote->peer->peer_id, zyre_peer->peer_id)) {
                         HASH_DEL (context->remote_agents, remote);
                         split_remove_worker (context, remote->uuid, NULL);
-                        s_agent_propagate_agent_event (
-                          IGS_AGENT_EXITED, remote->uuid,
-                          remote->definition->name, NULL);
+                        s_agent_propagate_agent_event (IGS_AGENT_EXITED, remote->uuid,
+                                                       remote->definition->name, NULL);
                         s_clean_and_free_remote_agent (&remote);
                     }
                 }
                 HASH_DEL (context->zyre_peers, zyre_peer);
-                s_agent_propagate_agent_event (IGS_PEER_EXITED, peerUUID, name,
-                                               NULL);
+                s_agent_propagate_agent_event (IGS_PEER_EXITED, peerUUID, name, NULL);
                 s_clean_and_free_zyre_peer (&zyre_peer, loop);
             }
         }
@@ -2935,16 +2931,14 @@ int trigger_definition_update (zloop_t *loop, int timer_id, void *arg)
     IGS_UNUSED (timer_id)
     igs_core_context_t *context = (igs_core_context_t *) arg;
     assert (context);
-
+    
+    model_read_write_lock (__FUNCTION__, __LINE__);
     igsagent_t *agent, *tmp;
-    HASH_ITER (hh, context->agents, agent, tmp)
-    {
+    HASH_ITER (hh, context->agents, agent, tmp){
         if (agent->network_need_to_send_definition_update) {
-            model_read_write_lock ();
             // check that this agent has not been destroyed when we were locked
             if (!agent || !(agent->uuid)) {
-                model_read_write_unlock ();
-                return 0;
+                continue;
             }
             char *definition_str = NULL;
             igs_zyre_peer_t *p, *ptmp;
@@ -2967,22 +2961,23 @@ int trigger_definition_update (zloop_t *loop, int timer_id, void *arg)
                     }
                 }
             }
-            agent->network_activation_during_runtime =
-              false; // reset flag if needed
+            agent->network_activation_during_runtime = false; // reset flag if needed
             free (definition_str);
             // NB: this is not optimal to resend state details on definition change
             // but it is the cleanest way to send state on after-start agent
             // activation. State details are still sent individually when they change.
             s_send_state_to (agent, IGS_PRIVATE_CHANNEL, false);
             agent->network_need_to_send_definition_update = false;
+            model_read_write_unlock (__FUNCTION__, __LINE__);
             s_agent_propagate_agent_event (IGS_AGENT_UPDATED_DEFINITION,
                                            agent->uuid, agent->definition->name,
                                            NULL);
+            model_read_write_lock (__FUNCTION__, __LINE__);
             // when definition changes, mapping may need to be updated as well
             agent->network_need_to_send_mapping_update = true;
-            model_read_write_unlock ();
         }
     }
+    model_read_write_unlock (__FUNCTION__, __LINE__);
     return 0;
 }
 
@@ -2996,13 +2991,12 @@ int s_trigger_mapping_update (zloop_t *loop, int timer_id, void *arg)
     assert (context);
 
     igsagent_t *agent, *tmp;
-    HASH_ITER (hh, context->agents, agent, tmp)
-    {
+    HASH_ITER (hh, context->agents, agent, tmp){
         if (agent->network_need_to_send_mapping_update) {
-            model_read_write_lock ();
+            model_read_write_lock (__FUNCTION__, __LINE__);
             // check that this agent has not been destroyed when we were locked
             if (!agent || !(agent->uuid)) {
-                model_read_write_unlock ();
+                model_read_write_unlock (__FUNCTION__, __LINE__);
                 return 0;
             }
             char *mapping_str = NULL;
@@ -3028,10 +3022,10 @@ int s_trigger_mapping_update (zloop_t *loop, int timer_id, void *arg)
                 s_network_configure_mapping_to_remote_agent (agent, remote);
             }
             agent->network_need_to_send_mapping_update = false;
+            model_read_write_unlock (__FUNCTION__, __LINE__);
             s_agent_propagate_agent_event (IGS_AGENT_UPDATED_MAPPING,
                                            agent->uuid, agent->definition->name,
                                            NULL);
-            model_read_write_unlock ();
         }
     }
     return 0;
@@ -3126,9 +3120,9 @@ static void s_run_loop (zsock_t *mypipe, void *args)
     }
 
     // start zyre now that everything is set
-    s_lock_zyre_peer ();
+    s_lock_zyre_peer (__FUNCTION__, __LINE__);
     int zyre_start_res = zyre_start (context->node);
-    s_unlock_zyre_peer ();
+    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     if (zyre_start_res != IGS_SUCCESS) {
         igs_error (
           "could not start zyre node : Ingescape will interrupt immediately.");
@@ -3237,7 +3231,7 @@ void s_init_loop (igs_core_context_t *context)
     context->external_stop = false;
     bool can_continue = true;
     // prepare zyre
-    s_lock_zyre_peer ();
+    s_lock_zyre_peer (__FUNCTION__, __LINE__);
     context->node = zyre_new (core_agent->definition->name);
     assert (context->node);
     if (context->security_is_enabled) {
@@ -3255,15 +3249,15 @@ void s_init_loop (igs_core_context_t *context)
                 igs_error (
                   "security is enabled but public certificates directory is "
                   "missing : rejecting");
-            s_unlock_zyre_peer ();
+            s_unlock_zyre_peer (__FUNCTION__, __LINE__);
             s_network_unlock ();
             return;
         }
     }
     // zyre_set_verbose(context->node);
-    s_unlock_zyre_peer ();
+    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     if (context->our_agent_endpoint) {
-        s_lock_zyre_peer ();
+        s_lock_zyre_peer (__FUNCTION__, __LINE__);
         zlist_t *brokers = zhash_keys (context->brokers);
         char *broker = zlist_first (brokers);
         while (broker) {
@@ -3300,15 +3294,15 @@ void s_init_loop (igs_core_context_t *context)
         if (context->advertised_endpoint)
             zyre_set_advertised_endpoint (context->node,
                                           context->advertised_endpoint);
-        s_unlock_zyre_peer ();
+        s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     }
     else {
-        s_lock_zyre_peer ();
+        s_lock_zyre_peer (__FUNCTION__, __LINE__);
         zyre_set_interface (context->node, context->network_device);
         zyre_set_port (context->node, context->network_zyre_port);
-        s_unlock_zyre_peer ();
+        s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     }
-    s_lock_zyre_peer ();
+    s_lock_zyre_peer (__FUNCTION__, __LINE__);
     zyre_set_interval (context->node, context->network_discovery_interval);
     zyre_set_expired_timeout (context->node, context->network_agent_timeout);
     zyre_join (context->node, IGS_PRIVATE_CHANNEL);
@@ -3325,43 +3319,40 @@ void s_init_loop (igs_core_context_t *context)
         }
         zlist_destroy (&keys);
     }
-    s_unlock_zyre_peer ();
+    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
 
     // create channel for replay
     assert (context->replay_channel == NULL);
-    context->replay_channel = (char *) zmalloc (
-      strlen (core_agent->definition->name) + strlen ("-IGS-REPLAY") + 1);
+    context->replay_channel = (char *) zmalloc (strlen (core_agent->definition->name) + strlen ("-IGS-REPLAY") + 1);
     snprintf (context->replay_channel, IGS_MAX_AGENT_NAME_LENGTH + 15,
               "%s-IGS-REPLAY", core_agent->definition->name);
-    s_lock_zyre_peer ();
+    s_lock_zyre_peer (__FUNCTION__, __LINE__);
     zyre_join (context->node, context->replay_channel);
-    s_unlock_zyre_peer ();
+    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
 
     // create channel for services feedback for each agent
     igsagent_t *agent, *tmp_agent;
     HASH_ITER (hh, context->agents, agent, tmp_agent){
         assert (agent->igs_channel);
-        s_lock_zyre_peer ();
+        s_lock_zyre_peer (__FUNCTION__, __LINE__);
         zyre_join (context->node, agent->igs_channel);
-        s_unlock_zyre_peer ();
+        s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     }
 
     // Add version and protocol to headers
-    s_lock_zyre_peer ();
+    s_lock_zyre_peer (__FUNCTION__, __LINE__);
     zyre_set_header (
       context->node, "ingescape", "v%d.%d.%d", (int) igs_version () / 10000,
       (int) (igs_version () % 10000) / 100, (int) (igs_version () % 100));
     zyre_set_header (context->node, "protocol", "v%d", igs_protocol ());
-    s_unlock_zyre_peer ();
+    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
 
     // Add stored headers to zyre
     igs_peer_header_t *el, *tmp;
-    s_lock_zyre_peer ();
+    s_lock_zyre_peer (__FUNCTION__, __LINE__);
     HASH_ITER (hh, context->peer_headers, el, tmp)
-    {
         zyre_set_header (context->node, el->key, "%s", el->value);
-    }
-    s_unlock_zyre_peer ();
+    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
 
     // start TCP publisher
     char endpoint[512];
@@ -3385,9 +3376,9 @@ void s_init_loop (igs_core_context_t *context)
     while (*insert != ':' && insert > endpoint) {
         insert--;
     }
-    s_lock_zyre_peer ();
+    s_lock_zyre_peer (__FUNCTION__, __LINE__);
     zyre_set_header (context->node, "publisher", "%s", insert + 1);
-    s_unlock_zyre_peer ();
+    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
 
     // start ipc publisher
 #if defined(__UNIX__) && !defined(__UTYPE_IOS)
@@ -3402,7 +3393,7 @@ void s_init_loop (igs_core_context_t *context)
             can_continue = false;
         }
     }
-    s_lock_zyre_peer ();
+    s_lock_zyre_peer (__FUNCTION__, __LINE__);
     context->network_ipc_full_path =
       (char *) zmalloc (strlen (context->network_ipc_folder_path)
                         + strlen (zyre_uuid (context->node)) + 2);
@@ -3413,7 +3404,7 @@ void s_init_loop (igs_core_context_t *context)
                         + strlen (zyre_uuid (context->node)) + 8);
     sprintf (context->network_ipc_endpoint, "ipc://%s/%s",
              context->network_ipc_folder_path, zyre_uuid (context->node));
-    s_unlock_zyre_peer ();
+    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     context->ipc_publisher = zsock_new_pub (context->network_ipc_endpoint);
     assert (context->ipc_publisher);
     if (context->security_is_enabled) {
@@ -3421,9 +3412,9 @@ void s_init_loop (igs_core_context_t *context)
         zsock_set_curve_server (context->ipc_publisher, 1);
     }
     zsock_set_sndhwm (context->ipc_publisher, context->network_hwm_value);
-    s_lock_zyre_peer ();
+    s_lock_zyre_peer (__FUNCTION__, __LINE__);
     zyre_set_header (context->node, "ipc", "%s", context->network_ipc_endpoint);
-    s_unlock_zyre_peer ();
+    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
 
 #elif defined(__WINDOWS__)
     context->network_ipc_endpoint = strdup ("tcp://127.0.0.1:*");
@@ -3435,19 +3426,19 @@ void s_init_loop (igs_core_context_t *context)
         zsock_set_curve_server (context->ipc_publisher, 1);
     }
     zsock_set_sndhwm (context->ipc_publisher, context->network_hwm_value);
-    s_lock_zyre_peer ();
+    s_lock_zyre_peer (__FUNCTION__, __LINE__);
     zyre_set_header (context->node, "loopback", "%s",
                      zsock_endpoint (ipc_publisher));
-    s_unlock_zyre_peer ();
+    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
 #endif
 
     // start inproc publisher
 #if !defined(__UYTPE_IOS)
-    s_lock_zyre_peer ();
+    s_lock_zyre_peer (__FUNCTION__, __LINE__);
     char *inproc_endpoint = (char *) zmalloc (
       sizeof (char) * (12 + strlen (zyre_uuid (context->node))));
     sprintf (inproc_endpoint, "inproc://%s", zyre_uuid (context->node));
-    s_unlock_zyre_peer ();
+    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     context->inproc_publisher = zsock_new_pub (inproc_endpoint);
     assert (context->inproc_publisher);
     if (context->security_is_enabled) {
@@ -3455,9 +3446,9 @@ void s_init_loop (igs_core_context_t *context)
         zsock_set_curve_server (context->inproc_publisher, 1);
     }
     zsock_set_sndhwm (context->inproc_publisher, context->network_hwm_value);
-    s_lock_zyre_peer ();
+    s_lock_zyre_peer (__FUNCTION__, __LINE__);
     zyre_set_header (context->node, "inproc", "%s", inproc_endpoint);
-    s_unlock_zyre_peer ();
+    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     free (inproc_endpoint);
 #endif
 
@@ -3480,17 +3471,17 @@ void s_init_loop (igs_core_context_t *context)
     while (*insert_point != ':' && insert_point > endpoint) {
         insert_point--;
     }
-    s_lock_zyre_peer ();
+    s_lock_zyre_peer (__FUNCTION__, __LINE__);
     zyre_set_header (context->node, "logger", "%s", insert_point + 1);
-    s_unlock_zyre_peer ();
+    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
 
     // process PID and path
 #if defined(__UNIX__)
     ssize_t ret;
     context->process_id = getpid ();
-    s_lock_zyre_peer ();
+    s_lock_zyre_peer (__FUNCTION__, __LINE__);
     zyre_set_header (context->node, "pid", "%i", context->process_id);
-    s_unlock_zyre_peer ();
+    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     if (context->command_line == NULL) {
         // command line was not set manually : we try to get exec path instead
 #if defined(__UTYPE_IOS)
@@ -3509,15 +3500,15 @@ void s_init_loop (igs_core_context_t *context)
                        strerror (errno));
         else
             igs_debug ("proc %d: %s", context->process_id, pathbuf);
-        s_lock_zyre_peer ();
+        s_lock_zyre_peer (__FUNCTION__, __LINE__);
         zyre_set_header (context->node, "commandline", "%s", pathbuf);
-        s_unlock_zyre_peer ();
+        s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     }
     else {
-        s_lock_zyre_peer ();
+        s_lock_zyre_peer (__FUNCTION__, __LINE__);
         zyre_set_header (context->node, "commandline", "%s",
                          context->command_line);
-        s_unlock_zyre_peer ();
+        s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     }
 #endif
 #if defined(__WINDOWS__)
@@ -3538,21 +3529,21 @@ void s_init_loop (igs_core_context_t *context)
 #else
         GetModuleFileName (NULL, exe_file_path, IGS_MAX_PATH_LENGTH);
 #endif
-        s_lock_zyre_peer ();
+        s_lock_zyre_peer (__FUNCTION__, __LINE__);
         zyre_set_header (context->node, "commandline", "%s", exe_file_path);
-        s_unlock_zyre_peer ();
+        s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     }
     else {
-        s_lock_zyre_peer ();
+        s_lock_zyre_peer (__FUNCTION__, __LINE__);
         zyre_set_header (context->node, "commandline", "%s",
                          context->command_line);
-        s_unlock_zyre_peer ();
+        s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     }
     DWORD pid = GetCurrentProcessId ();
     context->process_id = (int) pid;
-    s_lock_zyre_peer ();
+    s_lock_zyre_peer (__FUNCTION__, __LINE__);
     zyre_set_header (context->node, "pid", "%i", (int) pid);
-    s_unlock_zyre_peer ();
+    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
 #endif
 
     // hostname
@@ -3562,9 +3553,9 @@ void s_init_loop (igs_core_context_t *context)
 #if defined(__WINDOWS__)
     WSACleanup ();
 #endif
-    s_lock_zyre_peer ();
+    s_lock_zyre_peer (__FUNCTION__, __LINE__);
     zyre_set_header (context->node, "hostname", "%s", hostname);
-    s_unlock_zyre_peer ();
+    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     s_network_unlock ();
 
     if (can_continue)
@@ -3587,11 +3578,11 @@ igs_result_t network_publish_output (igsagent_t *agent, const igs_iop_t *iop)
 
     if (!agent->is_whole_agent_muted && !iop->is_muted
         && !agent->context->is_frozen) {
-        model_read_write_lock ();
+        model_read_write_lock (__FUNCTION__, __LINE__);
         split_add_work_to_queue (agent->context, agent->uuid, iop);
         // check that this agent has not been destroyed when we were locked
         if (!agent || !(agent->uuid)) {
-            model_read_write_unlock ();
+            model_read_write_unlock (__FUNCTION__, __LINE__);
             return IGS_SUCCESS;
         }
         zmsg_t *msg = zmsg_new ();
@@ -3683,29 +3674,24 @@ igs_result_t network_publish_output (igsagent_t *agent, const igs_iop_t *iop)
               iop->name);
         }
         // 4- distribute publication message to other agents inside our context
-        // without using network
+        // without using the network
         if (!agent->is_virtual) {
             free (zmsg_popstr (msg_quater)); // remove composite uuid/iop name
             zmsg_pushstr (msg_quater,
                           iop->name); // replace it by simple iop name
             // Generate a temporary fake remote agent, containing only
             // necessary information for s_handle_publication_from_remote_agent.
-            igs_remote_agent_t *fake_remote =
-              (igs_remote_agent_t *) zmalloc (sizeof (igs_remote_agent_t));
+            igs_remote_agent_t *fake_remote = (igs_remote_agent_t *) zmalloc (sizeof (igs_remote_agent_t));
             fake_remote->context = core_context;
-            fake_remote->definition =
-              (igs_definition_t *) zmalloc (sizeof (igs_definition_t));
+            fake_remote->definition = (igs_definition_t *) zmalloc (sizeof (igs_definition_t));
             fake_remote->definition->name = agent->definition->name;
-
-            model_read_write_unlock (); // to avoid deadlock inside
-                                        // s_handle_publication_from_remote_agent
-
+            model_read_write_unlock (__FUNCTION__, __LINE__); // to avoid deadlock inside s_handle_publication_from_remote_agent
             s_handle_publication_from_remote_agent (msg_quater, fake_remote);
             free (fake_remote->definition);
             free (fake_remote);
         }
         else
-            model_read_write_unlock ();
+            model_read_write_unlock (__FUNCTION__, __LINE__);
         zmsg_destroy (&msg_quater);
     }
     else {
@@ -4026,15 +4012,22 @@ void igsagent_set_name (igsagent_t *agent, const char *name)
 {
     assert (agent);
     assert (name && strlen (name) > 0);
-    if (streq (agent->definition->name, name))
+    if (streq (agent->definition->name, name)){
+        //in early core_agent init through logs, igs_channel is undefined
+        if (!agent->igs_channel){
+            agent->igs_channel = (char *) zmalloc (strlen (agent->definition->name) + strlen ("-IGS") + 1);
+            snprintf (agent->igs_channel,
+                      IGS_MAX_AGENT_NAME_LENGTH + strlen ("-IGS") + 1,
+                      "%s-IGS", agent->definition->name);
+        }
         return;
+    }
 
     char *n = s_strndup (name, IGS_MAX_AGENT_NAME_LENGTH);
     if (strlen (name) > IGS_MAX_AGENT_NAME_LENGTH)
-        igsagent_warn (
-          agent,
-          "Agent name '%s' exceeds maximum size and will be truncated to '%s'",
-          name, n);
+        igsagent_warn (agent,
+                       "Agent name '%s' exceeds maximum size and will be truncated to '%s'",
+                       name, n);
     bool invalid_name = false;
     size_t length_ofn = strlen (n);
     size_t i = 0;
@@ -4045,10 +4038,9 @@ void igsagent_set_name (igsagent_t *agent, const char *name)
         }
     }
     if (invalid_name)
-        igsagent_warn (
-          agent,
-          "Spaces and dots are not allowed in an agent name: '%s' has been changed to '%s'",
-          name, n);
+        igsagent_warn (agent,
+                       "Spaces and dots are not allowed in an agent name: '%s' has been changed to '%s'",
+                       name, n);
     char *previous = agent->definition->name;
     agent->definition->name = n;
     agent->network_need_to_send_definition_update = true;
@@ -4064,19 +4056,19 @@ void igsagent_set_name (igsagent_t *agent, const char *name)
         if (previous) {
             char *previous_igs_channel = (char *) zmalloc (strlen (previous) + strlen ("-IGS") + 1);
             snprintf (previous_igs_channel, IGS_MAX_AGENT_NAME_LENGTH + strlen("-IGS") + 1, "%s-IGS", previous);
-            s_lock_zyre_peer ();
+            s_lock_zyre_peer (__FUNCTION__, __LINE__);
             zyre_leave (agent->context->node, previous_igs_channel);
-            s_unlock_zyre_peer ();
+            s_unlock_zyre_peer (__FUNCTION__, __LINE__);
             free (previous_igs_channel);
         }
-        s_lock_zyre_peer ();
+        s_lock_zyre_peer (__FUNCTION__, __LINE__);
         zyre_join (agent->context->node, agent->igs_channel);
-        s_unlock_zyre_peer ();
+        s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     }
 
     if (previous) {
         igsagent_debug (agent, "Agent (%s) name changed from %s to %s",
-                         agent->uuid, previous, agent->definition->name);
+                        agent->uuid, previous, agent->definition->name);
         free (previous);
     }
 }
@@ -4101,7 +4093,7 @@ void igs_freeze (void)
     core_init_context ();
     if (core_context->is_frozen == false) {
         if ((core_context != NULL) && (core_context->node != NULL)) {
-            s_lock_zyre_peer ();
+            s_lock_zyre_peer (__FUNCTION__, __LINE__);
             igsagent_t *agent, *tmp;
             HASH_ITER (hh, core_context->agents, agent, tmp)
             {
@@ -4111,14 +4103,12 @@ void igs_freeze (void)
                 zmsg_addstr (msg, agent->uuid);
                 zyre_shout (core_context->node, IGS_PRIVATE_CHANNEL, &msg);
             }
-            s_unlock_zyre_peer ();
+            s_unlock_zyre_peer (__FUNCTION__, __LINE__);
         }
         core_context->is_frozen = true;
         igs_freeze_wrapper_t *elt;
         DL_FOREACH (core_context->freeze_callbacks, elt)
-        {
             elt->callback_ptr (core_context->is_frozen, elt->my_data);
-        }
     }
 }
 
@@ -4134,7 +4124,7 @@ void igs_unfreeze (void)
     if (core_context->is_frozen == true) {
         if ((core_context->network_actor != NULL)
             && (core_context->node != NULL)) {
-            s_lock_zyre_peer ();
+            s_lock_zyre_peer (__FUNCTION__, __LINE__);
             igsagent_t *agent, *tmp;
             HASH_ITER (hh, core_context->agents, agent, tmp)
             {
@@ -4144,14 +4134,12 @@ void igs_unfreeze (void)
                 zmsg_addstr (msg, agent->uuid);
                 zyre_shout (core_context->node, IGS_PRIVATE_CHANNEL, &msg);
             }
-            s_unlock_zyre_peer ();
+            s_unlock_zyre_peer (__FUNCTION__, __LINE__);
         }
         core_context->is_frozen = false;
         igs_freeze_wrapper_t *elt;
         DL_FOREACH (core_context->freeze_callbacks, elt)
-        {
             elt->callback_ptr (core_context->is_frozen, elt->my_data);
-        }
     }
 }
 
@@ -4178,13 +4166,13 @@ void igsagent_set_state (igsagent_t *agent, const char *state)
             free (agent->state);
         agent->state = s_strndup (state, IGS_MAX_AGENT_NAME_LENGTH);
         if (agent->context->node != NULL) {
-            s_lock_zyre_peer ();
+            s_lock_zyre_peer (__FUNCTION__, __LINE__);
             zmsg_t *msg = zmsg_new ();
             zmsg_addstr (msg, STATE_MSG);
             zmsg_addstr (msg, agent->state);
             zmsg_addstr (msg, agent->uuid);
             zyre_shout (agent->context->node, IGS_PRIVATE_CHANNEL, &msg);
-            s_unlock_zyre_peer ();
+            s_unlock_zyre_peer (__FUNCTION__, __LINE__);
         }
     }
 }
@@ -4205,20 +4193,17 @@ void igsagent_mute (igsagent_t *agent)
         agent->is_whole_agent_muted = true;
         if ((agent->context->network_actor != NULL)
             && (agent->context->node != NULL)) {
-            s_lock_zyre_peer ();
+            s_lock_zyre_peer (__FUNCTION__, __LINE__);
             zmsg_t *msg = zmsg_new ();
             zmsg_addstr (msg, AGENT_MUTED_MSG);
             zmsg_addstrf (msg, "%i", agent->is_whole_agent_muted);
             zmsg_addstr (msg, agent->uuid);
             zyre_shout (agent->context->node, IGS_PRIVATE_CHANNEL, &msg);
-            s_unlock_zyre_peer ();
+            s_unlock_zyre_peer (__FUNCTION__, __LINE__);
         }
         igs_mute_wrapper_t *elt;
         DL_FOREACH (agent->mute_callbacks, elt)
-        {
-            elt->callback_ptr (agent, agent->is_whole_agent_muted,
-                               elt->my_data);
-        }
+            elt->callback_ptr (agent, agent->is_whole_agent_muted, elt->my_data);
     }
 }
 
@@ -4229,20 +4214,17 @@ void igsagent_unmute (igsagent_t *agent)
         agent->is_whole_agent_muted = false;
         if ((agent->context->network_actor != NULL)
             && (agent->context->node != NULL)) {
-            s_lock_zyre_peer ();
+            s_lock_zyre_peer (__FUNCTION__, __LINE__);
             zmsg_t *msg = zmsg_new ();
             zmsg_addstr (msg, AGENT_MUTED_MSG);
             zmsg_addstrf (msg, "%i", agent->is_whole_agent_muted);
             zmsg_addstr (msg, agent->uuid);
             zyre_shout (agent->context->node, IGS_PRIVATE_CHANNEL, &msg);
-            s_unlock_zyre_peer ();
+            s_unlock_zyre_peer (__FUNCTION__, __LINE__);
         }
         igs_mute_wrapper_t *elt;
         DL_FOREACH (agent->mute_callbacks, elt)
-        {
-            elt->callback_ptr (agent, agent->is_whole_agent_muted,
-                               elt->my_data);
-        }
+            elt->callback_ptr (agent, agent->is_whole_agent_muted, elt->my_data);
     }
 }
 
@@ -4654,10 +4636,10 @@ igs_result_t igsagent_election_join (igsagent_t *agent,
         zlist_autofree (election);
         zhash_insert (core_context->elections, el_name, election);
         if (core_context->node) {
-            s_lock_zyre_peer ();
+            s_lock_zyre_peer (__FUNCTION__, __LINE__);
             zyre_set_contest_in_group (core_context->node, el_name);
             zyre_join (core_context->node, el_name);
-            s_unlock_zyre_peer ();
+            s_unlock_zyre_peer (__FUNCTION__, __LINE__);
         }
     }
     else
@@ -4730,9 +4712,9 @@ igs_result_t igsagent_election_leave (igsagent_t *agent,
         zhash_delete (core_context->elections, el_name);
         zlist_destroy (&election);
         if (core_context->node) {
-            s_lock_zyre_peer ();
+            s_lock_zyre_peer (__FUNCTION__, __LINE__);
             zyre_leave (core_context->node, el_name);
-            s_unlock_zyre_peer ();
+            s_unlock_zyre_peer (__FUNCTION__, __LINE__);
         }
     }
     if (zhash_size (core_context->elections) == 0)
@@ -4758,9 +4740,9 @@ void igs_net_set_discovery_interval (unsigned int interval)
 {
     core_init_context ();
     if (core_context->network_actor != NULL && core_context->node != NULL) {
-        s_lock_zyre_peer ();
+        s_lock_zyre_peer (__FUNCTION__, __LINE__);
         zyre_set_interval (core_context->node, interval);
-        s_unlock_zyre_peer ();
+        s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     }
     core_context->network_discovery_interval = interval;
 }
@@ -4769,9 +4751,9 @@ void igs_net_set_timeout (unsigned int duration)
 {
     core_init_context ();
     if (core_context->network_actor != NULL && core_context->node != NULL) {
-        s_lock_zyre_peer ();
+        s_lock_zyre_peer (__FUNCTION__, __LINE__);
         zyre_set_expired_timeout (core_context->node, duration);
-        s_unlock_zyre_peer ();
+        s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     }
     core_context->network_agent_timeout = duration;
 }

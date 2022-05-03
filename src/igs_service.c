@@ -605,10 +605,10 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
 
     bool found = false;
 
-    model_read_write_lock ();
+    model_read_write_lock (__FUNCTION__, __LINE__);
     // check that this agent has not been destroyed when we were locked
     if (!agent || !(agent->uuid)) {
-        model_read_write_unlock ();
+        model_read_write_unlock (__FUNCTION__, __LINE__);
         return IGS_SUCCESS;
     }
 
@@ -705,14 +705,14 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                         zmsg_add (msg, frame);
                     }
                 }
-                s_lock_zyre_peer ();
+                s_lock_zyre_peer (__FUNCTION__, __LINE__);
                 zyre_shouts (agent->context->node, agent->igs_channel,
                              "SERVICE %s(%s) called %s.%s(%s)",
                              agent->definition->name, agent->uuid,
                              remote_agent->definition->name, service_name,
                              remote_agent->uuid);
                 zyre_whisper (agent->context->node, remote_agent->peer->peer_id, &msg);
-                s_unlock_zyre_peer ();
+                s_unlock_zyre_peer (__FUNCTION__, __LINE__);
                 if (core_context->enable_service_logging)
                     s_service_log_sent_service (agent, remote_agent->definition->name, remote_agent->uuid,
                                                 service_name, *list);
@@ -735,11 +735,8 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                 igs_service_arg_t *arg = NULL;
                 found = true;
                 if (local_agent->definition == NULL) {
-                    igsagent_error (agent,
-                                     "definition is unknown for %s(%s) : "
-                                     "service will not be sent",
-                                     local_agent->definition->name,
-                                     agent_name_or_uuid);
+                    igsagent_error (agent, "definition is unknown for %s(%s) : service will not be sent",
+                                    local_agent->definition->name,agent_name_or_uuid);
                     continue;
                 }
                 else {
@@ -754,48 +751,37 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                         LL_COUNT (service->arguments, arg,
                                   defined_nb_arguments);
                         if (nb_arguments != defined_nb_arguments) {
-                            igsagent_error (
-                              agent,
-                              "passed number of arguments is not correct "
-                              "(received: %zu / "
-                              "expected: %zu) : service will not be sent",
-                              nb_arguments, defined_nb_arguments);
+                            igsagent_error (agent, "passed number of arguments is not correct (received: %zu / "
+                                            "expected: %zu) : service will not be sent", nb_arguments, defined_nb_arguments);
                             continue;
                         }
                         else {
                             // update service arguments values with new ones
-                            if (service->arguments && (list != NULL))
-                                service_copy_arguments (*list,
-                                                        service->arguments);
-                            if (service->cb != NULL) {
+                            if (service->arguments && list)
+                                service_copy_arguments (*list, service->arguments);
+                            if (service->cb) {
+                                model_read_write_unlock (__FUNCTION__, __LINE__);
                                 (service->cb) (local_agent, agent->definition->name,
                                                agent->uuid, service_name, service->arguments,
                                                nb_arguments, token, service->cb_data);
+                                model_read_write_lock (__FUNCTION__, __LINE__);
                                 service_free_values_in_arguments (service->arguments);
-                                if (core_context->enable_service_logging) {
+                                if (core_context->enable_service_logging)
                                     service_log_received_service (local_agent, agent->definition->name,
                                                                   agent->uuid, service_name, *list);
-                                }
                             }
                             else
-                                igsagent_error (agent,
-                                                 "no defined callback to "
-                                                 "handle received service %s",
-                                                 service_name);
+                                igsagent_error (agent, "no defined callback to handle received service %s", service_name);
                         }
                     }
                     else {
-                        igsagent_error (
-                          agent,
-                          "could not find service named %s for %s (%s) : "
-                          "service will not be sent",
-                          service_name, local_agent->definition->name,
-                          local_agent->uuid);
+                        igsagent_error (agent, "could not find service named %s for %s (%s) : service will not be sent",
+                                        service_name, local_agent->definition->name,local_agent->uuid);
                         continue;
                     }
                 }
 
-                s_lock_zyre_peer ();
+                s_lock_zyre_peer (__FUNCTION__, __LINE__);
                 if (core_context->node != NULL) {
                     zyre_shouts (agent->context->node, agent->igs_channel,
                                  "SERVICE %s(%s) called %s.%s(%s)",
@@ -803,7 +789,7 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                                  local_agent->definition->name, service_name,
                                  local_agent->uuid);
                 }
-                s_unlock_zyre_peer ();
+                s_unlock_zyre_peer (__FUNCTION__, __LINE__);
 
                 if (core_context->enable_service_logging)
                     s_service_log_sent_service (agent, local_agent->definition->name, local_agent->uuid,
@@ -820,11 +806,10 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
         s_service_free_service_arguments (*list);
         *list = NULL;
     }
-    model_read_write_unlock ();
+    model_read_write_unlock (__FUNCTION__, __LINE__);
     if (!found) {
-        igsagent_error (agent,
-                         "could not find an agent with name or UUID : %s",
-                         agent_name_or_uuid);
+        igsagent_error (agent, "could not find an agent with name or UUID : %s",
+                        agent_name_or_uuid);
         return IGS_FAILURE;
     }
     return IGS_SUCCESS;

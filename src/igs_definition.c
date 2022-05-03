@@ -76,10 +76,10 @@ igs_result_t definition_add_iop_to_definition (igsagent_t *agent,
     assert (agent);
     assert (iop);
     assert (def);
-    model_read_write_lock ();
+    model_read_write_lock (__FUNCTION__, __LINE__);
     // check that this agent has not been destroyed when we were locked
     if (!agent || !(agent->uuid)) {
-        model_read_write_unlock ();
+        model_read_write_unlock (__FUNCTION__, __LINE__);
         return IGS_SUCCESS;
     }
     igs_iop_t *previousIOP = NULL;
@@ -99,7 +99,7 @@ igs_result_t definition_add_iop_to_definition (igsagent_t *agent,
     if (previousIOP != NULL) {
         igsagent_error (agent, "%s already exists and cannot be overwritten",
                          iop->name);
-        model_read_write_unlock ();
+        model_read_write_unlock (__FUNCTION__, __LINE__);
         return IGS_FAILURE;
     }
     switch (iop_type) {
@@ -115,7 +115,7 @@ igs_result_t definition_add_iop_to_definition (igsagent_t *agent,
         default:
             break;
     }
-    model_read_write_unlock ();
+    model_read_write_unlock (__FUNCTION__, __LINE__);
     return IGS_SUCCESS;
 }
 
@@ -187,41 +187,37 @@ void definition_free_definition (igs_definition_t **def)
 {
     assert (def);
     assert (*def);
-    if ((*def)->name != NULL) {
+    if ((*def)->name) {
         free ((char *) (*def)->name);
         (*def)->name = NULL;
     }
-    if ((*def)->family != NULL) {
+    if ((*def)->family) {
         free ((char *) (*def)->family);
         (*def)->family = NULL;
     }
-    if ((*def)->description != NULL) {
+    if ((*def)->description) {
         free ((char *) (*def)->description);
         (*def)->description = NULL;
     }
-    if ((*def)->version != NULL) {
+    if ((*def)->version) {
         free ((char *) (*def)->version);
         (*def)->version = NULL;
     }
     igs_iop_t *current_iop, *tmp_iop;
-    HASH_ITER (hh, (*def)->params_table, current_iop, tmp_iop)
-    {
+    HASH_ITER (hh, (*def)->params_table, current_iop, tmp_iop){
         HASH_DEL ((*def)->params_table, current_iop);
         s_definition_free_iop (&current_iop);
     }
-    HASH_ITER (hh, (*def)->inputs_table, current_iop, tmp_iop)
-    {
+    HASH_ITER (hh, (*def)->inputs_table, current_iop, tmp_iop){
         HASH_DEL ((*def)->inputs_table, current_iop);
         s_definition_free_iop (&current_iop);
     }
-    HASH_ITER (hh, (*def)->outputs_table, current_iop, tmp_iop)
-    {
+    HASH_ITER (hh, (*def)->outputs_table, current_iop, tmp_iop){
         HASH_DEL ((*def)->outputs_table, current_iop);
         s_definition_free_iop (&current_iop);
     }
     igs_service_t *service, *tmp_service;
-    HASH_ITER (hh, (*def)->services_table, service, tmp_service)
-    {
+    HASH_ITER (hh, (*def)->services_table, service, tmp_service){
         HASH_DEL ((*def)->services_table, service);
         service_free_service (service);
     }
@@ -235,10 +231,10 @@ void definition_free_definition (igs_definition_t **def)
 void igsagent_clear_definition (igsagent_t *agent)
 {
     assert (agent);
-    model_read_write_lock ();
+    model_read_write_lock (__FUNCTION__, __LINE__);
     // check that this agent has not been destroyed when we were locked
     if (!agent || !(agent->uuid)) {
-        model_read_write_unlock ();
+        model_read_write_unlock (__FUNCTION__, __LINE__);
         return;
     }
     char *previous_name = NULL;
@@ -247,18 +243,16 @@ void igsagent_clear_definition (igsagent_t *agent)
             previous_name = strdup (agent->definition->name);
         definition_free_definition (&agent->definition);
     }
-    agent->definition =
-      (igs_definition_t *) zmalloc (sizeof (igs_definition_t));
+    agent->definition = (igs_definition_t *) zmalloc (sizeof (igs_definition_t));
     if (previous_name) {
         agent->definition->name = previous_name;
         igsagent_debug (agent, "Reuse previous name '%s'", previous_name);
-    }
-    else {
+    } else {
         agent->definition->name = strdup (IGS_DEFAULT_AGENT_NAME);
         // igsagent_debug(agent, "Use default name '%s'", IGS_DEFAULT_AGENT_NAME);
     }
     agent->network_need_to_send_definition_update = true;
-    model_read_write_unlock ();
+    model_read_write_unlock (__FUNCTION__, __LINE__);
 }
 
 char *igsagent_definition_json (igsagent_t *agent)
@@ -392,16 +386,16 @@ igs_result_t igsagent_input_remove (igsagent_t *agent, const char *name)
         igsagent_error (agent, "The input %s could not be found", name);
         return IGS_FAILURE;
     }
-    model_read_write_lock ();
+    model_read_write_lock (__FUNCTION__, __LINE__);
     // check that this agent has not been destroyed when we were locked
     if (!agent || !(agent->uuid)) {
-        model_read_write_unlock ();
+        model_read_write_unlock (__FUNCTION__, __LINE__);
         return IGS_SUCCESS;
     }
     HASH_DEL (agent->definition->inputs_table, iop);
     s_definition_free_iop (&iop);
-    model_read_write_unlock ();
     agent->network_need_to_send_definition_update = true;
+    model_read_write_unlock (__FUNCTION__, __LINE__);
     return IGS_SUCCESS;
 }
 
@@ -415,16 +409,16 @@ igs_result_t igsagent_output_remove (igsagent_t *agent, const char *name)
         igsagent_error (agent, "The output %s could not be found", name);
         return IGS_FAILURE;
     }
-    model_read_write_lock ();
+    model_read_write_lock (__FUNCTION__, __LINE__);
     // check that this agent has not been destroyed when we were locked
     if (!agent || !(agent->uuid)) {
-        model_read_write_unlock ();
+        model_read_write_unlock (__FUNCTION__, __LINE__);
         return IGS_SUCCESS;
     }
     HASH_DEL (agent->definition->outputs_table, iop);
     s_definition_free_iop (&iop);
-    model_read_write_unlock ();
     agent->network_need_to_send_definition_update = true;
+    model_read_write_unlock (__FUNCTION__, __LINE__);
     return IGS_SUCCESS;
 }
 
@@ -438,16 +432,16 @@ igs_result_t igsagent_parameter_remove (igsagent_t *agent, const char *name)
         igsagent_error (agent, "The parameter %s could not be found", name);
         return IGS_FAILURE;
     }
-    model_read_write_lock ();
+    model_read_write_lock (__FUNCTION__, __LINE__);
     // check that this agent has not been destroyed when we were locked
     if (!agent || !(agent->uuid)) {
-        model_read_write_unlock ();
+        model_read_write_unlock (__FUNCTION__, __LINE__);
         return IGS_SUCCESS;
     }
     HASH_DEL (agent->definition->params_table, iop);
     s_definition_free_iop (&iop);
-    model_read_write_unlock ();
     agent->network_need_to_send_definition_update = true;
+    model_read_write_unlock (__FUNCTION__, __LINE__);
     return IGS_SUCCESS;
 }
 
@@ -455,25 +449,25 @@ void igsagent_definition_set_path (igsagent_t *agent, const char *path)
 {
     assert (agent);
     assert (path);
-    model_read_write_lock ();
+    model_read_write_lock (__FUNCTION__, __LINE__);
     // check that this agent has not been destroyed when we were locked
     if (!agent || !(agent->uuid)) {
-        model_read_write_unlock ();
+        model_read_write_unlock (__FUNCTION__, __LINE__);
         return;
     }
     if (agent->definition_path)
         free (agent->definition_path);
     agent->definition_path = s_strndup (path, IGS_MAX_PATH_LENGTH);
     if (core_context->network_actor && core_context->node) {
-        s_lock_zyre_peer ();
+        s_lock_zyre_peer (__FUNCTION__, __LINE__);
         zmsg_t *msg = zmsg_new ();
         zmsg_addstr (msg, DEFINITION_FILE_PATH_MSG);
         zmsg_addstr (msg, agent->definition_path);
         zmsg_addstr (msg, agent->uuid);
         zyre_shout (core_context->node, IGS_PRIVATE_CHANNEL, &msg);
-        s_unlock_zyre_peer ();
+        s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     }
-    model_read_write_unlock ();
+    model_read_write_unlock (__FUNCTION__, __LINE__);
 }
 
 void igsagent_definition_save (igsagent_t *agent)
@@ -484,10 +478,10 @@ void igsagent_definition_save (igsagent_t *agent)
         igsagent_error (agent, "no path configured to save definition");
         return;
     }
-    model_read_write_lock ();
+    model_read_write_lock (__FUNCTION__, __LINE__);
     // check that this agent has not been destroyed when we were locked
     if (!agent || !(agent->uuid)) {
-        model_read_write_unlock ();
+        model_read_write_unlock (__FUNCTION__, __LINE__);
         return;
     }
     FILE *fp = NULL;
@@ -504,5 +498,5 @@ void igsagent_definition_save (igsagent_t *agent)
         fclose (fp);
         free (def);
     }
-    model_read_write_unlock ();
+    model_read_write_unlock (__FUNCTION__, __LINE__);
 }

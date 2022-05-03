@@ -25,9 +25,8 @@ void s_agent_propagate_agent_event (igs_agent_event_t event,
     HASH_ITER (hh, core_context->agents, agent, tmp){
         if (!streq (uuid, agent->uuid)) {
             igs_agent_event_wrapper_t *cb;
-            DL_FOREACH (agent->agent_event_callbacks, cb){
+            DL_FOREACH (agent->agent_event_callbacks, cb)
                 cb->callback_ptr (agent, event, uuid, name, event_data, cb->my_data);
-            }
         }
     }
 }
@@ -40,8 +39,7 @@ igsagent_t *igsagent_new (const char *name, bool activate_immediately)
     zuuid_t *uuid = zuuid_new ();
     agent->uuid = strdup (zuuid_str (uuid));
     zuuid_destroy (&uuid);
-    igsagent_clear_definition (
-      agent); // set valid but empty definition, preserve name
+    igsagent_clear_definition (agent); // set valid but empty definition, preserve name
     igsagent_set_name (agent, name);
     assert (agent->definition);
     igsagent_clear_mappings (agent); // set valid but empty mapping
@@ -55,7 +53,7 @@ void igsagent_destroy (igsagent_t **agent)
 {
     assert (agent);
     assert (*agent);
-    model_read_write_lock ();
+    model_read_write_lock (__FUNCTION__, __LINE__);
     if (igsagent_is_activated (*agent))
         igsagent_deactivate (*agent);
 
@@ -97,7 +95,7 @@ void igsagent_destroy (igsagent_t **agent)
         definition_free_definition (&(*agent)->definition);
     free (*agent);
     *agent = NULL;
-    model_read_write_unlock ();
+    model_read_write_unlock (__FUNCTION__, __LINE__);
 }
 
 igs_result_t igsagent_activate (igsagent_t *agent)
@@ -105,9 +103,9 @@ igs_result_t igsagent_activate (igsagent_t *agent)
     assert (agent);
     igsagent_t *a = NULL;
     HASH_FIND_STR (core_context->agents, agent->uuid, a);
-    if (a != NULL) {
+    if (a) {
         igsagent_error (agent, "agent %s (%s) is already activated",
-                         agent->definition->name, agent->uuid);
+                        agent->definition->name, agent->uuid);
         return IGS_FAILURE;
     }
     agent->context = core_context;
@@ -117,14 +115,12 @@ igs_result_t igsagent_activate (igsagent_t *agent)
     HASH_ADD_STR (core_context->agents, uuid, agent);
     igsagent_wrapper_t *agent_wrapper_cb;
     DL_FOREACH (agent->activate_callbacks, agent_wrapper_cb)
-    {
         agent_wrapper_cb->callback_ptr (agent, true, agent_wrapper_cb->my_data);
-    }
 
     if (agent->context && agent->context->node) {
-        s_lock_zyre_peer ();
+        s_lock_zyre_peer (__FUNCTION__, __LINE__);
         zyre_join (agent->context->node, agent->igs_channel);
-        s_unlock_zyre_peer ();
+        s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     }
 
     // notify all other agents inside this context that we have arrived
@@ -151,14 +147,11 @@ igs_result_t igsagent_activate (igsagent_t *agent)
         }
     }
     igs_remote_agent_t *r, *rtmp;
-    HASH_ITER (hh, core_context->remote_agents, r, rtmp)
-    {
+    HASH_ITER (hh, core_context->remote_agents, r, rtmp){
         igs_agent_event_wrapper_t *cb;
         DL_FOREACH (agent->agent_event_callbacks, cb)
-        {
             cb->callback_ptr (agent, IGS_AGENT_ENTERED, r->uuid,
                               r->definition->name, NULL, cb->my_data);
-        }
     }
     return IGS_SUCCESS;
 }
@@ -176,19 +169,17 @@ igs_result_t igsagent_deactivate (igsagent_t *agent)
     HASH_DEL (core_context->agents, agent);
     igsagent_wrapper_t *cb;
     DL_FOREACH (agent->activate_callbacks, cb)
-    {
         cb->callback_ptr (agent, false, cb->my_data);
-    }
     if (agent->context && agent->context->network_actor
         && agent->context->node) {
-        s_lock_zyre_peer ();
+        s_lock_zyre_peer (__FUNCTION__, __LINE__);
         zmsg_t *msg = zmsg_new ();
         zmsg_addstr (msg, REMOTE_AGENT_EXIT_MSG);
         zmsg_addstr (msg, agent->uuid);
         zmsg_addstr (msg, agent->definition->name);
         zyre_shout (agent->context->node, IGS_PRIVATE_CHANNEL, &msg);
         zyre_leave (agent->context->node, agent->igs_channel);
-        s_unlock_zyre_peer ();
+        s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     }
     agent->context = NULL;
 

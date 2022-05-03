@@ -104,8 +104,6 @@ lib-deploy-macos:
   only:
     refs:
       - main
-    variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
 
 
 # Build/Deploy ingescape on macos-qt6 runner
@@ -140,8 +138,6 @@ lib-deploy-macos-qt6:
   only:
     refs:
       - main
-    variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
 
 
 #__          ___           _
@@ -345,8 +341,6 @@ lib-deploy-windows:
   only:
     refs:
       - main
-    variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
 
 # _      _
 #| |    (_)
@@ -420,8 +414,6 @@ lib-deploy-linux-release-x64:
   only:
     refs:
       - main
-    variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
 
 
 ##

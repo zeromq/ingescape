@@ -20,13 +20,19 @@
 
 igs_mutex_t bus_zyre_mutex;
 static bool s_bus_zyre_mutex_initialized = false;
+static int s_zyre_lock_counter = 0;
 
 ////////////////////////////////////////////////////////////////////////
 // INTERNAL FUNCTIONS
 ////////////////////////////////////////////////////////////////////////
 
-void s_lock_zyre_peer (void)
+void s_lock_zyre_peer (const char *function, int line)
 {
+    if (IGS_ZYRE_PEER_MUTEX_DEBUG){
+        printf("---s_lock_zyre_peer from %s (line %d)\n", function, line);
+        if (s_zyre_lock_counter++)
+            printf("---s_lock_zyre_peer ACTIVE\n");
+    }
     if (!s_bus_zyre_mutex_initialized) {
         IGS_MUTEX_INIT (bus_zyre_mutex);
         s_bus_zyre_mutex_initialized = true;
@@ -34,8 +40,12 @@ void s_lock_zyre_peer (void)
     IGS_MUTEX_LOCK (bus_zyre_mutex);
 }
 
-void s_unlock_zyre_peer (void)
+void s_unlock_zyre_peer (const char *function, int line)
 {
+    if (IGS_ZYRE_PEER_MUTEX_DEBUG){
+        printf("-s_unlock_zyre_peer from %s (line %d)\n", function, line);
+        s_zyre_lock_counter--;
+    }
     assert (s_bus_zyre_mutex_initialized);
     IGS_MUTEX_UNLOCK (bus_zyre_mutex);
 }
@@ -52,9 +62,9 @@ igs_result_t igs_channel_join (const char *channel)
         return IGS_FAILURE;
     }
     if (core_context->network_actor != NULL && core_context->node != NULL) {
-        s_lock_zyre_peer ();
+        s_lock_zyre_peer (__FUNCTION__, __LINE__);
         zyre_join (core_context->node, channel);
-        s_unlock_zyre_peer ();
+        s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     } else {
         igs_error ("Ingescape must be started before joining a channel");
         return IGS_FAILURE;
@@ -67,9 +77,9 @@ void igs_channel_leave (const char *channel)
     core_init_context ();
     assert (channel && strlen (channel) > 0);
     if (core_context->network_actor != NULL && core_context->node != NULL) {
-        s_lock_zyre_peer ();
+        s_lock_zyre_peer (__FUNCTION__, __LINE__);
         zyre_leave (core_context->node, channel);
-        s_unlock_zyre_peer ();
+        s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     }
     else
         igs_warn ("Ingescape is not started, this command will be ignored");
@@ -94,10 +104,10 @@ igs_result_t igs_channel_shout_str (const char *channel, const char *msg, ...)
     va_start (list, msg);
     vsnprintf (content, IGS_MAX_STRING_MSG_LENGTH - 1, msg, list);
     va_end (list);
-    s_lock_zyre_peer ();
+    s_lock_zyre_peer (__FUNCTION__, __LINE__);
     if (zyre_shouts (core_context->node, channel, "%s", content) != 0)
         res = IGS_FAILURE;
-    s_unlock_zyre_peer ();
+    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     return res;
 }
 
@@ -117,10 +127,10 @@ igs_result_t igs_channel_shout_data (const char *channel, void *data, size_t siz
     zframe_t *frame = zframe_new (data, size);
     zmsg_t *msg = zmsg_new ();
     zmsg_append (msg, &frame);
-    s_lock_zyre_peer ();
+    s_lock_zyre_peer (__FUNCTION__, __LINE__);
     if (zyre_shout (core_context->node, channel, &msg) != 0)
         res = IGS_FAILURE;
-    s_unlock_zyre_peer ();
+    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     return res;
 }
 
@@ -139,10 +149,10 @@ igs_result_t igs_channel_shout_zmsg (const char *channel, zmsg_t **msg_p)
         return IGS_FAILURE;
     }
     igs_result_t res = IGS_SUCCESS;
-    s_lock_zyre_peer ();
+    s_lock_zyre_peer (__FUNCTION__, __LINE__);
     if (zyre_shout (core_context->node, channel, msg_p) != 0)
         res = IGS_FAILURE;
-    s_unlock_zyre_peer ();
+    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     return res;
 }
 
@@ -168,13 +178,13 @@ igs_result_t igs_channel_whisper_str (const char *agent_name_or_agent_id_or_peer
             va_start (list, msg);
             vsnprintf (content, IGS_MAX_STRING_MSG_LENGTH - 1, msg, list);
             va_end (list);
-            s_lock_zyre_peer ();
+            s_lock_zyre_peer (__FUNCTION__, __LINE__);
             zmsg_t *msg_to_send = zmsg_new ();
             zmsg_addstr (msg_to_send, content);
             zmsg_addstr (msg_to_send, agent->uuid);
             if (zyre_whisper (core_context->node, agent->peer->peer_id, &msg_to_send) != 0)
                 res = IGS_FAILURE;
-            s_unlock_zyre_peer ();
+            s_unlock_zyre_peer (__FUNCTION__, __LINE__);
             has_sent = true;
             // NB: no break to support multiple agents with same name
         }
@@ -192,10 +202,10 @@ igs_result_t igs_channel_whisper_str (const char *agent_name_or_agent_id_or_peer
                 va_start (list, msg);
                 vsnprintf (content, IGS_MAX_STRING_MSG_LENGTH - 1, msg, list);
                 va_end (list);
-                s_lock_zyre_peer ();
+                s_lock_zyre_peer (__FUNCTION__, __LINE__);
                 if (zyre_whispers (core_context->node, el->peer_id, "%s", content) != 0)
                     res = IGS_FAILURE;
-                s_unlock_zyre_peer ();
+                s_unlock_zyre_peer (__FUNCTION__, __LINE__);
             }
         }
     }
@@ -222,10 +232,10 @@ igs_result_t igs_channel_whisper_data (const char *agent_name_or_agent_id_or_pee
             zmsg_t *msg = zmsg_new ();
             zmsg_append (msg, &frame);
             zmsg_addstr (msg, agent->uuid);
-            s_lock_zyre_peer ();
+            s_lock_zyre_peer (__FUNCTION__, __LINE__);
             if (zyre_whisper (core_context->node, agent->peer->peer_id, &msg) != 0)
                 res = IGS_FAILURE;
-            s_unlock_zyre_peer ();
+            s_unlock_zyre_peer (__FUNCTION__, __LINE__);
             has_sent = true;
             // NB: no break to support multiple agents with same name
         }
@@ -241,10 +251,10 @@ igs_result_t igs_channel_whisper_data (const char *agent_name_or_agent_id_or_pee
                 zframe_t *frame = zframe_new (data, size);
                 zmsg_t *msg = zmsg_new ();
                 zmsg_append (msg, &frame);
-                s_lock_zyre_peer ();
+                s_lock_zyre_peer (__FUNCTION__, __LINE__);
                 if (zyre_whisper (core_context->node, el->peer_id, &msg) != 0)
                     res = IGS_FAILURE;
-                s_unlock_zyre_peer ();
+                s_unlock_zyre_peer (__FUNCTION__, __LINE__);
             }
         }
     }
@@ -271,10 +281,10 @@ igs_result_t igs_channel_whisper_zmsg (const char *agent_name_or_agent_id_or_pee
             || streq (agent->uuid, agent_name_or_agent_id_or_peer_id)) {
             zmsg_t *dup = zmsg_dup (*msg_p);
             zmsg_addstr ( dup, agent->uuid); // add agent uuid at the end of the message
-            s_lock_zyre_peer ();
+            s_lock_zyre_peer (__FUNCTION__, __LINE__);
             if (zyre_whisper (core_context->node, agent->peer->peer_id, &dup) != 0)
                 res = IGS_FAILURE;
-            s_unlock_zyre_peer ();
+            s_unlock_zyre_peer (__FUNCTION__, __LINE__);
             has_sent = true;
             // NB: no break to support multiple agents with same name
         }
@@ -288,10 +298,10 @@ igs_result_t igs_channel_whisper_zmsg (const char *agent_name_or_agent_id_or_pee
             if (streq (el->name, agent_name_or_agent_id_or_peer_id)
                 || streq (el->peer_id, agent_name_or_agent_id_or_peer_id)) {
                 zmsg_t *dup = zmsg_dup (*msg_p);
-                s_lock_zyre_peer ();
+                s_lock_zyre_peer (__FUNCTION__, __LINE__);
                 if (zyre_whisper (core_context->node, el->peer_id, &dup) != 0)
                     res = IGS_FAILURE;
-                s_unlock_zyre_peer ();
+                s_unlock_zyre_peer (__FUNCTION__, __LINE__);
                 has_sent = true;
             }
         }

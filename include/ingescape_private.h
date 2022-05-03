@@ -490,8 +490,9 @@ const igs_iop_t* model_write_iop (igsagent_t *agent, const char *iop_name, igs_i
                                   igs_iop_value_type_t val_type, void* value, size_t size);
 igs_iop_t* model_find_iop_by_name(igsagent_t *agent, const char* name, igs_iop_type_t type);
 char* model_get_iop_value_as_string (igs_iop_t* iop); //caller owns returned value
-void model_read_write_lock(void);
-void model_read_write_unlock(void);
+#define IGS_MODEL_READ_WRITE_MUTEX_DEBUG 0
+void model_read_write_lock(const char *function, int line);
+void model_read_write_unlock(const char *function, int line);
 igs_constraint_t* s_model_parse_constraint(igs_iop_value_type_t type,
                                            const char *expression,char **error);
 
@@ -516,8 +517,9 @@ void s_admin_make_file_path(const char *from, char *to, size_t size_of_to);
 void admin_log(igsagent_t *agent, igs_log_level_t, const char *function, const char *format, ...)  CHECK_PRINTF (4);
 
 // channels
-void s_lock_zyre_peer(void);
-void s_unlock_zyre_peer(void);
+#define IGS_ZYRE_PEER_MUTEX_DEBUG 0
+void s_lock_zyre_peer(const char *function, int line);
+void s_unlock_zyre_peer(const char *function, int line);
 
 // service
 void service_free_service(igs_service_t *t);
