@@ -279,6 +279,7 @@ lib-installer-runtime-windows-x64:
   needs: 
     - lib-windows-release-x64
     - binding-csharp-windows-x64-release
+    - test-csharp-release
 
 # Create runtime install for windows 32 bits (debug)
 lib-installer-debug-windows-x86:
@@ -301,7 +302,7 @@ lib-installer-debug-windows-x86:
     - lib-windows-debug-x86
     - binding-csharp-windows-x86-debug
   needs: 
-    - lib-windows-debug-x86"
+    - lib-windows-debug-x86
     - binding-csharp-windows-x86-debug
 
 # Create runtime install for windows 64 bits (debug)
@@ -325,8 +326,9 @@ lib-installer-debug-windows-x64:
     - lib-windows-debug-x64
     - binding-csharp-windows-x64-debug
   needs: 
-    - lib-windows-debug-x64"
+    - lib-windows-debug-x64
     - binding-csharp-windows-x64-debug
+    - test-csharp-debug
 
 
 # Deploy ingescape in windows to be able to compile agents
