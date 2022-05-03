@@ -1142,12 +1142,12 @@ test-csharp-debug:
     - cd bindings
     - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64\lib;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64\bin"
     - copy csharp\IngescapeCSharpWrapper\IngescapeCSharp\build\DebugX64\Debug\netstandard2.0\IngescapeCSharp.dll $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64\ -Force
-    - cmake -S csharp/IngescapeCSharpWrapper/unitTest/Tester -B csharp/IngescapeCSharpWrapper/unitTest/Tester/build/DebugX64 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Debug
-    - cmake --build csharp/IngescapeCSharpWrapper/unitTest/Tester/build/DebugX64 --config Debug
-    - C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe csharp/IngescapeCSharpWrapper/unitTest/Tester/build/DebugX64/Debug/Tester.dll /Platform:x64
+    - cmake -S csharp/IngescapeCSharpWrapper/test/Tester -B csharp/IngescapeCSharpWrapper/test/Tester/build/DebugX64 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Debug
+    - cmake --build csharp/IngescapeCSharpWrapper/test/Tester/build/DebugX64 --config Debug
+    - C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe csharp/IngescapeCSharpWrapper/test/Tester/build/DebugX64/Debug/Tester.dll /Platform:x64
   artifacts:
     paths:
-      - bindings/csharp/IngescapeCSharpWrapper/unitTest/Tester/build/DebugX64
+      - bindings/csharp/IngescapeCSharpWrapper/test/Tester/build/DebugX64
   dependencies:
     - binding-csharp-windows-x64-debug
 
@@ -1161,12 +1161,12 @@ test-csharp-release:
     - cd bindings
     - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64\lib;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64\bin"
     - copy csharp\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64\Release\netstandard2.0\IngescapeCSharp.dll $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64\ -Force
-    - cmake -S csharp/IngescapeCSharpWrapper/unitTest/Tester -B csharp/IngescapeCSharpWrapper/unitTest/Tester/build/ReleaseX64 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release
-    - cmake --build csharp/IngescapeCSharpWrapper/unitTest/Tester/build/ReleaseX64 --config Release
-    - C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe csharp/IngescapeCSharpWrapper/unitTest/Tester/build/ReleaseX64/Release/Tester.dll /Platform:x64
+    - cmake -S csharp/IngescapeCSharpWrapper/test/Tester -B csharp/IngescapeCSharpWrapper/test/Tester/build/ReleaseX64 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release
+    - cmake --build csharp/IngescapeCSharpWrapper/test/Tester/build/ReleaseX64 --config Release
+    - C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe csharp/IngescapeCSharpWrapper/test/Tester/build/ReleaseX64/Release/Tester.dll /Platform:x64
   artifacts:
     paths:
-      - bindings/csharp/IngescapeCSharpWrapper/unitTest/Tester/build/ReleaseX64
+      - bindings/csharp/IngescapeCSharpWrapper/test/Tester/build/ReleaseX64
   dependencies:
     - binding-csharp-windows-x64-release
 
