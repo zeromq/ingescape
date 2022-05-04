@@ -1153,6 +1153,10 @@ test-csharp-x64-debug:
   dependencies:
     - binding-csharp-windows-x64-debug
     - lib-windows-debug-x64
+  needs:
+    - binding-csharp-windows-x64-debug
+    - lib-windows-debug-x64
+
 
 test-csharp-x64-release:
   stage: binding-test
@@ -1168,6 +1172,9 @@ test-csharp-x64-release:
     - cmake --build csharp/IngescapeCSharpWrapper/test/Tester/build/ReleaseX64 --config Release
     - C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe csharp/IngescapeCSharpWrapper/test/Tester/build/ReleaseX64/Release/Tester.dll /Platform:x64
   dependencies:
+    - binding-csharp-windows-x64-release
+    - lib-windows-release-x64
+  needs:
     - binding-csharp-windows-x64-release
     - lib-windows-release-x64
 
@@ -1187,6 +1194,9 @@ test-csharp-x86-debug:
   dependencies:
     - binding-csharp-windows-x86-debug
     - lib-windows-debug-x86
+  needs:
+    - binding-csharp-windows-x86-debug
+    - lib-windows-debug-x86
 
 test-csharp-x86-release:
   stage: binding-test
@@ -1202,6 +1212,9 @@ test-csharp-x86-release:
     - cmake --build csharp/IngescapeCSharpWrapper/test/Tester/build/ReleaseX86 --config Release
     - C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe csharp/IngescapeCSharpWrapper/test/Tester/build/ReleaseX86/Release/Tester.dll /Platform:x86
   dependencies:
+    - binding-csharp-windows-x86-release
+    - lib-windows-release-x86
+  needs:
     - binding-csharp-windows-x86-release
     - lib-windows-release-x86
 
