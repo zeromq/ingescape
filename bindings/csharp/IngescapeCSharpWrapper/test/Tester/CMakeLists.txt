@@ -53,6 +53,33 @@ add_library(${PROJECT_NAME} SHARED ${test_sources})
 #	message(FATAL_ERROR "Dependency not found")
 #endif (NOT INGESCAPE_CSHARP_FOUND)
 
+if (WIN32)
+	if(CMAKE_CL_64)
+		if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+			set(_PATH_CSHARP "${CMAKE_CURRENT_SOURCE_DIR}/../../IngescapeCSharp/build/DebugX64/Debug/netstandard2.0/IngescapeCSharp.dll")
+		else()
+			set(_PATH_CSHARP "${CMAKE_CURRENT_SOURCE_DIR}/../../IngescapeCSharp/build/ReleaseX64/Release/netstandard2.0/IngescapeCSharp.dll")
+	else ()
+		if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+			set(_PATH_CSHARP "${CMAKE_CURRENT_SOURCE_DIR}/../../IngescapeCSharp/build/DebugX86/Debug/netstandard2.0/IngescapeCSharp.dll")
+		else()
+			set(_PATH_CSHARP "${CMAKE_CURRENT_SOURCE_DIR}/../../IngescapeCSharp/build/ReleaseX86/Release/netstandard2.0/IngescapeCSharp.dll")
+endif (WIN32)
+
+# On windows find library search .dll and .lib but csharp binding do not produce .lib
+find_file (
+    INGESCAPE_CSHARP_LIBRARIES
+    NAME IngescapeCSharp${CMAKE_SHARED_LIBRARY_SUFFIX}
+    HINTS ${_PATH_CSHARP}
+)
+
+include(FindPackageHandleStandardArgs)
+
+find_package_handle_standard_args(
+    INGESCAPE_CSHARP
+    REQUIRED_VARS INGESCAPE_CSHARP_LIBRARIES
+)
+
 set_property(TARGET ${CMAKE_PROJECT_NAME} PROPERTY VS_DOTNET_REFERENCES
 	"Microsoft.CSharp"
 	"System"
