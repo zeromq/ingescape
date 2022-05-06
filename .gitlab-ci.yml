@@ -1144,10 +1144,8 @@ test-csharp-x64-debug:
   variables:
     ARCH: "x64-debug"
   script:
-    - cd bindings
-    - $env:PATH += "$env:build\DebugX64\Debug;$env:build\DebugX64\dependencies\czmq\Debug;$env:build\DebugX64\dependencies\libzmq\lib\Debug;$env:build\DebugX64\dependencies\sodium\Debug;$env:build\DebugX64\dependencies\zyre\Debug"    
+    - cd bindings    
     - cmake -S csharp/IngescapeCSharpWrapper/test/Tester -B csharp/IngescapeCSharpWrapper/test/Tester/build/DebugX64 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Debug
-    - copy csharp\IngescapeCSharpWrapper\IngescapeCSharp\build\DebugX64\Debug\netstandard2.0\IngescapeCSharp.dll csharp/IngescapeCSharpWrapper/test/Tester/build/DebugX64
     - cmake --build csharp/IngescapeCSharpWrapper/test/Tester/build/DebugX64 --config Debug
     - C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe csharp/IngescapeCSharpWrapper/test/Tester/build/DebugX64/Debug/Tester.dll /Platform:x64
   dependencies:
@@ -1166,9 +1164,7 @@ test-csharp-x64-release:
     ARCH: "x64-release"
   script:
     - cd bindings
-    - $env:PATH += "$env:build\ReleaseX64\Release;$env:build\ReleaseX64\dependencies\czmq\Release;$env:build\ReleaseX64\dependencies\libzmq\lib\Release;$env:build\ReleaseX64\dependencies\sodium\Release;$env:build\ReleaseX64\dependencies\zyre\Release"
     - cmake -S csharp/IngescapeCSharpWrapper/test/Tester -B csharp/IngescapeCSharpWrapper/test/Tester/build/ReleaseX64 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release
-    - copy csharp\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64\Release\netstandard2.0\IngescapeCSharp.dll csharp/IngescapeCSharpWrapper/test/Tester/build/ReleaseX64
     - cmake --build csharp/IngescapeCSharpWrapper/test/Tester/build/ReleaseX64 --config Release
     - C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe csharp/IngescapeCSharpWrapper/test/Tester/build/ReleaseX64/Release/Tester.dll /Platform:x64
   dependencies:
@@ -1186,9 +1182,7 @@ test-csharp-x86-debug:
     ARCH: "x86-debug"
   script:
     - cd bindings
-    - $env:PATH += "$env:build\DebugX86\Debug;$env:build\DebugX86\dependencies\czmq\Debug;$env:build\DebugX86\dependencies\libzmq\lib\Debug;$env:build\DebugX86\dependencies\sodium\Debug;$env:build\DebugX86\dependencies\zyre\Debug"
     - cmake -S csharp/IngescapeCSharpWrapper/test/Tester -B csharp/IngescapeCSharpWrapper/test/Tester/build/DebugX86 -G"$env:VS_CMAKE_GENERATOR" -AWin32 -DCMAKE_BUILD_TYPE=Debug
-    - copy csharp\IngescapeCSharpWrapper\IngescapeCSharp\build\DebugX86\Debug\netstandard2.0\IngescapeCSharp.dll csharp/IngescapeCSharpWrapper/test/Tester/build/DebugX86
     - cmake --build csharp/IngescapeCSharpWrapper/test/Tester/build/DebugX86 --config Debug
     - C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe csharp/IngescapeCSharpWrapper/test/Tester/build/DebugX86/Debug/Tester.dll /Platform:x86
   dependencies:
@@ -1206,9 +1200,7 @@ test-csharp-x86-release:
     ARCH: "x86-release"
   script:
     - cd bindings
-    - $env:PATH += "$env:build\ReleaseX86\Debug;$env:build\ReleaseX86\dependencies\czmq\Debug;$env:build\ReleaseX86\dependencies\libzmq\lib\Debug;$env:build\ReleaseX86\dependencies\sodium\Debug;$env:build\ReleaseX86\dependencies\zyre\Debug"
     - cmake -S csharp/IngescapeCSharpWrapper/test/Tester -B csharp/IngescapeCSharpWrapper/test/Tester/build/ReleaseX86 -G"$env:VS_CMAKE_GENERATOR" -AWin32 -DCMAKE_BUILD_TYPE=Release
-    - copy csharp\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86\Release\netstandard2.0\IngescapeCSharp.dll csharp/IngescapeCSharpWrapper/test/Tester/build/ReleaseX86
     - cmake --build csharp/IngescapeCSharpWrapper/test/Tester/build/ReleaseX86 --config Release
     - C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe csharp/IngescapeCSharpWrapper/test/Tester/build/ReleaseX86/Release/Tester.dll /Platform:x86
   dependencies:
