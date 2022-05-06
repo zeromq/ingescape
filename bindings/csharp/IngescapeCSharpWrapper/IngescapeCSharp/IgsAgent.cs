@@ -158,6 +158,7 @@ namespace Ingescape
         }
 
         [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igsagent_is_activated(IntPtr agent);
         public bool IsActivated
         {
@@ -170,6 +171,7 @@ namespace Ingescape
             }
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate void AgentFunctionC(IntPtr agent, bool isActivated, IntPtr myData);
         public delegate void AgentFunction(Agent Agent, bool isActivated, object myData);
         private AgentFunctionC _OnActivateCallback;
@@ -307,6 +309,7 @@ namespace Ingescape
 
 
         [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igsagent_is_muted(IntPtr agent);
         public bool IsMuted
         {
@@ -322,6 +325,7 @@ namespace Ingescape
             }
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate void MuteFunctionC(IntPtr agent, bool AgentIsMuted, IntPtr myData);
         public delegate void MuteFunction(Agent agent, bool AgentIsMuted, object myData);
         private MuteFunctionC _OnMuteCallback;
@@ -347,9 +351,10 @@ namespace Ingescape
             igsagent_observe_mute(_pAgent, OnMuteCallback, data);
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate void AgentEventsFunctionC(IntPtr agent, AgentEvent agentEvent, IntPtr uuid, IntPtr name, IntPtr eventData, IntPtr myData);
         public delegate void AgentEventsFunction(Agent agent, AgentEvent agentEvent, string uuid, string name, object eventData, object myData);
-        private AgentEventsFunctionC _OnAgentEventCallback;
+        private AgentEventsFunctionC _OnAgentEventCallback;        
         private void OnAgentEventCallback(IntPtr agent, AgentEvent agentEvent, IntPtr uuid, IntPtr name, IntPtr eventData, IntPtr myData)
         {
             Tuple<AgentEventsFunction, object> tupleData = (Tuple<AgentEventsFunction, object>)GCHandle.FromIntPtr(myData).Target;
@@ -697,6 +702,7 @@ namespace Ingescape
         }
 
         [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igsagent_input_exists(IntPtr agent, IntPtr name);
         public bool InputExists(string name)
         {
@@ -707,6 +713,7 @@ namespace Ingescape
             return res;
         }
         [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igsagent_output_exists(IntPtr agent, IntPtr name);
         public bool OutputExists(string name)
         {
@@ -717,6 +724,7 @@ namespace Ingescape
             return res;
         }
         [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igsagent_parameter_exists(IntPtr agent, IntPtr name);
         public bool ParameterExists(string name)
         {
@@ -730,6 +738,7 @@ namespace Ingescape
 
         #region Reading and writing inputs/outputs/parameters, a.k.a IOPs
         [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igsagent_input_bool(IntPtr agent, IntPtr name);
         public bool InputBool(string name)
         {
@@ -791,6 +800,7 @@ namespace Ingescape
             return data;
         }
         [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igsagent_output_bool(IntPtr agent, IntPtr name);
         public bool OutputBool(string name)
         {
@@ -852,6 +862,7 @@ namespace Ingescape
             return data;
         }
         [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igsagent_parameter_bool(IntPtr agent, IntPtr name);
         public bool ParameterBool(string name)
         {
@@ -1373,6 +1384,7 @@ namespace Ingescape
         }
 
         [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igsagent_output_is_muted(IntPtr agent, IntPtr name);
         public bool OutputIsMuted(string name)
         {
@@ -1542,6 +1554,7 @@ namespace Ingescape
         }
 
         [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igsagent_mapping_outputs_request(IntPtr agent);
         public bool MappingOutputsRequest()
         {
@@ -1706,6 +1719,7 @@ namespace Ingescape
         }
 
         [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igsagent_service_exists(IntPtr agent, IntPtr name);
         public bool ServiceExists(string name)
         {
@@ -1831,6 +1845,7 @@ namespace Ingescape
         }
 
         [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igsagent_service_arg_exists(IntPtr agent, IntPtr serviceName, IntPtr argName);
         public bool ServiceArgExists(string serviceName, string argName)
         {

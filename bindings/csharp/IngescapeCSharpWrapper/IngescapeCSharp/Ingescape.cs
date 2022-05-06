@@ -54,6 +54,7 @@ namespace Ingescape
         public static void Stop() { igs_stop(); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igs_is_started();
         public static bool IsStarted() { return igs_is_started(); }
 
@@ -170,6 +171,7 @@ namespace Ingescape
         public static int AgentUnmute() { return igs_agent_unmute(); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igs_agent_is_muted();
         public static bool AgentIsMuted() { return igs_agent_is_muted(); }
 
@@ -210,6 +212,7 @@ namespace Ingescape
         public static Result Freeze() { return igs_freeze(); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igs_is_frozen();
         public static bool IsFrozen() { return igs_is_frozen(); }
 
@@ -674,6 +677,7 @@ namespace Ingescape
 
         //read per type
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igs_input_bool(IntPtr name);
         public static bool InputBool(string name)
         {
@@ -736,6 +740,7 @@ namespace Ingescape
         }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igs_output_bool(IntPtr name);
         public static bool OutputBool(string name)
         {
@@ -798,7 +803,8 @@ namespace Ingescape
         }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern bool igs_parameter_bool(IntPtr name);
+        [return: MarshalAs(UnmanagedType.I1)]
+        private static extern bool igs_parameter_bool(IntPtr name);        
         public static bool ParameterBool(string name)
         {
             IntPtr nameAsPtr = StringToUTF8Ptr(name);
@@ -1294,7 +1300,8 @@ namespace Ingescape
         }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern bool igs_output_is_muted(IntPtr name);
+        [return: MarshalAs(UnmanagedType.I1)]
+        private static extern bool igs_output_is_muted(IntPtr name);        
         public static bool OutputIsMuted(string name)
         {
             IntPtr nameAsPtr = StringToUTF8Ptr(name);
@@ -1435,8 +1442,9 @@ namespace Ingescape
         public static void MappingSetOutputsRequest(bool notify) { igs_mapping_set_outputs_request(notify); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igs_mapping_outputs_request();
-        public static bool MappingOutputsRequest() { return igs_mapping_outputs_request(); }
+        public static bool MappingOutputsRequest() { return Convert.ToBoolean(igs_mapping_outputs_request()); }
         #endregion
 
         #region Services edition & inspection
@@ -2091,10 +2099,12 @@ namespace Ingescape
         public static void LogSetConsole(bool verbose) { igs_log_set_console(verbose); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igs_log_console();
         public static bool LogConsole() { return igs_log_console(); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igs_log_console_color();
         public static bool LogConsoleColor() { return igs_log_console_color(); }
 
@@ -2115,6 +2125,7 @@ namespace Ingescape
         public static void LogSetStream(bool useLogStream) { igs_log_set_stream(useLogStream); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igs_log_stream();
         public static bool LogStream() { return igs_log_stream(); }
 
@@ -2137,6 +2148,7 @@ namespace Ingescape
         { igs_log_set_file_max_line_length(size); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igs_log_file();
         public static bool LogFile() { return igs_log_file(); }
 
@@ -2205,6 +2217,7 @@ namespace Ingescape
         public static void SetIpc(bool allow) { igs_set_ipc(allow); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igs_has_ipc();
         public static bool HasIpc() { return igs_has_ipc(); }
 
@@ -2350,6 +2363,7 @@ namespace Ingescape
         public static void MonitorStop() { igs_monitor_stop(); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igs_monitor_is_running();
         public static bool MonitorIsRunning() { return igs_monitor_is_running(); }
 
