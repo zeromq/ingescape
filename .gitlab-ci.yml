@@ -766,7 +766,9 @@ binding-node-js-macos:
     - cp ../../build/dependencies/sodium//libsodium.a ./dependencies/lib
     - cp -r ../../include/* ./dependencies/include
     - sed -i .bak 's@/usr/local@<!(echo $PWD)/dependencies@g' binding.gyp #update file paths for igs 
-    - npm install
+    - cat ./binding.gyp
+    #- npm install
+    - node-gyp --verbose configure --FROM_SOURCES=1
     - npm run build
   artifacts:
     paths:
@@ -790,7 +792,7 @@ binding-node-js-linux:
     - cp ../../build/dependencies/zyre/libzyre.a ./dependencies/lib
     - cp ../../build/dependencies/sodium//libsodium.a ./dependencies/lib
     - cp -r ../../include/* ./dependencies/include
-    - sed -i.bak 's@/usr/local@<!(echo $PWD)/dependencies@g' binding.gyp #update file paths for igs 
+    - sed -i .bak 's@/usr/local@<!(echo $PWD)/dependencies@g' binding.gyp #update file paths for igs 
     - cat ./binding.gyp
     - npm install
     - npm run build

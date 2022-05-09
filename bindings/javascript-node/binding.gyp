@@ -5,6 +5,9 @@
             "sources": [ "./src/main.c", "./src/private.c", "./src/admin_config_utils.c",
             "./src/init_control.c", "./src/definition.c", "./src/enum.c", "./src/iop.c",
             "./src/mapping.c", "./src/service.c", "./src/advanced.c", "./src/agent.c"],
+            'variables': {
+                'FROM_SOURCES%': '0'
+            },
 			"conditions": [
                 [
                     'OS=="win"',
@@ -70,6 +73,12 @@
                             "/usr/local/lib/libzmq.a",
                             "/usr/local/lib/libsodium.a" 
                         ]
+                    }
+                ],
+                [
+                    'FROM_SOURCES == 1', 
+                    {
+                        'defines': ['FROM_SOURCES']
                     }
                 ]
             ]

@@ -11,7 +11,13 @@
 */
 
 #include <node_api.h>
-#include <ingescape/ingescape.h> 
+
+#ifdef FROM_SOURCES
+#include "ingescape.h"
+#else
+#include <ingescape/ingescape.h>
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

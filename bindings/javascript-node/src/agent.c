@@ -11,7 +11,13 @@
 */
 
 #include "../include/private.h"
+
+#ifdef FROM_SOURCES
+#include "igsagent.h"
+#else
 #include <ingescape/igsagent.h>
+#endif
+
 
 threadsafe_context_hash_t *igsagent_observed_input_contexts = NULL;
 threadsafe_context_hash_t *igsagent_observed_output_contexts = NULL;
@@ -2264,9 +2270,9 @@ napi_value node_igsagent_service_arg_add(napi_env env, napi_callback_info info) 
     this = get_function_this_argument(env, info);
     char *service_name = convert_napi_to_string(env, argv[0]);
     char *arg_name = convert_napi_to_string(env, argv[1]);
-	int type;
+    int type;
     convert_napi_to_int(env, argv[2], &type);
-	int res = igsagent_service_arg_add(unwrap_native_agent(env, this), service_name, arg_name, type);
+    int res = igsagent_service_arg_add(unwrap_native_agent(env, this), service_name, arg_name, type);
     free(service_name);
     free(arg_name);
     napi_value res_convert;
@@ -2280,7 +2286,7 @@ napi_value node_igsagent_service_arg_remove(napi_env env, napi_callback_info inf
     this = get_function_this_argument(env, info);
     char * service_name = convert_napi_to_string(env, argv[0]);
     char * arg_name = convert_napi_to_string(env, argv[1]);
-	int res = igsagent_service_arg_remove(unwrap_native_agent(env, this), service_name, arg_name);
+    int res = igsagent_service_arg_remove(unwrap_native_agent(env, this), service_name, arg_name);
     free(service_name);
     free(arg_name);
     napi_value res_convert;
