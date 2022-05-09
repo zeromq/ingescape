@@ -771,10 +771,10 @@ binding-node-js-macos:
     - cp -r ../../dependencies/zyre/include/* ./dependencies/include
     - sed -i .bak 's@/usr/local@<!(echo $PWD)/dependencies@g' binding.gyp #update file paths for igs 
     - cat ./binding.gyp
-    - npm install --FROM_SOURCES=1
+    - npm install --from_sources=1
     #- node-gyp --verbose configure --FROM_SOURCES=1
     #- node-gyp build
-    - npm run build --FROM_SOURCES=1
+    - npm run build --from_sources=1
   artifacts:
     paths:
       - bindings/javascript-node/prebuilds
@@ -803,8 +803,8 @@ binding-node-js-linux:
     - cp -r ../../dependencies/zyre/include/* ./dependencies/include
     - sed -i .bak 's@/usr/local@<!(echo $PWD)/dependencies@g' binding.gyp #update file paths for igs 
     - cat ./binding.gyp
-    - npm install --FROM_SOURCES=1
-    - npm run build --FROM_SOURCES=1
+    - npm install --from_sources=1
+    - npm run build --from_sources=1
   artifacts:
     paths:
       - bindings/javascript-node/prebuilds
@@ -819,9 +819,9 @@ binding-node-js-windows:
   script:
     - cd ./bindings/javascript-node/
     - (Get-Content -path .\binding.gyp -Raw) -replace 'C:\\\\Program Files\\\\ingescape',"/$env:DEPLOYMENT_WINDOWS_NET_SHARE\\Builds\\Release\\x64" | Set-Content .\binding.gyp #update file paths for igs
-    - npm install --msvs_version=2017 --FROM_SOURCES=1
+    - npm install --msvs_version=2017 --from_sources=1
     - if (Test-Path C:\Users\admin\AppData\Local\Temp\prebuildify) { Remove-Item C:\Users\admin\AppData\Local\Temp\prebuildify -Force -Recurse } #To force prebuildify to re-upload its temporary cache
-    - npm run build --msvs_version=2017 --FROM_SOURCES=1
+    - npm run build --msvs_version=2017 --from_sources=1
   artifacts:
     paths:
       - bindings/javascript-node/prebuilds
@@ -833,7 +833,7 @@ test-node-js-macos:
     - macos-qt6
   script:
     - cd ./bindings/javascript-node/
-    - npm run test --FROM_SOURCES=1
+    - npm run test --from_sources=1
   dependencies: 
     - binding-node-js-macos 
 
@@ -844,7 +844,7 @@ test-node-js-linux:
   image: ingescape/ubuntu18.04-node
   script:
     - cd ./bindings/javascript-node/
-    - npm run test --FROM_SOURCES=1
+    - npm run test --from_sources=1
   dependencies:
     - binding-node-js-linux
 
@@ -854,7 +854,7 @@ test-node-js-windows:
     - windows
   script:
     - cd ./bindings/javascript-node/
-    - npm run test --FROM_SOURCES=1
+    - npm run test --from_sources=1
   dependencies:
     - binding-node-js-windows
 
@@ -903,7 +903,7 @@ test-python:
     - cp ../../build/dependencies/libzmq/lib/libzmq.a ./dependencies/linux
     - cp ../../build/dependencies/zyre/libzyre.a ./dependencies/linux
     - cp ../../build/dependencies/sodium//libsodium.a ./dependencies/linux
-    - cp -r ../../include/* ./dependencies/include
+    - cp -r ../../include/* ./dependencies/include 
     - ./build_and_run_tests.sh
   dependencies: []
   needs: []

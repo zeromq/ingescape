@@ -6,7 +6,7 @@
             "./src/init_control.c", "./src/definition.c", "./src/enum.c", "./src/iop.c",
             "./src/mapping.c", "./src/service.c", "./src/advanced.c", "./src/agent.c"],
             'variables': {
-                'FROM_SOURCES%': '0'
+                'from_sources%': '0'
             },
 			"conditions": [
                 [
@@ -76,7 +76,7 @@
                     }
                 ],
                 [
-                    'FROM_SOURCES == 1', 
+                    'from_sources == 1', 
                     {
                         'defines': ['FROM_SOURCES']
                     }
