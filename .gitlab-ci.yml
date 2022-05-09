@@ -757,12 +757,23 @@ binding-node-js-macos:
     - macos-qt6
   script:
     - cd ./bindings/javascript-node/
-    - sed -i .bak 's@/usr/local@<!(echo $HOME)/builds/sysroot/usr/local@g' binding.gyp #update file paths for igs 
+    - mkdir -p ./dependencies/lib
+    - mkdir -p ./dependencies/include
+    - cp ../../build/libingescape.a  ./dependencies/lib
+    - cp ../../build/dependencies/czmq/libczmq.a ./dependencies/lib
+    - cp ../../build/dependencies/libzmq/lib/libzmq.a ./dependencies/lib
+    - cp ../../build/dependencies/zyre/libzyre.a ./dependencies/lib
+    - cp ../../build/dependencies/sodium//libsodium.a ./dependencies/lib
+    - cp -r ../../include/* ./dependencies/include
+    - sed -i .bak 's@/usr/local@<!(echo $PWD)/dependencies@g' binding.gyp #update file paths for igs 
     - npm install
     - npm run build
   artifacts:
     paths:
       - bindings/javascript-node/prebuilds
+  dependencies:
+    - lib-build-macos
+  needs: [ "lib-build-macos" ]
 
 binding-node-js-linux:
   stage: binding-build
@@ -771,13 +782,24 @@ binding-node-js-linux:
   image: ingescape/ubuntu18.04-node
   script:
     - cd ./bindings/javascript-node/
-    - sed -i.bak 's@/usr/local@<!(echo $HOME)/builds/release/linux_x64/usr/local@g' binding.gyp #update file paths for igs 
+    - mkdir -p ./dependencies/lib
+    - mkdir -p ./dependencies/include
+    - cp ../../build/libingescape.a  ./dependencies/lib
+    - cp ../../build/dependencies/czmq/libczmq.a ./dependencies/lib
+    - cp ../../build/dependencies/libzmq/lib/libzmq.a ./dependencies/lib
+    - cp ../../build/dependencies/zyre/libzyre.a ./dependencies/lib
+    - cp ../../build/dependencies/sodium//libsodium.a ./dependencies/lib
+    - cp -r ../../include/* ./dependencies/include
+    - sed -i.bak 's@/usr/local@<!(echo $PWD)/dependencies@g' binding.gyp #update file paths for igs 
     - cat ./binding.gyp
     - npm install
     - npm run build
   artifacts:
     paths:
       - bindings/javascript-node/prebuilds
+  dependencies:
+    - lib-build-linux-x64
+  needs: [ "lib-build-linux-x64" ]
 
 binding-node-js-windows:
   stage: binding-build
@@ -865,18 +887,21 @@ test-python:
     - cd bindings/python
     - mkdir -p ./dependencies/linux/
     - mkdir -p ./dependencies/include/
-    - cp $HOME/builds/release/linux_x64/usr/local/lib/libingescape.a  ./dependencies/linux/
-    - cp $HOME/builds/release/linux_x64/usr/local/lib/libczmq.a ./dependencies/linux/
-    - cp $HOME/builds/release/linux_x64/usr/local/lib/libzmq.a ./dependencies/linux/
-    - cp $HOME/builds/release/linux_x64/usr/local/lib/libzyre.a ./dependencies/linux/
-    - cp $HOME/builds/release/linux_x64/usr/local/lib/libsodium.a ./dependencies/linux/
-    - cp -r $HOME/builds/release/linux_x64/usr/local/include/* ./dependencies/include/
+    - cp ../../build/libingescape.a  ./dependencies/linux
+    - cp ../../build/dependencies/czmq/libczmq.a ./dependencies/linux
+    - cp ../../build/dependencies/libzmq/lib/libzmq.a ./dependencies/linux
+    - cp ../../build/dependencies/zyre/libzyre.a ./dependencies/linux
+    - cp ../../build/dependencies/sodium//libsodium.a ./dependencies/linux
+    - cp -r ../../include/* ./dependencies/include
     - ./build_and_run_tests.sh
   dependencies: []
   needs: []
   artifacts:
     paths:
       - bindings/python/dependencies/*
+  dependencies:
+    - lib-build-linux-x64
+  needs: [ "lib-build-linux-x64" ]
 
 ## Package
 package-python-wheels-windows:
@@ -889,11 +914,11 @@ package-python-wheels-windows:
     - cd ./bindings/python/
     - mkdir ./dependencies/windows
     - mkdir ./dependencies/windows/x64
-    - Copy-Item -Path $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64\lib\libingescape.lib -Destination ./dependencies/windows/x64
-    - Copy-Item -Path $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64\lib\libczmq.lib -Destination ./dependencies/windows/x64
-    - Copy-Item -Path $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64\lib\libzmq-v141-mt-s-4_3_5.lib -Destination ./dependencies/windows/x64/libzmq.lib
-    - Copy-Item -Path $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64\lib\libzyre.lib -Destination ./dependencies/windows/x64
-    - Copy-Item -Path $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64\lib\libsodium.lib -Destination ./dependencies/windows/x64
+    - Copy-Item -Path ..\..\build\ReleaseX64\Release\libingescape.lib -Destination ./dependencies/windows/x64
+    - Copy-Item -Path ..\..\build\ReleaseX64\dependencies\czmq\Release\libczmq.lib -Destination ./dependencies/windows/x64
+    - Copy-Item -Path ..\..\build\ReleaseX64\dependencies\libzmq\lib\Release\libzmq-v142-mt-s-4_3_5.lib -Destination ./dependencies/windows/x64/libzmq.lib
+    - Copy-Item -Path ..\..\build\ReleaseX64\dependencies\zyre\Release\libzyre.lib -Destination ./dependencies/windows/x64
+    - Copy-Item -Path ..\..\build\ReleaseX64\dependencies\sodium\Release\libsodium.lib -Destination ./dependencies/windows/x64
     - |
         pushd 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build'
         cmd /c "vcvarsall.bat x64 & set" |
@@ -910,8 +935,10 @@ package-python-wheels-windows:
     - C:\Users\admin\AppData\Local\Programs\Python\Python39\python.exe setup.py bdist_wheel
   dependencies:
     - test-python
+    - lib-windows-release-x64
   needs:
     - test-python
+    - lib-windows-release-x64
   artifacts:
     paths:
       - bindings/python/dist/*
@@ -928,16 +955,18 @@ package-python-wheels-macos:
   script:
     - cd ./bindings/python/
     - mkdir -p ./dependencies/macos/
-    - cp  $HOME/builds/sysroot/usr/local/lib/libingescape.a  ./dependencies/macos
-    - cp  $HOME/builds/sysroot/usr/local/lib/libczmq.a ./dependencies/macos
-    - cp  $HOME/builds/sysroot/usr/local/lib/libzmq.a ./dependencies/macos
-    - cp  $HOME/builds/sysroot/usr/local/lib/libzyre.a ./dependencies/macos
-    - cp  $HOME/builds/sysroot/usr/local/lib/libsodium.a ./dependencies/macos
+    - cp ../../build/libingescape.a  ./dependencies/macos
+    - cp ../../build/dependencies/czmq/libczmq.a ./dependencies/macos
+    - cp ../../build/dependencies/libzmq/lib/libzmq.a ./dependencies/macos
+    - cp ../../build/dependencies/zyre/libzyre.a ./dependencies/macos
+    - cp ../../build/dependencies/sodium//libsodium.a ./dependencies/macos
     - python3 setup.py bdist_wheel
   dependencies:
     - test-python
+    - lib-build-macos
   needs:
     - test-python
+    - lib-build-macos
   artifacts:
     paths:
       - bindings/python/dist/*
@@ -1069,7 +1098,6 @@ binding-csharp-windows-x64-release:
     ARCH: "x64"
   script:
     - cd bindings
-    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
     - cmake -S csharp/IngescapeCSharpWrapper/IngescapeCSharp/ -B csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
     - Powershell.exe -executionpolicy remotesigned csharp/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64
     - cmake --build csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64 --target IngescapeCSharp --config Release
@@ -1088,7 +1116,6 @@ binding-csharp-windows-x64-debug:
     ARCH: "x64-debug"
   script:
     - cd bindings
-    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
     - cmake -S csharp/IngescapeCSharpWrapper/IngescapeCSharp/ -B csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/DebugX64 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Debug -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
     - Powershell.exe -executionpolicy remotesigned csharp/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/DebugX64
     - cmake --build csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/DebugX64 --target IngescapeCSharp --config Debug
@@ -1107,7 +1134,6 @@ binding-csharp-windows-x86-release:
     ARCH: "x86"
   script:
     - cd bindings
-    - $env:PATH += ";$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds"
     - cmake -S csharp/IngescapeCSharpWrapper/IngescapeCSharp/ -B csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86 -G"$env:VS_CMAKE_GENERATOR" -AWin32 -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
     - Powershell.exe -executionpolicy remotesigned csharp/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86
     - cmake --build csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86 --target IngescapeCSharp --config Release
