@@ -764,11 +764,11 @@ binding-node-js-macos:
     - cp ../../build/dependencies/libzmq/lib/libzmq.a ./dependencies/lib
     - cp ../../build/dependencies/zyre/libzyre.a ./dependencies/lib
     - cp ../../build/dependencies/sodium//libsodium.a ./dependencies/lib
-    - cp ../../dependencies/czmq/include/czmq.h ./dependencies/include
-    - cp ../../dependencies/libzmq/include/zmq.h ./dependencies/include
-    - cp ../../dependencies/sodium/src/libsodium/include/sodium.h ./dependencies/include
-    - cp ../../dependencies/zyre/include/zyre.h ./dependencies/include
     - cp -r ../../include/* ./dependencies/include
+    - cp -r ../../dependencies/czmq/include/* ./dependencies/include
+    - cp -r ../../dependencies/libzmq/include/* ./dependencies/include
+    - cp -r ../../dependencies/sodium/src/libsodium/include/* ./dependencies/include
+    - cp -r ../../dependencies/zyre/include/* ./dependencies/include
     - sed -i .bak 's@/usr/local@<!(echo $PWD)/dependencies@g' binding.gyp #update file paths for igs 
     - cat ./binding.gyp
     #- npm install
@@ -797,10 +797,10 @@ binding-node-js-linux:
     - cp ../../build/dependencies/zyre/libzyre.a ./dependencies/lib
     - cp ../../build/dependencies/sodium//libsodium.a ./dependencies/lib
     - cp -r ../../include/* ./dependencies/include
-    - cp ../../dependencies/czmq/include/czmq.h ./dependencies/include
-    - cp ../../dependencies/libzmq/include/zmq.h ./dependencies/include
-    - cp ../../dependencies/sodium/src/libsodium/include/sodium.h ./dependencies/include
-    - cp ../../dependencies/zyre/include/zyre.h ./dependencies/include
+    - cp -r ../../dependencies/czmq/include/* ./dependencies/include
+    - cp -r ../../dependencies/libzmq/include/* ./dependencies/include
+    - cp -r ../../dependencies/sodium/src/libsodium/include/* ./dependencies/include
+    - cp -r ../../dependencies/zyre/include/* ./dependencies/include
     - sed -i .bak 's@/usr/local@<!(echo $PWD)/dependencies@g' binding.gyp #update file paths for igs 
     - cat ./binding.gyp
     - npm install
