@@ -769,6 +769,7 @@ binding-node-js-macos:
     - cat ./binding.gyp
     #- npm install
     - node-gyp --verbose configure --FROM_SOURCES=1
+    - node-gyp build
     - npm run build
   artifacts:
     paths:
