@@ -347,12 +347,8 @@ lib-deploy-windows:
     - copy .\include\ingescape_private.h $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64\include\ingescape -Force
     - cmake --install .\build\DebugX86 --config Debug --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x86
     - copy .\include\ingescape_private.h $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x86\include\ingescape -Force
-  dependencies:
-    - lib-windows-release-x64
-    - lib-windows-release-x86
-    - lib-windows-debug-x64
-    - lib-windows-debug-x86
-  needs: [ "lib-windows-release-x64", "lib-windows-release-x86", "lib-windows-debug-x64", "lib-windows-debug-x86" ]
+  dependencies: [ "lib-windows-release-x64", "lib-windows-release-x86", "lib-windows-debug-x64", "lib-windows-debug-x86", "test-csharp-x64-release", "test-csharp-x64-debug", "test-csharp-x86-release", "test-csharp-x86-debug"]
+  needs: [ "lib-windows-release-x64", "lib-windows-release-x86", "lib-windows-debug-x64", "lib-windows-debug-x86", "test-csharp-x64-release", "test-csharp-x64-debug", "test-csharp-x86-release", "test-csharp-x86-debug"]
   only:
     refs:
       - main
@@ -1303,40 +1299,6 @@ test-csharp-x86-release:
   needs:
     - binding-csharp-windows-x86-release
     - lib-windows-release-x86
-
-
-## Deploy jobs to be able to compile agents with bindings
-binding-deploy-windows-release-x64:
-  stage: deploy
-  variables:
-    ARCH: "x64"
-  tags:
-    - windows
-  script:
-    - copy bindings\csharp\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX64\Release\netstandard2.0\IngescapeCSharp.dll $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64\ -Force
-  dependencies:
-    - binding-csharp-windows-x64-release
-  only:
-    refs:
-      - main
-    variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
-
-binding-deploy-windows-release-x86:
-  stage: deploy
-  variables:
-    ARCH: "x86"
-  tags:
-    - windows
-  script:
-    - copy bindings\csharp\IngescapeCSharpWrapper\IngescapeCSharp\build\ReleaseX86\Release\netstandard2.0\IngescapeCSharp.dll $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86\ -Force
-  dependencies:
-    - binding-csharp-windows-x86-release
-  only:
-    refs:
-      - main
-    variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
 
 
 # _____       _ _
