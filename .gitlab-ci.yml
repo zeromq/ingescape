@@ -902,6 +902,10 @@ test-python:
     - cp ../../build/dependencies/zyre/libzyre.a ./dependencies/linux
     - cp ../../build/dependencies/sodium//libsodium.a ./dependencies/linux
     - cp -r ../../include/* ./dependencies/include
+    - cp -r ../../dependencies/czmq/include/* ./dependencies/include
+    - cp -r ../../dependencies/libzmq/include/* ./dependencies/include
+    - cp -r ../../dependencies/sodium/src/libsodium/include/* ./dependencies/include
+    - cp -r ../../dependencies/zyre/include/* ./dependencies/include
     - export FROM_SOURCES="true"
     - ./build_and_run_tests.sh
   dependencies: []
