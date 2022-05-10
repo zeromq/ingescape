@@ -70,6 +70,9 @@ elif platform.system() == "Windows":
     sys.path.extend(windows_x64_lib_dirs)
     compile_args = ["-DINGESCAPE_STATIC"]
 
+manual_compiler_args = os.environ.get('FROM_SOURCES', default=None)
+if manual_compiler_args:
+    compile_args.append("-DFROM_SOURCES")
 
 extension_ingescape = Extension("ingescape", ingescape_src + ingescape_agent_src ,
             include_dirs = ingescape_include + ingescape_c_include,

@@ -3,7 +3,7 @@
  *
  * Copyright (c) the Contributors as noted in the AUTHORS file.
  * This file is part of Ingescape, see https://github.com/zeromq/ingescape.
- * 
+ *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -12,7 +12,11 @@
 
 #include "ingescape_agent_python.h"
 #include <stdio.h>
+#ifdef FROM_SOURCES
+#include "ingescape.h"
+#else
 #include <ingescape/ingescape.h>
+#endif
 #include "uthash/utlist.h"
 
 static char *s_strndup (const char *str, size_t chars)
@@ -1115,7 +1119,7 @@ PyObject *Agent_input_string(AgentObject *self, PyObject *args, PyObject *kwds)
         value = NULL;
         return ret;
     }
-    
+
 }
 
 PyObject *Agent_input_data(AgentObject *self, PyObject *args, PyObject *kwds)
@@ -1849,7 +1853,7 @@ PyObject *Agent_mapping_load_str(AgentObject *self, PyObject *args, PyObject *kw
 
     if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &json_str))
         return NULL;
-    if(self->agent)    
+    if(self->agent)
         return PyLong_FromLong(igsagent_mapping_load_str(self->agent, json_str));
     return NULL;
 }
@@ -1861,7 +1865,7 @@ PyObject *Agent_mapping_load_file(AgentObject *self, PyObject *args, PyObject *k
 
     if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &file_path))
         return NULL;
-    if(self->agent)    
+    if(self->agent)
         return PyLong_FromLong(igsagent_mapping_load_file(self->agent, file_path));
     return NULL;
 }
@@ -2041,7 +2045,7 @@ PyObject *Agent_service_call(AgentObject *self, PyObject *args, PyObject *kwds)
     }
     int format = 0;
     static char *kwlist[] = {"agent_name","service_name","argument_list", "token", NULL};
-    if (PyArg_ParseTupleAndKeywords(args, NULL, "ssOz", kwlist, &agentNameOrUUID, &serviceName, &argTuple, &token ) == true) 
+    if (PyArg_ParseTupleAndKeywords(args, NULL, "ssOz", kwlist, &agentNameOrUUID, &serviceName, &argTuple, &token ) == true)
     {
         if(argTuple == NULL || argTuple == Py_None)
             format = 0;

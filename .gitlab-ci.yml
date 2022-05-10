@@ -903,7 +903,8 @@ test-python:
     - cp ../../build/dependencies/libzmq/lib/libzmq.a ./dependencies/linux
     - cp ../../build/dependencies/zyre/libzyre.a ./dependencies/linux
     - cp ../../build/dependencies/sodium//libsodium.a ./dependencies/linux
-    - cp -r ../../include/* ./dependencies/include 
+    - cp -r ../../include/* ./dependencies/include
+    - export FROM_SOURCES="true"
     - ./build_and_run_tests.sh
   dependencies: []
   needs: []
@@ -971,6 +972,7 @@ package-python-wheels-macos:
     - cp ../../build/dependencies/libzmq/lib/libzmq.a ./dependencies/macos
     - cp ../../build/dependencies/zyre/libzyre.a ./dependencies/macos
     - cp ../../build/dependencies/sodium//libsodium.a ./dependencies/macos
+    - export FROM_SOURCES="true"
     - python3 setup.py bdist_wheel
   dependencies:
     - test-python

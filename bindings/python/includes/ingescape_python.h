@@ -3,7 +3,7 @@
  *
  * Copyright (c) the Contributors as noted in the AUTHORS file.
  * This file is part of Ingescape, see https://github.com/zeromq/ingescape.
- * 
+ *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -16,8 +16,14 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 #include <frameobject.h>
+
+#ifdef FROM_SOURCES
+#include "ingescape.h"
+#include "czmq.h"
+#else
 #include <ingescape/ingescape.h>
 #include <czmq.h>
+#endif
 
 PyObject * start_with_device_wrapper(PyObject * self, PyObject * args);
 PyObject * start_with_ip_wrapper(PyObject * self, PyObject * args);
@@ -289,7 +295,7 @@ PyObject * log_set_file_wrapper(PyObject * self, PyObject * args);
 PyObject * log_set_file_level_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
 PyObject * log_set_file_max_line_length_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
 PyObject * log_file_wrapper(PyObject * self, PyObject * args);
-PyObject * log_set_file_path_wrapper(PyObject * self, PyObject * args); 
+PyObject * log_set_file_path_wrapper(PyObject * self, PyObject * args);
 PyObject * log_file_path_wrapper(PyObject * self, PyObject * args);
 
 PyObject * log_include_data_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
