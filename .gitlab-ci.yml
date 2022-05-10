@@ -958,7 +958,7 @@ package-python-wheels-windows:
           }
         }
         popd
-
+    - SET FROM_SOURCES="true"
     - C:\Users\admin\AppData\Local\Programs\Python\Python36\python.exe setup.py bdist_wheel
     - C:\Users\admin\AppData\Local\Programs\Python\Python37\python.exe setup.py bdist_wheel
     - C:\Users\admin\AppData\Local\Programs\Python\Python38\python.exe setup.py bdist_wheel
@@ -1013,6 +1013,13 @@ package-python-wheels-manylinux_2_24_x86_64:
   image: quay.io/pypa/manylinux_2_24_x86_64
   script:
     - cd ./bindings/python/
+    - mkdir -p ./dependencies/linux/
+    - cp ../../build/libingescape.a  ./dependencies/linux
+    - cp ../../build/dependencies/czmq/libczmq.a ./dependencies/linux
+    - cp ../../build/dependencies/libzmq/lib/libzmq.a ./dependencies/linux
+    - cp ../../build/dependencies/zyre/libzyre.a ./dependencies/linux
+    - cp ../../build/dependencies/sodium//libsodium.a ./dependencies/linux
+    - export FROM_SOURCES="true"
     - python3.8 setup.py bdist_wheel
     - python3.9 setup.py bdist_wheel
     - python3.10 setup.py bdist_wheel
@@ -1022,8 +1029,10 @@ package-python-wheels-manylinux_2_24_x86_64:
         done
   dependencies:
     - test-python
+    - lib-build-linux-x64
   needs:
     - test-python
+    - lib-build-linux-x64
   artifacts:
     paths:
       - bindings/python/wheelhouse/*
@@ -1038,6 +1047,13 @@ package-python-wheels-manylinux2014_x86_64:
   image: quay.io/pypa/manylinux2014_x86_64
   script:
     - cd ./bindings/python/
+    - mkdir -p ./dependencies/linux/
+    - cp ../../build/libingescape.a  ./dependencies/linux
+    - cp ../../build/dependencies/czmq/libczmq.a ./dependencies/linux
+    - cp ../../build/dependencies/libzmq/lib/libzmq.a ./dependencies/linux
+    - cp ../../build/dependencies/zyre/libzyre.a ./dependencies/linux
+    - cp ../../build/dependencies/sodium//libsodium.a ./dependencies/linux
+    - export FROM_SOURCES="true"
     - python3.7 setup.py bdist_wheel
     - python3.8 setup.py bdist_wheel
     - python3.9 setup.py bdist_wheel
@@ -1047,8 +1063,10 @@ package-python-wheels-manylinux2014_x86_64:
         done
   dependencies:
     - test-python
+    - lib-build-linux-x64
   needs:
     - test-python
+    - lib-build-linux-x64
   artifacts:
     paths:
       - bindings/python/wheelhouse/*
@@ -1063,6 +1081,13 @@ package-python-wheels-manylinux2010_x86_64:
   image: quay.io/pypa/manylinux2010_x86_64
   script:
     - cd ./bindings/python/
+    - mkdir -p ./dependencies/linux/
+    - cp ../../build/libingescape.a  ./dependencies/linux
+    - cp ../../build/dependencies/czmq/libczmq.a ./dependencies/linux
+    - cp ../../build/dependencies/libzmq/lib/libzmq.a ./dependencies/linux
+    - cp ../../build/dependencies/zyre/libzyre.a ./dependencies/linux
+    - cp ../../build/dependencies/sodium//libsodium.a ./dependencies/linux
+    - export FROM_SOURCES="true"
     - python3.7 setup.py bdist_wheel
     - python3.8 setup.py bdist_wheel
     - |
@@ -1071,8 +1096,10 @@ package-python-wheels-manylinux2010_x86_64:
         done
   dependencies:
     - test-python
+    - lib-build-linux-x64
   needs:
     - test-python
+    - lib-build-linux-x64
   artifacts:
     paths:
       - bindings/python/wheelhouse/*
@@ -1089,6 +1116,13 @@ publish-python-package:
   when: manual
   script:
     - cd bindings/python
+    - mkdir -p ./dependencies/linux/
+    - cp ../../build/libingescape.a  ./dependencies/linux
+    - cp ../../build/dependencies/czmq/libczmq.a ./dependencies/linux
+    - cp ../../build/dependencies/libzmq/lib/libzmq.a ./dependencies/linux
+    - cp ../../build/dependencies/zyre/libzyre.a ./dependencies/linux
+    - cp ../../build/dependencies/sodium//libsodium.a ./dependencies/linux
+    - export FROM_SOURCES="true"
     - python3 setup.py sdist
     - python3 -m pip install --upgrade twine
     - python3 -m twine upload -u ${PYPI_USERNAME} -p ${PYPI_PASSWORD} dist/* wheelhouse/*
@@ -1111,8 +1145,8 @@ publish-python-package:
   only:
     refs:
       - main
-    variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
+    #variables:
+      #- $CI_PROJECT_ROOT_NAMESPACE == "ingescape"
 
 #   _____     _  _   
 #  / ____|  _| || |_ 
