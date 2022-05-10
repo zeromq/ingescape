@@ -830,7 +830,7 @@ binding-node-js-windows:
     - Xcopy ..\..\dependencies\libzmq\include .\dependencies\include\ /E /y
     - Xcopy ..\..\dependencies\sodium\src\libsodium\include .\dependencies\include\ /E /y
     - Xcopy ..\..\dependencies\zyre\include .\dependencies\include\ /E /y
-    - $CORRECT_PWD = $PWD -replace "\\", "\\\\"
+    - $CORRECT_PWD = $PWD -replace "\\", "\\"
     - (Get-Content -path .\binding.gyp -Raw) -replace 'C:\\\\Program Files\\\\ingescape',"$CORRECT_PWD\\dependencies\\windows" | Set-Content .\binding.gyp #update file paths for igs
     - npm install --msvs_version=2017 --from_sources=1
     - if (Test-Path C:\Users\admin\AppData\Local\Temp\prebuildify) { Remove-Item C:\Users\admin\AppData\Local\Temp\prebuildify -Force -Recurse } #To force prebuildify to re-upload its temporary cache
