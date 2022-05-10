@@ -70,6 +70,7 @@ elif platform.system() == "Windows":
     sys.path.extend(windows_x64_lib_dirs)
     compile_args = ["-DINGESCAPE_STATIC"]
 
+#Use an environment variable instead of "install-option" to add the compile arg. We are not able to use 'python wheels' with 'install-option' 
 manual_compiler_args = os.environ.get('FROM_SOURCES', default=None)
 if manual_compiler_args:
     compile_args.append("-DFROM_SOURCES")
