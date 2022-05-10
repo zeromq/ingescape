@@ -961,6 +961,7 @@ package-python-wheels-windows:
         }
         popd
     - SET FROM_SOURCES="true"
+    - echo %FROM_SOURCES%
     - C:\Users\admin\AppData\Local\Programs\Python\Python36\python.exe setup.py bdist_wheel
     - C:\Users\admin\AppData\Local\Programs\Python\Python37\python.exe setup.py bdist_wheel
     - C:\Users\admin\AppData\Local\Programs\Python\Python38\python.exe setup.py bdist_wheel
