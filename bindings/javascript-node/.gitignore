@@ -1,4 +1,4 @@
-build
-node_modules
-prebuilds
+build/
+node_modules/
+prebuilds/
 package-lock.json

@@ -1,7 +1,6 @@
 {
   "name": "multiply",
   "version": "1.0",
-  "description": "",
   "main": "multiply.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

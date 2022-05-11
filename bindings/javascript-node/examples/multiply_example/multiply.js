@@ -1,3 +1,15 @@
+/*  =========================================================================
+    multiply.js 
+
+    Copyright (c) the Contributors as noted in the AUTHORS file.
+    This file is part of Ingescape, see https://github.com/zeromq/ingescape.
+
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+    =========================================================================
+*/
+
 const igs = require('ingescape');
 const iopValueTypes = igs.iopValueTypes();
 
@@ -87,7 +99,7 @@ if (process.argc === 2)
   igs.agentSetName(process.argv[1]);
 else 
   //or by giving a default name if no argument was passed
-  igs.agentSetName("simpleDemoAgent");
+  igs.agentSetName("multiply");
 
 //Create an input and an ouput: both are of integer type
 //with default value set to zero.

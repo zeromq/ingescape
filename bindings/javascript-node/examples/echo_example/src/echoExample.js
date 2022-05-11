@@ -1,9 +1,15 @@
-//
-//  echoExample.js
-//
-//  Created by Chloé Roumieu on 2022/04/04.
-//  Copyright © 2021 Ingenuity i/o. All rights reserved.
-//
+/*  =========================================================================
+    echoExample.js 
+
+    Copyright (c) the Contributors as noted in the AUTHORS file.
+    This file is part of Ingescape, see https://github.com/zeromq/ingescape.
+
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+    =========================================================================
+*/
+
 
 const igs = require('ingescape');
 

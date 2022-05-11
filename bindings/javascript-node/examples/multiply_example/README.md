@@ -1,6 +1,7 @@
+# multiply
+
 ## Prerequisites
 
-* Ingescape library installed
 * NodeJS (https://nodejs.org/en/download/)
 
 ## Install dependencies
