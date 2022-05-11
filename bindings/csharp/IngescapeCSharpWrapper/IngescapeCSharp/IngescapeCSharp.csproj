@@ -13,7 +13,8 @@
     <Configurations>Debug;Release</Configurations>
     <UserSecretsId>ce583a44-f9eb-46a9-9cfa-dc93f94a4322</UserSecretsId>
     <SignAssembly>false</SignAssembly>
-    <AssemblyVersion>3.0.0.0</AssemblyVersion>
+    <AssemblyVersion>3.0.3.0</AssemblyVersion>
+    <AssemblyFileVersion>3.0.3.0</AssemblyFileVersion>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
