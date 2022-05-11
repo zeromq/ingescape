@@ -1,6 +1,4 @@
-# Ingescape python - Python module based on [Ingescape](#https://github.com/zeromq/ingescape)
-
-**[License](#License)**
+# Ingescape Python
 
 **[Dependencies](#Dependencies)**
 
@@ -11,15 +9,6 @@
 **[API Summary](#api-summary)**
 
 
-## License
-Copyright (c) the Contributors as noted in the AUTHORS file.
-This file is part of Ingescape, see https://github.com/zeromq/ingescape.
-
-This Source Code Form is subject to the terms of the Mozilla Public
-License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
-
 ## Dependencies
 
 Ingescape python relies on the following libraries:
@@ -28,12 +17,13 @@ Ingescape python relies on the following libraries:
 - setuptools, wheel
 
 
-## Installing Ingescape
+## Installing
 
 Ingescape python is designed to be installed trought pip :
 
 	python3 -m pip install setuptools wheel
 	python3 -m pip install ingescape
+
 
 ## Using Ingescape in Python
 
@@ -41,6 +31,7 @@ A full example is available in examples/echo_example.py
 
 
 ## API Summary
+
 The Ingescape module provides :
 
  - Global functions to use when you only have one agent in your process or application.
