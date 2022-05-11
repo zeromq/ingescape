@@ -92,57 +92,67 @@
   </Target>
   <Import Project="..\packages\MSTest.TestAdapter.1.3.2\build\net45\MSTest.TestAdapter.targets" Condition="Exists('..\packages\MSTest.TestAdapter.1.3.2\build\net45\MSTest.TestAdapter.targets')" />
   <PropertyGroup>
-    <PreBuildEvent>if $(ConfigurationName) == Debug (
-copy "$(ProjectDir)../../../../../builds\visual-studio\$(Configuration)\$(Platform)\ingescaped.dll" "$(ProjectDir)$(OutDir)"
-copy "$(ProjectDir)../../../../../builds\visual-studio\$(Configuration)\$(Platform)\ingescaped.lib" "$(ProjectDir)$(OutDir)"
-copy "$(ProjectDir)../../../../../builds\visual-studio\$(Configuration)\$(Platform)\ingescaped.pdb" "$(ProjectDir)$(OutDir)"
-copy "$(ProjectDir)../../../../../builds\visual-studio\$(Configuration)\$(Platform)\ingescaped.exp" "$(ProjectDir)$(OutDir)"
-copy "$(ProjectDir)../../../../../builds\visual-studio\$(Configuration)\$(Platform)\ingescaped.ilk" "$(ProjectDir)$(OutDir)"
+    <PreBuildEvent>if $(PlatformName) == x86 (
+set DEPS_PLATFORM="Win32"
+)
+if $(PlatformName) ==x64 ( 
+set DEPS_PLATFORM=$(PlatformName)
+)
 
-copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\libczmq.dll" "$(ProjectDir)$(OutDir)"
-copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\czmq.lib" "$(ProjectDir)$(OutDir)"
-copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\libczmq.pdb" "$(ProjectDir)$(OutDir)"
-copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\czmq.exp" "$(ProjectDir)$(OutDir)"
-copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\libczmq.ilk" "$(ProjectDir)$(OutDir)"
 
-copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-gd-4_3_5.dll" "$(ProjectDir)$(OutDir)"
-copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-gd-4_3_5.lib" "$(ProjectDir)$(OutDir)"
-copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-gd-4_3_5.pdb" "$(ProjectDir)$(OutDir)"
-copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-gd-4_3_5.exp" "$(ProjectDir)$(OutDir)"
-copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-gd-4_3_5.ilk" "$(ProjectDir)$(OutDir)"
+echo %25DEPS_PLATFORM%25
 
-copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\libsodium.dll" "$(ProjectDir)$(OutDir)"
-copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib" "$(ProjectDir)$(OutDir)"
-copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\libsodium.pdb" "$(ProjectDir)$(OutDir)"
-copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\sodium.exp" "$(ProjectDir)$(OutDir)"
-copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\libsodium.ilk" "$(ProjectDir)$(OutDir)"
+if $(ConfigurationName) == Debug (
+copy "$(ProjectDir)../../../../../builds\visual-studio\$(Configuration)\%25DEPS_PLATFORM%25\ingescaped.dll" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\$(Configuration)\%25DEPS_PLATFORM%25\ingescaped.lib" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\$(Configuration)\%25DEPS_PLATFORM%25\ingescaped.pdb" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\$(Configuration)\%25DEPS_PLATFORM%25\ingescaped.exp" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\$(Configuration)\%25DEPS_PLATFORM%25\ingescaped.ilk" "$(ProjectDir)$(OutDir)"
 
-copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\libzyre.dll" "$(ProjectDir)$(OutDir)"
-copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\zyre.lib" "$(ProjectDir)$(OutDir)"
-copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\libzyre.pdb" "$(ProjectDir)$(OutDir)"
-copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\zyre.exp" "$(ProjectDir)$(OutDir)"
-copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\libzyre.ilk" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\czmq\$(Configuration)\%25DEPS_PLATFORM%25\libczmq.dll" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\czmq\$(Configuration)\%25DEPS_PLATFORM%25\czmq.lib" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\czmq\$(Configuration)\%25DEPS_PLATFORM%25\libczmq.pdb" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\czmq\$(Configuration)\%25DEPS_PLATFORM%25\czmq.exp" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\czmq\$(Configuration)\%25DEPS_PLATFORM%25\libczmq.ilk" "$(ProjectDir)$(OutDir)"
+
+copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\libzmq\$(Configuration)\%25DEPS_PLATFORM%25\libzmq-v142-mt-gd-4_3_5.dll" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\libzmq\$(Configuration)\%25DEPS_PLATFORM%25\libzmq-v142-mt-gd-4_3_5.lib" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\libzmq\$(Configuration)\%25DEPS_PLATFORM%25\libzmq-v142-mt-gd-4_3_5.pdb" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\libzmq\$(Configuration)\%25DEPS_PLATFORM%25\libzmq-v142-mt-gd-4_3_5.exp" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\libzmq\$(Configuration)\%25DEPS_PLATFORM%25\libzmq-v142-mt-gd-4_3_5.ilk" "$(ProjectDir)$(OutDir)"
+
+copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\sodium\$(Configuration)\%25DEPS_PLATFORM%25\libsodium.dll" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\sodium\$(Configuration)\%25DEPS_PLATFORM%25\sodium.lib" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\sodium\$(Configuration)\%25DEPS_PLATFORM%25\libsodium.pdb" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\sodium\$(Configuration)\%25DEPS_PLATFORM%25\sodium.exp" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\sodium\$(Configuration)\%25DEPS_PLATFORM%25\libsodium.ilk" "$(ProjectDir)$(OutDir)"
+
+copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\zyre\$(Configuration)\%25DEPS_PLATFORM%25\libzyre.dll" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\zyre\$(Configuration)\%25DEPS_PLATFORM%25\zyre.lib" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\zyre\$(Configuration)\%25DEPS_PLATFORM%25\libzyre.pdb" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\zyre\$(Configuration)\%25DEPS_PLATFORM%25\zyre.exp" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\zyre\$(Configuration)\%25DEPS_PLATFORM%25\libzyre.ilk" "$(ProjectDir)$(OutDir)"
 )
 if $(ConfigurationName) == Release (
-copy "$(ProjectDir)../../../../../builds\visual-studio\$(Configuration)\$(Platform)\ingescape.dll" "$(ProjectDir)$(OutDir)"
-copy "$(ProjectDir)../../../../../builds\visual-studio\$(Configuration)\$(Platform)\ingescape.lib" "$(ProjectDir)$(OutDir)"
-copy "$(ProjectDir)../../../../../builds\visual-studio\$(Configuration)\$(Platform)\ingescape.exp" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\$(Configuration)\%25DEPS_PLATFORM%25\ingescape.dll" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\$(Configuration)\%25DEPS_PLATFORM%25\ingescape.lib" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\$(Configuration)\%25DEPS_PLATFORM%25\ingescape.exp" "$(ProjectDir)$(OutDir)"
 
-copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\libczmq.dll" "$(ProjectDir)$(OutDir)"
-copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\czmq.lib" "$(ProjectDir)$(OutDir)"
-copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\czmq.exp" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\czmq\$(Configuration)\%25DEPS_PLATFORM%25\libczmq.dll" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\czmq\$(Configuration)\%25DEPS_PLATFORM%25\czmq.lib" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\czmq\$(Configuration)\%25DEPS_PLATFORM%25\czmq.exp" "$(ProjectDir)$(OutDir)"
 
-copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v142-mt-4_3_5.dll" "$(ProjectDir)$(OutDir)"
-copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v142-mt-4_3_5.lib" "$(ProjectDir)$(OutDir)"
-copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v142-mt-4_3_5.exp" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\libzmq\$(Configuration)\%25DEPS_PLATFORM%25\libzmq-v142-mt-4_3_5.dll" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\libzmq\$(Configuration)\%25DEPS_PLATFORM%25\libzmq-v142-mt-4_3_5.lib" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\libzmq\$(Configuration)\%25DEPS_PLATFORM%25\libzmq-v142-mt-4_3_5.exp" "$(ProjectDir)$(OutDir)"
 
-copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\libsodium.dll" "$(ProjectDir)$(OutDir)"
-copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib" "$(ProjectDir)$(OutDir)"
-copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\sodium.exp" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\sodium\$(Configuration)\%25DEPS_PLATFORM%25\libsodium.dll" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\sodium\$(Configuration)\%25DEPS_PLATFORM%25\sodium.lib" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\sodium\$(Configuration)\%25DEPS_PLATFORM%25\sodium.exp" "$(ProjectDir)$(OutDir)"
 
-copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\libzyre.dll" "$(ProjectDir)$(OutDir)"
-copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\zyre.lib" "$(ProjectDir)$(OutDir)"
-copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\zyre.exp" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\zyre\$(Configuration)\%25DEPS_PLATFORM%25\libzyre.dll" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\zyre\$(Configuration)\%25DEPS_PLATFORM%25\zyre.lib" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)../../../../../builds\visual-studio\dependencies\zyre\$(Configuration)\%25DEPS_PLATFORM%25\zyre.exp" "$(ProjectDir)$(OutDir)"
 )</PreBuildEvent>
   </PropertyGroup>
 </Project>
