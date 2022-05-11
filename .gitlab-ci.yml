@@ -821,11 +821,11 @@ binding-node-js-windows:
     - Copy-Item -Path ..\..\build\ReleaseX64\dependencies\libzmq\lib\Release\libzmq-v142-mt-s-4_3_5.lib -Destination ./dependencies/windows/lib
     - Copy-Item -Path ..\..\build\ReleaseX64\dependencies\zyre\Release\libzyre.lib -Destination ./dependencies/windows/lib
     - Copy-Item -Path ..\..\build\ReleaseX64\dependencies\sodium\Release\libsodium.lib -Destination ./dependencies/windows/lib
-    - Xcopy ..\..\include .\dependencies\include\ /E /y
-    - Xcopy ..\..\dependencies\czmq\include .\dependencies\include\ /E /y
-    - Xcopy ..\..\dependencies\libzmq\include .\dependencies\include\ /E /y
-    - Xcopy ..\..\dependencies\sodium\src\libsodium\include .\dependencies\include\ /E /y
-    - Xcopy ..\..\dependencies\zyre\include .\dependencies\include\ /E /y
+    - Xcopy ..\..\include .\dependencies\windows\include\ /E /y
+    - Xcopy ..\..\dependencies\czmq\include .\dependencies\windows\include\ /E /y
+    - Xcopy ..\..\dependencies\libzmq\include .\dependencies\windows\include\ /E /y
+    - Xcopy ..\..\dependencies\sodium\src\libsodium\include .\dependencies\windows\include\ /E /y
+    - Xcopy ..\..\dependencies\zyre\include .\dependencies\windows\include\ /E /y
     - $CORRECT_PWD = $PWD -replace "\\", "\\"
     - (Get-Content -path .\binding.gyp -Raw) -replace 'C:\\\\Program Files\\\\ingescape',"$CORRECT_PWD\\dependencies\\windows" | Set-Content .\binding.gyp #update file paths for igs
     - npm install --msvs_version=2019 --from_sources=1
