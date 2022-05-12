@@ -54,7 +54,6 @@ lib-build-macos:
       - ./build
     name: "lib-build-macos"
     expire_in: 1 day
-  dependencies: []
 
 
 # Create runtime installer for macos
@@ -87,7 +86,8 @@ lib-installer-macos:
     name: "lib-installer-macos"
   dependencies:
     - lib-build-macos
-  needs: [ "lib-build-macos" ]
+  needs: 
+    - lib-build-macos
 
 
 lib-deploy-macos:
@@ -99,7 +99,8 @@ lib-deploy-macos:
     - make -C build DESTDIR=$HOME/builds/sysroot install
   dependencies:
     - lib-build-macos
-  needs: [ "lib-build-macos" ]
+  needs: 
+    - lib-build-macos
   only:
     refs:
       - main
@@ -122,7 +123,6 @@ lib-build-macos-qt6:
       - ./build
     name: "lib-build-macos"
     expire_in: 1 day
-  dependencies: []
 
 lib-deploy-macos-qt6:
   extends: .lib-build-files
@@ -133,7 +133,8 @@ lib-deploy-macos-qt6:
     - make -C build DESTDIR=$HOME/builds/sysroot install
   dependencies:
     - lib-build-macos-qt6
-  needs: [ "lib-build-macos-qt6" ]
+  needs: 
+    - lib-build-macos-qt6
   only:
     refs:
       - main
@@ -165,7 +166,6 @@ lib-windows-release-x64:
      - build
     name: "lib-windows-release-x64"
     expire_in: 1 day
-  dependencies: []
 
 # Create ingescape library for windows 32 bits release
 lib-windows-release-x86:
@@ -186,7 +186,6 @@ lib-windows-release-x86:
      - build
     name: "lib-windows-release-x86"
     expire_in: 1 day
-  dependencies: []
 
 # Create ingescape library for windows 64 bits debug
 lib-windows-debug-x64:
@@ -583,7 +582,6 @@ lib-android-release-aarch64:
       - build
     name: "lib-android-release-aarch64"
     expire_in: 1 day
-  dependencies: []
 
 # Create runtime install for Android (aarch64) - Generic ZIP
 lib-installer-runtime-android-aarch64:
@@ -643,7 +641,6 @@ lib-android-release-armv7a-softfp:
       - build
     name: "lib-android-release-armv7a-softfp"
     expire_in: 1 day
-  dependencies: []
 
 # Create runtime install for Android (armv7a softfp) - Generic ZIP
 lib-installer-runtime-android-armv7a-softfp:
@@ -730,7 +727,6 @@ build-deb-packages:
     paths:
       - debian_x64/ingescape*.deb
     name: "ingescape-dev-debian-package"
-  dependencies: []
   only:
     refs:
       - main
@@ -836,7 +832,8 @@ binding-node-js-windows:
       - bindings/javascript-node/prebuilds
   dependencies:
     - lib-windows-release-x64
-  needs: [ "lib-windows-release-x64" ]
+  needs: 
+    - lib-windows-release-x64
 
 
 ## Tests
@@ -923,14 +920,13 @@ test-python:
     - cp -r ../../dependencies/zyre/include/* ./dependencies/include
     - export FROM_SOURCES="true"
     - ./build_and_run_tests.sh
-  dependencies: []
-  needs: []
   artifacts:
     paths:
       - bindings/python/dependencies/*
   dependencies:
     - lib-build-linux-x64
-  needs: [ "lib-build-linux-x64" ]
+  needs: 
+    - lib-build-linux-x64
 
 ## Package
 package-python-wheels-windows:
@@ -1170,7 +1166,6 @@ binding-csharp-windows-x64-release:
      - bindings/csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64
     name: "binding-csharp-windows-x64-release"
     expire_in: 1 day
-  dependencies: []
 
 binding-csharp-windows-x64-debug:
   stage: binding-build
@@ -1188,7 +1183,6 @@ binding-csharp-windows-x64-debug:
      - bindings/csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/DebugX64
     name: "binding-csharp-windows-x64-debug"
     expire_in: 1 day
-  dependencies: []
 
 binding-csharp-windows-x86-release:
   stage: binding-build
@@ -1206,7 +1200,6 @@ binding-csharp-windows-x86-release:
      - bindings/csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86
     name: "binding-csharp-windows-x86-release"
     expire_in: 1 day
-  dependencies: []
 
 binding-csharp-windows-x86-debug:
   stage: binding-build
@@ -1224,7 +1217,6 @@ binding-csharp-windows-x86-debug:
      - bindings/csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/DebugX86
     name: "binding-csharp-windows-x86-debug"
     expire_in: 1 day
-  dependencies: []
 
 ## Tests
 test-csharp-x64-debug:
