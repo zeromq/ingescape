@@ -549,9 +549,6 @@ if (NOT DEPS_ONLY)
         endif()
       endif()
 
-      
-      
-
       # NSIS configuration for Windows see https://cmake.org/cmake/help/v3.14/cpack_
       # gen/nsis.html#cpack_gen:CPack%20NSIS%20Generator
       set(CPACK_NSIS_DISPLAY_NAME "${PROJECT_NAME} core library")
