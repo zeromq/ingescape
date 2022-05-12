@@ -1235,9 +1235,9 @@ test-csharp-x64-debug:
     ARCH: "x64-debug"
   script:
     - cd bindings    
-    - cmake -S csharp/IngescapeCSharpWrapper/test/Tester -B csharp/IngescapeCSharpWrapper/test/Tester/build/DebugX64 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Debug
-    - cmake --build csharp/IngescapeCSharpWrapper/test/Tester/build/DebugX64 --config Debug
-    - C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe csharp/IngescapeCSharpWrapper/test/Tester/build/DebugX64/Debug/Tester.dll /Platform:x64
+    - cmake -S csharp/IngescapeCSharpWrapper/test/igstester -B csharp/IngescapeCSharpWrapper/test/igstester/build/DebugX64 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Debug
+    - cmake --build csharp/IngescapeCSharpWrapper/test/igstester/build/DebugX64 --config Debug
+    - C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe csharp/IngescapeCSharpWrapper/test/igstester/build/DebugX64/Debug/igstester.dll /Platform:x64
   dependencies:
     - binding-csharp-windows-x64-debug
     - lib-windows-debug-x64
@@ -1254,9 +1254,9 @@ test-csharp-x64-release:
     ARCH: "x64-release"
   script:
     - cd bindings
-    - cmake -S csharp/IngescapeCSharpWrapper/test/Tester -B csharp/IngescapeCSharpWrapper/test/Tester/build/ReleaseX64 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release
-    - cmake --build csharp/IngescapeCSharpWrapper/test/Tester/build/ReleaseX64 --config Release
-    - C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe csharp/IngescapeCSharpWrapper/test/Tester/build/ReleaseX64/Release/Tester.dll /Platform:x64
+    - cmake -S csharp/IngescapeCSharpWrapper/test/igstester -B csharp/IngescapeCSharpWrapper/test/igstester/build/ReleaseX64 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release
+    - cmake --build csharp/IngescapeCSharpWrapper/test/igstester/build/ReleaseX64 --config Release
+    - C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe csharp/IngescapeCSharpWrapper/test/igstester/build/ReleaseX64/Release/igstester.dll /Platform:x64
   dependencies:
     - binding-csharp-windows-x64-release
     - lib-windows-release-x64
@@ -1272,9 +1272,9 @@ test-csharp-x86-debug:
     ARCH: "x86-debug"
   script:
     - cd bindings
-    - cmake -S csharp/IngescapeCSharpWrapper/test/Tester -B csharp/IngescapeCSharpWrapper/test/Tester/build/DebugX86 -G"$env:VS_CMAKE_GENERATOR" -AWin32 -DCMAKE_BUILD_TYPE=Debug
-    - cmake --build csharp/IngescapeCSharpWrapper/test/Tester/build/DebugX86 --config Debug
-    - C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe csharp/IngescapeCSharpWrapper/test/Tester/build/DebugX86/Debug/Tester.dll /Platform:x86
+    - cmake -S csharp/IngescapeCSharpWrapper/test/igstester -B csharp/IngescapeCSharpWrapper/test/igstester/build/DebugX86 -G"$env:VS_CMAKE_GENERATOR" -AWin32 -DCMAKE_BUILD_TYPE=Debug
+    - cmake --build csharp/IngescapeCSharpWrapper/test/igstester/build/DebugX86 --config Debug
+    - C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe csharp/IngescapeCSharpWrapper/test/igstester/build/DebugX86/Debug/igstester.dll /Platform:x86
   dependencies:
     - binding-csharp-windows-x86-debug
     - lib-windows-debug-x86
@@ -1290,9 +1290,9 @@ test-csharp-x86-release:
     ARCH: "x86-release"
   script:
     - cd bindings
-    - cmake -S csharp/IngescapeCSharpWrapper/test/Tester -B csharp/IngescapeCSharpWrapper/test/Tester/build/ReleaseX86 -G"$env:VS_CMAKE_GENERATOR" -AWin32 -DCMAKE_BUILD_TYPE=Release
-    - cmake --build csharp/IngescapeCSharpWrapper/test/Tester/build/ReleaseX86 --config Release
-    - C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe csharp/IngescapeCSharpWrapper/test/Tester/build/ReleaseX86/Release/Tester.dll /Platform:x86
+    - cmake -S csharp/IngescapeCSharpWrapper/test/igstester -B csharp/IngescapeCSharpWrapper/test/igstester/build/ReleaseX86 -G"$env:VS_CMAKE_GENERATOR" -AWin32 -DCMAKE_BUILD_TYPE=Release
+    - cmake --build csharp/IngescapeCSharpWrapper/test/igstester/build/ReleaseX86 --config Release
+    - C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe csharp/IngescapeCSharpWrapper/test/igstester/build/ReleaseX86/Release/igstester.dll /Platform:x86
   dependencies:
     - binding-csharp-windows-x86-release
     - lib-windows-release-x86
