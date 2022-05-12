@@ -5,7 +5,7 @@
 ########################################################################
 
 cmake_minimum_required(VERSION 3.13.1)
-project(Tester HOMEPAGE_URL https://ingescape.com LANGUAGES CSharp)
+project(igstester HOMEPAGE_URL https://ingescape.com LANGUAGES CSharp)
 
 # Little hack because without this line, CMAKE_CXX_SIZEOF_VOID_P is not initialised
 # And installer will alwayse end with win32, not win64
@@ -36,7 +36,7 @@ list(APPEND CMAKE_MODULE_PATH ${GVR_CMAKE_MODULES_DIR})
 ########################################################################
 
 set (test_sources
-  ${CMAKE_CURRENT_SOURCE_DIR}/Main.cs
+  ${CMAKE_CURRENT_SOURCE_DIR}/test.cs
 )
 
 source_group("Source Files" FILES ${test_sources})
