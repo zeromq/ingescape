@@ -1280,6 +1280,7 @@ namespace Ingescape
          inputs/outputs by using zmsg_t structures. zmsg_t structures
          offer advanced functionalities for data serialization.
          More can be found here: http://czmq.zeromq.org/manual:zmsg */
+        // No c# wrapping of zmsg_t structure exist.
         //FIXME: INGESCAPE_EXPORT igs_result_t igsagent_output_set_zmsg(const char *name, zmsg_t *msg);
         //FIXME: INGESCAPE_EXPORT igs_result_t igsagent_input_zmsg(const char *name, zmsg_t **msg); //msg is owned by caller
 
