@@ -7,10 +7,6 @@
 cmake_minimum_required(VERSION 3.13.1)
 project(IngescapeCSharp HOMEPAGE_URL https://ingescape.com LANGUAGES CSharp)
 
-# Little hack because without this line, CMAKE_CXX_SIZEOF_VOID_P is not initialised
-# And installer will alwayse end with win32, not win64
-enable_language(CXX)
-
 include(CSharpUtilities)
 
 set(CMAKE_SUPPRESS_REGENERATION true)
@@ -32,11 +28,14 @@ endif ()
 # version
 ########################################################################
 # Set version to current ingescape version
-set(INGESCAPE_VERSION_MAJOR 0)
-set(INGESCAPE_VERSION_MINOR 9)
-set(INGESCAPE_VERSION_PATCH 0)
-set(INGESCAPE_VERSION "${INGESCAPE_VERSION_MAJOR}.${INGESCAPE_VERSION_MINOR}.${INGESCAPE_VERSION_PATCH}")
-message(STATUS "Detected INGESCAPE binding Version - ${INGESCAPE_VERSION}")
+set(MAJOR 3)
+set(MINOR 5)
+set(BUILD 49)
+
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/AssemblyInfo.cs.in
+  ${CMAKE_CURRENT_SOURCE_DIR}/AssemblyInfo.cs
+  @ONLY)
 
 ########################################################################
 # sources files
@@ -48,8 +47,8 @@ set (ingescape_csharp_sources
   ${CMAKE_CURRENT_SOURCE_DIR}/Helpers.cs
   ${CMAKE_CURRENT_SOURCE_DIR}/IgsAgent.cs
   ${CMAKE_CURRENT_SOURCE_DIR}/Enums.cs
+  ${CMAKE_CURRENT_SOURCE_DIR}/AssemblyInfo.cs
 )
-
 source_group("Source Files" FILES ${ingescape_csharp_sources})
 
 ########################################################################
@@ -58,43 +57,15 @@ source_group("Source Files" FILES ${ingescape_csharp_sources})
 
 add_library(${PROJECT_NAME} SHARED ${ingescape_csharp_sources})
 
-OPTION(UTF8_ENCODING "UTF8" OFF)
-OPTION(UNITY "UNITY" OFF)
-OPTION(IOS "IOS" OFF)
-
-IF(UTF8_ENCODING)
-    ADD_DEFINITIONS(-DUTF8_ENCODING)
-ENDIF(UTF8_ENCODING)
-
-IF(IOS)
-    ADD_DEFINITIONS(-DIOS)
-ENDIF(IOS)
-
-IF(UNITY)
-    ADD_DEFINITIONS(-DUTF8_ENCODING -DUNITY)
-ENDIF(UNITY)
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY
   VS_GLOBAL_TargetFramework "netstandard2.0"
 )
 
-set_target_properties(${PROJECT_NAME} PROPERTIES VS_PACKAGE_REFERENCES
-   	"MSTest.TestFramework_1.3.2"
+set_property(TARGET ${PROJECT_NAME} PROPERTY
+  VS_GLOBAL_GenerateAssemblyInfo false
 )
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY
   VS_GLOBAL_EnableDefaultItems false
 )
-
-IF (WIN32)
-  set_target_properties (${PROJECT_NAME} PROPERTIES
-      SOVERSION "${INGESCAPE_VERSION_MAJOR}"
-      VERSION "${INGESCAPE_VERSION}"
-  )
-ELSE (WIN32)
-  set_target_properties (${PROJECT_NAME} PROPERTIES
-    SOVERSION "${INGESCAPE_VERSION_MAJOR}"
-    VERSION "${INGESCAPE_VERSION}"
-    PREFIX "lib"
-  )
-ENDIF(WIN32)

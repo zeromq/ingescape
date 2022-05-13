@@ -1,0 +1,15 @@
+using System.Reflection;
+using System.Runtime.InteropServices;
+
+[assembly: AssemblyTitle("")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("Ingenuity")]
+[assembly: AssemblyProduct("@PROJECT_NAME@")]
+[assembly: AssemblyCopyright("Copyright © Ingenuity 2022")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
+[assembly: ComVisible(false)]
+ 
+[assembly: AssemblyVersion("@MAJOR@.@MINOR@.@BUILD@.0")]
+[assembly: AssemblyFileVersion("@MAJOR@.@MINOR@.@BUILD@.0")]
