@@ -12,8 +12,8 @@ stages:
 
 # Define ingescape library files
 .lib-build-files:
-  only:
-    changes:
+  rules:
+    - changes:
       - .gitlab-ci.yml
       - src/**/*
       - builds/cmake/**/*
@@ -28,6 +28,13 @@ variables:
   VS_CMAKE_GENERATOR: "Visual Studio 16 2019"
   DEPLOYMENT_WINDOWS_NET_SHARE: "\\\\10.0.0.2\\gitlab_workspace\\dependencies"
 
+.base_repo_main_branch:
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+
+.root_namespace:
+  rules:
+    - if: $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
 
 #http://patorjk.com/software/taag/#p=display&f=Big&t=Windows
 #                       ____   _____
@@ -54,7 +61,6 @@ lib-build-macos:
       - ./build
     name: "lib-build-macos"
     expire_in: 1 day
-  dependencies: []
 
 
 # Create runtime installer for macos
@@ -87,7 +93,8 @@ lib-installer-macos:
     name: "lib-installer-macos"
   dependencies:
     - lib-build-macos
-  needs: [ "lib-build-macos" ]
+  needs: 
+    - lib-build-macos
 
 
 lib-deploy-macos:
@@ -99,10 +106,11 @@ lib-deploy-macos:
     - make -C build DESTDIR=$HOME/builds/sysroot install
   dependencies:
     - lib-build-macos
-  needs: [ "lib-build-macos" ]
-  only:
-    refs:
-      - main
+  needs: 
+    - lib-build-macos
+  rules:
+    - !reference [.base_repo_main_branch, rules]
+
 
 
 # Build/Deploy ingescape on macos-qt6 runner
@@ -122,7 +130,6 @@ lib-build-macos-qt6:
       - ./build
     name: "lib-build-macos"
     expire_in: 1 day
-  dependencies: []
 
 lib-deploy-macos-qt6:
   extends: .lib-build-files
@@ -133,10 +140,11 @@ lib-deploy-macos-qt6:
     - make -C build DESTDIR=$HOME/builds/sysroot install
   dependencies:
     - lib-build-macos-qt6
-  needs: [ "lib-build-macos-qt6" ]
-  only:
-    refs:
-      - main
+  needs: 
+    - lib-build-macos-qt6
+  rules:
+    - !reference [.base_repo_main_branch, rules]
+
 
 
 #__          ___           _
@@ -165,7 +173,6 @@ lib-windows-release-x64:
      - build
     name: "lib-windows-release-x64"
     expire_in: 1 day
-  dependencies: []
 
 # Create ingescape library for windows 32 bits release
 lib-windows-release-x86:
@@ -186,7 +193,6 @@ lib-windows-release-x86:
      - build
     name: "lib-windows-release-x86"
     expire_in: 1 day
-  dependencies: []
 
 # Create ingescape library for windows 64 bits debug
 lib-windows-debug-x64:
@@ -207,7 +213,6 @@ lib-windows-debug-x64:
      - build
     name: "lib-windows-debug-x64"
     expire_in: 1 day
-  dependencies: []
 
 # Create ingescape library for windows 32 bits debug
 lib-windows-debug-x86:
@@ -228,7 +233,6 @@ lib-windows-debug-x86:
      - build
     name: "lib-windows-debug-x86"
     expire_in: 1 day
-  dependencies: []
 
 
 # Create runtime install for windows 32 bits
@@ -347,11 +351,26 @@ lib-deploy-windows:
     - copy .\include\ingescape_private.h $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64\include\ingescape -Force
     - cmake --install .\build\DebugX86 --config Debug --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x86
     - copy .\include\ingescape_private.h $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x86\include\ingescape -Force
-  dependencies: [ "lib-windows-release-x64", "lib-windows-release-x86", "lib-windows-debug-x64", "lib-windows-debug-x86", "test-csharp-x64-release", "test-csharp-x64-debug", "test-csharp-x86-release", "test-csharp-x86-debug"]
-  needs: [ "lib-windows-release-x64", "lib-windows-release-x86", "lib-windows-debug-x64", "lib-windows-debug-x86", "test-csharp-x64-release", "test-csharp-x64-debug", "test-csharp-x86-release", "test-csharp-x86-debug"]
-  only:
-    refs:
-      - main
+  dependencies: 
+    - lib-windows-release-x64
+    - lib-windows-release-x86
+    - lib-windows-debug-x64
+    - lib-windows-debug-x86
+    - test-csharp-x64-release
+    - test-csharp-x64-debug
+    - test-csharp-x86-release
+    - test-csharp-x86-debug
+  needs: 
+    - lib-windows-release-x64
+    - lib-windows-release-x86
+    - lib-windows-debug-x64
+    - lib-windows-debug-x86
+    - test-csharp-x64-release
+    - test-csharp-x64-debug
+    - test-csharp-x86-release
+    - test-csharp-x86-debug
+  rules:
+    - !reference [.base_repo_main_branch, rules]
 
 # _      _
 #| |    (_)
@@ -382,7 +401,6 @@ lib-build-linux-x64:
       - ./build
     name: "lib-build-linux-x64"
     expire_in: 1 day
-  dependencies: []
 
 # Create library installer for linux 64 bits
 lib-installer-linux-x64:
@@ -408,7 +426,8 @@ lib-installer-linux-x64:
     name: "lib-installer-linux-x64"
   dependencies:
     - lib-build-linux-x64
-  needs: [ "lib-build-linux-x64" ]
+  needs: 
+    - lib-build-linux-x64
 
 # Deploy ingescape to be able to compile agents
 lib-deploy-linux-release-x64:
@@ -421,10 +440,10 @@ lib-deploy-linux-release-x64:
     - make -C build DESTDIR=$HOME/builds/release/linux_x64/ install
   dependencies:
     - lib-build-linux-x64
-  needs: [ "lib-build-linux-x64" ]
-  only:
-    refs:
-      - main
+  needs: 
+    - lib-build-linux-x64
+  rules:
+    - !reference [.base_repo_main_branch, rules]
 
 
 ##
@@ -447,7 +466,6 @@ lib-build-debian-qt6-x64:
       - ./build
     name: "lib-build-debian-10-x64"
     expire_in: 1 day
-  dependencies: []
 
 # Create library installer for linux 64 bits
 lib-installer-debian-qt6-x64:
@@ -472,7 +490,8 @@ lib-installer-debian-qt6-x64:
     name: "lib-installer-debian-qt6-x64"
   dependencies:
     - lib-build-debian-qt6-x64
-  needs: [ "lib-build-debian-qt6-x64" ]
+  needs: 
+    - lib-build-debian-qt6-x64
 
 # Deploy ingescape to be able to compile agents
 lib-deploy-debian-qt6-x64:
@@ -484,12 +503,11 @@ lib-deploy-debian-qt6-x64:
     - make -C build DESTDIR=$HOME/builds/release/linux_x64/ install
   dependencies:
     - lib-build-debian-qt6-x64
-  needs: [ "lib-build-debian-qt6-x64" ]
-  only:
-    refs:
-      - main
-    variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
+  needs: 
+    - lib-build-debian-qt6-x64
+  rules:
+    - !reference [.base_repo_main_branch, rules]
+    - !reference [.root_namespace, rules]
 
 ##
 ## armhf (RPi)
@@ -514,7 +532,6 @@ lib-linux-release-armhf:
       - ./build
     name: "lib-linux-release-armhf"
     expire_in: 1 day
-  dependencies: []
 
 # Create runtime install for linux ARMv7 (armhf) - Generic ZIP
 lib-installer-runtime-linux-armhf:
@@ -553,11 +570,9 @@ lib-deploy-linux-release-armhf:
     - cp include/ingescape_private.h ~/builds/release/armhf/usr/local/include/ingescape/
   dependencies:
     - lib-linux-release-armhf
-  only:
-    refs:
-      - main
-    variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
+  rules:
+    - !reference [.base_repo_main_branch, rules]
+    - !reference [.root_namespace, rules]
 
 
 ##
@@ -583,7 +598,6 @@ lib-android-release-aarch64:
       - build
     name: "lib-android-release-aarch64"
     expire_in: 1 day
-  dependencies: []
 
 # Create runtime install for Android (aarch64) - Generic ZIP
 lib-installer-runtime-android-aarch64:
@@ -614,11 +628,9 @@ lib-deploy-linux-release-aarch64:
     - cp include/ingescape_private.h ~/builds/release/aarch64/usr/local/include/ingescape/
   dependencies:
     - lib-android-release-aarch64
-  only:
-    refs:
-      - main
-    variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
+  rules:
+    - !reference [.base_repo_main_branch, rules]
+    - !reference [.root_namespace, rules]
 
 ##
 ## armv7a (Android)
@@ -643,7 +655,6 @@ lib-android-release-armv7a-softfp:
       - build
     name: "lib-android-release-armv7a-softfp"
     expire_in: 1 day
-  dependencies: []
 
 # Create runtime install for Android (armv7a softfp) - Generic ZIP
 lib-installer-runtime-android-armv7a-softfp:
@@ -674,11 +685,9 @@ lib-deploy-linux-release-armv7a-softfp:
     - cp include/ingescape_private.h ~/builds/release/armv7a-sf/usr/local/include/ingescape/
   dependencies:
     - lib-android-release-armv7a-softfp
-  only:
-    refs:
-      - main
-    variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
+  rules:
+    - !reference [.base_repo_main_branch, rules]
+    - !reference [.root_namespace, rules]
 
 
 ##
@@ -730,12 +739,9 @@ build-deb-packages:
     paths:
       - debian_x64/ingescape*.deb
     name: "ingescape-dev-debian-package"
-  dependencies: []
-  only:
-    refs:
-      - main
-    variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
+  rules:
+    - !reference [.base_repo_main_branch, rules]
+    - !reference [.root_namespace, rules]
 
 
 
@@ -774,7 +780,8 @@ binding-node-js-macos:
       - bindings/javascript-node/prebuilds
   dependencies:
     - lib-build-macos
-  needs: [ "lib-build-macos" ]
+  needs: 
+    - lib-build-macos
 
 binding-node-js-linux:
   stage: binding-build
@@ -804,7 +811,8 @@ binding-node-js-linux:
       - bindings/javascript-node/prebuilds
   dependencies:
     - lib-build-linux-x64
-  needs: [ "lib-build-linux-x64" ]
+  needs: 
+    - lib-build-linux-x64
 
 binding-node-js-windows:
   stage: binding-build
@@ -836,7 +844,8 @@ binding-node-js-windows:
       - bindings/javascript-node/prebuilds
   dependencies:
     - lib-windows-release-x64
-  needs: [ "lib-windows-release-x64" ]
+  needs: 
+    - lib-windows-release-x64
 
 
 ## Tests
@@ -886,11 +895,9 @@ deploy-node-js:
     - binding-node-js-macos
     - binding-node-js-linux
     - binding-node-js-windows
-  only:
-    refs:
-      - main
-    variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
+  rules:
+    - !reference [.base_repo_main_branch, rules]
+    - !reference [.root_namespace, rules]
 
 #   _____       _   _                 
 #  |  __ \     | | | |                
@@ -923,14 +930,13 @@ test-python:
     - cp -r ../../dependencies/zyre/include/* ./dependencies/include
     - export FROM_SOURCES="true"
     - ./build_and_run_tests.sh
-  dependencies: []
-  needs: []
   artifacts:
     paths:
       - bindings/python/dependencies/*
   dependencies:
     - lib-build-linux-x64
-  needs: [ "lib-build-linux-x64" ]
+  needs: 
+    - lib-build-linux-x64
 
 ## Package
 package-python-wheels-windows:
@@ -972,9 +978,8 @@ package-python-wheels-windows:
     paths:
       - bindings/python/dist/*
       - bindings/python/dependencies/*
-  only:
-    refs:
-      - main
+  rules:
+    - !reference [.base_repo_main_branch, rules]
 
 package-python-wheels-macos:
   stage: binding-package
@@ -1001,9 +1006,8 @@ package-python-wheels-macos:
     paths:
       - bindings/python/dist/*
       - bindings/python/dependencies/*
-  only:
-    refs:
-      - main
+  rules:
+    - !reference [.base_repo_main_branch, rules]
 
 package-python-wheels-manylinux_2_24_x86_64:
   stage: binding-package
@@ -1035,9 +1039,8 @@ package-python-wheels-manylinux_2_24_x86_64:
   artifacts:
     paths:
       - bindings/python/wheelhouse/*
-  only:
-    refs:
-      - main
+  rules:
+    - !reference [.base_repo_main_branch, rules]
 
 package-python-wheels-manylinux2014_x86_64:
   stage: binding-package
@@ -1069,9 +1072,8 @@ package-python-wheels-manylinux2014_x86_64:
   artifacts:
     paths:
       - bindings/python/wheelhouse/*
-  only:
-    refs:
-      - main
+  rules:
+    - !reference [.base_repo_main_branch, rules]
 
 package-python-wheels-manylinux2010_x86_64:
   stage: binding-package
@@ -1102,9 +1104,8 @@ package-python-wheels-manylinux2010_x86_64:
   artifacts:
     paths:
       - bindings/python/wheelhouse/*
-  only:
-    refs:
-      - main
+  rules:
+    - !reference [.base_repo_main_branch, rules]
 
 #Publish
 publish-python-package:
@@ -1141,11 +1142,9 @@ publish-python-package:
     paths:
       - bindings/python/dist/*
       - bindings/python/wheelhouse/*
-  only:
-    refs:
-      - main
-    variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
+  rules:
+    - !reference [.base_repo_main_branch, rules]
+    - !reference [.root_namespace, rules]
 
 #   _____     _  _   
 #  / ____|  _| || |_ 
@@ -1170,7 +1169,6 @@ binding-csharp-windows-x64-release:
      - bindings/csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64
     name: "binding-csharp-windows-x64-release"
     expire_in: 1 day
-  dependencies: []
 
 binding-csharp-windows-x64-debug:
   stage: binding-build
@@ -1188,7 +1186,6 @@ binding-csharp-windows-x64-debug:
      - bindings/csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/DebugX64
     name: "binding-csharp-windows-x64-debug"
     expire_in: 1 day
-  dependencies: []
 
 binding-csharp-windows-x86-release:
   stage: binding-build
@@ -1206,7 +1203,6 @@ binding-csharp-windows-x86-release:
      - bindings/csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86
     name: "binding-csharp-windows-x86-release"
     expire_in: 1 day
-  dependencies: []
 
 binding-csharp-windows-x86-debug:
   stage: binding-build
@@ -1224,7 +1220,6 @@ binding-csharp-windows-x86-debug:
      - bindings/csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/DebugX86
     name: "binding-csharp-windows-x86-debug"
     expire_in: 1 day
-  dependencies: []
 
 ## Tests
 test-csharp-x64-debug:
@@ -1366,8 +1361,6 @@ lib-delivery-all:
     - lib-installer-runtime-linux-armhf
     - lib-installer-runtime-android-armv7a-softfp
     - lib-installer-runtime-android-aarch64
-  only:
-    refs:
-      - main
-    variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
+  rules:
+    - !reference [.base_repo_main_branch, rules]
+    - !reference [.root_namespace, rules]
