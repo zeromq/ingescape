@@ -27,10 +27,8 @@ namespace Ingescape
         private static extern void igsagent_log(LogLevel logLevel, IntPtr function, IntPtr agent, IntPtr message);
         public void Trace(string message, [CallerMemberName] string memberName = "")
         {
-            if (_pAgent == IntPtr.Zero) 
-            { 
-                throw new NullReferenceException(); 
-            }
+            if (_pAgent == IntPtr.Zero)
+                throw new NullReferenceException("Agent pointer is null");
 
             IntPtr memberNameAsPtr = Igs.StringToUTF8Ptr(memberName);
             IntPtr messageAsPtr = Igs.StringToUTF8Ptr(message);
@@ -40,7 +38,8 @@ namespace Ingescape
         }
         public void Debug(string message, [CallerMemberName] string memberName = "")
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
 
             IntPtr memberNameAsPtr = Igs.StringToUTF8Ptr(memberName);
             IntPtr messageAsPtr = Igs.StringToUTF8Ptr(message);
@@ -50,7 +49,8 @@ namespace Ingescape
         }
         public void Info(string message, [CallerMemberName] string memberName = "")
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
 
             IntPtr memberNameAsPtr = Igs.StringToUTF8Ptr(memberName);
             IntPtr messageAsPtr = Igs.StringToUTF8Ptr(message);
@@ -61,7 +61,8 @@ namespace Ingescape
         }
         public void Warn(string message, [CallerMemberName] string memberName = "")
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
 
             IntPtr memberNameAsPtr = Igs.StringToUTF8Ptr(memberName);
             IntPtr messageAsPtr = Igs.StringToUTF8Ptr(message);
@@ -72,7 +73,8 @@ namespace Ingescape
         }
         public void Error(string message, [CallerMemberName] string memberName = "")
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
 
             IntPtr memberNameAsPtr = Igs.StringToUTF8Ptr(memberName);
             IntPtr messageAsPtr = Igs.StringToUTF8Ptr(message);
@@ -83,7 +85,8 @@ namespace Ingescape
         }
         public void Fatal(string message, [CallerMemberName] string memberName = "")
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
 
             IntPtr memberNameAsPtr = Igs.StringToUTF8Ptr(memberName);
             IntPtr messageAsPtr = Igs.StringToUTF8Ptr(message);
@@ -132,11 +135,10 @@ namespace Ingescape
         {
             if (disposing)
             {
-                if (_pAgent != IntPtr.Zero)
-                {
-                    igsagent_destroy(ref _pAgent);
-                    Marshal.FreeHGlobal(_pAgent);
-                }
+                if (_pAgent == IntPtr.Zero) 
+                    throw new NullReferenceException("Agent pointer is null");
+                igsagent_destroy(ref _pAgent);
+                Marshal.FreeHGlobal(_pAgent);
             }
         }
 
@@ -144,7 +146,8 @@ namespace Ingescape
         private static extern Result igsagent_activate(IntPtr agent);
         public Result Activate()
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             return igsagent_activate(_pAgent);
 
         }
@@ -153,7 +156,8 @@ namespace Ingescape
         private static extern Result igsagent_deactivate(IntPtr agent);
         public Result Deactivate()
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             return igsagent_deactivate(_pAgent);
         }
 
@@ -164,10 +168,9 @@ namespace Ingescape
         {
             get
             {
-                if (_pAgent != IntPtr.Zero)
-                    return igsagent_is_activated(_pAgent);
-                else
-                    return false;
+                if (_pAgent == IntPtr.Zero) 
+                    throw new NullReferenceException("Agent pointer is null");
+                return igsagent_is_activated(_pAgent);
             }
         }
 
@@ -186,14 +189,14 @@ namespace Ingescape
         private static extern void igsagent_observe(IntPtr agent, AgentFunctionC cb, IntPtr myData);
         public void ObserveActivate(AgentFunction callback, object myData)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             Tuple<AgentFunction, object> tupleData = new Tuple<AgentFunction, object>(callback, myData);
             GCHandle gCHandle = GCHandle.Alloc(tupleData);
             IntPtr data = GCHandle.ToIntPtr(gCHandle);
             if (_OnActivateCallback == null)
-            {
                 _OnActivateCallback = OnActivateCallback;
-            }
+            
             igsagent_observe(_pAgent, _OnActivateCallback, data);
         }
         #endregion
@@ -207,15 +210,15 @@ namespace Ingescape
         {
             get
             {
-                if (_pAgent != IntPtr.Zero)
-                    return Igs.PtrToStringFromUTF8(igsagent_name(_pAgent));
-                else
-                    return string.Empty;
+                if (_pAgent == IntPtr.Zero) 
+                    throw new NullReferenceException("Agent pointer is null");
+                return Igs.PtrToStringFromUTF8(igsagent_name(_pAgent));
             }
 
             set
             {
-                if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+                if (_pAgent == IntPtr.Zero) 
+                    throw new NullReferenceException("Agent pointer is null");
                 IntPtr nameAsPtr = Igs.StringToUTF8Ptr(value);
                 igsagent_set_name(_pAgent, nameAsPtr);
                 Marshal.FreeHGlobal(nameAsPtr);
@@ -230,18 +233,15 @@ namespace Ingescape
         {
             get
             {
-                if (_pAgent != IntPtr.Zero)
-                    return Igs.PtrToStringFromUTF8(igsagent_family(_pAgent));
-                else
-                {
-                    Igs.Error("Agent pointer is null");
-                    return string.Empty;
-                }
+                if (_pAgent == IntPtr.Zero) 
+                    throw new NullReferenceException("Agent pointer is null");
+                return Igs.PtrToStringFromUTF8(igsagent_family(_pAgent));
             }
 
             set
             {
-                if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+                if (_pAgent == IntPtr.Zero) 
+                    throw new NullReferenceException("Agent pointer is null");
                 IntPtr nameAsPtr = Igs.StringToUTF8Ptr(value);
                 igsagent_set_family(_pAgent, nameAsPtr);
                 Marshal.FreeHGlobal(nameAsPtr);
@@ -254,13 +254,10 @@ namespace Ingescape
         {
             get
             {
-                if (_pAgent != IntPtr.Zero)
-                    return Igs.PtrToStringFromUTF8(igsagent_uuid(_pAgent));
+                if (_pAgent == IntPtr.Zero) 
+                    throw new NullReferenceException("Agent pointer is null");
                 else
-                {
-                    Igs.Error("Agent pointer is null");
-                    return string.Empty;
-                }
+                    return Igs.PtrToStringFromUTF8(igsagent_uuid(_pAgent));
             }
         }
 
@@ -272,22 +269,19 @@ namespace Ingescape
         {
             get
             {
-                if (_pAgent != IntPtr.Zero)
-                    return Igs.PtrToStringFromUTF8(igsagent_state(_pAgent));
+                if (_pAgent == IntPtr.Zero) 
+                    throw new NullReferenceException("Agent pointer is null");
                 else
-                {
-                    Igs.Error("Agent pointer is null");
-                    return string.Empty;
-                }
+                    return Igs.PtrToStringFromUTF8(igsagent_state(_pAgent));
             }
             set
             {
-                if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
-                {
-                    IntPtr stateAsPtr = Igs.StringToUTF8Ptr(value);
-                    igsagent_set_state(_pAgent, stateAsPtr);
-                    Marshal.FreeHGlobal(stateAsPtr);
-                }
+                if (_pAgent == IntPtr.Zero) 
+                    throw new NullReferenceException("Agent pointer is null");
+                
+                IntPtr stateAsPtr = Igs.StringToUTF8Ptr(value);
+                igsagent_set_state(_pAgent, stateAsPtr);
+                Marshal.FreeHGlobal(stateAsPtr);
             }
         }
 
@@ -295,7 +289,8 @@ namespace Ingescape
         private static extern void igsagent_mute(IntPtr agent);
         public void Mute()
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             igsagent_mute(_pAgent);
         }
 
@@ -303,7 +298,8 @@ namespace Ingescape
         private static extern void igsagent_unmute(IntPtr agent);
         public void Unmute()
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             igsagent_unmute(_pAgent);
         }
 
@@ -315,13 +311,9 @@ namespace Ingescape
         {
             get
             {
-                if (_pAgent != IntPtr.Zero)
-                    return igsagent_is_muted(_pAgent);
-                else
-                {
-                    Igs.Error("Agent pointer is null");
-                    return false;
-                }
+                if (_pAgent == IntPtr.Zero)
+                    throw new NullReferenceException("Agent pointer is null");                
+                return igsagent_is_muted(_pAgent);
             }
         }
 
@@ -340,21 +332,21 @@ namespace Ingescape
         private static extern void igsagent_observe_mute(IntPtr agent, MuteFunctionC cb, IntPtr myData);
         public void ObserveMute(MuteFunction callback, object myData)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             Tuple<Agent.MuteFunction, object> tupleData = new Tuple<Agent.MuteFunction, object>(callback, myData);
             GCHandle gCHandle = GCHandle.Alloc(tupleData);
             IntPtr data = GCHandle.ToIntPtr(gCHandle);
             if (_OnMuteCallback == null)
-            {
                 _OnMuteCallback = OnMuteCallback;
-            }
+            
             igsagent_observe_mute(_pAgent, OnMuteCallback, data);
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate void AgentEventsFunctionC(IntPtr agent, AgentEvent agentEvent, IntPtr uuid, IntPtr name, IntPtr eventData, IntPtr myData);
         public delegate void AgentEventsFunction(Agent agent, AgentEvent agentEvent, string uuid, string name, object eventData, object myData);
-        private AgentEventsFunctionC _OnAgentEventCallback;        
+        private AgentEventsFunctionC _OnAgentEventCallback;
         private void OnAgentEventCallback(IntPtr agent, AgentEvent agentEvent, IntPtr uuid, IntPtr name, IntPtr eventData, IntPtr myData)
         {
             Tuple<AgentEventsFunction, object> tupleData = (Tuple<AgentEventsFunction, object>)GCHandle.FromIntPtr(myData).Target;
@@ -370,14 +362,14 @@ namespace Ingescape
         private static extern void igsagent_observe_agent_events(IntPtr Agent, AgentEventsFunctionC cb, IntPtr myData);
         public void ObserveAgentEvents(AgentEventsFunction callback, object myData)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             Tuple<Agent.AgentEventsFunction, object> tupleData = new Tuple<Agent.AgentEventsFunction, object>(callback, myData);
             GCHandle gCHandle = GCHandle.Alloc(tupleData);
             IntPtr data = GCHandle.ToIntPtr(gCHandle);
             if (_OnAgentEventCallback == null)
-            {
                 _OnAgentEventCallback = OnAgentEventCallback;
-            }
+            
             igsagent_observe_agent_events(_pAgent, _OnAgentEventCallback, data);
         }
         #endregion
@@ -387,7 +379,8 @@ namespace Ingescape
         private static extern Result igsagent_definition_load_str(IntPtr agent, IntPtr json_str);
         public Result DefinitionLoadStr(string json)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr jsonAsPtr = Igs.StringToUTF8Ptr(json);
             Result res = igsagent_definition_load_str(_pAgent, jsonAsPtr);
             Marshal.FreeHGlobal(jsonAsPtr);
@@ -398,7 +391,8 @@ namespace Ingescape
         private static extern Result igsagent_definition_load_file(IntPtr agent, IntPtr file_path);
         public Result DefinitionLoadFile(string file_path)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr pathAsPtr = Igs.StringToUTF8Ptr(file_path);
             Result res = igsagent_definition_load_file(_pAgent, pathAsPtr);
             Marshal.FreeHGlobal(pathAsPtr);
@@ -409,7 +403,8 @@ namespace Ingescape
         private static extern void igsagent_clear_definition(IntPtr agent);
         public void ClearDefinition()
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             igsagent_clear_definition(_pAgent);
         }
 
@@ -417,7 +412,8 @@ namespace Ingescape
         private static extern IntPtr igsagent_definition_json(IntPtr agent);
         public string DefinitionJson()
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             return Igs.PtrToStringFromUTF8(igsagent_definition_json(_pAgent));
         }
 
@@ -429,24 +425,20 @@ namespace Ingescape
         {
             get
             {
-                if (_pAgent != IntPtr.Zero)
-                    return Igs.PtrToStringFromUTF8(igsagent_definition_description(_pAgent));
+                if (_pAgent == IntPtr.Zero) 
+                    throw new NullReferenceException("Agent pointer is null");
                 else
-                {
-                    Igs.Error("Agent pointer is null");
-                    return string.Empty;
-                }
+                    return Igs.PtrToStringFromUTF8(igsagent_definition_description(_pAgent));
             }
 
             set
             {
-                if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+                if (_pAgent == IntPtr.Zero) 
+                    throw new NullReferenceException("Agent pointer is null");
                 IntPtr descriptionAsPtr = Igs.StringToUTF8Ptr(value);
                 igsagent_definition_set_description(_pAgent, descriptionAsPtr);
                 Marshal.FreeHGlobal(descriptionAsPtr);
-
             }
-
         }
 
         [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
@@ -457,18 +449,16 @@ namespace Ingescape
         {
             get
             {
-                if (_pAgent != IntPtr.Zero)
-                    return Igs.PtrToStringFromUTF8(igsagent_definition_version(_pAgent));
+                if (_pAgent == IntPtr.Zero) 
+                    throw new NullReferenceException("Agent pointer is null");
                 else
-                {
-                    Igs.Error("Agent pointer is null");
-                    return string.Empty;
-                }
+                    return Igs.PtrToStringFromUTF8(igsagent_definition_version(_pAgent));
             }
 
             set
             {
-                if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+                if (_pAgent == IntPtr.Zero) 
+                    throw new NullReferenceException("Agent pointer is null");
                 IntPtr versionAsPtr = Igs.StringToUTF8Ptr(value);
                 igsagent_definition_set_version(_pAgent, Igs.StringToUTF8Ptr(value));
                 Marshal.FreeHGlobal(versionAsPtr);
@@ -479,7 +469,8 @@ namespace Ingescape
         private static extern Result igsagent_input_create(IntPtr agent, IntPtr name, IopValueType value_type, IntPtr value, uint size);
         public Result InputCreate(string name, IopValueType type, object value = null)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             if (value != null)
             {
@@ -487,7 +478,7 @@ namespace Ingescape
                 IntPtr valuePtr = Igs.ObjectToPtr(value, out size);
                 if (valuePtr == null)
                 {
-                    Igs.Error("Wrong type");
+                    Igs.Error(string.Format("Invalid value type for the input {0}", name));
                     return Result.Failure;
                 }
 
@@ -508,7 +499,8 @@ namespace Ingescape
         private static extern Result igsagent_output_create(IntPtr agent, IntPtr name, IopValueType type, IntPtr value, uint size);
         public Result OutputCreate(string name, IopValueType type, object value = null)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             if (value != null)
             {
@@ -516,7 +508,7 @@ namespace Ingescape
                 IntPtr valuePtr = Igs.ObjectToPtr(value, out size);
                 if (valuePtr == null)
                 {
-                    Igs.Error("Wrong type");
+                    Igs.Error(string.Format("Invalid value type for the output {0}", name));
                     return Result.Failure;
                 }
 
@@ -537,7 +529,8 @@ namespace Ingescape
         private static extern Result igsagent_parameter_create(IntPtr agent, IntPtr name, IopValueType type, IntPtr value, uint size);
         public Result ParameterCreate(string name, IopValueType type, object value = null)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             if (value != null)
             {
@@ -545,7 +538,7 @@ namespace Ingescape
                 IntPtr valuePtr = Igs.ObjectToPtr(value, out size);
                 if (valuePtr == null)
                 {
-                    Igs.Error("Wrong type");
+                    Igs.Error(string.Format("Invalid value type for the parameter {0}", name));
                     return Result.Failure;
                 }
 
@@ -567,7 +560,8 @@ namespace Ingescape
         private static extern Result igsagent_input_remove(IntPtr agent, IntPtr name);
         public Result InputRemove(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             Result res = igsagent_input_remove(_pAgent, nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -578,7 +572,8 @@ namespace Ingescape
         private static extern Result igsagent_output_remove(IntPtr agent, IntPtr name);
         public Result OutputRemove(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             Result res = igsagent_output_remove(_pAgent, nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -589,7 +584,8 @@ namespace Ingescape
         private static extern Result igsagent_parameter_remove(IntPtr agent, IntPtr name);
         public Result ParameterRemove(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             Result res = igsagent_parameter_remove(_pAgent, nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -600,7 +596,8 @@ namespace Ingescape
         private static extern IopValueType igsagent_input_type(IntPtr agent, IntPtr name);
         public IopValueType InputType(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             IopValueType res = igsagent_input_type(_pAgent, nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -610,7 +607,8 @@ namespace Ingescape
         private static extern IopValueType igsagent_output_type(IntPtr agent, IntPtr name);
         public IopValueType OutputType(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             IopValueType res = igsagent_output_type(_pAgent, nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -620,7 +618,8 @@ namespace Ingescape
         private static extern IopValueType igsagent_parameter_type(IntPtr agent, IntPtr name);
         public IopValueType ParameterType(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             IopValueType res = igsagent_parameter_type(_pAgent, nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -631,21 +630,24 @@ namespace Ingescape
         private static extern uint igsagent_input_count(IntPtr agent);
         public uint InputCount()
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             return igsagent_input_count(_pAgent);
         }
         [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern uint igsagent_output_count(IntPtr agent);
         public uint OutputCount()
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             return igsagent_output_count(_pAgent);
         }
         [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern uint igsagent_parameter_count(IntPtr agent);
         public uint ParameterCount()
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             return igsagent_parameter_count(_pAgent);
         }
 
@@ -653,16 +655,16 @@ namespace Ingescape
         private static extern IntPtr igsagent_input_list(IntPtr agent, ref uint nbOfElements);
         public string[] InputList()
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             uint nb = 0;
             IntPtr pInputList = igsagent_input_list(_pAgent, ref nb);
             IntPtr[] pArrayinputList = new IntPtr[nb];
             string[] inputList = new string[nb];
             Marshal.Copy(pInputList, pArrayinputList, 0, (int)nb);
             for (int i = 0; i < nb; i++)
-            {
                 inputList[i] = Marshal.PtrToStringAnsi(pArrayinputList[i]);
-            }
+            
             Igs.igs_free_iop_list(pInputList, (int)nb);
             return inputList;
         }
@@ -670,16 +672,16 @@ namespace Ingescape
         private static extern IntPtr igsagent_output_list(IntPtr agent, ref uint nbOfElements);
         public string[] OutputList()
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             uint nb = 0;
             IntPtr pInputList = igsagent_output_list(_pAgent, ref nb);
             IntPtr[] pArrayinputList = new IntPtr[nb];
             string[] inputList = new string[nb];
             Marshal.Copy(pInputList, pArrayinputList, 0, (int)nb);
             for (int i = 0; i < nb; i++)
-            {
                 inputList[i] = Marshal.PtrToStringAnsi(pArrayinputList[i]);
-            }
+            
             Igs.igs_free_iop_list(pInputList, (int)nb);
             return inputList;
         }
@@ -687,16 +689,16 @@ namespace Ingescape
         private static extern IntPtr igsagent_parameter_list(IntPtr agent, ref uint nbOfElements);
         public string[] ParameterList()
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             uint nb = 0;
             IntPtr pInputList = igsagent_parameter_list(_pAgent, ref nb);
             IntPtr[] pArrayinputList = new IntPtr[nb];
             string[] inputList = new string[nb];
             Marshal.Copy(pInputList, pArrayinputList, 0, (int)nb);
             for (int i = 0; i < nb; i++)
-            {
                 inputList[i] = Marshal.PtrToStringAnsi(pArrayinputList[i]);
-            }
+            
             Igs.igs_free_iop_list(pInputList, (int)nb);
             return inputList;
         }
@@ -706,7 +708,8 @@ namespace Ingescape
         private static extern bool igsagent_input_exists(IntPtr agent, IntPtr name);
         public bool InputExists(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             bool res = igsagent_input_exists(_pAgent, nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -717,7 +720,8 @@ namespace Ingescape
         private static extern bool igsagent_output_exists(IntPtr agent, IntPtr name);
         public bool OutputExists(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             bool res = igsagent_output_exists(_pAgent, nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -728,7 +732,8 @@ namespace Ingescape
         private static extern bool igsagent_parameter_exists(IntPtr agent, IntPtr name);
         public bool ParameterExists(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             bool res = igsagent_parameter_exists(_pAgent, nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -742,7 +747,8 @@ namespace Ingescape
         private static extern bool igsagent_input_bool(IntPtr agent, IntPtr name);
         public bool InputBool(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             bool res = igsagent_input_bool(_pAgent, nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -752,7 +758,8 @@ namespace Ingescape
         private static extern int igsagent_input_int(IntPtr agent, IntPtr name);
         public int InputInt(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             int res = igsagent_input_int(_pAgent, nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -762,7 +769,8 @@ namespace Ingescape
         private static extern double igsagent_input_double(IntPtr agent, IntPtr name);
         public double InputDouble(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             double res = igsagent_input_int(_pAgent, nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -772,7 +780,8 @@ namespace Ingescape
         private static extern IntPtr igsagent_input_string(IntPtr agent, IntPtr name);
         public string InputString(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             string res = Igs.PtrToStringFromUTF8(igsagent_input_string(_pAgent, nameAsPtr));
             Marshal.FreeHGlobal(nameAsPtr);
@@ -782,7 +791,8 @@ namespace Ingescape
         private static extern Result igsagent_input_data(IntPtr agent, IntPtr name, ref IntPtr data, ref uint size);
         public byte[] InputData(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             uint size = 0;
             byte[] data = null;
             IntPtr ptr = IntPtr.Zero;
@@ -793,9 +803,7 @@ namespace Ingescape
             {
                 data = new byte[size];
                 if (ptr != IntPtr.Zero)
-                {
                     Marshal.Copy(ptr, data, 0, (int)size);
-                }
             }
             return data;
         }
@@ -804,7 +812,8 @@ namespace Ingescape
         private static extern bool igsagent_output_bool(IntPtr agent, IntPtr name);
         public bool OutputBool(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             bool res = igsagent_output_bool(_pAgent, nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -814,7 +823,8 @@ namespace Ingescape
         private static extern int igsagent_output_int(IntPtr agent, IntPtr name);
         public int OutputInt(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             int res = igsagent_output_int(_pAgent, nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -824,7 +834,8 @@ namespace Ingescape
         private static extern double igsagent_output_double(IntPtr agent, IntPtr name);
         public double OutputDouble(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             double res = igsagent_output_double(_pAgent, nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -834,7 +845,8 @@ namespace Ingescape
         private static extern IntPtr igsagent_output_string(IntPtr agent, IntPtr name);
         public string OutputString(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             string res = Igs.PtrToStringFromUTF8(igsagent_output_string(_pAgent, nameAsPtr));
             Marshal.FreeHGlobal(nameAsPtr);
@@ -844,7 +856,8 @@ namespace Ingescape
         private static extern Result igsagent_output_data(IntPtr agent, IntPtr name, ref IntPtr data, ref uint size);
         public byte[] OutputData(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             uint size = 0;
             byte[] data = null;
             IntPtr ptr = IntPtr.Zero;
@@ -855,9 +868,7 @@ namespace Ingescape
             {
                 data = new byte[size];
                 if (ptr != IntPtr.Zero)
-                {
                     Marshal.Copy(ptr, data, 0, (int)size);
-                }
             }
             return data;
         }
@@ -866,7 +877,8 @@ namespace Ingescape
         private static extern bool igsagent_parameter_bool(IntPtr agent, IntPtr name);
         public bool ParameterBool(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             bool res = igsagent_parameter_bool(_pAgent, nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -876,7 +888,8 @@ namespace Ingescape
         private static extern int igsagent_parameter_int(IntPtr agent, IntPtr name);
         public int ParameterInt(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             int res = igsagent_parameter_int(_pAgent, nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -886,7 +899,8 @@ namespace Ingescape
         private static extern double igsagent_parameter_double(IntPtr agent, IntPtr name);
         public double ParameterDouble(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             double res = igsagent_parameter_double(_pAgent, nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -896,7 +910,8 @@ namespace Ingescape
         private static extern IntPtr igsagent_parameter_string(IntPtr agent, IntPtr name);
         public string ParameterString(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             string res = Igs.PtrToStringFromUTF8(igsagent_parameter_string(_pAgent, nameAsPtr));
             Marshal.FreeHGlobal(nameAsPtr);
@@ -906,7 +921,8 @@ namespace Ingescape
         private static extern Result igsagent_parameter_data(IntPtr agent, IntPtr name, ref IntPtr data, ref uint size);
         public byte[] ParameterData(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             uint size = 0;
             byte[] data = null;
             IntPtr ptr = IntPtr.Zero;
@@ -917,9 +933,7 @@ namespace Ingescape
             {
                 data = new byte[size];
                 if (ptr != IntPtr.Zero)
-                {
                     Marshal.Copy(ptr, data, 0, (int)size);
-                }
             }
             return data;
         }
@@ -929,7 +943,8 @@ namespace Ingescape
         private static extern Result igsagent_input_set_bool(IntPtr agent, IntPtr name, bool value);
         public Result InputSetBool(string name, bool value)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             Result result = Result.Failure;
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             result = igsagent_input_set_bool(_pAgent, nameAsPtr, value);
@@ -941,7 +956,8 @@ namespace Ingescape
         private static extern Result igsagent_input_set_int(IntPtr agent, IntPtr name, int value);
         public Result InputSetInt(string name, int value)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             Result result = Result.Failure;
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             result = igsagent_input_set_int(_pAgent, nameAsPtr, value);
@@ -953,7 +969,8 @@ namespace Ingescape
         private static extern Result igsagent_input_set_double(IntPtr agent, IntPtr name, double value);
         public Result InputSetDouble(string name, double value)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             Result result = Result.Failure;
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             result = igsagent_input_set_double(_pAgent, nameAsPtr, value);
@@ -965,7 +982,8 @@ namespace Ingescape
         private static extern Result igsagent_input_set_string(IntPtr agent, IntPtr name, IntPtr value);
         public Result InputSetString(string name, string value)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             Result result = Result.Failure;
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             IntPtr valueAsPtr = Igs.StringToUTF8Ptr(value);
@@ -978,7 +996,8 @@ namespace Ingescape
         private static extern Result igsagent_input_set_impulsion(IntPtr agent, IntPtr name);
         public Result InputSetImpulsion(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             Result result = Result.Failure;
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             result = igsagent_input_set_impulsion(_pAgent, nameAsPtr);
@@ -990,7 +1009,8 @@ namespace Ingescape
         private static extern Result igsagent_input_set_data(IntPtr agent, IntPtr name, IntPtr value, uint size);
         public Result InputSetData(string name, byte[] value)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             Result result = Result.Failure;
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             uint size = Convert.ToUInt32(((byte[])value).Length);
@@ -1008,7 +1028,8 @@ namespace Ingescape
         private static extern Result igsagent_output_set_bool(IntPtr agent, IntPtr name, bool value);
         public Result OutputSetBool(string name, bool value)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             Result result = Result.Failure;
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             result = igsagent_output_set_bool(_pAgent, nameAsPtr, value);
@@ -1020,7 +1041,8 @@ namespace Ingescape
         private static extern Result igsagent_output_set_int(IntPtr agent, IntPtr name, int value);
         public Result OutputSetInt(string name, int value)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             Result result = Result.Failure;
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             result = igsagent_output_set_int(_pAgent, nameAsPtr, value);
@@ -1032,11 +1054,11 @@ namespace Ingescape
         private static extern Result igsagent_output_set_double(IntPtr agent, IntPtr name, double value);
         public Result OutputSetDouble(string name, double value)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             Result result = Result.Failure;
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             result = igsagent_output_set_double(_pAgent, nameAsPtr, value);
-
             Marshal.FreeHGlobal(nameAsPtr);
             return result;
         }
@@ -1045,7 +1067,8 @@ namespace Ingescape
         private static extern Result igsagent_output_set_string(IntPtr agent, IntPtr name, IntPtr value);
         public Result OutputSetString(string name, string value)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             Result result = Result.Failure;
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             IntPtr valueAsPtr = Igs.StringToUTF8Ptr(value);
@@ -1058,7 +1081,8 @@ namespace Ingescape
         private static extern Result igsagent_output_set_impulsion(IntPtr agent, IntPtr name);
         public Result OutputSetImpulsion(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             Result result = Result.Failure;
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             result = igsagent_input_set_impulsion(_pAgent, nameAsPtr);
@@ -1070,7 +1094,8 @@ namespace Ingescape
         private static extern Result igsagent_output_set_data(IntPtr agent, IntPtr name, IntPtr value, uint size);
         public Result OutputSetData(string name, byte[] value)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             Result result = Result.Failure;
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             uint size = Convert.ToUInt32(((byte[])value).Length);
@@ -1088,7 +1113,8 @@ namespace Ingescape
         private static extern Result igsagent_parameter_set_bool(IntPtr agent, IntPtr name, bool value);
         public Result ParameterSetBool(string name, bool value)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             Result result = Result.Failure;
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             result = igsagent_parameter_set_bool(_pAgent, nameAsPtr, value);
@@ -1100,7 +1126,8 @@ namespace Ingescape
         private static extern Result igsagent_parameter_set_int(IntPtr agent, IntPtr name, int value);
         public Result ParameterSetInt(string name, int value)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             Result result = Result.Failure;
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             result = igsagent_parameter_set_int(_pAgent, nameAsPtr, value);
@@ -1112,7 +1139,8 @@ namespace Ingescape
         private static extern Result igsagent_parameter_set_double(IntPtr agent, IntPtr name, double value);
         public Result ParameterSetDouble(string name, double value)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             Result result = Result.Failure;
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             result = igsagent_parameter_set_double(_pAgent, nameAsPtr, value);
@@ -1124,7 +1152,8 @@ namespace Ingescape
         private static extern Result igsagent_parameter_set_string(IntPtr agent, IntPtr name, IntPtr value);
         public Result ParameterSetString(string name, string value)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             Result result = Result.Failure;
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             IntPtr valueAsPtr = Igs.StringToUTF8Ptr(value);
@@ -1137,7 +1166,8 @@ namespace Ingescape
         private static extern Result igsagent_parameter_set_data(IntPtr agent, IntPtr name, IntPtr value, uint size);
         public Result ParameterSetData(string name, byte[] value)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             Result result = Result.Failure;
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             uint size = Convert.ToUInt32(((byte[])value).Length);
@@ -1156,7 +1186,8 @@ namespace Ingescape
         private static extern void igsagent_constraints_enforce(IntPtr agent, bool enforce);//default is false, i.e. disabled
         public  void ConstraintsEnforce(bool enforce) 
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             igsagent_constraints_enforce(_pAgent, enforce); 
         }
 
@@ -1164,7 +1195,8 @@ namespace Ingescape
         private static extern Result igsagent_input_add_constraint(IntPtr agent, IntPtr name, IntPtr constraint);        
         public Result InputAddConstraint(string name, string constraint)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             Result result = Result.Failure;
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             IntPtr constraintAsPtr = Igs.StringToUTF8Ptr(constraint);
@@ -1178,7 +1210,8 @@ namespace Ingescape
         private static extern Result igsagent_output_add_constraint(IntPtr agent, IntPtr name, IntPtr constraint);
         public Result OutputAddConstraint(string name, string constraint)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             Result result = Result.Failure;
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             IntPtr constraintAsPtr = Igs.StringToUTF8Ptr(constraint);
@@ -1192,7 +1225,8 @@ namespace Ingescape
         private static extern Result igsagent_parameter_add_constraint(IntPtr agent, IntPtr name, IntPtr constraint);
         public Result ParameterAddConstraint(string name, string constraint)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             Result result = Result.Failure;
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             IntPtr constraintAsPtr = Igs.StringToUTF8Ptr(constraint);
@@ -1207,7 +1241,8 @@ namespace Ingescape
         private static extern void igsagent_input_set_description(IntPtr agent, IntPtr name, IntPtr description);
         public void InputSetDescription(string name, string description)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             IntPtr descriptionAsPtr = Igs.StringToUTF8Ptr(description);
             igsagent_input_set_description(_pAgent, nameAsPtr, descriptionAsPtr);
@@ -1219,7 +1254,8 @@ namespace Ingescape
         private static extern void igsagent_output_set_description(IntPtr agent, IntPtr name, IntPtr description);
         public void OutputSetDescription(string name, string description)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             IntPtr descriptionAsPtr = Igs.StringToUTF8Ptr(description);
             igsagent_output_set_description(_pAgent, nameAsPtr, descriptionAsPtr);
@@ -1231,7 +1267,8 @@ namespace Ingescape
         private static extern void igsagent_parameter_set_description(IntPtr agent, IntPtr name, IntPtr description);
         public void ParameterSetDescription(string name, string description)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             IntPtr descriptionAsPtr = Igs.StringToUTF8Ptr(description);
             igsagent_parameter_set_description(_pAgent, nameAsPtr, descriptionAsPtr);
@@ -1252,7 +1289,8 @@ namespace Ingescape
         private static extern void igsagent_clear_input(IntPtr agent, IntPtr name);
         public void ClearInput(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             igsagent_clear_input(_pAgent, nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -1262,7 +1300,8 @@ namespace Ingescape
         private static extern void igsagent_clear_output(IntPtr agent, IntPtr name);
         public void ClearOutput(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             igsagent_clear_output(_pAgent, nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -1271,7 +1310,8 @@ namespace Ingescape
         private static extern void igsagent_clear_parameter(IntPtr agent, IntPtr name);
         public void ClearParameter(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             igsagent_clear_parameter(_pAgent, nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -1287,9 +1327,6 @@ namespace Ingescape
             Tuple<Agent.IopFunction, object> tupleData = (Tuple<Agent.IopFunction, object>)GCHandle.FromIntPtr(myData).Target;
             Agent.IopFunction cSharpFunction = tupleData.Item1;
             object data = tupleData.Item2;
-            /*var agentSearch = from x in _pAgentByIgsAgent
-                              where x.Value == agent
-                              select x.Key;*/
             object newValue = null;
             switch (valueType)
             {
@@ -1318,14 +1355,14 @@ namespace Ingescape
         private static extern void igsagent_observe_input(IntPtr agent, IntPtr name, igsAgent_observeCallbackC cb, IntPtr myData);
         public void ObserveInput(string name, IopFunction callback, object myData)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             Tuple<Agent.IopFunction, object> tupleData = new Tuple<Agent.IopFunction, object>(callback, myData);
             GCHandle gCHandle = GCHandle.Alloc(tupleData);
             IntPtr data = GCHandle.ToIntPtr(gCHandle);
             if (_OnAgentObserveCallback == null)
-            {
                 _OnAgentObserveCallback = OnAgentObserveCallback;
-            }
+            
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             igsagent_observe_input(_pAgent, nameAsPtr, _OnAgentObserveCallback, data);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -1334,14 +1371,14 @@ namespace Ingescape
         private static extern void igsagent_observe_output(IntPtr agent, IntPtr name, igsAgent_observeCallbackC cb, IntPtr myData);
         public void ObserveOutput(string name, IopFunction callback, object myData)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             Tuple<Agent.IopFunction, object> tupleData = new Tuple<Agent.IopFunction, object>(callback, myData);
             GCHandle gCHandle = GCHandle.Alloc(tupleData);
             IntPtr data = GCHandle.ToIntPtr(gCHandle);
             if (_OnAgentObserveCallback == null)
-            {
                 _OnAgentObserveCallback = OnAgentObserveCallback;
-            }
+            
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             igsagent_observe_output(_pAgent, nameAsPtr, _OnAgentObserveCallback, data);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -1351,14 +1388,14 @@ namespace Ingescape
         private static extern void igsagent_observe_parameter(IntPtr agent, IntPtr name, igsAgent_observeCallbackC cb, IntPtr myData);
         public void ObserveParameter(string name, IopFunction callback, object myData)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             Tuple<Agent.IopFunction, object> tupleData = new Tuple<Agent.IopFunction, object>(callback, myData);
             GCHandle gCHandle = GCHandle.Alloc(tupleData);
             IntPtr data = GCHandle.ToIntPtr(gCHandle);
             if (_OnAgentObserveCallback == null)
-            {
                 _OnAgentObserveCallback = OnAgentObserveCallback;
-            }
+            
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             igsagent_observe_parameter(_pAgent, nameAsPtr, _OnAgentObserveCallback, data);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -1368,7 +1405,8 @@ namespace Ingescape
         private static extern void igsagent_output_mute(IntPtr agent, IntPtr name);
         public void OutputMute(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             igsagent_output_mute(_pAgent, nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -1377,7 +1415,8 @@ namespace Ingescape
         private static extern void igsagent_output_unmute(IntPtr agent, IntPtr name);
         public void OutputUnmute(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             igsagent_output_unmute(_pAgent, nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -1388,7 +1427,8 @@ namespace Ingescape
         private static extern bool igsagent_output_is_muted(IntPtr agent, IntPtr name);
         public bool OutputIsMuted(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             bool res = igsagent_output_is_muted(_pAgent, nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -1401,7 +1441,8 @@ namespace Ingescape
         private static extern Result igsagent_mapping_load_str(IntPtr agent, IntPtr json_str);
         public Result MappingLoadStr(string json_str)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr jsonAsPtr = Igs.StringToUTF8Ptr(json_str);
             Result res = igsagent_mapping_load_str(_pAgent, jsonAsPtr);
             Marshal.FreeHGlobal(jsonAsPtr);
@@ -1412,7 +1453,8 @@ namespace Ingescape
         private static extern Result igsagent_mapping_load_file(IntPtr agent, IntPtr file_path);
         public Result MappingLoadFile(string file_path)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr pathAsPtr = Igs.StringToUTF8Ptr(file_path);
             Result res = igsagent_mapping_load_file(_pAgent, pathAsPtr);
             Marshal.FreeHGlobal(pathAsPtr);
@@ -1423,7 +1465,8 @@ namespace Ingescape
         private static extern IntPtr igsagent_mapping_json(IntPtr agent); //returns json string, must be freed by caller
         public string MappingJson()
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             return Igs.PtrToStringFromUTF8(igsagent_mapping_json(_pAgent));
         }
 
@@ -1431,7 +1474,8 @@ namespace Ingescape
         private static extern uint igsagent_mapping_count(IntPtr agent);
         public uint MappingCount()
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             return igsagent_mapping_count(_pAgent);
         }
 
@@ -1439,7 +1483,8 @@ namespace Ingescape
         private static extern void igsagent_clear_mappings(IntPtr agent);
         public void ClearMappings()
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             igsagent_clear_mappings(_pAgent);
         }
 
@@ -1447,7 +1492,8 @@ namespace Ingescape
         private static extern void igsagent_clear_mappings_with_agent(IntPtr agent, IntPtr agentName);
         public void ClearMappingsWithAgent(string agentName)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr agentNameAsPtr = Igs.StringToUTF8Ptr(agentName);
             igsagent_clear_mappings_with_agent(_pAgent, agentNameAsPtr);
             Marshal.FreeHGlobal(agentNameAsPtr);
@@ -1457,7 +1503,8 @@ namespace Ingescape
         private static extern uint igsagent_mapping_add(IntPtr agent, IntPtr fromOurInput, IntPtr toAgent, IntPtr withOutput);
         public uint MappingAdd(string fromOurInput, string toAgent, string withOutput)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr fromOurInputAsPtr = Igs.StringToUTF8Ptr(fromOurInput);
             IntPtr toAgentAsPtr = Igs.StringToUTF8Ptr(toAgent);
             IntPtr withOutputAsPtr = Igs.StringToUTF8Ptr(withOutput);
@@ -1472,7 +1519,8 @@ namespace Ingescape
         private static extern Result igsagent_mapping_remove_with_id(IntPtr agent, uint theId);
         public Result MappingRemoveWithId(uint theId)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             return igsagent_mapping_remove_with_id(_pAgent, theId);
         }
 
@@ -1480,7 +1528,8 @@ namespace Ingescape
         private static extern Result igsagent_mapping_remove_with_name(IntPtr agent, IntPtr fromOurInput, IntPtr toAgent, IntPtr withOutput);
         public Result MappingRemoveWithName(string fromOurInput, string toAgent, string withOutput)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr fromOurInputAsPtr = Igs.StringToUTF8Ptr(fromOurInput);
             IntPtr toAgentAsPtr = Igs.StringToUTF8Ptr(toAgent);
             IntPtr withOutputAsPtr = Igs.StringToUTF8Ptr(withOutput);
@@ -1498,11 +1547,9 @@ namespace Ingescape
         {
             get
             {
-                if (_pAgent != IntPtr.Zero)
-                    return igsagent_split_count(_pAgent);
-                else
-                    return 0;
-
+                if (_pAgent == IntPtr.Zero) 
+                    throw new NullReferenceException("Agent pointer is null");
+                return igsagent_split_count(_pAgent);
             }
         }
 
@@ -1510,7 +1557,8 @@ namespace Ingescape
         private static extern uint igsagent_split_add(IntPtr agent, IntPtr fromOurInput, IntPtr toAgent, IntPtr withOutput);
         public uint SplitAdd(string fromOurInput, string toAgent, string withOutput)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr ptrFromOurInput = Igs.StringToUTF8Ptr(fromOurInput);
             IntPtr ptrToAgent = Igs.StringToUTF8Ptr(toAgent);
             IntPtr ptrWithOutput = Igs.StringToUTF8Ptr(withOutput);
@@ -1525,7 +1573,8 @@ namespace Ingescape
         private static extern Result igsagent_split_remove_with_id(IntPtr agent, uint id);
         public Result SplitRemoveWithId(uint id)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             return igsagent_split_remove_with_id(_pAgent, id);
         }
 
@@ -1533,7 +1582,8 @@ namespace Ingescape
         private static extern Result igsagent_split_remove_with_name(IntPtr agent, IntPtr fromOurInput, IntPtr toAgent, IntPtr withOutput);
         public Result SplitRemoveWithName(string fromOurInput, string toAgent, string withOutput)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr ptrFromOurInput = Igs.StringToUTF8Ptr(fromOurInput);
             IntPtr ptrToAgent = Igs.StringToUTF8Ptr(toAgent);
             IntPtr ptrWithOutput = Igs.StringToUTF8Ptr(withOutput);
@@ -1549,7 +1599,8 @@ namespace Ingescape
         private static extern void igsagent_mapping_set_outputs_request(IntPtr agent, bool notify);
         public void MappingSetOutputsRequest(bool notify)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             igsagent_mapping_set_outputs_request(_pAgent, notify);
         }
 
@@ -1558,7 +1609,8 @@ namespace Ingescape
         private static extern bool igsagent_mapping_outputs_request(IntPtr agent);
         public bool MappingOutputsRequest()
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             return igsagent_mapping_outputs_request(_pAgent);
         }
         #endregion
@@ -1573,7 +1625,8 @@ namespace Ingescape
 
         public Result ServiceCall(string agentNameOrUUID, string serviceName, object[] arguments, string token = "")
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); };
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");;
             IntPtr agentNameOrUUIDAsPtr = Igs.StringToUTF8Ptr(agentNameOrUUID);
             IntPtr serviceNameAsPtr = Igs.StringToUTF8Ptr(serviceName);
             IntPtr tokenAsPtr = Igs.StringToUTF8Ptr(token);
@@ -1659,14 +1712,14 @@ namespace Ingescape
         private static extern Result igsagent_service_init(IntPtr agent, IntPtr name, Agent.ServiceFunctionC cb, IntPtr myData);
         public Result ServiceInit(string name, ServiceFunction callback, object myData)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             Tuple<Agent.ServiceFunction, object> tupleData = new Tuple<Agent.ServiceFunction, object>(callback, myData);
             GCHandle gCHandle = GCHandle.Alloc(tupleData);
             IntPtr data = GCHandle.ToIntPtr(gCHandle);
             if (_OnAgentServiceCallback == null)
-            {
                 _OnAgentServiceCallback = OnAgentServiceCallback;
-            }
+            
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             Result res = igsagent_service_init(_pAgent, nameAsPtr, _OnAgentServiceCallback, data);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -1677,7 +1730,8 @@ namespace Ingescape
         private static extern Result igsagent_service_remove(IntPtr agent, IntPtr name);
         public Result ServiceRemove(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             Result res = igsagent_service_remove(_pAgent, nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -1688,7 +1742,8 @@ namespace Ingescape
         private static extern Result igsagent_service_arg_add(IntPtr agent, IntPtr serviceName, IntPtr argName, IopValueType type);
         public Result ServiceArgAdd(string serviceName, string argName, IopValueType type)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr serviceNameAsPtr = Igs.StringToUTF8Ptr(serviceName);
             IntPtr argNameAsPtr = Igs.StringToUTF8Ptr(argName);
             Result res = igsagent_service_arg_add(_pAgent, serviceNameAsPtr, argNameAsPtr, type);
@@ -1701,7 +1756,8 @@ namespace Ingescape
         private static extern Result igsagent_service_arg_remove(IntPtr agent, IntPtr serviceName, IntPtr argName); //removes first occurence with this name
         public Result ServiceArgRemove(string serviceName, string argName)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr serviceNameAsPtr = Igs.StringToUTF8Ptr(serviceName);
             IntPtr argNameAsPtr = Igs.StringToUTF8Ptr(argName);
             Result res = igsagent_service_arg_remove(_pAgent, serviceNameAsPtr, argNameAsPtr);
@@ -1714,7 +1770,8 @@ namespace Ingescape
         private static extern uint igsagent_service_count(IntPtr agent);
         public uint ServiceCount()
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             return igsagent_service_count(_pAgent);
         }
 
@@ -1723,7 +1780,8 @@ namespace Ingescape
         private static extern bool igsagent_service_exists(IntPtr agent, IntPtr name);
         public bool ServiceExists(string name)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             bool res = igsagent_service_exists(_pAgent, nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -1734,27 +1792,20 @@ namespace Ingescape
         private static extern IntPtr igsagent_service_list(IntPtr agent, ref uint nbOfElements); //returned string* shall be freed by caller
         public string[] ServiceList()
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             uint nbOfElements = 0;
 
             IntPtr intPtr = igsagent_service_list(_pAgent, ref nbOfElements);
             if (nbOfElements != 0)
             {
                 IntPtr[] intPtrArray = new IntPtr[nbOfElements];
-
-                // Copy the pointer to the array of pointers
                 Marshal.Copy(intPtr, intPtrArray, 0, (int)nbOfElements);
-
-                // Fill the string array
                 string[] list = new string[nbOfElements];
                 for (int i = 0; i < nbOfElements; i++)
-                {
                     list[i] = Marshal.PtrToStringAnsi(intPtrArray[i]);
-                }
 
-                // Release memory
                 Igs.igs_free_services_list(intPtr, nbOfElements);
-                //Marshal.FreeHGlobal(intPtr);
                 return list;
             }
             else return null;
@@ -1797,13 +1848,9 @@ namespace Ingescape
                         case IopValueType.Data:
                             byte[] byteArray = new byte[structArgument.size];
 
+                            // FIXME: size has type "uint" in language C. The corresponding type in C# is uint. But "Marshal.Copy(...)" does not accept uint for parameter "length"
                             if (structArgument.union.data != IntPtr.Zero)
-                            {
-                                // Copies data from an unmanaged memory pointer to a managed 8-bit unsigned integer array.
-                                // Copy the content of the IntPtr to the byte array
-                                // FIXME: size has type "uint" in language C. The corresponding type in C# is uint. But "Marshal.Copy(...)" does not accept uint for parameter "length"
-                                Marshal.Copy(structArgument.union.data, byteArray, 0, (int)structArgument.size);
-                            }
+                                Marshal.Copy(structArgument.union.data, byteArray, 0, (int)structArgument.size);                            
                             else
                                 byteArray = null;
 
@@ -1813,31 +1860,22 @@ namespace Ingescape
                         default:
                             break;
                     }
-                    //byte[] bytes = Encoding.Default.GetBytes(structArgument.name);
-                    //string name = Encoding.UTF8.GetString(bytes);
-
-                    // Create a new C# service argument and add it to the list
                     ServiceArgument serviceArgument = new ServiceArgument(Igs.PtrToStringFromUTF8(structArgument.name), structArgument.type, value);
-                    //serviceArgument serviceArgument = new serviceArgument(name, structArgument.type, value);
                     serviceArgumentsList.Add(serviceArgument);
-
-
                     ptrArgument = structArgument.next;
                 }
                 return serviceArgumentsList;
             }
             else
-            {
                 return null;
-            }
         }
-
 
         [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern uint igsagent_service_args_count(IntPtr agent, IntPtr serviceName);
         public uint ServiceArgsCount(string serviceName)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr serviceNameAsPtr = Igs.StringToUTF8Ptr(serviceName);
             uint res = igsagent_service_args_count(_pAgent, serviceNameAsPtr);
             Marshal.FreeHGlobal(serviceNameAsPtr);
@@ -1849,7 +1887,8 @@ namespace Ingescape
         private static extern bool igsagent_service_arg_exists(IntPtr agent, IntPtr serviceName, IntPtr argName);
         public bool ServiceArgExists(string serviceName, string argName)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr serviceNameAsPtr = Igs.StringToUTF8Ptr(serviceName);
             IntPtr argNameAsPtr = Igs.StringToUTF8Ptr(argName);
             bool res = igsagent_service_arg_exists(_pAgent, serviceNameAsPtr, argNameAsPtr);
@@ -1863,7 +1902,8 @@ namespace Ingescape
         private static extern Result igsagent_election_join(IntPtr agent, IntPtr electionName);
         public Result ElectionJoin(string electionName)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr electionNameAsPtr = Igs.StringToUTF8Ptr(electionName);
             Result res = igsagent_election_join(_pAgent, electionNameAsPtr);
             Marshal.FreeHGlobal(electionNameAsPtr);
@@ -1874,7 +1914,8 @@ namespace Ingescape
         private static extern Result igsagent_election_leave(IntPtr agent, IntPtr electionName);
         public Result ElectionLeave(string electionName)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr electionNameAsPtr = Igs.StringToUTF8Ptr(electionName);
             Result res = igsagent_election_leave(_pAgent, electionNameAsPtr);
             Marshal.FreeHGlobal(electionNameAsPtr);
@@ -1886,7 +1927,8 @@ namespace Ingescape
         private static extern void igsagent_definition_set_path(IntPtr agent, IntPtr path);
         public void DefinitionSetPath(string path)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr pathAsPtr = Igs.StringToUTF8Ptr(path);
             igsagent_definition_set_path(_pAgent, pathAsPtr);
             Marshal.FreeHGlobal(pathAsPtr);
@@ -1896,7 +1938,8 @@ namespace Ingescape
         private static extern void igsagent_mapping_set_path(IntPtr agent, IntPtr path);
         public void MappingSetPath(string path)
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             IntPtr pathAsPtr = Igs.StringToUTF8Ptr(path);
             igsagent_mapping_set_path(_pAgent, pathAsPtr);
             Marshal.FreeHGlobal(pathAsPtr);
@@ -1906,7 +1949,8 @@ namespace Ingescape
         private static extern void igsagent_definition_save(IntPtr agent);
         public void DefinitionSave()
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             igsagent_definition_save(_pAgent);
         }
 
@@ -1914,7 +1958,8 @@ namespace Ingescape
         private static extern void igsagent_mapping_save(IntPtr agent);
         public void MappingSave()
         {
-            if (_pAgent == IntPtr.Zero) { throw new NullReferenceException(); }
+            if (_pAgent == IntPtr.Zero) 
+                throw new NullReferenceException("Agent pointer is null");
             igsagent_mapping_save(_pAgent);
         }
         #endregion

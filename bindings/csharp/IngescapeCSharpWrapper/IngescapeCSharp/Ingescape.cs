@@ -34,7 +34,7 @@ namespace Ingescape
         private static extern Result igs_start_with_device(IntPtr device, uint port);
         public static Result StartWithDevice(string networkDevice, uint port)
         {
-            // ingescape provide devices in Latin-1, need to start with Latin-1            
+            // ingescape provide devices in Latin-1, need to start with Latin-1
             Result result = igs_start_with_device(StringToLatin1Ptr(networkDevice), port);
             return result;
         }
@@ -82,9 +82,8 @@ namespace Ingescape
             GCHandle gCHandle = GCHandle.Alloc(tupleData);
             IntPtr data = GCHandle.ToIntPtr(gCHandle);
             if (_OnForcedStopCallback == null)
-            {
                 _OnForcedStopCallback = OnForcedStopCallback;
-            }
+            
             igs_observe_forced_stop(_OnForcedStopCallback, data);
         }
 
@@ -183,9 +182,8 @@ namespace Ingescape
             GCHandle gCHandle = GCHandle.Alloc(tupleData);
             IntPtr data = GCHandle.ToIntPtr(gCHandle);
             if (_OnMutedCallback == null)
-            {
                 _OnMutedCallback = OnMutedCallback;
-            }
+            
             igs_observe_mute(_OnMutedCallback, data);
         }
 
@@ -228,9 +226,8 @@ namespace Ingescape
             GCHandle gCHandle = GCHandle.Alloc(tupleData);
             IntPtr data = GCHandle.ToIntPtr(gCHandle);
             if (_OnFreezeCallback == null)
-            {
                 _OnFreezeCallback = OnFreezeCallback;
-            }
+            
             return igs_observe_freeze(_OnFreezeCallback, data);
         }
 
@@ -265,9 +262,8 @@ namespace Ingescape
             GCHandle gCHandle = GCHandle.Alloc(tupleData);
             IntPtr data = GCHandle.ToIntPtr(gCHandle);
             if (_OnAgentEvents == null)
-            {
                 _OnAgentEvents = OnAgentEventsCallBack;
-            }
+            
             return igs_observe_agent_events(_OnAgentEvents, data);
         }
         #endregion
@@ -302,10 +298,7 @@ namespace Ingescape
         public static string DefinitionJson()
         {
             IntPtr ptr = igs_definition_json();
-            if (ptr == IntPtr.Zero)
-                return string.Empty;
-            else
-                return Marshal.PtrToStringAnsi(ptr);
+            return (ptr == IntPtr.Zero) ? string.Empty : Marshal.PtrToStringAnsi(ptr);
         }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
@@ -321,10 +314,7 @@ namespace Ingescape
         public static string DefinitionVersion()
         {
             IntPtr ptr = igs_definition_version();
-            if (ptr == IntPtr.Zero)
-                return string.Empty;
-            else
-                return Marshal.PtrToStringAnsi(ptr);
+            return (ptr == IntPtr.Zero) ? string.Empty : Marshal.PtrToStringAnsi(ptr);
         }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
@@ -356,33 +346,19 @@ namespace Ingescape
                 uint size;
                 IntPtr valuePtr;
                 if (value.GetType() == typeof(string))
-                {
                     valuePtr = StringToUTF8Ptr(Convert.ToString(value), out size);
-                }
                 else if (value.GetType() == typeof(bool))
-                {
                     valuePtr = BoolToPtr(Convert.ToBoolean(value), out size);
-                }
                 else if (value.GetType() == typeof(byte[]))
-                {
                     valuePtr = DataToPtr((byte[])value, out size);
-                }
                 else if (value.GetType() == typeof(double))
-                {
                     valuePtr = DoubleToPtr(Convert.ToDouble(value), out size);
-                }
                 else if (value.GetType() == typeof(float))
-                {
                     valuePtr = DoubleToPtr(Convert.ToDouble(value), out size);
-                }
                 else if (value.GetType() == typeof(int))
-                {
                     valuePtr = IntToPtr(Convert.ToInt32(value), out size);
-                }
-                else
-                {
+                else 
                     return Result.Failure;
-                }
 
                 Result res = igs_input_create(nameAsPtr, type, valuePtr, size);
                 Marshal.FreeHGlobal(nameAsPtr);
@@ -407,33 +383,20 @@ namespace Ingescape
                 uint size;
                 IntPtr valuePtr;
                 if (value.GetType() == typeof(string))
-                {
                     valuePtr = StringToUTF8Ptr(Convert.ToString(value), out size);
-                }
                 else if (value.GetType() == typeof(bool))
-                {
                     valuePtr = BoolToPtr(Convert.ToBoolean(value), out size);
-                }
                 else if (value.GetType() == typeof(byte[]))
-                {
                     valuePtr = DataToPtr((byte[])value, out size);
-                }
                 else if (value.GetType() == typeof(double))
-                {
                     valuePtr = DoubleToPtr(Convert.ToDouble(value), out size);
-                }
                 else if (value.GetType() == typeof(float))
-                {
                     valuePtr = DoubleToPtr(Convert.ToDouble(value), out size);
-                }
                 else if (value.GetType() == typeof(int))
-                {
                     valuePtr = IntToPtr(Convert.ToInt32(value), out size);
-                }
                 else
-                {
                     return Result.Failure;
-                }
+
                 Result res = igs_output_create(nameAsPtr, type, valuePtr, size);
                 Marshal.FreeHGlobal(nameAsPtr);
                 Marshal.FreeHGlobal(valuePtr);
@@ -457,33 +420,19 @@ namespace Ingescape
                 uint size;
                 IntPtr valuePtr;
                 if (value.GetType() == typeof(string))
-                {
                     valuePtr = StringToUTF8Ptr(Convert.ToString(value), out size);
-                }
                 else if (value.GetType() == typeof(bool))
-                {
                     valuePtr = BoolToPtr(Convert.ToBoolean(value), out size);
-                }
                 else if (value.GetType() == typeof(byte[]))
-                {
                     valuePtr = DataToPtr((byte[])value, out size);
-                }
                 else if (value.GetType() == typeof(double))
-                {
                     valuePtr = DoubleToPtr(Convert.ToDouble(value), out size);
-                }
                 else if (value.GetType() == typeof(float))
-                {
                     valuePtr = DoubleToPtr(Convert.ToDouble(value), out size);
-                }
                 else if (value.GetType() == typeof(int))
-                {
                     valuePtr = IntToPtr(Convert.ToInt32(value), out size);
-                }
                 else
-                {
                     return Result.Failure;
-                }
                 Result res = igs_parameter_create(nameAsPtr, type, valuePtr, size);
                 Marshal.FreeHGlobal(nameAsPtr);
                 Marshal.FreeHGlobal(valuePtr);
@@ -583,9 +532,7 @@ namespace Ingescape
                 list = new string[nbOfElements];
                 Marshal.Copy(intptr, intPtrArray, 0, nbOfElements);
                 for (int i = 0; i < nbOfElements; i++)
-                {
                     list[i] = Marshal.PtrToStringAnsi(intPtrArray[i]);
-                }
                 Igs.igs_free_iop_list(intptr, nbOfElements);
             }
             return list;
@@ -604,9 +551,7 @@ namespace Ingescape
                 list = new string[nbOfElements];
                 Marshal.Copy(intptr, intPtrArray, 0, nbOfElements);
                 for (int i = 0; i < nbOfElements; i++)
-                {
                     list[i] = Marshal.PtrToStringAnsi(intPtrArray[i]);
-                }
                 Igs.igs_free_iop_list(intptr, nbOfElements);
             }
             return list;
@@ -625,9 +570,7 @@ namespace Ingescape
                 list = new string[nbOfElements];
                 Marshal.Copy(intptr, intPtrArray, 0, nbOfElements);
                 for (int i = 0; i < nbOfElements; i++)
-                {
                     list[i] = Marshal.PtrToStringAnsi(intPtrArray[i]);
-                }
                 Igs.igs_free_iop_list(intptr, nbOfElements);
             }
             return list;
@@ -732,9 +675,7 @@ namespace Ingescape
             {
                 data = new byte[size];
                 if (ptr != IntPtr.Zero)
-                {
                     Marshal.Copy(ptr, data, 0, (int)size);
-                }
             }
             return data;
         }
@@ -795,9 +736,7 @@ namespace Ingescape
             {
                 data = new byte[size];
                 if (ptr != IntPtr.Zero)
-                {
                     Marshal.Copy(ptr, data, 0, (int)size);
-                }
             }
             return data;
         }
@@ -858,9 +797,7 @@ namespace Ingescape
             {
                 data = new byte[size];
                 if (ptr != IntPtr.Zero)
-                {
                     Marshal.Copy(ptr, data, 0, (int)size);
-                }
             }
             return data;
         }
@@ -1241,9 +1178,8 @@ namespace Ingescape
             IntPtr data = GCHandle.ToIntPtr(gCHandle);
 
             if (_OnIOPCallback == null)
-            {
                 _OnIOPCallback = OnIOPCallback;
-            }
+            
             IntPtr nameAsPtr = StringToUTF8Ptr(inputName);
             igs_observe_input(nameAsPtr, _OnIOPCallback, data);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -1256,10 +1192,10 @@ namespace Ingescape
             Tuple<IopFunction, object> tupleData = new Tuple<IopFunction, object>(callback, myData);
             GCHandle gCHandle = GCHandle.Alloc(tupleData);
             IntPtr data = GCHandle.ToIntPtr(gCHandle);
+
             if (_OnIOPCallback == null)
-            {
                 _OnIOPCallback = OnIOPCallback;
-            }
+
             IntPtr nameAsPtr = StringToUTF8Ptr(outputName);
             igs_observe_output(nameAsPtr, _OnIOPCallback, data);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -1272,10 +1208,10 @@ namespace Ingescape
             Tuple<IopFunction, object> tupleData = new Tuple<IopFunction, object>(callback, myData);
             GCHandle gCHandle = GCHandle.Alloc(tupleData);
             IntPtr data = GCHandle.ToIntPtr(gCHandle);
+
             if (_OnIOPCallback == null)
-            {
                 _OnIOPCallback = OnIOPCallback;
-            }
+
             IntPtr nameAsPtr = StringToUTF8Ptr(ParameterName);
             igs_observe_parameter(nameAsPtr, _OnIOPCallback, data);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -1301,7 +1237,7 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.I1)]
-        private static extern bool igs_output_is_muted(IntPtr name);        
+        private static extern bool igs_output_is_muted(IntPtr name);
         public static bool OutputIsMuted(string name)
         {
             IntPtr nameAsPtr = StringToUTF8Ptr(name);
@@ -1338,10 +1274,7 @@ namespace Ingescape
         public static string MappingJson()
         {
             IntPtr ptr = igs_mapping_json();
-            if (ptr == IntPtr.Zero)
-                return string.Empty;
-            else
-                return Marshal.PtrToStringAnsi(ptr);
+            return (ptr == IntPtr.Zero) ? string.Empty : Marshal.PtrToStringAnsi(ptr);
         }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
@@ -1498,7 +1431,6 @@ namespace Ingescape
         private static extern IntPtr igs_service_args_clone(IntPtr list);
         private static List<ServiceArgument> ServiceArgsClone(List<ServiceArgument> list)
         {
-            //TO Check
             List<ServiceArgument> newServiceArguments = new List<ServiceArgument>(list);
             return newServiceArguments;
         }
@@ -1506,13 +1438,12 @@ namespace Ingescape
         // Call a service to another agent
         // requires to pass agent name or UUID, service name and a list of arguments
         // passed arguments list will be deallocated and destroyed
-        // PUBLIC int igs_service_call(const char *agentNameOrUUID, const char *serviceName, igs_service_arg_t **list);
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern Result igs_service_call(IntPtr agentNameOrUUID,
                                                IntPtr serviceName,
                                                ref IntPtr list, IntPtr token);
 
-        //for a null list
+        // For a null list
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern Result igs_service_call(IntPtr agentNameOrUUID,
                                                IntPtr serviceName,
@@ -1609,10 +1540,10 @@ namespace Ingescape
             Tuple<ServiceFunction, object> tupleData = new Tuple<ServiceFunction, object>(callback, myData);
             GCHandle gCHandle = GCHandle.Alloc(tupleData);
             IntPtr data = GCHandle.ToIntPtr(gCHandle);
+
             if (_OnServiceCallback == null)
-            {
                 _OnServiceCallback = OnServiceCallback;
-            }
+            
             IntPtr nameAsPtr = StringToUTF8Ptr(name);
             Result res = igs_service_init(nameAsPtr, _OnServiceCallback, data);
             Marshal.FreeHGlobal(nameAsPtr);
@@ -1679,20 +1610,12 @@ namespace Ingescape
             if (nbOfElements != 0)
             {
                 IntPtr[] intPtrArray = new IntPtr[nbOfElements];
-
-                // Copy the pointer to the array of pointers
                 Marshal.Copy(intPtr, intPtrArray, 0, (int)nbOfElements);
-
-                // Fill the string array
                 string[] list = new string[nbOfElements];
                 for (int i = 0; i < nbOfElements; i++)
-                {
                     list[i] = Marshal.PtrToStringAnsi(intPtrArray[i]);
-                }
 
-                // Release memory
                 igs_free_services_list(intPtr, nbOfElements);
-                //Marshal.FreeHGlobal(intPtr);
                 return list;
             }
             else return null;
@@ -1739,13 +1662,11 @@ namespace Ingescape
                         case IopValueType.Data:
                             byte[] byteArray = new byte[structArgument.size];
 
+                            // Copies data from an unmanaged memory pointer to a managed 8-bit unsigned integer array.
+                            // Copy the content of the IntPtr to the byte array
+                            // FIXME: size has type "uint" in language C. The corresponding type in C# is uint. But "Marshal.Copy(...)" does not accept uint for parameter "length"
                             if (structArgument.union.data != IntPtr.Zero)
-                            {
-                                // Copies data from an unmanaged memory pointer to a managed 8-bit unsigned integer array.
-                                // Copy the content of the IntPtr to the byte array
-                                // FIXME: size has type "uint" in language C. The corresponding type in C# is uint. But "Marshal.Copy(...)" does not accept uint for parameter "length"
                                 Marshal.Copy(structArgument.union.data, byteArray, 0, (int)structArgument.size);
-                            }
                             else
                                 byteArray = null;
 
@@ -1755,23 +1676,15 @@ namespace Ingescape
                         default:
                             break;
                     }
-                    //byte[] bytes = Encoding.Default.GetBytes(structArgument.name);
-                    //string name = Encoding.UTF8.GetString(bytes);
 
-                    // Create a new C# service argument and add it to the list
                     ServiceArgument serviceArgument = new ServiceArgument(PtrToStringFromUTF8(structArgument.name), structArgument.type, value);
-                    //serviceArgument serviceArgument = new serviceArgument(name, structArgument.type, value);
                     serviceArgumentsList.Add(serviceArgument);
-
-
                     ptrArgument = structArgument.next;
                 }
                 return serviceArgumentsList;
             }
             else
-            {
                 return null;
-            }
         }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
@@ -1828,9 +1741,8 @@ namespace Ingescape
                 GCHandle gCHandle = GCHandle.Alloc(tupleData);
                 IntPtr data = GCHandle.ToIntPtr(gCHandle);
                 if (_OnTimer == null)
-                {
                     _OnTimer = OnTimer;
-                }
+                
                 return igs_timer_start((UIntPtr)delay, (UIntPtr)times, _OnTimer, data);
             }
             else
@@ -1842,7 +1754,7 @@ namespace Ingescape
         public static void TimerStop(int timerId) { igs_timer_stop(timerId); }
         #endregion
 
-        #region BROKERS VS. SELF-DISCOVERY        
+        #region BROKERS VS. SELF-DISCOVERY
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern Result igs_broker_add(IntPtr brokerEndpoint);
         /// <summary>
@@ -2131,21 +2043,15 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_log_set_file(bool useLogFile, IntPtr path);
-        public static void LogSetFile(bool useLogFile, string path = null)
-        { //Error igs_log_set_file: first argument is a boolean to enable logs in file or not, second argument is the path to the Log file (pass null to use the default file path)
-            igs_log_set_file(useLogFile, StringToUTF8Ptr(path));
-
-        }
+        public static void LogSetFile(bool useLogFile, string path = null){ igs_log_set_file(useLogFile, StringToUTF8Ptr(path)); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_log_set_file_level(LogLevel level);
-        public static void LogSetFileLevel(LogLevel level)
-        { igs_log_set_file_level(level); }
+        public static void LogSetFileLevel(LogLevel level){ igs_log_set_file_level(level); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_log_set_file_max_line_length(uint size);
-        public static void LogSetFileMaxLineLength(uint size)
-        { igs_log_set_file_max_line_length(size); }
+        public static void LogSetFileMaxLineLength(uint size){ igs_log_set_file_max_line_length(size); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.I1)]
@@ -2161,10 +2067,7 @@ namespace Ingescape
         public static string LogFilePath()
         {
             IntPtr ptr = igs_log_file_path();
-            if (ptr == IntPtr.Zero)
-                return string.Empty;
-            else
-                return Marshal.PtrToStringAnsi(ptr);
+            return (ptr == IntPtr.Zero) ? string.Empty : Marshal.PtrToStringAnsi(ptr);
         }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
@@ -2235,27 +2138,17 @@ namespace Ingescape
         public static string[] NetDevicesList()
         {
             int nb = 0;
-            //#Error igs_net_devices_list now returns the list of devices and do not take it as parameter anymore
             IntPtr ptrDevices = igs_net_devices_list(ref nb);
-
             IntPtr[] ptrArrayOfDevices = new IntPtr[nb];
-
-
             Marshal.Copy(ptrDevices, ptrArrayOfDevices, 0, nb);
-
-            // Fill the strings array
             string[] devicesArray = new string[nb];
-
             for (int i = 0; i < nb; i++)
             {
                 string isoString = PtrToStringFromISO(ptrArrayOfDevices[i]);
-
                 devicesArray[i] = isoString;
             }
 
-            // Free the memory
             igs_free_net_devices_list(ptrDevices, nb);
-
             return devicesArray;
         }
 
@@ -2267,23 +2160,16 @@ namespace Ingescape
         public static string[] NetAddressesList()
         {
             int nb = 0;
-            //#Error igs_net_addresses_list now returns the list of devices and do not take it as parameter anymore
             IntPtr ptrAddresses = igs_net_addresses_list(ref nb);
-
             IntPtr[] ptrArrayOfAddresses = new IntPtr[nb];
-
             Marshal.Copy(ptrAddresses, ptrArrayOfAddresses, 0, nb);
-
-            // Fill the strings array
             string[] addressesArray = new string[nb];
             for (int i = 0; i < nb; i++)
             {
                 addressesArray[i] = Marshal.PtrToStringAnsi(ptrArrayOfAddresses[i]);
             }
 
-            // Free the memory
             igs_free_net_addresses_list(ptrAddresses, nb);
-
             return addressesArray;
         }
 
@@ -2323,7 +2209,7 @@ namespace Ingescape
         public static void NetSetHighWaterMarks(int hwmValue) { igs_net_set_high_water_marks(hwmValue); }
         #endregion
 
-        #region PERFORMANCE CHECK        
+        #region PERFORMANCE CHECK
         //sends number of messages with defined size and displays performance
         //information when finished (information displayed as INFO-level Log)
 
@@ -2404,9 +2290,7 @@ namespace Ingescape
             GCHandle gCHandle = GCHandle.Alloc(tupleData);
             IntPtr data = GCHandle.ToIntPtr(gCHandle);
             if (_OnMonitorCallback == null)
-            {
                 _OnMonitorCallback = OnMonitorCallback;
-            }
             igs_observe_monitor(_OnMonitorCallback, data);
         }
         #endregion

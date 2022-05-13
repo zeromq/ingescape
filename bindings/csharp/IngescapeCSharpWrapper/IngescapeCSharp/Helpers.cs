@@ -51,21 +51,15 @@ namespace Ingescape
         internal static string PtrToStringFromISO(IntPtr native)
         {
             if (native == IntPtr.Zero)
-            {
                 return string.Empty;
-            }
 
             int len = 0;
 
             while (Marshal.ReadByte(native, len) != 0)
-            {
                 ++len;
-            }
 
             if (len == 0)
-            {
                 return string.Empty;
-            }
 
             Encoding iso = Encoding.GetEncoding("ISO-8859-1");
 
@@ -79,21 +73,15 @@ namespace Ingescape
         internal static string PtrToStringFromUTF8(IntPtr native)
         {
             if (native == IntPtr.Zero)
-            {
                 return string.Empty;
-            }
 
             int len = 0;
 
             while (Marshal.ReadByte(native, len) != 0)
-            {
                 ++len;
-            }
 
             if (len == 0)
-            {
                 return string.Empty;
-            }
 
             byte[] buffer = new byte[len];
             Marshal.Copy(native, buffer, 0, buffer.Length);
@@ -106,7 +94,6 @@ namespace Ingescape
         internal static IntPtr StringToUTF8Ptr(string native)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(native + "\0");
-            //Console.WriteLine(BitConverter.ToString(bytes));
             IntPtr ptr = Marshal.AllocHGlobal(bytes.Length);
 
             Marshal.Copy(bytes, 0, ptr, bytes.Length);
@@ -175,29 +162,17 @@ namespace Ingescape
             IntPtr valuePtr = IntPtr.Zero;
 
             if (value.GetType() == typeof(string))
-            {
                 valuePtr = Igs.StringToUTF8Ptr(Convert.ToString(value), out size);
-            }
             else if (value.GetType() == typeof(bool))
-            {
                 valuePtr = Igs.BoolToPtr(Convert.ToBoolean(value), out size);
-            }
             else if (value.GetType() == typeof(byte[]))
-            {
                 valuePtr = Igs.DataToPtr((byte[])value, out size);
-            }
             else if (value.GetType() == typeof(double))
-            {
                 valuePtr = Igs.DoubleToPtr(Convert.ToDouble(value), out size);
-            }
             else if (value.GetType() == typeof(float))
-            {
                 valuePtr = Igs.DoubleToPtr(Convert.ToDouble(value), out size);
-            }
             else if (value.GetType() == typeof(int))
-            {
                 valuePtr = Igs.IntToPtr(Convert.ToInt32(value), out size);
-            }
             return valuePtr;
         }
         #endregion
