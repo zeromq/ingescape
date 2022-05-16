@@ -1162,7 +1162,7 @@ binding-csharp-windows-x64-release:
   script:
     - cd bindings
     - cmake -S csharp/IngescapeCSharpWrapper/IngescapeCSharp/ -B csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
-    - Powershell.exe -executionpolicy remotesigned csharp/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64
+    - Powershell.exe -executionpolicy remotesigned csharp/IngescapeCSharpWrapper/IngescapeCSharp/builds/cmake/FixCmakeSolution.ps1 -buildFolder csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64
     - cmake --build csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64 --target IngescapeCSharp --config Release
   artifacts:
     paths:
@@ -1179,7 +1179,7 @@ binding-csharp-windows-x64-debug:
   script:
     - cd bindings
     - cmake -S csharp/IngescapeCSharpWrapper/IngescapeCSharp/ -B csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/DebugX64 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Debug -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
-    - Powershell.exe -executionpolicy remotesigned csharp/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/DebugX64
+    - Powershell.exe -executionpolicy remotesigned csharp/IngescapeCSharpWrapper/IngescapeCSharp/builds/cmake/FixCmakeSolution.ps1 -buildFolder csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/DebugX64
     - cmake --build csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/DebugX64 --target IngescapeCSharp --config Debug
   artifacts:
     paths:
@@ -1196,7 +1196,7 @@ binding-csharp-windows-x86-release:
   script:
     - cd bindings
     - cmake -S csharp/IngescapeCSharpWrapper/IngescapeCSharp/ -B csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86 -G"$env:VS_CMAKE_GENERATOR" -AWin32 -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
-    - Powershell.exe -executionpolicy remotesigned csharp/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86
+    - Powershell.exe -executionpolicy remotesigned csharp/IngescapeCSharpWrapper/IngescapeCSharp/builds/cmake/FixCmakeSolution.ps1 -buildFolder csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86
     - cmake --build csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86 --target IngescapeCSharp --config Release
   artifacts:
     paths:
@@ -1213,7 +1213,7 @@ binding-csharp-windows-x86-debug:
   script:
     - cd bindings
     - cmake -S csharp/IngescapeCSharpWrapper/IngescapeCSharp/ -B csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/DebugX86 -G"$env:VS_CMAKE_GENERATOR" -AWin32 -DCMAKE_BUILD_TYPE=Debug -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
-    - Powershell.exe -executionpolicy remotesigned csharp/IngescapeCSharpWrapper/IngescapeCSharp/FixCmakeSolution.ps1 -buildFolder csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/DebugX86
+    - Powershell.exe -executionpolicy remotesigned csharp/IngescapeCSharpWrapper/IngescapeCSharp/builds/cmake/FixCmakeSolution.ps1 -buildFolder csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/DebugX86
     - cmake --build csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/DebugX86 --target IngescapeCSharp --config Debug
   artifacts:
     paths:
