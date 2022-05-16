@@ -30,11 +30,11 @@ variables:
 
 .base_repo_main_branch:
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
 
 .root_namespace:
   rules:
-    - if: $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
+    - if: '$CI_PROJECT_ROOT_NAMESPACE == "ingescape-private" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
 
 #http://patorjk.com/software/taag/#p=display&f=Big&t=Windows
 #                       ____   _____
@@ -506,7 +506,6 @@ lib-deploy-debian-qt6-x64:
   needs: 
     - lib-build-debian-qt6-x64
   rules:
-    - !reference [.base_repo_main_branch, rules]
     - !reference [.root_namespace, rules]
 
 ##
@@ -571,7 +570,6 @@ lib-deploy-linux-release-armhf:
   dependencies:
     - lib-linux-release-armhf
   rules:
-    - !reference [.base_repo_main_branch, rules]
     - !reference [.root_namespace, rules]
 
 
@@ -629,7 +627,6 @@ lib-deploy-linux-release-aarch64:
   dependencies:
     - lib-android-release-aarch64
   rules:
-    - !reference [.base_repo_main_branch, rules]
     - !reference [.root_namespace, rules]
 
 ##
@@ -686,7 +683,6 @@ lib-deploy-linux-release-armv7a-softfp:
   dependencies:
     - lib-android-release-armv7a-softfp
   rules:
-    - !reference [.base_repo_main_branch, rules]
     - !reference [.root_namespace, rules]
 
 
@@ -740,7 +736,6 @@ build-deb-packages:
       - debian_x64/ingescape*.deb
     name: "ingescape-dev-debian-package"
   rules:
-    - !reference [.base_repo_main_branch, rules]
     - !reference [.root_namespace, rules]
 
 
@@ -896,7 +891,6 @@ deploy-node-js:
     - binding-node-js-linux
     - binding-node-js-windows
   rules:
-    - !reference [.base_repo_main_branch, rules]
     - !reference [.root_namespace, rules]
 
 #   _____       _   _                 
@@ -1143,7 +1137,6 @@ publish-python-package:
       - bindings/python/dist/*
       - bindings/python/wheelhouse/*
   rules:
-    - !reference [.base_repo_main_branch, rules]
     - !reference [.root_namespace, rules]
 
 #   _____     _  _   
@@ -1362,5 +1355,4 @@ lib-delivery-all:
     - lib-installer-runtime-android-armv7a-softfp
     - lib-installer-runtime-android-aarch64
   rules:
-    - !reference [.base_repo_main_branch, rules]
     - !reference [.root_namespace, rules]
