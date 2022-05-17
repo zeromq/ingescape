@@ -47,7 +47,7 @@ set (ingescape_csharp_sources
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Helpers.cs
   ${CMAKE_CURRENT_SOURCE_DIR}/src/IgsAgent.cs
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Enums.cs
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/AssemblyInfo.cs
+  ${CMAKE_CURRENT_BINARY_DIR}/AssemblyInfo.cs
 )
 source_group("Source Files" FILES ${ingescape_csharp_sources})
 
