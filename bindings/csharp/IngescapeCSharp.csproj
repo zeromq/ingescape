@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    
+    <Platforms>x86;x64</Platforms>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <Configurations>Debug;Release</Configurations>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Configurations>Debug;Release</Configurations>
+    <UserSecretsId>ce583a44-f9eb-46a9-9cfa-dc93f94a4322</UserSecretsId>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+    <DefineConstants>DEBUGx86</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+    <DefineConstants>RELEASEx86</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <DefineConstants>RELEASE</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="cmake\**" />
+    <Compile Remove="examples\**" />
+    <Compile Remove="test\**" />
+    <EmbeddedResource Remove="cmake\**" />
+    <EmbeddedResource Remove="examples\**" />
+    <EmbeddedResource Remove="test\**" />
+    <None Remove="cmake\**" />
+    <None Remove="examples\**" />
+    <None Remove="test\**" />
+  </ItemGroup>
+
+</Project>

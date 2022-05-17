@@ -7,14 +7,8 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <Configurations>Debug;Release</Configurations>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Company>Ingenuity</Company>
-    <Authors />
-    <Copyright>Ingenuity.io</Copyright>
     <Configurations>Debug;Release</Configurations>
     <UserSecretsId>ce583a44-f9eb-46a9-9cfa-dc93f94a4322</UserSecretsId>
-    <SignAssembly>false</SignAssembly>
-    <AssemblyVersion>3.0.3.0</AssemblyVersion>
-    <AssemblyFileVersion>3.0.3.0</AssemblyFileVersion>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
@@ -33,5 +27,15 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <DefineConstants>RELEASE</DefineConstants>
   </PropertyGroup>
+
+  <ItemGroup>    
+    <Compile Include="src/Enums.cs" />
+    <Compile Include="src/Helpers.cs" />
+    <Compile Include="src/IgsAgent.cs" />
+    <Compile Include="src/Ingescape.cs" />
+    <Compile Include="src/ServiceArgument.cs" />
+    <Compile Include="Properties/AssemblyInfo.cs" />
+    <Compile Include="Properties/launchSettings.json" />
+  </ItemGroup>
 
 </Project>

@@ -5,9 +5,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("igstester")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
+[assembly: AssemblyCompany("Ingenuity.io")]
 [assembly: AssemblyProduct("igstester")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2022")]
+[assembly: AssemblyCopyright("Copyright © Ingenuity 2022")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
