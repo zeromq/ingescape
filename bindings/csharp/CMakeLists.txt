@@ -33,8 +33,8 @@ set(MINOR 5)
 set(BUILD 49)
 
 configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/AssemblyInfo.cs.in
-  ${CMAKE_CURRENT_SOURCE_DIR}/AssemblyInfo.cs
+  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/AssemblyInfo.cs.in
+  ${CMAKE_CURRENT_BINARY_DIR}/AssemblyInfo.cs
   @ONLY)
 
 ########################################################################
@@ -42,12 +42,12 @@ configure_file(
 ########################################################################
 
 set (ingescape_csharp_sources
-  ${CMAKE_CURRENT_SOURCE_DIR}/Ingescape.cs
-  ${CMAKE_CURRENT_SOURCE_DIR}/ServiceArgument.cs
-  ${CMAKE_CURRENT_SOURCE_DIR}/Helpers.cs
-  ${CMAKE_CURRENT_SOURCE_DIR}/IgsAgent.cs
-  ${CMAKE_CURRENT_SOURCE_DIR}/Enums.cs
-  ${CMAKE_CURRENT_SOURCE_DIR}/AssemblyInfo.cs
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Ingescape.cs
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/ServiceArgument.cs
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Helpers.cs
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/IgsAgent.cs
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Enums.cs
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/AssemblyInfo.cs
 )
 source_group("Source Files" FILES ${ingescape_csharp_sources})
 
