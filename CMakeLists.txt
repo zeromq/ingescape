@@ -4,6 +4,13 @@
 # Project setup
 # ##############################################################################
 cmake_minimum_required(VERSION 3.16)
+
+option(WITH_CSHARP_WRAPPER "Compile the library with CSHARP Binding" OFF)
+
+if(WITH_CSHARP_WRAPPER AND WIN32)
+add_subdirectory(${CMAKE_SOURCE_DIR}/bindings/csharp)
+endif()
+
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.11" CACHE STRING "Minimum OS X deployment version")
 
 option(OSX_UNIVERSAL "Build for both arm64 and x86_64" OFF)
@@ -519,35 +526,20 @@ if (NOT DEPS_ONLY)
         set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES64")
         set(CPACK_NSIS_PACKAGE_NAME
             "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION} (Win64)")
-        set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} (Win64)")
-        if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-        install(FILES 
-            "bindings/csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/DebugX64/Debug/netstandard2.0/IngescapeCSharp.dll"
-            DESTINATION lib
-        )
-        else()
-        install(FILES 
-            "bindings/csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX64/Release/netstandard2.0/IngescapeCSharp.dll"
-            DESTINATION lib
-        )
-        endif()
+        set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} (Win64)")	
       else()
         set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES")
         set(CPACK_NSIS_PACKAGE_NAME
             "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION}")
         set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} (Win32)")
-        if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-        install(FILES 
-            "bindings/csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/DebugX86/Debug/netstandard2.0/IngescapeCSharp.dll"
-            DESTINATION lib
-        )
-        else()
-        install(FILES 
-            "bindings/csharp/IngescapeCSharpWrapper/IngescapeCSharp/build/ReleaseX86/Release/netstandard2.0/IngescapeCSharp.dll"
-            DESTINATION lib
-        )
-        endif()
       endif()
+
+      if(WITH_CSHARP_WRAPPER)	    
+	install(FILES 
+            	"build/bindings/csharp/Debug/netstandard2.0/IngescapeCSharp.dll"      
+            	DESTINATION lib
+        )            
+      endif()	
 
       # NSIS configuration for Windows see https://cmake.org/cmake/help/v3.14/cpack_
       # gen/nsis.html#cpack_gen:CPack%20NSIS%20Generator
