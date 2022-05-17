@@ -1,4 +1,3 @@
-#!/usr/bin/env -P /usr/bin:/usr/local/bin python3 -B
 # coding: utf-8
 
 # =========================================================================
@@ -25,7 +24,7 @@ class Singleton(type):
         return cls._instances[cls]
 
 
-class EchoExample(metaclass=Singleton):
+class Echo(metaclass=Singleton):
     def __init__(self):
         # inputs
         self.boolI = None

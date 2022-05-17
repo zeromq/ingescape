@@ -13,7 +13,7 @@
 
 const igs = require('ingescape');
 
-class EchoExample {
+class Echo {
 
   constructor() {
     //inputs
@@ -163,5 +163,5 @@ class EchoExample {
   }
 };
 
-module.exports = {EchoExample:EchoExample};
+module.exports = {Echo:Echo};
 

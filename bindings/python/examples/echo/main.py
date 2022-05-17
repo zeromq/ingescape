@@ -1,4 +1,4 @@
-#!/usr/bin/env -P /usr/bin:/usr/local/bin python3 -B
+#!/usr/bin/env python3
 # coding: utf-8
 # =========================================================================
 # main.py
@@ -17,11 +17,11 @@ import getopt
 import time
 from pathlib import Path
 
-from echo_example import *
+from echo import *
 
 port = 5670
-agent_name = "echo_example"
-device = "en3"
+agent_name = "echo"
+device = "en0"
 verbose = False
 is_interrupted = False
 
@@ -90,13 +90,13 @@ def signal_handler(signal_received, frame):
 
 def on_agent_event_callback(event, uuid, name, event_data, my_data):
     agent_object = my_data
-    assert isinstance(agent_object, EchoExample)
+    assert isinstance(agent_object, Echo)
     # add code here if needed
 
 
 def on_freeze_callback(is_frozen, my_data):
     agent_object = my_data
-    assert isinstance(agent_object, EchoExample)
+    assert isinstance(agent_object, Echo)
     # add code here if needed
 
 
@@ -108,42 +108,42 @@ def impulsion_input_callback(iop_type, name, value_type, value, my_data):
 def bool_input_callback(iop_type, name, value_type, value, my_data):
     igs.info(f"Input {name} written to {value}")
     agent_object = my_data
-    assert isinstance(agent_object, EchoExample)
+    assert isinstance(agent_object, Echo)
     agent_object.boolI = value
     agent_object.boolO = value
 
 def integer_input_callback(iop_type, name, value_type, value, my_data):
     igs.info(f"Input {name} written to {value}")
     agent_object = my_data
-    assert isinstance(agent_object, EchoExample)
+    assert isinstance(agent_object, Echo)
     agent_object.integerI = value
     agent_object.integerO = value
 
 def double_input_callback(iop_type, name, value_type, value, my_data):
     igs.info(f"Input {name} written to {value}")
     agent_object = my_data
-    assert isinstance(agent_object, EchoExample)
+    assert isinstance(agent_object, Echo)
     agent_object.doubleI = value
     agent_object.doubleO = value
 
 def string_input_callback(iop_type, name, value_type, value, my_data):
     igs.info(f"Input {name} written to {value}")
     agent_object = my_data
-    assert isinstance(agent_object, EchoExample)
+    assert isinstance(agent_object, Echo)
     agent_object.stringI = value
     agent_object.stringO = value
 
 def data_input_callback(iop_type, name, value_type, value, my_data):
     igs.info(f"Input {name} written to {value}")
     agent_object = my_data
-    assert isinstance(agent_object, EchoExample)
+    assert isinstance(agent_object, Echo)
     agent_object.dataI = value
     agent_object.dataO = value
 
 # services
 def receive_values_callback(sender_agent_name, sender_agent_uuid, service_name, tuple_args, token, my_data):
     agent_object = my_data
-    assert isinstance(agent_object, EchoExample)
+    assert isinstance(agent_object, Echo)
     boolV = tuple_args[0]
     integer = tuple_args[1]
     double = tuple_args[2]
@@ -154,7 +154,7 @@ def receive_values_callback(sender_agent_name, sender_agent_uuid, service_name, 
 
 def send_values_callback(sender_agent_name, sender_agent_uuid, service_name, tuple_args, token, my_data):
     agent_object = my_data
-    assert isinstance(agent_object, EchoExample)
+    assert isinstance(agent_object, Echo)
     agent_object.send_values(sender_agent_name, sender_agent_uuid, token, my_data)
 
 
@@ -217,7 +217,7 @@ if __name__ == "__main__":
                 print_usage()
             exit(1)
 
-    agent = EchoExample()
+    agent = Echo()
 
     igs.observe_agent_events(on_agent_event_callback, agent)
     igs.observe_freeze(on_freeze_callback, agent)

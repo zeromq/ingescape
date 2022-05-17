@@ -21,9 +21,9 @@ const iopTypeEnum = IGS.iopValueTypes();
 const igsResultEnum = IGS.resultTypes();
 const agentEventEnum = IGS.agentEventTypes();
 
+let networkDevice = "en0";
 let port = 5670;
 let agentName = "nodeTester";
-let networkDevice = "en1";
 let verbose = false;
 let staticTests = false; 
 

@@ -1,7 +1,7 @@
 # Ingescape NodeJS
 
-Ingescape NodeJS comes with the Ingescape C library embedded (statically linked) and uses n-api to bind to it.
-`prebuildify` and `node-gyp-build` are used to respectively prebuild ingescape.node binary for windows, macos and linux, and to deliver the right package for your OS.
+Ingescape NodeJS embeds the Ingescape C library (statically linked) and uses n-api to wrap to it.
+`prebuildify` and `node-gyp-build` are used to prebuild the ingescape.node binary for windows, macos and linux, and to deliver the right package for all the supported operating systems.
 
 
 ## Prerequisites
@@ -11,7 +11,7 @@ Ingescape NodeJS comes with the Ingescape C library embedded (statically linked)
 
 ## Installing
 
-Once your Node.JS project is initiated, you can install ingescape with npm. 
+You can install ingescape with npm. 
 ```
 npm install ingescape
 ```
@@ -40,7 +40,7 @@ Your package will be built in `./prebuilds/{platform}-{arch}/node.napi.node`.
 
 ### Testing your own ingescape Node package
 
-Once built, you can test your ingescape package thanks to the ./tests/test.js script : assertions will fail if the script encounters an error. Be sure to specify correct values for port and network device variables inside the script.
+Once built, you can test your ingescape package thanks to the ./tests/test.js script. Be sure to specify correct values for network device (default is 'en0') and port (default is 5670) variables inside the script.
 
 ```bash
 npm run test

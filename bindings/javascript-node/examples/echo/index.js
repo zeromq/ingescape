@@ -13,7 +13,7 @@
 const igs = require('ingescape');
 const commandLineArgs = require('command-line-args')
 const fs = require('fs');
-const EchoExample = require("./src/echoExample").EchoExample;
+const Echo = require("./echo").Echo;
 
 const iopTypes = igs.iopTypes();
 const iopValueTypes = igs.iopValueTypes();
@@ -21,41 +21,41 @@ const iopValueTypes = igs.iopValueTypes();
 let verbose = false;
 let networkDevice = "";
 let port = 5670;
-let agentName = "echo_example";
+let agentName = "echo";
 let igsCertPath = "";
 let publicCertsDir = "";
 
-let echoExample = new EchoExample();
+let echoAgent = new Echo();
 
 //inputs
 function impulsionInputCallback(iopType, name, valueType, value, myData) {
   igs.info(name + " changed (impulsion)");
-  echoExample.setImpulsionI();
+  echoAgent.setImpulsionI();
 }
 
 function boolInputCallback(iopType, name, valueType, value, myData) {
   igs.info(name + " changed to " + value);
-  echoExample.setBoolI(value);
+  echoAgent.setBoolI(value);
 }
 
 function integerInputCallback(iopType, name, valueType, value, myData) {
   igs.info(name + " changed to " + value);
-  echoExample.setIntegerI(value);
+  echoAgent.setIntegerI(value);
 }
 
 function doubleInputCallback(iopType, name, valueType, value, myData) {
   igs.info(name + " changed to " + value);
-  echoExample.setDoubleI(value);
+  echoAgent.setDoubleI(value);
 }
 
 function stringInputCallback(iopType, name, valueType, value, myData) {
   igs.info(name + " changed to " + value);
-  echoExample.setStringI(value);
+  echoAgent.setStringI(value);
 }
 
 function dataInputCallback(iopType, name, valueType, value, myData) {
   igs.info(name + " changed (" + (value ? value.byteLength : "0") +" bytes)");
-  echoExample.setDataI(value);
+  echoAgent.setDataI(value);
 }
 
 //services
@@ -123,19 +123,19 @@ function receiveValuesCallback(senderAgentName, senderAgentUUID, serviceName, se
       return;
   }
 
-  echoExample.receiveValues(serviceArgs[0].value, serviceArgs[1].value, serviceArgs[2].value, serviceArgs[3].value, serviceArgs[4].value);
+  echoAgent.receiveValues(serviceArgs[0].value, serviceArgs[1].value, serviceArgs[2].value, serviceArgs[3].value, serviceArgs[4].value);
 }
 
 function sendValuesCallback(senderAgentName, senderAgentUUID, serviceName, serviceArgs, token, myData) {
   igs.info(senderAgentName + "(" + senderAgentUUID + ") called " + serviceName);
 
-  echoExample.sendValues();
+  echoAgent.sendValues();
 }
 
 
 // Command line interpreter
 function printUsage() {
-    console.info("Usage examples:");
+    console.info("Usage:");
     console.info("    node index.js --verbose --device en0 --port 5670");
     console.info("\nIngescape parameters:");
     console.info("--verbose : enable verbose mode in the application (default is disabled)");

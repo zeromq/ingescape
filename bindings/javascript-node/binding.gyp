@@ -6,7 +6,8 @@
             "./src/init_control.c", "./src/definition.c", "./src/enum.c", "./src/iop.c",
             "./src/mapping.c", "./src/service.c", "./src/advanced.c", "./src/agent.c"],
             'variables': {
-                'from_sources%': '0'
+                'openssl_fips' : '0',
+                'from_sources%': '0' 
             },
 			"conditions": [
                 [

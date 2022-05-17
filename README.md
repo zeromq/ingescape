@@ -563,4 +563,4 @@ Here is the structure of ingescape.h:
 
 Ingescape has built an architecture and data exchange model above some amazing ZeroMQ technologies. Please keep that in mind to decide where to contribute between CZMQ, Zyre and Ingescape.
 
-The Ingescape API does not fully comply  with the CLASS style guide yet but progressively get closer. We already share its objectives of simplicity and minimalism. Do read your code after you write it and ask, "Can I make this simpler?"
+The Ingescape API does not fully comply  with the CLASS style guide yet but progressively gets closer. We already share its objectives of simplicity and minimalism. Do read your code after you write it and ask, "Can I make this simpler?"

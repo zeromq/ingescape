@@ -124,7 +124,7 @@ igs.serviceArgAdd("multiply", "b", iopValueTypes.IGS_INTEGER_T);
 //Actually and finally start the agent
 //First argument is the network device name to use
 //Second argument is the network port used by all the agents of your system
-igs.startWithDevice("en1", 9009);
+igs.startWithDevice("en0", 5670);
 
 //Stop the agent properly before terminating the program
 process.on('SIGINT', function() {

@@ -16,7 +16,9 @@ set -e
 
 SCRIPT_DIR=$(cd `dirname $0`; pwd)
 
-python3 -m pip install $SCRIPT_DIR/.
+python3 -m pip install $SCRIPT_DIR/..
 
-python3 $SCRIPT_DIR/tests/tests_api_globale.py
-python3 $SCRIPT_DIR/tests/tests_api_agent.py
+echo -e "\n\n**** GLOBAL API ***************************"
+python3 $SCRIPT_DIR/global_api.py
+echo -e "\n\n**** AGENT API ***************************"
+python3 $SCRIPT_DIR/agent_api.py

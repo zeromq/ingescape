@@ -36,10 +36,10 @@ ingescape_src = ["./src/ingescape_python.c", "./src/admin.c",
 ingescape_agent_src =["./src/agent.c"]
 ingescape_include = ["./includes"]
 
-macos_lib_dirs = './dependencies/macos/'
-linux_lib_dirs = './dependencies/linux/'
-windows_x64_lib_dirs = './dependencies/windows/x64/'
-windows_x86_lib_dirs = './dependencies/windows/x86/'
+macos_lib_dirs = '/usr/local/lib/' #TODO: use lib path instead of hardcoding
+linux_lib_dirs = '/usr/local/lib/'
+windows_x64_lib_dirs = ''
+windows_x86_lib_dirs = ''
 
 extra_objects = []
 librairies = []

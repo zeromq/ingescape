@@ -1,17 +1,8 @@
-# Ingescape Python
-
-**[Dependencies](#Dependencies)**
-
-**[Installing Ingescape](#Installing-Ingescape)**
-
-**[Using Ingescape in Python](#Using-Ingescape-in-Python)**
-
-**[API Summary](#api-summary)**
-
+# Ingescape Python binding
 
 ## Dependencies
 
-Ingescape python relies on the following libraries:
+The Ingescape Python binding relies on the following libraries:
 
 - Python 3.6+ 
 - setuptools, wheel
@@ -19,21 +10,19 @@ Ingescape python relies on the following libraries:
 
 ## Installing
 
-Ingescape python is designed to be installed trought pip :
+Ingescape python is designed to be installed trough pip :
 
-	python3 -m pip install setuptools wheel
 	python3 -m pip install ingescape
 
 
-## Using Ingescape in Python
+## Using Ingescape with Python
 
-A full example is available in examples/echo_example.py
+Two examples are provided in the 'examples' directory.
 
 
-## API Summary
+## Compiling the Ingescape Python binding
 
-The Ingescape module provides :
+Run the following commands from the Ingescape Python directory :
 
- - Global functions to use when you only have one agent in your process or application.
- - An _Agent_ class that provides all the specific functions dedicated to several agents inside the same process.
-
+	python3 -m pip install setuptools wheel
+	python3 -m pip install .
