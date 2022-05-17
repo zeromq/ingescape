@@ -7,15 +7,11 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <Configurations>Debug;Release</Configurations>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Company>Ingenuity</Company>
-    <Authors />
-    <Copyright>Ingenuity.io</Copyright>
     <Configurations>Debug;Release</Configurations>
     <UserSecretsId>ce583a44-f9eb-46a9-9cfa-dc93f94a4322</UserSecretsId>
-    <SignAssembly>false</SignAssembly>
-    <AssemblyVersion>3.0.3.0</AssemblyVersion>
-    <AssemblyFileVersion>3.0.3.0</AssemblyFileVersion>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
@@ -33,5 +29,17 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <DefineConstants>RELEASE</DefineConstants>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="cmake\**" />
+    <Compile Remove="examples\**" />
+    <Compile Remove="test\**" />
+    <EmbeddedResource Remove="cmake\**" />
+    <EmbeddedResource Remove="examples\**" />
+    <EmbeddedResource Remove="test\**" />
+    <None Remove="cmake\**" />
+    <None Remove="examples\**" />
+    <None Remove="test\**" />
+  </ItemGroup>
 
 </Project>
