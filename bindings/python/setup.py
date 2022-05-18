@@ -38,8 +38,13 @@ ingescape_include = ["./includes"]
 
 macos_lib_dirs = '/usr/local/lib/' #TODO: use lib path instead of hardcoding
 linux_lib_dirs = '/usr/local/lib/'
-windows_x64_lib_dirs = ''
-windows_x86_lib_dirs = ''
+windows_x64_lib_dirs = 'C:\\Program Files\\ingescape\\lib\\'
+windows_x86_lib_dirs = 'C:\\Program Files (x86)\\ingescape\\lib\\'
+
+macos_lib_dirs_from_artifacts = './dependencies/macos/'
+linux_lib_dirs_from_artifacts = './dependencies/linux/'
+windows_x64_lib_dirs_from_artifacts = './dependencies/windows/x64/'
+windows_x86_lib_dirs_from_artifacts = './dependencies/windows/x86/'
 
 extra_objects = []
 librairies = []
@@ -49,29 +54,49 @@ ingescape_c_include = ['./dependencies/include/']
 compile_args = []
 link_args = []
 
+manual_compiler_args = os.environ.get('FROM_SOURCES', default=None)
+
 if platform.system() == "Linux":
-  extra_objects.append(linux_lib_dirs + 'libingescape.a')
-  extra_objects.append(linux_lib_dirs + 'libzyre.a')
-  extra_objects.append(linux_lib_dirs + 'libczmq.a')
-  extra_objects.append(linux_lib_dirs + 'libzmq.a')
-  extra_objects.append(linux_lib_dirs + 'libsodium.a')
+  if manual_compiler_args:
+    extra_objects.append(linux_lib_dirs_from_artifacts + 'libingescape.a')
+    extra_objects.append(linux_lib_dirs_from_artifacts + 'libzyre.a')
+    extra_objects.append(linux_lib_dirs_from_artifacts + 'libczmq.a')
+    extra_objects.append(linux_lib_dirs_from_artifacts + 'libzmq.a')
+    extra_objects.append(linux_lib_dirs_from_artifacts + 'libsodium.a')
+  else:
+    extra_objects.append(linux_lib_dirs + 'libingescape.a')
+    extra_objects.append(linux_lib_dirs + 'libzyre.a')
+    extra_objects.append(linux_lib_dirs + 'libczmq.a')
+    extra_objects.append(linux_lib_dirs + 'libzmq.a')
+    extra_objects.append(linux_lib_dirs + 'libsodium.a')
   compile_args = ["-I/usr/local/include/python3.8", "-I/usr/local/include/python3.8", "-Wno-unused-result", "-Wsign-compare", "-g", "-fwrapv", "-O3", "-Wall"]
   link_args = ["-L/usr/local/lib", "-lcrypt", "-lpthread", "-ldl",  "-lutil", "-lm", "-lstdc++"]
 elif platform.system() == "Darwin":
-  extra_objects.append(macos_lib_dirs + 'libingescape.a')
-  extra_objects.append(macos_lib_dirs + 'libzyre.a')
-  extra_objects.append(macos_lib_dirs + 'libczmq.a')
-  extra_objects.append(macos_lib_dirs + 'libzmq.a')
-  extra_objects.append(macos_lib_dirs + 'libsodium.a')
+  if manual_compiler_args:
+    extra_objects.append(macos_lib_dirs_from_artifacts + 'libingescape.a')
+    extra_objects.append(macos_lib_dirs_from_artifacts + 'libzyre.a')
+    extra_objects.append(macos_lib_dirs_from_artifacts + 'libczmq.a')
+    extra_objects.append(macos_lib_dirs_from_artifacts + 'libzmq.a')
+    extra_objects.append(macos_lib_dirs_from_artifacts + 'libsodium.a')
+  else:
+    extra_objects.append(macos_lib_dirs + 'libingescape.a')
+    extra_objects.append(macos_lib_dirs + 'libzyre.a')
+    extra_objects.append(macos_lib_dirs + 'libczmq.a')
+    extra_objects.append(macos_lib_dirs + 'libzmq.a')
+    extra_objects.append(macos_lib_dirs + 'libsodium.a')
 elif platform.system() == "Windows":
   if platform.machine().endswith('64'):
     librairies = ["libzmq",'libingescape', 'libzyre', 'libczmq', 'libsodium', "ws2_32", "Iphlpapi", 'Rpcrt4']
-    librairies_dirs.append(windows_x64_lib_dirs)
-    sys.path.extend(windows_x64_lib_dirs)
+    if manual_compiler_args:
+      librairies_dirs.append(windows_x64_lib_dirs_from_artifacts)
+      sys.path.extend(windows_x64_lib_dirs_from_artifacts)
+    else:
+      librairies_dirs.append(windows_x64_lib_dirs)
+      sys.path.extend(windows_x64_lib_dirs)
     compile_args = ["-DINGESCAPE_STATIC"]
 
 #Use an environment variable instead of "install-option" to add the compile arg. We are not able to use 'python wheels' with 'install-option' 
-manual_compiler_args = os.environ.get('FROM_SOURCES', default=None)
+
 if manual_compiler_args:
     compile_args.append("-DFROM_SOURCES")
 
