@@ -77,4 +77,5 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY
 )
 
 if (WITH_TEST)
-	target_link_libraries(igstester ${PROJECT_NAME})
+  target_link_libraries(igstester ${PROJECT_NAME})
+endif ()
