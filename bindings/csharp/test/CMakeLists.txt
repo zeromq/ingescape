@@ -48,11 +48,12 @@ set(CMAKE_DOTNET_TARGET_FRAMEWORK_VERSION "v4.7.2")
 
 add_library(${PROJECT_NAME} SHARED ${test_sources})
 
-find_package (IngescapeCSharp)
-if (NOT INGESCAPE_CSHARP_FOUND)
-	message(FATAL_ERROR "Dependency not found")
-endif (NOT INGESCAPE_CSHARP_FOUND)
-
+if (NOT WITH_CSHARP_WRAPPER AND NOT WITH_TEST)
+	find_package (IngescapeCSharp)
+	if (NOT INGESCAPE_CSHARP_FOUND)
+		message(FATAL_ERROR "Dependency not found")
+	endif (NOT INGESCAPE_CSHARP_FOUND)
+endif ()
 
 set_property(TARGET ${CMAKE_PROJECT_NAME} PROPERTY VS_DOTNET_REFERENCES
 	"Microsoft.CSharp"

@@ -75,3 +75,6 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY
 set_property(TARGET ${PROJECT_NAME} PROPERTY
   VS_GLOBAL_EnableDefaultItems false
 )
+
+if (WITH_TEST)
+	target_link_libraries(igstester ${PROJECT_NAME})
