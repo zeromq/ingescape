@@ -7,6 +7,12 @@
 cmake_minimum_required(VERSION 3.13.1)
 project(IngescapeCSharp HOMEPAGE_URL https://ingescape.com LANGUAGES CSharp)
 
+option(WITH_TEST "Compile the binding with test" OFF)
+
+if(WITH_TEST)
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/test)
+endif()
+
 include(CSharpUtilities)
 
 set(CMAKE_SUPPRESS_REGENERATION true)

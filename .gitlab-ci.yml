@@ -1150,74 +1150,6 @@ publish-python-package:
 # | |____  |_  __  _|
 #  \_____|   |_||_|  
 
-binding-csharp-windows-x64-release:
-  stage: binding-build
-  tags:
-    - windows
-  variables:
-    ARCH: "x64"
-  script:
-    - cd bindings
-    - cmake -S csharp/ -B csharp/build/ReleaseX64 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
-    - Powershell.exe -executionpolicy remotesigned csharp/cmake/FixCmakeSolution.ps1 -buildFolder csharp/build/ReleaseX64
-    - cmake --build csharp/build/ReleaseX64 --target IngescapeCSharp --config Release
-  artifacts:
-    paths:
-     - bindings/csharp/build/ReleaseX64
-    name: "binding-csharp-windows-x64-release"
-    expire_in: 1 day
-
-binding-csharp-windows-x64-debug:
-  stage: binding-build
-  tags:
-    - windows
-  variables:
-    ARCH: "x64-debug"
-  script:
-    - cd bindings
-    - cmake -S csharp/ -B csharp/build/DebugX64 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Debug -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
-    - Powershell.exe -executionpolicy remotesigned csharp/cmake/FixCmakeSolution.ps1 -buildFolder csharp/build/DebugX64
-    - cmake --build csharp/build/DebugX64 --target IngescapeCSharp --config Debug
-  artifacts:
-    paths:
-     - bindings/csharp/build/DebugX64
-    name: "binding-csharp-windows-x64-debug"
-    expire_in: 1 day
-
-binding-csharp-windows-x86-release:
-  stage: binding-build
-  tags:
-    - windows
-  variables:
-    ARCH: "x86"
-  script:
-    - cd bindings
-    - cmake -S csharp/ -B csharp/build/ReleaseX86 -G"$env:VS_CMAKE_GENERATOR" -AWin32 -DCMAKE_BUILD_TYPE=Release -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
-    - Powershell.exe -executionpolicy remotesigned csharp/cmake/FixCmakeSolution.ps1 -buildFolder csharp/build/ReleaseX86
-    - cmake --build csharp/build/ReleaseX86 --target IngescapeCSharp --config Release
-  artifacts:
-    paths:
-     - bindings/csharp/build/ReleaseX86
-    name: "binding-csharp-windows-x86-release"
-    expire_in: 1 day
-
-binding-csharp-windows-x86-debug:
-  stage: binding-build
-  tags:
-    - windows
-  variables:
-    ARCH: "x86-debug"
-  script:
-    - cd bindings
-    - cmake -S csharp/ -B csharp/build/DebugX86 -G"$env:VS_CMAKE_GENERATOR" -AWin32 -DCMAKE_BUILD_TYPE=Debug -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
-    - Powershell.exe -executionpolicy remotesigned csharp/cmake/FixCmakeSolution.ps1 -buildFolder csharp/build/DebugX86
-    - cmake --build csharp/build/DebugX86 --target IngescapeCSharp --config Debug
-  artifacts:
-    paths:
-     - bindings/csharp/build/DebugX86
-    name: "binding-csharp-windows-x86-debug"
-    expire_in: 1 day
-
 ## Tests
 test-csharp-x64-debug:
   stage: binding-test
@@ -1226,15 +1158,11 @@ test-csharp-x64-debug:
   variables:
     ARCH: "x64-debug"
   script:
-    - cd bindings
-    - cmake -S csharp/test -B csharp/test/build/DebugX64 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Debug
-    - cmake --build csharp/test/build/DebugX64 --config Debug
-    - C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe csharp/test/build/DebugX64/Debug/igstester.dll /Platform:x64
+    - cd build/bindings/csharp/test
+    - C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe Debug/igstester.dll /Platform:x64
   dependencies:
-    - binding-csharp-windows-x64-debug
     - lib-windows-debug-x64
   needs:
-    - binding-csharp-windows-x64-debug
     - lib-windows-debug-x64
 
 
@@ -1245,15 +1173,11 @@ test-csharp-x64-release:
   variables:
     ARCH: "x64-release"
   script:
-    - cd bindings
-    - cmake -S csharp/test -B csharp/test/build/ReleaseX64 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release
-    - cmake --build csharp/test/build/ReleaseX64 --config Release
-    - C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe csharp/test/build/ReleaseX64/Release/igstester.dll /Platform:x64
+    - cd v
+    - C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe Release/igstester.dll /Platform:x64
   dependencies:
-    - binding-csharp-windows-x64-release
     - lib-windows-release-x64
   needs:
-    - binding-csharp-windows-x64-release
     - lib-windows-release-x64
 
 test-csharp-x86-debug:
@@ -1263,15 +1187,11 @@ test-csharp-x86-debug:
   variables:
     ARCH: "x86-debug"
   script:
-    - cd bindings
-    - cmake -S csharp/test/ -B csharp/test/build/DebugX86 -G"$env:VS_CMAKE_GENERATOR" -AWin32 -DCMAKE_BUILD_TYPE=Debug
-    - cmake --build csharp/test/build/DebugX86 --config Debug
-    - C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe csharp/test/build/DebugX86/Debug/igstester.dll /Platform:x86
+    - cd build/bindings/csharp/test
+    - C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe Debug/igstester.dll /Platform:x86
   dependencies:
-    - binding-csharp-windows-x86-debug
     - lib-windows-debug-x86
   needs:
-    - binding-csharp-windows-x86-debug
     - lib-windows-debug-x86
 
 test-csharp-x86-release:
@@ -1281,15 +1201,11 @@ test-csharp-x86-release:
   variables:
     ARCH: "x86-release"
   script:
-    - cd bindings
-    - cmake -S csharp/test/ -B csharp/test/build/ReleaseX86 -G"$env:VS_CMAKE_GENERATOR" -AWin32 -DCMAKE_BUILD_TYPE=Release
-    - cmake --build csharp/test/build/ReleaseX86 --config Release
-    - C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe csharp/test/build/ReleaseX86/Release/igstester.dll /Platform:x86
+    - cd build/bindings/csharp/test
+    - C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe Release/igstester.dll /Platform:x86
   dependencies:
-    - binding-csharp-windows-x86-release
     - lib-windows-release-x86
   needs:
-    - binding-csharp-windows-x86-release
     - lib-windows-release-x86
 
 

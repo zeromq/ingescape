@@ -516,7 +516,7 @@ if (NOT DEPS_ONLY)
     set(
       CPACK_SOURCE_IGNORE_FILES
       "${CMAKE_CURRENT_SOURCE_DIR}/bindings/;${CMAKE_CURRENT_SOURCE_DIR}/build/;${CMAKE_CURRENT_SOURCE_DIR}/.git/;${CMAKE_CURRENT_SOURCE_DIR}/doc/;${CMAKE_CURRENT_SOURCE_DIR}/applications/;${CMAKE_CURRENT_SOURCE_DIR}/ingeprobe/;${CMAKE_CURRENT_SOURCE_DIR}/packaging/"
-      )
+    )
 
     if(WIN32)
       # Installers for 32- vs. 64-bit CMake: - Root install directory (displayed to
@@ -534,12 +534,12 @@ if (NOT DEPS_ONLY)
         set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} (Win32)")
       endif()
 
-      if(WITH_CSHARP_WRAPPER)	    
-	install(FILES 
-            	"build/bindings/csharp/Debug/netstandard2.0/IngescapeCSharp.dll"      
-            	DESTINATION lib
-        )            
-      endif()	
+      if(WITH_CSHARP_WRAPPER)
+        install(FILES 
+              "${CMAKE_CURRENT_BINARY_DIR}/bindings/csharp/${CMAKE_BUILD_TYPE}/netstandard2.0/IngescapeCSharp.dll"
+              DESTINATION lib
+        )
+      endif()
 
       # NSIS configuration for Windows see https://cmake.org/cmake/help/v3.14/cpack_
       # gen/nsis.html#cpack_gen:CPack%20NSIS%20Generator
