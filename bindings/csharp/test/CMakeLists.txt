@@ -7,9 +7,16 @@
 cmake_minimum_required(VERSION 3.13.1)
 project(igstester HOMEPAGE_URL https://ingescape.com LANGUAGES CSharp)
 
+if (WITH_CSHARP_WRAPPER)
+	set(FROM_INGESCAPE ON)
+endif ()
+if (WITH_TEST)
+	set(FROM_CSHARP ON)
+endif ()
+
 # Little hack because without this line, CMAKE_CXX_SIZEOF_VOID_P is not initialised
 # And installer will alwayse end with win32, not win64
-enable_language(CXX)
+#enable_language(CXX)
 
 include(CSharpUtilities)
 
@@ -28,8 +35,8 @@ if (NOT CMAKE_BUILD_TYPE)
     set (CMAKE_BUILD_TYPE Debug)
 endif ()
 
-set(GVR_CMAKE_MODULES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-list(APPEND CMAKE_MODULE_PATH ${GVR_CMAKE_MODULES_DIR})
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(DllFromLib)
 
 ########################################################################
 # sources files
@@ -44,93 +51,103 @@ source_group("Source Files" FILES ${test_sources})
 ########################################################################
 # Library
 ########################################################################
-set(CMAKE_DOTNET_TARGET_FRAMEWORK_VERSION "v4.7.2")
 
 add_library(${PROJECT_NAME} SHARED ${test_sources})
 
-if (NOT WITH_CSHARP_WRAPPER AND NOT WITH_TEST)
-	find_package (IngescapeCSharp)
-	if (NOT INGESCAPE_CSHARP_FOUND)
-		message(FATAL_ERROR "Dependency not found")
-	endif (NOT INGESCAPE_CSHARP_FOUND)
-endif ()
-
-set_property(TARGET ${CMAKE_PROJECT_NAME} PROPERTY VS_DOTNET_REFERENCES
-	"Microsoft.CSharp"
-	"System"
-	"System.Core"
-	${INGESCAPE_CSHARP_LIBRARIES}
+set_property(TARGET ${PROJECT_NAME} PROPERTY
+  VS_GLOBAL_TargetFramework "net472"
 )
-
-set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES VS_PACKAGE_REFERENCES
+set_property(TARGET ${PROJECT_NAME} PROPERTY
+  VS_GLOBAL_EnableDefaultItems false
+)
+set_target_properties(${PROJECT_NAME} PROPERTIES VS_PACKAGE_REFERENCES
 	"MSTest.TestFramework_2.2.10;MSTest.TestAdapter_2.2.10"
 )
 
-if (WIN32)
-	if(CMAKE_CL_64)
-		if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-			set(_INGESCAPE_ROOT_FOLDER_NAME "DebugX64")
-			set(_INGESCAPE_SUFFIX "d")
-			set(_LIBZMQ_NAME "libzmq-v142-mt-gd-4_3_5")
-		else()
-			set(_INGESCAPE_ROOT_FOLDER_NAME "ReleaseX64")
-			set(_INGESCAPE_SUFFIX "")
-			set(_LIBZMQ_NAME "libzmq-v142-mt-4_3_5")
-		endif()
+if (NOT FROM_CSHARP)
+	# Find the CSharp library on system
+	find_package (IngescapeCSharp)
+    if (NOT INGESCAPE_CSHARP_FOUND)
+        message(FATAL_ERROR "Dependency not found")
+    endif (NOT INGESCAPE_CSHARP_FOUND)
+	set_property(TARGET ${PROJECT_NAME} PROPERTY VS_DOTNET_REFERENCES
+		"Microsoft.CSharp"
+		"System"
+		"System.Core"
+		"${INGESCAPE_CSHARP_LIBRARIES}"
+	)
+else ()
+	set_property(TARGET ${PROJECT_NAME} PROPERTY VS_DOTNET_REFERENCES
+		"Microsoft.CSharp"
+		"System"
+		"System.Core"
+	)
+endif ()
+
+if ((NOT FROM_INGESCAPE) AND FROM_CSHARP)
+	# From CSharp cmake only. Find LIBS on system
+	find_library(SODIUM NAMES sodium REQUIRED)
+	find_library(ZMQ NAMES libzmq-v142-mt-4_3_5 REQUIRED)
+	find_library(CZMQ NAMES czmq REQUIRED)
+	find_library(ZYRE NAMES zyre REQUIRED)
+	find_library(INGESCAPE NAMES ingescape REQUIRED)	
+
+	dll_from_lib_exists(SODIUM)
+	dll_from_lib_exists(ZMQ)
+	dll_from_lib_exists(CZMQ)
+	dll_from_lib_exists(ZYRE)
+	dll_from_lib_exists(INGESCAPE)
+
+	add_custom_command(TARGET ${PROJECT_NAME}
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy ${ingescape_DLL_FILE} ${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/
+		COMMAND ${CMAKE_COMMAND} -E echo "Copying ingescape library"
+		COMMAND ${CMAKE_COMMAND} -E copy ${sodium_DLL_FILE} ${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/
+		COMMAND ${CMAKE_COMMAND} -E echo "Copying sodium library"
+		COMMAND ${CMAKE_COMMAND} -E copy ${libzmq-v142-mt-4_3_5_DLL_FILE} ${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/
+		COMMAND ${CMAKE_COMMAND} -E echo "Copying zmq library"
+		COMMAND ${CMAKE_COMMAND} -E copy ${czmq_DLL_FILE} ${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/
+		COMMAND ${CMAKE_COMMAND} -E echo "Copying czmq library"
+		COMMAND ${CMAKE_COMMAND} -E copy ${zyre_DLL_FILE} ${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/
+		COMMAND ${CMAKE_COMMAND} -E echo "Copying zyre library"
+	)
+endif ()
+
+if (FROM_INGESCAPE AND FROM_CSHARP)
+	#From CSharp and Ingescape CMakes.
+
+	macro(print_all_variables)
+		message(STATUS "print_all_variables------------------------------------------{")
+		get_cmake_property(_variableNames VARIABLES)
+		foreach (_variableName ${_variableNames})
+			message(STATUS "${_variableName}=${${_variableName}}")
+		endforeach()
+		message(STATUS "print_all_variables------------------------------------------}")
+	endmacro()
+
+	#print_all_variables()
+
+	if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+		set(_INGESCAPE_SUFFIX "d")
+		set(_LIBZMQ_NAME "libzmq-v142-mt-gd-4_3_5")
 	else()
-		if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-			set(_INGESCAPE_ROOT_FOLDER_NAME "DebugX86")
-			set(_INGESCAPE_SUFFIX "d")
-			set(_LIBZMQ_NAME "libzmq-v142-mt-gd-4_3_5")
-		else()
-			set(_INGESCAPE_ROOT_FOLDER_NAME "ReleaseX86")
-			set(_INGESCAPE_SUFFIX "")
-			set(_LIBZMQ_NAME "libzmq-v142-mt-4_3_5")
-		endif()
+		set(_INGESCAPE_SUFFIX "")
+		set(_LIBZMQ_NAME "libzmq-v142-mt-4_3_5")
 	endif()
-endif (WIN32)
+	
+	add_custom_command(TARGET ${PROJECT_NAME}
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E echo "Copying ingescape library"
+		COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/ingescape${_INGESCAPE_SUFFIX}.dll" "${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
+		COMMAND ${CMAKE_COMMAND} -E echo "Copying sodium library"
+		COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/dependencies/sodium/${CMAKE_BUILD_TYPE}/libsodium.dll" "${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
+		COMMAND ${CMAKE_COMMAND} -E echo "Copying zmq library"
+		COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/dependencies/libzmq/bin/${CMAKE_BUILD_TYPE}/${_LIBZMQ_NAME}.dll" "${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
+		COMMAND ${CMAKE_COMMAND} -E echo "Copying czmq library"
+		COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/dependencies/czmq/${CMAKE_BUILD_TYPE}/libczmq.dll" "${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
+		COMMAND ${CMAKE_COMMAND} -E echo "Copying zyre library"
+		COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/dependencies/zyre/${CMAKE_BUILD_TYPE}/libzyre.dll" "${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
+		DEPENDS ${CMAKE_PROJECT_NAME}
+	)
 
-#import .pdb in debug
-if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-add_custom_target(COPY_INGESCAPE_DEBUG ALL
-	#ingescape
-	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/../../../build/${_INGESCAPE_ROOT_FOLDER_NAME}/${CMAKE_BUILD_TYPE}/ingescaped.pdb" "${CMAKE_CURRENT_SOURCE_DIR}/build/${_INGESCAPE_ROOT_FOLDER_NAME}/${CMAKE_BUILD_TYPE}"
-	#czmq
-	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/../../../build/${_INGESCAPE_ROOT_FOLDER_NAME}/dependencies/czmq/${CMAKE_BUILD_TYPE}/libczmq.pdb" "${CMAKE_CURRENT_SOURCE_DIR}/build/${_INGESCAPE_ROOT_FOLDER_NAME}/${CMAKE_BUILD_TYPE}"
-	#zmq
-	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/../../../build/${_INGESCAPE_ROOT_FOLDER_NAME}/dependencies/libzmq/bin/${CMAKE_BUILD_TYPE}/libzmq-v142-mt-gd-4_3_5.dll" "${CMAKE_CURRENT_SOURCE_DIR}/build/${_INGESCAPE_ROOT_FOLDER_NAME}/${CMAKE_BUILD_TYPE}"
-	#sodium
-	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/../../../build/${_INGESCAPE_ROOT_FOLDER_NAME}/dependencies/sodium/${CMAKE_BUILD_TYPE}/libsodium.pdb" "${CMAKE_CURRENT_SOURCE_DIR}/build/${_INGESCAPE_ROOT_FOLDER_NAME}/${CMAKE_BUILD_TYPE}"
-	#zyre
-	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/../../../build/${_INGESCAPE_ROOT_FOLDER_NAME}/dependencies/zyre/${CMAKE_BUILD_TYPE}/libzyre.pdb" "${CMAKE_CURRENT_SOURCE_DIR}/build/${_INGESCAPE_ROOT_FOLDER_NAME}/${CMAKE_BUILD_TYPE}"
-	DEPENDS ${PROJECT_NAME}
-)
-endif()
-
-add_custom_target(COPY_INGESCAPE ALL
-	#ingescape
-	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/../../../build/${_INGESCAPE_ROOT_FOLDER_NAME}/${CMAKE_BUILD_TYPE}/ingescape${_INGESCAPE_SUFFIX}.dll" "${CMAKE_CURRENT_SOURCE_DIR}/build/${_INGESCAPE_ROOT_FOLDER_NAME}/${CMAKE_BUILD_TYPE}"
-	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/../../../build/${_INGESCAPE_ROOT_FOLDER_NAME}/${CMAKE_BUILD_TYPE}/ingescape${_INGESCAPE_SUFFIX}.lib" "${CMAKE_CURRENT_SOURCE_DIR}/build/${_INGESCAPE_ROOT_FOLDER_NAME}/${CMAKE_BUILD_TYPE}"
-	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/../../../build/${_INGESCAPE_ROOT_FOLDER_NAME}/${CMAKE_BUILD_TYPE}/ingescape${_INGESCAPE_SUFFIX}.exp" "${CMAKE_CURRENT_SOURCE_DIR}/build/${_INGESCAPE_ROOT_FOLDER_NAME}/${CMAKE_BUILD_TYPE}"
-	#czmq
-	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/../../../build/${_INGESCAPE_ROOT_FOLDER_NAME}/dependencies/czmq/${CMAKE_BUILD_TYPE}/libczmq.dll" "${CMAKE_CURRENT_SOURCE_DIR}/build/${_INGESCAPE_ROOT_FOLDER_NAME}/${CMAKE_BUILD_TYPE}"
-	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/../../../build/${_INGESCAPE_ROOT_FOLDER_NAME}/dependencies/czmq/${CMAKE_BUILD_TYPE}/libczmq.lib" "${CMAKE_CURRENT_SOURCE_DIR}/build/${_INGESCAPE_ROOT_FOLDER_NAME}/${CMAKE_BUILD_TYPE}"
-	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/../../../build/${_INGESCAPE_ROOT_FOLDER_NAME}/dependencies/czmq/${CMAKE_BUILD_TYPE}/czmq.lib" "${CMAKE_CURRENT_SOURCE_DIR}/build/${_INGESCAPE_ROOT_FOLDER_NAME}/${CMAKE_BUILD_TYPE}"
-	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/../../../build/${_INGESCAPE_ROOT_FOLDER_NAME}/dependencies/czmq/${CMAKE_BUILD_TYPE}/czmq.exp" "${CMAKE_CURRENT_SOURCE_DIR}/build/${_INGESCAPE_ROOT_FOLDER_NAME}/${CMAKE_BUILD_TYPE}"
-	#zmq
-	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/../../../build/${_INGESCAPE_ROOT_FOLDER_NAME}/dependencies/libzmq/bin/${CMAKE_BUILD_TYPE}/${_LIBZMQ_NAME}.dll" "${CMAKE_CURRENT_SOURCE_DIR}/build/${_INGESCAPE_ROOT_FOLDER_NAME}/${CMAKE_BUILD_TYPE}"
-	#sodium
-	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/../../../build/${_INGESCAPE_ROOT_FOLDER_NAME}/dependencies/sodium/${CMAKE_BUILD_TYPE}/libsodium.dll" "${CMAKE_CURRENT_SOURCE_DIR}/build/${_INGESCAPE_ROOT_FOLDER_NAME}/${CMAKE_BUILD_TYPE}"
-	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/../../../build/${_INGESCAPE_ROOT_FOLDER_NAME}/dependencies/sodium/${CMAKE_BUILD_TYPE}/libsodium.lib" "${CMAKE_CURRENT_SOURCE_DIR}/build/${_INGESCAPE_ROOT_FOLDER_NAME}/${CMAKE_BUILD_TYPE}"
-	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/../../../build/${_INGESCAPE_ROOT_FOLDER_NAME}/dependencies/sodium/${CMAKE_BUILD_TYPE}/sodium.lib" "${CMAKE_CURRENT_SOURCE_DIR}/build/${_INGESCAPE_ROOT_FOLDER_NAME}/${CMAKE_BUILD_TYPE}"
-	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/../../../build/${_INGESCAPE_ROOT_FOLDER_NAME}/dependencies/sodium/${CMAKE_BUILD_TYPE}/sodium.exp" "${CMAKE_CURRENT_SOURCE_DIR}/build/${_INGESCAPE_ROOT_FOLDER_NAME}/${CMAKE_BUILD_TYPE}"
-	#zyre
-	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/../../../build/${_INGESCAPE_ROOT_FOLDER_NAME}/dependencies/zyre/${CMAKE_BUILD_TYPE}/libzyre.dll" "${CMAKE_CURRENT_SOURCE_DIR}/build/${_INGESCAPE_ROOT_FOLDER_NAME}/${CMAKE_BUILD_TYPE}"
-	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/../../../build/${_INGESCAPE_ROOT_FOLDER_NAME}/dependencies/zyre/${CMAKE_BUILD_TYPE}/libzyre.lib" "${CMAKE_CURRENT_SOURCE_DIR}/build/${_INGESCAPE_ROOT_FOLDER_NAME}/${CMAKE_BUILD_TYPE}"
-	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/../../../build/${_INGESCAPE_ROOT_FOLDER_NAME}/dependencies/zyre/${CMAKE_BUILD_TYPE}/zyre.lib" "${CMAKE_CURRENT_SOURCE_DIR}/build/${_INGESCAPE_ROOT_FOLDER_NAME}/${CMAKE_BUILD_TYPE}"
-	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/../../../build/${_INGESCAPE_ROOT_FOLDER_NAME}/dependencies/zyre/${CMAKE_BUILD_TYPE}/zyre.exp" "${CMAKE_CURRENT_SOURCE_DIR}/build/${_INGESCAPE_ROOT_FOLDER_NAME}/${CMAKE_BUILD_TYPE}"
-	DEPENDS ${PROJECT_NAME}
-)
-
-
-
+endif ()

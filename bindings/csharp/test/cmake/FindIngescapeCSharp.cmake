@@ -1,19 +1,23 @@
 if (WIN32)
-	if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-		set(_PATH_CSHARP "${CMAKE_CURRENT_BINARY_DIR}/Debug/netstandard2.0")
-	else()
-		set(_PATH_CSHARP "${CMAKE_CURRENT_BINARY_DIR}/Release/netstandard2.0")
-	endif()
+	# Check 32 or 64 bit
+	# CMAKE_SIZEOF_VOID_P EQUAL 8 and CMAKE_CL_64 check current platform and no target
+	if ("${CMAKE_GENERATOR}" MATCHES "(Win64|IA64)")
+		# target is 64 bit
+		set(_MY_PROGRAM_FILES_PATH "ProgramW6432")
+	else ("${CMAKE_GENERATOR}" MATCHES "(Win64|IA64)")
+		# target is 32 bit
+		set(_MY_PROGRAM_FILES_PATH "ProgramFiles(x86)")
+	endif ("${CMAKE_GENERATOR}" MATCHES "(Win64|IA64)")
+	set(PC_INGESCAPE_LIBRARY_HINTS "$ENV{${_MY_PROGRAM_FILES_PATH}}\\ingescape\\lib\\")
 endif (WIN32)
-
-message(STATUS "${_PATH_CSHARP}")
 
 # On windows find library search .dll and .lib but csharp binding do not produce .lib
 find_file (
     INGESCAPE_CSHARP_LIBRARIES
     NAME IngescapeCSharp${CMAKE_SHARED_LIBRARY_SUFFIX}
-    HINTS ${_PATH_CSHARP}
+    HINTS ${PC_INGESCAPE_LIBRARY_HINTS}
 )
+
 
 include(FindPackageHandleStandardArgs)
 
