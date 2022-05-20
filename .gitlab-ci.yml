@@ -168,7 +168,7 @@ lib-windows-release-x64:
     - mkdir build\ReleaseX64
     - cmake -S . -B build\ReleaseX64 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID" -DWITH_CSHARP_WRAPPER=ON
     - Powershell.exe -executionpolicy remotesigned bindings/csharp/cmake/FixCmakeSolution.ps1 -buildFolder build/ReleaseX64/bindings/csharp
-    - Powershell.exe -executionpolicy remotesigned bindings/csharp/cmake/FixCmakeSolution.ps1 -buildFolderbuild/ReleaseX64/bindings/csharp/test -projectName igstester
+    - Powershell.exe -executionpolicy remotesigned bindings/csharp/cmake/FixCmakeSolution.ps1 -buildFolder build/ReleaseX64/bindings/csharp/test -projectName igstester
     - cmake --build build\ReleaseX64 --target ALL_BUILD --config Release
   artifacts:
     paths:
