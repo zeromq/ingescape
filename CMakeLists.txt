@@ -415,6 +415,7 @@ if (NOT DEPS_ONLY)
 
   if(WITH_CSHARP_WRAPPER AND WIN32)
     add_subdirectory(${CMAKE_SOURCE_DIR}/bindings/csharp)
+    add_dependencies(igstester ${CMAKE_PROJECT_NAME})
   endif()
 
   # Install public include files

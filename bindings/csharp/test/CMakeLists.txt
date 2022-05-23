@@ -134,9 +134,9 @@ if (FROM_INGESCAPE AND FROM_CSHARP)
 		set(_INGESCAPE_SUFFIX "")
 		set(_LIBZMQ_NAME "libzmq-v142-mt-4_3_5")
 	endif()
-
-	add_dependencies(${PROJECT_NAME} ${CMAKE_PROJECT_NAME})
+	
 	message("TEST : ${CMAKE_PROJECT_NAME}")
+	message("BINARY DIR : ${CMAKE_BINARY_DIR}")
 	
 	add_custom_command(TARGET ${PROJECT_NAME}
 		POST_BUILD
