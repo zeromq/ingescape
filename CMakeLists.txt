@@ -7,12 +7,6 @@ cmake_minimum_required(VERSION 3.16)
 
 option(WITH_CSHARP_WRAPPER "Compile the library with CSHARP Binding" OFF)
 
-message("ROOT : ${CMAKE_PROJECT_NAME}")
-
-if(WITH_CSHARP_WRAPPER AND WIN32)
-  add_subdirectory(${CMAKE_SOURCE_DIR}/bindings/csharp)
-endif()
-
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.11" CACHE STRING "Minimum OS X deployment version")
 
 option(OSX_UNIVERSAL "Build for both arm64 and x86_64" OFF)
@@ -35,6 +29,12 @@ set(INGESCAPE_VERSION "${INGESCAPE_VERSION_MAJOR}.${INGESCAPE_VERSION_MINOR}.${I
 message(STATUS "Detected INGESCAPE Version - ${INGESCAPE_VERSION}")
 
 project(ingescape VERSION ${INGESCAPE_VERSION} HOMEPAGE_URL https://ingescape.com LANGUAGES C)
+
+message("ROOT : ${CMAKE_PROJECT_NAME}")
+
+if(WITH_CSHARP_WRAPPER AND WIN32)
+  add_subdirectory(${CMAKE_SOURCE_DIR}/bindings/csharp)
+endif()
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
