@@ -32,10 +32,6 @@ project(ingescape VERSION ${INGESCAPE_VERSION} HOMEPAGE_URL https://ingescape.co
 
 message("ROOT : ${CMAKE_PROJECT_NAME}")
 
-if(WITH_CSHARP_WRAPPER AND WIN32)
-  add_subdirectory(${CMAKE_SOURCE_DIR}/bindings/csharp)
-endif()
-
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 ADD_DEFINITIONS (-DZYRE_BUILD_DRAFT_API)
@@ -417,8 +413,9 @@ if (NOT DEPS_ONLY)
                     COMPONENT library)
   endif()
 
-
-
+  if(WITH_CSHARP_WRAPPER AND WIN32)
+    add_subdirectory(${CMAKE_SOURCE_DIR}/bindings/csharp)
+  endif()
 
   # Install public include files
   install(FILES ${ingescape_headers_to_install}
