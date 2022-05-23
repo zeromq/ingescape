@@ -157,6 +157,14 @@ if (FROM_INGESCAPE AND FROM_CSHARP)
 		COMMENT "Creation d'un fichier"
 	)
 
+	add_custom_command(TARGET ${PROJECT_NAME}
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND}
+		ARGS -E copy "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/test_admin/test.txt" "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/"
+		DEPENDS ${CMAKE_PROJECT_NAME}
+		COMMENT "Creation d'un fichier"
+	)
+
 	#add_custom_command(TARGET ${PROJECT_NAME}
 	#	POST_BUILD
 	#	COMMAND ${CMAKE_COMMAND}
@@ -186,6 +194,7 @@ if (FROM_INGESCAPE AND FROM_CSHARP)
 		COMMAND ${CMAKE_COMMAND}
 		ARGS -E copy "${CMAKE_BINARY_DIR}/dependencies/sodium/${CMAKE_BUILD_TYPE}/libsodium.dll" "${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
 		DEPENDS ${CMAKE_PROJECT_NAME}
+		COMMENT "Copie de sodium"
 	)
 
 	add_custom_command(TARGET ${PROJECT_NAME}
@@ -193,6 +202,7 @@ if (FROM_INGESCAPE AND FROM_CSHARP)
 		COMMAND ${CMAKE_COMMAND}
 		ARGS -E copy "${CMAKE_BINARY_DIR}/dependencies/libzmq/bin/${CMAKE_BUILD_TYPE}/${_LIBZMQ_NAME}.dll" "${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
 		DEPENDS ${CMAKE_PROJECT_NAME}
+		COMMENT "Copie de zmq"
 	)
 
 	add_custom_command(TARGET ${PROJECT_NAME}
@@ -200,6 +210,7 @@ if (FROM_INGESCAPE AND FROM_CSHARP)
 		COMMAND ${CMAKE_COMMAND}
 		ARGS -E copy "${CMAKE_BINARY_DIR}/dependencies/czmq/${CMAKE_BUILD_TYPE}/libczmq.dll" "${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
 		DEPENDS ${CMAKE_PROJECT_NAME}
+		COMMENT "Copie de czmq"
 	)
 
 	add_custom_command(TARGET ${PROJECT_NAME}
@@ -207,6 +218,7 @@ if (FROM_INGESCAPE AND FROM_CSHARP)
 		COMMAND ${CMAKE_COMMAND}
 		ARGS -E copy "${CMAKE_BINARY_DIR}/dependencies/zyre/${CMAKE_BUILD_TYPE}/libzyre.dll" "${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
 		DEPENDS ${CMAKE_PROJECT_NAME}
+		COMMENT "Copie de zyre"
 	)
 
 endif ()
