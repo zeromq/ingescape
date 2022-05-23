@@ -427,7 +427,7 @@ if (NOT DEPS_ONLY)
 
     add_custom_command(TARGET ${CMAKE_PROJECT_NAME}
       POST_BUILD
-      #COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/buildTest/
+      COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/bindings/csharp/test/${CMAKE_BUILD_TYPE}/net472/
       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/ingescape${_INGESCAPE_SUFFIX}.dll ${CMAKE_BINARY_DIR}/bindings/csharp/test/${CMAKE_BUILD_TYPE}/net472/
       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/dependencies/sodium/${CMAKE_BUILD_TYPE}/libsodium.dll ${CMAKE_BINARY_DIR}/bindings/csharp/test/${CMAKE_BUILD_TYPE}/net472/
       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/dependencies/libzmq/bin/${CMAKE_BUILD_TYPE}/${_LIBZMQ_NAME}.dll ${CMAKE_BINARY_DIR}/bindings/csharp/test/${CMAKE_BUILD_TYPE}/net472/
