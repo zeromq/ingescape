@@ -157,11 +157,26 @@ if (FROM_INGESCAPE AND FROM_CSHARP)
 		COMMENT "Creation d'un fichier"
 	)
 
+	add_custom_command(TARGET ${PROJECT_NAME}
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND}
+		ARGS -E echo "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/ingescape${_INGESCAPE_SUFFIX}.dll to ${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/ingescape${_INGESCAPE_SUFFIX}.dll"
+		DEPENDS ${CMAKE_PROJECT_NAME}
+		COMMENT "echo"
+	)
 
 	add_custom_command(TARGET ${PROJECT_NAME}
 		POST_BUILD
 		COMMAND ${CMAKE_COMMAND}
-		ARGS -E copy "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/ingescape${_INGESCAPE_SUFFIX}.dll" "${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
+		ARGS -E copy "C:/Users/admin/gitlab_builds/34726_Debug_x64/broutin.aurelien/ingescape/build/DebugX64/Debug/ingescaped.dll" "C:/Users/admin/gitlab_builds/34726_Debug_x64/broutin.aurelien/ingescape/build/DebugX64/bindings/csharp/test/Debug/net472/"
+		DEPENDS ${CMAKE_PROJECT_NAME}
+		COMMENT "Copie d'ingescape en dur"
+	)
+
+	add_custom_command(TARGET ${PROJECT_NAME}
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND}
+		ARGS -E copy "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/ingescape${_INGESCAPE_SUFFIX}.dll" "${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/ingescape${_INGESCAPE_SUFFIX}.dll"
 		DEPENDS ${CMAKE_PROJECT_NAME}
 		COMMENT "Copie d'ingescape"
 	)
