@@ -137,15 +137,10 @@ if (FROM_INGESCAPE AND FROM_CSHARP)
 	
 	add_custom_command(TARGET ${PROJECT_NAME}
 		POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E echo "Copying ingescape library from ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/ingescape${_INGESCAPE_SUFFIX}.dll to ${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
 		COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/ingescape${_INGESCAPE_SUFFIX}.dll" "${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
-		COMMAND ${CMAKE_COMMAND} -E echo "Copying sodium library from ${CMAKE_BINARY_DIR}/dependencies/sodium/${CMAKE_BUILD_TYPE}/libsodium.dll to ${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
 		COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/dependencies/sodium/${CMAKE_BUILD_TYPE}/libsodium.dll" "${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
-		COMMAND ${CMAKE_COMMAND} -E echo "Copying zmq library from ${CMAKE_BINARY_DIR}/dependencies/libzmq/bin/${CMAKE_BUILD_TYPE}/${_LIBZMQ_NAME}.dll to ${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
 		COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/dependencies/libzmq/bin/${CMAKE_BUILD_TYPE}/${_LIBZMQ_NAME}.dll" "${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
-		COMMAND ${CMAKE_COMMAND} -E echo "Copying czmq library from ${CMAKE_BINARY_DIR}/dependencies/czmq/${CMAKE_BUILD_TYPE}/libczmq.dll to ${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
 		COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/dependencies/czmq/${CMAKE_BUILD_TYPE}/libczmq.dll" "${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
-		COMMAND ${CMAKE_COMMAND} -E echo "Copying zyre library from ${CMAKE_BINARY_DIR}/dependencies/zyre/${CMAKE_BUILD_TYPE}/libzyre.dll to ${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
 		COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/dependencies/zyre/${CMAKE_BUILD_TYPE}/libzyre.dll" "${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
 		DEPENDS ${CMAKE_PROJECT_NAME}
 	)
