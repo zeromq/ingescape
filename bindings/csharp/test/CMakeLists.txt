@@ -141,12 +141,29 @@ if (FROM_INGESCAPE AND FROM_CSHARP)
 
 	#COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/
 	
+	add_custom_command(TARGET ${PROJECT_NAME}
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND}
+		ARGS -E make_directory "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/test_admin/"
+		DEPENDS ${CMAKE_PROJECT_NAME}
+		COMMENT "Creation d'un dossier"
+	)
+
+	add_custom_command(TARGET ${PROJECT_NAME}
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND}
+		ARGS -E touch "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/test_admin/test.txt"
+		DEPENDS ${CMAKE_PROJECT_NAME}
+		COMMENT "Creation d'un fichier"
+	)
+
 
 	add_custom_command(TARGET ${PROJECT_NAME}
 		POST_BUILD
 		COMMAND ${CMAKE_COMMAND}
 		ARGS -E copy "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/ingescape${_INGESCAPE_SUFFIX}.dll" "${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
 		DEPENDS ${CMAKE_PROJECT_NAME}
+		COMMENT "Copie d'ingescape"
 	)
 
 	add_custom_command(TARGET ${PROJECT_NAME}
