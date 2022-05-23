@@ -7,8 +7,10 @@ cmake_minimum_required(VERSION 3.16)
 
 option(WITH_CSHARP_WRAPPER "Compile the library with CSHARP Binding" OFF)
 
+message("ROOT : ${CMAKE_PROJECT_NAME}")
+
 if(WITH_CSHARP_WRAPPER AND WIN32)
-add_subdirectory(${CMAKE_SOURCE_DIR}/bindings/csharp)
+  add_subdirectory(${CMAKE_SOURCE_DIR}/bindings/csharp)
 endif()
 
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.11" CACHE STRING "Minimum OS X deployment version")

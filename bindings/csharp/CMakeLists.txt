@@ -8,6 +8,7 @@ cmake_minimum_required(VERSION 3.13.1)
 project(IngescapeCSharp HOMEPAGE_URL https://ingescape.com LANGUAGES CSharp)
 
 option(WITH_TEST "Compile the binding with test" ON)
+message("WRAPPER : ${CMAKE_PROJECT_NAME}")
 
 if(WITH_TEST)
   add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/test)
@@ -79,5 +80,3 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY
 if (WITH_TEST)
   target_link_libraries(igstester ${PROJECT_NAME})
 endif ()
-
-message("WRAPPER : ${CMAKE_PROJECT_NAME}")
