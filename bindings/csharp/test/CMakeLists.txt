@@ -160,9 +160,9 @@ if (FROM_INGESCAPE AND FROM_CSHARP)
 	add_custom_command(TARGET ${PROJECT_NAME}
 		POST_BUILD
 		COMMAND ${CMAKE_COMMAND}
-		ARGS -E copy "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/test_admin/test.txt" "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/"
+		ARGS -E copy ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/test_admin/test.txt ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/test-copie.txt
 		DEPENDS ${CMAKE_PROJECT_NAME}
-		COMMENT "Creation d'un fichier"
+		COMMENT "Copie simple d'un fichier"
 	)
 
 	#add_custom_command(TARGET ${PROJECT_NAME}
