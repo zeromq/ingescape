@@ -79,3 +79,5 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY
 if (WITH_TEST)
   target_link_libraries(igstester ${PROJECT_NAME})
 endif ()
+
+message("WRAPPER : ${CMAKE_PROJECT_NAME}")
