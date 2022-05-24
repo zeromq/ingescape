@@ -14,10 +14,6 @@ if (WITH_TEST)
 	set(FROM_CSHARP ON)
 endif ()
 
-# Little hack because without this line, CMAKE_CXX_SIZEOF_VOID_P is not initialised
-# And installer will alwayse end with win32, not win64
-#enable_language(CXX)
-
 include(CSharpUtilities)
 
 set(CMAKE_SUPPRESS_REGENERATION true)
@@ -137,45 +133,5 @@ if (FROM_INGESCAPE AND FROM_CSHARP)
 	
 	message("TEST : ${CMAKE_PROJECT_NAME}")
 	message("BINARY DIR : ${CMAKE_BINARY_DIR}")
-
-	add_custom_command(TARGET ${PROJECT_NAME}
-		POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E echo "copying ingecape"
-		COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/${_INGESCAPE_DLL_NAME}.dll" "./${_INGESCAPE_DLL_NAME}.dll"
-		COMMENT "Copie d'ingescape"
-		VERBATIM
-	)
-
-	add_custom_command(TARGET ${PROJECT_NAME}
-		POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E echo "copying sodium"
-		COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/dependencies/sodium/${CMAKE_BUILD_TYPE}/libsodium.dll" "./libsodium.dll"
-		COMMENT "Copie de sodium"
-		VERBATIM
-	)
-
-	add_custom_command(TARGET ${PROJECT_NAME}
-		POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E echo "copying zmq"
-		COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/dependencies/libzmq/bin/${CMAKE_BUILD_TYPE}/${_LIBZMQ_DLL_NAME}.dll" "./${_LIBZMQ_DLL_NAME}.dll"
-		COMMENT "Copie de zmq"
-		VERBATIM
-	)
-
-	add_custom_command(TARGET ${PROJECT_NAME}
-		POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E echo "copying czmq"
-		COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/dependencies/czmq/${CMAKE_BUILD_TYPE}/libczmq.dll" "./libczmq.dll"
-		COMMENT "Copie de czmq"
-		VERBATIM
-	)
-
-	add_custom_command(TARGET ${PROJECT_NAME}
-		POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E echo "copying zyre"
-		COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/dependencies/zyre/${CMAKE_BUILD_TYPE}/libzyre.dll" "./libzyre.dll"
-		COMMENT "Copie de zyre"
-		VERBATIM
-	)
 
 endif ()

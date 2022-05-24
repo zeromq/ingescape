@@ -415,7 +415,26 @@ if (NOT DEPS_ONLY)
 
   if(WITH_CSHARP_WRAPPER AND WIN32)
     add_subdirectory(${CMAKE_SOURCE_DIR}/bindings/csharp)
-    add_dependencies(igstester ${CMAKE_PROJECT_NAME})
+    if (WITH_CSHARP_TEST)
+      add_dependencies(igstester ${CMAKE_PROJECT_NAME})
+      if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+        set(_INGESCAPE_SUFFIX "d")
+        set(_LIBZMQ_NAME "libzmq-v142-mt-gd-4_3_5")
+      else()
+        set(_INGESCAPE_SUFFIX "")
+        set(_LIBZMQ_NAME "libzmq-v142-mt-4_3_5")
+      endif()
+
+      add_custom_command(TARGET ${CMAKE_PROJECT_NAME}
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/bindings/csharp/test/${CMAKE_BUILD_TYPE}/net472/
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/ingescape${_INGESCAPE_SUFFIX}.dll ${CMAKE_BINARY_DIR}/bindings/csharp/test/${CMAKE_BUILD_TYPE}/net472/
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/dependencies/sodium/${CMAKE_BUILD_TYPE}/libsodium.dll ${CMAKE_BINARY_DIR}/bindings/csharp/test/${CMAKE_BUILD_TYPE}/net472/
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/dependencies/libzmq/bin/${CMAKE_BUILD_TYPE}/${_LIBZMQ_NAME}.dll ${CMAKE_BINARY_DIR}/bindings/csharp/test/${CMAKE_BUILD_TYPE}/net472/
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/dependencies/czmq/${CMAKE_BUILD_TYPE}/libczmq.dll ${CMAKE_BINARY_DIR}/bindings/csharp/test/${CMAKE_BUILD_TYPE}/net472/
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/dependencies/zyre/${CMAKE_BUILD_TYPE}/libzyre.dll ${CMAKE_BINARY_DIR}/bindings/csharp/test/${CMAKE_BUILD_TYPE}/net472/
+      )
+    endif ()
   endif()
 
   # Install public include files
