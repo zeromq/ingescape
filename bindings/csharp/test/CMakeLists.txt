@@ -10,7 +10,7 @@ project(igstester HOMEPAGE_URL https://ingescape.com LANGUAGES CSharp)
 if (WITH_CSHARP_WRAPPER)
 	set(FROM_INGESCAPE ON)
 endif ()
-if (WITH_TEST)
+if (WITH_CSHARP_TEST)
 	set(FROM_CSHARP ON)
 endif ()
 
@@ -130,8 +130,4 @@ if (FROM_INGESCAPE AND FROM_CSHARP)
 		set(_INGESCAPE_DLL_NAME "ingescape")
 		set(_LIBZMQ_DLL_NAME "libzmq-v142-mt-4_3_5")
 	endif()
-	
-	message("TEST : ${CMAKE_PROJECT_NAME}")
-	message("BINARY DIR : ${CMAKE_BINARY_DIR}")
-
 endif ()

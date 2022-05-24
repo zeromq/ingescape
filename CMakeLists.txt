@@ -30,8 +30,6 @@ message(STATUS "Detected INGESCAPE Version - ${INGESCAPE_VERSION}")
 
 project(ingescape VERSION ${INGESCAPE_VERSION} HOMEPAGE_URL https://ingescape.com LANGUAGES C)
 
-message("ROOT : ${CMAKE_PROJECT_NAME}")
-
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 ADD_DEFINITIONS (-DZYRE_BUILD_DRAFT_API)
@@ -416,6 +414,7 @@ if (NOT DEPS_ONLY)
   if(WITH_CSHARP_WRAPPER AND WIN32)
     add_subdirectory(${CMAKE_SOURCE_DIR}/bindings/csharp)
     if (WITH_CSHARP_TEST)
+      message("with csharp test")
       add_dependencies(igstester ${CMAKE_PROJECT_NAME})
       if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
         set(_INGESCAPE_SUFFIX "d")

@@ -7,10 +7,9 @@
 cmake_minimum_required(VERSION 3.13.1)
 project(IngescapeCSharp HOMEPAGE_URL https://ingescape.com LANGUAGES CSharp)
 
-option(WITH_TEST "Compile the binding with test" ON)
-message("WRAPPER : ${CMAKE_PROJECT_NAME}")
+set(WITH_CSHARP_TEST ON CACHE INTERNAL "")
 
-if(WITH_TEST)
+if (WITH_CSHARP_TEST)
   add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/test)
 endif()
 
@@ -19,7 +18,7 @@ include(CSharpUtilities)
 set(CMAKE_SUPPRESS_REGENERATION true)
 set(CMAKE_CSharp_FLAGS "/langversion:6")
 
-if(CMAKE_CONFIGURATION_TYPES)
+if (CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_CONFIGURATION_TYPES Debug Release)
   set(CMAKE_CONFIGURATION_TYPES "${CMAKE_CONFIGURATION_TYPES}" CACHE STRING
     "Reset the configurations to what we need"
@@ -77,6 +76,6 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY
   VS_GLOBAL_EnableDefaultItems false
 )
 
-if (WITH_TEST)
+if (WITH_CSHARP_TEST)
   target_link_libraries(igstester ${PROJECT_NAME})
 endif ()
