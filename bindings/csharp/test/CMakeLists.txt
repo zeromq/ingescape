@@ -140,35 +140,35 @@ if (FROM_INGESCAPE AND FROM_CSHARP)
 
 	add_custom_command(TARGET ${PROJECT_NAME}
 		POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/${_INGESCAPE_DLL_NAME}.dll ./${_INGESCAPE_DLL_NAME}.dll
+		COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/${_INGESCAPE_DLL_NAME}.dll "./${_INGESCAPE_DLL_NAME}.dll"
 		COMMENT "Copie d'ingescape"
 		VERBATIM
 	)
 
 	add_custom_command(TARGET ${PROJECT_NAME}
 		POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/dependencies/sodium/${CMAKE_BUILD_TYPE}/libsodium.dll ./libsodium.dll
+		COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/dependencies/sodium/${CMAKE_BUILD_TYPE}/libsodium.dll "./libsodium.dll"
 		COMMENT "Copie de sodium"
 		VERBATIM
 	)
 
 	add_custom_command(TARGET ${PROJECT_NAME}
 		POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/dependencies/libzmq/bin/${CMAKE_BUILD_TYPE}/${_LIBZMQ_DLL_NAME}.dll ./${_LIBZMQ_DLL_NAME}.dll
+		COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/dependencies/libzmq/bin/${CMAKE_BUILD_TYPE}/${_LIBZMQ_DLL_NAME}.dll "./${_LIBZMQ_DLL_NAME}.dll"
 		COMMENT "Copie de zmq"
 		VERBATIM
 	)
 
 	add_custom_command(TARGET ${PROJECT_NAME}
 		POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/dependencies/czmq/${CMAKE_BUILD_TYPE}/libczmq.dll ./libczmq.dll
+		COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/dependencies/czmq/${CMAKE_BUILD_TYPE}/libczmq.dll "./libczmq.dll"
 		COMMENT "Copie de czmq"
 		VERBATIM
 	)
 
 	add_custom_command(TARGET ${PROJECT_NAME}
 		POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/dependencies/zyre/${CMAKE_BUILD_TYPE}/libzyre.dll ./libzyre.dll
+		COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/dependencies/zyre/${CMAKE_BUILD_TYPE}/libzyre.dll "./libzyre.dll"
 		COMMENT "Copie de zyre"
 		VERBATIM
 	)
