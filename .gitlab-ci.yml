@@ -77,7 +77,7 @@ lib-installer-macos:
   extends: .lib-build-files
   stage: lib-installer
   tags:
-    - macos-qt6
+    - osx
   script:
     - make -C build package
 #    - packagesbuild ./builds/xcode/ingescape.pkgproj
@@ -101,7 +101,7 @@ lib-deploy-macos:
   extends: .lib-build-files
   stage: deploy
   tags:
-    - macos-qt6
+    - osx
   script:
     - make -C build DESTDIR=$HOME/builds/sysroot install
   dependencies:
@@ -123,7 +123,7 @@ lib-build-macos-qt6:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - git clean -xfd
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -Dmacos-qt6_UNIVERSAL=ON -DWITH_DEPS=ON -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DOSX_UNIVERSAL=ON -DWITH_DEPS=ON -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
     - make -j8 -C build
   artifacts:
     paths:
