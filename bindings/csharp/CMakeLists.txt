@@ -30,20 +30,22 @@ if (NOT CMAKE_BUILD_TYPE)
     set (CMAKE_BUILD_TYPE Debug)
 endif ()
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../builds/cmake/modules")
+
 ########################################################################
 # version
 ########################################################################
 
-if (WITH_CSHAP_WRAPPER)
-  # Set version to current ingescape version
-  set(MAJOR ${INGESCAPE_VERSION_MAJOR})
-  set(MINOR ${INGESCAPE_VERSION_MINOR})
-  set(BUILD ${INGESCAPE_VERSION_PATCH})
-else ()
-  set(MAJOR 1)
-  set(MINOR 0)
-  set(BUILD 0)
+if (NOT WITH_CSHARP_WRAPPER)
+  include(IngescapeHelper)
+  get_ingescape_version(INGESCAPE_VERSION_MAJOR INGESCAPE_VERSION_MINOR INGESCAPE_VERSION_PATCH)
 endif ()
+
+set(MAJOR ${INGESCAPE_VERSION_MAJOR})
+set(MINOR ${INGESCAPE_VERSION_MINOR})
+set(BUILD ${INGESCAPE_VERSION_PATCH})
+
+message("Ingescape version : ${INGESCAPE_VERSION_MAJOR}.${INGESCAPE_VERSION_MINOR}.${INGESCAPE_VERSION_PATCH}")
 
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/builds/visual-studio/cmake/AssemblyInfo.cs.in
