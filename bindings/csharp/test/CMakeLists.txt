@@ -10,13 +10,9 @@ project(igstester HOMEPAGE_URL https://ingescape.com LANGUAGES CSharp)
 if (WITH_CSHARP_WRAPPER)
 	set(FROM_INGESCAPE ON)
 endif ()
-if (WITH_TEST)
+if (WITH_CSHARP_TEST)
 	set(FROM_CSHARP ON)
 endif ()
-
-# Little hack because without this line, CMAKE_CXX_SIZEOF_VOID_P is not initialised
-# And installer will alwayse end with win32, not win64
-#enable_language(CXX)
 
 include(CSharpUtilities)
 
@@ -128,26 +124,10 @@ if (FROM_INGESCAPE AND FROM_CSHARP)
 	#print_all_variables()
 
 	if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-		set(_INGESCAPE_SUFFIX "d")
-		set(_LIBZMQ_NAME "libzmq-v142-mt-gd-4_3_5")
+		set(_INGESCAPE_DLL_NAME "ingescaped")
+		set(_LIBZMQ_DLL_NAME "libzmq-v142-mt-gd-4_3_5")
 	else()
-		set(_INGESCAPE_SUFFIX "")
-		set(_LIBZMQ_NAME "libzmq-v142-mt-4_3_5")
+		set(_INGESCAPE_DLL_NAME "ingescape")
+		set(_LIBZMQ_DLL_NAME "libzmq-v142-mt-4_3_5")
 	endif()
-	
-	add_custom_command(TARGET ${PROJECT_NAME}
-		POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E echo "Copying ingescape library from ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/ingescape${_INGESCAPE_SUFFIX}.dll to ${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
-		COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/ingescape${_INGESCAPE_SUFFIX}.dll" "${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
-		COMMAND ${CMAKE_COMMAND} -E echo "Copying sodium library from ${CMAKE_BINARY_DIR}/dependencies/sodium/${CMAKE_BUILD_TYPE}/libsodium.dll to ${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
-		COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/dependencies/sodium/${CMAKE_BUILD_TYPE}/libsodium.dll" "${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
-		COMMAND ${CMAKE_COMMAND} -E echo "Copying zmq library from ${CMAKE_BINARY_DIR}/dependencies/libzmq/bin/${CMAKE_BUILD_TYPE}/${_LIBZMQ_NAME}.dll to ${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
-		COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/dependencies/libzmq/bin/${CMAKE_BUILD_TYPE}/${_LIBZMQ_NAME}.dll" "${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
-		COMMAND ${CMAKE_COMMAND} -E echo "Copying czmq library from ${CMAKE_BINARY_DIR}/dependencies/czmq/${CMAKE_BUILD_TYPE}/libczmq.dll to ${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
-		COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/dependencies/czmq/${CMAKE_BUILD_TYPE}/libczmq.dll" "${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
-		COMMAND ${CMAKE_COMMAND} -E echo "Copying zyre library from ${CMAKE_BINARY_DIR}/dependencies/zyre/${CMAKE_BUILD_TYPE}/libzyre.dll to ${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
-		COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/dependencies/zyre/${CMAKE_BUILD_TYPE}/libzyre.dll" "${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
-		DEPENDS ${CMAKE_PROJECT_NAME}
-	)
-
 endif ()
