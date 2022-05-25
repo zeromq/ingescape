@@ -768,7 +768,7 @@ binding-node-js-macos:
     - cp -r ../../dependencies/zyre/include/* ./dependencies/include
     - sed -i .bak 's@/usr/local@<!(echo $PWD)/dependencies@g' binding.gyp #update file paths for igs 
     - cat ./binding.gyp
-    - npm install prebuildify
+    - npm install -g prebuildify
     - npm run build --from_sources=1
   artifacts:
     paths:
@@ -799,7 +799,7 @@ binding-node-js-linux:
     - cp -r ../../dependencies/zyre/include/* ./dependencies/include
     - sed -i.bak 's@/usr/local@<!(echo $PWD)/dependencies@g' binding.gyp #update file paths for igs 
     - cat ./binding.gyp
-    - npm install prebuildify
+    - npm install -g prebuildify
     - npm run build --from_sources=1
   artifacts:
     paths:
@@ -831,7 +831,7 @@ binding-node-js-windows:
     - Xcopy ..\..\dependencies\zyre\include .\dependencies\windows\include\ /E /y
     - $CORRECT_PWD = $PWD -replace "\\", "\\"
     - (Get-Content -path .\binding.gyp -Raw) -replace 'C:\\\\Program Files\\\\ingescape',"$CORRECT_PWD\\dependencies\\windows" | Set-Content .\binding.gyp #update file paths for igs
-    - npm install prebuildify
+    - npm install -g prebuildify
     - if (Test-Path C:\Users\admin\AppData\Local\Temp\prebuildify) { Remove-Item C:\Users\admin\AppData\Local\Temp\prebuildify -Force -Recurse } #To force prebuildify to re-upload its temporary cache
     - npm run build --msvs_version=2019 --from_sources=1
   artifacts:
