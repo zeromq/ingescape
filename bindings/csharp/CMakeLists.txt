@@ -33,13 +33,20 @@ endif ()
 ########################################################################
 # version
 ########################################################################
-# Set version to current ingescape version
-set(MAJOR 3)
-set(MINOR 5)
-set(BUILD 49)
+
+if (WITH_CSHAP_WRAPPER)
+  # Set version to current ingescape version
+  set(MAJOR ${INGESCAPE_VERSION_MAJOR})
+  set(MINOR ${INGESCAPE_VERSION_MINOR})
+  set(BUILD ${INGESCAPE_VERSION_PATCH})
+else ()
+  set(MAJOR 1)
+  set(MINOR 0)
+  set(BUILD 0)
+endif ()
 
 configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/AssemblyInfo.cs.in
+  ${CMAKE_CURRENT_SOURCE_DIR}/builds/visual-studio/cmake/AssemblyInfo.cs.in
   ${CMAKE_CURRENT_BINARY_DIR}/AssemblyInfo.cs
   @ONLY)
 
