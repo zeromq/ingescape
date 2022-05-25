@@ -5,10 +5,23 @@ An installer of the wrapper exists in this repository to install the library in 
 
 
 ## Building
-- Open the Visual Studio solution to build the C# library : .\IngescapeCSharpWrapper\IngescapeCSharpWrapper.sln
-- Build
-- You will find the library in the following folder: .\IngescapeCSharpWrapper\IngescapeCSharp\bin\(Debug ou Release)\(x64 ou x86)\netstandard2.0\IngescapeCSharp.dll
 
+    ## From Visual-Studio
+        - Open the Visual Studio solution to build the C# library : .\IngescapeCSharpWrapper\IngescapeCSharpWrapper.sln
+        - Build
+        - You will find the library in the following folder: .\IngescapeCSharpWrapper\IngescapeCSharp\bin\(Debug ou Release)\(x64 ou x86)\netstandard2.0\IngescapeCSharp.dll
+
+    ## From CMAKE        
+    Without Test:
+        - cmake -S . -B<BuildDir> -G"<VisualStudioGenerator>" (-A Win32 for x86) -DCMAKE_BUILD_TYPE=<ReleaseOrDebug> -DWITH_TEST=OFF
+        - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildFolder <BuildDir>/bindings/csharp -projectName IngescapeCSharp        
+        - cmake --build <BuildDir> --target IngescapeCSharp --config <ReleaseOrDebug>
+
+    With Test:
+        - cmake -S . -B<BuildDir> -G"<VisualStudioGenerator>" (-A Win32 for x86) -DCMAKE_BUILD_TYPE=<ReleaseOrDebug>
+        - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildFolder <BuildDir>/bindings/csharp -projectName IngescapeCSharp
+        - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildFolder <BuildDir>/bindings/csharp/test -projectName igstester
+        - cmake --build <BuildDir> --target igstester --config <ReleaseOrDebug>
 
 ## Testing
 The 'Tester' project is a C# version of igstester.c to test the C# library. Open the Test Explorer tab in Visual Studio to execute the test.
