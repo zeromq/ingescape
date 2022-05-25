@@ -109,7 +109,7 @@ lib-deploy-macos:
   needs: 
     - lib-build-macos
   rules:
-    - !reference [.base_repo_main_branch, rules]
+    - !reference [.root_namespace, rules]
 
 
 
@@ -143,7 +143,7 @@ lib-deploy-macos-qt6:
   needs: 
     - lib-build-macos-qt6
   rules:
-    - !reference [.base_repo_main_branch, rules]
+    - !reference [.root_namespace, rules]
 
 
 
@@ -370,7 +370,7 @@ lib-deploy-windows:
     - test-csharp-x86-release
     - test-csharp-x86-debug
   rules:
-    - !reference [.base_repo_main_branch, rules]
+    - !reference [.root_namespace, rules]
 
 # _      _
 #| |    (_)
@@ -443,7 +443,7 @@ lib-deploy-linux-release-x64:
   needs: 
     - lib-build-linux-x64
   rules:
-    - !reference [.base_repo_main_branch, rules]
+    - !reference [.root_namespace, rules]
 
 
 ##
