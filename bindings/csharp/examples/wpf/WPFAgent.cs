@@ -1,6 +1,6 @@
 //
-//  CSharpSampleWPF.cs
-//  CSharpSampleWPF version 1.0
+//  WPFAgent.cs
+//  WPFAgent version 1.0
 //  Created by IngeScape Editor on 2022/04/07
 //
 //  no description
@@ -13,9 +13,9 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-namespace CSharpSampleWPFNamespace
+namespace WPFNamespace
 {
-    public class CSharpSampleWPF : INotifyPropertyChanged
+    public class WPFAgent : INotifyPropertyChanged
     {
         const int _maxServiceLogLength = 4000;
 
@@ -303,7 +303,7 @@ namespace CSharpSampleWPFNamespace
             }
         }
 
-        public CSharpSampleWPF()
+        public WPFAgent()
         {
         }
 

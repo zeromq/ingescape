@@ -1,6 +1,6 @@
 //
 //  Main.cs
-//  CSharpSampleUnity version 1.0
+//  UnityAgent version 1.0
 //
 //  no description
 //  Copyright © 2021 Ingenuity i/o. All rights reserved.
@@ -30,7 +30,7 @@ public class Main : MonoBehaviour
     {
         UnityMainThreadDispatcher.Instance().Enqueue(() =>
         {
-            CSharpSampleUnity agent = myData as CSharpSampleUnity;
+            UnityAgent agent = myData as UnityAgent;
             if (agent != null)
                 agent.SetImpulsionI();
         });
@@ -44,7 +44,7 @@ public class Main : MonoBehaviour
     {
         UnityMainThreadDispatcher.Instance().Enqueue(() =>
         {
-            CSharpSampleUnity agent = myData as CSharpSampleUnity;
+            UnityAgent agent = myData as UnityAgent;
             if (agent != null)
                 agent.BoolI = (bool)value;
         });
@@ -58,7 +58,7 @@ public class Main : MonoBehaviour
     {
         UnityMainThreadDispatcher.Instance().Enqueue(() =>
         {
-            CSharpSampleUnity agent = myData as CSharpSampleUnity;
+            UnityAgent agent = myData as UnityAgent;
             if (agent != null)
                 agent.IntegerI = (int)value;
         });
@@ -72,7 +72,7 @@ public class Main : MonoBehaviour
     {
         UnityMainThreadDispatcher.Instance().Enqueue(() =>
         {
-            CSharpSampleUnity agent = myData as CSharpSampleUnity;
+            UnityAgent agent = myData as UnityAgent;
             if (agent != null)
                 agent.DoubleI = (double)value;
         });
@@ -86,7 +86,7 @@ public class Main : MonoBehaviour
     {
         UnityMainThreadDispatcher.Instance().Enqueue(() =>
         {
-            CSharpSampleUnity agent = myData as CSharpSampleUnity;
+            UnityAgent agent = myData as UnityAgent;
             if (agent != null)
                 agent.StringI = (string)value;
         });
@@ -100,7 +100,7 @@ public class Main : MonoBehaviour
     {
         UnityMainThreadDispatcher.Instance().Enqueue(() =>
         {
-            CSharpSampleUnity agent = myData as CSharpSampleUnity;
+            UnityAgent agent = myData as UnityAgent;
             if (agent != null)
                 agent.DataI = (byte[])value;
         });
@@ -114,7 +114,7 @@ public class Main : MonoBehaviour
     {
         UnityMainThreadDispatcher.Instance().Enqueue(() =>
         {
-            CSharpSampleUnity agent = myData as CSharpSampleUnity;
+            UnityAgent agent = myData as UnityAgent;
             if (agent != null)
                 agent.BoolP = (bool)value;
         });
@@ -128,7 +128,7 @@ public class Main : MonoBehaviour
     {
         UnityMainThreadDispatcher.Instance().Enqueue(() =>
         {
-            CSharpSampleUnity agent = myData as CSharpSampleUnity;
+            UnityAgent agent = myData as UnityAgent;
             if (agent != null)
                 agent.IntegerP = (int)value;
         });
@@ -142,7 +142,7 @@ public class Main : MonoBehaviour
     {
         UnityMainThreadDispatcher.Instance().Enqueue(() =>
         {
-            CSharpSampleUnity agent = myData as CSharpSampleUnity;
+            UnityAgent agent = myData as UnityAgent;
             if (agent != null)
                 agent.DoubleP = (double)value;
         });
@@ -156,7 +156,7 @@ public class Main : MonoBehaviour
     {
         UnityMainThreadDispatcher.Instance().Enqueue(() =>
         {
-            CSharpSampleUnity agent = myData as CSharpSampleUnity;
+            UnityAgent agent = myData as UnityAgent;
             if (agent != null)
                 agent.StringP = (string)value;
         });
@@ -170,7 +170,7 @@ public class Main : MonoBehaviour
     {
         UnityMainThreadDispatcher.Instance().Enqueue(() =>
         {
-            CSharpSampleUnity agent = myData as CSharpSampleUnity;
+            UnityAgent agent = myData as UnityAgent;
             if (agent != null)
                 agent.DataP = (byte[])value;
         });
@@ -185,7 +185,7 @@ public class Main : MonoBehaviour
     {
         UnityMainThreadDispatcher.Instance().Enqueue(() =>
         {
-            CSharpSampleUnity agent = myData as CSharpSampleUnity;
+            UnityAgent agent = myData as UnityAgent;
             if (agent != null)
                 agent.Service(senderAgentName, senderAgentUUID, serviceArguments);
         });
@@ -199,7 +199,7 @@ public class Main : MonoBehaviour
 
     void Start()
     {
-        Igs.AgentSetName("CSharpSampleUnity");
+        Igs.AgentSetName("echo");
         Igs.DefinitionSetVersion("1.0");
         Igs.LogSetConsoleLevel(LogLevel.LogDebug);
         Igs.LogSetConsole(_verbose);
@@ -270,7 +270,7 @@ public class Main : MonoBehaviour
         Igs.OutputCreate("string", IopValueType.String);
         Igs.OutputCreate("data", IopValueType.Data);
 
-        CSharpSampleUnity agent = new CSharpSampleUnity();
+        UnityAgent agent = new UnityAgent();
 
         Igs.ObserveInput("impulsion", ImpulsionInputCallback, agent);
         Igs.ObserveInput("bool", BoolInputCallback, agent);

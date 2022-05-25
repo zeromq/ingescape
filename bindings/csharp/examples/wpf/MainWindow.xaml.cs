@@ -16,7 +16,7 @@ using System.Windows.Threading;
 using System.Text.RegularExpressions;
 using Ingescape;
 
-namespace CSharpSampleWPFNamespace
+namespace WPFNamespace
 {
     public enum ExitCode
     {
@@ -36,8 +36,8 @@ namespace CSharpSampleWPFNamespace
         static bool _verbose = true;
         Dispatcher _dispatcherOfMainWindow = null;
 
-        CSharpSampleWPF _agent;
-        public CSharpSampleWPF Agent { get { return _agent; } }
+        WPFAgent _agent;
+        public WPFAgent Agent { get { return _agent; } }
 
         void ImpulsionInputCallback(IopType iopType,
                                 string name,
@@ -49,7 +49,7 @@ namespace CSharpSampleWPFNamespace
             {
                 _dispatcherOfMainWindow.InvokeAsync(new Action(() =>
                 {
-                    CSharpSampleWPF agent = myData as CSharpSampleWPF;
+                    WPFAgent agent = myData as WPFAgent;
                     if (agent != null)
                         agent.SetImpulsionI();
                 }));
@@ -65,7 +65,7 @@ namespace CSharpSampleWPFNamespace
             {
                 _dispatcherOfMainWindow.InvokeAsync(new Action(() =>
                 {
-                    CSharpSampleWPF agent = myData as CSharpSampleWPF;
+                    WPFAgent agent = myData as WPFAgent;
                     if (agent != null)
                         agent.BoolI = (bool)value;
                 }));
@@ -81,7 +81,7 @@ namespace CSharpSampleWPFNamespace
             {
                 _dispatcherOfMainWindow.InvokeAsync(new Action(() =>
                 {
-                    CSharpSampleWPF agent = myData as CSharpSampleWPF;
+                    WPFAgent agent = myData as WPFAgent;
                     if (agent != null)
                         agent.IntegerI = (int)value;
                 }));
@@ -97,7 +97,7 @@ namespace CSharpSampleWPFNamespace
             {
                 _dispatcherOfMainWindow.InvokeAsync(new Action(() =>
                 {
-                    CSharpSampleWPF agent = myData as CSharpSampleWPF;
+                    WPFAgent agent = myData as WPFAgent;
                     if (agent != null)
                         agent.DoubleI = (double)value;
                 }));
@@ -113,7 +113,7 @@ namespace CSharpSampleWPFNamespace
             {
                 _dispatcherOfMainWindow.InvokeAsync(new Action(() =>
                 {
-                    CSharpSampleWPF agent = myData as CSharpSampleWPF;
+                    WPFAgent agent = myData as WPFAgent;
                     if (agent != null)
                         agent.StringI = (string)value;
                 }));
@@ -129,7 +129,7 @@ namespace CSharpSampleWPFNamespace
             {
                 _dispatcherOfMainWindow.InvokeAsync(new Action(() =>
                 {
-                    CSharpSampleWPF agent = myData as CSharpSampleWPF;
+                    WPFAgent agent = myData as WPFAgent;
                     if (agent != null)
                         agent.DataI = (byte[])value;
                 }));
@@ -146,7 +146,7 @@ namespace CSharpSampleWPFNamespace
             {
                 _dispatcherOfMainWindow.InvokeAsync(new Action(() =>
                 {
-                    CSharpSampleWPF agent = myData as CSharpSampleWPF;
+                    WPFAgent agent = myData as WPFAgent;
                     if (agent != null)
                         agent.BoolP = (bool)value;
                 }));
@@ -162,7 +162,7 @@ namespace CSharpSampleWPFNamespace
             {
                 _dispatcherOfMainWindow.InvokeAsync(new Action(() =>
                 {
-                    CSharpSampleWPF agent = myData as CSharpSampleWPF;
+                    WPFAgent agent = myData as WPFAgent;
                     if (agent != null)
                         agent.IntegerP = (int)value;
                 }));
@@ -178,7 +178,7 @@ namespace CSharpSampleWPFNamespace
             {
                 _dispatcherOfMainWindow.InvokeAsync(new Action(() =>
                 {
-                    CSharpSampleWPF agent = myData as CSharpSampleWPF;
+                    WPFAgent agent = myData as WPFAgent;
                     if (agent != null)
                         agent.DoubleP = (double)value;
                 }));
@@ -194,7 +194,7 @@ namespace CSharpSampleWPFNamespace
             {
                 _dispatcherOfMainWindow.InvokeAsync(new Action(() =>
                 {
-                    CSharpSampleWPF agent = myData as CSharpSampleWPF;
+                    WPFAgent agent = myData as WPFAgent;
                     if (agent != null)
                         agent.StringP = (string)value;
                 }));
@@ -210,7 +210,7 @@ namespace CSharpSampleWPFNamespace
             {
                 _dispatcherOfMainWindow.InvokeAsync(new Action(() =>
                 {
-                    CSharpSampleWPF agent = myData as CSharpSampleWPF;
+                    WPFAgent agent = myData as WPFAgent;
                     if (agent != null)
                         agent.DataP = (byte[])value;
                 }));
@@ -228,7 +228,7 @@ namespace CSharpSampleWPFNamespace
             {
                 _dispatcherOfMainWindow.InvokeAsync(new Action(() =>
                 {
-                    CSharpSampleWPF agent = myData as CSharpSampleWPF;
+                    WPFAgent agent = myData as WPFAgent;
                     if (agent != null)
                         agent.Service(senderAgentName, senderAgentUUID, serviceArguments);
                 }));
@@ -247,7 +247,7 @@ namespace CSharpSampleWPFNamespace
             _dispatcherOfMainWindow = this.Dispatcher;
             this.DataContext = this;
 
-            Igs.AgentSetName("CSharpSampleWPF");
+            Igs.AgentSetName("WPFAgent");
             Igs.DefinitionSetVersion("1.0");
             Igs.LogSetConsoleLevel(LogLevel.LogDebug);
             Igs.LogSetConsole(_verbose);
@@ -312,7 +312,7 @@ namespace CSharpSampleWPFNamespace
             Igs.OutputCreate("string", IopValueType.String);
             Igs.OutputCreate("data", IopValueType.Data);
 
-            CSharpSampleWPF agent = new CSharpSampleWPF();
+            WPFAgent agent = new WPFAgent();
 
             Igs.ObserveInput("impulsion", ImpulsionInputCallback, agent);
             Igs.ObserveInput("bool", BoolInputCallback, agent);

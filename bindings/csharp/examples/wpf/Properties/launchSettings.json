@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "CSharpSampleWPF": {
+    "WPFAgent": {
       "commandName": "Project",
       "nativeDebugging": true
     }

@@ -1,6 +1,6 @@
 //
-//  CSharpSampleUnity.cs
-//  CSharpSampleUnity version 1.0
+//  UnityAgent.cs
+//  UnityAgent version 1.0
 //
 //  no description
 //  Copyright © 2021 Ingenuity i/o. All rights reserved.
@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class CSharpSampleUnity
+public class UnityAgent
 {
     //inputs
     public void SetImpulsionI()
@@ -247,7 +247,7 @@ public class CSharpSampleUnity
         }
     }
 
-    public CSharpSampleUnity()
+    public UnityAgent()
     {
     }
 
