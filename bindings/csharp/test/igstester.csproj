@@ -96,7 +96,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\IngescapeCSharp.csproj">
+    <ProjectReference Include="..\builds\visual-studio\IngescapeCSharp.csproj">
       <Project>{5a8f71bb-e14d-4f96-9a87-a622a03cdef4}</Project>
       <Name>IngescapeCSharp</Name>
     </ProjectReference>

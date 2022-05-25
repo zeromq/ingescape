@@ -32,14 +32,16 @@
 
   <ItemGroup>
     <Compile Remove="cmake\**" />
-    <Compile Remove="examples\**" />
-    <Compile Remove="test\**" />
     <EmbeddedResource Remove="cmake\**" />
-    <EmbeddedResource Remove="examples\**" />
-    <EmbeddedResource Remove="test\**" />
     <None Remove="cmake\**" />
-    <None Remove="examples\**" />
-    <None Remove="test\**" />
+  </ItemGroup>
+
+   <ItemGroup>
+    <Compile Include="$(ProjectDir)../../src/Enums.cs" />
+    <Compile Include="$(ProjectDir)../../src/Helpers.cs" />
+    <Compile Include="$(ProjectDir)../../src/IgsAgent.cs" />
+    <Compile Include="$(ProjectDir)../../src/Ingescape.cs" />
+    <Compile Include="$(ProjectDir)../../src/ServiceArgument.cs" />
   </ItemGroup>
 
 </Project>
