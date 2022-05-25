@@ -851,8 +851,10 @@ test-node-js-macos:
   script:
     - cd ./bindings/javascript-node/
     - npm run test --from_sources=1
-  dependencies: 
-    - binding-node-js-macos 
+  dependencies:
+    - binding-node-js-macos
+  needs:
+    - binding-node-js-macos
 
 test-node-js-linux:
   stage: binding-test
@@ -864,6 +866,8 @@ test-node-js-linux:
     - npm run test --from_sources=1
   dependencies:
     - binding-node-js-linux
+  needs:
+    - binding-node-js-linux
 
 test-node-js-windows:
   stage: binding-test
@@ -873,6 +877,8 @@ test-node-js-windows:
     - cd ./bindings/javascript-node/
     - npm run test --from_sources=1
   dependencies:
+    - binding-node-js-windows
+  needs:
     - binding-node-js-windows
 
 ## Deploy
