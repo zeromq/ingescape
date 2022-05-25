@@ -799,7 +799,7 @@ binding-node-js-linux:
     - cp -r ../../dependencies/zyre/include/* ./dependencies/include
     - sed -i.bak 's@/usr/local@<!(echo $PWD)/dependencies@g' binding.gyp #update file paths for igs 
     - cat ./binding.gyp
-    - npm install --from_sources=1
+    - npm install
     - npm run build --from_sources=1
   artifacts:
     paths:
