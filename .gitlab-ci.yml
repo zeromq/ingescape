@@ -49,7 +49,7 @@ lib-build-macos:
   extends: .lib-build-files
   stage: lib-build
   tags:
-    - osx
+    - macos-qt6
   before_script:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
@@ -77,7 +77,7 @@ lib-installer-macos:
   extends: .lib-build-files
   stage: lib-installer
   tags:
-    - osx
+    - macos-qt6
   script:
     - make -C build package
 #    - packagesbuild ./builds/xcode/ingescape.pkgproj
@@ -101,7 +101,7 @@ lib-deploy-macos:
   extends: .lib-build-files
   stage: deploy
   tags:
-    - osx
+    - macos-qt6
   script:
     - make -C build DESTDIR=$HOME/builds/sysroot install
   dependencies:
@@ -113,17 +113,17 @@ lib-deploy-macos:
 
 
 
-# Build/Deploy ingescape on osx runner
-lib-build-osx:
+# Build/Deploy ingescape on macos-qt6 runner
+lib-build-macos-qt6:
   extends: .lib-build-files
   stage: lib-build
   tags:
-    - osx
+    - macos-qt6
   before_script:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - git clean -xfd
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DOSX_UNIVERSAL=ON -DWITH_DEPS=ON -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -Dmacos-qt6_UNIVERSAL=ON -DWITH_DEPS=ON -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
     - make -j8 -C build
   artifacts:
     paths:
@@ -131,17 +131,17 @@ lib-build-osx:
     name: "lib-build-macos"
     expire_in: 1 day
 
-lib-deploy-osx:
+lib-deploy-macos-qt6:
   extends: .lib-build-files
   stage: deploy
   tags:
-    - osx
+    - macos-qt6
   script:
     - make -C build DESTDIR=$HOME/builds/sysroot install
   dependencies:
-    - lib-build-osx
+    - lib-build-macos-qt6
   needs: 
-    - lib-build-osx
+    - lib-build-macos-qt6
   rules:
     - !reference [.base_repo_main_branch, rules]
 
@@ -751,7 +751,7 @@ build-deb-packages:
 binding-node-js-macos:
   stage: binding-build
   tags:
-    - osx
+    - macos-qt6
   script:
     - cd ./bindings/javascript-node/
     - mkdir -p ./dependencies/lib
@@ -847,7 +847,7 @@ binding-node-js-windows:
 test-node-js-macos:
   stage: binding-test
   tags:
-    - osx
+    - macos-qt6
   script:
     - cd ./bindings/javascript-node/
     - npm run test --from_sources=1
@@ -978,7 +978,7 @@ package-python-wheels-windows:
 package-python-wheels-macos:
   stage: binding-package
   tags:
-    - osx
+    - macos-qt6
   image: ingescape/python-cmake
   script:
     - cd ./bindings/python/
