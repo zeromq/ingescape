@@ -1,30 +1,33 @@
 # Ingescape C#
 
 ## Installing
-An installer of the wrapper exists in this repository to install the library in your system with the last version of ingescape: "TODO"
+Ingescape C# comes with the main Ingescape library and is available on Windows only.
 
 
 ## Building
 
-    ## From Visual-Studio
-        - Open the Visual Studio solution to build the C# library : .\IngescapeCSharpWrapper\IngescapeCSharpWrapper.sln
-        - Build
-        - You will find the library in the following folder: .\IngescapeCSharpWrapper\IngescapeCSharp\bin\(Debug ou Release)\(x64 ou x86)\netstandard2.0\IngescapeCSharp.dll
+### Visual Studio
+Simply use the Visual Studio solution in .\IngescapeCSharpWrapper\IngescapeCSharpWrapper.sln
 
-    ## From CMAKE        
-    Without Test:
-        - cmake -S . -B<BuildDir> -G"<VisualStudioGenerator>" (-A Win32 for x86) -DCMAKE_BUILD_TYPE=<ReleaseOrDebug> -DWITH_TEST=OFF
-        - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildFolder <BuildDir>/bindings/csharp -projectName IngescapeCSharp        
-        - cmake --build <BuildDir> --target IngescapeCSharp --config <ReleaseOrDebug>
+### Cmake
 
-    With Test:
-        - cmake -S . -B<BuildDir> -G"<VisualStudioGenerator>" (-A Win32 for x86) -DCMAKE_BUILD_TYPE=<ReleaseOrDebug>
-        - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildFolder <BuildDir>/bindings/csharp -projectName IngescapeCSharp
-        - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildFolder <BuildDir>/bindings/csharp/test -projectName igstester
-        - cmake --build <BuildDir> --target igstester --config <ReleaseOrDebug>
+Cmake supports multiple versions of Visual Studio. One shall be specified in the cmake command.
+
+Compilation is possible for _Win32_ or _x64_. Change the '-A' option below according to your needs.
+Build type may be _Debug_ or _Release_.
+
+	cmake -S . -B .\build -G"Visual Studio 16 2019" -Ax64 -DCMAKE_BUILD_TYPE=Release -DWITH_TEST=OFF
+	Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -builddirectory ./build/bindings/csharp -projectName IngescapeCSharp        
+    cmake --build .\build --target IngescapeCSharp --config Release
 
 ## Testing
-The 'Tester' project is a C# version of igstester.c to test the C# library. Open the Test Explorer tab in Visual Studio to execute the test.
-By default, this test project reference the IngescapeCSharp project and create a copy of the dll into the output folder. The IngescapeCSharp.dll only works with ingescape.dll and its dependencies in the same directory but we cannot reference the ingescape.dll in a Visual Studio project.
-For that reason, we implemented a pre-build event to copy ingescape.dll and its dependencies, generated from the respective projects in the solution, into the output directory.
+The test.cs file is a C# transcription of igstester.c for the C# binding. 
 
+Open the Test Explorer tab in Visual Studio to execute the tests.
+
+Tests can be built using CMAKE.
+
+	cmake -S . -B.\build -G"Visual Studio 16 2019" -Ax64 -DCMAKE_BUILD_TYPE=Release
+	Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -builddirectory ./build/bindings/csharp -projectName IngescapeCSharp
+	Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -builddirectory ./build/bindings/csharp/test -projectName igstester
+	cmake --build .\build --target igstester --config Release
