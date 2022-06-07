@@ -25,7 +25,7 @@ The test.cs file is a C# transcription of igstester.c for the C# binding.
 
 Open the Test Explorer tab in Visual Studio to execute the tests.
 
-Tests can be built using CMAKE. Ingescape must be installed on system. To build test from ingescape sources, use ingescape CMAKE.
+Tests can be built using CMAKE. Ingescape must be installed on system.
 
 	cmake -S . -B.\build -G"Visual Studio 16 2019" -Ax64 -DCMAKE_BUILD_TYPE=Release
 	Powershell.exe -executionpolicy remotesigned builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildDirectory ./build -projectName IngescapeCSharp
