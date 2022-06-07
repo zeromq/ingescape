@@ -481,6 +481,7 @@ lib-installer-debian-qt6-x64:
   script:
     - apt-get update || apt-get update
     - apt-get install -y ingescape-dev
+    - apt-get install -y makeself
     - git clean -xfd
     - export INGESCAPE_MAJOR=$(grep "#define INGESCAPE_VERSION_MAJOR" include/ingescape.h | cut -d ' ' -f3-)
     - export INGESCAPE_MINOR=$(grep "#define INGESCAPE_VERSION_MINOR" include/ingescape.h | cut -d ' ' -f3-)
