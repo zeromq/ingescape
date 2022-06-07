@@ -199,6 +199,7 @@ public class Main : MonoBehaviour
 
     void Start()
     {
+        Application.logMessageReceived += LogMessageReceived;
         Igs.AgentSetName("echo");
         Igs.DefinitionSetVersion("1.0");
         Igs.LogSetConsoleLevel(LogLevel.LogDebug);
@@ -298,6 +299,27 @@ public class Main : MonoBehaviour
             Debug.Log(string.Format("Starting with device {0} on port {1}", _device, _port));
     }
 
+    private void LogMessageReceived(string condition, string stackTrace, LogType type)
+    {
+        string[] stackTraceLines = stackTrace.Split('\n');
+        string caller = (stackTraceLines.Length >= 2) ? stackTraceLines[1] : "";
+        switch (type)
+        {
+            case (LogType.Assert):
+            case (LogType.Error):
+            case (LogType.Exception):
+                Igs.Error(condition, caller);
+                break;
+            case (LogType.Warning):
+                Igs.Warn(condition, caller);
+                break;
+            default:
+                Igs.Debug(condition, caller);
+                break;
+        }
+    }
+
+
     private IEnumerator Close()
     {
         Debug.Log("Application quit");
@@ -312,9 +334,10 @@ public class Main : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        #if UNITY_EDITOR
-            Igs.ClearContext();
-        #endif
+        Application.logMessageReceived -= LogMessageReceived;
+#if UNITY_EDITOR
+        Igs.ClearContext();
+#endif
         Igs.Stop();
         Debug.Log("IngeScape stoped");
     }
