@@ -3,14 +3,17 @@
 # Define job order
 stages:
   - lib-build
+  - binding-build
+  - binding-test
   - lib-installer
-  - lib-deploy
-  - lib-delivery
+  - binding-package
+  - deploy
+  - delivery
 
 # Define ingescape library files
 .lib-build-files:
-  only:
-    changes:
+  rules:
+    - changes:
       - .gitlab-ci.yml
       - src/**/*
       - builds/cmake/**/*
@@ -22,9 +25,16 @@ stages:
 
 # Global variables. Can be used by any jobs
 variables:
-  VS_CMAKE_GENERATOR: "Visual Studio 15 2017"
+  VS_CMAKE_GENERATOR: "Visual Studio 16 2019"
   DEPLOYMENT_WINDOWS_NET_SHARE: "\\\\10.0.0.2\\gitlab_workspace\\dependencies"
 
+.base_repo_main_branch:
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+
+.root_namespace:
+  rules:
+    - if: '$CI_PROJECT_ROOT_NAMESPACE == "ingescape-private" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
 
 #http://patorjk.com/software/taag/#p=display&f=Big&t=Windows
 #                       ____   _____
@@ -51,7 +61,6 @@ lib-build-macos:
       - ./build
     name: "lib-build-macos"
     expire_in: 1 day
-  dependencies: []
 
 
 # Create runtime installer for macos
@@ -84,22 +93,24 @@ lib-installer-macos:
     name: "lib-installer-macos"
   dependencies:
     - lib-build-macos
-  needs: [ "lib-build-macos" ]
+  needs: 
+    - lib-build-macos
 
 
 lib-deploy-macos:
   extends: .lib-build-files
-  stage: lib-deploy
+  stage: deploy
   tags:
     - osx
   script:
     - make -C build DESTDIR=$HOME/builds/sysroot install
   dependencies:
     - lib-build-macos
-  needs: [ "lib-build-macos" ]
-  only:
-    refs:
-      - main
+  needs: 
+    - lib-build-macos
+  rules:
+    - !reference [.root_namespace, rules]
+
 
 
 # Build/Deploy ingescape on macos-qt6 runner
@@ -119,21 +130,21 @@ lib-build-macos-qt6:
       - ./build
     name: "lib-build-macos"
     expire_in: 1 day
-  dependencies: []
 
 lib-deploy-macos-qt6:
   extends: .lib-build-files
-  stage: lib-deploy
+  stage: deploy
   tags:
     - macos-qt6
   script:
     - make -C build DESTDIR=$HOME/builds/sysroot install
   dependencies:
     - lib-build-macos-qt6
-  needs: [ "lib-build-macos-qt6" ]
-  only:
-    refs:
-      - main
+  needs: 
+    - lib-build-macos-qt6
+  rules:
+    - !reference [.root_namespace, rules]
+
 
 
 #__          ___           _
@@ -155,14 +166,15 @@ lib-windows-release-x64:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - mkdir build\ReleaseX64
-    - cmake -S . -B build\ReleaseX64 -G"$env:VS_CMAKE_GENERATOR Win64" -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
+    - cmake -S . -B build\ReleaseX64 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID" -DWITH_CSHARP_WRAPPER=ON
+    - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildDirectory build/ReleaseX64/bindings/csharp -projectName IngescapeCSharp
+    - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildDirectory build/ReleaseX64/bindings/csharp/test -projectName igstester
     - cmake --build build\ReleaseX64 --target ALL_BUILD --config Release
   artifacts:
     paths:
      - build
     name: "lib-windows-release-x64"
     expire_in: 1 day
-  dependencies: []
 
 # Create ingescape library for windows 32 bits release
 lib-windows-release-x86:
@@ -176,14 +188,15 @@ lib-windows-release-x86:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - mkdir build\ReleaseX86
-    - cmake -S . -B build\ReleaseX86 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
+    - cmake -S . -B build\ReleaseX86 -G"$env:VS_CMAKE_GENERATOR" -AWin32 -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID" -DWITH_CSHARP_WRAPPER=ON
+    - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildDirectory build/ReleaseX86/bindings/csharp -projectName IngescapeCSharp
+    - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildDirectory build/ReleaseX86/bindings/csharp/test -projectName igstester
     - cmake --build build\ReleaseX86 --target ALL_BUILD --config Release
   artifacts:
     paths:
      - build
     name: "lib-windows-release-x86"
     expire_in: 1 day
-  dependencies: []
 
 # Create ingescape library for windows 64 bits debug
 lib-windows-debug-x64:
@@ -197,14 +210,15 @@ lib-windows-debug-x64:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - mkdir build\DebugX64
-    - cmake -S . -B build\DebugX64 -G"$env:VS_CMAKE_GENERATOR Win64" -DCMAKE_BUILD_TYPE=Debug -DWITH_DEPS=ON -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
+    - cmake -S . -B build\DebugX64 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Debug -DWITH_DEPS=ON -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID" -DWITH_CSHARP_WRAPPER=ON
+    - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildDirectory build/DebugX64/bindings/csharp -projectName IngescapeCSharp
+    - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildDirectory build/DebugX64/bindings/csharp/test -projectName igstester
     - cmake --build build\DebugX64 --target ALL_BUILD --config Debug
   artifacts:
     paths:
      - build
     name: "lib-windows-debug-x64"
     expire_in: 1 day
-  dependencies: []
 
 # Create ingescape library for windows 32 bits debug
 lib-windows-debug-x86:
@@ -218,14 +232,15 @@ lib-windows-debug-x86:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - mkdir build\DebugX86
-    - cmake -S . -B build\DebugX86 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Debug -DWITH_DEPS=ON -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID"
+    - cmake -S . -B build\DebugX86 -G"$env:VS_CMAKE_GENERATOR" -AWin32 -DCMAKE_BUILD_TYPE=Debug -DWITH_DEPS=ON -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID" -DWITH_CSHARP_WRAPPER=ON
+    - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildDirectory build/DebugX86/bindings/csharp -projectName IngescapeCSharp
+    - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildDirectory build/DebugX86/bindings/csharp/test -projectName igstester
     - cmake --build build\DebugX86 --target ALL_BUILD --config Debug
   artifacts:
     paths:
      - build
     name: "lib-windows-debug-x86"
     expire_in: 1 day
-  dependencies: []
 
 
 # Create runtime install for windows 32 bits
@@ -247,7 +262,9 @@ lib-installer-runtime-windows-x86:
     name: "lib-installer-runtime-windows-x86"
   dependencies:
     - lib-windows-release-x86
-  needs: [ "lib-windows-release-x86" ]
+  needs: 
+    - lib-windows-release-x86
+    - test-csharp-x86-release
 
 # Create runtime install for windows 64 bits
 lib-installer-runtime-windows-x64:
@@ -268,7 +285,9 @@ lib-installer-runtime-windows-x64:
     name: "lib-installer-runtime-windows-x64"
   dependencies:
     - lib-windows-release-x64
-  needs: [ "lib-windows-release-x64" ]
+  needs: 
+    - lib-windows-release-x64
+    - test-csharp-x64-release
 
 # Create runtime install for windows 32 bits (debug)
 lib-installer-debug-windows-x86:
@@ -289,7 +308,9 @@ lib-installer-debug-windows-x86:
     name: "lib-installer-debug-windows-x86"
   dependencies:
     - lib-windows-debug-x86
-  needs: [ "lib-windows-debug-x86" ]
+  needs: 
+    - lib-windows-debug-x86
+    - test-csharp-x86-debug
 
 # Create runtime install for windows 64 bits (debug)
 lib-installer-debug-windows-x64:
@@ -310,13 +331,15 @@ lib-installer-debug-windows-x64:
     name: "lib-installer-debug-windows-x64"
   dependencies:
     - lib-windows-debug-x64
-  needs: [ "lib-windows-debug-x64" ]
+  needs: 
+    - lib-windows-debug-x64
+    - test-csharp-x64-debug
 
 
 # Deploy ingescape in windows to be able to compile agents
 lib-deploy-windows:
   extends: .lib-build-files
-  stage: lib-deploy
+  stage: deploy
   tags:
     - windows
   script:
@@ -328,15 +351,26 @@ lib-deploy-windows:
     - copy .\include\ingescape_private.h $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64\include\ingescape -Force
     - cmake --install .\build\DebugX86 --config Debug --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x86
     - copy .\include\ingescape_private.h $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x86\include\ingescape -Force
-  dependencies:
+  dependencies: 
     - lib-windows-release-x64
     - lib-windows-release-x86
     - lib-windows-debug-x64
     - lib-windows-debug-x86
-  needs: [ "lib-windows-release-x64", "lib-windows-release-x86", "lib-windows-debug-x64", "lib-windows-debug-x86" ]
-  only:
-    refs:
-      - main
+    - test-csharp-x64-release
+    - test-csharp-x64-debug
+    - test-csharp-x86-release
+    - test-csharp-x86-debug
+  needs: 
+    - lib-windows-release-x64
+    - lib-windows-release-x86
+    - lib-windows-debug-x64
+    - lib-windows-debug-x86
+    - test-csharp-x64-release
+    - test-csharp-x64-debug
+    - test-csharp-x86-release
+    - test-csharp-x86-debug
+  rules:
+    - !reference [.root_namespace, rules]
 
 # _      _
 #| |    (_)
@@ -367,7 +401,6 @@ lib-build-linux-x64:
       - ./build
     name: "lib-build-linux-x64"
     expire_in: 1 day
-  dependencies: []
 
 # Create library installer for linux 64 bits
 lib-installer-linux-x64:
@@ -393,12 +426,13 @@ lib-installer-linux-x64:
     name: "lib-installer-linux-x64"
   dependencies:
     - lib-build-linux-x64
-  needs: [ "lib-build-linux-x64" ]
+  needs: 
+    - lib-build-linux-x64
 
 # Deploy ingescape to be able to compile agents
 lib-deploy-linux-release-x64:
   extends: .lib-build-files
-  stage: lib-deploy
+  stage: deploy
   tags:
     - docker
   image: ingescape/debian-testing-compil
@@ -406,10 +440,10 @@ lib-deploy-linux-release-x64:
     - make -C build DESTDIR=$HOME/builds/release/linux_x64/ install
   dependencies:
     - lib-build-linux-x64
-  needs: [ "lib-build-linux-x64" ]
-  only:
-    refs:
-      - main
+  needs: 
+    - lib-build-linux-x64
+  rules:
+    - !reference [.root_namespace, rules]
 
 
 ##
@@ -421,10 +455,14 @@ lib-build-debian-qt6-x64:
   extends: .lib-build-files
   stage: lib-build
   tags:
-    - debian-10-qt6
+    - docker
+  image: ingescape/qt6-debian-11
   before_script:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
+    - apt-get update || apt-get update
+    - apt-get install -y ingescape-dev
+    - git clean -xfd
     - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
     - make -C build
   artifacts:
@@ -432,15 +470,19 @@ lib-build-debian-qt6-x64:
       - ./build
     name: "lib-build-debian-10-x64"
     expire_in: 1 day
-  dependencies: []
 
 # Create library installer for linux 64 bits
 lib-installer-debian-qt6-x64:
   extends: .lib-build-files
   stage: lib-installer
   tags:
-    - debian-10-qt6
+    - docker
+  image: ingescape/qt6-debian-11
   script:
+    - apt-get update || apt-get update
+    - apt-get install -y ingescape-dev
+    - apt-get install -y makeself
+    - git clean -xfd
     - export INGESCAPE_MAJOR=$(grep "#define INGESCAPE_VERSION_MAJOR" include/ingescape.h | cut -d ' ' -f3-)
     - export INGESCAPE_MINOR=$(grep "#define INGESCAPE_VERSION_MINOR" include/ingescape.h | cut -d ' ' -f3-)
     - export INGESCAPE_VERSION=$INGESCAPE_MAJOR.$INGESCAPE_MINOR.$CI_PIPELINE_ID
@@ -457,24 +499,27 @@ lib-installer-debian-qt6-x64:
     name: "lib-installer-debian-qt6-x64"
   dependencies:
     - lib-build-debian-qt6-x64
-  needs: [ "lib-build-debian-qt6-x64" ]
+  needs: 
+    - lib-build-debian-qt6-x64
 
 # Deploy ingescape to be able to compile agents
 lib-deploy-debian-qt6-x64:
   extends: .lib-build-files
-  stage: lib-deploy
+  stage: deploy
   tags:
-    - debian-10-qt6
+    - docker
+  image: ingescape/qt6-debian-11
   script:
+  - apt-get update || apt-get update
+    - apt-get install -y ingescape-dev
+    - git clean -xfd
     - make -C build DESTDIR=$HOME/builds/release/linux_x64/ install
   dependencies:
     - lib-build-debian-qt6-x64
-  needs: [ "lib-build-debian-qt6-x64" ]
-  only:
-    refs:
-      - main
-    variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
+  needs: 
+    - lib-build-debian-qt6-x64
+  rules:
+    - !reference [.root_namespace, rules]
 
 ##
 ## armhf (RPi)
@@ -499,7 +544,6 @@ lib-linux-release-armhf:
       - ./build
     name: "lib-linux-release-armhf"
     expire_in: 1 day
-  dependencies: []
 
 # Create runtime install for linux ARMv7 (armhf) - Generic ZIP
 lib-installer-runtime-linux-armhf:
@@ -529,7 +573,7 @@ lib-installer-runtime-linux-armhf:
 # Deploy ingescape to be able to compile agents
 lib-deploy-linux-release-armhf:
   extends: .lib-build-files
-  stage: lib-deploy
+  stage: deploy
   tags:
     - docker
   image: ingescape/ubuntu-x-compil-rpi
@@ -538,11 +582,8 @@ lib-deploy-linux-release-armhf:
     - cp include/ingescape_private.h ~/builds/release/armhf/usr/local/include/ingescape/
   dependencies:
     - lib-linux-release-armhf
-  only:
-    refs:
-      - main
-    variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
+  rules:
+    - !reference [.root_namespace, rules]
 
 
 ##
@@ -568,7 +609,6 @@ lib-android-release-aarch64:
       - build
     name: "lib-android-release-aarch64"
     expire_in: 1 day
-  dependencies: []
 
 # Create runtime install for Android (aarch64) - Generic ZIP
 lib-installer-runtime-android-aarch64:
@@ -590,7 +630,7 @@ lib-installer-runtime-android-aarch64:
 # Deploy ingescape to be able to compile agents
 lib-deploy-linux-release-aarch64:
   extends: .lib-build-files
-  stage: lib-deploy
+  stage: deploy
   tags:
     - docker
   image: ingescape/ubuntu-x-compil-android-aarch64
@@ -599,11 +639,8 @@ lib-deploy-linux-release-aarch64:
     - cp include/ingescape_private.h ~/builds/release/aarch64/usr/local/include/ingescape/
   dependencies:
     - lib-android-release-aarch64
-  only:
-    refs:
-      - main
-    variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
+  rules:
+    - !reference [.root_namespace, rules]
 
 ##
 ## armv7a (Android)
@@ -628,7 +665,6 @@ lib-android-release-armv7a-softfp:
       - build
     name: "lib-android-release-armv7a-softfp"
     expire_in: 1 day
-  dependencies: []
 
 # Create runtime install for Android (armv7a softfp) - Generic ZIP
 lib-installer-runtime-android-armv7a-softfp:
@@ -650,7 +686,7 @@ lib-installer-runtime-android-armv7a-softfp:
 # Deploy ingescape to be able to compile agents
 lib-deploy-linux-release-armv7a-softfp:
   extends: .lib-build-files
-  stage: lib-deploy
+  stage: deploy
   tags:
     - docker
   image: ingescape/ubuntu-x-compil-android
@@ -659,11 +695,8 @@ lib-deploy-linux-release-armv7a-softfp:
     - cp include/ingescape_private.h ~/builds/release/armv7a-sf/usr/local/include/ingescape/
   dependencies:
     - lib-android-release-armv7a-softfp
-  only:
-    refs:
-      - main
-    variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
+  rules:
+    - !reference [.root_namespace, rules]
 
 
 ##
@@ -672,7 +705,7 @@ lib-deploy-linux-release-armv7a-softfp:
 
 build-deb-packages:
   extends: .lib-build-files
-  stage: lib-delivery
+  stage: delivery
   tags:
     - docker
   image: debian:10
@@ -715,7 +748,480 @@ build-deb-packages:
     paths:
       - debian_x64/ingescape*.deb
     name: "ingescape-dev-debian-package"
-  dependencies: []
+  rules:
+    - !reference [.root_namespace, rules]
+
+
+
+#   _   _           _             _  _____ 
+#  | \ | |         | |           | |/ ____|
+#  |  \| | ___   __| | ___       | | (___  
+#  | . ` |/ _ \ / _` |/ _ \  _   | |\___ \ 
+#  | |\  | (_) | (_| |  __/ | |__| |____) |
+#  |_| \_|\___/ \__,_|\___|  \____/|_____/ 
+
+## Builds                                    
+binding-node-js-macos:
+  stage: binding-build
+  tags:
+    - macos-qt6
+  script:
+    - cd ./bindings/javascript-node/
+    - mkdir -p ./dependencies/lib
+    - mkdir -p ./dependencies/include
+    - cp ../../build/libingescape.a  ./dependencies/lib
+    - cp ../../build/dependencies/czmq/libczmq.a ./dependencies/lib
+    - cp ../../build/dependencies/libzmq/lib/libzmq.a ./dependencies/lib
+    - cp ../../build/dependencies/zyre/libzyre.a ./dependencies/lib
+    - cp ../../build/dependencies/sodium//libsodium.a ./dependencies/lib
+    - cp -r ../../include/* ./dependencies/include
+    - cp -r ../../dependencies/czmq/include/* ./dependencies/include
+    - cp -r ../../dependencies/libzmq/include/* ./dependencies/include
+    - cp -r ../../dependencies/sodium/src/libsodium/include/* ./dependencies/include
+    - cp -r ../../dependencies/zyre/include/* ./dependencies/include
+    - sed -i .bak 's@/usr/local@<!(echo $PWD)/dependencies@g' binding.gyp #update file paths for igs 
+    - cat ./binding.gyp
+    - npm install -g prebuildify
+    - npm run build --from_sources=1
+  artifacts:
+    paths:
+      - bindings/javascript-node/prebuilds
+  dependencies:
+    - lib-build-macos
+  needs: 
+    - lib-build-macos
+
+binding-node-js-linux:
+  stage: binding-build
+  tags:
+    - docker
+  image: ingescape/ubuntu18.04-node
+  script:
+    - cd ./bindings/javascript-node/
+    - mkdir -p ./dependencies/lib
+    - mkdir -p ./dependencies/include
+    - cp ../../build/libingescape.a  ./dependencies/lib
+    - cp ../../build/dependencies/czmq/libczmq.a ./dependencies/lib
+    - cp ../../build/dependencies/libzmq/lib/libzmq.a ./dependencies/lib
+    - cp ../../build/dependencies/zyre/libzyre.a ./dependencies/lib
+    - cp ../../build/dependencies/sodium//libsodium.a ./dependencies/lib
+    - cp -r ../../include/* ./dependencies/include
+    - cp -r ../../dependencies/czmq/include/* ./dependencies/include
+    - cp -r ../../dependencies/libzmq/include/* ./dependencies/include
+    - cp -r ../../dependencies/sodium/src/libsodium/include/* ./dependencies/include
+    - cp -r ../../dependencies/zyre/include/* ./dependencies/include
+    - sed -i.bak 's@/usr/local@<!(echo $PWD)/dependencies@g' binding.gyp #update file paths for igs 
+    - cat ./binding.gyp
+    - npm install -g prebuildify
+    - npm run build --from_sources=1
+  artifacts:
+    paths:
+      - bindings/javascript-node/prebuilds
+  dependencies:
+    - lib-build-linux-x64
+  needs: 
+    - lib-build-linux-x64
+
+binding-node-js-windows:
+  stage: binding-build
+  tags:
+    - windows
+  before_script:
+    - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
+  script:
+    - cd ./bindings/javascript-node/
+    - mkdir ./dependencies/windows/lib
+    - mkdir ./dependencies/windows/include
+    - Copy-Item -Path ..\..\build\ReleaseX64\Release\libingescape.lib -Destination ./dependencies/windows/lib
+    - Copy-Item -Path ..\..\build\ReleaseX64\dependencies\czmq\Release\libczmq.lib -Destination ./dependencies/windows/lib
+    - Copy-Item -Path ..\..\build\ReleaseX64\dependencies\libzmq\lib\Release\libzmq-v142-mt-s-4_3_5.lib -Destination ./dependencies/windows/lib
+    - Copy-Item -Path ..\..\build\ReleaseX64\dependencies\zyre\Release\libzyre.lib -Destination ./dependencies/windows/lib
+    - Copy-Item -Path ..\..\build\ReleaseX64\dependencies\sodium\Release\libsodium.lib -Destination ./dependencies/windows/lib
+    - Xcopy ..\..\include .\dependencies\windows\include\ /E /y
+    - Xcopy ..\..\dependencies\czmq\include .\dependencies\windows\include\ /E /y
+    - Xcopy ..\..\dependencies\libzmq\include .\dependencies\windows\include\ /E /y
+    - Xcopy ..\..\dependencies\sodium\src\libsodium\include .\dependencies\windows\include\ /E /y
+    - Xcopy ..\..\dependencies\zyre\include .\dependencies\windows\include\ /E /y
+    - $CORRECT_PWD = $PWD -replace "\\", "\\"
+    - (Get-Content -path .\binding.gyp -Raw) -replace 'C:\\\\Program Files\\\\ingescape',"$CORRECT_PWD\\dependencies\\windows" | Set-Content .\binding.gyp #update file paths for igs
+    - npm install -g prebuildify
+    - if (Test-Path C:\Users\admin\AppData\Local\Temp\prebuildify) { Remove-Item C:\Users\admin\AppData\Local\Temp\prebuildify -Force -Recurse } #To force prebuildify to re-upload its temporary cache
+    - npm run build --msvs_version=2019 --from_sources=1
+  artifacts:
+    paths:
+      - bindings/javascript-node/prebuilds
+  dependencies:
+    - lib-windows-release-x64
+  needs: 
+    - lib-windows-release-x64
+
+
+## Tests
+test-node-js-macos:
+  stage: binding-test
+  tags:
+    - macos-qt6
+  script:
+    - cd ./bindings/javascript-node/
+    - npm run test --from_sources=1
+  dependencies:
+    - binding-node-js-macos
+  needs:
+    - binding-node-js-macos
+
+test-node-js-linux:
+  stage: binding-test
+  tags:
+    - docker
+  image: ingescape/ubuntu18.04-node
+  script:
+    - cd ./bindings/javascript-node/
+    - npm run test --from_sources=1
+  dependencies:
+    - binding-node-js-linux
+  needs:
+    - binding-node-js-linux
+
+test-node-js-windows:
+  stage: binding-test
+  tags:
+    - windows
+  script:
+    - cd ./bindings/javascript-node/
+    - npm run test --from_sources=1
+  dependencies:
+    - binding-node-js-windows
+  needs:
+    - binding-node-js-windows
+
+## Deploy
+deploy-node-js:
+  stage: deploy
+  tags:
+    - docker
+  image: ingescape/ubuntu18.04-node
+  allow_failure: true
+  script:
+    - echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" > ~/.npmrc
+    - cd bindings/javascript-node
+    - npm publish
+  dependencies:
+    - binding-node-js-macos
+    - binding-node-js-linux
+    - binding-node-js-windows
+  rules:
+    - !reference [.root_namespace, rules]
+
+#   _____       _   _                 
+#  |  __ \     | | | |                
+#  | |__) |   _| |_| |__   ___  _ __  
+#  |  ___/ | | | __| '_ \ / _ \| '_ \ 
+#  | |   | |_| | |_| | | | (_) | | | |
+#  |_|    \__, |\__|_| |_|\___/|_| |_|
+#          __/ |                      
+#         |___/                       
+
+#Tests
+test-python:
+  stage: binding-test
+  tags:
+    - docker
+  image: ingescape/python-cmake
+  script:
+    - cd bindings/python
+    - mkdir -p ./dependencies/linux/
+    - mkdir -p ./dependencies/include/
+    - cp ../../build/libingescape.a  ./dependencies/linux
+    - cp ../../build/dependencies/czmq/libczmq.a ./dependencies/linux
+    - cp ../../build/dependencies/libzmq/lib/libzmq.a ./dependencies/linux
+    - cp ../../build/dependencies/zyre/libzyre.a ./dependencies/linux
+    - cp ../../build/dependencies/sodium//libsodium.a ./dependencies/linux
+    - cp -r ../../include/* ./dependencies/include
+    - cp -r ../../dependencies/czmq/include/* ./dependencies/include
+    - cp -r ../../dependencies/libzmq/include/* ./dependencies/include
+    - cp -r ../../dependencies/sodium/src/libsodium/include/* ./dependencies/include
+    - cp -r ../../dependencies/zyre/include/* ./dependencies/include
+    - export FROM_SOURCES="true"
+    - ./tests/run_tests.sh
+  artifacts:
+    paths:
+      - bindings/python/dependencies/*
+  dependencies:
+    - lib-build-linux-x64
+  needs: 
+    - lib-build-linux-x64
+
+## Package
+package-python-wheels-windows:
+  stage: binding-package
+  variables:
+    ARCH: "x64"
+  tags:
+    - windows
+  script:
+    - cd ./bindings/python/
+    - mkdir ./dependencies/windows
+    - mkdir ./dependencies/windows/x64
+    - Copy-Item -Path ..\..\build\ReleaseX64\Release\libingescape.lib -Destination ./dependencies/windows/x64
+    - Copy-Item -Path ..\..\build\ReleaseX64\dependencies\czmq\Release\libczmq.lib -Destination ./dependencies/windows/x64
+    - Copy-Item -Path ..\..\build\ReleaseX64\dependencies\libzmq\lib\Release\libzmq-v142-mt-s-4_3_5.lib -Destination ./dependencies/windows/x64/libzmq.lib
+    - Copy-Item -Path ..\..\build\ReleaseX64\dependencies\zyre\Release\libzyre.lib -Destination ./dependencies/windows/x64
+    - Copy-Item -Path ..\..\build\ReleaseX64\dependencies\sodium\Release\libsodium.lib -Destination ./dependencies/windows/x64
+    - |
+        pushd 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build'
+        cmd /c "vcvarsall.bat x64 & set" |
+        foreach {
+          if ($_ -match "=") {
+            $v = $_.split("="); set-item -force -path "ENV:\$($v[0])"  -value "$($v[1])"
+          }
+        }
+        popd
+    - $Env:FROM_SOURCES = "true"
+    - C:\Users\admin\AppData\Local\Programs\Python\Python36\python.exe setup.py bdist_wheel
+    - C:\Users\admin\AppData\Local\Programs\Python\Python37\python.exe setup.py bdist_wheel
+    - C:\Users\admin\AppData\Local\Programs\Python\Python38\python.exe setup.py bdist_wheel
+    - C:\Users\admin\AppData\Local\Programs\Python\Python39\python.exe setup.py bdist_wheel
+  dependencies:
+    - test-python
+    - lib-windows-release-x64
+  needs:
+    - test-python
+    - lib-windows-release-x64
+  artifacts:
+    paths:
+      - bindings/python/dist/*
+      - bindings/python/dependencies/*
+  rules:
+    - !reference [.base_repo_main_branch, rules]
+
+package-python-wheels-macos:
+  stage: binding-package
+  tags:
+    - macos-qt6
+  image: ingescape/python-cmake
+  script:
+    - cd ./bindings/python/
+    - mkdir -p ./dependencies/macos/
+    - cp ../../build/libingescape.a  ./dependencies/macos
+    - cp ../../build/dependencies/czmq/libczmq.a ./dependencies/macos
+    - cp ../../build/dependencies/libzmq/lib/libzmq.a ./dependencies/macos
+    - cp ../../build/dependencies/zyre/libzyre.a ./dependencies/macos
+    - cp ../../build/dependencies/sodium//libsodium.a ./dependencies/macos
+    - export FROM_SOURCES="true"
+    - python3 setup.py bdist_wheel
+  dependencies:
+    - test-python
+    - lib-build-macos
+  needs:
+    - test-python
+    - lib-build-macos
+  artifacts:
+    paths:
+      - bindings/python/dist/*
+      - bindings/python/dependencies/*
+  rules:
+    - !reference [.base_repo_main_branch, rules]
+
+package-python-wheels-manylinux_2_24_x86_64:
+  stage: binding-package
+  tags:
+    - docker
+  image: quay.io/pypa/manylinux_2_24_x86_64
+  script:
+    - cd ./bindings/python/
+    - mkdir -p ./dependencies/linux/
+    - cp ../../build/libingescape.a  ./dependencies/linux
+    - cp ../../build/dependencies/czmq/libczmq.a ./dependencies/linux
+    - cp ../../build/dependencies/libzmq/lib/libzmq.a ./dependencies/linux
+    - cp ../../build/dependencies/zyre/libzyre.a ./dependencies/linux
+    - cp ../../build/dependencies/sodium//libsodium.a ./dependencies/linux
+    - export FROM_SOURCES="true"
+    - python3.8 setup.py bdist_wheel
+    - python3.9 setup.py bdist_wheel
+    - python3.10 setup.py bdist_wheel
+    - |
+        for whl in dist/*.whl; do
+          auditwheel repair "$whl" --plat "manylinux_2_24_x86_64" -w ./wheelhouse/
+        done
+  dependencies:
+    - test-python
+    - lib-build-linux-x64
+  needs:
+    - test-python
+    - lib-build-linux-x64
+  artifacts:
+    paths:
+      - bindings/python/wheelhouse/*
+  rules:
+    - !reference [.base_repo_main_branch, rules]
+
+package-python-wheels-manylinux2014_x86_64:
+  stage: binding-package
+  tags:
+    - docker
+  image: quay.io/pypa/manylinux2014_x86_64
+  script:
+    - cd ./bindings/python/
+    - mkdir -p ./dependencies/linux/
+    - cp ../../build/libingescape.a  ./dependencies/linux
+    - cp ../../build/dependencies/czmq/libczmq.a ./dependencies/linux
+    - cp ../../build/dependencies/libzmq/lib/libzmq.a ./dependencies/linux
+    - cp ../../build/dependencies/zyre/libzyre.a ./dependencies/linux
+    - cp ../../build/dependencies/sodium//libsodium.a ./dependencies/linux
+    - export FROM_SOURCES="true"
+    - python3.7 setup.py bdist_wheel
+    - python3.8 setup.py bdist_wheel
+    - python3.9 setup.py bdist_wheel
+    - |
+        for whl in dist/*.whl; do
+          auditwheel repair "$whl" --plat "manylinux2014_x86_64" -w ./wheelhouse/
+        done
+  dependencies:
+    - test-python
+    - lib-build-linux-x64
+  needs:
+    - test-python
+    - lib-build-linux-x64
+  artifacts:
+    paths:
+      - bindings/python/wheelhouse/*
+  rules:
+    - !reference [.base_repo_main_branch, rules]
+
+package-python-wheels-manylinux2010_x86_64:
+  stage: binding-package
+  tags:
+    - docker
+  image: quay.io/pypa/manylinux2010_x86_64
+  script:
+    - cd ./bindings/python/
+    - mkdir -p ./dependencies/linux/
+    - cp ../../build/libingescape.a  ./dependencies/linux
+    - cp ../../build/dependencies/czmq/libczmq.a ./dependencies/linux
+    - cp ../../build/dependencies/libzmq/lib/libzmq.a ./dependencies/linux
+    - cp ../../build/dependencies/zyre/libzyre.a ./dependencies/linux
+    - cp ../../build/dependencies/sodium//libsodium.a ./dependencies/linux
+    - export FROM_SOURCES="true"
+    - python3.7 setup.py bdist_wheel
+    - python3.8 setup.py bdist_wheel
+    - |
+        for whl in dist/*.whl; do
+          auditwheel repair "$whl" --plat "manylinux2010_x86_64" -w ./wheelhouse/
+        done
+  dependencies:
+    - test-python
+    - lib-build-linux-x64
+  needs:
+    - test-python
+    - lib-build-linux-x64
+  artifacts:
+    paths:
+      - bindings/python/wheelhouse/*
+  rules:
+    - !reference [.base_repo_main_branch, rules]
+
+#Publish
+publish-python-package:
+  stage: deploy
+  tags:
+    - docker
+  image: ingescape/python-cmake
+  when: manual
+  script:
+    - cd bindings/python
+    - mkdir -p ./dependencies/linux/
+    - cp ../../build/libingescape.a  ./dependencies/linux
+    - cp ../../build/dependencies/czmq/libczmq.a ./dependencies/linux
+    - cp ../../build/dependencies/libzmq/lib/libzmq.a ./dependencies/linux
+    - cp ../../build/dependencies/zyre/libzyre.a ./dependencies/linux
+    - cp ../../build/dependencies/sodium//libsodium.a ./dependencies/linux
+    - export FROM_SOURCES="true"
+    - python3 setup.py sdist
+    - python3 -m pip install --upgrade twine
+    - python3 -m twine upload -u ${PYPI_USERNAME} -p ${PYPI_PASSWORD} dist/* wheelhouse/*
+  dependencies:
+    - package-python-wheels-windows
+    - package-python-wheels-macos
+    - package-python-wheels-manylinux_2_24_x86_64
+    - package-python-wheels-manylinux2014_x86_64
+    - package-python-wheels-manylinux2010_x86_64
+  needs:
+    - package-python-wheels-windows
+    - package-python-wheels-macos
+    - package-python-wheels-manylinux_2_24_x86_64
+    - package-python-wheels-manylinux2014_x86_64
+    - package-python-wheels-manylinux2010_x86_64
+  artifacts:
+    paths:
+      - bindings/python/dist/*
+      - bindings/python/wheelhouse/*
+  rules:
+    - !reference [.root_namespace, rules]
+
+#   _____     _  _   
+#  / ____|  _| || |_ 
+# | |      |_  __  _|
+# | |       _| || |_ 
+# | |____  |_  __  _|
+#  \_____|   |_||_|  
+
+## Tests
+test-csharp-x64-debug:
+  stage: binding-test
+  tags:
+    - windows
+  variables:
+    ARCH: "x64-debug"
+  script:
+    - cd build/DebugX64/bindings/csharp/test/Debug/net472
+    - dotnet vstest igstester.dll /Platform:x64
+  dependencies:
+    - lib-windows-debug-x64
+  needs:
+    - lib-windows-debug-x64
+
+
+test-csharp-x64-release:
+  stage: binding-test
+  tags:
+    - windows
+  variables:
+    ARCH: "x64-release"
+  script:
+    - cd build/ReleaseX64/bindings/csharp/test/Release/net472
+    - dotnet vstest igstester.dll /Platform:x64
+  dependencies:
+    - lib-windows-release-x64
+  needs:
+    - lib-windows-release-x64
+
+test-csharp-x86-debug:
+  stage: binding-test
+  tags:
+    - windows
+  variables:
+    ARCH: "x86-debug"
+  script:
+    - cd build/DebugX86/bindings/csharp/test/Debug/net472
+    - dotnet vstest igstester.dll /Platform:x86
+  dependencies:
+    - lib-windows-debug-x86
+  needs:
+    - lib-windows-debug-x86
+
+test-csharp-x86-release:
+  stage: binding-test
+  tags:
+    - windows
+  variables:
+    ARCH: "x86-release"
+  script:
+    - cd build/ReleaseX86/bindings/csharp/test/Release/net472
+    - dotnet vstest igstester.dll /Platform:x86
+  dependencies:
+    - lib-windows-release-x86
+  needs:
+    - lib-windows-release-x86
 
 
 # _____       _ _
@@ -730,7 +1236,7 @@ build-deb-packages:
 # Deliver installers so they can be downloaded from the website
 lib-delivery-all:
   extends: .lib-build-files
-  stage: lib-delivery
+  stage: delivery
   tags:
     - docker
   image: ingescape/alpine-deployment
@@ -783,8 +1289,5 @@ lib-delivery-all:
     - lib-installer-runtime-linux-armhf
     - lib-installer-runtime-android-armv7a-softfp
     - lib-installer-runtime-android-aarch64
-  only:
-    refs:
-      - main
-    variables:
-      - $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
+  rules:
+    - !reference [.root_namespace, rules]

@@ -1,0 +1,8 @@
+bin/
+obj/
+packages/
+Library/
+examples/CSharpSampleUnity/*.csproj
+examples/CSharpSampleUnity/*.sln
+*.csproj.user
+.vs/

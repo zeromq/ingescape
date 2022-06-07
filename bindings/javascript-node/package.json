@@ -1,0 +1,23 @@
+{
+  "name": "ingescape",
+  "version": "3.0.0",
+  "main": "index.js",
+  "types": "/types/index.d.ts",
+  "scripts": {
+    "test": "cd ./tests && npm install && node test.js --static",
+    "build": "prebuildify --napi",
+    "install": "node-gyp-build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zeromq/ingescape.git"
+  },
+  "author": "Ingenuity I/O",
+  "license": "MPLV2",
+  "dependencies": {
+    "ingescape": "^3.0.0",
+    "node-gyp": "^9.0.0",
+    "node-gyp-build": "^4.3.0",
+    "prebuildify": "^5.0.0"
+  }
+}

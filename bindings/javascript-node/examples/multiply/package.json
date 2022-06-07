@@ -1,0 +1,13 @@
+{
+  "name": "multiply",
+  "version": "1.0",
+  "main": "multiply.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "node multiply.js"
+  },
+  "author": "Ingenuity I/O",
+  "dependencies": {
+    "ingescape": "*"
+  }
+}

@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    
+    <Platforms>x86;x64</Platforms>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <Configurations>Debug;Release</Configurations>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Configurations>Debug;Release</Configurations>
+    <UserSecretsId>ce583a44-f9eb-46a9-9cfa-dc93f94a4322</UserSecretsId>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+    <DefineConstants>DEBUGx86</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+    <DefineConstants>RELEASEx86</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <DefineConstants>RELEASE</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="cmake\**" />
+    <EmbeddedResource Remove="cmake\**" />
+    <None Remove="cmake\**" />
+  </ItemGroup>
+
+   <ItemGroup>
+    <Compile Include="$(ProjectDir)../../src/Enums.cs" />
+    <Compile Include="$(ProjectDir)../../src/Helpers.cs" />
+    <Compile Include="$(ProjectDir)../../src/IgsAgent.cs" />
+    <Compile Include="$(ProjectDir)../../src/Ingescape.cs" />
+    <Compile Include="$(ProjectDir)../../src/ServiceArgument.cs" />
+  </ItemGroup>
+
+</Project>

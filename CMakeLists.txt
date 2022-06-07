@@ -4,6 +4,9 @@
 # Project setup
 # ##############################################################################
 cmake_minimum_required(VERSION 3.16)
+
+option(WITH_CSHARP_WRAPPER "Compile the library with CSHARP Binding" OFF)
+
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.11" CACHE STRING "Minimum OS X deployment version")
 
 option(OSX_UNIVERSAL "Build for both arm64 and x86_64" OFF)
@@ -408,6 +411,30 @@ if (NOT DEPS_ONLY)
                     COMPONENT library)
   endif()
 
+  if(WITH_CSHARP_WRAPPER AND WIN32)
+    add_subdirectory(${CMAKE_SOURCE_DIR}/bindings/csharp)
+    if (WITH_CSHARP_TEST)
+      add_dependencies(igstester ${CMAKE_PROJECT_NAME})
+      if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+        set(_INGESCAPE_SUFFIX "d")
+        set(_LIBZMQ_NAME "libzmq-v142-mt-gd-4_3_5")
+      else()
+        set(_INGESCAPE_SUFFIX "")
+        set(_LIBZMQ_NAME "libzmq-v142-mt-4_3_5")
+      endif()
+
+      add_custom_command(TARGET ${CMAKE_PROJECT_NAME}
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/bindings/csharp/test/${CMAKE_BUILD_TYPE}/net472/
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/ingescape${_INGESCAPE_SUFFIX}.dll ${CMAKE_BINARY_DIR}/bindings/csharp/test/${CMAKE_BUILD_TYPE}/net472/
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/dependencies/sodium/${CMAKE_BUILD_TYPE}/libsodium.dll ${CMAKE_BINARY_DIR}/bindings/csharp/test/${CMAKE_BUILD_TYPE}/net472/
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/dependencies/libzmq/bin/${CMAKE_BUILD_TYPE}/${_LIBZMQ_NAME}.dll ${CMAKE_BINARY_DIR}/bindings/csharp/test/${CMAKE_BUILD_TYPE}/net472/
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/dependencies/czmq/${CMAKE_BUILD_TYPE}/libczmq.dll ${CMAKE_BINARY_DIR}/bindings/csharp/test/${CMAKE_BUILD_TYPE}/net472/
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/dependencies/zyre/${CMAKE_BUILD_TYPE}/libzyre.dll ${CMAKE_BINARY_DIR}/bindings/csharp/test/${CMAKE_BUILD_TYPE}/net472/
+      )
+    endif ()
+  endif()
+
   # Install public include files
   install(FILES ${ingescape_headers_to_install}
           DESTINATION include/ingescape
@@ -509,7 +536,7 @@ if (NOT DEPS_ONLY)
     set(
       CPACK_SOURCE_IGNORE_FILES
       "${CMAKE_CURRENT_SOURCE_DIR}/bindings/;${CMAKE_CURRENT_SOURCE_DIR}/build/;${CMAKE_CURRENT_SOURCE_DIR}/.git/;${CMAKE_CURRENT_SOURCE_DIR}/doc/;${CMAKE_CURRENT_SOURCE_DIR}/applications/;${CMAKE_CURRENT_SOURCE_DIR}/ingeprobe/;${CMAKE_CURRENT_SOURCE_DIR}/packaging/"
-      )
+    )
 
     if(WIN32)
       # Installers for 32- vs. 64-bit CMake: - Root install directory (displayed to
@@ -519,12 +546,19 @@ if (NOT DEPS_ONLY)
         set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES64")
         set(CPACK_NSIS_PACKAGE_NAME
             "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION} (Win64)")
-        set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} (Win64)")
+        set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} (Win64)")	
       else()
         set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES")
         set(CPACK_NSIS_PACKAGE_NAME
             "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION}")
         set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} (Win32)")
+      endif()
+
+      if(WITH_CSHARP_WRAPPER)
+        install(FILES 
+              "${CMAKE_CURRENT_BINARY_DIR}/bindings/csharp/${CMAKE_BUILD_TYPE}/netstandard2.0/IngescapeCSharp.dll"
+              DESTINATION lib
+        )
       endif()
 
       # NSIS configuration for Windows see https://cmake.org/cmake/help/v3.14/cpack_

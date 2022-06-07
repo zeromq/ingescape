@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "WPFAgent": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

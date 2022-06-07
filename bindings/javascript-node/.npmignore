@@ -1,0 +1,7 @@
+node_modules
+build
+examples
+package-lock.json
+prebuilds
+tests
+*.bak
