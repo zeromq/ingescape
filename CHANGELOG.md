@@ -7,7 +7,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [3.1.0]
 ### Added
 - Changelog
-- Binding C#
-- Binding Node JS
-- Binding Python
+- Bindings for C#, Node JS and Python
 
