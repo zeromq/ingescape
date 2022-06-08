@@ -1145,12 +1145,14 @@ publish-python-package:
     - package-python-wheels-manylinux_2_24_x86_64
     - package-python-wheels-manylinux2014_x86_64
     - package-python-wheels-manylinux2010_x86_64
+    - lib-build-linux-x64
   needs:
     - package-python-wheels-windows
     - package-python-wheels-macos
     - package-python-wheels-manylinux_2_24_x86_64
     - package-python-wheels-manylinux2014_x86_64
     - package-python-wheels-manylinux2010_x86_64
+    - lib-build-linux-x64
   artifacts:
     paths:
       - bindings/python/dist/*
