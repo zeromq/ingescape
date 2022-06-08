@@ -900,6 +900,7 @@ deploy-node-js:
   tags:
     - docker
   image: ingescape/ubuntu18.04-node
+  when: manual
   allow_failure: true
   script:
     - echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" > ~/.npmrc
