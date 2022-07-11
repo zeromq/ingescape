@@ -38,6 +38,7 @@ HEADERS += \
     $$PWD/../../src/uthash/uthash.h \
     $$PWD/../../include/ingescape.h \
     $$PWD/../../include/ingescape_private.h \
+    $$PWD/../../include/igsagent.h \
     $$PWD/../../src/yajl_alloc.h\
     $$PWD/../../src/yajl_buf.h \
     $$PWD/../../src/yajl_bytestack.h \

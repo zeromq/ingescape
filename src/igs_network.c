@@ -4286,9 +4286,9 @@ void igs_set_command_line_from_args (int argc, const char **argv)
     char pathbuf[PROC_PIDPATHINFO_MAXSIZE];
     ret = proc_pidpath (pid, pathbuf, sizeof (pathbuf));
 #else
-    char pathbuf[4 * 1024];
-    memset (pathbuf, 0, 4 * 1024);
-    ret = readlink ("/proc/self/exe", pathbuf, 4 * 1024);
+    char pathbuf[IGS_COMMAND_LINE_LENGTH];
+    memset (pathbuf, 0, IGS_COMMAND_LINE_LENGTH);
+    ret = readlink ("/proc/self/exe", pathbuf, IGS_COMMAND_LINE_LENGTH);
 #endif
     if (ret <= 0) {
         igs_error ("PID %d: proc_pidpath () - %s", pid, strerror (errno));
@@ -4305,17 +4305,17 @@ void igs_set_command_line_from_args (int argc, const char **argv)
 
 #elif defined(__WINDOWS__)
     // Use GetModuleFileName() to get exec path, argv[0] do not contain full path
-    char exe_file_path[IGS_MAX_PATH_LENGTH];
 #ifdef UNICODE
     WCHAR temp[IGS_MAX_PATH_LENGTH];
     GetModuleFileName (NULL, temp, IGS_MAX_PATH_LENGTH);
     // Conversion in char *
-    wcstombs_s (NULL, exe_file_path, sizeof (exe_file_path), temp,
-                sizeof (temp));
+    wcstombs_s (NULL, cmd, sizeof (cmd), temp, sizeof (temp));
 #else
-    GetModuleFileName (NULL, exe_file_path, IGS_MAX_PATH_LENGTH);
+    GetModuleFileName (NULL, cmd, IGS_MAX_PATH_LENGTH);
 #endif
-    if (strchr (exe_file_path, ' ') || strchr (exe_file_path, '\"')) {
+#endif
+    
+    if (strchr (cmd, ' ') || strchr (cmd, '\"')) {
         if (strlen (cmd) + 1 > IGS_COMMAND_LINE_LENGTH) {
             igs_error (
               "Path to our executable exceeds the maximum buffer size of %d. "
@@ -4323,15 +4323,15 @@ void igs_set_command_line_from_args (int argc, const char **argv)
               IGS_COMMAND_LINE_LENGTH);
             return;
         }
+        char *cmd_bis = strdup(cmd);
+        cmd[0] = '\0';
         strcat (cmd, "\"");
-        char *prev = exe_file_path;
-        char *it = strchr (exe_file_path, '\"');
+        char *prev = cmd_bis;
+        char *it = strchr (cmd_bis, '\"');
         while (it) {
             if (strlen (cmd) + (it - prev + 2) > IGS_COMMAND_LINE_LENGTH) {
-                igs_error (
-                  "Path to our executable exceeds the maximum buffer size of "
-                  "%d. Command line won't be set.",
-                  IGS_COMMAND_LINE_LENGTH);
+                igs_error ("Path to our executable exceeds the maximum buffer size of "
+                           "%d. Command line won't be set.", IGS_COMMAND_LINE_LENGTH);
                 return;
             }
             strncat (cmd, prev, (it - prev + 1));
@@ -4340,27 +4340,22 @@ void igs_set_command_line_from_args (int argc, const char **argv)
             it = strchr (it + 1, '\"');
         }
         if (strlen (cmd) + strlen (prev) + 2 > IGS_COMMAND_LINE_LENGTH) {
-            igs_error (
-              "Path to our executable exceeds the maximum buffer size of %d. "
-              "Command line won't be set.",
-              IGS_COMMAND_LINE_LENGTH);
+            igs_error ("Path to our executable exceeds the maximum buffer size of %d. "
+                       "Command line won't be set.", IGS_COMMAND_LINE_LENGTH);
             return;
         }
         strcat (cmd, prev);
         strcat (cmd, "\"");
+        free(cmd_bis);
     }
-    else
-        strcpy (cmd, exe_file_path);
-#endif
+        
 
     int i = 1;
     for (; i < argc; i++) {
-#if defined(__WINDOWS__)
-        char *formated_arg =
-          (char *) zmalloc (IGS_COMMAND_LINE_LENGTH * sizeof (char));
+        char *formated_arg = (char *) zmalloc (IGS_COMMAND_LINE_LENGTH * sizeof (char));
         if (strchr (argv[i], ' ') || strchr (argv[i], '\"')) {
             strcat (formated_arg, "\"");
-            char *prev = argv[i];
+            const char *prev = argv[i];
             char *it = strchr (argv[i], '\"');
             while (it) {
                 strncat (formated_arg, prev, (it - prev + 1));
@@ -4373,15 +4368,10 @@ void igs_set_command_line_from_args (int argc, const char **argv)
         }
         else
             strcpy (formated_arg, argv[i]);
-#else
-        char *formated_arg = strdup (argv[i]);
-#endif
-        if (strlen (cmd) + strlen (formated_arg) + 2
-            > IGS_COMMAND_LINE_LENGTH) { // 2 is for space and EOL
-            igs_error (
-              "passed arguments exceed buffer size: concatenation will stop "
-              "here with '%s'",
-              cmd);
+        
+        if (strlen (cmd) + strlen (formated_arg) + 2 > IGS_COMMAND_LINE_LENGTH) { // 2 is for space and EOL
+            igs_error ("passed arguments exceed buffer size: concatenation will stop "
+                       "here with '%s'", cmd);
             break;
         }
         else
