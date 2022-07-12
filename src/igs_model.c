@@ -820,6 +820,11 @@ void igs_log_include_services (bool enable)
     core_context->enable_service_logging = enable;
 }
 
+void igs_log_no_warning_if_undefined_service(bool enable){
+    core_init_context ();
+    core_context->allow_undefined_services = enable;
+}
+
 // --------------------------------  READ ------------------------------------//
 
 void *

@@ -717,7 +717,7 @@ INGESCAPE_EXPORT void igs_log(igs_log_level_t level,
 #define igs_fatal(...) igs_log(IGS_LOG_FATAL, __func__, __VA_ARGS__)
 
 
-//PROTOCL AND VERSION
+//PROTOCOL AND VERSION
 INGESCAPE_EXPORT int igs_version(void);
 INGESCAPE_EXPORT int igs_protocol(void);
 
@@ -748,7 +748,7 @@ INGESCAPE_EXPORT char * igs_log_file_path(void); // caller owns returned value
 
 INGESCAPE_EXPORT void igs_log_include_data(bool enable); //log details of data IOPs in log files , default is false.
 INGESCAPE_EXPORT void igs_log_include_services(bool enable); //log details about call/excecute services in log files, default is false.
-
+INGESCAPE_EXPORT void igs_log_no_warning_if_undefined_service(bool enable); //warns or not if an unknown service is called on this agent, default is warning (false).
 
 /*DEFINITION & MAPPING FILE MANAGEMENT
  These functions enable to write definition and mapping on disk
@@ -881,7 +881,6 @@ INGESCAPE_EXPORT void igs_replay_terminate(void);
 
 //////////////////////////////
 // JSON parsing and generation
-
 //NB: JSON parsing is based on YAJL
 
 // parse JSON string or file based on parsing events and a callback function

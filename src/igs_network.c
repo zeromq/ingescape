@@ -2644,18 +2644,13 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                                                token, service->cb_data);
                                 service_free_values_in_arguments (service->arguments);
                             }
-                        }
-                        else
-                            igsagent_warn (callee_agent,
-                                            "no defined callback to handle "
-                                            "received service %s",
-                                            service_name);
-                    }
-                    else
+                        } else
+                            igsagent_warn (callee_agent, "no defined callback to handle received service %s", service_name);
+                    } else if (!core_context->allow_undefined_services)
                         igsagent_warn (callee_agent,
-                                        "agent %s(%s) has no service named %s",
-                                        callee_agent->definition->name,
-                                        callee_uuid, service_name);
+                                       "agent %s(%s) has no service named %s",
+                                       callee_agent->definition->name,
+                                       callee_uuid, service_name);
                 }
                 free (caller_uuid);
                 free (callee_uuid);
