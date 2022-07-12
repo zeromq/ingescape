@@ -1185,13 +1185,8 @@ int main(int argc, const char * argv[]) {
     assert(!igs_service_exists("toto"));
     listOfStrings = igs_service_list(&nbElements);
     assert(listOfStrings == NULL && nbElements == 0);
-    assert(igs_service_args_first(NULL) == NULL);
     assert(igs_service_args_first("toto") == NULL);
-    assert(igs_service_args_count(NULL) == 0);
     assert(igs_service_args_count("toto") == 0);
-    assert(igs_service_arg_exists(NULL, NULL) == 0);
-    assert(igs_service_arg_exists("toto", NULL) == 0);
-    assert(igs_service_arg_exists(NULL, "toto") == 0);
     assert(igs_service_arg_exists("toto", "toto") == 0);
     assert(igs_service_init("myService", testerServiceCallback, NULL) == IGS_SUCCESS);
     assert(igs_service_remove("myService") == IGS_SUCCESS);
@@ -1280,7 +1275,72 @@ int main(int argc, const char * argv[]) {
     assert(list->next->next->next->next->type == IGS_DATA_T);
     assert(list->next->next->next->next->size == 0);
     assert(list->next->next->next->next->data == NULL);
-
+    
+    //service with reply
+    assert(igs_service_init("myServiceWithReply", testerServiceCallback, NULL) == IGS_SUCCESS);
+    assert(!igs_service_has_reply("myServiceWithReply"));
+    assert(igs_service_reply_name("myServiceWithReply") == NULL);
+    assert(igs_service_reply_args_first("myServiceWithReply") == NULL);
+    assert(igs_service_reply_args_count("myServiceWithReply") == 0);
+    assert(igs_service_reply_add("myServiceWithReply", "myReply") == IGS_SUCCESS);
+    assert(igs_service_reply_add("myServiceWithReply", "myReply2") == IGS_FAILURE);
+    assert(igs_service_has_reply("myServiceWithReply"));
+    assert(streq(igs_service_reply_name("myServiceWithReply"), "myReply")); //intentional memory leak here
+    assert(igs_service_reply_args_first("myServiceWithReply") == NULL);
+    assert(igs_service_reply_args_count("myServiceWithReply") == 0);
+    assert(igs_service_reply_arg_add("myServiceWithReply", "myBool", IGS_BOOL_T) == IGS_SUCCESS);
+    assert(igs_service_reply_arg_add("myServiceWithReply", "myInt", IGS_INTEGER_T) == IGS_SUCCESS);
+    assert(igs_service_reply_arg_add("myServiceWithReply", "myDouble", IGS_DOUBLE_T) == IGS_SUCCESS);
+    assert(igs_service_reply_arg_add("myServiceWithReply", "myString", IGS_STRING_T) == IGS_SUCCESS);
+    assert(igs_service_reply_arg_add("myServiceWithReply", "myData", IGS_DATA_T) == IGS_SUCCESS);
+    assert(igs_service_reply_args_first("myServiceWithReply"));
+    assert(igs_service_reply_args_count("myServiceWithReply") == 5);
+    assert(igs_service_reply_arg_exists("myServiceWithReply", "myBool"));
+    assert(igs_service_reply_arg_exists("myServiceWithReply", "myInt"));
+    assert(igs_service_reply_arg_exists("myServiceWithReply", "myDouble"));
+    assert(igs_service_reply_arg_exists("myServiceWithReply", "myString"));
+    assert(igs_service_reply_arg_exists("myServiceWithReply", "myData"));
+    assert(igs_service_reply_arg_remove("myServiceWithReply", "myBool") == IGS_SUCCESS);
+    assert(igs_service_reply_arg_remove("myServiceWithReply", "myInt") == IGS_SUCCESS);
+    assert(igs_service_reply_arg_remove("myServiceWithReply", "myDouble") == IGS_SUCCESS);
+    assert(igs_service_reply_arg_remove("myServiceWithReply", "myString") == IGS_SUCCESS);
+    assert(igs_service_reply_arg_remove("myServiceWithReply", "myData") == IGS_SUCCESS);
+    assert(igs_service_reply_arg_remove("myServiceWithReply", "myBool") == IGS_FAILURE);
+    assert(igs_service_reply_arg_remove("myServiceWithReply", "myInt") == IGS_FAILURE);
+    assert(igs_service_reply_arg_remove("myServiceWithReply", "myDouble") == IGS_FAILURE);
+    assert(igs_service_reply_arg_remove("myServiceWithReply", "myString") == IGS_FAILURE);
+    assert(igs_service_reply_arg_remove("myServiceWithReply", "myData") == IGS_FAILURE);
+    assert(!igs_service_reply_arg_exists("myServiceWithReply", "myBool"));
+    assert(!igs_service_reply_arg_exists("myServiceWithReply", "myInt"));
+    assert(!igs_service_reply_arg_exists("myServiceWithReply", "myDouble"));
+    assert(!igs_service_reply_arg_exists("myServiceWithReply", "myString"));
+    assert(!igs_service_reply_arg_exists("myServiceWithReply", "myData"));
+    assert(igs_service_reply_args_count("myServiceWithReply") == 0);
+    assert(igs_service_reply_remove("myServiceWithReply") == IGS_SUCCESS);
+    assert(igs_service_reply_remove("myServiceWithReply") == IGS_FAILURE);
+    assert(!igs_service_has_reply("myServiceWithReply"));
+    assert(igs_service_reply_name("myServiceWithReply") == NULL);
+    assert(igs_service_reply_args_first("myServiceWithReply") == NULL);
+    assert(igs_service_reply_args_count("myServiceWithReply") == 0);
+    assert(igs_service_reply_add("myServiceWithReply", "myReply") == IGS_SUCCESS);
+    assert(igs_service_reply_arg_add("myServiceWithReply", "myBool", IGS_BOOL_T) == IGS_SUCCESS);
+    assert(igs_service_reply_arg_add("myServiceWithReply", "myInt", IGS_INTEGER_T) == IGS_SUCCESS);
+    assert(igs_service_reply_arg_add("myServiceWithReply", "myDouble", IGS_DOUBLE_T) == IGS_SUCCESS);
+    assert(igs_service_reply_arg_add("myServiceWithReply", "myString", IGS_STRING_T) == IGS_SUCCESS);
+    assert(igs_service_reply_arg_add("myServiceWithReply", "myData", IGS_DATA_T) == IGS_SUCCESS);
+    igs_definition_save();
+    assert(igs_service_remove("myServiceWithReply") == IGS_SUCCESS);
+    igs_clear_definition();
+    igs_definition_load_file("/tmp/simple Demo Agent.json");
+    assert(igs_service_has_reply("myServiceWithReply"));
+    assert(streq(igs_service_reply_name("myServiceWithReply"), "myReply")); //intentional memory leak here
+    assert(igs_service_reply_args_first("myServiceWithReply"));
+    assert(igs_service_reply_args_count("myServiceWithReply") == 5);
+    assert(igs_service_reply_arg_exists("myServiceWithReply", "myBool"));
+    assert(igs_service_reply_arg_exists("myServiceWithReply", "myInt"));
+    assert(igs_service_reply_arg_exists("myServiceWithReply", "myDouble"));
+    assert(igs_service_reply_arg_exists("myServiceWithReply", "myString"));
+    assert(igs_service_reply_arg_exists("myServiceWithReply", "myData"));
 
     //channel
     assert(igs_peer_add_header("publisher", "toto") == IGS_FAILURE);

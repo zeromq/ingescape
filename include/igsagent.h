@@ -266,13 +266,23 @@ INGESCAPE_EXPORT igs_result_t igsagent_service_arg_add (igsagent_t *self,
                                                         const char *arg_name,
                                                         igs_iop_value_type_t value_type);
 INGESCAPE_EXPORT igs_result_t igsagent_service_arg_remove (igsagent_t *self, const char *service_name, const char *arg_name);
+INGESCAPE_EXPORT igs_result_t igsagent_service_reply_add(igsagent_t *self, const char *service_name, const char *reply_name);
+INGESCAPE_EXPORT igs_result_t igsagent_service_reply_remove(igsagent_t *self, const char *service_name);
+INGESCAPE_EXPORT igs_result_t igsagent_service_reply_arg_add(igsagent_t *self, const char *service_name,
+                                                             const char *arg_name, igs_iop_value_type_t type);
+INGESCAPE_EXPORT igs_result_t igsagent_service_reply_arg_remove(igsagent_t *self, const char *service_name,
+                                                                const char *arg_name);
 INGESCAPE_EXPORT size_t igsagent_service_count (igsagent_t *self);
 INGESCAPE_EXPORT bool igsagent_service_exists (igsagent_t *self, const char *service_name);
 INGESCAPE_EXPORT char ** igsagent_service_list (igsagent_t *self, size_t *nb_of_elements);//returned char** must be freed using igs_free_services_list
 INGESCAPE_EXPORT igs_service_arg_t * igsagent_service_args_first (igsagent_t *self, const char *service_name);
 INGESCAPE_EXPORT size_t igsagent_service_args_count (igsagent_t *self, const char *service_name);
 INGESCAPE_EXPORT bool igsagent_service_arg_exists (igsagent_t *self, const char *service_name, const char *arg_name);
-
+INGESCAPE_EXPORT bool igsagent_service_has_reply(igsagent_t *self, const char *service_name);
+INGESCAPE_EXPORT char * igsagent_service_reply_name(igsagent_t *self, const char *service_name); //returned char** must be freed by caller
+INGESCAPE_EXPORT igs_service_arg_t * igsagent_service_reply_args_first(igsagent_t *self, const char *service_name);
+INGESCAPE_EXPORT size_t igsagent_service_reply_args_count(igsagent_t *self, const char *service_name);
+INGESCAPE_EXPORT bool igsagent_service_reply_arg_exists(igsagent_t *self, const char *service_name, const char *arg_name);
 
 //////////////////////////////////////////
 // Elections and leadership between agents

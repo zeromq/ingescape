@@ -501,7 +501,14 @@ INGESCAPE_EXPORT igs_result_t igs_service_arg_add(const char *service_name, cons
 INGESCAPE_EXPORT igs_result_t igs_service_arg_remove(const char *service_name,
                                                      const char *arg_name); //removes first occurence of an argument with this name
 
-//introspection for services and their arguments
+//Zero to one REPLY per service. Reply is optional and used for specification purposes.
+INGESCAPE_EXPORT igs_result_t igs_service_reply_add(const char *service_name, const char *reply_name);
+INGESCAPE_EXPORT igs_result_t igs_service_reply_remove(const char *service_name);
+INGESCAPE_EXPORT igs_result_t igs_service_reply_arg_add(const char *service_name, const char *arg_name, igs_iop_value_type_t type);
+INGESCAPE_EXPORT igs_result_t igs_service_reply_arg_remove(const char *service_name,
+                                                           const char *arg_name);//removes first occurence of an argument with this name
+
+//introspection for services, their arguments and optional reply
 INGESCAPE_EXPORT size_t igs_service_count(void);
 INGESCAPE_EXPORT bool igs_service_exists(const char *name);
 INGESCAPE_EXPORT char ** igs_service_list(size_t *services_nbr);//returned char** must be freed using igs_free_services_list
@@ -510,6 +517,12 @@ INGESCAPE_EXPORT void igs_free_services_list(char **list, size_t services_nbr);
 INGESCAPE_EXPORT igs_service_arg_t * igs_service_args_first(const char *service_name);
 INGESCAPE_EXPORT size_t igs_service_args_count(const char *service_name);
 INGESCAPE_EXPORT bool igs_service_arg_exists(const char *service_name, const char *arg_name);
+
+INGESCAPE_EXPORT bool igs_service_has_reply(const char *service_name);
+INGESCAPE_EXPORT char * igs_service_reply_name(const char *service_name); //returned char** must be freed by caller
+INGESCAPE_EXPORT igs_service_arg_t * igs_service_reply_args_first(const char *service_name);
+INGESCAPE_EXPORT size_t igs_service_reply_args_count(const char *service_name);
+INGESCAPE_EXPORT bool igs_service_reply_arg_exists(const char *service_name, const char *arg_name);
 
 
 /////////

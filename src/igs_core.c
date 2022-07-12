@@ -102,7 +102,7 @@ void s_core_free_observeIOP (observed_iop_t **observed_iop)
 { // Internal
     assert (observed_iop);
     assert (*observed_iop);
-    if ((*observed_iop)->name != NULL) {
+    if ((*observed_iop)->name) {
         free ((*observed_iop)->name);
         (*observed_iop)->name = NULL;
     }
@@ -122,7 +122,7 @@ void s_core_free_service_cb_wrapper (service_cb_wrapper_t **service_cb_wrapper)
 { // Internal
     assert (service_cb_wrapper);
     assert (*service_cb_wrapper);
-    if ((*service_cb_wrapper)->name != NULL) {
+    if ((*service_cb_wrapper)->name) {
         free ((*service_cb_wrapper)->name);
         (*service_cb_wrapper)->name = NULL;
     }
@@ -132,7 +132,7 @@ void s_core_free_service_cb_wrapper (service_cb_wrapper_t **service_cb_wrapper)
 
 void igs_clear_context (void)
 {
-    if (core_context != NULL) {
+    if (core_context) {
         igs_stop ();
         igs_monitor_stop ();
         if (core_context->created_agents) {
@@ -209,7 +209,7 @@ void igs_clear_context (void)
             zactor_destroy (&(core_context->security_auth));
         if (core_context->security_cert)
             zcert_destroy (&(core_context->security_cert));
-        if (core_context->security_public_certificates_directory != NULL)
+        if (core_context->security_public_certificates_directory)
             free (core_context->security_public_certificates_directory);
 
         if (core_context->elections) {
@@ -878,7 +878,7 @@ igs_result_t igs_input_remove (const char *name)
         // delete associated callback wrappers
         observed_iop_t *observed_iop = NULL;
         HASH_FIND_STR (observed_inputs, name, observed_iop);
-        if (observed_iop != NULL) {
+        if (observed_iop) {
             HASH_DEL (observed_inputs, observed_iop);
             s_core_free_observeIOP (&observed_iop);
         }
@@ -894,7 +894,7 @@ igs_result_t igs_output_remove (const char *name)
         // delete associated callback wrappers
         observed_iop_t *observed_iop = NULL;
         HASH_FIND_STR (observed_outputs, name, observed_iop);
-        if (observed_iop != NULL) {
+        if (observed_iop) {
             HASH_DEL (observed_outputs, observed_iop);
             s_core_free_observeIOP (&observed_iop);
         }
@@ -910,7 +910,7 @@ igs_result_t igs_parameter_remove (const char *name)
         // delete associated callback wrappers
         observed_iop_t *observed_iop = NULL;
         HASH_FIND_STR (observed_parameters, name, observed_iop);
-        if (observed_iop != NULL) {
+        if (observed_iop) {
             HASH_DEL (observed_parameters, observed_iop);
             s_core_free_observeIOP (&observed_iop);
         }
@@ -1119,15 +1119,12 @@ igs_service_init (const char *name, igs_service_fn cb, void *my_data)
     assert (name && strlen (name) > 0);
     assert (cb);
     core_init_agent ();
-    service_cb_wrapper_t *wrap =
-      (service_cb_wrapper_t *) zmalloc (sizeof (service_cb_wrapper_t));
+    service_cb_wrapper_t *wrap = (service_cb_wrapper_t *) zmalloc (sizeof (service_cb_wrapper_t));
     wrap->name = strdup (name);
     wrap->cb = cb;
     wrap->my_data = my_data;
-    HASH_ADD_STR (service_cb_wrappers, name,
-                  wrap); // store wrapper to delete it later
-    return igsagent_service_init (core_agent, name, core_service_callback,
-                                   wrap);
+    HASH_ADD_STR (service_cb_wrappers, name, wrap); // store wrapper to delete it later
+    return igsagent_service_init (core_agent, name, core_service_callback, wrap);
 }
 
 igs_result_t igs_service_remove (const char *name)
@@ -1139,7 +1136,7 @@ igs_result_t igs_service_remove (const char *name)
         // delete associated callback wrapper
         service_cb_wrapper_t *service_cb_wrapper = NULL;
         HASH_FIND_STR (service_cb_wrappers, name, service_cb_wrapper);
-        if (service_cb_wrapper != NULL) {
+        if (service_cb_wrapper) {
             HASH_DEL (service_cb_wrappers, service_cb_wrapper);
             s_core_free_service_cb_wrapper (&service_cb_wrapper);
         }
@@ -1161,7 +1158,29 @@ igs_result_t igs_service_arg_remove (const char *service_name,
     core_init_agent ();
     return igsagent_service_arg_remove (core_agent, service_name, arg_name);
 }
-// removes first occurence with this name
+
+igs_result_t igs_service_reply_add(const char *service_name, const char *reply_name){
+    core_init_agent ();
+    return igsagent_service_reply_add(core_agent, service_name, reply_name);
+}
+
+igs_result_t igs_service_reply_remove(const char *service_name){
+    core_init_agent ();
+    return igsagent_service_reply_remove(core_agent, service_name);
+}
+
+igs_result_t igs_service_reply_arg_add(const char *service_name, const char *arg_name,
+                                       igs_iop_value_type_t type){
+    core_init_agent ();
+    return igsagent_service_reply_arg_add(core_agent, service_name, arg_name, type);
+}
+
+igs_result_t igs_service_reply_arg_remove(const char *service_name,
+                                          const char *arg_name){
+    core_init_agent ();
+    return igsagent_service_reply_arg_remove(core_agent, service_name, arg_name);
+}
+
 size_t igs_service_count (void)
 {
     core_init_agent ();
@@ -1196,4 +1215,29 @@ bool igs_service_arg_exists (const char *service_name, const char *arg_name)
 {
     core_init_agent ();
     return igsagent_service_arg_exists (core_agent, service_name, arg_name);
+}
+
+bool igs_service_has_reply(const char *service_name){
+    core_init_agent ();
+    return igsagent_service_has_reply(core_agent, service_name);
+}
+
+char * igs_service_reply_name(const char *service_name){
+    core_init_agent ();
+    return igsagent_service_reply_name(core_agent, service_name);
+}
+
+igs_service_arg_t * igs_service_reply_args_first(const char *service_name){
+    core_init_agent ();
+    return igsagent_service_reply_args_first(core_agent, service_name);
+}
+
+size_t igs_service_reply_args_count(const char *service_name){
+    core_init_agent ();
+    return igsagent_service_reply_args_count(core_agent, service_name);
+}
+
+bool igs_service_reply_arg_exists(const char *service_name, const char *arg_name){
+    core_init_agent ();
+    return igsagent_service_reply_arg_exists(core_agent, service_name, arg_name);
 }
