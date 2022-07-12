@@ -64,7 +64,7 @@ igsyajl_string_encode(const igsyajl_print_t print,
                 }
                 break;
         }
-        if (escaped != NULL) {
+        if (escaped) {
             print(ctx, (const char *) (str + beg), end - beg);
             print(ctx, escaped, (unsigned int)strlen(escaped));
             beg = ++end;

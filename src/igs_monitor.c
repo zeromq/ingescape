@@ -264,7 +264,7 @@ static void s_monitor_init_loop (zsock_t *pipe, void *args)
 void igs_monitor_start (unsigned int period)
 {
     core_init_context ();
-    if (core_context->monitor != NULL) {
+    if (core_context->monitor) {
         igs_warn ("monitor is already started");
         return;
     }
@@ -283,7 +283,7 @@ void igs_monitor_start_with_network (unsigned int period,
     assert (network_device);
     assert (strlen (network_device) > 0);
     core_init_context ();
-    if (core_context->monitor != NULL) {
+    if (core_context->monitor) {
         igs_warn ("monitor is already started");
         return;
     }
@@ -327,7 +327,7 @@ void igs_monitor_stop ()
 bool igs_monitor_is_running ()
 {
     core_init_context ();
-    return (core_context->monitor != NULL);
+    return (core_context->monitor);
 }
 
 void igs_observe_monitor (igs_monitor_fn cb, void *my_data)

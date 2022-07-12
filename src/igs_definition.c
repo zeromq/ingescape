@@ -96,7 +96,7 @@ igs_result_t definition_add_iop_to_definition (igsagent_t *agent,
         default:
             break;
     }
-    if (previousIOP != NULL) {
+    if (previousIOP) {
         igsagent_error (agent, "%s already exists and cannot be overwritten",
                          iop->name);
         model_read_write_unlock (__FUNCTION__, __LINE__);
@@ -295,7 +295,7 @@ void igsagent_set_family (igsagent_t *agent, const char *family)
     assert (agent);
     assert (agent->definition);
     assert (family);
-    if (agent->definition->family != NULL)
+    if (agent->definition->family)
         free (agent->definition->family);
     agent->definition->family = s_strndup (family, IGS_MAX_FAMILY_LENGTH);
     agent->network_need_to_send_definition_update = true;
@@ -319,7 +319,7 @@ void igsagent_definition_set_version (igsagent_t *agent, const char *version)
     assert (agent);
     assert (version);
     assert (agent->definition);
-    if (agent->definition->version != NULL)
+    if (agent->definition->version)
         free (agent->definition->version);
     agent->definition->version = s_strndup (version, IGS_MAX_VERSION_LENGTH);
     agent->network_need_to_send_definition_update = true;

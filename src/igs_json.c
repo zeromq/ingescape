@@ -78,8 +78,8 @@ s_igs_json_error (igsyajl_gen_status status,
 void
 s_json_free_parsing_elements (json_parsing_elements_t **e)
 {
-    if (*e != NULL) {
-        if ((*e)->handle != NULL)
+    if (*e) {
+        if ((*e)->handle)
             igsyajl_free ((*e)->handle);
         free (*e);
         *e = NULL;
@@ -342,7 +342,7 @@ igs_json_parse_from_file (const char *path, igs_json_fn cb, void *my_data)
     assert(path);
     assert(cb);
     FILE *fp = NULL;
-    if (path != NULL)
+    if (path)
         fp = fopen (path, "r");
     if (!fp) {
         igs_error ("could not open %s", path);

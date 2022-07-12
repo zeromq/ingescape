@@ -381,6 +381,9 @@ typedef struct igs_core_context {
     size_t log_file_max_line_length;
     char log_file_path[IGS_MAX_PATH_LENGTH];
     int log_nb_of_entries; //for fflush rotation
+    
+    //model
+    bool allow_undefined_services;
 
     // network
     bool network_allow_ipc;

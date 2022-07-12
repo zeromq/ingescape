@@ -142,7 +142,7 @@ void s_split_trigger_send_message_to_worker (igs_core_context_t *context, char *
                         default:
                             break;
                     }
-                    if (context->node != NULL) {
+                    if (context->node) {
                         igsagent_t *local_agent, *atmp;
                         HASH_ITER(hh, context->agents, local_agent, atmp){
                             if(streq(local_agent->uuid, agent_uuid)){
@@ -448,9 +448,9 @@ int split_message_from_splitter (zmsg_t *msg, igs_core_context_t *context)
         free(agent_uuid);
         free(inputName);
         free(outputName);
-        if (data != NULL)
+        if (data)
             free(data);
-        if (value != NULL)
+        if (value)
             free(value);
         return 1;
     }
@@ -590,7 +590,7 @@ uint64_t igsagent_split_add (igsagent_t *agent,
     free (mashup);
 
     igs_split_t *tmp = NULL;
-    if (agent->mapping->split_elements != NULL)
+    if (agent->mapping->split_elements)
         HASH_FIND (hh, agent->mapping->split_elements, &hash,
                    sizeof (uint64_t), tmp);
     if (tmp == NULL) {
@@ -703,7 +703,7 @@ igs_result_t igsagent_split_remove_with_name (igsagent_t *agent,
     free (mashup);
 
     igs_split_t *tmp = NULL;
-    if (agent->mapping->split_elements != NULL)
+    if (agent->mapping->split_elements)
         HASH_FIND (hh, agent->mapping->split_elements, &h,
                    sizeof (uint64_t), tmp);
     if (tmp == NULL) {

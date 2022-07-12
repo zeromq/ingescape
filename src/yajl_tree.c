@@ -51,7 +51,7 @@ struct context_s
 typedef struct context_s context_t;
 
 #define RETURN_ERROR(ctx,retval,...) {                                  \
-        if ((ctx)->errbuf != NULL)                                      \
+        if ((ctx)->errbuf)                                      \
             snprintf ((ctx)->errbuf, (ctx)->errbuf_size, __VA_ARGS__);  \
         return (retval);                                                \
     }
@@ -156,10 +156,10 @@ static int object_add_keyval(context_t *ctx,
     igsyajl_val *tmpv;
 
     /* We're checking for NULL in "context_add_value" or its callers. */
-    assert (ctx != NULL);
-    assert (obj != NULL);
-    assert (key != NULL);
-    assert (value != NULL);
+    assert (ctx);
+    assert (obj);
+    assert (key);
+    assert (value);
 
     /* We're assuring that "obj" is an object in "context_add_value". */
     assert(IGSYAJL_IS_OBJECT(obj));
@@ -188,9 +188,9 @@ static int array_add_value (context_t *ctx,
 
     /* We're checking for NULL pointers in "context_add_value" or its
      * callers. */
-    assert (ctx != NULL);
-    assert (array != NULL);
-    assert (value != NULL);
+    assert (ctx);
+    assert (array);
+    assert (value);
 
     /* "context_add_value" will only call us with array values. */
     assert(IGSYAJL_IS_ARRAY(array));
@@ -213,8 +213,8 @@ static int array_add_value (context_t *ctx,
 static int context_add_value (context_t *ctx, igsyajl_val v)
 {
     /* We're checking for NULL values in all the calling functions. */
-    assert (ctx != NULL);
-    assert (v != NULL);
+    assert (ctx);
+    assert (v);
 
     /*
      * There are three valid states in which this function may be called:
@@ -247,7 +247,7 @@ static int context_add_value (context_t *ctx, igsyajl_val v)
             free(v);
             return (0);
         }
-        else /* if (ctx->key != NULL) */
+        else /* if (ctx->key) */
         {
             char * key;
 
@@ -318,7 +318,7 @@ static int handle_number (void *ctx, const char *string, size_t string_length)
     endptr = NULL;
     errno = 0;
     v->u.number.d = strtod(v->u.number.r, &endptr);
-    if ((errno == 0) && (endptr != NULL) && (*endptr == 0))
+    if ((errno == 0) && (endptr) && (*endptr == 0))
         v->u.number.flags |= IGSYAJL_NUMBER_DOUBLE_VALID;
 
     return ((context_add_value(ctx, v) == 0) ? STATUS_CONTINUE : STATUS_ABORT);
@@ -426,7 +426,7 @@ igsyajl_val igsyajl_tree_parse (const char *input,
 	ctx.errbuf = error_buffer;
 	ctx.errbuf_size = error_buffer_size;
 
-    if (error_buffer != NULL)
+    if (error_buffer)
         memset (error_buffer, 0, error_buffer_size);
 
     handle = igsyajl_alloc (&callbacks, NULL, &ctx);
@@ -438,7 +438,7 @@ igsyajl_val igsyajl_tree_parse (const char *input,
                         strlen (input));
     status = igsyajl_complete_parse (handle);
     if (status != igsyajl_status_ok) {
-        if (error_buffer != NULL && error_buffer_size > 0) {
+        if (error_buffer && error_buffer_size > 0) {
                internal_err_str = (char *) igsyajl_get_error(handle, 1,
                      (const unsigned char *) input,
                      strlen(input));

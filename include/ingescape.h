@@ -501,7 +501,14 @@ INGESCAPE_EXPORT igs_result_t igs_service_arg_add(const char *service_name, cons
 INGESCAPE_EXPORT igs_result_t igs_service_arg_remove(const char *service_name,
                                                      const char *arg_name); //removes first occurence of an argument with this name
 
-//introspection for services and their arguments
+//Zero to one REPLY per service. Reply is optional and used for specification purposes.
+INGESCAPE_EXPORT igs_result_t igs_service_reply_add(const char *service_name, const char *reply_name);
+INGESCAPE_EXPORT igs_result_t igs_service_reply_remove(const char *service_name);
+INGESCAPE_EXPORT igs_result_t igs_service_reply_arg_add(const char *service_name, const char *arg_name, igs_iop_value_type_t type);
+INGESCAPE_EXPORT igs_result_t igs_service_reply_arg_remove(const char *service_name,
+                                                           const char *arg_name);//removes first occurence of an argument with this name
+
+//introspection for services, their arguments and optional reply
 INGESCAPE_EXPORT size_t igs_service_count(void);
 INGESCAPE_EXPORT bool igs_service_exists(const char *name);
 INGESCAPE_EXPORT char ** igs_service_list(size_t *services_nbr);//returned char** must be freed using igs_free_services_list
@@ -510,6 +517,12 @@ INGESCAPE_EXPORT void igs_free_services_list(char **list, size_t services_nbr);
 INGESCAPE_EXPORT igs_service_arg_t * igs_service_args_first(const char *service_name);
 INGESCAPE_EXPORT size_t igs_service_args_count(const char *service_name);
 INGESCAPE_EXPORT bool igs_service_arg_exists(const char *service_name, const char *arg_name);
+
+INGESCAPE_EXPORT bool igs_service_has_reply(const char *service_name);
+INGESCAPE_EXPORT char * igs_service_reply_name(const char *service_name); //returned char** must be freed by caller
+INGESCAPE_EXPORT igs_service_arg_t * igs_service_reply_args_first(const char *service_name);
+INGESCAPE_EXPORT size_t igs_service_reply_args_count(const char *service_name);
+INGESCAPE_EXPORT bool igs_service_reply_arg_exists(const char *service_name, const char *arg_name);
 
 
 /////////
@@ -704,7 +717,7 @@ INGESCAPE_EXPORT void igs_log(igs_log_level_t level,
 #define igs_fatal(...) igs_log(IGS_LOG_FATAL, __func__, __VA_ARGS__)
 
 
-//PROTOCL AND VERSION
+//PROTOCOL AND VERSION
 INGESCAPE_EXPORT int igs_version(void);
 INGESCAPE_EXPORT int igs_protocol(void);
 
@@ -735,7 +748,7 @@ INGESCAPE_EXPORT char * igs_log_file_path(void); // caller owns returned value
 
 INGESCAPE_EXPORT void igs_log_include_data(bool enable); //log details of data IOPs in log files , default is false.
 INGESCAPE_EXPORT void igs_log_include_services(bool enable); //log details about call/excecute services in log files, default is false.
-
+INGESCAPE_EXPORT void igs_log_no_warning_if_undefined_service(bool enable); //warns or not if an unknown service is called on this agent, default is warning (false).
 
 /*DEFINITION & MAPPING FILE MANAGEMENT
  These functions enable to write definition and mapping on disk
@@ -868,7 +881,6 @@ INGESCAPE_EXPORT void igs_replay_terminate(void);
 
 //////////////////////////////
 // JSON parsing and generation
-
 //NB: JSON parsing is based on YAJL
 
 // parse JSON string or file based on parsing events and a callback function

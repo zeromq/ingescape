@@ -1,14 +1,14 @@
 /*  =========================================================================
-    service - create/edit/remove services and services arguments
-
-    Copyright (c) the Contributors as noted in the AUTHORS file.
-    This file is part of Ingescape, see https://github.com/zeromq/ingescape.
-
-    This Source Code Form is subject to the terms of the Mozilla Public
-    License, v. 2.0. If a copy of the MPL was not distributed with this
-    file, You can obtain one at http://mozilla.org/MPL/2.0/.
-    =========================================================================
-*/
+ service - create/edit/remove services and services arguments
+ 
+ Copyright (c) the Contributors as noted in the AUTHORS file.
+ This file is part of Ingescape, see https://github.com/zeromq/ingescape.
+ 
+ This Source Code Form is subject to the terms of the Mozilla Public
+ License, v. 2.0. If a copy of the MPL was not distributed with this
+ file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ =========================================================================
+ */
 
 #include "ingescape.h"
 #include "ingescape_private.h"
@@ -26,25 +26,25 @@ void s_service_free_service_arguments (igs_service_arg_t *args)
     LL_FOREACH_SAFE (args, arg, tmp)
     {
         LL_DELETE (args, arg);
-        if (arg->name != NULL)
+        if (arg->name)
             free (arg->name);
-        if (arg->type == IGS_DATA_T && arg->data != NULL)
+        if (arg->type == IGS_DATA_T && arg->data)
             free (arg->data);
         else
-        if (arg->type == IGS_STRING_T && arg->c != NULL)
-            free (arg->c);
+            if (arg->type == IGS_STRING_T && arg->c)
+                free (arg->c);
         free (arg);
     }
 }
 
 void service_free_service (igs_service_t *t)
 {
-    if (t != NULL) {
-        if (t->name != NULL)
+    if (t) {
+        if (t->name)
             free (t->name);
         s_service_free_service_arguments (t->arguments);
-        if (t->reply != NULL) {
-            if (t->reply->name != NULL)
+        if (t->reply) {
+            if (t->reply->name)
                 free (t->reply->name);
             s_service_free_service_arguments (t->reply->arguments);
         }
@@ -91,7 +91,7 @@ igs_result_t service_add_values_to_arguments_from_message (const char *name,
                 current->data = (char *) zmalloc (size);
                 memcpy (current->data, zframe_data (f), size);
                 break;
-
+                
             default:
                 break;
         }
@@ -111,13 +111,13 @@ igs_result_t service_copy_arguments (igs_service_arg_t *source,
     igs_service_arg_t *tmp = NULL;
     DL_COUNT (source, tmp, nb_args_source);
     DL_COUNT (destination, tmp, nb_args_destination);
-
+    
     if (nb_args_source != nb_args_destination) {
         igs_error (
-          "number of elements must be the same in source and destination");
+                   "number of elements must be the same in source and destination");
         return IGS_FAILURE;
     }
-
+    
     igs_service_arg_t *current_source = NULL;
     igs_service_arg_t *current_destination = NULL;
     DL_FOREACH (destination, current_destination)
@@ -125,7 +125,7 @@ igs_result_t service_copy_arguments (igs_service_arg_t *source,
         // init source if needed
         if (current_source == NULL)
             current_source = source;
-
+        
         size_t size = current_source->size;
         switch (current_destination->type) {
             case IGS_BOOL_T:
@@ -152,7 +152,7 @@ igs_result_t service_copy_arguments (igs_service_arg_t *source,
                 current_destination->data = (void *) zmalloc (size);
                 memcpy (current_destination->data, current_source->data, size);
                 break;
-
+                
             default:
                 break;
         }
@@ -164,15 +164,15 @@ igs_result_t service_copy_arguments (igs_service_arg_t *source,
 
 void service_free_values_in_arguments (igs_service_arg_t *arg)
 {
-    if (arg != NULL) {
+    if (arg) {
         igs_service_arg_t *tmp = NULL;
         DL_FOREACH (arg, tmp)
         {
-            if (tmp->type == IGS_DATA_T && tmp->data != NULL)
+            if (tmp->type == IGS_DATA_T && tmp->data)
                 free (tmp->data);
             else
-            if (tmp->type == IGS_STRING_T && tmp->data != NULL)
-                free (tmp->c);
+                if (tmp->type == IGS_STRING_T && tmp->data)
+                    free (tmp->c);
             tmp->data = NULL;
             tmp->size = 0;
         }
@@ -187,58 +187,49 @@ void service_log_received_service (igsagent_t *agent,
 {
     char service_log[IGS_MAX_LOG_LENGTH] = "";
     char *service_log_cursor = service_log;
-    service_log_cursor += snprintf (
-      service_log, IGS_MAX_LOG_LENGTH, "received service %s from %s(%s) ",
-      service_name, caller_agent_name, caller_agentuuid);
+    service_log_cursor += snprintf (service_log, IGS_MAX_LOG_LENGTH, "received service %s from %s(%s) ",
+                                    service_name, caller_agent_name, caller_agentuuid);
     igs_service_arg_t *current_arg = NULL;
-    LL_FOREACH (list, current_arg)
-    {
+    LL_FOREACH (list, current_arg){
         if (service_log_cursor - service_log >= IGS_MAX_LOG_LENGTH)
             break;
         switch (current_arg->type) {
             case IGS_BOOL_T:
-                service_log_cursor += snprintf (
-                  service_log_cursor,
-                  IGS_MAX_LOG_LENGTH - (service_log_cursor - service_log),
-                  " %d", current_arg->b);
+                service_log_cursor += snprintf (service_log_cursor,
+                                                IGS_MAX_LOG_LENGTH - (service_log_cursor - service_log),
+                                                " %d", current_arg->b);
                 break;
             case IGS_INTEGER_T:
-                service_log_cursor += snprintf (
-                  service_log_cursor,
-                  IGS_MAX_LOG_LENGTH - (service_log_cursor - service_log),
-                  " %d", current_arg->i);
+                service_log_cursor += snprintf (service_log_cursor,
+                                                IGS_MAX_LOG_LENGTH - (service_log_cursor - service_log),
+                                                " %d", current_arg->i);
                 break;
             case IGS_DOUBLE_T:
-                service_log_cursor += snprintf (
-                  service_log_cursor,
-                  IGS_MAX_LOG_LENGTH - (service_log_cursor - service_log),
-                  " %f", current_arg->d);
+                service_log_cursor += snprintf (service_log_cursor,
+                                                IGS_MAX_LOG_LENGTH - (service_log_cursor - service_log),
+                                                " %f", current_arg->d);
                 break;
             case IGS_STRING_T:
-                service_log_cursor += snprintf (
-                  service_log_cursor,
-                  IGS_MAX_LOG_LENGTH - (service_log_cursor - service_log),
-                  " %s", current_arg->c);
+                service_log_cursor += snprintf (service_log_cursor,
+                                                IGS_MAX_LOG_LENGTH - (service_log_cursor - service_log),
+                                                " %s", current_arg->c);
                 break;
             case IGS_DATA_T: {
-                zchunk_t *chunk =
-                  zchunk_new (current_arg->data, current_arg->size);
+                zchunk_t *chunk = zchunk_new (current_arg->data, current_arg->size);
                 char *hex_str = zchunk_strhex (chunk);
                 if (hex_str) {
-                    service_log_cursor += snprintf (
-                      service_log_cursor,
-                      IGS_MAX_LOG_LENGTH - (service_log_cursor - service_log),
-                      " %s", hex_str);
+                    service_log_cursor += snprintf (service_log_cursor,
+                                                    IGS_MAX_LOG_LENGTH - (service_log_cursor - service_log),
+                                                    " %s", hex_str);
                     free (hex_str);
                 }
                 else
-                    service_log_cursor += snprintf (
-                      service_log_cursor,
-                      IGS_MAX_LOG_LENGTH - (service_log_cursor - service_log),
-                      " 00");
+                    service_log_cursor += snprintf (service_log_cursor,
+                                                    IGS_MAX_LOG_LENGTH - (service_log_cursor - service_log),
+                                                    " 00");
                 zchunk_destroy (&chunk);
             } break;
-
+                
             default:
                 break;
         }
@@ -251,7 +242,7 @@ void service_log_received_service (igsagent_t *agent,
 ////////////////////////////////////////////////////////////////////////
 void igs_service_args_destroy (igs_service_arg_t **list)
 {
-    if (list != NULL && *list != NULL) {
+    if (list && *list) {
         s_service_free_service_arguments (*list);
         *list = NULL;
     }
@@ -262,13 +253,11 @@ igs_service_arg_t *igs_service_args_clone (igs_service_arg_t *list)
     assert (list);
     igs_service_arg_t *res = NULL;
     igs_service_arg_t *arg = NULL;
-    LL_FOREACH (list, arg)
-    {
-        if (arg != NULL) {
-            igs_service_arg_t *new =
-              (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
+    LL_FOREACH (list, arg){
+        if (arg) {
+            igs_service_arg_t *new = (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
             new->type = arg->type;
-            if (arg->name != NULL)
+            if (arg->name)
                 new->name = strdup (arg->name);
             new->size = arg->size;
             switch (arg->type) {
@@ -282,14 +271,14 @@ igs_service_arg_t *igs_service_args_clone (igs_service_arg_t *list)
                     new->d = arg->d;
                     break;
                 case IGS_STRING_T:
-                    if (arg->c != NULL)
+                    if (arg->c)
                         new->c = strdup (arg->c);
                     break;
                 case IGS_DATA_T:
                     new->data = (void *) zmalloc (arg->size);
                     memcpy (new->data, arg->data, arg->size);
                     break;
-
+                    
                 default:
                     break;
             }
@@ -301,8 +290,7 @@ igs_service_arg_t *igs_service_args_clone (igs_service_arg_t *list)
 
 void igs_service_args_add_int (igs_service_arg_t **list, int value)
 {
-    igs_service_arg_t *new =
-      (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
+    igs_service_arg_t *new = (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
     new->type = IGS_INTEGER_T;
     new->i = value;
     new->size = sizeof (int);
@@ -311,8 +299,7 @@ void igs_service_args_add_int (igs_service_arg_t **list, int value)
 
 void igs_service_args_add_bool (igs_service_arg_t **list, bool value)
 {
-    igs_service_arg_t *new =
-      (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
+    igs_service_arg_t *new = (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
     new->type = IGS_BOOL_T;
     new->b = value;
     new->size = sizeof (bool);
@@ -321,8 +308,7 @@ void igs_service_args_add_bool (igs_service_arg_t **list, bool value)
 
 void igs_service_args_add_double (igs_service_arg_t **list, double value)
 {
-    igs_service_arg_t *new =
-      (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
+    igs_service_arg_t *new = (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
     new->type = IGS_DOUBLE_T;
     new->d = value;
     new->size = sizeof (double);
@@ -331,10 +317,9 @@ void igs_service_args_add_double (igs_service_arg_t **list, double value)
 
 void igs_service_args_add_string (igs_service_arg_t **list, const char *value)
 {
-    igs_service_arg_t *new =
-      (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
+    igs_service_arg_t *new = (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
     new->type = IGS_STRING_T;
-    if (value != NULL) {
+    if (value) {
         new->c = strdup (value);
         new->size = strlen (value) + 1;
     }
@@ -349,8 +334,7 @@ void igs_service_args_add_data (igs_service_arg_t **list,
                                 void *value,
                                 size_t size)
 {
-    igs_service_arg_t *new =
-      (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
+    igs_service_arg_t *new = (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
     new->type = IGS_DATA_T;
     new->data = (void *) zmalloc (size);
     memcpy (new->data, value, size);
@@ -359,9 +343,9 @@ void igs_service_args_add_data (igs_service_arg_t **list,
 }
 
 igs_result_t igsagent_service_init (igsagent_t *agent,
-                                     const char *name,
-                                     igsagent_service_fn cb,
-                                     void *my_data)
+                                    const char *name,
+                                    igsagent_service_fn cb,
+                                    void *my_data)
 {
     assert (agent);
     assert (name && strlen (name) > 0);
@@ -369,18 +353,18 @@ igs_result_t igsagent_service_init (igsagent_t *agent,
     igs_service_t *t = NULL;
     if (agent->definition == NULL)
         agent->definition =
-          (igs_definition_t *) zmalloc (sizeof (igs_definition_t));
-
+        (igs_definition_t *) zmalloc (sizeof (igs_definition_t));
+    
     HASH_FIND_STR (agent->definition->services_table, name, t);
-    if (t != NULL && t->cb != NULL) {
+    if (t && t->cb) {
         igsagent_error (
-          agent, "service with name %s already exists and has a callback",
-          name);
+                        agent, "service with name %s already exists and has a callback",
+                        name);
         return IGS_FAILURE;
     }
     if (cb == NULL) {
         igsagent_error (agent,
-                         "non-NULL callback is mandatory at service creation");
+                        "non-NULL callback is mandatory at service creation");
         return IGS_FAILURE;
     }
     if (t == NULL) {
@@ -389,7 +373,7 @@ igs_result_t igsagent_service_init (igsagent_t *agent,
         if (strnlen (name, IGS_MAX_STRING_MSG_LENGTH) == IGS_MAX_STRING_MSG_LENGTH) {
             t->name = s_strndup (name, IGS_MAX_STRING_MSG_LENGTH);
             igsagent_warn (agent, "service name has been shortened to %s",
-                            t->name);
+                           t->name);
         } else {
             t->name = s_strndup (name, IGS_MAX_STRING_MSG_LENGTH);
         }
@@ -422,9 +406,9 @@ igs_result_t igsagent_service_remove (igsagent_t *agent, const char *name)
 }
 
 igs_result_t igsagent_service_arg_add (igsagent_t *agent,
-                                        const char *service_name,
-                                        const char *arg_name,
-                                        igs_iop_value_type_t type)
+                                       const char *service_name,
+                                       const char *arg_name,
+                                       igs_iop_value_type_t type)
 {
     assert (agent);
     assert (service_name);
@@ -437,25 +421,24 @@ igs_result_t igsagent_service_arg_add (igsagent_t *agent,
     HASH_FIND_STR (agent->definition->services_table, service_name, t);
     if (type == IGS_IMPULSION_T) {
         igsagent_error (agent,
-                         "impulsion type is not allowed as a service argument");
+                        "impulsion type is not allowed as a service argument");
         return IGS_FAILURE;
     }
     if (type == IGS_UNKNOWN_T) {
         igsagent_error (agent,
-                         "unknown type is not allowed as a service argument");
+                        "unknown type is not allowed as a service argument");
         return IGS_FAILURE;
     }
-    if (t == NULL) {
+    if (!t) {
         igsagent_error (agent, "service with name %s does not exist",
-                         service_name);
+                        service_name);
         return IGS_FAILURE;
     }
-    igs_service_arg_t *a =
-      (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
+    igs_service_arg_t *a = (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
     if (strnlen (arg_name, IGS_MAX_STRING_MSG_LENGTH) == IGS_MAX_STRING_MSG_LENGTH) {
         a->name = s_strndup (arg_name, IGS_MAX_STRING_MSG_LENGTH);
         igsagent_warn (agent, "service argument name has been shortened to %s",
-                        a->name);
+                       a->name);
     }
     else
         a->name = s_strndup (arg_name, IGS_MAX_STRING_MSG_LENGTH);
@@ -485,8 +468,8 @@ igs_result_t igsagent_service_arg_add (igsagent_t *agent,
 }
 
 igs_result_t igsagent_service_arg_remove (igsagent_t *agent,
-                                           const char *service_name,
-                                           const char *arg_name)
+                                          const char *service_name,
+                                          const char *arg_name)
 {
     assert (agent);
     assert (service_name);
@@ -499,21 +482,20 @@ igs_result_t igsagent_service_arg_remove (igsagent_t *agent,
     HASH_FIND_STR (agent->definition->services_table, service_name, t);
     if (t == NULL) {
         igsagent_error (agent, "service with name %s does not exist",
-                         service_name);
+                        service_name);
         return IGS_FAILURE;
     }
     igs_service_arg_t *arg = NULL, *tmp = NULL;
     bool found = false;
-    LL_FOREACH_SAFE (t->arguments, arg, tmp)
-    {
+    LL_FOREACH_SAFE (t->arguments, arg, tmp) {
         if (streq (arg_name, arg->name)) {
             LL_DELETE (t->arguments, arg);
             free (arg->name);
-            if (arg->type == IGS_DATA_T && arg->data != NULL)
+            if (arg->type == IGS_DATA_T && arg->data)
                 free (arg->data);
             else
-            if (arg->type == IGS_STRING_T && arg->data != NULL)
-                free (arg->c);
+                if (arg->type == IGS_STRING_T && arg->data)
+                    free (arg->c);
             free (arg);
             found = true;
             agent->network_need_to_send_definition_update = true;
@@ -522,7 +504,166 @@ igs_result_t igsagent_service_arg_remove (igsagent_t *agent,
     }
     if (!found)
         igsagent_debug (agent, "no argument named %s for service %s", arg_name,
-                         service_name);
+                        service_name);
+    return IGS_SUCCESS;
+}
+
+igs_result_t igsagent_service_reply_add(igsagent_t *agent, const char *service_name, const char *reply_name){
+    assert (agent);
+    assert (service_name);
+    assert (reply_name);
+    igs_service_t *s = NULL;
+    if (agent->definition == NULL) {
+        igsagent_error (agent, "No definition available yet");
+        return IGS_FAILURE;
+    }
+    HASH_FIND_STR (agent->definition->services_table, service_name, s);
+    if (!s) {
+        igsagent_error (agent, "service with name %s does not exist",
+                        service_name);
+        return IGS_FAILURE;
+    }
+    if (s->reply){
+        igsagent_error (agent, "service with name %s already has a configured reply (named %s). Remove the reply first to add a new one.",
+                        service_name, s->reply->name);
+        return IGS_FAILURE;
+    }
+    s->reply = (igs_service_t *) zmalloc (sizeof (igs_service_t));
+    if (strnlen (reply_name, IGS_MAX_STRING_MSG_LENGTH) == IGS_MAX_STRING_MSG_LENGTH) {
+        s->reply->name = s_strndup (reply_name, IGS_MAX_STRING_MSG_LENGTH);
+        igsagent_warn (agent, "service name has been shortened to %s", s->reply->name);
+    } else
+        s->reply->name = s_strndup (reply_name, IGS_MAX_STRING_MSG_LENGTH);
+    agent->network_need_to_send_definition_update = true;
+    return IGS_SUCCESS;
+}
+
+igs_result_t igsagent_service_reply_remove(igsagent_t *agent, const char *service_name){
+    assert (agent);
+    assert (service_name);
+    igs_service_t *s = NULL;
+    if (agent->definition == NULL) {
+        igsagent_error (agent, "No definition available yet");
+        return IGS_FAILURE;
+    }
+    HASH_FIND_STR (agent->definition->services_table, service_name, s);
+    if (!s) {
+        igsagent_error (agent, "service with name %s does not exist",
+                        service_name);
+        return IGS_FAILURE;
+    }
+    if (!s->reply){
+        igsagent_error (agent, "service with name %s  has no reply");
+        return IGS_FAILURE;
+    } else {
+        service_free_service (s->reply);
+        s->reply = NULL;
+        agent->network_need_to_send_definition_update = true;
+        return IGS_SUCCESS;
+    }
+}
+
+igs_result_t igsagent_service_reply_arg_add(igsagent_t *agent, const char *service_name,
+                                            const char *arg_name, igs_iop_value_type_t type){
+    assert (agent);
+    assert (service_name);
+    igs_service_t *s = NULL;
+    if (agent->definition == NULL) {
+        igsagent_error (agent, "No definition available yet");
+        return IGS_FAILURE;
+    }
+    HASH_FIND_STR (agent->definition->services_table, service_name, s);
+    if (!s) {
+        igsagent_error (agent, "service with name %s does not exist",
+                        service_name);
+        return IGS_FAILURE;
+    }
+    if (!s->reply){
+        igsagent_error (agent, "service with name %s  has no reply");
+        return IGS_FAILURE;
+    }
+    if (type == IGS_IMPULSION_T) {
+        igsagent_error (agent,
+                        "impulsion type is not allowed as a service argument");
+        return IGS_FAILURE;
+    }
+    if (type == IGS_UNKNOWN_T) {
+        igsagent_error (agent, "unknown type is not allowed as a service argument");
+        return IGS_FAILURE;
+    }
+    igs_service_arg_t *a = (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
+    if (strnlen (arg_name, IGS_MAX_STRING_MSG_LENGTH) == IGS_MAX_STRING_MSG_LENGTH) {
+        a->name = s_strndup (arg_name, IGS_MAX_STRING_MSG_LENGTH);
+        igsagent_warn (agent, "service argument name has been shortened to %s",
+                       a->name);
+    } else
+        a->name = s_strndup (arg_name, IGS_MAX_STRING_MSG_LENGTH);
+    switch (type) {
+        case IGS_BOOL_T:
+            a->size = sizeof (bool);
+            break;
+        case IGS_INTEGER_T:
+            a->size = sizeof (int);
+            break;
+        case IGS_DOUBLE_T:
+            a->size = sizeof (double);
+            break;
+        case IGS_STRING_T:
+            a->size = 0;
+            break;
+        case IGS_DATA_T:
+            a->size = 0;
+            break;
+        default:
+            break;
+    }
+    a->type = type;
+    LL_APPEND (s->reply->arguments, a);
+    agent->network_need_to_send_definition_update = true;
+    return IGS_SUCCESS;
+}
+
+igs_result_t igsagent_service_reply_arg_remove(igsagent_t *agent, const char *service_name,
+                                               const char *arg_name){
+    assert (agent);
+    assert (service_name);
+    igs_service_t *s = NULL;
+    if (agent->definition == NULL) {
+        igsagent_error (agent, "No definition available yet");
+        return IGS_FAILURE;
+    }
+    HASH_FIND_STR (agent->definition->services_table, service_name, s);
+    if (!s) {
+        igsagent_error (agent, "service with name %s does not exist",
+                        service_name);
+        return IGS_FAILURE;
+    }
+    if (!s->reply){
+        igsagent_error (agent, "service with name %s  has no reply");
+        return IGS_FAILURE;
+    }
+    igs_service_arg_t *arg = NULL, *tmp = NULL;
+    bool found = false;
+    LL_FOREACH_SAFE (s->reply->arguments, arg, tmp) {
+        if (streq (arg_name, arg->name)) {
+            LL_DELETE (s->reply->arguments, arg);
+            free (arg->name);
+            if (arg->type == IGS_DATA_T && arg->data)
+                free (arg->data);
+            else
+                if (arg->type == IGS_STRING_T && arg->data)
+                    free (arg->c);
+            free (arg);
+            found = true;
+            agent->network_need_to_send_definition_update = true;
+            break;
+        }
+    }
+    if (!found) {
+        igsagent_debug (agent, "no argument named %s for reply %s in service %s",
+                        arg_name, s->reply->name, service_name);
+        return IGS_FAILURE;
+    }
     return IGS_SUCCESS;
 }
 
@@ -535,8 +676,8 @@ void s_service_log_sent_service (igsagent_t *agent,
     char service_log[IGS_MAX_LOG_LENGTH] = "";
     char *service_log_cursor = service_log;
     service_log_cursor +=
-      snprintf (service_log, IGS_MAX_LOG_LENGTH, "send service %s(%s).%s",
-                target_agent_name, target_agentuuid, service_name);
+    snprintf (service_log, IGS_MAX_LOG_LENGTH, "send service %s(%s).%s",
+              target_agent_name, target_agentuuid, service_name);
     igs_service_arg_t *current_arg = NULL;
     LL_FOREACH (list, current_arg)
     {
@@ -545,44 +686,44 @@ void s_service_log_sent_service (igsagent_t *agent,
         switch (current_arg->type) {
             case IGS_BOOL_T:
                 service_log_cursor += snprintf (
-                  service_log_cursor,
-                  IGS_MAX_LOG_LENGTH - (service_log_cursor - service_log),
-                  " %d", current_arg->b);
+                                                service_log_cursor,
+                                                IGS_MAX_LOG_LENGTH - (service_log_cursor - service_log),
+                                                " %d", current_arg->b);
                 break;
             case IGS_INTEGER_T:
                 service_log_cursor += snprintf (
-                  service_log_cursor,
-                  IGS_MAX_LOG_LENGTH - (service_log_cursor - service_log),
-                  " %d", current_arg->i);
+                                                service_log_cursor,
+                                                IGS_MAX_LOG_LENGTH - (service_log_cursor - service_log),
+                                                " %d", current_arg->i);
                 break;
             case IGS_DOUBLE_T:
                 service_log_cursor += snprintf (
-                  service_log_cursor,
-                  IGS_MAX_LOG_LENGTH - (service_log_cursor - service_log),
-                  " %f", current_arg->d);
+                                                service_log_cursor,
+                                                IGS_MAX_LOG_LENGTH - (service_log_cursor - service_log),
+                                                " %f", current_arg->d);
                 break;
             case IGS_STRING_T:
                 service_log_cursor += snprintf (
-                  service_log_cursor,
-                  IGS_MAX_LOG_LENGTH - (service_log_cursor - service_log),
-                  " %s", current_arg->c);
+                                                service_log_cursor,
+                                                IGS_MAX_LOG_LENGTH - (service_log_cursor - service_log),
+                                                " %s", current_arg->c);
                 break;
             case IGS_DATA_T: {
                 zchunk_t *chunk =
-                  zchunk_new (current_arg->data, current_arg->size);
+                zchunk_new (current_arg->data, current_arg->size);
                 char *hex_str = zchunk_strhex (chunk);
                 if (hex_str) {
                     service_log_cursor += snprintf (
-                      service_log_cursor,
-                      IGS_MAX_LOG_LENGTH - (service_log_cursor - service_log),
-                      " %s", hex_str);
+                                                    service_log_cursor,
+                                                    IGS_MAX_LOG_LENGTH - (service_log_cursor - service_log),
+                                                    " %s", hex_str);
                     free (hex_str);
                 }
                 else
                     service_log_cursor += snprintf (
-                      service_log_cursor,
-                      IGS_MAX_LOG_LENGTH - (service_log_cursor - service_log),
-                      " 00");
+                                                    service_log_cursor,
+                                                    IGS_MAX_LOG_LENGTH - (service_log_cursor - service_log),
+                                                    " 00");
                 zchunk_destroy (&chunk);
             } break;
             default:
@@ -593,27 +734,27 @@ void s_service_log_sent_service (igsagent_t *agent,
 }
 
 igs_result_t igsagent_service_call (igsagent_t *agent,
-                                     const char *agent_name_or_uuid,
-                                     const char *service_name,
-                                     igs_service_arg_t **list,
-                                     const char *token)
+                                    const char *agent_name_or_uuid,
+                                    const char *service_name,
+                                    igs_service_arg_t **list,
+                                    const char *token)
 {
     assert (agent);
     assert (agent_name_or_uuid);
     assert (service_name);
-    assert ((list == NULL) || (*list != NULL));
-
+    assert ((list == NULL) || (*list));
+    
     bool found = false;
-
+    
     model_read_write_lock (__FUNCTION__, __LINE__);
     // check that this agent has not been destroyed when we were locked
     if (!agent || !(agent->uuid)) {
         model_read_write_unlock (__FUNCTION__, __LINE__);
         return IGS_SUCCESS;
     }
-
+    
     // 1- iteration on remote agents
-    if (core_context->node != NULL) {
+    if (core_context->node) {
         igs_remote_agent_t *remote_agent = NULL, *tmp = NULL;
         HASH_ITER (hh, agent->context->remote_agents, remote_agent, tmp)
         {
@@ -623,39 +764,39 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                 // we found a matching agent
                 igs_service_arg_t *arg = NULL;
                 found = true;
-
+                
                 /*
-         We remove verifications on the service on sender side to enable
-         proper proxy implementation (local proxy does not implement
-         services but relays them to remote clients and virtual agents).
-
-        if (remote_agent->definition == NULL){
-            igsagent_warn(agent, "definition is unknown for %s(%s) : cannot
-        verify service before sending it", remote_agent->name,
-        agent_name_or_uuid);
-            //continue; //commented to allow sending the message anyway
-        }else{
-            igs_service_t *service = NULL;
-            HASH_FIND_STR(remote_agent->definition->services_table,
-        service_name, service); if (service != NULL){ size_t nb_arguments = 0;
-                if (list != NULL && *list != NULL)
-                    LL_COUNT(*list, arg, nb_arguments);
-                size_t defined_nb_arguments = 0;
-                LL_COUNT(service->arguments, arg, defined_nb_arguments);
-                if (nb_arguments != defined_nb_arguments){
-                    igsagent_error(agent, "passed number of arguments is not
-        correct (received: %zu / expected: %zu) : service will not be sent",
-                                   nb_arguments, defined_nb_arguments);
-                    continue;
-                }
-            }else{
-                igsagent_warn(agent, "could not find service named %s for %s
-        (%s) : cannot verify service before sending it", service_name,
-        remote_agent->name, remote_agent->uuid);
-                //continue; //commented to allow sending the message anyway
-            }
-        }
-        */
+                 We remove verifications on the service on sender side to enable
+                 proper proxy implementation (local proxy does not implement
+                 services but relays them to remote clients and virtual agents).
+                 
+                 if (remote_agent->definition == NULL){
+                 igsagent_warn(agent, "definition is unknown for %s(%s) : cannot
+                 verify service before sending it", remote_agent->name,
+                 agent_name_or_uuid);
+                 //continue; //commented to allow sending the message anyway
+                 }else{
+                 igs_service_t *service = NULL;
+                 HASH_FIND_STR(remote_agent->definition->services_table,
+                 service_name, service); if (service){ size_t nb_arguments = 0;
+                 if (list && *list)
+                 LL_COUNT(*list, arg, nb_arguments);
+                 size_t defined_nb_arguments = 0;
+                 LL_COUNT(service->arguments, arg, defined_nb_arguments);
+                 if (nb_arguments != defined_nb_arguments){
+                 igsagent_error(agent, "passed number of arguments is not
+                 correct (received: %zu / expected: %zu) : service will not be sent",
+                 nb_arguments, defined_nb_arguments);
+                 continue;
+                 }
+                 }else{
+                 igsagent_warn(agent, "could not find service named %s for %s
+                 (%s) : cannot verify service before sending it", service_name,
+                 remote_agent->name, remote_agent->uuid);
+                 //continue; //commented to allow sending the message anyway
+                 }
+                 }
+                 */
                 zmsg_t *msg = zmsg_new ();
                 if (remote_agent->peer->protocol
                     && (streq (remote_agent->peer->protocol, "v2")
@@ -665,7 +806,7 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                 }
                 else
                     zmsg_addstr (msg, CALL_SERVICE_MSG);
-
+                
                 zmsg_addstr (msg, agent->uuid);
                 zmsg_addstr (msg, remote_agent->uuid);
                 zmsg_addstr (msg, service_name);
@@ -673,7 +814,7 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                     zmsg_addstr (msg, token);
                 else
                     zmsg_addstr (msg, "");
-                if (list != NULL) {
+                if (list) {
                     LL_FOREACH (*list, arg)
                     {
                         zframe_t *frame = NULL;
@@ -688,9 +829,9 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                                 frame = zframe_new (&arg->d, sizeof (double));
                                 break;
                             case IGS_STRING_T: {
-                                if (arg->c != NULL)
+                                if (arg->c)
                                     frame =
-                                      zframe_new (arg->c, strlen (arg->c) + 1);
+                                    zframe_new (arg->c, strlen (arg->c) + 1);
                                 else
                                     frame = zframe_new (NULL, 0);
                                 break;
@@ -718,12 +859,12 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                                                 service_name, *list);
                 else
                     igsagent_debug (agent, "calling %s(%s).%s",
-                                     remote_agent->definition->name,
-                                     remote_agent->uuid, service_name);
+                                    remote_agent->definition->name,
+                                    remote_agent->uuid, service_name);
             }
         }
     }
-
+    
     // 2- iteration on local agents
     if (!agent->is_virtual) {
         igsagent_t *local_agent, *atmp;
@@ -743,9 +884,9 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                     igs_service_t *service = NULL;
                     HASH_FIND_STR (local_agent->definition->services_table,
                                    service_name, service);
-                    if (service != NULL) {
+                    if (service) {
                         size_t nb_arguments = 0;
-                        if (list != NULL && *list != NULL)
+                        if (list && *list)
                             LL_COUNT (*list, arg, nb_arguments);
                         size_t defined_nb_arguments = 0;
                         LL_COUNT (service->arguments, arg,
@@ -780,9 +921,9 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                         continue;
                     }
                 }
-
+                
                 s_lock_zyre_peer (__FUNCTION__, __LINE__);
-                if (core_context->node != NULL) {
+                if (core_context->node) {
                     zyre_shouts (agent->context->node, agent->igs_channel,
                                  "SERVICE %s(%s) called %s.%s(%s)",
                                  agent->definition->name, agent->uuid,
@@ -790,19 +931,19 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                                  local_agent->uuid);
                 }
                 s_unlock_zyre_peer (__FUNCTION__, __LINE__);
-
+                
                 if (core_context->enable_service_logging)
                     s_service_log_sent_service (agent, local_agent->definition->name, local_agent->uuid,
                                                 service_name, *list);
                 else
                     igsagent_debug (agent, "calling %s.%s(%s)",
-                                     local_agent->definition->name,
-                                     service_name, local_agent->uuid);
+                                    local_agent->definition->name,
+                                    service_name, local_agent->uuid);
             }
         }
     }
-
-    if ((list != NULL) && (*list != NULL)) {
+    
+    if ((list) && (*list)) {
         s_service_free_service_arguments (*list);
         *list = NULL;
     }
@@ -831,7 +972,7 @@ bool igsagent_service_exists (igsagent_t *agent, const char *name)
         return false;
     igs_service_t *t = NULL;
     HASH_FIND_STR (agent->definition->services_table, name, t);
-    return (t != NULL);
+    return (t);
 }
 
 char **igsagent_service_list (igsagent_t *agent, size_t *nb_of_elements)
@@ -869,42 +1010,38 @@ void igs_free_services_list (char **list, size_t nb_of_services)
 }
 
 igs_service_arg_t *igsagent_service_args_first (igsagent_t *agent,
-                                                 const char *service_name)
+                                                const char *service_name)
 {
-    if (service_name == NULL || strlen (service_name) == 0) {
-        igsagent_error (agent, "service name cannot be NULL or empty");
-        return NULL;
-    }
-    if (agent->definition == NULL) {
-        igsagent_error (agent, "definition is NULL");
+    assert(agent);
+    assert(service_name);
+    if (!agent->definition) {
+        igsagent_error (agent, "agent definition is NULL");
         return NULL;
     }
     igs_service_t *t = NULL;
     HASH_FIND_STR (agent->definition->services_table, service_name, t);
-    if (t == NULL) {
+    if (!t) {
         igsagent_debug (agent, "could not find service with name %s",
-                         service_name);
+                        service_name);
         return NULL;
     }
     return t->arguments;
 }
 
 size_t igsagent_service_args_count (igsagent_t *agent,
-                                      const char *service_name)
+                                    const char *service_name)
 {
-    if (service_name == NULL || strlen (service_name) == 0) {
-        igsagent_error (agent, "service name cannot be NULL or empty");
-        return 0;
-    }
-    if (agent->definition == NULL) {
-        igsagent_error (agent, "definition is NULL");
+    assert(agent);
+    assert(service_name);
+    if (!agent->definition) {
+        igsagent_error (agent, "agent definition is NULL");
         return 0;
     }
     igs_service_t *t = NULL;
     HASH_FIND_STR (agent->definition->services_table, service_name, t);
     if (t == NULL) {
         igsagent_debug (agent, "could not find service with name %s",
-                         service_name);
+                        service_name);
         return 0;
     }
     size_t nb = 0;
@@ -914,22 +1051,21 @@ size_t igsagent_service_args_count (igsagent_t *agent,
 }
 
 bool igsagent_service_arg_exists (igsagent_t *agent,
-                                   const char *service_name,
-                                   const char *arg_name)
+                                  const char *service_name,
+                                  const char *arg_name)
 {
-    if (service_name == NULL || strlen (service_name) == 0) {
-        igsagent_error (agent, "service name cannot be NULL or empty");
-        return false;
-    }
-    if (agent->definition == NULL) {
-        igsagent_error (agent, "definition is NULL");
+    assert(agent);
+    assert(service_name);
+    assert(arg_name);
+    if (!agent->definition) {
+        igsagent_error (agent, "agent definition is NULL");
         return false;
     }
     igs_service_t *t = NULL;
     HASH_FIND_STR (agent->definition->services_table, service_name, t);
     if (t == NULL) {
         igsagent_debug (agent, "could not find service with name %s",
-                         service_name);
+                        service_name);
         return false;
     }
     igs_service_arg_t *a = NULL;
@@ -939,4 +1075,102 @@ bool igsagent_service_arg_exists (igsagent_t *agent,
             return true;
     }
     return false;
+}
+
+bool igsagent_service_has_reply(igsagent_t *agent, const char *service_name){
+    assert(agent);
+    assert(service_name);
+    igs_service_t *t = NULL;
+    HASH_FIND_STR (agent->definition->services_table, service_name, t);
+    if (!t) {
+        igsagent_debug (agent, "could not find service with name %s",service_name);
+        return false;
+    }
+    if (t->reply)
+        return true;
+    else
+        return false;
+}
+
+char * igsagent_service_reply_name(igsagent_t *agent, const char *service_name){
+    assert(agent);
+    assert(service_name);
+    igs_service_t *t = NULL;
+    HASH_FIND_STR (agent->definition->services_table, service_name, t);
+    if (!t) {
+        igsagent_debug (agent, "could not find service with name %s",service_name);
+        return NULL;
+    }
+    if (t->reply){
+        assert(t->reply->name);
+        return strdup(t->reply->name);
+    }else
+        return NULL;
+}
+
+igs_service_arg_t * igsagent_service_reply_args_first(igsagent_t *agent, const char *service_name){
+    assert(agent);
+    assert(service_name);
+    if (!agent->definition) {
+        igsagent_error (agent, "agent definition is NULL");
+        return NULL;
+    }
+    igs_service_t *t = NULL;
+    HASH_FIND_STR (agent->definition->services_table, service_name, t);
+    if (!t) {
+        igsagent_debug (agent, "could not find service with name %s", service_name);
+        return NULL;
+    }
+    if (t->reply){
+        return t->reply->arguments;
+    }else
+        return NULL;
+}
+
+size_t igsagent_service_reply_args_count(igsagent_t *agent, const char *service_name){
+    assert(agent);
+    assert(service_name);
+    if (!agent->definition) {
+        igsagent_error (agent, "agent definition is NULL");
+        return 0;
+    }
+    igs_service_t *t = NULL;
+    HASH_FIND_STR (agent->definition->services_table, service_name, t);
+    if (t == NULL) {
+        igsagent_debug (agent, "could not find service with name %s", service_name);
+        return 0;
+    }
+    if (t->reply){
+        size_t nb = 0;
+        igs_service_arg_t *a = NULL;
+        LL_COUNT (t->reply->arguments, a, nb);
+        return nb;
+    }else
+        return 0;
+    
+}
+
+bool igsagent_service_reply_arg_exists(igsagent_t *agent, const char *service_name, const char *arg_name){
+    assert(agent);
+    assert(service_name);
+    assert(arg_name);
+    if (!agent->definition) {
+        igsagent_error (agent, "agent definition is NULL");
+        return false;
+    }
+    igs_service_t *t = NULL;
+    HASH_FIND_STR (agent->definition->services_table, service_name, t);
+    if (t == NULL) {
+        igsagent_debug (agent, "could not find service with name %s", service_name);
+        return false;
+    }
+    if (t->reply){
+        igs_service_arg_t *a = NULL;
+        LL_FOREACH (t->reply->arguments, a) {
+            if (streq (a->name, arg_name))
+                return true;
+        }
+        return false;
+    }else
+        return false;
 }

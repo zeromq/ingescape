@@ -101,7 +101,7 @@ igsyajl_gen_alloc(const igsyajl_alloc_funcs * afs)
     igsyajl_alloc_funcs afsBuffer;
 
     /* first order of business is to set up memory allocation routines */
-    if (afs != NULL) {
+    if (afs) {
         if (afs->malloc == NULL || afs->realloc == NULL || afs->free == NULL)
         {
             return NULL;
@@ -130,7 +130,7 @@ igsyajl_gen_reset(igsyajl_gen_t *g, const char * sep)
 {
     g->depth = 0;
     memset((void *) &(g->state), 0, sizeof(g->state));
-    if (sep != NULL) g->print(g->ctx, sep, strlen(sep));
+    if (sep) g->print(g->ctx, sep, strlen(sep));
 }
 
 void

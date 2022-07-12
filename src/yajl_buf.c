@@ -34,7 +34,7 @@ void igsyajl_buf_ensure_available(igsyajl_buf buf, size_t want)
 {
     size_t need;
     
-    assert(buf != NULL);
+    assert(buf);
 
     /* first call */
     if (buf->data == NULL) {
@@ -63,7 +63,7 @@ igsyajl_buf igsyajl_buf_alloc(igsyajl_alloc_funcs * alloc)
 
 void igsyajl_buf_free(igsyajl_buf buf)
 {
-    assert(buf != NULL);
+    assert(buf);
     if (buf->data) YA_FREE(buf->alloc, buf->data);
     YA_FREE(buf->alloc, buf);
 }
@@ -72,7 +72,7 @@ void igsyajl_buf_append(igsyajl_buf buf, const void * data, size_t len)
 {
     igsyajl_buf_ensure_available(buf, len);
     if (len > 0) {
-        assert(data != NULL);
+        assert(data);
         memcpy(buf->data + buf->used, data, len);
         buf->used += len;
         buf->data[buf->used] = 0;

@@ -325,13 +325,13 @@ void s_clean_and_free_zyre_peer (igs_zyre_peer_t **zyre_peer, zloop_t *loop)
     assert (loop);
     igs_debug ("cleaning peer %s (%s)", (*zyre_peer)->name,
                (*zyre_peer)->peer_id);
-    if ((*zyre_peer)->peer_id != NULL)
+    if ((*zyre_peer)->peer_id)
         free ((*zyre_peer)->peer_id);
-    if ((*zyre_peer)->name != NULL)
+    if ((*zyre_peer)->name)
         free ((*zyre_peer)->name);
-    if ((*zyre_peer)->protocol != NULL)
+    if ((*zyre_peer)->protocol)
         free ((*zyre_peer)->protocol);
-    if ((*zyre_peer)->subscriber != NULL) {
+    if ((*zyre_peer)->subscriber) {
         zloop_reader_end (loop, (*zyre_peer)->subscriber);
         zsock_destroy (&((*zyre_peer)->subscriber));
     }
@@ -388,7 +388,7 @@ int s_network_configure_mapping_to_remote_agent (
     assert (agent);
     assert (remote_agent);
     igs_map_t *el, *tmp;
-    if (agent->mapping != NULL) {
+    if (agent->mapping) {
         HASH_ITER (hh, agent->mapping->map_elements, el, tmp)
         {
             if (streq (remote_agent->definition->name, el->to_agent)
@@ -396,19 +396,19 @@ int s_network_configure_mapping_to_remote_agent (
                 // mapping element is compatible with subscriber name
                 // check if we find a compatible output in subscriber definition
                 igs_iop_t *found_output = NULL;
-                if (remote_agent->definition != NULL)
+                if (remote_agent->definition)
                     HASH_FIND_STR (remote_agent->definition->outputs_table,
                                    el->to_output, found_output);
 
                 // check if we find a valid input in our own definition
                 igs_iop_t *found_input = NULL;
-                if (agent->definition != NULL)
+                if (agent->definition)
                     HASH_FIND_STR (agent->definition->inputs_table,
                                    el->from_input, found_input);
 
                 // check type compatibility between input and output value types
                 // including implicit conversions
-                if (found_output != NULL && found_input != NULL
+                if (found_output && found_input
                     && mapping_check_input_output_compatibility (
                       agent, found_input, found_output)) {
                     // we have validated input, agent and output names : we can map
@@ -614,9 +614,9 @@ void s_clean_and_free_remote_agent (igs_remote_agent_t **remote_agent)
                (*remote_agent)->definition->name, (*remote_agent)->uuid);
 
     // clean the agent definition & mapping
-    if ((*remote_agent)->definition != NULL)
+    if ((*remote_agent)->definition)
         definition_free_definition (&(*remote_agent)->definition);
-    if ((*remote_agent)->mapping != NULL)
+    if ((*remote_agent)->mapping)
         mapping_free_mapping (&(*remote_agent)->mapping);
 
     // clean the remote_agent itself
@@ -630,7 +630,7 @@ void s_clean_and_free_remote_agent (igs_remote_agent_t **remote_agent)
     }
     if ((*remote_agent)->uuid)
         free ((*remote_agent)->uuid);
-    if ((*remote_agent)->context->loop != NULL
+    if ((*remote_agent)->context->loop
         && (*remote_agent)->timer_id > 0) {
         zloop_timer_end ((*remote_agent)->context->loop,
                          (*remote_agent)->timer_id);
@@ -731,7 +731,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                             // FIXME: certainly useless with new architecture
                             // same ip address and same process : we can use inproc
                             inproc_address = zyre_event_header (zyre_event, "inproc");
-                            if (inproc_address != NULL) {
+                            if (inproc_address) {
                                 use_inproc = true;
                                 igs_debug ("Use address %s to subscribe to %s", inproc_address, name);
                             }
@@ -743,7 +743,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
 #elif defined(__WINDOWS__)
                             ipc_address = zyre_event_header (zyre_event, "loopback");
 #endif
-                            if (ipc_address != NULL) {
+                            if (ipc_address) {
                                 useIPC = true;
                                 igs_debug ("Use address %s to subscribe to %s", ipc_address, name);
                             }
@@ -1203,7 +1203,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             else {
                 igs_debug ("received mapping from agent %s(%s) is empty",
                            remote_agent->definition->name, remote_agent->uuid);
-                if (remote_agent != NULL && remote_agent->mapping != NULL) {
+                if (remote_agent && remote_agent->mapping) {
                     mapping_free_mapping (&remote_agent->mapping);
                     remote_agent->mapping = NULL;
                     s_agent_propagate_agent_event (
@@ -1212,9 +1212,9 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 }
             }
 
-            if (new_mapping != NULL && remote_agent != NULL) {
+            if (new_mapping && remote_agent) {
                 // look if this agent already has a mapping
-                if (remote_agent->mapping != NULL) {
+                if (remote_agent->mapping) {
                     igs_debug (
                       "mapping already exists for agent %s(%s) : new mapping "
                       "will overwrite the previous one...",
@@ -1323,7 +1323,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             // Load mapping from string content
             igs_mapping_t *new_mapping = parser_load_mapping (str_mapping);
             if (new_mapping) {
-                if (agent->mapping != NULL)
+                if (agent->mapping)
                     mapping_free_mapping (&agent->mapping);
                 agent->mapping = new_mapping;
                 // check and activate mapping
@@ -1378,7 +1378,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 zmsg_addstr (msg_to_send, agent->uuid);
                 igs_iop_t *outputs = agent->definition->outputs_table;
                 igs_iop_t *current = NULL;
-                for (current = outputs; current != NULL;
+                for (current = outputs; current;
                      current = current->hh.next) {
                     switch (current->value_type) {
                         case IGS_INTEGER_T:
@@ -1508,7 +1508,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 zmsg_addstr (msg_to_send, agent->uuid);
                 igs_iop_t *outputs = agent->definition->inputs_table;
                 igs_iop_t *current = NULL;
-                for (current = outputs; current != NULL;
+                for (current = outputs; current;
                      current = current->hh.next) {
                     switch (current->value_type) {
                         case IGS_INTEGER_T:
@@ -1600,7 +1600,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 zmsg_addstr (msg_to_send, agent->uuid);
                 igs_iop_t *outputs = agent->definition->params_table;
                 igs_iop_t *current = NULL;
-                for (current = outputs; current != NULL;
+                for (current = outputs; current;
                      current = current->hh.next) {
                     switch (current->value_type) {
                         case IGS_INTEGER_T:
@@ -1973,7 +1973,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
 
                 igs_debug ("received SET_INPUT command from %s (%s)", name,
                            peerUUID);
-                if (iop_name != NULL && value != NULL)
+                if (iop_name && value)
                     igsagent_input_set_string (agent, iop_name, value);
                 free (iop_name);
                 free (value);
@@ -2029,7 +2029,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
 
                 igs_debug ("received SET_OUTPUT command from %s (%s)", name,
                            peerUUID);
-                if (iop_name != NULL && value != NULL)
+                if (iop_name && value)
                     igsagent_output_set_string (agent, iop_name, value);
                 free (iop_name);
                 free (value);
@@ -2085,7 +2085,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
 
                 igs_debug ("received SET_PARAMETER command from %s (%s)", name,
                            peerUUID);
-                if (iop_name != NULL && value != NULL)
+                if (iop_name && value)
                     igsagent_parameter_set_string (agent, iop_name, value);
                 free (iop_name);
                 free (value);
@@ -2154,7 +2154,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 }
 
                 igs_debug ("received MAP command from %s (%s)", name, peerUUID);
-                if (input != NULL && remote_agent != NULL && output != NULL)
+                if (input && remote_agent && output)
                     igsagent_mapping_add (agent, input, remote_agent, output);
                 free (input);
                 free (remote_agent);
@@ -2225,7 +2225,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
 
                 igs_debug ("received UNMAP command from %s (%s)", name,
                            peerUUID);
-                if (input != NULL && remote_agent != NULL && output != NULL)
+                if (input && remote_agent && output)
                     igsagent_mapping_remove_with_name (agent, input,
                                                         remote_agent, output);
                 free (input);
@@ -2297,7 +2297,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
 
                 igs_debug ("received ADD_SPLIT_ENTRY command from %s (%s)",
                            name, peerUUID);
-                if (input != NULL && remote_agent != NULL && output != NULL)
+                if (input && remote_agent && output)
                     igsagent_split_add (agent, input, remote_agent, output);
                 free (input);
                 free (remote_agent);
@@ -2369,7 +2369,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 igs_debug (
                   "received REMOVE_SPLIT_ENTRY_MSG command from %s (%s)", name,
                   peerUUID);
-                if (input != NULL && remote_agent != NULL && output != NULL)
+                if (input && remote_agent && output)
                     igsagent_split_remove_with_name (agent, input,
                                                       remote_agent, output);
                 free (input);
@@ -2622,7 +2622,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     igs_service_t *service = NULL;
                     HASH_FIND_STR (callee_agent->definition->services_table,
                                    service_name, service);
-                    if (service != NULL) {
+                    if (service) {
                         if (service->cb) {
                             s_lock_zyre_peer (__FUNCTION__, __LINE__);
                             zyre_shouts (context->node,
@@ -2644,18 +2644,13 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                                                token, service->cb_data);
                                 service_free_values_in_arguments (service->arguments);
                             }
-                        }
-                        else
-                            igsagent_warn (callee_agent,
-                                            "no defined callback to handle "
-                                            "received service %s",
-                                            service_name);
-                    }
-                    else
+                        } else
+                            igsagent_warn (callee_agent, "no defined callback to handle received service %s", service_name);
+                    } else if (!core_context->allow_undefined_services)
                         igsagent_warn (callee_agent,
-                                        "agent %s(%s) has no service named %s",
-                                        callee_agent->definition->name,
-                                        callee_uuid, service_name);
+                                       "agent %s(%s) has no service named %s",
+                                       callee_agent->definition->name,
+                                       callee_uuid, service_name);
                 }
                 free (caller_uuid);
                 free (callee_uuid);
@@ -2876,7 +2871,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
 
         igs_zyre_peer_t *zyre_peer = NULL;
         HASH_FIND_STR (context->zyre_peers, peerUUID, zyre_peer);
-        if (zyre_peer != NULL) {
+        if (zyre_peer) {
             if (zyre_peer->reconnected > 0) {
                 // do not clean: we are getting a timemout now whereas
                 // the agent is reconnected
@@ -3187,7 +3182,7 @@ static void s_run_loop (zsock_t *mypipe, void *args)
     context->network_ipc_full_path = NULL;
 #endif
 #if !defined(__UTYPE_IOS)
-    if (context->inproc_publisher != NULL)
+    if (context->inproc_publisher)
         zsock_destroy (&context->inproc_publisher);
 #endif
     if (context->logger)
@@ -3643,7 +3638,7 @@ igs_result_t network_publish_output (igsagent_t *agent, const igs_iop_t *iop)
                 result = IGS_FAILURE;
             }
             // 2- publish to IPC
-            if (core_context->ipc_publisher != NULL) {
+            if (core_context->ipc_publisher) {
                 // publisher can be NULL on IOS or for read/write problems with assigned
                 // IPC path in both cases, an error message has been issued at start
                 if (zmsg_send (&msg_bis, core_context->ipc_publisher) != 0) {
@@ -3655,7 +3650,7 @@ igs_result_t network_publish_output (igsagent_t *agent, const igs_iop_t *iop)
                 }
             }
             // 3- publish to inproc
-            if (core_context->inproc_publisher != NULL) {
+            if (core_context->inproc_publisher) {
                 if (zmsg_send (&msg_ter, core_context->inproc_publisher) != 0) {
                     igsagent_error (
                       agent, "Could not publish output %s using inproc\n",
@@ -3741,7 +3736,7 @@ igs_result_t igs_start_with_device (const char *network_device,
     assert (network_device);
     assert (port > 0);
 
-    if (core_context->network_actor != NULL) {
+    if (core_context->network_actor) {
         // Agent is active : need to stop it first
         igs_stop ();
     }
@@ -3795,7 +3790,7 @@ igs_result_t igs_start_with_ip (const char *ip_address, unsigned int port)
     assert (port > 0);
     core_init_agent ();
 
-    if (core_context->network_actor != NULL) {
+    if (core_context->network_actor) {
         // Agent is already active : need to stop it first
         igs_stop ();
     }
@@ -3932,7 +3927,7 @@ igs_result_t igs_start_with_brokers (const char *agent_endpoint)
     assert (strlen (address) > 0);
     assert (port > 0);
     core_context->ip_address = strdup (address);
-    if (core_context->network_actor != NULL) {
+    if (core_context->network_actor) {
         // Agent is already active : need to stop it first
         igs_stop ();
     }
@@ -3958,7 +3953,7 @@ igs_result_t igs_start_with_brokers (const char *agent_endpoint)
 void igs_stop ()
 {
     core_init_context ();
-    if (core_context->network_actor != NULL) {
+    if (core_context->network_actor) {
         // interrupting and destroying ingescape thread and zyre layer
         // this will also clean all agent->subscribers
         if (!core_context->external_stop) {
@@ -3999,7 +3994,7 @@ bool igs_is_started ()
 {
     core_init_context ();
     s_network_lock ();
-    if (core_context->loop != NULL) {
+    if (core_context->loop) {
         s_network_unlock ();
         return true;
     } else {
@@ -4092,7 +4087,7 @@ void igs_freeze (void)
 {
     core_init_context ();
     if (core_context->is_frozen == false) {
-        if ((core_context != NULL) && (core_context->node != NULL)) {
+        if ((core_context) && (core_context->node)) {
             s_lock_zyre_peer (__FUNCTION__, __LINE__);
             igsagent_t *agent, *tmp;
             HASH_ITER (hh, core_context->agents, agent, tmp)
@@ -4122,8 +4117,8 @@ void igs_unfreeze (void)
 {
     core_init_context ();
     if (core_context->is_frozen == true) {
-        if ((core_context->network_actor != NULL)
-            && (core_context->node != NULL)) {
+        if ((core_context->network_actor)
+            && (core_context->node)) {
             s_lock_zyre_peer (__FUNCTION__, __LINE__);
             igsagent_t *agent, *tmp;
             HASH_ITER (hh, core_context->agents, agent, tmp)
@@ -4146,7 +4141,7 @@ void igs_unfreeze (void)
 void igs_observe_freeze (igs_freeze_fn cb, void *my_data)
 {
     core_init_context ();
-    if (cb != NULL) {
+    if (cb) {
         igs_freeze_wrapper_t *new_cb =
           (igs_freeze_wrapper_t *) zmalloc (sizeof (igs_freeze_wrapper_t));
         new_cb->callback_ptr = cb;
@@ -4162,10 +4157,10 @@ void igsagent_set_state (igsagent_t *agent, const char *state)
     assert (agent);
     assert (state);
     if (agent->state == NULL || !streq (state, agent->state)) {
-        if (agent->state != NULL)
+        if (agent->state)
             free (agent->state);
         agent->state = s_strndup (state, IGS_MAX_AGENT_NAME_LENGTH);
-        if (agent->context->node != NULL) {
+        if (agent->context->node) {
             s_lock_zyre_peer (__FUNCTION__, __LINE__);
             zmsg_t *msg = zmsg_new ();
             zmsg_addstr (msg, STATE_MSG);
@@ -4191,8 +4186,8 @@ void igsagent_mute (igsagent_t *agent)
     assert (agent);
     if (!agent->is_whole_agent_muted) {
         agent->is_whole_agent_muted = true;
-        if ((agent->context->network_actor != NULL)
-            && (agent->context->node != NULL)) {
+        if ((agent->context->network_actor)
+            && (agent->context->node)) {
             s_lock_zyre_peer (__FUNCTION__, __LINE__);
             zmsg_t *msg = zmsg_new ();
             zmsg_addstr (msg, AGENT_MUTED_MSG);
@@ -4212,8 +4207,8 @@ void igsagent_unmute (igsagent_t *agent)
     assert (agent);
     if (agent->is_whole_agent_muted) {
         agent->is_whole_agent_muted = false;
-        if ((agent->context->network_actor != NULL)
-            && (agent->context->node != NULL)) {
+        if ((agent->context->network_actor)
+            && (agent->context->node)) {
             s_lock_zyre_peer (__FUNCTION__, __LINE__);
             zmsg_t *msg = zmsg_new ();
             zmsg_addstr (msg, AGENT_MUTED_MSG);
@@ -4260,7 +4255,7 @@ void igs_set_command_line (const char *line)
 {
     core_init_context ();
     assert (line);
-    if (core_context->command_line != NULL)
+    if (core_context->command_line)
         free (core_context->command_line);
     core_context->command_line = s_strndup (line, IGS_COMMAND_LINE_LENGTH);
     igs_debug ("Command line set to %s", core_context->command_line);
@@ -4380,7 +4375,7 @@ void igs_set_command_line_from_args (int argc, const char **argv)
         strcat (cmd, formated_arg);
         free (formated_arg);
     }
-    if (core_context->command_line != NULL)
+    if (core_context->command_line)
         free (core_context->command_line);
     core_context->command_line = s_strndup (cmd, IGS_COMMAND_LINE_LENGTH);
 }
@@ -4463,10 +4458,10 @@ void igs_free_net_devices_list (char **devices, int nb)
 {
     int i = 0;
     for (i = 0; i < nb; i++) {
-        if (devices != NULL && devices[i] != NULL)
+        if (devices && devices[i])
             free (devices[i]);
     }
-    if (devices != NULL)
+    if (devices)
         free (devices);
 }
 
@@ -4729,7 +4724,7 @@ igs_result_t igsagent_election_leave (igsagent_t *agent,
 void igs_net_set_discovery_interval (unsigned int interval)
 {
     core_init_context ();
-    if (core_context->network_actor != NULL && core_context->node != NULL) {
+    if (core_context->network_actor && core_context->node) {
         s_lock_zyre_peer (__FUNCTION__, __LINE__);
         zyre_set_interval (core_context->node, interval);
         s_unlock_zyre_peer (__FUNCTION__, __LINE__);
@@ -4740,7 +4735,7 @@ void igs_net_set_discovery_interval (unsigned int interval)
 void igs_net_set_timeout (unsigned int duration)
 {
     core_init_context ();
-    if (core_context->network_actor != NULL && core_context->node != NULL) {
+    if (core_context->network_actor && core_context->node) {
         s_lock_zyre_peer (__FUNCTION__, __LINE__);
         zyre_set_expired_timeout (core_context->node, duration);
         s_unlock_zyre_peer (__FUNCTION__, __LINE__);
@@ -4751,8 +4746,8 @@ void igs_net_set_timeout (unsigned int duration)
 void igs_net_set_publishing_port (unsigned int port)
 {
     core_init_context ();
-    if (core_context->network_actor != NULL
-        && core_context->publisher != NULL) {
+    if (core_context->network_actor
+        && core_context->publisher) {
         igs_error ("agent is already started : stop it first to change its "
                    "publishing port");
         return;
@@ -4763,7 +4758,7 @@ void igs_net_set_publishing_port (unsigned int port)
 void igs_net_set_log_stream_port (unsigned int port)
 {
     core_init_context ();
-    if (core_context->network_actor != NULL && core_context->logger != NULL) {
+    if (core_context->network_actor && core_context->logger) {
         igs_error (
           "agent is already started : stop it first to change its logger port");
         return;
@@ -4779,7 +4774,7 @@ void igs_set_ipc_dir (const char *path)
     if (core_context->network_ipc_folder_path == NULL
         || !streq (path, core_context->network_ipc_folder_path)) {
         if (*path == '/') {
-            if (core_context->network_ipc_folder_path != NULL)
+            if (core_context->network_ipc_folder_path)
                 free (core_context->network_ipc_folder_path);
             if (!zsys_file_exists (path)) {
                 igs_info ("folder %s was created automatically", path);
@@ -4830,8 +4825,8 @@ void igs_net_set_high_water_marks (int hwm_value)
         igs_error ("HWM value must be zero or higher");
         return;
     }
-    if (core_context->network_actor != NULL
-        && core_context->publisher != NULL) {
+    if (core_context->network_actor
+        && core_context->publisher) {
         zsock_set_sndhwm (core_context->publisher, hwm_value);
         if (core_context->ipc_publisher)
             zsock_set_sndhwm (core_context->ipc_publisher, hwm_value);
@@ -4891,7 +4886,7 @@ void igs_net_raise_sockets_limit ()
 zsock_t *igs_pipe_to_ingescape (void)
 {
     core_init_context ();
-    if (core_context->network_actor != NULL)
+    if (core_context->network_actor)
         return zactor_sock (core_context->network_actor);
     else {
         igs_warn ("ingescape is not started yet");
@@ -4931,7 +4926,7 @@ void igs_timer_stop (int timer_id)
     s_network_lock ();
     igs_timer_t *timer = NULL;
     HASH_FIND_INT (core_context->timers, &timer_id, timer);
-    if (timer != NULL) {
+    if (timer) {
         zloop_timer_end (core_context->loop, timer_id);
         HASH_DEL (core_context->timers, timer);
         free (timer);

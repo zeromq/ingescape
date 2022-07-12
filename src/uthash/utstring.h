@@ -69,7 +69,7 @@ do {                                                       \
 
 #define utstring_done(s)                                   \
 do {                                                       \
-  if ((s)->d != NULL) free((s)->d);                        \
+  if ((s)->d) free((s)->d);                        \
   (s)->n = 0;                                              \
 } while(0)
 
@@ -329,7 +329,7 @@ _UNUSED_ static long utstring_find(
     if ( (V_haystack_len >= (long) P_needle_len) && (P_needle_len > 0) )
     {
         V_KMP_Table = (long *)malloc(sizeof(long) * (P_needle_len + 1));
-        if (V_KMP_Table != NULL)
+        if (V_KMP_Table)
         {
             _utstring_build_table(P_Needle, P_needle_len, V_KMP_Table);
 
@@ -375,7 +375,7 @@ _UNUSED_ static long utstring_findR(
     if ( (V_haystack_len >= (long) P_needle_len) && (P_needle_len > 0) )
     {
         V_KMP_Table = (long *)malloc(sizeof(long) * (P_needle_len + 1));
-        if (V_KMP_Table != NULL)
+        if (V_KMP_Table)
         {
             _utstring_build_tabler(P_Needle, P_needle_len, V_KMP_Table);
 

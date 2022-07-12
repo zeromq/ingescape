@@ -147,15 +147,15 @@ IGSYAJL_API void igsyajl_tree_free (igsyajl_val v);
 IGSYAJL_API igsyajl_val igsyajl_tree_get(igsyajl_val parent, const char ** path, igsyajl_type type);
 
 /* Various convenience macros to check the type of a `igsyajl_val` */
-#define IGSYAJL_IS_STRING(v) (((v) != NULL) && ((v)->type == igsyajl_t_string))
-#define IGSYAJL_IS_NUMBER(v) (((v) != NULL) && ((v)->type == igsyajl_t_number))
+#define IGSYAJL_IS_STRING(v) (((v)) && ((v)->type == igsyajl_t_string))
+#define IGSYAJL_IS_NUMBER(v) (((v)) && ((v)->type == igsyajl_t_number))
 #define IGSYAJL_IS_INTEGER(v) (IGSYAJL_IS_NUMBER(v) && ((v)->u.number.flags & IGSYAJL_NUMBER_INT_VALID))
 #define IGSYAJL_IS_DOUBLE(v) (IGSYAJL_IS_NUMBER(v) && ((v)->u.number.flags & IGSYAJL_NUMBER_DOUBLE_VALID))
-#define IGSYAJL_IS_OBJECT(v) (((v) != NULL) && ((v)->type == igsyajl_t_object))
-#define IGSYAJL_IS_ARRAY(v)  (((v) != NULL) && ((v)->type == igsyajl_t_array ))
-#define IGSYAJL_IS_TRUE(v)   (((v) != NULL) && ((v)->type == igsyajl_t_true  ))
-#define IGSYAJL_IS_FALSE(v)  (((v) != NULL) && ((v)->type == igsyajl_t_false ))
-#define IGSYAJL_IS_NULL(v)   (((v) != NULL) && ((v)->type == igsyajl_t_null  ))
+#define IGSYAJL_IS_OBJECT(v) (((v)) && ((v)->type == igsyajl_t_object))
+#define IGSYAJL_IS_ARRAY(v)  (((v)) && ((v)->type == igsyajl_t_array ))
+#define IGSYAJL_IS_TRUE(v)   (((v)) && ((v)->type == igsyajl_t_true  ))
+#define IGSYAJL_IS_FALSE(v)  (((v)) && ((v)->type == igsyajl_t_false ))
+#define IGSYAJL_IS_NULL(v)   (((v)) && ((v)->type == igsyajl_t_null  ))
 
 /** Given a igsyajl_val_string return a ptr to the bare string it contains,
  *  or NULL if the value is not a string. */

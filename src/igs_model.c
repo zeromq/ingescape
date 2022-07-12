@@ -88,7 +88,7 @@ char *model_get_iop_value_as_string (igs_iop_t *iop)
 {
     assert (iop);
     char *str_value = NULL;
-    if (iop != NULL) {
+    if (iop) {
         switch (iop->value_type) {
             case IGS_INTEGER_T:
                 str_value = (char *) zmalloc (NUMBER_TO_STRING_MAX_LENGTH + 1);
@@ -326,7 +326,7 @@ const igs_iop_t *model_write_iop (igsagent_t *agent, const char *name,
                     out_value = &(iop->value.b);
                     break;
                 case IGS_STRING_T: {
-                    if (iop->value.s != NULL)
+                    if (iop->value.s)
                         free (iop->value.s);
                     if (value == NULL)
                         iop->value.s = strdup ("");
@@ -343,7 +343,7 @@ const igs_iop_t *model_write_iop (igsagent_t *agent, const char *name,
                     iop->value_size = 0;
                     break;
                 case IGS_DATA_T: {
-                    if (iop->value.data != NULL)
+                    if (iop->value.data)
                         free (iop->value.data);
                     iop->value.data = NULL;
                     iop->value.data = (void *) zmalloc (sizeof (int));
@@ -381,7 +381,7 @@ const igs_iop_t *model_write_iop (igsagent_t *agent, const char *name,
                     out_value = &(iop->value.b);
                     break;
                 case IGS_STRING_T: {
-                    if (iop->value.s != NULL)
+                    if (iop->value.s)
                         free (iop->value.s);
                     if (value == NULL)
                         iop->value.s = strdup ("");
@@ -398,7 +398,7 @@ const igs_iop_t *model_write_iop (igsagent_t *agent, const char *name,
                     iop->value_size = 0;
                     break;
                 case IGS_DATA_T: {
-                    if (iop->value.data != NULL)
+                    if (iop->value.data)
                         free (iop->value.data);
                     iop->value.data = NULL;
                     iop->value.data = (void *) zmalloc (sizeof (double));
@@ -431,7 +431,7 @@ const igs_iop_t *model_write_iop (igsagent_t *agent, const char *name,
                     out_value = &(iop->value.b);
                     break;
                 case IGS_STRING_T: {
-                    if (iop->value.s != NULL)
+                    if (iop->value.s)
                         free (iop->value.s);
                     if (value == NULL)
                         iop->value.s = strdup ("");
@@ -448,7 +448,7 @@ const igs_iop_t *model_write_iop (igsagent_t *agent, const char *name,
                     iop->value_size = 0;
                     break;
                 case IGS_DATA_T: {
-                    if (iop->value.data != NULL)
+                    if (iop->value.data)
                         free (iop->value.data);
                     iop->value.data = NULL;
                     iop->value.data = (void *) zmalloc (sizeof (bool));
@@ -494,7 +494,7 @@ const igs_iop_t *model_write_iop (igsagent_t *agent, const char *name,
                     out_value = &(iop->value.b);
                     break;
                 case IGS_STRING_T: {
-                    if (iop->value.s != NULL)
+                    if (iop->value.s)
                         free (iop->value.s);
                     if (value == NULL)
                         iop->value.s = strdup ("");
@@ -508,11 +508,11 @@ const igs_iop_t *model_write_iop (igsagent_t *agent, const char *name,
                     iop->value_size = 0;
                     break;
                 case IGS_DATA_T: {
-                    if (iop->value.data != NULL)
+                    if (iop->value.data)
                         free (iop->value.data);
                     iop->value.data = NULL;
                     size_t s = 0;
-                    if (value != NULL) {
+                    if (value) {
                         uint8_t *converted = s_model_string_to_bytes (value);
                         iop->value.data = converted;
                         if (converted)
@@ -553,7 +553,7 @@ const igs_iop_t *model_write_iop (igsagent_t *agent, const char *name,
                     out_value = &(iop->value.b);
                     break;
                 case IGS_STRING_T: {
-                    if (iop->value.s != NULL)
+                    if (iop->value.s)
                         free (iop->value.s);
                     iop->value.s = strdup ("");
                     out_size = iop->value_size = sizeof (char);
@@ -563,7 +563,7 @@ const igs_iop_t *model_write_iop (igsagent_t *agent, const char *name,
                     iop->value_size = 0;
                     break;
                 case IGS_DATA_T: {
-                    if (iop->value.data != NULL)
+                    if (iop->value.data)
                         free (iop->value.data);
                     iop->value.data = NULL;
                     iop->value_size = 0;
@@ -605,7 +605,7 @@ const igs_iop_t *model_write_iop (igsagent_t *agent, const char *name,
                     iop->value_size = 0;
                     break;
                 case IGS_DATA_T: {
-                    if (iop->value.data != NULL)
+                    if (iop->value.data)
                         free (iop->value.data);
                     iop->value.data = NULL;
                     iop->value.data = (void *) zmalloc (size);
@@ -705,7 +705,7 @@ const igs_iop_t *model_write_iop (igsagent_t *agent, const char *name,
 igs_iop_t *s_model_find_input_by_name (igsagent_t *agent, const char *name)
 {
     igs_iop_t *found = NULL;
-    if (name != NULL && agent->definition != NULL)
+    if (name && agent->definition)
         HASH_FIND_STR (agent->definition->inputs_table, name, found);
     else {
         if (name == NULL || strlen (name) == 0)
@@ -719,7 +719,7 @@ igs_iop_t *s_model_find_input_by_name (igsagent_t *agent, const char *name)
 igs_iop_t *s_model_find_output_by_name (igsagent_t *agent, const char *name)
 {
     igs_iop_t *found = NULL;
-    if (name != NULL && agent->definition != NULL)
+    if (name && agent->definition)
         HASH_FIND_STR (agent->definition->outputs_table, name, found);
     else {
         if (name == NULL || strlen (name) == 0)
@@ -733,7 +733,7 @@ igs_iop_t *s_model_find_output_by_name (igsagent_t *agent, const char *name)
 igs_iop_t *s_model_find_parameter_by_name (igsagent_t *agent, const char *name)
 {
     igs_iop_t *found = NULL;
-    if (name != NULL && agent->definition != NULL)
+    if (name && agent->definition)
         HASH_FIND_STR (agent->definition->params_table, name, found);
     else {
         if (name == NULL || strlen (name) == 0)
@@ -818,6 +818,11 @@ void igs_log_include_services (bool enable)
 {
     core_init_context ();
     core_context->enable_service_logging = enable;
+}
+
+void igs_log_no_warning_if_undefined_service(bool enable){
+    core_init_context ();
+    core_context->allow_undefined_services = enable;
 }
 
 // --------------------------------  READ ------------------------------------//
@@ -1831,7 +1836,7 @@ char **s_model_get_iop_list (igsagent_t *agent,
     char **list = (char **) malloc (N * sizeof (char *));
     igs_iop_t *current_iop;
     int index = 0;
-    for (current_iop = hash; current_iop != NULL;
+    for (current_iop = hash; current_iop;
          current_iop = current_iop->hh.next) {
         list[index] = strdup (current_iop->name);
         index++;
@@ -1864,7 +1869,7 @@ void igs_free_iop_list (char **list, size_t nb_of_elements)
     if (*list && nb_of_elements) {
         size_t i = 0;
         for (i = 0; i < nb_of_elements; i++) {
-            if (list[i] != NULL)
+            if (list[i])
                 free (list[i]);
         }
     }
@@ -1881,7 +1886,7 @@ bool s_model_check_iop_existence (igsagent_t *agent,
         return false;
     }
     HASH_FIND_STR (hash, name, iop);
-    return (iop != NULL);
+    return (iop);
 }
 
 bool igsagent_input_exists (igsagent_t *agent, const char *name)
@@ -1995,7 +2000,7 @@ void igsagent_output_mute (igsagent_t *agent, const char *name)
         return;
     }
     iop->is_muted = true;
-    if (core_context != NULL && core_context->node != NULL) {
+    if (core_context && core_context->node) {
         s_lock_zyre_peer (__FUNCTION__, __LINE__);
         zmsg_t *msg = zmsg_new ();
         zmsg_addstr (msg, OUTPUT_MUTED_MSG);
@@ -2014,7 +2019,7 @@ void igsagent_output_unmute (igsagent_t *agent, const char *name)
         return;
     }
     iop->is_muted = false;
-    if (core_context != NULL && core_context->node != NULL) {
+    if (core_context && core_context->node) {
         s_lock_zyre_peer (__FUNCTION__, __LINE__);
         zmsg_t *msg = zmsg_new ();
         zmsg_addstr (msg, OUTPUT_UNMUTED_MSG);
