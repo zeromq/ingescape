@@ -51,7 +51,7 @@ igsyajl_alloc(const igsyajl_callbacks * callbacks,
     igsyajl_alloc_funcs afsBuffer;
 
     /* first order of business is to set up memory allocation routines */
-    if (afs != NULL) {
+    if (afs) {
         if (afs->malloc == NULL || afs->realloc == NULL || afs->free == NULL)
         {
             return NULL;

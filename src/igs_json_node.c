@@ -148,7 +148,7 @@ igs_json_node_dup (igs_json_node_t *root)
                 result->u.number.i = root->u.number.i;
             else
                 result->u.number.d = root->u.number.d;
-            if (root->u.number.r != NULL)
+            if (root->u.number.r)
                 result->u.number.r = strdup (root->u.number.r);
             result->u.number.flags = root->u.number.flags;
             break;
@@ -175,13 +175,13 @@ igs_json_node_dup (igs_json_node_t *root)
             break;
         case IGS_JSON_TRUE:
             result->u.number.i = true;
-            if (root->u.number.r != NULL)
+            if (root->u.number.r)
                 result->u.number.r = strdup (root->u.number.r);
             result->u.number.flags = root->u.number.flags;
             break;
         case IGS_JSON_FALSE:
             result->u.number.i = false;
-            if (root->u.number.r != NULL)
+            if (root->u.number.r)
                 result->u.number.r = strdup (root->u.number.r);
             result->u.number.flags = root->u.number.flags;
             break;

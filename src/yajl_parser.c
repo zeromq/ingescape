@@ -86,7 +86,7 @@ igsyajl_render_error_string(igsyajl_handle hand, const unsigned char * jsonText,
         size_t memneeded = 0;
         memneeded += strlen(errorType);
         memneeded += strlen(" error");
-        if (errorText != NULL) {
+        if (errorText) {
             memneeded += strlen(": ");
             memneeded += strlen(errorText);
         }
@@ -95,7 +95,7 @@ igsyajl_render_error_string(igsyajl_handle hand, const unsigned char * jsonText,
         str[0] = 0;
         strncat((char *) str, errorType, memneeded + 2);
         strncat((char *) str, " error", memneeded + 2);
-        if (errorText != NULL) {
+        if (errorText) {
             strncat((char *) str, ": ", memneeded + 2);
             strncat((char *) str, errorText, memneeded + 2);
         }

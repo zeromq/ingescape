@@ -495,7 +495,7 @@ igs_result_t igsagent_mapping_remove_with_name (igsagent_t *agent,
     free (mashup);
 
     igs_map_t *tmp = NULL;
-    if (agent->mapping->map_elements != NULL)
+    if (agent->mapping->map_elements)
         HASH_FIND (hh, agent->mapping->map_elements, &h, sizeof (uint64_t),
                    tmp);
     if (tmp == NULL) {

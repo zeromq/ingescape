@@ -61,7 +61,7 @@ igs_result_t igs_channel_join (const char *channel)
         igs_error ("channel name %s is reserved and cannot be joined", channel);
         return IGS_FAILURE;
     }
-    if (core_context->network_actor != NULL && core_context->node != NULL) {
+    if (core_context->network_actor && core_context->node) {
         s_lock_zyre_peer (__FUNCTION__, __LINE__);
         zyre_join (core_context->node, channel);
         s_unlock_zyre_peer (__FUNCTION__, __LINE__);
@@ -76,7 +76,7 @@ void igs_channel_leave (const char *channel)
 {
     core_init_context ();
     assert (channel && strlen (channel) > 0);
-    if (core_context->network_actor != NULL && core_context->node != NULL) {
+    if (core_context->network_actor && core_context->node) {
         s_lock_zyre_peer (__FUNCTION__, __LINE__);
         zyre_leave (core_context->node, channel);
         s_unlock_zyre_peer (__FUNCTION__, __LINE__);
@@ -322,7 +322,7 @@ igs_result_t igs_peer_add_header (const char *key, const char *value)
         && strneq (key, "hostname")) {
         igs_peer_header_t *header;
         HASH_FIND_STR (core_context->peer_headers, key, header);
-        if (header != NULL) {
+        if (header) {
             igs_error ("service key '%s' already defined : new value will be ignored", key);
             return IGS_FAILURE;
         }
@@ -355,7 +355,7 @@ igs_result_t igs_peer_remove_header (const char *key)
         free (header->key);
         free (header->value);
         free (header);
-        if (core_context != NULL && core_context->node != NULL) {
+        if (core_context && core_context->node) {
             igs_error ("agent is started : restart the agent to actually remove the service description");
             return IGS_FAILURE;
         }
