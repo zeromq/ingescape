@@ -32,7 +32,6 @@ workflow:
 # Global variables. Can be used by any jobs
 variables:
   VS_CMAKE_GENERATOR: "Visual Studio 16 2019"
-  DEPLOYMENT_WINDOWS_NET_SHARE: "\\\\10.0.0.2\\gitlab_workspace\\dependencies"
 
 .base_repo_main_branch:
   rules:
@@ -172,7 +171,7 @@ lib-windows-release-x64:
     - |
       if ( ($env:CI_PROJECT_ROOT_NAMESPACE -eq "ingescape-private") -and ($env:CI_COMMIT_BRANCH -eq $env:CI_DEFAULT_BRANCH) )
       {
-        cmake --install .\build\ReleaseX64 --config Release --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64
+        cmake --install .\build\ReleaseX64 --config Release --prefix $env:WORKSPACE_NET_SHARE\Builds\Release\x64
         cmake --install .\build\ReleaseX64 --config Release --prefix $env:ARTIFACTS_NET_SHARE\win64\binaries\ingescape\release
       }
   artifacts:
@@ -200,7 +199,7 @@ lib-windows-release-x86:
     - |
       if ( ($env:CI_PROJECT_ROOT_NAMESPACE -eq "ingescape-private") -and ($env:CI_COMMIT_BRANCH -eq $env:CI_DEFAULT_BRANCH) )
       {
-        cmake --install .\build\ReleaseX86 --config Release --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86
+        cmake --install .\build\ReleaseX86 --config Release --prefix $env:WORKSPACE_NET_SHARE\Builds\Release\x86
         cmake --install .\build\ReleaseX86 --config Release --prefix $env:ARTIFACTS_NET_SHARE\win32\binaries\ingescape\release
       }
   artifacts:
@@ -228,7 +227,7 @@ lib-windows-debug-x64:
     - |
       if ( ($env:CI_PROJECT_ROOT_NAMESPACE -eq "ingescape-private") -and ($env:CI_COMMIT_BRANCH -eq $env:CI_DEFAULT_BRANCH) )
       {
-        cmake --install .\build\DebugX64 --config Debug --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64
+        cmake --install .\build\DebugX64 --config Debug --prefix $env:WORKSPACE_NET_SHARE\Builds\Debug\x64
         cmake --install .\build\DebugX64 --config Debug --prefix $env:ARTIFACTS_NET_SHARE\win64\binaries\ingescape\debug
       }
   artifacts:
@@ -256,7 +255,7 @@ lib-windows-debug-x86:
     - |
       if ( ($env:CI_PROJECT_ROOT_NAMESPACE -eq "ingescape-private") -and ($env:CI_COMMIT_BRANCH -eq $env:CI_DEFAULT_BRANCH) )
       {
-        cmake --install .\build\DebugX86 --config Debug --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x86
+        cmake --install .\build\DebugX86 --config Debug --prefix $env:WORKSPACE_NET_SHARE\Builds\Debug\x86
         cmake --install .\build\DebugX86 --config Debug --prefix $env:ARTIFACTS_NET_SHARE\win32\binaries\ingescape\debug
       }
   artifacts:
