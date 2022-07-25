@@ -309,7 +309,7 @@ lib-installer-runtime-windows-x64:
     - |
       if ( ($env:CI_PROJECT_ROOT_NAMESPACE -eq "ingescape-private") -and ($env:CI_COMMIT_BRANCH -eq $env:CI_DEFAULT_BRANCH) )
       {
-        cp build\ReleaseX64\ingescape-*.exe build\ReleaseX64\ingescape-*.zip $env:ARTIFACTS_NET_SHARE\win32\packages\ingescape\release -Force
+        cp build\ReleaseX64\ingescape-*.exe build\ReleaseX64\ingescape-*.zip $env:ARTIFACTS_NET_SHARE\win64\packages\ingescape\release -Force
       }
   artifacts:
     paths:
@@ -337,7 +337,7 @@ lib-installer-debug-windows-x86:
     - |
       if ( ($env:CI_PROJECT_ROOT_NAMESPACE -eq "ingescape-private") -and ($env:CI_COMMIT_BRANCH -eq $env:CI_DEFAULT_BRANCH) )
       {
-        cp build\DebugX86\ingescape-*.exe build\DebugX86\ingescape-*.zip $env:ARTIFACTS_NET_SHARE\win86\packages\ingescape\debug -Force
+        cp build\DebugX86\ingescape-*.exe build\DebugX86\ingescape-*.zip $env:ARTIFACTS_NET_SHARE\win32\packages\ingescape\debug -Force
       }
   artifacts:
     paths:
