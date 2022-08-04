@@ -734,7 +734,6 @@ build-deb-packages:
     - (cd b_debug && cpack -G DEB)
     - (cd _packages && dpkg-deb -R ingescape-debug-dev*.deb p && tree p && rm -rf p)
     - mv _packages/ingescape-debug-dev*.deb debian_x64
-    - echo "Deploying into autan shared repository"
     - cp debian_x64/* $ARTIFACTS_NET_SHARE/linux64/packages/ingescape
     - echo "Setting up SSH"
     - mkdir -p ~/.ssh/
