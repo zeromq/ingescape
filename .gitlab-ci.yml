@@ -10,6 +10,12 @@ stages:
   - deploy
   - delivery
 
+workflow:
+  rules:
+  - if: $CI_PIPELINE_SOURCE == "web" || $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
+    when: always
+  - when: never
+
 # Define ingescape library files
 .lib-build-files:
   rules:
@@ -26,7 +32,6 @@ stages:
 # Global variables. Can be used by any jobs
 variables:
   VS_CMAKE_GENERATOR: "Visual Studio 16 2019"
-  DEPLOYMENT_WINDOWS_NET_SHARE: "\\\\10.0.0.2\\gitlab_workspace\\dependencies"
 
 .base_repo_main_branch:
   rules:
@@ -54,7 +59,7 @@ lib-build-macos:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - git clean -xfd
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON
     - make -j8 -C build
   artifacts:
     paths:
@@ -93,7 +98,7 @@ lib-installer-macos:
     name: "lib-installer-macos"
   dependencies:
     - lib-build-macos
-  needs: 
+  needs:
     - lib-build-macos
 
 
@@ -106,7 +111,7 @@ lib-deploy-macos:
     - make -C build DESTDIR=$HOME/builds/sysroot install
   dependencies:
     - lib-build-macos
-  needs: 
+  needs:
     - lib-build-macos
   rules:
     - !reference [.root_namespace, rules]
@@ -123,28 +128,21 @@ lib-build-macos-qt6:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - git clean -xfd
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DOSX_UNIVERSAL=ON -DWITH_DEPS=ON -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DOSX_UNIVERSAL=ON -DWITH_DEPS=ON
     - make -j8 -C build
+    - |
+      if [[ $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]
+      then
+        make -C build DESTDIR=$HOME/builds/sysroot install
+        mkdir temp
+        make -C build DESTDIR=temp install
+        mv temp/usr/local/* $ARTIFACTS_NET_SHARE\macos\binaries\ingescape
+      fi
   artifacts:
     paths:
       - ./build
     name: "lib-build-macos"
     expire_in: 1 day
-
-lib-deploy-macos-qt6:
-  extends: .lib-build-files
-  stage: deploy
-  tags:
-    - macos-qt6
-  script:
-    - make -C build DESTDIR=$HOME/builds/sysroot install
-  dependencies:
-    - lib-build-macos-qt6
-  needs: 
-    - lib-build-macos-qt6
-  rules:
-    - !reference [.root_namespace, rules]
-
 
 
 #__          ___           _
@@ -166,10 +164,16 @@ lib-windows-release-x64:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - mkdir build\ReleaseX64
-    - cmake -S . -B build\ReleaseX64 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID" -DWITH_CSHARP_WRAPPER=ON
+    - cmake -S . -B build\ReleaseX64 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DWITH_CSHARP_WRAPPER=ON
     - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildDirectory build/ReleaseX64/bindings/csharp -projectName IngescapeCSharp
     - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildDirectory build/ReleaseX64/bindings/csharp/test -projectName igstester
     - cmake --build build\ReleaseX64 --target ALL_BUILD --config Release
+    - |
+      if ( ($env:CI_PROJECT_ROOT_NAMESPACE -eq "ingescape-private") -and ($env:CI_COMMIT_BRANCH -eq $env:CI_DEFAULT_BRANCH) )
+      {
+        cmake --install .\build\ReleaseX64 --config Release --prefix $env:WORKSPACE_NET_SHARE\Builds\Release\x64
+        cmake --install .\build\ReleaseX64 --config Release --prefix $env:ARTIFACTS_NET_SHARE\win64\binaries\ingescape\release
+      }
   artifacts:
     paths:
      - build
@@ -188,10 +192,16 @@ lib-windows-release-x86:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - mkdir build\ReleaseX86
-    - cmake -S . -B build\ReleaseX86 -G"$env:VS_CMAKE_GENERATOR" -AWin32 -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID" -DWITH_CSHARP_WRAPPER=ON
+    - cmake -S . -B build\ReleaseX86 -G"$env:VS_CMAKE_GENERATOR" -AWin32 -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DWITH_CSHARP_WRAPPER=ON
     - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildDirectory build/ReleaseX86/bindings/csharp -projectName IngescapeCSharp
     - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildDirectory build/ReleaseX86/bindings/csharp/test -projectName igstester
     - cmake --build build\ReleaseX86 --target ALL_BUILD --config Release
+    - |
+      if ( ($env:CI_PROJECT_ROOT_NAMESPACE -eq "ingescape-private") -and ($env:CI_COMMIT_BRANCH -eq $env:CI_DEFAULT_BRANCH) )
+      {
+        cmake --install .\build\ReleaseX86 --config Release --prefix $env:WORKSPACE_NET_SHARE\Builds\Release\x86
+        cmake --install .\build\ReleaseX86 --config Release --prefix $env:ARTIFACTS_NET_SHARE\win32\binaries\ingescape\release
+      }
   artifacts:
     paths:
      - build
@@ -210,10 +220,16 @@ lib-windows-debug-x64:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - mkdir build\DebugX64
-    - cmake -S . -B build\DebugX64 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Debug -DWITH_DEPS=ON -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID" -DWITH_CSHARP_WRAPPER=ON
+    - cmake -S . -B build\DebugX64 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Debug -DWITH_DEPS=ON -DWITH_CSHARP_WRAPPER=ON
     - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildDirectory build/DebugX64/bindings/csharp -projectName IngescapeCSharp
     - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildDirectory build/DebugX64/bindings/csharp/test -projectName igstester
     - cmake --build build\DebugX64 --target ALL_BUILD --config Debug
+    - |
+      if ( ($env:CI_PROJECT_ROOT_NAMESPACE -eq "ingescape-private") -and ($env:CI_COMMIT_BRANCH -eq $env:CI_DEFAULT_BRANCH) )
+      {
+        cmake --install .\build\DebugX64 --config Debug --prefix $env:WORKSPACE_NET_SHARE\Builds\Debug\x64
+        cmake --install .\build\DebugX64 --config Debug --prefix $env:ARTIFACTS_NET_SHARE\win64\binaries\ingescape\debug
+      }
   artifacts:
     paths:
      - build
@@ -232,10 +248,16 @@ lib-windows-debug-x86:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - mkdir build\DebugX86
-    - cmake -S . -B build\DebugX86 -G"$env:VS_CMAKE_GENERATOR" -AWin32 -DCMAKE_BUILD_TYPE=Debug -DWITH_DEPS=ON -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID" -DWITH_CSHARP_WRAPPER=ON
+    - cmake -S . -B build\DebugX86 -G"$env:VS_CMAKE_GENERATOR" -AWin32 -DCMAKE_BUILD_TYPE=Debug -DWITH_DEPS=ON -DWITH_CSHARP_WRAPPER=ON
     - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildDirectory build/DebugX86/bindings/csharp -projectName IngescapeCSharp
     - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildDirectory build/DebugX86/bindings/csharp/test -projectName igstester
     - cmake --build build\DebugX86 --target ALL_BUILD --config Debug
+    - |
+      if ( ($env:CI_PROJECT_ROOT_NAMESPACE -eq "ingescape-private") -and ($env:CI_COMMIT_BRANCH -eq $env:CI_DEFAULT_BRANCH) )
+      {
+        cmake --install .\build\DebugX86 --config Debug --prefix $env:WORKSPACE_NET_SHARE\Builds\Debug\x86
+        cmake --install .\build\DebugX86 --config Debug --prefix $env:ARTIFACTS_NET_SHARE\win32\binaries\ingescape\debug
+      }
   artifacts:
     paths:
      - build
@@ -255,6 +277,11 @@ lib-installer-runtime-windows-x86:
     - cd build\ReleaseX86
     - cpack --config CPackConfig.cmake
     - cd ..\..
+    - |
+      if ( ($env:CI_PROJECT_ROOT_NAMESPACE -eq "ingescape-private") -and ($env:CI_COMMIT_BRANCH -eq $env:CI_DEFAULT_BRANCH) )
+      {
+        cp build\ReleaseX86\ingescape-*.exe build\ReleaseX86\ingescape-*.zip $env:ARTIFACTS_NET_SHARE\win32\packages\ingescape\release -Force
+      }
   artifacts:
     paths:
       - build\ReleaseX86\ingescape-*.exe
@@ -262,7 +289,7 @@ lib-installer-runtime-windows-x86:
     name: "lib-installer-runtime-windows-x86"
   dependencies:
     - lib-windows-release-x86
-  needs: 
+  needs:
     - lib-windows-release-x86
     - test-csharp-x86-release
 
@@ -278,6 +305,11 @@ lib-installer-runtime-windows-x64:
     - cd build\ReleaseX64
     - cpack --config CPackConfig.cmake
     - cd ..\..
+    - |
+      if ( ($env:CI_PROJECT_ROOT_NAMESPACE -eq "ingescape-private") -and ($env:CI_COMMIT_BRANCH -eq $env:CI_DEFAULT_BRANCH) )
+      {
+        cp build\ReleaseX64\ingescape-*.exe build\ReleaseX64\ingescape-*.zip $env:ARTIFACTS_NET_SHARE\win64\packages\ingescape\release -Force
+      }
   artifacts:
     paths:
       - build\ReleaseX64\ingescape-*.exe
@@ -285,7 +317,7 @@ lib-installer-runtime-windows-x64:
     name: "lib-installer-runtime-windows-x64"
   dependencies:
     - lib-windows-release-x64
-  needs: 
+  needs:
     - lib-windows-release-x64
     - test-csharp-x64-release
 
@@ -301,6 +333,11 @@ lib-installer-debug-windows-x86:
     - cd build\DebugX86
     - cpack --config CPackConfig.cmake -C Debug
     - cd ..\..
+    - |
+      if ( ($env:CI_PROJECT_ROOT_NAMESPACE -eq "ingescape-private") -and ($env:CI_COMMIT_BRANCH -eq $env:CI_DEFAULT_BRANCH) )
+      {
+        cp build\DebugX86\ingescape-*.exe build\DebugX86\ingescape-*.zip $env:ARTIFACTS_NET_SHARE\win32\packages\ingescape\debug -Force
+      }
   artifacts:
     paths:
       - build\DebugX86\ingescape-*.exe
@@ -308,7 +345,7 @@ lib-installer-debug-windows-x86:
     name: "lib-installer-debug-windows-x86"
   dependencies:
     - lib-windows-debug-x86
-  needs: 
+  needs:
     - lib-windows-debug-x86
     - test-csharp-x86-debug
 
@@ -324,6 +361,11 @@ lib-installer-debug-windows-x64:
     - cd build\DebugX64
     - cpack --config CPackConfig.cmake -C Debug
     - cd ..\..
+    - |
+      if ( ($env:CI_PROJECT_ROOT_NAMESPACE -eq "ingescape-private") -and ($env:CI_COMMIT_BRANCH -eq $env:CI_DEFAULT_BRANCH) )
+      {
+        cp build\DebugX64\ingescape-*.exe build\DebugX64\ingescape-*.zip $env:ARTIFACTS_NET_SHARE\win64\packages\ingescape\debug -Force
+      }
   artifacts:
     paths:
       - build\DebugX64\ingescape-*.exe
@@ -331,46 +373,9 @@ lib-installer-debug-windows-x64:
     name: "lib-installer-debug-windows-x64"
   dependencies:
     - lib-windows-debug-x64
-  needs: 
+  needs:
     - lib-windows-debug-x64
     - test-csharp-x64-debug
-
-
-# Deploy ingescape in windows to be able to compile agents
-lib-deploy-windows:
-  extends: .lib-build-files
-  stage: deploy
-  tags:
-    - windows
-  script:
-    - cmake --install .\build\ReleaseX64 --config Release --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64
-    - copy .\include\ingescape_private.h $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64\include\ingescape -Force
-    - cmake --install .\build\ReleaseX86 --config Release --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86
-    - copy .\include\ingescape_private.h $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86\include\ingescape -Force
-    - cmake --install .\build\DebugX64 --config Debug --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64
-    - copy .\include\ingescape_private.h $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64\include\ingescape -Force
-    - cmake --install .\build\DebugX86 --config Debug --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x86
-    - copy .\include\ingescape_private.h $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x86\include\ingescape -Force
-  dependencies: 
-    - lib-windows-release-x64
-    - lib-windows-release-x86
-    - lib-windows-debug-x64
-    - lib-windows-debug-x86
-    - test-csharp-x64-release
-    - test-csharp-x64-debug
-    - test-csharp-x86-release
-    - test-csharp-x86-debug
-  needs: 
-    - lib-windows-release-x64
-    - lib-windows-release-x86
-    - lib-windows-debug-x64
-    - lib-windows-debug-x86
-    - test-csharp-x64-release
-    - test-csharp-x64-debug
-    - test-csharp-x86-release
-    - test-csharp-x86-debug
-  rules:
-    - !reference [.root_namespace, rules]
 
 # _      _
 #| |    (_)
@@ -394,8 +399,16 @@ lib-build-linux-x64:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - mkdir -p build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON
     - make -C build
+    - |
+      if [[ $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]
+      then
+        make -C build DESTDIR=$HOME/builds/release/linux_x64/ install
+        mkdir temp
+        make -C build DESTDIR=temp install
+        mv temp/usr/local/* $env:ARTIFACTS_NET_SHARE\linux64\binaries\ingescape
+      fi
   artifacts:
     paths:
       - ./build
@@ -412,13 +425,20 @@ lib-installer-linux-x64:
   script:
     - export INGESCAPE_MAJOR=$(grep "#define INGESCAPE_VERSION_MAJOR" include/ingescape.h | cut -d ' ' -f3-)
     - export INGESCAPE_MINOR=$(grep "#define INGESCAPE_VERSION_MINOR" include/ingescape.h | cut -d ' ' -f3-)
-    - export INGESCAPE_VERSION=$INGESCAPE_MAJOR.$INGESCAPE_MINOR.$CI_PIPELINE_ID
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCI_PIPELINE_ID=${CI_PIPELINE_ID} -DPACK_TGZ=ON
+    - export INGESCAPE_PATCH=$(grep "#define INGESCAPE_VERSION_PATCH" include/ingescape.h | cut -d ' ' -f3-)
+    - export INGESCAPE_VERSION=$INGESCAPE_MAJOR.$INGESCAPE_MINOR.$INGESCAPE_PATCH
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DPACK_TGZ=ON
     - cd build
     - make package
     - tar xf ingescape-${INGESCAPE_VERSION}-Linux.tar.gz
     - makeself --target /tmp/ingescape-${INGESCAPE_VERSION} ingescape-${INGESCAPE_VERSION}-Linux installer-ingescape-${INGESCAPE_VERSION}-linux-x64.run "Ingescape library v${INGESCAPE_VERSION}" ./install_script.sh
     - cd ..
+    - |
+      if [[ $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]
+      then
+        mkdir -p $ARTIFACTS_NET_SHARE/linux64/packages/ingescape
+        cp build/installer-ingescape-*.run $ARTIFACTS_NET_SHARE/linux64/packages/ingescape
+      fi
     - mv build linux_x64
   artifacts:
     paths:
@@ -426,25 +446,8 @@ lib-installer-linux-x64:
     name: "lib-installer-linux-x64"
   dependencies:
     - lib-build-linux-x64
-  needs: 
+  needs:
     - lib-build-linux-x64
-
-# Deploy ingescape to be able to compile agents
-lib-deploy-linux-release-x64:
-  extends: .lib-build-files
-  stage: deploy
-  tags:
-    - docker
-  image: ingescape/debian-testing-compil
-  script:
-    - make -C build DESTDIR=$HOME/builds/release/linux_x64/ install
-  dependencies:
-    - lib-build-linux-x64
-  needs: 
-    - lib-build-linux-x64
-  rules:
-    - !reference [.root_namespace, rules]
-
 
 ##
 ## Debian with Qt (VM)
@@ -463,7 +466,7 @@ lib-build-debian-qt6-x64:
     - apt-get update || apt-get update
     - apt-get install -y ingescape-dev
     - git clean -xfd
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON
     - make -C build
   artifacts:
     paths:
@@ -485,8 +488,9 @@ lib-installer-debian-qt6-x64:
     - git clean -xfd
     - export INGESCAPE_MAJOR=$(grep "#define INGESCAPE_VERSION_MAJOR" include/ingescape.h | cut -d ' ' -f3-)
     - export INGESCAPE_MINOR=$(grep "#define INGESCAPE_VERSION_MINOR" include/ingescape.h | cut -d ' ' -f3-)
-    - export INGESCAPE_VERSION=$INGESCAPE_MAJOR.$INGESCAPE_MINOR.$CI_PIPELINE_ID
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCI_PIPELINE_ID=${CI_PIPELINE_ID} -DPACK_TGZ=ON
+    - export INGESCAPE_PATCH=$(grep "#define INGESCAPE_VERSION_PATCH" include/ingescape.h | cut -d ' ' -f3-)
+    - export INGESCAPE_VERSION=$INGESCAPE_MAJOR.$INGESCAPE_MINOR.$INGESCAPE_PATCH
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DPACK_TGZ=ON
     - cd build
     - make package
     - tar xf ingescape-${INGESCAPE_VERSION}-Linux.tar.gz
@@ -499,7 +503,7 @@ lib-installer-debian-qt6-x64:
     name: "lib-installer-debian-qt6-x64"
   dependencies:
     - lib-build-debian-qt6-x64
-  needs: 
+  needs:
     - lib-build-debian-qt6-x64
 
 # Deploy ingescape to be able to compile agents
@@ -516,7 +520,7 @@ lib-deploy-debian-qt6-x64:
     - make -C build DESTDIR=$HOME/builds/release/linux_x64/ install
   dependencies:
     - lib-build-debian-qt6-x64
-  needs: 
+  needs:
     - lib-build-debian-qt6-x64
   rules:
     - !reference [.root_namespace, rules]
@@ -537,8 +541,16 @@ lib-linux-release-armhf:
   script:
     - git clean -xfd
     - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCMAKE_TOOLCHAIN_FILE=/toolchain.cmake -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCMAKE_TOOLCHAIN_FILE=/toolchain.cmake
     - make -C build
+    - |
+      if [[ $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]
+      then
+        make -C build install DESTDIR=~/builds/release/armhf
+        mkdir temp
+        make -C build DESTDIR=temp install
+        mv temp/usr/local/* $ARTIFACTS_NET_SHARE/linuxARMHF/binaries/ingescape
+      fi
   artifacts:
     paths:
       - ./build
@@ -555,13 +567,20 @@ lib-installer-runtime-linux-armhf:
   script:
     - export INGESCAPE_MAJOR=$(grep "#define INGESCAPE_VERSION_MAJOR" include/ingescape.h | cut -d ' ' -f3-)
     - export INGESCAPE_MINOR=$(grep "#define INGESCAPE_VERSION_MINOR" include/ingescape.h | cut -d ' ' -f3-)
-    - export INGESCAPE_VERSION=$INGESCAPE_MAJOR.$INGESCAPE_MINOR.$CI_PIPELINE_ID
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCI_PIPELINE_ID=${CI_PIPELINE_ID} -DPACK_TGZ=ON
+    - export INGESCAPE_PATCH=$(grep "#define INGESCAPE_VERSION_PATCH" include/ingescape.h | cut -d ' ' -f3-)
+    - export INGESCAPE_VERSION=$INGESCAPE_MAJOR.$INGESCAPE_MINOR.$INGESCAPE_PATCH
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DPACK_TGZ=ON
     - cd build
     - make package
     - tar xf ingescape-${INGESCAPE_VERSION}-Linux.tar.gz
     - makeself --target /tmp/ingescape-${INGESCAPE_VERSION} ingescape-${INGESCAPE_VERSION}-Linux installer-ingescape-${INGESCAPE_VERSION}-linux-armhf.run "Ingescape library v${INGESCAPE_VERSION}" ./install_script.sh
     - cd ..
+    - |
+      if [[ $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]
+      then
+        mkdir mkdir -p $ARTIFACTS_NET_SHARE/linuxARMHF/packages/ingescape
+        cp build/installer-ingescape-*.run $ARTIFACTS_NET_SHARE/linuxARMHF/packages/ingescape
+      fi
     - mv build linux_armhf
   artifacts:
     paths:
@@ -569,22 +588,6 @@ lib-installer-runtime-linux-armhf:
     name: "lib-installer-runtime-linux-armhf"
   dependencies:
     - lib-linux-release-armhf
-
-# Deploy ingescape to be able to compile agents
-lib-deploy-linux-release-armhf:
-  extends: .lib-build-files
-  stage: deploy
-  tags:
-    - docker
-  image: ingescape/ubuntu-x-compil-rpi
-  script:
-    - make -C build install DESTDIR=~/builds/release/armhf
-    - cp include/ingescape_private.h ~/builds/release/armhf/usr/local/include/ingescape/
-  dependencies:
-    - lib-linux-release-armhf
-  rules:
-    - !reference [.root_namespace, rules]
-
 
 ##
 ## aarch64 (Android)
@@ -602,8 +605,16 @@ lib-android-release-aarch64:
   script:
     - git clean -xfd
     - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCMAKE_TOOLCHAIN_FILE=/${ANDROID_NDK_TOOLCHAIN_FILE} -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCMAKE_TOOLCHAIN_FILE=/${ANDROID_NDK_TOOLCHAIN_FILE}
     - make -C build
+    - |
+      if [[ $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]
+      then
+        make -C build install DESTDIR=~/builds/release/aarch64
+        mkdir temp
+        make -C build DESTDIR=temp install
+        mv temp/usr/local/* $ARTIFACTS_NET_SHARE/armAARCH64/binaries/ingescape
+      fi
   artifacts:
     paths:
       - build
@@ -620,27 +631,18 @@ lib-installer-runtime-android-aarch64:
   script:
     - make -C build package
     - mv _packages android-arm64
+    - |
+      if [[ $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]
+      then
+        mkdir mkdir -p $ARTIFACTS_NET_SHARE/armAARCH64/packages/ingescape
+        cp android-arm64/ingescape-* DESTDIR=$ARTIFACTS_NET_SHARE/armAARCH64/packages/ingescape
+      fi
   artifacts:
     paths:
       - android-arm64/ingescape-*
     name: "lib-installer-runtime-android-aarch64"
   dependencies:
     - lib-android-release-aarch64
-
-# Deploy ingescape to be able to compile agents
-lib-deploy-linux-release-aarch64:
-  extends: .lib-build-files
-  stage: deploy
-  tags:
-    - docker
-  image: ingescape/ubuntu-x-compil-android-aarch64
-  script:
-    - make -C build install DESTDIR=~/builds/release/aarch64
-    - cp include/ingescape_private.h ~/builds/release/aarch64/usr/local/include/ingescape/
-  dependencies:
-    - lib-android-release-aarch64
-  rules:
-    - !reference [.root_namespace, rules]
 
 ##
 ## armv7a (Android)
@@ -658,8 +660,16 @@ lib-android-release-armv7a-softfp:
   script:
     - git clean -xfd
     - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCMAKE_TOOLCHAIN_FILE=/${ANDROID_NDK_TOOLCHAIN_FILE} -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCMAKE_TOOLCHAIN_FILE=/${ANDROID_NDK_TOOLCHAIN_FILE}
     - make -C build
+    - |
+      if [[ $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]
+      then
+        make -C build install DESTDIR=~/builds/release/armv7a-sf
+        mkdir temp
+        make -C build DESTDIR=temp install
+        mv temp/usr/local/* $ARTIFACTS_NET_SHARE/armARMV7/binaries/ingescape
+      fi
   artifacts:
     paths:
       - build
@@ -676,28 +686,18 @@ lib-installer-runtime-android-armv7a-softfp:
   script:
     - make -C build package
     - mv _packages android
+    - |
+      if [[ $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]
+      then
+        mkdir mkdir -p $ARTIFACTS_NET_SHARE/armARMV7/packages/ingescape
+        cp android/ingescape-* DESTDIR=$ARTIFACTS_NET_SHARE/armARMV7/packages/ingescape
+      fi
   artifacts:
     paths:
       - android/ingescape-*
     name: "lib-installer-runtime-android-armv7a-softfp"
   dependencies:
     - lib-android-release-armv7a-softfp
-
-# Deploy ingescape to be able to compile agents
-lib-deploy-linux-release-armv7a-softfp:
-  extends: .lib-build-files
-  stage: deploy
-  tags:
-    - docker
-  image: ingescape/ubuntu-x-compil-android
-  script:
-    - make -C build install DESTDIR=~/builds/release/armv7a-sf
-    - cp include/ingescape_private.h ~/builds/release/armv7a-sf/usr/local/include/ingescape/
-  dependencies:
-    - lib-android-release-armv7a-softfp
-  rules:
-    - !reference [.root_namespace, rules]
-
 
 ##
 ## Debian (.deb package)
@@ -734,6 +734,7 @@ build-deb-packages:
     - (cd b_debug && cpack -G DEB)
     - (cd _packages && dpkg-deb -R ingescape-debug-dev*.deb p && tree p && rm -rf p)
     - mv _packages/ingescape-debug-dev*.deb debian_x64
+    - cp debian_x64/* $ARTIFACTS_NET_SHARE/linux64/packages/ingescape
     - echo "Setting up SSH"
     - mkdir -p ~/.ssh/
     - ssh-keyscan -t rsa ingescape.com >> ~/.ssh/known_hosts
@@ -753,14 +754,14 @@ build-deb-packages:
 
 
 
-#   _   _           _             _  _____ 
+#   _   _           _             _  _____
 #  | \ | |         | |           | |/ ____|
-#  |  \| | ___   __| | ___       | | (___  
-#  | . ` |/ _ \ / _` |/ _ \  _   | |\___ \ 
+#  |  \| | ___   __| | ___       | | (___
+#  | . ` |/ _ \ / _` |/ _ \  _   | |\___ \
 #  | |\  | (_) | (_| |  __/ | |__| |____) |
-#  |_| \_|\___/ \__,_|\___|  \____/|_____/ 
+#  |_| \_|\___/ \__,_|\___|  \____/|_____/
 
-## Builds                                    
+## Builds
 binding-node-js-macos:
   stage: binding-build
   tags:
@@ -779,7 +780,7 @@ binding-node-js-macos:
     - cp -r ../../dependencies/libzmq/include/* ./dependencies/include
     - cp -r ../../dependencies/sodium/src/libsodium/include/* ./dependencies/include
     - cp -r ../../dependencies/zyre/include/* ./dependencies/include
-    - sed -i .bak 's@/usr/local@<!(echo $PWD)/dependencies@g' binding.gyp #update file paths for igs 
+    - sed -i .bak 's@/usr/local@<!(echo $PWD)/dependencies@g' binding.gyp #update file paths for igs
     - cat ./binding.gyp
     - npm install -g prebuildify
     - npm run build --from_sources=1
@@ -788,7 +789,7 @@ binding-node-js-macos:
       - bindings/javascript-node/prebuilds
   dependencies:
     - lib-build-macos
-  needs: 
+  needs:
     - lib-build-macos
 
 binding-node-js-linux:
@@ -810,7 +811,7 @@ binding-node-js-linux:
     - cp -r ../../dependencies/libzmq/include/* ./dependencies/include
     - cp -r ../../dependencies/sodium/src/libsodium/include/* ./dependencies/include
     - cp -r ../../dependencies/zyre/include/* ./dependencies/include
-    - sed -i.bak 's@/usr/local@<!(echo $PWD)/dependencies@g' binding.gyp #update file paths for igs 
+    - sed -i.bak 's@/usr/local@<!(echo $PWD)/dependencies@g' binding.gyp #update file paths for igs
     - cat ./binding.gyp
     - npm install -g prebuildify
     - npm run build --from_sources=1
@@ -819,7 +820,7 @@ binding-node-js-linux:
       - bindings/javascript-node/prebuilds
   dependencies:
     - lib-build-linux-x64
-  needs: 
+  needs:
     - lib-build-linux-x64
 
 binding-node-js-windows:
@@ -852,7 +853,7 @@ binding-node-js-windows:
       - bindings/javascript-node/prebuilds
   dependencies:
     - lib-windows-release-x64
-  needs: 
+  needs:
     - lib-windows-release-x64
 
 
@@ -913,14 +914,14 @@ deploy-node-js:
   rules:
     - !reference [.root_namespace, rules]
 
-#   _____       _   _                 
-#  |  __ \     | | | |                
-#  | |__) |   _| |_| |__   ___  _ __  
-#  |  ___/ | | | __| '_ \ / _ \| '_ \ 
+#   _____       _   _
+#  |  __ \     | | | |
+#  | |__) |   _| |_| |__   ___  _ __
+#  |  ___/ | | | __| '_ \ / _ \| '_ \
 #  | |   | |_| | |_| | | | (_) | | | |
 #  |_|    \__, |\__|_| |_|\___/|_| |_|
-#          __/ |                      
-#         |___/                       
+#          __/ |
+#         |___/
 
 #Tests
 test-python:
@@ -949,7 +950,7 @@ test-python:
       - bindings/python/dependencies/*
   dependencies:
     - lib-build-linux-x64
-  needs: 
+  needs:
     - lib-build-linux-x64
 
 ## Package
@@ -1161,12 +1162,12 @@ publish-python-package:
   rules:
     - !reference [.root_namespace, rules]
 
-#   _____     _  _   
-#  / ____|  _| || |_ 
+#   _____     _  _
+#  / ____|  _| || |_
 # | |      |_  __  _|
-# | |       _| || |_ 
+# | |       _| || |_
 # | |____  |_  __  _|
-#  \_____|   |_||_|  
+#  \_____|   |_||_|
 
 ## Tests
 test-csharp-x64-debug:
