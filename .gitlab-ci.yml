@@ -59,7 +59,7 @@ lib-build-macos:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - git clean -xfd
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON
     - make -j8 -C build
   artifacts:
     paths:
@@ -98,7 +98,7 @@ lib-installer-macos:
     name: "lib-installer-macos"
   dependencies:
     - lib-build-macos
-  needs: 
+  needs:
     - lib-build-macos
 
 
@@ -111,7 +111,7 @@ lib-deploy-macos:
     - make -C build DESTDIR=$HOME/builds/sysroot install
   dependencies:
     - lib-build-macos
-  needs: 
+  needs:
     - lib-build-macos
   rules:
     - !reference [.root_namespace, rules]
@@ -128,7 +128,7 @@ lib-build-macos-qt6:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - git clean -xfd
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DOSX_UNIVERSAL=ON -DWITH_DEPS=ON -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DOSX_UNIVERSAL=ON -DWITH_DEPS=ON
     - make -j8 -C build
     - |
       if [[ $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]
@@ -164,7 +164,7 @@ lib-windows-release-x64:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - mkdir build\ReleaseX64
-    - cmake -S . -B build\ReleaseX64 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID" -DWITH_CSHARP_WRAPPER=ON
+    - cmake -S . -B build\ReleaseX64 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DWITH_CSHARP_WRAPPER=ON
     - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildDirectory build/ReleaseX64/bindings/csharp -projectName IngescapeCSharp
     - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildDirectory build/ReleaseX64/bindings/csharp/test -projectName igstester
     - cmake --build build\ReleaseX64 --target ALL_BUILD --config Release
@@ -192,7 +192,7 @@ lib-windows-release-x86:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - mkdir build\ReleaseX86
-    - cmake -S . -B build\ReleaseX86 -G"$env:VS_CMAKE_GENERATOR" -AWin32 -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID" -DWITH_CSHARP_WRAPPER=ON
+    - cmake -S . -B build\ReleaseX86 -G"$env:VS_CMAKE_GENERATOR" -AWin32 -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DWITH_CSHARP_WRAPPER=ON
     - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildDirectory build/ReleaseX86/bindings/csharp -projectName IngescapeCSharp
     - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildDirectory build/ReleaseX86/bindings/csharp/test -projectName igstester
     - cmake --build build\ReleaseX86 --target ALL_BUILD --config Release
@@ -220,7 +220,7 @@ lib-windows-debug-x64:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - mkdir build\DebugX64
-    - cmake -S . -B build\DebugX64 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Debug -DWITH_DEPS=ON -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID" -DWITH_CSHARP_WRAPPER=ON
+    - cmake -S . -B build\DebugX64 -G"$env:VS_CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=Debug -DWITH_DEPS=ON -DWITH_CSHARP_WRAPPER=ON
     - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildDirectory build/DebugX64/bindings/csharp -projectName IngescapeCSharp
     - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildDirectory build/DebugX64/bindings/csharp/test -projectName igstester
     - cmake --build build\DebugX64 --target ALL_BUILD --config Debug
@@ -248,7 +248,7 @@ lib-windows-debug-x86:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - mkdir build\DebugX86
-    - cmake -S . -B build\DebugX86 -G"$env:VS_CMAKE_GENERATOR" -AWin32 -DCMAKE_BUILD_TYPE=Debug -DWITH_DEPS=ON -DCI_PIPELINE_ID="$env:CI_PIPELINE_ID" -DWITH_CSHARP_WRAPPER=ON
+    - cmake -S . -B build\DebugX86 -G"$env:VS_CMAKE_GENERATOR" -AWin32 -DCMAKE_BUILD_TYPE=Debug -DWITH_DEPS=ON -DWITH_CSHARP_WRAPPER=ON
     - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildDirectory build/DebugX86/bindings/csharp -projectName IngescapeCSharp
     - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildDirectory build/DebugX86/bindings/csharp/test -projectName igstester
     - cmake --build build\DebugX86 --target ALL_BUILD --config Debug
@@ -289,7 +289,7 @@ lib-installer-runtime-windows-x86:
     name: "lib-installer-runtime-windows-x86"
   dependencies:
     - lib-windows-release-x86
-  needs: 
+  needs:
     - lib-windows-release-x86
     - test-csharp-x86-release
 
@@ -317,7 +317,7 @@ lib-installer-runtime-windows-x64:
     name: "lib-installer-runtime-windows-x64"
   dependencies:
     - lib-windows-release-x64
-  needs: 
+  needs:
     - lib-windows-release-x64
     - test-csharp-x64-release
 
@@ -345,7 +345,7 @@ lib-installer-debug-windows-x86:
     name: "lib-installer-debug-windows-x86"
   dependencies:
     - lib-windows-debug-x86
-  needs: 
+  needs:
     - lib-windows-debug-x86
     - test-csharp-x86-debug
 
@@ -373,7 +373,7 @@ lib-installer-debug-windows-x64:
     name: "lib-installer-debug-windows-x64"
   dependencies:
     - lib-windows-debug-x64
-  needs: 
+  needs:
     - lib-windows-debug-x64
     - test-csharp-x64-debug
 
@@ -399,7 +399,7 @@ lib-build-linux-x64:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - mkdir -p build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON
     - make -C build
     - |
       if [[ $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]
@@ -425,13 +425,14 @@ lib-installer-linux-x64:
   script:
     - export INGESCAPE_MAJOR=$(grep "#define INGESCAPE_VERSION_MAJOR" include/ingescape.h | cut -d ' ' -f3-)
     - export INGESCAPE_MINOR=$(grep "#define INGESCAPE_VERSION_MINOR" include/ingescape.h | cut -d ' ' -f3-)
-    - export INGESCAPE_VERSION=$INGESCAPE_MAJOR.$INGESCAPE_MINOR.$CI_PIPELINE_ID
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCI_PIPELINE_ID=${CI_PIPELINE_ID} -DPACK_TGZ=ON
+    - export INGESCAPE_PATCH=$(grep "#define INGESCAPE_VERSION_PATCH" include/ingescape.h | cut -d ' ' -f3-)
+    - export INGESCAPE_VERSION=$INGESCAPE_MAJOR.$INGESCAPE_MINOR.$INGESCAPE_PATCH
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DPACK_TGZ=ON
     - cd build
     - make package
     - tar xf ingescape-${INGESCAPE_VERSION}-Linux.tar.gz
     - makeself --target /tmp/ingescape-${INGESCAPE_VERSION} ingescape-${INGESCAPE_VERSION}-Linux installer-ingescape-${INGESCAPE_VERSION}-linux-x64.run "Ingescape library v${INGESCAPE_VERSION}" ./install_script.sh
-    - cd ..   
+    - cd ..
     - |
       if [[ $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]
       then
@@ -445,7 +446,7 @@ lib-installer-linux-x64:
     name: "lib-installer-linux-x64"
   dependencies:
     - lib-build-linux-x64
-  needs: 
+  needs:
     - lib-build-linux-x64
 
 ##
@@ -465,7 +466,7 @@ lib-build-debian-qt6-x64:
     - apt-get update || apt-get update
     - apt-get install -y ingescape-dev
     - git clean -xfd
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON
     - make -C build
   artifacts:
     paths:
@@ -487,8 +488,9 @@ lib-installer-debian-qt6-x64:
     - git clean -xfd
     - export INGESCAPE_MAJOR=$(grep "#define INGESCAPE_VERSION_MAJOR" include/ingescape.h | cut -d ' ' -f3-)
     - export INGESCAPE_MINOR=$(grep "#define INGESCAPE_VERSION_MINOR" include/ingescape.h | cut -d ' ' -f3-)
-    - export INGESCAPE_VERSION=$INGESCAPE_MAJOR.$INGESCAPE_MINOR.$CI_PIPELINE_ID
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCI_PIPELINE_ID=${CI_PIPELINE_ID} -DPACK_TGZ=ON
+    - export INGESCAPE_PATCH=$(grep "#define INGESCAPE_VERSION_PATCH" include/ingescape.h | cut -d ' ' -f3-)
+    - export INGESCAPE_VERSION=$INGESCAPE_MAJOR.$INGESCAPE_MINOR.$INGESCAPE_PATCH
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DPACK_TGZ=ON
     - cd build
     - make package
     - tar xf ingescape-${INGESCAPE_VERSION}-Linux.tar.gz
@@ -501,7 +503,7 @@ lib-installer-debian-qt6-x64:
     name: "lib-installer-debian-qt6-x64"
   dependencies:
     - lib-build-debian-qt6-x64
-  needs: 
+  needs:
     - lib-build-debian-qt6-x64
 
 # Deploy ingescape to be able to compile agents
@@ -518,7 +520,7 @@ lib-deploy-debian-qt6-x64:
     - make -C build DESTDIR=$HOME/builds/release/linux_x64/ install
   dependencies:
     - lib-build-debian-qt6-x64
-  needs: 
+  needs:
     - lib-build-debian-qt6-x64
   rules:
     - !reference [.root_namespace, rules]
@@ -539,7 +541,7 @@ lib-linux-release-armhf:
   script:
     - git clean -xfd
     - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCMAKE_TOOLCHAIN_FILE=/toolchain.cmake -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCMAKE_TOOLCHAIN_FILE=/toolchain.cmake
     - make -C build
     - |
       if [[ $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]
@@ -565,8 +567,9 @@ lib-installer-runtime-linux-armhf:
   script:
     - export INGESCAPE_MAJOR=$(grep "#define INGESCAPE_VERSION_MAJOR" include/ingescape.h | cut -d ' ' -f3-)
     - export INGESCAPE_MINOR=$(grep "#define INGESCAPE_VERSION_MINOR" include/ingescape.h | cut -d ' ' -f3-)
-    - export INGESCAPE_VERSION=$INGESCAPE_MAJOR.$INGESCAPE_MINOR.$CI_PIPELINE_ID
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCI_PIPELINE_ID=${CI_PIPELINE_ID} -DPACK_TGZ=ON
+    - export INGESCAPE_PATCH=$(grep "#define INGESCAPE_VERSION_PATCH" include/ingescape.h | cut -d ' ' -f3-)
+    - export INGESCAPE_VERSION=$INGESCAPE_MAJOR.$INGESCAPE_MINOR.$INGESCAPE_PATCH
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DPACK_TGZ=ON
     - cd build
     - make package
     - tar xf ingescape-${INGESCAPE_VERSION}-Linux.tar.gz
@@ -602,7 +605,7 @@ lib-android-release-aarch64:
   script:
     - git clean -xfd
     - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCMAKE_TOOLCHAIN_FILE=/${ANDROID_NDK_TOOLCHAIN_FILE} -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCMAKE_TOOLCHAIN_FILE=/${ANDROID_NDK_TOOLCHAIN_FILE}
     - make -C build
     - |
       if [[ $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]
@@ -657,7 +660,7 @@ lib-android-release-armv7a-softfp:
   script:
     - git clean -xfd
     - mkdir build
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCMAKE_TOOLCHAIN_FILE=/${ANDROID_NDK_TOOLCHAIN_FILE} -DCI_PIPELINE_ID=${CI_PIPELINE_ID}
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCMAKE_TOOLCHAIN_FILE=/${ANDROID_NDK_TOOLCHAIN_FILE}
     - make -C build
     - |
       if [[ $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]
@@ -752,14 +755,14 @@ build-deb-packages:
 
 
 
-#   _   _           _             _  _____ 
+#   _   _           _             _  _____
 #  | \ | |         | |           | |/ ____|
-#  |  \| | ___   __| | ___       | | (___  
-#  | . ` |/ _ \ / _` |/ _ \  _   | |\___ \ 
+#  |  \| | ___   __| | ___       | | (___
+#  | . ` |/ _ \ / _` |/ _ \  _   | |\___ \
 #  | |\  | (_) | (_| |  __/ | |__| |____) |
-#  |_| \_|\___/ \__,_|\___|  \____/|_____/ 
+#  |_| \_|\___/ \__,_|\___|  \____/|_____/
 
-## Builds                                    
+## Builds
 binding-node-js-macos:
   stage: binding-build
   tags:
@@ -778,7 +781,7 @@ binding-node-js-macos:
     - cp -r ../../dependencies/libzmq/include/* ./dependencies/include
     - cp -r ../../dependencies/sodium/src/libsodium/include/* ./dependencies/include
     - cp -r ../../dependencies/zyre/include/* ./dependencies/include
-    - sed -i .bak 's@/usr/local@<!(echo $PWD)/dependencies@g' binding.gyp #update file paths for igs 
+    - sed -i .bak 's@/usr/local@<!(echo $PWD)/dependencies@g' binding.gyp #update file paths for igs
     - cat ./binding.gyp
     - npm install -g prebuildify
     - npm run build --from_sources=1
@@ -787,7 +790,7 @@ binding-node-js-macos:
       - bindings/javascript-node/prebuilds
   dependencies:
     - lib-build-macos
-  needs: 
+  needs:
     - lib-build-macos
 
 binding-node-js-linux:
@@ -809,7 +812,7 @@ binding-node-js-linux:
     - cp -r ../../dependencies/libzmq/include/* ./dependencies/include
     - cp -r ../../dependencies/sodium/src/libsodium/include/* ./dependencies/include
     - cp -r ../../dependencies/zyre/include/* ./dependencies/include
-    - sed -i.bak 's@/usr/local@<!(echo $PWD)/dependencies@g' binding.gyp #update file paths for igs 
+    - sed -i.bak 's@/usr/local@<!(echo $PWD)/dependencies@g' binding.gyp #update file paths for igs
     - cat ./binding.gyp
     - npm install -g prebuildify
     - npm run build --from_sources=1
@@ -818,7 +821,7 @@ binding-node-js-linux:
       - bindings/javascript-node/prebuilds
   dependencies:
     - lib-build-linux-x64
-  needs: 
+  needs:
     - lib-build-linux-x64
 
 binding-node-js-windows:
@@ -851,7 +854,7 @@ binding-node-js-windows:
       - bindings/javascript-node/prebuilds
   dependencies:
     - lib-windows-release-x64
-  needs: 
+  needs:
     - lib-windows-release-x64
 
 
@@ -912,14 +915,14 @@ deploy-node-js:
   rules:
     - !reference [.root_namespace, rules]
 
-#   _____       _   _                 
-#  |  __ \     | | | |                
-#  | |__) |   _| |_| |__   ___  _ __  
-#  |  ___/ | | | __| '_ \ / _ \| '_ \ 
+#   _____       _   _
+#  |  __ \     | | | |
+#  | |__) |   _| |_| |__   ___  _ __
+#  |  ___/ | | | __| '_ \ / _ \| '_ \
 #  | |   | |_| | |_| | | | (_) | | | |
 #  |_|    \__, |\__|_| |_|\___/|_| |_|
-#          __/ |                      
-#         |___/                       
+#          __/ |
+#         |___/
 
 #Tests
 test-python:
@@ -948,7 +951,7 @@ test-python:
       - bindings/python/dependencies/*
   dependencies:
     - lib-build-linux-x64
-  needs: 
+  needs:
     - lib-build-linux-x64
 
 ## Package
@@ -1160,12 +1163,12 @@ publish-python-package:
   rules:
     - !reference [.root_namespace, rules]
 
-#   _____     _  _   
-#  / ____|  _| || |_ 
+#   _____     _  _
+#  / ____|  _| || |_
 # | |      |_  __  _|
-# | |       _| || |_ 
+# | |       _| || |_
 # | |____  |_  __  _|
-#  \_____|   |_||_|  
+#  \_____|   |_||_|
 
 ## Tests
 test-csharp-x64-debug:
