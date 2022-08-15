@@ -514,12 +514,11 @@ const igs_iop_t *model_write_iop (igsagent_t *agent, const char *name,
                     size_t s = 0;
                     if (value) {
                         uint8_t *converted = s_model_string_to_bytes (value);
-                        iop->value.data = converted;
-                        if (converted)
+                        if (converted){
+                            iop->value.data = converted;
                             s = strlen (value) / 2;
-                        else {
-                            igs_error ("string %s is not a valid "
-                                       "hexadecimal-encoded string",
+                        }else {
+                            igs_error ("string %s is not a valid hexadecimal-encoded string",
                                        (char *) value);
                             model_read_write_unlock (__FUNCTION__, __LINE__);
                             return NULL;
