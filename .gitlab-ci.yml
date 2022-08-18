@@ -12,7 +12,7 @@ stages:
 
 workflow:
   rules:
-  - if: $CI_PIPELINE_SOURCE == "web" || $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
+  - if: $CI_PIPELINE_SOURCE == "web" || $CI_PROJECT_ROOT_NAMESPACE == "soum"
     when: always
   - when: never
 
@@ -35,11 +35,11 @@ variables:
 
 .base_repo_main_branch:
   rules:
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_BRANCH == "fix_ci"'
 
 .root_namespace:
   rules:
-    - if: '$CI_PROJECT_ROOT_NAMESPACE == "ingescape-private" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_PROJECT_ROOT_NAMESPACE == "soum" && $CI_COMMIT_BRANCH == "fix_ci"'
 
 #http://patorjk.com/software/taag/#p=display&f=Big&t=Windows
 #                       ____   _____
@@ -131,7 +131,7 @@ lib-build-macos-qt6:
     - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DOSX_UNIVERSAL=ON -DWITH_DEPS=ON
     - make -j8 -C build
     - |
-      if [[ $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]
+      if [[ $CI_PROJECT_ROOT_NAMESPACE == "soum" && $CI_COMMIT_BRANCH == "fix_ci" ]]
       then
         make -C build DESTDIR=$HOME/builds/sysroot install
         make -C build DESTDIR=temp install
@@ -170,7 +170,7 @@ lib-windows-release-x64:
     - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildDirectory build/ReleaseX64/bindings/csharp/test -projectName igstester
     - cmake --build build\ReleaseX64 --target ALL_BUILD --config Release
     - |
-      if ( ($env:CI_PROJECT_ROOT_NAMESPACE -eq "ingescape-private") -and ($env:CI_COMMIT_BRANCH -eq $env:CI_DEFAULT_BRANCH) )
+      if ( ($env:CI_PROJECT_ROOT_NAMESPACE -eq "soum") -and ($env:CI_COMMIT_BRANCH -eq "fix_ci") )
       {
         cmake --install .\build\ReleaseX64 --config Release --prefix $env:WORKSPACE_NET_SHARE\Builds\Release\x64
         cmake --install .\build\ReleaseX64 --config Release --prefix $env:ARTIFACTS_NET_SHARE\win64\binaries\ingescape\release
@@ -198,7 +198,7 @@ lib-windows-release-x86:
     - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildDirectory build/ReleaseX86/bindings/csharp/test -projectName igstester
     - cmake --build build\ReleaseX86 --target ALL_BUILD --config Release
     - |
-      if ( ($env:CI_PROJECT_ROOT_NAMESPACE -eq "ingescape-private") -and ($env:CI_COMMIT_BRANCH -eq $env:CI_DEFAULT_BRANCH) )
+      if ( ($env:CI_PROJECT_ROOT_NAMESPACE -eq "soum") -and ($env:CI_COMMIT_BRANCH -eq "fix_ci") )
       {
         cmake --install .\build\ReleaseX86 --config Release --prefix $env:WORKSPACE_NET_SHARE\Builds\Release\x86
         cmake --install .\build\ReleaseX86 --config Release --prefix $env:ARTIFACTS_NET_SHARE\win32\binaries\ingescape\release
@@ -226,7 +226,7 @@ lib-windows-debug-x64:
     - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildDirectory build/DebugX64/bindings/csharp/test -projectName igstester
     - cmake --build build\DebugX64 --target ALL_BUILD --config Debug
     - |
-      if ( ($env:CI_PROJECT_ROOT_NAMESPACE -eq "ingescape-private") -and ($env:CI_COMMIT_BRANCH -eq $env:CI_DEFAULT_BRANCH) )
+      if ( ($env:CI_PROJECT_ROOT_NAMESPACE -eq "soum") -and ($env:CI_COMMIT_BRANCH -eq "fix_ci") )
       {
         cmake --install .\build\DebugX64 --config Debug --prefix $env:WORKSPACE_NET_SHARE\Builds\Debug\x64
         cmake --install .\build\DebugX64 --config Debug --prefix $env:ARTIFACTS_NET_SHARE\win64\binaries\ingescape\debug
@@ -254,7 +254,7 @@ lib-windows-debug-x86:
     - Powershell.exe -executionpolicy remotesigned bindings/csharp/builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildDirectory build/DebugX86/bindings/csharp/test -projectName igstester
     - cmake --build build\DebugX86 --target ALL_BUILD --config Debug
     - |
-      if ( ($env:CI_PROJECT_ROOT_NAMESPACE -eq "ingescape-private") -and ($env:CI_COMMIT_BRANCH -eq $env:CI_DEFAULT_BRANCH) )
+      if ( ($env:CI_PROJECT_ROOT_NAMESPACE -eq "soum") -and ($env:CI_COMMIT_BRANCH -eq "fix_ci") )
       {
         cmake --install .\build\DebugX86 --config Debug --prefix $env:WORKSPACE_NET_SHARE\Builds\Debug\x86
         cmake --install .\build\DebugX86 --config Debug --prefix $env:ARTIFACTS_NET_SHARE\win32\binaries\ingescape\debug
@@ -279,7 +279,7 @@ lib-installer-release-windows-x86:
     - cpack --config CPackConfig.cmake
     - cd ..\..
     - |
-      if ( ($env:CI_PROJECT_ROOT_NAMESPACE -eq "ingescape-private") -and ($env:CI_COMMIT_BRANCH -eq $env:CI_DEFAULT_BRANCH) )
+      if ( ($env:CI_PROJECT_ROOT_NAMESPACE -eq "soum") -and ($env:CI_COMMIT_BRANCH -eq "fix_ci") )
       {
         mkdir $env:ARTIFACTS_NET_SHARE\win32\packages\ingescape\release -fo
         cp build\ReleaseX86\ingescape-*.exe $env:ARTIFACTS_NET_SHARE\win32\packages\ingescape\release -Force
@@ -309,7 +309,7 @@ lib-installer-release-windows-x64:
     - cpack --config CPackConfig.cmake
     - cd ..\..
     - |
-      if ( ($env:CI_PROJECT_ROOT_NAMESPACE -eq "ingescape-private") -and ($env:CI_COMMIT_BRANCH -eq $env:CI_DEFAULT_BRANCH) )
+      if ( ($env:CI_PROJECT_ROOT_NAMESPACE -eq "soum") -and ($env:CI_COMMIT_BRANCH -eq "fix_ci") )
       {
         mkdir $env:ARTIFACTS_NET_SHARE\win64\packages\ingescape\release -fo
         cp build\ReleaseX64\ingescape-*.exe $env:ARTIFACTS_NET_SHARE\win64\packages\ingescape\release -Force
@@ -339,7 +339,7 @@ lib-installer-debug-windows-x86:
     - cpack --config CPackConfig.cmake -C Debug
     - cd ..\..
     - |
-      if ( ($env:CI_PROJECT_ROOT_NAMESPACE -eq "ingescape-private") -and ($env:CI_COMMIT_BRANCH -eq $env:CI_DEFAULT_BRANCH) )
+      if ( ($env:CI_PROJECT_ROOT_NAMESPACE -eq "soum") -and ($env:CI_COMMIT_BRANCH -eq "fix_ci") )
       {
         mkdir $env:ARTIFACTS_NET_SHARE\win32\packages\ingescape\debug -fo
         cp build\DebugX86\ingescape-*.exe $env:ARTIFACTS_NET_SHARE\win32\packages\ingescape\debug -Force
@@ -369,7 +369,7 @@ lib-installer-debug-windows-x64:
     - cpack --config CPackConfig.cmake -C Debug
     - cd ..\..
     - |
-      if ( ($env:CI_PROJECT_ROOT_NAMESPACE -eq "ingescape-private") -and ($env:CI_COMMIT_BRANCH -eq $env:CI_DEFAULT_BRANCH) )
+      if ( ($env:CI_PROJECT_ROOT_NAMESPACE -eq "soum") -and ($env:CI_COMMIT_BRANCH -eq "fix_ci") )
       {
         mkdir $env:ARTIFACTS_NET_SHARE\win64\packages\ingescape\debug -fo
         cp build\DebugX64\ingescape-*.exe $env:ARTIFACTS_NET_SHARE\win64\packages\ingescape\debug -Force
@@ -411,7 +411,7 @@ lib-build-linux-x64:
     - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON
     - make -C build
     - |
-      if [[ $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]
+      if [[ $CI_PROJECT_ROOT_NAMESPACE == "soum" && $CI_COMMIT_BRANCH == "fix_ci" ]]
       then
         make -C build DESTDIR=$HOME/builds/release/linux_x64/ install
         make -C build DESTDIR=temp install
@@ -444,7 +444,7 @@ lib-installer-linux-x64:
     - makeself --target /tmp/ingescape-${INGESCAPE_VERSION} ingescape-${INGESCAPE_VERSION}-Linux installer-ingescape-${INGESCAPE_VERSION}-linux-x64.run "Ingescape library v${INGESCAPE_VERSION}" ./install_script.sh
     - cd ..
     - |
-      if [[ $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]
+      if [[ $CI_PROJECT_ROOT_NAMESPACE == "soum" && $CI_COMMIT_BRANCH == "fix_ci" ]]
       then
         mkdir -p $ARTIFACTS_NET_SHARE/linux64/packages/ingescape
         cp build/installer-ingescape-*.run $ARTIFACTS_NET_SHARE/linux64/packages/ingescape
@@ -547,7 +547,7 @@ lib-linux-release-armhf:
     - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCMAKE_TOOLCHAIN_FILE=/toolchain.cmake
     - make -C build
     - |
-      if [[ $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]
+      if [[ $CI_PROJECT_ROOT_NAMESPACE == "soum" && $CI_COMMIT_BRANCH == "fix_ci" ]]
       then
         make -C build install DESTDIR=~/builds/release/armhf
         make -C build DESTDIR=temp install
@@ -580,7 +580,7 @@ lib-installer-runtime-linux-armhf:
     - makeself --target /tmp/ingescape-${INGESCAPE_VERSION} ingescape-${INGESCAPE_VERSION}-Linux installer-ingescape-${INGESCAPE_VERSION}-linux-armhf.run "Ingescape library v${INGESCAPE_VERSION}" ./install_script.sh
     - cd ..
     - |
-      if [[ $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]
+      if [[ $CI_PROJECT_ROOT_NAMESPACE == "soum" && $CI_COMMIT_BRANCH == "fix_ci" ]]
       then
         mkdir mkdir -p $ARTIFACTS_NET_SHARE/linuxARMHF/packages/ingescape
         cp build/installer-ingescape-*.run $ARTIFACTS_NET_SHARE/linuxARMHF/packages/ingescape
@@ -612,7 +612,7 @@ lib-android-release-aarch64:
     - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCMAKE_TOOLCHAIN_FILE=/${ANDROID_NDK_TOOLCHAIN_FILE}
     - make -C build
     - |
-      if [[ $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]
+      if [[ $CI_PROJECT_ROOT_NAMESPACE == "soum" && $CI_COMMIT_BRANCH == "fix_ci" ]]
       then
         make -C build install DESTDIR=~/builds/release/aarch64
         make -C build DESTDIR=temp install
@@ -637,7 +637,7 @@ lib-installer-runtime-android-aarch64:
     - make -C build package
     - mv _packages android-arm64
     - |
-      if [[ $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]
+      if [[ $CI_PROJECT_ROOT_NAMESPACE == "soum" && $CI_COMMIT_BRANCH == "fix_ci" ]]
       then
         mkdir -p $ARTIFACTS_NET_SHARE/armAARCH64/packages/ingescape
         cp android-arm64/ingescape-* $ARTIFACTS_NET_SHARE/armAARCH64/packages/ingescape
@@ -668,7 +668,7 @@ lib-android-release-armv7a-softfp:
     - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DCMAKE_TOOLCHAIN_FILE=/${ANDROID_NDK_TOOLCHAIN_FILE}
     - make -C build
     - |
-      if [[ $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]
+      if [[ $CI_PROJECT_ROOT_NAMESPACE == "soum" && $CI_COMMIT_BRANCH == "fix_ci" ]]
       then
         make -C build install DESTDIR=~/builds/release/armv7a-sf
         make -C build DESTDIR=temp install
@@ -693,7 +693,7 @@ lib-installer-runtime-android-armv7a-softfp:
     - make -C build package
     - mv _packages android
     - |
-      if [[ $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]
+      if [[ $CI_PROJECT_ROOT_NAMESPACE == "soum" && $CI_COMMIT_BRANCH == "fix_ci" ]]
       then
         mkdir mkdir -p $ARTIFACTS_NET_SHARE/armARMV7/packages/ingescape
         cp android/ingescape-* $ARTIFACTS_NET_SHARE/armARMV7/packages/ingescape
