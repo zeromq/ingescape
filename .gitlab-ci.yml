@@ -137,7 +137,7 @@ lib-build-macos-qt6:
         make -C build DESTDIR=temp install
         mkdir -p $ARTIFACTS_NET_SHARE/macos/binaries/ingescape
         rm -rf $ARTIFACTS_NET_SHARE/macos/binaries/ingescape/*
-        cp -rLv build/temp/usr/local/* $ARTIFACTS_NET_SHARE/macos/binaries/ingescape
+        cp -RL build/temp/usr/local/* $ARTIFACTS_NET_SHARE/macos/binaries/ingescape
       fi
   artifacts:
     paths:
