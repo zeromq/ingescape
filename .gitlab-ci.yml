@@ -137,7 +137,7 @@ lib-build-macos-qt6:
         make -C build DESTDIR=temp install
         mkdir -p $ARTIFACTS_NET_SHARE/macos/binaries/ingescape
         rm -rf $ARTIFACTS_NET_SHARE/macos/binaries/ingescape/*
-        cp -RL build/temp/usr/local/* $ARTIFACTS_NET_SHARE/macos/binaries/ingescape
+        cp -RLf build/temp/usr/local/* $ARTIFACTS_NET_SHARE/macos/binaries/ingescape
       fi
   artifacts:
     paths:
@@ -460,75 +460,6 @@ lib-installer-linux-x64:
     - lib-build-linux-x64
   needs:
     - lib-build-linux-x64
-
-##
-## Debian with Qt (VM)
-##
-
-# Create ingescape library for linux (x64) from our custom libraries
-lib-build-debian-qt6-x64:
-  extends: .lib-build-files
-  stage: lib-build
-  tags:
-    - docker
-  image: ingescape/qt6-debian-11
-  before_script:
-    - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
-  script:
-    - git clean -xfd
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON
-    - make -C build
-  artifacts:
-    paths:
-      - ./build
-    name: "lib-build-debian-10-x64"
-    expire_in: 1 day
-
-# Create library installer for linux 64 bits
-lib-installer-debian-qt6-x64:
-  extends: .lib-build-files
-  stage: lib-installer
-  tags:
-    - docker
-  image: ingescape/qt6-debian-11
-  script:
-    - apt-get update || apt-get update
-    - apt-get install -y makeself
-    - export INGESCAPE_MAJOR=$(grep "#define INGESCAPE_VERSION_MAJOR" include/ingescape.h | cut -d ' ' -f3-)
-    - export INGESCAPE_MINOR=$(grep "#define INGESCAPE_VERSION_MINOR" include/ingescape.h | cut -d ' ' -f3-)
-    - export INGESCAPE_PATCH=$(grep "#define INGESCAPE_VERSION_PATCH" include/ingescape.h | cut -d ' ' -f3-)
-    - export INGESCAPE_VERSION=$INGESCAPE_MAJOR.$INGESCAPE_MINOR.$INGESCAPE_PATCH
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DPACK_TGZ=ON
-    - cd build
-    - make package
-    - tar xf ingescape-${INGESCAPE_VERSION}-Linux.tar.gz
-    - makeself --target /tmp/ingescape-${INGESCAPE_VERSION} ingescape-${INGESCAPE_VERSION}-Linux installer-ingescape-${INGESCAPE_VERSION}-linux-x64.run "Ingescape library v${INGESCAPE_VERSION}" ./install_script.sh
-    - cd ..
-    - mv build linux_x64
-  artifacts:
-    paths:
-      - ./linux_x64/installer-ingescape-*.run
-    name: "lib-installer-debian-qt6-x64"
-  dependencies:
-    - lib-build-debian-qt6-x64
-  needs:
-    - lib-build-debian-qt6-x64
-
-# Deploy ingescape to be able to compile agents
-lib-deploy-debian-qt6-x64:
-  extends: .lib-build-files
-  stage: deploy
-  tags:
-    - docker
-  image: ingescape/qt6-debian-11
-  script:
-    - make -C build DESTDIR=$HOME/builds/release/linux_x64/ install
-  dependencies:
-    - lib-build-debian-qt6-x64
-  needs:
-    - lib-build-debian-qt6-x64
-  rules:
-    - !reference [.root_namespace, rules]
 
 ##
 ## armhf (RPi)
