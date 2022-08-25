@@ -650,8 +650,7 @@ igs_result_t igsagent_split_remove_with_id (igsagent_t *agent,
     HASH_FIND (hh, agent->mapping->split_elements, &the_id,
                sizeof (uint64_t), el);
     if (el == NULL) {
-        igsagent_error (agent, "id %ld is not part of the current split",
-                         the_id);
+        igsagent_error (agent, "id %llu is not part of the current split", the_id);
         return IGS_FAILURE;
     }
     else {

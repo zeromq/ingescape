@@ -570,19 +570,19 @@ igs_result_t igs_parameter_add_constraint (const char *name, const char *constra
 void igs_input_set_description(const char *name, const char *description)
 {
     core_init_agent ();
-    return igsagent_input_set_description (core_agent, name, description);
+    igsagent_input_set_description (core_agent, name, description);
 }
 
 void igs_output_set_description(const char *name, const char *description)
 {
     core_init_agent ();
-    return igsagent_output_set_description (core_agent, name, description);
+    igsagent_output_set_description (core_agent, name, description);
 }
 
 void igs_parameter_set_description(const char *name, const char *description)
 {
     core_init_agent ();
-    return igsagent_parameter_set_description (core_agent, name, description);
+    igsagent_parameter_set_description (core_agent, name, description);
 }
 
 void igs_clear_input (const char *name)
@@ -1164,21 +1164,21 @@ igs_result_t igs_service_reply_add(const char *service_name, const char *reply_n
     return igsagent_service_reply_add(core_agent, service_name, reply_name);
 }
 
-igs_result_t igs_service_reply_remove(const char *service_name){
+igs_result_t igs_service_reply_remove(const char *service_name, const char *reply_name){
     core_init_agent ();
-    return igsagent_service_reply_remove(core_agent, service_name);
+    return igsagent_service_reply_remove(core_agent, service_name, reply_name);
 }
 
-igs_result_t igs_service_reply_arg_add(const char *service_name, const char *arg_name,
+igs_result_t igs_service_reply_arg_add(const char *service_name, const char *reply_name, const char *arg_name,
                                        igs_iop_value_type_t type){
     core_init_agent ();
-    return igsagent_service_reply_arg_add(core_agent, service_name, arg_name, type);
+    return igsagent_service_reply_arg_add(core_agent, service_name, reply_name, arg_name, type);
 }
 
-igs_result_t igs_service_reply_arg_remove(const char *service_name,
+igs_result_t igs_service_reply_arg_remove(const char *service_name, const char *reply_name,
                                           const char *arg_name){
     core_init_agent ();
-    return igsagent_service_reply_arg_remove(core_agent, service_name, arg_name);
+    return igsagent_service_reply_arg_remove(core_agent, service_name, reply_name, arg_name);
 }
 
 size_t igs_service_count (void)
@@ -1217,27 +1217,32 @@ bool igs_service_arg_exists (const char *service_name, const char *arg_name)
     return igsagent_service_arg_exists (core_agent, service_name, arg_name);
 }
 
-bool igs_service_has_reply(const char *service_name){
+bool igs_service_has_replies(const char *service_name){
     core_init_agent ();
-    return igsagent_service_has_reply(core_agent, service_name);
+    return igsagent_service_has_replies(core_agent, service_name);
 }
 
-char * igs_service_reply_name(const char *service_name){
+bool igs_service_has_reply(const char *service_name, const char *reply_name){
     core_init_agent ();
-    return igsagent_service_reply_name(core_agent, service_name);
+    return igsagent_service_has_reply(core_agent, service_name, reply_name);
 }
 
-igs_service_arg_t * igs_service_reply_args_first(const char *service_name){
+char ** igs_service_reply_names(const char *service_name, size_t *service_replies_nbr){
     core_init_agent ();
-    return igsagent_service_reply_args_first(core_agent, service_name);
+    return igsagent_service_reply_names(core_agent, service_name, service_replies_nbr);
 }
 
-size_t igs_service_reply_args_count(const char *service_name){
+igs_service_arg_t * igs_service_reply_args_first(const char *service_name, const char *reply_name){
     core_init_agent ();
-    return igsagent_service_reply_args_count(core_agent, service_name);
+    return igsagent_service_reply_args_first(core_agent, service_name, reply_name);
 }
 
-bool igs_service_reply_arg_exists(const char *service_name, const char *arg_name){
+size_t igs_service_reply_args_count(const char *service_name, const char *reply_name){
     core_init_agent ();
-    return igsagent_service_reply_arg_exists(core_agent, service_name, arg_name);
+    return igsagent_service_reply_args_count(core_agent, service_name, reply_name);
+}
+
+bool igs_service_reply_arg_exists(const char *service_name, const char *reply_name, const char *arg_name){
+    core_init_agent ();
+    return igsagent_service_reply_arg_exists(core_agent, service_name, reply_name, arg_name);
 }

@@ -443,7 +443,8 @@ INGESCAPE_EXPORT bool igs_mapping_outputs_request(void);
 /*NOTES:
  - one and only one mandatory callback per service, set using igs_service_init :
  generates a warning if the callback missing when loading definition or receiving service
- - service names shall be unique for a given agent */
+ - service names shall be unique for a given agent
+ - names for optional replies shall be unique for a given service */
 
 //services arguments
 //When a service call is received, service arguments are provided as a chained list.
@@ -461,8 +462,7 @@ struct _igs_service_arg_t{
     struct _igs_service_arg_t *next;
 };
 
-//Arguments list are initialized to NULL and
-//then filled by calling igs_service_args_add_*
+//Arguments list are initialized to NULL and then filled by calling igs_service_args_add_*
 //Example:
 //   igs_service_arg_t *list = NULL;
 //   igs_service_args_add_int(&list, 10);
@@ -477,7 +477,7 @@ INGESCAPE_EXPORT igs_service_arg_t * igs_service_args_clone(igs_service_arg_t *l
 
 /*call a service hosted by another agent
  Requires to pass an agent name or UUID, a service name and a list of arguments specific to the service.
- Token is an optional information to specifically identify a service and help routing replies.
+ Token is an optional information to help routing replies.
  Passed arguments list will be deallocated and destroyed by the call. */
 INGESCAPE_EXPORT igs_result_t igs_service_call (const char *agent_name_or_uuid,
                                                 const char *service_name,
@@ -485,8 +485,8 @@ INGESCAPE_EXPORT igs_result_t igs_service_call (const char *agent_name_or_uuid,
                                                 const char *token);
 
 /*create /remove / edit a service offered by our agent
- Warning: only one callback can be attached to a service (further attempts will be ignored
- and signaled by an error log). */
+ Warning: only one callback can be attached to a service
+ (further attempts will be ignored and signaled by an error log). */
 typedef void (igs_service_fn)(const char *sender_agent_name,
                               const char *sender_agent_uuid,
                               const char *service_name,
@@ -501,14 +501,15 @@ INGESCAPE_EXPORT igs_result_t igs_service_arg_add(const char *service_name, cons
 INGESCAPE_EXPORT igs_result_t igs_service_arg_remove(const char *service_name,
                                                      const char *arg_name); //removes first occurence of an argument with this name
 
-//Zero to one REPLY per service. Reply is optional and used for specification purposes.
+//replies are optional and used for specification purposes
 INGESCAPE_EXPORT igs_result_t igs_service_reply_add(const char *service_name, const char *reply_name);
-INGESCAPE_EXPORT igs_result_t igs_service_reply_remove(const char *service_name);
-INGESCAPE_EXPORT igs_result_t igs_service_reply_arg_add(const char *service_name, const char *arg_name, igs_iop_value_type_t type);
+INGESCAPE_EXPORT igs_result_t igs_service_reply_remove(const char *service_name, const char *reply_name);
+INGESCAPE_EXPORT igs_result_t igs_service_reply_arg_add(const char *service_name, const char *reply_name, const char *arg_name, igs_iop_value_type_t type);
 INGESCAPE_EXPORT igs_result_t igs_service_reply_arg_remove(const char *service_name,
+                                                           const char *reply_name,
                                                            const char *arg_name);//removes first occurence of an argument with this name
 
-//introspection for services, their arguments and optional reply
+//introspection for services, their arguments and optional replies
 INGESCAPE_EXPORT size_t igs_service_count(void);
 INGESCAPE_EXPORT bool igs_service_exists(const char *name);
 INGESCAPE_EXPORT char ** igs_service_list(size_t *services_nbr);//returned char** must be freed using igs_free_services_list
@@ -518,11 +519,12 @@ INGESCAPE_EXPORT igs_service_arg_t * igs_service_args_first(const char *service_
 INGESCAPE_EXPORT size_t igs_service_args_count(const char *service_name);
 INGESCAPE_EXPORT bool igs_service_arg_exists(const char *service_name, const char *arg_name);
 
-INGESCAPE_EXPORT bool igs_service_has_reply(const char *service_name);
-INGESCAPE_EXPORT char * igs_service_reply_name(const char *service_name); //returned char** must be freed by caller
-INGESCAPE_EXPORT igs_service_arg_t * igs_service_reply_args_first(const char *service_name);
-INGESCAPE_EXPORT size_t igs_service_reply_args_count(const char *service_name);
-INGESCAPE_EXPORT bool igs_service_reply_arg_exists(const char *service_name, const char *arg_name);
+INGESCAPE_EXPORT bool igs_service_has_replies(const char *service_name);
+INGESCAPE_EXPORT bool igs_service_has_reply(const char *service_name, const char *reply_name);
+INGESCAPE_EXPORT char ** igs_service_reply_names(const char *service_name, size_t *service_replies_nbr); //returned char** must be freed using igs_free_services_list
+INGESCAPE_EXPORT igs_service_arg_t * igs_service_reply_args_first(const char *service_name, const char *reply_name);
+INGESCAPE_EXPORT size_t igs_service_reply_args_count(const char *service_name, const char *reply_name);
+INGESCAPE_EXPORT bool igs_service_reply_arg_exists(const char *service_name, const char *reply_name, const char *arg_name);
 
 
 /////////
