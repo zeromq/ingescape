@@ -1818,7 +1818,7 @@ namespace Ingescape
             IntPtr replyNameAsPtr = StringToUTF8Ptr(replyName);
             IntPtr ptrArgument = igs_service_reply_args_first(serviceNameAsPtr, replyNameAsPtr);
             List<ServiceArgument> serviceReplyArgumentsList = null;
-            if (ptrArgument != null)
+            if (ptrArgument != IntPtr.Zero)
             {
                 serviceReplyArgumentsList = new List<ServiceArgument>();
                 while (ptrArgument != IntPtr.Zero)
@@ -1892,7 +1892,7 @@ namespace Ingescape
         {
             IntPtr nameAsPtr = StringToUTF8Ptr(serviceName);
             IntPtr replyNameAsPtr = StringToUTF8Ptr(replyName);
-            IntPtr argNameAsPtr = StringToUTF8Ptr(replyName);
+            IntPtr argNameAsPtr = StringToUTF8Ptr(argName);
             bool res = igs_service_reply_arg_exists(nameAsPtr, replyNameAsPtr, argNameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
             Marshal.FreeHGlobal(replyNameAsPtr);
