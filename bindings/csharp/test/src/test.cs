@@ -10,8 +10,8 @@ namespace Tester
     public class Main
     {
         private string _agentName = "tester";
-        private uint _port = 5555;
-        private bool _verbose = true;
+        private uint _port = 5670;
+        private bool _verbose = false;
 
         private bool _myBool = true;
         private int _myInt = 1;
@@ -160,11 +160,64 @@ namespace Tester
             Igs.LogIncludeServices(true);
 
             //agent name and uuid
-            Igs.AgentSetName("simple Demo Agent &");
-            Assert.AreEqual("simple_Demo_Agent_&", Igs.AgentName());
+            Assert.AreEqual("no_name", Igs.AgentName());
+            Igs.AgentSetName("simple Demo Agent");
+            Assert.AreEqual("simple_Demo_Agent", Igs.AgentName());
             Igs.AgentSetName(_agentName);
             string uuid = Igs.AgentUUID();
             Assert.IsNotNull(Igs.AgentUUID());
+
+            //constraints
+            Igs.InputCreate("constraint_impulsion", IopValueType.Impulsion);
+            Igs.InputCreate("constraint_int", IopValueType.Integer);
+            Igs.InputCreate("constraint_bool", IopValueType.Bool);
+            Igs.InputCreate("constraint_double", IopValueType.Double);
+            Igs.InputCreate("constraint_string", IopValueType.String);
+            Igs.InputCreate("constraint_data", IopValueType.Data);
+
+            Assert.AreEqual(Result.Success, Igs.InputAddConstraint("constraint_int", "min 10.12")); //will set 10 as min constraint
+            Assert.AreEqual(Result.Success, Igs.InputAddConstraint("constraint_int", "max 10.12")); //will set 10 as max constraint
+            Assert.AreEqual(Result.Success, Igs.InputAddConstraint("constraint_int", "[-.1, +10.13]"));
+            Assert.AreEqual(Result.Success, Igs.InputAddConstraint("constraint_int", "[-.1  ,  +10.13]"));
+            Assert.AreEqual(Result.Success, Igs.InputAddConstraint("constraint_int", "[-.1,+10.13]"));
+            Assert.AreEqual(Result.Failure, Igs.InputAddConstraint("constraint_int", "[1,-10.13]"));
+
+            Assert.AreEqual(Result.Success, Igs.InputAddConstraint("constraint_double", "min 10.12"));
+            Assert.AreEqual(Result.Success, Igs.InputAddConstraint("constraint_double", "max 10.12"));
+            Assert.AreEqual(Result.Success, Igs.InputAddConstraint("constraint_double", "[-.1, +10.13]"));
+            Assert.AreEqual(Result.Success, Igs.InputAddConstraint("constraint_double", "[12.12,12.12]"));
+
+            Assert.AreEqual(Result.Failure, Igs.InputAddConstraint("constraint_bool", "min 10.12"));
+            Assert.AreEqual(Result.Failure, Igs.InputAddConstraint("constraint_bool", "max 10.12"));
+            Assert.AreEqual(Result.Failure, Igs.InputAddConstraint("constraint_bool", "[1,10.13]"));
+
+            Assert.AreEqual(Result.Failure, Igs.InputAddConstraint("constraint_impulsion", "min 10.12"));
+            Assert.AreEqual(Result.Failure, Igs.InputAddConstraint("constraint_impulsion", "max 10.12"));
+            Assert.AreEqual(Result.Failure, Igs.InputAddConstraint("constraint_impulsion", "[1,10.13]"));
+
+            Assert.AreEqual(Result.Failure, Igs.InputAddConstraint("constraint_string", "min 10.12"));
+            Assert.AreEqual(Result.Failure, Igs.InputAddConstraint("constraint_string", "max 10.12"));
+            Assert.AreEqual(Result.Failure, Igs.InputAddConstraint("constraint_string", "[1,10.13]"));
+
+            Assert.AreEqual(Result.Failure, Igs.InputAddConstraint("constraint_data", "min 10.12"));
+            Assert.AreEqual(Result.Failure, Igs.InputAddConstraint("constraint_data", "max 10.12"));
+            Assert.AreEqual(Result.Failure, Igs.InputAddConstraint("constraint_data", "[1,-10.13]"));
+
+            Assert.AreEqual(Result.Failure, Igs.InputAddConstraint("constraint_string", "~ [^ +")); //bad format for regex
+            Assert.AreEqual(Result.Success, Igs.InputAddConstraint("constraint_string", "~ (\\d+)"));
+            Assert.AreEqual(Result.Success, Igs.InputAddConstraint("constraint_string", "~ (\\d+)"));
+            Assert.AreEqual(Result.Failure, Igs.InputAddConstraint("constraint_impulsion", "~ (\\d+)"));
+            Assert.AreEqual(Result.Failure, Igs.InputAddConstraint("constraint_int", "~ (\\d+)"));
+            Assert.AreEqual(Result.Failure, Igs.InputAddConstraint("constraint_double", "~ (\\d+)"));
+            Assert.AreEqual(Result.Failure, Igs.InputAddConstraint("constraint_bool", "~ (\\d+)"));
+            Assert.AreEqual(Result.Failure, Igs.InputAddConstraint("constraint_data", "~ (\\d+)"));
+
+            Igs.InputRemove("constraint_impulsion");
+            Igs.InputRemove("constraint_int");
+            Igs.InputRemove("constraint_bool");
+            Igs.InputRemove("constraint_double");
+            Igs.InputRemove("constraint_string");
+            Igs.InputRemove("constraint_data");
 
             //agent family
             string family = Igs.AgentFamily();
@@ -729,6 +782,128 @@ namespace Tester
             Assert.IsTrue(list[4].Value == null);
             Igs.DefinitionSave();
 
+            //service with reply
+            Assert.IsTrue(Igs.ServiceInit("myServiceWithReplies", testerServiceCallback, null) == Result.Success);
+            Assert.IsTrue(!Igs.ServiceHasReplies("myServiceWithReplies"));
+            Assert.IsTrue(!Igs.ServiceHasReply("myServiceWithReplies", "toto"));
+            string[] names = Igs.ServiceReplyNames("myServiceWithReplies");
+            Assert.IsTrue(names == null);
+            Assert.IsTrue(Igs.ServiceReplyArgumentsList("myServiceWithReplies", "toto") == null);
+            Assert.IsTrue(Igs.ServiceReplyArgsCount("myServiceWithReplies", "toto") == 0);
+            Assert.IsTrue(Igs.ServiceReplyAdd("myServiceWithReplies", "myReply") == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyAdd("myServiceWithReplies", "myReply2") == Result.Success);
+            Assert.IsTrue(Igs.ServiceHasReplies("myServiceWithReplies"));
+            Assert.IsTrue(Igs.ServiceHasReply("myServiceWithReplies", "myReply"));
+            Assert.IsTrue(Igs.ServiceHasReply("myServiceWithReplies", "myReply2"));
+            Assert.IsTrue(!Igs.ServiceHasReply("myServiceWithReplies", "myReply3"));
+            Assert.IsTrue(Igs.ServiceHasReplies("myServiceWithReplies"));
+            names = Igs.ServiceReplyNames("myServiceWithReplies");
+            Assert.IsTrue((names != null) && (names.Length == 2) && ("myReply" == names[0]) && ("myReply2" == names[1]));
+            Assert.IsTrue(Igs.ServiceReplyArgumentsList("myServiceWithReplies", "myReply") == null);
+            Assert.IsTrue(Igs.ServiceReplyArgsCount("myServiceWithReplies", "myReply") == 0);
+            Assert.IsTrue(Igs.ServiceReplyArgAdd("myServiceWithReplies", "myReply", "myBool", IopValueType.Bool) == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyArgAdd("myServiceWithReplies", "myReply", "myInt", IopValueType.Integer) == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyArgAdd("myServiceWithReplies", "myReply", "myDouble", IopValueType.Double) == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyArgAdd("myServiceWithReplies", "myReply", "myString", IopValueType.String) == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyArgAdd("myServiceWithReplies", "myReply", "myData", IopValueType.Data) == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyArgAdd("myServiceWithReplies", "myReply2", "myBool2", IopValueType.Bool) == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyArgAdd("myServiceWithReplies", "myReply2", "myInt2", IopValueType.Integer) == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyArgAdd("myServiceWithReplies", "myReply2", "myDouble2", IopValueType.Double) == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyArgAdd("myServiceWithReplies", "myReply2", "myString2", IopValueType.String) == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyArgAdd("myServiceWithReplies", "myReply2", "myData2", IopValueType.Data) == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyArgumentsList("myServiceWithReplies", "myReply") != null);
+            Assert.IsTrue(Igs.ServiceReplyArgsCount("myServiceWithReplies", "myReply") == 5);
+            Assert.IsTrue(Igs.ServiceReplyArgumentsList("myServiceWithReplies", "myReply2") != null);
+            Assert.IsTrue(Igs.ServiceReplyArgsCount("myServiceWithReplies", "myReply2") == 5);
+            Assert.IsTrue(Igs.ServiceReplyArgExists("myServiceWithReplies", "myReply", "myBool"));
+            Assert.IsTrue(Igs.ServiceReplyArgExists("myServiceWithReplies", "myReply", "myInt"));
+            Assert.IsTrue(Igs.ServiceReplyArgExists("myServiceWithReplies", "myReply", "myDouble"));
+            Assert.IsTrue(Igs.ServiceReplyArgExists("myServiceWithReplies", "myReply", "myString"));
+            Assert.IsTrue(Igs.ServiceReplyArgExists("myServiceWithReplies", "myReply", "myData"));
+            Assert.IsTrue(Igs.ServiceReplyArgExists("myServiceWithReplies", "myReply2", "myBool2"));
+            Assert.IsTrue(Igs.ServiceReplyArgExists("myServiceWithReplies", "myReply2", "myInt2"));
+            Assert.IsTrue(Igs.ServiceReplyArgExists("myServiceWithReplies", "myReply2", "myDouble2"));
+            Assert.IsTrue(Igs.ServiceReplyArgExists("myServiceWithReplies", "myReply2", "myString2"));
+            Assert.IsTrue(Igs.ServiceReplyArgExists("myServiceWithReplies", "myReply2", "myData2"));
+            Assert.IsTrue(Igs.ServiceReplyArgRemove("myServiceWithReplies", "myReply", "myBool") == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyArgRemove("myServiceWithReplies", "myReply", "myInt") == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyArgRemove("myServiceWithReplies", "myReply", "myDouble") == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyArgRemove("myServiceWithReplies", "myReply", "myString") == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyArgRemove("myServiceWithReplies", "myReply", "myData") == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyArgRemove("myServiceWithReplies", "myReply", "myBool") == Result.Failure);
+            Assert.IsTrue(Igs.ServiceReplyArgRemove("myServiceWithReplies", "myReply", "myInt") == Result.Failure);
+            Assert.IsTrue(Igs.ServiceReplyArgRemove("myServiceWithReplies", "myReply", "myDouble") == Result.Failure);
+            Assert.IsTrue(Igs.ServiceReplyArgRemove("myServiceWithReplies", "myReply", "myString") == Result.Failure);
+            Assert.IsTrue(Igs.ServiceReplyArgRemove("myServiceWithReplies", "myReply", "myData") == Result.Failure);
+            Assert.IsTrue(!Igs.ServiceReplyArgExists("myServiceWithReplies", "myReply", "myBool"));
+            Assert.IsTrue(!Igs.ServiceReplyArgExists("myServiceWithReplies", "myReply", "myInt"));
+            Assert.IsTrue(!Igs.ServiceReplyArgExists("myServiceWithReplies", "myReply", "myDouble"));
+            Assert.IsTrue(!Igs.ServiceReplyArgExists("myServiceWithReplies", "myReply", "myString"));
+            Assert.IsTrue(!Igs.ServiceReplyArgExists("myServiceWithReplies", "myReply", "myData"));
+            Assert.IsTrue(Igs.ServiceReplyArgsCount("myServiceWithReplies", "myReply") == 0);
+            Assert.IsTrue(Igs.ServiceReplyArgumentsList("myServiceWithReplies", "myReply") == null);
+            Assert.IsTrue(Igs.ServiceReplyRemove("myServiceWithReplies", "myReply") == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyRemove("myServiceWithReplies", "myReply") == Result.Failure);
+            Assert.IsTrue(!Igs.ServiceHasReply("myServiceWithReplies", "myReply"));
+            names = Igs.ServiceReplyNames("myServiceWithReplies");
+            Assert.IsTrue(names.Length == 1 && ("myReply2" == names[0]));
+            Assert.IsTrue(Igs.ServiceReplyArgRemove("myServiceWithReplies", "myReply2", "myBool2") == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyArgRemove("myServiceWithReplies", "myReply2", "myInt2") == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyArgRemove("myServiceWithReplies", "myReply2", "myDouble2") == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyArgRemove("myServiceWithReplies", "myReply2", "myString2") == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyArgRemove("myServiceWithReplies", "myReply2", "myData2") == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyArgRemove("myServiceWithReplies", "myReply2", "myBool2") == Result.Failure);
+            Assert.IsTrue(Igs.ServiceReplyArgRemove("myServiceWithReplies", "myReply2", "myInt2") == Result.Failure);
+            Assert.IsTrue(Igs.ServiceReplyArgRemove("myServiceWithReplies", "myReply2", "myDouble2") == Result.Failure);
+            Assert.IsTrue(Igs.ServiceReplyArgRemove("myServiceWithReplies", "myReply2", "myString2") == Result.Failure);
+            Assert.IsTrue(Igs.ServiceReplyArgRemove("myServiceWithReplies", "myReply2", "myData2") == Result.Failure);
+            Assert.IsTrue(!Igs.ServiceReplyArgExists("myServiceWithReplies", "myReply2", "myBool2"));
+            Assert.IsTrue(!Igs.ServiceReplyArgExists("myServiceWithReplies", "myReply2", "myInt2"));
+            Assert.IsTrue(!Igs.ServiceReplyArgExists("myServiceWithReplies", "myReply2", "myDouble2"));
+            Assert.IsTrue(!Igs.ServiceReplyArgExists("myServiceWithReplies", "myReply2", "myString2"));
+            Assert.IsTrue(!Igs.ServiceReplyArgExists("myServiceWithReplies", "myReply2", "myData2"));
+            Assert.IsTrue(Igs.ServiceReplyArgsCount("myServiceWithReplies", "myReply2") == 0);
+            Assert.IsTrue(Igs.ServiceReplyArgumentsList("myServiceWithReplies", "myReply2") == null);
+            Assert.IsTrue(Igs.ServiceHasReply("myServiceWithReplies", "myReply2"));
+            Assert.IsTrue(Igs.ServiceReplyRemove("myServiceWithReplies", "myReply2") == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyRemove("myServiceWithReplies", "myReply2") == Result.Failure);
+            Assert.IsTrue(!Igs.ServiceHasReply("myServiceWithReplies", "myReply2"));
+            names = Igs.ServiceReplyNames("myServiceWithReplies");
+            Assert.IsTrue(names == null);
+            Assert.IsTrue(!Igs.ServiceHasReplies("myServiceWithReplies"));
+            Assert.IsTrue(Igs.ServiceReplyAdd("myServiceWithReplies", "myReply") == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyAdd("myServiceWithReplies", "myReply2") == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyArgAdd("myServiceWithReplies", "myReply", "myBool", IopValueType.Bool) == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyArgAdd("myServiceWithReplies", "myReply", "myInt", IopValueType.Integer) == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyArgAdd("myServiceWithReplies", "myReply", "myDouble", IopValueType.Double) == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyArgAdd("myServiceWithReplies", "myReply", "myString", IopValueType.String) == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyArgAdd("myServiceWithReplies", "myReply", "myData", IopValueType.Data) == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyArgAdd("myServiceWithReplies", "myReply2", "myBool2", IopValueType.Bool) == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyArgAdd("myServiceWithReplies", "myReply2", "myInt2", IopValueType.Integer) == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyArgAdd("myServiceWithReplies", "myReply2", "myDouble2", IopValueType.Double) == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyArgAdd("myServiceWithReplies", "myReply2", "myString2", IopValueType.String) == Result.Success);
+            Assert.IsTrue(Igs.ServiceReplyArgAdd("myServiceWithReplies", "myReply2", "myData2", IopValueType.Data) == Result.Success);
+            Igs.DefinitionSave();
+            Assert.IsTrue(Igs.ServiceRemove("myServiceWithReplies") == Result.Success);
+            Igs.ClearDefinition();
+            Igs.DefinitionLoadFile("/tmp/simple Demo Agent.json");
+            Assert.IsTrue(Igs.ServiceHasReply("myServiceWithReplies", "myReply"));
+            Assert.IsTrue(Igs.ServiceHasReply("myServiceWithReplies", "myReply2"));
+            Assert.IsTrue(Igs.ServiceReplyArgumentsList("myServiceWithReplies", "myReply") != null);
+            Assert.IsTrue(Igs.ServiceReplyArgsCount("myServiceWithReplies", "myReply") == 5);
+            Assert.IsTrue(Igs.ServiceReplyArgumentsList("myServiceWithReplies", "myReply2") != null);
+            Assert.IsTrue(Igs.ServiceReplyArgsCount("myServiceWithReplies", "myReply2") == 5);
+            Assert.IsTrue(Igs.ServiceReplyArgExists("myServiceWithReplies", "myReply", "myBool"));
+            Assert.IsTrue(Igs.ServiceReplyArgExists("myServiceWithReplies", "myReply", "myInt"));
+            Assert.IsTrue(Igs.ServiceReplyArgExists("myServiceWithReplies", "myReply", "myDouble"));
+            Assert.IsTrue(Igs.ServiceReplyArgExists("myServiceWithReplies", "myReply", "myString"));
+            Assert.IsTrue(Igs.ServiceReplyArgExists("myServiceWithReplies", "myReply", "myData"));
+            Assert.IsTrue(Igs.ServiceReplyArgExists("myServiceWithReplies", "myReply2", "myBool2"));
+            Assert.IsTrue(Igs.ServiceReplyArgExists("myServiceWithReplies", "myReply2", "myInt2"));
+            Assert.IsTrue(Igs.ServiceReplyArgExists("myServiceWithReplies", "myReply2", "myDouble2"));
+            Assert.IsTrue(Igs.ServiceReplyArgExists("myServiceWithReplies", "myReply2", "myString2"));
+            Assert.IsTrue(Igs.ServiceReplyArgExists("myServiceWithReplies", "myReply2", "myData2"));
+
             //prepare agent for dynamic tests by adding proper complete definitions
             Igs.AgentSetName(_agentName);
             Igs.LogSetConsole(_verbose);
@@ -794,6 +969,16 @@ namespace Tester
             Igs.SplitAdd("my_string_split", "partner", "sparing_string");
             Igs.SplitAdd("my_data_split", "partner", "sparing_data");
 
+            //iop description
+            Igs.InputSetDescription("my_impulsion", "my iop description here");
+            Igs.InputSetDescription("my_impulsion", "my iop description here");
+            Igs.OutputSetDescription("my_impulsion", "my iop description here");
+            Igs.OutputSetDescription("my_impulsion", "my iop description here");
+            Igs.ParameterSetDescription("my_impulsion", "my iop description here");
+            Igs.ParameterSetDescription("my_impulsion", "my iop description here");
+
+            //IOP writing and types conversions
+            //TODO: 
 
             //add multiple agents to be enabled and disabled on demand
             //first additional agent is activated immediately
@@ -958,8 +1143,9 @@ namespace Tester
 
             //test mapping in same process between second_agent and first_agent
             //TODO :
-            SecondAgent.Activate();
+
             //test service in the same process
+            SecondAgent.Activate();
             FirstAgent.ServiceCall("secondAgent", "secondService", new object[] { true, 13, 13.3, "my string arg", new byte[] { 0, 0, 1, 1 } }, "token");
             SecondAgent.ServiceCall("firstAgent", "firstService", new object[] { true, 13, 13.3, "my string arg", BitConverter.GetBytes('f') }, "token");
 
