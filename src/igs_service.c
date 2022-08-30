@@ -43,10 +43,14 @@ void service_free_service (igs_service_t *t)
         if (t->name)
             free (t->name);
         s_service_free_service_arguments (t->arguments);
-        if (t->reply) {
-            if (t->reply->name)
-                free (t->reply->name);
-            s_service_free_service_arguments (t->reply->arguments);
+        if (t->replies) {
+            igs_service_t *r, *r_tmp;
+            HASH_ITER(hh, t->replies, r, r_tmp){
+                free (r->name);
+                s_service_free_service_arguments (r->arguments);
+                HASH_DEL(t->replies, r);
+                free(r);
+            }
         }
         free (t);
     }
@@ -513,6 +517,7 @@ igs_result_t igsagent_service_reply_add(igsagent_t *agent, const char *service_n
     assert (service_name);
     assert (reply_name);
     igs_service_t *s = NULL;
+    igs_service_t *r = NULL;
     if (agent->definition == NULL) {
         igsagent_error (agent, "No definition available yet");
         return IGS_FAILURE;
@@ -523,24 +528,27 @@ igs_result_t igsagent_service_reply_add(igsagent_t *agent, const char *service_n
                         service_name);
         return IGS_FAILURE;
     }
-    if (s->reply){
-        igsagent_error (agent, "service with name %s already has a configured reply (named %s). Remove the reply first to add a new one.",
-                        service_name, s->reply->name);
+    HASH_FIND_STR (s->replies, reply_name, r);
+    if (r) {
+        igsagent_error (agent, "service reply with name %s already exists",
+                        reply_name);
         return IGS_FAILURE;
     }
-    s->reply = (igs_service_t *) zmalloc (sizeof (igs_service_t));
+    r = (igs_service_t *) zmalloc (sizeof (igs_service_t));
     if (strnlen (reply_name, IGS_MAX_STRING_MSG_LENGTH) == IGS_MAX_STRING_MSG_LENGTH) {
-        s->reply->name = s_strndup (reply_name, IGS_MAX_STRING_MSG_LENGTH);
-        igsagent_warn (agent, "service name has been shortened to %s", s->reply->name);
+        r->name = s_strndup (reply_name, IGS_MAX_STRING_MSG_LENGTH);
+        igsagent_warn (agent, "service name has been shortened to %s", r->name);
     } else
-        s->reply->name = s_strndup (reply_name, IGS_MAX_STRING_MSG_LENGTH);
+        r->name = s_strndup (reply_name, IGS_MAX_STRING_MSG_LENGTH);
+    HASH_ADD_STR(s->replies, name, r);
     agent->network_need_to_send_definition_update = true;
     return IGS_SUCCESS;
 }
 
-igs_result_t igsagent_service_reply_remove(igsagent_t *agent, const char *service_name){
-    assert (agent);
-    assert (service_name);
+igs_result_t igsagent_service_reply_remove(igsagent_t *agent, const char *service_name, const char *reply_name){
+    assert(agent);
+    assert(service_name);
+    assert(reply_name);
     igs_service_t *s = NULL;
     if (agent->definition == NULL) {
         igsagent_error (agent, "No definition available yet");
@@ -548,25 +556,28 @@ igs_result_t igsagent_service_reply_remove(igsagent_t *agent, const char *servic
     }
     HASH_FIND_STR (agent->definition->services_table, service_name, s);
     if (!s) {
-        igsagent_error (agent, "service with name %s does not exist",
-                        service_name);
+        igsagent_error (agent, "service with name %s does not exist", service_name);
         return IGS_FAILURE;
     }
-    if (!s->reply){
-        igsagent_error (agent, "service with name %s  has no reply");
-        return IGS_FAILURE;
-    } else {
-        service_free_service (s->reply);
-        s->reply = NULL;
+    igs_service_t *r = NULL;
+    HASH_FIND_STR(s->replies, reply_name, r);
+    if (r){
+        HASH_DEL(s->replies, r);
+        service_free_service (r);
         agent->network_need_to_send_definition_update = true;
         return IGS_SUCCESS;
+    }else{
+        igsagent_error (agent, "service with name %s  has no reply named %s", service_name, reply_name);
+        return IGS_FAILURE;
     }
 }
 
-igs_result_t igsagent_service_reply_arg_add(igsagent_t *agent, const char *service_name,
+igs_result_t igsagent_service_reply_arg_add(igsagent_t *agent, const char *service_name, const char *reply_name,
                                             const char *arg_name, igs_iop_value_type_t type){
     assert (agent);
     assert (service_name);
+    assert(reply_name);
+    assert(arg_name);
     igs_service_t *s = NULL;
     if (agent->definition == NULL) {
         igsagent_error (agent, "No definition available yet");
@@ -574,17 +585,17 @@ igs_result_t igsagent_service_reply_arg_add(igsagent_t *agent, const char *servi
     }
     HASH_FIND_STR (agent->definition->services_table, service_name, s);
     if (!s) {
-        igsagent_error (agent, "service with name %s does not exist",
-                        service_name);
+        igsagent_error (agent, "service with name %s does not exist", service_name);
         return IGS_FAILURE;
     }
-    if (!s->reply){
-        igsagent_error (agent, "service with name %s  has no reply");
+    igs_service_t *r = NULL;
+    HASH_FIND_STR(s->replies, reply_name, r);
+    if (!r){
+        igsagent_error (agent, "service with name %s  has no reply named %s", service_name, reply_name);
         return IGS_FAILURE;
     }
     if (type == IGS_IMPULSION_T) {
-        igsagent_error (agent,
-                        "impulsion type is not allowed as a service argument");
+        igsagent_error (agent, "impulsion type is not allowed as a service argument");
         return IGS_FAILURE;
     }
     if (type == IGS_UNKNOWN_T) {
@@ -594,8 +605,7 @@ igs_result_t igsagent_service_reply_arg_add(igsagent_t *agent, const char *servi
     igs_service_arg_t *a = (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
     if (strnlen (arg_name, IGS_MAX_STRING_MSG_LENGTH) == IGS_MAX_STRING_MSG_LENGTH) {
         a->name = s_strndup (arg_name, IGS_MAX_STRING_MSG_LENGTH);
-        igsagent_warn (agent, "service argument name has been shortened to %s",
-                       a->name);
+        igsagent_warn (agent, "service argument name has been shortened to %s", a->name);
     } else
         a->name = s_strndup (arg_name, IGS_MAX_STRING_MSG_LENGTH);
     switch (type) {
@@ -618,15 +628,17 @@ igs_result_t igsagent_service_reply_arg_add(igsagent_t *agent, const char *servi
             break;
     }
     a->type = type;
-    LL_APPEND (s->reply->arguments, a);
+    LL_APPEND (r->arguments, a);
     agent->network_need_to_send_definition_update = true;
     return IGS_SUCCESS;
 }
 
-igs_result_t igsagent_service_reply_arg_remove(igsagent_t *agent, const char *service_name,
+igs_result_t igsagent_service_reply_arg_remove(igsagent_t *agent, const char *service_name, const char *reply_name,
                                                const char *arg_name){
     assert (agent);
     assert (service_name);
+    assert(reply_name);
+    assert(arg_name);
     igs_service_t *s = NULL;
     if (agent->definition == NULL) {
         igsagent_error (agent, "No definition available yet");
@@ -634,19 +646,20 @@ igs_result_t igsagent_service_reply_arg_remove(igsagent_t *agent, const char *se
     }
     HASH_FIND_STR (agent->definition->services_table, service_name, s);
     if (!s) {
-        igsagent_error (agent, "service with name %s does not exist",
-                        service_name);
+        igsagent_error (agent, "service with name %s does not exist", service_name);
         return IGS_FAILURE;
     }
-    if (!s->reply){
-        igsagent_error (agent, "service with name %s  has no reply");
+    igs_service_t *r = NULL;
+    HASH_FIND_STR(s->replies, reply_name, r);
+    if (!r){
+        igsagent_error (agent, "service with name %s  has no reply named %s", service_name, reply_name);
         return IGS_FAILURE;
     }
     igs_service_arg_t *arg = NULL, *tmp = NULL;
     bool found = false;
-    LL_FOREACH_SAFE (s->reply->arguments, arg, tmp) {
+    LL_FOREACH_SAFE (r->arguments, arg, tmp) {
         if (streq (arg_name, arg->name)) {
-            LL_DELETE (s->reply->arguments, arg);
+            LL_DELETE (r->arguments, arg);
             free (arg->name);
             if (arg->type == IGS_DATA_T && arg->data)
                 free (arg->data);
@@ -660,8 +673,7 @@ igs_result_t igsagent_service_reply_arg_remove(igsagent_t *agent, const char *se
         }
     }
     if (!found) {
-        igsagent_debug (agent, "no argument named %s for reply %s in service %s",
-                        arg_name, s->reply->name, service_name);
+        igsagent_debug (agent, "no argument named %s for reply %s in service %s", arg_name, reply_name, service_name);
         return IGS_FAILURE;
     }
     return IGS_SUCCESS;
@@ -1077,100 +1089,139 @@ bool igsagent_service_arg_exists (igsagent_t *agent,
     return false;
 }
 
-bool igsagent_service_has_reply(igsagent_t *agent, const char *service_name){
+bool igsagent_service_has_replies(igsagent_t *agent, const char *service_name){
     assert(agent);
     assert(service_name);
-    igs_service_t *t = NULL;
-    HASH_FIND_STR (agent->definition->services_table, service_name, t);
-    if (!t) {
-        igsagent_debug (agent, "could not find service with name %s",service_name);
+    igs_service_t *s = NULL;
+    HASH_FIND_STR (agent->definition->services_table, service_name, s);
+    if (!s) {
+        igsagent_debug (agent, "could not find service with name %s", service_name);
         return false;
     }
-    if (t->reply)
+    if (s->replies)
         return true;
     else
         return false;
 }
 
-char * igsagent_service_reply_name(igsagent_t *agent, const char *service_name){
+bool igsagent_service_has_reply(igsagent_t *agent, const char *service_name, const char *reply_name){
     assert(agent);
     assert(service_name);
-    igs_service_t *t = NULL;
-    HASH_FIND_STR (agent->definition->services_table, service_name, t);
-    if (!t) {
-        igsagent_debug (agent, "could not find service with name %s",service_name);
-        return NULL;
+    assert(reply_name);
+    igs_service_t *s = NULL;
+    HASH_FIND_STR (agent->definition->services_table, service_name, s);
+    if (!s) {
+        igsagent_debug (agent, "could not find service with name %s", service_name);
+        return false;
     }
-    if (t->reply){
-        assert(t->reply->name);
-        return strdup(t->reply->name);
-    }else
-        return NULL;
+    igs_service_t *r = NULL;
+    HASH_FIND_STR(s->replies, reply_name, r);
+    if (r)
+        return true;
+    else
+        return false;
 }
 
-igs_service_arg_t * igsagent_service_reply_args_first(igsagent_t *agent, const char *service_name){
+char ** igsagent_service_reply_names(igsagent_t *agent, const char *service_name, size_t *service_replies_nbr){
     assert(agent);
     assert(service_name);
+    assert(service_replies_nbr);
+    igs_service_t *s = NULL;
+    HASH_FIND_STR (agent->definition->services_table, service_name, s);
+    if (!s) {
+        igsagent_debug (agent, "could not find service with name %s", service_name);
+        return NULL;
+    }
+    igs_service_t *r, *tmp_r;
+    *service_replies_nbr = HASH_COUNT(s->replies);
+    if (!(*service_replies_nbr))
+        return NULL;
+    char ** names = (char**)calloc(*service_replies_nbr, sizeof(char*));
+    size_t index = 0;
+    HASH_ITER(hh, s->replies, r, tmp_r){
+        names[index] = strdup(r->name);
+        index++;
+    }
+    return names;
+}
+
+igs_service_arg_t * igsagent_service_reply_args_first(igsagent_t *agent, const char *service_name, const char *reply_name){
+    assert(agent);
+    assert(service_name);
+    assert(reply_name);
     if (!agent->definition) {
         igsagent_error (agent, "agent definition is NULL");
         return NULL;
     }
-    igs_service_t *t = NULL;
-    HASH_FIND_STR (agent->definition->services_table, service_name, t);
-    if (!t) {
+    igs_service_t *s = NULL;
+    HASH_FIND_STR (agent->definition->services_table, service_name, s);
+    if (!s) {
         igsagent_debug (agent, "could not find service with name %s", service_name);
         return NULL;
     }
-    if (t->reply){
-        return t->reply->arguments;
-    }else
+    igs_service_t *r = NULL;
+    HASH_FIND_STR(s->replies, reply_name, r);
+    if (r)
+        return r->arguments;
+    else {
+        igsagent_debug (agent, "could not find service with name %s and reply %s", service_name, reply_name);
         return NULL;
+    }
 }
 
-size_t igsagent_service_reply_args_count(igsagent_t *agent, const char *service_name){
+size_t igsagent_service_reply_args_count(igsagent_t *agent, const char *service_name, const char *reply_name){
     assert(agent);
     assert(service_name);
+    assert(reply_name);
     if (!agent->definition) {
         igsagent_error (agent, "agent definition is NULL");
         return 0;
     }
-    igs_service_t *t = NULL;
-    HASH_FIND_STR (agent->definition->services_table, service_name, t);
-    if (t == NULL) {
+    igs_service_t *s = NULL;
+    HASH_FIND_STR (agent->definition->services_table, service_name, s);
+    if (!s) {
         igsagent_debug (agent, "could not find service with name %s", service_name);
         return 0;
     }
-    if (t->reply){
-        size_t nb = 0;
-        igs_service_arg_t *a = NULL;
-        LL_COUNT (t->reply->arguments, a, nb);
-        return nb;
-    }else
+    igs_service_t *r = NULL;
+    HASH_FIND_STR(s->replies, reply_name, r);
+    if (r){
+        size_t res = 0;
+        igs_service_arg_t *arg;
+        LL_COUNT(r->arguments, arg, res);
+        return res;
+    }else {
+        igsagent_debug (agent, "could not find service with name %s and reply %s", service_name, reply_name);
         return 0;
-    
+    }
 }
 
-bool igsagent_service_reply_arg_exists(igsagent_t *agent, const char *service_name, const char *arg_name){
+bool igsagent_service_reply_arg_exists(igsagent_t *agent, const char *service_name, const char *reply_name, const char *arg_name){
     assert(agent);
     assert(service_name);
+    assert(reply_name);
     assert(arg_name);
     if (!agent->definition) {
         igsagent_error (agent, "agent definition is NULL");
         return false;
     }
-    igs_service_t *t = NULL;
-    HASH_FIND_STR (agent->definition->services_table, service_name, t);
-    if (t == NULL) {
+    igs_service_t *s = NULL;
+    HASH_FIND_STR (agent->definition->services_table, service_name, s);
+    if (!s) {
         igsagent_debug (agent, "could not find service with name %s", service_name);
         return false;
     }
-    if (t->reply){
+    igs_service_t *r = NULL;
+    HASH_FIND_STR(s->replies, reply_name, r);
+    if (r){
         igs_service_arg_t *a = NULL;
-        LL_FOREACH (t->reply->arguments, a) {
+        LL_FOREACH (r->arguments, a) {
             if (streq (a->name, arg_name))
                 return true;
         }
         return false;
-    }else
+    }else {
+        igsagent_debug (agent, "could not find service with name %s and reply named %s", service_name, reply_name);
         return false;
+    }
 }
