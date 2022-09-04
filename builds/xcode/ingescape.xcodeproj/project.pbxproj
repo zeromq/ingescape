@@ -1087,6 +1087,27 @@
 			remoteGlobalIDString = 465A1EDBB9684E589E42B1B9;
 			remoteInfo = zyre_selftest;
 		};
+		97FB90A528C4BD1E004FF800 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 05056DE1CA3B4582BAD9E8CD;
+			remoteInfo = test_xsub_verbose;
+		};
+		97FB90A728C4BD1E004FF800 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = AD934DE87ACE45D78361D670;
+			remoteInfo = test_zmq_ppoll_fd;
+		};
+		97FB90A928C4BD1E004FF800 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 4BF8E9DD24DE40EBA83DF8F0;
+			remoteInfo = test_zmq_ppoll_signals;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -1276,6 +1297,14 @@
 		97BD81A827073B4E00625AEA /* libzyre.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libzyre.a; path = ../ios/sysroot/lib/libzyre.a; sourceTree = "<group>"; };
 		97BD81A927073B4E00625AEA /* libsodium.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsodium.a; path = ../ios/sysroot/lib/libsodium.a; sourceTree = "<group>"; };
 		97D1622C270349D0003D2F54 /* liblz4.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblz4.a; path = ../../../../../../../usr/local/Cellar/lz4/1.9.3/lib/liblz4.a; sourceTree = "<group>"; };
+		97FB8FF928C4BD1E004FF800 /* libzmq.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libzmq.dylib; sourceTree = "<group>"; };
+		97FB8FFA28C4BD1E004FF800 /* libingescape.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libingescape.dylib; sourceTree = "<group>"; };
+		97FB8FFB28C4BD1E004FF800 /* libsodium.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libsodium.dylib; sourceTree = "<group>"; };
+		97FB8FFC28C4BD1E004FF800 /* libzyre.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libzyre.dylib; sourceTree = "<group>"; };
+		97FB8FFE28C4BD1E004FF800 /* libingescape.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libingescape.a; sourceTree = "<group>"; };
+		97FB8FFF28C4BD1E004FF800 /* libczmq.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libczmq.dylib; sourceTree = "<group>"; };
+		97FB900028C4BD1E004FF800 /* ios.toolchain.cmake */ = {isa = PBXFileReference; lastKnownFileType = text; path = ios.toolchain.cmake; sourceTree = "<group>"; };
+		97FB900128C4BD1E004FF800 /* cross_compile.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = cross_compile.sh; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1330,6 +1359,7 @@
 				97AFAA9B26C2BBF000D0CCB5 /* dependencies headers */,
 				97AFAD6F26C3F77800D0CCB5 /* include */,
 				979A79841EA7B112003153EF /* src */,
+				97FB8FF528C4BD1E004FF800 /* ios */,
 				9762EDE21EAE54D5002062A1 /* Frameworks */,
 				979A79791EA7B0D6003153EF /* Products */,
 			);
@@ -1515,8 +1545,11 @@
 				97A3BF3D25AF36CA004BD834 /* test_xpub_nodrop */,
 				97A3BF3F25AF36CA004BD834 /* test_xpub_verbose */,
 				97A3BF4125AF36CA004BD834 /* test_xpub_welcome_msg */,
+				97FB90A628C4BD1E004FF800 /* test_xsub_verbose */,
 				97A3BF4325AF36CA004BD834 /* test_z85_decode_fuzzer */,
 				97A3BF4525AF36CA004BD834 /* test_zmq_poll_fd */,
+				97FB90A828C4BD1E004FF800 /* test_zmq_ppoll_fd */,
+				97FB90AA28C4BD1E004FF800 /* test_zmq_ppoll_signals */,
 				97A3BF4725AF36CA004BD834 /* libtestutil.a */,
 				97A3BF4925AF36CA004BD834 /* libtestutil-static.a */,
 				97A3BF4B25AF36CA004BD834 /* unittest_curve_encoding */,
@@ -1715,6 +1748,38 @@
 			);
 			name = include;
 			path = ../../include;
+			sourceTree = "<group>";
+		};
+		97FB8FF528C4BD1E004FF800 /* ios */ = {
+			isa = PBXGroup;
+			children = (
+				97FB8FF828C4BD1E004FF800 /* lib */,
+				97FB900028C4BD1E004FF800 /* ios.toolchain.cmake */,
+				97FB900128C4BD1E004FF800 /* cross_compile.sh */,
+			);
+			name = ios;
+			path = ../ios;
+			sourceTree = "<group>";
+		};
+		97FB8FF828C4BD1E004FF800 /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				97FB8FFF28C4BD1E004FF800 /* libczmq.dylib */,
+				97FB8FFA28C4BD1E004FF800 /* libingescape.dylib */,
+				97FB8FFB28C4BD1E004FF800 /* libsodium.dylib */,
+				97FB8FF928C4BD1E004FF800 /* libzmq.dylib */,
+				97FB8FFC28C4BD1E004FF800 /* libzyre.dylib */,
+				97FB8FFD28C4BD1E004FF800 /* static */,
+			);
+			path = lib;
+			sourceTree = "<group>";
+		};
+		97FB8FFD28C4BD1E004FF800 /* static */ = {
+			isa = PBXGroup;
+			children = (
+				97FB8FFE28C4BD1E004FF800 /* libingescape.a */,
+			);
+			path = static;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -2851,6 +2916,27 @@
 			fileType = "compiled.mach-o.executable";
 			path = zyre_selftest;
 			remoteRef = 97A3C04A25AF372B004BD834 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		97FB90A628C4BD1E004FF800 /* test_xsub_verbose */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_xsub_verbose;
+			remoteRef = 97FB90A528C4BD1E004FF800 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		97FB90A828C4BD1E004FF800 /* test_zmq_ppoll_fd */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_zmq_ppoll_fd;
+			remoteRef = 97FB90A728C4BD1E004FF800 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		97FB90AA28C4BD1E004FF800 /* test_zmq_ppoll_signals */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_zmq_ppoll_signals;
+			remoteRef = 97FB90A928C4BD1E004FF800 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */

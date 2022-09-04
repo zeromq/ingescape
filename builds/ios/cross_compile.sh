@@ -1,29 +1,19 @@
 #!/bin/sh
 
 set -e
-
-cmake -S../../ -B./build -GXcode \
-    -DCMAKE_SYSTEM_NAME=iOS \
-    -DCMAKE_PREFIX_PATH=./sysroot/ \
-    "-DCMAKE_OSX_ARCHITECTURES=x86_64 arm64" \
-    -DCMAKE_OSX_DEPLOYMENT_TARGET=12.0 \
-    "-DCMAKE_OSX_SYSROOT=iphoneos" \
-    -DCMAKE_INSTALL_PREFIX=`pwd`/sysroot \
-    -DCMAKE_XCODE_GENERATE_SCHEME=YES \
-    -DCMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH=NO \
-    -DCMAKE_IOS_INSTALL_COMBINED=NO \
-    -DWITH_DEPS=ON \
-    -DWITH_PERF_TOOL=OFF \
-    -DCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM=56DRT9MG9S
-
-cmake --build build --config Debug --target sodium
-cmake --build build --config Debug --target sodium-static
-cmake --build build --config Debug --target libzmq
-cmake --build build --config Debug --target libzmq-static
-cmake --build build --config Debug --target czmq
-cmake --build build --config Debug --target czmq-static
-cmake --build build --config Debug --target zyre
-cmake --build build --config Debug --target zyre-static
-cmake --build build --config Debug --target ingescape
-cmake --build build --config Debug --target ingescape-static
-cmake --install build --config Debug
+#sudo xcode-select -switch /Applications/Xcode.app #adapt path if needed, according to 'xcode-select --print-path'
+rm -Rf build; rm -Rf lib
+mkdir -p lib/static
+cmake -S../../ -B./build -G Xcode -DCMAKE_TOOLCHAIN_FILE=./builds/ios/ios.toolchain.cmake -DPLATFORM=OS64 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=./sysroot -DOSX_UNIVERSAL=ON -DWITH_DEPS=ON -T buildsystem=1 -DCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM=56DRT9MG9S
+cd build
+xcodebuild -list -project ingescape.xcodeproj
+xcodebuild -project ingescape.xcodeproj -target ingescape-static -configuration Debug build
+xcodebuild -project ingescape.xcodeproj -target ingescape -configuration Release build
+cp Release-iphoneos/libingescape.dylib ../lib
+cp dependencies/sodium/Release-iphoneos/libsodium.dylib ../lib
+cp dependencies/libzmq/lib/Release/libzmq.dylib ../lib
+cp dependencies/czmq/Release-iphoneos/libczmq.dylib ../lib
+cp dependencies/zyre/Release-iphoneos/libzyre.dylib ../lib
+libtool -static -o ../lib/static/libingescape.a Debug-iphoneos/libingescape.a dependencies/sodium/Debug-iphoneos/libsodium.a dependencies/libzmq/lib/Debug/libzmq.a dependencies/czmq/Debug-iphoneos/libczmq.a dependencies/zyre/Debug-iphoneos/libzyre.a
+cd ..
+rm -Rf build
