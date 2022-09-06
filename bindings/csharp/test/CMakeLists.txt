@@ -81,12 +81,19 @@ else ()
 endif ()
 
 if ((NOT FROM_INGESCAPE) AND FROM_CSHARP)
+	if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+		set(_INGESCAPE_DLL_NAME "ingescaped")
+		set(_LIBZMQ_DLL_NAME "libzmq-v142-mt-gd-4_3_5")
+	else()
+		set(_INGESCAPE_DLL_NAME "ingescape")
+		set(_LIBZMQ_DLL_NAME "libzmq-v142-mt-4_3_5")
+	endif()
 	# From CSharp cmake only. Find LIBS on system
 	find_library(SODIUM NAMES sodium REQUIRED)
-	find_library(ZMQ NAMES libzmq-v142-mt-4_3_5 REQUIRED)
+	find_library(ZMQ NAMES ${_LIBZMQ_DLL_NAME} REQUIRED)
 	find_library(CZMQ NAMES czmq REQUIRED)
 	find_library(ZYRE NAMES zyre REQUIRED)
-	find_library(INGESCAPE NAMES ingescape REQUIRED)	
+	find_library(INGESCAPE NAMES ${_INGESCAPE_DLL_NAME} REQUIRED)	
 
 	dll_from_lib_exists(SODIUM)
 	dll_from_lib_exists(ZMQ)
@@ -96,38 +103,15 @@ if ((NOT FROM_INGESCAPE) AND FROM_CSHARP)
 
 	add_custom_command(TARGET ${PROJECT_NAME}
 		POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy ${ingescape_DLL_FILE} ${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/
-		COMMAND ${CMAKE_COMMAND} -E echo "Copying ingescape library"
-		COMMAND ${CMAKE_COMMAND} -E copy ${sodium_DLL_FILE} ${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/
-		COMMAND ${CMAKE_COMMAND} -E echo "Copying sodium library"
-		COMMAND ${CMAKE_COMMAND} -E copy ${libzmq-v142-mt-4_3_5_DLL_FILE} ${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/
-		COMMAND ${CMAKE_COMMAND} -E echo "Copying zmq library"
-		COMMAND ${CMAKE_COMMAND} -E copy ${czmq_DLL_FILE} ${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/
-		COMMAND ${CMAKE_COMMAND} -E echo "Copying czmq library"
-		COMMAND ${CMAKE_COMMAND} -E copy ${zyre_DLL_FILE} ${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/
-		COMMAND ${CMAKE_COMMAND} -E echo "Copying zyre library"
+		COMMAND ${CMAKE_COMMAND} -E copy "${${_INGESCAPE_DLL_NAME}_DLL_FILE}" "${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
+		COMMAND ${CMAKE_COMMAND} -E echo "Copying ${${_INGESCAPE_DLL_NAME}_DLL_FILE} library"
+		COMMAND ${CMAKE_COMMAND} -E copy "${sodium_DLL_FILE}" "${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
+		COMMAND ${CMAKE_COMMAND} -E echo "Copying ${sodium_DLL_FILE} library"
+		COMMAND ${CMAKE_COMMAND} -E copy "${${_LIBZMQ_DLL_NAME}_DLL_FILE}" "${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
+		COMMAND ${CMAKE_COMMAND} -E echo "Copying ${${_LIBZMQ_DLL_NAME}_DLL_FILE} library"
+		COMMAND ${CMAKE_COMMAND} -E copy "${czmq_DLL_FILE}" "${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
+		COMMAND ${CMAKE_COMMAND} -E echo "Copying ${czmq_DLL_FILE} library"
+		COMMAND ${CMAKE_COMMAND} -E copy "${zyre_DLL_FILE}" "${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/net472/"
+		COMMAND ${CMAKE_COMMAND} -E echo "Copying ${zyre_DLL_FILE} library"
 	)
-endif ()
-
-if (FROM_INGESCAPE AND FROM_CSHARP)
-	#From CSharp and Ingescape CMakes.
-
-	macro(print_all_variables)
-		message(STATUS "print_all_variables------------------------------------------{")
-		get_cmake_property(_variableNames VARIABLES)
-		foreach (_variableName ${_variableNames})
-			message(STATUS "${_variableName}=${${_variableName}}")
-		endforeach()
-		message(STATUS "print_all_variables------------------------------------------}")
-	endmacro()
-
-	#print_all_variables()
-
-	if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-		set(_INGESCAPE_DLL_NAME "ingescaped")
-		set(_LIBZMQ_DLL_NAME "libzmq-v142-mt-gd-4_3_5")
-	else()
-		set(_INGESCAPE_DLL_NAME "ingescape")
-		set(_LIBZMQ_DLL_NAME "libzmq-v142-mt-4_3_5")
-	endif()
 endif ()

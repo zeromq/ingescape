@@ -48,7 +48,7 @@ set(BUILD ${INGESCAPE_VERSION_PATCH})
 message("Ingescape version : ${INGESCAPE_VERSION_MAJOR}.${INGESCAPE_VERSION_MINOR}.${INGESCAPE_VERSION_PATCH}")
 
 configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/builds/visual-studio/cmake/AssemblyInfo.cs.in
+  ${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/AssemblyInfo.cs.in
   ${CMAKE_CURRENT_BINARY_DIR}/AssemblyInfo.cs
   @ONLY)
 
