@@ -37,3 +37,4 @@ build/
 .deps
 .libs
 dependencies/yajl/build/
+builds/ios/lib

@@ -7,7 +7,11 @@ cmake_minimum_required(VERSION 3.16)
 
 option(WITH_CSHARP_WRAPPER "Compile the library with CSHARP Binding" OFF)
 
-set(CMAKE_OSX_DEPLOYMENT_TARGET "10.11" CACHE STRING "Minimum OS X deployment version")
+if (APPLE)
+  set(CMAKE_OSX_DEPLOYMENT_TARGET "10.11" CACHE STRING "Minimum OS X deployment version")
+  set(CMAKE_OSX_SYSROOT "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/")
+  set(CMAKE_CXX_FLAGS "--sysroot ${CMAKE_OSX_SYSROOT} ${CMAKE_CXX_FLAGS}")
+endif(APPLE)
 
 option(OSX_UNIVERSAL "Build for both arm64 and x86_64" OFF)
 if(OSX_UNIVERSAL)
@@ -546,7 +550,7 @@ if (NOT DEPS_ONLY)
         set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES64")
         set(CPACK_NSIS_PACKAGE_NAME
             "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION} (Win64)")
-        set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} (Win64)")	
+        set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} (Win64)")
       else()
         set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES")
         set(CPACK_NSIS_PACKAGE_NAME
@@ -555,7 +559,7 @@ if (NOT DEPS_ONLY)
       endif()
 
       if(WITH_CSHARP_WRAPPER)
-        install(FILES 
+        install(FILES
               "${CMAKE_CURRENT_BINARY_DIR}/bindings/csharp/${CMAKE_BUILD_TYPE}/netstandard2.0/IngescapeCSharp.dll"
               DESTINATION lib
         )
