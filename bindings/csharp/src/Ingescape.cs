@@ -482,7 +482,7 @@ namespace Ingescape
         public static IopValueType InputType(string name)
         {
             IntPtr nameAsPtr = StringToUTF8Ptr(name);
-            IopValueType type = igs_input_type(StringToUTF8Ptr(name));
+            IopValueType type = igs_input_type(nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
             return type;
         }
@@ -492,7 +492,7 @@ namespace Ingescape
         public static IopValueType OutputType(string name)
         {
             IntPtr nameAsPtr = StringToUTF8Ptr(name);
-            IopValueType type = igs_output_type(StringToUTF8Ptr(name));
+            IopValueType type = igs_output_type(nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
             return type;
         }
@@ -502,7 +502,7 @@ namespace Ingescape
         public static IopValueType ParameterType(string name)
         {
             IntPtr nameAsPtr = StringToUTF8Ptr(name);
-            IopValueType type = igs_parameter_type(StringToUTF8Ptr(name));
+            IopValueType type = igs_parameter_type(nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
             return type;
         }
@@ -696,7 +696,7 @@ namespace Ingescape
         public static int OutputInt(string name)
         {
             IntPtr nameAsPtr = StringToUTF8Ptr(name);
-            int value = igs_output_int(StringToUTF8Ptr(name));
+            int value = igs_output_int(nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
             return value;
         }
@@ -757,7 +757,7 @@ namespace Ingescape
         public static int ParameterInt(string name)
         {
             IntPtr nameAsPtr = StringToUTF8Ptr(name);
-            int value = igs_parameter_int(StringToUTF8Ptr(name));
+            int value = igs_parameter_int(nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
             return value;
         }
@@ -1242,7 +1242,7 @@ namespace Ingescape
         public static bool OutputIsMuted(string name)
         {
             IntPtr nameAsPtr = StringToUTF8Ptr(name);
-            bool value = igs_output_is_muted(StringToUTF8Ptr(name));
+            bool value = igs_output_is_muted(nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
             return value;
         }
@@ -1585,6 +1585,61 @@ namespace Ingescape
             return res;
         }
 
+        ///<summary>
+        /////replies are optional and used for specification purposes
+        ///</summary>
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_service_reply_add(IntPtr serviceName, IntPtr replyName);
+        public static Result ServiceReplyAdd(string serviceName, string replyName)
+        {
+            IntPtr serviceNameAsPtr = StringToUTF8Ptr(serviceName);
+            IntPtr replyNameAsPtr = StringToUTF8Ptr(replyName);
+            Result res = igs_service_reply_add(serviceNameAsPtr, replyNameAsPtr);
+            Marshal.FreeHGlobal(serviceNameAsPtr);
+            Marshal.FreeHGlobal(replyNameAsPtr);
+            return res;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_service_reply_remove(IntPtr serviceName, IntPtr replyName);
+        public static Result ServiceReplyRemove(string serviceName, string replyName)
+        {
+            IntPtr serviceNameAsPtr = StringToUTF8Ptr(serviceName);
+            IntPtr replyNameAsPtr = StringToUTF8Ptr(replyName);
+            Result res = igs_service_reply_remove(serviceNameAsPtr, replyNameAsPtr);
+            Marshal.FreeHGlobal(serviceNameAsPtr);
+            Marshal.FreeHGlobal(replyNameAsPtr);
+            return res;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_service_reply_arg_add(IntPtr serviceName, IntPtr replyName, IntPtr argName, IopValueType type);
+        public static Result ServiceReplyArgAdd(string serviceName, string replyName, string argName, IopValueType type)
+        {
+            IntPtr serviceNameAsPtr = StringToUTF8Ptr(serviceName);
+            IntPtr replyNameAsPtr = StringToUTF8Ptr(replyName);
+            IntPtr argNameAsPtr = StringToUTF8Ptr(argName);
+            Result res = igs_service_reply_arg_add(serviceNameAsPtr, replyNameAsPtr, argNameAsPtr, type);
+            Marshal.FreeHGlobal(serviceNameAsPtr);
+            Marshal.FreeHGlobal(replyNameAsPtr);
+            Marshal.FreeHGlobal(argNameAsPtr);
+            return res;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_service_reply_arg_remove(IntPtr serviceName, IntPtr replyName, IntPtr argName);
+        public static Result ServiceReplyArgRemove(string serviceName, string replyName, string argName)
+        {
+            IntPtr serviceNameAsPtr = StringToUTF8Ptr(serviceName);
+            IntPtr replyNameAsPtr = StringToUTF8Ptr(replyName);
+            IntPtr argNameAsPtr = StringToUTF8Ptr(argName);
+            Result res = igs_service_reply_arg_remove(serviceNameAsPtr, replyNameAsPtr, argNameAsPtr);
+            Marshal.FreeHGlobal(serviceNameAsPtr);
+            Marshal.FreeHGlobal(replyNameAsPtr);
+            Marshal.FreeHGlobal(argNameAsPtr);
+            return res;
+        }
+
         // Introspection for services, arguments and replies
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern uint igs_service_count();
@@ -1620,21 +1675,21 @@ namespace Ingescape
                 return list;
             }
             else return null;
-
-
         }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         internal static extern void igs_free_services_list(IntPtr list, uint numberOfServices);
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr igs_service_args_first(IntPtr name);
-        public static List<ServiceArgument> ServiceArgumentsList(string name)
+        private static extern IntPtr igs_service_args_first(IntPtr serviceName);
+        public static List<ServiceArgument> ServiceArgumentsList(string serviceName)
         {
-            IntPtr ptrArgument = igs_service_args_first(StringToUTF8Ptr(name));
-            List<ServiceArgument> serviceArgumentsList = new List<ServiceArgument>();
+            IntPtr serviceNameAsPtr = StringToUTF8Ptr(serviceName);
+            IntPtr ptrArgument = igs_service_args_first(serviceNameAsPtr);
+            List<ServiceArgument> serviceArgumentsList = null;
             if (ptrArgument != null)
             {
+                serviceArgumentsList = new List<ServiceArgument>();
                 while (ptrArgument != IntPtr.Zero)
                 {
                     // Marshals data from an unmanaged block of memory to a newly allocated managed object of the type specified by a generic type parameter.
@@ -1682,10 +1737,9 @@ namespace Ingescape
                     serviceArgumentsList.Add(serviceArgument);
                     ptrArgument = structArgument.next;
                 }
-                return serviceArgumentsList;
             }
-            else
-                return null;
+            Marshal.FreeHGlobal(serviceNameAsPtr);
+            return serviceArgumentsList;
         }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
@@ -1708,6 +1762,141 @@ namespace Ingescape
             bool res = igs_service_arg_exists(nameAsPtr, argAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
             Marshal.FreeHGlobal(argAsPtr);
+            return res;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
+        private static extern bool igs_service_has_replies(IntPtr serviceName);
+        public static bool ServiceHasReplies(string serviceName)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(serviceName);
+            bool res = igs_service_has_replies(nameAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            return res;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
+        private static extern bool igs_service_has_reply(IntPtr serviceName, IntPtr replyName);
+        public static bool ServiceHasReply(string serviceName, string replyName)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(serviceName);
+            IntPtr replyNameAsPtr = StringToUTF8Ptr(replyName);
+            bool res = igs_service_has_reply(nameAsPtr, replyNameAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            Marshal.FreeHGlobal(replyNameAsPtr);
+            return res;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr igs_service_reply_names(IntPtr serviceName, ref uint serviceRepliesNbr);
+        public static string[] ServiceReplyNames(string serviceName)
+        {
+            uint serviceRepliesNbr = 0;
+            string[] replyNames = null;
+            IntPtr serviceNameAsPtr = StringToUTF8Ptr(serviceName);
+            IntPtr replyNamesAsPtr = igs_service_reply_names(serviceNameAsPtr, ref serviceRepliesNbr);
+            if (serviceRepliesNbr != 0)
+            {
+                IntPtr[] replyNamesAsPtrArray = new IntPtr[serviceRepliesNbr];
+                Marshal.Copy(replyNamesAsPtr, replyNamesAsPtrArray, 0, (int)serviceRepliesNbr);
+                replyNames = new string[serviceRepliesNbr];
+                for (int i = 0; i < serviceRepliesNbr; i++)
+                    replyNames[i] = Marshal.PtrToStringAnsi(replyNamesAsPtrArray[i]);
+
+                igs_free_services_list(replyNamesAsPtr, serviceRepliesNbr);
+            }
+            return replyNames;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr igs_service_reply_args_first(IntPtr serviceName, IntPtr replyName);
+        public static List<ServiceArgument> ServiceReplyArgumentsList(string serviceName, string replyName)
+        {
+            IntPtr serviceNameAsPtr = StringToUTF8Ptr(serviceName);
+            IntPtr replyNameAsPtr = StringToUTF8Ptr(replyName);
+            IntPtr ptrArgument = igs_service_reply_args_first(serviceNameAsPtr, replyNameAsPtr);
+            List<ServiceArgument> serviceReplyArgumentsList = null;
+            if (ptrArgument != IntPtr.Zero)
+            {
+                serviceReplyArgumentsList = new List<ServiceArgument>();
+                while (ptrArgument != IntPtr.Zero)
+                {
+                    // Marshals data from an unmanaged block of memory to a newly allocated managed object of the type specified by a generic type parameter.
+                    StructServiceArgument structArgument = Marshal.PtrToStructure<StructServiceArgument>(ptrArgument);
+
+                    object value = null;
+
+                    switch (structArgument.type)
+                    {
+                        case IopValueType.Bool:
+                            value = structArgument.union.b;
+                            break;
+
+                        case IopValueType.Integer:
+                            value = structArgument.union.i;
+                            break;
+
+                        case IopValueType.Double:
+                            value = structArgument.union.d;
+                            break;
+
+                        case IopValueType.String:
+                            value = PtrToStringFromUTF8(structArgument.union.c);
+                            break;
+
+                        case IopValueType.Data:
+                            byte[] byteArray = new byte[structArgument.size];
+
+                            // Copies data from an unmanaged memory pointer to a managed 8-bit unsigned integer array.
+                            // Copy the content of the IntPtr to the byte array
+                            if (structArgument.union.data != IntPtr.Zero)
+                                Marshal.Copy(structArgument.union.data, byteArray, 0, (int)structArgument.size);
+                            else
+                                byteArray = null;
+
+                            value = byteArray;
+                            break;
+
+                        default:
+                            break;
+                    }
+
+                    ServiceArgument serviceArgument = new ServiceArgument(PtrToStringFromUTF8(structArgument.name), structArgument.type, value);
+                    serviceReplyArgumentsList.Add(serviceArgument);
+                    ptrArgument = structArgument.next;
+                }
+            }
+            Marshal.FreeHGlobal(serviceNameAsPtr);
+            Marshal.FreeHGlobal(replyNameAsPtr);
+            return serviceReplyArgumentsList;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern uint igs_service_reply_args_count(IntPtr serviceName, IntPtr replyName);
+        public static uint ServiceReplyArgsCount(string serviceName, string replyName)
+        {
+            IntPtr serviceNameAsPtr = StringToUTF8Ptr(serviceName);
+            IntPtr replyNameAsPtr = StringToUTF8Ptr(replyName);
+            uint res = igs_service_reply_args_count(serviceNameAsPtr, replyNameAsPtr);
+            Marshal.FreeHGlobal(serviceNameAsPtr);
+            Marshal.FreeHGlobal(replyNameAsPtr);
+            return res;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
+        private static extern bool igs_service_reply_arg_exists(IntPtr serviceName, IntPtr replyName, IntPtr argName);
+        public static bool ServiceReplyArgExists(string serviceName, string replyName, string argName)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(serviceName);
+            IntPtr replyNameAsPtr = StringToUTF8Ptr(replyName);
+            IntPtr argNameAsPtr = StringToUTF8Ptr(argName);
+            bool res = igs_service_reply_arg_exists(nameAsPtr, replyNameAsPtr, argNameAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            Marshal.FreeHGlobal(replyNameAsPtr);
+            Marshal.FreeHGlobal(argNameAsPtr);
             return res;
         }
         #endregion

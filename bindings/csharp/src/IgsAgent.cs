@@ -466,7 +466,7 @@ namespace Ingescape
         }
 
         [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern Result igsagent_input_create(IntPtr agent, IntPtr name, IopValueType value_type, IntPtr value, uint size);
+        private static extern Result igsagent_input_create(IntPtr agent, IntPtr name, IopValueType type, IntPtr value, uint size);
         public Result InputCreate(string name, IopValueType type, object value = null)
         {
             if (_pAgent == IntPtr.Zero) 
@@ -1767,6 +1767,69 @@ namespace Ingescape
             return res;
         }
 
+        ///<summary>
+        /////replies are optional and used for specification purposes
+        ///</summary>
+        [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igsagent_service_reply_add(IntPtr agent, IntPtr serviceName, IntPtr replyName);
+        public Result ServiceReplyAdd(string serviceName, string replyName)
+        {
+            if (_pAgent == IntPtr.Zero)
+                throw new NullReferenceException("Agent pointer is null");
+            IntPtr serviceNameAsPtr = Igs.StringToUTF8Ptr(serviceName);
+            IntPtr replyNameAsPtr = Igs.StringToUTF8Ptr(replyName);
+            Result res = igsagent_service_reply_add(_pAgent, serviceNameAsPtr, replyNameAsPtr);
+            Marshal.FreeHGlobal(serviceNameAsPtr);
+            Marshal.FreeHGlobal(replyNameAsPtr);
+            return res;
+        }
+
+        [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igsagent_service_reply_remove(IntPtr agent, IntPtr serviceName, IntPtr replyName);
+        public Result ServiceReplyRemove(string serviceName, string replyName)
+        {
+            if (_pAgent == IntPtr.Zero)
+                throw new NullReferenceException("Agent pointer is null");
+            IntPtr serviceNameAsPtr = Igs.StringToUTF8Ptr(serviceName);
+            IntPtr replyNameAsPtr = Igs.StringToUTF8Ptr(replyName);
+            Result res = igsagent_service_reply_remove(_pAgent, serviceNameAsPtr, replyNameAsPtr);
+            Marshal.FreeHGlobal(serviceNameAsPtr);
+            Marshal.FreeHGlobal(replyNameAsPtr);
+            return res;
+        }
+
+        [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igsagent_service_reply_arg_add(IntPtr agent, IntPtr serviceName, IntPtr replyName, IntPtr argName, IopValueType type);
+        public Result ServiceReplyArgAdd(string serviceName, string replyName, string argName, IopValueType type)
+        {
+            if (_pAgent == IntPtr.Zero)
+                throw new NullReferenceException("Agent pointer is null");
+            IntPtr serviceNameAsPtr = Igs.StringToUTF8Ptr(serviceName);
+            IntPtr replyNameAsPtr = Igs.StringToUTF8Ptr(replyName);
+            IntPtr argNameAsPtr = Igs.StringToUTF8Ptr(argName);
+            Result res = igsagent_service_reply_arg_add(_pAgent, serviceNameAsPtr, replyNameAsPtr, argNameAsPtr, type);
+            Marshal.FreeHGlobal(serviceNameAsPtr);
+            Marshal.FreeHGlobal(replyNameAsPtr);
+            Marshal.FreeHGlobal(argNameAsPtr);
+            return res;
+        }
+
+        [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igsagent_service_reply_arg_remove(IntPtr agent, IntPtr serviceName, IntPtr replyName, IntPtr argName);
+        public Result ServiceReplyArgRemove(string serviceName, string replyName, string argName)
+        {
+            if (_pAgent == IntPtr.Zero)
+                throw new NullReferenceException("Agent pointer is null");
+            IntPtr serviceNameAsPtr = Igs.StringToUTF8Ptr(serviceName);
+            IntPtr replyNameAsPtr = Igs.StringToUTF8Ptr(replyName);
+            IntPtr argNameAsPtr = Igs.StringToUTF8Ptr(argName);
+            Result res = igsagent_service_reply_arg_remove(_pAgent, serviceNameAsPtr, replyNameAsPtr, argNameAsPtr);
+            Marshal.FreeHGlobal(serviceNameAsPtr);
+            Marshal.FreeHGlobal(replyNameAsPtr);
+            Marshal.FreeHGlobal(argNameAsPtr);
+            return res;
+        }
+
         [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern uint igsagent_service_count(IntPtr agent);
         public uint ServiceCount()
@@ -1817,10 +1880,14 @@ namespace Ingescape
 
         public List<ServiceArgument> ServiceArgumentsList(string name)
         {
-            IntPtr ptrArgument = igsagent_service_args_first(_pAgent, Igs.StringToUTF8Ptr(name));
-            List<ServiceArgument> serviceArgumentsList = new List<ServiceArgument>();
+            if (_pAgent == IntPtr.Zero)
+                throw new NullReferenceException("Agent pointer is null");
+            IntPtr serviceNameAsPtr = Igs.StringToUTF8Ptr(name);
+            IntPtr ptrArgument = igsagent_service_args_first(_pAgent, serviceNameAsPtr);
+            List<ServiceArgument> serviceArgumentsList = null;
             if (ptrArgument != null)
             {
+                serviceArgumentsList = new List<ServiceArgument>();
                 while (ptrArgument != IntPtr.Zero)
                 {
                     // Marshals data from an unmanaged block of memory to a newly allocated managed object of the type specified by a generic type parameter.
@@ -1848,8 +1915,7 @@ namespace Ingescape
 
                         case IopValueType.Data:
                             byte[] byteArray = new byte[structArgument.size];
-
-                            // FIXME: size has type "uint" in language C. The corresponding type in C# is uint. But "Marshal.Copy(...)" does not accept uint for parameter "length"
+                            
                             if (structArgument.union.data != IntPtr.Zero)
                                 Marshal.Copy(structArgument.union.data, byteArray, 0, (int)structArgument.size);                            
                             else
@@ -1865,10 +1931,9 @@ namespace Ingescape
                     serviceArgumentsList.Add(serviceArgument);
                     ptrArgument = structArgument.next;
                 }
-                return serviceArgumentsList;
             }
-            else
-                return null;
+            Marshal.FreeHGlobal(serviceNameAsPtr);
+            return serviceArgumentsList;
         }
 
         [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
@@ -1897,6 +1962,155 @@ namespace Ingescape
             Marshal.FreeHGlobal(argNameAsPtr);
             return res;
         }
+
+        [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
+        private static extern bool igsagent_service_has_replies(IntPtr agent, IntPtr serviceName);
+        public bool ServiceHasReplies(string serviceName)
+        {
+            if (_pAgent == IntPtr.Zero)
+                throw new NullReferenceException("Agent pointer is null");
+            IntPtr nameAsPtr = Igs.StringToUTF8Ptr(serviceName);
+            bool res = igsagent_service_has_replies(_pAgent, nameAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            return res;
+        }
+
+        [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
+        private static extern bool igsagent_service_has_reply(IntPtr agent, IntPtr serviceName, IntPtr replyName);
+        public bool ServiceHasReply(string serviceName, string replyName)
+        {
+            if (_pAgent == IntPtr.Zero)
+                throw new NullReferenceException("Agent pointer is null");
+            IntPtr nameAsPtr = Igs.StringToUTF8Ptr(serviceName);
+            IntPtr replyNameAsPtr = Igs.StringToUTF8Ptr(replyName);
+            bool res = igsagent_service_has_reply(_pAgent, nameAsPtr, replyNameAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            Marshal.FreeHGlobal(replyNameAsPtr);
+            return res;
+        }
+
+        [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr igsagent_service_reply_names(IntPtr agent, IntPtr serviceName, ref uint serviceRepliesNbr);
+        public string[] ServiceReplyNames(string serviceName)
+        {
+            if (_pAgent == IntPtr.Zero)
+                throw new NullReferenceException("Agent pointer is null");
+            uint serviceRepliesNbr = 0;
+            string[] replyNames = null;
+            IntPtr serviceNameAsPtr = Igs.StringToUTF8Ptr(serviceName);
+            IntPtr replyNamesAsPtr = igsagent_service_reply_names(_pAgent, serviceNameAsPtr, ref serviceRepliesNbr);
+            if (serviceRepliesNbr != 0)
+            {
+                IntPtr[] replyNamesAsPtrArray = new IntPtr[serviceRepliesNbr];
+                Marshal.Copy(replyNamesAsPtr, replyNamesAsPtrArray, 0, (int)serviceRepliesNbr);
+                replyNames = new string[serviceRepliesNbr];
+                for (int i = 0; i < serviceRepliesNbr; i++)
+                    replyNames[i] = Marshal.PtrToStringAnsi(replyNamesAsPtrArray[i]);
+
+                Igs.igs_free_services_list(replyNamesAsPtr, serviceRepliesNbr);
+            }
+            return replyNames;
+        }
+
+        [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr igsagent_service_reply_args_first(IntPtr agent, IntPtr serviceName, IntPtr replyName);
+        public List<ServiceArgument> ServiceReplyArgumentsList(string serviceName, string replyName)
+        {
+            if (_pAgent == IntPtr.Zero)
+                throw new NullReferenceException("Agent pointer is null");
+            IntPtr serviceNameAsPtr = Igs.StringToUTF8Ptr(serviceName);
+            IntPtr replyNameAsPtr = Igs.StringToUTF8Ptr(replyName);
+            IntPtr ptrArgument = igsagent_service_reply_args_first(_pAgent, serviceNameAsPtr, replyNameAsPtr);
+            List<ServiceArgument> serviceReplyArgumentsList = null;
+            if (ptrArgument != null)
+            {
+                serviceReplyArgumentsList = new List<ServiceArgument>();
+                while (ptrArgument != IntPtr.Zero)
+                {
+                    // Marshals data from an unmanaged block of memory to a newly allocated managed object of the type specified by a generic type parameter.
+                    Igs.StructServiceArgument structArgument = Marshal.PtrToStructure<Igs.StructServiceArgument>(ptrArgument);
+
+                    object value = null;
+
+                    switch (structArgument.type)
+                    {
+                        case IopValueType.Bool:
+                            value = structArgument.union.b;
+                            break;
+
+                        case IopValueType.Integer:
+                            value = structArgument.union.i;
+                            break;
+
+                        case IopValueType.Double:
+                            value = structArgument.union.d;
+                            break;
+
+                        case IopValueType.String:
+                            value = Igs.PtrToStringFromUTF8(structArgument.union.c);
+                            break;
+
+                        case IopValueType.Data:
+                            byte[] byteArray = new byte[structArgument.size];
+
+                            // Copies data from an unmanaged memory pointer to a managed 8-bit unsigned integer array.
+                            // Copy the content of the IntPtr to the byte array
+                            if (structArgument.union.data != IntPtr.Zero)
+                                Marshal.Copy(structArgument.union.data, byteArray, 0, (int)structArgument.size);
+                            else
+                                byteArray = null;
+
+                            value = byteArray;
+                            break;
+
+                        default:
+                            break;
+                    }
+
+                    ServiceArgument serviceArgument = new ServiceArgument(Igs.PtrToStringFromUTF8(structArgument.name), structArgument.type, value);
+                    serviceReplyArgumentsList.Add(serviceArgument);
+                    ptrArgument = structArgument.next;
+                }
+            }
+            Marshal.FreeHGlobal(serviceNameAsPtr);
+            Marshal.FreeHGlobal(replyNameAsPtr);
+            return serviceReplyArgumentsList;
+        }
+
+        [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern uint igsagent_service_reply_args_count(IntPtr agent, IntPtr serviceName, IntPtr replyName);
+        public uint ServiceReplyArgsCount(string serviceName, string replyName)
+        {
+            if (_pAgent == IntPtr.Zero)
+                throw new NullReferenceException("Agent pointer is null");
+            IntPtr serviceNameAsPtr = Igs.StringToUTF8Ptr(serviceName);
+            IntPtr replyNameAsPtr = Igs.StringToUTF8Ptr(replyName);
+            uint res = igsagent_service_reply_args_count(_pAgent, serviceNameAsPtr, replyNameAsPtr);
+            Marshal.FreeHGlobal(serviceNameAsPtr);
+            Marshal.FreeHGlobal(replyNameAsPtr);
+            return res;
+        }
+
+        [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
+        private static extern bool igsagent_service_reply_arg_exists(IntPtr agent, IntPtr serviceName, IntPtr replyName, IntPtr argName);
+        public bool ServiceReplyArgExists(string serviceName, string replyName, string argName)
+        {
+            if (_pAgent == IntPtr.Zero)
+                throw new NullReferenceException("Agent pointer is null");
+            IntPtr nameAsPtr = Igs.StringToUTF8Ptr(serviceName);
+            IntPtr replyNameAsPtr = Igs.StringToUTF8Ptr(replyName);
+            IntPtr argNameAsPtr = Igs.StringToUTF8Ptr(argName);
+            bool res = igsagent_service_reply_arg_exists(_pAgent, nameAsPtr, replyNameAsPtr, argNameAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            Marshal.FreeHGlobal(replyNameAsPtr);
+            Marshal.FreeHGlobal(argNameAsPtr);
+            return res;
+        }
+
+
         #endregion
 
         [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]

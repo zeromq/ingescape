@@ -17,7 +17,7 @@ Compilation is possible for _Win32_ or _x64_. Change the '-A' option below accor
 Build type may be _Debug_ or _Release_.
 
 	cmake -S . -B .\build -G"Visual Studio 16 2019" -Ax64 -DCMAKE_BUILD_TYPE=Release -DWITH_CSHARP_TEST=OFF
-	Powershell.exe -executionpolicy remotesigned builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildDirectory ./build -projectName IngescapeCSharp        
+	Powershell.exe -executionpolicy remotesigned builds/cmake/FixCmakeSolution.ps1 -buildDirectory ./build -projectName IngescapeCSharp        
     cmake --build .\build --target IngescapeCSharp --config Release
 
 ## Testing
@@ -28,7 +28,7 @@ Open the Test Explorer tab in Visual Studio to execute the tests.
 Tests can be built using CMAKE. Ingescape must be installed on system.
 
 	cmake -S . -B.\build -G"Visual Studio 16 2019" -Ax64 -DCMAKE_BUILD_TYPE=Release
-	Powershell.exe -executionpolicy remotesigned builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildDirectory ./build -projectName IngescapeCSharp
-	Powershell.exe -executionpolicy remotesigned builds/visual-studio/cmake/FixCmakeSolution.ps1 -buildDirectory ./build/test -projectName igstester
+	Powershell.exe -executionpolicy remotesigned builds/cmake/FixCmakeSolution.ps1 -buildDirectory ./build -projectName IngescapeCSharp
+	Powershell.exe -executionpolicy remotesigned builds/cmake/FixCmakeSolution.ps1 -buildDirectory ./build/test -projectName igstester
 	cmake --build .\build --target igstester --config Release
-    dotnet vstest .\build\test\Release\net472\igstester.dll /Platform:x64d
+    dotnet vstest .\build\test\Release\net472\igstester.dll /Platform:x64
