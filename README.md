@@ -244,10 +244,6 @@ Here is the code for the **ShapeRecognizer** agent to be copied into a main.c fi
 	//
 	//  main.c
 	//  ShapeRecognizer version 1.0
-	//  Created by Stéphane Valès on 2021/07/23
-	//
-	//  no description
-	//
 
 	#ifdef _WIN32
 	#define WIN32_LEAN_AND_MEAN
@@ -328,9 +324,6 @@ Here is the code for the **ImagesProvider** agent to be copied into another main
 	//  main.c
 	//  ImagesProvider version 1.0
 	//  Created by Stéphane Valès on 2021/07/23
-	//
-	//  no description
-	//
 
 	#ifdef _WIN32
 	#ifndef WIN32_LEAN_AND_MEAN
