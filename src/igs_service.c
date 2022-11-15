@@ -294,7 +294,7 @@ igs_service_arg_t *igs_service_args_clone (igs_service_arg_t *list)
 
 void igs_service_args_add_int (igs_service_arg_t **list, int value)
 {
-    assert(list && *list);
+    assert(list);
     igs_service_arg_t *new = (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
     new->type = IGS_INTEGER_T;
     new->i = value;
@@ -304,7 +304,7 @@ void igs_service_args_add_int (igs_service_arg_t **list, int value)
 
 void igs_service_args_add_bool (igs_service_arg_t **list, bool value)
 {
-    assert(list && *list);
+    assert(list);
     igs_service_arg_t *new = (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
     new->type = IGS_BOOL_T;
     new->b = value;
@@ -314,7 +314,7 @@ void igs_service_args_add_bool (igs_service_arg_t **list, bool value)
 
 void igs_service_args_add_double (igs_service_arg_t **list, double value)
 {
-    assert(list && *list);
+    assert(list);
     igs_service_arg_t *new = (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
     new->type = IGS_DOUBLE_T;
     new->d = value;
@@ -324,7 +324,7 @@ void igs_service_args_add_double (igs_service_arg_t **list, double value)
 
 void igs_service_args_add_string (igs_service_arg_t **list, const char *value)
 {
-    assert(list && *list);
+    assert(list);
     igs_service_arg_t *new = (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
     new->type = IGS_STRING_T;
     if (value) {
@@ -342,7 +342,7 @@ void igs_service_args_add_data (igs_service_arg_t **list,
                                 void *value,
                                 size_t size)
 {
-    assert(list && *list);
+    assert(list);
     igs_service_arg_t *new = (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
     new->type = IGS_DATA_T;
     new->data = (void *) zmalloc (size);
