@@ -294,6 +294,7 @@ igs_service_arg_t *igs_service_args_clone (igs_service_arg_t *list)
 
 void igs_service_args_add_int (igs_service_arg_t **list, int value)
 {
+    assert(list);
     igs_service_arg_t *new = (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
     new->type = IGS_INTEGER_T;
     new->i = value;
@@ -303,6 +304,7 @@ void igs_service_args_add_int (igs_service_arg_t **list, int value)
 
 void igs_service_args_add_bool (igs_service_arg_t **list, bool value)
 {
+    assert(list);
     igs_service_arg_t *new = (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
     new->type = IGS_BOOL_T;
     new->b = value;
@@ -312,6 +314,7 @@ void igs_service_args_add_bool (igs_service_arg_t **list, bool value)
 
 void igs_service_args_add_double (igs_service_arg_t **list, double value)
 {
+    assert(list);
     igs_service_arg_t *new = (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
     new->type = IGS_DOUBLE_T;
     new->d = value;
@@ -321,6 +324,7 @@ void igs_service_args_add_double (igs_service_arg_t **list, double value)
 
 void igs_service_args_add_string (igs_service_arg_t **list, const char *value)
 {
+    assert(list);
     igs_service_arg_t *new = (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
     new->type = IGS_STRING_T;
     if (value) {
@@ -338,6 +342,7 @@ void igs_service_args_add_data (igs_service_arg_t **list,
                                 void *value,
                                 size_t size)
 {
+    assert(list);
     igs_service_arg_t *new = (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
     new->type = IGS_DATA_T;
     new->data = (void *) zmalloc (size);
@@ -868,7 +873,7 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                 s_unlock_zyre_peer (__FUNCTION__, __LINE__);
                 if (core_context->enable_service_logging)
                     s_service_log_sent_service (agent, remote_agent->definition->name, remote_agent->uuid,
-                                                service_name, *list);
+                                                service_name, list ? *list : NULL);
                 else
                     igsagent_debug (agent, "calling %s(%s).%s",
                                     remote_agent->definition->name,
@@ -921,7 +926,7 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                                 service_free_values_in_arguments (service->arguments);
                                 if (core_context->enable_service_logging)
                                     service_log_received_service (local_agent, agent->definition->name,
-                                                                  agent->uuid, service_name, *list);
+                                                                  agent->uuid, service_name, list ? *list : NULL);
                             }
                             else
                                 igsagent_error (agent, "no defined callback to handle received service %s", service_name);
