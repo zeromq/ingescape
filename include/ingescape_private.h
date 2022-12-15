@@ -373,6 +373,7 @@ typedef struct igs_core_context {
     bool log_in_stream;
     bool log_in_file;
     bool log_in_console;
+    bool log_in_syslog;
     bool use_color_in_console;
     bool enable_data_logging;
     bool enable_service_logging;

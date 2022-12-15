@@ -235,6 +235,66 @@ void admin_log (igsagent_t *agent,
         }
     }
     
+    if (core_context->log_in_syslog){
+#if defined (__UNIX__)
+#   if defined (__UTYPE_ANDROID)
+        int priority = ANDROID_LOG_DEFAULT;
+        switch (level) {
+            case IGS_LOG_FATAL:
+                priority = ANDROID_LOG_FATAL;
+                break;
+            case IGS_LOG_ERROR:
+                priority = ANDROID_LOG_ERROR;
+                break;
+            case IGS_LOG_WARN:
+                priority = ANDROID_LOG_WARN;
+                break;
+            case IGS_LOG_INFO:
+                priority = ANDROID_LOG_INFO;
+                break;
+            case IGS_LOG_DEBUG:
+                priority = ANDROID_LOG_DEBUG;
+                break;
+            case IGS_LOG_TRACE:
+                priority = ANDROID_LOG_VERBOSE;
+                break;
+                
+            default:
+                break;
+        }
+        __android_log_print(priority, agent->definition->name, "%s;%s;%s",
+                            log_levels[level], function, log_content);
+#   else
+        int priority = LOG_DEBUG;
+        switch (level) {
+            case IGS_LOG_FATAL:
+                priority = LOG_CRIT;
+                break;
+            case IGS_LOG_ERROR:
+                priority = LOG_ERR;
+                break;
+            case IGS_LOG_WARN:
+                priority = LOG_WARNING;
+                break;
+            case IGS_LOG_INFO:
+                priority = LOG_NOTICE;
+                break;
+            case IGS_LOG_DEBUG:
+                priority = LOG_INFO;
+                break;
+            case IGS_LOG_TRACE:
+                priority = LOG_DEBUG;
+                break;
+                
+            default:
+                break;
+        }
+        syslog(priority, "%s;%s;%s;%s", agent->definition->name,
+               log_levels[level], function, log_content);
+#   endif
+#endif
+    }
+    
     if (full_log_content_rectified)
         free (full_log_content_rectified);
     assert (s_lock_initialized);
@@ -347,6 +407,22 @@ bool igs_log_console ()
 {
     core_init_context ();
     return core_context->log_in_console;
+}
+
+void igs_log_set_syslog (bool allow){
+    core_init_context ();
+    core_context->log_in_syslog = allow;
+#if defined (__UNIX__)
+    openlog ("ingescape", LOG_PID, LOG_USER);
+#elif defined (__WINDOWS__)
+    //  TODO: hook in Windows event log for Windows
+#endif
+    
+}
+
+bool igs_log_syslog(void){
+    core_init_context ();
+    return core_context->log_in_syslog;
 }
 
 void igs_log_set_console_color (bool allow)
