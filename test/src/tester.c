@@ -400,6 +400,9 @@ int main(int argc, const char * argv[]) {
         }
     }
     igs_clear_context();
+    igs_log_set_syslog(true);
+    //NB: on macos, because syslog is broken, logs can be checked using this command:
+    //log stream --info --debug --predicate 'sender == "ingescape"' --style syslog
     igs_log_include_data(true);
     igs_log_include_services(true);
 

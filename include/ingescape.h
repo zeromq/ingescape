@@ -31,7 +31,7 @@
 
 //  INGESCAPE version macros for compile-time API detection
 #define INGESCAPE_VERSION_MAJOR 3
-#define INGESCAPE_VERSION_MINOR 1
+#define INGESCAPE_VERSION_MINOR 2
 #define INGESCAPE_VERSION_PATCH 0
 
 #define INGESCAPE_MAKE_VERSION(major, minor, patch) \
@@ -735,6 +735,8 @@ INGESCAPE_EXPORT char * igs_command_line(void); //caller owns returned value
 //LOGS MANAGEMENT
 INGESCAPE_EXPORT void igs_log_set_console(bool); //enable logs in console (ERROR and FATAL are always displayed)
 INGESCAPE_EXPORT bool igs_log_console(void);
+INGESCAPE_EXPORT void igs_log_set_syslog(bool); //enable system logs on UNIX boxes (not working on Windows yet)
+INGESCAPE_EXPORT bool igs_log_syslog(void);
 INGESCAPE_EXPORT void igs_log_set_console_color(bool); //use colors in console
 INGESCAPE_EXPORT bool igs_log_console_color(void);
 INGESCAPE_EXPORT void igs_log_set_console_level (igs_log_level_t level); //set log level in console, default is IGS_LOG_INFO
