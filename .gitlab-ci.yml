@@ -783,10 +783,10 @@ binding-node-js-windows:
     - Xcopy ..\..\dependencies\sodium\src\libsodium\include .\dependencies\windows\include\ /E /y
     - Xcopy ..\..\dependencies\zyre\include .\dependencies\windows\include\ /E /y
     - $CORRECT_PWD = $PWD -replace "\\", "\\"
-    - (Get-Content -path .\binding.gyp -Raw) -replace 'C:\\\\Program Files\\\\ingescape',"$CORRECT_PWD\\dependencies\\windows" | Set-Content .\binding.gyp #update file paths for igs
+    - (Get-Content -path .\binding.gyp -Raw) -replace 'C:\\\\Program Files\\\\ingescape\\\\library',"$CORRECT_PWD\\dependencies\\windows" | Set-Content .\binding.gyp #update file paths for igs
     - npm install -g prebuildify
     - if (Test-Path C:\Users\admin\AppData\Local\Temp\prebuildify) { Remove-Item C:\Users\admin\AppData\Local\Temp\prebuildify -Force -Recurse } #To force prebuildify to re-upload its temporary cache
-    - npm run build --msvs_version=2019 --from_sources=1
+    - npm run build --msvs_version=2019 --from_sources=1 --verbose
   artifacts:
     paths:
       - bindings/javascript-node/prebuilds
