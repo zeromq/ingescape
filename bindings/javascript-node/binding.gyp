@@ -20,13 +20,13 @@
 						  'ZYRE_STATIC',
 						  'SODIUM_STATIC'
 						],
-                        "include_dirs": ['C:\\Program Files\\ingescape\\include'],
+                        "include_dirs": ['C:\\Program Files\\ingescape\\library\\include', 'C:\\Program Files\\ingescape\\library\\include\\ingescape'],
                         "libraries": [
-                            'C:\\Program Files\\ingescape\\lib\\libingescape.lib',
-                            'C:\\Program Files\\ingescape\\lib\\libzyre.lib',
-                            'C:\\Program Files\\ingescape\\lib\\libczmq.lib',
-                            'C:\\Program Files\\ingescape\\lib\\libzmq-v142-mt-s-4_3_5.lib',
-                            'C:\\Program Files\\ingescape\\lib\\libsodium.lib',
+                            'C:\\Program Files\\ingescape\\library\\lib\\libingescape.lib',
+                            'C:\\Program Files\\ingescape\\library\\lib\\libzyre.lib',
+                            'C:\\Program Files\\ingescape\\library\\lib\\libczmq.lib',
+                            'C:\\Program Files\\ingescape\\library\\lib\\libzmq-v142-mt-s-4_3_5.lib',
+                            'C:\\Program Files\\ingescape\\library\\lib\\libsodium.lib',
                             '-lws2_32',
                             '-lIphlpapi',
                             '-lRpcrt4'
