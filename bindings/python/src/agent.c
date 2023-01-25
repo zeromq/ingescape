@@ -2240,6 +2240,49 @@ PyObject *Agent_service_arg_remove(AgentObject *self, PyObject *args, PyObject *
     return PyLong_FromLong(igsagent_service_arg_remove(self->agent, service_name, arg_name));
 }
 
+PyObject *Agent_service_reply_add(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    char *service_name;
+    char *reply_name;
+    if (!PyArg_ParseTuple(args, "ss", &service_name, &reply_name))
+        return NULL;
+
+    return PyLong_FromLong(igsagent_service_reply_add(self->agent, service_name, reply_name));
+}
+
+PyObject *Agent_service_reply_remove(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    char *service_name;
+    char *reply_name;
+    if (!PyArg_ParseTuple(args, "ss", &service_name, &reply_name))
+        return NULL;
+
+    return PyLong_FromLong(igsagent_service_reply_remove(self->agent, service_name, reply_name));
+}
+
+PyObject *Agent_service_reply_arg_add(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    char *service_name;
+    char *reply_name;
+	char* arg_name;
+	int type;
+    if (!PyArg_ParseTuple(args, "sssi", &service_name, &reply_name, &arg_name, &type))
+        return NULL;
+
+    return PyLong_FromLong(igsagent_service_reply_arg_add(self->agent, service_name, reply_name, arg_name, type));
+}
+
+PyObject *Agent_service_reply_arg_remove(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    char *service_name;
+    char *reply_name;
+	char* arg_name;
+    if (!PyArg_ParseTuple(args, "sss", &service_name, &reply_name, &arg_name))
+        return NULL;
+
+    return PyLong_FromLong(igsagent_service_reply_arg_remove(self->agent, service_name, reply_name, arg_name));
+}
+
 PyObject *Agent_service_count(AgentObject *self, PyObject *args, PyObject *kwds)
 {
     if(self->agent)

@@ -1595,6 +1595,49 @@ PyObject * service_arg_remove_wrapper(PyObject * self, PyObject * args){
     return PyLong_FromLong(igs_service_arg_remove(callName, argName));
 }
 
+PyObject * service_reply_add_wrapper(PyObject *self, PyObject *args)
+{
+    char *callName;
+    char *replyName;
+    if (!PyArg_ParseTuple(args, "ss", &callName, &replyName))
+		return NULL;
+
+    return PyLong_FromLong(igs_service_reply_add(callName, replyName));
+}
+
+PyObject * service_reply_remove_wrapper(PyObject *self, PyObject *args)
+{
+    char *callName;
+    char *replyName;
+    if (!PyArg_ParseTuple(args, "ss", &callName, &replyName))
+		return NULL;
+
+    return PyLong_FromLong(igs_service_reply_remove(callName, replyName));
+}
+
+PyObject * service_reply_arg_add_wrapper(PyObject *self, PyObject *args)
+{
+    char *callName;
+    char *replyName;
+    char *argName;
+    int type;
+    if (!PyArg_ParseTuple(args, "sssi", &callName, &replyName, &argName, &type))
+		return NULL;
+
+    return PyLong_FromLong(igs_service_reply_arg_add(callName, replyName, argName, type));
+}
+
+PyObject * service_reply_arg_remove_wrapper(PyObject *self, PyObject *args)
+{
+    char *callName;
+    char *replyName;
+    char *argName;
+    if (!PyArg_ParseTuple(args, "sss", &callName, &replyName, &argName))
+		return NULL;
+
+    return PyLong_FromLong(igs_service_reply_arg_remove(callName, replyName, argName));
+}
+
 PyObject * service_count_wrapper(PyObject * self, PyObject * args)
 {
     return PyLong_FromLong((int)igs_service_count());

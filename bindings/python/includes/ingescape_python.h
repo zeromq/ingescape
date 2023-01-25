@@ -227,6 +227,11 @@ PyObject * service_remove_wrapper(PyObject * self, PyObject * args);
 PyObject * service_arg_add_wrapper(PyObject * self, PyObject * args);
 PyObject * service_arg_remove_wrapper(PyObject * self, PyObject * args);
 
+PyObject * service_reply_add_wrapper(PyObject * self, PyObject * args);
+PyObject * service_reply_remove_wrapper(PyObject * self, PyObject * args);
+PyObject * service_reply_arg_add_wrapper(PyObject * self, PyObject * args);
+PyObject * service_reply_arg_remove_wrapper(PyObject * self, PyObject * args);
+
 PyObject * service_count_wrapper(PyObject * self, PyObject * args);
 PyObject * service_exists_wrapper(PyObject * self, PyObject * args);
 PyObject *service_list_wrapper(PyObject * self, PyObject * args);

@@ -64,12 +64,12 @@ PyObject * log_set_file_wrapper(PyObject * self, PyObject * args)
 {
     bool useLogFile;
     PyObject *pathObject;
-    if (!PyArg_ParseTuple(args, "bO", &useLogFile, &pathObject))
+    if (!PyArg_ParseTuple(args, "bO", &useLogFile, &pathObject)) // First cast the second parameter as PyObject to check against Py_None
         return NULL;
     if(pathObject != Py_None)
     {
         char *path_c;
-        if (!PyArg_ParseTuple(args, "bO", &useLogFile, &path_c))
+        if (!PyArg_ParseTuple(args, "bs", &useLogFile, &path_c)) // Second patameter is not Py_None, we cast it to string
             return NULL;
         igs_log_set_file(useLogFile, path_c);
     }

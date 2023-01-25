@@ -330,6 +330,13 @@ assert a.service_arg_add("second_service", "third_arg", igs.STRING_T) == igs.SUC
 assert a.service_arg_exists("second_service", "third_arg") == True
 assert a.service_args_list("second_service") == (('first_arg', igs.INTEGER_T), ('second_arg', igs.DOUBLE_T), ('third_arg', igs.STRING_T))
 assert a.service_args_count("second_service") == 3
+
+assert a.service_reply_add("second_service", "service_reply") == igs.SUCCESS
+assert a.service_reply_arg_add("second_service", "service_reply", "first_arg", igs.INTEGER_T) == igs.SUCCESS
+assert a.service_reply_arg_add("second_service", "service_reply", "second_arg", igs.STRING_T) == igs.SUCCESS
+assert a.service_reply_arg_remove("second_service", "service_reply", "first_arg") == igs.SUCCESS
+assert a.service_reply_arg_remove("second_service", "service_reply", "second_arg") == igs.SUCCESS
+assert a.service_reply_remove("second_service", "service_reply") == igs.SUCCESS
 print ("OK")
 
 a.clear_definition()
