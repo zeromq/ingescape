@@ -287,10 +287,14 @@ igs_json_add_string (igs_json_t *json, const char *value)
     if (value == NULL)
         value = "";
     igsyajl_gen_t *g = (struct igsyajl_gen *) json;
-    igsyajl_gen_status status =
-      igsyajl_gen_string (g, (unsigned const char *) value, strlen (value));
-    if (status != igsyajl_gen_status_ok)
+    igsyajl_gen_status status = igsyajl_gen_string (g, (unsigned const char *) value, strlen (value));
+    if (status != igsyajl_gen_status_ok){
         s_igs_json_error (status, __func__, &value);
+        igs_error("Trying to add a empty string instead");
+        igsyajl_gen_status status = igsyajl_gen_string (g, "", 0);
+        if (status != igsyajl_gen_status_ok)
+            s_igs_json_error (status, __func__, &value);
+    }
 }
 
 void
