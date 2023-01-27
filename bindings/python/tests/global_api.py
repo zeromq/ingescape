@@ -238,12 +238,21 @@ assert igs.service_arg_exists("second_service", "third_arg") == True
 assert igs.service_args_list("second_service") == (('first_arg', igs.INTEGER_T), ('second_arg', igs.DOUBLE_T), ('third_arg', igs.STRING_T))
 assert igs.service_args_count("second_service") == 3
 
+assert not igs.service_has_replies("second_service")
+assert igs.service_reply_names("second_service") == []
 assert igs.service_reply_add("second_service", "reply_service") == igs.SUCCESS
+assert igs.service_has_replies("second_service")
 assert igs.service_reply_arg_add("second_service", "reply_service", "first_arg", igs.INTEGER_T) == igs.SUCCESS
 assert igs.service_reply_arg_add("second_service", "reply_service", "second_arg", igs.STRING_T) == igs.SUCCESS
+assert igs.service_reply_args_count("second_service", "reply_service") == 2
+assert igs.service_reply_args_list("second_service", "reply_service") == (("first_arg", igs.INTEGER_T), ("second_arg", igs.STRING_T))
+assert igs.service_reply_names("second_service") == ["reply_service"]
 assert igs.service_reply_arg_remove("second_service", "reply_service", "second_arg") == igs.SUCCESS
 assert igs.service_reply_arg_remove("second_service", "reply_service", "first_arg") == igs.SUCCESS
+assert igs.service_reply_args_count("second_service", "reply_service") == 0
+assert igs.service_reply_args_list("second_service", "reply_service") == ()
 assert igs.service_reply_remove("second_service", "reply_service") == igs.SUCCESS
+assert igs.service_reply_names("second_service") == []
 print ("OK")
 
 print ("[Global API] Testing channels", end =" ")

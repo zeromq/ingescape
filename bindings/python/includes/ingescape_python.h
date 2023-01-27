@@ -240,6 +240,15 @@ PyObject *service_args_list_wrapper(PyObject * self, PyObject * args);
 PyObject *service_args_count_wrapper(PyObject * self, PyObject * args);
 PyObject *service_arg_exists_wrapper(PyObject * self, PyObject * args);
 
+PyObject *service_has_replies_wrapper(PyObject * self, PyObject * args);
+PyObject *service_has_reply_wrapper(PyObject * self, PyObject * args);
+PyObject *service_reply_names_wrapper(PyObject * self, PyObject * args);
+PyObject *service_reply_args_wrapper(PyObject * self, PyObject * args);
+
+PyObject *service_reply_args_list_wrapper(PyObject * self, PyObject * args);
+PyObject *service_reply_args_count_wrapper(PyObject * self, PyObject * args);
+PyObject *service_reply_arg_exists_wrapper(PyObject * self, PyObject * args);
+
 typedef struct timer_callback_element{
     PyObject *callback;
     PyObject *my_data;

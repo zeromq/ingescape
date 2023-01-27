@@ -228,8 +228,14 @@ PyObject *Agent_service_arg_add(AgentObject *self, PyObject *args, PyObject *kwd
 PyObject *Agent_service_arg_remove(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_service_reply_add(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_service_reply_remove(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_service_reply_names(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_service_has_replies(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_service_has_reply(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_service_reply_arg_add(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_service_reply_arg_remove(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_service_reply_args_count(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_service_reply_args_list(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_service_reply_arg_exists(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_service_count(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_service_exists(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_service_list(AgentObject *self, PyObject *args, PyObject *kwds);

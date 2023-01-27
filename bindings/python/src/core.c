@@ -1701,3 +1701,84 @@ PyObject * service_arg_exists_wrapper(PyObject * self, PyObject * args)
     else
         Py_RETURN_FALSE;
 }
+
+PyObject * service_has_replies_wrapper(PyObject * self, PyObject * args)
+{
+    char * callName;
+    if (!PyArg_ParseTuple(args, "s", &callName))
+        return NULL;
+    if (igs_service_has_replies(callName))
+        Py_RETURN_TRUE;
+    else
+        Py_RETURN_FALSE;
+}
+
+PyObject * service_has_reply_wrapper(PyObject * self, PyObject * args)
+{
+    char * callName;
+    char * replyName;
+    if (!PyArg_ParseTuple(args, "ss", &callName, &replyName))
+        return NULL;
+    if (igs_service_has_reply(callName, replyName))
+        Py_RETURN_TRUE;
+    else
+        Py_RETURN_FALSE;
+}
+
+PyObject * service_reply_names_wrapper(PyObject * self, PyObject * args)
+{
+    char * callName;
+    if (!PyArg_ParseTuple(args, "s", &callName))
+        return NULL;
+
+    size_t nbOfElements = 0;
+    char** names = igs_service_reply_names(callName, &nbOfElements);
+    PyObject *ret = PyList_New(0);
+	for (size_t i = 0 ; i < nbOfElements ; ++i)
+        PyList_Append(ret, Py_BuildValue("s", names[i]));
+
+    return ret;
+}
+
+PyObject * service_reply_args_count_wrapper(PyObject * self, PyObject * args)
+{
+    char* callName;
+    char * replyName;
+    if (!PyArg_ParseTuple(args, "ss", &callName, &replyName))
+        return NULL;
+    return PyLong_FromLong((long)igs_service_reply_args_count(callName, replyName));
+}
+
+PyObject * service_reply_args_list_wrapper(PyObject * self, PyObject * args)
+{
+    char * callName;
+    char * replyName;
+    if (!PyArg_ParseTuple(args, "ss", &callName, &replyName))
+        return NULL;
+
+    igs_service_arg_t *firstElement = igs_service_reply_args_first(callName, replyName);
+    size_t nbOfElements = igs_service_reply_args_count(callName, replyName);
+    PyObject *ret = PyTuple_New(nbOfElements);
+    size_t index = 0;
+    igs_service_arg_t *newArg = NULL;
+    LL_FOREACH(firstElement, newArg){
+        PyTuple_SetItem(ret, index, Py_BuildValue("(si)",newArg->name, newArg->type));
+        index ++;
+    }
+    return ret;
+}
+
+PyObject * service_reply_arg_exists_wrapper(PyObject * self, PyObject * args)
+{
+    char * callName;
+    char * replyName;
+    char * argName;
+    if (!PyArg_ParseTuple(args, "sss", &callName, &replyName, &argName))
+        return NULL;
+
+	if (igs_service_reply_arg_exists(callName, replyName, argName))
+		Py_RETURN_TRUE;
+	else
+		Py_RETURN_FALSE;
+}
+
