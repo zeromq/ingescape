@@ -123,36 +123,47 @@ igs_result_t igsagent_activate (igsagent_t *agent)
         s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     }
 
-    // notify all other agents inside this context that we have arrived
+    // notify all other agents inside our context that we have arrived
+    char *definition_str = parser_export_definition(agent->definition);
     s_agent_propagate_agent_event (IGS_AGENT_ENTERED, agent->uuid,
-                                   agent->definition->name, NULL);
+                                   agent->definition->name, definition_str);
     s_agent_propagate_agent_event (IGS_AGENT_KNOWS_US, agent->uuid,
                                    agent->definition->name, NULL);
 
     // notify this agent with all the other agents already present in our context
     // locally and remotely
     igsagent_t *tmp;
-    HASH_ITER (hh, core_context->agents, a, tmp)
-    {
+    HASH_ITER (hh, core_context->agents, a, tmp){
         if (!streq (a->uuid, agent->uuid)) {
+            char *definition_str_for_a = parser_export_definition(a->definition);
             igs_agent_event_wrapper_t *agent_event_wrapper_cb;
-            DL_FOREACH (agent->agent_event_callbacks, agent_event_wrapper_cb)
-            {
+            DL_FOREACH (agent->agent_event_callbacks, agent_event_wrapper_cb){
                 agent_event_wrapper_cb->callback_ptr (agent, IGS_AGENT_ENTERED, a->uuid,
-                                                      a->definition->name, NULL, agent_event_wrapper_cb->my_data);
+                                                      a->definition->name, definition_str_for_a, agent_event_wrapper_cb->my_data);
                 // in our local context, other agents already know us
                 agent_event_wrapper_cb->callback_ptr (agent, IGS_AGENT_KNOWS_US, a->uuid,
                                                       a->definition->name, NULL, agent_event_wrapper_cb->my_data);
             }
+            if (definition_str_for_a)
+                free(definition_str_for_a);
         }
     }
     igs_remote_agent_t *r, *rtmp;
     HASH_ITER (hh, core_context->remote_agents, r, rtmp){
+        char *definition_str_for_r = parser_export_definition(r->definition);
         igs_agent_event_wrapper_t *cb;
-        DL_FOREACH (agent->agent_event_callbacks, cb)
+        DL_FOREACH (agent->agent_event_callbacks, cb){
             cb->callback_ptr (agent, IGS_AGENT_ENTERED, r->uuid,
+                              r->definition->name, definition_str_for_r, cb->my_data);
+            cb->callback_ptr (agent, IGS_AGENT_KNOWS_US, r->uuid,
                               r->definition->name, NULL, cb->my_data);
+        }
+        if (definition_str_for_r)
+            free(definition_str_for_r);
     }
+    
+    if (definition_str)
+        free(definition_str);
     return IGS_SUCCESS;
 }
 
