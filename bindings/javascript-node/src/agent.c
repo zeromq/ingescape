@@ -2294,6 +2294,70 @@ napi_value node_igsagent_service_arg_remove(napi_env env, napi_callback_info inf
     return res_convert;
 }
 
+napi_value node_igsagent_service_reply_add(napi_env env, napi_callback_info info) {
+    napi_value argv[2], this;
+    get_function_arguments(env, info, 2, argv);
+    this = get_function_this_argument(env, info);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    char *reply_name = convert_napi_to_string(env, argv[1]);
+    igsagent_t *associated_agent = unwrap_native_agent(env, this);
+    int success = igsagent_service_reply_add(associated_agent, service_name, reply_name);
+    free(service_name);
+    free(reply_name);
+    napi_value success_js;
+    convert_int_to_napi(env, success, &success_js);
+    return success_js;
+}
+
+napi_value node_igsagent_service_reply_remove(napi_env env, napi_callback_info info) {
+    napi_value argv[2], this;
+    get_function_arguments(env, info, 2, argv);
+    this = get_function_this_argument(env, info);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    char *reply_name = convert_napi_to_string(env, argv[1]);
+    igsagent_t *associated_agent = unwrap_native_agent(env, this);
+    int success = igsagent_service_reply_remove(associated_agent, service_name, reply_name);
+    free(service_name);
+    free(reply_name);
+    napi_value success_js;
+    convert_int_to_napi(env, success, &success_js);
+    return success_js;
+}
+
+napi_value node_igsagent_service_reply_arg_add(napi_env env, napi_callback_info info) {
+    napi_value argv[4], this;
+    get_function_arguments(env, info, 4, argv);
+    this = get_function_this_argument(env, info);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    char *reply_name = convert_napi_to_string(env, argv[1]);
+    char *arg_name = convert_napi_to_string(env, argv[2]);
+    int type;
+    convert_napi_to_int(env, argv[3], &type);
+    int res = igsagent_service_reply_arg_add(unwrap_native_agent(env, this), service_name, reply_name, arg_name, type);
+    free(service_name);
+    free(reply_name);
+    free(arg_name);
+    napi_value res_convert;
+    convert_int_to_napi(env, res, &res_convert);
+    return res_convert;
+}
+
+napi_value node_igsagent_service_reply_arg_remove(napi_env env, napi_callback_info info) {
+    napi_value argv[3], this;
+    get_function_arguments(env, info, 3, argv);
+    this = get_function_this_argument(env, info);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    char *reply_name = convert_napi_to_string(env, argv[1]);
+    char *arg_name = convert_napi_to_string(env, argv[2]);
+    int res = igsagent_service_reply_arg_remove(unwrap_native_agent(env, this), service_name, reply_name, arg_name);
+    free(service_name);
+    free(reply_name);
+    free(arg_name);
+    napi_value res_convert;
+    convert_int_to_napi(env, res, &res_convert);
+    return res_convert;
+}
+
 napi_value node_igsagent_service_count(napi_env env, napi_callback_info info) {
     napi_value this = get_function_this_argument(env, info);
     size_t res = igsagent_service_count(unwrap_native_agent(env, this));
@@ -2389,6 +2453,120 @@ napi_value node_igsagent_service_arg_exists(napi_env env, napi_callback_info inf
     napi_value res_convert;
     convert_bool_to_napi(env, exist, &res_convert);
     return res_convert;
+}
+
+napi_value node_igsagent_service_has_replies(napi_env env, napi_callback_info info) {
+    napi_value argv[1], this;
+    get_function_arguments(env, info, 1, argv);
+    this = get_function_this_argument(env, info);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    bool has_replies = igsagent_service_has_replies(unwrap_native_agent(env, this), service_name);
+    free(service_name);
+    napi_value has_replies_js;
+    convert_bool_to_napi(env, has_replies, &has_replies_js);
+    return has_replies_js;
+}
+
+napi_value node_igsagent_service_has_reply(napi_env env, napi_callback_info info) {
+    napi_value argv[2], this;
+    get_function_arguments(env, info, 2, argv);
+    this = get_function_this_argument(env, info);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    char *reply_name = convert_napi_to_string(env, argv[1]);
+    bool has_reply = igsagent_service_has_reply(unwrap_native_agent(env, this), service_name, reply_name);
+    free(service_name);
+    free(reply_name);
+    napi_value has_reply_js;
+    convert_bool_to_napi(env, has_reply, &has_reply_js);
+    return has_reply_js;
+}
+
+napi_value node_igsagent_service_reply_names(napi_env env, napi_callback_info info) {
+    napi_value argv[1], this;
+    get_function_arguments(env, info, 1, argv);
+    this = get_function_this_argument(env, info);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    size_t elements_nb = 0;
+    char **replies_list = igsagent_service_reply_names(unwrap_native_agent(env, this), service_name, &elements_nb);
+    free(service_name);
+    napi_value napi_replies;
+    convert_string_list_to_napi_array(env, replies_list, elements_nb, &napi_replies);
+    if (replies_list != NULL)
+        igs_free_services_list(replies_list, elements_nb);
+    return napi_replies;
+}
+
+napi_value node_igsagent_service_reply_args_list(napi_env env, napi_callback_info info) {
+    napi_value argv[2], this;
+    get_function_arguments(env, info, 2, argv);
+    this = get_function_this_argument(env, info);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    char *reply_name = convert_napi_to_string(env, argv[1]);
+    igs_service_arg_t *head = igsagent_service_reply_args_first(unwrap_native_agent(env, this), service_name, reply_name);
+    free(service_name);
+    free(reply_name);
+
+    napi_status status;
+    napi_value arrayJS;
+    status = napi_create_array(env, &arrayJS);
+    if (status != napi_ok)
+        trigger_exception(env, NULL, "N-API : Unable to create array.");
+
+    igs_service_arg_t *elt, *tmp;
+    int i = 0;
+    napi_value arg_name, arg_type, service_argument;
+    LL_FOREACH_SAFE(head, elt, tmp) {
+        status = napi_create_object(env, &service_argument);
+        if (status != napi_ok)
+            trigger_exception(env, NULL, "N-API : Unable to create object.");
+
+        // Add argument's name & argument's type
+        convert_string_to_napi(env, elt->name, &arg_name);
+        status = napi_set_named_property(env, service_argument, "name", arg_name);
+        if (status != napi_ok)
+            trigger_exception(env, NULL, "N-API : Unable to set name of service argument.");
+
+        convert_int_to_napi(env, elt->type, &arg_type);
+        status = napi_set_named_property(env, service_argument, "type", arg_type);
+        if (status != napi_ok)
+            trigger_exception(env, NULL, "N-API : Unable to set type of service argument.");
+
+        status = napi_set_element(env, arrayJS, i, service_argument);
+        if (status != napi_ok)
+            trigger_exception(env, NULL, "N-API : Unable to set service argument in array.");
+        i++;
+    }
+    return arrayJS;
+}
+
+napi_value node_igsagent_service_reply_args_count(napi_env env, napi_callback_info info) {
+    napi_value argv[2], this;
+    get_function_arguments(env, info, 2, argv);
+    this = get_function_this_argument(env, info);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    char *reply_name = convert_napi_to_string(env, argv[1]);
+    size_t nb_arg = igsagent_service_reply_args_count(unwrap_native_agent(env, this), service_name, reply_name);
+    free(service_name);
+    free(reply_name);
+    napi_value nb_arg_js;
+    convert_int_to_napi(env, nb_arg, &nb_arg_js);
+    return nb_arg_js;
+}
+
+napi_value node_igsagent_service_reply_arg_exists(napi_env env, napi_callback_info info) {
+    napi_value argv[3], this;
+    get_function_arguments(env, info, 3, argv);
+    this = get_function_this_argument(env, info);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    char *reply_name = convert_napi_to_string(env, argv[1]);
+    char *arg_name = convert_napi_to_string(env, argv[2]);
+    bool exists = igsagent_service_reply_arg_exists(unwrap_native_agent(env, this), service_name, reply_name, arg_name);
+    free(service_name);
+    free(reply_name);
+    free(arg_name);
+    napi_value exists_js;
+    convert_bool_to_napi(env, exists, &exists_js);
+    return exists_js;
 }
 
 napi_value node_igsagent_election_join(napi_env env, napi_callback_info info) {
@@ -2592,12 +2770,22 @@ napi_value init_agent(napi_env env, napi_value exports) {
         { "serviceRemove", NULL, node_igsagent_service_remove, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "serviceArgAdd", NULL, node_igsagent_service_arg_add, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "serviceArgRemove", NULL, node_igsagent_service_arg_remove, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "serviceReplyAdd", NULL, node_igsagent_service_reply_add, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "serviceReplyRemove", NULL, node_igsagent_service_reply_remove, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "serviceReplyArgAdd", NULL, node_igsagent_service_reply_arg_add, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "serviceReplyArgRemove", NULL, node_igsagent_service_reply_arg_remove, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "serviceCount", NULL, node_igsagent_service_count, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "serviceExists", NULL, node_igsagent_service_exists, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "serviceList", NULL, node_igsagent_service_list, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "serviceArgsList", NULL, node_igsagent_service_args_list, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "serviceArgsCount", NULL, node_igsagent_service_args_count, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "serviceArgExists", NULL, node_igsagent_service_arg_exists, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "serviceHasReplies", NULL, node_igsagent_service_has_replies, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "serviceHasReply", NULL, node_igsagent_service_has_reply, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "serviceReplyNames", NULL, node_igsagent_service_reply_names, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "serviceReplyArgsList", NULL, node_igsagent_service_reply_args_list, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "serviceReplyArgsCount", NULL, node_igsagent_service_reply_args_count, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "serviceReplyArgExists", NULL, node_igsagent_service_reply_arg_exists, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
 
         { "electionJoin", NULL, node_igsagent_election_join, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "electionLeave", NULL, node_igsagent_election_leave, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
