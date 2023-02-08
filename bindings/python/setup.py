@@ -109,10 +109,10 @@ extension_ingescape = Extension("ingescape", ingescape_src + ingescape_agent_src
             extra_link_args = link_args)
 
 setup(name =  "ingescape",
-      author = "Natanael Vaugien",
-      author_email = "vaugien@ingenuity.io",
+      author = "Ingenuity I/O",
+      author_email = "contact@ingenuity.io",
       url= "https://github.com/zeromq/ingescape",
-      version =  "3.0.4",
+      version =  "3.2.0",
       classifiers=[
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.7",
