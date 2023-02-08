@@ -2509,7 +2509,7 @@ PyObject *Agent_mapping_set_path(AgentObject *self, PyObject *args, PyObject *kw
     if(self->agent){
         igsagent_mapping_set_path(self->agent, path);
         return PyLong_FromLong(IGS_SUCCESS);
-	}
+    }
     return NULL;
 }
 
