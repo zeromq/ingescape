@@ -43,6 +43,23 @@ PyObject * log_console_wrapper(PyObject * self, PyObject * args)
         Py_RETURN_FALSE;
 }
 
+PyObject * log_syslog_wrapper(PyObject * self, PyObject * args)
+{
+    if(igs_log_syslog())
+        Py_RETURN_TRUE;
+    else
+        Py_RETURN_FALSE;
+}
+
+PyObject * log_set_syslog_wrapper(PyObject * self, PyObject * args)
+{
+    bool verbose;
+    if (!PyArg_ParseTuple(args, "b", &verbose))
+        return NULL;
+    igs_log_set_syslog(verbose);
+    return PyLong_FromLong(0);
+}
+
 PyObject * log_set_stream_wrapper(PyObject * self, PyObject * args)
 {
     bool stream;

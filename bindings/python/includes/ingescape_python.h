@@ -299,6 +299,8 @@ PyObject * command_line_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
 
 PyObject * log_set_console_wrapper(PyObject * self, PyObject * args);
 PyObject * log_console_wrapper(PyObject * self, PyObject * args);
+PyObject * log_set_syslog_wrapper(PyObject * self, PyObject * args);
+PyObject * log_syslog_wrapper(PyObject * self, PyObject * args);
 PyObject * log_set_console_color_wrapper(PyObject * self, PyObject * args);
 PyObject * log_console_color_wrapper(PyObject * self, PyObject * args);
 PyObject * log_set_console_level_wrapper(PyObject * self, PyObject * args);

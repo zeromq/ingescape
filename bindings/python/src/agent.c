@@ -2265,8 +2265,8 @@ PyObject *Agent_service_reply_arg_add(AgentObject *self, PyObject *args, PyObjec
 {
     char *service_name;
     char *reply_name;
-	char* arg_name;
-	int type;
+    char* arg_name;
+    int type;
     if (!PyArg_ParseTuple(args, "sssi", &service_name, &reply_name, &arg_name, &type))
         return NULL;
 
@@ -2277,7 +2277,7 @@ PyObject *Agent_service_reply_arg_remove(AgentObject *self, PyObject *args, PyOb
 {
     char *service_name;
     char *reply_name;
-	char* arg_name;
+    char* arg_name;
     if (!PyArg_ParseTuple(args, "sss", &service_name, &reply_name, &arg_name))
         return NULL;
 
@@ -2321,10 +2321,10 @@ PyObject * Agent_service_reply_arg_exists(AgentObject *self, PyObject * args, Py
     if (!PyArg_ParseTuple(args, "sss", &callName, &replyName, &argName))
         return NULL;
 
-	if (igsagent_service_reply_arg_exists(self->agent, callName, replyName, argName))
-		Py_RETURN_TRUE;
-	else
-		Py_RETURN_FALSE;
+    if (igsagent_service_reply_arg_exists(self->agent, callName, replyName, argName))
+        Py_RETURN_TRUE;
+    else
+        Py_RETURN_FALSE;
 }
 
 PyObject * Agent_service_has_replies(AgentObject* self, PyObject * args, PyObject *kwds)
@@ -2359,7 +2359,7 @@ PyObject * Agent_service_reply_names(AgentObject * self, PyObject * args, PyObje
     size_t nbOfElements = 0;
     char** names = igsagent_service_reply_names(self->agent, callName, &nbOfElements);
     PyObject *ret = PyList_New(0);
-	for (size_t i = 0 ; i < nbOfElements ; ++i)
+    for (size_t i = 0 ; i < nbOfElements ; ++i)
         PyList_Append(ret, Py_BuildValue("s", names[i]));
 
     return ret;
@@ -2506,9 +2506,10 @@ PyObject *Agent_mapping_set_path(AgentObject *self, PyObject *args, PyObject *kw
 
     if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &path))
         return NULL;
-    if(self->agent)
+    if(self->agent){
         igsagent_mapping_set_path(self->agent, path);
         return PyLong_FromLong(IGS_SUCCESS);
+	}
     return NULL;
 }
 

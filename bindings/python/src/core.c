@@ -1600,7 +1600,7 @@ PyObject * service_reply_add_wrapper(PyObject *self, PyObject *args)
     char *callName;
     char *replyName;
     if (!PyArg_ParseTuple(args, "ss", &callName, &replyName))
-		return NULL;
+        return NULL;
 
     return PyLong_FromLong(igs_service_reply_add(callName, replyName));
 }
@@ -1610,7 +1610,7 @@ PyObject * service_reply_remove_wrapper(PyObject *self, PyObject *args)
     char *callName;
     char *replyName;
     if (!PyArg_ParseTuple(args, "ss", &callName, &replyName))
-		return NULL;
+        return NULL;
 
     return PyLong_FromLong(igs_service_reply_remove(callName, replyName));
 }
@@ -1622,7 +1622,7 @@ PyObject * service_reply_arg_add_wrapper(PyObject *self, PyObject *args)
     char *argName;
     int type;
     if (!PyArg_ParseTuple(args, "sssi", &callName, &replyName, &argName, &type))
-		return NULL;
+        return NULL;
 
     return PyLong_FromLong(igs_service_reply_arg_add(callName, replyName, argName, type));
 }
@@ -1633,7 +1633,7 @@ PyObject * service_reply_arg_remove_wrapper(PyObject *self, PyObject *args)
     char *replyName;
     char *argName;
     if (!PyArg_ParseTuple(args, "sss", &callName, &replyName, &argName))
-		return NULL;
+        return NULL;
 
     return PyLong_FromLong(igs_service_reply_arg_remove(callName, replyName, argName));
 }
@@ -1734,7 +1734,7 @@ PyObject * service_reply_names_wrapper(PyObject * self, PyObject * args)
     size_t nbOfElements = 0;
     char** names = igs_service_reply_names(callName, &nbOfElements);
     PyObject *ret = PyList_New(0);
-	for (size_t i = 0 ; i < nbOfElements ; ++i)
+    for (size_t i = 0 ; i < nbOfElements ; ++i)
         PyList_Append(ret, Py_BuildValue("s", names[i]));
 
     return ret;
@@ -1776,9 +1776,9 @@ PyObject * service_reply_arg_exists_wrapper(PyObject * self, PyObject * args)
     if (!PyArg_ParseTuple(args, "sss", &callName, &replyName, &argName))
         return NULL;
 
-	if (igs_service_reply_arg_exists(callName, replyName, argName))
-		Py_RETURN_TRUE;
-	else
-		Py_RETURN_FALSE;
+    if (igs_service_reply_arg_exists(callName, replyName, argName))
+        Py_RETURN_TRUE;
+    else
+        Py_RETURN_FALSE;
 }
 
