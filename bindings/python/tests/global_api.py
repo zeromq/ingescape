@@ -46,12 +46,16 @@ print ("OK")
 
 print ("[Global API] Testing agent logs", end =" ")
 assert not igs.log_console()
+assert not igs.log_syslog()
+assert not igs.log_console()
 assert not igs.log_console_color()
 assert not igs.log_stream()
 assert not igs.log_file()
 assert igs.log_file_path() == ""
 igs.log_set_console(True)
 assert igs.log_console()
+igs.log_set_syslog(True)
+assert igs.log_syslog()
 igs.log_set_stream(True)
 assert igs.log_stream()
 igs.log_set_file_path("/tmp/log.txt")
@@ -62,6 +66,7 @@ igs.log_set_console_level(igs.LOG_TRACE)
 assert igs.log_console_level() == igs.LOG_TRACE
 print ("OK")
 igs.log_set_console(False)
+igs.log_set_syslog(False)
 
 
 assert igs.version() > 0
