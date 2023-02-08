@@ -850,6 +850,10 @@ deploy-node-js:
     - binding-node-js-macos
     - binding-node-js-linux
     - binding-node-js-windows
+  needs:
+    - binding-node-js-macos
+    - binding-node-js-linux
+    - binding-node-js-windows
   rules:
     - !reference [.root_namespace, rules]
 
