@@ -95,6 +95,22 @@ napi_value node_igs_log_console(napi_env env, napi_callback_info info) {
     return log_console_js;
 }
 
+napi_value node_igs_log_set_syslog(napi_env env, napi_callback_info info) {
+    napi_value argv[1];
+    get_function_arguments(env, info, 1, argv);
+    bool log_syslog;
+    convert_napi_to_bool(env, argv[0], &log_syslog);
+    igs_log_set_syslog(log_syslog);
+    return NULL;
+}
+
+napi_value node_igs_log_syslog(napi_env env, napi_callback_info info) {
+    bool log_syslog = igs_log_syslog();
+    napi_value log_syslog_js;
+    convert_bool_to_napi(env, log_syslog, &log_syslog_js);
+    return log_syslog_js;
+}
+
 napi_value node_igs_log_set_console_level(napi_env env, napi_callback_info info) {
     napi_value argv[1];
     get_function_arguments(env, info, 1, argv);
@@ -221,6 +237,15 @@ napi_value node_igs_log_include_services(napi_env env, napi_callback_info info) 
     bool log_include_services;
     convert_napi_to_bool(env, argv[0], &log_include_services);
     igs_log_include_services(log_include_services);
+    return NULL;
+}
+
+napi_value node_igs_log_no_warning_if_undefined_service(napi_env env, napi_callback_info info) {
+    napi_value argv[1];
+    get_function_arguments(env, info, 1, argv);
+    bool log_no_warning;
+    convert_napi_to_bool(env, argv[0], &log_no_warning);
+    igs_log_no_warning_if_undefined_service(log_no_warning);
     return NULL;
 }
 
@@ -436,6 +461,8 @@ napi_value init_admin_config_utils(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_igs_mapping_outputs_request, "mappingOutputsRequest", exports);
     exports = enable_callback_into_js(env, node_igs_log_set_console, "logSetConsole", exports);
     exports = enable_callback_into_js(env, node_igs_log_console, "logConsole", exports);
+    exports = enable_callback_into_js(env, node_igs_log_set_syslog, "logSetSyslog", exports);
+    exports = enable_callback_into_js(env, node_igs_log_syslog, "logSyslog", exports);
     exports = enable_callback_into_js(env, node_igs_log_set_console_level, "logSetConsoleLevel", exports);
     exports = enable_callback_into_js(env, node_igs_log_console_level, "logConsoleLevel", exports);
     exports = enable_callback_into_js(env, node_igs_log_set_console_color, "logSetConsoleColor", exports);
@@ -450,6 +477,7 @@ napi_value init_admin_config_utils(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_igs_log_set_file_max_line_length, "logSetFileMaxLineLength", exports);
     exports = enable_callback_into_js(env, node_igs_log_include_services, "logIncludeServices", exports);
     exports = enable_callback_into_js(env, node_igs_log_include_data, "logIncludeData", exports);
+    exports = enable_callback_into_js(env, node_igs_log_no_warning_if_undefined_service, "logNoWarningIfUndefinedService", exports);
     exports = enable_callback_into_js(env, node_igs_trace, "trace", exports);
     exports = enable_callback_into_js(env, node_igs_debug, "debug", exports);
     exports = enable_callback_into_js(env, node_igs_info, "info", exports);

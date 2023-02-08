@@ -86,6 +86,8 @@ export function mappingSetOutputsRequest(outputsRequest:boolean): undefined;
 export function mappingOutputsRequest(): boolean;
 export function logSetConsole(logConsole:boolean): undefined;
 export function logConsole(): boolean;
+export function logSetSyslog(syslog:boolean): undefined;
+export function logSyslog(): boolean;
 export function logSetConsoleLevel(consoleLevel:number): undefined;
 export function logConsoleLevel(): number;
 export function logSetConsoleColor(consoleColor:boolean): undefined;
@@ -100,6 +102,7 @@ export function logSetFileLevel(fileLevel:number): undefined;
 export function logSetFileMaxLineLength(maxLineLength:number): undefined;
 export function logIncludeServices(includeServices:boolean): undefined;
 export function logIncludeData(includeData:boolean): undefined;
+export function logNoWarningIfUndefinedService(includeData:boolean): undefined;
 export function trace(log:string): undefined;
 export function debug(log:string): undefined;
 export function info(log:string): undefined;
@@ -290,13 +293,23 @@ export class Agent {
     serviceRemove(name:string):number;
     serviceArgAdd(serviceName:string, argName:string, type:number):number;
     serviceArgRemove(serviceName:string, argName:string):number;
+    serviceReplyAdd(serviceName:string, replyName:string):number;
+    serviceReplyRemove(serviceName:string, replyName:string):number;
+    serviceReplyArgAdd(serviceName:string, replyName:string, argName:string, type:number):number;
+    serviceReplyArgRemove(serviceName:string, replyName:string, argName:string):number;
     serviceCount():number;
     serviceExists(name:string):boolean;
     serviceList():string[];
     serviceArgsList(serviceName:string):Object[];
     serviceArgsCount(serviceName:string):number;
     serviceArgExists(serviceName:string, argName:string):boolean;
-
+    serviceHasReplies(serviceName:string):boolean;
+    serviceHasReply(serviceName:string, replyName:string):boolean;
+    serviceReplyNames(serviceName:string):string[];
+    serviceReplyArgsList(serviceName:string, replyName:string):Object[];
+    serviceReplyArgsCount(serviceName:string, replyName:string):number
+    serviceReplyArgExists(serviceName:string, replyName:string, argName:string):boolean
+    
     electionJoin(electionName:string):number;
     electionLeave(electionName:string):number;
 
