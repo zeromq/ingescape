@@ -11,14 +11,14 @@
 # =========================================================================
 #
 
-__author__ = "vaugien"
+__author__ = "ingenuity"
 __copyright__ = "Copyright (c) the Contributors as noted in the AUTHORS file.\
                   This file is part of Ingescape, see https://github.com/zeromq/ingescape.\
                   This Source Code Form is subject to the terms of the Mozilla Public\
                   License, v. 2.0. If a copy of the MPL was not distributed with this\
                   file, You can obtain one at http://mozilla.org/MPL/2.0/."
 __license__ = "All rights reserved."
-__version__ = "3.0.4"
+__version__ = "3.2.0"
 
 import sys
 from setuptools import setup
@@ -109,10 +109,10 @@ extension_ingescape = Extension("ingescape", ingescape_src + ingescape_agent_src
             extra_link_args = link_args)
 
 setup(name =  "ingescape",
-      author = "Natanael Vaugien",
-      author_email = "vaugien@ingenuity.io",
+      author = "Ingenuity I/O",
+      author_email = "contact@ingenuity.io",
       url= "https://github.com/zeromq/ingescape",
-      version =  "3.0.4",
+      version =  "3.2.0",
       classifiers=[
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.7",

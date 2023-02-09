@@ -31,7 +31,7 @@
 
 //  INGESCAPE version macros for compile-time API detection
 #define INGESCAPE_VERSION_MAJOR 3
-#define INGESCAPE_VERSION_MINOR 2
+#define INGESCAPE_VERSION_MINOR 3
 #define INGESCAPE_VERSION_PATCH 0
 
 #define INGESCAPE_MAKE_VERSION(major, minor, patch) \
@@ -198,14 +198,14 @@ INGESCAPE_EXPORT void igs_observe_freeze(igs_freeze_fn cb, void *my_data);
  */
 typedef enum {
     IGS_PEER_ENTERED = 1, //event_data are the peer headers as a zhash_t*
-    IGS_PEER_EXITED, //event_data are NULL
-    IGS_AGENT_ENTERED, //event_data are NULL
-    IGS_AGENT_UPDATED_DEFINITION, //event_data are NULL
-    IGS_AGENT_KNOWS_US, //event_data are NULL
-    IGS_AGENT_EXITED, //event_data are NULL
-    IGS_AGENT_UPDATED_MAPPING, //event_data are NULL
-    IGS_AGENT_WON_ELECTION, //event_data is the election name as a const char*
-    IGS_AGENT_LOST_ELECTION //event_data is the election name as a const char*
+    IGS_PEER_EXITED, //event_data is NULL
+    IGS_AGENT_ENTERED, //event_data is the JSON string for agent definition as a char*
+    IGS_AGENT_UPDATED_DEFINITION, //event_data is the JSON string for agent definition as a char*
+    IGS_AGENT_KNOWS_US, //event_data is NULL
+    IGS_AGENT_EXITED, //event_data is NULL
+    IGS_AGENT_UPDATED_MAPPING, //event_data is the JSON string for agent mapping as a char*
+    IGS_AGENT_WON_ELECTION, //event_data is the election name as a char*
+    IGS_AGENT_LOST_ELECTION //event_data is the election name as a char*
 } igs_agent_event_t;
 typedef void (igs_agent_events_fn)(igs_agent_event_t event,
                                    const char *uuid,

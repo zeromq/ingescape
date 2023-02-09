@@ -46,12 +46,15 @@ print ("OK")
 
 print ("[Global API] Testing agent logs", end =" ")
 assert not igs.log_console()
+assert not igs.log_syslog()
 assert not igs.log_console_color()
 assert not igs.log_stream()
 assert not igs.log_file()
 assert igs.log_file_path() == ""
 igs.log_set_console(True)
 assert igs.log_console()
+igs.log_set_syslog(True)
+assert igs.log_syslog()
 igs.log_set_stream(True)
 assert igs.log_stream()
 igs.log_set_file_path("/tmp/log.txt")
@@ -62,6 +65,7 @@ igs.log_set_console_level(igs.LOG_TRACE)
 assert igs.log_console_level() == igs.LOG_TRACE
 print ("OK")
 igs.log_set_console(False)
+igs.log_set_syslog(False)
 
 
 assert igs.version() > 0
@@ -237,6 +241,22 @@ assert igs.service_arg_add("second_service", "third_arg", igs.STRING_T) == igs.S
 assert igs.service_arg_exists("second_service", "third_arg") == True
 assert igs.service_args_list("second_service") == (('first_arg', igs.INTEGER_T), ('second_arg', igs.DOUBLE_T), ('third_arg', igs.STRING_T))
 assert igs.service_args_count("second_service") == 3
+
+assert not igs.service_has_replies("second_service")
+assert igs.service_reply_names("second_service") == []
+assert igs.service_reply_add("second_service", "reply_service") == igs.SUCCESS
+assert igs.service_has_replies("second_service")
+assert igs.service_reply_arg_add("second_service", "reply_service", "first_arg", igs.INTEGER_T) == igs.SUCCESS
+assert igs.service_reply_arg_add("second_service", "reply_service", "second_arg", igs.STRING_T) == igs.SUCCESS
+assert igs.service_reply_args_count("second_service", "reply_service") == 2
+assert igs.service_reply_args_list("second_service", "reply_service") == (("first_arg", igs.INTEGER_T), ("second_arg", igs.STRING_T))
+assert igs.service_reply_names("second_service") == ["reply_service"]
+assert igs.service_reply_arg_remove("second_service", "reply_service", "second_arg") == igs.SUCCESS
+assert igs.service_reply_arg_remove("second_service", "reply_service", "first_arg") == igs.SUCCESS
+assert igs.service_reply_args_count("second_service", "reply_service") == 0
+assert igs.service_reply_args_list("second_service", "reply_service") == ()
+assert igs.service_reply_remove("second_service", "reply_service") == igs.SUCCESS
+assert igs.service_reply_names("second_service") == []
 print ("OK")
 
 print ("[Global API] Testing channels", end =" ")

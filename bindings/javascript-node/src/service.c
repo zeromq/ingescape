@@ -402,6 +402,64 @@ napi_value node_igs_service_arg_remove(napi_env env, napi_callback_info info) {
     return success_js;
 }
 
+napi_value node_igs_service_reply_add(napi_env env, napi_callback_info info) { 
+    napi_value argv[2];
+    get_function_arguments(env, info, 2, argv);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    char *reply_name = convert_napi_to_string(env, argv[1]);
+	int success = igs_service_reply_add(service_name, reply_name);
+    free(service_name);
+    free(reply_name);
+    napi_value success_js;
+    convert_int_to_napi(env, success, &success_js);
+    return success_js;
+}
+
+napi_value node_igs_service_reply_remove(napi_env env, napi_callback_info info) { 
+    napi_value argv[2];
+    get_function_arguments(env, info, 2, argv);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    char *reply_name = convert_napi_to_string(env, argv[1]);
+	int success = igs_service_reply_remove(service_name, reply_name);
+    free(service_name);
+    free(reply_name);
+    napi_value success_js;
+    convert_int_to_napi(env, success, &success_js);
+    return success_js;
+}
+
+napi_value node_igs_service_reply_arg_add(napi_env env, napi_callback_info info) { 
+    napi_value argv[4];
+    get_function_arguments(env, info, 4, argv);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    char *reply_name = convert_napi_to_string(env, argv[1]);
+    char *arg_name = convert_napi_to_string(env, argv[2]);
+	int type;
+    convert_napi_to_int(env, argv[3], &type);
+	int success = igs_service_reply_arg_add(service_name, reply_name, arg_name, type);
+    free(service_name);
+    free(reply_name);
+    free(arg_name);
+    napi_value success_js;
+    convert_int_to_napi(env, success, &success_js);
+    return success_js;
+}
+
+napi_value node_igs_service_reply_arg_remove(napi_env env, napi_callback_info info) { 
+    napi_value argv[3];
+    get_function_arguments(env, info, 3, argv);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    char *reply_name = convert_napi_to_string(env, argv[1]);
+    char *arg_name = convert_napi_to_string(env, argv[2]);
+	int success = igs_service_reply_arg_remove(service_name, reply_name, arg_name);
+    free(service_name);
+    free(reply_name);
+    free(arg_name);
+    napi_value success_js;
+    convert_int_to_napi(env, success, &success_js);
+    return success_js;
+}
+
 napi_value node_igs_service_count(napi_env env, napi_callback_info info) { 
     size_t count = igs_service_count();
     napi_value count_js;
@@ -493,6 +551,113 @@ napi_value node_igs_service_arg_exists(napi_env env, napi_callback_info info) {
     return exists_js;
 }
 
+napi_value node_igs_service_has_replies(napi_env env, napi_callback_info info) { 
+    napi_value argv[1];
+    get_function_arguments(env, info, 1, argv);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    bool hasReplies = igs_service_has_replies(service_name);
+    free(service_name);
+    napi_value hasReplies_js;
+    convert_bool_to_napi(env, hasReplies, &hasReplies_js);
+    return hasReplies_js;
+}
+
+napi_value node_igs_service_has_reply(napi_env env, napi_callback_info info) { 
+    napi_value argv[2];
+    get_function_arguments(env, info, 2, argv);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    char *reply_name = convert_napi_to_string(env, argv[1]);
+    bool hasReply = igs_service_has_reply(service_name, reply_name);
+    free(service_name);
+    free(reply_name);
+    napi_value hasReply_js;
+    convert_bool_to_napi(env, hasReply, &hasReply_js);
+    return hasReply_js;
+}
+
+napi_value node_igs_service_reply_names(napi_env env, napi_callback_info info) { 
+    napi_value argv[1];
+    get_function_arguments(env, info, 1, argv);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    size_t elements_nb = 0;
+    char **replies_list = igs_service_reply_names(service_name, &elements_nb);
+    free(service_name);
+    napi_value napi_replies;
+    convert_string_list_to_napi_array(env, replies_list, elements_nb, &napi_replies);
+    if (replies_list != NULL)
+        igs_free_services_list(replies_list, elements_nb);
+    return napi_replies;
+}
+
+napi_value node_igs_service_reply_args_list(napi_env env, napi_callback_info info) { 
+    napi_value argv[2];
+    get_function_arguments(env, info, 2, argv);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    char *reply_name = convert_napi_to_string(env, argv[1]);
+    igs_service_arg_t * head = igs_service_reply_args_first(service_name, reply_name);
+    free(service_name);
+    free(reply_name);
+    napi_status status;
+    napi_value args_list_js;
+    status = napi_create_array(env, &args_list_js);
+    if (status != napi_ok)
+        trigger_exception(env, NULL, "N-API : Unable to create array.");
+
+    igs_service_arg_t *elt, *tmp;
+    int i = 0;
+    napi_value arg_name, arg_type, service_argument;
+    LL_FOREACH_SAFE(head, elt, tmp) {
+        status = napi_create_object(env, &service_argument);
+        if (status != napi_ok)
+            trigger_exception(env, NULL, "N-API : Unable to create object.");
+
+        // Add argument's name & argument's type
+        convert_string_to_napi(env, elt->name, &arg_name);
+        status = napi_set_named_property(env, service_argument, "name", arg_name);
+        if (status != napi_ok)
+            trigger_exception(env, NULL, "N-API : Unable to set name of service argument.");
+
+        convert_int_to_napi(env, elt->type, &arg_type);
+        status = napi_set_named_property(env, service_argument, "type", arg_type);
+        if (status != napi_ok)
+            trigger_exception(env, NULL, "N-API : Unable to set type of service argument.");
+
+        status = napi_set_element(env, args_list_js, i, service_argument);
+        if (status != napi_ok)
+            trigger_exception(env, NULL, "N-API : Unable to set service argument in array.");
+        i++;
+    }
+    return args_list_js;
+}
+
+napi_value node_igs_service_reply_args_count(napi_env env, napi_callback_info info) { 
+    napi_value argv[2];
+    get_function_arguments(env, info, 2, argv);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    char *reply_name = convert_napi_to_string(env, argv[1]);
+    size_t args_count = igs_service_reply_args_count(service_name, reply_name);
+    free(service_name);
+    free(reply_name);
+    napi_value args_count_js;
+    convert_int_to_napi(env, args_count, &args_count_js);
+    return args_count_js;
+}
+
+napi_value node_igs_service_reply_arg_exists(napi_env env, napi_callback_info info) { 
+    napi_value argv[3];
+    get_function_arguments(env, info, 3, argv);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    char *reply_name = convert_napi_to_string(env, argv[1]);
+    char *arg_name = convert_napi_to_string(env, argv[2]);
+    bool exists = igs_service_reply_arg_exists(service_name, reply_name, arg_name);
+    free(service_name);
+    free(reply_name);
+    free(arg_name);
+    napi_value exists_js;
+    convert_bool_to_napi(env, exists, &exists_js);
+    return exists_js;
+}
+
 napi_value init_service(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_igs_service_args_add_int, "serviceArgsAddInt", exports);
     exports = enable_callback_into_js(env, node_igs_service_args_add_bool, "serviceArgsAddBool", exports);
@@ -504,11 +669,21 @@ napi_value init_service(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_igs_service_remove, "serviceRemove", exports);
     exports = enable_callback_into_js(env, node_igs_service_arg_add, "serviceArgAdd", exports);
     exports = enable_callback_into_js(env, node_igs_service_arg_remove, "serviceArgRemove", exports);
+    exports = enable_callback_into_js(env, node_igs_service_reply_add, "serviceReplyAdd", exports);
+    exports = enable_callback_into_js(env, node_igs_service_reply_remove, "serviceReplyRemove", exports);
+    exports = enable_callback_into_js(env, node_igs_service_reply_arg_add, "serviceReplyArgAdd", exports);
+    exports = enable_callback_into_js(env, node_igs_service_reply_arg_remove, "serviceReplyArgRemove", exports);
     exports = enable_callback_into_js(env, node_igs_service_count, "serviceCount", exports);
     exports = enable_callback_into_js(env, node_igs_service_exists, "serviceExists", exports);
     exports = enable_callback_into_js(env, node_igs_service_list, "serviceList", exports);
     exports = enable_callback_into_js(env, node_igs_service_args_list, "serviceArgsList", exports);
     exports = enable_callback_into_js(env, node_igs_service_args_count, "serviceArgsCount", exports);
     exports = enable_callback_into_js(env, node_igs_service_arg_exists, "serviceArgExists", exports);
+    exports = enable_callback_into_js(env, node_igs_service_has_replies, "serviceHasReplies", exports);
+    exports = enable_callback_into_js(env, node_igs_service_has_reply, "serviceHasReply", exports);
+    exports = enable_callback_into_js(env, node_igs_service_reply_names, "serviceReplyNames", exports);
+    exports = enable_callback_into_js(env, node_igs_service_reply_args_list, "serviceReplyArgsList", exports);
+    exports = enable_callback_into_js(env, node_igs_service_reply_args_count, "serviceReplyArgsCount", exports);
+    exports = enable_callback_into_js(env, node_igs_service_reply_arg_exists, "serviceReplyArgExists", exports);
     return exports;
 }
