@@ -244,7 +244,7 @@ namespace Ingescape
         {
             GCHandle gCHandleData = GCHandle.FromIntPtr(myData);
             object eventDataAsObject = null;
-            if (eventData != IntPtr.Zero && agentEvent != AgentEvent.PeerEntered)
+            if ((eventData != IntPtr.Zero) && (agentEvent == AgentEvent.AgentEntered) || (agentEvent == AgentEvent.AgentUpdatedDefinition) || (agentEvent == AgentEvent.AgentUpdatedMapping) || (agentEvent == AgentEvent.AgentWonElection) || (agentEvent == AgentEvent.AgentLostElection))
                 eventDataAsObject = PtrToStringFromUTF8(eventData);
 
             Tuple<AgentEventsFunction, object> tuple = (Tuple<AgentEventsFunction, object>)gCHandleData.Target;
