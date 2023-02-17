@@ -2205,6 +2205,20 @@ namespace Ingescape
         private static extern bool igs_log_console();
         public static bool LogConsole() { return igs_log_console(); }
 
+
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void igs_log_set_syslog(bool useSyslog);
+        public static void LogSetSyslog(bool useSyslog) { igs_log_set_syslog(useSyslog); }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
+        private static extern bool igs_log_syslog();
+        public static bool LogSyslog() { return igs_log_syslog(); }
+
+
+
+
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igs_log_console_color();
@@ -2267,6 +2281,10 @@ namespace Ingescape
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_log_include_services(bool enable);
         public static void LogIncludeServices(bool enable) { igs_log_include_services(enable); }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void igs_log_no_warning_if_undefined_service(bool enable);
+        public static void LogNoWarningIfUndefinedService(bool enable) { igs_log_no_warning_if_undefined_service(enable); }
         #endregion
 
         #region DEFINITION & MAPPING FILE MANAGEMENT

@@ -167,6 +167,11 @@ namespace Tester
             string uuid = Igs.AgentUUID();
             Assert.IsNotNull(Igs.AgentUUID());
 
+            Igs.LogSetSyslog(true);
+            Assert.IsTrue(Igs.LogSyslog());
+
+            Igs.LogNoWarningIfUndefinedService(true);
+
             //constraints
             Igs.InputCreate("constraint_impulsion", IopValueType.Impulsion);
             Igs.InputCreate("constraint_int", IopValueType.Integer);

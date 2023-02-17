@@ -24,8 +24,12 @@ exclusions = [
     "igs_channel_shout_data",
     "igs_channel_whisper_str",
     "igs_channel_whisper_data",
+    "igs_channel_shout_zmsg",
+    "igs_channel_whisper_zmsg",
     "igs_peer_add_header",
     "igs_peer_remove_header",
+    "igs_json_new",
+    "igs_json_node_is_double",
     "igs_json_parse_from_file",
     "igs_json_parse_from_str",
     "igs_json_destroy",
@@ -44,6 +48,15 @@ exclusions = [
     "igs_json_node_insert",
     "igs_json_node_is_integer",
     "igs_json_node_is_double"
+    "igs_json_new",
+    "igs_json_dump",
+    "igs_json_compact_dump",
+    "igs_json_node_for",
+    "igs_json_node_parse_from_file",
+    "igs_json_node_parse_from_str",
+    "igs_json_node_dup",
+    "igs_json_node_dump",
+    "igs_json_node_find"
 ]
 files = []
 
@@ -115,7 +128,7 @@ if __name__ == '__main__':
             if (verbose):
                 print("\nAPI from",header,":")
             for line in hFile:
-                res = re.search("^INGESCAPE_EXPORT (\w+) (\w+)( ?)\(.*;$", line)
+                res = re.search("^INGESCAPE_EXPORT (\w+)(?:\s[\*]*\s|\s)(\w+)( ?)\(.*$", line)
                 if res != None:
                     if (verbose):
                         print(res.group(2).strip())
