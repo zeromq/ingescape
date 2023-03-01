@@ -317,7 +317,7 @@ static int handle_number (void *ctx, const char *string, size_t string_length)
 
     endptr = NULL;
     errno = 0;
-    v->u.number.d = strtod(v->u.number.r, &endptr);
+    v->u.number.d = igsyajl_strtod(v->u.number.r, &endptr);
     if ((errno == 0) && (endptr) && (*endptr == 0))
         v->u.number.flags |= IGSYAJL_NUMBER_DOUBLE_VALID;
 

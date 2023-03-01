@@ -311,7 +311,7 @@ igsyajl_do_parse(igsyajl_handle hand, const unsigned char * jsonText,
                             igsyajl_buf_append(hand->decodeBuf, buf, bufLen);
                             buf = igsyajl_buf_data(hand->decodeBuf);
                             errno = 0;
-                            d = strtod((char *) buf, NULL);
+                            d = igsyajl_strtod((char *) buf, NULL);
                             if ((d >= HUGE_VAL || d <= -HUGE_VAL) &&
                                 errno == ERANGE)
                             {
