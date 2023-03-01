@@ -230,7 +230,7 @@ igsyajl_gen_double(igsyajl_gen_t *g, double number)
     ENSURE_VALID_STATE; ENSURE_NOT_KEY;
     if (isnan(number) || isinf(number)) return igsyajl_gen_invalid_number;
     INSERT_SEP; INSERT_WHITESPACE;
-    snprintf(i, 32, "%.20g", number);
+    igsyajl_snprintf(i, 32, "%.20g", number);
     if (strspn(i, "0123456789-") == strlen(i)) {
         strncat(i, ".0", 31);
     }

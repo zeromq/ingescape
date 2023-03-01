@@ -14,15 +14,53 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include "yajl_common.h"
 #include "yajl_parse.h"
 #include "yajl_lex.h"
 #include "yajl_parser.h"
 #include "yajl_alloc.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
 #include <assert.h>
+
+#if defined(_WIN32) || defined(WIN32)
+#include <locale.h>
+static _locale_t s_invariant_locale = NULL;
+
+static _locale_t 
+s_igsyajl_get_C_locale() 
+{
+    if (s_invariant_locale == NULL)
+        s_invariant_locale = _create_locale(LC_ALL, "C");
+    return s_invariant_locale;
+}
+#endif
+
+int 
+igsyajl_snprintf(char *s, size_t n, const char *format, ...)
+{
+    va_list list;
+    va_start(list, format);
+#if defined(_WIN32) || defined(WIN32)
+    return _vsnprintf_l(s, n, format, s_igsyajl_get_C_locale(), list);
+#else
+    return vsnprintf(s, n, format, list);
+#endif
+    va_end (list);
+}
+
+double 
+igsyajl_strtod (const char* str, char** endptr)
+{
+#if defined(_WIN32) || defined(WIN32)
+    return _strtod_l(str, endptr, s_igsyajl_get_C_locale());
+#else
+    return strtod(str, endptr);
+#endif
+}
 
 const char *
 igsyajl_status_to_string(igsyajl_status stat)
