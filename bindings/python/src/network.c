@@ -3,7 +3,7 @@
  *
  * Copyright (c) the Contributors as noted in the AUTHORS file.
  * This file is part of Ingescape, see https://github.com/zeromq/ingescape.
- * 
+ *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -131,7 +131,7 @@ void freeze(bool isPaused, void *myData){
         // Lock the GIL in order to execute the callback saffely
         PyGILState_STATE d_gstate;
         d_gstate = PyGILState_Ensure();
-        Py_XINCREF(actuel->arglist);         
+        Py_XINCREF(actuel->arglist);
         PyObject_CallFunction(actuel->call, "bO" , isPaused, actuel->arglist);
         // Release the GIL
         PyGILState_Release(d_gstate);
@@ -170,7 +170,7 @@ PyObject * set_command_line_wrapper(PyObject * self, PyObject * args)
 
 PyObject * command_line_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
 {
-    char * result = igs_mapping_json();
+    char * result = igs_command_line();
     if(result != NULL){
         PyObject * ret = PyUnicode_FromFormat("%s", result);
         free(result);
@@ -357,7 +357,7 @@ PyObject * igs_net_raise_sockets_limit_wrapper(PyObject *self, PyObject *args, P
 void timers_callback (int timer_id, void *my_data)
 {
     if(my_data != NULL)
-    {   
+    {
         PyGILState_STATE d_gstate;
         d_gstate = PyGILState_Ensure();
         timer_callback_element_t *callback_elt = (timer_callback_element_t *)my_data;
