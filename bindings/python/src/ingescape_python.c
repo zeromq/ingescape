@@ -258,7 +258,7 @@ static PyMethodDef Ingescape_methods[] =
         "log_set_file_max_line_length(size, )\n--\n\n "},
     {"log_include_data", log_include_data_wrapper, METH_VARARGS, "log_include_data(enable, )\n--\n\n "},
     {"log_include_services", igs_log_include_services_wrapper, METH_VARARGS, "log_include_services(enable, )\n--\n\n "},
-    {"log_no_warning_if_undefined_service", igs_log_no_warning_if_undefined_service, METH_VARARGS, "log_no_warning_if_undefined_service(enable, )\n--\n\n "},
+    {"log_no_warning_if_undefined_service", igs_log_no_warning_if_undefined_service_wrapper, METH_VARARGS, "log_no_warning_if_undefined_service(enable, )\n--\n\n "},
     {"trace", trace_wrapper, METH_VARARGS, "trace(value, )\n--\n\n "},
     {"debug", debug_wrapper, METH_VARARGS, "debug(value, )\n--\n\n "},
     {"info", info_wrapper, METH_VARARGS, "info(value, )\n--\n\n "},

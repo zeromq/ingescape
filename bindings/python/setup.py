@@ -43,7 +43,12 @@ def version_str(include_file):
 
     return f"{major}.{minor}.{patch}"
 
-__version__ = version_str("../../include/ingescape.h")
+from_sources = os.environ.get('FROM_SOURCES', default=None)
+
+if from_sources:
+  __version__ = version_str("./dependencies/include/ingescape.h")
+else:
+  __version__ = version_str(os.path.dirname(os.path.realpath(__file__)) + "/../../include/ingescape.h")
 
 ingescape_src = ["./src/ingescape_python.c", "./src/admin.c",
                   "./src/channels.c",  "./src/core.c",
@@ -71,10 +76,8 @@ ingescape_c_include = ['./dependencies/include/']
 compile_args = []
 link_args = []
 
-manual_compiler_args = os.environ.get('FROM_SOURCES', default=None)
-
 if platform.system() == "Linux":
-  if manual_compiler_args:
+  if from_sources:
     extra_objects.append(linux_lib_dirs_from_artifacts + 'libingescape.a')
     extra_objects.append(linux_lib_dirs_from_artifacts + 'libzyre.a')
     extra_objects.append(linux_lib_dirs_from_artifacts + 'libczmq.a')
@@ -89,7 +92,7 @@ if platform.system() == "Linux":
   compile_args = ["-I/usr/local/include/python3.8", "-I/usr/local/include/python3.8", "-Wno-unused-result", "-Wsign-compare", "-g", "-fwrapv", "-O3", "-Wall"]
   link_args = ["-L/usr/local/lib", "-lcrypt", "-lpthread", "-ldl",  "-lutil", "-lm", "-lstdc++"]
 elif platform.system() == "Darwin":
-  if manual_compiler_args:
+  if from_sources:
     extra_objects.append(macos_lib_dirs_from_artifacts + 'libingescape.a')
     extra_objects.append(macos_lib_dirs_from_artifacts + 'libzyre.a')
     extra_objects.append(macos_lib_dirs_from_artifacts + 'libczmq.a')
@@ -105,7 +108,7 @@ elif platform.system() == "Darwin":
 elif platform.system() == "Windows":
   if platform.machine().endswith('64'):
     librairies = ["libzmq",'libingescape', 'libzyre', 'libczmq', 'libsodium', "ws2_32", "Iphlpapi", 'Rpcrt4']
-    if manual_compiler_args:
+    if from_sources:
       librairies_dirs.append(windows_x64_lib_dirs_from_artifacts)
       sys.path.extend(windows_x64_lib_dirs_from_artifacts)
     else:
@@ -115,7 +118,7 @@ elif platform.system() == "Windows":
 
 #Use an environment variable instead of "install-option" to add the compile arg. We are not able to use 'python wheels' with 'install-option'
 
-if manual_compiler_args:
+if from_sources:
     compile_args.append("-DFROM_SOURCES")
 
 extension_ingescape = Extension("ingescape", ingescape_src + ingescape_agent_src ,
