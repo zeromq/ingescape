@@ -3,7 +3,7 @@
  *
  * Copyright (c) the Contributors as noted in the AUTHORS file.
  * This file is part of Ingescape, see https://github.com/zeromq/ingescape.
- * 
+ *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -145,7 +145,7 @@ PyObject * trace_wrapper(PyObject * self, PyObject * args)
         return NULL;
     PyFrameObject* frame = PyEval_GetFrame();
     Py_INCREF(frame);
-    // Get function name to print it in log 
+    // Get function name to print it in log
     PyObject *function = frame->f_code->co_name;
     Py_INCREF(function);
     Py_DECREF(frame);
@@ -169,11 +169,11 @@ PyObject * trace_wrapper(PyObject * self, PyObject * args)
 PyObject * debug_wrapper(PyObject * self, PyObject * args)
 {
     char * log;
-    if (!PyArg_ParseTuple(args, "s", &log)) 
+    if (!PyArg_ParseTuple(args, "s", &log))
         return NULL;
     PyFrameObject* frame = PyEval_GetFrame();
     Py_INCREF(frame);
-    // Get function name to print it in log 
+    // Get function name to print it in log
     PyObject *function = frame->f_code->co_name;
     Py_INCREF(function);
     Py_DECREF(frame);
@@ -352,5 +352,15 @@ PyObject * igs_log_include_services_wrapper(PyObject *self, PyObject *args, PyOb
     if (!PyArg_ParseTupleAndKeywords(args, NULL, "b", kwlist, &enable))
         return NULL;
     igs_log_include_services(enable);
+    return PyLong_FromLong(0);
+}
+
+PyObject * igs_log_no_warning_if_undefined_service_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+{
+    static char *kwlist[] = {"enable", NULL};
+    bool enable = true;
+    if (!PyArg_ParseTupleAndKeywords(args, NULL, "b", kwlist, &enable))
+        return NULL;
+    igs_log_no_warning_if_undefined_service(enable);
     return PyLong_FromLong(0);
 }

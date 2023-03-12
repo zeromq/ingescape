@@ -1,10 +1,10 @@
 /*  =========================================================================
- * ingescape_python.c - Main binding file, define all functions, classes 
+ * ingescape_python.c - Main binding file, define all functions, classes
  * for the binding
  *
  * Copyright (c) the Contributors as noted in the AUTHORS file.
  * This file is part of Ingescape, see https://github.com/zeromq/ingescape.
- * 
+ *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -254,10 +254,11 @@ static PyMethodDef Ingescape_methods[] =
     {"log_set_console_level", log_set_console_level_wrapper, METH_VARARGS, "log_set_console_level(level, )\n--\n\n "},
     {"log_console_level", log_console_level_wrapper, METH_VARARGS, "log_console_level()\n--\n\n "},
     {"log_set_file_level", log_set_file_level_wrapper, METH_VARARGS, "log_set_file_level(log_set_file_level, )\n--\n\n "},
-    {"log_set_file_max_line_length", log_set_file_max_line_length_wrapper, METH_VARARGS, 
+    {"log_set_file_max_line_length", log_set_file_max_line_length_wrapper, METH_VARARGS,
         "log_set_file_max_line_length(size, )\n--\n\n "},
     {"log_include_data", log_include_data_wrapper, METH_VARARGS, "log_include_data(enable, )\n--\n\n "},
     {"log_include_services", igs_log_include_services_wrapper, METH_VARARGS, "log_include_services(enable, )\n--\n\n "},
+    {"log_no_warning_if_undefined_service", igs_log_no_warning_if_undefined_service, METH_VARARGS, "log_no_warning_if_undefined_service(enable, )\n--\n\n "},
     {"trace", trace_wrapper, METH_VARARGS, "trace(value, )\n--\n\n "},
     {"debug", debug_wrapper, METH_VARARGS, "debug(value, )\n--\n\n "},
     {"info", info_wrapper, METH_VARARGS, "info(value, )\n--\n\n "},
@@ -307,7 +308,7 @@ static PyMethodDef Ingescape_methods[] =
     {"observe_monitor", igs_observe_monitor_wrapper, METH_VARARGS, "observe_monitor(callback, my_data, )\n--\n\n "},
 
     // Replay
-    {"replay_init", igs_replay_init_wrapper, METH_VARARGS, 
+    {"replay_init", igs_replay_init_wrapper, METH_VARARGS,
         "replay_init(log_file_path, speed, start_time, wait_for_start, replay_mode, agent, )\n--\n\n "},
     {"replay_start", igs_replay_start_wrapper, METH_NOARGS, "replay_start()\n--\n\n "},
     {"replay_pause", igs_replay_pause_wrapper, METH_VARARGS, "replay_pause(pause, )\n--\n\n "},

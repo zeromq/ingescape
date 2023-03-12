@@ -316,6 +316,7 @@ PyObject * log_file_path_wrapper(PyObject * self, PyObject * args);
 
 PyObject * log_include_data_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
 PyObject * igs_log_include_services_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject * igs_log_no_warning_if_undefined_service_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
 
 PyObject * definition_set_path_wrapper(PyObject * self, PyObject * args);
 PyObject * definition_save_wrapper(PyObject * self, PyObject * args);

@@ -63,6 +63,8 @@ igs.log_set_file_path("")
 assert igs.log_file_path() == ""
 igs.log_set_console_level(igs.LOG_TRACE)
 assert igs.log_console_level() == igs.LOG_TRACE
+igs.log_include_services(True)
+igs.log_no_warning_if_undefined_service(True)
 print ("OK")
 igs.log_set_console(False)
 igs.log_set_syslog(False)
@@ -406,7 +408,7 @@ assert float(readResult) -3.3 < 0.000001
 igs.input_set_double("my_data", 3.3)
 data = igs.input_data("my_data")
 #FIXME: error on cast
-#assert data == 3.3 
+#assert data == 3.3
 
 igs.input_set_string("my_impulsion", "True")
 igs.input_set_string("my_bool", "True")
@@ -481,7 +483,7 @@ assert not igs.input_bool("my_string")
 igs.input_set_string("my_string", "10.1")
 assert igs.input_int("my_string") == 10
 assert igs.input_double("my_string") - 10.1 < 0.000001
-assert igs.input_string("my_string") == "10.1" 
+assert igs.input_string("my_string") == "10.1"
 data, size = igs.input_data("my_string").decode('utf-8'), igs.input_data("my_string")[1]
 assert float(data[:-1]) == 10.1
 
