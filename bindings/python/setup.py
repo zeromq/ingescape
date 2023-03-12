@@ -11,26 +11,43 @@
 # =========================================================================
 #
 
-__author__ = "ingenuity"
-__copyright__ = "Copyright (c) the Contributors as noted in the AUTHORS file.\
-                  This file is part of Ingescape, see https://github.com/zeromq/ingescape.\
-                  This Source Code Form is subject to the terms of the Mozilla Public\
-                  License, v. 2.0. If a copy of the MPL was not distributed with this\
-                  file, You can obtain one at http://mozilla.org/MPL/2.0/."
-__license__ = "All rights reserved."
-__version__ = "3.3.1"
-
 import sys
 from setuptools import setup
 from setuptools.extension import Extension
-from setuptools.command.build_ext import build_ext
 import os
 import platform
-import struct
+
+__author__ = "Ingenuity I/O"
+__copyright__ = """Copyright (c) the Contributors as noted in the AUTHORS file.
+This file is part of Ingescape, see https://github.com/zeromq/ingescape.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/."""
+__license__ = "All rights reserved."
+
+
+def version_str(include_file):
+    major = None
+    minor = None
+    patch = None
+    with open(include_file, "r") as f:
+        for l in f.readlines():
+            if 'INGESCAPE_VERSION_MAJOR' in l:
+               major = l.split('INGESCAPE_VERSION_MAJOR')[1].strip()
+            if 'INGESCAPE_VERSION_MINOR' in l:
+               minor = l.split('INGESCAPE_VERSION_MINOR')[1].strip()
+            if 'INGESCAPE_VERSION_PATCH' in l:
+               patch = l.split('INGESCAPE_VERSION_PATCH')[1].strip()
+            if major is not None and minor is not None and patch is not None:
+                break
+
+    return f"{major}.{minor}.{patch}"
+
+__version__ = version_str("../../include/ingescape.h")
 
 ingescape_src = ["./src/ingescape_python.c", "./src/admin.c",
                   "./src/channels.c",  "./src/core.c",
-                  "./src/monitor.c", "./src/network.c", 
+                  "./src/monitor.c", "./src/network.c",
                   "./src/performance.c",
                   "./src/replay.c"]
 ingescape_agent_src =["./src/agent.c"]
@@ -84,6 +101,7 @@ elif platform.system() == "Darwin":
     extra_objects.append(macos_lib_dirs + 'libczmq.a')
     extra_objects.append(macos_lib_dirs + 'libzmq.a')
     extra_objects.append(macos_lib_dirs + 'libsodium.a')
+  compile_args = ["-I/usr/local/include"]
 elif platform.system() == "Windows":
   if platform.machine().endswith('64'):
     librairies = ["libzmq",'libingescape', 'libzyre', 'libczmq', 'libsodium', "ws2_32", "Iphlpapi", 'Rpcrt4']
@@ -95,7 +113,7 @@ elif platform.system() == "Windows":
       sys.path.extend(windows_x64_lib_dirs)
     compile_args = ["-DINGESCAPE_STATIC"]
 
-#Use an environment variable instead of "install-option" to add the compile arg. We are not able to use 'python wheels' with 'install-option' 
+#Use an environment variable instead of "install-option" to add the compile arg. We are not able to use 'python wheels' with 'install-option'
 
 if manual_compiler_args:
     compile_args.append("-DFROM_SOURCES")
@@ -112,7 +130,7 @@ setup(name =  "ingescape",
       author = "Ingenuity I/O",
       author_email = "contact@ingenuity.io",
       url= "https://github.com/zeromq/ingescape",
-      version =  "3.2.0",
+      version =  __version__,
       classifiers=[
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.7",
@@ -122,9 +140,5 @@ setup(name =  "ingescape",
         "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
         "Operating System :: OS Independent",
       ],
-      license =  "Copyright (c) the Contributors as noted in the AUTHORS file."
-                  "This file is part of Ingescape, see https://github.com/zeromq/ingescape."
-                  "This Source Code Form is subject to the terms of the Mozilla Public"
-                  "License, v. 2.0. If a copy of the MPL was not distributed with this"
-                  "file, You can obtain one at http://mozilla.org/MPL/2.0/.",
+      license =  __copyright__,
       ext_modules = [extension_ingescape])
