@@ -48,13 +48,15 @@ from_sources = os.environ.get('FROM_SOURCES', default=None)
 if from_sources:
   __version__ = version_str("./dependencies/include/ingescape.h")
 else:
-  __version__ = version_str(os.path.dirname(os.path.realpath(__file__)) + "/../../include/ingescape.h")
+  __version__ = @IGS_VERSION@
 
 ingescape_src = ["./src/ingescape_python.c", "./src/admin.c",
                   "./src/channels.c",  "./src/core.c",
                   "./src/monitor.c", "./src/network.c",
                   "./src/performance.c",
-                  "./src/replay.c"]
+                  "./src/replay.c",
+                  "./src/compat.c",
+                  "./src/util.c"]
 ingescape_agent_src =["./src/agent.c"]
 ingescape_include = ["./includes"]
 

@@ -4,3 +4,4 @@ ingescape.egg-info/
 venv/
 
 .*.swp
+setup.py

@@ -213,7 +213,7 @@ static PyMethodDef Ingescape_methods[] =
     {"net_addresses_list", net_addresses_list_wrapper, METH_NOARGS, "net_addresses_list()\n--\n\n "},
 
     // Services
-    {"service_call", sendCall_wrapper, METH_VARARGS, "service_call(agent_name_or_uuid, service_name, tuple_arguments, token, )\n--\n\n "},
+    {"service_call", service_call_wrapper, METH_VARARGS, "service_call(agent_name_or_uuid, service_name, tuple_arguments, token, )\n--\n\n "},
     {"service_init", service_init_wrapper, METH_VARARGS, "service_init(service_name, callback, my_data, )\n--\n\n "},
     {"service_remove", service_remove_wrapper, METH_VARARGS, "service_remove(service_name, )\n--\n\n "},
     {"service_arg_add", service_arg_add_wrapper, METH_VARARGS, "service_arg_add(service_name, argument_name, argument_type, )\n--\n\n "},
@@ -437,7 +437,7 @@ static PyObject *Agent_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     return (PyObject *)self;
 }
 
-static int *Agent_init(AgentObject *self, PyObject *args, PyObject *kwds)
+static int Agent_init(AgentObject *self, PyObject *args, PyObject *kwds)
 {
     static char *kwlist[] = {"name", "activate_immediately", NULL};
     char *name = NULL;

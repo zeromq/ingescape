@@ -3,7 +3,7 @@
  *
  * Copyright (c) the Contributors as noted in the AUTHORS file.
  * This file is part of Ingescape, see https://github.com/zeromq/ingescape.
- * 
+ *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -16,6 +16,7 @@
 
 #include "ingescape_python.h"
 #include "uthash/utlist.h"
+#include "util.h"
 
 static char *s_strndup (const char *str, size_t chars)
 {
@@ -46,8 +47,8 @@ PyObject * igs_clear_context_wrapper(PyObject *self, PyObject *args, PyObject *k
     agentEventCallback_t *elt_event = NULL;
     DL_FOREACH(agentEventCallbackList, elt_event)
     {
-        Py_CLEAR(elt_event->call);
-        Py_CLEAR(elt_event->argList);
+        Py_CLEAR(elt_event->callback);
+        Py_CLEAR(elt_event->my_data);
         free(elt_event);
     }
     // Clean monitors observe
@@ -188,15 +189,12 @@ void observe_mute_callback(bool is_muted, void *my_data)
     PyGILState_STATE d_gstate;
     d_gstate = PyGILState_Ensure();
     PyObject *tupleArgs = PyTuple_New(2);
-    if(is_muted)
-        PyTuple_SetItem(tupleArgs, 0, Py_True);
-    else
-        PyTuple_SetItem(tupleArgs, 0, Py_False);
+    PyTuple_SetItem(tupleArgs, 0, Py_BuildValue("O", is_muted ? Py_True : Py_False));
     mute_cb_t *actuel = NULL;
     DL_FOREACH(observe_mute_cbList, actuel) {
         Py_INCREF(actuel->my_data);
         PyTuple_SetItem(tupleArgs, 1, actuel->my_data);
-        PyObject_Call(actuel->callback, tupleArgs, NULL);
+        call_callback(actuel->callback, tupleArgs);
         Py_XDECREF(tupleArgs);
     }
     //release the GIL
@@ -229,31 +227,30 @@ void onAgentEvent(igs_agent_event_t event, const char *uuid, const char *name, v
     agentEventCallback_t *currentCallback = NULL;
     DL_FOREACH(agentEventCallbackList, currentCallback){
         // Lock the GIL to execute the callback safely
-        PyGILState_STATE d_gstate;
-        d_gstate = PyGILState_Ensure();
+        PyGILState_STATE d_gstate = PyGILState_Ensure();
         PyObject *globalArgList = NULL;
-        Py_XINCREF(currentCallback->argList);
+        Py_XINCREF(currentCallback->my_data);
         if (event == IGS_AGENT_WON_ELECTION || event == IGS_AGENT_LOST_ELECTION){
             globalArgList = PyTuple_Pack(5, PyLong_FromLong(event)
                                             , Py_BuildValue("s",uuid)
                                             , Py_BuildValue("s",name)
                                             , Py_BuildValue("s",(char*)eventData)
-                                            , currentCallback->argList);
+                                            , currentCallback->my_data);
         }else if (event == IGS_PEER_ENTERED){
             globalArgList = PyTuple_Pack(5, PyLong_FromLong(event)
                                             , Py_BuildValue("s",uuid)
                                             , Py_BuildValue("s",name)
                                             , Py_None   // FIXME: Cast zhash into python object
-                                            , currentCallback->argList);
+                                            , currentCallback->my_data);
         }else{
             globalArgList = PyTuple_Pack(5, PyLong_FromLong(event)
                                             , Py_BuildValue("s",uuid)
                                             , Py_BuildValue("s",name)
                                             , Py_None
-                                            , currentCallback->argList);
+                                            , currentCallback->my_data);
         }
         //execute the callback
-        PyObject_CallObject(currentCallback->call, globalArgList);
+        call_callback(currentCallback->callback, globalArgList);
         Py_XDECREF(globalArgList);
         //release the GIL
         PyGILState_Release(d_gstate);
@@ -262,21 +259,19 @@ void onAgentEvent(igs_agent_event_t event, const char *uuid, const char *name, v
 
 PyObject * observe_agent_events_wrapper(PyObject *self, PyObject *args)
 {
-    PyObject *temp;
-    PyObject arg;
-    PyObject *tempargList;
-    if (PyArg_ParseTuple(args, "OO", &temp, &arg)) {
-        if (!PyCallable_Check(temp)) {
+    PyObject *callback;
+    PyObject *my_data;
+    if (PyArg_ParseTuple(args, "OO", &callback, &my_data)) {
+        if (!PyCallable_Check(callback)) {
             PyErr_SetString(PyExc_TypeError, "parameter must be callable");
             return NULL;
         }
     }
-    Py_XINCREF(temp);
-    tempargList = Py_BuildValue("O", arg); 
-    Py_XINCREF(tempargList);
     agentEventCallback_t *newElt = calloc(1, sizeof(agentEventCallback_t));
-    newElt->argList = tempargList;
-    newElt->call = temp;
+    Py_INCREF(my_data);
+    newElt->my_data = my_data;
+    Py_INCREF(callback);
+    newElt->callback = callback;
     DL_APPEND(agentEventCallbackList, newElt);
     igs_observe_agent_events(onAgentEvent, NULL);
     return PyLong_FromLong(IGS_SUCCESS);
@@ -358,7 +353,7 @@ PyObject * igs_parameter_set_description_wrapper(PyObject *self, PyObject *args,
 PyObject * input_bool_wrapper(PyObject * self, PyObject * args)
 {
     char * name;
-    if (!PyArg_ParseTuple(args, "s", &name)) 
+    if (!PyArg_ParseTuple(args, "s", &name))
         return NULL;
     if (igs_input_bool(name))
         Py_RETURN_TRUE;
@@ -698,18 +693,14 @@ void observe(igs_iop_type_t iopType, const char* name, igs_iop_value_type_t valu
     // Lock the GIL to execute the callback safely
     PyGILState_STATE d_gstate;
     d_gstate = PyGILState_Ensure();
-    
+
     PyObject *tupleArgs = PyTuple_New(5);
     PyTuple_SetItem(tupleArgs, 0, Py_BuildValue("i", iopType));
     PyTuple_SetItem(tupleArgs, 1, Py_BuildValue("s", name));
     PyTuple_SetItem(tupleArgs, 2, Py_BuildValue("i", valueType));
     switch(valueType){
         case IGS_BOOL_T:
-            if (*(bool*)value){
-                PyTuple_SetItem(tupleArgs, 3, Py_True);
-            }else{
-                PyTuple_SetItem(tupleArgs, 3, Py_False);
-            }
+            PyTuple_SetItem(tupleArgs, 3, Py_BuildValue("O", *(bool*)value ? Py_True : Py_False));
             break;
         case IGS_INTEGER_T:
             PyTuple_SetItem(tupleArgs, 3, Py_BuildValue("i", *(int*)value));
@@ -736,7 +727,7 @@ void observe(igs_iop_type_t iopType, const char* name, igs_iop_value_type_t valu
             && (actuel->iopType == iopType)) {
             Py_INCREF(actuel->my_data);
             PyTuple_SetItem(tupleArgs, 4, actuel->my_data);
-            PyObject_Call(actuel->callback, tupleArgs, NULL);
+            call_callback(actuel->callback, tupleArgs);
             Py_XDECREF(tupleArgs);
         }
     }
@@ -1319,7 +1310,7 @@ PyObject * split_add_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
     if (!PyArg_ParseTupleAndKeywords(args, NULL, "sss", kwlist, &from_our_input, &to_agent, &with_output))
         return NULL;
     return PyLong_FromUnsignedLongLong((unsigned long long)igs_split_add(from_our_input, to_agent, with_output));
-    
+
 }
 
 PyObject * split_remove_with_id_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
@@ -1407,7 +1398,7 @@ PyObject * election_leave_wrapper(PyObject * self, PyObject * args)
     return PyLong_FromLong(igs_election_leave(electionName));
 }
 
-PyObject * sendCall_wrapper(PyObject * self, PyObject * args)
+PyObject * service_call_wrapper(PyObject * self, PyObject * args)
 {
     igs_service_arg_t *argumentList = NULL;
     char* agentNameOrUUID;
@@ -1420,7 +1411,7 @@ PyObject * sendCall_wrapper(PyObject * self, PyObject * args)
         return NULL;
     }
     int format = 0;
-    if (PyArg_ParseTuple(args, "ssOz",&agentNameOrUUID, &callName, &argTuple, &token)) 
+    if (PyArg_ParseTuple(args, "ssOz",&agentNameOrUUID, &callName, &argTuple, &token))
     {
         if(argTuple == NULL || argTuple == Py_None)
             format = 0;
@@ -1450,19 +1441,14 @@ PyObject * sendCall_wrapper(PyObject * self, PyObject * args)
                         igs_service_args_add_bool(&argumentList, false);
                 }
                 else if(PyUnicode_Check(newArgument))
-                {
-                    Py_ssize_t size;
-                    igs_service_args_add_string(&argumentList, PyUnicode_AsUTF8AndSize(newArgument, &size));
-                }
+                    igs_service_args_add_string(&argumentList, PyUnicode_AsUTF8(newArgument));
                 else
                     igs_service_args_add_data(&argumentList, PyBytes_FromObject(newArgument), PyBytes_Size(newArgument));
             }
         }
         result = igs_service_call(agentNameOrUUID, callName, &argumentList, token);
-        igs_service_args_destroy(&argumentList);
     }else if (format == 1){
-        if(argTuple != Py_None)
-        {
+        if(argTuple != Py_None){
             if(PyLong_CheckExact(argTuple))
                 igs_service_args_add_int(&argumentList, (int)PyLong_AsLong(argTuple));
             else if(PyFloat_CheckExact(argTuple))
@@ -1472,23 +1458,17 @@ PyObject * sendCall_wrapper(PyObject * self, PyObject * args)
                     igs_service_args_add_bool(&argumentList, true);
                 else
                     igs_service_args_add_bool(&argumentList, false);
-            }else if(PyUnicode_Check(argTuple)) {
-                Py_ssize_t size;
-                igs_service_args_add_string(&argumentList, PyUnicode_AsUTF8AndSize(argTuple, &size));
-            }else
+            }else if(PyUnicode_Check(argTuple))
+                igs_service_args_add_string(&argumentList, PyUnicode_AsUTF8(argTuple));
+            else
                 igs_service_args_add_data(&argumentList, PyBytes_FromObject(argTuple), PyBytes_Size(argTuple));
-        }
-        else
-        {
+
+            result = igs_service_call(agentNameOrUUID, callName, &argumentList, token);
+        }else
             result = igs_service_call(agentNameOrUUID, callName, NULL, token);
-            igs_service_args_destroy(&argumentList);
-            return PyLong_FromLong(result);
-        }
-        result = igs_service_call(agentNameOrUUID, callName, &argumentList, token);
-        igs_service_args_destroy(&argumentList);
-    }else{
+    }else
         result = igs_service_call(agentNameOrUUID, callName, NULL, token);
-    }
+
     return PyLong_FromLong(result);
 }
 
@@ -1507,11 +1487,7 @@ void observeCall(const char *senderAgentName, const char *senderAgentUUID,
             LL_FOREACH(firstArgument, currentArg){
                 switch(currentArg->type){
                     case IGS_BOOL_T:
-                        if (currentArg->b){
-                            PyTuple_SetItem(tupleArgs, index, Py_True);
-                        }else{
-                            PyTuple_SetItem(tupleArgs, index, Py_False);
-                        }
+                        PyTuple_SetItem(tupleArgs, index, Py_BuildValue("O", currentArg->b ? Py_True : Py_False));
                         break;
                     case IGS_INTEGER_T:
                         PyTuple_SetItem(tupleArgs, index, Py_BuildValue("i", currentArg->i));
@@ -1534,10 +1510,8 @@ void observeCall(const char *senderAgentName, const char *senderAgentUUID,
                 index ++;
             }
             PyObject *pyAgentName = Py_BuildValue("(sssOsO)", senderAgentName, senderAgentUUID, callName, tupleArgs, token, actuel->arglist);
-            PyObject *KWARGS = NULL;
-            PyObject_Call(actuel->call, pyAgentName, KWARGS);
+            call_callback(actuel->call, pyAgentName);
             Py_XDECREF(pyAgentName);
-            Py_XDECREF(KWARGS);
             break;
         }
     }
@@ -1781,4 +1755,3 @@ PyObject * service_reply_arg_exists_wrapper(PyObject * self, PyObject * args)
     else
         Py_RETURN_FALSE;
 }
-

@@ -10,9 +10,9 @@ The Ingescape Python binding relies on the following libraries:
 
 ## Installing
 
-Ingescape python is designed to be installed trough pip :
+Ingescape python binding is designed to be installed through pip :
 
-	python3 -m pip install ingescape
+    python3 -m pip install ingescape
 
 
 ## Using Ingescape with Python
@@ -24,5 +24,6 @@ Two examples are provided in the 'examples' directory.
 
 Run the following commands from the Ingescape Python directory :
 
-	python3 -m pip install setuptools wheel
-	python3 -m pip install .
+    python3 -m pip install setuptools wheel
+    ./prepare_setup.sh (or prepare_setup.ps1 for Windows Powershell)
+    python3 -m pip install .

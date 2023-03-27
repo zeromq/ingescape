@@ -146,7 +146,8 @@ PyObject * trace_wrapper(PyObject * self, PyObject * args)
     PyFrameObject* frame = PyEval_GetFrame();
     Py_INCREF(frame);
     // Get function name to print it in log
-    PyObject *function = frame->f_code->co_name;
+    PyCodeObject* f_code = PyFrame_GetCode(frame);
+    PyObject *function = f_code->co_name;
     Py_INCREF(function);
     Py_DECREF(frame);
 
@@ -174,7 +175,8 @@ PyObject * debug_wrapper(PyObject * self, PyObject * args)
     PyFrameObject* frame = PyEval_GetFrame();
     Py_INCREF(frame);
     // Get function name to print it in log
-    PyObject *function = frame->f_code->co_name;
+    PyCodeObject* f_code = PyFrame_GetCode(frame);
+    PyObject *function = f_code->co_name;
     Py_INCREF(function);
     Py_DECREF(frame);
     PyObject* funcTuple = Py_BuildValue("(O)", function);
@@ -201,7 +203,8 @@ PyObject * info_wrapper(PyObject * self, PyObject * args)
         return NULL;
     PyFrameObject* frame = PyEval_GetFrame();
     Py_INCREF(frame);
-    PyObject *function = frame->f_code->co_name;
+    PyCodeObject* f_code = PyFrame_GetCode(frame);
+    PyObject *function = f_code->co_name;
     Py_INCREF(function);
     Py_DECREF(frame);
     PyObject* funcTuple = Py_BuildValue("(O)", function);
@@ -228,7 +231,8 @@ PyObject * warn_wrapper(PyObject * self, PyObject * args)
         return NULL;
     PyFrameObject* frame = PyEval_GetFrame();
     Py_INCREF(frame);
-    PyObject *function = frame->f_code->co_name;
+    PyCodeObject* f_code = PyFrame_GetCode(frame);
+    PyObject *function = f_code->co_name;
     Py_INCREF(function);
     Py_DECREF(frame);
     PyObject* funcTuple = Py_BuildValue("(O)", function);
@@ -254,7 +258,8 @@ PyObject * error_wrapper(PyObject * self, PyObject * args)
         return NULL;
     PyFrameObject* frame = PyEval_GetFrame();
     Py_INCREF(frame);
-    PyObject *function = frame->f_code->co_name;
+    PyCodeObject* f_code = PyFrame_GetCode(frame);
+    PyObject *function = f_code->co_name;
     Py_INCREF(function);
     Py_DECREF(frame);
     PyObject* funcTuple = Py_BuildValue("(O)", function);
@@ -280,7 +285,8 @@ PyObject * fatal_wrapper(PyObject * self, PyObject * args)
         return NULL;
     PyFrameObject* frame = PyEval_GetFrame();
     Py_INCREF(frame);
-    PyObject *function = frame->f_code->co_name;
+    PyCodeObject* f_code = PyFrame_GetCode(frame);
+    PyObject *function = f_code->co_name;
     Py_INCREF(function);
     Py_DECREF(frame);
 

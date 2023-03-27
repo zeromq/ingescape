@@ -3,7 +3,7 @@
  *
  * Copyright (c) the Contributors as noted in the AUTHORS file.
  * This file is part of Ingescape, see https://github.com/zeromq/ingescape.
- * 
+ *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -16,6 +16,7 @@
 
 #include "ingescape_python.h"
 #include "uthash/utlist.h"
+#include "util.h"
 
 monitor_cb_t *observe_monitor_cbList = NULL;
 void observe_monitor_callback(igs_monitor_event_t event, const char *device, const char *ip_address, void *my_data)
@@ -26,14 +27,14 @@ void observe_monitor_callback(igs_monitor_event_t event, const char *device, con
     d_gstate = PyGILState_Ensure();
     PyObject *tupleArgs = PyTuple_New(4);
     PyTuple_SetItem(tupleArgs, 0, Py_BuildValue("i", event));
-    PyTuple_SetItem(tupleArgs, 1, Py_BuildValue("s", device));
-    PyTuple_SetItem(tupleArgs, 2, Py_BuildValue("s", ip_address));
+    PyTuple_SetItem(tupleArgs, 1, PyUnicode_DecodeLocale(device, NULL));
+    PyTuple_SetItem(tupleArgs, 2, PyUnicode_DecodeLocale(ip_address, NULL));
     monitor_cb_t *actuel = NULL;
-    DL_FOREACH(observe_monitor_cbList, actuel) 
+    DL_FOREACH(observe_monitor_cbList, actuel)
     {
         Py_INCREF(actuel->my_data);
         PyTuple_SetItem(tupleArgs, 3, actuel->my_data);
-        PyObject_Call(actuel->callback, tupleArgs, NULL);
+        call_callback(actuel->callback, tupleArgs);
         Py_XDECREF(tupleArgs);
     }
     //release the GIL
@@ -85,7 +86,7 @@ PyObject * igs_monitor_start_with_network_wrapper(PyObject *self, PyObject *args
 PyObject * igs_monitor_stop_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
 {
     igs_monitor_stop();
-    return PyLong_FromLong(IGS_SUCCESS);   
+    return PyLong_FromLong(IGS_SUCCESS);
 }
 
 PyObject * igs_monitor_is_running_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
@@ -105,4 +106,3 @@ PyObject * igs_monitor_set_start_stop_wrapper(PyObject *self, PyObject *args, Py
     igs_monitor_set_start_stop(flag);
     return PyLong_FromLong(IGS_SUCCESS);
 }
-
