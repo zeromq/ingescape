@@ -17,6 +17,8 @@
 #include <Python.h>
 #include <frameobject.h>
 
+#include "compat.h"
+
 #ifdef FROM_SOURCES
 #include "ingescape.h"
 #include "czmq.h"
@@ -80,8 +82,8 @@ extern freezeCallback_t *freezeList;
 PyObject * observe_freeze_wrapper(PyObject *self, PyObject *args);
 
 typedef struct agentEventCallback{
-    PyObject *call;
-    PyObject *argList;
+    PyObject *callback;
+    PyObject *my_data;
     struct agentEventCallback *next;
     struct agentEventCallback *prev;
 }agentEventCallback_t;
@@ -211,7 +213,7 @@ PyObject * mapping_set_outputs_request_wrapper(PyObject * self, PyObject * args)
 PyObject * mapping_outputs_request_wrapper(PyObject * self, PyObject * args);
 
 
-PyObject *sendCall_wrapper(PyObject * self, PyObject * args);
+PyObject *service_call_wrapper(PyObject * self, PyObject * args);
 
 typedef struct callCallback {
     char *callName;
