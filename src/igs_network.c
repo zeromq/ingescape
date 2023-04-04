@@ -2596,9 +2596,8 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
 
                 char *token = zmsg_popstr (msg_duplicate);
                 if (token == NULL) {
-                    igs_error (
-                      "no token in %s message received from %s(%s): rejecting",
-                      title, name, peerUUID);
+                    igs_error ("no token in %s message received from %s(%s): rejecting",
+                               title, name, peerUUID);
                     free (caller_uuid);
                     free (callee_uuid);
                     free (service_name);

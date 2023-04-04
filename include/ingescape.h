@@ -101,7 +101,7 @@ typedef struct _igs_service_arg_t igs_service_arg_t;
 #define IGS_DEFAULT_IPC_FOLDER_PATH "/tmp/ingescape/"  //
 #define IGS_MAX_STRING_MSG_LENGTH 4096       //
 #define IGS_DEFAULT_WORKER_CREDIT 3          //
-#define IGS_DEFAULT_LOG_DIR "~/Documents/IngeScape/logs/"  //
+#define IGS_DEFAULT_LOG_DIR "~/Documents/Ingescape/logs/"  //
 
 #ifdef __cplusplus
 extern "C" {
