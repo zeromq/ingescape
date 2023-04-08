@@ -291,9 +291,9 @@ igs_json_add_string (igs_json_t *json, const char *value)
     if (status != igsyajl_gen_status_ok){
         s_igs_json_error (status, __func__, &value);
         igs_error("Trying to add 'null' instead");
-        igsyajl_gen_status status = igsyajl_gen_null (g);
-        if (status != igsyajl_gen_status_ok)
-            s_igs_json_error (status, __func__, &value);
+        igsyajl_gen_status status2 = igsyajl_gen_null (g);
+        if (status2 != igsyajl_gen_status_ok)
+            s_igs_json_error (status2, __func__, &value);
     }
 }
 

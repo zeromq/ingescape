@@ -232,7 +232,7 @@ void makeFilePath(char *from, char *to, size_t size_of_to) {
     }
 }
 
-void print_cli_usage() {
+void print_cli_usage(void) {
     printf("Available commands in the terminal:\n");
     printf("\t/publish : runs the iop publication tests\n");
     printf("\t/services : runs the service tests\n");

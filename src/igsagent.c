@@ -177,7 +177,6 @@ igs_result_t igsagent_deactivate (igsagent_t *agent)
                          agent->definition->name, agent->uuid);
         return IGS_FAILURE;
     }
-    HASH_DEL (core_context->agents, agent);
     igsagent_wrapper_t *cb;
     DL_FOREACH (agent->activate_callbacks, cb)
         cb->callback_ptr (agent, false, cb->my_data);
@@ -192,10 +191,11 @@ igs_result_t igsagent_deactivate (igsagent_t *agent)
         zyre_leave (agent->context->node, agent->igs_channel);
         s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     }
-    agent->context = NULL;
 
     s_agent_propagate_agent_event (IGS_AGENT_EXITED, agent->uuid,
                                    agent->definition->name, NULL);
+    HASH_DEL (core_context->agents, agent);
+    agent->context = NULL;
     return IGS_SUCCESS;
 }
 

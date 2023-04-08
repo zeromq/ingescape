@@ -409,6 +409,7 @@ INGESCAPE_EXPORT size_t igs_mapping_count(void); //number of entries in the mapp
 //clear mappings
 INGESCAPE_EXPORT void igs_clear_mappings(void); //clears all our mappings with all agents
 INGESCAPE_EXPORT void igs_clear_mappings_with_agent(const char *agent_name); //clears our mappings with this agent
+INGESCAPE_EXPORT void igs_clear_mappings_for_input (const char *input_name); //clear all mappings for this input
 
 //edit our mappings
 INGESCAPE_EXPORT uint64_t igs_mapping_add(const char *from_our_input,
