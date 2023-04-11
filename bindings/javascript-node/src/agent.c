@@ -1959,6 +1959,16 @@ napi_value node_igsagent_clear_mappings_with_agent(napi_env env, napi_callback_i
     return NULL;
 }
 
+napi_value node_igsagent_clear_mappings_for_input(napi_env env, napi_callback_info info) {
+    napi_value argv[1], this;
+    get_function_arguments(env, info, 1, argv);
+    this = get_function_this_argument(env, info);
+    char *input_name = convert_napi_to_string(env, argv[0]);
+    igsagent_clear_mappings_for_input(unwrap_native_agent(env, this), input_name);
+    free(input_name);
+    return NULL;
+}
+
 napi_value node_igsagent_mapping_add(napi_env env, napi_callback_info info) {
     napi_value argv[3], this;
     get_function_arguments(env, info, 3, argv);
@@ -2753,6 +2763,7 @@ napi_value init_agent(napi_env env, napi_value exports) {
         { "mappingCount", NULL, node_igsagent_mapping_count, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "clearMappings", NULL, node_igsagent_clear_mappings, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "clearMappingsWithAgent", NULL, node_igsagent_clear_mappings_with_agent, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "clearMappingsForInput", NULL, node_igsagent_clear_mappings_for_input, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "mappingAdd", NULL, node_igsagent_mapping_add, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "mappingRemoveWithId", NULL, node_igsagent_mapping_remove_with_id, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "mappingRemoveWithName", NULL, node_igsagent_mapping_remove_with_name, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},

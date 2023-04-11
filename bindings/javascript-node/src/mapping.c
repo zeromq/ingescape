@@ -48,6 +48,15 @@ napi_value node_igs_clear_mappings_with_agent(napi_env env, napi_callback_info i
     return NULL;
 }
 
+napi_value node_igs_clear_mappings_for_input(napi_env env, napi_callback_info info) {
+    napi_value argv[1];
+    get_function_arguments(env, info, 1, argv);
+    char *input_name = convert_napi_to_string(env, argv[0]);
+    igs_clear_mappings_for_input(input_name);
+    free(input_name);
+    return NULL;
+}
+
 napi_value node_igs_mapping_json(napi_env env, napi_callback_info info) {
     char *json = igs_mapping_json();
     napi_value json_js;
@@ -157,7 +166,8 @@ napi_value init_mapping(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_igs_mapping_load_str, "mappingLoadStr", exports);
     exports = enable_callback_into_js(env, node_igs_mapping_load_file, "mappingLoadFile", exports);
     exports = enable_callback_into_js(env, node_igs_clear_mappings, "clearMappings", exports);
-    exports = enable_callback_into_js(env, node_igs_clear_mappings_with_agent, "clearMappingsWithAgent", exports);    
+    exports = enable_callback_into_js(env, node_igs_clear_mappings_with_agent, "clearMappingsWithAgent", exports);
+    exports = enable_callback_into_js(env, node_igs_clear_mappings_for_input, "clearMappingsForInput", exports);
     exports = enable_callback_into_js(env, node_igs_mapping_json, "mappingJson", exports);
     exports = enable_callback_into_js(env, node_igs_mapping_count, "mappingCount", exports);
     exports = enable_callback_into_js(env, node_igs_mapping_add, "mappingAdd", exports);
