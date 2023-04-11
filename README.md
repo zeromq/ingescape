@@ -103,11 +103,11 @@ Ingescape is  designed primarily to be compiled and installed using cmake, which
 By commodity, Ingescape includes its dependencies as a set of git submodules. Please use the proper git command to pull them as well. The cmake compilation can either compile and install Ingescape and all its dependencies, or compile and install ingescape only, if you want to manage the dependencies externally or if they are already on your system.
 
 
-### Ingescape and dependencies
+### Ingescape including dependencies
 
 Dependencies are fetched from forks managed by the ingescape team on github and used for long-term industrial maintenance. This is the best way to have a full stack for debugging and contributing to ingescape, using your preferred environment.
 
-	git clone --recurse-submodules git://github.com/zeromq/ingescape.git
+	git clone --recurse-submodules https://github.com/zeromq/ingescape.git
 	cd ingescape
 	mkdir build
 	cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DOSX_UNIVERSAL=ON \
@@ -116,9 +116,9 @@ Dependencies are fetched from forks managed by the ingescape team on github and 
 	sudo make -C build install
 	sudo ldconfig
 
-### Ingescape only
+### Ingescape **NOT** including dependencies
 
-All the dependencies need to be fetched and installed from their official repositories using the latest master or stable tags. Because Ingescape uses draft APIs from CZMQ and Zyre, compilation might rarely break depending on their respective evolutions and the delay to make the necessary updates.
+In this case, all the dependencies need to be fetched and installed individually from their official repositories using the latest master or stable tags. Because Ingescape uses draft APIs from CZMQ and Zyre, compilation might break occasionally depending on their respective evolutions and the delay to make the necessary updates.
 
     git clone --depth 1 -b stable https://github.com/jedisct1/libsodium.git
     cd libsodium
@@ -127,7 +127,7 @@ All the dependencies need to be fetched and installed from their official reposi
     sudo make install
     cd ..
 
-    git clone git://github.com/zeromq/libzmq.git
+    git clone https://github.com/zeromq/libzmq.git
     cd libzmq
     mkdir build
     cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DWITH_LIBSODIUM=ON -DENABLE_DRAFTS=ON -DWITH_TLS=OFF -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11
@@ -136,7 +136,7 @@ All the dependencies need to be fetched and installed from their official reposi
     sudo ldconfig
     cd ..
 
-    git clone git://github.com/zeromq/czmq.git
+    git clone https://github.com/zeromq/czmq.git
     cd czmq
     mkdir build
     cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DENABLE_DRAFTS=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11
@@ -145,7 +145,7 @@ All the dependencies need to be fetched and installed from their official reposi
     sudo ldconfig
     cd ..
 
-    git clone git://github.com/zeromq/zyre.git
+    git clone https://github.com/zeromq/zyre.git
     cd zyre
     mkdir build
     cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DENABLE_DRAFTS=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11
@@ -154,7 +154,7 @@ All the dependencies need to be fetched and installed from their official reposi
     sudo ldconfig
     cd ..
 
-    git clone git://github.com/zeromq/ingescape.git
+    git clone https://github.com/zeromq/ingescape.git
     cd ingescape
     mkdir build
     cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11

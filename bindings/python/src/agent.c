@@ -18,18 +18,7 @@
 #include <ingescape/ingescape.h>
 #endif
 #include "uthash/utlist.h"
-
-static char *s_strndup (const char *str, size_t chars)
-{
-    size_t n = 0;
-    char *buffer = (char *) malloc (chars + 1);
-    if (buffer) {
-        for (n = 0; ((n < chars) && (str[n] != 0)); n++)
-            buffer[n] = str[n];
-        buffer[n] = 0;
-    }
-    return buffer;
-}
+#include "util.h"
 
 PyObject *Agent_activate(AgentObject *self, PyObject *args, PyObject *kwds)
 {
@@ -72,7 +61,7 @@ void agentObserveCB(igsagent_t *agent, bool is_activated, void *my_data)
             PyTuple_SetItem(tupleArgs, 0, Py_BuildValue("O", agentCBIt->agent));
             Py_INCREF(agentCBIt->my_data);
             PyTuple_SetItem(tupleArgs, 2, agentCBIt->my_data);
-            PyObject_Call(agentCBIt->callback, tupleArgs, NULL);
+            call_callback(agentCBIt->callback, tupleArgs);
             Py_XDECREF(tupleArgs);
         }
     }
@@ -114,7 +103,8 @@ PyObject *Agent_trace(AgentObject *self, PyObject *args, PyObject *kwds)
         return NULL;
     PyFrameObject* frame = PyEval_GetFrame();
     Py_INCREF(frame);
-    PyObject *function = frame->f_code->co_name;
+    PyCodeObject* f_code = PyFrame_GetCode(frame);
+    PyObject *function = f_code->co_name;
     Py_INCREF(function);
     Py_DECREF(frame);
 
@@ -144,7 +134,8 @@ PyObject *Agent_debug(AgentObject *self, PyObject *args, PyObject *kwds)
 
     PyFrameObject* frame = PyEval_GetFrame();
     Py_INCREF(frame);
-    PyObject *function = frame->f_code->co_name;
+    PyCodeObject* f_code = PyFrame_GetCode(frame);
+    PyObject *function = f_code->co_name;
     Py_INCREF(function);
     Py_DECREF(frame);
 
@@ -173,7 +164,8 @@ PyObject *Agent_info(AgentObject *self, PyObject *args, PyObject *kwds)
         return NULL;
     PyFrameObject* frame = PyEval_GetFrame();
     Py_INCREF(frame);
-    PyObject *function = frame->f_code->co_name;
+    PyCodeObject* f_code = PyFrame_GetCode(frame);
+    PyObject *function = f_code->co_name;
     Py_INCREF(function);
     Py_DECREF(frame);
     PyObject* funcTuple = Py_BuildValue("(O)", function);
@@ -202,7 +194,8 @@ PyObject *Agent_warn(AgentObject *self, PyObject *args, PyObject *kwds)
 
     PyFrameObject* frame = PyEval_GetFrame();
     Py_INCREF(frame);
-    PyObject *function = frame->f_code->co_name;
+    PyCodeObject* f_code = PyFrame_GetCode(frame);
+    PyObject *function = f_code->co_name;
     Py_INCREF(function);
     Py_DECREF(frame);
     PyObject* funcTuple = Py_BuildValue("(O)", function);
@@ -234,7 +227,8 @@ PyObject *Agent_error(AgentObject *self, PyObject *args, PyObject *kwds)
 
     PyFrameObject* frame = PyEval_GetFrame();
     Py_INCREF(frame);
-    PyObject *function = frame->f_code->co_name;
+    PyCodeObject* f_code = PyFrame_GetCode(frame);
+    PyObject *function = f_code->co_name;
     Py_INCREF(function);
     Py_DECREF(frame);
 
@@ -268,7 +262,8 @@ PyObject *Agent_fatal(AgentObject *self, PyObject *args, PyObject *kwds)
 
     PyFrameObject* frame = PyEval_GetFrame();
     Py_INCREF(frame);
-    PyObject *function = frame->f_code->co_name;
+    PyCodeObject* f_code = PyFrame_GetCode(frame);
+    PyObject *function = f_code->co_name;
     Py_INCREF(function);
     Py_DECREF(frame);
 
@@ -449,7 +444,7 @@ void agentObserveMute(igsagent_t* agent, bool mute, void* my_data)
             PyTuple_SetItem(tupleArgs, 0, Py_BuildValue("O", agentMuteCBIt->agent));
             Py_INCREF(agentMuteCBIt->my_data);
             PyTuple_SetItem(tupleArgs, 2, agentMuteCBIt->my_data);
-            PyObject_Call(agentMuteCBIt->callback, tupleArgs, NULL);
+            call_callback(agentMuteCBIt->callback, tupleArgs);
             Py_XDECREF(tupleArgs);
         }
     }
@@ -513,7 +508,7 @@ void agentObserveEventsCB(igsagent_t *agent,
             PyTuple_SetItem(tupleArgs, 0, Py_BuildValue("O", agentEventCBIt->agent));
             Py_INCREF(agentEventCBIt->my_data);
             PyTuple_SetItem(tupleArgs, 5, agentEventCBIt->my_data);
-            PyObject_Call(agentEventCBIt->callback, tupleArgs, NULL);
+            call_callback(agentEventCBIt->callback, tupleArgs);
             Py_XDECREF(tupleArgs);
         }
     }
@@ -1612,11 +1607,7 @@ void agent_observe(igsagent_t* agent, igs_iop_type_t iopType, const char* name, 
     PyTuple_SetItem(tupleArgs, 3, Py_BuildValue("i", valueType));
     switch(valueType){
         case IGS_BOOL_T:
-            if (*(bool*)value){
-                PyTuple_SetItem(tupleArgs, 4, Py_True);
-            }else{
-                PyTuple_SetItem(tupleArgs, 4, Py_False);
-            }
+            PyTuple_SetItem(tupleArgs, 4, Py_BuildValue("O", *(bool*)value ? Py_True : Py_False));
             break;
         case IGS_INTEGER_T:
             PyTuple_SetItem(tupleArgs, 4, Py_BuildValue("i", *(int*)value));
@@ -1645,7 +1636,7 @@ void agent_observe(igsagent_t* agent, igs_iop_type_t iopType, const char* name, 
             PyTuple_SetItem(tupleArgs, 0, Py_BuildValue("O", actuel->agent));
             Py_INCREF(actuel->my_data);
             PyTuple_SetItem(tupleArgs, 5, actuel->my_data);
-            PyObject_Call(actuel->callback, tupleArgs, NULL);
+            call_callback(actuel->callback, tupleArgs);
             Py_XDECREF(tupleArgs);
         }
     }
@@ -2139,11 +2130,7 @@ void agentServiceCB(igsagent_t *agent,
     for (size_t argIdx = 0 ; argIdx < args_nbr ; ++argIdx) {
         switch(argIt->type){
             case IGS_BOOL_T:
-                if (argIt->b){
-                    PyTuple_SetItem(serviceArgsTuple, argIdx, Py_True);
-                }else{
-                    PyTuple_SetItem(serviceArgsTuple, argIdx, Py_False);
-                }
+                PyTuple_SetItem(serviceArgsTuple, argIdx, Py_BuildValue("O", argIt->b ? Py_True : Py_False));
                 break;
             case IGS_INTEGER_T:
                 PyTuple_SetItem(serviceArgsTuple, argIdx, Py_BuildValue("i", argIt->i));
@@ -2172,9 +2159,10 @@ void agentServiceCB(igsagent_t *agent,
         if ((service_it->agent->agent == agent) && streq(service_it->serviceName, service_name)) {
             PyTuple_SetItem(tupleArgs, 0, Py_BuildValue("O", service_it->agent));
             PyTuple_SetItem(tupleArgs, 6, service_it->my_data);
-            PyObject_Call(service_it->callback, tupleArgs, NULL);
+            call_callback(service_it->callback, tupleArgs);
         }
     }
+    Py_DECREF(tupleArgs);
     //release the GIL
     PyGILState_Release(d_gstate);
 }

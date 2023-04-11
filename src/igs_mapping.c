@@ -290,6 +290,24 @@ void igsagent_clear_mappings_with_agent (igsagent_t *agent,
     }
 }
 
+void igsagent_clear_mappings_for_input (igsagent_t *agent,
+                                        const char *input_name)
+{
+    if (agent->mapping) {
+        model_read_write_lock (__FUNCTION__, __LINE__);
+        igs_map_t *elmt, *tmp;
+        HASH_ITER (hh, agent->mapping->map_elements, elmt, tmp)
+        {
+            if (streq (elmt->from_input, input_name)) {
+                HASH_DEL (agent->mapping->map_elements, elmt);
+                s_mapping_free_mapping_element (&elmt);
+                agent->network_need_to_send_mapping_update = true;
+            }
+        }
+        model_read_write_unlock (__FUNCTION__, __LINE__);
+    }
+}
+
 char *igsagent_mapping_json (igsagent_t *agent)
 {
     char *mapping_json = NULL;

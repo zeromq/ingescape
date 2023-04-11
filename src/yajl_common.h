@@ -68,6 +68,11 @@ typedef struct
     void * ctx;
 } igsyajl_alloc_funcs;
 
+/** Locale insensitive variants of snprintf and strtod to always use a point
+ *  as decimal separator. */
+int igsyajl_snprintf(char *s, size_t n, const char *format, ...);
+double igsyajl_strtod (const char* str, char** endptr);
+
 #ifdef __cplusplus
 }
 #endif

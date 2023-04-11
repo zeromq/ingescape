@@ -224,6 +224,7 @@ INGESCAPE_EXPORT size_t igsagent_mapping_count (igsagent_t *self);
 
 INGESCAPE_EXPORT void igsagent_clear_mappings (igsagent_t *self);
 INGESCAPE_EXPORT void igsagent_clear_mappings_with_agent (igsagent_t *self, const char *agent_name);
+INGESCAPE_EXPORT void igsagent_clear_mappings_for_input (igsagent_t *self, const char *input_name);
 
 INGESCAPE_EXPORT uint64_t igsagent_mapping_add (igsagent_t *self, const char *from_our_input, const char *to_agent, const char *with_output);
 INGESCAPE_EXPORT igs_result_t igsagent_mapping_remove_with_id (igsagent_t *self, uint64_t id);

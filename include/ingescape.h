@@ -31,7 +31,7 @@
 
 //  INGESCAPE version macros for compile-time API detection
 #define INGESCAPE_VERSION_MAJOR 3
-#define INGESCAPE_VERSION_MINOR 3
+#define INGESCAPE_VERSION_MINOR 4
 #define INGESCAPE_VERSION_PATCH 0
 
 #define INGESCAPE_MAKE_VERSION(major, minor, patch) \
@@ -101,7 +101,7 @@ typedef struct _igs_service_arg_t igs_service_arg_t;
 #define IGS_DEFAULT_IPC_FOLDER_PATH "/tmp/ingescape/"  //
 #define IGS_MAX_STRING_MSG_LENGTH 4096       //
 #define IGS_DEFAULT_WORKER_CREDIT 3          //
-#define IGS_DEFAULT_LOG_DIR "~/Documents/IngeScape/logs/"  //
+#define IGS_DEFAULT_LOG_DIR "~/Documents/Ingescape/logs/"  //
 
 #ifdef __cplusplus
 extern "C" {
@@ -409,6 +409,7 @@ INGESCAPE_EXPORT size_t igs_mapping_count(void); //number of entries in the mapp
 //clear mappings
 INGESCAPE_EXPORT void igs_clear_mappings(void); //clears all our mappings with all agents
 INGESCAPE_EXPORT void igs_clear_mappings_with_agent(const char *agent_name); //clears our mappings with this agent
+INGESCAPE_EXPORT void igs_clear_mappings_for_input (const char *input_name); //clear all mappings for this input
 
 //edit our mappings
 INGESCAPE_EXPORT uint64_t igs_mapping_add(const char *from_our_input,

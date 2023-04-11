@@ -3,7 +3,7 @@
  *
  * Copyright (c) the Contributors as noted in the AUTHORS file.
  * This file is part of Ingescape, see https://github.com/zeromq/ingescape.
- * 
+ *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -16,13 +16,18 @@
 
 #include "ingescape_python.h"
 #include "uthash/utlist.h"
+#include "util.h"
 
 PyObject * start_with_device_wrapper(PyObject * self, PyObject * args)
 {
-    char * networkDevice;
+    PyObject* netDeviceUnicode;
     int port;
-    if (!PyArg_ParseTuple(args, "si", &networkDevice, &port))
+    if (!PyArg_ParseTuple(args, "Ui", &netDeviceUnicode, &port))
         return NULL;
+    PyObject* localeEncoded = PyUnicode_EncodeLocale(netDeviceUnicode, NULL);
+    Py_DECREF(netDeviceUnicode);
+    char * networkDevice = PyBytes_AsString(localeEncoded);
+    Py_DECREF(localeEncoded);
     return PyLong_FromLong(igs_start_with_device(networkDevice, port));
 }
 
@@ -129,10 +134,13 @@ void freeze(bool isPaused, void *myData){
     freezeCallback_t *actuel = NULL;
     DL_FOREACH(freezeList, actuel){
         // Lock the GIL in order to execute the callback saffely
-        PyGILState_STATE d_gstate;
-        d_gstate = PyGILState_Ensure();
-        Py_XINCREF(actuel->arglist);         
-        PyObject_CallFunction(actuel->call, "bO" , isPaused, actuel->arglist);
+        PyGILState_STATE d_gstate = PyGILState_Ensure();
+        PyObject* args = PyTuple_New(2);
+        PyTuple_SetItem(args, 0, Py_BuildValue("b", isPaused));
+        Py_XINCREF(actuel->arglist);
+        PyTuple_SetItem(args, 1, actuel->arglist);
+        call_callback(actuel->call, actuel->arglist);
+        Py_DECREF(args);
         // Release the GIL
         PyGILState_Release(d_gstate);
     }
@@ -170,7 +178,7 @@ PyObject * set_command_line_wrapper(PyObject * self, PyObject * args)
 
 PyObject * command_line_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
 {
-    char * result = igs_mapping_json();
+    char * result = igs_command_line();
     if(result != NULL){
         PyObject * ret = PyUnicode_FromFormat("%s", result);
         free(result);
@@ -186,7 +194,7 @@ PyObject * net_devices_list_wrapper(PyObject * self, PyObject * args)
     char **resultList = igs_net_devices_list(&nbList);
     PyObject *ret = PyList_New(nbList);
     for (int i = 0; i < nbList; i++)
-        PyList_SetItem(ret, i, Py_BuildValue("s",resultList[i]));
+        PyList_SetItem(ret, i, PyUnicode_EncodeLocale(resultList[i], NULL));
     igs_free_net_devices_list(resultList, nbList);
     return ret;
 }
@@ -207,10 +215,9 @@ void stop_callback(void *myData){
     stopCallback_t *actuel = NULL;
     DL_FOREACH(stopList, actuel){
         // Lock the GIL to execute the callback safely
-        PyGILState_STATE d_gstate;
-        d_gstate = PyGILState_Ensure();
+        PyGILState_STATE d_gstate = PyGILState_Ensure();
         Py_XINCREF(actuel->argstopList);
-        PyObject_CallObject(actuel->call, actuel->argstopList);
+        call_callback(actuel->call, actuel->argstopList);
         //release the GIL
         PyGILState_Release(d_gstate);
     }
@@ -357,7 +364,7 @@ PyObject * igs_net_raise_sockets_limit_wrapper(PyObject *self, PyObject *args, P
 void timers_callback (int timer_id, void *my_data)
 {
     if(my_data != NULL)
-    {   
+    {
         PyGILState_STATE d_gstate;
         d_gstate = PyGILState_Ensure();
         timer_callback_element_t *callback_elt = (timer_callback_element_t *)my_data;
@@ -368,7 +375,7 @@ void timers_callback (int timer_id, void *my_data)
         PyTuple_SetItem(tupleArgs, 1, callback_elt->my_data);
         Py_XINCREF(tupleArgs);
 
-        PyObject_Call(callback_elt->callback, tupleArgs, NULL);
+        call_callback(callback_elt->callback, tupleArgs);
         Py_XDECREF(tupleArgs);
 
         PyGILState_Release(d_gstate);

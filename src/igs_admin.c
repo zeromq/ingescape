@@ -307,7 +307,7 @@ void igs_log_set_console_level (igs_log_level_t level)
     core_context->log_level = level;
 }
 
-igs_log_level_t igs_log_console_level ()
+igs_log_level_t igs_log_console_level (void)
 {
     core_init_context ();
     return core_context->log_level;
@@ -391,7 +391,7 @@ void igs_log_set_file (bool allow, const char *path)
     }
 }
 
-bool igs_log_file ()
+bool igs_log_file (void)
 {
     core_init_context ();
     return core_context->log_in_file;
@@ -403,7 +403,7 @@ void igs_log_set_console (bool allow)
     core_context->log_in_console = allow;
 }
 
-bool igs_log_console ()
+bool igs_log_console (void)
 {
     core_init_context ();
     return core_context->log_in_console;
@@ -431,7 +431,7 @@ void igs_log_set_console_color (bool allow)
     core_context->use_color_in_console = allow;
 }
 
-bool igs_log_console_color ()
+bool igs_log_console_color (void)
 {
     core_init_context ();
     return core_context->use_color_in_console;
@@ -458,7 +458,7 @@ void igs_log_set_stream (bool stream)
     }
 }
 
-bool igs_log_stream ()
+bool igs_log_stream (void)
 {
     core_init_context ();
     return core_context->log_in_stream;
@@ -469,7 +469,7 @@ void igs_log_set_file_path (const char *path)
     igs_log_set_file (core_context->log_in_file, path);
 }
 
-char *igs_log_file_path ()
+char *igs_log_file_path (void)
 {
     core_init_context ();
     return (strlen(core_context->log_file_path)>0) ? strdup (core_context->log_file_path) : NULL;

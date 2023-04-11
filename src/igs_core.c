@@ -75,7 +75,7 @@ observe_mute_cb_wrapper_t *mute_cb_wrappers = NULL;
 observe_agent_events_cb_wrapper_t *agent_event_cb_wrappers = NULL;
 
 //////////////////  CORE CONTEXT //////////////////
-void core_init_context ()
+void core_init_context (void)
 {
     if (core_context == NULL) {
         core_context = (struct igs_core_context *) zmalloc (sizeof (struct igs_core_context));
@@ -232,7 +232,7 @@ void core_external_stop_cb (void *my_data)
     IGS_UNUSED (my_data)
 }
 
-void core_init_agent ()
+void core_init_agent (void)
 {
     core_init_context ();
     if (core_agent == NULL) {
@@ -941,6 +941,12 @@ void igs_clear_mappings_with_agent (const char *agent_name)
 {
     core_init_agent ();
     igsagent_clear_mappings_with_agent (core_agent, agent_name);
+}
+
+void igs_clear_mappings_for_input (const char *input_name)
+{
+    core_init_agent ();
+    igsagent_clear_mappings_for_input (core_agent, input_name);
 }
 
 char *igs_mapping_json (void)

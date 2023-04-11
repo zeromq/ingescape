@@ -1,6 +1,6 @@
 {
   "name": "ingescape",
-  "version": "3.2.0",
+  "version": "3.3.1",
   "main": "index.js",
   "types": "/types/index.d.ts",
   "scripts": {
@@ -15,7 +15,6 @@
   "author": "Ingenuity I/O",
   "license": "MPLV2",
   "dependencies": {
-    "ingescape": "^3.0.0",
     "node-gyp": "^9.0.0",
     "node-gyp-build": "^4.3.0",
     "prebuildify": "^5.0.1"

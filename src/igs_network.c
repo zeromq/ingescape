@@ -934,9 +934,9 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     igs_debug ("<-%s (%s) exited", remote->definition->name,
                                uuid);
                     split_remove_worker (context, uuid, NULL);
-                    HASH_DEL (context->remote_agents, remote);
                     s_agent_propagate_agent_event (IGS_AGENT_EXITED, uuid,
                                                    remote->definition->name, NULL);
+                    HASH_DEL (context->remote_agents, remote);
                     s_clean_and_free_remote_agent (&remote);
                 }
                 else
@@ -2596,9 +2596,8 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
 
                 char *token = zmsg_popstr (msg_duplicate);
                 if (token == NULL) {
-                    igs_error (
-                      "no token in %s message received from %s(%s): rejecting",
-                      title, name, peerUUID);
+                    igs_error ("no token in %s message received from %s(%s): rejecting",
+                               title, name, peerUUID);
                     free (caller_uuid);
                     free (callee_uuid);
                     free (service_name);
@@ -2870,10 +2869,10 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 HASH_ITER (hh, context->remote_agents, remote, tmpremote){
                     // destroy all remote agents attached to this peer
                     if (streq (remote->peer->peer_id, zyre_peer->peer_id)) {
-                        HASH_DEL (context->remote_agents, remote);
                         split_remove_worker (context, remote->uuid, NULL);
                         s_agent_propagate_agent_event (IGS_AGENT_EXITED, remote->uuid,
                                                        remote->definition->name, NULL);
+                        HASH_DEL (context->remote_agents, remote);
                         s_clean_and_free_remote_agent (&remote);
                     }
                 }
@@ -3935,7 +3934,7 @@ igs_result_t igs_start_with_brokers (const char *agent_endpoint)
     return IGS_SUCCESS;
 }
 
-void igs_stop ()
+void igs_stop (void)
 {
     core_init_context ();
     if (core_context->network_actor) {
@@ -3975,7 +3974,7 @@ void igs_stop ()
     }
 }
 
-bool igs_is_started ()
+bool igs_is_started (void)
 {
     core_init_context ();
     s_network_lock ();
@@ -4772,7 +4771,7 @@ void igs_set_ipc_dir (const char *path)
     }
 }
 
-const char *igs_ipc_dir ()
+const char *igs_ipc_dir (void)
 {
     core_init_context ();
     return strdup (core_context->network_ipc_folder_path);
@@ -4797,7 +4796,7 @@ void igs_set_ipc (bool allow)
     core_context->network_allow_ipc = allow;
 }
 
-bool igs_has_ipc ()
+bool igs_has_ipc (void)
 {
     core_init_context ();
     return core_context->network_allow_ipc;
@@ -4827,7 +4826,7 @@ void igs_net_set_high_water_marks (int hwm_value)
     core_context->network_hwm_value = hwm_value;
 }
 
-void igs_net_raise_sockets_limit ()
+void igs_net_raise_sockets_limit (void)
 {
     core_init_context ();
 #if defined(__UNIX__)

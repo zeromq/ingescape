@@ -297,7 +297,7 @@ void igs_monitor_start_with_network (unsigned int period,
     assert (core_context->monitor->monitor_actor);
 }
 
-void igs_monitor_stop ()
+void igs_monitor_stop (void)
 {
     core_init_context ();
     if (core_context->monitor == NULL) {
@@ -324,7 +324,7 @@ void igs_monitor_stop ()
 #endif
 }
 
-bool igs_monitor_is_running ()
+bool igs_monitor_is_running (void)
 {
     core_init_context ();
     return (core_context->monitor);

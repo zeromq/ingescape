@@ -1098,6 +1098,17 @@ int main(int argc, const char * argv[]) {
     igs_clear_mappings_with_agent("other_agent");
     assert(igs_mapping_count() == 0);
     assert(igs_mapping_remove_with_name("toto", "other_agent", "tata") == IGS_FAILURE);
+    assert(igs_mapping_add("toto", "other_agent", "tata") > 0);
+    assert(igs_mapping_count() == 1);
+    igs_clear_mappings_for_input("toto");
+    assert(igs_mapping_count() == 0);
+    assert(igs_mapping_add("toto", "other_agent", "tata") > 0);
+    assert(igs_mapping_count() == 1);
+    igs_clear_mappings_for_input("tata");
+    assert(igs_mapping_count() == 1);
+    igs_clear_mappings_for_input("toto");
+    assert(igs_mapping_count() == 0);
+    
 
     assert(igs_split_count() == 0);
     assert(igs_split_add("toto", "other_agent", "tata") != 0);

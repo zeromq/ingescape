@@ -12,7 +12,7 @@ stages:
 
 workflow:
   rules:
-  - if: $CI_PIPELINE_SOURCE == "web" || $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private"
+  - if: $CI_PIPELINE_SOURCE == "web"
     when: always
   - when: never
 
@@ -901,10 +901,12 @@ test-python:
     - cp -r ../../dependencies/sodium/src/libsodium/include/* ./dependencies/include
     - cp -r ../../dependencies/zyre/include/* ./dependencies/include
     - export FROM_SOURCES="true"
+    - ./prepare_setup.sh
     - ./tests/run_tests.sh
   artifacts:
     paths:
       - bindings/python/dependencies/*
+      - bindings/python/setup.py
   dependencies:
     - lib-build-linux-x64
   needs:
@@ -978,6 +980,7 @@ package-python-wheels-macos:
     paths:
       - bindings/python/dist/*
       - bindings/python/dependencies/*
+      - bindings/python/setup.py
   rules:
     - !reference [.base_repo_main_branch, rules]
 
@@ -998,6 +1001,7 @@ package-python-wheels-manylinux_2_24_x86_64:
     - python3.8 setup.py bdist_wheel
     - python3.9 setup.py bdist_wheel
     - python3.10 setup.py bdist_wheel
+    - python3.11 setup.py bdist_wheel
     - |
         for whl in dist/*.whl; do
           auditwheel repair "$whl" --plat "manylinux_2_24_x86_64" -w ./wheelhouse/
@@ -1031,6 +1035,8 @@ package-python-wheels-manylinux2014_x86_64:
     - python3.7 setup.py bdist_wheel
     - python3.8 setup.py bdist_wheel
     - python3.9 setup.py bdist_wheel
+    - python3.10 setup.py bdist_wheel
+    - python3.11 setup.py bdist_wheel
     - |
         for whl in dist/*.whl; do
           auditwheel repair "$whl" --plat "manylinux2014_x86_64" -w ./wheelhouse/
@@ -1062,6 +1068,8 @@ package-python-wheels-manylinux2010_x86_64:
     - cp ../../build/dependencies/sodium//libsodium.a ./dependencies/linux
     - export FROM_SOURCES="true"
     - python3.7 setup.py bdist_wheel
+    - python3.8 setup.py bdist_wheel
+    - python3.9 setup.py bdist_wheel
     - python3.8 setup.py bdist_wheel
     - |
         for whl in dist/*.whl; do

@@ -17,6 +17,8 @@
 #include <Python.h>
 #include <frameobject.h>
 
+#include "compat.h"
+
 #ifdef FROM_SOURCES
 #include "ingescape.h"
 #include "czmq.h"
@@ -80,8 +82,8 @@ extern freezeCallback_t *freezeList;
 PyObject * observe_freeze_wrapper(PyObject *self, PyObject *args);
 
 typedef struct agentEventCallback{
-    PyObject *call;
-    PyObject *argList;
+    PyObject *callback;
+    PyObject *my_data;
     struct agentEventCallback *next;
     struct agentEventCallback *prev;
 }agentEventCallback_t;
@@ -211,7 +213,7 @@ PyObject * mapping_set_outputs_request_wrapper(PyObject * self, PyObject * args)
 PyObject * mapping_outputs_request_wrapper(PyObject * self, PyObject * args);
 
 
-PyObject *sendCall_wrapper(PyObject * self, PyObject * args);
+PyObject *service_call_wrapper(PyObject * self, PyObject * args);
 
 typedef struct callCallback {
     char *callName;
@@ -316,6 +318,7 @@ PyObject * log_file_path_wrapper(PyObject * self, PyObject * args);
 
 PyObject * log_include_data_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
 PyObject * igs_log_include_services_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject * igs_log_no_warning_if_undefined_service_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
 
 PyObject * definition_set_path_wrapper(PyObject * self, PyObject * args);
 PyObject * definition_save_wrapper(PyObject * self, PyObject * args);

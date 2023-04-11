@@ -522,8 +522,8 @@ void admin_log(igsagent_t *agent, igs_log_level_t, const char *function, const c
 
 // channels
 #define IGS_ZYRE_PEER_MUTEX_DEBUG 0
-void s_lock_zyre_peer(const char *function, int line);
-void s_unlock_zyre_peer(const char *function, int line);
+INGESCAPE_EXPORT void s_lock_zyre_peer(const char *function, int line);
+INGESCAPE_EXPORT void s_unlock_zyre_peer(const char *function, int line);
 
 // service
 void service_free_service(igs_service_t *t);

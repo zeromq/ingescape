@@ -17,6 +17,8 @@
 #include <Python.h>
 #include <frameobject.h>
 
+#include "compat.h"
+
 #ifdef FROM_SOURCES
 #include "igsagent.h"
 #include "czmq.h"
