@@ -1284,16 +1284,25 @@ namespace Ingescape
 
         // Clear Mappings
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_clear_mappings();
+        private static extern void igs_clear_mappings();
         public static void ClearMappings() { igs_clear_mappings(); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_clear_mappings_with_agent(IntPtr agentName);
+        private static extern void igs_clear_mappings_with_agent(IntPtr agentName);
         public static void ClearMappingsWithAgent(string agentName)
         {
             IntPtr ptrAgentName = StringToUTF8Ptr(agentName);
             igs_clear_mappings_with_agent(ptrAgentName);
             Marshal.FreeHGlobal(ptrAgentName);
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void igs_clear_mappings_for_input(IntPtr inputName);
+        public static void ClearMappingsForInput(string inputName)
+        {
+            IntPtr ptrInputName = StringToUTF8Ptr(inputName);
+            igs_clear_mappings_for_input(ptrInputName);
+            Marshal.FreeHGlobal(ptrInputName);
         }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
@@ -1942,6 +1951,86 @@ namespace Ingescape
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_timer_stop(int timerId);
         public static void TimerStop(int timerId) { igs_timer_stop(timerId); }
+        #endregion
+
+        #region Communicating via channels (a.k.a Zyre groups and peers)
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_channel_shout_str(IntPtr channel, IntPtr msg);
+        public static Result ChannelShout(string channel, string msg) 
+        {
+            Result result;
+            IntPtr channelAsPtr = StringToUTF8Ptr(channel);
+            IntPtr messageAsPtr = StringToUTF8Ptr(msg);
+            result = igs_channel_shout_str(channelAsPtr, messageAsPtr);
+            Marshal.FreeHGlobal(channelAsPtr);
+            Marshal.FreeHGlobal(messageAsPtr);
+            return result;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_channel_shout_data(IntPtr channel, IntPtr msg, uint size);
+        public static Result ChannelShout(string channel, byte[] data)
+        {
+            Result result;
+            IntPtr channelAsPtr = StringToUTF8Ptr(channel);
+            uint size;
+            IntPtr dataPtr = DataToPtr(data, out size);
+            result = igs_channel_shout_data(channelAsPtr, dataPtr, size);
+            Marshal.FreeHGlobal(channelAsPtr);
+            Marshal.FreeHGlobal(dataPtr);
+            return result;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_channel_whisper_str(IntPtr agentNameOrUUID, IntPtr msg);
+        public static Result ChannelWhisper(string agentNameOrUUID, string msg)
+        {
+            Result result;
+            IntPtr agentAsPtr = StringToUTF8Ptr(agentNameOrUUID);
+            IntPtr messageAsPtr = StringToUTF8Ptr(msg);
+            result = igs_channel_whisper_str(agentAsPtr, messageAsPtr);
+            Marshal.FreeHGlobal(agentAsPtr);
+            Marshal.FreeHGlobal(messageAsPtr);
+            return result;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_channel_whisper_data(IntPtr agentNameOrUUID, IntPtr msg, uint size);
+        public static Result ChannelWhisper(string agentNameOrUUID, byte[] data)
+        {
+            Result result;
+            IntPtr agentAsPtr = StringToUTF8Ptr(agentNameOrUUID);
+            uint size;
+            IntPtr dataPtr = DataToPtr(data, out size);
+            result = igs_channel_whisper_data(agentAsPtr, dataPtr, size);
+            Marshal.FreeHGlobal(agentAsPtr);
+            Marshal.FreeHGlobal(dataPtr);
+            return result;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_peer_add_header(IntPtr key, IntPtr value);
+        public static Result PeerAddHeader(string key, string value)
+        {
+            Result result;
+            IntPtr keyAsPtr = StringToUTF8Ptr(key);
+            IntPtr valueAsPtr = StringToUTF8Ptr(value);
+            result = igs_peer_add_header(keyAsPtr, valueAsPtr);
+            Marshal.FreeHGlobal(keyAsPtr);
+            Marshal.FreeHGlobal(valueAsPtr);
+            return result;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_peer_remove_header(IntPtr key);
+        public static Result PeerRemoveHeader(string key)
+        {
+            Result result;
+            IntPtr keyAsPtr = StringToUTF8Ptr(key);
+            result = igs_peer_remove_header(keyAsPtr);
+            Marshal.FreeHGlobal(keyAsPtr);
+            return result;
+        }
         #endregion
 
         #region BROKERS VS. SELF-DISCOVERY

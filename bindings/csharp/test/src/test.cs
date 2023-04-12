@@ -11,6 +11,7 @@ namespace Tester
     {
         private string _agentName = "tester";
         private uint _port = 5670;
+        private string _networkDevice = "Ethernet";
         private bool _verbose = false;
 
         private bool _myBool = true;
@@ -725,6 +726,17 @@ namespace Tester
             Assert.IsTrue(Igs.MappingCount() == 0);
             Assert.IsTrue(Igs.MappingRemoveWithName("toto", "other_agent", "tata") == Result.Failure);
 
+            Assert.IsTrue(Igs.MappingAdd("toto", "other_agent", "tata") > 0);
+            Assert.IsTrue(Igs.MappingCount() == 1);
+            Igs.ClearMappingsForInput("toto");
+            Assert.IsTrue(Igs.MappingCount() == 0);
+            Assert.IsTrue(Igs.MappingAdd("toto", "other_agent", "tata") > 0);
+            Assert.IsTrue(Igs.MappingCount() == 1);
+            Igs.ClearMappingsForInput("tata");
+            Assert.IsTrue(Igs.MappingCount() == 1);
+            Igs.ClearMappingsForInput("toto");
+            Assert.IsTrue(Igs.MappingCount() == 0);
+
             Assert.IsTrue(Igs.SplitCount() == 0);
             Assert.IsTrue(Igs.SplitAdd("toto", "other_agent", "tata") != 0);
             ulong splitId = Igs.SplitAdd("toto", "other_agent", "tata");
@@ -984,6 +996,16 @@ namespace Tester
 
             //IOP writing and types conversions
             //TODO: 
+
+            Igs.StartWithDevice(_networkDevice, _port);
+            //Channel methods call test
+            Assert.IsTrue(Igs.ChannelShout("channel", "msg") == Result.Success);
+            Assert.IsTrue(Igs.ChannelShout("channel", new byte[] { 0, 1, 0, 1 }) == Result.Success);
+            Assert.IsTrue(Igs.ChannelWhisper("agentName", "msg") == Result.Success);
+            Assert.IsTrue(Igs.ChannelWhisper("agentName", new byte[] { 0, 1, 0, 1 }) == Result.Success);
+            Assert.IsTrue(Igs.PeerAddHeader("headerKey", "headerValue") == Result.Success);
+            Igs.Stop();
+            Assert.IsTrue(Igs.PeerRemoveHeader("headerKey") == Result.Success);
 
             //add multiple agents to be enabled and disabled on demand
             //first additional agent is activated immediately

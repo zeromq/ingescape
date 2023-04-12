@@ -1501,6 +1501,17 @@ namespace Ingescape
         }
 
         [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void igsagent_clear_mappings_for_input(IntPtr agent, IntPtr inputName);
+        public void ClearMappingsForInput(string inputName)
+        {
+            if (_pAgent == IntPtr.Zero)
+                throw new NullReferenceException("Agent pointer is null");
+            IntPtr inputNameAsPtr = Igs.StringToUTF8Ptr(inputName);
+            igsagent_clear_mappings_for_input(_pAgent, inputNameAsPtr);
+            Marshal.FreeHGlobal(inputNameAsPtr);
+        }
+
+        [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern uint igsagent_mapping_add(IntPtr agent, IntPtr fromOurInput, IntPtr toAgent, IntPtr withOutput);
         public uint MappingAdd(string fromOurInput, string toAgent, string withOutput)
         {
