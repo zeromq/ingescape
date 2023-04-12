@@ -807,6 +807,16 @@ assert(IGS.mappingCount() === 1);
 IGS.clearMappingsWithAgent("other_agent");
 assert(IGS.mappingCount() === 0);
 assert(IGS.mappingRemoveWithName("toto", "other_agent", "tata") === igsResultEnum.IGS_FAILURE);
+assert(IGS.mappingAdd("toto", "other_agent", "tata") > 0);
+assert(IGS.mappingCount() == 1);
+IGS.clearMappingsForInput("toto");
+assert(IGS.mappingCount() == 0);
+assert(IGS.mappingAdd("toto", "other_agent", "tata") > 0);
+assert(IGS.mappingCount() == 1);
+IGS.clearMappingsForInput("tata");
+assert(IGS.mappingCount() == 1);
+IGS.clearMappingsForInput("toto");
+assert(IGS.mappingCount() == 0);
 
 assert(IGS.splitCount() === 0);
 assert(IGS.splitAdd("toto", "other_agent", "tata") != 0);
