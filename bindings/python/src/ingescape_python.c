@@ -166,6 +166,7 @@ static PyMethodDef Ingescape_methods[] =
     {"mapping_remove_with_id", mapping_remove_with_id_wrapper, METH_VARARGS, "mapping_remove_with_id(id, )\n--\n\n "},
     {"mapping_remove_with_name", mapping_remove_with_name_wrapper, METH_VARARGS, "mapping_remove_with_name(from_our_input, to_agent, with_output, )\n--\n\n "},
     {"clear_mappings_with_agent", clear_mappings_with_agent_wrapper, METH_VARARGS, "clear_mappings_with_agent(agent_name, )\n--\n\n "},
+    {"clear_mappings_for_input", clear_mappings_for_input_wrapper, METH_VARARGS, "clear_mappings_for_input(input_name, )\n--\n\n "},
     {"mapping_set_outputs_request", mapping_set_outputs_request_wrapper, METH_VARARGS, "mapping_set_outputs_request(notify, )\n--\n\n "},
     {"mapping_outputs_request", mapping_outputs_request_wrapper, METH_NOARGS, "mapping_outputs_request()\n--\n\n "},
 
