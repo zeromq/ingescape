@@ -276,6 +276,7 @@ export class Agent {
     mappingCount():number;
     clearMappings():undefined;
     clearMappingsWithAgent(agentName:string):undefined;
+    clearMappingsForInput(inputName:string):undefined;
     mappingAdd(fromOurInput:string, toAgent:string, withOutput:string):BigInt;
     mappingRemoveWithId(id:BigInt):number;
     mappingRemoveWithName(fromOurInput:string, toAgent:string, withOutput:string): number;
@@ -426,6 +427,7 @@ export function mappingLoadStr(jsonMapping:string):number;
 export function mappingLoadFile(path:string):number;
 export function clearMappings():undefined;
 export function clearMappingsWithAgent(name:string):undefined;
+export function clearMappingsForInput(name:string):undefined;
 export function mappingJson():string;
 export function mappingCount():number;
 export function mappingAdd(fromOurInput:string, toAgent:string, withOutput:string):BigInt;
