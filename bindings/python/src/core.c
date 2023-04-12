@@ -1238,7 +1238,17 @@ PyObject * mapping_load_file_wrapper(PyObject * self, PyObject * args)
 PyObject * clear_mappings_wrapper(PyObject * self, PyObject * args)
 {
     igs_clear_mappings();
-    return PyLong_FromLong(0);
+    return PyLong_FromLong(IGS_SUCCESS);
+}
+
+PyObject * clear_mappings_for_input_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+{
+    static char *kwlist[] = {"input_name",  NULL};
+    char *input_name = NULL;
+    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &input_name))
+        return NULL;
+    igs_clear_mappings_for_input(input_name);
+    return PyLong_FromLong(IGS_SUCCESS);
 }
 
 PyObject * clear_mappings_with_agent_wrapper(PyObject *self, PyObject *args, PyObject *kwds)

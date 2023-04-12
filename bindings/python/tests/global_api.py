@@ -200,6 +200,21 @@ assert igs.mapping_count() == 1
 assert igs.mapping_remove_with_name("toto", "other_agent", "tata") == igs.SUCCESS
 assert igs.mapping_count() == 0
 assert igs.mapping_remove_with_name("toto", "other_agent", "tata") == igs.FAILURE
+assert igs.clear_mappings() == igs.SUCCESS
+assert igs.mapping_count() == 0
+
+assert igs.mapping_add("toto", "other_agent", "tata") > 0
+assert igs.mapping_add("titi", "other_agent", "tata") > 0
+assert igs.mapping_count() == 2
+assert igs.clear_mappings() == igs.SUCCESS
+assert igs.mapping_count() == 0
+
+assert igs.mapping_add("toto", "other_agent", "tata") > 0
+assert igs.mapping_add("titi", "other_agent", "tata") > 0
+assert igs.clear_mappings_for_input("toto") == igs.SUCCESS
+assert igs.mapping_count() == 1
+assert igs.clear_mappings_for_input("titi") == igs.SUCCESS
+assert igs.mapping_count() == 0
 print ("OK")
 
 print ("[Global API] Testing agent splits", end =" ")
