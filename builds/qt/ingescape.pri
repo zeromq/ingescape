@@ -103,10 +103,11 @@ win32:{
     }
 
     CONFIG(release, debug|release) {
+    message("Compilation is into Release mode. Use the dependencies into the folder" $$(ProgramFiles))
         #Add librairies
-        LIBS += -L$$(ProgramFiles)/ingescape/lib/ -lzyre -lczmq -llibsodium
+        LIBS += -L$$(ProgramFiles)/Ingescape/library/lib -lzyre -lczmq -llibsodium
 
-        INCLUDEPATH += $$(ProgramFiles)/ingescape/include
+        INCLUDEPATH += $$(ProgramFiles)/Ingescape/library/include
     }
 
     #To get the Ip address into the network.c
