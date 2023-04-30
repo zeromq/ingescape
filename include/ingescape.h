@@ -31,7 +31,7 @@
 
 //  INGESCAPE version macros for compile-time API detection
 #define INGESCAPE_VERSION_MAJOR 3
-#define INGESCAPE_VERSION_MINOR 4
+#define INGESCAPE_VERSION_MINOR 5
 #define INGESCAPE_VERSION_PATCH 0
 
 #define INGESCAPE_MAKE_VERSION(major, minor, patch) \
@@ -143,8 +143,10 @@ INGESCAPE_EXPORT bool igs_is_started(void);
 typedef void (igs_forced_stop_fn)(void *my_data);
 INGESCAPE_EXPORT void igs_observe_forced_stop(igs_forced_stop_fn cb,
                                               void *my_data);
-//zeromq pipe to receive stop event from ingescape in a thread-safe way
+//zeromq pipe to receive stop event and other messages from the ingescape thread
 INGESCAPE_EXPORT zsock_t * igs_pipe_to_ingescape(void);
+//zeromq pipe to send messages from the ingescape thread, e.g. from inside ingescape callbacks
+INGESCAPE_EXPORT zsock_t * igs_pipe_inside_ingescape(void);
 
 //agent name set and get
 INGESCAPE_EXPORT void igs_agent_set_name(const char *name);

@@ -3062,6 +3062,7 @@ static void s_run_loop (zsock_t *mypipe, void *args)
 {
     s_network_lock ();
     igs_core_context_t *context = (igs_core_context_t *) args;
+    context->internal_pipe = mypipe;
     assert (context);
     assert (context->node);
     assert (context->publisher);
@@ -3158,8 +3159,7 @@ static void s_run_loop (zsock_t *mypipe, void *args)
     zsock_destroy (&context->publisher);
     zsock_destroy (&context->ipc_publisher);
 #if defined(__UNIX__) && !defined(__UTYPE_IOS)
-    zsys_file_delete (
-      context->network_ipc_full_path); // destroy ipc_path in file system
+    zsys_file_delete (context->network_ipc_full_path); // destroy ipc_path in file system
     // NB: ipc_path is based on peer id which is unique. It will never be used
     // again.
     free (context->network_ipc_full_path);
@@ -3195,6 +3195,7 @@ static void s_run_loop (zsock_t *mypipe, void *args)
     if (context->security_auth)
         zactor_destroy (&(context->security_auth));
 
+    context->internal_pipe = NULL;
     igs_debug ("loop stopped");
     zstr_send (mypipe, "LOOP_STOPPED");
     s_network_unlock ();
@@ -4876,6 +4877,14 @@ zsock_t *igs_pipe_to_ingescape (void)
         igs_warn ("ingescape is not started yet");
         return NULL;
     }
+}
+
+zsock_t * igs_pipe_inside_ingescape(void)
+{
+    core_init_context ();
+    if (!core_context->internal_pipe)
+        igs_warn ("ingescape is not started yet");
+    return core_context->internal_pipe;
 }
 
 int igs_timer_start (size_t delay, size_t times, igs_timer_fn cb, void *my_data)
