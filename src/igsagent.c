@@ -155,8 +155,6 @@ igs_result_t igsagent_activate (igsagent_t *agent)
         DL_FOREACH (agent->agent_event_callbacks, cb){
             cb->callback_ptr (agent, IGS_AGENT_ENTERED, r->uuid,
                               r->definition->name, definition_str_for_r, cb->my_data);
-            cb->callback_ptr (agent, IGS_AGENT_KNOWS_US, r->uuid,
-                              r->definition->name, NULL, cb->my_data);
         }
         if (definition_str_for_r)
             free(definition_str_for_r);
