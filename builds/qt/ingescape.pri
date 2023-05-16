@@ -105,9 +105,9 @@ win32:{
     CONFIG(release, debug|release) {
     message("Compilation is into Release mode. Use the dependencies into the folder" $$(ProgramFiles))
         #Add librairies
-        LIBS += -L$$(ProgramFiles)/Ingescape/library/lib -lzyre -lczmq -llibsodium
+        LIBS += -L$$(ProgramW6432)/Ingescape/library/lib -lzyre -lczmq -llibsodium
 
-        INCLUDEPATH += $$(ProgramFiles)/Ingescape/library/include
+        INCLUDEPATH += $$(ProgramW6432)/Ingescape/library/include
     }
 
     LIBS += -lcrypt32 -lwsock32 -lws2_32 -lAdvapi32 -lUser32 -lIPHLPAPI
