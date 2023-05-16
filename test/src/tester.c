@@ -29,11 +29,11 @@ int ingescapeSentMessage(zloop_t *loop, zsock_t *reader, void *arg){
     char *message = NULL;
     zsock_recv(reader, "s", &message);
     if (streq(message, "LOOP_STOPPED")){
-        igs_info("LOOP_STOPPED received in ingescape thread");
+        igs_info("LOOP_STOPPED received from ingescape thread");
         return -1;
-    }else{
-        return 0;
-    }
+    }else if (strncmp(message, "input", 5) == 0)
+        igs_info("'%s' received from ingescape thread", message);
+    return 0;
 }
 
 //callbacks and variables for agent events
@@ -280,6 +280,11 @@ void testerIOPCallback(igs_iop_type_t iopType, const char* name, igs_iop_value_t
     IGS_UNUSED(myCbData)
     IGS_UNUSED(iopType)
     IGS_UNUSED(value)
+    
+    zsock_t *pipe = igs_pipe_inside_ingescape();
+    if (pipe)
+        zstr_sendf(pipe, "input %s was written", name);
+    
     if (autoTestsHaveStarted){
         switch (valueType) {
             case IGS_BOOL_T:

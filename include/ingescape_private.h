@@ -445,6 +445,7 @@ typedef struct igs_core_context {
     igs_remote_agent_t *remote_agents; // those our agents subscribed to
     igs_splitter_t *splitters;
     zactor_t *network_actor;
+    zsock_t *internal_pipe;
     zyre_t *node;
     zsock_t *publisher;
     zsock_t *ipc_publisher;

@@ -72,6 +72,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		9709238129E54A030019C6E5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 09EC3B469DCA4742B74EA815;
+			remoteInfo = test_pubsub_topics_count;
+		};
 		974D746B25D29BE10049C183 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 97A3BDD025AF36B8004BD834 /* sodium.xcodeproj */;
@@ -1492,6 +1499,7 @@
 				97A3BED325AF36CA004BD834 /* test_proxy_single_socket */,
 				97A3BED525AF36CA004BD834 /* test_proxy_terminate */,
 				97A3BED725AF36CA004BD834 /* test_pub_invert_matching */,
+				9709238229E54A030019C6E5 /* test_pubsub_topics_count */,
 				97A3BED925AF36CA004BD834 /* test_radio_dish */,
 				97A3BEDB25AF36CA004BD834 /* test_rebind_ipc */,
 				97A3BEDD25AF36CA004BD834 /* test_reconnect_ivl */,
@@ -1614,13 +1622,11 @@
 		97AFAA9B26C2BBF000D0CCB5 /* dependencies headers */ = {
 			isa = PBXGroup;
 			children = (
-				97AFAAD026C2BC8B00D0CCB5 /* sodium */,
-				97AFAACF26C2BC8B00D0CCB5 /* sodium.h */,
-				97AFAA9E26C2BC2200D0CCB5 /* zmq_utils.h */,
-				97AFAA9F26C2BC2200D0CCB5 /* zmq.h */,
 				97AFAAAF26C2BC4600D0CCB5 /* czmq_library.h */,
 				97AFAAC426C2BC4800D0CCB5 /* czmq_prelude.h */,
 				97AFAAA726C2BC4500D0CCB5 /* czmq.h */,
+				97AFAAD026C2BC8B00D0CCB5 /* sodium */,
+				97AFAACF26C2BC8B00D0CCB5 /* sodium.h */,
 				97AFAAB926C2BC4700D0CCB5 /* test_zgossip.h */,
 				97AFAAB026C2BC4600D0CCB5 /* zactor.h */,
 				97AFAAB526C2BC4700D0CCB5 /* zargs.h */,
@@ -1650,6 +1656,8 @@
 				97AFAAAC26C2BC4600D0CCB5 /* zlistx.h */,
 				97AFAAC526C2BC4900D0CCB5 /* zloop.h */,
 				97AFAAA626C2BC4500D0CCB5 /* zmonitor.h */,
+				97AFAA9E26C2BC2200D0CCB5 /* zmq_utils.h */,
+				97AFAA9F26C2BC2200D0CCB5 /* zmq.h */,
 				97AFAABB26C2BC4800D0CCB5 /* zmsg.h */,
 				97AFAAB726C2BC4700D0CCB5 /* zosc.h */,
 				97AFAAC126C2BC4800D0CCB5 /* zpoller.h */,
@@ -1899,6 +1907,13 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		9709238229E54A030019C6E5 /* test_pubsub_topics_count */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_pubsub_topics_count;
+			remoteRef = 9709238129E54A030019C6E5 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		974D746C25D29BE10049C183 /* libsodium_objects.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
