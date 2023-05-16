@@ -110,8 +110,7 @@ win32:{
         INCLUDEPATH += $$(ProgramFiles)/Ingescape/library/include
     }
 
-    #To get the Ip address into the network.c
-    LIBS += -L$$C:/Windows/System32 -lwsock32 -lIPHLPAPI -lws2_32
+    LIBS += -lcrypt32 -lwsock32 -lws2_32 -lAdvapi32 -lUser32 -lIPHLPAPI
 
     INCLUDEPATH += $$PWD/../../dependencies/windows/unix
 }
