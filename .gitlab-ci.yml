@@ -696,6 +696,8 @@ build-deb-packages:
     - ssh -i ssh_secret ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST} echo Connected
     - rsync --rsh="ssh -i ssh_secret" debian_x64/ingescape-dev*.deb ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST}:/home/ingescape/domains/repository.ingescape.com/public_html/debian/pool/main
     - ssh -i ssh_secret ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST} /home/ingescape/domains/repository.ingescape.com/refresh_deb_repo.sh
+  dependencies: []
+  needs: []
   artifacts:
     paths:
       - debian_x64/ingescape*.deb
@@ -703,6 +705,30 @@ build-deb-packages:
   rules:
     - !reference [.root_namespace, rules]
 
+
+update-vm-runners:
+  stage: delivery
+  tags:
+    - docker
+  image: alpine:latest
+  when: manual
+  script:
+    - echo "Setup SSH context"
+    - apk add openssh
+    - mkdir -p ~/.ssh
+    - ssh-keyscan ${UBUNTU_18_04_RUNNER} >> ~/.ssh/known_hosts
+    - ssh-keyscan ${DEBIAN_11_RUNNER} >> ~/.ssh/known_hosts
+    - umask 077
+    - echo ${SSH_SECRET} | base64 -d > ssh_secret
+    - umask 022
+    - echo "Upgrade ingescape for Ubuntu 18.04 VM runner (Circle linux build)"
+    - ssh -i ssh_secret root@${UBUNTU_18_04_RUNNER} apt-get update
+    - ssh -i ssh_secret root@${UBUNTU_18_04_RUNNER} apt-get install --reinstall ingescape-dev -y
+    - echo "Upgrade ingescape for Debian 11 VM runner (CCU GUIs linux build)"
+    - ssh -i ssh_secret root@${DEBIAN_11_RUNNER} apt-get update
+    - ssh -i ssh_secret root@${DEBIAN_11_RUNNER} apt-get install --reinstall ingescape-dev -y
+  dependencies: []
+  needs: []
 
 
 #   _   _           _             _  _____
