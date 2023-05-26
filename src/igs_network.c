@@ -936,8 +936,10 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     split_remove_worker (context, uuid, NULL);
                     s_agent_propagate_agent_event (IGS_AGENT_EXITED, uuid,
                                                    remote->definition->name, NULL);
+                    model_read_write_lock(__FUNCTION__, __LINE__);
                     HASH_DEL (context->remote_agents, remote);
                     s_clean_and_free_remote_agent (&remote);
+                    model_read_write_unlock(__FUNCTION__, __LINE__);
                 }
                 else
                     igs_error ("%s is not a known remote agent", uuid);
@@ -2872,8 +2874,10 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                         split_remove_worker (context, remote->uuid, NULL);
                         s_agent_propagate_agent_event (IGS_AGENT_EXITED, remote->uuid,
                                                        remote->definition->name, NULL);
+                        model_read_write_lock(__FUNCTION__, __LINE__);
                         HASH_DEL (context->remote_agents, remote);
                         s_clean_and_free_remote_agent (&remote);
+                        model_read_write_unlock(__FUNCTION__, __LINE__);
                     }
                 }
                 HASH_DEL (context->zyre_peers, zyre_peer);
