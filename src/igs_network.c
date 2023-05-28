@@ -628,8 +628,10 @@ void s_clean_and_free_remote_agent (igs_remote_agent_t **remote_agent)
         free (elt->filter);
         free (elt);
     }
-    if ((*remote_agent)->uuid)
+    if ((*remote_agent)->uuid){
         free ((*remote_agent)->uuid);
+        (*remote_agent)->uuid = NULL;
+    }
     if ((*remote_agent)->context->loop
         && (*remote_agent)->timer_id > 0) {
         zloop_timer_end ((*remote_agent)->context->loop,
@@ -804,8 +806,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             igsagent_t *agent, *tmp;
             char *definition_str = NULL;
             char *mapping_str = NULL;
-            HASH_ITER (hh, context->agents, agent, tmp)
-            {
+            HASH_ITER (hh, context->agents, agent, tmp){
                 // definition is sent to every newcomer on the channel (whether it is a
                 // ingescape agent or not)
                 if (zyre_peer->protocol
@@ -813,8 +814,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                         || streq (zyre_peer->protocol, "v3")))
                     definition_str = parser_export_definition_legacy (agent->definition);
                 else
-                    definition_str =
-                      parser_export_definition (agent->definition);
+                    definition_str = parser_export_definition (agent->definition);
                 if (definition_str) {
                     s_send_definition_to_zyre_peer (agent, peerUUID,
                                                     definition_str, false);
@@ -3096,8 +3096,7 @@ static void s_run_loop (zsock_t *mypipe, void *args)
     // iterate on agents to avoid sending definition and mapping update at startup
     // to all peers (they will receive def & map when joining INGESCAPE_PRIVATE)
     igsagent_t *agent, *tmp;
-    HASH_ITER (hh, context->agents, agent, tmp)
-    {
+    HASH_ITER (hh, context->agents, agent, tmp){
         agent->network_need_to_send_mapping_update = false;
         agent->network_need_to_send_definition_update = false;
         agent->network_activation_during_runtime = false;
@@ -3134,25 +3133,25 @@ static void s_run_loop (zsock_t *mypipe, void *args)
 
     s_network_lock ();
     igs_debug ("loop stopping..."); // clean dynamic part of the context
-
+    
+    model_read_write_lock(__FUNCTION__, __LINE__);
     igs_remote_agent_t *remote, *tmpremote;
-    HASH_ITER (hh, context->remote_agents, remote, tmpremote)
-    {
+    HASH_ITER (hh, context->remote_agents, remote, tmpremote){
         HASH_DEL (context->remote_agents, remote);
         s_clean_and_free_remote_agent (&remote);
     }
 
     igs_zyre_peer_t *zyre_peer, *tmp_peer;
-    HASH_ITER (hh, context->zyre_peers, zyre_peer, tmp_peer)
-    {
+    HASH_ITER (hh, context->zyre_peers, zyre_peer, tmp_peer){
         HASH_DEL (context->zyre_peers, zyre_peer);
         s_clean_and_free_zyre_peer (&zyre_peer, context->loop);
     }
+    model_read_write_unlock(__FUNCTION__, __LINE__);
+    
     zloop_destroy (&context->loop);
 
     igs_timer_t *current_timer, *tmp_timer;
-    HASH_ITER (hh, context->timers, current_timer, tmp_timer)
-    {
+    HASH_ITER (hh, context->timers, current_timer, tmp_timer){
         HASH_DEL (context->timers, current_timer);
         free (current_timer);
     }
