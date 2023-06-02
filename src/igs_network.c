@@ -2768,95 +2768,11 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
         }
     }
     else
-    if (streq (event, "LEAVE")) {
+    if (streq (event, "LEAVE"))
         igs_debug ("-%s has left %s", name, group);
-
-        // check if we are last in an elections channel
-        if (core_context->elections) {
-            zlist_t *elections = zhash_keys (context->elections);
-            char *election_name = zlist_first (elections);
-            while (election_name) {
-                if (streq (election_name, group)) {
-                    zlist_t *peer_attendees =
-                      zyre_peers_by_group (context->node, election_name);
-                    size_t nb = zlist_size (peer_attendees);
-                    if (nb == 0) {
-                        // we are last for this election group
-                        // inform all our agents participating in the election
-                        zlist_t *agent_attendees = (zlist_t *) zhash_lookup (
-                          context->elections, election_name);
-                        assert (agent_attendees);
-                        char *attendeeUUID = zlist_first (agent_attendees);
-                        while (attendeeUUID) {
-                            igsagent_t *agent = NULL;
-                            HASH_FIND_STR (context->agents, attendeeUUID,
-                                           agent);
-                            assert (agent);
-                            igs_info ("\\o/ agent %s(%s) is leader in '%s'",
-                                      agent->definition->name, agent->uuid,
-                                      election_name);
-                            igs_agent_event_wrapper_t *cb;
-                            DL_FOREACH (agent->agent_event_callbacks, cb){
-                                cb->callback_ptr (agent, IGS_AGENT_WON_ELECTION,
-                                                  agent->uuid,
-                                                  agent->definition->name,
-                                                  election_name, cb->my_data);
-                            }
-                            attendeeUUID = zlist_next (agent_attendees);
-                        }
-                    }
-                    zlist_destroy (&peer_attendees);
-                }
-                election_name = zlist_next (elections);
-            }
-            zlist_destroy (&elections);
-        }
-    }
     else
     if (streq (event, "EXIT")) {
         igs_debug ("<-%s (%s) exited", name, peerUUID);
-
-        // check if we are last in an elections channel
-        // FIXME: every time a peer exits, we check empty election channels.
-        // This can make IGS_AGENT_WON_ELECTION notifed multiple times for a given
-        // agent.
-        if (context->elections) {
-            zlist_t *elections = zhash_keys (context->elections);
-            char *election_name = zlist_first (elections);
-            while (election_name) {
-                zlist_t *peer_attendees =
-                  zyre_peers_by_group (context->node, election_name);
-                size_t nb = zlist_size (peer_attendees);
-                if (nb == 0) {
-                    // we are last for this election group
-                    // inform all our agents participating in the election
-                    zlist_t *agent_attendees = (zlist_t *) zhash_lookup (
-                      context->elections, election_name);
-                    assert (agent_attendees);
-                    char *attendeeUUID = zlist_first (agent_attendees);
-                    while (attendeeUUID) {
-                        igsagent_t *agent = NULL;
-                        HASH_FIND_STR (context->agents, attendeeUUID, agent);
-                        assert (agent);
-                        igs_info ("\\o/ agent %s(%s) is leader in '%s'",
-                                  agent->definition->name, agent->uuid,
-                                  election_name);
-                        igs_agent_event_wrapper_t *cb;
-                        DL_FOREACH (agent->agent_event_callbacks, cb)
-                        {
-                            cb->callback_ptr (agent, IGS_AGENT_WON_ELECTION,
-                                              agent->uuid,
-                                              agent->definition->name,
-                                              election_name, cb->my_data);
-                        }
-                        attendeeUUID = zlist_next (agent_attendees);
-                    }
-                }
-                zlist_destroy (&peer_attendees);
-                election_name = zlist_next (elections);
-            }
-            zlist_destroy (&elections);
-        }
 
         igs_zyre_peer_t *zyre_peer = NULL;
         HASH_FIND_STR (context->zyre_peers, peerUUID, zyre_peer);
