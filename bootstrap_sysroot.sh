@@ -47,7 +47,7 @@ SCRIPT_DIR=$(cd `dirname $0`; pwd)
         cd dependencies/libzmq
         rm -Rf builds/xcode
         mkdir -p builds/xcode
-        cmake -S . -B builds/xcode -DCMAKE_BUILD_TYPE=Debug -DWITH_DOCS=OFF -DWITH_LIBSODIUM=ON -DENABLE_DRAFTS=ON -DWITH_TLS=OFF -DCMAKE_PREFIX_PATH=$CODEROOT/sysroot/usr/local/ -G "Xcode" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11
+        cmake -S . -B builds/xcode -DCMAKE_BUILD_TYPE=Debug -DWITH_DOCS=OFF -DWITH_LIBSODIUM=ON -DWITH_TLS=OFF -DCMAKE_PREFIX_PATH=$CODEROOT/sysroot/usr/local/ -G "Xcode" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11
         #Hack to enable xcode project embedding because scripts coming with
         #the xcode project do not manage the target folder properly:
         mkdir -p builds/xcode/lib/Debug
@@ -62,7 +62,7 @@ SCRIPT_DIR=$(cd `dirname $0`; pwd)
         cd dependencies/czmq
         rm -Rf builds/xcode
         mkdir -p builds/xcode
-        cmake -S . -B builds/xcode -DCMAKE_BUILD_TYPE=Debug -DENABLE_DRAFTS=ON -DCMAKE_PREFIX_PATH=$CODEROOT/sysroot/usr/local/ -G "Xcode" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11 -DCZMQ_WITH_LZ4=OFF
+        cmake -S . -B builds/xcode -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH=$CODEROOT/sysroot/usr/local/ -G "Xcode" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11 -DCZMQ_WITH_LZ4=OFF
         #Hack to enable xcode project embedding because scripts coming with
         #the xcode project do not manage the target folder properly:
         mkdir -p builds/xcode/Debug
@@ -77,7 +77,7 @@ SCRIPT_DIR=$(cd `dirname $0`; pwd)
         cd dependencies/zyre
         rm -Rf builds/xcode
         mkdir -p builds/xcode
-        cmake -S . -B builds/xcode -DCMAKE_BUILD_TYPE=Debug -DENABLE_DRAFTS=ON -DCMAKE_PREFIX_PATH=$CODEROOT/sysroot/usr/local/ -G "Xcode" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11
+        cmake -S . -B builds/xcode -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH=$CODEROOT/sysroot/usr/local/ -G "Xcode" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11
         #Hack to enable xcode project embedding because scripts coming with
         #the xcode project do not manage the target folder properly:
         mkdir -p builds/xcode/Debug
