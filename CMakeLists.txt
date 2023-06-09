@@ -36,9 +36,6 @@ project(ingescape VERSION ${INGESCAPE_VERSION} HOMEPAGE_URL https://ingescape.co
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
-ADD_DEFINITIONS (-DZYRE_BUILD_DRAFT_API)
-ADD_DEFINITIONS (-DCZMQ_BUILD_DRAFT_API)
-ADD_DEFINITIONS (-DZMQ_BUILD_DRAFT_API)
 
 # Define the PIC compilation flag
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -181,7 +178,6 @@ if (WITH_DEPS)
   #zeromq
   set(WITH_TLS OFF CACHE BOOL "Use TLS for WSS support")
   set(WITH_LIBSODIUM ON CACHE BOOL "Use libsodium instead of built-in tweetnacl")
-  set(ENABLE_DRAFTS ON CACHE BOOL "Build and install draft classes and methods")
   add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libzmq)
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libzmq/include)
   add_dependencies(libzmq sodium)
