@@ -400,7 +400,7 @@ static int handle_null (void *ctx)
 /*
  * Public functions
  */
-igsyajl_val igsyajl_tree_parse (const char *input,
+igsyajl_val igsyajl_tree_parse (const char *input, const size_t input_size,
                           char *error_buffer, size_t error_buffer_size)
 {
     static const igsyajl_callbacks callbacks =
@@ -435,13 +435,13 @@ igsyajl_val igsyajl_tree_parse (const char *input,
 
     status = igsyajl_parse(handle,
                         (unsigned char *) input,
-                        strlen (input));
+                        input_size);
     status = igsyajl_complete_parse (handle);
     if (status != igsyajl_status_ok) {
         if (error_buffer && error_buffer_size > 0) {
                internal_err_str = (char *) igsyajl_get_error(handle, 1,
                      (const unsigned char *) input,
-                     strlen(input));
+                     input_size);
              snprintf(error_buffer, error_buffer_size, "%s", internal_err_str);
              YA_FREE(&(handle->alloc), internal_err_str);
         }

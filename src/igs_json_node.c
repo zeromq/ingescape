@@ -110,8 +110,7 @@ igs_json_node_parse_from_file (const char *path)
     }
     char errbuf[1024] = "unknown error";
     zchunk_t *data = zfile_read (file, zfile_size (path), 0);
-    igs_json_node_t *node = (igs_json_node_t *) igsyajl_tree_parse (
-      (const char *) zchunk_data (data), errbuf, sizeof (errbuf));
+    igs_json_node_t *node = (igs_json_node_t *) igsyajl_tree_parse ((const char *) zchunk_data (data), zchunk_size (data), errbuf, sizeof (errbuf));
     if (node == NULL)
         igs_error ("parsing error (%s) : %s", path, errbuf);
     zchunk_destroy (&data);
@@ -125,7 +124,7 @@ igs_json_node_parse_from_str (const char *content)
     assert (content);
     char errbuf[1024] = "unknown error";
     igs_json_node_t *node =
-      (igs_json_node_t *) igsyajl_tree_parse (content, errbuf, sizeof (errbuf));
+      (igs_json_node_t *) igsyajl_tree_parse (content, strlen(content), errbuf, sizeof (errbuf));
     if (node == NULL)
         igs_error ("parsing error (%s) : %s", content, errbuf);
     return node;

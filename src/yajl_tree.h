@@ -118,7 +118,7 @@ struct igsyajl_val_s
  * null terminated message describing the error in more detail is stored in
  * \em error_buffer if it is not \c NULL.
  */
-IGSYAJL_API igsyajl_val igsyajl_tree_parse (const char *input,
+IGSYAJL_API igsyajl_val igsyajl_tree_parse (const char *input, const size_t input_size,
                                    char *error_buffer, size_t error_buffer_size);
 
 
