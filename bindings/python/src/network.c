@@ -194,7 +194,7 @@ PyObject * net_devices_list_wrapper(PyObject * self, PyObject * args)
     char **resultList = igs_net_devices_list(&nbList);
     PyObject *ret = PyList_New(nbList);
     for (int i = 0; i < nbList; i++)
-        PyList_SetItem(ret, i, Py_BuildValue("s",resultList[i]));
+        PyList_SetItem(ret, i, PyUnicode_DecodeLocale(resultList[i], NULL));
     igs_free_net_devices_list(resultList, nbList);
     return ret;
 }
