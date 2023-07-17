@@ -1452,8 +1452,12 @@ PyObject * service_call_wrapper(PyObject * self, PyObject * args)
                 }
                 else if(PyUnicode_Check(newArgument))
                     igs_service_args_add_string(&argumentList, PyUnicode_AsUTF8(newArgument));
-                else
-                    igs_service_args_add_data(&argumentList, PyBytes_FromObject(newArgument), PyBytes_Size(newArgument));
+                else{
+                    if (PyByteArray_Check(newArgument))
+                        igs_service_args_add_data(&argumentList, PyByteArray_AsString(newArgument), PyByteArray_Size(newArgument));
+                    else if (PyBytes_Check(newArgument))
+                        igs_service_args_add_data(&argumentList, PyBytes_AsString(newArgument), PyBytes_Size(newArgument));
+                }
             }
         }
         result = igs_service_call(agentNameOrUUID, callName, &argumentList, token);
@@ -1470,9 +1474,12 @@ PyObject * service_call_wrapper(PyObject * self, PyObject * args)
                     igs_service_args_add_bool(&argumentList, false);
             }else if(PyUnicode_Check(argTuple))
                 igs_service_args_add_string(&argumentList, PyUnicode_AsUTF8(argTuple));
-            else
-                igs_service_args_add_data(&argumentList, PyBytes_FromObject(argTuple), PyBytes_Size(argTuple));
-
+            else{
+                if (PyByteArray_Check(argTuple))
+                    igs_service_args_add_data(&argumentList, PyByteArray_AsString(argTuple), PyByteArray_Size(argTuple));
+                else if (PyBytes_Check(argTuple))
+                    igs_service_args_add_data(&argumentList, PyBytes_AsString(argTuple), PyBytes_Size(argTuple));
+            }
             result = igs_service_call(agentNameOrUUID, callName, &argumentList, token);
         }else
             result = igs_service_call(agentNameOrUUID, callName, NULL, token);

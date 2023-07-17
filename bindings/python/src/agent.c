@@ -2073,30 +2073,39 @@ PyObject *Agent_service_call(AgentObject *self, PyObject *args, PyObject *kwds)
                     igs_service_args_add_string(&argumentList, PyUnicode_AsUTF8AndSize(newArgument, &size));
                 }
                 else
-                    igs_service_args_add_data(&argumentList, PyBytes_FromObject(newArgument), PyBytes_Size(newArgument));
+                {
+                    if (PyByteArray_Check(newArgument))
+                        igs_service_args_add_data(&argumentList, PyByteArray_AsString(newArgument), PyByteArray_Size(newArgument));
+                    else if (PyBytes_Check(newArgument))
+                        igs_service_args_add_data(&argumentList, PyBytes_AsString(newArgument), PyBytes_Size(newArgument));
+                }
             }
         }
         result = igsagent_service_call(self->agent, agentNameOrUUID, serviceName, &argumentList, token);
         igs_service_args_destroy(&argumentList);
     }else if (format == 1){
         if(PyLong_CheckExact(argTuple))
-                igs_service_args_add_int(&argumentList, (int)PyLong_AsLong(argTuple));
-            else if(PyFloat_CheckExact(argTuple))
-                igs_service_args_add_double(&argumentList, PyFloat_AsDouble(argTuple));
-            else if(PyBool_Check(argTuple))
-            {
-                if(argTuple == Py_True)
-                    igs_service_args_add_bool(&argumentList, true);
-                else
-                    igs_service_args_add_bool(&argumentList, false);
-            }
-            else if(PyUnicode_Check(argTuple))
-            {
-                Py_ssize_t size;
-                igs_service_args_add_string(&argumentList, PyUnicode_AsUTF8AndSize(argTuple, &size));
-            }
+            igs_service_args_add_int(&argumentList, (int)PyLong_AsLong(argTuple));
+        else if(PyFloat_CheckExact(argTuple))
+            igs_service_args_add_double(&argumentList, PyFloat_AsDouble(argTuple));
+        else if(PyBool_Check(argTuple))
+        {
+            if(argTuple == Py_True)
+                igs_service_args_add_bool(&argumentList, true);
             else
-                igs_service_args_add_data(&argumentList, PyBytes_FromObject(argTuple), PyBytes_Size(argTuple));
+                igs_service_args_add_bool(&argumentList, false);
+        }
+        else if(PyUnicode_Check(argTuple))
+        {
+            Py_ssize_t size;
+            igs_service_args_add_string(&argumentList, PyUnicode_AsUTF8AndSize(argTuple, &size));
+        }
+        else{
+            if (PyByteArray_Check(argTuple))
+                igs_service_args_add_data(&argumentList, PyByteArray_AsString(argTuple), PyByteArray_Size(argTuple));
+            else if (PyBytes_Check(argTuple))
+                igs_service_args_add_data(&argumentList, PyBytes_AsString(argTuple), PyBytes_Size(argTuple));
+        }
         result = igsagent_service_call(self->agent, agentNameOrUUID, serviceName, &argumentList, token);
         igs_service_args_destroy(&argumentList);
     }else
