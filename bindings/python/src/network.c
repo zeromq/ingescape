@@ -389,7 +389,7 @@ PyObject * igs_timer_start_wrapper(PyObject *self, PyObject *args, PyObject *kwd
     int times = 0;
     PyObject *callback = NULL;
     PyObject *my_data = NULL;
-    if (PyArg_ParseTupleAndKeywords(args, NULL, "ii00", kwlist, &delay, &times, &callback, &my_data)) {
+    if (PyArg_ParseTupleAndKeywords(args, NULL, "iiOO", kwlist, &delay, &times, &callback, &my_data)) {
         if (!PyCallable_Check(callback)) {
             PyErr_SetString(PyExc_TypeError, "'callback' parameter must be callable");
             return PyLong_FromLong(IGS_FAILURE);
