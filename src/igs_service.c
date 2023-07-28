@@ -766,6 +766,10 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
     model_read_write_lock (__FUNCTION__, __LINE__);
     // check that this agent has not been destroyed when we were locked
     if (!agent || !(agent->uuid)) {
+        if ((list) && (*list)) {
+            s_service_free_service_arguments (*list);
+            *list = NULL;
+        }
         model_read_write_unlock (__FUNCTION__, __LINE__);
         return IGS_SUCCESS;
     }
