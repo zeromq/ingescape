@@ -90,7 +90,7 @@ void core_init_context (void)
         core_context->network_hwm_value = 1000;
         core_context->network_discovery_interval = 1000;
         core_context->network_agent_timeout = 8000;
-        core_context->log_level = IGS_LOG_INFO;
+        core_context->log_level = IGS_LOG_WARN;
         core_context->log_file_level = IGS_LOG_TRACE;
         core_context->log_file_max_line_length = IGS_MAX_LOG_LENGTH;
         core_context->network_shall_raise_file_descriptors_limit = true;
