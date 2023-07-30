@@ -109,15 +109,13 @@ void s_unsubscribe_to_remote_agent_output (igs_remote_agent_t *remote_agent,
 
 // function actually handling messages from one of the remote agents we
 // subscribed to
-void s_handle_publication_from_remote_agent (zmsg_t *msg,
-                                             igs_remote_agent_t *remote_agent)
+void s_handle_publication (zmsg_t *msg, igs_remote_agent_t *remote_agent)
 {
     assert (msg);
     assert (remote_agent);
     assert (remote_agent->context);
     if (remote_agent->context->is_frozen == true) {
-        igs_debug ("Message received from %s but all traffic in our process is "
-                   "currently frozen",
+        igs_debug ("Message received from %s but all traffic in our process is currently frozen",
                    remote_agent->definition->name);
         return;
     }
@@ -125,7 +123,7 @@ void s_handle_publication_from_remote_agent (zmsg_t *msg,
     model_read_write_lock (__FUNCTION__, __LINE__);
     // Publication does not provide information about the targeted agents.
     // At this stage, we only know that one or more of our agents are targeted.
-    // We need to iterate through our agents and their mapping to check which
+    // We need to iterate through our agents and their mappings to check which
     // inputs need to be updated on which agent.
     igsagent_t *agent, *tmp_agent;
     HASH_ITER (hh, remote_agent->context->agents, agent, tmp_agent){
@@ -137,7 +135,7 @@ void s_handle_publication_from_remote_agent (zmsg_t *msg,
         char *output = NULL;
         char *v_type = NULL;
         igs_iop_value_type_t value_type = 0;
-        unsigned long i = 0;
+        size_t i = 0;
         for (i = 0; i < msg_size; i += 3) {
             // Each message part must contain 3 elements
             // 1 : output name
@@ -276,7 +274,7 @@ int s_trigger_outputs_request_to_newcomer (zloop_t *loop,
 }
 
 // manage incoming messages from one of the remote agents we subscribed to
-int s_manage_remote_publication (zloop_t *loop, zsock_t *socket, void *arg)
+int s_manage_received_publication (zloop_t *loop, zsock_t *socket, void *arg)
 {
     IGS_UNUSED (loop)
     igs_core_context_t *context = (igs_core_context_t *) arg;
@@ -284,36 +282,35 @@ int s_manage_remote_publication (zloop_t *loop, zsock_t *socket, void *arg)
     assert (context);
 
     zmsg_t *msg = zmsg_recv (socket);
-    // The output name now includes the agent uuid as prefix.
-    // We merged them to keep the ZeroMQ PUB/SUB filters working
-    // in a context where a peer now possibly hosts multiple agents.
-    char *output_name = zmsg_popstr (msg);
-    if (output_name == NULL) {
+    assert(msg);
+    // The output name includes the publishing agent uuid as a prefix.
+    // We merged uuid and output to keep the ZeroMQ PUB/SUB filters working
+    // in a context where a publishing peer possibly hosts multiple agents.
+    char *publication = zmsg_popstr (msg);
+    if (publication == NULL) {
         igs_error ("output name is NULL in received publication : rejecting");
         return 0;
     }
-    char uuid[IGS_AGENT_UUID_LENGTH + 1] = "";
-    if (strlen (output_name) < IGS_AGENT_UUID_LENGTH) {
-        igs_error ("output name '%s' is missing information : rejecting",
-                   output_name);
-        free (output_name);
+    if (strlen (publication) < IGS_AGENT_UUID_LENGTH) {
+        igs_error ("output name '%s' is missing information : rejecting", publication);
+        free (publication);
         return 0;
     }
-    snprintf (uuid, IGS_AGENT_UUID_LENGTH + 1, "%s", output_name);
-    char *real_output_name = output_name + IGS_AGENT_UUID_LENGTH + 1;
+    publication[IGS_AGENT_UUID_LENGTH] = '\0'; //enable proper extraction of publishing agent UUID
 
-    // NB: We push the output name again at the beginning of
-    // the message for proper use by s_handle_publication_from_remote_agent
-    zmsg_pushstr (msg, real_output_name);
-    free (output_name);
+    // We push the actual output name again at the beginning of
+    // the message for proper use by s_handle_publication
+    zmsg_pushstr (msg, publication + IGS_AGENT_UUID_LENGTH + 1);
 
     igs_remote_agent_t *remote_agent = NULL;
-    HASH_FIND_STR (context->remote_agents, uuid, remote_agent);
+    HASH_FIND_STR (context->remote_agents, publication, remote_agent);
     if (remote_agent == NULL) {
-        igs_error ("no remote agent with uuid '%s' : rejecting", uuid);
+        igs_error ("no remote agent with uuid '%s' : rejecting", publication);
+        free (publication);
         return 0;
     }
-    s_handle_publication_from_remote_agent (msg, remote_agent);
+    free (publication);
+    s_handle_publication (msg, remote_agent);
     zmsg_destroy (&msg);
     return 0;
 }
@@ -779,7 +776,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                         zcert_apply (context->security_cert, zyre_peer->subscriber);
                         zsock_set_curve_serverkey (zyre_peer->subscriber, peer_public_key);
                     }
-                    zloop_reader (loop, zyre_peer->subscriber, s_manage_remote_publication, context);
+                    zloop_reader (loop, zyre_peer->subscriber, s_manage_received_publication, context);
                     zloop_reader_set_tolerant (loop, zyre_peer->subscriber);
                 }
             }
@@ -1458,8 +1455,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 }
                 igs_debug ("privately received output values from %s (%s)",
                            remote_agent->definition->name, remote_agent->uuid);
-                s_handle_publication_from_remote_agent (msg_duplicate,
-                                                      remote_agent);
+                s_handle_publication (msg_duplicate, remote_agent);
                 zmsg_destroy (&msg_duplicate);
                 free (uuid);
             }
@@ -1709,8 +1705,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free (title);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
-                // stop our zyre loop by returning -1 : this will start the cleaning
-                // process
+                // stop our zyre loop by returning -1 : this will start the cleaning process
                 return -1;
             }
             else
@@ -3579,13 +3574,13 @@ igs_result_t network_publish_output (igsagent_t *agent, const igs_iop_t *iop)
             zmsg_pushstr (msg_quater,
                           iop->name); // replace it by simple iop name
             // Generate a temporary fake remote agent, containing only
-            // necessary information for s_handle_publication_from_remote_agent.
+            // necessary information for s_handle_publication.
             igs_remote_agent_t *fake_remote = (igs_remote_agent_t *) zmalloc (sizeof (igs_remote_agent_t));
             fake_remote->context = core_context;
             fake_remote->definition = (igs_definition_t *) zmalloc (sizeof (igs_definition_t));
             fake_remote->definition->name = agent->definition->name;
-            model_read_write_unlock (__FUNCTION__, __LINE__); // to avoid deadlock inside s_handle_publication_from_remote_agent
-            s_handle_publication_from_remote_agent (msg_quater, fake_remote);
+            model_read_write_unlock (__FUNCTION__, __LINE__); // to avoid deadlock inside s_handle_publication
+            s_handle_publication (msg_quater, fake_remote);
             free (fake_remote->definition);
             free (fake_remote);
         }
