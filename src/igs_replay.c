@@ -426,6 +426,7 @@ void igs_replay_init (const char *log_file_path,
                       uint replay_mode,
                       const char *agent)
 {
+    igs_warn("This function has been deprecated from version 3.5.5 and will soon be removed");
     assert (log_file_path || wait_for_start);
     assert (speed >= 0);
     assert (!start_time || strlen (start_time) < 9);
@@ -496,6 +497,7 @@ void igs_replay_init (const char *log_file_path,
 
 void igs_replay_start (void)
 {
+    igs_warn("This function has been deprecated from version 3.5.5 and will soon be removed");
     if (s_replay_actor)
         zstr_send (zactor_sock (s_replay_actor), "START_REPLAY");
     else
@@ -504,11 +506,13 @@ void igs_replay_start (void)
 
 void igs_replay_pause (bool pause)
 {
+    igs_warn("This function has been deprecated from version 3.5.5 and will soon be removed");
     s_replay_is_paused = pause;
 }
 
 void igs_replay_terminate (void)
 {
+    igs_warn("This function has been deprecated from version 3.5.5 and will soon be removed");
     if (s_replay_actor) {
         s_replay_shall_stop = true;
         zstr_send (zactor_sock (s_replay_actor), "STOP_REPLAY");

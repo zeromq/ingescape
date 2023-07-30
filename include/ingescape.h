@@ -32,7 +32,7 @@
 //  INGESCAPE version macros for compile-time API detection
 #define INGESCAPE_VERSION_MAJOR 3
 #define INGESCAPE_VERSION_MINOR 5
-#define INGESCAPE_VERSION_PATCH 4
+#define INGESCAPE_VERSION_PATCH 5
 
 #define INGESCAPE_MAKE_VERSION(major, minor, patch) \
 ((major) * 10000 + (minor) * 100 + (patch))
@@ -850,7 +850,19 @@ INGESCAPE_EXPORT void igs_observe_monitor(igs_monitor_fn cb, void *my_data);
 INGESCAPE_EXPORT void igs_clear_context(void);
 
 
-/* LOGS REPLAY
+/* LOGS REPLAY - DEPRECATED - will be removed soon
+ ---------------------------------------------------------------------
+ Why are we deprecating the replay features ?
+ • These features make the library heavier and require to maintain a compatibility
+ with log formats, which will inevitably become a hassle at some point. The
+ cost/benefit ratio is thus not very favorable.
+ • These replay features are practically unused and are easy to implement outside the
+ library simply by parsing logs and publishing data in various possible ways.
+ • The Ingescape ecosystem provides much better solutions based on record/replay
+ support with agent virtualization that beat these features in every way.
+ 
+ Post an issue on github if you want to discuss this topic with the community.
+ ---------------------------------------------------------------------
  Ingescape logs contain all the necessary information for an agent to replay
  its changes for inputs, outputs, parameters and services.
 
