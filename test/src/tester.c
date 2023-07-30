@@ -46,6 +46,8 @@ bool tester_secondAgentExited = false;
 void agentEvent(igs_agent_event_t event, const char *uuid, const char *name, void *eventData, void *myCbData){
     IGS_UNUSED(eventData)
     IGS_UNUSED(myCbData)
+    if (autoTests)
+        return;
     printf("agentEvent: in tester - %d - %s - %s\n", event, uuid, name);
     if (streq(name, "firstAgent")){
         if (event == IGS_AGENT_ENTERED)
@@ -81,6 +83,8 @@ bool second_testerAgentExited = false;
 void agentEvent2(igsagent_t *agent, igs_agent_event_t event, const char *uuid, const char *name, void *eventData, void *myCbData){
     IGS_UNUSED(eventData)
     IGS_UNUSED(myCbData)
+    if (autoTests)
+        return;
     printf("agentEvent2: in %s - %d - %s - %s\n", igsagent_name(agent), event, uuid, name); //intentional memory leak on agent name
     assert(agent == firstAgent || agent == secondAgent);
     if (agent == firstAgent){
@@ -123,22 +127,6 @@ void testerServiceCallback(const char *senderAgentName, const char *senderAgentU
                            const char *serviceName, igs_service_arg_t *firstArgument, size_t nbArgs,
                            const char *token, void* myCbData){
     IGS_UNUSED(myCbData)
-    if (autoTestsHaveStarted){
-        assert(token);
-        assert(streq(token, "token"));
-        assert(firstArgument->type == IGS_BOOL_T);
-        assert(firstArgument->b);
-        assert(firstArgument->next->type == IGS_INTEGER_T);
-        assert(firstArgument->next->i == 3);
-        assert(firstArgument->next->next->type == IGS_DOUBLE_T);
-        assert(firstArgument->next->next->d = 3.3 < 0.0001);
-        assert(firstArgument->next->next->next->type == IGS_STRING_T);
-        assert(streq(firstArgument->next->next->next->c,"service string test"));
-        assert(firstArgument->next->next->next->next->type == IGS_DATA_T);
-        assert(firstArgument->next->next->next->next->size == 64);
-        return;
-    }
-
     printf("received service %s from %s(%s) (", serviceName, senderAgentName, senderAgentUUID);
     igs_service_arg_t *currentArg = firstArgument;
     for (size_t i = 0; i < nbArgs; i++){
@@ -164,6 +152,21 @@ void testerServiceCallback(const char *senderAgentName, const char *senderAgentU
         currentArg = currentArg->next;
     }
     printf(" )\n");
+    if (autoTestsHaveStarted){
+        assert(token);
+        assert(streq(token, "token"));
+        assert(firstArgument->type == IGS_BOOL_T);
+        assert(firstArgument->b);
+        assert(firstArgument->next->type == IGS_INTEGER_T);
+        assert(firstArgument->next->i == 3);
+        assert(firstArgument->next->next->type == IGS_DOUBLE_T);
+        assert(firstArgument->next->next->d - 3.3 < 0.0001);
+        assert(firstArgument->next->next->next->type == IGS_STRING_T);
+        assert(streq(firstArgument->next->next->next->c,"service string test"));
+        assert(firstArgument->next->next->next->next->type == IGS_DATA_T);
+        assert(firstArgument->next->next->next->next->size == 64);
+        printf("services test is OK\n");
+    }
 }
 
 //callbacks for channels
@@ -175,10 +178,6 @@ void testerChannelCallback(const char *event, const char *peerID, const char *na
     IGS_UNUSED(myCbData)
     if (autoTests && autoTestsHaveStarted){
         assert(streq(name, "partner"));
-        if (msg){
-            printf("new message:\n");
-            zmsg_print(msg);
-        }
         if (streq(event, "SHOUT")){
             assert(streq(channel, "TEST_CHANNEL"));
             if (msgCountForAutoTests == 0){
@@ -217,6 +216,7 @@ void testerChannelCallback(const char *event, const char *peerID, const char *na
                 }
                 if (msgCountForAutoTests == 5){
                     assert(streq(s, "message content"));
+                    printf("channels test is OK\n");
                 }
             }
             if (s)
@@ -227,9 +227,8 @@ void testerChannelCallback(const char *event, const char *peerID, const char *na
     }else if (autoTests){
         if (streq(event, "WHISPER")){
             char *s = zmsg_popstr(msg);
-            if(streq(name, "partner") && streq(s, "starting autotests")){
+            if(s && streq(name, "partner") && streq(s, "starting autotests"))
                 autoTestsHaveStarted = true;
-            }
             if (s)
                 free(s);
         }
@@ -290,14 +289,17 @@ void testerIOPCallback(igs_iop_type_t iopType, const char* name, igs_iop_value_t
             case IGS_BOOL_T:
                 assert(igs_input_bool(name));
                 assert(valueSize == sizeof(bool));
+                printf("bool publish test is OK\n");
                 break;
             case IGS_INTEGER_T:
                 assert(igs_input_int(name) == 2);
                 assert(valueSize == sizeof(int));
+                printf("int publish test is OK\n");
                 break;
             case IGS_DOUBLE_T:
                 assert(igs_input_double(name) - 2.2 < 0.000001);
                 assert(valueSize == sizeof(double));
+                printf("double publish test is OK\n");
                 break;
             case IGS_STRING_T:
             {
@@ -305,16 +307,27 @@ void testerIOPCallback(igs_iop_type_t iopType, const char* name, igs_iop_value_t
                 assert(streq(stringValue, "output string test"));
                 assert(valueSize == strlen(stringValue) + 1);
                 free(stringValue);
+                printf("string publish test is OK\n");
                 break;
             }
             case IGS_DATA_T:
-                assert(valueSize == 64);
+            {
+                zframe_t *f = zframe_new(value, valueSize);
+                char *f_string = zframe_strdup(f);
+                assert(streq(f_string, "data test"));
+                free(f_string);
+                zframe_destroy(&f);
+                printf("data publish test is OK\n");
                 break;
+            }
             default:
                 break;
         }
         return;
     }
+    
+    if (autoTests)
+        return;
 
     printf("input %s changed", name);
     switch (valueType) {
@@ -346,71 +359,10 @@ void testerIOPCallback(igs_iop_type_t iopType, const char* name, igs_iop_value_t
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// MAIN & OPTIONS & COMMAND INTERPRETER
-//
-int main(int argc, const char * argv[]) {
-    myData = malloc(32);
-    myOtherData = malloc(64);
 
-    //manage options
-    int opt = 0;
-    bool interactiveloop = false;
-    bool staticTests = false;
-
-    static struct option long_options[] = {
-        {"verbose",     no_argument, 0,  'v' },
-        {"interactiveloop",     no_argument, 0,  'i' },
-        {"definition",  required_argument, 0,  'f' },
-        {"mapping",  required_argument, 0,  'm' },
-        {"device",      required_argument, 0,  'd' },
-        {"port",        required_argument, 0,  'p' },
-        {"name",        required_argument, 0,  'n' },
-        {"auto",        no_argument, 0,  'a' },
-        {"static",        no_argument, 0,  's' },
-        {"help",        no_argument, 0,  'h' },
-        {0, 0, 0, 0}
-    };
-
-    int long_index = 0;
-    while ((opt = getopt_long(argc, (char *const *)argv, "p", long_options, &long_index)) != -1) {
-        switch (opt) {
-            case 'v':
-                verbose = true;
-                break;
-            case 'i':
-                interactiveloop = true;
-                break;
-            case 'p':
-                port = (unsigned int)atoi(optarg);
-                break;
-            case 'd':
-                networkDevice = optarg;
-                break;
-            case 'n':
-                agentName = optarg;
-                break;
-            case 'a':
-                autoTests = true;
-                break;
-            case 's':
-                staticTests = true;
-                break;
-            case 'h':
-                print_usage(agentName);
-                exit(0);
-            default:
-                print_usage(agentName);
-                exit(1);
-        }
-    }
-    igs_clear_context();
+// static tests function
+void run_static_tests (int argc, const char * argv[]){
     igs_log_set_syslog(true);
-    //NB: on macos, because syslog is broken, logs can be checked using this command:
-    //log stream --info --debug --predicate 'sender == "ingescape"' --style syslog
-    igs_log_include_data(true);
-    igs_log_include_services(true);
-
     //agent name and uuid
     char *name = igs_agent_name();
     assert(streq(name, "no_name"));
@@ -881,7 +833,8 @@ int main(int argc, const char * argv[]) {
     assert(dataSize == 0 && data == NULL);
 
     //definition - part 2
-    //TODO: compare exported def, saved file and reference file//iop description
+    //TODO: compare exported def, saved file and reference file
+    //iop description
     igs_input_set_description("my_impulsion", "my iop description here");
     igs_output_set_description("my_impulsion", "my iop description here");
     igs_parameter_set_description("my_impulsion", "my iop description here");
@@ -1442,10 +1395,9 @@ int main(int argc, const char * argv[]) {
 
     //prepare agent for dynamic tests by adding proper complete definitions
     igs_agent_set_name(agentName);
-    igs_log_set_console(verbose);
+    igs_log_set_console(true);
     igs_observe_channels(testerChannelCallback, NULL);
 
-    igs_agent_set_name(agentName);
     igs_definition_set_description("One example for each type of IOP and call");
     igs_definition_set_version("1.0");
     igs_input_create("my_impulsion", IGS_IMPULSION_T, NULL, 0);
@@ -1910,33 +1862,136 @@ int main(int argc, const char * argv[]) {
     //                   100, NULL, true, 0, NULL);
     //    igs_replay_start();
     //    igs_replay_terminate();
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// MAIN & OPTIONS & COMMAND INTERPRETER
+//
+int main(int argc, const char * argv[]) {
+    myData = calloc(32, sizeof(char));
+    myOtherData = calloc(64, sizeof(char));
+
+    //manage options
+    int opt = 0;
+    bool interactiveloop = false;
+    bool staticTests = false;
+
+    static struct option long_options[] = {
+        {"verbose",     no_argument, 0,  'v' },
+        {"interactiveloop",     no_argument, 0,  'i' },
+        {"definition",  required_argument, 0,  'f' },
+        {"mapping",  required_argument, 0,  'm' },
+        {"device",      required_argument, 0,  'd' },
+        {"port",        required_argument, 0,  'p' },
+        {"name",        required_argument, 0,  'n' },
+        {"auto",        no_argument, 0,  'a' },
+        {"static",        no_argument, 0,  's' },
+        {"help",        no_argument, 0,  'h' },
+        {0, 0, 0, 0}
+    };
+
+    int long_index = 0;
+    while ((opt = getopt_long(argc, (char *const *)argv, "p", long_options, &long_index)) != -1) {
+        switch (opt) {
+            case 'v':
+                verbose = true;
+                break;
+            case 'i':
+                interactiveloop = true;
+                break;
+            case 'p':
+                port = (unsigned int)atoi(optarg);
+                break;
+            case 'd':
+                networkDevice = optarg;
+                break;
+            case 'n':
+                agentName = optarg;
+                break;
+            case 'a':
+                autoTests = true;
+                break;
+            case 's':
+                staticTests = true;
+                break;
+            case 'h':
+                print_usage(agentName);
+                exit(0);
+            default:
+                print_usage(agentName);
+                exit(1);
+        }
+    }
+    igs_clear_context();
+    //NB: on macos, because syslog is broken, logs can be checked using this command:
+    //log stream --info --debug --predicate 'sender == "ingescape"' --style syslog
+    igs_log_include_data(true);
+    igs_log_include_services(true);
+    igs_log_set_syslog(false);
+
+
 
     if (staticTests){
+        autoTests = false;
+        run_static_tests(argc, argv);
         //we terminate now after passing the static tests
         igsagent_destroy(&secondAgent);
         igsagent_destroy(&firstAgent);
+        igs_fatal("static tests have terminated with success");
         exit(EXIT_SUCCESS);
-    }else if (autoTests){
-        //we run a loop dedicated to automatic tests
-        
-        //start/stop stress tests
-        igs_start_with_device(networkDevice, port);
-        igs_start_with_device(networkDevice, port);
-        igs_stop();
-        igs_stop();
-        igs_stop();
-        
+    }
+    
+    igs_agent_set_name(agentName);
+    igs_log_set_console(true);
+    
+    igs_observe_channels(testerChannelCallback, NULL);
+
+    igs_definition_set_description("One example for each type of IOP and call");
+    igs_definition_set_version("1.0");
+    igs_input_create("my_impulsion", IGS_IMPULSION_T, NULL, 0);
+    igs_input_create("my_bool", IGS_BOOL_T, &myBool, sizeof(bool));
+    igs_input_create("my_int", IGS_INTEGER_T, &myInt, sizeof(int));
+    igs_input_create("my_double", IGS_DOUBLE_T, &myDouble, sizeof(double));
+    igs_input_create("my_string", IGS_STRING_T, myString, strlen(myString) + 1);
+    igs_input_create("my_data", IGS_DATA_T, myData, 32);
+    igs_service_init("myService", testerServiceCallback, NULL);
+    igs_service_arg_add("myService", "myBool", IGS_BOOL_T);
+    igs_service_arg_add("myService", "myInt", IGS_INTEGER_T);
+    igs_service_arg_add("myService", "myDouble", IGS_DOUBLE_T);
+    igs_service_arg_add("myService", "myString", IGS_STRING_T);
+    igs_service_arg_add("myService", "myData", IGS_DATA_T);
+
+    igs_observe_input("my_impulsion", testerIOPCallback, NULL);
+    igs_observe_input("my_bool", testerIOPCallback, NULL);
+    igs_observe_input("my_int", testerIOPCallback, NULL);
+    igs_observe_input("my_double", testerIOPCallback, NULL);
+    igs_observe_input("my_string", testerIOPCallback, NULL);
+    igs_observe_input("my_data", testerIOPCallback, NULL);
+
+    igs_mapping_add("my_impulsion", "partner", "sparing_impulsion");
+    igs_mapping_add("my_bool", "partner", "sparing_bool");
+    igs_mapping_add("my_int", "partner", "sparing_int");
+    igs_mapping_add("my_double", "partner", "sparing_double");
+    igs_mapping_add("my_string", "partner", "sparing_string");
+    igs_mapping_add("my_data", "partner", "sparing_data");
+    
+    if (autoTests){
+        if (verbose)
+            igs_log_set_console_level(IGS_LOG_TRACE);
+        else
+            igs_log_set_console_level(IGS_LOG_FATAL);
         igs_start_with_device(networkDevice, port);
         igs_channel_join("TEST_CHANNEL");
         zloop_t *loop = zloop_new();
         zsock_t *pipe = igs_pipe_to_ingescape();
         zloop_reader(loop, pipe, ingescapeSentMessage, NULL);
-        igs_info("ready to start autotests");
+        igs_fatal("ready to start autotests");
+        //we run a loop dedicated to automatic tests
         zloop_start(loop);
         zloop_destroy(&loop);
-        igsagent_destroy(&secondAgent);
         igs_stop();
-        igsagent_destroy(&firstAgent);
         igs_clear_context();
         exit(EXIT_SUCCESS);
     }else{
@@ -1980,6 +2035,12 @@ int main(int argc, const char * argv[]) {
         }
         igsagent_activate(firstAgent);
     }
+    //start/stop stress tests
+    igs_start_with_device(networkDevice, port);
+    igs_start_with_device(networkDevice, port);
+    igs_stop();
+    igs_stop();
+    igs_stop();
 
     igs_start_with_device(networkDevice, port);
 

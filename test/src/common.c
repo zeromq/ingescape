@@ -262,7 +262,9 @@ void publishCommandSparing(void){
     igs_output_set_int("sparing_int", 2);
     igs_output_set_double("sparing_double", 2.2);
     igs_output_set_string("sparing_string", "output string test");
-    igs_output_set_data("sparing_data", myOtherData, 64);
+    zframe_t *f = zframe_from("data test");
+    igs_output_set_data("sparing_data", zframe_data(f), zframe_size(f));
+    zframe_destroy(&f);
 }
 
 void servicesCommand(void){
