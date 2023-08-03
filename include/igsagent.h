@@ -23,8 +23,8 @@ extern "C" {
 #endif
 
 /*
- The functions here are not commented. They are clone of the main
- Ingescape functions extensively presented in ingescape.h, and add
+ The functions here are not commented. They are clones of the main
+ Ingescape functions extensively documented in ingescape.h, and add
  a specific agent pointer as their first argument.
  */
 
@@ -294,6 +294,13 @@ INGESCAPE_EXPORT bool igsagent_service_reply_arg_exists(igsagent_t *self, const 
 
 INGESCAPE_EXPORT igs_result_t igsagent_election_join (igsagent_t *self, const char *election_name);
 INGESCAPE_EXPORT igs_result_t igsagent_election_leave (igsagent_t *self, const char *election_name);
+
+//////////////////////////////////////////////////////////////////////
+// Ingescape real-time communications
+
+INGESCAPE_EXPORT int64_t igsagent_rt_get_current_timestamp(igsagent_t *agent);
+INGESCAPE_EXPORT void igsagent_rt_set_timestamps(igsagent_t *agent, bool enable);
+INGESCAPE_EXPORT bool igsagent_rt_timestamps(igsagent_t *agent);
 
 ///////////////////////////////////////////////////////
 // Administration, logging, configuration and utilities

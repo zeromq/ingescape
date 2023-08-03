@@ -148,31 +148,29 @@ long long s_execute_current_and_find_next_action (void)
           s_current_iop_data);
         if (res == 12) {
             // printf("line: %s\n", s_replay_current_line);
-            if (streq (s_current_action_types, "input")) {
+            if (streq (s_current_action_types, "input"))
                 s_current_action_type = IGS_REPLAY_INPUT;
-            } else if (streq (s_current_action_types, "output")) {
+            else if (streq (s_current_action_types, "output"))
                 s_current_action_type = IGS_REPLAY_OUTPUT;
-            } else if (streq (s_current_action_types, "parameter")) {
+            else if (streq (s_current_action_types, "parameter"))
                 s_current_action_type = IGS_REPLAY_PARAMETER;
-            } else {
+            else
                 s_current_action_type = 0;
-            }
 
-            if (streq (s_current_data_types, "impulsion")) {
+            if (streq (s_current_data_types, "impulsion"))
                 s_current_data_type = IGS_IMPULSION_T;
-            } else if (streq (s_current_data_types, "bool")) {
+            else if (streq (s_current_data_types, "bool"))
                 s_current_data_type = IGS_BOOL_T;
-            } else if (streq (s_current_data_types, "int")) {
+            else if (streq (s_current_data_types, "int"))
                 s_current_data_type = IGS_INTEGER_T;
-            } else if (streq (s_current_data_types, "double")) {
+            else if (streq (s_current_data_types, "double"))
                 s_current_data_type = IGS_DOUBLE_T;
-            } else if (streq (s_current_data_types, "string")) {
+            else if (streq (s_current_data_types, "string"))
                 s_current_data_type = IGS_STRING_T;
-            } else if (streq (s_current_data_types, "data")) {
+            else if (streq (s_current_data_types, "data"))
                 s_current_data_type = IGS_DATA_T;
-            } else {
+            else
                 s_current_data_type = IGS_UNKNOWN_T;
-            }
 
             found_data = true;
         } else {

@@ -189,6 +189,9 @@ int main(int argc, const char * argv[]) {
     igs_mapping_add("sparing_string", "testAgent", "my_string");
     igs_mapping_add("sparing_data", "testAgent", "my_data");
 
+    //igs_rt_set_timestamps(true);
+    //igs_rt_set_time(12);
+    
     if (verbose)
         igs_observe_channels(myChannelsCallback, NULL);
     

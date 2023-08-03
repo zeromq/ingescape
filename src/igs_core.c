@@ -95,6 +95,7 @@ void core_init_context (void)
         core_context->log_file_max_line_length = IGS_MAX_LOG_LENGTH;
         core_context->network_shall_raise_file_descriptors_limit = true;
         core_context->network_ipc_folder_path = strdup (IGS_DEFAULT_IPC_FOLDER_PATH);
+        core_context->rt_current_microseconds = INT64_MIN;
     }
 }
 
@@ -1251,4 +1252,32 @@ size_t igs_service_reply_args_count(const char *service_name, const char *reply_
 bool igs_service_reply_arg_exists(const char *service_name, const char *reply_name, const char *arg_name){
     core_init_agent ();
     return igsagent_service_reply_arg_exists(core_agent, service_name, reply_name, arg_name);
+}
+
+int64_t igs_rt_get_current_timestamp(void){
+    core_init_agent ();
+    return igsagent_rt_get_current_timestamp(core_agent);
+}
+
+void igs_rt_set_timestamps(bool enable){
+    core_init_agent ();
+    igsagent_rt_set_timestamps(core_agent, enable);
+}
+
+bool igs_rt_timestamps(void){
+    core_init_agent ();
+    return  igsagent_rt_timestamps(core_agent);
+}
+
+void igs_rt_set_time(u_int64_t microseconds){
+    core_init_context();
+    core_context->rt_current_microseconds = microseconds;
+    igsagent_t *agent, *tmp_agent;
+    HASH_ITER (hh, core_context->agents, agent, tmp_agent)
+        agent->rt_timestamps_enabled = true;
+}
+
+int64_t igs_rt_time(void){
+    core_init_context();
+    return core_context->rt_current_microseconds;
 }

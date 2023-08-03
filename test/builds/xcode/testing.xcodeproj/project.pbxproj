@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		97348E3F25C19C75009874BA /* ingescape.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 97348D8425C19C3C009874BA /* ingescape.framework */; };
 		97348E4A25C19D7C009874BA /* ingescape.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 97348D8425C19C3C009874BA /* ingescape.framework */; };
+		9740C38F2A7C0AF80007F000 /* ingescape.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 97348D8425C19C3C009874BA /* ingescape.framework */; };
 		9782CBD124E67A9300860307 /* tester.cert in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9782CBCD24E67A2100860307 /* tester.cert */; };
 		9782CBD224E67A9300860307 /* tester.cert_secret in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9782CBD024E67A2100860307 /* tester.cert_secret */; };
 		9782CBD324E67AAC00860307 /* partner.cert in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9782CBCF24E67A2100860307 /* partner.cert */; };
@@ -26,13 +26,6 @@
 			proxyType = 2;
 			remoteGlobalIDString = 974D720425D298960049C183;
 			remoteInfo = "ingescape-macos-static";
-		};
-		97348D8125C19C3C009874BA /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 97D708F424C1F090008825B0 /* ingescape.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 979A79781EA7B0D6003153EF;
-			remoteInfo = "ingescape-ios";
 		};
 		97348D8325C19C3C009874BA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -96,7 +89,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				97348E3F25C19C75009874BA /* ingescape.framework in Frameworks */,
+				9740C38F2A7C0AF80007F000 /* ingescape.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -114,7 +107,6 @@
 		97348D7D25C19C3C009874BA /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				97348D8225C19C3C009874BA /* libingescape.a */,
 				97348D8425C19C3C009874BA /* ingescape.framework */,
 				970ACD3326CA5CC800FE4FA1 /* libingescape.a */,
 			);
@@ -260,13 +252,6 @@
 			fileType = archive.ar;
 			path = libingescape.a;
 			remoteRef = 970ACD3226CA5CC800FE4FA1 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		97348D8225C19C3C009874BA /* libingescape.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libingescape.a;
-			remoteRef = 97348D8125C19C3C009874BA /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		97348D8425C19C3C009874BA /* ingescape.framework */ = {

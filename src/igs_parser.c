@@ -100,7 +100,7 @@ const char *s_value_type_to_string (igs_iop_value_type_t type)
         case IGS_UNKNOWN_T:
             return "UNKNOWN";
         default:
-            igs_error ("unknown igs_iop_value_type_t to convert");
+            igs_error ("unknown igs_iop_value_type_t %d to convert", type);
             break;
     }
     return NULL;

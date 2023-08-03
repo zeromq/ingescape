@@ -152,6 +152,9 @@ void testerServiceCallback(const char *senderAgentName, const char *senderAgentU
         currentArg = currentArg->next;
     }
     printf(" )\n");
+    int64_t timestamp = igs_rt_get_current_timestamp();
+    if (timestamp != INT64_MIN)
+        printf("\twith timestamp %lld\n", timestamp);
     if (autoTestsHaveStarted){
         assert(token);
         assert(streq(token, "token"));
@@ -357,6 +360,9 @@ void testerIOPCallback(igs_iop_type_t iopType, const char* name, igs_iop_value_t
         default:
             break;
     }
+    int64_t timestamp = igs_rt_get_current_timestamp();
+    if (timestamp != INT64_MIN)
+        printf("\twith timestamp %lld\n", timestamp);
 }
 
 
@@ -2033,14 +2039,13 @@ int main(int argc, const char * argv[]) {
             igs_free_net_devices_list(devices, nbD);
             igs_free_net_addresses_list(addresses, nbD);
         }
-        igsagent_activate(firstAgent);
     }
     //start/stop stress tests
     igs_start_with_device(networkDevice, port);
-    igs_start_with_device(networkDevice, port);
-    igs_stop();
-    igs_stop();
-    igs_stop();
+//    igs_start_with_device(networkDevice, port);
+//    igs_stop();
+//    igs_stop();
+//    igs_stop();
 
     igs_start_with_device(networkDevice, port);
 

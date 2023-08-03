@@ -796,7 +796,7 @@ void model_clear_iop (igsagent_t *agent, const char *name, igs_iop_type_t type)
             iop->value.b = false;
             break;
         case IGS_UNKNOWN_T:
-            igsagent_error (agent, "%s cannot be reset", name);
+            igsagent_error (agent, "%s cannot be reset (unknown type)", name);
             break;
         default:
             break;
@@ -1744,34 +1744,23 @@ igs_iop_value_type_t igsagent_input_type (igsagent_t *agent, const char *name)
 {
     assert (agent);
     assert (name);
-    if ((name == NULL) || (strlen (name) == 0)) {
-        igsagent_error (agent, "Input name cannot be NULL or empty");
-        return IGS_UNKNOWN_T;
-    }
+    assert(strlen(name));
     return s_model_get_type_for_iop (agent, name, IGS_INPUT_T);
 }
 
-igs_iop_value_type_t igsagent_output_type (igsagent_t *agent,
-                                            const char *name)
+igs_iop_value_type_t igsagent_output_type (igsagent_t *agent, const char *name)
 {
     assert (agent);
     assert (name);
-    if ((name == NULL) || (strlen (name) == 0)) {
-        igsagent_error (agent, "Output name cannot be NULL or empty");
-        return IGS_UNKNOWN_T;
-    }
+    assert(strlen(name));
     return s_model_get_type_for_iop (agent, name, IGS_OUTPUT_T);
 }
 
-igs_iop_value_type_t igsagent_parameter_type (igsagent_t *agent,
-                                               const char *name)
+igs_iop_value_type_t igsagent_parameter_type (igsagent_t *agent, const char *name)
 {
     assert (agent);
     assert (name);
-    if ((name == NULL) || (strlen (name) == 0)) {
-        igsagent_error (agent, "Parameter name cannot be NULL or empty");
-        return IGS_UNKNOWN_T;
-    }
+    assert(strlen(name));
     return s_model_get_type_for_iop (agent, name, IGS_PARAMETER_T);
 }
 
