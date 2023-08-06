@@ -1271,6 +1271,7 @@ bool igs_rt_timestamps(void){
 
 void igs_rt_set_time(u_int64_t microseconds){
     core_init_context();
+    igs_info("set rt time to %lld", microseconds);
     core_context->rt_current_microseconds = microseconds;
     igsagent_t *agent, *tmp_agent;
     HASH_ITER (hh, core_context->agents, agent, tmp_agent)

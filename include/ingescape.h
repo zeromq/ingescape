@@ -703,7 +703,7 @@ INGESCAPE_EXPORT igs_result_t igs_election_leave(const char *election_name);
  time in microseconds is set to INT64_MIN.*/
 INGESCAPE_EXPORT int64_t igs_rt_get_current_timestamp(void);
 
-/* ENABLE TIMESTAMPS IN OUR AGENT FOR PUBLISHED OUTPUTS AND SERVICES CALLS
+/* ENABLE TIMESTAMPS IN OUR AGENT FOR PUBLISHED OUTPUTS AND SERVICE CALLS
  When timestamps are enabled, every output publication and every service call
  carry an additional information providing the timestamp of the message on
  the sender side. On the receiver side, timestamp is obtained by calling

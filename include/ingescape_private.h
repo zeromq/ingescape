@@ -633,6 +633,8 @@ void s_agent_propagate_agent_event(igs_agent_event_t event, const char *uuid, co
 #define PING_MSG "PING"
 #define PONG_MSG "PONG"
 
+#define RT_SET_TIME_MSG "RT_SET_TIME "
+
 #ifdef __cplusplus
 }
 #endif

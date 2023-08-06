@@ -101,7 +101,7 @@ void igsagent_destroy (igsagent_t **agent)
 igs_result_t igsagent_activate (igsagent_t *agent)
 {
     assert (agent);
-    assert(agent->context);
+    agent->context = core_context;
     if (agent->context->rt_current_microseconds != INT64_MIN)
         agent->rt_timestamps_enabled = true;
     igsagent_t *a = NULL;
@@ -111,9 +111,7 @@ igs_result_t igsagent_activate (igsagent_t *agent)
                         agent->definition->name, agent->uuid);
         return IGS_FAILURE;
     }
-    agent->context = core_context;
-    agent->network_need_to_send_definition_update =
-      true; // will also trigger mapping update
+    agent->network_need_to_send_definition_update = true; // will also trigger mapping update
     agent->network_activation_during_runtime = true;
     HASH_ADD_STR (core_context->agents, uuid, agent);
     igsagent_wrapper_t *agent_wrapper_cb;
