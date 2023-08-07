@@ -722,7 +722,7 @@ INGESCAPE_EXPORT bool igs_rt_timestamps(void);
  NB : igs_rt_set_time and igs_rt_time operate at peer level for all the agents
  in the process. All agents in a process use the same time set by igs_rt_set_time.
  */
-INGESCAPE_EXPORT void igs_rt_set_time(u_int64_t microseconds);
+INGESCAPE_EXPORT void igs_rt_set_time(int64_t microseconds);
 INGESCAPE_EXPORT int64_t igs_rt_time(void);
 
 

@@ -1269,7 +1269,7 @@ bool igs_rt_timestamps(void){
     return  igsagent_rt_timestamps(core_agent);
 }
 
-void igs_rt_set_time(u_int64_t microseconds){
+void igs_rt_set_time(int64_t microseconds){
     core_init_context();
     igs_info("set rt time to %lld", microseconds);
     core_context->rt_current_microseconds = microseconds;
