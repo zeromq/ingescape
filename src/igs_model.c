@@ -1403,6 +1403,7 @@ igsagent_output_set_zmsg (igsagent_t *agent, const char *name, zmsg_t *msg)
     assert (name);
     assert (msg);
     zframe_t *frame = zmsg_encode (msg);
+    assert(frame);
     void *value = zframe_data (frame);
     size_t size = zframe_size (frame);
     const igs_iop_t *iop = model_write_iop (agent, name, IGS_OUTPUT_T, IGS_DATA_T, value, size);

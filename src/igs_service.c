@@ -59,48 +59,58 @@ void service_free_service (igs_service_t *t)
 igs_result_t service_add_values_to_arguments_from_message (const char *name,
                                                            igs_service_arg_t *arg,
                                                            zmsg_t *msg){
+    assert(name);
+    assert(msg);
+    //NB: a service may not have any argument
+    if (!arg)
+        return IGS_SUCCESS;
     size_t nb_frames = zmsg_size (msg);
     size_t nb_args = 0;
     igs_service_arg_t *tmp = NULL;
     DL_COUNT (arg, tmp, nb_args);
     if (nb_frames < nb_args) {
         igs_error ("arguments count do not match in received message for service %s "
-                   "(%zu vs. %zu expected)",
-                   name, nb_frames, nb_args);
+                   "(%zu vs. %zu expected)", name, nb_frames, nb_args);
         return IGS_FAILURE;
     }
     igs_service_arg_t *current = NULL;
     DL_FOREACH (arg, current){
         zframe_t *f = zmsg_pop (msg);
-        size_t size = zframe_size (f);
-        switch (current->type) {
-            case IGS_BOOL_T:
-                memcpy (&(current->b), zframe_data (f), sizeof (bool));
-                break;
-            case IGS_INTEGER_T:
-                memcpy (&(current->i), zframe_data (f), sizeof (int));
-                break;
-            case IGS_DOUBLE_T:
-                memcpy (&(current->d), zframe_data (f), sizeof (double));
-                break;
-            case IGS_STRING_T:
-                if (current->c)
-                    free (current->c);
-                current->c = (char *) zmalloc (size);
-                memcpy (current->c, zframe_data (f), size);
-                break;
-            case IGS_DATA_T:
-                if (current->data)
-                    free (current->data);
-                current->data = (char *) zmalloc (size);
-                memcpy (current->data, zframe_data (f), size);
-                break;
-                
-            default:
-                break;
+        if (f){
+            size_t size = zframe_size (f);
+            switch (current->type) {
+                case IGS_BOOL_T:
+                    memcpy (&(current->b), zframe_data (f), sizeof (bool));
+                    break;
+                case IGS_INTEGER_T:
+                    memcpy (&(current->i), zframe_data (f), sizeof (int));
+                    break;
+                case IGS_DOUBLE_T:
+                    memcpy (&(current->d), zframe_data (f), sizeof (double));
+                    break;
+                case IGS_STRING_T:
+                    if (current->c)
+                        free (current->c);
+                    current->c = (char *) zmalloc (size);
+                    memcpy (current->c, zframe_data (f), size);
+                    break;
+                case IGS_DATA_T:
+                    if (current->data)
+                        free (current->data);
+                    current->data = (char *) zmalloc (size);
+                    memcpy (current->data, zframe_data (f), size);
+                    break;
+                    
+                default:
+                    break;
+            }
+            current->size = size;
+            zframe_destroy (&f);
+        }else{
+            igs_error("passed message misses elements to match with the expected args for service %s (stopped at %s)",
+                      name, current->name);
+            return IGS_FAILURE;
         }
-        current->size = size;
-        zframe_destroy (&f);
     }
     return IGS_SUCCESS;
 }

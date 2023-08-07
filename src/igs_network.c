@@ -2609,7 +2609,6 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                             size_t nb_args = 0;
                             igs_service_arg_t *_arg = NULL;
                             LL_COUNT (service->arguments, _arg, nb_args);
-                            //TODO: msg_duplicate may end with a timestamp information that is not decoded yet
                             if (service_add_values_to_arguments_from_message (service_name,
                                                                               service->arguments,
                                                                               msg_duplicate) == IGS_SUCCESS) {
