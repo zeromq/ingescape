@@ -308,9 +308,8 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
         if (frame)
             zframe_destroy (&frame);
         if (value)
-            free (value);
-        free (output);
-        output = NULL;
+            freen (value);
+        freen (output);
     }
     zmsg_destroy (msg);
     model_read_write_unlock (__FUNCTION__, __LINE__);
