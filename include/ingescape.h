@@ -779,7 +779,7 @@ INGESCAPE_EXPORT void igs_log_set_syslog(bool); //enable system logs on UNIX box
 INGESCAPE_EXPORT bool igs_log_syslog(void);
 INGESCAPE_EXPORT void igs_log_set_console_color(bool); //use colors in console
 INGESCAPE_EXPORT bool igs_log_console_color(void);
-INGESCAPE_EXPORT void igs_log_set_console_level (igs_log_level_t level); //set log level in console, default is IGS_LOG_INFO
+INGESCAPE_EXPORT void igs_log_set_console_level (igs_log_level_t level); //set log level in console, default is IGS_LOG_WARN
 INGESCAPE_EXPORT igs_log_level_t igs_log_console_level(void);
 INGESCAPE_EXPORT void igs_log_set_stream(bool); //enable logs in socket stream
 INGESCAPE_EXPORT bool igs_log_stream(void);
