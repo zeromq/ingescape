@@ -31,7 +31,7 @@
 
 //  INGESCAPE version macros for compile-time API detection
 #define INGESCAPE_VERSION_MAJOR 3
-#define INGESCAPE_VERSION_MINOR 4
+#define INGESCAPE_VERSION_MINOR 6
 #define INGESCAPE_VERSION_PATCH 0
 
 #define INGESCAPE_MAKE_VERSION(major, minor, patch) \
@@ -143,8 +143,10 @@ INGESCAPE_EXPORT bool igs_is_started(void);
 typedef void (igs_forced_stop_fn)(void *my_data);
 INGESCAPE_EXPORT void igs_observe_forced_stop(igs_forced_stop_fn cb,
                                               void *my_data);
-//zeromq pipe to receive stop event from ingescape in a thread-safe way
+//zeromq pipe to receive stop event and other messages from the ingescape thread
 INGESCAPE_EXPORT zsock_t * igs_pipe_to_ingescape(void);
+//zeromq pipe to send messages from the ingescape thread, e.g. from inside ingescape callbacks
+INGESCAPE_EXPORT zsock_t * igs_pipe_inside_ingescape(void);
 
 //agent name set and get
 INGESCAPE_EXPORT void igs_agent_set_name(const char *name);
@@ -225,13 +227,13 @@ typedef enum {
 } igs_iop_type_t;
 
 typedef enum {
+    IGS_UNKNOWN_T = 0,
     IGS_INTEGER_T = 1,
     IGS_DOUBLE_T,
     IGS_STRING_T,
     IGS_BOOL_T,
     IGS_IMPULSION_T,
-    IGS_DATA_T,
-    IGS_UNKNOWN_T
+    IGS_DATA_T
 } igs_iop_value_type_t;
 
 //load / set / get definition
@@ -623,7 +625,7 @@ INGESCAPE_EXPORT igs_result_t igs_start_with_brokers(const char *agent_endpoint)
 
 
 /////////////////////////////////////////////
-// Security : identity, end-to-end encryption
+// Security : identity + end-to-end encryption
 
 /* Security is about authentification of other agents and encrypted communications.
  Both are offered by Ingescape with a public/private certificates mechanism relying
@@ -685,6 +687,43 @@ INGESCAPE_EXPORT zactor_t * igs_zmq_authenticator(void);
  */
 INGESCAPE_EXPORT igs_result_t igs_election_join(const char *election_name);
 INGESCAPE_EXPORT igs_result_t igs_election_leave(const char *election_name);
+
+
+//////////////////////////////////////////////////////////////////////
+// Ingescape real-time communications
+
+/* Ingescape is a reactive  communication solution but it is capable to
+ handle soft real-time communications and provides functions dedicated
+ to time management with or without a master clock involved. */
+
+/* GET TIMESTAMP FOR RECEIVED INPUTS AND SERVICES
+ When observing an input or a service, call this function inside the callback
+ to get the current timestamp in microseconds for the received information.
+ NB: if timestamp is not available in received input or service, current
+ time in microseconds is set to INT64_MIN.*/
+INGESCAPE_EXPORT int64_t igs_rt_get_current_timestamp(void);
+
+/* ENABLE TIMESTAMPS IN OUR AGENT FOR PUBLISHED OUTPUTS AND SERVICE CALLS
+ When timestamps are enabled, every output publication and every service call
+ carry an additional information providing the timestamp of the message on
+ the sender side. On the receiver side, timestamp is obtained by calling
+ igs_rt_get_current_timestamp*/
+INGESCAPE_EXPORT void igs_rt_set_timestamps(bool enable);
+INGESCAPE_EXPORT bool igs_rt_timestamps(void);
+
+/* SET TIME MANUALLY FOR TIMESTAMPED PUBLISHED OUTPUTS AND SERVICES
+ When a master clock is involed (e.g. linked to an input of an agent), it
+ is possible to override the automatic timestamp mechanism to force a value
+ for the current time in microseconds.
+ Once igs_rt_set_time has been called, it is necessary to continue calling it
+ periodically and manually to update the agent's current time in microseconds.
+ NB : a call to igs_rt_set_time autmatically enables timestamps for outputs
+ and services on all agents in our process. Timestamps cannot be disabled afterwards.
+ NB : igs_rt_set_time and igs_rt_time operate at peer level for all the agents
+ in the process. All agents in a process use the same time set by igs_rt_set_time.
+ */
+INGESCAPE_EXPORT void igs_rt_set_time(int64_t microseconds);
+INGESCAPE_EXPORT int64_t igs_rt_time(void);
 
 
 ///////////////////////////////////////////////////////
@@ -848,7 +887,19 @@ INGESCAPE_EXPORT void igs_observe_monitor(igs_monitor_fn cb, void *my_data);
 INGESCAPE_EXPORT void igs_clear_context(void);
 
 
-/* LOGS REPLAY
+/* LOGS REPLAY - DEPRECATED - will be removed soon
+ ---------------------------------------------------------------------
+ Why are we deprecating the replay features ?
+ • These features make the library heavier and require to maintain a compatibility
+ with log formats, which will inevitably become a hassle at some point. The
+ cost/benefit ratio is thus not very favorable.
+ • These replay features are practically unused and are easy to implement outside the
+ library simply by parsing logs and publishing data in various possible ways.
+ • The Ingescape ecosystem provides much better solutions based on record/replay
+ support with agent virtualization that beat these features in every way.
+ 
+ Post an issue on github if you want to discuss this topic with the community.
+ ---------------------------------------------------------------------
  Ingescape logs contain all the necessary information for an agent to replay
  its changes for inputs, outputs, parameters and services.
 

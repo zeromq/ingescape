@@ -63,6 +63,15 @@ typedef CRITICAL_SECTION igs_mutex_t;
 
 typedef struct igs_core_context igs_core_context_t;
 
+typedef enum {
+    IGS_TIMESTAMPED_INTEGER_T = IGS_DATA_T + 1,
+    IGS_TIMESTAMPED_DOUBLE_T,
+    IGS_TIMESTAMPED_STRING_T,
+    IGS_TIMESTAMPED_BOOL_T,
+    IGS_TIMESTAMPED_IMPULSION_T,
+    IGS_TIMESTAMPED_DATA_T
+} igs_iop_value_type_extended_t;
+
 //////////////////  IOP/SERVICE STRUCTURES AND ENUMS   //////////////////
 
 typedef struct igs_observe_wrapper{
@@ -318,11 +327,11 @@ struct _igsagent_t {
     char *state;
 
     /*
-     The concept of virtual agent is used by igs_proxy. Virtual
-     agents represent n existing agent which is executed somewhere
+     The concept of virtual agent is used by igsProxy. A virtual
+     agent represents an existing agent which is executed somewhere
      else. Thus virtual agents should not propagate published
      outputs or call services on other agents in the same context (i.e.
-     all represented inside the same igs_proxy instance).
+     all represented inside the same igsProxy instance).
      */
     bool is_virtual;
 
@@ -341,6 +350,10 @@ struct _igsagent_t {
     char *mapping_path;
     igs_mapping_t *mapping;
 
+    //real-time
+    bool rt_timestamps_enabled;
+    int64_t rt_current_timestamp_microseconds;
+    
     //network
     bool network_need_to_send_definition_update;
     bool network_need_to_send_mapping_update;
@@ -403,6 +416,9 @@ typedef struct igs_core_context {
     zhash_t *brokers;
     char *advertised_endpoint;
     char *our_broker_endpoint;
+    
+    //real-time : current time is common to all agent in the peer
+    int64_t rt_current_microseconds;
 
     // security
     bool security_is_enabled;
@@ -445,6 +461,7 @@ typedef struct igs_core_context {
     igs_remote_agent_t *remote_agents; // those our agents subscribed to
     igs_splitter_t *splitters;
     zactor_t *network_actor;
+    zsock_t *internal_pipe;
     zyre_t *node;
     zsock_t *publisher;
     zsock_t *ipc_publisher;
@@ -495,8 +512,8 @@ const igs_iop_t* model_write_iop (igsagent_t *agent, const char *iop_name, igs_i
 igs_iop_t* model_find_iop_by_name(igsagent_t *agent, const char* name, igs_iop_type_t type);
 char* model_get_iop_value_as_string (igs_iop_t* iop); //caller owns returned value
 #define IGS_MODEL_READ_WRITE_MUTEX_DEBUG 0
-void model_read_write_lock(const char *function, int line);
-void model_read_write_unlock(const char *function, int line);
+INGESCAPE_EXPORT void model_read_write_lock(const char *function, int line);
+INGESCAPE_EXPORT void model_read_write_unlock(const char *function, int line);
 igs_constraint_t* s_model_parse_constraint(igs_iop_value_type_t type,
                                            const char *expression,char **error);
 
@@ -531,7 +548,7 @@ INGESCAPE_EXPORT igs_result_t service_add_values_to_arguments_from_message(const
 igs_result_t service_copy_arguments(igs_service_arg_t *source, igs_service_arg_t *destination);
 void service_free_values_in_arguments(igs_service_arg_t *arg);
 void service_log_received_service(igsagent_t *agent, const char *caller_agent_name, const char *caller_agentuuid,
-                                  const char *service_name, igs_service_arg_t *list);
+                                  const char *service_name, igs_service_arg_t *list, int64_t timestamp);
 
 // agent
 void s_agent_propagate_agent_event(igs_agent_event_t event, const char *uuid, const char *name, void *event_data);
@@ -615,6 +632,8 @@ void s_agent_propagate_agent_event(igs_agent_event_t event, const char *uuid, co
 
 #define PING_MSG "PING"
 #define PONG_MSG "PONG"
+
+#define RT_SET_TIME_MSG "RT_SET_TIME "
 
 #ifdef __cplusplus
 }

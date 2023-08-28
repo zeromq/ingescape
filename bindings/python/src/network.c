@@ -190,11 +190,11 @@ PyObject * command_line_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
 
 PyObject * net_devices_list_wrapper(PyObject * self, PyObject * args)
 {
-    int nbList;
+    int nbList = 0;
     char **resultList = igs_net_devices_list(&nbList);
     PyObject *ret = PyList_New(nbList);
     for (int i = 0; i < nbList; i++)
-        PyList_SetItem(ret, i, PyUnicode_EncodeLocale(resultList[i], NULL));
+        PyList_SetItem(ret, i, PyUnicode_DecodeLocale(resultList[i], NULL));
     igs_free_net_devices_list(resultList, nbList);
     return ret;
 }
@@ -389,7 +389,7 @@ PyObject * igs_timer_start_wrapper(PyObject *self, PyObject *args, PyObject *kwd
     int times = 0;
     PyObject *callback = NULL;
     PyObject *my_data = NULL;
-    if (PyArg_ParseTupleAndKeywords(args, NULL, "ii00", kwlist, &delay, &times, &callback, &my_data)) {
+    if (PyArg_ParseTupleAndKeywords(args, NULL, "iiOO", kwlist, &delay, &times, &callback, &my_data)) {
         if (!PyCallable_Check(callback)) {
             PyErr_SetString(PyExc_TypeError, "'callback' parameter must be callable");
             return PyLong_FromLong(IGS_FAILURE);

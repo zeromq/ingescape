@@ -210,8 +210,7 @@ void admin_log (igsagent_t *agent,
         }
     }
     
-    if ((core_context->log_in_console && level >= core_context->log_level)
-        || level >= IGS_LOG_WARN) {
+    if (core_context->log_in_console && level >= core_context->log_level) {
         va_start (list, fmt);
         vsnprintf (log_content, IGS_MAX_LOG_LENGTH, fmt, list);
         va_end (list);

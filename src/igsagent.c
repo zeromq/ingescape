@@ -101,6 +101,9 @@ void igsagent_destroy (igsagent_t **agent)
 igs_result_t igsagent_activate (igsagent_t *agent)
 {
     assert (agent);
+    agent->context = core_context;
+    if (agent->context->rt_current_microseconds != INT64_MIN)
+        agent->rt_timestamps_enabled = true;
     igsagent_t *a = NULL;
     HASH_FIND_STR (core_context->agents, agent->uuid, a);
     if (a) {
@@ -108,9 +111,7 @@ igs_result_t igsagent_activate (igsagent_t *agent)
                         agent->definition->name, agent->uuid);
         return IGS_FAILURE;
     }
-    agent->context = core_context;
-    agent->network_need_to_send_definition_update =
-      true; // will also trigger mapping update
+    agent->network_need_to_send_definition_update = true; // will also trigger mapping update
     agent->network_activation_during_runtime = true;
     HASH_ADD_STR (core_context->agents, uuid, agent);
     igsagent_wrapper_t *agent_wrapper_cb;
@@ -155,8 +156,6 @@ igs_result_t igsagent_activate (igsagent_t *agent)
         DL_FOREACH (agent->agent_event_callbacks, cb){
             cb->callback_ptr (agent, IGS_AGENT_ENTERED, r->uuid,
                               r->definition->name, definition_str_for_r, cb->my_data);
-            cb->callback_ptr (agent, IGS_AGENT_KNOWS_US, r->uuid,
-                              r->definition->name, NULL, cb->my_data);
         }
         if (definition_str_for_r)
             free(definition_str_for_r);
@@ -247,4 +246,19 @@ void igsagent_log (igs_log_level_t level,
     vsnprintf (content, IGS_MAX_STRING_MSG_LENGTH - 1, format, list);
     va_end (list);
     admin_log (agent, level, function, "%s", content);
+}
+
+int64_t igsagent_rt_get_current_timestamp(igsagent_t *agent){
+    assert(agent);
+    return agent->rt_current_timestamp_microseconds;
+}
+
+void igsagent_rt_set_timestamps(igsagent_t *agent, bool enable){
+    assert(agent);
+    agent->rt_timestamps_enabled = enable;
+}
+
+bool igsagent_rt_timestamps(igsagent_t *agent){
+    assert(agent);
+    return agent->rt_timestamps_enabled;
 }

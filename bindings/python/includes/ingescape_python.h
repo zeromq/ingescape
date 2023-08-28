@@ -199,6 +199,7 @@ PyObject * mapping_count_wrapper(PyObject * self, PyObject * args);
 
 PyObject * clear_mappings_wrapper(PyObject * self, PyObject * args);
 PyObject * clear_mappings_with_agent_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject * clear_mappings_for_input_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
 
 PyObject * mapping_add_wrapper(PyObject * self, PyObject * args);
 PyObject * mapping_remove_with_id_wrapper(PyObject * self, PyObject * args);

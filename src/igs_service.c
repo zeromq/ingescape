@@ -59,48 +59,58 @@ void service_free_service (igs_service_t *t)
 igs_result_t service_add_values_to_arguments_from_message (const char *name,
                                                            igs_service_arg_t *arg,
                                                            zmsg_t *msg){
+    assert(name);
+    assert(msg);
+    //NB: a service may not have any argument
+    if (!arg)
+        return IGS_SUCCESS;
     size_t nb_frames = zmsg_size (msg);
     size_t nb_args = 0;
     igs_service_arg_t *tmp = NULL;
     DL_COUNT (arg, tmp, nb_args);
-    if (nb_frames != nb_args) {
+    if (nb_frames < nb_args) {
         igs_error ("arguments count do not match in received message for service %s "
-                   "(%zu vs. %zu expected)",
-                   name, nb_frames, nb_args);
+                   "(%zu vs. %zu expected)", name, nb_frames, nb_args);
         return IGS_FAILURE;
     }
     igs_service_arg_t *current = NULL;
     DL_FOREACH (arg, current){
         zframe_t *f = zmsg_pop (msg);
-        size_t size = zframe_size (f);
-        switch (current->type) {
-            case IGS_BOOL_T:
-                memcpy (&(current->b), zframe_data (f), sizeof (bool));
-                break;
-            case IGS_INTEGER_T:
-                memcpy (&(current->i), zframe_data (f), sizeof (int));
-                break;
-            case IGS_DOUBLE_T:
-                memcpy (&(current->d), zframe_data (f), sizeof (double));
-                break;
-            case IGS_STRING_T:
-                if (current->c)
-                    free (current->c);
-                current->c = (char *) zmalloc (size);
-                memcpy (current->c, zframe_data (f), size);
-                break;
-            case IGS_DATA_T:
-                if (current->data)
-                    free (current->data);
-                current->data = (char *) zmalloc (size);
-                memcpy (current->data, zframe_data (f), size);
-                break;
-                
-            default:
-                break;
+        if (f){
+            size_t size = zframe_size (f);
+            switch (current->type) {
+                case IGS_BOOL_T:
+                    memcpy (&(current->b), zframe_data (f), sizeof (bool));
+                    break;
+                case IGS_INTEGER_T:
+                    memcpy (&(current->i), zframe_data (f), sizeof (int));
+                    break;
+                case IGS_DOUBLE_T:
+                    memcpy (&(current->d), zframe_data (f), sizeof (double));
+                    break;
+                case IGS_STRING_T:
+                    if (current->c)
+                        free (current->c);
+                    current->c = (char *) zmalloc (size);
+                    memcpy (current->c, zframe_data (f), size);
+                    break;
+                case IGS_DATA_T:
+                    if (current->data)
+                        free (current->data);
+                    current->data = (char *) zmalloc (size);
+                    memcpy (current->data, zframe_data (f), size);
+                    break;
+                    
+                default:
+                    break;
+            }
+            current->size = size;
+            zframe_destroy (&f);
+        }else{
+            igs_error("passed message misses elements to match with the expected args for service %s (stopped at %s)",
+                      name, current->name);
+            return IGS_FAILURE;
         }
-        current->size = size;
-        zframe_destroy (&f);
     }
     return IGS_SUCCESS;
 }
@@ -187,7 +197,8 @@ void service_log_received_service (igsagent_t *agent,
                                    const char *caller_agent_name,
                                    const char *caller_agentuuid,
                                    const char *service_name,
-                                   igs_service_arg_t *list)
+                                   igs_service_arg_t *list,
+                                   int64_t timestamp)
 {
     char service_log[IGS_MAX_LOG_LENGTH] = "";
     char *service_log_cursor = service_log;
@@ -238,6 +249,9 @@ void service_log_received_service (igsagent_t *agent,
                 break;
         }
     }
+    if (service_log_cursor - service_log < IGS_MAX_LOG_LENGTH && timestamp != INT64_MIN)
+        snprintf (service_log_cursor, IGS_MAX_LOG_LENGTH - (service_log_cursor - service_log),
+                  " with timestamp %lld", timestamp);
     igsagent_debug (agent, "%s", service_log);
 }
 
@@ -429,25 +443,21 @@ igs_result_t igsagent_service_arg_add (igsagent_t *agent,
     }
     HASH_FIND_STR (agent->definition->services_table, service_name, t);
     if (type == IGS_IMPULSION_T) {
-        igsagent_error (agent,
-                        "impulsion type is not allowed as a service argument");
+        igsagent_error (agent, "impulsion type is not allowed as a service argument");
         return IGS_FAILURE;
     }
     if (type == IGS_UNKNOWN_T) {
-        igsagent_error (agent,
-                        "unknown type is not allowed as a service argument");
+        igsagent_error (agent, "unknown type is not allowed as a service argument");
         return IGS_FAILURE;
     }
     if (!t) {
-        igsagent_error (agent, "service with name %s does not exist",
-                        service_name);
+        igsagent_error (agent, "service with name %s does not exist", service_name);
         return IGS_FAILURE;
     }
     igs_service_arg_t *a = (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
     if (strnlen (arg_name, IGS_MAX_STRING_MSG_LENGTH) == IGS_MAX_STRING_MSG_LENGTH) {
         a->name = s_strndup (arg_name, IGS_MAX_STRING_MSG_LENGTH);
-        igsagent_warn (agent, "service argument name has been shortened to %s",
-                       a->name);
+        igsagent_warn (agent, "service argument name has been shortened to %s", a->name);
     }
     else
         a->name = s_strndup (arg_name, IGS_MAX_STRING_MSG_LENGTH);
@@ -688,7 +698,8 @@ void s_service_log_sent_service (igsagent_t *agent,
                                  const char *target_agent_name,
                                  const char *target_agentuuid,
                                  const char *service_name,
-                                 igs_service_arg_t *list)
+                                 igs_service_arg_t *list,
+                                 int64_t timestamp)
 {
     char service_log[IGS_MAX_LOG_LENGTH] = "";
     char *service_log_cursor = service_log;
@@ -702,26 +713,22 @@ void s_service_log_sent_service (igsagent_t *agent,
             break;
         switch (current_arg->type) {
             case IGS_BOOL_T:
-                service_log_cursor += snprintf (
-                                                service_log_cursor,
+                service_log_cursor += snprintf (service_log_cursor,
                                                 IGS_MAX_LOG_LENGTH - (service_log_cursor - service_log),
                                                 " %d", current_arg->b);
                 break;
             case IGS_INTEGER_T:
-                service_log_cursor += snprintf (
-                                                service_log_cursor,
+                service_log_cursor += snprintf (service_log_cursor,
                                                 IGS_MAX_LOG_LENGTH - (service_log_cursor - service_log),
                                                 " %d", current_arg->i);
                 break;
             case IGS_DOUBLE_T:
-                service_log_cursor += snprintf (
-                                                service_log_cursor,
+                service_log_cursor += snprintf (service_log_cursor,
                                                 IGS_MAX_LOG_LENGTH - (service_log_cursor - service_log),
                                                 " %f", current_arg->d);
                 break;
             case IGS_STRING_T:
-                service_log_cursor += snprintf (
-                                                service_log_cursor,
+                service_log_cursor += snprintf (service_log_cursor,
                                                 IGS_MAX_LOG_LENGTH - (service_log_cursor - service_log),
                                                 " %s", current_arg->c);
                 break;
@@ -730,15 +737,12 @@ void s_service_log_sent_service (igsagent_t *agent,
                 zchunk_new (current_arg->data, current_arg->size);
                 char *hex_str = zchunk_strhex (chunk);
                 if (hex_str) {
-                    service_log_cursor += snprintf (
-                                                    service_log_cursor,
+                    service_log_cursor += snprintf (service_log_cursor,
                                                     IGS_MAX_LOG_LENGTH - (service_log_cursor - service_log),
                                                     " %s", hex_str);
                     free (hex_str);
-                }
-                else
-                    service_log_cursor += snprintf (
-                                                    service_log_cursor,
+                }else
+                    service_log_cursor += snprintf (service_log_cursor,
                                                     IGS_MAX_LOG_LENGTH - (service_log_cursor - service_log),
                                                     " 00");
                 zchunk_destroy (&chunk);
@@ -747,6 +751,10 @@ void s_service_log_sent_service (igsagent_t *agent,
                 break;
         }
     }
+    
+    if (service_log_cursor - service_log < IGS_MAX_LOG_LENGTH && timestamp != INT64_MIN)
+        snprintf (service_log_cursor, IGS_MAX_LOG_LENGTH - (service_log_cursor - service_log),
+                  " with timestamp %lld", timestamp);
     igsagent_debug (agent, "%s", service_log);
 }
 
@@ -764,8 +772,19 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
     bool found = false;
     
     model_read_write_lock (__FUNCTION__, __LINE__);
+    int64_t current_microseconds = INT64_MIN;
+    if (agent->rt_timestamps_enabled){
+        if (agent->context->rt_current_microseconds != INT64_MIN)
+            current_microseconds = agent->context->rt_current_microseconds;
+        else
+            current_microseconds = zclock_usecs();
+    }
     // check that this agent has not been destroyed when we were locked
     if (!agent || !(agent->uuid)) {
+        if ((list) && (*list)) {
+            s_service_free_service_arguments (*list);
+            *list = NULL;
+        }
         model_read_write_unlock (__FUNCTION__, __LINE__);
         return IGS_SUCCESS;
     }
@@ -863,6 +882,8 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                         zmsg_add (msg, frame);
                     }
                 }
+                if (agent->rt_timestamps_enabled)
+                    zmsg_addmem(msg, &current_microseconds, sizeof(int64_t));
                 s_lock_zyre_peer (__FUNCTION__, __LINE__);
                 zyre_shouts (agent->context->node, agent->igs_channel,
                              "SERVICE %s(%s) called %s.%s(%s)",
@@ -873,7 +894,7 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                 s_unlock_zyre_peer (__FUNCTION__, __LINE__);
                 if (core_context->enable_service_logging)
                     s_service_log_sent_service (agent, remote_agent->definition->name, remote_agent->uuid,
-                                                service_name, list ? *list : NULL);
+                                                service_name, list ? *list : NULL, current_microseconds);
                 else
                     igsagent_debug (agent, "calling %s(%s).%s",
                                     remote_agent->definition->name,
@@ -885,8 +906,7 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
     // 2- iteration on local agents
     if (!agent->is_virtual) {
         igsagent_t *local_agent, *atmp;
-        HASH_ITER (hh, agent->context->agents, local_agent, atmp)
-        {
+        HASH_ITER (hh, agent->context->agents, local_agent, atmp){
             if (streq (local_agent->definition->name, agent_name_or_uuid)
                 || streq (local_agent->uuid, agent_name_or_uuid)) {
                 // we found a matching agent
@@ -896,12 +916,10 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                     igsagent_error (agent, "definition is unknown for %s(%s) : service will not be sent",
                                     local_agent->definition->name,agent_name_or_uuid);
                     continue;
-                }
-                else {
+                }else {
                     igs_service_t *service = NULL;
-                    HASH_FIND_STR (local_agent->definition->services_table,
-                                   service_name, service);
-                    if (service) {
+                    HASH_FIND_STR (local_agent->definition->services_table, service_name, service);
+                    if (service){
                         size_t nb_arguments = 0;
                         if (list && *list)
                             LL_COUNT (*list, arg, nb_arguments);
@@ -909,30 +927,29 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                         LL_COUNT (service->arguments, arg,
                                   defined_nb_arguments);
                         if (nb_arguments != defined_nb_arguments) {
-                            igsagent_error (agent, "passed number of arguments is not correct (received: %zu / "
-                                            "expected: %zu) : service will not be sent", nb_arguments, defined_nb_arguments);
+                            igsagent_error (agent, "passed number of arguments is not correct (received: %zu / expected: %zu) : service will not be sent",
+                                            nb_arguments, defined_nb_arguments);
                             continue;
-                        }
-                        else {
+                        }else {
                             // update service arguments values with new ones
                             if (service->arguments && list)
                                 service_copy_arguments (*list, service->arguments);
                             if (service->cb) {
                                 model_read_write_unlock (__FUNCTION__, __LINE__);
+                                agent->rt_current_timestamp_microseconds = current_microseconds;
                                 (service->cb) (local_agent, agent->definition->name,
                                                agent->uuid, service_name, service->arguments,
                                                nb_arguments, token, service->cb_data);
+                                agent->rt_current_timestamp_microseconds = INT64_MIN;
                                 model_read_write_lock (__FUNCTION__, __LINE__);
                                 service_free_values_in_arguments (service->arguments);
                                 if (core_context->enable_service_logging)
-                                    service_log_received_service (local_agent, agent->definition->name,
-                                                                  agent->uuid, service_name, list ? *list : NULL);
-                            }
-                            else
+                                    service_log_received_service (local_agent, agent->definition->name, agent->uuid, service_name,
+                                                                  list ? *list : NULL, current_microseconds);
+                            }else
                                 igsagent_error (agent, "no defined callback to handle received service %s", service_name);
                         }
-                    }
-                    else {
+                    }else{
                         igsagent_error (agent, "could not find service named %s for %s (%s) : service will not be sent",
                                         service_name, local_agent->definition->name,local_agent->uuid);
                         continue;
@@ -951,7 +968,7 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                 
                 if (core_context->enable_service_logging)
                     s_service_log_sent_service (agent, local_agent->definition->name, local_agent->uuid,
-                                                service_name, *list);
+                                                service_name, *list, current_microseconds);
                 else
                     igsagent_debug (agent, "calling %s.%s(%s)",
                                     local_agent->definition->name,

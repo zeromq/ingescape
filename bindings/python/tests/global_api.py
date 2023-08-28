@@ -30,6 +30,14 @@ def testerServiceCallback(sender_agent_name, sender_agent_uuid, service_name, ar
 def testerIOPCallback(iop_type, name, value_type, value, my_data):
     pass
 
+print ("[Global API] Net ifaces and devices", end =" ")
+print("igs.net_devices_list()")
+print(f'{igs.net_devices_list()}')
+print("igs.net_addresses_list()")
+print(f'{igs.net_addresses_list()}')
+assert len(igs.net_devices_list()) == len(igs.net_addresses_list())
+print ("OK")
+
 print ("[Global API] Testing agent name", end =" ")
 assert igs.agent_name() == "no_name"
 igs.agent_set_name("simple Demo Agent")
@@ -200,6 +208,21 @@ assert igs.mapping_count() == 1
 assert igs.mapping_remove_with_name("toto", "other_agent", "tata") == igs.SUCCESS
 assert igs.mapping_count() == 0
 assert igs.mapping_remove_with_name("toto", "other_agent", "tata") == igs.FAILURE
+assert igs.clear_mappings() == igs.SUCCESS
+assert igs.mapping_count() == 0
+
+assert igs.mapping_add("toto", "other_agent", "tata") > 0
+assert igs.mapping_add("titi", "other_agent", "tata") > 0
+assert igs.mapping_count() == 2
+assert igs.clear_mappings() == igs.SUCCESS
+assert igs.mapping_count() == 0
+
+assert igs.mapping_add("toto", "other_agent", "tata") > 0
+assert igs.mapping_add("titi", "other_agent", "tata") > 0
+assert igs.clear_mappings_for_input("toto") == igs.SUCCESS
+assert igs.mapping_count() == 1
+assert igs.clear_mappings_for_input("titi") == igs.SUCCESS
+assert igs.mapping_count() == 0
 print ("OK")
 
 print ("[Global API] Testing agent splits", end =" ")

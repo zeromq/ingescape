@@ -129,6 +129,10 @@ igs_iop_t *definition_create_iop (igsagent_t *agent,
     assert (agent);
     assert (name);
     assert (agent->definition);
+    if (value_type < IGS_UNKNOWN_T || value_type > IGS_DATA_T){
+        igsagent_error(agent, "invalid value type %d", value_type);
+        return NULL;
+    }
     igs_iop_t *iop = (igs_iop_t *) zmalloc (sizeof (igs_iop_t));
     char *n = s_strndup (name, IGS_MAX_IOP_NAME_LENGTH);
     bool space_in_name = false;
@@ -141,10 +145,7 @@ igs_iop_t *definition_create_iop (igsagent_t *agent,
         }
     }
     if (space_in_name)
-        igsagent_warn (
-          agent,
-          "spaces are not allowed in IOP name: '%s' has been renamed to '%s'",
-          name, n);
+        igsagent_warn (agent, "spaces are not allowed in IOP name: '%s' has been renamed to '%s'", name, n);
     iop->name = n;
     iop->type = type;
     iop->value_type = value_type;
@@ -334,8 +335,7 @@ igs_result_t igsagent_input_create (igsagent_t *agent,
     assert (agent);
     assert (name && strlen (name) > 0);
     assert (agent->definition);
-    igs_iop_t *iop =
-      definition_create_iop (agent, name, IGS_INPUT_T, value_type, value, size);
+    igs_iop_t *iop = definition_create_iop (agent, name, IGS_INPUT_T, value_type, value, size);
     if (!iop)
         return IGS_FAILURE;
     agent->network_need_to_send_definition_update = true;

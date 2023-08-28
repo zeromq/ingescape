@@ -109,88 +109,155 @@ void s_unsubscribe_to_remote_agent_output (igs_remote_agent_t *remote_agent,
 
 // function actually handling messages from one of the remote agents we
 // subscribed to
-void s_handle_publication_from_remote_agent (zmsg_t *msg,
-                                             igs_remote_agent_t *remote_agent)
+void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
 {
-    assert (msg);
+    assert (msg && *msg);
     assert (remote_agent);
     assert (remote_agent->context);
     if (remote_agent->context->is_frozen == true) {
-        igs_debug ("Message received from %s but all traffic in our process is "
-                   "currently frozen",
+        igs_debug ("Message received from %s but all traffic in our agent is currently frozen",
                    remote_agent->definition->name);
+        zmsg_destroy (msg);
         return;
     }
 
     model_read_write_lock (__FUNCTION__, __LINE__);
-    // Publication does not provide information about the targeted agents.
-    // At this stage, we only know that one or more of our agents are targeted.
-    // We need to iterate through our agents and their mapping to check which
-    // inputs need to be updated on which agent.
-    igsagent_t *agent, *tmp_agent;
-    HASH_ITER (hh, remote_agent->context->agents, agent, tmp_agent){
-        if (!agent || !agent->uuid || (strlen (agent->uuid) == 0))
-            continue;
-
-        zmsg_t *dup = zmsg_dup (msg);
-        size_t msg_size = zmsg_size (dup);
-        char *output = NULL;
-        char *v_type = NULL;
-        igs_iop_value_type_t value_type = 0;
-        unsigned long i = 0;
-        for (i = 0; i < msg_size; i += 3) {
-            // Each message part must contain 3 elements
-            // 1 : output name
-            // 2 : output iopt_type
-            // 3 : value of the output as a string or zframe
-            output = zmsg_popstr (dup);
-            if (output == NULL) {
-                igs_error (
-                  "output name is NULL in received publication : rejecting");
-                break;
-            }
-            v_type = zmsg_popstr (dup);
-            if (v_type == NULL) {
-                igs_error (
-                  "output type is NULL in received publication : rejecting");
-                free (output);
-                break;
-            }
-            value_type = atoi (v_type);
-            if (value_type < IGS_INTEGER_T || value_type > IGS_DATA_T) {
-                igs_error ("output type is not valid (%d) in received "
-                           "publication : rejecting",
-                           value_type);
-                free (output);
-                free (v_type);
-                break;
-            }
+    size_t msg_size = zmsg_size (*msg);
+    char *output = NULL;
+    char *v_type = NULL;
+    igs_iop_value_type_t value_type = 0;
+    zframe_t *timestamp_f = NULL;
+    int64_t timestamp = INT64_MIN;
+    zframe_t *frame = NULL;
+    void *data = NULL;
+    size_t size = 0;
+    char *value = NULL;
+    zmsg_t *bundle = NULL;
+    size_t i = 0;
+    
+    for (i = 0; i < msg_size; i += 3) {
+        // Each message part must contain 3 elements
+        // 1 : output name
+        // 2 : output iopt_type
+        // 3 : value of the output as a string or zframe or timestamped bundle
+        output = zmsg_popstr (*msg);
+        if (output == NULL) {
+            igs_error ("output name is NULL in received publication : rejecting");
+            break;
+        }
+        v_type = zmsg_popstr (*msg);
+        if (v_type == NULL) {
+            igs_error ("output type is NULL in received publication : rejecting");
+            free (output);
+            break;
+        }
+        value_type = atoi (v_type);
+        if (value_type < IGS_INTEGER_T || value_type > IGS_TIMESTAMPED_DATA_T) {
+            igs_error ("output value type is not valid (%d) in received publication : rejecting", value_type);
+            free (output);
             free (v_type);
-            v_type = NULL;
-
-            zframe_t *frame = NULL;
-            void *data = NULL;
-            size_t size = 0;
-            char *value = NULL;
-            // get data before iterating to all the mapping elements using it
-            if (value_type == IGS_STRING_T) {
-                value = zmsg_popstr (dup);
-                if (value == NULL) {
-                    igs_error (
-                      "value is NULL in received publication : rejecting");
-                    break;
-                }
+            break;
+        }
+        free (v_type);
+        
+        
+        // get data before iterating to all the mapping elements using it
+        if (value_type == IGS_STRING_T) {
+            value = zmsg_popstr (*msg);
+            if (!value) {
+                igs_error ("value from %s.%s is NULL in received publication : rejecting",
+                           remote_agent->definition->name, output);
+                break;
             }
-            else {
-                frame = zmsg_pop (dup);
-                if (frame == NULL) {
-                    igs_error (
-                      "value is NULL in received publication : rejecting");
-                    break;
-                }
-                data = zframe_data (frame);
-                size = zframe_size (frame);
+        } else if (value_type == IGS_TIMESTAMPED_STRING_T) {
+            bundle = zmsg_popmsg(*msg);
+            if (!bundle) {
+                igs_error ("value from %s.%s is NULL in received publication : rejecting",
+                           remote_agent->definition->name, output);
+                break;
             }
+            size_t bundle_size = zmsg_size(bundle);
+            if (bundle_size != 2) {
+                igs_error ("value from %s.%s is corrupted in received publication : rejecting",
+                           remote_agent->definition->name, output);
+                zmsg_destroy(&bundle);
+                break;
+            }
+            value = zmsg_popstr (bundle);
+            if (!value) {
+                igs_error ("value from %s.%s is NULL in received publication : rejecting",
+                           remote_agent->definition->name, output);
+                zmsg_destroy(&bundle);
+                break;
+            }
+            timestamp_f = zmsg_pop(bundle);
+            if (!timestamp_f) {
+                igs_error ("timestamp from %s.%s is NULL in received publication : rejecting",
+                           remote_agent->definition->name, output);
+                zmsg_destroy(&bundle);
+                break;
+            }
+            timestamp = *((int64_t *)zframe_data(timestamp_f));
+            zframe_destroy(&timestamp_f);
+            zmsg_destroy(&bundle);
+            
+        } else if (value_type == IGS_TIMESTAMPED_INTEGER_T
+                   || value_type == IGS_TIMESTAMPED_DOUBLE_T
+                   || value_type == IGS_TIMESTAMPED_BOOL_T
+                   || value_type == IGS_TIMESTAMPED_IMPULSION_T
+                   || value_type == IGS_TIMESTAMPED_DATA_T){
+            bundle = zmsg_popmsg(*msg);
+            if (!bundle) {
+                igs_error ("value from %s is NULL in received publication : rejecting", output);
+                break;
+            }
+            size_t bundle_size = zmsg_size(bundle);
+            if (bundle_size != 2) {
+                igs_error ("value from %s is corrupted in received publication : rejecting", output);
+                zmsg_destroy(&bundle);
+                break;
+            }
+            frame = zmsg_pop (bundle);
+            if (!frame) {
+                igs_error ("value from %s is NULL in received publication : rejecting", output);
+                zmsg_destroy(&bundle);
+                break;
+            }
+            data = zframe_data (frame);
+            size = zframe_size (frame);
+            timestamp_f = zmsg_pop(bundle);
+            if (!timestamp_f) {
+                igs_error ("timestamp from %s is NULL in received publication : rejecting", output);
+                zmsg_destroy(&bundle);
+                break;
+            }
+            timestamp = *((int64_t *)zframe_data(timestamp_f));
+            zframe_destroy(&timestamp_f);
+            zmsg_destroy(&bundle);
+            
+        } else {
+            frame = zmsg_pop (*msg);
+            if (!frame) {
+                igs_error ("value from %s is NULL in received publication : rejecting", output);
+                break;
+            }
+            data = zframe_data (frame);
+            size = zframe_size (frame);
+        }
+        
+        if (value_type >= IGS_TIMESTAMPED_INTEGER_T
+            && value_type <= IGS_TIMESTAMPED_DATA_T)
+            value_type -= IGS_DATA_T; //translate value type to non-timestamped value type
+        
+        // Publication does not provide information about the targeted agents in our
+        // context. At this stage, we only know that one or more of our agents are
+        // targeted. We need to iterate through our agents and their mappings to check
+        // which inputs need to be updated on which agent.
+        igsagent_t *agent, *tmp_agent;
+        HASH_ITER (hh, remote_agent->context->agents, agent, tmp_agent){
+            if (!agent || !agent->uuid || (strlen (agent->uuid) == 0))
+                continue;
+            
             // try to find mapping elements matching with this subscriber's output
             // and update mapped input(s) value accordingly
             // TODO : optimize mapping storage to avoid iterating
@@ -208,21 +275,19 @@ void s_handle_publication_from_remote_agent (zmsg_t *msg,
                             HASH_FIND_STR (agent->definition->inputs_table,
                                            elmt->from_input, found_input);
                         if (!found_input)
-                            igsagent_warn (agent,
-                                           "Input %s is missing in our definition but "
-                                           "expected in our mapping with %s.%s",
-                                           elmt->from_input, elmt->to_agent,
-                                           elmt->to_output);
+                            igsagent_warn (agent,"Input %s is missing in our definition but expected in our mapping with %s.%s",
+                                           elmt->from_input, elmt->to_agent, elmt->to_output);
                         else {
                             // we have a fully matching mapping element : write from received
                             // output to our input
+                            agent->rt_current_timestamp_microseconds = timestamp;
                             if (value_type == IGS_STRING_T) {
                                 model_read_write_unlock (__FUNCTION__, __LINE__);
                                 model_write_iop (agent, elmt->from_input,
                                                  IGS_INPUT_T, value_type, value,
                                                  strlen (value) + 1);
                                 model_read_write_lock (__FUNCTION__, __LINE__);
-
+                                
                             }
                             else {
                                 model_read_write_unlock (__FUNCTION__, __LINE__);
@@ -233,19 +298,20 @@ void s_handle_publication_from_remote_agent (zmsg_t *msg,
                             }
                             if (!agent->uuid)
                                 break;
+                            else
+                                agent->rt_current_timestamp_microseconds = INT64_MIN;
                         }
                     }
                 }
             }
-            if (frame)
-                zframe_destroy (&frame);
-            if (value)
-                free (value);
-            free (output);
-            output = NULL;
         }
-        zmsg_destroy (&dup);
+        if (frame)
+            zframe_destroy (&frame);
+        if (value)
+            freen (value);
+        freen (output);
     }
+    zmsg_destroy (msg);
     model_read_write_unlock (__FUNCTION__, __LINE__);
 }
 
@@ -276,7 +342,7 @@ int s_trigger_outputs_request_to_newcomer (zloop_t *loop,
 }
 
 // manage incoming messages from one of the remote agents we subscribed to
-int s_manage_remote_publication (zloop_t *loop, zsock_t *socket, void *arg)
+int s_manage_received_publication (zloop_t *loop, zsock_t *socket, void *arg)
 {
     IGS_UNUSED (loop)
     igs_core_context_t *context = (igs_core_context_t *) arg;
@@ -284,37 +350,35 @@ int s_manage_remote_publication (zloop_t *loop, zsock_t *socket, void *arg)
     assert (context);
 
     zmsg_t *msg = zmsg_recv (socket);
-    // The output name now includes the agent uuid as prefix.
-    // We merged them to keep the ZeroMQ PUB/SUB filters working
-    // in a context where a peer now possibly hosts multiple agents.
-    char *output_name = zmsg_popstr (msg);
-    if (output_name == NULL) {
+    assert(msg);
+    // The output name includes the publishing agent uuid as a prefix.
+    // We merged uuid and output to keep the ZeroMQ PUB/SUB filters working
+    // in a context where a publishing peer possibly hosts multiple agents.
+    char *publication = zmsg_popstr (msg);
+    if (publication == NULL) {
         igs_error ("output name is NULL in received publication : rejecting");
         return 0;
     }
-    char uuid[IGS_AGENT_UUID_LENGTH + 1] = "";
-    if (strlen (output_name) < IGS_AGENT_UUID_LENGTH) {
-        igs_error ("output name '%s' is missing information : rejecting",
-                   output_name);
-        free (output_name);
+    if (strlen (publication) < IGS_AGENT_UUID_LENGTH) {
+        igs_error ("output name '%s' is missing information : rejecting", publication);
+        free (publication);
         return 0;
     }
-    snprintf (uuid, IGS_AGENT_UUID_LENGTH + 1, "%s", output_name);
-    char *real_output_name = output_name + IGS_AGENT_UUID_LENGTH + 1;
+    publication[IGS_AGENT_UUID_LENGTH] = '\0'; //enable proper extraction of publishing agent UUID
 
-    // NB: We push the output name again at the beginning of
-    // the message for proper use by s_handle_publication_from_remote_agent
-    zmsg_pushstr (msg, real_output_name);
-    free (output_name);
+    // We push the actual output name again at the beginning of
+    // the message for proper use by s_handle_publication
+    zmsg_pushstr (msg, publication + IGS_AGENT_UUID_LENGTH + 1);
 
     igs_remote_agent_t *remote_agent = NULL;
-    HASH_FIND_STR (context->remote_agents, uuid, remote_agent);
+    HASH_FIND_STR (context->remote_agents, publication, remote_agent);
     if (remote_agent == NULL) {
-        igs_error ("no remote agent with uuid '%s' : rejecting", uuid);
+        igs_error ("no remote agent with uuid '%s' : rejecting", publication);
+        free (publication);
         return 0;
     }
-    s_handle_publication_from_remote_agent (msg, remote_agent);
-    zmsg_destroy (&msg);
+    free (publication);
+    s_handle_publication (&msg, remote_agent);
     return 0;
 }
 
@@ -628,8 +692,10 @@ void s_clean_and_free_remote_agent (igs_remote_agent_t **remote_agent)
         free (elt->filter);
         free (elt);
     }
-    if ((*remote_agent)->uuid)
+    if ((*remote_agent)->uuid){
         free ((*remote_agent)->uuid);
+        (*remote_agent)->uuid = NULL;
+    }
     if ((*remote_agent)->context->loop
         && (*remote_agent)->timer_id > 0) {
         zloop_timer_end ((*remote_agent)->context->loop,
@@ -777,7 +843,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                         zcert_apply (context->security_cert, zyre_peer->subscriber);
                         zsock_set_curve_serverkey (zyre_peer->subscriber, peer_public_key);
                     }
-                    zloop_reader (loop, zyre_peer->subscriber, s_manage_remote_publication, context);
+                    zloop_reader (loop, zyre_peer->subscriber, s_manage_received_publication, context);
                     zloop_reader_set_tolerant (loop, zyre_peer->subscriber);
                 }
             }
@@ -804,8 +870,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             igsagent_t *agent, *tmp;
             char *definition_str = NULL;
             char *mapping_str = NULL;
-            HASH_ITER (hh, context->agents, agent, tmp)
-            {
+            HASH_ITER (hh, context->agents, agent, tmp){
                 // definition is sent to every newcomer on the channel (whether it is a
                 // ingescape agent or not)
                 if (zyre_peer->protocol
@@ -813,8 +878,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                         || streq (zyre_peer->protocol, "v3")))
                     definition_str = parser_export_definition_legacy (agent->definition);
                 else
-                    definition_str =
-                      parser_export_definition (agent->definition);
+                    definition_str = parser_export_definition (agent->definition);
                 if (definition_str) {
                     s_send_definition_to_zyre_peer (agent, peerUUID,
                                                     definition_str, false);
@@ -936,13 +1000,23 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     split_remove_worker (context, uuid, NULL);
                     s_agent_propagate_agent_event (IGS_AGENT_EXITED, uuid,
                                                    remote->definition->name, NULL);
+                    model_read_write_lock(__FUNCTION__, __LINE__);
                     HASH_DEL (context->remote_agents, remote);
                     s_clean_and_free_remote_agent (&remote);
+                    model_read_write_unlock(__FUNCTION__, __LINE__);
                 }
                 else
                     igs_error ("%s is not a known remote agent", uuid);
                 if (uuid)
                     free (uuid);
+            }
+            else if (strncmp(title, RT_SET_TIME_MSG, strlen(RT_SET_TIME_MSG)) == 0){
+                char *timestamp_str = title + strlen(RT_SET_TIME_MSG);
+                if (*timestamp_str){
+                    int64_t timestamp = atoll(timestamp_str);
+                    igs_rt_set_time(timestamp);
+                }else
+                    igs_error("timestamp missing in RT_SET_TIME command : rejecting");
             }
             free (title);
         }
@@ -1456,9 +1530,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 }
                 igs_debug ("privately received output values from %s (%s)",
                            remote_agent->definition->name, remote_agent->uuid);
-                s_handle_publication_from_remote_agent (msg_duplicate,
-                                                      remote_agent);
-                zmsg_destroy (&msg_duplicate);
+                s_handle_publication (&msg_duplicate, remote_agent);
                 free (uuid);
             }
             else
@@ -1707,8 +1779,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free (title);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
-                // stop our zyre loop by returning -1 : this will start the cleaning
-                // process
+                // stop our zyre loop by returning -1 : this will start the cleaning process
                 return -1;
             }
             else
@@ -1914,11 +1985,10 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free (uuid);
             }
             else
-            if (streq (title, SET_INPUT_MSG)) {
+            if (streq (title, SET_INPUT_MSG) || streq (title, SET_OUTPUT_MSG) || streq (title, SET_PARAMETER_MSG)) {
                 char *iop_name = zmsg_popstr (msg_duplicate);
                 if (iop_name == NULL) {
-                    igs_error ("no valid iop name in %s message received from "
-                               "%s(%s): rejecting",
+                    igs_error ("no valid iop name in %s message received from %s(%s): rejecting",
                                title, name, peerUUID);
                     zmsg_destroy (&msg_duplicate);
                     zyre_event_destroy (&zyre_event);
@@ -1926,8 +1996,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 }
                 char *value = zmsg_popstr (msg_duplicate);
                 if (value == NULL) {
-                    igs_error ("no valid value in %s message received from "
-                               "%s(%s): rejecting",
+                    igs_error ("no valid value in %s message received from %s(%s): rejecting",
                                title, name, peerUUID);
                     free (iop_name);
                     zmsg_destroy (&msg_duplicate);
@@ -1936,8 +2005,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 }
                 char *uuid = zmsg_popstr (msg_duplicate);
                 if (uuid == NULL) {
-                    igs_error ("no valid uuid in %s message received from "
-                               "%s(%s): rejecting",
+                    igs_error ("no valid uuid in %s message received from %s(%s): rejecting",
                                title, name, peerUUID);
                     free (iop_name);
                     free (value);
@@ -1949,8 +2017,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 HASH_FIND_STR (context->agents, uuid, agent);
                 if (agent == NULL) {
                     igs_error (
-                      "no agent with uuid '%s' in %s message received from "
-                      "%s(%s): rejecting",
+                      "no agent with uuid '%s' in %s message received from %s(%s): rejecting",
                       uuid, title, name, peerUUID);
                     if (uuid)
                         free (uuid);
@@ -1960,123 +2027,42 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     zyre_event_destroy (&zyre_event);
                     return 0;
                 }
-
-                igs_debug ("received SET_INPUT command from %s (%s)", name,
-                           peerUUID);
-                if (iop_name && value)
-                    igsagent_input_set_string (agent, iop_name, value);
-                free (iop_name);
-                free (value);
-                free (uuid);
-            }
-            else
-            if (streq (title, SET_OUTPUT_MSG)) {
-                char *iop_name = zmsg_popstr (msg_duplicate);
-                if (iop_name == NULL) {
-                    igs_error ("no valid iop name in %s message received from "
-                               "%s(%s): rejecting",
-                               title, name, peerUUID);
-                    zmsg_destroy (&msg_duplicate);
-                    zyre_event_destroy (&zyre_event);
-                    return 0;
+                
+                bool shall_inject = true;
+                zframe_t *value_type_f = zmsg_pop(msg_duplicate);
+                if (value_type_f){
+                    int64_t value_type = *((int64_t*)zframe_data(value_type_f));
+                    if (value_type>= IGS_TIMESTAMPED_INTEGER_T
+                        && value_type <= IGS_TIMESTAMPED_DATA_T){
+                        //TODO: implement msg decoding (from hex string), data extraction and timestamp set
+                        if (streq (title, SET_INPUT_MSG))
+                            igs_error("injection of timestamped values is not supported yet : input %s.%s will not be injected",
+                                      agent->definition->name, iop_name);
+                        else if (streq (title, SET_OUTPUT_MSG))
+                            igs_error("injection of timestamped values is not supported yet : output %s.%s will not be injected",
+                                      agent->definition->name, iop_name);
+                        else if (streq (title, SET_PARAMETER_MSG))
+                            igs_error("injection of timestamped values is not supported yet : parameter %s.%s will not be injected",
+                                      agent->definition->name, iop_name);
+                        shall_inject = false;
+                    }
+                    zframe_destroy(&value_type_f);
                 }
-                char *value = zmsg_popstr (msg_duplicate);
-                if (value == NULL) {
-                    igs_error ("no valid value in %s message received from "
-                               "%s(%s): rejecting",
-                               title, name, peerUUID);
-                    free (iop_name);
-                    zmsg_destroy (&msg_duplicate);
-                    zyre_event_destroy (&zyre_event);
-                    return 0;
+                if (shall_inject){
+                    if (streq (title, SET_INPUT_MSG)){
+                        igs_debug ("received SET_INPUT command from %s (%s)", name, peerUUID);
+                        if (iop_name && value)
+                            igsagent_input_set_string (agent, iop_name, value);
+                    } else if (streq (title, SET_OUTPUT_MSG)){
+                        igs_debug ("received SET_OUTPUT command from %s (%s)", name, peerUUID);
+                        if (iop_name && value)
+                            igsagent_output_set_string (agent, iop_name, value);
+                    } else if (streq (title, SET_PARAMETER_MSG)){
+                        igs_debug ("received SET_PARAMETER command from %s (%s)", name, peerUUID);
+                        if (iop_name && value)
+                            igsagent_parameter_set_string (agent, iop_name, value);
+                    }
                 }
-                char *uuid = zmsg_popstr (msg_duplicate);
-                if (uuid == NULL) {
-                    igs_error ("no valid uuid in %s message received from "
-                               "%s(%s): rejecting",
-                               title, name, peerUUID);
-                    free (iop_name);
-                    free (value);
-                    zmsg_destroy (&msg_duplicate);
-                    zyre_event_destroy (&zyre_event);
-                    return 0;
-                }
-                igsagent_t *agent = NULL;
-                HASH_FIND_STR (context->agents, uuid, agent);
-                if (agent == NULL) {
-                    igs_error (
-                      "no agent with uuid '%s' in %s message received from "
-                      "%s(%s): rejecting",
-                      uuid, title, name, peerUUID);
-                    if (uuid)
-                        free (uuid);
-                    free (iop_name);
-                    free (value);
-                    zmsg_destroy (&msg_duplicate);
-                    zyre_event_destroy (&zyre_event);
-                    return 0;
-                }
-
-                igs_debug ("received SET_OUTPUT command from %s (%s)", name,
-                           peerUUID);
-                if (iop_name && value)
-                    igsagent_output_set_string (agent, iop_name, value);
-                free (iop_name);
-                free (value);
-                free (uuid);
-            }
-            else
-            if (streq (title, SET_PARAMETER_MSG)) {
-                char *iop_name = zmsg_popstr (msg_duplicate);
-                if (iop_name == NULL) {
-                    igs_error ("no valid iop name in %s message received from "
-                               "%s(%s): rejecting",
-                               title, name, peerUUID);
-                    zmsg_destroy (&msg_duplicate);
-                    zyre_event_destroy (&zyre_event);
-                    return 0;
-                }
-                char *value = zmsg_popstr (msg_duplicate);
-                if (value == NULL) {
-                    igs_error ("no valid value in %s message received from "
-                               "%s(%s): rejecting",
-                               title, name, peerUUID);
-                    free (iop_name);
-                    zmsg_destroy (&msg_duplicate);
-                    zyre_event_destroy (&zyre_event);
-                    return 0;
-                }
-                char *uuid = zmsg_popstr (msg_duplicate);
-                if (uuid == NULL) {
-                    igs_error ("no valid uuid in %s message received from "
-                               "%s(%s): rejecting",
-                               title, name, peerUUID);
-                    free (iop_name);
-                    free (value);
-                    zmsg_destroy (&msg_duplicate);
-                    zyre_event_destroy (&zyre_event);
-                    return 0;
-                }
-                igsagent_t *agent = NULL;
-                HASH_FIND_STR (context->agents, uuid, agent);
-                if (agent == NULL) {
-                    igs_error (
-                      "no agent with uuid '%s' in %s message received from "
-                      "%s(%s): rejecting",
-                      uuid, title, name, peerUUID);
-                    if (uuid)
-                        free (uuid);
-                    free (iop_name);
-                    free (value);
-                    zmsg_destroy (&msg_duplicate);
-                    zyre_event_destroy (&zyre_event);
-                    return 0;
-                }
-
-                igs_debug ("received SET_PARAMETER command from %s (%s)", name,
-                           peerUUID);
-                if (iop_name && value)
-                    igsagent_parameter_set_string (agent, iop_name, value);
                 free (iop_name);
                 free (value);
                 free (uuid);
@@ -2555,14 +2541,15 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 const char *caller_name = name; // default caller name is the one of the peer
 
                 if (streq (title, CALL_SERVICE_MSG_DEPRECATED))
-                    igs_warn ("Remote agent %s(%s) uses an older version of Ingescape with deprecated messages. Please upgrade this agent.", caller_name, caller_uuid);
+                    igs_warn ("Remote agent %s(%s) uses an older version of Ingescape with deprecated messages. Please upgrade this agent.",
+                              caller_name, caller_uuid);
 
                 igs_remote_agent_t *caller_agent = NULL;
                 HASH_FIND_STR (context->remote_agents, caller_uuid, caller_agent);
                 if (caller_agent) {
                     // replace caller name by the one of an actual agent
                     // NB: this will happen all the time, except when ingeprobe
-                    //(which is not an agent) emulates a call.
+                    // (which is not an agent) emulates a call.
                     caller_name = caller_agent->definition->name;
                 }
 
@@ -2609,8 +2596,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 if (callee_agent->definition
                     && callee_agent->definition->services_table) {
                     igs_service_t *service = NULL;
-                    HASH_FIND_STR (callee_agent->definition->services_table,
-                                   service_name, service);
+                    HASH_FIND_STR (callee_agent->definition->services_table, service_name, service);
                     if (service) {
                         if (service->cb) {
                             s_lock_zyre_peer (__FUNCTION__, __LINE__);
@@ -2625,13 +2611,23 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                             if (service_add_values_to_arguments_from_message (service_name,
                                                                               service->arguments,
                                                                               msg_duplicate) == IGS_SUCCESS) {
+                                callee_agent->rt_current_timestamp_microseconds = INT64_MIN;
+                                if (zmsg_size(msg_duplicate) >= 1){ //we still have the timestamp to handle
+                                    zframe_t *timestamp_f = zmsg_pop(msg_duplicate);
+                                    assert(timestamp_f);
+                                    assert(zframe_size(timestamp_f) == sizeof(int64_t));
+                                    callee_agent->rt_current_timestamp_microseconds = *((int64_t*)zframe_data(timestamp_f));
+                                    zframe_destroy(&timestamp_f);
+                                }
                                 if (core_context->enable_service_logging)
-                                    service_log_received_service (callee_agent, caller_name, caller_uuid, service_name, service->arguments);
+                                    service_log_received_service (callee_agent, caller_name, caller_uuid, service_name,
+                                                                  service->arguments, callee_agent->rt_current_timestamp_microseconds);
                                 (service->cb) (callee_agent, caller_name,
                                                caller_uuid, service_name,
                                                service->arguments, nb_args,
                                                token, service->cb_data);
                                 service_free_values_in_arguments (service->arguments);
+                                callee_agent->rt_current_timestamp_microseconds = INT64_MIN;
                             }
                         } else
                             igsagent_warn (callee_agent, "no defined callback to handle received service %s", service_name);
@@ -2713,19 +2709,24 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     s_unlock_zyre_peer (__FUNCTION__, __LINE__);
                 }
             }
-            else
-            if (streq (title, WORKER_GOODBYE_MSG)
-                    || streq (title, WORKER_HELLO_MSG)
-                    || streq (title, WORKER_READY_MSG))
+            else if (streq (title, WORKER_GOODBYE_MSG)
+                     || streq (title, WORKER_HELLO_MSG)
+                     || streq (title, WORKER_READY_MSG))
                 split_message_from_worker (title, msg_duplicate, context);
-            else
-            if (streq (title, SPLITTER_WORK_MSG))
+            else if (streq (title, SPLITTER_WORK_MSG))
                 split_message_from_splitter (msg_duplicate, context);
+            else if (strncmp(title, RT_SET_TIME_MSG, strlen(RT_SET_TIME_MSG)) == 0){
+                char *timestamp_str = title + strlen(RT_SET_TIME_MSG);
+                if (*timestamp_str){
+                    int64_t timestamp = atoll(timestamp_str);
+                    igs_rt_set_time(timestamp);
+                }else
+                    igs_error("timestamp missing in RT_SET_TIME command : rejecting");
+            }
         }
         free (title);
     }
-    else
-    if (streq (event, "LEADER")) {
+    else if (streq (event, "LEADER")) {
         const char *our_peer_uuid = zyre_uuid (context->node);
         bool is_leader = streq (our_peer_uuid, peerUUID);
         if (is_leader)
@@ -2765,96 +2766,10 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             attendeeUUID = zlist_next (election);
         }
     }
-    else
-    if (streq (event, "LEAVE")) {
+    else if (streq (event, "LEAVE"))
         igs_debug ("-%s has left %s", name, group);
-
-        // check if we are last in an elections channel
-        if (core_context->elections) {
-            zlist_t *elections = zhash_keys (context->elections);
-            char *election_name = zlist_first (elections);
-            while (election_name) {
-                if (streq (election_name, group)) {
-                    zlist_t *peer_attendees =
-                      zyre_peers_by_group (context->node, election_name);
-                    size_t nb = zlist_size (peer_attendees);
-                    if (nb == 0) {
-                        // we are last for this election group
-                        // inform all our agents participating in the election
-                        zlist_t *agent_attendees = (zlist_t *) zhash_lookup (
-                          context->elections, election_name);
-                        assert (agent_attendees);
-                        char *attendeeUUID = zlist_first (agent_attendees);
-                        while (attendeeUUID) {
-                            igsagent_t *agent = NULL;
-                            HASH_FIND_STR (context->agents, attendeeUUID,
-                                           agent);
-                            assert (agent);
-                            igs_info ("\\o/ agent %s(%s) is leader in '%s'",
-                                      agent->definition->name, agent->uuid,
-                                      election_name);
-                            igs_agent_event_wrapper_t *cb;
-                            DL_FOREACH (agent->agent_event_callbacks, cb){
-                                cb->callback_ptr (agent, IGS_AGENT_WON_ELECTION,
-                                                  agent->uuid,
-                                                  agent->definition->name,
-                                                  election_name, cb->my_data);
-                            }
-                            attendeeUUID = zlist_next (agent_attendees);
-                        }
-                    }
-                    zlist_destroy (&peer_attendees);
-                }
-                election_name = zlist_next (elections);
-            }
-            zlist_destroy (&elections);
-        }
-    }
-    else
-    if (streq (event, "EXIT")) {
+    else if (streq (event, "EXIT")) {
         igs_debug ("<-%s (%s) exited", name, peerUUID);
-
-        // check if we are last in an elections channel
-        // FIXME: every time a peer exits, we check empty election channels.
-        // This can make IGS_AGENT_WON_ELECTION notifed multiple times for a given
-        // agent.
-        if (context->elections) {
-            zlist_t *elections = zhash_keys (context->elections);
-            char *election_name = zlist_first (elections);
-            while (election_name) {
-                zlist_t *peer_attendees =
-                  zyre_peers_by_group (context->node, election_name);
-                size_t nb = zlist_size (peer_attendees);
-                if (nb == 0) {
-                    // we are last for this election group
-                    // inform all our agents participating in the election
-                    zlist_t *agent_attendees = (zlist_t *) zhash_lookup (
-                      context->elections, election_name);
-                    assert (agent_attendees);
-                    char *attendeeUUID = zlist_first (agent_attendees);
-                    while (attendeeUUID) {
-                        igsagent_t *agent = NULL;
-                        HASH_FIND_STR (context->agents, attendeeUUID, agent);
-                        assert (agent);
-                        igs_info ("\\o/ agent %s(%s) is leader in '%s'",
-                                  agent->definition->name, agent->uuid,
-                                  election_name);
-                        igs_agent_event_wrapper_t *cb;
-                        DL_FOREACH (agent->agent_event_callbacks, cb)
-                        {
-                            cb->callback_ptr (agent, IGS_AGENT_WON_ELECTION,
-                                              agent->uuid,
-                                              agent->definition->name,
-                                              election_name, cb->my_data);
-                        }
-                        attendeeUUID = zlist_next (agent_attendees);
-                    }
-                }
-                zlist_destroy (&peer_attendees);
-                election_name = zlist_next (elections);
-            }
-            zlist_destroy (&elections);
-        }
 
         igs_zyre_peer_t *zyre_peer = NULL;
         HASH_FIND_STR (context->zyre_peers, peerUUID, zyre_peer);
@@ -2872,8 +2787,10 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                         split_remove_worker (context, remote->uuid, NULL);
                         s_agent_propagate_agent_event (IGS_AGENT_EXITED, remote->uuid,
                                                        remote->definition->name, NULL);
+                        model_read_write_lock(__FUNCTION__, __LINE__);
                         HASH_DEL (context->remote_agents, remote);
                         s_clean_and_free_remote_agent (&remote);
+                        model_read_write_unlock(__FUNCTION__, __LINE__);
                     }
                 }
                 HASH_DEL (context->zyre_peers, zyre_peer);
@@ -3062,6 +2979,7 @@ static void s_run_loop (zsock_t *mypipe, void *args)
 {
     s_network_lock ();
     igs_core_context_t *context = (igs_core_context_t *) args;
+    context->internal_pipe = mypipe;
     assert (context);
     assert (context->node);
     assert (context->publisher);
@@ -3091,8 +3009,7 @@ static void s_run_loop (zsock_t *mypipe, void *args)
     // iterate on agents to avoid sending definition and mapping update at startup
     // to all peers (they will receive def & map when joining INGESCAPE_PRIVATE)
     igsagent_t *agent, *tmp;
-    HASH_ITER (hh, context->agents, agent, tmp)
-    {
+    HASH_ITER (hh, context->agents, agent, tmp){
         agent->network_need_to_send_mapping_update = false;
         agent->network_need_to_send_definition_update = false;
         agent->network_activation_during_runtime = false;
@@ -3129,25 +3046,25 @@ static void s_run_loop (zsock_t *mypipe, void *args)
 
     s_network_lock ();
     igs_debug ("loop stopping..."); // clean dynamic part of the context
-
+    
+    model_read_write_lock(__FUNCTION__, __LINE__);
     igs_remote_agent_t *remote, *tmpremote;
-    HASH_ITER (hh, context->remote_agents, remote, tmpremote)
-    {
+    HASH_ITER (hh, context->remote_agents, remote, tmpremote){
         HASH_DEL (context->remote_agents, remote);
         s_clean_and_free_remote_agent (&remote);
     }
 
     igs_zyre_peer_t *zyre_peer, *tmp_peer;
-    HASH_ITER (hh, context->zyre_peers, zyre_peer, tmp_peer)
-    {
+    HASH_ITER (hh, context->zyre_peers, zyre_peer, tmp_peer){
         HASH_DEL (context->zyre_peers, zyre_peer);
         s_clean_and_free_zyre_peer (&zyre_peer, context->loop);
     }
+    model_read_write_unlock(__FUNCTION__, __LINE__);
+    
     zloop_destroy (&context->loop);
 
     igs_timer_t *current_timer, *tmp_timer;
-    HASH_ITER (hh, context->timers, current_timer, tmp_timer)
-    {
+    HASH_ITER (hh, context->timers, current_timer, tmp_timer){
         HASH_DEL (context->timers, current_timer);
         free (current_timer);
     }
@@ -3158,8 +3075,7 @@ static void s_run_loop (zsock_t *mypipe, void *args)
     zsock_destroy (&context->publisher);
     zsock_destroy (&context->ipc_publisher);
 #if defined(__UNIX__) && !defined(__UTYPE_IOS)
-    zsys_file_delete (
-      context->network_ipc_full_path); // destroy ipc_path in file system
+    zsys_file_delete (context->network_ipc_full_path); // destroy ipc_path in file system
     // NB: ipc_path is based on peer id which is unique. It will never be used
     // again.
     free (context->network_ipc_full_path);
@@ -3195,6 +3111,7 @@ static void s_run_loop (zsock_t *mypipe, void *args)
     if (context->security_auth)
         zactor_destroy (&(context->security_auth));
 
+    context->internal_pipe = NULL;
     igs_debug ("loop stopped");
     zstr_send (mypipe, "LOOP_STOPPED");
     s_network_unlock ();
@@ -3564,60 +3481,129 @@ igs_result_t network_publish_output (igsagent_t *agent, const igs_iop_t *iop)
             model_read_write_unlock (__FUNCTION__, __LINE__);
             return IGS_SUCCESS;
         }
+        int64_t current_microseconds = INT64_MIN;
+        if (agent->rt_timestamps_enabled){
+            if (agent->context->rt_current_microseconds != INT64_MIN)
+                current_microseconds = agent->context->rt_current_microseconds;
+            else
+                current_microseconds = zclock_usecs();
+        }
         zmsg_t *msg = zmsg_new ();
         zmsg_addstrf (msg, "%s-%s", agent->uuid, iop->name);
-        zmsg_addstrf (msg, "%d", iop->value_type);
+        if (current_microseconds == INT64_MIN)
+            zmsg_addstrf (msg, "%d", iop->value_type);
         switch (iop->value_type) {
             case IGS_INTEGER_T:
-                zmsg_addmem (msg, &(iop->value.i), sizeof (int));
-                igsagent_debug (agent, "%s(%s) publishes %s -> %d",
-                                 agent->definition->name, agent->uuid,
-                                 iop->name, iop->value.i);
+                if (current_microseconds != INT64_MIN){
+                    zmsg_addstrf (msg, "%d", IGS_TIMESTAMPED_INTEGER_T);
+                    zmsg_t *packaged_value = zmsg_new();
+                    zmsg_addmem (packaged_value, &(iop->value.i), sizeof (int));
+                    zmsg_addmem(packaged_value, &current_microseconds, sizeof(int64_t));
+                    zmsg_addmsg(msg, &packaged_value);
+                    igsagent_debug (agent, "%s(%s) publishes %s int with timestamp %lld",
+                                    agent->definition->name, agent->uuid,
+                                    iop->name, current_microseconds);
+                } else {
+                    zmsg_addmem (msg, &(iop->value.i), sizeof (int));
+                    igsagent_debug (agent, "%s(%s) publishes %s int",
+                                    agent->definition->name, agent->uuid,
+                                    iop->name);
+                }
                 break;
             case IGS_DOUBLE_T:
-                zmsg_addmem (msg, &(iop->value.d), sizeof (double));
-                igsagent_debug (agent, "%s(%s) publishes %s -> %f",
-                                 agent->definition->name, agent->uuid,
-                                 iop->name, iop->value.d);
+                if (current_microseconds != INT64_MIN){
+                    zmsg_addstrf (msg, "%d", IGS_TIMESTAMPED_DOUBLE_T);
+                    zmsg_t *packaged_value = zmsg_new();
+                    zmsg_addmem (packaged_value, &(iop->value.d), sizeof (double));
+                    zmsg_addmem(packaged_value, &current_microseconds, sizeof(int64_t));
+                    zmsg_addmsg(msg, &packaged_value);
+                    igsagent_debug (agent, "%s(%s) publishes %s double with timestamp %lld",
+                                    agent->definition->name, agent->uuid,
+                                    iop->name, current_microseconds);
+                } else {
+                    zmsg_addmem (msg, &(iop->value.d), sizeof (double));
+                    igsagent_debug (agent, "%s(%s) publishes %s double",
+                                    agent->definition->name, agent->uuid,
+                                    iop->name);
+                }
                 break;
             case IGS_BOOL_T:
-                zmsg_addmem (msg, &(iop->value.b), sizeof (bool));
-                igsagent_debug (agent, "%s(%s) publishes %s -> %d",
-                                 agent->definition->name, agent->uuid,
-                                 iop->name, iop->value.b);
+                if (current_microseconds != INT64_MIN){
+                    zmsg_addstrf (msg, "%d", IGS_TIMESTAMPED_BOOL_T);
+                    zmsg_t *packaged_value = zmsg_new();
+                    zmsg_addmem (packaged_value, &(iop->value.b), sizeof (bool));
+                    zmsg_addmem(packaged_value, &current_microseconds, sizeof(int64_t));
+                    zmsg_addmsg(msg, &packaged_value);
+                    igsagent_debug (agent, "%s(%s) publishes %s bool with timestamp %lld",
+                                    agent->definition->name, agent->uuid,
+                                    iop->name, current_microseconds);
+                } else {
+                    zmsg_addmem (msg, &(iop->value.b), sizeof (bool));
+                    igsagent_debug (agent, "%s(%s) publishes %s bool",
+                                    agent->definition->name, agent->uuid,
+                                    iop->name);
+                }
                 break;
             case IGS_STRING_T:
-                zmsg_addstr (msg, iop->value.s);
-                igsagent_debug (agent, "%s(%s) publishes %s -> '%s'",
-                                 agent->definition->name, agent->uuid,
-                                 iop->name, iop->value.s);
+                if (current_microseconds != INT64_MIN){
+                    zmsg_addstrf (msg, "%d", IGS_TIMESTAMPED_STRING_T);
+                    zmsg_t *packaged_value = zmsg_new();
+                    zmsg_addstr (packaged_value, iop->value.s);
+                    zmsg_addmem(packaged_value, &current_microseconds, sizeof(int64_t));
+                    zmsg_addmsg(msg, &packaged_value);
+                    igsagent_debug (agent, "%s(%s) publishes %s string with timestamp %lld",
+                                    agent->definition->name, agent->uuid,
+                                    iop->name, current_microseconds);
+                } else {
+                    zmsg_addstr (msg, iop->value.s);
+                    igsagent_debug (agent, "%s(%s) publishes %s string",
+                                    agent->definition->name, agent->uuid,
+                                    iop->name);
+                }
                 break;
             case IGS_IMPULSION_T:
-                zmsg_addmem (msg, NULL, 0);
-                igsagent_debug (agent, "%s(%s) publishes impulsion %s",
-                                 agent->definition->name, agent->uuid,
-                                 iop->name);
+                if (current_microseconds != INT64_MIN){
+                    zmsg_addstrf (msg, "%d", IGS_TIMESTAMPED_IMPULSION_T);
+                    zmsg_t *packaged_value = zmsg_new();
+                    zmsg_addmem (packaged_value, NULL, 0);
+                    zmsg_addmem(packaged_value, &current_microseconds, sizeof(int64_t));
+                    zmsg_addmsg(msg, &packaged_value);
+                    igsagent_debug (agent, "%s(%s) publishes %s impulsion with timestamp %lld",
+                                    agent->definition->name, agent->uuid,
+                                    iop->name, current_microseconds);
+                } else {
+                    zmsg_addmem (msg, NULL, 0);
+                    igsagent_debug (agent, "%s(%s) publishes %s impulsion",
+                                    agent->definition->name, agent->uuid,
+                                    iop->name);
+                }
                 break;
             case IGS_DATA_T: {
                 zframe_t *frame = zframe_new (iop->value.data, iop->value_size);
-                zmsg_append (msg, &frame);
-                igsagent_debug (agent, "%s(%s) publishes data %s (%zu bytes)",
-                                 agent->definition->name, agent->uuid,
-                                 iop->name, iop->value_size);
+                if (current_microseconds != INT64_MIN){
+                    zmsg_addstrf (msg, "%d", IGS_TIMESTAMPED_DATA_T);
+                    zmsg_t *packaged_value = zmsg_new();
+                    zmsg_append (packaged_value, &frame);
+                    zmsg_addmem(packaged_value, &current_microseconds, sizeof(int64_t));
+                    zmsg_addmsg(msg, &packaged_value);
+                    igsagent_debug (agent, "%s(%s) publishes data %s (%zu bytes) with timestamp %lld",
+                                    agent->definition->name, agent->uuid,
+                                    iop->name, iop->value_size, current_microseconds);
+                } else {
+                    zmsg_append (msg, &frame);
+                    igsagent_debug (agent, "%s(%s) publishes data %s (%zu bytes)",
+                                    agent->definition->name, agent->uuid,
+                                    iop->name, iop->value_size);
+                }
             } break;
             default:
                 break;
         }
 
         // 1- publish to TCP
-        zmsg_t *msg_quater = zmsg_dup (msg);
         if (agent->context->network_actor && agent->context->publisher) {
-            zmsg_t *msg_bis = zmsg_dup (msg);
-            zmsg_t *msg_ter = zmsg_dup (msg);
-            if (zmsg_send (&msg, core_context->publisher) != 0) {
-                igsagent_error (agent,
-                                 "Could not publish output %s on the network\n",
-                                 iop->name);
+            if (zsock_send (core_context->publisher, "m", msg) != 0) {
+                igsagent_error (agent, "Could not publish output %s on the network\n", iop->name);
                 zmsg_destroy (&msg);
                 result = IGS_FAILURE;
             }
@@ -3625,55 +3611,45 @@ igs_result_t network_publish_output (igsagent_t *agent, const igs_iop_t *iop)
             if (core_context->ipc_publisher) {
                 // publisher can be NULL on IOS or for read/write problems with assigned
                 // IPC path in both cases, an error message has been issued at start
-                if (zmsg_send (&msg_bis, core_context->ipc_publisher) != 0) {
-                    igsagent_error (agent,
-                                     "Could not publish output %s using IPC\n",
-                                     iop->name);
-                    zmsg_destroy (&msg_bis);
+                if (zsock_send (core_context->ipc_publisher, "m", msg) != 0) {
+                    igsagent_error (agent, "Could not publish output %s using IPC\n", iop->name);
+                    zmsg_destroy (&msg);
                     result = IGS_FAILURE;
                 }
             }
             // 3- publish to inproc
             if (core_context->inproc_publisher) {
-                if (zmsg_send (&msg_ter, core_context->inproc_publisher) != 0) {
-                    igsagent_error (
-                      agent, "Could not publish output %s using inproc\n",
-                      iop->name);
-                    zmsg_destroy (&msg_ter);
+                if (zsock_send (core_context->inproc_publisher, "m", msg) != 0) {
+                    igsagent_error (agent, "Could not publish output %s using inproc\n", iop->name);
+                    zmsg_destroy (&msg);
                     result = IGS_FAILURE;
                 }
             }
-        }
-        else {
-            zmsg_destroy (&msg);
-            igsagent_warn (
-              agent,
-              "agent not started : could not publish output %s to the "
-              "network (published to agents in same process only)",
-              iop->name);
+        } else {
+            igsagent_warn (agent, "agent not started : could not publish output %s to the "
+                           "network (published to agents in same process only)", iop->name);
         }
         // 4- distribute publication message to other agents inside our context
         // without using the network
         if (!agent->is_virtual) {
-            free (zmsg_popstr (msg_quater)); // remove composite uuid/iop name
-            zmsg_pushstr (msg_quater,
-                          iop->name); // replace it by simple iop name
+            free (zmsg_popstr (msg)); // remove composite uuid/iop name from message
+            zmsg_pushstr (msg, iop->name); // replace it by simple iop name
             // Generate a temporary fake remote agent, containing only
-            // necessary information for s_handle_publication_from_remote_agent.
+            // necessary information for s_handle_publication.
             igs_remote_agent_t *fake_remote = (igs_remote_agent_t *) zmalloc (sizeof (igs_remote_agent_t));
             fake_remote->context = core_context;
             fake_remote->definition = (igs_definition_t *) zmalloc (sizeof (igs_definition_t));
             fake_remote->definition->name = agent->definition->name;
-            model_read_write_unlock (__FUNCTION__, __LINE__); // to avoid deadlock inside s_handle_publication_from_remote_agent
-            s_handle_publication_from_remote_agent (msg_quater, fake_remote);
+            model_read_write_unlock (__FUNCTION__, __LINE__); // to avoid deadlock inside s_handle_publication
+            s_handle_publication (&msg, fake_remote);
             free (fake_remote->definition);
             free (fake_remote);
         }
-        else
+        else {
             model_read_write_unlock (__FUNCTION__, __LINE__);
-        zmsg_destroy (&msg_quater);
-    }
-    else {
+            zmsg_destroy (&msg);
+        }
+    } else {
         if (agent->is_whole_agent_muted)
             igsagent_debug (
               agent, "Should publish output %s but the agent has been muted",
@@ -4876,6 +4852,14 @@ zsock_t *igs_pipe_to_ingescape (void)
         igs_warn ("ingescape is not started yet");
         return NULL;
     }
+}
+
+zsock_t * igs_pipe_inside_ingescape(void)
+{
+    core_init_context ();
+    if (!core_context->internal_pipe)
+        igs_warn ("ingescape is not started yet");
+    return core_context->internal_pipe;
 }
 
 int igs_timer_start (size_t delay, size_t times, igs_timer_fn cb, void *my_data)

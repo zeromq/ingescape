@@ -41,27 +41,32 @@ int ingescapeSentMessage(zloop_t *loop, zsock_t *reader, void *arg){
     if (streq(message, "LOOP_STOPPED")){
         igs_info("LOOP_STOPPED received in main app");
         return -1;
-    }else{
+    }else
         return 0;
-    }
 }
 
 int runAutoTests(zloop_t *loop, int timer_id, void *arg){
     IGS_UNUSED(loop)
     IGS_UNUSED(timer_id)
     IGS_UNUSED(arg)
-    igs_info("starting autotests");
-    zclock_sleep(1500);
-    igs_channel_whisper_str("tester", "starting autotests");
-    zclock_sleep(100);
+    zclock_sleep(1000);
+    igs_fatal("starting autotests");
+    igs_channel_whisper_str("tester", "%s", "starting autotests");
+    zclock_sleep(250);
+    igs_fatal("start publish tests");
     publishCommandSparing();
+    igs_fatal("end publish tests");
     zclock_sleep(250);
+    igs_fatal("start services tests");
     servicesCommandSparing();
+    igs_fatal("end services tests");
     zclock_sleep(250);
+    igs_fatal("start channels tests");
     channelsCommandSparing();
+    igs_fatal("end channels tests");
+    igs_fatal("autotests completed, stopping tester remotely");
     zclock_sleep(250);
     igs_channel_whisper_str("tester", "STOP_PEER");
-    igs_info("autotests completed");
     return -1;
 }
 
@@ -71,7 +76,7 @@ void agentEvents(igs_agent_event_t event, const char *uuid, const char *name, vo
     IGS_UNUSED(myCbData)
     igs_info("%s - %d", name, event);
     if (streq(name, "tester") && event == IGS_AGENT_KNOWS_US){
-        igs_info("starting auto tests with %s", name);
+        igs_fatal("starting auto tests with %s", name);
         zsock_signal(toMainThreadPipe, 0);
     }
 }
@@ -80,8 +85,8 @@ void agentEvents(igs_agent_event_t event, const char *uuid, const char *name, vo
 // MAIN & OPTIONS & COMMAND INTERPRETER
 //
 int main(int argc, const char * argv[]) {
-    myData = malloc(32);
-    myOtherData = malloc(64);
+    myData = calloc(32, sizeof(char));
+    myOtherData = calloc(64, sizeof(char));
 
     //manage options
     int opt = 0;
@@ -137,9 +142,12 @@ int main(int argc, const char * argv[]) {
 
     igs_agent_set_name(p_agentName);
 
-    igs_log_set_console(verbose);
+    igs_log_set_console(true);
     igs_log_set_file(true, NULL);
-    igs_log_set_console_level(IGS_LOG_TRACE);
+    if (verbose)
+        igs_log_set_console_level(IGS_LOG_TRACE);
+    else
+        igs_log_set_console_level(IGS_LOG_FATAL);
     igs_definition_set_description("One example for each type of IOP and call");
     igs_definition_set_version("1.0");
     igs_input_create("sparing_impulsion", IGS_IMPULSION_T, NULL, 0);
@@ -181,7 +189,11 @@ int main(int argc, const char * argv[]) {
     igs_mapping_add("sparing_string", "testAgent", "my_string");
     igs_mapping_add("sparing_data", "testAgent", "my_data");
 
-    igs_observe_channels(myChannelsCallback, NULL);
+    //igs_rt_set_timestamps(true);
+    //igs_rt_set_time(12);
+    
+    if (verbose)
+        igs_observe_channels(myChannelsCallback, NULL);
     
     if (staticTests)
         exit(EXIT_SUCCESS);
@@ -191,9 +203,6 @@ int main(int argc, const char * argv[]) {
 
     //mainloop management (two modes)
     if (!interactiveloop) {
-        //Run the main loop (non-interactive mode):
-        //we rely on CZMQ which is an ingeScape dependency and is thus
-        //always here.
         zloop_t *loop = zloop_new();
         zsock_t *pipe = igs_pipe_to_ingescape();
         zloop_reader(loop, pipe, ingescapeSentMessage, NULL);
@@ -203,7 +212,7 @@ int main(int argc, const char * argv[]) {
             mainThreadPipe = zsock_new(ZMQ_PAIR);
             zsock_attach(mainThreadPipe, endpoint, true);
             toMainThreadPipe = zsock_new_pair(endpoint);
-            igs_info("waiting for tester");
+            igs_fatal("waiting for tester");
             zsock_wait(mainThreadPipe); //wait for signal triggered in agentEvents
             zloop_timer(loop, 100, 1, runAutoTests, NULL);
         }
