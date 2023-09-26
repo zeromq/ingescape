@@ -487,17 +487,17 @@ INGESCAPE_EXPORT void definition_free_constraint (igs_constraint_t **constraint)
 
 // mapping
 INGESCAPE_EXPORT void mapping_free_mapping (igs_mapping_t **map);
-igs_map_t* mapping_create_mapping_element(const char * from_input,
+INGESCAPE_EXPORT igs_map_t* mapping_create_mapping_element(const char * from_input,
                                           const char *to_agent,
                                           const char* to_output);
 INGESCAPE_EXPORT bool mapping_is_equal(const char *first_str, const char *second_str);
 
-uint64_t s_djb2_hash (unsigned char *str);
+INGESCAPE_EXPORT uint64_t s_djb2_hash (unsigned char *str);
 bool mapping_check_input_output_compatibility(igsagent_t *agent, igs_iop_t *found_input, igs_iop_t *found_output);
 
 // split
-void split_free_split_element (igs_split_t **split_elmt);
-igs_split_t* split_create_split_element(const char * from_input,
+INGESCAPE_EXPORT void split_free_split_element (igs_split_t **split_elmt);
+INGESCAPE_EXPORT igs_split_t* split_create_split_element(const char * from_input,
                                         const char *to_agent,
                                         const char* to_output);
 void split_add_work_to_queue(igs_core_context_t *context, char* agent_uuid, const igs_iop_t *output);
