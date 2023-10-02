@@ -694,7 +694,7 @@ build-deb-packages:
     - umask 022
     - echo "Push to repo"
     - ssh -i ssh_secret ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST} echo Connected
-    - rsync --rsh="ssh -i ssh_secret" debian_x64/ingescape-dev*.deb ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST}:/home/ingescape/domains/repository.ingescape.com/public_html/debian/pool/main
+    - rsync --rsh="ssh -i ssh_secret" debian_x64/ingescape*.deb ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST}:/home/ingescape/domains/repository.ingescape.com/public_html/debian/pool/main
     - ssh -i ssh_secret ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST} /home/ingescape/domains/repository.ingescape.com/refresh_deb_repo.sh
   dependencies: []
   needs: []
