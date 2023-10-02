@@ -887,6 +887,7 @@ deploy-node-js:
   script:
     - echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" > ~/.npmrc
     - cd bindings/javascript-node
+    - ./prepare_version.sh
     - npm publish
   dependencies:
     - binding-node-js-macos
