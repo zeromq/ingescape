@@ -37,7 +37,7 @@ done
   IGS_MINOR=$(grep "#define INGESCAPE_VERSION_MINOR" ../../include/ingescape.h | cut -d' ' -f3)
   IGS_PATCH=$(grep "#define INGESCAPE_VERSION_PATCH" ../../include/ingescape.h | cut -d' ' -f3)
 
-  sed -i .orig "s/\"version\": \".*\",/\"version\": \"$IGS_MAJOR.$IGS_MINOR.$IGS_PATCH\",/" package.json
+  sed -i.orig "s/\"version\": \".*\",/\"version\": \"$IGS_MAJOR.$IGS_MINOR.$IGS_PATCH\",/" package.json
   cat package.json
 )
 
