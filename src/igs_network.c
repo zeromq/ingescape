@@ -4901,6 +4901,7 @@ void igs_timer_stop (int timer_id)
         zloop_timer_end (core_context->loop, timer_id);
         HASH_DEL (core_context->timers, timer);
         free (timer);
+        timer = NULL;
     }
     else
         igs_error ("could not find timer with id %d", timer_id);
