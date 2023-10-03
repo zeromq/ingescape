@@ -1,0 +1,11 @@
+#   ****  Generated on 2021-05-10 15:34:20 by CZMQ  ****
+#   ZeroMQ CURVE Public Certificate
+#   Exchange securely, or use a secure mechanism to verify the contents
+#   of this file after exchange. Store public certificates in your home
+#   directory, in the .curve subdirectory.
+
+metadata
+    date-created = "2021-05-10 15:34:20"
+    created-by = "CZMQ zmakecert"
+curve
+    public-key = "TVwAV!3=wY+D2GvkQt6Ug/f}QaFa?d5aT$E7HbAr"
