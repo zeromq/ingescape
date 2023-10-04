@@ -1058,40 +1058,40 @@ char *parser_export_definition (igs_definition_t *def)
         }
         igs_json_add_string (json, STR_TYPE);
         igs_json_add_string (json, s_value_type_to_string (iop->value_type));
-        igs_json_add_string (json, STR_VALUE);
-        switch (iop->value_type) {
-            case IGS_INTEGER_T:
-                igs_json_add_int (json, iop->value.i);
-                break;
-            case IGS_DOUBLE_T:
-                igs_json_add_double (json, iop->value.d);
-                break;
-            case IGS_BOOL_T:
-                igs_json_add_bool (json, iop->value.b);
-                break;
-            case IGS_STRING_T:
-                igs_json_add_string (json, iop->value.s);
-                break;
-            case IGS_IMPULSION_T:
-                igs_json_add_null (json);
-                break;
-            case IGS_DATA_T: {
-                if (iop->value_size){
-                    char *data_to_store = (char *) zmalloc ((2 * iop->value_size + 1) * sizeof (char));
-                    for (size_t i = 0; i < iop->value_size; i++)
-                        sprintf (data_to_store + 2 * i, "%02X",
-                                 *((uint8_t *) ((char *) iop->value.data + i)));
-                    igs_json_add_string (json, data_to_store);
-                    free (data_to_store);
-                }else{
-                    igs_json_add_null(json);
-                }
-                break;
-            }
-            default:
-                igs_json_add_string (json, "");
-                break;
-        }
+//        igs_json_add_string (json, STR_VALUE);
+//        switch (iop->value_type) {
+//            case IGS_INTEGER_T:
+//                igs_json_add_int (json, iop->value.i);
+//                break;
+//            case IGS_DOUBLE_T:
+//                igs_json_add_double (json, iop->value.d);
+//                break;
+//            case IGS_BOOL_T:
+//                igs_json_add_bool (json, iop->value.b);
+//                break;
+//            case IGS_STRING_T:
+//                igs_json_add_string (json, iop->value.s);
+//                break;
+//            case IGS_IMPULSION_T:
+//                igs_json_add_null (json);
+//                break;
+//            case IGS_DATA_T: {
+//                if (iop->value_size){
+//                    char *data_to_store = (char *) zmalloc ((2 * iop->value_size + 1) * sizeof (char));
+//                    for (size_t i = 0; i < iop->value_size; i++)
+//                        sprintf (data_to_store + 2 * i, "%02X",
+//                                 *((uint8_t *) ((char *) iop->value.data + i)));
+//                    igs_json_add_string (json, data_to_store);
+//                    free (data_to_store);
+//                }else{
+//                    igs_json_add_null(json);
+//                }
+//                break;
+//            }
+//            default:
+//                igs_json_add_string (json, "");
+//                break;
+//        }
         char constraint_expression[IGS_MAX_LOG_LENGTH] = "";
         if (iop->constraint){
             if (iop->constraint->type == IGS_CONSTRAINT_MIN){
