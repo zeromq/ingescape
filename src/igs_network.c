@@ -3672,9 +3672,12 @@ int network_timer_callback (zloop_t *loop, int timer_id, void *arg)
     IGS_UNUSED (timer_id)
     igs_timer_t *timer = (igs_timer_t *) arg;
     s_network_lock ();
-    if (timer != NULL)
+    if (timer != NULL){
+        s_network_unlock (); //unlock to allow user callback to use other igs methods
         timer->cb (timer->timer_id, timer->my_data);
-    s_network_unlock ();
+    }
+    else
+        s_network_unlock ();
     return 1;
 }
 
