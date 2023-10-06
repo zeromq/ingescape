@@ -81,6 +81,22 @@ igs.log_set_syslog(False)
 assert igs.version() > 0
 assert igs.protocol() >= 2
 
+print ("[Global API] Security")
+print ("Test certificates are in the tests/security directory")
+print ("Wrong path")
+assert igs.enable_security("/does/not/exist", "/does/not/exist") == igs.FAILURE
+print ("Wrong parameter types")
+try:
+    igs.enable_security(42, None) == igs.FAILURE
+    assert False, "An exception must be thrown"
+except:
+    pass
+print ("OK path")
+assert igs.enable_security("./security/private.cert_secret", "./security") == igs.SUCCESS
+print ("Disable security")
+assert igs.disable_security() == igs.SUCCESS
+print ("OK")
+
 assert not igs.mapping_outputs_request()
 igs.mapping_set_outputs_request(True)
 assert igs.mapping_outputs_request()

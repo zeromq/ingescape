@@ -249,7 +249,7 @@ PyObject * igs_enable_security_wrapper(PyObject *self, PyObject *args, PyObject 
     static char *kwlist[] = {"private_certificate_file", "public_certificates_directory",  NULL};
     char *private_certificate_file = NULL;
     char *public_certificates_directory = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &private_certificate_file, &public_certificates_directory))
+    if (!PyArg_ParseTupleAndKeywords(args, NULL, "ss", kwlist, &private_certificate_file, &public_certificates_directory))
         return NULL;
     return PyLong_FromLong(igs_enable_security(private_certificate_file, public_certificates_directory));
 }

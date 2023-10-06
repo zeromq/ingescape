@@ -694,7 +694,7 @@ build-deb-packages:
     - umask 022
     - echo "Push to repo"
     - ssh -i ssh_secret ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST} echo Connected
-    - rsync --rsh="ssh -i ssh_secret" debian_x64/ingescape-dev*.deb ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST}:/home/ingescape/domains/repository.ingescape.com/public_html/debian/pool/main
+    - rsync --rsh="ssh -i ssh_secret" debian_x64/ingescape*.deb ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST}:/home/ingescape/domains/repository.ingescape.com/public_html/debian/pool/main
     - ssh -i ssh_secret ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST} /home/ingescape/domains/repository.ingescape.com/refresh_deb_repo.sh
   dependencies: []
   needs: []
@@ -757,6 +757,7 @@ binding-node-js-macos:
     - cp -r ../../dependencies/libzmq/include/* ./dependencies/include
     - cp -r ../../dependencies/sodium/src/libsodium/include/* ./dependencies/include
     - cp -r ../../dependencies/zyre/include/* ./dependencies/include
+    - ./prepare_version.sh
     - sed -i .bak 's@/usr/local@<!(echo $PWD)/dependencies@g' binding.gyp #update file paths for igs
     - cat ./binding.gyp
     - npm install -g prebuildify
@@ -788,6 +789,7 @@ binding-node-js-linux:
     - cp -r ../../dependencies/libzmq/include/* ./dependencies/include
     - cp -r ../../dependencies/sodium/src/libsodium/include/* ./dependencies/include
     - cp -r ../../dependencies/zyre/include/* ./dependencies/include
+    - ./prepare_version.sh
     - sed -i.bak 's@/usr/local@<!(echo $PWD)/dependencies@g' binding.gyp #update file paths for igs
     - cat ./binding.gyp
     - npm install -g prebuildify
@@ -821,6 +823,7 @@ binding-node-js-windows:
     - Xcopy ..\..\dependencies\sodium\src\libsodium\include .\dependencies\windows\include\ /E /y
     - Xcopy ..\..\dependencies\zyre\include .\dependencies\windows\include\ /E /y
     - $CORRECT_PWD = $PWD -replace "\\", "\\"
+    - ./prepare_version.ps1
     - (Get-Content -path .\binding.gyp -Raw) -replace 'C:\\\\Program Files\\\\ingescape\\\\library',"$CORRECT_PWD\\dependencies\\windows" | Set-Content .\binding.gyp #update file paths for igs
     - npm install -g prebuildify
     - if (Test-Path C:\Users\admin\AppData\Local\Temp\prebuildify) { Remove-Item C:\Users\admin\AppData\Local\Temp\prebuildify -Force -Recurse } #To force prebuildify to re-upload its temporary cache
@@ -884,6 +887,7 @@ deploy-node-js:
   script:
     - echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" > ~/.npmrc
     - cd bindings/javascript-node
+    - ./prepare_version.sh
     - npm publish
   dependencies:
     - binding-node-js-macos
