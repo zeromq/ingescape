@@ -602,10 +602,10 @@ namespace Tester
             Assert.IsTrue(Igs.OutputType("my_data") == IopValueType.Data);
             Assert.IsTrue(Igs.OutputExists("my_data"));
             Assert.IsTrue(!Igs.OutputBool("my_bool"));
-            Assert.IsTrue(Igs.OutputInt("my_int") == 2);
-            Assert.IsTrue(Igs.OutputDouble("my_double") - 2.0 < 0.000001);
+            Assert.IsTrue(Igs.OutputInt("my_int") == 0);
+            Assert.IsTrue(Igs.OutputDouble("my_double") == 0.0);
             outputString = Igs.OutputString("my_string");
-            Assert.AreEqual(outputString, "new string");
+            Assert.AreEqual(outputString, "");
             Assert.IsTrue(Igs.OutputData("my_data").Length == 0);
             listOfStrings = Igs.ParameterList();
             Assert.IsTrue(listOfStrings != null && listOfStrings.Length == 6);
@@ -624,10 +624,10 @@ namespace Tester
             Assert.IsTrue(Igs.ParameterType("my_data") == IopValueType.Data);
             Assert.IsTrue(Igs.ParameterExists("my_data"));
             Assert.IsTrue(!Igs.ParameterBool("my_bool"));
-            Assert.IsTrue(Igs.ParameterInt("my_int") == 2);
-            Assert.IsTrue(Igs.ParameterDouble("my_double") - 2.0 < 0.000001);
+            Assert.IsTrue(Igs.ParameterInt("my_int") == 0);
+            Assert.IsTrue(Igs.ParameterDouble("my_double") == 0);
             parameterString = Igs.ParameterString("my_string");
-            Assert.AreEqual(parameterString, "new string");
+            Assert.AreEqual(parameterString, "");
             parameterString = null;
             Assert.IsTrue(Igs.ParameterData("my_data").Length == 0);
             Igs.ClearDefinition();
@@ -670,10 +670,10 @@ namespace Tester
             Assert.IsTrue(Igs.OutputType("my_data") == IopValueType.Data);
             Assert.IsTrue(Igs.OutputExists("my_data"));
             Assert.IsTrue(!Igs.OutputBool("my_bool"));
-            Assert.IsTrue(Igs.OutputInt("my_int") == 2);
-            Assert.IsTrue(Igs.OutputDouble("my_double") - 2.0 < 0.000001);
+            Assert.IsTrue(Igs.OutputInt("my_int") == 0);
+            Assert.IsTrue(Igs.OutputDouble("my_double") == 0);
             outputString = Igs.OutputString("my_string");
-            Assert.AreEqual(outputString, "new string");
+            Assert.AreEqual(outputString, "");
             outputString = null;
             data = null;
             Assert.IsTrue(Igs.OutputData("my_data").Length == 0);
@@ -695,10 +695,10 @@ namespace Tester
             Assert.IsTrue(Igs.ParameterType("my_data") == IopValueType.Data);
             Assert.IsTrue(Igs.ParameterExists("my_data"));
             Assert.IsTrue(!Igs.ParameterBool("my_bool"));
-            Assert.IsTrue(Igs.ParameterInt("my_int") == 2);
-            Assert.IsTrue(Igs.ParameterDouble("my_double") - 2.0 < 0.000001);
+            Assert.IsTrue(Igs.ParameterInt("my_int") == 0);
+            Assert.IsTrue(Igs.ParameterDouble("my_double") == 0);
             parameterString = Igs.ParameterString("my_string");
-            Assert.AreEqual(parameterString, "new string");
+            Assert.AreEqual(parameterString, "");
             parameterString = null;
             data = null;
             Assert.IsTrue(Igs.ParameterData("my_data").Length == 0);
@@ -1405,6 +1405,15 @@ namespace Tester
 
             FirstAgent.Destroy();
             SecondAgent.Destroy();
+
+            Igs.RtSetTimestamps(true);
+            Assert.IsTrue(Igs.RtTimestamps());
+            Assert.IsTrue(Igs.RtGetCurrentTimestamp() == 0);
+
+            Igs.RtSetTimestamps(false);
+            Igs.RtSetTime(1000);
+            Igs.RtSetTimestamps(true);
+            Assert.IsTrue(Igs.RtTime() == 1000);
         }
 
         [TestCleanup]
