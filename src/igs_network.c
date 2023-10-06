@@ -138,7 +138,7 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
     for (i = 0; i < msg_size; i += 3) {
         // Each message part must contain 3 elements
         // 1 : output name
-        // 2 : output iopt_type
+        // 2 : output value type
         // 3 : value of the output as a string or zframe or timestamped bundle
         output = zmsg_popstr (*msg);
         if (output == NULL) {
@@ -871,7 +871,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             char *definition_str = NULL;
             char *mapping_str = NULL;
             HASH_ITER (hh, context->agents, agent, tmp){
-                // definition is sent to every newcomer on the channel (whether it is a
+                // definition is sent to every newcomer on the channel (wether it is a
                 // ingescape agent or not)
                 if (zyre_peer->protocol
                     && (streq (zyre_peer->protocol, "v2")
@@ -1447,50 +1447,31 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     switch (current->value_type) {
                         case IGS_INTEGER_T:
                             zmsg_addstr (msg_to_send, current->name);
-                            zmsg_addstrf (msg_to_send, "%d",
-                                          current->value_type);
-                            zmsg_addmem (msg_to_send, &(current->value.i),
-                                         sizeof (int));
+                            zmsg_addstrf(msg_to_send,"%d", current->value_type);
+                            zmsg_addmem (msg_to_send, &(current->value.i), sizeof (int));
                             break;
                         case IGS_DOUBLE_T:
                             zmsg_addstr (msg_to_send, current->name);
-                            zmsg_addstrf (msg_to_send, "%d",
-                                          current->value_type);
-                            zmsg_addmem (msg_to_send, &(current->value.d),
-                                         sizeof (double));
+                            zmsg_addstrf(msg_to_send,"%d", current->value_type);
+                            zmsg_addmem (msg_to_send, &(current->value.d), sizeof (double));
                             break;
                         case IGS_STRING_T:
                             zmsg_addstr (msg_to_send, current->name);
-                            zmsg_addstrf (msg_to_send, "%d",
-                                          current->value_type);
+                            zmsg_addstrf(msg_to_send,"%d", current->value_type);
                             zmsg_addstr (msg_to_send, current->value.s);
                             break;
                         case IGS_BOOL_T:
                             zmsg_addstr (msg_to_send, current->name);
-                            zmsg_addstrf (msg_to_send, "%d",
-                                          current->value_type);
-                            zmsg_addmem (msg_to_send, &(current->value.b),
-                                         sizeof (bool));
+                            zmsg_addstrf(msg_to_send,"%d", current->value_type);
+                            zmsg_addmem (msg_to_send, &(current->value.b), sizeof (bool));
                             break;
                         case IGS_IMPULSION_T:
-                            // FIXME: we had to disable outputs sending for data and impulsions
-                            // but this is not consistent with inputs and parameters disabled
-                            //                                    zmsg_addstr(msg_to_send,
-                            //                                    found_iop->name);
-                            //                                    zmsg_addstrf(msg_to_send,
-                            //                                    "%d", found_iop->value_type);
-                            //                                    zmsg_addmem(msg_to_send, NULL,
-                            //                                    0);
+                            // sending impulsions a posteriori does not make sense : skipping
                             break;
                         case IGS_DATA_T:
-                            // disabled
-                            //                                    zmsg_addstr(msg_to_send,
-                            //                                    found_iop->name);
-                            //                                    zmsg_addstrf(msg_to_send,
-                            //                                    "%d", found_iop->value_type);
-                            //                                    zmsg_addmem(msg_to_send,
-                            //                                    (found_iop->value.data),
-                            //                                    found_iop->value_size);
+                            zmsg_addstr(msg_to_send, current->name);
+                            zmsg_addstrf(msg_to_send,"%d", current->value_type);
+                            zmsg_addmem(msg_to_send, current->value.data, current->value_size);
                             break;
 
                         default:
@@ -1499,7 +1480,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 }
                 model_read_write_unlock (__FUNCTION__, __LINE__);
                 s_lock_zyre_peer (__FUNCTION__, __LINE__);
-                igs_debug ("send output values to %s", peerUUID);
+                igs_debug ("send output values privately to %s", peerUUID);
                 zyre_whisper (node, peerUUID, &msg_to_send);
                 s_unlock_zyre_peer (__FUNCTION__, __LINE__);
                 free (uuid);

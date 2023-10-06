@@ -1097,7 +1097,10 @@ char *s_model_read_iop_as_string (igsagent_t *agent,
     }
     switch (iop->value_type) {
         case IGS_STRING_T:
-            res = strdup (iop->value.s);
+            if (iop->value.s)
+                res = strdup (iop->value.s);
+            else
+                res = NULL;
             return res;
         case IGS_BOOL_T:
             igsagent_warn (
