@@ -1405,6 +1405,15 @@ namespace Tester
 
             FirstAgent.Destroy();
             SecondAgent.Destroy();
+
+            Igs.RtSetTimestamps(true);
+            Assert.IsTrue(Igs.RtTimestamps());
+            Assert.IsTrue(Igs.RtGetCurrentTimestamp() == 0);
+
+            Igs.RtSetTimestamps(false);
+            Igs.RtSetTime(1000);
+            Igs.RtSetTimestamps(true);
+            Assert.IsTrue(Igs.RtTime() == 1000);
         }
 
         [TestCleanup]
