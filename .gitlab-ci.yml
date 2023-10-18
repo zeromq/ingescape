@@ -761,7 +761,8 @@ binding-node-js-macos:
     - sed -i .bak 's@/usr/local@<!(echo $PWD)/dependencies@g' binding.gyp #update file paths for igs
     - cat ./binding.gyp
     - npm install -g prebuildify
-    - npm run build --from_sources=1
+    - prebuildify --napi --arch x64
+    - prebuildify --napi --arch arm64
   artifacts:
     paths:
       - bindings/javascript-node/prebuilds
