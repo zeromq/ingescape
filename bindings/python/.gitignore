@@ -5,3 +5,5 @@ venv/
 
 .*.swp
 setup.py
+pyproject.toml
+dependencies
