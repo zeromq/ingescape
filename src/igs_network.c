@@ -1458,7 +1458,10 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                         case IGS_STRING_T:
                             zmsg_addstr (msg_to_send, current->name);
                             zmsg_addstrf(msg_to_send,"%d", current->value_type);
-                            zmsg_addstr (msg_to_send, current->value.s);
+                            if (current->value.s)
+                                zmsg_addstr (msg_to_send, current->value.s);
+                            else
+                                zmsg_addstr (msg_to_send, "");
                             break;
                         case IGS_BOOL_T:
                             zmsg_addstr (msg_to_send, current->name);
