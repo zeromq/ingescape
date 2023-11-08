@@ -2107,8 +2107,10 @@ int main(int argc, const char * argv[]) {
         }
     }
 
-    igsagent_destroy(&secondAgent);
-    igsagent_destroy(&firstAgent);
+    if (secondAgent)
+        igsagent_destroy(&secondAgent);
+    if (firstAgent)
+        igsagent_destroy(&firstAgent);
     igs_stop();
 
     return EXIT_SUCCESS;

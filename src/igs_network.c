@@ -3109,7 +3109,6 @@ void s_init_loop (igs_core_context_t *context)
     s_network_lock ();
 
     context->external_stop = false;
-    bool can_continue = true;
     // prepare zyre
     s_lock_zyre_peer (__FUNCTION__, __LINE__);
     context->node = zyre_new (core_agent->definition->name);
@@ -3262,31 +3261,32 @@ void s_init_loop (igs_core_context_t *context)
 
     // start ipc publisher
 #if defined(__UNIX__) && !defined(__UTYPE_IOS)
-    if (context->network_ipc_folder_path == NULL)
+    if (!context->network_ipc_folder_path)
         context->network_ipc_folder_path = strdup (IGS_DEFAULT_IPC_FOLDER_PATH);
 
     if (!zsys_file_exists (context->network_ipc_folder_path)) {
         zsys_dir_create ("%s", context->network_ipc_folder_path);
         if (!zsys_file_exists (context->network_ipc_folder_path)) {
-            igs_error ("could not create ipc folder path '%s'",
+            igs_fatal ("could not create ipc folder path '%s'",
                        context->network_ipc_folder_path);
-            can_continue = false;
+            return;
         }
     }
     s_lock_zyre_peer (__FUNCTION__, __LINE__);
-    context->network_ipc_full_path =
-      (char *) zmalloc (strlen (context->network_ipc_folder_path)
-                        + strlen (zyre_uuid (context->node)) + 2);
+    context->network_ipc_full_path = (char *) zmalloc (strlen (context->network_ipc_folder_path)
+                                                       + strlen (zyre_uuid (context->node)) + 2);
     sprintf (context->network_ipc_full_path, "%s/%s",
              context->network_ipc_folder_path, zyre_uuid (context->node));
-    context->network_ipc_endpoint =
-      (char *) zmalloc (strlen (context->network_ipc_folder_path)
-                        + strlen (zyre_uuid (context->node)) + 8);
+    context->network_ipc_endpoint = (char *) zmalloc (strlen (context->network_ipc_folder_path)
+                                                      + strlen (zyre_uuid (context->node)) + 8);
     sprintf (context->network_ipc_endpoint, "ipc://%s/%s",
              context->network_ipc_folder_path, zyre_uuid (context->node));
     s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     context->ipc_publisher = zsock_new_pub (context->network_ipc_endpoint);
-    assert (context->ipc_publisher);
+    if (!context->ipc_publisher){
+        igs_fatal("could not open ipc socket at %s, the ingescape agent will NOT start.", context->network_ipc_endpoint);
+        return;
+    }
     if (context->security_is_enabled) {
         zcert_apply (context->security_cert, context->ipc_publisher);
         zsock_set_curve_server (context->ipc_publisher, 1);
@@ -3298,9 +3298,11 @@ void s_init_loop (igs_core_context_t *context)
 
 #elif defined(__WINDOWS__)
     context->network_ipc_endpoint = strdup ("tcp://127.0.0.1:*");
-    zsock_t *ipc_publisher = context->ipc_publisher =
-      zsock_new_pub (context->network_ipc_endpoint);
-    assert (context->ipc_publisher);
+    zsock_t *ipc_publisher = context->ipc_publisher = zsock_new_pub (context->network_ipc_endpoint);
+    if (!context->ipc_publisher){
+        igs_fatal("could not open ipc socket at %s, aborting.", context->network_ipc_endpoint);
+        return;
+    }
     if (context->security_is_enabled) {
         zcert_apply (context->security_cert, context->ipc_publisher);
         zsock_set_curve_server (context->ipc_publisher, 1);
@@ -3438,8 +3440,7 @@ void s_init_loop (igs_core_context_t *context)
     s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     s_network_unlock ();
 
-    if (can_continue)
-        context->network_actor = zactor_new (s_run_loop, context);
+    context->network_actor = zactor_new (s_run_loop, context);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3730,8 +3731,10 @@ igs_result_t igs_start_with_device (const char *network_device,
     }
     core_context->network_zyre_port = port;
     s_init_loop (core_context);
-    assert (core_context->network_actor);
-    return IGS_SUCCESS;
+    if (core_context->network_actor)
+        return IGS_SUCCESS;
+    else
+        return IGS_FAILURE;
 }
 
 igs_result_t igs_start_with_ip (const char *ip_address, unsigned int port)
@@ -4724,16 +4727,24 @@ void igs_set_ipc_dir (const char *path)
     if (core_context->network_ipc_folder_path == NULL
         || !streq (path, core_context->network_ipc_folder_path)) {
         if (*path == '/') {
-            if (core_context->network_ipc_folder_path)
-                free (core_context->network_ipc_folder_path);
+            bool folder_is_ok = true;
             if (!zsys_file_exists (path)) {
                 igs_info ("folder %s was created automatically", path);
-                zsys_dir_create ("%s", path);
+                int res = zsys_dir_create ("%s", path);
+                if (res < 0){
+                    igs_error ("could not create %s", path);
+                    folder_is_ok = false;
+                }
             }
-            core_context->network_ipc_folder_path = strdup (path);
-        }
-        else
-            igs_error ("IPC folder path must be absolute");
+            if (folder_is_ok) {
+                if (core_context->network_ipc_folder_path)
+                    free (core_context->network_ipc_folder_path);
+                core_context->network_ipc_folder_path = strdup (path);
+            } else if (core_context->network_ipc_folder_path)
+                igs_error ("IPC dir remains set to %s", core_context->network_ipc_folder_path);
+                
+        }else
+            igs_error ("IPC folder path must be absolute (invalid path: %s)", path);
     }
 }
 

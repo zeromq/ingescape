@@ -815,7 +815,7 @@ INGESCAPE_EXPORT void igs_mapping_save(void);
  • On Microsoft Windows systems, the loopback is used.
  Advanced transports are allowed by default and can be disabled
  using igs_set_ipc.*/
-INGESCAPE_EXPORT void igs_set_ipc(bool allow);
+INGESCAPE_EXPORT void igs_set_ipc(bool allow); //default is true
 INGESCAPE_EXPORT bool igs_has_ipc(void);
 #if defined (__UNIX__)
 //set IPC folder path on UNIX systems (default is /tmp/ingescape/)
