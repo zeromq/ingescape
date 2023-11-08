@@ -2596,20 +2596,42 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                                                                               service->arguments,
                                                                               msg_duplicate) == IGS_SUCCESS) {
                                 callee_agent->rt_current_timestamp_microseconds = INT64_MIN;
+                                bool rest_of_the_message_is_ok = true;
                                 if (zmsg_size(msg_duplicate) >= 1){ //we still have the timestamp to handle
+                                    /*
+                                     We test >= 1 to be retro-compatible with future possible extensions of the protocol.
+                                     In the situation when a caller calls with erroneous additional arguments, we won't
+                                     be able to detect these additionnal arguments if the first erroneous additional
+                                     argument has a 64 bits size. In this particular case, the first erroneous additional
+                                     argument will be interpreted as a timestamp for the service call. In any other cases,
+                                     we will log an error.
+                                     This limitation is introduced because, on the caller side, we may not know the details
+                                     of a service, especially if ingescape proxies are involved, and we may allow additional
+                                     arguments without the possibility to block the call at its source.
+                                     NB: if arguments are missing, the call to service_add_values_to_arguments_from_message
+                                     here above will also reject the call.
+                                     */
                                     zframe_t *timestamp_f = zmsg_pop(msg_duplicate);
                                     assert(timestamp_f);
-                                    assert(zframe_size(timestamp_f) == sizeof(int64_t));
-                                    callee_agent->rt_current_timestamp_microseconds = *((int64_t*)zframe_data(timestamp_f));
-                                    zframe_destroy(&timestamp_f);
+                                    if (zframe_size(timestamp_f) == sizeof(int64_t)){
+                                        callee_agent->rt_current_timestamp_microseconds = *((int64_t*)zframe_data(timestamp_f));
+                                        zframe_destroy(&timestamp_f);
+                                    } else {
+                                        igsagent_error (callee_agent,
+                                                        "received data is corrupted and will be ignored for service %s called from %s(%s)",
+                                                        service_name, caller_name, caller_uuid);
+                                        rest_of_the_message_is_ok = false;
+                                    }
                                 }
-                                if (core_context->enable_service_logging)
-                                    service_log_received_service (callee_agent, caller_name, caller_uuid, service_name,
-                                                                  service->arguments, callee_agent->rt_current_timestamp_microseconds);
-                                (service->cb) (callee_agent, caller_name,
-                                               caller_uuid, service_name,
-                                               service->arguments, nb_args,
-                                               token, service->cb_data);
+                                if (rest_of_the_message_is_ok) {
+                                    if (core_context->enable_service_logging)
+                                        service_log_received_service (callee_agent, caller_name, caller_uuid, service_name,
+                                                                      service->arguments, callee_agent->rt_current_timestamp_microseconds);
+                                    (service->cb) (callee_agent, caller_name,
+                                                   caller_uuid, service_name,
+                                                   service->arguments, nb_args,
+                                                   token, service->cb_data);
+                                }
                                 service_free_values_in_arguments (service->arguments);
                                 callee_agent->rt_current_timestamp_microseconds = INT64_MIN;
                             }

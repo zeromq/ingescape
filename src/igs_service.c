@@ -792,8 +792,7 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
     // 1- iteration on remote agents
     if (core_context->node) {
         igs_remote_agent_t *remote_agent = NULL, *tmp = NULL;
-        HASH_ITER (hh, agent->context->remote_agents, remote_agent, tmp)
-        {
+        HASH_ITER (hh, agent->context->remote_agents, remote_agent, tmp) {
             if ((remote_agent->definition
                  && streq (remote_agent->definition->name, agent_name_or_uuid))
                 || streq (remote_agent->uuid, agent_name_or_uuid)) {
@@ -839,8 +838,7 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                         || streq (remote_agent->peer->protocol, "v3"))) {
                     igs_warn ("Remote agent %s(%s) uses an older version of Ingescape with deprecated protocol. Please upgrade this agent.", remote_agent->definition->name, remote_agent->uuid);
                     zmsg_addstr (msg, CALL_SERVICE_MSG_DEPRECATED);
-                }
-                else
+                } else
                     zmsg_addstr (msg, CALL_SERVICE_MSG);
                 
                 zmsg_addstr (msg, agent->uuid);
@@ -851,8 +849,7 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                 else
                     zmsg_addstr (msg, "");
                 if (list) {
-                    LL_FOREACH (*list, arg)
-                    {
+                    LL_FOREACH (*list, arg) {
                         zframe_t *frame = NULL;
                         switch (arg->type) {
                             case IGS_BOOL_T:
