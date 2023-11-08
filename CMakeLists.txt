@@ -286,7 +286,7 @@ if (NOT DEPS_ONLY)
                                 #MACOSX_FRAMEWORK_IDENTIFIER com.ingescape
                                 #XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "MyAccount Developer"
                                 VERSION "${INGESCAPE_VERSION}" # Current version
-                                SOVERSION "${INGESCAPE_VERSION_MAJOR}.0.0" # Compatibility version
+                                SOVERSION "${INGESCAPE_VERSION_MAJOR}" # Compatibility version
                                 OUTPUT_NAME "ingescape"
                                 PREFIX "lib"
       )
