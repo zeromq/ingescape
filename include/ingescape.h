@@ -31,8 +31,8 @@
 
 //  INGESCAPE version macros for compile-time API detection
 #define INGESCAPE_VERSION_MAJOR 3
-#define INGESCAPE_VERSION_MINOR 6
-#define INGESCAPE_VERSION_PATCH 5
+#define INGESCAPE_VERSION_MINOR 7
+#define INGESCAPE_VERSION_PATCH 0
 
 #define INGESCAPE_MAKE_VERSION(major, minor, patch) \
 ((major) * 10000 + (minor) * 100 + (patch))
@@ -337,7 +337,7 @@ INGESCAPE_EXPORT igs_result_t igs_parameter_set_data(const char *name, void *val
     - "~ regular_expression", e.g. "~ \\d+(\.\\d+)?)":
         IOP of type STRING must match the regular expression
 
- Regular expressions are absed on CZMQ integration of SLRE with the
+ Regular expressions are based on CZMQ integration of SLRE with the
  following syntax:
 ^               Match beginning of a buffer
 $               Match end of a buffer
@@ -365,9 +365,20 @@ INGESCAPE_EXPORT igs_result_t igs_output_add_constraint(const char *name, const 
 INGESCAPE_EXPORT igs_result_t igs_parameter_add_constraint(const char *name, const char *constraint);
 
 //IOP descriptions
-INGESCAPE_EXPORT void igs_input_set_description(const char *name, const char *description);
-INGESCAPE_EXPORT void igs_output_set_description(const char *name, const char *description);
-INGESCAPE_EXPORT void igs_parameter_set_description(const char *name, const char *description);
+INGESCAPE_EXPORT igs_result_t igs_input_set_description(const char *name, const char *description);
+INGESCAPE_EXPORT igs_result_t igs_output_set_description(const char *name, const char *description);
+INGESCAPE_EXPORT igs_result_t igs_parameter_set_description(const char *name, const char *description);
+
+/*IOP specification
+ This section enables to decribe precise specifications for IOPs, 
+ including a type. Specifications are descriptive only. Ingescape
+ does not check anything that is passed here.
+ For example, the type can be 'protobuf' and the specification can
+ be an actual protobuf structure in proto format.
+ */
+INGESCAPE_EXPORT igs_result_t igs_input_set_specification(const char *name, const char *spec_type, const char *specification);
+INGESCAPE_EXPORT igs_result_t igs_output_set_specification(const char *name, const char *spec_type, const char *specification);
+INGESCAPE_EXPORT igs_result_t igs_parameter_set_specification(const char *name, const char *spec_type, const char *specification);
 
 /*These two functions enable sending and receiving DATA on
  inputs/outputs by using zmsg_t structures. zmsg_t structures

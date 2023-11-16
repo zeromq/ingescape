@@ -123,6 +123,8 @@ typedef struct igs_constraint{
 typedef struct igs_iop{
     char* name;
     char *description;
+    char *spec_type;
+    char *specification;
     igs_iop_value_type_t value_type;
     igs_iop_type_t type;
     union {

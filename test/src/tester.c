@@ -841,9 +841,12 @@ void run_static_tests (int argc, const char * argv[]){
     //definition - part 2
     //TODO: compare exported def, saved file and reference file
     //iop description
-    igs_input_set_description("my_impulsion", "my iop description here");
-    igs_output_set_description("my_impulsion", "my iop description here");
-    igs_parameter_set_description("my_impulsion", "my iop description here");
+    assert (igs_input_set_description("my_impulsion", "my iop description here") == IGS_SUCCESS);
+    assert (igs_output_set_description("my_impulsion", "my iop description here") == IGS_SUCCESS);
+    assert (igs_parameter_set_description("my_impulsion", "my iop description here") == IGS_SUCCESS);
+    assert (igs_input_set_specification("my_impulsion", "protobuf", "some prototbuf \"here\"") == IGS_SUCCESS);
+    assert ( igs_output_set_specification("my_impulsion", "protobuf", "some prototbuf \"here\"") == IGS_SUCCESS);
+    assert (igs_parameter_set_specification("my_impulsion", "protobuf", "some prototbuf \"here\"") == IGS_SUCCESS);
     char *exportedDef = igs_definition_json();
     assert(exportedDef);
     igs_definition_set_path("/tmp/simple Demo Agent.json");

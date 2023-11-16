@@ -1605,7 +1605,7 @@ igs_result_t s_model_add_constraint (igsagent_t *self, igs_iop_type_t type,
     return IGS_SUCCESS;
 }
 
-void s_model_set_description(igsagent_t *self, igs_iop_type_t type,
+igs_result_t s_model_set_description(igsagent_t *self, igs_iop_type_t type,
                              const char *name,
                              const char *description)
 {
@@ -1617,7 +1617,7 @@ void s_model_set_description(igsagent_t *self, igs_iop_type_t type,
         HASH_FIND_STR (self->definition->inputs_table, name, iop);
         if (!iop) {
             igsagent_error (self, "Input %s cannot be found", name);
-            return;
+            return IGS_FAILURE;
         }
     }
     else
@@ -1625,7 +1625,7 @@ void s_model_set_description(igsagent_t *self, igs_iop_type_t type,
         HASH_FIND_STR (self->definition->outputs_table, name, iop);
         if (!iop) {
             igsagent_error (self, "Output %s cannot be found", name);
-            return;
+            return IGS_FAILURE;
         }
     }
     else
@@ -1633,16 +1633,62 @@ void s_model_set_description(igsagent_t *self, igs_iop_type_t type,
         HASH_FIND_STR (self->definition->params_table, name, iop);
         if (!iop) {
             igsagent_error (self, "Parameter %s cannot be found", name);
-            return;
+            return IGS_FAILURE;
         }
     }
     else {
         igsagent_error (self, "Unknown IOP type %d", type);
-        return;
+        return IGS_FAILURE;
     }
     if (iop->description)
         free(iop->description);
     iop->description = s_strndup(description, IGS_MAX_LOG_LENGTH);
+    return IGS_SUCCESS;
+}
+
+igs_result_t s_model_set_specification(igsagent_t *self, igs_iop_type_t type,
+                               const char *name, const char *spec_type,
+                               const char *specification)
+{
+    assert(self);
+    assert(name);
+    assert(spec_type);
+    assert(specification);
+    igs_iop_t *iop = NULL;
+    if (type == IGS_INPUT_T) {
+        HASH_FIND_STR (self->definition->inputs_table, name, iop);
+        if (!iop) {
+            igsagent_error (self, "Input %s cannot be found", name);
+            return IGS_FAILURE;
+        }
+    }
+    else
+    if (type == IGS_OUTPUT_T) {
+        HASH_FIND_STR (self->definition->outputs_table, name, iop);
+        if (!iop) {
+            igsagent_error (self, "Output %s cannot be found", name);
+            return IGS_FAILURE;
+        }
+    }
+    else
+    if (type == IGS_PARAMETER_T) {
+        HASH_FIND_STR (self->definition->params_table, name, iop);
+        if (!iop) {
+            igsagent_error (self, "Parameter %s cannot be found", name);
+            return IGS_FAILURE;
+        }
+    }
+    else {
+        igsagent_error (self, "Unknown IOP type %d", type);
+        return IGS_FAILURE;
+    }
+    if (iop->spec_type)
+        free(iop->spec_type);
+    iop->spec_type = s_strndup(spec_type, IGS_MAX_LOG_LENGTH);
+    if (iop->specification)
+        free(iop->specification);
+    iop->specification = s_strndup(specification, IGS_MAX_LOG_LENGTH);
+    return IGS_SUCCESS;
 }
 
 void igsagent_constraints_enforce(igsagent_t *self, bool enforce)
@@ -1668,19 +1714,37 @@ igs_result_t igsagent_parameter_add_constraint (igsagent_t *self, const char *na
     return s_model_add_constraint(self, IGS_PARAMETER_T, name, constraint);
 }
 
-void igsagent_input_set_description(igsagent_t *self, const char *name, const char *description)
+igs_result_t igsagent_input_set_description(igsagent_t *self, const char *name, const char *description)
 {
-    s_model_set_description(self, IGS_INPUT_T, name, description);
+    return s_model_set_description(self, IGS_INPUT_T, name, description);
 }
 
-void igsagent_output_set_description(igsagent_t *self, const char *name, const char *description)
+igs_result_t igsagent_output_set_description(igsagent_t *self, const char *name, const char *description)
 {
-    s_model_set_description(self, IGS_OUTPUT_T, name, description);
+    return s_model_set_description(self, IGS_OUTPUT_T, name, description);
 }
 
-void igsagent_parameter_set_description(igsagent_t *self, const char *name, const char *description)
+igs_result_t igsagent_parameter_set_description(igsagent_t *self, const char *name, const char *description)
 {
-    s_model_set_description(self, IGS_PARAMETER_T, name, description);
+    return s_model_set_description(self, IGS_PARAMETER_T, name, description);
+}
+
+igs_result_t igsagent_input_set_specification(igsagent_t *self, const char *name,
+                                              const char *spec_type, const char *specification)
+{
+    return s_model_set_specification(self, IGS_INPUT_T, name, spec_type, specification);
+}
+
+igs_result_t igsagent_output_set_specification(igsagent_t *self, const char *name,
+                                               const char *spec_type, const char *specification)
+{
+    return s_model_set_specification(self, IGS_OUTPUT_T, name, spec_type, specification);
+}
+
+igs_result_t igsagent_parameter_set_specification(igsagent_t *self, const char *name,
+                                                  const char *spec_type, const char *specification)
+{
+    return s_model_set_specification(self, IGS_PARAMETER_T, name, spec_type, specification);
 }
 
 void igsagent_clear_input (igsagent_t *agent, const char *name)

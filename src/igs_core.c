@@ -148,32 +148,27 @@ void igs_clear_context (void)
         core_agent = NULL;
         // delete core agent callback wrappers
         observed_iop_t *observed_iop, *observed_iop_tmp;
-        HASH_ITER (hh, observed_inputs, observed_iop, observed_iop_tmp)
-        {
+        HASH_ITER (hh, observed_inputs, observed_iop, observed_iop_tmp){
             HASH_DEL (observed_inputs, observed_iop);
             s_core_free_observeIOP (&observed_iop);
         }
-        HASH_ITER (hh, observed_outputs, observed_iop, observed_iop_tmp)
-        {
+        HASH_ITER (hh, observed_outputs, observed_iop, observed_iop_tmp){
             HASH_DEL (observed_outputs, observed_iop);
             s_core_free_observeIOP (&observed_iop);
         }
-        HASH_ITER (hh, observed_parameters, observed_iop, observed_iop_tmp)
-        {
+        HASH_ITER (hh, observed_parameters, observed_iop, observed_iop_tmp){
             HASH_DEL (observed_parameters, observed_iop);
             s_core_free_observeIOP (&observed_iop);
         }
         service_cb_wrapper_t *service_cb_wrapper, *service_cb_wrapper_tmp;
         HASH_ITER (hh, service_cb_wrappers, service_cb_wrapper,
-                   service_cb_wrapper_tmp)
-        {
+                   service_cb_wrapper_tmp){
             HASH_DEL (service_cb_wrappers, service_cb_wrapper);
             s_core_free_service_cb_wrapper (&service_cb_wrapper);
         }
         observe_mute_cb_wrapper_t *mute_cb_wrapper = NULL,
                                   *mute_cb_wrapper_tmp = NULL;
-        LL_FOREACH_SAFE (mute_cb_wrappers, mute_cb_wrapper, mute_cb_wrapper_tmp)
-        {
+        LL_FOREACH_SAFE (mute_cb_wrappers, mute_cb_wrapper, mute_cb_wrapper_tmp){
             LL_DELETE (mute_cb_wrappers, mute_cb_wrapper);
             free (mute_cb_wrapper);
             mute_cb_wrapper = NULL;
@@ -181,8 +176,7 @@ void igs_clear_context (void)
         observe_agent_events_cb_wrapper_t *agent_event_cb_wrapper = NULL,
                                           *agent_event_cb_wrapper_tmp = NULL;
         LL_FOREACH_SAFE (agent_event_cb_wrappers, agent_event_cb_wrapper,
-                         agent_event_cb_wrapper_tmp)
-        {
+                         agent_event_cb_wrapper_tmp){
             LL_DELETE (agent_event_cb_wrappers, agent_event_cb_wrapper);
             free (agent_event_cb_wrapper);
             agent_event_cb_wrapper = NULL;
@@ -192,15 +186,12 @@ void igs_clear_context (void)
             fclose (core_context->log_file);
 
         igs_freeze_wrapper_t *freeze_elt, *freeze_tmp;
-        DL_FOREACH_SAFE (core_context->freeze_callbacks, freeze_elt, freeze_tmp)
-        {
+        DL_FOREACH_SAFE (core_context->freeze_callbacks, freeze_elt, freeze_tmp){
             DL_DELETE (core_context->freeze_callbacks, freeze_elt);
             free (freeze_elt);
         }
         igs_forced_stop_wrapper_t *stop_elt, *stop_tmp;
-        DL_FOREACH_SAFE (core_context->external_stop_calbacks, stop_elt,
-                         stop_tmp)
-        {
+        DL_FOREACH_SAFE (core_context->external_stop_calbacks, stop_elt,stop_tmp){
             DL_DELETE (core_context->external_stop_calbacks, stop_elt);
             free (stop_elt);
         }
@@ -568,22 +559,40 @@ igs_result_t igs_parameter_add_constraint (const char *name, const char *constra
     return igsagent_parameter_add_constraint (core_agent, name, constraint);
 }
 
-void igs_input_set_description(const char *name, const char *description)
+igs_result_t igs_input_set_description(const char *name, const char *description)
 {
     core_init_agent ();
-    igsagent_input_set_description (core_agent, name, description);
+    return igsagent_input_set_description (core_agent, name, description);
 }
 
-void igs_output_set_description(const char *name, const char *description)
+igs_result_t igs_output_set_description(const char *name, const char *description)
 {
     core_init_agent ();
-    igsagent_output_set_description (core_agent, name, description);
+    return igsagent_output_set_description(core_agent, name, description);
 }
 
-void igs_parameter_set_description(const char *name, const char *description)
+igs_result_t igs_parameter_set_description(const char *name, const char *description)
 {
     core_init_agent ();
-    igsagent_parameter_set_description (core_agent, name, description);
+    return igsagent_parameter_set_description (core_agent, name, description);
+}
+
+igs_result_t igs_input_set_specification(const char *name, const char *type, const char *specification)
+{
+    core_init_agent ();
+    return igsagent_input_set_specification(core_agent, name, type, specification);
+}
+
+igs_result_t igs_output_set_specification(const char *name, const char *type, const char *specification)
+{
+    core_init_agent ();
+    return igsagent_output_set_specification(core_agent, name, type, specification);
+}
+
+igs_result_t igs_parameter_set_specification(const char *name, const char *type, const char *specification)
+{
+    core_init_agent ();
+    return igsagent_parameter_set_specification(core_agent, name, type, specification);
 }
 
 void igs_clear_input (const char *name)
