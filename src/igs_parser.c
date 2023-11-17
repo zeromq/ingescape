@@ -307,14 +307,14 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                     iop->description = s_strndup(iop_description->u.string, IGS_MAX_LOG_LENGTH);
                 }
                 
-                igs_json_node_t *iop_spec_type = igs_json_node_find (inputs->u.array.values[i], iop_spec_type_path);
+                igs_json_node_t *iop_spec_type = igs_json_node_find (outputs->u.array.values[i], iop_spec_type_path);
                 if (iop_spec_type && iop_spec_type->type == IGS_JSON_STRING && iop_spec_type->u.string){
                     if (iop->spec_type)
                         free(iop->spec_type);
                     iop->spec_type = s_strndup(iop_spec_type->u.string, IGS_MAX_LOG_LENGTH);
                 }
                 
-                igs_json_node_t *iop_specification = igs_json_node_find (inputs->u.array.values[i], iop_specification_path);
+                igs_json_node_t *iop_specification = igs_json_node_find (outputs->u.array.values[i], iop_specification_path);
                 if (iop_specification && iop_specification->type == IGS_JSON_STRING && iop_specification->u.string){
                     if (iop->specification)
                         free(iop->specification);
@@ -384,14 +384,14 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                     iop->description = s_strndup(iop_description->u.string, IGS_MAX_LOG_LENGTH);
                 }
                 
-                igs_json_node_t *iop_spec_type = igs_json_node_find (inputs->u.array.values[i], iop_spec_type_path);
+                igs_json_node_t *iop_spec_type = igs_json_node_find (parameters->u.array.values[i], iop_spec_type_path);
                 if (iop_spec_type && iop_spec_type->type == IGS_JSON_STRING && iop_spec_type->u.string){
                     if (iop->spec_type)
                         free(iop->spec_type);
                     iop->spec_type = s_strndup(iop_spec_type->u.string, IGS_MAX_LOG_LENGTH);
                 }
                 
-                igs_json_node_t *iop_specification = igs_json_node_find (inputs->u.array.values[i], iop_specification_path);
+                igs_json_node_t *iop_specification = igs_json_node_find (parameters->u.array.values[i], iop_specification_path);
                 if (iop_specification && iop_specification->type == IGS_JSON_STRING && iop_specification->u.string){
                     if (iop->specification)
                         free(iop->specification);
