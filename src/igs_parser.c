@@ -158,9 +158,10 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
               name->u.string, n);
         definition = (igs_definition_t *) zmalloc (sizeof (igs_definition_t));
         definition->name = n;
-    }
-    else
+    } else {
+        igs_json_node_destroy (json);
         return NULL;
+    }
 
     // family
     igs_json_node_t *family = igs_json_node_find (*json, family_path);
@@ -195,15 +196,13 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                     }
                 }
                 if (space_in_name)
-                    igs_warn ("Spaces are not allowed in IOP name: %s has been "
-                              "renamed to %s",
+                    igs_warn ("Spaces are not allowed in IOP name: %s has been renamed to %s",
                               iop_name->u.string, corrected_name);
 
                 HASH_FIND_STR (definition->inputs_table, corrected_name, iop);
                 if (iop) {
-                    igs_warn (
-                      "input with name '%s' already exists : ignoring new one",
-                      corrected_name);
+                    igs_warn ("input with name '%s' already exists : ignoring new one",
+                              corrected_name);
                     free (corrected_name);
                     continue; // iop with this name already exists
                 }
@@ -256,8 +255,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
     igs_json_node_t *outputs = igs_json_node_find (*json, outputs_path);
     if (outputs && outputs->type == IGS_JSON_ARRAY) {
         for (size_t i = 0; i < outputs->u.array.len; i++) {
-            igs_json_node_t *iop_name =
-              igs_json_node_find (outputs->u.array.values[i], name_path);
+            igs_json_node_t *iop_name = igs_json_node_find (outputs->u.array.values[i], name_path);
             if (iop_name && iop_name->type == IGS_JSON_STRING && iop_name->u.string) {
                 igs_iop_t *iop = NULL;
                 char *corrected_name = s_strndup (iop_name->u.string, IGS_MAX_IOP_NAME_LENGTH);
@@ -289,8 +287,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                 iop->value_type = IGS_UNKNOWN_T;
                 iop->name = corrected_name;
 
-                igs_json_node_t *iop_type =
-                  igs_json_node_find (outputs->u.array.values[i], type_path);
+                igs_json_node_t *iop_type = igs_json_node_find (outputs->u.array.values[i], type_path);
                 if (iop_type && iop_type->type == IGS_JSON_STRING && iop_type->u.string)
                     iop->value_type = s_string_to_value_type (iop_type->u.string);
                 
@@ -366,8 +363,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                 iop->value_type = IGS_UNKNOWN_T;
                 iop->name = corrected_name;
 
-                igs_json_node_t *iop_type =
-                  igs_json_node_find (parameters->u.array.values[i], type_path);
+                igs_json_node_t *iop_type = igs_json_node_find (parameters->u.array.values[i], type_path);
                 if (iop_type && iop_type->type == IGS_JSON_STRING && iop_type->u.string)
                     iop->value_type = s_string_to_value_type (iop_type->u.string);
                 
@@ -859,7 +855,7 @@ igs_definition_t *parser_load_definition (const char *json_str)
     }
     if (json->type != IGS_JSON_MAP) {
         igs_json_node_destroy (&json);
-        igs_error ("parsed JSON is not an array : '%s'", json_str);
+        igs_error ("parsed JSON is not a map : '%s'", json_str);
         return NULL;
     }
     return parser_parse_definition_from_node (&json); // will free json tree node
@@ -1497,7 +1493,7 @@ igs_result_t igsagent_definition_load_str (igsagent_t *agent,
     // Try to load definition
     igs_definition_t *tmp = parser_load_definition (json_str);
     if (tmp == NULL) {
-        igsagent_debug (agent, "json string caused an error and was ignored");
+        igsagent_error (agent, "json string caused an error and was ignored");
         return IGS_FAILURE;
     }
     model_read_write_lock (__FUNCTION__, __LINE__);
