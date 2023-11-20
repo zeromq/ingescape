@@ -259,7 +259,7 @@ char *igs_agent_family (void)
     return igsagent_family (core_agent);
 }
 
-const char * igs_agent_uuid (void)
+char * igs_agent_uuid (void)
 {
     core_init_agent ();
     return igsagent_uuid (core_agent);

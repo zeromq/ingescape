@@ -32,7 +32,7 @@
 //  INGESCAPE version macros for compile-time API detection
 #define INGESCAPE_VERSION_MAJOR 3
 #define INGESCAPE_VERSION_MINOR 7
-#define INGESCAPE_VERSION_PATCH 0
+#define INGESCAPE_VERSION_PATCH 1
 
 #define INGESCAPE_MAKE_VERSION(major, minor, patch) \
 ((major) * 10000 + (minor) * 100 + (patch))
@@ -152,8 +152,8 @@ INGESCAPE_EXPORT zsock_t * igs_pipe_inside_ingescape(void);
 INGESCAPE_EXPORT void igs_agent_set_name(const char *name);
 INGESCAPE_EXPORT char * igs_agent_name(void); //caller owns returned value
 
-//agent uuid, read-only
-INGESCAPE_EXPORT const char * igs_agent_uuid(void); //caller owns returned value
+//agent uuid
+INGESCAPE_EXPORT char * igs_agent_uuid(void); //caller owns returned value
 
 //control agent state
 INGESCAPE_EXPORT void igs_agent_set_state(const char *state);
