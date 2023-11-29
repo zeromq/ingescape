@@ -1283,11 +1283,32 @@ void igs_rt_set_time(int64_t microseconds){
     igs_info("set rt time to %lld", microseconds);
     core_context->rt_current_microseconds = microseconds;
     igsagent_t *agent, *tmp_agent;
-    HASH_ITER (hh, core_context->agents, agent, tmp_agent)
+    HASH_ITER (hh, core_context->agents, agent, tmp_agent){
         agent->rt_timestamps_enabled = true;
+        if (agent->rt_synchronous_mode_enabled
+            && agent->definition
+            && agent->definition->outputs_table){
+            //iterate on outputs and publish them separately
+            //NB: we do not create a single message because it would not be compatible
+            //with the mapping filters: only the 1st output would serve in the filter.
+            igs_iop_t *iop, *tmp_iop;
+            HASH_ITER(hh, agent->definition->outputs_table, iop, tmp_iop)
+                network_publish_output(agent, iop);
+        }
+    }
 }
 
 int64_t igs_rt_time(void){
     core_init_context();
     return core_context->rt_current_microseconds;
+}
+
+void igs_rt_set_synchronous_mode(bool enable){
+    core_init_agent();
+    igsagent_rt_set_synchronous_mode(core_agent, enable);
+}
+
+bool igs_rt_synchronous_mode(void){
+    core_init_agent();
+    return igsagent_rt_synchronous_mode(core_agent);
 }

@@ -76,9 +76,8 @@ PIP_ADAPTER_UNICAST_ADDRESS p_unicast = NULL;
 #define W_OK 02
 #endif
 
-// Removes filter to 'subscribe' socket for a spectific output of a given remote
-// agent
-//FIXME UNUSED
+// Removes filter to 'subscribe' socket to a spectific output of a given remote agent
+// FIXME: UNUSED
 void s_unsubscribe_to_remote_agent_output (igs_remote_agent_t *remote_agent,
                                            const char *output_name)
 {
@@ -354,30 +353,30 @@ int s_manage_received_publication (zloop_t *loop, zsock_t *socket, void *arg)
     // The output name includes the publishing agent uuid as a prefix.
     // We merged uuid and output to keep the ZeroMQ PUB/SUB filters working
     // in a context where a publishing peer possibly hosts multiple agents.
-    char *publication = zmsg_popstr (msg);
-    if (publication == NULL) {
-        igs_error ("output name is NULL in received publication : rejecting");
+    char *publication_id = zmsg_popstr (msg);
+    if (!publication_id) {
+        igs_error ("publication id is NULL in received publication : rejecting");
         return 0;
     }
-    if (strlen (publication) < IGS_AGENT_UUID_LENGTH) {
-        igs_error ("output name '%s' is missing information : rejecting", publication);
-        free (publication);
+    if (strlen (publication_id) < IGS_AGENT_UUID_LENGTH) {
+        igs_error ("publication id '%s' is missing information : rejecting", publication_id);
+        free (publication_id);
         return 0;
     }
-    publication[IGS_AGENT_UUID_LENGTH] = '\0'; //enable proper extraction of publishing agent UUID
+    publication_id[IGS_AGENT_UUID_LENGTH] = '\0'; //enable proper extraction of publishing agent UUID
 
     // We push the actual output name again at the beginning of
     // the message for proper use by s_handle_publication
-    zmsg_pushstr (msg, publication + IGS_AGENT_UUID_LENGTH + 1);
+    zmsg_pushstr (msg, publication_id + IGS_AGENT_UUID_LENGTH + 1);
 
     igs_remote_agent_t *remote_agent = NULL;
-    HASH_FIND_STR (context->remote_agents, publication, remote_agent);
+    HASH_FIND_STR (context->remote_agents, publication_id, remote_agent);
     if (remote_agent == NULL) {
-        igs_error ("no remote agent with uuid '%s' : rejecting", publication);
-        free (publication);
+        igs_error ("no remote agent with uuid '%s' : rejecting", publication_id);
+        free (publication_id);
         return 0;
     }
-    free (publication);
+    free (publication_id);
     s_handle_publication (&msg, remote_agent);
     return 0;
 }
@@ -405,23 +404,20 @@ void s_clean_and_free_zyre_peer (igs_zyre_peer_t **zyre_peer, zloop_t *loop)
 
 #define NOTIFY_REMOTE_AGENT_TIMER 500
 
-// Adds proper filter to 'subscribe' socket for a spectific output of a given
-// remote agent
+// Adds proper filter to make sub socket subscribe to a specific output
+// of a given remote agent
 void s_subscribe_to_remote_agent_output (igs_remote_agent_t *remote_agent,
                                          const char *output_name)
 {
     assert (remote_agent);
     assert (output_name);
     if (strlen (output_name) > 0) {
-        char filter_value[IGS_MAX_IOP_NAME_LENGTH + IGS_AGENT_UUID_LENGTH + 1] =
-          "";
-        snprintf (filter_value,
-                  IGS_MAX_IOP_NAME_LENGTH + IGS_AGENT_UUID_LENGTH + 1, "%s-%s",
+        char filter_value[IGS_MAX_IOP_NAME_LENGTH + IGS_AGENT_UUID_LENGTH + 1] = "";
+        snprintf (filter_value, IGS_MAX_IOP_NAME_LENGTH + IGS_AGENT_UUID_LENGTH + 1, "%s-%s",
                   remote_agent->uuid, output_name);
         bool filter_already_exists = false;
         igs_mapping_filter_t *filter = NULL;
-        DL_FOREACH (remote_agent->mapping_filters, filter)
-        {
+        DL_FOREACH (remote_agent->mapping_filters, filter){
             if (streq (filter->filter, filter_value)) {
                 filter_already_exists = true;
                 break;
@@ -431,17 +427,11 @@ void s_subscribe_to_remote_agent_output (igs_remote_agent_t *remote_agent,
             // Set subscriber to the output filter
             assert (remote_agent->peer->subscriber);
             igs_debug ("subscribe to agent %s output %s (%s)",
-                       remote_agent->definition->name, output_name,
-                       filter_value);
+                       remote_agent->definition->name, output_name, filter_value);
             zsock_set_subscribe (remote_agent->peer->subscriber, filter_value);
-            igs_mapping_filter_t *f = (igs_mapping_filter_t *) zmalloc (
-              sizeof (igs_mapping_filter_t));
+            igs_mapping_filter_t *f = (igs_mapping_filter_t *) zmalloc (sizeof (igs_mapping_filter_t));
             f->filter = strdup (filter_value);
             DL_APPEND (remote_agent->mapping_filters, f);
-        }
-        else {
-            // printf("\n****************\nFILTER BIS %s - %s\n***************\n",
-            // subscriber->agent->name, output_name);
         }
     }
 }
@@ -453,8 +443,7 @@ int s_network_configure_mapping_to_remote_agent (
     assert (remote_agent);
     igs_map_t *el, *tmp;
     if (agent->mapping) {
-        HASH_ITER (hh, agent->mapping->map_elements, el, tmp)
-        {
+        HASH_ITER (hh, agent->mapping->map_elements, el, tmp){
             if (streq (remote_agent->definition->name, el->to_agent)
                 || streq (el->to_agent, "*")) {
                 // mapping element is compatible with subscriber name
@@ -473,23 +462,20 @@ int s_network_configure_mapping_to_remote_agent (
                 // check type compatibility between input and output value types
                 // including implicit conversions
                 if (found_output && found_input
-                    && mapping_check_input_output_compatibility (
-                      agent, found_input, found_output)) {
+                    && mapping_check_input_output_compatibility (agent, found_input, found_output)) {
                     // we have validated input, agent and output names : we can map
                     // NOTE: the call below may happen several times if our agent uses
                     // the remote agent ouput on several of its inputs. This should not
                     // have any consequence.
-                    s_subscribe_to_remote_agent_output (remote_agent,
-                                                        el->to_output);
+                    s_subscribe_to_remote_agent_output (remote_agent, el->to_output);
 
                     // mapping was successful : we set timer to notify remote agent if not
                     // already done
                     if (!remote_agent->shall_send_outputs_request
                         && agent->network_request_outputs_from_mapped_agents) {
                         remote_agent->shall_send_outputs_request = true;
-                        remote_agent->timer_id = zloop_timer (
-                          core_context->loop, NOTIFY_REMOTE_AGENT_TIMER, 1,
-                          s_trigger_outputs_request_to_newcomer, remote_agent);
+                        remote_agent->timer_id = zloop_timer (core_context->loop, NOTIFY_REMOTE_AGENT_TIMER, 1,
+                                                              s_trigger_outputs_request_to_newcomer, remote_agent);
                     }
                 }
                 // NOTE: we do not clean subscriptions here because we cannot check if
@@ -1339,10 +1325,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 // recheck mapping towards our new definition
                 igs_remote_agent_t *remote, *tmp;
                 HASH_ITER (hh, context->remote_agents, remote, tmp)
-                {
-                    s_network_configure_mapping_to_remote_agent (agent,
-                                                                  remote);
-                }
+                    s_network_configure_mapping_to_remote_agent (agent, remote);
             }
             free (str_definition);
             free (uuid);
@@ -1393,10 +1376,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 // check and activate mapping
                 igs_remote_agent_t *remote, *tmp;
                 HASH_ITER (hh, context->remote_agents, remote, tmp)
-                {
-                    s_network_configure_mapping_to_remote_agent (agent,
-                                                                  remote);
-                }
+                    s_network_configure_mapping_to_remote_agent (agent, remote);
                 agent->network_need_to_send_mapping_update = true;
             }
             free (str_mapping);
@@ -2917,9 +2897,9 @@ int s_trigger_mapping_update (zloop_t *loop, int timer_id, void *arg)
                 }
             }
             igs_remote_agent_t *remote, *rtmp;
-            HASH_ITER (hh, context->remote_agents, remote, rtmp){
+            HASH_ITER (hh, context->remote_agents, remote, rtmp)
                 s_network_configure_mapping_to_remote_agent (agent, remote);
-            }
+            
             agent->network_need_to_send_mapping_update = false;
             model_read_write_unlock (__FUNCTION__, __LINE__);
             s_agent_propagate_agent_event (IGS_AGENT_UPDATED_MAPPING,agent->uuid,
@@ -3482,12 +3462,12 @@ igs_result_t network_publish_output (igsagent_t *agent, const igs_iop_t *iop)
     if (!agent->is_whole_agent_muted && !iop->is_muted
         && !agent->context->is_frozen) {
         model_read_write_lock (__FUNCTION__, __LINE__);
-        split_add_work_to_queue (agent->context, agent->uuid, iop);
         // check that this agent has not been destroyed when we were locked
         if (!agent || !(agent->uuid)) {
             model_read_write_unlock (__FUNCTION__, __LINE__);
             return IGS_SUCCESS;
         }
+        split_add_work_to_queue (agent->context, agent->uuid, iop);
         int64_t current_microseconds = INT64_MIN;
         if (agent->rt_timestamps_enabled){
             if (agent->context->rt_current_microseconds != INT64_MIN)
@@ -3497,7 +3477,7 @@ igs_result_t network_publish_output (igsagent_t *agent, const igs_iop_t *iop)
         }
         zmsg_t *msg = zmsg_new ();
         zmsg_addstrf (msg, "%s-%s", agent->uuid, iop->name);
-        if (current_microseconds == INT64_MIN)
+        if (current_microseconds == INT64_MIN) //no timestamping, we add value type immediately
             zmsg_addstrf (msg, "%d", iop->value_type);
         switch (iop->value_type) {
             case IGS_INTEGER_T:
@@ -3632,10 +3612,10 @@ igs_result_t network_publish_output (igsagent_t *agent, const igs_iop_t *iop)
                     result = IGS_FAILURE;
                 }
             }
-        } else {
+        }else
             igsagent_warn (agent, "agent not started : could not publish output %s to the "
                            "network (published to agents in same process only)", iop->name);
-        }
+        
         // 4- distribute publication message to other agents inside our context
         // without using the network
         if (!agent->is_virtual) {
@@ -3651,24 +3631,17 @@ igs_result_t network_publish_output (igsagent_t *agent, const igs_iop_t *iop)
             s_handle_publication (&msg, fake_remote);
             free (fake_remote->definition);
             free (fake_remote);
-        }
-        else {
+        } else {
             model_read_write_unlock (__FUNCTION__, __LINE__);
             zmsg_destroy (&msg);
         }
     } else {
         if (agent->is_whole_agent_muted)
-            igsagent_debug (
-              agent, "Should publish output %s but the agent has been muted",
-              iop->name);
+            igsagent_debug (agent, "Should publish output %s but the agent has been muted", iop->name);
         if (iop->is_muted)
-            igsagent_debug (agent,
-                             "Should publish output %s but it has been muted",
-                             iop->name);
+            igsagent_debug (agent, "Should publish output %s but it has been muted", iop->name);
         if (agent->context->is_frozen == true)
-            igsagent_debug (
-              agent, "Should publish output %s but the agent has been frozen",
-              iop->name);
+            igsagent_debug (agent, "Should publish output %s but the agent has been frozen", iop->name);
     }
     return result;
 }

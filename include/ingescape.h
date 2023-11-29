@@ -703,7 +703,7 @@ INGESCAPE_EXPORT igs_result_t igs_election_leave(const char *election_name);
 //////////////////////////////////////////////////////////////////////
 // Ingescape real-time communications
 
-/* Ingescape is a reactive  communication solution but it is capable to
+/* Ingescape is a reactive communication library but it is capable to
  handle soft real-time communications and provides functions dedicated
  to time management with or without a master clock involved. */
 
@@ -728,13 +728,24 @@ INGESCAPE_EXPORT bool igs_rt_timestamps(void);
  for the current time in microseconds.
  Once igs_rt_set_time has been called, it is necessary to continue calling it
  periodically and manually to update the agent's current time in microseconds.
- NB : a call to igs_rt_set_time autmatically enables timestamps for outputs
+ NB : a call to igs_rt_set_time  enables timestamps automatically for outputs
  and services on all agents in our process. Timestamps cannot be disabled afterwards.
  NB : igs_rt_set_time and igs_rt_time operate at peer level for all the agents
  in the process. All agents in a process use the same time set by igs_rt_set_time.
  */
 INGESCAPE_EXPORT void igs_rt_set_time(int64_t microseconds);
 INGESCAPE_EXPORT int64_t igs_rt_time(void);
+
+/* ENABLE SYNCHRONOUS MODE
+ When this mode is enabled, outputs are published only when igs_rt_set_time
+ is called. The call to igs_rt_set_time is the trigger for output publication
+ in this synchronous real-time mode. All published outputs are timestamped
+ with the value set by igs_rt_set_time.
+ NB: Ingescape services and channels are not affected by the synchronous mode.
+ NB: This mode is set at agent level.
+ */
+INGESCAPE_EXPORT void igs_rt_set_synchronous_mode(bool enable);
+INGESCAPE_EXPORT bool igs_rt_synchronous_mode(void);
 
 
 ///////////////////////////////////////////////////////

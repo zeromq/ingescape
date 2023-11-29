@@ -308,6 +308,8 @@ INGESCAPE_EXPORT igs_result_t igsagent_election_leave (igsagent_t *self, const c
 INGESCAPE_EXPORT int64_t igsagent_rt_get_current_timestamp(igsagent_t *agent);
 INGESCAPE_EXPORT void igsagent_rt_set_timestamps(igsagent_t *agent, bool enable);
 INGESCAPE_EXPORT bool igsagent_rt_timestamps(igsagent_t *agent);
+INGESCAPE_EXPORT void igsagent_rt_set_synchronous_mode(igsagent_t *agent, bool enable);
+INGESCAPE_EXPORT bool igsagent_rt_synchronous_mode(igsagent_t *agent);
 
 ///////////////////////////////////////////////////////
 // Administration, logging, configuration and utilities

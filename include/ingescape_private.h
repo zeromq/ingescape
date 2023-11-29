@@ -355,6 +355,7 @@ struct _igsagent_t {
     //real-time
     bool rt_timestamps_enabled;
     int64_t rt_current_timestamp_microseconds;
+    bool rt_synchronous_mode_enabled;
     
     //network
     bool network_need_to_send_definition_update;

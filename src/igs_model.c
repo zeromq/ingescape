@@ -1332,7 +1332,7 @@ igsagent_output_set_bool (igsagent_t *agent, const char *name, bool value)
     assert (name);
     const igs_iop_t *iop = model_write_iop (agent, name, IGS_OUTPUT_T,
                                             IGS_BOOL_T, &value, sizeof (bool));
-    if (iop)
+    if (iop && !agent->rt_synchronous_mode_enabled)
         network_publish_output (agent, iop);
     return (iop == NULL) ? IGS_FAILURE : IGS_SUCCESS;
 }
@@ -1344,7 +1344,7 @@ igsagent_output_set_int (igsagent_t *agent, const char *name, int value)
     assert (name);
     const igs_iop_t *iop = model_write_iop (agent, name, IGS_OUTPUT_T,
                                             IGS_INTEGER_T, &value, sizeof (int));
-    if (iop)
+    if (iop && !agent->rt_synchronous_mode_enabled)
         network_publish_output (agent, iop);
     return (iop == NULL) ? IGS_FAILURE : IGS_SUCCESS;
 }
@@ -1356,7 +1356,7 @@ igsagent_output_set_double (igsagent_t *agent, const char *name, double value)
     assert (name);
     const igs_iop_t *iop = model_write_iop (agent, name, IGS_OUTPUT_T,
                                             IGS_DOUBLE_T, &value, sizeof (double));
-    if (iop)
+    if (iop && !agent->rt_synchronous_mode_enabled)
         network_publish_output (agent, iop);
     return (iop == NULL) ? IGS_FAILURE : IGS_SUCCESS;
 }
@@ -1370,7 +1370,7 @@ igs_result_t igsagent_output_set_string (igsagent_t *agent,
     size_t length = (value == NULL) ? 0 : strlen (value) + 1;
     const igs_iop_t *iop = model_write_iop (agent, name, IGS_OUTPUT_T,
                                             IGS_STRING_T, (char *) value, length);
-    if (iop)
+    if (iop && !agent->rt_synchronous_mode_enabled)
         network_publish_output (agent, iop);
     return (iop == NULL) ? IGS_FAILURE : IGS_SUCCESS;
 }
@@ -1381,7 +1381,7 @@ igs_result_t igsagent_output_set_impulsion (igsagent_t *agent,
     assert (agent);
     assert (name);
     const igs_iop_t *iop = model_write_iop (agent, name, IGS_OUTPUT_T, IGS_IMPULSION_T, NULL, 0);
-    if (iop)
+    if (iop && !agent->rt_synchronous_mode_enabled)
         network_publish_output (agent, iop);
     return (iop == NULL) ? IGS_FAILURE : IGS_SUCCESS;
 }
@@ -1394,7 +1394,7 @@ igs_result_t igsagent_output_set_data (igsagent_t *agent,
     assert (agent);
     assert (name);
     const igs_iop_t *iop = model_write_iop (agent, name, IGS_OUTPUT_T, IGS_DATA_T, value, size);
-    if (iop)
+    if (iop && !agent->rt_synchronous_mode_enabled)
         network_publish_output (agent, iop);
     return (iop == NULL) ? IGS_FAILURE : IGS_SUCCESS;
 }
@@ -1410,7 +1410,7 @@ igsagent_output_set_zmsg (igsagent_t *agent, const char *name, zmsg_t *msg)
     void *value = zframe_data (frame);
     size_t size = zframe_size (frame);
     const igs_iop_t *iop = model_write_iop (agent, name, IGS_OUTPUT_T, IGS_DATA_T, value, size);
-    if (iop)
+    if (iop && !agent->rt_synchronous_mode_enabled)
         network_publish_output (agent, iop);
     zframe_destroy (&frame);
     return (iop == NULL) ? IGS_FAILURE : IGS_SUCCESS;

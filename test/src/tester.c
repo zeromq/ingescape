@@ -11,6 +11,7 @@
 unsigned int port = 5670;
 const char *agentName = "tester";
 const char *networkDevice = "en0"; //can be set to a default device name
+bool rt = false;
 bool verbose = false;
 bool autoTests = false;
 bool autoTestsHaveStarted = false;
@@ -1853,6 +1854,30 @@ void run_static_tests (int argc, const char * argv[]){
     //    igs_replay_terminate();
 }
 
+int rt_timer (zloop_t *loop, int timer_id, void *arg){
+    igs_output_set_impulsion("my_impulsion");
+    igs_output_set_bool("my_bool", myBool = !myBool);
+    igs_output_set_int("my_int", myInt++);
+    igs_output_set_double("my_double", myDouble++);
+    
+    if (!(myInt % 3))
+        igs_rt_set_time(zclock_mono()*1000);
+    return 0;
+}
+
+void set_timeCB(igs_iop_type_t iop_type,
+                const char *name,
+                igs_iop_value_type_t value_type,
+                void *value,
+                size_t value_size,
+                void *my_data){
+    /*
+     The usual timestamp values in milliseconds exceed the size of a signed 64 bits integer.
+     Use a data input with proper casting to feed an agent with a realistic timestamp, which
+     is ALWAYS expected in microseconds.
+     */
+    igs_rt_set_time(*(int*)value * 1000);
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1877,6 +1902,7 @@ int main(int argc, const char * argv[]) {
         {"name",        required_argument, 0,  'n' },
         {"auto",        no_argument, 0,  'a' },
         {"static",        no_argument, 0,  's' },
+        {"rt",        no_argument, 0,  'r' },
         {"help",        no_argument, 0,  'h' },
         {0, 0, 0, 0}
     };
@@ -1904,6 +1930,9 @@ int main(int argc, const char * argv[]) {
                 break;
             case 's':
                 staticTests = true;
+                break;
+            case 'r':
+                rt = true;
                 break;
             case 'h':
                 print_usage(agentName);
@@ -1966,11 +1995,25 @@ int main(int argc, const char * argv[]) {
     igs_mapping_add("my_string", "partner", "sparing_string");
     igs_mapping_add("my_data", "partner", "sparing_data");
     
+    //RT tests
+    if (rt){
+        igs_input_create("set_time", IGS_INTEGER_T, NULL, 0);
+        igs_observe_input("set_time", set_timeCB, NULL);
+        igs_output_create("my_impulsion", IGS_IMPULSION_T, NULL, 0);
+        igs_output_create("my_bool", IGS_BOOL_T, &myBool, sizeof(bool));
+        igs_output_create("my_int", IGS_INTEGER_T, &myInt, sizeof(int));
+        igs_output_create("my_double", IGS_DOUBLE_T, &myDouble, sizeof(double));
+        igs_output_create("my_string", IGS_STRING_T, myString, strlen(myString) + 1);
+        igs_output_create("my_data", IGS_DATA_T, myData, 32);
+        igs_rt_set_synchronous_mode(true);
+    }
+    
+    if (verbose)
+        igs_log_set_console_level(IGS_LOG_TRACE);
+    else
+        igs_log_set_console_level(IGS_LOG_FATAL);
+    
     if (autoTests){
-        if (verbose)
-            igs_log_set_console_level(IGS_LOG_TRACE);
-        else
-            igs_log_set_console_level(IGS_LOG_FATAL);
         igs_start_with_device(networkDevice, port);
         igs_channel_join("TEST_CHANNEL");
         zloop_t *loop = zloop_new();
@@ -2040,6 +2083,8 @@ int main(int argc, const char * argv[]) {
         zloop_t *loop = zloop_new();
         zsock_t *pipe = igs_pipe_to_ingescape();
         zloop_reader(loop, pipe, ingescapeSentMessage, NULL);
+        if (rt)
+            zloop_timer(loop, 500, 0, rt_timer, NULL);
         zloop_start(loop);
         zloop_destroy(&loop);
     }else{
