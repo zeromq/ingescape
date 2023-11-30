@@ -53,6 +53,10 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "--static"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--rt"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
@@ -60,12 +64,12 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "--device en0 --port 5670"
+            argument = "--device en0 --port 5669"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--interactiveloop"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--verbose"
