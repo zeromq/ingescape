@@ -31,8 +31,8 @@
 
 //  INGESCAPE version macros for compile-time API detection
 #define INGESCAPE_VERSION_MAJOR 3
-#define INGESCAPE_VERSION_MINOR 7
-#define INGESCAPE_VERSION_PATCH 1
+#define INGESCAPE_VERSION_MINOR 8
+#define INGESCAPE_VERSION_PATCH 0
 
 #define INGESCAPE_MAKE_VERSION(major, minor, patch) \
 ((major) * 10000 + (minor) * 100 + (patch))
