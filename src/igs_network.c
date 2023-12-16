@@ -2954,6 +2954,21 @@ int s_manage_parent (zloop_t *loop, zsock_t *pipe, void *arg)
         free (command);
         zmsg_destroy (&msg);
         return -1;
+    } else if (streq (command, "HANDLE_PUBLICATION")){
+        char *name = zmsg_popstr (msg);
+        assert(name);
+        // Generate a temporary fake remote agent, containing only
+        // necessary information
+        igs_remote_agent_t *fake_remote = (igs_remote_agent_t *) zmalloc (sizeof (igs_remote_agent_t));
+        fake_remote->context = core_context;
+        fake_remote->definition = (igs_definition_t *) zmalloc (sizeof (igs_definition_t));
+        fake_remote->definition->name = name;
+        s_handle_publication (&msg, fake_remote);
+        free (fake_remote->definition);
+        free (fake_remote);
+        free (name);
+        free (command);
+        return 0;
     }
     //else: nothing to do so far
     free (command);
@@ -3621,20 +3636,15 @@ igs_result_t network_publish_output (igsagent_t *agent, const igs_iop_t *iop)
         if (!agent->is_virtual) {
             free (zmsg_popstr (msg)); // remove composite uuid/iop name from message
             zmsg_pushstr (msg, iop->name); // replace it by simple iop name
-            // Generate a temporary fake remote agent, containing only
-            // necessary information for s_handle_publication.
-            igs_remote_agent_t *fake_remote = (igs_remote_agent_t *) zmalloc (sizeof (igs_remote_agent_t));
-            fake_remote->context = core_context;
-            fake_remote->definition = (igs_definition_t *) zmalloc (sizeof (igs_definition_t));
-            fake_remote->definition->name = agent->definition->name;
-            model_read_write_unlock (__FUNCTION__, __LINE__); // to avoid deadlock inside s_handle_publication
-            s_handle_publication (&msg, fake_remote);
-            free (fake_remote->definition);
-            free (fake_remote);
-        } else {
-            model_read_write_unlock (__FUNCTION__, __LINE__);
+            zsock_t *pipe = igs_pipe_to_ingescape();
+            if (pipe){
+                zmsg_pushstr(msg, agent->definition->name);
+                zmsg_pushstr(msg, "HANDLE_PUBLICATION");
+                zmsg_send(&msg, pipe);
+            }
+        } else
             zmsg_destroy (&msg);
-        }
+        model_read_write_unlock (__FUNCTION__, __LINE__);
     } else {
         if (agent->is_whole_agent_muted)
             igsagent_debug (agent, "Should publish output %s but the agent has been muted", iop->name);
