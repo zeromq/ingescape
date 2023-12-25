@@ -862,27 +862,21 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 if (zyre_peer->protocol
                     && (streq (zyre_peer->protocol, "v2")
                         || streq (zyre_peer->protocol, "v3")))
-                    definition_str = parser_export_definition_legacy (agent->definition);
+                    definition_str = agent->definition->json_legacy;
                 else
-                    definition_str = parser_export_definition (agent->definition);
-                if (definition_str) {
+                    definition_str = agent->definition->json;
+                if (definition_str)
                     s_send_definition_to_zyre_peer (agent, peerUUID,
                                                     definition_str, false);
-                    free (definition_str);
-                    definition_str = NULL;
-                }
                 else
                     s_send_definition_to_zyre_peer (agent, peerUUID, "", false);
                 // and so is our mapping
                 if (zyre_peer->protocol && streq (zyre_peer->protocol, "v2"))
-                    mapping_str = parser_export_mapping_legacy (agent->mapping);
+                    mapping_str = agent->mapping->json_legacy;
                 else
-                    mapping_str = parser_export_mapping (agent->mapping);
-                if (mapping_str) {
+                    mapping_str = agent->mapping->json;
+                if (mapping_str)
                     s_send_mapping_to_zyre_peer (agent, peerUUID, mapping_str);
-                    free (mapping_str);
-                    mapping_str = NULL;
-                }
                 else
                     s_send_mapping_to_zyre_peer (agent, peerUUID, "");
                 // and so is the state of our internal variables
@@ -1056,8 +1050,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             // Agents without definition are considered impossible.
             char *str_definition = zmsg_popstr (msg_duplicate);
             if (str_definition == NULL) {
-                igs_error ("no valid definition in %s message received from "
-                           "%s(%s): rejecting",
+                igs_error ("no valid definition in %s message received from %s(%s): rejecting",
                            title, name, peerUUID);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
@@ -1065,9 +1058,8 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             }
             char *uuid = zmsg_popstr (msg_duplicate);
             if (uuid == NULL) {
-                igs_error (
-                  "no valid uuid in %s message received from %s(%s): rejecting",
-                  title, name, peerUUID);
+                igs_error ("no valid uuid in %s message received from %s(%s): rejecting",
+                           title, name, peerUUID);
                 free (str_definition);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
@@ -1075,8 +1067,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             }
             char *remote_agent_name = zmsg_popstr (msg_duplicate);
             if (remote_agent_name == NULL) {
-                igs_error ("no valid agent name in %s message received from "
-                           "%s(%s): rejecting",
+                igs_error ("no valid agent name in %s message received from %s(%s): rejecting",
                            title, name, peerUUID);
                 free (str_definition);
                 free (uuid);
@@ -1088,12 +1079,12 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             // Load definition from string content
             igs_definition_t *new_definition = parser_load_definition (str_definition);
             if (new_definition && new_definition->name) {
+                definition_update_json (new_definition);
                 bool is_agent_new = false;
                 igs_remote_agent_t *remote_agent = NULL;
                 HASH_FIND_STR (context->remote_agents, uuid, remote_agent);
                 if (remote_agent == NULL) {
-                    remote_agent = (igs_remote_agent_t *) zmalloc (
-                      sizeof (igs_remote_agent_t));
+                    remote_agent = (igs_remote_agent_t *) zmalloc (sizeof (igs_remote_agent_t));
                     remote_agent->context = context;
                     remote_agent->uuid = strdup (uuid);
                     igs_zyre_peer_t *zyre_peer = NULL;
@@ -1102,8 +1093,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     remote_agent->peer = zyre_peer;
                     remote_agent->definition = new_definition;
                     HASH_ADD_STR (context->remote_agents, uuid, remote_agent);
-                    igs_debug ("registering agent %s(%s)", uuid,
-                               remote_agent_name);
+                    igs_debug ("registering agent %s(%s)", uuid,remote_agent_name);
                     is_agent_new = true;
                 } else {
                     // else we already know this agent, its definition (possibly including name)
@@ -1112,12 +1102,9 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                       "Definition already exists for remote agent %s : new "
                       "definition will overwrite the previous one...",
                       remote_agent->definition->name);
-                    if (strneq (remote_agent->definition->name,
-                                new_definition->name))
-                        igs_debug (
-                          "Remote agent is changing name from %s to %s",
-                          remote_agent->definition->name, new_definition->name);
-
+                    if (strneq (remote_agent->definition->name,new_definition->name))
+                        igs_debug ("Remote agent is changing name from %s to %s",
+                                   remote_agent->definition->name, new_definition->name);
                     igs_definition_t *old_def = remote_agent->definition;
                     remote_agent->definition = new_definition;
                     definition_free_definition (&old_def);
@@ -1165,12 +1152,8 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                         char *input_split_element;
                         char *output_split_element;
                         igs_split_t *elt, *tmp_split;
-                        HASH_ITER (hh, elt_agent->mapping->split_elements,
-                                   elt, tmp_split)
-                        {
-                            if (elt
-                                && streq (elt->to_agent,
-                                          remote_agent->definition->name)) {
+                        HASH_ITER (hh, elt_agent->mapping->split_elements,elt, tmp_split){
+                            if (elt && streq (elt->to_agent,remote_agent->definition->name)) {
                                 found_split_element = true;
                                 input_split_element = elt->from_input;
                                 output_split_element = elt->to_output;
@@ -1182,18 +1165,14 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                             zmsg_addstr (ready_message, WORKER_HELLO_MSG);
                             zmsg_addstr (ready_message, elt_agent->uuid);
                             zmsg_addstr (ready_message, input_split_element);
-                            zmsg_addstr (ready_message,
-                                         output_split_element);
-                            zmsg_addstrf (ready_message, "%i",
-                                          IGS_DEFAULT_WORKER_CREDIT);
-                            igs_channel_whisper_zmsg (remote_agent->uuid,
-                                                      &ready_message);
+                            zmsg_addstr (ready_message,output_split_element);
+                            zmsg_addstrf (ready_message, "%i",IGS_DEFAULT_WORKER_CREDIT);
+                            igs_channel_whisper_zmsg (remote_agent->uuid,&ready_message);
                         }
                     }
-                }
-                else
+                }else
                     s_agent_propagate_agent_event (IGS_AGENT_UPDATED_DEFINITION,
-                                                   uuid, remote_agent_name, str_definition);
+                                                   uuid, remote_agent_name, remote_agent->definition->json);
             }
             else {
                 if (new_definition && !new_definition->name)
@@ -1267,15 +1246,15 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             if (new_mapping && remote_agent) {
                 // look if this agent already has a mapping
                 if (remote_agent->mapping) {
-                    igs_debug (
-                      "mapping already exists for agent %s(%s) : new mapping will overwrite the previous one...",
-                      remote_agent->definition->name, remote_agent->uuid);
+                    igs_debug ("mapping already exists for agent %s(%s) : new mapping will overwrite the previous one...",
+                               remote_agent->definition->name, remote_agent->uuid);
                     mapping_free_mapping (&remote_agent->mapping);
                 }
 
                 igs_debug ("store mapping for agent %s(%s)",
                            remote_agent->definition->name, remote_agent->uuid);
                 remote_agent->mapping = new_mapping;
+                mapping_update_json(remote_agent->mapping);
                 s_agent_propagate_agent_event (IGS_AGENT_UPDATED_MAPPING, uuid,
                                                remote_agent->definition->name, str_mapping);
             }
@@ -1377,6 +1356,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 igs_remote_agent_t *remote, *tmp;
                 HASH_ITER (hh, context->remote_agents, remote, tmp)
                     s_network_configure_mapping_to_remote_agent (agent, remote);
+                mapping_update_json(agent->mapping);
                 agent->network_need_to_send_mapping_update = true;
             }
             free (str_mapping);
@@ -2823,18 +2803,16 @@ int trigger_definition_update (zloop_t *loop, int timer_id, void *arg)
             if (!agent || !(agent->uuid))
                 continue;
             
-            char *definition_str = parser_export_definition (agent->definition);
-            char *definition_str_legacy = parser_export_definition_legacy (agent->definition);
             igs_zyre_peer_t *p, *ptmp;
             HASH_ITER (hh, context->zyre_peers, p, ptmp){
                 if (p->has_joined_private_channel) {
                     if (p->protocol && (streq (p->protocol, "v2") || streq (p->protocol, "v3"))){
-                        if (definition_str_legacy)
-                            s_send_definition_to_zyre_peer (agent, p->peer_id, definition_str_legacy,
+                        if (agent->definition->json_legacy)
+                            s_send_definition_to_zyre_peer (agent, p->peer_id, agent->definition->json_legacy,
                                                             agent->network_activation_during_runtime);
                     }else{
-                        if (definition_str)
-                            s_send_definition_to_zyre_peer (agent, p->peer_id, definition_str,
+                        if (agent->definition->json)
+                            s_send_definition_to_zyre_peer (agent, p->peer_id, agent->definition->json,
                                                             agent->network_activation_during_runtime);
                     }
                 }
@@ -2849,15 +2827,10 @@ int trigger_definition_update (zloop_t *loop, int timer_id, void *arg)
             model_read_write_unlock (__FUNCTION__, __LINE__);
             //propagate definition update to other agents in the same process (if any)
             s_agent_propagate_agent_event (IGS_AGENT_UPDATED_DEFINITION,
-                                           agent->uuid, agent->definition->name, definition_str);
+                                           agent->uuid, agent->definition->name, agent->definition->json);
             model_read_write_lock (__FUNCTION__, __LINE__);
             // when definition changes, mapping may need to be updated as well
             agent->network_need_to_send_mapping_update = true;
-            
-            if (definition_str)
-                free(definition_str);
-            if (definition_str_legacy)
-                free(definition_str_legacy);
         }
     }
     model_read_write_unlock (__FUNCTION__, __LINE__);
@@ -2882,17 +2855,15 @@ int s_trigger_mapping_update (zloop_t *loop, int timer_id, void *arg)
                 model_read_write_unlock (__FUNCTION__, __LINE__);
                 return 0;
             }
-            char *mapping_str = parser_export_mapping (agent->mapping);
-            char *mapping_str_legacy = parser_export_mapping_legacy (agent->mapping);
             igs_zyre_peer_t *p, *ptmp;
             HASH_ITER (hh, context->zyre_peers, p, ptmp){
                 if (p->has_joined_private_channel) {
                     if (p->protocol && streq (p->protocol, "v2")){
-                        if (mapping_str_legacy)
-                            s_send_mapping_to_zyre_peer (agent, p->peer_id, mapping_str_legacy);
+                        if (agent->mapping->json_legacy)
+                            s_send_mapping_to_zyre_peer (agent, p->peer_id, agent->mapping->json_legacy);
                     }else{
-                        if (mapping_str)
-                            s_send_mapping_to_zyre_peer (agent, p->peer_id, mapping_str);
+                        if (agent->mapping->json)
+                            s_send_mapping_to_zyre_peer (agent, p->peer_id, agent->mapping->json);
                     }
                 }
             }
@@ -2903,11 +2874,7 @@ int s_trigger_mapping_update (zloop_t *loop, int timer_id, void *arg)
             agent->network_need_to_send_mapping_update = false;
             model_read_write_unlock (__FUNCTION__, __LINE__);
             s_agent_propagate_agent_event (IGS_AGENT_UPDATED_MAPPING,agent->uuid,
-                                           agent->definition->name, mapping_str);
-            if (mapping_str)
-                free (mapping_str);
-            if (mapping_str_legacy)
-                free (mapping_str_legacy);
+                                           agent->definition->name, agent->mapping->json);
         }
     }
     return 0;
@@ -3996,6 +3963,7 @@ void igsagent_set_name (igsagent_t *agent, const char *name)
                        name, n);
     char *previous = agent->definition->name;
     agent->definition->name = n;
+    definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
     
     if (agent->igs_channel)

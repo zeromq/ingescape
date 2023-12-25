@@ -50,7 +50,14 @@ void mapping_free_mapping (igs_mapping_t **mapping)
     assert (*mapping);
     if ((*mapping) == NULL)
         return;
-
+    if ((*mapping)->json) {
+        free ((char *) (*mapping)->json);
+        (*mapping)->json = NULL;
+    }
+    if ((*mapping)->json_legacy) {
+        free ((char *) (*mapping)->json_legacy);
+        (*mapping)->json_legacy = NULL;
+    }
     igs_map_t *current_map_elmt, *tmp_map_elmt;
     HASH_ITER (hh, (*mapping)->map_elements, current_map_elmt, tmp_map_elmt){
         HASH_DEL ((*mapping)->map_elements, current_map_elmt);
@@ -182,6 +189,21 @@ bool mapping_check_input_output_compatibility (igsagent_t *agent,
     return is_compatible;
 }
 
+void mapping_update_json (igs_mapping_t *mapping)
+{
+    assert(mapping);
+    if (mapping->json) {
+        free ((char *) mapping->json);
+        mapping->json = NULL;
+    }
+    if (mapping->json_legacy) {
+        free ((char *) mapping->json_legacy);
+        mapping->json_legacy = NULL;
+    }
+    mapping->json = parser_export_mapping (mapping);
+    mapping->json_legacy = parser_export_mapping_legacy (mapping);
+}
+
 ////////////////////////////////////////////////////////////////////////
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
@@ -216,6 +238,7 @@ igs_result_t igsagent_mapping_load_str (igsagent_t *agent,
         if (agent->mapping)
             mapping_free_mapping (&agent->mapping);
         agent->mapping = tmp;
+        mapping_update_json(agent->mapping);
         agent->network_need_to_send_mapping_update = true;
         model_read_write_unlock (__FUNCTION__, __LINE__);
     }
@@ -223,14 +246,14 @@ igs_result_t igsagent_mapping_load_str (igsagent_t *agent,
 }
 
 igs_result_t igsagent_mapping_load_file (igsagent_t *agent,
-                                           const char *file_path)
+                                         const char *file_path)
 {
     assert (agent);
     assert (file_path);
     igs_mapping_t *tmp = parser_load_mapping_from_path (file_path);
     if (tmp == NULL) {
         igsagent_error (agent, "mapping could not be loaded from path '%s'",
-                         file_path);
+                        file_path);
         return IGS_FAILURE;
     }
     model_read_write_lock (__FUNCTION__, __LINE__);
@@ -243,6 +266,7 @@ igs_result_t igsagent_mapping_load_file (igsagent_t *agent,
         mapping_free_mapping (&agent->mapping);
     agent->mapping_path = s_strndup (file_path, IGS_MAX_PATH_LENGTH - 1);
     agent->mapping = tmp;
+    mapping_update_json(agent->mapping);
     agent->network_need_to_send_mapping_update = true;
     model_read_write_unlock (__FUNCTION__, __LINE__);
     return IGS_SUCCESS;
@@ -261,8 +285,8 @@ void igsagent_clear_mappings (igsagent_t *agent)
     }
     if (agent->mapping)
         mapping_free_mapping (&agent->mapping);
-    agent->mapping =
-      (struct igs_mapping *) zmalloc (sizeof (struct igs_mapping));
+    agent->mapping = (struct igs_mapping *) zmalloc (sizeof (struct igs_mapping));
+    mapping_update_json(agent->mapping);
     agent->network_need_to_send_mapping_update = true;
     model_read_write_unlock (__FUNCTION__, __LINE__);
 }
@@ -286,6 +310,8 @@ void igsagent_clear_mappings_with_agent (igsagent_t *agent,
                 agent->network_need_to_send_mapping_update = true;
             }
         }
+        if (agent->network_need_to_send_mapping_update)
+            mapping_update_json(agent->mapping);
         model_read_write_unlock (__FUNCTION__, __LINE__);
     }
 }
@@ -301,29 +327,22 @@ void igsagent_clear_mappings_for_input (igsagent_t *agent,
             if (streq (elmt->from_input, input_name)) {
                 HASH_DEL (agent->mapping->map_elements, elmt);
                 s_mapping_free_mapping_element (&elmt);
+                mapping_update_json(agent->mapping);
                 agent->network_need_to_send_mapping_update = true;
             }
         }
+        if (agent->network_need_to_send_mapping_update)
+            mapping_update_json(agent->mapping);
         model_read_write_unlock (__FUNCTION__, __LINE__);
     }
 }
 
 char *igsagent_mapping_json (igsagent_t *agent)
 {
-    char *mapping_json = NULL;
-    if (agent->mapping == NULL) {
-        igsagent_warn (agent, "No mapping defined yet");
+    assert(agent);
+    if (!agent->mapping)
         return NULL;
-    }
-    model_read_write_lock (__FUNCTION__, __LINE__);
-    // check that this agent has not been destroyed when we were locked
-    if (!agent || !(agent->uuid)) {
-        model_read_write_unlock (__FUNCTION__, __LINE__);
-        return NULL;
-    }
-    mapping_json = parser_export_mapping (agent->mapping);
-    model_read_write_unlock (__FUNCTION__, __LINE__);
-    return mapping_json;
+    return (agent->mapping->json)?strdup(agent->mapping->json):NULL;
 }
 
 size_t igsagent_mapping_count (igsagent_t *agent)
@@ -442,6 +461,7 @@ uint64_t igsagent_mapping_add (igsagent_t *agent,
         igs_map_t *new = mapping_create_mapping_element (reviewed_from_our_input, reviewed_to_agent, reviewed_with_output);
         new->id = hash;
         HASH_ADD (hh, agent->mapping->map_elements, id, sizeof (uint64_t), new);
+        mapping_update_json(agent->mapping);
         agent->network_need_to_send_mapping_update = true;
     } else
         igsagent_warn (agent,
@@ -480,6 +500,7 @@ igs_result_t igsagent_mapping_remove_with_id (igsagent_t *agent,
     }
     HASH_DEL (agent->mapping->map_elements, el);
     s_mapping_free_mapping_element (&el);
+    mapping_update_json(agent->mapping);
     agent->network_need_to_send_mapping_update = true;
     model_read_write_unlock (__FUNCTION__, __LINE__);
     return IGS_SUCCESS;
@@ -529,6 +550,7 @@ igs_result_t igsagent_mapping_remove_with_name (igsagent_t *agent,
     }
     HASH_DEL (agent->mapping->map_elements, tmp);
     s_mapping_free_mapping_element (&tmp);
+    mapping_update_json(agent->mapping);
     agent->network_need_to_send_mapping_update = true;
     model_read_write_unlock (__FUNCTION__, __LINE__);
     return IGS_SUCCESS;
@@ -576,16 +598,12 @@ void igsagent_mapping_save (igsagent_t *agent)
     FILE *fp = NULL;
     fp = fopen (agent->mapping_path, "w+");
     igsagent_info (agent, "save to path %s", agent->mapping_path);
-    if (fp == NULL)
-        igsagent_error (agent, "Could not open %s for writing",
-                         agent->mapping_path);
-    else {
-        char *map = parser_export_mapping (agent->mapping);
-        assert (map);
-        fprintf (fp, "%s", map);
+    if (!fp)
+        igsagent_error (agent, "Could not open %s for writing", agent->mapping_path);
+    else if (agent->mapping->json){
+        fprintf (fp, "%s", agent->mapping->json);
         fflush (fp);
         fclose (fp);
-        free (map);
     }
     model_read_write_unlock (__FUNCTION__, __LINE__);
 }

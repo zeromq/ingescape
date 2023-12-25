@@ -208,6 +208,14 @@ void definition_free_definition (igs_definition_t **def)
         free ((char *) (*def)->version);
         (*def)->version = NULL;
     }
+    if ((*def)->json) {
+        free ((char *) (*def)->json);
+        (*def)->json = NULL;
+    }
+    if ((*def)->json_legacy) {
+        free ((char *) (*def)->json_legacy);
+        (*def)->json_legacy = NULL;
+    }
     igs_iop_t *current_iop, *tmp_iop;
     HASH_ITER (hh, (*def)->params_table, current_iop, tmp_iop){
         HASH_DEL ((*def)->params_table, current_iop);
@@ -228,6 +236,21 @@ void definition_free_definition (igs_definition_t **def)
     }
     free (*def);
     *def = NULL;
+}
+
+void definition_update_json (igs_definition_t *def)
+{
+    assert(def);
+    if (def->json) {
+        free ((char *) def->json);
+        def->json = NULL;
+    }
+    if (def->json_legacy) {
+        free ((char *) def->json_legacy);
+        def->json_legacy = NULL;
+    }
+    def->json = parser_export_definition (def);
+    def->json_legacy = parser_export_definition_legacy (def);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -256,18 +279,17 @@ void igsagent_clear_definition (igsagent_t *agent)
         agent->definition->name = strdup (IGS_DEFAULT_AGENT_NAME);
         // igsagent_debug(agent, "Use default name '%s'", IGS_DEFAULT_AGENT_NAME);
     }
+    definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
     model_read_write_unlock (__FUNCTION__, __LINE__);
 }
 
 char *igsagent_definition_json (igsagent_t *agent)
 {
-    assert (agent);
-    char *def = NULL;
+    assert(agent);
     if (!agent->definition)
         return NULL;
-    def = parser_export_definition (agent->definition);
-    return def;
+    return (agent->definition->json)?strdup(agent->definition->json):NULL;
 }
 
 char *igsagent_family (igsagent_t *agent)
@@ -303,6 +325,7 @@ void igsagent_set_family (igsagent_t *agent, const char *family)
     if (agent->definition->family)
         free (agent->definition->family);
     agent->definition->family = s_strndup (family, IGS_MAX_FAMILY_LENGTH);
+    definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
 }
 
@@ -316,6 +339,7 @@ void igsagent_definition_set_description (igsagent_t *agent,
         free (agent->definition->description);
     agent->definition->description =
       s_strndup (description, IGS_MAX_DESCRIPTION_LENGTH);
+    definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
 }
 
@@ -327,6 +351,7 @@ void igsagent_definition_set_version (igsagent_t *agent, const char *version)
     if (agent->definition->version)
         free (agent->definition->version);
     agent->definition->version = s_strndup (version, IGS_MAX_VERSION_LENGTH);
+    definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
 }
 
@@ -342,6 +367,7 @@ igs_result_t igsagent_input_create (igsagent_t *agent,
     igs_iop_t *iop = definition_create_iop (agent, name, IGS_INPUT_T, value_type, value, size);
     if (!iop)
         return IGS_FAILURE;
+    definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
     return IGS_SUCCESS;
 }
@@ -359,6 +385,7 @@ igs_result_t igsagent_output_create (igsagent_t *agent,
                                             value_type, value, size);
     if (!iop)
         return IGS_FAILURE;
+    definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
     return IGS_SUCCESS;
 }
@@ -376,6 +403,7 @@ igs_result_t igsagent_parameter_create (igsagent_t *agent,
                                             value_type, value, size);
     if (!iop)
         return IGS_FAILURE;
+    definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
     return IGS_SUCCESS;
 }
@@ -398,6 +426,7 @@ igs_result_t igsagent_input_remove (igsagent_t *agent, const char *name)
     }
     HASH_DEL (agent->definition->inputs_table, iop);
     s_definition_free_iop (&iop);
+    definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
     model_read_write_unlock (__FUNCTION__, __LINE__);
     return IGS_SUCCESS;
@@ -421,6 +450,7 @@ igs_result_t igsagent_output_remove (igsagent_t *agent, const char *name)
     }
     HASH_DEL (agent->definition->outputs_table, iop);
     s_definition_free_iop (&iop);
+    definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
     model_read_write_unlock (__FUNCTION__, __LINE__);
     return IGS_SUCCESS;
@@ -444,6 +474,7 @@ igs_result_t igsagent_parameter_remove (igsagent_t *agent, const char *name)
     }
     HASH_DEL (agent->definition->params_table, iop);
     s_definition_free_iop (&iop);
+    definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
     model_read_write_unlock (__FUNCTION__, __LINE__);
     return IGS_SUCCESS;
@@ -491,16 +522,12 @@ void igsagent_definition_save (igsagent_t *agent)
     FILE *fp = NULL;
     fp = fopen (agent->definition_path, "w+");
     igsagent_info (agent, "save to path %s", agent->definition_path);
-    if (fp == NULL)
-        igsagent_error (agent, "Could not open '%s' for writing",
-                         agent->definition_path);
-    else {
-        char *def = parser_export_definition (agent->definition);
-        assert (def);
-        fprintf (fp, "%s", def);
+    if (!fp)
+        igsagent_error (agent, "Could not open '%s' for writing", agent->definition_path);
+    else if (agent->definition->json) {
+        fprintf (fp, "%s", agent->definition->json);
         fflush (fp);
         fclose (fp);
-        free (def);
     }
     model_read_write_unlock (__FUNCTION__, __LINE__);
 }

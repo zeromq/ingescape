@@ -1505,6 +1505,7 @@ igs_result_t igsagent_definition_load_str (igsagent_t *agent,
     igsagent_set_name (agent, tmp->name);
     definition_free_definition (&agent->definition);
     agent->definition = tmp;
+    definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
     model_read_write_unlock (__FUNCTION__, __LINE__);
     return IGS_SUCCESS;
@@ -1533,6 +1534,7 @@ igs_result_t igsagent_definition_load_file (igsagent_t *agent,
     definition_free_definition (&agent->definition);
     agent->definition_path = s_strndup (file_path, IGS_MAX_PATH_LENGTH - 1);
     agent->definition = tmp;
+    definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
     model_read_write_unlock (__FUNCTION__, __LINE__);
     return IGS_SUCCESS;

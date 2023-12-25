@@ -156,6 +156,8 @@ typedef struct igs_definition{
     char* family;
     char* description;
     char* version;
+    char *json;
+    char *json_legacy;
     igs_iop_t* params_table;
     igs_iop_t* inputs_table;
     igs_iop_t* outputs_table;
@@ -179,6 +181,8 @@ typedef struct igs_split{
 } igs_split_t;
 
 typedef struct igs_mapping{
+    char *json;
+    char *json_legacy;
     igs_map_t* map_elements;
     igs_split_t* split_elements;
 } igs_mapping_t;
@@ -487,6 +491,7 @@ void core_init_context(void);
 // definition
 INGESCAPE_EXPORT void definition_free_definition (igs_definition_t **definition);
 INGESCAPE_EXPORT void definition_free_constraint (igs_constraint_t **constraint);
+INGESCAPE_EXPORT void definition_update_json (igs_definition_t *definition);
 
 // mapping
 INGESCAPE_EXPORT void mapping_free_mapping (igs_mapping_t **map);
@@ -497,6 +502,7 @@ INGESCAPE_EXPORT bool mapping_is_equal(const char *first_str, const char *second
 
 INGESCAPE_EXPORT uint64_t s_djb2_hash (unsigned char *str);
 bool mapping_check_input_output_compatibility(igsagent_t *agent, igs_iop_t *found_input, igs_iop_t *found_output);
+INGESCAPE_EXPORT void mapping_update_json (igs_mapping_t *mapping);
 
 // split
 INGESCAPE_EXPORT void split_free_split_element (igs_split_t **split_elmt);

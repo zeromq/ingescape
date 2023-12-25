@@ -640,7 +640,7 @@ const igs_iop_t *model_write_iop (igsagent_t *agent, const char *name,
                 break;
         }
         char log_iop_value_buffer[MAX_IOP_VALUE_LOG_BUFFER_LENGTH] = "";
-        char *log_iop_value = NULL;
+        char *log_iop_value = NULL; //FIXME: try to use log_iop_value_buffer only
         switch (iop->value_type) {
             case IGS_IMPULSION_T:
                 log_iop_value = strdup ("impulsion (no value)");
@@ -691,7 +691,8 @@ const igs_iop_t *model_write_iop (igsagent_t *agent, const char *name,
         }
         igsagent_debug (agent, "set %s %s to %s", log_iop_type, name,
                         log_iop_value);
-        free (log_iop_value);
+        if (log_iop_value)
+            free (log_iop_value);
         
         model_read_write_unlock (__FUNCTION__, __LINE__);
         // handle iop callbacks

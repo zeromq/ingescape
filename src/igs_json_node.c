@@ -98,7 +98,7 @@ igs_json_node_parse_from_file (const char *path)
 {
     assert (path);
     zfile_t *file = zfile_new (NULL, path);
-    if (file == NULL || !zfile_is_regular (file) || !zfile_is_readable (file)
+    if (!file || !zfile_is_regular (file) || !zfile_is_readable (file)
         || zfile_input (file) != 0) {
         if (!zfile_is_regular (file))
             igs_error ("not a regular file : %s", path);
@@ -111,7 +111,7 @@ igs_json_node_parse_from_file (const char *path)
     char errbuf[1024] = "unknown error";
     zchunk_t *data = zfile_read (file, zfile_size (path), 0);
     igs_json_node_t *node = (igs_json_node_t *) igsyajl_tree_parse ((const char *) zchunk_data (data), zchunk_size (data), errbuf, sizeof (errbuf));
-    if (node == NULL)
+    if (!node)
         igs_error ("parsing error (%s) : %s", path, errbuf);
     zchunk_destroy (&data);
     zfile_destroy (&file);

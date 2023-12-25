@@ -401,6 +401,7 @@ igs_result_t igsagent_service_init (igsagent_t *agent,
             t->name = s_strndup (name, IGS_MAX_STRING_MSG_LENGTH);
         }
         HASH_ADD_STR (agent->definition->services_table, name, t);
+        definition_update_json (agent->definition);
         agent->network_need_to_send_definition_update = true;
     }
     t->cb = cb;
@@ -424,6 +425,7 @@ igs_result_t igsagent_service_remove (igsagent_t *agent, const char *name)
     }
     HASH_DEL (agent->definition->services_table, t);
     service_free_service (t);
+    definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
     return IGS_SUCCESS;
 }
@@ -482,6 +484,7 @@ igs_result_t igsagent_service_arg_add (igsagent_t *agent,
     }
     a->type = type;
     LL_APPEND (t->arguments, a);
+    definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
     return IGS_SUCCESS;
 }
@@ -517,6 +520,7 @@ igs_result_t igsagent_service_arg_remove (igsagent_t *agent,
                     free (arg->c);
             free (arg);
             found = true;
+            definition_update_json (agent->definition);
             agent->network_need_to_send_definition_update = true;
             break;
         }
@@ -556,6 +560,7 @@ igs_result_t igsagent_service_reply_add(igsagent_t *agent, const char *service_n
     } else
         r->name = s_strndup (reply_name, IGS_MAX_STRING_MSG_LENGTH);
     HASH_ADD_STR(s->replies, name, r);
+    definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
     return IGS_SUCCESS;
 }
@@ -579,6 +584,7 @@ igs_result_t igsagent_service_reply_remove(igsagent_t *agent, const char *servic
     if (r){
         HASH_DEL(s->replies, r);
         service_free_service (r);
+        definition_update_json (agent->definition);
         agent->network_need_to_send_definition_update = true;
         return IGS_SUCCESS;
     }else{
@@ -644,6 +650,7 @@ igs_result_t igsagent_service_reply_arg_add(igsagent_t *agent, const char *servi
     }
     a->type = type;
     LL_APPEND (r->arguments, a);
+    definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
     return IGS_SUCCESS;
 }
@@ -683,6 +690,7 @@ igs_result_t igsagent_service_reply_arg_remove(igsagent_t *agent, const char *se
                     free (arg->c);
             free (arg);
             found = true;
+            definition_update_json (agent->definition);
             agent->network_need_to_send_definition_update = true;
             break;
         }

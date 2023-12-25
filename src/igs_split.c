@@ -608,6 +608,7 @@ uint64_t igsagent_split_add (igsagent_t *agent,
         new->id = hash;
         HASH_ADD (hh, agent->mapping->split_elements, id,
                   sizeof (uint64_t), new);
+        mapping_update_json(agent->mapping);
         agent->network_need_to_send_mapping_update = true;
 
         // If agent is already known send HELLO message immediately
@@ -668,6 +669,7 @@ igs_result_t igsagent_split_remove_with_id (igsagent_t *agent,
         zmsg_addstr (goodbye_message, el->to_output);
         igs_channel_whisper_zmsg (el->to_agent, &goodbye_message);
         split_free_split_element(&el);
+        mapping_update_json(agent->mapping);
         agent->network_need_to_send_mapping_update = true;
         model_read_write_unlock (__FUNCTION__, __LINE__);
     }
@@ -725,6 +727,7 @@ igs_result_t igsagent_split_remove_with_name (igsagent_t *agent,
     zmsg_addstr (goodbye_message, tmp->to_output);
     igs_channel_whisper_zmsg (tmp->to_agent, &goodbye_message);
     split_free_split_element (&tmp);
+    mapping_update_json(agent->mapping);
     agent->network_need_to_send_mapping_update = true;
     model_read_write_unlock (__FUNCTION__, __LINE__);
     return IGS_SUCCESS;
