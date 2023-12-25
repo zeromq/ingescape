@@ -44,7 +44,7 @@ bool tester_firstAgentExited = false;
 bool tester_secondAgentEntered = false;
 bool tester_secondAgentKnowsUs = false;
 bool tester_secondAgentExited = false;
-void agentEvent(igs_agent_event_t event, const char *uuid, const char *name, void *eventData, void *myCbData){
+void agentEvent(igs_agent_event_t event, const char *uuid, const char *name, const void *eventData, void *myCbData){
     IGS_UNUSED(eventData)
     IGS_UNUSED(myCbData)
     if (autoTests)
@@ -369,7 +369,7 @@ void testerIOPCallback(igs_iop_type_t iopType, const char* name, igs_iop_value_t
 
 // static tests function
 void run_static_tests (int argc, const char * argv[]){
-    igs_log_set_syslog(true);
+    igs_log_set_syslog(false);
     //agent name and uuid
     char *name = igs_agent_name();
     assert(streq(name, "no_name"));
@@ -1763,22 +1763,25 @@ void run_static_tests (int argc, const char * argv[]){
     igsagent_split_add(secondAgent, "second_data_split", "firstAgent", "first_data");
 
     //test mapping in same process between second_agent and first_agent
-    igsagent_activate(secondAgent);
-    igsagent_output_set_bool(firstAgent, "first_bool", true);
-    assert(igsagent_input_bool(secondAgent, "second_bool"));
-    igsagent_output_set_bool(firstAgent, "first_bool", false);
-    assert(!igsagent_input_bool(secondAgent, "second_bool"));
-    igsagent_output_set_int(firstAgent, "first_int", 5);
-    assert(igsagent_input_int(secondAgent, "second_int") == 5);
-    igsagent_output_set_double(firstAgent, "first_double", 5.5);
-    assert(igsagent_input_double(secondAgent, "second_double") - 5.5 < 0.000001);
-    igsagent_output_set_string(firstAgent, "first_string", "test string mapping");
-    assert(streq(igsagent_input_string(secondAgent, "second_string"), "test string mapping")); //intentional memory leak here
-    data = (void*)"my data";
-    dataSize = strlen("my data") + 1;
-    igsagent_output_set_data(firstAgent, "first_data", data, dataSize);
-    assert(igsagent_input_data(secondAgent, "second_data", &data, &dataSize) == IGS_SUCCESS);
-    assert(streq((char*)data, "my data") && strlen((char*)data) == dataSize - 1);
+    //NB: these tests have been obsolete since the delegation of internal
+    //publication handling to the ingescape zloop. Internal mappings require
+    //a running ingescape loop in order to work properly.
+//    igsagent_activate(secondAgent);
+//    igsagent_output_set_bool(firstAgent, "first_bool", true);
+//    assert(igsagent_input_bool(secondAgent, "second_bool"));
+//    igsagent_output_set_bool(firstAgent, "first_bool", false);
+//    assert(!igsagent_input_bool(secondAgent, "second_bool"));
+//    igsagent_output_set_int(firstAgent, "first_int", 5);
+//    assert(igsagent_input_int(secondAgent, "second_int") == 5);
+//    igsagent_output_set_double(firstAgent, "first_double", 5.5);
+//    assert(igsagent_input_double(secondAgent, "second_double") - 5.5 < 0.000001);
+//    igsagent_output_set_string(firstAgent, "first_string", "test string mapping");
+//    assert(streq(igsagent_input_string(secondAgent, "second_string"), "test string mapping")); //intentional memory leak here
+//    data = (void*)"my data";
+//    dataSize = strlen("my data") + 1;
+//    igsagent_output_set_data(firstAgent, "first_data", data, dataSize);
+//    assert(igsagent_input_data(secondAgent, "second_data", &data, &dataSize) == IGS_SUCCESS);
+//    assert(streq((char*)data, "my data") && strlen((char*)data) == dataSize - 1);
 
     //test service in the same process
     list = NULL;
@@ -1948,8 +1951,6 @@ int main(int argc, const char * argv[]) {
     igs_log_include_data(true);
     igs_log_include_services(true);
     igs_log_set_syslog(false);
-
-
 
     if (staticTests){
         autoTests = false;
