@@ -577,22 +577,22 @@ igs_result_t igs_parameter_set_description(const char *name, const char *descrip
     return igsagent_parameter_set_description (core_agent, name, description);
 }
 
-igs_result_t igs_input_set_specification(const char *name, const char *type, const char *specification)
+igs_result_t igs_input_set_detailed_type(const char *name, const char *type_name, const char *specification)
 {
     core_init_agent ();
-    return igsagent_input_set_specification(core_agent, name, type, specification);
+    return igsagent_input_set_detailed_type(core_agent, name, type_name, specification);
 }
 
-igs_result_t igs_output_set_specification(const char *name, const char *type, const char *specification)
+igs_result_t igs_output_set_detailed_type(const char *name, const char *type_name, const char *specification)
 {
     core_init_agent ();
-    return igsagent_output_set_specification(core_agent, name, type, specification);
+    return igsagent_output_set_detailed_type(core_agent, name, type_name, specification);
 }
 
-igs_result_t igs_parameter_set_specification(const char *name, const char *type, const char *specification)
+igs_result_t igs_parameter_set_detailed_type(const char *name, const char *type_name, const char *specification)
 {
     core_init_agent ();
-    return igsagent_parameter_set_specification(core_agent, name, type, specification);
+    return igsagent_parameter_set_detailed_type(core_agent, name, type_name, specification);
 }
 
 void igs_clear_input (const char *name)
@@ -824,6 +824,31 @@ char *igs_definition_json (void)
 {
     core_init_agent ();
     return igsagent_definition_json (core_agent);
+}
+
+void igs_definition_set_package(const char *package)
+{
+    core_init_agent ();
+    igsagent_definition_set_package (core_agent, package);
+}
+
+// returned char* must be freed by caller
+char * igs_definition_package(void)
+{
+    core_init_agent ();
+    return igsagent_definition_package (core_agent);
+}
+
+void igs_definition_set_class(const char *my_class)
+{
+    core_init_agent ();
+    igsagent_definition_set_class (core_agent, my_class);
+}
+
+// returned char* must be freed by caller
+char * igs_definition_class(void){
+    core_init_agent ();
+    return igsagent_definition_class (core_agent);
 }
 
 // returned char* must be freed by caller

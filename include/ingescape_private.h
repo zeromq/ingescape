@@ -123,7 +123,7 @@ typedef struct igs_constraint{
 typedef struct igs_iop{
     char* name;
     char *description;
-    char *spec_type;
+    char *detailed_type;
     char *specification;
     igs_iop_value_type_t value_type;
     igs_iop_type_t type;
@@ -152,12 +152,14 @@ typedef struct igs_service{
 } igs_service_t;
 
 typedef struct igs_definition{
+    char* my_class;
+    char* package;
     char* name;
-    char* family;
     char* description;
     char* version;
     char *json;
     char *json_legacy;
+    char* family;
     igs_iop_t* params_table;
     igs_iop_t* inputs_table;
     igs_iop_t* outputs_table;

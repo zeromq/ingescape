@@ -1647,13 +1647,13 @@ igs_result_t s_model_set_description(igsagent_t *self, igs_iop_type_t type,
     return IGS_SUCCESS;
 }
 
-igs_result_t s_model_set_specification(igsagent_t *self, igs_iop_type_t type,
-                               const char *name, const char *spec_type,
-                               const char *specification)
+igs_result_t s_model_set_detailed_type(igsagent_t *self, igs_iop_type_t type,
+                                       const char *name, const char *type_name,
+                                       const char *specification)
 {
     assert(self);
     assert(name);
-    assert(spec_type);
+    assert(type_name);
     assert(specification);
     igs_iop_t *iop = NULL;
     if (type == IGS_INPUT_T) {
@@ -1683,9 +1683,9 @@ igs_result_t s_model_set_specification(igsagent_t *self, igs_iop_type_t type,
         igsagent_error (self, "Unknown IOP type %d", type);
         return IGS_FAILURE;
     }
-    if (iop->spec_type)
-        free(iop->spec_type);
-    iop->spec_type = s_strndup(spec_type, IGS_MAX_LOG_LENGTH);
+    if (iop->detailed_type)
+        free(iop->detailed_type);
+    iop->detailed_type = s_strndup(type_name, IGS_MAX_LOG_LENGTH);
     if (iop->specification)
         free(iop->specification);
     iop->specification = s_strndup(specification, IGS_MAX_LOG_LENGTH);
@@ -1730,22 +1730,22 @@ igs_result_t igsagent_parameter_set_description(igsagent_t *self, const char *na
     return s_model_set_description(self, IGS_PARAMETER_T, name, description);
 }
 
-igs_result_t igsagent_input_set_specification(igsagent_t *self, const char *name,
-                                              const char *spec_type, const char *specification)
+igs_result_t igsagent_input_set_detailed_type(igsagent_t *self, const char *name,
+                                              const char *type_name, const char *specification)
 {
-    return s_model_set_specification(self, IGS_INPUT_T, name, spec_type, specification);
+    return s_model_set_detailed_type(self, IGS_INPUT_T, name, type_name, specification);
 }
 
-igs_result_t igsagent_output_set_specification(igsagent_t *self, const char *name,
-                                               const char *spec_type, const char *specification)
+igs_result_t igsagent_output_set_detailed_type(igsagent_t *self, const char *name,
+                                               const char *type_name, const char *specification)
 {
-    return s_model_set_specification(self, IGS_OUTPUT_T, name, spec_type, specification);
+    return s_model_set_detailed_type(self, IGS_OUTPUT_T, name, type_name, specification);
 }
 
-igs_result_t igsagent_parameter_set_specification(igsagent_t *self, const char *name,
-                                                  const char *spec_type, const char *specification)
+igs_result_t igsagent_parameter_set_detailed_type(igsagent_t *self, const char *name,
+                                                  const char *type_name, const char *specification)
 {
-    return s_model_set_specification(self, IGS_PARAMETER_T, name, spec_type, specification);
+    return s_model_set_detailed_type(self, IGS_PARAMETER_T, name, type_name, specification);
 }
 
 void igsagent_clear_input (igsagent_t *agent, const char *name)

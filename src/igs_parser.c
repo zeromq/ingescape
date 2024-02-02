@@ -19,9 +19,11 @@
 
 #define STR_DEFINITION "definition"
 #define STR_NAME "name"
+#define STR_CLASS "class"
+#define STR_PACKAGE "package"
 #define STR_FAMILY "family"
 #define STR_DESCRIPTION "description"
-#define STR_SPEC_TYPE "spec_type"
+#define STR_DETAILED_TYPE "detailed_type"
 #define STR_SPECIFICATION "specification"
 #define STR_VERSION "version"
 #define STR_PARAMETERS "parameters"
@@ -126,9 +128,11 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
     const char *arguments_path[] = {STR_ARGUMENTS, NULL};
     const char *agent_name_path[] = {STR_DEFINITION, STR_NAME, NULL};
     const char *name_path[] = {STR_NAME, NULL};
+    const char *class_path[] = {STR_DEFINITION, STR_CLASS, NULL};
+    const char *package_path[] = {STR_DEFINITION, STR_PACKAGE, NULL};
     const char *constraint_path[] = {STR_CONSTRAINT, NULL};
     const char *iop_description_path[] = {STR_DESCRIPTION, NULL};
-    const char *iop_spec_type_path[] = {STR_SPEC_TYPE, NULL};
+    const char *iop_detailed_type_path[] = {STR_DETAILED_TYPE, NULL};
     const char *iop_specification_path[] = {STR_SPECIFICATION, NULL};
     const char *family_path[] = {STR_DEFINITION, STR_FAMILY, NULL};
     const char *type_path[] = {STR_TYPE, NULL};
@@ -162,6 +166,16 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
         igs_json_node_destroy (json);
         return NULL;
     }
+    
+    // class
+    igs_json_node_t *class = igs_json_node_find (*json, class_path);
+    if (class && class->type == IGS_JSON_STRING && class->u.string)
+        definition->my_class = strdup (class->u.string);
+    
+    // package
+    igs_json_node_t *package = igs_json_node_find (*json, package_path);
+    if (package && package->type == IGS_JSON_STRING && package->u.string)
+        definition->package = strdup (package->u.string);
 
     // family
     igs_json_node_t *family = igs_json_node_find (*json, family_path);
@@ -231,11 +245,11 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                     iop->description = s_strndup(iop_description->u.string, IGS_MAX_LOG_LENGTH);
                 }
                 
-                igs_json_node_t *iop_spec_type = igs_json_node_find (inputs->u.array.values[i], iop_spec_type_path);
-                if (iop_spec_type && iop_spec_type->type == IGS_JSON_STRING && iop_spec_type->u.string){
-                    if (iop->spec_type)
-                        free(iop->spec_type);
-                    iop->spec_type = s_strndup(iop_spec_type->u.string, IGS_MAX_LOG_LENGTH);
+                igs_json_node_t *iop_detailed_type = igs_json_node_find (inputs->u.array.values[i], iop_detailed_type_path);
+                if (iop_detailed_type && iop_detailed_type->type == IGS_JSON_STRING && iop_detailed_type->u.string){
+                    if (iop->detailed_type)
+                        free(iop->detailed_type);
+                    iop->detailed_type = s_strndup(iop_detailed_type->u.string, IGS_MAX_PATH_LENGTH);
                 }
                 
                 igs_json_node_t *iop_specification = igs_json_node_find (inputs->u.array.values[i], iop_specification_path);
@@ -304,11 +318,11 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                     iop->description = s_strndup(iop_description->u.string, IGS_MAX_LOG_LENGTH);
                 }
                 
-                igs_json_node_t *iop_spec_type = igs_json_node_find (outputs->u.array.values[i], iop_spec_type_path);
-                if (iop_spec_type && iop_spec_type->type == IGS_JSON_STRING && iop_spec_type->u.string){
-                    if (iop->spec_type)
-                        free(iop->spec_type);
-                    iop->spec_type = s_strndup(iop_spec_type->u.string, IGS_MAX_LOG_LENGTH);
+                igs_json_node_t *iop_detailed_type = igs_json_node_find (outputs->u.array.values[i], iop_detailed_type_path);
+                if (iop_detailed_type && iop_detailed_type->type == IGS_JSON_STRING && iop_detailed_type->u.string){
+                    if (iop->detailed_type)
+                        free(iop->detailed_type);
+                    iop->detailed_type = s_strndup(iop_detailed_type->u.string, IGS_MAX_PATH_LENGTH);
                 }
                 
                 igs_json_node_t *iop_specification = igs_json_node_find (outputs->u.array.values[i], iop_specification_path);
@@ -380,11 +394,11 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                     iop->description = s_strndup(iop_description->u.string, IGS_MAX_LOG_LENGTH);
                 }
                 
-                igs_json_node_t *iop_spec_type = igs_json_node_find (parameters->u.array.values[i], iop_spec_type_path);
-                if (iop_spec_type && iop_spec_type->type == IGS_JSON_STRING && iop_spec_type->u.string){
-                    if (iop->spec_type)
-                        free(iop->spec_type);
-                    iop->spec_type = s_strndup(iop_spec_type->u.string, IGS_MAX_LOG_LENGTH);
+                igs_json_node_t *iop_detailed_type = igs_json_node_find (parameters->u.array.values[i], iop_detailed_type_path);
+                if (iop_detailed_type && iop_detailed_type->type == IGS_JSON_STRING && iop_detailed_type->u.string){
+                    if (iop->detailed_type)
+                        free(iop->detailed_type);
+                    iop->detailed_type = s_strndup(iop_detailed_type->u.string, IGS_MAX_PATH_LENGTH);
                 }
                 
                 igs_json_node_t *iop_specification = igs_json_node_find (parameters->u.array.values[i], iop_specification_path);
@@ -920,6 +934,14 @@ char *parser_export_definition (igs_definition_t *def)
         igs_json_add_string (json, STR_NAME);
         igs_json_add_string (json, def->name);
     }
+    if (def->my_class) {
+        igs_json_add_string (json, STR_CLASS);
+        igs_json_add_string (json, def->my_class);
+    }
+    if (def->package) {
+        igs_json_add_string (json, STR_PACKAGE);
+        igs_json_add_string (json, def->package);
+    }
     if (def->family) {
         igs_json_add_string (json, STR_FAMILY);
         igs_json_add_string (json, def->family);
@@ -996,9 +1018,9 @@ char *parser_export_definition (igs_definition_t *def)
             igs_json_add_string (json, STR_DESCRIPTION);
             igs_json_add_string (json, iop->description);
         }
-        if (iop->spec_type){
-            igs_json_add_string (json, STR_SPEC_TYPE);
-            igs_json_add_string (json, iop->spec_type);
+        if (iop->detailed_type){
+            igs_json_add_string (json, STR_DETAILED_TYPE);
+            igs_json_add_string (json, iop->detailed_type);
         }
         if (iop->specification){
             igs_json_add_string (json, STR_SPECIFICATION);
@@ -1071,9 +1093,9 @@ char *parser_export_definition (igs_definition_t *def)
             igs_json_add_string (json, STR_DESCRIPTION);
             igs_json_add_string (json, iop->description);
         }
-        if (iop->spec_type){
-            igs_json_add_string (json, STR_SPEC_TYPE);
-            igs_json_add_string (json, iop->spec_type);
+        if (iop->detailed_type){
+            igs_json_add_string (json, STR_DETAILED_TYPE);
+            igs_json_add_string (json, iop->detailed_type);
         }
         if (iop->specification){
             igs_json_add_string (json, STR_SPECIFICATION);
@@ -1145,9 +1167,9 @@ char *parser_export_definition (igs_definition_t *def)
             igs_json_add_string (json, STR_DESCRIPTION);
             igs_json_add_string (json, iop->description);
         }
-        if (iop->spec_type){
-            igs_json_add_string (json, STR_SPEC_TYPE);
-            igs_json_add_string (json, iop->spec_type);
+        if (iop->detailed_type){
+            igs_json_add_string (json, STR_DETAILED_TYPE);
+            igs_json_add_string (json, iop->detailed_type);
         }
         if (iop->specification){
             igs_json_add_string (json, STR_SPECIFICATION);

@@ -97,6 +97,10 @@ INGESCAPE_EXPORT igs_result_t igsagent_definition_load_str (igsagent_t *self, co
 INGESCAPE_EXPORT igs_result_t igsagent_definition_load_file (igsagent_t *self, const char *file_path);
 INGESCAPE_EXPORT void igsagent_clear_definition (igsagent_t *self);
 INGESCAPE_EXPORT char * igsagent_definition_json (igsagent_t *self);//caller owns returned value
+INGESCAPE_EXPORT char * igsagent_definition_package (igsagent_t *self);//caller owns returned value
+INGESCAPE_EXPORT char * igsagent_definition_class (igsagent_t *self);//caller owns returned value
+INGESCAPE_EXPORT void igsagent_definition_set_package (igsagent_t *self, const char *package);
+INGESCAPE_EXPORT void igsagent_definition_set_class (igsagent_t *self, const char *my_class);
 INGESCAPE_EXPORT char * igsagent_definition_description (igsagent_t *self);//caller owns returned value
 INGESCAPE_EXPORT char * igsagent_definition_version (igsagent_t *self);//caller owns returned value
 INGESCAPE_EXPORT void igsagent_definition_set_description (igsagent_t *self, const char *descritpion);
@@ -185,12 +189,12 @@ INGESCAPE_EXPORT igs_result_t igsagent_input_set_description(igsagent_t *self, c
 INGESCAPE_EXPORT igs_result_t igsagent_output_set_description(igsagent_t *self, const char *name, const char *description);
 INGESCAPE_EXPORT igs_result_t igsagent_parameter_set_description(igsagent_t *self, const char *name, const char *description);
 
-INGESCAPE_EXPORT igs_result_t igsagent_input_set_specification(igsagent_t *self, const char *name, 
-                                                               const char *spec_type, const char *specification);
-INGESCAPE_EXPORT igs_result_t igsagent_output_set_specification(igsagent_t *self, const char *name,
-                                                                const char *spec_type, const char *specification);
-INGESCAPE_EXPORT igs_result_t igsagent_parameter_set_specification(igsagent_t *self, const char *name,
-                                                                   const char *spec_type, const char *specification);
+INGESCAPE_EXPORT igs_result_t igsagent_input_set_detailed_type(igsagent_t *self, const char *name,
+                                                               const char *type_name, const char *specification);
+INGESCAPE_EXPORT igs_result_t igsagent_output_set_detailed_type(igsagent_t *self, const char *name,
+                                                                const char *type_name, const char *specification);
+INGESCAPE_EXPORT igs_result_t igsagent_parameter_set_detailed_type(igsagent_t *self, const char *name,
+                                                                   const char *type_name, const char *specification);
 
 /*These two functions enable sending and receiving DATA
  inputs/outputs by using zmsg_t structures. zmsg_t structures

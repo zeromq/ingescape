@@ -63,8 +63,8 @@ void s_definition_free_iop (igs_iop_t **iop)
         definition_free_constraint(&(*iop)->constraint);
     if ((*iop)->description)
         free((*iop)->description);
-    if ((*iop)->spec_type)
-        free((*iop)->spec_type);
+    if ((*iop)->detailed_type)
+        free((*iop)->detailed_type);
     if ((*iop)->specification)
         free((*iop)->specification);
 
@@ -192,6 +192,14 @@ void definition_free_definition (igs_definition_t **def)
 {
     assert (def);
     assert (*def);
+    if ((*def)->my_class) {
+        free ((char *) (*def)->my_class);
+        (*def)->my_class = NULL;
+    }
+    if ((*def)->package) {
+        free ((char *) (*def)->package);
+        (*def)->package = NULL;
+    }
     if ((*def)->name) {
         free ((char *) (*def)->name);
         (*def)->name = NULL;
@@ -292,6 +300,20 @@ char *igsagent_definition_json (igsagent_t *agent)
     return (agent->definition->json)?strdup(agent->definition->json):NULL;
 }
 
+char *igsagent_definition_package (igsagent_t *agent)
+{
+    assert (agent);
+    assert (agent->definition);
+    return (agent->definition->package) ? strdup (agent->definition->package):NULL;
+}
+
+char *igsagent_definition_class (igsagent_t *agent)
+{
+    assert (agent);
+    assert (agent->definition);
+    return (agent->definition->my_class) ? strdup (agent->definition->my_class):NULL;
+}
+
 char *igsagent_family (igsagent_t *agent)
 {
     assert (agent);
@@ -325,6 +347,34 @@ void igsagent_set_family (igsagent_t *agent, const char *family)
     if (agent->definition->family)
         free (agent->definition->family);
     agent->definition->family = s_strndup (family, IGS_MAX_FAMILY_LENGTH);
+    definition_update_json (agent->definition);
+    agent->network_need_to_send_definition_update = true;
+}
+
+void igsagent_definition_set_package (igsagent_t *agent,
+                                      const char *package)
+{
+    assert (agent);
+    assert (package);
+    assert (agent->definition);
+    if (agent->definition->package)
+        free (agent->definition->package);
+    agent->definition->package =
+      s_strndup (package, IGS_MAX_DESCRIPTION_LENGTH);
+    definition_update_json (agent->definition);
+    agent->network_need_to_send_definition_update = true;
+}
+
+void igsagent_definition_set_class (igsagent_t *agent,
+                                    const char *my_class)
+{
+    assert (agent);
+    assert (my_class);
+    assert (agent->definition);
+    if (agent->definition->my_class)
+        free (agent->definition->my_class);
+    agent->definition->my_class =
+      s_strndup (my_class, IGS_MAX_DESCRIPTION_LENGTH);
     definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
 }

@@ -159,12 +159,6 @@ INGESCAPE_EXPORT char * igs_agent_uuid(void); //caller owns returned value
 INGESCAPE_EXPORT void igs_agent_set_state(const char *state);
 INGESCAPE_EXPORT char * igs_agent_state(void); //caller owns returned value
 
-/*agent family - optional
- 32 characters canonical UUID format is commonly expected,
- default is an empty string, max length is 64 characters*/
-INGESCAPE_EXPORT void igs_agent_set_family(const char *family);
-INGESCAPE_EXPORT char * igs_agent_family(void); //caller owns returned value
-
 //mute the agent
 INGESCAPE_EXPORT void igs_agent_mute(void);
 INGESCAPE_EXPORT void igs_agent_unmute(void);
@@ -218,7 +212,7 @@ INGESCAPE_EXPORT void igs_observe_agent_events (igs_agent_events_fn cb, void *my
 
 
 //////////////////////////////////////////////////////////////////////////////////
-// Editing & inspecting definitions, adding and removing inputs/outputs/parameters
+// Editing & inspecting agent DEFINITION
 
 typedef enum {
     IGS_INPUT_T = 1,
@@ -236,17 +230,37 @@ typedef enum {
     IGS_DATA_T
 } igs_iop_value_type_t;
 
+/*Package, class, description, version
+ In a Model-Based System Engineering (MBSE) context, an agent may
+ receive additonal information regarding its position, role and
+ activities in a given system. These information are represented
+ by:
+    • A package, positioning the class inside a larger set,
+    • A class, naming the agent in the context of a given system,
+    • A free-text description for the role and activities of the agent,
+    • A version
+ The class is set by default to the name of the agent.
+ The package generally complies to a hierarchical structure with '::'
+ as a separator, e.g. level1::level2::level3, but the library does not
+ make any verification.
+ */
+INGESCAPE_EXPORT void igs_definition_set_package(const char *package);
+INGESCAPE_EXPORT char * igs_definition_package(void); //caller owns returned value
+INGESCAPE_EXPORT void igs_definition_set_class(const char *my_class);
+INGESCAPE_EXPORT char * igs_definition_class(void); //caller owns returned value
+INGESCAPE_EXPORT void igs_definition_set_description(const char *description);
+INGESCAPE_EXPORT char * igs_definition_description(void); //caller owns returned value
+INGESCAPE_EXPORT void igs_definition_set_version(const char *version);
+INGESCAPE_EXPORT char * igs_definition_version(void); //caller owns returned value
+
+
 //load / set / get definition
 INGESCAPE_EXPORT igs_result_t igs_definition_load_str (const char* json_str);
 INGESCAPE_EXPORT igs_result_t igs_definition_load_file (const char* file_path);
 INGESCAPE_EXPORT void igs_clear_definition(void); //clears definition data for the agent
 INGESCAPE_EXPORT char * igs_definition_json(void); //returns json string, caller owns returned value
-INGESCAPE_EXPORT char * igs_definition_description(void); //caller owns returned value
-INGESCAPE_EXPORT char * igs_definition_version(void); //caller owns returned value
-INGESCAPE_EXPORT void igs_definition_set_description(const char *description);
-INGESCAPE_EXPORT void igs_definition_set_version(const char *version);
 
-//edit the definition
+//create & remove inputs/outputs
 INGESCAPE_EXPORT igs_result_t igs_input_create(const char *name,
                                                igs_iop_value_type_t value_type,
                                                void *value,
@@ -263,7 +277,7 @@ INGESCAPE_EXPORT igs_result_t igs_input_remove(const char *name);
 INGESCAPE_EXPORT igs_result_t igs_output_remove(const char *name);
 INGESCAPE_EXPORT igs_result_t igs_parameter_remove(const char *name);
 
-//check IOP type, list and existence
+//inputs/outputs type, list and existence
 INGESCAPE_EXPORT igs_iop_value_type_t igs_input_type(const char *name);
 INGESCAPE_EXPORT igs_iop_value_type_t igs_output_type(const char *name);
 INGESCAPE_EXPORT igs_iop_value_type_t igs_parameter_type(const char *name);
@@ -369,16 +383,16 @@ INGESCAPE_EXPORT igs_result_t igs_input_set_description(const char *name, const 
 INGESCAPE_EXPORT igs_result_t igs_output_set_description(const char *name, const char *description);
 INGESCAPE_EXPORT igs_result_t igs_parameter_set_description(const char *name, const char *description);
 
-/*IOP specification
- This section enables to decribe precise specifications for IOPs, 
- including a type. Specifications are descriptive only. Ingescape
- does not check anything that is passed here.
- For example, the type can be 'protobuf' and the specification can
- be an actual protobuf structure in proto format.
+/*IOP detailed types
+ This section enables to decribe precise specifications for IOPs,
+ around a detailed type. Specifications are descriptive only.
+ Ingescape does not check anything that is passed here.
+ For example, the detailed type can be 'protobuf' and the specification
+ can be an actual protobuf structure in proto format.
  */
-INGESCAPE_EXPORT igs_result_t igs_input_set_specification(const char *name, const char *spec_type, const char *specification);
-INGESCAPE_EXPORT igs_result_t igs_output_set_specification(const char *name, const char *spec_type, const char *specification);
-INGESCAPE_EXPORT igs_result_t igs_parameter_set_specification(const char *name, const char *spec_type, const char *specification);
+INGESCAPE_EXPORT igs_result_t igs_input_set_detailed_type(const char *input_name, const char *type_name, const char *specification);
+INGESCAPE_EXPORT igs_result_t igs_output_set_detailed_type(const char *output_name, const char *type_name, const char *specification);
+INGESCAPE_EXPORT igs_result_t igs_parameter_set_detailed_type(const char *param_name, const char *type_name, const char *specification);
 
 /*These two functions enable sending and receiving DATA on
  inputs/outputs by using zmsg_t structures. zmsg_t structures
@@ -907,6 +921,14 @@ INGESCAPE_EXPORT void igs_observe_monitor(igs_monitor_fn cb, void *my_data);
  and you cannot stop your application to do so. This function SHALL NOT be used
  in production environments.*/
 INGESCAPE_EXPORT void igs_clear_context(void);
+
+/*AGENT FAMILY - for licensing purposes
+ 32 characters canonical UUID format is commonly expected,
+ Default is an empty string. Max length is 64 characters.
+ The family is used together with an external licensing
+ mechanism to uniquely identify a given software agent.*/
+INGESCAPE_EXPORT void igs_agent_set_family(const char *family);
+INGESCAPE_EXPORT char * igs_agent_family(void); //caller owns returned value
 
 
 /* LOGS REPLAY - DEPRECATED - will be removed soon
