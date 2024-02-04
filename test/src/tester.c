@@ -373,14 +373,23 @@ void run_static_tests (int argc, const char * argv[]){
     //agent name and uuid
     char *name = igs_agent_name();
     assert(streq(name, "no_name"));
+    assert(igs_definition_class() == NULL);
+    assert(igs_definition_package() == NULL);
     free(name);
     igs_agent_set_name("simple Demo Agent");
+    assert(streq(igs_definition_class(),"simple_Demo_Agent")); //intentional memory leak here
     name = igs_agent_name();
     assert(streq(name, "simple_Demo_Agent"));
     free(name);
     name = NULL;
     igs_agent_set_name(agentName);
     assert(igs_agent_uuid()); //intentional memory leak here
+    
+    //package and class
+    igs_definition_set_class("my_class");
+    assert(streq(igs_definition_class(),"my_class")); //intentional memory leak here
+    igs_definition_set_package("my::package");
+    assert(streq(igs_definition_package(),"my::package")); //intentional memory leak here
 
     //constraints
     igs_input_create("constraint_impulsion", IGS_IMPULSION_T, 0, 0);
@@ -580,7 +589,7 @@ void run_static_tests (int argc, const char * argv[]){
     assert(igs_definition_version() == NULL);
     igs_definition_set_description("");
     igs_definition_set_version("");
-    //TODO: test loading valid string and file definitions
+    //TODO: test loading valid definitions from string and file
     igs_definition_set_description("my description");
     char *defDesc = igs_definition_description();
     assert(streq(defDesc, "my description"));
@@ -1342,10 +1351,14 @@ void run_static_tests (int argc, const char * argv[]){
     assert(igs_service_reply_arg_add("myServiceWithReplies", "myReply2", "myDouble2", IGS_DOUBLE_T) == IGS_SUCCESS);
     assert(igs_service_reply_arg_add("myServiceWithReplies", "myReply2", "myString2", IGS_STRING_T) == IGS_SUCCESS);
     assert(igs_service_reply_arg_add("myServiceWithReplies", "myReply2", "myData2", IGS_DATA_T) == IGS_SUCCESS);
+    igs_definition_set_class("my_class");
+    igs_definition_set_package("my::package");
     igs_definition_save();
     assert(igs_service_remove("myServiceWithReplies") == IGS_SUCCESS);
     igs_clear_definition();
     igs_definition_load_file("/tmp/simple Demo Agent.json");
+    assert(streq(igs_definition_class(),"my_class")); //intentional memory leak here
+    assert(streq(igs_definition_package(),"my::package")); //intentional memory leak here
     assert(igs_service_has_reply("myServiceWithReplies", "myReply"));
     assert(igs_service_has_reply("myServiceWithReplies", "myReply2"));
     assert(igs_service_reply_args_first("myServiceWithReplies", "myReply"));

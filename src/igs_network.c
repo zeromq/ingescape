@@ -3966,6 +3966,9 @@ void igsagent_set_name (igsagent_t *agent, const char *name)
     definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
     
+    if (!agent->definition->my_class)
+        agent->definition->my_class = strdup(n);
+    
     if (agent->igs_channel)
         free (agent->igs_channel);
     agent->igs_channel = (char *) zmalloc (strlen (agent->definition->name) + strlen ("-IGS") + 1);
