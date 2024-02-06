@@ -278,10 +278,10 @@ void testerChannelCallback(const char *event, const char *peerID, const char *na
     }
 }
 
-//callbacks for iops
-void testerIOPCallback(igs_iop_type_t iopType, const char* name, igs_iop_value_type_t valueType, void* value, size_t valueSize, void* myCbData){
+//callbacks for ios
+void testerIOCallback(igs_io_type_t ioType, const char* name, igs_io_value_type_t valueType, void* value, size_t valueSize, void* myCbData){
     IGS_UNUSED(myCbData)
-    IGS_UNUSED(iopType)
+    IGS_UNUSED(ioType)
     IGS_UNUSED(value)
     
     zsock_t *pipe = igs_pipe_inside_ingescape();
@@ -542,20 +542,20 @@ void run_static_tests (int argc, const char * argv[]){
     igs_unfreeze();
     assert(!igs_is_frozen());
 
-    //iops with NULL definition
+    //ios with NULL definition
     assert(igs_input_count() == 0);
     assert(igs_output_count() == 0);
-    assert(igs_parameter_count() == 0);
+    assert(igs_attribute_count() == 0);
     assert(!igs_input_exists("toto"));
     assert(!igs_output_exists("toto"));
-    assert(!igs_parameter_exists("toto"));
+    assert(!igs_attribute_exists("toto"));
     char **listOfStrings = NULL;
     size_t nbElements = 0;
     listOfStrings = igs_input_list(&nbElements);
     assert(listOfStrings == NULL && nbElements == 0);
     listOfStrings = igs_output_list(&nbElements);
     assert(listOfStrings == NULL && nbElements == 0);
-    listOfStrings = igs_parameter_list(&nbElements);
+    listOfStrings = igs_attribute_list(&nbElements);
     assert(listOfStrings == NULL && nbElements == 0);
     assert(!igs_output_is_muted(NULL));
     assert(!igs_output_is_muted("toto"));
@@ -574,11 +574,11 @@ void run_static_tests (int argc, const char * argv[]){
     assert(igs_output_double("toto") < 0.000001);
     assert(!igs_output_string("toto"));
     assert(igs_output_data("toto", &data, &dataSize) == IGS_FAILURE);
-    assert(!igs_parameter_bool("toto"));
-    assert(!igs_parameter_int("toto"));
-    assert(igs_parameter_double("toto") < 0.000001);
-    assert(!igs_parameter_string("toto"));
-    assert(igs_parameter_data("toto", &data, &dataSize) == IGS_FAILURE);
+    assert(!igs_attribute_bool("toto"));
+    assert(!igs_attribute_int("toto"));
+    assert(igs_attribute_double("toto") < 0.000001);
+    assert(!igs_attribute_string("toto"));
+    assert(igs_attribute_data("toto", &data, &dataSize) == IGS_FAILURE);
 
     //definition - part 1
     assert(igs_definition_load_str("invalid json") == IGS_FAILURE);
@@ -600,20 +600,20 @@ void run_static_tests (int argc, const char * argv[]){
     free(defVer);
     assert(igs_input_create("toto", IGS_BOOL_T, NULL, 0) == IGS_SUCCESS);
     assert(igs_output_create("toto", IGS_BOOL_T, NULL, 0) == IGS_SUCCESS);
-    assert(igs_parameter_create("toto", IGS_BOOL_T, NULL, 0) == IGS_SUCCESS);
+    assert(igs_attribute_create("toto", IGS_BOOL_T, NULL, 0) == IGS_SUCCESS);
     assert(igs_input_create("toto", IGS_BOOL_T, NULL, 0) == IGS_FAILURE);
     assert(igs_output_create("toto", IGS_BOOL_T, NULL, 0) == IGS_FAILURE);
-    assert(igs_parameter_create("toto", IGS_BOOL_T, NULL, 0) == IGS_FAILURE);
+    assert(igs_attribute_create("toto", IGS_BOOL_T, NULL, 0) == IGS_FAILURE);
     igs_output_mute("toto");
     assert(igs_output_is_muted("toto"));
     igs_output_unmute("toto");
     assert(!igs_output_is_muted("toto"));
     assert(igs_input_remove("toto") == IGS_SUCCESS);
     assert(igs_output_remove("toto") == IGS_SUCCESS);
-    assert(igs_parameter_remove("toto") == IGS_SUCCESS);
+    assert(igs_attribute_remove("toto") == IGS_SUCCESS);
     assert(igs_input_remove("toto") == IGS_FAILURE);
     assert(igs_output_remove("toto") == IGS_FAILURE);
-    assert(igs_parameter_remove("toto") == IGS_FAILURE);
+    assert(igs_attribute_remove("toto") == IGS_FAILURE);
 
     //inputs
     assert(igs_input_create("my impulsion", IGS_IMPULSION_T, NULL, 0) == IGS_SUCCESS);
@@ -631,7 +631,7 @@ void run_static_tests (int argc, const char * argv[]){
     listOfStrings = NULL;
     listOfStrings = igs_input_list(&nbElements);
     assert(listOfStrings && nbElements == 6);
-    igs_free_iop_list(listOfStrings, nbElements);
+    igs_free_io_list(listOfStrings, nbElements);
     listOfStrings = NULL;
     assert(igs_input_count() == 6);
     assert(igs_input_type("my_impulsion") == IGS_IMPULSION_T);
@@ -715,7 +715,7 @@ void run_static_tests (int argc, const char * argv[]){
     listOfStrings = NULL;
     listOfStrings = igs_output_list(&nbElements);
     assert(listOfStrings && nbElements == 6);
-    igs_free_iop_list(listOfStrings, nbElements);
+    igs_free_io_list(listOfStrings, nbElements);
     listOfStrings = NULL;
     assert(igs_output_count() == 6);
     assert(igs_output_type("my_impulsion") == IGS_IMPULSION_T);
@@ -775,69 +775,69 @@ void run_static_tests (int argc, const char * argv[]){
 
 
     //parameters
-    assert(igs_parameter_create("my impulsion", IGS_IMPULSION_T, NULL, 0) == IGS_SUCCESS);
-    assert(igs_parameter_create("my impulsion", IGS_IMPULSION_T, NULL, 0) == IGS_FAILURE);
-    assert(igs_parameter_create("my bool", IGS_BOOL_T, &myBool, sizeof(bool)) == IGS_SUCCESS);
-    assert(igs_parameter_create("my bool", IGS_BOOL_T, &myBool, sizeof(bool)) == IGS_FAILURE);
-    assert(igs_parameter_create("my int", IGS_INTEGER_T, &myInt, sizeof(int)) == IGS_SUCCESS);
-    assert(igs_parameter_create("my int", IGS_INTEGER_T, &myInt, sizeof(int)) == IGS_FAILURE);
-    assert(igs_parameter_create("my double", IGS_DOUBLE_T, &myDouble, sizeof(double)) == IGS_SUCCESS);
-    assert(igs_parameter_create("my double", IGS_DOUBLE_T, &myDouble, sizeof(double)) == IGS_FAILURE);
-    assert(igs_parameter_create("my string", IGS_STRING_T, myString, strlen(myString) + 1) == IGS_SUCCESS);
-    assert(igs_parameter_create("my string", IGS_STRING_T, myString, strlen(myString) + 1) == IGS_FAILURE);
-    assert(igs_parameter_create("my data", IGS_DATA_T, myData, 32) == IGS_SUCCESS);
-    assert(igs_parameter_create("my data", IGS_DATA_T, myData, 32) == IGS_FAILURE);
+    assert(igs_attribute_create("my impulsion", IGS_IMPULSION_T, NULL, 0) == IGS_SUCCESS);
+    assert(igs_attribute_create("my impulsion", IGS_IMPULSION_T, NULL, 0) == IGS_FAILURE);
+    assert(igs_attribute_create("my bool", IGS_BOOL_T, &myBool, sizeof(bool)) == IGS_SUCCESS);
+    assert(igs_attribute_create("my bool", IGS_BOOL_T, &myBool, sizeof(bool)) == IGS_FAILURE);
+    assert(igs_attribute_create("my int", IGS_INTEGER_T, &myInt, sizeof(int)) == IGS_SUCCESS);
+    assert(igs_attribute_create("my int", IGS_INTEGER_T, &myInt, sizeof(int)) == IGS_FAILURE);
+    assert(igs_attribute_create("my double", IGS_DOUBLE_T, &myDouble, sizeof(double)) == IGS_SUCCESS);
+    assert(igs_attribute_create("my double", IGS_DOUBLE_T, &myDouble, sizeof(double)) == IGS_FAILURE);
+    assert(igs_attribute_create("my string", IGS_STRING_T, myString, strlen(myString) + 1) == IGS_SUCCESS);
+    assert(igs_attribute_create("my string", IGS_STRING_T, myString, strlen(myString) + 1) == IGS_FAILURE);
+    assert(igs_attribute_create("my data", IGS_DATA_T, myData, 32) == IGS_SUCCESS);
+    assert(igs_attribute_create("my data", IGS_DATA_T, myData, 32) == IGS_FAILURE);
     listOfStrings = NULL;
-    listOfStrings = igs_parameter_list(&nbElements);
+    listOfStrings = igs_attribute_list(&nbElements);
     assert(listOfStrings && nbElements == 6);
-    igs_free_iop_list(listOfStrings, nbElements);
+    igs_free_io_list(listOfStrings, nbElements);
     listOfStrings = NULL;
-    assert(igs_parameter_count() == 6);
-    assert(igs_parameter_type("my_impulsion") == IGS_IMPULSION_T);
-    assert(igs_parameter_exists("my_impulsion"));
-    assert(igs_parameter_type("my_bool") == IGS_BOOL_T);
-    assert(igs_parameter_exists("my_bool"));
-    assert(igs_parameter_type("my_int") == IGS_INTEGER_T);
-    assert(igs_parameter_exists("my_int"));
-    assert(igs_parameter_type("my_double") == IGS_DOUBLE_T);
-    assert(igs_parameter_exists("my_double"));
-    assert(igs_parameter_type("my_string") == IGS_STRING_T);
-    assert(igs_parameter_exists("my_string"));
-    assert(igs_parameter_type("my_data") == IGS_DATA_T);
-    assert(igs_parameter_exists("my_data"));
-    assert(igs_parameter_bool("my_bool"));
-    assert(igs_parameter_int("my_int") == 1);
-    assert(igs_parameter_double("my_double") - 1.0 < 0.000001);
-    string = igs_parameter_string("my_string");
+    assert(igs_attribute_count() == 6);
+    assert(igs_attribute_type("my_impulsion") == IGS_IMPULSION_T);
+    assert(igs_attribute_exists("my_impulsion"));
+    assert(igs_attribute_type("my_bool") == IGS_BOOL_T);
+    assert(igs_attribute_exists("my_bool"));
+    assert(igs_attribute_type("my_int") == IGS_INTEGER_T);
+    assert(igs_attribute_exists("my_int"));
+    assert(igs_attribute_type("my_double") == IGS_DOUBLE_T);
+    assert(igs_attribute_exists("my_double"));
+    assert(igs_attribute_type("my_string") == IGS_STRING_T);
+    assert(igs_attribute_exists("my_string"));
+    assert(igs_attribute_type("my_data") == IGS_DATA_T);
+    assert(igs_attribute_exists("my_data"));
+    assert(igs_attribute_bool("my_bool"));
+    assert(igs_attribute_int("my_int") == 1);
+    assert(igs_attribute_double("my_double") - 1.0 < 0.000001);
+    string = igs_attribute_string("my_string");
     assert(streq(string, "my string"));
     free(string);
     string = NULL;
     data = NULL;
     dataSize = 0;
-    assert(igs_parameter_data("my_data", &data, &dataSize) == IGS_SUCCESS);
+    assert(igs_attribute_data("my_data", &data, &dataSize) == IGS_SUCCESS);
     assert(dataSize == 32 && memcmp(data, myData, dataSize) == 0);
     free(data);
     data = NULL;
     dataSize = 0;
-    assert(igs_parameter_set_bool("", false) == IGS_FAILURE);
-    assert(igs_parameter_set_bool("my_bool", false) == IGS_SUCCESS);
-    assert(!igs_parameter_bool("my_bool"));
-    assert(igs_parameter_set_int("", 2) == IGS_FAILURE);
-    assert(igs_parameter_set_int("my_int", 2) == IGS_SUCCESS);
-    assert(igs_parameter_int("my_int") == 2);
-    assert(igs_parameter_set_double("", 2) == IGS_FAILURE);
-    assert(igs_parameter_set_double("my_double", 2) == IGS_SUCCESS);
-    assert(igs_parameter_double("my_double") - 2 < 0.000001);
-    assert(igs_parameter_set_string("", "new string") == IGS_FAILURE);
-    assert(igs_parameter_set_string("my_string", "new string") == IGS_SUCCESS);
-    string = igs_parameter_string("my_string");
+    assert(igs_attribute_set_bool("", false) == IGS_FAILURE);
+    assert(igs_attribute_set_bool("my_bool", false) == IGS_SUCCESS);
+    assert(!igs_attribute_bool("my_bool"));
+    assert(igs_attribute_set_int("", 2) == IGS_FAILURE);
+    assert(igs_attribute_set_int("my_int", 2) == IGS_SUCCESS);
+    assert(igs_attribute_int("my_int") == 2);
+    assert(igs_attribute_set_double("", 2) == IGS_FAILURE);
+    assert(igs_attribute_set_double("my_double", 2) == IGS_SUCCESS);
+    assert(igs_attribute_double("my_double") - 2 < 0.000001);
+    assert(igs_attribute_set_string("", "new string") == IGS_FAILURE);
+    assert(igs_attribute_set_string("my_string", "new string") == IGS_SUCCESS);
+    string = igs_attribute_string("my_string");
     assert(streq(string, "new string"));
     free(string);
-    assert(igs_parameter_set_data("", myOtherData, 64) == IGS_FAILURE);
-    assert(igs_parameter_set_data("my_data", myOtherData, 64) == IGS_SUCCESS);
+    assert(igs_attribute_set_data("", myOtherData, 64) == IGS_FAILURE);
+    assert(igs_attribute_set_data("my_data", myOtherData, 64) == IGS_SUCCESS);
     data = NULL;
     dataSize = 0;
-    assert(igs_parameter_data("my_data", &data, &dataSize) == IGS_SUCCESS);
+    assert(igs_attribute_data("my_data", &data, &dataSize) == IGS_SUCCESS);
     assert(dataSize == 64 && memcmp(data, myOtherData, dataSize) == 0);
     free(data);
     data = NULL;
@@ -845,18 +845,18 @@ void run_static_tests (int argc, const char * argv[]){
     igs_clear_parameter("my_data");
     data = NULL;
     dataSize = 0;
-    assert(igs_parameter_data("my_data", &data, &dataSize) == IGS_SUCCESS);
+    assert(igs_attribute_data("my_data", &data, &dataSize) == IGS_SUCCESS);
     assert(dataSize == 0 && data == NULL);
 
     //definition - part 2
     //TODO: compare exported def, saved file and reference file
-    //iop description
-    assert (igs_input_set_description("my_impulsion", "my iop description here") == IGS_SUCCESS);
-    assert (igs_output_set_description("my_impulsion", "my iop description here") == IGS_SUCCESS);
-    assert (igs_parameter_set_description("my_impulsion", "my iop description here") == IGS_SUCCESS);
+    //io description
+    assert (igs_input_set_description("my_impulsion", "my io description here") == IGS_SUCCESS);
+    assert (igs_output_set_description("my_impulsion", "my io description here") == IGS_SUCCESS);
+    assert (igs_attribute_set_description("my_impulsion", "my io description here") == IGS_SUCCESS);
     assert (igs_input_set_detailed_type("my_impulsion", "protobuf", "some prototbuf \"here\"") == IGS_SUCCESS);
     assert (igs_output_set_detailed_type("my_impulsion", "protobuf", "some prototbuf \"here\"") == IGS_SUCCESS);
-    assert (igs_parameter_set_detailed_type("my_impulsion", "protobuf", "some prototbuf \"here\"") == IGS_SUCCESS);
+    assert (igs_attribute_set_detailed_type("my_impulsion", "protobuf", "some prototbuf \"here\"") == IGS_SUCCESS);
     char *exportedDef = igs_definition_json();
     assert(exportedDef);
     igs_definition_set_path("/tmp/simple Demo Agent.json");
@@ -875,7 +875,7 @@ void run_static_tests (int argc, const char * argv[]){
     assert(listOfStrings == NULL && nbElements == 0);
     listOfStrings = igs_output_list(&nbElements);
     assert(listOfStrings == NULL && nbElements == 0);
-    listOfStrings = igs_parameter_list(&nbElements);
+    listOfStrings = igs_attribute_list(&nbElements);
     assert(listOfStrings == NULL && nbElements == 0);
     listOfStrings = igs_service_list(&nbElements);
     assert(listOfStrings == NULL && nbElements == 0);
@@ -884,7 +884,7 @@ void run_static_tests (int argc, const char * argv[]){
     listOfStrings = NULL;
     listOfStrings = igs_input_list(&nbElements);
     assert(listOfStrings && nbElements == 6);
-    igs_free_iop_list(listOfStrings, nbElements);
+    igs_free_io_list(listOfStrings, nbElements);
     listOfStrings = NULL;
     assert(igs_input_count() == 6);
     assert(igs_input_type("my_impulsion") == IGS_IMPULSION_T);
@@ -901,7 +901,7 @@ void run_static_tests (int argc, const char * argv[]){
     assert(igs_input_exists("my_data"));
     listOfStrings = igs_output_list(&nbElements);
     assert(listOfStrings && nbElements == 6);
-    igs_free_iop_list(listOfStrings, nbElements);
+    igs_free_io_list(listOfStrings, nbElements);
     listOfStrings = NULL;
     assert(igs_output_count() == 6);
     assert(igs_output_type("my_impulsion") == IGS_IMPULSION_T);
@@ -924,30 +924,30 @@ void run_static_tests (int argc, const char * argv[]){
     dataSize = 0;
     assert(igs_output_data("my_data", &data, &dataSize) == IGS_SUCCESS);
     assert(dataSize == 0 && data == NULL);
-    listOfStrings = igs_parameter_list(&nbElements);
+    listOfStrings = igs_attribute_list(&nbElements);
     assert(listOfStrings && nbElements == 6);
-    igs_free_iop_list(listOfStrings, nbElements);
+    igs_free_io_list(listOfStrings, nbElements);
     listOfStrings = NULL;
-    assert(igs_parameter_count() == 6);
-    assert(igs_parameter_type("my_impulsion") == IGS_IMPULSION_T);
-    assert(igs_parameter_exists("my_impulsion"));
-    assert(igs_parameter_type("my_bool") == IGS_BOOL_T);
-    assert(igs_parameter_exists("my_bool"));
-    assert(igs_parameter_type("my_int") == IGS_INTEGER_T);
-    assert(igs_parameter_exists("my_int"));
-    assert(igs_parameter_type("my_double") == IGS_DOUBLE_T);
-    assert(igs_parameter_exists("my_double"));
-    assert(igs_parameter_type("my_string") == IGS_STRING_T);
-    assert(igs_parameter_exists("my_string"));
-    assert(igs_parameter_type("my_data") == IGS_DATA_T);
-    assert(igs_parameter_exists("my_data"));
-    assert(!igs_parameter_bool("my_bool"));
-    assert(igs_parameter_int("my_int") == 0);
-    assert(igs_parameter_double("my_double") == 0.0);
-    assert(!igs_parameter_string("my_string"));
+    assert(igs_attribute_count() == 6);
+    assert(igs_attribute_type("my_impulsion") == IGS_IMPULSION_T);
+    assert(igs_attribute_exists("my_impulsion"));
+    assert(igs_attribute_type("my_bool") == IGS_BOOL_T);
+    assert(igs_attribute_exists("my_bool"));
+    assert(igs_attribute_type("my_int") == IGS_INTEGER_T);
+    assert(igs_attribute_exists("my_int"));
+    assert(igs_attribute_type("my_double") == IGS_DOUBLE_T);
+    assert(igs_attribute_exists("my_double"));
+    assert(igs_attribute_type("my_string") == IGS_STRING_T);
+    assert(igs_attribute_exists("my_string"));
+    assert(igs_attribute_type("my_data") == IGS_DATA_T);
+    assert(igs_attribute_exists("my_data"));
+    assert(!igs_attribute_bool("my_bool"));
+    assert(igs_attribute_int("my_int") == 0);
+    assert(igs_attribute_double("my_double") == 0.0);
+    assert(!igs_attribute_string("my_string"));
     data = NULL;
     dataSize = 0;
-    assert(igs_parameter_data("my_data", &data, &dataSize) == IGS_SUCCESS);
+    assert(igs_attribute_data("my_data", &data, &dataSize) == IGS_SUCCESS);
     assert(dataSize == 0 && data == NULL);
     igs_clear_definition();
     free(exportedDef);
@@ -957,7 +957,7 @@ void run_static_tests (int argc, const char * argv[]){
     listOfStrings = NULL;
     listOfStrings = igs_input_list(&nbElements);
     assert(listOfStrings && nbElements == 6);
-    igs_free_iop_list(listOfStrings, nbElements);
+    igs_free_io_list(listOfStrings, nbElements);
     listOfStrings = NULL;
     assert(igs_input_count() == 6);
     assert(igs_input_type("my_impulsion") == IGS_IMPULSION_T);
@@ -977,7 +977,7 @@ void run_static_tests (int argc, const char * argv[]){
     listOfStrings = NULL;
     listOfStrings = igs_output_list(&nbElements);
     assert(listOfStrings && nbElements == 6);
-    igs_free_iop_list(listOfStrings, nbElements);
+    igs_free_io_list(listOfStrings, nbElements);
     listOfStrings = NULL;
     assert(igs_output_count() == 6);
     assert(igs_output_type("my_impulsion") == IGS_IMPULSION_T);
@@ -1004,30 +1004,30 @@ void run_static_tests (int argc, const char * argv[]){
     data = NULL;
     dataSize = 0;
     listOfStrings = NULL;
-    listOfStrings = igs_parameter_list(&nbElements);
+    listOfStrings = igs_attribute_list(&nbElements);
     assert(listOfStrings && nbElements == 6);
-    igs_free_iop_list(listOfStrings, nbElements);
+    igs_free_io_list(listOfStrings, nbElements);
     listOfStrings = NULL;
-    assert(igs_parameter_count() == 6);
-    assert(igs_parameter_type("my_impulsion") == IGS_IMPULSION_T);
-    assert(igs_parameter_exists("my_impulsion"));
-    assert(igs_parameter_type("my_bool") == IGS_BOOL_T);
-    assert(igs_parameter_exists("my_bool"));
-    assert(igs_parameter_type("my_int") == IGS_INTEGER_T);
-    assert(igs_parameter_exists("my_int"));
-    assert(igs_parameter_type("my_double") == IGS_DOUBLE_T);
-    assert(igs_parameter_exists("my_double"));
-    assert(igs_parameter_type("my_string") == IGS_STRING_T);
-    assert(igs_parameter_exists("my_string"));
-    assert(igs_parameter_type("my_data") == IGS_DATA_T);
-    assert(igs_parameter_exists("my_data"));
-    assert(!igs_parameter_bool("my_bool"));
-    assert(igs_parameter_int("my_int") == 0);
-    assert(igs_parameter_double("my_double") == 0.0);
-    assert(!igs_parameter_string("my_string"));
+    assert(igs_attribute_count() == 6);
+    assert(igs_attribute_type("my_impulsion") == IGS_IMPULSION_T);
+    assert(igs_attribute_exists("my_impulsion"));
+    assert(igs_attribute_type("my_bool") == IGS_BOOL_T);
+    assert(igs_attribute_exists("my_bool"));
+    assert(igs_attribute_type("my_int") == IGS_INTEGER_T);
+    assert(igs_attribute_exists("my_int"));
+    assert(igs_attribute_type("my_double") == IGS_DOUBLE_T);
+    assert(igs_attribute_exists("my_double"));
+    assert(igs_attribute_type("my_string") == IGS_STRING_T);
+    assert(igs_attribute_exists("my_string"));
+    assert(igs_attribute_type("my_data") == IGS_DATA_T);
+    assert(igs_attribute_exists("my_data"));
+    assert(!igs_attribute_bool("my_bool"));
+    assert(igs_attribute_int("my_int") == 0);
+    assert(igs_attribute_double("my_double") == 0.0);
+    assert(!igs_attribute_string("my_string"));
     data = NULL;
     dataSize = 0;
-    assert(igs_parameter_data("my_data", &data, &dataSize) == IGS_SUCCESS);
+    assert(igs_attribute_data("my_data", &data, &dataSize) == IGS_SUCCESS);
     assert(dataSize == 0 && data == NULL);
     free(data);
     igs_clear_definition();
@@ -1401,7 +1401,7 @@ void run_static_tests (int argc, const char * argv[]){
     igs_log_set_console(true);
     igs_observe_channels(testerChannelCallback, NULL);
 
-    igs_definition_set_description("One example for each type of IOP and call");
+    igs_definition_set_description("One example for each type of IO and call");
     igs_definition_set_version("1.0");
     igs_input_create("my_impulsion", IGS_IMPULSION_T, NULL, 0);
     igs_input_create("my_bool", IGS_BOOL_T, &myBool, sizeof(bool));
@@ -1421,12 +1421,12 @@ void run_static_tests (int argc, const char * argv[]){
     igs_output_create("my_double", IGS_DOUBLE_T, &myDouble, sizeof(double));
     igs_output_create("my_string", IGS_STRING_T, myString, strlen(myString) + 1);
     igs_output_create("my_data", IGS_DATA_T, myData, 32);
-    igs_parameter_create("my_impulsion", IGS_IMPULSION_T, NULL, 0);
-    igs_parameter_create("my_bool", IGS_BOOL_T, &myBool, sizeof(bool));
-    igs_parameter_create("my_int", IGS_INTEGER_T, &myInt, sizeof(int));
-    igs_parameter_create("my_double", IGS_DOUBLE_T, &myDouble, sizeof(double));
-    igs_parameter_create("my_string", IGS_STRING_T, myString, strlen(myString) + 1);
-    igs_parameter_create("my_data", IGS_DATA_T, myData, 32);
+    igs_attribute_create("my_impulsion", IGS_IMPULSION_T, NULL, 0);
+    igs_attribute_create("my_bool", IGS_BOOL_T, &myBool, sizeof(bool));
+    igs_attribute_create("my_int", IGS_INTEGER_T, &myInt, sizeof(int));
+    igs_attribute_create("my_double", IGS_DOUBLE_T, &myDouble, sizeof(double));
+    igs_attribute_create("my_string", IGS_STRING_T, myString, strlen(myString) + 1);
+    igs_attribute_create("my_data", IGS_DATA_T, myData, 32);
     igs_service_init("myService", testerServiceCallback, NULL);
     igs_service_arg_add("myService", "myBool", IGS_BOOL_T);
     igs_service_arg_add("myService", "myInt", IGS_INTEGER_T);
@@ -1434,18 +1434,18 @@ void run_static_tests (int argc, const char * argv[]){
     igs_service_arg_add("myService", "myString", IGS_STRING_T);
     igs_service_arg_add("myService", "myData", IGS_DATA_T);
 
-    igs_observe_input("my_impulsion", testerIOPCallback, NULL);
-    igs_observe_input("my_bool", testerIOPCallback, NULL);
-    igs_observe_input("my_int", testerIOPCallback, NULL);
-    igs_observe_input("my_double", testerIOPCallback, NULL);
-    igs_observe_input("my_string", testerIOPCallback, NULL);
-    igs_observe_input("my_data", testerIOPCallback, NULL);
-    igs_observe_input("my_impulsion_split", testerIOPCallback, NULL);
-    igs_observe_input("my_bool_split", testerIOPCallback, NULL);
-    igs_observe_input("my_int_split", testerIOPCallback, NULL);
-    igs_observe_input("my_double_split", testerIOPCallback, NULL);
-    igs_observe_input("my_string_split", testerIOPCallback, NULL);
-    igs_observe_input("my_data_split", testerIOPCallback, NULL);
+    igs_observe_input("my_impulsion", testerIOCallback, NULL);
+    igs_observe_input("my_bool", testerIOCallback, NULL);
+    igs_observe_input("my_int", testerIOCallback, NULL);
+    igs_observe_input("my_double", testerIOCallback, NULL);
+    igs_observe_input("my_string", testerIOCallback, NULL);
+    igs_observe_input("my_data", testerIOCallback, NULL);
+    igs_observe_input("my_impulsion_split", testerIOCallback, NULL);
+    igs_observe_input("my_bool_split", testerIOCallback, NULL);
+    igs_observe_input("my_int_split", testerIOCallback, NULL);
+    igs_observe_input("my_double_split", testerIOCallback, NULL);
+    igs_observe_input("my_string_split", testerIOCallback, NULL);
+    igs_observe_input("my_data_split", testerIOCallback, NULL);
 
     igs_mapping_add("my_impulsion", "partner", "sparing_impulsion");
     igs_mapping_add("my_bool", "partner", "sparing_bool");
@@ -1461,15 +1461,15 @@ void run_static_tests (int argc, const char * argv[]){
     igs_split_add("my_string_split", "partner", "sparing_string");
     igs_split_add("my_data_split", "partner", "sparing_data");
 
-    //iop description
-    igs_input_set_description("my_impulsion", "my iop description here");
-    igs_input_set_description("my_impulsion", "my iop description here");
-    igs_output_set_description("my_impulsion", "my iop description here");
-    igs_output_set_description("my_impulsion", "my iop description here");
-    igs_parameter_set_description("my_impulsion", "my iop description here");
-    igs_parameter_set_description("my_impulsion", "my iop description here");
+    //io description
+    igs_input_set_description("my_impulsion", "my io description here");
+    igs_input_set_description("my_impulsion", "my io description here");
+    igs_output_set_description("my_impulsion", "my io description here");
+    igs_output_set_description("my_impulsion", "my io description here");
+    igs_attribute_set_description("my_impulsion", "my attribute description here");
+    igs_attribute_set_description("my_impulsion", "my attribute description here");
 
-    //IOP writing and types conversions
+    //IO writing and types conversions
     igs_input_set_impulsion("my_impulsion");
     igs_input_set_impulsion("my_bool");
     assert(!igs_input_bool("my_bool"));
@@ -1642,12 +1642,12 @@ void run_static_tests (int argc, const char * argv[]){
     igsagent_output_create(firstAgent, "first_double", IGS_DOUBLE_T, &myDouble, sizeof(double));
     igsagent_output_create(firstAgent, "first_string", IGS_STRING_T, myString, strlen(myString) + 1);
     igsagent_output_create(firstAgent, "first_data", IGS_DATA_T, myData, 32);
-    igsagent_parameter_create(firstAgent, "first_impulsion", IGS_IMPULSION_T, NULL, 0);
-    igsagent_parameter_create(firstAgent, "first_bool", IGS_BOOL_T, &myBool, sizeof(bool));
-    igsagent_parameter_create(firstAgent, "first_int", IGS_INTEGER_T, &myInt, sizeof(int));
-    igsagent_parameter_create(firstAgent, "first_double", IGS_DOUBLE_T, &myDouble, sizeof(double));
-    igsagent_parameter_create(firstAgent, "first_string", IGS_STRING_T, myString, strlen(myString) + 1);
-    igsagent_parameter_create(firstAgent, "first_data", IGS_DATA_T, myData, 32);
+    igsagent_attribute_create(firstAgent, "first_impulsion", IGS_IMPULSION_T, NULL, 0);
+    igsagent_attribute_create(firstAgent, "first_bool", IGS_BOOL_T, &myBool, sizeof(bool));
+    igsagent_attribute_create(firstAgent, "first_int", IGS_INTEGER_T, &myInt, sizeof(int));
+    igsagent_attribute_create(firstAgent, "first_double", IGS_DOUBLE_T, &myDouble, sizeof(double));
+    igsagent_attribute_create(firstAgent, "first_string", IGS_STRING_T, myString, strlen(myString) + 1);
+    igsagent_attribute_create(firstAgent, "first_data", IGS_DATA_T, myData, 32);
 
     igsagent_service_init(firstAgent, "firstService", agentServiceCallback, NULL);
     igsagent_service_arg_add(firstAgent, "firstService", "firstBool", IGS_BOOL_T);
@@ -1656,19 +1656,19 @@ void run_static_tests (int argc, const char * argv[]){
     igsagent_service_arg_add(firstAgent, "firstService", "firstString", IGS_STRING_T);
     igsagent_service_arg_add(firstAgent, "firstService", "firstData", IGS_DATA_T);
 
-    igsagent_observe_input(firstAgent, "first_impulsion", agentIOPCallback, NULL);
-    igsagent_observe_input(firstAgent, "first_bool", agentIOPCallback, NULL);
-    igsagent_observe_input(firstAgent, "first_int", agentIOPCallback, NULL);
-    igsagent_observe_input(firstAgent, "first_double", agentIOPCallback, NULL);
-    igsagent_observe_input(firstAgent, "first_string", agentIOPCallback, NULL);
-    igsagent_observe_input(firstAgent, "first_data", agentIOPCallback, NULL);
+    igsagent_observe_input(firstAgent, "first_impulsion", agentIOCallback, NULL);
+    igsagent_observe_input(firstAgent, "first_bool", agentIOCallback, NULL);
+    igsagent_observe_input(firstAgent, "first_int", agentIOCallback, NULL);
+    igsagent_observe_input(firstAgent, "first_double", agentIOCallback, NULL);
+    igsagent_observe_input(firstAgent, "first_string", agentIOCallback, NULL);
+    igsagent_observe_input(firstAgent, "first_data", agentIOCallback, NULL);
 
-    igsagent_observe_input(firstAgent, "first_impulsion_split", agentIOPCallback, NULL);
-    igsagent_observe_input(firstAgent, "first_bool_split", agentIOPCallback, NULL);
-    igsagent_observe_input(firstAgent, "first_int_split", agentIOPCallback, NULL);
-    igsagent_observe_input(firstAgent, "first_double_split", agentIOPCallback, NULL);
-    igsagent_observe_input(firstAgent, "first_string_split", agentIOPCallback, NULL);
-    igsagent_observe_input(firstAgent, "first_data_split", agentIOPCallback, NULL);
+    igsagent_observe_input(firstAgent, "first_impulsion_split", agentIOCallback, NULL);
+    igsagent_observe_input(firstAgent, "first_bool_split", agentIOCallback, NULL);
+    igsagent_observe_input(firstAgent, "first_int_split", agentIOCallback, NULL);
+    igsagent_observe_input(firstAgent, "first_double_split", agentIOCallback, NULL);
+    igsagent_observe_input(firstAgent, "first_string_split", agentIOCallback, NULL);
+    igsagent_observe_input(firstAgent, "first_data_split", agentIOCallback, NULL);
 
     igsagent_mapping_add(firstAgent, "first_impulsion", "partner", "sparing_impulsion");
     igsagent_mapping_add(firstAgent, "first_bool", "partner", "sparing_bool");
@@ -1706,12 +1706,12 @@ void run_static_tests (int argc, const char * argv[]){
     igsagent_output_create(secondAgent, "second_double", IGS_DOUBLE_T, &myDouble, sizeof(double));
     igsagent_output_create(secondAgent, "second_string", IGS_STRING_T, myString, strlen(myString) + 1);
     igsagent_output_create(secondAgent, "second_data", IGS_DATA_T, myData, 32);
-    igsagent_parameter_create(secondAgent, "second_impulsion", IGS_IMPULSION_T, NULL, 0);
-    igsagent_parameter_create(secondAgent, "second_bool", IGS_BOOL_T, &myBool, sizeof(bool));
-    igsagent_parameter_create(secondAgent, "second_int", IGS_INTEGER_T, &myInt, sizeof(int));
-    igsagent_parameter_create(secondAgent, "second_double", IGS_DOUBLE_T, &myDouble, sizeof(double));
-    igsagent_parameter_create(secondAgent, "second_string", IGS_STRING_T, myString, strlen(myString) + 1);
-    igsagent_parameter_create(secondAgent, "second_data", IGS_DATA_T, myData, 32);
+    igsagent_attribute_create(secondAgent, "second_impulsion", IGS_IMPULSION_T, NULL, 0);
+    igsagent_attribute_create(secondAgent, "second_bool", IGS_BOOL_T, &myBool, sizeof(bool));
+    igsagent_attribute_create(secondAgent, "second_int", IGS_INTEGER_T, &myInt, sizeof(int));
+    igsagent_attribute_create(secondAgent, "second_double", IGS_DOUBLE_T, &myDouble, sizeof(double));
+    igsagent_attribute_create(secondAgent, "second_string", IGS_STRING_T, myString, strlen(myString) + 1);
+    igsagent_attribute_create(secondAgent, "second_data", IGS_DATA_T, myData, 32);
     igsagent_service_init(secondAgent, "secondService", agentServiceCallback, NULL);
     igsagent_service_arg_add(secondAgent, "secondService", "secondBool", IGS_BOOL_T);
     igsagent_service_arg_add(secondAgent, "secondService", "secondInt", IGS_INTEGER_T);
@@ -1719,19 +1719,19 @@ void run_static_tests (int argc, const char * argv[]){
     igsagent_service_arg_add(secondAgent, "secondService", "secondString", IGS_STRING_T);
     igsagent_service_arg_add(secondAgent, "secondService", "secondData", IGS_DATA_T);
 
-    igsagent_observe_input(secondAgent, "second_impulsion", agentIOPCallback, NULL);
-    igsagent_observe_input(secondAgent, "second_bool", agentIOPCallback, NULL);
-    igsagent_observe_input(secondAgent, "second_int", agentIOPCallback, NULL);
-    igsagent_observe_input(secondAgent, "second_double", agentIOPCallback, NULL);
-    igsagent_observe_input(secondAgent, "second_string", agentIOPCallback, NULL);
-    igsagent_observe_input(secondAgent, "second_data", agentIOPCallback, NULL);
+    igsagent_observe_input(secondAgent, "second_impulsion", agentIOCallback, NULL);
+    igsagent_observe_input(secondAgent, "second_bool", agentIOCallback, NULL);
+    igsagent_observe_input(secondAgent, "second_int", agentIOCallback, NULL);
+    igsagent_observe_input(secondAgent, "second_double", agentIOCallback, NULL);
+    igsagent_observe_input(secondAgent, "second_string", agentIOCallback, NULL);
+    igsagent_observe_input(secondAgent, "second_data", agentIOCallback, NULL);
 
-    igsagent_observe_input(secondAgent, "second_impulsion_split", agentIOPCallback, NULL);
-    igsagent_observe_input(secondAgent, "second_bool_split", agentIOPCallback, NULL);
-    igsagent_observe_input(secondAgent, "second_int_split", agentIOPCallback, NULL);
-    igsagent_observe_input(secondAgent, "second_double_split", agentIOPCallback, NULL);
-    igsagent_observe_input(secondAgent, "second_string_split", agentIOPCallback, NULL);
-    igsagent_observe_input(secondAgent, "second_data_split", agentIOPCallback, NULL);
+    igsagent_observe_input(secondAgent, "second_impulsion_split", agentIOCallback, NULL);
+    igsagent_observe_input(secondAgent, "second_bool_split", agentIOCallback, NULL);
+    igsagent_observe_input(secondAgent, "second_int_split", agentIOCallback, NULL);
+    igsagent_observe_input(secondAgent, "second_double_split", agentIOCallback, NULL);
+    igsagent_observe_input(secondAgent, "second_string_split", agentIOCallback, NULL);
+    igsagent_observe_input(secondAgent, "second_data_split", agentIOCallback, NULL);
 
     igsagent_mapping_add(secondAgent, "second_impulsion", "partner", "sparing_impulsion");
     igsagent_mapping_add(secondAgent, "second_bool", "partner", "sparing_bool");
@@ -1881,9 +1881,9 @@ int rt_timer (zloop_t *loop, int timer_id, void *arg){
     return 0;
 }
 
-void set_timeCB(igs_iop_type_t iop_type,
+void set_timeCB(igs_io_type_t io_type,
                 const char *name,
-                igs_iop_value_type_t value_type,
+                igs_io_value_type_t value_type,
                 void *value,
                 size_t value_size,
                 void *my_data){
@@ -1980,7 +1980,7 @@ int main(int argc, const char * argv[]) {
     
     igs_observe_channels(testerChannelCallback, NULL);
 
-    igs_definition_set_description("One example for each type of IOP and call");
+    igs_definition_set_description("One example for each type of IO and call");
     igs_definition_set_version("1.0");
     igs_input_create("my_impulsion", IGS_IMPULSION_T, NULL, 0);
     igs_input_create("my_bool", IGS_BOOL_T, &myBool, sizeof(bool));
@@ -1995,12 +1995,12 @@ int main(int argc, const char * argv[]) {
     igs_service_arg_add("myService", "myString", IGS_STRING_T);
     igs_service_arg_add("myService", "myData", IGS_DATA_T);
 
-    igs_observe_input("my_impulsion", testerIOPCallback, NULL);
-    igs_observe_input("my_bool", testerIOPCallback, NULL);
-    igs_observe_input("my_int", testerIOPCallback, NULL);
-    igs_observe_input("my_double", testerIOPCallback, NULL);
-    igs_observe_input("my_string", testerIOPCallback, NULL);
-    igs_observe_input("my_data", testerIOPCallback, NULL);
+    igs_observe_input("my_impulsion", testerIOCallback, NULL);
+    igs_observe_input("my_bool", testerIOCallback, NULL);
+    igs_observe_input("my_int", testerIOCallback, NULL);
+    igs_observe_input("my_double", testerIOCallback, NULL);
+    igs_observe_input("my_string", testerIOCallback, NULL);
+    igs_observe_input("my_data", testerIOCallback, NULL);
 
     igs_mapping_add("my_impulsion", "partner", "sparing_impulsion");
     igs_mapping_add("my_bool", "partner", "sparing_bool");

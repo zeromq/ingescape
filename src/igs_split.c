@@ -91,7 +91,7 @@ igs_split_t *split_create_split_element (const char *from_input,
     return new_split_elmt;
 }
 
-void s_split_trigger_send_message_to_worker (igs_core_context_t *context, char *agent_uuid, const igs_iop_t *output)
+void s_split_trigger_send_message_to_worker (igs_core_context_t *context, char *agent_uuid, const igs_io_t *output)
 {
     assert(context);
     assert(agent_uuid);
@@ -188,7 +188,7 @@ void s_split_trigger_send_message_to_worker (igs_core_context_t *context, char *
     }
 }
 
-void split_add_work_to_queue (igs_core_context_t *context, char* agent_uuid, const igs_iop_t *output)
+void split_add_work_to_queue (igs_core_context_t *context, char* agent_uuid, const igs_io_t *output)
 {
     assert(context);
     assert(agent_uuid);
@@ -239,7 +239,7 @@ void split_add_work_to_queue (igs_core_context_t *context, char* agent_uuid, con
 ////////////////////////////////////////////////////////////////////////
 
 
-void s_split_add_credit_to_worker (igs_core_context_t *context, char* agent_uuid, igs_iop_t* output,
+void s_split_add_credit_to_worker (igs_core_context_t *context, char* agent_uuid, igs_io_t* output,
                                    char* worker_uuid, char* input_name, int credit, bool new_worker)
 {
     assert(context);
@@ -329,12 +329,12 @@ int split_message_from_worker (char *command, zmsg_t *msg, igs_core_context_t *c
         igsagent_t *agent, *tmpAgent;
         HASH_ITER(hh, context->agents, agent, tmpAgent){
             if(streq(agent_uuid, agent->uuid)){
-                igs_iop_t *iop, *tmpIop;
-                HASH_ITER(hh, agent->definition->outputs_table, iop, tmpIop){
-                    if(!iop || !iop->name)
+                igs_io_t *io, *tmpIop;
+                HASH_ITER(hh, agent->definition->outputs_table, io, tmpIop){
+                    if(!io || !io->name)
                         continue;
-                    if (streq(outputName, iop->name)){
-                        s_split_add_credit_to_worker(context, agent->uuid, iop, worker_uuid, inputName, credit, true);
+                    if (streq(outputName, io->name)){
+                        s_split_add_credit_to_worker(context, agent->uuid, io, worker_uuid, inputName, credit, true);
                         break;
                     }
                 }
@@ -354,12 +354,12 @@ int split_message_from_worker (char *command, zmsg_t *msg, igs_core_context_t *c
         igsagent_t *agent, *tmpAgent;
         HASH_ITER(hh, context->agents, agent, tmpAgent){
             if(streq(agent_uuid, agent->uuid)){
-                igs_iop_t *iop, *tmpIop;
-                HASH_ITER(hh, agent->definition->outputs_table, iop, tmpIop){
-                    if(!iop || !iop->name)
+                igs_io_t *io, *tmpIop;
+                HASH_ITER(hh, agent->definition->outputs_table, io, tmpIop){
+                    if(!io || !io->name)
                         continue;
-                    if (streq(outputName, iop->name)){
-                        s_split_add_credit_to_worker (context, agent->uuid, iop, worker_uuid, inputName, 1, false);
+                    if (streq(outputName, io->name)){
+                        s_split_add_credit_to_worker (context, agent->uuid, io, worker_uuid, inputName, 1, false);
                         break;
                     }
                 }
@@ -404,7 +404,7 @@ int split_message_from_splitter (zmsg_t *msg, igs_core_context_t *context)
         free(outputName);
         return 1;
     }
-    igs_iop_value_type_t valueType = atoi(vType);
+    igs_io_value_type_t valueType = atoi(vType);
 
     free(vType);
     vType = NULL;
@@ -459,9 +459,9 @@ int split_message_from_splitter (zmsg_t *msg, igs_core_context_t *context)
     HASH_ITER(hh, core_context->agents, elt, tmp){
         if (streq(elt->uuid, worker_uuid)){
             if (valueType == IGS_STRING_T)
-                model_write_iop(elt, inputName, IGS_INPUT_T, valueType, value, strlen(value)+1);
+                model_write(elt, inputName, IGS_INPUT_T, valueType, value, strlen(value)+1);
             else
-                model_write_iop(elt, inputName, IGS_INPUT_T, valueType, data, size);
+                model_write(elt, inputName, IGS_INPUT_T, valueType, data, size);
             break;
         }
     }
@@ -513,7 +513,7 @@ uint64_t igsagent_split_add (igsagent_t *agent,
 
     // from_our_input
     char *reviewed_from_our_input =
-      s_strndup (from_our_input, IGS_MAX_IOP_NAME_LENGTH);
+      s_strndup (from_our_input, IGS_MAX_IO_NAME_LENGTH);
     bool space_in_name = false;
     size_t i = 0;
     size_t length_of_reviewed_from_our_input = strlen (reviewed_from_our_input);
@@ -530,7 +530,7 @@ uint64_t igsagent_split_add (igsagent_t *agent,
     }
 
     // to_agent
-    char *reviewed_to_agent = s_strndup (to_agent, IGS_MAX_IOP_NAME_LENGTH);
+    char *reviewed_to_agent = s_strndup (to_agent, IGS_MAX_IO_NAME_LENGTH);
     size_t length_of_reviewed_to_agent = strlen (reviewed_to_agent);
     space_in_name = false;
     for (i = 0; i < length_of_reviewed_to_agent; i++) {
@@ -554,7 +554,7 @@ uint64_t igsagent_split_add (igsagent_t *agent,
 
     // with_output
     char *reviewed_with_output =
-      s_strndup (with_output, IGS_MAX_IOP_NAME_LENGTH);
+      s_strndup (with_output, IGS_MAX_IO_NAME_LENGTH);
     size_t length_of_reviewed_with_output = strlen (reviewed_with_output);
     space_in_name = false;
     for (i = 0; i < length_of_reviewed_with_output; i++) {

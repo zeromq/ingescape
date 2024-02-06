@@ -261,3 +261,92 @@ bool igsagent_rt_synchronous_mode(igsagent_t *agent){
     assert(agent);
     return agent->rt_synchronous_mode_enabled;
 }
+
+//DEPRECATED functions management for parameters
+igs_result_t igsagent_parameter_create(igsagent_t *self, const char *name,
+                                  igs_iop_value_type_t value_type,
+                                  void *value,
+                                  size_t size){
+    igs_warn("this function is deprecated, please use igsagent_attribute_create instead.");
+    return igsagent_attribute_create(self, name, value_type, value, size);
+ }
+igs_result_t igsagent_parameter_remove(igsagent_t *self, const char *name){
+    igs_warn("this function is deprecated, please use igsagent_attribute_remove instead.");
+    return igsagent_attribute_remove(self, name);
+}
+igs_iop_value_type_t igsagent_parameter_type(igsagent_t *self, const char *name){
+    igs_warn("this function is deprecated, please use igsagent_attribute_type instead.");
+    return igsagent_attribute_type(self, name);
+}
+size_t igsagent_parameter_count(igsagent_t *self){
+    igs_warn("this function is deprecated, please use igsagent_attribute_count instead.");
+    return igsagent_attribute_count(self);
+}
+char** igsagent_parameter_list(igsagent_t *self, size_t *parameters_nbr){
+    igs_warn("this function is deprecated, please use igsagent_attribute_list instead.");
+    return igsagent_attribute_list(self, parameters_nbr);
+}
+bool igsagent_parameter_exists(igsagent_t *self, const char *name){
+    igs_warn("this function is deprecated, please use igsagent_attribute_exists instead.");
+    return igsagent_attribute_exists(self, name);
+}
+bool igsagent_parameter_bool(igsagent_t *self, const char *name){
+    igs_warn("this function is deprecated, please use igsagent_attribute_bool instead.");
+    return igsagent_attribute_bool(self, name);
+}
+int igsagent_parameter_int(igsagent_t *self, const char *name){
+    igs_warn("this function is deprecated, please use igsagent_attribute_int instead.");
+    return igsagent_attribute_int(self, name);
+}
+double igsagent_parameter_double(igsagent_t *self, const char *name){
+    igs_warn("this function is deprecated, please use igsagent_attribute_double instead.");
+    return igsagent_attribute_double(self, name);
+}
+char * igsagent_parameter_string(igsagent_t *self, const char *name){
+    igs_warn("this function is deprecated, please use igsagent_attribute_string instead.");
+    return igsagent_attribute_string(self, name);
+}
+igs_result_t igsagent_parameter_data(igsagent_t *self, const char *name, void **data, size_t *size){
+    igs_warn("this function is deprecated, please use igsagent_attribute_data instead.");
+    return igsagent_attribute_data(self, name, data, size);
+}
+igs_result_t igsagent_parameter_set_bool(igsagent_t *self, const char *name, bool value){
+    igs_warn("this function is deprecated, please use igsagent_attribute_set_bool instead.");
+    return igsagent_attribute_set_bool(self, name, value);
+}
+igs_result_t igsagent_parameter_set_int(igsagent_t *self, const char *name, int value){
+    igs_warn("this function is deprecated, please use igsagent_attribute_set_int instead.");
+    return igsagent_attribute_set_int(self, name, value);
+}
+igs_result_t igsagent_parameter_set_double(igsagent_t *self, const char *name, double value){
+    igs_warn("this function is deprecated, please use igsagent_attribute_set_double instead.");
+    return igsagent_attribute_set_double(self, name, value);
+}
+igs_result_t igsagent_parameter_set_string(igsagent_t *self, const char *name, const char *value){
+    igs_warn("this function is deprecated, please use igsagent_attribute_set_string instead.");
+    return igsagent_attribute_set_string(self, name, value);
+}
+igs_result_t igsagent_parameter_set_data(igsagent_t *self, const char *name, void *value, size_t size){
+    igs_warn("this function is deprecated, please use igsagent_attribute_set_data instead.");
+    return igsagent_attribute_set_data(self, name, value, size);
+}
+igs_result_t igsagent_parameter_add_constraint(igsagent_t *self, const char *name, const char *constraint){
+    igs_warn("this function is deprecated, please use igsagent_attribute_add_constraint instead.");
+    return igsagent_attribute_add_constraint(self, name, constraint);
+}
+igs_result_t igsagent_parameter_set_description(igsagent_t *self, const char *name, const char *description){
+    igs_warn("this function is deprecated, please use igsagent_attribute_set_description instead.");
+    return igsagent_attribute_set_description(self, name, description);
+}
+igs_result_t igsagent_parameter_set_detailed_type(igsagent_t *self, const char *param_name, const char *type_name, const char *specification){
+    igs_warn("this function is deprecated, please use igsagent_attribute_set_detailed_type instead.");
+    return igsagent_attribute_set_detailed_type(self, param_name, type_name, specification);
+}
+void igsagent_clear_parameter(igsagent_t *self, const char *name){
+    igs_warn("this function is deprecated, please use igsagent_clear_attribute instead.");
+    return igsagent_clear_attribute(self, name);
+}
+void igsagent_observe_parameter(igsagent_t *self, const char *name, igsagent_iop_fn cb, void *my_data){
+    igs_warn("this function is deprecated, please use igsagent_observe_attribute instead.");
+    return igsagent_observe_attribute(self, name, cb, my_data);
+}

@@ -33,52 +33,52 @@ void definition_free_constraint (igs_constraint_t **c){
 }
 
 
-void s_definition_free_iop (igs_iop_t **iop)
+void s_definition_free_io (igs_io_t **io)
 {
-    assert (iop);
-    assert (*iop);
-    if ((*iop)->name)
-        free ((*iop)->name);
+    assert (io);
+    assert (*io);
+    if ((*io)->name)
+        free ((*io)->name);
 
-    switch ((*iop)->value_type) {
+    switch ((*io)->value_type) {
         case IGS_STRING_T:
-            if ((*iop)->value.s)
-                free ((char *) (*iop)->value.s);
+            if ((*io)->value.s)
+                free ((char *) (*io)->value.s);
             break;
         case IGS_DATA_T:
-            if ((*iop)->value.data)
-                free ((*iop)->value.data);
+            if ((*io)->value.data)
+                free ((*io)->value.data);
             break;
         default:
             break;
     }
-    if ((*iop)->callbacks) {
+    if ((*io)->callbacks) {
         igs_observe_wrapper_t *cb, *tmp;
-        DL_FOREACH_SAFE ((*iop)->callbacks, cb, tmp){
-            DL_DELETE ((*iop)->callbacks, cb);
+        DL_FOREACH_SAFE ((*io)->callbacks, cb, tmp){
+            DL_DELETE ((*io)->callbacks, cb);
             free (cb);
         }
     }
-    if ((*iop)->constraint)
-        definition_free_constraint(&(*iop)->constraint);
-    if ((*iop)->description)
-        free((*iop)->description);
-    if ((*iop)->detailed_type)
-        free((*iop)->detailed_type);
-    if ((*iop)->specification)
-        free((*iop)->specification);
+    if ((*io)->constraint)
+        definition_free_constraint(&(*io)->constraint);
+    if ((*io)->description)
+        free((*io)->description);
+    if ((*io)->detailed_type)
+        free((*io)->detailed_type);
+    if ((*io)->specification)
+        free((*io)->specification);
 
-    free (*iop);
-    *iop = NULL;
+    free (*io);
+    *io = NULL;
 }
 
-igs_result_t definition_add_iop_to_definition (igsagent_t *agent,
-                                               igs_iop_t *iop,
-                                               igs_iop_type_t iop_type,
+igs_result_t definition_add_io_to_definition (igsagent_t *agent,
+                                               igs_io_t *io,
+                                               igs_io_type_t io_type,
                                                igs_definition_t *def)
 {
     assert (agent);
-    assert (iop);
+    assert (io);
     assert (def);
     model_read_write_lock (__FUNCTION__, __LINE__);
     // check that this agent has not been destroyed when we were locked
@@ -86,35 +86,35 @@ igs_result_t definition_add_iop_to_definition (igsagent_t *agent,
         model_read_write_unlock (__FUNCTION__, __LINE__);
         return IGS_SUCCESS;
     }
-    igs_iop_t *previousIOP = NULL;
-    switch (iop_type) {
+    igs_io_t *previousIOP = NULL;
+    switch (io_type) {
         case IGS_INPUT_T:
-            HASH_FIND_STR (def->inputs_table, iop->name, previousIOP);
+            HASH_FIND_STR (def->inputs_table, io->name, previousIOP);
             break;
         case IGS_OUTPUT_T:
-            HASH_FIND_STR (def->outputs_table, iop->name, previousIOP);
+            HASH_FIND_STR (def->outputs_table, io->name, previousIOP);
             break;
-        case IGS_PARAMETER_T:
-            HASH_FIND_STR (def->params_table, iop->name, previousIOP);
+        case IGS_ATTRIBUTE_T:
+            HASH_FIND_STR (def->params_table, io->name, previousIOP);
             break;
         default:
             break;
     }
     if (previousIOP) {
         igsagent_error (agent, "%s already exists and cannot be overwritten",
-                         iop->name);
+                         io->name);
         model_read_write_unlock (__FUNCTION__, __LINE__);
         return IGS_FAILURE;
     }
-    switch (iop_type) {
+    switch (io_type) {
         case IGS_INPUT_T:
-            HASH_ADD_STR (def->inputs_table, name, iop);
+            HASH_ADD_STR (def->inputs_table, name, io);
             break;
         case IGS_OUTPUT_T:
-            HASH_ADD_STR (def->outputs_table, name, iop);
+            HASH_ADD_STR (def->outputs_table, name, io);
             break;
-        case IGS_PARAMETER_T:
-            HASH_ADD_STR (def->params_table, name, iop);
+        case IGS_ATTRIBUTE_T:
+            HASH_ADD_STR (def->params_table, name, io);
             break;
         default:
             break;
@@ -123,10 +123,10 @@ igs_result_t definition_add_iop_to_definition (igsagent_t *agent,
     return IGS_SUCCESS;
 }
 
-igs_iop_t *definition_create_iop (igsagent_t *agent,
+igs_io_t *definition_create_io (igsagent_t *agent,
                                   const char *name,
-                                  igs_iop_type_t type,
-                                  igs_iop_value_type_t value_type,
+                                  igs_io_type_t type,
+                                  igs_io_value_type_t value_type,
                                   void *value,
                                   size_t size)
 {
@@ -137,8 +137,8 @@ igs_iop_t *definition_create_iop (igsagent_t *agent,
         igsagent_error(agent, "invalid value type %d", value_type);
         return NULL;
     }
-    igs_iop_t *iop = (igs_iop_t *) zmalloc (sizeof (igs_iop_t));
-    char *n = s_strndup (name, IGS_MAX_IOP_NAME_LENGTH);
+    igs_io_t *io = (igs_io_t *) zmalloc (sizeof (igs_io_t));
+    char *n = s_strndup (name, IGS_MAX_IO_NAME_LENGTH);
     bool space_in_name = false;
     size_t length_of_n = strlen (n);
     size_t i = 0;
@@ -150,39 +150,39 @@ igs_iop_t *definition_create_iop (igsagent_t *agent,
     }
     if (space_in_name)
         igsagent_warn (agent, "spaces are not allowed in IOP name: '%s' has been renamed to '%s'", name, n);
-    iop->name = n;
-    iop->type = type;
-    iop->value_type = value_type;
+    io->name = n;
+    io->type = type;
+    io->value_type = value_type;
     switch (type) {
         case IGS_INPUT_T:
-            if (definition_add_iop_to_definition (agent, iop, IGS_INPUT_T,
+            if (definition_add_io_to_definition (agent, io, IGS_INPUT_T,
                                                   agent->definition)
                 != IGS_SUCCESS) {
-                s_definition_free_iop (&iop);
+                s_definition_free_io (&io);
                 return NULL;
             }
             break;
         case IGS_OUTPUT_T:
-            if (definition_add_iop_to_definition (agent, iop, IGS_OUTPUT_T,
+            if (definition_add_io_to_definition (agent, io, IGS_OUTPUT_T,
                                                   agent->definition)
                 != IGS_SUCCESS) {
-                s_definition_free_iop (&iop);
+                s_definition_free_io (&io);
                 return NULL;
             }
             break;
-        case IGS_PARAMETER_T:
-            if (definition_add_iop_to_definition (agent, iop, IGS_PARAMETER_T,
+        case IGS_ATTRIBUTE_T:
+            if (definition_add_io_to_definition (agent, io, IGS_ATTRIBUTE_T,
                                                   agent->definition)
                 != IGS_SUCCESS) {
-                s_definition_free_iop (&iop);
+                s_definition_free_io (&io);
                 return NULL;
             }
             break;
         default:
             break;
     }
-    model_write_iop (agent, n, type, value_type, value, size);
-    return iop;
+    model_write (agent, n, type, value_type, value, size);
+    return io;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -220,22 +220,26 @@ void definition_free_definition (igs_definition_t **def)
         free ((char *) (*def)->json);
         (*def)->json = NULL;
     }
-    if ((*def)->json_legacy) {
-        free ((char *) (*def)->json_legacy);
-        (*def)->json_legacy = NULL;
+    if ((*def)->json_legacy_v3) {
+        free ((char *) (*def)->json_legacy_v3);
+        (*def)->json_legacy_v3 = NULL;
     }
-    igs_iop_t *current_iop, *tmp_iop;
-    HASH_ITER (hh, (*def)->params_table, current_iop, tmp_iop){
-        HASH_DEL ((*def)->params_table, current_iop);
-        s_definition_free_iop (&current_iop);
+    if ((*def)->json_legacy_v4) {
+        free ((char *) (*def)->json_legacy_v4);
+        (*def)->json_legacy_v4 = NULL;
     }
-    HASH_ITER (hh, (*def)->inputs_table, current_iop, tmp_iop){
-        HASH_DEL ((*def)->inputs_table, current_iop);
-        s_definition_free_iop (&current_iop);
+    igs_io_t *current_io, *tmp_io;
+    HASH_ITER (hh, (*def)->params_table, current_io, tmp_io){
+        HASH_DEL ((*def)->params_table, current_io);
+        s_definition_free_io (&current_io);
     }
-    HASH_ITER (hh, (*def)->outputs_table, current_iop, tmp_iop){
-        HASH_DEL ((*def)->outputs_table, current_iop);
-        s_definition_free_iop (&current_iop);
+    HASH_ITER (hh, (*def)->inputs_table, current_io, tmp_io){
+        HASH_DEL ((*def)->inputs_table, current_io);
+        s_definition_free_io (&current_io);
+    }
+    HASH_ITER (hh, (*def)->outputs_table, current_io, tmp_io){
+        HASH_DEL ((*def)->outputs_table, current_io);
+        s_definition_free_io (&current_io);
     }
     igs_service_t *service, *tmp_service;
     HASH_ITER (hh, (*def)->services_table, service, tmp_service){
@@ -253,12 +257,17 @@ void definition_update_json (igs_definition_t *def)
         free ((char *) def->json);
         def->json = NULL;
     }
-    if (def->json_legacy) {
-        free ((char *) def->json_legacy);
-        def->json_legacy = NULL;
+    if (def->json_legacy_v3) {
+        free ((char *) def->json_legacy_v3);
+        def->json_legacy_v3 = NULL;
+    }
+    if (def->json_legacy_v4) {
+        free ((char *) def->json_legacy_v4);
+        def->json_legacy_v4 = NULL;
     }
     def->json = parser_export_definition (def);
-    def->json_legacy = parser_export_definition_legacy (def);
+    def->json_legacy_v3 = parser_export_definition_legacy_v3 (def);
+    def->json_legacy_v4 = parser_export_definition_legacy_v4 (def);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -407,15 +416,15 @@ void igsagent_definition_set_version (igsagent_t *agent, const char *version)
 
 igs_result_t igsagent_input_create (igsagent_t *agent,
                                      const char *name,
-                                     igs_iop_value_type_t value_type,
+                                     igs_io_value_type_t value_type,
                                      void *value,
                                      size_t size)
 {
     assert (agent);
     assert (name && strlen (name) > 0);
     assert (agent->definition);
-    igs_iop_t *iop = definition_create_iop (agent, name, IGS_INPUT_T, value_type, value, size);
-    if (!iop)
+    igs_io_t *io = definition_create_io (agent, name, IGS_INPUT_T, value_type, value, size);
+    if (!io)
         return IGS_FAILURE;
     definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
@@ -424,34 +433,34 @@ igs_result_t igsagent_input_create (igsagent_t *agent,
 
 igs_result_t igsagent_output_create (igsagent_t *agent,
                                       const char *name,
-                                      igs_iop_value_type_t value_type,
+                                      igs_io_value_type_t value_type,
                                       void *value,
                                       size_t size)
 {
     assert (agent);
     assert (name && strlen (name) > 0);
     assert (agent->definition);
-    igs_iop_t *iop = definition_create_iop (agent, name, IGS_OUTPUT_T,
+    igs_io_t *io = definition_create_io (agent, name, IGS_OUTPUT_T,
                                             value_type, value, size);
-    if (!iop)
+    if (!io)
         return IGS_FAILURE;
     definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
     return IGS_SUCCESS;
 }
 
-igs_result_t igsagent_parameter_create (igsagent_t *agent,
+igs_result_t igsagent_attribute_create (igsagent_t *agent,
                                          const char *name,
-                                         igs_iop_value_type_t value_type,
+                                         igs_io_value_type_t value_type,
                                          void *value,
                                          size_t size)
 {
     assert (agent);
     assert (name && strlen (name) > 0);
     assert (agent->definition);
-    igs_iop_t *iop = definition_create_iop (agent, name, IGS_PARAMETER_T,
+    igs_io_t *io = definition_create_io (agent, name, IGS_ATTRIBUTE_T,
                                             value_type, value, size);
-    if (!iop)
+    if (!io)
         return IGS_FAILURE;
     definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
@@ -463,8 +472,8 @@ igs_result_t igsagent_input_remove (igsagent_t *agent, const char *name)
     assert (agent);
     assert (name);
     assert (agent->definition);
-    igs_iop_t *iop = model_find_iop_by_name (agent, name, IGS_INPUT_T);
-    if (iop == NULL) {
+    igs_io_t *io = model_find_io_by_name (agent, name, IGS_INPUT_T);
+    if (io == NULL) {
         igsagent_error (agent, "The input %s could not be found", name);
         return IGS_FAILURE;
     }
@@ -474,8 +483,8 @@ igs_result_t igsagent_input_remove (igsagent_t *agent, const char *name)
         model_read_write_unlock (__FUNCTION__, __LINE__);
         return IGS_SUCCESS;
     }
-    HASH_DEL (agent->definition->inputs_table, iop);
-    s_definition_free_iop (&iop);
+    HASH_DEL (agent->definition->inputs_table, io);
+    s_definition_free_io (&io);
     definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
     model_read_write_unlock (__FUNCTION__, __LINE__);
@@ -487,8 +496,8 @@ igs_result_t igsagent_output_remove (igsagent_t *agent, const char *name)
     assert (agent);
     assert (name);
     assert (agent->definition);
-    igs_iop_t *iop = model_find_iop_by_name (agent, name, IGS_OUTPUT_T);
-    if (iop == NULL) {
+    igs_io_t *io = model_find_io_by_name (agent, name, IGS_OUTPUT_T);
+    if (io == NULL) {
         igsagent_error (agent, "The output %s could not be found", name);
         return IGS_FAILURE;
     }
@@ -498,22 +507,22 @@ igs_result_t igsagent_output_remove (igsagent_t *agent, const char *name)
         model_read_write_unlock (__FUNCTION__, __LINE__);
         return IGS_SUCCESS;
     }
-    HASH_DEL (agent->definition->outputs_table, iop);
-    s_definition_free_iop (&iop);
+    HASH_DEL (agent->definition->outputs_table, io);
+    s_definition_free_io (&io);
     definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
     model_read_write_unlock (__FUNCTION__, __LINE__);
     return IGS_SUCCESS;
 }
 
-igs_result_t igsagent_parameter_remove (igsagent_t *agent, const char *name)
+igs_result_t igsagent_attribute_remove (igsagent_t *agent, const char *name)
 {
     assert (agent);
     assert (name);
     assert (agent->definition);
-    igs_iop_t *iop = model_find_iop_by_name (agent, name, IGS_PARAMETER_T);
-    if (iop == NULL) {
-        igsagent_error (agent, "The parameter %s could not be found", name);
+    igs_io_t *io = model_find_io_by_name (agent, name, IGS_ATTRIBUTE_T);
+    if (io == NULL) {
+        igsagent_error (agent, "The attribute %s could not be found", name);
         return IGS_FAILURE;
     }
     model_read_write_lock (__FUNCTION__, __LINE__);
@@ -522,8 +531,8 @@ igs_result_t igsagent_parameter_remove (igsagent_t *agent, const char *name)
         model_read_write_unlock (__FUNCTION__, __LINE__);
         return IGS_SUCCESS;
     }
-    HASH_DEL (agent->definition->params_table, iop);
-    s_definition_free_iop (&iop);
+    HASH_DEL (agent->definition->params_table, io);
+    s_definition_free_io (&io);
     definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
     model_read_write_unlock (__FUNCTION__, __LINE__);

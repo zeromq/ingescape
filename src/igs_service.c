@@ -433,7 +433,7 @@ igs_result_t igsagent_service_remove (igsagent_t *agent, const char *name)
 igs_result_t igsagent_service_arg_add (igsagent_t *agent,
                                        const char *service_name,
                                        const char *arg_name,
-                                       igs_iop_value_type_t type)
+                                       igs_io_value_type_t type)
 {
     assert (agent);
     assert (service_name);
@@ -594,7 +594,7 @@ igs_result_t igsagent_service_reply_remove(igsagent_t *agent, const char *servic
 }
 
 igs_result_t igsagent_service_reply_arg_add(igsagent_t *agent, const char *service_name, const char *reply_name,
-                                            const char *arg_name, igs_iop_value_type_t type){
+                                            const char *arg_name, igs_io_value_type_t type){
     assert (agent);
     assert (service_name);
     assert(reply_name);

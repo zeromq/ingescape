@@ -171,13 +171,13 @@ igs_map_t *mapping_create_mapping_element (const char *from_input,
 }
 
 bool mapping_check_input_output_compatibility (igsagent_t *agent,
-                                               igs_iop_t *input,
-                                               igs_iop_t *output)
+                                               igs_io_t *input,
+                                               igs_io_t *output)
 {
     // for compatibility, only DATA outputs imply limitations
-    // the rest is handled correctly in model_write_iop
+    // the rest is handled correctly in model_write
     bool is_compatible = true;
-    igs_iop_value_type_t type = input->value_type;
+    igs_io_value_type_t type = input->value_type;
     if (output->value_type == IGS_DATA_T) {
         if (type != IGS_DATA_T && type != IGS_IMPULSION_T) {
             is_compatible = false;
@@ -371,7 +371,7 @@ uint64_t igsagent_mapping_add (igsagent_t *agent,
     assert (with_output && strlen (with_output) > 0);
     // from_our_input
     char *reviewed_from_our_input =
-      s_strndup (from_our_input, IGS_MAX_IOP_NAME_LENGTH);
+      s_strndup (from_our_input, IGS_MAX_IO_NAME_LENGTH);
     bool space_in_name = false;
     size_t i = 0;
     size_t length_of_reviewed_from_our_input = strlen (reviewed_from_our_input);
@@ -388,7 +388,7 @@ uint64_t igsagent_mapping_add (igsagent_t *agent,
     }
 
     // to_agent
-    char *reviewed_to_agent = s_strndup (to_agent, IGS_MAX_IOP_NAME_LENGTH);
+    char *reviewed_to_agent = s_strndup (to_agent, IGS_MAX_IO_NAME_LENGTH);
     size_t length_of_reviewed_to_agent = strlen (reviewed_to_agent);
     space_in_name = false;
     for (i = 0; i < length_of_reviewed_to_agent; i++) {
@@ -411,7 +411,7 @@ uint64_t igsagent_mapping_add (igsagent_t *agent,
 
     // with_output
     char *reviewed_with_output =
-      s_strndup (with_output, IGS_MAX_IOP_NAME_LENGTH);
+      s_strndup (with_output, IGS_MAX_IO_NAME_LENGTH);
     size_t length_of_reviewed_with_output = strlen (reviewed_with_output);
     space_in_name = false;
     for (i = 0; i < length_of_reviewed_with_output; i++) {
