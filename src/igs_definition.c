@@ -95,7 +95,7 @@ igs_result_t definition_add_io_to_definition (igsagent_t *agent,
             HASH_FIND_STR (def->outputs_table, io->name, previousIOP);
             break;
         case IGS_ATTRIBUTE_T:
-            HASH_FIND_STR (def->params_table, io->name, previousIOP);
+            HASH_FIND_STR (def->attributes_table, io->name, previousIOP);
             break;
         default:
             break;
@@ -114,7 +114,7 @@ igs_result_t definition_add_io_to_definition (igsagent_t *agent,
             HASH_ADD_STR (def->outputs_table, name, io);
             break;
         case IGS_ATTRIBUTE_T:
-            HASH_ADD_STR (def->params_table, name, io);
+            HASH_ADD_STR (def->attributes_table, name, io);
             break;
         default:
             break;
@@ -229,8 +229,8 @@ void definition_free_definition (igs_definition_t **def)
         (*def)->json_legacy_v4 = NULL;
     }
     igs_io_t *current_io, *tmp_io;
-    HASH_ITER (hh, (*def)->params_table, current_io, tmp_io){
-        HASH_DEL ((*def)->params_table, current_io);
+    HASH_ITER (hh, (*def)->attributes_table, current_io, tmp_io){
+        HASH_DEL ((*def)->attributes_table, current_io);
         s_definition_free_io (&current_io);
     }
     HASH_ITER (hh, (*def)->inputs_table, current_io, tmp_io){
@@ -531,7 +531,7 @@ igs_result_t igsagent_attribute_remove (igsagent_t *agent, const char *name)
         model_read_write_unlock (__FUNCTION__, __LINE__);
         return IGS_SUCCESS;
     }
-    HASH_DEL (agent->definition->params_table, io);
+    HASH_DEL (agent->definition->attributes_table, io);
     s_definition_free_io (&io);
     definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;

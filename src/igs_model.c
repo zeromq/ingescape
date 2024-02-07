@@ -734,7 +734,7 @@ igs_io_t *s_model_find_attribute_by_name (igsagent_t *agent, const char *name)
 {
     igs_io_t *found = NULL;
     if (name && agent->definition)
-        HASH_FIND_STR (agent->definition->params_table, name, found);
+        HASH_FIND_STR (agent->definition->attributes_table, name, found);
     else {
         if (name == NULL || strlen (name) == 0)
             igsagent_error (agent, "Parameter name cannot be NULL or empty");
@@ -1580,7 +1580,7 @@ igs_result_t s_model_add_constraint (igsagent_t *self, igs_io_type_t type,
     }
     else
     if (type == IGS_ATTRIBUTE_T) {
-        HASH_FIND_STR (self->definition->params_table, name, io);
+        HASH_FIND_STR (self->definition->attributes_table, name, io);
         if (!io) {
             igsagent_error (self, "Parameter %s cannot be found", name);
             return IGS_FAILURE;
@@ -1631,7 +1631,7 @@ igs_result_t s_model_set_description(igsagent_t *self, igs_io_type_t type,
     }
     else
     if (type == IGS_ATTRIBUTE_T) {
-        HASH_FIND_STR (self->definition->params_table, name, io);
+        HASH_FIND_STR (self->definition->attributes_table, name, io);
         if (!io) {
             igsagent_error (self, "Parameter %s cannot be found", name);
             return IGS_FAILURE;
@@ -1673,7 +1673,7 @@ igs_result_t s_model_set_detailed_type(igsagent_t *self, igs_io_type_t type,
     }
     else
     if (type == IGS_ATTRIBUTE_T) {
-        HASH_FIND_STR (self->definition->params_table, name, io);
+        HASH_FIND_STR (self->definition->attributes_table, name, io);
         if (!io) {
             igsagent_error (self, "Parameter %s cannot be found", name);
             return IGS_FAILURE;
@@ -1796,7 +1796,7 @@ igs_io_value_type_t s_model_get_type_for_io (igsagent_t *agent,
     }
     else
     if (type == IGS_ATTRIBUTE_T) {
-        HASH_FIND_STR (agent->definition->params_table, name, io);
+        HASH_FIND_STR (agent->definition->attributes_table, name, io);
         if (io == NULL) {
             igsagent_error (agent, "Parameter %s cannot be found", name);
             return 0;
@@ -1860,7 +1860,7 @@ size_t igsagent_attribute_count (igsagent_t *agent)
         igsagent_warn (agent, "definition is NULL");
         return 0;
     }
-    return HASH_COUNT (agent->definition->params_table);
+    return HASH_COUNT (agent->definition->attributes_table);
 }
 
 char **s_model_get_io_list (igsagent_t *agent,
@@ -1881,7 +1881,7 @@ char **s_model_get_io_list (igsagent_t *agent,
             hash = agent->definition->outputs_table;
             break;
         case IGS_ATTRIBUTE_T:
-            hash = agent->definition->params_table;
+            hash = agent->definition->attributes_table;
             break;
         default:
             break;
@@ -1973,7 +1973,7 @@ bool igsagent_attribute_exists (igsagent_t *agent, const char *name)
     if (agent->definition == NULL)
         return false;
     return s_model_check_io_existence (agent, name,
-                                        agent->definition->params_table);
+                                        agent->definition->attributes_table);
 }
 
 // --------------------------------  OBSERVE

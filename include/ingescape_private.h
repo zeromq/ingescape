@@ -161,7 +161,7 @@ typedef struct igs_definition{
     char *json_legacy_v3;
     char *json_legacy_v4;
     char* family;
-    igs_io_t* params_table;
+    igs_io_t* attributes_table;
     igs_io_t* inputs_table;
     igs_io_t* outputs_table;
     igs_service_t *services_table;

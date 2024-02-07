@@ -1606,7 +1606,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 zmsg_t *msg_to_send = zmsg_new ();
                 zmsg_addstr (msg_to_send, CURRENT_ATTRIBUTES_MSG);
                 zmsg_addstr (msg_to_send, agent->uuid);
-                igs_io_t *outputs = agent->definition->params_table;
+                igs_io_t *outputs = agent->definition->attributes_table;
                 igs_io_t *current = NULL;
                 for (current = outputs; current;
                      current = current->hh.next) {

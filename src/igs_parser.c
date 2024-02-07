@@ -366,7 +366,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                               "renamed to %s",
                               io_name->u.string, corrected_name);
 
-                HASH_FIND_STR (definition->params_table, corrected_name, io);
+                HASH_FIND_STR (definition->attributes_table, corrected_name, io);
                 if (io) {
                     igs_warn ("attribute with name '%s' already exists : "
                               "ignoring new one",
@@ -411,7 +411,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                     io->specification = s_strndup(io_specification->u.string, IGS_MAX_LOG_LENGTH);
                 }
 
-                HASH_ADD_STR (definition->params_table, name, io);
+                HASH_ADD_STR (definition->attributes_table, name, io);
             }
         }
     } else if (attributes)
@@ -1108,7 +1108,7 @@ char *parser_export_definition (igs_definition_t *def)
 
     igs_json_add_string (json, STR_ATTRIBUTES);
     igs_json_open_array (json);
-    HASH_ITER (hh, def->params_table, io, tmp_io)
+    HASH_ITER (hh, def->attributes_table, io, tmp_io)
     {
         igs_json_open_map (json);
         if (io->name) {
@@ -1445,7 +1445,7 @@ char *parser_export_definition_legacy_v4 (igs_definition_t *def)
 
     igs_json_add_string (json, STR_ATTRIBUTES_DEPRECATED);
     igs_json_open_array (json);
-    HASH_ITER (hh, def->params_table, io, tmp_io)
+    HASH_ITER (hh, def->attributes_table, io, tmp_io)
     {
         igs_json_open_map (json);
         if (io->name) {
@@ -1655,7 +1655,7 @@ char *parser_export_definition_legacy_v3 (igs_definition_t *def)
 
     igs_json_add_string (json, STR_ATTRIBUTES_DEPRECATED);
     igs_json_open_array (json);
-    HASH_ITER (hh, def->params_table, io, tmp_io)
+    HASH_ITER (hh, def->attributes_table, io, tmp_io)
     {
         igs_json_open_map (json);
         if (io->name) {
