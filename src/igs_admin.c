@@ -20,7 +20,7 @@
 #include "ingescape_classes.h"
 #include "ingescape_private.h"
 
-#define INGESCAPE_PROTOCOL 4
+#define INGESCAPE_PROTOCOL 5
 #define NUMBER_OF_LOGS_FOR_FFLUSH 0
 
 #ifndef W_OK

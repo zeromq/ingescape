@@ -70,12 +70,12 @@ typedef enum {
     IGS_TIMESTAMPED_BOOL_T,
     IGS_TIMESTAMPED_IMPULSION_T,
     IGS_TIMESTAMPED_DATA_T
-} igs_iop_value_type_extended_t;
+} igs_io_value_type_extended_t;
 
 //////////////////  IOP/SERVICE STRUCTURES AND ENUMS   //////////////////
 
 typedef struct igs_observe_wrapper{
-    igsagent_iop_fn *callback_ptr;
+    igsagent_io_fn *callback_ptr;
     void* data;
     struct igs_observe_wrapper *prev;
     struct igs_observe_wrapper *next;
@@ -120,13 +120,13 @@ typedef struct igs_constraint{
     struct igs_constraint *next;
 } igs_constraint_t;
 
-typedef struct igs_iop{
+typedef struct igs_io{
     char* name;
     char *description;
-    char *spec_type;
+    char *detailed_type;
     char *specification;
-    igs_iop_value_type_t value_type;
-    igs_iop_type_t type;
+    igs_io_value_type_t value_type;
+    igs_io_type_t type;
     union {
         int i;
         double d;
@@ -139,7 +139,7 @@ typedef struct igs_iop{
     igs_observe_wrapper_t *callbacks;
     igs_constraint_t *constraint;
     UT_hash_handle hh;         /* makes this structure hashable */
-} igs_iop_t;
+} igs_io_t;
 
 typedef struct igs_service{
     char * name;
@@ -152,13 +152,18 @@ typedef struct igs_service{
 } igs_service_t;
 
 typedef struct igs_definition{
+    char* my_class;
+    char* package;
     char* name;
-    char* family;
     char* description;
     char* version;
-    igs_iop_t* params_table;
-    igs_iop_t* inputs_table;
-    igs_iop_t* outputs_table;
+    char *json;
+    char *json_legacy_v3;
+    char *json_legacy_v4;
+    char* family;
+    igs_io_t* attributes_table;
+    igs_io_t* inputs_table;
+    igs_io_t* outputs_table;
     igs_service_t *services_table;
 } igs_definition_t;
 
@@ -179,6 +184,8 @@ typedef struct igs_split{
 } igs_split_t;
 
 typedef struct igs_mapping{
+    char *json;
+    char *json_legacy;
     igs_map_t* map_elements;
     igs_split_t* split_elements;
 } igs_mapping_t;
@@ -197,7 +204,7 @@ typedef struct igs_worker{
 }igs_worker_t;
 
 typedef struct igs_queued_works{
-    igs_iop_value_type_t value_type;
+    igs_io_value_type_t value_type;
     union {
         int i;
         double d;
@@ -487,6 +494,7 @@ void core_init_context(void);
 // definition
 INGESCAPE_EXPORT void definition_free_definition (igs_definition_t **definition);
 INGESCAPE_EXPORT void definition_free_constraint (igs_constraint_t **constraint);
+INGESCAPE_EXPORT void definition_update_json (igs_definition_t *definition);
 
 // mapping
 INGESCAPE_EXPORT void mapping_free_mapping (igs_mapping_t **map);
@@ -496,41 +504,43 @@ INGESCAPE_EXPORT igs_map_t* mapping_create_mapping_element(const char * from_inp
 INGESCAPE_EXPORT bool mapping_is_equal(const char *first_str, const char *second_str);
 
 INGESCAPE_EXPORT uint64_t s_djb2_hash (unsigned char *str);
-bool mapping_check_input_output_compatibility(igsagent_t *agent, igs_iop_t *found_input, igs_iop_t *found_output);
+bool mapping_check_input_output_compatibility(igsagent_t *agent, igs_io_t *found_input, igs_io_t *found_output);
+INGESCAPE_EXPORT void mapping_update_json (igs_mapping_t *mapping);
 
 // split
 INGESCAPE_EXPORT void split_free_split_element (igs_split_t **split_elmt);
 INGESCAPE_EXPORT igs_split_t* split_create_split_element(const char * from_input,
                                         const char *to_agent,
                                         const char* to_output);
-void split_add_work_to_queue(igs_core_context_t *context, char* agent_uuid, const igs_iop_t *output);
+void split_add_work_to_queue(igs_core_context_t *context, char* agent_uuid, const igs_io_t *output);
 void split_remove_worker(igs_core_context_t *context, char *worker_uuid, char *input_name);
 int split_message_from_worker(char *command, zmsg_t *msg, igs_core_context_t *context);
 int split_message_from_splitter(zmsg_t *msg, igs_core_context_t *context);
 
 // model
 uint8_t* s_model_string_to_bytes (char* string);
-const igs_iop_t* model_write_iop (igsagent_t *agent, const char *iop_name, igs_iop_type_t type,
-                                  igs_iop_value_type_t val_type, void* value, size_t size);
-igs_iop_t* model_find_iop_by_name(igsagent_t *agent, const char* name, igs_iop_type_t type);
-char* model_get_iop_value_as_string (igs_iop_t* iop); //caller owns returned value
+const igs_io_t* model_write (igsagent_t *agent, const char *io_name, igs_io_type_t type,
+                             igs_io_value_type_t val_type, void* value, size_t size);
+igs_io_t* model_find_io_by_name(igsagent_t *agent, const char* name, igs_io_type_t type);
+char* model_get_io_value_as_string (igs_io_t* io); //caller owns returned value
 #define IGS_MODEL_READ_WRITE_MUTEX_DEBUG 0
 INGESCAPE_EXPORT void model_read_write_lock(const char *function, int line);
 INGESCAPE_EXPORT void model_read_write_unlock(const char *function, int line);
-igs_constraint_t* s_model_parse_constraint(igs_iop_value_type_t type,
+igs_constraint_t* s_model_parse_constraint(igs_io_value_type_t type,
                                            const char *expression,char **error);
 
 // network
 #define IGS_PRIVATE_CHANNEL "INGESCAPE_PRIVATE"
 #define IGS_DEFAULT_AGENT_NAME "no_name"
-igs_result_t network_publish_output (igsagent_t *agent, const igs_iop_t *iop);
+igs_result_t network_publish_output (igsagent_t *agent, const igs_io_t *io);
 
 // parser
 INGESCAPE_EXPORT igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json);
 INGESCAPE_EXPORT igs_definition_t* parser_load_definition (const char* json_str);
 INGESCAPE_EXPORT igs_definition_t* parser_load_definition_from_path (const char* file_path);
 INGESCAPE_EXPORT char* parser_export_definition(igs_definition_t* def);
-INGESCAPE_EXPORT char* parser_export_definition_legacy(igs_definition_t* def);
+INGESCAPE_EXPORT char* parser_export_definition_legacy_v4(igs_definition_t* def);
+INGESCAPE_EXPORT char* parser_export_definition_legacy_v3(igs_definition_t* def);
 INGESCAPE_EXPORT char* parser_export_mapping(igs_mapping_t* mapping);
 INGESCAPE_EXPORT char* parser_export_mapping_legacy(igs_mapping_t* mapping);
 INGESCAPE_EXPORT igs_mapping_t* parser_load_mapping (const char* json_str);
@@ -570,8 +580,10 @@ void s_agent_propagate_agent_event(igs_agent_event_t event, const char *uuid, co
 #define CURRENT_OUTPUTS_MSG "CURRENT_OUTPUTS"
 #define GET_CURRENT_INPUTS_MSG "GET_CURRENT_INPUTS"
 #define CURRENT_INPUTS_MSG "CURRENT_INPUTS"
-#define GET_CURRENT_PARAMETERS_MSG "GET_CURRENT_PARAMETERS"
-#define CURRENT_PARAMETERS_MSG "CURRENT_PARAMETERS"
+#define GET_CURRENT_ATTRIBUTES_MSG "GET_CURRENT_ATTRIBUTES"
+#define CURRENT_ATTRIBUTES_MSG "CURRENT_ATTRIBUTES"
+#define GET_CURRENT_ATTRIBUTES_MSG_DEPRECATED "GET_CURRENT_PARAMETERS"
+#define CURRENT_ATTRIBUTES_MSG_DEPRECATED "CURRENT_PARAMETERS"
 
 #define STATE_MSG "STATE"
 
@@ -597,7 +609,8 @@ void s_agent_propagate_agent_event(igs_agent_event_t event, const char *uuid, co
 
 #define SET_INPUT_MSG "SET_INPUT"
 #define SET_OUTPUT_MSG "SET_OUTPUT"
-#define SET_PARAMETER_MSG "SET_PARAMETER"
+#define SET_ATTRIBUTE_MSG "SET_ATTRIBUTE"
+#define SET_ATTRIBUTE_MSG_DEPRECATED "SET_PARAMETER"
 #define CALL_SERVICE_MSG "SERVICE"
 #define CALL_SERVICE_MSG_DEPRECATED "CALL" // DEPRECATED since ingescape 3.0 that uses protocol v4
 

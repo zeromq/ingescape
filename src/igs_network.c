@@ -124,7 +124,7 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
     size_t msg_size = zmsg_size (*msg);
     char *output = NULL;
     char *v_type = NULL;
-    igs_iop_value_type_t value_type = 0;
+    igs_io_value_type_t value_type = 0;
     zframe_t *timestamp_f = NULL;
     int64_t timestamp = INT64_MIN;
     zframe_t *frame = NULL;
@@ -269,7 +269,7 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
                         // we have a match on emitting agent name and its ouput name :
                         // still need to check the targeted input existence in our
                         // definition
-                        igs_iop_t *found_input = NULL;
+                        igs_io_t *found_input = NULL;
                         if (agent->definition->inputs_table)
                             HASH_FIND_STR (agent->definition->inputs_table,
                                            elmt->from_input, found_input);
@@ -282,7 +282,7 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
                             agent->rt_current_timestamp_microseconds = timestamp;
                             if (value_type == IGS_STRING_T) {
                                 model_read_write_unlock (__FUNCTION__, __LINE__);
-                                model_write_iop (agent, elmt->from_input,
+                                model_write (agent, elmt->from_input,
                                                  IGS_INPUT_T, value_type, value,
                                                  strlen (value) + 1);
                                 model_read_write_lock (__FUNCTION__, __LINE__);
@@ -290,7 +290,7 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
                             }
                             else {
                                 model_read_write_unlock (__FUNCTION__, __LINE__);
-                                model_write_iop (agent, elmt->from_input,
+                                model_write (agent, elmt->from_input,
                                                  IGS_INPUT_T, value_type, data,
                                                  size);
                                 model_read_write_lock (__FUNCTION__, __LINE__);
@@ -412,8 +412,8 @@ void s_subscribe_to_remote_agent_output (igs_remote_agent_t *remote_agent,
     assert (remote_agent);
     assert (output_name);
     if (strlen (output_name) > 0) {
-        char filter_value[IGS_MAX_IOP_NAME_LENGTH + IGS_AGENT_UUID_LENGTH + 1] = "";
-        snprintf (filter_value, IGS_MAX_IOP_NAME_LENGTH + IGS_AGENT_UUID_LENGTH + 1, "%s-%s",
+        char filter_value[IGS_MAX_IO_NAME_LENGTH + IGS_AGENT_UUID_LENGTH + 1] = "";
+        snprintf (filter_value, IGS_MAX_IO_NAME_LENGTH + IGS_AGENT_UUID_LENGTH + 1, "%s-%s",
                   remote_agent->uuid, output_name);
         bool filter_already_exists = false;
         igs_mapping_filter_t *filter = NULL;
@@ -448,13 +448,13 @@ int s_network_configure_mapping_to_remote_agent (
                 || streq (el->to_agent, "*")) {
                 // mapping element is compatible with subscriber name
                 // check if we find a compatible output in subscriber definition
-                igs_iop_t *found_output = NULL;
+                igs_io_t *found_output = NULL;
                 if (remote_agent->definition)
                     HASH_FIND_STR (remote_agent->definition->outputs_table,
                                    el->to_output, found_output);
 
                 // check if we find a valid input in our own definition
-                igs_iop_t *found_input = NULL;
+                igs_io_t *found_input = NULL;
                 if (agent->definition)
                     HASH_FIND_STR (agent->definition->inputs_table,
                                    el->from_input, found_input);
@@ -541,15 +541,15 @@ void s_send_state_to (igsagent_t *agent,
     zmsg_t *msg = NULL;
 
     if (agent->definition && agent->definition->outputs_table) {
-        igs_iop_t *current_iop, *tmp_iop;
-        HASH_ITER (hh, agent->definition->outputs_table, current_iop, tmp_iop)
+        igs_io_t *current_io, *tmp_io;
+        HASH_ITER (hh, agent->definition->outputs_table, current_io, tmp_io)
         {
-            if (current_iop->name) {
+            if (current_io->name) {
                 s_lock_zyre_peer (__FUNCTION__, __LINE__);
                 msg = zmsg_new ();
-                zmsg_addstr (msg, (current_iop->is_muted) ? OUTPUT_MUTED_MSG
+                zmsg_addstr (msg, (current_io->is_muted) ? OUTPUT_MUTED_MSG
                                                           : OUTPUT_UNMUTED_MSG);
-                zmsg_addstr (msg, current_iop->name);
+                zmsg_addstr (msg, current_io->name);
                 zmsg_addstr (msg, agent->uuid);
                 if (is_for_peer)
                     zyre_whisper (context->node, peer_or_channel, &msg);
@@ -862,27 +862,23 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 if (zyre_peer->protocol
                     && (streq (zyre_peer->protocol, "v2")
                         || streq (zyre_peer->protocol, "v3")))
-                    definition_str = parser_export_definition_legacy (agent->definition);
+                    definition_str = agent->definition->json_legacy_v3;
+                else if (zyre_peer->protocol && streq (zyre_peer->protocol, "v4"))
+                    definition_str = agent->definition->json_legacy_v4;
                 else
-                    definition_str = parser_export_definition (agent->definition);
-                if (definition_str) {
+                    definition_str = agent->definition->json;
+                if (definition_str)
                     s_send_definition_to_zyre_peer (agent, peerUUID,
                                                     definition_str, false);
-                    free (definition_str);
-                    definition_str = NULL;
-                }
                 else
                     s_send_definition_to_zyre_peer (agent, peerUUID, "", false);
                 // and so is our mapping
                 if (zyre_peer->protocol && streq (zyre_peer->protocol, "v2"))
-                    mapping_str = parser_export_mapping_legacy (agent->mapping);
+                    mapping_str = agent->mapping->json_legacy;
                 else
-                    mapping_str = parser_export_mapping (agent->mapping);
-                if (mapping_str) {
+                    mapping_str = agent->mapping->json;
+                if (mapping_str)
                     s_send_mapping_to_zyre_peer (agent, peerUUID, mapping_str);
-                    free (mapping_str);
-                    mapping_str = NULL;
-                }
                 else
                     s_send_mapping_to_zyre_peer (agent, peerUUID, "");
                 // and so is the state of our internal variables
@@ -923,7 +919,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             HASH_ITER (hh, context->agents, target_agent, targettmp)
             {
                 if (streq (agent_name, target_agent->definition->name)) {
-                    igs_iop_value_type_t input_type =
+                    igs_io_value_type_t input_type =
                       igsagent_input_type (target_agent, input);
                     if (zmsg_size (msg_duplicate) > 0) {
                         igs_debug ("replaying %s.%s", agent_name, input);
@@ -957,7 +953,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                             }
                             data = zframe_data (frame);
                             size = zframe_size (frame);
-                            model_write_iop (target_agent, input, IGS_INPUT_T,
+                            model_write (target_agent, input, IGS_INPUT_T,
                                              input_type, data, size);
                             zframe_destroy (&frame);
                         }
@@ -1056,8 +1052,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             // Agents without definition are considered impossible.
             char *str_definition = zmsg_popstr (msg_duplicate);
             if (str_definition == NULL) {
-                igs_error ("no valid definition in %s message received from "
-                           "%s(%s): rejecting",
+                igs_error ("no valid definition in %s message received from %s(%s): rejecting",
                            title, name, peerUUID);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
@@ -1065,9 +1060,8 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             }
             char *uuid = zmsg_popstr (msg_duplicate);
             if (uuid == NULL) {
-                igs_error (
-                  "no valid uuid in %s message received from %s(%s): rejecting",
-                  title, name, peerUUID);
+                igs_error ("no valid uuid in %s message received from %s(%s): rejecting",
+                           title, name, peerUUID);
                 free (str_definition);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
@@ -1075,8 +1069,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             }
             char *remote_agent_name = zmsg_popstr (msg_duplicate);
             if (remote_agent_name == NULL) {
-                igs_error ("no valid agent name in %s message received from "
-                           "%s(%s): rejecting",
+                igs_error ("no valid agent name in %s message received from %s(%s): rejecting",
                            title, name, peerUUID);
                 free (str_definition);
                 free (uuid);
@@ -1088,12 +1081,12 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             // Load definition from string content
             igs_definition_t *new_definition = parser_load_definition (str_definition);
             if (new_definition && new_definition->name) {
+                definition_update_json (new_definition);
                 bool is_agent_new = false;
                 igs_remote_agent_t *remote_agent = NULL;
                 HASH_FIND_STR (context->remote_agents, uuid, remote_agent);
                 if (remote_agent == NULL) {
-                    remote_agent = (igs_remote_agent_t *) zmalloc (
-                      sizeof (igs_remote_agent_t));
+                    remote_agent = (igs_remote_agent_t *) zmalloc (sizeof (igs_remote_agent_t));
                     remote_agent->context = context;
                     remote_agent->uuid = strdup (uuid);
                     igs_zyre_peer_t *zyre_peer = NULL;
@@ -1102,8 +1095,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     remote_agent->peer = zyre_peer;
                     remote_agent->definition = new_definition;
                     HASH_ADD_STR (context->remote_agents, uuid, remote_agent);
-                    igs_debug ("registering agent %s(%s)", uuid,
-                               remote_agent_name);
+                    igs_debug ("registering agent %s(%s)", uuid,remote_agent_name);
                     is_agent_new = true;
                 } else {
                     // else we already know this agent, its definition (possibly including name)
@@ -1112,12 +1104,9 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                       "Definition already exists for remote agent %s : new "
                       "definition will overwrite the previous one...",
                       remote_agent->definition->name);
-                    if (strneq (remote_agent->definition->name,
-                                new_definition->name))
-                        igs_debug (
-                          "Remote agent is changing name from %s to %s",
-                          remote_agent->definition->name, new_definition->name);
-
+                    if (strneq (remote_agent->definition->name,new_definition->name))
+                        igs_debug ("Remote agent is changing name from %s to %s",
+                                   remote_agent->definition->name, new_definition->name);
                     igs_definition_t *old_def = remote_agent->definition;
                     remote_agent->definition = new_definition;
                     definition_free_definition (&old_def);
@@ -1165,12 +1154,8 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                         char *input_split_element;
                         char *output_split_element;
                         igs_split_t *elt, *tmp_split;
-                        HASH_ITER (hh, elt_agent->mapping->split_elements,
-                                   elt, tmp_split)
-                        {
-                            if (elt
-                                && streq (elt->to_agent,
-                                          remote_agent->definition->name)) {
+                        HASH_ITER (hh, elt_agent->mapping->split_elements,elt, tmp_split){
+                            if (elt && streq (elt->to_agent,remote_agent->definition->name)) {
                                 found_split_element = true;
                                 input_split_element = elt->from_input;
                                 output_split_element = elt->to_output;
@@ -1182,18 +1167,14 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                             zmsg_addstr (ready_message, WORKER_HELLO_MSG);
                             zmsg_addstr (ready_message, elt_agent->uuid);
                             zmsg_addstr (ready_message, input_split_element);
-                            zmsg_addstr (ready_message,
-                                         output_split_element);
-                            zmsg_addstrf (ready_message, "%i",
-                                          IGS_DEFAULT_WORKER_CREDIT);
-                            igs_channel_whisper_zmsg (remote_agent->uuid,
-                                                      &ready_message);
+                            zmsg_addstr (ready_message,output_split_element);
+                            zmsg_addstrf (ready_message, "%i",IGS_DEFAULT_WORKER_CREDIT);
+                            igs_channel_whisper_zmsg (remote_agent->uuid,&ready_message);
                         }
                     }
-                }
-                else
+                }else
                     s_agent_propagate_agent_event (IGS_AGENT_UPDATED_DEFINITION,
-                                                   uuid, remote_agent_name, str_definition);
+                                                   uuid, remote_agent_name, remote_agent->definition->json);
             }
             else {
                 if (new_definition && !new_definition->name)
@@ -1267,15 +1248,15 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             if (new_mapping && remote_agent) {
                 // look if this agent already has a mapping
                 if (remote_agent->mapping) {
-                    igs_debug (
-                      "mapping already exists for agent %s(%s) : new mapping will overwrite the previous one...",
-                      remote_agent->definition->name, remote_agent->uuid);
+                    igs_debug ("mapping already exists for agent %s(%s) : new mapping will overwrite the previous one...",
+                               remote_agent->definition->name, remote_agent->uuid);
                     mapping_free_mapping (&remote_agent->mapping);
                 }
 
                 igs_debug ("store mapping for agent %s(%s)",
                            remote_agent->definition->name, remote_agent->uuid);
                 remote_agent->mapping = new_mapping;
+                mapping_update_json(remote_agent->mapping);
                 s_agent_propagate_agent_event (IGS_AGENT_UPDATED_MAPPING, uuid,
                                                remote_agent->definition->name, str_mapping);
             }
@@ -1377,6 +1358,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 igs_remote_agent_t *remote, *tmp;
                 HASH_ITER (hh, context->remote_agents, remote, tmp)
                     s_network_configure_mapping_to_remote_agent (agent, remote);
+                mapping_update_json(agent->mapping);
                 agent->network_need_to_send_mapping_update = true;
             }
             free (str_mapping);
@@ -1420,8 +1402,8 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 zmsg_t *msg_to_send = zmsg_new ();
                 zmsg_addstr (msg_to_send, CURRENT_OUTPUTS_MSG);
                 zmsg_addstr (msg_to_send, agent->uuid);
-                igs_iop_t *outputs = agent->definition->outputs_table;
-                igs_iop_t *current = NULL;
+                igs_io_t *outputs = agent->definition->outputs_table;
+                igs_io_t *current = NULL;
                 for (current = outputs; current;
                      current = current->hh.next) {
                     switch (current->value_type) {
@@ -1532,8 +1514,8 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 zmsg_t *msg_to_send = zmsg_new ();
                 zmsg_addstr (msg_to_send, CURRENT_INPUTS_MSG);
                 zmsg_addstr (msg_to_send, agent->uuid);
-                igs_iop_t *outputs = agent->definition->inputs_table;
-                igs_iop_t *current = NULL;
+                igs_io_t *outputs = agent->definition->inputs_table;
+                igs_io_t *current = NULL;
                 for (current = outputs; current;
                      current = current->hh.next) {
                     switch (current->value_type) {
@@ -1590,7 +1572,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free (uuid);
             }
             else
-            if (streq (title, GET_CURRENT_PARAMETERS_MSG)) {
+            if (streq (title, GET_CURRENT_ATTRIBUTES_MSG)) {
                 // identify agent
                 char *uuid = zmsg_popstr (msg_duplicate);
                 if (uuid == NULL) {
@@ -1622,10 +1604,10 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     return 0;
                 }
                 zmsg_t *msg_to_send = zmsg_new ();
-                zmsg_addstr (msg_to_send, CURRENT_PARAMETERS_MSG);
+                zmsg_addstr (msg_to_send, CURRENT_ATTRIBUTES_MSG);
                 zmsg_addstr (msg_to_send, agent->uuid);
-                igs_iop_t *outputs = agent->definition->params_table;
-                igs_iop_t *current = NULL;
+                igs_io_t *outputs = agent->definition->attributes_table;
+                igs_io_t *current = NULL;
                 for (current = outputs; current;
                      current = current->hh.next) {
                     switch (current->value_type) {
@@ -1676,7 +1658,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 }
                 model_read_write_unlock (__FUNCTION__, __LINE__);
                 s_lock_zyre_peer (__FUNCTION__, __LINE__);
-                igs_debug ("send parameters values to %s", peerUUID);
+                igs_debug ("send attributes values to %s", peerUUID);
                 zyre_whisper (node, peerUUID, &msg_to_send);
                 s_unlock_zyre_peer (__FUNCTION__, __LINE__);
                 free (uuid);
@@ -1866,9 +1848,9 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             }
             else
             if (streq (title, MUTE_OUTPUT_MSG)) {
-                char *iop_name = zmsg_popstr (msg_duplicate);
-                if (iop_name == NULL) {
-                    igs_error ("no valid iop name in %s message received from "
+                char *io_name = zmsg_popstr (msg_duplicate);
+                if (io_name == NULL) {
+                    igs_error ("no valid io name in %s message received from "
                                "%s(%s): rejecting",
                                title, name, peerUUID);
                     zmsg_destroy (&msg_duplicate);
@@ -1880,7 +1862,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     igs_error ("no valid uuid in %s message received from "
                                "%s(%s): rejecting",
                                title, name, peerUUID);
-                    free (iop_name);
+                    free (io_name);
                     zmsg_destroy (&msg_duplicate);
                     zyre_event_destroy (&zyre_event);
                     return 0;
@@ -1894,7 +1876,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                       uuid, title, name, peerUUID);
                     if (uuid)
                         free (uuid);
-                    free (iop_name);
+                    free (io_name);
                     zmsg_destroy (&msg_duplicate);
                     zyre_event_destroy (&zyre_event);
                     return 0;
@@ -1902,15 +1884,15 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
 
                 igs_debug ("received MUTE command from %s (%s)", name,
                            peerUUID);
-                igsagent_output_mute (agent, iop_name);
-                free (iop_name);
+                igsagent_output_mute (agent, io_name);
+                free (io_name);
                 free (uuid);
             }
             else
             if (streq (title, UNMUTE_OUTPUT_MSG)) {
-                char *iop_name = zmsg_popstr (msg_duplicate);
-                if (iop_name == NULL) {
-                    igs_error ("no valid iop name in %s message received from "
+                char *io_name = zmsg_popstr (msg_duplicate);
+                if (io_name == NULL) {
+                    igs_error ("no valid io name in %s message received from "
                                "%s(%s): rejecting",
                                title, name, peerUUID);
                     zmsg_destroy (&msg_duplicate);
@@ -1922,7 +1904,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     igs_error ("no valid uuid in %s message received from "
                                "%s(%s): rejecting",
                                title, name, peerUUID);
-                    free (iop_name);
+                    free (io_name);
                     zmsg_destroy (&msg_duplicate);
                     zyre_event_destroy (&zyre_event);
                     return 0;
@@ -1936,7 +1918,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                       uuid, title, name, peerUUID);
                     if (uuid)
                         free (uuid);
-                    free (iop_name);
+                    free (io_name);
                     zmsg_destroy (&msg_duplicate);
                     zyre_event_destroy (&zyre_event);
                     return 0;
@@ -1944,15 +1926,15 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
 
                 igs_debug ("received UNMUTE command from %s (%s)", name,
                            peerUUID);
-                igsagent_output_unmute (agent, iop_name);
-                free (iop_name);
+                igsagent_output_unmute (agent, io_name);
+                free (io_name);
                 free (uuid);
             }
             else
-            if (streq (title, SET_INPUT_MSG) || streq (title, SET_OUTPUT_MSG) || streq (title, SET_PARAMETER_MSG)) {
-                char *iop_name = zmsg_popstr (msg_duplicate);
-                if (iop_name == NULL) {
-                    igs_error ("no valid iop name in %s message received from %s(%s): rejecting",
+            if (streq (title, SET_INPUT_MSG) || streq (title, SET_OUTPUT_MSG) || streq (title, SET_ATTRIBUTE_MSG)) {
+                char *io_name = zmsg_popstr (msg_duplicate);
+                if (io_name == NULL) {
+                    igs_error ("no valid io name in %s message received from %s(%s): rejecting",
                                title, name, peerUUID);
                     zmsg_destroy (&msg_duplicate);
                     zyre_event_destroy (&zyre_event);
@@ -1962,7 +1944,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 if (value == NULL) {
                     igs_error ("no valid value in %s message received from %s(%s): rejecting",
                                title, name, peerUUID);
-                    free (iop_name);
+                    free (io_name);
                     zmsg_destroy (&msg_duplicate);
                     zyre_event_destroy (&zyre_event);
                     return 0;
@@ -1971,7 +1953,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 if (uuid == NULL) {
                     igs_error ("no valid uuid in %s message received from %s(%s): rejecting",
                                title, name, peerUUID);
-                    free (iop_name);
+                    free (io_name);
                     free (value);
                     zmsg_destroy (&msg_duplicate);
                     zyre_event_destroy (&zyre_event);
@@ -1985,7 +1967,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                       uuid, title, name, peerUUID);
                     if (uuid)
                         free (uuid);
-                    free (iop_name);
+                    free (io_name);
                     free (value);
                     zmsg_destroy (&msg_duplicate);
                     zyre_event_destroy (&zyre_event);
@@ -2001,13 +1983,13 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                         //TODO: implement msg decoding (from hex string), data extraction and timestamp set
                         if (streq (title, SET_INPUT_MSG))
                             igs_error("injection of timestamped values is not supported yet : input %s.%s will not be injected",
-                                      agent->definition->name, iop_name);
+                                      agent->definition->name, io_name);
                         else if (streq (title, SET_OUTPUT_MSG))
                             igs_error("injection of timestamped values is not supported yet : output %s.%s will not be injected",
-                                      agent->definition->name, iop_name);
-                        else if (streq (title, SET_PARAMETER_MSG))
-                            igs_error("injection of timestamped values is not supported yet : parameter %s.%s will not be injected",
-                                      agent->definition->name, iop_name);
+                                      agent->definition->name, io_name);
+                        else if (streq (title, SET_ATTRIBUTE_MSG))
+                            igs_error("injection of timestamped values is not supported yet : attribute %s.%s will not be injected",
+                                      agent->definition->name, io_name);
                         shall_inject = false;
                     }
                     zframe_destroy(&value_type_f);
@@ -2015,19 +1997,19 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 if (shall_inject){
                     if (streq (title, SET_INPUT_MSG)){
                         igs_debug ("received SET_INPUT command from %s (%s)", name, peerUUID);
-                        if (iop_name && value)
-                            igsagent_input_set_string (agent, iop_name, value);
+                        if (io_name && value)
+                            igsagent_input_set_string (agent, io_name, value);
                     } else if (streq (title, SET_OUTPUT_MSG)){
                         igs_debug ("received SET_OUTPUT command from %s (%s)", name, peerUUID);
-                        if (iop_name && value)
-                            igsagent_output_set_string (agent, iop_name, value);
-                    } else if (streq (title, SET_PARAMETER_MSG)){
-                        igs_debug ("received SET_PARAMETER command from %s (%s)", name, peerUUID);
-                        if (iop_name && value)
-                            igsagent_parameter_set_string (agent, iop_name, value);
+                        if (io_name && value)
+                            igsagent_output_set_string (agent, io_name, value);
+                    } else if (streq (title, SET_ATTRIBUTE_MSG)){
+                        igs_debug ("received SET_ATTRIBUTE command from %s (%s)", name, peerUUID);
+                        if (io_name && value)
+                            igsagent_attribute_set_string (agent, io_name, value);
                     }
                 }
-                free (iop_name);
+                free (io_name);
                 free (value);
                 free (uuid);
             }
@@ -2823,18 +2805,20 @@ int trigger_definition_update (zloop_t *loop, int timer_id, void *arg)
             if (!agent || !(agent->uuid))
                 continue;
             
-            char *definition_str = parser_export_definition (agent->definition);
-            char *definition_str_legacy = parser_export_definition_legacy (agent->definition);
             igs_zyre_peer_t *p, *ptmp;
             HASH_ITER (hh, context->zyre_peers, p, ptmp){
                 if (p->has_joined_private_channel) {
                     if (p->protocol && (streq (p->protocol, "v2") || streq (p->protocol, "v3"))){
-                        if (definition_str_legacy)
-                            s_send_definition_to_zyre_peer (agent, p->peer_id, definition_str_legacy,
+                        if (agent->definition->json_legacy_v3)
+                            s_send_definition_to_zyre_peer (agent, p->peer_id, agent->definition->json_legacy_v3,
+                                                            agent->network_activation_during_runtime);
+                    }else if (p->protocol && streq (p->protocol, "v4")){
+                        if (agent->definition->json_legacy_v4)
+                            s_send_definition_to_zyre_peer (agent, p->peer_id, agent->definition->json_legacy_v4,
                                                             agent->network_activation_during_runtime);
                     }else{
-                        if (definition_str)
-                            s_send_definition_to_zyre_peer (agent, p->peer_id, definition_str,
+                        if (agent->definition->json)
+                            s_send_definition_to_zyre_peer (agent, p->peer_id, agent->definition->json,
                                                             agent->network_activation_during_runtime);
                     }
                 }
@@ -2849,15 +2833,10 @@ int trigger_definition_update (zloop_t *loop, int timer_id, void *arg)
             model_read_write_unlock (__FUNCTION__, __LINE__);
             //propagate definition update to other agents in the same process (if any)
             s_agent_propagate_agent_event (IGS_AGENT_UPDATED_DEFINITION,
-                                           agent->uuid, agent->definition->name, definition_str);
+                                           agent->uuid, agent->definition->name, agent->definition->json);
             model_read_write_lock (__FUNCTION__, __LINE__);
             // when definition changes, mapping may need to be updated as well
             agent->network_need_to_send_mapping_update = true;
-            
-            if (definition_str)
-                free(definition_str);
-            if (definition_str_legacy)
-                free(definition_str_legacy);
         }
     }
     model_read_write_unlock (__FUNCTION__, __LINE__);
@@ -2882,17 +2861,15 @@ int s_trigger_mapping_update (zloop_t *loop, int timer_id, void *arg)
                 model_read_write_unlock (__FUNCTION__, __LINE__);
                 return 0;
             }
-            char *mapping_str = parser_export_mapping (agent->mapping);
-            char *mapping_str_legacy = parser_export_mapping_legacy (agent->mapping);
             igs_zyre_peer_t *p, *ptmp;
             HASH_ITER (hh, context->zyre_peers, p, ptmp){
                 if (p->has_joined_private_channel) {
                     if (p->protocol && streq (p->protocol, "v2")){
-                        if (mapping_str_legacy)
-                            s_send_mapping_to_zyre_peer (agent, p->peer_id, mapping_str_legacy);
+                        if (agent->mapping->json_legacy)
+                            s_send_mapping_to_zyre_peer (agent, p->peer_id, agent->mapping->json_legacy);
                     }else{
-                        if (mapping_str)
-                            s_send_mapping_to_zyre_peer (agent, p->peer_id, mapping_str);
+                        if (agent->mapping->json)
+                            s_send_mapping_to_zyre_peer (agent, p->peer_id, agent->mapping->json);
                     }
                 }
             }
@@ -2903,11 +2880,7 @@ int s_trigger_mapping_update (zloop_t *loop, int timer_id, void *arg)
             agent->network_need_to_send_mapping_update = false;
             model_read_write_unlock (__FUNCTION__, __LINE__);
             s_agent_propagate_agent_event (IGS_AGENT_UPDATED_MAPPING,agent->uuid,
-                                           agent->definition->name, mapping_str);
-            if (mapping_str)
-                free (mapping_str);
-            if (mapping_str_legacy)
-                free (mapping_str_legacy);
+                                           agent->definition->name, agent->mapping->json);
         }
     }
     return 0;
@@ -3464,17 +3437,17 @@ void s_init_loop (igs_core_context_t *context)
 // PRIVATE API
 ////////////////////////////////////////////////////////////////////////
 
-igs_result_t network_publish_output (igsagent_t *agent, const igs_iop_t *iop)
+igs_result_t network_publish_output (igsagent_t *agent, const igs_io_t *io)
 {
     assert (agent);
     assert (agent->context);
     assert (agent->uuid);
-    assert (iop);
-    assert (iop->name);
+    assert (io);
+    assert (io->name);
     int result = IGS_SUCCESS;
 
 
-    if (!agent->is_whole_agent_muted && !iop->is_muted
+    if (!agent->is_whole_agent_muted && !io->is_muted
         && !agent->context->is_frozen) {
         model_read_write_lock (__FUNCTION__, __LINE__);
         // check that this agent has not been destroyed when we were locked
@@ -3482,7 +3455,7 @@ igs_result_t network_publish_output (igsagent_t *agent, const igs_iop_t *iop)
             model_read_write_unlock (__FUNCTION__, __LINE__);
             return IGS_SUCCESS;
         }
-        split_add_work_to_queue (agent->context, agent->uuid, iop);
+        split_add_work_to_queue (agent->context, agent->uuid, io);
         int64_t current_microseconds = INT64_MIN;
         if (agent->rt_timestamps_enabled){
             if (agent->context->rt_current_microseconds != INT64_MIN)
@@ -3491,76 +3464,76 @@ igs_result_t network_publish_output (igsagent_t *agent, const igs_iop_t *iop)
                 current_microseconds = zclock_usecs();
         }
         zmsg_t *msg = zmsg_new ();
-        zmsg_addstrf (msg, "%s-%s", agent->uuid, iop->name);
+        zmsg_addstrf (msg, "%s-%s", agent->uuid, io->name);
         if (current_microseconds == INT64_MIN) //no timestamping, we add value type immediately
-            zmsg_addstrf (msg, "%d", iop->value_type);
-        switch (iop->value_type) {
+            zmsg_addstrf (msg, "%d", io->value_type);
+        switch (io->value_type) {
             case IGS_INTEGER_T:
                 if (current_microseconds != INT64_MIN){
                     zmsg_addstrf (msg, "%d", IGS_TIMESTAMPED_INTEGER_T);
                     zmsg_t *packaged_value = zmsg_new();
-                    zmsg_addmem (packaged_value, &(iop->value.i), sizeof (int));
+                    zmsg_addmem (packaged_value, &(io->value.i), sizeof (int));
                     zmsg_addmem(packaged_value, &current_microseconds, sizeof(int64_t));
                     zmsg_addmsg(msg, &packaged_value);
                     igsagent_debug (agent, "%s(%s) publishes %s int with timestamp %lld",
                                     agent->definition->name, agent->uuid,
-                                    iop->name, current_microseconds);
+                                    io->name, current_microseconds);
                 } else {
-                    zmsg_addmem (msg, &(iop->value.i), sizeof (int));
+                    zmsg_addmem (msg, &(io->value.i), sizeof (int));
                     igsagent_debug (agent, "%s(%s) publishes %s int",
                                     agent->definition->name, agent->uuid,
-                                    iop->name);
+                                    io->name);
                 }
                 break;
             case IGS_DOUBLE_T:
                 if (current_microseconds != INT64_MIN){
                     zmsg_addstrf (msg, "%d", IGS_TIMESTAMPED_DOUBLE_T);
                     zmsg_t *packaged_value = zmsg_new();
-                    zmsg_addmem (packaged_value, &(iop->value.d), sizeof (double));
+                    zmsg_addmem (packaged_value, &(io->value.d), sizeof (double));
                     zmsg_addmem(packaged_value, &current_microseconds, sizeof(int64_t));
                     zmsg_addmsg(msg, &packaged_value);
                     igsagent_debug (agent, "%s(%s) publishes %s double with timestamp %lld",
                                     agent->definition->name, agent->uuid,
-                                    iop->name, current_microseconds);
+                                    io->name, current_microseconds);
                 } else {
-                    zmsg_addmem (msg, &(iop->value.d), sizeof (double));
+                    zmsg_addmem (msg, &(io->value.d), sizeof (double));
                     igsagent_debug (agent, "%s(%s) publishes %s double",
                                     agent->definition->name, agent->uuid,
-                                    iop->name);
+                                    io->name);
                 }
                 break;
             case IGS_BOOL_T:
                 if (current_microseconds != INT64_MIN){
                     zmsg_addstrf (msg, "%d", IGS_TIMESTAMPED_BOOL_T);
                     zmsg_t *packaged_value = zmsg_new();
-                    zmsg_addmem (packaged_value, &(iop->value.b), sizeof (bool));
+                    zmsg_addmem (packaged_value, &(io->value.b), sizeof (bool));
                     zmsg_addmem(packaged_value, &current_microseconds, sizeof(int64_t));
                     zmsg_addmsg(msg, &packaged_value);
                     igsagent_debug (agent, "%s(%s) publishes %s bool with timestamp %lld",
                                     agent->definition->name, agent->uuid,
-                                    iop->name, current_microseconds);
+                                    io->name, current_microseconds);
                 } else {
-                    zmsg_addmem (msg, &(iop->value.b), sizeof (bool));
+                    zmsg_addmem (msg, &(io->value.b), sizeof (bool));
                     igsagent_debug (agent, "%s(%s) publishes %s bool",
                                     agent->definition->name, agent->uuid,
-                                    iop->name);
+                                    io->name);
                 }
                 break;
             case IGS_STRING_T:
                 if (current_microseconds != INT64_MIN){
                     zmsg_addstrf (msg, "%d", IGS_TIMESTAMPED_STRING_T);
                     zmsg_t *packaged_value = zmsg_new();
-                    zmsg_addstr (packaged_value, iop->value.s);
+                    zmsg_addstr (packaged_value, io->value.s);
                     zmsg_addmem(packaged_value, &current_microseconds, sizeof(int64_t));
                     zmsg_addmsg(msg, &packaged_value);
                     igsagent_debug (agent, "%s(%s) publishes %s string with timestamp %lld",
                                     agent->definition->name, agent->uuid,
-                                    iop->name, current_microseconds);
+                                    io->name, current_microseconds);
                 } else {
-                    zmsg_addstr (msg, iop->value.s);
+                    zmsg_addstr (msg, io->value.s);
                     igsagent_debug (agent, "%s(%s) publishes %s string",
                                     agent->definition->name, agent->uuid,
-                                    iop->name);
+                                    io->name);
                 }
                 break;
             case IGS_IMPULSION_T:
@@ -3572,16 +3545,16 @@ igs_result_t network_publish_output (igsagent_t *agent, const igs_iop_t *iop)
                     zmsg_addmsg(msg, &packaged_value);
                     igsagent_debug (agent, "%s(%s) publishes %s impulsion with timestamp %lld",
                                     agent->definition->name, agent->uuid,
-                                    iop->name, current_microseconds);
+                                    io->name, current_microseconds);
                 } else {
                     zmsg_addmem (msg, NULL, 0);
                     igsagent_debug (agent, "%s(%s) publishes %s impulsion",
                                     agent->definition->name, agent->uuid,
-                                    iop->name);
+                                    io->name);
                 }
                 break;
             case IGS_DATA_T: {
-                zframe_t *frame = zframe_new (iop->value.data, iop->value_size);
+                zframe_t *frame = zframe_new (io->value.data, io->value_size);
                 if (current_microseconds != INT64_MIN){
                     zmsg_addstrf (msg, "%d", IGS_TIMESTAMPED_DATA_T);
                     zmsg_t *packaged_value = zmsg_new();
@@ -3590,12 +3563,12 @@ igs_result_t network_publish_output (igsagent_t *agent, const igs_iop_t *iop)
                     zmsg_addmsg(msg, &packaged_value);
                     igsagent_debug (agent, "%s(%s) publishes data %s (%zu bytes) with timestamp %lld",
                                     agent->definition->name, agent->uuid,
-                                    iop->name, iop->value_size, current_microseconds);
+                                    io->name, io->value_size, current_microseconds);
                 } else {
                     zmsg_append (msg, &frame);
                     igsagent_debug (agent, "%s(%s) publishes data %s (%zu bytes)",
                                     agent->definition->name, agent->uuid,
-                                    iop->name, iop->value_size);
+                                    io->name, io->value_size);
                 }
             } break;
             default:
@@ -3605,7 +3578,7 @@ igs_result_t network_publish_output (igsagent_t *agent, const igs_iop_t *iop)
         // 1- publish to TCP
         if (agent->context->network_actor && agent->context->publisher) {
             if (zsock_send (core_context->publisher, "m", msg) != 0) {
-                igsagent_error (agent, "Could not publish output %s on the network\n", iop->name);
+                igsagent_error (agent, "Could not publish output %s on the network\n", io->name);
                 zmsg_destroy (&msg);
                 result = IGS_FAILURE;
             }
@@ -3614,7 +3587,7 @@ igs_result_t network_publish_output (igsagent_t *agent, const igs_iop_t *iop)
                 // publisher can be NULL on IOS or for read/write problems with assigned
                 // IPC path in both cases, an error message has been issued at start
                 if (zsock_send (core_context->ipc_publisher, "m", msg) != 0) {
-                    igsagent_error (agent, "Could not publish output %s using IPC\n", iop->name);
+                    igsagent_error (agent, "Could not publish output %s using IPC\n", io->name);
                     zmsg_destroy (&msg);
                     result = IGS_FAILURE;
                 }
@@ -3622,20 +3595,20 @@ igs_result_t network_publish_output (igsagent_t *agent, const igs_iop_t *iop)
             // 3- publish to inproc
             if (core_context->inproc_publisher) {
                 if (zsock_send (core_context->inproc_publisher, "m", msg) != 0) {
-                    igsagent_error (agent, "Could not publish output %s using inproc\n", iop->name);
+                    igsagent_error (agent, "Could not publish output %s using inproc\n", io->name);
                     zmsg_destroy (&msg);
                     result = IGS_FAILURE;
                 }
             }
         }else
             igsagent_warn (agent, "agent not started : could not publish output %s to the "
-                           "network (published to agents in same process only)", iop->name);
+                           "network (published to agents in same process only)", io->name);
         
         // 4- distribute publication message to other agents inside our context
         // without using the network
         if (!agent->is_virtual) {
-            free (zmsg_popstr (msg)); // remove composite uuid/iop name from message
-            zmsg_pushstr (msg, iop->name); // replace it by simple iop name
+            free (zmsg_popstr (msg)); // remove composite uuid/io name from message
+            zmsg_pushstr (msg, io->name); // replace it by simple io name
             zsock_t *pipe = igs_pipe_to_ingescape();
             if (pipe){
                 zmsg_pushstr(msg, agent->definition->name);
@@ -3647,11 +3620,11 @@ igs_result_t network_publish_output (igsagent_t *agent, const igs_iop_t *iop)
         model_read_write_unlock (__FUNCTION__, __LINE__);
     } else {
         if (agent->is_whole_agent_muted)
-            igsagent_debug (agent, "Should publish output %s but the agent has been muted", iop->name);
-        if (iop->is_muted)
-            igsagent_debug (agent, "Should publish output %s but it has been muted", iop->name);
+            igsagent_debug (agent, "Should publish output %s but the agent has been muted", io->name);
+        if (io->is_muted)
+            igsagent_debug (agent, "Should publish output %s but it has been muted", io->name);
         if (agent->context->is_frozen == true)
-            igsagent_debug (agent, "Should publish output %s but the agent has been frozen", iop->name);
+            igsagent_debug (agent, "Should publish output %s but the agent has been frozen", io->name);
     }
     return result;
 }
@@ -3996,7 +3969,11 @@ void igsagent_set_name (igsagent_t *agent, const char *name)
                        name, n);
     char *previous = agent->definition->name;
     agent->definition->name = n;
+    definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
+    
+    if (!agent->definition->my_class)
+        agent->definition->my_class = strdup(n);
     
     if (agent->igs_channel)
         free (agent->igs_channel);

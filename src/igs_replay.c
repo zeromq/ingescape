@@ -51,10 +51,10 @@ char s_current_agent[IGS_MAX_AGENT_NAME_LENGTH] = "";
 int s_current_microsec = 0;
 char s_current_action_types[16] = "";
 igs_replay_mode_t s_current_action_type = 0;
-char s_current_iop_name[IGS_MAX_IOP_NAME_LENGTH] = "";
+char s_current_io_name[IGS_MAX_IO_NAME_LENGTH] = "";
 char s_current_data_types[64] = "";
-igs_iop_value_type_t s_current_data_type = IGS_UNKNOWN_T;
-char s_current_iop_data[8192] = "";
+igs_io_value_type_t s_current_data_type = IGS_UNKNOWN_T;
+char s_current_io_data[8192] = "";
 struct tm s_current_time = {0};
 time_t s_current_unix_time = 0;
 time_t s_current_unix_msec_time = 0;
@@ -66,7 +66,7 @@ long long s_execute_current_and_find_next_action (void)
     if (s_current_action_type
         && (streq (s_replay_agent, "")
             || streq (s_current_agent, s_replay_agent))) {
-        if (s_current_data_type == IGS_DATA_T && s_current_iop_data[0] == '|') {
+        if (s_current_data_type == IGS_DATA_T && s_current_io_data[0] == '|') {
             // ignore this data entry because it is a size and not actual binary data
         } else {
             igsagent_t *agent, *tmp;
@@ -78,36 +78,36 @@ long long s_execute_current_and_find_next_action (void)
                             if (s_replay_mode & IGS_REPLAY_INPUT) {
                                 igs_info ("replaying %s.%s.%s = (%s) %s",
                                           agent->definition->name, "input",
-                                          s_current_iop_name,
+                                          s_current_io_name,
                                           s_current_data_types,
-                                          s_current_iop_data);
+                                          s_current_io_data);
                                 igsagent_input_set_string (agent,
-                                                            s_current_iop_name,
-                                                            s_current_iop_data);
+                                                            s_current_io_name,
+                                                            s_current_io_data);
                             }
                             break;
                         case IGS_REPLAY_OUTPUT:
                             if (s_replay_mode & IGS_REPLAY_OUTPUT) {
                                 igs_info ("replaying %s.%s.%s = (%s) %s",
                                           agent->definition->name, "output",
-                                          s_current_iop_name,
+                                          s_current_io_name,
                                           s_current_data_types,
-                                          s_current_iop_data);
+                                          s_current_io_data);
                                 igsagent_output_set_string (
-                                  agent, s_current_iop_name,
-                                  s_current_iop_data);
+                                  agent, s_current_io_name,
+                                  s_current_io_data);
                             }
                             break;
-                        case IGS_REPLAY_PARAMETER:
-                            if (s_replay_mode & IGS_REPLAY_PARAMETER) {
+                        case IGS_REPLAY_ATTRIBUTE:
+                            if (s_replay_mode & IGS_REPLAY_ATTRIBUTE) {
                                 igs_info ("replaying %s.%s.%s = (%s) %s",
-                                          agent->definition->name, "parameter",
-                                          s_current_iop_name,
+                                          agent->definition->name, "attribute",
+                                          s_current_io_name,
                                           s_current_data_types,
-                                          s_current_iop_data);
-                                igsagent_parameter_set_string (
-                                  agent, s_current_iop_name,
-                                  s_current_iop_data);
+                                          s_current_io_data);
+                                igsagent_attribute_set_string (
+                                  agent, s_current_io_name,
+                                  s_current_io_data);
                             }
                             break;
                         case IGS_REPLAY_CALL_SERVICE:
@@ -144,16 +144,16 @@ long long s_execute_current_and_find_next_action (void)
           s_current_agent, &s_current_time.tm_mday, &s_current_time.tm_mon,
           &s_current_time.tm_year, &s_current_time.tm_hour,
           &s_current_time.tm_min, &s_current_time.tm_sec, &s_current_microsec,
-          s_current_action_types, s_current_iop_name, s_current_data_types,
-          s_current_iop_data);
+          s_current_action_types, s_current_io_name, s_current_data_types,
+          s_current_io_data);
         if (res == 12) {
             // printf("line: %s\n", s_replay_current_line);
             if (streq (s_current_action_types, "input"))
                 s_current_action_type = IGS_REPLAY_INPUT;
             else if (streq (s_current_action_types, "output"))
                 s_current_action_type = IGS_REPLAY_OUTPUT;
-            else if (streq (s_current_action_types, "parameter"))
-                s_current_action_type = IGS_REPLAY_PARAMETER;
+            else if (streq (s_current_action_types, "attribute"))
+                s_current_action_type = IGS_REPLAY_ATTRIBUTE;
             else
                 s_current_action_type = 0;
 
@@ -462,7 +462,7 @@ void igs_replay_init (const char *log_file_path,
 
     if (!replay_mode)
         replay_mode = IGS_REPLAY_INPUT + IGS_REPLAY_OUTPUT
-                      + IGS_REPLAY_PARAMETER + IGS_REPLAY_EXECUTE_SERVICE
+                      + IGS_REPLAY_ATTRIBUTE + IGS_REPLAY_EXECUTE_SERVICE
                       + IGS_REPLAY_CALL_SERVICE;
     else
         replay_mode = s_replay_mode;
