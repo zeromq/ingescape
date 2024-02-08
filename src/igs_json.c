@@ -584,7 +584,7 @@ igs_json_test (bool verbose)
                                  "dynamic definition for DDS storage agent");
             igs_json_add_string (json, "version");
             igs_json_add_string (json, "dynamic");
-            igs_json_add_string (json, "parameters");
+            igs_json_add_string (json, "attributes");
             igs_json_open_array (json);
             {
             }

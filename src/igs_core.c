@@ -31,19 +31,19 @@ igs_core_context_t *core_context = NULL;
 igsagent_t *core_agent = NULL;
 
 // Callback wrappers
-typedef struct observe_iop_cb_wrapper
+typedef struct observe_io_cb_wrapper
 {
-    igs_iop_fn *cb;
+    igs_io_fn *cb;
     void *my_data;
-    struct observe_iop_cb_wrapper *next;
-} observe_iop_cb_wrapper_t;
+    struct observe_io_cb_wrapper *next;
+} observe_io_cb_wrapper_t;
 
-typedef struct observed_iop
+typedef struct observed_io
 {
     char *name;
-    observe_iop_cb_wrapper_t *firstCBWrapper;
+    observe_io_cb_wrapper_t *firstCBWrapper;
     UT_hash_handle hh;
-} observed_iop_t;
+} observed_io_t;
 
 typedef struct
 {
@@ -67,9 +67,9 @@ typedef struct observe_agent_events_cb_wrapper
     struct observe_agent_events_cb_wrapper *next;
 } observe_agent_events_cb_wrapper_t;
 
-observed_iop_t *observed_inputs = NULL;
-observed_iop_t *observed_outputs = NULL;
-observed_iop_t *observed_parameters = NULL;
+observed_io_t *observed_inputs = NULL;
+observed_io_t *observed_outputs = NULL;
+observed_io_t *observed_attributes = NULL;
 service_cb_wrapper_t *service_cb_wrappers = NULL;
 observe_mute_cb_wrapper_t *mute_cb_wrappers = NULL;
 observe_agent_events_cb_wrapper_t *agent_event_cb_wrappers = NULL;
@@ -99,24 +99,24 @@ void core_init_context (void)
     }
 }
 
-void s_core_free_observeIOP (observed_iop_t **observed_iop)
+void s_core_free_observeIOP (observed_io_t **observed_io)
 { // Internal
-    assert (observed_iop);
-    assert (*observed_iop);
-    if ((*observed_iop)->name) {
-        free ((*observed_iop)->name);
-        (*observed_iop)->name = NULL;
+    assert (observed_io);
+    assert (*observed_io);
+    if ((*observed_io)->name) {
+        free ((*observed_io)->name);
+        (*observed_io)->name = NULL;
     }
-    observe_iop_cb_wrapper_t *iop_cb_wrapper = NULL, *iop_cb_wrapper_tmp = NULL;
-    LL_FOREACH_SAFE ((*observed_iop)->firstCBWrapper, iop_cb_wrapper,
-                     iop_cb_wrapper_tmp)
+    observe_io_cb_wrapper_t *io_cb_wrapper = NULL, *io_cb_wrapper_tmp = NULL;
+    LL_FOREACH_SAFE ((*observed_io)->firstCBWrapper, io_cb_wrapper,
+                     io_cb_wrapper_tmp)
     {
-        LL_DELETE ((*observed_iop)->firstCBWrapper, iop_cb_wrapper);
-        free (iop_cb_wrapper);
-        iop_cb_wrapper = NULL;
+        LL_DELETE ((*observed_io)->firstCBWrapper, io_cb_wrapper);
+        free (io_cb_wrapper);
+        io_cb_wrapper = NULL;
     }
-    free (*observed_iop);
-    (*observed_iop) = NULL;
+    free (*observed_io);
+    (*observed_io) = NULL;
 }
 
 void s_core_free_service_cb_wrapper (service_cb_wrapper_t **service_cb_wrapper)
@@ -147,18 +147,18 @@ void igs_clear_context (void)
         }
         core_agent = NULL;
         // delete core agent callback wrappers
-        observed_iop_t *observed_iop, *observed_iop_tmp;
-        HASH_ITER (hh, observed_inputs, observed_iop, observed_iop_tmp){
-            HASH_DEL (observed_inputs, observed_iop);
-            s_core_free_observeIOP (&observed_iop);
+        observed_io_t *observed_io, *observed_io_tmp;
+        HASH_ITER (hh, observed_inputs, observed_io, observed_io_tmp){
+            HASH_DEL (observed_inputs, observed_io);
+            s_core_free_observeIOP (&observed_io);
         }
-        HASH_ITER (hh, observed_outputs, observed_iop, observed_iop_tmp){
-            HASH_DEL (observed_outputs, observed_iop);
-            s_core_free_observeIOP (&observed_iop);
+        HASH_ITER (hh, observed_outputs, observed_io, observed_io_tmp){
+            HASH_DEL (observed_outputs, observed_io);
+            s_core_free_observeIOP (&observed_io);
         }
-        HASH_ITER (hh, observed_parameters, observed_iop, observed_iop_tmp){
-            HASH_DEL (observed_parameters, observed_iop);
-            s_core_free_observeIOP (&observed_iop);
+        HASH_ITER (hh, observed_attributes, observed_io, observed_io_tmp){
+            HASH_DEL (observed_attributes, observed_io);
+            s_core_free_observeIOP (&observed_io);
         }
         service_cb_wrapper_t *service_cb_wrapper, *service_cb_wrapper_tmp;
         HASH_ITER (hh, service_cb_wrappers, service_cb_wrapper,
@@ -409,34 +409,34 @@ igs_result_t igs_output_data (const char *name, void **data, size_t *size)
     return igsagent_output_data (core_agent, name, data, size);
 }
 
-bool igs_parameter_bool (const char *name)
+bool igs_attribute_bool (const char *name)
 {
     core_init_agent ();
-    return igsagent_parameter_bool (core_agent, name);
+    return igsagent_attribute_bool (core_agent, name);
 }
 
-int igs_parameter_int (const char *name)
+int igs_attribute_int (const char *name)
 {
     core_init_agent ();
-    return igsagent_parameter_int (core_agent, name);
+    return igsagent_attribute_int (core_agent, name);
 }
 
-double igs_parameter_double (const char *name)
+double igs_attribute_double (const char *name)
 {
     core_init_agent ();
-    return igsagent_parameter_double (core_agent, name);
+    return igsagent_attribute_double (core_agent, name);
 }
 
-char *igs_parameter_string (const char *name)
+char *igs_attribute_string (const char *name)
 {
     core_init_agent ();
-    return igsagent_parameter_string (core_agent, name);
+    return igsagent_attribute_string (core_agent, name);
 }
 
-igs_result_t igs_parameter_data (const char *name, void **data, size_t *size)
+igs_result_t igs_attribute_data (const char *name, void **data, size_t *size)
 {
     core_init_agent ();
-    return igsagent_parameter_data (core_agent, name, data, size);
+    return igsagent_attribute_data (core_agent, name, data, size);
 }
 
 igs_result_t igs_input_set_bool (const char *name, bool value)
@@ -511,34 +511,34 @@ igs_result_t igs_output_set_data (const char *name, void *value, size_t size)
     return igsagent_output_set_data (core_agent, name, value, size);
 }
 
-igs_result_t igs_parameter_set_bool (const char *name, bool value)
+igs_result_t igs_attribute_set_bool (const char *name, bool value)
 {
     core_init_agent ();
-    return igsagent_parameter_set_bool (core_agent, name, value);
+    return igsagent_attribute_set_bool (core_agent, name, value);
 }
 
-igs_result_t igs_parameter_set_int (const char *name, int value)
+igs_result_t igs_attribute_set_int (const char *name, int value)
 {
     core_init_agent ();
-    return igsagent_parameter_set_int (core_agent, name, value);
+    return igsagent_attribute_set_int (core_agent, name, value);
 }
 
-igs_result_t igs_parameter_set_double (const char *name, double value)
+igs_result_t igs_attribute_set_double (const char *name, double value)
 {
     core_init_agent ();
-    return igsagent_parameter_set_double (core_agent, name, value);
+    return igsagent_attribute_set_double (core_agent, name, value);
 }
 
-igs_result_t igs_parameter_set_string (const char *name, const char *value)
+igs_result_t igs_attribute_set_string (const char *name, const char *value)
 {
     core_init_agent ();
-    return igsagent_parameter_set_string (core_agent, name, value);
+    return igsagent_attribute_set_string (core_agent, name, value);
 }
 
-igs_result_t igs_parameter_set_data (const char *name, void *value, size_t size)
+igs_result_t igs_attribute_set_data (const char *name, void *value, size_t size)
 {
     core_init_agent ();
-    return igsagent_parameter_set_data (core_agent, name, value, size);
+    return igsagent_attribute_set_data (core_agent, name, value, size);
 }
 
 igs_result_t igs_input_add_constraint (const char *name, const char *constraint)
@@ -553,10 +553,10 @@ igs_result_t igs_output_add_constraint (const char *name, const char *constraint
     return igsagent_output_add_constraint (core_agent, name, constraint);
 }
 
-igs_result_t igs_parameter_add_constraint (const char *name, const char *constraint)
+igs_result_t igs_attribute_add_constraint (const char *name, const char *constraint)
 {
     core_init_agent ();
-    return igsagent_parameter_add_constraint (core_agent, name, constraint);
+    return igsagent_attribute_add_constraint (core_agent, name, constraint);
 }
 
 igs_result_t igs_input_set_description(const char *name, const char *description)
@@ -571,28 +571,28 @@ igs_result_t igs_output_set_description(const char *name, const char *descriptio
     return igsagent_output_set_description(core_agent, name, description);
 }
 
-igs_result_t igs_parameter_set_description(const char *name, const char *description)
+igs_result_t igs_attribute_set_description(const char *name, const char *description)
 {
     core_init_agent ();
-    return igsagent_parameter_set_description (core_agent, name, description);
+    return igsagent_attribute_set_description (core_agent, name, description);
 }
 
-igs_result_t igs_input_set_specification(const char *name, const char *type, const char *specification)
+igs_result_t igs_input_set_detailed_type(const char *name, const char *type_name, const char *specification)
 {
     core_init_agent ();
-    return igsagent_input_set_specification(core_agent, name, type, specification);
+    return igsagent_input_set_detailed_type(core_agent, name, type_name, specification);
 }
 
-igs_result_t igs_output_set_specification(const char *name, const char *type, const char *specification)
+igs_result_t igs_output_set_detailed_type(const char *name, const char *type_name, const char *specification)
 {
     core_init_agent ();
-    return igsagent_output_set_specification(core_agent, name, type, specification);
+    return igsagent_output_set_detailed_type(core_agent, name, type_name, specification);
 }
 
-igs_result_t igs_parameter_set_specification(const char *name, const char *type, const char *specification)
+igs_result_t igs_attribute_set_detailed_type(const char *name, const char *type_name, const char *specification)
 {
     core_init_agent ();
-    return igsagent_parameter_set_specification(core_agent, name, type, specification);
+    return igsagent_attribute_set_detailed_type(core_agent, name, type_name, specification);
 }
 
 void igs_clear_input (const char *name)
@@ -607,83 +607,83 @@ void igs_clear_output (const char *name)
     igsagent_clear_output (core_agent, name);
 }
 
-void igs_clear_parameter (const char *name)
+void igs_clear_attribute (const char *name)
 {
     core_init_agent ();
-    igsagent_clear_parameter (core_agent, name);
+    igsagent_clear_attribute (core_agent, name);
 }
 
 void core_observeIOPCallback (igsagent_t *agent,
-                              igs_iop_type_t type,
+                              igs_io_type_t type,
                               const char *name,
-                              igs_iop_value_type_t value_type,
+                              igs_io_value_type_t value_type,
                               void *value,
                               size_t value_size,
                               void *my_data)
 {
     IGS_UNUSED (agent)
-    observe_iop_cb_wrapper_t *wrap = (observe_iop_cb_wrapper_t *) my_data;
+    observe_io_cb_wrapper_t *wrap = (observe_io_cb_wrapper_t *) my_data;
     wrap->cb (type, name, value_type, value, value_size, wrap->my_data);
 }
 
-void igs_observe_input (const char *name, igs_iop_fn cb, void *my_data)
+void igs_observe_input (const char *name, igs_io_fn cb, void *my_data)
 {
     core_init_agent ();
-    observe_iop_cb_wrapper_t *wrap =
-      (observe_iop_cb_wrapper_t *) zmalloc (sizeof (observe_iop_cb_wrapper_t));
+    observe_io_cb_wrapper_t *wrap =
+      (observe_io_cb_wrapper_t *) zmalloc (sizeof (observe_io_cb_wrapper_t));
     wrap->cb = cb;
     wrap->my_data = my_data;
     // store wrapper to delete it later
-    observed_iop_t *observed_iop = NULL;
-    HASH_FIND_STR (observed_inputs, name, observed_iop);
-    if (observed_iop == NULL) {
-        observed_iop = (observed_iop_t *) zmalloc (sizeof (observed_iop_t));
-        observed_iop->name = strdup (name);
-        observed_iop->firstCBWrapper = NULL;
-        HASH_ADD_STR (observed_inputs, name, observed_iop);
+    observed_io_t *observed_io = NULL;
+    HASH_FIND_STR (observed_inputs, name, observed_io);
+    if (observed_io == NULL) {
+        observed_io = (observed_io_t *) zmalloc (sizeof (observed_io_t));
+        observed_io->name = strdup (name);
+        observed_io->firstCBWrapper = NULL;
+        HASH_ADD_STR (observed_inputs, name, observed_io);
     }
-    LL_APPEND (observed_iop->firstCBWrapper, wrap);
+    LL_APPEND (observed_io->firstCBWrapper, wrap);
     igsagent_observe_input (core_agent, name, core_observeIOPCallback, wrap);
 }
 
-void igs_observe_output (const char *name, igs_iop_fn cb, void *my_data)
+void igs_observe_output (const char *name, igs_io_fn cb, void *my_data)
 {
     core_init_agent ();
-    observe_iop_cb_wrapper_t *wrap =
-      (observe_iop_cb_wrapper_t *) zmalloc (sizeof (observe_iop_cb_wrapper_t));
+    observe_io_cb_wrapper_t *wrap =
+      (observe_io_cb_wrapper_t *) zmalloc (sizeof (observe_io_cb_wrapper_t));
     wrap->cb = cb;
     wrap->my_data = my_data;
     // store wrapper to delete it later
-    observed_iop_t *observed_iop = NULL;
-    HASH_FIND_STR (observed_outputs, name, observed_iop);
-    if (observed_iop == NULL) {
-        observed_iop = (observed_iop_t *) zmalloc (sizeof (observed_iop_t));
-        observed_iop->name = strdup (name);
-        observed_iop->firstCBWrapper = NULL;
-        HASH_ADD_STR (observed_outputs, name, observed_iop);
+    observed_io_t *observed_io = NULL;
+    HASH_FIND_STR (observed_outputs, name, observed_io);
+    if (observed_io == NULL) {
+        observed_io = (observed_io_t *) zmalloc (sizeof (observed_io_t));
+        observed_io->name = strdup (name);
+        observed_io->firstCBWrapper = NULL;
+        HASH_ADD_STR (observed_outputs, name, observed_io);
     }
-    LL_APPEND (observed_iop->firstCBWrapper, wrap);
+    LL_APPEND (observed_io->firstCBWrapper, wrap);
     igsagent_observe_output (core_agent, name, core_observeIOPCallback, wrap);
 }
 
-void igs_observe_parameter (const char *name, igs_iop_fn cb, void *my_data)
+void igs_observe_attribute (const char *name, igs_io_fn cb, void *my_data)
 {
     core_init_agent ();
-    observe_iop_cb_wrapper_t *wrap =
-      (observe_iop_cb_wrapper_t *) zmalloc (sizeof (observe_iop_cb_wrapper_t));
+    observe_io_cb_wrapper_t *wrap =
+      (observe_io_cb_wrapper_t *) zmalloc (sizeof (observe_io_cb_wrapper_t));
     wrap->cb = cb;
     wrap->my_data = my_data;
     // store wrapper to delete it later
-    observed_iop_t *observed_iop = NULL;
-    HASH_FIND_STR (observed_parameters, name, observed_iop);
-    if (observed_iop == NULL) {
-        observed_iop = (observed_iop_t *) zmalloc (sizeof (observed_iop_t));
-        observed_iop->name = strdup (name);
-        observed_iop->firstCBWrapper = NULL;
-        HASH_ADD_STR (observed_parameters, name, observed_iop);
+    observed_io_t *observed_io = NULL;
+    HASH_FIND_STR (observed_attributes, name, observed_io);
+    if (observed_io == NULL) {
+        observed_io = (observed_io_t *) zmalloc (sizeof (observed_io_t));
+        observed_io->name = strdup (name);
+        observed_io->firstCBWrapper = NULL;
+        HASH_ADD_STR (observed_attributes, name, observed_io);
     }
-    LL_APPEND (observed_iop->firstCBWrapper, wrap);
-    igsagent_observe_parameter (core_agent, name, core_observeIOPCallback,
+    LL_APPEND (observed_io->firstCBWrapper, wrap);
+    igsagent_observe_attribute (core_agent, name, core_observeIOPCallback,
                                  wrap);
 }
 
@@ -705,22 +705,22 @@ bool igs_output_is_muted (const char *name)
     return igsagent_output_is_muted (core_agent, name);
 }
 
-igs_iop_value_type_t igs_input_type (const char *name)
+igs_io_value_type_t igs_input_type (const char *name)
 {
     core_init_agent ();
     return igsagent_input_type (core_agent, name);
 }
 
-igs_iop_value_type_t igs_output_type (const char *name)
+igs_io_value_type_t igs_output_type (const char *name)
 {
     core_init_agent ();
     return igsagent_output_type (core_agent, name);
 }
 
-igs_iop_value_type_t igs_parameter_type (const char *name)
+igs_io_value_type_t igs_attribute_type (const char *name)
 {
     core_init_agent ();
-    return igsagent_parameter_type (core_agent, name);
+    return igsagent_attribute_type (core_agent, name);
 }
 
 size_t igs_input_count (void)
@@ -735,10 +735,10 @@ size_t igs_output_count (void)
     return igsagent_output_count (core_agent);
 }
 
-size_t igs_parameter_count (void)
+size_t igs_attribute_count (void)
 {
     core_init_agent ();
-    return igsagent_parameter_count (core_agent);
+    return igsagent_attribute_count (core_agent);
 }
 
 char **igs_input_list (size_t *nb_of_elements)
@@ -753,10 +753,10 @@ char **igs_output_list (size_t *nb_of_elements)
     return igsagent_output_list (core_agent, nb_of_elements);
 }
 
-char **igs_parameter_list (size_t *nb_of_elements)
+char **igs_attribute_list (size_t *nb_of_elements)
 {
     core_init_agent ();
-    return igsagent_parameter_list (core_agent, nb_of_elements);
+    return igsagent_attribute_list (core_agent, nb_of_elements);
 }
 
 bool igs_input_exists (const char *name)
@@ -771,10 +771,10 @@ bool igs_output_exists (const char *name)
     return igsagent_output_exists (core_agent, name);
 }
 
-bool igs_parameter_exists (const char *name)
+bool igs_attribute_exists (const char *name)
 {
     core_init_agent ();
-    return igsagent_parameter_exists (core_agent, name);
+    return igsagent_attribute_exists (core_agent, name);
 }
 
 // definition
@@ -795,21 +795,21 @@ void igs_clear_definition (void)
     core_init_agent ();
     igsagent_clear_definition (core_agent);
     // delete associated callback wrappers
-    observed_iop_t *observed_iop, *observed_iop_tmp;
-    HASH_ITER (hh, observed_inputs, observed_iop, observed_iop_tmp)
+    observed_io_t *observed_io, *observed_io_tmp;
+    HASH_ITER (hh, observed_inputs, observed_io, observed_io_tmp)
     {
-        HASH_DEL (observed_inputs, observed_iop);
-        s_core_free_observeIOP (&observed_iop);
+        HASH_DEL (observed_inputs, observed_io);
+        s_core_free_observeIOP (&observed_io);
     }
-    HASH_ITER (hh, observed_outputs, observed_iop, observed_iop_tmp)
+    HASH_ITER (hh, observed_outputs, observed_io, observed_io_tmp)
     {
-        HASH_DEL (observed_outputs, observed_iop);
-        s_core_free_observeIOP (&observed_iop);
+        HASH_DEL (observed_outputs, observed_io);
+        s_core_free_observeIOP (&observed_io);
     }
-    HASH_ITER (hh, observed_parameters, observed_iop, observed_iop_tmp)
+    HASH_ITER (hh, observed_attributes, observed_io, observed_io_tmp)
     {
-        HASH_DEL (observed_parameters, observed_iop);
-        s_core_free_observeIOP (&observed_iop);
+        HASH_DEL (observed_attributes, observed_io);
+        s_core_free_observeIOP (&observed_io);
     }
     service_cb_wrapper_t *service_cb_wrapper, *service_cb_wrapper_tmp;
     HASH_ITER (hh, service_cb_wrappers, service_cb_wrapper,
@@ -824,6 +824,31 @@ char *igs_definition_json (void)
 {
     core_init_agent ();
     return igsagent_definition_json (core_agent);
+}
+
+void igs_definition_set_package(const char *package)
+{
+    core_init_agent ();
+    igsagent_definition_set_package (core_agent, package);
+}
+
+// returned char* must be freed by caller
+char * igs_definition_package(void)
+{
+    core_init_agent ();
+    return igsagent_definition_package (core_agent);
+}
+
+void igs_definition_set_class(const char *my_class)
+{
+    core_init_agent ();
+    igsagent_definition_set_class (core_agent, my_class);
+}
+
+// returned char* must be freed by caller
+char * igs_definition_class(void){
+    core_init_agent ();
+    return igsagent_definition_class (core_agent);
 }
 
 // returned char* must be freed by caller
@@ -853,7 +878,7 @@ void igs_definition_set_version (const char *version)
 }
 
 igs_result_t igs_input_create (const char *name,
-                               igs_iop_value_type_t value_type,
+                               igs_io_value_type_t value_type,
                                void *value,
                                size_t size)
 {
@@ -862,7 +887,7 @@ igs_result_t igs_input_create (const char *name,
 }
 
 igs_result_t igs_output_create (const char *name,
-                                igs_iop_value_type_t value_type,
+                                igs_io_value_type_t value_type,
                                 void *value,
                                 size_t size)
 {
@@ -870,13 +895,13 @@ igs_result_t igs_output_create (const char *name,
     return igsagent_output_create (core_agent, name, value_type, value, size);
 }
 
-igs_result_t igs_parameter_create (const char *name,
-                                   igs_iop_value_type_t value_type,
+igs_result_t igs_attribute_create (const char *name,
+                                   igs_io_value_type_t value_type,
                                    void *value,
                                    size_t size)
 {
     core_init_agent ();
-    return igsagent_parameter_create (core_agent, name, value_type, value,
+    return igsagent_attribute_create (core_agent, name, value_type, value,
                                        size);
 }
 
@@ -886,11 +911,11 @@ igs_result_t igs_input_remove (const char *name)
     igs_result_t result = igsagent_input_remove (core_agent, name);
     if (result == IGS_SUCCESS) {
         // delete associated callback wrappers
-        observed_iop_t *observed_iop = NULL;
-        HASH_FIND_STR (observed_inputs, name, observed_iop);
-        if (observed_iop) {
-            HASH_DEL (observed_inputs, observed_iop);
-            s_core_free_observeIOP (&observed_iop);
+        observed_io_t *observed_io = NULL;
+        HASH_FIND_STR (observed_inputs, name, observed_io);
+        if (observed_io) {
+            HASH_DEL (observed_inputs, observed_io);
+            s_core_free_observeIOP (&observed_io);
         }
     }
     return result;
@@ -902,27 +927,27 @@ igs_result_t igs_output_remove (const char *name)
     igs_result_t result = igsagent_output_remove (core_agent, name);
     if (result == IGS_SUCCESS) {
         // delete associated callback wrappers
-        observed_iop_t *observed_iop = NULL;
-        HASH_FIND_STR (observed_outputs, name, observed_iop);
-        if (observed_iop) {
-            HASH_DEL (observed_outputs, observed_iop);
-            s_core_free_observeIOP (&observed_iop);
+        observed_io_t *observed_io = NULL;
+        HASH_FIND_STR (observed_outputs, name, observed_io);
+        if (observed_io) {
+            HASH_DEL (observed_outputs, observed_io);
+            s_core_free_observeIOP (&observed_io);
         }
     }
     return result;
 }
 
-igs_result_t igs_parameter_remove (const char *name)
+igs_result_t igs_attribute_remove (const char *name)
 {
     core_init_agent ();
-    igs_result_t result = igsagent_parameter_remove (core_agent, name);
+    igs_result_t result = igsagent_attribute_remove (core_agent, name);
     if (result == IGS_SUCCESS) {
         // delete associated callback wrappers
-        observed_iop_t *observed_iop = NULL;
-        HASH_FIND_STR (observed_parameters, name, observed_iop);
-        if (observed_iop) {
-            HASH_DEL (observed_parameters, observed_iop);
-            s_core_free_observeIOP (&observed_iop);
+        observed_io_t *observed_io = NULL;
+        HASH_FIND_STR (observed_attributes, name, observed_io);
+        if (observed_io) {
+            HASH_DEL (observed_attributes, observed_io);
+            s_core_free_observeIOP (&observed_io);
         }
     }
     return result;
@@ -1162,7 +1187,7 @@ igs_result_t igs_service_remove (const char *name)
 
 igs_result_t igs_service_arg_add (const char *service_name,
                                   const char *arg_name,
-                                  igs_iop_value_type_t type)
+                                  igs_io_value_type_t type)
 {
     core_init_agent ();
     return igsagent_service_arg_add (core_agent, service_name, arg_name, type);
@@ -1186,7 +1211,7 @@ igs_result_t igs_service_reply_remove(const char *service_name, const char *repl
 }
 
 igs_result_t igs_service_reply_arg_add(const char *service_name, const char *reply_name, const char *arg_name,
-                                       igs_iop_value_type_t type){
+                                       igs_io_value_type_t type){
     core_init_agent ();
     return igsagent_service_reply_arg_add(core_agent, service_name, reply_name, arg_name, type);
 }
@@ -1291,9 +1316,9 @@ void igs_rt_set_time(int64_t microseconds){
             //iterate on outputs and publish them separately
             //NB: we do not create a single message because it would not be compatible
             //with the mapping filters: only the 1st output would serve in the filter.
-            igs_iop_t *iop, *tmp_iop;
-            HASH_ITER(hh, agent->definition->outputs_table, iop, tmp_iop)
-                network_publish_output(agent, iop);
+            igs_io_t *io, *tmp_io;
+            HASH_ITER(hh, agent->definition->outputs_table, io, tmp_io)
+                network_publish_output(agent, io);
         }
     }
 }
@@ -1311,4 +1336,97 @@ void igs_rt_set_synchronous_mode(bool enable){
 bool igs_rt_synchronous_mode(void){
     core_init_agent();
     return igsagent_rt_synchronous_mode(core_agent);
+}
+
+//DEPRECATED functions management for parameters
+igs_result_t igs_parameter_create(const char *name,
+                                  igs_iop_value_type_t value_type,
+                                  void *value,
+                                  size_t size){
+    igs_warn("this function is deprecated, please use igs_attribute_create instead.");
+    return igs_attribute_create(name, value_type, value, size);
+ }
+igs_result_t igs_parameter_remove(const char *name){
+    igs_warn("this function is deprecated, please use igs_attribute_remove instead.");
+    return igs_attribute_remove(name);
+}
+igs_iop_value_type_t igs_parameter_type(const char *name){
+    igs_warn("this function is deprecated, please use igs_attribute_type instead.");
+    return igs_attribute_type(name);
+}
+size_t igs_parameter_count(void){
+    igs_warn("this function is deprecated, please use igs_attribute_count instead.");
+    return igs_attribute_count();
+}
+char** igs_parameter_list(size_t *parameters_nbr){
+    igs_warn("this function is deprecated, please use igs_attribute_list instead.");
+    return igs_attribute_list(parameters_nbr);
+}
+bool igs_parameter_exists(const char *name){
+    igs_warn("this function is deprecated, please use igs_attribute_exists instead.");
+    return igs_attribute_exists(name);
+}
+bool igs_parameter_bool(const char *name){
+    igs_warn("this function is deprecated, please use igs_attribute_bool instead.");
+    return igs_attribute_bool(name);
+}
+int igs_parameter_int(const char *name){
+    igs_warn("this function is deprecated, please use igs_attribute_int instead.");
+    return igs_attribute_int(name);
+}
+double igs_parameter_double(const char *name){
+    igs_warn("this function is deprecated, please use igs_attribute_double instead.");
+    return igs_attribute_double(name);
+}
+char * igs_parameter_string(const char *name){
+    igs_warn("this function is deprecated, please use igs_attribute_string instead.");
+    return igs_attribute_string(name);
+}
+igs_result_t igs_parameter_data(const char *name, void **data, size_t *size){
+    igs_warn("this function is deprecated, please use igs_attribute_data instead.");
+    return igs_attribute_data(name, data, size);
+}
+igs_result_t igs_parameter_set_bool(const char *name, bool value){
+    igs_warn("this function is deprecated, please use igs_attribute_set_bool instead.");
+    return igs_attribute_set_bool(name, value);
+}
+igs_result_t igs_parameter_set_int(const char *name, int value){
+    igs_warn("this function is deprecated, please use igs_attribute_set_int instead.");
+    return igs_attribute_set_int(name, value);
+}
+igs_result_t igs_parameter_set_double(const char *name, double value){
+    igs_warn("this function is deprecated, please use igs_attribute_set_double instead.");
+    return igs_attribute_set_double(name, value);
+}
+igs_result_t igs_parameter_set_string(const char *name, const char *value){
+    igs_warn("this function is deprecated, please use igs_attribute_set_string instead.");
+    return igs_attribute_set_string(name, value);
+}
+igs_result_t igs_parameter_set_data(const char *name, void *value, size_t size){
+    igs_warn("this function is deprecated, please use igs_attribute_set_data instead.");
+    return igs_attribute_set_data(name, value, size);
+}
+igs_result_t igs_parameter_add_constraint(const char *name, const char *constraint){
+    igs_warn("this function is deprecated, please use igs_attribute_add_constraint instead.");
+    return igs_attribute_add_constraint(name, constraint);
+}
+igs_result_t igs_parameter_set_description(const char *name, const char *description){
+    igs_warn("this function is deprecated, please use igs_attribute_set_description instead.");
+    return igs_attribute_set_description(name, description);
+}
+igs_result_t igs_parameter_set_detailed_type(const char *param_name, const char *type_name, const char *specification){
+    igs_warn("this function is deprecated, please use igs_attribute_set_detailed_type instead.");
+    return igs_attribute_set_detailed_type(param_name, type_name, specification);
+}
+void igs_clear_parameter(const char *name){
+    igs_warn("this function is deprecated, please use igs_clear_attribute instead.");
+    return igs_clear_attribute(name);
+}
+void igs_observe_parameter(const char *name, igs_iop_fn cb, void *my_data){
+    igs_warn("this function is deprecated, please use igs_observe_attribute instead.");
+    return igs_observe_attribute(name, cb, my_data);
+}
+void igs_free_iop_list(char **list, size_t io_nbr){
+    igs_warn("this function is deprecated, please use igs_free_io_list instead.");
+    return igs_free_io_list(list, io_nbr);
 }

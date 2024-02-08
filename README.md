@@ -459,7 +459,7 @@ Here is the JSON definition for **ShapeRecognizer**:
                 "value": ""
             }
         ],
-        "parameters": [
+        "attributes": [
 
         ],
         "services": [
@@ -536,8 +536,9 @@ The global Ingescape API is centralized in a single header file. The header is h
 Here is the structure of ingescape.h:
 
 - Agent initialization, control and events
-- Editing & inspecting definitions, adding and removing inputs/outputs/parameters
-- Reading and writing inputs/outputs/parameters
+- Editing & inspecting definitions, adding and removing inputs/outputs
+- Reading and writing inputs/outputs
+- Handling attributes
 - Mappings edition & inspection
 - Services edition & inspection
 - Timers

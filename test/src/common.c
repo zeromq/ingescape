@@ -11,8 +11,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Global callbacks
-void myIOPCallback(igs_iop_type_t iopType, const char* name, igs_iop_value_type_t valueType, void* cbValue, size_t valueSize, void* myCbData){
-    IGS_UNUSED(iopType)
+void myIOCallback(igs_io_type_t ioType, const char* name, igs_io_value_type_t valueType, void* cbValue, size_t valueSize, void* myCbData){
+    IGS_UNUSED(ioType)
     IGS_UNUSED(cbValue)
     IGS_UNUSED(myCbData)
     printf("input %s changed", name);
@@ -122,11 +122,11 @@ void myChannelsCallback(const char *event, const char *peerID, const char *name,
 
 ///////////////////////////////////////////////////////////////////////////////
 // Agent callbacks
-void agentIOPCallback(igsagent_t *agent, igs_iop_type_t iopType, const char* name, igs_iop_value_type_t valueType,
+void agentIOCallback(igsagent_t *agent, igs_io_type_t ioType, const char* name, igs_io_value_type_t valueType,
                       void* value, size_t valueSize, void* myCbData){
     IGS_UNUSED(myCbData)
     IGS_UNUSED(value)
-    IGS_UNUSED(iopType)
+    IGS_UNUSED(ioType)
     char *thisAgentName = igsagent_name(agent);
     printf("input %s changed on %s", name, thisAgentName);
     free(thisAgentName);
@@ -234,7 +234,7 @@ void makeFilePath(char *from, char *to, size_t size_of_to) {
 
 void print_cli_usage(void) {
     printf("Available commands in the terminal:\n");
-    printf("\t/publish : runs the iop publication tests\n");
+    printf("\t/publish : runs the io publication tests\n");
     printf("\t/services : runs the service tests\n");
     printf("\t/channels : runs the channels tests\n");
     printf("\t/editor agent_uuid : runs the editor (i.e. private bus API) tests on a specific agent\n");
@@ -327,7 +327,7 @@ void editorCommand(const char *agentUUID, const char *input){
     igs_channel_whisper_zmsg(agentUUID, &msg);
 
     msg = zmsg_new();
-    zmsg_addstr(msg, "GET_CURRENT_PARAMETERS");
+    zmsg_addstr(msg, "GET_CURRENT_ATTRIBUTES");
     zmsg_addstr(msg, agentUUID);
     igs_channel_whisper_zmsg(agentUUID, &msg);
 
@@ -379,7 +379,7 @@ void editorCommand(const char *agentUUID, const char *input){
     igs_channel_whisper_zmsg(agentUUID, &msg);
 
     msg = zmsg_new();
-    zmsg_addstr(msg, "SET_PARAMETER");
+    zmsg_addstr(msg, "SET_ATTRIBUTE");
     zmsg_addstr(msg, input);
     zmsg_addstr(msg, "10");
     zmsg_addstr(msg, agentUUID);
