@@ -197,7 +197,7 @@ igsTester --device "en0" --port 5670 --verbose --interactiveloop
 #in each console, then type /help to display the available console commands
 /help
 Available commands in the terminal:
-	/publish : runs the iop publication tests
+	/publish : runs the io publication tests
 	/services : runs the service tests
 	/channels : runs the channels tests
 	/editor agent_uuid : runs the editor (i.e. private bus API) tests on a specific agent
@@ -254,7 +254,7 @@ Here is the code for the **ShapeRecognizer** agent to be copied into a main.c fi
 
 	#include <ingescape/ingescape.h>
 
-	void imageCallback(igs_iop_type_t iopType, const char* name, igs_iop_value_type_t valueType,
+	void imageCallback(igs_io_type_t ioType, const char* name, igs_io_value_type_t valueType,
 	                   void* value, size_t valueSize, void* myData){
 	    igs_info("%s received (%zu bytes)", name, valueSize);
 	    //doing some sophisticated AI stuff here...
@@ -336,7 +336,7 @@ Here is the code for the **ImagesProvider** agent to be copied into another main
 
 	#include <ingescape/ingescape.h>
 
-	void shapeCallback(igs_iop_type_t iopType, const char* name, igs_iop_value_type_t valueType,
+	void shapeCallback(igs_io_type_t ioType, const char* name, igs_io_value_type_t valueType,
 	                   void* value, size_t valueSize, void* myData){
 	    igs_info("%s recognized as %s", name, (char*)value);
 	}

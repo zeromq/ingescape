@@ -72,6 +72,20 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		97082F822B762630000A4EFA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 5047D926FE4D47D6BA3B4D09;
+			remoteInfo = test_proxy_steerable;
+		};
+		97082F842B762630000A4EFA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 164569ED3D654A5583D987B9;
+			remoteInfo = test_xpub_topic;
+		};
 		9709238129E54A030019C6E5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */;
@@ -163,13 +177,6 @@
 			remoteGlobalIDString = 52BAC5B2EE564CA98F37540C;
 			remoteInfo = test_bind_after_connect_tcp;
 		};
-		97A3BE7225AF36CA004BD834 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 4F9E014CF7EF46A2A3037EF0;
-			remoteInfo = test_bind_curve_fuzzer;
-		};
 		97A3BE7425AF36CA004BD834 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */;
@@ -218,13 +225,6 @@
 			proxyType = 2;
 			remoteGlobalIDString = CAE0528F5AEA49E0809FA43F;
 			remoteInfo = test_conflate;
-		};
-		97A3BE8225AF36CA004BD834 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = C891407CE63E4E04B6E453D7;
-			remoteInfo = test_connect_curve_fuzzer;
 		};
 		97A3BE8425AF36CA004BD834 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -625,13 +625,6 @@
 			remoteGlobalIDString = 9DC4258176364FB48202DFFA;
 			remoteInfo = test_scatter_gather;
 		};
-		97A3BEF625AF36CA004BD834 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = ADCC104FC4644337B2D0BC5D;
-			remoteInfo = test_security_curve;
-		};
 		97A3BEF825AF36CA004BD834 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */;
@@ -891,13 +884,6 @@
 			remoteGlobalIDString = DC3C8B7D1FFB48B791AAED91;
 			remoteInfo = test_xpub_welcome_msg;
 		};
-		97A3BF4225AF36CA004BD834 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 1B2A9A8A2E8140B5863613D7;
-			remoteInfo = test_z85_decode_fuzzer;
-		};
 		97A3BF4425AF36CA004BD834 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */;
@@ -1131,6 +1117,7 @@
 
 /* Begin PBXFileReference section */
 		8D40229C25F7C60500FCAF1C /* igs_split.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = igs_split.c; sourceTree = "<group>"; };
+		97082EDF2B762630000A4EFA /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../README.md; sourceTree = "<group>"; };
 		970ACB9626C4240B00FE4FA1 /* igs_json_node.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = igs_json_node.c; sourceTree = "<group>"; };
 		9725395923564B230071A9BA /* igs_performance.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = igs_performance.c; sourceTree = "<group>"; };
 		972A52631FD1733E00711352 /* igs_admin.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = igs_admin.c; sourceTree = "<group>"; };
@@ -1358,6 +1345,7 @@
 		979A796F1EA7B0D6003153EF = {
 			isa = PBXGroup;
 			children = (
+				97082EDF2B762630000A4EFA /* README.md */,
 				9762EDD01EAE5414002062A1 /* Info.plist */,
 				97A3BDD025AF36B8004BD834 /* sodium.xcodeproj */,
 				97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */,
@@ -1447,7 +1435,6 @@
 				97A3BE6D25AF36CA004BD834 /* test_atomics */,
 				97A3BE6F25AF36CA004BD834 /* test_base85 */,
 				97A3BE7125AF36CA004BD834 /* test_bind_after_connect_tcp */,
-				97A3BE7325AF36CA004BD834 /* test_bind_curve_fuzzer */,
 				97A3BE7525AF36CA004BD834 /* test_bind_fuzzer */,
 				97A3BE7725AF36CA004BD834 /* test_bind_null_fuzzer */,
 				97A3BE7925AF36CA004BD834 /* test_bind_src_address */,
@@ -1455,7 +1442,6 @@
 				97A3BE7D25AF36CA004BD834 /* test_channel */,
 				97A3BE7F25AF36CA004BD834 /* test_client_server */,
 				97A3BE8125AF36CA004BD834 /* test_conflate */,
-				97A3BE8325AF36CA004BD834 /* test_connect_curve_fuzzer */,
 				97A3BE8525AF36CA004BD834 /* test_connect_fuzzer */,
 				97A3BE8725AF36CA004BD834 /* test_connect_null_fuzzer */,
 				97A3BE8925AF36CA004BD834 /* test_connect_resolve */,
@@ -1497,6 +1483,7 @@
 				97A3BECF25AF36CA004BD834 /* test_proxy */,
 				97A3BED125AF36CA004BD834 /* test_proxy_hwm */,
 				97A3BED325AF36CA004BD834 /* test_proxy_single_socket */,
+				97082F832B762630000A4EFA /* test_proxy_steerable */,
 				97A3BED525AF36CA004BD834 /* test_proxy_terminate */,
 				97A3BED725AF36CA004BD834 /* test_pub_invert_matching */,
 				9709238229E54A030019C6E5 /* test_pubsub_topics_count */,
@@ -1515,7 +1502,6 @@
 				97A3BEF125AF36CA004BD834 /* test_router_mandatory_hwm */,
 				97A3BEF325AF36CA004BD834 /* test_router_notify */,
 				97A3BEF525AF36CA004BD834 /* test_scatter_gather */,
-				97A3BEF725AF36CA004BD834 /* test_security_curve */,
 				97A3BEF925AF36CA004BD834 /* test_security_gssapi */,
 				97A3BEFB25AF36CA004BD834 /* test_security_no_zap_handler */,
 				97A3BEFD25AF36CA004BD834 /* test_security_null */,
@@ -1551,10 +1537,10 @@
 				97A3BF3925AF36CA004BD834 /* test_xpub_manual */,
 				97A3BF3B25AF36CA004BD834 /* test_xpub_manual_last_value */,
 				97A3BF3D25AF36CA004BD834 /* test_xpub_nodrop */,
+				97082F852B762630000A4EFA /* test_xpub_topic */,
 				97A3BF3F25AF36CA004BD834 /* test_xpub_verbose */,
 				97A3BF4125AF36CA004BD834 /* test_xpub_welcome_msg */,
 				97FB90A628C4BD1E004FF800 /* test_xsub_verbose */,
-				97A3BF4325AF36CA004BD834 /* test_z85_decode_fuzzer */,
 				97A3BF4525AF36CA004BD834 /* test_zmq_poll_fd */,
 				97FB90A828C4BD1E004FF800 /* test_zmq_ppoll_fd */,
 				97FB90AA28C4BD1E004FF800 /* test_zmq_ppoll_signals */,
@@ -1907,6 +1893,20 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		97082F832B762630000A4EFA /* test_proxy_steerable */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_proxy_steerable;
+			remoteRef = 97082F822B762630000A4EFA /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		97082F852B762630000A4EFA /* test_xpub_topic */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_xpub_topic;
+			remoteRef = 97082F842B762630000A4EFA /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		9709238229E54A030019C6E5 /* test_pubsub_topics_count */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
@@ -1947,7 +1947,7 @@
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
 			name = libzmq.dylib;
-			path = libzmq.5.2.5.dylib;
+			path = libzmq.5.2.6.dylib;
 			remoteRef = 97A3BE6225AF36CA004BD834 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -2000,13 +2000,6 @@
 			remoteRef = 97A3BE7025AF36CA004BD834 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		97A3BE7325AF36CA004BD834 /* test_bind_curve_fuzzer */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_bind_curve_fuzzer;
-			remoteRef = 97A3BE7225AF36CA004BD834 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		97A3BE7525AF36CA004BD834 /* test_bind_fuzzer */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
@@ -2054,13 +2047,6 @@
 			fileType = "compiled.mach-o.executable";
 			path = test_conflate;
 			remoteRef = 97A3BE8025AF36CA004BD834 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		97A3BE8325AF36CA004BD834 /* test_connect_curve_fuzzer */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_connect_curve_fuzzer;
-			remoteRef = 97A3BE8225AF36CA004BD834 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		97A3BE8525AF36CA004BD834 /* test_connect_fuzzer */ = {
@@ -2462,13 +2448,6 @@
 			remoteRef = 97A3BEF425AF36CA004BD834 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		97A3BEF725AF36CA004BD834 /* test_security_curve */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_security_curve;
-			remoteRef = 97A3BEF625AF36CA004BD834 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		97A3BEF925AF36CA004BD834 /* test_security_gssapi */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
@@ -2726,13 +2705,6 @@
 			fileType = "compiled.mach-o.executable";
 			path = test_xpub_welcome_msg;
 			remoteRef = 97A3BF4025AF36CA004BD834 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		97A3BF4325AF36CA004BD834 /* test_z85_decode_fuzzer */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_z85_decode_fuzzer;
-			remoteRef = 97A3BF4225AF36CA004BD834 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		97A3BF4525AF36CA004BD834 /* test_zmq_poll_fd */ = {
