@@ -417,10 +417,10 @@ if (NOT DEPS_ONLY)
       add_dependencies(igstester ${CMAKE_PROJECT_NAME})
       if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
         set(_INGESCAPE_SUFFIX "d")
-        set(_LIBZMQ_NAME "libzmq-v142-mt-gd-4_3_5")
+        set(_LIBZMQ_NAME "libzmq-v142-mt-gd-4_3_6")
       else()
         set(_INGESCAPE_SUFFIX "")
-        set(_LIBZMQ_NAME "libzmq-v142-mt-4_3_5")
+        set(_LIBZMQ_NAME "libzmq-v142-mt-4_3_6")
       endif()
 
       add_custom_command(TARGET ${CMAKE_PROJECT_NAME}
