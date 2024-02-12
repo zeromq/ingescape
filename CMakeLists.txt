@@ -178,6 +178,7 @@ if (WITH_DEPS)
   #zeromq
   set(WITH_TLS OFF CACHE BOOL "Use TLS for WSS support")
   set(WITH_LIBSODIUM ON CACHE BOOL "Use libsodium instead of built-in tweetnacl")
+  set(ENABLE_CURVE ON CACHE BOOL "Enable CURVE security")
   add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libzmq)
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libzmq/include)
   add_dependencies(libzmq sodium)
