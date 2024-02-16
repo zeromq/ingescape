@@ -21,7 +21,7 @@ export type LogLevels = {
 };
 export function logLevels(): LogLevels;
 
-export type IOPValueTypes = {
+export type IOValueTypes = {
     IGS_INTEGER_T: number;
     IGS_DOUBLE_T: number;
     IGS_STRING_T: number;
@@ -30,14 +30,14 @@ export type IOPValueTypes = {
     IGS_DATA_T: number;
     IGS_UNKNOWN_T: number;
 };
-export function iopValueTypes(): IOPValueTypes;
+export function ioValueTypes(): IOValueTypes;
 
-export type IOPTypes = {
+export type IOTypes = {
     IGS_INPUT_T: number;
     IGS_OUTPUT_T: number;
-    IGS_PARAMETER_T: number;
+    IGS_ATTRIBUTE_T: number;
 };
-export function iopValueTypes(): IOPTypes;
+export function ioTypes(): IOTypes;
 
 export type MonitorEventTypes = {
     IGS_NETWORK_OK: number;
@@ -69,7 +69,7 @@ export function agentEventTypes(): AgentEventTypes;
 export type ReplayModes = {
     IGS_REPLAY_INPUT: number;
     IGS_REPLAY_OUTPUT: number;
-    IGS_REPLAY_PARAMETER: number;
+    IGS_REPLAY_ATTRIBUTE: number;
     IGS_REPLAY_EXECUTE_SERVICE: number;
     IGS_REPLAY_CALL_SERVICE: number;
 };
@@ -194,22 +194,28 @@ export class Agent {
 
     inputCreate(name:string, type:number, value:number|boolean|string|null|ArrayBuffer):number;
     outputCreate(name:string, type:number, value:number|boolean|string|null|ArrayBuffer):number;
+    attributeCreate(name:string, type:number, value:number|boolean|string|null|ArrayBuffer):number;
     parameterCreate(name:string, type:number, value:number|boolean|string|null|ArrayBuffer):number;
     inputRemove(name:string):number;
     outputRemove(name:string):number;
+    attributeRemove(name:string):number;
     parameterRemove(name:string):number;
 
     inputType(name:string):number;
     outputType(name:string):number;
+    attributeType(name:string):number;
     parameterType(name:string):number;
     inputCount():number;
     outputCount():number;
+    attributeCount():number;
     parameterCount():number;
     inputList():string[];
     outputList():string[];
+    attributeList():string[];
     parameterList():string[];
     inputExists(name:string):boolean;
     outputExists(name:string):boolean;
+    attributeExists(name:string):boolean;
     parameterExists(name:string):boolean;
 
     inputBool(name:string):boolean;
@@ -223,6 +229,12 @@ export class Agent {
     outputDouble(name:string):number;
     outputString(name:string):string;
     outputData(name:string):null|ArrayBuffer;
+
+    attributeBool(name:string):boolean;
+    attributeInt(name:string):number;
+    attributeDouble(name:string):number;
+    attributeString(name:string):string;
+    attributeData(name:string):null|ArrayBuffer;
 
     parameterBool(name:string):boolean;
     parameterInt(name:string):number;
@@ -244,6 +256,12 @@ export class Agent {
     outputSetImpulsion(name:string):number;
     outputSetData(name:string, value:null|ArrayBuffer):number;
 
+    attributeSetBool(name:string, value:boolean):number;
+    attributeSetInt(name:string, value:number):number;
+    attributeSetDouble(name:string, value:number):number;
+    attributeSetString(name:string, value:string):number;
+    attributeSetData(name:string, value:null|ArrayBuffer):number;
+
     parameterSetBool(name:string, value:boolean):number;
     parameterSetInt(name:string, value:number):number;
     parameterSetDouble(name:string, value:number):number;
@@ -253,18 +271,20 @@ export class Agent {
     constraintsEnforce(enforce:boolean):undefined;
     inputAddConstraint(name:string, constraint:string):number;
     outputAddConstraint(name:string, constraint:string):number;
+    attributeAddConstraint(name:string, constraint:string):number;
     parameterAddConstraint(name:string, constraint:string):number;
     inputSetDescription(name:string, description:string):undefined;
     outputSetDescription(name:string, description:string):undefined;
+    attributeSetDescription(name:string, description:string):undefined;
     parameterSetDescription(name:string, description:string):undefined;
     
     clearInput(name:string):undefined;
     clearOutput(name:string):undefined;
     clearParameter(name:string):undefined;
 
-    observeInput(name:string, cb:(agent:Agent, iopType:number, name:string, valueType:number, value:number|boolean|string|null|ArrayBuffer, myData:any) => undefined, myData:any):undefined;
-    observeOutput(name:string, cb:(agent:Agent, iopType:number, name:string, valueType:number, value:number|boolean|string|null|ArrayBuffer, myData:any) => undefined, myData:any):undefined;
-    observeParameter(name:string, cb:(agent:Agent, iopType:number, name:string, valueType:number, value:number|boolean|string|null|ArrayBuffer, myData:any) => undefined, myData:any):undefined;
+    observeInput(name:string, cb:(agent:Agent, ioType:number, name:string, valueType:number, value:number|boolean|string|null|ArrayBuffer, myData:any) => undefined, myData:any):undefined;
+    observeOutput(name:string, cb:(agent:Agent, ioType:number, name:string, valueType:number, value:number|boolean|string|null|ArrayBuffer, myData:any) => undefined, myData:any):undefined;
+    observeParameter(name:string, cb:(agent:Agent, ioType:number, name:string, valueType:number, value:number|boolean|string|null|ArrayBuffer, myData:any) => undefined, myData:any):undefined;
 
     outputMute(name:string):undefined;
     outputUnmute(name:string):undefined;
@@ -331,9 +351,11 @@ export function definitionSetDescription(description:string):undefined;
 export function definitionSetVersion(version:string):undefined;
 export function inputCreate(name:string, type:number, value:number|boolean|string|null|ArrayBuffer):number;
 export function outputCreate(name:string, type:number, value:number|boolean|string|null|ArrayBuffer):number;
+export function attributeCreate(name:string, type:number, value:number|boolean|string|null|ArrayBuffer):number;
 export function parameterCreate(name:string, type:number, value:number|boolean|string|null|ArrayBuffer):number;
 export function inputRemove(name:string):number;
 export function outputRemove(name:string):number;
+export function attributeRemove(name:string):number;
 export function parameterRemove(name:string):number;
 
 //init_control
@@ -357,7 +379,7 @@ export function unfreeze():undefined;
 export function observeFreeze(cb:(isPaused:boolean, myData:any) => undefined, myData:any):undefined;
 export function observeAgentEvents(cb:(event:number, uuid:string, name:string, eventData:string|null, myData:any) => undefined, myData:any):undefined;
 
-//iop
+//io
 export function inputBool(name:string):boolean;
 export function inputInt(name:string):number;
 export function inputDouble(name:string):number;
@@ -368,6 +390,11 @@ export function outputInt(name:string):number;
 export function outputDouble(name:string):number;
 export function outputString(name:string):string;
 export function outputData(name:string):null|ArrayBuffer;
+export function attributeBool(name:string):boolean;
+export function attributeInt(name:string):number;
+export function attributeDouble(name:string):number;
+export function attributeString(name:string):string;
+export function attributeData(name:string):null|ArrayBuffer;
 export function parameterBool(name:string):boolean;
 export function parameterInt(name:string):number;
 export function parameterDouble(name:string):number;
@@ -386,6 +413,11 @@ export function outputSetDouble(name:string, value:number):number;
 export function outputSetString(name:string, value:string):number;
 export function outputSetImpulsion(name:string):number;
 export function outputSetData(name:string, value:null|ArrayBuffer):number;
+export function attributeSetBool(name:string, value:boolean):number;
+export function attributeSetInt(name:string, value:number):number;
+export function attributeSetDouble(name:string, value:number):number;
+export function attributeSetString(name:string, value:string):number;
+export function attributeSetData(name:string, value:null|ArrayBuffer):number;
 export function parameterSetBool(name:string, value:boolean):number;
 export function parameterSetInt(name:string, value:number):number;
 export function parameterSetDouble(name:string, value:number):number;
@@ -395,31 +427,37 @@ export function parameterSetData(name:string, value:null|ArrayBuffer):number;
 export function clearInput(name:string):undefined;
 export function clearOutput(name:string):undefined;
 export function clearParameter(name:string):undefined;
-export function observeInput(name:string, cb:(iopType:number, name:string, valueType:number, value:number|boolean|string|null|ArrayBuffer, myData:any) => undefined, myData:any):undefined;
-export function observeOutput(name:string, cb:(iopType:number, name:string, valueType:number, value:number|boolean|string|null|ArrayBuffer, myData:any) => undefined, myData:any):undefined;
-export function observeParameter(name:string, cb:(iopType:number, name:string, valueType:number, value:number|boolean|string|null|ArrayBuffer, myData:any) => undefined, myData:any):undefined;
+export function observeInput(name:string, cb:(ioType:number, name:string, valueType:number, value:number|boolean|string|null|ArrayBuffer, myData:any) => undefined, myData:any):undefined;
+export function observeOutput(name:string, cb:(ioType:number, name:string, valueType:number, value:number|boolean|string|null|ArrayBuffer, myData:any) => undefined, myData:any):undefined;
+export function observeParameter(name:string, cb:(ioType:number, name:string, valueType:number, value:number|boolean|string|null|ArrayBuffer, myData:any) => undefined, myData:any):undefined;
 export function outputMute(name:string):undefined;
 export function outputUnmute(name:string):undefined;
 export function outputIsMuted(name:string):boolean;
 export function inputType(name:string):number;
 export function outputType(name:string):number;
+export function attributeType(name:string):number;
 export function parameterType(name:string):number;
 export function inputCount():number;
 export function outputCount():number;
+export function attributeCount():number;
 export function parameterCount():number;
 export function inputList():string[];
 export function outputList():string[];
+export function attributeList():string[];
 export function parameterList():string[];
 export function inputExists(name:string):boolean;
 export function outputExists(name:string):boolean;
+export function attributeExists(name:string):boolean;
 export function parameterExists(name:string):boolean;
 
 export function constraintsEnforce(enforce:boolean):undefined;
 export function inputAddConstraint(name:string, constraint:string):number;
 export function outputAddConstraint(name:string, constraint:string):number;
+export function attributeAddConstraint(name:string, constraint:string):number;
 export function parameterAddConstraint(name:string, constraint:string):number;
 export function inputSetDescription(name:string, description:string):undefined;
 export function outputSetDescription(name:string, description:string):undefined;
+export function attributeSetDescription(name:string, description:string):undefined;
 export function parameterSetDescription(name:string, description:string):undefined;
 
 //mapping

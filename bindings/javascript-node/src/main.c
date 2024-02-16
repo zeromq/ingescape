@@ -19,7 +19,7 @@ napi_value Init(napi_env env, napi_value exports) {
 	exports = init_agent(env, exports);
 	exports = init_init_control(env, exports);
 	exports = init_definition(env, exports);
-	exports = init_iop(env, exports);
+	exports = init_io(env, exports);
 	exports = init_mapping(env, exports);
 	exports = init_service(env, exports);
 	exports = init_enum(env, exports);

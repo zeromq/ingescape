@@ -15,8 +15,8 @@ const commandLineArgs = require('command-line-args')
 const fs = require('fs');
 const Echo = require("./echo").Echo;
 
-const iopTypes = igs.iopTypes();
-const iopValueTypes = igs.iopValueTypes();
+const ioTypes = igs.ioTypes();
+const ioValueTypes = igs.ioValueTypes();
 
 let verbose = false;
 let networkDevice = "";
@@ -28,32 +28,32 @@ let publicCertsDir = "";
 let echoAgent = new Echo();
 
 //inputs
-function impulsionInputCallback(iopType, name, valueType, value, myData) {
+function impulsionInputCallback(ioType, name, valueType, value, myData) {
   igs.info(name + " changed (impulsion)");
   echoAgent.setImpulsionI();
 }
 
-function boolInputCallback(iopType, name, valueType, value, myData) {
+function boolInputCallback(ioType, name, valueType, value, myData) {
   igs.info(name + " changed to " + value);
   echoAgent.setBoolI(value);
 }
 
-function integerInputCallback(iopType, name, valueType, value, myData) {
+function integerInputCallback(ioType, name, valueType, value, myData) {
   igs.info(name + " changed to " + value);
   echoAgent.setIntegerI(value);
 }
 
-function doubleInputCallback(iopType, name, valueType, value, myData) {
+function doubleInputCallback(ioType, name, valueType, value, myData) {
   igs.info(name + " changed to " + value);
   echoAgent.setDoubleI(value);
 }
 
-function stringInputCallback(iopType, name, valueType, value, myData) {
+function stringInputCallback(ioType, name, valueType, value, myData) {
   igs.info(name + " changed to " + value);
   echoAgent.setStringI(value);
 }
 
-function dataInputCallback(iopType, name, valueType, value, myData) {
+function dataInputCallback(ioType, name, valueType, value, myData) {
   igs.info(name + " changed (" + (value ? value.byteLength : "0") +" bytes)");
   echoAgent.setDataI(value);
 }
@@ -73,7 +73,7 @@ function receiveValuesCallback(senderAgentName, senderAgentUUID, serviceName, se
       igs.warn("Unable to retrieve service argument at index 0. Service will not be executed.");
       return;
   }
-  if (serviceArgs[0].type !== iopValueTypes.IGS_BOOL_T)
+  if (serviceArgs[0].type !== ioValueTypes.IGS_BOOL_T)
   {
       igs.warn("Argument at index 0 is not of type IGS_BOOL_T. Service will not be executed.");
       return;
@@ -84,7 +84,7 @@ function receiveValuesCallback(senderAgentName, senderAgentUUID, serviceName, se
       igs.warn("Unable to retrieve service argument at index 1. Service will not be executed.");
       return;
   }
-  if (serviceArgs[1].type !== iopValueTypes.IGS_INTEGER_T)
+  if (serviceArgs[1].type !== ioValueTypes.IGS_INTEGER_T)
   {
       igs.warn("Argument at index 1 is not of type IGS_INTEGER_T. Service will not be executed.");
       return;
@@ -95,7 +95,7 @@ function receiveValuesCallback(senderAgentName, senderAgentUUID, serviceName, se
       igs.warn("Unable to retrieve service argument at index 2. Service will not be executed.");
       return;
   }
-  if (serviceArgs[2].type !== iopValueTypes.IGS_DOUBLE_T)
+  if (serviceArgs[2].type !== ioValueTypes.IGS_DOUBLE_T)
   {
       igs.warn("Argument at index 2 is not of type IGS_DOUBLE_T. Service will not be executed.");
       return;
@@ -106,7 +106,7 @@ function receiveValuesCallback(senderAgentName, senderAgentUUID, serviceName, se
       igs.warn("Unable to retrieve service argument at index 3. Service will not be executed.");
       return;
   }
-  if (serviceArgs[3].type !== iopValueTypes.IGS_STRING_T)
+  if (serviceArgs[3].type !== ioValueTypes.IGS_STRING_T)
   {
       igs.warn("Argument at index 3 is not of type IGS_STRING_T. Service will not be executed.");
       return;
@@ -117,7 +117,7 @@ function receiveValuesCallback(senderAgentName, senderAgentUUID, serviceName, se
       igs.warn("Unable to retrieve service argument at index 4. Service will not be executed.");
       return;
   }
-  if (serviceArgs[4].type !== iopValueTypes.IGS_DATA_T)
+  if (serviceArgs[4].type !== ioValueTypes.IGS_DATA_T)
   {
       igs.warn("Argument at index 4 is not of type IGS_DATA_T. Service will not be executed.");
       return;
@@ -228,18 +228,18 @@ if (networkDevice.length === 0) {
     }
 }
 
-igs.inputCreate("impulsion", iopValueTypes.IGS_IMPULSION_T, null);
-igs.inputCreate("bool", iopValueTypes.IGS_BOOL_T, false);
-igs.inputCreate("integer", iopValueTypes.IGS_INTEGER_T, 0);
-igs.inputCreate("double", iopValueTypes.IGS_DOUBLE_T, 0);
-igs.inputCreate("string", iopValueTypes.IGS_STRING_T, "");
-igs.inputCreate("data", iopValueTypes.IGS_DATA_T, new ArrayBuffer());
-igs.outputCreate("impulsion", iopValueTypes.IGS_IMPULSION_T, null);
-igs.outputCreate("bool", iopValueTypes.IGS_BOOL_T, false);
-igs.outputCreate("integer", iopValueTypes.IGS_INTEGER_T, 0);
-igs.outputCreate("double", iopValueTypes.IGS_DOUBLE_T, 0);
-igs.outputCreate("string", iopValueTypes.IGS_STRING_T, "");
-igs.outputCreate("data", iopValueTypes.IGS_DATA_T, new ArrayBuffer());
+igs.inputCreate("impulsion", ioValueTypes.IGS_IMPULSION_T, null);
+igs.inputCreate("bool", ioValueTypes.IGS_BOOL_T, false);
+igs.inputCreate("integer", ioValueTypes.IGS_INTEGER_T, 0);
+igs.inputCreate("double", ioValueTypes.IGS_DOUBLE_T, 0);
+igs.inputCreate("string", ioValueTypes.IGS_STRING_T, "");
+igs.inputCreate("data", ioValueTypes.IGS_DATA_T, new ArrayBuffer());
+igs.outputCreate("impulsion", ioValueTypes.IGS_IMPULSION_T, null);
+igs.outputCreate("bool", ioValueTypes.IGS_BOOL_T, false);
+igs.outputCreate("integer", ioValueTypes.IGS_INTEGER_T, 0);
+igs.outputCreate("double", ioValueTypes.IGS_DOUBLE_T, 0);
+igs.outputCreate("string", ioValueTypes.IGS_STRING_T, "");
+igs.outputCreate("data", ioValueTypes.IGS_DATA_T, new ArrayBuffer());
 igs.observeInput("impulsion", impulsionInputCallback, null);
 igs.observeInput("bool", boolInputCallback, null);
 igs.observeInput("integer", integerInputCallback, null);
@@ -247,11 +247,11 @@ igs.observeInput("double", doubleInputCallback, null);
 igs.observeInput("string", stringInputCallback, null);
 igs.observeInput("data", dataInputCallback, null);
 igs.serviceInit("receive_values", receiveValuesCallback, null);
-igs.serviceArgAdd("receive_values", "bool", iopValueTypes.IGS_BOOL_T);
-igs.serviceArgAdd("receive_values", "integer", iopValueTypes.IGS_INTEGER_T);
-igs.serviceArgAdd("receive_values", "double", iopValueTypes.IGS_DOUBLE_T);
-igs.serviceArgAdd("receive_values", "string", iopValueTypes.IGS_STRING_T);
-igs.serviceArgAdd("receive_values", "data", iopValueTypes.IGS_DATA_T);
+igs.serviceArgAdd("receive_values", "bool", ioValueTypes.IGS_BOOL_T);
+igs.serviceArgAdd("receive_values", "integer", ioValueTypes.IGS_INTEGER_T);
+igs.serviceArgAdd("receive_values", "double", ioValueTypes.IGS_DOUBLE_T);
+igs.serviceArgAdd("receive_values", "string", ioValueTypes.IGS_STRING_T);
+igs.serviceArgAdd("receive_values", "data", ioValueTypes.IGS_DATA_T);
 igs.serviceInit("send_values", sendValuesCallback, null);
 
 //actually start ingescape

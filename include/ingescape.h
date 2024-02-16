@@ -480,7 +480,7 @@ INGESCAPE_EXPORT bool igs_service_reply_arg_exists(const char *service_name, con
  Attributes are used to expose internal variables into agents, which are
  included in their definition. Attributes generally describe key variables
  in an agent, which affect the internal behavior of the agent.
- NOTE: Attributes used to be named attributes in older versions.
+ NOTE: Attributes used to be named parameters in older versions.
  */
 INGESCAPE_EXPORT igs_result_t igs_attribute_create(const char *name,
                                                    igs_io_value_type_t value_type,

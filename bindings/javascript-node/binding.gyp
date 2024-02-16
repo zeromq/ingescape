@@ -25,7 +25,7 @@
                             'C:\\Program Files\\ingescape\\library\\lib\\libingescape.lib',
                             'C:\\Program Files\\ingescape\\library\\lib\\libzyre.lib',
                             'C:\\Program Files\\ingescape\\library\\lib\\libczmq.lib',
-                            'C:\\Program Files\\ingescape\\library\\lib\\libzmq-v142-mt-s-4_3_5.lib',
+                            'C:\\Program Files\\ingescape\\library\\lib\\libzmq-v142-mt-s-4_3_6.lib',
                             'C:\\Program Files\\ingescape\\library\\lib\\libsodium.lib',
                             '-lws2_32',
                             '-lIphlpapi',

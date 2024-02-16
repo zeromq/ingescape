@@ -401,8 +401,8 @@ napi_value node_igs_clear_context(napi_env env, napi_callback_info info) {
         HASH_DEL (observed_output_contexts, threadsafe_context_hash);
         free_threadsafe_context_hash(env, &threadsafe_context_hash);
     }
-    HASH_ITER (hh, observed_parameter_contexts, threadsafe_context_hash, threadsafe_context_hash_tmp) {
-        HASH_DEL (observed_parameter_contexts, threadsafe_context_hash);
+    HASH_ITER (hh, observed_attribute_contexts, threadsafe_context_hash, threadsafe_context_hash_tmp) {
+        HASH_DEL (observed_attribute_contexts, threadsafe_context_hash);
         free_threadsafe_context_hash(env, &threadsafe_context_hash);
     }
     HASH_ITER (hh, service_contexts, threadsafe_context_hash, threadsafe_context_hash_tmp) {

@@ -372,7 +372,7 @@ static void cb_agent_event_into_js(napi_env env, napi_value js_callback, void* c
         trigger_exception(env, NULL, "Unable to call javascript function.");
 }
 
-void agent_events_fn (igs_agent_event_t event, const char *uuid, const char *name, void* event_data, void *my_data) {
+void agent_events_fn (igs_agent_event_t event, const char *uuid, const char *name, const void* event_data, void *my_data) {
     threadsafe_context_t *threadsafe_context = (threadsafe_context_t *) my_data;
     agent_events_callback_args_t *callback_arg = calloc(1, sizeof(agent_events_callback_args_t));
     callback_arg->event = event;
