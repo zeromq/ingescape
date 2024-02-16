@@ -802,7 +802,7 @@ binding-node-js-windows:
     - mkdir ./dependencies/windows/include
     - Copy-Item -Path ..\..\build\ReleaseX64\Release\libingescape.lib -Destination ./dependencies/windows/lib
     - Copy-Item -Path ..\..\build\ReleaseX64\dependencies\czmq\Release\libczmq.lib -Destination ./dependencies/windows/lib
-    - Copy-Item -Path ..\..\build\ReleaseX64\dependencies\libzmq\lib\Release\libzmq-v142-mt-s-4_3_5.lib -Destination ./dependencies/windows/lib
+    - Copy-Item -Path ..\..\build\ReleaseX64\dependencies\libzmq\lib\Release\libzmq-v142-mt-s-4_3_6.lib -Destination ./dependencies/windows/lib
     - Copy-Item -Path ..\..\build\ReleaseX64\dependencies\zyre\Release\libzyre.lib -Destination ./dependencies/windows/lib
     - Copy-Item -Path ..\..\build\ReleaseX64\dependencies\sodium\Release\libsodium.lib -Destination ./dependencies/windows/lib
     - Xcopy ..\..\include .\dependencies\windows\include\ /E /y

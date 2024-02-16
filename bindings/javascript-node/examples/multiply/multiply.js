@@ -11,7 +11,7 @@
 */
 
 const igs = require('ingescape');
-const iopValueTypes = igs.iopValueTypes();
+const ioValueTypes = igs.ioValueTypes();
 
 /*
  This is a callback function that runs everytime the
@@ -22,12 +22,12 @@ const iopValueTypes = igs.iopValueTypes();
  - printing the new value
  - multiplying the value by 2 and writing the result to the output
  */
-function myIOPCallback(iopType, name, valueType, value, myData) {
+function myIOCallback(ioType, name, valueType, value, myData) {
   /*
     This callback is fed with all the information necessary:
-    - the IOP type : input, output or parameter
-    - the IOP name
-    - the IOP value type (impulsion, boolean, etc.)
+    - the IO type : input, output or parameter
+    - the IO name
+    - the IO value type (impulsion, boolean, etc.)
     - a pointer to the value
     - the actual memory size of the value
     - optional data passed from the call to observeInput
@@ -59,7 +59,7 @@ function myServiceCallback(senderAgentName, senderAgentUUID, serviceName, servic
       igs.warn("Unable to retrieve service argument at index 0. Service will not be executed.");
       return;
   }
-  if (serviceArgs[0].type !== iopValueTypes.IGS_INTEGER_T)
+  if (serviceArgs[0].type !== ioValueTypes.IGS_INTEGER_T)
   {
       igs.warn("Argument at index 0 is not of type IGS_INTEGER_T. Service will not be executed.");
       return;
@@ -69,7 +69,7 @@ function myServiceCallback(senderAgentName, senderAgentUUID, serviceName, servic
       igs.warn("Unable to retrieve service argument at index 1. Service will not be executed.");
       return;
   }
-  if (serviceArgs[1].type !== iopValueTypes.IGS_INTEGER_T)
+  if (serviceArgs[1].type !== ioValueTypes.IGS_INTEGER_T)
   {
       igs.warn("Argument at index 1 is not of type IGS_INTEGER_T. Service will not be executed.");
       return;
@@ -103,23 +103,23 @@ else
 
 //Create an input and an ouput: both are of integer type
 //with default value set to zero.
-igs.inputCreate("integer", iopValueTypes.IGS_INTEGER_T, 0);
-igs.outputCreate("integer", iopValueTypes.IGS_INTEGER_T, 0);
+igs.inputCreate("integer", ioValueTypes.IGS_INTEGER_T, 0);
+igs.outputCreate("integer", ioValueTypes.IGS_INTEGER_T, 0);
 
 //Set the definition information (optional)
 igs.definitionSetVersion("1.0");
 igs.definitionSetDescription("Definition for our first agent.");
 
 //Attach the callback to our agent's input
-//NB: callbacks can be attached to any IOP
-igs.observeInput("integer", myIOPCallback, null);
+//NB: callbacks can be attached to any IO
+igs.observeInput("integer", myIOCallback, null);
 
 //Create a service with 2 arguments: both are of integer type
 //And attach the callback to our agent's service
 //NB: callbacks can be attached to any service
 igs.serviceInit("multiply", myServiceCallback, null);
-igs.serviceArgAdd("multiply", "a", iopValueTypes.IGS_INTEGER_T);
-igs.serviceArgAdd("multiply", "b", iopValueTypes.IGS_INTEGER_T);
+igs.serviceArgAdd("multiply", "a", ioValueTypes.IGS_INTEGER_T);
+igs.serviceArgAdd("multiply", "b", ioValueTypes.IGS_INTEGER_T);
 
 //Actually and finally start the agent
 //First argument is the network device name to use

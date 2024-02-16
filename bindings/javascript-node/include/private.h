@@ -47,8 +47,8 @@ int convert_data_to_napi(napi_env env, void *value, size_t size, napi_value *con
 int convert_string_list_to_napi_array(napi_env env, char **list, size_t length, napi_value *converted_value);
 
 // IGS utils
-int convert_value_IOP_into_napi(napi_env env, igs_iop_value_type_t type, void *value, size_t size, napi_value *value_napi);
-void * convert_value_with_good_type(napi_env env, napi_value value, igs_iop_value_type_t type, size_t *size_convert);
+int convert_value_IO_into_napi(napi_env env, igs_io_value_type_t type, void *value, size_t size, napi_value *value_napi);
+void * convert_value_with_good_type(napi_env env, napi_value value, igs_io_value_type_t type, size_t *size_convert);
 void service_args_c_from_js(napi_env env, napi_value array, igs_service_arg_t **first_argument);
 void service_args_js_from_c(napi_env env, igs_service_arg_t *first_argument, napi_value *arrayJS);
 
@@ -79,7 +79,7 @@ void free_threadsafe_context_hash (napi_env env, threadsafe_context_hash_t **thr
 
 threadsafe_context_hash_t *observed_input_contexts;
 threadsafe_context_hash_t *observed_output_contexts;
-threadsafe_context_hash_t *observed_parameter_contexts;
+threadsafe_context_hash_t *observed_attribute_contexts;
 threadsafe_context_hash_t *service_contexts;
 threadsafe_context_t *observe_mute_contexts;
 threadsafe_context_t *observe_agent_events_contexts;
@@ -104,24 +104,35 @@ typedef struct freeze_callback_args {
     napi_ref my_data_ref;
 } freeze_callback_args_t;
 
-typedef struct igsagent_iop_callback_args {
-	igs_iop_type_t iop_type;
+/*/////////////////////////////
+// DEPRECATED : Parameters
+ IOP have been renamed 'IO' and some attached types
+ have been renamed. 
+*/
+typedef igs_io_type_t igs_io_type_t;
+typedef igs_io_value_type_t igs_io_value_type_t;
+
+typedef struct igsagent_io_callback_args {
+	igs_io_type_t io_type;
 	char* name;
-	igs_iop_value_type_t value_type;
+	igs_io_value_type_t value_type;
 	void* value;
 	size_t value_size;
     napi_ref my_data_ref;
     napi_ref this_ref;
-} igsagent_iop_callback_args_t;
+} igsagent_io_callback_args_t;
 
-typedef struct iop_callback_args {
-	igs_iop_type_t iop_type;
+typedef struct io_callback_args {
+	igs_io_type_t io_type;
 	char* name;
-	igs_iop_value_type_t value_type;
+	igs_io_value_type_t value_type;
 	void* value;
 	size_t value_size;
     napi_ref my_data_ref;
-} iop_callback_args_t;
+} io_callback_args_t;
+
+typedef igsagent_io_callback_args_t igsagent_io_callback_args_t;
+typedef io_callback_args_t io_callback_args_t;
 
 typedef struct service_callback_args {
     char *sender_agent_name;
@@ -188,6 +199,6 @@ napi_value init_advanced(napi_env env, napi_value exports);
 napi_value init_definition(napi_env env, napi_value exports);
 napi_value init_enum(napi_env env, napi_value exports);
 napi_value init_init_control(napi_env env, napi_value exports);
-napi_value init_iop(napi_env env, napi_value exports);
+napi_value init_io(napi_env env, napi_value exports);
 napi_value init_mapping(napi_env env, napi_value exports);
 napi_value init_service(napi_env env, napi_value exports);

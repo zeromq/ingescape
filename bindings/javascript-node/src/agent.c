@@ -21,7 +21,7 @@
 
 threadsafe_context_hash_t *igsagent_observed_input_contexts = NULL;
 threadsafe_context_hash_t *igsagent_observed_output_contexts = NULL;
-threadsafe_context_hash_t *igsagent_observed_parameter_contexts = NULL;
+threadsafe_context_hash_t *igsagent_observed_attribute_contexts = NULL;
 threadsafe_context_hash_t *igsagent_service_contexts = NULL;
 threadsafe_context_t *igsagent_observe_contexts = NULL;
 threadsafe_context_t *igsagent_observe_mute_contexts = NULL;
@@ -90,7 +90,7 @@ napi_value destroy_agent_context(napi_env env, napi_callback_info info) {
             free_threadsafe_context_hash(env, &threadsafe_context_hash);
         }
     }
-    HASH_ITER (hh, igsagent_observed_parameter_contexts, threadsafe_context_hash, threadsafe_context_hash_tmp) {
+    HASH_ITER (hh, igsagent_observed_attribute_contexts, threadsafe_context_hash, threadsafe_context_hash_tmp) {
         LL_FOREACH_SAFE (threadsafe_context_hash->list, threadsafe_context, threadsafe_context_tmp) {
             concerned_agent = get_igsagent_from_this_ref(env, threadsafe_context->this_ref);
             if (concerned_agent == agent) {
@@ -99,7 +99,7 @@ napi_value destroy_agent_context(napi_env env, napi_callback_info info) {
             }
         }
         if (threadsafe_context_hash->list == NULL) {
-            HASH_DEL (igsagent_observed_parameter_contexts, threadsafe_context_hash);
+            HASH_DEL (igsagent_observed_attribute_contexts, threadsafe_context_hash);
             free_threadsafe_context_hash(env, &threadsafe_context_hash);
         }
     }
@@ -627,7 +627,7 @@ napi_value node_igsagent_definition_load_str(napi_env env, napi_callback_info in
                 free_threadsafe_context_hash(env, &threadsafe_context_hash);
             }
         }
-        HASH_ITER (hh, igsagent_observed_parameter_contexts, threadsafe_context_hash, threadsafe_context_hash_tmp) {
+        HASH_ITER (hh, igsagent_observed_attribute_contexts, threadsafe_context_hash, threadsafe_context_hash_tmp) {
             LL_FOREACH_SAFE (threadsafe_context_hash->list, threadsafe_context, threadsafe_context_tmp) {
                 concerned_agent = get_igsagent_from_this_ref(env, threadsafe_context->this_ref);
                 if (concerned_agent == associated_agent) {
@@ -636,7 +636,7 @@ napi_value node_igsagent_definition_load_str(napi_env env, napi_callback_info in
                 }
             }
             if (threadsafe_context_hash->list == NULL) {
-                HASH_DEL (igsagent_observed_parameter_contexts, threadsafe_context_hash);
+                HASH_DEL (igsagent_observed_attribute_contexts, threadsafe_context_hash);
                 free_threadsafe_context_hash(env, &threadsafe_context_hash);
             }
         }
@@ -697,7 +697,7 @@ napi_value node_igsagent_definition_load_file(napi_env env, napi_callback_info i
                 free_threadsafe_context_hash(env, &threadsafe_context_hash);
             }
         }
-        HASH_ITER (hh, igsagent_observed_parameter_contexts, threadsafe_context_hash, threadsafe_context_hash_tmp) {
+        HASH_ITER (hh, igsagent_observed_attribute_contexts, threadsafe_context_hash, threadsafe_context_hash_tmp) {
             LL_FOREACH_SAFE (threadsafe_context_hash->list, threadsafe_context, threadsafe_context_tmp) {
                 concerned_agent = get_igsagent_from_this_ref(env, threadsafe_context->this_ref);
                 if (concerned_agent == associated_agent) {
@@ -706,7 +706,7 @@ napi_value node_igsagent_definition_load_file(napi_env env, napi_callback_info i
                 }
             }
             if (threadsafe_context_hash->list == NULL) {
-                HASH_DEL (igsagent_observed_parameter_contexts, threadsafe_context_hash);
+                HASH_DEL (igsagent_observed_attribute_contexts, threadsafe_context_hash);
                 free_threadsafe_context_hash(env, &threadsafe_context_hash);
             }
         }
@@ -734,7 +734,7 @@ napi_value node_igsagent_clear_definition(napi_env env, napi_callback_info info)
     napi_value this = get_function_this_argument(env, info);
     igsagent_t *associated_agent = unwrap_native_agent(env, this);
     igsagent_clear_definition(associated_agent);
-    // Free associated IOPC callback data
+    // Free associated IO callback data
     threadsafe_context_hash_t *threadsafe_context_hash, *threadsafe_context_hash_tmp;
     threadsafe_context_t *threadsafe_context, *threadsafe_context_tmp;
     igsagent_t *concerned_agent = NULL;
@@ -764,7 +764,7 @@ napi_value node_igsagent_clear_definition(napi_env env, napi_callback_info info)
             free_threadsafe_context_hash(env, &threadsafe_context_hash);
         }
     }
-    HASH_ITER (hh, igsagent_observed_parameter_contexts, threadsafe_context_hash, threadsafe_context_hash_tmp) {
+    HASH_ITER (hh, igsagent_observed_attribute_contexts, threadsafe_context_hash, threadsafe_context_hash_tmp) {
         LL_FOREACH_SAFE (threadsafe_context_hash->list, threadsafe_context, threadsafe_context_tmp) {
             concerned_agent = get_igsagent_from_this_ref(env, threadsafe_context->this_ref);
             if (concerned_agent == associated_agent) {
@@ -773,7 +773,7 @@ napi_value node_igsagent_clear_definition(napi_env env, napi_callback_info info)
             }
         }
         if (threadsafe_context_hash->list == NULL) {
-            HASH_DEL (igsagent_observed_parameter_contexts, threadsafe_context_hash);
+            HASH_DEL (igsagent_observed_attribute_contexts, threadsafe_context_hash);
             free_threadsafe_context_hash(env, &threadsafe_context_hash);
         }
     }
@@ -872,7 +872,7 @@ napi_value node_igsagent_output_create(napi_env env, napi_callback_info info) {
     return success_js;
 }
 
-napi_value node_igsagent_parameter_create(napi_env env, napi_callback_info info) {
+napi_value node_igsagent_attribute_create(napi_env env, napi_callback_info info) {
     napi_value argv[3], this;
     get_function_arguments(env, info, 3, argv);
     this = get_function_this_argument(env, info);
@@ -881,11 +881,16 @@ napi_value node_igsagent_parameter_create(napi_env env, napi_callback_info info)
     convert_napi_to_int(env, argv[1], &type);
     size_t size;
     void *c_value = convert_value_with_good_type(env, argv[2], type, &size);
-    success = igsagent_parameter_create(unwrap_native_agent(env, this), name, type, c_value, size);
+    success = igsagent_attribute_create(unwrap_native_agent(env, this), name, type, c_value, size);
     free(name);
     napi_value success_js;
     convert_int_to_napi(env, success, &success_js);
     return success_js;
+}
+
+napi_value node_igsagent_parameter_create(napi_env env, napi_callback_info info) {
+    igs_warn("this function is deprecated, please use node_igsagent_attribute_create instead.");   
+    return node_igsagent_attribute_create(env, info);
 }
 
 napi_value node_igsagent_input_remove(napi_env env, napi_callback_info info) {
@@ -954,19 +959,19 @@ napi_value node_igsagent_output_remove(napi_env env, napi_callback_info info) {
     return success_js;
 }
 
-napi_value node_igsagent_parameter_remove(napi_env env, napi_callback_info info) {
+napi_value node_igsagent_attribute_remove(napi_env env, napi_callback_info info) {
     napi_value argv[1], this;
     get_function_arguments(env, info, 1, argv);
     this = get_function_this_argument(env, info);
     char *name = convert_napi_to_string(env, argv[0]);
     igsagent_t *associated_agent = unwrap_native_agent(env, this);
-    int success = igsagent_parameter_remove(associated_agent, name);
+    int success = igsagent_attribute_remove(associated_agent, name);
     if (success == IGS_SUCCESS) {
         // Free associated callback data
         threadsafe_context_hash_t *threadsafe_context_hash = NULL;
         threadsafe_context_t *threadsafe_context, *threadsafe_context_tmp;
         igsagent_t *concerned_agent = NULL;
-        HASH_FIND_STR (igsagent_observed_parameter_contexts, name, threadsafe_context_hash);
+        HASH_FIND_STR (igsagent_observed_attribute_contexts, name, threadsafe_context_hash);
         if (threadsafe_context_hash != NULL) {
             LL_FOREACH_SAFE (threadsafe_context_hash->list, threadsafe_context, threadsafe_context_tmp) {
                 concerned_agent = get_igsagent_from_this_ref(env, threadsafe_context->this_ref);
@@ -976,7 +981,7 @@ napi_value node_igsagent_parameter_remove(napi_env env, napi_callback_info info)
                 }
             }
             if (threadsafe_context_hash->list == NULL) {
-                HASH_DEL (igsagent_observed_parameter_contexts, threadsafe_context_hash);
+                HASH_DEL (igsagent_observed_attribute_contexts, threadsafe_context_hash);
                 free_threadsafe_context_hash(env, &threadsafe_context_hash);
             }
         }
@@ -985,6 +990,11 @@ napi_value node_igsagent_parameter_remove(napi_env env, napi_callback_info info)
     napi_value success_js;
     convert_int_to_napi(env, success, &success_js);
     return success_js;
+}
+
+napi_value node_igsagent_parameter_remove(napi_env env, napi_callback_info info) {
+    igs_warn("this function is deprecated, please use node_igsagent_attribute_remove instead.");
+    return node_igsagent_attribute_remove(env, info);
 }
 
 napi_value node_igsagent_input_type(napi_env env, napi_callback_info info) {
@@ -1011,16 +1021,21 @@ napi_value node_igsagent_output_type(napi_env env, napi_callback_info info) {
     return type_js;
 }
 
-napi_value node_igsagent_parameter_type(napi_env env, napi_callback_info info) {
+napi_value node_igsagent_attribute_type(napi_env env, napi_callback_info info) {
     napi_value argv[1], this;
     get_function_arguments(env, info, 1, argv);
     this = get_function_this_argument(env, info);
     char *name = convert_napi_to_string(env, argv[0]);
-    int type = igsagent_parameter_type(unwrap_native_agent(env, this), name);
+    int type = igsagent_attribute_type(unwrap_native_agent(env, this), name);
     free(name);
     napi_value type_js;
     convert_int_to_napi(env, type, &type_js);
     return type_js;
+}
+
+napi_value node_igsagent_parameter_type(napi_env env, napi_callback_info info) {
+  igs_warn("this function is deprecated, please use node_igsagent_attribute_type instead.");
+  return node_igsagent_attribute_type(env, info);
 }
 
 napi_value node_igsagent_input_count(napi_env env, napi_callback_info info) {
@@ -1039,12 +1054,17 @@ napi_value node_igsagent_output_count(napi_env env, napi_callback_info info) {
     return count_js;
 }
 
-napi_value node_igsagent_parameter_count(napi_env env, napi_callback_info info) {
+napi_value node_igsagent_attribute_count(napi_env env, napi_callback_info info) {
     napi_value this = get_function_this_argument(env, info);
-    int count = igsagent_parameter_count(unwrap_native_agent(env, this));
+    int count = igsagent_attribute_count(unwrap_native_agent(env, this));
     napi_value count_js;
     convert_int_to_napi(env, count, &count_js);
     return count_js;
+}
+
+napi_value node_igsagent_parameter_count(napi_env env, napi_callback_info info) {
+    igs_warn("this function is deprecated, please use node_igsagent_attribute_count instead.");
+    return node_igsagent_attribute_count(env, info);
 }
 
 napi_value node_igsagent_input_list(napi_env env, napi_callback_info info) {
@@ -1054,7 +1074,7 @@ napi_value node_igsagent_input_list(napi_env env, napi_callback_info info) {
     napi_value inputs_js;
     convert_string_list_to_napi_array(env, inputs, inputs_nb, &inputs_js);
     if (inputs != NULL)
-        igs_free_iop_list(inputs, inputs_nb);
+        igs_free_io_list(inputs, inputs_nb);
     return inputs_js;
 }
 
@@ -1065,19 +1085,24 @@ napi_value node_igsagent_output_list(napi_env env, napi_callback_info info) {
     napi_value outputs_js;
     convert_string_list_to_napi_array(env, outputs, outputs_nb, &outputs_js);
     if (outputs != NULL)
-        igs_free_iop_list(outputs, outputs_nb);
+        igs_free_io_list(outputs, outputs_nb);
     return outputs_js;
 }
 
-napi_value node_igsagent_parameter_list(napi_env env, napi_callback_info info) {
+napi_value node_igsagent_attribute_list(napi_env env, napi_callback_info info) {
     napi_value this = get_function_this_argument(env, info);
-    size_t parameters_nb = 0;
-    char **parameters = igsagent_parameter_list(unwrap_native_agent(env, this), &parameters_nb);
-    napi_value parameters_js;
-    convert_string_list_to_napi_array(env, parameters, parameters_nb, &parameters_js);
-    if (parameters != NULL)
-        igs_free_iop_list(parameters, parameters_nb);
-    return parameters_js;
+    size_t attributes_nb = 0;
+    char **attributes = igsagent_attribute_list(unwrap_native_agent(env, this), &attributes_nb);
+    napi_value attributes_js;
+    convert_string_list_to_napi_array(env, attributes, attributes_nb, &attributes_js);
+    if (attributes != NULL)
+        igs_free_io_list(attributes, attributes_nb);
+    return attributes_js;
+}
+
+napi_value node_igsagent_parameter_list(napi_env env, napi_callback_info info) {
+    igs_warn("this function is deprecated, please use node_igsagent_attribute_list instead.");
+    return node_igsagent_attribute_list(env, info);
 }
 
 napi_value node_igsagent_input_exists(napi_env env, napi_callback_info info) {
@@ -1104,16 +1129,21 @@ napi_value node_igsagent_output_exists(napi_env env, napi_callback_info info) {
     return exists_js;
 }
 
-napi_value node_igsagent_parameter_exists(napi_env env, napi_callback_info info) {
+napi_value node_igsagent_attribute_exists(napi_env env, napi_callback_info info) {
     napi_value argv[1], this;
     get_function_arguments(env, info, 1, argv);
     this = get_function_this_argument(env, info);
     char *name = convert_napi_to_string(env, argv[0]);
-    bool exists = igsagent_parameter_exists(unwrap_native_agent(env, this), name);
+    bool exists = igsagent_attribute_exists(unwrap_native_agent(env, this), name);
     free(name);
     napi_value exists_js;
     convert_bool_to_napi(env, exists, &exists_js);
     return exists_js;
+}
+
+napi_value node_igsagent_parameter_exists(napi_env env, napi_callback_info info) {
+    igs_warn("this function is deprecated, please use node_igsagent_attribute_exists instead.");
+    return node_igsagent_attribute_exists(env, info);
 }
 
 napi_value node_igsagent_input_bool(napi_env env, napi_callback_info info) {
@@ -1248,48 +1278,63 @@ napi_value node_igsagent_output_data(napi_env env, napi_callback_info info) {
     return data_js;
 }
 
-napi_value node_igsagent_parameter_bool(napi_env env, napi_callback_info info) {
+napi_value node_igsagent_attribute_bool(napi_env env, napi_callback_info info) {
     napi_value argv[1], this;
     get_function_arguments(env, info, 1, argv);
     this = get_function_this_argument(env, info);
     char *name = convert_napi_to_string(env, argv[0]);
-    bool value = igsagent_parameter_bool(unwrap_native_agent(env, this), name);
+    bool value = igsagent_attribute_bool(unwrap_native_agent(env, this), name);
     free(name);
     napi_value value_js;
     convert_bool_to_napi(env, value, &value_js);
     return value_js;
 }
 
-napi_value node_igsagent_parameter_int(napi_env env, napi_callback_info info) {
+napi_value node_igsagent_parameter_bool(napi_env env, napi_callback_info info) {
+    igs_warn("this function is deprecated, please use node_igsagent_attribute_bool instead.");
+    return node_igsagent_attribute_bool(env, info);
+}
+
+napi_value node_igsagent_attribute_int(napi_env env, napi_callback_info info) {
     napi_value argv[1], this;
     get_function_arguments(env, info, 1, argv);
     this = get_function_this_argument(env, info);
     char *name = convert_napi_to_string(env, argv[0]);
-    int value = igsagent_parameter_int(unwrap_native_agent(env, this), name);
+    int value = igsagent_attribute_int(unwrap_native_agent(env, this), name);
     free(name);
     napi_value value_js;
     convert_int_to_napi(env, value, &value_js);
     return value_js;
 }
 
-napi_value node_igsagent_parameter_double(napi_env env, napi_callback_info info) {
+napi_value node_igsagent_parameter_int(napi_env env, napi_callback_info info) {
+    igs_warn("this function is deprecated, please use node_igsagent_attribute_int instead.");
+    return node_igsagent_attribute_int(env, info);
+}
+
+napi_value node_igsagent_attribute_double(napi_env env, napi_callback_info info) {
     napi_value argv[1], this;
     get_function_arguments(env, info, 1, argv);
     this = get_function_this_argument(env, info);
     char *name = convert_napi_to_string(env, argv[0]);
-    double value = igsagent_parameter_double(unwrap_native_agent(env, this), name);
+    double value = igsagent_attribute_double(unwrap_native_agent(env, this), name);
     free(name);
     napi_value value_js;
     convert_double_to_napi(env, value, &value_js);
     return value_js;
 }
 
-napi_value node_igsagent_parameter_string(napi_env env, napi_callback_info info) {
+napi_value node_igsagent_parameter_double(napi_env env, napi_callback_info info) {
+    igs_warn("this function is deprecated, please use node_igsagent_attribute_double instead.");
+    return node_igsagent_attribute_double(env, info);
+}
+
+napi_value node_igsagent_attribute_string(napi_env env, napi_callback_info info) {
     napi_value argv[1], this;
     get_function_arguments(env, info, 1, argv);
     this = get_function_this_argument(env, info);
     char *name = convert_napi_to_string(env, argv[0]);
-    char *value = igsagent_parameter_string(unwrap_native_agent(env, this), name);
+    char *value = igsagent_attribute_string(unwrap_native_agent(env, this), name);
     free(name);
     napi_value value_js;
     convert_string_to_napi(env, value, &value_js);
@@ -1298,20 +1343,30 @@ napi_value node_igsagent_parameter_string(napi_env env, napi_callback_info info)
     return value_js;
 }
 
-napi_value node_igsagent_parameter_data(napi_env env, napi_callback_info info) {
+napi_value node_igsagent_parameter_string(napi_env env, napi_callback_info info) {
+    igs_warn("this function is deprecated, please use node_igsagent_attribute_string instead.");
+    return node_igsagent_attribute_string(env, info);
+}
+
+napi_value node_igsagent_attribute_data(napi_env env, napi_callback_info info) {
     napi_value argv[1], this;
     get_function_arguments(env, info, 1, argv);
     this = get_function_this_argument(env, info);
     char *name = convert_napi_to_string(env, argv[0]);
     void *data = NULL;
     size_t size;
-    igsagent_parameter_data(unwrap_native_agent(env, this), name, &data, &size);
+    igsagent_attribute_data(unwrap_native_agent(env, this), name, &data, &size);
     free(name);
     napi_value data_js;
     convert_data_to_napi(env, data, size, &data_js);
     if (data != NULL)
         free(data);
     return data_js;
+}
+
+napi_value node_igsagent_parameter_data(napi_env env, napi_callback_info info) {
+    igs_warn("this function is deprecated, please use node_igsagent_attribute_data instead.");
+    return node_igsagent_attribute_data(env, info);
 }
 
 napi_value node_igsagent_input_set_bool(napi_env env, napi_callback_info info) {
@@ -1480,14 +1535,33 @@ napi_value node_igsagent_output_set_data(napi_env env, napi_callback_info info) 
     return success_js;
 }
 
-napi_value node_igsagent_parameter_set_bool(napi_env env, napi_callback_info info) {
+napi_value node_igsagent_attribute_set_bool(napi_env env, napi_callback_info info) {
     napi_value argv[2], this;
     get_function_arguments(env, info, 2, argv);
     this = get_function_this_argument(env, info);
     char *name = convert_napi_to_string(env, argv[0]);
     bool value;
     convert_napi_to_bool(env, argv[1], &value);
-    int success = igsagent_parameter_set_bool(unwrap_native_agent(env, this), name, value);
+    int success = igsagent_attribute_set_bool(unwrap_native_agent(env, this), name, value);
+    free(name);
+    napi_value success_js;
+    convert_int_to_napi(env, success, &success_js);
+    return success_js;
+}
+
+napi_value node_igsagent_parameter_set_bool(napi_env env, napi_callback_info info) {
+    igs_warn("this function is deprecated, please use node_igsagent_attribute_set_bool instead.");
+    return node_igsagent_attribute_set_bool(env, info);
+}
+
+napi_value node_igsagent_attribute_set_int(napi_env env, napi_callback_info info) {
+    napi_value argv[2], this;
+    get_function_arguments(env, info, 2, argv);
+    this = get_function_this_argument(env, info);
+    char *name = convert_napi_to_string(env, argv[0]);
+    int value;
+    convert_napi_to_int(env, argv[1], &value);
+    int success = igsagent_attribute_set_int(unwrap_native_agent(env, this), name, value);
     free(name);
     napi_value success_js;
     convert_int_to_napi(env, success, &success_js);
@@ -1495,13 +1569,18 @@ napi_value node_igsagent_parameter_set_bool(napi_env env, napi_callback_info inf
 }
 
 napi_value node_igsagent_parameter_set_int(napi_env env, napi_callback_info info) {
+    igs_warn("this function is deprecated, please use node_igsagent_attribute_set_int instead.");
+    return node_igsagent_attribute_set_int(env, info);
+}
+
+napi_value node_igsagent_attribute_set_double(napi_env env, napi_callback_info info) {
     napi_value argv[2], this;
     get_function_arguments(env, info, 2, argv);
     this = get_function_this_argument(env, info);
     char *name = convert_napi_to_string(env, argv[0]);
-    int value;
-    convert_napi_to_int(env, argv[1], &value);
-    int success = igsagent_parameter_set_int(unwrap_native_agent(env, this), name, value);
+    double value;
+    convert_napi_to_double(env, argv[1], &value);
+    int success = igsagent_attribute_set_double(unwrap_native_agent(env, this), name, value);
     free(name);
     napi_value success_js;
     convert_int_to_napi(env, success, &success_js);
@@ -1509,26 +1588,17 @@ napi_value node_igsagent_parameter_set_int(napi_env env, napi_callback_info info
 }
 
 napi_value node_igsagent_parameter_set_double(napi_env env, napi_callback_info info) {
-    napi_value argv[2], this;
-    get_function_arguments(env, info, 2, argv);
-    this = get_function_this_argument(env, info);
-    char *name = convert_napi_to_string(env, argv[0]);
-    double value;
-    convert_napi_to_double(env, argv[1], &value);
-    int success = igsagent_parameter_set_double(unwrap_native_agent(env, this), name, value);
-    free(name);
-    napi_value success_js;
-    convert_int_to_napi(env, success, &success_js);
-    return success_js;
+    igs_warn("this function is deprecated, please use node_igsagent_attribute_set_double instead.");
+    return node_igsagent_attribute_set_double(env, info);
 }
 
-napi_value node_igsagent_parameter_set_string(napi_env env, napi_callback_info info) {
+napi_value node_igsagent_attribute_set_string(napi_env env, napi_callback_info info) {
     napi_value argv[2], this;
     get_function_arguments(env, info, 2, argv);
     this = get_function_this_argument(env, info);
     char *name = convert_napi_to_string(env, argv[0]);
     char *value = convert_napi_to_string(env, argv[1]);
-    int success = igsagent_parameter_set_string(unwrap_native_agent(env, this), name, value);
+    int success = igsagent_attribute_set_string(unwrap_native_agent(env, this), name, value);
     free(name);
     free(value);
     napi_value success_js;
@@ -1536,7 +1606,12 @@ napi_value node_igsagent_parameter_set_string(napi_env env, napi_callback_info i
     return success_js;
 }
 
-napi_value node_igsagent_parameter_set_data(napi_env env, napi_callback_info info) {
+napi_value node_igsagent_parameter_set_string(napi_env env, napi_callback_info info) {
+    igs_warn("this function is deprecated, please use node_igsagent_attribute_set_string instead.");
+    return node_igsagent_attribute_set_string(env, info);
+}
+
+napi_value node_igsagent_attribute_set_data(napi_env env, napi_callback_info info) {
     napi_value argv[2], this;
     get_function_arguments(env, info, 2, argv);
     this = get_function_this_argument(env, info);
@@ -1544,11 +1619,16 @@ napi_value node_igsagent_parameter_set_data(napi_env env, napi_callback_info inf
     void *data;
     size_t size;
     convert_napi_to_data(env, argv[1], &data, &size);
-    int success = igsagent_parameter_set_data(unwrap_native_agent(env, this), name, data, size);
+    int success = igsagent_attribute_set_data(unwrap_native_agent(env, this), name, data, size);
     free(name);
     napi_value success_js;
     convert_int_to_napi(env, success, &success_js);
     return success_js;
+}
+
+napi_value node_igsagent_parameter_set_data(napi_env env, napi_callback_info info) {
+    igs_warn("this function is deprecated, please use node_igsagent_attribute_set_data instead.");
+    return node_igsagent_attribute_set_data(env, info);
 }
 
 napi_value node_igsagent_constraints_enforce(napi_env env, napi_callback_info info) {
@@ -1589,18 +1669,23 @@ napi_value node_igsagent_output_add_constraint(napi_env env, napi_callback_info 
     return success_js;
 }
 
-napi_value node_igsagent_parameter_add_constraint(napi_env env, napi_callback_info info) {
+napi_value node_igsagent_attribute_add_constraint(napi_env env, napi_callback_info info) {
     napi_value argv[2], this;
     get_function_arguments(env, info, 2, argv);
     this = get_function_this_argument(env, info);
     char *name = convert_napi_to_string(env, argv[0]);
     char *constraint = convert_napi_to_string(env, argv[1]);
-    int success = igsagent_parameter_add_constraint(unwrap_native_agent(env, this), name, constraint);
+    int success = igsagent_attribute_add_constraint(unwrap_native_agent(env, this), name, constraint);
     free(name);
     free(constraint);
     napi_value success_js;
     convert_int_to_napi(env, success, &success_js);
     return success_js;
+}
+
+napi_value node_igsagent_parameter_add_constraint(napi_env env, napi_callback_info info) {
+    igs_warn("this function is deprecated, please use node_igsagent_attribute_add_constraint instead.");
+    return node_igsagent_attribute_add_constraint(env, info);
 }
 
 napi_value node_igsagent_input_set_description(napi_env env, napi_callback_info info) {
@@ -1627,16 +1712,21 @@ napi_value node_igsagent_output_set_description(napi_env env, napi_callback_info
     return NULL;
 }
 
-napi_value node_igsagent_parameter_set_description(napi_env env, napi_callback_info info) {
+napi_value node_igsagent_attribute_set_description(napi_env env, napi_callback_info info) {
     napi_value argv[2], this;
     get_function_arguments(env, info, 2, argv);
     this = get_function_this_argument(env, info);
     char *name = convert_napi_to_string(env, argv[0]);
     char *description = convert_napi_to_string(env, argv[1]);
-    igsagent_parameter_set_description(unwrap_native_agent(env, this), name, description);
+    igsagent_attribute_set_description(unwrap_native_agent(env, this), name, description);
     free(name);
     free(description);
     return NULL;
+}
+
+napi_value node_igsagent_parameter_set_description(napi_env env, napi_callback_info info) {
+    igs_warn("this function is deprecated, please use node_igsagent_attribute_set_description instead.");
+    return node_igsagent_attribute_set_description(env, info);
 }
 
 napi_value node_igsagent_clear_input(napi_env env, napi_callback_info info) {
@@ -1659,27 +1749,32 @@ napi_value node_igsagent_clear_output(napi_env env, napi_callback_info info) {
     return NULL;
 }
 
-napi_value node_igsagent_clear_parameter(napi_env env, napi_callback_info info) {
+napi_value node_igsagent_clear_attribute(napi_env env, napi_callback_info info) {
     napi_value argv[1], this;
     get_function_arguments(env, info, 1, argv);
     this = get_function_this_argument(env, info);
     char *name = convert_napi_to_string(env, argv[0]);
-    igsagent_clear_parameter(unwrap_native_agent(env, this), name);
+    igsagent_clear_attribute(unwrap_native_agent(env, this), name);
     free(name);
     return NULL;
 }
 
-static void cb_igsagent_iop_into_js(napi_env env, napi_value js_callback, void* ctx, void* data) {
+napi_value node_igsagent_clear_parameter(napi_env env, napi_callback_info info) {
+    igs_warn("this function is deprecated, please use node_igsagent_clear_attribute instead.");
+    return node_igsagent_clear_attribute(env, info);
+}
+
+static void cb_igsagent_io_into_js(napi_env env, napi_value js_callback, void* ctx, void* data) {
     napi_status status;
-    igsagent_iop_callback_args_t * callback_arg = (igsagent_iop_callback_args_t *) data;
+    igsagent_io_callback_args_t * callback_arg = (igsagent_io_callback_args_t *) data;
     napi_value argv[6];
     status = napi_get_reference_value(env, callback_arg->this_ref, &argv[0]);
     if (status != napi_ok)
         trigger_exception(env, NULL, "N-API : Unable to get reference value.");
-    convert_int_to_napi(env, callback_arg->iop_type, &argv[1]);
+    convert_int_to_napi(env, callback_arg->io_type, &argv[1]);
     convert_string_to_napi(env, callback_arg->name, &argv[2]);
     convert_int_to_napi(env, callback_arg->value_type, &argv[3]);
-    convert_value_IOP_into_napi(env, callback_arg->value_type, callback_arg->value, callback_arg->value_size, &argv[4]);
+    convert_value_IO_into_napi(env, callback_arg->value_type, callback_arg->value, callback_arg->value_size, &argv[4]);
     if (callback_arg->my_data_ref == NULL)
         convert_null_to_napi(env, &argv[5]);
     else {
@@ -1704,12 +1799,12 @@ static void cb_igsagent_iop_into_js(napi_env env, napi_value js_callback, void* 
         trigger_exception(env, NULL, "Unable to call javascript function.");
 }
 
-void igsagent_iop_callback(igsagent_t *agent, igs_iop_type_t iop_type, const char *name,
-                           igs_iop_value_type_t value_type, void *value, size_t value_size,
+void igsagent_io_callback(igsagent_t *agent, igs_io_type_t io_type, const char *name,
+                           igs_io_value_type_t value_type, void *value, size_t value_size,
                            void *my_data) {
     threadsafe_context_t *threadsafe_context = (threadsafe_context_t *) my_data;
-    igsagent_iop_callback_args_t * callback_arg =  calloc(1, sizeof(igsagent_iop_callback_args_t));
-    callback_arg->iop_type = iop_type;
+    igsagent_io_callback_args_t * callback_arg =  calloc(1, sizeof(igsagent_io_callback_args_t));
+    callback_arg->io_type = io_type;
     callback_arg->name = strdup(name);
     callback_arg->value_type = value_type;
     callback_arg->value = calloc(1, value_size);
@@ -1744,7 +1839,7 @@ napi_value node_igsagent_observe_input(napi_env env, napi_callback_info info) {
     if (status != napi_ok)
         trigger_exception(env, NULL, "Invalid name for async_name napi_value.");
     status = napi_create_threadsafe_function(env, argv[1], NULL, async_name, 0, 1, NULL, NULL, NULL,
-    cb_igsagent_iop_into_js, &(threadsafe_context->threadsafe_func));
+    cb_igsagent_io_into_js, &(threadsafe_context->threadsafe_func));
     if (status != napi_ok)
         trigger_exception(env, NULL, "Impossible to create threadsafe function.");
 
@@ -1765,7 +1860,7 @@ napi_value node_igsagent_observe_input(napi_env env, napi_callback_info info) {
     if (status != napi_ok)
         trigger_exception(env, NULL, "Failed to create reference of 'this' argument");
 
-    igsagent_observe_input(unwrap_native_agent(env, this), name, igsagent_iop_callback, threadsafe_context);
+    igsagent_observe_input(unwrap_native_agent(env, this), name, igsagent_io_callback, threadsafe_context);
     free(name);
     return NULL;
 }
@@ -1794,7 +1889,7 @@ napi_value node_igsagent_observe_output(napi_env env, napi_callback_info info) {
     if (status != napi_ok)
         trigger_exception(env, NULL, "Invalid name for async_name napi_value.");
     status = napi_create_threadsafe_function(env, argv[1], NULL, async_name, 0, 1, NULL, NULL, NULL,
-    cb_igsagent_iop_into_js, &(threadsafe_context->threadsafe_func));
+    cb_igsagent_io_into_js, &(threadsafe_context->threadsafe_func));
     if (status != napi_ok)
         trigger_exception(env, NULL, "Impossible to create threadsafe function.");
 
@@ -1815,12 +1910,12 @@ napi_value node_igsagent_observe_output(napi_env env, napi_callback_info info) {
     if (status != napi_ok)
         trigger_exception(env, NULL, "Failed to create reference of 'this' argument");
 
-    igsagent_observe_output(unwrap_native_agent(env, this), name, igsagent_iop_callback, threadsafe_context);
+    igsagent_observe_output(unwrap_native_agent(env, this), name, igsagent_io_callback, threadsafe_context);
     free(name);
     return NULL;
 }
 
-napi_value node_igsagent_observe_parameter(napi_env env, napi_callback_info info) {
+napi_value node_igsagent_observe_attribute(napi_env env, napi_callback_info info) {
     napi_value argv[3], this;
     get_function_arguments(env, info, 3, argv);
     this = get_function_this_argument(env, info);
@@ -1834,17 +1929,17 @@ napi_value node_igsagent_observe_parameter(napi_env env, napi_callback_info info
         threadsafe_hash = (threadsafe_context_hash_t *) zmalloc (sizeof (threadsafe_context_hash_t));
         threadsafe_hash->key = strdup (name);
         threadsafe_hash->list = NULL;
-        HASH_ADD_STR (igsagent_observed_parameter_contexts, key, threadsafe_hash);
+        HASH_ADD_STR (igsagent_observed_attribute_contexts, key, threadsafe_hash);
     }
     LL_APPEND (threadsafe_hash->list, threadsafe_context);
 
     napi_status status;
     napi_value async_name;
-    status = napi_create_string_utf8(env, "ingescape/igsagent_parameterCallback", NAPI_AUTO_LENGTH, &async_name);
+    status = napi_create_string_utf8(env, "ingescape/igsagent_attributeCallback", NAPI_AUTO_LENGTH, &async_name);
     if (status != napi_ok)
         trigger_exception(env, NULL, "Invalid name for async_name napi_value.");
     status = napi_create_threadsafe_function(env, argv[1], NULL, async_name, 0, 1, NULL, NULL, NULL,
-    cb_igsagent_iop_into_js, &(threadsafe_context->threadsafe_func));
+    cb_igsagent_io_into_js, &(threadsafe_context->threadsafe_func));
     if (status != napi_ok)
         trigger_exception(env, NULL, "Impossible to create threadsafe function.");
 
@@ -1865,9 +1960,14 @@ napi_value node_igsagent_observe_parameter(napi_env env, napi_callback_info info
     if (status != napi_ok)
         trigger_exception(env, NULL, "Failed to create reference of 'this' argument");
 
-    igsagent_observe_parameter(unwrap_native_agent(env, this), name, igsagent_iop_callback, threadsafe_context);
+    igsagent_observe_attribute(unwrap_native_agent(env, this), name, igsagent_io_callback, threadsafe_context);
     free(name);
     return NULL;
+}
+
+napi_value node_igsagent_observe_parameter(napi_env env, napi_callback_info info) {
+    igs_warn("this function is deprecated, please use node_igsagent_observe_attribute instead.");
+    return node_igsagent_observe_attribute(env, info);
 }
 
 napi_value node_igsagent_output_mute(napi_env env, napi_callback_info info) {
@@ -2680,22 +2780,28 @@ napi_value init_agent(napi_env env, napi_value exports) {
 
         { "inputCreate", NULL, node_igsagent_input_create, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "outputCreate", NULL, node_igsagent_output_create, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
-        { "parameterCreate", NULL, node_igsagent_parameter_create, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "attributeCreate", NULL, node_igsagent_attribute_create, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "parameterCreate", NULL, node_igsagent_parameter_create, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},        
         { "inputRemove", NULL, node_igsagent_input_remove, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "outputRemove", NULL, node_igsagent_output_remove, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "attributeRemove", NULL, node_igsagent_attribute_remove, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "parameterRemove", NULL, node_igsagent_parameter_remove, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
 
         { "inputType", NULL, node_igsagent_input_type, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "outputType", NULL, node_igsagent_output_type, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "attributeType", NULL, node_igsagent_attribute_type, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "parameterType", NULL, node_igsagent_parameter_type, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "inputCount", NULL, node_igsagent_input_count, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "outputCount", NULL, node_igsagent_output_count, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "attributeCount", NULL, node_igsagent_attribute_count, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "parameterCount", NULL, node_igsagent_parameter_count, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "inputList", NULL, node_igsagent_input_list, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "outputList", NULL, node_igsagent_output_list, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "attributeList", NULL, node_igsagent_attribute_list, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "parameterList", NULL, node_igsagent_parameter_list, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "inputExists", NULL, node_igsagent_input_exists, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "outputExists", NULL, node_igsagent_output_exists, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "attributeExists", NULL, node_igsagent_attribute_exists, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "parameterExists", NULL, node_igsagent_parameter_exists, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
 
         { "inputBool", NULL, node_igsagent_input_bool, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
@@ -2710,10 +2816,15 @@ napi_value init_agent(napi_env env, napi_value exports) {
         { "outputString", NULL, node_igsagent_output_string, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "outputData", NULL, node_igsagent_output_data, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
 
+        { "attributeBool", NULL, node_igsagent_attribute_bool, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "parameterBool", NULL, node_igsagent_parameter_bool, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "attributeInt", NULL, node_igsagent_attribute_int, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "parameterInt", NULL, node_igsagent_parameter_int, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "attributeDouble", NULL, node_igsagent_attribute_double, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "parameterDouble", NULL, node_igsagent_parameter_double, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "attributeString", NULL, node_igsagent_attribute_string, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "parameterString", NULL, node_igsagent_parameter_string, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "attributeData", NULL, node_igsagent_attribute_data, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "parameterData", NULL, node_igsagent_parameter_data, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
 
         { "inputSetBool", NULL, node_igsagent_input_set_bool, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
@@ -2730,27 +2841,36 @@ napi_value init_agent(napi_env env, napi_value exports) {
         { "outputSetImpulsion", NULL, node_igsagent_output_set_impulsion, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "outputSetData", NULL, node_igsagent_output_set_data, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
 
+        { "attributeSetBool", NULL, node_igsagent_attribute_set_bool, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "parameterSetBool", NULL, node_igsagent_parameter_set_bool, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "attributeSetInt", NULL, node_igsagent_attribute_set_int, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "parameterSetInt", NULL, node_igsagent_parameter_set_int, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "attributeSetDouble", NULL, node_igsagent_attribute_set_double, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "parameterSetDouble", NULL, node_igsagent_parameter_set_double, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "attributeSetString", NULL, node_igsagent_attribute_set_string, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "parameterSetString", NULL, node_igsagent_parameter_set_string, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "attributeSetData", NULL, node_igsagent_attribute_set_data, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "parameterSetData", NULL, node_igsagent_parameter_set_data, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
 
         { "constraintsEnforce", NULL, node_igsagent_constraints_enforce, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "inputAddConstraint", NULL, node_igsagent_input_add_constraint, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "outputAddConstraint", NULL, node_igsagent_output_add_constraint, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "attributeAddConstraint", NULL, node_igsagent_attribute_add_constraint, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "parameterAddConstraint", NULL, node_igsagent_parameter_add_constraint, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
 
         { "inputSetDescription", NULL, node_igsagent_input_set_description, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "outputSetDescription", NULL, node_igsagent_output_set_description, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "attributeSetDescription", NULL, node_igsagent_attribute_set_description, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "parameterSetDescription", NULL, node_igsagent_parameter_set_description, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
 
         { "clearInput", NULL, node_igsagent_clear_input, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "clearOutput", NULL, node_igsagent_clear_output, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "clearAttribute", NULL, node_igsagent_clear_attribute, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "clearParameter", NULL, node_igsagent_clear_parameter, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
 
         { "observeInput", NULL, node_igsagent_observe_input, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "observeOutput", NULL, node_igsagent_observe_output, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "observeAttribute", NULL, node_igsagent_observe_attribute, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "observeParameter", NULL, node_igsagent_observe_parameter, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
 
         { "outputMute", NULL, node_igsagent_output_mute, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
@@ -2806,7 +2926,7 @@ napi_value init_agent(napi_env env, napi_value exports) {
         { "mappingSetPath", NULL, node_igsagent_mapping_set_path, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "mappingSave", NULL, node_igsagent_mapping_save, NULL, NULL, NULL, napi_writable | napi_configurable, NULL}
     };
-    status = napi_define_class(env, "Agent", NAPI_AUTO_LENGTH, node_igsagent_new, NULL, 121, properties, &cons);
+    status = napi_define_class(env, "Agent", NAPI_AUTO_LENGTH, node_igsagent_new, NULL, 160, properties, &cons);
     if (status != napi_ok) {
         trigger_exception(env, NULL, "Unable to wrap Agent class.");
         return NULL;

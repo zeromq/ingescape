@@ -1857,9 +1857,9 @@ void run_static_tests (int argc, const char * argv[]){
     //    igs_replay_init("tester_replay.log",
     //                   10, "11:26:12", false, IGS_REPLAY_INPUT+IGS_REPLAY_OUTPUT, "firstAgent");
     //    igs_replay_init("tester_replay.log",
-    //                   10, "11:26:12", false, IGS_REPLAY_INPUT+IGS_REPLAY_OUTPUT+IGS_REPLAY_PARAMETER, "firstAgent");
+    //                   10, "11:26:12", false, IGS_REPLAY_INPUT+IGS_REPLAY_OUTPUT+IGS_REPLAY_ATTRIBUTE, "firstAgent");
     //    igs_replay_init("tester_replay.log",
-    //                   10, "11:26:12", false, IGS_REPLAY_INPUT+IGS_REPLAY_OUTPUT+IGS_REPLAY_PARAMETER+IGS_REPLAY_EXECUTE_SERVICE+IGS_REPLAY_CALL_SERVICE, "firstAgent");
+    //                   10, "11:26:12", false, IGS_REPLAY_INPUT+IGS_REPLAY_OUTPUT+IGS_REPLAY_ATTRIBUTE+IGS_REPLAY_EXECUTE_SERVICE+IGS_REPLAY_CALL_SERVICE, "firstAgent");
     //    igs_replay_terminate();
     //    igs_replay_init("tester_replay.log",
     //                   100, NULL, false, 0, NULL);
