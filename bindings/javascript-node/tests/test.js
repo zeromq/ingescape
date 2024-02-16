@@ -10,7 +10,7 @@
     =========================================================================
 */
 
-const IGS = require(__dirname + "/../prebuilds/" + process.platform + "-" + process.arch + "/ingescape.node"); // igs js wrapper
+const IGS = require(__dirname + "/../prebuilds/" + process.platform + "-" + process.arch + "/node.napi"); // igs js wrapper
 
 const assert = require('assert');
 const commands = require('command-line-args');
