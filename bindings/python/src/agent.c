@@ -1389,7 +1389,9 @@ PyObject *Agent_input_set_data(AgentObject *self, PyObject *args, PyObject *kwds
     if (!PyArg_ParseTupleAndKeywords(args, NULL, "sy*", kwlist, &name, &buf))
         Py_RETURN_NONE;
 
-    return PyLong_FromLong(igsagent_input_set_data(self->agent, name, buf.buf, (size_t)buf.len));
+    PyObject* result = PyLong_FromLong(igsagent_input_set_data(self->agent, name, buf.buf, (size_t)buf.len));
+    PyBuffer_Release(&buf);
+    return result;
 }
 
 
@@ -1477,7 +1479,9 @@ PyObject *Agent_output_set_data(AgentObject *self, PyObject *args, PyObject *kwd
     if (!PyArg_ParseTupleAndKeywords(args, NULL, "sy*", kwlist, &name, &buf))
         Py_RETURN_NONE;
 
-    return PyLong_FromLong(igsagent_output_set_data(self->agent, name, buf.buf, (size_t)buf.len));
+    PyObject* result = PyLong_FromLong(igsagent_output_set_data(self->agent, name, buf.buf, (size_t)buf.len));
+    PyBuffer_Release(&buf);
+    return result;
 }
 
 
@@ -1553,7 +1557,9 @@ PyObject *Agent_parameter_set_data(AgentObject *self, PyObject *args, PyObject *
     if (!PyArg_ParseTupleAndKeywords(args, NULL, "sy*", kwlist, &name, &buf))
         Py_RETURN_NONE;
 
-    return PyLong_FromLong(igsagent_parameter_set_data(self->agent, name, buf.buf, (size_t)buf.len));
+    PyObject* result = PyLong_FromLong(igsagent_parameter_set_data(self->agent, name, buf.buf, (size_t)buf.len));
+    PyBuffer_Release(&buf);
+    return result;
 }
 
 PyObject *Agent_clear_input(AgentObject *self, PyObject *args, PyObject *kwds)
