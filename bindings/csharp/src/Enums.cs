@@ -10,6 +10,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 =========================================================================
 */
 
+
 namespace Ingescape
 {
     public enum IopType
@@ -30,6 +31,9 @@ namespace Ingescape
         Unknown
     };
 
+    /// <summary>
+    /// <inheritdoc cref="Igs.Log"/>
+    /// </summary>
     public enum LogLevel
     {
         LogTrace = 0,
@@ -46,6 +50,17 @@ namespace Ingescape
         Success = 0
     };
 
+    /// <summary>
+    /// IGS_PEER_ENTERED: a new peer has entered the network<br />
+    /// IGS_PEER_EXITED: a peer has left the network(clean exit or timeout)<br />
+    /// IGS_AGENT_ENTERED: an agent carried by a peer has entered the network<br />
+    /// IGS_AGENT_UPDATED_DEFINITION: an agent has updated its definition<br />
+    /// IGS_AGENT_KNOWS_US: an agent is fully ready to communicate with us(services can be called)<br />
+    /// IGS_AGENT_EXITED: an agent has left the netork(peer has left or agent has been deactivated)<br />
+    /// IGS_AGENT_UPDATED_MAPPING: an agent has updated its mapping<br />
+    /// IGS_AGENT_WON_ELECTION: THIS AGENT has won an election(via its peer)<br />
+    /// IGS_AGENT_LOST_ELECTION: THIS AGENT has lost an election(via its peer)<br />
+    /// </summary>
     public enum AgentEvent
     {
         PeerEntered = 1,

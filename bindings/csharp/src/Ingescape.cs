@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Xml.Linq;
 
 namespace Ingescape
 {
@@ -29,7 +30,8 @@ namespace Ingescape
         #endregion
 
         #region Agent initialization, control and events
-        // Initialization and control
+
+            #region start & stop ingescape
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern Result igs_start_with_device(IntPtr device, uint port);
         public static Result StartWithDevice(string networkDevice, uint port)
@@ -51,6 +53,20 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_stop();
+        /// <summary>
+        /// <para>Ingescape can be stopped either from the applications itself
+        /// or from the network.When ingescape is stopped from the network,
+        /// the application can be notified and take actions such as stopping, entering a specific mode, etc. </para>
+        /// 
+        /// <para>To stop ingescape from its hosting application,
+        /// just call igs_stop().</para>
+        /// 
+        /// <para>To be notified that Ingescape has been stopped, you can:<br />
+        /// - register a callabck with igs_observe_forced_stop.<br />
+        /// WARNING: this callback will be executed from the ingescape thread with potential thread-safety issues depending on your application structure.<br />
+        /// - periodically check the value returned by igs_is_started()<br />
+        /// In any case, igs_stop() MUST NEVER BE CALLED directly from any Ingescape callback, because it would create a deadlock betweenthe main thread and the ingescape thread. </para>
+        /// </summary>
         public static void Stop() { igs_stop(); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
@@ -71,11 +87,14 @@ namespace Ingescape
             cSharpFunction(data);
         }
 
-        //PUBLIC zsock_t* igs_pipe_to_ingescape(void); //TOFIX: zsock
-
-        //register a callback when the agent is forced to Stop by the ingescape platform
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_observe_forced_stop([MarshalAs(UnmanagedType.FunctionPtr)] ForcedStopFunctionC cb, IntPtr myData);
+        /// <summary>
+        /// register a callback when the agent is forced to Stop by the ingescape platform. <br />
+        /// WARNING: this callback will be executed from the ingescape thread with potential thread-safety issues depending on your application structure.
+        /// </summary>
+        /// <param name="callback"></param>
+        /// <param name="myData"></param>
         public static void ObserveForcedStop(ForcedStopFunction callback, object myData)
         {
             Tuple<ForcedStopFunction, object> tupleData = new Tuple<ForcedStopFunction, object>(callback, myData);
@@ -86,8 +105,10 @@ namespace Ingescape
             
             igs_observe_forced_stop(_OnForcedStopCallback, data);
         }
+        #endregion
 
-        // Agent name
+            #region agent name
+
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_agent_set_name(IntPtr name);
         public static void AgentSetName(string name)
@@ -104,7 +125,9 @@ namespace Ingescape
             IntPtr ptr = igs_agent_name();
             return PtrToStringFromUTF8(ptr);
         }
+        #endregion
 
+            #region agent uuid
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_agent_uuid();
         public static string AgentUUID()
@@ -112,8 +135,9 @@ namespace Ingescape
             IntPtr ptr = igs_agent_uuid();
             return PtrToStringFromUTF8(ptr);
         }
+        #endregion
 
-        // Agent state
+            #region control agent state
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_agent_set_state(IntPtr state);
         public static void AgentSetState(string state)
@@ -130,24 +154,9 @@ namespace Ingescape
             IntPtr ptr = igs_agent_state();
             return PtrToStringFromUTF8(ptr);
         }
+        #endregion
 
-        // Agent family - optional
-        //32 characters canonical UUID format is commonly expected,
-        //default is an empty string, max length is 64 characters*/
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void igs_agent_set_family(IntPtr family);
-        public static void AgentSetFamily(string family)
-        {
-            IntPtr familyAsPtr = StringToUTF8Ptr(family);
-            igs_agent_set_family(familyAsPtr);
-            Marshal.FreeHGlobal(familyAsPtr);
-        }
-
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr igs_agent_family(); //string must be freed by caller
-        public static string AgentFamily() { return PtrToStringFromUTF8(igs_agent_family()); }
-
-        // Mute the agent ouputs
+            #region mute the agent
         private static MuteFunctionC _OnMutedCallback;
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate void MuteFunctionC(bool AgentIsMuted, IntPtr myData);
@@ -186,12 +195,9 @@ namespace Ingescape
             
             igs_observe_mute(_OnMutedCallback, data);
         }
+        #endregion
 
-        //Freeze and Unfreeze the agent
-        //When freezed, agent will not send anything on its outputs and
-        //its inputs are not reactive to external data.
-        //NB: the internal semantics of Freeze and Unfreeze for a given agent
-        //are up to the developer and can be controlled using callbacks and igs_observe_freeze
+            #region freeze the agent
         private static FreezeFunctionC _OnFreezeCallback;
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate void FreezeFunctionC(bool isPaused, IntPtr myData);
@@ -207,6 +213,14 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern Result igs_freeze();
+
+        /// <summary>
+        /// When freezed, agent will not send anything on its outputs and
+        /// its inputs are not reactive to external data.<br />
+        /// NB: the internal semantics of freeze and unfreeze for a given agent
+        /// are up to the developer and can be controlled using callbacks and igs_observe_freeze
+        /// </summary>
+        /// <returns></returns>
         public static Result Freeze() { return igs_freeze(); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
@@ -216,6 +230,14 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_unfreeze();
+
+        /// <summary>
+        /// When freezed, agent will not send anything on its outputs and
+        /// its inputs are not reactive to external data.<br />
+        /// NB: the internal semantics of freeze and unfreeze for a given agent
+        /// are up to the developer and can be controlled using callbacks and igs_observe_freeze
+        /// </summary>
+        /// <returns></returns>
         public static int Unfreeze() { return igs_unfreeze(); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
@@ -230,7 +252,9 @@ namespace Ingescape
             
             return igs_observe_freeze(_OnFreezeCallback, data);
         }
+        #endregion
 
+            #region observe agents
         private static AgentEventsFunctionC _OnAgentEvents;
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate void AgentEventsFunctionC(AgentEvent agentEvent, IntPtr uuid, IntPtr name, IntPtr eventData, IntPtr myData);
@@ -268,41 +292,74 @@ namespace Ingescape
         }
         #endregion
 
-        #region Editing & inspecting definitions, adding and removing inputs/outputs/parameters
+        #endregion
+
+        #region Edit & inspect agent definition (inputs, outputs, services, attributes)s
+
+            #region Package, class, description, version
+
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern Result igs_definition_load_str(IntPtr json_str);
-        public static Result DefinitionLoadStr(string json)
+        private static extern void igs_definition_set_package(IntPtr package);
+
+        /// <summary>
+        /// <code>
+        /// In a Model-Based System Engineering (MBSE) context, an agent may
+        /// provide additonal information regarding its category and role in
+        /// a given system.These information are represented by:
+        /// • A package, positioning the class inside a larger set,
+        /// • A class, naming the agent in the context of a given system,
+        /// • A free-text description for the role and activities of the agent,
+        /// • A version.
+        /// The class is set by default to the name of the agent.
+        /// The package generally complies with a hierarchical structure using '::'
+        /// as a separator, e.g.level1::level2::level3.Note that the library does
+        /// not make any verification.
+        /// </code>
+        /// </summary>
+        /// <param name="package"></param>
+        public static void DefinitionSetPackage(string package)
         {
-            IntPtr jsonAsPtr = StringToUTF8Ptr(json);
-            Result res = igs_definition_load_str(jsonAsPtr);
-            Marshal.FreeHGlobal(jsonAsPtr);
-            return res;
+            IntPtr packageAsPtr = StringToUTF8Ptr(package);
+            igs_definition_set_package(packageAsPtr);
+            Marshal.FreeHGlobal(packageAsPtr);
         }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern Result igs_definition_load_file(IntPtr file_path);
-        public static Result DefinitionLoadFile(string file_path)
+        private static extern IntPtr igs_definition_package(); //caller owns returned value
+
+        /// <summary>
+        /// <inheritdoc cref="DefinitionSetPackage"/>
+        /// </summary>
+        public static string DefinitionPackage(){ return PtrToStringFromUTF8(igs_definition_package()); }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void igs_definition_set_class(IntPtr my_class);
+
+        /// <summary>
+        /// <inheritdoc cref="DefinitionSetPackage"/>
+        /// </summary>
+        public static void DefinitionSetClass(string myClass)
         {
-            IntPtr pathAsPtr = StringToUTF8Ptr(file_path);
-            Result res = igs_definition_load_file(pathAsPtr);
-            Marshal.FreeHGlobal(pathAsPtr);
-            return res;
+            IntPtr classAsPtr = StringToUTF8Ptr(myClass);
+            igs_definition_set_class(classAsPtr);
+            Marshal.FreeHGlobal(classAsPtr);
         }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_clear_definition();
-        public static int ClearDefinition() { return igs_clear_definition(); }
+        private static extern IntPtr igs_definition_class(); //caller owns returned value
 
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr igs_definition_json();
-        public static string DefinitionJson()
-        {
-            IntPtr ptr = igs_definition_json();
-            return (ptr == IntPtr.Zero) ? string.Empty : Marshal.PtrToStringAnsi(ptr);
-        }
+        /// <summary>
+        /// <inheritdoc cref="DefinitionSetPackage"/>
+        /// </summary>
+        public static string DefinitionClass() { return PtrToStringFromUTF8(igs_definition_class()); }
+
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_definition_description();
+
+        /// <summary>
+        /// <inheritdoc cref="DefinitionSetPackage"/>
+        /// </summary>
         public static string DefinitionDescription()
         {
             IntPtr ptr = igs_definition_description();
@@ -311,6 +368,10 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_definition_version();
+
+        /// <summary>
+        /// <inheritdoc cref="DefinitionSetPackage"/>
+        /// </summary>
         public static string DefinitionVersion()
         {
             IntPtr ptr = igs_definition_version();
@@ -319,6 +380,10 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_definition_set_description(IntPtr description);
+
+        /// <summary>
+        /// <inheritdoc cref="DefinitionSetPackage"/>
+        /// </summary>
         public static void DefinitionSetDescription(string description)
         {
             IntPtr descriptionAsPtr = StringToUTF8Ptr(description);
@@ -328,14 +393,20 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_definition_set_version(IntPtr Version);
+
+        /// <summary>
+        /// <inheritdoc cref="DefinitionSetPackage"/>
+        /// </summary>
         public static void DefinitionSetVersion(string Version)
         {
             IntPtr versionAsPtr = StringToUTF8Ptr(Version);
             igs_definition_set_version(versionAsPtr);
             Marshal.FreeHGlobal(versionAsPtr);
         }
+        #endregion
 
-        // Edit the definition using the API
+            #region create & remove inputs/outputs
+
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern Result igs_input_create(IntPtr name, IopValueType value_type, IntPtr value, uint size);
         public static Result InputCreate(string name, IopValueType type, object value = null)
@@ -411,42 +482,6 @@ namespace Ingescape
         }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern Result igs_parameter_create(IntPtr name, IopValueType type, IntPtr value, uint size);
-        public static Result ParameterCreate(string name, IopValueType type, object value = null)
-        {
-            IntPtr nameAsPtr = StringToUTF8Ptr(name);
-            if (value != null)
-            {
-                uint size;
-                IntPtr valuePtr;
-                if (value.GetType() == typeof(string))
-                    valuePtr = StringToUTF8Ptr(Convert.ToString(value), out size);
-                else if (value.GetType() == typeof(bool))
-                    valuePtr = BoolToPtr(Convert.ToBoolean(value), out size);
-                else if (value.GetType() == typeof(byte[]))
-                    valuePtr = DataToPtr((byte[])value, out size);
-                else if (value.GetType() == typeof(double))
-                    valuePtr = DoubleToPtr(Convert.ToDouble(value), out size);
-                else if (value.GetType() == typeof(float))
-                    valuePtr = DoubleToPtr(Convert.ToDouble(value), out size);
-                else if (value.GetType() == typeof(int))
-                    valuePtr = IntToPtr(Convert.ToInt32(value), out size);
-                else
-                    return Result.Failure;
-                Result res = igs_parameter_create(nameAsPtr, type, valuePtr, size);
-                Marshal.FreeHGlobal(nameAsPtr);
-                Marshal.FreeHGlobal(valuePtr);
-                return res;
-            }
-            else
-            {
-                Result res = igs_parameter_create(nameAsPtr, type, IntPtr.Zero, 0);
-                Marshal.FreeHGlobal(nameAsPtr);
-                return res;
-            }
-        }
-
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern Result igs_input_remove(IntPtr name);
         public static Result InputRemove(string name)
         {
@@ -465,18 +500,10 @@ namespace Ingescape
             Marshal.FreeHGlobal(nameAsPtr);
             return res;
         }
+        #endregion
 
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern Result igs_parameter_remove(IntPtr name);
-        public static Result ParameterRemove(string name)
-        {
-            IntPtr nameAsPtr = StringToUTF8Ptr(name);
-            Result res = igs_parameter_remove(nameAsPtr);
-            Marshal.FreeHGlobal(nameAsPtr);
-            return res;
-        }
+            #region inputs/outputs type, list and existence
 
-        //check IOP type, lists and existence
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern IopValueType igs_input_type(IntPtr name);
         public static IopValueType InputType(string name)
@@ -498,26 +525,12 @@ namespace Ingescape
         }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern IopValueType igs_parameter_type(IntPtr name);
-        public static IopValueType ParameterType(string name)
-        {
-            IntPtr nameAsPtr = StringToUTF8Ptr(name);
-            IopValueType type = igs_parameter_type(nameAsPtr);
-            Marshal.FreeHGlobal(nameAsPtr);
-            return type;
-        }
-
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_input_count();
         public static int InputCount() { return igs_input_count(); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_output_count();
         public static int OutputCount() { return igs_output_count(); }
-
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_parameter_count();
-        public static int ParameterCount() { return igs_parameter_count(); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_input_list(ref int nbOfElements);
@@ -533,7 +546,7 @@ namespace Ingescape
                 Marshal.Copy(intptr, intPtrArray, 0, nbOfElements);
                 for (int i = 0; i < nbOfElements; i++)
                     list[i] = Marshal.PtrToStringAnsi(intPtrArray[i]);
-                Igs.igs_free_iop_list(intptr, nbOfElements);
+                Igs.igs_free_io_list(intptr, nbOfElements);
             }
             return list;
         }
@@ -552,32 +565,13 @@ namespace Ingescape
                 Marshal.Copy(intptr, intPtrArray, 0, nbOfElements);
                 for (int i = 0; i < nbOfElements; i++)
                     list[i] = Marshal.PtrToStringAnsi(intPtrArray[i]);
-                Igs.igs_free_iop_list(intptr, nbOfElements);
+                Igs.igs_free_io_list(intptr, nbOfElements);
             }
             return list;
         }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr igs_parameter_list(ref int nbOfElements);
-        public static string[] ParameterList()
-        {
-            int nbOfElements = 0;
-            string[] list = null;
-            IntPtr intptr = igs_parameter_list(ref nbOfElements);
-            if (intptr != IntPtr.Zero)
-            {
-                IntPtr[] intPtrArray = new IntPtr[nbOfElements];
-                list = new string[nbOfElements];
-                Marshal.Copy(intptr, intPtrArray, 0, nbOfElements);
-                for (int i = 0; i < nbOfElements; i++)
-                    list[i] = Marshal.PtrToStringAnsi(intPtrArray[i]);
-                Igs.igs_free_iop_list(intptr, nbOfElements);
-            }
-            return list;
-        }
-
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern void igs_free_iop_list(IntPtr list, int nbOfElements);
+        internal static extern void igs_free_io_list(IntPtr list, int nbOfElements);
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.I1)]
@@ -600,25 +594,55 @@ namespace Ingescape
             Marshal.FreeHGlobal(nameAsPtr);
             return value;
         }
+        #endregion
+ 
+            #region load / set / get / clear definition
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.I1)]
-        private static extern bool igs_parameter_exists(IntPtr name);
-        public static bool ParameterExists(string name)
+        private static extern Result igs_definition_load_str(IntPtr json_str);
+        public static Result DefinitionLoadStr(string json)
         {
-            IntPtr nameAsPtr = StringToUTF8Ptr(name);
-            bool value = igs_parameter_exists(nameAsPtr);
-            Marshal.FreeHGlobal(nameAsPtr);
-            return value;
+            IntPtr jsonAsPtr = StringToUTF8Ptr(json);
+            Result res = igs_definition_load_str(jsonAsPtr);
+            Marshal.FreeHGlobal(jsonAsPtr);
+            return res;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_definition_load_file(IntPtr file_path);
+        public static Result DefinitionLoadFile(string file_path)
+        {
+            IntPtr pathAsPtr = StringToUTF8Ptr(file_path);
+            Result res = igs_definition_load_file(pathAsPtr);
+            Marshal.FreeHGlobal(pathAsPtr);
+            return res;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int igs_clear_definition();
+
+        /// <summary>
+        /// clears definition data for the agent
+        /// </summary>
+        /// <returns></returns>
+        public static int ClearDefinition() { return igs_clear_definition(); }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr igs_definition_json();
+
+        /// <summary>
+        /// returns json string
+        /// </summary>
+        /// <returns></returns>
+        public static string DefinitionJson()
+        {
+            IntPtr ptr = igs_definition_json();
+            return (ptr == IntPtr.Zero) ? string.Empty : Marshal.PtrToStringAnsi(ptr);
         }
         #endregion
 
-        #region Reading and writing inputs/outputs/parameters, a.k.a IOPs
+            #region read IOs per value type
 
-        // IOP Model : Inputs, Outputs and Parameters read/write/check/observe/AgentMute
-
-
-        //read per type
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igs_input_bool(IntPtr name);
@@ -740,68 +764,9 @@ namespace Ingescape
             }
             return data;
         }
+        #endregion
 
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.I1)]
-        private static extern bool igs_parameter_bool(IntPtr name);        
-        public static bool ParameterBool(string name)
-        {
-            IntPtr nameAsPtr = StringToUTF8Ptr(name);
-            bool value = igs_parameter_bool(nameAsPtr);
-            Marshal.FreeHGlobal(nameAsPtr);
-            return value;
-        }
-
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_parameter_int(IntPtr name);
-        public static int ParameterInt(string name)
-        {
-            IntPtr nameAsPtr = StringToUTF8Ptr(name);
-            int value = igs_parameter_int(nameAsPtr);
-            Marshal.FreeHGlobal(nameAsPtr);
-            return value;
-        }
-
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern double igs_parameter_double(IntPtr name);
-        public static double ParameterDouble(string name)
-        {
-            IntPtr nameAsPtr = StringToUTF8Ptr(name);
-            double value = igs_parameter_double(nameAsPtr);
-            Marshal.FreeHGlobal(nameAsPtr);
-            return value;
-        }
-
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr igs_parameter_string(IntPtr name);
-        public static string ParameterString(string name)
-        {
-            IntPtr nameAsPtr = StringToUTF8Ptr(name);
-            IntPtr valueAsPtr = igs_parameter_string(nameAsPtr);
-            string value = PtrToStringFromUTF8(valueAsPtr);
-            Marshal.FreeHGlobal(nameAsPtr);
-            return value;
-        }
-
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern Result igs_parameter_data(IntPtr name, ref IntPtr data, ref uint size);
-        public static byte[] ParameterData(string name)
-        {
-            uint size = 0;
-            byte[] data = null;
-            IntPtr ptr = IntPtr.Zero;
-            IntPtr nameAsPtr = StringToUTF8Ptr(name);
-            Result result = igs_parameter_data(nameAsPtr, ref ptr, ref size);
-            Marshal.FreeHGlobal(nameAsPtr);
-            if (result == Result.Success)
-            {
-                data = new byte[size];
-                if (ptr != IntPtr.Zero)
-                    Marshal.Copy(ptr, data, 0, (int)size);
-            }
-            return data;
-        }
-
+            #region write IOs per value type
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern Result igs_input_set_bool(IntPtr name, bool value);
         public static Result InputSetBool(string name, bool value)
@@ -945,75 +910,60 @@ namespace Ingescape
             Marshal.FreeHGlobal(valueAsPtr);
             return result;
         }
+        #endregion
 
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern Result igs_parameter_set_bool(IntPtr name, bool value);
-        public static Result ParameterSetBool(string name, bool value)
-        {
-            Result result = Result.Failure;
-            IntPtr nameAsPtr = StringToUTF8Ptr(name);
-            result = igs_parameter_set_bool(nameAsPtr, value);
-            Marshal.FreeHGlobal(nameAsPtr);
-            return result;
-        }
+            #region  Constraints on IOs
 
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern Result igs_parameter_set_int(IntPtr name, int value);
-        public static Result ParameterSetInt(string name, int value)
-        {
-            Result result = Result.Failure;
-            IntPtr nameAsPtr = StringToUTF8Ptr(name);
-            result = igs_parameter_set_int(nameAsPtr, value);
-            Marshal.FreeHGlobal(nameAsPtr);
-            return result;
-        }
-
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern Result igs_parameter_set_double(IntPtr name, double value);
-        public static Result ParameterSetDouble(string name, double value)
-        {
-            Result result = Result.Failure;
-            IntPtr nameAsPtr = StringToUTF8Ptr(name);
-            result = igs_parameter_set_double(nameAsPtr, value);
-            Marshal.FreeHGlobal(nameAsPtr);
-            return result;
-        }
-
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern Result igs_parameter_set_string(IntPtr name, IntPtr value);
-        public static Result ParameterSetString(string name, string value)
-        {
-            Result result = Result.Failure;
-            IntPtr nameAsPtr = StringToUTF8Ptr(name);
-            IntPtr valueAsPtr = StringToUTF8Ptr(value);
-            result = igs_parameter_set_string(nameAsPtr, valueAsPtr);
-            Marshal.FreeHGlobal(nameAsPtr);
-            Marshal.FreeHGlobal(valueAsPtr);
-            return result;
-        }
-
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern Result igs_parameter_set_data(IntPtr name, IntPtr value, uint size);
-        public static Result ParameterSetData(string name, byte[] value)
-        {
-            Result result = Result.Failure;
-            IntPtr nameAsPtr = StringToUTF8Ptr(name);
-            uint size = Convert.ToUInt32(((byte[])value).Length);
-            IntPtr valueAsPtr = Marshal.AllocHGlobal((int)size);
-            Marshal.Copy(value, 0, valueAsPtr, (int)size);
-            result = igs_parameter_set_data(nameAsPtr, valueAsPtr, size);
-            Marshal.FreeHGlobal(nameAsPtr);
-            Marshal.FreeHGlobal(valueAsPtr);
-            return result;
-        }
-
-        //Constraints on IOPs
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_constraints_enforce(bool enforce);//default is false, i.e. disabled
+
+        /// <summary>
+        /// <inheritdoc cref="InputAddConstraint"/>
+        /// </summary>
+        /// <param name="enforce"></param>
         public static void ConstraintsEnforce(bool enforce){ igs_constraints_enforce(enforce); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern Result igs_input_add_constraint(IntPtr name, IntPtr constraint);
+
+        /// <summary>
+        /// <para>
+        /// Constraints enable verifications upon sending or receiving information
+        /// with inputs and outputs.<br />
+        /// The syntax for the constraints is global but
+        /// some constraints only apply to certain types:</para>
+        /// <code xml:space="preserve">
+        /// Integers and doubles:<br />
+        ///     "max 10.123"  : applies a max allowed value on the IO<br />
+        ///     "min -10" : applies a min allowed value on the IO<br />
+        ///     "[-10, .1]" : applies min and max allowed values on the IO<br />
+        /// Strings:<br />
+        ///     "~ regular_expression", e.g. "~ \\d+(\.\\d+)?)":<br />
+        ///     IOs of type STRING must match the regular expression<br />
+        /// Regular expressions are based on CZMQ integration of SLRE with the<br />
+        /// following syntax:<br />
+        ///     ^               Match beginning of a buffer
+        ///     $               Match end of a buffer
+        ///     ()              Grouping and substring capturing
+        ///     [...]           Match any character from set, caution: range-based syntax such as [0..9] is NOT supported
+        ///     [^...]          Match any character but ones from set
+        ///     \s              Match whitespace
+        ///     \S              Match non-whitespace
+        ///     \d              Match decimal digit
+        ///     \r              Match carriage return
+        ///     \n              Match newline
+        ///     +               Match one or more times (greedy)
+        ///     +?              Match one or more times (non-greedy)
+        ///     *               Match zero or more times(greedy)
+        ///     *?              Match zero or more times(non-greedy)
+        ///     ?               Match zero or once
+        ///     \xDD            Match byte with hex value 0xDD
+        ///     \meta           Match one of the meta character: ^$().[*+?\
+        /// </code>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="constraint"></param>
+        /// <returns></returns>
         public static Result InputAddConstraint(string name, string constraint)
         {
             Result result = Result.Failure;
@@ -1027,6 +977,13 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern Result igs_output_add_constraint(IntPtr name, IntPtr constraint);
+
+        /// <summary>
+        /// <inheritdoc cref="InputAddConstraint"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="constraint"></param>
+        /// <returns></returns>
         public static Result OutputAddConstraint(string name, string constraint)
         {
             Result result = Result.Failure;
@@ -1037,66 +994,97 @@ namespace Ingescape
             Marshal.FreeHGlobal(constraintAsPtr);
             return result;
         }
+        #endregion  
+
+            #region IO description
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern Result igs_parameter_add_constraint(IntPtr name, IntPtr constraint);
-        public static Result ParameterAddConstraint(string name, string constraint)
-        {
-            Result result = Result.Failure;
-            IntPtr nameAsPtr = StringToUTF8Ptr(name);
-            IntPtr constraintAsPtr = StringToUTF8Ptr(constraint);
-            result = igs_parameter_add_constraint(nameAsPtr, constraintAsPtr);
-            Marshal.FreeHGlobal(nameAsPtr);
-            Marshal.FreeHGlobal(constraintAsPtr);
-            return result;
-        }
-
-        //IOP descriptions
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void igs_input_set_description(IntPtr name, IntPtr description);
-        public static void InputSetDescription(string name, string description)
+        private static extern Result igs_input_set_description(IntPtr name, IntPtr description);
+        public static Result InputSetDescription(string name, string description)
         {
             IntPtr nameAsPtr = StringToUTF8Ptr(name);
             IntPtr descriptionAsPtr = StringToUTF8Ptr(description);
-            igs_input_set_description(nameAsPtr, descriptionAsPtr);
+            Result res = igs_input_set_description(nameAsPtr, descriptionAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
             Marshal.FreeHGlobal(descriptionAsPtr);
+            return res;
         }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void igs_output_set_description(IntPtr name, IntPtr description);
-        public static void OutputSetDescription(string name, string description)
+        private static extern Result igs_output_set_description(IntPtr name, IntPtr description);
+        public static Result OutputSetDescription(string name, string description)
         {
             IntPtr nameAsPtr = StringToUTF8Ptr(name);
             IntPtr descriptionAsPtr = StringToUTF8Ptr(description);
-            igs_output_set_description(nameAsPtr, descriptionAsPtr);
+            Result res = igs_output_set_description(nameAsPtr, descriptionAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
             Marshal.FreeHGlobal(descriptionAsPtr);
+            return res;
         }
+        #endregion
 
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void igs_parameter_set_description(IntPtr name, IntPtr description);
-        public static void ParameterSetDescription(string name, string description)
+            #region IO detailed type
+        
+        [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_input_set_detailed_type(IntPtr paramName, IntPtr typeName, IntPtr specification);
+
+        /// <summary>
+        /// decribe precise specifications for IOs,
+        /// around a detailed type.Specifications are descriptive only. <br />
+        /// Ingescape does not check anything that is passed here.<br />
+        /// For example, the detailed type can be 'protobuf' and the specification
+        /// can be an actual protobuf structure in proto format.<br />
+        /// </summary>
+        /// <param name="paramName"></param>
+        /// <param name="typeName"></param>
+        /// <param name="specification"></param>
+        /// <returns></returns>
+        public static Result InputSetDetailedType(string paramName, string typeName, string specification)
         {
-            IntPtr nameAsPtr = StringToUTF8Ptr(name);
-            IntPtr descriptionAsPtr = StringToUTF8Ptr(description);
-            igs_parameter_set_description(nameAsPtr, descriptionAsPtr);
-            Marshal.FreeHGlobal(nameAsPtr);
-            Marshal.FreeHGlobal(descriptionAsPtr);
+            IntPtr paramNameAsPtr = Igs.StringToUTF8Ptr(paramName);
+            IntPtr typeAsPtr = Igs.StringToUTF8Ptr(typeName);
+            IntPtr specificationAsPtr = Igs.StringToUTF8Ptr(specification);
+            Result res = igs_input_set_detailed_type(paramNameAsPtr, typeAsPtr, specificationAsPtr);
+            Marshal.FreeHGlobal(paramNameAsPtr);
+            Marshal.FreeHGlobal(typeAsPtr);
+            Marshal.FreeHGlobal(specificationAsPtr);
+            return res;
         }
 
-        /*These two functions enable sending and receiving DATA on
-         inputs/outputs by using zmsg_t structures. zmsg_t structures
-         offer advanced functionalities for data serialization.
-         More can be found here: http://czmq.zeromq.org/manual:zmsg */
-        // No c# wrapping of zmsg_t structure exist.
-        //FIXME: INGESCAPE_EXPORT igs_result_t igs_output_set_zmsg(const char *name, zmsg_t *msg);
-        //FIXME: INGESCAPE_EXPORT igs_result_t igs_input_zmsg(const char *name, zmsg_t **msg); //msg is owned by caller
+        [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_output_set_detailed_type(IntPtr paramName, IntPtr typeName, IntPtr specification);
 
-        //clear IOP data in memory without having to write the IOP
-        //(relevant for IOPs with Data type only)
+        /// <summary>
+        /// <inheritdoc cref="InputSetDetailedType"/>
+        /// </summary>
+        /// <param name="paramName"></param>
+        /// <param name="typeName"></param>
+        /// <param name="specification"></param>
+        /// <returns></returns>
+        public static Result OutputSetDetailedType(string paramName, string typeName, string specification)
+        {
+            IntPtr paramNameAsPtr = Igs.StringToUTF8Ptr(paramName);
+            IntPtr typeAsPtr = Igs.StringToUTF8Ptr(typeName);
+            IntPtr specificationAsPtr = Igs.StringToUTF8Ptr(specification);
+            Result res = igs_output_set_detailed_type(paramNameAsPtr, typeAsPtr, specificationAsPtr);
+            Marshal.FreeHGlobal(paramNameAsPtr);
+            Marshal.FreeHGlobal(typeAsPtr);
+            Marshal.FreeHGlobal(specificationAsPtr);
+            return res;
+        }
+
+        #endregion
+
+            #region Clear IO 
+
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_clear_input(IntPtr name);
+
+        /// <summary>
+        /// Clear IO data in memory without having to write an empty value
+        /// into the IO.Especially useful for IOs handling large strings and data.
+        /// </summary>
+        /// <param name="name"></param>
         public static void ClearInput(string name)
         {
             IntPtr nameAsPtr = StringToUTF8Ptr(name);
@@ -1112,17 +1100,10 @@ namespace Ingescape
             igs_clear_output(nameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
         }
+        #endregion
 
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void igs_clear_parameter(IntPtr name);
-        public static void ClearParameter(string name)
-        {
-            IntPtr nameAsPtr = StringToUTF8Ptr(name);
-            igs_clear_parameter(nameAsPtr);
-            Marshal.FreeHGlobal(nameAsPtr);
-        }
+            #region observe changes to an IO
 
-        // Observe writing to an IOP
         private static IopFunctionC _OnIOPCallback;
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate void IopFunctionC(IopType iopType,
@@ -1201,23 +1182,9 @@ namespace Ingescape
             igs_observe_output(nameAsPtr, _OnIOPCallback, data);
             Marshal.FreeHGlobal(nameAsPtr);
         }
+        #endregion
 
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void igs_observe_parameter(IntPtr name, IopFunctionC cb, IntPtr myData);
-        public static void ObserveParameter(string ParameterName, IopFunction callback, object myData)
-        {
-            Tuple<IopFunction, object> tupleData = new Tuple<IopFunction, object>(callback, myData);
-            GCHandle gCHandle = GCHandle.Alloc(tupleData);
-            IntPtr data = GCHandle.ToIntPtr(gCHandle);
-
-            if (_OnIOPCallback == null)
-                _OnIOPCallback = OnIOPCallback;
-
-            IntPtr nameAsPtr = StringToUTF8Ptr(ParameterName);
-            igs_observe_parameter(nameAsPtr, _OnIOPCallback, data);
-            Marshal.FreeHGlobal(nameAsPtr);
-        }
-
+            #region mute or unmute an output
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_output_mute(IntPtr name);
         public static void OutputMute(string name)
@@ -1248,150 +1215,9 @@ namespace Ingescape
         }
         #endregion
 
-        #region Mapping edition & inspection
-        // Load / set / get mapping
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern Result igs_mapping_load_str(IntPtr json_str);
-        public static Result MappingLoadStr(string json_str)
-        {
-            IntPtr jsonAsPtr = StringToUTF8Ptr(json_str);
-            Result res = igs_mapping_load_str(jsonAsPtr);
-            Marshal.FreeHGlobal(jsonAsPtr);
-            return res;
-        }
+            #region Services edition & inspection
 
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern Result igs_mapping_load_file(IntPtr file_path);
-        public static Result MappingLoadFile(string file_path)
-        {
-            IntPtr pathAsPtr = StringToUTF8Ptr(file_path);
-            Result res = igs_mapping_load_file(pathAsPtr);
-            Marshal.FreeHGlobal(pathAsPtr);
-            return res;
-        }
-
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr igs_mapping_json();
-        public static string MappingJson()
-        {
-            IntPtr ptr = igs_mapping_json();
-            return (ptr == IntPtr.Zero) ? string.Empty : Marshal.PtrToStringAnsi(ptr);
-        }
-
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern uint igs_mapping_count();
-        public static uint MappingCount() { return igs_mapping_count(); }
-
-        // Clear Mappings
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void igs_clear_mappings();
-        public static void ClearMappings() { igs_clear_mappings(); }
-
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void igs_clear_mappings_with_agent(IntPtr agentName);
-        public static void ClearMappingsWithAgent(string agentName)
-        {
-            IntPtr ptrAgentName = StringToUTF8Ptr(agentName);
-            igs_clear_mappings_with_agent(ptrAgentName);
-            Marshal.FreeHGlobal(ptrAgentName);
-        }
-
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void igs_clear_mappings_for_input(IntPtr inputName);
-        public static void ClearMappingsForInput(string inputName)
-        {
-            IntPtr ptrInputName = StringToUTF8Ptr(inputName);
-            igs_clear_mappings_for_input(ptrInputName);
-            Marshal.FreeHGlobal(ptrInputName);
-        }
-
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern ulong igs_mapping_add(IntPtr fromOurInput, IntPtr toAgent, IntPtr withOutput);
-        public static ulong MappingAdd(string fromOurInput, string toAgent, string withOutput)
-        {
-            IntPtr fromOurInputAsPtr = StringToUTF8Ptr(fromOurInput);
-            IntPtr toAgentAsPtr = StringToUTF8Ptr(toAgent);
-            IntPtr withOutputAsPtr = StringToUTF8Ptr(withOutput);
-            ulong id = igs_mapping_add(fromOurInputAsPtr, toAgentAsPtr, withOutputAsPtr);
-            Marshal.FreeHGlobal(fromOurInputAsPtr);
-            Marshal.FreeHGlobal(toAgentAsPtr);
-            Marshal.FreeHGlobal(withOutputAsPtr);
-            return id;
-        }
-
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern Result igs_mapping_remove_with_id(ulong theId);
-        public static Result MappingRemoveWithId(ulong theId) { return igs_mapping_remove_with_id(theId); }
-
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern Result igs_mapping_remove_with_name(IntPtr fromOurInput, IntPtr toAgent, IntPtr withOutput);
-        public static Result MappingRemoveWithName(string fromOurInput, string toAgent, string withOutput)
-        {
-            IntPtr fromOurInputAsPtr = StringToUTF8Ptr(fromOurInput);
-            IntPtr toAgentAsPtr = StringToUTF8Ptr(toAgent);
-            IntPtr withOutputAsPtr = StringToUTF8Ptr(withOutput);
-            Result res = igs_mapping_remove_with_name(fromOurInputAsPtr, toAgentAsPtr, withOutputAsPtr);
-            Marshal.FreeHGlobal(fromOurInputAsPtr);
-            Marshal.FreeHGlobal(toAgentAsPtr);
-            Marshal.FreeHGlobal(withOutputAsPtr);
-            return res;
-        }
-
-        // Edit our splits 
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern uint igs_split_count();
-        public static uint SplitCount() { return igs_split_count(); }
-
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern ulong igs_split_add(IntPtr fromOurInput, IntPtr toAgent, IntPtr withOutput);
-        public static ulong SplitAdd(string fromOurInput, string toAgent, string withOutput)
-        {
-            IntPtr ptrFromOurInput = StringToUTF8Ptr(fromOurInput);
-            IntPtr ptrToAgent = StringToUTF8Ptr(toAgent);
-            IntPtr ptrWithOutput = StringToUTF8Ptr(withOutput);
-            ulong result = igs_split_add(ptrFromOurInput, ptrToAgent, ptrWithOutput);
-            Marshal.FreeHGlobal(ptrFromOurInput);
-            Marshal.FreeHGlobal(ptrToAgent);
-            Marshal.FreeHGlobal(ptrWithOutput);
-            return result;
-        }
-
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern Result igs_split_remove_with_id(ulong id);
-        public static Result SplitRemoveWithId(ulong id) { return igs_split_remove_with_id(id); }
-
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern Result igs_split_remove_with_name(IntPtr fromOurInput, IntPtr toAgent, IntPtr withOutput);
-        public static Result SplitRemoveWithName(string fromOurInput, string toAgent, string withOutput)
-        {
-            IntPtr ptrFromOurInput = StringToUTF8Ptr(fromOurInput);
-            IntPtr ptrToAgent = StringToUTF8Ptr(toAgent);
-            IntPtr ptrWithOutput = StringToUTF8Ptr(withOutput);
-            Result result = igs_split_remove_with_name(ptrFromOurInput, ptrToAgent, ptrWithOutput);
-            Marshal.FreeHGlobal(ptrFromOurInput);
-            Marshal.FreeHGlobal(ptrToAgent);
-            Marshal.FreeHGlobal(ptrWithOutput);
-            return result;
-        }
-
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void igs_mapping_set_outputs_request(bool notify);
-        /// <summary>
-        /// When mapping other agents, it is possible to request the
-        /// mapped agents to send us their current output values
-        /// through a private communication for our proper initialization.
-        /// By default, this behavior is disabled. 
-        /// </summary>
-        public static void MappingSetOutputsRequest(bool notify) { igs_mapping_set_outputs_request(notify); }
-
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.I1)]
-        private static extern bool igs_mapping_outputs_request();
-        public static bool MappingOutputsRequest() { return Convert.ToBoolean(igs_mapping_outputs_request()); }
-        #endregion
-
-        #region Services edition & inspection
-        // Callback model to handle services received by our agent
+        //services arguments
         [StructLayout(LayoutKind.Explicit)]
         internal struct UnionServiceArgument
         {
@@ -1407,7 +1233,6 @@ namespace Ingescape
             public IntPtr data;
         }
 
-        // Service arguments are provided as a chained list
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         internal struct StructServiceArgument
         {
@@ -1445,9 +1270,8 @@ namespace Ingescape
             return newServiceArguments;
         }
 
-        // Call a service to another agent
-        // requires to pass agent name or UUID, service name and a list of arguments
-        // passed arguments list will be deallocated and destroyed
+        #region call a service hosted by another agent
+        
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern Result igs_service_call(IntPtr agentNameOrUUID,
                                                IntPtr serviceName,
@@ -1459,6 +1283,15 @@ namespace Ingescape
                                                IntPtr serviceName,
                                                IntPtr list, IntPtr token);
 
+        /// <summary>
+        /// Requires to pass an agent name or UUID, a service name and a list of arguments specific to the service.<br />
+        /// Token is an optional information to help routing replies.<br />
+        /// </summary>
+        /// <param name="agentNameOrUUID"></param>
+        /// <param name="serviceName"></param>
+        /// <param name="arguments"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public static Result ServiceCall(string agentNameOrUUID, string serviceName, object[] arguments, string token = "")
         {
             IntPtr agentNameOrUUIDAsPtr = StringToUTF8Ptr(agentNameOrUUID);
@@ -1512,6 +1345,9 @@ namespace Ingescape
             Marshal.FreeHGlobal(tokenAsPtr);
             return success;
         }
+        #endregion
+
+        #region create /remove / edit a service offered by our agent
 
         private static ServiceFunctionC _OnServiceCallback;
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -1545,6 +1381,14 @@ namespace Ingescape
         private static extern Result igs_service_init(IntPtr name,
                                                [MarshalAs(UnmanagedType.FunctionPtr)] ServiceFunctionC cb,
                                                IntPtr myData);
+        /// <summary>
+        /// WARNING: only one callback shall be attached to a service
+        /// (further attempts will be ignored and signaled by an error log).*/
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="callback"></param>
+        /// <param name="myData"></param>
+        /// <returns></returns>
         public static Result ServiceInit(string name, ServiceFunction callback, object myData)
         {
             Tuple<ServiceFunction, object> tupleData = new Tuple<ServiceFunction, object>(callback, myData);
@@ -1593,10 +1437,10 @@ namespace Ingescape
             Marshal.FreeHGlobal(argNameAsPtr);
             return res;
         }
+        #endregion
 
-        ///<summary>
-        /////replies are optional and used for specification purposes
-        ///</summary>
+        #region replies are optional and used for specification purposes
+
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern Result igs_service_reply_add(IntPtr serviceName, IntPtr replyName);
         public static Result ServiceReplyAdd(string serviceName, string replyName)
@@ -1648,8 +1492,10 @@ namespace Ingescape
             Marshal.FreeHGlobal(argNameAsPtr);
             return res;
         }
+        #endregion
 
-        // Introspection for services, arguments and replies
+        #region introspection for services, their arguments and optional replies
+
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern uint igs_service_count();
         public static uint ServiceCount() { return igs_service_count(); }
@@ -1910,7 +1756,633 @@ namespace Ingescape
         }
         #endregion
 
+        #endregion
+
+            #region Attributes edition & inspection
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_attribute_create(IntPtr name, IopValueType type, IntPtr value, uint size);
+
+        /// <summary>
+        /// Attributes are very similar to IOs, except that they are not exposed
+        /// to other agents.They are not usable in mappings. <br />
+        /// Attributes are used to expose internal variables into agents, which are
+        /// included in their definition.Attributes generally describe key variables
+        /// in an agent, which affect the internal behavior of the agent.<br />
+        /// NOTE: Attributes used to be named parameters in older versions.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="type"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static Result AttributeCreate(string name, IopValueType type, object value = null)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            if (value != null)
+            {
+                uint size;
+                IntPtr valuePtr;
+                if (value.GetType() == typeof(string))
+                    valuePtr = StringToUTF8Ptr(Convert.ToString(value), out size);
+                else if (value.GetType() == typeof(bool))
+                    valuePtr = BoolToPtr(Convert.ToBoolean(value), out size);
+                else if (value.GetType() == typeof(byte[]))
+                    valuePtr = DataToPtr((byte[])value, out size);
+                else if (value.GetType() == typeof(double))
+                    valuePtr = DoubleToPtr(Convert.ToDouble(value), out size);
+                else if (value.GetType() == typeof(float))
+                    valuePtr = DoubleToPtr(Convert.ToDouble(value), out size);
+                else if (value.GetType() == typeof(int))
+                    valuePtr = IntToPtr(Convert.ToInt32(value), out size);
+                else
+                    return Result.Failure;
+                Result res = igs_attribute_create(nameAsPtr, type, valuePtr, size);
+                Marshal.FreeHGlobal(nameAsPtr);
+                Marshal.FreeHGlobal(valuePtr);
+                return res;
+            }
+            else
+            {
+                Result res = igs_attribute_create(nameAsPtr, type, IntPtr.Zero, 0);
+                Marshal.FreeHGlobal(nameAsPtr);
+                return res;
+            }
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_attribute_remove(IntPtr name);
+
+        /// <summary>
+        /// <inheritdoc cref="AttributeCreate"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static Result AttributeRemove(string name)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            Result res = igs_attribute_remove(nameAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            return res;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IopValueType igs_attribute_type(IntPtr name);
+
+        /// <summary>
+        /// <inheritdoc cref="AttributeCreate"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static IopValueType AttributeType(string name)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            IopValueType type = igs_attribute_type(nameAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            return type;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int igs_attribute_count();
+
+        /// <summary>
+        /// <inheritdoc cref="AttributeCreate"/>
+        /// </summary>
+        /// <returns></returns>
+        public static int AttributeCount() { return igs_attribute_count(); }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr igs_attribute_list(ref int nbOfElements);
+
+        /// <summary>
+        /// <inheritdoc cref="AttributeCreate"/>
+        /// </summary>
+        /// <returns></returns>
+        public static string[] AttributeList()
+        {
+            int nbOfElements = 0;
+            string[] list = null;
+            IntPtr intptr = igs_attribute_list(ref nbOfElements);
+            if (intptr != IntPtr.Zero)
+            {
+                IntPtr[] intPtrArray = new IntPtr[nbOfElements];
+                list = new string[nbOfElements];
+                Marshal.Copy(intptr, intPtrArray, 0, nbOfElements);
+                for (int i = 0; i < nbOfElements; i++)
+                    list[i] = Marshal.PtrToStringAnsi(intPtrArray[i]);
+                Igs.igs_free_io_list(intptr, nbOfElements);
+            }
+            return list;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
+        private static extern bool igs_attribute_exists(IntPtr name);
+
+        /// <summary>
+        /// <inheritdoc cref="AttributeCreate"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static bool AttributeExists(string name)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            bool value = igs_attribute_exists(nameAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            return value;
+        }
+
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
+        private static extern bool igs_attribute_bool(IntPtr name);
+
+        /// <summary>
+        /// <inheritdoc cref="AttributeCreate"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static bool AttributeBool(string name)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            bool value = igs_attribute_bool(nameAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            return value;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int igs_attribute_int(IntPtr name);
+
+        /// <summary>
+        /// <inheritdoc cref="AttributeCreate"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static int AttributeInt(string name)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            int value = igs_attribute_int(nameAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            return value;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern double igs_attribute_double(IntPtr name);
+
+        /// <summary>
+        /// <inheritdoc cref="AttributeCreate"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static double AttributeDouble(string name)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            double value = igs_attribute_double(nameAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            return value;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr igs_attribute_string(IntPtr name);
+
+        /// <summary>
+        /// <inheritdoc cref="AttributeCreate"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static string AttributeString(string name)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            IntPtr valueAsPtr = igs_attribute_string(nameAsPtr);
+            string value = PtrToStringFromUTF8(valueAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            return value;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_attribute_data(IntPtr name, ref IntPtr data, ref uint size);
+
+        /// <summary>
+        /// <inheritdoc cref="AttributeCreate"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static byte[] AttributeData(string name)
+        {
+            uint size = 0;
+            byte[] data = null;
+            IntPtr ptr = IntPtr.Zero;
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            Result result = igs_attribute_data(nameAsPtr, ref ptr, ref size);
+            Marshal.FreeHGlobal(nameAsPtr);
+            if (result == Result.Success)
+            {
+                data = new byte[size];
+                if (ptr != IntPtr.Zero)
+                    Marshal.Copy(ptr, data, 0, (int)size);
+            }
+            return data;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_attribute_set_bool(IntPtr name, bool value);
+
+        /// <summary>
+        /// <inheritdoc cref="AttributeCreate"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static Result AttributeSetBool(string name, bool value)
+        {
+            Result result = Result.Failure;
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            result = igs_attribute_set_bool(nameAsPtr, value);
+            Marshal.FreeHGlobal(nameAsPtr);
+            return result;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_attribute_set_int(IntPtr name, int value);
+
+        /// <summary>
+        /// <inheritdoc cref="AttributeCreate"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static Result AttributeSetInt(string name, int value)
+        {
+            Result result = Result.Failure;
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            result = igs_attribute_set_int(nameAsPtr, value);
+            Marshal.FreeHGlobal(nameAsPtr);
+            return result;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_attribute_set_double(IntPtr name, double value);
+        /// <summary>
+        /// <inheritdoc cref="AttributeCreate"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static Result AttributeSetDouble(string name, double value)
+        {
+            Result result = Result.Failure;
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            result = igs_attribute_set_double(nameAsPtr, value);
+            Marshal.FreeHGlobal(nameAsPtr);
+            return result;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_attribute_set_string(IntPtr name, IntPtr value);
+
+        /// <summary>
+        /// <inheritdoc cref="AttributeCreate"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static Result AttributeSetString(string name, string value)
+        {
+            Result result = Result.Failure;
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            IntPtr valueAsPtr = StringToUTF8Ptr(value);
+            result = igs_attribute_set_string(nameAsPtr, valueAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            Marshal.FreeHGlobal(valueAsPtr);
+            return result;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_attribute_set_data(IntPtr name, IntPtr value, uint size);
+
+        /// <summary>
+        /// <inheritdoc cref="AttributeCreate"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static Result AttributeSetData(string name, byte[] value)
+        {
+            Result result = Result.Failure;
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            uint size = Convert.ToUInt32(((byte[])value).Length);
+            IntPtr valueAsPtr = Marshal.AllocHGlobal((int)size);
+            Marshal.Copy(value, 0, valueAsPtr, (int)size);
+            result = igs_attribute_set_data(nameAsPtr, valueAsPtr, size);
+            Marshal.FreeHGlobal(nameAsPtr);
+            Marshal.FreeHGlobal(valueAsPtr);
+            return result;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_attribute_add_constraint(IntPtr name, IntPtr constraint);
+
+        /// <summary>
+        /// <inheritdoc cref="AttributeCreate"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="constraint"></param>
+        /// <returns></returns>
+        public static Result AttributeAddConstraint(string name, string constraint)
+        {
+            Result result = Result.Failure;
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            IntPtr constraintAsPtr = StringToUTF8Ptr(constraint);
+            result = igs_attribute_add_constraint(nameAsPtr, constraintAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            Marshal.FreeHGlobal(constraintAsPtr);
+            return result;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_attribute_set_description(IntPtr name, IntPtr description);
+
+        /// <summary>
+        /// <inheritdoc cref="AttributeCreate"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="description"></param>
+        public static Result AttributeSetDescription(string name, string description)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            IntPtr descriptionAsPtr = StringToUTF8Ptr(description);
+            Result res = igs_attribute_set_description(nameAsPtr, descriptionAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            Marshal.FreeHGlobal(descriptionAsPtr);
+            return res;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_attribute_set_detailed_type(IntPtr paramName, IntPtr typeName, IntPtr specification);
+
+        /// <summary>
+        /// <inheritdoc cref="AttributeCreate"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="description"></param>
+        public static Result AttributeSetDetailedType(string paramName, string typeName, string specification)
+        {
+            IntPtr paramNameAsPtr = StringToUTF8Ptr(paramName);
+            IntPtr typeAsPtr = StringToUTF8Ptr(typeName);
+            IntPtr specificationAsPtr = StringToUTF8Ptr(specification);
+            Result res = igs_attribute_set_detailed_type(paramNameAsPtr, typeAsPtr, specificationAsPtr);
+            Marshal.FreeHGlobal(paramNameAsPtr);
+            Marshal.FreeHGlobal(typeAsPtr);
+            Marshal.FreeHGlobal(specificationAsPtr);
+            return res;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void igs_clear_attribute(IntPtr name);
+
+        /// <summary>
+        /// <inheritdoc cref="AttributeCreate"/>
+        /// </summary>
+        /// <param name="name"></param>
+        public static void ClearAttribute(string name)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            igs_clear_attribute(nameAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void igs_observe_attribute(IntPtr name, IopFunctionC cb, IntPtr myData);
+
+        /// <summary>
+        /// <inheritdoc cref="AttributeCreate"/>
+        /// </summary>
+        /// <param name="ParameterName"></param>
+        /// <param name="callback"></param>
+        /// <param name="myData"></param>
+        public static void ObserveAttribute(string ParameterName, IopFunction callback, object myData)
+        {
+            Tuple<IopFunction, object> tupleData = new Tuple<IopFunction, object>(callback, myData);
+            GCHandle gCHandle = GCHandle.Alloc(tupleData);
+            IntPtr data = GCHandle.ToIntPtr(gCHandle);
+
+            if (_OnIOPCallback == null)
+                _OnIOPCallback = OnIOPCallback;
+
+            IntPtr nameAsPtr = StringToUTF8Ptr(ParameterName);
+            igs_observe_attribute(nameAsPtr, _OnIOPCallback, data);
+            Marshal.FreeHGlobal(nameAsPtr);
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Mapping edition & inspection
+
+            #region load / set / get mapping
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_mapping_load_str(IntPtr json_str);
+        public static Result MappingLoadStr(string json_str)
+        {
+            IntPtr jsonAsPtr = StringToUTF8Ptr(json_str);
+            Result res = igs_mapping_load_str(jsonAsPtr);
+            Marshal.FreeHGlobal(jsonAsPtr);
+            return res;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_mapping_load_file(IntPtr file_path);
+        public static Result MappingLoadFile(string file_path)
+        {
+            IntPtr pathAsPtr = StringToUTF8Ptr(file_path);
+            Result res = igs_mapping_load_file(pathAsPtr);
+            Marshal.FreeHGlobal(pathAsPtr);
+            return res;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr igs_mapping_json();
+        public static string MappingJson()
+        {
+            IntPtr ptr = igs_mapping_json();
+            return (ptr == IntPtr.Zero) ? string.Empty : Marshal.PtrToStringAnsi(ptr);
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern uint igs_mapping_count();
+
+        /// <summary>
+        /// number of entries in the mapping output type
+        /// </summary>
+        /// <returns></returns>
+        public static uint MappingCount() { return igs_mapping_count(); }
+
+        #endregion
+
+            #region clear Mappings
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void igs_clear_mappings();
+
+        /// <summary>
+        /// clears all our mappings with all agents
+        /// </summary>
+        public static void ClearMappings() { igs_clear_mappings(); }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void igs_clear_mappings_with_agent(IntPtr agentName);
+
+        /// <summary>
+        /// clears our mappings with this agent
+        /// </summary>
+        /// <param name="agentName"></param>
+        public static void ClearMappingsWithAgent(string agentName)
+        {
+            IntPtr ptrAgentName = StringToUTF8Ptr(agentName);
+            igs_clear_mappings_with_agent(ptrAgentName);
+            Marshal.FreeHGlobal(ptrAgentName);
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void igs_clear_mappings_for_input(IntPtr inputName);
+
+        /// <summary>
+        /// clear all mappings for this input
+        /// </summary>
+        /// <param name="inputName"></param>
+        public static void ClearMappingsForInput(string inputName)
+        {
+            IntPtr ptrInputName = StringToUTF8Ptr(inputName);
+            igs_clear_mappings_for_input(ptrInputName);
+            Marshal.FreeHGlobal(ptrInputName);
+        }
+
+        #endregion
+
+            #region edit mappings
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern ulong igs_mapping_add(IntPtr fromOurInput, IntPtr toAgent, IntPtr withOutput);
+
+        /// <summary>
+        /// returns mapping id or zero if creation failed
+        /// </summary>
+        /// <param name="fromOurInput"></param>
+        /// <param name="toAgent"></param>
+        /// <param name="withOutput"></param>
+        /// <returns></returns>
+        public static ulong MappingAdd(string fromOurInput, string toAgent, string withOutput)
+        {
+            IntPtr fromOurInputAsPtr = StringToUTF8Ptr(fromOurInput);
+            IntPtr toAgentAsPtr = StringToUTF8Ptr(toAgent);
+            IntPtr withOutputAsPtr = StringToUTF8Ptr(withOutput);
+            ulong id = igs_mapping_add(fromOurInputAsPtr, toAgentAsPtr, withOutputAsPtr);
+            Marshal.FreeHGlobal(fromOurInputAsPtr);
+            Marshal.FreeHGlobal(toAgentAsPtr);
+            Marshal.FreeHGlobal(withOutputAsPtr);
+            return id;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_mapping_remove_with_id(ulong theId);
+        public static Result MappingRemoveWithId(ulong theId) { return igs_mapping_remove_with_id(theId); }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_mapping_remove_with_name(IntPtr fromOurInput, IntPtr toAgent, IntPtr withOutput);
+        public static Result MappingRemoveWithName(string fromOurInput, string toAgent, string withOutput)
+        {
+            IntPtr fromOurInputAsPtr = StringToUTF8Ptr(fromOurInput);
+            IntPtr toAgentAsPtr = StringToUTF8Ptr(toAgent);
+            IntPtr withOutputAsPtr = StringToUTF8Ptr(withOutput);
+            Result res = igs_mapping_remove_with_name(fromOurInputAsPtr, toAgentAsPtr, withOutputAsPtr);
+            Marshal.FreeHGlobal(fromOurInputAsPtr);
+            Marshal.FreeHGlobal(toAgentAsPtr);
+            Marshal.FreeHGlobal(withOutputAsPtr);
+            return res;
+        }
+
+        #endregion
+
+            #region edit splits
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern uint igs_split_count();
+
+        /// <summary>
+        /// number of splits entries
+        /// </summary>
+        /// <returns></returns>
+        public static uint SplitCount() { return igs_split_count(); }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern ulong igs_split_add(IntPtr fromOurInput, IntPtr toAgent, IntPtr withOutput);
+
+        /// <summary>
+        /// returns split id or zero if creation failed
+        /// </summary>
+        /// <param name="fromOurInput"></param>
+        /// <param name="toAgent"></param>
+        /// <param name="withOutput"></param>
+        /// <returns></returns>
+        public static ulong SplitAdd(string fromOurInput, string toAgent, string withOutput)
+        {
+            IntPtr ptrFromOurInput = StringToUTF8Ptr(fromOurInput);
+            IntPtr ptrToAgent = StringToUTF8Ptr(toAgent);
+            IntPtr ptrWithOutput = StringToUTF8Ptr(withOutput);
+            ulong result = igs_split_add(ptrFromOurInput, ptrToAgent, ptrWithOutput);
+            Marshal.FreeHGlobal(ptrFromOurInput);
+            Marshal.FreeHGlobal(ptrToAgent);
+            Marshal.FreeHGlobal(ptrWithOutput);
+            return result;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_split_remove_with_id(ulong id);
+        public static Result SplitRemoveWithId(ulong id) { return igs_split_remove_with_id(id); }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_split_remove_with_name(IntPtr fromOurInput, IntPtr toAgent, IntPtr withOutput);
+        public static Result SplitRemoveWithName(string fromOurInput, string toAgent, string withOutput)
+        {
+            IntPtr ptrFromOurInput = StringToUTF8Ptr(fromOurInput);
+            IntPtr ptrToAgent = StringToUTF8Ptr(toAgent);
+            IntPtr ptrWithOutput = StringToUTF8Ptr(withOutput);
+            Result result = igs_split_remove_with_name(ptrFromOurInput, ptrToAgent, ptrWithOutput);
+            Marshal.FreeHGlobal(ptrFromOurInput);
+            Marshal.FreeHGlobal(ptrToAgent);
+            Marshal.FreeHGlobal(ptrWithOutput);
+            return result;
+        }
+
+        #endregion
+
+            #region mapping other agents
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void igs_mapping_set_outputs_request(bool notify);
+        /// <summary>
+        /// When mapping other agents, it is possible to request the
+        /// mapped agents to send us their current output values
+        /// through a private communication for our proper initialization.
+        /// By default, this behavior is disabled. 
+        /// </summary>
+        public static void MappingSetOutputsRequest(bool notify) { igs_mapping_set_outputs_request(notify); }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
+        private static extern bool igs_mapping_outputs_request();
+
+        /// <summary>
+        /// <inheritdoc cref="MappingSetOutputsRequest"/>
+        /// </summary>
+        /// <returns></returns>
+        public static bool MappingOutputsRequest() { return Convert.ToBoolean(igs_mapping_outputs_request()); }
+        #endregion
+
+        #endregion
+
         #region  Timers 
+
         private static TimerFunctionC _OnTimer;
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate void TimerFunctionC(int timerId, IntPtr myData);
@@ -1928,9 +2400,10 @@ namespace Ingescape
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_timer_start(UIntPtr delay, UIntPtr times, TimerFunctionC cb, IntPtr myData);
         /// <summary>
-        //Timers can be created to call code a certain number of times,
-        //each time after a certain delay. 0 times means repeating forever.
-        //Timers must be created after starting an agent.
+        /// Timers can be created to call code a certain number of times,
+        /// each time after a certain delay. 0 times means repeating forever.<br />
+        /// Delay is expressed in milliseconds.<br />
+        /// WARNING: Timers MUST be created after starting an agent.<br />
         /// </summary>
         public static int TimerStart(uint delay, uint times, TimerFunction cbsharp, object myData)
         {
@@ -1950,10 +2423,18 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_timer_stop(int timerId);
+
+        /// <summary>
+        /// <inheritdoc cref="TimerStart"/>
+        /// </summary>
+        /// <param name="timerId"></param>
         public static void TimerStop(int timerId) { igs_timer_stop(timerId); }
+
         #endregion
 
         #region Communicating via channels (a.k.a Zyre groups and peers)
+
+            #region send message to a channel
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern Result igs_channel_shout_str(IntPtr channel, IntPtr msg);
         public static Result ChannelShout(string channel, string msg) 
@@ -1980,9 +2461,19 @@ namespace Ingescape
             Marshal.FreeHGlobal(dataPtr);
             return result;
         }
+        #endregion
 
+            #region send a message to an agent by name or by uuid
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern Result igs_channel_whisper_str(IntPtr agentNameOrUUID, IntPtr msg);
+        /// <summary>
+        /// send a message to an agent by name or by uuid <br />
+        /// NB: peer ids and names are also supported by these functions but are used only if no agent is found first<br />
+        /// NB: if several agents share the same name, all will receive the message if addressed by name<br />
+        /// </summary>
+        /// <param name="agentNameOrUUID"></param>
+        /// <param name="msg"></param>
+        /// <returns></returns>
         public static Result ChannelWhisper(string agentNameOrUUID, string msg)
         {
             Result result;
@@ -1996,6 +2487,13 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern Result igs_channel_whisper_data(IntPtr agentNameOrUUID, IntPtr msg, uint size);
+
+        /// <summary>
+        /// <inheritdoc cref="ChannelWhisper"/>
+        /// </summary>
+        /// <param name="agentNameOrUUID"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public static Result ChannelWhisper(string agentNameOrUUID, byte[] data)
         {
             Result result;
@@ -2007,7 +2505,9 @@ namespace Ingescape
             Marshal.FreeHGlobal(dataPtr);
             return result;
         }
+        #endregion
 
+            #region set zyre headers
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern Result igs_peer_add_header(IntPtr key, IntPtr value);
         public static Result PeerAddHeader(string key, string value)
@@ -2033,39 +2533,42 @@ namespace Ingescape
         }
         #endregion
 
+        #endregion
+
         #region BROKERS VS. SELF-DISCOVERY
+
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern Result igs_broker_add(IntPtr brokerEndpoint);
         /// <summary>
-        /// igs_start_with_device and igs_start_with_ip enable the agents to self-discover
+        /// <para>igs_start_with_device and igs_start_with_ip enable the agents to self-discover
         /// using UDP broadcast messages on the passed port.UDP broadcast messages can
         /// be blocked on some networks and can make things complex on networks with
-        /// sub-networks.
+        /// sub-networks.<br />
         /// That is why ingescape also supports the use of brokers to relay discovery
         /// using TCP connections.Any agent can be a broker and agents using brokers
         /// simply have to use a list of broker endpoints.One broker is enough but
-        /// several brokers can be set for robustness.
+        /// several brokers can be set for robustness.</para>
         /// 
-        /// For clarity, it is better if brokers are well identified on your platform,
+        /// <para>For clarity, it is better if brokers are well identified on your platform,
         /// started before any agent, and serve only as brokers.But any other architecture
-        /// is permitted and brokers can be restarted at any time.
+        /// is permitted and brokers can be restarted at any time.</para>
         /// 
-        /// Endpoints have the form tcp://ip_address:port
+        /// <para>Endpoints have the form tcp://ip_address:port<br />
         /// • igs_brokers_add is used to add brokers to connect to.Add
         /// as many brokers as you want.At least one declared broker is necessary to
         /// use igs_start_with_brokers. Use igs_clear_brokers to remove all the current
-        /// brokers.
+        /// brokers.<br />
         ///  • The endpoint in igs_broker_set_endpoint is the broker address we should be reached
         /// at as a broker if we want to be one.Using igs_broker_set_endpoint makes us a broker
-        /// when starting.
+        /// when starting.<br />
         /// • The endpoint in igs_broker_set_advertized_endpoint replaces the one declared in
         /// igs_start_with_brokers for the registration to the brokers.This function enables
         /// passing through NAT and using a public address.Attention: this public address
         ///  shall make sense to all the agents that will connect to us, independently from
-        /// their local network.
+        /// their local network.<br />
         /// • Our agent endpoint in igs_start_with_brokers gives the address and port our
         /// agent can be reached at.This endpoint must be valid in the actual network
-        /// configuration.*/
+        /// configuration.</para>
         /// </summary>
         public static Result BrokerAdd(string brokerEndpoint)
         {
@@ -2077,10 +2580,18 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_clear_brokers();
+
+        /// <summary>
+        /// <inheritdoc cref="BrokerAdd"/>
+        /// </summary>
         public static void ClearBrokers() { igs_clear_brokers(); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_broker_enable_with_endpoint(IntPtr ourBrokerEndpoint);
+
+        /// <summary>
+        /// <inheritdoc cref="BrokerAdd"/>
+        /// </summary>
         public static void BrokerEnableWithEndpoint(string ourBrokerEndpoint)
         {
             IntPtr ourBrokerEndpointAsPtr = StringToUTF8Ptr(ourBrokerEndpoint);
@@ -2090,15 +2601,29 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_broker_set_advertized_endpoint(IntPtr advertisedEndpoint);
+
+        /// <summary>
+        /// <inheritdoc cref="BrokerAdd"/>
+        /// </summary>
+        /// <param name="advertisedEndpoint"> can be null</param>
         public static void BrokerSetAdvertizedEndpoint(string advertisedEndpoint)
         {
-            IntPtr advertisedEndpointAsPtr = StringToUTF8Ptr(advertisedEndpoint);
-            igs_broker_set_advertized_endpoint(advertisedEndpointAsPtr);
-            Marshal.FreeHGlobal(advertisedEndpointAsPtr);
+            if (advertisedEndpoint == null)
+                igs_broker_set_advertized_endpoint(IntPtr.Zero);
+            else
+            {
+                IntPtr advertisedEndpointAsPtr = StringToUTF8Ptr(advertisedEndpoint);
+                igs_broker_set_advertized_endpoint(advertisedEndpointAsPtr);
+                Marshal.FreeHGlobal(advertisedEndpointAsPtr);
+            }
         }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern Result igs_start_with_brokers(IntPtr agentEndpoint);
+
+        /// <summary>
+        /// <inheritdoc cref="BrokerAdd"/>
+        /// </summary>
         public static Result StartWithBrokers(string agentEndpoint)
         {
             IntPtr agentEndpointAsPtr = StringToUTF8Ptr(agentEndpoint);
@@ -2106,30 +2631,32 @@ namespace Ingescape
             Marshal.FreeHGlobal(agentEndpointAsPtr);
             return res;
         }
+
         #endregion
 
-        #region  Security : identity, end-to-end encryption        
+        #region  Security : identity, end-to-end encryption
+
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern Result igs_enable_security(IntPtr privateKeyFile, IntPtr publicKeysDirectory);
         /// <summary>
-        /// Security is about authentification of other agents and encrypted communications.
+        /// <para>Security is about authentification of other agents and encrypted communications.
         ///  Both are offered by Ingescape using a public/private keys mechanism relying on ZeroMQ.
-        ///  Security is activated optionally.
+        ///  Security is activated optionally.<br />
         ///  • If public/private keys are generated on the fly, one obtains the same protection as TLS
         ///  for HTTPS communications.Thirdparties cannot steal identities and communications are
-        ///  encrypted end-to-end.But any Ingescape agent with security enabled can join a platform.
+        ///  encrypted end-to-end.But any Ingescape agent with security enabled can join a platform.<br />
         ///  • If public/private keys are stored locally by each agent, no thirdparty can join a platform
         ///  without having a public key that is well-known by the other agents.This is safer but requires
         /// securing and synchronizing local files with each agent accessing its private key and public
-        /// keys of other agents.
+        /// keys of other agents.</para>
         /// 
-        /// Security is enabled by calling igs_enable_security.
+        /// <para>Security is enabled by calling igs_enable_security.<br />
         ///  • If privateKey is null, our private key is generated on the fly and any agent with
-        ///  security enabled will be able to connect, publicKeysDirectory will be ignored.
+        ///  security enabled will be able to connect, publicKeysDirectory will be ignored.<br />
         ///  • If privateKey is NOT null, private key at privateKey path will be used and only
-        ///  agents whose public keys are in publicKeysDirectory will be able to connect.
+        ///  agents whose public keys are in publicKeysDirectory will be able to connect.<br />
         ///  NB: if privateKey is NOT null and publicKeysDirectory is null or does not exist,
-        ///  security will not be enabled and our agent will not start.
+        ///  security will not be enabled and our agent will not start.</para>
         /// </summary>
         public static Result EnableSecurity(string privateKeyFile, string publicKeysDirectory)
         {
@@ -2143,10 +2670,18 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_disable_security();
+
+        /// <summary>
+        /// <inheritdoc cref="EnableSecurity"/>
+        /// </summary>
         public static void DisableSecurity() { igs_disable_security(); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern Result igs_broker_add_secure(IntPtr brokerEndpoint, IntPtr publicKeyPath);
+
+        /// <summary>
+        /// <inheritdoc cref="EnableSecurity"/>
+        /// </summary>
         public static Result BrokerAddSecure(string brokerEndpoint, string publicKeyPath)
         {
             IntPtr brokerEndpointAsPtr = StringToUTF8Ptr(brokerEndpoint);
@@ -2156,25 +2691,33 @@ namespace Ingescape
             Marshal.FreeHGlobal(publicKeyPathAsPtr);
             return res;
         }
+
         #endregion
 
-        #region Elections and leadership between agents 
+        #region Elections and leadership between agents
+
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern Result igs_election_join(IntPtr electionName);
         /// <summary>
-        /// Create named contests between agents and designate a leader, as soon as they
-        /// are two or more.
-        ///  • AgentWonElection means that the election is over and this agent has WON
-        ///  • AgentLostElection means that the election is over and this agent has LOST
-        ///  • When only one agent participates in an election, the election does not happen.
-        ///  • When only one agent remains for an election, the election does not happen.
-        /// At startup, this means that developers must either start their agents as
-        /// 
-        /// leaders or wait a reasonable amount of time for an election to happen.
-        /// 
-        /// During runtime, this means that developers shall rely on AgentExited
-        /// events to check if they suddenly are alone in an election and thus shall
-        /// become leaders.
+        /// Create named elections between agents and designate a winner,
+        ///  as soon as they are two agents or more participating.<br />
+        ///  • AgentWonElection agent event means that the election is over and this agent has WON<br />
+        ///  • AgentLostElection agent event means that the election is over and this agent has LOST<br />
+        ///  • The election happens only when at least two agents participate.<br />
+        /// Nothing happens if only one agent participates.<br />
+        ///  • When only one agent remains in an election after several have
+        /// joined and left, it is declared winner.<br />
+        /// At startup, it is up to the developer to decide if an agent shall be
+        /// considered as winner or wait for a certain amount of time to trigger
+        /// some behavior.Do not forget that elections take at least some
+        /// millisconds to be concluded.<br />
+        /// Agents in the same peer cannot compete one with another. Elections are
+        /// reserved to agents running on separate peers/processes.If several
+        /// agents in the same peer participate in the same election, they will
+        /// all be declared winners or losers all together.<br />
+        /// The AgentWonElection and AgentLostElection agent events
+        /// can be triggered MULTIPLE TIMES in a row. Please adjust your agent
+        /// behavior accordingly.<br />
         /// </summary>
         public static Result ElectionJoin(string electionName)
         {
@@ -2186,6 +2729,12 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern Result igs_election_leave(IntPtr electionName);
+
+        /// <summary>
+        /// <inheritdoc cref="ElectionJoin"/>
+        /// </summary>
+        /// <param name="electionName"></param>
+        /// <returns></returns>
         public static Result ElectionLeave(string electionName)
         {
             IntPtr electionNameAsPtr = StringToUTF8Ptr(electionName);
@@ -2193,14 +2742,23 @@ namespace Ingescape
             Marshal.FreeHGlobal(electionNameAsPtr);
             return res;
         }
+
         #endregion
 
         #region Ingescape real-time communications
 
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int igs_rt_get_current_timestamp();
+            #region GET TIMESTAMP FOR RECEIVED INPUTS AND SERVICES
+
         /// <summary>
-        /// GET TIMESTAMP FOR RECEIVED INPUTS AND SERVICES
+        /// Ingescape is a reactive communication library but it is capable to
+        /// handle soft real-time communications and provides functions dedicated
+        /// to time management with or without a master clock involved.
+        /// </summary>
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]        
+        private static extern int igs_rt_get_current_timestamp();
+
+        /// <summary>
+        /// <inheritdoc cref="igs_rt_get_current_timestamp"/> <br />
         /// When observing an input or a service, call this function inside the callback
         /// to get the current timestamp in microseconds for the received information.
         /// NB: if timestamp is not available in received input or service, current
@@ -2208,11 +2766,14 @@ namespace Ingescape
         /// </summary>
         public static int RtGetCurrentTimestamp() { return igs_rt_get_current_timestamp(); }
 
+        #endregion
+
+            #region ENABLE TIMESTAMPS IN OUR AGENT FOR PUBLISHED OUTPUTS AND SERVICE CALLS
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_rt_set_timestamps(bool enable);
         /// <summary>
-        /// ENABLE TIMESTAMPS IN OUR AGENT FOR PUBLISHED OUTPUTS AND SERVICE CALLS
+        /// <inheritdoc cref="igs_rt_get_current_timestamp"/> <br />
         /// When timestamps are enabled, every output publication and every service call
         /// carry an additional information providing the timestamp of the message on
         /// the sender side. On the receiver side, timestamp is obtained by calling
@@ -2221,18 +2782,26 @@ namespace Ingescape
         public static void RtSetTimestamps(bool enable) { igs_rt_set_timestamps(enable); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igs_rt_timestamps();
-        public static bool RtTimestamps() { return igs_rt_timestamps(); }
 
+        /// <summary>
+        /// <inheritdoc cref="RtSetTimestamps"/>
+        /// </summary>
+        /// <returns></returns>
+        public static bool RtTimestamps() { return igs_rt_timestamps(); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_rt_set_time(int microseconds);
+        #endregion
+
+            #region SET TIME MANUALLY FOR TIMESTAMPED PUBLISHED OUTPUTS AND SERVICES
 
         /// <summary>
-        /// SET TIME MANUALLY FOR TIMESTAMPED PUBLISHED OUTPUTS AND SERVICES
+        /// <inheritdoc cref="igs_rt_get_current_timestamp"/> <br />
         /// When a master clock is involed(e.g.linked to an input of an agent), it
         /// is possible to override the automatic timestamp mechanism to force a value
-        /// for the current time in microseconds.
+        /// for the current time in microseconds.<br />
         /// Once igs_rt_set_time has been called, it is necessary to continue calling it
         /// periodically and manually to update the agent's current time in microseconds.
         /// NB : a call to igs_rt_set_time autmatically enables timestamps for outputs
@@ -2244,22 +2813,59 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_rt_time();
+
+        /// <summary>
+        /// <inheritdoc cref="RtSetTime"/>
+        /// </summary>
+        /// <returns></returns>
         public static int RtTime() { return igs_rt_time(); }
+
+        #endregion
+
+            #region ENABLE SYNCHRONOUS MODE
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void igs_rt_set_synchronous_mode(bool enable);
+
+        /// <summary>
+        /// <inheritdoc cref="igs_rt_get_current_timestamp"/> <br />
+        /// When this mode is enabled, outputs are published only when igs_rt_set_time
+        /// is called.The call to igs_rt_set_time is the trigger for output publication
+        /// in this synchronous real-time mode.All published outputs are timestamped
+        /// with the value set by igs_rt_set_time.<br />
+        /// NB: Ingescape services and channels are not affected by the synchronous mode.<br />
+        /// NB: This mode is set at agent level.
+        /// </summary>
+        public static void RtSetSynchronousMode(bool enable) { igs_rt_set_synchronous_mode(enable); }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
+        private static extern bool igs_rt_synchronous_mode();
+
+        /// <summary>
+        /// <inheritdoc cref="RtSetSynchronousMode"/>
+        /// </summary>
+        /// <returns></returns>
+        public static bool RtSynchronousMode() { return igs_rt_synchronous_mode(); }
+        #endregion
+
         #endregion
 
         #region Administration, logging, configuration and utilities
 
-        #region LOG ALIASES
+            #region LOG ALIASES
+
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_log(LogLevel logLevel, IntPtr function, IntPtr message);
+
         /// <summary>
-        /// Logs policy
-        ///  - Fatal : Events that force application termination.
-        ///  - Error : Events that are Fatal to the current operation but not the whole application.
-        ///  - warning : Events that can potentially cause application anomalies but that can be recovered automatically(by circumventing or retrying).
-        ///  - Info : Generally useful information to Log(service start/Stop, configuration assumptions, etc.).
-        ///  - Debug : Information that is diagnostically helpful to people more than just developers but useless for system monitoring.
-        ///  - Trace : Information about parts of functions, for detailed diagnostic only.
+        /// LOGS POLICY <br />
+        /// - fatal : Events that force application termination.<br />
+        /// - error : Events that are fatal to the current operation but not the whole application.<br />
+        /// - warning : Events that can potentially cause application anomalies but that can be recovered automatically (by circumventing or retrying).<br />
+        /// - info : Generally useful information to log (service start/stop, configuration assumptions, etc.).<br />
+        /// - debug : Information that is diagnostically helpful to people more than just developers but useless for system monitoring.<br />
+        ///  - trace : Information about parts of functions, for detailed diagnostic only.<br />
         /// </summary>
         public static void Log(LogLevel logLevel, string function, string message) { igs_log(logLevel, StringToUTF8Ptr(function), StringToUTF8Ptr(message)); }
 
@@ -2269,9 +2875,11 @@ namespace Ingescape
         public static void Warn(string message, [CallerMemberName] string memberName = "") { Log(LogLevel.LogWarn, memberName, message); }
         public static void Error(string message, [CallerMemberName] string memberName = "") { Log(LogLevel.LogError, memberName, message); }
         public static void Fatal(string message, [CallerMemberName] string memberName = "") { Log(LogLevel.LogFatal, memberName, message); }
+
         #endregion
 
-        #region PROTOCOL AND REGION
+            #region PROTOCOL AND REGION
+
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern int igs_version();
         public static int Version() { return igs_version(); }
@@ -2281,12 +2889,13 @@ namespace Ingescape
         public static int Protocol() { return igs_protocol(); }
         #endregion
 
-        #region COMMAND LINE
+            #region COMMAND LINE
+
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_set_command_line(IntPtr line);
         /// <summary>
-        /// Command line for the agent can be passed here for inclusion in the
-        /// agent's headers. If not used, header is initialized with exec path.
+        /// Agent command line can be passed here to be used by ingescapeLauncher. If not set,
+        /// command line is initialized with exec path without any attribute.
         /// </summary>
         public static void SetCommandLine(string line)
         {
@@ -2298,8 +2907,7 @@ namespace Ingescape
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_set_command_line_from_args(int argc, IntPtr argv); //first element is replaced by absolute exec path on UNIX
         /// <summary>
-        /// Command line for the agent can be passed here for inclusion in the
-        /// agent's headers. If not used, header is initialized with exec path.
+        /// <inheritdoc cref="SetCommandLine"/>
         /// </summary>
         public static void SetCommandLineFromArgs(string[] argv)
         {
@@ -2334,11 +2942,18 @@ namespace Ingescape
             string result = PtrToStringFromUTF8(lineAsPtr);
             return result;
         }
+
         #endregion
 
-        #region LOGS MANAGEMENT
+            #region LOGS MANAGEMENT
+
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_log_set_console(bool verbose);
+
+        /// <summary>
+        /// enable logs in console (ERROR and FATAL are always displayed)
+        /// </summary>
+        /// <param name="verbose"></param>
         public static void LogSetConsole(bool verbose) { igs_log_set_console(verbose); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
@@ -2346,19 +2961,19 @@ namespace Ingescape
         private static extern bool igs_log_console();
         public static bool LogConsole() { return igs_log_console(); }
 
-
-
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_log_set_syslog(bool useSyslog);
-        public static void LogSetSyslog(bool useSyslog) { igs_log_set_syslog(useSyslog); }
+
+        /// <summary>
+        /// enable system logs on UNIX boxes (not working on Windows yet)
+        /// </summary>
+        /// <param name="useSyslog"></param>
+        private static void LogSetSyslog(bool useSyslog) { igs_log_set_syslog(useSyslog); } // private cause not working on Windows yet
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igs_log_syslog();
         public static bool LogSyslog() { return igs_log_syslog(); }
-
-
-
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.I1)]
@@ -2367,10 +2982,20 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_log_set_console_color(bool useColor);
+
+        /// <summary>
+        /// use colors in console
+        /// </summary>
+        /// <param name="useColor"></param>
         public static void LogSetConsoleColor(bool useColor) { igs_log_set_console_color(useColor); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_log_set_console_level(LogLevel level);
+
+        /// <summary>
+        /// set log level in console, default is IGS_LOG_WARN
+        /// </summary>
+        /// <param name="level"></param>
         public static void LogSetConsoleLevel(LogLevel level) { igs_log_set_console_level(level); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
@@ -2379,6 +3004,11 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_log_set_stream(bool useLogStream);
+
+        /// <summary>
+        /// enable logs in socket stream
+        /// </summary>
+        /// <param name="useLogStream"></param>
         public static void LogSetStream(bool useLogStream) { igs_log_set_stream(useLogStream); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
@@ -2388,6 +3018,12 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_log_set_file(bool useLogFile, IntPtr path);
+
+        /// <summary>
+        /// enable logs in file. If path is NULL, uses default path (~/Documents/Ingescape/logs).
+        /// </summary>
+        /// <param name="useLogFile"></param>
+        /// <param name="path"></param>
         public static void LogSetFile(bool useLogFile, string path = null){ igs_log_set_file(useLogFile, StringToUTF8Ptr(path)); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
@@ -2405,6 +3041,11 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_log_set_file_path(string path);
+
+        /// <summary>
+        /// default directory is ~/ on UNIX systems and current PATH on Windows
+        /// </summary>
+        /// <param name="path"></param>
         public static void LogSetFilePath(string path) { igs_log_set_file_path(path); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
@@ -2417,20 +3058,45 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_log_include_data(bool enable);
+
+        /// <summary>
+        /// log details of data IOs in log files , default is false.
+        /// </summary>
+        /// <param name="enable"></param>
         public static void LogIncludeData(bool enable) { igs_log_include_data(enable); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_log_include_services(bool enable);
+
+        /// <summary>
+        /// log details about call/excecute services in log files, default is false.
+        /// </summary>
+        /// <param name="enable"></param>
         public static void LogIncludeServices(bool enable) { igs_log_include_services(enable); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_log_no_warning_if_undefined_service(bool enable);
+
+        /// <summary>
+        /// warns or not if an unknown service is called on this agent, default is warning (false).
+        /// </summary>
+        /// <param name="enable"></param>
         public static void LogNoWarningIfUndefinedService(bool enable) { igs_log_no_warning_if_undefined_service(enable); }
+
         #endregion
 
-        #region DEFINITION & MAPPING FILE MANAGEMENT
+            #region DEFINITION & MAPPING FILE MANAGEMENT
+
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_definition_set_path(IntPtr path);
+
+        /// <summary>
+        /// Enable to write definition and mapping on disk
+        /// for our agent.Definition and mapping paths are initialized with
+        /// igs_definition_load_file and igs_mappings_load_file.But they can
+        /// also be configured using these functions to store current definitions.
+        /// </summary>
+        /// <param name="path"></param>
         public static void DefinitionSetPath(string path)
         {
             IntPtr ptrPath = StringToUTF8Ptr(path);
@@ -2440,10 +3106,19 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_definition_save();
+
+        /// <summary>
+        /// <inheritdoc cref="DefinitionSetPath"/>
+        /// </summary>
         public static void DefinitionSave() { igs_definition_save(); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_mapping_set_path(IntPtr path);
+
+        /// <summary>
+        /// <inheritdoc cref="DefinitionSetPath"/>
+        /// </summary>
+        /// <param name="path"></param>
         public static void MappingSetPath(string path)
         {
             IntPtr ptrPath = StringToUTF8Ptr(path);
@@ -2453,37 +3128,50 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_mapping_save();
+
+        /// <summary>
+        /// <inheritdoc cref="DefinitionSetPath"/>
+        /// </summary>
         public static void MappingSave() { igs_mapping_save(); }
         #endregion
 
-        #region ADVANCED TRANSPORTS
+            #region ADVANCED TRANSPORTS
+
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_set_ipc(bool allow);
+
         /// <summary>
         /// Ingescape automatically detects agents on the same computer
         /// and then uses optimized inter-process communication protocols
-        /// depending on the operating system.
-        /// On Microsoft Windows systems, the loopback is used.
-        /// Advanced transports are allowed by default and can be disabled
+        /// depending on the operating system. <br />
+        /// On Microsoft Windows systems, the loopback is used. <br />
+        /// Advanced transports are allowed by default and can be disabled <br />
+        /// default is true
         /// </summary>
         public static void SetIpc(bool allow) { igs_set_ipc(allow); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool igs_has_ipc();
+
+        /// <summary>
+        /// <inheritdoc cref="SetIpc"/>
+        /// </summary>
+        /// <returns></returns>
         public static bool HasIpc() { return igs_has_ipc(); }
 
-        /*FIXME:
-        #if defined (__UNIX__)
-        //set IPC folder path on UNIX systems (default is /tmp/ingescape/)
-        INGESCAPE_EXPORT void igs_set_ipc_dir(const char *path);
-        INGESCAPE_EXPORT const char * igs_ipc_dir(void);
-        #endif*/
         #endregion
 
-        #region NETWORK DEVICES
+            #region NETWORK DEVICES
+
         [DllImport(ingescapeDLLPath, CharSet = CharSet.Auto, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_net_devices_list(ref int nb);
+
+        /// <summary>
+        /// detect network adapters with broadcast capabilities
+        /// to be used in StartWithDevice
+        /// </summary>
+        /// <returns></returns>
         public static string[] NetDevicesList()
         {
             int nb = 0;
@@ -2506,6 +3194,11 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr igs_net_addresses_list(ref int nb);
+
+        /// <summary>
+        /// <inheritdoc cref="NetDevicesList"/>
+        /// </summary>
+        /// <returns></returns>
         public static string[] NetAddressesList()
         {
             int nb = 0;
@@ -2524,9 +3217,11 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_free_net_addresses_list(IntPtr addresses, int nb);
+
         #endregion
 
-        #region NETWORK CONFIGURATION
+            #region NETWORK CONFIGURATION
+
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_net_set_publishing_port(uint port);
         public static void NetSetPublishingPort(uint port) { igs_net_set_publishing_port(port); }
@@ -2536,56 +3231,88 @@ namespace Ingescape
         public static void NetSetLogStreamPort(uint port) { igs_net_set_log_stream_port(port); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void igs_net_set_discovery_interval(uint port); //in milliseconds
-        public static void NetSetDiscoveryInterval(uint port) { igs_net_set_discovery_interval(port); }
+        private static extern void igs_net_set_discovery_interval(uint interval);
+
+        /// <summary>
+        /// in milliseconds
+        /// </summary>
+        /// <param name="interval""></param>
+        public static void NetSetDiscoveryInterval(uint interval) { igs_net_set_discovery_interval(interval); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void igs_net_set_timeout(uint port);
-        public static void NetSetTimeout(uint port) { igs_net_set_timeout(port); }               
+        private static extern void igs_net_set_timeout(uint duration);
+
+        /// <summary>
+        /// in milliseconds
+        /// </summary>
+        /// <param name="duration""></param>
+        public static void NetSetTimeout(uint duration) { igs_net_set_timeout(duration); }
         
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_net_raise_sockets_limit();
+
         /// <summary>
-        //UNIX only, to be called before any ingescape or ZeroMQ activity
+        /// UNIX only, to be called before any ingescape or ZeroMQ activity
         /// </summary>
-        public static void NetRaiseSocketsLimit() { igs_net_raise_sockets_limit(); }
+        private static void NetRaiseSocketsLimit() { igs_net_raise_sockets_limit(); }  // private cause unix only
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_net_set_high_water_marks(int hwmValue);
         /// <summary>
-        //Set high water marks (HWM) for the publish/subscribe sockets.
-        //Setting HWM to 0 means that they are disabled.
+        /// Set high water marks (HWM) for the publish/subscribe sockets.<br />
+        /// Setting HWM to 0 means that they are disabled.
+        /// </summary>
         public static void NetSetHighWaterMarks(int hwmValue) { igs_net_set_high_water_marks(hwmValue); }
+
         #endregion
 
-        #region PERFORMANCE CHECK
-        //sends number of messages with defined size and displays performance
-        //information when finished (information displayed as INFO-level Log)
+            #region PERFORMANCE CHECK
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_net_performance_check(IntPtr peerId, uint msgSize, uint nbOfMsg);
+
+        /// <summary>
+        /// sends number of messages with defined size and displays performance
+        /// information when finished (information displayed as INFO-level Log)
+        /// </summary>
+        /// <param name="peerId"></param>
+        /// <param name="msgSize"></param>
+        /// <param name="nbOfMsg"></param>
         public static void NetPerformanceCheck(string peerId, uint msgSize, uint nbOfMsg)
         {
             IntPtr peerIdAsPtr = StringToUTF8Ptr(peerId);
             igs_net_performance_check(peerIdAsPtr, msgSize, nbOfMsg);
             Marshal.FreeHGlobal(peerIdAsPtr);
         }
+
         #endregion
 
-        #region NETWORK MONITORING
-        //Ingescape provides an integrated ObserveMonitor to detect events relative to the network.
-        //NB: once igs_monitor_start has been called, igs_monitor_stop must be
-        //called to actually Stop the ObserveMonitor. If not stopped, it may cause an Error when
-        //an agent terminates.
+            #region NETWORK MONITORING
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_monitor_start(uint period);//in milliseconds
+
+        /// <summary>
+        /// <para> Ingescape provides an integrated ObserveMonitor to detect events relative to the network.<br />
+        /// NB: once igs_monitor_start has been called, igs_monitor_stop must be
+        /// called to actually Stop the ObserveMonitor. If not stopped, it may cause an Error when
+        /// an agent terminates.
+        /// </para>
+        /// </summary>
+        /// <param name="period">in milliseconds</param>
         public static void MonitorStart(uint period) { igs_monitor_start(period); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_monitor_start_with_network(uint period,
                                                    IntPtr networkDevice,
                                                    uint port);
+
+        /// <summary>
+        /// <inheritdoc cref="MonitorStart"/>
+        /// </summary>
+        /// <param name="period"></param>
+        /// <param name="networkDevice"></param>
+        /// <param name="port"></param>
         public static void MonitorStartWithNetwork(uint period, string networkDevice, uint port)
         {
             IntPtr networkDeviceAsPtr = StringToUTF8Ptr(networkDevice);
@@ -2595,6 +3322,10 @@ namespace Ingescape
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_monitor_stop();
+
+        /// <summary>
+        /// <inheritdoc cref="MonitorStart"/>
+        /// </summary>
         public static void MonitorStop() { igs_monitor_stop(); }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
@@ -2602,11 +3333,16 @@ namespace Ingescape
         private static extern bool igs_monitor_is_running();
         public static bool MonitorIsRunning() { return igs_monitor_is_running(); }
 
-        /* When the ObserveMonitor is started and igs_monitor_set_start_stop is set to true :
-         - IP change will cause the agent to restart on the new IP (same device, same port)
-         - Network device disappearance will cause the agent to Stop. Agent will restart when device is back.*/
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_monitor_set_start_stop(bool flag);
+
+        /// <summary>
+        /// <para> When the ObserveMonitor is started and igs_monitor_set_start_stop is set to true :<br />
+        /// - IP change will cause the agent to restart on the new IP(same device, same port)<br />
+        /// - Network device disappearance will cause the agent to Stop.Agent will restart when device is back.
+        /// </para>
+        /// </summary>
+        /// <param name="flag"></param>
         public static void MonitorSetStartStop(bool flag) { igs_monitor_set_start_stop(flag); }
 
         private static MonitorFunctionC _OnMonitorCallback;
@@ -2642,34 +3378,67 @@ namespace Ingescape
                 _OnMonitorCallback = OnMonitorCallback;
             igs_observe_monitor(_OnMonitorCallback, data);
         }
+
         #endregion
 
-        #region  CLEAN CONTEXT
-        /// <summary>
-        /// Use this function when you absolutely need to clean all the Ingescape content
-        ///and you cannot Stop your application to do so.This function SHALL NOT be used
-        ///in production environments.
-        /// </summary>
+            #region  CLEAN CONTEXT
+
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_clear_context();
+
+        /// <summary>
+        /// Use this function when you absolutely need to clean all the Ingescape content
+        /// and you cannot Stop your application to do so.This function SHALL NOT be used
+        /// in production environments.
+        /// </summary>
         public static void ClearContext() { igs_clear_context(); }
 
-        #endregion 
+        #endregion
 
-        #region LOGS REPLAY
+            #region AGENT FAMILY - for licensing puroposes
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void igs_agent_set_family(IntPtr family);
+
+        /// <summary>
+        /// 32 characters canonical UUID format is commonly expected,
+        /// Default is an empty string. Max length is 64 characters. <br />
+        /// The family is used together with an external licensing
+        /// mechanism to uniquely identify a given software agent.
+        /// </summary>
+        /// <param name="family"></param>
+        public static void AgentSetFamily(string family)
+        {
+            IntPtr familyAsPtr = StringToUTF8Ptr(family);
+            igs_agent_set_family(familyAsPtr);
+            Marshal.FreeHGlobal(familyAsPtr);
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr igs_agent_family();
+
+        /// <summary>
+        /// <inheritdoc cref="AgentSetFamily"/>
+        /// </summary>
+        /// <returns></returns>
+        public static string AgentFamily() { return PtrToStringFromUTF8(igs_agent_family()); }
+
+        #endregion
+
+            #region LOGS REPLAY
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_replay_init(IntPtr logFilePath, uint speed, IntPtr startTime,
                            bool waitForStart, uint replayMode, IntPtr agent);
 
-        ///<summary>Ingescape logs contain all the necessary information for an agent to replay its changes for inputs, outputs, parameters and calls.
-        ///ReplayTerminate cleans the thread and requires calling igs_replay_init again.
+        ///<summary>Ingescape logs contain all the necessary information for an agent to replay its changes for inputs, outputs, parameters and calls.<br />
+        ///ReplayTerminate cleans the thread and requires calling igs_replay_init again.<br />
         ///Replay thread is cleaned automatically also when the Log file has been read completely.</summary>
         ///<param name="logFilePath">path to the Log file to be read.</param>
         ///<param name="speed">replay speed. Default is zero, meaning as fast as possible.</param>
         ///<param name="startTime">with format hh:mm::s, specifies the time when speed shall be used. Replay as fast as possible before that.</param>
         ///<param name="waitForStart">waits for a call to igs_replay_start before starting the replay. Default is false.</param>
         ///<param name="replayMode">a boolean composition of ReplayMode value to decide what shall be replayed.If mode is zero, all IOP and calls are replayed.</param>
-        ///<param name="agent">an OPTIONAL agent name serving as filter when the logs contain activity for multiple agents.</param>   
+        ///<param name="agent">an OPTIONAL agent name serving as filter when the logs contain activity for multiple agents.</param>
         public static void ReplayInit(string logFilePath, uint speed, string startTime, bool waitForStart, ReplayMode replayMode, string agent)
         {
             IntPtr logFilePathAsPtr = StringToUTF8Ptr(logFilePath);
@@ -2693,7 +3462,331 @@ namespace Ingescape
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_replay_terminate();
         public static void ReplayTerminate() { igs_replay_terminate(); }
+
         #endregion
+
+        #endregion
+
+        #region DEPRECATED : Parameters
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_parameter_create(IntPtr name, IopValueType type, IntPtr value, uint size);
+
+        [Obsolete("this function is deprecated, please use AttributeCreate instead.")]
+        public static Result ParameterCreate(string name, IopValueType type, object value = null)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            if (value != null)
+            {
+                uint size;
+                IntPtr valuePtr;
+                if (value.GetType() == typeof(string))
+                    valuePtr = StringToUTF8Ptr(Convert.ToString(value), out size);
+                else if (value.GetType() == typeof(bool))
+                    valuePtr = BoolToPtr(Convert.ToBoolean(value), out size);
+                else if (value.GetType() == typeof(byte[]))
+                    valuePtr = DataToPtr((byte[])value, out size);
+                else if (value.GetType() == typeof(double))
+                    valuePtr = DoubleToPtr(Convert.ToDouble(value), out size);
+                else if (value.GetType() == typeof(float))
+                    valuePtr = DoubleToPtr(Convert.ToDouble(value), out size);
+                else if (value.GetType() == typeof(int))
+                    valuePtr = IntToPtr(Convert.ToInt32(value), out size);
+                else
+                    return Result.Failure;
+                Result res = igs_parameter_create(nameAsPtr, type, valuePtr, size);
+                Marshal.FreeHGlobal(nameAsPtr);
+                Marshal.FreeHGlobal(valuePtr);
+                return res;
+            }
+            else
+            {
+                Result res = igs_parameter_create(nameAsPtr, type, IntPtr.Zero, 0);
+                Marshal.FreeHGlobal(nameAsPtr);
+                return res;
+            }
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_parameter_remove(IntPtr name);
+
+        [Obsolete("this function is deprecated, please use AttributeRemove instead.")]
+        public static Result ParameterRemove(string name)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            Result res = igs_parameter_remove(nameAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            return res;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IopValueType igs_parameter_type(IntPtr name);
+
+        [Obsolete("this function is deprecated, please use AttributeType instead.")]
+        public static IopValueType ParameterType(string name)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            IopValueType type = igs_parameter_type(nameAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            return type;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int igs_parameter_count();
+
+        [Obsolete("this function is deprecated, please use AttributeCount instead.")]
+        public static int ParameterCount() { return igs_attribute_count(); }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr igs_parameter_list(ref int nbOfElements);
+
+        [Obsolete("this function is deprecated, please use AttributeList instead.")]
+        public static string[] ParameterList()
+        {
+            int nbOfElements = 0;
+            string[] list = null;
+            IntPtr intptr = igs_parameter_list(ref nbOfElements);
+            if (intptr != IntPtr.Zero)
+            {
+                IntPtr[] intPtrArray = new IntPtr[nbOfElements];
+                list = new string[nbOfElements];
+                Marshal.Copy(intptr, intPtrArray, 0, nbOfElements);
+                for (int i = 0; i < nbOfElements; i++)
+                    list[i] = Marshal.PtrToStringAnsi(intPtrArray[i]);
+                Igs.igs_free_io_list(intptr, nbOfElements);
+            }
+            return list;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
+        private static extern bool igs_parameter_exists(IntPtr name);
+
+        [Obsolete("this function is deprecated, please use AttributeExists instead.")]
+        public static bool ParameterExists(string name)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            bool value = igs_parameter_exists(nameAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            return value;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
+        private static extern bool igs_parameter_bool(IntPtr name);
+
+        [Obsolete("this function is deprecated, please use AttributeBool instead.")]
+        public static bool ParameterBool(string name)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            bool value = igs_parameter_bool(nameAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            return value;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int igs_parameter_int(IntPtr name);
+
+        [Obsolete("this function is deprecated, please use AttributeInt instead.")]
+        public static int ParameterInt(string name)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            int value = igs_parameter_int(nameAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            return value;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern double igs_parameter_double(IntPtr name);
+
+        [Obsolete("this function is deprecated, please use AttributeDouble instead.")]
+        public static double ParameterDouble(string name)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            double value = igs_parameter_double(nameAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            return value;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr igs_parameter_string(IntPtr name);
+
+        [Obsolete("this function is deprecated, please use AttributeString instead.")]
+        public static string ParameterString(string name)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            IntPtr valueAsPtr = igs_parameter_string(nameAsPtr);
+            string value = PtrToStringFromUTF8(valueAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            return value;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_parameter_data(IntPtr name, ref IntPtr data, ref uint size);
+
+        [Obsolete("this function is deprecated, please use AttributeData instead.")]
+        public static byte[] ParameterData(string name)
+        {
+            uint size = 0;
+            byte[] data = null;
+            IntPtr ptr = IntPtr.Zero;
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            Result result = igs_parameter_data(nameAsPtr, ref ptr, ref size);
+            Marshal.FreeHGlobal(nameAsPtr);
+            if (result == Result.Success)
+            {
+                data = new byte[size];
+                if (ptr != IntPtr.Zero)
+                    Marshal.Copy(ptr, data, 0, (int)size);
+            }
+            return data;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_parameter_set_bool(IntPtr name, bool value);
+
+        [Obsolete("this function is deprecated, please use AttributeSetBool instead.")]
+        public static Result ParameterSetBool(string name, bool value)
+        {
+            Result result = Result.Failure;
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            result = igs_parameter_set_bool(nameAsPtr, value);
+            Marshal.FreeHGlobal(nameAsPtr);
+            return result;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_parameter_set_int(IntPtr name, int value);
+
+        [Obsolete("this function is deprecated, please use AttributeSetInt instead.")]
+        public static Result ParameterSetInt(string name, int value)
+        {
+            Result result = Result.Failure;
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            result = igs_parameter_set_int(nameAsPtr, value);
+            Marshal.FreeHGlobal(nameAsPtr);
+            return result;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_parameter_set_double(IntPtr name, double value);
+
+        [Obsolete("this function is deprecated, please use AttributeSetDouble instead.")]
+        public static Result ParameterSetDouble(string name, double value)
+        {
+            Result result = Result.Failure;
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            result = igs_parameter_set_double(nameAsPtr, value);
+            Marshal.FreeHGlobal(nameAsPtr);
+            return result;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_parameter_set_string(IntPtr name, IntPtr value);
+
+        [Obsolete("this function is deprecated, please use AttributeSetString instead.")]
+        public static Result ParameterSetString(string name, string value)
+        {
+            Result result = Result.Failure;
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            IntPtr valueAsPtr = StringToUTF8Ptr(value);
+            result = igs_parameter_set_string(nameAsPtr, valueAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            Marshal.FreeHGlobal(valueAsPtr);
+            return result;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_parameter_set_data(IntPtr name, IntPtr value, uint size);
+
+        [Obsolete("this function is deprecated, please use AttributeSetData instead.")]
+        public static Result ParameterSetData(string name, byte[] value)
+        {
+            Result result = Result.Failure;
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            uint size = Convert.ToUInt32(((byte[])value).Length);
+            IntPtr valueAsPtr = Marshal.AllocHGlobal((int)size);
+            Marshal.Copy(value, 0, valueAsPtr, (int)size);
+            result = igs_parameter_set_data(nameAsPtr, valueAsPtr, size);
+            Marshal.FreeHGlobal(nameAsPtr);
+            Marshal.FreeHGlobal(valueAsPtr);
+            return result;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_parameter_add_constraint(IntPtr name, IntPtr constraint);
+
+        [Obsolete("this function is deprecated, please use AttributeAddConstraint instead.")]
+        public static Result ParameterAddConstraint(string name, string constraint)
+        {
+            Result result = Result.Failure;
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            IntPtr constraintAsPtr = StringToUTF8Ptr(constraint);
+            result = igs_parameter_add_constraint(nameAsPtr, constraintAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            Marshal.FreeHGlobal(constraintAsPtr);
+            return result;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_parameter_set_description(IntPtr name, IntPtr description);
+
+        [Obsolete("this function is deprecated, please use AttributeSetDescription instead.")]
+        public static Result ParameterSetDescription(string name, string description)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            IntPtr descriptionAsPtr = StringToUTF8Ptr(description);
+            Result res = igs_parameter_set_description(nameAsPtr, descriptionAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            Marshal.FreeHGlobal(descriptionAsPtr);
+            return res;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_parameter_set_detailed_type(IntPtr paramName, IntPtr typeName, IntPtr specification);
+
+        [Obsolete("this function is deprecated, please use AttributeSetDetailedType instead.")]
+        public static Result ParameterSetDetailedType(string paramName, string typeName, string specification)
+        {
+            IntPtr paramNameAsPtr = StringToUTF8Ptr(paramName);
+            IntPtr typeAsPtr = StringToUTF8Ptr(typeName);
+            IntPtr specificationAsPtr = StringToUTF8Ptr(specification);
+            Result res = igs_parameter_set_detailed_type(paramNameAsPtr, typeAsPtr, specificationAsPtr);
+            Marshal.FreeHGlobal(paramNameAsPtr);
+            Marshal.FreeHGlobal(typeAsPtr);
+            Marshal.FreeHGlobal(specificationAsPtr);
+            return res;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void igs_clear_parameter(IntPtr name);
+
+        [Obsolete("this function is deprecated, please use ClearAttribute instead.")]
+        public static void ClearParameter(string name)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            igs_clear_parameter(nameAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void igs_observe_parameter(IntPtr name, IopFunctionC cb, IntPtr myData);
+
+        [Obsolete("this function is deprecated, please use ObserveAttribute instead.")]
+        public static void ObserveParameter(string ParameterName, IopFunction callback, object myData)
+        {
+            Tuple<IopFunction, object> tupleData = new Tuple<IopFunction, object>(callback, myData);
+            GCHandle gCHandle = GCHandle.Alloc(tupleData);
+            IntPtr data = GCHandle.ToIntPtr(gCHandle);
+
+            if (_OnIOPCallback == null)
+                _OnIOPCallback = OnIOPCallback;
+
+            IntPtr nameAsPtr = StringToUTF8Ptr(ParameterName);
+            igs_observe_parameter(nameAsPtr, _OnIOPCallback, data);
+            Marshal.FreeHGlobal(nameAsPtr);
+        }
+
         #endregion
     }
 }
