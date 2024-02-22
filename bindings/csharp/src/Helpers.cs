@@ -22,21 +22,24 @@ namespace Ingescape
         internal static double PtrToDouble(IntPtr ptr)
         {
             double[] dValue = new double[1];
-            Marshal.Copy(ptr, dValue, 0, 1);
+            if (ptr != IntPtr.Zero)
+                Marshal.Copy(ptr, dValue, 0, 1);
             return dValue[0];
         }
 
         internal static int PtrToInt(IntPtr ptr)
         {
             int[] iValue = new int[1];
-            Marshal.Copy(ptr, iValue, 0, 1);
+            if (ptr != IntPtr.Zero)
+                Marshal.Copy(ptr, iValue, 0, 1);
             return iValue[0];
         }
 
         internal static bool PtrToBool(IntPtr ptr)
         {
             int[] ibValue = new int[1];
-            Marshal.Copy(ptr, ibValue, 0, 1);
+            if (ptr != IntPtr.Zero)
+                Marshal.Copy(ptr, ibValue, 0, 1);
             bool bValue = Convert.ToBoolean(ibValue[0]);
             return bValue;
         }
@@ -44,7 +47,8 @@ namespace Ingescape
         internal static byte[] PtrToData(IntPtr ptr, int size)
         {
             byte[] dataValue = new byte[size];
-            Marshal.Copy(ptr, dataValue, 0, size);
+            if (ptr != IntPtr.Zero)
+                Marshal.Copy(ptr, dataValue, 0, size);
             return dataValue;
         }
 
