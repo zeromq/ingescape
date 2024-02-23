@@ -3974,6 +3974,10 @@ void igsagent_set_name (igsagent_t *agent, const char *name)
     
     if (!agent->definition->my_class)
         agent->definition->my_class = strdup(n);
+    else if (previous && streq(agent->definition->my_class, previous)){
+        free (agent->definition->my_class);
+        agent->definition->my_class = strdup(n);
+    }
     
     if (agent->igs_channel)
         free (agent->igs_channel);
