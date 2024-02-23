@@ -383,6 +383,7 @@ void run_static_tests (int argc, const char * argv[]){
     free(name);
     name = NULL;
     igs_agent_set_name(agentName);
+    assert(streq(igs_definition_class(),agentName)); //intentional memory leak here
     assert(igs_agent_uuid()); //intentional memory leak here
     
     //package and class
