@@ -94,33 +94,43 @@ PyObject * definition_load_str_wrapper(PyObject * self, PyObject * args);
 PyObject * definition_load_file_wrapper(PyObject * self, PyObject * args);
 PyObject * clear_definition_wrapper(PyObject * self, PyObject * args);
 PyObject * definition_json_wrapper(PyObject * self, PyObject * args);
-PyObject * definition_description_wrapper(PyObject * self, PyObject * args);
-PyObject * definition_version_wrapper(PyObject * self, PyObject * args);
+PyObject * definition_set_class_wrapper(PyObject * self, PyObject * args);
+PyObject * definition_class_wrapper(PyObject * self, PyObject * args);
+PyObject * definition_set_package_wrapper(PyObject * self, PyObject * args);
+PyObject * definition_package_wrapper(PyObject * self, PyObject * args);
 PyObject * definition_set_description_wrapper(PyObject * self, PyObject * args);
+PyObject * definition_description_wrapper(PyObject * self, PyObject * args);
 PyObject * definition_set_version_wrapper(PyObject * self, PyObject * args);
+PyObject * definition_version_wrapper(PyObject * self, PyObject * args);
 
 PyObject * input_create_wrapper(PyObject * self, PyObject * args);
 PyObject * output_create_wrapper(PyObject * self, PyObject * args);
+PyObject * attribute_create_wrapper(PyObject * self, PyObject * args);
 PyObject * parameter_create_wrapper(PyObject * self, PyObject * args);
 
 PyObject * input_remove_wrapper(PyObject * self, PyObject * args);
 PyObject * output_remove_wrapper(PyObject * self, PyObject * args);
+PyObject * attribute_remove_wrapper(PyObject * self, PyObject * args);
 PyObject * parameter_remove_wrapper(PyObject * self, PyObject * args);
 
 PyObject * input_type_wrapper(PyObject * self, PyObject * args);
 PyObject * output_type_wrapper(PyObject * self, PyObject * args);
+PyObject * attribute_type_wrapper(PyObject * self, PyObject * args);
 PyObject * parameter_type_wrapper(PyObject * self, PyObject * args);
 
 PyObject * input_count_wrapper(PyObject * self, PyObject * args);
 PyObject * output_count_wrapper(PyObject * self, PyObject * args);
+PyObject * attribute_count_wrapper(PyObject * self, PyObject * args);
 PyObject * parameter_count_wrapper(PyObject * self, PyObject * args);
 
 PyObject * input_list_wrapper(PyObject * self, PyObject * args);
 PyObject * output_list_wrapper(PyObject * self, PyObject * args);
+PyObject * attribute_list_wrapper(PyObject * self, PyObject * args);
 PyObject * parameter_list_wrapper(PyObject * self, PyObject * args);
 
 PyObject * input_exists_wrapper(PyObject * self, PyObject * args);
 PyObject * output_exists_wrapper(PyObject * self, PyObject * args);
+PyObject * attribute_exists_wrapper(PyObject * self, PyObject * args);
 PyObject * parameter_exists_wrapper(PyObject * self, PyObject * args);
 
 PyObject * input_bool_wrapper(PyObject * self, PyObject * args);
@@ -134,6 +144,12 @@ PyObject * output_int_wrapper(PyObject * self, PyObject * args);
 PyObject * output_double_wrapper(PyObject * self, PyObject * args);
 PyObject * output_string_wrapper(PyObject * self, PyObject * args);
 PyObject * output_data_wrapper(PyObject * self, PyObject * args);
+
+PyObject * attribute_bool_wrapper(PyObject * self, PyObject * args);
+PyObject * attribute_int_wrapper(PyObject * self, PyObject * args);
+PyObject * attribute_double_wrapper(PyObject * self, PyObject * args);
+PyObject * attribute_string_wrapper(PyObject * self, PyObject * args);
+PyObject * attribute_data_wrapper(PyObject * self, PyObject * args);
 
 PyObject * parameter_bool_wrapper(PyObject * self, PyObject * args);
 PyObject * parameter_int_wrapper(PyObject * self, PyObject * args);
@@ -155,6 +171,12 @@ PyObject * output_set_string_wrapper(PyObject * self, PyObject * args);
 PyObject * output_set_impulsion_wrapper(PyObject * self, PyObject * args);
 PyObject * output_set_data_wrapper(PyObject * self, PyObject * args);
 
+PyObject * attribute_set_bool_wrapper(PyObject * self, PyObject * args);
+PyObject * attribute_set_int_wrapper(PyObject * self, PyObject * args);
+PyObject * attribute_set_double_wrapper(PyObject * self, PyObject * args);
+PyObject * attribute_set_string_wrapper(PyObject * self, PyObject * args);
+PyObject * attribute_set_data_wrapper(PyObject * self, PyObject * args);
+
 PyObject * parameter_set_bool_wrapper(PyObject * self, PyObject * args);
 PyObject * parameter_set_int_wrapper(PyObject * self, PyObject * args);
 PyObject * parameter_set_double_wrapper(PyObject * self, PyObject * args);
@@ -164,27 +186,35 @@ PyObject * parameter_set_data_wrapper(PyObject * self, PyObject * args);
 PyObject * igs_constraints_enforce_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
 PyObject * igs_input_add_constraint_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
 PyObject * igs_output_add_constraint_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject * igs_attribute_add_constraint_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
 PyObject * igs_parameter_add_constraint_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
 
 PyObject * igs_input_set_description_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
 PyObject * igs_output_set_description_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject * igs_attribute_set_description_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
 PyObject * igs_parameter_set_description_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
+
+PyObject * igs_input_set_detailed_type_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject * igs_output_set_detailed_type_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject * igs_attribute_set_detailed_type_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
 
 PyObject * clear_input_wrapper(PyObject * self, PyObject * args);
 PyObject * clear_output_wrapper(PyObject * self, PyObject * args);
+PyObject * clear_attribute_wrapper(PyObject * self, PyObject * args);
 PyObject * clear_parameter_wrapper(PyObject * self, PyObject * args);
 
-typedef struct observe_iop_cb {
+typedef struct observe_io_cb {
     char *nameArg;
-    igs_iop_type_t iopType;
+    igs_io_type_t ioType;
     PyObject *callback;
     PyObject *my_data;
-    struct observe_iop_cb *next;
-    struct observe_iop_cb *prev;
-} observe_iop_cb_t;
-extern observe_iop_cb_t *observe_iop_cbList;
+    struct observe_io_cb *next;
+    struct observe_io_cb *prev;
+} observe_io_cb_t;
+extern observe_io_cb_t *observe_io_cbList;
 PyObject *observe_input_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
 PyObject *observe_output_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject *observe_attribute_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
 PyObject *observe_parameter_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
 
 PyObject * output_mute_wrapper(PyObject * self, PyObject * args);
@@ -285,6 +315,16 @@ PyObject * igs_broker_add_secure_wrapper(PyObject *self, PyObject *args, PyObjec
 
 PyObject * election_join_wrapper(PyObject * self, PyObject * args);
 PyObject * election_leave_wrapper(PyObject * self, PyObject * args);
+
+
+// Real-time APIs
+PyObject * rt_get_current_timestamp_wrapper(PyObject * self, PyObject * args);
+PyObject * rt_set_timestamps_wrapper(PyObject * self, PyObject * args);
+PyObject * rt_timestamps_wrapper(PyObject * self, PyObject * args);
+PyObject * rt_set_time_wrapper(PyObject * self, PyObject * args);
+PyObject * rt_time_wrapper(PyObject * self, PyObject * args);
+PyObject * rt_set_synchronous_mode_wrapper(PyObject * self, PyObject * args);
+PyObject * rt_synchronous_mode_wrapper(PyObject * self, PyObject * args);
 
 
 PyObject * trace_wrapper(PyObject * self, PyObject * args);

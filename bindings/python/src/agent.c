@@ -574,13 +574,13 @@ PyObject *Agent_clear_definition(AgentObject *self, PyObject *args, PyObject *kw
     if(self->agent)
     {
         igsagent_clear_definition(self->agent);
-        agentobserve_iop_cb_t *it = NULL;
+        agentobserve_io_cb_t *it = NULL;
         do {
-            DL_FOREACH(agentobserve_iop_cbList, it) {
+            DL_FOREACH(agentobserve_io_cbList, it) {
                 if (it->agent == self) break;
             }
             if (it) {
-                DL_DELETE(agentobserve_iop_cbList, it);
+                DL_DELETE(agentobserve_io_cbList, it);
                 Py_CLEAR(it->callback);
                 Py_CLEAR(it->my_data);
                 free(it);
@@ -608,16 +608,31 @@ PyObject *Agent_definition_json(AgentObject *self, PyObject *args, PyObject *kwd
     return NULL;
 }
 
-PyObject *Agent_definition_description(AgentObject *self, PyObject *args, PyObject *kwds)
+PyObject *Agent_definition_set_package(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    static char *kwlist[] = {"package",  NULL};
+    char *package = NULL;
+
+    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &package))
+        Py_RETURN_NONE;
+    if(self->agent)
+    {
+        igsagent_definition_set_package(self->agent, package);
+        return PyLong_FromLong(IGS_SUCCESS);
+    }
+    Py_RETURN_NONE;
+}
+
+PyObject *Agent_definition_package(AgentObject *self, PyObject *args, PyObject *kwds)
 {
     if(self->agent)
     {
-        char *def = igsagent_definition_description(self->agent);
-        if(def != NULL){
-            PyObject *ret = PyUnicode_FromFormat("%s", def);
+        char *package = igsagent_definition_package(self->agent);
+        if(package != NULL){
+            PyObject *ret = PyUnicode_FromFormat("%s", package);
             Py_INCREF(ret);
-            free(def);
-            def = NULL;
+            free(package);
+            package = NULL;
             return ret;
         }else
             return PyUnicode_FromFormat("");
@@ -625,16 +640,31 @@ PyObject *Agent_definition_description(AgentObject *self, PyObject *args, PyObje
     return NULL;
 }
 
-PyObject *Agent_definition_version(AgentObject *self, PyObject *args, PyObject *kwds)
+PyObject *Agent_definition_set_class(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    static char *kwlist[] = {"class",  NULL};
+    char *class = NULL;
+
+    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &class))
+        Py_RETURN_NONE;
+    if(self->agent)
+    {
+        igsagent_definition_set_class(self->agent, class);
+        return PyLong_FromLong(IGS_SUCCESS);
+    }
+    Py_RETURN_NONE;
+}
+
+PyObject *Agent_definition_class(AgentObject *self, PyObject *args, PyObject *kwds)
 {
     if(self->agent)
     {
-        char *def = igsagent_definition_version(self->agent);
-        if(def != NULL){
-            PyObject *ret = PyUnicode_FromFormat("%s", def);
+        char *class = igsagent_definition_class(self->agent);
+        if(class != NULL){
+            PyObject *ret = PyUnicode_FromFormat("%s", class);
             Py_INCREF(ret);
-            free(def);
-            def = NULL;
+            free(class);
+            class = NULL;
             return ret;
         }else
             return PyUnicode_FromFormat("");
@@ -657,6 +687,23 @@ PyObject *Agent_definition_set_description(AgentObject *self, PyObject *args, Py
     Py_RETURN_NONE;
 }
 
+PyObject *Agent_definition_description(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    if(self->agent)
+    {
+        char *description = igsagent_definition_description(self->agent);
+        if(description != NULL){
+            PyObject *ret = PyUnicode_FromFormat("%s", description);
+            Py_INCREF(ret);
+            free(description);
+            description = NULL;
+            return ret;
+        }else
+            return PyUnicode_FromFormat("");
+    }
+    return NULL;
+}
+
 PyObject *Agent_definition_set_version(AgentObject *self, PyObject *args, PyObject *kwds)
 {
     static char *kwlist[] = {"version",  NULL};
@@ -672,440 +719,310 @@ PyObject *Agent_definition_set_version(AgentObject *self, PyObject *args, PyObje
     Py_RETURN_NONE;
 }
 
-PyObject *Agent_input_create(AgentObject *self, PyObject *args, PyObject *kwds)
+PyObject *Agent_definition_version(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    char * name;
-    igs_iop_value_type_t type;
-    int _type;
+    if(self->agent)
+    {
+        char *version = igsagent_definition_version(self->agent);
+        if(version != NULL){
+            PyObject *ret = PyUnicode_FromFormat("%s", version);
+            Py_INCREF(ret);
+            free(version);
+            version = NULL;
+            return ret;
+        }else
+            return PyUnicode_FromFormat("");
+    }
+    return NULL;
+}
+
+typedef igs_result_t (*agent_io_create_api)(igsagent_t*, const char*, igs_io_value_type_t, void*, size_t);
+PyObject *s_agent_io_create(AgentObject *self, PyObject *args, PyObject *kwds, agent_io_create_api igs_api)
+{
+    const char * name;
+    int given_value_type;
     PyObject *value;
     int result;
 
-    if (!PyArg_ParseTuple(args, "siO", &name, &_type, &value)) {
+    if (!PyArg_ParseTuple(args, "siO", &name, &given_value_type, &value)) {
         Py_RETURN_NONE;
     }
-    type = (igs_iop_value_type_t)(_type);
-    if (value == Py_None){
-        result = igsagent_input_create(self->agent, name, type, NULL, 0);
-    }
-    else if (type == IGS_STRING_T)
+
+    igs_io_value_type_t io_value_type = (igs_io_value_type_t)(given_value_type);
+    if (value == Py_None)
+        result = igs_api(self->agent, name, io_value_type, NULL, 0);
+    else if (io_value_type == IGS_STRING_T)
     {
         char *value_c;
-        if (!PyArg_ParseTuple(args, "sis", &name, &_type, &value_c)){
+        if (!PyArg_ParseTuple(args, "sis", &name, &given_value_type, &value_c))
             return NULL;
-        }
-        result = igsagent_input_create(self->agent, name, type, value_c, strlen(value_c));
-    }else if (type == IGS_INTEGER_T){
+        result = igs_api(self->agent, name, io_value_type, value_c, strlen(value_c));
+    }else if (io_value_type == IGS_INTEGER_T){
         int value_c;
-        if (!PyArg_ParseTuple(args, "sii", &name, &_type, &value_c)) {
+        if (!PyArg_ParseTuple(args, "sii", &name, &given_value_type, &value_c))
             return NULL;
-        }
-        result = igsagent_input_create(self->agent, name, type, &value_c, sizeof(int));
-    }else if (type == IGS_DOUBLE_T){
+        result = igs_api(self->agent, name, io_value_type, &value_c, sizeof(int));
+    }else if (io_value_type == IGS_DOUBLE_T){
         double value_c;
-        if (!PyArg_ParseTuple(args, "sid", &name, &_type, &value_c)) {
+        if (!PyArg_ParseTuple(args, "sid", &name, &given_value_type, &value_c))
             return NULL;
-        }
-        result = igsagent_input_create(self->agent, name, type, &value_c, sizeof(double));
-    }else if (type == IGS_BOOL_T){
-        if (value == Py_True)
-        {
-            bool value = true;
-            result = igsagent_input_create(self->agent, name, type, &value, sizeof(bool));
-        }
-        else
-        {
-            bool value = false;
-            result = igsagent_input_create(self->agent, name, type, &value, sizeof(bool));
-        }
-    }else{
-        result = igsagent_input_create(self->agent, name, type, value, (size_t)PyObject_Size(value));
-    }
+        result = igs_api(self->agent, name, io_value_type, &value_c, sizeof(double));
+    }else if (io_value_type == IGS_BOOL_T){
+        bool bool_value = (value == Py_True);
+        result = igs_api(self->agent, name, io_value_type, &bool_value, sizeof(bool));
+    }else
+        result = igs_api(self->agent, name, io_value_type, value, (size_t)PyObject_Size(value));
+
     return PyLong_FromLong(result);
+}
+
+PyObject *Agent_input_create(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_create(self, args, kwds, igsagent_input_create);
 }
 
 PyObject *Agent_output_create(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    char * name;
-    igs_iop_value_type_t type;
-    int _type;
-    PyObject *value;
-    int result;
+    return s_agent_io_create(self, args, kwds, igsagent_output_create);
+}
 
-    if (!PyArg_ParseTuple(args, "siO", &name, &_type, &value)) {
-        Py_RETURN_NONE;
-    }
-    type = (igs_iop_value_type_t)(_type);
-    if (value == Py_None){
-        result = igsagent_output_create(self->agent, name, type, NULL, 0);
-    }
-    else if (type == IGS_STRING_T)
-    {
-        char *value_c;
-        if (!PyArg_ParseTuple(args, "sis", &name, &_type, &value_c)){
-            return NULL;
-        }
-        result = igsagent_output_create(self->agent, name, type, value_c, strlen(value_c));
-    }else if (type == IGS_INTEGER_T){
-        int value_c;
-        if (!PyArg_ParseTuple(args, "sii", &name, &_type, &value_c)) {
-            return NULL;
-        }
-        result = igsagent_output_create(self->agent, name, type, &value_c, sizeof(int));
-    }else if (type == IGS_DOUBLE_T){
-        double value_c;
-        if (!PyArg_ParseTuple(args, "sid", &name, &_type, &value_c)) {
-            return NULL;
-        }
-        result = igsagent_output_create(self->agent, name, type, &value_c, sizeof(double));
-    }else if (type == IGS_BOOL_T){
-        if (value == Py_True)
-        {
-            bool value = true;
-            result = igsagent_output_create(self->agent, name, type, &value, sizeof(bool));
-        }
-        else
-        {
-            bool value = false;
-            result = igsagent_output_create(self->agent, name, type, &value, sizeof(bool));
-        }
-    }else{
-        result = igsagent_output_create(self->agent, name, type, value, (size_t)PyObject_Size(value));
-    }
-    return PyLong_FromLong(result);
+PyObject *Agent_attribute_create(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_create(self, args, kwds, igsagent_attribute_create);
 }
 
 PyObject *Agent_parameter_create(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    char * name;
-    igs_iop_value_type_t type;
-    int _type;
-    PyObject *value;
-    int result;
-
-    if (!PyArg_ParseTuple(args, "siO", &name, &_type, &value)) {
-        Py_RETURN_NONE;
-    }
-    type = (igs_iop_value_type_t)(_type);
-    if (value == Py_None){
-        result = igsagent_parameter_create(self->agent, name, type, NULL, 0);
-    }
-    else if (type == IGS_STRING_T)
-    {
-        char *value_c;
-        if (!PyArg_ParseTuple(args, "sis", &name, &_type, &value_c)){
-            return NULL;
-        }
-        result = igsagent_parameter_create(self->agent, name, type, value_c, strlen(value_c));
-    }else if (type == IGS_INTEGER_T){
-        int value_c;
-        if (!PyArg_ParseTuple(args, "sii", &name, &_type, &value_c)) {
-            return NULL;
-        }
-        result = igsagent_parameter_create(self->agent, name, type, &value_c, sizeof(int));
-    }else if (type == IGS_DOUBLE_T){
-        double value_c;
-        if (!PyArg_ParseTuple(args, "sid", &name, &_type, &value_c)) {
-            return NULL;
-        }
-        result = igsagent_parameter_create(self->agent, name, type, &value_c, sizeof(double));
-    }else if (type == IGS_BOOL_T){
-        if (value == Py_True)
-        {
-            bool value = true;
-            result = igsagent_parameter_create(self->agent, name, type, &value, sizeof(bool));
-        }
-        else
-        {
-            bool value = false;
-            result = igsagent_parameter_create(self->agent, name, type, &value, sizeof(bool));
-        }
-    }else{
-        result = igsagent_parameter_create(self->agent, name, type, value, (size_t)PyObject_Size(value));
-    }
-    return PyLong_FromLong(result);
+    return s_agent_io_create(self, args, kwds, igsagent_parameter_create);
 }
 
-
-PyObject *Agent_input_remove(AgentObject *self, PyObject *args, PyObject *kwds)
+typedef igs_result_t (*agent_io_remove_api)(igsagent_t*, const char*);
+PyObject *s_agent_io_remove(AgentObject *self, PyObject *args, PyObject *kwds, igs_io_type_t io_type, agent_io_remove_api igs_api)
 {
     static char *kwlist[] = {"name",  NULL};
-    char *name = NULL;
+    const char *name = NULL;
     if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &name))
         return PyLong_FromLong(IGS_FAILURE);
-    agentobserve_iop_cb_t *it = NULL;
+    agentobserve_io_cb_t *it = NULL;
     do {
-        DL_FOREACH(agentobserve_iop_cbList, it) {
+        DL_FOREACH(agentobserve_io_cbList, it) {
             if (it->agent == self
                 && it->nameArg == name
-                && it->iopType == IGS_INPUT_T) break;
+                && it->ioType == io_type) break;
         }
         if (it) {
-            DL_DELETE(agentobserve_iop_cbList, it);
+            DL_DELETE(agentobserve_io_cbList, it);
             Py_CLEAR(it->callback);
             Py_CLEAR(it->my_data);
             free(it->nameArg);
             free(it);
         }
     } while(it);
-    return PyLong_FromLong(igsagent_input_remove(self->agent, name));
+    return PyLong_FromLong(igs_api(self->agent, name));
+}
+
+PyObject *Agent_input_remove(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_remove(self, args, kwds, IGS_INPUT_T, igsagent_input_remove);
 }
 
 PyObject *Agent_output_remove(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    static char *kwlist[] = {"name",  NULL};
-    char *name = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &name))
-        return PyLong_FromLong(IGS_FAILURE);
-    agentobserve_iop_cb_t *it = NULL;
-    do {
-        DL_FOREACH(agentobserve_iop_cbList, it) {
-            if (it->agent == self
-                && it->nameArg == name
-                && it->iopType == IGS_OUTPUT_T) break;
-        }
-        if (it) {
-            DL_DELETE(agentobserve_iop_cbList, it);
-            Py_CLEAR(it->callback);
-            Py_CLEAR(it->my_data);
-            free(it->nameArg);
-            free(it);
-        }
-    } while(it);
-    return PyLong_FromLong(igsagent_output_remove(self->agent, name));
+    return s_agent_io_remove(self, args, kwds, IGS_OUTPUT_T, igsagent_output_remove);
+}
+
+PyObject *Agent_attribute_remove(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_remove(self, args, kwds, IGS_ATTRIBUTE_T, igsagent_attribute_remove);
 }
 
 PyObject *Agent_parameter_remove(AgentObject *self, PyObject *args, PyObject *kwds)
 {
+    return s_agent_io_remove(self, args, kwds, IGS_ATTRIBUTE_T, igsagent_parameter_remove);
+}
+
+typedef igs_io_value_type_t (*agent_io_type)(igsagent_t*, const char*);
+PyObject *s_agent_io_type(AgentObject *self, PyObject *args, PyObject *kwds, agent_io_type igs_api)
+{
     static char *kwlist[] = {"name",  NULL};
-    char *name = NULL;
+    const char *name = NULL;
     if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &name))
         Py_RETURN_NONE;
     if(self->agent)
-    {
-        agentobserve_iop_cb_t *it = NULL;
-        do {
-            DL_FOREACH(agentobserve_iop_cbList, it) {
-                if (it->agent == self
-                    && it->nameArg == name
-                    && it->iopType == IGS_PARAMETER_T) break;
-            }
-            if (it) {
-                DL_DELETE(agentobserve_iop_cbList, it);
-                Py_CLEAR(it->callback);
-                Py_CLEAR(it->my_data);
-                free(it->nameArg);
-                free(it);
-            }
-        } while(it);
-        return PyLong_FromLong(igsagent_parameter_remove(self->agent, name));
-    }
+        return PyLong_FromLong(igs_api(self->agent, name));
     Py_RETURN_NONE;
 }
 
-
 PyObject *Agent_input_type(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    static char *kwlist[] = {"name",  NULL};
-    char *name = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &name))
-        Py_RETURN_NONE;
-    if(self->agent)
-    {
-        return PyLong_FromLong(igsagent_input_type(self->agent, name));
-    }
-    Py_RETURN_NONE;
+    return s_agent_io_type(self, args, kwds, igsagent_input_type);
 }
 
 PyObject *Agent_output_type(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-   static char *kwlist[] = {"name",  NULL};
-    char *name = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &name))
-        Py_RETURN_NONE;
-    if(self->agent)
-    {
-        return PyLong_FromLong(igsagent_output_type(self->agent, name));
-    }
-    Py_RETURN_NONE;
+    return s_agent_io_type(self, args, kwds, igsagent_output_type);
+}
+
+PyObject *Agent_attribute_type(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_type(self, args, kwds, igsagent_attribute_type);
 }
 
 PyObject *Agent_parameter_type(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    static char *kwlist[] = {"name",  NULL};
-    char *name = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &name))
-        Py_RETURN_NONE;
-    if(self->agent)
-    {
-        return PyLong_FromLong(igsagent_parameter_type(self->agent, name));
-    }
-    Py_RETURN_NONE;
+    return s_agent_io_type(self, args, kwds, igsagent_parameter_type);
 }
-
 
 PyObject *Agent_input_count(AgentObject *self, PyObject *args, PyObject *kwds)
 {
     if(self->agent)
-    {
         return PyLong_FromLong(igsagent_input_count(self->agent));
-    }
     Py_RETURN_NONE;
 }
 
 PyObject *Agent_output_count(AgentObject *self, PyObject *args, PyObject *kwds)
 {
     if(self->agent)
-    {
         return PyLong_FromLong(igsagent_output_count(self->agent));
-    }
+    Py_RETURN_NONE;
+}
+
+PyObject *Agent_attribute_count(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    if(self->agent)
+        return PyLong_FromLong(igsagent_attribute_count(self->agent));
     Py_RETURN_NONE;
 }
 
 PyObject *Agent_parameter_count(AgentObject *self, PyObject *args, PyObject *kwds)
 {
     if(self->agent)
-    {
         return PyLong_FromLong(igsagent_parameter_count(self->agent));
-    }
     Py_RETURN_NONE;
 }
 
-
-PyObject *Agent_input_list(AgentObject *self, PyObject *args, PyObject *kwds)
+typedef char** (*agent_io_list)(igsagent_t*, size_t*);
+PyObject *s_agent_io_list(AgentObject *self, PyObject *args, PyObject *kwds, agent_io_list igs_api)
 {
     if(!self->agent)
         return PyLong_FromLong(IGS_FAILURE);
     size_t nbOfElements;
     PyObject * ret;
 
-    char **result = igsagent_input_list(self->agent, &nbOfElements);
+    char **result = igs_api(self->agent, &nbOfElements);
     ret = PyList_New(nbOfElements);
-    for (size_t i = 0; i < nbOfElements; i++){
+    for (size_t i = 0; i < nbOfElements; i++)
         PyList_SetItem(ret, i, Py_BuildValue("s",result[i]));
-    }
     return ret;
+}
+
+PyObject *Agent_input_list(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_list(self, args, kwds, igsagent_input_list);
 }
 
 PyObject *Agent_output_list(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    if(!self->agent)
-        Py_RETURN_NONE;
-    size_t nbOfElements;
-    PyObject * ret;
-    char **result = igsagent_output_list(self->agent, &nbOfElements);
+    return s_agent_io_list(self, args, kwds, igsagent_output_list);
+}
 
-    ret = PyList_New(nbOfElements);
-    for (size_t i = 0; i < nbOfElements; i++){
-        PyList_SetItem(ret, i, Py_BuildValue("s",result[i]));
-    }
-    return ret;
+PyObject *Agent_attribute_list(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_list(self, args, kwds, igsagent_attribute_list);
 }
 
 PyObject *Agent_parameter_list(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    if(!self->agent)
-        Py_RETURN_NONE;
-    size_t nbOfElements;
-    char **result = igsagent_parameter_list(self->agent, &nbOfElements);
-    PyObject * ret = PyList_New(nbOfElements);
-    for (size_t i = 0; i < nbOfElements; i++){
-        PyList_SetItem(ret, i, Py_BuildValue("s",result[i]));
-    }
-    return ret;
+    return s_agent_io_list(self, args, kwds, igsagent_parameter_list);
 }
 
-
-PyObject *Agent_input_exists(AgentObject *self, PyObject *args, PyObject *kwds)
+typedef bool (*agent_io_exists)(igsagent_t*, const char*);
+PyObject *s_agent_io_exists(AgentObject *self, PyObject *args, PyObject *kwds, agent_io_exists igs_api)
 {
     static char *kwlist[] = {"name",  NULL};
     char *name = NULL;
 
     if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &name))
         Py_RETURN_NONE;
-    if(igsagent_input_exists(self->agent,name)) {
+    if(igs_api(self->agent,name)) {
         Py_RETURN_TRUE;
     }else{
         Py_RETURN_FALSE;
     }
+}
+
+PyObject *Agent_input_exists(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_exists(self, args, kwds, igsagent_input_exists);
 }
 
 PyObject *Agent_output_exists(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    static char *kwlist[] = {"name",  NULL};
-    char *name = NULL;
+    return s_agent_io_exists(self, args, kwds, igsagent_output_exists);
+}
 
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &name))
-        Py_RETURN_NONE;
-    if (igsagent_output_exists(self->agent,name)) {
-        Py_RETURN_TRUE;
-    }else{
-        Py_RETURN_FALSE;
-    }
+PyObject *Agent_attribute_exists(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_exists(self, args, kwds, igsagent_attribute_exists);
 }
 
 PyObject *Agent_parameter_exists(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    static char *kwlist[] = {"name",  NULL};
-    char *name = NULL;
-
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &name))
-        Py_RETURN_NONE;
-    if (igsagent_parameter_exists(self->agent,name)) {
-        Py_RETURN_TRUE;
-    }else{
-        Py_RETURN_FALSE;
-    }
+    return s_agent_io_exists(self, args, kwds, igsagent_parameter_exists);
 }
 
-
-PyObject *Agent_input_bool(AgentObject *self, PyObject *args, PyObject *kwds)
+typedef bool (*agent_io_bool)(igsagent_t*, const char*);
+PyObject *s_agent_io_bool(AgentObject *self, PyObject *args, PyObject *kwds, agent_io_bool igs_api)
 {
     static char *kwlist[] = {"name",  NULL};
-    char *name = NULL;
+    const char *name = NULL;
 
     if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &name))
         Py_RETURN_NONE;
-    if (igsagent_input_bool(self->agent, name)) {
+    if (igs_api(self->agent, name)) {
         Py_RETURN_TRUE;
     } else{
         Py_RETURN_FALSE;
     }
 }
 
-PyObject *Agent_input_int(AgentObject *self, PyObject *args, PyObject *kwds)
+typedef int (*agent_io_int)(igsagent_t*, const char*);
+PyObject *s_agent_io_int(AgentObject *self, PyObject *args, PyObject *kwds, agent_io_int igs_api)
 {
     if(!self->agent)
         Py_RETURN_NONE;
     static char *kwlist[] = {"name",  NULL};
-    char *name = NULL;
+    const char *name = NULL;
 
     if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &name))
         Py_RETURN_NONE;
-    return PyLong_FromLong(igsagent_input_int(self->agent, name));
+    return PyLong_FromLong(igs_api(self->agent, name));
 }
 
-PyObject *Agent_input_double(AgentObject *self, PyObject *args, PyObject *kwds)
+typedef double (*agent_io_double)(igsagent_t*, const char*);
+PyObject *s_agent_io_double(AgentObject *self, PyObject *args, PyObject *kwds, agent_io_double igs_api)
 {
     if(!self->agent)
         Py_RETURN_NONE;
     static char *kwlist[] = {"name",  NULL};
-    char *name = NULL;
+    const char *name = NULL;
 
     if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &name))
         Py_RETURN_NONE;
-    return PyFloat_FromDouble(igsagent_input_double(self->agent, name));
+    return PyFloat_FromDouble(igs_api(self->agent, name));
 }
 
-PyObject *Agent_input_string(AgentObject *self, PyObject *args, PyObject *kwds)
+typedef char* (*agent_io_string)(igsagent_t*, const char*);
+PyObject *s_agent_io_string(AgentObject *self, PyObject *args, PyObject *kwds, agent_io_string igs_api)
 {
     if(!self->agent)
         Py_RETURN_NONE;
     static char *kwlist[] = {"name",  NULL};
-    char *name = NULL;
+    const char *name = NULL;
 
     if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &name))
         Py_RETURN_NONE;
-    char *value = igsagent_input_string(self->agent, name);
+    char *value = igs_api(self->agent, name);
     if(value == NULL)
         Py_RETURN_NONE;
     else{
@@ -1114,22 +1031,22 @@ PyObject *Agent_input_string(AgentObject *self, PyObject *args, PyObject *kwds)
         value = NULL;
         return ret;
     }
-
 }
 
-PyObject *Agent_input_data(AgentObject *self, PyObject *args, PyObject *kwds)
+typedef igs_result_t (*agent_io_data)(igsagent_t*, const char*, void**, size_t*);
+PyObject *s_agent_io_data(AgentObject *self, PyObject *args, PyObject *kwds, agent_io_data igs_api)
 {
     if(!self->agent)
         Py_RETURN_NONE;
     static char *kwlist[] = {"name",  NULL};
-    char *name = NULL;
+    const char *name = NULL;
 
     if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &name))
         Py_RETURN_NONE;
 
     void *my_data = NULL;
     size_t valueSize = 0;
-    igsagent_input_data(self->agent, name, &my_data, &valueSize);
+    igs_api(self->agent, name, &my_data, &valueSize);
     if(my_data == NULL)
         Py_RETURN_NONE;
     else{
@@ -1138,471 +1055,356 @@ PyObject *Agent_input_data(AgentObject *self, PyObject *args, PyObject *kwds)
         my_data = NULL;
         return ret;
     }
+}
+
+PyObject *Agent_input_bool(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_bool(self, args, kwds, igsagent_input_bool);
+}
+
+PyObject *Agent_input_int(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_int(self, args, kwds, igsagent_input_int);
+}
+
+PyObject *Agent_input_double(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_double(self, args, kwds, igsagent_input_double);
+}
+
+PyObject *Agent_input_string(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_string(self, args, kwds, igsagent_input_string);
+}
+
+PyObject *Agent_input_data(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_data(self, args, kwds, igsagent_input_data);
 }
 
 
 PyObject *Agent_output_bool(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    static char *kwlist[] = {"name",  NULL};
-    char *name = NULL;
-
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &name))
-        return PyLong_FromLong(IGS_FAILURE);
-    if (igsagent_output_bool(self->agent, name)) {
-        Py_RETURN_TRUE;
-    } else{
-        Py_RETURN_FALSE;
-    }
+    return s_agent_io_bool(self, args, kwds, igsagent_output_bool);
 }
 
 PyObject *Agent_output_int(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    if(!self->agent)
-        Py_RETURN_NONE;
-    static char *kwlist[] = {"name",  NULL};
-    char *name = NULL;
-
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &name))
-        Py_RETURN_NONE;
-    return PyLong_FromLong(igsagent_output_int(self->agent,name));
+    return s_agent_io_int(self, args, kwds, igsagent_output_int);
 }
 
 PyObject *Agent_output_double(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    if(!self->agent)
-        Py_RETURN_NONE;
-    static char *kwlist[] = {"name",  NULL};
-    char *name = NULL;
-
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &name))
-        Py_RETURN_NONE;
-    return PyFloat_FromDouble(igsagent_output_double(self->agent, name));
+    return s_agent_io_double(self, args, kwds, igsagent_output_double);
 }
 
 PyObject *Agent_output_string(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    if(!self->agent)
-        Py_RETURN_NONE;
-    static char *kwlist[] = {"name",  NULL};
-    char *name = NULL;
-
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &name))
-        Py_RETURN_NONE;
-    char *value = igsagent_output_string(self->agent, name);
-    if(value == NULL)
-        Py_RETURN_NONE;
-    else{
-        PyObject *ret =  PyUnicode_FromFormat("%s", value);
-        free(value);
-        value = NULL;
-        return ret;
-    }
+    return s_agent_io_string(self, args, kwds, igsagent_output_string);
 }
 
 PyObject *Agent_output_data(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    if(!self->agent)
-        Py_RETURN_NONE;
-    static char *kwlist[] = {"name",  NULL};
-    char *name = NULL;
-
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &name))
-        Py_RETURN_NONE;
-
-    void *my_data = NULL;
-    size_t valueSize = 0;
-    igsagent_output_data(self->agent, name, &my_data, &valueSize);
-    if(my_data == NULL)
-        Py_RETURN_NONE;
-    else{
-        PyObject *ret = Py_BuildValue("y#", my_data, valueSize);
-        free(my_data);
-        my_data = NULL;
-        return ret;
-    }
+    return s_agent_io_data(self, args, kwds, igsagent_output_data);
 }
 
+PyObject *Agent_attribute_bool(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_bool(self, args, kwds, igsagent_attribute_bool);
+}
+
+PyObject *Agent_attribute_int(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_int(self, args, kwds, igsagent_attribute_int);
+}
+
+PyObject *Agent_attribute_double(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_double(self, args, kwds, igsagent_attribute_double);
+}
+
+PyObject *Agent_attribute_string(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_string(self, args, kwds, igsagent_attribute_string);
+}
+
+PyObject *Agent_attribute_data(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_data(self, args, kwds, igsagent_attribute_data);
+}
 
 PyObject *Agent_parameter_bool(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    static char *kwlist[] = {"name",  NULL};
-    char *name = NULL;
-
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &name))
-        return PyLong_FromLong(IGS_FAILURE);
-    if (igsagent_parameter_bool(self->agent, name)) {
-        Py_RETURN_TRUE;
-    } else{
-        Py_RETURN_FALSE;
-    }
+    return s_agent_io_bool(self, args, kwds, igsagent_parameter_bool);
 }
 
 PyObject *Agent_parameter_int(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    if(!self->agent)
-        Py_RETURN_NONE;
-    static char *kwlist[] = {"name",  NULL};
-    char *name = NULL;
-
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &name))
-        Py_RETURN_NONE;
-    return PyLong_FromLong(igsagent_parameter_int(self->agent,name));
+    return s_agent_io_int(self, args, kwds, igsagent_parameter_int);
 }
 
 PyObject *Agent_parameter_double(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    if(!self->agent)
-        Py_RETURN_NONE;
-    static char *kwlist[] = {"name",  NULL};
-    char *name = NULL;
-
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &name))
-        Py_RETURN_NONE;
-    return PyFloat_FromDouble(igsagent_parameter_double(self->agent, name));
+    return s_agent_io_double(self, args, kwds, igsagent_parameter_double);
 }
 
 PyObject *Agent_parameter_string(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    if(!self->agent)
-        Py_RETURN_NONE;
-    static char *kwlist[] = {"name",  NULL};
-    char *name = NULL;
-
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &name))
-        Py_RETURN_NONE;
-    char *value = igsagent_parameter_string(self->agent, name);
-    if(value == NULL)
-        Py_RETURN_NONE;
-    else{
-        PyObject *ret =  PyUnicode_FromFormat("%s", value);
-        free(value);
-        value = NULL;
-        return ret;
-    }
+    return s_agent_io_string(self, args, kwds, igsagent_parameter_string);
 }
 
 PyObject *Agent_parameter_data(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    if(!self->agent)
-        Py_RETURN_NONE;
-    static char *kwlist[] = {"name",  NULL};
-    char *name = NULL;
-
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &name))
-        Py_RETURN_NONE;
-
-    void *my_data = NULL;
-    size_t valueSize = 0;
-    igsagent_parameter_data(self->agent, name, &my_data, &valueSize);
-    if(my_data == NULL)
-        Py_RETURN_NONE;
-    else{
-        PyObject *ret = Py_BuildValue("y#", my_data, valueSize);
-        free(my_data);
-        my_data = NULL;
-        return ret;
-    }
+    return s_agent_io_data(self, args, kwds, igsagent_parameter_data);
 }
 
-PyObject *Agent_input_set_bool(AgentObject *self, PyObject *args, PyObject *kwds)
+typedef igs_result_t (*agent_io_set_bool)(igsagent_t*, const char*, bool);
+PyObject *s_agent_io_set_bool(AgentObject *self, PyObject *args, PyObject *kwds, agent_io_set_bool igs_api)
 {
     if(!self->agent)
         Py_RETURN_NONE;
     static char *kwlist[] = {"name", "value", NULL};
-    char *name = NULL;
+    const char *name = NULL;
     int value;
     int result;
 
     if (!PyArg_ParseTupleAndKeywords(args, NULL, "sp", kwlist, &name, &value))
         Py_RETURN_NONE;
 
-    if (value == 1){
-        result = igsagent_input_set_bool(self->agent, name, true);
-    }else{
-        result = igsagent_input_set_bool(self->agent, name, false);
-    }
-    return PyLong_FromLong(result);
+    return PyLong_FromLong(igs_api(self->agent, name, (value == 1)));
+}
+
+typedef igs_result_t (*agent_io_set_int)(igsagent_t*, const char*, int);
+PyObject *s_agent_io_set_int(AgentObject *self, PyObject *args, PyObject *kwds, agent_io_set_int igs_api)
+{
+    if(!self->agent)
+        Py_RETURN_NONE;
+    static char *kwlist[] = {"name", "value", NULL};
+    const char *name = NULL;
+    int value;
+
+    if (!PyArg_ParseTupleAndKeywords(args, NULL, "si", kwlist, &name, &value))
+        Py_RETURN_NONE;
+
+    return PyLong_FromLong(igs_api(self->agent, name, value));
+}
+
+typedef igs_result_t (*agent_io_set_double)(igsagent_t*, const char*, double);
+PyObject *s_agent_io_set_double(AgentObject *self, PyObject *args, PyObject *kwds, agent_io_set_double igs_api)
+{
+    if(!self->agent)
+        Py_RETURN_NONE;
+    static char *kwlist[] = {"name", "value", NULL};
+    char *name = NULL;
+    double value;
+
+    if (!PyArg_ParseTupleAndKeywords(args, NULL, "sd", kwlist, &name, &value))
+        Py_RETURN_NONE;
+
+    return PyLong_FromLong(igs_api(self->agent, name, value));
+}
+
+typedef igs_result_t (*agent_io_set_string)(igsagent_t*, const char*, const char*);
+PyObject *s_agent_io_set_string(AgentObject *self, PyObject *args, PyObject *kwds, agent_io_set_string igs_api)
+{
+   if(!self->agent)
+        Py_RETURN_NONE;
+    static char *kwlist[] = {"name", "value", NULL};
+    const char *name = NULL;
+    const char *value = NULL;
+
+    if (!PyArg_ParseTupleAndKeywords(args, NULL, "ss", kwlist, &name, &value))
+        Py_RETURN_NONE;
+
+    return PyLong_FromLong(igs_api(self->agent, name, value));
+}
+
+typedef igs_result_t (*agent_io_set_impulsion)(igsagent_t*, const char*);
+PyObject *s_agent_io_set_impulsion(AgentObject *self, PyObject *args, PyObject *kwds, agent_io_set_impulsion igs_api)
+{
+    if(!self->agent)
+        Py_RETURN_NONE;
+    static char *kwlist[] = {"name",NULL};
+    const char *name = NULL;
+
+    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &name))
+        Py_RETURN_NONE;
+
+    return PyLong_FromLong(igs_api(self->agent, name));
+}
+
+typedef igs_result_t (*agent_io_set_data)(igsagent_t*, const char*, void*, size_t);
+PyObject *s_agent_io_set_data(AgentObject *self, PyObject *args, PyObject *kwds, agent_io_set_data igs_api)
+{
+    if(!self->agent)
+        Py_RETURN_NONE;
+    static char *kwlist[] = {"name", "value", NULL};
+    const char * name;
+    Py_buffer buf;
+    if (!PyArg_ParseTupleAndKeywords(args, NULL, "sy*", kwlist, &name, &buf))
+        Py_RETURN_NONE;
+
+    PyObject* result = PyLong_FromLong(igs_api(self->agent, name, buf.buf, (size_t)buf.len));
+    PyBuffer_Release(&buf);
+    return result;
+}
+
+// input setters
+PyObject *Agent_input_set_bool(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_set_bool(self, args, kwds, igsagent_input_set_bool);
 }
 
 PyObject *Agent_input_set_int(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    if(!self->agent)
-        Py_RETURN_NONE;
-    static char *kwlist[] = {"name", "value", NULL};
-    char *name = NULL;
-    int value;
-
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "si", kwlist, &name, &value))
-        Py_RETURN_NONE;
-
-    return PyLong_FromLong(igsagent_input_set_int(self->agent, name, value));
+    return s_agent_io_set_int(self, args, kwds, igsagent_input_set_int);
 }
 
 PyObject *Agent_input_set_double(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    if(!self->agent)
-        Py_RETURN_NONE;
-    static char *kwlist[] = {"name", "value", NULL};
-    char *name = NULL;
-    double value;
-
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "sd", kwlist, &name, &value))
-        Py_RETURN_NONE;
-
-    return PyLong_FromLong(igsagent_input_set_double(self->agent, name, value));
+    return s_agent_io_set_double(self, args, kwds, igsagent_input_set_double);
 }
 
 PyObject *Agent_input_set_string(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-   if(!self->agent)
-        Py_RETURN_NONE;
-    static char *kwlist[] = {"name", "value", NULL};
-    char *name = NULL;
-    char *value = NULL;
-
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "ss", kwlist, &name, &value))
-        Py_RETURN_NONE;
-
-    return PyLong_FromLong(igsagent_input_set_string(self->agent, name, value));
+    return s_agent_io_set_string(self, args, kwds, igsagent_input_set_string);
 }
 
 PyObject *Agent_input_set_impulsion(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    if(!self->agent)
-        Py_RETURN_NONE;
-    static char *kwlist[] = {"name",NULL};
-    char *name = NULL;
-
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &name))
-        Py_RETURN_NONE;
-
-    return PyLong_FromLong(igsagent_input_set_impulsion(self->agent, name));
+    return s_agent_io_set_impulsion(self, args, kwds, igsagent_input_set_impulsion);
 }
 
 PyObject *Agent_input_set_data(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    if(!self->agent)
-        Py_RETURN_NONE;
-    static char *kwlist[] = {"name", "value", NULL};
-    char * name;
-    Py_buffer buf;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "sy*", kwlist, &name, &buf))
-        Py_RETURN_NONE;
-
-    return PyLong_FromLong(igsagent_input_set_data(self->agent, name, buf.buf, (size_t)buf.len));
+    return s_agent_io_set_data(self, args, kwds, igsagent_input_set_data);
 }
 
-
+// output setters
 PyObject *Agent_output_set_bool(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    if(!self->agent)
-        Py_RETURN_NONE;
-    static char *kwlist[] = {"name", "value", NULL};
-    char *name = NULL;
-    int value;
-    int result = 0;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "sp", kwlist, &name, &value))
-        Py_RETURN_NONE;
-
-    if (value == 1){
-        result = igsagent_output_set_bool(self->agent, name, true);
-    }else{
-        result = igsagent_output_set_bool(self->agent, name, false);
-    }
-    return PyLong_FromLong(result);
+    return s_agent_io_set_bool(self, args, kwds, igsagent_output_set_bool);
 }
 
 PyObject *Agent_output_set_int(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    if(!self->agent)
-        Py_RETURN_NONE;
-    static char *kwlist[] = {"name", "value", NULL};
-    char *name = NULL;
-    int value;
-
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "si", kwlist, &name, &value))
-        Py_RETURN_NONE;
-
-    return PyLong_FromLong(igsagent_output_set_int(self->agent, name, value));
+    return s_agent_io_set_int(self, args, kwds, igsagent_output_set_int);
 }
 
 PyObject *Agent_output_set_double(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    if(!self->agent)
-        Py_RETURN_NONE;
-    static char *kwlist[] = {"name", "value", NULL};
-    char *name = NULL;
-    double value;
-
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "sd", kwlist, &name, &value))
-        Py_RETURN_NONE;
-
-    return PyLong_FromLong(igsagent_output_set_double(self->agent, name, value));
+    return s_agent_io_set_double(self, args, kwds, igsagent_output_set_double);
 }
 
 PyObject *Agent_output_set_string(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-   if(!self->agent)
-        Py_RETURN_NONE;
-    static char *kwlist[] = {"name", "value", NULL};
-    char *name = NULL;
-    char *value = NULL;
-
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "ss", kwlist, &name, &value))
-        Py_RETURN_NONE;
-
-    return PyLong_FromLong(igsagent_output_set_string(self->agent, name, value));
+    return s_agent_io_set_string(self, args, kwds, igsagent_output_set_string);
 }
 
 PyObject *Agent_output_set_impulsion(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    if(!self->agent)
-        Py_RETURN_NONE;
-    static char *kwlist[] = {"name",NULL};
-    char *name = NULL;
-
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &name))
-        Py_RETURN_NONE;
-
-    return PyLong_FromLong(igsagent_output_set_impulsion(self->agent, name));
+    return s_agent_io_set_impulsion(self, args, kwds, igsagent_output_set_impulsion);
 }
 
 PyObject *Agent_output_set_data(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    if(!self->agent)
-        Py_RETURN_NONE;
-    static char *kwlist[] = {"name", "value", NULL};
-    char * name;
-    Py_buffer buf;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "sy*", kwlist, &name, &buf))
-        Py_RETURN_NONE;
-
-    return PyLong_FromLong(igsagent_output_set_data(self->agent, name, buf.buf, (size_t)buf.len));
+    return s_agent_io_set_data(self, args, kwds, igsagent_output_set_data);
 }
 
+// attribute setters
+PyObject *Agent_attribute_set_bool(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_set_bool(self, args, kwds, igsagent_attribute_set_bool);
+}
 
+PyObject *Agent_attribute_set_int(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_set_int(self, args, kwds, igsagent_attribute_set_int);
+}
+
+PyObject *Agent_attribute_set_double(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_set_double(self, args, kwds, igsagent_attribute_set_double);
+}
+
+PyObject *Agent_attribute_set_string(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_set_string(self, args, kwds, igsagent_attribute_set_string);
+}
+
+PyObject *Agent_attribute_set_data(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_set_data(self, args, kwds, igsagent_attribute_set_data);
+}
+
+// parameter setters
 PyObject *Agent_parameter_set_bool(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    if(!self->agent)
-        Py_RETURN_NONE;
-    static char *kwlist[] = {"name", "value", NULL};
-    char *name = NULL;
-    int value;
-    int result;
-
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "sp", kwlist, &name, &value))
-        Py_RETURN_NONE;
-
-    if (value == 1){
-        result = igsagent_parameter_set_bool(self->agent, name, true);
-    }else{
-        result = igsagent_parameter_set_bool(self->agent, name, false);
-    }
-    return PyLong_FromLong(result);
+    return s_agent_io_set_bool(self, args, kwds, igsagent_parameter_set_bool);
 }
 
 PyObject *Agent_parameter_set_int(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    if(!self->agent)
-        Py_RETURN_NONE;
-    static char *kwlist[] = {"name", "value", NULL};
-    char *name = NULL;
-    int value;
-
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "si", kwlist, &name, &value))
-        Py_RETURN_NONE;
-
-    return PyLong_FromLong(igsagent_parameter_set_int(self->agent, name, value));
+    return s_agent_io_set_int(self, args, kwds, igsagent_parameter_set_int);
 }
 
 PyObject *Agent_parameter_set_double(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    if(!self->agent)
-        Py_RETURN_NONE;
-    static char *kwlist[] = {"name", "value", NULL};
-    char *name = NULL;
-    double value;
-
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "sd", kwlist, &name, &value))
-        Py_RETURN_NONE;
-
-    return PyLong_FromLong(igsagent_parameter_set_double(self->agent, name, value));
+    return s_agent_io_set_double(self, args, kwds, igsagent_parameter_set_double);
 }
 
 PyObject *Agent_parameter_set_string(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-   if(!self->agent)
-        Py_RETURN_NONE;
-    static char *kwlist[] = {"name", "value", NULL};
-    char *name = NULL;
-    char *value = NULL;
-
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "ss", kwlist, &name, &value))
-        Py_RETURN_NONE;
-
-    return PyLong_FromLong(igsagent_parameter_set_string(self->agent, name, value));
+    return s_agent_io_set_string(self, args, kwds, igsagent_parameter_set_string);
 }
 
 PyObject *Agent_parameter_set_data(AgentObject *self, PyObject *args, PyObject *kwds)
 {
+    return s_agent_io_set_data(self, args, kwds, igsagent_parameter_set_data);
+}
+
+typedef void (*agent_io_clear)(igsagent_t*, const char* name);
+PyObject *s_agent_io_clear(AgentObject *self, PyObject *args, PyObject *kwds, agent_io_clear igs_api)
+{
     if(!self->agent)
         Py_RETURN_NONE;
-    static char *kwlist[] = {"name", "value", NULL};
-    char * name;
-    Py_buffer buf;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "sy*", kwlist, &name, &buf))
-        Py_RETURN_NONE;
+    static char *kwlist[] = {"name",  NULL};
+    const char *name = NULL;
 
-    return PyLong_FromLong(igsagent_parameter_set_data(self->agent, name, buf.buf, (size_t)buf.len));
+    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &name))
+        Py_RETURN_NONE;
+    igs_api(self->agent, name);
+    return PyLong_FromLong(IGS_SUCCESS);
 }
 
 PyObject *Agent_clear_input(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    if(!self->agent)
-        Py_RETURN_NONE;
-    static char *kwlist[] = {"name",  NULL};
-    char *name = NULL;
-
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &name))
-        Py_RETURN_NONE;
-    igsagent_clear_input(self->agent, name);
-    return PyLong_FromLong(IGS_SUCCESS);
+    return s_agent_io_clear(self, args, kwds, igsagent_clear_input);
 }
 
 PyObject *Agent_clear_output(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    if(!self->agent)
-        Py_RETURN_NONE;
-    static char *kwlist[] = {"name",  NULL};
-    char *name = NULL;
+    return s_agent_io_clear(self, args, kwds, igsagent_clear_output);
+}
 
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &name))
-        Py_RETURN_NONE;
-    igsagent_clear_output(self->agent, name);
-    return PyLong_FromLong(IGS_SUCCESS);
+PyObject *Agent_clear_attribute(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_clear(self, args, kwds, igsagent_clear_attribute);
 }
 
 PyObject *Agent_clear_parameter(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    if(!self->agent)
-        Py_RETURN_NONE;
-    static char *kwlist[] = {"name",  NULL};
-    char *name = NULL;
-
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &name))
-        Py_RETURN_NONE;
-    igsagent_clear_parameter(self->agent, name);
-    return PyLong_FromLong(IGS_SUCCESS);
+    return s_agent_io_clear(self, args, kwds, igsagent_clear_parameter);
 }
 
-agentobserve_iop_cb_t *agentobserve_iop_cbList = NULL;
-void agent_observe(igsagent_t* agent, igs_iop_type_t iopType, const char* name, igs_iop_value_type_t valueType, void* value, unsigned long valueSize, void* myData){
+agentobserve_io_cb_t *agentobserve_io_cbList = NULL;
+void agent_observe(igsagent_t* agent, igs_io_type_t ioType, const char* name, igs_io_value_type_t valueType, void* value, unsigned long valueSize, void* myData){
     IGS_UNUSED(myData);
     PyGILState_STATE d_gstate;
     d_gstate = PyGILState_Ensure();
 
     PyObject *tupleArgs = PyTuple_New(6);
-    PyTuple_SetItem(tupleArgs, 1, Py_BuildValue("i", iopType));
+    PyTuple_SetItem(tupleArgs, 1, Py_BuildValue("i", ioType));
     PyTuple_SetItem(tupleArgs, 2, Py_BuildValue("s", name));
     PyTuple_SetItem(tupleArgs, 3, Py_BuildValue("i", valueType));
     switch(valueType){
@@ -1628,11 +1430,11 @@ void agent_observe(igsagent_t* agent, igs_iop_type_t iopType, const char* name, 
             break;
     }
 
-    agentobserve_iop_cb_t *actuel = NULL;
-    DL_FOREACH(agentobserve_iop_cbList, actuel) {
+    agentobserve_io_cb_t *actuel = NULL;
+    DL_FOREACH(agentobserve_io_cbList, actuel) {
         if (streq(actuel->nameArg, name)
             && (actuel->agent->agent == agent)
-            && (actuel->iopType == iopType)) {
+            && (actuel->ioType == ioType)) {
             PyTuple_SetItem(tupleArgs, 0, Py_BuildValue("O", actuel->agent));
             Py_INCREF(actuel->my_data);
             PyTuple_SetItem(tupleArgs, 5, actuel->my_data);
@@ -1643,15 +1445,16 @@ void agent_observe(igsagent_t* agent, igs_iop_type_t iopType, const char* name, 
     PyGILState_Release(d_gstate);
 }
 
-PyObject *_Agent_observe_generic(AgentObject *self, PyObject *args, PyObject *kwds, igs_iop_type_t iopType)
+typedef void (*agent_io_observe)(igsagent_t*, const char*, igsagent_io_fn, void*);
+PyObject *s_agent_io_observe(AgentObject *self, PyObject *args, PyObject *kwds, igs_io_type_t ioType, agent_io_observe igs_api)
 {
     if(!self->agent)
         return PyLong_FromLong(IGS_FAILURE);
 
     PyObject *callback = NULL;
     PyObject *my_data = NULL;
-    char *iopName = NULL;
-    if (PyArg_ParseTuple(args, "sOO", &iopName, &callback, &my_data)) {
+    char *ioName = NULL;
+    if (PyArg_ParseTuple(args, "sOO", &ioName, &callback, &my_data)) {
         if (!PyCallable_Check(callback)) {
             PyErr_SetString(PyExc_TypeError, "'callback' parameter must be callable");
             return PyLong_FromLong(IGS_FAILURE);;
@@ -1660,42 +1463,35 @@ PyObject *_Agent_observe_generic(AgentObject *self, PyObject *args, PyObject *kw
     else {
         return PyLong_FromLong(IGS_FAILURE);
     }
-    agentobserve_iop_cb_t *newElt = calloc(1, sizeof(agentobserve_iop_cb_t));
+    agentobserve_io_cb_t *newElt = calloc(1, sizeof(agentobserve_io_cb_t));
     newElt->agent = self;
-    newElt->iopType = iopType;
-    newElt->nameArg = strdup(iopName);
+    newElt->ioType = ioType;
+    newElt->nameArg = strdup(ioName);
     newElt->my_data = Py_BuildValue("O", my_data);
     newElt->callback = callback;
-    DL_APPEND(agentobserve_iop_cbList, newElt);
-    switch(iopType)
-    {
-        case IGS_INPUT_T:
-            igsagent_observe_input(self->agent, iopName, agent_observe, NULL);
-            break;
-        case IGS_OUTPUT_T:
-            igsagent_observe_output(self->agent, iopName, agent_observe, NULL);
-            break;
-        case IGS_PARAMETER_T:
-            igsagent_observe_parameter(self->agent, iopName, agent_observe, NULL);
-            break;
-    }
-
+    DL_APPEND(agentobserve_io_cbList, newElt);
+    igs_api(self->agent, ioName, agent_observe, NULL);
     return PyLong_FromLong(IGS_SUCCESS);
 }
 
 PyObject *Agent_observe_input(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    return _Agent_observe_generic(self, args, NULL, IGS_INPUT_T);
+    return s_agent_io_observe(self, args, NULL, IGS_INPUT_T, igsagent_observe_input);
 }
 
 PyObject *Agent_observe_output(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    return _Agent_observe_generic(self, args, NULL, IGS_OUTPUT_T);
+    return s_agent_io_observe(self, args, NULL, IGS_OUTPUT_T, igsagent_observe_output);
+}
+
+PyObject *Agent_observe_attribute(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_observe(self, args, NULL, IGS_ATTRIBUTE_T, igsagent_observe_attribute);
 }
 
 PyObject *Agent_observe_parameter(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    return _Agent_observe_generic(self, args, NULL, IGS_PARAMETER_T);
+    return s_agent_io_observe(self, args, NULL, IGS_ATTRIBUTE_T, igsagent_observe_parameter);
 }
 
 PyObject *Agent_output_mute(AgentObject *self, PyObject *args, PyObject *kwds)
@@ -1753,89 +1549,108 @@ PyObject * Agent_constraints_enforce(AgentObject *self, PyObject *args, PyObject
     return PyLong_FromLong(0);
 }
 
-PyObject * Agent_input_add_constraint(AgentObject *self, PyObject *args, PyObject *kwds)
+typedef igs_result_t (*agent_io_add_constraint)(igsagent_t*, const char*, const char*);
+PyObject * s_agent_io_add_constraint(AgentObject *self, PyObject *args, PyObject *kwds, agent_io_add_constraint igs_api)
 {
     if(!self->agent)
         Py_RETURN_NONE;
 
     static char *kwlist[] = {"name", "constraint", NULL};
-    char * name = NULL;
-    char * constraint = NULL;
+    const char * name = NULL;
+    const char * constraint = NULL;
     if (!PyArg_ParseTupleAndKeywords(args, NULL, "ss", kwlist, &name, &constraint))
         Py_RETURN_NONE;
-    igsagent_input_add_constraint(self->agent, name, constraint);
+    igs_api(self->agent, name, constraint);
     return PyLong_FromLong(0);
+}
+
+PyObject * Agent_input_add_constraint(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_add_constraint(self, args, kwds, igsagent_input_add_constraint);
 }
 
 PyObject * Agent_output_add_constraint(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    if(!self->agent)
-        Py_RETURN_NONE;
+    return s_agent_io_add_constraint(self, args, kwds, igsagent_output_add_constraint);
+}
 
-    static char *kwlist[] = {"name", "constraint", NULL};
-    char * name = NULL;
-    char * constraint = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "ss", kwlist, &name, &constraint))
-        Py_RETURN_NONE;
-    igsagent_output_add_constraint(self->agent, name, constraint);
-    return PyLong_FromLong(0);
+PyObject * Agent_attribute_add_constraint(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_add_constraint(self, args, kwds, igsagent_attribute_add_constraint);
 }
 
 PyObject * Agent_parameter_add_constraint(AgentObject *self, PyObject *args, PyObject *kwds)
 {
+    return s_agent_io_add_constraint(self, args, kwds, igsagent_parameter_add_constraint);
+}
+
+typedef igs_result_t (*agent_io_set_description)(igsagent_t*, const char*, const char*);
+PyObject * s_agent_io_set_description(AgentObject *self, PyObject *args, PyObject *kwds, agent_io_set_description igs_api)
+{
     if(!self->agent)
         Py_RETURN_NONE;
 
-    static char *kwlist[] = {"name", "constraint", NULL};
-    char * name = NULL;
-    char * constraint = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "ss", kwlist, &name, &constraint))
-        Py_RETURN_NONE;
-    igsagent_parameter_add_constraint(self->agent, name, constraint);
-    return PyLong_FromLong(0);
+    static char *kwlist[] = {"name", "description", NULL};
+    const char * name = NULL;
+    const char * description = NULL;
+    if (!PyArg_ParseTupleAndKeywords(args, NULL, "ss", kwlist, &name, &description))
+        return NULL;
+    igs_api(self->agent, name, description);
+    return PyLong_FromLong(IGS_SUCCESS);
 }
 
 PyObject * Agent_input_set_description(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    if(!self->agent)
-        Py_RETURN_NONE;
-
-    static char *kwlist[] = {"name", "description", NULL};
-    char * name = NULL;
-    char * description = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "ss", kwlist, &name, &description))
-        return NULL;
-    igsagent_input_set_description(self->agent, name, description);
-    return PyLong_FromLong(IGS_SUCCESS);
+    return s_agent_io_set_description(self, args, kwds, igsagent_input_set_description);
 }
 
 PyObject * Agent_output_set_description(AgentObject *self, PyObject *args, PyObject *kwds)
 {
-    if(!self->agent)
-        Py_RETURN_NONE;
+    return s_agent_io_set_description(self, args, kwds, igsagent_output_set_description);
+}
 
-    static char *kwlist[] = {"name", "description", NULL};
-    char * name = NULL;
-    char * description = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "ss", kwlist, &name, &description))
-        return NULL;
-    igsagent_output_set_description(self->agent, name, description);
-    return PyLong_FromLong(IGS_SUCCESS);
+PyObject * Agent_attribute_set_description(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_set_description(self, args, kwds, igsagent_attribute_set_description);
 }
 
 PyObject * Agent_parameter_set_description(AgentObject *self, PyObject *args, PyObject *kwds)
 {
+    return s_agent_io_set_description(self, args, kwds, igsagent_parameter_set_description);
+}
+
+typedef igs_result_t (*agent_io_set_detailed_type)(igsagent_t*, const char*, const char*, const char*);
+PyObject * s_agent_io_set_detailed_type(AgentObject *self, PyObject *args, PyObject *kwds, agent_io_set_detailed_type igs_api)
+{
     if(!self->agent)
         Py_RETURN_NONE;
 
-    static char *kwlist[] = {"name", "description", NULL};
-    char * name = NULL;
-    char * description = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "ss", kwlist, &name, &description))
+    static char *kwlist[] = {"input_name", "type_name", "specification", NULL};
+    const char * input_name = NULL;
+    const char * type_name = NULL;
+    const char * specification = NULL;
+    if (!PyArg_ParseTupleAndKeywords(args, NULL, "sss", kwlist, &input_name, &type_name, &specification))
         return NULL;
-    igsagent_parameter_set_description(self->agent, name, description);
+    igs_api(self->agent, input_name, type_name, specification);
     return PyLong_FromLong(IGS_SUCCESS);
 }
+
+PyObject * Agent_input_set_detailed_type(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_set_detailed_type(self, args, kwds, igsagent_input_set_detailed_type);
+}
+
+PyObject * Agent_output_set_detailed_type(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_set_detailed_type(self, args, kwds, igsagent_output_set_detailed_type);
+}
+
+PyObject * Agent_attribute_set_detailed_type(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_set_detailed_type(self, args, kwds, igsagent_attribute_set_detailed_type);
+}
+
+//NOTE: igsagent_parameter_set_detailed_type is not binded because it was already obsolete (in favor of igsagent_attribute_set_detailed_type) when the binding was updated
 
 PyObject *Agent_mapping_load_str(AgentObject *self, PyObject *args, PyObject *kwds)
 {
@@ -1906,6 +1721,20 @@ PyObject *Agent_clear_mappings_with_agent(AgentObject *self, PyObject *args, PyO
         return NULL;
     if(self->agent){
         igsagent_clear_mappings_with_agent(self->agent, agent_name);
+        return PyLong_FromLong(IGS_SUCCESS);
+    }
+    return NULL;
+}
+
+PyObject *Agent_clear_mappings_for_input(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    static char *kwlist[] = {"input_name",  NULL};
+    const char *input_name = NULL;
+
+    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &input_name))
+        return NULL;
+    if(self->agent){
+        igsagent_clear_mappings_for_input(self->agent, input_name);
         return PyLong_FromLong(IGS_SUCCESS);
     }
     return NULL;
@@ -2473,6 +2302,48 @@ PyObject *Agent_election_leave(AgentObject *self, PyObject *args, PyObject *kwds
     if(self->agent)
         return PyLong_FromLong(igsagent_election_leave(self->agent, election_name));
     return NULL;
+}
+
+// Real-time APIs
+PyObject * Agent_rt_get_current_timestamp(AgentObject * self, PyObject * args)
+{
+    return PyLong_FromLong(igsagent_rt_get_current_timestamp(self->agent));
+}
+
+PyObject * Agent_rt_set_timestamps(AgentObject * self, PyObject * args)
+{
+    bool enable;
+    if (!PyArg_ParseTuple(args, "b", &enable)) {
+        return NULL;
+    }
+
+    igsagent_rt_set_timestamps(self->agent, enable);
+    return PyLong_FromLong(IGS_SUCCESS);
+}
+
+PyObject * Agent_rt_timestamps(AgentObject * self, PyObject * args)
+{
+    if (igsagent_rt_timestamps(self->agent))
+        Py_RETURN_TRUE;
+    Py_RETURN_FALSE;
+}
+
+PyObject * Agent_rt_set_synchronous_mode(AgentObject * self, PyObject * args)
+{
+    bool enable;
+    if (!PyArg_ParseTuple(args, "b", &enable)) {
+        return NULL;
+    }
+
+    igsagent_rt_set_synchronous_mode(self->agent, enable);
+    return PyLong_FromLong(IGS_SUCCESS);
+}
+
+PyObject * Agent_rt_synchronous_mode(AgentObject * self, PyObject * args)
+{
+    if (igsagent_rt_synchronous_mode(self->agent))
+        Py_RETURN_TRUE;
+    Py_RETURN_FALSE;
 }
 
 PyObject *Agent_definition_set_path(AgentObject *self, PyObject *args, PyObject *kwds)

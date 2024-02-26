@@ -90,33 +90,43 @@ PyObject *Agent_definition_load_str(AgentObject *self, PyObject *args, PyObject 
 PyObject *Agent_definition_load_file(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_clear_definition(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_definition_json(AgentObject *self, PyObject *args, PyObject *kwds);
-PyObject *Agent_definition_description(AgentObject *self, PyObject *args, PyObject *kwds);
-PyObject *Agent_definition_version(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_definition_set_class(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_definition_class(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_definition_set_package(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_definition_package(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_definition_set_description(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_definition_description(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_definition_set_version(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_definition_version(AgentObject *self, PyObject *args, PyObject *kwds);
 
 PyObject *Agent_input_create(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_output_create(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_attribute_create(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_parameter_create(AgentObject *self, PyObject *args, PyObject *kwds);
 
 PyObject *Agent_input_remove(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_output_remove(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_attribute_remove(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_parameter_remove(AgentObject *self, PyObject *args, PyObject *kwds);
 
 PyObject *Agent_input_type(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_output_type(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_attribute_type(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_parameter_type(AgentObject *self, PyObject *args, PyObject *kwds);
 
 PyObject *Agent_input_count(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_output_count(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_attribute_count(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_parameter_count(AgentObject *self, PyObject *args, PyObject *kwds);
 
 PyObject *Agent_input_list(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_output_list(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_attribute_list(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_parameter_list(AgentObject *self, PyObject *args, PyObject *kwds);
 
 PyObject *Agent_input_exists(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_output_exists(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_attribute_exists(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_parameter_exists(AgentObject *self, PyObject *args, PyObject *kwds);
 
 
@@ -131,6 +141,12 @@ PyObject *Agent_output_int(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_output_double(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_output_string(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_output_data(AgentObject *self, PyObject *args, PyObject *kwds);
+
+PyObject *Agent_attribute_bool(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_attribute_int(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_attribute_double(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_attribute_string(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_attribute_data(AgentObject *self, PyObject *args, PyObject *kwds);
 
 PyObject *Agent_parameter_bool(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_parameter_int(AgentObject *self, PyObject *args, PyObject *kwds);
@@ -152,6 +168,12 @@ PyObject *Agent_output_set_string(AgentObject *self, PyObject *args, PyObject *k
 PyObject *Agent_output_set_impulsion(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_output_set_data(AgentObject *self, PyObject *args, PyObject *kwds);
 
+PyObject *Agent_attribute_set_bool(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_attribute_set_int(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_attribute_set_double(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_attribute_set_string(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_attribute_set_data(AgentObject *self, PyObject *args, PyObject *kwds);
+
 PyObject *Agent_parameter_set_bool(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_parameter_set_int(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_parameter_set_double(AgentObject *self, PyObject *args, PyObject *kwds);
@@ -161,28 +183,36 @@ PyObject *Agent_parameter_set_data(AgentObject *self, PyObject *args, PyObject *
 PyObject * Agent_constraints_enforce(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject * Agent_input_add_constraint(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject * Agent_output_add_constraint(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject * Agent_attribute_add_constraint(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject * Agent_parameter_add_constraint(AgentObject *self, PyObject *args, PyObject *kwds);
 
 PyObject * Agent_input_set_description(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject * Agent_output_set_description(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject * Agent_attribute_set_description(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject * Agent_parameter_set_description(AgentObject *self, PyObject *args, PyObject *kwds);
+
+PyObject * Agent_input_set_detailed_type(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject * Agent_output_set_detailed_type(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject * Agent_attribute_set_detailed_type(AgentObject *self, PyObject *args, PyObject *kwds);
 
 PyObject *Agent_clear_input(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_clear_output(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_clear_attribute(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_clear_parameter(AgentObject *self, PyObject *args, PyObject *kwds);
 
-typedef struct agentobserve_iop_cb {
+typedef struct agentobserve_io_cb {
     AgentObject* agent;     // Agent ref
-    char *nameArg;          // name of the iop
-    igs_iop_type_t iopType;
+    char *nameArg;          // name of the io
+    igs_io_type_t ioType;
     PyObject *callback;
     PyObject *my_data;
-    struct agentobserve_iop_cb *next;
-    struct agentobserve_iop_cb *prev;
-} agentobserve_iop_cb_t;
-extern agentobserve_iop_cb_t *agentobserve_iop_cbList;
+    struct agentobserve_io_cb *next;
+    struct agentobserve_io_cb *prev;
+} agentobserve_io_cb_t;
+extern agentobserve_io_cb_t *agentobserve_io_cbList;
 PyObject *Agent_observe_input(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_observe_output(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_observe_attribute(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_observe_parameter(AgentObject *self, PyObject *args, PyObject *kwds);
 
 PyObject *Agent_output_mute(AgentObject *self, PyObject *args, PyObject *kwds);
@@ -197,6 +227,7 @@ PyObject *Agent_mapping_count(AgentObject *self, PyObject *args, PyObject *kwds)
 
 PyObject *Agent_clear_mappings(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_clear_mappings_with_agent(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_clear_mappings_for_input(AgentObject *self, PyObject *args, PyObject *kwds);
 
 PyObject *Agent_mapping_add(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_mapping_remove_with_id(AgentObject *self, PyObject *args, PyObject *kwds);
@@ -248,6 +279,12 @@ PyObject *Agent_service_args_exists(AgentObject *self, PyObject *args, PyObject 
 
 PyObject *Agent_election_join(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_election_leave(AgentObject *self, PyObject *args, PyObject *kwds);
+
+PyObject * Agent_rt_get_current_timestamp(AgentObject *self, PyObject *args);
+PyObject * Agent_rt_set_timestamps(AgentObject *self, PyObject *args);
+PyObject * Agent_rt_timestamps(AgentObject *self, PyObject *args);
+PyObject * Agent_rt_set_synchronous_mode(AgentObject *self, PyObject *args);
+PyObject * Agent_rt_synchronous_mode(AgentObject *self, PyObject *args);
 
 PyObject *Agent_definition_set_path(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_definition_save(AgentObject *self, PyObject *args, PyObject *kwds);

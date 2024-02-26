@@ -16,7 +16,7 @@
 import sys
 import ingescape as igs
 
-def multiply_callback(iop_type, iop_name, value_type, value, my_data):
+def multiply_callback(io_type, io_name, value_type, value, my_data):
     igs.info(f"From service, multiply {value} by 2 : {value * 2}")
     igs.output_set_int("out", value * 2)
 

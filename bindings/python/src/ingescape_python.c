@@ -67,6 +67,13 @@ static PyMethodDef Ingescape_methods[] =
     {"output_string", output_string_wrapper, METH_VARARGS, "output_string(output_name, )\n--\n\n "},
     {"output_data", output_data_wrapper, METH_VARARGS, "output_data(output_name, )\n--\n\n "},
 
+    //read attribute per type
+    {"attribute_bool", attribute_bool_wrapper, METH_VARARGS, "attribute_bool(attribute_name, )\n--\n\n "},
+    {"attribute_int", attribute_int_wrapper, METH_VARARGS, "attribute_int(attribute_name, )\n--\n\n "},
+    {"attribute_double", attribute_double_wrapper, METH_VARARGS, "attribute_double(attribute_name, )\n--\n\n "},
+    {"attribute_string", attribute_string_wrapper, METH_VARARGS, "attribute_string(attribute_name, )\n--\n\n "},
+    {"attribute_data", attribute_data_wrapper, METH_VARARGS, "attribute_data(attribute_name, )\n--\n\n "},
+
     //read parameter per type
     {"parameter_bool", parameter_bool_wrapper, METH_VARARGS, "parameter_bool(parameter_name, )\n--\n\n "},
     {"parameter_int", parameter_int_wrapper, METH_VARARGS, "parameter_int(parameter_name, )\n--\n\n "},
@@ -90,6 +97,13 @@ static PyMethodDef Ingescape_methods[] =
     {"output_set_impulsion", output_set_impulsion_wrapper, METH_VARARGS, "output_set_impulsion(output_name, value, )\n--\n\n "},
     {"output_set_data", output_set_data_wrapper, METH_VARARGS, "output_set_data(output_name, value, )\n--\n\n "},
 
+    //write Attribute per type
+    {"attribute_set_bool", attribute_set_bool_wrapper, METH_VARARGS, "attribute_set_bool(attribute_name, value, )\n--\n\n "},
+    {"attribute_set_int", attribute_set_int_wrapper, METH_VARARGS, "attribute_set_int(attribute_name, value, )\n--\n\n "},
+    {"attribute_set_double", attribute_set_double_wrapper, METH_VARARGS, "attribute_set_double(attribute_name, value, )\n--\n\n "},
+    {"attribute_set_string", attribute_set_string_wrapper, METH_VARARGS, "attribute_set_string(attribute_name, value, )\n--\n\n "},
+    {"attribute_set_data", attribute_set_data_wrapper, METH_VARARGS, "attribute_set_data(attribute_name, value, )\n--\n\n "},
+
     //write Parameter per type
     {"parameter_set_bool", parameter_set_bool_wrapper, METH_VARARGS, "parameter_set_bool(parameter_name, value, )\n--\n\n "},
     {"parameter_set_int", parameter_set_int_wrapper, METH_VARARGS, "parameter_set_int(parameter_name, value, )\n--\n\n "},
@@ -97,27 +111,31 @@ static PyMethodDef Ingescape_methods[] =
     {"parameter_set_string", parameter_set_string_wrapper, METH_VARARGS, "parameter_set_string(parameter_name, value, )\n--\n\n "},
     {"parameter_set_data", parameter_set_data_wrapper, METH_VARARGS, "parameter_set_data(parameter_name, value, )\n--\n\n "},
 
-    //check IOP type
+    //check IO type
     {"input_type", input_type_wrapper, METH_VARARGS, "input_type(input_name, )\n--\n\n "},
     {"output_type", output_type_wrapper, METH_VARARGS, "output_type(output_name, )\n--\n\n "},
+    {"attribute_type", attribute_type_wrapper, METH_VARARGS, "attribute_type(attribute_name, )\n--\n\n "},
     {"parameter_type", parameter_type_wrapper, METH_VARARGS, "parameter_type(parameter_name, )\n--\n\n "},
 
-    //get number of IOP
+    //get number of IO
     {"input_count", input_count_wrapper, METH_NOARGS, "input_count()\n--\n\n "},
     {"output_count", output_count_wrapper, METH_NOARGS, "output_count()\n--\n\n "},
+    {"attribute_count", attribute_count_wrapper, METH_NOARGS, "attribute_count()\n--\n\n "},
     {"parameter_count", parameter_count_wrapper, METH_NOARGS, "parameter_count()\n--\n\n "},
 
-    //check existence of IOP
+    //check existence of IO
     {"input_exists", input_exists_wrapper, METH_VARARGS, "input_exists(input_name, )\n--\n\n "},
     {"output_exists", output_exists_wrapper, METH_VARARGS, "output_exists(output_name, )\n--\n\n "},
+    {"attribute_exists", attribute_exists_wrapper, METH_VARARGS, "attribute_exists(attribute_name, )\n--\n\n "},
     {"parameter_exists", parameter_exists_wrapper, METH_VARARGS, "parameter_exists(parameter_name, )\n--\n\n "},
 
-    // get Iop list
+    // get Io list
     {"input_list", input_list_wrapper, METH_NOARGS, "input_list()\n--\n\n "},
     {"output_list", output_list_wrapper, METH_NOARGS, "output_list()\n--\n\n "},
+    {"attribute_list", attribute_list_wrapper, METH_NOARGS, "attribute_list()\n--\n\n "},
     {"parameter_list", parameter_list_wrapper, METH_NOARGS, "parameter_list()\n--\n\n "},
 
-    //mute or unmute an IOP
+    //mute or unmute an IO
     {"output_mute", output_mute_wrapper, METH_VARARGS, "output_mute(output_name, )\n--\n\n "},
     {"output_unmute", output_unmute_wrapper, METH_VARARGS, "output_unmute(output_name, )\n--\n\n "},
     {"output_is_muted", output_is_muted_wrapper, METH_VARARGS,  "output_is_muted(output_name, )\n--\n\n "},
@@ -127,28 +145,33 @@ static PyMethodDef Ingescape_methods[] =
     {"definition_load_file", definition_load_file_wrapper, METH_VARARGS, "definition_load_file(file_path, )\n--\n\n "},
     {"clear_definition", clear_definition_wrapper, METH_NOARGS, "clear_definition()\n--\n\n "},
 
-    //get information about definition
+    //read/write
     {"definition_json", definition_json_wrapper, METH_NOARGS, "definition_json()\n--\n\n "},
+    {"definition_set_class", definition_set_class_wrapper, METH_VARARGS, "definition_set_class(class, )\n--\n\n "},
+    {"definition_class", definition_class_wrapper, METH_NOARGS, "definition_class()\n--\n\n "},
+    {"definition_set_package", definition_set_package_wrapper, METH_VARARGS, "definition_set_package(package, )\n--\n\n "},
+    {"definition_package", definition_package_wrapper, METH_NOARGS, "definition_package()\n--\n\n "},
+    {"definition_set_description", definition_set_description_wrapper, METH_VARARGS, "definition_set_description(description, )\n--\n\n "},
     {"definition_description", definition_description_wrapper, METH_NOARGS, "definition_description()\n--\n\n "},
+    {"definition_set_version", definition_set_version_wrapper, METH_VARARGS, "definition_set_version(version, )\n--\n\n "},
     {"definition_version", definition_version_wrapper, METH_NOARGS, "definition_version()\n--\n\n "},
 
-    //set definition
-    {"definition_set_description", definition_set_description_wrapper, METH_VARARGS, "definition_set_description(description, )\n--\n\n "},
-    {"definition_set_version", definition_set_version_wrapper, METH_VARARGS, "definition_set_version(version, )\n--\n\n "},
-
-    //remove IOP
+    //remove IO
     {"input_remove", input_remove_wrapper, METH_VARARGS, "input_remove(input_name, )\n--\n\n "},
     {"output_remove", output_remove_wrapper, METH_VARARGS, "output_remove(output_name, )\n--\n\n "},
+    {"attribute_remove", attribute_remove_wrapper, METH_VARARGS, "attribute_remove(attribute_name, )\n--\n\n "},
     {"parameter_remove", parameter_remove_wrapper, METH_VARARGS, "parameter_remove(parameter_name, )\n--\n\n "},
 
-    //createIOP
+    //createIO
     {"input_create", input_create_wrapper, METH_VARARGS, "input_create(input_name, value_type, value, )\n--\n\n "},
     {"output_create", output_create_wrapper, METH_VARARGS, "output_create(output_name, value_type, value, )\n--\n\n "},
+    {"attribute_create", attribute_create_wrapper, METH_VARARGS, "attribute_create(attribute_name, value_type, value, )\n--\n\n "},
     {"parameter_create", parameter_create_wrapper, METH_VARARGS, "parameter_create(parameter_name, value_type, value, )\n--\n\n "},
 
-    //clear IOP
+    //clear IO
     {"clear_input", clear_input_wrapper, METH_VARARGS, "clear_input(input_name, )\n--\n\n "},
     {"clear_output", clear_output_wrapper, METH_VARARGS, "clear_output(output_name, )\n--\n\n "},
+    {"clear_attribute", clear_attribute_wrapper, METH_VARARGS, "clear_attribute(attribute_name, )\n--\n\n "},
     {"clear_parameter", clear_parameter_wrapper, METH_VARARGS, "clear_parameter(parameter_name, )\n--\n\n "},
     {"clear_context", igs_clear_context_wrapper, METH_NOARGS, "clear_context()\n--\n\n "},
 
@@ -180,9 +203,10 @@ static PyMethodDef Ingescape_methods[] =
     {"set_command_line", set_command_line_wrapper, METH_VARARGS, "set_command_line(command_line, )\n--\n\n "},
     {"command_line", command_line_wrapper, METH_NOARGS, "command_line()\n--\n\n "},
 
-    //Observe Iop, freeze and forced stop
+    //Observe Io, freeze and forced stop
     {"observe_input", (PyCFunction) observe_input_wrapper, METH_VARARGS, "observe_input(input_name, callback, my_data, )\n--\n\n "},
     {"observe_output", (PyCFunction) observe_output_wrapper, METH_VARARGS, "observe_output(output_name, callback, my_data, )\n--\n\n "},
+    {"observe_attribute", (PyCFunction) observe_attribute_wrapper, METH_VARARGS, "observe_attribute(attribute_name, callback, my_data, )\n--\n\n "},
     {"observe_parameter", (PyCFunction) observe_parameter_wrapper, METH_VARARGS, "observe_parameter(parameter_name, callback, my_data, )\n--\n\n "},
     {"observe_freeze", observe_freeze_wrapper, METH_VARARGS, "observe_freeze(callback, my_data, )\n--\n\n "},
     {"observe_forced_stop", observe_forced_stop_wrapper, METH_VARARGS, "observe_forced_stop(callback, my_data, )\n--\n\n "},
@@ -234,9 +258,9 @@ static PyMethodDef Ingescape_methods[] =
     {"service_has_replies", service_has_replies_wrapper, METH_VARARGS, "service_has_replies(service_name, )\n--\n\n "},
     {"service_has_reply", service_has_reply_wrapper, METH_VARARGS, "service_has_reply(service_name, reply_name, )\n--\n\n "},
     {"service_reply_names", service_reply_names_wrapper, METH_VARARGS, "service_reply_names(service_name, )\n--\n\n "},
-    {"service_reply_args_count", service_reply_args_count_wrapper, METH_VARARGS, "service_args_count(service_name, )\n--\n\n "},
-    {"service_reply_args_list", service_reply_args_list_wrapper, METH_VARARGS, "service_args_list(service_name, )\n--\n\n "},
-    {"service_reply_arg_exists", service_reply_arg_exists_wrapper, METH_VARARGS, "service_arg_exists(service_name, argument_name, )\n--\n\n "},
+    {"service_reply_args_count", service_reply_args_count_wrapper, METH_VARARGS, "service_reply_args_count(service_name, )\n--\n\n "},
+    {"service_reply_args_list", service_reply_args_list_wrapper, METH_VARARGS, "service_reply_args_list(service_name, )\n--\n\n "},
+    {"service_reply_arg_exists", service_reply_arg_exists_wrapper, METH_VARARGS, "service_reply_arg_exists(service_name, argument_name, )\n--\n\n "},
 
 
     //logs and debug messages
@@ -270,6 +294,15 @@ static PyMethodDef Ingescape_methods[] =
     // Election
     {"election_join", election_join_wrapper, METH_VARARGS, "election_join(election_name, )\n--\n\n "},
     {"election_leave", election_leave_wrapper, METH_VARARGS, "election_leave(election_name, )\n--\n\n "},
+
+    // Real-time
+    {"rt_get_current_timestamp", rt_get_current_timestamp_wrapper, METH_NOARGS, "rt_get_current_timestamp()\n--\n\n "},
+    {"rt_set_timestamps", rt_set_timestamps_wrapper, METH_VARARGS, "rt_set_timestamps(enable, )\n--\n\n "},
+    {"rt_set_time", rt_set_time_wrapper, METH_VARARGS, "rt_timestamps()\n--\n\n "},
+    {"rt_time", rt_time_wrapper, METH_NOARGS, "rt_set_time(microseconds, )\n--\n\n "},
+    {"rt_timestamps", rt_timestamps_wrapper, METH_NOARGS, "rt_time()\n--\n\n "},
+    {"rt_set_synchronous_mode", rt_set_synchronous_mode_wrapper, METH_VARARGS, "rt_set_synchronous_mode(enable, )\n--\n\n "},
+    {"rt_synchronous_mode", rt_synchronous_mode_wrapper, METH_NOARGS, "rt_synchronous_mode()\n--\n\n "},
 
     // Broker
     {"broker_add", igs_broker_add_wrapper, METH_VARARGS, "broker_add(broker_endpoint, )\n--\n\n "},
@@ -315,14 +348,19 @@ static PyMethodDef Ingescape_methods[] =
     {"replay_pause", igs_replay_pause_wrapper, METH_VARARGS, "replay_pause(pause, )\n--\n\n "},
     {"replay_terminate", igs_replay_terminate_wrapper, METH_NOARGS, "replay_terminate()\n--\n\n "},
 
-    // Constraints and description
+    // Constraints, description and detailed types
     {"constraints_enforce", igs_constraints_enforce_wrapper, METH_VARARGS, "constraints_enforce(enforce, )\n--\n\n "},
     {"input_add_constraint", igs_input_add_constraint_wrapper, METH_VARARGS, "input_add_constraint(name, constraint, )\n--\n\n "},
     {"output_add_constraint", igs_output_add_constraint_wrapper, METH_VARARGS, "output_add_constraint(name, constraint, )\n--\n\n "},
+    {"attribute_add_constraint", igs_attribute_add_constraint_wrapper, METH_VARARGS, "attribute_add_constraint(name, constraint, )\n--\n\n "},
     {"parameter_add_constraint", igs_parameter_add_constraint_wrapper, METH_VARARGS, "parameter_add_constraint(name, constraint, )\n--\n\n "},
     {"input_set_description", igs_input_set_description_wrapper, METH_VARARGS, "input_set_description(name, description, )\n--\n\n "},
     {"output_set_description", igs_output_set_description_wrapper, METH_VARARGS, "output_set_description(name, description, )\n--\n\n "},
+    {"attribute_set_description", igs_attribute_set_description_wrapper, METH_VARARGS, "attribute_set_description(name, description, )\n--\n\n "},
     {"parameter_set_description", igs_parameter_set_description_wrapper, METH_VARARGS, "parameter_set_description(name, description, )\n--\n\n "},
+    {"input_set_detailed_type", igs_input_set_detailed_type_wrapper, METH_VARARGS, "input_set_detailed_type(name, type_name, specification, )\n--\n\n "},
+    {"output_set_detailed_type", igs_output_set_detailed_type_wrapper, METH_VARARGS, "output_set_detailed_type(name, type_name, specification)\n--\n\n "},
+    {"attribute_set_detailed_type", igs_attribute_set_detailed_type_wrapper, METH_VARARGS, "attribute_set_detailed_type(name, type_name, specification)\n--\n\n "},
 
     // Timers
     {"timer_start", igs_timer_start_wrapper, METH_VARARGS, "timer_start(delay,times, callback, my_data, )\n--\n\n "},
@@ -368,13 +406,13 @@ static void Agent_dealloc(AgentObject *self)
         } while(it);
     }
     {
-        agentobserve_iop_cb_t *it = NULL;
+        agentobserve_io_cb_t *it = NULL;
         do {
-            DL_FOREACH(agentobserve_iop_cbList, it) {
+            DL_FOREACH(agentobserve_io_cbList, it) {
                 if (it->agent == self) break;
             }
             if (it) {
-                DL_DELETE(agentobserve_iop_cbList, it);
+                DL_DELETE(agentobserve_io_cbList, it);
                 free(it->nameArg);
                 Py_CLEAR(it->callback);
                 Py_CLEAR(it->my_data);
@@ -493,37 +531,47 @@ static PyMethodDef Agent_methods[] = {
     {"definition_load_file", (PyCFunction) Agent_definition_load_file, METH_VARARGS, "definition_load_file(self, path, )\n--\n\n "},
     {"clear_definition", (PyCFunction) Agent_clear_definition, METH_NOARGS, "clear_definition(self, )\n--\n\n "},
     {"definition_json", (PyCFunction) Agent_definition_json, METH_NOARGS, "definition_json(self, )\n--\n\n "},
-    {"definition_description", (PyCFunction) Agent_definition_description, METH_NOARGS, "definition_description(self, )\n--\n\n "},
-    {"definition_version", (PyCFunction) Agent_definition_version, METH_NOARGS, "definition_version(self, )\n--\n\n "},
+    {"definition_set_class", (PyCFunction) Agent_definition_set_class, METH_VARARGS, "definition_set_class(self, class, )\n--\n\n "},
+    {"definition_class", (PyCFunction) Agent_definition_class, METH_NOARGS, "definition_class(self, )\n--\n\n "},
+    {"definition_set_package", (PyCFunction) Agent_definition_set_package, METH_VARARGS, "definition_set_package(self, package, )\n--\n\n "},
+    {"definition_package", (PyCFunction) Agent_definition_package, METH_NOARGS, "definition_package(self, )\n--\n\n "},
     {"definition_set_description", (PyCFunction) Agent_definition_set_description, METH_VARARGS, "definition_set_description(self, description, )\n--\n\n "},
+    {"definition_description", (PyCFunction) Agent_definition_description, METH_NOARGS, "definition_description(self, )\n--\n\n "},
     {"definition_set_version", (PyCFunction) Agent_definition_set_version, METH_VARARGS, "definition_set_version(self, version, )\n--\n\n "},
+    {"definition_version", (PyCFunction) Agent_definition_version, METH_NOARGS, "definition_version(self, )\n--\n\n "},
 
     {"input_create", (PyCFunction) Agent_input_create, METH_VARARGS, "input_create(self, name, value_type, value, )\n--\n\n "},
     {"output_create", (PyCFunction) Agent_output_create, METH_VARARGS, "output_create(self, name, value_type, value, )\n--\n\n "},
+    {"attribute_create", (PyCFunction) Agent_attribute_create, METH_VARARGS, "attribute_create(self, name, value_type, value, )\n--\n\n "},
     {"parameter_create", (PyCFunction) Agent_parameter_create, METH_VARARGS, "parameter_create(self, name, value_type, value, )\n--\n\n "},
 
     {"input_remove", (PyCFunction) Agent_input_remove, METH_VARARGS, "input_remove(self, name, )\n--\n\n "},
     {"output_remove", (PyCFunction) Agent_output_remove, METH_VARARGS, "output_remove(self, name, )\n--\n\n "},
+    {"attribute_remove", (PyCFunction) Agent_attribute_remove, METH_VARARGS, "attribute_remove(self, name, )\n--\n\n "},
     {"parameter_remove", (PyCFunction) Agent_parameter_remove, METH_VARARGS, "parameter_remove(self, name, )\n--\n\n "},
 
     {"input_type", (PyCFunction) Agent_input_type, METH_VARARGS, "input_type(self, name, )\n--\n\n "},
     {"output_type", (PyCFunction) Agent_output_type, METH_VARARGS, "output_type(self, name, )\n--\n\n "},
+    {"attribute_type", (PyCFunction) Agent_attribute_type, METH_VARARGS, "attribute_type(self, name, )\n--\n\n "},
     {"parameter_type", (PyCFunction) Agent_parameter_type, METH_VARARGS, "parameter_type(self, name, )\n--\n\n "},
 
     {"input_count", (PyCFunction) Agent_input_count, METH_NOARGS, "input_count(self, )\n--\n\n "},
     {"output_count", (PyCFunction) Agent_output_count, METH_NOARGS, "output_count(self, )\n--\n\n "},
+    {"attribute_count", (PyCFunction) Agent_attribute_count, METH_NOARGS, "attribute_count(self, )\n--\n\n "},
     {"parameter_count", (PyCFunction) Agent_parameter_count, METH_NOARGS, "parameter_count(self, )\n--\n\n "},
 
     {"input_list", (PyCFunction) Agent_input_list, METH_NOARGS, "input_list(self, )\n--\n\n "},
     {"output_list", (PyCFunction) Agent_output_list, METH_NOARGS, "output_list(self, )\n--\n\n "},
+    {"attribute_list", (PyCFunction) Agent_attribute_list, METH_NOARGS, "attribute_list(self, )\n--\n\n "},
     {"parameter_list", (PyCFunction) Agent_parameter_list, METH_NOARGS, "parameter_list(self, )\n--\n\n "},
 
     {"input_exists", (PyCFunction) Agent_input_exists, METH_VARARGS, "input_exists(self, name, )\n--\n\n "},
     {"output_exists", (PyCFunction) Agent_output_exists, METH_VARARGS, "output_exists(self, name, )\n--\n\n "},
+    {"attribute_exists", (PyCFunction) Agent_attribute_exists, METH_VARARGS, "attribute_exists(self, name, )\n--\n\n "},
     {"parameter_exists", (PyCFunction) Agent_parameter_exists, METH_VARARGS, "parameter_exists(self, name, )\n--\n\n "},
 
     ////////////////////////////////////////////////////////////
-    // Reading and writing inputs/outputs/parameters, a.k.a IOPs
+    // Reading and writing inputs/outputs/parameters, a.k.a IOs
     {"input_bool", (PyCFunction) Agent_input_bool, METH_VARARGS, "input_bool(self, name, )\n--\n\n "},
     {"input_int", (PyCFunction) Agent_input_int, METH_VARARGS, "input_int(self, name, )\n--\n\n "},
     {"input_double", (PyCFunction) Agent_input_double, METH_VARARGS, "input_double(self, name, )\n--\n\n "},
@@ -535,6 +583,12 @@ static PyMethodDef Agent_methods[] = {
     {"output_double", (PyCFunction) Agent_output_double, METH_VARARGS, "output_double(self, name, )\n--\n\n "},
     {"output_string", (PyCFunction) Agent_output_string, METH_VARARGS, "output_string(self, name, )\n--\n\n "},
     {"output_data", (PyCFunction) Agent_output_data, METH_VARARGS, "output_data(self, name, )\n--\n\n "},
+
+    {"attribute_bool", (PyCFunction) Agent_attribute_bool, METH_VARARGS, "attribute_bool(self, name, )\n--\n\n "},
+    {"attribute_int", (PyCFunction) Agent_attribute_int, METH_VARARGS, "attribute_int(self, name, )\n--\n\n "},
+    {"attribute_double", (PyCFunction) Agent_attribute_double, METH_VARARGS, "attribute_double(self, name, )\n--\n\n "},
+    {"attribute_string", (PyCFunction) Agent_attribute_string, METH_VARARGS, "attribute_string(self, name, )\n--\n\n "},
+    {"attribute_data", (PyCFunction) Agent_attribute_data, METH_VARARGS, "attribute_data(self, name, )\n--\n\n "},
 
     {"parameter_bool", (PyCFunction) Agent_parameter_bool, METH_VARARGS, "parameter_bool(self, name, )\n--\n\n "},
     {"parameter_int", (PyCFunction) Agent_parameter_int, METH_VARARGS, "parameter_int(self, name, )\n--\n\n "},
@@ -556,6 +610,12 @@ static PyMethodDef Agent_methods[] = {
     {"output_set_impulsion", (PyCFunction) Agent_output_set_impulsion, METH_VARARGS, "output_set_impulsion(self, name, )\n--\n\n "},
     {"output_set_data", (PyCFunction) Agent_output_set_data, METH_VARARGS, "output_set_data(self, name, value, )\n--\n\n "},
 
+    {"attribute_set_bool", (PyCFunction) Agent_attribute_set_bool, METH_VARARGS, "attribute_set_bool(self, name, value, )\n--\n\n "},
+    {"attribute_set_int", (PyCFunction) Agent_attribute_set_int, METH_VARARGS, "attribute_set_int(self, name, value, )\n--\n\n "},
+    {"attribute_set_double", (PyCFunction) Agent_attribute_set_double, METH_VARARGS, "attribute_set_double(self, name, value, )\n--\n\n "},
+    {"attribute_set_string", (PyCFunction) Agent_attribute_set_string, METH_VARARGS, "attribute_set_string(self, name, value, )\n--\n\n "},
+    {"attribute_set_data", (PyCFunction) Agent_attribute_set_data, METH_VARARGS, "attribute_set_data(self, name, value, )\n--\n\n "},
+
     {"parameter_set_bool", (PyCFunction) Agent_parameter_set_bool, METH_VARARGS, "parameter_set_bool(self, name, value, )\n--\n\n "},
     {"parameter_set_int", (PyCFunction) Agent_parameter_set_int, METH_VARARGS, "parameter_set_int(self, name, value, )\n--\n\n "},
     {"parameter_set_double", (PyCFunction) Agent_parameter_set_double, METH_VARARGS, "parameter_set_double(self, name, value, )\n--\n\n "},
@@ -564,10 +624,12 @@ static PyMethodDef Agent_methods[] = {
 
     {"clear_input", (PyCFunction) Agent_clear_input, METH_VARARGS, "clear_input(self, name, )\n--\n\n "},
     {"clear_output", (PyCFunction) Agent_clear_output, METH_VARARGS, "clear_output(self, name, )\n--\n\n "},
+    {"clear_attribute", (PyCFunction) Agent_clear_attribute, METH_VARARGS, "clear_attribute(self, name, )\n--\n\n "},
     {"clear_parameter", (PyCFunction) Agent_clear_parameter, METH_VARARGS, "clear_parameter(self, name, )\n--\n\n "},
 
     {"observe_input", (PyCFunction) Agent_observe_input, METH_VARARGS, "observe_input(self, name, callback, my_data, )\n--\n\n "},
     {"observe_output", (PyCFunction) Agent_observe_output, METH_VARARGS, "observe_output(self, name, callback, my_data, )\n--\n\n "},
+    {"observe_attribute", (PyCFunction) Agent_observe_attribute, METH_VARARGS, "observe_attribute(self, name, callback, my_data, )\n--\n\n "},
     {"observe_parameter", (PyCFunction) Agent_observe_parameter, METH_VARARGS, "observe_parameter(self, name, callback, my_data, )\n--\n\n "},
 
     {"output_mute", (PyCFunction) Agent_output_mute, METH_VARARGS, "output_mute(self, name, )\n--\n\n "},
@@ -583,6 +645,7 @@ static PyMethodDef Agent_methods[] = {
 
     {"clear_mappings", (PyCFunction) Agent_clear_mappings, METH_NOARGS, "clear_mappings(self, )\n--\n\n "},
     {"clear_mappings_with_agent", (PyCFunction) Agent_clear_mappings_with_agent, METH_VARARGS, "clear_mappings_with_agent(self, agent_name, )\n--\n\n "},
+    {"clear_mappings_for_input", (PyCFunction) Agent_clear_mappings_for_input, METH_VARARGS, "clear_mappings_for_input(self, agent_name, )\n--\n\n "},
 
     {"mapping_add", (PyCFunction) Agent_mapping_add, METH_VARARGS, "mapping_add(self, from_our_input, to_agent, with_output, )\n--\n\n "},
     {"mapping_remove_with_id", (PyCFunction) Agent_mapping_remove_with_id, METH_VARARGS, "mapping_remove_with_id(self, id, )\n--\n\n "},
@@ -608,9 +671,9 @@ static PyMethodDef Agent_methods[] = {
     {"service_has_replies", (PyCFunction) Agent_service_has_replies, METH_VARARGS, "service_has_replies(self, service_name, )\n--\n\n "},
     {"service_has_reply", (PyCFunction) Agent_service_has_reply, METH_VARARGS, "service_has_reply(self, service_name, reply_name, )\n--\n\n "},
     {"service_reply_names", (PyCFunction) Agent_service_reply_names, METH_VARARGS, "service_reply_names(self, service_name, )\n--\n\n "},
-    {"service_reply_args_count", (PyCFunction) Agent_service_reply_args_count, METH_VARARGS, "service_args_count(self, service_name, )\n--\n\n "},
-    {"service_reply_args_list", (PyCFunction) Agent_service_reply_args_list, METH_VARARGS, "service_args_list(self, service_name, )\n--\n\n "},
-    {"service_reply_arg_exists", (PyCFunction) Agent_service_reply_arg_exists, METH_VARARGS, "service_arg_exists(self, service_name, argument_name, )\n--\n\n "},
+    {"service_reply_args_count", (PyCFunction) Agent_service_reply_args_count, METH_VARARGS, "service_reply_args_count(self, service_name, )\n--\n\n "},
+    {"service_reply_args_list", (PyCFunction) Agent_service_reply_args_list, METH_VARARGS, "service_reply_args_list(self, service_name, )\n--\n\n "},
+    {"service_reply_arg_exists", (PyCFunction) Agent_service_reply_arg_exists, METH_VARARGS, "service_reply_arg_exists(self, service_name, argument_name, )\n--\n\n "},
     {"service_arg_add", (PyCFunction) Agent_service_arg_add, METH_VARARGS, "service_arg_add(self, service_name, arg_name, value_type, )\n--\n\n "},
     {"service_arg_remove", (PyCFunction) Agent_service_arg_remove, METH_VARARGS, "service_arg_remove(self, service_name, arg_name )\n--\n\n "},
     {"service_count", (PyCFunction) Agent_service_count, METH_NOARGS, "service_count(self, )\n--\n\n "},
@@ -625,6 +688,13 @@ static PyMethodDef Agent_methods[] = {
     {"election_join", (PyCFunction) Agent_election_join, METH_VARARGS, "election_join(self, election_name, )\n--\n\n "},
     {"election_leave", (PyCFunction) Agent_election_leave, METH_VARARGS, "election_leave(self, election_name, )\n--\n\n "},
 
+    //////////////////////////////////////////
+    // Real-time
+    {"rt_get_current_timestamp", (PyCFunction) Agent_rt_get_current_timestamp, METH_NOARGS, "rt_get_current_timestamp(self, )\n--\n\n "},
+    {"rt_set_timestamps", (PyCFunction) Agent_rt_set_timestamps, METH_VARARGS, "rt_set_timestamps(self, enable, )\n--\n\n "},
+    {"rt_timestamps", (PyCFunction) Agent_rt_timestamps, METH_NOARGS, "rt_time(self, )\n--\n\n "},
+    {"rt_set_synchronous_mode", (PyCFunction) Agent_rt_set_synchronous_mode, METH_VARARGS, "rt_set_synchronous_mode(self, enable, )\n--\n\n "},
+    {"rt_synchronous_mode", (PyCFunction) Agent_rt_synchronous_mode, METH_NOARGS, "rt_synchronous_mode(self, )\n--\n\n "},
 
     ///////////////////////////////////////////////////////
     // Administration, logging, configuration and utilities
@@ -634,18 +704,28 @@ static PyMethodDef Agent_methods[] = {
     {"mapping_save", (PyCFunction) Agent_mapping_save, METH_NOARGS, "mapping_save(self, )\n--\n\n "},
 
     ///////////////////////////////////////////////////////
-    // IOP constraints and descriptions
+    // IO constraints and descriptions
     {"constraints_enforce", (PyCFunction) Agent_constraints_enforce, METH_VARARGS, "constraints_enforce(self, enforce, )\n--\n\n "},
     {"input_add_constraint", (PyCFunction) Agent_input_add_constraint, METH_VARARGS, "input_add_constraint(self, name, constraint, )\n--\n\n "},
     {"output_add_constraint", (PyCFunction) Agent_output_add_constraint, METH_VARARGS, "output_add_constraint(self, name, constraint, )\n--\n\n "},
+    {"attribute_add_constraint", (PyCFunction) Agent_attribute_add_constraint, METH_VARARGS, "attribute_add_constraint(self, name, constraint, )\n--\n\n "},
     {"parameter_add_constraint", (PyCFunction) Agent_parameter_add_constraint, METH_VARARGS, "parameter_add_constraint(self, name, constraint, )\n--\n\n "},
 
     {"input_set_description", (PyCFunction) Agent_input_set_description, METH_VARARGS, "input_set_description(self, name, description, )\n--\n\n "},
     {"output_set_description", (PyCFunction) Agent_output_set_description, METH_VARARGS, "output_set_description(self, name, description, )\n--\n\n "},
+    {"attribute_set_description", (PyCFunction) Agent_attribute_set_description, METH_VARARGS, "attribute_set_description(self, name, description, )\n--\n\n "},
     {"parameter_set_description", (PyCFunction) Agent_parameter_set_description, METH_VARARGS, "parameter_set_description(self, name, description, )\n--\n\n "},
 
-    // FIXME: igsagent_input_zmsg is to dependent on ZeroMQ, it might be added if full ZeroMQ suuport is implemented
-    // FIXME: igsagent_output_set_zmsg is to dependent on ZeroMQ, it might be added if full ZeroMQ suuport is implemented
+    {"input_set_detailed_type", (PyCFunction) Agent_input_set_detailed_type, METH_VARARGS, "input_set_detailed_type(self, input_name, type_name, specification, )\n--\n\n "},
+    {"output_set_detailed_type", (PyCFunction) Agent_output_set_detailed_type, METH_VARARGS, "output_set_detailed_type(self, output_name, type_name, specification, )\n--\n\n "},
+    {"attribute_set_detailed_type", (PyCFunction) Agent_attribute_set_detailed_type, METH_VARARGS, "attribute_set_detailed_type(self, attribute_name, type_name, specification, )\n--\n\n "},
+
+    //NOTE: igsagent_input_zmsg is to dependent on ZeroMQ, it might be added if full ZeroMQ suuport is implemented
+    //NOTE: igsagent_output_set_zmsg is to dependent on ZeroMQ, it might be added if full ZeroMQ suuport is implemented
+    //NOTE: igs_pipe_inside_ingescape is to dependent on ZeroMQ, it might be added if full ZeroMQ suuport is implemented
+    //NOTE: igs_free_io_list is a C-only API. It won't be implemented in Python (already handled by the binding).
+    //NOTE: igs_service_args_clone is a C-only API. It won't be implemented in Python (already handled by the binding).
+    //NOTE: igs_free_iop_list is a C-only API. It won't be implemented in Python (already handled by the binding).
 
     {NULL}  /* Sentinel */
 };
@@ -702,7 +782,7 @@ PyMODINIT_FUNC PyInit_ingescape(void)
 
     PyModule_AddIntConstant(module_ingescape, "INPUT_T", 1);
     PyModule_AddIntConstant(module_ingescape, "OUTPUT_T", 2);
-    PyModule_AddIntConstant(module_ingescape, "PARAMETER_T", 3);
+    PyModule_AddIntConstant(module_ingescape, "ATTRIBUTE_T", 3);
 
     PyModule_AddIntConstant(module_ingescape, "INTEGER_T", 1);
     PyModule_AddIntConstant(module_ingescape, "DOUBLE_T", 2);
@@ -726,7 +806,7 @@ PyMODINIT_FUNC PyInit_ingescape(void)
 
     PyModule_AddIntConstant(module_ingescape, "REPLAY_INPUT", 1);
     PyModule_AddIntConstant(module_ingescape, "REPLAY_OUTPUT", 2);
-    PyModule_AddIntConstant(module_ingescape, "REPLAY_PARAMETER", 4);
+    PyModule_AddIntConstant(module_ingescape, "REPLAY_ATTRIBUTE", 4);
     PyModule_AddIntConstant(module_ingescape, "REPLAY_EXECUTE_SERVICE", 8);
     PyModule_AddIntConstant(module_ingescape, "REPLAY_CALL_SERVICE", 16);
 

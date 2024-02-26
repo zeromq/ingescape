@@ -938,7 +938,7 @@ INGESCAPE_EXPORT char * igs_agent_family(void); //caller owns returned value
  library simply by parsing logs and publishing data in various possible ways.
  • The Ingescape ecosystem provides much better solutions based on record/replay
  support with agent virtualization that beat these features in every way.
- 
+
  Post an issue on github if you want to discuss this topic with the community.
  ---------------------------------------------------------------------
  Ingescape logs contain all the necessary information for an agent to replay
