@@ -33,11 +33,11 @@ static char *s_strndup (const char *str, size_t chars)
 PyObject * igs_clear_context_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
 {
     igs_clear_context();
-    // Clean observes on IOPs
-    observe_iop_cb_t *actuel = NULL;
-    DL_FOREACH(observe_iop_cbList, actuel)
+    // Clean observes on IOs
+    observe_io_cb_t *actuel = NULL;
+    DL_FOREACH(observe_io_cbList, actuel)
     {
-        DL_DELETE(observe_iop_cbList, actuel);
+        DL_DELETE(observe_io_cbList, actuel);
         Py_CLEAR(actuel->callback);
         Py_CLEAR(actuel->my_data);
         free(actuel->nameArg);
@@ -287,67 +287,96 @@ PyObject * igs_constraints_enforce_wrapper(PyObject *self, PyObject *args, PyObj
     return PyLong_FromLong(0);
 }
 
-PyObject * igs_input_add_constraint_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+typedef igs_result_t (*io_add_constraint)(const char*, const char*);
+PyObject * s_io_add_constraint(PyObject *self, PyObject *args, PyObject *kwds, io_add_constraint igs_api)
 {
     static char *kwlist[] = {"name", "constraint", NULL};
     char * name = NULL;
     char * constraint = NULL;
     if (!PyArg_ParseTupleAndKeywords(args, NULL, "ss", kwlist, &name, &constraint))
         return NULL;
-    return PyLong_FromLong(igs_input_add_constraint(name, constraint));
+    return PyLong_FromLong(igs_api(name, constraint));
+}
+
+PyObject * igs_input_add_constraint_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+{
+    s_io_add_constraint(self, args, kwds, igs_input_add_constraint);
 }
 
 PyObject * igs_output_add_constraint_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
 {
-    static char *kwlist[] = {"name", "constraint", NULL};
-    char * name = NULL;
-    char * constraint = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "ss", kwlist, &name, &constraint))
-        return NULL;
-    return PyLong_FromLong(igs_output_add_constraint(name, constraint));
+    s_io_add_constraint(self, args, kwds, igs_output_add_constraint);
+}
+
+PyObject * igs_attribute_add_constraint_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+{
+    s_io_add_constraint(self, args, kwds, igs_attribute_add_constraint);
 }
 
 PyObject * igs_parameter_add_constraint_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
 {
-    static char *kwlist[] = {"name", "constraint", NULL};
-    char * name = NULL;
-    char * constraint = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "ss", kwlist, &name, &constraint))
+    s_io_add_constraint(self, args, kwds, igs_parameter_add_constraint);
+}
+
+typedef void (*io_set_description)(const char*, const char*);
+PyObject * s_io_set_description(PyObject *self, PyObject *args, PyObject *kwds, io_set_description igs_api)
+{
+    static char *kwlist[] = {"name", "description", NULL};
+    const char * name = NULL;
+    const char * description = NULL;
+    if (!PyArg_ParseTupleAndKeywords(args, NULL, "ss", kwlist, &name, &description))
         return NULL;
-    return PyLong_FromLong(igs_parameter_add_constraint(name, constraint));
+    igs_api(name, description);
+    return PyLong_FromLong(IGS_SUCCESS);
 }
 
 PyObject * igs_input_set_description_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
 {
-    static char *kwlist[] = {"name", "description", NULL};
-    char * name = NULL;
-    char * description = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "ss", kwlist, &name, &description))
-        return NULL;
-    igs_input_set_description(name, description);
-    return PyLong_FromLong(IGS_SUCCESS);
+    s_io_set_description(self, args, kwds, igs_input_set_description);
 }
 
 PyObject * igs_output_set_description_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
 {
-    static char *kwlist[] = {"name", "description", NULL};
-    char * name = NULL;
-    char * description = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "ss", kwlist, &name, &description))
-        return NULL;
-    igs_output_set_description(name, description);
-    return PyLong_FromLong(IGS_SUCCESS);
+    s_io_set_description(self, args, kwds, igs_output_set_description);
+}
+
+PyObject * igs_attribute_set_description_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+{
+    s_io_set_description(self, args, kwds, igs_attribute_set_description);
 }
 
 PyObject * igs_parameter_set_description_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
 {
-    static char *kwlist[] = {"name", "description", NULL};
-    char * name = NULL;
-    char * description = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "ss", kwlist, &name, &description))
+    s_io_set_description(self, args, kwds, igs_parameter_set_description);
+}
+
+typedef void (*io_set_detailed_type)(const char*, const char*, const char*);
+PyObject * s_io_set_detailed_type(PyObject *self, PyObject *args, PyObject *kwds, io_set_detailed_type igs_api)
+{
+    static char *kwlist[] = {"input_name", "type_name", "specification", NULL};
+    const char * input_name = NULL;
+    const char * type_name = NULL;
+    const char * specification = NULL;
+    if (!PyArg_ParseTupleAndKeywords(args, NULL, "sss", kwlist, &input_name, &type_name, &specification))
         return NULL;
-    igs_parameter_set_description(name, description);
+    igs_api(input_name, type_name, specification);
     return PyLong_FromLong(IGS_SUCCESS);
+}
+
+PyObject * igs_input_set_detailed_type_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+{
+    s_io_set_detailed_type(self, args, kwds, igs_input_set_detailed_type);
+}
+
+PyObject * igs_output_set_detailed_type_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+{
+    s_io_set_detailed_type(self, args, kwds, igs_output_set_detailed_type);
+}
+
+//NOTE: igs_parameter_set_detailed_type is not binded because it was already obsolete (in favor of igs_attribute_set_detailed_type) when the binding was updated
+PyObject * igs_attribute_set_detailed_type_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+{
+    s_io_set_detailed_type(self, args, kwds, igs_attribute_set_detailed_type);
 }
 
 PyObject * input_bool_wrapper(PyObject * self, PyObject * args)
@@ -453,7 +482,9 @@ PyObject * input_set_data_wrapper(PyObject * self, PyObject * args)
     Py_buffer buf;
     if (!PyArg_ParseTuple(args, "sy*", &name, &buf))
         return NULL;
-    return PyLong_FromLong(igs_input_set_data(name, buf.buf, (size_t)buf.len));
+    PyObject* result = PyLong_FromLong(igs_input_set_data(name, buf.buf, (size_t)buf.len));
+    PyBuffer_Release(&buf);
+    return result;
 }
 
 PyObject * output_bool_wrapper(PyObject * self, PyObject * args)
@@ -555,16 +586,29 @@ PyObject * output_set_impulsion_wrapper(PyObject * self, PyObject * args)
 
 PyObject * output_set_data_wrapper(PyObject * self, PyObject * args)
 {
-    char * name;
+    const char * name;
     Py_buffer buf;
     if (!PyArg_ParseTuple(args, "sy*", &name, &buf))
         return NULL;
-    return PyLong_FromLong(igs_output_set_data(name, buf.buf, (size_t)buf.len));
+    PyObject* result = PyLong_FromLong(igs_output_set_data(name, buf.buf, (size_t)buf.len));
+    PyBuffer_Release(&buf);
+    return result;
+}
+
+PyObject * attribute_bool_wrapper(PyObject * self, PyObject * args)
+{
+    const char * name;
+    if (!PyArg_ParseTuple(args, "s", &name))
+        return NULL;
+    if (igs_attribute_bool(name))
+        Py_RETURN_TRUE;
+    else
+        Py_RETURN_FALSE;
 }
 
 PyObject * parameter_bool_wrapper(PyObject * self, PyObject * args)
 {
-    char * name;
+    const char * name;
     if (!PyArg_ParseTuple(args, "s", &name))
         return NULL;
     if (igs_parameter_bool(name))
@@ -573,29 +617,46 @@ PyObject * parameter_bool_wrapper(PyObject * self, PyObject * args)
         Py_RETURN_FALSE;
 }
 
+PyObject * attribute_int_wrapper(PyObject * self, PyObject * args)
+{
+    const char * name;
+    if (!PyArg_ParseTuple(args, "s", &name))
+        return NULL;
+    return PyLong_FromLong(igs_attribute_int(name));
+}
+
 PyObject * parameter_int_wrapper(PyObject * self, PyObject * args)
 {
-    char * name;
+    const char * name;
     if (!PyArg_ParseTuple(args, "s", &name))
         return NULL;
     return PyLong_FromLong(igs_parameter_int(name));
 }
 
+PyObject * attribute_double_wrapper(PyObject * self, PyObject * args)
+{
+    const char * name;
+    if (!PyArg_ParseTuple(args, "s", &name))
+        return NULL;
+    return PyFloat_FromDouble(igs_attribute_double(name));
+}
+
 PyObject * parameter_double_wrapper(PyObject * self, PyObject * args)
 {
-    char * name;
+    const char * name;
     if (!PyArg_ParseTuple(args, "s", &name))
         return NULL;
     return PyFloat_FromDouble(igs_parameter_double(name));
 }
 
-PyObject * parameter_string_wrapper(PyObject * self, PyObject * args)
+typedef char* (*param_attr_string)(const char*);
+PyObject * s_param_attr_string_wrapper(PyObject * self, PyObject * args, param_attr_string igs_api)
 {
-    char * name;
-    char * result;
+    const char * name;
+    const char * result;
     if (!PyArg_ParseTuple(args, "s", &name))
         return NULL;
-    result = igs_parameter_string(name);
+    result = igs_api(name);
     if(result != NULL){
         PyObject *ret = PyUnicode_FromFormat("%s", result);
         free(result);
@@ -605,59 +666,138 @@ PyObject * parameter_string_wrapper(PyObject * self, PyObject * args)
         return PyUnicode_FromFormat("");
 }
 
-PyObject * parameter_data_wrapper(PyObject * self, PyObject * args)
+PyObject * attribute_string_wrapper(PyObject * self, PyObject * args)
 {
-    char *name;
+    return s_param_attr_string_wrapper(self, args, igs_attribute_string);
+}
+
+PyObject * parameter_string_wrapper(PyObject * self, PyObject * args)
+{
+    return s_param_attr_string_wrapper(self, args, igs_parameter_string);
+}
+
+typedef igs_result_t (*param_attr_data)(const char*, void**, size_t*);
+PyObject * s_param_attr_data_wrapper(PyObject * self, PyObject * args, param_attr_data igs_api)
+{
+    const char *name;
     void *myData;
     size_t valueSize;
     if (!PyArg_ParseTuple(args, "s", &name))
         return NULL;
-    igs_parameter_data(name, &myData, &valueSize);
+    igs_api(name, &myData, &valueSize);
     return Py_BuildValue("y#", myData, &valueSize);
 }
-PyObject * parameter_set_bool_wrapper(PyObject * self, PyObject * args)
+
+PyObject * attribute_data_wrapper(PyObject * self, PyObject * args)
 {
-    char * name;
+    return s_param_attr_data_wrapper(self, args, igs_attribute_data);
+}
+
+PyObject * parameter_data_wrapper(PyObject * self, PyObject * args)
+{
+    return s_param_attr_data_wrapper(self, args, igs_parameter_data);
+}
+
+typedef igs_result_t (*param_attr_set_bool)(const char*, bool);
+PyObject * s_param_attr_set_bool_wrapper(PyObject * self, PyObject * args, param_attr_set_bool igs_api)
+{
+    const char * name;
     bool value;
     if (!PyArg_ParseTuple(args, "sb", &name, &value))
         return NULL;
-    return PyLong_FromLong(igs_parameter_set_bool(name, value));
+    return PyLong_FromLong(igs_api(name, value));
+}
+
+PyObject * attribute_set_bool_wrapper(PyObject * self, PyObject * args)
+{
+    s_param_attr_set_bool_wrapper(self, args, igs_attribute_set_bool);
+}
+
+PyObject * parameter_set_bool_wrapper(PyObject * self, PyObject * args)
+{
+    s_param_attr_set_bool_wrapper(self, args, igs_parameter_set_bool);
+}
+
+typedef igs_result_t (*param_attr_set_int)(const char*, int);
+PyObject * s_param_attr_set_int_wrapper(PyObject * self, PyObject * args, param_attr_set_int igs_api)
+{
+    const char * name;
+    int value;
+    if (!PyArg_ParseTuple(args, "si", &name, &value))
+        return NULL;
+    return PyLong_FromLong(igs_api(name, value));
+}
+
+PyObject * attribute_set_int_wrapper(PyObject * self, PyObject * args)
+{
+    return s_param_attr_set_int_wrapper(self, args, igs_attribute_set_int);
 }
 
 PyObject * parameter_set_int_wrapper(PyObject * self, PyObject * args)
 {
-    char * name;
-    int value;
-    if (!PyArg_ParseTuple(args, "si", &name, &value))
+    return s_param_attr_set_int_wrapper(self, args, igs_parameter_set_int);
+}
+
+typedef igs_result_t (*param_attr_set_double)(const char*, double);
+PyObject * s_param_attr_set_double_wrapper(PyObject * self, PyObject * args, param_attr_set_double igs_api)
+{
+    const char * name;
+    double value;
+    if (!PyArg_ParseTuple(args, "sd", &name, &value))
         return NULL;
-    return PyLong_FromLong(igs_parameter_set_int(name, value));
+    return PyLong_FromLong(igs_api(name, value));
+}
+
+PyObject * attribute_set_double_wrapper(PyObject * self, PyObject * args)
+{
+    return s_param_attr_set_double_wrapper(self, args, igs_attribute_set_double);
 }
 
 PyObject * parameter_set_double_wrapper(PyObject * self, PyObject * args)
 {
-    char * name;
-    double value;
-    if (!PyArg_ParseTuple(args, "sd", &name, &value))
+    return s_param_attr_set_double_wrapper(self, args, igs_parameter_set_double);
+}
+
+typedef igs_result_t (*param_attr_set_string)(const char*, const char*);
+PyObject * s_param_attr_set_string_wrapper(PyObject * self, PyObject * args, param_attr_set_string igs_api)
+{
+    const char * name;
+    const char * value;
+    if (!PyArg_ParseTuple(args, "ss", &name, &value))
         return NULL;
-    return PyLong_FromLong(igs_parameter_set_double(name, value));
+    return PyLong_FromLong(igs_api(name, value));
+}
+
+PyObject * attribute_set_string_wrapper(PyObject * self, PyObject * args)
+{
+    return s_param_attr_set_string_wrapper(self, args, igs_attribute_set_string);
 }
 
 PyObject * parameter_set_string_wrapper(PyObject * self, PyObject * args)
 {
-    char * name;
-    char * value;
-    if (!PyArg_ParseTuple(args, "ss", &name, &value))
+    return s_param_attr_set_string_wrapper(self, args, igs_parameter_set_string);
+}
+
+typedef igs_result_t (*param_attr_set_data)(const char*, void*, size_t);
+PyObject * s_param_attr_set_data_wrapper(PyObject * self, PyObject * args, param_attr_set_data igs_api)
+{
+    const char * name;
+    Py_buffer buf;
+    if (!PyArg_ParseTuple(args, "sy*", &name, &buf))
         return NULL;
-    return PyLong_FromLong(igs_parameter_set_string(name, value));
+    PyObject* result = PyLong_FromLong(igs_parameter_set_data(name, buf.buf, (size_t)buf.len));
+    PyBuffer_Release(&buf);
+    return result;
+}
+
+PyObject * attribute_set_data_wrapper(PyObject * self, PyObject * args)
+{
+    return s_param_attr_set_data_wrapper(self, args, igs_attribute_set_data);
 }
 
 PyObject * parameter_set_data_wrapper(PyObject * self, PyObject * args)
 {
-    char * name;
-    Py_buffer buf;
-    if (!PyArg_ParseTuple(args, "sy*", &name, &buf))
-        return NULL;
-    return PyLong_FromLong(igs_parameter_set_data(name, buf.buf, (size_t)buf.len));
+    return s_param_attr_set_data_wrapper(self, args, igs_parameter_set_data);
 }
 
 PyObject * clear_input_wrapper(PyObject * self, PyObject * args)
@@ -678,24 +818,35 @@ PyObject * clear_output_wrapper(PyObject * self, PyObject * args)
     return PyLong_FromLong(IGS_SUCCESS);
 }
 
-PyObject * clear_parameter_wrapper(PyObject * self, PyObject * args)
+typedef igs_result_t (*clear_param_attr)(const char*);
+PyObject * s_clear_param_attr_wrapper(PyObject * self, PyObject * args, clear_param_attr igs_api)
 {
-    char * name;
+    const char * name;
     if (!PyArg_ParseTuple(args, "s", &name))
         return NULL;
-    igs_clear_parameter(name);
+    igs_api(name);
     return PyLong_FromLong(IGS_SUCCESS);
 }
 
-observe_iop_cb_t *observe_iop_cbList = NULL;
-void observe(igs_iop_type_t iopType, const char* name, igs_iop_value_type_t valueType, void* value, unsigned long valueSize, void* myData){
+PyObject * clear_attribute_wrapper(PyObject * self, PyObject * args)
+{
+    return s_clear_param_attr_wrapper(self, args, igs_clear_attribute);
+}
+
+PyObject * clear_parameter_wrapper(PyObject * self, PyObject * args)
+{
+    return s_clear_param_attr_wrapper(self, args, igs_clear_parameter);
+}
+
+observe_io_cb_t *observe_io_cbList = NULL;
+void observe(igs_io_type_t ioType, const char* name, igs_io_value_type_t valueType, void* value, unsigned long valueSize, void* myData){
     IGS_UNUSED(myData);
     // Lock the GIL to execute the callback safely
     PyGILState_STATE d_gstate;
     d_gstate = PyGILState_Ensure();
 
     PyObject *tupleArgs = PyTuple_New(5);
-    PyTuple_SetItem(tupleArgs, 0, Py_BuildValue("i", iopType));
+    PyTuple_SetItem(tupleArgs, 0, Py_BuildValue("i", ioType));
     PyTuple_SetItem(tupleArgs, 1, Py_BuildValue("s", name));
     PyTuple_SetItem(tupleArgs, 2, Py_BuildValue("i", valueType));
     switch(valueType){
@@ -721,10 +872,10 @@ void observe(igs_iop_type_t iopType, const char* name, igs_iop_value_type_t valu
             break;
     }
 
-    observe_iop_cb_t *actuel = NULL;
-    DL_FOREACH(observe_iop_cbList, actuel) {
+    observe_io_cb_t *actuel = NULL;
+    DL_FOREACH(observe_io_cbList, actuel) {
         if (streq(actuel->nameArg, name)
-            && (actuel->iopType == iopType)) {
+            && (actuel->ioType == ioType)) {
             Py_INCREF(actuel->my_data);
             PyTuple_SetItem(tupleArgs, 4, actuel->my_data);
             call_callback(actuel->callback, tupleArgs);
@@ -735,12 +886,13 @@ void observe(igs_iop_type_t iopType, const char* name, igs_iop_value_type_t valu
     PyGILState_Release(d_gstate);
 }
 
-PyObject *_observe_generic(PyObject *self, PyObject *args, PyObject *kwds, igs_iop_type_t iopType)
+typedef void (*observe_wrapper)(const char*, igs_io_fn, void*);
+PyObject *s_observe_generic(PyObject *self, PyObject *args, PyObject *kwds, igs_io_type_t ioType, observe_wrapper igs_api)
 {
     PyObject *callback = NULL;
     PyObject *my_data = NULL;
-    char *iopName = NULL;
-    if (PyArg_ParseTuple(args, "sOO", &iopName, &callback, &my_data)) {
+    char *ioName = NULL;
+    if (PyArg_ParseTuple(args, "sOO", &ioName, &callback, &my_data)) {
         if (!PyCallable_Check(callback)) { // check if the callback is a function
             PyErr_SetString(PyExc_TypeError, "'callback' parameter must be callable");
             return PyLong_FromLong(IGS_FAILURE);;
@@ -750,40 +902,34 @@ PyObject *_observe_generic(PyObject *self, PyObject *args, PyObject *kwds, igs_i
         return PyLong_FromLong(IGS_FAILURE);
     }
 
-    observe_iop_cb_t *newElt = calloc(1, sizeof(observe_iop_cb_t));
-    newElt->iopType = iopType;
-    newElt->nameArg = strdup(iopName);
+    observe_io_cb_t *newElt = calloc(1, sizeof(observe_io_cb_t));
+    newElt->ioType = ioType;
+    newElt->nameArg = strdup(ioName);
     newElt->my_data = Py_BuildValue("O", my_data);
     newElt->callback = callback;
-    DL_APPEND(observe_iop_cbList, newElt);
-    switch(iopType)
-    {
-        case IGS_INPUT_T:
-            igs_observe_input(iopName, observe, NULL);
-            break;
-        case IGS_OUTPUT_T:
-            igs_observe_output(iopName, observe, NULL);
-            break;
-        case IGS_PARAMETER_T:
-            igs_observe_parameter(iopName, observe, NULL);
-            break;
-    }
+    DL_APPEND(observe_io_cbList, newElt);
+    igs_api(ioName, observe, NULL);
     return PyLong_FromLong(IGS_SUCCESS);
 }
 
 PyObject *observe_input_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
 {
-    return _observe_generic(self, args, kwds, IGS_INPUT_T);
+    return s_observe_generic(self, args, kwds, IGS_INPUT_T, igs_observe_input);
 }
 
 PyObject *observe_output_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
 {
-    return _observe_generic(self, args, kwds, IGS_OUTPUT_T);
+    return s_observe_generic(self, args, kwds, IGS_OUTPUT_T, igs_observe_output);
+}
+
+PyObject *observe_attribute_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_observe_generic(self, args, kwds, IGS_ATTRIBUTE_T, igs_observe_attribute);
 }
 
 PyObject *observe_parameter_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
 {
-    return _observe_generic(self, args, kwds, IGS_PARAMETER_T);
+    return s_observe_generic(self, args, kwds, IGS_ATTRIBUTE_T, igs_observe_parameter);
 }
 
 PyObject * output_mute_wrapper(PyObject * self, PyObject * args)
@@ -831,12 +977,23 @@ PyObject * output_type_wrapper(PyObject * self, PyObject * args)
     return PyLong_FromLong(igs_output_type(name));
 }
 
-PyObject * parameter_type_wrapper(PyObject * self, PyObject * args)
+typedef igs_iop_value_type_t (*param_attr_type) (const char*);
+PyObject * s_param_attr_type_wrapper(PyObject * self, PyObject * args, param_attr_type igs_api)
 {
     char* name;
     if (!PyArg_ParseTuple(args, "s", &name))
         return NULL;
-    return PyLong_FromLong(igs_parameter_type(name));
+    return PyLong_FromLong(igs_api(name));
+}
+
+PyObject * attribute_type_wrapper(PyObject * self, PyObject * args)
+{
+    return s_param_attr_type_wrapper(self, args, igs_attribute_type);
+}
+
+PyObject * parameter_type_wrapper(PyObject * self, PyObject * args)
+{
+    return s_param_attr_type_wrapper(self, args, igs_parameter_type);
 }
 
 PyObject * input_count_wrapper(PyObject * self, PyObject * args)
@@ -849,15 +1006,21 @@ PyObject * output_count_wrapper(PyObject * self, PyObject * args)
     return PyLong_FromLong(igs_output_count());
 }
 
+PyObject * attribute_count_wrapper(PyObject * self, PyObject * args)
+{
+    return PyLong_FromLong(igs_attribute_count());
+}
+
 PyObject * parameter_count_wrapper(PyObject * self, PyObject * args)
 {
     return PyLong_FromLong(igs_parameter_count());
 }
 
-PyObject * input_list_wrapper(PyObject * self, PyObject * args)
+typedef char ** (*io_list)(size_t*);
+PyObject * s_io_list(PyObject * self, PyObject * args, io_list igs_api)
 {
     size_t nbOfElements;
-    char **result = igs_input_list(&nbOfElements);
+    char **result = igs_api(&nbOfElements);
     PyObject * ret = PyList_New(nbOfElements);
     for (size_t i = 0; i < nbOfElements; i++){
         PyList_SetItem(ret, i, Py_BuildValue("s", result[i]));
@@ -865,24 +1028,24 @@ PyObject * input_list_wrapper(PyObject * self, PyObject * args)
     return ret;
 }
 
+PyObject * input_list_wrapper(PyObject * self, PyObject * args)
+{
+    s_io_list(self, args, igs_input_list);
+}
+
 PyObject * output_list_wrapper(PyObject * self, PyObject * args)
 {
-    size_t nbOfElements;
-    char **result = igs_output_list(&nbOfElements);
-    PyObject * ret = PyList_New(nbOfElements);
-    for (size_t i = 0; i < nbOfElements; i++)
-        PyList_SetItem(ret, i, Py_BuildValue("s",result[i]));
-    return ret;
+    s_io_list(self, args, igs_output_list);
+}
+
+PyObject * attribute_list_wrapper(PyObject * self, PyObject * args)
+{
+    s_io_list(self, args, igs_attribute_list);
 }
 
 PyObject * parameter_list_wrapper(PyObject * self, PyObject * args)
 {
-    size_t nbOfElements;
-    char **result = igs_parameter_list(&nbOfElements);
-    PyObject * ret = PyList_New(nbOfElements);
-    for (size_t i = 0; i < nbOfElements; i++)
-        PyList_SetItem(ret, i, Py_BuildValue("s", result[i]));
-    return ret;
+    s_io_list(self, args, igs_parameter_list);
 }
 
 PyObject * input_exists_wrapper(PyObject * self, PyObject * args)
@@ -907,9 +1070,20 @@ PyObject * output_exists_wrapper(PyObject * self, PyObject * args)
         Py_RETURN_FALSE;
 }
 
+PyObject * attribute_exists_wrapper(PyObject * self, PyObject * args)
+{
+    const char * name;
+    if (!PyArg_ParseTuple(args, "s", &name))
+        return NULL;
+    if (igs_attribute_exists(name))
+        Py_RETURN_TRUE;
+    else
+        Py_RETURN_FALSE;
+}
+
 PyObject * parameter_exists_wrapper(PyObject * self, PyObject * args)
 {
-    char * name;
+    const char * name;
     if (!PyArg_ParseTuple(args, "s", &name))
         return NULL;
     if (igs_parameter_exists(name))
@@ -937,10 +1111,10 @@ PyObject * definition_load_file_wrapper(PyObject * self, PyObject * args)
 PyObject * clear_definition_wrapper(PyObject * self, PyObject * args)
 {
     igs_clear_definition();
-    observe_iop_cb_t *actuel = NULL;
-    DL_FOREACH(observe_iop_cbList, actuel)
+    observe_io_cb_t *actuel = NULL;
+    DL_FOREACH(observe_io_cbList, actuel)
     {
-        DL_DELETE(observe_iop_cbList, actuel);
+        DL_DELETE(observe_io_cbList, actuel);
         Py_CLEAR(actuel->callback);
         Py_CLEAR(actuel->my_data);
         free(actuel->nameArg);
@@ -961,9 +1135,18 @@ PyObject * definition_json_wrapper(PyObject * self, PyObject * args)
         return PyUnicode_FromFormat("");
 }
 
-PyObject * definition_description_wrapper(PyObject * self, PyObject * args)
+PyObject * definition_set_package_wrapper(PyObject * self, PyObject * args)
 {
-    char * result = igs_definition_description();
+    const char* package ;
+    if (!PyArg_ParseTuple(args, "s", &package))
+        return NULL;
+    igs_definition_set_package(package);
+    return PyLong_FromLong(IGS_SUCCESS);
+}
+
+PyObject * definition_package_wrapper(PyObject * self, PyObject * args)
+{
+    char * result = igs_definition_package();
     if(result!=NULL){
         PyObject *ret = PyUnicode_FromFormat("%s", result);
         free(result);
@@ -973,9 +1156,18 @@ PyObject * definition_description_wrapper(PyObject * self, PyObject * args)
         return PyUnicode_FromFormat("");
 }
 
-PyObject * definition_version_wrapper(PyObject * self, PyObject * args)
+PyObject * definition_set_class_wrapper(PyObject * self, PyObject * args)
 {
-    char * result = igs_definition_version();
+    const char* class ;
+    if (!PyArg_ParseTuple(args, "s", &class))
+        return NULL;
+    igs_definition_set_class(class);
+    return PyLong_FromLong(IGS_SUCCESS);
+}
+
+PyObject * definition_class_wrapper(PyObject * self, PyObject * args)
+{
+    char * result = igs_definition_class();
     if(result!=NULL){
         PyObject *ret = PyUnicode_FromFormat("%s", result);
         free(result);
@@ -994,6 +1186,18 @@ PyObject * definition_set_description_wrapper(PyObject * self, PyObject * args)
     return PyLong_FromLong(IGS_SUCCESS);
 }
 
+PyObject * definition_description_wrapper(PyObject * self, PyObject * args)
+{
+    char * result = igs_definition_description();
+    if(result!=NULL){
+        PyObject *ret = PyUnicode_FromFormat("%s", result);
+        free(result);
+        result = NULL;
+        return ret;
+    }else
+        return PyUnicode_FromFormat("");
+}
+
 PyObject * definition_set_version_wrapper(PyObject * self, PyObject * args)
 {
     char* version ;
@@ -1001,6 +1205,18 @@ PyObject * definition_set_version_wrapper(PyObject * self, PyObject * args)
         return NULL;
     igs_definition_set_version(version);
     return PyLong_FromLong(IGS_SUCCESS);
+}
+
+PyObject * definition_version_wrapper(PyObject * self, PyObject * args)
+{
+    char * result = igs_definition_version();
+    if(result!=NULL){
+        PyObject *ret = PyUnicode_FromFormat("%s", result);
+        free(result);
+        result = NULL;
+        return ret;
+    }else
+        return PyUnicode_FromFormat("");
 }
 
 PyObject * input_create_wrapper(PyObject * self, PyObject * args)
@@ -1096,9 +1312,10 @@ PyObject * output_create_wrapper(PyObject * self, PyObject * args)
     return PyLong_FromLong(result);
 }
 
-PyObject * parameter_create_wrapper(PyObject * self, PyObject * args)
+typedef igs_result_t (*param_attr_create)(const char*, igs_io_value_type_t, void*, unsigned long);
+PyObject* s_param_attr_create_wrapper(PyObject* self, PyObject* args, param_attr_create igs_api)
 {
-    char * name;
+    const char * name;
     int type;
     void *value;
     int result;
@@ -1106,41 +1323,47 @@ PyObject * parameter_create_wrapper(PyObject * self, PyObject * args)
         return NULL;
 
     if (value == Py_None)
-    {
-        result = igs_parameter_create(name, type, NULL, 0);
-    }
+        result = igs_api(name, type, NULL, 0);
     else if (type == IGS_STRING_T)
     {
-        char *value_c;
+        const char *value_c;
         if (!PyArg_ParseTuple(args, "sis", &name, &type, &value_c))
             return NULL;
-        result = igs_parameter_create(name, type, (void*)value_c, strlen(value_c));
+        result = igs_api(name, type, (void*)value_c, strlen(value_c));
     }
     else if (type == IGS_INTEGER_T)
     {
         int value_c;
         if (!PyArg_ParseTuple(args, "sii", &name, &type, &value_c))
             return NULL;
-        result = igs_parameter_create(name, type, &value_c, sizeof(int));
+        result = igs_api(name, type, &value_c, sizeof(int));
     }
     else if (type == IGS_DOUBLE_T)
     {
         double value_c;
         if (!PyArg_ParseTuple(args, "sid", &name, &type, &value_c))
             return NULL;
-        result = igs_parameter_create(name, type, &value_c, sizeof(double));
+        result = igs_api(name, type, &value_c, sizeof(double));
     }
     else if (type == IGS_BOOL_T){
         bool value_c;
         if (!PyArg_ParseTuple(args, "sib", &name, &type, &value_c))
             return NULL;
-        result = igs_parameter_create(name, type, &value_c, sizeof(bool));
+        result = igs_api(name, type, &value_c, sizeof(bool));
     }
     else
-    {
-        result = igs_parameter_create(name, type, value, (size_t)PyObject_Size(value));
-    }
+        result = igs_api(name, type, value, (size_t)PyObject_Size(value));
     return PyLong_FromLong(result);
+}
+
+PyObject * attribute_create_wrapper(PyObject * self, PyObject * args)
+{
+    return s_param_attr_create_wrapper(self, args, igs_attribute_create);
+}
+
+PyObject * parameter_create_wrapper(PyObject * self, PyObject * args)
+{
+    return s_param_attr_create_wrapper(self, args, igs_parameter_create);
 }
 
 PyObject * input_remove_wrapper(PyObject * self, PyObject * args)
@@ -1151,13 +1374,13 @@ PyObject * input_remove_wrapper(PyObject * self, PyObject * args)
     int result = igs_input_remove(name);
     if(result == IGS_SUCCESS)
     {
-        observe_iop_cb_t *actuel = NULL;
-        DL_FOREACH(observe_iop_cbList, actuel)
+        observe_io_cb_t *actuel = NULL;
+        DL_FOREACH(observe_io_cbList, actuel)
         {
             if (streq(actuel->nameArg, name)
-                && (actuel->iopType == IGS_INPUT_T))
+                && (actuel->ioType == IGS_INPUT_T))
             {
-                DL_DELETE(observe_iop_cbList, actuel);
+                DL_DELETE(observe_io_cbList, actuel);
                 Py_CLEAR(actuel->callback);
                 Py_CLEAR(actuel->my_data);
                 free(actuel->nameArg);
@@ -1176,13 +1399,38 @@ PyObject * output_remove_wrapper(PyObject * self, PyObject * args)
     int result = igs_output_remove(name);
     if(result == IGS_SUCCESS)
     {
-        observe_iop_cb_t *actuel = NULL;
-        DL_FOREACH(observe_iop_cbList, actuel)
+        observe_io_cb_t *actuel = NULL;
+        DL_FOREACH(observe_io_cbList, actuel)
         {
             if (streq(actuel->nameArg, name)
-                && (actuel->iopType == IGS_OUTPUT_T))
+                && (actuel->ioType == IGS_OUTPUT_T))
             {
-                DL_DELETE(observe_iop_cbList, actuel);
+                DL_DELETE(observe_io_cbList, actuel);
+                Py_CLEAR(actuel->callback);
+                Py_CLEAR(actuel->my_data);
+                free(actuel->nameArg);
+                free(actuel);
+            }
+        }
+    }
+    return PyLong_FromLong(result);
+}
+
+PyObject * attribute_remove_wrapper(PyObject * self, PyObject * args)
+{
+    char* name ;
+    if (!PyArg_ParseTuple(args, "s", &name))
+        return NULL;
+    int result = igs_attribute_remove(name);
+    if(result == IGS_SUCCESS)
+    {
+        observe_io_cb_t *actuel = NULL;
+        DL_FOREACH(observe_io_cbList, actuel)
+        {
+            if (streq(actuel->nameArg, name)
+                && (actuel->ioType == IGS_ATTRIBUTE_T))
+            {
+                DL_DELETE(observe_io_cbList, actuel);
                 Py_CLEAR(actuel->callback);
                 Py_CLEAR(actuel->my_data);
                 free(actuel->nameArg);
@@ -1201,13 +1449,13 @@ PyObject * parameter_remove_wrapper(PyObject * self, PyObject * args)
     int result = igs_parameter_remove(name);
     if(result == IGS_SUCCESS)
     {
-        observe_iop_cb_t *actuel = NULL;
-        DL_FOREACH(observe_iop_cbList, actuel)
+        observe_io_cb_t *actuel = NULL;
+        DL_FOREACH(observe_io_cbList, actuel)
         {
             if (streq(actuel->nameArg, name)
-                && (actuel->iopType == IGS_PARAMETER_T))
+                && (actuel->ioType == IGS_ATTRIBUTE_T))
             {
-                DL_DELETE(observe_iop_cbList, actuel);
+                DL_DELETE(observe_io_cbList, actuel);
                 Py_CLEAR(actuel->callback);
                 Py_CLEAR(actuel->my_data);
                 free(actuel->nameArg);
@@ -1407,6 +1655,64 @@ PyObject * election_leave_wrapper(PyObject * self, PyObject * args)
     }
     return PyLong_FromLong(igs_election_leave(electionName));
 }
+
+// Real-time APIs
+PyObject * rt_get_current_timestamp_wrapper(PyObject * self, PyObject * args)
+{
+    return PyLong_FromLong(igs_rt_get_current_timestamp());
+}
+
+PyObject * rt_set_timestamps_wrapper(PyObject * self, PyObject * args)
+{
+    bool enable;
+    if (!PyArg_ParseTuple(args, "b", &enable)) {
+        return NULL;
+    }
+
+    igs_rt_set_timestamps(enable);
+    return PyLong_FromLong(IGS_SUCCESS);
+}
+
+PyObject * rt_timestamps_wrapper(PyObject * self, PyObject * args)
+{
+    if (igs_rt_timestamps())
+        Py_RETURN_TRUE;
+    Py_RETURN_FALSE;
+}
+
+PyObject * rt_set_time_wrapper(PyObject * self, PyObject * args)
+{
+    static char *kwlist[] = {"microseconds",  NULL};
+    long long micros = 0;
+    if (!PyArg_ParseTupleAndKeywords(args, NULL, "L", kwlist, &micros))
+        return NULL;
+    igs_rt_set_time((int64_t)micros);
+    return PyLong_FromLong(IGS_SUCCESS);
+}
+
+PyObject * rt_time_wrapper(PyObject * self, PyObject * args)
+{
+    return PyLong_FromLongLong(igs_rt_time());
+}
+
+PyObject * rt_set_synchronous_mode_wrapper(PyObject * self, PyObject * args)
+{
+    bool enable;
+    if (!PyArg_ParseTuple(args, "b", &enable)) {
+        return NULL;
+    }
+
+    igs_rt_set_synchronous_mode(enable);
+    return PyLong_FromLong(IGS_SUCCESS);
+}
+
+PyObject * rt_synchronous_mode_wrapper(PyObject * self, PyObject * args)
+{
+    if (igs_rt_synchronous_mode())
+        Py_RETURN_TRUE;
+    Py_RETURN_FALSE;
+}
+
 
 PyObject * service_call_wrapper(PyObject * self, PyObject * args)
 {
