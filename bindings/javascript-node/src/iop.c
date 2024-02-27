@@ -944,6 +944,50 @@ napi_value node_igs_parameter_set_description(napi_env env, napi_callback_info i
     return node_igs_attribute_set_description(env, info);
 }
 
+napi_value node_igs_input_set_detailed_type(napi_env env, napi_callback_info info) {
+    napi_value argv[3];
+    get_function_arguments(env, info, 3, argv);
+    char *name = convert_napi_to_string(env, argv[0]);
+    char *type_name = convert_napi_to_string(env, argv[1]);
+    char *specification = convert_napi_to_string(env, argv[2]);
+    int success = igs_input_set_detailed_type(name, type_name, specification);
+    free(name);
+    free(type_name);
+    free(specification);
+    napi_value success_js;
+    convert_int_to_napi(env, success, &success_js);
+    return success_js;
+}
+
+napi_value node_igs_output_set_detailed_type(napi_env env, napi_callback_info info) {
+    napi_value argv[3];
+    get_function_arguments(env, info, 3, argv);
+    char *name = convert_napi_to_string(env, argv[0]);
+    char *type_name = convert_napi_to_string(env, argv[1]);
+    char *specification = convert_napi_to_string(env, argv[2]);
+    int success = igs_output_set_detailed_type(name, type_name, specification);
+    free(name);
+    free(type_name);
+    free(specification);
+    napi_value success_js;
+    convert_int_to_napi(env, success, &success_js);
+    return success_js;
+}
+
+napi_value node_igs_attribute_set_detailed_type(napi_env env, napi_callback_info info) {
+    napi_value argv[3];
+    get_function_arguments(env, info, 3, argv);
+    char *name = convert_napi_to_string(env, argv[0]);
+    char *type_name = convert_napi_to_string(env, argv[1]);
+    char *specification = convert_napi_to_string(env, argv[2]);
+    int success = igs_attribute_set_detailed_type(name, type_name, specification);
+    free(name);
+    free(type_name);
+    free(specification);
+    napi_value success_js;
+    convert_int_to_napi(env, success, &success_js);
+    return success_js;
+}
 
 napi_value init_io(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_igs_input_bool, "inputBool", exports);
@@ -1023,6 +1067,11 @@ napi_value init_io(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_igs_input_set_description, "inputSetDescription", exports);  
     exports = enable_callback_into_js(env, node_igs_output_set_description, "outputSetDescription", exports);  
     exports = enable_callback_into_js(env, node_igs_parameter_set_description, "parameterSetDescription", exports);  
-    exports = enable_callback_into_js(env, node_igs_attribute_set_description, "attributeSetDescription", exports);  
+    exports = enable_callback_into_js(env, node_igs_attribute_set_description, "attributeSetDescription", exports); 
+    exports = enable_callback_into_js(env, node_igs_input_set_detailed_type, "inputSetDetailedType", exports);
+    exports = enable_callback_into_js(env, node_igs_output_set_detailed_type, "outputSetDetailedType", exports);
+    exports = enable_callback_into_js(env, node_igs_attribute_set_detailed_type, "attributeSetDetailedType", exports);
+    //NOTE: igs_parameter_set_detailed_type is not binded because it was already obsolete (in favor of igs_attribute_set_detailed_type) when the binding was updated
+
     return exports;
 }

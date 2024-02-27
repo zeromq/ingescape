@@ -146,6 +146,61 @@ napi_value node_igs_election_leave(napi_env env, napi_callback_info info) {
     return success_js;
 }
 
+// Real-time communications
+napi_value node_igs_rt_get_current_timestamp(napi_env env, napi_callback_info info) {
+    int64_t timestamp = igs_rt_get_current_timestamp();
+    napi_value timestamp_js;
+    convert_int_to_napi(env, timestamp, &timestamp_js);
+    return timestamp_js;
+}
+
+napi_value node_igs_rt_set_timestamps(napi_env env, napi_callback_info info) {
+    napi_value argv[1];
+    get_function_arguments(env, info, 1, argv);
+    bool enable;
+    convert_napi_to_bool(env, argv[0], &enable);
+    igs_rt_set_timestamps(enable);
+    return NULL;
+}
+
+napi_value node_igs_rt_timestamps(napi_env env, napi_callback_info info) {
+    bool enable = igs_rt_timestamps();
+    napi_value enable_js;
+    convert_bool_to_napi(env, enable, &enable_js);
+    return enable_js;
+}
+
+napi_value node_igs_rt_set_time(napi_env env, napi_callback_info info) {
+    napi_value argv[1];
+    get_function_arguments(env, info, 1, argv);
+    int time;
+    convert_napi_to_int(env, argv[0], &time);
+    igs_rt_set_time(time);
+    return NULL;
+}
+
+napi_value node_igs_rt_time(napi_env env, napi_callback_info info) {
+    int64_t time = igs_rt_time();
+    napi_value time_js;
+    convert_int_to_napi(env, time, &time_js);
+    return time_js;
+}
+
+napi_value node_igs_rt_set_synchronous_mode(napi_env env, napi_callback_info info) {
+    napi_value argv[1];
+    get_function_arguments(env, info, 1, argv);
+    bool enable;
+    convert_napi_to_bool(env, argv[0], &enable);
+    igs_rt_set_synchronous_mode(enable);
+    return NULL;
+}
+
+napi_value node_igs_rt_synchronous_mode(napi_env env, napi_callback_info info) {
+    bool enable = igs_rt_synchronous_mode();
+    napi_value enable_js;
+    convert_bool_to_napi(env, enable, &enable_js);
+    return enable_js;
+}
 
 // Network configuration
 napi_value node_igs_net_set_publishing_port(napi_env env, napi_callback_info info) {
@@ -452,6 +507,14 @@ napi_value init_advanced(napi_env env, napi_value exports) {
     // Elections between agents
     exports = enable_callback_into_js(env, node_igs_election_join, "electionJoin", exports);
     exports = enable_callback_into_js(env, node_igs_election_leave, "electionLeave", exports);
+    // Real-time communications
+    exports = enable_callback_into_js(env, node_igs_rt_get_current_timestamp, "rtGetCurrentTimestamp", exports);
+    exports = enable_callback_into_js(env, node_igs_rt_set_timestamps, "rtSetTimestamps", exports);
+    exports = enable_callback_into_js(env, node_igs_rt_timestamps, "rtTimestamps", exports);
+    exports = enable_callback_into_js(env, node_igs_rt_set_time, "rtSetTime", exports);
+    exports = enable_callback_into_js(env, node_igs_rt_time, "rtTime", exports);
+    exports = enable_callback_into_js(env, node_igs_rt_set_synchronous_mode, "rtSetSynchronousMode", exports);
+    exports = enable_callback_into_js(env, node_igs_rt_synchronous_mode, "rtSynchronousMode", exports);
     // Network configuration
     exports = enable_callback_into_js(env, node_igs_net_set_publishing_port, "netSetPublishingPort", exports);
     exports = enable_callback_into_js(env, node_igs_net_set_log_stream_port, "netSetLogStreamPort", exports);
