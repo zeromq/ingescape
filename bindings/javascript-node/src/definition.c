@@ -105,6 +105,40 @@ napi_value node_igs_definition_json(napi_env env, napi_callback_info info) {
     return json_definition_js;
 }
 
+napi_value node_igs_definition_package(napi_env env, napi_callback_info info) {
+    char *package = igs_definition_package();
+    napi_value package_js;
+    convert_string_to_napi(env, package, &package_js);
+    free(package);
+    return package_js;
+}
+
+napi_value node_igs_definition_class(napi_env env, napi_callback_info info) {
+    char *class = igs_definition_class();
+    napi_value class_js;
+    convert_string_to_napi(env, class, &class_js);
+    free(class);
+    return class_js;
+}
+
+napi_value node_igs_definition_set_package(napi_env env, napi_callback_info info) {
+    napi_value argv[1];
+    get_function_arguments(env, info, 1, argv);
+    char *package = convert_napi_to_string(env, argv[0]);
+    igs_definition_set_package(package);
+    free(package);
+    return NULL;
+}
+
+napi_value node_igs_definition_set_class(napi_env env, napi_callback_info info) {
+    napi_value argv[1];
+    get_function_arguments(env, info, 1, argv);
+    char *class = convert_napi_to_string(env, argv[0]);
+    igs_definition_set_class(class);
+    free(class);
+    return NULL;
+}
+
 napi_value node_igs_definition_description(napi_env env, napi_callback_info info) {
     char *description = igs_definition_description();
     napi_value description_js;
@@ -260,6 +294,10 @@ napi_value init_definition(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_igs_definition_load_file, "definitionLoadFile", exports);
     exports = enable_callback_into_js(env, node_igs_clear_definition, "clearDefinition", exports);
     exports = enable_callback_into_js(env, node_igs_definition_json, "definitionJson", exports);
+    exports = enable_callback_into_js(env, node_igs_definition_package, "definitionPackage", exports);
+    exports = enable_callback_into_js(env, node_igs_definition_class, "definitionClass", exports);
+    exports = enable_callback_into_js(env, node_igs_definition_set_package, "definitionSetPackage", exports);
+    exports = enable_callback_into_js(env, node_igs_definition_set_class, "definitionSetClass", exports);
     exports = enable_callback_into_js(env, node_igs_definition_description, "definitionDescription", exports);
     exports = enable_callback_into_js(env, node_igs_definition_version, "definitionVersion", exports);
     exports = enable_callback_into_js(env, node_igs_definition_set_description, "definitionSetDescription", exports);

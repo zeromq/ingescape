@@ -10,7 +10,8 @@
     =========================================================================
 */
 
-const IGS = require(__dirname + "/../prebuilds/" + process.platform + "-" + process.arch + "/node.napi"); // igs js wrapper
+const IGS = require(__dirname + "/../prebuilds/" + process.platform + "-" + process.arch + "/ingescape.node"); // igs js wrapper
+
 
 const assert = require('assert');
 const commands = require('command-line-args');
@@ -325,6 +326,10 @@ assert(IGS.agentName() === agentName);
 assert(IGS.definitionDescription() === "");
 assert(IGS.definitionVersion() === "");
 //TODO: test loading valid string and file definitions
+IGS.definitionSetPackage("package");
+assert(IGS.definitionPackage() === "package");
+IGS.definitionSetClass("class");
+assert(IGS.definitionClass() === "class");
 IGS.definitionSetDescription("my description");
 assert(IGS.definitionDescription());
 IGS.definitionSetVersion("version");
@@ -575,7 +580,9 @@ IGS.inputSetDescription("my_impulsion", "my io description here");
 IGS.outputSetDescription("my_impulsion", "my io description here");
 IGS.attributeSetDescription("my_impulsion", "my io description here");
 IGS.parameterSetDescription("my_impulsion", "my io description here");
-
+IGS.inputSetDetailedType("my_impulsion", "type_name", "specification");
+IGS.outputSetDetailedType("my_impulsion", "type_name", "specification");
+IGS.attributeSetDetailedType("my_impulsion", "type_name", "specification");
 
 // Definition - part 2
 // TODO: compare exported def, saved file and reference file
@@ -1503,6 +1510,15 @@ firstAgent.parameterCreate("first_string", ioTypeEnum.IGS_STRING_T, "my string")
 firstAgent.attributeCreate("first_data", ioTypeEnum.IGS_DATA_T, new ArrayBuffer(32));
 firstAgent.parameterCreate("first_data", ioTypeEnum.IGS_DATA_T, new ArrayBuffer(32));
 
+// N.B.: no way to assert, just call method
+firstAgent.inputSetDescription("first_impulsion", "my io description here");
+firstAgent.outputSetDescription("first_impulsion", "my io description here");
+firstAgent.attributeSetDescription("first_impulsion", "my io description here");
+firstAgent.parameterSetDescription("first_impulsion", "my io description here");
+firstAgent.inputSetDetailedType("first_impulsion", "type_name", "specification");
+firstAgent.outputSetDetailedType("first_impulsion", "type_name", "specification");
+firstAgent.attributeSetDetailedType("first_impulsion", "type_name", "specification");
+
 firstAgent.serviceInit("firstService", agentServiceCallback, null);
 firstAgent.serviceArgAdd("firstService", "firstBool", ioTypeEnum.IGS_BOOL_T);
 firstAgent.serviceArgAdd("firstService", "firstInt", ioTypeEnum.IGS_INTEGER_T);
@@ -1541,7 +1557,14 @@ firstAgent.splitAdd("first_data_split", "partner", "sparing_data");
  //second additional agent is NOT activated immediately
 global.secondAgent = new IGS.Agent("secondAgent", false);
 secondAgent.definitionSetDescription("Second virtual agent");
+assert(secondAgent.definitionDescription() === "Second virtual agent");
 secondAgent.definitionSetVersion("1.0");
+assert(secondAgent.definitionVersion() === "1.0");
+secondAgent.definitionSetPackage("second package");
+assert(secondAgent.definitionPackage() === "second package");
+secondAgent.definitionSetClass("second class");
+assert(secondAgent.definitionClass() === "second class");
+
 secondAgent.inputCreate("second_impulsion", ioTypeEnum.IGS_IMPULSION_T, null);
 secondAgent.inputCreate("second_bool", ioTypeEnum.IGS_BOOL_T, true);
 secondAgent.inputCreate("second_int", ioTypeEnum.IGS_INTEGER_T, 1);
@@ -1685,6 +1708,15 @@ assert(IGS.electionLeave("my other election") === igsResultEnum.IGS_FAILURE);
 IGS.agentSetFamily("family_test");
 
 //TODO : test agent events in same process
+
+// Real time communications
+IGS.rtGetCurrentTimestamp(); // N.B.: no way to assert, just call method
+IGS.rtSetTimestamps(true);
+assert(IGS.rtTimestamps())
+IGS.rtSetTime(1000);
+assert(IGS.rtTime() === 1000)
+IGS.rtSetSynchronousMode(true);
+assert(IGS.rtSynchronousMode());
 
 if (staticTests) {
     //we terminate now after passing the static tests
