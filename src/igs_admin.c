@@ -210,10 +210,14 @@ void admin_log (igsagent_t *agent,
         }
     }
     
-    if (core_context->log_in_console && level >= core_context->log_level) {
+    if (core_context->log_in_syslog
+        || (core_context->log_in_console && level >= core_context->log_level)){
         va_start (list, fmt);
         vsnprintf (log_content, IGS_MAX_LOG_LENGTH, fmt, list);
         va_end (list);
+    }
+    
+    if (core_context->log_in_console && level >= core_context->log_level) {
         if (level >= IGS_LOG_WARN) {
             if (core_context->use_color_in_console)
                 fprintf (stderr, "%s;%s%s\x1b[0m;%s;%s\n",
