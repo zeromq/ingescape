@@ -131,6 +131,13 @@ export function disableSecurity(): undefined;
 export function brokerAddSecure(brokerEndpoint:string, pathToPublicCertificateForBroker:string): number;
 export function electionJoin(electionName:string): number;
 export function electionLeave(electionName:string): number;
+export function rtGetCurrentTimestamp(): number;
+export function rtSetTimestamps(enable:boolean): undefined;
+export function rtTimestamps(): boolean;
+export function rtSetTime(microseconds:number): undefined;
+export function rtTime(): number;
+export function rtSetSynchronousMode(enable:boolean): undefined;
+export function rtSynchronousMode(): boolean;
 export function netSetPublishingPort(port:number): undefined;
 export function netSetLogStreamPort(port:number): undefined;
 export function netSetDiscoveryInterval(intervalMs:number): undefined;
@@ -187,6 +194,10 @@ export class Agent {
     definitionLoadFile(filePath:string):number;
     clearDefinition():undefined;
     definitionJson():string;
+    definitionPackage():string;
+    definitionClass():string;
+    definitionSetPackage(description:string):undefined;
+    definitionSetClass(version:string):undefined;
     definitionDescription():string;
     definitionVersion():string;
     definitionSetDescription(description:string):undefined;
@@ -277,7 +288,10 @@ export class Agent {
     outputSetDescription(name:string, description:string):undefined;
     attributeSetDescription(name:string, description:string):undefined;
     parameterSetDescription(name:string, description:string):undefined;
-    
+    inputSetDetailedType(name:string, type_name:string, specification:string):number;
+    outputSetDetailedType(name:string, type_name:string, specification:string):number;
+    attributeSetDetailedType(name:string, type_name:string, specification:string):number;
+
     clearInput(name:string):undefined;
     clearOutput(name:string):undefined;
     clearParameter(name:string):undefined;
@@ -345,6 +359,10 @@ export function definitionLoadStr(jsonDefinition:string):number;
 export function definitionLoadFile(filePath:string):number;
 export function clearDefinition():undefined;
 export function definitionJson():string;
+export function definitionPackage():string;
+export function definitionClass():string;
+export function definitionSetPackage(description:string):undefined;
+export function definitionSetClass(version:string):undefined;
 export function definitionDescription():string;
 export function definitionVersion():string;
 export function definitionSetDescription(description:string):undefined;
@@ -459,6 +477,9 @@ export function inputSetDescription(name:string, description:string):undefined;
 export function outputSetDescription(name:string, description:string):undefined;
 export function attributeSetDescription(name:string, description:string):undefined;
 export function parameterSetDescription(name:string, description:string):undefined;
+export function inputSetDetailedType(name:string, type_name:string, specification:string):number;
+export function outputSetDetailedType(name:string, type_name:string, specification:string):number;
+export function attributeSetDetailedType(name:string, type_name:string, specification:string):number;
 
 //mapping
 export function mappingLoadStr(jsonMapping:string):number;

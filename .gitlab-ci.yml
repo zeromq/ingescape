@@ -710,6 +710,8 @@ update-vm-runners:
     - ssh -i ssh_secret root@${DEBIAN_11_RUNNER} apt-get install --reinstall ingescape-dev -y
   dependencies: []
   needs: []
+  rules:
+    - !reference [.root_namespace, rules]
 
 
 #   _   _           _             _  _____

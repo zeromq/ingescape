@@ -802,6 +802,45 @@ napi_value node_igsagent_definition_json(napi_env env, napi_callback_info info) 
     return json_js;
 }
 
+napi_value node_igsagent_definition_package(napi_env env, napi_callback_info info) {
+    napi_value this = get_function_this_argument(env, info);;
+    char *package = igsagent_definition_package(unwrap_native_agent(env, this));
+    napi_value package_js;
+    convert_string_to_napi(env, package, &package_js);
+    free(package);
+    return package_js;
+}
+
+
+napi_value node_igsagent_definition_class(napi_env env, napi_callback_info info) {
+    napi_value this = get_function_this_argument(env, info);;
+    char *class = igsagent_definition_class(unwrap_native_agent(env, this));
+    napi_value class_js;
+    convert_string_to_napi(env, class, &class_js);
+    free(class);
+    return class_js;
+}
+
+napi_value node_igsagent_definition_set_package(napi_env env, napi_callback_info info) {
+    napi_value argv[1], this;
+    get_function_arguments(env, info, 1, argv);
+    this = get_function_this_argument(env, info);
+    char *package = convert_napi_to_string(env, argv[0]);
+    igsagent_definition_set_package(unwrap_native_agent(env, this), package);
+    free(package);
+    return NULL;
+}
+
+napi_value node_igsagent_definition_set_class(napi_env env, napi_callback_info info) {
+    napi_value argv[1], this;
+    get_function_arguments(env, info, 1, argv);
+    this = get_function_this_argument(env, info);
+    char *class = convert_napi_to_string(env, argv[0]);
+    igsagent_definition_set_class(unwrap_native_agent(env, this), class);
+    free(class);
+    return NULL;
+}
+
 napi_value node_igsagent_definition_description(napi_env env, napi_callback_info info) {
     napi_value this = get_function_this_argument(env, info);;
     char *description = igsagent_definition_description(unwrap_native_agent(env, this));
@@ -1727,6 +1766,54 @@ napi_value node_igsagent_attribute_set_description(napi_env env, napi_callback_i
 napi_value node_igsagent_parameter_set_description(napi_env env, napi_callback_info info) {
     igs_warn("this function is deprecated, please use node_igsagent_attribute_set_description instead.");
     return node_igsagent_attribute_set_description(env, info);
+}
+
+napi_value node_igsagent_input_set_detailed_type(napi_env env, napi_callback_info info) {
+    napi_value argv[3], this;
+    get_function_arguments(env, info, 3, argv);
+    this = get_function_this_argument(env, info);
+    char *name = convert_napi_to_string(env, argv[0]);
+    char *type_name = convert_napi_to_string(env, argv[1]);
+    char *specification = convert_napi_to_string(env, argv[2]);
+    int success = igsagent_input_set_detailed_type(unwrap_native_agent(env, this), name, type_name, specification);
+    free(name);
+    free(type_name);
+    free(specification);
+    napi_value success_js;
+    convert_int_to_napi(env, success, &success_js);
+    return success_js;
+}
+
+napi_value node_igsagent_output_set_detailed_type(napi_env env, napi_callback_info info) {
+    napi_value argv[3], this;
+    get_function_arguments(env, info, 3, argv);
+    this = get_function_this_argument(env, info);
+    char *name = convert_napi_to_string(env, argv[0]);
+    char *type_name = convert_napi_to_string(env, argv[1]);
+    char *specification = convert_napi_to_string(env, argv[2]);
+    int success = igsagent_output_set_detailed_type(unwrap_native_agent(env, this), name, type_name, specification);
+    free(name);
+    free(type_name);
+    free(specification);
+    napi_value success_js;
+    convert_int_to_napi(env, success, &success_js);
+    return success_js;
+}
+
+napi_value node_igsagent_attribute_set_detailed_type(napi_env env, napi_callback_info info) {
+    napi_value argv[3], this;
+    get_function_arguments(env, info, 3, argv);
+    this = get_function_this_argument(env, info);
+    char *name = convert_napi_to_string(env, argv[0]);
+    char *type_name = convert_napi_to_string(env, argv[1]);
+    char *specification = convert_napi_to_string(env, argv[2]);
+    int success = igsagent_attribute_set_detailed_type(unwrap_native_agent(env, this), name, type_name, specification);
+    free(name);
+    free(type_name);
+    free(specification);
+    napi_value success_js;
+    convert_int_to_napi(env, success, &success_js);
+    return success_js;
 }
 
 napi_value node_igsagent_clear_input(napi_env env, napi_callback_info info) {
@@ -2773,6 +2860,12 @@ napi_value init_agent(napi_env env, napi_value exports) {
         { "definitionLoadFile", NULL, node_igsagent_definition_load_file, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "clearDefinition", NULL, node_igsagent_clear_definition, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "definitionJson", NULL, node_igsagent_definition_json, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        
+        { "definitionPackage", NULL, node_igsagent_definition_package, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "definitionClass", NULL, node_igsagent_definition_class, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "definitionSetPackage", NULL, node_igsagent_definition_set_package, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "definitionSetClass", NULL, node_igsagent_definition_set_class, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+
         { "definitionDescription", NULL, node_igsagent_definition_description, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "definitionVersion", NULL, node_igsagent_definition_version, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "definitionSetDescription", NULL, node_igsagent_definition_set_description, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
@@ -2863,6 +2956,11 @@ napi_value init_agent(napi_env env, napi_value exports) {
         { "attributeSetDescription", NULL, node_igsagent_attribute_set_description, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "parameterSetDescription", NULL, node_igsagent_parameter_set_description, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
 
+        { "inputSetDetailedType", NULL, node_igsagent_input_set_detailed_type, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "outputSetDetailedType", NULL, node_igsagent_output_set_detailed_type, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "attributeSetDetailedType", NULL, node_igsagent_attribute_set_detailed_type, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        //NOTE: igsagent_parameter_set_detailed_type is not binded because it was already obsolete (in favor of igsagent_attribute_set_detailed_type) when the binding was updated
+
         { "clearInput", NULL, node_igsagent_clear_input, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "clearOutput", NULL, node_igsagent_clear_output, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "clearAttribute", NULL, node_igsagent_clear_attribute, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
@@ -2926,7 +3024,7 @@ napi_value init_agent(napi_env env, napi_value exports) {
         { "mappingSetPath", NULL, node_igsagent_mapping_set_path, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "mappingSave", NULL, node_igsagent_mapping_save, NULL, NULL, NULL, napi_writable | napi_configurable, NULL}
     };
-    status = napi_define_class(env, "Agent", NAPI_AUTO_LENGTH, node_igsagent_new, NULL, 160, properties, &cons);
+    status = napi_define_class(env, "Agent", NAPI_AUTO_LENGTH, node_igsagent_new, NULL, 167, properties, &cons);
     if (status != napi_ok) {
         trigger_exception(env, NULL, "Unable to wrap Agent class.");
         return NULL;
