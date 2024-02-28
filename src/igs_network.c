@@ -3633,7 +3633,22 @@ igs_result_t network_publish_output (igsagent_t *agent, const igs_iop_t *iop)
         
         // 4- distribute publication message to other agents inside our context
         // without using the network
-        if (!agent->is_virtual) {
+        /*
+         FIXME: In situations where an agent inputs in the peer are excessively
+         sollicited and it results in even more intensive output publications,
+         it may saturate the ingescape loop. And the HANDLE_PUBLICATION messages
+         below will end up reaching more than 2000 messages, corresponding to
+         the High Water Marks reached on both buffers for the pipe PAIR socket.
+         For some reason, once the HWM is reached, messages are not dropped and,
+         more disturbingly, the call to zmsg_send blocks. Moreover, the HWM option
+         does not work for this PAIR of sockets.
+         We should investigate the PAIR socket and its handling of HWM and find
+         another solution to avoid saturating the ingescape loop in this scenario.
+         For the moment, we do not relay to internal agents if there is only one
+         active agent. This will solve 99.9% of the cases but is not 100% satisfying.
+         */
+        unsigned int nb_active_agents = HASH_COUNT(agent->context->agents);
+        if (!agent->is_virtual && nb_active_agents > 1) {
             free (zmsg_popstr (msg)); // remove composite uuid/iop name from message
             zmsg_pushstr (msg, iop->name); // replace it by simple iop name
             zsock_t *pipe = igs_pipe_to_ingescape();
