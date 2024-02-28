@@ -427,7 +427,7 @@ typedef struct igs_core_context {
     char *advertised_endpoint;
     char *our_broker_endpoint;
     
-    //real-time : current time is common to all agent in the peer
+    //real-time : current time is common to all agents in the peer
     int64_t rt_current_microseconds;
 
     // security
