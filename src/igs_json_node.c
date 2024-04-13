@@ -131,6 +131,24 @@ igs_json_node_parse_from_str (const char *content)
 }
 
 igs_json_node_t *
+igs_json_node_parse_from_str2 (const char *format, ...)
+{
+    assert (format);
+    va_list list;
+    va_start (list, format);
+    char content[IGS_MAX_STRING_MSG_LENGTH] = "";
+    size_t length = vsnprintf (content, IGS_MAX_STRING_MSG_LENGTH - 1, format, list);
+    va_end (list);
+    if (length < IGS_MAX_STRING_MSG_LENGTH - 1)
+        return igs_json_node_parse_from_str (content);
+    else {
+        igs_error("resulting string was longer than allowed (%d), returning NULL",
+                  IGS_MAX_STRING_MSG_LENGTH - 1);
+        return NULL;
+    }
+}
+
+igs_json_node_t *
 igs_json_node_dup (igs_json_node_t *root)
 {
     assert(root);
@@ -246,6 +264,27 @@ igs_json_node_insert (igs_json_node_t *parent,
     }
     else
         igs_error ("parent node must be an array or a map");
+}
+
+void 
+igs_json_node_insert2 (igs_json_node_t *parent, const char *key,
+                       const char **subpath, igs_json_node_t **node_to_insert)
+{
+    assert(parent);
+    assert(node_to_insert);
+    igs_json_node_t *target = parent;
+    if (subpath)
+        target = igs_json_node_find(parent, subpath);
+    if (!target){
+        igs_error("subpath does not exist");
+        return;
+    }
+    if (target->type != IGS_JSON_MAP && target->type != IGS_JSON_ARRAY){
+        igs_error("insertion node must be an array or a map");
+        return;
+    }
+    igs_json_node_insert(target, key, *node_to_insert);
+    igs_json_node_destroy(node_to_insert);
 }
 
 

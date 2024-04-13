@@ -1041,22 +1041,27 @@ struct _igs_json_node_t {
 };
 
 //convert between JSON and JSON nodes
-INGESCAPE_EXPORT void igs_json_insert_node (igs_json_t *self, igs_json_node_t *node);
-INGESCAPE_EXPORT igs_json_node_t * igs_json_node_for (igs_json_t *self);
+INGESCAPE_EXPORT void igs_json_insert_node (igs_json_t *self, igs_json_node_t *node); //inserts at current position
+INGESCAPE_EXPORT igs_json_node_t * igs_json_node_for (igs_json_t *self); //caller owns returned value
 
 // manipulate json nodes
 INGESCAPE_EXPORT igs_json_node_t * igs_json_node_parse_from_file(const char *path);
 INGESCAPE_EXPORT igs_json_node_t * igs_json_node_parse_from_str(const char *content);
+INGESCAPE_EXPORT igs_json_node_t * igs_json_node_parse_from_str2(const char *format, ...) CHECK_PRINTF (1);
 INGESCAPE_EXPORT void igs_json_node_destroy(igs_json_node_t **node);
 INGESCAPE_EXPORT igs_json_node_t * igs_json_node_dup(igs_json_node_t *node); //caller owns returned value
 INGESCAPE_EXPORT char * igs_json_node_dump(igs_json_node_t *node); //caller owns returned value
 
-//insert node in an existing structure
+//insert node in an existing structure (array or map)
 //Key must be non-NULL to insert in a map node.
 //Does not take ownership of node_to_insert (duplicates it).
+//Subpath must be NULL-terminated.
 INGESCAPE_EXPORT void igs_json_node_insert(igs_json_node_t *parent, const char *key, igs_json_node_t *node_to_insert);
+INGESCAPE_EXPORT void igs_json_node_insert2(igs_json_node_t *parent, const char *key,
+                                            const char **subpath, igs_json_node_t **node_to_insert); //takes ownership of node_to_insert
 
 /* Nodes support queries to retrieve sub-nodes
+ Path must be NULL-terminated.
  Important notes :
  - returned value must NOT be freed manually : it is owned by the node
  - returned structure contains a type that shall be checked to handle actual contained value(s)
