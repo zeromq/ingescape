@@ -70,7 +70,7 @@ int runAutoTests(zloop_t *loop, int timer_id, void *arg){
     return -1;
 }
 
-void agentEvents(igs_agent_event_t event, const char *uuid, const char *name, void *eventData, void *myCbData){
+void agentEvents(igs_agent_event_t event, const char *uuid, const char *name, const void *eventData, void *myCbData){
     IGS_UNUSED(uuid)
     IGS_UNUSED(eventData)
     IGS_UNUSED(myCbData)
