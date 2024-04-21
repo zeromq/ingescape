@@ -152,8 +152,7 @@ igs_json_node_t *
 igs_json_node_dup (igs_json_node_t *root)
 {
     assert(root);
-    igs_json_node_t *result =
-      (igs_json_node_t *) zmalloc (sizeof (igs_json_node_t));
+    igs_json_node_t *result =  (igs_json_node_t *) zmalloc (sizeof (igs_json_node_t));
     result->type = root->type;
 
     switch (root->type) {
@@ -171,24 +170,18 @@ igs_json_node_dup (igs_json_node_t *root)
             break;
         case IGS_JSON_MAP: // igsyajl_t_object
             result->u.object.len = root->u.object.len;
-            result->u.object.keys =
-              (const char **) zmalloc (root->u.object.len * sizeof (char *));
-            result->u.object.values =
-              (igs_json_node_t **) zmalloc (root->u.object.len * sizeof (igs_json_node_t *));
+            result->u.object.keys = (const char **) zmalloc (root->u.object.len * sizeof (char *));
+            result->u.object.values = (igs_json_node_t **) zmalloc (root->u.object.len * sizeof (igs_json_node_t *));
             for (size_t i = 0; i < root->u.object.len; i++) {
                 result->u.object.keys[i] = strdup (root->u.object.keys[i]);
-                result->u.object.values[i] =
-                  igs_json_node_dup (root->u.object.values[i]);
+                result->u.object.values[i] = igs_json_node_dup (root->u.object.values[i]);
             }
             break;
         case IGS_JSON_ARRAY: // igsyajl_t_array
             result->u.array.len = root->u.array.len;
-            result->u.array.values =
-              (igs_json_node_t **) zmalloc (root->u.array.len * sizeof (igs_json_node_t *));
-            for (size_t i = 0; i < root->u.array.len; i++) {
-                result->u.array.values[i] =
-                igs_json_node_dup (root->u.array.values[i]);
-            }
+            result->u.array.values = (igs_json_node_t **) zmalloc (root->u.array.len * sizeof (igs_json_node_t *));
+            for (size_t i = 0; i < root->u.array.len; i++)
+                result->u.array.values[i] = igs_json_node_dup (root->u.array.values[i]);
             break;
         case IGS_JSON_TRUE:
             result->u.number.i = true;
@@ -230,7 +223,7 @@ igs_json_node_insert (igs_json_node_t *parent,
     assert (node_to_insert);
     if (parent->type == IGS_JSON_ARRAY) {
         size_t size = parent->u.array.len;
-        parent->u.array.values = realloc (parent->u.array.values, size + 1);
+        parent->u.array.values = realloc (parent->u.array.values, (size+1)*sizeof(igs_json_node_t *));
         assert (parent->u.array.values);
         parent->u.array.values[size] = igs_json_node_dup (node_to_insert);
         parent->u.array.len += 1;
@@ -251,10 +244,8 @@ igs_json_node_insert (igs_json_node_t *parent,
         if (known_key)
             igs_json_node_destroy (&(parent->u.object.values[index]));
         else {
-            parent->u.object.values =
-              realloc (parent->u.object.values, size + 1);
-            parent->u.object.keys =
-              (const char **) realloc (parent->u.object.keys, size + 1);
+            parent->u.object.values = (igs_json_node_t **)realloc (parent->u.object.values, (size+1)*sizeof(igs_json_node_t *));
+            parent->u.object.keys = (const char **) realloc (parent->u.object.keys, (size + 1)*sizeof(char*));
             assert (parent->u.object.values);
             assert (parent->u.object.keys);
             parent->u.object.keys[index] = strdup (key);
