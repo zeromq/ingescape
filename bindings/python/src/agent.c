@@ -88,7 +88,7 @@ PyObject *Agent_observe(AgentObject *self, PyObject *args, PyObject *kwds)
     agentObserveCB_t* newElt = calloc(1, sizeof(agentObserveCB_t));
     newElt->agent = self;
     newElt->my_data = Py_BuildValue("O", my_data);
-    newElt->callback = callback;
+    newElt->callback = Py_BuildValue("O", callback);
     DL_APPEND(agentObserveCBList, newElt);
     igsagent_observe(self->agent, agentObserveCB, NULL);
     return PyLong_FromLong(IGS_SUCCESS);
@@ -472,7 +472,7 @@ PyObject *Agent_observe_mute(AgentObject *self, PyObject *args, PyObject *kwds)
     agentMuteCB_t* newElt = calloc(1, sizeof(agentMuteCB_t));
     newElt->agent = self;
     newElt->my_data = Py_BuildValue("O", my_data);
-    newElt->callback = callback;
+    newElt->callback = Py_BuildValue("O", callback);
     DL_APPEND(agentMuteCBList, newElt);
     igsagent_observe_mute(self->agent, agentObserveMute, NULL);
     return PyLong_FromLong(IGS_SUCCESS);
@@ -539,7 +539,7 @@ PyObject *Agent_observe_agent_event(AgentObject *self, PyObject *args, PyObject 
     agentObserveEventsCB_t* newElt = calloc(1, sizeof(agentObserveEventsCB_t));
     newElt->agent = self;
     newElt->my_data = Py_BuildValue("O", my_data);
-    newElt->callback = callback;
+    newElt->callback = Py_BuildValue("O", callback);
     DL_APPEND(agentObserveEventsCBList, newElt);
     igsagent_observe_agent_events(self->agent, agentObserveEventsCB, NULL);
     return PyLong_FromLong(IGS_SUCCESS);
@@ -1468,7 +1468,7 @@ PyObject *s_agent_io_observe(AgentObject *self, PyObject *args, PyObject *kwds, 
     newElt->ioType = ioType;
     newElt->nameArg = strdup(ioName);
     newElt->my_data = Py_BuildValue("O", my_data);
-    newElt->callback = callback;
+    newElt->callback = Py_BuildValue("O", callback);
     DL_APPEND(agentobserve_io_cbList, newElt);
     igs_api(self->agent, ioName, agent_observe, NULL);
     return PyLong_FromLong(IGS_SUCCESS);
@@ -2027,7 +2027,7 @@ PyObject *Agent_service_init(AgentObject *self, PyObject *args, PyObject *kwds)
         newElt->agent = self;
         newElt->serviceName = strdup(serviceName);
         newElt->my_data = Py_BuildValue("O", myData);
-        newElt->callback = callback;
+        newElt->callback = Py_BuildValue("O", callback);
         DL_APPEND(agentServiceCBList, newElt);
     }
     return PyLong_FromLong(result);

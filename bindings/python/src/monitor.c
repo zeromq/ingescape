@@ -55,7 +55,7 @@ PyObject *igs_observe_monitor_wrapper(PyObject *self, PyObject *args, PyObject *
     }
     monitor_cb_t *newElt = calloc(1, sizeof(monitor_cb_t));
     newElt->my_data = Py_BuildValue("O", my_data);
-    newElt->callback = callback;
+    newElt->callback = Py_BuildValue("O", callback);
     DL_APPEND(observe_monitor_cbList, newElt);
     igs_observe_monitor(observe_monitor_callback, NULL);
     return PyLong_FromLong(IGS_SUCCESS);

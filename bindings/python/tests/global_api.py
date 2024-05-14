@@ -259,6 +259,14 @@ assert len(igs.attribute_list()) == 0
 assert len(igs.parameter_list()) == 0
 print ("OK")
 
+print ("[Global API] Remove observed intput then add it again", end =" ")
+assert igs.input_create("volatile", igs.IMPULSION_T, None) == igs.SUCCESS
+igs.observe_input("volatile", observe_io, None)
+igs.input_remove("volatile")
+assert igs.input_create("volatile", igs.IMPULSION_T, None) == igs.SUCCESS
+igs.observe_input("volatile", observe_io, None)
+print ("OK")
+
 print ("[Global API] Testing agent mappings", end =" ")
 assert igs.mapping_add("toto", "other_agent", "tata") > 0
 map_id = igs.mapping_add("toto", "other_agent", "tata")

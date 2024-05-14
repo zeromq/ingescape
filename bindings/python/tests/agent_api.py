@@ -321,6 +321,14 @@ assert len(a.attribute_list()) == 0
 assert len(a.parameter_list()) == 0
 print ("OK")
 
+print ("[Agent API] Testing remove observed intput then add it again", end =" ")
+assert a.input_create("volatile", igs.IMPULSION_T, None) == igs.SUCCESS
+a.observe_input("volatile", observe_io_agent, None)
+a.input_remove("volatile")
+assert a.input_create("volatile", igs.IMPULSION_T, None) == igs.SUCCESS
+a.observe_input("volatile", observe_io_agent, None)
+print ("OK")
+
 print ("[Agent API] Testing agent mappings", end =" ")
 assert a.mapping_add("toto", "other_agent", "tata") > 0
 map_id = a.mapping_add("toto", "other_agent", "tata")

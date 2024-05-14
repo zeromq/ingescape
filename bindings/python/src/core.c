@@ -215,7 +215,7 @@ PyObject *observe_mute_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
     }
     mute_cb_t *newElt = calloc(1, sizeof(mute_cb_t));
     newElt->my_data = Py_BuildValue("O", my_data);
-    newElt->callback = callback;
+    newElt->callback = Py_BuildValue("O", callback);
     DL_APPEND(observe_mute_cbList, newElt);
     igs_observe_mute(observe_mute_callback, NULL);
     return PyLong_FromLong(IGS_SUCCESS);
@@ -271,7 +271,7 @@ PyObject * observe_agent_events_wrapper(PyObject *self, PyObject *args)
     Py_INCREF(my_data);
     newElt->my_data = my_data;
     Py_INCREF(callback);
-    newElt->callback = callback;
+    newElt->callback = Py_BuildValue("O", callback);
     DL_APPEND(agentEventCallbackList, newElt);
     igs_observe_agent_events(onAgentEvent, NULL);
     return PyLong_FromLong(IGS_SUCCESS);
@@ -906,7 +906,7 @@ PyObject *s_observe_generic(PyObject *self, PyObject *args, PyObject *kwds, igs_
     newElt->ioType = ioType;
     newElt->nameArg = strdup(ioName);
     newElt->my_data = Py_BuildValue("O", my_data);
-    newElt->callback = callback;
+    newElt->callback = Py_BuildValue("O", callback);
     DL_APPEND(observe_io_cbList, newElt);
     igs_api(ioName, observe, NULL);
     return PyLong_FromLong(IGS_SUCCESS);
@@ -1377,8 +1377,7 @@ PyObject * input_remove_wrapper(PyObject * self, PyObject * args)
         observe_io_cb_t *actuel = NULL;
         DL_FOREACH(observe_io_cbList, actuel)
         {
-            if (streq(actuel->nameArg, name)
-                && (actuel->ioType == IGS_INPUT_T))
+            if (streq(actuel->nameArg, name) && (actuel->ioType == IGS_INPUT_T))
             {
                 DL_DELETE(observe_io_cbList, actuel);
                 Py_CLEAR(actuel->callback);
