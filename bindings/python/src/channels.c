@@ -35,7 +35,7 @@ PyObject * channel_leave_wrapper(PyObject *self, PyObject *args)
 
 // FIXME: channels are to ZMQ dependent
 //observe_channel_cb_t *observe_channel_list = NULL;
-// PyObject * observe_channels_wrapper(PyObject *self, PyObject *args, PyObject *kwds){ }
+// PyObject * observe_channels_wrapper(PyObject *self, PyObject *args){ }
 
 PyObject * channel_shout_str_wrapper(PyObject *self, PyObject *args)
 {

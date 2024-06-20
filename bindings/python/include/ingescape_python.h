@@ -66,7 +66,7 @@ typedef struct mute_cb {
     struct mute_cb *prev;
 } mute_cb_t;
 extern mute_cb_t *observe_mute_cbList;
-PyObject *observe_mute_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject *observe_mute_wrapper(PyObject *self, PyObject *args);
 
 PyObject * freeze_wrapper(PyObject * self, PyObject * args);
 PyObject * unfreeze_wrapper(PyObject * self, PyObject * args);
@@ -183,20 +183,20 @@ PyObject * parameter_set_double_wrapper(PyObject * self, PyObject * args);
 PyObject * parameter_set_string_wrapper(PyObject * self, PyObject * args);
 PyObject * parameter_set_data_wrapper(PyObject * self, PyObject * args);
 
-PyObject * igs_constraints_enforce_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject * igs_input_add_constraint_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject * igs_output_add_constraint_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject * igs_attribute_add_constraint_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject * igs_parameter_add_constraint_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject * igs_constraints_enforce_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_input_add_constraint_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_output_add_constraint_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_attribute_add_constraint_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_parameter_add_constraint_wrapper(PyObject *self, PyObject *args);
 
-PyObject * igs_input_set_description_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject * igs_output_set_description_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject * igs_attribute_set_description_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject * igs_parameter_set_description_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject * igs_input_set_description_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_output_set_description_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_attribute_set_description_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_parameter_set_description_wrapper(PyObject *self, PyObject *args);
 
-PyObject * igs_input_set_detailed_type_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject * igs_output_set_detailed_type_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject * igs_attribute_set_detailed_type_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject * igs_input_set_detailed_type_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_output_set_detailed_type_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_attribute_set_detailed_type_wrapper(PyObject *self, PyObject *args);
 
 PyObject * clear_input_wrapper(PyObject * self, PyObject * args);
 PyObject * clear_output_wrapper(PyObject * self, PyObject * args);
@@ -212,10 +212,10 @@ typedef struct observe_io_cb {
     struct observe_io_cb *prev;
 } observe_io_cb_t;
 extern observe_io_cb_t *observe_io_cbList;
-PyObject *observe_input_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject *observe_output_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject *observe_attribute_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject *observe_parameter_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject *observe_input_wrapper(PyObject *self, PyObject *args);
+PyObject *observe_output_wrapper(PyObject *self, PyObject *args);
+PyObject *observe_attribute_wrapper(PyObject *self, PyObject *args);
+PyObject *observe_parameter_wrapper(PyObject *self, PyObject *args);
 
 PyObject * output_mute_wrapper(PyObject * self, PyObject * args);
 PyObject * output_unmute_wrapper(PyObject * self, PyObject * args);
@@ -228,17 +228,17 @@ PyObject * mapping_json_wrapper(PyObject * self, PyObject * args);
 PyObject * mapping_count_wrapper(PyObject * self, PyObject * args);
 
 PyObject * clear_mappings_wrapper(PyObject * self, PyObject * args);
-PyObject * clear_mappings_with_agent_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject * clear_mappings_for_input_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject * clear_mappings_with_agent_wrapper(PyObject *self, PyObject *args);
+PyObject * clear_mappings_for_input_wrapper(PyObject *self, PyObject *args);
 
 PyObject * mapping_add_wrapper(PyObject * self, PyObject * args);
 PyObject * mapping_remove_with_id_wrapper(PyObject * self, PyObject * args);
 PyObject * mapping_remove_with_name_wrapper(PyObject * self, PyObject * args);
 
-PyObject *split_count_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject *split_add_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject *split_remove_with_id_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject *split_remove_with_name_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject *split_count_wrapper(PyObject *self, PyObject *args);
+PyObject *split_add_wrapper(PyObject *self, PyObject *args);
+PyObject *split_remove_with_id_wrapper(PyObject *self, PyObject *args);
+PyObject *split_remove_with_name_wrapper(PyObject *self, PyObject *args);
 
 PyObject * mapping_set_outputs_request_wrapper(PyObject * self, PyObject * args);
 PyObject * mapping_outputs_request_wrapper(PyObject * self, PyObject * args);
@@ -287,8 +287,8 @@ typedef struct timer_callback_element{
     PyObject *my_data;
 } timer_callback_element_t;
 
-PyObject * igs_timer_start_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject * igs_timer_stop_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject * igs_timer_start_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_timer_stop_wrapper(PyObject *self, PyObject *args);
 
 PyObject * channel_join_wrapper(PyObject *self, PyObject *args);
 PyObject * channel_leave_wrapper(PyObject *self, PyObject *args);
@@ -303,15 +303,15 @@ PyObject * peer_add_header_wrapper(PyObject *self, PyObject *args);
 PyObject * peer_remove_header_wrapper(PyObject *self, PyObject *args);
 
 
-PyObject * igs_broker_add_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject * igs_clear_brokers_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject * igs_broker_enable_with_endpoint_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject * igs_broker_set_advertized_endpoint_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject * igs_start_with_brokers_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject * igs_broker_add_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_clear_brokers_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_broker_enable_with_endpoint_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_broker_set_advertized_endpoint_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_start_with_brokers_wrapper(PyObject *self, PyObject *args);
 
-PyObject * igs_enable_security_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject * igs_disable_security_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject * igs_broker_add_secure_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject * igs_enable_security_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_disable_security_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_broker_add_secure_wrapper(PyObject *self, PyObject *args);
 
 PyObject * election_join_wrapper(PyObject * self, PyObject * args);
 PyObject * election_leave_wrapper(PyObject * self, PyObject * args);
@@ -338,7 +338,7 @@ PyObject * version_wrapper(PyObject * self, PyObject * args);
 PyObject * protocol_wrapper(PyObject * self, PyObject * args);
 
 PyObject * set_command_line_wrapper(PyObject * self, PyObject * args);
-PyObject * command_line_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject * command_line_wrapper(PyObject *self, PyObject *args);
 
 PyObject * log_set_console_wrapper(PyObject * self, PyObject * args);
 PyObject * log_console_wrapper(PyObject * self, PyObject * args);
@@ -351,26 +351,26 @@ PyObject * log_console_level_wrapper(PyObject * self, PyObject * args);
 PyObject * log_set_stream_wrapper(PyObject * self, PyObject * args);
 PyObject * log_stream_wrapper(PyObject * self, PyObject * args);
 PyObject * log_set_file_wrapper(PyObject * self, PyObject * args);
-PyObject * log_set_file_level_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject * log_set_file_max_line_length_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject * log_set_file_level_wrapper(PyObject *self, PyObject *args);
+PyObject * log_set_file_max_line_length_wrapper(PyObject *self, PyObject *args);
 PyObject * log_file_wrapper(PyObject * self, PyObject * args);
 PyObject * log_set_file_path_wrapper(PyObject * self, PyObject * args);
 PyObject * log_file_path_wrapper(PyObject * self, PyObject * args);
 
-PyObject * log_include_data_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject * igs_log_include_services_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject * igs_log_no_warning_if_undefined_service_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject * log_include_data_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_log_include_services_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_log_no_warning_if_undefined_service_wrapper(PyObject *self, PyObject *args);
 
 PyObject * definition_set_path_wrapper(PyObject * self, PyObject * args);
 PyObject * definition_save_wrapper(PyObject * self, PyObject * args);
 PyObject * mapping_set_path_wrapper(PyObject * self, PyObject * args);
 PyObject * mapping_save_wrapper(PyObject * self, PyObject * args);
 
-PyObject * igs_set_ipc_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject * igs_has_ipc_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject * igs_set_ipc_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_has_ipc_wrapper(PyObject *self, PyObject *args);
 #if defined (__UNIX__)
-PyObject * igs_set_ipc_dir_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject * igs_ipc_dir_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject * igs_set_ipc_dir_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_ipc_dir_wrapper(PyObject *self, PyObject *args);
 #endif
 
 PyObject * net_devices_list_wrapper(PyObject * self, PyObject * args);
@@ -378,21 +378,21 @@ PyObject * net_addresses_list_wrapper(PyObject * self, PyObject * args);
 
 
 PyObject * net_set_publishing_port_wrapper(PyObject *self, PyObject *args);
-PyObject * igs_net_set_log_stream_port_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject * igs_net_set_log_stream_port_wrapper(PyObject *self, PyObject *args);
 PyObject * net_set_discovery_interval_wrapper(PyObject *self, PyObject *args);
-PyObject * igs_net_set_timeout_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject * igs_net_raise_sockets_limit_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject * igs_net_set_high_water_marks_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject * igs_net_set_timeout_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_net_raise_sockets_limit_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_net_set_high_water_marks_wrapper(PyObject *self, PyObject *args);
 
 
-PyObject * igs_clear_context_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject * igs_clear_context_wrapper(PyObject *self, PyObject *args);
 
 
-PyObject * igs_monitor_start_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject * igs_monitor_start_with_network_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject * igs_monitor_stop_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject * igs_monitor_is_running_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject * igs_monitor_set_start_stop_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject * igs_monitor_start_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_monitor_start_with_network_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_monitor_stop_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_monitor_is_running_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_monitor_set_start_stop_wrapper(PyObject *self, PyObject *args);
 
 typedef struct monitor_cb {
     PyObject *callback;
@@ -401,15 +401,13 @@ typedef struct monitor_cb {
     struct monitor_cb *prev;
 } monitor_cb_t;
 extern monitor_cb_t *observe_monitor_cbList;
-PyObject * igs_observe_monitor_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject * igs_observe_monitor_wrapper(PyObject *self, PyObject *args);
 
-PyObject * igs_clear_context_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject * igs_replay_init_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_replay_start_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_replay_pause_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_replay_terminate_wrapper(PyObject *self, PyObject *args);
 
-PyObject * igs_replay_init_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject * igs_replay_start_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject * igs_replay_pause_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject * igs_replay_terminate_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
-
-PyObject * igs_net_performance_check_wrapper(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject * igs_net_performance_check_wrapper(PyObject *self, PyObject *args);
 
 #endif /* ingescape_python_h */

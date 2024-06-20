@@ -246,7 +246,7 @@ PyObject *Agent_service_call(AgentObject *self, PyObject *args, PyObject *kwds);
 
 typedef struct agentServicesCB {
     AgentObject* agent;      // Agent ref
-    const char* serviceName; // Service name
+    char* serviceName; // Service name
     PyObject *callback;
     PyObject *my_data;
     struct agentServicesCB *next;
