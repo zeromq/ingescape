@@ -30,7 +30,7 @@ static char *s_strndup (const char *str, size_t chars)
     return buffer;
 }
 
-PyObject * igs_clear_context_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_clear_context_wrapper(PyObject *self, PyObject *args)
 {
     igs_clear_context();
     // Clean observes on IOs
@@ -130,7 +130,7 @@ PyObject * agent_set_family_wrapper(PyObject * self, PyObject * args)
 
 PyObject * agent_uuid_wrapper(PyObject * self, PyObject * args)
  {
-    const char * uuid = igs_agent_uuid();
+    char * uuid = igs_agent_uuid();
     if(uuid != NULL){
         PyObject *ret = PyUnicode_FromFormat("%s", uuid);
         free(uuid);
@@ -201,7 +201,7 @@ void observe_mute_callback(bool is_muted, void *my_data)
     PyGILState_Release(d_gstate);
 }
 
-PyObject *observe_mute_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject *observe_mute_wrapper(PyObject *self, PyObject *args)
 {
     PyObject *callback = NULL;
     PyObject *my_data = NULL;
@@ -222,7 +222,7 @@ PyObject *observe_mute_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
 }
 
 agentEventCallback_t *agentEventCallbackList = NULL;
-void onAgentEvent(igs_agent_event_t event, const char *uuid, const char *name, void *eventData, void *myData)
+void onAgentEvent(igs_agent_event_t event, const char *uuid, const char *name, const void *eventData, void *myData)
 {
     agentEventCallback_t *currentCallback = NULL;
     DL_FOREACH(agentEventCallbackList, currentCallback){
@@ -277,106 +277,100 @@ PyObject * observe_agent_events_wrapper(PyObject *self, PyObject *args)
     return PyLong_FromLong(IGS_SUCCESS);
 }
 
-PyObject * igs_constraints_enforce_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_constraints_enforce_wrapper(PyObject *self, PyObject *args)
 {
-    static char *kwlist[] = {"enforce", NULL};
     bool enforce = true;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "b", kwlist, &enforce))
+    if (!PyArg_ParseTuple(args, "b", &enforce))
         return NULL;
     igs_constraints_enforce(enforce);
     return PyLong_FromLong(0);
 }
 
 typedef igs_result_t (*io_add_constraint)(const char*, const char*);
-PyObject * s_io_add_constraint(PyObject *self, PyObject *args, PyObject *kwds, io_add_constraint igs_api)
+PyObject * s_io_add_constraint(PyObject *self, PyObject *args, io_add_constraint igs_api)
 {
-    static char *kwlist[] = {"name", "constraint", NULL};
     char * name = NULL;
     char * constraint = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "ss", kwlist, &name, &constraint))
+    if (!PyArg_ParseTuple(args, "ss", &name, &constraint))
         return NULL;
     return PyLong_FromLong(igs_api(name, constraint));
 }
 
-PyObject * igs_input_add_constraint_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_input_add_constraint_wrapper(PyObject *self, PyObject *args)
 {
-    s_io_add_constraint(self, args, kwds, igs_input_add_constraint);
+    return s_io_add_constraint(self, args, igs_input_add_constraint);
 }
 
-PyObject * igs_output_add_constraint_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_output_add_constraint_wrapper(PyObject *self, PyObject *args)
 {
-    s_io_add_constraint(self, args, kwds, igs_output_add_constraint);
+    return s_io_add_constraint(self, args, igs_output_add_constraint);
 }
 
-PyObject * igs_attribute_add_constraint_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_attribute_add_constraint_wrapper(PyObject *self, PyObject *args)
 {
-    s_io_add_constraint(self, args, kwds, igs_attribute_add_constraint);
+    return s_io_add_constraint(self, args, igs_attribute_add_constraint);
 }
 
-PyObject * igs_parameter_add_constraint_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_parameter_add_constraint_wrapper(PyObject *self, PyObject *args)
 {
-    s_io_add_constraint(self, args, kwds, igs_parameter_add_constraint);
+    return s_io_add_constraint(self, args, igs_parameter_add_constraint);
 }
 
-typedef void (*io_set_description)(const char*, const char*);
-PyObject * s_io_set_description(PyObject *self, PyObject *args, PyObject *kwds, io_set_description igs_api)
+typedef igs_result_t (*io_set_description)(const char*, const char*);
+PyObject * s_io_set_description(PyObject *self, PyObject *args, io_set_description igs_api)
 {
-    static char *kwlist[] = {"name", "description", NULL};
     const char * name = NULL;
     const char * description = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "ss", kwlist, &name, &description))
+    if (!PyArg_ParseTuple(args, "ss", &name, &description))
         return NULL;
-    igs_api(name, description);
-    return PyLong_FromLong(IGS_SUCCESS);
+    return PyLong_FromLong(igs_api(name, description));
 }
 
-PyObject * igs_input_set_description_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_input_set_description_wrapper(PyObject *self, PyObject *args)
 {
-    s_io_set_description(self, args, kwds, igs_input_set_description);
+    return s_io_set_description(self, args, igs_input_set_description);
 }
 
-PyObject * igs_output_set_description_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_output_set_description_wrapper(PyObject *self, PyObject *args)
 {
-    s_io_set_description(self, args, kwds, igs_output_set_description);
+    return s_io_set_description(self, args, igs_output_set_description);
 }
 
-PyObject * igs_attribute_set_description_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_attribute_set_description_wrapper(PyObject *self, PyObject *args)
 {
-    s_io_set_description(self, args, kwds, igs_attribute_set_description);
+    return s_io_set_description(self, args, igs_attribute_set_description);
 }
 
-PyObject * igs_parameter_set_description_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_parameter_set_description_wrapper(PyObject *self, PyObject *args)
 {
-    s_io_set_description(self, args, kwds, igs_parameter_set_description);
+    return s_io_set_description(self, args, igs_parameter_set_description);
 }
 
-typedef void (*io_set_detailed_type)(const char*, const char*, const char*);
-PyObject * s_io_set_detailed_type(PyObject *self, PyObject *args, PyObject *kwds, io_set_detailed_type igs_api)
+typedef igs_result_t (*io_set_detailed_type)(const char*, const char*, const char*);
+PyObject * s_io_set_detailed_type(PyObject *self, PyObject *args, io_set_detailed_type igs_api)
 {
-    static char *kwlist[] = {"input_name", "type_name", "specification", NULL};
     const char * input_name = NULL;
     const char * type_name = NULL;
     const char * specification = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "sss", kwlist, &input_name, &type_name, &specification))
+    if (!PyArg_ParseTuple(args, "sss", &input_name, &type_name, &specification))
         return NULL;
-    igs_api(input_name, type_name, specification);
-    return PyLong_FromLong(IGS_SUCCESS);
+    return PyLong_FromLong(igs_api(input_name, type_name, specification));
 }
 
-PyObject * igs_input_set_detailed_type_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_input_set_detailed_type_wrapper(PyObject *self, PyObject *args)
 {
-    s_io_set_detailed_type(self, args, kwds, igs_input_set_detailed_type);
+    return s_io_set_detailed_type(self, args, igs_input_set_detailed_type);
 }
 
-PyObject * igs_output_set_detailed_type_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_output_set_detailed_type_wrapper(PyObject *self, PyObject *args)
 {
-    s_io_set_detailed_type(self, args, kwds, igs_output_set_detailed_type);
+    return s_io_set_detailed_type(self, args, igs_output_set_detailed_type);
 }
 
 //NOTE: igs_parameter_set_detailed_type is not binded because it was already obsolete (in favor of igs_attribute_set_detailed_type) when the binding was updated
-PyObject * igs_attribute_set_detailed_type_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_attribute_set_detailed_type_wrapper(PyObject *self, PyObject *args)
 {
-    s_io_set_detailed_type(self, args, kwds, igs_attribute_set_detailed_type);
+    return s_io_set_detailed_type(self, args, igs_attribute_set_detailed_type);
 }
 
 PyObject * input_bool_wrapper(PyObject * self, PyObject * args)
@@ -653,7 +647,7 @@ typedef char* (*param_attr_string)(const char*);
 PyObject * s_param_attr_string_wrapper(PyObject * self, PyObject * args, param_attr_string igs_api)
 {
     const char * name;
-    const char * result;
+    char * result;
     if (!PyArg_ParseTuple(args, "s", &name))
         return NULL;
     result = igs_api(name);
@@ -710,12 +704,12 @@ PyObject * s_param_attr_set_bool_wrapper(PyObject * self, PyObject * args, param
 
 PyObject * attribute_set_bool_wrapper(PyObject * self, PyObject * args)
 {
-    s_param_attr_set_bool_wrapper(self, args, igs_attribute_set_bool);
+    return s_param_attr_set_bool_wrapper(self, args, igs_attribute_set_bool);
 }
 
 PyObject * parameter_set_bool_wrapper(PyObject * self, PyObject * args)
 {
-    s_param_attr_set_bool_wrapper(self, args, igs_parameter_set_bool);
+    return s_param_attr_set_bool_wrapper(self, args, igs_parameter_set_bool);
 }
 
 typedef igs_result_t (*param_attr_set_int)(const char*, int);
@@ -818,7 +812,7 @@ PyObject * clear_output_wrapper(PyObject * self, PyObject * args)
     return PyLong_FromLong(IGS_SUCCESS);
 }
 
-typedef igs_result_t (*clear_param_attr)(const char*);
+typedef void (*clear_param_attr)(const char*);
 PyObject * s_clear_param_attr_wrapper(PyObject * self, PyObject * args, clear_param_attr igs_api)
 {
     const char * name;
@@ -887,7 +881,7 @@ void observe(igs_io_type_t ioType, const char* name, igs_io_value_type_t valueTy
 }
 
 typedef void (*observe_wrapper)(const char*, igs_io_fn, void*);
-PyObject *s_observe_generic(PyObject *self, PyObject *args, PyObject *kwds, igs_io_type_t ioType, observe_wrapper igs_api)
+PyObject *s_observe_generic(PyObject *self, PyObject *args, igs_io_type_t ioType, observe_wrapper igs_api)
 {
     PyObject *callback = NULL;
     PyObject *my_data = NULL;
@@ -912,24 +906,24 @@ PyObject *s_observe_generic(PyObject *self, PyObject *args, PyObject *kwds, igs_
     return PyLong_FromLong(IGS_SUCCESS);
 }
 
-PyObject *observe_input_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject *observe_input_wrapper(PyObject *self, PyObject *args)
 {
-    return s_observe_generic(self, args, kwds, IGS_INPUT_T, igs_observe_input);
+    return s_observe_generic(self, args, IGS_INPUT_T, igs_observe_input);
 }
 
-PyObject *observe_output_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject *observe_output_wrapper(PyObject *self, PyObject *args)
 {
-    return s_observe_generic(self, args, kwds, IGS_OUTPUT_T, igs_observe_output);
+    return s_observe_generic(self, args, IGS_OUTPUT_T, igs_observe_output);
 }
 
-PyObject *observe_attribute_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject *observe_attribute_wrapper(PyObject *self, PyObject *args)
 {
-    return s_observe_generic(self, args, kwds, IGS_ATTRIBUTE_T, igs_observe_attribute);
+    return s_observe_generic(self, args, IGS_ATTRIBUTE_T, igs_observe_attribute);
 }
 
-PyObject *observe_parameter_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject *observe_parameter_wrapper(PyObject *self, PyObject *args)
 {
-    return s_observe_generic(self, args, kwds, IGS_ATTRIBUTE_T, igs_observe_parameter);
+    return s_observe_generic(self, args, IGS_ATTRIBUTE_T, igs_observe_parameter);
 }
 
 PyObject * output_mute_wrapper(PyObject * self, PyObject * args)
@@ -1030,22 +1024,22 @@ PyObject * s_io_list(PyObject * self, PyObject * args, io_list igs_api)
 
 PyObject * input_list_wrapper(PyObject * self, PyObject * args)
 {
-    s_io_list(self, args, igs_input_list);
+    return s_io_list(self, args, igs_input_list);
 }
 
 PyObject * output_list_wrapper(PyObject * self, PyObject * args)
 {
-    s_io_list(self, args, igs_output_list);
+    return s_io_list(self, args, igs_output_list);
 }
 
 PyObject * attribute_list_wrapper(PyObject * self, PyObject * args)
 {
-    s_io_list(self, args, igs_attribute_list);
+    return s_io_list(self, args, igs_attribute_list);
 }
 
 PyObject * parameter_list_wrapper(PyObject * self, PyObject * args)
 {
-    s_io_list(self, args, igs_parameter_list);
+    return s_io_list(self, args, igs_parameter_list);
 }
 
 PyObject * input_exists_wrapper(PyObject * self, PyObject * args)
@@ -1488,21 +1482,19 @@ PyObject * clear_mappings_wrapper(PyObject * self, PyObject * args)
     return PyLong_FromLong(IGS_SUCCESS);
 }
 
-PyObject * clear_mappings_for_input_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * clear_mappings_for_input_wrapper(PyObject *self, PyObject *args)
 {
-    static char *kwlist[] = {"input_name",  NULL};
     char *input_name = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &input_name))
+    if (!PyArg_ParseTuple(args, "s", &input_name))
         return NULL;
     igs_clear_mappings_for_input(input_name);
     return PyLong_FromLong(IGS_SUCCESS);
 }
 
-PyObject * clear_mappings_with_agent_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * clear_mappings_with_agent_wrapper(PyObject *self, PyObject *args)
 {
-    static char *kwlist[] = {"agent_name",  NULL};
     char *agent_name = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &agent_name))
+    if (!PyArg_ParseTuple(args, "s", &agent_name))
         return NULL;
     igs_clear_mappings_with_agent(agent_name);
     return PyLong_FromLong(IGS_SUCCESS);
@@ -1553,39 +1545,36 @@ PyObject * mapping_remove_with_name_wrapper(PyObject * self, PyObject * args)
     return PyLong_FromLong(igs_mapping_remove_with_name(fromOurInput, toAgent, withOutput));
 }
 
-PyObject * split_count_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * split_count_wrapper(PyObject *self, PyObject *args)
 {
     return PyLong_FromLong((long)igs_split_count());
 }
 
-PyObject * split_add_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * split_add_wrapper(PyObject *self, PyObject *args)
 {
-    static char *kwlist[] = {"from_our_input", "to_agent", "with_output",  NULL};
     char *from_our_input = NULL;
     char *to_agent = NULL;
     char *with_output = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "sss", kwlist, &from_our_input, &to_agent, &with_output))
+    if (!PyArg_ParseTuple(args, "sss", &from_our_input, &to_agent, &with_output))
         return NULL;
     return PyLong_FromUnsignedLongLong((unsigned long long)igs_split_add(from_our_input, to_agent, with_output));
 
 }
 
-PyObject * split_remove_with_id_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * split_remove_with_id_wrapper(PyObject *self, PyObject *args)
 {
-    static char *kwlist[] = {"id",  NULL};
     unsigned long long id_mapp = 0;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "K", kwlist, &id_mapp))
+    if (!PyArg_ParseTuple(args, "K", &id_mapp))
         return NULL;
     return PyLong_FromLong(igs_split_remove_with_id((uint64_t)id_mapp));
 }
 
-PyObject * split_remove_with_name_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * split_remove_with_name_wrapper(PyObject *self, PyObject *args)
 {
-    static char *kwlist[] = {"from_our_input", "to_agent", "with_output",  NULL};
     char *from_our_input = NULL;
     char *to_agent = NULL;
     char *with_output = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "sss", kwlist, &from_our_input, &to_agent, &with_output))
+    if (!PyArg_ParseTuple(args, "sss", &from_our_input, &to_agent, &with_output))
         return NULL;
     return PyLong_FromLong(igs_split_remove_with_name(from_our_input, to_agent, with_output));
 }
@@ -1681,9 +1670,8 @@ PyObject * rt_timestamps_wrapper(PyObject * self, PyObject * args)
 
 PyObject * rt_set_time_wrapper(PyObject * self, PyObject * args)
 {
-    static char *kwlist[] = {"microseconds",  NULL};
     long long micros = 0;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "L", kwlist, &micros))
+    if (!PyArg_ParseTuple(args, "L", &micros))
         return NULL;
     igs_rt_set_time((int64_t)micros);
     return PyLong_FromLong(IGS_SUCCESS);

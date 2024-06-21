@@ -1166,7 +1166,6 @@ PyObject *s_agent_io_set_bool(AgentObject *self, PyObject *args, PyObject *kwds,
     static char *kwlist[] = {"name", "value", NULL};
     const char *name = NULL;
     int value;
-    int result;
 
     if (!PyArg_ParseTupleAndKeywords(args, NULL, "sp", kwlist, &name, &value))
         Py_RETURN_NONE;

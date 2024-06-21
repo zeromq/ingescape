@@ -320,52 +320,47 @@ PyObject * log_console_level_wrapper(PyObject * self, PyObject * args)
     return PyLong_FromLong(igs_log_console_level());
 }
 
-PyObject * log_set_file_level_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * log_set_file_level_wrapper(PyObject *self, PyObject *args)
 {
-    static char *kwlist[] = {"level", NULL};
     int level = 0;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "i", kwlist, &level))
+    if (!PyArg_ParseTuple(args, "i", &level))
         return NULL;
     igs_log_set_file_level(level);
     return PyLong_FromLong(0);
 }
 
 
-PyObject * log_set_file_max_line_length_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * log_set_file_max_line_length_wrapper(PyObject *self, PyObject *args)
 {
-    static char *kwlist[] = {"size", NULL};
     int size = 0;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "i", kwlist, &size))
+    if (!PyArg_ParseTuple(args, "i", &size))
         return NULL;
     igs_log_set_file_max_line_length((size_t)size);
     return PyLong_FromLong(0);
 }
 
-PyObject * log_include_data_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * log_include_data_wrapper(PyObject *self, PyObject *args)
 {
-    static char *kwlist[] = {"enable", NULL};
     bool enable = true;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "b", kwlist, &enable))
+    if (!PyArg_ParseTuple(args, "b", &enable))
         return NULL;
     igs_log_include_data(enable);
     return PyLong_FromLong(0);
 }
 
-PyObject * igs_log_include_services_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_log_include_services_wrapper(PyObject *self, PyObject *args)
 {
-    static char *kwlist[] = {"enable", NULL};
     bool enable = true;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "b", kwlist, &enable))
+    if (!PyArg_ParseTuple(args, "b", &enable))
         return NULL;
     igs_log_include_services(enable);
     return PyLong_FromLong(0);
 }
 
-PyObject * igs_log_no_warning_if_undefined_service_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_log_no_warning_if_undefined_service_wrapper(PyObject *self, PyObject *args)
 {
-    static char *kwlist[] = {"enable", NULL};
     bool enable = true;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "b", kwlist, &enable))
+    if (!PyArg_ParseTuple(args, "b", &enable))
         return NULL;
     igs_log_no_warning_if_undefined_service(enable);
     return PyLong_FromLong(0);
