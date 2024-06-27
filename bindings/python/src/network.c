@@ -46,57 +46,52 @@ PyObject * stop_wrapper(PyObject * self, PyObject * args)
     return PyLong_FromLong(IGS_SUCCESS);
 }
 
-PyObject * igs_broker_add_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_broker_add_wrapper(PyObject *self, PyObject *args)
 {
-    static char *kwlist[] = {"broker_endpoint",  NULL};
     char *broker_endpoint = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &broker_endpoint))
+    if (!PyArg_ParseTuple(args, "s", &broker_endpoint))
         return NULL;
     return PyLong_FromLong(igs_broker_add(broker_endpoint));
 }
 
-PyObject * igs_clear_brokers_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_clear_brokers_wrapper(PyObject *self, PyObject *args)
 {
     igs_clear_brokers();
     return PyLong_FromLong(IGS_SUCCESS);
 }
 
-PyObject * igs_broker_enable_with_endpoint_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_broker_enable_with_endpoint_wrapper(PyObject *self, PyObject *args)
 {
-    static char *kwlist[] = {"our_broker_endpoint",  NULL};
     char *our_broker_endpoint = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &our_broker_endpoint))
+    if (!PyArg_ParseTuple(args, "s", &our_broker_endpoint))
         return NULL;
     igs_broker_enable_with_endpoint(our_broker_endpoint);
     return PyLong_FromLong(IGS_SUCCESS);
 }
 
-PyObject * igs_broker_set_advertized_endpoint_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_broker_set_advertized_endpoint_wrapper(PyObject *self, PyObject *args)
 {
-    static char *kwlist[] = {"advertised_endpoint",  NULL};
     char *advertised_endpoint = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &advertised_endpoint))
+    if (!PyArg_ParseTuple(args, "s", &advertised_endpoint))
         return NULL;
     igs_broker_set_advertized_endpoint(advertised_endpoint);
     return PyLong_FromLong(IGS_SUCCESS);
 }
 
-PyObject * igs_start_with_brokers_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_start_with_brokers_wrapper(PyObject *self, PyObject *args)
 {
-    static char *kwlist[] = {"agent_endpoint",  NULL};
     char *agent_endpoint = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &agent_endpoint))
+    if (!PyArg_ParseTuple(args, "s", &agent_endpoint))
         return NULL;
     return PyLong_FromLong(igs_start_with_brokers(agent_endpoint));
 }
 
 
-PyObject * igs_broker_add_secure_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_broker_add_secure_wrapper(PyObject *self, PyObject *args)
 {
-    static char *kwlist[] = {"broker_endpoint", "path_to_public_certificate_for_broker",  NULL};
     char *broker_endpoint = NULL;
     char *path_to_public_certificate_for_broker = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &broker_endpoint, &path_to_public_certificate_for_broker))
+    if (!PyArg_ParseTuple(args, "s", &broker_endpoint, &path_to_public_certificate_for_broker))
         return NULL;
     return PyLong_FromLong(igs_broker_add_secure(broker_endpoint, path_to_public_certificate_for_broker));
 }
@@ -176,7 +171,7 @@ PyObject * set_command_line_wrapper(PyObject * self, PyObject * args)
     return PyLong_FromLong(0);
 }
 
-PyObject * command_line_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * command_line_wrapper(PyObject *self, PyObject *args)
 {
     char * result = igs_command_line();
     if(result != NULL){
@@ -244,17 +239,16 @@ PyObject * observe_forced_stop_wrapper(PyObject *self, PyObject *args)
     return PyLong_FromLong(IGS_SUCCESS);
 }
 
-PyObject * igs_enable_security_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_enable_security_wrapper(PyObject *self, PyObject *args)
 {
-    static char *kwlist[] = {"private_certificate_file", "public_certificates_directory",  NULL};
     char *private_certificate_file = NULL;
     char *public_certificates_directory = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "ss", kwlist, &private_certificate_file, &public_certificates_directory))
+    if (!PyArg_ParseTuple(args, "ss", &private_certificate_file, &public_certificates_directory))
         return NULL;
     return PyLong_FromLong(igs_enable_security(private_certificate_file, public_certificates_directory));
 }
 
-PyObject * igs_disable_security_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_disable_security_wrapper(PyObject *self, PyObject *args)
 {
     igs_disable_security();
     return PyLong_FromLong(IGS_SUCCESS);
@@ -269,11 +263,10 @@ PyObject * net_set_discovery_interval_wrapper(PyObject *self, PyObject *args)
     return PyLong_FromLong(IGS_SUCCESS);
 }
 
-PyObject * igs_net_set_timeout_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_net_set_timeout_wrapper(PyObject *self, PyObject *args)
 {
-    static char *kwlist[] = {"duration", NULL};
     int duration = 0;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "i", kwlist, &duration))
+    if (!PyArg_ParseTuple(args, "i", &duration))
         return NULL;
     igs_net_set_timeout((unsigned int)duration);
     return PyLong_FromLong(IGS_SUCCESS);
@@ -288,22 +281,20 @@ PyObject * net_set_publishing_port_wrapper(PyObject *self, PyObject *args)
     return PyLong_FromLong(IGS_SUCCESS);
 }
 
-PyObject * igs_net_set_log_stream_port_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_net_set_log_stream_port_wrapper(PyObject *self, PyObject *args)
 {
-    static char *kwlist[] = {"port", NULL};
     int port = 0;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "i", kwlist, &port))
+    if (!PyArg_ParseTuple(args, "i", &port))
         return NULL;
     igs_net_set_log_stream_port((unsigned int)port);
     return PyLong_FromLong(IGS_SUCCESS);
 }
 
-PyObject * igs_set_ipc_dir_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_set_ipc_dir_wrapper(PyObject *self, PyObject *args)
 {
 #if defined (__UNIX__)
-    static char *kwlist[] = {"path", NULL};
     char * path = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &path))
+    if (!PyArg_ParseTuple(args, "s", &path))
         return NULL;
     igs_set_ipc_dir(path);
     return PyLong_FromLong(IGS_SUCCESS);
@@ -311,7 +302,7 @@ PyObject * igs_set_ipc_dir_wrapper(PyObject *self, PyObject *args, PyObject *kwd
     return PyLong_FromLong(IGS_FAILURE);
 }
 
-PyObject * igs_ipc_dir_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_ipc_dir_wrapper(PyObject *self, PyObject *args)
 {
 #if defined (__UNIX__)
     const char * result = igs_ipc_dir();
@@ -324,17 +315,16 @@ PyObject * igs_ipc_dir_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
     Py_RETURN_NONE;
 }
 
-PyObject * igs_set_ipc_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_set_ipc_wrapper(PyObject *self, PyObject *args)
 {
-    static char *kwlist[] = {"allow", NULL};
     bool allow = true;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "b", kwlist, &allow))
+    if (!PyArg_ParseTuple(args, "b", &allow))
         return NULL;
     igs_set_ipc(allow);
     return PyLong_FromLong(IGS_SUCCESS);
 }
 
-PyObject * igs_has_ipc_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_has_ipc_wrapper(PyObject *self, PyObject *args)
 {
     if(igs_has_ipc())
         Py_RETURN_TRUE;
@@ -342,17 +332,16 @@ PyObject * igs_has_ipc_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
         Py_RETURN_FALSE;
 }
 
-PyObject * igs_net_set_high_water_marks_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_net_set_high_water_marks_wrapper(PyObject *self, PyObject *args)
 {
-    static char *kwlist[] = {"hwm_value", NULL};
     int hwm_value = 0;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "i", kwlist, &hwm_value))
+    if (!PyArg_ParseTuple(args, "i", &hwm_value))
         return NULL;
     igs_net_set_high_water_marks(hwm_value);
     return PyLong_FromLong(IGS_SUCCESS);
 }
 
-PyObject * igs_net_raise_sockets_limit_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_net_raise_sockets_limit_wrapper(PyObject *self, PyObject *args)
 {
 #if defined (__UNIX__)
     igs_net_raise_sockets_limit();
@@ -382,14 +371,13 @@ void timers_callback (int timer_id, void *my_data)
     }
 }
 
-PyObject * igs_timer_start_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_timer_start_wrapper(PyObject *self, PyObject *args)
 {
-    static char *kwlist[] = {"delay", "times", "callback", "my_data", NULL};
     int delay = 0;
     int times = 0;
     PyObject *callback = NULL;
     PyObject *my_data = NULL;
-    if (PyArg_ParseTupleAndKeywords(args, NULL, "iiOO", kwlist, &delay, &times, &callback, &my_data)) {
+    if (PyArg_ParseTuple(args, "iiOO", &delay, &times, &callback, &my_data)) {
         if (!PyCallable_Check(callback)) {
             PyErr_SetString(PyExc_TypeError, "'callback' parameter must be callable");
             return PyLong_FromLong(IGS_FAILURE);
@@ -404,11 +392,10 @@ PyObject * igs_timer_start_wrapper(PyObject *self, PyObject *args, PyObject *kwd
     return PyLong_FromLong(igs_timer_start(delay, times, timers_callback, python_timer_callback));
 }
 
-PyObject * igs_timer_stop_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_timer_stop_wrapper(PyObject *self, PyObject *args)
 {
-    static char *kwlist[] = {"timer_id", NULL};
     int timer_id = 0;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "i", kwlist, &timer_id))
+    if (!PyArg_ParseTuple(args, "i", &timer_id))
         return NULL;
     igs_timer_stop(timer_id);
     return PyLong_FromLong(IGS_SUCCESS);

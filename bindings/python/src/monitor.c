@@ -41,7 +41,7 @@ void observe_monitor_callback(igs_monitor_event_t event, const char *device, con
     PyGILState_Release(d_gstate);
 }
 
-PyObject *igs_observe_monitor_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject *igs_observe_monitor_wrapper(PyObject *self, PyObject *args)
 {
     PyObject *callback = NULL;
     PyObject *my_data = NULL;
@@ -61,35 +61,33 @@ PyObject *igs_observe_monitor_wrapper(PyObject *self, PyObject *args, PyObject *
     return PyLong_FromLong(IGS_SUCCESS);
 }
 
-PyObject * igs_monitor_start_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_monitor_start_wrapper(PyObject *self, PyObject *args)
 {
-    static char *kwlist[] = {"period", NULL};
     int period = 0;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "i", kwlist, &period))
+    if (!PyArg_ParseTuple(args, "i", &period))
         return NULL;
     igs_monitor_start(period);
     return PyLong_FromLong(IGS_SUCCESS);
 }
 
-PyObject * igs_monitor_start_with_network_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_monitor_start_with_network_wrapper(PyObject *self, PyObject *args)
 {
-    static char *kwlist[] = {"period", "network_device", "port", NULL};
     int period = 0;
     char * network_device = NULL;
     int port = 0;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "isi", kwlist, &period, &network_device, &port))
+    if (!PyArg_ParseTuple(args, "isi", &period, &network_device, &port))
         return NULL;
     igs_monitor_start_with_network((unsigned int)period, network_device, (unsigned int)port);
     return PyLong_FromLong(IGS_SUCCESS);
 }
 
-PyObject * igs_monitor_stop_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_monitor_stop_wrapper(PyObject *self, PyObject *args)
 {
     igs_monitor_stop();
     return PyLong_FromLong(IGS_SUCCESS);
 }
 
-PyObject * igs_monitor_is_running_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_monitor_is_running_wrapper(PyObject *self, PyObject *args)
 {
     if(igs_monitor_is_running())
         Py_RETURN_TRUE;
@@ -97,11 +95,10 @@ PyObject * igs_monitor_is_running_wrapper(PyObject *self, PyObject *args, PyObje
         Py_RETURN_FALSE;
 }
 
-PyObject * igs_monitor_set_start_stop_wrapper(PyObject *self, PyObject *args, PyObject *kwds)
+PyObject * igs_monitor_set_start_stop_wrapper(PyObject *self, PyObject *args)
 {
-    static char *kwlist[] = {"flag", NULL};
     bool flag = false;
-    if (!PyArg_ParseTupleAndKeywords(args, NULL, "b", kwlist, &flag))
+    if (!PyArg_ParseTuple(args, "b", &flag))
         return NULL;
     igs_monitor_set_start_stop(flag);
     return PyLong_FromLong(IGS_SUCCESS);
