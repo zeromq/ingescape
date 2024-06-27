@@ -35,7 +35,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/modules/
 include(IngescapeHelper)
 include(IdentifyOS)
 
-# gets version from admin.c file
+# get version
 get_ingescape_version(INGESCAPE_VERSION_MAJOR INGESCAPE_VERSION_MINOR INGESCAPE_VERSION_PATCH)
 set(INGESCAPE_VERSION "${INGESCAPE_VERSION_MAJOR}.${INGESCAPE_VERSION_MINOR}.${INGESCAPE_VERSION_PATCH}")
 message(STATUS "Detected INGESCAPE Version - ${INGESCAPE_VERSION}")
