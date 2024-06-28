@@ -174,8 +174,8 @@ bool mapping_check_input_output_compatibility (igsagent_t *agent,
                                                igs_io_t *input,
                                                igs_io_t *output)
 {
-    // for compatibility, only DATA outputs imply limitations
-    // the rest is handled correctly in model_write
+    // For compatibility reasons, only DATA outputs imply limitations.
+    // The rest is covnerted automatically in model_write.
     bool is_compatible = true;
     igs_io_value_type_t type = input->value_type;
     if (output->value_type == IGS_DATA_T) {

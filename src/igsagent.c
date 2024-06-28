@@ -344,9 +344,9 @@ igs_result_t igsagent_parameter_set_detailed_type(igsagent_t *self, const char *
 }
 void igsagent_clear_parameter(igsagent_t *self, const char *name){
     igs_warn("this function is deprecated, please use igsagent_clear_attribute instead.");
-    return igsagent_clear_attribute(self, name);
+    igsagent_clear_attribute(self, name);
 }
 void igsagent_observe_parameter(igsagent_t *self, const char *name, igsagent_iop_fn cb, void *my_data){
     igs_warn("this function is deprecated, please use igsagent_observe_attribute instead.");
-    return igsagent_observe_attribute(self, name, cb, my_data);
+    igsagent_observe_attribute(self, name, cb, my_data);
 }

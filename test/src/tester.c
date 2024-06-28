@@ -1872,6 +1872,9 @@ void run_static_tests (int argc, const char * argv[]){
 }
 
 int rt_timer (zloop_t *loop, int timer_id, void *arg){
+    IGS_UNUSED(loop)
+    IGS_UNUSED(timer_id)
+    IGS_UNUSED(arg)
     igs_output_set_impulsion("my_impulsion");
     igs_output_set_bool("my_bool", myBool = !myBool);
     igs_output_set_int("my_int", myInt++);
@@ -1888,6 +1891,11 @@ void set_timeCB(igs_io_type_t io_type,
                 void *value,
                 size_t value_size,
                 void *my_data){
+    IGS_UNUSED(io_type)
+    IGS_UNUSED(name)
+    IGS_UNUSED(value_type)
+    IGS_UNUSED(value_size)
+    IGS_UNUSED(my_data)
     /*
      The usual timestamp values in milliseconds exceed the size of a signed 64 bits integer.
      Use a data input with proper casting to feed an agent with a realistic timestamp, which

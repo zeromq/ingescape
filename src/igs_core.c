@@ -1420,13 +1420,13 @@ igs_result_t igs_parameter_set_detailed_type(const char *param_name, const char 
 }
 void igs_clear_parameter(const char *name){
     igs_warn("this function is deprecated, please use igs_clear_attribute instead.");
-    return igs_clear_attribute(name);
+    igs_clear_attribute(name);
 }
 void igs_observe_parameter(const char *name, igs_iop_fn cb, void *my_data){
     igs_warn("this function is deprecated, please use igs_observe_attribute instead.");
-    return igs_observe_attribute(name, cb, my_data);
+    igs_observe_attribute(name, cb, my_data);
 }
 void igs_free_iop_list(char **list, size_t io_nbr){
     igs_warn("this function is deprecated, please use igs_free_io_list instead.");
-    return igs_free_io_list(list, io_nbr);
+    igs_free_io_list(list, io_nbr);
 }

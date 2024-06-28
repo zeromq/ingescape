@@ -181,7 +181,9 @@ igs_io_t *definition_create_io (igsagent_t *agent,
         default:
             break;
     }
+    model_read_write_lock (__FUNCTION__, __LINE__);
     model_write (agent, n, type, value_type, value, size);
+    model_read_write_unlock (__FUNCTION__, __LINE__);
     return io;
 }
 
