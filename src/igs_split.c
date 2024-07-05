@@ -458,12 +458,10 @@ int split_message_from_splitter (zmsg_t *msg, igs_core_context_t *context)
     igsagent_t *tmp, *elt;
     HASH_ITER(hh, core_context->agents, elt, tmp){
         if (streq(elt->uuid, worker_uuid)){
-            model_read_write_lock (__FUNCTION__, __LINE__);
             if (valueType == IGS_STRING_T)
-                model_write(elt, inputName, IGS_INPUT_T, valueType, value, strlen(value)+1);
+                model_write(elt, inputName, IGS_INPUT_T, valueType, value, strlen(value)+1, true);
             else
-                model_write(elt, inputName, IGS_INPUT_T, valueType, data, size);
-            model_read_write_unlock (__FUNCTION__, __LINE__);
+                model_write(elt, inputName, IGS_INPUT_T, valueType, data, size, true);
             break;
         }
     }

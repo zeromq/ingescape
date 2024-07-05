@@ -281,9 +281,9 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
                             // output to our input
                             agent->rt_current_timestamp_microseconds = timestamp;
                             if (value_type == IGS_STRING_T)
-                                model_write (agent, elmt->from_input, IGS_INPUT_T, value_type, value, strlen (value) + 1);
+                                model_write (agent, elmt->from_input, IGS_INPUT_T, value_type, value, strlen (value) + 1, false);
                             else
-                                model_write (agent, elmt->from_input, IGS_INPUT_T, value_type, data, size);
+                                model_write (agent, elmt->from_input, IGS_INPUT_T, value_type, data, size, false);
                             if (!agent->uuid)
                                 break;
                             else
@@ -942,9 +942,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                             }
                             data = zframe_data (frame);
                             size = zframe_size (frame);
-                            model_read_write_lock (__FUNCTION__, __LINE__);
-                            model_write (target_agent, input, IGS_INPUT_T, input_type, data, size);
-                            model_read_write_unlock (__FUNCTION__, __LINE__);
+                            model_write (target_agent, input, IGS_INPUT_T, input_type, data, size, true);
                             zframe_destroy (&frame);
                         }
                     }

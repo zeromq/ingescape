@@ -144,14 +144,18 @@ void s_model_run_observe_callbacks_for_io (igsagent_t *agent,
 }
 
 const igs_io_t *model_write (igsagent_t *agent, const char *name,
-                                  igs_io_type_t type, igs_io_value_type_t value_type,
-                                  void *value, size_t size)
+                             igs_io_type_t type, igs_io_value_type_t value_type,
+                             void *value, size_t size, bool use_lock)
 {
     assert (agent);
     assert (name);
+    if (use_lock)
+        model_read_write_lock(__FUNCTION__, __LINE__);
     igs_io_t *io = model_find_io_by_name (agent, name, type);
     if (!io) {
         igsagent_error (agent, "%s not found for writing", name);
+        if (use_lock)
+            model_read_write_unlock(__FUNCTION__, __LINE__);
         return NULL;
     }
     int ret = 1;
@@ -159,8 +163,11 @@ const igs_io_t *model_write (igsagent_t *agent, const char *name,
     size_t out_size = 0;
     char buf[NUMBER_TO_STRING_MAX_LENGTH + 1] = "";
     // check that this agent has not been destroyed when we were locked
-    if (!agent || !(agent->uuid))
+    if (!agent || !(agent->uuid)){
+        if (use_lock)
+            model_read_write_unlock(__FUNCTION__, __LINE__);
         return NULL;
+    }
     
     //apply constraint if any
     if (io->constraint && agent->enforce_constraints){
@@ -172,6 +179,8 @@ const igs_io_t *model_write (igsagent_t *agent, const char *name,
                     break;
                 case IGS_DATA_T:
                     igsagent_error(agent, "constraint type error for %s (value is data and IOP is integer)", io->name);
+                    if (use_lock)
+                        model_read_write_unlock(__FUNCTION__, __LINE__);
                     return NULL;
                 case IGS_DOUBLE_T:
                     converted_value = (int)(*(double*)value);
@@ -185,21 +194,29 @@ const igs_io_t *model_write (igsagent_t *agent, const char *name,
                 case IGS_CONSTRAINT_MIN:
                     if (converted_value < io->constraint->min_int.min){
                         igsagent_error(agent, "constraint error for %s (too low)", io->name);
+                        if (use_lock)
+                            model_read_write_unlock(__FUNCTION__, __LINE__);
                         return NULL;
                     }
                     break;
                 case IGS_CONSTRAINT_MAX:
                     if (converted_value > io->constraint->max_int.max){
                         igsagent_error(agent, "constraint error for %s (too high)", io->name);
+                        if (use_lock)
+                            model_read_write_unlock(__FUNCTION__, __LINE__);
                         return NULL;
                     }
                     break;
                 case IGS_CONSTRAINT_RANGE:
                     if (converted_value > io->constraint->range_int.max){
                         igsagent_error(agent, "constraint error for %s (too high)", io->name);
+                        if (use_lock)
+                            model_read_write_unlock(__FUNCTION__, __LINE__);
                         return NULL;
                     }else if (converted_value < io->constraint->range_int.min){
                         igsagent_error(agent, "constraint error for %s (too low)", io->name);
+                        if (use_lock)
+                            model_read_write_unlock(__FUNCTION__, __LINE__);
                         return NULL;
                     }
                     break;
@@ -215,6 +232,8 @@ const igs_io_t *model_write (igsagent_t *agent, const char *name,
                     break;
                 case IGS_DATA_T:
                     igsagent_error(agent, "constraint type error for %s (value is data and IOP is double)", io->name);
+                    if (use_lock)
+                        model_read_write_unlock(__FUNCTION__, __LINE__);
                     return NULL;
                 case IGS_INTEGER_T:
                 case IGS_BOOL_T:
@@ -229,21 +248,29 @@ const igs_io_t *model_write (igsagent_t *agent, const char *name,
                 case IGS_CONSTRAINT_MIN:
                     if (converted_value < io->constraint->min_double.min){
                         igsagent_error(agent, "constraint error for %s (too low)", io->name);
+                        if (use_lock)
+                            model_read_write_unlock(__FUNCTION__, __LINE__);
                         return NULL;
                     }
                     break;
                 case IGS_CONSTRAINT_MAX:
                     if (converted_value > io->constraint->max_double.max){
                         igsagent_error(agent, "constraint error for %s (too high)", io->name);
+                        if (use_lock)
+                            model_read_write_unlock(__FUNCTION__, __LINE__);
                         return NULL;
                     }
                     break;
                 case IGS_CONSTRAINT_RANGE:
                     if (converted_value > io->constraint->range_double.max){
                         igsagent_error(agent, "constraint error for %s (too high)", io->name);
+                        if (use_lock)
+                            model_read_write_unlock(__FUNCTION__, __LINE__);
                         return NULL;
                     }else if (converted_value < io->constraint->range_double.min){
                         igsagent_error(agent, "constraint error for %s (too low)", io->name);
+                        if (use_lock)
+                            model_read_write_unlock(__FUNCTION__, __LINE__);
                         return NULL;
                     }
                     break;
@@ -259,6 +286,8 @@ const igs_io_t *model_write (igsagent_t *agent, const char *name,
                     break;
                 case IGS_DATA_T:
                     igsagent_error(agent, "constraint type error for %s (value is data and IOP is string)", io->name);
+                    if (use_lock)
+                        model_read_write_unlock(__FUNCTION__, __LINE__);
                     return NULL;
                 case IGS_INTEGER_T:
                 case IGS_BOOL_T:
@@ -278,10 +307,14 @@ const igs_io_t *model_write (igsagent_t *agent, const char *name,
             }
             if (!converted_value){
                 igsagent_error(agent, "constraint error for %s (value is NULL)", io->name);
+                if (use_lock)
+                    model_read_write_unlock(__FUNCTION__, __LINE__);
                 return NULL;
             }
             if (!zrex_matches(io->constraint->regexp.rex, converted_value)){
                 igsagent_error(agent, "constraint error for %s (not matching regexp)", io->name);
+                if (use_lock)
+                    model_read_write_unlock(__FUNCTION__, __LINE__);
                 return NULL;
             }
         }
@@ -336,7 +369,7 @@ const igs_io_t *model_write (igsagent_t *agent, const char *name,
                 } break;
                 default:
                     igsagent_error (agent, "%s has an invalid value type %d",
-                                     name, io->value_type);
+                                    name, io->value_type);
                     ret = 0;
                     break;
             }
@@ -503,6 +536,8 @@ const igs_io_t *model_write (igsagent_t *agent, const char *name,
                         }else {
                             igs_error ("string %s is not a valid hexadecimal-encoded string",
                                        (char *) value);
+                            if (use_lock)
+                                model_read_write_unlock(__FUNCTION__, __LINE__);
                             return NULL;
                         }
                     }
@@ -559,27 +594,19 @@ const igs_io_t *model_write (igsagent_t *agent, const char *name,
         case IGS_DATA_T: {
             switch (io->value_type) {
                 case IGS_INTEGER_T:
-                    igsagent_warn (
-                      agent, "Raw data is not allowed into integer IOP %s",
-                      name);
+                    igsagent_warn (agent, "Raw data is not allowed into integer IOP %s",name);
                     ret = 0;
                     break;
                 case IGS_DOUBLE_T:
-                    igsagent_warn (
-                      agent, "Raw data is not allowed into double IOP %s",
-                      name);
+                    igsagent_warn (agent, "Raw data is not allowed into double IOP %s",name);
                     ret = 0;
                     break;
                 case IGS_BOOL_T:
-                    igsagent_warn (
-                      agent, "Raw data is not allowed into boolean IOP %s",
-                      name);
+                    igsagent_warn (agent, "Raw data is not allowed into boolean IOP %s",name);
                     ret = 0;
                     break;
                 case IGS_STRING_T: {
-                    igsagent_warn (
-                      agent, "Raw data is not allowed into string IOP %s",
-                      name);
+                    igsagent_warn (agent, "Raw data is not allowed into string IOP %s",name);
                     ret = 0;
                 } break;
                 case IGS_IMPULSION_T:
@@ -595,8 +622,7 @@ const igs_io_t *model_write (igsagent_t *agent, const char *name,
                     out_value = io->value.data;
                 } break;
                 default:
-                    igsagent_error(agent, "%s has an invalid value type %d",
-                                   name, io->value_type);
+                    igsagent_error(agent, "%s has an invalid value type %d", name, io->value_type);
                     ret = 0;
                     break;
             }
@@ -676,8 +702,13 @@ const igs_io_t *model_write (igsagent_t *agent, const char *name,
         if (log_io_value)
             free (log_io_value);
         
+        if (use_lock)
+            model_read_write_unlock(__FUNCTION__, __LINE__);
         // handle io callbacks
         s_model_run_observe_callbacks_for_io (agent, io, out_value, out_size);
+    }else{
+        if (use_lock)
+            model_read_write_unlock(__FUNCTION__, __LINE__);
     }
     
     return io;
@@ -1253,10 +1284,8 @@ igsagent_input_set_bool (igsagent_t *agent, const char *name, bool value)
 {
     assert (agent);
     assert (name);
-    model_read_write_lock (__FUNCTION__, __LINE__);
     const igs_io_t *io = model_write (agent, name, IGS_INPUT_T,
-                                      IGS_BOOL_T, &value, sizeof (bool));
-    model_read_write_unlock (__FUNCTION__, __LINE__);
+                                      IGS_BOOL_T, &value, sizeof (bool), true);
     return (io == NULL) ? IGS_FAILURE : IGS_SUCCESS;
 }
 
@@ -1265,9 +1294,7 @@ igsagent_input_set_int (igsagent_t *agent, const char *name, int value)
 {
     assert (agent);
     assert (name);
-    model_read_write_lock (__FUNCTION__, __LINE__);
-    const igs_io_t *io = model_write (agent, name, IGS_INPUT_T, IGS_INTEGER_T, &value, sizeof (int));
-    model_read_write_unlock (__FUNCTION__, __LINE__);
+    const igs_io_t *io = model_write (agent, name, IGS_INPUT_T, IGS_INTEGER_T, &value, sizeof (int), true);
     return (io == NULL) ? IGS_FAILURE : IGS_SUCCESS;
 }
 
@@ -1276,9 +1303,7 @@ igsagent_input_set_double (igsagent_t *agent, const char *name, double value)
 {
     assert (agent);
     assert (name);
-    model_read_write_lock (__FUNCTION__, __LINE__);
-    const igs_io_t *io = model_write (agent, name, IGS_INPUT_T, IGS_DOUBLE_T, &value, sizeof (double));
-    model_read_write_unlock (__FUNCTION__, __LINE__);
+    const igs_io_t *io = model_write (agent, name, IGS_INPUT_T, IGS_DOUBLE_T, &value, sizeof (double), true);
     return (io == NULL) ? IGS_FAILURE : IGS_SUCCESS;
 }
 
@@ -1289,9 +1314,7 @@ igs_result_t igsagent_input_set_string (igsagent_t *agent,
     assert (agent);
     assert (name);
     size_t value_length = (value == NULL) ? 0 : strlen (value) + 1;
-    model_read_write_lock (__FUNCTION__, __LINE__);
-    const igs_io_t *io = model_write (agent, name, IGS_INPUT_T, IGS_STRING_T, (char *) value, value_length);
-    model_read_write_unlock (__FUNCTION__, __LINE__);
+    const igs_io_t *io = model_write (agent, name, IGS_INPUT_T, IGS_STRING_T, (char *) value, value_length, true);
     return (io == NULL) ? IGS_FAILURE : IGS_SUCCESS;
 }
 
@@ -1300,9 +1323,7 @@ igs_result_t igsagent_input_set_impulsion (igsagent_t *agent,
 {
     assert (agent);
     assert (name);
-    model_read_write_lock (__FUNCTION__, __LINE__);
-    const igs_io_t *io = model_write (agent, name, IGS_INPUT_T, IGS_IMPULSION_T, NULL, 0);
-    model_read_write_unlock (__FUNCTION__, __LINE__);
+    const igs_io_t *io = model_write (agent, name, IGS_INPUT_T, IGS_IMPULSION_T, NULL, 0, true);
     return (io == NULL) ? IGS_FAILURE : IGS_SUCCESS;
 }
 
@@ -1313,9 +1334,7 @@ igs_result_t igsagent_input_set_data (igsagent_t *agent,
 {
     assert (agent);
     assert (name);
-    model_read_write_lock (__FUNCTION__, __LINE__);
-    const igs_io_t *io = model_write (agent, name, IGS_INPUT_T, IGS_DATA_T, value, size);
-    model_read_write_unlock (__FUNCTION__, __LINE__);
+    const igs_io_t *io = model_write (agent, name, IGS_INPUT_T, IGS_DATA_T, value, size, true);
     return (io == NULL) ? IGS_FAILURE : IGS_SUCCESS;
 }
 
@@ -1324,10 +1343,8 @@ igsagent_output_set_bool (igsagent_t *agent, const char *name, bool value)
 {
     assert (agent);
     assert (name);
-    model_read_write_lock (__FUNCTION__, __LINE__);
     const igs_io_t *io = model_write (agent, name, IGS_OUTPUT_T,
-                                      IGS_BOOL_T, &value, sizeof (bool));
-    model_read_write_unlock (__FUNCTION__, __LINE__);
+                                      IGS_BOOL_T, &value, sizeof (bool), true);
     if (io && !agent->rt_synchronous_mode_enabled)
         network_publish_output (agent, io);
     return (io == NULL) ? IGS_FAILURE : IGS_SUCCESS;
@@ -1338,10 +1355,8 @@ igsagent_output_set_int (igsagent_t *agent, const char *name, int value)
 {
     assert (agent);
     assert (name);
-    model_read_write_lock (__FUNCTION__, __LINE__);
     const igs_io_t *io = model_write (agent, name, IGS_OUTPUT_T,
-                                      IGS_INTEGER_T, &value, sizeof (int));
-    model_read_write_unlock (__FUNCTION__, __LINE__);
+                                      IGS_INTEGER_T, &value, sizeof (int), true);
     if (io && !agent->rt_synchronous_mode_enabled)
         network_publish_output (agent, io);
     return (io == NULL) ? IGS_FAILURE : IGS_SUCCESS;
@@ -1352,10 +1367,8 @@ igsagent_output_set_double (igsagent_t *agent, const char *name, double value)
 {
     assert (agent);
     assert (name);
-    model_read_write_lock (__FUNCTION__, __LINE__);
     const igs_io_t *io = model_write (agent, name, IGS_OUTPUT_T,
-                                      IGS_DOUBLE_T, &value, sizeof (double));
-    model_read_write_unlock (__FUNCTION__, __LINE__);
+                                      IGS_DOUBLE_T, &value, sizeof (double), true);
     if (io && !agent->rt_synchronous_mode_enabled)
         network_publish_output (agent, io);
     return (io == NULL) ? IGS_FAILURE : IGS_SUCCESS;
@@ -1368,10 +1381,8 @@ igs_result_t igsagent_output_set_string (igsagent_t *agent,
     assert (agent);
     assert (name);
     size_t length = (value == NULL) ? 0 : strlen (value) + 1;
-    model_read_write_lock (__FUNCTION__, __LINE__);
     const igs_io_t *io = model_write (agent, name, IGS_OUTPUT_T,
-                                      IGS_STRING_T, (char *) value, length);
-    model_read_write_unlock (__FUNCTION__, __LINE__);
+                                      IGS_STRING_T, (char *) value, length, true);
     if (io && !agent->rt_synchronous_mode_enabled)
         network_publish_output (agent, io);
     return (io == NULL) ? IGS_FAILURE : IGS_SUCCESS;
@@ -1382,9 +1393,7 @@ igs_result_t igsagent_output_set_impulsion (igsagent_t *agent,
 {
     assert (agent);
     assert (name);
-    model_read_write_lock (__FUNCTION__, __LINE__);
-    const igs_io_t *io = model_write (agent, name, IGS_OUTPUT_T, IGS_IMPULSION_T, NULL, 0);
-    model_read_write_unlock (__FUNCTION__, __LINE__);
+    const igs_io_t *io = model_write (agent, name, IGS_OUTPUT_T, IGS_IMPULSION_T, NULL, 0, true);
     if (io && !agent->rt_synchronous_mode_enabled)
         network_publish_output (agent, io);
     return (io == NULL) ? IGS_FAILURE : IGS_SUCCESS;
@@ -1397,9 +1406,7 @@ igs_result_t igsagent_output_set_data (igsagent_t *agent,
 {
     assert (agent);
     assert (name);
-    model_read_write_lock (__FUNCTION__, __LINE__);
-    const igs_io_t *io = model_write (agent, name, IGS_OUTPUT_T, IGS_DATA_T, value, size);
-    model_read_write_unlock (__FUNCTION__, __LINE__);
+    const igs_io_t *io = model_write (agent, name, IGS_OUTPUT_T, IGS_DATA_T, value, size, true);
     if (io && !agent->rt_synchronous_mode_enabled)
         network_publish_output (agent, io);
     return (io == NULL) ? IGS_FAILURE : IGS_SUCCESS;
@@ -1415,9 +1422,7 @@ igsagent_output_set_zmsg (igsagent_t *agent, const char *name, zmsg_t *msg)
     assert(frame);
     void *value = zframe_data (frame);
     size_t size = zframe_size (frame);
-    model_read_write_lock (__FUNCTION__, __LINE__);
-    const igs_io_t *io = model_write (agent, name, IGS_OUTPUT_T, IGS_DATA_T, value, size);
-    model_read_write_unlock (__FUNCTION__, __LINE__);
+    const igs_io_t *io = model_write (agent, name, IGS_OUTPUT_T, IGS_DATA_T, value, size, true);
     if (io && !agent->rt_synchronous_mode_enabled)
         network_publish_output (agent, io);
     zframe_destroy (&frame);
@@ -1429,10 +1434,8 @@ igsagent_attribute_set_bool (igsagent_t *agent, const char *name, bool value)
 {
     assert (agent);
     assert (name);
-    model_read_write_lock (__FUNCTION__, __LINE__);
     const igs_io_t *io = model_write (agent, name, IGS_ATTRIBUTE_T,
-                                      IGS_BOOL_T, &value, sizeof (bool));
-    model_read_write_unlock (__FUNCTION__, __LINE__);
+                                      IGS_BOOL_T, &value, sizeof (bool), true);
     return (io == NULL) ? IGS_FAILURE : IGS_SUCCESS;
 }
 
@@ -1441,9 +1444,7 @@ igsagent_attribute_set_int (igsagent_t *agent, const char *name, int value)
 {
     assert (agent);
     assert (name);
-    model_read_write_lock (__FUNCTION__, __LINE__);
-    const igs_io_t *io = model_write (agent, name, IGS_ATTRIBUTE_T, IGS_INTEGER_T, &value, sizeof (int));
-    model_read_write_unlock (__FUNCTION__, __LINE__);
+    const igs_io_t *io = model_write (agent, name, IGS_ATTRIBUTE_T, IGS_INTEGER_T, &value, sizeof (int), true);
     return (io == NULL) ? IGS_FAILURE : IGS_SUCCESS;
 }
 
@@ -1453,9 +1454,7 @@ igs_result_t igsagent_attribute_set_double (igsagent_t *agent,
 {
     assert (agent);
     assert (name);
-    model_read_write_lock (__FUNCTION__, __LINE__);
-    const igs_io_t *io = model_write (agent, name, IGS_ATTRIBUTE_T, IGS_DOUBLE_T, &value, sizeof (double));
-    model_read_write_unlock (__FUNCTION__, __LINE__);
+    const igs_io_t *io = model_write (agent, name, IGS_ATTRIBUTE_T, IGS_DOUBLE_T, &value, sizeof (double), true);
     return (io == NULL) ? IGS_FAILURE : IGS_SUCCESS;
 }
 
@@ -1466,9 +1465,7 @@ igs_result_t igsagent_attribute_set_string (igsagent_t *agent,
     assert (agent);
     assert (name);
     size_t value_length = (value == NULL) ? 0 : strlen (value) + 1;
-    model_read_write_lock (__FUNCTION__, __LINE__);
-    const igs_io_t *io = model_write (agent, name, IGS_ATTRIBUTE_T, IGS_STRING_T, (char *) value, value_length);
-    model_read_write_unlock (__FUNCTION__, __LINE__);
+    const igs_io_t *io = model_write (agent, name, IGS_ATTRIBUTE_T, IGS_STRING_T, (char *) value, value_length, true);
     return (io == NULL) ? IGS_FAILURE : IGS_SUCCESS;
 }
 
@@ -1479,9 +1476,7 @@ igs_result_t igsagent_attribute_set_data (igsagent_t *agent,
 {
     assert (agent);
     assert (name);
-    model_read_write_lock (__FUNCTION__, __LINE__);
-    const igs_io_t *io =model_write (agent, name, IGS_ATTRIBUTE_T, IGS_DATA_T, value, size);
-    model_read_write_unlock (__FUNCTION__, __LINE__);
+    const igs_io_t *io =model_write (agent, name, IGS_ATTRIBUTE_T, IGS_DATA_T, value, size, true);
     return (io == NULL) ? IGS_FAILURE : IGS_SUCCESS;
 }
 
