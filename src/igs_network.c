@@ -106,6 +106,18 @@ void s_unsubscribe_to_remote_agent_output (igs_remote_agent_t *remote_agent,
 // ZMQ callbacks
 ////////////////////////////////////////////////////////////////////////
 
+void s_free_transaction (void *data){
+    assert(data);
+    igs_publication_transaction_t *t = (igs_publication_transaction_t*)data;
+    if (t->input)
+        free(t->input);
+    if (t->frame) //also destroys data (coming from the frame)
+        zframe_destroy(&t->frame);
+    if (t->value)
+        free(t->value);
+    data = NULL;
+}
+
 // function actually handling messages from one of the remote agents we
 // subscribed to
 void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
@@ -120,7 +132,6 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
         return;
     }
 
-    model_read_write_lock (__FUNCTION__, __LINE__);
     size_t msg_size = zmsg_size (*msg);
     char *output = NULL;
     char *v_type = NULL;
@@ -128,24 +139,29 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
     zframe_t *timestamp_f = NULL;
     int64_t timestamp = INT64_MIN;
     zframe_t *frame = NULL;
-    void *data = NULL;
     size_t size = 0;
     char *value = NULL;
+    void *data = NULL;
     zmsg_t *bundle = NULL;
     size_t i = 0;
     
+    zlist_t *transactions = zlist_new();
+    
+    //NB: The following iterations need to be protected in case the remote agent disappears
+    //while we are handling data.
+    model_read_write_lock (__FUNCTION__, __LINE__);
     for (i = 0; i < msg_size; i += 3) {
         // Each message part must contain 3 elements
         // 1 : output name
         // 2 : output value type
         // 3 : value of the output as a string or zframe or timestamped bundle
         output = zmsg_popstr (*msg);
-        if (output == NULL) {
+        if (!output) {
             igs_error ("output name is NULL in received publication : rejecting");
             break;
         }
         v_type = zmsg_popstr (*msg);
-        if (v_type == NULL) {
+        if (!v_type) {
             igs_error ("output type is NULL in received publication : rejecting");
             free (output);
             break;
@@ -253,7 +269,7 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
         // targeted. We need to iterate through our agents and their mappings to check
         // which inputs need to be updated on which agent.
         igsagent_t *agent, *tmp_agent;
-        HASH_ITER (hh, remote_agent->context->agents, agent, tmp_agent){
+        HASH_ITER (hh, core_context->agents, agent, tmp_agent){
             if (!agent || !agent->uuid || (strlen (agent->uuid) == 0))
                 continue;
             
@@ -277,13 +293,18 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
                             igsagent_warn (agent,"Input %s is missing in our definition but expected in our mapping with %s.%s",
                                            elmt->from_input, elmt->to_agent, elmt->to_output);
                         else {
-                            // we have a fully matching mapping element : write from received
-                            // output to our input
+                            // we have a fully matching mapping element: use the input
                             agent->rt_current_timestamp_microseconds = timestamp;
-                            if (value_type == IGS_STRING_T)
-                                model_write (agent, elmt->from_input, IGS_INPUT_T, value_type, value, strlen (value) + 1, false);
-                            else
-                                model_write (agent, elmt->from_input, IGS_INPUT_T, value_type, data, size, false);
+                            igs_publication_transaction_t *transaction = (igs_publication_transaction_t*)calloc(1, sizeof(igs_publication_transaction_t));
+                            transaction->agent = agent;
+                            transaction->input = strdup(elmt->from_input); //destroyed with transaction
+                            transaction->value_type = value_type;
+                            transaction->value = value; //destroyed with transaction
+                            transaction->data = data; //destroyed with frame
+                            transaction->size = size;
+                            transaction->frame = frame; //destroyed with transaction
+                            zlist_append(transactions, transaction);
+                            zlist_freefn(transactions, transaction, s_free_transaction, false);
                             if (!agent->uuid)
                                 break;
                             else
@@ -293,14 +314,23 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
                 }
             }
         }
-        if (frame)
-            zframe_destroy (&frame);
-        if (value)
-            freen (value);
         freen (output);
     }
-    zmsg_destroy (msg);
     model_read_write_unlock (__FUNCTION__, __LINE__);
+    
+    //actually write the inputs for which we have collected transactions
+    igs_publication_transaction_t *transaction = (igs_publication_transaction_t *)zlist_first(transactions);
+    while (transaction){
+        if (transaction->value_type == IGS_STRING_T)
+            model_write (transaction->agent, transaction->input, IGS_INPUT_T, transaction->value_type,
+                         transaction->value, strlen ((char *)transaction->value) + 1);
+        else
+            model_write (transaction->agent, transaction->input, IGS_INPUT_T, transaction->value_type,
+                         transaction->data, transaction->size);
+        transaction = zlist_next(transactions);
+    }
+    zlist_destroy(&transactions); //also frees each transaction
+    zmsg_destroy (msg);
 }
 
 // Timer callback to send GET_CURRENT_OUTPUTS notification for an agent we
@@ -942,7 +972,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                             }
                             data = zframe_data (frame);
                             size = zframe_size (frame);
-                            model_write (target_agent, input, IGS_INPUT_T, input_type, data, size, true);
+                            model_write (target_agent, input, IGS_INPUT_T, input_type, data, size);
                             zframe_destroy (&frame);
                         }
                     }

@@ -53,7 +53,7 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "--static"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--rt"
@@ -61,10 +61,10 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--auto"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "--device en0 --port 5669"
+            argument = "--device en0 --port 5670"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument

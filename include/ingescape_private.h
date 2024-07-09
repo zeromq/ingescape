@@ -323,6 +323,16 @@ typedef struct igs_agent_event_wrapper {
     struct igs_agent_event_wrapper *next;
 } igs_agent_event_wrapper_t;
 
+typedef struct igs_publication_transaction {
+    igsagent_t *agent;
+    char *input;
+    igs_io_value_type_t value_type;
+    char *value;
+    void *data;
+    size_t size;
+    zframe_t *frame;
+} igs_publication_transaction_t;
+
 
 //////////////////  MAIN  STRUCTURES   //////////////////
 
@@ -520,7 +530,7 @@ int split_message_from_splitter(zmsg_t *msg, igs_core_context_t *context);
 // model
 uint8_t* s_model_string_to_bytes (char* string);
 const igs_io_t* model_write (igsagent_t *agent, const char *io_name, igs_io_type_t type,
-                             igs_io_value_type_t val_type, void* value, size_t size, bool use_lock);
+                             igs_io_value_type_t val_type, void* value, size_t size);
 igs_io_t* model_find_io_by_name(igsagent_t *agent, const char* name, igs_io_type_t type);
 char* model_get_io_value_as_string (igs_io_t* io); //caller owns returned value
 #define IGS_MODEL_READ_WRITE_MUTEX_DEBUG 0

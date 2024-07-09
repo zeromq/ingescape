@@ -181,7 +181,7 @@ igs_io_t *definition_create_io (igsagent_t *agent,
         default:
             break;
     }
-    model_write (agent, n, type, value_type, value, size, true);
+    model_write (agent, n, type, value_type, value, size);
     return io;
 }
 
