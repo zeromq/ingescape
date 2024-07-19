@@ -109,9 +109,15 @@ void s_unsubscribe_to_remote_agent_output (igs_remote_agent_t *remote_agent,
 void s_free_transaction (void *data){
     assert(data);
     igs_publication_transaction_t *t = (igs_publication_transaction_t*)data;
-    if (t->input)
-        free(t->input);
-    if (t->frame) //also destroys data (coming from the frame)
+    assert(t->targets);
+    igs_publication_transaction_target_t *target = zlist_first(t->targets);
+    while (target) {
+        zlist_remove(t->targets, target);
+        free(target->input);
+        target = (igs_publication_transaction_target_t*)zlist_next(t->targets);
+    }
+    zlist_destroy(&t->targets);
+    if(t->frame) //also destroys data (coming from the frame)
         zframe_destroy(&t->frame);
     if (t->value)
         free(t->value);
@@ -151,6 +157,9 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
     //while we are handling data.
     model_read_write_lock (__FUNCTION__, __LINE__);
     for (i = 0; i < msg_size; i += 3) {
+        value = NULL;
+        data = NULL;
+        frame = NULL;
         // Each message part must contain 3 elements
         // 1 : output name
         // 2 : output value type
@@ -264,6 +273,16 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
             && value_type <= IGS_TIMESTAMPED_DATA_T)
             value_type -= IGS_DATA_T; //translate value type to non-timestamped value type
         
+        igs_publication_transaction_t *transaction = (igs_publication_transaction_t*)calloc(1, sizeof(igs_publication_transaction_t));
+        transaction->value_type = value_type;
+        transaction->value = value; //destroyed with transaction
+        transaction->data = data; //destroyed with frame
+        transaction->size = size;
+        transaction->frame = frame; //destroyed with transaction
+        transaction->targets = zlist_new();
+        zlist_append(transactions, transaction);
+        zlist_freefn(transactions, transaction, s_free_transaction, false);
+        
         // Publication does not provide information about the targeted agents in our
         // context. At this stage, we only know that one or more of our agents are
         // targeted. We need to iterate through our agents and their mappings to check
@@ -295,16 +314,10 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
                         else {
                             // we have a fully matching mapping element: use the input
                             agent->rt_current_timestamp_microseconds = timestamp;
-                            igs_publication_transaction_t *transaction = (igs_publication_transaction_t*)calloc(1, sizeof(igs_publication_transaction_t));
-                            transaction->agent = agent;
-                            transaction->input = strdup(elmt->from_input); //destroyed with transaction
-                            transaction->value_type = value_type;
-                            transaction->value = value; //destroyed with transaction
-                            transaction->data = data; //destroyed with frame
-                            transaction->size = size;
-                            transaction->frame = frame; //destroyed with transaction
-                            zlist_append(transactions, transaction);
-                            zlist_freefn(transactions, transaction, s_free_transaction, false);
+                            igs_publication_transaction_target_t *target = (igs_publication_transaction_target_t*)calloc(1, sizeof(igs_publication_transaction_target_t));
+                            target->agent = agent;
+                            target->input = strdup(elmt->from_input); //destroyed with transaction
+                            zlist_append(transaction->targets, target);
                             if (!agent->uuid)
                                 break;
                             else
@@ -321,15 +334,25 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
     //actually write the inputs for which we have collected transactions
     igs_publication_transaction_t *transaction = (igs_publication_transaction_t *)zlist_first(transactions);
     while (transaction){
-        if (transaction->value_type == IGS_STRING_T)
-            model_write (transaction->agent, transaction->input, IGS_INPUT_T, transaction->value_type,
-                         transaction->value, strlen ((char *)transaction->value) + 1);
-        else
-            model_write (transaction->agent, transaction->input, IGS_INPUT_T, transaction->value_type,
-                         transaction->data, transaction->size);
+        igs_publication_transaction_target_t *target = NULL;
+        if (transaction->value_type == IGS_STRING_T){
+            target = zlist_first(transaction->targets);
+            while (target) {
+                model_write (target->agent, target->input, IGS_INPUT_T, transaction->value_type,
+                             transaction->value, strlen ((char *)transaction->value) + 1);
+                target = zlist_next(transaction->targets);
+            }
+        }else{ 
+            target = zlist_first(transaction->targets);
+            while (target) {
+                model_write (target->agent, target->input, IGS_INPUT_T, transaction->value_type,
+                             transaction->data, transaction->size);
+            target = zlist_next(transaction->targets);
+            }
+        }
         transaction = zlist_next(transactions);
     }
-    zlist_destroy(&transactions); //also frees each transaction
+    zlist_destroy(&transactions); //also frees each transaction and its content
     zmsg_destroy (msg);
 }
 
