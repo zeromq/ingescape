@@ -31,8 +31,8 @@
 
 //  INGESCAPE version macros for compile-time API detection
 #define INGESCAPE_VERSION_MAJOR 4
-#define INGESCAPE_VERSION_MINOR 1
-#define INGESCAPE_VERSION_PATCH 5
+#define INGESCAPE_VERSION_MINOR 2
+#define INGESCAPE_VERSION_PATCH 0
 
 #define INGESCAPE_MAKE_VERSION(major, minor, patch) \
 ((major) * 10000 + (minor) * 100 + (patch))
@@ -412,8 +412,9 @@ struct _igs_service_arg_t{
 //Arguments list are initialized to NULL and then filled by calling igs_service_args_add_*
 //Example:
 //   igs_service_arg_t *list = NULL;
-//   igs_service_args_add_int(&list, 10);
-//   igs_service_args_add_string(&list, "other argument");
+//   igs_service_args_add_int (&list, 10);
+//   igs_service_args_add_string (&list, "other argument");
+//   igs_service_args_destroy (&list);
 
 INGESCAPE_EXPORT void igs_service_args_add_int(igs_service_arg_t **list, int value);
 INGESCAPE_EXPORT void igs_service_args_add_bool(igs_service_arg_t **list, bool value);
@@ -877,6 +878,22 @@ INGESCAPE_EXPORT void  igs_net_raise_sockets_limit(void); //UNIX only, to be cal
 INGESCAPE_EXPORT void igs_net_set_high_water_marks(int hwm_value);
 
 
+/* SATURATION CONTROL
+ In situations where an agent inputs in the peer are excessively
+ sollicited and it results in even more intensive output publications,
+ it may saturate the ingescape loop with HANDLE_PUBLICATION messages,
+ which will end up reaching more than 1000 messages, corresponding to
+ the default High Water Marks on the pipe PAIR socket. The saturated
+ PAIR socket will then block and freeze the agent.
+ We allow here to remove the HWM and to print in real-time the number
+ of HANDLE_PUBLICATION message stacked in the pipe.
+ Please note, that disabling the HWM may induce a memory exhaustion
+ for the agent and the operating system: USE WITH CAUTION.
+ */
+INGESCAPE_EXPORT void igs_unbind_pipe(void);
+INGESCAPE_EXPORT void igs_monitor_pipe_stack(bool monitor); //default is false
+
+
 /*PERFORMANCE CHECK
  sends number of messages with defined size and displays performance
  information when finished (information displayed as INFO-level log)*/
@@ -926,54 +943,6 @@ INGESCAPE_EXPORT void igs_clear_context(void);
  mechanism to uniquely identify a given software agent.*/
 INGESCAPE_EXPORT void igs_agent_set_family(const char *family);
 INGESCAPE_EXPORT char * igs_agent_family(void); //caller owns returned value
-
-
-/* LOGS REPLAY - DEPRECATED - will be removed soon
- ---------------------------------------------------------------------
- Why are we deprecating the replay features ?
- • These features make the library heavier and require to maintain a compatibility
- with log formats, which will inevitably become a hassle at some point. The
- cost/benefit ratio is thus not very favorable.
- • These replay features are practically unused and are easy to implement outside the
- library simply by parsing logs and publishing data in various possible ways.
- • The Ingescape ecosystem provides much better solutions based on record/replay
- support with agent virtualization that beat these features in every way.
-
- Post an issue on github if you want to discuss this topic with the community.
- ---------------------------------------------------------------------
- Ingescape logs contain all the necessary information for an agent to replay
- its changes for inputs, outputs and services.
-
- Replay happens in a dedicated thread created after calling igs_replay_init:
- • log_file_path : path to the log file to be read
- • speed : replay speed. Default is zero, meaning as fast as possible.
- • start_time : with format hh:mm::s, specifies the time when speed shall be used.
- Replay as fast as possible before that.
- • wait_for_start : waits for a call to igs_replay_start before starting the replay. Default is false.
- • replay_mode : a boolean composition of igs_replay_mode_t value to decide what shall be replayed.
- If mode is zero, all IOs and services are replayed.
- • agent : an OPTIONAL agent name serving as filter when the logs contain activity for multiple agents.
-
- igs_replay_terminate cleans the thread and requires calling igs_replay_init again.
- Replay thread is cleaned automatically also when the log file has been read completely.
- NB: replay is still under heavy development, use at your own risk...*/
-typedef enum {
-    IGS_REPLAY_INPUT = 1,
-    IGS_REPLAY_OUTPUT = 2,
-    IGS_REPLAY_ATTRIBUTE = 4,
-    IGS_REPLAY_EXECUTE_SERVICE= 8,
-    IGS_REPLAY_CALL_SERVICE = 16
-
-} igs_replay_mode_t;
-INGESCAPE_EXPORT void igs_replay_init(const char *log_file_path,
-                                      size_t speed,
-                                      const char *start_time,
-                                      bool wait_for_start,
-                                      uint replay_mode,
-                                      const char *agent);
-INGESCAPE_EXPORT void igs_replay_start(void);
-INGESCAPE_EXPORT void igs_replay_pause(bool pause);
-INGESCAPE_EXPORT void igs_replay_terminate(void);
 
 
 //////////////////////////////

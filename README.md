@@ -165,7 +165,7 @@ In this case, all the dependencies need to be fetched and installed individually
 
 
 ### Testing
-Two test programs are built and installed with Ingescape. They are called *igsTester* and *igsPartner* and are installed in /usr/local/bin on \*nix boxes. They enable various series of tests - static and dynamic - to check the library. **They are optional if you are a user and not a contributor.**
+Three test programs are built and installed with Ingescape. They are called *igsTester*,  *igsPartner* and *igsStresser*. They are installed in /usr/local/bin on \*nix boxes. They enable various series of tests - static and dynamic - to check the library. **They are optional if you are a user and not a contributor.**
 
 #### Static tests on most of the API
 ```
@@ -185,6 +185,17 @@ In another console, run:
 igsTester --device "en0" --port 5670 --verbose --auto
 ```
 Both agents discover each other and run tests automatically. If the two programs run properly (despite a lot of expected error messages in the console) and both terminate by returning 0, it means that everything went OK.
+
+#### Stress tests
+Open one or several consoles and run the following commands, depending on what you want to test.
+For inputs, outputs and services stress tests, run:
+```
+igsStresser --device en0 --port 5670 --agents 10 --publish --verbose
+```
+For stress tests on all the aspects at once, run:
+```
+igsStresser --device en0 --port 5670 --agents 10 --deactivate --change_state --change_definition --change_mapping --publish --elections --verbose
+```
 
 #### Interactive tests
 The two agents also provide advanced console commands to test security, brokers, additional agents in the process, etc.

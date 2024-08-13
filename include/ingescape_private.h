@@ -17,9 +17,6 @@
 #include <string.h>
 #include <zyre.h>
 
-#include "uthash/uthash.h"
-#include "uthash/utlist.h"
-
 #if defined (__WINDOWS__)
     #ifndef WIN32_LEAN_AND_MEAN
     #define WIN32_LEAN_AND_MEAN
@@ -77,9 +74,7 @@ typedef enum {
 typedef struct igs_observe_wrapper{
     igsagent_io_fn *callback_ptr;
     void* data;
-    struct igs_observe_wrapper *prev;
-    struct igs_observe_wrapper *next;
-} igs_observe_wrapper_t;
+} igs_observe_io_wrapper_t;
 
 typedef enum {
     IGS_CONSTRAINT_MIN = 0,
@@ -116,8 +111,6 @@ typedef struct igs_constraint{
             char *string;
         } regexp;
     };
-    struct igs_constraint *prev;
-    struct igs_constraint *next;
 } igs_constraint_t;
 
 typedef struct igs_io{
@@ -136,19 +129,17 @@ typedef struct igs_io{
     } value;
     size_t value_size;
     bool is_muted;
-    igs_observe_wrapper_t *callbacks;
+    zlist_t *io_callbacks; //igs_observe_io_wrapper_t
     igs_constraint_t *constraint;
-    UT_hash_handle hh;         /* makes this structure hashable */
 } igs_io_t;
 
 typedef struct igs_service{
     char * name;
     char * description;
-    igsagent_service_fn *cb;
+    igsagent_service_fn *service_cb;
     void *cb_data;
-    igs_service_arg_t *arguments;
-    struct igs_service *replies;
-    UT_hash_handle hh;
+    zlist_t *arguments; //igs_service_arg_t
+    zhashx_t *replies; //struct igs_service
 } igs_service_t;
 
 typedef struct igs_definition{
@@ -161,10 +152,10 @@ typedef struct igs_definition{
     char *json_legacy_v3;
     char *json_legacy_v4;
     char* family;
-    igs_io_t* attributes_table;
-    igs_io_t* inputs_table;
-    igs_io_t* outputs_table;
-    igs_service_t *services_table;
+    zhashx_t* attributes_table; //igs_io_t
+    zhashx_t* inputs_table; //igs_io_t
+    zhashx_t* outputs_table; //igs_io_t
+    zhashx_t *services_table; //igs_service_t
 } igs_definition_t;
 
 typedef struct igs_map{
@@ -172,7 +163,6 @@ typedef struct igs_map{
     char* from_input;
     char* to_agent;
     char* to_output;
-    UT_hash_handle hh;
 } igs_map_t;
 
 typedef struct igs_split{
@@ -180,26 +170,23 @@ typedef struct igs_split{
     char* from_input;
     char* to_agent;
     char* to_output;
-    UT_hash_handle hh;
 } igs_split_t;
 
 typedef struct igs_mapping{
     char *json;
     char *json_legacy;
-    igs_map_t* map_elements;
-    igs_split_t* split_elements;
+    zlist_t* map_elements; //igs_map_t
+    zlist_t* split_elements; //igs_split_t
 } igs_mapping_t;
 
 typedef struct igs_mapping_filter {
     char *filter;
-    struct igs_mapping_filter *next, *prev;
 } igs_mapping_filter_t;
 
 typedef struct igs_worker{
     char *input_name;
     char *agent_uuid;
     int credit;
-    struct igs_worker *next;
     int uses;
 }igs_worker_t;
 
@@ -213,15 +200,13 @@ typedef struct igs_queued_works{
         void* data;
     } value;
     size_t value_size;
-    struct igs_queued_works *next;
 }igs_queued_work_t;
 
 typedef struct igs_splitter{
     char *agent_uuid;
     char *output_name;
-    igs_worker_t *workers_list;
-    igs_queued_work_t *queued_works;
-    struct igs_splitter *next;
+    zlist_t *workers; //igs_worker_t
+    zlist_t *queued_works; //igs_queued_work_t
 }igs_splitter_t;
 
 //////////////////  NETWORK  STRUCTURES AND ENUMS   //////////////////
@@ -233,7 +218,6 @@ typedef struct igs_zyre_peer {
     int reconnected;
     bool has_joined_private_channel;
     char *protocol;
-    UT_hash_handle hh;
 } igs_zyre_peer_t;
 
 // remote agent we are subscribing to
@@ -244,27 +228,18 @@ typedef struct igs_remote_agent{
     igs_definition_t *definition;
     bool shall_send_outputs_request;
     igs_mapping_t *mapping;
-    igs_mapping_filter_t *mapping_filters;
+    zlist_t *mapping_filters; //igs_mapping_filter_t
     int timer_id;
-    UT_hash_handle hh;
 } igs_remote_agent_t;
 
 typedef struct igs_timer{
     int timer_id;
     igs_timer_fn *cb;
     void *my_data;
-    UT_hash_handle hh;
 } igs_timer_t;
-
-typedef struct igs_peer_header {
-    char *key;
-    char *value;
-    UT_hash_handle hh;
-} igs_peer_header_t;
 
 
 //////////////////  UTILITY  STRUCTURES  //////////////////
-
 typedef struct igs_observe_monitor {
     unsigned int period;
     igs_monitor_event_t status;
@@ -277,50 +252,36 @@ typedef struct igs_observe_monitor {
 typedef struct igs_monitor_wrapper {
     igs_monitor_fn *callback_ptr;
     void *my_data;
-    struct igs_monitor_wrapper *prev;
-    struct igs_monitor_wrapper *next;
 } igs_monitor_wrapper_t;
 
 typedef struct igs_mute_wrapper {
     igsagent_mute_fn *callback_ptr;
     void *my_data;
-    struct igs_mute_wrapper *prev;
-    struct igs_mute_wrapper *next;
 } igs_mute_wrapper_t;
 
 typedef struct igs_freeze_wrapper {
     igs_freeze_fn *callback_ptr;
     void *my_data;
-    struct igs_freeze_wrapper *prev;
-    struct igs_freeze_wrapper *next;
 } igs_freeze_wrapper_t;
 
 typedef struct igs_channels_wrapper {
     igs_channels_fn *callback_ptr;
     void *my_data;
-    struct igs_channels_wrapper *prev;
-    struct igs_channels_wrapper *next;
 } igs_channels_wrapper_t;
 
 typedef struct igs_forced_stop_wrapper {
     igs_forced_stop_fn *callback_ptr;
     void *my_data;
-    struct igs_forced_stop_wrapper *prev;
-    struct igs_forced_stop_wrapper *next;
 } igs_forced_stop_wrapper_t;
 
 typedef struct igsagent_wrapper {
     igsagent_fn *callback_ptr;
     void *my_data;
-    struct igsagent_wrapper *prev;
-    struct igsagent_wrapper *next;
 } igsagent_wrapper_t;
 
 typedef struct igs_agent_event_wrapper {
     igsagent_agent_events_fn *callback_ptr;
     void *my_data;
-    struct igs_agent_event_wrapper *prev;
-    struct igs_agent_event_wrapper *next;
 } igs_agent_event_wrapper_t;
 
 typedef struct igs_publication_transaction {
@@ -336,6 +297,38 @@ typedef struct igs_publication_transaction_target {
     igsagent_t *agent;
     char *input;
 } igs_publication_transaction_target_t;
+
+//////////////////  CALLBACK WRAPPERS   //////////////////
+typedef struct observe_io_cb_wrapper
+{
+    igs_io_fn *cb;
+    void *my_data;
+} observe_io_cb_wrapper_t;
+
+typedef struct observed_io
+{
+    char *name;
+    zlist_t *observed_io_wrappers;
+} observed_io_t;
+
+typedef struct
+{
+    char *name;
+    igs_service_fn *cb;
+    void *my_data;
+} service_cb_wrapper_t;
+
+typedef struct observe_mute_cb_wrapper
+{
+    igs_mute_fn *cb;
+    void *my_data;
+} observe_mute_cb_wrapper_t;
+
+typedef struct observe_agent_events_cb_wrapper
+{
+    igs_agent_events_fn *cb;
+    void *my_data;
+} observe_agent_events_cb_wrapper_t;
 
 
 //////////////////  MAIN  STRUCTURES   //////////////////
@@ -361,8 +354,8 @@ struct _igsagent_t {
     igs_core_context_t *context;
     char *igs_channel;
 
-    igsagent_wrapper_t *activate_callbacks;
-    igs_agent_event_wrapper_t *agent_event_callbacks;
+    zlist_t *activate_callbacks; //igsagent_wrapper_t
+    zlist_t *agent_event_callbacks; //igs_agent_event_wrapper_t
     bool enforce_constraints;
 
     // definition
@@ -385,11 +378,9 @@ struct _igsagent_t {
     bool network_activation_during_runtime;
 
     bool is_whole_agent_muted;
-    igs_mute_wrapper_t *mute_callbacks;
+    zlist_t *mute_callbacks; //igs_mute_wrapper_t
 
     zlist_t *elections;
-
-    UT_hash_handle hh;
 };
 
 /*
@@ -401,9 +392,9 @@ typedef struct igs_core_context {
     ////////////////////////////////////////////
     // persisting data with setters and getters or
     // managed automatically
-    //
+    
     // channels
-    igs_peer_header_t *peer_headers;
+    zhash_t *peer_headers; //igs_peer_header_t
 
     // admin
     FILE *log_file;
@@ -422,6 +413,12 @@ typedef struct igs_core_context {
     
     //model
     bool allow_undefined_services;
+    zhashx_t *observed_inputs; //observed_io_t
+    zhashx_t *observed_outputs; //observed_io_t
+    zhashx_t *observed_attributes; //observed_io_t
+    zhashx_t *service_cb_wrappers; //service_cb_wrapper_t
+    zlist_t *mute_cb_wrappers; //observe_mute_cb_wrapper_t
+    zlist_t *agent_event_cb_wrappers; //observe_agent_events_cb_wrapper_t
 
     // network
     bool network_allow_ipc;
@@ -435,8 +432,8 @@ typedef struct igs_core_context {
     bool network_shall_raise_file_descriptors_limit;
     bool external_stop;
     bool is_frozen;
-    igs_freeze_wrapper_t *freeze_callbacks;
-    igs_forced_stop_wrapper_t *external_stop_calbacks;
+    zlist_t *freeze_callbacks; //igs_freeze_wrapper_t
+    zlist_t *external_stop_calbacks; //igs_forced_stop_wrapper_t
     zhash_t *brokers;
     char *advertised_endpoint;
     char *our_broker_endpoint;
@@ -451,6 +448,8 @@ typedef struct igs_core_context {
     char *security_public_certificates_directory;
 
     // performance
+    bool unbind_pipe; //removes HWM on PAIR pipe between main thread and ingescape thread
+    bool monitor_pipe_stack; //counts piled messages in the pipe in real-time
     size_t performance_msg_counter;
     size_t performance_msg_count_target;
     size_t performance_msg_size;
@@ -459,11 +458,11 @@ typedef struct igs_core_context {
 
     // network monitor
     igs_monitor_t *monitor;
-    igs_monitor_wrapper_t *monitor_callbacks;
+    zlist_t *monitor_callbacks; //igs_monitor_wrapper_t
     bool monitor_shall_start_stop_agent;
 
     // elections
-    zhash_t *elections;
+    zhashx_t *elections;
 
     // initiated at start, cleaned at stop
     char *network_device;
@@ -473,17 +472,17 @@ typedef struct igs_core_context {
     // initiated at s_init_loop, cleaned at loop stop
     char *command_line;
     char *replay_channel;
-    igs_timer_t *timers; // set manually, destroyed automatically
+    zlist_t *timers; // igs_timer_t
     int process_id;
     char *network_ipc_folder_path;
     char *network_ipc_full_path;
     char *network_ipc_endpoint;
-    igs_zyre_peer_t *zyre_peers;
-    igs_channels_wrapper_t *zyre_callbacks;
-    igsagent_t *agents;
-    zhash_t *created_agents;
-    igs_remote_agent_t *remote_agents; // those our agents subscribed to
-    igs_splitter_t *splitters;
+    zhashx_t *zyre_peers; //igs_zyre_peer_t
+    zlist_t *zyre_callbacks; //igs_channels_wrapper_t
+    zhashx_t *agents; //igsagent_t, all active agents we own
+    zhashx_t *created_agents; //igsagent_t, all created agents we own (some may be inactive)
+    zhashx_t *remote_agents; //igs_remote_agent_t, all known external agents
+    zlist_t *splitters; //igs_splitter_t
     zactor_t *network_actor;
     zsock_t *internal_pipe;
     zyre_t *node;
@@ -502,8 +501,8 @@ typedef struct igs_core_context {
 // default context and agent
 INGESCAPE_EXPORT extern igs_core_context_t *core_context;
 INGESCAPE_EXPORT extern igsagent_t *core_agent;
-void core_init_agent(void);
-void core_init_context(void);
+INGESCAPE_EXPORT void core_init_agent(void);
+INGESCAPE_EXPORT void core_init_context(void);
 
 // definition
 INGESCAPE_EXPORT void definition_free_definition (igs_definition_t **definition);
@@ -516,37 +515,85 @@ INGESCAPE_EXPORT igs_map_t* mapping_create_mapping_element(const char * from_inp
                                           const char *to_agent,
                                           const char* to_output);
 INGESCAPE_EXPORT bool mapping_is_equal(const char *first_str, const char *second_str);
-
-INGESCAPE_EXPORT uint64_t s_djb2_hash (unsigned char *str);
-bool mapping_check_input_output_compatibility(igsagent_t *agent, igs_io_t *found_input, igs_io_t *found_output);
+INGESCAPE_EXPORT uint64_t mapping_djb2_hash (unsigned char *str);
+INGESCAPE_EXPORT bool mapping_check_input_output_compatibility(igsagent_t *agent, igs_io_t *found_input, igs_io_t *found_output);
 INGESCAPE_EXPORT void mapping_update_json (igs_mapping_t *mapping);
 
 // split
 INGESCAPE_EXPORT void split_free_split_element (igs_split_t **split_elmt);
+INGESCAPE_EXPORT void split_free_splitter (igs_splitter_t **splitter);
 INGESCAPE_EXPORT igs_split_t* split_create_split_element(const char * from_input,
-                                        const char *to_agent,
-                                        const char* to_output);
-void split_add_work_to_queue(igs_core_context_t *context, char* agent_uuid, const igs_io_t *output);
-void split_remove_worker(igs_core_context_t *context, char *worker_uuid, char *input_name);
-int split_message_from_worker(char *command, zmsg_t *msg, igs_core_context_t *context);
-int split_message_from_splitter(zmsg_t *msg, igs_core_context_t *context);
+                                                         const char *to_agent,
+                                                         const char* to_output);
+INGESCAPE_EXPORT void split_add_work_to_queue(igs_core_context_t *context, char* agent_uuid, const igs_io_t *output);
+INGESCAPE_EXPORT void split_remove_worker(igs_core_context_t *context, char *worker_uuid, char *input_name);
+INGESCAPE_EXPORT int split_message_from_worker(char *command, zmsg_t *msg, igs_core_context_t *context);
+INGESCAPE_EXPORT int split_message_from_splitter(zmsg_t *msg, igs_core_context_t *context);
 
 // model
-uint8_t* s_model_string_to_bytes (char* string);
-const igs_io_t* model_write (igsagent_t *agent, const char *io_name, igs_io_type_t type,
-                             igs_io_value_type_t val_type, void* value, size_t size);
-igs_io_t* model_find_io_by_name(igsagent_t *agent, const char* name, igs_io_type_t type);
-char* model_get_io_value_as_string (igs_io_t* io); //caller owns returned value
+/*
+ Note on thread safety and model mutexes
+ ---------------------------------------
+ Ingescape model thread-safety is protected by the two mutex functions below.
+ The mutexes protect the model on all possible accesses and modifications involving:
+ - public functions
+ - readers and timers attached to zloops
+ Public functions are prefixed either by igs_ or igsagent_. When an igs_
+ function has an igsagent_ equivalent, the latter shall be protected because
+ it wraps the former.
+ Here is the list of reader and timer functions (which also include mutexes):
+ - s_manage_parent: listening to parent thread messages and internal agent publications
+ - s_manage_received_publication: listening to all SUB sockets receiving data
+ - s_manage_zyre_incoming: listening to zyre incoming messages from other peers/agents
+ - s_trigger_outputs_request_to_newcomer: asynchronous request to remote agent for its output values (reply received in s_manage_zyre_incoming)
+ - s_trigger_definition_update: send our definition to peers when it has changed
+ - s_trigger_mapping_update: send our mapping to peers when it has changed
+ - s_manage_network_timer: execute callbacks for timers attached to the ingescape zloop
+ 
+ Functions handling callbacks are the ones creating risks of deadlocks because they are reentrant
+ and mutexes shall be unlocked when entering them. A specific care shall be given to check that
+ their objects are not destroyed when used.
+ Here is the list of the callback structures and functions actually executing them:
+ - io_callbacks (in each io object)
+    executed in model_write and model_LOCKED_handle_io_callbacks
+ - service_cb (in each service object)
+    - executed by s_manage_zyre_incoming (CALL_SERVICE_MSG), igsagent_service_call
+ - igs_monitor_wrapper_t (monitor_callbacks)
+    - executed by igs_monitor_trigger_network_check (#core_context->network_device)
+ - igs_mute_wrapper_t (mute_callbacks)
+    - executed by igsagent_mute, igsagent_unmute (#current agent)
+ - igs_freeze_wrapper_t (freeze_callbacks)
+    - executed by igs_freeze, igs_unfreeze (#core_context->is_frozen)
+ - igs_channels_wrapper_t (zyre_callbacks)
+    - executed by s_manage_zyre_incoming (#nothing)
+ - igs_forced_stop_wrapper_t (external_stop_calbacks)
+    - executed by s_run_loop (loop stopping) (#nothing)
+ - igsagent_wrapper_t (activate_callbacks)
+    igsagent_activate, igsagent_deactivate (#current agent)
+ - igs_agent_event_wrapper_t (agent_event_callbacks)
+    s_manage_zyre_incoming (KNOWS_US, WON_ELECTION, LOST_ELECTION) (#current agent), igsagent_activate (#current agent)
+        agent_LOCKED_propagate_agent_event (#core_context->agents to find the proper agent, might be improved to focus on specific agent): s_manage_zyre_incoming (PEER_ENTERED, AGENT_EXITED,AGENT_ENTERED, KNOWS_US, UPDATE_DEF, UPDATE_MAP, AGENT_EXITED, PEER_EXITED), s_trigger_definition_update, s_trigger_mapping_update, igsagent_activate, igsagent_deactivate
+ 
+ To improve thread-safety, despite the need to unlock callbacks, we always duplicate iterators involving
+ call backs and we duplicate or check validity of involved arguments when required.
+ 
+ 
+ context ->loop and ->node shall be protected by s_network_lock/s_network_unlock
+ s_manage_network_timer shall be protected also, to be analyzed... possible reentry through the called callback
+ */
 #define IGS_MODEL_READ_WRITE_MUTEX_DEBUG 0
 INGESCAPE_EXPORT void model_read_write_lock(const char *function, int line);
 INGESCAPE_EXPORT void model_read_write_unlock(const char *function, int line);
-igs_constraint_t* s_model_parse_constraint(igs_io_value_type_t type,
-                                           const char *expression,char **error);
+INGESCAPE_EXPORT igs_io_t* model_write (igsagent_t *agent, const char *io_name, igs_io_type_t type,
+                                        igs_io_value_type_t val_type, void* value, size_t size);
+INGESCAPE_EXPORT void model_LOCKED_handle_io_callbacks (igsagent_t *agent, igs_io_t *io);
+INGESCAPE_EXPORT igs_io_t* model_find_io_by_name(igsagent_t *agent, const char* name, igs_io_type_t type);
+INGESCAPE_EXPORT igs_constraint_t* model_parse_constraint(igs_io_value_type_t type, const char *expression, char **error);
 
 // network
 #define IGS_PRIVATE_CHANNEL "INGESCAPE_PRIVATE"
 #define IGS_DEFAULT_AGENT_NAME "no_name"
-igs_result_t network_publish_output (igsagent_t *agent, const igs_io_t *io);
+INGESCAPE_EXPORT igs_result_t network_publish_output (igsagent_t *agent, const igs_io_t *io);
 
 // parser
 INGESCAPE_EXPORT igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json);
@@ -561,8 +608,8 @@ INGESCAPE_EXPORT igs_mapping_t* parser_load_mapping (const char* json_str);
 INGESCAPE_EXPORT igs_mapping_t* parser_load_mapping_from_path (const char* load_file);
 
 // admin
-void s_admin_make_file_path(const char *from, char *to, size_t size_of_to);
-void admin_log(igsagent_t *agent, igs_log_level_t, const char *function, const char *format, ...)  CHECK_PRINTF (4);
+INGESCAPE_EXPORT void admin_make_file_path(const char *from, char *to, size_t size_of_to);
+INGESCAPE_EXPORT void admin_log(igsagent_t *agent, igs_log_level_t, const char *function, const char *format, ...)  CHECK_PRINTF (4);
 
 // channels
 #define IGS_ZYRE_PEER_MUTEX_DEBUG 0
@@ -570,15 +617,15 @@ INGESCAPE_EXPORT void s_lock_zyre_peer(const char *function, int line);
 INGESCAPE_EXPORT void s_unlock_zyre_peer(const char *function, int line);
 
 // service
-void service_free_service(igs_service_t *t);
-INGESCAPE_EXPORT igs_result_t service_add_values_to_arguments_from_message(const char *name, igs_service_arg_t *arg, zmsg_t *msg);
-igs_result_t service_copy_arguments(igs_service_arg_t *source, igs_service_arg_t *destination);
-void service_free_values_in_arguments(igs_service_arg_t *arg);
-void service_log_received_service(igsagent_t *agent, const char *caller_agent_name, const char *caller_agentuuid,
-                                  const char *service_name, igs_service_arg_t *list, int64_t timestamp);
+INGESCAPE_EXPORT void service_free_service(igs_service_t **t);
+INGESCAPE_EXPORT igs_result_t service_make_values_to_arguments_from_message(igs_service_arg_t **args,
+                                                                            igs_service_t *service, zmsg_t *msg);
+INGESCAPE_EXPORT void service_free_values_in_arguments(zlist_t *args);
+INGESCAPE_EXPORT void service_log_received_service(igsagent_t *agent, const char *caller_agent_name, const char *caller_agentuuid,
+                                                   const char *service_name, igs_service_arg_t *args, int64_t timestamp);
 
 // agent
-void s_agent_propagate_agent_event(igs_agent_event_t event, const char *uuid, const char *name, void *event_data);
+INGESCAPE_EXPORT void agent_LOCKED_propagate_agent_event(igs_agent_event_t event, const char *uuid, const char *name, void *event_data);
 
 // protocol messages
 #define REMOTE_AGENT_EXIT_MSG "REMOTE_AGENT_EXIT"

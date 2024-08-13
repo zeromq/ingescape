@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		972C276C2C69003D00C4B3E3 /* stresser.c in Sources */ = {isa = PBXBuildFile; fileRef = 972C275E2C68FF4100C4B3E3 /* stresser.c */; };
+		972C276D2C69004800C4B3E3 /* ingescape.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 97348D8425C19C3C009874BA /* ingescape.framework */; };
 		97348E4A25C19D7C009874BA /* ingescape.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 97348D8425C19C3C009874BA /* ingescape.framework */; };
 		9740C38F2A7C0AF80007F000 /* ingescape.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 97348D8425C19C3C009874BA /* ingescape.framework */; };
 		9782CBD124E67A9300860307 /* tester.cert in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9782CBCD24E67A2100860307 /* tester.cert */; };
@@ -37,6 +39,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		972C27632C69003000C4B3E3 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		97817D6C251CD31600EFF20F /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -71,6 +82,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		972C275E2C68FF4100C4B3E3 /* stresser.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = stresser.c; sourceTree = "<group>"; };
+		972C27652C69003000C4B3E3 /* igsStresser */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = igsStresser; sourceTree = BUILT_PRODUCTS_DIR; };
 		9782CBCD24E67A2100860307 /* tester.cert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = tester.cert; sourceTree = "<group>"; };
 		9782CBCE24E67A2100860307 /* partner.cert_secret */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = partner.cert_secret; sourceTree = "<group>"; };
 		9782CBCF24E67A2100860307 /* partner.cert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = partner.cert; sourceTree = "<group>"; };
@@ -85,6 +98,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		972C27622C69003000C4B3E3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				972C276D2C69004800C4B3E3 /* ingescape.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		97D7090324C1F137008825B0 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -141,6 +162,7 @@
 			children = (
 				97D7090624C1F137008825B0 /* igsTester */,
 				97D709BB24C1F243008825B0 /* igsPartner */,
+				972C27652C69003000C4B3E3 /* igsStresser */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -152,6 +174,7 @@
 				97D708F324C1F077008825B0 /* partner.c */,
 				97F1B3FA24C1F402006B70AA /* common.h */,
 				97F1B3FB24C1F402006B70AA /* common.c */,
+				972C275E2C68FF4100C4B3E3 /* stresser.c */,
 			);
 			name = src;
 			path = ../../src;
@@ -167,6 +190,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		972C27642C69003000C4B3E3 /* igsStresser */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 972C27692C69003000C4B3E3 /* Build configuration list for PBXNativeTarget "igsStresser" */;
+			buildPhases = (
+				972C27612C69003000C4B3E3 /* Sources */,
+				972C27622C69003000C4B3E3 /* Frameworks */,
+				972C27632C69003000C4B3E3 /* CopyFiles */,
+				972C276E2C69006100C4B3E3 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = igsStresser;
+			productName = igsStresser;
+			productReference = 972C27652C69003000C4B3E3 /* igsStresser */;
+			productType = "com.apple.product-type.tool";
+		};
 		97D7090524C1F137008825B0 /* igsTester */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 97D7090A24C1F137008825B0 /* Build configuration list for PBXNativeTarget "igsTester" */;
@@ -213,6 +254,9 @@
 				LastUpgradeCheck = 1200;
 				ORGANIZATIONNAME = "Ingenuity i/o";
 				TargetAttributes = {
+					972C27642C69003000C4B3E3 = {
+						CreatedOnToolsVersion = 15.4;
+					};
 					97D7090524C1F137008825B0 = {
 						CreatedOnToolsVersion = 11.6;
 					};
@@ -242,6 +286,7 @@
 			targets = (
 				97D7090524C1F137008825B0 /* igsTester */,
 				97D709BA24C1F243008825B0 /* igsPartner */,
+				972C27642C69003000C4B3E3 /* igsStresser */,
 			);
 		};
 /* End PBXProject section */
@@ -264,6 +309,23 @@
 /* End PBXReferenceProxy section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		972C276E2C69006100C4B3E3 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "install_name_tool -add_rpath @executable_path $TARGET_BUILD_DIR/$PRODUCT_NAME\nls\n";
+		};
 		97F1B41A24C20826006B70AA /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -301,6 +363,14 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		972C27612C69003000C4B3E3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				972C276C2C69003D00C4B3E3 /* stresser.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		97D7090224C1F137008825B0 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -322,6 +392,50 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		972C276A2C69003000C4B3E3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 56DRT9MG9S;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../../../include",
+					"$(SRCROOT)/../../../dependencies/czmq/include",
+					"$(SRCROOT)/../../../dependencies/zyre/include",
+					"$(SRCROOT)/../../../dependencies/libzmq/include",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.5;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		972C276B2C69003000C4B3E3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 56DRT9MG9S;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../../../include",
+					"$(SRCROOT)/../../../dependencies/czmq/include",
+					"$(SRCROOT)/../../../dependencies/zyre/include",
+					"$(SRCROOT)/../../../dependencies/libzmq/include",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.5;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		97D708EC24C1EFA2008825B0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -523,6 +637,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		972C27692C69003000C4B3E3 /* Build configuration list for PBXNativeTarget "igsStresser" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				972C276A2C69003000C4B3E3 /* Debug */,
+				972C276B2C69003000C4B3E3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		97D708E224C1EFA2008825B0 /* Build configuration list for PBXProject "testing" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

@@ -119,7 +119,6 @@ list(APPEND ingescape_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/src/igs_network.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/igs_parser.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/igs_performance.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/igs_replay.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/igs_service.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/igs_split.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/igsagent.c
