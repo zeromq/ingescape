@@ -33,7 +33,7 @@
 
 #define PORT 5669
 bool verbose = false;
-char *agent_name = "stresser";
+char *agent_name = (char*)"stresser";
 bool deactivate = false;
 bool change_state = false;
 bool change_definition = false;
@@ -78,9 +78,11 @@ int ingescapeSentMessage(zloop_t *loop, zsock_t *reader, void *arg){
 }
 
 int s_extract_number(const char *string) {
+    assert(string);
     size_t length = strlen(string);
+    assert(length);
     size_t i = length - 1;
-    while (i >= 0 && isdigit(string[i]) && string[i] != '-')
+    while (isdigit(string[i]) && string[i] != '-')
         i--;
     char result[32] = "";
     strncpy(result, &string[i+1], 31);
@@ -126,10 +128,11 @@ int stress_activate_deactivate (zloop_t *loop, int timer_id, void *arg){
 }
 
 void stress_activate_deactivate_fn (zsock_t *pipe, void *args){
+    IGS_UNUSED(args)
     zsock_signal(pipe, 0);
     zloop_t *loop = zloop_new();
     zloop_timer(loop, STRESS_ACTIVATE_DEACTIVATE_PERIOD, 0, stress_activate_deactivate, NULL);
-    zloop_reader(loop, pipe, s_read_pipe, "stress_activate_deactivate");
+    zloop_reader(loop, pipe, s_read_pipe, (char*)"stress_activate_deactivate");
     zloop_start(loop);
     zloop_destroy(&loop);
     igs_info("thread %s stopped", "stress_activate_deactivate");
@@ -155,10 +158,11 @@ int stress_change_state (zloop_t *loop, int timer_id, void *arg){
 }
 
 void stress_change_state_fn (zsock_t *pipe, void *args){
+    IGS_UNUSED(args)
     zsock_signal(pipe, 0);
     zloop_t *loop = zloop_new();
     zloop_timer(loop, STRESS_CHANGE_STATE_PERIOD, 0, stress_change_state, NULL);
-    zloop_reader(loop, pipe, s_read_pipe, "stress_change_state");
+    zloop_reader(loop, pipe, s_read_pipe, (char*)"stress_change_state");
     zloop_start(loop);
     zloop_destroy(&loop);
     igs_info("thread %s stopped", "stress_change_state");
@@ -184,10 +188,11 @@ int stress_change_definition (zloop_t *loop, int timer_id, void *arg){
 }
 
 void stress_change_definition_fn (zsock_t *pipe, void *args){
+    IGS_UNUSED(args)
     zsock_signal(pipe, 0);
     zloop_t *loop = zloop_new();
     zloop_timer(loop, STRESS_CHANGE_DEFINITION_PERIOD, 0, stress_change_definition, NULL);
-    zloop_reader(loop, pipe, s_read_pipe, "stress_change_definition");
+    zloop_reader(loop, pipe, s_read_pipe, (char*)"stress_change_definition");
     zloop_start(loop);
     zloop_destroy(&loop);
     igs_info("thread %s stopped", "stress_change_definition");
@@ -234,10 +239,11 @@ int stress_change_mapping (zloop_t *loop, int timer_id, void *arg){
 }
 
 void stress_change_mapping_fn (zsock_t *pipe, void *args){
+    IGS_UNUSED(args)
     zsock_signal(pipe, 0);
     zloop_t *loop = zloop_new();
     zloop_timer(loop, STRESS_CHANGE_MAPPING_PERIOD, 0, stress_change_mapping, NULL);
-    zloop_reader(loop, pipe, s_read_pipe, "stress_change_mapping");
+    zloop_reader(loop, pipe, s_read_pipe, (char*)"stress_change_mapping");
     zloop_start(loop);
     zloop_destroy(&loop);
     igs_info("thread %s stopped", "stress_change_mapping");
@@ -261,9 +267,9 @@ int stress_publish (zloop_t *loop, int timer_id, void *arg){
         igsagent_output_set_double(a, "double", ++d);
         char s[17] = "";
         size_t charset_size = sizeof(charset) - 1;
-        for (size_t i = 0; i < 16; i++) {
+        for (size_t si = 0; si < 16; si++) {
             int k = rand() % charset_size;
-            s[i] = charset[k];
+            s[si] = charset[k];
         }
         s[16] = '\0';
         igsagent_output_set_string(a, "string", s);
@@ -293,10 +299,11 @@ int stress_publish (zloop_t *loop, int timer_id, void *arg){
 }
 
 void stress_publish_fn (zsock_t *pipe, void *args){
+    IGS_UNUSED(args)
     zsock_signal(pipe, 0);
     zloop_t *loop = zloop_new();
     zloop_timer(loop, STRESS_PUBLISH_PERIOD, 0, stress_publish, NULL);
-    zloop_reader(loop, pipe, s_read_pipe, "stress_publish");
+    zloop_reader(loop, pipe, s_read_pipe, (char*)"stress_publish");
     zloop_start(loop);
     zloop_destroy(&loop);
     igs_info("thread %s stopped", "stress_publish");
@@ -322,10 +329,11 @@ int stress_elections (zloop_t *loop, int timer_id, void *arg){
 }
 
 void stress_elections_fn (zsock_t *pipe, void *args){
+    IGS_UNUSED(args)
     zsock_signal(pipe, 0);
     zloop_t *loop = zloop_new();
     zloop_timer(loop, STRESS_ELECTIONS_PERIOD, 0, stress_elections, NULL);
-    zloop_reader(loop, pipe, s_read_pipe, "stress_elections");
+    zloop_reader(loop, pipe, s_read_pipe, (char*)"stress_elections");
     zloop_start(loop);
     zloop_destroy(&loop);
     igs_info("thread %s stopped", "stress_elections");
@@ -341,7 +349,9 @@ void observe_agent_events (igsagent_t *agent,
                            const char *name,
                            void *event_data,
                            void *data){
-    char *event_name = NULL;
+    IGS_UNUSED(event_data)
+    IGS_UNUSED(data)
+    const char *event_name = NULL;
     switch (event) {
         case IGS_PEER_ENTERED:
             event_name = "IGS_PEER_ENTERED";
@@ -385,6 +395,8 @@ void observe_input (igsagent_t *agent,
                     void *value,
                     size_t value_size,
                     void *data){
+    IGS_UNUSED(type)
+    IGS_UNUSED(data)
     if (verbose){
         switch (value_type) {
             case IGS_IMPULSION_T:
@@ -420,6 +432,7 @@ void service (igsagent_t *agent,
               size_t args_nbr,
               const char *token,
               void *data){
+    IGS_UNUSED(data)
     if (verbose)
         igsagent_fatal(agent, "%s called by %s (%s)", service_name, sender_agent_name, sender_agent_uuid);
     assert(args_nbr == 5);
@@ -435,6 +448,8 @@ void reply (igsagent_t *agent,
             size_t args_nbr,
             const char *token,
             void *data){
+    IGS_UNUSED(args_nbr)
+    IGS_UNUSED(data)
     if (verbose)
         igsagent_fatal(agent, "%s called by %s (%s)", service_name, sender_agent_name, sender_agent_uuid);
     assert(streq(first_argument->next->next->next->c, token));
