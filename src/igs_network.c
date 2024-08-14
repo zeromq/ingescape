@@ -104,25 +104,6 @@ void s_unsubscribe_to_remote_agent_output (igs_remote_agent_t *remote_agent,
     }
 }
 
-
-void s_free_transaction (void *data){
-    assert(data);
-    igs_publication_transaction_t *t = (igs_publication_transaction_t*)data;
-    assert(t->targets);
-    igs_publication_transaction_target_t *target = zlist_first(t->targets);
-    while (target) {
-        zlist_remove(t->targets, target);
-        free(target->input);
-        target = (igs_publication_transaction_target_t*)zlist_next(t->targets);
-    }
-    zlist_destroy(&t->targets);
-    if(t->frame) //also destroys t->data (coming from the frame)
-        zframe_destroy(&t->frame);
-    if (t->value)
-        free(t->value);
-    data = NULL;
-}
-
 // function actually handling messages from one of the remote agents we
 // subscribed to
 void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
@@ -149,8 +130,6 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
     void *data = NULL;
     zmsg_t *bundle = NULL;
     size_t i = 0;
-    
-    zlist_t *transactions = zlist_new();
     
     //NB: The following iterations need to be protected in case the remote agent disappears
     //while we are handling data.
@@ -271,89 +250,58 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
             && value_type <= IGS_TIMESTAMPED_DATA_T)
             value_type -= IGS_DATA_T; //translate value type to non-timestamped value type
         
-        igs_publication_transaction_t *transaction = (igs_publication_transaction_t*)calloc(1, sizeof(igs_publication_transaction_t));
-        transaction->value_type = value_type;
-        transaction->value = value; //destroyed with transaction
-        transaction->data = data; //destroyed with frame
-        transaction->size = size;
-        transaction->frame = frame; //destroyed with transaction
-        transaction->targets = zlist_new();
-        zlist_append(transactions, transaction);
-        zlist_freefn(transactions, transaction, s_free_transaction, false);
-        
         // Publication does not provide information about the targeted agents in our
         // context. At this stage, we only know that one or more of our agents are
         // targeted. We need to iterate through our agents and their mappings to check
         // which inputs need to be updated on which agent.
         igsagent_t *agent = zhashx_first(core_context->agents);
-        while (agent) {
+        while (agent && agent->uuid && agent->mapping) {
             // try to find mapping elements matching with this subscriber's output
             // and update mapped input(s) value accordingly
             // TODO: optimize mapping storage to avoid iterating
             // check that this agent has not been destroyed when we were locked
-            if (agent->mapping) {
-                igs_map_t *elmt = zlist_first(agent->mapping->map_elements);
-                while (elmt) {
-                    if (streq (elmt->to_agent, remote_agent->definition->name)
-                        && streq (elmt->to_output, output)) {
-                        // we have a match on emitting agent name and its ouput name :
-                        // still need to check the targeted input existence in our
-                        // definition
-                        assert (agent->definition->inputs_table);
-                        igs_io_t *found_input = zhashx_lookup(agent->definition->inputs_table, elmt->from_input);
-                        if (!found_input)
-                            igsagent_warn (agent,"Input %s is missing in our definition but expected in our mapping with %s.%s",
-                                           elmt->from_input, elmt->to_agent, elmt->to_output);
-                        else {
-                            // we have a fully matching mapping element: use the input
-                            agent->rt_current_timestamp_microseconds = timestamp;
-                            igs_publication_transaction_target_t *target = (igs_publication_transaction_target_t*) calloc (1,sizeof(igs_publication_transaction_target_t));
-                            target->agent = agent;
-                            target->input = strdup(elmt->from_input); //destroyed with transaction
-                            zlist_append(transaction->targets, target);
-                            agent->rt_current_timestamp_microseconds = INT64_MIN;
+            assert(agent->mapping->map_elements);
+            igs_map_t *elmt = zlist_first(agent->mapping->map_elements);
+            while (elmt) {
+                if (streq (elmt->to_agent, remote_agent->definition->name)
+                    && streq (elmt->to_output, output)) {
+                    // we have a match on emitting agent name and its ouput name :
+                    // still need to check the targeted input existence in our
+                    // definition
+                    assert (agent->definition->inputs_table);
+                    igs_io_t *found_input = zhashx_lookup(agent->definition->inputs_table, elmt->from_input);
+                    if (!found_input)
+                        igsagent_warn (agent,"Input %s is missing in our definition but expected in our mapping with %s.%s",
+                                       elmt->from_input, elmt->to_agent, elmt->to_output);
+                    else {
+                        // we have a fully matching mapping element: use the input
+                        agent->rt_current_timestamp_microseconds = timestamp;
+                        igs_io_t *io = NULL;
+                        if (value_type == IGS_STRING_T)
+                            io = model_write (agent, found_input->name, IGS_INPUT_T, value_type, value, strlen(value) + 1);
+                        else
+                            io = model_write (agent, found_input->name, IGS_INPUT_T, value_type, data, size);
+                        if (io){
+                            model_read_write_unlock(__FUNCTION__, __LINE__);
+                            model_LOCKED_handle_io_callbacks(agent, io);
+                            model_read_write_lock(__FUNCTION__, __LINE__);
                         }
+                        agent->rt_current_timestamp_microseconds = INT64_MIN;
                     }
-                    elmt = zlist_next(agent->mapping->map_elements);
                 }
+                elmt = zlist_next(agent->mapping->map_elements);
             }
             agent = zhashx_next(core_context->agents);
         }
         freen (output);
-    }
-    
-    //actually write the inputs for which we have collected transactions
-    igs_publication_transaction_t *transaction = (igs_publication_transaction_t *)zlist_first(transactions);
-    while (transaction){
-        igs_publication_transaction_target_t *target = NULL;
-        if (transaction->value_type == IGS_STRING_T){
-            target = zlist_first(transaction->targets);
-            while (target) {
-                igs_io_t *io = model_write (target->agent, target->input, IGS_INPUT_T, transaction->value_type,
-                                            transaction->value, strlen ((char *)transaction->value) + 1);
-                if (io){
-                    model_read_write_unlock(__FUNCTION__, __LINE__);
-                    model_LOCKED_handle_io_callbacks(target->agent, io);
-                    model_read_write_lock(__FUNCTION__, __LINE__);
-                }
-                target = zlist_next(transaction->targets);
-            }
-        }else{
-            target = zlist_first(transaction->targets);
-            while (target) {
-                igs_io_t *io = model_write (target->agent, target->input, IGS_INPUT_T, transaction->value_type,
-                                            transaction->data, transaction->size);
-                if (io){
-                    model_read_write_unlock(__FUNCTION__, __LINE__);
-                    model_LOCKED_handle_io_callbacks(target->agent, io);
-                    model_read_write_lock(__FUNCTION__, __LINE__);
-                }
-                target = zlist_next(transaction->targets);
-            }
+        if (value)
+            freen(value);
+        if (frame){
+            zframe_destroy(&frame);
+            data = NULL;
         }
-        transaction = zlist_next(transactions);
+        size = 0;
     }
-    zlist_destroy(&transactions); //also frees each transaction and its content
     zmsg_destroy (msg);
 }
 
@@ -2893,19 +2841,18 @@ int s_manage_parent (zloop_t *loop, zsock_t *pipe, void *arg)
         fake_remote->context = core_context;
         fake_remote->definition = (igs_definition_t *) zmalloc (sizeof (igs_definition_t));
         fake_remote->definition->name = name;
-        s_handle_publication (&msg, fake_remote);
+        s_handle_publication (&msg, fake_remote); //destroys msg
         free (fake_remote->definition);
         free (fake_remote);
         free (name);
-        free (command);
         if (core_context->monitor_pipe_stack)
             printf("***HANDLE_PUBLICATION - %d (max: %d)\n", --handle_publications_balance, handle_publications_balance_max);
         model_read_write_unlock(__FUNCTION__, __LINE__);
-        return 0;
     }
     //else: nothing to do so far
     free (command);
-    zmsg_destroy (&msg);
+    if (msg)
+        zmsg_destroy (&msg);
     return 0;
 }
 

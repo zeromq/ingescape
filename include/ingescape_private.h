@@ -284,20 +284,6 @@ typedef struct igs_agent_event_wrapper {
     void *my_data;
 } igs_agent_event_wrapper_t;
 
-typedef struct igs_publication_transaction {
-    zlist_t *targets;
-    igs_io_value_type_t value_type;
-    char *value;
-    void *data;
-    size_t size;
-    zframe_t *frame;
-} igs_publication_transaction_t;
-
-typedef struct igs_publication_transaction_target {
-    igsagent_t *agent;
-    char *input;
-} igs_publication_transaction_target_t;
-
 //////////////////  CALLBACK WRAPPERS   //////////////////
 typedef struct observe_io_cb_wrapper
 {

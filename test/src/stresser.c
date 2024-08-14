@@ -423,12 +423,7 @@ void service (igsagent_t *agent,
     if (verbose)
         igsagent_fatal(agent, "%s called by %s (%s)", service_name, sender_agent_name, sender_agent_uuid);
     assert(args_nbr == 5);
-    igs_service_arg_t *args = NULL;
-    igs_service_args_add_bool(&args,    first_argument->b);
-    igs_service_args_add_int(&args,     first_argument->next->i);
-    igs_service_args_add_double(&args,  first_argument->next->next->d);
-    igs_service_args_add_string(&args,  first_argument->next->next->next->c);
-    igs_service_args_add_data(&args,    first_argument->next->next->next->next->data, first_argument->next->next->next->next->size);
+    igs_service_arg_t *args = igs_service_args_clone(first_argument);
     igsagent_service_call(agent, sender_agent_uuid, "reply", &args, token);
 }
 

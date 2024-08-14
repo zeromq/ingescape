@@ -155,10 +155,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
             }
         }
         if (space_in_name)
-            igs_warn (
-              "spaces are not allowed in definition name: '%s' has been "
-              "changed to '%s'",
-              name->u.string, n);
+            igs_warn ("spaces are not allowed in definition name: '%s' has been changed to '%s'", name->u.string, n);
         definition = (igs_definition_t *) zmalloc (sizeof (igs_definition_t));
         definition->name = n;
         definition->inputs_table = zhashx_new();

@@ -18,11 +18,11 @@
 ////////////////////////////////////////////////////////////////////////
 #pragma mark INTERNAL FUNCTIONS
 ////////////////////////////////////////////////////////////////////////
-void s_service_free_service_arguments (zlist_t **args)
+void s_service_free_service_arguments (igs_service_arg_t **args)
 {
-    igs_service_arg_t *arg = zlist_first(*args);
+    assert(args);
+    igs_service_arg_t *arg = *args;
     while (arg) {
-        zlist_remove(*args, arg);
         if (arg->name){
             free (arg->name);
             arg->name = NULL;
@@ -32,9 +32,8 @@ void s_service_free_service_arguments (zlist_t **args)
         else if (arg->type == IGS_STRING_T && arg->c)
             free (arg->c);
         free (arg);
-        arg = zlist_next(*args);
+        arg = arg->next;
     }
-    zlist_destroy(args);
 }
 
 igs_result_t s_service_copy_arguments (igs_service_arg_t **source,
@@ -151,7 +150,9 @@ void service_free_service (igs_service_t **s)
     }
     if ((*s)->description)
         free ((*s)->description);
-    s_service_free_service_arguments (&(*s)->arguments);
+    igs_service_arg_t *first = zlist_first((*s)->arguments);
+    s_service_free_service_arguments (&first);
+    zlist_destroy(&(*s)->arguments);
     igs_service_t *r = zhashx_first((*s)->replies);
     while (r) {
         //zhashx_delete((*t)->replies, r->name);
@@ -313,14 +314,7 @@ void igs_service_args_destroy (igs_service_arg_t **list)
     assert(list);
     if(*list)
         return;
-    zlist_t *args = zlist_new();
-    igs_service_arg_t *arg = *list;
-    while (arg) {
-        zlist_append(args, arg);
-        arg = arg->next;
-    }
-    s_service_free_service_arguments(&args);
-    *list = NULL;
+    s_service_free_service_arguments(list);
 }
 
 igs_service_arg_t *igs_service_args_clone (igs_service_arg_t *list)
@@ -815,37 +809,9 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                 || streq (remote_agent->uuid, agent_name_or_uuid)) {
                 // we found a matching agent
                 found = true;
-                
-                /*We remove verifications on the service on sender side to enable
+                /*NB: We removed verifications on the service on sender side to enable
                  proper proxy implementation (local proxy does not implement
-                 services but relays them to remote clients and virtual agents).
-                 
-                if (remote_agent->definition == NULL){
-                    igsagent_warn(agent, "definition is unknown for %s(%s) : cannot
-                                  verify service before sending it", remote_agent->name,
-                                  agent_name_or_uuid);
-                    //continue; //commented to allow sending the message anyway
-                }else{
-                    igs_service_t *service = NULL;
-                    HASH_FIND_STR(remote_agent->definition->services_table,
-                                  service_name, service); if (service){ size_t nb_arguments = 0;
-                        if (list && *list)
-                            LL_COUNT(*list, arg, nb_arguments);
-                        size_t defined_nb_arguments = 0;
-                        LL_COUNT(service->arguments, arg, defined_nb_arguments);
-                        if (nb_arguments != defined_nb_arguments){
-                            igsagent_error(agent, "passed number of arguments is not
-                                           correct (received: %zu / expected: %zu) : service will not be sent",
-                                           nb_arguments, defined_nb_arguments);
-                            continue;
-                        }
-                    }else{
-                        igsagent_warn(agent, "could not find service named %s for %s
-                                      (%s) : cannot verify service before sending it", service_name,
-                                      remote_agent->name, remote_agent->uuid);
-                        //continue; //commented to allow sending the message anyway
-                    }
-                }*/
+                 services but relays them to remote clients and virtual agents)*/
                 zmsg_t *msg = zmsg_new ();
                 if (remote_agent->peer->protocol
                     && (streq (remote_agent->peer->protocol, "v2")
