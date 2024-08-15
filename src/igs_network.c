@@ -1007,11 +1007,10 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             // => all agents in this peer know us
             char *uuid = zmsg_popstr (msg_duplicate);
             if (uuid == NULL) {
-                igs_error (
-                           "no valid uuid in %s message received from %s(%s): rejecting",
-                           title, name, peerUUID);
+                igs_error ("no valid uuid in %s message received from %s(%s): rejecting", title, name, peerUUID);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             model_read_write_lock(__FUNCTION__, __LINE__);
@@ -1047,29 +1046,29 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             // Agents without definition are considered impossible.
             char *str_definition = zmsg_popstr (msg_duplicate);
             if (str_definition == NULL) {
-                igs_error ("no valid definition in %s message received from %s(%s): rejecting",
-                           title, name, peerUUID);
+                igs_error ("no valid definition in %s message received from %s(%s): rejecting", title, name, peerUUID);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             char *uuid = zmsg_popstr (msg_duplicate);
             if (uuid == NULL) {
-                igs_error ("no valid uuid in %s message received from %s(%s): rejecting",
-                           title, name, peerUUID);
+                igs_error ("no valid uuid in %s message received from %s(%s): rejecting", title, name, peerUUID);
                 free (str_definition);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             char *remote_agent_name = zmsg_popstr (msg_duplicate);
             if (remote_agent_name == NULL) {
-                igs_error ("no valid agent name in %s message received from %s(%s): rejecting",
-                           title, name, peerUUID);
+                igs_error ("no valid agent name in %s message received from %s(%s): rejecting", title, name, peerUUID);
                 free (str_definition);
                 free (uuid);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             
@@ -1190,21 +1189,19 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             // identify remote agent
             char *str_mapping = zmsg_popstr (msg_duplicate);
             if (str_mapping == NULL) {
-                igs_error ("no valid mapping in %s message received from "
-                           "%s(%s): rejecting",
-                           title, name, peerUUID);
+                igs_error ("no valid mapping in %s message received from %s(%s): rejecting", title, name, peerUUID);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             char *uuid = zmsg_popstr (msg_duplicate);
             if (uuid == NULL) {
-                igs_error (
-                           "uuid is NULL in %s message received from %s(%s): rejecting",
-                           title, name, peerUUID);
+                igs_error ("uuid is NULL in %s message received from %s(%s): rejecting", title, name, peerUUID);
                 free (str_mapping);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             
@@ -1217,6 +1214,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
                 model_read_write_unlock(__FUNCTION__, __LINE__);
+                free(title);
                 return 0;
             }
             
@@ -1262,21 +1260,19 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             // identify agent
             char *str_definition = zmsg_popstr (msg_duplicate);
             if (str_definition == NULL) {
-                igs_error ("no valid definition in %s message received from "
-                           "%s(%s): rejecting",
-                           title, name, peerUUID);
+                igs_error ("no valid definition in %s message received from %s(%s): rejecting", title, name, peerUUID);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             char *uuid = zmsg_popstr (msg_duplicate);
             if (uuid == NULL) {
-                igs_error (
-                           "no valid uuid in %s message received from %s(%s): rejecting",
-                           title, name, peerUUID);
+                igs_error ("no valid uuid in %s message received from %s(%s): rejecting", title, name, peerUUID);
                 free (str_definition);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             
@@ -1290,6 +1286,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
                 model_read_write_unlock(__FUNCTION__, __LINE__);
+                free(title);
                 return 0;
             }
             model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -1315,6 +1312,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 igs_error ("no valid mapping in %s message received from  %s(%s): rejecting", title, name, peerUUID);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             char *uuid = zmsg_popstr (msg_duplicate);
@@ -1323,6 +1321,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free (str_mapping);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             
@@ -1358,16 +1357,15 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             free (uuid);
             model_read_write_unlock(__FUNCTION__, __LINE__);
         }
-        // OTHER SUPPORTED MESSAGES
+        // OTHER MESSAGES
         else if (streq (title, GET_CURRENT_OUTPUTS_MSG)) {
             // identify agent
             char *uuid = zmsg_popstr (msg_duplicate);
             if (!uuid) {
-                igs_error ("no valid uuid in %s message received from "
-                           "%s(%s): rejecting",
-                           title, name, peerUUID);
+                igs_error ("no valid uuid in %s message received from %s(%s): rejecting", title, name, peerUUID);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             igsagent_t *agent = zhashx_lookup(context->agents, uuid);
@@ -1377,6 +1375,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     free (uuid);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             
@@ -1435,11 +1434,10 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
         else if (streq (title, CURRENT_OUTPUTS_MSG)) {
             char *uuid = zmsg_popstr (msg_duplicate);
             if (!uuid) {
-                igs_error ("no valid uuid in %s message received from "
-                           "%s(%s): rejecting",
-                           title, name, peerUUID);
+                igs_error ("no valid uuid in %s message received from %s(%s): rejecting", title, name, peerUUID);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             
@@ -1451,6 +1449,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     free (uuid);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             igs_debug ("privately received output values from %s (%s)",
@@ -1465,6 +1464,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 igs_error ("no valid uuid in %s message received from %s(%s): rejecting", title, name, peerUUID);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             igsagent_t *agent = zhashx_lookup(context->agents, uuid);
@@ -1474,6 +1474,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     free (uuid);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             
@@ -1547,6 +1548,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                            title, name, peerUUID);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             igsagent_t *agent = zhashx_lookup(context->agents, uuid);
@@ -1556,6 +1558,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     free (uuid);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             
@@ -1628,6 +1631,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                            title, name, peerUUID);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             
@@ -1655,6 +1659,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                            title, name, peerUUID);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             
@@ -1667,6 +1672,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
                 model_read_write_unlock(__FUNCTION__, __LINE__);
+                free(title);
                 return 0;
             }
             igs_debug ("received 'STOP_AGENT %s' command from %s (%s)", uuid, name, peerUUID);
@@ -1693,6 +1699,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                            title, name, peerUUID);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             model_read_write_lock(__FUNCTION__, __LINE__);
@@ -1704,6 +1711,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
                 model_read_write_unlock(__FUNCTION__, __LINE__);
+                free(title);
                 return 0;
             }
             igs_debug ("received CLEAR_MAPPING command from %s (%s)", name, peerUUID);
@@ -1753,6 +1761,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 igs_error ("no valid uuid in %s message received from  %s(%s): rejecting", title, name, peerUUID);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             model_read_write_lock(__FUNCTION__, __LINE__);
@@ -1764,6 +1773,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
                 model_read_write_unlock(__FUNCTION__, __LINE__);
+                free(title);
                 return 0;
             }
             igs_debug ("received MUTE_AGENT command from %s (%s)", name, peerUUID);
@@ -1778,6 +1788,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                            title, name, peerUUID);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             model_read_write_lock(__FUNCTION__, __LINE__);
@@ -1789,6 +1800,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
                 model_read_write_unlock(__FUNCTION__, __LINE__);
+                free(title);
                 return 0;
             }
             igs_debug ("received UNMUTE_AGENT command from %s (%s)", name, peerUUID);
@@ -1803,6 +1815,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                            title, name, peerUUID);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             char *uuid = zmsg_popstr (msg_duplicate);
@@ -1813,6 +1826,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free (io_name);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             model_read_write_lock(__FUNCTION__, __LINE__);
@@ -1825,6 +1839,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
                 model_read_write_unlock(__FUNCTION__, __LINE__);
+                free(title);
                 return 0;
             }
             igs_debug ("received MUTE command from %s (%s)", name, peerUUID);
@@ -1841,6 +1856,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                            title, name, peerUUID);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             char *uuid = zmsg_popstr (msg_duplicate);
@@ -1851,6 +1867,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free (io_name);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             model_read_write_lock(__FUNCTION__, __LINE__);
@@ -1863,6 +1880,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
                 model_read_write_unlock(__FUNCTION__, __LINE__);
+                free(title);
                 return 0;
             }
             igs_debug ("received UNMUTE command from %s (%s)", name, peerUUID);
@@ -1878,6 +1896,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                            title, name, peerUUID);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             char *value = zmsg_popstr (msg_duplicate);
@@ -1887,6 +1906,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free (io_name);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             char *uuid = zmsg_popstr (msg_duplicate);
@@ -1897,6 +1917,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free (value);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             model_read_write_lock(__FUNCTION__, __LINE__);
@@ -1910,6 +1931,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
                 model_read_write_unlock(__FUNCTION__, __LINE__);
+                free(title);
                 return 0;
             }
             
@@ -1962,6 +1984,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                            title, name, peerUUID);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             char *remote_agent = zmsg_popstr (msg_duplicate);
@@ -1973,6 +1996,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free (input);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             char *output = zmsg_popstr (msg_duplicate);
@@ -1984,6 +2008,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free (remote_agent);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             char *uuid = zmsg_popstr (msg_duplicate);
@@ -1996,6 +2021,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free (output);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             model_read_write_lock(__FUNCTION__, __LINE__);
@@ -2010,6 +2036,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
                 model_read_write_unlock(__FUNCTION__, __LINE__);
+                free(title);
                 return 0;
             }
             
@@ -2030,6 +2057,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                            title, name, peerUUID);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             char *remote_agent = zmsg_popstr (msg_duplicate);
@@ -2041,6 +2069,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free (input);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             char *output = zmsg_popstr (msg_duplicate);
@@ -2052,6 +2081,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free (remote_agent);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             char *uuid = zmsg_popstr (msg_duplicate);
@@ -2064,6 +2094,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free (output);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             model_read_write_lock(__FUNCTION__, __LINE__);
@@ -2078,6 +2109,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
                 model_read_write_unlock(__FUNCTION__, __LINE__);
+                free(title);
                 return 0;
             }
             
@@ -2099,6 +2131,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                            title, name, peerUUID);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             char *remote_agent = zmsg_popstr (msg_duplicate);
@@ -2110,6 +2143,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free (input);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             char *output = zmsg_popstr (msg_duplicate);
@@ -2121,6 +2155,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free (remote_agent);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             char *uuid = zmsg_popstr (msg_duplicate);
@@ -2133,6 +2168,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free (output);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             model_read_write_lock(__FUNCTION__, __LINE__);
@@ -2147,6 +2183,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
                 model_read_write_unlock(__FUNCTION__, __LINE__);
+                free(title);
                 return 0;
             }
             
@@ -2167,6 +2204,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                            title, name, peerUUID);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             char *remote_agent = zmsg_popstr (msg_duplicate);
@@ -2178,6 +2216,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free (input);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             char *output = zmsg_popstr (msg_duplicate);
@@ -2189,6 +2228,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free (remote_agent);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             char *uuid = zmsg_popstr (msg_duplicate);
@@ -2201,6 +2241,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free (output);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             model_read_write_lock(__FUNCTION__, __LINE__);
@@ -2215,6 +2256,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
                 model_read_write_unlock(__FUNCTION__, __LINE__);
+                free(title);
                 return 0;
             }
             
@@ -2255,6 +2297,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 igs_error ( "no valid definition path in %s message received from %s(%s): rejecting", title, name, peerUUID);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             char *uuid = zmsg_popstr (msg_duplicate);
@@ -2263,6 +2306,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free (definition_path);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             model_read_write_lock(__FUNCTION__, __LINE__);
@@ -2275,6 +2319,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
                 model_read_write_unlock(__FUNCTION__, __LINE__);
+                free(title);
                 return 0;
             }
             igs_debug ("received SET_DEFINITION_PATH command from %s (%s)", name, peerUUID);
@@ -2289,6 +2334,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 igs_error ("no valid mapping path in %s message received from %s(%s): rejecting", title, name, peerUUID);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             char *uuid = zmsg_popstr (msg_duplicate);
@@ -2297,6 +2343,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free (mapping_path);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             model_read_write_lock(__FUNCTION__, __LINE__);
@@ -2309,6 +2356,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
                 model_read_write_unlock(__FUNCTION__, __LINE__);
+                free(title);
                 return 0;
             }
             igs_debug ("received SET_MAPPING_PATH command from %s (%s)", name, peerUUID);
@@ -2324,6 +2372,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 igs_error ("no valid uuid in %s message received from %s(%s): rejecting", title, name, peerUUID);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             model_read_write_lock(__FUNCTION__, __LINE__);
@@ -2335,6 +2384,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
                 model_read_write_unlock(__FUNCTION__, __LINE__);
+                free(title);
                 return 0;
             }
             igs_debug ("received SAVE_DEFINITION_TO_PATH command from %s (%s)", name, peerUUID);
@@ -2349,6 +2399,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 igs_error ("no valid uuid in %s message received from %s(%s): rejecting", title, name, peerUUID);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             model_read_write_lock(__FUNCTION__, __LINE__);
@@ -2360,6 +2411,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
                 model_read_write_unlock(__FUNCTION__, __LINE__);
+                free(title);
                 return 0;
             }
             igs_debug ("received SAVE_MAPPING_TO_PATH command from %s (%s)", name, peerUUID);
@@ -2373,6 +2425,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 igs_error ("no valid caller_uuid in %s message received from %s(%s): rejecting", title, name, peerUUID);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             char *callee_uuid = zmsg_popstr (msg_duplicate);
@@ -2381,6 +2434,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free(caller_uuid);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
+                free(title);
                 return 0;
             }
             
@@ -2406,6 +2460,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
                 model_read_write_unlock(__FUNCTION__, __LINE__);
+                free(title);
                 return 0;
             }
             
@@ -2420,6 +2475,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
                 model_read_write_unlock(__FUNCTION__, __LINE__);
+                free(title);
                 return 0;
             }
             
@@ -2434,6 +2490,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
                 model_read_write_unlock(__FUNCTION__, __LINE__);
+                free(title);
                 return 0;
             }
             
