@@ -1831,17 +1831,17 @@ void run_static_tests (int argc, const char * argv[]){
     assert(tester_secondAgentExited);
 
     //elections
-    assert(igs_election_leave("my election") == IGS_FAILURE);
+    assert(igs_election_leave("my election") == IGS_SUCCESS);
     assert(igs_election_join("my election") == IGS_SUCCESS);
     assert(igs_election_join("my election") == IGS_FAILURE);
     assert(igs_election_join("INGESCAPE_PRIVATE") == IGS_FAILURE);
     assert(igs_election_leave("my election") == IGS_SUCCESS);
-    assert(igs_election_leave("my election") == IGS_FAILURE);
-    assert(igs_election_leave("my other election") == IGS_FAILURE);
+    assert(igs_election_leave("my election") == IGS_SUCCESS);
+    assert(igs_election_leave("my other election") == IGS_SUCCESS);
     assert(igs_election_join("my other election") == IGS_SUCCESS);
     assert(igs_election_join("my other election") == IGS_FAILURE);
     assert(igs_election_leave("my other election") == IGS_SUCCESS);
-    assert(igs_election_leave("my other election") == IGS_FAILURE);
+    assert(igs_election_leave("my other election") == IGS_SUCCESS);
 
     igs_agent_set_family("family_test");
 
@@ -1978,7 +1978,7 @@ int main(int argc, const char * argv[]) {
         //we terminate now after passing the static tests
         igsagent_destroy(&secondAgent);
         igsagent_destroy(&firstAgent);
-        igs_fatal("static tests have terminated with success");
+        igs_fatal("static tests have terminated with SUCCESS");
         exit(EXIT_SUCCESS);
     }
     

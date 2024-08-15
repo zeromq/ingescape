@@ -138,7 +138,7 @@ typedef struct igs_service{
     char * description;
     igsagent_service_fn *service_cb;
     void *cb_data;
-    zlist_t *arguments; //igs_service_arg_t
+    igs_service_arg_t *arguments;
     zhashx_t *replies; //struct igs_service
 } igs_service_t;
 

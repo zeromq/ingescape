@@ -36,6 +36,7 @@ void s_service_free_service_arguments (igs_service_arg_t **args)
         arg = arg->next;
         free (previous);
     }
+    *args = NULL;
 }
 
 igs_result_t s_service_copy_arguments (igs_service_arg_t **source,
@@ -152,9 +153,7 @@ void service_free_service (igs_service_t **s)
     }
     if ((*s)->description)
         free ((*s)->description);
-    igs_service_arg_t *first = zlist_first((*s)->arguments);
-    s_service_free_service_arguments (&first);
-    zlist_destroy(&(*s)->arguments);
+    s_service_free_service_arguments (&(*s)->arguments);
     igs_service_t *r = zhashx_first((*s)->replies);
     while (r) {
         //zhashx_delete((*t)->replies, r->name);
@@ -175,7 +174,7 @@ igs_result_t service_make_values_to_arguments_from_message (igs_service_arg_t **
     
     igs_service_arg_t *previous = NULL;
     igs_service_arg_t *current = NULL;
-    igs_service_arg_t *current_from_service = zlist_first(service->arguments);
+    igs_service_arg_t *current_from_service = service->arguments;
     while (current_from_service){
         current = (igs_service_arg_t *) zmalloc (sizeof(igs_service_arg_t));
         if (!*args)
@@ -221,7 +220,7 @@ igs_result_t service_make_values_to_arguments_from_message (igs_service_arg_t **
             return IGS_FAILURE;
         }
         previous = current;
-        current_from_service = zlist_next(service->arguments);
+        current_from_service = current_from_service->next;
     }
     return IGS_SUCCESS;
 }
@@ -480,7 +479,6 @@ igs_result_t igsagent_service_init (igsagent_t *agent,
             igsagent_warn (agent, "service name has been shortened to %s", s->name);
         } else
             s->name = s_strndup (name, IGS_MAX_STRING_MSG_LENGTH);
-        s->arguments = zlist_new();
         s->replies = zhashx_new();
         zhashx_insert(agent->definition->services_table, s->name, s);
         definition_update_json (agent->definition);
@@ -563,10 +561,14 @@ igs_result_t igsagent_service_arg_add (igsagent_t *agent,
             break;
     }
     a->type = type;
-    igs_service_arg_t *previous_arg = zlist_last(s->arguments);
+    igs_service_arg_t *previous_arg = s->arguments;
+    while (previous_arg && previous_arg->next) {
+        previous_arg = previous_arg->next;
+    }
     if (previous_arg)
         previous_arg->next = a;
-    zlist_append(s->arguments, a);
+    else
+        s->arguments = a;
     definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
     model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -589,13 +591,14 @@ igs_result_t igsagent_service_arg_remove (igsagent_t *agent,
         return IGS_FAILURE;
     }
     bool found = false;
-    igs_service_arg_t *arg = zlist_first(s->arguments);
+    igs_service_arg_t *arg = s->arguments;
+    igs_service_arg_t *previous_arg = NULL;
     while (arg) {
         if (streq (arg_name, arg->name)) {
-            zlist_remove(s->arguments, arg);
-            igs_service_arg_t *previous_arg = zlist_last(s->arguments);
             if (previous_arg)
-                previous_arg->next = NULL;
+                previous_arg->next = arg->next;
+            else
+                s->arguments = arg->next;
             free (arg->name);
             if (arg->type == IGS_DATA_T && arg->data)
                 free (arg->data);
@@ -607,7 +610,8 @@ igs_result_t igsagent_service_arg_remove (igsagent_t *agent,
             agent->network_need_to_send_definition_update = true;
             break;
         }
-        arg = zlist_next(s->arguments);
+        previous_arg = arg;
+        arg = arg->next;
     }
     if (!found)
         igsagent_debug (agent, "no argument named %s for service %s", arg_name, service_name);
@@ -639,7 +643,6 @@ igs_result_t igsagent_service_reply_add(igsagent_t *agent, const char *service_n
         igsagent_warn (agent, "service name has been shortened to %s", r->name);
     } else
         r->name = s_strndup (reply_name, IGS_MAX_STRING_MSG_LENGTH);
-    r->arguments = zlist_new();
     r->replies = zhashx_new();
     zhashx_insert(s->replies, r->name, r);
     definition_update_json (agent->definition);
@@ -732,10 +735,14 @@ igs_result_t igsagent_service_reply_arg_add(igsagent_t *agent, const char *servi
             break;
     }
     a->type = type;
-    igs_service_arg_t *previous_arg = zlist_last(r->arguments);
+    igs_service_arg_t *previous_arg = r->arguments;
+    while (previous_arg && previous_arg->next) {
+        previous_arg = previous_arg->next;
+    }
     if (previous_arg)
         previous_arg->next = a;
-    zlist_append(r->arguments, a);
+    else
+        r->arguments = a;
     definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
     model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -763,13 +770,14 @@ igs_result_t igsagent_service_reply_arg_remove(igsagent_t *agent, const char *se
         return IGS_FAILURE;
     }
     bool found = false;
-    igs_service_arg_t *arg = zlist_first(r->arguments);
+    igs_service_arg_t *arg = r->arguments;
+    igs_service_arg_t *previous_arg = NULL;
     while (arg) {
         if (streq (arg_name, arg->name)) {
-            zlist_remove(r->arguments, arg);
-            igs_service_arg_t *previous_arg = zlist_last(r->arguments);
             if (previous_arg)
-                previous_arg->next = NULL;
+                previous_arg->next = arg->next;
+            else
+                r->arguments = arg->next;
             free (arg->name);
             if (arg->type == IGS_DATA_T && arg->data)
                 free (arg->data);
@@ -782,7 +790,8 @@ igs_result_t igsagent_service_reply_arg_remove(igsagent_t *agent, const char *se
             agent->network_need_to_send_definition_update = true;
             break;
         }
-        arg = zlist_next(r->arguments);
+        previous_arg = arg;
+        arg = arg->next;
     }
     if (!found) {
         igsagent_debug (agent, "no argument named %s for reply %s in service %s", arg_name, reply_name, service_name);
@@ -919,7 +928,12 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                             arg = arg->next;
                         }
                     }
-                    size_t defined_nb_arguments = zlist_size(service->arguments);
+                    size_t defined_nb_arguments = 0;
+                    igs_service_arg_t *count_arg = service->arguments;
+                    while (count_arg) {
+                        defined_nb_arguments++;
+                        count_arg = count_arg->next;
+                    }
                     if (nb_arguments != defined_nb_arguments) {
                         igsagent_error (agent, "passed number of arguments is not correct (received: %zu / expected: %zu) : service will not be called", nb_arguments, defined_nb_arguments);
                         continue;
@@ -1040,14 +1054,7 @@ igs_service_arg_t *igsagent_service_args_first (igsagent_t *agent,
         model_read_write_unlock(__FUNCTION__, __LINE__);
         return NULL;
     }
-    igs_service_arg_t *arg = zlist_first(s->arguments);
-    igs_service_arg_t *prev = NULL;
-    while (arg) {
-        prev = arg;
-        arg = zlist_next(s->arguments);
-        prev->next = arg;
-    }
-    igs_service_arg_t *res = zlist_first(s->arguments);
+    igs_service_arg_t *res = s->arguments;
     model_read_write_unlock(__FUNCTION__, __LINE__);
     return res;
 }
@@ -1065,7 +1072,12 @@ size_t igsagent_service_args_count (igsagent_t *agent,
         model_read_write_unlock(__FUNCTION__, __LINE__);
         return 0;
     }
-    size_t nb = zlist_size(s->arguments);
+    size_t nb = 0;
+    igs_service_arg_t *count_arg = s->arguments;
+    while (count_arg) {
+        nb++;
+        count_arg = count_arg->next;
+    }
     model_read_write_unlock(__FUNCTION__, __LINE__);
     return nb;
 }
@@ -1084,13 +1096,13 @@ bool igsagent_service_arg_exists (igsagent_t *agent,
         model_read_write_unlock(__FUNCTION__, __LINE__);
         return false;
     }
-    igs_service_arg_t *a = zlist_first(s->arguments);
+    igs_service_arg_t *a = s->arguments;
     while (a) {
         if (streq (a->name, arg_name)){
             model_read_write_unlock(__FUNCTION__, __LINE__);
             return true;
         }
-        a = zlist_next(s->arguments);
+        a = a->next;
     }
     model_read_write_unlock(__FUNCTION__, __LINE__);
     return false;
@@ -1180,15 +1192,9 @@ igs_service_arg_t * igsagent_service_reply_args_first(igsagent_t *agent, const c
     }
     igs_service_t *r = zhashx_lookup(s->replies, reply_name);
     if (r){
-        igs_service_arg_t *arg = zlist_first(r->arguments);
-        igs_service_arg_t *prev = NULL;
-        while (arg) {
-            prev = arg;
-            arg = zlist_next(r->arguments);
-            prev->next = arg;
-        }
+        igs_service_arg_t *res = r->arguments;
         model_read_write_unlock(__FUNCTION__, __LINE__);
-        return zlist_first(r->arguments);
+        return res;
     }else {
         igsagent_debug (agent, "could not find service with name %s and reply %s", service_name, reply_name);
         model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -1210,8 +1216,14 @@ size_t igsagent_service_reply_args_count(igsagent_t *agent, const char *service_
     }
     igs_service_t *r = zhashx_lookup(s->replies, reply_name);
     if (r){
+        size_t res = 0;
+        igs_service_arg_t *arg_count = r->arguments;
+        while (arg_count) {
+            res++;
+            arg_count = arg_count->next;
+        }
         model_read_write_unlock(__FUNCTION__, __LINE__);
-        return zlist_size(r->arguments);
+        return res;
     }else {
         igsagent_debug (agent, "could not find service with name %s and reply %s", service_name, reply_name);
         model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -1234,13 +1246,13 @@ bool igsagent_service_reply_arg_exists(igsagent_t *agent, const char *service_na
     }
     igs_service_t *r = zhashx_lookup(s->replies, reply_name);
     if (r){
-        igs_service_arg_t *a = zlist_first(r->arguments);
+        igs_service_arg_t *a = r->arguments;
         while (a) {
             if (streq (a->name, arg_name)){
                 model_read_write_unlock(__FUNCTION__, __LINE__);
                 return true;
             }
-            a = zlist_next(r->arguments);
+            a = a->next;
         }
     }else
         igsagent_debug (agent, "could not find service with name %s and reply named %s", service_name, reply_name);

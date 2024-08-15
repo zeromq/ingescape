@@ -437,7 +437,6 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
 
                 service = (igs_service_t *) zmalloc (sizeof (igs_service_t));
                 service->name = corrected_name;
-                service->arguments = zlist_new();
                 service->replies = zhashx_new();
 
                 description = igs_json_node_find (services->u.array.values[i], description_path);
@@ -469,10 +468,14 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                                 igs_json_node_t *arg_type = igs_json_node_find (arguments->u.array.values[j], type_path);
                                 if (arg_type && arg_type->type == IGS_JSON_STRING && arg_type->u.string)
                                     new_arg->type = s_string_to_value_type (arg_type->u.string);
-                                igs_service_arg_t *previous_arg = zlist_last(service->arguments);
-                                if (previous_arg)
-                                    previous_arg->next = new_arg;
-                                zlist_append(service->arguments, new_arg);
+                                igs_service_arg_t *last_arg = service->arguments;
+                                while (last_arg && last_arg->next) {
+                                    last_arg = last_arg->next;
+                                }
+                                if (last_arg)
+                                    last_arg->next = new_arg;
+                                else
+                                    service->arguments = new_arg;
                             }
                         }
                     }
@@ -499,7 +502,6 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                                           reply_name->u.string, corrected_reply_name);
                             igs_service_t *my_reply = (igs_service_t *) zmalloc (sizeof (igs_service_t));
                             my_reply->name = corrected_reply_name;
-                            my_reply->arguments = zlist_new();
                             my_reply->replies = zhashx_new();
 
                             arguments = igs_json_node_find (replies->u.array.values[j], arguments_path);
@@ -527,10 +529,14 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                                             igs_json_node_t *arg_type = igs_json_node_find (arguments->u.array.values[len], type_path);
                                             if (arg_type && arg_type->type == IGS_JSON_STRING && arg_type->u.string)
                                                 new_arg->type = s_string_to_value_type (arg_type->u.string);
-                                            igs_service_arg_t *previous_arg = zlist_last(my_reply->arguments);
-                                            if (previous_arg)
-                                                previous_arg->next = new_arg;
-                                            zlist_append(my_reply->arguments,new_arg);
+                                            igs_service_arg_t *last_arg = my_reply->arguments;
+                                            while (last_arg && last_arg->next) {
+                                                last_arg = last_arg->next;
+                                            }
+                                            if (last_arg)
+                                                last_arg->next = new_arg;
+                                            else
+                                                my_reply->arguments = new_arg;
                                         }
                                     }
                                 }
@@ -1167,7 +1173,7 @@ char *parser_export_definition (igs_definition_t *def)
             if (service->arguments) {
                 igs_json_add_string (json, STR_ARGUMENTS);
                 igs_json_open_array (json);
-                igs_service_arg_t *argument = zlist_first(service->arguments);
+                igs_service_arg_t *argument = service->arguments;
                 while (argument) {
                     if (argument->name) {
                         igs_json_open_map (json);
@@ -1178,7 +1184,7 @@ char *parser_export_definition (igs_definition_t *def)
                           json, s_value_type_to_string (argument->type));
                         igs_json_close_map (json);
                     }
-                    argument = zlist_next(service->arguments);
+                    argument = argument->next;
                 }
                 igs_json_close_array (json);
             }
@@ -1199,7 +1205,7 @@ char *parser_export_definition (igs_definition_t *def)
                         if (r->arguments) {
                             igs_json_add_string (json, STR_ARGUMENTS);
                             igs_json_open_array (json);
-                            igs_service_arg_t *argument = zlist_first(r->arguments);
+                            igs_service_arg_t *argument = r->arguments;
                             while (argument) {
                                 if (argument->name) {
                                     igs_json_open_map (json);
@@ -1211,7 +1217,7 @@ char *parser_export_definition (igs_definition_t *def)
                                       s_value_type_to_string (argument->type));
                                     igs_json_close_map (json);
                                 }
-                                argument = zlist_next(r->arguments);
+                                argument = argument->next;
                             }
                             igs_json_close_array (json);
                         }
@@ -1508,7 +1514,7 @@ char *parser_export_definition_legacy_v4 (igs_definition_t *def)
             if (service->arguments) {
                 igs_json_add_string (json, STR_ARGUMENTS);
                 igs_json_open_array (json);
-                igs_service_arg_t *argument = zlist_first(service->arguments);
+                igs_service_arg_t *argument = service->arguments;
                 while (argument) {
                     if (argument->name) {
                         igs_json_open_map (json);
@@ -1519,7 +1525,7 @@ char *parser_export_definition_legacy_v4 (igs_definition_t *def)
                           json, s_value_type_to_string (argument->type));
                         igs_json_close_map (json);
                     }
-                    argument = zlist_next(service->arguments);
+                    argument = argument->next;
                 }
                 igs_json_close_array (json);
             }
@@ -1540,7 +1546,7 @@ char *parser_export_definition_legacy_v4 (igs_definition_t *def)
                         if (r->arguments) {
                             igs_json_add_string (json, STR_ARGUMENTS);
                             igs_json_open_array (json);
-                            igs_service_arg_t *argument = zlist_first(r->arguments);
+                            igs_service_arg_t *argument = r->arguments;
                             while (argument) {
                                 if (argument->name) {
                                     igs_json_open_map (json);
@@ -1552,7 +1558,7 @@ char *parser_export_definition_legacy_v4 (igs_definition_t *def)
                                       s_value_type_to_string (argument->type));
                                     igs_json_close_map (json);
                                 }
-                                argument = zlist_next(r->arguments);
+                                argument = argument->next;
                             }
                             igs_json_close_array (json);
                         }
@@ -1663,7 +1669,7 @@ char *parser_export_definition_legacy_v3 (igs_definition_t *def)
             if (service->arguments) {
                 igs_json_add_string (json, STR_ARGUMENTS);
                 igs_json_open_array (json);
-                igs_service_arg_t *argument = zlist_first(service->arguments);
+                igs_service_arg_t *argument = service->arguments;
                 while (argument) {
                     if (argument->name) {
                         igs_json_open_map (json);
@@ -1674,7 +1680,7 @@ char *parser_export_definition_legacy_v3 (igs_definition_t *def)
                           json, s_value_type_to_string (argument->type));
                         igs_json_close_map (json);
                     }
-                    argument = zlist_next(service->arguments);
+                    argument = argument->next;
                 }
                 igs_json_close_array (json);
             }
@@ -1695,7 +1701,7 @@ char *parser_export_definition_legacy_v3 (igs_definition_t *def)
                         if (r->arguments) {
                             igs_json_add_string (json, STR_ARGUMENTS);
                             igs_json_open_array (json);
-                            igs_service_arg_t *argument = zlist_first(r->arguments);
+                            igs_service_arg_t *argument = r->arguments;
                             while (argument) {
                                 if (argument->name) {
                                     igs_json_open_map (json);
@@ -1707,7 +1713,7 @@ char *parser_export_definition_legacy_v3 (igs_definition_t *def)
                                       s_value_type_to_string (argument->type));
                                     igs_json_close_map (json);
                                 }
-                                argument = zlist_next(r->arguments);
+                                argument = argument->next;
                             }
                             igs_json_close_array (json);
                         }

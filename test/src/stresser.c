@@ -673,6 +673,7 @@ int main(int argc, const char * argv[]) {
         a = zlist_next(agents);
     }
     zlist_destroy(&agents);
-
+    igs_clear_context();
+    
     return EXIT_SUCCESS;
 }

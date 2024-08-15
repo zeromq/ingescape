@@ -2501,7 +2501,12 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     s_lock_zyre_peer (__FUNCTION__, __LINE__);
                     zyre_shouts (context->node, callee_agent->igs_channel, "CALLED %s from %s (%s)", service_name, caller_name, caller_uuid);
                     s_unlock_zyre_peer (__FUNCTION__, __LINE__);
-                    size_t nb_args = zlist_size(service->arguments);
+                    size_t nb_args = 0;
+                    igs_service_arg_t *arg_count = service->arguments;
+                    while (arg_count) {
+                        nb_args++;
+                        arg_count = arg_count->next;
+                    }
                     size_t nb_frames = zmsg_size (msg);
                     igs_service_arg_t *args = NULL;
                     if (nb_frames >= nb_args){
