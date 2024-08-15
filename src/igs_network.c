@@ -431,8 +431,8 @@ void s_subscribe_to_remote_agent_output (igs_remote_agent_t *remote_agent,
     }
 }
 
-int s_network_configure_mapping_to_remote_agent (
-                                                 igsagent_t *agent, igs_remote_agent_t *remote_agent)
+int s_network_configure_mapping_to_remote_agent (igsagent_t *agent,
+                                                 igs_remote_agent_t *remote_agent)
 {
     assert (agent);
     assert (remote_agent);
@@ -450,7 +450,7 @@ int s_network_configure_mapping_to_remote_agent (
                 // check if we find a valid input in our own definition
                 igs_io_t *found_input = NULL;
                 if (agent->definition)
-                    found_input = zhashx_lookup(remote_agent->definition->inputs_table, el->from_input);
+                    found_input = zhashx_lookup(agent->definition->inputs_table, el->from_input);
                 
                 // check type compatibility between input and output value types
                 // including implicit conversions
@@ -771,7 +771,6 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                         // process
                         int pid = atoi (zyre_event_header (zyre_event, "pid"));
                         if (context->process_id == pid) {
-                            // FIXME: certainly useless with new architecture
                             // same ip address and same process : we can use inproc
                             inproc_address = zyre_event_header (zyre_event, "inproc");
                             if (inproc_address) {
@@ -801,19 +800,18 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                         igs_debug ("Subscription created for %s at %s (inproc)",
                                    zyre_peer->name, inproc_address);
                     }
-                    else
-                        if (context->network_allow_ipc && useIPC) {
-                            zyre_peer->subscriber = zsock_new_sub (ipc_address, NULL);
-                            zsock_set_rcvhwm (zyre_peer->subscriber, context->network_hwm_value);
-                            igs_debug ("Subscription created for %s at %s (ipc)",
-                                       zyre_peer->name, ipc_address);
-                        }
-                        else {
-                            zyre_peer->subscriber = zsock_new_sub (endpoint_address, NULL);
-                            zsock_set_rcvhwm (zyre_peer->subscriber, context->network_hwm_value);
-                            igs_debug ("Subscription created for %s at %s (tcp)",
-                                       zyre_peer->name, endpoint_address);
-                        }
+                    else if (context->network_allow_ipc && useIPC) {
+                        zyre_peer->subscriber = zsock_new_sub (ipc_address, NULL);
+                        zsock_set_rcvhwm (zyre_peer->subscriber, context->network_hwm_value);
+                        igs_debug ("Subscription created for %s at %s (ipc)",
+                                   zyre_peer->name, ipc_address);
+                    }
+                    else {
+                        zyre_peer->subscriber = zsock_new_sub (endpoint_address, NULL);
+                        zsock_set_rcvhwm (zyre_peer->subscriber, context->network_hwm_value);
+                        igs_debug ("Subscription created for %s at %s (tcp)",
+                                   zyre_peer->name, endpoint_address);
+                    }
                     assert (zyre_peer->subscriber);
                     
                     if (context->security_is_enabled && peer_public_key) {

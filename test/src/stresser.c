@@ -580,12 +580,7 @@ int main(int argc, const char * argv[]) {
     igs_log_set_stream(true);
     igs_set_command_line_from_args(argc, argv);
     igs_log_set_console(true);
-    igs_log_set_file(true, NULL);
-    if (verbose)
-        igs_log_set_console_level(IGS_LOG_TRACE);
-    else
-        igs_log_set_console_level(IGS_LOG_INFO);
-    
+    igs_log_set_file(true, NULL);    
     igs_log_set_console_level(IGS_LOG_TRACE);
     
     igs_unbind_pipe();
