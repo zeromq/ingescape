@@ -22,6 +22,7 @@ void s_service_free_service_arguments (igs_service_arg_t **args)
 {
     assert(args);
     igs_service_arg_t *arg = *args;
+    igs_service_arg_t *previous = NULL;
     while (arg) {
         if (arg->name){
             free (arg->name);
@@ -31,8 +32,9 @@ void s_service_free_service_arguments (igs_service_arg_t **args)
             free (arg->data);
         else if (arg->type == IGS_STRING_T && arg->c)
             free (arg->c);
-        free (arg);
+        previous = arg;
         arg = arg->next;
+        free (previous);
     }
 }
 
@@ -312,7 +314,7 @@ void service_log_received_service (igsagent_t *agent,
 void igs_service_args_destroy (igs_service_arg_t **list)
 {
     assert(list);
-    if(*list)
+    if(!*list)
         return;
     s_service_free_service_arguments(list);
 }
@@ -561,6 +563,9 @@ igs_result_t igsagent_service_arg_add (igsagent_t *agent,
             break;
     }
     a->type = type;
+    igs_service_arg_t *previous_arg = zlist_last(s->arguments);
+    if (previous_arg)
+        previous_arg->next = a;
     zlist_append(s->arguments, a);
     definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
@@ -588,6 +593,9 @@ igs_result_t igsagent_service_arg_remove (igsagent_t *agent,
     while (arg) {
         if (streq (arg_name, arg->name)) {
             zlist_remove(s->arguments, arg);
+            igs_service_arg_t *previous_arg = zlist_last(s->arguments);
+            if (previous_arg)
+                previous_arg->next = NULL;
             free (arg->name);
             if (arg->type == IGS_DATA_T && arg->data)
                 free (arg->data);
@@ -724,6 +732,9 @@ igs_result_t igsagent_service_reply_arg_add(igsagent_t *agent, const char *servi
             break;
     }
     a->type = type;
+    igs_service_arg_t *previous_arg = zlist_last(r->arguments);
+    if (previous_arg)
+        previous_arg->next = a;
     zlist_append(r->arguments, a);
     definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
@@ -756,6 +767,9 @@ igs_result_t igsagent_service_reply_arg_remove(igsagent_t *agent, const char *se
     while (arg) {
         if (streq (arg_name, arg->name)) {
             zlist_remove(r->arguments, arg);
+            igs_service_arg_t *previous_arg = zlist_last(r->arguments);
+            if (previous_arg)
+                previous_arg->next = NULL;
             free (arg->name);
             if (arg->type == IGS_DATA_T && arg->data)
                 free (arg->data);

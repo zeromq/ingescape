@@ -462,13 +462,16 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                                 }
                                 if (space_in_arg_name)
                                     igs_warn ("Spaces are not allowed in service argument name: %s has been renamed to %s",
-                                              arg_name->u.string,corrected_arg_name);
+                                              arg_name->u.string, corrected_arg_name);
 
                                 igs_service_arg_t *new_arg = (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
                                 new_arg->name = corrected_arg_name;
                                 igs_json_node_t *arg_type = igs_json_node_find (arguments->u.array.values[j], type_path);
                                 if (arg_type && arg_type->type == IGS_JSON_STRING && arg_type->u.string)
                                     new_arg->type = s_string_to_value_type (arg_type->u.string);
+                                igs_service_arg_t *previous_arg = zlist_last(service->arguments);
+                                if (previous_arg)
+                                    previous_arg->next = new_arg;
                                 zlist_append(service->arguments, new_arg);
                             }
                         }
@@ -524,6 +527,9 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                                             igs_json_node_t *arg_type = igs_json_node_find (arguments->u.array.values[len], type_path);
                                             if (arg_type && arg_type->type == IGS_JSON_STRING && arg_type->u.string)
                                                 new_arg->type = s_string_to_value_type (arg_type->u.string);
+                                            igs_service_arg_t *previous_arg = zlist_last(my_reply->arguments);
+                                            if (previous_arg)
+                                                previous_arg->next = new_arg;
                                             zlist_append(my_reply->arguments,new_arg);
                                         }
                                     }

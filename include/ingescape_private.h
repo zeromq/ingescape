@@ -405,6 +405,8 @@ typedef struct igs_core_context {
     zhashx_t *service_cb_wrappers; //service_cb_wrapper_t
     zlist_t *mute_cb_wrappers; //observe_mute_cb_wrapper_t
     zlist_t *agent_event_cb_wrappers; //observe_agent_events_cb_wrapper_t
+    zlist_t *freeze_callbacks; //igs_freeze_wrapper_t
+    zlist_t *external_stop_calbacks; //igs_forced_stop_wrapper_t
 
     // network
     bool network_allow_ipc;
@@ -418,8 +420,6 @@ typedef struct igs_core_context {
     bool network_shall_raise_file_descriptors_limit;
     bool external_stop;
     bool is_frozen;
-    zlist_t *freeze_callbacks; //igs_freeze_wrapper_t
-    zlist_t *external_stop_calbacks; //igs_forced_stop_wrapper_t
     zhash_t *brokers;
     char *advertised_endpoint;
     char *our_broker_endpoint;

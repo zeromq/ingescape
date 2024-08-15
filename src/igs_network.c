@@ -380,9 +380,7 @@ void s_clean_and_free_zyre_peer (igs_zyre_peer_t **zyre_peer, zloop_t *loop)
 {
     assert (zyre_peer);
     assert (*zyre_peer);
-    assert (loop);
-    igs_debug ("cleaning peer %s (%s)", (*zyre_peer)->name,
-               (*zyre_peer)->peer_id);
+    igs_debug ("cleaning peer %s (%s)", (*zyre_peer)->name, (*zyre_peer)->peer_id);
     if ((*zyre_peer)->peer_id)
         free ((*zyre_peer)->peer_id);
     if ((*zyre_peer)->name)
@@ -390,7 +388,8 @@ void s_clean_and_free_zyre_peer (igs_zyre_peer_t **zyre_peer, zloop_t *loop)
     if ((*zyre_peer)->protocol)
         free ((*zyre_peer)->protocol);
     if ((*zyre_peer)->subscriber) {
-        zloop_reader_end (loop, (*zyre_peer)->subscriber);
+        if (loop)
+            zloop_reader_end (loop, (*zyre_peer)->subscriber);
         zsock_destroy (&((*zyre_peer)->subscriber));
     }
     free (*zyre_peer);
@@ -1175,9 +1174,10 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     model_read_write_lock(__FUNCTION__, __LINE__);
                 }
             } else {
-                if (new_definition && !new_definition->name)
+                if (new_definition && !new_definition->name){
                     igs_error ("received definition from remote agent %s(%s) does not contain a name : rejecting", remote_agent_name, uuid);
-                else
+                    definition_free_definition(&new_definition);
+                }else
                     igs_error ("received definition from remote agent %s(%s) is empty or invalid : agent will not be registered",
                                remote_agent_name, uuid);
             }
@@ -2385,7 +2385,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             }
             
             model_read_write_lock(__FUNCTION__, __LINE__);
-            const char *caller_name = name; // default caller name is the one of the peer
+            char *caller_name = strdup(name); // default caller name is the one of the peer
             if (streq (title, CALL_SERVICE_MSG_DEPRECATED))
                 igs_warn ("Remote agent %s(%s) uses an older version of Ingescape with deprecated messages. Please upgrade this agent.",
                           caller_name, caller_uuid);
@@ -2393,9 +2393,8 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             igs_remote_agent_t *caller_agent = zhashx_lookup(context->remote_agents, caller_uuid);
             if (caller_agent) {
                 // replace caller name by the one of an actual agent
-                // NB: this will happen all the time, except when ingeprobe
-                // (which is not an agent) emulates a call.
-                caller_name = caller_agent->definition->name;
+                free(caller_name);
+                caller_name = strdup(caller_agent->definition->name);
             }
             
             igsagent_t *callee_agent = zhashx_lookup(context->agents, callee_uuid);
@@ -2403,6 +2402,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 igs_error ("no callee agent with uuid '%s' in %s message received from %s(%s): rejecting", callee_uuid, title, name, peerUUID);
                 free (callee_uuid);
                 free (caller_uuid);
+                free(caller_name);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
                 model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -2416,6 +2416,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                            title, name, peerUUID);
                 free (caller_uuid);
                 free (callee_uuid);
+                free(caller_name);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
                 model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -2428,6 +2429,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                            title, name, peerUUID);
                 free (caller_uuid);
                 free (callee_uuid);
+                free(caller_name);
                 free (service_name);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
@@ -2496,6 +2498,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             }
             free (caller_uuid);
             free (callee_uuid);
+            free(caller_name);
             free (service_name);
             if (token)
                 free (token);
@@ -2927,7 +2930,32 @@ static void s_run_loop (zsock_t *mypipe, void *args)
     
     s_network_lock ();
     igs_debug ("loop stopping..."); // clean dynamic part of the context
+    zloop_destroy (&context->loop);
+    context->internal_pipe = NULL;
     
+    // zmq stack cleaning
+    igs_debug ("cleaning network stack...");
+    s_lock_zyre_peer(__FUNCTION__, __LINE__);
+    zyre_stop (context->node);
+    zyre_destroy (&context->node);
+    s_unlock_zyre_peer(__FUNCTION__, __LINE__);
+    zsock_destroy (&context->publisher);
+    zsock_destroy (&context->ipc_publisher);
+    igs_debug ("cleaning internall communication stack...");
+#if defined(__UNIX__) && !defined(__UTYPE_IOS)
+    zsys_file_delete (context->network_ipc_full_path); // destroy ipc_path in file system
+    // NB: ipc_path is based on peer id which is unique. It will never be used again.
+    free (context->network_ipc_full_path);
+    context->network_ipc_full_path = NULL;
+#endif
+#if !defined(__UTYPE_IOS)
+    if (context->inproc_publisher)
+        zsock_destroy (&context->inproc_publisher);
+#endif
+    if (context->logger)
+        zsock_destroy (&context->logger);
+    
+    igs_debug ("cleaning network structures...");
     igs_remote_agent_t *remote = zhashx_first(context->remote_agents);
     while (remote) {
         zhashx_delete(context->remote_agents, remote->uuid);
@@ -2942,35 +2970,12 @@ static void s_run_loop (zsock_t *mypipe, void *args)
         zyre_peer = zhashx_next(context->zyre_peers);
     }
     
-    zloop_destroy (&context->loop);
-    
     igs_timer_t *current_timer = zlist_first(context->timers);
     while (current_timer) {
         zlist_remove(context->timers, current_timer);
         free(current_timer);
         current_timer = zlist_next(context->timers);
     }
-    
-    // zmq stack cleaning
-    s_lock_zyre_peer(__FUNCTION__, __LINE__);
-    zyre_stop (context->node);
-    zyre_destroy (&context->node);
-    s_unlock_zyre_peer(__FUNCTION__, __LINE__);
-    zsock_destroy (&context->publisher);
-    zsock_destroy (&context->ipc_publisher);
-#if defined(__UNIX__) && !defined(__UTYPE_IOS)
-    zsys_file_delete (context->network_ipc_full_path); // destroy ipc_path in file system
-    // NB: ipc_path is based on peer id which is unique. It will never be used
-    // again.
-    free (context->network_ipc_full_path);
-    context->network_ipc_full_path = NULL;
-#endif
-#if !defined(__UTYPE_IOS)
-    if (context->inproc_publisher)
-        zsock_destroy (&context->inproc_publisher);
-#endif
-    if (context->logger)
-        zsock_destroy (&context->logger);
     
     // clean remaining dynamic data
     if (context->replay_channel) {
@@ -2988,9 +2993,9 @@ static void s_run_loop (zsock_t *mypipe, void *args)
     if (context->security_auth)
         zactor_destroy (&(context->security_auth));
     
-    context->internal_pipe = NULL;
     igs_debug ("loop stopped");
-    zstr_send (mypipe, "LOOP_STOPPED");
+    if (context->network_actor)
+        zstr_send (mypipe, "LOOP_STOPPED");
     
     // handle external stop if needed
     if (context->external_stop) {

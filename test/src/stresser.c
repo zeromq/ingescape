@@ -28,7 +28,7 @@
 #define STRESS_CHANGE_STATE_PERIOD 200
 #define STRESS_CHANGE_DEFINITION_PERIOD 1000 //NB: s_trigger_definition_update is called every second
 #define STRESS_CHANGE_MAPPING_PERIOD 1000 //NB: s_trigger_mapping_update is called every second
-#define STRESS_PUBLISH_PERIOD 50 //min tried: 5, must be a minimum of 2ms (see stress_publish) * nb of agents not to saturate the thread's zloop
+#define STRESS_PUBLISH_PERIOD 100 //min tried: 5, must be a minimum of 2ms (see stress_publish) * nb of agents not to saturate the thread's zloop
 #define STRESS_ELECTIONS_PERIOD 500
 
 #define PORT 5669
