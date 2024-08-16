@@ -53,7 +53,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "--device en0 --port 5670"
+            argument = "--device en0 --port 5669"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument

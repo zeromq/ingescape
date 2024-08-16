@@ -25,21 +25,25 @@ void s_split_trigger_send_message_to_worker (igs_core_context_t *context,
     assert(agent_uuid);
     assert(output);
 
-    igs_splitter_t *splitter = zlist_first(context->splitters);
+    zlist_t *splitters = zlist_dup(context->splitters);
+    igs_splitter_t *splitter = zlist_first(splitters);
     while (splitter) {
         if(streq(splitter->agent_uuid, agent_uuid) && streq(splitter->output_name, output->name)){
             igs_worker_t *max_credit_worker = NULL;
-            igs_worker_t *worker = max_credit_worker = zlist_first(splitter->workers);
+            zlist_t *workers = zlist_dup(splitter->workers);
+            igs_worker_t *worker = max_credit_worker = zlist_first(workers);
             while (worker) {
                 if(max_credit_worker->credit < worker->credit //take worker with more credits
                    || (max_credit_worker->credit == worker->credit //take worker with same credits but less uses
                        && worker->uses < max_credit_worker->uses))
                     max_credit_worker = worker;
-                worker = zlist_next(splitter->workers);
+                worker = zlist_next(workers);
             }
+            zlist_destroy(&workers);
             if(max_credit_worker && max_credit_worker->credit > 0){
                 igs_queued_work_t *work = zlist_first(splitter->queued_works);
                 if(work){
+                    char *max_credit_worker_uuid = strdup(max_credit_worker->agent_uuid);
                     zmsg_t *readyMessage = zmsg_new();
                     zmsg_addstr(readyMessage, SPLITTER_WORK_MSG);
                     zmsg_addstr(readyMessage, splitter->agent_uuid );
@@ -69,11 +73,23 @@ void s_split_trigger_send_message_to_worker (igs_core_context_t *context,
                         default:
                             break;
                     }
+                    
+                    zlist_remove(splitter->queued_works, work);
+                    if(work->value_type == IGS_STRING_T)
+                        free(work->value.s);
+                    else if (work->value_type == IGS_DATA_T)
+                        free(work->value.data);
+                    free(work);
+                    max_credit_worker->uses++;
+                    max_credit_worker->credit--;
+                    
                     if (context->node) {
-                        igsagent_t *local_agent = zhashx_first(context->agents);
+                        zlistx_t *agents = zhashx_values(context->agents);
+                        igsagent_t *local_agent = zlistx_first(agents);
                         while (local_agent) {
                             if(streq(local_agent->uuid, agent_uuid)){
-                                igs_remote_agent_t *remote_agent = zhashx_first(context->remote_agents);
+                                zlistx_t *remote_agents = zhashx_values(context->remote_agents);
+                                igs_remote_agent_t *remote_agent = zlistx_first(remote_agents);
                                 while (remote_agent) {
                                     if(streq(remote_agent->uuid, max_credit_worker->agent_uuid)){
                                         s_lock_zyre_peer(__FUNCTION__, __LINE__);
@@ -87,28 +103,25 @@ void s_split_trigger_send_message_to_worker (igs_core_context_t *context,
                                                      max_credit_worker->input_name);
                                         s_unlock_zyre_peer(__FUNCTION__, __LINE__);
                                     }
-                                    remote_agent = zhashx_next(context->remote_agents);
+                                    remote_agent = zlistx_next(remote_agents);
                                 }
+                                zlistx_destroy(&remote_agents);
                             }
-                            local_agent = zhashx_next(context->agents);
+                            local_agent = zlistx_next(agents);
                         }
+                        zlistx_destroy(&agents);
                     }
-                    igs_channel_whisper_zmsg(max_credit_worker->agent_uuid, &readyMessage);
-                    
-                    zlist_remove(splitter->queued_works, work);
-                    if(work->value_type == IGS_STRING_T)
-                        free(work->value.s);
-                    else if (work->value_type == IGS_DATA_T)
-                        free(work->value.data);
-                    free(work);
-                    max_credit_worker->uses++;
-                    max_credit_worker->credit--;
+                    model_read_write_unlock(__FUNCTION__, __LINE__);
+                    igs_channel_whisper_zmsg(max_credit_worker_uuid, &readyMessage);
+                    free(max_credit_worker_uuid);
+                    model_read_write_lock(__FUNCTION__, __LINE__);
                 }
             }
             break;
         }
-        splitter = zlist_next(context->splitters);
+        splitter = zlist_next(splitters);
     }
+    zlist_destroy(&splitters);
 }
 
 void s_split_add_credit_to_worker (igs_core_context_t *context, char* agent_uuid, igs_io_t* output,
@@ -238,6 +251,7 @@ void split_remove_worker (igs_core_context_t *context, char *uuid, char *input_n
             worker = zlist_next(splitter->workers);
         }
         if(zlist_size(splitter->workers) == 0){
+            zlist_destroy(&splitter->workers);
             zlist_remove(context->splitters, splitter);
             free(splitter->agent_uuid);
             free(splitter->output_name);
@@ -251,7 +265,7 @@ void split_remove_worker (igs_core_context_t *context, char *uuid, char *input_n
                 free(work_elt);
                 work_elt = zlist_next(splitter->queued_works);
             }
-            free(splitter->queued_works);
+            zlist_destroy(&splitter->queued_works);
             free(splitter);
         }
         splitter = zlist_next(context->splitters);
@@ -280,7 +294,8 @@ void split_add_work_to_queue (igs_core_context_t *context,
     assert(agent_uuid);
     assert(output);
     assert(output->name);
-    igs_splitter_t *splitter = zlist_first(context->splitters);
+    zlist_t *splitters = zlist_dup(context->splitters);
+    igs_splitter_t *splitter = zlist_first(splitters);
     while (splitter) {
         assert(splitter->workers);
         if(streq(splitter->agent_uuid, agent_uuid)
@@ -313,13 +328,11 @@ void split_add_work_to_queue (igs_core_context_t *context,
             zlist_append(splitter->queued_works, new_work);
         }
         s_split_trigger_send_message_to_worker(context, agent_uuid, output);
-        splitter = zlist_next(context->splitters);
+        splitter = zlist_next(splitters);
     }
+    zlist_destroy(&splitters);
 }
 
-////////////////////////////////////////////////////////////////////////
-// Handler for message from worker or splitter
-////////////////////////////////////////////////////////////////////////
 int split_message_from_worker (char *command, zmsg_t *msg, igs_core_context_t *context)
 {
     assert(command);
@@ -355,20 +368,18 @@ int split_message_from_worker (char *command, zmsg_t *msg, igs_core_context_t *c
             free(outputName);
             return 1;
         }
-        igsagent_t *agent = zhashx_first(context->agents);
-        while (agent) {
-            if(streq(agent_uuid, agent->uuid)){
-                igs_io_t *io = zhashx_first(agent->definition->outputs_table);
-                while (io) {
-                    if (streq(outputName, io->name)){
-                        s_split_add_credit_to_worker(context, agent->uuid, io, worker_uuid, inputName, credit, true);
-                        break;
-                    }
-                    io = zhashx_next(agent->definition->outputs_table);
+        igsagent_t *agent = zhashx_lookup(context->agents, agent_uuid);
+        if (agent) {
+            igs_io_t *io = zhashx_first(agent->definition->outputs_table);
+            while (io) {
+                if (streq(outputName, io->name)){
+                    s_split_add_credit_to_worker(context, agent->uuid, io, worker_uuid, inputName, credit, true);
+                    break;
                 }
+                io = zhashx_next(agent->definition->outputs_table);
             }
-            agent = zhashx_next(context->agents);
-        }
+        } else
+            igs_error("%s is not a known UUID for our agents", agent_uuid);
         free(creditStr);
         free(agent_uuid);
     }else if(streq(command, WORKER_READY_MSG)){
@@ -451,7 +462,7 @@ int split_message_from_splitter (zmsg_t *msg, igs_core_context_t *context)
     char * value = NULL;
     if (valueType == IGS_STRING_T){
         value = zmsg_popstr(msg);
-        if (value == NULL){
+        if (!value){
             igs_error("value is NULL in received publication : rejecting");
             free(agent_uuid);
             free(inputName);
@@ -509,7 +520,9 @@ int split_message_from_splitter (zmsg_t *msg, igs_core_context_t *context)
     zmsg_addstr(readyMessage, worker_uuid);
     zmsg_addstr(readyMessage, inputName);
     zmsg_addstr(readyMessage, outputName);
+    model_read_write_unlock(__FUNCTION__, __LINE__);
     igs_channel_whisper_zmsg(agent_uuid, &readyMessage);
+    model_read_write_lock(__FUNCTION__, __LINE__);
     free(worker_uuid);
     free(agent_uuid);
     free(inputName);
@@ -632,9 +645,9 @@ uint64_t igsagent_split_add (igsagent_t *agent,
         mapping_update_json(agent->mapping);
         agent->network_need_to_send_mapping_update = true;
 
-        // If agent is already known send HELLO message immediately
+        // If agent is already known send WORKER_HELLO_MSG immediately
         igs_remote_agent_t *remote = zhashx_first(core_context->remote_agents);
-        while (remote) {
+        while (remote && remote->uuid) {
             if (streq (remote->definition->name, to_agent)) {
                 zmsg_t *ready_message = zmsg_new ();
                 zmsg_addstr (ready_message, WORKER_HELLO_MSG);
@@ -642,11 +655,16 @@ uint64_t igsagent_split_add (igsagent_t *agent,
                 zmsg_addstr (ready_message, from_our_input);
                 zmsg_addstr (ready_message, with_output);
                 zmsg_addstrf (ready_message, "%i", IGS_DEFAULT_WORKER_CREDIT);
-                igs_channel_whisper_zmsg (remote->uuid, &ready_message);
+                char *remote_uuid = strdup(remote->uuid);
+                model_read_write_unlock(__FUNCTION__, __LINE__);
+                igs_channel_whisper_zmsg (remote_uuid, &ready_message);
+                model_read_write_lock(__FUNCTION__, __LINE__);
+                free(remote_uuid);
             }
             remote = zhashx_next(core_context->remote_agents);
         }
     }
+        
     else
         igsagent_warn (agent, "split combination %s->%s.%s already exists : will not be duplicated",
                        reviewed_from_our_input, reviewed_to_agent, reviewed_with_output);
@@ -681,17 +699,17 @@ igs_result_t igsagent_split_remove_with_id (igsagent_t *agent,
         return IGS_FAILURE;
     } else {
         zlist_remove(agent->mapping->split_elements, el);
+        mapping_update_json(agent->mapping);
+        agent->network_need_to_send_mapping_update = true;
         zmsg_t *goodbye_message = zmsg_new ();
         zmsg_addstr (goodbye_message, WORKER_GOODBYE_MSG);
         zmsg_addstr (goodbye_message, agent->uuid);
         zmsg_addstr (goodbye_message, el->from_input);
         zmsg_addstr (goodbye_message, el->to_output);
+        model_read_write_unlock(__FUNCTION__, __LINE__);
         igs_channel_whisper_zmsg (el->to_agent, &goodbye_message);
         split_free_split_element(&el);
-        mapping_update_json(agent->mapping);
-        agent->network_need_to_send_mapping_update = true;
     }
-    model_read_write_unlock(__FUNCTION__, __LINE__);
     return IGS_SUCCESS;
 }
 
@@ -733,16 +751,16 @@ igs_result_t igsagent_split_remove_with_name (igsagent_t *agent,
         return IGS_FAILURE;
     }else{
         zlist_remove(agent->mapping->split_elements, el);
-        zmsg_t *goodbye_message = zmsg_new ();
-        zmsg_addstr (goodbye_message, WORKER_GOODBYE_MSG);
-        zmsg_addstr (goodbye_message, agent->uuid);
-        zmsg_addstr (goodbye_message, tmp->from_input);
-        zmsg_addstr (goodbye_message, tmp->to_output);
-        igs_channel_whisper_zmsg (el->to_agent, &goodbye_message);
         split_free_split_element (&el);
         mapping_update_json(agent->mapping);
         agent->network_need_to_send_mapping_update = true;
+        zmsg_t *goodbye_message = zmsg_new ();
+        zmsg_addstr (goodbye_message, WORKER_GOODBYE_MSG);
+        zmsg_addstr (goodbye_message, agent->uuid);
+        zmsg_addstr (goodbye_message, from_our_input);
+        zmsg_addstr (goodbye_message, with_output);
+        model_read_write_unlock(__FUNCTION__, __LINE__);
+        igs_channel_whisper_zmsg (to_agent, &goodbye_message);
     }
-    model_read_write_unlock(__FUNCTION__, __LINE__);
     return IGS_SUCCESS;
 }

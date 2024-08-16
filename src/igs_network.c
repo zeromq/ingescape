@@ -1075,7 +1075,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             igs_definition_t *new_definition = parser_load_definition (str_definition);
             if (new_definition && new_definition->name) {
                 definition_update_json (new_definition);
-                bool is_agent_new = false;
+                bool is_remote_agent_new = false;
                 igs_remote_agent_t *remote_agent = zhashx_lookup(context->remote_agents, uuid);
                 if (!remote_agent) {
                     remote_agent = (igs_remote_agent_t *) zmalloc (sizeof (igs_remote_agent_t));
@@ -1088,7 +1088,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     remote_agent->definition = new_definition;
                     zhashx_insert(context->remote_agents, remote_agent->uuid, remote_agent);
                     igs_debug ("registering agent %s(%s)", uuid, remote_agent_name);
-                    is_agent_new = true;
+                    is_remote_agent_new = true;
                 } else {
                     // else we already know this agent, its definition (possibly including name)
                     // has been updated
@@ -1112,7 +1112,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     agent = zhashx_next(context->agents);
                 }
                 
-                if (is_agent_new) {
+                if (is_remote_agent_new) {
                     // notify remote agent that our agents knows it
                     s_lock_zyre_peer (__FUNCTION__, __LINE__);
                     zmsg_t *msg_know = zmsg_new ();
@@ -1121,31 +1121,24 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     zyre_whisper (node, peerUUID, &msg_know);
                     s_unlock_zyre_peer (__FUNCTION__, __LINE__);
                     
-                    // Send ready message for splitter creation if a split exist with
+                    // Send hello message for splitter creation if a split exists with
                     // the new remote agent.
                     igsagent_t *elt_agent = zhashx_first(context->agents);
                     while (elt_agent) {
-                        bool found_split_element = false;
-                        char *input_split_element;
-                        char *output_split_element;
                         igs_split_t *elt = zlist_first(elt_agent->mapping->split_elements);
                         while (elt) {
-                            if (elt && streq (elt->to_agent,remote_agent->definition->name)) {
-                                found_split_element = true;
-                                input_split_element = elt->from_input;
-                                output_split_element = elt->to_output;
-                                break;
+                            if (streq (elt->to_agent, remote_agent_name)) {
+                                zmsg_t *ready_message = zmsg_new ();
+                                zmsg_addstr (ready_message, WORKER_HELLO_MSG);
+                                zmsg_addstr (ready_message, elt_agent->uuid);
+                                zmsg_addstr (ready_message, elt->from_input);
+                                zmsg_addstr (ready_message, elt->to_output);
+                                zmsg_addstrf (ready_message, "%i",IGS_DEFAULT_WORKER_CREDIT);
+                                model_read_write_unlock(__FUNCTION__, __LINE__);
+                                igs_channel_whisper_zmsg (remote_agent->uuid, &ready_message);
+                                model_read_write_lock(__FUNCTION__, __LINE__);
                             }
                             elt = zlist_next(elt_agent->mapping->split_elements);
-                        }
-                        if (found_split_element) {
-                            zmsg_t *ready_message = zmsg_new ();
-                            zmsg_addstr (ready_message, WORKER_HELLO_MSG);
-                            zmsg_addstr (ready_message, elt_agent->uuid);
-                            zmsg_addstr (ready_message, input_split_element);
-                            zmsg_addstr (ready_message,output_split_element);
-                            zmsg_addstrf (ready_message, "%i",IGS_DEFAULT_WORKER_CREDIT);
-                            igs_channel_whisper_zmsg (remote_agent->uuid,&ready_message);
                         }
                         elt_agent = zhashx_next(context->agents);
                     }
@@ -2619,9 +2612,9 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             }
             model_read_write_unlock(__FUNCTION__, __LINE__);
         }
-        else if (streq (title, WORKER_GOODBYE_MSG)
-                 || streq (title, WORKER_HELLO_MSG)
-                 || streq (title, WORKER_READY_MSG)){
+        else if (streq (title, WORKER_HELLO_MSG)
+                 || streq (title, WORKER_READY_MSG)
+                 || streq (title, WORKER_GOODBYE_MSG)){
             model_read_write_lock(__FUNCTION__, __LINE__);
             split_message_from_worker (title, msg_duplicate, context);
             model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -2702,15 +2695,19 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             else {
                 zlistx_t *remote_agents = zhashx_values(context->remote_agents);
                 igs_remote_agent_t *remote = zlistx_first(remote_agents);
-                while (remote) {
+                while (remote && remote->uuid) {
                     // destroy all remote agents attached to this peer
                     if (streq (remote->peer->peer_id, zyre_peer->peer_id)) {
                         split_remove_worker (context, remote->uuid, NULL);
                         zhashx_delete(context->remote_agents, remote->uuid);
-                        model_read_write_unlock(__FUNCTION__, __LINE__);
-                        agent_LOCKED_propagate_agent_event (IGS_AGENT_EXITED, remote->uuid, remote->definition->name, NULL);
-                        model_read_write_lock(__FUNCTION__, __LINE__);
+                        char *remote_uuid = strdup(remote->uuid);
+                        char *remote_name = strdup(remote->definition->name);
                         s_clean_and_free_remote_agent (&remote);
+                        model_read_write_unlock(__FUNCTION__, __LINE__);
+                        agent_LOCKED_propagate_agent_event (IGS_AGENT_EXITED, remote_uuid, remote_name, NULL);
+                        model_read_write_lock(__FUNCTION__, __LINE__);
+                        free(remote_uuid);
+                        free(remote_name);
                     }
                     remote = zlistx_next(remote_agents);
                 }
@@ -2909,7 +2906,7 @@ int s_manage_parent (zloop_t *loop, zsock_t *pipe, void *arg)
         free (fake_remote);
         free (name);
         if (core_context->monitor_pipe_stack)
-            printf("***HANDLE_PUBLICATION - %d (max: %d)\n", --handle_publications_balance, handle_publications_balance_max);
+            printf("---HANDLE_PUBLICATION - %d (max: %d)\n", --handle_publications_balance, handle_publications_balance_max);
         model_read_write_unlock(__FUNCTION__, __LINE__);
     }
     //else: nothing to do so far
@@ -3568,9 +3565,9 @@ igs_result_t network_publish_output (igsagent_t *agent, const igs_io_t *io)
             if (core_context->monitor_pipe_stack){
                 if (++handle_publications_balance > handle_publications_balance_max)
                     handle_publications_balance_max = handle_publications_balance;
-                printf("HANDLE_PUBLICATION - %d (max: %d)\n", handle_publications_balance, handle_publications_balance_max);
+                printf("+++HANDLE_PUBLICATION - %d (max: %d)\n", handle_publications_balance, handle_publications_balance_max);
             }
-            zsock_t *pipe = zactor_sock (agent->context->network_actor);
+            zsock_t *pipe = zactor_sock(agent->context->network_actor);
             if (pipe){
                 zmsg_pushstr(msg, agent->definition->name);
                 zmsg_pushstr(msg, "HANDLE_PUBLICATION");

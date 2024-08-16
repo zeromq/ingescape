@@ -506,6 +506,73 @@ INGESCAPE_EXPORT bool mapping_check_input_output_compatibility(igsagent_t *agent
 INGESCAPE_EXPORT void mapping_update_json (igs_mapping_t *mapping);
 
 // split
+/*
+ Splits are a load balancing mechanism replacing classic dataflows in Ingescape.
+ Theyt create specific connections between inputs and outputs, relying on credits
+ and availability, so that publications on an ouput are split (or balanced) between
+ receiving agents (on one or several on their inputs).
+ 
+ Splits are declarations similar to mapping links, involving an input of an agent
+ and an output of a remote agent. Splitters are structures on a publishing agent,
+ orchestrating publications on its outputs to actually balance them. This balance
+ is achieved between a set of declared Workers, which are remote agents, ready
+ to receive publications on their inputs, using the balancing mechanism, instead
+ of classic dataflow. A Splitter and its Workers use a mechanism of credits and
+ number of uses to define the available workers and the one that should be used
+ in priority. A Splitter stores a list of Works to be distributed between the
+ available Workers depending on the defined splits.
+ 
+ Splits are created either using the API, a mapping file or instuctions sent
+ through private messages (coming from Circle, using ADD_SPLIT_ENTRY_MSG). They
+ are then part of the model and stored in agent->mapping->split_elements.
+ 
+ If a split is created  while the agent is started, a WORKER_HELLO_MSG is sent
+ immeditaley to relevant remote agents (i.e. remote agents invovled in the splitter).
+ In the mean time, when a remote agent enters, if it is involed in a split, it also
+ receives a WORKER_HELLO_MSG.
+ 
+ Upon receiving a WORKER_HELLO_MSG, an agent calls s_split_add_credit_to_worker,
+ which searches for or creates a splitter if needed. The splitter is dedicated
+ to one of our outputs. Then a worker is searched for or created and receives
+ new credits, meaning it is available for work. Workers are dedicated to the
+ relation with a specific input of a remote agent involved in the split.
+ For an output of our agent are a set of Splitters. For an input of a remote
+ agent are a set of Workers.
+ 
+ At the end of the call to s_split_add_credit_to_worker,
+ s_split_trigger_send_message_to_worker is called for our output. This call
+ iterates on our Splitters, Workers and Works, using the credits and number
+ of uses to execute the Works with the best available Workers. It sends a
+ SPLITTER_WORK_MSG to the remote agents corresponding to the selected Worker
+ for a given Work, i.e. a publication with its value type and data.
+ 
+ s_split_trigger_send_message_to_worker is called by :
+ - s_split_add_credit_to_worker (upon receiving WORKER_HELLO_MSG or WORKER_READY_MSG),
+ - split_add_work_to_queue called from network_publish_output
+ 
+ Upon receiving SPLITTER_WORK_MSG, split_message_from_splitter is called.
+ This function writes the received data on our proper input. It then sends
+ a WORKER_READY_MSG to the sender, indicating that we are ready for new
+ Work.
+ 
+ Upon receiving WORKER_READY_MSG, our agent calls s_split_add_credit_to_worker,
+ which runs again the machanism to send our Works to available Workers.
+ 
+ WORKER_GOODBYE_MSG is sent when an agent removes a given Split.
+ Upon receiving WORKER_GOODBYE_MSG, split_remove_worker is called
+ with the effect of removing our Workers for this agent in all our
+ Splitters. NB: if a Splitter looses its last Worker, it is destroyed
+ as well and so are the pending Works. The Splitter will be recreated
+ if a new Worker appears.
+ 
+ NB: s_split_trigger_send_message_to_worker contains a call to
+ igs_channel_whisper_zmsg which needs to bu unclocked. At the moment,
+ all the calls to s_split_trigger_send_message_to_worker are done
+ inside a lock. That is why s_split_trigger_send_message_to_worker
+ unlkocks its call to igs_channel_whisper_zmsg. Future evolutions
+ of the code need to check and maintain this.
+ 
+ */
 INGESCAPE_EXPORT void split_free_split_element (igs_split_t **split_elmt);
 INGESCAPE_EXPORT void split_free_splitter (igs_splitter_t **splitter);
 INGESCAPE_EXPORT igs_split_t* split_create_split_element(const char * from_input,

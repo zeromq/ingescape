@@ -294,8 +294,6 @@ void igs_clear_context (void)
     
     zhashx_destroy(&core_context->agents);
     
-    assert(zhashx_size(core_context->remote_agents)==0);
-    
     igs_splitter_t *splitter = zlist_first(core_context->splitters);
     while (splitter) {
         zlist_remove(core_context->splitters, splitter);
@@ -1125,12 +1123,11 @@ size_t igs_split_count (void)
 }
 
 uint64_t igs_split_add (const char *from_our_input,
-                             const char *to_agent,
-                             const char *with_output)
+                        const char *to_agent,
+                        const char *with_output)
 {
     core_init_agent ();
-    return igsagent_split_add (core_agent, from_our_input, to_agent,
-                                with_output);
+    return igsagent_split_add (core_agent, from_our_input, to_agent, with_output);
 }
 
 igs_result_t igs_split_remove_with_id (uint64_t the_id)
@@ -1145,7 +1142,7 @@ igs_result_t igs_split_remove_with_name (const char *from_our_input,
 {
     core_init_agent ();
     return igsagent_split_remove_with_name (core_agent, from_our_input,
-                                             to_agent, with_output);
+                                            to_agent, with_output);
 }
 
 // admin
