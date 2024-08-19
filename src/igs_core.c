@@ -320,10 +320,9 @@ void igs_clear_context (void)
 void core_init_agent (void)
 {
     core_init_context ();
-    if (core_agent == NULL) {
-        core_agent = igsagent_new (IGS_DEFAULT_AGENT_NAME, false);
+    if (!core_agent) {
+        core_agent = igsagent_new (IGS_DEFAULT_AGENT_NAME, true);
         core_agent->context = core_context;
-        igsagent_activate (core_agent);
     }
 }
 
@@ -1400,7 +1399,7 @@ bool igs_rt_timestamps(void){
 }
 
 void igs_rt_set_time(int64_t microseconds){
-    core_init_context();
+    core_init_agent ();
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_info("set rt time to %lld", microseconds);
     core_context->rt_current_microseconds = microseconds;
@@ -1425,17 +1424,17 @@ void igs_rt_set_time(int64_t microseconds){
 }
 
 int64_t igs_rt_time(void){
-    core_init_context();
+    core_init_agent ();
     return core_context->rt_current_microseconds;
 }
 
 void igs_rt_set_synchronous_mode(bool enable){
-    core_init_agent();
+    core_init_agent ();
     igsagent_rt_set_synchronous_mode(core_agent, enable);
 }
 
 bool igs_rt_synchronous_mode(void){
-    core_init_agent();
+    core_init_agent ();
     return igsagent_rt_synchronous_mode(core_agent);
 }
 

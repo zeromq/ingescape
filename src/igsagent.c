@@ -61,7 +61,6 @@ igsagent_t *igsagent_new (const char *name, bool activate_immediately)
     
     igsagent_clear_definition (agent); // set valid but empty definition, preserve name
     igsagent_set_name (agent, name);
-    assert (agent->definition);
     igsagent_clear_mappings (agent); // set valid but empty mapping
     if (activate_immediately)
         igsagent_activate (agent);
@@ -193,7 +192,7 @@ igs_result_t igsagent_activate (igsagent_t *agent)
     char *json = strdup(agent->definition->json);
     
     model_read_write_unlock(__FUNCTION__, __LINE__);
-    // notify all other agents inside our context that we have arrived
+    // notify all other agents inside our context that we have activated
     agent_LOCKED_propagate_agent_event (IGS_AGENT_ENTERED, uuid, name, json);
     agent_LOCKED_propagate_agent_event (IGS_AGENT_KNOWS_US, uuid, name, NULL);
     //FIXME: shall we send an IGS_AGENT_UPDATED_MAPPING event here ?

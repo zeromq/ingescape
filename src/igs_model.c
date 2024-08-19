@@ -1353,18 +1353,18 @@ igs_io_t *model_find_io_by_name (igsagent_t *agent,
 
 void igs_log_include_data (bool enable)
 {
-    core_init_context ();
+    core_init_agent ();
     core_context->enable_data_logging = enable;
 }
 
 void igs_log_include_services (bool enable)
 {
-    core_init_context ();
+    core_init_agent ();
     core_context->enable_service_logging = enable;
 }
 
 void igs_log_no_warning_if_undefined_service(bool enable){
-    core_init_context ();
+    core_init_agent ();
     core_context->allow_undefined_services = enable;
 }
 

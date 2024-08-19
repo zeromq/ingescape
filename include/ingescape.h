@@ -116,6 +116,10 @@ typedef enum{
 ///////////////////////////////////////////
 // Agent initialization, control and events
 
+//agent name
+INGESCAPE_EXPORT void igs_agent_set_name(const char *name); //(the first function to call)
+INGESCAPE_EXPORT char * igs_agent_name(void); //caller owns returned value
+
 //start & stop ingescape
 INGESCAPE_EXPORT igs_result_t igs_start_with_device(const char *network_device, unsigned int port);
 INGESCAPE_EXPORT igs_result_t igs_start_with_ip(const char *ip_address, unsigned int port);
@@ -147,10 +151,6 @@ INGESCAPE_EXPORT void igs_observe_forced_stop(igs_forced_stop_fn cb,
 INGESCAPE_EXPORT zsock_t * igs_pipe_to_ingescape(void);
 //zeromq pipe to send messages from the ingescape thread, i.e. from inside ingescape callbacks
 INGESCAPE_EXPORT zsock_t * igs_pipe_inside_ingescape(void);
-
-//agent name
-INGESCAPE_EXPORT void igs_agent_set_name(const char *name);
-INGESCAPE_EXPORT char * igs_agent_name(void); //caller owns returned value
 
 //agent uuid
 INGESCAPE_EXPORT char * igs_agent_uuid(void); //caller owns returned value

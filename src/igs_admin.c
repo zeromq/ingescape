@@ -295,19 +295,19 @@ void admin_log (igsagent_t *agent,
 
 void igs_log_set_console_level (igs_log_level_t level)
 {
-    core_init_context ();
+    core_init_agent ();
     core_context->log_level = level;
 }
 
 igs_log_level_t igs_log_console_level (void)
 {
-    core_init_context ();
+    core_init_agent ();
     return core_context->log_level;
 }
 
 void igs_log_set_file (bool allow, const char *path)
 {
-    core_init_context ();
+    core_init_agent ();
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (allow != core_context->log_in_file) {
         core_context->log_in_file = allow;
@@ -386,24 +386,24 @@ void igs_log_set_file (bool allow, const char *path)
 
 bool igs_log_file (void)
 {
-    core_init_context ();
+    core_init_agent ();
     return core_context->log_in_file;
 }
 
 void igs_log_set_console (bool allow)
 {
-    core_init_context ();
+    core_init_agent ();
     core_context->log_in_console = allow;
 }
 
 bool igs_log_console (void)
 {
-    core_init_context ();
+    core_init_agent ();
     return core_context->log_in_console;
 }
 
 void igs_log_set_syslog (bool allow){
-    core_init_context ();
+    core_init_agent ();
     model_read_write_lock(__FUNCTION__, __LINE__);
     core_context->log_in_syslog = allow;
 #if defined (__UNIX__)
@@ -415,25 +415,25 @@ void igs_log_set_syslog (bool allow){
 }
 
 bool igs_log_syslog(void){
-    core_init_context ();
+    core_init_agent ();
     return core_context->log_in_syslog;
 }
 
 void igs_log_set_console_color (bool allow)
 {
-    core_init_context ();
+    core_init_agent ();
     core_context->use_color_in_console = allow;
 }
 
 bool igs_log_console_color (void)
 {
-    core_init_context ();
+    core_init_agent ();
     return core_context->use_color_in_console;
 }
 
 void igs_log_set_stream (bool stream)
 {
-    core_init_context ();
+    core_init_agent ();
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (stream != core_context->log_in_stream) {
         core_context->log_in_stream = stream;
@@ -456,7 +456,7 @@ void igs_log_set_stream (bool stream)
 
 bool igs_log_stream (void)
 {
-    core_init_context ();
+    core_init_agent ();
     return core_context->log_in_stream;
 }
 
@@ -467,7 +467,7 @@ void igs_log_set_file_path (const char *path)
 
 char *igs_log_file_path (void)
 {
-    core_init_context ();
+    core_init_agent ();
     model_read_write_lock(__FUNCTION__, __LINE__);
     char *res = (strlen(core_context->log_file_path)>0) ? strdup (core_context->log_file_path) : NULL;
     model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -476,12 +476,12 @@ char *igs_log_file_path (void)
 
 void igs_log_set_file_level (igs_log_level_t level)
 {
-    core_init_context ();
+    core_init_agent ();
     core_context->log_file_level = level;
 }
 
 void igs_log_set_file_max_line_length (size_t size)
 {
-    core_init_context ();
+    core_init_agent ();
     core_context->log_file_max_line_length = size;
 }

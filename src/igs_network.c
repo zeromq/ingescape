@@ -3604,7 +3604,7 @@ int s_manage_network_timer (zloop_t *loop, int timer_id, void *arg)
 void igs_observe_channels (igs_channels_fn cb, void *my_data)
 {
     assert (cb);
-    core_init_context ();
+    core_init_agent ();
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_channels_wrapper_t *new_cb =
     (igs_channels_wrapper_t *) zmalloc (sizeof (igs_channels_wrapper_t));
@@ -3718,7 +3718,7 @@ igs_result_t igs_start_with_ip (const char *ip_address, unsigned int port)
 
 igs_result_t igs_broker_add (const char *broker_endpoint)
 {
-    core_init_context ();
+    core_init_agent ();
     model_read_write_lock(__FUNCTION__, __LINE__);
     assert (broker_endpoint);
     assert (core_context->brokers);
@@ -3738,7 +3738,7 @@ igs_result_t igs_broker_add (const char *broker_endpoint)
 
 void igs_clear_brokers (void)
 {
-    core_init_context ();
+    core_init_agent ();
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (core_context->brokers)
         zhash_destroy (&(core_context->brokers));
@@ -3751,7 +3751,7 @@ igs_result_t
 igs_broker_add_secure (const char *broker_endpoint,
                        const char *path_to_public_certificate_for_broker)
 {
-    core_init_context ();
+    core_init_agent ();
     assert (broker_endpoint);
     assert (path_to_public_certificate_for_broker);
     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -3778,7 +3778,7 @@ igs_broker_add_secure (const char *broker_endpoint,
 
 void igs_broker_enable_with_endpoint (const char *our_broker_endpoint)
 {
-    core_init_context ();
+    core_init_agent ();
     model_read_write_lock(__FUNCTION__, __LINE__);
     assert (our_broker_endpoint);
     if (core_context->our_broker_endpoint)
@@ -3789,7 +3789,7 @@ void igs_broker_enable_with_endpoint (const char *our_broker_endpoint)
 
 void igs_broker_set_advertized_endpoint (const char *advertised_endpoint)
 {
-    core_init_context ();
+    core_init_agent ();
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (core_context->advertised_endpoint)
         free (core_context->advertised_endpoint);
@@ -3838,7 +3838,7 @@ igs_result_t igs_start_with_brokers (const char *agent_endpoint)
 
 void igs_stop (void)
 {
-    core_init_context ();
+    core_init_agent ();
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (core_context->network_actor) {
         // interrupting and destroying ingescape thread and zyre layer
@@ -3875,7 +3875,7 @@ void igs_stop (void)
 
 bool igs_is_started (void)
 {
-    core_init_context ();
+    core_init_agent ();
     model_read_write_lock(__FUNCTION__, __LINE__);
     bool res = false;
     s_network_lock ();
@@ -3893,7 +3893,8 @@ void igsagent_set_name (igsagent_t *agent, const char *name)
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (streq (agent->definition->name, name)){
         if (!agent->igs_channel){
-            //name is the same but we do not have channel yet
+            //name is already set in definition but channel is not set yet
+            //NB: this happens when a JSON definition is loaded
             agent->igs_channel = (char *) zmalloc (strlen (agent->definition->name) + strlen ("-IGS") + 1);
             snprintf (agent->igs_channel, IGS_MAX_AGENT_NAME_LENGTH + strlen ("-IGS") + 1,
                       "%s-IGS", agent->definition->name);
@@ -3904,9 +3905,7 @@ void igsagent_set_name (igsagent_t *agent, const char *name)
     
     char *n = s_strndup (name, IGS_MAX_AGENT_NAME_LENGTH);
     if (strlen (name) > IGS_MAX_AGENT_NAME_LENGTH)
-        igsagent_warn (agent,
-                       "Agent name '%s' exceeds maximum size and will be truncated to '%s'",
-                       name, n);
+        printf("Agent name '%s' exceeds maximum size and will be truncated to '%s'\n", name, n);
     bool invalid_name = false;
     size_t length_ofn = strlen (n);
     size_t i = 0;
@@ -3917,18 +3916,17 @@ void igsagent_set_name (igsagent_t *agent, const char *name)
         }
     }
     if (invalid_name)
-        igsagent_warn (agent, "Spaces and dots are not allowed in an agent name: '%s' has been changed to '%s'", name, n);
+        printf("Spaces and dots are not allowed in an agent name: '%s' has been changed to '%s'\n", name, n);
     char *previous = agent->definition->name;
     agent->definition->name = n;
-    definition_update_json (agent->definition);
-    agent->network_need_to_send_definition_update = true;
-    
     if (!agent->definition->my_class)
         agent->definition->my_class = strdup(n);
     else if (previous && streq(agent->definition->my_class, previous)){
         free (agent->definition->my_class);
         agent->definition->my_class = strdup(n);
     }
+    definition_update_json (agent->definition);
+    agent->network_need_to_send_definition_update = true;
     
     if (agent->igs_channel)
         free (agent->igs_channel);
@@ -3951,8 +3949,7 @@ void igsagent_set_name (igsagent_t *agent, const char *name)
     }
     
     if (previous) {
-        igsagent_debug (agent, "Agent (%s) name changed from %s to %s",
-                        agent->uuid, previous, agent->definition->name);
+        igsagent_debug (agent, "Agent (%s) name changed from %s to %s", agent->uuid, previous, agent->definition->name);
         free (previous);
     }
     model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -3981,7 +3978,7 @@ char *igsagent_uuid (igsagent_t *agent)
 
 void igs_freeze (void)
 {
-    core_init_context ();
+    core_init_agent ();
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (core_context->is_frozen == false) {
         if ((core_context) && (core_context->node)) {
@@ -4013,13 +4010,13 @@ void igs_freeze (void)
 
 bool igs_is_frozen (void)
 {
-    core_init_context ();
+    core_init_agent ();
     return core_context->is_frozen;
 }
 
 void igs_unfreeze (void)
 {
-    core_init_context ();
+    core_init_agent ();
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (core_context->is_frozen == true) {
         if ((core_context->network_actor)
@@ -4052,7 +4049,7 @@ void igs_unfreeze (void)
 
 void igs_observe_freeze (igs_freeze_fn cb, void *my_data)
 {
-    core_init_context ();
+    core_init_agent ();
     assert(cb);
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_freeze_wrapper_t *new_cb = (igs_freeze_wrapper_t *) zmalloc (sizeof (igs_freeze_wrapper_t));
@@ -4176,7 +4173,7 @@ void igsagent_observe_mute (igsagent_t *agent,
 
 char *igs_command_line (void)
 {
-    core_init_context ();
+    core_init_agent ();
     model_read_write_lock(__FUNCTION__, __LINE__);
     char *res = NULL;
     if (core_context->command_line)
@@ -4187,7 +4184,7 @@ char *igs_command_line (void)
 
 void igs_set_command_line (const char *line)
 {
-    core_init_context ();
+    core_init_agent ();
     assert (line);
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (core_context->command_line)
@@ -4199,7 +4196,7 @@ void igs_set_command_line (const char *line)
 
 void igs_set_command_line_from_args (int argc, const char **argv)
 {
-    core_init_context ();
+    core_init_agent ();
     if (argc < 1 || argv == NULL || argv[0] == NULL) {
         igs_error ("passed args must at least contain one element");
         return;
@@ -4430,7 +4427,7 @@ void igs_observe_forced_stop (igs_forced_stop_fn cb, void *my_data)
 igs_result_t igs_enable_security (const char *private_certificate_file,
                                   const char *public_certificates_directory)
 {
-    core_init_context ();
+    core_init_agent ();
     model_read_write_lock(__FUNCTION__, __LINE__);
     core_context->security_is_enabled = true;
     
@@ -4501,7 +4498,7 @@ igs_result_t igs_enable_security (const char *private_certificate_file,
 
 void igs_disable_security (void)
 {
-    core_init_context ();
+    core_init_agent ();
     model_read_write_lock(__FUNCTION__, __LINE__);
     core_context->security_is_enabled = false;
     if (core_context->security_cert)
@@ -4517,7 +4514,7 @@ void igs_disable_security (void)
 
 zactor_t *igs_zmq_authenticator (void)
 {
-    core_init_context ();
+    core_init_agent ();
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (!core_context->security_auth) {
         core_context->security_auth = zactor_new (zauth, NULL);
@@ -4539,7 +4536,6 @@ igs_result_t igsagent_election_join (igsagent_t *agent,
 {
     assert (agent);
     assert (election_name);
-    core_init_context ();
     if (streq (election_name, IGS_PRIVATE_CHANNEL)) {
         igsagent_error (agent, "this name is reserved and not allowed for an election name");
         return IGS_FAILURE;
@@ -4593,7 +4589,6 @@ igs_result_t igsagent_election_leave (igsagent_t *agent,
 {
     assert (agent);
     assert (election_name);
-    core_init_context ();
     if (!agent->elections) {
         igsagent_debug (agent, "%s(%s) does not participate in any election", agent->definition->name, agent->uuid);
         return IGS_SUCCESS;
@@ -4650,7 +4645,7 @@ igs_result_t igsagent_election_leave (igsagent_t *agent,
 
 void igs_net_set_discovery_interval (unsigned int interval)
 {
-    core_init_context ();
+    core_init_agent ();
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (core_context->network_actor && core_context->node) {
         s_lock_zyre_peer (__FUNCTION__, __LINE__);
@@ -4663,7 +4658,7 @@ void igs_net_set_discovery_interval (unsigned int interval)
 
 void igs_net_set_timeout (unsigned int duration)
 {
-    core_init_context ();
+    core_init_agent ();
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (core_context->network_actor && core_context->node) {
         s_lock_zyre_peer (__FUNCTION__, __LINE__);
@@ -4677,7 +4672,7 @@ void igs_net_set_timeout (unsigned int duration)
 void igs_net_set_publishing_port (unsigned int port)
 {
     assert(port > 0);
-    core_init_context ();
+    core_init_agent ();
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (core_context->network_actor
         && core_context->publisher) {
@@ -4689,7 +4684,7 @@ void igs_net_set_publishing_port (unsigned int port)
 
 void igs_net_set_log_stream_port (unsigned int port)
 {
-    core_init_context ();
+    core_init_agent ();
     assert(port > 0);
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (core_context->network_actor && core_context->logger) {
@@ -4702,7 +4697,7 @@ void igs_net_set_log_stream_port (unsigned int port)
 #if defined(__UNIX__)
 void igs_set_ipc_dir (const char *path)
 {
-    core_init_context ();
+    core_init_agent ();
     assert (path);
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (core_context->network_ipc_folder_path == NULL
@@ -4732,7 +4727,7 @@ void igs_set_ipc_dir (const char *path)
 
 const char *igs_ipc_dir (void)
 {
-    core_init_context ();
+    core_init_agent ();
     model_read_write_lock(__FUNCTION__, __LINE__);
     char *res = strdup (core_context->network_ipc_folder_path);
     model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -4742,7 +4737,7 @@ const char *igs_ipc_dir (void)
 
 void igs_set_allow_inproc (bool allow)
 {
-    core_init_context ();
+    core_init_agent ();
     model_read_write_lock(__FUNCTION__, __LINE__);
     core_context->network_allow_inproc = allow;
     model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -4750,25 +4745,25 @@ void igs_set_allow_inproc (bool allow)
 
 bool igs_get_allow_inproc (void)
 {
-    core_init_context ();
+    core_init_agent ();
     return core_context->network_allow_inproc;
 }
 
 void igs_set_ipc (bool allow)
 {
-    core_init_context ();
+    core_init_agent ();
     core_context->network_allow_ipc = allow;
 }
 
 bool igs_has_ipc (void)
 {
-    core_init_context ();
+    core_init_agent ();
     return core_context->network_allow_ipc;
 }
 
 void igs_net_set_high_water_marks (int hwm_value)
 {
-    core_init_context ();
+    core_init_agent ();
     assert(hwm_value > 0);
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (core_context->network_actor
@@ -4790,7 +4785,7 @@ void igs_net_set_high_water_marks (int hwm_value)
 }
 
 void igs_unbind_pipe(void){
-    core_init_context ();
+    core_init_agent ();
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (core_context->network_actor)
         igs_error("Peer must be stopped for this function to work.");
@@ -4800,7 +4795,7 @@ void igs_unbind_pipe(void){
 }
 
 void igs_monitor_pipe_stack(bool monitor){
-    core_init_context ();
+    core_init_agent ();
     model_read_write_lock(__FUNCTION__, __LINE__);
     core_context->monitor_pipe_stack = monitor;
     model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -4808,7 +4803,7 @@ void igs_monitor_pipe_stack(bool monitor){
 
 void igs_net_raise_sockets_limit (void)
 {
-    core_init_context ();
+    core_init_agent();
     model_read_write_lock(__FUNCTION__, __LINE__);
 #if defined(__UNIX__)
     if (core_context->network_shall_raise_file_descriptors_limit) {
@@ -4830,8 +4825,7 @@ void igs_net_raise_sockets_limit (void)
                 else {
                     // adjust allowed number of sockets per process in ZeroMQ
                     zsys_set_max_sockets (0); // 0 = use maximum value allowed by the OS
-                    igs_debug ("raised file descriptors limit from %llu to %llu",
-                               prev_cur, limit.rlim_cur);
+                    igs_debug ("raised file descriptors limit from %llu to %llu", prev_cur, limit.rlim_cur);
                     core_context->network_shall_raise_file_descriptors_limit =
                     false;
                 }
@@ -4846,7 +4840,7 @@ void igs_net_raise_sockets_limit (void)
 
 zsock_t *igs_pipe_to_ingescape (void)
 {
-    core_init_context ();
+    core_init_agent ();
     model_read_write_lock(__FUNCTION__, __LINE__);
     zsock_t *res = NULL;
     if (!core_context->network_actor)
@@ -4859,7 +4853,7 @@ zsock_t *igs_pipe_to_ingescape (void)
 
 zsock_t * igs_pipe_inside_ingescape(void)
 {
-    core_init_context ();
+    core_init_agent ();
     if (!core_context->internal_pipe)
         igs_warn ("ingescape is not started yet");
     return core_context->internal_pipe;
@@ -4867,7 +4861,7 @@ zsock_t * igs_pipe_inside_ingescape(void)
 
 int igs_timer_start (size_t delay, size_t times, igs_timer_fn cb, void *my_data)
 {
-    core_init_context ();
+    core_init_agent ();
     assert(cb);
     if (core_context->loop == NULL) {
         igs_error ("Ingescape must be started to create a timer");
@@ -4885,7 +4879,7 @@ int igs_timer_start (size_t delay, size_t times, igs_timer_fn cb, void *my_data)
 
 void igs_timer_stop (int timer_id)
 {
-    core_init_context ();
+    core_init_agent ();
     if (core_context->loop == NULL) {
         igs_error ("Ingescape must be started to destroy a timer");
         return;

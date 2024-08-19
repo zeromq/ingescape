@@ -17,7 +17,7 @@
 // Timer callback to check network
 int igs_monitor_trigger_network_check (zloop_t *loop, int timer_id, void *arg)
 {
-    core_init_context ();
+    core_init_agent ();
     IGS_UNUSED (loop)
     IGS_UNUSED (timer_id)
     IGS_UNUSED (arg)
@@ -237,7 +237,7 @@ static void s_monitor_init_loop (zsock_t *pipe, void *args)
 
 void igs_monitor_start (unsigned int period)
 {
-    core_init_context ();
+    core_init_agent ();
     if (core_context->monitor) {
         igs_warn ("monitor is already started");
         return;
@@ -257,7 +257,7 @@ void igs_monitor_start_with_network (unsigned int period,
 {
     assert (network_device);
     assert (strlen (network_device) > 0);
-    core_init_context ();
+    core_init_agent ();
     if (core_context->monitor) {
         igs_warn ("monitor is already started");
         return;
@@ -275,7 +275,7 @@ void igs_monitor_start_with_network (unsigned int period,
 
 void igs_monitor_stop (void)
 {
-    core_init_context ();
+    core_init_agent ();
     if (!core_context->monitor)
         return;
     
@@ -303,7 +303,7 @@ void igs_monitor_stop (void)
 
 bool igs_monitor_is_running (void)
 {
-    core_init_context ();
+    core_init_agent ();
     model_read_write_lock(__FUNCTION__, __LINE__);
     bool res = (core_context->monitor);
     model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -312,7 +312,7 @@ bool igs_monitor_is_running (void)
 
 void igs_observe_monitor (igs_monitor_fn cb, void *my_data)
 {
-    core_init_context ();
+    core_init_agent ();
     assert (cb);
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_monitor_wrapper_t *new_cb = (igs_monitor_wrapper_t *) zmalloc (sizeof (igs_monitor_wrapper_t));
@@ -324,7 +324,7 @@ void igs_observe_monitor (igs_monitor_fn cb, void *my_data)
 
 void igs_monitor_set_start_stop (bool flag)
 {
-    core_init_context ();
+    core_init_agent ();
     model_read_write_lock(__FUNCTION__, __LINE__);
     core_context->monitor_shall_start_stop_agent = flag;
     model_read_write_unlock(__FUNCTION__, __LINE__);

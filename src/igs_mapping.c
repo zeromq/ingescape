@@ -186,6 +186,20 @@ igs_map_t *mapping_create_mapping_element (const char *from_input,
     return new_map_elmt;
 }
 
+igs_split_t *mapping_create_split_element (const char *from_input,
+                                           const char *to_agent,
+                                           const char *to_output)
+{
+    assert(from_input);
+    assert(to_agent);
+    assert(to_output);
+    igs_split_t *new_split_elmt = (igs_split_t *) zmalloc (sizeof (igs_map_t));
+    new_split_elmt->from_input = strdup (from_input);
+    new_split_elmt->to_agent = strdup (to_agent);
+    new_split_elmt->to_output = strdup (to_output);
+    return new_split_elmt;
+}
+
 bool mapping_check_input_output_compatibility (igsagent_t *agent,
                                                igs_io_t *input,
                                                igs_io_t *output)

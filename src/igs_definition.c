@@ -287,13 +287,11 @@ void igsagent_clear_definition (igsagent_t *agent)
         definition_free_definition (&agent->definition);
     }
     agent->definition = (igs_definition_t *) zmalloc (sizeof (igs_definition_t));
-    if (previous_name) {
+    if (previous_name)
         agent->definition->name = previous_name;
-        igsagent_debug (agent, "reuse previous name '%s'", previous_name);
-    } else {
+    else
         agent->definition->name = strdup (IGS_DEFAULT_AGENT_NAME);
-        // igsagent_debug(agent, "Use default name '%s'", IGS_DEFAULT_AGENT_NAME);
-    }
+    
     agent->definition->attributes_table = zhashx_new();
     agent->definition->inputs_table = zhashx_new();
     agent->definition->outputs_table = zhashx_new();

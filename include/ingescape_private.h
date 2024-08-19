@@ -487,8 +487,20 @@ typedef struct igs_core_context {
 // default context and agent
 INGESCAPE_EXPORT extern igs_core_context_t *core_context;
 INGESCAPE_EXPORT extern igsagent_t *core_agent;
-INGESCAPE_EXPORT void core_init_agent(void);
+
+/*
+ These two functions respectively initiate the context and the defautl agent.
+ The context is necessary for all agents. And the default agent, named core_agent,
+ shall be created to make the high-level API usable. It is already possible to
+ create several independent agents. Future evolutions could enable the creation
+ of several independent contexts but, at the moment, it is easier and safer
+ to create separate agents instead.
+ core_init_context is called at the beginning of core functions to lazily initiate
+ the contexte, whereas core_init_agent is called at the beginning of the high-level
+ API functions to initiate both the context and the default agent.
+ */
 INGESCAPE_EXPORT void core_init_context(void);
+INGESCAPE_EXPORT void core_init_agent(void);
 
 // definition
 INGESCAPE_EXPORT void definition_free_definition (igs_definition_t **definition);
@@ -498,8 +510,11 @@ INGESCAPE_EXPORT void definition_update_json (igs_definition_t *definition);
 // mapping
 INGESCAPE_EXPORT void mapping_free_mapping (igs_mapping_t **map);
 INGESCAPE_EXPORT igs_map_t* mapping_create_mapping_element(const char * from_input,
-                                          const char *to_agent,
-                                          const char* to_output);
+                                                           const char *to_agent,
+                                                           const char* to_output);
+INGESCAPE_EXPORT igs_split_t* mapping_create_split_element(const char * from_input,
+                                                         const char *to_agent,
+                                                         const char* to_output);
 INGESCAPE_EXPORT bool mapping_is_equal(const char *first_str, const char *second_str);
 INGESCAPE_EXPORT uint64_t mapping_djb2_hash (unsigned char *str);
 INGESCAPE_EXPORT bool mapping_check_input_output_compatibility(igsagent_t *agent, igs_io_t *found_input, igs_io_t *found_output);

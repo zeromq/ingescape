@@ -55,7 +55,7 @@ void s_unlock_zyre_peer (const char *function, int line)
 ////////////////////////////////////////////////////////////////////////
 igs_result_t igs_channel_join (const char *channel)
 {
-    core_init_context ();
+    core_init_agent ();
     assert (channel && strlen (channel) > 0);
     igs_result_t res = IGS_SUCCESS;
     if (streq (IGS_PRIVATE_CHANNEL, channel)) {
@@ -77,7 +77,7 @@ igs_result_t igs_channel_join (const char *channel)
 
 void igs_channel_leave (const char *channel)
 {
-    core_init_context ();
+    core_init_agent ();
     assert (channel && strlen (channel) > 0);
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (core_context->network_actor && core_context->node) {
@@ -91,7 +91,7 @@ void igs_channel_leave (const char *channel)
 
 igs_result_t igs_channel_shout_str (const char *channel, const char *msg, ...)
 {
-    core_init_context ();
+    core_init_agent ();
     assert (channel);
     assert (msg);
     if (streq (IGS_PRIVATE_CHANNEL, channel)) {
@@ -119,7 +119,7 @@ igs_result_t igs_channel_shout_str (const char *channel, const char *msg, ...)
 
 igs_result_t igs_channel_shout_data (const char *channel, void *data, size_t size)
 {
-    core_init_context ();
+    core_init_agent ();
     assert (channel);
     if (streq (IGS_PRIVATE_CHANNEL, channel)) {
         igs_error ("channel name %s is reserved and cannot be used", channel);
@@ -144,7 +144,7 @@ igs_result_t igs_channel_shout_data (const char *channel, void *data, size_t siz
 
 igs_result_t igs_channel_shout_zmsg (const char *channel, zmsg_t **msg_p)
 {
-    core_init_context ();
+    core_init_agent ();
     assert (channel);
     assert (msg_p);
     assert (*msg_p);
@@ -168,7 +168,7 @@ igs_result_t igs_channel_shout_zmsg (const char *channel, zmsg_t **msg_p)
 
 igs_result_t igs_channel_whisper_str (const char *agent_name_or_agent_id_or_peerid, const char *msg, ...)
 {
-    core_init_context ();
+    core_init_agent ();
     assert (agent_name_or_agent_id_or_peerid);
     assert (msg);
     int res = IGS_SUCCESS;
@@ -226,7 +226,7 @@ igs_result_t igs_channel_whisper_str (const char *agent_name_or_agent_id_or_peer
 
 igs_result_t igs_channel_whisper_data (const char *agent_name_or_agent_id_or_peerid, void *data, size_t size)
 {
-    core_init_context ();
+    core_init_agent ();
     assert (agent_name_or_agent_id_or_peerid);
     if (core_context->node == NULL) {
         igs_error ("Ingescape must be started before trying to send a message");
@@ -277,7 +277,7 @@ igs_result_t igs_channel_whisper_data (const char *agent_name_or_agent_id_or_pee
 
 igs_result_t igs_channel_whisper_zmsg (const char *agent_name_or_agent_id_or_peer_id, zmsg_t **msg_p)
 {
-    core_init_context ();
+    core_init_agent ();
     assert (agent_name_or_agent_id_or_peer_id);
     assert (msg_p);
     assert (*msg_p);
@@ -331,7 +331,7 @@ igs_result_t igs_channel_whisper_zmsg (const char *agent_name_or_agent_id_or_pee
 
 igs_result_t igs_peer_add_header (const char *key, const char *value)
 {
-    core_init_context ();
+    core_init_agent ();
     assert (key);
     assert (value);
     if (strneq (key, "publisher") && strneq (key, "logger")
@@ -357,7 +357,7 @@ igs_result_t igs_peer_add_header (const char *key, const char *value)
 igs_result_t igs_peer_remove_header (const char *key)
 {
     assert (key);
-    core_init_context ();
+    core_init_agent ();
     if (core_context && core_context->node) {
         igs_error ("agent is started : restart the agent to actually remove the service description");
         return IGS_FAILURE;
