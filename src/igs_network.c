@@ -4114,7 +4114,7 @@ void igsagent_mute (igsagent_t *agent)
         model_read_write_unlock(__FUNCTION__, __LINE__);
         elt->callback_ptr (agent, agent->is_whole_agent_muted, elt->my_data);
         model_read_write_lock(__FUNCTION__, __LINE__);
-        elt = zlist_next(agent->mute_callbacks);
+        elt = zlist_next(callbacks);
     }
     zlist_destroy(&callbacks);
     model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -4142,7 +4142,7 @@ void igsagent_unmute (igsagent_t *agent)
         model_read_write_unlock(__FUNCTION__, __LINE__);
         elt->callback_ptr (agent, agent->is_whole_agent_muted, elt->my_data);
         model_read_write_lock(__FUNCTION__, __LINE__);
-        elt = zlist_next(agent->mute_callbacks);
+        elt = zlist_next(callbacks);
     }
     zlist_destroy(&callbacks);
     model_read_write_unlock(__FUNCTION__, __LINE__);

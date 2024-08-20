@@ -6,6 +6,18 @@
 //  Copyright © 2024 Ingenuity i/o. All rights reserved.
 //
 
+#if defined (_WIN32)
+    #ifndef WIN32_LEAN_AND_MEAN
+    #define WIN32_LEAN_AND_MEAN
+    #endif
+
+    #ifndef NOMINMAX
+        #define NOMINMAX
+    #endif
+    #include <windows.h>
+    #include <winsock2.h>
+#endif
+
 #include <stdio.h>
 #include <getopt.h> //command line options at statrtup
 #include <stdlib.h> //standard C functions such as getenv, atoi, exit, etc.
@@ -257,7 +269,7 @@ int stress_publish (zloop_t *loop, int timer_id, void *arg){
     igsagent_t *a = zlist_first(dup);
     while (a) {
         srand((uint)zclock_usecs());
-        
+
         igsagent_output_set_impulsion(a, "impulsion");
         bool b = igsagent_input_bool(a, "bool");
         igsagent_output_set_bool(a, "bool", !b);
@@ -274,7 +286,7 @@ int stress_publish (zloop_t *loop, int timer_id, void *arg){
         s[16] = '\0';
         igsagent_output_set_string(a, "string", s);
         igsagent_output_set_data(a, "data", s, 17);
-        
+
         char *name = igsagent_name(a);
         size_t index = s_extract_number(name);
         free(name);
@@ -291,7 +303,7 @@ int stress_publish (zloop_t *loop, int timer_id, void *arg){
         igs_service_args_add_string(&args, s);
         igs_service_args_add_data(&args, s, 17);
         igsagent_service_call(a, target, "service", &args, s);
-        
+
         a = zlist_next(dup);
     }
     zlist_destroy(&dup);
@@ -380,7 +392,7 @@ void observe_agent_events (igsagent_t *agent,
         case IGS_AGENT_LOST_ELECTION:
             event_name = "IGS_AGENT_LOST_ELECTION";
             break;
-            
+
         default:
             break;
     }
@@ -417,7 +429,7 @@ void observe_input (igsagent_t *agent,
             case IGS_DATA_T:
                 igsagent_fatal(agent, "%s received %zu bytes", name, value_size);
                 break;
-                
+
             default:
                 break;
         }
@@ -573,34 +585,34 @@ int main(int argc, const char * argv[]) {
         }
     }
 
-    
+
     igs_agent_set_name(agent_name);
     igs_log_set_console(true);
     igs_log_set_file(true, NULL);
     igs_log_set_stream(true);
     igs_set_command_line_from_args(argc, argv);
     igs_log_set_console(true);
-    igs_log_set_file(true, NULL);    
+    igs_log_set_file(true, NULL);
     igs_log_set_console_level(IGS_LOG_TRACE);
-    
+
     igs_unbind_pipe();
     igs_monitor_pipe_stack(verbose);
-    
+
     if (stress_peer){
         //TODO: add start/stop stress here
     }
-    
-    
+
+
     agents = zlist_new();
     for (size_t i = 0; i < nb_of_agents; i++) {
         char additionalAgentName[IGS_MAX_AGENT_NAME_LENGTH] = "";
         sprintf(additionalAgentName, "%s-%zu", agent_name, i);
         igsagent_t *agent = igsagent_new(additionalAgentName, true);
         zlist_append(agents, agent);
-        
+
         igsagent_set_state(agent, "0");
         igsagent_observe_agent_events(agent, observe_agent_events, NULL);
-        
+
         igsagent_input_create(agent, "impulsion", IGS_IMPULSION_T, NULL, 0);
         igsagent_observe_input(agent, "impulsion", observe_input, NULL);
         igsagent_input_create(agent, "bool", IGS_BOOL_T, NULL, 0);
@@ -624,7 +636,7 @@ int main(int argc, const char * argv[]) {
         igsagent_attribute_create(agent, "double", IGS_DOUBLE_T, NULL, 0);
         igsagent_attribute_create(agent, "string", IGS_STRING_T, NULL, 0);
         igsagent_attribute_create(agent, "data", IGS_DATA_T, NULL, 0);
-        
+
         igsagent_service_init(agent, "service", service, NULL);
         igsagent_service_arg_add(agent, "service", "bool", IGS_BOOL_T);
         igsagent_service_arg_add(agent, "service", "int", IGS_INTEGER_T);
@@ -638,12 +650,12 @@ int main(int argc, const char * argv[]) {
         igsagent_service_arg_add(agent, "reply", "string", IGS_STRING_T);
         igsagent_service_arg_add(agent, "reply", "data", IGS_DATA_T);
     }
-    
+
     zloop_t *loop = zloop_new();
     igs_start_with_device(networkDevice, port);
     zsock_t *pipe = igs_pipe_to_ingescape();
     zloop_reader(loop, pipe, ingescapeSentMessage, NULL);
-    
+
     if (deactivate)
         a_stress_activate_deactivate = zactor_new(stress_activate_deactivate_fn, NULL);
     if (change_state)
@@ -657,9 +669,9 @@ int main(int argc, const char * argv[]) {
     //NB: elections only make sense between separated peers => to be used with several igsStresser instances
     if (elections)
         a_stress_elections = zactor_new(stress_elections_fn, NULL);
-    
+
     zloop_start(loop);
-    
+
     zloop_destroy(&loop);
     igs_stop();
     igsagent_t *a = zlist_first(agents);
@@ -669,6 +681,6 @@ int main(int argc, const char * argv[]) {
     }
     zlist_destroy(&agents);
     igs_clear_context();
-    
+
     return EXIT_SUCCESS;
 }

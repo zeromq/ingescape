@@ -341,13 +341,6 @@ static PyMethodDef Ingescape_methods[] =
     {"monitor_set_start_stop", igs_monitor_set_start_stop_wrapper, METH_VARARGS, "monitor_set_start_stop(flag, )\n--\n\n "},
     {"observe_monitor", igs_observe_monitor_wrapper, METH_VARARGS, "observe_monitor(callback, my_data, )\n--\n\n "},
 
-    // Replay
-    {"replay_init", igs_replay_init_wrapper, METH_VARARGS,
-        "replay_init(log_file_path, speed, start_time, wait_for_start, replay_mode, agent, )\n--\n\n "},
-    {"replay_start", igs_replay_start_wrapper, METH_NOARGS, "replay_start()\n--\n\n "},
-    {"replay_pause", igs_replay_pause_wrapper, METH_VARARGS, "replay_pause(pause, )\n--\n\n "},
-    {"replay_terminate", igs_replay_terminate_wrapper, METH_NOARGS, "replay_terminate()\n--\n\n "},
-
     // Constraints, description and detailed types
     {"constraints_enforce", igs_constraints_enforce_wrapper, METH_VARARGS, "constraints_enforce(enforce, )\n--\n\n "},
     {"input_add_constraint", igs_input_add_constraint_wrapper, METH_VARARGS, "input_add_constraint(name, constraint, )\n--\n\n "},
@@ -803,12 +796,6 @@ PyMODINIT_FUNC PyInit_ingescape(void)
     PyModule_AddIntConstant(module_ingescape, "NETWORK_DEVICE_NOT_AVAILABLE", 2);
     PyModule_AddIntConstant(module_ingescape, "NETWORK_ADDRESS_CHANGED", 3);
     PyModule_AddIntConstant(module_ingescape, "NETWORK_OK_AFTER_MANUAL_RESTART", 4);
-
-    PyModule_AddIntConstant(module_ingescape, "REPLAY_INPUT", 1);
-    PyModule_AddIntConstant(module_ingescape, "REPLAY_OUTPUT", 2);
-    PyModule_AddIntConstant(module_ingescape, "REPLAY_ATTRIBUTE", 4);
-    PyModule_AddIntConstant(module_ingescape, "REPLAY_EXECUTE_SERVICE", 8);
-    PyModule_AddIntConstant(module_ingescape, "REPLAY_CALL_SERVICE", 16);
 
     if (PyType_Ready(&AgentType) < 0)
             return NULL;

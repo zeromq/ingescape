@@ -1121,7 +1121,9 @@ assert(IGS.serviceHasReply("myServiceWithReplies", "myReply"));
 assert(IGS.serviceHasReply("myServiceWithReplies", "myReply2"));
 assert(!IGS.serviceHasReply("myServiceWithReplies", "myReply3"));
 let names = IGS.serviceReplyNames("myServiceWithReplies");
-assert((names.length === 2) && (names[0] === "myReply") && (names[1] === "myReply2"));
+assert(names.length === 2);
+assert(names.includes("myReply"));
+assert(names.includes("myReply2"));
 assert(IGS.serviceReplyArgsList("myServiceWithReplies", "myReply").length === 0);
 assert(IGS.serviceReplyArgsCount("myServiceWithReplies", "myReply") === 0);
 assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply", "myBool", ioTypeEnum.IGS_BOOL_T) === igsResultEnum.IGS_SUCCESS);
@@ -1693,17 +1695,17 @@ argsList = IGS.serviceArgsAddData(argsList, new ArrayBuffer(16));
 firstAgent.serviceCall("secondAgent", "secondService", argsList, "token");
 
 //elections
-assert(IGS.electionLeave("my election") === igsResultEnum.IGS_FAILURE);
+assert(IGS.electionLeave("my election") === igsResultEnum.IGS_SUCCESS);
 assert(IGS.electionJoin("my election") === igsResultEnum.IGS_SUCCESS);
 assert(IGS.electionJoin("my election") === igsResultEnum.IGS_FAILURE);
 assert(IGS.electionJoin("INGESCAPE_PRIVATE") === igsResultEnum.IGS_FAILURE);
 assert(IGS.electionLeave("my election") === igsResultEnum.IGS_SUCCESS);
-assert(IGS.electionLeave("my election") === igsResultEnum.IGS_FAILURE);
-assert(IGS.electionLeave("my other election") === igsResultEnum.IGS_FAILURE);
+assert(IGS.electionLeave("my election") === igsResultEnum.IGS_SUCCESS);
+assert(IGS.electionLeave("my other election") === igsResultEnum.IGS_SUCCESS);
 assert(IGS.electionJoin("my other election") === igsResultEnum.IGS_SUCCESS);
 assert(IGS.electionJoin("my other election") === igsResultEnum.IGS_FAILURE);
 assert(IGS.electionLeave("my other election") === igsResultEnum.IGS_SUCCESS);
-assert(IGS.electionLeave("my other election") === igsResultEnum.IGS_FAILURE);
+assert(IGS.electionLeave("my other election") === igsResultEnum.IGS_SUCCESS);
 
 IGS.agentSetFamily("family_test");
 

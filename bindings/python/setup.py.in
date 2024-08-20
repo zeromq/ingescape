@@ -96,7 +96,6 @@ setup(
                 "./src/monitor.c",
                 "./src/network.c",
                 "./src/performance.c",
-                "./src/replay.c",
                 "./src/util.c"
             ],
             include_dirs = ["./include", "./dependencies/include/"],
