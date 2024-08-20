@@ -66,15 +66,6 @@ export type AgentEventTypes = {
 };
 export function agentEventTypes(): AgentEventTypes;
 
-export type ReplayModes = {
-    IGS_REPLAY_INPUT: number;
-    IGS_REPLAY_OUTPUT: number;
-    IGS_REPLAY_ATTRIBUTE: number;
-    IGS_REPLAY_EXECUTE_SERVICE: number;
-    IGS_REPLAY_CALL_SERVICE: number;
-};
-export function replayModes(): ReplayModes;
-
 //admin_config_utils
 export function version(): number;
 export function protocol(): number;
@@ -153,10 +144,6 @@ export function monitorStop(): undefined;
 export function monitorIsRunning(): bool;
 export function monitorSetStartStop(flag:bool): undefined;
 export function observeMonitor(cb:(event:number, device:string, ipAddress:string, myData:any)=>undefined, myData:any): number;
-export function replayInit(logFilePath:string, speed:number, startTime:string, waitForStart:boolean, replayMode:number, agentName:string): undefined;
-export function replayStart(): undefined;
-export function replayPause(pause:bool): undefined;
-export function replayTerminate(): undefined;
 export function clearContext(): undefined;
 
 //agent

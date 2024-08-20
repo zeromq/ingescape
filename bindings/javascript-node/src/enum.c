@@ -184,35 +184,6 @@ napi_value node_get_agent_event_types(napi_env env, napi_callback_info info) {
     return object;
 }
 
-// Get enum modes for replay
-napi_value node_get_replay_modes(napi_env env, napi_callback_info info) {
-    napi_value object;
-    napi_create_object(env, &object);
-
-    napi_value replay_input_mode;
-    convert_int_to_napi(env, IGS_REPLAY_INPUT, &replay_input_mode);
-    napi_set_named_property(env, object, "IGS_REPLAY_INPUT", replay_input_mode);
-
-    napi_value replay_output_mode;
-    convert_int_to_napi(env, IGS_REPLAY_OUTPUT, &replay_output_mode);
-    napi_set_named_property(env, object, "IGS_REPLAY_OUTPUT", replay_output_mode);
-
-    napi_value replay_parameter_mode;
-    convert_int_to_napi(env, IGS_REPLAY_ATTRIBUTE, &replay_parameter_mode);
-    napi_set_named_property(env, object, "IGS_REPLAY_ATTRIBUTE", replay_parameter_mode);
-
-    napi_value replay_execute_service_mode;
-    convert_int_to_napi(env, IGS_REPLAY_EXECUTE_SERVICE, &replay_execute_service_mode);
-    napi_set_named_property(env, object, "IGS_REPLAY_EXECUTE_SERVICE", replay_execute_service_mode);
-
-    napi_value replay_call_service_mode;
-    convert_int_to_napi(env, IGS_REPLAY_CALL_SERVICE, &replay_call_service_mode);
-    napi_set_named_property(env, object, "IGS_REPLAY_CALL_SERVICE", replay_call_service_mode);
-
-    return object;
-}
-
-
 napi_value init_enum(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_get_log_levels_js, "logLevels", exports);  
     exports = enable_callback_into_js(env, node_get_io_types_js, "ioValueTypes", exports);  
@@ -220,6 +191,5 @@ napi_value init_enum(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_get_monitor_event_types, "monitorEventTypes", exports);
     exports = enable_callback_into_js(env, node_get_igs_result_types, "resultTypes", exports);
     exports = enable_callback_into_js(env, node_get_agent_event_types, "agentEventTypes", exports);
-    exports = enable_callback_into_js(env, node_get_replay_modes, "replayModes", exports);
     return exports;
 }

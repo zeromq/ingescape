@@ -20,7 +20,6 @@ SOURCES += \
     $$PWD/../../src/igs_network.c \
     $$PWD/../../src/igs_parser.c \
     $$PWD/../../src/igs_performance.c \
-    $$PWD/../../src/igs_replay.c \
     $$PWD/../../src/igs_service.c \
     $$PWD/../../src/igs_split.c \
     $$PWD/../../src/igsagent.c \
