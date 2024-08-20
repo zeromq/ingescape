@@ -1373,7 +1373,7 @@ namespace Ingescape
             object data = tuple.Item2;
             ServiceFunction cSharpFunction = tuple.Item1;
             string serviceNameAsString = PtrToStringFromUTF8(serviceName);
-            List<ServiceArgument> serviceArguments = ServiceArgumentsList(serviceNameAsString);
+            List<ServiceArgument> serviceArguments = Igs.ServiceArgumentsListFromFirstArg(firstArgument);
             cSharpFunction(PtrToStringFromUTF8(senderAgentName), PtrToStringFromUTF8(senderAgentUUID), serviceNameAsString, serviceArguments, PtrToStringFromUTF8(token), data);
         }
 
@@ -1541,58 +1541,7 @@ namespace Ingescape
         {
             IntPtr serviceNameAsPtr = StringToUTF8Ptr(serviceName);
             IntPtr ptrArgument = igs_service_args_first(serviceNameAsPtr);
-            List<ServiceArgument> serviceArgumentsList = null;
-            if (ptrArgument != null)
-            {
-                serviceArgumentsList = new List<ServiceArgument>();
-                while (ptrArgument != IntPtr.Zero)
-                {
-                    // Marshals data from an unmanaged block of memory to a newly allocated managed object of the type specified by a generic type parameter.
-                    StructServiceArgument structArgument = Marshal.PtrToStructure<StructServiceArgument>(ptrArgument);
-
-                    object value = null;
-
-                    switch (structArgument.type)
-                    {
-                        case IopValueType.Bool:
-                            value = structArgument.union.b;
-                            break;
-
-                        case IopValueType.Integer:
-                            value = structArgument.union.i;
-                            break;
-
-                        case IopValueType.Double:
-                            value = structArgument.union.d;
-                            break;
-
-                        case IopValueType.String:
-                            value = PtrToStringFromUTF8(structArgument.union.c);
-                            break;
-
-                        case IopValueType.Data:
-                            byte[] byteArray = new byte[structArgument.size];
-
-                            // Copies data from an unmanaged memory pointer to a managed 8-bit unsigned integer array.
-                            // Copy the content of the IntPtr to the byte array
-                            // FIXME: size has type "uint" in language C. The corresponding type in C# is uint. But "Marshal.Copy(...)" does not accept uint for parameter "length"
-                            if (structArgument.union.data != IntPtr.Zero)
-                                Marshal.Copy(structArgument.union.data, byteArray, 0, (int)structArgument.size);
-                            else
-                                byteArray = null;
-
-                            value = byteArray;
-                            break;
-
-                        default:
-                            break;
-                    }
-
-                    ServiceArgument serviceArgument = new ServiceArgument(PtrToStringFromUTF8(structArgument.name), structArgument.type, value);
-                    serviceArgumentsList.Add(serviceArgument);
-                    ptrArgument = structArgument.next;
-                }
-            }
+            List<ServiceArgument> serviceArgumentsList = Igs.ServiceArgumentsListFromFirstArg(ptrArgument);
             Marshal.FreeHGlobal(serviceNameAsPtr);
             return serviceArgumentsList;
         }
@@ -3266,6 +3215,42 @@ namespace Ingescape
 
         #endregion
 
+            #region SATURATION CONTROL
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void igs_unbind_pipe();
+
+        /// <summary>
+        /// In situations where an agent inputs in the peer are excessively
+        /// sollicited and it results in even more intensive output publications,
+        /// it may saturate the ingescape loop with HANDLE_PUBLICATION messages,
+        /// which will end up reaching more than 1000 messages, corresponding to
+        /// the default High Water Marks on the pipe PAIR socket.The saturated
+        /// PAIR socket will then block and freeze the agent.
+        /// We allow here to remove the HWM and to print in real-time the number
+        /// of HANDLE_PUBLICATION message stacked in the pipe.
+        /// Please note, that disabling the HWM may induce a memory exhaustion
+        /// for the agent and the operating system: USE WITH CAUTION.
+        /// </summary>
+        public static void UnbindPipe()
+        {
+            igs_unbind_pipe();
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void igs_monitor_pipe_stack(bool monitor); //default is false
+
+        /// <summary>
+        /// <inheritdoc cref="UnbindPipe"/>
+        /// </summary>
+        /// <param name="monitor">default is false</param>
+        public static void MonitorPipeStack(bool monitor)
+        {
+            igs_monitor_pipe_stack(monitor);
+        }
+
+        #endregion
+
             #region PERFORMANCE CHECK
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
@@ -3425,48 +3410,8 @@ namespace Ingescape
 
         #endregion
 
-            #region LOGS REPLAY
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void igs_replay_init(IntPtr logFilePath, uint speed, IntPtr startTime,
-                           bool waitForStart, uint replayMode, IntPtr agent);
-
-        ///<summary>Ingescape logs contain all the necessary information for an agent to replay its changes for inputs, outputs, parameters and calls.<br />
-        ///ReplayTerminate cleans the thread and requires calling igs_replay_init again.<br />
-        ///Replay thread is cleaned automatically also when the Log file has been read completely.</summary>
-        ///<param name="logFilePath">path to the Log file to be read.</param>
-        ///<param name="speed">replay speed. Default is zero, meaning as fast as possible.</param>
-        ///<param name="startTime">with format hh:mm::s, specifies the time when speed shall be used. Replay as fast as possible before that.</param>
-        ///<param name="waitForStart">waits for a call to igs_replay_start before starting the replay. Default is false.</param>
-        ///<param name="replayMode">a boolean composition of ReplayMode value to decide what shall be replayed.If mode is zero, all IOP and calls are replayed.</param>
-        ///<param name="agent">an OPTIONAL agent name serving as filter when the logs contain activity for multiple agents.</param>
-        public static void ReplayInit(string logFilePath, uint speed, string startTime, bool waitForStart, ReplayMode replayMode, string agent)
-        {
-            IntPtr logFilePathAsPtr = StringToUTF8Ptr(logFilePath);
-            IntPtr startTimeAsPtr = StringToUTF8Ptr(startTime);
-            IntPtr agentAsPtr = StringToUTF8Ptr(agent);
-
-            igs_replay_init(logFilePathAsPtr, speed, startTimeAsPtr, waitForStart, Convert.ToUInt32(replayMode), agentAsPtr);
-            Marshal.FreeHGlobal(logFilePathAsPtr);
-            Marshal.FreeHGlobal(startTimeAsPtr);
-            Marshal.FreeHGlobal(agentAsPtr);
-        }
-
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void igs_replay_start();
-        public static void ReplayStart() { igs_replay_start(); }
-
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void igs_replay_pause(bool pause);
-        public static void ReplayPause(bool pause) { igs_replay_pause(pause); }
-
-        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void igs_replay_terminate();
-        public static void ReplayTerminate() { igs_replay_terminate(); }
-
         #endregion
-
-        #endregion
-
+        
         #region DEPRECATED : Parameters
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]

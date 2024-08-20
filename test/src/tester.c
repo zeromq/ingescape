@@ -558,7 +558,6 @@ void run_static_tests (int argc, const char * argv[]){
     assert(listOfStrings == NULL && nbElements == 0);
     listOfStrings = igs_attribute_list(&nbElements);
     assert(listOfStrings == NULL && nbElements == 0);
-    assert(!igs_output_is_muted(NULL));
     assert(!igs_output_is_muted("toto"));
     igs_output_mute("toto");
     igs_output_unmute("toto");
@@ -1153,7 +1152,6 @@ void run_static_tests (int argc, const char * argv[]){
     igs_service_args_destroy(&listBis);
 
     assert(igs_service_count() == 0);
-    assert(!igs_service_exists(NULL));
     assert(!igs_service_exists("toto"));
     listOfStrings = igs_service_list(&nbElements);
     assert(listOfStrings == NULL && nbElements == 0);
@@ -1265,7 +1263,7 @@ void run_static_tests (int argc, const char * argv[]){
     assert(!igs_service_has_reply("myServiceWithReplies", "myReply3"));
     assert(igs_service_has_replies("myServiceWithReplies"));
     names = igs_service_reply_names("myServiceWithReplies", &replies_nb);
-    assert(names && replies_nb == 2 && streq("myReply", names[0]) && streq("myReply2", names[1]));
+    assert(names && replies_nb == 2 && streq("myReply", names[1]) && streq("myReply2", names[0]));
     igs_free_services_list(names, replies_nb);
     assert(igs_service_reply_args_first("myServiceWithReplies", "myReply") == NULL);
     assert(igs_service_reply_args_count("myServiceWithReplies", "myReply") == 0);
@@ -1833,17 +1831,17 @@ void run_static_tests (int argc, const char * argv[]){
     assert(tester_secondAgentExited);
 
     //elections
-    assert(igs_election_leave("my election") == IGS_FAILURE);
+    assert(igs_election_leave("my election") == IGS_SUCCESS);
     assert(igs_election_join("my election") == IGS_SUCCESS);
     assert(igs_election_join("my election") == IGS_FAILURE);
     assert(igs_election_join("INGESCAPE_PRIVATE") == IGS_FAILURE);
     assert(igs_election_leave("my election") == IGS_SUCCESS);
-    assert(igs_election_leave("my election") == IGS_FAILURE);
-    assert(igs_election_leave("my other election") == IGS_FAILURE);
+    assert(igs_election_leave("my election") == IGS_SUCCESS);
+    assert(igs_election_leave("my other election") == IGS_SUCCESS);
     assert(igs_election_join("my other election") == IGS_SUCCESS);
     assert(igs_election_join("my other election") == IGS_FAILURE);
     assert(igs_election_leave("my other election") == IGS_SUCCESS);
-    assert(igs_election_leave("my other election") == IGS_FAILURE);
+    assert(igs_election_leave("my other election") == IGS_SUCCESS);
 
     igs_agent_set_family("family_test");
 
@@ -1980,7 +1978,7 @@ int main(int argc, const char * argv[]) {
         //we terminate now after passing the static tests
         igsagent_destroy(&secondAgent);
         igsagent_destroy(&firstAgent);
-        igs_fatal("static tests have terminated with success");
+        igs_fatal("static tests have terminated with SUCCESS");
         exit(EXIT_SUCCESS);
     }
     

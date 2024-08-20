@@ -30,58 +30,33 @@ char *s_strndup (const char *str, size_t chars)
 igs_core_context_t *core_context = NULL;
 igsagent_t *core_agent = NULL;
 
-// Callback wrappers
-typedef struct observe_io_cb_wrapper
-{
-    igs_io_fn *cb;
-    void *my_data;
-    struct observe_io_cb_wrapper *next;
-} observe_io_cb_wrapper_t;
-
-typedef struct observed_io
-{
-    char *name;
-    observe_io_cb_wrapper_t *firstCBWrapper;
-    UT_hash_handle hh;
-} observed_io_t;
-
-typedef struct
-{
-    char *name;
-    igs_service_fn *cb;
-    void *my_data;
-    UT_hash_handle hh;
-} service_cb_wrapper_t;
-
-typedef struct observe_mute_cb_wrapper
-{
-    igs_mute_fn *cb;
-    void *my_data;
-    struct observe_mute_cb_wrapper *next;
-} observe_mute_cb_wrapper_t;
-
-typedef struct observe_agent_events_cb_wrapper
-{
-    igs_agent_events_fn *cb;
-    void *my_data;
-    struct observe_agent_events_cb_wrapper *next;
-} observe_agent_events_cb_wrapper_t;
-
-observed_io_t *observed_inputs = NULL;
-observed_io_t *observed_outputs = NULL;
-observed_io_t *observed_attributes = NULL;
-service_cb_wrapper_t *service_cb_wrappers = NULL;
-observe_mute_cb_wrapper_t *mute_cb_wrappers = NULL;
-observe_agent_events_cb_wrapper_t *agent_event_cb_wrappers = NULL;
-
 //////////////////  CORE CONTEXT //////////////////
 void core_init_context (void)
 {
-    if (core_context == NULL) {
+    if (!core_context) {
+        model_read_write_lock(__FUNCTION__, __LINE__);
         core_context = (struct igs_core_context *) zmalloc (sizeof (struct igs_core_context));
-        core_context->created_agents = zhash_new ();
+        core_context->peer_headers = zhash_new();
+        zhash_autofree(core_context->peer_headers);
+        core_context->observed_inputs = zhashx_new();
+        core_context->observed_outputs = zhashx_new();
+        core_context->observed_attributes = zhashx_new();
+        core_context->service_cb_wrappers = zhashx_new();
+        core_context->mute_cb_wrappers = zlist_new();
+        core_context->agent_event_cb_wrappers = zlist_new();
+        core_context->freeze_callbacks = zlist_new();
+        core_context->external_stop_calbacks = zlist_new();
         core_context->brokers = zhash_new ();
-        zhash_autofree (core_context->brokers);
+        zhash_autofree(core_context->brokers);
+        core_context->monitor_callbacks = zlist_new();
+        core_context->elections = zhashx_new();
+        core_context->timers = zlist_new();
+        core_context->zyre_peers = zhashx_new();
+        core_context->zyre_callbacks = zlist_new();
+        core_context->agents = zhashx_new();
+        core_context->created_agents = zhashx_new ();
+        core_context->remote_agents = zhashx_new ();
+        core_context->splitters = zlist_new();
         // default values for context variables
         // NB: other values stay at zero / NULL until they are changed
         // by other functions.
@@ -96,142 +71,258 @@ void core_init_context (void)
         core_context->network_shall_raise_file_descriptors_limit = true;
         core_context->network_ipc_folder_path = strdup (IGS_DEFAULT_IPC_FOLDER_PATH);
         core_context->rt_current_microseconds = INT64_MIN;
+        model_read_write_unlock(__FUNCTION__, __LINE__);
     }
 }
 
 void s_core_free_observeIOP (observed_io_t **observed_io)
-{ // Internal
+{
     assert (observed_io);
     assert (*observed_io);
     if ((*observed_io)->name) {
         free ((*observed_io)->name);
         (*observed_io)->name = NULL;
     }
-    observe_io_cb_wrapper_t *io_cb_wrapper = NULL, *io_cb_wrapper_tmp = NULL;
-    LL_FOREACH_SAFE ((*observed_io)->firstCBWrapper, io_cb_wrapper,
-                     io_cb_wrapper_tmp)
-    {
-        LL_DELETE ((*observed_io)->firstCBWrapper, io_cb_wrapper);
-        free (io_cb_wrapper);
-        io_cb_wrapper = NULL;
+    observe_io_cb_wrapper_t *wrapper = zlist_first((*observed_io)->observed_io_wrappers);
+    while (wrapper) {
+        free (wrapper);
+        wrapper = zlist_next((*observed_io)->observed_io_wrappers);
     }
+    zlist_destroy(&(*observed_io)->observed_io_wrappers);
     free (*observed_io);
     (*observed_io) = NULL;
 }
 
 void s_core_free_service_cb_wrapper (service_cb_wrapper_t **service_cb_wrapper)
-{ // Internal
+{
     assert (service_cb_wrapper);
     assert (*service_cb_wrapper);
-    if ((*service_cb_wrapper)->name) {
-        free ((*service_cb_wrapper)->name);
-        (*service_cb_wrapper)->name = NULL;
-    }
+    assert ((*service_cb_wrapper)->name);
+    free ((*service_cb_wrapper)->name);
+    (*service_cb_wrapper)->name = NULL;
     free (*service_cb_wrapper);
     (*service_cb_wrapper) = NULL;
 }
 
 void igs_clear_context (void)
 {
-    if (core_context) {
-        igs_stop ();
-        igs_monitor_stop ();
-        if (core_context->created_agents) {
-            igsagent_t *a =
-              (igsagent_t *) zhash_first (core_context->created_agents);
-            while (a) {
-                igsagent_destroy (&a);
-                a = zhash_next (core_context->created_agents);
-            }
-            zhash_destroy (&core_context->created_agents);
-        }
-        core_agent = NULL;
-        // delete core agent callback wrappers
-        observed_io_t *observed_io, *observed_io_tmp;
-        HASH_ITER (hh, observed_inputs, observed_io, observed_io_tmp){
-            HASH_DEL (observed_inputs, observed_io);
-            s_core_free_observeIOP (&observed_io);
-        }
-        HASH_ITER (hh, observed_outputs, observed_io, observed_io_tmp){
-            HASH_DEL (observed_outputs, observed_io);
-            s_core_free_observeIOP (&observed_io);
-        }
-        HASH_ITER (hh, observed_attributes, observed_io, observed_io_tmp){
-            HASH_DEL (observed_attributes, observed_io);
-            s_core_free_observeIOP (&observed_io);
-        }
-        service_cb_wrapper_t *service_cb_wrapper, *service_cb_wrapper_tmp;
-        HASH_ITER (hh, service_cb_wrappers, service_cb_wrapper,
-                   service_cb_wrapper_tmp){
-            HASH_DEL (service_cb_wrappers, service_cb_wrapper);
-            s_core_free_service_cb_wrapper (&service_cb_wrapper);
-        }
-        observe_mute_cb_wrapper_t *mute_cb_wrapper = NULL,
-                                  *mute_cb_wrapper_tmp = NULL;
-        LL_FOREACH_SAFE (mute_cb_wrappers, mute_cb_wrapper, mute_cb_wrapper_tmp){
-            LL_DELETE (mute_cb_wrappers, mute_cb_wrapper);
-            free (mute_cb_wrapper);
-            mute_cb_wrapper = NULL;
-        }
-        observe_agent_events_cb_wrapper_t *agent_event_cb_wrapper = NULL,
-                                          *agent_event_cb_wrapper_tmp = NULL;
-        LL_FOREACH_SAFE (agent_event_cb_wrappers, agent_event_cb_wrapper,
-                         agent_event_cb_wrapper_tmp){
-            LL_DELETE (agent_event_cb_wrappers, agent_event_cb_wrapper);
-            free (agent_event_cb_wrapper);
-            agent_event_cb_wrapper = NULL;
-        }
-
-        if (core_context->log_file)
-            fclose (core_context->log_file);
-
-        igs_freeze_wrapper_t *freeze_elt, *freeze_tmp;
-        DL_FOREACH_SAFE (core_context->freeze_callbacks, freeze_elt, freeze_tmp){
-            DL_DELETE (core_context->freeze_callbacks, freeze_elt);
-            free (freeze_elt);
-        }
-        igs_forced_stop_wrapper_t *stop_elt, *stop_tmp;
-        DL_FOREACH_SAFE (core_context->external_stop_calbacks, stop_elt,stop_tmp){
-            DL_DELETE (core_context->external_stop_calbacks, stop_elt);
-            free (stop_elt);
-        }
-        zhash_destroy (&core_context->brokers);
-
-        if (core_context->security_auth)
-            zactor_destroy (&(core_context->security_auth));
-        if (core_context->security_cert)
-            zcert_destroy (&(core_context->security_cert));
-        if (core_context->security_public_certificates_directory)
-            free (core_context->security_public_certificates_directory);
-
-        if (core_context->elections) {
-            zlist_t *e = (zlist_t *) zhash_first (core_context->elections);
-            while (e) {
-                zlist_destroy (&e);
-                e = zhash_next (core_context->elections);
-            }
-            zhash_destroy (&core_context->elections);
-        }
-
-        free (core_context);
-        core_context = NULL;
+    if (!core_context)
+        return;
+    igs_stop ();
+    igs_monitor_stop ();
+    
+    model_read_write_lock(__FUNCTION__, __LINE__);
+    
+    zhash_destroy(&core_context->peer_headers);
+    
+    if (core_context->log_file){
+        fclose (core_context->log_file);
+        core_context->log_file = 0;
     }
+    
+    core_context->log_file_path[0] = '\0';
+    
+    observed_io_t *observed_io = zhashx_first(core_context->observed_inputs);
+    while (observed_io) {
+        //zhashx_delete(core_context->observed_inputs, observed_io->name);
+        s_core_free_observeIOP (&observed_io);
+        observed_io = zhashx_next(core_context->observed_inputs);
+    }
+    zhashx_destroy(&core_context->observed_inputs);
+    
+    observed_io = zhashx_first(core_context->observed_outputs);
+    while (observed_io) {
+        //zhash_delete(core_context->observed_outputs, observed_io->name);
+        s_core_free_observeIOP (&observed_io);
+        observed_io = zhashx_next(core_context->observed_outputs);
+    }
+    zhashx_destroy(&core_context->observed_outputs);
+    
+    observed_io = zhashx_first(core_context->observed_attributes);
+    while (observed_io) {
+        //zhashx_delete(core_context->observed_attributes, observed_io->name);
+        s_core_free_observeIOP (&observed_io);
+        observed_io = zhashx_next(core_context->observed_attributes);
+    }
+    zhashx_destroy(&core_context->observed_attributes);
+    
+    service_cb_wrapper_t *service_cb_wrapper = zhashx_first(core_context->service_cb_wrappers);
+    while (service_cb_wrapper) {
+        //zhashx_delete(core_context->service_cb_wrappers, service_cb_wrapper->name);
+        s_core_free_service_cb_wrapper (&service_cb_wrapper);
+        service_cb_wrapper = zhashx_next(core_context->service_cb_wrappers);
+    }
+    zhashx_destroy(&core_context->service_cb_wrappers);
+    
+    observe_mute_cb_wrapper_t *mute_cb_wrapper = zlist_first(core_context->mute_cb_wrappers);
+    while (mute_cb_wrapper) {
+        zlist_remove(core_context->mute_cb_wrappers, mute_cb_wrapper);
+        free (mute_cb_wrapper);
+        mute_cb_wrapper = zlist_next(core_context->mute_cb_wrappers);
+    }
+    zlist_destroy(&core_context->mute_cb_wrappers);
+    
+    observe_agent_events_cb_wrapper_t *agent_event_cb_wrapper = zlist_first(core_context->agent_event_cb_wrappers);
+    while (agent_event_cb_wrapper) {
+        zlist_remove(core_context->agent_event_cb_wrappers, agent_event_cb_wrapper);
+        free (agent_event_cb_wrapper);
+        agent_event_cb_wrapper = zlist_next(core_context->agent_event_cb_wrappers);
+    }
+    zlist_destroy(&core_context->agent_event_cb_wrappers);
+    
+    igs_freeze_wrapper_t *freeze_elt = zlist_first(core_context->freeze_callbacks);
+    while (freeze_elt) {
+        zlist_remove(core_context->freeze_callbacks, freeze_elt);
+        freeze_elt->callback_ptr = NULL;
+        free(freeze_elt);
+        freeze_elt = zlist_next(core_context->freeze_callbacks);
+    }
+    zlist_destroy(&core_context->freeze_callbacks);
+    
+    igs_forced_stop_wrapper_t *stop_elt = zlist_first(core_context->external_stop_calbacks);
+    while (stop_elt) {
+        zlist_remove(core_context->external_stop_calbacks, stop_elt);
+        stop_elt->callback_ptr = NULL;
+        free(stop_elt);
+        stop_elt = zlist_next(core_context->external_stop_calbacks);
+    }
+    zlist_destroy(&core_context->external_stop_calbacks);
+    
+    zhash_destroy (&core_context->brokers);
+    
+    if (core_context->advertised_endpoint){
+        free(core_context->advertised_endpoint);
+        core_context->advertised_endpoint = NULL;
+    }
+    
+    if (core_context->our_broker_endpoint){
+        free(core_context->our_broker_endpoint);
+        core_context->our_broker_endpoint = NULL;
+    }
+    
+    if (core_context->security_auth)
+        zactor_destroy (&(core_context->security_auth));
+    if (core_context->security_cert)
+        zcert_destroy (&(core_context->security_cert));
+    if (core_context->security_public_certificates_directory){
+        free (core_context->security_public_certificates_directory);
+        core_context->security_public_certificates_directory = NULL;
+    }
+    
+    assert(core_context->monitor == NULL);
+    
+    igs_monitor_wrapper_t *monitor_elt = zlist_first(core_context->monitor_callbacks);
+    while (monitor_elt) {
+        zlist_remove(core_context->monitor_callbacks, monitor_elt);
+        monitor_elt->callback_ptr = NULL;
+        free(monitor_elt);
+        monitor_elt = zlist_next(core_context->monitor_callbacks);
+    }
+    zlist_destroy(&core_context->monitor_callbacks);
+    
+    zlist_t *election = (zlist_t *) zhashx_first (core_context->elections);
+    while (election) {
+        zlist_destroy (&election);
+        election = zhashx_next (core_context->elections);
+    }
+    zhashx_destroy (&core_context->elections);
+    
+    if (core_context->network_device){
+        free(core_context->network_device);
+        core_context->network_device = NULL;
+    }
+    
+    if (core_context->ip_address){
+        free(core_context->ip_address);
+        core_context->ip_address = NULL;
+    }
+    
+    if (core_context->our_agent_endpoint){
+        free(core_context->our_agent_endpoint);
+        core_context->our_agent_endpoint = NULL;
+    }
+    
+    if (core_context->command_line){
+        free(core_context->command_line);
+        core_context->command_line = NULL;
+    }
+    
+    if (core_context->replay_channel){
+        free(core_context->replay_channel);
+        core_context->replay_channel = NULL;
+    }
+    
+    assert(zlist_size(core_context->timers)==0);
+    
+    if (core_context->network_ipc_folder_path){
+        free(core_context->network_ipc_folder_path);
+        core_context->network_ipc_folder_path = NULL;
+    }
+    
+    if (core_context->network_ipc_full_path){
+        free(core_context->network_ipc_full_path);
+        core_context->network_ipc_full_path = NULL;
+    }
+    
+    if (core_context->network_ipc_endpoint){
+        free(core_context->network_ipc_endpoint);
+        core_context->network_ipc_endpoint = NULL;
+    }
+    
+    assert(zhashx_size(core_context->zyre_peers)==0);
+    
+    igs_channels_wrapper_t *zyre_cb = zlist_first(core_context->zyre_callbacks);
+    while (zyre_cb) {
+        zlist_remove(core_context->zyre_callbacks, zyre_cb);
+        zyre_cb->callback_ptr = NULL;
+        free(zyre_cb);
+        zyre_cb = zlist_next(core_context->zyre_callbacks);
+    }
+    zlist_destroy(&core_context->zyre_callbacks);
+    
+    
+    igsagent_t *a = (igsagent_t *) zhashx_first(core_context->created_agents);
+    while (a && a->uuid) {
+        //zhash_delete(core_context->created_agents, a->uuid);
+        model_read_write_unlock(__FUNCTION__, __LINE__);
+        igsagent_destroy (&a);
+        model_read_write_lock(__FUNCTION__, __LINE__);
+        a = zhashx_next(core_context->created_agents);
+    }
+    zhashx_destroy(&core_context->created_agents);
+    core_agent = NULL;
+    
+    zhashx_destroy(&core_context->agents);
+    
+    igs_splitter_t *splitter = zlist_first(core_context->splitters);
+    while (splitter) {
+        zlist_remove(core_context->splitters, splitter);
+        split_free_splitter(&splitter);
+        splitter = zlist_next(core_context->splitters);
+    }
+    zlist_destroy(&core_context->splitters);
+    
+    assert(core_context->network_actor == NULL);
+    assert(core_context->internal_pipe == NULL);
+    assert(core_context->node == NULL);
+    assert(core_context->publisher == NULL);
+    assert(core_context->ipc_publisher == NULL);
+    assert(core_context->inproc_publisher == NULL);
+    assert(core_context->logger == NULL);
+    assert(core_context->loop == NULL);
+    
+    free (core_context);
+    core_context = NULL;
+    model_read_write_unlock(__FUNCTION__, __LINE__);
 }
 
 //////////////////  CORE AGENT //////////////////
-void core_external_stop_cb (void *my_data)
-{
-    IGS_UNUSED (my_data)
-}
-
 void core_init_agent (void)
 {
     core_init_context ();
-    if (core_agent == NULL) {
-        core_agent = igsagent_new (IGS_DEFAULT_AGENT_NAME, false);
-        igs_observe_forced_stop (core_external_stop_cb, NULL);
+    if (!core_agent) {
+        core_agent = igsagent_new (IGS_DEFAULT_AGENT_NAME, true);
         core_agent->context = core_context;
-        igsagent_activate (core_agent);
     }
 }
 
@@ -308,11 +399,12 @@ void igs_observe_mute (igs_mute_fn cb, void *my_data)
 {
     assert (cb);
     core_init_agent ();
-    observe_mute_cb_wrapper_t *wrap = (observe_mute_cb_wrapper_t *) zmalloc (
-      sizeof (observe_mute_cb_wrapper_t));
+    model_read_write_lock(__FUNCTION__, __LINE__);
+    observe_mute_cb_wrapper_t *wrap = (observe_mute_cb_wrapper_t *) zmalloc (sizeof (observe_mute_cb_wrapper_t));
     wrap->cb = cb;
     wrap->my_data = my_data;
-    LL_APPEND (mute_cb_wrappers, wrap); // store wrapper to delete it later
+    zlist_append(core_context->mute_cb_wrappers, wrap);
+    model_read_write_unlock(__FUNCTION__, __LINE__);
     igsagent_observe_mute (core_agent, core_observe_mute_callback, wrap);
 }
 
@@ -332,14 +424,13 @@ void igs_observe_agent_events (igs_agent_events_fn cb, void *my_data)
 {
     assert (cb);
     core_init_agent ();
-    observe_agent_events_cb_wrapper_t *wrap =
-      (observe_agent_events_cb_wrapper_t *) zmalloc (
-        sizeof (observe_agent_events_cb_wrapper_t));
+    model_read_write_lock(__FUNCTION__, __LINE__);
+    observe_agent_events_cb_wrapper_t *wrap = (observe_agent_events_cb_wrapper_t *) zmalloc (sizeof (observe_agent_events_cb_wrapper_t));
     wrap->cb = cb;
     wrap->my_data = my_data;
-    LL_APPEND (agent_event_cb_wrappers, wrap);
-    igsagent_observe_agent_events (core_agent,
-                                   core_observe_agent_events_callback, wrap);
+    zlist_append(core_context->agent_event_cb_wrappers, wrap);
+    model_read_write_unlock(__FUNCTION__, __LINE__);
+    igsagent_observe_agent_events (core_agent, core_observe_agent_events_callback, wrap);
 }
 
 // IOP
@@ -629,62 +720,58 @@ void core_observeIOPCallback (igsagent_t *agent,
 void igs_observe_input (const char *name, igs_io_fn cb, void *my_data)
 {
     core_init_agent ();
-    observe_io_cb_wrapper_t *wrap =
-      (observe_io_cb_wrapper_t *) zmalloc (sizeof (observe_io_cb_wrapper_t));
+    model_read_write_lock(__FUNCTION__, __LINE__);
+    observe_io_cb_wrapper_t *wrap = (observe_io_cb_wrapper_t *) zmalloc (sizeof (observe_io_cb_wrapper_t));
     wrap->cb = cb;
     wrap->my_data = my_data;
-    // store wrapper to delete it later
-    observed_io_t *observed_io = NULL;
-    HASH_FIND_STR (observed_inputs, name, observed_io);
-    if (observed_io == NULL) {
+    observed_io_t *observed_io = zhashx_lookup(core_context->observed_inputs, name);
+    if (!observed_io) {
         observed_io = (observed_io_t *) zmalloc (sizeof (observed_io_t));
         observed_io->name = strdup (name);
-        observed_io->firstCBWrapper = NULL;
-        HASH_ADD_STR (observed_inputs, name, observed_io);
+        observed_io->observed_io_wrappers = zlist_new();
+        zhashx_insert(core_context->observed_inputs, name, observed_io);
     }
-    LL_APPEND (observed_io->firstCBWrapper, wrap);
+    zlist_append(observed_io->observed_io_wrappers, wrap);
+    model_read_write_unlock(__FUNCTION__, __LINE__);
     igsagent_observe_input (core_agent, name, core_observeIOPCallback, wrap);
 }
 
 void igs_observe_output (const char *name, igs_io_fn cb, void *my_data)
 {
     core_init_agent ();
-    observe_io_cb_wrapper_t *wrap =
-      (observe_io_cb_wrapper_t *) zmalloc (sizeof (observe_io_cb_wrapper_t));
+    model_read_write_lock(__FUNCTION__, __LINE__);
+    observe_io_cb_wrapper_t *wrap = (observe_io_cb_wrapper_t *) zmalloc (sizeof (observe_io_cb_wrapper_t));
     wrap->cb = cb;
     wrap->my_data = my_data;
-    // store wrapper to delete it later
-    observed_io_t *observed_io = NULL;
-    HASH_FIND_STR (observed_outputs, name, observed_io);
-    if (observed_io == NULL) {
+    observed_io_t *observed_io = zhashx_lookup(core_context->observed_outputs, name);
+    if (!observed_io) {
         observed_io = (observed_io_t *) zmalloc (sizeof (observed_io_t));
         observed_io->name = strdup (name);
-        observed_io->firstCBWrapper = NULL;
-        HASH_ADD_STR (observed_outputs, name, observed_io);
+        observed_io->observed_io_wrappers = zlist_new();
+        zhashx_insert(core_context->observed_outputs, name, observed_io);
     }
-    LL_APPEND (observed_io->firstCBWrapper, wrap);
+    zlist_append(observed_io->observed_io_wrappers, wrap);
+    model_read_write_unlock(__FUNCTION__, __LINE__);
     igsagent_observe_output (core_agent, name, core_observeIOPCallback, wrap);
 }
 
 void igs_observe_attribute (const char *name, igs_io_fn cb, void *my_data)
 {
     core_init_agent ();
-    observe_io_cb_wrapper_t *wrap =
-      (observe_io_cb_wrapper_t *) zmalloc (sizeof (observe_io_cb_wrapper_t));
+    model_read_write_lock(__FUNCTION__, __LINE__);
+    observe_io_cb_wrapper_t *wrap = (observe_io_cb_wrapper_t *) zmalloc (sizeof (observe_io_cb_wrapper_t));
     wrap->cb = cb;
     wrap->my_data = my_data;
-    // store wrapper to delete it later
-    observed_io_t *observed_io = NULL;
-    HASH_FIND_STR (observed_attributes, name, observed_io);
-    if (observed_io == NULL) {
+    observed_io_t *observed_io = zhashx_lookup(core_context->observed_attributes, name);
+    if (!observed_io) {
         observed_io = (observed_io_t *) zmalloc (sizeof (observed_io_t));
         observed_io->name = strdup (name);
-        observed_io->firstCBWrapper = NULL;
-        HASH_ADD_STR (observed_attributes, name, observed_io);
+        observed_io->observed_io_wrappers = zlist_new();
+        zhashx_insert(core_context->observed_attributes, name, observed_io);
     }
-    LL_APPEND (observed_io->firstCBWrapper, wrap);
-    igsagent_observe_attribute (core_agent, name, core_observeIOPCallback,
-                                 wrap);
+    zlist_append(observed_io->observed_io_wrappers, wrap);
+    model_read_write_unlock(__FUNCTION__, __LINE__);
+    igsagent_observe_attribute (core_agent, name, core_observeIOPCallback, wrap);
 }
 
 void igs_output_mute (const char *name)
@@ -794,30 +881,34 @@ void igs_clear_definition (void)
 {
     core_init_agent ();
     igsagent_clear_definition (core_agent);
+    
+    model_read_write_lock(__FUNCTION__, __LINE__);
     // delete associated callback wrappers
-    observed_io_t *observed_io, *observed_io_tmp;
-    HASH_ITER (hh, observed_inputs, observed_io, observed_io_tmp)
-    {
-        HASH_DEL (observed_inputs, observed_io);
+    observed_io_t *observed_io = zhashx_first(core_context->observed_inputs);
+    while (observed_io) {
+        zhashx_delete(core_context->observed_inputs, observed_io->name);
         s_core_free_observeIOP (&observed_io);
+        observed_io = zhashx_next(core_context->observed_inputs);
     }
-    HASH_ITER (hh, observed_outputs, observed_io, observed_io_tmp)
-    {
-        HASH_DEL (observed_outputs, observed_io);
+    observed_io = zhashx_first(core_context->observed_outputs);
+    while (observed_io) {
+        zhashx_delete(core_context->observed_outputs, observed_io->name);
         s_core_free_observeIOP (&observed_io);
+        observed_io = zhashx_next(core_context->observed_outputs);
     }
-    HASH_ITER (hh, observed_attributes, observed_io, observed_io_tmp)
-    {
-        HASH_DEL (observed_attributes, observed_io);
+    observed_io = zhashx_first(core_context->observed_attributes);
+    while (observed_io) {
+        zhashx_delete(core_context->observed_attributes, observed_io->name);
         s_core_free_observeIOP (&observed_io);
+        observed_io = zhashx_next(core_context->observed_attributes);
     }
-    service_cb_wrapper_t *service_cb_wrapper, *service_cb_wrapper_tmp;
-    HASH_ITER (hh, service_cb_wrappers, service_cb_wrapper,
-               service_cb_wrapper_tmp)
-    {
-        HASH_DEL (service_cb_wrappers, service_cb_wrapper);
+    service_cb_wrapper_t *service_cb_wrapper = zhashx_first(core_context->service_cb_wrappers);
+    while (service_cb_wrapper) {
+        zhashx_delete(core_context->service_cb_wrappers, service_cb_wrapper->name);
         s_core_free_service_cb_wrapper (&service_cb_wrapper);
+        service_cb_wrapper = zhashx_next(core_context->service_cb_wrappers);
     }
+    model_read_write_unlock(__FUNCTION__, __LINE__);
 }
 
 char *igs_definition_json (void)
@@ -909,15 +1000,16 @@ igs_result_t igs_input_remove (const char *name)
 {
     core_init_agent ();
     igs_result_t result = igsagent_input_remove (core_agent, name);
+    model_read_write_lock(__FUNCTION__, __LINE__);
     if (result == IGS_SUCCESS) {
         // delete associated callback wrappers
-        observed_io_t *observed_io = NULL;
-        HASH_FIND_STR (observed_inputs, name, observed_io);
+        observed_io_t *observed_io = zhashx_lookup(core_context->observed_inputs, name);
         if (observed_io) {
-            HASH_DEL (observed_inputs, observed_io);
+            zhashx_delete(core_context->observed_inputs, name);
             s_core_free_observeIOP (&observed_io);
         }
     }
+    model_read_write_unlock(__FUNCTION__, __LINE__);
     return result;
 }
 
@@ -925,15 +1017,16 @@ igs_result_t igs_output_remove (const char *name)
 {
     core_init_agent ();
     igs_result_t result = igsagent_output_remove (core_agent, name);
+    model_read_write_lock(__FUNCTION__, __LINE__);
     if (result == IGS_SUCCESS) {
         // delete associated callback wrappers
-        observed_io_t *observed_io = NULL;
-        HASH_FIND_STR (observed_outputs, name, observed_io);
+        observed_io_t *observed_io = zhashx_lookup(core_context->observed_outputs, name);
         if (observed_io) {
-            HASH_DEL (observed_outputs, observed_io);
+            zhashx_delete(core_context->observed_outputs, name);
             s_core_free_observeIOP (&observed_io);
         }
     }
+    model_read_write_unlock(__FUNCTION__, __LINE__);
     return result;
 }
 
@@ -941,15 +1034,16 @@ igs_result_t igs_attribute_remove (const char *name)
 {
     core_init_agent ();
     igs_result_t result = igsagent_attribute_remove (core_agent, name);
+    model_read_write_lock(__FUNCTION__, __LINE__);
     if (result == IGS_SUCCESS) {
         // delete associated callback wrappers
-        observed_io_t *observed_io = NULL;
-        HASH_FIND_STR (observed_attributes, name, observed_io);
+        observed_io_t *observed_io = zhashx_lookup(core_context->observed_attributes, name);
         if (observed_io) {
-            HASH_DEL (observed_attributes, observed_io);
+            zhashx_delete(core_context->observed_attributes, name);
             s_core_free_observeIOP (&observed_io);
         }
     }
+    model_read_write_unlock(__FUNCTION__, __LINE__);
     return result;
 }
 
@@ -997,12 +1091,11 @@ size_t igs_mapping_count (void)
 }
 
 uint64_t igs_mapping_add (const char *from_our_input,
-                               const char *to_agent,
-                               const char *with_output)
+                          const char *to_agent,
+                          const char *with_output)
 {
     core_init_agent ();
-    return igsagent_mapping_add (core_agent, from_our_input, to_agent,
-                                  with_output);
+    return igsagent_mapping_add (core_agent, from_our_input, to_agent, with_output);
 }
 // returns mapping id or zero or below if creation failed
 igs_result_t igs_mapping_remove_with_id (uint64_t the_id)
@@ -1029,12 +1122,11 @@ size_t igs_split_count (void)
 }
 
 uint64_t igs_split_add (const char *from_our_input,
-                             const char *to_agent,
-                             const char *with_output)
+                        const char *to_agent,
+                        const char *with_output)
 {
     core_init_agent ();
-    return igsagent_split_add (core_agent, from_our_input, to_agent,
-                                with_output);
+    return igsagent_split_add (core_agent, from_our_input, to_agent, with_output);
 }
 
 igs_result_t igs_split_remove_with_id (uint64_t the_id)
@@ -1049,7 +1141,7 @@ igs_result_t igs_split_remove_with_name (const char *from_our_input,
 {
     core_init_agent ();
     return igsagent_split_remove_with_name (core_agent, from_our_input,
-                                             to_agent, with_output);
+                                            to_agent, with_output);
 }
 
 // admin
@@ -1160,11 +1252,13 @@ igs_service_init (const char *name, igs_service_fn cb, void *my_data)
     assert (name && strlen (name) > 0);
     assert (cb);
     core_init_agent ();
+    model_read_write_lock(__FUNCTION__, __LINE__);
     service_cb_wrapper_t *wrap = (service_cb_wrapper_t *) zmalloc (sizeof (service_cb_wrapper_t));
     wrap->name = strdup (name);
     wrap->cb = cb;
     wrap->my_data = my_data;
-    HASH_ADD_STR (service_cb_wrappers, name, wrap); // store wrapper to delete it later
+    zhashx_insert(core_context->service_cb_wrappers, name, wrap);
+    model_read_write_unlock(__FUNCTION__, __LINE__);
     return igsagent_service_init (core_agent, name, core_service_callback, wrap);
 }
 
@@ -1173,15 +1267,16 @@ igs_result_t igs_service_remove (const char *name)
     assert (name);
     core_init_agent ();
     igs_result_t result = igsagent_service_remove (core_agent, name);
+    model_read_write_lock(__FUNCTION__, __LINE__);
     if (result == IGS_SUCCESS) {
         // delete associated callback wrapper
-        service_cb_wrapper_t *service_cb_wrapper = NULL;
-        HASH_FIND_STR (service_cb_wrappers, name, service_cb_wrapper);
+        service_cb_wrapper_t *service_cb_wrapper = zhashx_lookup(core_context->service_cb_wrappers, name);
         if (service_cb_wrapper) {
-            HASH_DEL (service_cb_wrappers, service_cb_wrapper);
+            zhashx_delete(core_context->service_cb_wrappers, name);
             s_core_free_service_cb_wrapper (&service_cb_wrapper);
         }
     }
+    model_read_write_unlock(__FUNCTION__, __LINE__);
     return result;
 }
 
@@ -1304,37 +1399,42 @@ bool igs_rt_timestamps(void){
 }
 
 void igs_rt_set_time(int64_t microseconds){
-    core_init_context();
+    core_init_agent ();
+    model_read_write_lock(__FUNCTION__, __LINE__);
     igs_info("set rt time to %lld", microseconds);
     core_context->rt_current_microseconds = microseconds;
-    igsagent_t *agent, *tmp_agent;
-    HASH_ITER (hh, core_context->agents, agent, tmp_agent){
+    igsagent_t *agent = zhashx_first(core_context->agents);
+    while (agent) {
         agent->rt_timestamps_enabled = true;
         if (agent->rt_synchronous_mode_enabled
             && agent->definition
             && agent->definition->outputs_table){
             //iterate on outputs and publish them separately
-            //NB: we do not create a single message because it would not be compatible
+            //NB: we do not create a single gathering message because it would not be compatible
             //with the mapping filters: only the 1st output would serve in the filter.
-            igs_io_t *io, *tmp_io;
-            HASH_ITER(hh, agent->definition->outputs_table, io, tmp_io)
+            igs_io_t *io = zhashx_first(agent->definition->outputs_table);
+            while (io) {
                 network_publish_output(agent, io);
+                io = zhashx_next(agent->definition->outputs_table);
+            }
         }
+        agent = zhashx_next(core_context->agents);
     }
+    model_read_write_unlock(__FUNCTION__, __LINE__);
 }
 
 int64_t igs_rt_time(void){
-    core_init_context();
+    core_init_agent ();
     return core_context->rt_current_microseconds;
 }
 
 void igs_rt_set_synchronous_mode(bool enable){
-    core_init_agent();
+    core_init_agent ();
     igsagent_rt_set_synchronous_mode(core_agent, enable);
 }
 
 bool igs_rt_synchronous_mode(void){
-    core_init_agent();
+    core_init_agent ();
     return igsagent_rt_synchronous_mode(core_agent);
 }
 

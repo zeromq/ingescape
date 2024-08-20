@@ -41,7 +41,7 @@ char log_content[IGS_MAX_LOG_LENGTH] = "";
 char log_time[LOG_TIME_LENGTH] = "";
 
 // TODO: This method is a utility method and is not specialy linked with the administration. It is used in multiple .c files and may be moved to a more relevant place.
-void s_admin_make_file_path (const char *from, char *to, size_t size_of_to)
+void admin_make_file_path (const char *from, char *to, size_t size_of_to)
 {
     if (from[0] == '~') {
         from++;
@@ -131,51 +131,44 @@ void admin_log (igsagent_t *agent,
     
     if (core_context->log_in_stream && core_context->logger)
         zstr_sendf (core_context->logger, "%s;%s;%s;%s\n",
-                    agent->definition->name, log_levels[level], function,
-                    full_log_content_rectified);
+                    agent->definition->name, log_levels[level], function, full_log_content_rectified);
     
     if (core_context->log_in_file && level >= core_context->log_file_level) {
         full_log_content_rectified[full_log_length + full_log_length_offset] = '\0';
-        if (!core_context->log_file
-            && strlen (core_context->log_file_path) == 0) {
+        if (!core_context->log_file && strlen (core_context->log_file_path) == 0) {
             // Current path is empty and log file is not already initiated, create
             // file with default path
             char buff[IGS_MAX_PATH_LENGTH] = "";
-            snprintf (core_context->log_file_path, IGS_MAX_PATH_LENGTH,
-                      IGS_DEFAULT_LOG_DIR);
+            snprintf (core_context->log_file_path, IGS_MAX_PATH_LENGTH, IGS_DEFAULT_LOG_DIR);
             strncpy (buff, core_context->log_file_path, IGS_MAX_PATH_LENGTH);
-            s_admin_make_file_path (buff, core_context->log_file_path,
-                                    IGS_MAX_PATH_LENGTH);
+            admin_make_file_path (buff, core_context->log_file_path, IGS_MAX_PATH_LENGTH);
             if (!zsys_file_exists (core_context->log_file_path)) {
                 printf ("creating log dir %s\n", core_context->log_file_path);
                 if (zsys_dir_create (core_context->log_file_path) != 0)
-                    printf ("error while creating log dir %s\n",
-                            core_context->log_file_path);
+                    printf ("error while creating log dir %s\n", core_context->log_file_path);
             }
-            strncat (core_context->log_file_path, agent->definition->name,
-                     IGS_MAX_PATH_LENGTH);
+            strncat (core_context->log_file_path, agent->definition->name, IGS_MAX_PATH_LENGTH);
             strncat (core_context->log_file_path, ".log", IGS_MAX_PATH_LENGTH);
             printf ("using log file %s\n", core_context->log_file_path);
             if (core_context && core_context->node) {
-                s_lock_zyre_peer (__FUNCTION__, __LINE__);
-                igsagent_t *a, *tmp;
-                HASH_ITER (hh, core_context->agents, a, tmp)
-                {
+                igsagent_t *a = zhashx_first(core_context->agents);
+                while (a) {
                     zmsg_t *msg = zmsg_new ();
                     zmsg_addstr (msg, LOG_FILE_PATH_MSG);
                     zmsg_addstr (msg, core_context->log_file_path);
                     zmsg_addstr (msg, a->uuid);
+                    s_lock_zyre_peer (__FUNCTION__, __LINE__);
                     zyre_shout (core_context->node, IGS_PRIVATE_CHANNEL, &msg);
+                    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
+                    a = zhashx_next(core_context->agents);
                 }
-                s_unlock_zyre_peer (__FUNCTION__, __LINE__);
             }
         }
         if (!core_context->log_file
             || !zsys_file_exists (core_context->log_file_path)) {
             core_context->log_file = fopen (core_context->log_file_path, "a");
             if (!core_context->log_file)
-                printf ("error while trying to create/open log file: %s\n",
-                        core_context->log_file_path);
+                printf ("error while trying to create/open log file: %s\n", core_context->log_file_path);
         }
         if (core_context->log_file) {
 #if defined(__WINDOWS__)
@@ -196,22 +189,18 @@ void admin_log (igsagent_t *agent,
 #endif
             if (fprintf (core_context->log_file, "%s;%s;%s;%s;%s\n",
                          agent->definition->name, log_time, log_levels[level],
-                         function, full_log_content_rectified)
-                > 0) {
-                if (++core_context->log_nb_of_entries
-                    > NUMBER_OF_LOGS_FOR_FFLUSH) {
+                         function, full_log_content_rectified) > 0) {
+                if (++core_context->log_nb_of_entries > NUMBER_OF_LOGS_FOR_FFLUSH) {
                     core_context->log_nb_of_entries = 0;
                     fflush (core_context->log_file);
                 }
             }
             else
-                printf ("error while writing logs in %s\n",
-                        core_context->log_file_path);
+                printf ("error while writing logs in %s\n", core_context->log_file_path);
         }
     }
     
-    if (core_context->log_in_syslog
-        || (core_context->log_in_console && level >= core_context->log_level)){
+    if (core_context->log_in_syslog || (core_context->log_in_console && level >= core_context->log_level)){
         va_start (list, fmt);
         vsnprintf (log_content, IGS_MAX_LOG_LENGTH, fmt, list);
         va_end (list);
@@ -300,32 +289,31 @@ void admin_log (igsagent_t *agent,
     
     if (full_log_content_rectified)
         free (full_log_content_rectified);
-    assert (s_lock_initialized);
+    
     IGS_MUTEX_UNLOCK (lock);
 }
 
 void igs_log_set_console_level (igs_log_level_t level)
 {
-    core_init_context ();
+    core_init_agent ();
     core_context->log_level = level;
 }
 
 igs_log_level_t igs_log_console_level (void)
 {
-    core_init_context ();
+    core_init_agent ();
     return core_context->log_level;
 }
 
 void igs_log_set_file (bool allow, const char *path)
 {
-    core_init_context ();
+    core_init_agent ();
+    model_read_write_lock(__FUNCTION__, __LINE__);
     if (allow != core_context->log_in_file) {
         core_context->log_in_file = allow;
         if (core_context->network_actor && core_context->node) {
-            s_lock_zyre_peer (__FUNCTION__, __LINE__);
-            igsagent_t *agent, *tmp;
-            HASH_ITER (hh, core_context->agents, agent, tmp)
-            {
+            igsagent_t *agent = zhashx_first(core_context->agents);
+            while (agent){
                 zmsg_t *msg = zmsg_new ();
                 zmsg_addstr (msg, LOG_IN_FILE_MSG);
                 if (allow)
@@ -333,14 +321,16 @@ void igs_log_set_file (bool allow, const char *path)
                 else
                     zmsg_addstr (msg, "0");
                 zmsg_addstr (msg, agent->uuid);
+                s_lock_zyre_peer (__FUNCTION__, __LINE__);
                 zyre_shout (core_context->node, IGS_PRIVATE_CHANNEL, &msg);
+                s_unlock_zyre_peer (__FUNCTION__, __LINE__);
+                agent = zhashx_next(core_context->agents);
             }
-            s_unlock_zyre_peer (__FUNCTION__, __LINE__);
         }
     }
     if (path && strlen (path) > 0) {
         char tmp_path[4096] = "";
-        s_admin_make_file_path (path, tmp_path, 4095);
+        admin_make_file_path (path, tmp_path, 4095);
         if (!zsys_file_exists (tmp_path)) {
             zfile_t *newF = zfile_new (NULL, tmp_path);
             if (newF)
@@ -349,11 +339,12 @@ void igs_log_set_file (bool allow, const char *path)
         }
         if (access (tmp_path, W_OK) == -1) {
             igs_error ("'%s' is not writable and will not be used", tmp_path);
+            model_read_write_unlock(__FUNCTION__, __LINE__);
             return;
         }
         if (streq (core_context->log_file_path, tmp_path)) {
-            igs_info ("'%s' is already the log path",
-                      core_context->log_file_path);
+            igs_info ("'%s' is already the log path", core_context->log_file_path);
+            model_read_write_unlock(__FUNCTION__, __LINE__);
             return;
         }
         strncpy (core_context->log_file_path, tmp_path, 4096);
@@ -365,23 +356,21 @@ void igs_log_set_file (bool allow, const char *path)
         }
         core_context->log_file = fopen (core_context->log_file_path, "a");
         if (core_context->log_file == NULL)
-            igs_error ("could NOT create log file at path %s",
-                       core_context->log_file_path);
+            igs_error ("could NOT create log file at path %s", core_context->log_file_path);
         else
-            igs_info ("switching to new log file: %s",
-                      core_context->log_file_path);
+            igs_info ("switching to new log file: %s", core_context->log_file_path);
         if (core_context->log_file && core_context && core_context->node) {
-            s_lock_zyre_peer (__FUNCTION__, __LINE__);
-            igsagent_t *agent, *tmp;
-            HASH_ITER (hh, core_context->agents, agent, tmp)
-            {
+            igsagent_t *agent = zhashx_first(core_context->agents);
+            while (agent){
                 zmsg_t *msg = zmsg_new ();
                 zmsg_addstr (msg, LOG_FILE_PATH_MSG);
                 zmsg_addstr (msg, core_context->log_file_path);
                 zmsg_addstr (msg, agent->uuid);
+                s_lock_zyre_peer (__FUNCTION__, __LINE__);
                 zyre_shout (core_context->node, IGS_PRIVATE_CHANNEL, &msg);
+                s_unlock_zyre_peer (__FUNCTION__, __LINE__);
+                agent = zhashx_next(core_context->agents);
             }
-            s_unlock_zyre_peer (__FUNCTION__, __LINE__);
         }
     }
     else {
@@ -392,78 +381,82 @@ void igs_log_set_file (bool allow, const char *path)
         }
         core_context->log_file_path[0] = '\0';
     }
+    model_read_write_unlock(__FUNCTION__, __LINE__);
 }
 
 bool igs_log_file (void)
 {
-    core_init_context ();
+    core_init_agent ();
     return core_context->log_in_file;
 }
 
 void igs_log_set_console (bool allow)
 {
-    core_init_context ();
+    core_init_agent ();
     core_context->log_in_console = allow;
 }
 
 bool igs_log_console (void)
 {
-    core_init_context ();
+    core_init_agent ();
     return core_context->log_in_console;
 }
 
 void igs_log_set_syslog (bool allow){
-    core_init_context ();
+    core_init_agent ();
+    model_read_write_lock(__FUNCTION__, __LINE__);
     core_context->log_in_syslog = allow;
 #if defined (__UNIX__)
     openlog ("ingescape", LOG_PID, LOG_USER);
 #elif defined (__WINDOWS__)
     //  TODO: hook in Windows event log for Windows
 #endif
-    
+    model_read_write_unlock(__FUNCTION__, __LINE__);
 }
 
 bool igs_log_syslog(void){
-    core_init_context ();
+    core_init_agent ();
     return core_context->log_in_syslog;
 }
 
 void igs_log_set_console_color (bool allow)
 {
-    core_init_context ();
+    core_init_agent ();
     core_context->use_color_in_console = allow;
 }
 
 bool igs_log_console_color (void)
 {
-    core_init_context ();
+    core_init_agent ();
     return core_context->use_color_in_console;
 }
 
 void igs_log_set_stream (bool stream)
 {
-    core_init_context ();
+    core_init_agent ();
+    model_read_write_lock(__FUNCTION__, __LINE__);
     if (stream != core_context->log_in_stream) {
         core_context->log_in_stream = stream;
         if (core_context->network_actor && core_context->node) {
-            s_lock_zyre_peer (__FUNCTION__, __LINE__);
-            igsagent_t *agent, *tmp;
-            HASH_ITER (hh, core_context->agents, agent, tmp)
-            {
+            igsagent_t *agent = zhashx_first(core_context->agents);
+            while (agent){
                 zmsg_t *msg = zmsg_new ();
                 zmsg_addstr (msg, LOG_IN_STREAM_MSG);
                 zmsg_addstr (msg, (stream) ? "1" : "0");
                 zmsg_addstr (msg, agent->uuid);
+                s_lock_zyre_peer (__FUNCTION__, __LINE__);
                 zyre_shout (core_context->node, IGS_PRIVATE_CHANNEL, &msg);
+                s_unlock_zyre_peer (__FUNCTION__, __LINE__);
+                agent = zhashx_next(core_context->agents);
             }
-            s_unlock_zyre_peer (__FUNCTION__, __LINE__);
         }
     }
+    model_read_write_unlock(__FUNCTION__, __LINE__);
 }
 
 bool igs_log_stream (void)
 {
-    core_init_context ();
+    core_init_agent ();
     return core_context->log_in_stream;
 }
 
@@ -474,18 +467,21 @@ void igs_log_set_file_path (const char *path)
 
 char *igs_log_file_path (void)
 {
-    core_init_context ();
-    return (strlen(core_context->log_file_path)>0) ? strdup (core_context->log_file_path) : NULL;
+    core_init_agent ();
+    model_read_write_lock(__FUNCTION__, __LINE__);
+    char *res = (strlen(core_context->log_file_path)>0) ? strdup (core_context->log_file_path) : NULL;
+    model_read_write_unlock(__FUNCTION__, __LINE__);
+    return res;
 }
 
 void igs_log_set_file_level (igs_log_level_t level)
 {
-    core_init_context ();
+    core_init_agent ();
     core_context->log_file_level = level;
 }
 
 void igs_log_set_file_max_line_length (size_t size)
 {
-    core_init_context ();
+    core_init_agent ();
     core_context->log_file_max_line_length = size;
 }

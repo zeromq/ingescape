@@ -166,7 +166,7 @@ namespace Tester
             string uuid = Igs.AgentUUID();
             Assert.IsNotNull(Igs.AgentUUID());
 
-            //package and class            
+            //package and class
             string classStr = "my_class";
             Igs.DefinitionSetClass(classStr);
             Assert.AreEqual(classStr, Igs.DefinitionClass());
@@ -833,7 +833,10 @@ namespace Tester
             Assert.IsTrue(!Igs.ServiceHasReply("myServiceWithReplies", "myReply3"));
             Assert.IsTrue(Igs.ServiceHasReplies("myServiceWithReplies"));
             names = Igs.ServiceReplyNames("myServiceWithReplies");
-            Assert.IsTrue((names != null) && (names.Length == 2) && ("myReply" == names[0]) && ("myReply2" == names[1]));
+            Assert.IsTrue(names != null);
+            Assert.IsTrue(names.Length == 2);
+            Assert.IsTrue(names.Contains("myReply"));
+            Assert.IsTrue(names.Contains("myReply2"));
             Assert.IsTrue(Igs.ServiceReplyArgumentsList("myServiceWithReplies", "myReply") == null);
             Assert.IsTrue(Igs.ServiceReplyArgsCount("myServiceWithReplies", "myReply") == 0);
             Assert.IsTrue(Igs.ServiceReplyArgAdd("myServiceWithReplies", "myReply", "myBool", IopValueType.Bool) == Result.Success);
@@ -1043,7 +1046,7 @@ namespace Tester
             Igs.InputSetBool("my_data", true);
             Assert.IsTrue(Igs.InputData("my_data").Length == sizeof(bool));
 
-            
+
             Igs.InputSetInt("my_impulsion", 3);
             Igs.InputSetInt("my_bool", 3);
             Assert.IsTrue(Igs.InputBool("my_bool"));
@@ -1340,28 +1343,28 @@ namespace Tester
             SecondAgent.Activate();
 
             //elections
-            Assert.IsTrue(Igs.ElectionLeave("my election") == Result.Failure);
+            Assert.IsTrue(Igs.ElectionLeave("my election") == Result.Success);
             Assert.IsTrue(Igs.ElectionJoin("my election") == Result.Success);
             Assert.IsTrue(Igs.ElectionJoin("my election") == Result.Failure);
             Assert.IsTrue(Igs.ElectionJoin("INGESCAPE_PRIVATE") == Result.Failure);
             Assert.IsTrue(Igs.ElectionLeave("my election") == Result.Success);
-            Assert.IsTrue(Igs.ElectionLeave("my election") == Result.Failure);
-            Assert.IsTrue(Igs.ElectionLeave("my other election") == Result.Failure);
+            Assert.IsTrue(Igs.ElectionLeave("my election") == Result.Success);
+            Assert.IsTrue(Igs.ElectionLeave("my other election") == Result.Success);
             Assert.IsTrue(Igs.ElectionJoin("my other election") == Result.Success);
             Assert.IsTrue(Igs.ElectionJoin("my other election") == Result.Failure);
             Assert.IsTrue(Igs.ElectionLeave("my other election") == Result.Success);
-            Assert.IsTrue(Igs.ElectionLeave("my other election") == Result.Failure);
-            Assert.IsTrue(FirstAgent.ElectionLeave("my election") == Result.Failure);
+            Assert.IsTrue(Igs.ElectionLeave("my other election") == Result.Success);
+            Assert.IsTrue(FirstAgent.ElectionLeave("my election") == Result.Success);
             Assert.IsTrue(FirstAgent.ElectionJoin("my election") == Result.Success);
             Assert.IsTrue(FirstAgent.ElectionJoin("my election") == Result.Failure);
             Assert.IsTrue(FirstAgent.ElectionJoin("INGESCAPE_PRIVATE") == Result.Failure);
             Assert.IsTrue(FirstAgent.ElectionLeave("my election") == Result.Success);
-            Assert.IsTrue(FirstAgent.ElectionLeave("my election") == Result.Failure);
-            Assert.IsTrue(FirstAgent.ElectionLeave("my other election") == Result.Failure);
+            Assert.IsTrue(FirstAgent.ElectionLeave("my election") == Result.Success);
+            Assert.IsTrue(FirstAgent.ElectionLeave("my other election") == Result.Success);
             Assert.IsTrue(FirstAgent.ElectionJoin("my other election") == Result.Success);
             Assert.IsTrue(FirstAgent.ElectionJoin("my other election") == Result.Failure);
             Assert.IsTrue(FirstAgent.ElectionLeave("my other election") == Result.Success);
-            Assert.IsTrue(FirstAgent.ElectionLeave("my other election") == Result.Failure);
+            Assert.IsTrue(FirstAgent.ElectionLeave("my other election") == Result.Success);
 
             FirstAgent.ClearDefinition();
 
@@ -1533,6 +1536,10 @@ namespace Tester
             Assert.IsTrue(FirstAgent.AttributeData("my_data").Length == 0);
 
             Igs.AgentSetFamily("family_test");
+
+            // Saturation control
+            Igs.UnbindPipe();
+            Igs.MonitorPipeStack(true);
 
             Assert.IsTrue(Igs.StartWithDevice("", _port) == Result.Failure);
 

@@ -144,9 +144,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
     if (name && name->type == IGS_JSON_STRING && name->u.string) {
         char *n = s_strndup (name->u.string, IGS_MAX_AGENT_NAME_LENGTH);
         if (strlen (name->u.string) > IGS_MAX_AGENT_NAME_LENGTH)
-            igs_warn ("definition name '%s' exceeds maximum size and will be "
-                      "truncated to '%s'",
-                      name->u.string, n);
+            igs_warn ("definition name '%s' exceeds maximum size and will be truncated to '%s'", name->u.string, n);
         bool space_in_name = false;
         size_t length_ofn = strlen (n);
         size_t i = 0;
@@ -157,12 +155,13 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
             }
         }
         if (space_in_name)
-            igs_warn (
-              "spaces are not allowed in definition name: '%s' has been "
-              "changed to '%s'",
-              name->u.string, n);
+            igs_warn ("spaces are not allowed in definition name: '%s' has been changed to '%s'", name->u.string, n);
         definition = (igs_definition_t *) zmalloc (sizeof (igs_definition_t));
         definition->name = n;
+        definition->inputs_table = zhashx_new();
+        definition->outputs_table = zhashx_new();
+        definition->attributes_table = zhashx_new();
+        definition->services_table = zhashx_new();
     } else {
         igs_json_node_destroy (json);
         return NULL;
@@ -199,7 +198,6 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
         for (size_t i = 0; i < inputs->u.array.len; i++) {
             igs_json_node_t *io_name = igs_json_node_find (inputs->u.array.values[i], name_path);
             if (io_name && io_name->type == IGS_JSON_STRING && io_name->u.string) {
-                igs_io_t *io = NULL;
                 char *corrected_name = s_strndup (io_name->u.string, IGS_MAX_IO_NAME_LENGTH);
                 bool space_in_name = false;
                 size_t length_ofn = strlen (corrected_name);
@@ -213,11 +211,10 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                 if (space_in_name)
                     igs_warn ("Spaces are not allowed in IOP name: %s has been renamed to %s",
                               io_name->u.string, corrected_name);
-
-                HASH_FIND_STR (definition->inputs_table, corrected_name, io);
+                
+                igs_io_t *io = zhashx_lookup(definition->inputs_table, corrected_name);
                 if (io) {
-                    igs_warn ("input with name '%s' already exists : ignoring new one",
-                              corrected_name);
+                    igs_warn ("input with name '%s' already exists : ignoring new one", corrected_name);
                     free (corrected_name);
                     continue; // io with this name already exists
                 }
@@ -226,6 +223,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                 io->type = IGS_INPUT_T;
                 io->value_type = IGS_UNKNOWN_T;
                 io->name = corrected_name;
+                io->io_callbacks = zlist_new();
 
                 igs_json_node_t *io_type = igs_json_node_find (inputs->u.array.values[i], type_path);
                 if (io_type && io_type->type == IGS_JSON_STRING && io_type->u.string)
@@ -234,7 +232,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                 igs_json_node_t *constraint = igs_json_node_find (inputs->u.array.values[i], constraint_path);
                 if (constraint && constraint->type == IGS_JSON_STRING && constraint->u.string){
                     char *error = NULL;
-                    io->constraint = s_model_parse_constraint(io->value_type, constraint->u.string, &error);
+                    io->constraint = model_parse_constraint(io->value_type, constraint->u.string, &error);
                     if (error)
                         igs_error ("%s", error);
                 }
@@ -259,8 +257,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                         free(io->specification);
                     io->specification = s_strndup(io_specification->u.string, IGS_MAX_LOG_LENGTH);
                 }
-
-                HASH_ADD_STR (definition->inputs_table, name, io);
+                zhashx_insert(definition->inputs_table, io->name, io);
             }
         }
     }else if(inputs)
@@ -272,7 +269,6 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
         for (size_t i = 0; i < outputs->u.array.len; i++) {
             igs_json_node_t *io_name = igs_json_node_find (outputs->u.array.values[i], name_path);
             if (io_name && io_name->type == IGS_JSON_STRING && io_name->u.string) {
-                igs_io_t *io = NULL;
                 char *corrected_name = s_strndup (io_name->u.string, IGS_MAX_IO_NAME_LENGTH);
                 bool space_in_name = false;
                 size_t length_ofn = strlen (corrected_name);
@@ -287,12 +283,10 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                     igs_warn ("Spaces are not allowed in IOP name: %s has been "
                               "renamed to %s",
                               io_name->u.string, corrected_name);
-
-                HASH_FIND_STR (definition->outputs_table, corrected_name, io);
+                
+                igs_io_t *io = zhashx_lookup(definition->outputs_table, corrected_name);
                 if (io) {
-                    igs_warn (
-                      "output with name '%s' already exists : ignoring new one",
-                      corrected_name);
+                    igs_warn ("output with name '%s' already exists : ignoring new one", corrected_name);
                     free (corrected_name);
                     continue; // io with this name already exists
                 }
@@ -301,6 +295,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                 io->type = IGS_OUTPUT_T;
                 io->value_type = IGS_UNKNOWN_T;
                 io->name = corrected_name;
+                io->io_callbacks = zlist_new();
 
                 igs_json_node_t *io_type = igs_json_node_find (outputs->u.array.values[i], type_path);
                 if (io_type && io_type->type == IGS_JSON_STRING && io_type->u.string)
@@ -309,7 +304,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                 igs_json_node_t *constraint = igs_json_node_find (outputs->u.array.values[i], constraint_path);
                 if (constraint && constraint->type == IGS_JSON_STRING && constraint->u.string){
                     char *error = NULL;
-                    io->constraint = s_model_parse_constraint(io->value_type, constraint->u.string, &error);
+                    io->constraint = model_parse_constraint(io->value_type, constraint->u.string, &error);
                 }
                 
                 igs_json_node_t *io_description = igs_json_node_find (outputs->u.array.values[i], io_description_path);
@@ -333,12 +328,10 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                     io->specification = s_strndup(io_specification->u.string, IGS_MAX_LOG_LENGTH);
                 }
                 
-                HASH_ADD_STR (definition->outputs_table, name, io);
+                zhashx_insert(definition->outputs_table, io->name, io);
             }
         }
-    }
-    else
-    if (outputs)
+    } else if (outputs)
         igs_error ("outputs are not an array : ignoring");
 
     // attributes
@@ -350,7 +343,6 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
             igs_json_node_t *io_name =
               igs_json_node_find (attributes->u.array.values[i], name_path);
             if (io_name && io_name->type == IGS_JSON_STRING && io_name->u.string) {
-                igs_io_t *io = NULL;
                 char *corrected_name = s_strndup (io_name->u.string, IGS_MAX_IO_NAME_LENGTH);
                 bool space_in_name = false;
                 size_t length_ofn = strlen (corrected_name);
@@ -365,12 +357,10 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                     igs_warn ("Spaces are not allowed in IOP name: %s has been "
                               "renamed to %s",
                               io_name->u.string, corrected_name);
-
-                HASH_FIND_STR (definition->attributes_table, corrected_name, io);
+                
+                igs_io_t *io = zhashx_lookup(definition->attributes_table, corrected_name);
                 if (io) {
-                    igs_warn ("attribute with name '%s' already exists : "
-                              "ignoring new one",
-                              corrected_name);
+                    igs_warn ("attribute with name '%s' already exists : ignoring new one", corrected_name);
                     free (corrected_name);
                     continue; // io with this name already exists
                 }
@@ -379,6 +369,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                 io->type = IGS_ATTRIBUTE_T;
                 io->value_type = IGS_UNKNOWN_T;
                 io->name = corrected_name;
+                io->io_callbacks = zlist_new();
 
                 igs_json_node_t *io_type = igs_json_node_find (attributes->u.array.values[i], type_path);
                 if (io_type && io_type->type == IGS_JSON_STRING && io_type->u.string)
@@ -387,7 +378,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                 igs_json_node_t *constraint = igs_json_node_find (attributes->u.array.values[i], constraint_path);
                 if (constraint && constraint->type == IGS_JSON_STRING && constraint->u.string){
                     char *error = NULL;
-                    io->constraint = s_model_parse_constraint(io->value_type, constraint->u.string, &error);
+                    io->constraint = model_parse_constraint(io->value_type, constraint->u.string, &error);
                 }
                 
                 igs_json_node_t *io_description = igs_json_node_find (attributes->u.array.values[i], io_description_path);
@@ -410,8 +401,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                         free(io->specification);
                     io->specification = s_strndup(io_specification->u.string, IGS_MAX_LOG_LENGTH);
                 }
-
-                HASH_ADD_STR (definition->attributes_table, name, io);
+                zhashx_insert(definition->attributes_table, io->name, io);
             }
         }
     } else if (attributes)
@@ -426,7 +416,6 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
             igs_json_node_t *service_name =
               igs_json_node_find (services->u.array.values[i], name_path);
             if (service_name && service_name->type == IGS_JSON_STRING && service_name->u.string) {
-                igs_service_t *service = NULL;
                 char *corrected_name = s_strndup (service_name->u.string, IGS_MAX_IO_NAME_LENGTH);
                 bool space_in_name = false;
                 size_t length_ofn = strlen (corrected_name);
@@ -438,73 +427,55 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                     }
                 }
                 if (space_in_name)
-                    igs_warn (
-                      "Spaces are not allowed in service name: %s has been "
-                      "renamed to %s",
-                      service_name->u.string, corrected_name);
-                HASH_FIND_STR (definition->services_table, corrected_name,
-                               service);
+                    igs_warn ("Spaces are not allowed in service name: %s has been renamed to %s", service_name->u.string, corrected_name);
+                igs_service_t *service = zhashx_lookup(definition->services_table, corrected_name);
                 if (service) {
-                    igs_warn ("service with name '%s' already exists : "
-                              "ignoring new one",
-                              corrected_name);
+                    igs_warn ("service with name '%s' already exists : ignoring new one", corrected_name);
                     free (corrected_name);
                     continue; // service with this name already exists
                 }
 
                 service = (igs_service_t *) zmalloc (sizeof (igs_service_t));
                 service->name = corrected_name;
+                service->replies = zhashx_new();
 
-                description = igs_json_node_find (services->u.array.values[i],
-                                                  description_path);
+                description = igs_json_node_find (services->u.array.values[i], description_path);
                 if (description && description->type == IGS_JSON_STRING && description->u.string)
                     service->description = strdup (description->u.string);
 
-                igs_json_node_t *arguments = igs_json_node_find (
-                  services->u.array.values[i], arguments_path);
+                igs_json_node_t *arguments = igs_json_node_find (services->u.array.values[i], arguments_path);
                 if (arguments && arguments->type == IGS_JSON_ARRAY) {
                     for (size_t j = 0; j < arguments->u.array.len; j++) {
-                        if (arguments->u.array.values[j]
-                            && arguments->u.array.values[j]->type
-                                 == IGS_JSON_MAP) {
-                            igs_json_node_t *arg_name = igs_json_node_find (
-                              arguments->u.array.values[j], name_path);
-                            if (arg_name && arg_name->type == IGS_JSON_STRING
-                                && arg_name->u.string) {
-                                char *corrected_arg_name = s_strndup (
-                                  arg_name->u.string, IGS_MAX_IO_NAME_LENGTH);
+                        if (arguments->u.array.values[j] && arguments->u.array.values[j]->type == IGS_JSON_MAP) {
+                            igs_json_node_t *arg_name = igs_json_node_find (arguments->u.array.values[j], name_path);
+                            if (arg_name && arg_name->type == IGS_JSON_STRING && arg_name->u.string) {
+                                char *corrected_arg_name = s_strndup (arg_name->u.string, IGS_MAX_IO_NAME_LENGTH);
                                 bool space_in_arg_name = false;
-                                size_t arg_name_length =
-                                  strlen (corrected_arg_name);
+                                size_t arg_name_length = strlen (corrected_arg_name);
                                 size_t arg_name_idx = 0;
-                                for (arg_name_idx = 0;
-                                     arg_name_idx < arg_name_length;
-                                     arg_name_idx++) {
-                                    if (corrected_arg_name[arg_name_idx]
-                                        == ' ') {
+                                for (arg_name_idx = 0; arg_name_idx < arg_name_length; arg_name_idx++) {
+                                    if (corrected_arg_name[arg_name_idx] == ' ') {
                                         corrected_arg_name[arg_name_idx] = '_';
                                         space_in_arg_name = true;
                                     }
                                 }
                                 if (space_in_arg_name)
-                                    igs_warn ("Spaces are not allowed in "
-                                              "service argument name: "
-                                              "%s has been renamed to %s",
-                                              arg_name->u.string,
-                                              corrected_arg_name);
+                                    igs_warn ("Spaces are not allowed in service argument name: %s has been renamed to %s",
+                                              arg_name->u.string, corrected_arg_name);
 
-                                igs_service_arg_t *new_arg =
-                                  (igs_service_arg_t *) zmalloc (
-                                    sizeof (igs_service_arg_t));
+                                igs_service_arg_t *new_arg = (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
                                 new_arg->name = corrected_arg_name;
-                                igs_json_node_t *arg_type = igs_json_node_find (
-                                  arguments->u.array.values[j], type_path);
-                                if (arg_type
-                                    && arg_type->type == IGS_JSON_STRING
-                                    && arg_type->u.string)
-                                    new_arg->type = s_string_to_value_type (
-                                      arg_type->u.string);
-                                LL_APPEND (service->arguments, new_arg);
+                                igs_json_node_t *arg_type = igs_json_node_find (arguments->u.array.values[j], type_path);
+                                if (arg_type && arg_type->type == IGS_JSON_STRING && arg_type->u.string)
+                                    new_arg->type = s_string_to_value_type (arg_type->u.string);
+                                igs_service_arg_t *last_arg = service->arguments;
+                                while (last_arg && last_arg->next) {
+                                    last_arg = last_arg->next;
+                                }
+                                if (last_arg)
+                                    last_arg->next = new_arg;
+                                else
+                                    service->arguments = new_arg;
                             }
                         }
                     }
@@ -527,9 +498,11 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                                 }
                             }
                             if (space_in_reply_name)
-                                igs_warn ("Spaces are not allowed in service argument name: %s has been renamed to %s", reply_name->u.string, corrected_reply_name);
+                                igs_warn ("Spaces are not allowed in service argument name: %s has been renamed to %s", 
+                                          reply_name->u.string, corrected_reply_name);
                             igs_service_t *my_reply = (igs_service_t *) zmalloc (sizeof (igs_service_t));
                             my_reply->name = corrected_reply_name;
+                            my_reply->replies = zhashx_new();
 
                             arguments = igs_json_node_find (replies->u.array.values[j], arguments_path);
                             if (arguments && arguments->type == IGS_JSON_ARRAY) {
@@ -556,16 +529,23 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                                             igs_json_node_t *arg_type = igs_json_node_find (arguments->u.array.values[len], type_path);
                                             if (arg_type && arg_type->type == IGS_JSON_STRING && arg_type->u.string)
                                                 new_arg->type = s_string_to_value_type (arg_type->u.string);
-                                            LL_APPEND (my_reply->arguments,new_arg);
+                                            igs_service_arg_t *last_arg = my_reply->arguments;
+                                            while (last_arg && last_arg->next) {
+                                                last_arg = last_arg->next;
+                                            }
+                                            if (last_arg)
+                                                last_arg->next = new_arg;
+                                            else
+                                                my_reply->arguments = new_arg;
                                         }
                                     }
                                 }
                             }
-                            HASH_ADD_STR(service->replies, name, my_reply);
+                            zhashx_insert(service->replies, my_reply->name, my_reply);
                         }
                     }
                 }
-                HASH_ADD_STR (definition->services_table, name, service);
+                zhashx_insert(definition->services_table, service->name, service);
             }
         }
     }
@@ -613,6 +593,8 @@ igs_mapping_t *parser_parse_mapping_from_node (igs_json_node_t **json)
     }
 
     mapping = (igs_mapping_t *) zmalloc (sizeof (igs_mapping_t));
+    mapping->map_elements = zlist_new();
+    mapping->split_elements = zlist_new();
 
     // FIXME: we will not use from_agent in parsing because the received
     // mappings should all imply our inputs. In the future, we could
@@ -714,23 +696,27 @@ igs_mapping_t *parser_parse_mapping_from_node (igs_json_node_t **json)
                 strcat (mashup, "."); // separator
                 strcat (mashup, to_output);
                 mashup[len - 1] = '\0';
-                uint64_t h = s_djb2_hash ((unsigned char *) mashup);
+                uint64_t h = mapping_djb2_hash ((unsigned char *) mashup);
                 free (mashup);
 
-                igs_map_t *tmp = NULL;
-                HASH_FIND (hh, mapping->map_elements, &h,
-                           sizeof (uint64_t), tmp);
-                if (tmp == NULL) {
+                igs_map_t *map_emlt = NULL;
+                igs_map_t *map_tmp = zlist_first(mapping->map_elements);
+                while (map_tmp) {
+                    if (map_tmp->id == h){
+                        map_emlt = map_tmp;
+                        break;
+                    }
+                    map_tmp = zlist_next(mapping->map_elements);
+                }
+                
+                if (!map_emlt) {
                     // element does not exist yet : create and register it
-                    igs_map_t *new = mapping_create_mapping_element (
-                      from_input, to_agent, to_output);
+                    igs_map_t *new = mapping_create_mapping_element (from_input, to_agent, to_output);
                     new->id = h;
-                    HASH_ADD (hh, mapping->map_elements, id,
-                              sizeof (uint64_t), new);
+                    zlist_append(mapping->map_elements, new);
                 }
                 else
-                    igs_error ("hash already exists for %s->%s.%s", from_input,
-                               to_agent, to_output);
+                    igs_error ("hash already exists for %s->%s.%s", from_input, to_agent, to_output);
             }
             if (from_input)
                 free (from_input);
@@ -750,17 +736,12 @@ igs_mapping_t *parser_parse_mapping_from_node (igs_json_node_t **json)
             igs_json_node_t *from_input_node = NULL;
             igs_json_node_t *to_agent_node = NULL;
             igs_json_node_t *to_output_node = NULL;
-            from_input_node = igs_json_node_find (splits->u.array.values[i],
-                                                  from_input_path);
-            to_agent_node =
-              igs_json_node_find (splits->u.array.values[i], to_agent_path);
-            to_output_node =
-              igs_json_node_find (splits->u.array.values[i], to_output_path);
+            from_input_node = igs_json_node_find (splits->u.array.values[i], from_input_path);
+            to_agent_node = igs_json_node_find (splits->u.array.values[i], to_agent_path);
+            to_output_node = igs_json_node_find (splits->u.array.values[i], to_output_path);
 
-            if (from_input_node && from_input_node->type == IGS_JSON_STRING
-                && from_input_node->u.string) {
-                char *corrected_name = s_strndup (from_input_node->u.string,
-                                                  IGS_MAX_IO_NAME_LENGTH);
+            if (from_input_node && from_input_node->type == IGS_JSON_STRING && from_input_node->u.string) {
+                char *corrected_name = s_strndup (from_input_node->u.string, IGS_MAX_IO_NAME_LENGTH);
                 bool space_in_name = false;
                 size_t length_ofn = strlen (corrected_name);
                 size_t k = 0;
@@ -771,16 +752,13 @@ igs_mapping_t *parser_parse_mapping_from_node (igs_json_node_t **json)
                     }
                 }
                 if (space_in_name)
-                    igs_warn (
-                      "Spaces are not allowed in split element name: %s has "
-                      "been renamed to %s",
-                      from_input_node->u.string, corrected_name);
+                    igs_warn ("Spaces are not allowed in split element name: %s has been renamed to %s",
+                              from_input_node->u.string, corrected_name);
                 from_input = corrected_name;
             }
             if (to_agent_node && to_agent_node->type == IGS_JSON_STRING
                 && to_agent_node->u.string) {
-                char *corrected_name =
-                  s_strndup (to_agent_node->u.string, IGS_MAX_IO_NAME_LENGTH);
+                char *corrected_name = s_strndup (to_agent_node->u.string, IGS_MAX_IO_NAME_LENGTH);
                 bool space_in_name = false;
                 size_t length_ofn = strlen (corrected_name);
                 size_t k = 0;
@@ -791,16 +769,13 @@ igs_mapping_t *parser_parse_mapping_from_node (igs_json_node_t **json)
                     }
                 }
                 if (space_in_name)
-                    igs_warn (
-                      "Spaces are not allowed in split element name: %s has "
-                      "been renamed to %s",
-                      to_agent_node->u.string, corrected_name);
+                    igs_warn ("Spaces are not allowed in split element name: %s has been renamed to %s",
+                              to_agent_node->u.string, corrected_name);
                 to_agent = corrected_name;
             }
             if (to_output_node && to_output_node->type == IGS_JSON_STRING
                 && to_output_node->u.string) {
-                char *corrected_name =
-                  s_strndup (to_output_node->u.string, IGS_MAX_IO_NAME_LENGTH);
+                char *corrected_name = s_strndup (to_output_node->u.string, IGS_MAX_IO_NAME_LENGTH);
                 bool space_in_name = false;
                 size_t length_ofn = strlen (corrected_name);
                 size_t k = 0;
@@ -811,15 +786,12 @@ igs_mapping_t *parser_parse_mapping_from_node (igs_json_node_t **json)
                     }
                 }
                 if (space_in_name)
-                    igs_warn (
-                      "Spaces are not allowed in split element name: %s has "
-                      "been renamed to %s",
-                      to_output_node->u.string, corrected_name);
+                    igs_warn ("Spaces are not allowed in split element name: %s has been renamed to %s",
+                              to_output_node->u.string, corrected_name);
                 to_output = corrected_name;
             }
             if (from_input && to_agent && to_output) {
-                size_t len = strlen (from_input) + strlen (to_agent)
-                             + strlen (to_output) + 3 + 1;
+                size_t len = strlen (from_input) + strlen (to_agent) + strlen (to_output) + 3 + 1;
                 char *mashup = (char *) zmalloc (len * sizeof (char));
                 strcpy (mashup, from_input);
                 strcat (mashup, "."); // separator
@@ -827,23 +799,26 @@ igs_mapping_t *parser_parse_mapping_from_node (igs_json_node_t **json)
                 strcat (mashup, "."); // separator
                 strcat (mashup, to_output);
                 mashup[len - 1] = '\0';
-                uint64_t h = s_djb2_hash ((unsigned char *) mashup);
+                uint64_t h = mapping_djb2_hash ((unsigned char *) mashup);
                 free (mashup);
 
-                igs_split_t *tmp = NULL;
-                HASH_FIND (hh, mapping->split_elements, &h,
-                           sizeof (uint64_t), tmp);
-                if (tmp == NULL) {
+                igs_map_t *map_emlt = NULL;
+                igs_map_t *map_tmp = zlist_first(mapping->split_elements);
+                while (map_tmp) {
+                    if (map_tmp->id == h){
+                        map_emlt = map_tmp;
+                        break;
+                    }
+                    map_tmp = zlist_next(mapping->split_elements);
+                }
+                if (!map_emlt) {
                     // element does not exist yet : create and register it
-                    igs_split_t *new = split_create_split_element (
-                      from_input, to_agent, to_output);
+                    igs_split_t *new = split_create_split_element (from_input, to_agent, to_output);
                     new->id = h;
-                    HASH_ADD (hh, mapping->split_elements, id,
-                              sizeof (uint64_t), new);
+                    zlist_append(mapping->split_elements, new);
                 }
                 else
-                    igs_error ("hash already exists for %s->%s.%s", from_input,
-                               to_agent, to_output);
+                    igs_error ("hash already exists for %s->%s.%s", from_input, to_agent, to_output);
             }
             if (from_input)
                 free (from_input);
@@ -958,9 +933,8 @@ char *parser_export_definition (igs_definition_t *def)
 
     igs_json_add_string (json, STR_INPUTS);
     igs_json_open_array (json);
-    igs_io_t *io, *tmp_io;
-    HASH_ITER (hh, def->inputs_table, io, tmp_io)
-    {
+    igs_io_t *io = zhashx_first(def->inputs_table);
+    while (io) {
         igs_json_open_map (json);
         if (io->name) {
             igs_json_add_string (json, STR_NAME);
@@ -1028,13 +1002,14 @@ char *parser_export_definition (igs_definition_t *def)
             igs_json_add_string (json, io->specification);
         }
         igs_json_close_map (json);
+        io = zhashx_next(def->inputs_table);
     }
     igs_json_close_array (json);
 
     igs_json_add_string (json, STR_OUTPUTS);
     igs_json_open_array (json);
-    HASH_ITER (hh, def->outputs_table, io, tmp_io)
-    {
+    io = zhashx_first(def->outputs_table);
+    while (io) {
         igs_json_open_map (json);
         if (io->name) {
             igs_json_add_string (json, STR_NAME);
@@ -1103,13 +1078,14 @@ char *parser_export_definition (igs_definition_t *def)
             igs_json_add_string (json, io->specification);
         }
         igs_json_close_map (json);
+        io = zhashx_next(def->outputs_table);
     }
     igs_json_close_array (json);
 
     igs_json_add_string (json, STR_ATTRIBUTES);
     igs_json_open_array (json);
-    HASH_ITER (hh, def->attributes_table, io, tmp_io)
-    {
+    io = zhashx_first(def->attributes_table);
+    while (io) {
         igs_json_open_map (json);
         if (io->name) {
             igs_json_add_string (json, STR_NAME);
@@ -1177,14 +1153,14 @@ char *parser_export_definition (igs_definition_t *def)
             igs_json_add_string (json, io->specification);
         }
         igs_json_close_map (json);
+        io = zhashx_next(def->attributes_table);
     }
     igs_json_close_array (json);
 
     igs_json_add_string (json, STR_SERVICES);
     igs_json_open_array (json);
-    igs_service_t *service, *tmp_service;
-    HASH_ITER (hh, def->services_table, service, tmp_service)
-    {
+    igs_service_t *service = zhashx_first(def->services_table);
+    while (service) {
         igs_json_open_map (json);
         if (service->name) {
             igs_json_add_string (json, STR_NAME);
@@ -1197,9 +1173,8 @@ char *parser_export_definition (igs_definition_t *def)
             if (service->arguments) {
                 igs_json_add_string (json, STR_ARGUMENTS);
                 igs_json_open_array (json);
-                igs_service_arg_t *argument = NULL;
-                LL_FOREACH (service->arguments, argument)
-                {
+                igs_service_arg_t *argument = service->arguments;
+                while (argument) {
                     if (argument->name) {
                         igs_json_open_map (json);
                         igs_json_add_string (json, STR_NAME);
@@ -1209,15 +1184,16 @@ char *parser_export_definition (igs_definition_t *def)
                           json, s_value_type_to_string (argument->type));
                         igs_json_close_map (json);
                     }
+                    argument = argument->next;
                 }
                 igs_json_close_array (json);
             }
 
             if (service->replies) {
-                igs_service_t *r, *r_tmp;
                 igs_json_add_string (json, STR_REPLIES);
                 igs_json_open_array (json);
-                HASH_ITER(hh, service->replies, r, r_tmp){
+                igs_service_t *r = zhashx_first(service->replies);
+                while (r) {
                     if (r->name) {
                         igs_json_open_map (json);
                         igs_json_add_string (json, STR_NAME);
@@ -1229,8 +1205,8 @@ char *parser_export_definition (igs_definition_t *def)
                         if (r->arguments) {
                             igs_json_add_string (json, STR_ARGUMENTS);
                             igs_json_open_array (json);
-                            igs_service_arg_t *argument = NULL;
-                            LL_FOREACH (r->arguments, argument){
+                            igs_service_arg_t *argument = r->arguments;
+                            while (argument) {
                                 if (argument->name) {
                                     igs_json_open_map (json);
                                     igs_json_add_string (json, STR_NAME);
@@ -1241,16 +1217,19 @@ char *parser_export_definition (igs_definition_t *def)
                                       s_value_type_to_string (argument->type));
                                     igs_json_close_map (json);
                                 }
+                                argument = argument->next;
                             }
                             igs_json_close_array (json);
                         }
                         igs_json_close_map (json);
                     }
+                    r = zhashx_next(service->replies);
                 }
                 igs_json_close_array (json);
             }
         }
         igs_json_close_map (json);
+        service = zhashx_next(def->services_table);
     }
     igs_json_close_array (json);
 
@@ -1295,9 +1274,8 @@ char *parser_export_definition_legacy_v4 (igs_definition_t *def)
 
     igs_json_add_string (json, STR_INPUTS);
     igs_json_open_array (json);
-    igs_io_t *io, *tmp_io;
-    HASH_ITER (hh, def->inputs_table, io, tmp_io)
-    {
+    igs_io_t *io = zhashx_first(def->inputs_table);
+    while (io) {
         igs_json_open_map (json);
         if (io->name) {
             igs_json_add_string (json, STR_NAME);
@@ -1365,13 +1343,14 @@ char *parser_export_definition_legacy_v4 (igs_definition_t *def)
             igs_json_add_string (json, io->specification);
         }
         igs_json_close_map (json);
+        io = zhashx_next(def->inputs_table);
     }
     igs_json_close_array (json);
 
     igs_json_add_string (json, STR_OUTPUTS);
     igs_json_open_array (json);
-    HASH_ITER (hh, def->outputs_table, io, tmp_io)
-    {
+    io = zhashx_first(def->outputs_table);
+    while (io) {
         igs_json_open_map (json);
         if (io->name) {
             igs_json_add_string (json, STR_NAME);
@@ -1440,13 +1419,14 @@ char *parser_export_definition_legacy_v4 (igs_definition_t *def)
             igs_json_add_string (json, io->specification);
         }
         igs_json_close_map (json);
+        io = zhashx_next(def->outputs_table);
     }
     igs_json_close_array (json);
 
     igs_json_add_string (json, STR_ATTRIBUTES_DEPRECATED);
     igs_json_open_array (json);
-    HASH_ITER (hh, def->attributes_table, io, tmp_io)
-    {
+    io = zhashx_first(def->attributes_table);
+    while (io) {
         igs_json_open_map (json);
         if (io->name) {
             igs_json_add_string (json, STR_NAME);
@@ -1514,14 +1494,14 @@ char *parser_export_definition_legacy_v4 (igs_definition_t *def)
             igs_json_add_string (json, io->specification);
         }
         igs_json_close_map (json);
+        io = zhashx_next(def->attributes_table);
     }
     igs_json_close_array (json);
 
     igs_json_add_string (json, STR_SERVICES);
     igs_json_open_array (json);
-    igs_service_t *service, *tmp_service;
-    HASH_ITER (hh, def->services_table, service, tmp_service)
-    {
+    igs_service_t *service = zhashx_first(def->services_table);
+    while (service) {
         igs_json_open_map (json);
         if (service->name) {
             igs_json_add_string (json, STR_NAME);
@@ -1534,9 +1514,8 @@ char *parser_export_definition_legacy_v4 (igs_definition_t *def)
             if (service->arguments) {
                 igs_json_add_string (json, STR_ARGUMENTS);
                 igs_json_open_array (json);
-                igs_service_arg_t *argument = NULL;
-                LL_FOREACH (service->arguments, argument)
-                {
+                igs_service_arg_t *argument = service->arguments;
+                while (argument) {
                     if (argument->name) {
                         igs_json_open_map (json);
                         igs_json_add_string (json, STR_NAME);
@@ -1546,15 +1525,16 @@ char *parser_export_definition_legacy_v4 (igs_definition_t *def)
                           json, s_value_type_to_string (argument->type));
                         igs_json_close_map (json);
                     }
+                    argument = argument->next;
                 }
                 igs_json_close_array (json);
             }
 
             if (service->replies) {
-                igs_service_t *r, *r_tmp;
                 igs_json_add_string (json, STR_REPLIES);
                 igs_json_open_array (json);
-                HASH_ITER(hh, service->replies, r, r_tmp){
+                igs_service_t *r = zhashx_first(service->replies);
+                while (r) {
                     if (r->name) {
                         igs_json_open_map (json);
                         igs_json_add_string (json, STR_NAME);
@@ -1566,8 +1546,8 @@ char *parser_export_definition_legacy_v4 (igs_definition_t *def)
                         if (r->arguments) {
                             igs_json_add_string (json, STR_ARGUMENTS);
                             igs_json_open_array (json);
-                            igs_service_arg_t *argument = NULL;
-                            LL_FOREACH (r->arguments, argument){
+                            igs_service_arg_t *argument = r->arguments;
+                            while (argument) {
                                 if (argument->name) {
                                     igs_json_open_map (json);
                                     igs_json_add_string (json, STR_NAME);
@@ -1578,16 +1558,19 @@ char *parser_export_definition_legacy_v4 (igs_definition_t *def)
                                       s_value_type_to_string (argument->type));
                                     igs_json_close_map (json);
                                 }
+                                argument = argument->next;
                             }
                             igs_json_close_array (json);
                         }
                         igs_json_close_map (json);
                     }
+                    r = zhashx_next(service->replies);
                 }
                 igs_json_close_array (json);
             }
         }
         igs_json_close_map (json);
+        service  =zhashx_next(def->services_table);
     }
     igs_json_close_array (json);
 
@@ -1623,9 +1606,8 @@ char *parser_export_definition_legacy_v3 (igs_definition_t *def)
 
     igs_json_add_string (json, STR_INPUTS);
     igs_json_open_array (json);
-    igs_io_t *io, *tmp_io;
-    HASH_ITER (hh, def->inputs_table, io, tmp_io)
-    {
+    igs_io_t *io = zhashx_first(def->inputs_table);
+    while (io) {
         igs_json_open_map (json);
         if (io->name) {
             igs_json_add_string (json, STR_NAME);
@@ -1635,13 +1617,14 @@ char *parser_export_definition_legacy_v3 (igs_definition_t *def)
         igs_json_add_string (json, s_value_type_to_string (io->value_type));
         // NB: inputs do not have intial values
         igs_json_close_map (json);
+        io = zhashx_next(def->inputs_table);
     }
     igs_json_close_array (json);
 
     igs_json_add_string (json, STR_OUTPUTS);
     igs_json_open_array (json);
-    HASH_ITER (hh, def->outputs_table, io, tmp_io)
-    {
+    io = zhashx_first(def->outputs_table);
+    while (io) {
         igs_json_open_map (json);
         if (io->name) {
             igs_json_add_string (json, STR_NAME);
@@ -1650,13 +1633,14 @@ char *parser_export_definition_legacy_v3 (igs_definition_t *def)
         igs_json_add_string (json, STR_TYPE);
         igs_json_add_string (json, s_value_type_to_string (io->value_type));
         igs_json_close_map (json);
+        io = zhashx_next(def->outputs_table);
     }
     igs_json_close_array (json);
 
     igs_json_add_string (json, STR_ATTRIBUTES_DEPRECATED);
     igs_json_open_array (json);
-    HASH_ITER (hh, def->attributes_table, io, tmp_io)
-    {
+    io = zhashx_first(def->attributes_table);
+    while (io) {
         igs_json_open_map (json);
         if (io->name) {
             igs_json_add_string (json, STR_NAME);
@@ -1665,14 +1649,14 @@ char *parser_export_definition_legacy_v3 (igs_definition_t *def)
         igs_json_add_string (json, STR_TYPE);
         igs_json_add_string (json, s_value_type_to_string (io->value_type));
         igs_json_close_map (json);
+        io = zhashx_next(def->attributes_table);
     }
     igs_json_close_array (json);
 
     igs_json_add_string (json, STR_SERVICES_DEPRECATED);
     igs_json_open_array (json);
-    igs_service_t *service, *tmp_service;
-    HASH_ITER (hh, def->services_table, service, tmp_service)
-    {
+    igs_service_t *service = zhashx_first(def->services_table);
+    while (service) {
         igs_json_open_map (json);
         if (service->name) {
             igs_json_add_string (json, STR_NAME);
@@ -1685,9 +1669,8 @@ char *parser_export_definition_legacy_v3 (igs_definition_t *def)
             if (service->arguments) {
                 igs_json_add_string (json, STR_ARGUMENTS);
                 igs_json_open_array (json);
-                igs_service_arg_t *argument = NULL;
-                LL_FOREACH (service->arguments, argument)
-                {
+                igs_service_arg_t *argument = service->arguments;
+                while (argument) {
                     if (argument->name) {
                         igs_json_open_map (json);
                         igs_json_add_string (json, STR_NAME);
@@ -1697,15 +1680,16 @@ char *parser_export_definition_legacy_v3 (igs_definition_t *def)
                           json, s_value_type_to_string (argument->type));
                         igs_json_close_map (json);
                     }
+                    argument = argument->next;
                 }
                 igs_json_close_array (json);
             }
 
             if (service->replies) {
-                igs_service_t *r, *r_tmp;
                 igs_json_add_string (json, STR_REPLIES);
                 igs_json_open_array (json);
-                HASH_ITER(hh, service->replies, r, r_tmp){
+                igs_service_t *r = zhashx_first(service->replies);
+                while (r) {
                     if (r->name) {
                         igs_json_open_map (json);
                         igs_json_add_string (json, STR_NAME);
@@ -1717,8 +1701,8 @@ char *parser_export_definition_legacy_v3 (igs_definition_t *def)
                         if (r->arguments) {
                             igs_json_add_string (json, STR_ARGUMENTS);
                             igs_json_open_array (json);
-                            igs_service_arg_t *argument = NULL;
-                            LL_FOREACH (r->arguments, argument){
+                            igs_service_arg_t *argument = r->arguments;
+                            while (argument) {
                                 if (argument->name) {
                                     igs_json_open_map (json);
                                     igs_json_add_string (json, STR_NAME);
@@ -1729,16 +1713,19 @@ char *parser_export_definition_legacy_v3 (igs_definition_t *def)
                                       s_value_type_to_string (argument->type));
                                     igs_json_close_map (json);
                                 }
+                                argument = argument->next;
                             }
                             igs_json_close_array (json);
                         }
                         igs_json_close_map (json);
                     }
+                    r = zhashx_next(service->replies);
                 }
                 igs_json_close_array (json);
             }
         }
         igs_json_close_map (json);
+        service = zhashx_next(def->services_table);
     }
     igs_json_close_array (json);
 
@@ -1756,9 +1743,8 @@ char *parser_export_mapping (igs_mapping_t *mapping)
     igs_json_open_map (json);
     igs_json_add_string (json, STR_MAPPINGS);
     igs_json_open_array (json);
-    igs_map_t *elmt, *tmp;
-    HASH_ITER (hh, mapping->map_elements, elmt, tmp)
-    {
+    igs_map_t *elmt = zlist_first(mapping->map_elements);
+    while (elmt) {
         igs_json_open_map (json);
         if (elmt->from_input) {
             igs_json_add_string (json, STR_FROM_INPUT);
@@ -1773,14 +1759,14 @@ char *parser_export_mapping (igs_mapping_t *mapping)
             igs_json_add_string (json, elmt->to_output);
         }
         igs_json_close_map (json);
+        elmt = zlist_next(mapping->map_elements);
     }
     igs_json_close_array (json);
 
     igs_json_add_string (json, STR_SPLITS);
     igs_json_open_array (json);
-    igs_split_t *elmt_split, *tmp_split;
-    HASH_ITER (hh, mapping->split_elements, elmt_split, tmp_split)
-    {
+    igs_split_t *elmt_split = zlist_first(mapping->split_elements);
+    while (elmt_split) {
         igs_json_open_map (json);
         if (elmt_split->from_input) {
             igs_json_add_string (json, STR_FROM_INPUT);
@@ -1795,6 +1781,7 @@ char *parser_export_mapping (igs_mapping_t *mapping)
             igs_json_add_string (json, elmt_split->to_output);
         }
         igs_json_close_map (json);
+        elmt_split = zlist_next(mapping->split_elements);
     }
     igs_json_close_array (json);
 
@@ -1814,9 +1801,8 @@ char *parser_export_mapping_legacy (igs_mapping_t *mapping)
     igs_json_open_map (json);
     igs_json_add_string (json, STR_LEGACY_MAPPINGS);
     igs_json_open_array (json);
-    igs_map_t *elmt, *tmp;
-    HASH_ITER (hh, mapping->map_elements, elmt, tmp)
-    {
+    igs_map_t *elmt = zlist_first(mapping->map_elements);
+    while (elmt) {
         igs_json_open_map (json);
         if (elmt->from_input) {
             igs_json_add_string (json, STR_LEGACY_FROM_INPUT);
@@ -1831,6 +1817,7 @@ char *parser_export_mapping_legacy (igs_mapping_t *mapping)
             igs_json_add_string (json, elmt->to_output);
         }
         igs_json_close_map (json);
+        elmt = zlist_next(mapping->map_elements);
     }
     igs_json_close_array (json);
     igs_json_close_map (json);
@@ -1850,23 +1837,19 @@ igs_result_t igsagent_definition_load_str (igsagent_t *agent,
     assert (agent);
     assert (json_str);
     // Try to load definition
+    model_read_write_lock(__FUNCTION__, __LINE__);
     igs_definition_t *tmp = parser_load_definition (json_str);
     if (tmp == NULL) {
         igsagent_error (agent, "json string caused an error and was ignored");
+        model_read_write_unlock(__FUNCTION__, __LINE__);
         return IGS_FAILURE;
     }
-    model_read_write_lock (__FUNCTION__, __LINE__);
-    // check that this agent has not been destroyed when we were locked
-    if (!agent || !(agent->uuid)) {
-        model_read_write_unlock (__FUNCTION__, __LINE__);
-        return IGS_FAILURE;
-    }
-    igsagent_set_name (agent, tmp->name);
     definition_free_definition (&agent->definition);
     agent->definition = tmp;
     definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
-    model_read_write_unlock (__FUNCTION__, __LINE__);
+    model_read_write_unlock(__FUNCTION__, __LINE__);
+    igsagent_set_name (agent, tmp->name);
     return IGS_SUCCESS;
 }
 
@@ -1876,25 +1859,19 @@ igs_result_t igsagent_definition_load_file (igsagent_t *agent,
     assert (agent);
     assert (file_path);
     // Try to load definition
+    model_read_write_lock(__FUNCTION__, __LINE__);
     igs_definition_t *tmp = parser_load_definition_from_path (file_path);
     if (tmp == NULL) {
-        igsagent_debug (
-          agent, "json file content at '%s' caused an error and was ignored",
-          file_path);
+        igsagent_error (agent, "json file content at '%s' caused an error and was ignored", file_path);
+        model_read_write_unlock(__FUNCTION__, __LINE__);
         return IGS_FAILURE;
     }
-    model_read_write_lock (__FUNCTION__, __LINE__);
-    // check that this agent has not been destroyed when we were locked
-    if (!agent || !(agent->uuid)) {
-        model_read_write_unlock (__FUNCTION__, __LINE__);
-        return IGS_FAILURE;
-    }
-    igsagent_set_name (agent, tmp->name);
     definition_free_definition (&agent->definition);
     agent->definition_path = s_strndup (file_path, IGS_MAX_PATH_LENGTH - 1);
     agent->definition = tmp;
     definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
-    model_read_write_unlock (__FUNCTION__, __LINE__);
+    model_read_write_unlock(__FUNCTION__, __LINE__);
+    igsagent_set_name (agent, tmp->name);
     return IGS_SUCCESS;
 }
