@@ -1285,44 +1285,44 @@ void model_LOCKED_handle_io_callbacks (igsagent_t *agent, igs_io_t *io){
         switch (io->value_type) {
             case IGS_IMPULSION_T:
                 model_read_write_unlock(__FUNCTION__, __LINE__);
-                if (agent->uuid && io->io_callbacks && cb->callback_ptr)
+                if (agent->uuid)
                     cb->callback_ptr (agent, io_type, name, value_type, NULL, 0, cb->data);
                 model_read_write_lock(__FUNCTION__, __LINE__);
                 break;
             case IGS_BOOL_T:
                 model_read_write_unlock(__FUNCTION__, __LINE__);
-                if (agent->uuid && io->io_callbacks && cb->callback_ptr)
+                if (agent->uuid)
                     cb->callback_ptr (agent, io_type, name, value_type, &io->value.b, io->value_size, cb->data);
                 model_read_write_lock(__FUNCTION__, __LINE__);
                 break;
             case IGS_INTEGER_T:
                 model_read_write_unlock(__FUNCTION__, __LINE__);
-                if (agent->uuid && io->io_callbacks && cb->callback_ptr)
+                if (agent->uuid)
                     cb->callback_ptr (agent, io_type, name, value_type, &io->value.i, io->value_size, cb->data);
                 model_read_write_lock(__FUNCTION__, __LINE__);
                 break;
             case IGS_DOUBLE_T:
                 model_read_write_unlock(__FUNCTION__, __LINE__);
-                if (agent->uuid && io->io_callbacks && cb->callback_ptr)
+                if (agent->uuid)
                     cb->callback_ptr (agent, io_type, name, value_type, &io->value.d, io->value_size, cb->data);
                 model_read_write_lock(__FUNCTION__, __LINE__);
                 break;
             case IGS_STRING_T:
                 model_read_write_unlock(__FUNCTION__, __LINE__);
-                if (agent->uuid && io->io_callbacks && cb->callback_ptr)
+                if (agent->uuid)
                     cb->callback_ptr (agent, io_type, name, value_type, io->value.s, io->value_size, cb->data);
                 model_read_write_lock(__FUNCTION__, __LINE__);
                 break;
             case IGS_DATA_T:
                 model_read_write_unlock(__FUNCTION__, __LINE__);
-                if (agent->uuid && io->io_callbacks && cb->callback_ptr)
+                if (agent->uuid)
                     cb->callback_ptr (agent, io_type, name, value_type, io->value.data, io->value_size, cb->data);
                 model_read_write_lock(__FUNCTION__, __LINE__);
                 break;
             default:
                 break;
         }
-        cb = zlist_next(io->io_callbacks);
+        cb = zlist_next(callbacks);
     }
     free(name);
     zlist_destroy(&callbacks);

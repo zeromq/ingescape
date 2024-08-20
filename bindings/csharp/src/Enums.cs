@@ -82,15 +82,6 @@ namespace Ingescape
         NetworkOkAfterManualRestart
     }
 
-    public enum ReplayMode
-    {
-        ReplayInput = 1,
-        ReplayOutput = 2,
-        ReplayParameter = 4,
-        ReplayExecuteService = 8,
-        ReplayCallService = 16
-    }
-
     /// <summary>
     /// parse a JSON string or file based on parsing events and a callback
     /// </summary>

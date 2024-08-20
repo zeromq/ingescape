@@ -1371,7 +1371,7 @@ namespace Ingescape
             object data = tuple.Item2;
             ServiceFunction cSharpFunction = tuple.Item1;
             string serviceNameAsString = Igs.PtrToStringFromUTF8(serviceName);
-            List<ServiceArgument> serviceArguments = ServiceArgumentsList(serviceNameAsString);
+            List<ServiceArgument> serviceArguments = Igs.ServiceArgumentsListFromFirstArg(firstArgument);
             cSharpFunction(this, Igs.PtrToStringFromUTF8(senderAgentName), Igs.PtrToStringFromUTF8(senderAgentUUID), serviceNameAsString, serviceArguments, Igs.PtrToStringFromUTF8(token), data);
         }
 
@@ -1551,54 +1551,7 @@ namespace Ingescape
                 throw new NullReferenceException("Agent pointer is null");
             IntPtr serviceNameAsPtr = Igs.StringToUTF8Ptr(name);
             IntPtr ptrArgument = igsagent_service_args_first(_pAgent, serviceNameAsPtr);
-            List<ServiceArgument> serviceArgumentsList = null;
-            if (ptrArgument != null)
-            {
-                serviceArgumentsList = new List<ServiceArgument>();
-                while (ptrArgument != IntPtr.Zero)
-                {
-                    // Marshals data from an unmanaged block of memory to a newly allocated managed object of the type specified by a generic type parameter.
-                    Igs.StructServiceArgument structArgument = Marshal.PtrToStructure<Igs.StructServiceArgument>(ptrArgument);
-
-                    object value = null;
-
-                    switch (structArgument.type)
-                    {
-                        case IopValueType.Bool:
-                            value = structArgument.union.b;
-                            break;
-
-                        case IopValueType.Integer:
-                            value = structArgument.union.i;
-                            break;
-
-                        case IopValueType.Double:
-                            value = structArgument.union.d;
-                            break;
-
-                        case IopValueType.String:
-                            value = Igs.PtrToStringFromUTF8(structArgument.union.c);
-                            break;
-
-                        case IopValueType.Data:
-                            byte[] byteArray = new byte[structArgument.size];
-
-                            if (structArgument.union.data != IntPtr.Zero)
-                                Marshal.Copy(structArgument.union.data, byteArray, 0, (int)structArgument.size);
-                            else
-                                byteArray = null;
-
-                            value = byteArray;
-                            break;
-
-                        default:
-                            break;
-                    }
-                    ServiceArgument serviceArgument = new ServiceArgument(Igs.PtrToStringFromUTF8(structArgument.name), structArgument.type, value);
-                    serviceArgumentsList.Add(serviceArgument);
-                    ptrArgument = structArgument.next;
-                }
-            }
+            List<ServiceArgument> serviceArgumentsList = Igs.ServiceArgumentsListFromFirstArg(ptrArgument);
             Marshal.FreeHGlobal(serviceNameAsPtr);
             return serviceArgumentsList;
         }
