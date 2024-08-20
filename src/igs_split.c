@@ -280,9 +280,9 @@ igs_split_t *split_create_split_element (const char *from_input,
     assert(to_agent);
     assert(to_output);
     igs_split_t *new_split_elmt = (igs_split_t *) zmalloc (sizeof (igs_split_t));
-    new_split_elmt->from_input = strndup (from_input, IGS_MAX_IO_NAME_LENGTH);
-    new_split_elmt->to_agent = strndup (to_agent, IGS_MAX_IO_NAME_LENGTH);
-    new_split_elmt->to_output = strndup (to_output, IGS_MAX_IO_NAME_LENGTH);
+    new_split_elmt->from_input = s_strndup (from_input, IGS_MAX_IO_NAME_LENGTH);
+    new_split_elmt->to_agent = s_strndup (to_agent, IGS_MAX_IO_NAME_LENGTH);
+    new_split_elmt->to_output = s_strndup (to_output, IGS_MAX_IO_NAME_LENGTH);
     return new_split_elmt;
 }
 

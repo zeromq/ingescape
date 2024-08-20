@@ -445,7 +445,6 @@
     <ClCompile Include="$(ProjectDir)..\..\src\igs_performance.c" />
     <ClCompile Include="$(ProjectDir)..\..\src\igsagent.c" />
     <ClCompile Include="$(ProjectDir)..\..\src\igs_core.c" />
-    <ClCompile Include="$(ProjectDir)..\..\src\igs_replay.c" />
     <ClCompile Include="$(ProjectDir)..\..\src\igs_channels.c" />
     <ClCompile Include="$(ProjectDir)..\..\src\igs_split.c" />
     <ClCompile Include="$(ProjectDir)..\..\src\yajl_alloc.c" />

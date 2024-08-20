@@ -1,7 +1,7 @@
 /*  =========================================================================
     advanced - brokers, security, elections, advanced network config, 
                performance check, agent family, network monitoring, 
-               logs replay and clean global context
+               logs and clean global context
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of Ingescape, see https://github.com/zeromq/ingescape.
@@ -406,45 +406,6 @@ napi_value node_igs_observe_monitor(napi_env env, napi_callback_info info) {
     return NULL;
 }
 
-// Logs replay
-napi_value node_igs_replay_init(napi_env env, napi_callback_info info) {
-    napi_value argv[6];
-    get_function_arguments(env, info, 6, argv);
-    
-    int speed, replay_mode;
-    bool wait_for_start;
-    char *log_file_path = convert_napi_to_string(env, argv[0]),
-         *start_time = convert_napi_to_string(env, argv[2]),
-         *agent = convert_napi_to_string(env, argv[5]);
-    convert_napi_to_int(env, argv[1], &speed);
-    convert_napi_to_bool(env, argv[3], &wait_for_start);
-    convert_napi_to_int(env, argv[4], &replay_mode);
-    igs_replay_init(log_file_path, speed, start_time, wait_for_start, replay_mode, agent);
-    free(log_file_path);
-    free(start_time);
-    free(agent);
-    return NULL;
-}
-
-napi_value node_igs_replay_start(napi_env env, napi_callback_info info) {
-    igs_replay_start();
-    return NULL;
-}
-
-napi_value node_igs_replay_pause(napi_env env, napi_callback_info info) {
-    napi_value argv[1];
-    get_function_arguments(env, info, 1, argv);
-    bool pause;
-    convert_napi_to_bool(env, argv[0], &pause);
-    igs_replay_pause(pause);
-    return NULL;
-}
-
-napi_value node_igs_replay_terminate(napi_env env, napi_callback_info info) {
-    igs_replay_terminate();
-    return NULL;
-}
-
 napi_value node_igs_clear_context(napi_env env, napi_callback_info info) {
     igs_clear_context();
     threadsafe_context_hash_t *threadsafe_context_hash, *threadsafe_context_hash_tmp;
@@ -534,11 +495,6 @@ napi_value init_advanced(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_igs_monitor_is_running, "monitorIsRunning", exports);
     exports = enable_callback_into_js(env, node_igs_monitor_set_start_stop, "monitorSetStartStop", exports);
     exports = enable_callback_into_js(env, node_igs_observe_monitor, "observeMonitor", exports);
-    // Logs replay
-    exports = enable_callback_into_js(env, node_igs_replay_init, "replayInit", exports);
-    exports = enable_callback_into_js(env, node_igs_replay_start, "replayStart", exports);
-    exports = enable_callback_into_js(env, node_igs_replay_pause, "replayPause", exports);
-    exports = enable_callback_into_js(env, node_igs_replay_terminate, "replayTerminate", exports);
     // Clean context
     exports = enable_callback_into_js(env, node_igs_clear_context, "clearContext", exports);
     return exports;

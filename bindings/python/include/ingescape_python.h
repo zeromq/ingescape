@@ -403,11 +403,6 @@ typedef struct monitor_cb {
 extern monitor_cb_t *observe_monitor_cbList;
 PyObject * igs_observe_monitor_wrapper(PyObject *self, PyObject *args);
 
-PyObject * igs_replay_init_wrapper(PyObject *self, PyObject *args);
-PyObject * igs_replay_start_wrapper(PyObject *self, PyObject *args);
-PyObject * igs_replay_pause_wrapper(PyObject *self, PyObject *args);
-PyObject * igs_replay_terminate_wrapper(PyObject *self, PyObject *args);
-
 PyObject * igs_net_performance_check_wrapper(PyObject *self, PyObject *args);
 
 #endif /* ingescape_python_h */
