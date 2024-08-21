@@ -91,7 +91,6 @@ void igsagent_destroy (igsagent_t **agent)
 
     igsagent_wrapper_t *activate_cb = zlist_first((*agent)->activate_callbacks);
     while (activate_cb) {
-        zlist_remove((*agent)->activate_callbacks, activate_cb);
         activate_cb->callback_ptr = NULL;
         free(activate_cb);
         activate_cb = zlist_next((*agent)->activate_callbacks);
@@ -99,7 +98,6 @@ void igsagent_destroy (igsagent_t **agent)
     zlist_destroy(&(*agent)->activate_callbacks);
     igs_agent_event_wrapper_t *event_cb = zlist_first((*agent)->agent_event_callbacks);
     while (event_cb) {
-        zlist_remove((*agent)->agent_event_callbacks, event_cb);
         event_cb->callback_ptr = NULL;
         free(event_cb);
         event_cb = zlist_next((*agent)->agent_event_callbacks);
@@ -107,7 +105,6 @@ void igsagent_destroy (igsagent_t **agent)
     zlist_destroy(&(*agent)->agent_event_callbacks);
     igs_mute_wrapper_t *mute_cb = zlist_first((*agent)->mute_callbacks);
     while (mute_cb) {
-        zlist_remove((*agent)->mute_callbacks, mute_cb);
         mute_cb->callback_ptr = NULL;
         free(mute_cb);
         mute_cb = zlist_next((*agent)->mute_callbacks);

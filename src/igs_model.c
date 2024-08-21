@@ -27,34 +27,6 @@
 ////////////////////////////////////////////////////////////////////////
 #pragma mark INTERNAL FUNCTIONS
 ////////////////////////////////////////////////////////////////////////
-uint8_t *s_model_string_to_bytes (char *string)
-{
-    assert (string);
-    size_t slength = strlen (string);
-    if ((slength % 2) != 0) // must be even
-        return NULL;
-    size_t dlength = slength / 2;
-    uint8_t *data = (uint8_t *) zmalloc (dlength);
-    size_t index = 0;
-    while (index < slength) {
-        char c = string[index];
-        int value = 0;
-        if (c >= '0' && c <= '9')
-            value = (c - '0');
-        else if (c >= 'A' && c <= 'F')
-            value = (10 + (c - 'A'));
-        else if (c >= 'a' && c <= 'f')
-            value = (10 + (c - 'a'));
-        else {
-            free (data);
-            return NULL;
-        }
-        data[(index / 2)] += value << (((index + 1) % 2) * 4);
-        index++;
-    }
-    return data;
-}
-
 igs_io_t *s_model_find_input_by_name (igsagent_t *agent, const char *name)
 {
     assert(agent);
@@ -762,6 +734,34 @@ char *s_model_get_io_value_as_string (igs_io_t *io)
 ////////////////////////////////////////////////////////////////////////
 #pragma mark PRIVATE API
 ////////////////////////////////////////////////////////////////////////
+uint8_t *model_string_to_bytes (char *string)
+{
+    assert (string);
+    size_t slength = strlen (string);
+    if ((slength % 2) != 0) // must be even
+        return NULL;
+    size_t dlength = slength / 2;
+    uint8_t *data = (uint8_t *) zmalloc (dlength);
+    size_t index = 0;
+    while (index < slength) {
+        char c = string[index];
+        int value = 0;
+        if (c >= '0' && c <= '9')
+            value = (c - '0');
+        else if (c >= 'A' && c <= 'F')
+            value = (10 + (c - 'A'));
+        else if (c >= 'a' && c <= 'f')
+            value = (10 + (c - 'a'));
+        else {
+            free (data);
+            return NULL;
+        }
+        data[(index / 2)] += value << (((index + 1) % 2) * 4);
+        index++;
+    }
+    return data;
+}
+
 igs_mutex_t s_model_read_write_mutex;
 static bool s_model_read_write_mutex_initialized = false;
 static int s_model_lock_counter = 0;
@@ -1104,7 +1104,7 @@ igs_io_t *model_write (igsagent_t *agent, const char *name,
                     io->value.data = NULL;
                     size_t s = 0;
                     if (value) {
-                        uint8_t *converted = s_model_string_to_bytes (value);
+                        uint8_t *converted = model_string_to_bytes (value);
                         if (converted){
                             io->value.data = converted;
                             s = strlen (value) / 2;

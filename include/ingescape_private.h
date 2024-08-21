@@ -652,6 +652,7 @@ INGESCAPE_EXPORT int split_message_from_splitter(zmsg_t *msg, igs_core_context_t
 #define IGS_MODEL_READ_WRITE_MUTEX_DEBUG 0
 INGESCAPE_EXPORT void model_read_write_lock(const char *function, int line);
 INGESCAPE_EXPORT void model_read_write_unlock(const char *function, int line);
+INGESCAPE_EXPORT uint8_t *model_string_to_bytes (char *string);
 INGESCAPE_EXPORT igs_io_t* model_write (igsagent_t *agent, const char *io_name, igs_io_type_t type,
                                         igs_io_value_type_t val_type, void* value, size_t size);
 INGESCAPE_EXPORT void model_LOCKED_handle_io_callbacks (igsagent_t *agent, igs_io_t *io);

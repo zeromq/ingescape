@@ -667,7 +667,6 @@ void s_clean_and_free_remote_agent (igs_remote_agent_t **remote_agent)
     igs_mapping_filter_t *elt = zlist_first((*remote_agent)->mapping_filters);
     while (elt) {
         zsock_set_unsubscribe ((*remote_agent)->peer->subscriber, elt->filter);
-        zlist_remove((*remote_agent)->mapping_filters, elt);
         free (elt->filter);
         free (elt);
         elt = zlist_next((*remote_agent)->mapping_filters);

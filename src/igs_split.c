@@ -210,7 +210,6 @@ void split_free_splitter (igs_splitter_t **splitter)
         free((*splitter)->output_name);
     igs_worker_t *worker = zlist_first((*splitter)->workers);
     while (worker) {
-        zlist_remove((*splitter)->workers, worker);
         if (worker->input_name)
             free(worker->input_name);
         if (worker->agent_uuid)

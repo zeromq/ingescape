@@ -55,7 +55,6 @@ void s_definition_free_io (igs_io_t **io)
     if ((*io)->io_callbacks) {
         igs_observe_io_wrapper_t *cb = zlist_first((*io)->io_callbacks);
         while (cb) {
-            //zlist_remove((*io)->io_callbacks, cb);
             cb->callback_ptr = NULL;
             free(cb);
             cb = zlist_next((*io)->io_callbacks);
@@ -220,7 +219,6 @@ void definition_free_definition (igs_definition_t **def)
     
     igs_io_t *current_io = zhashx_first((*def)->attributes_table);
     while (current_io) {
-        //zhashx_delete((*def)->attributes_table, current_io->name);
         s_definition_free_io (&current_io);
         current_io = zhashx_next((*def)->attributes_table);
     }
@@ -228,7 +226,6 @@ void definition_free_definition (igs_definition_t **def)
     
     current_io = zhashx_first((*def)->inputs_table);
     while (current_io) {
-        //zhashx_delete((*def)->inputs_table, current_io->name);
         s_definition_free_io (&current_io);
         current_io = zhashx_next((*def)->inputs_table);
     }
@@ -236,7 +233,6 @@ void definition_free_definition (igs_definition_t **def)
     
     current_io = zhashx_first((*def)->outputs_table);
     while (current_io) {
-        //zhashx_delete((*def)->outputs_table, current_io->name);
         s_definition_free_io (&current_io);
         current_io = zhashx_next((*def)->outputs_table);
     }
@@ -244,7 +240,6 @@ void definition_free_definition (igs_definition_t **def)
     
     igs_service_t *service = zhashx_first((*def)->services_table);
     while (service) {
-        //zhashx_delete((*def)->services_table, service->name);
         service_free_service (&service);
         service = zhashx_next((*def)->services_table);
     }

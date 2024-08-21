@@ -156,7 +156,6 @@ void service_free_service (igs_service_t **s)
     s_service_free_service_arguments (&(*s)->arguments);
     igs_service_t *r = zhashx_first((*s)->replies);
     while (r) {
-        //zhashx_delete((*t)->replies, r->name);
         service_free_service(&r);
         r = zhashx_next((*s)->replies);
     }

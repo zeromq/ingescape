@@ -66,7 +66,6 @@ void mapping_free_mapping (igs_mapping_t **mapping)
     
     igs_split_t *current_split_elmt = zlist_first((*mapping)->split_elements);
     while (current_split_elmt) {
-        //zlist_remove((*mapping)->split_elements, current_map_elmt);
         split_free_split_element (&current_split_elmt);
         current_split_elmt = zlist_next((*mapping)->split_elements);
     }
