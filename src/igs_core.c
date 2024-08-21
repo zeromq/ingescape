@@ -124,7 +124,6 @@ void igs_clear_context (void)
     
     observed_io_t *observed_io = zhashx_first(core_context->observed_inputs);
     while (observed_io) {
-        //zhashx_delete(core_context->observed_inputs, observed_io->name);
         s_core_free_observeIOP (&observed_io);
         observed_io = zhashx_next(core_context->observed_inputs);
     }
@@ -132,7 +131,6 @@ void igs_clear_context (void)
     
     observed_io = zhashx_first(core_context->observed_outputs);
     while (observed_io) {
-        //zhash_delete(core_context->observed_outputs, observed_io->name);
         s_core_free_observeIOP (&observed_io);
         observed_io = zhashx_next(core_context->observed_outputs);
     }
@@ -140,7 +138,6 @@ void igs_clear_context (void)
     
     observed_io = zhashx_first(core_context->observed_attributes);
     while (observed_io) {
-        //zhashx_delete(core_context->observed_attributes, observed_io->name);
         s_core_free_observeIOP (&observed_io);
         observed_io = zhashx_next(core_context->observed_attributes);
     }
@@ -148,7 +145,6 @@ void igs_clear_context (void)
     
     service_cb_wrapper_t *service_cb_wrapper = zhashx_first(core_context->service_cb_wrappers);
     while (service_cb_wrapper) {
-        //zhashx_delete(core_context->service_cb_wrappers, service_cb_wrapper->name);
         s_core_free_service_cb_wrapper (&service_cb_wrapper);
         service_cb_wrapper = zhashx_next(core_context->service_cb_wrappers);
     }
@@ -156,7 +152,6 @@ void igs_clear_context (void)
     
     observe_mute_cb_wrapper_t *mute_cb_wrapper = zlist_first(core_context->mute_cb_wrappers);
     while (mute_cb_wrapper) {
-        zlist_remove(core_context->mute_cb_wrappers, mute_cb_wrapper);
         free (mute_cb_wrapper);
         mute_cb_wrapper = zlist_next(core_context->mute_cb_wrappers);
     }
@@ -164,7 +159,6 @@ void igs_clear_context (void)
     
     observe_agent_events_cb_wrapper_t *agent_event_cb_wrapper = zlist_first(core_context->agent_event_cb_wrappers);
     while (agent_event_cb_wrapper) {
-        zlist_remove(core_context->agent_event_cb_wrappers, agent_event_cb_wrapper);
         free (agent_event_cb_wrapper);
         agent_event_cb_wrapper = zlist_next(core_context->agent_event_cb_wrappers);
     }
@@ -172,7 +166,6 @@ void igs_clear_context (void)
     
     igs_freeze_wrapper_t *freeze_elt = zlist_first(core_context->freeze_callbacks);
     while (freeze_elt) {
-        zlist_remove(core_context->freeze_callbacks, freeze_elt);
         freeze_elt->callback_ptr = NULL;
         free(freeze_elt);
         freeze_elt = zlist_next(core_context->freeze_callbacks);
@@ -181,7 +174,6 @@ void igs_clear_context (void)
     
     igs_forced_stop_wrapper_t *stop_elt = zlist_first(core_context->external_stop_calbacks);
     while (stop_elt) {
-        zlist_remove(core_context->external_stop_calbacks, stop_elt);
         stop_elt->callback_ptr = NULL;
         free(stop_elt);
         stop_elt = zlist_next(core_context->external_stop_calbacks);
@@ -886,28 +878,31 @@ void igs_clear_definition (void)
     // delete associated callback wrappers
     observed_io_t *observed_io = zhashx_first(core_context->observed_inputs);
     while (observed_io) {
-        zhashx_delete(core_context->observed_inputs, observed_io->name);
         s_core_free_observeIOP (&observed_io);
         observed_io = zhashx_next(core_context->observed_inputs);
     }
+    zhashx_purge(core_context->observed_inputs);
     observed_io = zhashx_first(core_context->observed_outputs);
     while (observed_io) {
         zhashx_delete(core_context->observed_outputs, observed_io->name);
         s_core_free_observeIOP (&observed_io);
         observed_io = zhashx_next(core_context->observed_outputs);
     }
+    zhashx_purge(core_context->observed_outputs);
     observed_io = zhashx_first(core_context->observed_attributes);
     while (observed_io) {
         zhashx_delete(core_context->observed_attributes, observed_io->name);
         s_core_free_observeIOP (&observed_io);
         observed_io = zhashx_next(core_context->observed_attributes);
     }
+    zhashx_purge(core_context->observed_attributes);
     service_cb_wrapper_t *service_cb_wrapper = zhashx_first(core_context->service_cb_wrappers);
     while (service_cb_wrapper) {
         zhashx_delete(core_context->service_cb_wrappers, service_cb_wrapper->name);
         s_core_free_service_cb_wrapper (&service_cb_wrapper);
         service_cb_wrapper = zhashx_next(core_context->service_cb_wrappers);
     }
+    zhashx_purge(core_context->service_cb_wrappers);
     model_read_write_unlock(__FUNCTION__, __LINE__);
 }
 
