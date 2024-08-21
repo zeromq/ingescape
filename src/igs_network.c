@@ -3015,24 +3015,24 @@ static void s_run_loop (zsock_t *mypipe, void *args)
     igs_debug ("cleaning network structures...");
     igs_remote_agent_t *remote = zhashx_first(context->remote_agents);
     while (remote) {
-        zhashx_delete(context->remote_agents, remote->uuid);
         s_clean_and_free_remote_agent (&remote);
         remote = zhashx_next(context->remote_agents);
     }
+    zhashx_purge(context->remote_agents);
     
     igs_zyre_peer_t *zyre_peer = zhashx_first(context->zyre_peers);
     while (zyre_peer) {
-        zhashx_delete(context->zyre_peers, zyre_peer->peer_id);
         s_clean_and_free_zyre_peer (&zyre_peer, context->loop);
         zyre_peer = zhashx_next(context->zyre_peers);
     }
+    zhashx_purge(context->zyre_peers);
     
     igs_timer_t *current_timer = zlist_first(context->timers);
     while (current_timer) {
-        zlist_remove(context->timers, current_timer);
         free(current_timer);
         current_timer = zlist_next(context->timers);
     }
+    zlist_purge(context->timers);
     
     // clean remaining dynamic data
     if (context->replay_channel) {
