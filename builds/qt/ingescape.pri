@@ -34,7 +34,6 @@ SOURCES += \
     $$PWD/../../src/yajl.c
 
 HEADERS += \
-    $$PWD/../../src/uthash/uthash.h \
     $$PWD/../../include/ingescape.h \
     $$PWD/../../include/ingescape_private.h \
     $$PWD/../../include/igsagent.h \
