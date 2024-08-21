@@ -145,7 +145,6 @@ void igs_clear_context (void)
     
     service_cb_wrapper_t *service_cb_wrapper = zhashx_first(core_context->service_cb_wrappers);
     while (service_cb_wrapper) {
-        //zhashx_delete(core_context->service_cb_wrappers, service_cb_wrapper->name);
         s_core_free_service_cb_wrapper (&service_cb_wrapper);
         service_cb_wrapper = zhashx_next(core_context->service_cb_wrappers);
     }
