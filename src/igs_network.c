@@ -2646,37 +2646,40 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             igs_info ("\\o/ peer %s(%s) is leader in '%s'", name, peerUUID, group);
         
         zlist_t *election = zhashx_lookup (context->elections, group);
-        assert (election);
-        // inform all our agents participating in the election
-        zlist_t *election_copy = zlist_dup(election);
-        char *attendeeUUID = zlist_first (election_copy);
-        while (attendeeUUID) {
-            igsagent_t *agent = zhashx_lookup(context->agents, attendeeUUID);
-            if (!agent || !agent->uuid)
-                continue;
-            if (is_leader)
-                igs_info ("\\o/ agent %s(%s) is leader in '%s'", agent->definition->name, agent->uuid, group);
-            else
-                igs_info ("\\o/ agent %s(%s) is NOT leader in '%s'", agent->definition->name, agent->uuid, group);
-            char *election_name = strdup (group);
-            zlist_t *agent_event_callbacks = zlist_dup(agent->agent_event_callbacks);
-            igs_agent_event_wrapper_t *cb = zlist_first(agent_event_callbacks);
-            while (cb && cb->callback_ptr && agent && agent->uuid) {
-                model_read_write_unlock(__FUNCTION__, __LINE__);
+        //We may have joined the elections channel MANUALLY and receive election results.
+        //In this case, no election object exists.
+        if (election){
+            // inform all our agents participating in the election
+            zlist_t *election_copy = zlist_dup(election);
+            char *attendeeUUID = zlist_first (election_copy);
+            while (attendeeUUID) {
+                igsagent_t *agent = zhashx_lookup(context->agents, attendeeUUID);
+                if (!agent || !agent->uuid)
+                    continue;
                 if (is_leader)
-                    cb->callback_ptr (agent, IGS_AGENT_WON_ELECTION, agent->uuid, agent->definition->name,
-                                      election_name, cb->my_data);
+                    igs_info ("\\o/ agent %s(%s) is leader in '%s'", agent->definition->name, agent->uuid, group);
                 else
-                    cb->callback_ptr (agent, IGS_AGENT_LOST_ELECTION, agent->uuid, agent->definition->name,
-                                      election_name, cb->my_data);
-                model_read_write_lock(__FUNCTION__, __LINE__);
-                cb = zlist_next(agent_event_callbacks);
+                    igs_info ("\\o/ agent %s(%s) is NOT leader in '%s'", agent->definition->name, agent->uuid, group);
+                char *election_name = strdup (group);
+                zlist_t *agent_event_callbacks = zlist_dup(agent->agent_event_callbacks);
+                igs_agent_event_wrapper_t *cb = zlist_first(agent_event_callbacks);
+                while (cb && cb->callback_ptr && agent && agent->uuid) {
+                    model_read_write_unlock(__FUNCTION__, __LINE__);
+                    if (is_leader)
+                        cb->callback_ptr (agent, IGS_AGENT_WON_ELECTION, agent->uuid, agent->definition->name,
+                                          election_name, cb->my_data);
+                    else
+                        cb->callback_ptr (agent, IGS_AGENT_LOST_ELECTION, agent->uuid, agent->definition->name,
+                                          election_name, cb->my_data);
+                    model_read_write_lock(__FUNCTION__, __LINE__);
+                    cb = zlist_next(agent_event_callbacks);
+                }
+                zlist_destroy(&agent_event_callbacks);
+                free (election_name);
+                attendeeUUID = zlist_next (election_copy);
             }
-            zlist_destroy(&agent_event_callbacks);
-            free (election_name);
-            attendeeUUID = zlist_next (election_copy);
+            zlist_destroy(&election_copy);
         }
-        zlist_destroy(&election_copy);
         model_read_write_unlock(__FUNCTION__, __LINE__);
     }
     else if (streq (event, "LEAVE"))
