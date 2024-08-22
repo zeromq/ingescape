@@ -466,11 +466,11 @@ igs_result_t igsagent_service_init (igsagent_t *agent,
     
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_service_t *s = zhashx_lookup(agent->definition->services_table, name);
-    if (s) {
-        igsagent_error (agent, "service with name %s already exists and has a callback", name);
+    if (s && s->service_cb) {
+        igsagent_error (agent, "service with name %s exists and already has a callback", name);
         model_read_write_unlock(__FUNCTION__, __LINE__);
         return IGS_FAILURE;
-    }else{
+    }else if (!s){
         // service is completely new: allocate it
         s = (igs_service_t *) zmalloc (sizeof (igs_service_t));
         if (strnlen (name, IGS_MAX_STRING_MSG_LENGTH) == IGS_MAX_STRING_MSG_LENGTH) {
