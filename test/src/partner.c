@@ -104,9 +104,11 @@ int main(int argc, const char * argv[]) {
         {"auto",        no_argument, 0,  'a' },
         {"static",        no_argument, 0,  's' },
         {"help",        no_argument, 0,  'h' },
+        {"broker",  required_argument, 0,  'b' },
         {0, 0, 0, 0}
     };
 
+    char * broker = NULL;
     int long_index = 0;
     while ((opt = getopt_long(argc, (char *const *)argv, "p", long_options, &long_index)) != -1) {
         switch (opt) {
@@ -118,6 +120,9 @@ int main(int argc, const char * argv[]) {
                 break;
             case 'p':
                 port = (unsigned int)atoi(optarg);
+                break;
+            case 'b':
+                broker = strdup(optarg);
                 break;
             case 'd':
                 p_networkDevice = optarg;
@@ -198,7 +203,16 @@ int main(int argc, const char * argv[]) {
     if (staticTests)
         exit(EXIT_SUCCESS);
 
-    igs_start_with_device(p_networkDevice, port);
+
+    if (broker) {
+        char buffer[1024] = "";
+        snprintf(buffer, 1024, "tcp://%s:5661", broker);
+        igs_broker_enable_with_endpoint(buffer);
+        snprintf(buffer, 1024, "tcp://%s:5671", broker);
+        igs_start_with_brokers(buffer);
+    } else {
+        igs_start_with_device(p_networkDevice, port);
+    }
     igs_channel_join("TEST_CHANNEL");
 
     //mainloop management (two modes)
