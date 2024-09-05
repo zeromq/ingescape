@@ -1929,9 +1929,11 @@ int main(int argc, const char * argv[]) {
         {"static",        no_argument, 0,  's' },
         {"rt",        no_argument, 0,  'r' },
         {"help",        no_argument, 0,  'h' },
+        {"broker",  required_argument, 0,  'b' },        
         {0, 0, 0, 0}
     };
 
+    char * broker = NULL;
     int long_index = 0;
     while ((opt = getopt_long(argc, (char *const *)argv, "p", long_options, &long_index)) != -1) {
         switch (opt) {
@@ -1944,6 +1946,9 @@ int main(int argc, const char * argv[]) {
             case 'p':
                 port = (unsigned int)atoi(optarg);
                 break;
+            case 'b':
+                broker = strdup(optarg);
+                break;                
             case 'd':
                 networkDevice = optarg;
                 break;
@@ -2096,7 +2101,11 @@ int main(int argc, const char * argv[]) {
 //    igs_stop();
 //    igs_stop();
 
-    igs_start_with_device(networkDevice, port);
+    if (broker) {
+        brokerCommand(broker);
+    } else {
+        igs_start_with_device(networkDevice, port);
+    }
 
     //mainloop management (two modes)
     if (!interactiveloop) {
