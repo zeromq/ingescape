@@ -205,7 +205,11 @@ int main(int argc, const char * argv[]) {
 
 
     if (broker) {
-        brokerCommandSparing(broker);
+        char buffer[1024] = "";
+        snprintf(buffer, 1024, "tcp://%s:5661", broker);
+        igs_broker_enable_with_endpoint(buffer);
+        snprintf(buffer, 1024, "tcp://%s:5671", broker);
+        igs_start_with_brokers(buffer);
     } else {
         igs_start_with_device(p_networkDevice, port);
     }

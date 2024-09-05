@@ -2094,16 +2094,20 @@ int main(int argc, const char * argv[]) {
             igs_free_net_addresses_list(addresses, nbD);
         }
     }
-    //start/stop stress tests
-    igs_start_with_device(networkDevice, port);
+    if (broker) {
+        char buffer[1024] = "";
+        snprintf(buffer, 1024, "tcp://%s:5661", broker);
+        assert(igs_broker_add(buffer) == IGS_SUCCESS);
+        snprintf(buffer, 1024, "tcp://%s:5670", broker);
+        assert(igs_start_with_brokers(buffer) == IGS_SUCCESS);        
+    } else {
+        //start/stop stress tests
+        igs_start_with_device(networkDevice, port);
 //    igs_start_with_device(networkDevice, port);
 //    igs_stop();
 //    igs_stop();
 //    igs_stop();
 
-    if (broker) {
-        brokerCommand(broker);
-    } else {
         igs_start_with_device(networkDevice, port);
     }
 
