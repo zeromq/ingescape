@@ -460,6 +460,8 @@ igs_result_t igsagent_service_init (igsagent_t *agent,
                                     void *my_data)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (name && strlen (name) > 0);
     assert (cb);
     assert(agent->definition);
@@ -492,6 +494,8 @@ igs_result_t igsagent_service_init (igsagent_t *agent,
 igs_result_t igsagent_service_remove (igsagent_t *agent, const char *name)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (name);
     assert (agent->definition);
     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -515,6 +519,8 @@ igs_result_t igsagent_service_arg_add (igsagent_t *agent,
                                        igs_io_value_type_t type)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (service_name);
     assert (arg_name && strlen (arg_name) > 0);
     assert (agent->definition);
@@ -579,6 +585,8 @@ igs_result_t igsagent_service_arg_remove (igsagent_t *agent,
                                           const char *arg_name)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (service_name);
     assert (arg_name);
     assert (agent->definition);
@@ -620,6 +628,8 @@ igs_result_t igsagent_service_arg_remove (igsagent_t *agent,
 
 igs_result_t igsagent_service_reply_add(igsagent_t *agent, const char *service_name, const char *reply_name){
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (service_name);
     assert (reply_name);
     assert (agent->definition);
@@ -652,6 +662,8 @@ igs_result_t igsagent_service_reply_add(igsagent_t *agent, const char *service_n
 
 igs_result_t igsagent_service_reply_remove(igsagent_t *agent, const char *service_name, const char *reply_name){
     assert(agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert(service_name);
     assert(reply_name);
     assert(agent->definition);
@@ -681,6 +693,8 @@ igs_result_t igsagent_service_reply_remove(igsagent_t *agent, const char *servic
 igs_result_t igsagent_service_reply_arg_add(igsagent_t *agent, const char *service_name, const char *reply_name,
                                             const char *arg_name, igs_io_value_type_t type){
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (service_name);
     assert (reply_name);
     assert (arg_name);
@@ -751,6 +765,8 @@ igs_result_t igsagent_service_reply_arg_add(igsagent_t *agent, const char *servi
 igs_result_t igsagent_service_reply_arg_remove(igsagent_t *agent, const char *service_name, 
                                                const char *reply_name, const char *arg_name){
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (service_name);
     assert (reply_name);
     assert (arg_name);
@@ -808,6 +824,8 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                                     const char *token)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (agent_name_or_uuid);
     assert (service_name);
     assert ((list == NULL) || (*list));
@@ -988,6 +1006,8 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
 size_t igsagent_service_count (igsagent_t *agent)
 {
     assert(agent);
+    if (!agent->uuid)
+        return 0;
     assert (agent->definition);
     model_read_write_lock(__FUNCTION__, __LINE__);
     size_t res = zhashx_size(agent->definition->services_table);
@@ -998,6 +1018,8 @@ size_t igsagent_service_count (igsagent_t *agent)
 bool igsagent_service_exists (igsagent_t *agent, const char *name)
 {
     assert (agent);
+    if (!agent->uuid)
+        return false;
     assert (agent->definition);
     assert(name);
     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -1009,6 +1031,10 @@ bool igsagent_service_exists (igsagent_t *agent, const char *name)
 char **igsagent_service_list (igsagent_t *agent, size_t *nb_of_elements)
 {
     assert (agent);
+    if (!agent->uuid){
+        *nb_of_elements = 0;
+        return NULL;
+    }
     assert (agent->definition);
     model_read_write_lock(__FUNCTION__, __LINE__);
     size_t nb = zhashx_size(agent->definition->services_table);
@@ -1044,6 +1070,8 @@ igs_service_arg_t *igsagent_service_args_first (igsagent_t *agent,
                                                 const char *service_name)
 {
     assert(agent);
+    if (!agent->uuid)
+        return NULL;
     assert(service_name);
     assert(agent->definition);
     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -1062,6 +1090,8 @@ size_t igsagent_service_args_count (igsagent_t *agent,
                                     const char *service_name)
 {
     assert(agent);
+    if (!agent->uuid)
+        return 0;
     assert(service_name);
     assert(agent->definition);
     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -1086,6 +1116,8 @@ bool igsagent_service_arg_exists (igsagent_t *agent,
                                   const char *arg_name)
 {
     assert(agent);
+    if (!agent->uuid)
+        return false;
     assert(service_name);
     assert(arg_name);
     assert(agent->definition);
@@ -1109,6 +1141,8 @@ bool igsagent_service_arg_exists (igsagent_t *agent,
 
 bool igsagent_service_has_replies(igsagent_t *agent, const char *service_name){
     assert(agent);
+    if (!agent->uuid)
+        return false;
     assert(service_name);
     assert(agent->definition);
     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -1128,6 +1162,8 @@ bool igsagent_service_has_replies(igsagent_t *agent, const char *service_name){
 
 bool igsagent_service_has_reply(igsagent_t *agent, const char *service_name, const char *reply_name){
     assert(agent);
+    if (!agent->uuid)
+        return false;
     assert(service_name);
     assert(reply_name);
     assert(agent->definition);
@@ -1149,6 +1185,10 @@ bool igsagent_service_has_reply(igsagent_t *agent, const char *service_name, con
 
 char ** igsagent_service_reply_names(igsagent_t *agent, const char *service_name, size_t *service_replies_nbr){
     assert(agent);
+    if (!agent->uuid){
+        *service_replies_nbr = 0;
+        return NULL;
+    }
     assert(service_name);
     assert(service_replies_nbr);
     assert(agent->definition);
@@ -1179,6 +1219,8 @@ char ** igsagent_service_reply_names(igsagent_t *agent, const char *service_name
 
 igs_service_arg_t * igsagent_service_reply_args_first(igsagent_t *agent, const char *service_name, const char *reply_name){
     assert(agent);
+    if (!agent->uuid)
+        return NULL;
     assert(service_name);
     assert(reply_name);
     assert(agent->definition);
@@ -1203,6 +1245,8 @@ igs_service_arg_t * igsagent_service_reply_args_first(igsagent_t *agent, const c
 
 size_t igsagent_service_reply_args_count(igsagent_t *agent, const char *service_name, const char *reply_name){
     assert(agent);
+    if (!agent->uuid)
+        return 0;
     assert(service_name);
     assert(reply_name);
     assert(agent->definition);
@@ -1232,6 +1276,8 @@ size_t igsagent_service_reply_args_count(igsagent_t *agent, const char *service_
 
 bool igsagent_service_reply_arg_exists(igsagent_t *agent, const char *service_name, const char *reply_name, const char *arg_name){
     assert(agent);
+    if (!agent->uuid)
+        return false;
     assert(service_name);
     assert(reply_name);
     assert(arg_name);

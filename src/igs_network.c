@@ -1023,7 +1023,8 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     while (agent->uuid && r && r->uuid) {
                         if (streq (r->peer->peer_id, peerUUID)){
                             model_read_write_unlock(__FUNCTION__, __LINE__);
-                            cb->callback_ptr (agent, IGS_AGENT_KNOWS_US, r->uuid, r->definition->name, NULL, cb->my_data);
+                            if (agent->uuid && r->uuid)
+                                cb->callback_ptr (agent, IGS_AGENT_KNOWS_US, r->uuid, r->definition->name, NULL, cb->my_data);
                             model_read_write_lock(__FUNCTION__, __LINE__);
                         }
                         r = zlistx_next(remote_agents);
@@ -1134,7 +1135,8 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                                 zmsg_addstr (ready_message, elt->to_output);
                                 zmsg_addstrf (ready_message, "%i",IGS_DEFAULT_WORKER_CREDIT);
                                 model_read_write_unlock(__FUNCTION__, __LINE__);
-                                igs_channel_whisper_zmsg (remote_agent->uuid, &ready_message);
+                                if (remote_agent->uuid)
+                                    igs_channel_whisper_zmsg (remote_agent->uuid, &ready_message);
                                 model_read_write_lock(__FUNCTION__, __LINE__);
                             }
                             elt = zlist_next(elt_agent->mapping->split_elements);
@@ -1158,8 +1160,9 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     }
                 }else{
                     model_read_write_unlock(__FUNCTION__, __LINE__);
-                    agent_LOCKED_propagate_agent_event (IGS_AGENT_UPDATED_DEFINITION,
-                                                        uuid, remote_agent_name, remote_agent->definition->json);
+                    if (remote_agent->uuid)
+                        agent_LOCKED_propagate_agent_event (IGS_AGENT_UPDATED_DEFINITION,
+                                                            uuid, remote_agent_name, remote_agent->definition->json);
                     model_read_write_lock(__FUNCTION__, __LINE__);
                 }
             } else {
@@ -1221,8 +1224,9 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     mapping_free_mapping (&remote_agent->mapping);
                     remote_agent->mapping = NULL;
                     model_read_write_unlock(__FUNCTION__, __LINE__);
-                    agent_LOCKED_propagate_agent_event (IGS_AGENT_UPDATED_MAPPING, uuid,
-                                                        remote_agent->definition->name, NULL); //mapping is empty => arg is NULL
+                    if (remote_agent->uuid)
+                        agent_LOCKED_propagate_agent_event (IGS_AGENT_UPDATED_MAPPING, uuid,
+                                                            remote_agent->definition->name, NULL); //mapping is empty => arg is NULL
                     model_read_write_lock(__FUNCTION__, __LINE__);
                 }
             }
@@ -1239,7 +1243,9 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 remote_agent->mapping = new_mapping;
                 mapping_update_json(remote_agent->mapping);
                 model_read_write_unlock(__FUNCTION__, __LINE__);
-                agent_LOCKED_propagate_agent_event (IGS_AGENT_UPDATED_MAPPING, uuid, remote_agent->definition->name, str_mapping);
+                if (remote_agent->uuid)
+                    agent_LOCKED_propagate_agent_event (IGS_AGENT_UPDATED_MAPPING, uuid, 
+                                                        remote_agent->definition->name, str_mapping);
                 model_read_write_lock(__FUNCTION__, __LINE__);
             }
             free (str_mapping);
@@ -2533,8 +2539,9 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                                 service_log_received_service (callee_agent, caller_name, caller_uuid, service_name,
                                                               args, callee_agent->rt_current_timestamp_microseconds);
                             model_read_write_unlock(__FUNCTION__, __LINE__);
-                            (service->service_cb) (callee_agent, caller_name, caller_uuid, service_name,
-                                                   args, nb_args, token, service->cb_data);
+                            if (callee_agent->uuid)
+                                (service->service_cb) (callee_agent, caller_name, caller_uuid, service_name,
+                                                       args, nb_args, token, service->cb_data);
                             model_read_write_lock(__FUNCTION__, __LINE__);
                         }
                         igs_service_args_destroy(&args);
@@ -2665,10 +2672,10 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 igs_agent_event_wrapper_t *cb = zlist_first(agent_event_callbacks);
                 while (cb && cb->callback_ptr && agent && agent->uuid) {
                     model_read_write_unlock(__FUNCTION__, __LINE__);
-                    if (is_leader)
+                    if (is_leader && agent->uuid)
                         cb->callback_ptr (agent, IGS_AGENT_WON_ELECTION, agent->uuid, agent->definition->name,
                                           election_name, cb->my_data);
-                    else
+                    else if (agent->uuid)
                         cb->callback_ptr (agent, IGS_AGENT_LOST_ELECTION, agent->uuid, agent->definition->name,
                                           election_name, cb->my_data);
                     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -2797,8 +2804,9 @@ int s_trigger_definition_update (zloop_t *loop, int timer_id, void *arg)
             
             //propagate definition update to other agents in the same process (if any)
             model_read_write_unlock(__FUNCTION__, __LINE__);
-            agent_LOCKED_propagate_agent_event (IGS_AGENT_UPDATED_DEFINITION,
-                                                agent->uuid, agent->definition->name, agent->definition->json);
+            if (agent->uuid)
+                agent_LOCKED_propagate_agent_event (IGS_AGENT_UPDATED_DEFINITION,
+                                                    agent->uuid, agent->definition->name, agent->definition->json);
             model_read_write_lock(__FUNCTION__, __LINE__);
         }
         agent = zlistx_next(agents);
@@ -2842,8 +2850,9 @@ int s_trigger_mapping_update (zloop_t *loop, int timer_id, void *arg)
             }
             agent->network_need_to_send_mapping_update = false;
             model_read_write_unlock(__FUNCTION__, __LINE__);
-            agent_LOCKED_propagate_agent_event (IGS_AGENT_UPDATED_MAPPING,agent->uuid,
-                                                agent->definition->name, agent->mapping->json);
+            if (agent->uuid)
+                agent_LOCKED_propagate_agent_event (IGS_AGENT_UPDATED_MAPPING,agent->uuid,
+                                                    agent->definition->name, agent->mapping->json);
             model_read_write_lock(__FUNCTION__, __LINE__);
         }
         agent = zlistx_next(agents);
@@ -3891,6 +3900,8 @@ bool igs_is_started (void)
 void igsagent_set_name (igsagent_t *agent, const char *name)
 {
     assert (agent);
+    if (!agent->uuid)
+        return;
     assert (name && strlen (name) > 0);
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (streq (agent->definition->name, name)){
@@ -3960,6 +3971,8 @@ void igsagent_set_name (igsagent_t *agent, const char *name)
 char *igsagent_name (igsagent_t *agent)
 {
     assert (agent);
+    if (!agent->uuid)
+        return NULL;
     assert (agent->definition);
     assert (agent->definition->name);
     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -4064,6 +4077,8 @@ void igs_observe_freeze (igs_freeze_fn cb, void *my_data)
 void igsagent_set_state (igsagent_t *agent, const char *state)
 {
     assert (agent);
+    if (!agent->uuid)
+        return;
     assert (state);
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (agent->state == NULL || !streq (state, agent->state)) {
@@ -4086,6 +4101,8 @@ void igsagent_set_state (igsagent_t *agent, const char *state)
 char *igsagent_state (igsagent_t *agent)
 {
     assert (agent);
+    if (!agent->uuid)
+        return NULL;
     model_read_write_lock(__FUNCTION__, __LINE__);
     char *res = NULL;
     if (agent->state)
@@ -4097,6 +4114,8 @@ char *igsagent_state (igsagent_t *agent)
 void igsagent_mute (igsagent_t *agent)
 {
     assert (agent);
+    if (!agent->uuid)
+        return;
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (!agent->is_whole_agent_muted) {
         agent->is_whole_agent_muted = true;
@@ -4114,7 +4133,8 @@ void igsagent_mute (igsagent_t *agent)
     igs_mute_wrapper_t *elt = zlist_first(callbacks);
     while (elt && elt->callback_ptr && agent->uuid) {
         model_read_write_unlock(__FUNCTION__, __LINE__);
-        elt->callback_ptr (agent, agent->is_whole_agent_muted, elt->my_data);
+        if (agent->uuid)
+            elt->callback_ptr (agent, agent->is_whole_agent_muted, elt->my_data);
         model_read_write_lock(__FUNCTION__, __LINE__);
         elt = zlist_next(callbacks);
     }
@@ -4125,6 +4145,8 @@ void igsagent_mute (igsagent_t *agent)
 void igsagent_unmute (igsagent_t *agent)
 {
     assert (agent);
+    if (!agent->uuid)
+        return;
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (agent->is_whole_agent_muted) {
         agent->is_whole_agent_muted = false;
@@ -4142,7 +4164,8 @@ void igsagent_unmute (igsagent_t *agent)
     igs_mute_wrapper_t *elt = zlist_first(callbacks);
     while (elt && elt->callback_ptr && agent->uuid) {
         model_read_write_unlock(__FUNCTION__, __LINE__);
-        elt->callback_ptr (agent, agent->is_whole_agent_muted, elt->my_data);
+        if (agent->uuid)
+            elt->callback_ptr (agent, agent->is_whole_agent_muted, elt->my_data);
         model_read_write_lock(__FUNCTION__, __LINE__);
         elt = zlist_next(callbacks);
     }
@@ -4153,6 +4176,8 @@ void igsagent_unmute (igsagent_t *agent)
 bool igsagent_is_muted (igsagent_t *agent)
 {
     assert (agent);
+    if (!agent->uuid)
+        return false;
     model_read_write_lock(__FUNCTION__, __LINE__);
     bool res = agent->is_whole_agent_muted;
     model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -4164,6 +4189,8 @@ void igsagent_observe_mute (igsagent_t *agent,
                             void *my_data)
 {
     assert (agent);
+    if (!agent->uuid)
+        return;
     assert (cb);
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_mute_wrapper_t *new_cb = (igs_mute_wrapper_t *) zmalloc (sizeof (igs_mute_wrapper_t));

@@ -1835,6 +1835,8 @@ igs_result_t igsagent_definition_load_str (igsagent_t *agent,
                                            const char *json_str)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (json_str);
     // Try to load definition
     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -1857,6 +1859,8 @@ igs_result_t igsagent_definition_load_file (igsagent_t *agent,
                                             const char *file_path)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (file_path);
     // Try to load definition
     model_read_write_lock(__FUNCTION__, __LINE__);

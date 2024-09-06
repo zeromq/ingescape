@@ -32,7 +32,8 @@ void agent_LOCKED_propagate_agent_event (igs_agent_event_t event,
             igs_agent_event_wrapper_t *cb = zlist_first(event_callbacks);
             while (cb && cb->callback_ptr && agent && agent->uuid) {
                 model_read_write_unlock(__FUNCTION__, __LINE__);
-                cb->callback_ptr (agent, event, uuid, name, event_data, cb->my_data);
+                if (agent->uuid)
+                    cb->callback_ptr (agent, event, uuid, name, event_data, cb->my_data);
                 model_read_write_lock(__FUNCTION__, __LINE__);
                 cb = zlist_next(event_callbacks);
             }
@@ -73,13 +74,14 @@ void igsagent_destroy (igsagent_t **agent)
     assert (*agent);
     if (igsagent_is_activated (*agent))
         igsagent_deactivate (*agent);
+    if (!(*agent)->uuid)
+        return;
     
     model_read_write_lock(__FUNCTION__, __LINE__);
     zhashx_delete (core_context->created_agents, (*agent)->uuid);
-    if ((*agent)->uuid) {
-        free ((*agent)->uuid);
-        (*agent)->uuid = NULL;
-    }
+    free ((*agent)->uuid);
+    (*agent)->uuid = NULL;
+    
     if ((*agent)->state)
         free ((*agent)->state);
     if ((*agent)->definition_path)
@@ -123,6 +125,8 @@ void igsagent_destroy (igsagent_t **agent)
 igs_result_t igsagent_activate (igsagent_t *agent)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     model_read_write_lock(__FUNCTION__, __LINE__);
     agent->context = core_context;
     if (agent->context->rt_current_microseconds != INT64_MIN)
@@ -156,11 +160,13 @@ igs_result_t igsagent_activate (igsagent_t *agent)
             igs_agent_event_wrapper_t *agent_event_wrapper_cb = zlist_first(agent_event_callbacks);
             while (agent_event_wrapper_cb && agent->uuid) {
                 model_read_write_unlock(__FUNCTION__, __LINE__);
-                agent_event_wrapper_cb->callback_ptr (agent, IGS_AGENT_ENTERED, local->uuid,
-                                                      local->definition->name, local->definition->json, agent_event_wrapper_cb->my_data);
+                if (agent->uuid && local->uuid)
+                    agent_event_wrapper_cb->callback_ptr (agent, IGS_AGENT_ENTERED, local->uuid,
+                                                          local->definition->name, local->definition->json, agent_event_wrapper_cb->my_data);
                 // in our local context, other agents already know us
-                agent_event_wrapper_cb->callback_ptr (agent, IGS_AGENT_KNOWS_US, local->uuid,
-                                                      local->definition->name, NULL, agent_event_wrapper_cb->my_data);
+                if (agent->uuid && local->uuid)
+                    agent_event_wrapper_cb->callback_ptr (agent, IGS_AGENT_KNOWS_US, local->uuid,
+                                                          local->definition->name, NULL, agent_event_wrapper_cb->my_data);
                 model_read_write_lock(__FUNCTION__, __LINE__);
                 //FIXME: shall we send an IGS_AGENT_UPDATED_MAPPING event here ?
                 agent_event_wrapper_cb = zlist_next(agent_event_callbacks);
@@ -173,8 +179,9 @@ igs_result_t igsagent_activate (igsagent_t *agent)
         igs_agent_event_wrapper_t *cb = zlist_first(agent_event_callbacks);
         while (remote->uuid && cb && agent->uuid) {
             model_read_write_unlock(__FUNCTION__, __LINE__);
-            cb->callback_ptr (agent, IGS_AGENT_ENTERED, remote->uuid,
-                              remote->definition->name, remote->definition->json, cb->my_data);
+            if (agent->uuid && remote->uuid)
+                cb->callback_ptr (agent, IGS_AGENT_ENTERED, remote->uuid,
+                                  remote->definition->name, remote->definition->json, cb->my_data);
             model_read_write_lock(__FUNCTION__, __LINE__);
             //FIXME: shall we send an IGS_AGENT_UPDATED_MAPPING event here ?
             cb = zlist_next(agent_event_callbacks);
@@ -204,7 +211,8 @@ igs_result_t igsagent_activate (igsagent_t *agent)
         igsagent_wrapper_t *agent_wrapper_cb = zlist_first(activate_callbacks);
         while (agent->uuid && agent_wrapper_cb && agent_wrapper_cb->callback_ptr) {
             model_read_write_unlock(__FUNCTION__, __LINE__);
-            agent_wrapper_cb->callback_ptr (agent, true, agent_wrapper_cb->my_data);
+            if (agent->uuid)
+                agent_wrapper_cb->callback_ptr (agent, true, agent_wrapper_cb->my_data);
             model_read_write_lock(__FUNCTION__, __LINE__);
             agent_wrapper_cb = zlist_next(activate_callbacks);
         }
@@ -218,6 +226,8 @@ igs_result_t igsagent_activate (igsagent_t *agent)
 igs_result_t igsagent_deactivate (igsagent_t *agent)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     model_read_write_lock(__FUNCTION__, __LINE__);
     igsagent_t *a = zhashx_lookup(core_context->agents, agent->uuid);
     if (!a) {
@@ -245,7 +255,8 @@ igs_result_t igsagent_deactivate (igsagent_t *agent)
     igsagent_wrapper_t *cb = zlist_first(activate_callbacks);
     while (cb && agent->uuid) {
         model_read_write_unlock(__FUNCTION__, __LINE__);
-        cb->callback_ptr (agent, false, cb->my_data);
+        if (agent->uuid)
+            cb->callback_ptr (agent, false, cb->my_data);
         model_read_write_lock(__FUNCTION__, __LINE__);
         cb = zlist_next(activate_callbacks);
     }
@@ -261,6 +272,8 @@ igs_result_t igsagent_deactivate (igsagent_t *agent)
 bool igsagent_is_activated (igsagent_t *agent)
 {
     assert (agent);
+    if (!agent->uuid)
+        return false;
     model_read_write_lock(__FUNCTION__, __LINE__);
     bool is_activated = false;
     igsagent_t *a = zhashx_lookup(core_context->agents, agent->uuid);
@@ -273,6 +286,8 @@ bool igsagent_is_activated (igsagent_t *agent)
 void igsagent_observe (igsagent_t *agent, igsagent_fn cb, void *my_data)
 {
     assert (agent);
+    if (!agent->uuid)
+        return;
     assert (cb);
     model_read_write_lock(__FUNCTION__, __LINE__);
     igsagent_wrapper_t *new_cb = (igsagent_wrapper_t *) zmalloc (sizeof (igsagent_wrapper_t));
@@ -287,6 +302,8 @@ void igsagent_observe_agent_events (igsagent_t *agent,
                                     void *my_data)
 {
     assert (agent);
+    if (!agent->uuid)
+        return;
     assert (cb);
     core_init_context ();
     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -305,6 +322,8 @@ void igsagent_log (igs_log_level_t level,
 {
     assert (function);
     assert (agent);
+    if (!agent->uuid)
+        return;
     assert (format);
     va_list list;
     va_start (list, format);
@@ -316,26 +335,36 @@ void igsagent_log (igs_log_level_t level,
 
 int64_t igsagent_rt_get_current_timestamp(igsagent_t *agent){
     assert(agent);
+    if (!agent->uuid)
+        return 0;
     return agent->rt_current_timestamp_microseconds;
 }
 
 void igsagent_rt_set_timestamps(igsagent_t *agent, bool enable){
     assert(agent);
+    if (!agent->uuid)
+        return;
     agent->rt_timestamps_enabled = enable;
 }
 
 bool igsagent_rt_timestamps(igsagent_t *agent){
     assert(agent);
+    if (!agent->uuid)
+        return false;
     return agent->rt_timestamps_enabled;
 }
 
 void igsagent_rt_set_synchronous_mode(igsagent_t *agent, bool enable){
     assert(agent);
+    if (!agent->uuid)
+        return;
     agent->rt_synchronous_mode_enabled = enable;
 }
 
 bool igsagent_rt_synchronous_mode(igsagent_t *agent){
     assert(agent);
+    if (!agent->uuid)
+        return false;
     return agent->rt_synchronous_mode_enabled;
 }
 

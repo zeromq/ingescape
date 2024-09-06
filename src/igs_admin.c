@@ -89,6 +89,8 @@ void admin_log (igsagent_t *agent,
                 ...)
 {
     assert (agent);
+    if (!agent->uuid)
+        return;
     assert (function);
     assert (fmt);
 

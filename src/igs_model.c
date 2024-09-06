@@ -1270,6 +1270,8 @@ igs_io_t *model_write (igsagent_t *agent, const char *name,
 
 void model_LOCKED_handle_io_callbacks (igsagent_t *agent, igs_io_t *io){
     assert(agent);
+    if (!agent->uuid) //protection against concurrent agent destruction
+        return;
     assert(io);
     if (!io->io_callbacks)
         return;
@@ -1374,6 +1376,8 @@ igs_result_t igsagent_input_buffer (igsagent_t *agent,
                                     size_t *size)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_result_t res = s_read_io (agent, name, IGS_INPUT_T, value, size);
@@ -1387,6 +1391,8 @@ igs_result_t igsagent_output_buffer (igsagent_t *agent,
                                      size_t *size)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_result_t res = s_read_io (agent, name, IGS_OUTPUT_T, value, size);
@@ -1400,6 +1406,8 @@ igs_result_t igsagent_attribute_buffer (igsagent_t *agent,
                                         size_t *size)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_result_t res = s_read_io (agent, name, IGS_ATTRIBUTE_T, value, size);
@@ -1410,6 +1418,8 @@ igs_result_t igsagent_attribute_buffer (igsagent_t *agent,
 bool igsagent_input_bool (igsagent_t *agent, const char *name)
 {
     assert (agent);
+    if (!agent->uuid)
+        return false;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     bool res = s_model_read_io_as_bool (agent, name, IGS_INPUT_T);
@@ -1420,6 +1430,8 @@ bool igsagent_input_bool (igsagent_t *agent, const char *name)
 int igsagent_input_int (igsagent_t *agent, const char *name)
 {
     assert (agent);
+    if (!agent->uuid)
+        return 0;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     int res = s_model_read_io_as_int (agent, name, IGS_INPUT_T);
@@ -1430,6 +1442,8 @@ int igsagent_input_int (igsagent_t *agent, const char *name)
 double igsagent_input_double (igsagent_t *agent, const char *name)
 {
     assert (agent);
+    if (!agent->uuid)
+        return 0;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     double res = s_model_read_io_as_double (agent, name, IGS_INPUT_T);
@@ -1440,6 +1454,8 @@ double igsagent_input_double (igsagent_t *agent, const char *name)
 char *igsagent_input_string (igsagent_t *agent, const char *name)
 {
     assert (agent);
+    if (!agent->uuid)
+        return NULL;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     char *res = s_model_read_io_as_string (agent, name, IGS_INPUT_T);
@@ -1453,6 +1469,11 @@ igs_result_t igsagent_input_data (igsagent_t *agent,
                                   size_t *size)
 {
     assert (agent);
+    if (!agent->uuid){
+        *data = NULL;
+        *size = 0;
+        return IGS_FAILURE;
+    }
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_result_t res = s_model_read_io_as_data (agent, name, IGS_INPUT_T, data, size);
@@ -1464,6 +1485,10 @@ igs_result_t
 igsagent_input_zmsg (igsagent_t *agent, const char *name, zmsg_t **msg)
 {
     assert (agent);
+    if (!agent->uuid){
+        *msg = NULL;
+        return IGS_FAILURE;
+    }
     assert (name);
     void *data = NULL;
     size_t size = 0;
@@ -1480,6 +1505,8 @@ igsagent_input_zmsg (igsagent_t *agent, const char *name, zmsg_t **msg)
 bool igsagent_output_bool (igsagent_t *agent, const char *name)
 {
     assert (agent);
+    if (!agent->uuid)
+        return false;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     bool res = s_model_read_io_as_bool (agent, name, IGS_OUTPUT_T);
@@ -1490,6 +1517,8 @@ bool igsagent_output_bool (igsagent_t *agent, const char *name)
 int igsagent_output_int (igsagent_t *agent, const char *name)
 {
     assert (agent);
+    if (!agent->uuid)
+        return 0;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     int res = s_model_read_io_as_int (agent, name, IGS_OUTPUT_T);
@@ -1500,6 +1529,8 @@ int igsagent_output_int (igsagent_t *agent, const char *name)
 double igsagent_output_double (igsagent_t *agent, const char *name)
 {
     assert (agent);
+    if (!agent->uuid)
+        return 0;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     double res = s_model_read_io_as_double (agent, name, IGS_OUTPUT_T);
@@ -1510,6 +1541,8 @@ double igsagent_output_double (igsagent_t *agent, const char *name)
 char *igsagent_output_string (igsagent_t *agent, const char *name)
 {
     assert (agent);
+    if (!agent->uuid)
+        return NULL;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     char *res = s_model_read_io_as_string (agent, name, IGS_OUTPUT_T);
@@ -1523,6 +1556,11 @@ igs_result_t igsagent_output_data (igsagent_t *agent,
                                    size_t *size)
 {
     assert (agent);
+    if (!agent->uuid){
+        *data = NULL;
+        *size = 0;
+        return IGS_FAILURE;
+    }
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_result_t res = s_model_read_io_as_data (agent, name, IGS_OUTPUT_T, data, size);
@@ -1533,6 +1571,8 @@ igs_result_t igsagent_output_data (igsagent_t *agent,
 bool igsagent_attribute_bool (igsagent_t *agent, const char *name)
 {
     assert (agent);
+    if (!agent->uuid)
+        return false;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     bool res = s_model_read_io_as_bool (agent, name, IGS_ATTRIBUTE_T);
@@ -1543,6 +1583,8 @@ bool igsagent_attribute_bool (igsagent_t *agent, const char *name)
 int igsagent_attribute_int (igsagent_t *agent, const char *name)
 {
     assert (agent);
+    if (!agent->uuid)
+        return 0;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     int res = s_model_read_io_as_int (agent, name, IGS_ATTRIBUTE_T);
@@ -1553,6 +1595,8 @@ int igsagent_attribute_int (igsagent_t *agent, const char *name)
 double igsagent_attribute_double (igsagent_t *agent, const char *name)
 {
     assert (agent);
+    if (!agent->uuid)
+        return 0;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     double res = s_model_read_io_as_double (agent, name, IGS_ATTRIBUTE_T);
@@ -1563,6 +1607,8 @@ double igsagent_attribute_double (igsagent_t *agent, const char *name)
 char *igsagent_attribute_string (igsagent_t *agent, const char *name)
 {
     assert (agent);
+    if (!agent->uuid)
+        return NULL;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     char *res = s_model_read_io_as_string (agent, name, IGS_ATTRIBUTE_T);
@@ -1576,6 +1622,11 @@ igs_result_t igsagent_attribute_data (igsagent_t *agent,
                                       size_t *size)
 {
     assert (agent);
+    if (!agent->uuid){
+        *data = NULL;
+        *size = 0;
+        return IGS_FAILURE;
+    }
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_result_t res = s_model_read_io_as_data (agent, name, IGS_ATTRIBUTE_T, data, size);
@@ -1590,6 +1641,8 @@ igs_result_t
 igsagent_input_set_bool (igsagent_t *agent, const char *name, bool value)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_io_t *io = model_write (agent, name, IGS_INPUT_T, IGS_BOOL_T, &value, sizeof (bool));
@@ -1605,6 +1658,8 @@ igs_result_t
 igsagent_input_set_int (igsagent_t *agent, const char *name, int value)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_io_t *io = model_write (agent, name, IGS_INPUT_T, IGS_INTEGER_T, &value, sizeof (int));
@@ -1620,6 +1675,8 @@ igs_result_t
 igsagent_input_set_double (igsagent_t *agent, const char *name, double value)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_io_t *io = model_write (agent, name, IGS_INPUT_T, IGS_DOUBLE_T, &value, sizeof (double));
@@ -1636,6 +1693,8 @@ igs_result_t igsagent_input_set_string (igsagent_t *agent,
                                         const char *value)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (name);
     size_t value_length = (value == NULL) ? 0 : strlen (value) + 1;
     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -1652,6 +1711,8 @@ igs_result_t igsagent_input_set_impulsion (igsagent_t *agent,
                                            const char *name)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_io_t *io = model_write (agent, name, IGS_INPUT_T, IGS_IMPULSION_T, NULL, 0);
@@ -1669,6 +1730,8 @@ igs_result_t igsagent_input_set_data (igsagent_t *agent,
                                       size_t size)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_io_t *io = model_write (agent, name, IGS_INPUT_T, IGS_DATA_T, value, size);
@@ -1684,6 +1747,8 @@ igs_result_t
 igsagent_output_set_bool (igsagent_t *agent, const char *name, bool value)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_io_t *io = model_write (agent, name, IGS_OUTPUT_T, IGS_BOOL_T, &value, sizeof (bool));
@@ -1701,6 +1766,8 @@ igs_result_t
 igsagent_output_set_int (igsagent_t *agent, const char *name, int value)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_io_t *io = model_write (agent, name, IGS_OUTPUT_T, IGS_INTEGER_T, &value, sizeof (int));
@@ -1718,6 +1785,8 @@ igs_result_t
 igsagent_output_set_double (igsagent_t *agent, const char *name, double value)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_io_t *io = model_write (agent, name, IGS_OUTPUT_T, IGS_DOUBLE_T, &value, sizeof (double));
@@ -1736,6 +1805,8 @@ igs_result_t igsagent_output_set_string (igsagent_t *agent,
                                          const char *value)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     size_t length = (value == NULL) ? 0 : strlen (value) + 1;
@@ -1754,6 +1825,8 @@ igs_result_t igsagent_output_set_impulsion (igsagent_t *agent,
                                             const char *name)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_io_t *io = model_write (agent, name, IGS_OUTPUT_T, IGS_IMPULSION_T, NULL, 0);
@@ -1773,6 +1846,8 @@ igs_result_t igsagent_output_set_data (igsagent_t *agent,
                                        size_t size)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_io_t *io = model_write (agent, name, IGS_OUTPUT_T, IGS_DATA_T, value, size);
@@ -1790,6 +1865,8 @@ igs_result_t
 igsagent_output_set_zmsg (igsagent_t *agent, const char *name, zmsg_t *msg)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (name);
     assert (msg);
     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -1812,6 +1889,8 @@ igs_result_t
 igsagent_attribute_set_bool (igsagent_t *agent, const char *name, bool value)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_io_t *io = model_write (agent, name, IGS_ATTRIBUTE_T, IGS_BOOL_T, &value, sizeof (bool));
@@ -1827,6 +1906,8 @@ igs_result_t
 igsagent_attribute_set_int (igsagent_t *agent, const char *name, int value)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_io_t *io = model_write (agent, name, IGS_ATTRIBUTE_T, IGS_INTEGER_T, &value, sizeof (int));
@@ -1843,6 +1924,8 @@ igs_result_t igsagent_attribute_set_double (igsagent_t *agent,
                                             double value)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_io_t *io = model_write (agent, name, IGS_ATTRIBUTE_T, IGS_DOUBLE_T, &value, sizeof (double));
@@ -1859,6 +1942,8 @@ igs_result_t igsagent_attribute_set_string (igsagent_t *agent,
                                             const char *value)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (name);
     size_t value_length = (value == NULL) ? 0 : strlen (value) + 1;
     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -1877,6 +1962,8 @@ igs_result_t igsagent_attribute_set_data (igsagent_t *agent,
                                           size_t size)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_io_t *io = model_write (agent, name, IGS_ATTRIBUTE_T, IGS_DATA_T, value, size);
@@ -1890,12 +1977,18 @@ igs_result_t igsagent_attribute_set_data (igsagent_t *agent,
 
 void igsagent_constraints_enforce(igsagent_t *self, bool enforce)
 {
+    assert (self);
+    if (!self->uuid)
+        return;
     self->enforce_constraints = enforce;
 }
 
 igs_result_t igsagent_input_add_constraint (igsagent_t *self, const char *name,
                                             const char *constraint)
 {
+    assert (self);
+    if (!self->uuid)
+        return IGS_FAILURE;
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_result_t res =  s_model_add_constraint(self, IGS_INPUT_T, name, constraint);
     model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -1905,6 +1998,9 @@ igs_result_t igsagent_input_add_constraint (igsagent_t *self, const char *name,
 igs_result_t igsagent_output_add_constraint (igsagent_t *self, const char *name,
                                              const char *constraint)
 {
+    assert (self);
+    if (!self->uuid)
+        return IGS_FAILURE;
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_result_t res =  s_model_add_constraint(self, IGS_OUTPUT_T, name, constraint);
     model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -1914,6 +2010,9 @@ igs_result_t igsagent_output_add_constraint (igsagent_t *self, const char *name,
 igs_result_t igsagent_attribute_add_constraint (igsagent_t *self, const char *name,
                                                 const char *constraint)
 {
+    assert (self);
+    if (!self->uuid)
+        return IGS_FAILURE;
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_result_t res =  s_model_add_constraint(self, IGS_ATTRIBUTE_T, name, constraint);
     model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -1922,6 +2021,9 @@ igs_result_t igsagent_attribute_add_constraint (igsagent_t *self, const char *na
 
 igs_result_t igsagent_input_set_description(igsagent_t *self, const char *name, const char *description)
 {
+    assert (self);
+    if (!self->uuid)
+        return IGS_FAILURE;
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_result_t res =  s_model_set_description(self, IGS_INPUT_T, name, description);
     model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -1930,6 +2032,9 @@ igs_result_t igsagent_input_set_description(igsagent_t *self, const char *name, 
 
 igs_result_t igsagent_output_set_description(igsagent_t *self, const char *name, const char *description)
 {
+    assert (self);
+    if (!self->uuid)
+        return IGS_FAILURE;
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_result_t res =  s_model_set_description(self, IGS_OUTPUT_T, name, description);
     model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -1938,6 +2043,9 @@ igs_result_t igsagent_output_set_description(igsagent_t *self, const char *name,
 
 igs_result_t igsagent_attribute_set_description(igsagent_t *self, const char *name, const char *description)
 {
+    assert (self);
+    if (!self->uuid)
+        return IGS_FAILURE;
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_result_t res =  s_model_set_description(self, IGS_ATTRIBUTE_T, name, description);
     model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -1947,6 +2055,9 @@ igs_result_t igsagent_attribute_set_description(igsagent_t *self, const char *na
 igs_result_t igsagent_input_set_detailed_type(igsagent_t *self, const char *name,
                                               const char *type_name, const char *specification)
 {
+    assert (self);
+    if (!self->uuid)
+        return IGS_FAILURE;
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_result_t res =  s_model_set_detailed_type(self, IGS_INPUT_T, name, type_name, specification);
     model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -1956,6 +2067,9 @@ igs_result_t igsagent_input_set_detailed_type(igsagent_t *self, const char *name
 igs_result_t igsagent_output_set_detailed_type(igsagent_t *self, const char *name,
                                                const char *type_name, const char *specification)
 {
+    assert (self);
+    if (!self->uuid)
+        return IGS_FAILURE;
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_result_t res =  s_model_set_detailed_type(self, IGS_OUTPUT_T, name, type_name, specification);
     model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -1965,6 +2079,9 @@ igs_result_t igsagent_output_set_detailed_type(igsagent_t *self, const char *nam
 igs_result_t igsagent_attribute_set_detailed_type(igsagent_t *self, const char *name,
                                                   const char *type_name, const char *specification)
 {
+    assert (self);
+    if (!self->uuid)
+        return IGS_FAILURE;
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_result_t res =  s_model_set_detailed_type(self, IGS_ATTRIBUTE_T, name, type_name, specification);
     model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -1974,6 +2091,8 @@ igs_result_t igsagent_attribute_set_detailed_type(igsagent_t *self, const char *
 void igsagent_clear_input (igsagent_t *agent, const char *name)
 {
     assert (agent);
+    if (!agent->uuid)
+        return;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     s_model_clear_io (agent, name, IGS_INPUT_T);
@@ -1983,6 +2102,8 @@ void igsagent_clear_input (igsagent_t *agent, const char *name)
 void igsagent_clear_output (igsagent_t *agent, const char *name)
 {
     assert (agent);
+    if (!agent->uuid)
+        return;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     s_model_clear_io (agent, name, IGS_OUTPUT_T);
@@ -1992,6 +2113,8 @@ void igsagent_clear_output (igsagent_t *agent, const char *name)
 void igsagent_clear_attribute (igsagent_t *agent, const char *name)
 {
     assert (agent);
+    if (!agent->uuid)
+        return;
     assert (name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     s_model_clear_io (agent, name, IGS_ATTRIBUTE_T);
@@ -2003,6 +2126,8 @@ void igsagent_clear_attribute (igsagent_t *agent, const char *name)
 igs_io_value_type_t igsagent_input_type (igsagent_t *agent, const char *name)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_UNKNOWN_T;
     assert (name);
     assert (strlen(name));
     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -2014,6 +2139,8 @@ igs_io_value_type_t igsagent_input_type (igsagent_t *agent, const char *name)
 igs_io_value_type_t igsagent_output_type (igsagent_t *agent, const char *name)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_UNKNOWN_T;
     assert (name);
     assert (strlen(name));
     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -2025,6 +2152,8 @@ igs_io_value_type_t igsagent_output_type (igsagent_t *agent, const char *name)
 igs_io_value_type_t igsagent_attribute_type (igsagent_t *agent, const char *name)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_UNKNOWN_T;
     assert (name);
     assert (strlen(name));
     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -2036,6 +2165,8 @@ igs_io_value_type_t igsagent_attribute_type (igsagent_t *agent, const char *name
 size_t igsagent_input_count (igsagent_t *agent)
 {
     assert (agent);
+    if (!agent->uuid)
+        return 0;
     if (agent->definition == NULL) {
         igsagent_warn (agent, "definition is NULL");
         return 0;
@@ -2049,6 +2180,8 @@ size_t igsagent_input_count (igsagent_t *agent)
 size_t igsagent_output_count (igsagent_t *agent)
 {
     assert (agent);
+    if (!agent->uuid)
+        return 0;
     if (agent->definition == NULL) {
         igsagent_warn (agent, "definition is NULL");
         return 0;
@@ -2062,6 +2195,8 @@ size_t igsagent_output_count (igsagent_t *agent)
 size_t igsagent_attribute_count (igsagent_t *agent)
 {
     assert (agent);
+    if (!agent->uuid)
+        return 0;
     if (agent->definition == NULL) {
         igsagent_warn (agent, "definition is NULL");
         return 0;
@@ -2075,6 +2210,10 @@ size_t igsagent_attribute_count (igsagent_t *agent)
 char **igsagent_input_list (igsagent_t *agent, size_t *nb_of_elements)
 {
     assert (agent);
+    if (!agent->uuid){
+        *nb_of_elements = 0;
+        return NULL;
+    }
     model_read_write_lock(__FUNCTION__, __LINE__);
     char **res = s_model_get_io_list (agent, nb_of_elements, IGS_INPUT_T);
     model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -2084,6 +2223,10 @@ char **igsagent_input_list (igsagent_t *agent, size_t *nb_of_elements)
 char **igsagent_output_list (igsagent_t *agent, size_t *nb_of_elements)
 {
     assert (agent);
+    if (!agent->uuid){
+        *nb_of_elements = 0;
+        return NULL;
+    }
     model_read_write_lock(__FUNCTION__, __LINE__);
     char **res = s_model_get_io_list (agent, nb_of_elements, IGS_OUTPUT_T);
     model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -2093,6 +2236,10 @@ char **igsagent_output_list (igsagent_t *agent, size_t *nb_of_elements)
 char **igsagent_attribute_list (igsagent_t *agent, size_t *nb_of_elements)
 {
     assert (agent);
+    if (!agent->uuid){
+        *nb_of_elements = 0;
+        return NULL;
+    }
     model_read_write_lock(__FUNCTION__, __LINE__);
     char **res = s_model_get_io_list (agent, nb_of_elements, IGS_ATTRIBUTE_T);
     model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -2116,6 +2263,8 @@ void igs_free_io_list (char **list, size_t nb_of_elements)
 bool igsagent_input_exists (igsagent_t *agent, const char *name)
 {
     assert (agent);
+    if (!agent->uuid)
+        return false;
     assert (name);
     if (agent->definition == NULL)
         return false;
@@ -2128,6 +2277,8 @@ bool igsagent_input_exists (igsagent_t *agent, const char *name)
 bool igsagent_output_exists (igsagent_t *agent, const char *name)
 {
     assert (agent);
+    if (!agent->uuid)
+        return false;
     assert (name);
     if (agent->definition == NULL)
         return false;
@@ -2140,6 +2291,8 @@ bool igsagent_output_exists (igsagent_t *agent, const char *name)
 bool igsagent_attribute_exists (igsagent_t *agent, const char *name)
 {
     assert (agent);
+    if (!agent->uuid)
+        return false;
     assert (name);
     if (agent->definition == NULL)
         return false;
@@ -2157,6 +2310,8 @@ void igsagent_observe_input (igsagent_t *agent,
                              void *my_data)
 {
     assert (agent);
+    if (!agent->uuid)
+        return;
     assert (name);
     assert (cb);
     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -2170,6 +2325,8 @@ void igsagent_observe_output (igsagent_t *agent,
                               void *my_data)
 {
     assert (agent);
+    if (!agent->uuid)
+        return;
     assert (name);
     assert (cb);
     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -2183,6 +2340,8 @@ void igsagent_observe_attribute (igsagent_t *agent,
                                  void *my_data)
 {
     assert (agent);
+    if (!agent->uuid)
+        return;
     assert (name);
     assert (cb);
     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -2195,6 +2354,8 @@ void igsagent_observe_attribute (igsagent_t *agent,
 void igsagent_output_mute (igsagent_t *agent, const char *name)
 {
     assert(agent);
+    if (!agent->uuid)
+        return;
     assert(name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_io_t *io = model_find_io_by_name (agent, name, IGS_OUTPUT_T);
@@ -2219,6 +2380,8 @@ void igsagent_output_mute (igsagent_t *agent, const char *name)
 void igsagent_output_unmute (igsagent_t *agent, const char *name)
 {
     assert(agent);
+    if (!agent->uuid)
+        return;
     assert(name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_io_t *io = model_find_io_by_name (agent, name, IGS_OUTPUT_T);
@@ -2243,6 +2406,8 @@ void igsagent_output_unmute (igsagent_t *agent, const char *name)
 bool igsagent_output_is_muted (igsagent_t *agent, const char *name)
 {
     assert(agent);
+    if (!agent->uuid)
+        return false;
     assert(name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_io_t *io = model_find_io_by_name (agent, name, IGS_OUTPUT_T);

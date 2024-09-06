@@ -536,6 +536,8 @@ int split_message_from_splitter (zmsg_t *msg, igs_core_context_t *context)
 size_t igsagent_split_count (igsagent_t *agent)
 {
     assert (agent);
+    if (!agent->uuid)
+        return 0;
     assert (agent->mapping);
     model_read_write_lock(__FUNCTION__, __LINE__);
     size_t res = zlist_size(agent->mapping->split_elements);
@@ -549,6 +551,8 @@ uint64_t igsagent_split_add (igsagent_t *agent,
                              const char *with_output)
 {
     assert (agent);
+    if (!agent->uuid)
+        return 0;
     assert (from_our_input && strlen (from_our_input) > 0);
     assert (to_agent && strlen (to_agent) > 0);
     assert (with_output && strlen (with_output) > 0);
@@ -679,6 +683,8 @@ igs_result_t igsagent_split_remove_with_id (igsagent_t *agent,
                                             uint64_t the_id)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (the_id > 0);
     assert (agent->mapping);
     assert(agent->mapping->split_elements);
@@ -706,8 +712,10 @@ igs_result_t igsagent_split_remove_with_id (igsagent_t *agent,
         zmsg_addstr (goodbye_message, el->from_input);
         zmsg_addstr (goodbye_message, el->to_output);
         model_read_write_unlock(__FUNCTION__, __LINE__);
-        igs_channel_whisper_zmsg (el->to_agent, &goodbye_message);
-        split_free_split_element(&el);
+        if (el->to_agent)
+            igs_channel_whisper_zmsg (el->to_agent, &goodbye_message);
+        if (el->to_agent)
+            split_free_split_element(&el);
     }
     return IGS_SUCCESS;
 }
@@ -718,6 +726,8 @@ igs_result_t igsagent_split_remove_with_name (igsagent_t *agent,
                                                const char *with_output)
 {
     assert(agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert(from_our_input);
     assert(to_agent);
     assert(with_output);

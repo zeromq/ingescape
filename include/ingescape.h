@@ -32,7 +32,7 @@
 //  INGESCAPE version macros for compile-time API detection
 #define INGESCAPE_VERSION_MAJOR 4
 #define INGESCAPE_VERSION_MINOR 2
-#define INGESCAPE_VERSION_PATCH 0
+#define INGESCAPE_VERSION_PATCH 2
 
 #define INGESCAPE_MAKE_VERSION(major, minor, patch) \
 ((major) * 10000 + (minor) * 100 + (patch))
@@ -628,9 +628,9 @@ INGESCAPE_EXPORT igs_result_t igs_peer_remove_header(const char *key);
  as many brokers as you want. At least one declared broker is necessary to
  use igs_start_with_brokers. Use igs_clear_brokers to remove all the current
  brokers.
- • The endpoint in igs_broker_set_endpoint is the broker address we should be reached
- at as a broker if we want to be one. Using igs_broker_set_endpoint makes us a broker
- when starting.
+ • The endpoint in igs_broker_enable_with_endpoint is the broker address we should 
+ be reached at as a broker if we want to be one. Using igs_broker_enable_with_endpoint
+ makes us a broker when starting.
  • The endpoint in igs_broker_set_advertized_endpoint replaces the one declared in
  igs_start_with_brokers for the registration to the brokers. This function enables
  passing through NAT and using a public address. Attention: this public address

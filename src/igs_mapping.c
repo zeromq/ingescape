@@ -239,6 +239,8 @@ igs_result_t igsagent_mapping_load_str (igsagent_t *agent,
                                         const char *json_str)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (json_str);
     char *current_mapping = igsagent_mapping_json (agent);
     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -271,6 +273,8 @@ igs_result_t igsagent_mapping_load_file (igsagent_t *agent,
                                          const char *file_path)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (file_path);
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_mapping_t *tmp = parser_load_mapping_from_path (file_path);
@@ -291,6 +295,9 @@ igs_result_t igsagent_mapping_load_file (igsagent_t *agent,
 
 void igsagent_clear_mappings (igsagent_t *agent)
 {
+    assert(agent);
+    if (!agent->uuid)
+        return;
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (agent->mapping)
         mapping_free_mapping (&agent->mapping);
@@ -305,6 +312,10 @@ void igsagent_clear_mappings (igsagent_t *agent)
 void igsagent_clear_mappings_with_agent (igsagent_t *agent,
                                          const char *agent_name)
 {
+    assert(agent);
+    if (!agent->uuid)
+        return;
+    assert(agent_name);
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (agent->mapping) {
         igs_map_t *elmt = zlist_first(agent->mapping->map_elements);
@@ -325,8 +336,11 @@ void igsagent_clear_mappings_with_agent (igsagent_t *agent,
 void igsagent_clear_mappings_for_input (igsagent_t *agent,
                                         const char *input_name)
 {
-    model_read_write_lock(__FUNCTION__, __LINE__);
     assert(agent);
+    if (!agent->uuid)
+        return;
+    assert(input_name);
+    model_read_write_lock(__FUNCTION__, __LINE__);
     assert(agent->mapping);
     igs_map_t *elmt = zlist_first(agent->mapping->map_elements);
     while (elmt) {
@@ -346,6 +360,8 @@ void igsagent_clear_mappings_for_input (igsagent_t *agent,
 char *igsagent_mapping_json (igsagent_t *agent)
 {
     assert(agent);
+    if (!agent->uuid)
+        return NULL;
     assert(agent->mapping);
     model_read_write_lock(__FUNCTION__, __LINE__);
     char *res = (agent->mapping->json)?strdup(agent->mapping->json):NULL;
@@ -356,6 +372,8 @@ char *igsagent_mapping_json (igsagent_t *agent)
 size_t igsagent_mapping_count (igsagent_t *agent)
 {
     assert (agent);
+    if (!agent->uuid)
+        return 0;
     assert (agent->mapping);
     model_read_write_lock(__FUNCTION__, __LINE__);
     size_t res = zlist_size(agent->mapping->map_elements);
@@ -369,10 +387,17 @@ uint64_t igsagent_mapping_add (igsagent_t *agent,
                                const char *with_output)
 {
     assert (agent);
+    if (!agent->uuid)
+        return 0;
     assert (from_our_input && strlen (from_our_input) > 0);
     assert (to_agent && strlen (to_agent) > 0);
     assert (with_output && strlen (with_output) > 0);
     
+    char *a_name = igsagent_name (agent);
+    if (!a_name)
+        return 0;
+    
+    model_read_write_lock(__FUNCTION__, __LINE__);
     // from_our_input
     char *reviewed_from_our_input = s_strndup (from_our_input, IGS_MAX_IO_NAME_LENGTH);
     bool space_in_name = false;
@@ -387,6 +412,7 @@ uint64_t igsagent_mapping_add (igsagent_t *agent,
     if (space_in_name) {
         igsagent_error (agent, "spaces are not allowed in IOP name '%s'",from_our_input);
         free (reviewed_from_our_input);
+        model_read_write_unlock(__FUNCTION__, __LINE__);
         return 0;
     }
     
@@ -404,10 +430,10 @@ uint64_t igsagent_mapping_add (igsagent_t *agent,
         igsagent_error (agent, "spaces are not allowed in agent name '%s'", to_agent);
         free (reviewed_from_our_input);
         free (reviewed_to_agent);
+        model_read_write_unlock(__FUNCTION__, __LINE__);
         return 0;
     }
     
-    char *a_name = igsagent_name (agent);
     if (streq (reviewed_to_agent, a_name))
         igsagent_warn (agent, "mapping inputs to outputs of the same agent will not work EXCEPT from one clone or variant to others");
     free (a_name);
@@ -430,7 +456,6 @@ uint64_t igsagent_mapping_add (igsagent_t *agent,
         return 0;
     }
     
-    model_read_write_lock(__FUNCTION__, __LINE__);
     assert (agent->mapping);
     // Add the new mapping element if not already there
     size_t len = strlen (from_our_input) + strlen (to_agent) + strlen (with_output) + 2 + 1;
@@ -474,6 +499,8 @@ igs_result_t igsagent_mapping_remove_with_id (igsagent_t *agent,
                                               uint64_t the_id)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (agent->mapping);
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_map_t *lookup = NULL;
@@ -504,6 +531,8 @@ igs_result_t igsagent_mapping_remove_with_name (igsagent_t *agent,
                                                 const char *with_output)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (from_our_input);
     assert (to_agent);
     assert (with_output);
@@ -550,6 +579,8 @@ igs_result_t igsagent_mapping_remove_with_name (igsagent_t *agent,
 void igsagent_mapping_set_path (igsagent_t *agent, const char *path)
 {
     assert (agent);
+    if (!agent->uuid)
+        return;
     assert (path);
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (agent->mapping_path)
@@ -570,6 +601,8 @@ void igsagent_mapping_set_path (igsagent_t *agent, const char *path)
 void igsagent_mapping_save (igsagent_t *agent)
 {
     assert (agent);
+    if (!agent->uuid)
+        return;
     assert (agent->mapping);
     if (!agent->mapping_path) {
         igsagent_error (agent, "no path configured to save mapping");

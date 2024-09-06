@@ -274,6 +274,8 @@ void definition_update_json (igs_definition_t *def)
 void igsagent_clear_definition (igsagent_t *agent)
 {
     assert (agent);
+    if (!agent->uuid)
+        return;
     model_read_write_lock(__FUNCTION__, __LINE__);
     char *previous_name = NULL;
     if (agent->definition) {
@@ -310,6 +312,8 @@ char *igsagent_definition_json (igsagent_t *agent)
 char *igsagent_definition_package (igsagent_t *agent)
 {
     assert (agent);
+    if (!agent->uuid)
+        return NULL;
     assert (agent->definition);
     model_read_write_lock(__FUNCTION__, __LINE__);
     char *res = (agent->definition->package) ? strdup (agent->definition->package):NULL;
@@ -320,6 +324,8 @@ char *igsagent_definition_package (igsagent_t *agent)
 char *igsagent_definition_class (igsagent_t *agent)
 {
     assert (agent);
+    if (!agent->uuid)
+        return NULL;
     assert (agent->definition);
     model_read_write_lock(__FUNCTION__, __LINE__);
     char *res = (agent->definition->my_class) ? strdup (agent->definition->my_class):NULL;
@@ -330,6 +336,8 @@ char *igsagent_definition_class (igsagent_t *agent)
 char *igsagent_family (igsagent_t *agent)
 {
     assert (agent);
+    if (!agent->uuid)
+        return NULL;
     assert (agent->definition);
     model_read_write_lock(__FUNCTION__, __LINE__);
     char *res = (agent->definition->family) ? strdup (agent->definition->family) : NULL;
@@ -340,6 +348,8 @@ char *igsagent_family (igsagent_t *agent)
 char *igsagent_definition_description (igsagent_t *agent)
 {
     assert (agent);
+    if (!agent->uuid)
+        return NULL;
     assert (agent->definition);
     model_read_write_lock(__FUNCTION__, __LINE__);
     char *res = (agent->definition->description) ? strdup (agent->definition->description) : NULL;
@@ -350,6 +360,8 @@ char *igsagent_definition_description (igsagent_t *agent)
 char *igsagent_definition_version (igsagent_t *agent)
 {
     assert (agent);
+    if (!agent->uuid)
+        return NULL;
     assert (agent->definition);
     model_read_write_lock(__FUNCTION__, __LINE__);
     char *res = (agent->definition->version) ? strdup (agent->definition->version) : NULL;
@@ -360,6 +372,8 @@ char *igsagent_definition_version (igsagent_t *agent)
 void igsagent_set_family (igsagent_t *agent, const char *family)
 {
     assert (agent);
+    if (!agent->uuid)
+        return;
     assert (agent->definition);
     assert (family);
     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -375,6 +389,8 @@ void igsagent_definition_set_package (igsagent_t *agent,
                                       const char *package)
 {
     assert (agent);
+    if (!agent->uuid)
+        return;
     assert (package);
     assert (agent->definition);
     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -390,6 +406,8 @@ void igsagent_definition_set_class (igsagent_t *agent,
                                     const char *my_class)
 {
     assert (agent);
+    if (!agent->uuid)
+        return;
     assert (my_class);
     assert (agent->definition);
     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -405,6 +423,8 @@ void igsagent_definition_set_description (igsagent_t *agent,
                                            const char *description)
 {
     assert (agent);
+    if (!agent->uuid)
+        return;
     assert (description);
     assert (agent->definition);
     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -419,6 +439,8 @@ void igsagent_definition_set_description (igsagent_t *agent,
 void igsagent_definition_set_version (igsagent_t *agent, const char *version)
 {
     assert (agent);
+    if (!agent->uuid)
+        return;
     assert (version);
     assert (agent->definition);
     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -437,6 +459,8 @@ igs_result_t igsagent_input_create (igsagent_t *agent,
                                      size_t size)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (name && strlen (name) > 0);
     assert (agent->definition);
     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -458,6 +482,8 @@ igs_result_t igsagent_output_create (igsagent_t *agent,
                                       size_t size)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (name && strlen (name) > 0);
     assert (agent->definition);
     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -479,6 +505,8 @@ igs_result_t igsagent_attribute_create (igsagent_t *agent,
                                          size_t size)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (name && strlen (name) > 0);
     assert (agent->definition);
     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -496,6 +524,8 @@ igs_result_t igsagent_attribute_create (igsagent_t *agent,
 igs_result_t igsagent_input_remove (igsagent_t *agent, const char *name)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (name);
     assert (agent->definition);
     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -516,6 +546,8 @@ igs_result_t igsagent_input_remove (igsagent_t *agent, const char *name)
 igs_result_t igsagent_output_remove (igsagent_t *agent, const char *name)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (name);
     assert (agent->definition);
     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -536,6 +568,8 @@ igs_result_t igsagent_output_remove (igsagent_t *agent, const char *name)
 igs_result_t igsagent_attribute_remove (igsagent_t *agent, const char *name)
 {
     assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
     assert (name);
     assert (agent->definition);
     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -556,6 +590,8 @@ igs_result_t igsagent_attribute_remove (igsagent_t *agent, const char *name)
 void igsagent_definition_set_path (igsagent_t *agent, const char *path)
 {
     assert (agent);
+    if (!agent->uuid)
+        return;
     assert (path);
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (agent->definition_path)
@@ -576,6 +612,8 @@ void igsagent_definition_set_path (igsagent_t *agent, const char *path)
 void igsagent_definition_save (igsagent_t *agent)
 {
     assert (agent);
+    if (!agent->uuid)
+        return;
     assert (agent->definition);
     if (!agent->definition_path) {
         igsagent_error (agent, "no path configured to save definition");
