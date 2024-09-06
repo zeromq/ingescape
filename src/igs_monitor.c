@@ -181,7 +181,6 @@ int igs_monitor_trigger_network_check (zloop_t *loop, int timer_id, void *arg)
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (need_to_call_callbacks){
         zlist_t *dup = zlist_dup(core_context->monitor_callbacks);
-        model_read_write_unlock(__FUNCTION__, __LINE__);
         igs_monitor_wrapper_t *cb = zlist_first(dup);
         while (cb && cb->callback_ptr) {
             model_read_write_unlock(__FUNCTION__, __LINE__);
