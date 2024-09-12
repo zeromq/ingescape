@@ -262,7 +262,8 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
             // check that this agent has not been destroyed when we were locked
             assert(agent->mapping->map_elements);
             igs_map_t *elmt = zlist_first(agent->mapping->map_elements);
-            while (elmt) {
+            while (elmt && elmt->from_input && remote_agent->definition 
+                   && remote_agent->definition->name && agent->uuid) {
                 if (streq (elmt->to_agent, remote_agent->definition->name)
                     && streq (elmt->to_output, output)) {
                     // we have a match on emitting agent name and its ouput name :
@@ -281,12 +282,13 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
                             io = model_write (agent, found_input->name, IGS_INPUT_T, value_type, value, strlen(value) + 1);
                         else
                             io = model_write (agent, found_input->name, IGS_INPUT_T, value_type, data, size);
-                        if (io){
+                        if (io && io->name){
                             model_read_write_unlock(__FUNCTION__, __LINE__);
                             model_LOCKED_handle_io_callbacks(agent, io);
                             model_read_write_lock(__FUNCTION__, __LINE__);
                         }
-                        agent->rt_current_timestamp_microseconds = INT64_MIN;
+                        if (agent->uuid)
+                            agent->rt_current_timestamp_microseconds = INT64_MIN;
                     }
                 }
                 elmt = zlist_next(agent->mapping->map_elements);
