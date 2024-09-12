@@ -18,6 +18,7 @@
 ////////////////////////////////////////////////////////////////////////
 #pragma mark INTERNAL FUNCTIONS
 ////////////////////////////////////////////////////////////////////////
+
 void s_service_free_service_arguments (igs_service_arg_t **args)
 {
     assert(args);
@@ -154,6 +155,7 @@ void service_free_service (igs_service_t **s)
     if ((*s)->description)
         free ((*s)->description);
     s_service_free_service_arguments (&(*s)->arguments);
+    zlist_destroy(&(*s)->replies_names_ordered);
     igs_service_t *r = zhashx_first((*s)->replies);
     while (r) {
         service_free_service(&r);
@@ -480,7 +482,11 @@ igs_result_t igsagent_service_init (igsagent_t *agent,
             igsagent_warn (agent, "service name has been shortened to %s", s->name);
         } else
             s->name = s_strndup (name, IGS_MAX_STRING_MSG_LENGTH);
+        s->replies_names_ordered = zlist_new();
+        zlist_comparefn(s->replies_names_ordered, (zlist_compare_fn*) strcmp);
+        zlist_autofree(s->replies_names_ordered);
         s->replies = zhashx_new();
+        zlist_append(agent->definition->services_names_ordered, strdup(s->name));
         zhashx_insert(agent->definition->services_table, s->name, s);
         definition_update_json (agent->definition);
         agent->network_need_to_send_definition_update = true;
@@ -505,6 +511,7 @@ igs_result_t igsagent_service_remove (igsagent_t *agent, const char *name)
         model_read_write_unlock(__FUNCTION__, __LINE__);
         return IGS_FAILURE;
     }
+    zlist_remove(agent->definition->services_names_ordered, (char*)name);
     zhashx_delete(agent->definition->services_table, name);
     service_free_service (&s);
     definition_update_json (agent->definition);
@@ -652,7 +659,11 @@ igs_result_t igsagent_service_reply_add(igsagent_t *agent, const char *service_n
         igsagent_warn (agent, "service name has been shortened to %s", r->name);
     } else
         r->name = s_strndup (reply_name, IGS_MAX_STRING_MSG_LENGTH);
+    r->replies_names_ordered = zlist_new();
+    zlist_comparefn(r->replies_names_ordered, (zlist_compare_fn*) strcmp);
+    zlist_autofree(r->replies_names_ordered);
     r->replies = zhashx_new();
+    zlist_append(s->replies_names_ordered, strdup(r->name));
     zhashx_insert(s->replies, r->name, r);
     definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
@@ -677,6 +688,7 @@ igs_result_t igsagent_service_reply_remove(igsagent_t *agent, const char *servic
     igs_service_t *r = zhashx_lookup(s->replies, reply_name);
     igs_result_t res = IGS_SUCCESS;
     if (r){
+        zlist_remove(s->replies_names_ordered, (char*)reply_name);
         zhashx_delete(s->replies, reply_name);
         service_free_service (&r);
         definition_update_json (agent->definition);
@@ -1046,10 +1058,10 @@ char **igsagent_service_list (igsagent_t *agent, size_t *nb_of_elements)
     *nb_of_elements = nb;
     char **res = (char **) zmalloc (nb * sizeof (char *));
     size_t i = 0;
-    igs_service_t *el = zhashx_first(agent->definition->services_table);
-    while (el) {
-        res[i++] = strdup (el->name);
-        el = zhashx_next(agent->definition->services_table);
+    const char* service_name = zlist_first(agent->definition->services_names_ordered);
+    while (service_name) {
+        res[i++] = strdup (service_name);
+        service_name = zlist_next(agent->definition->services_names_ordered);
     }
     model_read_write_unlock(__FUNCTION__, __LINE__);
     return res;
@@ -1207,11 +1219,11 @@ char ** igsagent_service_reply_names(igsagent_t *agent, const char *service_name
     }
     char ** names = (char**)calloc(*service_replies_nbr, sizeof(char*));
     size_t index = 0;
-    igs_service_t *r = zhashx_first(s->replies);
-    while (r) {
-        names[index] = strdup(r->name);
+    const char* r_name = zlist_first(s->replies_names_ordered);
+    while (r_name) {
+        names[index] = strdup(r_name);
         index++;
-        r = zhashx_next(s->replies);
+        r_name = zlist_next(s->replies_names_ordered);
     }
     model_read_write_unlock(__FUNCTION__, __LINE__);
     return names;

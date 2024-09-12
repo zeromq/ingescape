@@ -102,12 +102,15 @@ igs_result_t definition_add_io_to_definition (igsagent_t *agent,
     }
     switch (io_type) {
         case IGS_INPUT_T:
+            zlist_append(def->inputs_names_ordered, strdup(io->name));
             zhashx_insert(def->inputs_table, io->name, io);
             break;
         case IGS_OUTPUT_T:
+            zlist_append(def->outputs_names_ordered, strdup(io->name));
             zhashx_insert(def->outputs_table, io->name, io);
             break;
         case IGS_ATTRIBUTE_T:
+            zlist_append(def->attributes_names_ordered, strdup(io->name));
             zhashx_insert(def->attributes_table, io->name, io);
             break;
         default:
@@ -216,21 +219,24 @@ void definition_free_definition (igs_definition_t **def)
         free ((char *) (*def)->json_legacy_v4);
         (*def)->json_legacy_v4 = NULL;
     }
-    
+
+    zlist_destroy(&(*def)->attributes_names_ordered);
     igs_io_t *current_io = zhashx_first((*def)->attributes_table);
     while (current_io) {
         s_definition_free_io (&current_io);
         current_io = zhashx_next((*def)->attributes_table);
     }
     zhashx_destroy(&(*def)->attributes_table);
-    
+
+    zlist_destroy(&(*def)->inputs_names_ordered);
     current_io = zhashx_first((*def)->inputs_table);
     while (current_io) {
         s_definition_free_io (&current_io);
         current_io = zhashx_next((*def)->inputs_table);
     }
     zhashx_destroy(&(*def)->inputs_table);
-    
+
+    zlist_destroy(&(*def)->outputs_names_ordered);
     current_io = zhashx_first((*def)->outputs_table);
     while (current_io) {
         s_definition_free_io (&current_io);
@@ -238,6 +244,7 @@ void definition_free_definition (igs_definition_t **def)
     }
     zhashx_destroy(&(*def)->outputs_table);
     
+    zlist_destroy(&(*def)->services_names_ordered);
     igs_service_t *service = zhashx_first((*def)->services_table);
     while (service) {
         service_free_service (&service);
@@ -288,10 +295,22 @@ void igsagent_clear_definition (igsagent_t *agent)
         agent->definition->name = previous_name;
     else
         agent->definition->name = strdup (IGS_DEFAULT_AGENT_NAME);
-    
+
+    agent->definition->attributes_names_ordered = zlist_new();
+    zlist_comparefn (agent->definition->attributes_names_ordered, (zlist_compare_fn *) strcmp);
+    zlist_autofree(agent->definition->attributes_names_ordered);
     agent->definition->attributes_table = zhashx_new();
+    agent->definition->inputs_names_ordered = zlist_new();
+    zlist_comparefn (agent->definition->inputs_names_ordered, (zlist_compare_fn *) strcmp);
+    zlist_autofree(agent->definition->inputs_names_ordered);
     agent->definition->inputs_table = zhashx_new();
+    agent->definition->outputs_names_ordered = zlist_new();
+    zlist_comparefn (agent->definition->outputs_names_ordered, (zlist_compare_fn *) strcmp);
+    zlist_autofree(agent->definition->outputs_names_ordered);
     agent->definition->outputs_table = zhashx_new();
+    agent->definition->services_names_ordered = zlist_new();
+    zlist_comparefn (agent->definition->services_names_ordered, (zlist_compare_fn *) strcmp);
+    zlist_autofree(agent->definition->services_names_ordered);
     agent->definition->services_table = zhashx_new();
     definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
@@ -535,6 +554,7 @@ igs_result_t igsagent_input_remove (igsagent_t *agent, const char *name)
         model_read_write_unlock(__FUNCTION__, __LINE__);
         return IGS_FAILURE;
     }
+    zlist_remove(agent->definition->inputs_names_ordered, io->name);
     zhashx_delete(agent->definition->inputs_table, io->name);
     s_definition_free_io (&io);
     definition_update_json (agent->definition);
@@ -557,6 +577,7 @@ igs_result_t igsagent_output_remove (igsagent_t *agent, const char *name)
         model_read_write_unlock(__FUNCTION__, __LINE__);
         return IGS_FAILURE;
     }
+    zlist_remove(agent->definition->outputs_names_ordered, io->name);
     zhashx_delete(agent->definition->outputs_table, io->name);
     s_definition_free_io (&io);
     definition_update_json (agent->definition);
@@ -579,6 +600,7 @@ igs_result_t igsagent_attribute_remove (igsagent_t *agent, const char *name)
         model_read_write_unlock(__FUNCTION__, __LINE__);
         return IGS_FAILURE;
     }
+    zlist_remove(agent->definition->attributes_names_ordered, io->name);
     zhashx_delete(agent->definition->attributes_table, io->name);
     s_definition_free_io (&io);
     definition_update_json (agent->definition);
