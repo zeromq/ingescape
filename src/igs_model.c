@@ -1,9 +1,9 @@
 /*  =========================================================================
  model - read/write/observe inputs, outputs and attributes
- 
+
  Copyright (c) the Contributors as noted in the AUTHORS file.
  This file is part of Ingescape, see https://github.com/zeromq/ingescape.
- 
+
  This Source Code Form is subject to the terms of the Mozilla Public
  License, v. 2.0. If a copy of the MPL was not distributed with this
  file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -565,7 +565,7 @@ bool s_model_check_io_existence (igsagent_t *agent,
                                  const char *name,
                                  zhashx_t *hash)
 {
-    
+
     if (agent->definition == NULL) {
         igsagent_error (agent, "Definition is NULL");
         return false;
@@ -578,38 +578,48 @@ char **s_model_get_io_list (igsagent_t *agent,
                             size_t *nb_of_elements,
                             igs_io_type_t type)
 {
+    assert(agent);
     if (agent->definition == NULL) {
         igsagent_warn (agent, "Definition is NULL");
-        *nb_of_elements = 0;
+        if (nb_of_elements)
+            *nb_of_elements = 0;
         return NULL;
     }
-    zhashx_t *hash = NULL;
+    zlist_t *list = NULL;
     switch (type) {
         case IGS_INPUT_T:
-            hash = agent->definition->inputs_table;
+            list = agent->definition->inputs_names_ordered;
             break;
         case IGS_OUTPUT_T:
-            hash = agent->definition->outputs_table;
+            list = agent->definition->outputs_names_ordered;
             break;
         case IGS_ATTRIBUTE_T:
-            hash = agent->definition->attributes_table;
+            list = agent->definition->attributes_names_ordered;
             break;
         default:
             break;
     }
-    size_t N = (*nb_of_elements) = zhashx_size (hash);
+    if (list == NULL) {
+        if (nb_of_elements)
+            *nb_of_elements = 0;
+        return NULL;
+    }
+
+    size_t N = zlist_size (list);
+    if (nb_of_elements)
+        *nb_of_elements = N;
     if (N < 1)
         return NULL;
-    
-    char **list = (char **) malloc (N * sizeof (char *));
-    igs_io_t *current_io = zhashx_first(hash);
+
+    char **names_list = (char **) malloc (N * sizeof (char *));
+    const char *io_name = (const char*) zlist_first (list);
     int index = 0;
-    while (current_io) {
-        list[index] = strdup (current_io->name);
+    while (io_name) {
+        names_list[index] = strdup (io_name);
         index++;
-        current_io = zhashx_next(hash);
+        io_name = zlist_next(list);
     }
-    return list;
+    return names_list;
 }
 
 static void s_model_observe (igsagent_t *agent,
@@ -802,7 +812,7 @@ igs_io_t *model_write (igsagent_t *agent, const char *name,
     }
     int ret = 1;
     char buf[NUMBER_TO_STRING_MAX_LENGTH + 1] = "";
-    
+
     //apply constraint if any
     if (io->constraint && agent->enforce_constraints){
         if (io->value_type == IGS_INTEGER_T){
@@ -821,7 +831,7 @@ igs_io_t *model_write (igsagent_t *agent, const char *name,
                     converted_value = *(int*)value;
                     break;
             }
-            
+
             switch (io->constraint->type) {
                 case IGS_CONSTRAINT_MIN:
                     if (converted_value < io->constraint->min_int.min){
@@ -844,7 +854,7 @@ igs_io_t *model_write (igsagent_t *agent, const char *name,
                         return NULL;
                     }
                     break;
-                    
+
                 default:
                     break;
             }
@@ -865,7 +875,7 @@ igs_io_t *model_write (igsagent_t *agent, const char *name,
                     converted_value = *(double*)value;
                     break;
             }
-            
+
             switch (io->constraint->type) {
                 case IGS_CONSTRAINT_MIN:
                     if (converted_value < io->constraint->min_double.min){
@@ -888,7 +898,7 @@ igs_io_t *model_write (igsagent_t *agent, const char *name,
                         return NULL;
                     }
                     break;
-                    
+
                 default:
                     break;
             }
@@ -927,7 +937,7 @@ igs_io_t *model_write (igsagent_t *agent, const char *name,
             }
         }
     }
-    
+
     // TODO: optimize if value is NULL
     switch (value_type) {
         case IGS_INTEGER_T: {
@@ -1194,7 +1204,7 @@ igs_io_t *model_write (igsagent_t *agent, const char *name,
         default:
             break;
     }
-    
+
     if (ret) {
         // compose log entry
         const char *log_io_type = NULL;

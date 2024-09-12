@@ -1,9 +1,9 @@
 /*  =========================================================================
  network - ingescape network ayer
- 
+
  Copyright (c) the Contributors as noted in the AUTHORS file.
  This file is part of Ingescape, see https://github.com/zeromq/ingescape.
- 
+
  This Source Code Form is subject to the terms of the Mozilla Public
  License, v. 2.0. If a copy of the MPL was not distributed with this
  file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -117,7 +117,7 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
         zmsg_destroy (msg);
         return;
     }
-    
+
     size_t msg_size = zmsg_size (*msg);
     char *output = NULL;
     char *v_type = NULL;
@@ -130,7 +130,7 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
     void *data = NULL;
     zmsg_t *bundle = NULL;
     size_t i = 0;
-    
+
     //NB: The following iterations need to be protected in case the remote agent disappears
     //while we are handling data.
     for (i = 0; i < msg_size; i += 3) {
@@ -160,8 +160,8 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
             break;
         }
         free (v_type);
-        
-        
+
+
         // get data before iterating to all the mapping elements using it
         if (value_type == IGS_STRING_T) {
             value = zmsg_popstr (*msg);
@@ -201,7 +201,7 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
             memcpy(&timestamp, zframe_data(timestamp_f), sizeof(int64_t));
             zframe_destroy(&timestamp_f);
             zmsg_destroy(&bundle);
-            
+
         } else if (value_type == IGS_TIMESTAMPED_INTEGER_T
                    || value_type == IGS_TIMESTAMPED_DOUBLE_T
                    || value_type == IGS_TIMESTAMPED_BOOL_T
@@ -235,7 +235,7 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
             memcpy(&timestamp, zframe_data(timestamp_f), sizeof(int64_t));
             zframe_destroy(&timestamp_f);
             zmsg_destroy(&bundle);
-            
+
         } else {
             frame = zmsg_pop (*msg);
             if (!frame) {
@@ -245,11 +245,11 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
             data = zframe_data (frame);
             size = zframe_size (frame);
         }
-        
+
         if (value_type >= IGS_TIMESTAMPED_INTEGER_T
             && value_type <= IGS_TIMESTAMPED_DATA_T)
             value_type -= IGS_DATA_T; //translate value type to non-timestamped value type
-        
+
         // Publication does not provide information about the targeted agents in our
         // context. At this stage, we only know that one or more of our agents are
         // targeted. We need to iterate through our agents and their mappings to check
@@ -318,7 +318,7 @@ int s_trigger_outputs_request_to_newcomer (zloop_t *loop,
     assert (remote_agent);
     assert (remote_agent->context);
     assert (remote_agent->context->node);
-    
+
     if (remote_agent->shall_send_outputs_request) {
         s_lock_zyre_peer (__FUNCTION__, __LINE__);
         zmsg_t *msg = zmsg_new ();
@@ -340,7 +340,7 @@ int s_manage_received_publication (zloop_t *loop, zsock_t *socket, void *arg)
     igs_core_context_t *context = (igs_core_context_t *) arg;
     assert (socket);
     assert (context);
-    
+
     model_read_write_lock(__FUNCTION__, __LINE__);
     zmsg_t *msg = zmsg_recv (socket);
     assert(msg);
@@ -358,11 +358,11 @@ int s_manage_received_publication (zloop_t *loop, zsock_t *socket, void *arg)
         return 0;
     }
     publication_id[IGS_AGENT_UUID_LENGTH] = '\0'; //enable proper extraction of publishing agent UUID
-    
+
     // We push the actual output name again at the beginning of
     // the message for proper use by s_handle_publication
     zmsg_pushstr (msg, publication_id + IGS_AGENT_UUID_LENGTH + 1);
-    
+
     igs_remote_agent_t *remote_agent = zhashx_lookup(context->remote_agents, publication_id);
     if (!remote_agent) {
         igs_error ("no remote agent with uuid '%s' : rejecting", publication_id);
@@ -446,12 +446,12 @@ int s_network_configure_mapping_to_remote_agent (igsagent_t *agent,
                 igs_io_t *found_output = NULL;
                 if (remote_agent->definition)
                     found_output = zhashx_lookup(remote_agent->definition->outputs_table, el->to_output);
-                
+
                 // check if we find a valid input in our own definition
                 igs_io_t *found_input = NULL;
                 if (agent->definition)
                     found_input = zhashx_lookup(agent->definition->inputs_table, el->from_input);
-                
+
                 // check type compatibility between input and output value types
                 // including implicit conversions
                 if (found_output && found_input
@@ -461,7 +461,7 @@ int s_network_configure_mapping_to_remote_agent (igsagent_t *agent,
                     // the remote agent ouput on several of its inputs. This should not
                     // have any consequence.
                     s_subscribe_to_remote_agent_output (remote_agent, el->to_output);
-                    
+
                     // mapping was successful : we set timer to notify remote agent if not
                     // already done
                     if (!remote_agent->shall_send_outputs_request
@@ -533,7 +533,7 @@ void s_send_state_to (igsagent_t *agent,
     assert (peer_or_channel);
     igs_core_context_t *context = agent->context;
     zmsg_t *msg = NULL;
-    
+
     if (agent->definition && agent->definition->outputs_table) {
         igs_io_t *current_io = zhashx_first(agent->definition->outputs_table);
         while (current_io) {
@@ -553,7 +553,7 @@ void s_send_state_to (igsagent_t *agent,
             current_io = zhashx_next(agent->definition->outputs_table);
         }
     }
-    
+
     s_lock_zyre_peer (__FUNCTION__, __LINE__);
     msg = zmsg_new ();
     zmsg_addstr (msg, AGENT_MUTED_MSG);
@@ -564,7 +564,7 @@ void s_send_state_to (igsagent_t *agent,
     else
         zyre_shout (context->node, peer_or_channel, &msg);
     s_unlock_zyre_peer (__FUNCTION__, __LINE__);
-    
+
     if (agent->state) {
         s_lock_zyre_peer (__FUNCTION__, __LINE__);
         msg = zmsg_new ();
@@ -577,7 +577,7 @@ void s_send_state_to (igsagent_t *agent,
             zyre_shout (context->node, peer_or_channel, &msg);
         s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     }
-    
+
     if (agent->definition_path) {
         s_lock_zyre_peer (__FUNCTION__, __LINE__);
         msg = zmsg_new ();
@@ -590,7 +590,7 @@ void s_send_state_to (igsagent_t *agent,
             zyre_shout (context->node, peer_or_channel, &msg);
         s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     }
-    
+
     if (agent->mapping_path) {
         s_lock_zyre_peer (__FUNCTION__, __LINE__);
         msg = zmsg_new ();
@@ -603,7 +603,7 @@ void s_send_state_to (igsagent_t *agent,
             zyre_shout (context->node, peer_or_channel, &msg);
         s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     }
-    
+
     s_lock_zyre_peer (__FUNCTION__, __LINE__);
     msg = zmsg_new ();
     zmsg_addstr (msg, FROZEN_MSG);
@@ -614,7 +614,7 @@ void s_send_state_to (igsagent_t *agent,
     else
         zyre_shout (context->node, peer_or_channel, &msg);
     s_unlock_zyre_peer (__FUNCTION__, __LINE__);
-    
+
     s_lock_zyre_peer (__FUNCTION__, __LINE__);
     msg = zmsg_new ();
     zmsg_addstr (msg, LOG_IN_STREAM_MSG);
@@ -625,7 +625,7 @@ void s_send_state_to (igsagent_t *agent,
     else
         zyre_shout (context->node, peer_or_channel, &msg);
     s_unlock_zyre_peer (__FUNCTION__, __LINE__);
-    
+
     s_lock_zyre_peer (__FUNCTION__, __LINE__);
     msg = zmsg_new ();
     zmsg_addstr (msg, LOG_IN_FILE_MSG);
@@ -636,7 +636,7 @@ void s_send_state_to (igsagent_t *agent,
     else
         zyre_shout (context->node, peer_or_channel, &msg);
     s_unlock_zyre_peer (__FUNCTION__, __LINE__);
-    
+
     s_lock_zyre_peer (__FUNCTION__, __LINE__);
     msg = zmsg_new ();
     zmsg_addstr (msg, LOG_FILE_PATH_MSG);
@@ -656,13 +656,13 @@ void s_clean_and_free_remote_agent (igs_remote_agent_t **remote_agent)
     assert ((*remote_agent)->context);
     igs_debug ("cleaning remote agent %s (%s)",
                (*remote_agent)->definition->name, (*remote_agent)->uuid);
-    
+
     // clean the agent definition & mapping
     if ((*remote_agent)->definition)
         definition_free_definition (&(*remote_agent)->definition);
     if ((*remote_agent)->mapping)
         mapping_free_mapping (&(*remote_agent)->mapping);
-    
+
     // clean the remote_agent itself
     igs_mapping_filter_t *elt = zlist_first((*remote_agent)->mapping_filters);
     while (elt) {
@@ -692,7 +692,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
     assert (context);
     zyre_t *node = context->node;
     assert (node);
-    
+
     zyre_event_t *zyre_event = zyre_event_new (node);
     const char *event = zyre_event_type (zyre_event);
     const char *peerUUID = zyre_event_peer_uuid (zyre_event);
@@ -702,7 +702,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
     const char *group = zyre_event_group (zyre_event);
     zmsg_t *msg = zyre_event_msg (zyre_event);
     zmsg_t *msg_duplicate = zmsg_dup (msg);
-    
+
     // parse event
     if (streq (event, "ENTER")) {
         model_read_write_lock(__FUNCTION__, __LINE__);
@@ -726,19 +726,19 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 }
                 zlist_destroy (&keys);
             }
-            
+
             const char *peer_public_key = zyre_event_header (zyre_event, "X-PUBLICKEY");
             const char *protocol_version = zyre_event_header (zyre_event, "protocol");
             if (protocol_version)
                 zyre_peer->protocol = s_strndup (protocol_version, 16);
-            
+
             const char *publisher_port = zyre_event_header (zyre_event, "publisher");
             if (publisher_port) {
                 // we extract the publisher adress to subscribe to from the zyre message
                 // header
                 char endpoint_address[128];
                 strncpy (endpoint_address, address, 127);
-                
+
                 // IP adress extraction
                 char *insert = endpoint_address + strlen (endpoint_address);
                 bool extractOK = true;
@@ -750,12 +750,12 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                         break;
                     }
                 }
-                
+
                 if (extractOK) {
                     // we found a possible publisher to subscribe to
                     *(insert + 1) =
                     '\0'; // close endpoint_address string after ':' location
-                    
+
                     // check towards our own ip address (without port)
                     char *incoming_ip_address =
                     endpoint_address + 6; // ignore tcp://
@@ -812,7 +812,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                                    zyre_peer->name, endpoint_address);
                     }
                     assert (zyre_peer->subscriber);
-                    
+
                     if (context->security_is_enabled && peer_public_key) {
                         zcert_apply (context->security_cert, zyre_peer->subscriber);
                         zsock_set_curve_serverkey (zyre_peer->subscriber, peer_public_key);
@@ -889,7 +889,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 zyre_event_destroy (&zyre_event);
                 return 0;
             }
-            
+
             model_read_write_lock(__FUNCTION__, __LINE__);
             char *value = NULL;
             zframe_t *frame = NULL;
@@ -951,7 +951,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             free (agent_name);
             free (input);
             model_read_write_unlock(__FUNCTION__, __LINE__);
-            
+
         }
         else if (streq (group, IGS_PRIVATE_CHANNEL)) {
             char *title = zmsg_popstr (msg_duplicate);
@@ -998,7 +998,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             zyre_event_destroy (&zyre_event);
             return 0;
         }
-        
+
         if (streq (title, REMOTE_PEER_KNOWS_AGENT_MSG)) {
             // distant peer has received one of our agents definition
             // => all agents in this peer know us
@@ -1069,7 +1069,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free(title);
                 return 0;
             }
-            
+
             model_read_write_lock(__FUNCTION__, __LINE__);
             // Load definition from string content
             igs_definition_t *new_definition = parser_load_definition (str_definition);
@@ -1100,7 +1100,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     definition_free_definition (&old_def);
                 }
                 assert (remote_agent);
-                
+
                 igs_debug ("store definition for remote agent %s(%s)",
                            remote_agent->definition->name, remote_agent->uuid);
                 // Check the involvement of this new remote agent and its definition in
@@ -1111,7 +1111,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     s_network_configure_mapping_to_remote_agent (agent, remote_agent);
                     agent = zhashx_next(context->agents);
                 }
-                
+
                 if (is_remote_agent_new) {
                     // notify remote agent that our agents knows it
                     s_lock_zyre_peer (__FUNCTION__, __LINE__);
@@ -1120,7 +1120,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     zmsg_addstr (msg_know, uuid);
                     zyre_whisper (node, peerUUID, &msg_know);
                     s_unlock_zyre_peer (__FUNCTION__, __LINE__);
-                    
+
                     // Send hello message for splitter creation if a split exists with
                     // the new remote agent.
                     igsagent_t *elt_agent = zhashx_first(context->agents);
@@ -1143,7 +1143,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                         }
                         elt_agent = zhashx_next(context->agents);
                     }
-                    
+
                     model_read_write_unlock(__FUNCTION__, __LINE__);
                     agent_LOCKED_propagate_agent_event (IGS_AGENT_ENTERED, uuid, remote_agent_name, str_definition);
                     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -1197,7 +1197,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free(title);
                 return 0;
             }
-            
+
             model_read_write_lock(__FUNCTION__, __LINE__);
             igs_remote_agent_t *remote_agent = zhashx_lookup(context->remote_agents, uuid);
             if (!remote_agent) {
@@ -1210,7 +1210,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free(title);
                 return 0;
             }
-            
+
             igs_mapping_t *new_mapping = NULL;
             if (strlen (str_mapping) > 0) {
                 // load mapping from string content
@@ -1230,7 +1230,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     model_read_write_lock(__FUNCTION__, __LINE__);
                 }
             }
-            
+
             if (new_mapping && remote_agent) {
                 // look if this agent already has a mapping
                 if (remote_agent->mapping) {
@@ -1238,13 +1238,13 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                                remote_agent->definition->name, remote_agent->uuid);
                     mapping_free_mapping (&remote_agent->mapping);
                 }
-                
+
                 igs_debug ("store mapping for agent %s(%s)", remote_agent->definition->name, remote_agent->uuid);
                 remote_agent->mapping = new_mapping;
                 mapping_update_json(remote_agent->mapping);
                 model_read_write_unlock(__FUNCTION__, __LINE__);
                 if (remote_agent->uuid)
-                    agent_LOCKED_propagate_agent_event (IGS_AGENT_UPDATED_MAPPING, uuid, 
+                    agent_LOCKED_propagate_agent_event (IGS_AGENT_UPDATED_MAPPING, uuid,
                                                         remote_agent->definition->name, str_mapping);
                 model_read_write_lock(__FUNCTION__, __LINE__);
             }
@@ -1271,7 +1271,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free(title);
                 return 0;
             }
-            
+
             model_read_write_lock(__FUNCTION__, __LINE__);
             igsagent_t *agent = zhashx_lookup(context->agents, uuid);
             if (!agent) {
@@ -1286,7 +1286,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 return 0;
             }
             model_read_write_unlock(__FUNCTION__, __LINE__);
-            
+
             // load definition
             if (igsagent_definition_load_str (agent, str_definition) == IGS_SUCCESS) {
                 model_read_write_lock(__FUNCTION__, __LINE__);
@@ -1320,7 +1320,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free(title);
                 return 0;
             }
-            
+
             model_read_write_lock(__FUNCTION__, __LINE__);
             igsagent_t *agent = zhashx_lookup(context->agents, uuid);
             if (!agent) {
@@ -1333,7 +1333,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 model_read_write_unlock(__FUNCTION__, __LINE__);
                 return 0;
             }
-            
+
             // Load mapping from string content
             igs_mapping_t *new_mapping = parser_load_mapping (str_mapping);
             if (new_mapping) {
@@ -1374,7 +1374,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free(title);
                 return 0;
             }
-            
+
             model_read_write_lock(__FUNCTION__, __LINE__);
             // check that this agent has not been destroyed when we were locked
             zmsg_t *msg_to_send = zmsg_new ();
@@ -1414,7 +1414,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                         zmsg_addstrf(msg_to_send,"%d", current->value_type);
                         zmsg_addmem(msg_to_send, current->value.data, current->value_size);
                         break;
-                        
+
                     default:
                         break;
                 }
@@ -1436,7 +1436,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free(title);
                 return 0;
             }
-            
+
             model_read_write_lock(__FUNCTION__, __LINE__);
             igs_remote_agent_t *remote_agent = zhashx_lookup(context->remote_agents, uuid);
             if (!remote_agent) {
@@ -1473,60 +1473,62 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free(title);
                 return 0;
             }
-            
+
             model_read_write_lock(__FUNCTION__, __LINE__);
             // check that this agent has not been destroyed when we were locked
             zmsg_t *msg_to_send = zmsg_new ();
             zmsg_addstr (msg_to_send, CURRENT_INPUTS_MSG);
             zmsg_addstr (msg_to_send, agent->uuid);
-            igs_io_t *current = zhashx_first(agent->definition->inputs_table);
-            while (current) {
+            const char* io_name = zlist_first(agent->definition->inputs_names_ordered);
+            while (io_name) {
+                igs_io_t *current = (igs_io_t*) zhashx_lookup (agent->definition->inputs_table, io_name);
+                assert(current);
                 switch (current->value_type) {
                     case IGS_INTEGER_T:
                         zmsg_addstr (msg_to_send, current->name);
                         zmsg_addstrf (msg_to_send, "%d",
-                                      current->value_type);
+                                        current->value_type);
                         zmsg_addmem (msg_to_send, &(current->value.i),
-                                     sizeof (int));
+                                        sizeof (int));
                         break;
                     case IGS_DOUBLE_T:
                         zmsg_addstr (msg_to_send, current->name);
                         zmsg_addstrf (msg_to_send, "%d",
-                                      current->value_type);
+                                        current->value_type);
                         zmsg_addmem (msg_to_send, &(current->value.d),
-                                     sizeof (double));
+                                        sizeof (double));
                         break;
                     case IGS_STRING_T:
                         zmsg_addstr (msg_to_send, current->name);
                         zmsg_addstrf (msg_to_send, "%d",
-                                      current->value_type);
+                                        current->value_type);
                         zmsg_addstr (msg_to_send, current->value.s);
                         break;
                     case IGS_BOOL_T:
                         zmsg_addstr (msg_to_send, current->name);
                         zmsg_addstrf (msg_to_send, "%d",
-                                      current->value_type);
+                                        current->value_type);
                         zmsg_addmem (msg_to_send, &(current->value.b),
-                                     sizeof (bool));
+                                        sizeof (bool));
                         break;
                     case IGS_IMPULSION_T:
                         zmsg_addstr (msg_to_send, current->name);
                         zmsg_addstrf (msg_to_send, "%d",
-                                      current->value_type);
+                                        current->value_type);
                         zmsg_addmem (msg_to_send, NULL, 0);
                         break;
                     case IGS_DATA_T:
                         zmsg_addstr (msg_to_send, current->name);
                         zmsg_addstrf (msg_to_send, "%d",
-                                      current->value_type);
+                                        current->value_type);
                         zmsg_addmem (msg_to_send, (current->value.data),
-                                     current->value_size);
+                                        current->value_size);
                         break;
-                        
+
                     default:
                         break;
                 }
-                current = zhashx_next(agent->definition->inputs_table);
+                io_name = zlist_next(agent->definition->inputs_names_ordered);
             }
             s_lock_zyre_peer (__FUNCTION__, __LINE__);
             igs_debug ("send input values to %s", peerUUID);
@@ -1557,60 +1559,62 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free(title);
                 return 0;
             }
-            
+
             model_read_write_lock(__FUNCTION__, __LINE__);
             // check that this agent has not been destroyed when we were locked
             zmsg_t *msg_to_send = zmsg_new ();
             zmsg_addstr (msg_to_send, CURRENT_ATTRIBUTES_MSG);
             zmsg_addstr (msg_to_send, agent->uuid);
-            igs_io_t *current = zhashx_first(agent->definition->attributes_table);
-            while (current) {
+            const char* io_name = zlist_first(agent->definition->attributes_names_ordered);
+            while (io_name) {
+                igs_io_t *current = (igs_io_t*) zhashx_lookup (agent->definition->attributes_table, io_name);
+                assert(current);
                 switch (current->value_type) {
                     case IGS_INTEGER_T:
                         zmsg_addstr (msg_to_send, current->name);
                         zmsg_addstrf (msg_to_send, "%d",
-                                      current->value_type);
+                                        current->value_type);
                         zmsg_addmem (msg_to_send, &(current->value.i),
-                                     sizeof (int));
+                                        sizeof (int));
                         break;
                     case IGS_DOUBLE_T:
                         zmsg_addstr (msg_to_send, current->name);
                         zmsg_addstrf (msg_to_send, "%d",
-                                      current->value_type);
+                                        current->value_type);
                         zmsg_addmem (msg_to_send, &(current->value.d),
-                                     sizeof (double));
+                                        sizeof (double));
                         break;
                     case IGS_STRING_T:
                         zmsg_addstr (msg_to_send, current->name);
                         zmsg_addstrf (msg_to_send, "%d",
-                                      current->value_type);
+                                        current->value_type);
                         zmsg_addstr (msg_to_send, current->value.s);
                         break;
                     case IGS_BOOL_T:
                         zmsg_addstr (msg_to_send, current->name);
                         zmsg_addstrf (msg_to_send, "%d",
-                                      current->value_type);
+                                        current->value_type);
                         zmsg_addmem (msg_to_send, &(current->value.b),
-                                     sizeof (bool));
+                                        sizeof (bool));
                         break;
                     case IGS_IMPULSION_T:
                         zmsg_addstr (msg_to_send, current->name);
                         zmsg_addstrf (msg_to_send, "%d",
-                                      current->value_type);
+                                        current->value_type);
                         zmsg_addmem (msg_to_send, NULL, 0);
                         break;
                     case IGS_DATA_T:
                         zmsg_addstr (msg_to_send, current->name);
                         zmsg_addstrf (msg_to_send, "%d",
-                                      current->value_type);
+                                        current->value_type);
                         zmsg_addmem (msg_to_send, (current->value.data),
-                                     current->value_size);
+                                        current->value_size);
                         break;
-                        
+
                     default:
                         break;
                 }
-                current = zhashx_next(agent->definition->attributes_table);
+                io_name = zlist_next(agent->definition->attributes_names_ordered);
             }
             s_lock_zyre_peer (__FUNCTION__, __LINE__);
             igs_debug ("send attributes values to %s", peerUUID);
@@ -1630,8 +1634,8 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free(title);
                 return 0;
             }
-            
-            
+
+
             model_read_write_lock(__FUNCTION__, __LINE__);
             igs_debug ("received 'START_AGENT %s' command from %s (%s)", agent_name, name, peerUUID);
             igsagent_t *a = zhashx_first (core_context->created_agents);
@@ -1658,7 +1662,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free(title);
                 return 0;
             }
-            
+
             model_read_write_lock(__FUNCTION__, __LINE__);
             igsagent_t *agent = zhashx_lookup(context->agents, uuid);
             if (!agent) {
@@ -1930,7 +1934,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free(title);
                 return 0;
             }
-            
+
             bool shall_inject = true;
             zframe_t *value_type_f = zmsg_pop(msg_duplicate);
             if (value_type_f){
@@ -2035,7 +2039,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free(title);
                 return 0;
             }
-            
+
             igs_debug ("received MAP command from %s (%s)", name, peerUUID);
             model_read_write_unlock(__FUNCTION__, __LINE__);
             if (input && remote_agent && output)
@@ -2108,7 +2112,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free(title);
                 return 0;
             }
-            
+
             igs_debug ("received UNMAP command from %s (%s)", name, peerUUID);
             model_read_write_unlock(__FUNCTION__, __LINE__);
             if (input && remote_agent && output)
@@ -2182,7 +2186,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free(title);
                 return 0;
             }
-            
+
             igs_debug ("received ADD_SPLIT_ENTRY command from %s (%s)", name, peerUUID);
             model_read_write_unlock(__FUNCTION__, __LINE__);
             if (input && remote_agent && output)
@@ -2255,7 +2259,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free(title);
                 return 0;
             }
-            
+
             igs_debug ("received REMOVE_SPLIT_ENTRY_MSG command from %s (%s)", name, peerUUID);
             model_read_write_unlock(__FUNCTION__, __LINE__);
             if (input && remote_agent && output)
@@ -2433,20 +2437,20 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free(title);
                 return 0;
             }
-            
+
             model_read_write_lock(__FUNCTION__, __LINE__);
             char *caller_name = strdup(name); // default caller name is the one of the peer
             if (streq (title, CALL_SERVICE_MSG_DEPRECATED))
                 igs_warn ("Remote agent %s(%s) uses an older version of Ingescape with deprecated messages. Please upgrade this agent.",
                           caller_name, caller_uuid);
-            
+
             igs_remote_agent_t *caller_agent = zhashx_lookup(context->remote_agents, caller_uuid);
             if (caller_agent) {
                 // replace caller name by the one of an actual agent
                 free(caller_name);
                 caller_name = strdup(caller_agent->definition->name);
             }
-            
+
             igsagent_t *callee_agent = zhashx_lookup(context->agents, callee_uuid);
             if (!callee_agent) {
                 igs_error ("no callee agent with uuid '%s' in %s message received from %s(%s): rejecting", callee_uuid, title, name, peerUUID);
@@ -2459,7 +2463,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free(title);
                 return 0;
             }
-            
+
             char *service_name = zmsg_popstr (msg_duplicate);
             if (service_name == NULL) {
                 igs_error ("no service name in %s message received from "
@@ -2474,7 +2478,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free(title);
                 return 0;
             }
-            
+
             char *token = zmsg_popstr (msg_duplicate);
             if (token == NULL) {
                 igs_error ("no token in %s message received from %s(%s): rejecting",
@@ -2489,7 +2493,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free(title);
                 return 0;
             }
-            
+
             if (callee_agent->definition && callee_agent->definition->services_table) {
                 igs_service_t *service = zhashx_lookup(callee_agent->definition->services_table, service_name);
                 if (service) {
@@ -2550,7 +2554,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     } else
                         igs_error ("arguments count do not match in received message for service %s (%zu vs. %zu expected)",
                                    name, nb_frames, nb_args);
-                    
+
                 } else if (!core_context->allow_undefined_services)
                     igsagent_warn (callee_agent, "agent %s(%s) has no service named %s",
                                    callee_agent->definition->name, callee_uuid, service_name);
@@ -2651,7 +2655,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             igs_info ("\\o/ peer %s(%s) -that's us- is leader in '%s'", name, peerUUID, group);
         else
             igs_info ("\\o/ peer %s(%s) is leader in '%s'", name, peerUUID, group);
-        
+
         zlist_t *election = zhashx_lookup (context->elections, group);
         //We may have joined the elections channel MANUALLY and receive election results.
         //In this case, no election object exists.
@@ -2691,7 +2695,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
     }
     else if (streq (event, "LEAVE"))
         igs_debug ("-%s has left %s", name, group);
-    
+
     else if (streq (event, "EXIT")) {
         model_read_write_lock(__FUNCTION__, __LINE__);
         igs_debug ("<-%s (%s) exited", name, peerUUID);
@@ -2730,7 +2734,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
         }
         model_read_write_unlock(__FUNCTION__, __LINE__);
     }
-    
+
     // handle callbacks
     // NB: as explained earlier, agent may be NULL
     // depending on the event type.
@@ -2753,7 +2757,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
         elt = zlist_next(zyre_callbacks);
     }
     zlist_destroy(&zyre_callbacks);
-    
+
     zmsg_destroy (&msg_duplicate);
     zyre_event_destroy (&zyre_event);
     model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -2767,7 +2771,7 @@ int s_trigger_definition_update (zloop_t *loop, int timer_id, void *arg)
     IGS_UNUSED (timer_id)
     igs_core_context_t *context = (igs_core_context_t *) arg;
     assert (context);
-    
+
     model_read_write_lock(__FUNCTION__, __LINE__);
     zlistx_t *agents = zhashx_values(context->agents);
     igsagent_t *agent = zlistx_first(agents);
@@ -2797,11 +2801,11 @@ int s_trigger_definition_update (zloop_t *loop, int timer_id, void *arg)
             // but it is the cleanest way to send state on after-start agent
             // activation. State details are still sent individually when they change.
             s_send_state_to (agent, IGS_PRIVATE_CHANNEL, false);
-            
+
             agent->network_need_to_send_definition_update = false;
             // when definition changes, mapping may need to be updated as well
             agent->network_need_to_send_mapping_update = true;
-            
+
             //propagate definition update to other agents in the same process (if any)
             model_read_write_unlock(__FUNCTION__, __LINE__);
             if (agent->uuid)
@@ -2824,7 +2828,7 @@ int s_trigger_mapping_update (zloop_t *loop, int timer_id, void *arg)
     IGS_UNUSED (timer_id)
     igs_core_context_t *context = (igs_core_context_t *) arg;
     assert (context);
-    
+
     model_read_write_lock(__FUNCTION__, __LINE__);
     zlistx_t *agents = zhashx_values(context->agents);
     igsagent_t *agent = zlistx_first(agents);
@@ -2889,7 +2893,7 @@ int s_manage_parent (zloop_t *loop, zsock_t *pipe, void *arg)
 {
     IGS_UNUSED (loop)
     IGS_UNUSED (arg)
-    
+
     zmsg_t *msg = zmsg_recv (pipe);
     assert (msg);
     char *command = zmsg_popstr (msg);
@@ -2942,7 +2946,7 @@ static void s_run_loop (zsock_t *mypipe, void *args)
     assert (context->ipc_publisher);
     assert (context->inproc_publisher);
 #endif
-    
+
     if (context->security_is_enabled && !context->security_auth) {
         context->security_auth = zactor_new (zauth, NULL);
         assert (context->security_auth);
@@ -2957,7 +2961,7 @@ static void s_run_loop (zsock_t *mypipe, void *args)
                 == 0);
         assert (zsock_wait (context->security_auth) >= 0);
     }
-    
+
     // iterate on agents to avoid sending definition and mapping update at startup
     // to all peers (they will receive def & map when joining INGESCAPE_PRIVATE)
     igsagent_t *agent = zhashx_first(context->agents);
@@ -2967,7 +2971,7 @@ static void s_run_loop (zsock_t *mypipe, void *args)
         agent->network_activation_during_runtime = false;
         agent = zhashx_next(context->agents);
     }
-    
+
     // start zyre now that everything is set
     s_lock_zyre_peer (__FUNCTION__, __LINE__);
     int zyre_start_res = zyre_start (context->node);
@@ -2977,7 +2981,7 @@ static void s_run_loop (zsock_t *mypipe, void *args)
                    "could not start zyre node : Ingescape will interrupt immediately.");
         return;
     }
-    
+
     context->loop = zloop_new ();
     assert (context->loop);
     zloop_set_verbose (context->loop, false);
@@ -2987,20 +2991,20 @@ static void s_run_loop (zsock_t *mypipe, void *args)
     zloop_reader_set_tolerant (context->loop, zyre_socket (context->node));
     zloop_timer (context->loop, 1000, 0, s_trigger_definition_update, context);
     zloop_timer (context->loop, 1000, 0, s_trigger_mapping_update, context);
-    
+
     zsock_signal (mypipe, 0);
     s_network_unlock ();
-    
+
     /////////////////////
     igs_debug ("loop starting");
     zloop_start (context->loop); // returns when one of the readers returns -1
     /////////////////////
-    
+
     s_network_lock ();
     igs_debug ("loop stopping..."); // clean dynamic part of the context
     zloop_destroy (&context->loop);
     context->internal_pipe = NULL;
-    
+
     // zmq stack cleaning
     igs_debug ("cleaning network stack...");
     s_lock_zyre_peer(__FUNCTION__, __LINE__);
@@ -3022,7 +3026,7 @@ static void s_run_loop (zsock_t *mypipe, void *args)
 #endif
     if (context->logger)
         zsock_destroy (&context->logger);
-    
+
     igs_debug ("cleaning network structures...");
     igs_remote_agent_t *remote = zhashx_first(context->remote_agents);
     while (remote) {
@@ -3030,21 +3034,21 @@ static void s_run_loop (zsock_t *mypipe, void *args)
         remote = zhashx_next(context->remote_agents);
     }
     zhashx_purge(context->remote_agents);
-    
+
     igs_zyre_peer_t *zyre_peer = zhashx_first(context->zyre_peers);
     while (zyre_peer) {
         s_clean_and_free_zyre_peer (&zyre_peer, context->loop);
         zyre_peer = zhashx_next(context->zyre_peers);
     }
     zhashx_purge(context->zyre_peers);
-    
+
     igs_timer_t *current_timer = zlist_first(context->timers);
     while (current_timer) {
         free(current_timer);
         current_timer = zlist_next(context->timers);
     }
     zlist_purge(context->timers);
-    
+
     // clean remaining dynamic data
     if (context->replay_channel) {
         free (context->replay_channel);
@@ -3060,11 +3064,11 @@ static void s_run_loop (zsock_t *mypipe, void *args)
     }
     if (context->security_auth)
         zactor_destroy (&(context->security_auth));
-    
+
     igs_debug ("loop stopped");
     if (context->network_actor)
         zstr_send (mypipe, "LOOP_STOPPED");
-    
+
     // handle external stop if needed
     if (context->external_stop) {
         igs_forced_stop_wrapper_t *cb = zlist_first(context->external_stop_calbacks);
@@ -3079,10 +3083,10 @@ static void s_run_loop (zsock_t *mypipe, void *args)
 void s_init_loop (igs_core_context_t *context)
 {
     core_init_agent (); // to be sure to have a default agent name
-    
+
     igs_debug ("loop init");
     s_network_lock ();
-    
+
     context->external_stop = false;
     // prepare zyre
     s_lock_zyre_peer (__FUNCTION__, __LINE__);
@@ -3142,7 +3146,7 @@ void s_init_loop (igs_core_context_t *context)
         zyre_set_port (context->node, context->network_zyre_port);
         s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     }
-    
+
     s_lock_zyre_peer (__FUNCTION__, __LINE__);
     zyre_set_interval (context->node, context->network_discovery_interval);
     zyre_set_expired_timeout (context->node, context->network_agent_timeout);
@@ -3158,7 +3162,7 @@ void s_init_loop (igs_core_context_t *context)
     }
     zlistx_destroy (&keys);
     s_unlock_zyre_peer (__FUNCTION__, __LINE__);
-    
+
     // create channel for replay
     assert (context->replay_channel == NULL);
     context->replay_channel = (char *) zmalloc (strlen (core_agent->definition->name) + strlen ("-IGS-REPLAY") + 1);
@@ -3167,7 +3171,7 @@ void s_init_loop (igs_core_context_t *context)
     s_lock_zyre_peer (__FUNCTION__, __LINE__);
     zyre_join (context->node, context->replay_channel);
     s_unlock_zyre_peer (__FUNCTION__, __LINE__);
-    
+
     // create channel for services feedback for each agent
     igsagent_t *agent = zhashx_first(context->agents);
     while (agent) {
@@ -3177,14 +3181,14 @@ void s_init_loop (igs_core_context_t *context)
         s_unlock_zyre_peer (__FUNCTION__, __LINE__);
         agent = zhashx_next(context->agents);
     }
-    
+
     // Add version and protocol to headers
     s_lock_zyre_peer (__FUNCTION__, __LINE__);
     zyre_set_header (context->node, "ingescape", "v%d.%d.%d",
                      (int) igs_version () / 10000, (int) (igs_version () % 10000) / 100, (int) (igs_version () % 100));
     zyre_set_header (context->node, "protocol", "v%d", igs_protocol ());
     s_unlock_zyre_peer (__FUNCTION__, __LINE__);
-    
+
     // Add stored headers to zyre
     zlist_t *header_keys = zhash_keys(context->peer_headers);
     char *header_key = zlist_first(header_keys);
@@ -3197,14 +3201,14 @@ void s_init_loop (igs_core_context_t *context)
         header_key = zlist_next(header_keys);
     }
     zlist_destroy(&header_keys);
-    
+
     // start TCP publisher
     char endpoint[512];
     if (context->network_publishing_port == 0)
         snprintf (endpoint, 512, "tcp://%s:*", context->ip_address);
     else
         snprintf (endpoint, 512, "tcp://%s:%d", context->ip_address, context->network_publishing_port);
-    
+
     context->publisher = zsock_new_pub (endpoint);
     if (!context->publisher)
         igs_error("zsock_new_pub(%s): %s", endpoint, strerror(errno));
@@ -3222,12 +3226,12 @@ void s_init_loop (igs_core_context_t *context)
     s_lock_zyre_peer (__FUNCTION__, __LINE__);
     zyre_set_header (context->node, "publisher", "%s", insert + 1);
     s_unlock_zyre_peer (__FUNCTION__, __LINE__);
-    
+
     // start ipc publisher
 #if defined(__UNIX__) && !defined(__UTYPE_IOS)
     if (!context->network_ipc_folder_path)
         context->network_ipc_folder_path = strdup (IGS_DEFAULT_IPC_FOLDER_PATH);
-    
+
     if (!zsys_file_exists (context->network_ipc_folder_path)) {
         zsys_dir_create ("%s", context->network_ipc_folder_path);
         if (!zsys_file_exists (context->network_ipc_folder_path)) {
@@ -3257,7 +3261,7 @@ void s_init_loop (igs_core_context_t *context)
     s_lock_zyre_peer (__FUNCTION__, __LINE__);
     zyre_set_header (context->node, "ipc", "%s", context->network_ipc_endpoint);
     s_unlock_zyre_peer (__FUNCTION__, __LINE__);
-    
+
 #elif defined(__WINDOWS__)
     context->network_ipc_endpoint = strdup ("tcp://127.0.0.1:*");
     zsock_t *ipc_publisher = context->ipc_publisher = zsock_new_pub (context->network_ipc_endpoint);
@@ -3275,7 +3279,7 @@ void s_init_loop (igs_core_context_t *context)
                      zsock_endpoint (ipc_publisher));
     s_unlock_zyre_peer (__FUNCTION__, __LINE__);
 #endif
-    
+
     // start inproc publisher
 #if !defined(__UYTPE_IOS)
     s_lock_zyre_peer (__FUNCTION__, __LINE__);
@@ -3294,13 +3298,13 @@ void s_init_loop (igs_core_context_t *context)
     s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     free (inproc_endpoint);
 #endif
-    
+
     // logger stream
     if (context->network_log_stream_port == 0)
         sprintf (endpoint, "tcp://%s:*", context->ip_address);
     else
         sprintf (endpoint, "tcp://%s:%d", context->ip_address, context->network_log_stream_port);
-    
+
     context->logger = zsock_new_pub (endpoint);
     assert (context->logger);
     if (context->security_is_enabled) {
@@ -3316,7 +3320,7 @@ void s_init_loop (igs_core_context_t *context)
     s_lock_zyre_peer (__FUNCTION__, __LINE__);
     zyre_set_header (context->node, "logger", "%s", insert_point + 1);
     s_unlock_zyre_peer (__FUNCTION__, __LINE__);
-    
+
     // process PID and path
 #if defined(__UNIX__)
     ssize_t ret;
@@ -3358,7 +3362,7 @@ void s_init_loop (igs_core_context_t *context)
     if ((context->command_line == NULL)
         || (strlen (context->command_line) == 0)) {
         // command line was not set manually : we try to get exec path instead
-        
+
         // Use GetModuleFileName() to get exec path
         char exe_file_path[IGS_MAX_PATH_LENGTH];
 #ifdef UNICODE
@@ -3385,7 +3389,7 @@ void s_init_loop (igs_core_context_t *context)
     zyre_set_header (context->node, "pid", "%i", (int) pid);
     s_unlock_zyre_peer (__FUNCTION__, __LINE__);
 #endif
-    
+
     // hostname
     char hostname[1024];
     hostname[1023] = '\0';
@@ -3397,7 +3401,7 @@ void s_init_loop (igs_core_context_t *context)
     zyre_set_header (context->node, "hostname", "%s", hostname);
     s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     s_network_unlock ();
-    
+
     context->network_actor = zactor_new (s_run_loop, context);
     if (core_context->unbind_pipe){
         zsock_t *pipe = zactor_sock(context->network_actor);
@@ -3420,7 +3424,7 @@ igs_result_t network_publish_output (igsagent_t *agent, const igs_io_t *io)
     assert (io);
     assert (io->name);
     int result = IGS_SUCCESS;
-    
+
     if (!agent->is_whole_agent_muted && !io->is_muted && !agent->context->is_frozen) {
         split_add_work_to_queue (agent->context, agent->uuid, io);
         int64_t current_microseconds = INT64_MIN;
@@ -3541,7 +3545,7 @@ igs_result_t network_publish_output (igsagent_t *agent, const igs_io_t *io)
             default:
                 break;
         }
-        
+
         // 1- publish to TCP
         if (agent->context->network_actor && agent->context->publisher) {
             if (zsock_send (core_context->publisher, "m", msg) != 0) {
@@ -3567,7 +3571,7 @@ igs_result_t network_publish_output (igsagent_t *agent, const igs_io_t *io)
         }else
             igsagent_debug (agent, "agent not started : could not publish output %s to the "
                             "network (published to agents in same process only)", io->name);
-        
+
         // 4- distribute publication message to other agents inside our context
         size_t nb_active_agents = zhashx_size(agent->context->agents);
         if (agent->context && agent->context->network_actor && !agent->is_virtual && nb_active_agents > 1) {
@@ -3586,7 +3590,7 @@ igs_result_t network_publish_output (igsagent_t *agent, const igs_io_t *io)
             }
         } else
             zmsg_destroy (&msg);
-        
+
     } else {
         if (agent->context)
             igsagent_debug (agent, "Should publish output %s but the agent is deactivated", io->name);
@@ -3631,15 +3635,15 @@ igs_result_t igs_start_with_device (const char *network_device,
     assert(network_device);
     assert (port > 0);
     core_init_agent ();
-    
+
     if (core_context->network_actor) {
         // peer is active : need to stop it first
         igs_stop ();
     }
-    
+
     model_read_write_lock(__FUNCTION__, __LINE__);
     core_context->network_device = s_strndup (network_device, IGS_NETWORK_DEVICE_LENGTH);
-    
+
 #if defined(__WINDOWS__)
     WORD version_requested = MAKEWORD (2, 2);
     WSADATA wsa_data;
@@ -3647,7 +3651,7 @@ igs_result_t igs_start_with_device (const char *network_device,
     assert (rc == 0);
     assert (LOBYTE (wsa_data.wVersion) == 2 && HIBYTE (wsa_data.wVersion) == 2);
 #endif
-    
+
     ziflist_t *iflist = ziflist_new ();
     assert (iflist);
     const char *name = ziflist_first (iflist);
@@ -3661,7 +3665,7 @@ igs_result_t igs_start_with_device (const char *network_device,
         name = ziflist_next (iflist);
     }
     ziflist_destroy (&iflist);
-    
+
     if (core_context->ip_address == NULL) {
         igs_error ("IP address could not be determined on device %s : our agent will NOT start", network_device);
         model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -3680,15 +3684,15 @@ igs_result_t igs_start_with_ip (const char *ip_address, unsigned int port)
     assert (ip_address);
     assert (port > 0);
     core_init_agent ();
-    
+
     if (core_context->network_actor) {
         // Agent is already active : need to stop it first
         igs_stop ();
     }
-    
+
     model_read_write_lock(__FUNCTION__, __LINE__);
     core_context->ip_address = s_strndup (ip_address, IGS_IP_ADDRESS_LENGTH);
-    
+
 #if defined(__WINDOWS__)
     WORD version_requested = MAKEWORD (2, 2);
     WSADATA wsa_data;
@@ -3696,7 +3700,7 @@ igs_result_t igs_start_with_ip (const char *ip_address, unsigned int port)
     assert (rc == 0);
     assert (LOBYTE (wsa_data.wVersion) == 2 && HIBYTE (wsa_data.wVersion) == 2);
 #endif
-    
+
     ziflist_t *iflist = ziflist_new ();
     assert (iflist);
     const char *name = ziflist_first (iflist);
@@ -3713,7 +3717,7 @@ igs_result_t igs_start_with_ip (const char *ip_address, unsigned int port)
         name = ziflist_next (iflist);
     }
     ziflist_destroy (&iflist);
-    
+
     if (core_context->network_device == NULL) {
         igs_error ("device name could not be determined for IP address %s : our agent will NOT start", ip_address);
         model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -3804,7 +3808,7 @@ void igs_broker_set_advertized_endpoint (const char *advertised_endpoint)
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (core_context->advertised_endpoint)
         free (core_context->advertised_endpoint);
-    
+
     if (advertised_endpoint == NULL) {
         igs_info ("endpoint advertisement is disabled");
         core_context->advertised_endpoint = NULL;
@@ -3833,14 +3837,14 @@ igs_result_t igs_start_with_brokers (const char *agent_endpoint)
         free (core_context->our_agent_endpoint);
     core_context->our_agent_endpoint =
     s_strndup (agent_endpoint, IGS_IP_ADDRESS_LENGTH);
-    
+
     assert (core_context->brokers);
     if (zhash_size (core_context->brokers) == 0 && core_context->our_broker_endpoint == NULL) {
         igs_error ("no broker to connect to and we do not serve as broker : our agent will NOT start");
         model_read_write_unlock(__FUNCTION__, __LINE__);
         return IGS_FAILURE;
     }
-    
+
     s_init_loop (core_context);
     assert (core_context->network_actor);
     model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -3868,7 +3872,7 @@ void igs_stop (void)
     }
     else
         igs_debug ("ingescape already stopped");
-    
+
     if (core_context->network_device) {
         free (core_context->network_device);
         core_context->network_device = NULL;
@@ -3915,7 +3919,7 @@ void igsagent_set_name (igsagent_t *agent, const char *name)
         model_read_write_unlock(__FUNCTION__, __LINE__);
         return;
     }
-    
+
     char *n = s_strndup (name, IGS_MAX_AGENT_NAME_LENGTH);
     if (strlen (name) > IGS_MAX_AGENT_NAME_LENGTH)
         printf("Agent name '%s' exceeds maximum size and will be truncated to '%s'\n", name, n);
@@ -3940,13 +3944,13 @@ void igsagent_set_name (igsagent_t *agent, const char *name)
     }
     definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
-    
+
     if (agent->igs_channel)
         free (agent->igs_channel);
     agent->igs_channel = (char *) zmalloc (strlen (agent->definition->name) + strlen ("-IGS") + 1);
     snprintf (agent->igs_channel, IGS_MAX_AGENT_NAME_LENGTH + strlen ("-IGS") + 1,
               "%s-IGS", agent->definition->name);
-    
+
     if (agent->context && agent->context->node) {
         if (previous) {
             char *previous_igs_channel = (char *) zmalloc (strlen (previous) + strlen ("-IGS") + 1);
@@ -3960,7 +3964,7 @@ void igsagent_set_name (igsagent_t *agent, const char *name)
         zyre_join (agent->context->node, agent->igs_channel);
         s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     }
-    
+
     if (previous) {
         igsagent_debug (agent, "Agent (%s) name changed from %s to %s", agent->uuid, previous, agent->definition->name);
         free (previous);
@@ -4232,7 +4236,7 @@ void igs_set_command_line_from_args (int argc, const char **argv)
     }
     model_read_write_lock(__FUNCTION__, __LINE__);
     char cmd[IGS_COMMAND_LINE_LENGTH] = "";
-    
+
 #if defined(__UNIX__)
     size_t ret;
     pid_t pid;
@@ -4254,15 +4258,15 @@ void igs_set_command_line_from_args (int argc, const char **argv)
         return;
     }
     igs_debug ("proc %d: %s", pid, pathbuf);
-    
-    
+
+
     if (strlen (pathbuf) > IGS_COMMAND_LINE_LENGTH) {
         igs_error ("path is too long: %s", pathbuf);
         model_read_write_unlock(__FUNCTION__, __LINE__);
         return;
     }
     strcat (cmd, pathbuf);
-    
+
 #elif defined(__WINDOWS__)
     // Use GetModuleFileName() to get exec path, argv[0] do not contain full path
 #ifdef UNICODE
@@ -4274,7 +4278,7 @@ void igs_set_command_line_from_args (int argc, const char **argv)
     GetModuleFileName (NULL, cmd, IGS_MAX_PATH_LENGTH);
 #endif
 #endif
-    
+
     if (strchr (cmd, ' ') || strchr (cmd, '\"')) {
         if (strlen (cmd) + 1 > IGS_COMMAND_LINE_LENGTH) {
             igs_error ("Path to our executable exceeds the maximum buffer size of %d. Command line won't be set.",
@@ -4307,8 +4311,8 @@ void igs_set_command_line_from_args (int argc, const char **argv)
         strcat (cmd, "\"");
         free(cmd_bis);
     }
-    
-    
+
+
     int i = 1;
     for (; i < argc; i++) {
         char *formated_arg = (char *) zmalloc (IGS_COMMAND_LINE_LENGTH * sizeof (char));
@@ -4327,7 +4331,7 @@ void igs_set_command_line_from_args (int argc, const char **argv)
         }
         else
             strcpy (formated_arg, argv[i]);
-        
+
         if (strlen (cmd) + strlen (formated_arg) + 2 > IGS_COMMAND_LINE_LENGTH) { // 2 is for space and EOL
             igs_error ("passed arguments exceed buffer size: concatenation will stop here with '%s'", cmd);
             free(formated_arg);
@@ -4335,7 +4339,7 @@ void igs_set_command_line_from_args (int argc, const char **argv)
         }
         else
             strcat (cmd, " ");
-        
+
         strcat (cmd, formated_arg);
         free (formated_arg);
     }
@@ -4372,7 +4376,7 @@ char** igs_net_devices_list (int *nb)
     char** devices = (char **) zmalloc (MAX_NUMBER_OF_NETDEVICES * sizeof (char *));
     assert(devices);
     int current_device_nb = 0;
-    
+
     ziflist_t *iflist = ziflist_new ();
     assert (iflist);
     const char *name = ziflist_first (iflist);
@@ -4407,7 +4411,7 @@ char** igs_net_addresses_list (int *nb)
     char** addresses = (char **) zmalloc (MAX_NUMBER_OF_NETDEVICES * sizeof (char *));
     assert(addresses);
     int current_device_nb = 0;
-    
+
     ziflist_t *iflist = ziflist_new ();
     assert (iflist);
     const char *name = ziflist_first (iflist);
@@ -4459,7 +4463,7 @@ igs_result_t igs_enable_security (const char *private_certificate_file,
     core_init_agent ();
     model_read_write_lock(__FUNCTION__, __LINE__);
     core_context->security_is_enabled = true;
-    
+
     if (private_certificate_file) {
         char private_key_path[IGS_MAX_PATH_LENGTH] = "";
         admin_make_file_path (private_certificate_file, private_key_path,
@@ -4474,8 +4478,8 @@ igs_result_t igs_enable_security (const char *private_certificate_file,
         if (core_context->security_cert)
             zcert_destroy (&(core_context->security_cert));
         core_context->security_cert = new_certificate;
-        
-        
+
+
         if (public_certificates_directory == NULL) {
             igs_error ("public certificates directory cannot be NULL when a private certificate is provided");
             model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -4488,7 +4492,7 @@ igs_result_t igs_enable_security (const char *private_certificate_file,
             model_read_write_unlock(__FUNCTION__, __LINE__);
             return IGS_FAILURE;
         }
-        
+
         if (core_context->security_public_certificates_directory)
             free (core_context->security_public_certificates_directory);
         core_context->security_public_certificates_directory =
@@ -4503,7 +4507,7 @@ igs_result_t igs_enable_security (const char *private_certificate_file,
             free (core_context->security_public_certificates_directory);
         core_context->security_public_certificates_directory = strdup (IGS_DEFAULT_SECURITY_DIRECTORY);
     }
-    
+
     if (!core_context->security_auth) {
         core_context->security_auth = zactor_new (zauth, NULL);
         assert (core_context->security_auth);
@@ -4574,10 +4578,10 @@ igs_result_t igsagent_election_join (igsagent_t *agent,
         igsagent_error (agent, "election name is limited to %lu characters", 255 - strlen (el_name));
         return IGS_FAILURE;
     }
-    
+
     model_read_write_lock(__FUNCTION__, __LINE__);
     strncat (el_name, election_name, 255);
-    
+
     assert(core_context->elections);
     zlist_t *election = (zlist_t *) zhashx_lookup (core_context->elections, el_name);
     if (!election) {
@@ -4602,7 +4606,7 @@ igs_result_t igsagent_election_join (igsagent_t *agent,
         }
     }
     zlist_append (election, agent->uuid);
-    
+
     // elections by agent
     if (!agent->elections) {
         agent->elections = zlist_new ();
@@ -4627,10 +4631,10 @@ igs_result_t igsagent_election_leave (igsagent_t *agent,
         igsagent_error (agent, "election name is limited to %lu characters", 255 - strlen (el_name));
         return IGS_FAILURE;
     }
-    
+
     model_read_write_lock(__FUNCTION__, __LINE__);
     strncat (el_name, election_name, 255);
-    
+
     assert(core_context->elections);
     zlist_t *election = zhashx_lookup (core_context->elections, el_name);
     if (!election) {
@@ -4655,7 +4659,7 @@ igs_result_t igsagent_election_leave (igsagent_t *agent,
             s_unlock_zyre_peer (__FUNCTION__, __LINE__);
         }
     }
-    
+
     // elections by agent
     char *agent_election = zlist_first (agent->elections);
     while (agent_election) {
@@ -4667,7 +4671,7 @@ igs_result_t igsagent_election_leave (igsagent_t *agent,
     }
     if (zlist_size (agent->elections) == 0)
         zlist_destroy (&agent->elections);
-    
+
     model_read_write_unlock(__FUNCTION__, __LINE__);
     return IGS_SUCCESS;
 }
@@ -4747,7 +4751,7 @@ void igs_set_ipc_dir (const char *path)
                 core_context->network_ipc_folder_path = strdup (path);
             } else if (core_context->network_ipc_folder_path)
                 igs_error ("IPC dir remains set to %s", core_context->network_ipc_folder_path);
-            
+
         }else
             igs_error ("IPC folder path must be absolute (invalid path: %s)", path);
     }

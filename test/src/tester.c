@@ -283,11 +283,11 @@ void testerIOCallback(igs_io_type_t ioType, const char* name, igs_io_value_type_
     IGS_UNUSED(myCbData)
     IGS_UNUSED(ioType)
     IGS_UNUSED(value)
-    
+
     zsock_t *pipe = igs_pipe_inside_ingescape();
     if (pipe)
         zstr_sendf(pipe, "input %s was written", name);
-    
+
     if (autoTestsHaveStarted){
         switch (valueType) {
             case IGS_BOOL_T:
@@ -329,7 +329,7 @@ void testerIOCallback(igs_io_type_t ioType, const char* name, igs_io_value_type_
         }
         return;
     }
-    
+
     if (autoTests)
         return;
 
@@ -385,7 +385,7 @@ void run_static_tests (int argc, const char * argv[]){
     igs_agent_set_name(agentName);
     assert(streq(igs_definition_class(),agentName)); //intentional memory leak here
     assert(igs_agent_uuid()); //intentional memory leak here
-    
+
     //package and class
     igs_definition_set_class("my_class");
     assert(streq(igs_definition_class(),"my_class")); //intentional memory leak here
@@ -399,35 +399,35 @@ void run_static_tests (int argc, const char * argv[]){
     igs_input_create("constraint_double", IGS_DOUBLE_T, 0, 0);
     igs_input_create("constraint_string", IGS_STRING_T, 0, 0);
     igs_input_create("constraint_data", IGS_DATA_T, 0, 0);
-    
+
     assert(igs_input_add_constraint("constraint_int", "min 10.12") == IGS_SUCCESS); //will set 10 as min constraint
     assert(igs_input_add_constraint("constraint_int", "max 10.12") == IGS_SUCCESS); //will set 10 as max constraint
     assert(igs_input_add_constraint("constraint_int", "[-.1, +10.13]") == IGS_SUCCESS);
     assert(igs_input_add_constraint("constraint_int", "[-.1  ,  +10.13]") == IGS_SUCCESS);
     assert(igs_input_add_constraint("constraint_int", "[-.1,+10.13]") == IGS_SUCCESS);
     assert(igs_input_add_constraint("constraint_int", "[1,-10.13]") == IGS_FAILURE);
-    
+
     assert(igs_input_add_constraint("constraint_double", "min 10.12") == IGS_SUCCESS);
     assert(igs_input_add_constraint("constraint_double", "max 10.12") == IGS_SUCCESS);
     assert(igs_input_add_constraint("constraint_double", "[-.1, +10.13]") == IGS_SUCCESS);
     assert(igs_input_add_constraint("constraint_double", "[12.12,12.12]") == IGS_SUCCESS);
-    
+
     assert(igs_input_add_constraint("constraint_bool", "min 10.12") == IGS_FAILURE);
     assert(igs_input_add_constraint("constraint_bool", "max 10.12") == IGS_FAILURE);
     assert(igs_input_add_constraint("constraint_bool", "[1,10.13]") == IGS_FAILURE);
-    
+
     assert(igs_input_add_constraint("constraint_impulsion", "min 10.12") == IGS_FAILURE);
     assert(igs_input_add_constraint("constraint_impulsion", "max 10.12") == IGS_FAILURE);
     assert(igs_input_add_constraint("constraint_impulsion", "[1,10.13]") == IGS_FAILURE);
-    
+
     assert(igs_input_add_constraint("constraint_string", "min 10.12") == IGS_FAILURE);
     assert(igs_input_add_constraint("constraint_string", "max 10.12") == IGS_FAILURE);
     assert(igs_input_add_constraint("constraint_string", "[1,10.13]") == IGS_FAILURE);
-    
+
     assert(igs_input_add_constraint("constraint_data", "min 10.12") == IGS_FAILURE);
     assert(igs_input_add_constraint("constraint_data", "max 10.12") == IGS_FAILURE);
     assert(igs_input_add_constraint("constraint_data", "[1,-10.13]") == IGS_FAILURE);
-    
+
     assert(igs_input_add_constraint("constraint_string", "~ [^ +") == IGS_FAILURE); //bad format for regex
     assert(igs_input_add_constraint("constraint_string", "~ (\\d+)") == IGS_SUCCESS);
     assert(igs_input_add_constraint("constraint_string", "~ (\\d+)") == IGS_SUCCESS);
@@ -436,15 +436,15 @@ void run_static_tests (int argc, const char * argv[]){
     assert(igs_input_add_constraint("constraint_double", "~ (\\d+)") == IGS_FAILURE);
     assert(igs_input_add_constraint("constraint_bool", "~ (\\d+)") == IGS_FAILURE);
     assert(igs_input_add_constraint("constraint_data", "~ (\\d+)") == IGS_FAILURE);
-    
+
     igs_input_remove("constraint_impulsion");
     igs_input_remove("constraint_int");
     igs_input_remove("constraint_bool");
     igs_input_remove("constraint_double");
     igs_input_remove("constraint_string");
     igs_input_remove("constraint_data");
-    
-    
+
+
     //agent family
     char *family = igs_agent_family();
     assert(family == NULL);
@@ -1065,7 +1065,7 @@ void run_static_tests (int argc, const char * argv[]){
     assert(igs_mapping_count() == 1);
     igs_clear_mappings_for_input("toto");
     assert(igs_mapping_count() == 0);
-    
+
 
     assert(igs_split_count() == 0);
     assert(igs_split_add("toto", "other_agent", "tata") != 0);
@@ -1245,7 +1245,7 @@ void run_static_tests (int argc, const char * argv[]){
     assert(list->next->next->next->next->type == IGS_DATA_T);
     assert(list->next->next->next->next->size == 0);
     assert(list->next->next->next->next->data == NULL);
-    
+
     //service with reply
     assert(igs_service_init("myServiceWithReplies", testerServiceCallback, NULL) == IGS_SUCCESS);
     assert(!igs_service_has_replies("myServiceWithReplies"));
@@ -1263,7 +1263,7 @@ void run_static_tests (int argc, const char * argv[]){
     assert(!igs_service_has_reply("myServiceWithReplies", "myReply3"));
     assert(igs_service_has_replies("myServiceWithReplies"));
     names = igs_service_reply_names("myServiceWithReplies", &replies_nb);
-    assert(names && replies_nb == 2 && streq("myReply", names[1]) && streq("myReply2", names[0]));
+    assert(names && replies_nb == 2 && streq("myReply", names[0]) && streq("myReply2", names[1]));
     igs_free_services_list(names, replies_nb);
     assert(igs_service_reply_args_first("myServiceWithReplies", "myReply") == NULL);
     assert(igs_service_reply_args_count("myServiceWithReplies", "myReply") == 0);
@@ -1877,7 +1877,7 @@ int rt_timer (zloop_t *loop, int timer_id, void *arg){
     igs_output_set_bool("my_bool", myBool = !myBool);
     igs_output_set_int("my_int", myInt++);
     igs_output_set_double("my_double", myDouble++);
-    
+
     if (!(myInt % 3))
         igs_rt_set_time(zclock_mono()*1000);
     return 0;
@@ -1927,7 +1927,7 @@ int main(int argc, const char * argv[]) {
         {"static",        no_argument, 0,  's' },
         {"rt",        no_argument, 0,  'r' },
         {"help",        no_argument, 0,  'h' },
-        {"broker",  required_argument, 0,  'b' },        
+        {"broker",  required_argument, 0,  'b' },
         {0, 0, 0, 0}
     };
 
@@ -1946,7 +1946,7 @@ int main(int argc, const char * argv[]) {
                 break;
             case 'b':
                 broker = strdup(optarg);
-                break;                
+                break;
             case 'd':
                 networkDevice = optarg;
                 break;
@@ -1986,10 +1986,10 @@ int main(int argc, const char * argv[]) {
         igs_fatal("static tests have terminated with SUCCESS");
         exit(EXIT_SUCCESS);
     }
-    
+
     igs_agent_set_name(agentName);
     igs_log_set_console(true);
-    
+
     igs_observe_channels(testerChannelCallback, NULL);
 
     igs_definition_set_description("One example for each type of IO and call");
@@ -2020,7 +2020,7 @@ int main(int argc, const char * argv[]) {
     igs_mapping_add("my_double", "partner", "sparing_double");
     igs_mapping_add("my_string", "partner", "sparing_string");
     igs_mapping_add("my_data", "partner", "sparing_data");
-    
+
     //RT tests
     if (rt){
         igs_input_create("set_time", IGS_INTEGER_T, NULL, 0);
@@ -2033,12 +2033,12 @@ int main(int argc, const char * argv[]) {
         igs_output_create("my_data", IGS_DATA_T, myData, 32);
         igs_rt_set_synchronous_mode(true);
     }
-    
+
     if (verbose)
         igs_log_set_console_level(IGS_LOG_TRACE);
     else
         igs_log_set_console_level(IGS_LOG_FATAL);
-    
+
     if (autoTests){
         igs_start_with_device(networkDevice, port);
         igs_channel_join("TEST_CHANNEL");
@@ -2097,7 +2097,7 @@ int main(int argc, const char * argv[]) {
         snprintf(buffer, 1024, "tcp://%s:5661", broker);
         assert(igs_broker_add(buffer) == IGS_SUCCESS);
         snprintf(buffer, 1024, "tcp://%s:5670", broker);
-        assert(igs_start_with_brokers(buffer) == IGS_SUCCESS);        
+        assert(igs_start_with_brokers(buffer) == IGS_SUCCESS);
     } else {
         //start/stop stress tests
         igs_start_with_device(networkDevice, port);

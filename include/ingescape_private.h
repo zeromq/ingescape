@@ -139,6 +139,7 @@ typedef struct igs_service{
     igsagent_service_fn *service_cb;
     void *cb_data;
     igs_service_arg_t *arguments;
+    zlist_t *replies_names_ordered; // char*, to keep insertion order
     zhashx_t *replies; //struct igs_service
 } igs_service_t;
 
@@ -152,9 +153,13 @@ typedef struct igs_definition{
     char *json_legacy_v3;
     char *json_legacy_v4;
     char* family;
+    zlist_t* attributes_names_ordered; // char*, to keep insertion order
     zhashx_t* attributes_table; //igs_io_t
+    zlist_t* inputs_names_ordered; // char*, to keep insertion order
     zhashx_t* inputs_table; //igs_io_t
+    zlist_t* outputs_names_ordered; // char*, to keep insertion order
     zhashx_t* outputs_table; //igs_io_t
+    zlist_t* services_names_ordered; // char*, to keep insertion order
     zhashx_t *services_table; //igs_service_t
 } igs_definition_t;
 
