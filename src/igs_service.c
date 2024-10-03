@@ -967,8 +967,6 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                         igsagent_error (agent, "passed number of arguments is not correct (received: %zu / expected: %zu) : service will not be called", nb_arguments, defined_nb_arguments);
                         continue;
                     }else {
-                        // update service arguments values with new ones
-                        assert (service->service_cb);
                         agent->rt_current_timestamp_microseconds = current_microseconds;
                         agent->rt_current_timestamp_microseconds = INT64_MIN;
                         if (core_context->enable_service_logging)
@@ -986,7 +984,7 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                         else
                             igsagent_debug (agent, "calling %s.%s(%s) locally", local_agent->definition->name, service_name, local_agent->uuid);
                         model_read_write_unlock(__FUNCTION__, __LINE__);
-                        if (local_agent->uuid && agent->uuid)
+                        if (local_agent->uuid && agent->uuid && service->service_cb)
                             (service->service_cb) (local_agent, agent->definition->name, agent->uuid, service_name,
                                                    *list, nb_arguments, token, service->cb_data);
                         model_read_write_lock(__FUNCTION__, __LINE__);

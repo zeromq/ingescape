@@ -2499,7 +2499,6 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             if (callee_agent->definition && callee_agent->definition->services_table) {
                 igs_service_t *service = zhashx_lookup(callee_agent->definition->services_table, service_name);
                 if (service) {
-                    assert(service->service_cb);
                     s_lock_zyre_peer (__FUNCTION__, __LINE__);
                     zyre_shouts (context->node, callee_agent->igs_channel, "CALLED %s from %s (%s)", service_name, caller_name, caller_uuid);
                     s_unlock_zyre_peer (__FUNCTION__, __LINE__);
@@ -2531,21 +2530,21 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                              */
                             zframe_t *timestamp_f = zmsg_pop(msg_duplicate);
                             assert(timestamp_f);
-                            if (zframe_size(timestamp_f) == sizeof(int64_t)){
+                            if (zframe_size(timestamp_f) == sizeof(int64_t))
                                 memcpy(&callee_agent->rt_current_timestamp_microseconds, zframe_data(timestamp_f), sizeof(int64_t));
-                                zframe_destroy(&timestamp_f);
-                            } else {
+                            else {
                                 igsagent_error (callee_agent, "received data is corrupted and will be ignored for service %s called from %s(%s)",
                                                 service_name, caller_name, caller_uuid);
                                 rest_of_the_message_is_ok = false;
                             }
+                            zframe_destroy(&timestamp_f);
                         }
                         if (rest_of_the_message_is_ok) {
                             if (core_context->enable_service_logging)
                                 service_log_received_service (callee_agent, caller_name, caller_uuid, service_name,
                                                               args, callee_agent->rt_current_timestamp_microseconds);
                             model_read_write_unlock(__FUNCTION__, __LINE__);
-                            if (callee_agent->uuid)
+                            if (callee_agent->uuid && service->service_cb)
                                 (service->service_cb) (callee_agent, caller_name, caller_uuid, service_name,
                                                        args, nb_args, token, service->cb_data);
                             model_read_write_lock(__FUNCTION__, __LINE__);
@@ -2556,7 +2555,6 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     } else
                         igs_error ("arguments count do not match in received message for service %s (%zu vs. %zu expected)",
                                    name, nb_frames, nb_args);
-
                 } else if (!core_context->allow_undefined_services)
                     igsagent_warn (callee_agent, "agent %s(%s) has no service named %s",
                                    callee_agent->definition->name, callee_uuid, service_name);
