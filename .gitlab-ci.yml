@@ -364,6 +364,8 @@ lib-build-linux-x64:
   image: ingescape/debian-testing-compil
   tags:
     - docker
+  variables:
+    GIT_STRATEGY: clone
   before_script:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
@@ -392,6 +394,8 @@ lib-installer-linux-x64:
   image: ingescape/debian-testing-compil
   tags:
     - docker
+  variables:
+    GIT_STRATEGY: clone
   before_script:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
@@ -432,6 +436,8 @@ lib-linux-release-armhf:
   tags:
     - docker
   image: ingescape/ubuntu-x-compil-rpi
+  variables:
+    GIT_STRATEGY: clone
   before_script:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
@@ -461,6 +467,8 @@ lib-installer-runtime-linux-armhf:
   tags:
     - docker
   image: ingescape/ubuntu-x-compil-rpi
+  variables:
+    GIT_STRATEGY: clone
   before_script:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
@@ -501,6 +509,8 @@ lib-android-release-aarch64:
   tags:
     - docker
   image: ingescape/ubuntu-x-compil-android-aarch64
+  variables:
+    GIT_STRATEGY: clone
   before_script:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
@@ -530,6 +540,8 @@ lib-installer-runtime-android-aarch64:
   tags:
     - docker
   image: ingescape/ubuntu-x-compil-android-aarch64
+  variables:
+    GIT_STRATEGY: clone
   before_script:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
@@ -561,6 +573,8 @@ lib-android-release-armv7a-softfp:
   tags:
     - docker
   image: ingescape/ubuntu-x-compil-android
+  variables:
+    GIT_STRATEGY: clone
   before_script:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
@@ -590,6 +604,8 @@ lib-installer-runtime-android-armv7a-softfp:
   tags:
     - docker
   image: ingescape/ubuntu-x-compil-android
+  variables:
+    GIT_STRATEGY: clone
   before_script:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
@@ -620,6 +636,8 @@ build-deb-packages:
   tags:
     - docker
   image: debian:10
+  variables:
+    GIT_STRATEGY: clone
   script:
     - apt-get update || apt-get update
     - apt-get install -y build-essential file git tree rsync wget libssl-dev libcurl4-openssl-dev
@@ -742,6 +760,8 @@ binding-node-js-linux:
   tags:
     - docker
   image: ingescape/ubuntu18.04-node
+  variables:
+    GIT_STRATEGY: clone
   before_script:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
@@ -825,6 +845,8 @@ test-node-js-linux:
   tags:
     - docker
   image: ingescape/ubuntu18.04-node
+  variables:
+    GIT_STRATEGY: clone
   script:
     - cd ./bindings/javascript-node/
     - npm run test --from_sources=1
@@ -851,6 +873,8 @@ deploy-node-js:
   tags:
     - docker
   image: ingescape/ubuntu18.04-node
+  variables:
+    GIT_STRATEGY: clone
   when: manual
   allow_failure: true
   script:
@@ -884,6 +908,8 @@ test-python:
   tags:
     - docker
   image: ingescape/python-cmake
+  variables:
+    GIT_STRATEGY: clone
   before_script:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
@@ -980,6 +1006,8 @@ package-python-wheels-manylinux_2_24_x86_64:
   tags:
     - docker
   image: quay.io/pypa/manylinux_2_24_x86_64
+  variables:
+    GIT_STRATEGY: clone
   before_script:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
@@ -1015,6 +1043,8 @@ package-python-wheels-manylinux2014_x86_64:
   tags:
     - docker
   image: quay.io/pypa/manylinux2014_x86_64
+  variables:
+    GIT_STRATEGY: clone
   before_script:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
@@ -1051,6 +1081,8 @@ package-python-wheels-manylinux2010_x86_64:
   tags:
     - docker
   image: quay.io/pypa/manylinux2010_x86_64
+  variables:
+    GIT_STRATEGY: clone
   before_script:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
@@ -1085,6 +1117,8 @@ publish-python-package:
   tags:
     - docker
   image: ingescape/python-cmake
+  variables:
+    GIT_STRATEGY: clone
   when: manual
   before_script:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
