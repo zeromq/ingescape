@@ -3759,7 +3759,7 @@ void igs_clear_brokers (void)
         zhash_destroy (&(core_context->brokers));
     core_context->brokers = zhash_new ();
     zhash_autofree (core_context->brokers);
-    model_read_write_lock(__FUNCTION__, __LINE__);
+    model_read_write_unlock(__FUNCTION__, __LINE__);
 }
 
 igs_result_t
@@ -3799,7 +3799,7 @@ void igs_broker_enable_with_endpoint (const char *our_broker_endpoint)
     if (core_context->our_broker_endpoint)
         free (core_context->our_broker_endpoint);
     core_context->our_broker_endpoint = strdup (our_broker_endpoint);
-    model_read_write_lock(__FUNCTION__, __LINE__);
+    model_read_write_unlock(__FUNCTION__, __LINE__);
 }
 
 void igs_broker_set_advertized_endpoint (const char *advertised_endpoint)
@@ -3815,7 +3815,7 @@ void igs_broker_set_advertized_endpoint (const char *advertised_endpoint)
     }
     else
         core_context->advertised_endpoint = strdup (advertised_endpoint);
-    model_read_write_lock(__FUNCTION__, __LINE__);
+    model_read_write_unlock(__FUNCTION__, __LINE__);
 }
 
 igs_result_t igs_start_with_brokers (const char *agent_endpoint)
