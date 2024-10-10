@@ -134,7 +134,7 @@ void freeze(bool isPaused, void *myData){
         PyTuple_SetItem(args, 0, Py_BuildValue("b", isPaused));
         Py_XINCREF(actuel->arglist);
         PyTuple_SetItem(args, 1, actuel->arglist);
-        call_callback(actuel->call, actuel->arglist);
+        call_callback(actuel->call, args);
         Py_DECREF(args);
         // Release the GIL
         PyGILState_Release(d_gstate);
