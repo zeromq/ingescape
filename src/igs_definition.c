@@ -412,6 +412,10 @@ void igsagent_definition_set_package (igsagent_t *agent,
         return;
     assert (package);
     assert (agent->definition);
+    if (agent->context && agent->context->node) {
+        igsagent_error(agent, "Agent is started and cannot change its package");
+        return;
+    }
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (agent->definition->package)
         free (agent->definition->package);
@@ -429,6 +433,10 @@ void igsagent_definition_set_class (igsagent_t *agent,
         return;
     assert (my_class);
     assert (agent->definition);
+    if (agent->context && agent->context->node) {
+        igsagent_error(agent, "Agent is started and cannot change its class");
+        return;
+    }
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (agent->definition->my_class)
         free (agent->definition->my_class);
