@@ -3642,7 +3642,7 @@ igs_result_t igs_start_with_device (const char *network_device,
     }
 
     model_read_write_lock(__FUNCTION__, __LINE__);
-    core_context->network_device = s_strndup (network_device, IGS_NETWORK_DEVICE_LENGTH);
+    core_context->network_device = s_strndup (network_device, IGS_MAX_NETWORK_DEVICE_LENGTH);
 
 #if defined(__WINDOWS__)
     WORD version_requested = MAKEWORD (2, 2);
@@ -3658,7 +3658,7 @@ igs_result_t igs_start_with_device (const char *network_device,
     while (name) {
         //printf (" - name=%s address=%s netmask=%s broadcast=%s\n", name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist));
         if (streq (name, network_device)) {
-            core_context->ip_address = s_strndup (ziflist_address (iflist), IGS_IP_ADDRESS_LENGTH);
+            core_context->ip_address = s_strndup (ziflist_address (iflist), IGS_MAX_IP_ADDRESS_LENGTH);
             igs_info ("Starting with ip address %s and port %d on device %s", core_context->ip_address, port, network_device);
             break;
         }
@@ -3691,7 +3691,7 @@ igs_result_t igs_start_with_ip (const char *ip_address, unsigned int port)
     }
 
     model_read_write_lock(__FUNCTION__, __LINE__);
-    core_context->ip_address = s_strndup (ip_address, IGS_IP_ADDRESS_LENGTH);
+    core_context->ip_address = s_strndup (ip_address, IGS_MAX_IP_ADDRESS_LENGTH);
 
 #if defined(__WINDOWS__)
     WORD version_requested = MAKEWORD (2, 2);
@@ -3709,8 +3709,7 @@ igs_result_t igs_start_with_ip (const char *ip_address, unsigned int port)
         //                name, ziflist_address (iflist), ziflist_netmask (iflist),
         //                ziflist_broadcast (iflist));
         if (streq (ziflist_address (iflist), ip_address)) {
-            core_context->network_device =
-            s_strndup (name, IGS_NETWORK_DEVICE_LENGTH);
+            core_context->network_device = s_strndup (name, IGS_MAX_NETWORK_DEVICE_LENGTH);
             igs_info ("starting with ip address %s and port %d on device %s", ip_address, port, core_context->network_device);
             break;
         }
@@ -3836,7 +3835,7 @@ igs_result_t igs_start_with_brokers (const char *agent_endpoint)
     if (core_context->our_agent_endpoint)
         free (core_context->our_agent_endpoint);
     core_context->our_agent_endpoint =
-    s_strndup (agent_endpoint, IGS_IP_ADDRESS_LENGTH);
+    s_strndup (agent_endpoint, IGS_MAX_IP_ADDRESS_LENGTH);
 
     assert (core_context->brokers);
     if (zhash_size (core_context->brokers) == 0 && core_context->our_broker_endpoint == NULL) {
@@ -3907,6 +3906,7 @@ void igsagent_set_name (igsagent_t *agent, const char *name)
     if (!agent->uuid)
         return;
     assert (name && strlen (name) > 0);
+    assert(model_check_string(name, IGS_MAX_AGENT_NAME_LENGTH));
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (streq (agent->definition->name, name)){
         if (!agent->igs_channel){
@@ -3920,27 +3920,13 @@ void igsagent_set_name (igsagent_t *agent, const char *name)
         return;
     }
 
-    char *n = s_strndup (name, IGS_MAX_AGENT_NAME_LENGTH);
-    if (strlen (name) > IGS_MAX_AGENT_NAME_LENGTH)
-        printf("Agent name '%s' exceeds maximum size and will be truncated to '%s'\n", name, n);
-    bool invalid_name = false;
-    size_t length_ofn = strlen (n);
-    size_t i = 0;
-    for (i = 0; i < length_ofn; i++) {
-        if (n[i] == ' ' || n[i] == '.') {
-            n[i] = '_';
-            invalid_name = true;
-        }
-    }
-    if (invalid_name)
-        printf("Spaces and dots are not allowed in an agent name: '%s' has been changed to '%s'\n", name, n);
     char *previous = agent->definition->name;
-    agent->definition->name = n;
+    agent->definition->name = s_strndup (name, IGS_MAX_AGENT_NAME_LENGTH);
     if (!agent->definition->my_class)
-        agent->definition->my_class = strdup(n);
+        agent->definition->my_class = strdup(agent->definition->name);
     else if (previous && streq(agent->definition->my_class, previous)){
         free (agent->definition->my_class);
-        agent->definition->my_class = strdup(n);
+        agent->definition->my_class = strdup(agent->definition->name);
     }
     definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
@@ -4085,10 +4071,10 @@ void igsagent_set_state (igsagent_t *agent, const char *state)
         return;
     assert (state);
     model_read_write_lock(__FUNCTION__, __LINE__);
-    if (agent->state == NULL || !streq (state, agent->state)) {
+    if (!agent->state || !streq (state, agent->state)) {
         if (agent->state)
             free (agent->state);
-        agent->state = s_strndup (state, IGS_MAX_AGENT_NAME_LENGTH);
+        agent->state = s_strndup (state, IGS_MAX_STATE_LENGTH);
         if (agent->context && agent->context->node) {
             s_lock_zyre_peer (__FUNCTION__, __LINE__);
             zmsg_t *msg = zmsg_new ();
@@ -4210,7 +4196,7 @@ char *igs_command_line (void)
     model_read_write_lock(__FUNCTION__, __LINE__);
     char *res = NULL;
     if (core_context->command_line)
-        res = s_strndup (core_context->command_line, IGS_COMMAND_LINE_LENGTH);
+        res = s_strndup (core_context->command_line, IGS_MAX_COMMAND_LINE_LENGTH);
     model_read_write_unlock(__FUNCTION__, __LINE__);
     return res;
 }
@@ -4222,7 +4208,7 @@ void igs_set_command_line (const char *line)
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (core_context->command_line)
         free (core_context->command_line);
-    core_context->command_line = s_strndup (line, IGS_COMMAND_LINE_LENGTH);
+    core_context->command_line = s_strndup (line, IGS_MAX_COMMAND_LINE_LENGTH);
     igs_debug ("Command line set to %s", core_context->command_line);
     model_read_write_unlock(__FUNCTION__, __LINE__);
 }
@@ -4235,7 +4221,7 @@ void igs_set_command_line_from_args (int argc, const char **argv)
         return;
     }
     model_read_write_lock(__FUNCTION__, __LINE__);
-    char cmd[IGS_COMMAND_LINE_LENGTH] = "";
+    char cmd[IGS_MAX_COMMAND_LINE_LENGTH] = "";
 
 #if defined(__UNIX__)
     size_t ret;
@@ -4248,9 +4234,9 @@ void igs_set_command_line_from_args (int argc, const char **argv)
     char pathbuf[PROC_PIDPATHINFO_MAXSIZE];
     ret = proc_pidpath (pid, pathbuf, sizeof (pathbuf));
 #else
-    char pathbuf[IGS_COMMAND_LINE_LENGTH];
-    memset (pathbuf, 0, IGS_COMMAND_LINE_LENGTH);
-    ret = readlink ("/proc/self/exe", pathbuf, IGS_COMMAND_LINE_LENGTH);
+    char pathbuf[IGS_MAX_COMMAND_LINE_LENGTH];
+    memset (pathbuf, 0, IGS_MAX_COMMAND_LINE_LENGTH);
+    ret = readlink ("/proc/self/exe", pathbuf, IGS_MAX_COMMAND_LINE_LENGTH);
 #endif
     if (ret <= 0) {
         igs_error ("PID %d: proc_pidpath () - %s", pid, strerror (errno));
@@ -4260,7 +4246,7 @@ void igs_set_command_line_from_args (int argc, const char **argv)
     igs_debug ("proc %d: %s", pid, pathbuf);
 
 
-    if (strlen (pathbuf) > IGS_COMMAND_LINE_LENGTH) {
+    if (strlen (pathbuf) > IGS_MAX_COMMAND_LINE_LENGTH) {
         igs_error ("path is too long: %s", pathbuf);
         model_read_write_unlock(__FUNCTION__, __LINE__);
         return;
@@ -4280,9 +4266,9 @@ void igs_set_command_line_from_args (int argc, const char **argv)
 #endif
 
     if (strchr (cmd, ' ') || strchr (cmd, '\"')) {
-        if (strlen (cmd) + 1 > IGS_COMMAND_LINE_LENGTH) {
+        if (strlen (cmd) + 1 > IGS_MAX_COMMAND_LINE_LENGTH) {
             igs_error ("Path to our executable exceeds the maximum buffer size of %d. Command line won't be set.",
-                       IGS_COMMAND_LINE_LENGTH);
+                       IGS_MAX_COMMAND_LINE_LENGTH);
             model_read_write_unlock(__FUNCTION__, __LINE__);
             return;
         }
@@ -4292,9 +4278,9 @@ void igs_set_command_line_from_args (int argc, const char **argv)
         char *prev = cmd_bis;
         char *it = strchr (cmd_bis, '\"');
         while (it) {
-            if (strlen (cmd) + (it - prev + 2) > IGS_COMMAND_LINE_LENGTH) {
+            if (strlen (cmd) + (it - prev + 2) > IGS_MAX_COMMAND_LINE_LENGTH) {
                 igs_error ("Path to our executable exceeds the maximum buffer size of "
-                           "%d. Command line won't be set.", IGS_COMMAND_LINE_LENGTH);
+                           "%d. Command line won't be set.", IGS_MAX_COMMAND_LINE_LENGTH);
                 return;
             }
             strncat (cmd, prev, (it - prev + 1));
@@ -4302,9 +4288,9 @@ void igs_set_command_line_from_args (int argc, const char **argv)
             prev = it + 1;
             it = strchr (it + 1, '\"');
         }
-        if (strlen (cmd) + strlen (prev) + 2 > IGS_COMMAND_LINE_LENGTH) {
+        if (strlen (cmd) + strlen (prev) + 2 > IGS_MAX_COMMAND_LINE_LENGTH) {
             igs_error ("Path to our executable exceeds the maximum buffer size of %d. "
-                       "Command line won't be set.", IGS_COMMAND_LINE_LENGTH);
+                       "Command line won't be set.", IGS_MAX_COMMAND_LINE_LENGTH);
             return;
         }
         strcat (cmd, prev);
@@ -4315,7 +4301,7 @@ void igs_set_command_line_from_args (int argc, const char **argv)
 
     int i = 1;
     for (; i < argc; i++) {
-        char *formated_arg = (char *) zmalloc (IGS_COMMAND_LINE_LENGTH * sizeof (char));
+        char *formated_arg = (char *) zmalloc (IGS_MAX_COMMAND_LINE_LENGTH * sizeof (char));
         if (strchr (argv[i], ' ') || strchr (argv[i], '\"')) {
             strcat (formated_arg, "\"");
             const char *prev = argv[i];
@@ -4332,7 +4318,7 @@ void igs_set_command_line_from_args (int argc, const char **argv)
         else
             strcpy (formated_arg, argv[i]);
 
-        if (strlen (cmd) + strlen (formated_arg) + 2 > IGS_COMMAND_LINE_LENGTH) { // 2 is for space and EOL
+        if (strlen (cmd) + strlen (formated_arg) + 2 > IGS_MAX_COMMAND_LINE_LENGTH) { // 2 is for space and EOL
             igs_error ("passed arguments exceed buffer size: concatenation will stop here with '%s'", cmd);
             free(formated_arg);
             break;
@@ -4345,7 +4331,7 @@ void igs_set_command_line_from_args (int argc, const char **argv)
     }
     if (core_context->command_line)
         free (core_context->command_line);
-    core_context->command_line = s_strndup (cmd, IGS_COMMAND_LINE_LENGTH);
+    core_context->command_line = s_strndup (cmd, IGS_MAX_COMMAND_LINE_LENGTH);
     model_read_write_unlock(__FUNCTION__, __LINE__);
 }
 
@@ -4384,8 +4370,8 @@ char** igs_net_devices_list (int *nb)
         //        printf (" - name=%s address=%s netmask=%s broadcast=%s\n",
         //                name, ziflist_address (iflist), ziflist_netmask (iflist),
         //                ziflist_broadcast (iflist));
-        devices[current_device_nb] = (char *) zmalloc ((IGS_NETWORK_DEVICE_LENGTH + 1) * sizeof (char));
-        strncpy (devices[current_device_nb], name, IGS_NETWORK_DEVICE_LENGTH);
+        devices[current_device_nb] = (char *) zmalloc ((IGS_MAX_NETWORK_DEVICE_LENGTH + 1) * sizeof (char));
+        strncpy (devices[current_device_nb], name, IGS_MAX_NETWORK_DEVICE_LENGTH);
         current_device_nb++;
         name = ziflist_next (iflist);
     }
@@ -4467,7 +4453,7 @@ igs_result_t igs_enable_security (const char *private_certificate_file,
     if (private_certificate_file) {
         char private_key_path[IGS_MAX_PATH_LENGTH] = "";
         admin_make_file_path (private_certificate_file, private_key_path,
-                                IGS_MAX_PATH_LENGTH);
+                              IGS_MAX_PATH_LENGTH);
         zcert_t *new_certificate = zcert_load (private_key_path);
         if (new_certificate == NULL) {
             igs_error ("could not load private certificate at '%s'",

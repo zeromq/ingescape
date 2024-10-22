@@ -708,6 +708,9 @@ void core_observeIOPCallback (igsagent_t *agent,
 void igs_observe_input (const char *name, igs_io_fn cb, void *my_data)
 {
     core_init_agent ();
+    assert(name);
+    assert(model_check_string(name, IGS_MAX_IO_NAME_LENGTH));
+    assert(cb);
     model_read_write_lock(__FUNCTION__, __LINE__);
     observe_io_cb_wrapper_t *wrap = (observe_io_cb_wrapper_t *) zmalloc (sizeof (observe_io_cb_wrapper_t));
     wrap->cb = cb;
@@ -715,18 +718,21 @@ void igs_observe_input (const char *name, igs_io_fn cb, void *my_data)
     observed_io_t *observed_io = zhashx_lookup(core_context->observed_inputs, name);
     if (!observed_io) {
         observed_io = (observed_io_t *) zmalloc (sizeof (observed_io_t));
-        observed_io->name = strdup (name);
+        observed_io->name = s_strndup (name, IGS_MAX_IO_NAME_LENGTH);
         observed_io->observed_io_wrappers = zlist_new();
-        zhashx_insert(core_context->observed_inputs, name, observed_io);
+        zhashx_insert(core_context->observed_inputs, observed_io->name, observed_io);
     }
     zlist_append(observed_io->observed_io_wrappers, wrap);
     model_read_write_unlock(__FUNCTION__, __LINE__);
-    igsagent_observe_input (core_agent, name, core_observeIOPCallback, wrap);
+    igsagent_observe_input (core_agent, observed_io->name, core_observeIOPCallback, wrap);
 }
 
 void igs_observe_output (const char *name, igs_io_fn cb, void *my_data)
 {
     core_init_agent ();
+    assert(name);
+    assert(model_check_string(name, IGS_MAX_IO_NAME_LENGTH));
+    assert(cb);
     model_read_write_lock(__FUNCTION__, __LINE__);
     observe_io_cb_wrapper_t *wrap = (observe_io_cb_wrapper_t *) zmalloc (sizeof (observe_io_cb_wrapper_t));
     wrap->cb = cb;
@@ -734,18 +740,21 @@ void igs_observe_output (const char *name, igs_io_fn cb, void *my_data)
     observed_io_t *observed_io = zhashx_lookup(core_context->observed_outputs, name);
     if (!observed_io) {
         observed_io = (observed_io_t *) zmalloc (sizeof (observed_io_t));
-        observed_io->name = strdup (name);
+        observed_io->name = s_strndup (name, IGS_MAX_IO_NAME_LENGTH);
         observed_io->observed_io_wrappers = zlist_new();
-        zhashx_insert(core_context->observed_outputs, name, observed_io);
+        zhashx_insert(core_context->observed_outputs, observed_io->name, observed_io);
     }
     zlist_append(observed_io->observed_io_wrappers, wrap);
     model_read_write_unlock(__FUNCTION__, __LINE__);
-    igsagent_observe_output (core_agent, name, core_observeIOPCallback, wrap);
+    igsagent_observe_output (core_agent, observed_io->name, core_observeIOPCallback, wrap);
 }
 
 void igs_observe_attribute (const char *name, igs_io_fn cb, void *my_data)
 {
     core_init_agent ();
+    assert(name);
+    assert(model_check_string(name, IGS_MAX_IO_NAME_LENGTH));
+    assert(cb);
     model_read_write_lock(__FUNCTION__, __LINE__);
     observe_io_cb_wrapper_t *wrap = (observe_io_cb_wrapper_t *) zmalloc (sizeof (observe_io_cb_wrapper_t));
     wrap->cb = cb;
@@ -753,13 +762,13 @@ void igs_observe_attribute (const char *name, igs_io_fn cb, void *my_data)
     observed_io_t *observed_io = zhashx_lookup(core_context->observed_attributes, name);
     if (!observed_io) {
         observed_io = (observed_io_t *) zmalloc (sizeof (observed_io_t));
-        observed_io->name = strdup (name);
+        observed_io->name = s_strndup (name, IGS_MAX_IO_NAME_LENGTH);
         observed_io->observed_io_wrappers = zlist_new();
-        zhashx_insert(core_context->observed_attributes, name, observed_io);
+        zhashx_insert(core_context->observed_attributes, observed_io->name, observed_io);
     }
     zlist_append(observed_io->observed_io_wrappers, wrap);
     model_read_write_unlock(__FUNCTION__, __LINE__);
-    igsagent_observe_attribute (core_agent, name, core_observeIOPCallback, wrap);
+    igsagent_observe_attribute (core_agent, observed_io->name, core_observeIOPCallback, wrap);
 }
 
 void igs_output_mute (const char *name)
@@ -1179,8 +1188,8 @@ void igs_log (igs_log_level_t level,
     core_init_agent ();
     va_list list;
     va_start (list, format);
-    char content[IGS_MAX_STRING_MSG_LENGTH] = "";
-    vsnprintf (content, IGS_MAX_STRING_MSG_LENGTH - 1, format, list);
+    char content[IGS_MAX_LOG_LENGTH] = "";
+    vsnprintf (content, IGS_MAX_LOG_LENGTH - 1, format, list);
     va_end (list);
     admin_log (core_agent, level, function, "%s", content);
 }
@@ -1239,16 +1248,29 @@ igs_result_t
 igs_service_init (const char *name, igs_service_fn cb, void *my_data)
 {
     assert (name && strlen (name) > 0);
+    assert(model_check_string(name, IGS_MAX_SERVICE_NAME_LENGTH));
     assert (cb);
     core_init_agent ();
     model_read_write_lock(__FUNCTION__, __LINE__);
-    service_cb_wrapper_t *wrap = (service_cb_wrapper_t *) zmalloc (sizeof (service_cb_wrapper_t));
-    wrap->name = strdup (name);
-    wrap->cb = cb;
-    wrap->my_data = my_data;
-    zhashx_insert(core_context->service_cb_wrappers, name, wrap);
+    service_cb_wrapper_t *wrap = zhashx_lookup(core_context->service_cb_wrappers, name);
+    if (!wrap){
+        wrap = (service_cb_wrapper_t *) zmalloc (sizeof (service_cb_wrapper_t));
+        wrap->name = s_strndup (name, IGS_MAX_SERVICE_NAME_LENGTH);
+        wrap->cb = cb;
+        wrap->my_data = my_data;
+        zhashx_insert(core_context->service_cb_wrappers, wrap->name, wrap);
+    } else {
+        igs_error ("service with name %s exists and already has a callback", name);
+        model_read_write_unlock(__FUNCTION__, __LINE__);
+        return IGS_FAILURE;
+    }
     model_read_write_unlock(__FUNCTION__, __LINE__);
-    return igsagent_service_init (core_agent, name, core_service_callback, wrap);
+    if (igsagent_service_init (core_agent, wrap->name, core_service_callback, wrap) == IGS_FAILURE){
+        zhashx_delete(core_context->service_cb_wrappers, wrap->name);
+        s_core_free_service_cb_wrapper(&wrap);
+        return IGS_FAILURE;
+    }
+    return IGS_SUCCESS;
 }
 
 igs_result_t igs_service_remove (const char *name)

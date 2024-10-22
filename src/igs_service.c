@@ -465,6 +465,7 @@ igs_result_t igsagent_service_init (igsagent_t *agent,
     if (!agent->uuid)
         return IGS_FAILURE;
     assert (name && strlen (name) > 0);
+    assert(model_check_string(name, IGS_MAX_SERVICE_NAME_LENGTH));
     assert (cb);
     assert(agent->definition);
     
@@ -477,11 +478,7 @@ igs_result_t igsagent_service_init (igsagent_t *agent,
     }else if (!s){
         // service is completely new: allocate it
         s = (igs_service_t *) zmalloc (sizeof (igs_service_t));
-        if (strnlen (name, IGS_MAX_STRING_MSG_LENGTH) == IGS_MAX_STRING_MSG_LENGTH) {
-            s->name = s_strndup (name, IGS_MAX_STRING_MSG_LENGTH);
-            igsagent_warn (agent, "service name has been shortened to %s", s->name);
-        } else
-            s->name = s_strndup (name, IGS_MAX_STRING_MSG_LENGTH);
+        s->name = s_strndup (name, IGS_MAX_SERVICE_NAME_LENGTH);
         s->replies_names_ordered = zlist_new();
         zlist_comparefn(s->replies_names_ordered, (zlist_compare_fn*) strcmp);
         zlist_autofree(s->replies_names_ordered);
@@ -530,6 +527,7 @@ igs_result_t igsagent_service_arg_add (igsagent_t *agent,
         return IGS_FAILURE;
     assert (service_name);
     assert (arg_name && strlen (arg_name) > 0);
+    assert(model_check_string(arg_name, IGS_MAX_SERVICE_ARG_NAME_LENGTH));
     assert (agent->definition);
     if (type == IGS_IMPULSION_T) {
         igsagent_error (agent, "impulsion type is not allowed as a service argument");
@@ -547,12 +545,7 @@ igs_result_t igsagent_service_arg_add (igsagent_t *agent,
         return IGS_FAILURE;
     }
     igs_service_arg_t *a = (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
-    if (strnlen (arg_name, IGS_MAX_STRING_MSG_LENGTH) == IGS_MAX_STRING_MSG_LENGTH) {
-        a->name = s_strndup (arg_name, IGS_MAX_STRING_MSG_LENGTH);
-        igsagent_warn (agent, "service argument name has been shortened to %s", a->name);
-    }
-    else
-        a->name = s_strndup (arg_name, IGS_MAX_STRING_MSG_LENGTH);
+    a->name = s_strndup (arg_name, IGS_MAX_SERVICE_ARG_NAME_LENGTH);
     switch (type) {
         case IGS_BOOL_T:
             a->size = sizeof (bool);
@@ -639,6 +632,7 @@ igs_result_t igsagent_service_reply_add(igsagent_t *agent, const char *service_n
         return IGS_FAILURE;
     assert (service_name);
     assert (reply_name);
+    assert(model_check_string(reply_name, IGS_MAX_SERVICE_NAME_LENGTH));
     assert (agent->definition);
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_service_t *s = zhashx_lookup(agent->definition->services_table, service_name);
@@ -654,11 +648,7 @@ igs_result_t igsagent_service_reply_add(igsagent_t *agent, const char *service_n
         return IGS_FAILURE;
     }
     r = (igs_service_t *) zmalloc (sizeof (igs_service_t));
-    if (strnlen (reply_name, IGS_MAX_STRING_MSG_LENGTH) == IGS_MAX_STRING_MSG_LENGTH) {
-        r->name = s_strndup (reply_name, IGS_MAX_STRING_MSG_LENGTH);
-        igsagent_warn (agent, "service name has been shortened to %s", r->name);
-    } else
-        r->name = s_strndup (reply_name, IGS_MAX_STRING_MSG_LENGTH);
+    r->name = s_strndup (reply_name, IGS_MAX_SERVICE_NAME_LENGTH);
     r->replies_names_ordered = zlist_new();
     zlist_comparefn(r->replies_names_ordered, (zlist_compare_fn*) strcmp);
     zlist_autofree(r->replies_names_ordered);
@@ -710,6 +700,7 @@ igs_result_t igsagent_service_reply_arg_add(igsagent_t *agent, const char *servi
     assert (service_name);
     assert (reply_name);
     assert (arg_name);
+    assert(model_check_string(arg_name, IGS_MAX_SERVICE_ARG_NAME_LENGTH));
     assert (agent->definition);
     model_read_write_lock(__FUNCTION__, __LINE__);
     igs_service_t *s = zhashx_lookup(agent->definition->services_table, service_name);
@@ -720,7 +711,7 @@ igs_result_t igsagent_service_reply_arg_add(igsagent_t *agent, const char *servi
     }
     igs_service_t *r = zhashx_lookup(s->replies, reply_name);
     if (!r){
-        igsagent_error (agent, "service with name %s  has no reply named %s", service_name, reply_name);
+        igsagent_error (agent, "service with name %s has no reply named %s", service_name, reply_name);
         model_read_write_unlock(__FUNCTION__, __LINE__);
         return IGS_FAILURE;
     }
@@ -735,11 +726,7 @@ igs_result_t igsagent_service_reply_arg_add(igsagent_t *agent, const char *servi
         return IGS_FAILURE;
     }
     igs_service_arg_t *a = (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
-    if (strnlen (arg_name, IGS_MAX_STRING_MSG_LENGTH) == IGS_MAX_STRING_MSG_LENGTH) {
-        a->name = s_strndup (arg_name, IGS_MAX_STRING_MSG_LENGTH);
-        igsagent_warn (agent, "service argument name has been shortened to %s", a->name);
-    } else
-        a->name = s_strndup (arg_name, IGS_MAX_STRING_MSG_LENGTH);
+    a->name = s_strndup (arg_name, IGS_MAX_SERVICE_ARG_NAME_LENGTH);
     switch (type) {
         case IGS_BOOL_T:
             a->size = sizeof (bool);

@@ -32,7 +32,7 @@
 //  INGESCAPE version macros for compile-time API detection
 #define INGESCAPE_VERSION_MAJOR 4
 #define INGESCAPE_VERSION_MINOR 2
-#define INGESCAPE_VERSION_PATCH 5
+#define INGESCAPE_VERSION_PATCH 6
 
 #define INGESCAPE_MAKE_VERSION(major, minor, patch) \
 ((major) * 10000 + (minor) * 100 + (patch))
@@ -86,22 +86,30 @@ typedef struct _igs_json_t igs_json_t;
 typedef struct _igs_json_node_t igs_json_node_t;
 typedef struct _igs_service_arg_t igs_service_arg_t;
 
-#define IGS_MAX_PATH_LENGTH 4096             //
-#define IGS_MAX_IO_NAME_LENGTH 1024          //
 #define IGS_AGENT_UUID_LENGTH 32             //
+#define IGS_MAX_PATH_LENGTH 4096             //
+#define IGS_MAX_STATE_LENGTH 4096            //
+#define IGS_MAX_IO_NAME_LENGTH 1024          //
+#define IGS_MAX_SERVICE_NAME_LENGTH 1024     //
+#define IGS_MAX_SERVICE_ARG_NAME_LENGTH 1024 //
 #define IGS_MAX_AGENT_NAME_LENGTH 1024       //
-#define IGS_MAX_DESCRIPTION_LENGTH 4096      //
+#define IGS_MAX_AGENT_CLASS_LENGTH 1024      //
+#define IGS_MAX_AGENT_PACKAGE_LENGTH 4096    //
+#define IGS_MAX_DESCRIPTION_LENGTH 4096*4096 //
 #define IGS_MAX_FAMILY_LENGTH 64             //
 #define IGS_MAX_VERSION_LENGTH 64            //
+#define IGS_MAX_DETAILED_TYPE_LENGTH 1024    //
+#define IGS_MAX_SPECIFICATION_LENGTH 4096*4096
+#define IGS_MAX_CONSTRAINT_LENGTH 4096       //
 #define IGS_MAX_LOG_LENGTH 4096              //
-#define IGS_COMMAND_LINE_LENGTH 4096         //
-#define IGS_NETWORK_DEVICE_LENGTH 1024       //
-#define IGS_IP_ADDRESS_LENGTH 1024           //
-#define IGS_MAX_PEER_ID_LENGTH 128           //
-#define IGS_DEFAULT_IPC_FOLDER_PATH "/tmp/ingescape/"  //
 #define IGS_MAX_STRING_MSG_LENGTH 4096       //
+#define IGS_MAX_PEER_ID_LENGTH 128           //
+#define IGS_MAX_COMMAND_LINE_LENGTH 4096     //
+#define IGS_MAX_NETWORK_DEVICE_LENGTH 1024   //
+#define IGS_MAX_IP_ADDRESS_LENGTH 1024       //
 #define IGS_DEFAULT_WORKER_CREDIT 3          //
-#define IGS_DEFAULT_LOG_DIR "~/Documents/Ingescape/logs/"  //
+#define IGS_DEFAULT_IPC_FOLDER_PATH "/tmp/ingescape/"
+#define IGS_DEFAULT_LOG_DIR "~/Documents/Ingescape/logs/"
 
 #ifdef __cplusplus
 extern "C" {
@@ -428,10 +436,10 @@ INGESCAPE_EXPORT igs_service_arg_t * igs_service_args_clone(igs_service_arg_t *l
  Requires to pass an agent name or UUID, a service name and a list of arguments specific to the service.
  Token is an optional information to help routing replies.
  Passed arguments list will be deallocated and destroyed by the call. */
-INGESCAPE_EXPORT igs_result_t igs_service_call (const char *agent_name_or_uuid,
-                                                const char *service_name,
-                                                igs_service_arg_t **list,
-                                                const char *token);
+INGESCAPE_EXPORT igs_result_t igs_service_call(const char *agent_name_or_uuid,
+                                               const char *service_name,
+                                               igs_service_arg_t **list,
+                                               const char *token);
 
 /*create /remove / edit a service offered by our agent
  WARNING: only one callback shall be attached to a service

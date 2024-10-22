@@ -413,7 +413,7 @@ igs_result_t s_model_add_constraint (igsagent_t *self, igs_io_type_t type,
             if (type == IGS_ATTRIBUTE_T) {
                 io = zhashx_lookup (self->definition->attributes_table, name);
                 if (!io) {
-                    igsagent_error (self, "Parameter %s cannot be found", name);
+                    igsagent_error (self, "Attribute %s cannot be found", name);
                     return IGS_FAILURE;
                 }
             }
@@ -474,7 +474,7 @@ igs_result_t s_model_set_description(igsagent_t *self, igs_io_type_t type,
             }
     if (io->description)
         free(io->description);
-    io->description = s_strndup(description, IGS_MAX_LOG_LENGTH);
+    io->description = s_strndup(description, IGS_MAX_DESCRIPTION_LENGTH);
     return IGS_SUCCESS;
 }
 
@@ -485,6 +485,7 @@ igs_result_t s_model_set_detailed_type(igsagent_t *self, igs_io_type_t type,
     assert(self);
     assert(name);
     assert(type_name);
+    assert(model_check_string(type_name, IGS_MAX_DETAILED_TYPE_LENGTH));
     assert(specification);
     igs_io_t *io = NULL;
     if (type == IGS_INPUT_T) {
@@ -516,10 +517,10 @@ igs_result_t s_model_set_detailed_type(igsagent_t *self, igs_io_type_t type,
             }
     if (io->detailed_type)
         free(io->detailed_type);
-    io->detailed_type = s_strndup(type_name, IGS_MAX_LOG_LENGTH);
+    io->detailed_type = s_strndup(type_name, IGS_MAX_DETAILED_TYPE_LENGTH);
     if (io->specification)
         free(io->specification);
-    io->specification = s_strndup(specification, IGS_MAX_LOG_LENGTH);
+    io->specification = s_strndup(specification, IGS_MAX_SPECIFICATION_LENGTH);
     return IGS_SUCCESS;
 }
 
@@ -770,6 +771,59 @@ uint8_t *model_string_to_bytes (char *string)
         index++;
     }
     return data;
+}
+
+size_t model_clean_string(char *string, int64_t max){
+    assert(string);
+    if (max <= 0)
+        max = INT64_MAX;
+    char *char_index = string;
+    size_t offset = 0;
+    size_t write_index = 0;
+    while (1) {
+        while (*(char_index+offset) == '\t'
+            || *(char_index+offset) == '\v'
+            || *(char_index+offset) == '\r'
+            || *(char_index+offset) == '\n'
+            || *(char_index+offset) == '\f'){
+            offset++;
+        }
+        if (offset)
+            string[write_index] = *(char_index + offset);
+        if (string[write_index] == '\0')
+            break;
+        write_index++;
+        char_index++;
+        if (write_index == max){
+            string[write_index] = '\0';
+            offset++; //to signal a change
+            break;
+        }
+    }
+    return offset;
+}
+
+bool model_check_string(const char *string, int64_t max){
+    assert(string);
+    if (max <= 0)
+        max = INT64_MAX;
+    size_t offset = 0;
+    while (1) {
+        if (string[offset] == '\t'
+            || string[offset] == '\v'
+            || string[offset] == '\r'
+            || string[offset] == '\n'
+            || string[offset] == '\f'){
+            igs_error("string '%s' contains invalid characters", string);
+            return false;
+        }
+        if (string[offset] == '\0')
+            break;
+        if (offset >= max)
+            return false;
+        offset++;
+    }
+    return true;
 }
 
 igs_mutex_t s_model_read_write_mutex;

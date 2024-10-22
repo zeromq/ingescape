@@ -128,6 +128,7 @@ igs_io_t *definition_create_io (igsagent_t *agent,
 {
     assert (agent);
     assert (name);
+    assert(model_check_string(name, IGS_MAX_IO_NAME_LENGTH));
     assert (agent->definition);
     if (value_type < IGS_UNKNOWN_T || value_type > IGS_DATA_T){
         igsagent_error(agent, "invalid value type %d", value_type);
@@ -135,19 +136,7 @@ igs_io_t *definition_create_io (igsagent_t *agent,
     }
     igs_io_t *io = (igs_io_t *) zmalloc (sizeof (igs_io_t));
     io->io_callbacks = zlist_new();
-    char *n = s_strndup (name, IGS_MAX_IO_NAME_LENGTH);
-    bool space_in_name = false;
-    size_t length_of_n = strlen (n);
-    size_t i = 0;
-    for (i = 0; i < length_of_n; i++) {
-        if (n[i] == ' ') {
-            n[i] = '_';
-            space_in_name = true;
-        }
-    }
-    if (space_in_name)
-        igsagent_warn (agent, "spaces are not allowed in IOP name: '%s' has been renamed to '%s'", name, n);
-    io->name = n;
+    io->name = s_strndup (name, IGS_MAX_IO_NAME_LENGTH);
     io->type = type;
     io->value_type = value_type;
     switch (type) {
@@ -172,7 +161,7 @@ igs_io_t *definition_create_io (igsagent_t *agent,
         default:
             break;
     }
-    model_write (agent, n, type, value_type, value, size);
+    model_write (agent, io->name, type, value_type, value, size);
     return io;
 }
 
@@ -395,6 +384,7 @@ void igsagent_set_family (igsagent_t *agent, const char *family)
         return;
     assert (agent->definition);
     assert (family);
+    assert(model_check_string(family, IGS_MAX_FAMILY_LENGTH));
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (agent->definition->family)
         free (agent->definition->family);
@@ -411,6 +401,7 @@ void igsagent_definition_set_package (igsagent_t *agent,
     if (!agent->uuid)
         return;
     assert (package);
+    assert(model_check_string(package, IGS_MAX_AGENT_PACKAGE_LENGTH));
     assert (agent->definition);
     if (agent->context && agent->context->node) {
         igsagent_error(agent, "Agent is started and cannot change its package");
@@ -419,7 +410,7 @@ void igsagent_definition_set_package (igsagent_t *agent,
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (agent->definition->package)
         free (agent->definition->package);
-    agent->definition->package = s_strndup (package, IGS_MAX_DESCRIPTION_LENGTH);
+    agent->definition->package = s_strndup (package, IGS_MAX_AGENT_PACKAGE_LENGTH);
     definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
     model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -432,6 +423,7 @@ void igsagent_definition_set_class (igsagent_t *agent,
     if (!agent->uuid)
         return;
     assert (my_class);
+    assert(model_check_string(my_class, IGS_MAX_AGENT_CLASS_LENGTH));
     assert (agent->definition);
     if (agent->context && agent->context->node) {
         igsagent_error(agent, "Agent is started and cannot change its class");
@@ -440,14 +432,14 @@ void igsagent_definition_set_class (igsagent_t *agent,
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (agent->definition->my_class)
         free (agent->definition->my_class);
-    agent->definition->my_class = s_strndup (my_class, IGS_MAX_DESCRIPTION_LENGTH);
+    agent->definition->my_class = s_strndup (my_class, IGS_MAX_AGENT_CLASS_LENGTH);
     definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
     model_read_write_unlock(__FUNCTION__, __LINE__);
 }
 
 void igsagent_definition_set_description (igsagent_t *agent,
-                                           const char *description)
+                                          const char *description)
 {
     assert (agent);
     if (!agent->uuid)
@@ -463,12 +455,14 @@ void igsagent_definition_set_description (igsagent_t *agent,
     model_read_write_unlock(__FUNCTION__, __LINE__);
 }
 
-void igsagent_definition_set_version (igsagent_t *agent, const char *version)
+void igsagent_definition_set_version (igsagent_t *agent,
+                                      const char *version)
 {
     assert (agent);
     if (!agent->uuid)
         return;
     assert (version);
+    assert(model_check_string(version, IGS_MAX_VERSION_LENGTH));
     assert (agent->definition);
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (agent->definition->version)

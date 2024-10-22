@@ -389,82 +389,26 @@ uint64_t igsagent_mapping_add (igsagent_t *agent,
     assert (agent);
     if (!agent->uuid)
         return 0;
-    assert (from_our_input && strlen (from_our_input) > 0);
-    assert (to_agent && strlen (to_agent) > 0);
-    assert (with_output && strlen (with_output) > 0);
-    
-    char *a_name = igsagent_name (agent);
-    if (!a_name)
-        return 0;
+    assert(from_our_input && strlen (from_our_input) > 0);
+    assert(model_check_string(from_our_input, IGS_MAX_IO_NAME_LENGTH));
+    assert(to_agent && strlen (to_agent) > 0);
+    assert(model_check_string(to_agent, IGS_MAX_AGENT_NAME_LENGTH));
+    assert(with_output && strlen (with_output) > 0);
+    assert(model_check_string(with_output, IGS_MAX_IO_NAME_LENGTH));
     
     model_read_write_lock(__FUNCTION__, __LINE__);
-    // from_our_input
-    char *reviewed_from_our_input = s_strndup (from_our_input, IGS_MAX_IO_NAME_LENGTH);
-    bool space_in_name = false;
-    size_t i = 0;
-    size_t length_of_reviewed_from_our_input = strlen (reviewed_from_our_input);
-    for (i = 0; i < length_of_reviewed_from_our_input; i++) {
-        if (reviewed_from_our_input[i] == ' ') {
-            space_in_name = true;
-            break;
-        }
-    }
-    if (space_in_name) {
-        igsagent_error (agent, "spaces are not allowed in IOP name '%s'",from_our_input);
-        free (reviewed_from_our_input);
-        model_read_write_unlock(__FUNCTION__, __LINE__);
-        return 0;
-    }
-    
-    // to_agent
-    char *reviewed_to_agent = s_strndup (to_agent, IGS_MAX_IO_NAME_LENGTH);
-    size_t length_of_reviewed_to_agent = strlen (reviewed_to_agent);
-    space_in_name = false;
-    for (i = 0; i < length_of_reviewed_to_agent; i++) {
-        if (reviewed_to_agent[i] == ' ') {
-            space_in_name = true;
-            break;
-        }
-    }
-    if (space_in_name) {
-        igsagent_error (agent, "spaces are not allowed in agent name '%s'", to_agent);
-        free (reviewed_from_our_input);
-        free (reviewed_to_agent);
-        model_read_write_unlock(__FUNCTION__, __LINE__);
-        return 0;
-    }
-    
-    if (streq (reviewed_to_agent, a_name))
-        igsagent_warn (agent, "mapping inputs to outputs of the same agent will not work EXCEPT from one clone or variant to others");
-    free (a_name);
-    
-    // with_output
-    char *reviewed_with_output = s_strndup (with_output, IGS_MAX_IO_NAME_LENGTH);
-    size_t length_of_reviewed_with_output = strlen (reviewed_with_output);
-    space_in_name = false;
-    for (i = 0; i < length_of_reviewed_with_output; i++) {
-        if (reviewed_with_output[i] == ' ') {
-            space_in_name = true;
-            break;
-        }
-    }
-    if (space_in_name) {
-        igsagent_error (agent, "spaces are not allowed in IOP '%s'", with_output);
-        free (reviewed_from_our_input);
-        free (reviewed_to_agent);
-        free (reviewed_with_output);
-        return 0;
-    }
-    
     assert (agent->mapping);
+    if (agent->definition && agent->definition->name && streq (to_agent, agent->definition->name))
+        igsagent_warn (agent, "mapping inputs to outputs of the same agent will not work EXCEPT from one clone or variant to others");
+    
     // Add the new mapping element if not already there
     size_t len = strlen (from_our_input) + strlen (to_agent) + strlen (with_output) + 2 + 1;
     char *mashup = (char *) zmalloc (len * sizeof (char));
-    strcpy (mashup, reviewed_from_our_input);
+    strcpy (mashup, from_our_input);
     strcat (mashup, "."); // separator
-    strcat (mashup, reviewed_to_agent);
+    strcat (mashup, to_agent);
     strcat (mashup, "."); // separator
-    strcat (mashup, reviewed_with_output);
+    strcat (mashup, with_output);
     mashup[len - 1] = '\0';
     uint64_t hash = mapping_djb2_hash ((unsigned char *) mashup);
     free (mashup);
@@ -480,17 +424,14 @@ uint64_t igsagent_mapping_add (igsagent_t *agent,
     }
     if (!mapping_already_exists) {
         // NB: we allow mappings involving inputs that do not exist (ever, yet or anymore)
-        igs_map_t *new = mapping_create_mapping_element (reviewed_from_our_input, reviewed_to_agent, reviewed_with_output);
+        igs_map_t *new = mapping_create_mapping_element (from_our_input, to_agent, with_output);
         new->id = hash;
         zlist_append(agent->mapping->map_elements, new);
         mapping_update_json(agent->mapping);
         agent->network_need_to_send_mapping_update = true;
     } else
-        igsagent_debug (agent,"mapping combination %s->%s.%s already exists : will not be duplicated",
-                        reviewed_from_our_input, reviewed_to_agent, reviewed_with_output);
-    free (reviewed_from_our_input);
-    free (reviewed_to_agent);
-    free (reviewed_with_output);
+        igsagent_debug (agent,"mapping combination %s->%s.%s already exists and will not be duplicated",
+                        from_our_input, to_agent, with_output);
     model_read_write_unlock(__FUNCTION__, __LINE__);
     return hash;
 }
