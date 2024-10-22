@@ -3166,7 +3166,7 @@ void s_init_loop (igs_core_context_t *context)
     // create channel for replay
     assert (context->replay_channel == NULL);
     context->replay_channel = (char *) zmalloc (strlen (core_agent->definition->name) + strlen ("-IGS-REPLAY") + 1);
-    snprintf (context->replay_channel, IGS_MAX_AGENT_NAME_LENGTH + 15,
+    snprintf (context->replay_channel, strlen (core_agent->definition->name) + strlen ("-IGS-REPLAY") + 1,
               "%s-IGS-REPLAY", core_agent->definition->name);
     s_lock_zyre_peer (__FUNCTION__, __LINE__);
     zyre_join (context->node, context->replay_channel);
@@ -3913,7 +3913,7 @@ void igsagent_set_name (igsagent_t *agent, const char *name)
             //name is already set in definition but channel is not set yet
             //NB: this happens when a JSON definition is loaded
             agent->igs_channel = (char *) zmalloc (strlen (agent->definition->name) + strlen ("-IGS") + 1);
-            snprintf (agent->igs_channel, IGS_MAX_AGENT_NAME_LENGTH + strlen ("-IGS") + 1,
+            snprintf (agent->igs_channel, strlen (agent->definition->name) + strlen ("-IGS") + 1,
                       "%s-IGS", agent->definition->name);
         }
         model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -3934,13 +3934,13 @@ void igsagent_set_name (igsagent_t *agent, const char *name)
     if (agent->igs_channel)
         free (agent->igs_channel);
     agent->igs_channel = (char *) zmalloc (strlen (agent->definition->name) + strlen ("-IGS") + 1);
-    snprintf (agent->igs_channel, IGS_MAX_AGENT_NAME_LENGTH + strlen ("-IGS") + 1,
+    snprintf (agent->igs_channel, strlen (agent->definition->name) + strlen ("-IGS") + 1,
               "%s-IGS", agent->definition->name);
 
     if (agent->context && agent->context->node) {
         if (previous) {
             char *previous_igs_channel = (char *) zmalloc (strlen (previous) + strlen ("-IGS") + 1);
-            snprintf (previous_igs_channel, IGS_MAX_AGENT_NAME_LENGTH + strlen("-IGS") + 1, "%s-IGS", previous);
+            snprintf (previous_igs_channel, strlen (previous) + strlen("-IGS") + 1, "%s-IGS", previous);
             s_lock_zyre_peer (__FUNCTION__, __LINE__);
             zyre_leave (agent->context->node, previous_igs_channel);
             s_unlock_zyre_peer (__FUNCTION__, __LINE__);
