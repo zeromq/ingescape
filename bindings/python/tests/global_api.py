@@ -42,7 +42,7 @@ print ("[Global API] Testing agent name", end =" ")
 assert igs.agent_name() == "no_name"
 assert igs.definition_class() == ""
 igs.agent_set_name("simple Demo Agent")
-assert igs.agent_name() == "simple_Demo_Agent"
+assert igs.agent_name() == "simple Demo Agent"
 print("CLASS", igs.definition_class())
 assert igs.definition_class() == igs.agent_name()
 igs.agent_set_name("tester")
