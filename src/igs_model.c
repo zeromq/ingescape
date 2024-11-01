@@ -401,26 +401,24 @@ igs_result_t s_model_add_constraint (igsagent_t *self, igs_io_type_t type,
             return IGS_FAILURE;
         }
     }
-    else
-        if (type == IGS_OUTPUT_T) {
-            io = zhashx_lookup (self->definition->outputs_table, name);
-            if (!io) {
-                igsagent_error (self, "Output %s cannot be found", name);
-                return IGS_FAILURE;
-            }
+    else if (type == IGS_OUTPUT_T) {
+        io = zhashx_lookup (self->definition->outputs_table, name);
+        if (!io) {
+            igsagent_error (self, "Output %s cannot be found", name);
+            return IGS_FAILURE;
         }
-        else
-            if (type == IGS_ATTRIBUTE_T) {
-                io = zhashx_lookup (self->definition->attributes_table, name);
-                if (!io) {
-                    igsagent_error (self, "Attribute %s cannot be found", name);
-                    return IGS_FAILURE;
-                }
-            }
-            else {
-                igsagent_error (self, "Unknown IOP type %d", type);
-                return IGS_FAILURE;
-            }
+    }
+    else if (type == IGS_ATTRIBUTE_T) {
+        io = zhashx_lookup (self->definition->attributes_table, name);
+        if (!io) {
+            igsagent_error (self, "Attribute %s cannot be found", name);
+            return IGS_FAILURE;
+        }
+    }
+    else {
+        igsagent_error (self, "Unknown IOP type %d", type);
+        return IGS_FAILURE;
+    }
     if (io->constraint){
         igsagent_warn (self, "%s already has a constraint that will be removed", name);
         definition_free_constraint(&io->constraint);
@@ -434,6 +432,8 @@ igs_result_t s_model_add_constraint (igsagent_t *self, igs_io_type_t type,
         }
         return IGS_FAILURE;
     }
+    definition_update_json(self->definition);
+    
     return IGS_SUCCESS;
 }
 
@@ -475,6 +475,7 @@ igs_result_t s_model_set_description(igsagent_t *self, igs_io_type_t type,
     if (io->description)
         free(io->description);
     io->description = s_strndup(description, IGS_MAX_DESCRIPTION_LENGTH);
+    definition_update_json(self->definition);
     return IGS_SUCCESS;
 }
 
@@ -521,6 +522,7 @@ igs_result_t s_model_set_detailed_type(igsagent_t *self, igs_io_type_t type,
     if (io->specification)
         free(io->specification);
     io->specification = s_strndup(specification, IGS_MAX_SPECIFICATION_LENGTH);
+    definition_update_json(self->definition);
     return IGS_SUCCESS;
 }
 
