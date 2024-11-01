@@ -161,7 +161,7 @@ namespace Tester
             //agent name and uuid
             Assert.AreEqual("no_name", Igs.AgentName());
             Igs.AgentSetName("simple Demo Agent");
-            Assert.AreEqual("simple_Demo_Agent", Igs.AgentName());
+            Assert.AreEqual("simple Demo Agent", Igs.AgentName());
             Igs.AgentSetName(_agentName);
             string uuid = Igs.AgentUUID();
             Assert.IsNotNull(Igs.AgentUUID());
@@ -383,18 +383,18 @@ namespace Tester
             Assert.IsTrue(Igs.AttributeRemove("toto") == Result.Failure);
 
             //inputs
-            Assert.IsTrue(Igs.InputCreate("my impulsion", IopValueType.Impulsion) == Result.Success);
-            Assert.IsTrue(Igs.InputCreate("my impulsion", IopValueType.Impulsion) == Result.Failure);
-            Assert.IsTrue(Igs.InputCreate("my bool", IopValueType.Bool, _myBool) == Result.Success);
-            Assert.IsTrue(Igs.InputCreate("my bool", IopValueType.Bool, _myBool) == Result.Failure);
-            Assert.IsTrue(Igs.InputCreate("my int", IopValueType.Integer, _myInt) == Result.Success);
-            Assert.IsTrue(Igs.InputCreate("my int", IopValueType.Integer, _myInt) == Result.Failure);
-            Assert.IsTrue(Igs.InputCreate("my double", IopValueType.Double, _myDouble) == Result.Success);
-            Assert.IsTrue(Igs.InputCreate("my double", IopValueType.Double, _myDouble) == Result.Failure);
-            Assert.IsTrue(Igs.InputCreate("my string", IopValueType.String, _myString) == Result.Success);
-            Assert.IsTrue(Igs.InputCreate("my string", IopValueType.String, _myString) == Result.Failure);
-            Assert.IsTrue(Igs.InputCreate("my data", IopValueType.Data, _myData) == Result.Success);
-            Assert.IsTrue(Igs.InputCreate("my data", IopValueType.Data, _myData) == Result.Failure);
+            Assert.IsTrue(Igs.InputCreate("my_impulsion", IopValueType.Impulsion) == Result.Success);
+            Assert.IsTrue(Igs.InputCreate("my_impulsion", IopValueType.Impulsion) == Result.Failure);
+            Assert.IsTrue(Igs.InputCreate("my_bool", IopValueType.Bool, _myBool) == Result.Success);
+            Assert.IsTrue(Igs.InputCreate("my_bool", IopValueType.Bool, _myBool) == Result.Failure);
+            Assert.IsTrue(Igs.InputCreate("my_int", IopValueType.Integer, _myInt) == Result.Success);
+            Assert.IsTrue(Igs.InputCreate("my_int", IopValueType.Integer, _myInt) == Result.Failure);
+            Assert.IsTrue(Igs.InputCreate("my_double", IopValueType.Double, _myDouble) == Result.Success);
+            Assert.IsTrue(Igs.InputCreate("my_double", IopValueType.Double, _myDouble) == Result.Failure);
+            Assert.IsTrue(Igs.InputCreate("my_string", IopValueType.String, _myString) == Result.Success);
+            Assert.IsTrue(Igs.InputCreate("my_string", IopValueType.String, _myString) == Result.Failure);
+            Assert.IsTrue(Igs.InputCreate("my_data", IopValueType.Data, _myData) == Result.Success);
+            Assert.IsTrue(Igs.InputCreate("my_data", IopValueType.Data, _myData) == Result.Failure);
             listOfStrings = null;
             listOfStrings = Igs.InputList();
             Assert.IsTrue(listOfStrings != null && listOfStrings.Length == 6);
@@ -441,18 +441,18 @@ namespace Tester
             Assert.IsTrue(Igs.InputData("my_data").Length == 0);
 
             //outputs
-            Assert.IsTrue(Igs.OutputCreate("my impulsion", IopValueType.Impulsion) == Result.Success);
-            Assert.IsTrue(Igs.OutputCreate("my impulsion", IopValueType.Impulsion) == Result.Failure);
-            Assert.IsTrue(Igs.OutputCreate("my bool", IopValueType.Bool, _myBool) == Result.Success);
-            Assert.IsTrue(Igs.OutputCreate("my bool", IopValueType.Bool, _myBool) == Result.Failure);
-            Assert.IsTrue(Igs.OutputCreate("my int", IopValueType.Integer, _myInt) == Result.Success);
-            Assert.IsTrue(Igs.OutputCreate("my int", IopValueType.Integer, _myInt) == Result.Failure);
-            Assert.IsTrue(Igs.OutputCreate("my double", IopValueType.Double, _myDouble) == Result.Success);
-            Assert.IsTrue(Igs.OutputCreate("my double", IopValueType.Double, _myDouble) == Result.Failure);
-            Assert.IsTrue(Igs.OutputCreate("my string", IopValueType.String, _myString) == Result.Success);
-            Assert.IsTrue(Igs.OutputCreate("my string", IopValueType.String, _myString) == Result.Failure);
-            Assert.IsTrue(Igs.OutputCreate("my data", IopValueType.Data, _myData) == Result.Success);
-            Assert.IsTrue(Igs.OutputCreate("my data", IopValueType.Data, _myData) == Result.Failure);
+            Assert.IsTrue(Igs.OutputCreate("my_impulsion", IopValueType.Impulsion) == Result.Success);
+            Assert.IsTrue(Igs.OutputCreate("my_impulsion", IopValueType.Impulsion) == Result.Failure);
+            Assert.IsTrue(Igs.OutputCreate("my_bool", IopValueType.Bool, _myBool) == Result.Success);
+            Assert.IsTrue(Igs.OutputCreate("my_bool", IopValueType.Bool, _myBool) == Result.Failure);
+            Assert.IsTrue(Igs.OutputCreate("my_int", IopValueType.Integer, _myInt) == Result.Success);
+            Assert.IsTrue(Igs.OutputCreate("my_int", IopValueType.Integer, _myInt) == Result.Failure);
+            Assert.IsTrue(Igs.OutputCreate("my_double", IopValueType.Double, _myDouble) == Result.Success);
+            Assert.IsTrue(Igs.OutputCreate("my_double", IopValueType.Double, _myDouble) == Result.Failure);
+            Assert.IsTrue(Igs.OutputCreate("my_string", IopValueType.String, _myString) == Result.Success);
+            Assert.IsTrue(Igs.OutputCreate("my_string", IopValueType.String, _myString) == Result.Failure);
+            Assert.IsTrue(Igs.OutputCreate("my_data", IopValueType.Data, _myData) == Result.Success);
+            Assert.IsTrue(Igs.OutputCreate("my_data", IopValueType.Data, _myData) == Result.Failure);
             listOfStrings = null;
             listOfStrings = Igs.OutputList();
             Assert.IsTrue(listOfStrings != null && listOfStrings.Length == 6);
@@ -498,18 +498,18 @@ namespace Tester
             Assert.IsTrue(Igs.OutputData("my_data").Length == 0);
 
             //parameters
-            Assert.IsTrue(Igs.AttributeCreate("my impulsion", IopValueType.Impulsion) == Result.Success);
-            Assert.IsTrue(Igs.AttributeCreate("my impulsion", IopValueType.Impulsion) == Result.Failure);
-            Assert.IsTrue(Igs.AttributeCreate("my bool", IopValueType.Bool, _myBool) == Result.Success);
-            Assert.IsTrue(Igs.AttributeCreate("my bool", IopValueType.Bool, _myBool) == Result.Failure);
-            Assert.IsTrue(Igs.AttributeCreate("my int", IopValueType.Integer, _myInt) == Result.Success);
-            Assert.IsTrue(Igs.AttributeCreate("my int", IopValueType.Integer, _myInt) == Result.Failure);
-            Assert.IsTrue(Igs.AttributeCreate("my double", IopValueType.Double, _myDouble) == Result.Success);
-            Assert.IsTrue(Igs.AttributeCreate("my double", IopValueType.Double, _myDouble) == Result.Failure);
-            Assert.IsTrue(Igs.AttributeCreate("my string", IopValueType.String, _myString) == Result.Success);
-            Assert.IsTrue(Igs.AttributeCreate("my string", IopValueType.String, _myString) == Result.Failure);
-            Assert.IsTrue(Igs.AttributeCreate("my data", IopValueType.Data, _myData) == Result.Success);
-            Assert.IsTrue(Igs.AttributeCreate("my data", IopValueType.Data, _myData) == Result.Failure);
+            Assert.IsTrue(Igs.AttributeCreate("my_impulsion", IopValueType.Impulsion) == Result.Success);
+            Assert.IsTrue(Igs.AttributeCreate("my_impulsion", IopValueType.Impulsion) == Result.Failure);
+            Assert.IsTrue(Igs.AttributeCreate("my_bool", IopValueType.Bool, _myBool) == Result.Success);
+            Assert.IsTrue(Igs.AttributeCreate("my_bool", IopValueType.Bool, _myBool) == Result.Failure);
+            Assert.IsTrue(Igs.AttributeCreate("my_int", IopValueType.Integer, _myInt) == Result.Success);
+            Assert.IsTrue(Igs.AttributeCreate("my_int", IopValueType.Integer, _myInt) == Result.Failure);
+            Assert.IsTrue(Igs.AttributeCreate("my_double", IopValueType.Double, _myDouble) == Result.Success);
+            Assert.IsTrue(Igs.AttributeCreate("my_double", IopValueType.Double, _myDouble) == Result.Failure);
+            Assert.IsTrue(Igs.AttributeCreate("my_string", IopValueType.String, _myString) == Result.Success);
+            Assert.IsTrue(Igs.AttributeCreate("my_string", IopValueType.String, _myString) == Result.Failure);
+            Assert.IsTrue(Igs.AttributeCreate("my_data", IopValueType.Data, _myData) == Result.Success);
+            Assert.IsTrue(Igs.AttributeCreate("my_data", IopValueType.Data, _myData) == Result.Failure);
             listOfStrings = null;
             listOfStrings = Igs.AttributeList();
             Assert.IsTrue(listOfStrings != null && listOfStrings.Length == 6);
@@ -1369,18 +1369,18 @@ namespace Tester
             FirstAgent.ClearDefinition();
 
             //inputs
-            Assert.IsTrue(FirstAgent.InputCreate("my impulsion", IopValueType.Impulsion) == Result.Success);
-            Assert.IsTrue(FirstAgent.InputCreate("my impulsion", IopValueType.Impulsion) == Result.Failure);
-            Assert.IsTrue(FirstAgent.InputCreate("my bool", IopValueType.Bool, _myBool) == Result.Success);
-            Assert.IsTrue(FirstAgent.InputCreate("my bool", IopValueType.Bool, _myBool) == Result.Failure);
-            Assert.IsTrue(FirstAgent.InputCreate("my int", IopValueType.Integer, _myInt) == Result.Success);
-            Assert.IsTrue(FirstAgent.InputCreate("my int", IopValueType.Integer, _myInt) == Result.Failure);
-            Assert.IsTrue(FirstAgent.InputCreate("my double", IopValueType.Double, _myDouble) == Result.Success);
-            Assert.IsTrue(FirstAgent.InputCreate("my double", IopValueType.Double, _myDouble) == Result.Failure);
-            Assert.IsTrue(FirstAgent.InputCreate("my string", IopValueType.String, _myString) == Result.Success);
-            Assert.IsTrue(FirstAgent.InputCreate("my string", IopValueType.String, _myString) == Result.Failure);
-            Assert.IsTrue(FirstAgent.InputCreate("my data", IopValueType.Data, _myData) == Result.Success);
-            Assert.IsTrue(FirstAgent.InputCreate("my data", IopValueType.Data, _myData) == Result.Failure);
+            Assert.IsTrue(FirstAgent.InputCreate("my_impulsion", IopValueType.Impulsion) == Result.Success);
+            Assert.IsTrue(FirstAgent.InputCreate("my_impulsion", IopValueType.Impulsion) == Result.Failure);
+            Assert.IsTrue(FirstAgent.InputCreate("my_bool", IopValueType.Bool, _myBool) == Result.Success);
+            Assert.IsTrue(FirstAgent.InputCreate("my_bool", IopValueType.Bool, _myBool) == Result.Failure);
+            Assert.IsTrue(FirstAgent.InputCreate("my_int", IopValueType.Integer, _myInt) == Result.Success);
+            Assert.IsTrue(FirstAgent.InputCreate("my_int", IopValueType.Integer, _myInt) == Result.Failure);
+            Assert.IsTrue(FirstAgent.InputCreate("my_double", IopValueType.Double, _myDouble) == Result.Success);
+            Assert.IsTrue(FirstAgent.InputCreate("my_double", IopValueType.Double, _myDouble) == Result.Failure);
+            Assert.IsTrue(FirstAgent.InputCreate("my_string", IopValueType.String, _myString) == Result.Success);
+            Assert.IsTrue(FirstAgent.InputCreate("my_string", IopValueType.String, _myString) == Result.Failure);
+            Assert.IsTrue(FirstAgent.InputCreate("my_data", IopValueType.Data, _myData) == Result.Success);
+            Assert.IsTrue(FirstAgent.InputCreate("my_data", IopValueType.Data, _myData) == Result.Failure);
             listOfStrings = null;
             listOfStrings = FirstAgent.InputList();
             Assert.IsTrue(listOfStrings != null && listOfStrings.Length == 6);
@@ -1422,18 +1422,18 @@ namespace Tester
             Assert.AreEqual(inputString, "new string");
 
             //outputs
-            Assert.IsTrue(FirstAgent.OutputCreate("my impulsion", IopValueType.Impulsion) == Result.Success);
-            Assert.IsTrue(FirstAgent.OutputCreate("my impulsion", IopValueType.Impulsion) == Result.Failure);
-            Assert.IsTrue(FirstAgent.OutputCreate("my bool", IopValueType.Bool, _myBool) == Result.Success);
-            Assert.IsTrue(FirstAgent.OutputCreate("my bool", IopValueType.Bool, _myBool) == Result.Failure);
-            Assert.IsTrue(FirstAgent.OutputCreate("my int", IopValueType.Integer, _myInt) == Result.Success);
-            Assert.IsTrue(FirstAgent.OutputCreate("my int", IopValueType.Integer, _myInt) == Result.Failure);
-            Assert.IsTrue(FirstAgent.OutputCreate("my double", IopValueType.Double, _myDouble) == Result.Success);
-            Assert.IsTrue(FirstAgent.OutputCreate("my double", IopValueType.Double, _myDouble) == Result.Failure);
-            Assert.IsTrue(FirstAgent.OutputCreate("my string", IopValueType.String, _myString) == Result.Success);
-            Assert.IsTrue(FirstAgent.OutputCreate("my string", IopValueType.String, _myString) == Result.Failure);
-            Assert.IsTrue(FirstAgent.OutputCreate("my data", IopValueType.Data, _myData) == Result.Success);
-            Assert.IsTrue(FirstAgent.OutputCreate("my data", IopValueType.Data, _myData) == Result.Failure);
+            Assert.IsTrue(FirstAgent.OutputCreate("my_impulsion", IopValueType.Impulsion) == Result.Success);
+            Assert.IsTrue(FirstAgent.OutputCreate("my_impulsion", IopValueType.Impulsion) == Result.Failure);
+            Assert.IsTrue(FirstAgent.OutputCreate("my_bool", IopValueType.Bool, _myBool) == Result.Success);
+            Assert.IsTrue(FirstAgent.OutputCreate("my_bool", IopValueType.Bool, _myBool) == Result.Failure);
+            Assert.IsTrue(FirstAgent.OutputCreate("my_int", IopValueType.Integer, _myInt) == Result.Success);
+            Assert.IsTrue(FirstAgent.OutputCreate("my_int", IopValueType.Integer, _myInt) == Result.Failure);
+            Assert.IsTrue(FirstAgent.OutputCreate("my_double", IopValueType.Double, _myDouble) == Result.Success);
+            Assert.IsTrue(FirstAgent.OutputCreate("my_double", IopValueType.Double, _myDouble) == Result.Failure);
+            Assert.IsTrue(FirstAgent.OutputCreate("my_string", IopValueType.String, _myString) == Result.Success);
+            Assert.IsTrue(FirstAgent.OutputCreate("my_string", IopValueType.String, _myString) == Result.Failure);
+            Assert.IsTrue(FirstAgent.OutputCreate("my_data", IopValueType.Data, _myData) == Result.Success);
+            Assert.IsTrue(FirstAgent.OutputCreate("my_data", IopValueType.Data, _myData) == Result.Failure);
             listOfStrings = null;
             listOfStrings = FirstAgent.OutputList();
             Assert.IsTrue(listOfStrings != null && listOfStrings.Length == 6);
@@ -1480,18 +1480,18 @@ namespace Tester
             Assert.IsTrue(FirstAgent.OutputData("my_data").Length == 0);
 
             //parameters
-            Assert.IsTrue(FirstAgent.AttributeCreate("my impulsion", IopValueType.Impulsion) == Result.Success);
-            Assert.IsTrue(FirstAgent.AttributeCreate("my impulsion", IopValueType.Impulsion) == Result.Failure);
-            Assert.IsTrue(FirstAgent.AttributeCreate("my bool", IopValueType.Bool, _myBool) == Result.Success);
-            Assert.IsTrue(FirstAgent.AttributeCreate("my bool", IopValueType.Bool, _myBool) == Result.Failure);
-            Assert.IsTrue(FirstAgent.AttributeCreate("my int", IopValueType.Integer, _myInt) == Result.Success);
-            Assert.IsTrue(FirstAgent.AttributeCreate("my int", IopValueType.Integer, _myInt) == Result.Failure);
-            Assert.IsTrue(FirstAgent.AttributeCreate("my double", IopValueType.Double, _myDouble) == Result.Success);
-            Assert.IsTrue(FirstAgent.AttributeCreate("my double", IopValueType.Double, _myDouble) == Result.Failure);
-            Assert.IsTrue(FirstAgent.AttributeCreate("my string", IopValueType.String, _myString) == Result.Success);
-            Assert.IsTrue(FirstAgent.AttributeCreate("my string", IopValueType.String, _myString) == Result.Failure);
-            Assert.IsTrue(FirstAgent.AttributeCreate("my data", IopValueType.Data, _myData) == Result.Success);
-            Assert.IsTrue(FirstAgent.AttributeCreate("my data", IopValueType.Data, _myData) == Result.Failure);
+            Assert.IsTrue(FirstAgent.AttributeCreate("my_impulsion", IopValueType.Impulsion) == Result.Success);
+            Assert.IsTrue(FirstAgent.AttributeCreate("my_impulsion", IopValueType.Impulsion) == Result.Failure);
+            Assert.IsTrue(FirstAgent.AttributeCreate("my_bool", IopValueType.Bool, _myBool) == Result.Success);
+            Assert.IsTrue(FirstAgent.AttributeCreate("my_bool", IopValueType.Bool, _myBool) == Result.Failure);
+            Assert.IsTrue(FirstAgent.AttributeCreate("my_int", IopValueType.Integer, _myInt) == Result.Success);
+            Assert.IsTrue(FirstAgent.AttributeCreate("my_int", IopValueType.Integer, _myInt) == Result.Failure);
+            Assert.IsTrue(FirstAgent.AttributeCreate("my_double", IopValueType.Double, _myDouble) == Result.Success);
+            Assert.IsTrue(FirstAgent.AttributeCreate("my_double", IopValueType.Double, _myDouble) == Result.Failure);
+            Assert.IsTrue(FirstAgent.AttributeCreate("my_string", IopValueType.String, _myString) == Result.Success);
+            Assert.IsTrue(FirstAgent.AttributeCreate("my_string", IopValueType.String, _myString) == Result.Failure);
+            Assert.IsTrue(FirstAgent.AttributeCreate("my_data", IopValueType.Data, _myData) == Result.Success);
+            Assert.IsTrue(FirstAgent.AttributeCreate("my_data", IopValueType.Data, _myData) == Result.Failure);
             listOfStrings = null;
             listOfStrings = FirstAgent.AttributeList();
             Assert.IsTrue(listOfStrings != null && listOfStrings.Length == 6);
