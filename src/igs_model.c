@@ -433,6 +433,7 @@ igs_result_t s_model_add_constraint (igsagent_t *self, igs_io_type_t type,
         return IGS_FAILURE;
     }
     definition_update_json(self->definition);
+    self->network_need_to_send_definition_update = true;
     
     return IGS_SUCCESS;
 }
@@ -476,6 +477,7 @@ igs_result_t s_model_set_description(igsagent_t *self, igs_io_type_t type,
         free(io->description);
     io->description = s_strndup(description, IGS_MAX_DESCRIPTION_LENGTH);
     definition_update_json(self->definition);
+    self->network_need_to_send_definition_update = true;
     return IGS_SUCCESS;
 }
 
@@ -523,6 +525,7 @@ igs_result_t s_model_set_detailed_type(igsagent_t *self, igs_io_type_t type,
         free(io->specification);
     io->specification = s_strndup(specification, IGS_MAX_SPECIFICATION_LENGTH);
     definition_update_json(self->definition);
+    self->network_need_to_send_definition_update = true;
     return IGS_SUCCESS;
 }
 
