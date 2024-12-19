@@ -967,13 +967,13 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                         
                         if (core_context->enable_service_logging)
                             s_service_log_sent_service (agent, local_agent->definition->name, local_agent->uuid,
-                                                        service_name, *list, current_microseconds);
+                                                        service_name, (list)?*list:NULL, current_microseconds);
                         else
                             igsagent_debug (agent, "calling %s.%s(%s) locally", local_agent->definition->name, service_name, local_agent->uuid);
                         model_read_write_unlock(__FUNCTION__, __LINE__);
                         if (local_agent->uuid && agent->uuid && service->service_cb)
                             (service->service_cb) (local_agent, agent->definition->name, agent->uuid, service_name,
-                                                   *list, nb_arguments, token, service->cb_data);
+                                                   (list)?*list:NULL, nb_arguments, token, service->cb_data);
                         model_read_write_lock(__FUNCTION__, __LINE__);
                     }
                 }else
