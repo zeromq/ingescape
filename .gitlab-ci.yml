@@ -666,7 +666,7 @@ build-deb-packages:
     - cp debian_x64/* $ARTIFACTS_NET_SHARE/linux64/packages/ingescape
     - echo "Setting up SSH"
     - mkdir -p ~/.ssh/
-    - ssh-keyscan -t rsa ingescape.com >> ~/.ssh/known_hosts
+    - ssh-keyscan ${STABLE_DELIVERY_HOST} >> ~/.ssh/known_hosts
     - umask 077
     - echo ${STABLE_SSH_SECRET} | base64 -d > ssh_secret
     - umask 022
