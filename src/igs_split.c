@@ -494,7 +494,7 @@ int split_message_from_splitter (zmsg_t *msg, igs_core_context_t *context)
         return 1;
     }
     
-    zlistx_t *agents = zhashx_values(core_context->agents);
+    zlistx_t *agents = zhashx_values(context->agents);
     igsagent_t *agent = zlistx_first(agents);
     while (agent && agent->uuid) {
         if (streq(agent->uuid, worker_uuid)){
