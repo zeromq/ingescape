@@ -1,7 +1,7 @@
 /*  =========================================================================
     advanced - brokers, security, elections, advanced network config, 
                performance check, agent family, network monitoring, 
-               logs replay and clean global context
+               logs and clean global context
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of Ingescape, see https://github.com/zeromq/ingescape.
@@ -146,6 +146,61 @@ napi_value node_igs_election_leave(napi_env env, napi_callback_info info) {
     return success_js;
 }
 
+// Real-time communications
+napi_value node_igs_rt_get_current_timestamp(napi_env env, napi_callback_info info) {
+    int64_t timestamp = igs_rt_get_current_timestamp();
+    napi_value timestamp_js;
+    convert_int_to_napi(env, timestamp, &timestamp_js);
+    return timestamp_js;
+}
+
+napi_value node_igs_rt_set_timestamps(napi_env env, napi_callback_info info) {
+    napi_value argv[1];
+    get_function_arguments(env, info, 1, argv);
+    bool enable;
+    convert_napi_to_bool(env, argv[0], &enable);
+    igs_rt_set_timestamps(enable);
+    return NULL;
+}
+
+napi_value node_igs_rt_timestamps(napi_env env, napi_callback_info info) {
+    bool enable = igs_rt_timestamps();
+    napi_value enable_js;
+    convert_bool_to_napi(env, enable, &enable_js);
+    return enable_js;
+}
+
+napi_value node_igs_rt_set_time(napi_env env, napi_callback_info info) {
+    napi_value argv[1];
+    get_function_arguments(env, info, 1, argv);
+    int time;
+    convert_napi_to_int(env, argv[0], &time);
+    igs_rt_set_time(time);
+    return NULL;
+}
+
+napi_value node_igs_rt_time(napi_env env, napi_callback_info info) {
+    int64_t time = igs_rt_time();
+    napi_value time_js;
+    convert_int_to_napi(env, time, &time_js);
+    return time_js;
+}
+
+napi_value node_igs_rt_set_synchronous_mode(napi_env env, napi_callback_info info) {
+    napi_value argv[1];
+    get_function_arguments(env, info, 1, argv);
+    bool enable;
+    convert_napi_to_bool(env, argv[0], &enable);
+    igs_rt_set_synchronous_mode(enable);
+    return NULL;
+}
+
+napi_value node_igs_rt_synchronous_mode(napi_env env, napi_callback_info info) {
+    bool enable = igs_rt_synchronous_mode();
+    napi_value enable_js;
+    convert_bool_to_napi(env, enable, &enable_js);
+    return enable_js;
+}
 
 // Network configuration
 napi_value node_igs_net_set_publishing_port(napi_env env, napi_callback_info info) {
@@ -351,45 +406,6 @@ napi_value node_igs_observe_monitor(napi_env env, napi_callback_info info) {
     return NULL;
 }
 
-// Logs replay
-napi_value node_igs_replay_init(napi_env env, napi_callback_info info) {
-    napi_value argv[6];
-    get_function_arguments(env, info, 6, argv);
-    
-    int speed, replay_mode;
-    bool wait_for_start;
-    char *log_file_path = convert_napi_to_string(env, argv[0]),
-         *start_time = convert_napi_to_string(env, argv[2]),
-         *agent = convert_napi_to_string(env, argv[5]);
-    convert_napi_to_int(env, argv[1], &speed);
-    convert_napi_to_bool(env, argv[3], &wait_for_start);
-    convert_napi_to_int(env, argv[4], &replay_mode);
-    igs_replay_init(log_file_path, speed, start_time, wait_for_start, replay_mode, agent);
-    free(log_file_path);
-    free(start_time);
-    free(agent);
-    return NULL;
-}
-
-napi_value node_igs_replay_start(napi_env env, napi_callback_info info) {
-    igs_replay_start();
-    return NULL;
-}
-
-napi_value node_igs_replay_pause(napi_env env, napi_callback_info info) {
-    napi_value argv[1];
-    get_function_arguments(env, info, 1, argv);
-    bool pause;
-    convert_napi_to_bool(env, argv[0], &pause);
-    igs_replay_pause(pause);
-    return NULL;
-}
-
-napi_value node_igs_replay_terminate(napi_env env, napi_callback_info info) {
-    igs_replay_terminate();
-    return NULL;
-}
-
 napi_value node_igs_clear_context(napi_env env, napi_callback_info info) {
     igs_clear_context();
     threadsafe_context_hash_t *threadsafe_context_hash, *threadsafe_context_hash_tmp;
@@ -401,8 +417,8 @@ napi_value node_igs_clear_context(napi_env env, napi_callback_info info) {
         HASH_DEL (observed_output_contexts, threadsafe_context_hash);
         free_threadsafe_context_hash(env, &threadsafe_context_hash);
     }
-    HASH_ITER (hh, observed_parameter_contexts, threadsafe_context_hash, threadsafe_context_hash_tmp) {
-        HASH_DEL (observed_parameter_contexts, threadsafe_context_hash);
+    HASH_ITER (hh, observed_attribute_contexts, threadsafe_context_hash, threadsafe_context_hash_tmp) {
+        HASH_DEL (observed_attribute_contexts, threadsafe_context_hash);
         free_threadsafe_context_hash(env, &threadsafe_context_hash);
     }
     HASH_ITER (hh, service_contexts, threadsafe_context_hash, threadsafe_context_hash_tmp) {
@@ -452,6 +468,14 @@ napi_value init_advanced(napi_env env, napi_value exports) {
     // Elections between agents
     exports = enable_callback_into_js(env, node_igs_election_join, "electionJoin", exports);
     exports = enable_callback_into_js(env, node_igs_election_leave, "electionLeave", exports);
+    // Real-time communications
+    exports = enable_callback_into_js(env, node_igs_rt_get_current_timestamp, "rtGetCurrentTimestamp", exports);
+    exports = enable_callback_into_js(env, node_igs_rt_set_timestamps, "rtSetTimestamps", exports);
+    exports = enable_callback_into_js(env, node_igs_rt_timestamps, "rtTimestamps", exports);
+    exports = enable_callback_into_js(env, node_igs_rt_set_time, "rtSetTime", exports);
+    exports = enable_callback_into_js(env, node_igs_rt_time, "rtTime", exports);
+    exports = enable_callback_into_js(env, node_igs_rt_set_synchronous_mode, "rtSetSynchronousMode", exports);
+    exports = enable_callback_into_js(env, node_igs_rt_synchronous_mode, "rtSynchronousMode", exports);
     // Network configuration
     exports = enable_callback_into_js(env, node_igs_net_set_publishing_port, "netSetPublishingPort", exports);
     exports = enable_callback_into_js(env, node_igs_net_set_log_stream_port, "netSetLogStreamPort", exports);
@@ -471,11 +495,6 @@ napi_value init_advanced(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_igs_monitor_is_running, "monitorIsRunning", exports);
     exports = enable_callback_into_js(env, node_igs_monitor_set_start_stop, "monitorSetStartStop", exports);
     exports = enable_callback_into_js(env, node_igs_observe_monitor, "observeMonitor", exports);
-    // Logs replay
-    exports = enable_callback_into_js(env, node_igs_replay_init, "replayInit", exports);
-    exports = enable_callback_into_js(env, node_igs_replay_start, "replayStart", exports);
-    exports = enable_callback_into_js(env, node_igs_replay_pause, "replayPause", exports);
-    exports = enable_callback_into_js(env, node_igs_replay_terminate, "replayTerminate", exports);
     // Clean context
     exports = enable_callback_into_js(env, node_igs_clear_context, "clearContext", exports);
     return exports;

@@ -11,6 +11,14 @@ if (APPLE)
   set(CMAKE_OSX_DEPLOYMENT_TARGET "10.11" CACHE STRING "Minimum OS X deployment version")
   set(CMAKE_OSX_SYSROOT "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/")
   set(CMAKE_CXX_FLAGS "--sysroot ${CMAKE_OSX_SYSROOT} ${CMAKE_CXX_FLAGS}")
+  set(CMAKE_SKIP_BUILD_RPATH FALSE)
+  set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+  list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
+  if("${isSystemDir}" STREQUAL "-1")
+    message("add install prefix to path : ${CMAKE_INSTALL_PREFIX}")
+    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/usr/local/lib")
+  endif("${isSystemDir}" STREQUAL "-1")
 endif(APPLE)
 
 option(OSX_UNIVERSAL "Build for both arm64 and x86_64" OFF)
@@ -27,7 +35,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake/modules/
 include(IngescapeHelper)
 include(IdentifyOS)
 
-# gets version from admin.c file
+# get version
 get_ingescape_version(INGESCAPE_VERSION_MAJOR INGESCAPE_VERSION_MINOR INGESCAPE_VERSION_PATCH)
 set(INGESCAPE_VERSION "${INGESCAPE_VERSION_MAJOR}.${INGESCAPE_VERSION_MINOR}.${INGESCAPE_VERSION_PATCH}")
 message(STATUS "Detected INGESCAPE Version - ${INGESCAPE_VERSION}")
@@ -111,7 +119,6 @@ list(APPEND ingescape_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/src/igs_network.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/igs_parser.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/igs_performance.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/igs_replay.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/igs_service.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/igs_split.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/igsagent.c
@@ -178,6 +185,7 @@ if (WITH_DEPS)
   #zeromq
   set(WITH_TLS OFF CACHE BOOL "Use TLS for WSS support")
   set(WITH_LIBSODIUM ON CACHE BOOL "Use libsodium instead of built-in tweetnacl")
+  set(ENABLE_CURVE ON CACHE BOOL "Enable CURVE security")
   add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libzmq)
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libzmq/include)
   add_dependencies(libzmq sodium)
@@ -417,10 +425,10 @@ if (NOT DEPS_ONLY)
       add_dependencies(igstester ${CMAKE_PROJECT_NAME})
       if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
         set(_INGESCAPE_SUFFIX "d")
-        set(_LIBZMQ_NAME "libzmq-v142-mt-gd-4_3_5")
+        set(_LIBZMQ_NAME "libzmq-v142-mt-gd-4_3_6")
       else()
         set(_INGESCAPE_SUFFIX "")
-        set(_LIBZMQ_NAME "libzmq-v142-mt-4_3_5")
+        set(_LIBZMQ_NAME "libzmq-v142-mt-4_3_6")
       endif()
 
       add_custom_command(TARGET ${CMAKE_PROJECT_NAME}

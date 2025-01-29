@@ -10,14 +10,15 @@
     =========================================================================
 */
 
-const IGS = require(__dirname + "/../prebuilds/" + process.platform + "-" + process.arch + "/node.napi"); // igs js wrapper
+const IGS = require(__dirname + "/../prebuilds/" + process.platform + "-" + process.arch + "/ingescape.node"); // igs js wrapper
+
 
 const assert = require('assert');
 const commands = require('command-line-args');
 
 const logLevelEnum = IGS.logLevels();
-const iopEnum = IGS.iopTypes();
-const iopTypeEnum = IGS.iopValueTypes();
+const ioEnum = IGS.ioTypes();
+const ioTypeEnum = IGS.ioValueTypes();
 const igsResultEnum = IGS.resultTypes();
 const agentEventEnum = IGS.agentEventTypes();
 
@@ -77,19 +78,19 @@ function testerServiceCallback(
     console.log("received service %s from %s(%s) (", serviceName, senderAgentName, senderAgentUUID);
     argumentsArray.forEach(function(argument) {
         switch (argument.type) {
-            case iopTypeEnum.IGS_BOOL_T:
+            case ioTypeEnum.IGS_BOOL_T:
                 console.log(" let " + argument.value);
                 break;
-            case iopTypeEnum.IGS_INTEGER_T:
+            case ioTypeEnum.IGS_INTEGER_T:
                 console.log(" integer " + argument.value);
                 break;
-            case iopTypeEnum.IGS_DOUBLE_T:
+            case ioTypeEnum.IGS_DOUBLE_T:
                 console.log(" double " + argument.value);
                 break;
-            case iopTypeEnum.IGS_STRING_T:
+            case ioTypeEnum.IGS_STRING_T:
                 console.log(" string " + argument.value);
                 break;
-            case iopTypeEnum.IGS_DATA_T:
+            case ioTypeEnum.IGS_DATA_T:
                 console.log(" data - " + argument.value.byteLength+ " bytes");
                 break;
             default:
@@ -111,19 +112,19 @@ function agentServiceCallback(
     console.log(thisAgentName + " received service " + serviceName + " from " + senderAgentName + "(" + senderAgentUUID + ")");
     argumentsArray.forEach(function(argument) {
         switch (argument.type) {
-            case iopTypeEnum.IGS_BOOL_T:
+            case ioTypeEnum.IGS_BOOL_T:
                 console.log(" bool " + argument.value);
                 break;
-            case iopTypeEnum.IGS_INTEGER_T:
+            case ioTypeEnum.IGS_INTEGER_T:
                 console.log(" integer " + argument.value);
                 break;
-            case iopTypeEnum.IGS_DOUBLE_T:
+            case ioTypeEnum.IGS_DOUBLE_T:
                 console.log(" double " + argument.value);
                 break;
-            case iopTypeEnum.IGS_STRING_T:
+            case ioTypeEnum.IGS_STRING_T:
                 console.log(" string " + argument.value);
                 break;
-            case iopTypeEnum.IGS_DATA_T:
+            case ioTypeEnum.IGS_DATA_T:
                 console.log(" data - " + argument.value.byteLength+ " bytes");
                 break;
             default:
@@ -133,28 +134,28 @@ function agentServiceCallback(
     console.log(" )\n");
 }
 
-//callbacks for iops
-function testerIOPCallback(type, name, valueType, value, data) {
+//callbacks for ios
+function testerIOCallback(type, name, valueType, value, data) {
     console.log("input " + name + " changed");
     switch (valueType) {
-        case iopTypeEnum.IGS_IMPULSION_T:
+        case ioTypeEnum.IGS_IMPULSION_T:
             console.log(" (impulsion)\n");
             break;
-        case iopTypeEnum.IGS_BOOL_T:
+        case ioTypeEnum.IGS_BOOL_T:
             console.log(" to bool ", IGS.inputBool(name) + "\n");
             break;
-        case iopTypeEnum.IGS_INTEGER_T:
+        case ioTypeEnum.IGS_INTEGER_T:
             console.log(" to int " + IGS.inputInt(name) + "\n");
             break;
-        case iopTypeEnum.IGS_DOUBLE_T:
+        case ioTypeEnum.IGS_DOUBLE_T:
             console.log(" to double " + IGS.inputDouble(name) + "\n");
             break;
-        case iopTypeEnum.IGS_STRING_T:
+        case ioTypeEnum.IGS_STRING_T:
         {
             console.log(" to string " + IGS.inputString(name) + "\n");
             break;
         }
-        case iopTypeEnum.IGS_DATA_T:
+        case ioTypeEnum.IGS_DATA_T:
             console.log(" to data with size ", IGS.inputData(name).byteLength + "\n");
             break;
         default:
@@ -162,28 +163,28 @@ function testerIOPCallback(type, name, valueType, value, data) {
     }
 }
 
-function agentIOPCallback(agent, type, name, valueType, value, data) {
+function agentIOCallback(agent, type, name, valueType, value, data) {
     let thisAgentName = agent.name();
     console.log("input " + name + " changed on " + thisAgentName);
     switch (valueType) {
-        case iopTypeEnum.IGS_IMPULSION_T:
+        case ioTypeEnum.IGS_IMPULSION_T:
             console.log(" (impulsion)\n");
             break;
-        case iopTypeEnum.IGS_BOOL_T:
+        case ioTypeEnum.IGS_BOOL_T:
             console.log(" to bool ", IGS.inputBool(name) + "\n");
             break;
-        case iopTypeEnum.IGS_INTEGER_T:
+        case ioTypeEnum.IGS_INTEGER_T:
             console.log(" to int " + IGS.inputInt(name) + "\n");
             break;
-        case iopTypeEnum.IGS_DOUBLE_T:
+        case ioTypeEnum.IGS_DOUBLE_T:
             console.log(" to double " + IGS.inputDouble(name) + "\n");
             break;
-        case iopTypeEnum.IGS_STRING_T:
+        case ioTypeEnum.IGS_STRING_T:
         {
             console.log(" to string " + IGS.inputString(name) + "\n");
             break;
         }
-        case iopTypeEnum.IGS_DATA_T:
+        case ioTypeEnum.IGS_DATA_T:
             console.log(" to data with size ", IGS.inputData(name).byteLength + "\n");
             break;
         default:
@@ -196,7 +197,7 @@ IGS.clearContext();
 //agent name and uuid
 assert(IGS.agentName() === "no_name");
 IGS.agentSetName("agent 007");
-assert(IGS.agentName() === "agent_007");
+assert(IGS.agentName() === "agent 007");
 IGS.agentSetName(agentName);
 assert(IGS.agentUuid(), "IGS.agentUuid()");
 
@@ -276,15 +277,18 @@ assert(IGS.isFrozen(), "IGS.isFrozen()");
 IGS.unfreeze();
 assert(!IGS.isFrozen(), "!IGS.isFrozen()");
 
-// IOPs with null definition
+// IOs with null definition
 assert(IGS.inputCount() === 0);
 assert(IGS.outputCount() === 0);
+assert(IGS.attributeCount() === 0);
 assert(IGS.parameterCount() === 0);
 assert(!IGS.inputExists("toto"));
 assert(!IGS.outputExists("toto"));
+assert(!IGS.attributeExists("toto"));
 assert(!IGS.parameterExists("toto"));
 assert(IGS.inputList().length === 0);
 assert(IGS.outputList().length === 0);
+assert(IGS.attributeList().length === 0);
 assert(IGS.parameterList().length === 0);
 
 assert(!IGS.outputIsMuted(""));
@@ -303,10 +307,15 @@ assert(IGS.outputInt("toto") === 0);
 assert(IGS.outputDouble("toto") < 0.000001);
 assert(IGS.outputString("toto").length === 0);
 assert(IGS.outputData("toto") === null);
+assert(!IGS.attributeBool("toto"));
 assert(!IGS.parameterBool("toto"));
+assert(IGS.attributeInt("toto") === 0);
 assert(IGS.parameterInt("toto") === 0);
+assert(IGS.attributeDouble("toto") < 0.000001);
 assert(IGS.parameterDouble("toto") < 0.000001);
+assert(IGS.attributeString("toto").length === 0);
 assert(IGS.parameterString("toto").length === 0);
+assert(IGS.attributeData("toto") === null);
 assert(IGS.parameterData("toto") === null);
 
 // Definition - part 1
@@ -317,54 +326,65 @@ assert(IGS.agentName() === agentName);
 assert(IGS.definitionDescription() === "");
 assert(IGS.definitionVersion() === "");
 //TODO: test loading valid string and file definitions
+IGS.definitionSetPackage("package");
+assert(IGS.definitionPackage() === "package");
+IGS.definitionSetClass("class");
+assert(IGS.definitionClass() === "class");
 IGS.definitionSetDescription("my description");
 assert(IGS.definitionDescription());
 IGS.definitionSetVersion("version");
 assert(IGS.definitionVersion() === "version");
 
-assert(IGS.inputCreate("toto", iopTypeEnum.IGS_BOOL_T, false) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.outputCreate("toto", iopTypeEnum.IGS_BOOL_T, false) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.parameterCreate("toto", iopTypeEnum.IGS_BOOL_T, false) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.inputCreate("toto", iopTypeEnum.IGS_BOOL_T, false) === igsResultEnum.IGS_FAILURE);
-assert(IGS.outputCreate("toto", iopTypeEnum.IGS_BOOL_T, false) === igsResultEnum.IGS_FAILURE);
-assert(IGS.parameterCreate("toto", iopTypeEnum.IGS_BOOL_T, false) === igsResultEnum.IGS_FAILURE);
+assert(IGS.inputCreate("toto", ioTypeEnum.IGS_BOOL_T, false) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.outputCreate("toto", ioTypeEnum.IGS_BOOL_T, false) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.attributeCreate("toto", ioTypeEnum.IGS_BOOL_T, false) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.inputCreate("toto", ioTypeEnum.IGS_BOOL_T, false) === igsResultEnum.IGS_FAILURE);
+assert(IGS.outputCreate("toto", ioTypeEnum.IGS_BOOL_T, false) === igsResultEnum.IGS_FAILURE);
+assert(IGS.attributeCreate("toto", ioTypeEnum.IGS_BOOL_T, false) === igsResultEnum.IGS_FAILURE);
 IGS.outputMute("toto");
 assert(IGS.outputIsMuted("toto"));
 IGS.outputUnmute("toto");
 assert(!IGS.outputIsMuted("toto"));
 assert(IGS.inputRemove("toto") === igsResultEnum.IGS_SUCCESS);
 assert(IGS.outputRemove("toto") === igsResultEnum.IGS_SUCCESS);
-assert(IGS.parameterRemove("toto") === igsResultEnum.IGS_SUCCESS);
+assert(IGS.attributeRemove("toto") === igsResultEnum.IGS_SUCCESS);
 assert(IGS.inputRemove("toto") === igsResultEnum.IGS_FAILURE);
 assert(IGS.outputRemove("toto") === igsResultEnum.IGS_FAILURE);
+assert(IGS.attributeRemove("toto") === igsResultEnum.IGS_FAILURE);
+
+//Parameters old api compatibility
+assert(IGS.parameterCreate("toto", ioTypeEnum.IGS_BOOL_T, false) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.parameterCreate("toto", ioTypeEnum.IGS_BOOL_T, false) === igsResultEnum.IGS_FAILURE);
+assert(IGS.parameterRemove("toto") === igsResultEnum.IGS_SUCCESS);
 assert(IGS.parameterRemove("toto") === igsResultEnum.IGS_FAILURE);
 
+
  // Inputs
-assert(IGS.inputCreate("my impulsion", iopTypeEnum.IGS_IMPULSION_T, null) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.inputCreate("my impulsion", iopTypeEnum.IGS_IMPULSION_T, null) === igsResultEnum.IGS_FAILURE);
-assert(IGS.inputCreate("my bool", iopTypeEnum.IGS_BOOL_T, true) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.inputCreate("my bool", iopTypeEnum.IGS_BOOL_T, true) === igsResultEnum.IGS_FAILURE);
-assert(IGS.inputCreate("my int", iopTypeEnum.IGS_INTEGER_T, 1) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.inputCreate("my int", iopTypeEnum.IGS_INTEGER_T, 1) === igsResultEnum.IGS_FAILURE);
-assert(IGS.inputCreate("my double", iopTypeEnum.IGS_DOUBLE_T, 1) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.inputCreate("my double", iopTypeEnum.IGS_DOUBLE_T, 1) === igsResultEnum.IGS_FAILURE);
-assert(IGS.inputCreate("my string", iopTypeEnum.IGS_STRING_T, "my string") === igsResultEnum.IGS_SUCCESS);
-assert(IGS.inputCreate("my string", iopTypeEnum.IGS_STRING_T, "my string") === igsResultEnum.IGS_FAILURE);
-assert(IGS.inputCreate("my data", iopTypeEnum.IGS_DATA_T, new ArrayBuffer(32)) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.inputCreate("my data", iopTypeEnum.IGS_DATA_T, new ArrayBuffer(32)) === igsResultEnum.IGS_FAILURE);
+assert(IGS.inputCreate("my_impulsion", ioTypeEnum.IGS_IMPULSION_T, null) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.inputCreate("my_impulsion", ioTypeEnum.IGS_IMPULSION_T, null) === igsResultEnum.IGS_FAILURE);
+assert(IGS.inputCreate("my_bool", ioTypeEnum.IGS_BOOL_T, true) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.inputCreate("my_bool", ioTypeEnum.IGS_BOOL_T, true) === igsResultEnum.IGS_FAILURE);
+assert(IGS.inputCreate("my_int", ioTypeEnum.IGS_INTEGER_T, 1) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.inputCreate("my_int", ioTypeEnum.IGS_INTEGER_T, 1) === igsResultEnum.IGS_FAILURE);
+assert(IGS.inputCreate("my_double", ioTypeEnum.IGS_DOUBLE_T, 1) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.inputCreate("my_double", ioTypeEnum.IGS_DOUBLE_T, 1) === igsResultEnum.IGS_FAILURE);
+assert(IGS.inputCreate("my_string", ioTypeEnum.IGS_STRING_T, "my string") === igsResultEnum.IGS_SUCCESS);
+assert(IGS.inputCreate("my_string", ioTypeEnum.IGS_STRING_T, "my string") === igsResultEnum.IGS_FAILURE);
+assert(IGS.inputCreate("my_data", ioTypeEnum.IGS_DATA_T, new ArrayBuffer(32)) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.inputCreate("my_data", ioTypeEnum.IGS_DATA_T, new ArrayBuffer(32)) === igsResultEnum.IGS_FAILURE);
 assert(IGS.inputList().length === 6);
 assert(IGS.inputCount() === 6);
-assert(IGS.inputType("my_impulsion") === iopTypeEnum.IGS_IMPULSION_T);
+assert(IGS.inputType("my_impulsion") === ioTypeEnum.IGS_IMPULSION_T);
 assert(IGS.inputExists("my_impulsion"));
-assert(IGS.inputType("my_bool") === iopTypeEnum.IGS_BOOL_T);
+assert(IGS.inputType("my_bool") === ioTypeEnum.IGS_BOOL_T);
 assert(IGS.inputExists("my_bool"));
-assert(IGS.inputType("my_int") === iopTypeEnum.IGS_INTEGER_T);
+assert(IGS.inputType("my_int") === ioTypeEnum.IGS_INTEGER_T);
 assert(IGS.inputExists("my_int"));
-assert(IGS.inputType("my_double") === iopTypeEnum.IGS_DOUBLE_T);
+assert(IGS.inputType("my_double") === ioTypeEnum.IGS_DOUBLE_T);
 assert(IGS.inputExists("my_double"));
-assert(IGS.inputType("my_string") === iopTypeEnum.IGS_STRING_T);
+assert(IGS.inputType("my_string") === ioTypeEnum.IGS_STRING_T);
 assert(IGS.inputExists("my_string"));
-assert(IGS.inputType("my_data") === iopTypeEnum.IGS_DATA_T);
+assert(IGS.inputType("my_data") === ioTypeEnum.IGS_DATA_T);
 assert(IGS.inputExists("my_data"));
 
 assert(IGS.inputBool("my_bool"));
@@ -397,31 +417,31 @@ assert(IGS.inputData("my_data") === null);
 
 
 // Outputs
-assert(IGS.outputCreate("my impulsion", iopTypeEnum.IGS_IMPULSION_T, null) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.outputCreate("my impulsion", iopTypeEnum.IGS_IMPULSION_T, null) === igsResultEnum.IGS_FAILURE);
-assert(IGS.outputCreate("my bool", iopTypeEnum.IGS_BOOL_T, true) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.outputCreate("my bool", iopTypeEnum.IGS_BOOL_T, true) === igsResultEnum.IGS_FAILURE);
-assert(IGS.outputCreate("my int", iopTypeEnum.IGS_INTEGER_T, 1) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.outputCreate("my int", iopTypeEnum.IGS_INTEGER_T, 1) === igsResultEnum.IGS_FAILURE);
-assert(IGS.outputCreate("my double", iopTypeEnum.IGS_DOUBLE_T, 1) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.outputCreate("my double", iopTypeEnum.IGS_DOUBLE_T, 1) === igsResultEnum.IGS_FAILURE);
-assert(IGS.outputCreate("my string", iopTypeEnum.IGS_STRING_T, "my string") === igsResultEnum.IGS_SUCCESS);
-assert(IGS.outputCreate("my string", iopTypeEnum.IGS_STRING_T, "my string") === igsResultEnum.IGS_FAILURE);
-assert(IGS.outputCreate("my data", iopTypeEnum.IGS_DATA_T, new ArrayBuffer(32)) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.outputCreate("my data", iopTypeEnum.IGS_DATA_T, new ArrayBuffer(32)) === igsResultEnum.IGS_FAILURE);
+assert(IGS.outputCreate("my_impulsion", ioTypeEnum.IGS_IMPULSION_T, null) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.outputCreate("my_impulsion", ioTypeEnum.IGS_IMPULSION_T, null) === igsResultEnum.IGS_FAILURE);
+assert(IGS.outputCreate("my_bool", ioTypeEnum.IGS_BOOL_T, true) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.outputCreate("my_bool", ioTypeEnum.IGS_BOOL_T, true) === igsResultEnum.IGS_FAILURE);
+assert(IGS.outputCreate("my_int", ioTypeEnum.IGS_INTEGER_T, 1) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.outputCreate("my_int", ioTypeEnum.IGS_INTEGER_T, 1) === igsResultEnum.IGS_FAILURE);
+assert(IGS.outputCreate("my_double", ioTypeEnum.IGS_DOUBLE_T, 1) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.outputCreate("my_double", ioTypeEnum.IGS_DOUBLE_T, 1) === igsResultEnum.IGS_FAILURE);
+assert(IGS.outputCreate("my_string", ioTypeEnum.IGS_STRING_T, "my string") === igsResultEnum.IGS_SUCCESS);
+assert(IGS.outputCreate("my_string", ioTypeEnum.IGS_STRING_T, "my string") === igsResultEnum.IGS_FAILURE);
+assert(IGS.outputCreate("my_data", ioTypeEnum.IGS_DATA_T, new ArrayBuffer(32)) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.outputCreate("my_data", ioTypeEnum.IGS_DATA_T, new ArrayBuffer(32)) === igsResultEnum.IGS_FAILURE);
 assert(IGS.outputList().length === 6);
 assert(IGS.outputCount() === 6);
-assert(IGS.outputType("my_impulsion") === iopTypeEnum.IGS_IMPULSION_T);
+assert(IGS.outputType("my_impulsion") === ioTypeEnum.IGS_IMPULSION_T);
 assert(IGS.outputExists("my_impulsion"));
-assert(IGS.outputType("my_bool") === iopTypeEnum.IGS_BOOL_T);
+assert(IGS.outputType("my_bool") === ioTypeEnum.IGS_BOOL_T);
 assert(IGS.outputExists("my_bool"));
-assert(IGS.outputType("my_int") === iopTypeEnum.IGS_INTEGER_T);
+assert(IGS.outputType("my_int") === ioTypeEnum.IGS_INTEGER_T);
 assert(IGS.outputExists("my_int"));
-assert(IGS.outputType("my_double") === iopTypeEnum.IGS_DOUBLE_T);
+assert(IGS.outputType("my_double") === ioTypeEnum.IGS_DOUBLE_T);
 assert(IGS.outputExists("my_double"));
-assert(IGS.outputType("my_string") === iopTypeEnum.IGS_STRING_T);
+assert(IGS.outputType("my_string") === ioTypeEnum.IGS_STRING_T);
 assert(IGS.outputExists("my_string"));
-assert(IGS.outputType("my_data") === iopTypeEnum.IGS_DATA_T);
+assert(IGS.outputType("my_data") === ioTypeEnum.IGS_DATA_T);
 assert(IGS.outputExists("my_data"));
 assert(IGS.outputBool("my_bool"));
 assert(IGS.outputInt("my_int") === 1);
@@ -446,32 +466,90 @@ assert(IGS.outputData("my_data").byteLength === 64);
 IGS.clearOutput("my_data");
 assert(IGS.outputData("my_data") === null);
 
+// Attributes
+assert(IGS.attributeCreate("my_impulsion", ioTypeEnum.IGS_IMPULSION_T, null) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.attributeCreate("my_impulsion", ioTypeEnum.IGS_IMPULSION_T, null) === igsResultEnum.IGS_FAILURE);
+assert(IGS.attributeCreate("my_bool", ioTypeEnum.IGS_BOOL_T, true) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.attributeCreate("my_bool", ioTypeEnum.IGS_BOOL_T, true) === igsResultEnum.IGS_FAILURE);
+assert(IGS.attributeCreate("my_int", ioTypeEnum.IGS_INTEGER_T, 1) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.attributeCreate("my_int", ioTypeEnum.IGS_INTEGER_T, 1) === igsResultEnum.IGS_FAILURE);
+assert(IGS.attributeCreate("my_double", ioTypeEnum.IGS_DOUBLE_T, 1) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.attributeCreate("my_double", ioTypeEnum.IGS_DOUBLE_T, 1) === igsResultEnum.IGS_FAILURE);
+assert(IGS.attributeCreate("my_string", ioTypeEnum.IGS_STRING_T, "my string") === igsResultEnum.IGS_SUCCESS);
+assert(IGS.attributeCreate("my_string", ioTypeEnum.IGS_STRING_T, "my string") === igsResultEnum.IGS_FAILURE);
+assert(IGS.attributeCreate("my_data", ioTypeEnum.IGS_DATA_T, new ArrayBuffer(32)) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.attributeCreate("my_data", ioTypeEnum.IGS_DATA_T, new ArrayBuffer(32)) === igsResultEnum.IGS_FAILURE);
+assert(IGS.attributeList().length === 6);
+assert(IGS.attributeCount() === 6);
+assert(IGS.attributeType("my_impulsion") === ioTypeEnum.IGS_IMPULSION_T);
+assert(IGS.attributeExists("my_impulsion"));
+assert(IGS.attributeType("my_bool") === ioTypeEnum.IGS_BOOL_T);
+assert(IGS.attributeExists("my_bool"));
+assert(IGS.attributeType("my_int") === ioTypeEnum.IGS_INTEGER_T);
+assert(IGS.attributeExists("my_int"));
+assert(IGS.attributeType("my_double") === ioTypeEnum.IGS_DOUBLE_T);
+assert(IGS.attributeExists("my_double"));
+assert(IGS.attributeType("my_string") === ioTypeEnum.IGS_STRING_T);
+assert(IGS.attributeExists("my_string"));
+assert(IGS.attributeType("my_data") === ioTypeEnum.IGS_DATA_T);
+assert(IGS.attributeExists("my_data"));
+assert(IGS.attributeBool("my_bool"));
+assert(IGS.attributeInt("my_int") === 1);
+assert(IGS.attributeDouble("my_double") - 1.0 < 0.000001);
+assert(IGS.attributeString("my_string") === "my string");
+assert(IGS.attributeData("my_data").byteLength === 32);
+assert(IGS.attributeSetBool("", false) === igsResultEnum.IGS_FAILURE);
+assert(IGS.attributeSetBool("my_bool", false) === igsResultEnum.IGS_SUCCESS);
+assert(!IGS.attributeBool("my_bool"));
+assert(IGS.attributeSetInt("", 2) === igsResultEnum.IGS_FAILURE);
+assert(IGS.attributeSetInt("my_int", 2) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.attributeInt("my_int") === 2);
+assert(IGS.attributeSetDouble("", 2) === igsResultEnum.IGS_FAILURE);
+assert(IGS.attributeSetDouble("my_double", 2) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.attributeDouble("my_double") - 2 < 0.000001);
+assert(IGS.attributeSetString("", "new string") === igsResultEnum.IGS_FAILURE);
+assert(IGS.attributeSetString("my_string", "new string") === igsResultEnum.IGS_SUCCESS);
+assert(IGS.attributeString("my_string") === "new string");
+assert(IGS.attributeSetData("", new ArrayBuffer(64)) === igsResultEnum.IGS_FAILURE);
+assert(IGS.attributeSetData("my_data", new ArrayBuffer(64)) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.attributeData("my_data").byteLength === 64);
+IGS.clearAttribute("my_data");
+assert(IGS.attributeData("my_data") === null);
+
+//Clear created attributes to test parameters
+IGS.attributeRemove("my_impulsion");
+IGS.attributeRemove("my_bool");
+IGS.attributeRemove("my_int");
+IGS.attributeRemove("my_double");
+IGS.attributeRemove("my_string");
+IGS.attributeRemove("my_data");
+
 // Parameters
-assert(IGS.parameterCreate("my impulsion", iopTypeEnum.IGS_IMPULSION_T, null) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.parameterCreate("my impulsion", iopTypeEnum.IGS_IMPULSION_T, null) === igsResultEnum.IGS_FAILURE);
-assert(IGS.parameterCreate("my bool", iopTypeEnum.IGS_BOOL_T, true) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.parameterCreate("my bool", iopTypeEnum.IGS_BOOL_T, true) === igsResultEnum.IGS_FAILURE);
-assert(IGS.parameterCreate("my int", iopTypeEnum.IGS_INTEGER_T, 1) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.parameterCreate("my int", iopTypeEnum.IGS_INTEGER_T, 1) === igsResultEnum.IGS_FAILURE);
-assert(IGS.parameterCreate("my double", iopTypeEnum.IGS_DOUBLE_T, 1) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.parameterCreate("my double", iopTypeEnum.IGS_DOUBLE_T, 1) === igsResultEnum.IGS_FAILURE);
-assert(IGS.parameterCreate("my string", iopTypeEnum.IGS_STRING_T,"my string") === igsResultEnum.IGS_SUCCESS);
-assert(IGS.parameterCreate("my string", iopTypeEnum.IGS_STRING_T, "my string") === igsResultEnum.IGS_FAILURE);
-assert(IGS.parameterCreate("my data", iopTypeEnum.IGS_DATA_T, new ArrayBuffer(32)) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.parameterCreate("my data", iopTypeEnum.IGS_DATA_T, new ArrayBuffer(32)) === igsResultEnum.IGS_FAILURE);
+assert(IGS.parameterCreate("my_impulsion", ioTypeEnum.IGS_IMPULSION_T, null) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.parameterCreate("my_impulsion", ioTypeEnum.IGS_IMPULSION_T, null) === igsResultEnum.IGS_FAILURE);
+assert(IGS.parameterCreate("my_bool", ioTypeEnum.IGS_BOOL_T, true) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.parameterCreate("my_bool", ioTypeEnum.IGS_BOOL_T, true) === igsResultEnum.IGS_FAILURE);
+assert(IGS.parameterCreate("my_int", ioTypeEnum.IGS_INTEGER_T, 1) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.parameterCreate("my_int", ioTypeEnum.IGS_INTEGER_T, 1) === igsResultEnum.IGS_FAILURE);
+assert(IGS.parameterCreate("my_double", ioTypeEnum.IGS_DOUBLE_T, 1) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.parameterCreate("my_double", ioTypeEnum.IGS_DOUBLE_T, 1) === igsResultEnum.IGS_FAILURE);
+assert(IGS.parameterCreate("my_string", ioTypeEnum.IGS_STRING_T, "my string") === igsResultEnum.IGS_SUCCESS);
+assert(IGS.parameterCreate("my_string", ioTypeEnum.IGS_STRING_T, "my string") === igsResultEnum.IGS_FAILURE);
+assert(IGS.parameterCreate("my_data", ioTypeEnum.IGS_DATA_T, new ArrayBuffer(32)) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.parameterCreate("my_data", ioTypeEnum.IGS_DATA_T, new ArrayBuffer(32)) === igsResultEnum.IGS_FAILURE);
 assert(IGS.parameterList().length === 6);
 assert(IGS.parameterCount() === 6);
-assert(IGS.parameterType("my_impulsion") === iopTypeEnum.IGS_IMPULSION_T);
+assert(IGS.parameterType("my_impulsion") === ioTypeEnum.IGS_IMPULSION_T);
 assert(IGS.parameterExists("my_impulsion"));
-assert(IGS.parameterType("my_bool") === iopTypeEnum.IGS_BOOL_T);
+assert(IGS.parameterType("my_bool") === ioTypeEnum.IGS_BOOL_T);
 assert(IGS.parameterExists("my_bool"));
-assert(IGS.parameterType("my_int") === iopTypeEnum.IGS_INTEGER_T);
+assert(IGS.parameterType("my_int") === ioTypeEnum.IGS_INTEGER_T);
 assert(IGS.parameterExists("my_int"));
-assert(IGS.parameterType("my_double") === iopTypeEnum.IGS_DOUBLE_T);
+assert(IGS.parameterType("my_double") === ioTypeEnum.IGS_DOUBLE_T);
 assert(IGS.parameterExists("my_double"));
-assert(IGS.parameterType("my_string") === iopTypeEnum.IGS_STRING_T);
+assert(IGS.parameterType("my_string") === ioTypeEnum.IGS_STRING_T);
 assert(IGS.parameterExists("my_string"));
-assert(IGS.parameterType("my_data") === iopTypeEnum.IGS_DATA_T);
+assert(IGS.parameterType("my_data") === ioTypeEnum.IGS_DATA_T);
 assert(IGS.parameterExists("my_data"));
 assert(IGS.parameterBool("my_bool"));
 assert(IGS.parameterInt("my_int") === 1);
@@ -496,11 +574,15 @@ assert(IGS.parameterData("my_data").byteLength === 64);
 IGS.clearParameter("my_data");
 assert(IGS.parameterData("my_data") === null);
 
-// N.B.: no way to assert, just call method
-IGS.inputSetDescription("my_impulsion", "my iop description here");
-IGS.outputSetDescription("my_impulsion", "my iop description here");
-IGS.parameterSetDescription("my_impulsion", "my iop description here");
 
+// N.B.: no way to assert, just call method
+IGS.inputSetDescription("my_impulsion", "my io description here");
+IGS.outputSetDescription("my_impulsion", "my io description here");
+IGS.attributeSetDescription("my_impulsion", "my io description here");
+IGS.parameterSetDescription("my_impulsion", "my io description here");
+IGS.inputSetDetailedType("my_impulsion", "type_name", "specification");
+IGS.outputSetDetailedType("my_impulsion", "type_name", "specification");
+IGS.attributeSetDetailedType("my_impulsion", "type_name", "specification");
 
 // Definition - part 2
 // TODO: compare exported def, saved file and reference file
@@ -514,127 +596,166 @@ assert(IGS.definitionDescription() === "");
 assert(IGS.definitionVersion() === "");
 assert(IGS.inputList().length === 0);
 assert(IGS.outputList().length === 0);
+assert(IGS.attributeList().length === 0);
 assert(IGS.parameterList().length === 0);
 assert(IGS.serviceList().length === 0);
 
 IGS.definitionLoadStr(exportedDefinition);
 assert(IGS.inputList().length === 6);
 assert(IGS.inputCount() === 6);
-assert(IGS.inputType("my_impulsion") === iopTypeEnum.IGS_IMPULSION_T);
+assert(IGS.inputType("my_impulsion") === ioTypeEnum.IGS_IMPULSION_T);
 assert(IGS.inputExists("my_impulsion"));
-assert(IGS.inputType("my_bool") === iopTypeEnum.IGS_BOOL_T);
+assert(IGS.inputType("my_bool") === ioTypeEnum.IGS_BOOL_T);
 assert(IGS.inputExists("my_bool"));
-assert(IGS.inputType("my_int") === iopTypeEnum.IGS_INTEGER_T);
+assert(IGS.inputType("my_int") === ioTypeEnum.IGS_INTEGER_T);
 assert(IGS.inputExists("my_int"));
-assert(IGS.inputType("my_double") === iopTypeEnum.IGS_DOUBLE_T);
+assert(IGS.inputType("my_double") === ioTypeEnum.IGS_DOUBLE_T);
 assert(IGS.inputExists("my_double"));
-assert(IGS.inputType("my_string") === iopTypeEnum.IGS_STRING_T);
+assert(IGS.inputType("my_string") === ioTypeEnum.IGS_STRING_T);
 assert(IGS.inputExists("my_string"));
-assert(IGS.inputType("my_data") === iopTypeEnum.IGS_DATA_T);
+assert(IGS.inputType("my_data") === ioTypeEnum.IGS_DATA_T);
 assert(IGS.inputExists("my_data"));
 assert(IGS.outputList().length === 6);
 assert(IGS.outputCount() === 6);
-assert(IGS.outputType("my_impulsion") === iopTypeEnum.IGS_IMPULSION_T);
+assert(IGS.outputType("my_impulsion") === ioTypeEnum.IGS_IMPULSION_T);
 assert(IGS.outputExists("my_impulsion"));
-assert(IGS.outputType("my_bool") === iopTypeEnum.IGS_BOOL_T);
+assert(IGS.outputType("my_bool") === ioTypeEnum.IGS_BOOL_T);
 assert(IGS.outputExists("my_bool"));
-assert(IGS.outputType("my_int") === iopTypeEnum.IGS_INTEGER_T);
+assert(IGS.outputType("my_int") === ioTypeEnum.IGS_INTEGER_T);
 assert(IGS.outputExists("my_int"));
-assert(IGS.outputType("my_double") === iopTypeEnum.IGS_DOUBLE_T);
+assert(IGS.outputType("my_double") === ioTypeEnum.IGS_DOUBLE_T);
 assert(IGS.outputExists("my_double"));
-assert(IGS.outputType("my_string") === iopTypeEnum.IGS_STRING_T);
+assert(IGS.outputType("my_string") === ioTypeEnum.IGS_STRING_T);
 assert(IGS.outputExists("my_string"));
-assert(IGS.outputType("my_data") === iopTypeEnum.IGS_DATA_T);
+assert(IGS.outputType("my_data") === ioTypeEnum.IGS_DATA_T);
 assert(IGS.outputExists("my_data"));
 assert(!IGS.outputBool("my_bool"));
 assert(IGS.outputInt("my_int") === 0);
 assert(IGS.outputDouble("my_double") < 0.000001);
 assert(IGS.outputString("my_string") === "");
 assert(IGS.outputData("my_data") === null);
+assert(IGS.attributeList().length === 6);
 assert(IGS.parameterList().length === 6);
+assert(IGS.attributeCount() === 6);
 assert(IGS.parameterCount() === 6);
-assert(IGS.parameterType("my_impulsion") === iopTypeEnum.IGS_IMPULSION_T);
+assert(IGS.attributeType("my_impulsion") === ioTypeEnum.IGS_IMPULSION_T);
+assert(IGS.parameterType("my_impulsion") === ioTypeEnum.IGS_IMPULSION_T);
+assert(IGS.attributeExists("my_impulsion"));
 assert(IGS.parameterExists("my_impulsion"));
-assert(IGS.parameterType("my_bool") === iopTypeEnum.IGS_BOOL_T);
+assert(IGS.attributeType("my_bool") === ioTypeEnum.IGS_BOOL_T);
+assert(IGS.parameterType("my_bool") === ioTypeEnum.IGS_BOOL_T);
+assert(IGS.attributeExists("my_bool"));
 assert(IGS.parameterExists("my_bool"));
-assert(IGS.parameterType("my_int") === iopTypeEnum.IGS_INTEGER_T);
+assert(IGS.attributeType("my_int") === ioTypeEnum.IGS_INTEGER_T);
+assert(IGS.parameterType("my_int") === ioTypeEnum.IGS_INTEGER_T);
+assert(IGS.attributeExists("my_int"));
 assert(IGS.parameterExists("my_int"));
-assert(IGS.parameterType("my_double") === iopTypeEnum.IGS_DOUBLE_T);
+assert(IGS.attributeType("my_double") === ioTypeEnum.IGS_DOUBLE_T);
+assert(IGS.parameterType("my_double") === ioTypeEnum.IGS_DOUBLE_T);
+assert(IGS.attributeExists("my_double"));
 assert(IGS.parameterExists("my_double"));
-assert(IGS.parameterType("my_string") === iopTypeEnum.IGS_STRING_T);
+assert(IGS.attributeType("my_string") === ioTypeEnum.IGS_STRING_T);
+assert(IGS.parameterType("my_string") === ioTypeEnum.IGS_STRING_T);
+assert(IGS.attributeExists("my_string"));
 assert(IGS.parameterExists("my_string"));
-assert(IGS.parameterType("my_data") === iopTypeEnum.IGS_DATA_T);
+assert(IGS.attributeType("my_data") === ioTypeEnum.IGS_DATA_T);
+assert(IGS.parameterType("my_data") === ioTypeEnum.IGS_DATA_T);
+assert(IGS.attributeExists("my_data"));
 assert(IGS.parameterExists("my_data"));
+assert(!IGS.attributeBool("my_bool"));
 assert(!IGS.parameterBool("my_bool"));
+assert(IGS.attributeInt("my_int") === 0);
 assert(IGS.parameterInt("my_int") === 0);
+assert(IGS.attributeDouble("my_double") < 0.000001);
 assert(IGS.parameterDouble("my_double") < 0.000001);
+assert(IGS.attributeString("my_string") === "");
 assert(IGS.parameterString("my_string") === "");
+assert(IGS.attributeData("my_data") === null);
 assert(IGS.parameterData("my_data") === null);
 IGS.clearDefinition();
 
 IGS.definitionLoadFile("/tmp/simple Demo Agent.json");
 assert(IGS.inputList().length === 6);
 assert(IGS.inputCount() === 6);
-assert(IGS.inputType("my_impulsion") === iopTypeEnum.IGS_IMPULSION_T);
+assert(IGS.inputType("my_impulsion") === ioTypeEnum.IGS_IMPULSION_T);
 assert(IGS.inputExists("my_impulsion"));
-assert(IGS.inputType("my_bool") === iopTypeEnum.IGS_BOOL_T);
+assert(IGS.inputType("my_bool") === ioTypeEnum.IGS_BOOL_T);
 assert(IGS.inputExists("my_bool"));
-assert(IGS.inputType("my_int") === iopTypeEnum.IGS_INTEGER_T);
+assert(IGS.inputType("my_int") === ioTypeEnum.IGS_INTEGER_T);
 assert(IGS.inputExists("my_int"));
-assert(IGS.inputType("my_double") === iopTypeEnum.IGS_DOUBLE_T);
+assert(IGS.inputType("my_double") === ioTypeEnum.IGS_DOUBLE_T);
 assert(IGS.inputExists("my_double"));
-assert(IGS.inputType("my_string") === iopTypeEnum.IGS_STRING_T);
+assert(IGS.inputType("my_string") === ioTypeEnum.IGS_STRING_T);
 assert(IGS.inputExists("my_string"));
-assert(IGS.inputType("my_data") === iopTypeEnum.IGS_DATA_T);
+assert(IGS.inputType("my_data") === ioTypeEnum.IGS_DATA_T);
 assert(IGS.inputExists("my_data"));
 assert(IGS.outputList().length === 6);
 assert(IGS.outputCount() === 6);
-assert(IGS.outputType("my_impulsion") === iopTypeEnum.IGS_IMPULSION_T);
+assert(IGS.outputType("my_impulsion") === ioTypeEnum.IGS_IMPULSION_T);
 assert(IGS.outputExists("my_impulsion"));
-assert(IGS.outputType("my_bool") === iopTypeEnum.IGS_BOOL_T);
+assert(IGS.outputType("my_bool") === ioTypeEnum.IGS_BOOL_T);
 assert(IGS.outputExists("my_bool"));
-assert(IGS.outputType("my_int") === iopTypeEnum.IGS_INTEGER_T);
+assert(IGS.outputType("my_int") === ioTypeEnum.IGS_INTEGER_T);
 assert(IGS.outputExists("my_int"));
-assert(IGS.outputType("my_double") === iopTypeEnum.IGS_DOUBLE_T);
+assert(IGS.outputType("my_double") === ioTypeEnum.IGS_DOUBLE_T);
 assert(IGS.outputExists("my_double"));
-assert(IGS.outputType("my_string") === iopTypeEnum.IGS_STRING_T);
+assert(IGS.outputType("my_string") === ioTypeEnum.IGS_STRING_T);
 assert(IGS.outputExists("my_string"));
-assert(IGS.outputType("my_data") === iopTypeEnum.IGS_DATA_T);
+assert(IGS.outputType("my_data") === ioTypeEnum.IGS_DATA_T);
 assert(IGS.outputExists("my_data"));
 assert(!IGS.outputBool("my_bool"));
 assert(IGS.outputInt("my_int") === 0);
 assert(IGS.outputDouble("my_double") < 0.000001);
 assert(IGS.outputString("my_string") === "");
 assert(IGS.outputData("my_data") === null);
+assert(IGS.attributeList().length === 6);
 assert(IGS.parameterList().length === 6);
+assert(IGS.attributeCount() === 6);
 assert(IGS.parameterCount() === 6);
-assert(IGS.parameterType("my_impulsion") === iopTypeEnum.IGS_IMPULSION_T);
+assert(IGS.attributeType("my_impulsion") === ioTypeEnum.IGS_IMPULSION_T);
+assert(IGS.parameterType("my_impulsion") === ioTypeEnum.IGS_IMPULSION_T);
+assert(IGS.attributeExists("my_impulsion"));
 assert(IGS.parameterExists("my_impulsion"));
-assert(IGS.parameterType("my_bool") === iopTypeEnum.IGS_BOOL_T);
+assert(IGS.attributeType("my_bool") === ioTypeEnum.IGS_BOOL_T);
+assert(IGS.parameterType("my_bool") === ioTypeEnum.IGS_BOOL_T);
+assert(IGS.attributeExists("my_bool"));
 assert(IGS.parameterExists("my_bool"));
-assert(IGS.parameterType("my_int") === iopTypeEnum.IGS_INTEGER_T);
+assert(IGS.attributeType("my_int") === ioTypeEnum.IGS_INTEGER_T);
+assert(IGS.parameterType("my_int") === ioTypeEnum.IGS_INTEGER_T);
+assert(IGS.attributeExists("my_int"));
 assert(IGS.parameterExists("my_int"));
-assert(IGS.parameterType("my_double") === iopTypeEnum.IGS_DOUBLE_T);
+assert(IGS.attributeType("my_double") === ioTypeEnum.IGS_DOUBLE_T);
+assert(IGS.parameterType("my_double") === ioTypeEnum.IGS_DOUBLE_T);
+assert(IGS.attributeExists("my_double"));
 assert(IGS.parameterExists("my_double"));
-assert(IGS.parameterType("my_string") === iopTypeEnum.IGS_STRING_T);
+assert(IGS.attributeType("my_string") === ioTypeEnum.IGS_STRING_T);
+assert(IGS.parameterType("my_string") === ioTypeEnum.IGS_STRING_T);
+assert(IGS.attributeExists("my_string"));
 assert(IGS.parameterExists("my_string"));
-assert(IGS.parameterType("my_data") === iopTypeEnum.IGS_DATA_T);
+assert(IGS.attributeType("my_data") === ioTypeEnum.IGS_DATA_T);
+assert(IGS.parameterType("my_data") === ioTypeEnum.IGS_DATA_T);
+assert(IGS.attributeExists("my_data"));
 assert(IGS.parameterExists("my_data"));
+assert(!IGS.attributeBool("my_bool"));
 assert(!IGS.parameterBool("my_bool"));
+assert(IGS.attributeInt("my_int") === 0);
 assert(IGS.parameterInt("my_int") === 0);
+assert(IGS.attributeDouble("my_double") < 0.000001);
 assert(IGS.parameterDouble("my_double") < 0.000001);
+assert(IGS.attributeString("my_string") === "");
 assert(IGS.parameterString("my_string") === "");
+assert(IGS.attributeData("my_data") === null);
 assert(IGS.parameterData("my_data") === null);
 
 IGS.clearDefinition();
 
 //inputs constraints
-IGS.inputCreate("constraint_impulsion", iopTypeEnum.IGS_IMPULSION_T, null);
-IGS.inputCreate("constraint_bool", iopTypeEnum.IGS_BOOL_T, false);
-IGS.inputCreate("constraint_int", iopTypeEnum.IGS_INTEGER_T, 0);
-IGS.inputCreate("constraint_double", iopTypeEnum.IGS_DOUBLE_T, 0);
-IGS.inputCreate("constraint_string", iopTypeEnum.IGS_STRING_T, "");
-IGS.inputCreate("constraint_data", iopTypeEnum.IGS_DATA_T, null);
+IGS.inputCreate("constraint_impulsion", ioTypeEnum.IGS_IMPULSION_T, null);
+IGS.inputCreate("constraint_bool", ioTypeEnum.IGS_BOOL_T, false);
+IGS.inputCreate("constraint_int", ioTypeEnum.IGS_INTEGER_T, 0);
+IGS.inputCreate("constraint_double", ioTypeEnum.IGS_DOUBLE_T, 0);
+IGS.inputCreate("constraint_string", ioTypeEnum.IGS_STRING_T, "");
+IGS.inputCreate("constraint_data", ioTypeEnum.IGS_DATA_T, null);
 
 assert(IGS.inputAddConstraint("constraint_int", "min 10.12") == igsResultEnum.IGS_SUCCESS); //will set 10 as min constraint
 assert(IGS.inputAddConstraint("constraint_int", "max 10.12") == igsResultEnum.IGS_SUCCESS); //will set 10 as max constraint
@@ -681,12 +802,12 @@ IGS.inputRemove("constraint_string");
 IGS.inputRemove("constraint_data");
 
 //output constraints
-IGS.outputCreate("constraint_impulsion", iopTypeEnum.IGS_IMPULSION_T, null);
-IGS.outputCreate("constraint_bool", iopTypeEnum.IGS_BOOL_T, false);
-IGS.outputCreate("constraint_int", iopTypeEnum.IGS_INTEGER_T, 0);
-IGS.outputCreate("constraint_double", iopTypeEnum.IGS_DOUBLE_T, 0);
-IGS.outputCreate("constraint_string", iopTypeEnum.IGS_STRING_T, "");
-IGS.outputCreate("constraint_data", iopTypeEnum.IGS_DATA_T, null);
+IGS.outputCreate("constraint_impulsion", ioTypeEnum.IGS_IMPULSION_T, null);
+IGS.outputCreate("constraint_bool", ioTypeEnum.IGS_BOOL_T, false);
+IGS.outputCreate("constraint_int", ioTypeEnum.IGS_INTEGER_T, 0);
+IGS.outputCreate("constraint_double", ioTypeEnum.IGS_DOUBLE_T, 0);
+IGS.outputCreate("constraint_string", ioTypeEnum.IGS_STRING_T, "");
+IGS.outputCreate("constraint_data", ioTypeEnum.IGS_DATA_T, null);
 
 assert(IGS.outputAddConstraint("constraint_int", "min 10.12") == igsResultEnum.IGS_SUCCESS); //will set 10 as min constraint
 assert(IGS.outputAddConstraint("constraint_int", "max 10.12") == igsResultEnum.IGS_SUCCESS); //will set 10 as max constraint
@@ -732,56 +853,98 @@ IGS.outputRemove("constraint_double");
 IGS.outputRemove("constraint_string");
 IGS.outputRemove("constraint_data");
 
-//parameter constraints
-IGS.parameterCreate("constraint_impulsion", iopTypeEnum.IGS_IMPULSION_T, null);
-IGS.parameterCreate("constraint_bool", iopTypeEnum.IGS_BOOL_T, false);
-IGS.parameterCreate("constraint_int", iopTypeEnum.IGS_INTEGER_T, 0);
-IGS.parameterCreate("constraint_double", iopTypeEnum.IGS_DOUBLE_T, 0);
-IGS.parameterCreate("constraint_string", iopTypeEnum.IGS_STRING_T, "");
-IGS.parameterCreate("constraint_data", iopTypeEnum.IGS_DATA_T, null);
+//attribute & parameter constraints
+IGS.attributeCreate("constraint_impulsion", ioTypeEnum.IGS_IMPULSION_T, null);
+IGS.parameterCreate("constraint_impulsion", ioTypeEnum.IGS_IMPULSION_T, null);
+IGS.attributeCreate("constraint_bool", ioTypeEnum.IGS_BOOL_T, false);
+IGS.parameterCreate("constraint_bool", ioTypeEnum.IGS_BOOL_T, false);
+IGS.attributeCreate("constraint_int", ioTypeEnum.IGS_INTEGER_T, 0);
+IGS.parameterCreate("constraint_int", ioTypeEnum.IGS_INTEGER_T, 0);
+IGS.attributeCreate("constraint_double", ioTypeEnum.IGS_DOUBLE_T, 0);
+IGS.parameterCreate("constraint_double", ioTypeEnum.IGS_DOUBLE_T, 0);
+IGS.attributeCreate("constraint_string", ioTypeEnum.IGS_STRING_T, "");
+IGS.parameterCreate("constraint_string", ioTypeEnum.IGS_STRING_T, "");
+IGS.attributeCreate("constraint_data", ioTypeEnum.IGS_DATA_T, null);
+IGS.parameterCreate("constraint_data", ioTypeEnum.IGS_DATA_T, null);
 
+assert(IGS.attributeAddConstraint("constraint_int", "min 10.12") == igsResultEnum.IGS_SUCCESS); //will set 10 as min constraint
 assert(IGS.parameterAddConstraint("constraint_int", "min 10.12") == igsResultEnum.IGS_SUCCESS); //will set 10 as min constraint
+assert(IGS.attributeAddConstraint("constraint_int", "max 10.12") == igsResultEnum.IGS_SUCCESS); //will set 10 as max constraint
 assert(IGS.parameterAddConstraint("constraint_int", "max 10.12") == igsResultEnum.IGS_SUCCESS); //will set 10 as max constraint
+assert(IGS.attributeAddConstraint("constraint_int", "[-.1, +10.13]") == igsResultEnum.IGS_SUCCESS);
 assert(IGS.parameterAddConstraint("constraint_int", "[-.1, +10.13]") == igsResultEnum.IGS_SUCCESS);
+assert(IGS.attributeAddConstraint("constraint_int", "[-.1  ,  +10.13]") == igsResultEnum.IGS_SUCCESS);
 assert(IGS.parameterAddConstraint("constraint_int", "[-.1  ,  +10.13]") == igsResultEnum.IGS_SUCCESS);
+assert(IGS.attributeAddConstraint("constraint_int", "[-.1,+10.13]") == igsResultEnum.IGS_SUCCESS);
 assert(IGS.parameterAddConstraint("constraint_int", "[-.1,+10.13]") == igsResultEnum.IGS_SUCCESS);
+assert(IGS.attributeAddConstraint("constraint_int", "[1,-10.13]") == igsResultEnum.IGS_FAILURE);
 assert(IGS.parameterAddConstraint("constraint_int", "[1,-10.13]") == igsResultEnum.IGS_FAILURE);
 
+assert(IGS.attributeAddConstraint("constraint_double", "min 10.12") == igsResultEnum.IGS_SUCCESS);
 assert(IGS.parameterAddConstraint("constraint_double", "min 10.12") == igsResultEnum.IGS_SUCCESS);
+assert(IGS.attributeAddConstraint("constraint_double", "max 10.12") == igsResultEnum.IGS_SUCCESS);
 assert(IGS.parameterAddConstraint("constraint_double", "max 10.12") == igsResultEnum.IGS_SUCCESS);
+assert(IGS.attributeAddConstraint("constraint_double", "[-.1, +10.13]") == igsResultEnum.IGS_SUCCESS);
 assert(IGS.parameterAddConstraint("constraint_double", "[-.1, +10.13]") == igsResultEnum.IGS_SUCCESS);
+assert(IGS.attributeAddConstraint("constraint_double", "[12.12,12.12]") == igsResultEnum.IGS_SUCCESS);
 assert(IGS.parameterAddConstraint("constraint_double", "[12.12,12.12]") == igsResultEnum.IGS_SUCCESS);
 
+assert(IGS.attributeAddConstraint("constraint_bool", "min 10.12") == igsResultEnum.IGS_FAILURE);
 assert(IGS.parameterAddConstraint("constraint_bool", "min 10.12") == igsResultEnum.IGS_FAILURE);
+assert(IGS.attributeAddConstraint("constraint_bool", "max 10.12") == igsResultEnum.IGS_FAILURE);
 assert(IGS.parameterAddConstraint("constraint_bool", "max 10.12") == igsResultEnum.IGS_FAILURE);
+assert(IGS.attributeAddConstraint("constraint_bool", "[1,10.13]") == igsResultEnum.IGS_FAILURE);
 assert(IGS.parameterAddConstraint("constraint_bool", "[1,10.13]") == igsResultEnum.IGS_FAILURE);
 
+assert(IGS.attributeAddConstraint("constraint_impulsion", "min 10.12") == igsResultEnum.IGS_FAILURE);
 assert(IGS.parameterAddConstraint("constraint_impulsion", "min 10.12") == igsResultEnum.IGS_FAILURE);
+assert(IGS.attributeAddConstraint("constraint_impulsion", "max 10.12") == igsResultEnum.IGS_FAILURE);
 assert(IGS.parameterAddConstraint("constraint_impulsion", "max 10.12") == igsResultEnum.IGS_FAILURE);
+assert(IGS.attributeAddConstraint("constraint_impulsion", "[1,10.13]") == igsResultEnum.IGS_FAILURE);
 assert(IGS.parameterAddConstraint("constraint_impulsion", "[1,10.13]") == igsResultEnum.IGS_FAILURE);
 
+assert(IGS.attributeAddConstraint("constraint_string", "min 10.12") == igsResultEnum.IGS_FAILURE);
 assert(IGS.parameterAddConstraint("constraint_string", "min 10.12") == igsResultEnum.IGS_FAILURE);
+assert(IGS.attributeAddConstraint("constraint_string", "max 10.12") == igsResultEnum.IGS_FAILURE);
 assert(IGS.parameterAddConstraint("constraint_string", "max 10.12") == igsResultEnum.IGS_FAILURE);
+assert(IGS.attributeAddConstraint("constraint_string", "[1,10.13]") == igsResultEnum.IGS_FAILURE);
 assert(IGS.parameterAddConstraint("constraint_string", "[1,10.13]") == igsResultEnum.IGS_FAILURE);
 
+assert(IGS.attributeAddConstraint("constraint_data", "min 10.12") == igsResultEnum.IGS_FAILURE);
 assert(IGS.parameterAddConstraint("constraint_data", "min 10.12") == igsResultEnum.IGS_FAILURE);
+assert(IGS.attributeAddConstraint("constraint_data", "max 10.12") == igsResultEnum.IGS_FAILURE);
 assert(IGS.parameterAddConstraint("constraint_data", "max 10.12") == igsResultEnum.IGS_FAILURE);
+assert(IGS.attributeAddConstraint("constraint_data", "[1,-10.13]") == igsResultEnum.IGS_FAILURE);
 assert(IGS.parameterAddConstraint("constraint_data", "[1,-10.13]") == igsResultEnum.IGS_FAILURE);
 
+assert(IGS.attributeAddConstraint("constraint_string", "~ [^ +") == igsResultEnum.IGS_FAILURE); //bad format for regex
 assert(IGS.parameterAddConstraint("constraint_string", "~ [^ +") == igsResultEnum.IGS_FAILURE); //bad format for regex
+assert(IGS.attributeAddConstraint("constraint_string", "~ (\\d+)") == igsResultEnum.IGS_SUCCESS);
 assert(IGS.parameterAddConstraint("constraint_string", "~ (\\d+)") == igsResultEnum.IGS_SUCCESS);
+assert(IGS.attributeAddConstraint("constraint_string", "~ (\\d+)") == igsResultEnum.IGS_SUCCESS);
 assert(IGS.parameterAddConstraint("constraint_string", "~ (\\d+)") == igsResultEnum.IGS_SUCCESS);
+assert(IGS.attributeAddConstraint("constraint_impulsion", "~ (\\d+)") == igsResultEnum.IGS_FAILURE);
 assert(IGS.parameterAddConstraint("constraint_impulsion", "~ (\\d+)") == igsResultEnum.IGS_FAILURE);
+assert(IGS.attributeAddConstraint("constraint_int", "~ (\\d+)") == igsResultEnum.IGS_FAILURE);
 assert(IGS.parameterAddConstraint("constraint_int", "~ (\\d+)") == igsResultEnum.IGS_FAILURE);
+assert(IGS.attributeAddConstraint("constraint_double", "~ (\\d+)") == igsResultEnum.IGS_FAILURE);
 assert(IGS.parameterAddConstraint("constraint_double", "~ (\\d+)") == igsResultEnum.IGS_FAILURE);
+assert(IGS.attributeAddConstraint("constraint_bool", "~ (\\d+)") == igsResultEnum.IGS_FAILURE);
 assert(IGS.parameterAddConstraint("constraint_bool", "~ (\\d+)") == igsResultEnum.IGS_FAILURE);
+assert(IGS.attributeAddConstraint("constraint_data", "~ (\\d+)") == igsResultEnum.IGS_FAILURE);
 assert(IGS.parameterAddConstraint("constraint_data", "~ (\\d+)") == igsResultEnum.IGS_FAILURE);
 
+IGS.attributeRemove("constraint_impulsion");
 IGS.parameterRemove("constraint_impulsion");
+IGS.attributeRemove("constraint_int");
 IGS.parameterRemove("constraint_int");
+IGS.attributeRemove("constraint_bool");
 IGS.parameterRemove("constraint_bool");
+IGS.attributeRemove("constraint_double");
 IGS.parameterRemove("constraint_double");
+IGS.attributeRemove("constraint_string");
 IGS.parameterRemove("constraint_string");
+IGS.attributeRemove("constraint_data");
 IGS.parameterRemove("constraint_data");
 
 
@@ -856,15 +1019,15 @@ argsList = IGS.serviceArgsAddInt(argsList, 1);
 argsList = IGS.serviceArgsAddDouble(argsList, 1);
 argsList = IGS.serviceArgsAddString(argsList, "my string");
 argsList = IGS.serviceArgsAddData(argsList, new ArrayBuffer(32));
-assert(argsList[0].type === iopTypeEnum.IGS_BOOL_T);
+assert(argsList[0].type === ioTypeEnum.IGS_BOOL_T);
 assert(argsList[0].value === true);
-assert(argsList[1].type === iopTypeEnum.IGS_INTEGER_T);
+assert(argsList[1].type === ioTypeEnum.IGS_INTEGER_T);
 assert(argsList[1].value === 1);
-assert(argsList[2].type === iopTypeEnum.IGS_DOUBLE_T);
+assert(argsList[2].type === ioTypeEnum.IGS_DOUBLE_T);
 assert(argsList[2].value - 1 < 0.000001);
-assert(argsList[3].type === iopTypeEnum.IGS_STRING_T);
+assert(argsList[3].type === ioTypeEnum.IGS_STRING_T);
 assert(argsList[3].value === "my string");
-assert(argsList[4].type === iopTypeEnum.IGS_DATA_T);
+assert(argsList[4].type === ioTypeEnum.IGS_DATA_T);
 assert(argsList[4].value.byteLength === 32);
 
 assert(IGS.serviceCount() === 0);
@@ -882,26 +1045,26 @@ assert(IGS.serviceArgExists("toto", "toto") === false);
 assert(IGS.serviceInit("myService", testerServiceCallback, null) === igsResultEnum.IGS_SUCCESS);
 assert(IGS.serviceRemove("myService") === igsResultEnum.IGS_SUCCESS);
 assert(IGS.serviceRemove("myService") === igsResultEnum.IGS_FAILURE);
-assert(IGS.serviceArgAdd("myService", "myArg", iopTypeEnum.IGS_BOOL_T) === igsResultEnum.IGS_FAILURE);
+assert(IGS.serviceArgAdd("myService", "myArg", ioTypeEnum.IGS_BOOL_T) === igsResultEnum.IGS_FAILURE);
 assert(IGS.serviceArgRemove("myService", "myArg") === igsResultEnum.IGS_FAILURE);
 
 assert(IGS.serviceInit("myService", testerServiceCallback, null) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.serviceArgAdd("myService", "myBool", iopTypeEnum.IGS_BOOL_T) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.serviceArgAdd("myService", "myInt", iopTypeEnum.IGS_INTEGER_T) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.serviceArgAdd("myService", "myDouble", iopTypeEnum.IGS_DOUBLE_T) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.serviceArgAdd("myService", "myString", iopTypeEnum.IGS_STRING_T) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.serviceArgAdd("myService", "myData", iopTypeEnum.IGS_DATA_T) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceArgAdd("myService", "myBool", ioTypeEnum.IGS_BOOL_T) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceArgAdd("myService", "myInt", ioTypeEnum.IGS_INTEGER_T) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceArgAdd("myService", "myDouble", ioTypeEnum.IGS_DOUBLE_T) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceArgAdd("myService", "myString", ioTypeEnum.IGS_STRING_T) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceArgAdd("myService", "myData", ioTypeEnum.IGS_DATA_T) === igsResultEnum.IGS_SUCCESS);
 assert(IGS.serviceCount() === 1);
 assert(IGS.serviceExists("myService"));
 assert(IGS.serviceList().length === 1 && IGS.serviceList()[0] === "myService");
 assert(IGS.serviceRemove("myService") === igsResultEnum.IGS_SUCCESS);
 
 assert(IGS.serviceInit("myService", testerServiceCallback, null) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.serviceArgAdd("myService", "myBool", iopTypeEnum.IGS_BOOL_T) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.serviceArgAdd("myService", "myInt", iopTypeEnum.IGS_INTEGER_T) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.serviceArgAdd("myService", "myDouble", iopTypeEnum.IGS_DOUBLE_T) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.serviceArgAdd("myService", "myString", iopTypeEnum.IGS_STRING_T) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.serviceArgAdd("myService", "myData", iopTypeEnum.IGS_DATA_T) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceArgAdd("myService", "myBool", ioTypeEnum.IGS_BOOL_T) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceArgAdd("myService", "myInt", ioTypeEnum.IGS_INTEGER_T) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceArgAdd("myService", "myDouble", ioTypeEnum.IGS_DOUBLE_T) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceArgAdd("myService", "myString", ioTypeEnum.IGS_STRING_T) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceArgAdd("myService", "myData", ioTypeEnum.IGS_DATA_T) === igsResultEnum.IGS_SUCCESS);
 assert(IGS.serviceArgsCount("myService") === 5);
 assert(IGS.serviceArgExists("myService", "myBool"));
 assert(IGS.serviceArgExists("myService", "myInt"));
@@ -911,15 +1074,15 @@ assert(IGS.serviceArgExists("myService", "myData"));
 argsList = IGS.serviceArgsList("myService");
 assert(argsList);
 assert(argsList[0].name === "myBool");
-assert(argsList[0].type === iopTypeEnum.IGS_BOOL_T);
+assert(argsList[0].type === ioTypeEnum.IGS_BOOL_T);
 assert(argsList[1].name === "myInt");
-assert(argsList[1].type === iopTypeEnum.IGS_INTEGER_T);
+assert(argsList[1].type === ioTypeEnum.IGS_INTEGER_T);
 assert(argsList[2].name === "myDouble");
-assert(argsList[2].type === iopTypeEnum.IGS_DOUBLE_T);
+assert(argsList[2].type === ioTypeEnum.IGS_DOUBLE_T);
 assert(argsList[3].name === "myString");
-assert(argsList[3].type === iopTypeEnum.IGS_STRING_T);
+assert(argsList[3].type === ioTypeEnum.IGS_STRING_T);
 assert(argsList[4].name === "myData");
-assert(argsList[4].type === iopTypeEnum.IGS_DATA_T);
+assert(argsList[4].type === ioTypeEnum.IGS_DATA_T);
 IGS.definitionSave();
 assert(IGS.serviceRemove("myService") === igsResultEnum.IGS_SUCCESS);
 IGS.clearDefinition();
@@ -934,15 +1097,15 @@ assert(IGS.serviceArgExists("myService", "myData"));
 argsList = IGS.serviceArgsList("myService");
 assert(argsList);
 assert(argsList[0].name === "myBool");
-assert(argsList[0].type === iopTypeEnum.IGS_BOOL_T);
+assert(argsList[0].type === ioTypeEnum.IGS_BOOL_T);
 assert(argsList[1].name === "myInt");
-assert(argsList[1].type === iopTypeEnum.IGS_INTEGER_T);
+assert(argsList[1].type === ioTypeEnum.IGS_INTEGER_T);
 assert(argsList[2].name === "myDouble");
-assert(argsList[2].type === iopTypeEnum.IGS_DOUBLE_T);
+assert(argsList[2].type === ioTypeEnum.IGS_DOUBLE_T);
 assert(argsList[3].name === "myString");
-assert(argsList[3].type === iopTypeEnum.IGS_STRING_T);
+assert(argsList[3].type === ioTypeEnum.IGS_STRING_T);
 assert(argsList[4].name === "myData");
-assert(argsList[4].type === iopTypeEnum.IGS_DATA_T);
+assert(argsList[4].type === ioTypeEnum.IGS_DATA_T);
 
 // Service with reply
 assert(IGS.serviceInit("myServiceWithReplies", testerServiceCallback, null) === igsResultEnum.IGS_SUCCESS);
@@ -958,46 +1121,48 @@ assert(IGS.serviceHasReply("myServiceWithReplies", "myReply"));
 assert(IGS.serviceHasReply("myServiceWithReplies", "myReply2"));
 assert(!IGS.serviceHasReply("myServiceWithReplies", "myReply3"));
 let names = IGS.serviceReplyNames("myServiceWithReplies");
-assert((names.length === 2) && (names[0] === "myReply") && (names[1] === "myReply2"));
+assert(names.length === 2);
+assert(names.includes("myReply"));
+assert(names.includes("myReply2"));
 assert(IGS.serviceReplyArgsList("myServiceWithReplies", "myReply").length === 0);
 assert(IGS.serviceReplyArgsCount("myServiceWithReplies", "myReply") === 0);
-assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply", "myBool", iopTypeEnum.IGS_BOOL_T) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply", "myInt", iopTypeEnum.IGS_INTEGER_T) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply", "myDouble", iopTypeEnum.IGS_DOUBLE_T) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply", "myString", iopTypeEnum.IGS_STRING_T) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply", "myData", iopTypeEnum.IGS_DATA_T) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply2", "myBool2", iopTypeEnum.IGS_BOOL_T) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply2", "myInt2", iopTypeEnum.IGS_INTEGER_T) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply2", "myDouble2", iopTypeEnum.IGS_DOUBLE_T) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply2", "myString2", iopTypeEnum.IGS_STRING_T) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply2", "myData2", iopTypeEnum.IGS_DATA_T) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply", "myBool", ioTypeEnum.IGS_BOOL_T) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply", "myInt", ioTypeEnum.IGS_INTEGER_T) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply", "myDouble", ioTypeEnum.IGS_DOUBLE_T) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply", "myString", ioTypeEnum.IGS_STRING_T) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply", "myData", ioTypeEnum.IGS_DATA_T) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply2", "myBool2", ioTypeEnum.IGS_BOOL_T) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply2", "myInt2", ioTypeEnum.IGS_INTEGER_T) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply2", "myDouble2", ioTypeEnum.IGS_DOUBLE_T) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply2", "myString2", ioTypeEnum.IGS_STRING_T) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply2", "myData2", ioTypeEnum.IGS_DATA_T) === igsResultEnum.IGS_SUCCESS);
 
 assert(IGS.serviceReplyArgsCount("myServiceWithReplies", "myReply") === 5);
 argsList = IGS.serviceReplyArgsList("myServiceWithReplies", "myReply");
 assert(argsList);
 assert(argsList[0].name === "myBool");
-assert(argsList[0].type === iopTypeEnum.IGS_BOOL_T);
+assert(argsList[0].type === ioTypeEnum.IGS_BOOL_T);
 assert(argsList[1].name === "myInt");
-assert(argsList[1].type === iopTypeEnum.IGS_INTEGER_T);
+assert(argsList[1].type === ioTypeEnum.IGS_INTEGER_T);
 assert(argsList[2].name === "myDouble");
-assert(argsList[2].type === iopTypeEnum.IGS_DOUBLE_T);
+assert(argsList[2].type === ioTypeEnum.IGS_DOUBLE_T);
 assert(argsList[3].name === "myString");
-assert(argsList[3].type === iopTypeEnum.IGS_STRING_T);
+assert(argsList[3].type === ioTypeEnum.IGS_STRING_T);
 assert(argsList[4].name === "myData");
-assert(argsList[4].type === iopTypeEnum.IGS_DATA_T);
+assert(argsList[4].type === ioTypeEnum.IGS_DATA_T);
 assert(IGS.serviceReplyArgsCount("myServiceWithReplies", "myReply2") === 5);
 argsList = IGS.serviceReplyArgsList("myServiceWithReplies", "myReply2");
 assert(argsList);
 assert(argsList[0].name === "myBool2");
-assert(argsList[0].type === iopTypeEnum.IGS_BOOL_T);
+assert(argsList[0].type === ioTypeEnum.IGS_BOOL_T);
 assert(argsList[1].name === "myInt2");
-assert(argsList[1].type === iopTypeEnum.IGS_INTEGER_T);
+assert(argsList[1].type === ioTypeEnum.IGS_INTEGER_T);
 assert(argsList[2].name === "myDouble2");
-assert(argsList[2].type === iopTypeEnum.IGS_DOUBLE_T);
+assert(argsList[2].type === ioTypeEnum.IGS_DOUBLE_T);
 assert(argsList[3].name === "myString2");
-assert(argsList[3].type === iopTypeEnum.IGS_STRING_T);
+assert(argsList[3].type === ioTypeEnum.IGS_STRING_T);
 assert(argsList[4].name === "myData2");
-assert(argsList[4].type === iopTypeEnum.IGS_DATA_T);
+assert(argsList[4].type === ioTypeEnum.IGS_DATA_T);
 
 assert(IGS.serviceReplyArgExists("myServiceWithReplies", "myReply", "myBool"));
 assert(IGS.serviceReplyArgExists("myServiceWithReplies", "myReply", "myInt"));
@@ -1059,16 +1224,16 @@ assert(!IGS.serviceHasReplies("myServiceWithReplies"));
 
 assert(IGS.serviceReplyAdd("myServiceWithReplies", "myReply") === igsResultEnum.IGS_SUCCESS);
 assert(IGS.serviceReplyAdd("myServiceWithReplies", "myReply2") === igsResultEnum.IGS_SUCCESS);
-assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply", "myBool", iopTypeEnum.IGS_BOOL_T) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply", "myInt", iopTypeEnum.IGS_INTEGER_T) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply", "myDouble", iopTypeEnum.IGS_DOUBLE_T) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply", "myString", iopTypeEnum.IGS_STRING_T) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply", "myData", iopTypeEnum.IGS_DATA_T) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply2", "myBool2", iopTypeEnum.IGS_BOOL_T) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply2", "myInt2", iopTypeEnum.IGS_INTEGER_T) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply2", "myDouble2", iopTypeEnum.IGS_DOUBLE_T) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply2", "myString2", iopTypeEnum.IGS_STRING_T) === igsResultEnum.IGS_SUCCESS);
-assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply2", "myData2", iopTypeEnum.IGS_DATA_T) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply", "myBool", ioTypeEnum.IGS_BOOL_T) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply", "myInt", ioTypeEnum.IGS_INTEGER_T) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply", "myDouble", ioTypeEnum.IGS_DOUBLE_T) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply", "myString", ioTypeEnum.IGS_STRING_T) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply", "myData", ioTypeEnum.IGS_DATA_T) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply2", "myBool2", ioTypeEnum.IGS_BOOL_T) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply2", "myInt2", ioTypeEnum.IGS_INTEGER_T) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply2", "myDouble2", ioTypeEnum.IGS_DOUBLE_T) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply2", "myString2", ioTypeEnum.IGS_STRING_T) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply2", "myData2", ioTypeEnum.IGS_DATA_T) === igsResultEnum.IGS_SUCCESS);
 IGS.definitionSave();
 assert(IGS.serviceRemove("myServiceWithReplies") === igsResultEnum.IGS_SUCCESS);
 IGS.clearDefinition();
@@ -1079,28 +1244,28 @@ assert(IGS.serviceReplyArgsCount("myServiceWithReplies", "myReply") === 5);
 argsList = IGS.serviceReplyArgsList("myServiceWithReplies", "myReply");
 assert(argsList);
 assert(argsList[0].name === "myBool");
-assert(argsList[0].type === iopTypeEnum.IGS_BOOL_T);
+assert(argsList[0].type === ioTypeEnum.IGS_BOOL_T);
 assert(argsList[1].name === "myInt");
-assert(argsList[1].type === iopTypeEnum.IGS_INTEGER_T);
+assert(argsList[1].type === ioTypeEnum.IGS_INTEGER_T);
 assert(argsList[2].name === "myDouble");
-assert(argsList[2].type === iopTypeEnum.IGS_DOUBLE_T);
+assert(argsList[2].type === ioTypeEnum.IGS_DOUBLE_T);
 assert(argsList[3].name === "myString");
-assert(argsList[3].type === iopTypeEnum.IGS_STRING_T);
+assert(argsList[3].type === ioTypeEnum.IGS_STRING_T);
 assert(argsList[4].name === "myData");
-assert(argsList[4].type === iopTypeEnum.IGS_DATA_T);
+assert(argsList[4].type === ioTypeEnum.IGS_DATA_T);
 assert(IGS.serviceReplyArgsCount("myServiceWithReplies", "myReply2") === 5);
 argsList = IGS.serviceReplyArgsList("myServiceWithReplies", "myReply2");
 assert(argsList);
 assert(argsList[0].name === "myBool2");
-assert(argsList[0].type === iopTypeEnum.IGS_BOOL_T);
+assert(argsList[0].type === ioTypeEnum.IGS_BOOL_T);
 assert(argsList[1].name === "myInt2");
-assert(argsList[1].type === iopTypeEnum.IGS_INTEGER_T);
+assert(argsList[1].type === ioTypeEnum.IGS_INTEGER_T);
 assert(argsList[2].name === "myDouble2");
-assert(argsList[2].type === iopTypeEnum.IGS_DOUBLE_T);
+assert(argsList[2].type === ioTypeEnum.IGS_DOUBLE_T);
 assert(argsList[3].name === "myString2");
-assert(argsList[3].type === iopTypeEnum.IGS_STRING_T);
+assert(argsList[3].type === ioTypeEnum.IGS_STRING_T);
 assert(argsList[4].name === "myData2");
-assert(argsList[4].type === iopTypeEnum.IGS_DATA_T);
+assert(argsList[4].type === ioTypeEnum.IGS_DATA_T);
 assert(IGS.serviceReplyArgExists("myServiceWithReplies", "myReply", "myBool"));
 assert(IGS.serviceReplyArgExists("myServiceWithReplies", "myReply", "myInt"));
 assert(IGS.serviceReplyArgExists("myServiceWithReplies", "myReply", "myDouble"));
@@ -1116,51 +1281,57 @@ assert(IGS.serviceReplyArgExists("myServiceWithReplies", "myReply2", "myData2"))
 IGS.agentSetName(agentName);
 IGS.logSetConsole(verbose);
 
-IGS.definitionSetDescription("One example for each type of IOP and call");
+IGS.definitionSetDescription("One example for each type of IO and call");
 IGS.definitionSetVersion("1.0");
-IGS.inputCreate("my_impulsion", iopTypeEnum.IGS_IMPULSION_T, null);
-IGS.inputCreate("my_bool", iopTypeEnum.IGS_BOOL_T, true);
-IGS.inputCreate("my_int", iopTypeEnum.IGS_INTEGER_T, 1);
-IGS.inputCreate("my_double", iopTypeEnum.IGS_DOUBLE_T, 1);
-IGS.inputCreate("my_string", iopTypeEnum.IGS_STRING_T, "my string");
-IGS.inputCreate("my_data", iopTypeEnum.IGS_DATA_T, new ArrayBuffer(32));
-IGS.inputCreate("my_impulsion_split", iopTypeEnum.IGS_IMPULSION_T, null);
-IGS.inputCreate("my_bool_split", iopTypeEnum.IGS_BOOL_T, true);
-IGS.inputCreate("my_int_split", iopTypeEnum.IGS_INTEGER_T, 1);
-IGS.inputCreate("my_double_split", iopTypeEnum.IGS_DOUBLE_T, 1);
-IGS.inputCreate("my_string_split", iopTypeEnum.IGS_STRING_T, "my string");
-IGS.inputCreate("my_data_split", iopTypeEnum.IGS_DATA_T, new ArrayBuffer(32));
-IGS.outputCreate("my_impulsion", iopTypeEnum.IGS_IMPULSION_T, null);
-IGS.outputCreate("my_bool", iopTypeEnum.IGS_BOOL_T, true);
-IGS.outputCreate("my_int", iopTypeEnum.IGS_INTEGER_T, 1);
-IGS.outputCreate("my_double", iopTypeEnum.IGS_DOUBLE_T, 1);
-IGS.outputCreate("my_string", iopTypeEnum.IGS_STRING_T, "my string");
-IGS.outputCreate("my_data", iopTypeEnum.IGS_DATA_T, new ArrayBuffer(32));
-IGS.parameterCreate("my_impulsion", iopTypeEnum.IGS_IMPULSION_T, null);
-IGS.parameterCreate("my_bool", iopTypeEnum.IGS_BOOL_T, true);
-IGS.parameterCreate("my_int", iopTypeEnum.IGS_INTEGER_T, 1);
-IGS.parameterCreate("my_double", iopTypeEnum.IGS_DOUBLE_T, 1);
-IGS.parameterCreate("my_string", iopTypeEnum.IGS_STRING_T, "my string");
-IGS.parameterCreate("my_data", iopTypeEnum.IGS_DATA_T, new ArrayBuffer(32));
+IGS.inputCreate("my_impulsion", ioTypeEnum.IGS_IMPULSION_T, null);
+IGS.inputCreate("my_bool", ioTypeEnum.IGS_BOOL_T, true);
+IGS.inputCreate("my_int", ioTypeEnum.IGS_INTEGER_T, 1);
+IGS.inputCreate("my_double", ioTypeEnum.IGS_DOUBLE_T, 1);
+IGS.inputCreate("my_string", ioTypeEnum.IGS_STRING_T, "my string");
+IGS.inputCreate("my_data", ioTypeEnum.IGS_DATA_T, new ArrayBuffer(32));
+IGS.inputCreate("my_impulsion_split", ioTypeEnum.IGS_IMPULSION_T, null);
+IGS.inputCreate("my_bool_split", ioTypeEnum.IGS_BOOL_T, true);
+IGS.inputCreate("my_int_split", ioTypeEnum.IGS_INTEGER_T, 1);
+IGS.inputCreate("my_double_split", ioTypeEnum.IGS_DOUBLE_T, 1);
+IGS.inputCreate("my_string_split", ioTypeEnum.IGS_STRING_T, "my string");
+IGS.inputCreate("my_data_split", ioTypeEnum.IGS_DATA_T, new ArrayBuffer(32));
+IGS.outputCreate("my_impulsion", ioTypeEnum.IGS_IMPULSION_T, null);
+IGS.outputCreate("my_bool", ioTypeEnum.IGS_BOOL_T, true);
+IGS.outputCreate("my_int", ioTypeEnum.IGS_INTEGER_T, 1);
+IGS.outputCreate("my_double", ioTypeEnum.IGS_DOUBLE_T, 1);
+IGS.outputCreate("my_string", ioTypeEnum.IGS_STRING_T, "my string");
+IGS.outputCreate("my_data", ioTypeEnum.IGS_DATA_T, new ArrayBuffer(32));
+IGS.attributeCreate("my_impulsion", ioTypeEnum.IGS_IMPULSION_T, null);
+IGS.parameterCreate("my_impulsion", ioTypeEnum.IGS_IMPULSION_T, null);
+IGS.attributeCreate("my_bool", ioTypeEnum.IGS_BOOL_T, true);
+IGS.parameterCreate("my_bool", ioTypeEnum.IGS_BOOL_T, true);
+IGS.attributeCreate("my_int", ioTypeEnum.IGS_INTEGER_T, 1);
+IGS.parameterCreate("my_int", ioTypeEnum.IGS_INTEGER_T, 1);
+IGS.attributeCreate("my_double", ioTypeEnum.IGS_DOUBLE_T, 1);
+IGS.parameterCreate("my_double", ioTypeEnum.IGS_DOUBLE_T, 1);
+IGS.attributeCreate("my_string", ioTypeEnum.IGS_STRING_T, "my string");
+IGS.parameterCreate("my_string", ioTypeEnum.IGS_STRING_T, "my string");
+IGS.attributeCreate("my_data", ioTypeEnum.IGS_DATA_T, new ArrayBuffer(32));
+IGS.parameterCreate("my_data", ioTypeEnum.IGS_DATA_T, new ArrayBuffer(32));
 IGS.serviceInit("myService", testerServiceCallback, null);
-IGS.serviceArgAdd("myService", "myBool", iopTypeEnum.IGS_BOOL_T);
-IGS.serviceArgAdd("myService", "myInt", iopTypeEnum.IGS_INTEGER_T);
-IGS.serviceArgAdd("myService", "myDouble", iopTypeEnum.IGS_DOUBLE_T);
-IGS.serviceArgAdd("myService", "myString", iopTypeEnum.IGS_STRING_T);
-IGS.serviceArgAdd("myService", "myData", iopTypeEnum.IGS_DATA_T);
+IGS.serviceArgAdd("myService", "myBool", ioTypeEnum.IGS_BOOL_T);
+IGS.serviceArgAdd("myService", "myInt", ioTypeEnum.IGS_INTEGER_T);
+IGS.serviceArgAdd("myService", "myDouble", ioTypeEnum.IGS_DOUBLE_T);
+IGS.serviceArgAdd("myService", "myString", ioTypeEnum.IGS_STRING_T);
+IGS.serviceArgAdd("myService", "myData", ioTypeEnum.IGS_DATA_T);
 
-IGS.observeInput("my_impulsion", testerIOPCallback, null);
-IGS.observeInput("my_bool", testerIOPCallback, null);
-IGS.observeInput("my_int", testerIOPCallback, null);
-IGS.observeInput("my_double", testerIOPCallback, null);
-IGS.observeInput("my_string", testerIOPCallback, null);
-IGS.observeInput("my_data", testerIOPCallback, null);
-IGS.observeInput("my_impulsion_split", testerIOPCallback, null);
-IGS.observeInput("my_bool_split", testerIOPCallback, null);
-IGS.observeInput("my_int_split", testerIOPCallback, null);
-IGS.observeInput("my_double_split", testerIOPCallback, null);
-IGS.observeInput("my_string_split", testerIOPCallback, null);
-IGS.observeInput("my_data_split", testerIOPCallback, null);
+IGS.observeInput("my_impulsion", testerIOCallback, null);
+IGS.observeInput("my_bool", testerIOCallback, null);
+IGS.observeInput("my_int", testerIOCallback, null);
+IGS.observeInput("my_double", testerIOCallback, null);
+IGS.observeInput("my_string", testerIOCallback, null);
+IGS.observeInput("my_data", testerIOCallback, null);
+IGS.observeInput("my_impulsion_split", testerIOCallback, null);
+IGS.observeInput("my_bool_split", testerIOCallback, null);
+IGS.observeInput("my_int_split", testerIOCallback, null);
+IGS.observeInput("my_double_split", testerIOCallback, null);
+IGS.observeInput("my_string_split", testerIOCallback, null);
+IGS.observeInput("my_data_split", testerIOCallback, null);
 
 IGS.mappingAdd("my_impulsion", "partner", "sparing_impulsion");
 IGS.mappingAdd("my_bool", "partner", "sparing_bool");
@@ -1176,7 +1347,7 @@ IGS.splitAdd("my_double_split", "partner", "sparing_double");
 IGS.splitAdd("my_string_split", "partner", "sparing_string");
 IGS.splitAdd("my_data_split", "partner", "sparing_data");
 
-// IOP writing and types conversions
+// IO writing and types conversions
 IGS.inputSetImpulsion("my_impulsion");
 IGS.inputSetImpulsion("my_bool");
 assert(!IGS.inputBool("my_bool"));
@@ -1310,51 +1481,66 @@ firstAgent.setName("firstAgent");
 assert(firstAgent.name() === "firstAgent");
 firstAgent.definitionSetDescription("First virtual agent");
 firstAgent.definitionSetVersion("1.0");
-firstAgent.inputCreate("first_impulsion", iopTypeEnum.IGS_IMPULSION_T, null);
-firstAgent.inputCreate("first_bool", iopTypeEnum.IGS_BOOL_T, true);
-firstAgent.inputCreate("first_int", iopTypeEnum.IGS_INTEGER_T, 1);
-firstAgent.inputCreate("first_double", iopTypeEnum.IGS_DOUBLE_T, 1);
-firstAgent.inputCreate("first_string", iopTypeEnum.IGS_STRING_T, "my string");
-firstAgent.inputCreate("first_data", iopTypeEnum.IGS_DATA_T, new ArrayBuffer(32));
-firstAgent.inputCreate("first_impulsion_split", iopTypeEnum.IGS_IMPULSION_T, null);
-firstAgent.inputCreate("first_bool_split", iopTypeEnum.IGS_BOOL_T, true);
-firstAgent.inputCreate("first_int_split", iopTypeEnum.IGS_INTEGER_T, 1);
-firstAgent.inputCreate("first_double_split", iopTypeEnum.IGS_DOUBLE_T, 1);
-firstAgent.inputCreate("first_string_split", iopTypeEnum.IGS_STRING_T, "my string");
-firstAgent.inputCreate("first_data_split", iopTypeEnum.IGS_DATA_T, new ArrayBuffer(32));
-firstAgent.outputCreate("first_impulsion", iopTypeEnum.IGS_IMPULSION_T, null);
-firstAgent.outputCreate("first_bool", iopTypeEnum.IGS_BOOL_T, true);
-firstAgent.outputCreate("first_int", iopTypeEnum.IGS_INTEGER_T, 1);
-firstAgent.outputCreate("first_double", iopTypeEnum.IGS_DOUBLE_T, 1);
-firstAgent.outputCreate("first_string", iopTypeEnum.IGS_STRING_T, "my string");
-firstAgent.outputCreate("first_data", iopTypeEnum.IGS_DATA_T, new ArrayBuffer(32));
-firstAgent.parameterCreate("first_impulsion", iopTypeEnum.IGS_IMPULSION_T, null);
-firstAgent.parameterCreate("first_bool", iopTypeEnum.IGS_BOOL_T, true);
-firstAgent.parameterCreate("first_int", iopTypeEnum.IGS_INTEGER_T, 1);
-firstAgent.parameterCreate("first_double", iopTypeEnum.IGS_DOUBLE_T, 1);
-firstAgent.parameterCreate("first_string", iopTypeEnum.IGS_STRING_T, "my string");
-firstAgent.parameterCreate("first_data", iopTypeEnum.IGS_DATA_T, new ArrayBuffer(32));
+firstAgent.inputCreate("first_impulsion", ioTypeEnum.IGS_IMPULSION_T, null);
+firstAgent.inputCreate("first_bool", ioTypeEnum.IGS_BOOL_T, true);
+firstAgent.inputCreate("first_int", ioTypeEnum.IGS_INTEGER_T, 1);
+firstAgent.inputCreate("first_double", ioTypeEnum.IGS_DOUBLE_T, 1);
+firstAgent.inputCreate("first_string", ioTypeEnum.IGS_STRING_T, "my string");
+firstAgent.inputCreate("first_data", ioTypeEnum.IGS_DATA_T, new ArrayBuffer(32));
+firstAgent.inputCreate("first_impulsion_split", ioTypeEnum.IGS_IMPULSION_T, null);
+firstAgent.inputCreate("first_bool_split", ioTypeEnum.IGS_BOOL_T, true);
+firstAgent.inputCreate("first_int_split", ioTypeEnum.IGS_INTEGER_T, 1);
+firstAgent.inputCreate("first_double_split", ioTypeEnum.IGS_DOUBLE_T, 1);
+firstAgent.inputCreate("first_string_split", ioTypeEnum.IGS_STRING_T, "my string");
+firstAgent.inputCreate("first_data_split", ioTypeEnum.IGS_DATA_T, new ArrayBuffer(32));
+firstAgent.outputCreate("first_impulsion", ioTypeEnum.IGS_IMPULSION_T, null);
+firstAgent.outputCreate("first_bool", ioTypeEnum.IGS_BOOL_T, true);
+firstAgent.outputCreate("first_int", ioTypeEnum.IGS_INTEGER_T, 1);
+firstAgent.outputCreate("first_double", ioTypeEnum.IGS_DOUBLE_T, 1);
+firstAgent.outputCreate("first_string", ioTypeEnum.IGS_STRING_T, "my string");
+firstAgent.outputCreate("first_data", ioTypeEnum.IGS_DATA_T, new ArrayBuffer(32));
+firstAgent.attributeCreate("first_impulsion", ioTypeEnum.IGS_IMPULSION_T, null);
+firstAgent.parameterCreate("first_impulsion", ioTypeEnum.IGS_IMPULSION_T, null);
+firstAgent.attributeCreate("first_bool", ioTypeEnum.IGS_BOOL_T, true);
+firstAgent.parameterCreate("first_bool", ioTypeEnum.IGS_BOOL_T, true);
+firstAgent.attributeCreate("first_int", ioTypeEnum.IGS_INTEGER_T, 1);
+firstAgent.parameterCreate("first_int", ioTypeEnum.IGS_INTEGER_T, 1);
+firstAgent.attributeCreate("first_double", ioTypeEnum.IGS_DOUBLE_T, 1);
+firstAgent.parameterCreate("first_double", ioTypeEnum.IGS_DOUBLE_T, 1);
+firstAgent.attributeCreate("first_string", ioTypeEnum.IGS_STRING_T, "my string");
+firstAgent.parameterCreate("first_string", ioTypeEnum.IGS_STRING_T, "my string");
+firstAgent.attributeCreate("first_data", ioTypeEnum.IGS_DATA_T, new ArrayBuffer(32));
+firstAgent.parameterCreate("first_data", ioTypeEnum.IGS_DATA_T, new ArrayBuffer(32));
+
+// N.B.: no way to assert, just call method
+firstAgent.inputSetDescription("first_impulsion", "my io description here");
+firstAgent.outputSetDescription("first_impulsion", "my io description here");
+firstAgent.attributeSetDescription("first_impulsion", "my io description here");
+firstAgent.parameterSetDescription("first_impulsion", "my io description here");
+firstAgent.inputSetDetailedType("first_impulsion", "type_name", "specification");
+firstAgent.outputSetDetailedType("first_impulsion", "type_name", "specification");
+firstAgent.attributeSetDetailedType("first_impulsion", "type_name", "specification");
 
 firstAgent.serviceInit("firstService", agentServiceCallback, null);
-firstAgent.serviceArgAdd("firstService", "firstBool", iopTypeEnum.IGS_BOOL_T);
-firstAgent.serviceArgAdd("firstService", "firstInt", iopTypeEnum.IGS_INTEGER_T);
-firstAgent.serviceArgAdd("firstService", "firstDouble", iopTypeEnum.IGS_DOUBLE_T);
-firstAgent.serviceArgAdd("firstService", "firstString", iopTypeEnum.IGS_STRING_T);
-firstAgent.serviceArgAdd("firstService", "firstData", iopTypeEnum.IGS_DATA_T);
+firstAgent.serviceArgAdd("firstService", "firstBool", ioTypeEnum.IGS_BOOL_T);
+firstAgent.serviceArgAdd("firstService", "firstInt", ioTypeEnum.IGS_INTEGER_T);
+firstAgent.serviceArgAdd("firstService", "firstDouble", ioTypeEnum.IGS_DOUBLE_T);
+firstAgent.serviceArgAdd("firstService", "firstString", ioTypeEnum.IGS_STRING_T);
+firstAgent.serviceArgAdd("firstService", "firstData", ioTypeEnum.IGS_DATA_T);
 
-firstAgent.observeInput("first_impulsion", agentIOPCallback, null);
-firstAgent.observeInput("first_bool", agentIOPCallback, null);
-firstAgent.observeInput("first_int", agentIOPCallback, null);
-firstAgent.observeInput("first_double", agentIOPCallback, null);
-firstAgent.observeInput("first_string", agentIOPCallback, null);
-firstAgent.observeInput("first_data", agentIOPCallback, null);
+firstAgent.observeInput("first_impulsion", agentIOCallback, null);
+firstAgent.observeInput("first_bool", agentIOCallback, null);
+firstAgent.observeInput("first_int", agentIOCallback, null);
+firstAgent.observeInput("first_double", agentIOCallback, null);
+firstAgent.observeInput("first_string", agentIOCallback, null);
+firstAgent.observeInput("first_data", agentIOCallback, null);
 
-firstAgent.observeInput("first_impulsion_split", agentIOPCallback, null);
-firstAgent.observeInput("first_bool_split", agentIOPCallback, null);
-firstAgent.observeInput("first_int_split", agentIOPCallback, null);
-firstAgent.observeInput("first_double_split", agentIOPCallback, null);
-firstAgent.observeInput("first_string_split", agentIOPCallback, null);
-firstAgent.observeInput("first_data_split", agentIOPCallback, null);
+firstAgent.observeInput("first_impulsion_split", agentIOCallback, null);
+firstAgent.observeInput("first_bool_split", agentIOCallback, null);
+firstAgent.observeInput("first_int_split", agentIOCallback, null);
+firstAgent.observeInput("first_double_split", agentIOCallback, null);
+firstAgent.observeInput("first_string_split", agentIOCallback, null);
+firstAgent.observeInput("first_data_split", agentIOCallback, null);
 
 firstAgent.mappingAdd("first_impulsion", "partner", "sparing_impulsion");
 firstAgent.mappingAdd("first_bool", "partner", "sparing_bool");
@@ -1373,51 +1559,64 @@ firstAgent.splitAdd("first_data_split", "partner", "sparing_data");
  //second additional agent is NOT activated immediately
 global.secondAgent = new IGS.Agent("secondAgent", false);
 secondAgent.definitionSetDescription("Second virtual agent");
+assert(secondAgent.definitionDescription() === "Second virtual agent");
 secondAgent.definitionSetVersion("1.0");
-secondAgent.inputCreate("second_impulsion", iopTypeEnum.IGS_IMPULSION_T, null);
-secondAgent.inputCreate("second_bool", iopTypeEnum.IGS_BOOL_T, true);
-secondAgent.inputCreate("second_int", iopTypeEnum.IGS_INTEGER_T, 1);
-secondAgent.inputCreate("second_double", iopTypeEnum.IGS_DOUBLE_T, 1);
-secondAgent.inputCreate("second_string", iopTypeEnum.IGS_STRING_T, "my string");
-secondAgent.inputCreate("second_data", iopTypeEnum.IGS_DATA_T, new ArrayBuffer(32));
-secondAgent.inputCreate("second_impulsion_split", iopTypeEnum.IGS_IMPULSION_T, null);
-secondAgent.inputCreate("second_bool_split", iopTypeEnum.IGS_BOOL_T, true);
-secondAgent.inputCreate("second_int_split", iopTypeEnum.IGS_INTEGER_T, 1);
-secondAgent.inputCreate("second_double_split", iopTypeEnum.IGS_DOUBLE_T, 1);
-secondAgent.inputCreate("second_string_split", iopTypeEnum.IGS_STRING_T, "my string");
-secondAgent.inputCreate("second_data_split", iopTypeEnum.IGS_DATA_T, new ArrayBuffer(32));
-secondAgent.outputCreate("second_impulsion", iopTypeEnum.IGS_IMPULSION_T, null);
-secondAgent.outputCreate("second_bool", iopTypeEnum.IGS_BOOL_T, true);
-secondAgent.outputCreate("second_int", iopTypeEnum.IGS_INTEGER_T, 1);
-secondAgent.outputCreate("second_double", iopTypeEnum.IGS_DOUBLE_T, 1);
-secondAgent.outputCreate("second_string", iopTypeEnum.IGS_STRING_T, "my string");
-secondAgent.outputCreate("second_data", iopTypeEnum.IGS_DATA_T, new ArrayBuffer(32));
-secondAgent.parameterCreate("second_impulsion", iopTypeEnum.IGS_IMPULSION_T, null);
-secondAgent.parameterCreate("second_bool", iopTypeEnum.IGS_BOOL_T, true);
-secondAgent.parameterCreate("second_int", iopTypeEnum.IGS_INTEGER_T, 1);
-secondAgent.parameterCreate("second_double", iopTypeEnum.IGS_DOUBLE_T, 1);
-secondAgent.parameterCreate("second_string", iopTypeEnum.IGS_STRING_T, "my string");
-secondAgent.parameterCreate("second_data", iopTypeEnum.IGS_DATA_T, new ArrayBuffer(32));
+assert(secondAgent.definitionVersion() === "1.0");
+secondAgent.definitionSetPackage("second package");
+assert(secondAgent.definitionPackage() === "second package");
+secondAgent.definitionSetClass("second class");
+assert(secondAgent.definitionClass() === "second class");
+
+secondAgent.inputCreate("second_impulsion", ioTypeEnum.IGS_IMPULSION_T, null);
+secondAgent.inputCreate("second_bool", ioTypeEnum.IGS_BOOL_T, true);
+secondAgent.inputCreate("second_int", ioTypeEnum.IGS_INTEGER_T, 1);
+secondAgent.inputCreate("second_double", ioTypeEnum.IGS_DOUBLE_T, 1);
+secondAgent.inputCreate("second_string", ioTypeEnum.IGS_STRING_T, "my string");
+secondAgent.inputCreate("second_data", ioTypeEnum.IGS_DATA_T, new ArrayBuffer(32));
+secondAgent.inputCreate("second_impulsion_split", ioTypeEnum.IGS_IMPULSION_T, null);
+secondAgent.inputCreate("second_bool_split", ioTypeEnum.IGS_BOOL_T, true);
+secondAgent.inputCreate("second_int_split", ioTypeEnum.IGS_INTEGER_T, 1);
+secondAgent.inputCreate("second_double_split", ioTypeEnum.IGS_DOUBLE_T, 1);
+secondAgent.inputCreate("second_string_split", ioTypeEnum.IGS_STRING_T, "my string");
+secondAgent.inputCreate("second_data_split", ioTypeEnum.IGS_DATA_T, new ArrayBuffer(32));
+secondAgent.outputCreate("second_impulsion", ioTypeEnum.IGS_IMPULSION_T, null);
+secondAgent.outputCreate("second_bool", ioTypeEnum.IGS_BOOL_T, true);
+secondAgent.outputCreate("second_int", ioTypeEnum.IGS_INTEGER_T, 1);
+secondAgent.outputCreate("second_double", ioTypeEnum.IGS_DOUBLE_T, 1);
+secondAgent.outputCreate("second_string", ioTypeEnum.IGS_STRING_T, "my string");
+secondAgent.outputCreate("second_data", ioTypeEnum.IGS_DATA_T, new ArrayBuffer(32));
+secondAgent.attributeCreate("second_impulsion", ioTypeEnum.IGS_IMPULSION_T, null);
+secondAgent.parameterCreate("second_impulsion", ioTypeEnum.IGS_IMPULSION_T, null);
+secondAgent.attributeCreate("second_bool", ioTypeEnum.IGS_BOOL_T, true);
+secondAgent.parameterCreate("second_bool", ioTypeEnum.IGS_BOOL_T, true);
+secondAgent.attributeCreate("second_int", ioTypeEnum.IGS_INTEGER_T, 1);
+secondAgent.parameterCreate("second_int", ioTypeEnum.IGS_INTEGER_T, 1);
+secondAgent.attributeCreate("second_double", ioTypeEnum.IGS_DOUBLE_T, 1);
+secondAgent.parameterCreate("second_double", ioTypeEnum.IGS_DOUBLE_T, 1);
+secondAgent.attributeCreate("second_string", ioTypeEnum.IGS_STRING_T, "my string");
+secondAgent.parameterCreate("second_string", ioTypeEnum.IGS_STRING_T, "my string");
+secondAgent.attributeCreate("second_data", ioTypeEnum.IGS_DATA_T, new ArrayBuffer(32));
+secondAgent.parameterCreate("second_data", ioTypeEnum.IGS_DATA_T, new ArrayBuffer(32));
 secondAgent.serviceInit("secondService", agentServiceCallback, null);
-secondAgent.serviceArgAdd("secondService", "secondBool", iopTypeEnum.IGS_BOOL_T);
-secondAgent.serviceArgAdd("secondService", "secondInt", iopTypeEnum.IGS_INTEGER_T);
-secondAgent.serviceArgAdd("secondService", "secondDouble", iopTypeEnum.IGS_DOUBLE_T);
-secondAgent.serviceArgAdd("secondService", "secondString", iopTypeEnum.IGS_STRING_T);
-secondAgent.serviceArgAdd("secondService", "secondData", iopTypeEnum.IGS_DATA_T);
+secondAgent.serviceArgAdd("secondService", "secondBool", ioTypeEnum.IGS_BOOL_T);
+secondAgent.serviceArgAdd("secondService", "secondInt", ioTypeEnum.IGS_INTEGER_T);
+secondAgent.serviceArgAdd("secondService", "secondDouble", ioTypeEnum.IGS_DOUBLE_T);
+secondAgent.serviceArgAdd("secondService", "secondString", ioTypeEnum.IGS_STRING_T);
+secondAgent.serviceArgAdd("secondService", "secondData", ioTypeEnum.IGS_DATA_T);
 
-secondAgent.observeInput("second_impulsion", agentIOPCallback, null);
-secondAgent.observeInput("second_bool", agentIOPCallback, null);
-secondAgent.observeInput("second_int", agentIOPCallback, null);
-secondAgent.observeInput("second_double", agentIOPCallback, null);
-secondAgent.observeInput("second_string", agentIOPCallback, null);
-secondAgent.observeInput("second_data", agentIOPCallback, null);
+secondAgent.observeInput("second_impulsion", agentIOCallback, null);
+secondAgent.observeInput("second_bool", agentIOCallback, null);
+secondAgent.observeInput("second_int", agentIOCallback, null);
+secondAgent.observeInput("second_double", agentIOCallback, null);
+secondAgent.observeInput("second_string", agentIOCallback, null);
+secondAgent.observeInput("second_data", agentIOCallback, null);
 
-secondAgent.observeInput("second_impulsion_split", agentIOPCallback, null);
-secondAgent.observeInput("second_bool_split", agentIOPCallback, null);
-secondAgent.observeInput("second_int_split", agentIOPCallback, null);
-secondAgent.observeInput("second_double_split", agentIOPCallback, null);
-secondAgent.observeInput("second_string_split", agentIOPCallback, null);
-secondAgent.observeInput("second_data_split", agentIOPCallback, null);
+secondAgent.observeInput("second_impulsion_split", agentIOCallback, null);
+secondAgent.observeInput("second_bool_split", agentIOCallback, null);
+secondAgent.observeInput("second_int_split", agentIOCallback, null);
+secondAgent.observeInput("second_double_split", agentIOCallback, null);
+secondAgent.observeInput("second_string_split", agentIOCallback, null);
+secondAgent.observeInput("second_data_split", agentIOCallback, null);
 
 secondAgent.mappingAdd("second_impulsion", "partner", "sparing_impulsion");
 secondAgent.mappingAdd("second_bool", "partner", "sparing_bool");
@@ -1496,21 +1695,30 @@ argsList = IGS.serviceArgsAddData(argsList, new ArrayBuffer(16));
 firstAgent.serviceCall("secondAgent", "secondService", argsList, "token");
 
 //elections
-assert(IGS.electionLeave("my election") === igsResultEnum.IGS_FAILURE);
+assert(IGS.electionLeave("my election") === igsResultEnum.IGS_SUCCESS);
 assert(IGS.electionJoin("my election") === igsResultEnum.IGS_SUCCESS);
 assert(IGS.electionJoin("my election") === igsResultEnum.IGS_FAILURE);
 assert(IGS.electionJoin("INGESCAPE_PRIVATE") === igsResultEnum.IGS_FAILURE);
 assert(IGS.electionLeave("my election") === igsResultEnum.IGS_SUCCESS);
-assert(IGS.electionLeave("my election") === igsResultEnum.IGS_FAILURE);
-assert(IGS.electionLeave("my other election") === igsResultEnum.IGS_FAILURE);
+assert(IGS.electionLeave("my election") === igsResultEnum.IGS_SUCCESS);
+assert(IGS.electionLeave("my other election") === igsResultEnum.IGS_SUCCESS);
 assert(IGS.electionJoin("my other election") === igsResultEnum.IGS_SUCCESS);
 assert(IGS.electionJoin("my other election") === igsResultEnum.IGS_FAILURE);
 assert(IGS.electionLeave("my other election") === igsResultEnum.IGS_SUCCESS);
-assert(IGS.electionLeave("my other election") === igsResultEnum.IGS_FAILURE);
+assert(IGS.electionLeave("my other election") === igsResultEnum.IGS_SUCCESS);
 
 IGS.agentSetFamily("family_test");
 
 //TODO : test agent events in same process
+
+// Real time communications
+IGS.rtGetCurrentTimestamp(); // N.B.: no way to assert, just call method
+IGS.rtSetTimestamps(true);
+assert(IGS.rtTimestamps())
+IGS.rtSetTime(1000);
+assert(IGS.rtTime() === 1000)
+IGS.rtSetSynchronousMode(true);
+assert(IGS.rtSynchronousMode());
 
 if (staticTests) {
     //we terminate now after passing the static tests

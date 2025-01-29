@@ -27,7 +27,7 @@ void igs_net_performance_check (const char *peer_id,
                                 size_t msg_size,
                                 size_t nb_of_msg)
 {
-    core_init_context ();
+    core_init_agent ();
     if (core_context->node == NULL) {
         igs_error ("agent must be started to execute performance tests");
         return;

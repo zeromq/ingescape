@@ -18,7 +18,7 @@ signal.signal(signal.SIGINT, signal_handler)
 
 print("[Global API] Testing!")
 
-def observe_iop(iop_type, name, value_type, value, my_data):
+def observe_io(io_type, name, value_type, value, my_data):
     pass
 
 def service_callback(sender_agent_name, sender_agent_uuid, service_name, arguments, token, my_data):
@@ -27,7 +27,7 @@ def service_callback(sender_agent_name, sender_agent_uuid, service_name, argumen
 def testerServiceCallback(sender_agent_name, sender_agent_uuid, service_name, arguments, token, my_data):
     pass
 
-def testerIOPCallback(iop_type, name, value_type, value, my_data):
+def testerIOCallback(io_type, name, value_type, value, my_data):
     pass
 
 print ("[Global API] Net ifaces and devices", end =" ")
@@ -40,9 +40,15 @@ print ("OK")
 
 print ("[Global API] Testing agent name", end =" ")
 assert igs.agent_name() == "no_name"
+assert igs.definition_class() == ""
 igs.agent_set_name("simple Demo Agent")
-assert igs.agent_name() == "simple_Demo_Agent"
+assert igs.agent_name() == "simple Demo Agent"
+print("CLASS", igs.definition_class())
+assert igs.definition_class() == igs.agent_name()
 igs.agent_set_name("tester")
+assert igs.agent_name() == "tester"
+print("CLASS", igs.definition_class())
+assert igs.definition_class() == igs.agent_name()
 print ("OK")
 
 print ("[Global API] Testing agent family and uuid", end =" ")
@@ -120,12 +126,15 @@ assert not igs.is_frozen()
 print ("[Global API] Testing agent definition", end =" ")
 assert igs.input_count() == 0
 assert igs.output_count() == 0
+assert igs.attribute_count() == 0
 assert igs.parameter_count() == 0
 assert not igs.input_exists("toto")
 assert not igs.output_exists("toto")
+assert not igs.attribute_exists("toto")
 assert not igs.parameter_exists("toto")
 assert len(igs.input_list()) == 0
 assert len(igs.output_list()) == 0
+assert len(igs.attribute_list()) == 0
 assert len(igs.parameter_list()) == 0
 
 assert not igs.output_is_muted("toto")
@@ -142,6 +151,12 @@ assert igs.output_double("toto") == 0.0
 assert not igs.output_string("toto") is None
 assert igs.output_data("toto") is None
 
+assert not igs.attribute_bool("toto")
+assert igs.attribute_int("toto") == 0
+assert igs.attribute_double("toto") == 0.0
+assert not igs.attribute_string("toto") is None
+assert igs.attribute_data("toto") is None
+
 assert not igs.parameter_bool("toto")
 assert igs.parameter_int("toto") == 0
 assert igs.parameter_double("toto") == 0.0
@@ -155,18 +170,41 @@ assert len(igs.definition_json()) > 0
 assert igs.agent_name() == "tester"
 assert igs.definition_version() == ""
 assert igs.definition_description() == ""
+assert igs.definition_package() == ""
 
 igs.definition_set_version("version")
 assert igs.definition_version() == "version"
 igs.definition_set_description("description")
 assert igs.definition_description() == "description"
+igs.definition_set_package("com.ingescape.python.test")
+assert igs.definition_package() == "com.ingescape.python.test"
+igs.definition_set_class("TestClass")
+assert igs.definition_class() == "TestClass"
 
 assert igs.input_create("toto", igs.BOOL_T, None) == igs.SUCCESS
-igs.observe_input("toto", observe_iop, None)
+igs.observe_input("toto", observe_io, None)
+igs.input_set_description("toto", "This is toto's description")
+#NOTE: No API available to access this description
+igs.input_set_detailed_type("toto", "custom_type", "its specification")
+#NOTE: No API available to access this detailed type
 assert igs.input_count() == 1
 assert igs.output_create("toto", igs.BOOL_T, None) == igs.SUCCESS
+igs.output_set_description("toto", "This is toto's description")
+#NOTE: No API available to access this description
+igs.output_set_detailed_type("toto", "custom_type", "its specification")
+#NOTE: No API available to access this detailed type
 assert igs.output_count() == 1
+assert igs.attribute_create("toto", igs.BOOL_T, None) == igs.SUCCESS
+igs.attribute_set_description("toto", "This is toto's description")
+#NOTE: No API available to access this description
+igs.attribute_set_detailed_type("toto", "custom_type", "its specification")
+#NOTE: No API available to access this detailed type
+assert igs.attribute_count() == 1
+igs.attribute_remove("toto")
 assert igs.parameter_create("toto", igs.BOOL_T, None) == igs.SUCCESS
+igs.parameter_set_description("toto", "This is toto's description")
+#NOTE: No API available to access this description
+#NOTE: No detailed type for parameters. Parameters were already obsolete when detailed type was introduced
 assert igs.parameter_count() == 1
 
 assert not igs.output_is_muted("toto")
@@ -189,6 +227,14 @@ igs.output_remove("toto2")
 assert not igs.output_exists("toto2")
 assert igs.output_count() == 1
 
+assert igs.attribute_create("toto2", igs.STRING_T, None) == igs.SUCCESS
+assert igs.attribute_count() == 2
+assert igs.attribute_exists("toto2")
+assert igs.attribute_type("toto2") == igs.STRING_T
+igs.attribute_remove("toto2")
+assert not igs.attribute_exists("toto2")
+assert igs.attribute_count() == 1
+
 assert igs.parameter_create("toto2", igs.STRING_T, None) == igs.SUCCESS
 assert igs.parameter_count() == 2
 assert igs.parameter_exists("toto2")
@@ -201,13 +247,24 @@ igs.clear_definition()
 assert igs.agent_name() == "tester"
 assert igs.input_count() == 0
 assert igs.output_count() == 0
+assert igs.attribute_count() == 0
 assert igs.parameter_count() == 0
 assert not igs.input_exists("toto")
 assert not igs.output_exists("toto")
+assert not igs.attribute_exists("toto")
 assert not igs.parameter_exists("toto")
 assert len(igs.input_list()) == 0
 assert len(igs.output_list()) == 0
+assert len(igs.attribute_list()) == 0
 assert len(igs.parameter_list()) == 0
+print ("OK")
+
+print ("[Global API] Remove observed intput then add it again", end =" ")
+assert igs.input_create("volatile", igs.IMPULSION_T, None) == igs.SUCCESS
+igs.observe_input("volatile", observe_io, None)
+igs.input_remove("volatile")
+assert igs.input_create("volatile", igs.IMPULSION_T, None) == igs.SUCCESS
+igs.observe_input("volatile", observe_io, None)
 print ("OK")
 
 print ("[Global API] Testing agent mappings", end =" ")
@@ -322,10 +379,10 @@ print ("OK")
 
 igs.clear_definition()
 igs.agent_set_name(agentName)
-igs.definition_set_description("One example for each type of IOP and call")
+igs.definition_set_description("One example for each type of IO and call")
 igs.definition_set_version("1.0")
 
-print ("[Global API] Testing initial value of IOP", end =" ")
+print ("[Global API] Testing initial value of IO", end =" ")
 igs.input_create("toto", igs.INTEGER_T, 10)
 assert igs.input_int("toto") == 10
 igs.input_remove("toto")
@@ -358,6 +415,13 @@ igs.output_create("my_int", igs.INTEGER_T, 10)
 igs.output_create("my_double", igs.DOUBLE_T, 10.5)
 igs.output_create("my_string", igs.STRING_T, "Test_string")
 igs.output_create("my_data", igs.DATA_T, None)
+igs.attribute_create("my_impulsion", igs.IMPULSION_T, None)
+igs.attribute_create("my_bool", igs.BOOL_T, True)
+igs.attribute_create("my_int", igs.INTEGER_T, 10)
+igs.attribute_create("my_double", igs.DOUBLE_T, 10.5)
+igs.attribute_create("my_string", igs.STRING_T, "Test_string")
+igs.attribute_create("my_data", igs.DATA_T, None)
+#Retrocompatibility test. No creation expected. Console output remaining that the function is deprecated and explaining the parameter is already existed and can't be created
 igs.parameter_create("my_impulsion", igs.IMPULSION_T, None)
 igs.parameter_create("my_bool", igs.BOOL_T, True)
 igs.parameter_create("my_int", igs.INTEGER_T, 10)
@@ -371,12 +435,12 @@ igs.service_arg_add("myService", "myDouble", igs.DOUBLE_T)
 igs.service_arg_add("myService", "myString", igs.STRING_T)
 igs.service_arg_add("myService", "myData", igs.DATA_T)
 
-igs.observe_input("my_impulsion", testerIOPCallback, None)
-igs.observe_input("my_bool", testerIOPCallback, None)
-igs.observe_input("my_int", testerIOPCallback, None)
-igs.observe_input("my_double", testerIOPCallback, None)
-igs.observe_input("my_string", testerIOPCallback, None)
-igs.observe_input("my_data", testerIOPCallback, None)
+igs.observe_input("my_impulsion", testerIOCallback, None)
+igs.observe_input("my_bool", testerIOCallback, None)
+igs.observe_input("my_int", testerIOCallback, None)
+igs.observe_input("my_double", testerIOCallback, None)
+igs.observe_input("my_string", testerIOCallback, None)
+igs.observe_input("my_data", testerIOCallback, None)
 
 igs.mapping_add("my_impulsion", "partner", "sparing_impulsion")
 igs.mapping_add("my_bool", "partner", "sparing_bool")
@@ -392,7 +456,7 @@ igs.split_add("my_double_split", "partner", "sparing_double")
 igs.split_add("my_string_split", "partner", "sparing_string")
 igs.split_add("my_data_split", "partner", "sparing_data")
 
-print ("[Global API] Testing IOP writing and type conversion", end =" ")
+print ("[Global API] Testing IO writing and type conversion", end =" ")
 igs.input_set_impulsion("my_impulsion")
 igs.input_set_impulsion("my_bool")
 assert not igs.input_bool("my_bool")

@@ -70,7 +70,7 @@ int runAutoTests(zloop_t *loop, int timer_id, void *arg){
     return -1;
 }
 
-void agentEvents(igs_agent_event_t event, const char *uuid, const char *name, void *eventData, void *myCbData){
+void agentEvents(igs_agent_event_t event, const char *uuid, const char *name, const void *eventData, void *myCbData){
     IGS_UNUSED(uuid)
     IGS_UNUSED(eventData)
     IGS_UNUSED(myCbData)
@@ -104,9 +104,11 @@ int main(int argc, const char * argv[]) {
         {"auto",        no_argument, 0,  'a' },
         {"static",        no_argument, 0,  's' },
         {"help",        no_argument, 0,  'h' },
+        {"broker",  required_argument, 0,  'b' },
         {0, 0, 0, 0}
     };
 
+    char * broker = NULL;
     int long_index = 0;
     while ((opt = getopt_long(argc, (char *const *)argv, "p", long_options, &long_index)) != -1) {
         switch (opt) {
@@ -118,6 +120,9 @@ int main(int argc, const char * argv[]) {
                 break;
             case 'p':
                 port = (unsigned int)atoi(optarg);
+                break;
+            case 'b':
+                broker = strdup(optarg);
                 break;
             case 'd':
                 p_networkDevice = optarg;
@@ -148,7 +153,7 @@ int main(int argc, const char * argv[]) {
         igs_log_set_console_level(IGS_LOG_TRACE);
     else
         igs_log_set_console_level(IGS_LOG_FATAL);
-    igs_definition_set_description("One example for each type of IOP and call");
+    igs_definition_set_description("One example for each type of IO and call");
     igs_definition_set_version("1.0");
     igs_input_create("sparing_impulsion", IGS_IMPULSION_T, NULL, 0);
     igs_input_create("sparing_bool", IGS_BOOL_T, &myBool, sizeof(bool));
@@ -162,12 +167,12 @@ int main(int argc, const char * argv[]) {
     igs_output_create("sparing_double", IGS_DOUBLE_T, &myDouble, sizeof(double));
     igs_output_create("sparing_string", IGS_STRING_T, myString, strlen(myString) + 1);
     igs_output_create("sparing_data", IGS_DATA_T, myData, 32);
-    igs_parameter_create("sparing_impulsion", IGS_IMPULSION_T, NULL, 0);
-    igs_parameter_create("sparing_bool", IGS_BOOL_T, &myBool, sizeof(bool));
-    igs_parameter_create("sparing_int", IGS_INTEGER_T, &myInt, sizeof(int));
-    igs_parameter_create("sparing_double", IGS_DOUBLE_T, &myDouble, sizeof(double));
-    igs_parameter_create("sparing_string", IGS_STRING_T, myString, strlen(myString) + 1);
-    igs_parameter_create("sparing_data", IGS_DATA_T, myData, 32);
+    igs_attribute_create("sparing_impulsion", IGS_IMPULSION_T, NULL, 0);
+    igs_attribute_create("sparing_bool", IGS_BOOL_T, &myBool, sizeof(bool));
+    igs_attribute_create("sparing_int", IGS_INTEGER_T, &myInt, sizeof(int));
+    igs_attribute_create("sparing_double", IGS_DOUBLE_T, &myDouble, sizeof(double));
+    igs_attribute_create("sparing_string", IGS_STRING_T, myString, strlen(myString) + 1);
+    igs_attribute_create("sparing_data", IGS_DATA_T, myData, 32);
     igs_service_init("sparingService", myServiceCallback, NULL);
     igs_service_arg_add("sparingService", "myBool", IGS_BOOL_T);
     igs_service_arg_add("sparingService", "myInt", IGS_INTEGER_T);
@@ -175,12 +180,12 @@ int main(int argc, const char * argv[]) {
     igs_service_arg_add("sparingService", "myString", IGS_STRING_T);
     igs_service_arg_add("sparingService", "myData", IGS_DATA_T);
 
-    igs_observe_input("sparing_impulsion", myIOPCallback, NULL);
-    igs_observe_input("sparing_bool", myIOPCallback, NULL);
-    igs_observe_input("sparing_int", myIOPCallback, NULL);
-    igs_observe_input("sparing_double", myIOPCallback, NULL);
-    igs_observe_input("sparing_string", myIOPCallback, NULL);
-    igs_observe_input("sparing_data", myIOPCallback, NULL);
+    igs_observe_input("sparing_impulsion", myIOCallback, NULL);
+    igs_observe_input("sparing_bool", myIOCallback, NULL);
+    igs_observe_input("sparing_int", myIOCallback, NULL);
+    igs_observe_input("sparing_double", myIOCallback, NULL);
+    igs_observe_input("sparing_string", myIOCallback, NULL);
+    igs_observe_input("sparing_data", myIOCallback, NULL);
 
     igs_mapping_add("sparing_impulsion", "testAgent", "my_impulsion");
     igs_mapping_add("sparing_bool", "testAgent", "my_bool");
@@ -198,7 +203,16 @@ int main(int argc, const char * argv[]) {
     if (staticTests)
         exit(EXIT_SUCCESS);
 
-    igs_start_with_device(p_networkDevice, port);
+
+    if (broker) {
+        char buffer[1024] = "";
+        snprintf(buffer, 1024, "tcp://%s:5661", broker);
+        igs_broker_enable_with_endpoint(buffer);
+        snprintf(buffer, 1024, "tcp://%s:5671", broker);
+        igs_start_with_brokers(buffer);
+    } else {
+        igs_start_with_device(p_networkDevice, port);
+    }
     igs_channel_join("TEST_CHANNEL");
 
     //mainloop management (two modes)

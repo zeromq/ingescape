@@ -213,7 +213,7 @@ int convert_string_list_to_napi_array(napi_env env, char **list, size_t length, 
     return 1;
 }
 
-int convert_value_IOP_into_napi(napi_env env, igs_iop_value_type_t type, void *value, size_t size, napi_value *value_napi) {
+int convert_value_IO_into_napi(napi_env env, igs_io_value_type_t type, void *value, size_t size, napi_value *value_napi) {
     if (value == NULL) {
         convert_null_to_napi(env, value_napi);
         return 1;
@@ -240,14 +240,14 @@ int convert_value_IOP_into_napi(napi_env env, igs_iop_value_type_t type, void *v
             break;
         }
         default : 
-            trigger_exception(env, NULL, "Unknown igs_iop_value_type_t.");
+            trigger_exception(env, NULL, "Unknown igs_io_value_type_t.");
             return 0;
     }
     return 1;
 }
 
-// to convert napi value into C value according to igs_iop_value_type_t value
-void * convert_value_with_good_type(napi_env env, napi_value value, igs_iop_value_type_t type, size_t *size_convert) {
+// to convert napi value into C value according to igs_io_value_type_t value
+void * convert_value_with_good_type(napi_env env, napi_value value, igs_io_value_type_t type, size_t *size_convert) {
     void *c_value;
     *size_convert = 0;
     switch(type) {
@@ -280,7 +280,7 @@ void * convert_value_with_good_type(napi_env env, napi_value value, igs_iop_valu
         default : 
             *size_convert = 0;
             c_value = NULL;
-            trigger_exception(env, NULL, "Unknow iop_type_js.");
+            trigger_exception(env, NULL, "Unknow io_type_js.");
     }
     return c_value;
 }

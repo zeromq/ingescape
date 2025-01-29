@@ -30,9 +30,9 @@
 #endif
 
 //  INGESCAPE version macros for compile-time API detection
-#define INGESCAPE_VERSION_MAJOR 3
-#define INGESCAPE_VERSION_MINOR 8
-#define INGESCAPE_VERSION_PATCH 3
+#define INGESCAPE_VERSION_MAJOR 4
+#define INGESCAPE_VERSION_MINOR 2
+#define INGESCAPE_VERSION_PATCH 8
 
 #define INGESCAPE_MAKE_VERSION(major, minor, patch) \
 ((major) * 10000 + (minor) * 100 + (patch))
@@ -77,7 +77,7 @@ INGESCAPE_MAKE_VERSION(INGESCAPE_VERSION_MAJOR, INGESCAPE_VERSION_MINOR, INGESCA
 #   define CHECK_PRINTF(a)
 #endif
 
-//Macro to avoid "unused parameter" warnings
+//Macro to avoid "unused attribute" warnings
 #define IGS_UNUSED(x) (void)x;
 
 //Opaque class structures to allow forward references
@@ -86,22 +86,30 @@ typedef struct _igs_json_t igs_json_t;
 typedef struct _igs_json_node_t igs_json_node_t;
 typedef struct _igs_service_arg_t igs_service_arg_t;
 
-#define IGS_MAX_PATH_LENGTH 4096             //
-#define IGS_MAX_IOP_NAME_LENGTH 1024         //
 #define IGS_AGENT_UUID_LENGTH 32             //
+#define IGS_MAX_PATH_LENGTH 4096             //
+#define IGS_MAX_STATE_LENGTH 4096            //
+#define IGS_MAX_IO_NAME_LENGTH 1024          //
+#define IGS_MAX_SERVICE_NAME_LENGTH 1024     //
+#define IGS_MAX_SERVICE_ARG_NAME_LENGTH 1024 //
 #define IGS_MAX_AGENT_NAME_LENGTH 1024       //
-#define IGS_MAX_DESCRIPTION_LENGTH 4096      //
+#define IGS_MAX_AGENT_CLASS_LENGTH 1024      //
+#define IGS_MAX_AGENT_PACKAGE_LENGTH 4096    //
+#define IGS_MAX_DESCRIPTION_LENGTH 4096*4096 //
 #define IGS_MAX_FAMILY_LENGTH 64             //
 #define IGS_MAX_VERSION_LENGTH 64            //
+#define IGS_MAX_DETAILED_TYPE_LENGTH 1024    //
+#define IGS_MAX_SPECIFICATION_LENGTH 4096*4096
+#define IGS_MAX_CONSTRAINT_LENGTH 4096       //
 #define IGS_MAX_LOG_LENGTH 4096              //
-#define IGS_COMMAND_LINE_LENGTH 4096         //
-#define IGS_NETWORK_DEVICE_LENGTH 1024       //
-#define IGS_IP_ADDRESS_LENGTH 1024           //
-#define IGS_MAX_PEER_ID_LENGTH 128           //
-#define IGS_DEFAULT_IPC_FOLDER_PATH "/tmp/ingescape/"  //
 #define IGS_MAX_STRING_MSG_LENGTH 4096       //
+#define IGS_MAX_PEER_ID_LENGTH 128           //
+#define IGS_MAX_COMMAND_LINE_LENGTH 4096     //
+#define IGS_MAX_NETWORK_DEVICE_LENGTH 1024   //
+#define IGS_MAX_IP_ADDRESS_LENGTH 1024       //
 #define IGS_DEFAULT_WORKER_CREDIT 3          //
-#define IGS_DEFAULT_LOG_DIR "~/Documents/Ingescape/logs/"  //
+#define IGS_DEFAULT_IPC_FOLDER_PATH "/tmp/ingescape/"
+#define IGS_DEFAULT_LOG_DIR "~/Documents/Ingescape/logs/"
 
 #ifdef __cplusplus
 extern "C" {
@@ -115,6 +123,10 @@ typedef enum{
 
 ///////////////////////////////////////////
 // Agent initialization, control and events
+
+//agent name
+INGESCAPE_EXPORT void igs_agent_set_name(const char *name); //(the first function to call)
+INGESCAPE_EXPORT char * igs_agent_name(void); //caller owns returned value
 
 //start & stop ingescape
 INGESCAPE_EXPORT igs_result_t igs_start_with_device(const char *network_device, unsigned int port);
@@ -145,12 +157,8 @@ INGESCAPE_EXPORT void igs_observe_forced_stop(igs_forced_stop_fn cb,
                                               void *my_data);
 //zeromq pipe to receive stop event and other messages from the ingescape thread
 INGESCAPE_EXPORT zsock_t * igs_pipe_to_ingescape(void);
-//zeromq pipe to send messages from the ingescape thread, e.g. from inside ingescape callbacks
+//zeromq pipe to send messages from the ingescape thread, i.e. from inside ingescape callbacks
 INGESCAPE_EXPORT zsock_t * igs_pipe_inside_ingescape(void);
-
-//agent name set and get
-INGESCAPE_EXPORT void igs_agent_set_name(const char *name);
-INGESCAPE_EXPORT char * igs_agent_name(void); //caller owns returned value
 
 //agent uuid
 INGESCAPE_EXPORT char * igs_agent_uuid(void); //caller owns returned value
@@ -159,17 +167,10 @@ INGESCAPE_EXPORT char * igs_agent_uuid(void); //caller owns returned value
 INGESCAPE_EXPORT void igs_agent_set_state(const char *state);
 INGESCAPE_EXPORT char * igs_agent_state(void); //caller owns returned value
 
-/*agent family - optional
- 32 characters canonical UUID format is commonly expected,
- default is an empty string, max length is 64 characters*/
-INGESCAPE_EXPORT void igs_agent_set_family(const char *family);
-INGESCAPE_EXPORT char * igs_agent_family(void); //caller owns returned value
-
 //mute the agent
 INGESCAPE_EXPORT void igs_agent_mute(void);
 INGESCAPE_EXPORT void igs_agent_unmute(void);
 INGESCAPE_EXPORT bool igs_agent_is_muted(void);
-
 typedef void (igs_mute_fn)(bool is_muted,
                            void *my_data);
 INGESCAPE_EXPORT void igs_observe_mute(igs_mute_fn cb, void *my_data);
@@ -182,7 +183,6 @@ INGESCAPE_EXPORT void igs_observe_mute(igs_mute_fn cb, void *my_data);
 INGESCAPE_EXPORT void igs_freeze(void);
 INGESCAPE_EXPORT bool igs_is_frozen(void);
 INGESCAPE_EXPORT void igs_unfreeze(void);
-
 typedef void (igs_freeze_fn)(bool is_paused,
                              void *my_data);
 INGESCAPE_EXPORT void igs_observe_freeze(igs_freeze_fn cb, void *my_data);
@@ -202,29 +202,29 @@ typedef enum {
     IGS_PEER_ENTERED = 1, //event_data are the peer headers as a zhash_t*
     IGS_PEER_EXITED, //event_data is NULL
     IGS_AGENT_ENTERED, //event_data is the JSON string for agent definition as a char*
-    IGS_AGENT_UPDATED_DEFINITION, //event_data is the JSON string for agent definition as a char*
+    IGS_AGENT_UPDATED_DEFINITION, //event_data is the JSON string for agent definition as a const char*
     IGS_AGENT_KNOWS_US, //event_data is NULL
     IGS_AGENT_EXITED, //event_data is NULL
-    IGS_AGENT_UPDATED_MAPPING, //event_data is the JSON string for agent mapping as a char*
+    IGS_AGENT_UPDATED_MAPPING, //event_data is the JSON string for agent mapping as a const char*
     IGS_AGENT_WON_ELECTION, //event_data is the election name as a char*
     IGS_AGENT_LOST_ELECTION //event_data is the election name as a char*
 } igs_agent_event_t;
 typedef void (igs_agent_events_fn)(igs_agent_event_t event,
                                    const char *uuid,
                                    const char *name,
-                                   void *event_data,
+                                   const void *event_data,
                                    void *my_data);
 INGESCAPE_EXPORT void igs_observe_agent_events (igs_agent_events_fn cb, void *my_data);
 
 
 //////////////////////////////////////////////////////////////////////////////////
-// Editing & inspecting definitions, adding and removing inputs/outputs/parameters
+// Edit & inspect agent definition (inputs, outputs, services, attributes)
 
 typedef enum {
     IGS_INPUT_T = 1,
     IGS_OUTPUT_T,
-    IGS_PARAMETER_T
-} igs_iop_type_t;
+    IGS_ATTRIBUTE_T
+} igs_io_type_t;
 
 typedef enum {
     IGS_UNKNOWN_T = 0,
@@ -234,58 +234,63 @@ typedef enum {
     IGS_BOOL_T,
     IGS_IMPULSION_T,
     IGS_DATA_T
-} igs_iop_value_type_t;
+} igs_io_value_type_t;
 
-//load / set / get definition
+/*Package, class, description, version
+ In a Model-Based System Engineering (MBSE) context, an agent may
+ provide additonal information regarding its category and role in
+ a given system. These information are represented by:
+    • A package, positioning the class inside a larger set,
+    • A class, naming the agent in the context of a given system,
+    • A free-text description for the role and activities of the agent,
+    • A version.
+ The class is set by default to the name of the agent.
+ The package generally complies with a hierarchical structure using '::'
+ as a separator, e.g. level1::level2::level3. Note that the library does
+ not make any verification.
+ */
+INGESCAPE_EXPORT void igs_definition_set_package(const char *package);
+INGESCAPE_EXPORT char * igs_definition_package(void); //caller owns returned value
+INGESCAPE_EXPORT void igs_definition_set_class(const char *my_class);
+INGESCAPE_EXPORT char * igs_definition_class(void); //caller owns returned value
+INGESCAPE_EXPORT void igs_definition_set_description(const char *description);
+INGESCAPE_EXPORT char * igs_definition_description(void); //caller owns returned value
+INGESCAPE_EXPORT void igs_definition_set_version(const char *version);
+INGESCAPE_EXPORT char * igs_definition_version(void); //caller owns returned value
+
+//create & remove inputs/outputs
+INGESCAPE_EXPORT igs_result_t igs_input_create(const char *name,
+                                               igs_io_value_type_t value_type,
+                                               void *value,
+                                               size_t size);
+INGESCAPE_EXPORT igs_result_t igs_output_create(const char *name,
+                                                igs_io_value_type_t value_type,
+                                                void *value,
+                                                size_t size);
+INGESCAPE_EXPORT igs_result_t igs_input_remove(const char *name);
+INGESCAPE_EXPORT igs_result_t igs_output_remove(const char *name);
+
+//inputs/outputs type, list and existence
+INGESCAPE_EXPORT igs_io_value_type_t igs_input_type(const char *name);
+INGESCAPE_EXPORT igs_io_value_type_t igs_output_type(const char *name);
+
+INGESCAPE_EXPORT size_t igs_input_count(void);
+INGESCAPE_EXPORT size_t igs_output_count(void);
+
+INGESCAPE_EXPORT char ** igs_input_list(size_t *inputs_nbr); //returned char** must be freed using igs_free_io_list
+INGESCAPE_EXPORT char** igs_output_list(size_t *outputs_nbr); //returned char** must be freed using igs_free_io_list
+INGESCAPE_EXPORT void igs_free_io_list(char **list, size_t io_nbr);
+
+INGESCAPE_EXPORT bool igs_input_exists(const char *name);
+INGESCAPE_EXPORT bool igs_output_exists(const char *name);
+
+//load / set / get / clear definition
 INGESCAPE_EXPORT igs_result_t igs_definition_load_str (const char* json_str);
 INGESCAPE_EXPORT igs_result_t igs_definition_load_file (const char* file_path);
 INGESCAPE_EXPORT void igs_clear_definition(void); //clears definition data for the agent
 INGESCAPE_EXPORT char * igs_definition_json(void); //returns json string, caller owns returned value
-INGESCAPE_EXPORT char * igs_definition_description(void); //caller owns returned value
-INGESCAPE_EXPORT char * igs_definition_version(void); //caller owns returned value
-INGESCAPE_EXPORT void igs_definition_set_description(const char *description);
-INGESCAPE_EXPORT void igs_definition_set_version(const char *version);
 
-//edit the definition
-INGESCAPE_EXPORT igs_result_t igs_input_create(const char *name,
-                                               igs_iop_value_type_t value_type,
-                                               void *value,
-                                               size_t size);
-INGESCAPE_EXPORT igs_result_t igs_output_create(const char *name,
-                                                igs_iop_value_type_t value_type,
-                                                void *value,
-                                                size_t size);
-INGESCAPE_EXPORT igs_result_t igs_parameter_create(const char *name,
-                                                   igs_iop_value_type_t value_type,
-                                                   void *value,
-                                                   size_t size);
-INGESCAPE_EXPORT igs_result_t igs_input_remove(const char *name);
-INGESCAPE_EXPORT igs_result_t igs_output_remove(const char *name);
-INGESCAPE_EXPORT igs_result_t igs_parameter_remove(const char *name);
-
-//check IOP type, list and existence
-INGESCAPE_EXPORT igs_iop_value_type_t igs_input_type(const char *name);
-INGESCAPE_EXPORT igs_iop_value_type_t igs_output_type(const char *name);
-INGESCAPE_EXPORT igs_iop_value_type_t igs_parameter_type(const char *name);
-
-INGESCAPE_EXPORT size_t igs_input_count(void);
-INGESCAPE_EXPORT size_t igs_output_count(void);
-INGESCAPE_EXPORT size_t igs_parameter_count(void);
-
-INGESCAPE_EXPORT char ** igs_input_list(size_t *inputs_nbr); //returned char** must be freed using igs_free_iop_list
-INGESCAPE_EXPORT char** igs_output_list(size_t *outputs_nbr); //returned char** must be freed using igs_free_iop_list
-INGESCAPE_EXPORT char** igs_parameter_list(size_t *parameters_nbr); //returned char** must be freed using igs_free_iop_list
-INGESCAPE_EXPORT void igs_free_iop_list(char **list, size_t iop_nbr);
-
-INGESCAPE_EXPORT bool igs_input_exists(const char *name);
-INGESCAPE_EXPORT bool igs_output_exists(const char *name);
-INGESCAPE_EXPORT bool igs_parameter_exists(const char *name);
-
-
-////////////////////////////////////////////////////////////
-// Reading and writing inputs/outputs/parameters, a.k.a IOPs
-
-//read IOPs per value type
+//read IOs per value type
 INGESCAPE_EXPORT bool igs_input_bool(const char *name);
 INGESCAPE_EXPORT int igs_input_int(const char *name);
 INGESCAPE_EXPORT double igs_input_double(const char *name);
@@ -298,13 +303,7 @@ INGESCAPE_EXPORT double igs_output_double(const char *name);
 INGESCAPE_EXPORT char * igs_output_string(const char *name); //caller owns returned value
 INGESCAPE_EXPORT igs_result_t igs_output_data(const char *name, void **data, size_t *size); //caller owns returned value
 
-INGESCAPE_EXPORT bool igs_parameter_bool(const char *name);
-INGESCAPE_EXPORT int igs_parameter_int(const char *name);
-INGESCAPE_EXPORT double igs_parameter_double(const char *name);
-INGESCAPE_EXPORT char * igs_parameter_string(const char *name); //caller owns returned value
-INGESCAPE_EXPORT igs_result_t igs_parameter_data(const char *name, void **data, size_t *size); //caller owns returned value
-
-//write IOPs per value type
+//write IOs per value type
 INGESCAPE_EXPORT igs_result_t igs_input_set_bool(const char *name, bool value);
 INGESCAPE_EXPORT igs_result_t igs_input_set_int(const char *name, int value);
 INGESCAPE_EXPORT igs_result_t igs_input_set_double(const char *name, double value);
@@ -319,23 +318,17 @@ INGESCAPE_EXPORT igs_result_t igs_output_set_string(const char *name, const char
 INGESCAPE_EXPORT igs_result_t igs_output_set_impulsion(const char *name);
 INGESCAPE_EXPORT igs_result_t igs_output_set_data(const char *name, void *value, size_t size);
 
-INGESCAPE_EXPORT igs_result_t igs_parameter_set_bool(const char *name, bool value);
-INGESCAPE_EXPORT igs_result_t igs_parameter_set_int(const char *name, int value);
-INGESCAPE_EXPORT igs_result_t igs_parameter_set_double(const char *name, double value);
-INGESCAPE_EXPORT igs_result_t igs_parameter_set_string(const char *name, const char *value);
-INGESCAPE_EXPORT igs_result_t igs_parameter_set_data(const char *name, void *value, size_t size);
-
-/*Constraints on IOPs
+/*Constraints on IOs
  Constraints enable verifications upon sending or receiving information
  with inputs and outputs. The syntax for the constraints is global but
  some constraints only apply to certain types:
  Integers and doubles:
-    - "max 10.123"  : applies a max allowed value on the IOP
-    - "min -10" : applies a min allowed value on the IOP
-    - "[-10, .1]" : applies min and max allowed values on the IOP
+    - "max 10.123"  : applies a max allowed value on the IO
+    - "min -10" : applies a min allowed value on the IO
+    - "[-10, .1]" : applies min and max allowed values on the IO
  Strings
     - "~ regular_expression", e.g. "~ \\d+(\.\\d+)?)":
-        IOP of type STRING must match the regular expression
+        IOs of type STRING must match the regular expression
 
  Regular expressions are based on CZMQ integration of SLRE with the
  following syntax:
@@ -357,52 +350,45 @@ $               Match end of a buffer
 ?               Match zero or once
 \xDD            Match byte with hex value 0xDD
 \meta           Match one of the meta character: ^$().[*+?\
-
  */
 INGESCAPE_EXPORT void igs_constraints_enforce(bool enforce); //default is false, i.e. disabled
 INGESCAPE_EXPORT igs_result_t igs_input_add_constraint(const char *name, const char *constraint);
 INGESCAPE_EXPORT igs_result_t igs_output_add_constraint(const char *name, const char *constraint);
-INGESCAPE_EXPORT igs_result_t igs_parameter_add_constraint(const char *name, const char *constraint);
 
-//IOP descriptions
+//IO description
 INGESCAPE_EXPORT igs_result_t igs_input_set_description(const char *name, const char *description);
 INGESCAPE_EXPORT igs_result_t igs_output_set_description(const char *name, const char *description);
-INGESCAPE_EXPORT igs_result_t igs_parameter_set_description(const char *name, const char *description);
 
-/*IOP specification
- This section enables to decribe precise specifications for IOPs, 
- including a type. Specifications are descriptive only. Ingescape
- does not check anything that is passed here.
- For example, the type can be 'protobuf' and the specification can
- be an actual protobuf structure in proto format.
+/*IO detailed type
+ This section enables to decribe precise specifications for IOs,
+ around a detailed type. Specifications are descriptive only.
+ Ingescape does not check anything that is passed here.
+ For example, the detailed type can be 'protobuf' and the specification
+ can be an actual protobuf structure in proto format.
  */
-INGESCAPE_EXPORT igs_result_t igs_input_set_specification(const char *name, const char *spec_type, const char *specification);
-INGESCAPE_EXPORT igs_result_t igs_output_set_specification(const char *name, const char *spec_type, const char *specification);
-INGESCAPE_EXPORT igs_result_t igs_parameter_set_specification(const char *name, const char *spec_type, const char *specification);
+INGESCAPE_EXPORT igs_result_t igs_input_set_detailed_type(const char *input_name, const char *type_name, const char *specification);
+INGESCAPE_EXPORT igs_result_t igs_output_set_detailed_type(const char *output_name, const char *type_name, const char *specification);
 
-/*These two functions enable sending and receiving DATA on
- inputs/outputs by using zmsg_t structures. zmsg_t structures
- offer advanced functionalities for data serialization.
+/*Using ZeroMQ native zmsg_t structuresfor sending and receiving DATA on IOs.
+ zmsg_t structures offer advanced functionalities for data serialization.
  More can be found here: http://czmq.zeromq.org/manual:zmsg */
 INGESCAPE_EXPORT igs_result_t igs_output_set_zmsg(const char *name, zmsg_t *msg);
 INGESCAPE_EXPORT igs_result_t igs_input_zmsg(const char *name, zmsg_t **msg); //msg is owned by caller
 
-/*Clear IOP data in memory without having to write an empty value
- into the IOP. Especially useful for IOPs handling large strings and data.*/
+/*Clear IO data in memory without having to write an empty value
+ into the IO. Especially useful for IOs handling large strings and data.*/
 INGESCAPE_EXPORT void igs_clear_input(const char *name);
 INGESCAPE_EXPORT void igs_clear_output(const char *name);
-INGESCAPE_EXPORT void igs_clear_parameter(const char *name);
 
-//observe changes to an IOP
-typedef void (igs_iop_fn)(igs_iop_type_t iop_type,
+//observe changes to an IO
+typedef void (igs_io_fn)(igs_io_type_t io_type,
                           const char *name,
-                          igs_iop_value_type_t value_type,
+                          igs_io_value_type_t value_type,
                           void *value,
                           size_t value_size,
                           void *my_data);
-INGESCAPE_EXPORT void igs_observe_input(const char *name, igs_iop_fn cb, void *my_data);
-INGESCAPE_EXPORT void igs_observe_output(const char *name, igs_iop_fn cb, void *my_data);
-INGESCAPE_EXPORT void igs_observe_parameter(const char *name, igs_iop_fn cb, void *my_data);
+INGESCAPE_EXPORT void igs_observe_input(const char *name, igs_io_fn cb, void *my_data);
+INGESCAPE_EXPORT void igs_observe_output(const char *name, igs_io_fn cb, void *my_data);
 
 //mute or unmute an output
 INGESCAPE_EXPORT void igs_output_mute(const char *name);
@@ -410,61 +396,16 @@ INGESCAPE_EXPORT void igs_output_unmute(const char *name);
 INGESCAPE_EXPORT bool igs_output_is_muted(const char *name);
 
 
-////////////////////////////////
-// Mapping edition & inspection
-
-//load / set / get mapping
-INGESCAPE_EXPORT igs_result_t igs_mapping_load_str(const char* json_str);
-INGESCAPE_EXPORT igs_result_t igs_mapping_load_file(const char* file_path);
-INGESCAPE_EXPORT char * igs_mapping_json(void); //returns json string, caller owns returned value
-INGESCAPE_EXPORT size_t igs_mapping_count(void); //number of entries in the mapping output type
-
-//clear mappings
-INGESCAPE_EXPORT void igs_clear_mappings(void); //clears all our mappings with all agents
-INGESCAPE_EXPORT void igs_clear_mappings_with_agent(const char *agent_name); //clears our mappings with this agent
-INGESCAPE_EXPORT void igs_clear_mappings_for_input (const char *input_name); //clear all mappings for this input
-
-//edit our mappings
-INGESCAPE_EXPORT uint64_t igs_mapping_add(const char *from_our_input,
-                                          const char *to_agent,
-                                          const char *with_output); //returns mapping id or zero if creation failed
-INGESCAPE_EXPORT igs_result_t igs_mapping_remove_with_id(uint64_t id);
-INGESCAPE_EXPORT igs_result_t igs_mapping_remove_with_name(const char *from_our_input,
-                                                           const char *to_agent,
-                                                           const char *with_output);
-
-//edit our splits
-INGESCAPE_EXPORT size_t igs_split_count(void); //number of splits entries
-INGESCAPE_EXPORT uint64_t igs_split_add(const char *from_our_input,
-                                        const char *to_agent,
-                                        const char *with_output); //returns split id or zero if creation failed
-INGESCAPE_EXPORT igs_result_t igs_split_remove_with_id(uint64_t the_id);
-INGESCAPE_EXPORT igs_result_t igs_split_remove_with_name(const char *from_our_input,
-                                                         const char *to_agent,
-                                                         const char *with_output);
-
-/*When mapping other agents, it is possible to ask the mapped
- agents to send us their current output values through a dedicated
- message for our initialization.
- By default, this behavior is disabled.*/
-INGESCAPE_EXPORT void igs_mapping_set_outputs_request(bool notify);
-INGESCAPE_EXPORT bool igs_mapping_outputs_request(void);
-
-
-////////////////////////////////
-// Services edition & inspection
-
-/*NOTES:
+/* Services edition & inspection
  - one and only one mandatory callback per service, set using igs_service_init :
  generates a warning if the callback missing when loading definition or receiving service
  - service names shall be unique for a given agent
  - names for optional replies shall be unique for a given service */
 
 //services arguments
-//When a service call is received, service arguments are provided as a chained list.
 struct _igs_service_arg_t{
     char *name;
-    igs_iop_value_type_t type;
+    igs_io_value_type_t type;
     union{
         bool b;
         int i;
@@ -473,13 +414,15 @@ struct _igs_service_arg_t{
         void *data;
     };
     size_t size;
-    struct _igs_service_arg_t *next;
+    struct _igs_service_arg_t *next; //arguments lists are chained
 };
 
 //Arguments list are initialized to NULL and then filled by calling igs_service_args_add_*
 //Example:
 //   igs_service_arg_t *list = NULL;
-//   igs_service_args_add_int(&list, 10);
+//   igs_service_args_add_int (&list, 10);
+//   igs_service_args_add_string (&list, "other argument");
+//   igs_service_args_destroy (&list);
 
 INGESCAPE_EXPORT void igs_service_args_add_int(igs_service_arg_t **list, int value);
 INGESCAPE_EXPORT void igs_service_args_add_bool(igs_service_arg_t **list, bool value);
@@ -493,14 +436,14 @@ INGESCAPE_EXPORT igs_service_arg_t * igs_service_args_clone(igs_service_arg_t *l
  Requires to pass an agent name or UUID, a service name and a list of arguments specific to the service.
  Token is an optional information to help routing replies.
  Passed arguments list will be deallocated and destroyed by the call. */
-INGESCAPE_EXPORT igs_result_t igs_service_call (const char *agent_name_or_uuid,
-                                                const char *service_name,
-                                                igs_service_arg_t **list,
-                                                const char *token);
+INGESCAPE_EXPORT igs_result_t igs_service_call(const char *agent_name_or_uuid,
+                                               const char *service_name,
+                                               igs_service_arg_t **list,
+                                               const char *token);
 
 /*create /remove / edit a service offered by our agent
- Warning: only one callback can be attached to a service
- (further attempts will be ignored and signaled by an error log). */
+ WARNING: only one callback shall be attached to a service
+ (further attempts will be ignored and signaled by an error log).*/
 typedef void (igs_service_fn)(const char *sender_agent_name,
                               const char *sender_agent_uuid,
                               const char *service_name,
@@ -511,14 +454,14 @@ typedef void (igs_service_fn)(const char *sender_agent_name,
 
 INGESCAPE_EXPORT igs_result_t igs_service_init(const char *name, igs_service_fn cb, void *my_data);
 INGESCAPE_EXPORT igs_result_t igs_service_remove(const char *name);
-INGESCAPE_EXPORT igs_result_t igs_service_arg_add(const char *service_name, const char *arg_name, igs_iop_value_type_t type);
+INGESCAPE_EXPORT igs_result_t igs_service_arg_add(const char *service_name, const char *arg_name, igs_io_value_type_t type);
 INGESCAPE_EXPORT igs_result_t igs_service_arg_remove(const char *service_name,
                                                      const char *arg_name); //removes first occurence of an argument with this name
 
 //replies are optional and used for specification purposes
 INGESCAPE_EXPORT igs_result_t igs_service_reply_add(const char *service_name, const char *reply_name);
 INGESCAPE_EXPORT igs_result_t igs_service_reply_remove(const char *service_name, const char *reply_name);
-INGESCAPE_EXPORT igs_result_t igs_service_reply_arg_add(const char *service_name, const char *reply_name, const char *arg_name, igs_iop_value_type_t type);
+INGESCAPE_EXPORT igs_result_t igs_service_reply_arg_add(const char *service_name, const char *reply_name, const char *arg_name, igs_io_value_type_t type);
 INGESCAPE_EXPORT igs_result_t igs_service_reply_arg_remove(const char *service_name,
                                                            const char *reply_name,
                                                            const char *arg_name);//removes first occurence of an argument with this name
@@ -539,6 +482,83 @@ INGESCAPE_EXPORT char ** igs_service_reply_names(const char *service_name, size_
 INGESCAPE_EXPORT igs_service_arg_t * igs_service_reply_args_first(const char *service_name, const char *reply_name);
 INGESCAPE_EXPORT size_t igs_service_reply_args_count(const char *service_name, const char *reply_name);
 INGESCAPE_EXPORT bool igs_service_reply_arg_exists(const char *service_name, const char *reply_name, const char *arg_name);
+
+/* Attributes edition & inspection
+ Attributes are very similar to IOs, except that they are not exposed
+ to other agents. They are not usable in mappings.
+ Attributes are used to expose internal variables into agents, which are
+ included in their definition. Attributes generally describe key variables
+ in an agent, which affect the internal behavior of the agent.
+ NOTE: Attributes used to be named parameters in older versions.
+ */
+INGESCAPE_EXPORT igs_result_t igs_attribute_create(const char *name,
+                                                   igs_io_value_type_t value_type,
+                                                   void *value,
+                                                   size_t size);
+INGESCAPE_EXPORT igs_result_t igs_attribute_remove(const char *name);
+INGESCAPE_EXPORT igs_io_value_type_t igs_attribute_type(const char *name);
+INGESCAPE_EXPORT size_t igs_attribute_count(void);
+INGESCAPE_EXPORT char** igs_attribute_list(size_t *attributes_nbr); //returned char** must be freed using igs_free_io_list
+INGESCAPE_EXPORT bool igs_attribute_exists(const char *name);
+
+INGESCAPE_EXPORT bool igs_attribute_bool(const char *name);
+INGESCAPE_EXPORT int igs_attribute_int(const char *name);
+INGESCAPE_EXPORT double igs_attribute_double(const char *name);
+INGESCAPE_EXPORT char * igs_attribute_string(const char *name); //caller owns returned value
+INGESCAPE_EXPORT igs_result_t igs_attribute_data(const char *name, void **data, size_t *size); //caller owns returned value
+
+INGESCAPE_EXPORT igs_result_t igs_attribute_set_bool(const char *name, bool value);
+INGESCAPE_EXPORT igs_result_t igs_attribute_set_int(const char *name, int value);
+INGESCAPE_EXPORT igs_result_t igs_attribute_set_double(const char *name, double value);
+INGESCAPE_EXPORT igs_result_t igs_attribute_set_string(const char *name, const char *value);
+INGESCAPE_EXPORT igs_result_t igs_attribute_set_data(const char *name, void *value, size_t size);
+
+INGESCAPE_EXPORT igs_result_t igs_attribute_add_constraint(const char *name, const char *constraint);
+INGESCAPE_EXPORT igs_result_t igs_attribute_set_description(const char *name, const char *description);
+INGESCAPE_EXPORT igs_result_t igs_attribute_set_detailed_type(const char *param_name, const char *type_name, const char *specification);
+INGESCAPE_EXPORT void igs_clear_attribute(const char *name);
+
+INGESCAPE_EXPORT void igs_observe_attribute(const char *name, igs_io_fn cb, void *my_data);
+
+
+////////////////////////////////
+// Mappings edition & inspection
+
+//load / set / get mapping
+INGESCAPE_EXPORT igs_result_t igs_mapping_load_str(const char* json_str);
+INGESCAPE_EXPORT igs_result_t igs_mapping_load_file(const char* file_path);
+INGESCAPE_EXPORT char * igs_mapping_json(void); //returns json string, caller owns returned value
+INGESCAPE_EXPORT size_t igs_mapping_count(void); //number of entries in the mapping output type
+
+//clear mappings
+INGESCAPE_EXPORT void igs_clear_mappings(void); //clears all our mappings with all agents
+INGESCAPE_EXPORT void igs_clear_mappings_with_agent(const char *agent_name); //clears our mappings with this agent
+INGESCAPE_EXPORT void igs_clear_mappings_for_input (const char *input_name); //clear all mappings for this input
+
+//edit mappings
+INGESCAPE_EXPORT uint64_t igs_mapping_add(const char *from_our_input,
+                                          const char *to_agent,
+                                          const char *with_output); //returns mapping id or zero if creation failed
+INGESCAPE_EXPORT igs_result_t igs_mapping_remove_with_id(uint64_t id);
+INGESCAPE_EXPORT igs_result_t igs_mapping_remove_with_name(const char *from_our_input,
+                                                           const char *to_agent,
+                                                           const char *with_output);
+
+//edit splits
+INGESCAPE_EXPORT size_t igs_split_count(void); //number of splits entries
+INGESCAPE_EXPORT uint64_t igs_split_add(const char *from_our_input,
+                                        const char *to_agent,
+                                        const char *with_output); //returns split id or zero if creation failed
+INGESCAPE_EXPORT igs_result_t igs_split_remove_with_id(uint64_t the_id);
+INGESCAPE_EXPORT igs_result_t igs_split_remove_with_name(const char *from_our_input,
+                                                         const char *to_agent,
+                                                         const char *with_output);
+
+/*When mapping other agents' outputs, it is possible to ask the mapped
+ agents to send us their current output values through a dedicated
+ message for our initialization. By default, this behavior is disabled.*/
+INGESCAPE_EXPORT void igs_mapping_set_outputs_request(bool notify);
+INGESCAPE_EXPORT bool igs_mapping_outputs_request(void);
 
 
 /////////
@@ -616,9 +636,9 @@ INGESCAPE_EXPORT igs_result_t igs_peer_remove_header(const char *key);
  as many brokers as you want. At least one declared broker is necessary to
  use igs_start_with_brokers. Use igs_clear_brokers to remove all the current
  brokers.
- • The endpoint in igs_broker_set_endpoint is the broker address we should be reached
- at as a broker if we want to be one. Using igs_broker_set_endpoint makes us a broker
- when starting.
+ • The endpoint in igs_broker_enable_with_endpoint is the broker address we should 
+ be reached at as a broker if we want to be one. Using igs_broker_enable_with_endpoint
+ makes us a broker when starting.
  • The endpoint in igs_broker_set_advertized_endpoint replaces the one declared in
  igs_start_with_brokers for the registration to the brokers. This function enables
  passing through NAT and using a public address. Attention: this public address
@@ -631,7 +651,7 @@ INGESCAPE_EXPORT igs_result_t igs_peer_remove_header(const char *key);
 INGESCAPE_EXPORT igs_result_t igs_broker_add(const char *broker_endpoint);
 INGESCAPE_EXPORT void igs_clear_brokers(void);
 INGESCAPE_EXPORT void igs_broker_enable_with_endpoint(const char *our_broker_endpoint);
-INGESCAPE_EXPORT void igs_broker_set_advertized_endpoint(const char *advertised_endpoint); //parameter can be NULL
+INGESCAPE_EXPORT void igs_broker_set_advertized_endpoint(const char *advertised_endpoint); //advertised_endpoint can be NULL
 INGESCAPE_EXPORT igs_result_t igs_start_with_brokers(const char *agent_endpoint);
 
 
@@ -788,7 +808,7 @@ INGESCAPE_EXPORT int igs_protocol(void);
 
 /*COMMAND LINE
  Agent command line can be passed here to be used by ingescapeLauncher. If not set,
- command line is initialized with exec path without any parameter.*/
+ command line is initialized with exec path without any attribute.*/
 INGESCAPE_EXPORT void igs_set_command_line(const char *line);
 INGESCAPE_EXPORT void igs_set_command_line_from_args(int argc, const char * argv[]); //first element is replaced by absolute exec path on UNIX systems
 INGESCAPE_EXPORT char * igs_command_line(void); //caller owns returned value
@@ -812,7 +832,7 @@ INGESCAPE_EXPORT bool igs_log_file(void);
 INGESCAPE_EXPORT void igs_log_set_file_path(const char *path); //default directory is ~/ on UNIX systems and current PATH on Windows
 INGESCAPE_EXPORT char * igs_log_file_path(void); // caller owns returned value
 
-INGESCAPE_EXPORT void igs_log_include_data(bool enable); //log details of data IOPs in log files , default is false.
+INGESCAPE_EXPORT void igs_log_include_data(bool enable); //log details of data IOs in log files , default is false.
 INGESCAPE_EXPORT void igs_log_include_services(bool enable); //log details about call/excecute services in log files, default is false.
 INGESCAPE_EXPORT void igs_log_no_warning_if_undefined_service(bool enable); //warns or not if an unknown service is called on this agent, default is warning (false).
 
@@ -866,6 +886,22 @@ INGESCAPE_EXPORT void  igs_net_raise_sockets_limit(void); //UNIX only, to be cal
 INGESCAPE_EXPORT void igs_net_set_high_water_marks(int hwm_value);
 
 
+/* SATURATION CONTROL
+ In situations where an agent inputs in the peer are excessively
+ sollicited and it results in even more intensive output publications,
+ it may saturate the ingescape loop with HANDLE_PUBLICATION messages,
+ which will end up reaching more than 1000 messages, corresponding to
+ the default High Water Marks on the pipe PAIR socket. The saturated
+ PAIR socket will then block and freeze the agent.
+ We allow here to remove the HWM and to print in real-time the number
+ of HANDLE_PUBLICATION message stacked in the pipe.
+ Please note, that disabling the HWM may induce a memory exhaustion
+ for the agent and the operating system: USE WITH CAUTION.
+ */
+INGESCAPE_EXPORT void igs_unbind_pipe(void);
+INGESCAPE_EXPORT void igs_monitor_pipe_stack(bool monitor); //default is false
+
+
 /*PERFORMANCE CHECK
  sends number of messages with defined size and displays performance
  information when finished (information displayed as INFO-level log)*/
@@ -908,53 +944,13 @@ INGESCAPE_EXPORT void igs_observe_monitor(igs_monitor_fn cb, void *my_data);
  in production environments.*/
 INGESCAPE_EXPORT void igs_clear_context(void);
 
-
-/* LOGS REPLAY - DEPRECATED - will be removed soon
- ---------------------------------------------------------------------
- Why are we deprecating the replay features ?
- • These features make the library heavier and require to maintain a compatibility
- with log formats, which will inevitably become a hassle at some point. The
- cost/benefit ratio is thus not very favorable.
- • These replay features are practically unused and are easy to implement outside the
- library simply by parsing logs and publishing data in various possible ways.
- • The Ingescape ecosystem provides much better solutions based on record/replay
- support with agent virtualization that beat these features in every way.
- 
- Post an issue on github if you want to discuss this topic with the community.
- ---------------------------------------------------------------------
- Ingescape logs contain all the necessary information for an agent to replay
- its changes for inputs, outputs, parameters and services.
-
- Replay happens in a dedicated thread created after calling igs_replay_init:
- • log_file_path : path to the log file to be read
- • speed : replay speed. Default is zero, meaning as fast as possible.
- • start_time : with format hh:mm::s, specifies the time when speed shall be used.
- Replay as fast as possible before that.
- • wait_for_start : waits for a call to igs_replay_start before starting the replay. Default is false.
- • replay_mode : a boolean composition of igs_replay_mode_t value to decide what shall be replayed.
- If mode is zero, all IOP and services are replayed.
- • agent : an OPTIONAL agent name serving as filter when the logs contain activity for multiple agents.
-
- igs_replay_terminate cleans the thread and requires calling igs_replay_init again.
- Replay thread is cleaned automatically also when the log file has been read completely.
- NB: replay is still under heavy development, use at your own risk...*/
-typedef enum {
-    IGS_REPLAY_INPUT = 1,
-    IGS_REPLAY_OUTPUT = 2,
-    IGS_REPLAY_PARAMETER = 4,
-    IGS_REPLAY_EXECUTE_SERVICE= 8,
-    IGS_REPLAY_CALL_SERVICE = 16
-
-} igs_replay_mode_t;
-INGESCAPE_EXPORT void igs_replay_init(const char *log_file_path,
-                                      size_t speed,
-                                      const char *start_time,
-                                      bool wait_for_start,
-                                      uint replay_mode,
-                                      const char *agent);
-INGESCAPE_EXPORT void igs_replay_start(void);
-INGESCAPE_EXPORT void igs_replay_pause(bool pause);
-INGESCAPE_EXPORT void igs_replay_terminate(void);
+/*AGENT FAMILY - for licensing purposes
+ 32 characters canonical UUID format is commonly expected,
+ Default is an empty string. Max length is 64 characters.
+ The family is used together with an external licensing
+ mechanism to uniquely identify a given software agent.*/
+INGESCAPE_EXPORT void igs_agent_set_family(const char *family);
+INGESCAPE_EXPORT char * igs_agent_family(void); //caller owns returned value
 
 
 //////////////////////////////
@@ -1022,22 +1018,27 @@ struct _igs_json_node_t {
 };
 
 //convert between JSON and JSON nodes
-INGESCAPE_EXPORT void igs_json_insert_node (igs_json_t *self, igs_json_node_t *node);
-INGESCAPE_EXPORT igs_json_node_t * igs_json_node_for (igs_json_t *self);
+INGESCAPE_EXPORT void igs_json_insert_node (igs_json_t *self, igs_json_node_t *node); //inserts at current position
+INGESCAPE_EXPORT igs_json_node_t * igs_json_node_for (igs_json_t *self); //caller owns returned value
 
 // manipulate json nodes
 INGESCAPE_EXPORT igs_json_node_t * igs_json_node_parse_from_file(const char *path);
 INGESCAPE_EXPORT igs_json_node_t * igs_json_node_parse_from_str(const char *content);
+INGESCAPE_EXPORT igs_json_node_t * igs_json_node_parse_from_str2(const char *format, ...) CHECK_PRINTF (1);
 INGESCAPE_EXPORT void igs_json_node_destroy(igs_json_node_t **node);
 INGESCAPE_EXPORT igs_json_node_t * igs_json_node_dup(igs_json_node_t *node); //caller owns returned value
 INGESCAPE_EXPORT char * igs_json_node_dump(igs_json_node_t *node); //caller owns returned value
 
-//insert node in an existing structure
+//insert node in an existing structure (array or map)
 //Key must be non-NULL to insert in a map node.
 //Does not take ownership of node_to_insert (duplicates it).
+//Subpath must be NULL-terminated.
 INGESCAPE_EXPORT void igs_json_node_insert(igs_json_node_t *parent, const char *key, igs_json_node_t *node_to_insert);
+INGESCAPE_EXPORT void igs_json_node_insert2(igs_json_node_t *parent, const char *key,
+                                            const char **subpath, igs_json_node_t **node_to_insert); //takes ownership of node_to_insert
 
 /* Nodes support queries to retrieve sub-nodes
+ Path must be NULL-terminated.
  Important notes :
  - returned value must NOT be freed manually : it is owned by the node
  - returned structure contains a type that shall be checked to handle actual contained value(s)
@@ -1049,6 +1050,47 @@ INGESCAPE_EXPORT igs_json_node_t * igs_json_node_find(igs_json_node_t *node, con
 //NB: int values are considered both int and double
 INGESCAPE_EXPORT bool igs_json_node_is_integer(igs_json_node_t *node);
 INGESCAPE_EXPORT bool igs_json_node_is_double(igs_json_node_t *node);
+
+
+/*/////////////////////////////
+// DEPRECATED : Parameters
+ Parameters have been renamed 'Attributes' and some attached types
+ have been renamed. Backward compatibility is preserved as long as
+ this section is preserved.
+*/
+#define IGS_MAX_IOP_NAME_LENGTH 1024
+typedef igs_io_type_t igs_iop_type_t;
+typedef igs_io_value_type_t igs_iop_value_type_t;
+typedef igs_io_fn igs_iop_fn;
+INGESCAPE_EXPORT igs_result_t igs_parameter_create(const char *name,
+                                                   igs_iop_value_type_t value_type,
+                                                   void *value,
+                                                   size_t size);
+INGESCAPE_EXPORT igs_result_t igs_parameter_remove(const char *name);
+INGESCAPE_EXPORT igs_iop_value_type_t igs_parameter_type(const char *name);
+INGESCAPE_EXPORT size_t igs_parameter_count(void);
+INGESCAPE_EXPORT char** igs_parameter_list(size_t *parameters_nbr); //returned char** must be freed using igs_free_iop_list
+INGESCAPE_EXPORT bool igs_parameter_exists(const char *name);
+
+INGESCAPE_EXPORT bool igs_parameter_bool(const char *name);
+INGESCAPE_EXPORT int igs_parameter_int(const char *name);
+INGESCAPE_EXPORT double igs_parameter_double(const char *name);
+INGESCAPE_EXPORT char * igs_parameter_string(const char *name); //caller owns returned value
+INGESCAPE_EXPORT igs_result_t igs_parameter_data(const char *name, void **data, size_t *size); //caller owns returned value
+
+INGESCAPE_EXPORT igs_result_t igs_parameter_set_bool(const char *name, bool value);
+INGESCAPE_EXPORT igs_result_t igs_parameter_set_int(const char *name, int value);
+INGESCAPE_EXPORT igs_result_t igs_parameter_set_double(const char *name, double value);
+INGESCAPE_EXPORT igs_result_t igs_parameter_set_string(const char *name, const char *value);
+INGESCAPE_EXPORT igs_result_t igs_parameter_set_data(const char *name, void *value, size_t size);
+
+INGESCAPE_EXPORT igs_result_t igs_parameter_add_constraint(const char *name, const char *constraint);
+INGESCAPE_EXPORT igs_result_t igs_parameter_set_description(const char *name, const char *description);
+INGESCAPE_EXPORT igs_result_t igs_parameter_set_detailed_type(const char *param_name, const char *type_name, const char *specification);
+INGESCAPE_EXPORT void igs_clear_parameter(const char *name);
+INGESCAPE_EXPORT void igs_observe_parameter(const char *name, igs_iop_fn cb, void *my_data);
+
+INGESCAPE_EXPORT void igs_free_iop_list(char **list, size_t io_nbr);
 
 #ifdef __cplusplus
 }

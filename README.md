@@ -165,7 +165,7 @@ In this case, all the dependencies need to be fetched and installed individually
 
 
 ### Testing
-Two test programs are built and installed with Ingescape. They are called *igsTester* and *igsPartner* and are installed in /usr/local/bin on \*nix boxes. They enable various series of tests - static and dynamic - to check the library. **They are optional if you are a user and not a contributor.**
+Three test programs are built and installed with Ingescape. They are called *igsTester*,  *igsPartner* and *igsStresser*. They are installed in /usr/local/bin on \*nix boxes. They enable various series of tests - static and dynamic - to check the library. **They are optional if you are a user and not a contributor.**
 
 #### Static tests on most of the API
 ```
@@ -186,6 +186,17 @@ igsTester --device "en0" --port 5670 --verbose --auto
 ```
 Both agents discover each other and run tests automatically. If the two programs run properly (despite a lot of expected error messages in the console) and both terminate by returning 0, it means that everything went OK.
 
+#### Stress tests
+Open one or several consoles and run the following commands, depending on what you want to test.
+For inputs, outputs and services stress tests, run:
+```
+igsStresser --device en0 --port 5670 --agents 10 --publish --verbose
+```
+For stress tests on all the aspects at once, run:
+```
+igsStresser --device en0 --port 5670 --agents 10 --deactivate --change_state --change_definition --change_mapping --publish --elections --verbose
+```
+
 #### Interactive tests
 The two agents also provide advanced console commands to test security, brokers, additional agents in the process, etc.
 
@@ -197,7 +208,7 @@ igsTester --device "en0" --port 5670 --verbose --interactiveloop
 #in each console, then type /help to display the available console commands
 /help
 Available commands in the terminal:
-	/publish : runs the iop publication tests
+	/publish : runs the io publication tests
 	/services : runs the service tests
 	/channels : runs the channels tests
 	/editor agent_uuid : runs the editor (i.e. private bus API) tests on a specific agent
@@ -254,7 +265,7 @@ Here is the code for the **ShapeRecognizer** agent to be copied into a main.c fi
 
 	#include <ingescape/ingescape.h>
 
-	void imageCallback(igs_iop_type_t iopType, const char* name, igs_iop_value_type_t valueType,
+	void imageCallback(igs_io_type_t ioType, const char* name, igs_io_value_type_t valueType,
 	                   void* value, size_t valueSize, void* myData){
 	    igs_info("%s received (%zu bytes)", name, valueSize);
 	    //doing some sophisticated AI stuff here...
@@ -336,7 +347,7 @@ Here is the code for the **ImagesProvider** agent to be copied into another main
 
 	#include <ingescape/ingescape.h>
 
-	void shapeCallback(igs_iop_type_t iopType, const char* name, igs_iop_value_type_t valueType,
+	void shapeCallback(igs_io_type_t ioType, const char* name, igs_io_value_type_t valueType,
 	                   void* value, size_t valueSize, void* myData){
 	    igs_info("%s recognized as %s", name, (char*)value);
 	}
@@ -459,7 +470,7 @@ Here is the JSON definition for **ShapeRecognizer**:
                 "value": ""
             }
         ],
-        "parameters": [
+        "attributes": [
 
         ],
         "services": [
@@ -536,8 +547,9 @@ The global Ingescape API is centralized in a single header file. The header is h
 Here is the structure of ingescape.h:
 
 - Agent initialization, control and events
-- Editing & inspecting definitions, adding and removing inputs/outputs/parameters
-- Reading and writing inputs/outputs/parameters
+- Editing & inspecting definitions, adding and removing inputs/outputs
+- Reading and writing inputs/outputs
+- Handling attributes
 - Mappings edition & inspection
 - Services edition & inspection
 - Timers

@@ -38,7 +38,7 @@ extern void *myOtherData;
 
 #define BUFFER_SIZE 4096
 
-void myIOPCallback(igs_iop_type_t iopType, const char* name, igs_iop_value_type_t valueType, void* value, size_t valueSize, void* myData);
+void myIOCallback(igs_io_type_t ioType, const char* name, igs_io_value_type_t valueType, void* value, size_t valueSize, void* myData);
 void myServiceCallback(const char *senderAgentName, const char *senderAgentUUID,
                        const char *serviceName, igs_service_arg_t *firstArgument, size_t nbArgs,
                        const char *token, void* myCbData);
@@ -46,7 +46,7 @@ void myChannelsCallback(const char *event, const char *peerID, const char *name,
                         const char *address, const char *channel,
                         zhash_t *headers, zmsg_t *msg, void *myData);
 
-void agentIOPCallback(igsagent_t *agent, igs_iop_type_t iopType, const char* name, igs_iop_value_type_t valueType,
+void agentIOCallback(igsagent_t *agent, igs_io_type_t ioType, const char* name, igs_io_value_type_t valueType,
                       void* value, size_t valueSize, void* myData);
 void agentServiceCallback(igsagent_t *agent, const char *senderAgentName, const char *senderAgentUUID,
                           const char *serviceName, igs_service_arg_t *firstArgument, size_t nbArgs,

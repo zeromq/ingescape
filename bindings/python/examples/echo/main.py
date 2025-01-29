@@ -44,7 +44,7 @@ def print_usage_help():
     print("	/quit : quits the agent")
     print("	/help : displays this message")
 
-def return_iop_value_type_as_str(value_type):
+def return_io_value_type_as_str(value_type):
     if value_type == igs.INTEGER_T:
         return "Integer"
     elif value_type == igs.DOUBLE_T:
@@ -101,39 +101,39 @@ def on_freeze_callback(is_frozen, my_data):
 
 
 # inputs
-def impulsion_input_callback(iop_type, name, value_type, value, my_data):
+def impulsion_input_callback(io_type, name, value_type, value, my_data):
     igs.info(f"Input {name} written")
     igs.output_set_impulsion("impulsion")
 
-def bool_input_callback(iop_type, name, value_type, value, my_data):
+def bool_input_callback(io_type, name, value_type, value, my_data):
     igs.info(f"Input {name} written to {value}")
     agent_object = my_data
     assert isinstance(agent_object, Echo)
     agent_object.boolI = value
     agent_object.boolO = value
 
-def integer_input_callback(iop_type, name, value_type, value, my_data):
+def integer_input_callback(io_type, name, value_type, value, my_data):
     igs.info(f"Input {name} written to {value}")
     agent_object = my_data
     assert isinstance(agent_object, Echo)
     agent_object.integerI = value
     agent_object.integerO = value
 
-def double_input_callback(iop_type, name, value_type, value, my_data):
+def double_input_callback(io_type, name, value_type, value, my_data):
     igs.info(f"Input {name} written to {value}")
     agent_object = my_data
     assert isinstance(agent_object, Echo)
     agent_object.doubleI = value
     agent_object.doubleO = value
 
-def string_input_callback(iop_type, name, value_type, value, my_data):
+def string_input_callback(io_type, name, value_type, value, my_data):
     igs.info(f"Input {name} written to {value}")
     agent_object = my_data
     assert isinstance(agent_object, Echo)
     agent_object.stringI = value
     agent_object.stringO = value
 
-def data_input_callback(iop_type, name, value_type, value, my_data):
+def data_input_callback(io_type, name, value_type, value, my_data):
     igs.info(f"Input {name} written to {value}")
     agent_object = my_data
     assert isinstance(agent_object, Echo)

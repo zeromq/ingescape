@@ -98,7 +98,7 @@ igs_json_node_parse_from_file (const char *path)
 {
     assert (path);
     zfile_t *file = zfile_new (NULL, path);
-    if (file == NULL || !zfile_is_regular (file) || !zfile_is_readable (file)
+    if (!file || !zfile_is_regular (file) || !zfile_is_readable (file)
         || zfile_input (file) != 0) {
         if (!zfile_is_regular (file))
             igs_error ("not a regular file : %s", path);
@@ -111,7 +111,7 @@ igs_json_node_parse_from_file (const char *path)
     char errbuf[1024] = "unknown error";
     zchunk_t *data = zfile_read (file, zfile_size (path), 0);
     igs_json_node_t *node = (igs_json_node_t *) igsyajl_tree_parse ((const char *) zchunk_data (data), zchunk_size (data), errbuf, sizeof (errbuf));
-    if (node == NULL)
+    if (!node)
         igs_error ("parsing error (%s) : %s", path, errbuf);
     zchunk_destroy (&data);
     zfile_destroy (&file);
@@ -131,11 +131,28 @@ igs_json_node_parse_from_str (const char *content)
 }
 
 igs_json_node_t *
+igs_json_node_parse_from_str2 (const char *format, ...)
+{
+    assert (format);
+    va_list list;
+    va_start (list, format);
+    char content[IGS_MAX_STRING_MSG_LENGTH] = "";
+    size_t length = vsnprintf (content, IGS_MAX_STRING_MSG_LENGTH - 1, format, list);
+    va_end (list);
+    if (length < IGS_MAX_STRING_MSG_LENGTH - 1)
+        return igs_json_node_parse_from_str (content);
+    else {
+        igs_error("resulting string was longer than allowed (%d), returning NULL",
+                  IGS_MAX_STRING_MSG_LENGTH - 1);
+        return NULL;
+    }
+}
+
+igs_json_node_t *
 igs_json_node_dup (igs_json_node_t *root)
 {
     assert(root);
-    igs_json_node_t *result =
-      (igs_json_node_t *) zmalloc (sizeof (igs_json_node_t));
+    igs_json_node_t *result =  (igs_json_node_t *) zmalloc (sizeof (igs_json_node_t));
     result->type = root->type;
 
     switch (root->type) {
@@ -153,24 +170,18 @@ igs_json_node_dup (igs_json_node_t *root)
             break;
         case IGS_JSON_MAP: // igsyajl_t_object
             result->u.object.len = root->u.object.len;
-            result->u.object.keys =
-              (const char **) zmalloc (root->u.object.len * sizeof (char *));
-            result->u.object.values =
-              (igs_json_node_t **) zmalloc (root->u.object.len * sizeof (igs_json_node_t *));
+            result->u.object.keys = (const char **) zmalloc (root->u.object.len * sizeof (char *));
+            result->u.object.values = (igs_json_node_t **) zmalloc (root->u.object.len * sizeof (igs_json_node_t *));
             for (size_t i = 0; i < root->u.object.len; i++) {
                 result->u.object.keys[i] = strdup (root->u.object.keys[i]);
-                result->u.object.values[i] =
-                  igs_json_node_dup (root->u.object.values[i]);
+                result->u.object.values[i] = igs_json_node_dup (root->u.object.values[i]);
             }
             break;
         case IGS_JSON_ARRAY: // igsyajl_t_array
             result->u.array.len = root->u.array.len;
-            result->u.array.values =
-              (igs_json_node_t **) zmalloc (root->u.array.len * sizeof (igs_json_node_t *));
-            for (size_t i = 0; i < root->u.array.len; i++) {
-                result->u.array.values[i] =
-                igs_json_node_dup (root->u.array.values[i]);
-            }
+            result->u.array.values = (igs_json_node_t **) zmalloc (root->u.array.len * sizeof (igs_json_node_t *));
+            for (size_t i = 0; i < root->u.array.len; i++)
+                result->u.array.values[i] = igs_json_node_dup (root->u.array.values[i]);
             break;
         case IGS_JSON_TRUE:
             result->u.number.i = true;
@@ -212,7 +223,7 @@ igs_json_node_insert (igs_json_node_t *parent,
     assert (node_to_insert);
     if (parent->type == IGS_JSON_ARRAY) {
         size_t size = parent->u.array.len;
-        parent->u.array.values = realloc (parent->u.array.values, size + 1);
+        parent->u.array.values = realloc (parent->u.array.values, (size+1)*sizeof(igs_json_node_t *));
         assert (parent->u.array.values);
         parent->u.array.values[size] = igs_json_node_dup (node_to_insert);
         parent->u.array.len += 1;
@@ -233,10 +244,8 @@ igs_json_node_insert (igs_json_node_t *parent,
         if (known_key)
             igs_json_node_destroy (&(parent->u.object.values[index]));
         else {
-            parent->u.object.values =
-              realloc (parent->u.object.values, size + 1);
-            parent->u.object.keys =
-              (const char **) realloc (parent->u.object.keys, size + 1);
+            parent->u.object.values = (igs_json_node_t **)realloc (parent->u.object.values, (size+1)*sizeof(igs_json_node_t *));
+            parent->u.object.keys = (const char **) realloc (parent->u.object.keys, (size + 1)*sizeof(char*));
             assert (parent->u.object.values);
             assert (parent->u.object.keys);
             parent->u.object.keys[index] = strdup (key);
@@ -246,6 +255,27 @@ igs_json_node_insert (igs_json_node_t *parent,
     }
     else
         igs_error ("parent node must be an array or a map");
+}
+
+void 
+igs_json_node_insert2 (igs_json_node_t *parent, const char *key,
+                       const char **subpath, igs_json_node_t **node_to_insert)
+{
+    assert(parent);
+    assert(node_to_insert);
+    igs_json_node_t *target = parent;
+    if (subpath)
+        target = igs_json_node_find(parent, subpath);
+    if (!target){
+        igs_error("subpath does not exist");
+        return;
+    }
+    if (target->type != IGS_JSON_MAP && target->type != IGS_JSON_ARRAY){
+        igs_error("insertion node must be an array or a map");
+        return;
+    }
+    igs_json_node_insert(target, key, *node_to_insert);
+    igs_json_node_destroy(node_to_insert);
 }
 
 

@@ -18,7 +18,7 @@ napi_value node_igs_definition_load_str(napi_env env, napi_callback_info info) {
     char *json_str = convert_napi_to_string(env, argv[0]);
     int success = igs_definition_load_str(json_str);
     if (success == IGS_SUCCESS) {
-        // Free old associated IOPC callback data
+        // Free old associated IOC callback data
         threadsafe_context_hash_t *threadsafe_context_hash, *threadsafe_context_hash_tmp;
         HASH_ITER (hh, observed_input_contexts, threadsafe_context_hash, threadsafe_context_hash_tmp) {
             HASH_DEL (observed_input_contexts, threadsafe_context_hash);
@@ -28,8 +28,8 @@ napi_value node_igs_definition_load_str(napi_env env, napi_callback_info info) {
             HASH_DEL (observed_output_contexts, threadsafe_context_hash);
             free_threadsafe_context_hash(env, &threadsafe_context_hash);
         }
-        HASH_ITER (hh, observed_parameter_contexts, threadsafe_context_hash, threadsafe_context_hash_tmp) {
-            HASH_DEL (observed_parameter_contexts, threadsafe_context_hash);
+        HASH_ITER (hh, observed_attribute_contexts, threadsafe_context_hash, threadsafe_context_hash_tmp) {
+            HASH_DEL (observed_attribute_contexts, threadsafe_context_hash);
             free_threadsafe_context_hash(env, &threadsafe_context_hash);
         }
         HASH_ITER (hh, service_contexts, threadsafe_context_hash, threadsafe_context_hash_tmp) {
@@ -49,7 +49,7 @@ napi_value node_igs_definition_load_file(napi_env env, napi_callback_info info) 
     char *file_path = convert_napi_to_string(env, argv[0]);
     int success = igs_definition_load_file(file_path);
     if (success == IGS_SUCCESS) {
-        // Free old associated IOPC callback data
+        // Free old associated IOC callback data
         threadsafe_context_hash_t *threadsafe_context_hash, *threadsafe_context_hash_tmp;
         HASH_ITER (hh, observed_input_contexts, threadsafe_context_hash, threadsafe_context_hash_tmp) {
             HASH_DEL (observed_input_contexts, threadsafe_context_hash);
@@ -59,8 +59,8 @@ napi_value node_igs_definition_load_file(napi_env env, napi_callback_info info) 
             HASH_DEL (observed_output_contexts, threadsafe_context_hash);
             free_threadsafe_context_hash(env, &threadsafe_context_hash);
         }
-        HASH_ITER (hh, observed_parameter_contexts, threadsafe_context_hash, threadsafe_context_hash_tmp) {
-            HASH_DEL (observed_parameter_contexts, threadsafe_context_hash);
+        HASH_ITER (hh, observed_attribute_contexts, threadsafe_context_hash, threadsafe_context_hash_tmp) {
+            HASH_DEL (observed_attribute_contexts, threadsafe_context_hash);
             free_threadsafe_context_hash(env, &threadsafe_context_hash);
         }
         HASH_ITER (hh, service_contexts, threadsafe_context_hash, threadsafe_context_hash_tmp) {
@@ -76,7 +76,7 @@ napi_value node_igs_definition_load_file(napi_env env, napi_callback_info info) 
 
 napi_value node_igs_clear_definition(napi_env env, napi_callback_info info) {
     igs_clear_definition();
-    // Free associated IOPC callback data 
+    // Free associated IO callback data 
     threadsafe_context_hash_t *threadsafe_context_hash, *threadsafe_context_hash_tmp;
     HASH_ITER (hh, observed_input_contexts, threadsafe_context_hash, threadsafe_context_hash_tmp) {
         HASH_DEL (observed_input_contexts, threadsafe_context_hash);
@@ -86,8 +86,8 @@ napi_value node_igs_clear_definition(napi_env env, napi_callback_info info) {
         HASH_DEL (observed_output_contexts, threadsafe_context_hash);
         free_threadsafe_context_hash(env, &threadsafe_context_hash);
     }
-    HASH_ITER (hh, observed_parameter_contexts, threadsafe_context_hash, threadsafe_context_hash_tmp) {
-        HASH_DEL (observed_parameter_contexts, threadsafe_context_hash);
+    HASH_ITER (hh, observed_attribute_contexts, threadsafe_context_hash, threadsafe_context_hash_tmp) {
+        HASH_DEL (observed_attribute_contexts, threadsafe_context_hash);
         free_threadsafe_context_hash(env, &threadsafe_context_hash);
     }
     HASH_ITER (hh, service_contexts, threadsafe_context_hash, threadsafe_context_hash_tmp) {
@@ -103,6 +103,40 @@ napi_value node_igs_definition_json(napi_env env, napi_callback_info info) {
     convert_string_to_napi(env, json_definition, &json_definition_js);
     free(json_definition);
     return json_definition_js;
+}
+
+napi_value node_igs_definition_package(napi_env env, napi_callback_info info) {
+    char *package = igs_definition_package();
+    napi_value package_js;
+    convert_string_to_napi(env, package, &package_js);
+    free(package);
+    return package_js;
+}
+
+napi_value node_igs_definition_class(napi_env env, napi_callback_info info) {
+    char *class = igs_definition_class();
+    napi_value class_js;
+    convert_string_to_napi(env, class, &class_js);
+    free(class);
+    return class_js;
+}
+
+napi_value node_igs_definition_set_package(napi_env env, napi_callback_info info) {
+    napi_value argv[1];
+    get_function_arguments(env, info, 1, argv);
+    char *package = convert_napi_to_string(env, argv[0]);
+    igs_definition_set_package(package);
+    free(package);
+    return NULL;
+}
+
+napi_value node_igs_definition_set_class(napi_env env, napi_callback_info info) {
+    napi_value argv[1];
+    get_function_arguments(env, info, 1, argv);
+    char *class = convert_napi_to_string(env, argv[0]);
+    igs_definition_set_class(class);
+    free(class);
+    return NULL;
 }
 
 napi_value node_igs_definition_description(napi_env env, napi_callback_info info) {
@@ -169,7 +203,7 @@ napi_value node_igs_output_create(napi_env env, napi_callback_info info) {
     return success_js;
 }
 
-napi_value node_igs_parameter_create(napi_env env, napi_callback_info info) {
+napi_value node_igs_attribute_create(napi_env env, napi_callback_info info) {
     napi_value argv[3];
     get_function_arguments(env, info, 3, argv);
     char *name = convert_napi_to_string(env, argv[0]);
@@ -177,11 +211,16 @@ napi_value node_igs_parameter_create(napi_env env, napi_callback_info info) {
     convert_napi_to_int(env, argv[1], &type);
     size_t size;
     void *c_value = convert_value_with_good_type(env, argv[2], type, &size);
-    success = igs_parameter_create(name, type, c_value, size);
+    success = igs_attribute_create(name, type, c_value, size);
     free(name);
     napi_value success_js;
     convert_int_to_napi(env, success, &success_js);
     return success_js;
+}
+
+napi_value node_igs_parameter_create(napi_env env, napi_callback_info info) {
+    igs_warn("this function is deprecated, please use igs_attribute_create instead.");
+    return node_igs_attribute_create(env, info);
 }
 
 napi_value node_igs_input_remove(napi_env env, napi_callback_info info) {
@@ -224,17 +263,17 @@ napi_value node_igs_output_remove(napi_env env, napi_callback_info info) {
     return success_js;
 }
 
-napi_value node_igs_parameter_remove(napi_env env, napi_callback_info info) {
+napi_value node_igs_attribute_remove(napi_env env, napi_callback_info info) {
     napi_value argv[1];
     get_function_arguments(env, info, 1, argv);
     char *name = convert_napi_to_string(env, argv[0]);
-    int success = igs_parameter_remove(name);
+    int success = igs_attribute_remove(name);
     if (success == IGS_SUCCESS) {
         // Free associated callback data
         threadsafe_context_hash_t *threadsafe_context_hash = NULL;
-        HASH_FIND_STR (observed_parameter_contexts, name, threadsafe_context_hash);
+        HASH_FIND_STR (observed_attribute_contexts, name, threadsafe_context_hash);
         if (threadsafe_context_hash != NULL) {
-            HASH_DEL (observed_parameter_contexts, threadsafe_context_hash);
+            HASH_DEL (observed_attribute_contexts, threadsafe_context_hash);
             free_threadsafe_context_hash(env, &threadsafe_context_hash);
         }
     }
@@ -244,21 +283,32 @@ napi_value node_igs_parameter_remove(napi_env env, napi_callback_info info) {
     return success_js;
 }
 
+napi_value node_igs_parameter_remove(napi_env env, napi_callback_info info) {
+    igs_warn("this function is deprecated, please use node_igs_attribute_remove instead.");
+    return node_igs_attribute_remove(env, info);
+}
+
 
 napi_value init_definition(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_igs_definition_load_str, "definitionLoadStr", exports);
     exports = enable_callback_into_js(env, node_igs_definition_load_file, "definitionLoadFile", exports);
     exports = enable_callback_into_js(env, node_igs_clear_definition, "clearDefinition", exports);
     exports = enable_callback_into_js(env, node_igs_definition_json, "definitionJson", exports);
+    exports = enable_callback_into_js(env, node_igs_definition_package, "definitionPackage", exports);
+    exports = enable_callback_into_js(env, node_igs_definition_class, "definitionClass", exports);
+    exports = enable_callback_into_js(env, node_igs_definition_set_package, "definitionSetPackage", exports);
+    exports = enable_callback_into_js(env, node_igs_definition_set_class, "definitionSetClass", exports);
     exports = enable_callback_into_js(env, node_igs_definition_description, "definitionDescription", exports);
     exports = enable_callback_into_js(env, node_igs_definition_version, "definitionVersion", exports);
     exports = enable_callback_into_js(env, node_igs_definition_set_description, "definitionSetDescription", exports);
     exports = enable_callback_into_js(env, node_igs_definition_set_version, "definitionSetVersion", exports);
     exports = enable_callback_into_js(env, node_igs_input_create, "inputCreate", exports);
     exports = enable_callback_into_js(env, node_igs_output_create, "outputCreate", exports);
+    exports = enable_callback_into_js(env, node_igs_attribute_create, "attributeCreate", exports);
     exports = enable_callback_into_js(env, node_igs_parameter_create, "parameterCreate", exports);
     exports = enable_callback_into_js(env, node_igs_input_remove, "inputRemove", exports);
     exports = enable_callback_into_js(env, node_igs_output_remove, "outputRemove", exports);
+    exports = enable_callback_into_js(env, node_igs_attribute_remove, "attributeRemove", exports);
     exports = enable_callback_into_js(env, node_igs_parameter_remove, "parameterRemove", exports);
     return exports;
 }

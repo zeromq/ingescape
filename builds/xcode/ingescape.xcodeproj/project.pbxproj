@@ -32,7 +32,6 @@
 		974D72CA25D298BB0049C183 /* igs_network.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A799A1EA7B112003153EF /* igs_network.c */; };
 		974D72CB25D298BB0049C183 /* igs_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A799C1EA7B112003153EF /* igs_parser.c */; };
 		974D72CC25D298BB0049C183 /* igs_performance.c in Sources */ = {isa = PBXBuildFile; fileRef = 9725395923564B230071A9BA /* igs_performance.c */; };
-		974D72CD25D298BB0049C183 /* igs_replay.c in Sources */ = {isa = PBXBuildFile; fileRef = 97817B7A2514BA4700EFF20F /* igs_replay.c */; };
 		974D784725D2BB930049C183 /* libczmq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 97A3BFFA25AF3702004BD834 /* libczmq.a */; };
 		974D784825D2BB930049C183 /* libsodium.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 97A3BDD625AF36B8004BD834 /* libsodium.a */; };
 		974D784A25D2BB930049C183 /* libzmq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 97A3BE6525AF36CA004BD834 /* libzmq.a */; };
@@ -49,7 +48,6 @@
 		976BFF2B2695A6E200C90139 /* libzmq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 97A3BE6525AF36CA004BD834 /* libzmq.a */; };
 		976BFF2C2695A6E200C90139 /* libzyre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 97A3C04725AF372B004BD834 /* libzyre.a */; };
 		9772A52820BDE42700729D59 /* igs_service.c in Sources */ = {isa = PBXBuildFile; fileRef = 9772A52620BDE42700729D59 /* igs_service.c */; };
-		97817B7C2514BA4700EFF20F /* igs_replay.c in Sources */ = {isa = PBXBuildFile; fileRef = 97817B7A2514BA4700EFF20F /* igs_replay.c */; };
 		97ABC93D2282EC5D00215310 /* igs_monitor.c in Sources */ = {isa = PBXBuildFile; fileRef = 97ABC93B2282EC5D00215310 /* igs_monitor.c */; };
 		97AFAA6226C2B4C500D0CCB5 /* yajl_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = 97AFAA4C26C2B4C300D0CCB5 /* yajl_parser.c */; };
 		97AFAA6326C2B4C500D0CCB5 /* yajl_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = 97AFAA4C26C2B4C300D0CCB5 /* yajl_parser.c */; };
@@ -72,6 +70,20 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		97082F822B762630000A4EFA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 5047D926FE4D47D6BA3B4D09;
+			remoteInfo = test_proxy_steerable;
+		};
+		97082F842B762630000A4EFA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 164569ED3D654A5583D987B9;
+			remoteInfo = test_xpub_topic;
+		};
 		9709238129E54A030019C6E5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */;
@@ -163,13 +175,6 @@
 			remoteGlobalIDString = 52BAC5B2EE564CA98F37540C;
 			remoteInfo = test_bind_after_connect_tcp;
 		};
-		97A3BE7225AF36CA004BD834 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 4F9E014CF7EF46A2A3037EF0;
-			remoteInfo = test_bind_curve_fuzzer;
-		};
 		97A3BE7425AF36CA004BD834 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */;
@@ -218,13 +223,6 @@
 			proxyType = 2;
 			remoteGlobalIDString = CAE0528F5AEA49E0809FA43F;
 			remoteInfo = test_conflate;
-		};
-		97A3BE8225AF36CA004BD834 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = C891407CE63E4E04B6E453D7;
-			remoteInfo = test_connect_curve_fuzzer;
 		};
 		97A3BE8425AF36CA004BD834 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -625,13 +623,6 @@
 			remoteGlobalIDString = 9DC4258176364FB48202DFFA;
 			remoteInfo = test_scatter_gather;
 		};
-		97A3BEF625AF36CA004BD834 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = ADCC104FC4644337B2D0BC5D;
-			remoteInfo = test_security_curve;
-		};
 		97A3BEF825AF36CA004BD834 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */;
@@ -891,13 +882,6 @@
 			remoteGlobalIDString = DC3C8B7D1FFB48B791AAED91;
 			remoteInfo = test_xpub_welcome_msg;
 		};
-		97A3BF4225AF36CA004BD834 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 1B2A9A8A2E8140B5863613D7;
-			remoteInfo = test_z85_decode_fuzzer;
-		};
 		97A3BF4425AF36CA004BD834 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */;
@@ -1094,6 +1078,34 @@
 			remoteGlobalIDString = 465A1EDBB9684E589E42B1B9;
 			remoteInfo = zyre_selftest;
 		};
+		97B5E2AE2C52A3CD00DA6070 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E0CB2DBEF8F0401488DFCA1B;
+			remoteInfo = test_bind_curve_fuzzer;
+		};
+		97B5E2B02C52A3CD00DA6070 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = FEB4D31143EB4D959D9E8AA9;
+			remoteInfo = test_connect_curve_fuzzer;
+		};
+		97B5E2B22C52A3CD00DA6070 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = F51A60064ABC4B2983EE5008;
+			remoteInfo = test_security_curve;
+		};
+		97B5E2B42C52A3CD00DA6070 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1AE7828C35DA404FAB06FB7C;
+			remoteInfo = test_z85_decode_fuzzer;
+		};
 		97FB90A528C4BD1E004FF800 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */;
@@ -1131,6 +1143,7 @@
 
 /* Begin PBXFileReference section */
 		8D40229C25F7C60500FCAF1C /* igs_split.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = igs_split.c; sourceTree = "<group>"; };
+		97082EDF2B762630000A4EFA /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../README.md; sourceTree = "<group>"; };
 		970ACB9626C4240B00FE4FA1 /* igs_json_node.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = igs_json_node.c; sourceTree = "<group>"; };
 		9725395923564B230071A9BA /* igs_performance.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = igs_performance.c; sourceTree = "<group>"; };
 		972A52631FD1733E00711352 /* igs_admin.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = igs_admin.c; sourceTree = "<group>"; };
@@ -1143,7 +1156,6 @@
 		9768B2AD22830F0E00310410 /* igs_json.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = igs_json.c; sourceTree = "<group>"; };
 		976A93DF23F305F300CAA795 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/usr/lib/libc++.tbd"; sourceTree = DEVELOPER_DIR; };
 		9772A52620BDE42700729D59 /* igs_service.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = igs_service.c; sourceTree = "<group>"; };
-		97817B7A2514BA4700EFF20F /* igs_replay.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = igs_replay.c; sourceTree = "<group>"; };
 		979A79851EA7B112003153EF /* igs_definition.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = igs_definition.c; sourceTree = "<group>"; };
 		979A79981EA7B112003153EF /* igs_mapping.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = igs_mapping.c; sourceTree = "<group>"; };
 		979A79991EA7B112003153EF /* igs_model.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = igs_model.c; sourceTree = "<group>"; };
@@ -1154,15 +1166,6 @@
 		97A3BFDE25AF3702004BD834 /* czmq.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = czmq.xcodeproj; path = ../../dependencies/czmq/builds/xcode/czmq.xcodeproj; sourceTree = "<group>"; };
 		97A3C01C25AF372B004BD834 /* zyre.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = zyre.xcodeproj; path = ../../dependencies/zyre/builds/xcode/zyre.xcodeproj; sourceTree = "<group>"; };
 		97ABC93B2282EC5D00215310 /* igs_monitor.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = igs_monitor.c; sourceTree = "<group>"; };
-		97AFAA4226C2B4AB00D0CCB5 /* utlist.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utlist.h; sourceTree = "<group>"; };
-		97AFAA4326C2B4AB00D0CCB5 /* ringbuf.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ringbuf.h; sourceTree = "<group>"; };
-		97AFAA4426C2B4AB00D0CCB5 /* libut.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libut.h; sourceTree = "<group>"; };
-		97AFAA4526C2B4AB00D0CCB5 /* utarray.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utarray.h; sourceTree = "<group>"; };
-		97AFAA4626C2B4AB00D0CCB5 /* utmm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utmm.h; sourceTree = "<group>"; };
-		97AFAA4726C2B4AB00D0CCB5 /* utringbuffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utringbuffer.h; sourceTree = "<group>"; };
-		97AFAA4826C2B4AB00D0CCB5 /* uthash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = uthash.h; sourceTree = "<group>"; };
-		97AFAA4926C2B4AB00D0CCB5 /* utvector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utvector.h; sourceTree = "<group>"; };
-		97AFAA4A26C2B4AB00D0CCB5 /* utstring.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utstring.h; sourceTree = "<group>"; };
 		97AFAA4B26C2B4C300D0CCB5 /* yajl_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yajl_common.h; sourceTree = "<group>"; };
 		97AFAA4C26C2B4C300D0CCB5 /* yajl_parser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = yajl_parser.c; sourceTree = "<group>"; };
 		97AFAA4D26C2B4C300D0CCB5 /* yajl_alloc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yajl_alloc.h; sourceTree = "<group>"; };
@@ -1358,6 +1361,7 @@
 		979A796F1EA7B0D6003153EF = {
 			isa = PBXGroup;
 			children = (
+				97082EDF2B762630000A4EFA /* README.md */,
 				9762EDD01EAE5414002062A1 /* Info.plist */,
 				97A3BDD025AF36B8004BD834 /* sodium.xcodeproj */,
 				97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */,
@@ -1396,11 +1400,9 @@
 				979A799A1EA7B112003153EF /* igs_network.c */,
 				979A799C1EA7B112003153EF /* igs_parser.c */,
 				9725395923564B230071A9BA /* igs_performance.c */,
-				97817B7A2514BA4700EFF20F /* igs_replay.c */,
 				9772A52620BDE42700729D59 /* igs_service.c */,
 				8D40229C25F7C60500FCAF1C /* igs_split.c */,
 				9736B37A238414E200A97173 /* igsagent.c */,
-				97AFAA4126C2B4AB00D0CCB5 /* uthash */,
 				97AFAA5326C2B4C400D0CCB5 /* yajl_alloc.c */,
 				97AFAA4D26C2B4C300D0CCB5 /* yajl_alloc.h */,
 				97AFAA5226C2B4C400D0CCB5 /* yajl_buf.c */,
@@ -1447,7 +1449,7 @@
 				97A3BE6D25AF36CA004BD834 /* test_atomics */,
 				97A3BE6F25AF36CA004BD834 /* test_base85 */,
 				97A3BE7125AF36CA004BD834 /* test_bind_after_connect_tcp */,
-				97A3BE7325AF36CA004BD834 /* test_bind_curve_fuzzer */,
+				97B5E2AF2C52A3CD00DA6070 /* test_bind_curve_fuzzer */,
 				97A3BE7525AF36CA004BD834 /* test_bind_fuzzer */,
 				97A3BE7725AF36CA004BD834 /* test_bind_null_fuzzer */,
 				97A3BE7925AF36CA004BD834 /* test_bind_src_address */,
@@ -1455,7 +1457,7 @@
 				97A3BE7D25AF36CA004BD834 /* test_channel */,
 				97A3BE7F25AF36CA004BD834 /* test_client_server */,
 				97A3BE8125AF36CA004BD834 /* test_conflate */,
-				97A3BE8325AF36CA004BD834 /* test_connect_curve_fuzzer */,
+				97B5E2B12C52A3CD00DA6070 /* test_connect_curve_fuzzer */,
 				97A3BE8525AF36CA004BD834 /* test_connect_fuzzer */,
 				97A3BE8725AF36CA004BD834 /* test_connect_null_fuzzer */,
 				97A3BE8925AF36CA004BD834 /* test_connect_resolve */,
@@ -1497,6 +1499,7 @@
 				97A3BECF25AF36CA004BD834 /* test_proxy */,
 				97A3BED125AF36CA004BD834 /* test_proxy_hwm */,
 				97A3BED325AF36CA004BD834 /* test_proxy_single_socket */,
+				97082F832B762630000A4EFA /* test_proxy_steerable */,
 				97A3BED525AF36CA004BD834 /* test_proxy_terminate */,
 				97A3BED725AF36CA004BD834 /* test_pub_invert_matching */,
 				9709238229E54A030019C6E5 /* test_pubsub_topics_count */,
@@ -1515,7 +1518,7 @@
 				97A3BEF125AF36CA004BD834 /* test_router_mandatory_hwm */,
 				97A3BEF325AF36CA004BD834 /* test_router_notify */,
 				97A3BEF525AF36CA004BD834 /* test_scatter_gather */,
-				97A3BEF725AF36CA004BD834 /* test_security_curve */,
+				97B5E2B32C52A3CD00DA6070 /* test_security_curve */,
 				97A3BEF925AF36CA004BD834 /* test_security_gssapi */,
 				97A3BEFB25AF36CA004BD834 /* test_security_no_zap_handler */,
 				97A3BEFD25AF36CA004BD834 /* test_security_null */,
@@ -1551,10 +1554,11 @@
 				97A3BF3925AF36CA004BD834 /* test_xpub_manual */,
 				97A3BF3B25AF36CA004BD834 /* test_xpub_manual_last_value */,
 				97A3BF3D25AF36CA004BD834 /* test_xpub_nodrop */,
+				97082F852B762630000A4EFA /* test_xpub_topic */,
 				97A3BF3F25AF36CA004BD834 /* test_xpub_verbose */,
 				97A3BF4125AF36CA004BD834 /* test_xpub_welcome_msg */,
 				97FB90A628C4BD1E004FF800 /* test_xsub_verbose */,
-				97A3BF4325AF36CA004BD834 /* test_z85_decode_fuzzer */,
+				97B5E2B52C52A3CD00DA6070 /* test_z85_decode_fuzzer */,
 				97A3BF4525AF36CA004BD834 /* test_zmq_poll_fd */,
 				97FB90A828C4BD1E004FF800 /* test_zmq_ppoll_fd */,
 				97FB90AA28C4BD1E004FF800 /* test_zmq_ppoll_signals */,
@@ -1601,22 +1605,6 @@
 				97A3C04B25AF372B004BD834 /* zyre_selftest */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		97AFAA4126C2B4AB00D0CCB5 /* uthash */ = {
-			isa = PBXGroup;
-			children = (
-				97AFAA4226C2B4AB00D0CCB5 /* utlist.h */,
-				97AFAA4326C2B4AB00D0CCB5 /* ringbuf.h */,
-				97AFAA4426C2B4AB00D0CCB5 /* libut.h */,
-				97AFAA4526C2B4AB00D0CCB5 /* utarray.h */,
-				97AFAA4626C2B4AB00D0CCB5 /* utmm.h */,
-				97AFAA4726C2B4AB00D0CCB5 /* utringbuffer.h */,
-				97AFAA4826C2B4AB00D0CCB5 /* uthash.h */,
-				97AFAA4926C2B4AB00D0CCB5 /* utvector.h */,
-				97AFAA4A26C2B4AB00D0CCB5 /* utstring.h */,
-			);
-			path = uthash;
 			sourceTree = "<group>";
 		};
 		97AFAA9B26C2BBF000D0CCB5 /* dependencies headers */ = {
@@ -1907,6 +1895,20 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		97082F832B762630000A4EFA /* test_proxy_steerable */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_proxy_steerable;
+			remoteRef = 97082F822B762630000A4EFA /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		97082F852B762630000A4EFA /* test_xpub_topic */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_xpub_topic;
+			remoteRef = 97082F842B762630000A4EFA /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		9709238229E54A030019C6E5 /* test_pubsub_topics_count */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
@@ -1947,7 +1949,7 @@
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
 			name = libzmq.dylib;
-			path = libzmq.5.2.5.dylib;
+			path = libzmq.5.2.6.dylib;
 			remoteRef = 97A3BE6225AF36CA004BD834 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -2000,13 +2002,6 @@
 			remoteRef = 97A3BE7025AF36CA004BD834 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		97A3BE7325AF36CA004BD834 /* test_bind_curve_fuzzer */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_bind_curve_fuzzer;
-			remoteRef = 97A3BE7225AF36CA004BD834 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		97A3BE7525AF36CA004BD834 /* test_bind_fuzzer */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
@@ -2054,13 +2049,6 @@
 			fileType = "compiled.mach-o.executable";
 			path = test_conflate;
 			remoteRef = 97A3BE8025AF36CA004BD834 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		97A3BE8325AF36CA004BD834 /* test_connect_curve_fuzzer */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_connect_curve_fuzzer;
-			remoteRef = 97A3BE8225AF36CA004BD834 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		97A3BE8525AF36CA004BD834 /* test_connect_fuzzer */ = {
@@ -2462,13 +2450,6 @@
 			remoteRef = 97A3BEF425AF36CA004BD834 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		97A3BEF725AF36CA004BD834 /* test_security_curve */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_security_curve;
-			remoteRef = 97A3BEF625AF36CA004BD834 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		97A3BEF925AF36CA004BD834 /* test_security_gssapi */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
@@ -2728,13 +2709,6 @@
 			remoteRef = 97A3BF4025AF36CA004BD834 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		97A3BF4325AF36CA004BD834 /* test_z85_decode_fuzzer */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_z85_decode_fuzzer;
-			remoteRef = 97A3BF4225AF36CA004BD834 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		97A3BF4525AF36CA004BD834 /* test_zmq_poll_fd */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
@@ -2933,6 +2907,34 @@
 			remoteRef = 97A3C04A25AF372B004BD834 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		97B5E2AF2C52A3CD00DA6070 /* test_bind_curve_fuzzer */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_bind_curve_fuzzer;
+			remoteRef = 97B5E2AE2C52A3CD00DA6070 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		97B5E2B12C52A3CD00DA6070 /* test_connect_curve_fuzzer */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_connect_curve_fuzzer;
+			remoteRef = 97B5E2B02C52A3CD00DA6070 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		97B5E2B32C52A3CD00DA6070 /* test_security_curve */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_security_curve;
+			remoteRef = 97B5E2B22C52A3CD00DA6070 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		97B5E2B52C52A3CD00DA6070 /* test_z85_decode_fuzzer */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_z85_decode_fuzzer;
+			remoteRef = 97B5E2B42C52A3CD00DA6070 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		97FB90A628C4BD1E004FF800 /* test_xsub_verbose */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
@@ -2984,7 +2986,6 @@
 				974D72CA25D298BB0049C183 /* igs_network.c in Sources */,
 				974D72CB25D298BB0049C183 /* igs_parser.c in Sources */,
 				974D72CC25D298BB0049C183 /* igs_performance.c in Sources */,
-				974D72CD25D298BB0049C183 /* igs_replay.c in Sources */,
 				97AFAA8F26C2B4C600D0CCB5 /* yajl.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2999,7 +3000,6 @@
 				97AFAA7F26C2B4C600D0CCB5 /* yajl_encode.c in Sources */,
 				8D4022A025F7C60500FCAF1C /* igs_split.c in Sources */,
 				97AFAA6926C2B4C500D0CCB5 /* yajl_gen.c in Sources */,
-				97817B7C2514BA4700EFF20F /* igs_replay.c in Sources */,
 				97574A9022870C5100C31B99 /* igs_json.c in Sources */,
 				9762EDDA1EAE547B002062A1 /* igs_definition.c in Sources */,
 				9772A52820BDE42700729D59 /* igs_service.c in Sources */,

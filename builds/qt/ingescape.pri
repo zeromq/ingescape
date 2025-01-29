@@ -20,7 +20,6 @@ SOURCES += \
     $$PWD/../../src/igs_network.c \
     $$PWD/../../src/igs_parser.c \
     $$PWD/../../src/igs_performance.c \
-    $$PWD/../../src/igs_replay.c \
     $$PWD/../../src/igs_service.c \
     $$PWD/../../src/igs_split.c \
     $$PWD/../../src/igsagent.c \
@@ -35,7 +34,6 @@ SOURCES += \
     $$PWD/../../src/yajl.c
 
 HEADERS += \
-    $$PWD/../../src/uthash/uthash.h \
     $$PWD/../../include/ingescape.h \
     $$PWD/../../include/ingescape_private.h \
     $$PWD/../../include/igsagent.h \

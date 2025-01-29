@@ -4,7 +4,7 @@ set -e
 #sudo xcode-select -switch /Applications/Xcode.app #adapt path if needed, according to 'xcode-select --print-path'
 rm -Rf build; rm -Rf lib
 mkdir -p lib/static
-cmake -S../../ -B./build -G Xcode -DCMAKE_TOOLCHAIN_FILE=./builds/ios/ios.toolchain.cmake -DPLATFORM=OS64 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=./sysroot -DOSX_UNIVERSAL=ON -DWITH_DEPS=ON -T buildsystem=1 -DCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM=56DRT9MG9S
+cmake -S../../ -B./build -G Xcode -DCMAKE_TOOLCHAIN_FILE=./builds/ios/ios.toolchain.cmake -DPLATFORM=OS64 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=./sysroot -DOSX_UNIVERSAL=ON -DWITH_DEPS=ON -T buildsystem=12 -DCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM=56DRT9MG9S
 cd build
 xcodebuild -list -project ingescape.xcodeproj
 xcodebuild -project ingescape.xcodeproj -target ingescape-static -configuration Debug build

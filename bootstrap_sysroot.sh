@@ -47,7 +47,7 @@ SCRIPT_DIR=$(cd `dirname $0`; pwd)
         cd dependencies/libzmq
         rm -Rf builds/xcode
         mkdir -p builds/xcode
-        cmake -S . -B builds/xcode -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DWITH_DOCS=OFF -DWITH_LIBSODIUM=ON -DWITH_TLS=OFF -DCMAKE_PREFIX_PATH=$CODEROOT/sysroot/usr/local/ -G "Xcode" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11
+        cmake -S . -B builds/xcode -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DWITH_DOCS=OFF -DENABLE_CURVE=ON -DWITH_LIBSODIUM=ON -DWITH_TLS=OFF -DCMAKE_PREFIX_PATH=$CODEROOT/sysroot/usr/local/ -G "Xcode" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11
         #Hack to enable xcode project embedding because scripts coming with
         #the xcode project do not manage the target folder properly:
         mkdir -p builds/xcode/lib/Debug
