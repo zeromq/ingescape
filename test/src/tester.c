@@ -11,6 +11,7 @@
 unsigned int port = 5670;
 const char *agentName = "tester";
 const char *networkDevice = "en0"; //can be set to a default device name
+bool rt = false;
 bool verbose = false;
 bool autoTests = false;
 bool autoTestsHaveStarted = false;
@@ -841,9 +842,12 @@ void run_static_tests (int argc, const char * argv[]){
     //definition - part 2
     //TODO: compare exported def, saved file and reference file
     //iop description
-    igs_input_set_description("my_impulsion", "my iop description here");
-    igs_output_set_description("my_impulsion", "my iop description here");
-    igs_parameter_set_description("my_impulsion", "my iop description here");
+    assert (igs_input_set_description("my_impulsion", "my iop description here") == IGS_SUCCESS);
+    assert (igs_output_set_description("my_impulsion", "my iop description here") == IGS_SUCCESS);
+    assert (igs_parameter_set_description("my_impulsion", "my iop description here") == IGS_SUCCESS);
+    assert (igs_input_set_specification("my_impulsion", "protobuf", "some prototbuf \"here\"") == IGS_SUCCESS);
+    assert ( igs_output_set_specification("my_impulsion", "protobuf", "some prototbuf \"here\"") == IGS_SUCCESS);
+    assert (igs_parameter_set_specification("my_impulsion", "protobuf", "some prototbuf \"here\"") == IGS_SUCCESS);
     char *exportedDef = igs_definition_json();
     assert(exportedDef);
     igs_definition_set_path("/tmp/simple Demo Agent.json");
@@ -1759,22 +1763,25 @@ void run_static_tests (int argc, const char * argv[]){
     igsagent_split_add(secondAgent, "second_data_split", "firstAgent", "first_data");
 
     //test mapping in same process between second_agent and first_agent
-    igsagent_activate(secondAgent);
-    igsagent_output_set_bool(firstAgent, "first_bool", true);
-    assert(igsagent_input_bool(secondAgent, "second_bool"));
-    igsagent_output_set_bool(firstAgent, "first_bool", false);
-    assert(!igsagent_input_bool(secondAgent, "second_bool"));
-    igsagent_output_set_int(firstAgent, "first_int", 5);
-    assert(igsagent_input_int(secondAgent, "second_int") == 5);
-    igsagent_output_set_double(firstAgent, "first_double", 5.5);
-    assert(igsagent_input_double(secondAgent, "second_double") - 5.5 < 0.000001);
-    igsagent_output_set_string(firstAgent, "first_string", "test string mapping");
-    assert(streq(igsagent_input_string(secondAgent, "second_string"), "test string mapping")); //intentional memory leak here
-    data = (void*)"my data";
-    dataSize = strlen("my data") + 1;
-    igsagent_output_set_data(firstAgent, "first_data", data, dataSize);
-    assert(igsagent_input_data(secondAgent, "second_data", &data, &dataSize) == IGS_SUCCESS);
-    assert(streq((char*)data, "my data") && strlen((char*)data) == dataSize - 1);
+    //NB: these tests have been obsolete since the delegation of internal
+    //publication handling to the ingescape zloop. Internal mappings require
+    //a running ingescape loop in order to work properly.
+//    igsagent_activate(secondAgent);
+//    igsagent_output_set_bool(firstAgent, "first_bool", true);
+//    assert(igsagent_input_bool(secondAgent, "second_bool"));
+//    igsagent_output_set_bool(firstAgent, "first_bool", false);
+//    assert(!igsagent_input_bool(secondAgent, "second_bool"));
+//    igsagent_output_set_int(firstAgent, "first_int", 5);
+//    assert(igsagent_input_int(secondAgent, "second_int") == 5);
+//    igsagent_output_set_double(firstAgent, "first_double", 5.5);
+//    assert(igsagent_input_double(secondAgent, "second_double") - 5.5 < 0.000001);
+//    igsagent_output_set_string(firstAgent, "first_string", "test string mapping");
+//    assert(streq(igsagent_input_string(secondAgent, "second_string"), "test string mapping")); //intentional memory leak here
+//    data = (void*)"my data";
+//    dataSize = strlen("my data") + 1;
+//    igsagent_output_set_data(firstAgent, "first_data", data, dataSize);
+//    assert(igsagent_input_data(secondAgent, "second_data", &data, &dataSize) == IGS_SUCCESS);
+//    assert(streq((char*)data, "my data") && strlen((char*)data) == dataSize - 1);
 
     //test service in the same process
     list = NULL;
@@ -1850,6 +1857,30 @@ void run_static_tests (int argc, const char * argv[]){
     //    igs_replay_terminate();
 }
 
+int rt_timer (zloop_t *loop, int timer_id, void *arg){
+    igs_output_set_impulsion("my_impulsion");
+    igs_output_set_bool("my_bool", myBool = !myBool);
+    igs_output_set_int("my_int", myInt++);
+    igs_output_set_double("my_double", myDouble++);
+    
+    if (!(myInt % 3))
+        igs_rt_set_time(zclock_mono()*1000);
+    return 0;
+}
+
+void set_timeCB(igs_iop_type_t iop_type,
+                const char *name,
+                igs_iop_value_type_t value_type,
+                void *value,
+                size_t value_size,
+                void *my_data){
+    /*
+     The usual timestamp values in milliseconds exceed the size of a signed 64 bits integer.
+     Use a data input with proper casting to feed an agent with a realistic timestamp, which
+     is ALWAYS expected in microseconds.
+     */
+    igs_rt_set_time(*(int*)value * 1000);
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1874,6 +1905,7 @@ int main(int argc, const char * argv[]) {
         {"name",        required_argument, 0,  'n' },
         {"auto",        no_argument, 0,  'a' },
         {"static",        no_argument, 0,  's' },
+        {"rt",        no_argument, 0,  'r' },
         {"help",        no_argument, 0,  'h' },
         {0, 0, 0, 0}
     };
@@ -1901,6 +1933,9 @@ int main(int argc, const char * argv[]) {
                 break;
             case 's':
                 staticTests = true;
+                break;
+            case 'r':
+                rt = true;
                 break;
             case 'h':
                 print_usage(agentName);
@@ -1963,11 +1998,25 @@ int main(int argc, const char * argv[]) {
     igs_mapping_add("my_string", "partner", "sparing_string");
     igs_mapping_add("my_data", "partner", "sparing_data");
     
+    //RT tests
+    if (rt){
+        igs_input_create("set_time", IGS_INTEGER_T, NULL, 0);
+        igs_observe_input("set_time", set_timeCB, NULL);
+        igs_output_create("my_impulsion", IGS_IMPULSION_T, NULL, 0);
+        igs_output_create("my_bool", IGS_BOOL_T, &myBool, sizeof(bool));
+        igs_output_create("my_int", IGS_INTEGER_T, &myInt, sizeof(int));
+        igs_output_create("my_double", IGS_DOUBLE_T, &myDouble, sizeof(double));
+        igs_output_create("my_string", IGS_STRING_T, myString, strlen(myString) + 1);
+        igs_output_create("my_data", IGS_DATA_T, myData, 32);
+        igs_rt_set_synchronous_mode(true);
+    }
+    
+    if (verbose)
+        igs_log_set_console_level(IGS_LOG_TRACE);
+    else
+        igs_log_set_console_level(IGS_LOG_FATAL);
+    
     if (autoTests){
-        if (verbose)
-            igs_log_set_console_level(IGS_LOG_TRACE);
-        else
-            igs_log_set_console_level(IGS_LOG_FATAL);
         igs_start_with_device(networkDevice, port);
         igs_channel_join("TEST_CHANNEL");
         zloop_t *loop = zloop_new();
@@ -2037,6 +2086,8 @@ int main(int argc, const char * argv[]) {
         zloop_t *loop = zloop_new();
         zsock_t *pipe = igs_pipe_to_ingescape();
         zloop_reader(loop, pipe, ingescapeSentMessage, NULL);
+        if (rt)
+            zloop_timer(loop, 500, 0, rt_timer, NULL);
         zloop_start(loop);
         zloop_destroy(&loop);
     }else{
@@ -2107,8 +2158,10 @@ int main(int argc, const char * argv[]) {
         }
     }
 
-    igsagent_destroy(&secondAgent);
-    igsagent_destroy(&firstAgent);
+    if (secondAgent)
+        igsagent_destroy(&secondAgent);
+    if (firstAgent)
+        igsagent_destroy(&firstAgent);
     igs_stop();
 
     return EXIT_SUCCESS;

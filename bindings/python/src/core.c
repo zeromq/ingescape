@@ -453,7 +453,9 @@ PyObject * input_set_data_wrapper(PyObject * self, PyObject * args)
     Py_buffer buf;
     if (!PyArg_ParseTuple(args, "sy*", &name, &buf))
         return NULL;
-    return PyLong_FromLong(igs_input_set_data(name, buf.buf, (size_t)buf.len));
+    PyObject* result = PyLong_FromLong(igs_input_set_data(name, buf.buf, (size_t)buf.len));
+    PyBuffer_Release(&buf);
+    return result;
 }
 
 PyObject * output_bool_wrapper(PyObject * self, PyObject * args)
@@ -555,16 +557,18 @@ PyObject * output_set_impulsion_wrapper(PyObject * self, PyObject * args)
 
 PyObject * output_set_data_wrapper(PyObject * self, PyObject * args)
 {
-    char * name;
+    const char * name;
     Py_buffer buf;
     if (!PyArg_ParseTuple(args, "sy*", &name, &buf))
         return NULL;
-    return PyLong_FromLong(igs_output_set_data(name, buf.buf, (size_t)buf.len));
+    PyObject* result = PyLong_FromLong(igs_output_set_data(name, buf.buf, (size_t)buf.len));
+    PyBuffer_Release(&buf);
+    return result;
 }
 
 PyObject * parameter_bool_wrapper(PyObject * self, PyObject * args)
 {
-    char * name;
+    const char * name;
     if (!PyArg_ParseTuple(args, "s", &name))
         return NULL;
     if (igs_parameter_bool(name))
@@ -657,7 +661,9 @@ PyObject * parameter_set_data_wrapper(PyObject * self, PyObject * args)
     Py_buffer buf;
     if (!PyArg_ParseTuple(args, "sy*", &name, &buf))
         return NULL;
-    return PyLong_FromLong(igs_parameter_set_data(name, buf.buf, (size_t)buf.len));
+    PyObject* result = PyLong_FromLong(igs_parameter_set_data(name, buf.buf, (size_t)buf.len));
+    PyBuffer_Release(&buf);
+    return result;
 }
 
 PyObject * clear_input_wrapper(PyObject * self, PyObject * args)

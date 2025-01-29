@@ -63,6 +63,10 @@ void s_definition_free_iop (igs_iop_t **iop)
         definition_free_constraint(&(*iop)->constraint);
     if ((*iop)->description)
         free((*iop)->description);
+    if ((*iop)->spec_type)
+        free((*iop)->spec_type);
+    if ((*iop)->specification)
+        free((*iop)->specification);
 
     free (*iop);
     *iop = NULL;

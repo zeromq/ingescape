@@ -31,8 +31,8 @@
 
 //  INGESCAPE version macros for compile-time API detection
 #define INGESCAPE_VERSION_MAJOR 3
-#define INGESCAPE_VERSION_MINOR 6
-#define INGESCAPE_VERSION_PATCH 4
+#define INGESCAPE_VERSION_MINOR 8
+#define INGESCAPE_VERSION_PATCH 3
 
 #define INGESCAPE_MAKE_VERSION(major, minor, patch) \
 ((major) * 10000 + (minor) * 100 + (patch))
@@ -152,8 +152,8 @@ INGESCAPE_EXPORT zsock_t * igs_pipe_inside_ingescape(void);
 INGESCAPE_EXPORT void igs_agent_set_name(const char *name);
 INGESCAPE_EXPORT char * igs_agent_name(void); //caller owns returned value
 
-//agent uuid, read-only
-INGESCAPE_EXPORT const char * igs_agent_uuid(void); //caller owns returned value
+//agent uuid
+INGESCAPE_EXPORT char * igs_agent_uuid(void); //caller owns returned value
 
 //control agent state
 INGESCAPE_EXPORT void igs_agent_set_state(const char *state);
@@ -337,7 +337,7 @@ INGESCAPE_EXPORT igs_result_t igs_parameter_set_data(const char *name, void *val
     - "~ regular_expression", e.g. "~ \\d+(\.\\d+)?)":
         IOP of type STRING must match the regular expression
 
- Regular expressions are absed on CZMQ integration of SLRE with the
+ Regular expressions are based on CZMQ integration of SLRE with the
  following syntax:
 ^               Match beginning of a buffer
 $               Match end of a buffer
@@ -365,9 +365,20 @@ INGESCAPE_EXPORT igs_result_t igs_output_add_constraint(const char *name, const 
 INGESCAPE_EXPORT igs_result_t igs_parameter_add_constraint(const char *name, const char *constraint);
 
 //IOP descriptions
-INGESCAPE_EXPORT void igs_input_set_description(const char *name, const char *description);
-INGESCAPE_EXPORT void igs_output_set_description(const char *name, const char *description);
-INGESCAPE_EXPORT void igs_parameter_set_description(const char *name, const char *description);
+INGESCAPE_EXPORT igs_result_t igs_input_set_description(const char *name, const char *description);
+INGESCAPE_EXPORT igs_result_t igs_output_set_description(const char *name, const char *description);
+INGESCAPE_EXPORT igs_result_t igs_parameter_set_description(const char *name, const char *description);
+
+/*IOP specification
+ This section enables to decribe precise specifications for IOPs, 
+ including a type. Specifications are descriptive only. Ingescape
+ does not check anything that is passed here.
+ For example, the type can be 'protobuf' and the specification can
+ be an actual protobuf structure in proto format.
+ */
+INGESCAPE_EXPORT igs_result_t igs_input_set_specification(const char *name, const char *spec_type, const char *specification);
+INGESCAPE_EXPORT igs_result_t igs_output_set_specification(const char *name, const char *spec_type, const char *specification);
+INGESCAPE_EXPORT igs_result_t igs_parameter_set_specification(const char *name, const char *spec_type, const char *specification);
 
 /*These two functions enable sending and receiving DATA on
  inputs/outputs by using zmsg_t structures. zmsg_t structures
@@ -692,7 +703,7 @@ INGESCAPE_EXPORT igs_result_t igs_election_leave(const char *election_name);
 //////////////////////////////////////////////////////////////////////
 // Ingescape real-time communications
 
-/* Ingescape is a reactive  communication solution but it is capable to
+/* Ingescape is a reactive communication library but it is capable to
  handle soft real-time communications and provides functions dedicated
  to time management with or without a master clock involved. */
 
@@ -717,13 +728,24 @@ INGESCAPE_EXPORT bool igs_rt_timestamps(void);
  for the current time in microseconds.
  Once igs_rt_set_time has been called, it is necessary to continue calling it
  periodically and manually to update the agent's current time in microseconds.
- NB : a call to igs_rt_set_time autmatically enables timestamps for outputs
+ NB : a call to igs_rt_set_time  enables timestamps automatically for outputs
  and services on all agents in our process. Timestamps cannot be disabled afterwards.
  NB : igs_rt_set_time and igs_rt_time operate at peer level for all the agents
  in the process. All agents in a process use the same time set by igs_rt_set_time.
  */
 INGESCAPE_EXPORT void igs_rt_set_time(int64_t microseconds);
 INGESCAPE_EXPORT int64_t igs_rt_time(void);
+
+/* ENABLE SYNCHRONOUS MODE
+ When this mode is enabled, outputs are published only when igs_rt_set_time
+ is called. The call to igs_rt_set_time is the trigger for output publication
+ in this synchronous real-time mode. All published outputs are timestamped
+ with the value set by igs_rt_set_time.
+ NB: Ingescape services and channels are not affected by the synchronous mode.
+ NB: This mode is set at agent level.
+ */
+INGESCAPE_EXPORT void igs_rt_set_synchronous_mode(bool enable);
+INGESCAPE_EXPORT bool igs_rt_synchronous_mode(void);
 
 
 ///////////////////////////////////////////////////////
@@ -815,7 +837,7 @@ INGESCAPE_EXPORT void igs_mapping_save(void);
  • On Microsoft Windows systems, the loopback is used.
  Advanced transports are allowed by default and can be disabled
  using igs_set_ipc.*/
-INGESCAPE_EXPORT void igs_set_ipc(bool allow);
+INGESCAPE_EXPORT void igs_set_ipc(bool allow); //default is true
 INGESCAPE_EXPORT bool igs_has_ipc(void);
 #if defined (__UNIX__)
 //set IPC folder path on UNIX systems (default is /tmp/ingescape/)

@@ -22,10 +22,10 @@ const igsResultEnum = IGS.resultTypes();
 const agentEventEnum = IGS.agentEventTypes();
 
 let networkDevice = "en0";
-let port = 5670;
+let port = 1337;
 let agentName = "nodeTester";
 let verbose = false;
-let staticTests = false; 
+let staticTests = false;
 
 const optionDefinitions = [
     { name : 'verbose', alias: 'v', type: Boolean},
@@ -68,11 +68,11 @@ global.secondAgent;
 
 //callbacks for services
 function testerServiceCallback(
-    senderAgentName, 
-    senderAgentUUID, 
-    serviceName, 
-    argumentsArray, 
-    token, 
+    senderAgentName,
+    senderAgentUUID,
+    serviceName,
+    argumentsArray,
+    token,
     myData) {
     console.log("received service %s from %s(%s) (", serviceName, senderAgentName, senderAgentUUID);
     argumentsArray.forEach(function(argument) {
@@ -101,11 +101,11 @@ function testerServiceCallback(
 
 function agentServiceCallback(
     agent,
-    senderAgentName, 
-    senderAgentUUID, 
-    serviceName, 
-    argumentsArray, 
-    token, 
+    senderAgentName,
+    senderAgentUUID,
+    serviceName,
+    argumentsArray,
+    token,
     myData) {
     let thisAgentName = agent.name();
     console.log(thisAgentName + " received service " + serviceName + " from " + senderAgentName + "(" + senderAgentUUID + ")");
@@ -275,7 +275,7 @@ IGS.freeze();
 assert(IGS.isFrozen(), "IGS.isFrozen()");
 IGS.unfreeze();
 assert(!IGS.isFrozen(), "!IGS.isFrozen()");
- 
+
 // IOPs with null definition
 assert(IGS.inputCount() === 0);
 assert(IGS.outputCount() === 0);
@@ -312,7 +312,7 @@ assert(IGS.parameterData("toto") === null);
 // Definition - part 1
 assert(IGS.definitionLoadStr("invalid json") === igsResultEnum.IGS_FAILURE);
 assert(IGS.definitionLoadFile("/does not exist") === igsResultEnum.IGS_FAILURE);
-assert(IGS.definitionJson()); 
+assert(IGS.definitionJson());
 assert(IGS.agentName() === agentName);
 assert(IGS.definitionDescription() === "");
 assert(IGS.definitionVersion() === "");
@@ -496,7 +496,7 @@ assert(IGS.parameterData("my_data").byteLength === 64);
 IGS.clearParameter("my_data");
 assert(IGS.parameterData("my_data") === null);
 
-// N.B.: no way to assert, just call method 
+// N.B.: no way to assert, just call method
 IGS.inputSetDescription("my_impulsion", "my iop description here");
 IGS.outputSetDescription("my_impulsion", "my iop description here");
 IGS.parameterSetDescription("my_impulsion", "my iop description here");
@@ -1464,17 +1464,27 @@ secondAgent.splitAdd("second_data_split", "firstAgent", "first_data");
 //test mapping in same process between second_agent and first_agent
 secondAgent.activate();
 firstAgent.outputSetBool("first_bool", true);
-assert(secondAgent.inputBool("second_bool"));
 firstAgent.outputSetBool("first_bool", false);
-assert(!secondAgent.inputBool("second_bool"));
 firstAgent.outputSetInt("first_int", 5);
-assert(secondAgent.inputInt("second_int") === 5);
 firstAgent.outputSetDouble("first_double", 5.5);
-assert(secondAgent.inputDouble("second_double") - 5.5 < 0.000001);
 firstAgent.outputSetString("first_string", "test string mapping");
-assert(secondAgent.inputString("second_string") === "test string mapping");
 firstAgent.outputSetData("first_data", new ArrayBuffer(16));
-assert(secondAgent.inputData("second_data").byteLength === 16);
+
+checkMappedValues();
+async function checkMappedValues() {
+    await sleep(1); // Wait a bit for the propagation through the mappings
+    assert(secondAgent.inputBool("second_bool"));
+    assert(!secondAgent.inputBool("second_bool"));
+    assert(secondAgent.inputInt("second_int") === 5);
+    assert(secondAgent.inputDouble("second_double") - 5.5 < 0.000001);
+    assert(secondAgent.inputString("second_string") === "test string mapping");
+    assert(secondAgent.inputData("second_data").byteLength === 16);
+}
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
 
 //test service in the same process
 argsList = [];
@@ -1544,7 +1554,7 @@ process.on('SIGINT', function() {
     process.exit();
 });
 
-// Stop the agent when Node process exit 
+// Stop the agent when Node process exit
 process.on('exit', (code) => {
     IGS.stop();
 });

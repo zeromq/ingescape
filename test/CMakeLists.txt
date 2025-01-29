@@ -6,6 +6,12 @@ add_executable(igsPartner
     src/partner.c
     src/common.c)
 
+# Override default release flags to not define NDEBUG, which CMake sets by default for Release builds
+# NB: The NDEBUG flag compile out all assert() calls, skipping whatever was done in the assert call (function call, computation, etc.)
+# It changes the compiled code from the source code and we don't want that.
+set(CMAKE_C_FLAGS_RELEASE "-O3")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
 target_include_directories(igsTester PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/src # local headers
   $<$<BOOL:${WIN32}>:${CMAKE_CURRENT_SOURCE_DIR}/../packaging/windows/unix> # getopt.h on windows only

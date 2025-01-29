@@ -181,9 +181,16 @@ INGESCAPE_EXPORT igs_result_t igsagent_input_add_constraint(igsagent_t *self, co
 INGESCAPE_EXPORT igs_result_t igsagent_output_add_constraint(igsagent_t *self, const char *name, const char *constraint);
 INGESCAPE_EXPORT igs_result_t igsagent_parameter_add_constraint(igsagent_t *self, const char *name, const char *constraint);
 
-INGESCAPE_EXPORT void igsagent_input_set_description(igsagent_t *self, const char *name, const char *description);
-INGESCAPE_EXPORT void igsagent_output_set_description(igsagent_t *self, const char *name, const char *description);
-INGESCAPE_EXPORT void igsagent_parameter_set_description(igsagent_t *self, const char *name, const char *description);
+INGESCAPE_EXPORT igs_result_t igsagent_input_set_description(igsagent_t *self, const char *name, const char *description);
+INGESCAPE_EXPORT igs_result_t igsagent_output_set_description(igsagent_t *self, const char *name, const char *description);
+INGESCAPE_EXPORT igs_result_t igsagent_parameter_set_description(igsagent_t *self, const char *name, const char *description);
+
+INGESCAPE_EXPORT igs_result_t igsagent_input_set_specification(igsagent_t *self, const char *name, 
+                                                               const char *spec_type, const char *specification);
+INGESCAPE_EXPORT igs_result_t igsagent_output_set_specification(igsagent_t *self, const char *name,
+                                                                const char *spec_type, const char *specification);
+INGESCAPE_EXPORT igs_result_t igsagent_parameter_set_specification(igsagent_t *self, const char *name,
+                                                                   const char *spec_type, const char *specification);
 
 /*These two functions enable sending and receiving DATA
  inputs/outputs by using zmsg_t structures. zmsg_t structures
@@ -301,6 +308,8 @@ INGESCAPE_EXPORT igs_result_t igsagent_election_leave (igsagent_t *self, const c
 INGESCAPE_EXPORT int64_t igsagent_rt_get_current_timestamp(igsagent_t *agent);
 INGESCAPE_EXPORT void igsagent_rt_set_timestamps(igsagent_t *agent, bool enable);
 INGESCAPE_EXPORT bool igsagent_rt_timestamps(igsagent_t *agent);
+INGESCAPE_EXPORT void igsagent_rt_set_synchronous_mode(igsagent_t *agent, bool enable);
+INGESCAPE_EXPORT bool igsagent_rt_synchronous_mode(igsagent_t *agent);
 
 ///////////////////////////////////////////////////////
 // Administration, logging, configuration and utilities

@@ -262,3 +262,13 @@ bool igsagent_rt_timestamps(igsagent_t *agent){
     assert(agent);
     return agent->rt_timestamps_enabled;
 }
+
+void igsagent_rt_set_synchronous_mode(igsagent_t *agent, bool enable){
+    assert(agent);
+    agent->rt_synchronous_mode_enabled = enable;
+}
+
+bool igsagent_rt_synchronous_mode(igsagent_t *agent){
+    assert(agent);
+    return agent->rt_synchronous_mode_enabled;
+}

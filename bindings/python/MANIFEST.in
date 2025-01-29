@@ -6,5 +6,5 @@ include ./dependencies/windows/x86/*
 include ./dependencies/include/*
 include ./dependencies/include/ingescape/*
 
-include ./includes/*
-include ./includes/uthash/*
+include ./include/*
+include ./include/uthash/*

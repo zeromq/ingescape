@@ -3,7 +3,7 @@
  *
  * Copyright (c) the Contributors as noted in the AUTHORS file.
  * This file is part of Ingescape, see https://github.com/zeromq/ingescape.
- * 
+ *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -27,7 +27,7 @@ PyObject * channel_join_wrapper(PyObject *self, PyObject *args)
 PyObject * channel_leave_wrapper(PyObject *self, PyObject *args)
 {
     char *channel;
-    if (!PyArg_ParseTuple(args, "s", &channel)) 
+    if (!PyArg_ParseTuple(args, "s", &channel))
         return NULL;
     igs_channel_leave(channel);
     return PyLong_FromLong(IGS_SUCCESS);
@@ -51,9 +51,11 @@ PyObject * channel_shout_data_wrapper(PyObject *self, PyObject *args)
     char * channel;
     size_t size;
     Py_buffer buf;
-    if (!PyArg_ParseTuple(args, "sy*k", &channel, &buf, &size)) 
+    if (!PyArg_ParseTuple(args, "sy*k", &channel, &buf, &size))
         return NULL;
-    return PyLong_FromLong(igs_channel_shout_data(channel, buf.buf, size));
+    PyObject* result = PyLong_FromLong(igs_channel_shout_data(channel, buf.buf, size));
+    PyBuffer_Release(&buf);
+    return result;
 }
 
 PyObject * channel_whisper_str_wrapper(PyObject *self, PyObject *args)
@@ -71,7 +73,9 @@ PyObject * channel_whisper_data_wrapper(PyObject *self, PyObject *args)
     Py_buffer buf;
     if (!PyArg_ParseTuple(args, "sy*k", &agentNameOrPeerID, &buf, &size))
         return NULL;
-    return PyLong_FromLong(igs_channel_whisper_data(agentNameOrPeerID, buf.buf, size));
+    PyObject* result = PyLong_FromLong(igs_channel_whisper_data(agentNameOrPeerID, buf.buf, size));
+    PyBuffer_Release(&buf);
+    return result;
 }
 
 PyObject * peer_add_header_wrapper(PyObject *self, PyObject *args)

@@ -33,10 +33,6 @@ workflow:
 variables:
   VS_CMAKE_GENERATOR: "Visual Studio 16 2019"
 
-.base_repo_main_branch:
-  rules:
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
-
 .root_namespace:
   rules:
     - if: '$CI_PROJECT_ROOT_NAMESPACE == "ingescape-private" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
@@ -54,13 +50,22 @@ lib-build-macos:
   extends: .lib-build-files
   stage: lib-build
   tags:
-    - osx
+    - macos-qt6
   before_script:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - git clean -xfd
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON -DOSX_UNIVERSAL=ON
     - make -j8 -C build
+    - |
+      if [[ $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]
+      then
+        make -C build DESTDIR=$HOME/builds/sysroot install
+        make -C build DESTDIR=temp install
+        mkdir -p $ARTIFACTS_NET_SHARE/macos/binaries/ingescape
+        rm -rf $ARTIFACTS_NET_SHARE/macos/binaries/ingescape/*
+        cp -RLf build/temp/usr/local/* $ARTIFACTS_NET_SHARE/macos/binaries/ingescape
+      fi
   artifacts:
     paths:
       - ./build
@@ -82,7 +87,7 @@ lib-installer-macos:
   extends: .lib-build-files
   stage: lib-installer
   tags:
-    - osx
+    - macos-qt6
   script:
     - make -C build package
 #    - packagesbuild ./builds/xcode/ingescape.pkgproj
@@ -102,48 +107,24 @@ lib-installer-macos:
     - lib-build-macos
 
 
-lib-deploy-macos:
+# Build/Deploy ingescape on OSX (cyclone) runner
+# Cyclone runner shall not be used in the future. This job is here to keep old pipelines working with the latest ingescape version.
+lib-deploy-on-old-macos-runner:
   extends: .lib-build-files
   stage: deploy
   tags:
-    - osx
-  script:
-    - make -C build DESTDIR=$HOME/builds/sysroot install
-  dependencies:
-    - lib-build-macos
-  needs:
-    - lib-build-macos
-  rules:
-    - !reference [.root_namespace, rules]
-
-
-
-# Build/Deploy ingescape on macos-qt6 runner
-lib-build-macos-qt6:
-  extends: .lib-build-files
-  stage: lib-build
-  tags:
-    - macos-qt6
+    - old-osx
   before_script:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - git clean -xfd
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DOSX_UNIVERSAL=ON -DWITH_DEPS=ON
-    - make -j8 -C build
-    - |
-      if [[ $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]
-      then
-        make -C build DESTDIR=$HOME/builds/sysroot install
-        make -C build DESTDIR=temp install
-        mkdir -p $ARTIFACTS_NET_SHARE/macos/binaries/ingescape
-        rm -rf $ARTIFACTS_NET_SHARE/macos/binaries/ingescape/*
-        cp -RLf build/temp/usr/local/* $ARTIFACTS_NET_SHARE/macos/binaries/ingescape
-      fi
-  artifacts:
-    paths:
-      - ./build
-    name: "lib-build-macos"
-    expire_in: 1 day
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_DEPS=ON
+    - make -C build DESTDIR=$HOME/builds/sysroot install
+  dependencies: []
+  needs:
+    - lib-build-macos
+  rules:
+    - !reference [.root_namespace, rules]
 
 
 #__          ___           _
@@ -743,6 +724,8 @@ binding-node-js-macos:
   stage: binding-build
   tags:
     - macos-qt6
+  before_script:
+    - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - cd ./bindings/javascript-node/
     - mkdir -p ./dependencies/lib
@@ -761,6 +744,9 @@ binding-node-js-macos:
     - sed -i .bak 's@/usr/local@<!(echo $PWD)/dependencies@g' binding.gyp #update file paths for igs
     - cat ./binding.gyp
     - npm install -g prebuildify
+    - export PREBUILD_ARCH=x64
+    - npm run build --from_sources=1
+    - export PREBUILD_ARCH=arm64
     - npm run build --from_sources=1
   artifacts:
     paths:
@@ -775,6 +761,8 @@ binding-node-js-linux:
   tags:
     - docker
   image: ingescape/ubuntu18.04-node
+  before_script:
+    - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - cd ./bindings/javascript-node/
     - mkdir -p ./dependencies/lib
@@ -919,24 +907,14 @@ test-python:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - cd bindings/python
-    - mkdir -p ./dependencies/linux/
-    - mkdir -p ./dependencies/include/
-    - cp ../../build/libingescape.a  ./dependencies/linux
-    - cp ../../build/dependencies/czmq/libczmq.a ./dependencies/linux
-    - cp ../../build/dependencies/libzmq/lib/libzmq.a ./dependencies/linux
-    - cp ../../build/dependencies/zyre/libzyre.a ./dependencies/linux
-    - cp ../../build/dependencies/sodium//libsodium.a ./dependencies/linux
-    - cp -r ../../include/* ./dependencies/include
-    - cp -r ../../dependencies/czmq/include/* ./dependencies/include
-    - cp -r ../../dependencies/libzmq/include/* ./dependencies/include
-    - cp -r ../../dependencies/sodium/src/libsodium/include/* ./dependencies/include
-    - cp -r ../../dependencies/zyre/include/* ./dependencies/include
+    - export PLATFORM="linux"
     - export FROM_SOURCES="true"
-    - ./prepare_setup.sh
+    - ./prepare_for_packaging.sh
     - ./tests/run_tests.sh
   artifacts:
     paths:
       - bindings/python/dependencies/*
+      - bindings/python/pyproject.toml
       - bindings/python/setup.py
   dependencies:
     - lib-build-linux-x64
@@ -950,29 +928,24 @@ package-python-wheels-windows:
     ARCH: "x64"
   tags:
     - windows
+  before_script:
+    - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - cd ./bindings/python/
-    - mkdir ./dependencies/windows
-    - mkdir ./dependencies/windows/x64
-    - Copy-Item -Path ..\..\build\ReleaseX64\Release\libingescape.lib -Destination ./dependencies/windows/x64
-    - Copy-Item -Path ..\..\build\ReleaseX64\dependencies\czmq\Release\libczmq.lib -Destination ./dependencies/windows/x64
-    - Copy-Item -Path ..\..\build\ReleaseX64\dependencies\libzmq\lib\Release\libzmq-v142-mt-s-4_3_5.lib -Destination ./dependencies/windows/x64/libzmq.lib
-    - Copy-Item -Path ..\..\build\ReleaseX64\dependencies\zyre\Release\libzyre.lib -Destination ./dependencies/windows/x64
-    - Copy-Item -Path ..\..\build\ReleaseX64\dependencies\sodium\Release\libsodium.lib -Destination ./dependencies/windows/x64
-    - |
-        pushd 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build'
-        cmd /c "vcvarsall.bat x64 & set" |
-        foreach {
-          if ($_ -match "=") {
-            $v = $_.split("="); set-item -force -path "ENV:\$($v[0])"  -value "$($v[1])"
-          }
-        }
-        popd
     - $Env:FROM_SOURCES = "true"
-    - C:\Users\admin\AppData\Local\Programs\Python\Python36\python.exe setup.py bdist_wheel
-    - C:\Users\admin\AppData\Local\Programs\Python\Python37\python.exe setup.py bdist_wheel
-    - C:\Users\admin\AppData\Local\Programs\Python\Python38\python.exe setup.py bdist_wheel
-    - C:\Users\admin\AppData\Local\Programs\Python\Python39\python.exe setup.py bdist_wheel
+    - .\prepare_for_packaging.ps1
+    - C:\Users\admin\AppData\Local\Programs\Python\Python37\python.exe -m pip install --upgrade build
+    - C:\Users\admin\AppData\Local\Programs\Python\Python37\python.exe -m build
+    - C:\Users\admin\AppData\Local\Programs\Python\Python38\python.exe -m pip install --upgrade build
+    - C:\Users\admin\AppData\Local\Programs\Python\Python38\python.exe -m build
+    - C:\Users\admin\AppData\Local\Programs\Python\Python39\python.exe -m pip install --upgrade build
+    - C:\Users\admin\AppData\Local\Programs\Python\Python39\python.exe -m build
+    - C:\Users\admin\AppData\Local\Programs\Python\Python310\python.exe -m pip install --upgrade build
+    - C:\Users\admin\AppData\Local\Programs\Python\Python310\python.exe -m build
+    - C:\Users\admin\AppData\Local\Programs\Python\Python311\python.exe -m pip install --upgrade build
+    - C:\Users\admin\AppData\Local\Programs\Python\Python311\python.exe -m build
+    - C:\Users\admin\AppData\Local\Programs\Python\Python312\python.exe -m pip install --upgrade build
+    - C:\Users\admin\AppData\Local\Programs\Python\Python312\python.exe -m build
   dependencies:
     - test-python
     - lib-windows-release-x64
@@ -983,24 +956,33 @@ package-python-wheels-windows:
     paths:
       - bindings/python/dist/*
       - bindings/python/dependencies/*
-  rules:
-    - !reference [.base_repo_main_branch, rules]
 
 package-python-wheels-macos:
   stage: binding-package
   tags:
     - macos-qt6
-  image: ingescape/python-cmake
+  before_script:
+    - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - cd ./bindings/python/
-    - mkdir -p ./dependencies/macos/
-    - cp ../../build/libingescape.a  ./dependencies/macos
-    - cp ../../build/dependencies/czmq/libczmq.a ./dependencies/macos
-    - cp ../../build/dependencies/libzmq/lib/libzmq.a ./dependencies/macos
-    - cp ../../build/dependencies/zyre/libzyre.a ./dependencies/macos
-    - cp ../../build/dependencies/sodium//libsodium.a ./dependencies/macos
+    - export PLATFORM="macos"
     - export FROM_SOURCES="true"
-    - python3 setup.py bdist_wheel
+    - ./prepare_for_packaging.sh
+    - /usr/local/opt/python@3.8/bin/python3.8 -m pip install --upgrade build
+    - /usr/local/opt/python@3.8/bin/python3.8 -m build
+    - /usr/local/opt/python@3.9/bin/python3.9 -m pip install --upgrade build
+    - /usr/local/opt/python@3.9/bin/python3.9 -m build
+    - /usr/local/opt/python@3.10/bin/python3.10 -m pip install --upgrade build
+    - /usr/local/opt/python@3.10/bin/python3.10 -m build
+    - /usr/local/opt/python@3.11/bin/python3.11 -m pip install --upgrade build
+    - /usr/local/opt/python@3.11/bin/python3.11 -m build
+    - echo "NOTE python 3.12 needs to be run in its venv to install packages under macOS (see PEP668)"
+    - /usr/local/opt/python@3.12/bin/python3.12 -m venv .venv3.12
+    - source .venv3.12/bin/activate
+    - python3.12 -m pip install --upgrade build
+    - python3.12 -m build
+    - deactivate
+    - rm -rf .venv3.12
   dependencies:
     - test-python
     - lib-build-macos
@@ -1011,28 +993,28 @@ package-python-wheels-macos:
     paths:
       - bindings/python/dist/*
       - bindings/python/dependencies/*
-      - bindings/python/setup.py
-  rules:
-    - !reference [.base_repo_main_branch, rules]
 
 package-python-wheels-manylinux_2_24_x86_64:
   stage: binding-package
   tags:
     - docker
   image: quay.io/pypa/manylinux_2_24_x86_64
+  before_script:
+    - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - cd ./bindings/python/
     - mkdir -p ./dependencies/linux/
-    - cp ../../build/libingescape.a  ./dependencies/linux
-    - cp ../../build/dependencies/czmq/libczmq.a ./dependencies/linux
-    - cp ../../build/dependencies/libzmq/lib/libzmq.a ./dependencies/linux
-    - cp ../../build/dependencies/zyre/libzyre.a ./dependencies/linux
-    - cp ../../build/dependencies/sodium//libsodium.a ./dependencies/linux
+    - export PLATFORM="linux"
     - export FROM_SOURCES="true"
-    - python3.8 setup.py bdist_wheel
-    - python3.9 setup.py bdist_wheel
-    - python3.10 setup.py bdist_wheel
-    - python3.11 setup.py bdist_wheel
+    - ./prepare_for_packaging.sh
+    - python3.8  -m pip install --upgrade build
+    - python3.8  -m build
+    - python3.9  -m pip install --upgrade build
+    - python3.9  -m build
+    - python3.10 -m pip install --upgrade build
+    - python3.10 -m build
+    - python3.11 -m pip install --upgrade build
+    - python3.11 -m build
     - |
         for whl in dist/*.whl; do
           auditwheel repair "$whl" --plat "manylinux_2_24_x86_64" -w ./wheelhouse/
@@ -1046,28 +1028,29 @@ package-python-wheels-manylinux_2_24_x86_64:
   artifacts:
     paths:
       - bindings/python/wheelhouse/*
-  rules:
-    - !reference [.base_repo_main_branch, rules]
 
 package-python-wheels-manylinux2014_x86_64:
   stage: binding-package
   tags:
     - docker
   image: quay.io/pypa/manylinux2014_x86_64
+  before_script:
+    - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - cd ./bindings/python/
-    - mkdir -p ./dependencies/linux/
-    - cp ../../build/libingescape.a  ./dependencies/linux
-    - cp ../../build/dependencies/czmq/libczmq.a ./dependencies/linux
-    - cp ../../build/dependencies/libzmq/lib/libzmq.a ./dependencies/linux
-    - cp ../../build/dependencies/zyre/libzyre.a ./dependencies/linux
-    - cp ../../build/dependencies/sodium//libsodium.a ./dependencies/linux
+    - export PLATFORM="linux"
     - export FROM_SOURCES="true"
-    - python3.7 setup.py bdist_wheel
-    - python3.8 setup.py bdist_wheel
-    - python3.9 setup.py bdist_wheel
-    - python3.10 setup.py bdist_wheel
-    - python3.11 setup.py bdist_wheel
+    - ./prepare_for_packaging.sh
+    - python3.7  -m pip install --upgrade build
+    - python3.7  -m build
+    - python3.8  -m pip install --upgrade build
+    - python3.8  -m build
+    - python3.9  -m pip install --upgrade build
+    - python3.9  -m build
+    - python3.10 -m pip install --upgrade build
+    - python3.10 -m build
+    - python3.11 -m pip install --upgrade build
+    - python3.11 -m build
     - |
         for whl in dist/*.whl; do
           auditwheel repair "$whl" --plat "manylinux2014_x86_64" -w ./wheelhouse/
@@ -1081,27 +1064,26 @@ package-python-wheels-manylinux2014_x86_64:
   artifacts:
     paths:
       - bindings/python/wheelhouse/*
-  rules:
-    - !reference [.base_repo_main_branch, rules]
 
 package-python-wheels-manylinux2010_x86_64:
   stage: binding-package
   tags:
     - docker
   image: quay.io/pypa/manylinux2010_x86_64
+  before_script:
+    - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - cd ./bindings/python/
     - mkdir -p ./dependencies/linux/
-    - cp ../../build/libingescape.a  ./dependencies/linux
-    - cp ../../build/dependencies/czmq/libczmq.a ./dependencies/linux
-    - cp ../../build/dependencies/libzmq/lib/libzmq.a ./dependencies/linux
-    - cp ../../build/dependencies/zyre/libzyre.a ./dependencies/linux
-    - cp ../../build/dependencies/sodium//libsodium.a ./dependencies/linux
+    - export PLATFORM="linux"
     - export FROM_SOURCES="true"
-    - python3.7 setup.py bdist_wheel
-    - python3.8 setup.py bdist_wheel
-    - python3.9 setup.py bdist_wheel
-    - python3.8 setup.py bdist_wheel
+    - ./prepare_for_packaging.sh
+    - python3.7 -m pip install --upgrade build
+    - python3.7 -m build
+    - python3.8 -m pip install --upgrade build
+    - python3.8 -m build
+    - python3.9 -m pip install --upgrade build
+    - python3.9 -m build
     - |
         for whl in dist/*.whl; do
           auditwheel repair "$whl" --plat "manylinux2010_x86_64" -w ./wheelhouse/
@@ -1115,8 +1097,6 @@ package-python-wheels-manylinux2010_x86_64:
   artifacts:
     paths:
       - bindings/python/wheelhouse/*
-  rules:
-    - !reference [.base_repo_main_branch, rules]
 
 #Publish
 publish-python-package:
@@ -1125,17 +1105,16 @@ publish-python-package:
     - docker
   image: ingescape/python-cmake
   when: manual
+  before_script:
+    - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - cd bindings/python
     - mkdir -p ./dependencies/linux/
-    - cp ../../build/libingescape.a  ./dependencies/linux
-    - cp ../../build/dependencies/czmq/libczmq.a ./dependencies/linux
-    - cp ../../build/dependencies/libzmq/lib/libzmq.a ./dependencies/linux
-    - cp ../../build/dependencies/zyre/libzyre.a ./dependencies/linux
-    - cp ../../build/dependencies/sodium//libsodium.a ./dependencies/linux
+    - export PLATFORM="linux"
     - export FROM_SOURCES="true"
-    - python3 setup.py sdist
-    - python3 -m pip install --upgrade twine
+    - ./prepare_for_packaging.sh
+    - python3 -m pip install --upgrade twine build
+    - python3 -m build --sdist
     - python3 -m twine upload -u ${PYPI_USERNAME} -p ${PYPI_PASSWORD} dist/* wheelhouse/*
   dependencies:
     - package-python-wheels-windows

@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61.0", "cython"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ingescape"
+authors = [
+    {name = "Ingenuity I/O", email = "contact@ingenuity.io"},
+]
+description = "Ingescape library python3 binding"
+readme = "README.md"
+requires-python = ">=3.7"
+license = {text = """Copyright (c) the Contributors as noted in the AUTHORS file.
+This file is part of Ingescape, see https://github.com/zeromq/ingescape.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/."""}
+classifiers = [
+    "Programming Language :: Python :: 3",
+	"License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
+	"Operating System :: OS Independent",
+]
+dependencies = [
+    "wheel",
+]
+version = @IGS_VERSION@
+
+[project.urls]
+Homepage = "https://ingescape.com/"
+Repository = "https://github.com/zeromq/ingescape.git"
