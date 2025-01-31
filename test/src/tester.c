@@ -1176,8 +1176,12 @@ void run_static_tests (int argc, const char * argv[]){
     listOfStrings = igs_service_list(&nbElements);
     assert(nbElements == 1 && streq(listOfStrings[0], "myService"));
     
+    assert(igs_service_description("myService") == NULL);
     assert(igs_service_set_description("unknow", "myService description") == IGS_FAILURE);
     assert(igs_service_set_description("myService", "myService description") == IGS_SUCCESS);
+    char * description = igs_service_description("myService");
+    assert(strcmp(description, "myService description") == 0);
+    free(description);
     assert(igs_service_set_description("myService", "") == IGS_SUCCESS);
     
     assert(igs_service_arg_set_description("unknow", "myBool", "myBool description") == IGS_FAILURE);

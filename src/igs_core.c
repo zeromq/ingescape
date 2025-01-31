@@ -1298,6 +1298,13 @@ igs_result_t igs_service_set_description (const char *name, const char *descript
     return igsagent_service_set_description (core_agent, name, description);
 }
 
+char * igs_service_description (const char *name)
+{
+    assert (name);
+    core_init_agent ();
+    return igsagent_service_description (core_agent, name);
+}
+
 igs_result_t igs_service_arg_add (const char *service_name,
                                   const char *arg_name,
                                   igs_io_value_type_t type)

@@ -543,6 +543,21 @@ igs_result_t igsagent_service_set_description (igsagent_t *agent, const char *na
     return IGS_SUCCESS;
 }
 
+char * igsagent_service_description (igsagent_t *agent, const char *name)
+{
+    assert (agent);
+    if (!agent->uuid)
+        return NULL;
+    assert (agent->definition);
+    model_read_write_lock(__FUNCTION__, __LINE__);
+    igs_service_t *service = zhashx_lookup(agent->definition->services_table, name);
+    if (!service)
+        igsagent_error (agent, "service with name '%s' does not exist", name);
+    char *res = (service && (service->description)) ? strdup (service->description) : NULL;
+    model_read_write_unlock(__FUNCTION__, __LINE__);
+    return res;
+}
+
 igs_result_t igsagent_service_arg_add (igsagent_t *agent,
                                        const char *service_name,
                                        const char *arg_name,

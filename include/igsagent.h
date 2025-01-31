@@ -210,6 +210,7 @@ typedef void (igsagent_service_fn) (igsagent_t *agent,
 INGESCAPE_EXPORT igs_result_t igsagent_service_init (igsagent_t *self, const char *name, igsagent_service_fn cb, void *data);
 INGESCAPE_EXPORT igs_result_t igsagent_service_remove (igsagent_t *self, const char *name);
 INGESCAPE_EXPORT igs_result_t igsagent_service_set_description (igsagent_t *agent, const char *name, const char *description);
+INGESCAPE_EXPORT char * igsagent_service_description (igsagent_t *agent, const char *name);
 INGESCAPE_EXPORT igs_result_t igsagent_service_arg_add (igsagent_t *self,
                                                         const char *service_name,
                                                         const char *arg_name,
