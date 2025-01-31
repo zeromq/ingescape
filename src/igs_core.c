@@ -1291,6 +1291,13 @@ igs_result_t igs_service_remove (const char *name)
     return result;
 }
 
+igs_result_t igs_service_set_description (const char *name, const char *description)
+{
+    assert (name);
+    core_init_agent ();
+    return igsagent_service_set_description (core_agent, name, description);
+}
+
 igs_result_t igs_service_arg_add (const char *service_name,
                                   const char *arg_name,
                                   igs_io_value_type_t type)
@@ -1304,6 +1311,14 @@ igs_result_t igs_service_arg_remove (const char *service_name,
 {
     core_init_agent ();
     return igsagent_service_arg_remove (core_agent, service_name, arg_name);
+}
+
+igs_result_t igs_service_arg_set_description(const char *service_name,
+                                             const char *arg_name,
+                                             const char *description)
+{
+    core_init_agent ();
+    return igsagent_service_arg_set_description (core_agent, service_name, arg_name, description);
 }
 
 igs_result_t igs_service_reply_add(const char *service_name, const char *reply_name){

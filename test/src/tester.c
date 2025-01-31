@@ -1175,13 +1175,25 @@ void run_static_tests (int argc, const char * argv[]){
     assert(igs_service_exists("myService"));
     listOfStrings = igs_service_list(&nbElements);
     assert(nbElements == 1 && streq(listOfStrings[0], "myService"));
+    
+    assert(igs_service_set_description("unknow", "myService description") == IGS_FAILURE);
+    assert(igs_service_set_description("myService", "myService description") == IGS_SUCCESS);
+    assert(igs_service_set_description("myService", "") == IGS_SUCCESS);
+    
+    assert(igs_service_arg_set_description("unknow", "myBool", "myBool description") == IGS_FAILURE);
+    assert(igs_service_arg_set_description("myService", "unknow", "myBool description") == IGS_FAILURE);
+    assert(igs_service_arg_set_description("myService", "myBool", "myBool description") == IGS_SUCCESS);
+    assert(igs_service_arg_set_description("myService", "myBool", "") == IGS_SUCCESS);
+    
     igs_free_services_list(listOfStrings, nbElements);
     listOfStrings = NULL;
     assert(listOfStrings == NULL);
     assert(igs_service_remove("myService") == IGS_SUCCESS);
 
     assert(igs_service_init("myService", testerServiceCallback, NULL) == IGS_SUCCESS);
+    assert(igs_service_set_description("myService", "myService description") == IGS_SUCCESS);
     assert(igs_service_arg_add("myService", "myBool", IGS_BOOL_T) == IGS_SUCCESS);
+    assert(igs_service_arg_set_description("myService", "myBool", "myBool description") == IGS_SUCCESS);
     assert(igs_service_arg_add("myService", "myInt", IGS_INTEGER_T) == IGS_SUCCESS);
     assert(igs_service_arg_add("myService", "myDouble", IGS_DOUBLE_T) == IGS_SUCCESS);
     assert(igs_service_arg_add("myService", "myString", IGS_STRING_T) == IGS_SUCCESS);

@@ -29,6 +29,10 @@ void s_service_free_service_arguments (igs_service_arg_t **args)
             free (arg->name);
             arg->name = NULL;
         }
+        if (arg->description){
+            free (arg->description);
+            arg->description = NULL;
+        }
         if (arg->type == IGS_DATA_T && arg->data)
             free (arg->data);
         else if (arg->type == IGS_STRING_T && arg->c)
@@ -517,6 +521,28 @@ igs_result_t igsagent_service_remove (igsagent_t *agent, const char *name)
     return IGS_SUCCESS;
 }
 
+igs_result_t igsagent_service_set_description (igsagent_t *agent, const char *name, const char *description)
+{
+    assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
+    assert (name);
+    assert (description);
+    assert (agent->definition);
+    model_read_write_lock(__FUNCTION__, __LINE__);
+    igs_service_t *service = zhashx_lookup(agent->definition->services_table, name);
+    if (!service) {
+        igsagent_error (agent, "service with name '%s' does not exist", name);
+        model_read_write_unlock(__FUNCTION__, __LINE__);
+        return IGS_FAILURE;
+    }
+    service->description = strdup (description);
+    definition_update_json (agent->definition);
+    agent->network_need_to_send_definition_update = true;
+    model_read_write_unlock(__FUNCTION__, __LINE__);
+    return IGS_SUCCESS;
+}
+
 igs_result_t igsagent_service_arg_add (igsagent_t *agent,
                                        const char *service_name,
                                        const char *arg_name,
@@ -607,6 +633,8 @@ igs_result_t igsagent_service_arg_remove (igsagent_t *agent,
             else
                 s->arguments = arg->next;
             free (arg->name);
+            if (arg->description)
+                free (arg->description);
             if (arg->type == IGS_DATA_T && arg->data)
                 free (arg->data);
             else if (arg->type == IGS_STRING_T && arg->data)
@@ -624,6 +652,43 @@ igs_result_t igsagent_service_arg_remove (igsagent_t *agent,
         igsagent_debug (agent, "no argument named %s for service %s", arg_name, service_name);
     model_read_write_unlock(__FUNCTION__, __LINE__);
     return IGS_SUCCESS;
+}
+
+igs_result_t igsagent_service_arg_set_description (igsagent_t *agent,
+                                                   const char *service_name,
+                                                   const char *arg_name,
+                                                   const char *description)
+{
+    assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
+    assert (service_name);
+    assert (arg_name);
+    assert (description);
+    assert (agent->definition);
+    model_read_write_lock(__FUNCTION__, __LINE__);
+    igs_service_t *s = zhashx_lookup(agent->definition->services_table, service_name);
+    if (!s) {
+        igsagent_error (agent, "service with name %s does not exist", service_name);
+        model_read_write_unlock(__FUNCTION__, __LINE__);
+        return IGS_FAILURE;
+    }
+    bool found = false;
+    igs_service_arg_t *arg = s->arguments;
+    while (arg) {
+        if (streq (arg_name, arg->name)) {
+            arg->description = strdup(description);
+            found = true;
+            definition_update_json (agent->definition);
+            agent->network_need_to_send_definition_update = true;
+            break;
+        }
+        arg = arg->next;
+    }
+    if (!found)
+        igsagent_error (agent, "no argument named %s for service %s", arg_name, service_name);
+    model_read_write_unlock(__FUNCTION__, __LINE__);
+    return !found ? IGS_FAILURE : IGS_SUCCESS;
 }
 
 igs_result_t igsagent_service_reply_add(igsagent_t *agent, const char *service_name, const char *reply_name){
@@ -761,7 +826,7 @@ igs_result_t igsagent_service_reply_arg_add(igsagent_t *agent, const char *servi
     return IGS_SUCCESS;
 }
 
-igs_result_t igsagent_service_reply_arg_remove(igsagent_t *agent, const char *service_name, 
+igs_result_t igsagent_service_reply_arg_remove(igsagent_t *agent, const char *service_name,
                                                const char *reply_name, const char *arg_name){
     assert (agent);
     if (!agent->uuid)
@@ -793,6 +858,8 @@ igs_result_t igsagent_service_reply_arg_remove(igsagent_t *agent, const char *se
             else
                 r->arguments = arg->next;
             free (arg->name);
+            if (arg->description)
+                free (arg->description);
             if (arg->type == IGS_DATA_T && arg->data)
                 free (arg->data);
             else

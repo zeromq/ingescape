@@ -129,6 +129,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
     const char *services_path[] = {STR_DEFINITION, STR_SERVICES, NULL};
     const char *service_path_deprecated[] = {STR_DEFINITION, STR_SERVICES_DEPRECATED, NULL};
     const char *arguments_path[] = {STR_ARGUMENTS, NULL};
+    const char *argument_description_path[] = {STR_DESCRIPTION, NULL};
     const char *agent_name_path[] = {STR_DEFINITION, STR_NAME, NULL};
     const char *name_path[] = {STR_NAME, NULL};
     const char *class_path[] = {STR_DEFINITION, STR_CLASS, NULL};
@@ -453,6 +454,11 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                                 igs_json_node_t *arg_type = igs_json_node_find (arguments->u.array.values[j], type_path);
                                 if (arg_type && arg_type->type == IGS_JSON_STRING && arg_type->u.string)
                                     new_arg->type = s_string_to_value_type (arg_type->u.string);
+
+                                description = igs_json_node_find (arguments->u.array.values[j], argument_description_path);
+                                if (description && description->type == IGS_JSON_STRING && description->u.string)
+                                    new_arg->description = strdup (description->u.string);
+
                                 igs_service_arg_t *last_arg = service->arguments;
                                 while (last_arg && last_arg->next) {
                                     last_arg = last_arg->next;
@@ -1084,6 +1090,10 @@ char *parser_export_definition (igs_definition_t *def)
                         igs_json_open_map (json);
                         igs_json_add_string (json, STR_NAME);
                         igs_json_add_string (json, argument->name);
+                        if (argument->description) {
+                            igs_json_add_string (json, STR_DESCRIPTION);
+                            igs_json_add_string (json, argument->description);
+                        }
                         igs_json_add_string (json, STR_TYPE);
                         igs_json_add_string (
                                                 json, s_value_type_to_string (argument->type));
