@@ -1339,6 +1339,18 @@ igs_result_t igs_service_reply_add(const char *service_name, const char *reply_n
     return igsagent_service_reply_add(core_agent, service_name, reply_name);
 }
 
+igs_result_t igs_service_reply_set_description(const char *service_name, const char *reply_name, const char *description)
+{
+    core_init_agent ();
+    return igsagent_service_reply_set_description(core_agent, service_name, reply_name, description);
+}
+
+char * igs_service_reply_description(const char *service_name, const char *reply_name)
+{
+    core_init_agent ();
+    return igsagent_service_reply_description(core_agent, service_name, reply_name);
+}
+
 igs_result_t igs_service_reply_remove(const char *service_name, const char *reply_name){
     core_init_agent ();
     return igsagent_service_reply_remove(core_agent, service_name, reply_name);

@@ -1184,6 +1184,7 @@ void run_static_tests (int argc, const char * argv[]){
     free(description);
     assert(igs_service_set_description("myService", "") == IGS_SUCCESS);
     
+    assert(igs_service_arg_description("myService", "myBool") == NULL);
     assert(igs_service_arg_set_description("unknow", "myBool", "myBool description") == IGS_FAILURE);
     assert(igs_service_arg_set_description("myService", "unknow", "myBool description") == IGS_FAILURE);
     assert(igs_service_arg_set_description("myService", "myBool", "myBool description") == IGS_SUCCESS);
@@ -1286,6 +1287,16 @@ void run_static_tests (int argc, const char * argv[]){
     assert(igs_service_has_replies("myServiceWithReplies"));
     names = igs_service_reply_names("myServiceWithReplies", &replies_nb);
     assert(names && replies_nb == 2 && streq("myReply", names[0]) && streq("myReply2", names[1]));
+    
+    assert(igs_service_reply_description("myServiceWithReplies", "myReply") == NULL);
+    assert(igs_service_reply_set_description("unknow", "myReply", "myService description") == IGS_FAILURE);
+    assert(igs_service_reply_set_description("myServiceWithReplies", "unknow", "myService description") == IGS_FAILURE);
+    assert(igs_service_reply_set_description("myServiceWithReplies", "myReply", "myServiceReply description") == IGS_SUCCESS);
+    char * replyDescription = igs_service_reply_description("myServiceWithReplies", "myReply");
+    assert(strcmp(replyDescription, "myServiceReply description") == 0);
+    free(replyDescription);
+    assert(igs_service_reply_set_description("myServiceWithReplies", "myReply", "") == IGS_SUCCESS);
+    
     igs_free_services_list(names, replies_nb);
     assert(igs_service_reply_args_first("myServiceWithReplies", "myReply") == NULL);
     assert(igs_service_reply_args_count("myServiceWithReplies", "myReply") == 0);

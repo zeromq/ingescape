@@ -465,6 +465,8 @@ INGESCAPE_EXPORT char * igs_service_arg_description (const char *service_name, c
 
 //replies are optional and used for specification purposes
 INGESCAPE_EXPORT igs_result_t igs_service_reply_add(const char *service_name, const char *reply_name);
+INGESCAPE_EXPORT igs_result_t igs_service_reply_set_description(const char *service_name, const char *reply_name, const char *description);
+INGESCAPE_EXPORT char * igs_service_reply_description(const char *service_name, const char *reply_name);
 INGESCAPE_EXPORT igs_result_t igs_service_reply_remove(const char *service_name, const char *reply_name);
 INGESCAPE_EXPORT igs_result_t igs_service_reply_arg_add(const char *service_name, const char *reply_name, const char *arg_name, igs_io_value_type_t type);
 INGESCAPE_EXPORT igs_result_t igs_service_reply_arg_remove(const char *service_name,

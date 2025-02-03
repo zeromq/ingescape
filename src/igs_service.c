@@ -771,6 +771,62 @@ igs_result_t igsagent_service_reply_add(igsagent_t *agent, const char *service_n
     return IGS_SUCCESS;
 }
 
+igs_result_t igsagent_service_reply_set_description(igsagent_t *agent, const char *service_name, const char *reply_name, const char *description)
+{
+    assert (agent);
+    if (!agent->uuid)
+        return IGS_FAILURE;
+    assert (service_name);
+    assert (reply_name);
+    assert(model_check_string(reply_name, IGS_MAX_SERVICE_NAME_LENGTH));
+    assert (agent->definition);
+    model_read_write_lock(__FUNCTION__, __LINE__);
+    igs_service_t *s = zhashx_lookup(agent->definition->services_table, service_name);
+    if (!s) {
+        igsagent_error (agent, "service with name %s does not exist", service_name);
+        model_read_write_unlock(__FUNCTION__, __LINE__);
+        return IGS_FAILURE;
+    }
+    igs_service_t *r = zhashx_lookup(s->replies, reply_name);
+    if (!r) {
+        igsagent_error (agent, "service with name %s has no reply named %s", service_name, reply_name);
+        model_read_write_unlock(__FUNCTION__, __LINE__);
+        return IGS_FAILURE;
+    }
+    r->description = s_strndup (description, IGS_MAX_DESCRIPTION_LENGTH);
+    definition_update_json (agent->definition);
+    agent->network_need_to_send_definition_update = true;
+    model_read_write_unlock(__FUNCTION__, __LINE__);
+    return IGS_SUCCESS;
+}
+
+char * igsagent_service_reply_description(igsagent_t *agent, const char *service_name, const char *reply_name)
+{
+    assert (agent);
+    if (!agent->uuid)
+        return NULL;
+    assert (service_name);
+    assert (reply_name);
+    assert(model_check_string(reply_name, IGS_MAX_SERVICE_NAME_LENGTH));
+    assert (agent->definition);
+    model_read_write_lock(__FUNCTION__, __LINE__);
+    igs_service_t *s = zhashx_lookup(agent->definition->services_table, service_name);
+    if (!s) {
+        igsagent_error (agent, "service with name %s does not exist", service_name);
+        model_read_write_unlock(__FUNCTION__, __LINE__);
+        return NULL;
+    }
+    igs_service_t *r = zhashx_lookup(s->replies, reply_name);
+    if (!r) {
+        igsagent_error (agent, "service with name %s has no reply named %s", service_name, reply_name);
+        model_read_write_unlock(__FUNCTION__, __LINE__);
+        return NULL;
+    }
+    char *description = (r && (r->description)) ? strdup (r->description) : NULL;
+    model_read_write_unlock(__FUNCTION__, __LINE__);
+    return description;
+}
+
 igs_result_t igsagent_service_reply_remove(igsagent_t *agent, const char *service_name, const char *reply_name){
     assert(agent);
     if (!agent->uuid)
