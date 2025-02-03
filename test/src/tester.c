@@ -1287,6 +1287,7 @@ void run_static_tests (int argc, const char * argv[]){
     assert(igs_service_has_replies("myServiceWithReplies"));
     names = igs_service_reply_names("myServiceWithReplies", &replies_nb);
     assert(names && replies_nb == 2 && streq("myReply", names[0]) && streq("myReply2", names[1]));
+    igs_free_services_list(names, replies_nb);
     
     assert(igs_service_reply_description("myServiceWithReplies", "myReply") == NULL);
     assert(igs_service_reply_set_description("unknow", "myReply", "myService description") == IGS_FAILURE);
@@ -1297,7 +1298,18 @@ void run_static_tests (int argc, const char * argv[]){
     free(replyDescription);
     assert(igs_service_reply_set_description("myServiceWithReplies", "myReply", "") == IGS_SUCCESS);
     
-    igs_free_services_list(names, replies_nb);
+    assert(igs_service_reply_arg_add("myServiceWithReplies", "myReply", "myBool", IGS_BOOL_T) == IGS_SUCCESS);
+    assert(igs_service_reply_arg_description("myServiceWithReplies", "myReply", "myBool") == NULL);
+    assert(igs_service_reply_arg_set_description("unknow", "myReply", "myBool", "myArgBool description") == IGS_FAILURE);
+    assert(igs_service_reply_arg_set_description("myServiceWithReplies", "unknow", "myBool", "myArgBool description") == IGS_FAILURE);
+    assert(igs_service_reply_arg_set_description("myServiceWithReplies", "myReply", "unknow", "myArgBool description") == IGS_FAILURE);
+    assert(igs_service_reply_arg_set_description("myServiceWithReplies", "myReply", "myBool", "myArgBool description") == IGS_SUCCESS);
+    char * replyArgDescription = igs_service_reply_arg_description("myServiceWithReplies", "myReply", "myBool");
+    assert(strcmp(replyArgDescription, "myArgBool description") == 0);
+    free(replyArgDescription);
+    assert(igs_service_reply_arg_set_description("myServiceWithReplies", "myReply", "myBool", "") == IGS_SUCCESS);
+    igs_service_reply_arg_remove("myServiceWithReplies", "myReply", "myBool");
+    
     assert(igs_service_reply_args_first("myServiceWithReplies", "myReply") == NULL);
     assert(igs_service_reply_args_count("myServiceWithReplies", "myReply") == 0);
     assert(igs_service_reply_arg_add("myServiceWithReplies", "myReply", "myBool", IGS_BOOL_T) == IGS_SUCCESS);
