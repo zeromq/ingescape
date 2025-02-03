@@ -706,6 +706,36 @@ igs_result_t igsagent_service_arg_set_description (igsagent_t *agent,
     return !found ? IGS_FAILURE : IGS_SUCCESS;
 }
 
+char * igsagent_service_arg_description(igsagent_t *agent, const char *service_name, const char *arg_name)
+{
+    assert (agent);
+    if (!agent->uuid)
+        return NULL;
+    assert (service_name);
+    assert (arg_name);
+    assert (agent->definition);
+    model_read_write_lock(__FUNCTION__, __LINE__);
+    igs_service_t *s = zhashx_lookup(agent->definition->services_table, service_name);
+    if (!s) {
+        igsagent_error (agent, "service with name %s does not exist", service_name);
+        model_read_write_unlock(__FUNCTION__, __LINE__);
+        return NULL;
+    }
+    char * description = NULL;
+    igs_service_arg_t *arg = s->arguments;
+    while (arg) {
+        if (streq (arg_name, arg->name)) {
+            description = strdup(arg->description);
+            break;
+        }
+        arg = arg->next;
+    }
+    if (description == NULL)
+        igsagent_error (agent, "no argument named %s for service %s", arg_name, service_name);
+    model_read_write_unlock(__FUNCTION__, __LINE__);
+    return description;
+}
+
 igs_result_t igsagent_service_reply_add(igsagent_t *agent, const char *service_name, const char *reply_name){
     assert (agent);
     if (!agent->uuid)

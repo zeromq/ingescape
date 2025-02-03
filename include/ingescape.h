@@ -461,6 +461,7 @@ INGESCAPE_EXPORT igs_result_t igs_service_arg_add(const char *service_name, cons
 INGESCAPE_EXPORT igs_result_t igs_service_arg_remove(const char *service_name,
                                                      const char *arg_name); //removes first occurence of an argument with this name
 INGESCAPE_EXPORT igs_result_t igs_service_arg_set_description(const char *service_name, const char *arg_name, const char *description);
+INGESCAPE_EXPORT char * igs_service_arg_description (const char *service_name, const char *arg_name);
 
 //replies are optional and used for specification purposes
 INGESCAPE_EXPORT igs_result_t igs_service_reply_add(const char *service_name, const char *reply_name);

@@ -1328,6 +1328,12 @@ igs_result_t igs_service_arg_set_description(const char *service_name,
     return igsagent_service_arg_set_description (core_agent, service_name, arg_name, description);
 }
 
+char * igs_service_arg_description (const char *service_name, const char *arg_name)
+{
+    core_init_agent ();
+    return igsagent_service_arg_description (core_agent, service_name, arg_name);
+}
+
 igs_result_t igs_service_reply_add(const char *service_name, const char *reply_name){
     core_init_agent ();
     return igsagent_service_reply_add(core_agent, service_name, reply_name);
