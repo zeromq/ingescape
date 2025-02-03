@@ -128,6 +128,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
     const char *attributes_path_deprecated[] = {STR_DEFINITION, STR_ATTRIBUTES_DEPRECATED, NULL};
     const char *services_path[] = {STR_DEFINITION, STR_SERVICES, NULL};
     const char *service_path_deprecated[] = {STR_DEFINITION, STR_SERVICES_DEPRECATED, NULL};
+    const char *service_description_path[] = {STR_DESCRIPTION, NULL};
     const char *arguments_path[] = {STR_ARGUMENTS, NULL};
     const char *argument_description_path[] = {STR_DESCRIPTION, NULL};
     const char *agent_name_path[] = {STR_DEFINITION, STR_NAME, NULL};
@@ -435,7 +436,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                 zlist_autofree(service->replies_names_ordered);
                 service->replies = zhashx_new();
 
-                description = igs_json_node_find (services->u.array.values[i], description_path);
+                description = igs_json_node_find (services->u.array.values[i], service_description_path);
                 if (description && description->type == IGS_JSON_STRING && description->u.string)
                     service->description = s_strndup (description->u.string, IGS_MAX_DESCRIPTION_LENGTH);
 
@@ -485,9 +486,9 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                             igs_service_t *my_reply = (igs_service_t *) zmalloc (sizeof (igs_service_t));
                             my_reply->name = corrected_reply_name;
                             
-                            description = igs_json_node_find (replies->u.array.values[i], description_path);
-                            if (description && description->type == IGS_JSON_STRING && description->u.string)
-                                my_reply->description = s_strndup (description->u.string, IGS_MAX_DESCRIPTION_LENGTH);
+                            igs_json_node_t *replyDescription = igs_json_node_find (replies->u.array.values[j], service_description_path);
+                            if (replyDescription && replyDescription->type == IGS_JSON_STRING && replyDescription->u.string)
+                                my_reply->description = s_strndup (replyDescription->u.string, IGS_MAX_DESCRIPTION_LENGTH);
                             
                             my_reply->replies_names_ordered = zlist_new();
                             zlist_comparefn(my_reply->replies_names_ordered, (zlist_compare_fn*) strcmp);
