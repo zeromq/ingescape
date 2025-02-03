@@ -536,7 +536,7 @@ igs_result_t igsagent_service_set_description (igsagent_t *agent, const char *na
         model_read_write_unlock(__FUNCTION__, __LINE__);
         return IGS_FAILURE;
     }
-    service->description = strdup (description);
+    service->description = s_strndup (description, IGS_MAX_DESCRIPTION_LENGTH);
     definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
     model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -692,7 +692,7 @@ igs_result_t igsagent_service_arg_set_description (igsagent_t *agent,
     igs_service_arg_t *arg = s->arguments;
     while (arg) {
         if (streq (arg_name, arg->name)) {
-            arg->description = strdup(description);
+            arg->description = s_strndup (description, IGS_MAX_DESCRIPTION_LENGTH);
             found = true;
             definition_update_json (agent->definition);
             agent->network_need_to_send_definition_update = true;
@@ -725,7 +725,8 @@ char * igsagent_service_arg_description(igsagent_t *agent, const char *service_n
     igs_service_arg_t *arg = s->arguments;
     while (arg) {
         if (streq (arg_name, arg->name)) {
-            description = strdup(arg->description);
+            if (arg->description)
+                description = s_strndup (arg->description, IGS_MAX_DESCRIPTION_LENGTH);
             break;
         }
         arg = arg->next;

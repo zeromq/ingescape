@@ -437,7 +437,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
 
                 description = igs_json_node_find (services->u.array.values[i], description_path);
                 if (description && description->type == IGS_JSON_STRING && description->u.string)
-                    service->description = strdup (description->u.string);
+                    service->description = s_strndup (description->u.string, IGS_MAX_DESCRIPTION_LENGTH);
 
                 igs_json_node_t *arguments = igs_json_node_find (services->u.array.values[i], arguments_path);
                 if (arguments && arguments->type == IGS_JSON_ARRAY) {
@@ -457,7 +457,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
 
                                 description = igs_json_node_find (arguments->u.array.values[j], argument_description_path);
                                 if (description && description->type == IGS_JSON_STRING && description->u.string)
-                                    new_arg->description = strdup (description->u.string);
+                                    new_arg->description = s_strndup (description->u.string, IGS_MAX_DESCRIPTION_LENGTH);
 
                                 igs_service_arg_t *last_arg = service->arguments;
                                 while (last_arg && last_arg->next) {
