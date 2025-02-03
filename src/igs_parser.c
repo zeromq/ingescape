@@ -484,6 +484,11 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                                 igs_warn ("reply name '%s' has been changed to '%s'", reply_name->u.string, corrected_reply_name);
                             igs_service_t *my_reply = (igs_service_t *) zmalloc (sizeof (igs_service_t));
                             my_reply->name = corrected_reply_name;
+                            
+                            description = igs_json_node_find (replies->u.array.values[i], description_path);
+                            if (description && description->type == IGS_JSON_STRING && description->u.string)
+                                my_reply->description = s_strndup (description->u.string, IGS_MAX_DESCRIPTION_LENGTH);
+                            
                             my_reply->replies_names_ordered = zlist_new();
                             zlist_comparefn(my_reply->replies_names_ordered, (zlist_compare_fn*) strcmp);
                             zlist_autofree(my_reply->replies_names_ordered);
@@ -501,6 +506,11 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                                                 igs_warn ("reply argument name '%s' has been changed to '%s'", arg_name->u.string, corrected_reply_arg_name);
                                             igs_service_arg_t *new_arg = (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
                                             new_arg->name = corrected_reply_arg_name;
+                                            
+                                            description = igs_json_node_find (arguments->u.array.values[j], argument_description_path);
+                                            if (description && description->type == IGS_JSON_STRING && description->u.string)
+                                                new_arg->description = s_strndup (description->u.string, IGS_MAX_DESCRIPTION_LENGTH);
+                                            
                                             igs_json_node_t *arg_type = igs_json_node_find (arguments->u.array.values[len], type_path);
                                             if (arg_type && arg_type->type == IGS_JSON_STRING && arg_type->u.string)
                                                 new_arg->type = s_string_to_value_type (arg_type->u.string);
@@ -1128,6 +1138,10 @@ char *parser_export_definition (igs_definition_t *def)
                                     igs_json_open_map (json);
                                     igs_json_add_string (json, STR_NAME);
                                     igs_json_add_string (json, argument->name);
+                                    if (argument->description) {
+                                        igs_json_add_string (json, STR_DESCRIPTION);
+                                        igs_json_add_string (json, argument->description);
+                                    }
                                     igs_json_add_string (json, STR_TYPE);
                                     igs_json_add_string (
                                                             json,
