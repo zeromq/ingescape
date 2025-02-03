@@ -32,7 +32,7 @@
 //  INGESCAPE version macros for compile-time API detection
 #define INGESCAPE_VERSION_MAJOR 4
 #define INGESCAPE_VERSION_MINOR 2
-#define INGESCAPE_VERSION_PATCH 8
+#define INGESCAPE_VERSION_PATCH 10
 
 #define INGESCAPE_MAKE_VERSION(major, minor, patch) \
 ((major) * 10000 + (minor) * 100 + (patch))
@@ -747,7 +747,7 @@ INGESCAPE_EXPORT int64_t igs_rt_get_current_timestamp(void);
  When timestamps are enabled, every output publication and every service call
  carry an additional information providing the timestamp of the message on
  the sender side. On the receiver side, timestamp is obtained by calling
- igs_rt_get_current_timestamp*/
+ igs_rt_get_current_timestamp in the corresponding callback*/
 INGESCAPE_EXPORT void igs_rt_set_timestamps(bool enable);
 INGESCAPE_EXPORT bool igs_rt_timestamps(void);
 
@@ -757,7 +757,7 @@ INGESCAPE_EXPORT bool igs_rt_timestamps(void);
  for the current time in microseconds.
  Once igs_rt_set_time has been called, it is necessary to continue calling it
  periodically and manually to update the agent's current time in microseconds.
- NB : a call to igs_rt_set_time  enables timestamps automatically for outputs
+ NB : a call to igs_rt_set_time automatically enables timestamps  for outputs
  and services on all agents in our process. Timestamps cannot be disabled afterwards.
  NB : igs_rt_set_time and igs_rt_time operate at peer level for all the agents
  in the process. All agents in a process use the same time set by igs_rt_set_time.

@@ -173,7 +173,7 @@ void service_free_service (igs_service_t **s)
 igs_result_t service_make_values_to_arguments_from_message (igs_service_arg_t **args,
                                                             igs_service_t *service,
                                                             zmsg_t *msg){
-    assert(args && !*args);
+    assert(args);
     assert(service);
     assert(msg);
     
@@ -1201,7 +1201,6 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                         continue;
                     }else {
                         agent->rt_current_timestamp_microseconds = current_microseconds;
-                        agent->rt_current_timestamp_microseconds = INT64_MIN;
                         if (core_context->enable_service_logging)
                             service_log_received_service (local_agent, agent->definition->name, agent->uuid, service_name,
                                                           (list)?*list:NULL, current_microseconds);
@@ -1221,6 +1220,7 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                             (service->service_cb) (local_agent, agent->definition->name, agent->uuid, service_name,
                                                    (list)?*list:NULL, nb_arguments, token, service->cb_data);
                         model_read_write_lock(__FUNCTION__, __LINE__);
+                        agent->rt_current_timestamp_microseconds = INT64_MIN;
                     }
                 }else
                     igsagent_error (agent, "could not find service named %s for %s (%s) : service will not be called",
