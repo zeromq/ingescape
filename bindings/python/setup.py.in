@@ -50,8 +50,8 @@ if platform.system() == "Linux":
     extra_objects.append(linux_lib_dirs_from_artifacts + 'libczmq.a')
     extra_objects.append(linux_lib_dirs_from_artifacts + 'libzmq.a')
     extra_objects.append(linux_lib_dirs_from_artifacts + 'libsodium.a')
-  compile_args = ["-I/usr/local/include/python3.8", "-I/usr/local/include/python3.8", "-Wno-unused-result", "-Wsign-compare", "-g", "-fwrapv", "-O3", "-Wall"]
-  link_args = ["-L/usr/local/lib", "-lcrypt", "-lpthread", "-ldl",  "-lutil", "-lm", "-lstdc++"]
+  compile_args = ["-Wno-unused-result", "-Wsign-compare", "-g", "-fwrapv", "-O3", "-Wall"]
+  link_args = ["-lcrypt", "-lpthread", "-ldl",  "-lutil", "-lm", "-lstdc++"]
 elif platform.system() == "Darwin":
   if use_system_libs:
     extra_objects.append(macos_lib_dirs + 'libingescape.a')
