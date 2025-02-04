@@ -45,7 +45,7 @@ elif platform.system() == "Darwin":
     extra_objects.append(macos_lib_dirs_from_artifacts + 'libczmq.a')
     extra_objects.append(macos_lib_dirs_from_artifacts + 'libzmq.a')
     extra_objects.append(macos_lib_dirs_from_artifacts + 'libsodium.a')
-  compile_args = ["-Wno-nullability-completeness", "-Wno-expansion-to-defined"]
+    compile_args = ["-Wno-nullability-completeness", "-Wno-expansion-to-defined"]
 elif platform.system() == "Windows":
     if platform.machine().endswith('64'):
         librairies = ["libzmq",'libingescape', 'libzyre', 'libczmq', 'libsodium', "ws2_32", "Iphlpapi", 'Rpcrt4']
