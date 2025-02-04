@@ -19,13 +19,8 @@
 
 #include "compat.h"
 
-#ifdef FROM_SOURCES
-#include "igsagent.h"
-#include "czmq.h"
-#else
 #include <ingescape/igsagent.h>
 #include <czmq.h>
-#endif
 
 
 typedef struct {

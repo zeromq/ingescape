@@ -12,11 +12,6 @@
 
 #include "ingescape_agent_python.h"
 #include <stdio.h>
-#ifdef FROM_SOURCES
-#include "ingescape.h"
-#else
-#include <ingescape/ingescape.h>
-#endif
 #include "uthash/utlist.h"
 #include "util.h"
 

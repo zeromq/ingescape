@@ -19,13 +19,8 @@
 
 #include "compat.h"
 
-#ifdef FROM_SOURCES
-#include "ingescape.h"
-#include "czmq.h"
-#else
 #include <ingescape/ingescape.h>
 #include <czmq.h>
-#endif
 
 PyObject * start_with_device_wrapper(PyObject * self, PyObject * args);
 PyObject * start_with_ip_wrapper(PyObject * self, PyObject * args);
