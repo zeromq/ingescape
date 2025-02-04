@@ -159,7 +159,10 @@ INGESCAPE_EXPORT igs_result_t igsagent_input_add_constraint(igsagent_t *self, co
 INGESCAPE_EXPORT igs_result_t igsagent_output_add_constraint(igsagent_t *self, const char *name, const char *constraint);
 
 INGESCAPE_EXPORT igs_result_t igsagent_input_set_description(igsagent_t *self, const char *name, const char *description);
+INGESCAPE_EXPORT char * igsagent_input_description(igsagent_t *self, const char *name);//caller owns returned value
+
 INGESCAPE_EXPORT igs_result_t igsagent_output_set_description(igsagent_t *self, const char *name, const char *description);
+INGESCAPE_EXPORT char * igsagent_output_description(igsagent_t *self, const char *name);//caller owns returned value
 
 INGESCAPE_EXPORT igs_result_t igsagent_input_set_detailed_type(igsagent_t *self, const char *name,
                                                                const char *type_name, const char *specification);
@@ -209,16 +212,27 @@ typedef void (igsagent_service_fn) (igsagent_t *agent,
                                     void *data);
 INGESCAPE_EXPORT igs_result_t igsagent_service_init (igsagent_t *self, const char *name, igsagent_service_fn cb, void *data);
 INGESCAPE_EXPORT igs_result_t igsagent_service_remove (igsagent_t *self, const char *name);
+INGESCAPE_EXPORT igs_result_t igsagent_service_set_description (igsagent_t *agent, const char *name, const char *description);
+INGESCAPE_EXPORT char * igsagent_service_description (igsagent_t *agent, const char *name);
 INGESCAPE_EXPORT igs_result_t igsagent_service_arg_add (igsagent_t *self,
                                                         const char *service_name,
                                                         const char *arg_name,
                                                         igs_io_value_type_t value_type);
 INGESCAPE_EXPORT igs_result_t igsagent_service_arg_remove (igsagent_t *self, const char *service_name, const char *arg_name);
+INGESCAPE_EXPORT igs_result_t igsagent_service_arg_set_description (igsagent_t *agent,
+                                                                    const char *service_name,
+                                                                    const char *arg_name,
+                                                                    const char *description);
+INGESCAPE_EXPORT char * igsagent_service_arg_description(igsagent_t *agent, const char *service_name, const char *arg_name);
 INGESCAPE_EXPORT igs_result_t igsagent_service_reply_add(igsagent_t *self, const char *service_name, const char *reply_name);
+INGESCAPE_EXPORT igs_result_t igsagent_service_reply_set_description(igsagent_t *self, const char *service_name, const char *reply_name, const char *description);
+INGESCAPE_EXPORT char * igsagent_service_reply_description(igsagent_t *self, const char *service_name, const char *reply_name);
 INGESCAPE_EXPORT igs_result_t igsagent_service_reply_remove(igsagent_t *self, const char *service_name, const char *reply_name);
 INGESCAPE_EXPORT igs_result_t igsagent_service_reply_arg_add(igsagent_t *self, const char *service_name,
                                                              const char *reply_name,
                                                              const char *arg_name, igs_io_value_type_t type);
+INGESCAPE_EXPORT igs_result_t igsagent_service_reply_arg_set_description(igsagent_t *self, const char *service_name, const char *reply_name, const char *arg_name, const char *description);
+INGESCAPE_EXPORT char * igsagent_service_reply_arg_description(igsagent_t *self, const char *service_name, const char *reply_name, const char *arg_name);
 INGESCAPE_EXPORT igs_result_t igsagent_service_reply_arg_remove(igsagent_t *self, const char *service_name,
                                                                 const char *reply_name,
                                                                 const char *arg_name);
@@ -259,6 +273,7 @@ INGESCAPE_EXPORT igs_result_t igsagent_attribute_set_string (igsagent_t *self, c
 INGESCAPE_EXPORT igs_result_t igsagent_attribute_set_data (igsagent_t *self, const char *name, void *value, size_t size);
 INGESCAPE_EXPORT igs_result_t igsagent_attribute_add_constraint(igsagent_t *self, const char *name, const char *constraint);
 INGESCAPE_EXPORT igs_result_t igsagent_attribute_set_description(igsagent_t *self, const char *name, const char *description);
+INGESCAPE_EXPORT char * igsagent_attribute_description(igsagent_t *self, const char *name);//caller owns returned value
 INGESCAPE_EXPORT igs_result_t igsagent_attribute_set_detailed_type(igsagent_t *self, const char *name,
                                                                    const char *type_name, const char *specification);
 INGESCAPE_EXPORT void igsagent_clear_attribute (igsagent_t *self, const char *name);

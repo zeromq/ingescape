@@ -644,16 +644,34 @@ igs_result_t igs_input_set_description(const char *name, const char *description
     return igsagent_input_set_description (core_agent, name, description);
 }
 
+char * igs_input_description(const char *name)
+{
+    core_init_agent ();
+    return igsagent_input_description (core_agent, name);
+}
+
 igs_result_t igs_output_set_description(const char *name, const char *description)
 {
     core_init_agent ();
     return igsagent_output_set_description(core_agent, name, description);
 }
 
+char * igs_output_description(const char *name)
+{
+    core_init_agent ();
+    return igsagent_output_description (core_agent, name);
+}
+
 igs_result_t igs_attribute_set_description(const char *name, const char *description)
 {
     core_init_agent ();
     return igsagent_attribute_set_description (core_agent, name, description);
+}
+
+char * igs_attribute_description(const char *name)
+{
+    core_init_agent ();
+    return igsagent_attribute_description (core_agent, name);
 }
 
 igs_result_t igs_input_set_detailed_type(const char *name, const char *type_name, const char *specification)
@@ -1291,6 +1309,20 @@ igs_result_t igs_service_remove (const char *name)
     return result;
 }
 
+igs_result_t igs_service_set_description (const char *name, const char *description)
+{
+    assert (name);
+    core_init_agent ();
+    return igsagent_service_set_description (core_agent, name, description);
+}
+
+char * igs_service_description (const char *name)
+{
+    assert (name);
+    core_init_agent ();
+    return igsagent_service_description (core_agent, name);
+}
+
 igs_result_t igs_service_arg_add (const char *service_name,
                                   const char *arg_name,
                                   igs_io_value_type_t type)
@@ -1306,9 +1338,35 @@ igs_result_t igs_service_arg_remove (const char *service_name,
     return igsagent_service_arg_remove (core_agent, service_name, arg_name);
 }
 
+igs_result_t igs_service_arg_set_description(const char *service_name,
+                                             const char *arg_name,
+                                             const char *description)
+{
+    core_init_agent ();
+    return igsagent_service_arg_set_description (core_agent, service_name, arg_name, description);
+}
+
+char * igs_service_arg_description (const char *service_name, const char *arg_name)
+{
+    core_init_agent ();
+    return igsagent_service_arg_description (core_agent, service_name, arg_name);
+}
+
 igs_result_t igs_service_reply_add(const char *service_name, const char *reply_name){
     core_init_agent ();
     return igsagent_service_reply_add(core_agent, service_name, reply_name);
+}
+
+igs_result_t igs_service_reply_set_description(const char *service_name, const char *reply_name, const char *description)
+{
+    core_init_agent ();
+    return igsagent_service_reply_set_description(core_agent, service_name, reply_name, description);
+}
+
+char * igs_service_reply_description(const char *service_name, const char *reply_name)
+{
+    core_init_agent ();
+    return igsagent_service_reply_description(core_agent, service_name, reply_name);
 }
 
 igs_result_t igs_service_reply_remove(const char *service_name, const char *reply_name){
@@ -1320,6 +1378,18 @@ igs_result_t igs_service_reply_arg_add(const char *service_name, const char *rep
                                        igs_io_value_type_t type){
     core_init_agent ();
     return igsagent_service_reply_arg_add(core_agent, service_name, reply_name, arg_name, type);
+}
+
+igs_result_t igs_service_reply_arg_set_description(const char *service_name, const char *reply_name, const char *arg_name, const char *description)
+{
+    core_init_agent ();
+    return igsagent_service_reply_arg_set_description(core_agent, service_name, reply_name, arg_name, description);
+}
+
+char * igs_service_reply_arg_description(const char *service_name, const char *reply_name, const char *arg_name)
+{
+    core_init_agent ();
+    return igsagent_service_reply_arg_description(core_agent, service_name, reply_name, arg_name);
 }
 
 igs_result_t igs_service_reply_arg_remove(const char *service_name, const char *reply_name,

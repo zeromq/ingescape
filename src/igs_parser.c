@@ -128,7 +128,9 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
     const char *attributes_path_deprecated[] = {STR_DEFINITION, STR_ATTRIBUTES_DEPRECATED, NULL};
     const char *services_path[] = {STR_DEFINITION, STR_SERVICES, NULL};
     const char *service_path_deprecated[] = {STR_DEFINITION, STR_SERVICES_DEPRECATED, NULL};
+    const char *service_description_path[] = {STR_DESCRIPTION, NULL};
     const char *arguments_path[] = {STR_ARGUMENTS, NULL};
+    const char *argument_description_path[] = {STR_DESCRIPTION, NULL};
     const char *agent_name_path[] = {STR_DEFINITION, STR_NAME, NULL};
     const char *name_path[] = {STR_NAME, NULL};
     const char *class_path[] = {STR_DEFINITION, STR_CLASS, NULL};
@@ -434,9 +436,9 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                 zlist_autofree(service->replies_names_ordered);
                 service->replies = zhashx_new();
 
-                description = igs_json_node_find (services->u.array.values[i], description_path);
+                description = igs_json_node_find (services->u.array.values[i], service_description_path);
                 if (description && description->type == IGS_JSON_STRING && description->u.string)
-                    service->description = strdup (description->u.string);
+                    service->description = s_strndup (description->u.string, IGS_MAX_DESCRIPTION_LENGTH);
 
                 igs_json_node_t *arguments = igs_json_node_find (services->u.array.values[i], arguments_path);
                 if (arguments && arguments->type == IGS_JSON_ARRAY) {
@@ -453,6 +455,11 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                                 igs_json_node_t *arg_type = igs_json_node_find (arguments->u.array.values[j], type_path);
                                 if (arg_type && arg_type->type == IGS_JSON_STRING && arg_type->u.string)
                                     new_arg->type = s_string_to_value_type (arg_type->u.string);
+
+                                description = igs_json_node_find (arguments->u.array.values[j], argument_description_path);
+                                if (description && description->type == IGS_JSON_STRING && description->u.string)
+                                    new_arg->description = s_strndup (description->u.string, IGS_MAX_DESCRIPTION_LENGTH);
+
                                 igs_service_arg_t *last_arg = service->arguments;
                                 while (last_arg && last_arg->next) {
                                     last_arg = last_arg->next;
@@ -478,6 +485,11 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                                 igs_warn ("reply name '%s' has been changed to '%s'", reply_name->u.string, corrected_reply_name);
                             igs_service_t *my_reply = (igs_service_t *) zmalloc (sizeof (igs_service_t));
                             my_reply->name = corrected_reply_name;
+                            
+                            igs_json_node_t *replyDescription = igs_json_node_find (replies->u.array.values[j], service_description_path);
+                            if (replyDescription && replyDescription->type == IGS_JSON_STRING && replyDescription->u.string)
+                                my_reply->description = s_strndup (replyDescription->u.string, IGS_MAX_DESCRIPTION_LENGTH);
+                            
                             my_reply->replies_names_ordered = zlist_new();
                             zlist_comparefn(my_reply->replies_names_ordered, (zlist_compare_fn*) strcmp);
                             zlist_autofree(my_reply->replies_names_ordered);
@@ -495,6 +507,11 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                                                 igs_warn ("reply argument name '%s' has been changed to '%s'", arg_name->u.string, corrected_reply_arg_name);
                                             igs_service_arg_t *new_arg = (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
                                             new_arg->name = corrected_reply_arg_name;
+                                            
+                                            description = igs_json_node_find (arguments->u.array.values[j], argument_description_path);
+                                            if (description && description->type == IGS_JSON_STRING && description->u.string)
+                                                new_arg->description = s_strndup (description->u.string, IGS_MAX_DESCRIPTION_LENGTH);
+                                            
                                             igs_json_node_t *arg_type = igs_json_node_find (arguments->u.array.values[len], type_path);
                                             if (arg_type && arg_type->type == IGS_JSON_STRING && arg_type->u.string)
                                                 new_arg->type = s_string_to_value_type (arg_type->u.string);
@@ -1084,6 +1101,10 @@ char *parser_export_definition (igs_definition_t *def)
                         igs_json_open_map (json);
                         igs_json_add_string (json, STR_NAME);
                         igs_json_add_string (json, argument->name);
+                        if (argument->description) {
+                            igs_json_add_string (json, STR_DESCRIPTION);
+                            igs_json_add_string (json, argument->description);
+                        }
                         igs_json_add_string (json, STR_TYPE);
                         igs_json_add_string (
                                                 json, s_value_type_to_string (argument->type));
@@ -1118,6 +1139,10 @@ char *parser_export_definition (igs_definition_t *def)
                                     igs_json_open_map (json);
                                     igs_json_add_string (json, STR_NAME);
                                     igs_json_add_string (json, argument->name);
+                                    if (argument->description) {
+                                        igs_json_add_string (json, STR_DESCRIPTION);
+                                        igs_json_add_string (json, argument->description);
+                                    }
                                     igs_json_add_string (json, STR_TYPE);
                                     igs_json_add_string (
                                                             json,
