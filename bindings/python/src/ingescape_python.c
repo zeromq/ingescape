@@ -244,6 +244,15 @@ static PyMethodDef Ingescape_methods[] =
     {"service_arg_add", service_arg_add_wrapper, METH_VARARGS, "service_arg_add(service_name, argument_name, argument_type, )\n--\n\n "},
     {"service_arg_remove", service_arg_remove_wrapper, METH_VARARGS, "service_arg_remove(service_name, arg_name, )\n--\n\n "},
 
+    {"service_set_description", service_set_description_wrapper, METH_VARARGS, "service_set_description(service_name, description)\n--\n\n "},
+    {"service_description", service_description_wrapper, METH_VARARGS, "service_description(service_name)\n--\n\n "},
+    {"service_arg_set_description", service_arg_set_description_wrapper, METH_VARARGS, "service_arg_set_description(service_name, arg_name, description)\n--\n\n "},
+    {"service_arg_description", service_arg_description_wrapper, METH_VARARGS, "service_arg_description(service_name, arg_name)\n--\n\n "},
+    {"service_reply_set_description", service_reply_set_description_wrapper, METH_VARARGS, "service_reply_set_description(service_name, reply_name, description)\n--\n\n "},
+    {"service_reply_description", service_reply_description_wrapper, METH_VARARGS, "service_reply_description(service_name, reply_name)\n--\n\n "},
+    {"service_reply_arg_set_description", service_reply_arg_set_description_wrapper, METH_VARARGS, "service_reply_arg_set_description(service_name, reply_name, arg_name, description)\n--\n\n "},
+    {"service_reply_arg_description", service_reply_arg_description_wrapper, METH_VARARGS, "service_reply_arg_description(service_name, reply_name, arg_name)\n--\n\n "},
+
     {"service_reply_add", service_reply_add_wrapper, METH_VARARGS, "service_reply_add(service_name, reply_name, )\n--\n\n "},
     {"service_reply_remove", service_reply_remove_wrapper, METH_VARARGS, "service_reply_remove(service_name, reply_name, )\n--\n\n "},
     {"service_reply_arg_add", service_reply_arg_add_wrapper, METH_VARARGS, "service_reply_arg_add(service_name, reply_name, arg_name, type, )\n--\n\n "},
