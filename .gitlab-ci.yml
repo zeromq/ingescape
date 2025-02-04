@@ -1105,7 +1105,11 @@ publish-python-package:
     - cd bindings/python
     - python3 -m pip install --upgrade twine build
     - python3 -m build --sdist
-    - python3 -m twine upload -u ${PYPI_USERNAME} -p ${PYPI_PASSWORD} dist/* wheelhouse/*
+    - |
+      if [[ $CI_PROJECT_ROOT_NAMESPACE == "ingescape-private" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]
+      then
+        python3 -m twine upload -u ${PYPI_USERNAME} -p ${PYPI_PASSWORD} dist/* wheelhouse/*
+      fi
   dependencies:
     - package-python-wheels-windows
     - package-python-wheels-macos
@@ -1124,8 +1128,6 @@ publish-python-package:
     paths:
       - bindings/python/dist/*
       - bindings/python/wheelhouse/*
-  rules:
-    - !reference [.root_namespace, rules]
 
 #   _____     _  _
 #  / ____|  _| || |_
