@@ -29,6 +29,3 @@ Run the following commands from the Ingescape Python directory :
     python3 -m pip install .
 
 The last command will build and install the python binding on your environment.
-
-You can also build the python binding against the ingescape library installed on you system.
-To do so, you must define the environment variable `USE_SYSTEM_LIBS=1` before executing the build commands above.
