@@ -852,9 +852,24 @@ void run_static_tests (int argc, const char * argv[]){
     //definition - part 2
     //TODO: compare exported def, saved file and reference file
     //io description
+    assert (igs_input_description("my impulsion") == NULL);
     assert (igs_input_set_description("my impulsion", "my io description here") == IGS_SUCCESS);
+    char * inputDescription = igs_input_description("my impulsion");
+    assert (streq(inputDescription, "my io description here"));
+    free(inputDescription);
+    
+    assert (igs_output_description("my impulsion") == NULL);
     assert (igs_output_set_description("my impulsion", "my io description here") == IGS_SUCCESS);
+    char * outputDescription = igs_output_description("my impulsion");
+    assert (streq(outputDescription, "my io description here"));
+    free(outputDescription);
+    
+    assert (igs_attribute_description("my impulsion") == NULL);
     assert (igs_attribute_set_description("my impulsion", "my io description here") == IGS_SUCCESS);
+    char * attributeDescription = igs_attribute_description("my impulsion");
+    assert (streq(attributeDescription, "my io description here"));
+    free(attributeDescription);
+    
     assert (igs_input_set_detailed_type("my impulsion", "protobuf", "some prototbuf \"here\"") == IGS_SUCCESS);
     assert (igs_output_set_detailed_type("my impulsion", "protobuf", "some prototbuf \"here\"") == IGS_SUCCESS);
     assert (igs_attribute_set_detailed_type("my impulsion", "protobuf", "some prototbuf \"here\"") == IGS_SUCCESS);
@@ -1175,13 +1190,43 @@ void run_static_tests (int argc, const char * argv[]){
     assert(igs_service_exists("myService"));
     listOfStrings = igs_service_list(&nbElements);
     assert(nbElements == 1 && streq(listOfStrings[0], "myService"));
+    
+    assert(igs_service_description("myService") == NULL);
+    assert(igs_service_set_description("unknow", "myService description") == IGS_FAILURE);
+    assert(igs_service_set_description("myService", "myService description") == IGS_SUCCESS);
+    char * servicedescription = igs_service_description("myService");
+    assert(streq(servicedescription, "myService description"));
+    free(servicedescription);
+    
+    assert(igs_service_arg_description("myService", "myBool") == NULL);
+    assert(igs_service_arg_set_description("unknow", "myBool", "myBool description") == IGS_FAILURE);
+    assert(igs_service_arg_set_description("myService", "unknow", "myBool description") == IGS_FAILURE);
+    assert(igs_service_arg_set_description("myService", "myBool", "myBool description") == IGS_SUCCESS);
+    char * serviceArgDescription = igs_service_arg_description("myService", "myBool");
+    assert(streq(serviceArgDescription, "myBool description"));
+    free(serviceArgDescription);
+    assert(igs_service_arg_description("unknow", "myBool") == NULL);
+    assert(igs_service_arg_description("myService", "unknow") == NULL);
+    
+    char * currentDefinition = igs_definition_json();
+    igs_clear_definition();
+    igs_definition_load_str(currentDefinition);
+    char * newServiceDescription = igs_service_description("myService");
+    assert(streq(newServiceDescription, "myService description"));
+    free(newServiceDescription);
+    char * newServiceArgDescription = igs_service_arg_description("myService", "myBool");
+    assert(streq(newServiceArgDescription, "myBool description"));
+    free(newServiceArgDescription);
+    
     igs_free_services_list(listOfStrings, nbElements);
     listOfStrings = NULL;
     assert(listOfStrings == NULL);
     assert(igs_service_remove("myService") == IGS_SUCCESS);
 
     assert(igs_service_init("myService", testerServiceCallback, NULL) == IGS_SUCCESS);
+    assert(igs_service_set_description("myService", "myService description") == IGS_SUCCESS);
     assert(igs_service_arg_add("myService", "myBool", IGS_BOOL_T) == IGS_SUCCESS);
+    assert(igs_service_arg_set_description("myService", "myBool", "myBool description") == IGS_SUCCESS);
     assert(igs_service_arg_add("myService", "myInt", IGS_INTEGER_T) == IGS_SUCCESS);
     assert(igs_service_arg_add("myService", "myDouble", IGS_DOUBLE_T) == IGS_SUCCESS);
     assert(igs_service_arg_add("myService", "myString", IGS_STRING_T) == IGS_SUCCESS);
@@ -1266,6 +1311,38 @@ void run_static_tests (int argc, const char * argv[]){
     names = igs_service_reply_names("myServiceWithReplies", &replies_nb);
     assert(names && replies_nb == 2 && streq("myReply", names[0]) && streq("myReply2", names[1]));
     igs_free_services_list(names, replies_nb);
+    
+    assert(igs_service_reply_description("myServiceWithReplies", "myReply") == NULL);
+    assert(igs_service_reply_set_description("unknow", "myReply", "myServiceReply description") == IGS_FAILURE);
+    assert(igs_service_reply_set_description("myServiceWithReplies", "unknow", "myServiceReply description") == IGS_FAILURE);
+    assert(igs_service_reply_set_description("myServiceWithReplies", "myReply", "myServiceReply description") == IGS_SUCCESS);
+    char * replyDescription = igs_service_reply_description("myServiceWithReplies", "myReply");
+    assert(streq(replyDescription, "myServiceReply description"));
+    free(replyDescription);
+    
+    assert(igs_service_reply_arg_add("myServiceWithReplies", "myReply", "myBool", IGS_BOOL_T) == IGS_SUCCESS);
+    assert(igs_service_reply_arg_description("myServiceWithReplies", "myReply", "myBool") == NULL);
+    assert(igs_service_reply_arg_set_description("unknow", "myReply", "myBool", "myArgBool description") == IGS_FAILURE);
+    assert(igs_service_reply_arg_set_description("myServiceWithReplies", "unknow", "myBool", "myArgBool description") == IGS_FAILURE);
+    assert(igs_service_reply_arg_set_description("myServiceWithReplies", "myReply", "unknow", "myArgBool description") == IGS_FAILURE);
+    assert(igs_service_reply_arg_set_description("myServiceWithReplies", "myReply", "myBool", "myArgBool description") == IGS_SUCCESS);
+    char * replyArgDescription = igs_service_reply_arg_description("myServiceWithReplies", "myReply", "myBool");
+    assert(streq(replyArgDescription, "myArgBool description"));
+    free(replyArgDescription);
+    
+    currentDefinition = igs_definition_json();
+    igs_clear_definition();
+    igs_definition_load_str(currentDefinition);
+    char * newReplyDescription = igs_service_reply_description("myServiceWithReplies", "myReply");
+    assert(streq(newReplyDescription, "myServiceReply description"));
+    free(newReplyDescription);
+    char * newReplyArgDescription = igs_service_reply_arg_description("myServiceWithReplies", "myReply", "myBool");
+    assert(streq(newReplyArgDescription, "myArgBool description"));
+    free(newReplyArgDescription);
+    
+    assert(igs_service_reply_arg_set_description("myServiceWithReplies", "myReply", "myBool", "") == IGS_SUCCESS);
+    igs_service_reply_arg_remove("myServiceWithReplies", "myReply", "myBool");
+    
     assert(igs_service_reply_args_first("myServiceWithReplies", "myReply") == NULL);
     assert(igs_service_reply_args_count("myServiceWithReplies", "myReply") == 0);
     assert(igs_service_reply_arg_add("myServiceWithReplies", "myReply", "myBool", IGS_BOOL_T) == IGS_SUCCESS);
@@ -1909,7 +1986,7 @@ void set_timeCB(igs_io_type_t io_type,
 //
 int main(int argc, const char * argv[]) {
     
-    char *t0 = "Ma classe étrange <(🦄)>";
+    const char *t0 = "Ma classe étrange <(🦄)>";
     char *t1 = strdup("Ma classe étrange <(🦄)>");
     char *t2 = strdup("Ma classe étrange <(🦄)>\n");
     char *t3 = strdup("\nMa classe étrange <(🦄)>");

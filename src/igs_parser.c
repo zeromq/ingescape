@@ -128,7 +128,9 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
     const char *attributes_path_deprecated[] = {STR_DEFINITION, STR_ATTRIBUTES_DEPRECATED, NULL};
     const char *services_path[] = {STR_DEFINITION, STR_SERVICES, NULL};
     const char *service_path_deprecated[] = {STR_DEFINITION, STR_SERVICES_DEPRECATED, NULL};
+    const char *service_description_path[] = {STR_DESCRIPTION, NULL};
     const char *arguments_path[] = {STR_ARGUMENTS, NULL};
+    const char *argument_description_path[] = {STR_DESCRIPTION, NULL};
     const char *agent_name_path[] = {STR_DEFINITION, STR_NAME, NULL};
     const char *name_path[] = {STR_NAME, NULL};
     const char *class_path[] = {STR_DEFINITION, STR_CLASS, NULL};
@@ -140,12 +142,13 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
     const char *family_path[] = {STR_DEFINITION, STR_FAMILY, NULL};
     const char *type_path[] = {STR_TYPE, NULL};
     const char *replies_path[] = {STR_REPLIES, NULL};
+    size_t changes = 0;
 
     // name is mandatory
     igs_json_node_t *name = igs_json_node_find (*json, agent_name_path);
     if (name && name->type == IGS_JSON_STRING && name->u.string) {
         char *n = s_strndup (name->u.string, IGS_MAX_AGENT_NAME_LENGTH);
-        size_t changes = model_clean_string(n, IGS_MAX_AGENT_NAME_LENGTH);
+        changes = model_clean_string(n, IGS_MAX_AGENT_NAME_LENGTH);
         if (changes)
             igs_warn ("definition name '%s' has been changed to '%s'", name->u.string, n);
         //FIXME: Use a definition method to create the definition
@@ -176,7 +179,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
     igs_json_node_t *class = igs_json_node_find (*json, class_path);
     if (class && class->type == IGS_JSON_STRING && class->u.string){
         definition->my_class = strdup (class->u.string);
-        size_t changes = model_clean_string(definition->my_class, IGS_MAX_AGENT_CLASS_LENGTH);
+        changes = model_clean_string(definition->my_class, IGS_MAX_AGENT_CLASS_LENGTH);
         if (changes)
             igs_warn ("definition class '%s' has been changed to '%s'", class->u.string, definition->my_class);
     }
@@ -185,7 +188,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
     igs_json_node_t *package = igs_json_node_find (*json, package_path);
     if (package && package->type == IGS_JSON_STRING && package->u.string){
         definition->package = strdup (package->u.string);
-        size_t changes = model_clean_string(definition->package, IGS_MAX_AGENT_PACKAGE_LENGTH);
+        changes = model_clean_string(definition->package, IGS_MAX_AGENT_PACKAGE_LENGTH);
         if (changes)
             igs_warn ("definition package '%s' has been changed to '%s'", package->u.string, definition->package);
     }
@@ -194,7 +197,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
     igs_json_node_t *family = igs_json_node_find (*json, family_path);
     if (family && family->type == IGS_JSON_STRING && family->u.string){
         definition->family = s_strndup(family->u.string, IGS_MAX_FAMILY_LENGTH);
-        size_t changes = model_clean_string(definition->family, IGS_MAX_FAMILY_LENGTH);
+        changes = model_clean_string(definition->family, IGS_MAX_FAMILY_LENGTH);
         if (changes)
             igs_warn ("definition family '%s' has been changed to '%s'", family->u.string, definition->family);
     }
@@ -208,7 +211,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
     igs_json_node_t *version = igs_json_node_find (*json, version_path);
     if (version && version->type == IGS_JSON_STRING && version->u.string){
         definition->version = s_strndup(version->u.string, IGS_MAX_VERSION_LENGTH);
-        size_t changes = model_clean_string(definition->version, IGS_MAX_VERSION_LENGTH);
+        changes = model_clean_string(definition->version, IGS_MAX_VERSION_LENGTH);
         if (changes)
             igs_warn ("definition version '%s' has been changed to '%s'", version->u.string, definition->version);
     }
@@ -220,7 +223,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
             igs_json_node_t *io_name = igs_json_node_find (inputs->u.array.values[i], name_path);
             if (io_name && io_name->type == IGS_JSON_STRING && io_name->u.string) {
                 char *corrected_name = s_strndup (io_name->u.string, IGS_MAX_IO_NAME_LENGTH);
-                size_t changes = model_clean_string(corrected_name, IGS_MAX_IO_NAME_LENGTH);
+                changes = model_clean_string(corrected_name, IGS_MAX_IO_NAME_LENGTH);
                 if (changes)
                     igs_warn ("input name '%s' has been changed to '%s'", io_name->u.string, corrected_name);
                 igs_io_t *io = zhashx_lookup(definition->inputs_table, corrected_name);
@@ -260,7 +263,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                     if (io->detailed_type)
                         free(io->detailed_type);
                     io->detailed_type = s_strndup(io_detailed_type->u.string, IGS_MAX_DETAILED_TYPE_LENGTH);
-                    size_t changes = model_clean_string(io->detailed_type, IGS_MAX_DETAILED_TYPE_LENGTH);
+                    changes = model_clean_string(io->detailed_type, IGS_MAX_DETAILED_TYPE_LENGTH);
                     if (changes)
                         igs_warn ("input detailed type '%s' has been changed to '%s'", io_detailed_type->u.string, io->detailed_type);
                 }
@@ -285,7 +288,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
             igs_json_node_t *io_name = igs_json_node_find (outputs->u.array.values[i], name_path);
             if (io_name && io_name->type == IGS_JSON_STRING && io_name->u.string) {
                 char *corrected_name = s_strndup (io_name->u.string, IGS_MAX_IO_NAME_LENGTH);
-                size_t changes = model_clean_string(corrected_name, IGS_MAX_IO_NAME_LENGTH);
+                changes = model_clean_string(corrected_name, IGS_MAX_IO_NAME_LENGTH);
                 if (changes)
                     igs_warn ("output name '%s' has been changed to '%s'", io_name->u.string, corrected_name);
                 igs_io_t *io = zhashx_lookup(definition->outputs_table, corrected_name);
@@ -323,7 +326,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                     if (io->detailed_type)
                         free(io->detailed_type);
                     io->detailed_type = s_strndup(io_detailed_type->u.string, IGS_MAX_DETAILED_TYPE_LENGTH);
-                    size_t changes = model_clean_string(io->detailed_type, IGS_MAX_DETAILED_TYPE_LENGTH);
+                    changes = model_clean_string(io->detailed_type, IGS_MAX_DETAILED_TYPE_LENGTH);
                     if (changes)
                         igs_warn ("output detailed type '%s' has been changed to '%s'", io_detailed_type->u.string, io->detailed_type);
                 }
@@ -351,7 +354,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
             igs_json_node_t *io_name = igs_json_node_find (attributes->u.array.values[i], name_path);
             if (io_name && io_name->type == IGS_JSON_STRING && io_name->u.string) {
                 char *corrected_name = s_strndup (io_name->u.string, IGS_MAX_IO_NAME_LENGTH);
-                size_t changes = model_clean_string(corrected_name, IGS_MAX_IO_NAME_LENGTH);
+                changes = model_clean_string(corrected_name, IGS_MAX_IO_NAME_LENGTH);
                 if (changes)
                     igs_warn ("attribute name '%s' has been changed to '%s'", io_name->u.string, corrected_name);
                 igs_io_t *io = zhashx_lookup(definition->attributes_table, corrected_name);
@@ -389,7 +392,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                     if (io->detailed_type)
                         free(io->detailed_type);
                     io->detailed_type = s_strndup(io_detailed_type->u.string, IGS_MAX_DETAILED_TYPE_LENGTH);
-                    size_t changes = model_clean_string(io->detailed_type, IGS_MAX_DETAILED_TYPE_LENGTH);
+                    changes = model_clean_string(io->detailed_type, IGS_MAX_DETAILED_TYPE_LENGTH);
                     if (changes)
                         igs_warn ("attribute detailed type '%s' has been changed to '%s'", io_detailed_type->u.string, io->detailed_type);
                 }
@@ -417,7 +420,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
               igs_json_node_find (services->u.array.values[i], name_path);
             if (service_name && service_name->type == IGS_JSON_STRING && service_name->u.string) {
                 char *corrected_name = s_strndup (service_name->u.string, IGS_MAX_SERVICE_NAME_LENGTH);
-                size_t changes = model_clean_string(corrected_name, IGS_MAX_SERVICE_NAME_LENGTH);
+                changes = model_clean_string(corrected_name, IGS_MAX_SERVICE_NAME_LENGTH);
                 if (changes)
                     igs_warn ("service name '%s' has been changed to '%s'", service_name->u.string, corrected_name);
                 igs_service_t *service = zhashx_lookup(definition->services_table, corrected_name);
@@ -434,9 +437,9 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                 zlist_autofree(service->replies_names_ordered);
                 service->replies = zhashx_new();
 
-                description = igs_json_node_find (services->u.array.values[i], description_path);
+                description = igs_json_node_find (services->u.array.values[i], service_description_path);
                 if (description && description->type == IGS_JSON_STRING && description->u.string)
-                    service->description = strdup (description->u.string);
+                    service->description = s_strndup (description->u.string, IGS_MAX_DESCRIPTION_LENGTH);
 
                 igs_json_node_t *arguments = igs_json_node_find (services->u.array.values[i], arguments_path);
                 if (arguments && arguments->type == IGS_JSON_ARRAY) {
@@ -453,6 +456,11 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                                 igs_json_node_t *arg_type = igs_json_node_find (arguments->u.array.values[j], type_path);
                                 if (arg_type && arg_type->type == IGS_JSON_STRING && arg_type->u.string)
                                     new_arg->type = s_string_to_value_type (arg_type->u.string);
+
+                                description = igs_json_node_find (arguments->u.array.values[j], argument_description_path);
+                                if (description && description->type == IGS_JSON_STRING && description->u.string)
+                                    new_arg->description = s_strndup (description->u.string, IGS_MAX_DESCRIPTION_LENGTH);
+
                                 igs_service_arg_t *last_arg = service->arguments;
                                 while (last_arg && last_arg->next) {
                                     last_arg = last_arg->next;
@@ -478,6 +486,11 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                                 igs_warn ("reply name '%s' has been changed to '%s'", reply_name->u.string, corrected_reply_name);
                             igs_service_t *my_reply = (igs_service_t *) zmalloc (sizeof (igs_service_t));
                             my_reply->name = corrected_reply_name;
+                            
+                            igs_json_node_t *replyDescription = igs_json_node_find (replies->u.array.values[j], service_description_path);
+                            if (replyDescription && replyDescription->type == IGS_JSON_STRING && replyDescription->u.string)
+                                my_reply->description = s_strndup (replyDescription->u.string, IGS_MAX_DESCRIPTION_LENGTH);
+                            
                             my_reply->replies_names_ordered = zlist_new();
                             zlist_comparefn(my_reply->replies_names_ordered, (zlist_compare_fn*) strcmp);
                             zlist_autofree(my_reply->replies_names_ordered);
@@ -495,6 +508,11 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                                                 igs_warn ("reply argument name '%s' has been changed to '%s'", arg_name->u.string, corrected_reply_arg_name);
                                             igs_service_arg_t *new_arg = (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
                                             new_arg->name = corrected_reply_arg_name;
+                                            
+                                            description = igs_json_node_find (arguments->u.array.values[j], argument_description_path);
+                                            if (description && description->type == IGS_JSON_STRING && description->u.string)
+                                                new_arg->description = s_strndup (description->u.string, IGS_MAX_DESCRIPTION_LENGTH);
+                                            
                                             igs_json_node_t *arg_type = igs_json_node_find (arguments->u.array.values[len], type_path);
                                             if (arg_type && arg_type->type == IGS_JSON_STRING && arg_type->u.string)
                                                 new_arg->type = s_string_to_value_type (arg_type->u.string);
@@ -547,6 +565,7 @@ igs_mapping_t *parser_parse_mapping_from_node (igs_json_node_t **json)
     const char *alternate_from_input_path[] = {STR_LEGACY_FROM_INPUT, NULL};
     const char *alternate_to_agent_path[] = {STR_LEGACY_TO_AGENT, NULL};
     const char *alternate_to_output_path[] = {STR_LEGACY_TO_OUTPUT, NULL};
+    size_t changes = 0;
 
     bool use_alternate = false;
     igs_json_node_t *mappings = igs_json_node_find (*json, mappings_path);
@@ -592,21 +611,21 @@ igs_mapping_t *parser_parse_mapping_from_node (igs_json_node_t **json)
             }
             if (from_input_node && from_input_node->type == IGS_JSON_STRING && from_input_node->u.string) {
                 char *corrected_name = s_strndup (from_input_node->u.string, IGS_MAX_IO_NAME_LENGTH);
-                size_t changes = model_clean_string(corrected_name, IGS_MAX_IO_NAME_LENGTH);
+                changes = model_clean_string(corrected_name, IGS_MAX_IO_NAME_LENGTH);
                 if (changes)
                     igs_warn("mapping input name '%s' has been changed to '%s'", from_input_node->u.string, corrected_name);
                 from_input = corrected_name;
             }
             if (to_agent_node && to_agent_node->type == IGS_JSON_STRING && to_agent_node->u.string) {
                 char *corrected_name = s_strndup (to_agent_node->u.string, IGS_MAX_AGENT_NAME_LENGTH);
-                size_t changes = model_clean_string(corrected_name, IGS_MAX_AGENT_NAME_LENGTH);
+                changes = model_clean_string(corrected_name, IGS_MAX_AGENT_NAME_LENGTH);
                 if (changes)
                     igs_warn("mapping agent name '%s' has been changed to '%s'", to_agent_node->u.string, corrected_name);
                 to_agent = corrected_name;
             }
             if (to_output_node && to_output_node->type == IGS_JSON_STRING && to_output_node->u.string) {
                 char *corrected_name = s_strndup (to_output_node->u.string, IGS_MAX_IO_NAME_LENGTH);
-                size_t changes = model_clean_string(corrected_name, IGS_MAX_IO_NAME_LENGTH);
+                changes = model_clean_string(corrected_name, IGS_MAX_IO_NAME_LENGTH);
                 if (changes)
                     igs_warn("mapping output name '%s' has been changed to '%s'", to_output_node->u.string, corrected_name);
                 to_output = corrected_name;
@@ -666,21 +685,21 @@ igs_mapping_t *parser_parse_mapping_from_node (igs_json_node_t **json)
 
             if (from_input_node && from_input_node->type == IGS_JSON_STRING && from_input_node->u.string) {
                 char *corrected_name = s_strndup (from_input_node->u.string, IGS_MAX_IO_NAME_LENGTH);
-                size_t changes = model_clean_string(corrected_name, IGS_MAX_IO_NAME_LENGTH);
+                changes = model_clean_string(corrected_name, IGS_MAX_IO_NAME_LENGTH);
                 if (changes)
                     igs_warn("split input name '%s' has been changed to '%s'", from_input_node->u.string, corrected_name);
                 from_input = corrected_name;
             }
             if (to_agent_node && to_agent_node->type == IGS_JSON_STRING && to_agent_node->u.string) {
                 char *corrected_name = s_strndup (to_agent_node->u.string, IGS_MAX_IO_NAME_LENGTH);
-                size_t changes = model_clean_string(corrected_name, IGS_MAX_AGENT_NAME_LENGTH);
+                changes = model_clean_string(corrected_name, IGS_MAX_AGENT_NAME_LENGTH);
                 if (changes)
                     igs_warn("split agent name '%s' has been changed to '%s'", to_agent_node->u.string, corrected_name);
                 to_agent = corrected_name;
             }
             if (to_output_node && to_output_node->type == IGS_JSON_STRING && to_output_node->u.string) {
                 char *corrected_name = s_strndup (to_output_node->u.string, IGS_MAX_IO_NAME_LENGTH);
-                size_t changes = model_clean_string(corrected_name, IGS_MAX_IO_NAME_LENGTH);
+                changes = model_clean_string(corrected_name, IGS_MAX_IO_NAME_LENGTH);
                 if (changes)
                     igs_warn("split output name '%s' has been changed to '%s'", to_output_node->u.string, corrected_name);
                 to_output = corrected_name;
@@ -1084,6 +1103,10 @@ char *parser_export_definition (igs_definition_t *def)
                         igs_json_open_map (json);
                         igs_json_add_string (json, STR_NAME);
                         igs_json_add_string (json, argument->name);
+                        if (argument->description) {
+                            igs_json_add_string (json, STR_DESCRIPTION);
+                            igs_json_add_string (json, argument->description);
+                        }
                         igs_json_add_string (json, STR_TYPE);
                         igs_json_add_string (
                                                 json, s_value_type_to_string (argument->type));
@@ -1118,6 +1141,10 @@ char *parser_export_definition (igs_definition_t *def)
                                     igs_json_open_map (json);
                                     igs_json_add_string (json, STR_NAME);
                                     igs_json_add_string (json, argument->name);
+                                    if (argument->description) {
+                                        igs_json_add_string (json, STR_DESCRIPTION);
+                                        igs_json_add_string (json, argument->description);
+                                    }
                                     igs_json_add_string (json, STR_TYPE);
                                     igs_json_add_string (
                                                             json,

@@ -481,6 +481,42 @@ igs_result_t s_model_set_description(igsagent_t *self, igs_io_type_t type,
     return IGS_SUCCESS;
 }
 
+char * s_model_get_description(igsagent_t *self, igs_io_type_t type,
+                                     const char *name)
+{
+    assert(self);
+    assert(name);
+    igs_io_t *io = NULL;
+    if (type == IGS_INPUT_T) {
+        io = zhashx_lookup (self->definition->inputs_table, name);
+        if (!io) {
+            igsagent_error (self, "Input %s cannot be found", name);
+            return NULL;
+        }
+    }
+    else
+        if (type == IGS_OUTPUT_T) {
+            io = zhashx_lookup (self->definition->outputs_table, name);
+            if (!io) {
+                igsagent_error (self, "Output %s cannot be found", name);
+                return NULL;
+            }
+        }
+        else
+            if (type == IGS_ATTRIBUTE_T) {
+                io = zhashx_lookup (self->definition->attributes_table, name);
+                if (!io) {
+                    igsagent_error (self, "Parameter %s cannot be found", name);
+                    return NULL;
+                }
+            }
+            else {
+                igsagent_error (self, "Unknown IOP type %d", type);
+                return NULL;
+            }
+    return (io && io->description) ? strdup(io->description) : NULL;
+}
+
 igs_result_t s_model_set_detailed_type(igsagent_t *self, igs_io_type_t type,
                                        const char *name, const char *type_name,
                                        const char *specification)
@@ -784,7 +820,7 @@ size_t model_clean_string(char *string, int64_t max){
         max = INT64_MAX;
     char *char_index = string;
     size_t offset = 0;
-    size_t write_index = 0;
+    int64_t write_index = 0;
     while (1) {
         while (*(char_index+offset) == '\t'
             || *(char_index+offset) == '\v'
@@ -812,7 +848,7 @@ bool model_check_string(const char *string, int64_t max){
     assert(string);
     if (max <= 0)
         max = INT64_MAX;
-    size_t offset = 0;
+    int64_t offset = 0;
     while (1) {
         if (string[offset] == '\t'
             || string[offset] == '\v'
@@ -2099,6 +2135,17 @@ igs_result_t igsagent_input_set_description(igsagent_t *self, const char *name, 
     return res;
 }
 
+char * igsagent_input_description(igsagent_t *self, const char *name)
+{
+    assert (self);
+    if (!self->uuid)
+        return NULL;
+    model_read_write_lock(__FUNCTION__, __LINE__);
+    char * description =  s_model_get_description(self, IGS_INPUT_T, name);
+    model_read_write_unlock(__FUNCTION__, __LINE__);
+    return description;
+}
+
 igs_result_t igsagent_output_set_description(igsagent_t *self, const char *name, const char *description)
 {
     assert (self);
@@ -2110,6 +2157,17 @@ igs_result_t igsagent_output_set_description(igsagent_t *self, const char *name,
     return res;
 }
 
+char * igsagent_output_description(igsagent_t *self, const char *name)
+{
+    assert (self);
+    if (!self->uuid)
+        return NULL;
+    model_read_write_lock(__FUNCTION__, __LINE__);
+    char * description =  s_model_get_description(self, IGS_OUTPUT_T, name);
+    model_read_write_unlock(__FUNCTION__, __LINE__);
+    return description;
+}
+
 igs_result_t igsagent_attribute_set_description(igsagent_t *self, const char *name, const char *description)
 {
     assert (self);
@@ -2119,6 +2177,17 @@ igs_result_t igsagent_attribute_set_description(igsagent_t *self, const char *na
     igs_result_t res =  s_model_set_description(self, IGS_ATTRIBUTE_T, name, description);
     model_read_write_unlock(__FUNCTION__, __LINE__);
     return res;
+}
+
+char * igsagent_attribute_description(igsagent_t *self, const char *name)
+{
+    assert (self);
+    if (!self->uuid)
+        return NULL;
+    model_read_write_lock(__FUNCTION__, __LINE__);
+    char * description =  s_model_get_description(self, IGS_ATTRIBUTE_T, name);
+    model_read_write_unlock(__FUNCTION__, __LINE__);
+    return description;
 }
 
 igs_result_t igsagent_input_set_detailed_type(igsagent_t *self, const char *name,

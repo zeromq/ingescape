@@ -31,8 +31,8 @@
 
 //  INGESCAPE version macros for compile-time API detection
 #define INGESCAPE_VERSION_MAJOR 4
-#define INGESCAPE_VERSION_MINOR 2
-#define INGESCAPE_VERSION_PATCH 10
+#define INGESCAPE_VERSION_MINOR 3
+#define INGESCAPE_VERSION_PATCH 0
 
 #define INGESCAPE_MAKE_VERSION(major, minor, patch) \
 ((major) * 10000 + (minor) * 100 + (patch))
@@ -357,7 +357,9 @@ INGESCAPE_EXPORT igs_result_t igs_output_add_constraint(const char *name, const 
 
 //IO description
 INGESCAPE_EXPORT igs_result_t igs_input_set_description(const char *name, const char *description);
+INGESCAPE_EXPORT char * igs_input_description(const char *name);
 INGESCAPE_EXPORT igs_result_t igs_output_set_description(const char *name, const char *description);
+INGESCAPE_EXPORT char * igs_output_description(const char *name);
 
 /*IO detailed type
  This section enables to decribe precise specifications for IOs,
@@ -405,6 +407,7 @@ INGESCAPE_EXPORT bool igs_output_is_muted(const char *name);
 //services arguments
 struct _igs_service_arg_t{
     char *name;
+    char *description;
     igs_io_value_type_t type;
     union{
         bool b;
@@ -454,14 +457,22 @@ typedef void (igs_service_fn)(const char *sender_agent_name,
 
 INGESCAPE_EXPORT igs_result_t igs_service_init(const char *name, igs_service_fn cb, void *my_data);
 INGESCAPE_EXPORT igs_result_t igs_service_remove(const char *name);
+INGESCAPE_EXPORT igs_result_t igs_service_set_description (const char *name, const char *description);
+INGESCAPE_EXPORT char * igs_service_description (const char *name); //caller owns returned value
 INGESCAPE_EXPORT igs_result_t igs_service_arg_add(const char *service_name, const char *arg_name, igs_io_value_type_t type);
 INGESCAPE_EXPORT igs_result_t igs_service_arg_remove(const char *service_name,
                                                      const char *arg_name); //removes first occurence of an argument with this name
+INGESCAPE_EXPORT igs_result_t igs_service_arg_set_description(const char *service_name, const char *arg_name, const char *description);
+INGESCAPE_EXPORT char * igs_service_arg_description (const char *service_name, const char *arg_name); //caller owns returned value
 
 //replies are optional and used for specification purposes
 INGESCAPE_EXPORT igs_result_t igs_service_reply_add(const char *service_name, const char *reply_name);
+INGESCAPE_EXPORT igs_result_t igs_service_reply_set_description(const char *service_name, const char *reply_name, const char *description);
+INGESCAPE_EXPORT char * igs_service_reply_description(const char *service_name, const char *reply_name); //caller owns returned value
 INGESCAPE_EXPORT igs_result_t igs_service_reply_remove(const char *service_name, const char *reply_name);
 INGESCAPE_EXPORT igs_result_t igs_service_reply_arg_add(const char *service_name, const char *reply_name, const char *arg_name, igs_io_value_type_t type);
+INGESCAPE_EXPORT igs_result_t igs_service_reply_arg_set_description(const char *service_name, const char *reply_name, const char *arg_name, const char *description);
+INGESCAPE_EXPORT char * igs_service_reply_arg_description(const char *service_name, const char *reply_name, const char *arg_name); //caller owns returned value
 INGESCAPE_EXPORT igs_result_t igs_service_reply_arg_remove(const char *service_name,
                                                            const char *reply_name,
                                                            const char *arg_name);//removes first occurence of an argument with this name
@@ -515,6 +526,7 @@ INGESCAPE_EXPORT igs_result_t igs_attribute_set_data(const char *name, void *val
 
 INGESCAPE_EXPORT igs_result_t igs_attribute_add_constraint(const char *name, const char *constraint);
 INGESCAPE_EXPORT igs_result_t igs_attribute_set_description(const char *name, const char *description);
+INGESCAPE_EXPORT char * igs_attribute_description(const char *name);
 INGESCAPE_EXPORT igs_result_t igs_attribute_set_detailed_type(const char *param_name, const char *type_name, const char *specification);
 INGESCAPE_EXPORT void igs_clear_attribute(const char *name);
 
