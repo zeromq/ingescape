@@ -456,21 +456,21 @@ typedef void (igs_service_fn)(const char *sender_agent_name,
 INGESCAPE_EXPORT igs_result_t igs_service_init(const char *name, igs_service_fn cb, void *my_data);
 INGESCAPE_EXPORT igs_result_t igs_service_remove(const char *name);
 INGESCAPE_EXPORT igs_result_t igs_service_set_description (const char *name, const char *description);
-INGESCAPE_EXPORT char * igs_service_description (const char *name);
+INGESCAPE_EXPORT char * igs_service_description (const char *name); //caller owns returned value
 INGESCAPE_EXPORT igs_result_t igs_service_arg_add(const char *service_name, const char *arg_name, igs_io_value_type_t type);
 INGESCAPE_EXPORT igs_result_t igs_service_arg_remove(const char *service_name,
                                                      const char *arg_name); //removes first occurence of an argument with this name
 INGESCAPE_EXPORT igs_result_t igs_service_arg_set_description(const char *service_name, const char *arg_name, const char *description);
-INGESCAPE_EXPORT char * igs_service_arg_description (const char *service_name, const char *arg_name);
+INGESCAPE_EXPORT char * igs_service_arg_description (const char *service_name, const char *arg_name); //caller owns returned value
 
 //replies are optional and used for specification purposes
 INGESCAPE_EXPORT igs_result_t igs_service_reply_add(const char *service_name, const char *reply_name);
 INGESCAPE_EXPORT igs_result_t igs_service_reply_set_description(const char *service_name, const char *reply_name, const char *description);
-INGESCAPE_EXPORT char * igs_service_reply_description(const char *service_name, const char *reply_name);
+INGESCAPE_EXPORT char * igs_service_reply_description(const char *service_name, const char *reply_name); //caller owns returned value
 INGESCAPE_EXPORT igs_result_t igs_service_reply_remove(const char *service_name, const char *reply_name);
 INGESCAPE_EXPORT igs_result_t igs_service_reply_arg_add(const char *service_name, const char *reply_name, const char *arg_name, igs_io_value_type_t type);
 INGESCAPE_EXPORT igs_result_t igs_service_reply_arg_set_description(const char *service_name, const char *reply_name, const char *arg_name, const char *description);
-INGESCAPE_EXPORT char * igs_service_reply_arg_description(const char *service_name, const char *reply_name, const char *arg_name);
+INGESCAPE_EXPORT char * igs_service_reply_arg_description(const char *service_name, const char *reply_name, const char *arg_name); //caller owns returned value
 INGESCAPE_EXPORT igs_result_t igs_service_reply_arg_remove(const char *service_name,
                                                            const char *reply_name,
                                                            const char *arg_name);//removes first occurence of an argument with this name
