@@ -644,16 +644,34 @@ igs_result_t igs_input_set_description(const char *name, const char *description
     return igsagent_input_set_description (core_agent, name, description);
 }
 
+char * igs_input_description(const char *name)
+{
+    core_init_agent ();
+    return igsagent_input_description (core_agent, name);
+}
+
 igs_result_t igs_output_set_description(const char *name, const char *description)
 {
     core_init_agent ();
     return igsagent_output_set_description(core_agent, name, description);
 }
 
+char * igs_output_description(const char *name)
+{
+    core_init_agent ();
+    return igsagent_output_description (core_agent, name);
+}
+
 igs_result_t igs_attribute_set_description(const char *name, const char *description)
 {
     core_init_agent ();
     return igsagent_attribute_set_description (core_agent, name, description);
+}
+
+char * igs_attribute_description(const char *name)
+{
+    core_init_agent ();
+    return igsagent_attribute_description (core_agent, name);
 }
 
 igs_result_t igs_input_set_detailed_type(const char *name, const char *type_name, const char *specification)

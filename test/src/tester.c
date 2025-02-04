@@ -852,9 +852,24 @@ void run_static_tests (int argc, const char * argv[]){
     //definition - part 2
     //TODO: compare exported def, saved file and reference file
     //io description
+    assert (igs_input_description("my impulsion") == NULL);
     assert (igs_input_set_description("my impulsion", "my io description here") == IGS_SUCCESS);
+    char * inputDescription = igs_input_description("my impulsion");
+    assert (streq(inputDescription, "my io description here"));
+    free(inputDescription);
+    
+    assert (igs_output_description("my impulsion") == NULL);
     assert (igs_output_set_description("my impulsion", "my io description here") == IGS_SUCCESS);
+    char * outputDescription = igs_output_description("my impulsion");
+    assert (streq(outputDescription, "my io description here"));
+    free(outputDescription);
+    
+    assert (igs_attribute_description("my impulsion") == NULL);
     assert (igs_attribute_set_description("my impulsion", "my io description here") == IGS_SUCCESS);
+    char * attributeDescription = igs_attribute_description("my impulsion");
+    assert (streq(attributeDescription, "my io description here"));
+    free(attributeDescription);
+    
     assert (igs_input_set_detailed_type("my impulsion", "protobuf", "some prototbuf \"here\"") == IGS_SUCCESS);
     assert (igs_output_set_detailed_type("my impulsion", "protobuf", "some prototbuf \"here\"") == IGS_SUCCESS);
     assert (igs_attribute_set_detailed_type("my impulsion", "protobuf", "some prototbuf \"here\"") == IGS_SUCCESS);

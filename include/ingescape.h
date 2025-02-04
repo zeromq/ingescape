@@ -357,7 +357,9 @@ INGESCAPE_EXPORT igs_result_t igs_output_add_constraint(const char *name, const 
 
 //IO description
 INGESCAPE_EXPORT igs_result_t igs_input_set_description(const char *name, const char *description);
+INGESCAPE_EXPORT char * igs_input_description(const char *name);
 INGESCAPE_EXPORT igs_result_t igs_output_set_description(const char *name, const char *description);
+INGESCAPE_EXPORT char * igs_output_description(const char *name);
 
 /*IO detailed type
  This section enables to decribe precise specifications for IOs,
@@ -524,6 +526,7 @@ INGESCAPE_EXPORT igs_result_t igs_attribute_set_data(const char *name, void *val
 
 INGESCAPE_EXPORT igs_result_t igs_attribute_add_constraint(const char *name, const char *constraint);
 INGESCAPE_EXPORT igs_result_t igs_attribute_set_description(const char *name, const char *description);
+INGESCAPE_EXPORT char * igs_attribute_description(const char *name);
 INGESCAPE_EXPORT igs_result_t igs_attribute_set_detailed_type(const char *param_name, const char *type_name, const char *specification);
 INGESCAPE_EXPORT void igs_clear_attribute(const char *name);
 
