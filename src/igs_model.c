@@ -820,7 +820,7 @@ size_t model_clean_string(char *string, int64_t max){
         max = INT64_MAX;
     char *char_index = string;
     size_t offset = 0;
-    size_t write_index = 0;
+    int64_t write_index = 0;
     while (1) {
         while (*(char_index+offset) == '\t'
             || *(char_index+offset) == '\v'
@@ -848,7 +848,7 @@ bool model_check_string(const char *string, int64_t max){
     assert(string);
     if (max <= 0)
         max = INT64_MAX;
-    size_t offset = 0;
+    int64_t offset = 0;
     while (1) {
         if (string[offset] == '\t'
             || string[offset] == '\v'

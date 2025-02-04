@@ -1986,7 +1986,7 @@ void set_timeCB(igs_io_type_t io_type,
 //
 int main(int argc, const char * argv[]) {
     
-    char *t0 = "Ma classe étrange <(🦄)>";
+    const char *t0 = "Ma classe étrange <(🦄)>";
     char *t1 = strdup("Ma classe étrange <(🦄)>");
     char *t2 = strdup("Ma classe étrange <(🦄)>\n");
     char *t3 = strdup("\nMa classe étrange <(🦄)>");
