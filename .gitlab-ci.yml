@@ -12,22 +12,21 @@ stages:
 
 workflow:
   rules:
-  - if: $CI_PIPELINE_SOURCE == "web"
-    when: always
-  - when: never
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: always
+    - when: never
 
 # Define ingescape library files
 .lib-build-files:
   rules:
     - changes:
-      - .gitlab-ci.yml
-      - src/**/*
-      - builds/cmake/**/*
-      - dependencies/yajl/**/*
-      - dependencies/unix/*
-      - dependencies/windows/unix/*
-      - CMakeLists.txt
-
+        - .gitlab-ci.yml
+        - src/**/*
+        - builds/cmake/**/*
+        - dependencies/yajl/**/*
+        - dependencies/unix/*
+        - dependencies/windows/unix/*
+        - CMakeLists.txt
 
 # Global variables. Can be used by any jobs
 variables:
@@ -72,7 +71,6 @@ lib-build-macos:
     name: "lib-build-macos"
     expire_in: 1 day
 
-
 # Create runtime installer for macos
 #On runner machine:
 #- install Packages from http://s.sudre.free.fr/Software/Packages/about.html
@@ -90,13 +88,13 @@ lib-installer-macos:
     - macos-qt6
   script:
     - make -C build package
-#    - packagesbuild ./builds/xcode/ingescape.pkgproj
-#    - mv ./builds/xcode/build/ingescape.pkg ./builds/xcode/build/ingescape_unsigned.pkg
-#    - 'productsign --sign "Developer ID Installer: Ingenuity i/o (56DRT9MG9S)" ./builds/xcode/build/ingescape_unsigned.pkg ./builds/xcode/build/ingescape.pkg'
+    #    - packagesbuild ./builds/xcode/ingescape.pkgproj
+    #    - mv ./builds/xcode/build/ingescape.pkg ./builds/xcode/build/ingescape_unsigned.pkg
+    #    - 'productsign --sign "Developer ID Installer: Ingenuity i/o (56DRT9MG9S)" ./builds/xcode/build/ingescape_unsigned.pkg ./builds/xcode/build/ingescape.pkg'
     - mkdir -p $HOME/builds/packages
-#    - cp ./builds/xcode/build/ingescape.pkg $HOME/builds/packages/
+    #    - cp ./builds/xcode/build/ingescape.pkg $HOME/builds/packages/
     - cp ./build/ingescape*.pkg $HOME/builds/packages/
-#    - mv ./build/ingescape*.pkg .
+  #    - mv ./build/ingescape*.pkg .
   artifacts:
     paths:
       - ./build
@@ -137,7 +135,7 @@ lib-windows-release-x64:
       }
   artifacts:
     paths:
-     - build
+      - build
     name: "lib-windows-release-x64"
     expire_in: 1 day
 
@@ -165,7 +163,7 @@ lib-windows-release-x86:
       }
   artifacts:
     paths:
-     - build
+      - build
     name: "lib-windows-release-x86"
     expire_in: 1 day
 
@@ -193,7 +191,7 @@ lib-windows-debug-x64:
       }
   artifacts:
     paths:
-     - build
+      - build
     name: "lib-windows-debug-x64"
     expire_in: 1 day
 
@@ -221,10 +219,9 @@ lib-windows-debug-x86:
       }
   artifacts:
     paths:
-     - build
+      - build
     name: "lib-windows-debug-x86"
     expire_in: 1 day
-
 
 # Create runtime install for windows 32 bits
 lib-installer-release-windows-x86:
@@ -683,7 +680,6 @@ build-deb-packages:
   rules:
     - !reference [.root_namespace, rules]
 
-
 update-vm-runners:
   stage: delivery
   tags:
@@ -709,7 +705,6 @@ update-vm-runners:
   needs: []
   rules:
     - !reference [.root_namespace, rules]
-
 
 #   _   _           _             _  _____
 #  | \ | |         | |           | |/ ____|
@@ -825,7 +820,6 @@ binding-node-js-windows:
     - lib-windows-release-x64
   needs:
     - lib-windows-release-x64
-
 
 ## Tests
 test-node-js-macos:
@@ -1025,9 +1019,9 @@ package-python-wheels-manylinux_2_24_x86_64:
     - python3.11 -m pip install --upgrade build
     - python3.11 -m build
     - |
-        for whl in dist/*.whl; do
-          auditwheel repair "$whl" --plat "manylinux_2_24_x86_64" -w ./wheelhouse/
-        done
+      for whl in dist/*.whl; do
+        auditwheel repair "$whl" --plat "manylinux_2_24_x86_64" -w ./wheelhouse/
+      done
   dependencies:
     - test-python
     - lib-build-linux-x64
@@ -1063,9 +1057,9 @@ package-python-wheels-manylinux2014_x86_64:
     - python3.11 -m pip install --upgrade build
     - python3.11 -m build
     - |
-        for whl in dist/*.whl; do
-          auditwheel repair "$whl" --plat "manylinux2014_x86_64" -w ./wheelhouse/
-        done
+      for whl in dist/*.whl; do
+        auditwheel repair "$whl" --plat "manylinux2014_x86_64" -w ./wheelhouse/
+      done
   dependencies:
     - test-python
     - lib-build-linux-x64
@@ -1098,9 +1092,9 @@ package-python-wheels-manylinux2010_x86_64:
     - python3.9 -m pip install --upgrade build
     - python3.9 -m build
     - |
-        for whl in dist/*.whl; do
-          auditwheel repair "$whl" --plat "manylinux2010_x86_64" -w ./wheelhouse/
-        done
+      for whl in dist/*.whl; do
+        auditwheel repair "$whl" --plat "manylinux2010_x86_64" -w ./wheelhouse/
+      done
   dependencies:
     - test-python
     - lib-build-linux-x64
@@ -1174,7 +1168,6 @@ test-csharp-x64-debug:
   needs:
     - lib-windows-debug-x64
 
-
 test-csharp-x64-release:
   stage: binding-test
   tags:
@@ -1217,7 +1210,6 @@ test-csharp-x86-release:
   needs:
     - lib-windows-release-x86
 
-
 # _____       _ _
 #|  __ \     | (_)
 #| |  | | ___| |___   _____ _ __ _   _
@@ -1244,12 +1236,12 @@ lib-delivery-all:
     - echo "Deliver Windows x86"
     - mkdir --parents library/win32
     - mv build/ReleaseX86/ingescape-*
-         library/win32/
+      library/win32/
     - ls library/win32/ | grep -v 'latest_delivery' > library/win32/latest_delivery
     - echo "Deliver Windows x64"
     - mkdir --parents library/win64
     - mv build/ReleaseX64/ingescape-*
-         library/win64/
+      library/win64/
     - ls library/win64/ | grep -v 'latest_delivery' > library/win64/latest_delivery
     - echo "Deliver macos"
     - mkdir --parents library/macos
@@ -1266,12 +1258,12 @@ lib-delivery-all:
     - echo "Deliver Android armv7a (softfp)"
     - mkdir --parents library/android
     - mv android/ingescape-*
-         library/android/
+      library/android/
     - ls library/android/ | grep -v 'latest_delivery' > library/android/latest_delivery
     - echo "Deliver Android aarch64"
     - mkdir --parents library/android-arm64
     - mv android-arm64/ingescape-*
-         library/android-arm64/
+      library/android-arm64/
     - ls library/android-arm64/ | grep -v 'latest_delivery' > library/android-arm64/latest_delivery
     - echo "Synchronization"
     - rsync --rsh="ssh -i ssh_secret" --recursive library ${DELIVERY_USER}@${DELIVERY_HOST}:${DELIVERY_DESTINATION}
