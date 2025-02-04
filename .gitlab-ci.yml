@@ -1021,6 +1021,7 @@ package-python-wheels-manylinux_2_24_x86_64:
   artifacts:
     paths:
       - bindings/python/wheelhouse/*
+      - bindings/python/dependencies/*
 
 package-python-wheels-manylinux2014_x86_64:
   stage: binding-package
@@ -1070,7 +1071,6 @@ package-python-wheels-manylinux2010_x86_64:
     - cd ./bindings/python/
     - mkdir -p ./dependencies/linux/
     - export PLATFORM="linux"
-    - export FROM_SOURCES="true"
     - ./prepare_for_packaging.sh
     - python3.8 -m pip install --upgrade build
     - python3.8 -m build
@@ -1103,10 +1103,6 @@ publish-python-package:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - cd bindings/python
-    - mkdir -p ./dependencies/linux/
-    - export PLATFORM="linux"
-    - export FROM_SOURCES="true"
-    - ./prepare_for_packaging.sh
     - python3 -m pip install --upgrade twine build
     - python3 -m build --sdist
     - python3 -m twine upload -u ${PYPI_USERNAME} -p ${PYPI_PASSWORD} dist/* wheelhouse/*
