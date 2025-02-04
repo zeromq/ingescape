@@ -185,8 +185,11 @@ PyObject * igs_attribute_add_constraint_wrapper(PyObject *self, PyObject *args);
 PyObject * igs_parameter_add_constraint_wrapper(PyObject *self, PyObject *args);
 
 PyObject * igs_input_set_description_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_input_description_wrapper(PyObject *self, PyObject *args);
 PyObject * igs_output_set_description_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_output_description_wrapper(PyObject *self, PyObject *args);
 PyObject * igs_attribute_set_description_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_attribute_description_wrapper(PyObject *self, PyObject *args);
 PyObject * igs_parameter_set_description_wrapper(PyObject *self, PyObject *args);
 
 PyObject * igs_input_set_detailed_type_wrapper(PyObject *self, PyObject *args);

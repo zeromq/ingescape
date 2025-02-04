@@ -326,9 +326,30 @@ PyObject * s_io_set_description(PyObject *self, PyObject *args, io_set_descripti
     return PyLong_FromLong(igs_api(name, description));
 }
 
+typedef char* (*io_description)(const char*);
+PyObject * s_io_description(PyObject *self, PyObject *args, io_description igs_api)
+{
+    const char * name = NULL;
+    if (!PyArg_ParseTuple(args, "s", &name))
+        return NULL;
+    char * result = igs_api(name);
+    if(result != NULL){
+        PyObject *ret = PyUnicode_FromFormat("%s", result);
+        free(result);
+        result = NULL;
+        return ret;
+    }else
+        return PyUnicode_FromFormat("");
+}
+
 PyObject * igs_input_set_description_wrapper(PyObject *self, PyObject *args)
 {
     return s_io_set_description(self, args, igs_input_set_description);
+}
+
+PyObject * igs_input_description_wrapper(PyObject *self, PyObject *args)
+{
+    return s_io_description(self, args, igs_input_description);
 }
 
 PyObject * igs_output_set_description_wrapper(PyObject *self, PyObject *args)
@@ -336,9 +357,19 @@ PyObject * igs_output_set_description_wrapper(PyObject *self, PyObject *args)
     return s_io_set_description(self, args, igs_output_set_description);
 }
 
+PyObject * igs_output_description_wrapper(PyObject *self, PyObject *args)
+{
+    return s_io_description(self, args, igs_output_description);
+}
+
 PyObject * igs_attribute_set_description_wrapper(PyObject *self, PyObject *args)
 {
     return s_io_set_description(self, args, igs_attribute_set_description);
+}
+
+PyObject * igs_attribute_description_wrapper(PyObject *self, PyObject *args)
+{
+    return s_io_description(self, args, igs_attribute_description);
 }
 
 PyObject * igs_parameter_set_description_wrapper(PyObject *self, PyObject *args)
