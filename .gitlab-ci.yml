@@ -944,7 +944,6 @@ package-python-wheels-windows:
     - C:\Users\admin\AppData\Local\Programs\Python\Python312\python.exe -m pip install --upgrade build
     - C:\Users\admin\AppData\Local\Programs\Python\Python312\python.exe -m build
   dependencies:
-    - test-python
     - lib-windows-release-x64
   needs:
     - test-python
@@ -975,7 +974,6 @@ package-python-wheels-macos:
     - /Library/Frameworks/Python.framework/Versions/3.12/bin/python3 -m pip install --upgrade build
     - /Library/Frameworks/Python.framework/Versions/3.12/bin/python3 -m build
   dependencies:
-    - test-python
     - lib-build-macos
   needs:
     - test-python
@@ -1012,7 +1010,6 @@ package-python-wheels-manylinux_2_24_x86_64:
         auditwheel repair "$whl" --plat "manylinux_2_24_x86_64" -w ./wheelhouse/
       done
   dependencies:
-    - test-python
     - lib-build-linux-x64
   needs:
     - test-python
@@ -1048,7 +1045,6 @@ package-python-wheels-manylinux2014_x86_64:
         auditwheel repair "$whl" --plat "manylinux2014_x86_64" -w ./wheelhouse/
       done
   dependencies:
-    - test-python
     - lib-build-linux-x64
   needs:
     - test-python
@@ -1080,7 +1076,6 @@ package-python-wheels-manylinux2010_x86_64:
         auditwheel repair "$whl" --plat "manylinux2010_x86_64" -w ./wheelhouse/
       done
   dependencies:
-    - test-python
     - lib-build-linux-x64
   needs:
     - test-python
@@ -1102,7 +1097,13 @@ publish-python-package:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - cd bindings/python
-    - ./prepare_for_packaging.sh
+    - export IGS_MAJOR=$(grep "#define INGESCAPE_VERSION_MAJOR" ../../include/ingescape.h | cut -d' ' -f3)
+    - export IGS_MINOR=$(grep "#define INGESCAPE_VERSION_MINOR" ../../include/ingescape.h | cut -d' ' -f3)
+    - export IGS_PATCH=$(grep "#define INGESCAPE_VERSION_PATCH" ../../include/ingescape.h | cut -d' ' -f3)
+    - echo "Prepare pyproject.toml from pyproject.toml.in"
+    - sed "s/@IGS_VERSION@/\"$IGS_MAJOR.$IGS_MINOR.$IGS_PATCH\"/" pyproject.toml.in > pyproject.toml
+    - echo "Prepare setup.py from setup.py.in"
+    - sed "s/@IGS_VERSION@/\"$IGS_MAJOR.$IGS_MINOR.$IGS_PATCH\"/" setup.py.in > setup.py
     - python3 -m pip install --upgrade twine build
     - python3 -m build --sdist
     - |
@@ -1116,14 +1117,12 @@ publish-python-package:
     - package-python-wheels-manylinux_2_24_x86_64
     - package-python-wheels-manylinux2014_x86_64
     - package-python-wheels-manylinux2010_x86_64
-    - lib-build-linux-x64
   needs:
     - package-python-wheels-windows
     - package-python-wheels-macos
     - package-python-wheels-manylinux_2_24_x86_64
     - package-python-wheels-manylinux2014_x86_64
     - package-python-wheels-manylinux2010_x86_64
-    - lib-build-linux-x64
   artifacts:
     paths:
       - bindings/python/dist/*
