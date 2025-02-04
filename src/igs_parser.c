@@ -509,7 +509,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                                             igs_service_arg_t *new_arg = (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
                                             new_arg->name = corrected_reply_arg_name;
                                             
-                                            description = igs_json_node_find (arguments->u.array.values[j], argument_description_path);
+                                            description = igs_json_node_find (arguments->u.array.values[len], argument_description_path);
                                             if (description && description->type == IGS_JSON_STRING && description->u.string)
                                                 new_arg->description = s_strndup (description->u.string, IGS_MAX_DESCRIPTION_LENGTH);
                                             
