@@ -1922,7 +1922,7 @@ PyObject * service_set_description_wrapper(PyObject * self, PyObject * args)
 PyObject * service_description_wrapper(PyObject * self, PyObject * args)
 {
     const char * service_name = NULL;
-    if (!PyArg_ParseTuple(args, "ss", &service_name))
+    if (!PyArg_ParseTuple(args, "s", &service_name))
         return NULL;
     char * result = igs_service_description(service_name);
     if(result != NULL){
