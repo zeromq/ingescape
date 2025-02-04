@@ -933,10 +933,7 @@ package-python-wheels-windows:
     - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
   script:
     - cd ./bindings/python/
-    - $Env:FROM_SOURCES = "true"
     - .\prepare_for_packaging.ps1
-    - C:\Users\admin\AppData\Local\Programs\Python\Python37\python.exe -m pip install --upgrade build
-    - C:\Users\admin\AppData\Local\Programs\Python\Python37\python.exe -m build
     - C:\Users\admin\AppData\Local\Programs\Python\Python38\python.exe -m pip install --upgrade build
     - C:\Users\admin\AppData\Local\Programs\Python\Python38\python.exe -m build
     - C:\Users\admin\AppData\Local\Programs\Python\Python39\python.exe -m pip install --upgrade build
@@ -967,23 +964,17 @@ package-python-wheels-macos:
   script:
     - cd ./bindings/python/
     - export PLATFORM="macos"
-    - export FROM_SOURCES="true"
     - ./prepare_for_packaging.sh
-    - /usr/local/opt/python@3.8/bin/python3.8 -m pip install --upgrade build
-    - /usr/local/opt/python@3.8/bin/python3.8 -m build
-    - /usr/local/opt/python@3.9/bin/python3.9 -m pip install --upgrade build
-    - /usr/local/opt/python@3.9/bin/python3.9 -m build
-    - /usr/local/opt/python@3.10/bin/python3.10 -m pip install --upgrade build
-    - /usr/local/opt/python@3.10/bin/python3.10 -m build
-    - /usr/local/opt/python@3.11/bin/python3.11 -m pip install --upgrade build
-    - /usr/local/opt/python@3.11/bin/python3.11 -m build
-    - echo "NOTE python 3.12 needs to be run in its venv to install packages under macOS (see PEP668)"
-    - /usr/local/opt/python@3.12/bin/python3.12 -m venv .venv3.12
-    - source .venv3.12/bin/activate
-    - python3.12 -m pip install --upgrade build
-    - python3.12 -m build
-    - deactivate
-    - rm -rf .venv3.12
+    - /Library/Frameworks/Python.framework/Versions/3.8/bin/python3 -m pip install --upgrade build
+    - /Library/Frameworks/Python.framework/Versions/3.8/bin/python3 -m build
+    - /Library/Frameworks/Python.framework/Versions/3.9/bin/python3 -m pip install --upgrade build
+    - /Library/Frameworks/Python.framework/Versions/3.9/bin/python3 -m build
+    - /Library/Frameworks/Python.framework/Versions/3.10/bin/python3 -m pip install --upgrade build
+    - /Library/Frameworks/Python.framework/Versions/3.10/bin/python3 -m build
+    - /Library/Frameworks/Python.framework/Versions/3.11/bin/python3 -m pip install --upgrade build
+    - /Library/Frameworks/Python.framework/Versions/3.11/bin/python3 -m build
+    - /Library/Frameworks/Python.framework/Versions/3.12/bin/python3 -m pip install --upgrade build
+    - /Library/Frameworks/Python.framework/Versions/3.12/bin/python3 -m build
   dependencies:
     - test-python
     - lib-build-macos
@@ -1008,7 +999,6 @@ package-python-wheels-manylinux_2_24_x86_64:
     - cd ./bindings/python/
     - mkdir -p ./dependencies/linux/
     - export PLATFORM="linux"
-    - export FROM_SOURCES="true"
     - ./prepare_for_packaging.sh
     - python3.8  -m pip install --upgrade build
     - python3.8  -m build
@@ -1044,10 +1034,7 @@ package-python-wheels-manylinux2014_x86_64:
   script:
     - cd ./bindings/python/
     - export PLATFORM="linux"
-    - export FROM_SOURCES="true"
     - ./prepare_for_packaging.sh
-    - python3.7  -m pip install --upgrade build
-    - python3.7  -m build
     - python3.8  -m pip install --upgrade build
     - python3.8  -m build
     - python3.9  -m pip install --upgrade build
@@ -1085,8 +1072,6 @@ package-python-wheels-manylinux2010_x86_64:
     - export PLATFORM="linux"
     - export FROM_SOURCES="true"
     - ./prepare_for_packaging.sh
-    - python3.7 -m pip install --upgrade build
-    - python3.7 -m build
     - python3.8 -m pip install --upgrade build
     - python3.8 -m build
     - python3.9 -m pip install --upgrade build
