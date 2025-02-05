@@ -1237,6 +1237,7 @@ namespace Ingescape
         internal struct StructServiceArgument
         {
             public IntPtr name;
+            public IntPtr description;
             public IopValueType type;
             public UnionServiceArgument union;
             public uint size;
