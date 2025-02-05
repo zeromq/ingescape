@@ -3240,6 +3240,12 @@ void s_init_loop (igs_core_context_t *context)
             return;
         }
     }
+    
+    int result = chmod(context->network_ipc_folder_path, 0777);
+    if ( result != EXIT_SUCCESS ) {
+        igs_error("Failed to modify access rights of ipc folder path");
+    }
+
     s_lock_zyre_peer (__FUNCTION__, __LINE__);
     context->network_ipc_full_path = (char *) zmalloc (strlen (context->network_ipc_folder_path) + strlen (zyre_uuid (context->node)) + 2);
     sprintf (context->network_ipc_full_path, "%s/%s",
@@ -4719,6 +4725,11 @@ void igs_set_ipc_dir (const char *path)
     core_init_agent ();
     assert (path);
     model_read_write_lock(__FUNCTION__, __LINE__);
+    if (core_context->network_actor) {
+        igs_error ("agent is already started : stop it first to change the ipc dir");
+        model_read_write_unlock(__FUNCTION__, __LINE__);
+        return;
+    }
     if (core_context->network_ipc_folder_path == NULL
         || !streq (path, core_context->network_ipc_folder_path)) {
         if (*path == '/') {
@@ -4737,6 +4748,11 @@ void igs_set_ipc_dir (const char *path)
                 core_context->network_ipc_folder_path = strdup (path);
             } else if (core_context->network_ipc_folder_path)
                 igs_error ("IPC dir remains set to %s", core_context->network_ipc_folder_path);
+            
+            int result = chmod(core_context->network_ipc_folder_path, 0777);
+            if ( result != EXIT_SUCCESS ) {
+                igs_error("Failed to modify access rights of ipc folder path");
+            }
 
         }else
             igs_error ("IPC folder path must be absolute (invalid path: %s)", path);
