@@ -132,8 +132,10 @@ a = igs.Agent(AGENT_NAME, True)
 
 print ("[Agent API] Testing observe input callbacks", end =" ")
 a.input_create(INPUT_NAME, igs.STRING_T, None)
-a.input_set_description(INPUT_NAME, "This is a description")
-a.input_set_detailed_type(INPUT_NAME, "custom_type", "specification")
+assert a.input_description(INPUT_NAME) == ""
+assert a.input_set_description(INPUT_NAME, "This is a description") == igs.SUCCESS
+assert a.input_description(INPUT_NAME) == "This is a description"
+assert a.input_set_detailed_type(INPUT_NAME, "custom_type", "specification") == igs.SUCCESS
 a.observe_input(INPUT_NAME, input_obs, None)
 a.input_set_string(INPUT_NAME, INPUT_VALUE)
 assert INPUT_COUNT_ACTUAL == INPUT_COUNT_EXPECTED
@@ -141,8 +143,10 @@ print ("OK")
 
 print ("[Agent API] Testing observe output callbacks", end =" ")
 a.output_create(OUTPUT_NAME, igs.STRING_T, None)
-a.output_set_description(INPUT_NAME, "This is a description")
-a.output_set_detailed_type(INPUT_NAME, "custom_type", "specification")
+assert a.output_description(OUTPUT_NAME) == ""
+assert a.output_set_description(OUTPUT_NAME, "This is a description") == igs.SUCCESS
+assert a.output_description(OUTPUT_NAME) == "This is a description"
+assert a.output_set_detailed_type(OUTPUT_NAME, "custom_type", "specification") == igs.SUCCESS
 a.observe_output(OUTPUT_NAME, output_obs, None)
 a.output_set_string(OUTPUT_NAME, OUTPUT_VALUE)
 assert OUTPUT_COUNT_ACTUAL == OUTPUT_COUNT_EXPECTED
@@ -157,8 +161,10 @@ print ("OK")
 
 print ("[Agent API] Testing observe attribute callbacks", end =" ")
 a.attribute_create(ATTRIBUTE_NAME, igs.STRING_T, None)
-a.attribute_set_description(INPUT_NAME, "This is a description")
-a.attribute_set_detailed_type(INPUT_NAME, "custom_type", "specification")
+assert a.attribute_description(ATTRIBUTE_NAME) == ""
+assert a.attribute_set_description(ATTRIBUTE_NAME, "This is a description") == igs.SUCCESS
+assert a.attribute_description(ATTRIBUTE_NAME) == "This is a description"
+assert a.attribute_set_detailed_type(ATTRIBUTE_NAME, "custom_type", "specification") == igs.SUCCESS
 a.observe_attribute(ATTRIBUTE_NAME, attribute_obs, None)
 a.attribute_set_string(ATTRIBUTE_NAME, ATTRIBUTE_VALUE)
 assert ATTRIBUTE_COUNT_ACTUAL == ATTRIBUTE_COUNT_EXPECTED

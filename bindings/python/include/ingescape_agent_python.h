@@ -182,8 +182,11 @@ PyObject * Agent_attribute_add_constraint(AgentObject *self, PyObject *args, PyO
 PyObject * Agent_parameter_add_constraint(AgentObject *self, PyObject *args, PyObject *kwds);
 
 PyObject * Agent_input_set_description(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject * Agent_input_description(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject * Agent_output_set_description(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject * Agent_output_description(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject * Agent_attribute_set_description(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject * Agent_attribute_description(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject * Agent_parameter_set_description(AgentObject *self, PyObject *args, PyObject *kwds);
 
 PyObject * Agent_input_set_detailed_type(AgentObject *self, PyObject *args, PyObject *kwds);

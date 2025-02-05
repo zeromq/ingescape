@@ -717,8 +717,11 @@ static PyMethodDef Agent_methods[] = {
     {"parameter_add_constraint", (PyCFunction) Agent_parameter_add_constraint, METH_VARARGS, "parameter_add_constraint(self, name, constraint, )\n--\n\n "},
 
     {"input_set_description", (PyCFunction) Agent_input_set_description, METH_VARARGS, "input_set_description(self, name, description, )\n--\n\n "},
+    {"input_description", (PyCFunction) Agent_input_description, METH_VARARGS, "input_description(self, name, description, )\n--\n\n "},
     {"output_set_description", (PyCFunction) Agent_output_set_description, METH_VARARGS, "output_set_description(self, name, description, )\n--\n\n "},
+    {"output_description", (PyCFunction) Agent_output_description, METH_VARARGS, "output_description(self, name, description, )\n--\n\n "},
     {"attribute_set_description", (PyCFunction) Agent_attribute_set_description, METH_VARARGS, "attribute_set_description(self, name, description, )\n--\n\n "},
+    {"attribute_description", (PyCFunction) Agent_attribute_description, METH_VARARGS, "attribute_description(self, name, description, )\n--\n\n "},
     {"parameter_set_description", (PyCFunction) Agent_parameter_set_description, METH_VARARGS, "parameter_set_description(self, name, description, )\n--\n\n "},
 
     {"input_set_detailed_type", (PyCFunction) Agent_input_set_detailed_type, METH_VARARGS, "input_set_detailed_type(self, input_name, type_name, specification, )\n--\n\n "},
