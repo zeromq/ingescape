@@ -19,13 +19,8 @@
 
 #include "compat.h"
 
-#ifdef FROM_SOURCES
-#include "igsagent.h"
-#include "czmq.h"
-#else
 #include <ingescape/igsagent.h>
 #include <czmq.h>
-#endif
 
 
 typedef struct {
@@ -187,8 +182,11 @@ PyObject * Agent_attribute_add_constraint(AgentObject *self, PyObject *args, PyO
 PyObject * Agent_parameter_add_constraint(AgentObject *self, PyObject *args, PyObject *kwds);
 
 PyObject * Agent_input_set_description(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject * Agent_input_description(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject * Agent_output_set_description(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject * Agent_output_description(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject * Agent_attribute_set_description(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject * Agent_attribute_description(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject * Agent_parameter_set_description(AgentObject *self, PyObject *args, PyObject *kwds);
 
 PyObject * Agent_input_set_detailed_type(AgentObject *self, PyObject *args, PyObject *kwds);
@@ -256,6 +254,14 @@ extern agentServiceCB_t* agentServiceCBList;
 
 PyObject *Agent_service_call(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_service_init(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_service_set_description(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_service_description(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_service_arg_set_description(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_service_arg_description(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_service_reply_set_description(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_service_reply_description(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_service_reply_arg_set_description(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_service_reply_arg_description(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_service_remove(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_service_arg_add(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_service_arg_remove(AgentObject *self, PyObject *args, PyObject *kwds);

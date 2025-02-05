@@ -326,9 +326,30 @@ PyObject * s_io_set_description(PyObject *self, PyObject *args, io_set_descripti
     return PyLong_FromLong(igs_api(name, description));
 }
 
+typedef char* (*io_description)(const char*);
+PyObject * s_io_description(PyObject *self, PyObject *args, io_description igs_api)
+{
+    const char * name = NULL;
+    if (!PyArg_ParseTuple(args, "s", &name))
+        return NULL;
+    char * result = igs_api(name);
+    if(result != NULL){
+        PyObject *ret = PyUnicode_FromFormat("%s", result);
+        free(result);
+        result = NULL;
+        return ret;
+    }else
+        return PyUnicode_FromFormat("");
+}
+
 PyObject * igs_input_set_description_wrapper(PyObject *self, PyObject *args)
 {
     return s_io_set_description(self, args, igs_input_set_description);
+}
+
+PyObject * igs_input_description_wrapper(PyObject *self, PyObject *args)
+{
+    return s_io_description(self, args, igs_input_description);
 }
 
 PyObject * igs_output_set_description_wrapper(PyObject *self, PyObject *args)
@@ -336,9 +357,19 @@ PyObject * igs_output_set_description_wrapper(PyObject *self, PyObject *args)
     return s_io_set_description(self, args, igs_output_set_description);
 }
 
+PyObject * igs_output_description_wrapper(PyObject *self, PyObject *args)
+{
+    return s_io_description(self, args, igs_output_description);
+}
+
 PyObject * igs_attribute_set_description_wrapper(PyObject *self, PyObject *args)
 {
     return s_io_set_description(self, args, igs_attribute_set_description);
+}
+
+PyObject * igs_attribute_description_wrapper(PyObject *self, PyObject *args)
+{
+    return s_io_description(self, args, igs_attribute_description);
 }
 
 PyObject * igs_parameter_set_description_wrapper(PyObject *self, PyObject *args)
@@ -1877,6 +1908,110 @@ PyObject * service_arg_remove_wrapper(PyObject * self, PyObject * args){
     if (!PyArg_ParseTuple(args, "ss", &callName, &argName))
         return NULL;
     return PyLong_FromLong(igs_service_arg_remove(callName, argName));
+}
+
+PyObject * service_set_description_wrapper(PyObject * self, PyObject * args)
+{
+    const char * name = NULL;
+    const char * description = NULL;
+    if (!PyArg_ParseTuple(args, "ss", &name, &description))
+        return NULL;
+    return PyLong_FromLong(igs_service_set_description(name, description));
+}
+
+PyObject * service_description_wrapper(PyObject * self, PyObject * args)
+{
+    const char * service_name = NULL;
+    if (!PyArg_ParseTuple(args, "s", &service_name))
+        return NULL;
+    char * result = igs_service_description(service_name);
+    if(result != NULL){
+        PyObject *ret = PyUnicode_FromFormat("%s", result);
+        free(result);
+        result = NULL;
+        return ret;
+    }else
+        return PyUnicode_FromFormat("");
+}
+
+PyObject * service_arg_set_description_wrapper(PyObject * self, PyObject * args)
+{
+    const char * service_name = NULL;
+    const char * arg_name = NULL;
+    const char * description = NULL;
+    if (!PyArg_ParseTuple(args, "sss", &service_name, &arg_name, &description))
+        return NULL;
+    return PyLong_FromLong(igs_service_arg_set_description(service_name, arg_name, description));
+}
+
+PyObject * service_arg_description_wrapper(PyObject * self, PyObject * args)
+{
+    const char * service_name = NULL;
+    const char * arg_name = NULL;
+    if (!PyArg_ParseTuple(args, "ss", &service_name, &arg_name))
+        return NULL;
+    char * result = igs_service_arg_description(service_name, arg_name);
+    if(result != NULL){
+        PyObject *ret = PyUnicode_FromFormat("%s", result);
+        free(result);
+        result = NULL;
+        return ret;
+    }else
+        return PyUnicode_FromFormat("");
+}
+
+PyObject * service_reply_set_description_wrapper(PyObject * self, PyObject * args)
+{
+    const char * service_name = NULL;
+    const char * reply_name = NULL;
+    const char * description = NULL;
+    if (!PyArg_ParseTuple(args, "sss", &service_name, &reply_name, &description))
+        return NULL;
+    return PyLong_FromLong(igs_service_reply_set_description(service_name, reply_name, description));
+}
+
+PyObject * service_reply_description_wrapper(PyObject * self, PyObject * args)
+{
+    const char * service_name = NULL;
+    const char * reply_name = NULL;
+    if (!PyArg_ParseTuple(args, "ss", &service_name, &reply_name))
+        return NULL;
+    char * result = igs_service_reply_description(service_name, reply_name);
+    if(result != NULL){
+        PyObject *ret = PyUnicode_FromFormat("%s", result);
+        free(result);
+        result = NULL;
+        return ret;
+    }else
+        return PyUnicode_FromFormat("");
+}
+
+PyObject * service_reply_arg_set_description_wrapper(PyObject * self, PyObject * args)
+{
+    const char * service_name = NULL;
+    const char * reply_name = NULL;
+    const char * arg_name = NULL;
+    const char * description = NULL;
+    if (!PyArg_ParseTuple(args, "ssss", &service_name, &reply_name, &arg_name, &description))
+        return NULL;
+    return PyLong_FromLong(igs_service_reply_arg_set_description(service_name, reply_name, arg_name, description));
+}
+
+PyObject * service_reply_arg_description_wrapper(PyObject * self, PyObject * args)
+{
+    const char * service_name = NULL;
+    const char * reply_name = NULL;
+    const char * arg_name = NULL;
+    if (!PyArg_ParseTuple(args, "sss", &service_name, &reply_name, &arg_name))
+        return NULL;
+    char * result = igs_service_reply_arg_description(service_name, reply_name, arg_name);
+    if(result != NULL){
+        PyObject *ret = PyUnicode_FromFormat("%s", result);
+        free(result);
+        result = NULL;
+        return ret;
+    }else
+        return PyUnicode_FromFormat("");
 }
 
 PyObject * service_reply_add_wrapper(PyObject *self, PyObject *args)

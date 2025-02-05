@@ -132,8 +132,10 @@ a = igs.Agent(AGENT_NAME, True)
 
 print ("[Agent API] Testing observe input callbacks", end =" ")
 a.input_create(INPUT_NAME, igs.STRING_T, None)
-a.input_set_description(INPUT_NAME, "This is a description")
-a.input_set_detailed_type(INPUT_NAME, "custom_type", "specification")
+assert a.input_description(INPUT_NAME) == ""
+assert a.input_set_description(INPUT_NAME, "This is a description") == igs.SUCCESS
+assert a.input_description(INPUT_NAME) == "This is a description"
+assert a.input_set_detailed_type(INPUT_NAME, "custom_type", "specification") == igs.SUCCESS
 a.observe_input(INPUT_NAME, input_obs, None)
 a.input_set_string(INPUT_NAME, INPUT_VALUE)
 assert INPUT_COUNT_ACTUAL == INPUT_COUNT_EXPECTED
@@ -141,8 +143,10 @@ print ("OK")
 
 print ("[Agent API] Testing observe output callbacks", end =" ")
 a.output_create(OUTPUT_NAME, igs.STRING_T, None)
-a.output_set_description(INPUT_NAME, "This is a description")
-a.output_set_detailed_type(INPUT_NAME, "custom_type", "specification")
+assert a.output_description(OUTPUT_NAME) == ""
+assert a.output_set_description(OUTPUT_NAME, "This is a description") == igs.SUCCESS
+assert a.output_description(OUTPUT_NAME) == "This is a description"
+assert a.output_set_detailed_type(OUTPUT_NAME, "custom_type", "specification") == igs.SUCCESS
 a.observe_output(OUTPUT_NAME, output_obs, None)
 a.output_set_string(OUTPUT_NAME, OUTPUT_VALUE)
 assert OUTPUT_COUNT_ACTUAL == OUTPUT_COUNT_EXPECTED
@@ -157,8 +161,10 @@ print ("OK")
 
 print ("[Agent API] Testing observe attribute callbacks", end =" ")
 a.attribute_create(ATTRIBUTE_NAME, igs.STRING_T, None)
-a.attribute_set_description(INPUT_NAME, "This is a description")
-a.attribute_set_detailed_type(INPUT_NAME, "custom_type", "specification")
+assert a.attribute_description(ATTRIBUTE_NAME) == ""
+assert a.attribute_set_description(ATTRIBUTE_NAME, "This is a description") == igs.SUCCESS
+assert a.attribute_description(ATTRIBUTE_NAME) == "This is a description"
+assert a.attribute_set_detailed_type(ATTRIBUTE_NAME, "custom_type", "specification") == igs.SUCCESS
 a.observe_attribute(ATTRIBUTE_NAME, attribute_obs, None)
 a.attribute_set_string(ATTRIBUTE_NAME, ATTRIBUTE_VALUE)
 assert ATTRIBUTE_COUNT_ACTUAL == ATTRIBUTE_COUNT_EXPECTED
@@ -173,7 +179,13 @@ print ("OK")
 
 print ("[Agent API] Testing observe service calls", end =" ")
 a.service_init(SERVICE_NAME, service_cb, None)
+assert a.service_description(SERVICE_NAME) == ""
+assert a.service_set_description(SERVICE_NAME, f"{SERVICE_NAME} description") == igs.SUCCESS
+assert a.service_description(SERVICE_NAME) == f"{SERVICE_NAME} description"
 a.service_arg_add(SERVICE_NAME, SERVICE_ATTR1, SERVICE_ATTR1_TYPE)
+assert a.service_arg_description(SERVICE_NAME, SERVICE_ATTR1) == ""
+assert a.service_arg_set_description(SERVICE_NAME, SERVICE_ATTR1, f"{SERVICE_NAME} {SERVICE_ATTR1} description") == igs.SUCCESS
+assert a.service_arg_description(SERVICE_NAME, SERVICE_ATTR1) == f"{SERVICE_NAME} {SERVICE_ATTR1} description"
 a.service_arg_add(SERVICE_NAME, SERVICE_ATTR2, SERVICE_ATTR2_TYPE)
 a.service_call(AGENT_NAME, SERVICE_NAME, ("coucou", 42), None)
 assert SERVICE_CALL_COUNT_ACTUAL == SERVICE_CALL_COUNT_EXPECTED
@@ -391,7 +403,13 @@ assert not a.service_has_replies("second_service")
 assert a.service_reply_names("second_service") == []
 assert a.service_reply_add("second_service", "reply_service") == igs.SUCCESS
 assert a.service_has_replies("second_service")
+assert a.service_reply_description("second_service", "reply_service") == ""
+assert a.service_reply_set_description("second_service", "reply_service", "second_service reply_service description") == igs.SUCCESS
+assert a.service_reply_description("second_service", "reply_service") == "second_service reply_service description"
 assert a.service_reply_arg_add("second_service", "reply_service", "first_arg", igs.INTEGER_T) == igs.SUCCESS
+assert a.service_reply_arg_description("second_service", "reply_service", "first_arg") == ""
+assert a.service_reply_arg_set_description("second_service", "reply_service", "first_arg", "second_service reply_service first_arg description") == igs.SUCCESS
+assert a.service_reply_arg_description("second_service", "reply_service", "first_arg") == "second_service reply_service first_arg description"
 assert a.service_reply_arg_add("second_service", "reply_service", "second_arg", igs.STRING_T) == igs.SUCCESS
 assert a.service_reply_args_count("second_service", "reply_service") == 2
 assert a.service_reply_args_list("second_service", "reply_service") == (("first_arg", igs.INTEGER_T), ("second_arg", igs.STRING_T))

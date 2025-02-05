@@ -45,15 +45,14 @@ done
   echo "Prepare setup.py from setup.py.in"
   sed "s/@IGS_VERSION@/\"$IGS_MAJOR.$IGS_MINOR.$IGS_PATCH\"/" setup.py.in > setup.py
   echo "Copy library files"
-  rm -rf ./dependencies
   mkdir -p ./dependencies/$PLATFORM/
-  mkdir -p ./dependencies/include/
+  mkdir -p ./dependencies/include/ingescape
   cp ../../build/libingescape.a "./dependencies/$PLATFORM"
   cp ../../build/dependencies/czmq/libczmq.a "./dependencies/$PLATFORM"
   cp ../../build/dependencies/libzmq/lib/libzmq.a "./dependencies/$PLATFORM"
   cp ../../build/dependencies/zyre/libzyre.a "./dependencies/$PLATFORM"
-  cp ../../build/dependencies/sodium//libsodium.a "./dependencies/$PLATFORM"
-  cp -r ../../include/* ./dependencies/include
+  cp ../../build/dependencies/sodium/libsodium.a "./dependencies/$PLATFORM"
+  cp -r ../../include/* ./dependencies/include/ingescape
   cp -r ../../dependencies/czmq/include/* ./dependencies/include
   cp -r ../../dependencies/libzmq/include/* ./dependencies/include
   cp -r ../../dependencies/sodium/src/libsodium/include/* ./dependencies/include
