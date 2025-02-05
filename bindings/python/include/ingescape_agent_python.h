@@ -254,6 +254,14 @@ extern agentServiceCB_t* agentServiceCBList;
 
 PyObject *Agent_service_call(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_service_init(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_service_set_description(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_service_description(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_service_arg_set_description(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_service_arg_description(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_service_reply_set_description(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_service_reply_description(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_service_reply_arg_set_description(AgentObject *self, PyObject *args, PyObject *kwds);
+PyObject *Agent_service_reply_arg_description(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_service_remove(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_service_arg_add(AgentObject *self, PyObject *args, PyObject *kwds);
 PyObject *Agent_service_arg_remove(AgentObject *self, PyObject *args, PyObject *kwds);

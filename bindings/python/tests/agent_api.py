@@ -179,7 +179,13 @@ print ("OK")
 
 print ("[Agent API] Testing observe service calls", end =" ")
 a.service_init(SERVICE_NAME, service_cb, None)
+assert a.service_description(SERVICE_NAME) == ""
+assert a.service_set_description(SERVICE_NAME, f"{SERVICE_NAME} description") == igs.SUCCESS
+assert a.service_description(SERVICE_NAME) == f"{SERVICE_NAME} description"
 a.service_arg_add(SERVICE_NAME, SERVICE_ATTR1, SERVICE_ATTR1_TYPE)
+assert a.service_arg_description(SERVICE_NAME, SERVICE_ATTR1) == ""
+assert a.service_arg_set_description(SERVICE_NAME, SERVICE_ATTR1, f"{SERVICE_NAME} {SERVICE_ATTR1} description") == igs.SUCCESS
+assert a.service_arg_description(SERVICE_NAME, SERVICE_ATTR1) == f"{SERVICE_NAME} {SERVICE_ATTR1} description"
 a.service_arg_add(SERVICE_NAME, SERVICE_ATTR2, SERVICE_ATTR2_TYPE)
 a.service_call(AGENT_NAME, SERVICE_NAME, ("coucou", 42), None)
 assert SERVICE_CALL_COUNT_ACTUAL == SERVICE_CALL_COUNT_EXPECTED
@@ -397,7 +403,13 @@ assert not a.service_has_replies("second_service")
 assert a.service_reply_names("second_service") == []
 assert a.service_reply_add("second_service", "reply_service") == igs.SUCCESS
 assert a.service_has_replies("second_service")
+assert a.service_reply_description("second_service", "reply_service") == ""
+assert a.service_reply_set_description("second_service", "reply_service", "second_service reply_service description") == igs.SUCCESS
+assert a.service_reply_description("second_service", "reply_service") == "second_service reply_service description"
 assert a.service_reply_arg_add("second_service", "reply_service", "first_arg", igs.INTEGER_T) == igs.SUCCESS
+assert a.service_reply_arg_description("second_service", "reply_service", "first_arg") == ""
+assert a.service_reply_arg_set_description("second_service", "reply_service", "first_arg", "second_service reply_service first_arg description") == igs.SUCCESS
+assert a.service_reply_arg_description("second_service", "reply_service", "first_arg") == "second_service reply_service first_arg description"
 assert a.service_reply_arg_add("second_service", "reply_service", "second_arg", igs.STRING_T) == igs.SUCCESS
 assert a.service_reply_args_count("second_service", "reply_service") == 2
 assert a.service_reply_args_list("second_service", "reply_service") == (("first_arg", igs.INTEGER_T), ("second_arg", igs.STRING_T))
