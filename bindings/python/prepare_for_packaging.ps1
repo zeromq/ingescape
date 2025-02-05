@@ -18,6 +18,8 @@ echo "Prepare setup.py from setup.py.in"
 (Get-Content ./setup.py.in) -Replace '@IGS_VERSION@', "`"$IGS_VERSION`"" | Set-Content ./setup.py
 
 echo "Copy library files"
+mkdir -f ./dependencies/include
+mkdir -f ./dependencies/include/ingescape
 mkdir -f ./dependencies/windows
 mkdir -f ./dependencies/windows/x64
 Copy-Item -Path ..\..\build\ReleaseX64\Release\libingescape.lib -Destination ./dependencies/windows/x64 -Force
@@ -25,7 +27,7 @@ Copy-Item -Path ..\..\build\ReleaseX64\dependencies\czmq\Release\libczmq.lib -De
 Copy-Item -Path ..\..\build\ReleaseX64\dependencies\libzmq\lib\Release\libzmq-v142-mt-s-4_3_6.lib -Destination ./dependencies/windows/x64/libzmq.lib -Force
 Copy-Item -Path ..\..\build\ReleaseX64\dependencies\zyre\Release\libzyre.lib -Destination ./dependencies/windows/x64 -Force
 copy-Item -Path ..\..\build\ReleaseX64\dependencies\sodium\Release\libsodium.lib -Destination ./dependencies/windows/x64 -Force
-copy-Item -Path ../../include/* -Destination ./dependencies/include -Recurse -Force
+copy-Item -Path ../../include/* -Destination ./dependencies/include/ingescape -Recurse -Force
 copy-Item -Path ../../dependencies/czmq/include/* -Destination ./dependencies/include -Recurse -Force
 copy-Item -Path ../../dependencies/libzmq/include/* -Destination ./dependencies/include -Recurse -Force
 copy-Item -Path ../../dependencies/sodium/src/libsodium/include/* -Destination ./dependencies/include -Recurse -Force

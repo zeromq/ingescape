@@ -12,11 +12,6 @@
 
 #include "ingescape_agent_python.h"
 #include <stdio.h>
-#ifdef FROM_SOURCES
-#include "ingescape.h"
-#else
-#include <ingescape/ingescape.h>
-#endif
 #include "uthash/utlist.h"
 #include "util.h"
 
@@ -1598,9 +1593,35 @@ PyObject * s_agent_io_set_description(AgentObject *self, PyObject *args, PyObjec
     return PyLong_FromLong(IGS_SUCCESS);
 }
 
+typedef char* (*agent_io_description)(igsagent_t*, const char*);
+PyObject * s_agent_io_description(AgentObject *self, PyObject *args, PyObject *kwds, agent_io_description igs_api)
+{
+    if(!self->agent)
+        Py_RETURN_NONE;
+
+    static char *kwlist[] = {"name", NULL};
+    const char * name = NULL;
+    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &name))
+        return NULL;
+
+    char * result = igs_api(self->agent, name);
+    if(result != NULL){
+        PyObject *ret = PyUnicode_FromFormat("%s", result);
+        free(result);
+        result = NULL;
+        return ret;
+    }else
+        return PyUnicode_FromFormat("");
+}
+
 PyObject * Agent_input_set_description(AgentObject *self, PyObject *args, PyObject *kwds)
 {
     return s_agent_io_set_description(self, args, kwds, igsagent_input_set_description);
+}
+
+PyObject * Agent_input_description(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_description(self, args, kwds, igsagent_input_description);
 }
 
 PyObject * Agent_output_set_description(AgentObject *self, PyObject *args, PyObject *kwds)
@@ -1608,9 +1629,19 @@ PyObject * Agent_output_set_description(AgentObject *self, PyObject *args, PyObj
     return s_agent_io_set_description(self, args, kwds, igsagent_output_set_description);
 }
 
+PyObject * Agent_output_description(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_description(self, args, kwds, igsagent_output_description);
+}
+
 PyObject * Agent_attribute_set_description(AgentObject *self, PyObject *args, PyObject *kwds)
 {
     return s_agent_io_set_description(self, args, kwds, igsagent_attribute_set_description);
+}
+
+PyObject * Agent_attribute_description(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    return s_agent_io_description(self, args, kwds, igsagent_attribute_description);
 }
 
 PyObject * Agent_parameter_set_description(AgentObject *self, PyObject *args, PyObject *kwds)
@@ -2030,6 +2061,142 @@ PyObject *Agent_service_init(AgentObject *self, PyObject *args, PyObject *kwds)
         DL_APPEND(agentServiceCBList, newElt);
     }
     return PyLong_FromLong(result);
+}
+
+PyObject *Agent_service_set_description(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    static char *kwlist[] = {"service_name", "description", NULL};
+    char *service_name = NULL;
+    char *description = NULL;
+    if (!PyArg_ParseTupleAndKeywords(args, NULL, "ss", kwlist, &service_name, &description))
+        return NULL;
+    if(self->agent)
+        return PyLong_FromLong(igsagent_service_set_description(self->agent, service_name, description));
+    return NULL;
+}
+
+PyObject *Agent_service_description(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    if(!self->agent)
+        Py_RETURN_NONE;
+
+    static char *kwlist[] = {"service_name", NULL};
+    const char * service_name = NULL;
+    if (!PyArg_ParseTupleAndKeywords(args, NULL, "s", kwlist, &service_name))
+        return NULL;
+
+    char * result = igsagent_service_description(self->agent, service_name);
+    if(result != NULL){
+        PyObject *ret = PyUnicode_FromFormat("%s", result);
+        free(result);
+        result = NULL;
+        return ret;
+    }else
+        return PyUnicode_FromFormat("");
+}
+
+PyObject *Agent_service_arg_set_description(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    static char *kwlist[] = {"service_name", "description", "arg_name", NULL};
+    char *service_name = NULL;
+    char *arg_name = NULL;
+    char *description = NULL;
+    if (!PyArg_ParseTupleAndKeywords(args, NULL, "sss", kwlist, &service_name, &arg_name, &description))
+        return NULL;
+    if(self->agent)
+        return PyLong_FromLong(igsagent_service_arg_set_description(self->agent, service_name, arg_name, description));
+    return NULL;
+}
+
+PyObject *Agent_service_arg_description(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    if(!self->agent)
+        Py_RETURN_NONE;
+
+    static char *kwlist[] = {"service_name", "arg_name", NULL};
+    const char * service_name = NULL;
+    const char * arg_name = NULL;
+    if (!PyArg_ParseTupleAndKeywords(args, NULL, "ss", kwlist, &service_name, &arg_name))
+        return NULL;
+
+    char * result = igsagent_service_arg_description(self->agent, service_name, arg_name);
+    if(result != NULL){
+        PyObject *ret = PyUnicode_FromFormat("%s", result);
+        free(result);
+        result = NULL;
+        return ret;
+    }else
+        return PyUnicode_FromFormat("");
+}
+
+PyObject *Agent_service_reply_set_description(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    static char *kwlist[] = {"service_name", "reply_name", "description", NULL};
+    char *service_name = NULL;
+    char *reply_name = NULL;
+    char *description = NULL;
+    if (!PyArg_ParseTupleAndKeywords(args, NULL, "sss", kwlist, &service_name, &reply_name, &description))
+        return NULL;
+    if(self->agent)
+        return PyLong_FromLong(igsagent_service_reply_set_description(self->agent, service_name, reply_name, description));
+    return NULL;
+}
+
+PyObject *Agent_service_reply_description(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    if(!self->agent)
+        Py_RETURN_NONE;
+
+    static char *kwlist[] = {"service_name", "reply_name", NULL};
+    const char * service_name = NULL;
+    const char * reply_name = NULL;
+    if (!PyArg_ParseTupleAndKeywords(args, NULL, "ss", kwlist, &service_name, &reply_name))
+        return NULL;
+
+    char * result = igsagent_service_reply_description(self->agent, service_name, reply_name);
+    if(result != NULL){
+        PyObject *ret = PyUnicode_FromFormat("%s", result);
+        free(result);
+        result = NULL;
+        return ret;
+    }else
+        return PyUnicode_FromFormat("");
+}
+
+PyObject *Agent_service_reply_arg_set_description(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    static char *kwlist[] = {"service_name", "reply_name", "arg_name", "description", NULL};
+    char *service_name = NULL;
+    char *reply_name = NULL;
+    char *arg_name = NULL;
+    char *description = NULL;
+    if (!PyArg_ParseTupleAndKeywords(args, NULL, "ssss", kwlist, &service_name, &reply_name, &arg_name,  &description))
+        return NULL;
+    if(self->agent)
+        return PyLong_FromLong(igsagent_service_reply_arg_set_description(self->agent, service_name, reply_name, arg_name, description));
+    return NULL;
+}
+
+PyObject *Agent_service_reply_arg_description(AgentObject *self, PyObject *args, PyObject *kwds)
+{
+    if(!self->agent)
+        Py_RETURN_NONE;
+
+    static char *kwlist[] = {"service_name", "reply_name", "arg_name", NULL};
+    const char * service_name = NULL;
+    const char * reply_name = NULL;
+    const char * arg_name = NULL;
+    if (!PyArg_ParseTupleAndKeywords(args, NULL, "sss", kwlist, &service_name, &reply_name, &arg_name))
+        return NULL;
+
+    char * result = igsagent_service_reply_arg_description(self->agent, service_name, reply_name, arg_name);
+    if(result != NULL){
+        PyObject *ret = PyUnicode_FromFormat("%s", result);
+        free(result);
+        result = NULL;
+        return ret;
+    }else
+        return PyUnicode_FromFormat("");
 }
 
 PyObject *Agent_service_remove(AgentObject *self, PyObject *args, PyObject *kwds)

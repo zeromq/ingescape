@@ -19,13 +19,8 @@
 
 #include "compat.h"
 
-#ifdef FROM_SOURCES
-#include "ingescape.h"
-#include "czmq.h"
-#else
 #include <ingescape/ingescape.h>
 #include <czmq.h>
-#endif
 
 PyObject * start_with_device_wrapper(PyObject * self, PyObject * args);
 PyObject * start_with_ip_wrapper(PyObject * self, PyObject * args);
@@ -190,8 +185,11 @@ PyObject * igs_attribute_add_constraint_wrapper(PyObject *self, PyObject *args);
 PyObject * igs_parameter_add_constraint_wrapper(PyObject *self, PyObject *args);
 
 PyObject * igs_input_set_description_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_input_description_wrapper(PyObject *self, PyObject *args);
 PyObject * igs_output_set_description_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_output_description_wrapper(PyObject *self, PyObject *args);
 PyObject * igs_attribute_set_description_wrapper(PyObject *self, PyObject *args);
+PyObject * igs_attribute_description_wrapper(PyObject *self, PyObject *args);
 PyObject * igs_parameter_set_description_wrapper(PyObject *self, PyObject *args);
 
 PyObject * igs_input_set_detailed_type_wrapper(PyObject *self, PyObject *args);
@@ -259,6 +257,15 @@ PyObject * service_init_wrapper(PyObject *self, PyObject *args);
 PyObject * service_remove_wrapper(PyObject * self, PyObject * args);
 PyObject * service_arg_add_wrapper(PyObject * self, PyObject * args);
 PyObject * service_arg_remove_wrapper(PyObject * self, PyObject * args);
+
+PyObject * service_set_description_wrapper(PyObject * self, PyObject * args);
+PyObject * service_description_wrapper(PyObject * self, PyObject * args);
+PyObject * service_arg_set_description_wrapper(PyObject * self, PyObject * args);
+PyObject * service_arg_description_wrapper(PyObject * self, PyObject * args);
+PyObject * service_reply_set_description_wrapper(PyObject * self, PyObject * args);
+PyObject * service_reply_description_wrapper(PyObject * self, PyObject * args);
+PyObject * service_reply_arg_set_description_wrapper(PyObject * self, PyObject * args);
+PyObject * service_reply_arg_description_wrapper(PyObject * self, PyObject * args);
 
 PyObject * service_reply_add_wrapper(PyObject * self, PyObject * args);
 PyObject * service_reply_remove_wrapper(PyObject * self, PyObject * args);
