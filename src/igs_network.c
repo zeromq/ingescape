@@ -3242,9 +3242,8 @@ void s_init_loop (igs_core_context_t *context)
     }
     
     int result = chmod(context->network_ipc_folder_path, 0777);
-    if ( result != EXIT_SUCCESS ) {
-        igs_error("Failed to modify access rights of ipc folder path");
-    }
+    if (result != EXIT_SUCCESS)
+        igs_error("failed chmod 0777 for IPC folder at '%s'", context->network_ipc_folder_path);
 
     s_lock_zyre_peer (__FUNCTION__, __LINE__);
     context->network_ipc_full_path = (char *) zmalloc (strlen (context->network_ipc_folder_path) + strlen (zyre_uuid (context->node)) + 2);
@@ -4726,7 +4725,7 @@ void igs_set_ipc_dir (const char *path)
     assert (path);
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (core_context->network_actor) {
-        igs_error ("agent is already started : stop it first to change the ipc dir");
+        igs_error ("IPC folder path cannot be changed while the agent is running");
         model_read_write_unlock(__FUNCTION__, __LINE__);
         return;
     }
@@ -4747,13 +4746,11 @@ void igs_set_ipc_dir (const char *path)
                     free (core_context->network_ipc_folder_path);
                 core_context->network_ipc_folder_path = strdup (path);
             } else if (core_context->network_ipc_folder_path)
-                igs_error ("IPC dir remains set to %s", core_context->network_ipc_folder_path);
+                igs_error ("IPC folder remains set to %s", core_context->network_ipc_folder_path);
             
             int result = chmod(core_context->network_ipc_folder_path, 0777);
-            if ( result != EXIT_SUCCESS ) {
-                igs_error("Failed to modify access rights of ipc folder path");
-            }
-
+            if (result != EXIT_SUCCESS)
+                igs_error("failed chmod 0777 for IPC folder at '%s'", core_context->network_ipc_folder_path);
         }else
             igs_error ("IPC folder path must be absolute (invalid path: %s)", path);
     }
