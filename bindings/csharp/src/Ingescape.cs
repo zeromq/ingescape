@@ -1011,12 +1011,36 @@ namespace Ingescape
         }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr igs_input_description(IntPtr name);
+        public static string InputDescription(string name)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            IntPtr descriptionAsPtr = igs_input_description(nameAsPtr);
+            string res = PtrToStringFromUTF8(descriptionAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            Marshal.FreeHGlobal(descriptionAsPtr);
+            return res;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern Result igs_output_set_description(IntPtr name, IntPtr description);
         public static Result OutputSetDescription(string name, string description)
         {
             IntPtr nameAsPtr = StringToUTF8Ptr(name);
             IntPtr descriptionAsPtr = StringToUTF8Ptr(description);
             Result res = igs_output_set_description(nameAsPtr, descriptionAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            Marshal.FreeHGlobal(descriptionAsPtr);
+            return res;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr igs_output_description(IntPtr name);
+        public static string OutputDescription(string name)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            IntPtr descriptionAsPtr = igs_output_description(nameAsPtr);
+            string res = PtrToStringFromUTF8(descriptionAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
             Marshal.FreeHGlobal(descriptionAsPtr);
             return res;
@@ -1416,6 +1440,30 @@ namespace Ingescape
         }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_service_set_description (const char *name, const char *description);
+        public static Result ServiceSetDescription(string name, string description)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            IntPtr descriptionAsPtr = StringToUTF8Ptr(description);
+            Result res = igs_service_set_description(nameAsPtr, descriptionAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            Marshal.FreeHGlobal(descriptionAsPtr);
+            return res;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr igs_service_description (IntPtr name);
+        public static string ServiceDescription(string name)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            IntPtr descriptionAsPtr = igs_service_description(nameAsPtr);
+            string res = PtrToStringFromUTF8(descriptionAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            Marshal.FreeHGlobal(descriptionAsPtr);
+            return res;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern Result igs_service_arg_add(IntPtr serviceName, IntPtr argName, IopValueType type);
         public static Result ServiceArgAdd(string serviceName, string argName, IopValueType type)
         {
@@ -1436,6 +1484,34 @@ namespace Ingescape
             Result res = igs_service_arg_remove(nameAsPtr, argNameAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
             Marshal.FreeHGlobal(argNameAsPtr);
+            return res;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_service_arg_set_description(IntPtr serviceName, IntPtr argName, IntPtr description);
+        public static Result ServiceArgSetDescription(string serviceName, string argName, string description)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            IntPtr argAsPtr = StringToUTF8Ptr(argName);
+            IntPtr descriptionAsPtr = StringToUTF8Ptr(description);
+            Result res = igs_service_arg_set_description(nameAsPtr, argAsPtr, descriptionAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            Marshal.FreeHGlobal(argAsPtr);
+            Marshal.FreeHGlobal(descriptionAsPtr);
+            return res;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr igs_service_arg_description(IntPtr serviceName, IntPtr argName);
+        public static string ServiceArgDescription(string serviceName, string argName)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            IntPtr argAsPtr = StringToUTF8Ptr(argName);
+            IntPtr descriptionAsPtr = igs_service_arg_description(nameAsPtr, argAsPtr);
+            string res = PtrToStringFromUTF8(descriptionAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            Marshal.FreeHGlobal(argAsPtr);
+            Marshal.FreeHGlobal(descriptionAsPtr);
             return res;
         }
         #endregion
@@ -1467,6 +1543,34 @@ namespace Ingescape
         }
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_service_reply_set_description (IntPtr serviceName, IntPtr replyName, IntPtr description);
+        public static Result ServiceReplySetDescription(string serviceName, string replyName, string description)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(serviceName);
+            IntPtr replyNameAsPtr = StringToUTF8Ptr(replyName);
+            IntPtr descriptionAsPtr = StringToUTF8Ptr(description);
+            Result res = igs_service_reply_set_description(nameAsPtr, replyNameAsPtr, descriptionAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            Marshal.FreeHGlobal(replyNameAsPtr);
+            Marshal.FreeHGlobal(descriptionAsPtr);
+            return res;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr igs_service_reply_description (IntPtr name, IntPtr replyName);
+        public static string ServiceReplyDescription(string name, string replyName)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            IntPtr replyNameAsPtr = StringToUTF8Ptr(replyName);
+            IntPtr descriptionAsPtr = igs_service_reply_description(nameAsPtr, replyNameAsPtr);
+            string res = PtrToStringFromUTF8(descriptionAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            Marshal.FreeHGlobal(replyNameAsPtr);
+            Marshal.FreeHGlobal(descriptionAsPtr);
+            return res;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern Result igs_service_reply_arg_add(IntPtr serviceName, IntPtr replyName, IntPtr argName, IopValueType type);
         public static Result ServiceReplyArgAdd(string serviceName, string replyName, string argName, IopValueType type)
         {
@@ -1477,6 +1581,36 @@ namespace Ingescape
             Marshal.FreeHGlobal(serviceNameAsPtr);
             Marshal.FreeHGlobal(replyNameAsPtr);
             Marshal.FreeHGlobal(argNameAsPtr);
+            return res;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igs_service_reply_arg_set_description (IntPtr serviceName, IntPtr replyName, IntPtr argName, IntPtr description);
+        public static Result ServiceReplyArgSetDescription(string serviceName, string replyName, string argName, string description)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(serviceName);
+            IntPtr replyNameAsPtr = StringToUTF8Ptr(replyName);
+            IntPtr argNameAsPtr = StringToUTF8Ptr(argName);
+            IntPtr descriptionAsPtr = StringToUTF8Ptr(description);
+            Result res = igs_service_reply_set_description(nameAsPtr, replyNameAsPtr, argNameAsPtr, descriptionAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            Marshal.FreeHGlobal(replyNameAsPtr);
+            Marshal.FreeHGlobal(argNameAsPtr);
+            Marshal.FreeHGlobal(descriptionAsPtr);
+            return res;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr igs_service_reply_description (IntPtr name, IntPtr replyName);
+        public static string ServiceReplyArgDescription(string name, string replyName)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            IntPtr replyNameAsPtr = StringToUTF8Ptr(replyName);
+            IntPtr descriptionAsPtr = igs_service_reply_description(nameAsPtr, replyNameAsPtr);
+            string res = PtrToStringFromUTF8(descriptionAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            Marshal.FreeHGlobal(replyNameAsPtr);
+            Marshal.FreeHGlobal(descriptionAsPtr);
             return res;
         }
 
@@ -2061,6 +2195,18 @@ namespace Ingescape
             IntPtr nameAsPtr = StringToUTF8Ptr(name);
             IntPtr descriptionAsPtr = StringToUTF8Ptr(description);
             Result res = igs_attribute_set_description(nameAsPtr, descriptionAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            Marshal.FreeHGlobal(descriptionAsPtr);
+            return res;
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr igs_attribute_description(IntPtr name);
+        public static string AttributeDescription(string name)
+        {
+            IntPtr nameAsPtr = StringToUTF8Ptr(name);
+            IntPtr descriptionAsPtr = igs_attribute_description(nameAsPtr);
+            string res = PtrToStringFromUTF8(descriptionAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
             Marshal.FreeHGlobal(descriptionAsPtr);
             return res;
