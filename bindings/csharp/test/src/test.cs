@@ -26,6 +26,11 @@ namespace Tester
 
         }
 
+        public void testerAgentServiceCallback(Agent agent, string senderAgentName, string senderAgentUUID, string serviceName, List<ServiceArgument> arguments, string token, object _myData)
+        {
+
+        }
+
         public void testerIOPCallback(IopType iopType, string name, IopValueType valueType, object value, object _myData)
         {
 
@@ -1633,6 +1638,50 @@ namespace Tester
             Assert.IsNull(FirstAgent.AttributeDescription("my_impulsion"));
             Assert.IsTrue(FirstAgent.AttributeSetDescription("my_impulsion", "myFirstAgent attribute impulsion description") == Result.Success);
             Assert.AreEqual(FirstAgent.AttributeDescription("my_impulsion"), "myFirstAgent attribute impulsion description");
+
+
+            Assert.IsTrue(FirstAgent.ServiceInit("myService", testerAgentServiceCallback, null) == Result.Success);
+            Assert.IsTrue(FirstAgent.ServiceArgAdd("myService", "myBool", IopValueType.Bool) == Result.Success);
+            Assert.IsTrue(FirstAgent.ServiceArgAdd("myService", "myInt", IopValueType.Integer) == Result.Success);
+
+            Assert.IsTrue(FirstAgent.ServiceDescription("myService") == null);
+            Assert.IsTrue(FirstAgent.ServiceSetDescription("unknow", "myFirstAgent service description") == Result.Failure);
+            Assert.IsTrue(FirstAgent.ServiceSetDescription("myService", "myFirstAgent service description") == Result.Success);
+            string agentServicedescription = FirstAgent.ServiceDescription("myService");
+            Assert.AreEqual(agentServicedescription,"myFirstAgent service description");
+
+            Assert.IsTrue(FirstAgent.ServiceInit("myService2", testerAgentServiceCallback, null) == Result.Success);
+            Assert.IsTrue(FirstAgent.ServiceSetDescription("myService2", "myFirstAgent service2 description") == Result.Success);
+
+            Assert.IsTrue(FirstAgent.ServiceArgDescription("myService", "myBool") == null);
+            Assert.IsTrue(FirstAgent.ServiceArgSetDescription("unknow", "myBool", "myFirstAgent Bool description") == Result.Failure);
+            Assert.IsTrue(FirstAgent.ServiceArgSetDescription("myService", "unknow", "myFirstAgent Bool description") == Result.Failure);
+            Assert.IsTrue(FirstAgent.ServiceArgSetDescription("myService", "myBool", "myFirstAgent Bool description") == Result.Success);
+            string agentServiceArgBoolDescription = FirstAgent.ServiceArgDescription("myService", "myBool");
+            Assert.IsTrue(agentServiceArgBoolDescription == "myFirstAgent Bool description");
+            Assert.IsTrue(FirstAgent.ServiceArgDescription("unknow", "myBool") == null);
+            Assert.IsTrue(FirstAgent.ServiceArgDescription("myService", "unknow") == null);
+
+            Assert.IsTrue(FirstAgent.ServiceArgDescription("myService", "myInt") == null);
+            Assert.IsTrue(FirstAgent.ServiceArgSetDescription("unknow", "myInt", "myFirstAgent Int description") == Result.Failure);
+            Assert.IsTrue(FirstAgent.ServiceArgSetDescription("myService", "unknow", "myFirstAgent Int description") == Result.Failure);
+            Assert.IsTrue(FirstAgent.ServiceArgSetDescription("myService", "myInt", "myFirstAgent Int description") == Result.Success);
+            string agentServiceArgIntDescription = FirstAgent.ServiceArgDescription("myService", "myInt");
+            Assert.IsTrue(agentServiceArgIntDescription == "myFirstAgent Int description");
+            Assert.IsTrue(FirstAgent.ServiceArgDescription("unknow", "myInt") == null);
+            Assert.IsTrue(FirstAgent.ServiceArgDescription("myService", "unknow") == null);
+
+            string currentAgentDefinition = FirstAgent.DefinitionJson();
+            Igs.ClearDefinition();
+            FirstAgent.DefinitionLoadStr(currentAgentDefinition);
+            string newAgentServiceDescription = FirstAgent.ServiceDescription("myService");
+            Assert.AreEqual(newAgentServiceDescription, "myFirstAgent service description");
+            string newAgentService2Description = FirstAgent.ServiceDescription("myService2");
+            Assert.AreEqual(newAgentService2Description, "myFirstAgent service2 description");
+            string newAgentServiceArgBoolDescription = FirstAgent.ServiceArgDescription("myService", "myBool");
+            Assert.AreEqual(newAgentServiceArgBoolDescription, "myFirstAgent Bool description");
+            string newAgentServiceArgIntDescription = FirstAgent.ServiceArgDescription("myService", "myInt");
+            Assert.AreEqual(newAgentServiceArgIntDescription, "myFirstAgent Int description");
 
             Igs.AgentSetFamily("family_test");
 
