@@ -1683,6 +1683,70 @@ namespace Tester
             string newAgentServiceArgIntDescription = FirstAgent.ServiceArgDescription("myService", "myInt");
             Assert.AreEqual(newAgentServiceArgIntDescription, "myFirstAgent Int description");
 
+            Assert.IsTrue(FirstAgent.ServiceInit("myServiceWithReplies", testerAgentServiceCallback, null) == Result.Success);
+            Assert.IsTrue(!FirstAgent.ServiceHasReplies("myServiceWithReplies"));
+            Assert.IsTrue(!FirstAgent.ServiceHasReply("myServiceWithReplies", "toto"));
+            string[] agentNames = FirstAgent.ServiceReplyNames("myServiceWithReplies");
+            Assert.IsTrue(agentNames == null);
+            Assert.IsTrue(FirstAgent.ServiceReplyArgumentsList("myServiceWithReplies", "toto") == null);
+            Assert.IsTrue(FirstAgent.ServiceReplyArgsCount("myServiceWithReplies", "toto") == 0);
+            Assert.IsTrue(FirstAgent.ServiceReplyAdd("myServiceWithReplies", "myReply") == Result.Success);
+            Assert.IsTrue(FirstAgent.ServiceReplyAdd("myServiceWithReplies", "myReply2") == Result.Success);
+            Assert.IsTrue(FirstAgent.ServiceHasReplies("myServiceWithReplies"));
+            Assert.IsTrue(FirstAgent.ServiceHasReply("myServiceWithReplies", "myReply"));
+            Assert.IsTrue(FirstAgent.ServiceHasReply("myServiceWithReplies", "myReply2"));
+            Assert.IsTrue(!FirstAgent.ServiceHasReply("myServiceWithReplies", "myReply3"));
+            Assert.IsTrue(FirstAgent.ServiceHasReplies("myServiceWithReplies"));
+            agentNames = FirstAgent.ServiceReplyNames("myServiceWithReplies");
+            Assert.IsTrue(agentNames != null);
+            Assert.IsTrue(agentNames.Length == 2);
+            Assert.IsTrue(agentNames.Contains("myReply"));
+            Assert.IsTrue(agentNames.Contains("myReply2"));
+
+            Assert.IsTrue(FirstAgent.ServiceReplyDescription("myServiceWithReplies", "myReply") == null);
+            Assert.IsTrue(FirstAgent.ServiceReplySetDescription("unknow", "myReply", "myFirstAgent ServiceReply description") == Result.Failure);
+            Assert.IsTrue(FirstAgent.ServiceReplySetDescription("myServiceWithReplies", "unknow", "myFirstAgent ServiceReply description") == Result.Failure);
+            Assert.IsTrue(FirstAgent.ServiceReplySetDescription("myServiceWithReplies", "myReply", "myFirstAgent ServiceReply description") == Result.Success);
+            string agentReplyDescription = FirstAgent.ServiceReplyDescription("myServiceWithReplies", "myReply");
+            Assert.AreEqual(agentReplyDescription, "myFirstAgent ServiceReply description");
+
+            Assert.IsTrue(FirstAgent.ServiceReplyDescription("myServiceWithReplies", "myReply2") == null);
+            Assert.IsTrue(FirstAgent.ServiceReplySetDescription("myServiceWithReplies", "myReply2", "myFirstAgent ServiceReply2 description") == Result.Success);
+
+            Assert.IsTrue(FirstAgent.ServiceReplyArgAdd("myServiceWithReplies", "myReply", "myBool", IopValueType.Bool) == Result.Success);
+            Assert.IsTrue(FirstAgent.ServiceReplyArgDescription("myServiceWithReplies", "myReply", "myBool") == null);
+            Assert.IsTrue(FirstAgent.ServiceReplyArgSetDescription("unknow", "myReply", "myBool", "myFirstAgent ArgBool description") == Result.Failure);
+            Assert.IsTrue(FirstAgent.ServiceReplyArgSetDescription("myServiceWithReplies", "unknow", "myBool", "myFirstAgent ArgBool description") == Result.Failure);
+            Assert.IsTrue(FirstAgent.ServiceReplyArgSetDescription("myServiceWithReplies", "myReply", "unknow", "myFirstAgent ArgBool description") == Result.Failure);
+            Assert.IsTrue(FirstAgent.ServiceReplyArgSetDescription("myServiceWithReplies", "myReply", "myBool", "myFirstAgent ArgBool description") == Result.Success);
+            string agentReplyArgBoolDescription = FirstAgent.ServiceReplyArgDescription("myServiceWithReplies", "myReply", "myBool");
+            Assert.IsTrue(agentReplyArgBoolDescription == "myFirstAgent ArgBool description");
+            Assert.IsTrue(FirstAgent.ServiceReplyArgAdd("myServiceWithReplies", "myReply", "myInt", IopValueType.Integer) == Result.Success);
+            Assert.IsTrue(FirstAgent.ServiceReplyArgDescription("myServiceWithReplies", "myReply", "myInt") == null);
+            Assert.IsTrue(FirstAgent.ServiceReplyArgSetDescription("unknow", "myReply", "myInt", "myFirstAgent ArgInt description") == Result.Failure);
+            Assert.IsTrue(FirstAgent.ServiceReplyArgSetDescription("myServiceWithReplies", "unknow", "myInt", "myFirstAgent ArgInt description") == Result.Failure);
+            Assert.IsTrue(FirstAgent.ServiceReplyArgSetDescription("myServiceWithReplies", "myReply", "unknow", "myFirstAgent ArgInt description") == Result.Failure);
+            Assert.IsTrue(FirstAgent.ServiceReplyArgSetDescription("myServiceWithReplies", "myReply", "myInt", "myFirstAgent ArgInt description") == Result.Success);
+            string agentReplyArgIntDescription = FirstAgent.ServiceReplyArgDescription("myServiceWithReplies", "myReply", "myInt");
+            Assert.IsTrue(agentReplyArgIntDescription == "myFirstAgent ArgInt description");
+
+            currentDefinition = FirstAgent.DefinitionJson();
+            FirstAgent.ClearDefinition();
+            FirstAgent.DefinitionLoadStr(currentDefinition);
+            string newAgentReplyDescription = FirstAgent.ServiceReplyDescription("myServiceWithReplies", "myReply");
+            Assert.IsTrue(newAgentReplyDescription == "myFirstAgent ServiceReply description");
+            string newAgentReply2Description = FirstAgent.ServiceReplyDescription("myServiceWithReplies", "myReply2");
+            Assert.IsTrue(newAgentReply2Description == "myFirstAgent ServiceReply2 description");
+            string newAgentReplyArgBoolDescription = FirstAgent.ServiceReplyArgDescription("myServiceWithReplies", "myReply", "myBool");
+            Assert.IsTrue(newAgentReplyArgBoolDescription == "myFirstAgent ArgBool description");
+            string newAgentReplyArgIntDescription = FirstAgent.ServiceReplyArgDescription("myServiceWithReplies", "myReply", "myInt");
+            Assert.IsTrue(newAgentReplyArgIntDescription == "myFirstAgent ArgInt description");
+
+            Assert.IsTrue(FirstAgent.ServiceReplyArgSetDescription("myServiceWithReplies", "myReply", "myBool", "") == Result.Success);
+            Assert.IsTrue(FirstAgent.ServiceReplyArgSetDescription("myServiceWithReplies", "myReply", "myInt", "") == Result.Success);
+            FirstAgent.ServiceReplyArgRemove("myServiceWithReplies", "myReply", "myBool");
+            FirstAgent.ServiceReplyArgRemove("myServiceWithReplies", "myReply", "myInt");
+
             Igs.AgentSetFamily("family_test");
 
             // Saturation control
