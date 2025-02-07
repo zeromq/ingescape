@@ -1508,6 +1508,10 @@ namespace Tester
             inputString = FirstAgent.InputString("my_string");
             Assert.AreEqual(inputString, "new string");
 
+            Assert.IsNull(FirstAgent.InputDescription("my_impulsion"));
+            Assert.IsTrue(FirstAgent.InputSetDescription("my_impulsion", "myFirstAgent input impulsion description") == Result.Success);
+            Assert.AreEqual(FirstAgent.InputDescription("my_impulsion"), "myFirstAgent input impulsion description");
+
             //outputs
             Assert.IsTrue(FirstAgent.OutputCreate("my_impulsion", IopValueType.Impulsion) == Result.Success);
             Assert.IsTrue(FirstAgent.OutputCreate("my_impulsion", IopValueType.Impulsion) == Result.Failure);
@@ -1566,6 +1570,10 @@ namespace Tester
             FirstAgent.ClearOutput("my_data");
             Assert.IsTrue(FirstAgent.OutputData("my_data").Length == 0);
 
+            Assert.IsNull(FirstAgent.OutputDescription("my_impulsion"));
+            Assert.IsTrue(FirstAgent.OutputSetDescription("my_impulsion", "myFirstAgent output impulsion description") == Result.Success);
+            Assert.AreEqual(FirstAgent.OutputDescription("my_impulsion"), "myFirstAgent output impulsion description");
+
             //parameters
             Assert.IsTrue(FirstAgent.AttributeCreate("my_impulsion", IopValueType.Impulsion) == Result.Success);
             Assert.IsTrue(FirstAgent.AttributeCreate("my_impulsion", IopValueType.Impulsion) == Result.Failure);
@@ -1621,6 +1629,10 @@ namespace Tester
             Assert.IsTrue(FirstAgent.AttributeData("my_data").Length == 1);
             FirstAgent.ClearAttribute("my_data");
             Assert.IsTrue(FirstAgent.AttributeData("my_data").Length == 0);
+
+            Assert.IsNull(FirstAgent.AttributeDescription("my_impulsion"));
+            Assert.IsTrue(FirstAgent.AttributeSetDescription("my_impulsion", "myFirstAgent attribute impulsion description") == Result.Success);
+            Assert.AreEqual(FirstAgent.AttributeDescription("my_impulsion"), "myFirstAgent attribute impulsion description");
 
             Igs.AgentSetFamily("family_test");
 
