@@ -131,7 +131,7 @@ namespace Ingescape
         internal static string PtrToStringFromUTF8(IntPtr native)
         {
             if (native == IntPtr.Zero)
-                return string.Empty;
+                return null;
 
             int len = 0;
 

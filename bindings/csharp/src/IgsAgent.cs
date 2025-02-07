@@ -1093,6 +1093,19 @@ namespace Ingescape
         }
 
         [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr igsagent_input_description(IntPtr agent, IntPtr name);
+        public string InputDescription(string name)
+        {
+            if (_pAgent == IntPtr.Zero)
+                throw new NullReferenceException("Agent pointer is null");
+            IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
+            IntPtr descriptionAsPtr = igsagent_input_description(_pAgent, nameAsPtr);
+            string res = Igs.PtrToStringFromUTF8(descriptionAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            return res;
+        }
+
+        [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern Result igsagent_output_set_description(IntPtr agent, IntPtr name, IntPtr description);
         public Result OutputSetDescription(string name, string description)
         {
@@ -1103,6 +1116,19 @@ namespace Ingescape
             Result res = igsagent_output_set_description(_pAgent, nameAsPtr, descriptionAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
             Marshal.FreeHGlobal(descriptionAsPtr);
+            return res;
+        }
+
+        [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr igsagent_output_description(IntPtr agent, IntPtr name);
+        public string OutputDescription(string name)
+        {
+            if (_pAgent == IntPtr.Zero)
+                throw new NullReferenceException("Agent pointer is null");
+            IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
+            IntPtr descriptionAsPtr = igsagent_output_description(_pAgent, nameAsPtr);
+            string res = Igs.PtrToStringFromUTF8(descriptionAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
             return res;
         }
 
@@ -1410,6 +1436,33 @@ namespace Ingescape
         }
 
         [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igsagent_service_set_description(IntPtr agent, IntPtr name, IntPtr description);
+        public Result ServiceSetDescription(string name, string description)
+        {
+            if (_pAgent == IntPtr.Zero)
+                throw new NullReferenceException("Agent pointer is null");
+            IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
+            IntPtr descriptionAsPtr = Igs.StringToUTF8Ptr(description);
+            Result res = igsagent_service_set_description(_pAgent, nameAsPtr, descriptionAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            Marshal.FreeHGlobal(descriptionAsPtr);
+            return res;
+        }
+
+        [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr igsagent_service_description(IntPtr agent, IntPtr name);
+        public string ServiceDescription(string name)
+        {
+            if (_pAgent == IntPtr.Zero)
+                throw new NullReferenceException("Agent pointer is null");
+            IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
+            IntPtr descriptionAsPtr = igsagent_service_description(_pAgent, nameAsPtr);
+            string res = Igs.PtrToStringFromUTF8(descriptionAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            return res;
+        }
+
+        [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern Result igsagent_service_arg_add(IntPtr agent, IntPtr serviceName, IntPtr argName, IopValueType type);
         public Result ServiceArgAdd(string serviceName, string argName, IopValueType type)
         {
@@ -1438,6 +1491,37 @@ namespace Ingescape
         }
 
         [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igsagent_service_arg_set_description(IntPtr agent, IntPtr serviceName, IntPtr argName, IntPtr description);
+        public Result ServiceArgSetDescription(string serviceName, string argName, string description)
+        {
+            if (_pAgent == IntPtr.Zero)
+                throw new NullReferenceException("Agent pointer is null");
+            IntPtr nameAsPtr = Igs.StringToUTF8Ptr(serviceName);
+            IntPtr argAsPtr = Igs.StringToUTF8Ptr(argName);
+            IntPtr descriptionAsPtr = Igs.StringToUTF8Ptr(description);
+            Result res = igsagent_service_arg_set_description(_pAgent, nameAsPtr, argAsPtr, descriptionAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            Marshal.FreeHGlobal(argAsPtr);
+            Marshal.FreeHGlobal(descriptionAsPtr);
+            return res;
+        }
+
+        [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr igsagent_service_arg_description(IntPtr agent, IntPtr serviceName, IntPtr argName);
+        public string ServiceArgDescription(string serviceName, string argName)
+        {
+            if (_pAgent == IntPtr.Zero)
+                throw new NullReferenceException("Agent pointer is null");
+            IntPtr nameAsPtr = Igs.StringToUTF8Ptr(serviceName);
+            IntPtr argAsPtr = Igs.StringToUTF8Ptr(argName);
+            IntPtr descriptionAsPtr = igsagent_service_arg_description(_pAgent, nameAsPtr, argAsPtr);
+            string res = Igs.PtrToStringFromUTF8(descriptionAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            Marshal.FreeHGlobal(argAsPtr);
+            return res;
+        }
+
+        [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern Result igsagent_service_reply_add(IntPtr agent, IntPtr serviceName, IntPtr replyName);
         public Result ServiceReplyAdd(string serviceName, string replyName)
         {
@@ -1447,6 +1531,36 @@ namespace Ingescape
             IntPtr replyNameAsPtr = Igs.StringToUTF8Ptr(replyName);
             Result res = igsagent_service_reply_add(_pAgent, serviceNameAsPtr, replyNameAsPtr);
             Marshal.FreeHGlobal(serviceNameAsPtr);
+            Marshal.FreeHGlobal(replyNameAsPtr);
+            return res;
+        }
+
+        [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igsagent_service_reply_set_description(IntPtr agent, IntPtr serviceName, IntPtr replyName, IntPtr description);
+        public Result ServiceReplySetDescription(string serviceName, string replyName, string description)
+        {
+            if (_pAgent == IntPtr.Zero)
+                throw new NullReferenceException("Agent pointer is null");
+            IntPtr nameAsPtr = Igs.StringToUTF8Ptr(serviceName);
+            IntPtr replyNameAsPtr = Igs.StringToUTF8Ptr(replyName);
+            IntPtr descriptionAsPtr = Igs.StringToUTF8Ptr(description);
+            Result res = igsagent_service_reply_set_description(_pAgent, nameAsPtr, replyNameAsPtr, descriptionAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            Marshal.FreeHGlobal(replyNameAsPtr);
+            return res;
+        }
+
+        [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr igsagent_service_reply_description(IntPtr agent, IntPtr name, IntPtr replyName);
+        public string ServiceReplyDescription(string name, string replyName)
+        {
+            if (_pAgent == IntPtr.Zero)
+                throw new NullReferenceException("Agent pointer is null");
+            IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
+            IntPtr replyNameAsPtr = Igs.StringToUTF8Ptr(replyName);
+            IntPtr descriptionAsPtr = igsagent_service_reply_description(_pAgent, nameAsPtr, replyNameAsPtr);
+            string res = Igs.PtrToStringFromUTF8(descriptionAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
             Marshal.FreeHGlobal(replyNameAsPtr);
             return res;
         }
@@ -1478,6 +1592,39 @@ namespace Ingescape
             Marshal.FreeHGlobal(serviceNameAsPtr);
             Marshal.FreeHGlobal(replyNameAsPtr);
             Marshal.FreeHGlobal(argNameAsPtr);
+            return res;
+        }
+
+        [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igsagent_service_reply_arg_set_description(IntPtr agent, IntPtr serviceName, IntPtr replyName, IntPtr argName, IntPtr description);
+        public Result ServiceReplyArgSetDescription(string serviceName, string replyName, string argName, string description)
+        {
+            if (_pAgent == IntPtr.Zero)
+                throw new NullReferenceException("Agent pointer is null");
+            IntPtr nameAsPtr = Igs.StringToUTF8Ptr(serviceName);
+            IntPtr replyNameAsPtr = Igs.StringToUTF8Ptr(replyName);
+            IntPtr argNameAsPtr = Igs.StringToUTF8Ptr(argName);
+            IntPtr descriptionAsPtr = Igs.StringToUTF8Ptr(description);
+            Result res = igsagent_service_reply_arg_set_description(_pAgent, nameAsPtr, replyNameAsPtr, argNameAsPtr, descriptionAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            Marshal.FreeHGlobal(replyNameAsPtr);
+            Marshal.FreeHGlobal(argNameAsPtr);
+            return res;
+        }
+
+        [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr igsagent_service_reply_arg_description(IntPtr agent, IntPtr name, IntPtr replyName, IntPtr argName);
+        public string ServiceReplyArgDescription(string name, string replyName, string argName)
+        {
+            if (_pAgent == IntPtr.Zero)
+                throw new NullReferenceException("Agent pointer is null");
+            IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
+            IntPtr replyNameAsPtr = Igs.StringToUTF8Ptr(replyName);
+            IntPtr argNameAsPtr = Igs.StringToUTF8Ptr(argName);
+            IntPtr descriptionAsPtr = igsagent_service_reply_arg_description(_pAgent, nameAsPtr, replyNameAsPtr, argNameAsPtr);
+            string res = Igs.PtrToStringFromUTF8(descriptionAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            Marshal.FreeHGlobal(replyNameAsPtr);
             return res;
         }
 
@@ -1644,7 +1791,7 @@ namespace Ingescape
             IntPtr replyNameAsPtr = Igs.StringToUTF8Ptr(replyName);
             IntPtr ptrArgument = igsagent_service_reply_args_first(_pAgent, serviceNameAsPtr, replyNameAsPtr);
             List<ServiceArgument> serviceReplyArgumentsList = null;
-            if (ptrArgument != null)
+            if (ptrArgument != IntPtr.Zero)
             {
                 serviceReplyArgumentsList = new List<ServiceArgument>();
                 while (ptrArgument != IntPtr.Zero)
@@ -2066,6 +2213,19 @@ namespace Ingescape
             Result res = igsagent_attribute_set_description(_pAgent, nameAsPtr, descriptionAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
             Marshal.FreeHGlobal(descriptionAsPtr);
+            return res;
+        }
+
+        [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr igsagent_attribute_description(IntPtr agent, IntPtr name);
+        public string AttributeDescription(string name)
+        {
+            if (_pAgent == IntPtr.Zero)
+                throw new NullReferenceException("Agent pointer is null");
+            IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
+            IntPtr descriptionAsPtr = igsagent_attribute_description(_pAgent, nameAsPtr);
+            string res = Igs.PtrToStringFromUTF8(descriptionAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
             return res;
         }
 
@@ -2793,18 +2953,37 @@ namespace Ingescape
         }
 
         [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void igsagent_parameter_set_description(IntPtr agent, IntPtr name, IntPtr description);
+        private static extern Result igsagent_parameter_set_description(IntPtr agent, IntPtr name, IntPtr description);
 
         [Obsolete("this function is deprecated, please use AttributeSetDescription instead.")]
-        public void ParameterSetDescription(string name, string description)
+        public Result ParameterSetDescription(string name, string description)
         {
             if (_pAgent == IntPtr.Zero)
                 throw new NullReferenceException("Agent pointer is null");
             IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
             IntPtr descriptionAsPtr = Igs.StringToUTF8Ptr(description);
-            igsagent_parameter_set_description(_pAgent, nameAsPtr, descriptionAsPtr);
+            Result res = igsagent_parameter_set_description(_pAgent, nameAsPtr, descriptionAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
             Marshal.FreeHGlobal(descriptionAsPtr);
+            return res;
+        }
+
+        [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Result igsagent_parameter_set_detailed_type(IntPtr agent, IntPtr name, IntPtr type, IntPtr specification);
+
+        [Obsolete("this function is deprecated, please use AttributeSetDescription instead.")]
+        public Result ParameterSetDetailedType(string name, string type, string specification)
+        {
+            if (_pAgent == IntPtr.Zero)
+                throw new NullReferenceException("Agent pointer is null");
+            IntPtr nameAsPtr = Igs.StringToUTF8Ptr(name);
+            IntPtr typeAsPtr = Igs.StringToUTF8Ptr(type);
+            IntPtr specificationAsPtr = Igs.StringToUTF8Ptr(specification);
+            Result res = igsagent_parameter_set_detailed_type(_pAgent, nameAsPtr, typeAsPtr, specificationAsPtr);
+            Marshal.FreeHGlobal(nameAsPtr);
+            Marshal.FreeHGlobal(typeAsPtr);
+            Marshal.FreeHGlobal(specificationAsPtr);
+            return res;
         }
 
         [DllImport(Igs.ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
