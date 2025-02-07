@@ -1041,7 +1041,6 @@ namespace Ingescape
             IntPtr descriptionAsPtr = igs_output_description(nameAsPtr);
             string res = PtrToStringFromUTF8(descriptionAsPtr);
             Marshal.FreeHGlobal(nameAsPtr);
-            Marshal.FreeHGlobal(descriptionAsPtr);
             return res;
         }
         #endregion

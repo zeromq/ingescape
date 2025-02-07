@@ -1096,12 +1096,15 @@ namespace Tester
             Igs.SplitAdd("my_data_split", "partner", "sparing_data");
 
             //io description
-            Igs.InputSetDescription("my_impulsion", "my iop description here");
-            Igs.InputSetDescription("my_impulsion", "my iop description here");
-            Igs.OutputSetDescription("my_impulsion", "my iop description here");
-            Igs.OutputSetDescription("my_impulsion", "my iop description here");
-            Igs.AttributeSetDescription("my_impulsion", "my iop description here");
-            Igs.AttributeSetDescription("my_impulsion", "my iop description here");
+            Assert.IsTrue(Igs.InputDescription("my_impulsion") == null);
+            Assert.IsTrue(Igs.InputSetDescription("my_impulsion", "my iop description here") == Result.Success);
+            Assert.IsTrue(Igs.InputDescription("my_impulsion") == "my iop description here");
+            Assert.IsTrue(Igs.OutputDescription("my_impulsion") == null);
+            Assert.IsTrue(Igs.OutputSetDescription("my_impulsion", "my iop description here") == Result.Success);
+            Assert.IsTrue(Igs.OutputDescription("my_impulsion") == "my iop description here");
+            Assert.IsTrue(Igs.AttributeDescription("my_impulsion") == null);
+            Assert.IsTrue(Igs.AttributeSetDescription("my_impulsion", "my iop description here") == Result.Success);
+            Assert.IsTrue(Igs.AttributeDescription("my_impulsion") == "my iop description here");
 
             //IO writing and types conversions
             Igs.InputSetImpulsion("my_impulsion");
