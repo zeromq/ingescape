@@ -374,6 +374,31 @@ napi_value node_igs_service_remove(napi_env env, napi_callback_info info) {
     return success_js;
 }
 
+napi_value node_igs_service_set_description(napi_env env, napi_callback_info info) {
+    napi_value argv[2];
+    get_function_arguments(env, info, 2, argv);
+    char *name = convert_napi_to_string(env, argv[0]);
+    char *description = convert_napi_to_string(env, argv[1]);
+    int success = igs_service_set_description(name, description);
+    free(name);
+    free(description);
+    napi_value success_js;
+    convert_int_to_napi(env, success, &success_js);
+    return success_js;
+}
+
+napi_value node_igs_service_description(napi_env env, napi_callback_info info) {
+    napi_value argv[1];
+    get_function_arguments(env, info, 1, argv);
+    char *name = convert_napi_to_string(env, argv[0]);
+    char *description = igs_service_description(name);
+    free(name);
+    napi_value description_js;
+    convert_string_to_napi(env, description, &description_js);
+    free(description);
+    return description_js;
+}
+
 napi_value node_igs_service_arg_add(napi_env env, napi_callback_info info) {
     napi_value argv[3];
     get_function_arguments(env, info, 3, argv);
@@ -402,6 +427,35 @@ napi_value node_igs_service_arg_remove(napi_env env, napi_callback_info info) {
     return success_js;
 }
 
+napi_value node_igs_service_arg_set_description(napi_env env, napi_callback_info info) {
+    napi_value argv[3];
+    get_function_arguments(env, info, 3, argv);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    char *arg_name = convert_napi_to_string(env, argv[1]);
+    char *description = convert_napi_to_string(env, argv[2]);
+    int success = igs_service_arg_set_description(service_name, arg_name, description);
+    free(service_name);
+    free(arg_name);
+    free(description);
+    napi_value success_js;
+    convert_int_to_napi(env, success, &success_js);
+    return success_js;
+}
+
+napi_value node_igs_service_arg_description(napi_env env, napi_callback_info info) {
+    napi_value argv[2];
+    get_function_arguments(env, info, 2, argv);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    char *arg_name = convert_napi_to_string(env, argv[1]);
+    char *description = igs_service_arg_description(service_name, arg_name);
+    free(service_name);
+    free(arg_name);
+    napi_value description_js;
+    convert_string_to_napi(env, description, &description_js);
+    free(description);
+    return description_js;
+}
+
 napi_value node_igs_service_reply_add(napi_env env, napi_callback_info info) { 
     napi_value argv[2];
     get_function_arguments(env, info, 2, argv);
@@ -426,6 +480,35 @@ napi_value node_igs_service_reply_remove(napi_env env, napi_callback_info info) 
     napi_value success_js;
     convert_int_to_napi(env, success, &success_js);
     return success_js;
+}
+
+napi_value node_igs_service_reply_set_description(napi_env env, napi_callback_info info) {
+    napi_value argv[3];
+    get_function_arguments(env, info, 3, argv);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    char *reply_name = convert_napi_to_string(env, argv[1]);
+    char *description = convert_napi_to_string(env, argv[2]);
+    int success = igs_service_reply_set_description(service_name, reply_name, description);
+    free(service_name);
+    free(reply_name);
+    free(description);
+    napi_value success_js;
+    convert_int_to_napi(env, success, &success_js);
+    return success_js;
+}
+
+napi_value node_igs_service_reply_description(napi_env env, napi_callback_info info) {
+    napi_value argv[2];
+    get_function_arguments(env, info, 2, argv);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    char *reply_name = convert_napi_to_string(env, argv[1]);
+    char *description = igs_service_reply_description(service_name, reply_name);
+    free(service_name);
+    free(reply_name);
+    napi_value description_js;
+    convert_string_to_napi(env, description, &description_js);
+    free(description);
+    return description_js;
 }
 
 napi_value node_igs_service_reply_arg_add(napi_env env, napi_callback_info info) { 
@@ -458,6 +541,39 @@ napi_value node_igs_service_reply_arg_remove(napi_env env, napi_callback_info in
     napi_value success_js;
     convert_int_to_napi(env, success, &success_js);
     return success_js;
+}
+
+napi_value node_igs_service_reply_arg_set_description(napi_env env, napi_callback_info info) {
+    napi_value argv[4];
+    get_function_arguments(env, info, 4, argv);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    char *reply_name = convert_napi_to_string(env, argv[1]);
+    char *arg_name = convert_napi_to_string(env, argv[2]);
+    char *description = convert_napi_to_string(env, argv[3]);
+    int success = igs_service_reply_arg_set_description(service_name, reply_name, arg_name, description);
+    free(service_name);
+    free(reply_name);
+    free(arg_name);
+    free(description);
+    napi_value success_js;
+    convert_int_to_napi(env, success, &success_js);
+    return success_js;
+}
+
+napi_value node_igs_service_reply_arg_description(napi_env env, napi_callback_info info) {
+    napi_value argv[3];
+    get_function_arguments(env, info, 3, argv);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    char *reply_name = convert_napi_to_string(env, argv[1]);
+    char *arg_name = convert_napi_to_string(env, argv[2]);
+    char *description = igs_service_reply_arg_description(service_name, reply_name, arg_name);
+    free(service_name);
+    free(reply_name);
+    free(arg_name);
+    napi_value description_js;
+    convert_string_to_napi(env, description, &description_js);
+    free(description);
+    return description_js;
 }
 
 napi_value node_igs_service_count(napi_env env, napi_callback_info info) { 
@@ -667,12 +783,20 @@ napi_value init_service(napi_env env, napi_value exports) {
     exports = enable_callback_into_js(env, node_igs_service_call, "serviceCall", exports);
     exports = enable_callback_into_js(env, node_igs_service_init, "serviceInit", exports);
     exports = enable_callback_into_js(env, node_igs_service_remove, "serviceRemove", exports);
+    exports = enable_callback_into_js(env, node_igs_service_set_description, "serviceSetDescription", exports);
+    exports = enable_callback_into_js(env, node_igs_service_description, "serviceDescription", exports);
     exports = enable_callback_into_js(env, node_igs_service_arg_add, "serviceArgAdd", exports);
     exports = enable_callback_into_js(env, node_igs_service_arg_remove, "serviceArgRemove", exports);
+    exports = enable_callback_into_js(env, node_igs_service_arg_set_description, "serviceArgSetDescription", exports);
+    exports = enable_callback_into_js(env, node_igs_service_arg_description, "serviceArgDescription", exports);
     exports = enable_callback_into_js(env, node_igs_service_reply_add, "serviceReplyAdd", exports);
     exports = enable_callback_into_js(env, node_igs_service_reply_remove, "serviceReplyRemove", exports);
+    exports = enable_callback_into_js(env, node_igs_service_reply_set_description, "serviceReplySetDescription", exports);
+    exports = enable_callback_into_js(env, node_igs_service_reply_description, "serviceReplyDescription", exports);
     exports = enable_callback_into_js(env, node_igs_service_reply_arg_add, "serviceReplyArgAdd", exports);
     exports = enable_callback_into_js(env, node_igs_service_reply_arg_remove, "serviceReplyArgRemove", exports);
+    exports = enable_callback_into_js(env, node_igs_service_reply_arg_set_description, "serviceReplyArgSetDescription", exports);
+    exports = enable_callback_into_js(env, node_igs_service_reply_arg_description, "serviceReplyArgDescription", exports);
     exports = enable_callback_into_js(env, node_igs_service_count, "serviceCount", exports);
     exports = enable_callback_into_js(env, node_igs_service_exists, "serviceExists", exports);
     exports = enable_callback_into_js(env, node_igs_service_list, "serviceList", exports);

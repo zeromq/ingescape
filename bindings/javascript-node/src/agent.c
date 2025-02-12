@@ -1733,10 +1733,25 @@ napi_value node_igsagent_input_set_description(napi_env env, napi_callback_info 
     this = get_function_this_argument(env, info);
     char *name = convert_napi_to_string(env, argv[0]);
     char *description = convert_napi_to_string(env, argv[1]);
-    igsagent_input_set_description(unwrap_native_agent(env, this), name, description);
+    int success = igsagent_input_set_description(unwrap_native_agent(env, this), name, description);
     free(name);
     free(description);
-    return NULL;
+    napi_value success_js;
+    convert_int_to_napi(env, success, &success_js);
+    return success_js;
+}
+
+napi_value node_igsagent_input_description(napi_env env, napi_callback_info info) {
+    napi_value argv[1], this;
+    get_function_arguments(env, info, 1, argv);
+    this = get_function_this_argument(env, info);
+    char *name = convert_napi_to_string(env, argv[0]);
+    char *description = igsagent_input_description(unwrap_native_agent(env, this), name);
+    free(name);
+    napi_value description_js;
+    convert_string_to_napi(env, description, &description_js);
+    free(description);
+    return description_js;
 }
 
 napi_value node_igsagent_output_set_description(napi_env env, napi_callback_info info) {
@@ -1745,10 +1760,25 @@ napi_value node_igsagent_output_set_description(napi_env env, napi_callback_info
     this = get_function_this_argument(env, info);
     char *name = convert_napi_to_string(env, argv[0]);
     char *description = convert_napi_to_string(env, argv[1]);
-    igsagent_output_set_description(unwrap_native_agent(env, this), name, description);
+    int success = igsagent_output_set_description(unwrap_native_agent(env, this), name, description);
     free(name);
     free(description);
-    return NULL;
+    napi_value success_js;
+    convert_int_to_napi(env, success, &success_js);
+    return success_js;
+}
+
+napi_value node_igsagent_output_description(napi_env env, napi_callback_info info) {
+    napi_value argv[1], this;
+    get_function_arguments(env, info, 1, argv);
+    this = get_function_this_argument(env, info);
+    char *name = convert_napi_to_string(env, argv[0]);
+    char *description = igsagent_output_description(unwrap_native_agent(env, this), name);
+    free(name);
+    napi_value description_js;
+    convert_string_to_napi(env, description, &description_js);
+    free(description);
+    return description_js;
 }
 
 napi_value node_igsagent_attribute_set_description(napi_env env, napi_callback_info info) {
@@ -1757,10 +1787,25 @@ napi_value node_igsagent_attribute_set_description(napi_env env, napi_callback_i
     this = get_function_this_argument(env, info);
     char *name = convert_napi_to_string(env, argv[0]);
     char *description = convert_napi_to_string(env, argv[1]);
-    igsagent_attribute_set_description(unwrap_native_agent(env, this), name, description);
+    int success = igsagent_attribute_set_description(unwrap_native_agent(env, this), name, description);
     free(name);
     free(description);
-    return NULL;
+    napi_value success_js;
+    convert_int_to_napi(env, success, &success_js);
+    return success_js;
+}
+
+napi_value node_igsagent_attribute_description(napi_env env, napi_callback_info info) {
+    napi_value argv[1], this;
+    get_function_arguments(env, info, 1, argv);
+    this = get_function_this_argument(env, info);
+    char *name = convert_napi_to_string(env, argv[0]);
+    char *description = igsagent_attribute_description(unwrap_native_agent(env, this), name);
+    free(name);
+    napi_value description_js;
+    convert_string_to_napi(env, description, &description_js);
+    free(description);
+    return description_js;
 }
 
 napi_value node_igsagent_parameter_set_description(napi_env env, napi_callback_info info) {
@@ -2461,6 +2506,33 @@ napi_value node_igsagent_service_remove(napi_env env, napi_callback_info info) {
     return success_js;
 }
 
+napi_value node_igsagent_service_set_description(napi_env env, napi_callback_info info) {
+    napi_value argv[2], this;
+    get_function_arguments(env, info, 2, argv);
+    this = get_function_this_argument(env, info);
+    char *name = convert_napi_to_string(env, argv[0]);
+    char *description = convert_napi_to_string(env, argv[1]);
+    int success = igsagent_service_set_description(unwrap_native_agent(env, this), name, description);
+    free(name);
+    free(description);
+    napi_value success_js;
+    convert_int_to_napi(env, success, &success_js);
+    return success_js;
+}
+
+napi_value node_igsagent_service_description(napi_env env, napi_callback_info info) {
+    napi_value argv[1], this;
+    get_function_arguments(env, info, 1, argv);
+    this = get_function_this_argument(env, info);
+    char *name = convert_napi_to_string(env, argv[0]);
+    char *description = igsagent_service_description(unwrap_native_agent(env, this), name);
+    free(name);
+    napi_value description_js;
+    convert_string_to_napi(env, description, &description_js);
+    free(description);
+    return description_js;
+}
+
 napi_value node_igsagent_service_arg_add(napi_env env, napi_callback_info info) {
     napi_value argv[3], this;
     get_function_arguments(env, info, 3, argv);
@@ -2481,14 +2553,45 @@ napi_value node_igsagent_service_arg_remove(napi_env env, napi_callback_info inf
     napi_value argv[2], this;
     get_function_arguments(env, info, 2, argv);
     this = get_function_this_argument(env, info);
-    char * service_name = convert_napi_to_string(env, argv[0]);
-    char * arg_name = convert_napi_to_string(env, argv[1]);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    char *arg_name = convert_napi_to_string(env, argv[1]);
     int res = igsagent_service_arg_remove(unwrap_native_agent(env, this), service_name, arg_name);
     free(service_name);
     free(arg_name);
     napi_value res_convert;
     convert_int_to_napi(env, res, &res_convert);
     return res_convert;
+}
+
+napi_value node_igsagent_service_arg_set_description(napi_env env, napi_callback_info info) {
+    napi_value argv[3], this;
+    get_function_arguments(env, info, 3, argv);
+    this = get_function_this_argument(env, info);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    char *arg_name = convert_napi_to_string(env, argv[1]);
+    char *description = convert_napi_to_string(env, argv[2]);
+    int success = igsagent_service_arg_set_description(unwrap_native_agent(env, this), service_name, arg_name, description);
+    free(service_name);
+    free(arg_name);
+    free(description);
+    napi_value success_js;
+    convert_int_to_napi(env, success, &success_js);
+    return success_js;
+}
+
+napi_value node_igsagent_service_arg_description(napi_env env, napi_callback_info info) {
+    napi_value argv[2], this;
+    get_function_arguments(env, info, 2, argv);
+    this = get_function_this_argument(env, info);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    char *arg_name = convert_napi_to_string(env, argv[1]);
+    char *description = igsagent_service_arg_description(unwrap_native_agent(env, this), service_name, arg_name);
+    free(service_name);
+    free(arg_name);
+    napi_value description_js;
+    convert_string_to_napi(env, description, &description_js);
+    free(description);
+    return description_js;
 }
 
 napi_value node_igsagent_service_reply_add(napi_env env, napi_callback_info info) {
@@ -2519,6 +2622,37 @@ napi_value node_igsagent_service_reply_remove(napi_env env, napi_callback_info i
     napi_value success_js;
     convert_int_to_napi(env, success, &success_js);
     return success_js;
+}
+
+napi_value node_igsagent_service_reply_set_description(napi_env env, napi_callback_info info) {
+    napi_value argv[3], this;
+    get_function_arguments(env, info, 3, argv);
+    this = get_function_this_argument(env, info);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    char *reply_name = convert_napi_to_string(env, argv[1]);
+    char *description = convert_napi_to_string(env, argv[2]);
+    int success = igsagent_service_reply_set_description(unwrap_native_agent(env, this), service_name, reply_name, description);
+    free(service_name);
+    free(reply_name);
+    free(description);
+    napi_value success_js;
+    convert_int_to_napi(env, success, &success_js);
+    return success_js;
+}
+
+napi_value node_igsagent_service_reply_description(napi_env env, napi_callback_info info) {
+    napi_value argv[2], this;
+    get_function_arguments(env, info, 2, argv);
+    this = get_function_this_argument(env, info);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    char *reply_name = convert_napi_to_string(env, argv[1]);
+    char *description = igsagent_service_reply_description(unwrap_native_agent(env, this), service_name, reply_name);
+    free(service_name);
+    free(reply_name);
+    napi_value description_js;
+    convert_string_to_napi(env, description, &description_js);
+    free(description);
+    return description_js;
 }
 
 napi_value node_igsagent_service_reply_arg_add(napi_env env, napi_callback_info info) {
@@ -2553,6 +2687,41 @@ napi_value node_igsagent_service_reply_arg_remove(napi_env env, napi_callback_in
     napi_value res_convert;
     convert_int_to_napi(env, res, &res_convert);
     return res_convert;
+}
+
+napi_value node_igsagent_service_reply_arg_set_description(napi_env env, napi_callback_info info) {
+    napi_value argv[4], this;
+    get_function_arguments(env, info, 4, argv);
+    this = get_function_this_argument(env, info);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    char *reply_name = convert_napi_to_string(env, argv[1]);
+    char *arg_name = convert_napi_to_string(env, argv[2]);
+    char *description = convert_napi_to_string(env, argv[3]);
+    int success = igsagent_service_reply_arg_set_description(unwrap_native_agent(env, this), service_name, reply_name, arg_name, description);
+    free(service_name);
+    free(reply_name);
+    free(arg_name);
+    free(description);
+    napi_value success_js;
+    convert_int_to_napi(env, success, &success_js);
+    return success_js;
+}
+
+napi_value node_igsagent_service_reply_arg_description(napi_env env, napi_callback_info info) {
+    napi_value argv[3], this;
+    get_function_arguments(env, info, 3, argv);
+    this = get_function_this_argument(env, info);
+    char *service_name = convert_napi_to_string(env, argv[0]);
+    char *reply_name = convert_napi_to_string(env, argv[1]);
+    char *arg_name = convert_napi_to_string(env, argv[2]);
+    char *description = igsagent_service_reply_arg_description(unwrap_native_agent(env, this), service_name, reply_name, arg_name);
+    free(service_name);
+    free(reply_name);
+    free(arg_name);
+    napi_value description_js;
+    convert_string_to_napi(env, description, &description_js);
+    free(description);
+    return description_js;
 }
 
 napi_value node_igsagent_service_count(napi_env env, napi_callback_info info) {
@@ -2952,8 +3121,11 @@ napi_value init_agent(napi_env env, napi_value exports) {
         { "parameterAddConstraint", NULL, node_igsagent_parameter_add_constraint, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
 
         { "inputSetDescription", NULL, node_igsagent_input_set_description, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "inputDescription", NULL, node_igsagent_input_description, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "outputSetDescription", NULL, node_igsagent_output_set_description, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "outputDescription", NULL, node_igsagent_output_description, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "attributeSetDescription", NULL, node_igsagent_attribute_set_description, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "attributeDescription", NULL, node_igsagent_attribute_description, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "parameterSetDescription", NULL, node_igsagent_parameter_set_description, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
 
         { "inputSetDetailedType", NULL, node_igsagent_input_set_detailed_type, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
@@ -2997,12 +3169,20 @@ napi_value init_agent(napi_env env, napi_value exports) {
         { "serviceCall", NULL, node_igsagent_service_call, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "serviceInit", NULL, node_igsagent_service_init, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "serviceRemove", NULL, node_igsagent_service_remove, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "serviceSetDescription", NULL, node_igsagent_service_set_description, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "serviceDescription", NULL, node_igsagent_service_description, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "serviceArgAdd", NULL, node_igsagent_service_arg_add, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "serviceArgRemove", NULL, node_igsagent_service_arg_remove, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "serviceArgSetDescription", NULL, node_igsagent_service_arg_set_description, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "serviceArgDescription", NULL, node_igsagent_service_arg_description, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "serviceReplyAdd", NULL, node_igsagent_service_reply_add, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "serviceReplyRemove", NULL, node_igsagent_service_reply_remove, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "serviceReplySetDescription", NULL, node_igsagent_service_reply_set_description, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "serviceReplyDescription", NULL, node_igsagent_service_reply_description, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "serviceReplyArgAdd", NULL, node_igsagent_service_reply_arg_add, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "serviceReplyArgRemove", NULL, node_igsagent_service_reply_arg_remove, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "serviceReplyArgSetDescription", NULL, node_igsagent_service_reply_arg_set_description, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
+        { "serviceReplyArgDescription", NULL, node_igsagent_service_reply_arg_description, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "serviceCount", NULL, node_igsagent_service_count, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "serviceExists", NULL, node_igsagent_service_exists, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
         { "serviceList", NULL, node_igsagent_service_list, NULL, NULL, NULL, napi_writable | napi_configurable, NULL},
