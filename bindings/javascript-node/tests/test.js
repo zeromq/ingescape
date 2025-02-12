@@ -10,7 +10,7 @@
     =========================================================================
 */
 
-const IGS = require(__dirname + "/../prebuilds/" + process.platform + "-" + process.arch + "/ingescape.node"); // igs js wrapper
+const IGS = require(__dirname + "/../prebuilds/" + process.platform + "-" + process.arch + "/node.napi.node"); // igs js wrapper
 
 
 const assert = require('assert');
@@ -574,18 +574,21 @@ assert(IGS.parameterData("my_data").byteLength === 64);
 IGS.clearParameter("my_data");
 assert(IGS.parameterData("my_data") === null);
 
-
-// N.B.: no way to assert, just call method
-IGS.inputSetDescription("my_impulsion", "my io description here");
-IGS.outputSetDescription("my_impulsion", "my io description here");
-IGS.attributeSetDescription("my_impulsion", "my io description here");
-IGS.parameterSetDescription("my_impulsion", "my io description here");
-IGS.inputSetDetailedType("my_impulsion", "type_name", "specification");
-IGS.outputSetDetailedType("my_impulsion", "type_name", "specification");
-IGS.attributeSetDetailedType("my_impulsion", "type_name", "specification");
-
 // Definition - part 2
 // TODO: compare exported def, saved file and reference file
+// IOA description
+assert(IGS.inputDescription("my_impulsion") === "");
+assert(IGS.inputSetDescription("my_impulsion", "my io description here") === igsResultEnum.IGS_SUCCESS);
+assert(IGS.inputDescription("my_impulsion") === "my io description here");
+
+assert(IGS.outputDescription("my_impulsion") === "");
+assert(IGS.outputSetDescription("my_impulsion", "my io description here") === igsResultEnum.IGS_SUCCESS);
+assert(IGS.outputDescription("my_impulsion") === "my io description here");
+
+assert(IGS.attributeDescription("my_impulsion") === "");
+assert(IGS.attributeSetDescription("my_impulsion", "my io description here") === igsResultEnum.IGS_SUCCESS);
+assert(IGS.attributeDescription("my_impulsion") === "my io description here");
+
 let exportedDefinition = IGS.definitionJson()
 assert(exportedDefinition);
 IGS.definitionSetPath("/tmp/simple Demo Agent.json");
@@ -1057,7 +1060,25 @@ assert(IGS.serviceArgAdd("myService", "myData", ioTypeEnum.IGS_DATA_T) === igsRe
 assert(IGS.serviceCount() === 1);
 assert(IGS.serviceExists("myService"));
 assert(IGS.serviceList().length === 1 && IGS.serviceList()[0] === "myService");
+
+assert(IGS.serviceDescription("myService") === "");
+assert(IGS.serviceSetDescription("unknow", "myService description") === igsResultEnum.IGS_FAILURE);
+assert(IGS.serviceSetDescription("myService", "myService description") === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceDescription("myService") === "myService description");
+
+assert(IGS.serviceInit("myService2", testerServiceCallback, null) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceSetDescription("myService2", "myService2 description") === igsResultEnum.IGS_SUCCESS);
+
+assert(IGS.serviceArgDescription("myService", "myBool") === "");
+assert(IGS.serviceArgSetDescription("unknow", "myBool", "myBool description") === igsResultEnum.IGS_FAILURE);
+assert(IGS.serviceArgSetDescription("myService", "unknow", "myBool description") === igsResultEnum.IGS_FAILURE);
+assert(IGS.serviceArgSetDescription("myService", "myBool", "myBool description") === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceArgDescription("myService", "myBool") ===  "myBool description");
+assert(IGS.serviceArgDescription("unknow", "myBool") === "");
+assert(IGS.serviceArgDescription("myService", "unknow") === "");
+
 assert(IGS.serviceRemove("myService") === igsResultEnum.IGS_SUCCESS);
+
 
 assert(IGS.serviceInit("myService", testerServiceCallback, null) === igsResultEnum.IGS_SUCCESS);
 assert(IGS.serviceArgAdd("myService", "myBool", ioTypeEnum.IGS_BOOL_T) === igsResultEnum.IGS_SUCCESS);
@@ -1124,9 +1145,28 @@ let names = IGS.serviceReplyNames("myServiceWithReplies");
 assert(names.length === 2);
 assert(names.includes("myReply"));
 assert(names.includes("myReply2"));
+
+assert(IGS.serviceReplyDescription("myServiceWithReplies", "myReply") === "");
+assert(IGS.serviceReplySetDescription("unknow", "myReply", "myServiceReply description") === igsResultEnum.IGS_FAILURE);
+assert(IGS.serviceReplySetDescription("myServiceWithReplies", "unknow", "myServiceReply description") === igsResultEnum.IGS_FAILURE);
+assert(IGS.serviceReplySetDescription("myServiceWithReplies", "myReply", "myServiceReply description") === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceReplyDescription("myServiceWithReplies", "myReply") === "myServiceReply description");
+
+assert(IGS.serviceReplyDescription("myServiceWithReplies", "myReply2") === "");
+assert(IGS.serviceReplySetDescription("myServiceWithReplies", "myReply2", "myServiceReply2 description") === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceReplyDescription("myServiceWithReplies", "myReply2") === "myServiceReply2 description");
+
 assert(IGS.serviceReplyArgsList("myServiceWithReplies", "myReply").length === 0);
 assert(IGS.serviceReplyArgsCount("myServiceWithReplies", "myReply") === 0);
 assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply", "myBool", ioTypeEnum.IGS_BOOL_T) === igsResultEnum.IGS_SUCCESS);
+
+assert(IGS.serviceReplyArgDescription("myServiceWithReplies", "myReply", "myBool") === "");
+assert(IGS.serviceReplyArgSetDescription("unknow", "myReply", "myBool", "myArgBool description") === igsResultEnum.IGS_FAILURE);
+assert(IGS.serviceReplyArgSetDescription("myServiceWithReplies", "unknow", "myBool", "myArgBool description") === igsResultEnum.IGS_FAILURE);
+assert(IGS.serviceReplyArgSetDescription("myServiceWithReplies", "myReply", "unknow", "myArgBool description") === igsResultEnum.IGS_FAILURE);
+assert(IGS.serviceReplyArgSetDescription("myServiceWithReplies", "myReply", "myBool", "myArgBool description") === igsResultEnum.IGS_SUCCESS);
+assert(IGS.serviceReplyArgDescription("myServiceWithReplies", "myReply", "myBool") === "myArgBool description");
+
 assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply", "myInt", ioTypeEnum.IGS_INTEGER_T) === igsResultEnum.IGS_SUCCESS);
 assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply", "myDouble", ioTypeEnum.IGS_DOUBLE_T) === igsResultEnum.IGS_SUCCESS);
 assert(IGS.serviceReplyArgAdd("myServiceWithReplies", "myReply", "myString", ioTypeEnum.IGS_STRING_T) === igsResultEnum.IGS_SUCCESS);
@@ -1512,21 +1552,43 @@ firstAgent.parameterCreate("first_string", ioTypeEnum.IGS_STRING_T, "my string")
 firstAgent.attributeCreate("first_data", ioTypeEnum.IGS_DATA_T, new ArrayBuffer(32));
 firstAgent.parameterCreate("first_data", ioTypeEnum.IGS_DATA_T, new ArrayBuffer(32));
 
-// N.B.: no way to assert, just call method
-firstAgent.inputSetDescription("first_impulsion", "my io description here");
-firstAgent.outputSetDescription("first_impulsion", "my io description here");
-firstAgent.attributeSetDescription("first_impulsion", "my io description here");
-firstAgent.parameterSetDescription("first_impulsion", "my io description here");
+assert(firstAgent.inputDescription("first_impulsion") === "");
+assert(firstAgent.inputSetDescription("first_impulsion", "my io description here") === igsResultEnum.IGS_SUCCESS);
+assert(firstAgent.inputDescription("first_impulsion") === "my io description here");
+assert(firstAgent.outputDescription("first_impulsion") === "");
+assert(firstAgent.outputSetDescription("first_impulsion", "my io description here") === igsResultEnum.IGS_SUCCESS);
+assert(firstAgent.outputDescription("first_impulsion") === "my io description here");
+assert(firstAgent.attributeDescription("first_impulsion") === "");
+assert(firstAgent.attributeSetDescription("first_impulsion", "my io description here") === igsResultEnum.IGS_SUCCESS);
+assert(firstAgent.attributeDescription("first_impulsion") === "my io description here");
+assert(firstAgent.parameterSetDescription("first_impulsion", "my io description here")=== igsResultEnum.IGS_SUCCESS);
+
 firstAgent.inputSetDetailedType("first_impulsion", "type_name", "specification");
 firstAgent.outputSetDetailedType("first_impulsion", "type_name", "specification");
 firstAgent.attributeSetDetailedType("first_impulsion", "type_name", "specification");
 
-firstAgent.serviceInit("firstService", agentServiceCallback, null);
-firstAgent.serviceArgAdd("firstService", "firstBool", ioTypeEnum.IGS_BOOL_T);
-firstAgent.serviceArgAdd("firstService", "firstInt", ioTypeEnum.IGS_INTEGER_T);
-firstAgent.serviceArgAdd("firstService", "firstDouble", ioTypeEnum.IGS_DOUBLE_T);
-firstAgent.serviceArgAdd("firstService", "firstString", ioTypeEnum.IGS_STRING_T);
-firstAgent.serviceArgAdd("firstService", "firstData", ioTypeEnum.IGS_DATA_T);
+assert(firstAgent.serviceInit("firstService", agentServiceCallback, null) === igsResultEnum.IGS_SUCCESS);
+assert(firstAgent.serviceSetDescription("firstService", "firstService description") === igsResultEnum.IGS_SUCCESS);
+assert(firstAgent.serviceDescription("firstService") === "firstService description");
+
+assert(firstAgent.serviceArgAdd("firstService", "firstBool", ioTypeEnum.IGS_BOOL_T) === igsResultEnum.IGS_SUCCESS);
+assert(firstAgent.serviceArgSetDescription("firstService", "firstBool", "firstBool description") === igsResultEnum.IGS_SUCCESS);
+assert(firstAgent.serviceArgDescription("firstService", "firstBool") ===  "firstBool description");
+assert(firstAgent.serviceArgAdd("firstService", "firstInt", ioTypeEnum.IGS_INTEGER_T) === igsResultEnum.IGS_SUCCESS);
+assert(firstAgent.serviceArgAdd("firstService", "firstDouble", ioTypeEnum.IGS_DOUBLE_T) === igsResultEnum.IGS_SUCCESS);
+assert(firstAgent.serviceArgAdd("firstService", "firstString", ioTypeEnum.IGS_STRING_T) === igsResultEnum.IGS_SUCCESS);
+assert(firstAgent.serviceArgAdd("firstService", "firstData", ioTypeEnum.IGS_DATA_T) === igsResultEnum.IGS_SUCCESS);
+
+assert(firstAgent.serviceReplyAdd("firstService", "firstReply") === igsResultEnum.IGS_SUCCESS);
+assert(firstAgent.serviceReplySetDescription("firstService", "firstReply", "firstReply description") === igsResultEnum.IGS_SUCCESS);
+assert(firstAgent.serviceReplyDescription("firstService", "firstReply") === "firstReply description");
+assert(firstAgent.serviceReplyArgAdd("firstService", "firstReply", "firstBool", ioTypeEnum.IGS_BOOL_T) === igsResultEnum.IGS_SUCCESS);
+assert(firstAgent.serviceReplyArgSetDescription("firstService", "firstReply", "firstBool", "firstBool description") === igsResultEnum.IGS_SUCCESS);
+assert(firstAgent.serviceReplyArgDescription("firstService", "firstReply", "firstBool") === "firstBool description");
+assert(firstAgent.serviceReplyArgAdd("firstService", "firstReply", "firstInt", ioTypeEnum.IGS_INTEGER_T) === igsResultEnum.IGS_SUCCESS);
+assert(firstAgent.serviceReplyArgAdd("firstService", "firstReply", "firstDouble", ioTypeEnum.IGS_DOUBLE_T) === igsResultEnum.IGS_SUCCESS);
+assert(firstAgent.serviceReplyArgAdd("firstService", "firstReply", "firstString", ioTypeEnum.IGS_STRING_T) === igsResultEnum.IGS_SUCCESS);
+assert(firstAgent.serviceReplyArgAdd("firstService", "firstReply", "firstData", ioTypeEnum.IGS_DATA_T) === igsResultEnum.IGS_SUCCESS);
 
 firstAgent.observeInput("first_impulsion", agentIOCallback, null);
 firstAgent.observeInput("first_bool", agentIOCallback, null);
