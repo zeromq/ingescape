@@ -3858,7 +3858,6 @@ igs_result_t igs_start_with_brokers (const char *agent_endpoint)
 void igs_stop (void)
 {
     core_init_agent ();
-    model_read_write_lock(__FUNCTION__, __LINE__);
     if (core_context->network_actor) {
         // interrupting and destroying ingescape thread and zyre layer
         // this will also clean all agent->subscribers
@@ -3877,6 +3876,7 @@ void igs_stop (void)
     else
         igs_debug ("ingescape already stopped");
 
+    model_read_write_lock(__FUNCTION__, __LINE__);
     if (core_context->network_device) {
         free (core_context->network_device);
         core_context->network_device = NULL;
