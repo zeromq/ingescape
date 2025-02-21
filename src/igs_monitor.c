@@ -277,11 +277,11 @@ void igs_monitor_stop (void)
     core_init_agent ();
     if (!core_context->monitor)
         return;
-    
-    model_read_write_lock(__FUNCTION__, __LINE__);
-    zstr_sendx (core_context->monitor->monitor_actor, "$TERM", NULL);
+
     if (core_context->monitor->monitor_actor)
         zactor_destroy (&core_context->monitor->monitor_actor);
+
+    model_read_write_lock(__FUNCTION__, __LINE__);
     if (core_context->monitor->network_device)
         free (core_context->monitor->network_device);
     core_context->monitor->network_device = NULL;
