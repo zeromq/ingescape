@@ -57,6 +57,7 @@ igsagent_t *igsagent_new (const char *name, bool activate_immediately)
     agent->activate_callbacks = zlist_new();
     agent->agent_event_callbacks = zlist_new();
     agent->mute_callbacks = zlist_new();
+    agent->rt_current_timestamp_microseconds = INT64_MIN;
     zhashx_insert (core_context->created_agents, agent->uuid, agent);
     model_read_write_unlock(__FUNCTION__, __LINE__);
     

@@ -3436,8 +3436,18 @@ igs_result_t network_publish_output (igsagent_t *agent, const igs_io_t *io)
         if (agent->rt_timestamps_enabled){
             if (agent->context->rt_current_microseconds != INT64_MIN)
                 current_microseconds = agent->context->rt_current_microseconds;
-            else
-                current_microseconds = zclock_usecs();
+            else{
+                #if defined(__UNIX__)
+                struct timespec ts;
+                assert(clock_gettime(CLOCK_REALTIME, &ts) == 0);
+                current_microseconds = ts.tv_sec * 1000000LL + ts.tv_nsec / 1000;
+                #elif defined(__WINDOWS__)
+                LARGE_INTEGER frequency, counter;
+                assert(QueryPerformanceFrequency(&frequency));
+                assert(QueryPerformanceCounter(&counter));
+                current_microseconds = (counter.QuadPart * 1000000LL) / frequency.QuadPart;
+                #endif
+            }
         }
         zmsg_t *msg = zmsg_new ();
         zmsg_addstrf (msg, "%s-%s", agent->uuid, io->name);
