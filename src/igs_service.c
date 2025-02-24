@@ -1101,6 +1101,7 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
             //          - then we substract 11644473600000000LL to get a microseconds UNIX timestamp
             current_microseconds = (li.QuadPart / 10LL) - 11644473600000000LL;
             #endif
+        }
     }
     
     // 1- iteration on remote agents
