@@ -3442,10 +3442,17 @@ igs_result_t network_publish_output (igsagent_t *agent, const igs_io_t *io)
                 assert(clock_gettime(CLOCK_REALTIME, &ts) == 0);
                 current_microseconds = ts.tv_sec * 1000000LL + ts.tv_nsec / 1000;
                 #elif defined(__WINDOWS__)
-                LARGE_INTEGER frequency, counter;
-                assert(QueryPerformanceFrequency(&frequency));
-                assert(QueryPerformanceCounter(&counter));
-                current_microseconds = (counter.QuadPart * 1000000LL) / frequency.QuadPart;
+                FILETIME ft;
+                LARGE_INTEGER li;
+                GetSystemTimePreciseAsFileTime(&ft);
+                li.LowPart = ft.dwLowDateTime;
+                li.HighPart = ft.dwHighDateTime;
+                //NOTE: Windows timestamp is based on Jan 1st 1601 with a 100ns precision.
+                //      To convert it into a UNIX timestamp (based on Jan 1st 1970), we must substract the number of microseconds between these two dates.
+                //      Calculation details :
+                //          - li.QuadPart / 10LL turns 100ns prevision value into microseconds
+                //          - then we substract 11644473600000000LL to get a microseconds UNIX timestamp
+                current_microseconds = (li.QuadPart / 10LL) - 11644473600000000LL;
                 #endif
             }
         }
