@@ -3448,7 +3448,8 @@ igs_result_t network_publish_output (igsagent_t *agent, const igs_io_t *io)
                 li.LowPart = ft.dwLowDateTime;
                 li.HighPart = ft.dwHighDateTime;
                 //NOTE: Windows timestamp is based on Jan 1st 1601 with a 100ns precision.
-                //      To convert it into a UNIX timestamp (based on Jan 1st 1970), we must substract the number of microseconds between these two dates.
+                //      To convert it into a UNIX timestamp (based on Jan 1st 1970),
+                //      we must substract the number of microseconds between these two dates.
                 //      Calculation details :
                 //          - li.QuadPart / 10LL turns 100ns prevision value into microseconds
                 //          - then we substract 11644473600000000LL to get a microseconds UNIX timestamp
