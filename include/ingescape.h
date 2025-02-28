@@ -32,7 +32,7 @@
 //  INGESCAPE version macros for compile-time API detection
 #define INGESCAPE_VERSION_MAJOR 4
 #define INGESCAPE_VERSION_MINOR 3
-#define INGESCAPE_VERSION_PATCH 5
+#define INGESCAPE_VERSION_PATCH 6
 
 #define INGESCAPE_MAKE_VERSION(major, minor, patch) \
 ((major) * 10000 + (minor) * 100 + (patch))
@@ -894,7 +894,7 @@ INGESCAPE_EXPORT void igs_net_set_discovery_interval(unsigned int interval); //i
 INGESCAPE_EXPORT void igs_net_set_timeout(unsigned int duration); //in milliseconds
 INGESCAPE_EXPORT void  igs_net_raise_sockets_limit(void); //UNIX only, to be called before any ingescape or ZeroMQ activity
 //Set high water marks (HWM) for the publish/subscribe sockets.
-//Setting HWM to 0 means that they are disabled.
+//Setting HWM to 0 means that they are disabled (use at your own risk).
 INGESCAPE_EXPORT void igs_net_set_high_water_marks(int hwm_value);
 
 

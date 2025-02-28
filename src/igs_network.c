@@ -4814,7 +4814,7 @@ bool igs_has_ipc (void)
 void igs_net_set_high_water_marks (int hwm_value)
 {
     core_init_agent ();
-    assert(hwm_value > 0);
+    assert(hwm_value >= 0);
     model_read_write_lock(__FUNCTION__, __LINE__);
     if (core_context->network_actor
         && core_context->publisher) {
