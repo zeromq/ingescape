@@ -58,6 +58,7 @@
 /* #undef ZMQ_HAVE_LIBBSD */
 
 #define ZMQ_HAVE_IPC
+#define ZMQ_HAVE_STRUCT_SOCKADDR_UN
 
 #define ZMQ_USE_BUILTIN_SHA1
 /* #undef ZMQ_USE_NSS */

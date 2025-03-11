@@ -20,7 +20,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B30376DD-096B-3792-AC2B-A4534624E3CB}</ProjectGuid>
-    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <Keyword>Win32Proj</Keyword>
     <Platform>x64</Platform>
     <ProjectName>ingescape</ProjectName>
@@ -30,22 +30,22 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -116,7 +116,7 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>$(ProjectDir)dependencies\zyre\$(Configuration)\$(Platform)\zyre.lib;ws2_32.lib;$(ProjectDir)dependencies\czmq\$(Configuration)\$(Platform)\czmq.lib;$(ProjectDir)dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v142-mt-gd-4_3_5.lib;$(ProjectDir)dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib;rpcrt4.lib;iphlpapi.lib;Rpcrt4.lib;Iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)dependencies\zyre\$(Configuration)\$(Platform)\zyre.lib;ws2_32.lib;$(ProjectDir)dependencies\czmq\$(Configuration)\$(Platform)\czmq.lib;$(ProjectDir)dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-$(PlatformToolset)-mt-gd-4_3_5.lib;$(ProjectDir)dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib;rpcrt4.lib;iphlpapi.lib;Rpcrt4.lib;Iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -160,7 +160,7 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>$(ProjectDir)dependencies\zyre\$(Configuration)\$(Platform)\zyre.lib;ws2_32.lib;$(ProjectDir)dependencies\czmq\$(Configuration)\$(Platform)\czmq.lib;$(ProjectDir)dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v142-mt-gd-4_3_5.lib;$(ProjectDir)dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib;rpcrt4.lib;iphlpapi.lib;Rpcrt4.lib;Iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)dependencies\zyre\$(Configuration)\$(Platform)\zyre.lib;ws2_32.lib;$(ProjectDir)dependencies\czmq\$(Configuration)\$(Platform)\czmq.lib;$(ProjectDir)dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-$(PlatformToolset)-mt-gd-4_3_5.lib;$(ProjectDir)dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib;rpcrt4.lib;iphlpapi.lib;Rpcrt4.lib;Iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x86</AdditionalOptions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -202,7 +202,7 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>$(ProjectDir)dependencies\zyre\$(Configuration)\$(Platform)\zyre.lib;ws2_32.lib;$(ProjectDir)dependencies\czmq\$(Configuration)\$(Platform)\czmq.lib;$(ProjectDir)dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v142-mt-4_3_5.lib;$(ProjectDir)dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib;rpcrt4.lib;iphlpapi.lib;Rpcrt4.lib;Iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)dependencies\zyre\$(Configuration)\$(Platform)\zyre.lib;ws2_32.lib;$(ProjectDir)dependencies\czmq\$(Configuration)\$(Platform)\czmq.lib;$(ProjectDir)dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-$(PlatformToolset)-mt-4_3_5.lib;$(ProjectDir)dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib;rpcrt4.lib;iphlpapi.lib;Rpcrt4.lib;Iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -244,7 +244,7 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>$(ProjectDir)dependencies\zyre\$(Configuration)\$(Platform)\zyre.lib;ws2_32.lib;$(ProjectDir)dependencies\czmq\$(Configuration)\$(Platform)\czmq.lib;$(ProjectDir)dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v142-mt-4_3_5.lib;$(ProjectDir)dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib;rpcrt4.lib;iphlpapi.lib;Rpcrt4.lib;Iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)dependencies\zyre\$(Configuration)\$(Platform)\zyre.lib;ws2_32.lib;$(ProjectDir)dependencies\czmq\$(Configuration)\$(Platform)\czmq.lib;$(ProjectDir)dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-$(PlatformToolset)-mt-4_3_5.lib;$(ProjectDir)dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib;rpcrt4.lib;iphlpapi.lib;Rpcrt4.lib;Iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x86</AdditionalOptions>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -288,7 +288,7 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>dependencies\zyre\MinSizeRel\zyre.lib;ws2_32.lib;dependencies\czmq\MinSizeRel\czmq.lib;dependencies\libzmq\lib\MinSizeRel\libzmq-v142-mt-4_3_5.lib;dependencies\sodium\MinSizeRel\sodium.lib;rpcrt4.lib;iphlpapi.lib;ws2_32.lib;Rpcrt4.lib;Iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>dependencies\zyre\MinSizeRel\zyre.lib;ws2_32.lib;dependencies\czmq\MinSizeRel\czmq.lib;dependencies\libzmq\lib\MinSizeRel\libzmq-$(PlatformToolset)-mt-4_3_5.lib;dependencies\sodium\MinSizeRel\sodium.lib;rpcrt4.lib;iphlpapi.lib;ws2_32.lib;Rpcrt4.lib;Iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -332,7 +332,7 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>dependencies\zyre\MinSizeRel\zyre.lib;ws2_32.lib;dependencies\czmq\MinSizeRel\czmq.lib;dependencies\libzmq\lib\MinSizeRel\libzmq-v142-mt-4_3_5.lib;dependencies\sodium\MinSizeRel\sodium.lib;rpcrt4.lib;iphlpapi.lib;ws2_32.lib;Rpcrt4.lib;Iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>dependencies\zyre\MinSizeRel\zyre.lib;ws2_32.lib;dependencies\czmq\MinSizeRel\czmq.lib;dependencies\libzmq\lib\MinSizeRel\libzmq-$(PlatformToolset)-mt-4_3_5.lib;dependencies\sodium\MinSizeRel\sodium.lib;rpcrt4.lib;iphlpapi.lib;ws2_32.lib;Rpcrt4.lib;Iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -375,7 +375,7 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>dependencies\zyre\RelWithDebInfo\zyre.lib;ws2_32.lib;dependencies\czmq\RelWithDebInfo\czmq.lib;dependencies\libzmq\lib\RelWithDebInfo\libzmq-v142-mt-4_3_5.lib;dependencies\sodium\RelWithDebInfo\sodium.lib;rpcrt4.lib;iphlpapi.lib;ws2_32.lib;Rpcrt4.lib;Iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>dependencies\zyre\RelWithDebInfo\zyre.lib;ws2_32.lib;dependencies\czmq\RelWithDebInfo\czmq.lib;dependencies\libzmq\lib\RelWithDebInfo\libzmq-$(PlatformToolset)-mt-4_3_5.lib;dependencies\sodium\RelWithDebInfo\sodium.lib;rpcrt4.lib;iphlpapi.lib;ws2_32.lib;Rpcrt4.lib;Iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -418,7 +418,7 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>dependencies\zyre\RelWithDebInfo\zyre.lib;ws2_32.lib;dependencies\czmq\RelWithDebInfo\czmq.lib;dependencies\libzmq\lib\RelWithDebInfo\libzmq-v142-mt-4_3_5.lib;dependencies\sodium\RelWithDebInfo\sodium.lib;rpcrt4.lib;iphlpapi.lib;ws2_32.lib;Rpcrt4.lib;Iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>dependencies\zyre\RelWithDebInfo\zyre.lib;ws2_32.lib;dependencies\czmq\RelWithDebInfo\czmq.lib;dependencies\libzmq\lib\RelWithDebInfo\libzmq-$(PlatformToolset)-mt-4_3_5.lib;dependencies\sodium\RelWithDebInfo\sodium.lib;rpcrt4.lib;iphlpapi.lib;ws2_32.lib;Rpcrt4.lib;Iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>true</GenerateDebugInformation>

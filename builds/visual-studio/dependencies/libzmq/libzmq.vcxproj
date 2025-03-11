@@ -20,7 +20,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1728F069-24E8-31BC-8C5E-6B6E0F33F228}</ProjectGuid>
-    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <Keyword>Win32Proj</Keyword>
     <Platform>x64</Platform>
     <ProjectName>libzmq</ProjectName>
@@ -30,22 +30,22 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -58,8 +58,8 @@
     <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Configuration)\$(Platform)</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">libzmq.dir\$(Configuration)\$(Platform)</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">libzmq-v142-mt-gd-4_3_5</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">libzmq-v142-mt-gd-4_3_5</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">libzmq-$(PlatformToolset)-mt-gd-4_3_5</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">libzmq-$(PlatformToolset)-mt-gd-4_3_5</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.dll</TargetExt>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.dll</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
@@ -68,8 +68,8 @@
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateManifest>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Configuration)\$(Platform)</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">libzmq.dir\$(Configuration)\$(Platform)</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">libzmq-v142-mt-4_3_5</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">libzmq-v142-mt-4_3_5</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">libzmq-$(PlatformToolset)-mt-4_3_5</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">libzmq-$(PlatformToolset)-mt-4_3_5</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.dll</TargetExt>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.dll</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
@@ -121,8 +121,8 @@
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>$(ProjectDir)/$(Configuration)/$(Platform)/libzmq-v142-mt-gd-4_3_5.lib</ImportLibrary>
-      <ProgramDataBaseFile>$(ProjectDir)/$(Configuration)/$(Platform)/libzmq-v142-mt-gd-4_3_5.pdb</ProgramDataBaseFile>
+      <ImportLibrary>$(ProjectDir)/$(Configuration)/$(Platform)/libzmq-$(PlatformToolset)-mt-gd-4_3_5.lib</ImportLibrary>
+      <ProgramDataBaseFile>$(ProjectDir)/$(Configuration)/$(Platform)/libzmq-$(PlatformToolset)-mt-gd-4_3_5.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
     </Link>
     <ProjectReference>
@@ -165,8 +165,8 @@
       <AdditionalOptions>%(AdditionalOptions) /machine:x86</AdditionalOptions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>$(ProjectDir)/$(Configuration)/$(Platform)/libzmq-v142-mt-gd-4_3_5.lib</ImportLibrary>
-      <ProgramDataBaseFile>$(ProjectDir)/$(Configuration)/$(Platform)/libzmq-v142-mt-gd-4_3_5.pdb</ProgramDataBaseFile>
+      <ImportLibrary>$(ProjectDir)/$(Configuration)/$(Platform)/libzmq-$(PlatformToolset)-mt-gd-4_3_5.lib</ImportLibrary>
+      <ProgramDataBaseFile>$(ProjectDir)/$(Configuration)/$(Platform)/libzmq-$(PlatformToolset)-mt-gd-4_3_5.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
     </Link>
     <ProjectReference>
@@ -209,8 +209,8 @@
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>$(ProjectDir)/$(Configuration)/$(Platform)/libzmq-v142-mt-4_3_5.lib</ImportLibrary>
-      <ProgramDataBaseFile>$(ProjectDir)/$(Configuration)/$(Platform)/libzmq-v142-mt-4_3_5.pdb</ProgramDataBaseFile>
+      <ImportLibrary>$(ProjectDir)/$(Configuration)/$(Platform)/libzmq-$(PlatformToolset)-mt-4_3_5.lib</ImportLibrary>
+      <ProgramDataBaseFile>$(ProjectDir)/$(Configuration)/$(Platform)/libzmq-$(PlatformToolset)-mt-4_3_5.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
     </Link>
     <ProjectReference>
@@ -253,8 +253,8 @@
       <AdditionalOptions>%(AdditionalOptions) /machine:x86</AdditionalOptions>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>$(ProjectDir)/$(Configuration)/$(Platform)/libzmq-v142-mt-4_3_5.lib</ImportLibrary>
-      <ProgramDataBaseFile>$(ProjectDir)/$(Configuration)/$(Platform)/libzmq-v142-mt-4_3_5.pdb</ProgramDataBaseFile>
+      <ImportLibrary>$(ProjectDir)/$(Configuration)/$(Platform)/libzmq-$(PlatformToolset)-mt-4_3_5.lib</ImportLibrary>
+      <ProgramDataBaseFile>$(ProjectDir)/$(Configuration)/$(Platform)/libzmq-$(PlatformToolset)-mt-4_3_5.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
     </Link>
     <ProjectReference>

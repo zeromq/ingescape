@@ -24,7 +24,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{6DF21852-05C8-3718-9B1E-56638C23117C}</ProjectGuid>
-    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <Keyword>Win32Proj</Keyword>
     <Platform>x64</Platform>
     <ProjectName>sodium</ProjectName>
@@ -34,22 +34,25 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -258,8 +261,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\crypto_aead\aes256gcm\aesni\aead_aes256gcm_aesni.c" />
-    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\crypto_aead\chacha20poly1305\sodium\aead_chacha20poly1305.c" />
-    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\crypto_aead\xchacha20poly1305\sodium\aead_xchacha20poly1305.c" />
     <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\crypto_auth\crypto_auth.c" />
     <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\crypto_auth\hmacsha256\auth_hmacsha256.c" />
     <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\crypto_auth\hmacsha512\auth_hmacsha512.c" />
@@ -354,7 +355,6 @@
     <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\crypto_stream\salsa208\stream_salsa208.c" />
     <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\crypto_stream\xchacha20\stream_xchacha20.c" />
     <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\crypto_stream\xsalsa20\stream_xsalsa20.c" />
-    <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\crypto_verify\sodium\verify.c" />
     <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\randombytes\internal\randombytes_internal_random.c" />
     <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\randombytes\randombytes.c" />
     <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\randombytes\sysrandom\randombytes_sysrandom.c" />
@@ -363,6 +363,20 @@
     <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\sodium\runtime.c" />
     <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\sodium\utils.c" />
     <ClCompile Include="$(ProjectDir)..\..\..\..\dependencies\sodium\src\libsodium\sodium\version.c" />
+    <ClCompile Include="..\..\..\..\dependencies\sodium\src\libsodium\crypto_aead\aegis128l\aead_aegis128l.c" />
+    <ClCompile Include="..\..\..\..\dependencies\sodium\src\libsodium\crypto_aead\aegis128l\aegis128l_aesni.c" />
+    <ClCompile Include="..\..\..\..\dependencies\sodium\src\libsodium\crypto_aead\aegis128l\aegis128l_armcrypto.c" />
+    <ClCompile Include="..\..\..\..\dependencies\sodium\src\libsodium\crypto_aead\aegis128l\aegis128l_soft.c" />
+    <ClCompile Include="..\..\..\..\dependencies\sodium\src\libsodium\crypto_aead\aegis256\aead_aegis256.c" />
+    <ClCompile Include="..\..\..\..\dependencies\sodium\src\libsodium\crypto_aead\aegis256\aegis256_aesni.c" />
+    <ClCompile Include="..\..\..\..\dependencies\sodium\src\libsodium\crypto_aead\aegis256\aegis256_armcrypto.c" />
+    <ClCompile Include="..\..\..\..\dependencies\sodium\src\libsodium\crypto_aead\aegis256\aegis256_soft.c" />
+    <ClCompile Include="..\..\..\..\dependencies\sodium\src\libsodium\crypto_aead\aes256gcm\aead_aes256gcm.c" />
+    <ClCompile Include="..\..\..\..\dependencies\sodium\src\libsodium\crypto_aead\aes256gcm\armcrypto\aead_aes256gcm_armcrypto.c" />
+    <ClCompile Include="..\..\..\..\dependencies\sodium\src\libsodium\crypto_aead\chacha20poly1305\aead_chacha20poly1305.c" />
+    <ClCompile Include="..\..\..\..\dependencies\sodium\src\libsodium\crypto_aead\xchacha20poly1305\aead_xchacha20poly1305.c" />
+    <ClCompile Include="..\..\..\..\dependencies\sodium\src\libsodium\crypto_core\softaes\softaes.c" />
+    <ClCompile Include="..\..\..\..\dependencies\sodium\src\libsodium\crypto_verify\verify.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

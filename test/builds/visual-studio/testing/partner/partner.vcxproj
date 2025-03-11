@@ -22,32 +22,32 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{E0431216-19B6-4DD2-BD2B-3D27713CDDCE}</ProjectGuid>
     <RootNamespace>partner</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -95,7 +95,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>$(ProjectDir)..\..\..\..\..\builds\visual-studio\$(Configuration)\$(Platform)\ingescaped.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-gd-4_3_5.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\czmq.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\zyre.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)..\..\..\..\..\builds\visual-studio\$(Configuration)\$(Platform)\ingescaped.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-$(PlatformToolset)-mt-gd-4_3_5.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\czmq.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\zyre.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(SolutionDir)..\..\..\..\builds\visual-studio\$(Configuration)\$(Platform)\ingescaped.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
@@ -110,11 +110,11 @@ copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configu
 copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\czmq.exp" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
 copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\libczmq.ilk" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
 
-copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-gd-4_3_5.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
-copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-gd-4_3_5.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
-copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-gd-4_3_5.pdb" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
-copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-gd-4_3_5.exp" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
-copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-gd-4_3_5.ilk" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-$(PlatformToolset)-mt-gd-4_3_5.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-$(PlatformToolset)-mt-gd-4_3_5.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-$(PlatformToolset)-mt-gd-4_3_5.pdb" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-$(PlatformToolset)-mt-gd-4_3_5.exp" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-$(PlatformToolset)-mt-gd-4_3_5.ilk" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
 
 copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\libsodium.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
 copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
@@ -140,7 +140,7 @@ copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\zyre\$(Configu
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>$(ProjectDir)..\..\..\..\..\builds\visual-studio\$(Configuration)\$(Platform)\ingescaped.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-gd-4_3_5.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\czmq.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\zyre.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)..\..\..\..\..\builds\visual-studio\$(Configuration)\$(Platform)\ingescaped.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-$(PlatformToolset)-mt-gd-4_3_5.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\czmq.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\zyre.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(SolutionDir)..\..\..\..\builds\visual-studio\$(Configuration)\$(Platform)\ingescaped.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
@@ -155,11 +155,11 @@ copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configu
 copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\czmq.exp" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
 copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\libczmq.ilk" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
 
-copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-gd-4_3_5.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
-copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-gd-4_3_5.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
-copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-gd-4_3_5.pdb" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
-copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-gd-4_3_5.exp" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
-copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-gd-4_3_5.ilk" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-$(PlatformToolset)-mt-gd-4_3_5.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-$(PlatformToolset)-mt-gd-4_3_5.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-$(PlatformToolset)-mt-gd-4_3_5.pdb" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-$(PlatformToolset)-mt-gd-4_3_5.exp" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-$(PlatformToolset)-mt-gd-4_3_5.ilk" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
 
 copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\libsodium.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
 copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
@@ -189,7 +189,7 @@ copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\zyre\$(Configu
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>$(ProjectDir)..\..\..\..\..\builds\visual-studio\$(Configuration)\$(Platform)\ingescape.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-4_3_5.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\czmq.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\zyre.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)..\..\..\..\..\builds\visual-studio\$(Configuration)\$(Platform)\ingescape.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-$(PlatformToolset)-mt-4_3_5.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\czmq.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\zyre.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(SolutionDir)..\..\..\..\builds\visual-studio\$(Configuration)\$(Platform)\ingescape.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
@@ -198,8 +198,8 @@ copy "$(SolutionDir)..\..\..\..\builds\visual-studio\$(Configuration)\$(Platform
 copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\libczmq.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
 copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\czmq.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
 
-copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-4_3_5.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
-copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-4_3_5.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-$(PlatformToolset)-mt-4_3_5.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-$(PlatformToolset)-mt-4_3_5.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
 
 copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\libsodium.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
 copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
@@ -223,7 +223,7 @@ copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\zyre\$(Configu
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>$(ProjectDir)..\..\..\..\..\builds\visual-studio\$(Configuration)\$(Platform)\ingescape.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-4_3_5.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\czmq.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\zyre.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)..\..\..\..\..\builds\visual-studio\$(Configuration)\$(Platform)\ingescape.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-$(PlatformToolset)-mt-4_3_5.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\czmq.lib;$(ProjectDir)..\..\..\..\..\builds\visual-studio\dependencies\zyre\$(Configuration)\$(Platform)\zyre.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(SolutionDir)..\..\..\..\builds\visual-studio\$(Configuration)\$(Platform)\ingescape.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
@@ -232,8 +232,8 @@ copy "$(SolutionDir)..\..\..\..\builds\visual-studio\$(Configuration)\$(Platform
 copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\libczmq.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
 copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\czmq\$(Configuration)\$(Platform)\czmq.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
 
-copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-4_3_5.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
-copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-v141-mt-4_3_5.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-$(PlatformToolset)-mt-4_3_5.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
+copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\libzmq\$(Configuration)\$(Platform)\libzmq-$(PlatformToolset)-mt-4_3_5.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
 
 copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\libsodium.dll" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
 copy "$(SolutionDir)..\..\..\..\builds\visual-studio\dependencies\sodium\$(Configuration)\$(Platform)\sodium.lib" "$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)"
