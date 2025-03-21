@@ -102,15 +102,15 @@ igs_result_t definition_add_io_to_definition (igsagent_t *agent,
     }
     switch (io_type) {
         case IGS_INPUT_T:
-            zlist_append(def->inputs_names_ordered, strdup(io->name));
+            zlist_append(def->inputs_names_ordered, io->name);
             zhashx_insert(def->inputs_table, io->name, io);
             break;
         case IGS_OUTPUT_T:
-            zlist_append(def->outputs_names_ordered, strdup(io->name));
+            zlist_append(def->outputs_names_ordered, io->name);
             zhashx_insert(def->outputs_table, io->name, io);
             break;
         case IGS_ATTRIBUTE_T:
-            zlist_append(def->attributes_names_ordered, strdup(io->name));
+            zlist_append(def->attributes_names_ordered, io->name);
             zhashx_insert(def->attributes_table, io->name, io);
             break;
         default:
