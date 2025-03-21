@@ -487,7 +487,7 @@ igs_result_t igsagent_service_init (igsagent_t *agent,
         zlist_comparefn(s->replies_names_ordered, (zlist_compare_fn*) strcmp);
         zlist_autofree(s->replies_names_ordered);
         s->replies = zhashx_new();
-        zlist_append(agent->definition->services_names_ordered, strdup(s->name));
+        zlist_append(agent->definition->services_names_ordered, s->name);
         zhashx_insert(agent->definition->services_table, s->name, s);
         definition_update_json (agent->definition);
         agent->network_need_to_send_definition_update = true;
@@ -764,7 +764,7 @@ igs_result_t igsagent_service_reply_add(igsagent_t *agent, const char *service_n
     zlist_comparefn(r->replies_names_ordered, (zlist_compare_fn*) strcmp);
     zlist_autofree(r->replies_names_ordered);
     r->replies = zhashx_new();
-    zlist_append(s->replies_names_ordered, strdup(r->name));
+    zlist_append(s->replies_names_ordered, r->name);
     zhashx_insert(s->replies, r->name, r);
     definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;

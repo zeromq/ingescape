@@ -274,7 +274,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                         free(io->specification);
                     io->specification = s_strndup(io_specification->u.string, IGS_MAX_SPECIFICATION_LENGTH);
                 }
-                zlist_append(definition->inputs_names_ordered, strdup(io->name));
+                zlist_append(definition->inputs_names_ordered, io->name);
                 zhashx_insert(definition->inputs_table, io->name, io);
             }
         }
@@ -338,7 +338,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                     io->specification = s_strndup(io_specification->u.string, IGS_MAX_SPECIFICATION_LENGTH);
                 }
 
-                zlist_append(definition->outputs_names_ordered, strdup(io->name));
+                zlist_append(definition->outputs_names_ordered, io->name);
                 zhashx_insert(definition->outputs_table, io->name, io);
             }
         }
@@ -403,7 +403,7 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                         free(io->specification);
                     io->specification = s_strndup(io_specification->u.string, IGS_MAX_SPECIFICATION_LENGTH);
                 }
-                zlist_append(definition->attributes_names_ordered, strdup(io->name));
+                zlist_append(definition->attributes_names_ordered, io->name);
                 zhashx_insert(definition->attributes_table, io->name, io);
             }
         }
@@ -528,12 +528,12 @@ igs_definition_t *parser_parse_definition_from_node (igs_json_node_t **json)
                                     }
                                 }
                             }
-                            zlist_append(service->replies_names_ordered, strdup(my_reply->name));
+                            zlist_append(service->replies_names_ordered, my_reply->name);
                             zhashx_insert(service->replies, my_reply->name, my_reply);
                         }
                     }
                 }
-                zlist_append(definition->services_names_ordered, strdup(service->name));
+                zlist_append(definition->services_names_ordered, service->name);
                 zhashx_insert(definition->services_table, service->name, service);
             }
         }
