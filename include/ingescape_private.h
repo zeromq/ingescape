@@ -145,6 +145,7 @@ typedef struct igs_service{
 
 typedef struct igs_definition{
     char* my_class;
+    bool class_set_explicitly;
     char* package;
     char* name;
     char* description;

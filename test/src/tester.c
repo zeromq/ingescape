@@ -385,13 +385,26 @@ void run_static_tests (int argc, const char * argv[]){
     name = NULL;
     igs_agent_set_name(agentName);
     assert(streq(igs_definition_class(),agentName)); //intentional memory leak here
-    assert(igs_agent_uuid()); //intentional memory leak here
 
-    //package and class
-    igs_definition_set_class("my class");
-    assert(streq(igs_definition_class(),"my class")); //intentional memory leak here
+    // If class is not explicitly set, it follows the agent name
+    igs_agent_set_name("someOtherName");
+    assert(streq(igs_definition_class(),"someOtherName")); //intentional memory leak here
+
+    // Once class is explicitly set, changing the agent name must not change the class name
+    igs_agent_set_name(agentName);
+    igs_definition_set_class(agentName);
+    assert(streq(igs_agent_name(),agentName)); //intentional memory leak here
+    assert(streq(igs_definition_class(),agentName)); //intentional memory leak here
+    igs_agent_set_name("someOtherName");
+    assert(streq(igs_agent_name(),"someOtherName")); //intentional memory leak here
+    assert(streq(igs_definition_class(),agentName)); //intentional memory leak here
+
+    igs_agent_set_name(agentName);
+
+    //package
     igs_definition_set_package("my::pac kage");
     assert(streq(igs_definition_package(),"my::pac kage")); //intentional memory leak here
+
 
     //constraints
     igs_input_create("constraint_impulsion", IGS_IMPULSION_T, 0, 0);

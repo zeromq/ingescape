@@ -285,6 +285,7 @@ void igsagent_clear_definition (igsagent_t *agent)
     else
         agent->definition->name = strdup (IGS_DEFAULT_AGENT_NAME);
 
+    agent->definition->class_set_explicitly = false;
     agent->definition->attributes_names_ordered = zlist_new();
     zlist_comparefn (agent->definition->attributes_names_ordered, (zlist_compare_fn *) strcmp);
     zlist_autofree(agent->definition->attributes_names_ordered);
@@ -433,6 +434,7 @@ void igsagent_definition_set_class (igsagent_t *agent,
     if (agent->definition->my_class)
         free (agent->definition->my_class);
     agent->definition->my_class = s_strndup (my_class, IGS_MAX_AGENT_CLASS_LENGTH);
+    agent->definition->class_set_explicitly = true;
     definition_update_json (agent->definition);
     agent->network_need_to_send_definition_update = true;
     model_read_write_unlock(__FUNCTION__, __LINE__);

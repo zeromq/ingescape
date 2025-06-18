@@ -3947,7 +3947,7 @@ void igsagent_set_name (igsagent_t *agent, const char *name)
     agent->definition->name = s_strndup (name, IGS_MAX_AGENT_NAME_LENGTH);
     if (!agent->definition->my_class)
         agent->definition->my_class = strdup(agent->definition->name);
-    else if (previous && streq(agent->definition->my_class, previous)){
+    else if (previous && streq(agent->definition->my_class, previous) && !agent->definition->class_set_explicitly){
         free (agent->definition->my_class);
         agent->definition->my_class = strdup(agent->definition->name);
     }
