@@ -61,7 +61,10 @@ void s_split_trigger_send_message_to_worker (igs_core_context_t *context,
                             zmsg_addmem(readyMessage, &(work->value.b), sizeof(bool));
                             break;
                         case IGS_STRING_T:
-                            zmsg_addstr(readyMessage, work->value.s);
+                            if (work->value.s)
+                                zmsg_addmem(readyMessage, &(work->value.s), strlen(work->value.s) + 1);
+                            else
+                                zmsg_addmem(readyMessage, NULL, 0);
                             break;
                         case IGS_IMPULSION_T:
                             zmsg_addmem(readyMessage, NULL, 0);
@@ -75,9 +78,9 @@ void s_split_trigger_send_message_to_worker (igs_core_context_t *context,
                     }
                     
                     zlist_remove(splitter->queued_works, work);
-                    if(work->value_type == IGS_STRING_T)
+                    if(work->value_type == IGS_STRING_T && work->value.s)
                         free(work->value.s);
-                    else if (work->value_type == IGS_DATA_T)
+                    else if (work->value_type == IGS_DATA_T && work->value.data)
                         free(work->value.data);
                     free(work);
                     max_credit_worker->uses++;
@@ -257,9 +260,9 @@ void split_remove_worker (igs_core_context_t *context, char *uuid, char *input_n
             igs_queued_work_t *work_elt = zlist_first(splitter->queued_works);
             while (work_elt) {
                 zlist_remove(splitter->queued_works, work_elt);
-                if(work_elt->value_type == IGS_DATA_T)
+                if(work_elt->value_type == IGS_DATA_T && work_elt->value.data)
                     free(work_elt->value.data);
-                else if(work_elt->value_type == IGS_STRING_T)
+                else if(work_elt->value_type == IGS_STRING_T && work_elt->value.s)
                     free(work_elt->value.s);
                 free(work_elt);
                 work_elt = zlist_next(splitter->queued_works);
@@ -313,7 +316,7 @@ void split_add_work_to_queue (igs_core_context_t *context,
                     new_work->value.b = output->value.b;
                     break;
                 case IGS_STRING_T:
-                    new_work->value.s = strdup(output->value.s);
+                    new_work->value.s = (output->value.s)?strdup(output->value.s):NULL;
                     break;
                 case IGS_IMPULSION_T:
                     break;

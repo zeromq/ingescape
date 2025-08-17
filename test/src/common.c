@@ -284,7 +284,7 @@ void servicesCommandSparing(void){
     igs_service_args_add_double(&args, 3.3);
     igs_service_args_add_string(&args, "service string test");
     igs_service_args_add_data(&args, myOtherData, 64);
-    igs_service_call("tester", "myService", &args, "token");
+    igs_service_call("tester", "my Service", &args, "token");
 }
 
 void channelsCommand(void){

@@ -222,6 +222,7 @@ igs_result_t service_make_values_to_arguments_from_message (igs_service_arg_t **
         }else{
             igs_error("passed message misses elements to match with the expected args for service %s (stopped at %s)",
                       service->name, current->name);
+            s_service_free_service_arguments(args);
             return IGS_FAILURE;
         }
         previous = current;
@@ -426,10 +427,6 @@ void igs_service_args_add_string (igs_service_arg_t **list, const char *value)
         new->c = strdup (value);
         new->size = strlen (value) + 1;
     }
-    else {
-        new->c = NULL;
-        new->size = 0;
-    }
     if (!*list)
         *list = new;
     else{
@@ -447,9 +444,11 @@ void igs_service_args_add_data (igs_service_arg_t **list,
     assert(list);
     igs_service_arg_t *new = (igs_service_arg_t *) zmalloc (sizeof (igs_service_arg_t));
     new->type = IGS_DATA_T;
-    new->data = (void *) zmalloc (size);
-    memcpy (new->data, value, size);
-    new->size = size;
+    if (value && size){
+        new->data = (void *) zmalloc (size);
+        memcpy (new->data, value, size);
+        new->size = size;
+    }
     if (!*list)
         *list = new;
     else{
@@ -1146,9 +1145,8 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                                 frame = zframe_new (&arg->d, sizeof (double));
                                 break;
                             case IGS_STRING_T: {
-                                if (arg->c)
-                                    frame =
-                                    zframe_new (arg->c, strlen (arg->c) + 1);
+                                if (arg->c && arg->size)
+                                    frame = zframe_new (arg->c, strlen (arg->c) + 1);
                                 else
                                     frame = zframe_new (NULL, 0);
                                 break;

@@ -126,7 +126,6 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
     int64_t timestamp = INT64_MIN;
     zframe_t *frame = NULL;
     size_t size = 0;
-    char *value = NULL;
     void *data = NULL;
     zmsg_t *bundle = NULL;
     size_t i = 0;
@@ -134,7 +133,6 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
     //NB: The following iterations need to be protected in case the remote agent disappears
     //while we are handling data.
     for (i = 0; i < msg_size; i += 3) {
-        value = NULL;
         data = NULL;
         frame = NULL;
         // Each message part must contain 3 elements
@@ -161,52 +159,13 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
         }
         free (v_type);
 
-
         // get data before iterating to all the mapping elements using it
-        if (value_type == IGS_STRING_T) {
-            value = zmsg_popstr (*msg);
-            if (!value) {
-                igs_error ("value from %s.%s is NULL in received publication : rejecting",
-                           remote_agent->definition->name, output);
-                break;
-            }
-        } else if (value_type == IGS_TIMESTAMPED_STRING_T) {
-            bundle = zmsg_popmsg(*msg);
-            if (!bundle) {
-                igs_error ("value from %s.%s is NULL in received publication : rejecting",
-                           remote_agent->definition->name, output);
-                break;
-            }
-            size_t bundle_size = zmsg_size(bundle);
-            if (bundle_size != 2) {
-                igs_error ("value from %s.%s is corrupted in received publication : rejecting",
-                           remote_agent->definition->name, output);
-                zmsg_destroy(&bundle);
-                break;
-            }
-            value = zmsg_popstr (bundle);
-            if (!value) {
-                igs_error ("value from %s.%s is NULL in received publication : rejecting",
-                           remote_agent->definition->name, output);
-                zmsg_destroy(&bundle);
-                break;
-            }
-            timestamp_f = zmsg_pop(bundle);
-            if (!timestamp_f) {
-                igs_error ("timestamp from %s.%s is NULL in received publication : rejecting",
-                           remote_agent->definition->name, output);
-                zmsg_destroy(&bundle);
-                break;
-            }
-            memcpy(&timestamp, zframe_data(timestamp_f), sizeof(int64_t));
-            zframe_destroy(&timestamp_f);
-            zmsg_destroy(&bundle);
-
-        } else if (value_type == IGS_TIMESTAMPED_INTEGER_T
-                   || value_type == IGS_TIMESTAMPED_DOUBLE_T
-                   || value_type == IGS_TIMESTAMPED_BOOL_T
-                   || value_type == IGS_TIMESTAMPED_IMPULSION_T
-                   || value_type == IGS_TIMESTAMPED_DATA_T){
+        if (value_type == IGS_TIMESTAMPED_INTEGER_T
+            || value_type == IGS_TIMESTAMPED_DOUBLE_T
+            || value_type == IGS_TIMESTAMPED_BOOL_T
+            || value_type == IGS_TIMESTAMPED_STRING_T
+            || value_type == IGS_TIMESTAMPED_IMPULSION_T
+            || value_type == IGS_TIMESTAMPED_DATA_T){
             bundle = zmsg_popmsg(*msg);
             if (!bundle) {
                 igs_error ("value from %s is NULL in received publication : rejecting", output);
@@ -278,10 +237,7 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
                         // we have a fully matching mapping element: use the input
                         agent->rt_current_timestamp_microseconds = timestamp;
                         igs_io_t *io = NULL;
-                        if (value_type == IGS_STRING_T)
-                            io = model_write (agent, found_input->name, IGS_INPUT_T, value_type, value, strlen(value) + 1);
-                        else
-                            io = model_write (agent, found_input->name, IGS_INPUT_T, value_type, data, size);
+                        io = model_write (agent, found_input->name, IGS_INPUT_T, value_type, data, size);
                         if (io && io->name){
                             model_read_write_unlock(__FUNCTION__, __LINE__);
                             model_LOCKED_handle_io_callbacks(agent, io);
@@ -296,8 +252,6 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
             agent = zhashx_next(core_context->agents);
         }
         freen (output);
-        if (value)
-            freen(value);
         if (frame){
             zframe_destroy(&frame);
             data = NULL;
@@ -1504,7 +1458,10 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                         zmsg_addstr (msg_to_send, current->name);
                         zmsg_addstrf (msg_to_send, "%d",
                                         current->value_type);
-                        zmsg_addstr (msg_to_send, current->value.s);
+                        if (current->value.s)
+                            zmsg_addstr (msg_to_send, current->value.s);
+                        else
+                            zmsg_addstr (msg_to_send, "");
                         break;
                     case IGS_BOOL_T:
                         zmsg_addstr (msg_to_send, current->name);
@@ -1590,7 +1547,10 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                         zmsg_addstr (msg_to_send, current->name);
                         zmsg_addstrf (msg_to_send, "%d",
                                         current->value_type);
-                        zmsg_addstr (msg_to_send, current->value.s);
+                        if (current->value.s)
+                            zmsg_addstr (msg_to_send, current->value.s);
+                        else
+                            zmsg_addstr (msg_to_send, "");
                         break;
                     case IGS_BOOL_T:
                         zmsg_addstr (msg_to_send, current->name);
@@ -2511,47 +2471,48 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     size_t nb_frames = zmsg_size (msg);
                     igs_service_arg_t *args = NULL;
                     if (nb_frames >= nb_args){
-                        service_make_values_to_arguments_from_message (&args, service, msg_duplicate);
-                        callee_agent->rt_current_timestamp_microseconds = INT64_MIN;
-                        bool rest_of_the_message_is_ok = true;
-                        if (zmsg_size(msg_duplicate) >= 1){ //we still have the timestamp to handle
-                            /*
-                             We test >= 1 to be retro-compatible with future possible extensions of the protocol.
-                             In the situation when a caller calls with erroneous additional arguments, we won't
-                             be able to detect these additionnal arguments if the first erroneous additional
-                             argument has a 64 bits size. In this particular case, the first erroneous additional
-                             argument will be interpreted as a timestamp for the service call. In any other cases,
-                             we will log an error.
-                             This limitation is introduced because, on the caller side, we may not know the details
-                             of a service, especially if ingescape proxies are involved, and we may allow additional
-                             arguments without the possibility to block the call at its source.
-                             NB: if arguments are missing, the call to service_make_values_to_arguments_from_message
-                             here above will also reject the call.
-                             */
-                            zframe_t *timestamp_f = zmsg_pop(msg_duplicate);
-                            assert(timestamp_f);
-                            if (zframe_size(timestamp_f) == sizeof(int64_t))
-                                memcpy(&callee_agent->rt_current_timestamp_microseconds, zframe_data(timestamp_f), sizeof(int64_t));
-                            else {
-                                igsagent_error (callee_agent, "received data is corrupted and will be ignored for service %s called from %s(%s)",
-                                                service_name, caller_name, caller_uuid);
-                                rest_of_the_message_is_ok = false;
-                            }
-                            zframe_destroy(&timestamp_f);
-                        }
-                        if (rest_of_the_message_is_ok) {
-                            if (core_context->enable_service_logging)
-                                service_log_received_service (callee_agent, caller_name, caller_uuid, service_name,
-                                                              args, callee_agent->rt_current_timestamp_microseconds);
-                            model_read_write_unlock(__FUNCTION__, __LINE__);
-                            if (callee_agent->uuid && service->service_cb)
-                                (service->service_cb) (callee_agent, caller_name, caller_uuid, service_name,
-                                                       args, nb_args, token, service->cb_data);
-                            model_read_write_lock(__FUNCTION__, __LINE__);
-                        }
-                        igs_service_args_destroy(&args);
-                        if (callee_agent->uuid)
+                        if (service_make_values_to_arguments_from_message (&args, service, msg_duplicate) == IGS_SUCCESS){
                             callee_agent->rt_current_timestamp_microseconds = INT64_MIN;
+                            bool rest_of_the_message_is_ok = true;
+                            if (zmsg_size(msg_duplicate) >= 1){ //we still have the timestamp to handle
+                                /*
+                                 We test >= 1 to be retro-compatible with future possible extensions of the protocol.
+                                 In the situation when a caller calls with erroneous additional arguments, we won't
+                                 be able to detect these additionnal arguments if the first erroneous additional
+                                 argument has a 64 bits size. In this particular case, the first erroneous additional
+                                 argument will be interpreted as a timestamp for the service call. In any other cases,
+                                 we will log an error.
+                                 This limitation is introduced because, on the caller side, we may not know the details
+                                 of a service, especially if ingescape proxies are involved, and we may allow additional
+                                 arguments without the possibility to block the call at its source.
+                                 NB: if arguments are missing, the call to service_make_values_to_arguments_from_message
+                                 here above will also reject the call.
+                                 */
+                                zframe_t *timestamp_f = zmsg_pop(msg_duplicate);
+                                assert(timestamp_f);
+                                if (zframe_size(timestamp_f) == sizeof(int64_t))
+                                    memcpy(&callee_agent->rt_current_timestamp_microseconds, zframe_data(timestamp_f), sizeof(int64_t));
+                                else {
+                                    igsagent_error (callee_agent, "received data is corrupted and will be ignored for service %s called from %s(%s)",
+                                                    service_name, caller_name, caller_uuid);
+                                    rest_of_the_message_is_ok = false;
+                                }
+                                zframe_destroy(&timestamp_f);
+                            }
+                            if (rest_of_the_message_is_ok) {
+                                if (core_context->enable_service_logging)
+                                    service_log_received_service (callee_agent, caller_name, caller_uuid, service_name,
+                                                                  args, callee_agent->rt_current_timestamp_microseconds);
+                                model_read_write_unlock(__FUNCTION__, __LINE__);
+                                if (callee_agent->uuid && service->service_cb)
+                                    (service->service_cb) (callee_agent, caller_name, caller_uuid, service_name,
+                                                           args, nb_args, token, service->cb_data);
+                                model_read_write_lock(__FUNCTION__, __LINE__);
+                            }
+                            igs_service_args_destroy(&args);
+                            if (callee_agent->uuid)
+                                callee_agent->rt_current_timestamp_microseconds = INT64_MIN;
+                        }
                     } else
                         igs_error ("arguments count do not match in received message for service %s (%zu vs. %zu expected)",
                                    name, nb_frames, nb_args);
@@ -3517,17 +3478,23 @@ igs_result_t network_publish_output (igsagent_t *agent, const igs_io_t *io)
                 if (current_microseconds != INT64_MIN){
                     zmsg_addstrf (msg, "%d", IGS_TIMESTAMPED_STRING_T);
                     zmsg_t *packaged_value = zmsg_new();
-                    zmsg_addstr (packaged_value, io->value.s);
+                    if (io->value.s)
+                        zmsg_addmem (packaged_value, io->value.s, io->value_size);
+                    else
+                        zmsg_addmem (packaged_value, NULL, 0);
                     zmsg_addmem(packaged_value, &current_microseconds, sizeof(int64_t));
                     zmsg_addmsg(msg, &packaged_value);
-                    igsagent_debug (agent, "%s(%s) publishes %s string with timestamp %lld",
+                    igsagent_debug (agent, "%s(%s) publishes %s string (%zu bytes) with timestamp %lld",
                                     agent->definition->name, agent->uuid,
-                                    io->name, current_microseconds);
+                                    io->name, io->value_size, current_microseconds);
                 } else {
-                    zmsg_addstr (msg, io->value.s);
-                    igsagent_debug (agent, "%s(%s) publishes %s string",
+                    if (io->value.s)
+                        zmsg_addmem (msg, io->value.s, io->value_size);
+                    else
+                        zmsg_addmem (msg, NULL, 0);
+                    igsagent_debug (agent, "%s(%s) publishes %s string (%zu bytes)",
                                     agent->definition->name, agent->uuid,
-                                    io->name);
+                                    io->name, io->value_size);
                 }
                 break;
             case IGS_IMPULSION_T:

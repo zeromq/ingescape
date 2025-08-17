@@ -1,0 +1,162 @@
+{
+    "extensions": {
+        "eventsTimeline": {
+            "events": [
+            ],
+            "patterns": [
+            ],
+            "timelines": [
+                {
+                    "eventInstances": [
+                    ],
+                    "name": "Timeline_1",
+                    "order": 0,
+                    "patternInstances": [
+                    ]
+                }
+            ]
+        },
+        "recordAndReplay": {
+            "file_path": {
+                "f64c90fa-fd29-4ee0-b253-0a1e149cd043": "/Users/steph/Documents/Ingescape/sandbox/railway/CCU_record_10min_13_06_25 - 11_08_24.csv"
+            }
+        }
+    },
+    "library": {
+        "classes": [
+            {
+                "className": "RealTimeWeather",
+                "color": 0,
+                "definition": {
+                    "outputs": [
+                        {
+                            "name": "rawSensors",
+                            "type": "DATA"
+                        },
+                        {
+                            "name": "currentSituation",
+                            "type": "STRING"
+                        }
+                    ]
+                },
+                "description": "",
+                "icon": -1,
+                "package": "",
+                "plugin": "ingescape_class",
+                "uuid": "fc436092-a7d6-4f39-8b25-eab7b6782d85",
+                "version": ""
+            },
+            {
+                "className": "IntelligentForecaster",
+                "color": 0,
+                "definition": {
+                    "inputs": [
+                        {
+                            "name": "realTime",
+                            "type": "DATA"
+                        }
+                    ],
+                    "outputs": [
+                        {
+                            "name": "forecast",
+                            "type": "STRING"
+                        }
+                    ]
+                },
+                "description": "",
+                "icon": -1,
+                "package": "",
+                "plugin": "ingescape_class",
+                "uuid": "b5dfb022-d890-4997-a60f-5332564698da",
+                "version": ""
+            },
+            {
+                "className": "WeatherDashboard",
+                "color": 0,
+                "definition": {
+                    "inputs": [
+                        {
+                            "name": "forecast",
+                            "type": "STRING"
+                        },
+                        {
+                            "name": "realTime",
+                            "type": "STRING"
+                        }
+                    ]
+                },
+                "description": "",
+                "icon": -1,
+                "package": "",
+                "plugin": "ingescape_class",
+                "uuid": "bb0cf4e6-e4fc-42ad-b6da-aa2e3a792c62",
+                "version": ""
+            }
+        ]
+    },
+    "systemViews": [
+        {
+            "children": [
+                {
+                    "agent": {
+                    },
+                    "class": "b5dfb022-d890-4997-a60f-5332564698da",
+                    "height": 100,
+                    "name": "IntelligentForecaster",
+                    "simulationTime": 5000,
+                    "uuid": "c57476de-dca0-4c87-a4b3-02540ae668c0",
+                    "width": 250,
+                    "x": 4338.863152097516,
+                    "y": -16.650136533038676
+                },
+                {
+                    "agent": {
+                    },
+                    "class": "bb0cf4e6-e4fc-42ad-b6da-aa2e3a792c62",
+                    "height": 122,
+                    "name": "WeatherDashboard",
+                    "simulationTime": 5000,
+                    "uuid": "e9984e06-a8d9-42d6-b959-07c8abee53ec",
+                    "width": 250,
+                    "x": 4566.369909265262,
+                    "y": 176.5413724179882
+                },
+                {
+                    "agent": {
+                    },
+                    "class": "fc436092-a7d6-4f39-8b25-eab7b6782d85",
+                    "height": 122,
+                    "name": "RealTimeWeather",
+                    "simulationTime": 5000,
+                    "uuid": "b4dfc6ad-d9a5-45a0-93d5-2ced4c617d0f",
+                    "width": 250,
+                    "x": 4020.492733823223,
+                    "y": 67.59327212682399
+                }
+            ],
+            "links": {
+                "mappings": [
+                    {
+                        "from": "IntelligentForecaster",
+                        "fromInput": "realTime",
+                        "to": "RealTimeWeather",
+                        "toOutput": "rawSensors"
+                    },
+                    {
+                        "from": "WeatherDashboard",
+                        "fromInput": "forecast",
+                        "to": "IntelligentForecaster",
+                        "toOutput": "forecast"
+                    },
+                    {
+                        "from": "WeatherDashboard",
+                        "fromInput": "realTime",
+                        "to": "RealTimeWeather",
+                        "toOutput": "currentSituation"
+                    }
+                ]
+            },
+            "name": "Main view"
+        }
+    ]
+}
