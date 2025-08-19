@@ -514,7 +514,7 @@ build-deb-packages:
   stage: delivery
   tags:
     - docker
-  image: debian:12
+  image: debian:11
   variables:
     GIT_STRATEGY: clone
   script:
