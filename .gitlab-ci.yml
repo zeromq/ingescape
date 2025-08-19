@@ -1105,5 +1105,12 @@ lib-delivery-all:
     - lib-installer-runtime-linux-armhf
     - lib-installer-runtime-android-armv7a-softfp
     - lib-installer-runtime-android-aarch64
+  needs:
+    - lib-installer-release-windows-x64
+    - lib-installer-macos
+    - lib-installer-linux-x64
+    - lib-installer-runtime-linux-armhf
+    - lib-installer-runtime-android-armv7a-softfp
+    - lib-installer-runtime-android-aarch64
   rules:
     - !reference [.root_namespace, rules]
