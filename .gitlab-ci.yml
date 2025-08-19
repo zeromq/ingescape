@@ -195,7 +195,6 @@ lib-installer-release-windows-x64:
     - lib-windows-release-x64
   needs:
     - lib-windows-release-x64
-    - test-csharp-x64-release
 
 # Create runtime install for windows 64 bits (debug)
 lib-installer-debug-windows-x64:
@@ -225,7 +224,6 @@ lib-installer-debug-windows-x64:
     - lib-windows-debug-x64
   needs:
     - lib-windows-debug-x64
-    - test-csharp-x64-debug
 
 # _      _
 #| |    (_)
