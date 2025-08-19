@@ -573,16 +573,16 @@ update-vm-runners:
     - apk add openssh
     - mkdir -p ~/.ssh
     - ssh-keyscan ${UBUNTU_18_04_RUNNER} >> ~/.ssh/known_hosts
-    - ssh-keyscan ${DEBIAN_11_RUNNER} >> ~/.ssh/known_hosts
+    #- ssh-keyscan ${DEBIAN_11_RUNNER} >> ~/.ssh/known_hosts
     - umask 077
     - echo ${SSH_SECRET} | base64 -d > ssh_secret
     - umask 022
     - echo "Upgrade ingescape for Ubuntu 18.04 VM runner (Circle linux build)"
     - ssh -i ssh_secret root@${UBUNTU_18_04_RUNNER} apt-get update
     - ssh -i ssh_secret root@${UBUNTU_18_04_RUNNER} apt-get install --reinstall ingescape-dev -y
-    - echo "Upgrade ingescape for Debian 11 VM runner (CCU GUIs linux build)"
-    - ssh -i ssh_secret root@${DEBIAN_11_RUNNER} apt-get update
-    - ssh -i ssh_secret root@${DEBIAN_11_RUNNER} apt-get install --reinstall ingescape-dev -y
+    #- echo "Upgrade ingescape for Debian 11 VM runner (CCU GUIs linux build)"
+    #- ssh -i ssh_secret root@${DEBIAN_11_RUNNER} apt-get update
+    #- ssh -i ssh_secret root@${DEBIAN_11_RUNNER} apt-get install --reinstall ingescape-dev -y
   dependencies: []
   needs: []
   rules:
