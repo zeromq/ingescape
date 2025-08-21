@@ -523,7 +523,7 @@ INGESCAPE_EXPORT igs_split_t* mapping_create_split_element(const char * from_inp
                                                          const char* to_output);
 INGESCAPE_EXPORT bool mapping_is_equal(const char *first_str, const char *second_str);
 INGESCAPE_EXPORT uint64_t mapping_djb2_hash (unsigned char *str);
-INGESCAPE_EXPORT bool mapping_check_input_output_compatibility(igsagent_t *agent, igs_io_t *found_input, igs_io_t *found_output);
+INGESCAPE_EXPORT bool mapping_check_input_output_compatibility(igsagent_t *agent, igs_io_t *found_input, igs_io_t *found_output); //DEPRECATED
 INGESCAPE_EXPORT void mapping_update_json (igs_mapping_t *mapping);
 
 // split

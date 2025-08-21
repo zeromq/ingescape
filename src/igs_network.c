@@ -410,8 +410,7 @@ int s_network_configure_mapping_to_remote_agent (igsagent_t *agent,
 
                 // check type compatibility between input and output value types
                 // including implicit conversions
-                if (found_output && found_input
-                    && mapping_check_input_output_compatibility (agent, found_input, found_output)) {
+                if (found_output && found_input) {
                     // we have validated input, agent and output names : we can map
                     // NOTE: the call below may happen several times if our agent uses
                     // the remote agent ouput on several of its inputs. This should not

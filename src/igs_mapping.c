@@ -203,17 +203,11 @@ bool mapping_check_input_output_compatibility (igsagent_t *agent,
                                                igs_io_t *input,
                                                igs_io_t *output)
 {
-    // For compatibility reasons, only DATA outputs imply limitations.
-    // The rest is covnerted automatically in model_write.
-    bool is_compatible = true;
-    igs_io_value_type_t type = input->value_type;
-    if (output->value_type == IGS_DATA_T) {
-        if (type != IGS_DATA_T && type != IGS_IMPULSION_T) {
-            is_compatible = false;
-            igsagent_warn (agent, "DATA outputs can only be mapped by DATA or IMPULSION inputs");
-        }
-    }
-    return is_compatible;
+    assert(agent);
+    assert(input);
+    assert(output);
+    igs_warn("this function is deprecated, please don't use it anymore.");
+    return true;
 }
 
 void mapping_update_json (igs_mapping_t *mapping)
