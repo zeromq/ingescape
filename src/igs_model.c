@@ -1112,11 +1112,11 @@ igs_io_t *model_write (igsagent_t *agent, const char *name,
                         break;
                     case IGS_DOUBLE_T:
                         io->value_size = sizeof (double);
-                        io->value.d = *(int *) (value);
+                        io->value.d = (double) *(int *) (value);
                         break;
                     case IGS_BOOL_T:
                         io->value_size = sizeof (bool);
-                        io->value.b = *(int *) (value);
+                        io->value.b = (bool) *(int *) (value);
                         break;
                     case IGS_STRING_T: {
                         if (io->value.s)
@@ -1147,7 +1147,7 @@ igs_io_t *model_write (igsagent_t *agent, const char *name,
                 switch (io->value_type) {
                     case IGS_INTEGER_T:
                         io->value_size = sizeof (int);
-                        io->value.i = (*(double *) (value));
+                        io->value.i = (int) (*(double *) (value));
                         break;
                     case IGS_DOUBLE_T:
                         io->value_size = sizeof (double);
@@ -1155,7 +1155,7 @@ igs_io_t *model_write (igsagent_t *agent, const char *name,
                         break;
                     case IGS_BOOL_T:
                         io->value_size = sizeof (bool);
-                        io->value.b = (*(double *) (value));
+                        io->value.b = (bool) (*(double *) (value));
                         break;
                     case IGS_STRING_T: {
                         if (io->value.s)
@@ -1186,11 +1186,11 @@ igs_io_t *model_write (igsagent_t *agent, const char *name,
                 switch (io->value_type) {
                     case IGS_INTEGER_T:
                         io->value_size = sizeof (int);
-                        io->value.i = *(bool *) (value);
+                        io->value.i = (int) *(bool *) (value);
                         break;
                     case IGS_DOUBLE_T:
                         io->value_size = sizeof (double);
-                        io->value.d = *(bool *) (value);
+                        io->value.d = (double) *(bool *) (value);
                         break;
                     case IGS_BOOL_T:
                         io->value_size = sizeof (bool);
@@ -1199,7 +1199,7 @@ igs_io_t *model_write (igsagent_t *agent, const char *name,
                     case IGS_STRING_T: {
                         if (io->value.s)
                             free (io->value.s);
-                        snprintf (buf, NUMBER_TO_STRING_MAX_LENGTH + 1, "%d", *(bool *) value);
+                        snprintf (buf, NUMBER_TO_STRING_MAX_LENGTH + 1, "%d", (*(bool *) value) ? true : false);
                         io->value.s = strdup (buf);
                         io->value_size = (strlen (io->value.s) + 1) * sizeof (char);
                     } break;
@@ -1314,7 +1314,7 @@ igs_io_t *model_write (igsagent_t *agent, const char *name,
                             io->value.i = *(int*)value;
                             io->value_size = sizeof(int);
                         }else{
-                            igsagent_error(agent, "Raw data does not have proper size for integer IOP %s (%zu bytes vs %zu bytes)",
+                            igsagent_error(agent, "Raw data does not have proper size for integer IOP %s (%zu bytes vs %zu bytes expected)",
                                            name, size, sizeof(int));
                             ret = 0;
                         }
@@ -1324,7 +1324,7 @@ igs_io_t *model_write (igsagent_t *agent, const char *name,
                             io->value.d = *(double*)value;
                             io->value_size = sizeof(double);
                         }else{
-                            igsagent_error(agent, "Raw data does not have proper size for double IOP %s (%zu bytes vs %zu bytes)",
+                            igsagent_error(agent, "Raw data does not have proper size for double IOP %s (%zu bytes vs %zu bytes expected)",
                                            name, size, sizeof(double));
                             ret = 0;
                         }
@@ -1334,7 +1334,7 @@ igs_io_t *model_write (igsagent_t *agent, const char *name,
                             io->value.b = *(bool*)value;
                             io->value_size = sizeof(bool);
                         }else{
-                            igsagent_error(agent, "Raw data does not have proper size for bool IOP %s (%zu bytes vs %zu bytes)",
+                            igsagent_error(agent, "Raw data does not have proper size for bool IOP %s (%zu bytes vs %zu bytes expected)",
                                            name, size, sizeof(bool));
                             ret = 0;
                         }
@@ -1428,8 +1428,7 @@ igs_io_t *model_write (igsagent_t *agent, const char *name,
                         sprintf (log_io_value, "data %s", hex_chunk);
                         free (hex_chunk);
                         zchunk_destroy (&chunk);
-                    }
-                    else {
+                    } else {
                         log_io_value = (void *) zmalloc ((strlen ("data 00") + 1) * sizeof (char));
                         sprintf (log_io_value, "data 00");
                     }
@@ -1437,7 +1436,7 @@ igs_io_t *model_write (igsagent_t *agent, const char *name,
                 else {
                     snprintf (log_io_value_buffer,
                               MAX_IOP_VALUE_LOG_BUFFER_LENGTH,
-                              "data |size: %zu bytes", io->value_size);
+                              "data | size: %zu bytes", io->value_size);
                     log_io_value = strdup (log_io_value_buffer);
                 }
             } break;

@@ -412,8 +412,8 @@ int s_network_configure_mapping_to_remote_agent (igsagent_t *agent,
                 // including implicit conversions
                 if (found_output && found_input) {
                     // we have validated input, agent and output names : we can map
-                    // NOTE: the call below may happen several times if our agent uses
-                    // the remote agent ouput on several of its inputs. This should not
+                    // NB: the call below may happen several times if our agent uses
+                    // the remote agent output on several of its inputs. This should not
                     // have any consequence.
                     s_subscribe_to_remote_agent_output (remote_agent, el->to_output);
 

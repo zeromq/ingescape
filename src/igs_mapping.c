@@ -199,17 +199,6 @@ igs_split_t *mapping_create_split_element (const char *from_input,
     return new_split_elmt;
 }
 
-bool mapping_check_input_output_compatibility (igsagent_t *agent,
-                                               igs_io_t *input,
-                                               igs_io_t *output)
-{
-    assert(agent);
-    assert(input);
-    assert(output);
-    igs_warn("this function is deprecated, please don't use it anymore.");
-    return true;
-}
-
 void mapping_update_json (igs_mapping_t *mapping)
 {
     assert(mapping);
