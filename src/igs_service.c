@@ -204,14 +204,20 @@ igs_result_t service_make_values_to_arguments_from_message (igs_service_arg_t **
                 case IGS_STRING_T:
                     if (current->c)
                         free (current->c);
-                    current->c = (char *) zmalloc (size);
-                    memcpy (current->c, zframe_data (f), size);
+                    if (size > 0){
+                      current->c = (char *) zmalloc (size);
+                      memcpy (current->c, zframe_data (f), size);
+                    }else
+                      current->c = NULL;
                     break;
                 case IGS_DATA_T:
                     if (current->data)
                         free (current->data);
-                    current->data = (char *) zmalloc (size);
-                    memcpy (current->data, zframe_data (f), size);
+                    if (size > 0){
+                      current->data = zmalloc (size);
+                      memcpy (current->data, zframe_data (f), size);
+                    } else
+                      current->data = NULL;
                     break;
                     
                 default:
