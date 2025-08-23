@@ -1852,7 +1852,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
         }
         else if (streq (title, SET_INPUT_MSG) || streq (title, SET_OUTPUT_MSG) || streq (title, SET_ATTRIBUTE_MSG)) {
             char *io_name = zmsg_popstr (msg_duplicate);
-            if (io_name == NULL) {
+            if (!io_name) {
                 igs_error ("no valid io name in %s message received from %s(%s): rejecting",
                            title, name, peerUUID);
                 zmsg_destroy (&msg_duplicate);
@@ -1860,9 +1860,10 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free(title);
                 return 0;
             }
-            char *value = zmsg_popstr (msg_duplicate);
-            if (value == NULL) {
-                igs_error ("no valid value in %s message received from %s(%s): rejecting",
+            char *value = NULL;
+            zframe_t *value_frame = zmsg_pop(msg_duplicate);
+            if (!value_frame){
+                igs_error ("no valid value frame in %s message received from %s(%s): rejecting",
                            title, name, peerUUID);
                 free (io_name);
                 zmsg_destroy (&msg_duplicate);
@@ -1870,8 +1871,11 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 free(title);
                 return 0;
             }
+            if (zframe_size(value_frame) > 0)
+                value = zframe_strdup(value_frame);
+            zframe_destroy(&value_frame);
             char *uuid = zmsg_popstr (msg_duplicate);
-            if (uuid == NULL) {
+            if (!uuid) {
                 igs_error ("no valid uuid in %s message received from %s(%s): rejecting",
                            title, name, peerUUID);
                 free (io_name);
@@ -1888,7 +1892,8 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 if (uuid)
                     free (uuid);
                 free (io_name);
-                free (value);
+                if (value)
+                    free (value);
                 zmsg_destroy (&msg_duplicate);
                 zyre_event_destroy (&zyre_event);
                 model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -1921,20 +1926,18 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             if (shall_inject){
                 if (streq (title, SET_INPUT_MSG)){
                     igs_debug ("received SET_INPUT command from %s (%s)", name, peerUUID);
-                    if (io_name && value)
-                        igsagent_input_set_string (agent, io_name, value);
+                    igsagent_input_set_string (agent, io_name, value);
                 } else if (streq (title, SET_OUTPUT_MSG)){
                     igs_debug ("received SET_OUTPUT command from %s (%s)", name, peerUUID);
-                    if (io_name && value)
-                        igsagent_output_set_string (agent, io_name, value);
+                    igsagent_output_set_string (agent, io_name, value);
                 } else if (streq (title, SET_ATTRIBUTE_MSG)){
                     igs_debug ("received SET_ATTRIBUTE command from %s (%s)", name, peerUUID);
-                    if (io_name && value)
-                        igsagent_attribute_set_string (agent, io_name, value);
+                    igsagent_attribute_set_string (agent, io_name, value);
                 }
             }
             free (io_name);
-            free (value);
+            if (value)
+                free (value);
             free (uuid);
         }
         else if (streq (title, MAP_MSG)) {
