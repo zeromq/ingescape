@@ -31,8 +31,8 @@
 
 //  INGESCAPE version macros for compile-time API detection
 #define INGESCAPE_VERSION_MAJOR 4
-#define INGESCAPE_VERSION_MINOR 4
-#define INGESCAPE_VERSION_PATCH 4
+#define INGESCAPE_VERSION_MINOR 5
+#define INGESCAPE_VERSION_PATCH 0
 
 #define INGESCAPE_MAKE_VERSION(major, minor, patch) \
 ((major) * 10000 + (minor) * 100 + (patch))
@@ -207,7 +207,8 @@ typedef enum {
     IGS_AGENT_EXITED, //event_data is NULL
     IGS_AGENT_UPDATED_MAPPING, //event_data is the JSON string for agent mapping as a const char*
     IGS_AGENT_WON_ELECTION, //event_data is the election name as a char*
-    IGS_AGENT_LOST_ELECTION //event_data is the election name as a char*
+    IGS_AGENT_LOST_ELECTION, //event_data is the election name as a char*
+    IGS_AGENT_CHANGED_STATE //event_data is the state string as char*
 } igs_agent_event_t;
 typedef void (igs_agent_events_fn)(igs_agent_event_t event,
                                    const char *uuid,

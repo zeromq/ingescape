@@ -931,6 +931,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 } else
                     igs_error("exit message without UUID : rejecting");
                 model_read_write_unlock(__FUNCTION__, __LINE__);
+                
             } else if (title && strncmp(title, RT_SET_TIME_MSG, strlen(RT_SET_TIME_MSG)) == 0){
                 model_read_write_lock(__FUNCTION__, __LINE__);
                 char *timestamp_str = title + strlen(RT_SET_TIME_MSG);
@@ -940,6 +941,38 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     igs_rt_set_time(timestamp);
                 }else
                     igs_error("timestamp missing in RT_SET_TIME command : rejecting");
+                
+            } else if (streq (title, STATE_MSG)){
+                char *state = zmsg_popstr (msg_duplicate);
+                if (!state) {
+                    igs_error ("no valid state in %s message received from %s(%s): rejecting", title, name, peerUUID);
+                    zmsg_destroy (&msg_duplicate);
+                    zyre_event_destroy (&zyre_event);
+                    free(title);
+                    return 0;
+                }
+                char *uuid = zmsg_popstr (msg_duplicate);
+                if (!uuid) {
+                    igs_error ("no valid uuid in %s message received from %s(%s): rejecting", title, name, peerUUID);
+                    free (state);
+                    zmsg_destroy (&msg_duplicate);
+                    zyre_event_destroy (&zyre_event);
+                    free(title);
+                    return 0;
+                }
+                char *name = NULL;
+                model_read_write_lock(__FUNCTION__, __LINE__);
+                igs_remote_agent_t *remote = zhashx_lookup(context->remote_agents, uuid);
+                if (remote && remote->definition && remote->definition->name)
+                    name = strdup(remote->definition->name);
+                model_read_write_unlock(__FUNCTION__, __LINE__);
+                if (name){
+                    agent_LOCKED_propagate_agent_event(IGS_AGENT_CHANGED_STATE, uuid, name, state);
+                    free(name);
+                }
+                free(state);
+                free(uuid);
+                
             } else if (!title)
                 igs_error("whisper message to private channel is missing title : rejecting");
             free (title);
@@ -2606,6 +2639,37 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             }else
                 igs_error("timestamp missing in RT_SET_TIME command : rejecting");
         }
+        else if (streq (title, STATE_MSG)){
+            char *state = zmsg_popstr (msg_duplicate);
+            if (!state) {
+                igs_error ("no valid state in %s message received from %s(%s): rejecting", title, name, peerUUID);
+                zmsg_destroy (&msg_duplicate);
+                zyre_event_destroy (&zyre_event);
+                free(title);
+                return 0;
+            }
+            char *uuid = zmsg_popstr (msg_duplicate);
+            if (!uuid) {
+                igs_error ("no valid uuid in %s message received from %s(%s): rejecting", title, name, peerUUID);
+                free (state);
+                zmsg_destroy (&msg_duplicate);
+                zyre_event_destroy (&zyre_event);
+                free(title);
+                return 0;
+            }
+            char *name = NULL;
+            model_read_write_lock(__FUNCTION__, __LINE__);
+            igs_remote_agent_t *remote = zhashx_lookup(context->remote_agents, uuid);
+            if (remote && remote->definition && remote->definition->name)
+                name = strdup(remote->definition->name);
+            model_read_write_unlock(__FUNCTION__, __LINE__);
+            if (name){
+                agent_LOCKED_propagate_agent_event(IGS_AGENT_CHANGED_STATE, uuid, name, state);
+                free(name);
+            }
+            free(state);
+            free(uuid);
+        }
         free (title);
     }
     else if (streq (event, "LEADER")) {
@@ -2760,7 +2824,7 @@ int s_trigger_definition_update (zloop_t *loop, int timer_id, void *arg)
                 p = zhashx_next(context->zyre_peers);
             }
             agent->network_activation_during_runtime = false; // reset flag
-            // NB: this is not optimal to resend state details on definition change
+            // NB: it is not optimal to resend state details on definition change
             // but it is the cleanest way to send state on after-start agent
             // activation. State details are still sent individually when they change.
             s_send_state_to (agent, IGS_PRIVATE_CHANNEL, false);
@@ -4062,8 +4126,8 @@ void igsagent_set_state (igsagent_t *agent, const char *state)
     if (!agent->uuid)
         return;
     assert (state);
-    model_read_write_lock(__FUNCTION__, __LINE__);
     if (!agent->state || !streq (state, agent->state)) {
+        model_read_write_lock(__FUNCTION__, __LINE__);
         if (agent->state)
             free (agent->state);
         agent->state = s_strndup (state, IGS_MAX_STATE_LENGTH);
@@ -4076,8 +4140,9 @@ void igsagent_set_state (igsagent_t *agent, const char *state)
             zyre_shout (agent->context->node, IGS_PRIVATE_CHANNEL, &msg);
             s_unlock_zyre_peer (__FUNCTION__, __LINE__);
         }
+        model_read_write_unlock(__FUNCTION__, __LINE__);
+        agent_LOCKED_propagate_agent_event(IGS_AGENT_CHANGED_STATE, agent->uuid, agent->definition->name, (char*)state);
     }
-    model_read_write_unlock(__FUNCTION__, __LINE__);
 }
 
 char *igsagent_state (igsagent_t *agent)
