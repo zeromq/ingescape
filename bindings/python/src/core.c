@@ -443,7 +443,7 @@ PyObject * input_string_wrapper(PyObject * self, PyObject * args)
         result = NULL;
         return ret;
     }else
-        return PyUnicode_FromFormat("");
+        return Py_None;
 }
 
 PyObject * input_data_wrapper(PyObject * self, PyObject * args)
@@ -551,7 +551,7 @@ PyObject * output_string_wrapper(PyObject * self, PyObject * args)
         result = NULL;
         return ret;
     }else
-        return PyUnicode_FromFormat("");
+        return Py_None;
 }
 
 PyObject * output_data_wrapper(PyObject * self, PyObject * args)
@@ -688,7 +688,7 @@ PyObject * s_param_attr_string_wrapper(PyObject * self, PyObject * args, param_a
         result = NULL;
         return ret;
     }else
-        return PyUnicode_FromFormat("");
+        return Py_None;
 }
 
 PyObject * attribute_string_wrapper(PyObject * self, PyObject * args)

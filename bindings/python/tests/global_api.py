@@ -142,25 +142,25 @@ assert not igs.output_is_muted("toto")
 assert not igs.input_bool("toto")
 assert igs.input_int("toto") == 0
 assert igs.input_double("toto") == 0.0
-assert not igs.input_string("toto") is None
+assert igs.input_string("toto") is None
 assert igs.input_data("toto") is None
 
 assert not igs.output_bool("toto")
 assert igs.output_int("toto") == 0
 assert igs.output_double("toto") == 0.0
-assert not igs.output_string("toto") is None
+assert igs.output_string("toto") is None
 assert igs.output_data("toto") is None
 
 assert not igs.attribute_bool("toto")
 assert igs.attribute_int("toto") == 0
 assert igs.attribute_double("toto") == 0.0
-assert not igs.attribute_string("toto") is None
+assert igs.attribute_string("toto") is None
 assert igs.attribute_data("toto") is None
 
 assert not igs.parameter_bool("toto")
 assert igs.parameter_int("toto") == 0
 assert igs.parameter_double("toto") == 0.0
-assert not igs.parameter_string("toto") is None
+assert igs.parameter_string("toto") is None
 assert igs.parameter_data("toto") is None
 
 assert igs.definition_load_str("invalid json") == igs.FAILURE
@@ -469,7 +469,7 @@ igs.split_add("my_double_split", "partner", "sparing_double")
 igs.split_add("my_string_split", "partner", "sparing_string")
 igs.split_add("my_data_split", "partner", "sparing_data")
 
-print ("[Global API] Testing IO writing and type conversion", end =" ")
+print ("[Global API] Testing IO writing and type conversion ", end =" ")
 igs.input_set_impulsion("my_impulsion")
 igs.input_set_impulsion("my_bool")
 assert not igs.input_bool("my_bool")
@@ -479,6 +479,7 @@ igs.input_set_impulsion("my_double")
 assert igs.input_double("my_double")  < 0.000001
 igs.input_set_impulsion("my_string")
 readResult = igs.input_string("my_string")
+assert readResult is None
 igs.input_set_impulsion("my_data")
 data = igs.input_data("my_data")
 assert(data is None)
@@ -537,9 +538,9 @@ igs.input_set_string("my_string", "3.3")
 readResult = igs.input_string("my_string")
 assert readResult == "3.3"
 igs.input_set_string("my_data", "3.3")
-assert igs.input_string("my_data") == ""
+assert igs.input_string("my_data") is None
 data = igs.input_data("my_data")
-assert data == None
+assert data == b"3.3\x00"
 
 data = b"My data"
 data_size = sys.getsizeof(data) -33
@@ -552,6 +553,47 @@ igs.input_set_data("my_string", data)
 igs.input_set_data("my_data", data)
 data = igs.input_data("my_data")
 assert data == b"My data"
+
+assert igs.input_set_string("my_data", "this is a test string") == igs.SUCCESS # converted as raw data
+b = igs.input_data("my_data")
+assert len(b) == len("this is a test string") + 1
+assert igs.input_set_string("my_data", "0123456789abcdef") == igs.SUCCESS # parsed as hexadecimal data
+b = igs.input_data("my_data")
+assert len(b) == 8
+assert igs.input_set_string("my_data", "") == igs.SUCCESS
+b = igs.input_data("my_data")
+assert len(b) == 1
+
+data = b'my raw data\x00'
+assert igs.input_set_data("my_impulsion", data) == igs.SUCCESS
+assert igs.input_set_data("my_bool", data) == igs.FAILURE
+assert igs.input_set_data("my_int", data) == igs.FAILURE
+assert igs.input_set_data("my_double", data) == igs.FAILURE
+assert igs.input_set_data("my_string", data) == igs.SUCCESS
+data_str = igs.input_string("my_string")
+assert len(data_str) == len(data.decode("utf-8")) - 1
+assert data_str == data[:-1].decode("utf-8")
+assert igs.input_set_data("my_data", data) == igs.SUCCESS
+assert igs.input_data("my_data") == data
+assert igs.input_data("my_data")[:-1].decode("utf-8") == "my raw data"
+
+myBool = True
+igs.input_set_bool("my_bool", False)
+assert igs.input_set_data("my_bool", bytes((myBool,))) == igs.SUCCESS
+assert igs.input_bool("my_bool")
+myInt = 123456
+igs.input_set_int("my_int", 0)
+assert igs.input_set_data("my_int", myInt.to_bytes(4, "little")) == igs.SUCCESS
+assert igs.input_int("my_int") == myInt
+
+import struct
+myDouble = 123.456
+igs.input_set_double("my_double", 0.0)
+assert igs.input_set_data("my_double", struct.pack('d', myDouble)) == igs.SUCCESS
+assert igs.input_double("my_double") == myDouble
+
+igs.input_set_string("my_string", "")
+assert igs.input_string("my_string") == ""
 
 igs.input_set_bool("my_bool", True)
 assert igs.input_bool("my_bool")
@@ -608,7 +650,7 @@ igs.input_set_data("my_data", bytes(data))
 assert not igs.input_bool("my_data")
 assert igs.input_int("my_data") == 0
 assert igs.input_double("my_data") < 0.000001
-assert igs.input_string("my_data") == ""
+assert igs.input_string("my_data") is None
 data = igs.input_data("my_data")
 assert data.decode('utf-8') == "my data"
 print ("OK")
