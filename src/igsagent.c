@@ -236,16 +236,16 @@ igs_result_t igsagent_deactivate (igsagent_t *agent)
         model_read_write_unlock(__FUNCTION__, __LINE__);
         return IGS_SUCCESS;
     }
+    s_lock_zyre_peer (__FUNCTION__, __LINE__);
     if (agent->context && agent->context->network_actor && agent->context->node) {
-        s_lock_zyre_peer (__FUNCTION__, __LINE__);
         zmsg_t *msg = zmsg_new ();
         zmsg_addstr (msg, REMOTE_AGENT_EXIT_MSG);
         zmsg_addstr (msg, agent->uuid);
         zmsg_addstr (msg, agent->definition->name);
         zyre_shout (agent->context->node, IGS_PRIVATE_CHANNEL, &msg);
         zyre_leave (agent->context->node, agent->igs_channel);
-        s_unlock_zyre_peer (__FUNCTION__, __LINE__);
     }
+    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
 
     zhashx_delete(core_context->agents, agent->uuid);
     agent->context = NULL;
