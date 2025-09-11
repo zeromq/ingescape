@@ -695,7 +695,7 @@ namespace Ingescape
             IntPtr nameAsPtr = StringToUTF8Ptr(name);
             Result result = igs_input_data(nameAsPtr, ref ptr, ref size);
             Marshal.FreeHGlobal(nameAsPtr);
-            if (result == Result.Success)
+            if ((result == Result.Success) && (size != 0))
             {
                 data = new byte[size];
                 if (ptr != IntPtr.Zero)

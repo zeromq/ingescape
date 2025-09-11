@@ -151,6 +151,8 @@ namespace Ingescape
         #region CSharpTypesToPtr
         internal static IntPtr StringToUTF8Ptr(string native)
         {
+            if (native == null)
+                return IntPtr.Zero;
             byte[] bytes = Encoding.UTF8.GetBytes(native + "\0");
             IntPtr ptr = Marshal.AllocHGlobal(bytes.Length);
 
