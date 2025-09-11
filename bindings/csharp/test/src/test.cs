@@ -331,7 +331,6 @@ namespace Tester
             Assert.IsNull(listOfStrings);
             listOfStrings = Igs.AttributeList();
             Assert.IsNull(listOfStrings);
-            Assert.IsTrue(!Igs.OutputIsMuted(null));
             Assert.IsTrue(!Igs.OutputIsMuted("toto"));
             Igs.OutputMute("toto");
             Igs.OutputUnmute("toto");
@@ -424,7 +423,7 @@ namespace Tester
             Assert.AreEqual(inputString, "my string");
             Assert.IsTrue(Igs.InputData("my_data").SequenceEqual(_myData));
             data = Igs.InputData("my_impulsion");
-            Assert.IsTrue(data.Length == 0);
+            Assert.IsNull(data);
             Assert.IsTrue(Igs.InputSetImpulsion("my_impulsion") == Result.Success);
             Assert.IsTrue(Igs.InputSetBool("", false) == Result.Failure);
             Assert.IsTrue(Igs.InputSetBool("my_bool", false) == Result.Success);
@@ -443,7 +442,7 @@ namespace Tester
             Assert.IsTrue(Igs.InputSetData("my_data", myOtherData) == Result.Success);
             Assert.IsTrue(Igs.InputData("my_data").SequenceEqual(myOtherData));
             Igs.ClearInput("my_data");
-            Assert.IsTrue(Igs.InputData("my_data").Length == 0);
+            Assert.IsNull(Igs.InputData("my_data"));
 
             //outputs
             Assert.IsTrue(Igs.OutputCreate("my_impulsion", IopValueType.Impulsion) == Result.Success);
@@ -1121,9 +1120,9 @@ namespace Tester
             Assert.IsTrue(Igs.InputDouble("my_double") < 0.000001);
             Igs.InputSetImpulsion("my_string");
             string readResult = Igs.InputString("my_string");
-            Assert.IsTrue(readResult.Length == 0);
+            Assert.IsNull(readResult);
             Igs.InputSetImpulsion("my_data");
-            Assert.IsTrue(Igs.InputData("my_data").Length == 0);
+            Assert.IsNull(Igs.InputData("my_data"));
 
             Igs.InputSetBool("my_impulsion", true);
             Igs.InputSetBool("my_bool", true);
@@ -1175,9 +1174,41 @@ namespace Tester
             Igs.InputSetString("my_string", "3.3");
             readResult = Igs.InputString("my_string");
             Assert.IsTrue(readResult == "3.3");
-            Assert.IsTrue(Igs.InputSetString("my_data", "toto") == Result.Failure);
+
+            Assert.IsTrue(Igs.InputSetString("my_data", "this is a test string") == Result.Success); //converted as raw data
+            data = Igs.InputData("my_data");
+            Assert.IsTrue(data.Length == ("this is a test string".Length + 1));
+
             Assert.IsTrue(Igs.InputSetString("my_data", "0123456789abcdef") == Result.Success);
             Assert.IsTrue(Igs.InputData("my_data").Length == 8);
+
+            Assert.IsTrue(Igs.InputSetString("my_data", "12") == Result.Success);
+            Assert.IsTrue(Igs.InputData("my_data").Length == 1);
+
+            Assert.IsTrue(Igs.InputSetString("my_data", null) == Result.Success);
+            Assert.IsNull(Igs.InputData("my_data"));
+
+            byte[] myRawData = System.Text.Encoding.UTF8.GetBytes("my raw data" + "\0");
+            Assert.IsTrue(Igs.InputSetData("my_impulsion", myRawData) == Result.Success);
+            Assert.IsTrue(Igs.InputSetData("my_bool", myRawData) == Result.Failure);
+            Assert.IsTrue(Igs.InputSetData("my_int", myRawData) == Result.Failure);
+            Assert.IsTrue(Igs.InputSetData("my_double", myRawData) == Result.Failure);
+            Assert.IsTrue(Igs.InputSetData("my_string", myRawData) == Result.Success);
+            Assert.AreEqual(Igs.InputString("my_string"), "my raw data");
+            Assert.IsTrue(Igs.InputSetData("my_data", myRawData) == Result.Success);
+            Assert.IsTrue(Igs.InputData("my_data").SequenceEqual(myRawData));
+            bool myBool = true;
+            Igs.InputSetBool("my_bool", false);
+            Igs.InputSetData("my_bool", BitConverter.GetBytes(myBool));
+            Assert.IsTrue(Igs.InputBool("my_bool"));
+            int myInt = 123456;
+            Igs.InputSetInt("my_int", 0);
+            Igs.InputSetData("my_int", BitConverter.GetBytes(myInt));
+            Assert.AreEqual(Igs.InputInt("my_int"), myInt);
+            double myDouble = 123.456;
+            Igs.InputSetDouble("my_double", 0.0);
+            Igs.InputSetData("my_double", BitConverter.GetBytes(myDouble));
+            Assert.AreEqual(Igs.InputDouble("my_double"), myDouble);
 
             Igs.InputSetBool("my_bool", true);
             Assert.IsTrue(Igs.InputBool("my_bool"));
@@ -1224,6 +1255,19 @@ namespace Tester
             Assert.IsTrue(Igs.InputDouble("my_string") - 10.1 < 0.000001);
             Assert.IsTrue(Igs.InputString("my_string") == "10.1");
             Assert.IsTrue(Igs.InputData("my_string").Length == 5);
+            Igs.InputSetString("my_string", "");
+            Assert.AreEqual(Igs.InputString("my_string"), "");
+            Igs.InputSetString("my_string", null);
+            Assert.IsNull(Igs.InputString("my_string"));
+
+            byte[] myData = System.Text.Encoding.UTF8.GetBytes("my data" + "\0");
+            Igs.InputSetData("my_data", myData);
+            Assert.IsFalse(Igs.InputBool("my_data"));
+            Assert.IsTrue(Igs.InputInt("my_data") == 0);
+            Assert.IsTrue(Igs.InputDouble("my_data") < 0.000001);
+            Assert.IsTrue(Igs.InputString("my_data") == null);
+            Assert.IsTrue(Igs.InputData("my_data").SequenceEqual(myData));
+
 
             Igs.StartWithDevice(_networkDevice, _port);
             //Channel methods call test
