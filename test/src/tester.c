@@ -576,7 +576,7 @@ void run_static_tests (int argc, const char * argv[]){
     igs_output_mute("toto");
     igs_output_unmute("toto");
     assert(!igs_input_bool("toto"));
-    assert(!igs_input_int("toto"));
+    assert(igs_input_int("toto") == 0);
     assert(igs_input_double("toto") < 0.000001);
     assert(!igs_input_string("toto"));
     void *data = NULL;
@@ -584,7 +584,7 @@ void run_static_tests (int argc, const char * argv[]){
     assert(igs_input_data("toto", &data, &dataSize) == IGS_FAILURE);
     igs_clear_input("toto");
     assert(!igs_output_bool("toto"));
-    assert(!igs_output_int("toto"));
+    assert(igs_output_int("toto") == 0);
     assert(igs_output_double("toto") < 0.000001);
     assert(!igs_output_string("toto"));
     assert(igs_output_data("toto", &data, &dataSize) == IGS_FAILURE);
@@ -856,7 +856,7 @@ void run_static_tests (int argc, const char * argv[]){
     free(data);
     data = NULL;
     dataSize = 0;
-    igs_clear_parameter("my data");
+    igs_clear_attribute("my data");
     data = NULL;
     dataSize = 0;
     assert(igs_attribute_data("my data", &data, &dataSize) == IGS_SUCCESS);
@@ -1160,11 +1160,11 @@ void run_static_tests (int argc, const char * argv[]){
     assert(listBis->name == NULL);
     assert(listBis->type == IGS_BOOL_T);
     assert(listBis->size == sizeof(bool));
-    assert(listBis->b == myInt);
+    assert(listBis->b == myBool);
     assert(listBis->next->name == NULL);
     assert(listBis->next->type == IGS_INTEGER_T);
     assert(listBis->next->size == sizeof(int));
-    assert(listBis->next->i == myBool);
+    assert(listBis->next->i == myInt);
     assert(listBis->next->next->name == NULL);
     assert(listBis->next->next->type == IGS_DOUBLE_T);
     assert(listBis->next->next->size == sizeof(double));
