@@ -209,6 +209,13 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
             && value_type <= IGS_TIMESTAMPED_DATA_T)
             value_type -= IGS_DATA_T; //translate value type to non-timestamped value type
 
+        if (value_type == IGS_STRING_T){
+            //for retrocompatiblity reasons, we need to add '\0' to the received data
+            char *str_data = (char*)calloc(size+1, sizeof(char));
+            memcpy(str_data, data, size);
+            data = str_data;
+        }
+        
         // Publication does not provide information about the targeted agents in our
         // context. At this stage, we only know that one or more of our agents are
         // targeted. We need to iterate through our agents and their mappings to check
