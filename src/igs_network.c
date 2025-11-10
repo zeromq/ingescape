@@ -209,11 +209,11 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
             && value_type <= IGS_TIMESTAMPED_DATA_T)
             value_type -= IGS_DATA_T; //translate value type to non-timestamped value type
 
-        if (value_type == IGS_STRING_T){
-            //for retrocompatiblity reasons, we need to add '\0' to the received data
+        if (value_type == IGS_STRING_T & size > 0){
             char *str_data = (char*)calloc(size+1, sizeof(char));
             memcpy(str_data, data, size);
             data = str_data;
+            size = strlen(str_data) + 1;
         }
         
         // Publication does not provide information about the targeted agents in our
