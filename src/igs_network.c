@@ -209,11 +209,14 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
             && value_type <= IGS_TIMESTAMPED_DATA_T)
             value_type -= IGS_DATA_T; //translate value type to non-timestamped value type
 
-        if (value_type == IGS_STRING_T & size > 0){
+        bool shall_clean_data = false;
+        if (value_type == IGS_STRING_T & size > 0 && ((const char*)data)[size - 1] != '\0'){
+            //we have to deal with an older message format, which requires aditional '\0'
             char *str_data = (char*)calloc(size+1, sizeof(char));
             memcpy(str_data, data, size);
             data = str_data;
             size = strlen(str_data) + 1;
+            shall_clean_data = true;
         }
         
         // Publication does not provide information about the targeted agents in our
@@ -263,6 +266,8 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
             zframe_destroy(&frame);
             data = NULL;
         }
+        if (shall_clean_data)
+            free(data);
         size = 0;
     }
     zmsg_destroy (msg);
