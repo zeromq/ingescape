@@ -216,6 +216,7 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
             memcpy(str_data, data, size);
             data = str_data;
             size = strlen(str_data) + 1;
+            zframe_destroy(&frame); //size > 0 implies that frame exists
             shall_clean_data = true;
         }
         
