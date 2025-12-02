@@ -111,6 +111,7 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
     assert (msg && *msg);
     assert (remote_agent);
     assert (remote_agent->context);
+    assert (remote_agent->uuid);
     if (remote_agent->context->is_frozen == true) {
         igs_debug ("Message received from %s but all traffic in our agent is currently frozen",
                    remote_agent->definition->name);
@@ -118,6 +119,7 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
         return;
     }
 
+    char* remote_agent_uuid = strdup(remote_agent->uuid);
     size_t msg_size = zmsg_size (*msg);
     char *output = NULL;
     char *v_type = NULL;
@@ -130,9 +132,9 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
     zmsg_t *bundle = NULL;
     size_t i = 0;
 
-    //NB: The following iterations need to be protected in case the remote agent disappears
-    //while we are handling data.
-    for (i = 0; i < msg_size; i += 3) {
+    //NB: Because of unlock/cb/lock sequence, we need to check if the remote agent still exists after each lock.
+    bool remote_agent_still_exists = true;
+    for (i = 0; (i < msg_size) && remote_agent_still_exists; i += 3) {
         data = NULL;
         frame = NULL;
         // Each message part must contain 3 elements
@@ -224,18 +226,22 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
         // context. At this stage, we only know that one or more of our agents are
         // targeted. We need to iterate through our agents and their mappings to check
         // which inputs need to be updated on which agent.
+        //NB: A list of contacted agents is kept to compare against the model after each unlock/cb/lock pattern
+        zlist_t *contacted_agents = zlist_new();
+        zlist_autofree(contacted_agents);
+        zlist_comparefn(contacted_agents, (zlist_compare_fn *) strcmp);
         igsagent_t *agent = zhashx_first(core_context->agents);
         while (agent && agent->uuid && agent->mapping) {
+            char* agent_uuid = strdup(agent->uuid);
+
             // try to find mapping elements matching with this subscriber's output
             // and update mapped input(s) value accordingly
             // TODO: optimize mapping storage to avoid iterating
             // check that this agent has not been destroyed when we were locked
             assert(agent->mapping->map_elements);
             igs_map_t *elmt = zlist_first(agent->mapping->map_elements);
-            while (elmt && elmt->from_input && remote_agent->definition 
-                   && remote_agent->definition->name && agent->uuid) {
-                if (streq (elmt->to_agent, remote_agent->definition->name)
-                    && streq (elmt->to_output, output)) {
+            while (elmt && elmt->from_input && remote_agent->definition && remote_agent->definition->name && agent->uuid) {
+                if (streq (elmt->to_agent, remote_agent->definition->name) && streq (elmt->to_output, output)) {
                     // we have a match on emitting agent name and its ouput name :
                     // still need to check the targeted input existence in our
                     // definition
@@ -254,14 +260,30 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
                             model_LOCKED_handle_io_callbacks(agent, io);
                             model_read_write_lock(__FUNCTION__, __LINE__);
                         }
-                        if (agent->uuid)
+
+                        //NB: Because of unlock/cb/lock sequence, we need to check if the agent we are iterating on still exists
+                        igsagent_t *ctx_agent = zhashx_lookup(core_context->agents, agent_uuid);
+                        if (ctx_agent)
                             agent->rt_current_timestamp_microseconds = INT64_MIN;
+                        else
+                            break;
                     }
                 }
+
                 elmt = zlist_next(agent->mapping->map_elements);
             }
-            agent = zhashx_next(core_context->agents);
+
+            zlist_append(contacted_agents, agent_uuid);
+
+            // Retrieve the next agent in the context that has not yet been contacted
+            agent = zhashx_first(core_context->agents);
+            while (agent && zlist_exists(contacted_agents, agent->uuid))
+                agent = zhashx_next(core_context->agents);
+
+            free(agent_uuid);
         }
+        zlist_destroy(&contacted_agents);
+
         freen (output);
         if (frame){
             zframe_destroy(&frame);
@@ -270,7 +292,24 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
         if (shall_clean_data)
             free(data);
         size = 0;
+
+        if (streq(remote_agent_uuid, "FAKE_UUID")) //NOTE: Fake agents always exist
+            remote_agent_still_exists = true;
+        else{
+            bool found = false;
+            zlistx_t *ctx_remote_agents = zhashx_values(core_context->remote_agents);
+            igsagent_t* it = zlistx_first(ctx_remote_agents);
+            while (it && !found){
+                if (it && streq(it->uuid, remote_agent_uuid))
+                    found = true;
+                it = zlistx_next(ctx_remote_agents);
+            }
+            remote_agent_still_exists = found;
+            zlistx_destroy(&ctx_remote_agents);
+        }
     }
+
+    free(remote_agent_uuid);
     zmsg_destroy (msg);
 }
 
@@ -944,7 +983,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 } else
                     igs_error("exit message without UUID : rejecting");
                 model_read_write_unlock(__FUNCTION__, __LINE__);
-                
+
             } else if (title && strncmp(title, RT_SET_TIME_MSG, strlen(RT_SET_TIME_MSG)) == 0){
                 model_read_write_lock(__FUNCTION__, __LINE__);
                 char *timestamp_str = title + strlen(RT_SET_TIME_MSG);
@@ -954,7 +993,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     igs_rt_set_time(timestamp);
                 }else
                     igs_error("timestamp missing in RT_SET_TIME command : rejecting");
-                
+
             } else if (streq (title, STATE_MSG)){
                 char *state = zmsg_popstr (msg_duplicate);
                 if (!state) {
@@ -985,7 +1024,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 }
                 free(state);
                 free(uuid);
-                
+
             } else if (!title)
                 igs_error("whisper message to private channel is missing title : rejecting");
             free (title);
@@ -2954,6 +2993,7 @@ int s_manage_parent (zloop_t *loop, zsock_t *pipe, void *arg)
         // necessary information
         igs_remote_agent_t *fake_remote = (igs_remote_agent_t *) zmalloc (sizeof (igs_remote_agent_t));
         fake_remote->context = core_context;
+        fake_remote->uuid = strdup("FAKE_UUID"); //NOTE: UUID needs to be non-NULL to pass assert checks
         fake_remote->definition = (igs_definition_t *) zmalloc (sizeof (igs_definition_t));
         fake_remote->definition->name = name;
         s_handle_publication (&msg, fake_remote); //destroys msg
@@ -3280,7 +3320,7 @@ void s_init_loop (igs_core_context_t *context)
             return;
         }
     }
-    
+
     int result = chmod(context->network_ipc_folder_path, 0777);
     if (result != EXIT_SUCCESS)
         igs_error("failed chmod 0777 for IPC folder at '%s'", context->network_ipc_folder_path);
@@ -4812,7 +4852,7 @@ void igs_set_ipc_dir (const char *path)
                 core_context->network_ipc_folder_path = strdup (path);
             } else if (core_context->network_ipc_folder_path)
                 igs_error ("IPC folder remains set to %s", core_context->network_ipc_folder_path);
-            
+
             int result = chmod(core_context->network_ipc_folder_path, 0777);
             if (result != EXIT_SUCCESS)
                 igs_error("failed chmod 0777 for IPC folder at '%s'", core_context->network_ipc_folder_path);
