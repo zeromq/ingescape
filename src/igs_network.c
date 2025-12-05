@@ -2997,6 +2997,7 @@ int s_manage_parent (zloop_t *loop, zsock_t *pipe, void *arg)
         fake_remote->definition = (igs_definition_t *) zmalloc (sizeof (igs_definition_t));
         fake_remote->definition->name = name;
         s_handle_publication (&msg, fake_remote); //destroys msg
+        free (fake_remote->uuid);
         free (fake_remote->definition);
         free (fake_remote);
         free (name);
