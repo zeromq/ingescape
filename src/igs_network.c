@@ -3022,10 +3022,19 @@ static void s_run_loop (zsock_t *mypipe, void *args)
     assert (context->publisher);
     assert (context->replay_channel);
 #if defined(__UNIX__) && !defined(__UTYPE_IOS)
-    assert (context->network_ipc_full_path);
-    assert (context->network_ipc_endpoint);
-    assert (context->ipc_publisher);
-    assert (context->inproc_publisher);
+    if (context->network_allow_ipc){
+        assert (context->network_ipc_full_path);
+        assert (context->network_ipc_endpoint);
+        assert (context->ipc_publisher);
+    }else{
+        assert (!context->network_ipc_full_path);
+        assert (!context->network_ipc_endpoint);
+        assert (!context->ipc_publisher);
+    }
+    if (context->network_allow_inproc)
+        assert (context->inproc_publisher);
+    else
+        assert (!context->inproc_publisher);
 #endif
 
     if (context->security_is_enabled && !context->security_auth) {
@@ -3096,10 +3105,12 @@ static void s_run_loop (zsock_t *mypipe, void *args)
     zsock_destroy (&context->ipc_publisher);
     igs_debug ("cleaning internall communication stack...");
 #if defined(__UNIX__) && !defined(__UTYPE_IOS)
-    zsys_file_delete (context->network_ipc_full_path); // destroy ipc_path in file system
-    // NB: ipc_path is based on peer id which is unique. It will never be used again.
-    free (context->network_ipc_full_path);
-    context->network_ipc_full_path = NULL;
+    if (context->network_ipc_full_path){
+        zsys_file_delete (context->network_ipc_full_path); // destroy ipc_path in file system
+        // NB: ipc_path is based on peer id which is unique. It will never be used again.
+        free (context->network_ipc_full_path);
+        context->network_ipc_full_path = NULL;
+    }
 #endif
 #if !defined(__UTYPE_IOS)
     if (context->inproc_publisher)
@@ -3309,81 +3320,85 @@ void s_init_loop (igs_core_context_t *context)
     s_unlock_zyre_peer (__FUNCTION__, __LINE__);
 
     // start ipc publisher
+    if (context->network_allow_ipc){
 #if defined(__UNIX__) && !defined(__UTYPE_IOS)
-    if (!context->network_ipc_folder_path)
-        context->network_ipc_folder_path = strdup (IGS_DEFAULT_IPC_FOLDER_PATH);
-
-    if (!zsys_file_exists (context->network_ipc_folder_path)) {
-        zsys_dir_create ("%s", context->network_ipc_folder_path);
+        if (!context->network_ipc_folder_path)
+            context->network_ipc_folder_path = strdup (IGS_DEFAULT_IPC_FOLDER_PATH);
+        
         if (!zsys_file_exists (context->network_ipc_folder_path)) {
-            igs_fatal ("could not create ipc folder path '%s'",
-                       context->network_ipc_folder_path);
+            zsys_dir_create ("%s", context->network_ipc_folder_path);
+            if (!zsys_file_exists (context->network_ipc_folder_path)) {
+                igs_fatal ("could not create ipc folder path '%s'",
+                           context->network_ipc_folder_path);
+                return;
+            }
+        }
+        
+        int result = chmod(context->network_ipc_folder_path, 0777);
+        if (result != EXIT_SUCCESS)
+            igs_error("failed chmod 0777 for IPC folder at '%s'", context->network_ipc_folder_path);
+        
+        s_lock_zyre_peer (__FUNCTION__, __LINE__);
+        context->network_ipc_full_path = (char *) zmalloc (strlen (context->network_ipc_folder_path) + strlen (zyre_uuid (context->node)) + 2);
+        sprintf (context->network_ipc_full_path, "%s/%s",
+                 context->network_ipc_folder_path, zyre_uuid (context->node));
+        context->network_ipc_endpoint = (char *) zmalloc (strlen (context->network_ipc_folder_path) + strlen (zyre_uuid (context->node)) + 8);
+        sprintf (context->network_ipc_endpoint, "ipc://%s/%s",
+                 context->network_ipc_folder_path, zyre_uuid (context->node));
+        s_unlock_zyre_peer (__FUNCTION__, __LINE__);
+        context->ipc_publisher = zsock_new_pub (context->network_ipc_endpoint);
+        if (!context->ipc_publisher){
+            igs_fatal("could not open ipc socket at %s, the ingescape agent will NOT start.", context->network_ipc_endpoint);
             return;
         }
-    }
-
-    int result = chmod(context->network_ipc_folder_path, 0777);
-    if (result != EXIT_SUCCESS)
-        igs_error("failed chmod 0777 for IPC folder at '%s'", context->network_ipc_folder_path);
-
-    s_lock_zyre_peer (__FUNCTION__, __LINE__);
-    context->network_ipc_full_path = (char *) zmalloc (strlen (context->network_ipc_folder_path) + strlen (zyre_uuid (context->node)) + 2);
-    sprintf (context->network_ipc_full_path, "%s/%s",
-             context->network_ipc_folder_path, zyre_uuid (context->node));
-    context->network_ipc_endpoint = (char *) zmalloc (strlen (context->network_ipc_folder_path) + strlen (zyre_uuid (context->node)) + 8);
-    sprintf (context->network_ipc_endpoint, "ipc://%s/%s",
-             context->network_ipc_folder_path, zyre_uuid (context->node));
-    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
-    context->ipc_publisher = zsock_new_pub (context->network_ipc_endpoint);
-    if (!context->ipc_publisher){
-        igs_fatal("could not open ipc socket at %s, the ingescape agent will NOT start.", context->network_ipc_endpoint);
-        return;
-    }
-    if (context->security_is_enabled) {
-        zcert_apply (context->security_cert, context->ipc_publisher);
-        zsock_set_curve_server (context->ipc_publisher, 1);
-    }
-    zsock_set_sndhwm (context->ipc_publisher, context->network_hwm_value);
-    s_lock_zyre_peer (__FUNCTION__, __LINE__);
-    zyre_set_header (context->node, "ipc", "%s", context->network_ipc_endpoint);
-    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
-
+        if (context->security_is_enabled) {
+            zcert_apply (context->security_cert, context->ipc_publisher);
+            zsock_set_curve_server (context->ipc_publisher, 1);
+        }
+        zsock_set_sndhwm (context->ipc_publisher, context->network_hwm_value);
+        s_lock_zyre_peer (__FUNCTION__, __LINE__);
+        zyre_set_header (context->node, "ipc", "%s", context->network_ipc_endpoint);
+        s_unlock_zyre_peer (__FUNCTION__, __LINE__);
+        
 #elif defined(__WINDOWS__)
-    context->network_ipc_endpoint = strdup ("tcp://127.0.0.1:*");
-    zsock_t *ipc_publisher = context->ipc_publisher = zsock_new_pub (context->network_ipc_endpoint);
-    if (!context->ipc_publisher){
-        igs_fatal("could not open ipc socket at %s, aborting.", context->network_ipc_endpoint);
-        return;
-    }
-    if (context->security_is_enabled) {
-        zcert_apply (context->security_cert, context->ipc_publisher);
-        zsock_set_curve_server (context->ipc_publisher, 1);
-    }
-    zsock_set_sndhwm (context->ipc_publisher, context->network_hwm_value);
-    s_lock_zyre_peer (__FUNCTION__, __LINE__);
-    zyre_set_header (context->node, "loopback", "%s",
-                     zsock_endpoint (ipc_publisher));
-    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
+        context->network_ipc_endpoint = strdup ("tcp://127.0.0.1:*");
+        zsock_t *ipc_publisher = context->ipc_publisher = zsock_new_pub (context->network_ipc_endpoint);
+        if (!context->ipc_publisher){
+            igs_fatal("could not open ipc socket at %s, aborting.", context->network_ipc_endpoint);
+            return;
+        }
+        if (context->security_is_enabled) {
+            zcert_apply (context->security_cert, context->ipc_publisher);
+            zsock_set_curve_server (context->ipc_publisher, 1);
+        }
+        zsock_set_sndhwm (context->ipc_publisher, context->network_hwm_value);
+        s_lock_zyre_peer (__FUNCTION__, __LINE__);
+        zyre_set_header (context->node, "loopback", "%s",
+                         zsock_endpoint (ipc_publisher));
+        s_unlock_zyre_peer (__FUNCTION__, __LINE__);
 #endif
+    }
 
     // start inproc publisher
+    if (context->network_allow_inproc){
 #if !defined(__UYTPE_IOS)
-    s_lock_zyre_peer (__FUNCTION__, __LINE__);
-    char *inproc_endpoint = (char *) zmalloc (sizeof (char) * (12 + strlen (zyre_uuid (context->node))));
-    sprintf (inproc_endpoint, "inproc://%s", zyre_uuid (context->node));
-    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
-    context->inproc_publisher = zsock_new_pub (inproc_endpoint);
-    assert (context->inproc_publisher);
-    if (context->security_is_enabled) {
-        zcert_apply (context->security_cert, context->inproc_publisher);
-        zsock_set_curve_server (context->inproc_publisher, 1);
-    }
-    zsock_set_sndhwm (context->inproc_publisher, context->network_hwm_value);
-    s_lock_zyre_peer (__FUNCTION__, __LINE__);
-    zyre_set_header (context->node, "inproc", "%s", inproc_endpoint);
-    s_unlock_zyre_peer (__FUNCTION__, __LINE__);
-    free (inproc_endpoint);
+        s_lock_zyre_peer (__FUNCTION__, __LINE__);
+        char *inproc_endpoint = (char *) zmalloc (sizeof (char) * (12 + strlen (zyre_uuid (context->node))));
+        sprintf (inproc_endpoint, "inproc://%s", zyre_uuid (context->node));
+        s_unlock_zyre_peer (__FUNCTION__, __LINE__);
+        context->inproc_publisher = zsock_new_pub (inproc_endpoint);
+        assert (context->inproc_publisher);
+        if (context->security_is_enabled) {
+            zcert_apply (context->security_cert, context->inproc_publisher);
+            zsock_set_curve_server (context->inproc_publisher, 1);
+        }
+        zsock_set_sndhwm (context->inproc_publisher, context->network_hwm_value);
+        s_lock_zyre_peer (__FUNCTION__, __LINE__);
+        zyre_set_header (context->node, "inproc", "%s", inproc_endpoint);
+        s_unlock_zyre_peer (__FUNCTION__, __LINE__);
+        free (inproc_endpoint);
 #endif
+    }
 
     // logger stream
     if (context->network_log_stream_port == 0)
@@ -4873,7 +4888,7 @@ const char *igs_ipc_dir (void)
 }
 #endif
 
-void igs_set_allow_inproc (bool allow)
+void igs_set_inproc (bool allow)
 {
     core_init_agent ();
     model_read_write_lock(__FUNCTION__, __LINE__);
@@ -4881,7 +4896,7 @@ void igs_set_allow_inproc (bool allow)
     model_read_write_unlock(__FUNCTION__, __LINE__);
 }
 
-bool igs_get_allow_inproc (void)
+bool igs_get_inproc (void)
 {
     core_init_agent ();
     return core_context->network_allow_inproc;
@@ -4890,7 +4905,9 @@ bool igs_get_allow_inproc (void)
 void igs_set_ipc (bool allow)
 {
     core_init_agent ();
+    model_read_write_lock(__FUNCTION__, __LINE__);
     core_context->network_allow_ipc = allow;
+    model_read_write_unlock(__FUNCTION__, __LINE__);
 }
 
 bool igs_has_ipc (void)

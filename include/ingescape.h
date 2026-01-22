@@ -877,7 +877,10 @@ INGESCAPE_EXPORT bool igs_has_ipc(void);
 INGESCAPE_EXPORT void igs_set_ipc_dir(const char *path);
 INGESCAPE_EXPORT const char * igs_ipc_dir(void);
 #endif
-
+/*When agents are in the same process, using the igsagent functions,
+ they automatically communicate using shared memory.*/
+INGESCAPE_EXPORT void igs_set_inproc(bool allow); //default is true
+INGESCAPE_EXPORT bool igs_has_inproc(void);
 
 /*NETWORK DEVICES
  Utility functions to detect network adapters with broadcast capabilities
