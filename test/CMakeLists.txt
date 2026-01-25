@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.5)
 if(APPLE)
     set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE STRING "MacOS Universal Binaries")
     set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
