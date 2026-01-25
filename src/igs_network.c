@@ -720,16 +720,18 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
             zyre_peer->peer_id = s_strndup (peerUUID, IGS_MAX_PEER_ID_LENGTH);
             zhashx_insert(context->zyre_peers, zyre_peer->peer_id, zyre_peer);
             zyre_peer->name = s_strndup (name, IGS_MAX_AGENT_NAME_LENGTH);
-            zlist_t *keys = zhash_keys (headers);
-            size_t s = zlist_size (keys);
-            if (s > 0) {
-                igs_debug ("Handling headers for peer %s (%s)", name, peerUUID);
-                char *k = zlist_first (keys);
-                const char *v;
-                while (k) {
-                    v = zyre_event_header (zyre_event, k);
-                    igs_debug ("\t%s -> %s", k, v);
-                    k = zlist_next (keys);
+            if (headers){
+                zlist_t *keys = zhash_keys (headers);
+                size_t s = zlist_size (keys);
+                if (s > 0) {
+                    igs_debug ("Headers for peer %s (%s)", name, peerUUID);
+                    char *k = zlist_first (keys);
+                    const char *v;
+                    while (k) {
+                        v = zyre_event_header (zyre_event, k);
+                        igs_debug ("\t%s -> %s", k, v);
+                        k = zlist_next (keys);
+                    }
                 }
                 zlist_destroy (&keys);
             }
