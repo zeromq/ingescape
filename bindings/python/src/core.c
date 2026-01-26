@@ -230,18 +230,43 @@ void onAgentEvent(igs_agent_event_t event, const char *uuid, const char *name, c
         PyGILState_STATE d_gstate = PyGILState_Ensure();
         PyObject *globalArgList = NULL;
         Py_XINCREF(currentCallback->my_data);
-        if (event == IGS_AGENT_WON_ELECTION || event == IGS_AGENT_LOST_ELECTION){
+        if ((event == IGS_AGENT_ENTERED)
+            || (event == IGS_AGENT_UPDATED_DEFINITION)
+            || (event == IGS_AGENT_UPDATED_MAPPING)
+            || (event == IGS_AGENT_CHANGED_STATE)
+            || (event == IGS_AGENT_WON_ELECTION)
+            || (event == IGS_AGENT_LOST_ELECTION)){
+            //NOTE: event_data is a string
             globalArgList = PyTuple_Pack(5, PyLong_FromLong(event)
-                                            , Py_BuildValue("s",uuid)
-                                            , Py_BuildValue("s",name)
-                                            , Py_BuildValue("s",(char*)eventData)
+                                            , Py_BuildValue("s", uuid)
+                                            , Py_BuildValue("s", name)
+                                            , Py_BuildValue("s", (char*)eventData)
                                             , currentCallback->my_data);
         }else if (event == IGS_PEER_ENTERED){
-            globalArgList = PyTuple_Pack(5, PyLong_FromLong(event)
-                                            , Py_BuildValue("s",uuid)
-                                            , Py_BuildValue("s",name)
-                                            , Py_None   // FIXME: Cast zhash into python object
-                                            , currentCallback->my_data);
+            //NOTE: event_data is a zhash_t*
+            zhash_t *headers = (zhash_t*)eventData;
+            if (headers){
+                zlist_t *keys = zhash_keys(headers);
+                PyObject *headersDict = PyDict_New();
+                char *key = NULL;
+                char *value = NULL;
+                while ((key = zlist_pop(keys)) != NULL){
+                    value = Py_BuildValue("s", zhash_lookup(headers, key));
+                    PyDict_SetItemString(headersDict, key, value);
+                }
+                globalArgList = PyTuple_Pack(5, PyLong_FromLong(event)
+                                                , Py_BuildValue("s",uuid)
+                                                , Py_BuildValue("s",name)
+                                                , headersDict
+                                                , currentCallback->my_data);
+                zlist_destroy(&keys);
+            }else{
+                globalArgList = PyTuple_Pack(5, PyLong_FromLong(event)
+                                                , Py_BuildValue("s",uuid)
+                                                , Py_BuildValue("s",name)
+                                                , Py_None
+                                                , currentCallback->my_data);
+            }
         }else{
             globalArgList = PyTuple_Pack(5, PyLong_FromLong(event)
                                             , Py_BuildValue("s",uuid)
