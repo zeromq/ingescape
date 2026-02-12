@@ -970,7 +970,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                 if (uuid){
                     igs_remote_agent_t *remote = zhashx_lookup(context->remote_agents, uuid);
                     if (remote) {
-                        igs_debug ("<-%s (%s) exited", remote->definition->name, uuid);
+                        igs_debug ("<-%s (%s) exited (agent)", remote->definition->name, uuid);
                         split_remove_worker (context, uuid, NULL);
                         zhashx_delete(context->remote_agents, remote->uuid);
                         char *def_name = strdup(remote->definition->name);
@@ -2779,7 +2779,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
 
     else if (streq (event, "EXIT")) {
         model_read_write_lock(__FUNCTION__, __LINE__);
-        igs_debug ("<-%s (%s) exited", name, peerUUID);
+        igs_debug ("<-%s (%s) exited (peer)", name, peerUUID);
         igs_zyre_peer_t *zyre_peer = zhashx_lookup(context->zyre_peers, peerUUID);
         if (zyre_peer) {
             if (zyre_peer->reconnected > 0) {

@@ -246,7 +246,7 @@ void testerChannelCallback(const char *event, const char *peerID, const char *na
         zlist_t *keys = zhash_keys(headers);
         char *key = zlist_first(keys);
         while (key != NULL) {
-            printf("%s--->%s\n", key, (char *)zhash_lookup(headers, key));
+            printf("\t%s--->%s\n", key, (char *)zhash_lookup(headers, key));
             key = zlist_next(keys);
         }
     } else if (streq(event, "EXIT")){
@@ -2296,11 +2296,8 @@ int main(int argc, const char * argv[]) {
         assert(igs_start_with_brokers(buffer) == IGS_SUCCESS);
     } else {
         //start/stop stress tests
-        igs_start_with_device(networkDevice, port);
-//    igs_start_with_device(networkDevice, port);
-//    igs_stop();
-//    igs_stop();
-//    igs_stop();
+//        for (int i = 0; i < 250; i++)
+//            igs_start_with_device(networkDevice, port);
 
         igs_start_with_device(networkDevice, port);
     }
