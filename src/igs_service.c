@@ -1218,10 +1218,9 @@ igs_result_t igsagent_service_call (igsagent_t *agent,
                         defined_nb_arguments++;
                         count_arg = count_arg->next;
                     }
-                    if (nb_arguments != defined_nb_arguments) {
+                    if (nb_arguments != defined_nb_arguments)
                         igsagent_error (agent, "passed number of arguments is not correct (received: %zu / expected: %zu) : service will not be called", nb_arguments, defined_nb_arguments);
-                        continue;
-                    }else {
+                    else {
                         agent->rt_current_timestamp_microseconds = current_microseconds;
                         if (core_context->enable_service_logging)
                             service_log_received_service (local_agent, agent->definition->name, agent->uuid, service_name,
