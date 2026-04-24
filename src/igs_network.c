@@ -24,6 +24,8 @@ static int handle_publications_balance_max = 0;
 
 #if defined(__UTYPE_LINUX)
 #include <unistd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #endif
 
 #if (defined(__UTYPE_IOS) || defined(__UTYPE_OSX))
@@ -779,8 +781,19 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                         // process
                         int pid = atoi (zyre_event_header (zyre_event, "pid"));
                         if (context->process_id == pid) {
-                            // same ip address and same process : we can use inproc
+                            // same ip address and same process : we may use inproc
+                            // (with an additional check for Linux)
+#if !defined(__linux__)
+                            const char *pid_ns = zyre_event_header (zyre_event, "pid_namespace");
+                            if (pid_ns){
+                                unsigned long pid_namespace = strtoul(pid_ns, NULL, 10);
+                                if (pid_namespace && context->pid_namespace
+                                    && pid_namespace == context->pid_namespace)
+                                    inproc_address = zyre_event_header (zyre_event, "inproc");
+                            }
+#else
                             inproc_address = zyre_event_header (zyre_event, "inproc");
+#endif
                             if (inproc_address) {
                                 use_inproc = true;
                                 igs_debug ("Use address %s to subscribe to %s", inproc_address, name);
@@ -3431,6 +3444,15 @@ void s_init_loop (igs_core_context_t *context)
     s_lock_zyre_peer (__FUNCTION__, __LINE__);
     zyre_set_header (context->node, "pid", "%i", context->process_id);
     s_unlock_zyre_peer (__FUNCTION__, __LINE__);
+#if defined(__linux__)
+    struct stat st;
+    if (stat("/proc/self/ns/pid", &st) == 0){
+        context->pid_namespace = st.st_ino;
+        s_lock_zyre_peer (__FUNCTION__, __LINE__);
+        zyre_set_header (context->node, "pid_namespace", "%lu", context->pid_namespace);
+        s_unlock_zyre_peer (__FUNCTION__, __LINE__);
+    }
+#endif
     if (context->command_line == NULL) {
         // command line was not set manually : we try to get exec path instead
 #if defined(__UTYPE_IOS)

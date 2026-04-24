@@ -466,6 +466,7 @@ typedef struct igs_core_context {
     char *replay_channel;
     zlist_t *timers; // igs_timer_t
     int process_id;
+    unsigned long pid_namespace;
     char *network_ipc_folder_path;
     char *network_ipc_full_path;
     char *network_ipc_endpoint;
