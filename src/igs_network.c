@@ -24,6 +24,8 @@ static int handle_publications_balance_max = 0;
 
 #if defined(__UTYPE_LINUX)
 #include <unistd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #endif
 
 #if (defined(__UTYPE_IOS) || defined(__UTYPE_OSX))
@@ -775,19 +777,25 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                     const char *inproc_address = NULL;
                     if (streq (context->ip_address, incoming_ip_address)) {
                         // same IP address : we can try to use ipc (or loopback on windows)
-                        // instead of TCP or we can use inproc if both agents are in the same
-                        // process
+                        // or we can use inproc if both agents are in the same process
                         int pid = atoi (zyre_event_header (zyre_event, "pid"));
-                        if (context->process_id == pid) {
-                            // same ip address and same process : we can use inproc
+                        const char *pid_ns = zyre_event_header (zyre_event, "pid_namespace");
+                        unsigned long pid_namespace = 0;
+                        if (pid_ns)
+                            pid_namespace = strtoul(pid_ns, NULL, 10);
+                        if (context->process_id == pid //same PID AND
+                            && ((!pid_namespace && !context->pid_namespace) //no namespace at all
+                                || (pid_namespace && context->pid_namespace //OR
+                                    && pid_namespace == context->pid_namespace)) //same namespace
+                            ) {
+                            // same ip address and same process (and same namespace) : we may use inproc
                             inproc_address = zyre_event_header (zyre_event, "inproc");
                             if (inproc_address) {
                                 use_inproc = true;
                                 igs_debug ("Use address %s to subscribe to %s", inproc_address, name);
                             }
-                        }
-                        else {
-                            // try to recover agent ipc/loopback address
+                        } else {
+                            // get ipc/loopback address
 #if defined(__UNIX__)
                             ipc_address = zyre_event_header (zyre_event, "ipc");
 #elif defined(__WINDOWS__)
@@ -813,8 +821,7 @@ int s_manage_zyre_incoming (zloop_t *loop, zsock_t *socket, void *arg)
                         zsock_set_rcvhwm (zyre_peer->subscriber, context->network_hwm_value);
                         igs_debug ("Subscription created for %s at %s (ipc)",
                                    zyre_peer->name, ipc_address);
-                    }
-                    else {
+                    } else {
                         zyre_peer->subscriber = zsock_new_sub (endpoint_address, NULL);
                         zsock_set_rcvhwm (zyre_peer->subscriber, context->network_hwm_value);
                         igs_debug ("Subscription created for %s at %s (tcp)",
@@ -3431,6 +3438,15 @@ void s_init_loop (igs_core_context_t *context)
     s_lock_zyre_peer (__FUNCTION__, __LINE__);
     zyre_set_header (context->node, "pid", "%i", context->process_id);
     s_unlock_zyre_peer (__FUNCTION__, __LINE__);
+#if defined(__linux__)
+    struct stat st;
+    if (stat("/proc/self/ns/pid", &st) == 0){
+        context->pid_namespace = st.st_ino;
+        s_lock_zyre_peer (__FUNCTION__, __LINE__);
+        zyre_set_header (context->node, "pid_namespace", "%lu", context->pid_namespace);
+        s_unlock_zyre_peer (__FUNCTION__, __LINE__);
+    }
+#endif
     if (context->command_line == NULL) {
         // command line was not set manually : we try to get exec path instead
 #if defined(__UTYPE_IOS)
