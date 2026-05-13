@@ -560,6 +560,60 @@ build-deb-packages:
   rules:
     - !reference [.root_namespace, rules]
 
+##
+## CentOS Stream 9 (.rpm package)
+##
+
+build-rpm-packages:
+  extends: .lib-build-files
+  stage: delivery
+  tags:
+    - docker
+  image: quay.io/centos/centos:stream9
+  variables:
+    GIT_STRATEGY: clone
+  script:
+    - dnf install -y gcc gcc-c++ make cmake git file rsync wget openssl-devel libcurl-devel rpm-build openssh-clients
+    - git -c url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ingescape.com/".insteadOf="ssh://git@gitlab.ingescape.com:22222/" submodule update --init --remote --recursive
+    - mkdir centos_x64
+    - echo "Release build"
+    - cmake -S . -B b -DWITH_DEPS=ON -DCMAKE_BUILD_TYPE=Release -DCPACK_COMPONENTS_ALL="Unspecified;library"
+    - cmake --build b --parallel 6
+    - (cd b && cpack -G RPM)
+    - rpm -qpl _packages/ingescape-dev-*.rpm
+    - mv _packages/ingescape-dev-*.rpm centos_x64
+    - echo "Release build -no-strip"
+    - cmake -S . -B b_no_strip -DWITH_DEPS=ON -DCMAKE_BUILD_TYPE=Release -DRPM_NO_STRIP=ON -DCPACK_COMPONENTS_ALL="Unspecified;library"
+    - cmake --build b_no_strip --parallel 6
+    - (cd b_no_strip && cpack -G RPM)
+    - rpm -qpl _packages/ingescape-no-strip-dev-*.rpm
+    - mv _packages/ingescape-no-strip-dev-*.rpm centos_x64
+    - echo "Debug build"
+    - cmake -S . -B b_debug -DWITH_DEPS=ON -DCMAKE_BUILD_TYPE=Debug -DCPACK_COMPONENTS_ALL="Unspecified;library"
+    - cmake --build b_debug --parallel 6
+    - (cd b_debug && cpack -G RPM)
+    - rpm -qpl _packages/ingescape-debug-dev-*.rpm
+    - mv _packages/ingescape-debug-dev-*.rpm centos_x64
+    - cp centos_x64/* $ARTIFACTS_NET_SHARE/linux64/packages/ingescape/rpm/
+    # - echo "Setting up SSH"
+    # - mkdir -p ~/.ssh/
+    # - ssh-keyscan ${STABLE_DELIVERY_HOST} >> ~/.ssh/known_hosts
+    # - umask 077
+    # - echo ${STABLE_SSH_SECRET} | base64 -d > ssh_secret
+    # - umask 022
+    # - echo "Push to repo"
+    # - ssh -i ssh_secret ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST} echo Connected
+    # - rsync --rsh="ssh -i ssh_secret" centos_x64/ingescape*.rpm ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST}:/home/ingescape/domains/repository.ingescape.com/public_html/rpm/
+    # - ssh -i ssh_secret ${STABLE_DELIVERY_USER}@${STABLE_DELIVERY_HOST} /home/ingescape/domains/repository.ingescape.com/refresh_rpm_repo.sh
+  dependencies: []
+  needs: []
+  artifacts:
+    paths:
+      - centos_x64/ingescape*.rpm
+    name: "ingescape-dev-rpm-package"
+  rules:
+    - !reference [.root_namespace, rules]
+
 update-vm-runners:
   stage: delivery
   tags:
