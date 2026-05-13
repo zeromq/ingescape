@@ -522,9 +522,12 @@ if (NOT DEPS_ONLY)
   # ##############################################################################
   # Package installer for release build only
   option(PACK_TGZ "Force pack ingescape as a TGZ and not a .deb package" OFF)
-  if (${CMAKE_OS_NAME} MATCHES "Debian" AND NOT ${PACK_TGZ})
+  if ((${CMAKE_OS_NAME} MATCHES "Debian" OR ${CMAKE_OS_NAME} MATCHES "Ubuntu") AND NOT ${PACK_TGZ})
     set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake")
     include(Packing-debian)
+  elseif ((${CMAKE_OS_NAME} MATCHES "Fedora" OR ${CMAKE_OS_NAME} MATCHES "RedHat" OR ${CMAKE_OS_NAME} MATCHES "CentOS") AND NOT ${PACK_TGZ})
+    set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/builds/cmake")
+    include(Packing-rpm)
   elseif((WIN32) OR (${CMAKE_BUILD_TYPE} STREQUAL "Release"))
     #https://cmake.org/cmake/help/v3.16/module/CPack.html#
     set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
