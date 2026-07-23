@@ -30,6 +30,7 @@ static int handle_publications_balance_max = 0;
 
 #if (defined(__UTYPE_IOS) || defined(__UTYPE_OSX))
 #include <TargetConditionals.h>
+#include <sys/sysctl.h>
 #if defined(__UTYPE_OSX)
 #include <libproc.h>
 #endif
@@ -4986,7 +4987,22 @@ void igs_net_raise_sockets_limit (void)
         else {
             rlim_t prev_cur = limit.rlim_cur;
 #if defined(__UTYPE_OSX) || defined(__UTYPE_IOS)
-            limit.rlim_cur = MIN (OPEN_MAX, limit .rlim_max); // OPEN_MAX is the actual per process limit in macOS
+            // Query live process ceiling instead of assuming the historical OPEN_MAX constant
+            rlim_t fallbackValue = MIN (MAX (OPEN_MAX, limit.rlim_cur), limit.rlim_max);
+            uint64_t maxFilesPerProc = 0;
+            size_t len = sizeof(maxFilesPerProc);
+            int mib[2] = { CTL_KERN, KERN_MAXFILESPERPROC };
+            if (sysctl (mib, 2, &maxFilesPerProc, &len, NULL, 0) != 0) {
+                igs_debug ("sysctl(KERN_MAXFILESPERPROC) failed with errno=%d, falling back to %llu", errno, fallbackValue);
+                limit.rlim_cur = fallbackValue;
+            } else {
+                // Check if sysctl value is actually settable
+                limit.rlim_cur = MIN ((rlim_t)maxFilesPerProc, limit.rlim_max);
+                if (setrlimit (RLIMIT_NOFILE, &limit) != 0) {
+                    igs_error ("setrlimit() with rlim_cur=%llu failed with errno=%d, falling back to %llu", limit.rlim_cur, errno, fallbackValue);
+                    limit.rlim_cur = fallbackValue;
+                }
+            }
 #else
             limit.rlim_cur = limit.rlim_max;
 #endif
