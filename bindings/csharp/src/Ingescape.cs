@@ -3248,6 +3248,28 @@ namespace Ingescape
         /// <returns></returns>
         public static bool HasIpc() { return igs_has_ipc(); }
 
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void igs_set_ipc_dir(IntPtr dir);
+
+        /// <summary>
+        /// UNIX only, default value is '/tmp/ingescape/'
+        /// NB: this function does nothing on Windows
+        /// </summary>
+        public static void SetIpcDir(string dir) 
+        { 
+            IntPtr strPtr = StringToUTF8Ptr(dir);
+            igs_set_ipc_dir(strPtr);
+            Marshal.FreeHGlobal(strPtr);
+        }
+
+        [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr igs_ipc_dir();
+        public static string IpcDir()
+        {
+            IntPtr ptr = igs_ipc_dir();
+            return PtrToStringFromUTF8(ptr);
+        }
+
         #endregion
 
             #region NETWORK DEVICES
@@ -3341,8 +3363,9 @@ namespace Ingescape
 
         /// <summary>
         /// UNIX only, to be called before any ingescape or ZeroMQ activity
+        /// NB: this function does nothing on Windows
         /// </summary>
-        private static void NetRaiseSocketsLimit() { igs_net_raise_sockets_limit(); }  // private cause unix only
+        public static void NetRaiseSocketsLimit() { igs_net_raise_sockets_limit(); } 
 
         [DllImport(ingescapeDLLPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void igs_net_set_high_water_marks(int hwmValue);

@@ -292,27 +292,21 @@ PyObject * igs_net_set_log_stream_port_wrapper(PyObject *self, PyObject *args)
 
 PyObject * igs_set_ipc_dir_wrapper(PyObject *self, PyObject *args)
 {
-#if defined (__UNIX__)
     char * path = NULL;
     if (!PyArg_ParseTuple(args, "s", &path))
         return NULL;
     igs_set_ipc_dir(path);
     return PyLong_FromLong(IGS_SUCCESS);
-#endif
-    return PyLong_FromLong(IGS_FAILURE);
 }
 
 PyObject * igs_ipc_dir_wrapper(PyObject *self, PyObject *args)
 {
-#if defined (__UNIX__)
     const char * result = igs_ipc_dir();
     if(result != NULL){
         return Py_BuildValue("s", result);
     }else{
         return Py_BuildValue("s", "");
     }
-#endif
-    Py_RETURN_NONE;
 }
 
 PyObject * igs_set_ipc_wrapper(PyObject *self, PyObject *args)
@@ -343,11 +337,8 @@ PyObject * igs_net_set_high_water_marks_wrapper(PyObject *self, PyObject *args)
 
 PyObject * igs_net_raise_sockets_limit_wrapper(PyObject *self, PyObject *args)
 {
-#if defined (__UNIX__)
     igs_net_raise_sockets_limit();
     return PyLong_FromLong(IGS_SUCCESS);
-#endif
-    return PyLong_FromLong(IGS_FAILURE);
 }
 
 void timers_callback (int timer_id, void *my_data)
