@@ -328,17 +328,13 @@ static PyMethodDef Ingescape_methods[] =
     // IPC
     {"set_ipc", igs_set_ipc_wrapper, METH_VARARGS, "set_ipc(allow, )\n--\n\n "},
     {"has_ipc", igs_has_ipc_wrapper, METH_NOARGS, "has_ipc()\n--\n\n "},
-#if defined (__UNIX__)
     {"set_ipc_dir", igs_set_ipc_dir_wrapper, METH_VARARGS, "set_ipc_dir(path, )\n--\n\n "},
     {"ipc_dir", igs_ipc_dir_wrapper, METH_NOARGS, "ipc_dir()\n--\n\n "},
-#endif
 
     // net
     {"net_set_log_stream_port", igs_net_set_log_stream_port_wrapper, METH_VARARGS, "net_set_log_stream_port(port, )\n--\n\n "},
     {"net_set_timeout", igs_net_set_timeout_wrapper, METH_VARARGS, "net_set_timeout(duration, )\n--\n\n "},
-#if defined (__UNIX__)
     {"net_raise_sockets_limit", igs_net_raise_sockets_limit_wrapper, METH_NOARGS, "net_raise_sockets_limit()\n--\n\n "},
-#endif
     {"net_set_high_water_marks", igs_net_set_high_water_marks_wrapper, METH_VARARGS, "net_set_high_water_marks(hwm_value, )\n--\n\n "},
     {"net_performance_check", igs_net_performance_check_wrapper, METH_VARARGS, "net_performance_check(peer_id, msg_size, msg_nbr, )\n--\n\n "},
 

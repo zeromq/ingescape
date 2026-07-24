@@ -872,11 +872,9 @@ INGESCAPE_EXPORT void igs_mapping_save(void);
  using igs_set_ipc.*/
 INGESCAPE_EXPORT void igs_set_ipc(bool allow); //default is true
 INGESCAPE_EXPORT bool igs_has_ipc(void);
-#if defined (__UNIX__)
-//set IPC folder path on UNIX systems (default is /tmp/ingescape/)
+// UNIX only to set IPC folder path (default is /tmp/ingescape/)
 INGESCAPE_EXPORT void igs_set_ipc_dir(const char *path);
 INGESCAPE_EXPORT const char * igs_ipc_dir(void);
-#endif
 /*When agents are in the same process, using the igsagent functions,
  they automatically communicate using shared memory.*/
 INGESCAPE_EXPORT void igs_set_inproc(bool allow); //default is true

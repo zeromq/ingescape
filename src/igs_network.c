@@ -4858,12 +4858,13 @@ void igs_net_set_log_stream_port (unsigned int port)
     model_read_write_unlock(__FUNCTION__, __LINE__);
 }
 
-#if defined(__UNIX__)
+
 void igs_set_ipc_dir (const char *path)
 {
     core_init_agent ();
     assert (path);
     model_read_write_lock(__FUNCTION__, __LINE__);
+#if defined(__UNIX__)
     if (core_context->network_actor) {
         igs_error ("IPC folder path cannot be changed while the agent is running");
         model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -4894,6 +4895,9 @@ void igs_set_ipc_dir (const char *path)
         }else
             igs_error ("IPC folder path must be absolute (invalid path: %s)", path);
     }
+#else
+    igs_info ("this function has no effect on non-UNIX systems");
+#endif
     model_read_write_unlock(__FUNCTION__, __LINE__);
 }
 
@@ -4901,11 +4905,16 @@ const char *igs_ipc_dir (void)
 {
     core_init_agent ();
     model_read_write_lock(__FUNCTION__, __LINE__);
+#if defined(__UNIX__)
     char *res = strdup (core_context->network_ipc_folder_path);
+#else
+    igs_info ("IPC directory is not relevant on non-UNIX systems");
+    char *res = NULL;
+#endif
     model_read_write_unlock(__FUNCTION__, __LINE__);
     return res;
 }
-#endif
+
 
 void igs_set_inproc (bool allow)
 {

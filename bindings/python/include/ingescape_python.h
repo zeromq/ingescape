@@ -375,10 +375,8 @@ PyObject * mapping_save_wrapper(PyObject * self, PyObject * args);
 
 PyObject * igs_set_ipc_wrapper(PyObject *self, PyObject *args);
 PyObject * igs_has_ipc_wrapper(PyObject *self, PyObject *args);
-#if defined (__UNIX__)
 PyObject * igs_set_ipc_dir_wrapper(PyObject *self, PyObject *args);
 PyObject * igs_ipc_dir_wrapper(PyObject *self, PyObject *args);
-#endif
 
 PyObject * net_devices_list_wrapper(PyObject * self, PyObject * args);
 PyObject * net_addresses_list_wrapper(PyObject * self, PyObject * args);
