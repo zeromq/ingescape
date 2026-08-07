@@ -21,7 +21,7 @@ PyObject * igs_net_performance_check_wrapper(PyObject *self, PyObject *args)
     char * peer_id = NULL;
     int msg_size = 0;
     int msgs_nbr = 0;
-    if (!PyArg_ParseTuple(args, "i", &peer_id, &msg_size, &msgs_nbr))
+    if (!PyArg_ParseTuple(args, "sii", &peer_id, &msg_size, &msgs_nbr))
         return NULL;
     igs_net_performance_check(peer_id, (size_t)msg_size, (size_t)msgs_nbr);
     return PyLong_FromLong(IGS_SUCCESS);

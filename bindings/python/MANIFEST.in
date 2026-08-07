@@ -8,3 +8,7 @@ include ./dependencies/include/ingescape/*
 
 include ./include/*
 include ./include/uthash/*
+
+include ./ingescape/__init__.py
+include ./ingescape/__init__.pyi
+include ./ingescape/py.typed

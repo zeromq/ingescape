@@ -91,7 +91,7 @@ PyObject * igs_broker_add_secure_wrapper(PyObject *self, PyObject *args)
 {
     char *broker_endpoint = NULL;
     char *path_to_public_certificate_for_broker = NULL;
-    if (!PyArg_ParseTuple(args, "s", &broker_endpoint, &path_to_public_certificate_for_broker))
+    if (!PyArg_ParseTuple(args, "ss", &broker_endpoint, &path_to_public_certificate_for_broker))
         return NULL;
     return PyLong_FromLong(igs_broker_add_secure(broker_endpoint, path_to_public_certificate_for_broker));
 }

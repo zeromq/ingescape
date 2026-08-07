@@ -54,9 +54,11 @@ elif platform.system() == "Windows":
     compile_args = ["-DINGESCAPE_STATIC"]
 
 setup(
+    packages = ["ingescape"],
+    package_data = {"ingescape": ["py.typed", "__init__.pyi"]},
     ext_modules = [
         Extension(
-            name = "ingescape",
+            name = "ingescape._ingescape",
             sources = [
                 "./src/admin.c",
                 "./src/agent.c",
