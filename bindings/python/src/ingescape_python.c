@@ -86,7 +86,7 @@ static PyMethodDef Ingescape_methods[] =
     {"input_set_int", input_set_int_wrapper, METH_VARARGS,  "input_set_int(input_name, value, )\n--\n\n "},
     {"input_set_double", input_set_double_wrapper, METH_VARARGS,  "input_set_double(input_name, value, )\n--\n\n "},
     {"input_set_string", input_set_string_wrapper, METH_VARARGS,  "input_set_string(input_name, value, )\n--\n\n "},
-    {"input_set_impulsion", input_set_impulsion_wrapper, METH_VARARGS,  "input_set_impulsion(input_name, value, )\n--\n\n "},
+    {"input_set_impulsion", input_set_impulsion_wrapper, METH_VARARGS,  "input_set_impulsion(input_name, )\n--\n\n "},
     {"input_set_data", input_set_data_wrapper, METH_VARARGS,  "input_set_data(input_name, value, )\n--\n\n "},
 
     //write output per type
@@ -94,7 +94,7 @@ static PyMethodDef Ingescape_methods[] =
     {"output_set_int", output_set_int_wrapper, METH_VARARGS, "output_set_int(output_name, value, )\n--\n\n "},
     {"output_set_double", output_set_double_wrapper, METH_VARARGS, "output_set_double(output_name, value, )\n--\n\n "},
     {"output_set_string", output_set_string_wrapper, METH_VARARGS, "output_set_string(output_name, value, )\n--\n\n "},
-    {"output_set_impulsion", output_set_impulsion_wrapper, METH_VARARGS, "output_set_impulsion(output_name, value, )\n--\n\n "},
+    {"output_set_impulsion", output_set_impulsion_wrapper, METH_VARARGS, "output_set_impulsion(output_name, )\n--\n\n "},
     {"output_set_data", output_set_data_wrapper, METH_VARARGS, "output_set_data(output_name, value, )\n--\n\n "},
 
     //write Attribute per type
@@ -147,7 +147,7 @@ static PyMethodDef Ingescape_methods[] =
 
     //read/write
     {"definition_json", definition_json_wrapper, METH_NOARGS, "definition_json()\n--\n\n "},
-    {"definition_set_class", definition_set_class_wrapper, METH_VARARGS, "definition_set_class(class, )\n--\n\n "},
+    {"definition_set_class", definition_set_class_wrapper, METH_VARARGS, "definition_set_class(class_name, )\n--\n\n "},
     {"definition_class", definition_class_wrapper, METH_NOARGS, "definition_class()\n--\n\n "},
     {"definition_set_package", definition_set_package_wrapper, METH_VARARGS, "definition_set_package(package, )\n--\n\n "},
     {"definition_package", definition_package_wrapper, METH_NOARGS, "definition_package()\n--\n\n "},
@@ -228,9 +228,9 @@ static PyMethodDef Ingescape_methods[] =
     {"channel_join", channel_join_wrapper, METH_VARARGS, "channel_join(channel, )\n--\n\n "},
     {"channel_leave", channel_leave_wrapper, METH_VARARGS, "channel_leave(channel, )\n--\n\n "},
     {"channel_shout_str", channel_shout_str_wrapper, METH_VARARGS, "channel_shout_str(channel, msg, )\n--\n\n "},
-    {"channel_shout_data", channel_shout_data_wrapper, METH_VARARGS, "channel_shout_data(channel, data, )\n--\n\n "},
+    {"channel_shout_data", channel_shout_data_wrapper, METH_VARARGS, "channel_shout_data(channel, data, size, )\n--\n\n "},
     {"channel_whisper_str", channel_whisper_str_wrapper, METH_VARARGS, "channel_whisper_str(agent_name_or_agent_id_or_peer_id, msg, )\n--\n\n "},
-    {"channel_whisper_data", channel_whisper_data_wrapper, METH_VARARGS, "channel_whisper_data(agent_name_or_agent_id_or_peer_id, data, )\n--\n\n "},
+    {"channel_whisper_data", channel_whisper_data_wrapper, METH_VARARGS, "channel_whisper_data(agent_name_or_agent_id_or_peer_id, data, size, )\n--\n\n "},
     {"peer_add_header", peer_add_header_wrapper, METH_VARARGS, "peer_add_header(key, value, )\n--\n\n "},
     {"peer_remove_header", peer_remove_header_wrapper, METH_VARARGS, "peer_remove_header(channel, )\n--\n\n "},
     // {"observe_channels", observe_channels_wrapper, METH_VARARGS, ""}, FIXME: callback is very ZMQ dependent (zhash and zmsg).
@@ -267,9 +267,9 @@ static PyMethodDef Ingescape_methods[] =
     {"service_has_replies", service_has_replies_wrapper, METH_VARARGS, "service_has_replies(service_name, )\n--\n\n "},
     {"service_has_reply", service_has_reply_wrapper, METH_VARARGS, "service_has_reply(service_name, reply_name, )\n--\n\n "},
     {"service_reply_names", service_reply_names_wrapper, METH_VARARGS, "service_reply_names(service_name, )\n--\n\n "},
-    {"service_reply_args_count", service_reply_args_count_wrapper, METH_VARARGS, "service_reply_args_count(service_name, )\n--\n\n "},
-    {"service_reply_args_list", service_reply_args_list_wrapper, METH_VARARGS, "service_reply_args_list(service_name, )\n--\n\n "},
-    {"service_reply_arg_exists", service_reply_arg_exists_wrapper, METH_VARARGS, "service_reply_arg_exists(service_name, argument_name, )\n--\n\n "},
+    {"service_reply_args_count", service_reply_args_count_wrapper, METH_VARARGS, "service_reply_args_count(service_name, reply_name, )\n--\n\n "},
+    {"service_reply_args_list", service_reply_args_list_wrapper, METH_VARARGS, "service_reply_args_list(service_name, reply_name, )\n--\n\n "},
+    {"service_reply_arg_exists", service_reply_arg_exists_wrapper, METH_VARARGS, "service_reply_arg_exists(service_name, reply_name, argument_name, )\n--\n\n "},
 
 
     //logs and debug messages
@@ -287,7 +287,7 @@ static PyMethodDef Ingescape_methods[] =
     {"log_file_path", log_file_path_wrapper, METH_NOARGS, "log_file_path()\n--\n\n "},
     {"log_set_console_level", log_set_console_level_wrapper, METH_VARARGS, "log_set_console_level(level, )\n--\n\n "},
     {"log_console_level", log_console_level_wrapper, METH_VARARGS, "log_console_level()\n--\n\n "},
-    {"log_set_file_level", log_set_file_level_wrapper, METH_VARARGS, "log_set_file_level(log_set_file_level, )\n--\n\n "},
+    {"log_set_file_level", log_set_file_level_wrapper, METH_VARARGS, "log_set_file_level(level, )\n--\n\n "},
     {"log_set_file_max_line_length", log_set_file_max_line_length_wrapper, METH_VARARGS,
         "log_set_file_max_line_length(size, )\n--\n\n "},
     {"log_include_data", log_include_data_wrapper, METH_VARARGS, "log_include_data(enable, )\n--\n\n "},
@@ -307,9 +307,9 @@ static PyMethodDef Ingescape_methods[] =
     // Real-time
     {"rt_get_current_timestamp", rt_get_current_timestamp_wrapper, METH_NOARGS, "rt_get_current_timestamp()\n--\n\n "},
     {"rt_set_timestamps", rt_set_timestamps_wrapper, METH_VARARGS, "rt_set_timestamps(enable, )\n--\n\n "},
-    {"rt_set_time", rt_set_time_wrapper, METH_VARARGS, "rt_timestamps()\n--\n\n "},
-    {"rt_time", rt_time_wrapper, METH_NOARGS, "rt_set_time(microseconds, )\n--\n\n "},
-    {"rt_timestamps", rt_timestamps_wrapper, METH_NOARGS, "rt_time()\n--\n\n "},
+    {"rt_set_time", rt_set_time_wrapper, METH_VARARGS, "rt_set_time(microseconds, )\n--\n\n "},
+    {"rt_time", rt_time_wrapper, METH_NOARGS, "rt_time()\n--\n\n "},
+    {"rt_timestamps", rt_timestamps_wrapper, METH_NOARGS, "rt_timestamps()\n--\n\n "},
     {"rt_set_synchronous_mode", rt_set_synchronous_mode_wrapper, METH_VARARGS, "rt_set_synchronous_mode(enable, )\n--\n\n "},
     {"rt_synchronous_mode", rt_synchronous_mode_wrapper, METH_NOARGS, "rt_synchronous_mode()\n--\n\n "},
 
@@ -353,10 +353,10 @@ static PyMethodDef Ingescape_methods[] =
     {"attribute_add_constraint", igs_attribute_add_constraint_wrapper, METH_VARARGS, "attribute_add_constraint(name, constraint, )\n--\n\n "},
     {"parameter_add_constraint", igs_parameter_add_constraint_wrapper, METH_VARARGS, "parameter_add_constraint(name, constraint, )\n--\n\n "},
     {"input_set_description", igs_input_set_description_wrapper, METH_VARARGS, "input_set_description(name, description, )\n--\n\n "},
-    {"input_description", igs_input_description_wrapper, METH_VARARGS, "input_description(name, description, )\n--\n\n "},
+    {"input_description", igs_input_description_wrapper, METH_VARARGS, "input_description(name, )\n--\n\n "},
     {"output_set_description", igs_output_set_description_wrapper, METH_VARARGS, "output_set_description(name, description, )\n--\n\n "},
-    {"output_description", igs_output_description_wrapper, METH_VARARGS, "output_description(name, description, )\n--\n\n "},
-    {"attribute_description", igs_attribute_description_wrapper, METH_VARARGS, "attribute_description(name, description, )\n--\n\n "},
+    {"output_description", igs_output_description_wrapper, METH_VARARGS, "output_description(name, )\n--\n\n "},
+    {"attribute_description", igs_attribute_description_wrapper, METH_VARARGS, "attribute_description(name, )\n--\n\n "},
     {"attribute_set_description", igs_attribute_set_description_wrapper, METH_VARARGS, "attribute_set_description(name, description, )\n--\n\n "},
     {"parameter_set_description", igs_parameter_set_description_wrapper, METH_VARARGS, "parameter_set_description(name, description, )\n--\n\n "},
     {"input_set_detailed_type", igs_input_set_detailed_type_wrapper, METH_VARARGS, "input_set_detailed_type(name, type_name, specification, )\n--\n\n "},
@@ -668,11 +668,11 @@ static PyMethodDef Agent_methods[] = {
     {"service_set_description", (PyCFunction) Agent_service_set_description, METH_VARARGS, "service_set_description(self, service_name, description)\n--\n\n "},
     {"service_description", (PyCFunction) Agent_service_description, METH_VARARGS, "service_description(self, service_name)\n--\n\n "},
     {"service_arg_set_description", (PyCFunction) Agent_service_arg_set_description, METH_VARARGS, "service_arg_set_description(self, service_name, arg_name, description)\n--\n\n "},
-    {"service_arg_description", (PyCFunction) Agent_service_arg_description, METH_VARARGS, "service_arg_description(self, arg_name, service_name)\n--\n\n "},
+    {"service_arg_description", (PyCFunction) Agent_service_arg_description, METH_VARARGS, "service_arg_description(self, service_name, arg_name)\n--\n\n "},
     {"service_reply_set_description", (PyCFunction) Agent_service_reply_set_description, METH_VARARGS, "service_reply_set_description(self, service_name, reply_name, description)\n--\n\n "},
-    {"service_reply_description", (PyCFunction) Agent_service_reply_description, METH_VARARGS, "service_reply_description(self, reply_name, service_name)\n--\n\n "},
+    {"service_reply_description", (PyCFunction) Agent_service_reply_description, METH_VARARGS, "service_reply_description(self, service_name, reply_name)\n--\n\n "},
     {"service_reply_arg_set_description", (PyCFunction) Agent_service_reply_arg_set_description, METH_VARARGS, "service_reply_arg_set_description(self, service_name, reply_name, arg_name, description)\n--\n\n "},
-    {"service_reply_arg_description", (PyCFunction) Agent_service_reply_arg_description, METH_VARARGS, "service_reply_arg_description(self, reply_name, arg_name, service_name)\n--\n\n "},
+    {"service_reply_arg_description", (PyCFunction) Agent_service_reply_arg_description, METH_VARARGS, "service_reply_arg_description(self, service_name, reply_name, arg_name)\n--\n\n "},
     {"service_reply_add", (PyCFunction) Agent_service_reply_add, METH_VARARGS, "service_reply_add(self, service_name, reply_name, )\n--\n\n "},
     {"service_reply_remove", (PyCFunction) Agent_service_reply_remove, METH_VARARGS, "service_reply_remove(self, service_name, reply_name, )\n--\n\n "},
     {"service_reply_arg_add", (PyCFunction) Agent_service_reply_arg_add, METH_VARARGS, "service_reply_arg_add(self, service_name, reply_name, arg_name, type, )\n--\n\n "},
@@ -680,9 +680,9 @@ static PyMethodDef Agent_methods[] = {
     {"service_has_replies", (PyCFunction) Agent_service_has_replies, METH_VARARGS, "service_has_replies(self, service_name, )\n--\n\n "},
     {"service_has_reply", (PyCFunction) Agent_service_has_reply, METH_VARARGS, "service_has_reply(self, service_name, reply_name, )\n--\n\n "},
     {"service_reply_names", (PyCFunction) Agent_service_reply_names, METH_VARARGS, "service_reply_names(self, service_name, )\n--\n\n "},
-    {"service_reply_args_count", (PyCFunction) Agent_service_reply_args_count, METH_VARARGS, "service_reply_args_count(self, service_name, )\n--\n\n "},
-    {"service_reply_args_list", (PyCFunction) Agent_service_reply_args_list, METH_VARARGS, "service_reply_args_list(self, service_name, )\n--\n\n "},
-    {"service_reply_arg_exists", (PyCFunction) Agent_service_reply_arg_exists, METH_VARARGS, "service_reply_arg_exists(self, service_name, argument_name, )\n--\n\n "},
+    {"service_reply_args_count", (PyCFunction) Agent_service_reply_args_count, METH_VARARGS, "service_reply_args_count(self, service_name, reply_name, )\n--\n\n "},
+    {"service_reply_args_list", (PyCFunction) Agent_service_reply_args_list, METH_VARARGS, "service_reply_args_list(self, service_name, reply_name, )\n--\n\n "},
+    {"service_reply_arg_exists", (PyCFunction) Agent_service_reply_arg_exists, METH_VARARGS, "service_reply_arg_exists(self, service_name, reply_name, argument_name, )\n--\n\n "},
     {"service_arg_add", (PyCFunction) Agent_service_arg_add, METH_VARARGS, "service_arg_add(self, service_name, arg_name, value_type, )\n--\n\n "},
     {"service_arg_remove", (PyCFunction) Agent_service_arg_remove, METH_VARARGS, "service_arg_remove(self, service_name, arg_name )\n--\n\n "},
     {"service_count", (PyCFunction) Agent_service_count, METH_NOARGS, "service_count(self, )\n--\n\n "},
@@ -701,7 +701,7 @@ static PyMethodDef Agent_methods[] = {
     // Real-time
     {"rt_get_current_timestamp", (PyCFunction) Agent_rt_get_current_timestamp, METH_NOARGS, "rt_get_current_timestamp(self, )\n--\n\n "},
     {"rt_set_timestamps", (PyCFunction) Agent_rt_set_timestamps, METH_VARARGS, "rt_set_timestamps(self, enable, )\n--\n\n "},
-    {"rt_timestamps", (PyCFunction) Agent_rt_timestamps, METH_NOARGS, "rt_time(self, )\n--\n\n "},
+    {"rt_timestamps", (PyCFunction) Agent_rt_timestamps, METH_NOARGS, "rt_timestamps(self, )\n--\n\n "},
     {"rt_set_synchronous_mode", (PyCFunction) Agent_rt_set_synchronous_mode, METH_VARARGS, "rt_set_synchronous_mode(self, enable, )\n--\n\n "},
     {"rt_synchronous_mode", (PyCFunction) Agent_rt_synchronous_mode, METH_NOARGS, "rt_synchronous_mode(self, )\n--\n\n "},
 
@@ -721,11 +721,11 @@ static PyMethodDef Agent_methods[] = {
     {"parameter_add_constraint", (PyCFunction) Agent_parameter_add_constraint, METH_VARARGS, "parameter_add_constraint(self, name, constraint, )\n--\n\n "},
 
     {"input_set_description", (PyCFunction) Agent_input_set_description, METH_VARARGS, "input_set_description(self, name, description, )\n--\n\n "},
-    {"input_description", (PyCFunction) Agent_input_description, METH_VARARGS, "input_description(self, name, description, )\n--\n\n "},
+    {"input_description", (PyCFunction) Agent_input_description, METH_VARARGS, "input_description(self, name, )\n--\n\n "},
     {"output_set_description", (PyCFunction) Agent_output_set_description, METH_VARARGS, "output_set_description(self, name, description, )\n--\n\n "},
-    {"output_description", (PyCFunction) Agent_output_description, METH_VARARGS, "output_description(self, name, description, )\n--\n\n "},
+    {"output_description", (PyCFunction) Agent_output_description, METH_VARARGS, "output_description(self, name, )\n--\n\n "},
     {"attribute_set_description", (PyCFunction) Agent_attribute_set_description, METH_VARARGS, "attribute_set_description(self, name, description, )\n--\n\n "},
-    {"attribute_description", (PyCFunction) Agent_attribute_description, METH_VARARGS, "attribute_description(self, name, description, )\n--\n\n "},
+    {"attribute_description", (PyCFunction) Agent_attribute_description, METH_VARARGS, "attribute_description(self, name, )\n--\n\n "},
     {"parameter_set_description", (PyCFunction) Agent_parameter_set_description, METH_VARARGS, "parameter_set_description(self, name, description, )\n--\n\n "},
 
     {"input_set_detailed_type", (PyCFunction) Agent_input_set_detailed_type, METH_VARARGS, "input_set_detailed_type(self, input_name, type_name, specification, )\n--\n\n "},
@@ -760,16 +760,21 @@ static PyTypeObject AgentType = {
 ////////////////////////////////////////////////////
 // Module creation
 
+// The compiled extension is named '_ingescape' so it stays a private submodule
+// of the 'ingescape' package. The public name 'ingescape' then resolves to the
+// package's __init__.py, alongside which we ship the py.typed marker and the
+// __init__.pyi stub required to expose type information (PEP 561:
+// https://peps.python.org/pep-0561/).
 static struct PyModuleDef init_ingescape_wrapper =
 {
     PyModuleDef_HEAD_INIT,
-    "ingescape", //    Name of the python module
+    "ingescape", //    Name reported as __module__ of the exposed objects
     "IngeScape", //    docstring of the module
     -1,
     Ingescape_methods
 };
 
-PyMODINIT_FUNC PyInit_ingescape(void)
+PyMODINIT_FUNC PyInit__ingescape(void)
 {
     Py_Initialize();
 
