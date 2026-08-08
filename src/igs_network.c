@@ -224,7 +224,7 @@ void s_handle_publication (zmsg_t **msg, igs_remote_agent_t *remote_agent)
             zframe_destroy(&frame); //size > 0 implies that frame exists
             shall_clean_data = true;
         }
-        
+
         // Publication does not provide information about the targeted agents in our
         // context. At this stage, we only know that one or more of our agents are
         // targeted. We need to iterate through our agents and their mappings to check
@@ -3015,6 +3015,15 @@ int s_manage_parent (zloop_t *loop, zsock_t *pipe, void *arg)
             printf("---HANDLE_PUBLICATION - %d (max: %d)\n", --handle_publications_balance, handle_publications_balance_max);
         model_read_write_unlock(__FUNCTION__, __LINE__);
     }
+    else if (streq (command, "STOP_TIMER")){
+        zframe_t* timer_ptr_f = zmsg_pop (msg);
+        assert(timer_ptr_f);
+        igs_timer_t* timer_ptr = (igs_timer_t*)zframe_data (timer_ptr_f);
+        assert(timer_ptr);
+        zframe_destroy (&timer_ptr_f);
+        zloop_timer_end (core_context->loop, timer_ptr->timer_id);
+        free (timer_ptr);
+    }
     //else: nothing to do so far
     free (command);
     if (msg)
@@ -3334,7 +3343,7 @@ void s_init_loop (igs_core_context_t *context)
 #if defined(__UNIX__) && !defined(__UTYPE_IOS)
         if (!context->network_ipc_folder_path)
             context->network_ipc_folder_path = strdup (IGS_DEFAULT_IPC_FOLDER_PATH);
-        
+
         if (!zsys_file_exists (context->network_ipc_folder_path)) {
             zsys_dir_create ("%s", context->network_ipc_folder_path);
             if (!zsys_file_exists (context->network_ipc_folder_path)) {
@@ -3343,11 +3352,11 @@ void s_init_loop (igs_core_context_t *context)
                 return;
             }
         }
-        
+
         int result = chmod(context->network_ipc_folder_path, 0777);
         if (result != EXIT_SUCCESS)
             igs_error("failed chmod 0777 for IPC folder at '%s'", context->network_ipc_folder_path);
-        
+
         s_lock_zyre_peer (__FUNCTION__, __LINE__);
         context->network_ipc_full_path = (char *) zmalloc (strlen (context->network_ipc_folder_path) + strlen (zyre_uuid (context->node)) + 2);
         sprintf (context->network_ipc_full_path, "%s/%s",
@@ -3369,7 +3378,7 @@ void s_init_loop (igs_core_context_t *context)
         s_lock_zyre_peer (__FUNCTION__, __LINE__);
         zyre_set_header (context->node, "ipc", "%s", context->network_ipc_endpoint);
         s_unlock_zyre_peer (__FUNCTION__, __LINE__);
-        
+
 #elif defined(__WINDOWS__)
         context->network_ipc_endpoint = strdup ("tcp://127.0.0.1:*");
         zsock_t *ipc_publisher = context->ipc_publisher = zsock_new_pub (context->network_ipc_endpoint);
@@ -5087,9 +5096,16 @@ void igs_timer_stop (int timer_id)
     igs_timer_t *timer = zlist_first(core_context->timers);
     while (timer) {
         if (timer->timer_id == timer_id) {
-            zloop_timer_end (core_context->loop, timer_id);
-            zlist_remove(core_context->timers, timer);
-            free (timer);
+            zlist_remove (core_context->timers, timer);
+            
+            //NOTE: zloop_timer_end must be called  from the thread handling the event loop to avoid race conditions.
+            //      We send a zmsg here to let the zloop cleanly end the timer and free the memory.
+            //      This avoids race conditions when different threads start/stop timers while the zloop is trying tu run their callbacks.
+            zmsg_t* m = zmsg_new();
+            zmsg_addstr(m, "STOP_TIMER");
+            zmsg_addmem(m, &timer, sizeof(igs_timer_t *));
+            zmsg_send(&m, core_context->internal_pipe);
+
             found_timer = true;
             break;
         }
