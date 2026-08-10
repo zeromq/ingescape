@@ -102,24 +102,22 @@ void admin_log (igsagent_t *agent,
     
     // generate log entries for stream and file
     va_list list;
-    va_start (list, fmt);
-    size_t full_log_length = vsnprintf (NULL, 0, fmt, list);
-    va_end (list);
-    size_t full_log_length_offset = 0;
     char *full_log_content_rectified = NULL;
+    size_t full_log_length_rectified = 0;
     if (core_context->log_in_file || (core_context->log_in_stream && core_context->logger)) {
-        full_log_content_rectified = (char*)zmalloc(core_context->log_file_max_line_length * 2 + 1);
-        char *full_log_content = (char*)zmalloc(core_context->log_file_max_line_length + 1);
-        va_start (list, fmt);
-        vsnprintf (full_log_content, core_context->log_file_max_line_length + 1, fmt, list);
-        va_end (list);
-        size_t j = 0;
-        for (size_t i = 0; i < full_log_length; i++) {
+         char *full_log_content = (char*)zmalloc(core_context->log_file_max_line_length + 1);
+         va_start (list, fmt);
+         vsnprintf (full_log_content, core_context->log_file_max_line_length + 1, fmt, list);
+         va_end (list);
+         size_t truncated_log_length = strnlen (full_log_content, core_context->log_file_max_line_length);
+         full_log_content_rectified = (char*)zmalloc(truncated_log_length * 2 + 1);
+
+         size_t j = 0;
+         for (size_t i = 0; i < truncated_log_length; i++) {
             if (full_log_content[i] == '\n') {
                 full_log_content_rectified[j] = '\\';
                 full_log_content_rectified[j + 1] = 'n';
                 j++;
-                full_log_length_offset++;
             } else if (full_log_content[i] == '\0')
                 break;
             else
@@ -128,6 +126,7 @@ void admin_log (igsagent_t *agent,
         }
         full_log_content_rectified[j] = '\0';
         free(full_log_content);
+        full_log_length_rectified = j;
     }
 
     
@@ -136,7 +135,7 @@ void admin_log (igsagent_t *agent,
                     agent->definition->name, log_levels[level], function, full_log_content_rectified);
     
     if (core_context->log_in_file && level >= core_context->log_file_level) {
-        full_log_content_rectified[full_log_length + full_log_length_offset] = '\0';
+        full_log_content_rectified[full_log_length_rectified] = '\0';
         if (!core_context->log_file && strlen (core_context->log_file_path) == 0) {
             // Current path is empty and log file is not already initiated, create
             // file with default path
