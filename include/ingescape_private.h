@@ -242,6 +242,7 @@ typedef struct igs_timer{
     int timer_id;
     igs_timer_fn *cb;
     void *my_data;
+    bool canceled;
 } igs_timer_t;
 
 

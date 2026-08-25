@@ -3762,7 +3762,8 @@ int s_manage_network_timer (zloop_t *loop, int timer_id, void *arg)
     IGS_UNUSED (loop)
     IGS_UNUSED (timer_id)
     igs_timer_t *timer = (igs_timer_t *) arg;
-    timer->cb (timer->timer_id, timer->my_data);
+    if (timer && !timer->canceled)
+        timer->cb (timer->timer_id, timer->my_data);
     return 1;
 }
 
@@ -5078,6 +5079,7 @@ int igs_timer_start (size_t delay, size_t times, igs_timer_fn cb, void *my_data)
     igs_timer_t *timer = (igs_timer_t *) zmalloc (sizeof (igs_timer_t));
     timer->cb = cb;
     timer->my_data = my_data;
+    timer->canceled = false;
     int res = timer->timer_id = zloop_timer(core_context->loop, delay, times, s_manage_network_timer, timer);
     zlist_append(core_context->timers, timer);
     model_read_write_unlock(__FUNCTION__, __LINE__);
@@ -5096,8 +5098,9 @@ void igs_timer_stop (int timer_id)
     igs_timer_t *timer = zlist_first(core_context->timers);
     while (timer) {
         if (timer->timer_id == timer_id) {
+            timer->canceled = true;
             zlist_remove (core_context->timers, timer);
-            
+
             //NOTE: zloop_timer_end must be called  from the thread handling the event loop to avoid race conditions.
             //      We send a zmsg here to let the zloop cleanly end the timer and free the memory.
             //      This avoids race conditions when different threads start/stop timers while the zloop is trying tu run their callbacks.
