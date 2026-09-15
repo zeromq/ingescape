@@ -10,11 +10,11 @@
     =========================================================================
 */
 
-const IGS = require(__dirname + "/../prebuilds/" + process.platform + "-" + process.arch + "/ingescape.node"); // igs js wrapper
-
+const IGS = require(__dirname + "/../index.js");
 
 const assert = require('assert');
 const commands = require('command-line-args');
+const { TextEncoder, TextDecoder } = require('util');
 
 const logLevelEnum = IGS.logLevels();
 const ioEnum = IGS.ioTypes();
@@ -189,6 +189,83 @@ function agentIOCallback(agent, type, name, valueType, value, data) {
             break;
         default:
             break;
+    }
+}
+
+//callbacks and variables for agent events (top-level, mirrors tester.c's agentEvent)
+let testerFirstAgentEntered = false;
+let testerFirstAgentKnowsUs = false;
+let testerFirstAgentExited = false;
+let testerSecondAgentEntered = false;
+let testerSecondAgentKnowsUs = false;
+let testerSecondAgentExited = false;
+function agentEventCallback(event, uuid, name, eventData, myData) {
+    console.log("agentEvent: in tester - " + event + " - " + uuid + " - " + name);
+    if (name === "firstAgent") {
+        if (event === agentEventEnum.IGS_AGENT_ENTERED)
+            testerFirstAgentEntered = true;
+        if (event === agentEventEnum.IGS_AGENT_KNOWS_US)
+            testerFirstAgentKnowsUs = true;
+        if (event === agentEventEnum.IGS_AGENT_EXITED)
+            testerFirstAgentExited = true;
+    } else if (name === "secondAgent") {
+        if (event === agentEventEnum.IGS_AGENT_ENTERED)
+            testerSecondAgentEntered = true;
+        if (event === agentEventEnum.IGS_AGENT_KNOWS_US)
+            testerSecondAgentKnowsUs = true;
+        if (event === agentEventEnum.IGS_AGENT_EXITED)
+            testerSecondAgentExited = true;
+    }
+}
+
+//callbacks and variables for agent events (per-agent, mirrors tester.c's agentEvent2)
+let firstSecondAgentEntered = false;
+let firstSecondAgentKnowsUs = false;
+let firstSecondAgentExited = false;
+let firstTesterAgentEntered = false;
+let firstTesterAgentKnowsUs = false;
+let firstTesterAgentExited = false;
+let secondFirstAgentEntered = false;
+let secondFirstAgentKnowsUs = false;
+let secondFirstAgentExited = false;
+let secondTesterAgentEntered = false;
+let secondTesterAgentKnowsUs = false;
+let secondTesterAgentExited = false;
+function agentEventCallback2(agent, event, uuid, name, eventData, myData) {
+    let thisAgentName = agent.name();
+    console.log("agentEvent2: in " + thisAgentName + " - " + event + " - " + uuid + " - " + name);
+    if (agent === firstAgent) {
+        if (name === agentName) {
+            if (event === agentEventEnum.IGS_AGENT_ENTERED)
+                firstTesterAgentEntered = true;
+            if (event === agentEventEnum.IGS_AGENT_KNOWS_US)
+                firstTesterAgentKnowsUs = true;
+            if (event === agentEventEnum.IGS_AGENT_EXITED)
+                firstTesterAgentExited = true;
+        } else if (name === "secondAgent") {
+            if (event === agentEventEnum.IGS_AGENT_ENTERED)
+                firstSecondAgentEntered = true;
+            if (event === agentEventEnum.IGS_AGENT_KNOWS_US)
+                firstSecondAgentKnowsUs = true;
+            if (event === agentEventEnum.IGS_AGENT_EXITED)
+                firstSecondAgentExited = true;
+        }
+    } else if (agent === secondAgent) {
+        if (name === agentName) {
+            if (event === agentEventEnum.IGS_AGENT_ENTERED)
+                secondTesterAgentEntered = true;
+            if (event === agentEventEnum.IGS_AGENT_KNOWS_US)
+                secondTesterAgentKnowsUs = true;
+            if (event === agentEventEnum.IGS_AGENT_EXITED)
+                secondTesterAgentExited = true;
+        } else if (name === "firstAgent") {
+            if (event === agentEventEnum.IGS_AGENT_ENTERED)
+                secondFirstAgentEntered = true;
+            if (event === agentEventEnum.IGS_AGENT_KNOWS_US)
+                secondFirstAgentKnowsUs = true;
+            if (event === agentEventEnum.IGS_AGENT_EXITED)
+                secondFirstAgentExited = true;
+        }
     }
 }
 
@@ -1396,9 +1473,11 @@ assert(IGS.inputInt("my_int") === 0);
 IGS.inputSetImpulsion("my_double");
 assert(IGS.inputDouble("my_double")  < 0.000001);
 IGS.inputSetImpulsion("my_string");
-assert(IGS.inputString("my_string").length === 0);
+assert(!IGS.inputString("my_string"));
 IGS.inputSetImpulsion("my_data");
 assert(IGS.inputData("my_data") === null);
+
+IGS.outputSetImpulsion("my_impulsion");
 
 IGS.inputSetBool("my_impulsion", true);
 IGS.inputSetBool("my_bool", true);
@@ -1445,18 +1524,36 @@ IGS.inputSetString("my_double", "3.3");
 assert(IGS.inputDouble("my_double") - 3.3 < 0.000001);
 IGS.inputSetString("my_string", "3.3");
 assert(IGS.inputString("my_string") === "3.3");
-assert(IGS.inputSetString("my_data", "toto") === igsResultEnum.IGS_FAILURE);
-assert(IGS.inputSetString("my_data", "0123456789abcdef") === igsResultEnum.IGS_SUCCESS);
+assert(IGS.inputSetString("my_data", "this is a test string") === igsResultEnum.IGS_SUCCESS); //converted as raw data
+assert(IGS.inputData("my_data").byteLength === "this is a test string".length + 1);
+assert(IGS.inputSetString("my_data", "0123456789abcdef") === igsResultEnum.IGS_SUCCESS); //parsed as hexadecimal data
 assert(IGS.inputData("my_data").byteLength === 8);
+assert(IGS.inputSetString("my_data", "") === igsResultEnum.IGS_SUCCESS);
+assert(IGS.inputData("my_data").byteLength === 1);
 
 
-IGS.inputSetData("my_impulsion", new ArrayBuffer(32));
-IGS.inputSetData("my_bool", new ArrayBuffer(32));
-IGS.inputSetData("my_int", new ArrayBuffer(32));
-IGS.inputSetData("my_double", new ArrayBuffer(32));
-IGS.inputSetData("my_string", new ArrayBuffer(32));
-IGS.inputSetData("my_data", new ArrayBuffer(32));
-assert(IGS.inputData("my_data").byteLength === 32);
+let rawData = new TextEncoder().encode("my raw data\0").buffer; // 12 bytes, mirrors a null-terminated C string
+assert(IGS.inputSetData("my_impulsion", rawData) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.inputSetData("my_bool", rawData) === igsResultEnum.IGS_FAILURE);
+assert(IGS.inputSetData("my_int", rawData) === igsResultEnum.IGS_FAILURE);
+assert(IGS.inputSetData("my_double", rawData) === igsResultEnum.IGS_FAILURE);
+assert(IGS.inputSetData("my_string", rawData) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.inputString("my_string") === "my raw data");
+assert(IGS.inputSetData("my_data", rawData) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.inputData("my_data").byteLength === 12);
+assert(new TextDecoder().decode(IGS.inputData("my_data")) === "my raw data\0");
+
+IGS.inputSetBool("my_bool", false);
+assert(IGS.inputSetData("my_bool", new Uint8Array([1]).buffer) === igsResultEnum.IGS_SUCCESS); //sizeof(bool)
+assert(IGS.inputBool("my_bool"));
+
+IGS.inputSetInt("my_int", 0);
+assert(IGS.inputSetData("my_int", new Int32Array([123456]).buffer) === igsResultEnum.IGS_SUCCESS); //sizeof(int)
+assert(IGS.inputInt("my_int") === 123456);
+
+IGS.inputSetDouble("my_double", 0.0);
+assert(IGS.inputSetData("my_double", new Float64Array([123.456]).buffer) === igsResultEnum.IGS_SUCCESS); //sizeof(double)
+assert(IGS.inputDouble("my_double") === 123.456);
 
 IGS.inputSetBool("my_bool", true);
 assert(IGS.inputBool("my_bool"));
@@ -1503,15 +1600,26 @@ assert(IGS.inputInt("my_string") === 10);
 assert(IGS.inputDouble("my_string") - 10.1 < 0.000001);
 assert(IGS.inputString("my_string") === "10.1");
 assert(IGS.inputData("my_string").byteLength === 5);
+IGS.inputSetString("my_string", "");
+assert(IGS.inputString("my_string") === "");
 
 IGS.inputSetData("my_data", null);
 assert(!IGS.inputBool("my_data"));
-IGS.inputSetData("my_data", new ArrayBuffer(16));
+IGS.inputSetData("my_data", new TextEncoder().encode("my data\0").buffer);
 assert(!IGS.inputBool("my_data"));
 assert(IGS.inputInt("my_data") === 0);
 assert(IGS.inputDouble("my_data") < 0.000001);
-assert(IGS.inputString("my_data") === "");
-assert(IGS.inputData("my_data").byteLength === 16);
+assert(!IGS.inputString("my_data"));
+assert(IGS.inputData("my_data").byteLength === 8);
+assert(new TextDecoder().decode(IGS.inputData("my_data")) === "my data\0");
+
+//zero-size data is always read back as null, regardless of the buffer passed
+assert(IGS.inputSetData("my_data", new ArrayBuffer(0)) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.inputData("my_data") === null);
+assert(IGS.inputSetData("my_data", new TextEncoder().encode("").buffer) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.inputData("my_data") === null);
+assert(IGS.inputSetData("my_data", null) === igsResultEnum.IGS_SUCCESS);
+assert(IGS.inputData("my_data") === null);
 
 //add multiple agents to be enabled and disabled on demand
 //first additional agent is activated immediately
@@ -1723,24 +1831,23 @@ secondAgent.splitAdd("second_string_split", "firstAgent", "first_string");
 secondAgent.splitAdd("second_data_split", "firstAgent", "first_data");
 
 //test mapping in same process between second_agent and first_agent
-secondAgent.activate();
-firstAgent.outputSetBool("first_bool", true);
-firstAgent.outputSetBool("first_bool", false);
-firstAgent.outputSetInt("first_int", 5);
-firstAgent.outputSetDouble("first_double", 5.5);
-firstAgent.outputSetString("first_string", "test string mapping");
-firstAgent.outputSetData("first_data", new ArrayBuffer(16));
+//NB: these tests have been obsolete since the delegation of internal
+//publication handling to the ingescape zloop. Internal mappings require
+//a running ingescape loop in order to work properly.
+//secondAgent.activate();
+//firstAgent.outputSetBool("first_bool", true);
+//assert(secondAgent.inputBool("second_bool"));
+//firstAgent.outputSetBool("first_bool", false);
+//assert(!secondAgent.inputBool("second_bool"));
+//firstAgent.outputSetInt("first_int", 5);
+//assert(secondAgent.inputInt("second_int") === 5);
+//firstAgent.outputSetDouble("first_double", 5.5);
+//assert(secondAgent.inputDouble("second_double") - 5.5 < 0.000001);
+//firstAgent.outputSetString("first_string", "test string mapping");
+//assert(secondAgent.inputString("second_string") === "test string mapping");
+//firstAgent.outputSetData("first_data", new ArrayBuffer(16));
+//assert(secondAgent.inputData("second_data").byteLength === 16);
 
-checkMappedValues();
-async function checkMappedValues() {
-    await sleep(1); // Wait a bit for the propagation through the mappings
-    assert(secondAgent.inputBool("second_bool"));
-    assert(!secondAgent.inputBool("second_bool"));
-    assert(secondAgent.inputInt("second_int") === 5);
-    assert(secondAgent.inputDouble("second_double") - 5.5 < 0.000001);
-    assert(secondAgent.inputString("second_string") === "test string mapping");
-    assert(secondAgent.inputData("second_data").byteLength === 16);
-}
 function sleep(ms) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
@@ -1771,53 +1878,88 @@ assert(IGS.electionLeave("my other election") === igsResultEnum.IGS_SUCCESS);
 
 IGS.agentSetFamily("family_test");
 
-//TODO : test agent events in same process
+//test agent events in same process
+(async () => {
+    secondAgent.deactivate();
+    firstAgent.deactivate();
+    IGS.observeAgentEvents(agentEventCallback, null);
+    firstAgent.observeAgentEvents(agentEventCallback2, null);
+    secondAgent.observeAgentEvents(agentEventCallback2, null);
+    firstAgent.activate();
+    await sleep(10); // let the (asynchronous) agent event callbacks run
+    assert(testerFirstAgentEntered);
+    assert(testerFirstAgentKnowsUs);
+    assert(firstTesterAgentEntered);
+    assert(firstTesterAgentKnowsUs);
+    secondAgent.activate();
+    await sleep(10);
+    assert(secondFirstAgentEntered);
+    assert(secondFirstAgentKnowsUs);
+    assert(secondTesterAgentEntered);
+    assert(secondTesterAgentKnowsUs);
+    assert(testerSecondAgentEntered);
+    assert(testerSecondAgentKnowsUs);
+    assert(firstSecondAgentEntered);
+    assert(firstSecondAgentKnowsUs);
+    firstAgent.deactivate();
+    await sleep(10);
+    assert(testerFirstAgentExited);
+    assert(secondFirstAgentExited);
+    secondAgent.deactivate();
+    await sleep(10);
+    assert(testerSecondAgentExited);
 
-// Real time communications
-IGS.rtGetCurrentTimestamp(); // N.B.: no way to assert, just call method
-IGS.rtSetTimestamps(true);
-assert(IGS.rtTimestamps())
-IGS.rtSetTime(1000);
-assert(IGS.rtTime() === 1000)
-IGS.rtSetSynchronousMode(true);
-assert(IGS.rtSynchronousMode());
+    //reactivate both agents for the remainder of the test run
+    firstAgent.activate();
+    secondAgent.activate();
+    await sleep(10);
 
-if (staticTests) {
-    //we terminate now after passing the static tests
-    secondAgent.destroy();
-    delete secondAgent;
-    firstAgent.destroy();
-    delete firstAgent;
-    process.exit();
-}
-else {
-    //we run normally
-    if (networkDevice === undefined) {
-        // we have no device to start with: try to find one
-        let devices = IGS.netDevicesList();
-        let nb = devices.length;
-        if (nb === 1) {
-            // we have exactly one compliant network device available: we use it
-            networkDevice = devices[0];
-            IGS.info("using " + networkDevice + " as default network device (this is the only one available)");
-        } else {
-            if (nb === 0) {
-                IGS.error("No network device found: aborting.");
-                process.exit(1);
-            }
-            else {
-                IGS.error("No network device passed as command line parameter and several are available.");
-                console.log("Please use one of these network devices:");
-                for (let i = 0; i < nb; i++){
-                    console.log("\t" + devices[i]);
+    // Real time communications
+    IGS.rtGetCurrentTimestamp(); // N.B.: no way to assert, just call method
+    IGS.rtSetTimestamps(true);
+    assert(IGS.rtTimestamps())
+    IGS.rtSetTime(1000);
+    assert(IGS.rtTime() === 1000)
+    IGS.rtSetSynchronousMode(true);
+    assert(IGS.rtSynchronousMode());
+
+    if (staticTests) {
+        //we terminate now after passing the static tests
+        secondAgent.destroy();
+        delete secondAgent;
+        firstAgent.destroy();
+        delete firstAgent;
+        process.exit();
+    }
+    else {
+        //we run normally
+        if (networkDevice === undefined) {
+            // we have no device to start with: try to find one
+            let devices = IGS.netDevicesList();
+            let nb = devices.length;
+            if (nb === 1) {
+                // we have exactly one compliant network device available: we use it
+                networkDevice = devices[0];
+                IGS.info("using " + networkDevice + " as default network device (this is the only one available)");
+            } else {
+                if (nb === 0) {
+                    IGS.error("No network device found: aborting.");
+                    process.exit(1);
                 }
-                printUsage();
-                process.exit(1);
+                else {
+                    IGS.error("No network device passed as command line parameter and several are available.");
+                    console.log("Please use one of these network devices:");
+                    for (let i = 0; i < nb; i++){
+                        console.log("\t" + devices[i]);
+                    }
+                    printUsage();
+                    process.exit(1);
+                }
             }
         }
+        firstAgent.activate();
     }
-    firstAgent.activate();
-}
+})();
 
 // Stop the agent when server receive SIGINT signal
 process.on('SIGINT', function() {
