@@ -939,8 +939,6 @@ package-python-wheels-manylinux_2_24_x86_64:
     - mkdir -p ./dependencies/linux/
     - export PLATFORM="linux"
     - ./prepare_for_packaging.sh
-    - python3.8  -m pip install --upgrade build
-    - python3.8  -m build
     - python3.9  -m pip install --upgrade build
     - python3.9  -m build
     - python3.10 -m pip install --upgrade build
@@ -974,8 +972,6 @@ package-python-wheels-manylinux2014_x86_64:
     - cd ./bindings/python/
     - export PLATFORM="linux"
     - ./prepare_for_packaging.sh
-    - python3.8  -m pip install --upgrade build
-    - python3.8  -m build
     - python3.9  -m pip install --upgrade build
     - python3.9  -m build
     - python3.10 -m pip install --upgrade build

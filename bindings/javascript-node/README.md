@@ -7,11 +7,13 @@ Ingescape NodeJS embeds the Ingescape C library (statically linked) and uses n-a
 ## Prerequisites
 
 * NodeJS (https://nodejs.org/en/download/)
+* Python 3.8 to 3.11, **only if you plan to build the native addon yourself** (see below). This is not required to simply `npm install ingescape`, since prebuilt binaries are downloaded/used automatically via `node-gyp-build`.
+  Newer Python versions (3.12+) removed the `distutils` module from the standard library, which `node-gyp` (used internally by `prebuildify`) still depends on.
 
 
 ## Installing
 
-You can install ingescape with npm. 
+You can install ingescape with npm.
 ```
 npm install ingescape
 ```
@@ -21,7 +23,7 @@ Two examples of ingescape agents are provided in the directory ./examples. The m
 
 ## Building your own ingescape Node package
 
-Install `prebuildify` to build the package : 
+Install `prebuildify` to build the package :
 
 ```bash
 npm install prebuildify
@@ -29,11 +31,13 @@ npm install prebuildify
 
 Replace the paths to the static ingescape library with your owns in the binding.gyp file.
 
-Then, build your own ingescape package : 
+Then, build your own ingescape package :
 
 ```bash
 npm run build
 ```
+
+If the build fails with a `ModuleNotFoundError: No module named 'distutils'` error, see the Python note under Prerequisites above.
 
 Your package will be built in `./prebuilds/{platform}-{arch}/node.napi.node`.
 
