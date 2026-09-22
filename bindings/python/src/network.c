@@ -25,10 +25,12 @@ PyObject * start_with_device_wrapper(PyObject * self, PyObject * args)
     if (!PyArg_ParseTuple(args, "Ui", &netDeviceUnicode, &port))
         return NULL;
     PyObject* localeEncoded = PyUnicode_EncodeLocale(netDeviceUnicode, NULL);
-    Py_DECREF(netDeviceUnicode);
+    if (localeEncoded == NULL)
+        return NULL;
     char * networkDevice = PyBytes_AsString(localeEncoded);
+    int result = igs_start_with_device(networkDevice, port);
     Py_DECREF(localeEncoded);
-    return PyLong_FromLong(igs_start_with_device(networkDevice, port));
+    return PyLong_FromLong(result);
 }
 
 PyObject * start_with_ip_wrapper(PyObject * self, PyObject * args)
@@ -145,13 +147,14 @@ PyObject * observe_freeze_wrapper(PyObject *self, PyObject *args)
 {
     PyObject *temp;
     PyObject *temparglist;
-    PyObject arg;
+    PyObject *arg;
     if (PyArg_ParseTuple(args, "OO", &temp, &arg)) {
         if (!PyCallable_Check(temp)) {
             PyErr_SetString(PyExc_TypeError, "parameter must be callable");
             return NULL;
         }
-    }
+    } else
+        return NULL;
     Py_XINCREF(temp);
     temparglist = Py_BuildValue("O", arg);
     freezeCallback_t *newElt = calloc(1, sizeof(freezeCallback_t));
@@ -221,14 +224,15 @@ void stop_callback(void *myData){
 PyObject * observe_forced_stop_wrapper(PyObject *self, PyObject *args)
 {
     PyObject *temp;
-    PyObject arg;
+    PyObject *arg;
     PyObject *tempargstopList;
     if (PyArg_ParseTuple(args, "OO", &temp, &arg)) {
         if (!PyCallable_Check(temp)) {
             PyErr_SetString(PyExc_TypeError, "parameter must be callable");
             return NULL;
         }
-    }
+    } else
+        return NULL;
     Py_XINCREF(temp);
     tempargstopList = Py_BuildValue("(O)", arg);
     stopCallback_t *newElt = calloc(1, sizeof(stopCallback_t));

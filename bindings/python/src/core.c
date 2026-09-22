@@ -291,7 +291,8 @@ PyObject * observe_agent_events_wrapper(PyObject *self, PyObject *args)
             PyErr_SetString(PyExc_TypeError, "parameter must be callable");
             return NULL;
         }
-    }
+    } else
+        return NULL;
     agentEventCallback_t *newElt = calloc(1, sizeof(agentEventCallback_t));
     Py_INCREF(my_data);
     newElt->my_data = my_data;
@@ -468,7 +469,7 @@ PyObject * input_string_wrapper(PyObject * self, PyObject * args)
         result = NULL;
         return ret;
     }else
-        return Py_None;
+        Py_RETURN_NONE;
 }
 
 PyObject * input_data_wrapper(PyObject * self, PyObject * args)
@@ -576,7 +577,7 @@ PyObject * output_string_wrapper(PyObject * self, PyObject * args)
         result = NULL;
         return ret;
     }else
-        return Py_None;
+        Py_RETURN_NONE;
 }
 
 PyObject * output_data_wrapper(PyObject * self, PyObject * args)
@@ -713,7 +714,7 @@ PyObject * s_param_attr_string_wrapper(PyObject * self, PyObject * args, param_a
         result = NULL;
         return ret;
     }else
-        return Py_None;
+        Py_RETURN_NONE;
 }
 
 PyObject * attribute_string_wrapper(PyObject * self, PyObject * args)
@@ -913,6 +914,7 @@ void observe(igs_io_type_t ioType, const char* name, igs_io_value_type_t valueTy
             PyTuple_SetItem(tupleArgs, 3, Py_BuildValue("s", (char*)value));
             break;
         case IGS_IMPULSION_T:
+            Py_INCREF(Py_None);
             PyTuple_SetItem(tupleArgs, 3, Py_None);
             break;
         case IGS_DATA_T:
@@ -1779,6 +1781,8 @@ PyObject * service_call_wrapper(PyObject * self, PyObject * args)
         else if(!PyTuple_Check(argTuple))
             format = 1;
     }
+    else
+        return NULL;
     int result;
     if(format == 2)
     {
@@ -1865,6 +1869,7 @@ void observeCall(const char *senderAgentName, const char *senderAgentUUID,
                         PyTuple_SetItem(tupleArgs, index, Py_BuildValue("s", currentArg->c));
                         break;
                     case IGS_IMPULSION_T:
+                        Py_INCREF(Py_None);
                         PyTuple_SetItem(tupleArgs, index, Py_None);
                         break;
                     case IGS_DATA_T:
@@ -1895,7 +1900,8 @@ PyObject * service_init_wrapper(PyObject *self, PyObject *args)
             PyErr_SetString(PyExc_TypeError, "parameter must be callable");
             return NULL;
         }
-    }
+    } else
+        return NULL;
     Py_XINCREF(temp);
     temparglist = Py_BuildValue("O", arg);
     Py_INCREF(temparglist);
