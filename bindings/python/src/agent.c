@@ -492,10 +492,13 @@ void agentObserveEventsCB(igsagent_t *agent,
     PyTuple_SetItem(tupleArgs, 3, Py_BuildValue("s", name));
     if (event == IGS_AGENT_WON_ELECTION || event == IGS_AGENT_LOST_ELECTION)
         PyTuple_SetItem(tupleArgs, 4, Py_BuildValue("s", (char*)event_data));
-    else if (event == IGS_PEER_ENTERED)
-        PyTuple_SetItem(tupleArgs, 4,Py_None); // FIXME: cast zhash into python item
-    else
+    else if (event == IGS_PEER_ENTERED) {
+        Py_INCREF(Py_None);
+        PyTuple_SetItem(tupleArgs, 4, Py_None); // FIXME: cast zhash into python item
+    } else {
+        Py_INCREF(Py_None);
         PyTuple_SetItem(tupleArgs, 4, Py_None);
+    }
 
     agentObserveEventsCB_t* agentEventCBIt = NULL;
     DL_FOREACH(agentObserveEventsCBList, agentEventCBIt) {
@@ -1415,6 +1418,7 @@ void agent_observe(igsagent_t* agent, igs_io_type_t ioType, const char* name, ig
             PyTuple_SetItem(tupleArgs, 4, Py_BuildValue("s", (char*)value));
             break;
         case IGS_IMPULSION_T:
+            Py_INCREF(Py_None);
             PyTuple_SetItem(tupleArgs, 4, Py_None);
             break;
         case IGS_DATA_T:
@@ -2010,6 +2014,7 @@ void agentServiceCB(igsagent_t *agent,
                 PyTuple_SetItem(serviceArgsTuple, argIdx, Py_BuildValue("s", argIt->c));
                 break;
             case IGS_IMPULSION_T:
+                Py_INCREF(Py_None);
                 PyTuple_SetItem(serviceArgsTuple, argIdx, Py_None);
                 break;
             case IGS_DATA_T:
@@ -2050,7 +2055,8 @@ PyObject *Agent_service_init(AgentObject *self, PyObject *args, PyObject *kwds)
             PyErr_SetString(PyExc_TypeError, "parameter 3 must be callable");
             return PyLong_FromLong(IGS_FAILURE);;
         }
-    }
+    } else
+        return NULL;
     igs_result_t result = igsagent_service_init(self->agent, serviceName, agentServiceCB, NULL);
     if (result == IGS_SUCCESS) {
         agentServiceCB_t *newElt = calloc(1, sizeof(agentServiceCB_t));
