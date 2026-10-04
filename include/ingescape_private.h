@@ -471,6 +471,7 @@ typedef struct igs_core_context {
     char *network_ipc_folder_path;
     char *network_ipc_full_path;
     char *network_ipc_endpoint;
+    bool network_ipc_readable_by_all_users;
     zhashx_t *zyre_peers; //igs_zyre_peer_t
     zlist_t *zyre_callbacks; //igs_channels_wrapper_t
     zhashx_t *agents; //igsagent_t, all active agents we own

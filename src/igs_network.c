@@ -3370,6 +3370,11 @@ void s_init_loop (igs_core_context_t *context)
             igs_fatal("could not open ipc socket at %s, the ingescape agent will NOT start.", context->network_ipc_endpoint);
             return;
         }
+        if (context->network_ipc_readable_by_all_users){
+            result = chmod(context->network_ipc_full_path, 0777);
+            if (result != EXIT_SUCCESS)
+                igs_error("failed chmod 0777 for IPC socket at '%s'", context->network_ipc_full_path);
+        }
         if (context->security_is_enabled) {
             zcert_apply (context->security_cert, context->ipc_publisher);
             zsock_set_curve_server (context->ipc_publisher, 1);
@@ -4925,6 +4930,12 @@ const char *igs_ipc_dir (void)
     return res;
 }
 
+void igs_set_ipc_readable_by_all_users(bool allow){
+    core_init_agent ();
+    model_read_write_lock(__FUNCTION__, __LINE__);
+    core_context->network_ipc_readable_by_all_users = allow;
+    model_read_write_unlock(__FUNCTION__, __LINE__);
+}
 
 void igs_set_inproc (bool allow)
 {

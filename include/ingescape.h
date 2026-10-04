@@ -31,8 +31,8 @@
 
 //  INGESCAPE version macros for compile-time API detection
 #define INGESCAPE_VERSION_MAJOR 4
-#define INGESCAPE_VERSION_MINOR 6
-#define INGESCAPE_VERSION_PATCH 8
+#define INGESCAPE_VERSION_MINOR 7
+#define INGESCAPE_VERSION_PATCH 0
 
 #define INGESCAPE_MAKE_VERSION(major, minor, patch) \
 ((major) * 10000 + (minor) * 100 + (patch))
@@ -864,7 +864,7 @@ INGESCAPE_EXPORT void igs_mapping_save(void);
  Ingescape automatically detects agents on the same computer
  and then uses optimized inter-process communication protocols
  depending on the operating system.
- • On UNIX systems, UNIX domain sockets are used that require a
+ • On UNIX systems, UNIX domain sockets are used and require a
  path whose default value is '/tmp/ingescape/' completed by the
  agent UUID.
  • On Microsoft Windows systems, the loopback is used.
@@ -875,6 +875,17 @@ INGESCAPE_EXPORT bool igs_has_ipc(void);
 // UNIX only to set IPC folder path (default is /tmp/ingescape/)
 INGESCAPE_EXPORT void igs_set_ipc_dir(const char *path);
 INGESCAPE_EXPORT const char * igs_ipc_dir(void);
+/*
+ In some situations, agents running on the same computer may be
+ executed by different users on this computer. By default, IPC sockets
+ are created with the 755 rights, blocking IPC communications between
+ distinct users. The igs_set_ipc_readable_by_all_users sets the IPC
+ socket with 777 rights.
+ To take effect, this function shall be called before calling
+ igs_start_* functions.
+ TO BE USED WITH CAUTION TO AVOID SECURITY ISSUES
+ */
+INGESCAPE_EXPORT void igs_set_ipc_readable_by_all_users(bool allow);
 /*When agents are in the same process, using the igsagent functions,
  they automatically communicate using shared memory.*/
 INGESCAPE_EXPORT void igs_set_inproc(bool allow); //default is true
