@@ -8,7 +8,7 @@ cmake_minimum_required(VERSION 3.16)
 option(WITH_CSHARP_WRAPPER "Compile the library with CSHARP Binding" OFF)
 
 if (APPLE)
-  set(CMAKE_OSX_DEPLOYMENT_TARGET "10.11" CACHE STRING "Minimum OS X deployment version")
+  set(CMAKE_OSX_DEPLOYMENT_TARGET "12.0" CACHE STRING "Minimum OS X deployment version")
   set(CMAKE_OSX_SYSROOT "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/")
   set(CMAKE_CXX_FLAGS "--sysroot ${CMAKE_OSX_SYSROOT} ${CMAKE_CXX_FLAGS}")
   set(CMAKE_SKIP_BUILD_RPATH FALSE)

@@ -565,6 +565,7 @@
 					"$(SRCROOT)/../../../dependencies/libzmq/include",
 					"$(SRCROOT)/../../../dependencies/zyre/include",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 26.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -586,6 +587,7 @@
 					"$(SRCROOT)/../../../dependencies/libzmq/include",
 					"$(SRCROOT)/../../../dependencies/zyre/include",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 26.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

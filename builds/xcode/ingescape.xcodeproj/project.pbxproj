@@ -91,6 +91,20 @@
 			remoteGlobalIDString = 09EC3B469DCA4742B74EA815;
 			remoteInfo = test_pubsub_topics_count;
 		};
+		972FD702306D2AFB0012FF05 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = C7068EB63B434D20922C4757;
+			remoteInfo = curve_keygen;
+		};
+		972FD704306D2AFB0012FF05 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97A3BDDC25AF36C9004BD834 /* ZeroMQ.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 243A07985B2D484D92DC349E;
+			remoteInfo = test_peer_disconnect;
+		};
 		974D746B25D29BE10049C183 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 97A3BDD025AF36B8004BD834 /* sodium.xcodeproj */;
@@ -1441,6 +1455,7 @@
 		97A3BDDD25AF36C9004BD834 /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				972FD703306D2AFB0012FF05 /* curve_keygen */,
 				97A3BE6325AF36CA004BD834 /* libzmq.dylib */,
 				97A3BE6525AF36CA004BD834 /* libzmq.a */,
 				97A3BE6725AF36CA004BD834 /* libobjects.a */,
@@ -1494,6 +1509,7 @@
 				97A3BEC525AF36CA004BD834 /* test_pair_ipc */,
 				97A3BEC725AF36CA004BD834 /* test_pair_tcp */,
 				97A3BEC925AF36CA004BD834 /* test_peer */,
+				972FD705306D2AFB0012FF05 /* test_peer_disconnect */,
 				97A3BECB25AF36CA004BD834 /* test_poller */,
 				97A3BECD25AF36CA004BD834 /* test_probe_router */,
 				97A3BECF25AF36CA004BD834 /* test_proxy */,
@@ -1914,6 +1930,20 @@
 			fileType = "compiled.mach-o.executable";
 			path = test_pubsub_topics_count;
 			remoteRef = 9709238129E54A030019C6E5 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		972FD703306D2AFB0012FF05 /* curve_keygen */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = curve_keygen;
+			remoteRef = 972FD702306D2AFB0012FF05 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		972FD705306D2AFB0012FF05 /* test_peer_disconnect */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_peer_disconnect;
+			remoteRef = 972FD704306D2AFB0012FF05 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		974D746C25D29BE10049C183 /* libsodium_objects.a */ = {
@@ -3049,7 +3079,7 @@
 					"$(SRCROOT)/../../dependencies/czmq/include",
 					"$(SRCROOT)/../../dependencies/zyre/include",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 11.1;
+				MACOSX_DEPLOYMENT_TARGET = 26.6;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = ingescape;
@@ -3081,7 +3111,7 @@
 					"$(SRCROOT)/../../dependencies/czmq/include",
 					"$(SRCROOT)/../../dependencies/zyre/include",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 11.1;
+				MACOSX_DEPLOYMENT_TARGET = 26.6;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = ingescape;
 				SDKROOT = macosx;
@@ -3121,7 +3151,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "";
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ingescape;
 				PRODUCT_NAME = ingescape;
 				SDKROOT = macosx;
@@ -3163,7 +3193,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "";
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ingescape;
 				PRODUCT_NAME = ingescape;
 				SDKROOT = macosx;
